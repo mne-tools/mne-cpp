@@ -178,6 +178,9 @@ bool SurfaceSet::read(const QString& p_sLHFileName, const QString& p_sRHFileName
         }
     }
 
+    if(p_SurfaceSet.m_qMapSurfs.isEmpty())
+        return false;
+
     p_SurfaceSet.calcOffset();
 
     return true;

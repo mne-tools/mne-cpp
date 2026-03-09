@@ -164,6 +164,9 @@ bool AnnotationSet::read(const QString& p_sLHFileName, const QString& p_sRHFileN
         }
     }
 
+    if(p_AnnotationSet.m_qMapAnnots.isEmpty())
+        return false;
+
     return true;
 }
 

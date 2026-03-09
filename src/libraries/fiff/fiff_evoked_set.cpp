@@ -120,7 +120,17 @@ FiffEvokedSet FiffEvokedSet::pick_channels(const QStringList& include,
                                            const QStringList& exclude) const
 {
     FiffEvokedSet res;
-    res.info = this->info;
+
+    //
+    //   Update info to match the channel selection
+    //
+    RowVectorXi sel = FiffInfo::pick_channels(this->info.ch_names, include, exclude);
+    if (sel.cols() > 0) {
+        res.info = this->info.pick_info(sel);
+    } else {
+        res.info = this->info;
+    }
+
     QList<FiffEvoked>::ConstIterator ev;
     for(ev = evoked.begin(); ev != evoked.end(); ++ev)
         res.evoked.push_back(ev->pick_channels(include, exclude));

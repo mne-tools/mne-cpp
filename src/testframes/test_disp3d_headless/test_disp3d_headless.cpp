@@ -63,9 +63,10 @@ private slots:
         // square(0) should be large (1)
         double sq0 = Interpolation::square(0.0);
         QVERIFY(qAbs(sq0 - 1.0) < 1e-10);
-        // At distance 1, square should be 0
+        // square(x) = max(-(1/9)*x^2 + 1, 0); at x=1: 8/9
+        // Note: implementation uses float (1.0f/9.0f), so tolerance must account for float precision
         double sq1 = Interpolation::square(1.0);
-        QVERIFY(qAbs(sq1 - 0.0) < 1e-10);
+        QVERIFY(qAbs(sq1 - 8.0/9.0) < 1e-5);
     }
 
     void interpolation_cubicFunction()
@@ -118,10 +119,12 @@ private slots:
         VectorXi projectedSensors(2);
         projectedSensors << 0, 2;
 
-        // Distance table: 2 sensors x 4 vertices
-        auto matDist = QSharedPointer<MatrixXd>::create(2, 4);
-        (*matDist) << 0.0, 0.1, 0.2, 0.3,
-                      0.3, 0.2, 0.0, 0.1;
+        // Distance table: nVertices x nSensors (4 x 2)
+        auto matDist = QSharedPointer<MatrixXd>::create(4, 2);
+        (*matDist) << 0.0, 0.3,
+                      0.1, 0.2,
+                      0.2, 0.0,
+                      0.3, 0.1;
 
         auto mat = Interpolation::createInterpolationMat(
             projectedSensors, matDist, Interpolation::linear, 0.5);
@@ -177,8 +180,8 @@ private slots:
 
         auto distMatrix = GeometryInfo::scdc(verts, neighbors, subset, 10.0);
         QVERIFY(distMatrix != nullptr);
-        QCOMPARE(distMatrix->rows(), (Index)2);
-        QCOMPARE(distMatrix->cols(), (Index)4);
+        QCOMPARE(distMatrix->rows(), (Index)4);
+        QCOMPARE(distMatrix->cols(), (Index)2);
 
         // Distance from vertex 0 to itself should be 0
         QVERIFY(qAbs((*distMatrix)(0, 0)) < 1e-6);

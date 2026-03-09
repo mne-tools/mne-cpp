@@ -129,8 +129,8 @@ private slots:
         QString path = m_sDataPath + "/subjects/sample/bem/sample-5120-bem.fif";
         if (!QFile::exists(path)) QSKIP("BEM file not found");
 
-        int* kinds = nullptr;
-        FwdBemModel* model = FwdBemModel::fwd_bem_load_surfaces(path, kinds, 0);
+        int kinds[] = { FIFFV_BEM_SURF_ID_BRAIN };
+        FwdBemModel* model = FwdBemModel::fwd_bem_load_surfaces(path, kinds, 1);
         QVERIFY(model != nullptr);
         QVERIFY(model->nsurf > 0);
 
