@@ -9,7 +9,28 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+
+    - name: Determine release info
+      id: release-info
+      run: |
+        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+          echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          echo "prefix=mne-cpp-${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+        elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
+          echo "tag=latest" >> "$GITHUB_OUTPUT"
+          echo "prefix=mne-cpp-latest" >> "$GITHUB_OUTPUT"
+          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+        elif [[ "$GITHUB_REF" == "refs/heads/staging" ]]; then
+          echo "tag=dev_build" >> "$GITHUB_OUTPUT"
+          echo "prefix=mne-cpp-dev" >> "$GITHUB_OUTPUT"
+          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "tag=none" >> "$GITHUB_OUTPUT"
+          echo "prefix=mne-cpp-local" >> "$GITHUB_OUTPUT"
+          echo "should_upload=false" >> "$GITHUB_OUTPUT"
+        fi
     - name: Install Python 3.10 version
       uses: actions/setup-python@v5
       with:
@@ -35,23 +56,14 @@ jobs:
         fi
         ls "$QT_PREFIX/lib"/libQt6*.so* 2>/dev/null | head -5 || echo "  No Qt .so files found at $QT_PREFIX/lib"
         ./tools/deploy.bat dynamic pack
-    - name: Deploy binaries with stable release on Github
-      if: startsWith(github.ref, 'refs/tags/')
+    - name: Upload release binaries
+      if: steps.release-info.outputs.should_upload == 'true'
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         file: mne-cpp-linux-dynamic-x86_64.tar.gz
-        asset_name: mne-cpp-${{ github.ref_name }}-linux-dynamic-x86_64.tar.gz
-        tag: ${{ github.ref }}
-        overwrite: true
-    - name: Deploy binaries with dev release on Github
-      if: endsWith(github.ref, 'v2.0-dev') == true
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        file: mne-cpp-linux-dynamic-x86_64.tar.gz
-        asset_name: mne-cpp-v2.0-dev-linux-dynamic-x86_64.tar.gz
-        tag: dev_build
+        asset_name: ${{ steps.release-info.outputs.prefix }}-linux-dynamic-x86_64.tar.gz
+        tag: ${{ steps.release-info.outputs.tag }}
         overwrite: true
 
 
@@ -60,7 +72,28 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+
+    - name: Determine release info
+      id: release-info
+      run: |
+        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+          echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          echo "prefix=mne-cpp-${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+        elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
+          echo "tag=latest" >> "$GITHUB_OUTPUT"
+          echo "prefix=mne-cpp-latest" >> "$GITHUB_OUTPUT"
+          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+        elif [[ "$GITHUB_REF" == "refs/heads/staging" ]]; then
+          echo "tag=dev_build" >> "$GITHUB_OUTPUT"
+          echo "prefix=mne-cpp-dev" >> "$GITHUB_OUTPUT"
+          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "tag=none" >> "$GITHUB_OUTPUT"
+          echo "prefix=mne-cpp-local" >> "$GITHUB_OUTPUT"
+          echo "should_upload=false" >> "$GITHUB_OUTPUT"
+        fi
     - name: Install Python 3.10 version
       uses: actions/setup-python@v5
       with:
@@ -106,21 +139,12 @@ jobs:
     - name: Deploy binaries
       run: |
         ./tools/deploy.bat static pack
-    - name: Deploy binaries with stable release on Github
-      if: startsWith(github.ref, 'refs/tags/')
+    - name: Upload release binaries
+      if: steps.release-info.outputs.should_upload == 'true'
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         file: mne-cpp-linux-static-x86_64.tar.gz
-        asset_name: mne-cpp-${{ github.ref_name }}-linux-static-x86_64.tar.gz
-        tag: ${{ github.ref }}
-        overwrite: true
-    - name: Deploy binaries with dev release on Github
-      if: endsWith(github.ref, 'v2.0-dev') == true
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        file: mne-cpp-linux-static-x86_64.tar.gz
-        asset_name: mne-cpp-v2.0-dev-linux-static-x86_64.tar.gz
-        tag: dev_build
+        asset_name: ${{ steps.release-info.outputs.prefix }}-linux-static-x86_64.tar.gz
+        tag: ${{ steps.release-info.outputs.tag }}
         overwrite: true

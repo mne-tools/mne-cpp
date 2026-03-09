@@ -1,0 +1,66 @@
+# ---------------------------------------------------------------------------
+# Reusable workflow: Build MNE-CPP (no tests, min/max Qt versions)
+# Called by main.yml, staging.yml, and pull-request.yml
+# ---------------------------------------------------------------------------
+name: Reusable Build
+
+on:
+  workflow_call:
+    inputs:
+      qt_version:
+        description: "Qt version to build with"
+        required: true
+        type: string
+
+jobs:
+  Build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        os: [ubuntu-24.04, macos-26, windows-2025]
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v4
+
+    - name: Install Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        architecture: ${{ matrix.os == 'macos-26' && 'arm64' || 'x64' }}
+
+    - name: Install Qt (Linux|MacOS)
+      if: matrix.os == 'ubuntu-24.04' || matrix.os == 'macos-26'
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: ${{ inputs.qt_version }}
+        modules: qtshadertools
+
+    - name: Install Qt (Windows)
+      if: matrix.os == 'windows-2025'
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: ${{ inputs.qt_version }}
+        arch: win64_msvc2022_64
+        modules: qtshadertools
+
+    - name: Configure and compile MNE-CPP (Linux|MacOS)
+      if: matrix.os == 'ubuntu-24.04' || matrix.os == 'macos-26'
+      run: |
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
+
+    - name: Configure and compile MNE-CPP (Windows)
+      if: matrix.os == 'windows-2025'
+      run: |
+        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+        cmake --build build --config Release
+
+    - name: Deploy binaries
+      run: |
+        ./tools/deploy.bat dynamic pack
