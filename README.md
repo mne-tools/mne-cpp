@@ -2,11 +2,14 @@
   <a href="/resources/design/logos/MNE-CPP_Logo.svg"><img src="/resources/design/logos/MNE-CPP_Logo.svg" width="400" height="200" alt="MNE-CPP"></a>
 </p>
 <p align="center">
-<a href="https://github.com/mne-tools/mne-cpp/actions/workflows/release.yml" target="_blank">
-    <img src="https://github.com/mne-tools/mne-cpp/actions/workflows/release.yml/badge.svg" alt="Release">
+<a href="https://github.com/mne-tools/mne-cpp/actions/workflows/main.yml" target="_blank">
+    <img src="https://github.com/mne-tools/mne-cpp/actions/workflows/main.yml/badge.svg?branch=main" alt="Main">
 </a>
-<a href="https://github.com/mne-tools/mne-cpp/actions/workflows/tests.yml" target="_blank">
-    <img src="https://github.com/mne-tools/mne-cpp/actions/workflows/tests.yml/badge.svg" alt="Tests">
+<a href="https://github.com/mne-tools/mne-cpp/actions/workflows/staging.yml" target="_blank">
+    <img src="https://github.com/mne-tools/mne-cpp/actions/workflows/staging.yml/badge.svg?branch=staging" alt="Staging">
+</a>
+<a href="https://github.com/mne-tools/mne-cpp/actions/workflows/pull-request.yml" target="_blank">
+    <img src="https://github.com/mne-tools/mne-cpp/actions/workflows/pull-request.yml/badge.svg" alt="Pull Request">
 </a>
 <a href="https://codecov.io/gh/mne-tools/mne-cpp" target="_blank">
     <img src="https://codecov.io/gh/mne-tools/mne-cpp/branch/main/graph/badge.svg" alt="CodeCov">
