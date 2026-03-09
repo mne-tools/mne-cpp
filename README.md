@@ -8,9 +8,6 @@
 <a href="https://github.com/mne-tools/mne-cpp/actions/workflows/staging.yml" target="_blank">
     <img src="https://github.com/mne-tools/mne-cpp/actions/workflows/staging.yml/badge.svg?branch=staging" alt="Staging">
 </a>
-<a href="https://github.com/mne-tools/mne-cpp/actions/workflows/pull-request.yml" target="_blank">
-    <img src="https://github.com/mne-tools/mne-cpp/actions/workflows/pull-request.yml/badge.svg" alt="Pull Request">
-</a>
 <a href="https://codecov.io/gh/mne-tools/mne-cpp" target="_blank">
     <img src="https://codecov.io/gh/mne-tools/mne-cpp/branch/main/graph/badge.svg" alt="CodeCov">
 </a>
