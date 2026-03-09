@@ -1,0 +1,65 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Pull Request Pipeline
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Triggered on pull requests targeting `staging` or `main`.
+#
+# This is the FEATURE BRANCH pipeline:
+#   • Verifies the project builds across all platforms
+#   • Tests min + max supported Qt versions
+#   • Runs the full test suite (without coverage — that's done on staging)
+#   • No deployments, no releases
+#
+# Branch model:  Feature → Staging → Main
+# ═══════════════════════════════════════════════════════════════════════════
+name: Pull Request
+
+on:
+  pull_request:
+    branches:
+      - staging
+      - main
+
+# Cancel superseded runs for the same PR
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+
+  # ── Build compatibility: minimum supported Qt ────────────────────────────
+  BuildMinQt:
+    uses: ./.github/workflows/_reusable-build.yml
+    with:
+      qt_version: '6.10.0'
+
+  # ── Build compatibility: maximum supported Qt ────────────────────────────
+  BuildMaxQt:
+    uses: ./.github/workflows/_reusable-build.yml
+    with:
+      qt_version: '6.10.2'
+
+  # ── Tests (no coverage collection) ──────────────────────────────────────
+  Tests:
+    uses: ./.github/workflows/_reusable-tests.yml
+    with:
+      with_code_coverage: false
+      upload_codecov: false
+
+  # ── Doxygen build check ─────────────────────────────────────────────────
+  Doxygen:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v4
+
+    - name: Install Doxygen and Graphviz
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
+
+    - name: Run Doxygen (build check only — no deploy)
+      run: |
+        cd doc/doxygen
+        doxygen mne-cpp_doxyfile

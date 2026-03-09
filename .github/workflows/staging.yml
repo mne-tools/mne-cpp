@@ -1,0 +1,271 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Staging Branch Pipeline
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Triggered on pushes to `staging`.
+#
+# This is the DEVELOPMENT pipeline:
+#   • Creates/updates a rolling "dev_build" pre-release on GitHub
+#   • Builds development binaries for Linux, macOS, Windows
+#   • Runs full test suite with coverage threshold & regression checks
+#     (fails if coverage < minimum threshold or drops from previous run)
+#   • Deploys dev website     → mne-cpp.github.io/dev/
+#   • Deploys dev Doxygen API → mne-cpp.github.io/doxygen-api/dev/
+#   • Builds WebAssembly dev version
+#
+# Coverage is NOT uploaded to Codecov (that's reserved for main).
+# Instead, coverage is checked via lcov with:
+#   1) A minimum threshold (configurable via COVERAGE_THRESHOLD env var)
+#   2) Regression detection (compares to previous run's baseline)
+#
+# Branch model:  Feature → Staging → Main
+# ═══════════════════════════════════════════════════════════════════════════
+name: Staging
+
+on:
+  push:
+    branches:
+      - staging
+
+# Cancel superseded runs
+concurrency:
+  group: staging-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Minimum acceptable line coverage percentage.
+  # The pipeline will FAIL if coverage drops below this.
+  COVERAGE_THRESHOLD: 50
+
+jobs:
+
+  # ── Create / update dev_build pre-release ────────────────────────────────
+  CreateDevRelease:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v4
+
+    - name: Update dev_build tag and release
+      timeout-minutes: 5
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        set -x
+        git config --global user.email christoph.dinh@mne-cpp.org
+        git config --global user.name chdinh
+        git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}
+
+        # Delete existing dev_build release (if any)
+        if gh release view dev_build > /dev/null 2>&1; then
+          gh release delete dev_build --yes --cleanup-tag
+        fi
+        git push origin :refs/tags/dev_build 2>/dev/null || true
+
+        # Create new tag + pre-release
+        git tag dev_build -f -a -m "Development Builds"
+        git push origin dev_build -f
+        gh release create dev_build \
+          --prerelease \
+          --title "Development Builds" \
+          --notes "Latest development builds from the staging branch. These are pre-release builds for testing." \
+          --target ${{ github.sha }}
+
+  # ── Platform release builds (parallel) ───────────────────────────────────
+  Linux:
+    needs: CreateDevRelease
+    uses: ./.github/workflows/release-linux.yml
+    secrets: inherit
+
+  MacOS:
+    needs: CreateDevRelease
+    uses: ./.github/workflows/release-macos.yml
+    secrets: inherit
+
+  Windows:
+    needs: CreateDevRelease
+    uses: ./.github/workflows/release-windows.yml
+    secrets: inherit
+
+  # ── Build compatibility matrix (min + max Qt) ───────────────────────────
+  BuildMinQt:
+    uses: ./.github/workflows/_reusable-build.yml
+    with:
+      qt_version: '6.10.0'
+
+  BuildMaxQt:
+    uses: ./.github/workflows/_reusable-build.yml
+    with:
+      qt_version: '6.10.2'
+
+  # ── Tests with coverage threshold & regression checks ────────────────────
+  Tests:
+    uses: ./.github/workflows/_reusable-tests.yml
+    with:
+      with_code_coverage: true
+      upload_codecov: false
+      coverage_threshold: 50
+      fail_on_coverage_regression: true
+
+  # ── Doxygen API documentation (dev) ──────────────────────────────────────
+  Doxygen:
+    runs-on: ubuntu-24.04
+    needs: CreateDevRelease
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v4
+
+    - name: Install Doxygen 1.16.1 and Graphviz
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qq qttools5-dev-tools graphviz
+        wget -q https://github.com/doxygen/doxygen/releases/download/Release_1_16_1/doxygen-1.16.1.linux.bin.tar.gz
+        tar xzf doxygen-1.16.1.linux.bin.tar.gz
+        sudo install -m 755 doxygen-1.16.1/bin/doxygen /usr/local/bin/doxygen
+
+    - name: Run Doxygen
+      run: |
+        cd doc/doxygen
+        doxygen mne-cpp_doxyfile
+
+    - name: Deploy qch to dev_build release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        file: doc/doxygen/qt-creator_doc/mne-cpp.qch
+        asset_name: mne-cpp-dev-doc-qtcreator.qch
+        tag: dev_build
+        overwrite: true
+
+    - name: Deploy Doxygen to GitHub Pages (dev subdirectory)
+      env:
+        GIT_CREDENTIALS: ${{ secrets.GIT_CREDENTIALS }}
+      run: |
+        cd doc/doxygen
+        git config --global user.email christoph.dinh@mne-cpp.org
+        git config --global user.name chdinh
+        # Clone doxygen-api repo
+        git clone -b gh-pages "https://${GIT_CREDENTIALS}@github.com/mne-cpp/doxygen-api" gh-pages
+        cd gh-pages
+        # Only update the /dev subdirectory — preserve stable root docs
+        rm -rf dev
+        mkdir -p dev
+        cp -r ../html/* dev/
+        git add .
+        git commit -m 'Update dev API docs' --allow-empty
+        git push origin gh-pages
+
+  # ── Website (dev version) ────────────────────────────────────────────────
+  Website:
+    runs-on: ubuntu-24.04
+    needs: CreateDevRelease
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: doc/website/package-lock.json
+
+    - name: Build Docusaurus site (dev)
+      env:
+        MNECPP_SITE_ENV: dev
+        DOCUSAURUS_BASE_URL: /dev/
+      run: |
+        cd doc/website
+        npm ci
+        npm run build
+
+    - name: Deploy to mne-cpp.github.io/dev/
+      env:
+        GIT_CREDENTIALS: ${{ secrets.GIT_CREDENTIALS }}
+      run: |
+        git config --global user.email christoph.dinh@mne-cpp.org
+        git config --global user.name chdinh
+        git clone -b main --single-branch "https://${GIT_CREDENTIALS}@github.com/mne-cpp/mne-cpp.github.io.git"
+        cd mne-cpp.github.io
+
+        # Only update the /dev subdirectory — preserve stable root docs
+        rm -rf dev
+        mkdir -p dev
+        cp -RT ../doc/website/build dev/
+
+        git add .
+        git commit -m 'Update dev website' --allow-empty
+        git push origin main
+
+  # ── WebAssembly (dev) ────────────────────────────────────────────────────
+  WebAssembly:
+    runs-on: ubuntu-24.04
+    needs: CreateDevRelease
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qq build-essential libgl1-mesa-dev ninja-build
+
+    - name: Setup Emscripten
+      run: |
+        cd ..
+        git clone https://github.com/emscripten-core/emsdk.git
+        cd emsdk
+        ./emsdk install 4.0.7
+        ./emsdk activate 4.0.7
+
+    - name: Download pre-built WASM Qt binaries
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release download qt_binaries -p 'qt6_6102_static_binaries_wasm.tar.gz' -D /tmp
+        mkdir -p ${{ runner.tool_cache }}/Qt/6.10.2/wasm_multithread
+        tar xf /tmp/qt6_6102_static_binaries_wasm.tar.gz -C ${{ runner.tool_cache }}/Qt/6.10.2/wasm_multithread
+        echo "Qt6_DIR=${{ runner.tool_cache }}/Qt/6.10.2" >> $GITHUB_ENV
+
+    - name: Download host Qt binaries for cross-compilation
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release download qt_binaries -p 'qt6_6102_static_binaries_linux.tar.gz' -D /tmp
+        mkdir -p ${{ runner.tool_cache }}/Qt/6.10.2/gcc_64
+        tar xf /tmp/qt6_6102_static_binaries_linux.tar.gz -C ${{ runner.tool_cache }}/Qt/6.10.2/gcc_64
+
+    - name: Build WASM
+      run: |
+        source ../emsdk/emsdk_env.sh
+        ./tools/wasm.sh --emsdk 4.0.7
+
+    - name: Prepare WASM artifacts
+      run: |
+        rm -rf out/wasm/apps/mne_analyze_plugins
+        rm -rf resources/data
+        cp resources/design/logos/qtlogo.svg out/wasm/apps/qtlogo.svg
+        if [ -d "out/wasm/examples" ]; then
+          cp resources/design/logos/qtlogo.svg out/wasm/examples/qtlogo.svg
+        fi
+
+    - name: Package and upload WASM to dev_build release
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        tar cfz mne-cpp-wasm.tar.gz -C out/wasm .
+      
+    - name: Upload WASM to dev_build release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        file: mne-cpp-wasm.tar.gz
+        asset_name: mne-cpp-dev-wasm.tar.gz
+        tag: dev_build
+        overwrite: true

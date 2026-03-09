@@ -4,13 +4,19 @@ import type * as Preset from '@docusaurus/preset-classic';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
+// Determine if this is a dev or stable build (set via CI env var)
+const siteEnv = process.env.MNECPP_SITE_ENV || 'stable';
+const isDev = siteEnv === 'dev';
+const versionLabel = isDev ? 'dev (latest)' : 'v2.0.0';
+
 const config: Config = {
     title: 'MNE-CPP',
     tagline: 'The C++ framework for real-time functional brain imaging.',
     favicon: 'img/favicon.ico',
 
     url: 'https://mne-cpp.github.io',
-    baseUrl: '/',
+    // Allow CI to override baseUrl for dev builds (deployed under /dev/)
+    baseUrl: process.env.DOCUSAURUS_BASE_URL || '/',
 
     organizationName: 'mne-cpp',
     projectName: 'mne-cpp.github.io',
@@ -96,7 +102,9 @@ const config: Config = {
                     label: 'Development',
                 },
                 {
-                    href: 'https://mne-cpp.github.io/doxygen-api/',
+                    href: isDev
+                        ? 'https://mne-cpp.github.io/doxygen-api/dev/'
+                        : 'https://mne-cpp.github.io/doxygen-api/',
                     label: 'API Reference',
                     position: 'left',
                 },
@@ -106,10 +114,20 @@ const config: Config = {
                     position: 'left',
                 },
                 {
-                    type: 'html',
+                    type: 'dropdown',
+                    label: versionLabel,
                     position: 'right',
-                    className: 'navbar-version-item',
-                    value: '<span class="navbar-version-badge">v2.0.0</span>',
+                    className: 'navbar-version-dropdown',
+                    items: [
+                        {
+                            label: 'v2.0.0 (Stable)',
+                            href: 'https://mne-cpp.github.io/',
+                        },
+                        {
+                            label: 'dev (Latest Development)',
+                            href: 'https://mne-cpp.github.io/dev/',
+                        },
+                    ],
                 },
                 {
                     href: 'https://github.com/mne-tools/mne-cpp',

@@ -1,0 +1,348 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Main Branch Pipeline
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Triggered on pushes to `main` and version tags (v*).
+#
+# ┌────────────────────┬────────────────────────────────────────────────────┐
+# │ Trigger            │ What runs                                         │
+# ├────────────────────┼────────────────────────────────────────────────────┤
+# │ Push to main       │ Tests + Codecov, build matrix (min/max Qt),       │
+# │                    │ deploy production website + Doxygen API docs      │
+# ├────────────────────┼────────────────────────────────────────────────────┤
+# │ Tag v* on main     │ Everything above, PLUS:                           │
+# │                    │ GitHub Release, platform binaries (Linux/macOS/   │
+# │                    │ Windows, dynamic+static), cross-platform          │
+# │                    │ installers, WebAssembly build                     │
+# └────────────────────┴────────────────────────────────────────────────────┘
+#
+# To cut a release:
+#   git tag v2.0.1 -a -m "Release v2.0.1"
+#   git push origin v2.0.1
+#
+# Branch model:  Feature → Staging → Main
+# ═══════════════════════════════════════════════════════════════════════════
+name: Main
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+# Cancel superseded runs on the same branch/tag
+concurrency:
+  group: main-${{ github.ref }}
+  cancel-in-progress: true
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Jobs that run on EVERY push to main (and also on tags)
+# ═══════════════════════════════════════════════════════════════════════════
+jobs:
+
+  # ── Build compatibility matrix (min + max Qt) ───────────────────────────
+  BuildMinQt:
+    uses: ./.github/workflows/_reusable-build.yml
+    with:
+      qt_version: '6.10.0'
+
+  BuildMaxQt:
+    uses: ./.github/workflows/_reusable-build.yml
+    with:
+      qt_version: '6.10.2'
+
+  # ── Tests with Codecov coverage ──────────────────────────────────────────
+  Tests:
+    uses: ./.github/workflows/_reusable-tests.yml
+    with:
+      with_code_coverage: true
+      upload_codecov: true
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  # ── Doxygen API documentation (production) ───────────────────────────────
+  Doxygen:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v4
+
+    - name: Install Doxygen 1.16.1 and Graphviz
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qq qttools5-dev-tools graphviz
+        wget -q https://github.com/doxygen/doxygen/releases/download/Release_1_16_1/doxygen-1.16.1.linux.bin.tar.gz
+        tar xzf doxygen-1.16.1.linux.bin.tar.gz
+        sudo install -m 755 doxygen-1.16.1/bin/doxygen /usr/local/bin/doxygen
+
+    - name: Run Doxygen
+      run: |
+        cd doc/doxygen
+        doxygen mne-cpp_doxyfile
+
+    - name: Deploy qch to GitHub Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        file: doc/doxygen/qt-creator_doc/mne-cpp.qch
+        asset_name: mne-cpp-${{ github.ref_name }}-doc-qtcreator.qch
+        tag: ${{ github.ref }}
+        overwrite: true
+
+    - name: Deploy Doxygen to GitHub Pages (production)
+      env:
+        GIT_CREDENTIALS: ${{ secrets.GIT_CREDENTIALS }}
+      run: |
+        cd doc/doxygen
+        git config --global user.email christoph.dinh@mne-cpp.org
+        git config --global user.name chdinh
+        # Deploy to the root (stable) of doxygen-api
+        git clone -b gh-pages "https://${GIT_CREDENTIALS}@github.com/mne-cpp/doxygen-api" gh-pages
+        cd gh-pages
+        # Preserve /dev directory if it exists (staging docs)
+        if [ -d "dev" ]; then
+          cp -r dev /tmp/doxygen-dev-backup
+        fi
+        git rm -rf --ignore-unmatch .
+        git commit --amend --reset-author -a -m 'Update stable API docs' --allow-empty
+        touch .nojekyll
+        cp -r ../html/* .
+        # Restore /dev directory
+        if [ -d "/tmp/doxygen-dev-backup" ]; then
+          cp -r /tmp/doxygen-dev-backup dev
+        fi
+        git add .
+        git add .nojekyll
+        git commit --amend --reset-author -a -m 'Update stable API docs'
+        git push -f --all
+
+  # ── Website (production) ─────────────────────────────────────────────────
+  Website:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: doc/website/package-lock.json
+
+    - name: Build Docusaurus site (production)
+      env:
+        MNECPP_SITE_ENV: stable
+      run: |
+        cd doc/website
+        npm ci
+        npm run build
+
+    - name: Deploy to mne-cpp.github.io
+      env:
+        GIT_CREDENTIALS: ${{ secrets.GIT_CREDENTIALS }}
+      run: |
+        git config --global user.email christoph.dinh@mne-cpp.org
+        git config --global user.name chdinh
+        git clone -b main --single-branch "https://${GIT_CREDENTIALS}@github.com/mne-cpp/mne-cpp.github.io.git"
+        cd mne-cpp.github.io
+
+        # Preserve /dev directory (staging website)
+        if [ -d "dev" ]; then
+          cp -r dev /tmp/website-dev-backup
+        fi
+
+        git rm -rf --ignore-unmatch .
+        git commit --amend --reset-author -a -m 'Update website' --allow-empty
+        cd ..
+
+        # Copy the stable Docusaurus build
+        cp -RT doc/website/build mne-cpp.github.io
+
+        # Restore /dev directory
+        if [ -d "/tmp/website-dev-backup" ]; then
+          cp -r /tmp/website-dev-backup mne-cpp.github.io/dev
+        fi
+
+        cd mne-cpp.github.io
+        git add .
+        git commit --amend --reset-author -a -m 'Update website'
+        git push -f --all
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Jobs that run ONLY on version tags (v*)  — the actual release pipeline
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  # ── Create GitHub Release ────────────────────────────────────────────────
+  CreateRelease:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v4
+
+    - name: Create version branch for new minor releases
+      run: |
+        currentVersionPatch=$(echo ${GITHUB_REF#refs/tags/} | cut -d. -f3)
+        if [[ "$currentVersionPatch" == 0 ]]; then
+          echo "New minor version — branching off ${GITHUB_REF#refs/tags/}"
+          git config --global user.email christoph.dinh@mne-cpp.org
+          git config --global user.name chdinh
+          git checkout -b ${GITHUB_REF#refs/tags/}
+          git push origin refs/heads/${GITHUB_REF#refs/tags/}
+        fi
+
+    - name: Create GitHub Release
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        TAG="${GITHUB_REF#refs/tags/}"
+        gh release create "$TAG" \
+          --title "MNE-CPP $TAG" \
+          --generate-notes \
+          --target ${{ github.sha }}
+
+  # ── Platform release builds (parallel) ───────────────────────────────────
+  Linux:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: CreateRelease
+    uses: ./.github/workflows/release-linux.yml
+    secrets: inherit
+
+  MacOS:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: CreateRelease
+    uses: ./.github/workflows/release-macos.yml
+    secrets: inherit
+
+  Windows:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: CreateRelease
+    uses: ./.github/workflows/release-windows.yml
+    secrets: inherit
+
+  # ── Installers (after all platform builds) ───────────────────────────────
+  Installer:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [Linux, MacOS, Windows]
+    uses: ./.github/workflows/release-installer.yml
+    secrets: inherit
+
+  # ── WebAssembly ──────────────────────────────────────────────────────────
+  WebAssembly:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-24.04
+    needs: CreateRelease
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qq build-essential libgl1-mesa-dev ninja-build
+
+    - name: Setup Emscripten
+      run: |
+        cd ..
+        git clone https://github.com/emscripten-core/emsdk.git
+        cd emsdk
+        ./emsdk install 4.0.7
+        ./emsdk activate 4.0.7
+
+    - name: Download pre-built WASM Qt binaries
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release download qt_binaries -p 'qt6_6102_static_binaries_wasm.tar.gz' -D /tmp
+        mkdir -p ${{ runner.tool_cache }}/Qt/6.10.2/wasm_multithread
+        tar xf /tmp/qt6_6102_static_binaries_wasm.tar.gz -C ${{ runner.tool_cache }}/Qt/6.10.2/wasm_multithread
+        echo "Qt6_DIR=${{ runner.tool_cache }}/Qt/6.10.2" >> $GITHUB_ENV
+
+    - name: Download host Qt binaries for cross-compilation
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release download qt_binaries -p 'qt6_6102_static_binaries_linux.tar.gz' -D /tmp
+        mkdir -p ${{ runner.tool_cache }}/Qt/6.10.2/gcc_64
+        tar xf /tmp/qt6_6102_static_binaries_linux.tar.gz -C ${{ runner.tool_cache }}/Qt/6.10.2/gcc_64
+
+    - name: Build WASM
+      run: |
+        source ../emsdk/emsdk_env.sh
+        ./tools/wasm.sh --emsdk 4.0.7
+
+    - name: Prepare WASM artifacts
+      run: |
+        rm -rf out/wasm/apps/mne_analyze_plugins
+        rm -rf resources/data
+        cp resources/design/logos/qtlogo.svg out/wasm/apps/qtlogo.svg
+        if [ -d "out/wasm/examples" ]; then
+          cp resources/design/logos/qtlogo.svg out/wasm/examples/qtlogo.svg
+        fi
+
+    - name: Package WASM
+      run: |
+        tar cfz mne-cpp-wasm.tar.gz -C out/wasm .
+
+    - name: Upload WASM to GitHub Release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        file: mne-cpp-wasm.tar.gz
+        asset_name: mne-cpp-${{ github.ref_name }}-wasm.tar.gz
+        tag: ${{ github.ref }}
+        overwrite: true
+
+    - name: Deploy WASM to mne-cpp/wasm repository
+      env:
+        GIT_CREDENTIALS: ${{ secrets.GIT_CREDENTIALS }}
+      run: |
+        git config --global user.email christoph.dinh@mne-cpp.org
+        git config --global user.name chdinh
+        git clone "https://${GIT_CREDENTIALS}@github.com/mne-cpp/wasm.git" wasm-repo
+        cd wasm-repo
+
+        # --- gh-pages branch ---
+        if git rev-parse --verify origin/gh-pages > /dev/null 2>&1; then
+          git checkout gh-pages
+        else
+          git checkout --orphan gh-pages
+        fi
+        git rm -rf --ignore-unmatch .
+        git clean -f -d
+        git commit --allow-empty -m 'Update wasm builds'
+        cp -RT ../out/wasm/apps .
+        if [ -d "../out/wasm/examples" ]; then
+          mkdir -p examples
+          cp -RT ../out/wasm/examples examples
+        fi
+        git add .
+        git commit --amend --reset-author -m 'Update wasm builds'
+        git push -f origin gh-pages
+
+        # --- main branch ---
+        if git rev-parse --verify origin/main > /dev/null 2>&1; then
+          git checkout main
+        else
+          git checkout --orphan main
+        fi
+        git rm -rf --ignore-unmatch .
+        git clean -f -d
+        git commit --allow-empty -m 'Update wasm builds'
+        cp -RT ../out/wasm/apps .
+        if [ -d "../out/wasm/examples" ]; then
+          mkdir -p examples
+          cp -RT ../out/wasm/examples examples
+        fi
+        git add .
+        git commit --amend --reset-author -m 'Update wasm builds'
+        git push -f origin main

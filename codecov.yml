@@ -1,6 +1,6 @@
 codecov:
   require_ci_to_pass: yes
-  branch: v2.0-dev
+  branch: main
 
 coverage:
   precision: 2
