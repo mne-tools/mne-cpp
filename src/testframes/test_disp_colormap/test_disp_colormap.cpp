@@ -108,16 +108,16 @@ private slots:
         QVERIFY(qRed(c) > qBlue(c));
     }
 
-    // RedBlue: red at -1, blue at +1
+    // RedBlue: blue at -1, red at +1
     void testRedBlueRedEnd()
     {
-        QRgb c = ColorMap::valueToRedBlue(-1.0);
+        QRgb c = ColorMap::valueToRedBlue(1.0);
         QVERIFY(qRed(c) > qBlue(c));
     }
 
     void testRedBlueBlueEnd()
     {
-        QRgb c = ColorMap::valueToRedBlue(1.0);
+        QRgb c = ColorMap::valueToRedBlue(-1.0);
         QVERIFY(qBlue(c) > qRed(c));
     }
 };

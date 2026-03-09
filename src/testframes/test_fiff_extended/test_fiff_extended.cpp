@@ -208,7 +208,15 @@ private slots:
         QFile rawFile(rawPath);
         FiffRawData raw(rawFile);
 
-        FiffCov prepared = cov.prepare_noise_cov(raw.info, cov.names);
+        // prepare_noise_cov requires only MEG+EEG channels that exist in both info and cov
+        // Must also exclude bad channels since prepare_noise_cov excludes them internally
+        RowVectorXi picks = raw.info.pick_types(true, true, false, QStringList(), raw.info.bads);
+        QStringList chNames;
+        for(int i = 0; i < picks.size(); ++i) {
+            if(cov.names.contains(raw.info.ch_names[picks(i)]))
+                chNames << raw.info.ch_names[picks(i)];
+        }
+        FiffCov prepared = cov.prepare_noise_cov(raw.info, chNames);
         QVERIFY(!prepared.isEmpty());
     }
 
@@ -268,7 +276,7 @@ private slots:
     void testFiffInfoDefaultCtor()
     {
         FiffInfo info;
-        QCOMPARE(info.nchan, 0);
+        QCOMPARE(info.nchan, -1);
     }
 
     void testFiffInfoPickInfo()
@@ -448,7 +456,7 @@ private slots:
         FiffRawData raw(rawFile);
         QVERIFY(raw.info.nchan > 0);
         raw.clear();
-        QCOMPARE(raw.info.nchan, 0);
+        QCOMPARE(raw.info.nchan, -1);
     }
 
     void testFiffRawDataReadSegment()

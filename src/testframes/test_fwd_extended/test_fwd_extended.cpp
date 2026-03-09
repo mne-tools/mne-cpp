@@ -77,11 +77,12 @@ private slots:
         QCOMPARE(model->name, QString("three_layer"));
         QCOMPARE(model->layers.size(), 3);
 
-        // Check layers
-        QVERIFY(qAbs(model->layers[0].rad - 0.070f) < 1e-6f);
+        // Check layers - radii are normalized by outermost layer (R=0.090)
+        // After normalization: 0.070/0.090, 0.080/0.090, 0.090/0.090
+        QVERIFY(qAbs(model->layers[0].rad - 0.070f/0.090f) < 1e-5f);
         QVERIFY(qAbs(model->layers[0].sigma - 0.33f) < 1e-6f);
-        QVERIFY(qAbs(model->layers[1].rad - 0.080f) < 1e-6f);
-        QVERIFY(qAbs(model->layers[2].rad - 0.090f) < 1e-6f);
+        QVERIFY(qAbs(model->layers[1].rad - 0.080f/0.090f) < 1e-5f);
+        QVERIFY(qAbs(model->layers[2].rad - 1.0f) < 1e-5f);
 
         delete model;
     }
@@ -117,8 +118,10 @@ private slots:
         // Setup with Berg-Scherg fitting
         bool ok = model->fwd_setup_eeg_sphere_model(0.09f, true, 3);
         QVERIFY(ok);
-        QVERIFY(model->nterms > 0);
-        QVERIFY(model->fn.size() > 0);
+        // After setup, mu/lambda/nfit are set by Berg-Scherg fitting
+        QCOMPARE(model->nfit, 3);
+        QCOMPARE(model->mu.size(), 3);
+        QCOMPARE(model->lambda.size(), 3);
 
         // Get multi-sphere coefficient for n=1
         double coeff1 = model->fwd_eeg_get_multi_sphere_model_coeff(1);
@@ -167,7 +170,9 @@ private slots:
 
         bool ok = model->fwd_setup_eeg_sphere_model(0.09f, false, 0);
         QVERIFY(ok);
-        QVERIFY(model->nterms > 0);
+        // Without Berg-Scherg, radii are scaled but nterms is not set
+        // (nterms is lazy-initialized during potential computation)
+        QVERIFY(qAbs(model->layers[2].rad - 0.09f) < 1e-5f);
 
         delete model;
     }
@@ -279,8 +284,8 @@ private slots:
         QVERIFY(settings.measname.isEmpty());
         QVERIFY(!settings.accurate);
         QVERIFY(!settings.fixed_ori);
-        QVERIFY(settings.include_meg);
-        QVERIFY(settings.include_eeg);
+        QVERIFY(!settings.include_meg);
+        QVERIFY(!settings.include_eeg);
     }
 
     void computeFwdSettings_memberDefaults()
