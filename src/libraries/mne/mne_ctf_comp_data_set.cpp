@@ -434,13 +434,22 @@ MNECTFCompDataSet::MNECTFCompDataSet()
 //=============================================================================================================
 
 MNECTFCompDataSet::MNECTFCompDataSet(const MNECTFCompDataSet &set)
+:ncomp(0)
+,nch(set.nch)
+,undo(nullptr)
+,current(nullptr)
 {
     if (set.ncomp > 0) {
-        this->ncomp = set.comps.size();
-        for (int k = 0; k < this->ncomp; k++)
+        for (int k = 0; k < set.ncomp; k++)
             if(set.comps[k])
                 this->comps.append(new MNECTFCompData(*set.comps[k]));
+        this->ncomp = this->comps.size();
     }
+
+    this->chs = set.chs;
+
+    if(set.undo)
+        this->undo = std::make_unique<MNECTFCompData>(*set.undo);
 
     if(set.current)
         this->current = std::make_unique<MNECTFCompData>(*set.current);
