@@ -158,9 +158,12 @@ jobs:
       id: lcov
       if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && !inputs.upload_codecov
       run: |
+        echo "=== Coverage diagnostics ==="
+        echo "gcno files: $(find build -name '*.gcno' 2>/dev/null | wc -l)"
+        echo "gcda files: $(find build -name '*.gcda' 2>/dev/null | wc -l)"
         lcov --capture --directory build \
              --output-file coverage.info \
-             --ignore-errors mismatch 2>/dev/null || true
+             --ignore-errors mismatch
         # Remove external/test code from the report
         lcov --remove coverage.info \
              '*/src/external/*' '*/src/examples/*' '*/src/testframes/*' \
