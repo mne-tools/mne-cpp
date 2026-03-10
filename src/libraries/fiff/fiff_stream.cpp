@@ -1922,11 +1922,14 @@ FiffStream::SPtr FiffStream::start_file(QIODevice& p_IODevice)
     FiffStream::SPtr p_pStream(new FiffStream(&p_IODevice));
     QString t_sFileName = p_pStream->streamName();
 
-    if(!p_pStream->device()->open(QIODevice::WriteOnly))
+    if(!p_IODevice.isOpen())
     {
-        qWarning("Cannot write to %s\n", t_sFileName.toUtf8().constData());//consider throw
-        FiffStream::SPtr p_pEmptyStream;
-        return p_pEmptyStream;
+        if(!p_pStream->device()->open(QIODevice::WriteOnly))
+        {
+            qWarning("Cannot write to %s\n", t_sFileName.toUtf8().constData());//consider throw
+            FiffStream::SPtr p_pEmptyStream;
+            return p_pEmptyStream;
+        }
     }
 
     //
@@ -2407,14 +2410,14 @@ fiff_long_t FiffStream::write_cov(const FiffCov &p_FiffCov)
 //           fiff_write_float_sparse_rcs(fid,FIFF.FIFF_MNE_COV,cov.data);
 //        else
 //        {
-            // Store only lower part of covariance matrix
+            // Store lower triangle including diagonal (matches read_cov format)
             qint32 dim = p_FiffCov.dim;
-            qint32 n = ((dim*dim) - dim)/2;
+            qint32 n = dim*(dim+1)/2;
 
             VectorXd vals(n);
             qint32 count = 0;
-            for(qint32 i = 1; i < dim; ++i)
-                for(qint32 j = 0; j < i; ++j)
+            for(qint32 i = 0; i < dim; ++i)
+                for(qint32 j = 0; j <= i; ++j)
                     vals(count++) = p_FiffCov.data(i,j);
 
             this->write_double(FIFF_MNE_COV, vals.data(), vals.size());
@@ -3252,8 +3255,10 @@ QList<FiffDirEntry::SPtr> FiffStream::make_dir(bool *ok)
         * so read_tag_info never returns -1.  Detect this by checking
         * whether the stream is still healthy after the header read.
         */
-        if (this->status() != QDataStream::Ok)
+        if (this->status() != QDataStream::Ok) {
+            this->resetStatus();
             break;
+        }
         /*
         * Check that we haven't run into the directory
         */
