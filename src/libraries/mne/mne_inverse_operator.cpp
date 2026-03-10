@@ -904,7 +904,10 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
     p_MNEInverseOperator.nchan = p_sing.rows();
     p_MNEInverseOperator.nave = p_nave;
     p_MNEInverseOperator.depth_prior = p_depth_prior;
-    p_MNEInverseOperator.source_cov = p_source_cov;
+    // p_source_cov was aliased from p_depth_prior, so it may carry
+    // the wrong cov-kind.  Make an independent copy with the correct kind.
+    p_MNEInverseOperator.source_cov = FiffCov::SDPtr(new FiffCov(*p_source_cov));
+    p_MNEInverseOperator.source_cov->kind = FIFFV_MNE_SOURCE_COV;
     p_MNEInverseOperator.noise_cov = FiffCov::SDPtr(new FiffCov(p_outNoiseCov));
     p_MNEInverseOperator.orient_prior = p_orient_prior;
     p_MNEInverseOperator.projs = info.projs;
