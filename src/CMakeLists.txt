@@ -63,7 +63,7 @@ if(USE_FFTW)
 endif()
 
 if(WITH_CODE_COV)
-  add_compile_options("--coverage")
+  add_compile_options("--coverage" "-O0" "-g")
   add_link_options("--coverage")
 endif()
 
