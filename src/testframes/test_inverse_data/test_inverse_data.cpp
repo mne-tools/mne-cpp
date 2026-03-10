@@ -54,6 +54,155 @@ using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
+/**
+ * Build a smaller inverse operator by subsampling the forward solution.
+ *
+ * Source-space I/O (triangulation, patch stats, neighbor info) is very
+ * expensive for the full oct-6 source space (~8000 vertices / hemisphere).
+ * This helper keeps every @p step-th in-use vertex, producing a much
+ * smaller inverse operator suitable for write/read roundtrip tests.
+ *
+ * @param[in] info      Measurement info.
+ * @param[in] fwd       Full forward solution (free-orientation assumed).
+ * @param[in] noiseCov  Noise covariance.
+ * @param[in] step      Keep every step-th source (e.g. 15 → ~500 sources).
+ * @return  Inverse operator built from the subsampled forward.
+ */
+static MNEInverseOperator makeSmallInverseOp(const FiffInfo& info,
+                                             const MNEForwardSolution& fwd,
+                                             const FiffCov& noiseCov,
+                                             int step)
+{
+    MNEForwardSolution small(fwd);
+    const bool isFixed = small.isFixedOrient();
+    const int  orient  = isFixed ? 1 : 3;
+
+    // 1. Thin the inuse vector in each hemisphere
+    for (qint32 h = 0; h < small.src.size(); ++h) {
+        MNESourceSpace& sp = small.src[h];
+        VectorXi newInuse = VectorXi::Zero(sp.np);
+        int count = 0;
+        for (int v = 0; v < sp.np; ++v) {
+            if (sp.inuse[v]) {
+                if (count % step == 0)
+                    newInuse[v] = 1;
+                ++count;
+            }
+        }
+        sp.update_inuse(newInuse);
+    }
+
+    // 2. Map surviving sources back to their original linear indices
+    QVector<int> keepIdx;
+    int globalOffset = 0;
+    for (qint32 h = 0; h < fwd.src.size(); ++h) {
+        const MNESourceSpace& origSp = fwd.src[h];
+        const MNESourceSpace& newSp  = small.src[h];
+        int origCount = 0;
+        for (int v = 0; v < origSp.np; ++v) {
+            if (origSp.inuse[v]) {
+                if (newSp.inuse[v])
+                    keepIdx.append(globalOffset + origCount);
+                ++origCount;
+            }
+        }
+        globalOffset += origSp.nuse;
+    }
+
+    // 3. Subsample gain matrix columns
+    const int nChan = fwd.sol->data.rows();
+    const int nKeep = keepIdx.size();
+    MatrixXd G(nChan, nKeep * orient);
+    for (int i = 0; i < nKeep; ++i)
+        for (int j = 0; j < orient; ++j)
+            G.col(i * orient + j) = fwd.sol->data.col(keepIdx[i] * orient + j);
+
+    small.sol->data = G;
+    small.sol->nrow = G.rows();
+    small.sol->ncol = G.cols();
+    small.nsource   = nKeep;
+
+    // 4. Subsample source positions / normals
+    MatrixX3f rr(nKeep, 3);
+    MatrixX3f nn(isFixed ? nKeep : nKeep * 3, 3);
+    for (int i = 0; i < nKeep; ++i) {
+        rr.row(i) = fwd.source_rr.row(keepIdx[i]);
+        if (isFixed) {
+            nn.row(i) = fwd.source_nn.row(keepIdx[i]);
+        } else {
+            for (int j = 0; j < 3; ++j)
+                nn.row(i * 3 + j) = fwd.source_nn.row(keepIdx[i] * 3 + j);
+        }
+    }
+    small.source_rr = rr;
+    small.source_nn = nn;
+
+    // 5. Build inverse operator from the reduced forward
+    return MNEInverseOperator::make_inverse_operator(
+        info, small, noiseCov, 0.2f, 0.8f, false, true);
+}
+
+//=============================================================================================================
+/**
+ * Strip source-space geometry down to in-use vertices only.
+ *
+ * The full oct-6 source space stores ~160 K vertices and ~320 K triangles
+ * per hemisphere, regardless of how many are actually "in use".  Writing
+ * and reading all of that geometry takes tens of seconds (or more in CI),
+ * which causes timeouts in roundtrip tests.
+ *
+ * This helper keeps only the @c nuse in-use vertex positions / normals,
+ * resets @c np = nuse, and clears every optional field that scales with
+ * the mesh (triangulations, patch stats, distances).  The resulting
+ * inverse operator file is tiny, yet still exercises the full write /
+ * read code path for every inverse-operator field.
+ *
+ * @param[in,out] inv   Inverse operator whose source spaces are modified
+ *                       in-place.
+ */
+static void stripSourceSpaceGeometry(MNEInverseOperator& inv)
+{
+    for (qint32 h = 0; h < inv.src.size(); ++h) {
+        MNESourceSpace& sp = inv.src[h];
+        const int nkeep = sp.nuse;
+
+        // Extract only in-use vertex positions and normals
+        auto origRr = sp.rr;   // copy (PointsT  — RowMajor float Nx3)
+        auto origNn = sp.nn;   // copy (NormalsT — RowMajor float Nx3)
+        decltype(sp.rr) newRr(nkeep, 3);
+        decltype(sp.nn) newNn(nkeep, 3);
+        int idx = 0;
+        for (int v = 0; v < sp.np; ++v) {
+            if (sp.inuse[v]) {
+                newRr.row(idx) = origRr.row(v);
+                newNn.row(idx) = origNn.row(v);
+                ++idx;
+            }
+        }
+        Q_ASSERT(idx == nkeep);
+
+        sp.np     = nkeep;
+        sp.rr     = newRr;
+        sp.nn     = newNn;
+        sp.inuse  = VectorXi::Ones(nkeep);
+        sp.vertno = VectorXi::LinSpaced(nkeep, 0, nkeep - 1);
+
+        // Clear triangulation (writer skips when ntri == 0)
+        sp.ntri     = 0;
+        sp.itris.resize(0, 3);
+        sp.nuse_tri = 0;
+        sp.use_itris.resize(0, 3);
+
+        // Clear patch / neighbor data (writer skips when empty)
+        sp.nearest.clear();
+
+        // Clear distances
+        sp.dist       = FiffSparseMatrix();
+        sp.dist_limit = 0;
+    }
+}
+
+//=============================================================================================================
 
 class TestInverseData : public QObject
 {
@@ -141,9 +290,75 @@ private slots:
     //=========================================================================
     void inverseOp_writeReadRoundtrip()
     {
-        QSKIP("Full inverse operator write/read roundtrip exceeds CI timeout "
-               "(source spaces with ~8000 vertices). "
-               "Inverse I/O is covered by test_compute_raw_inverse.");
+        if (!m_bDataLoaded) QSKIP("Required data not loaded");
+        if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+
+        // Build a small inverse operator (~500 sources instead of ~8000)
+        // to keep source-space I/O (triangulation, patch stats) feasible
+        // within CI time limits.
+        MNEInverseOperator smallInv = makeSmallInverseOp(m_info, m_fwd, m_noiseCov, 15);
+        QVERIFY2(smallInv.nchan > 0, "Failed to build small inverse operator");
+        qDebug() << "Small inverse for roundtrip: nsource=" << smallInv.nsource;
+
+        // Strip full-mesh geometry from source spaces so the file is
+        // small enough for fast I/O (keeps only in-use vertex positions).
+        stripSourceSpaceGeometry(smallInv);
+
+        QTemporaryDir tmpDir;
+        QVERIFY(tmpDir.isValid());
+        QString invPath = tmpDir.path() + "/test_inv-inv.fif";
+
+        // Write the inverse operator to a temporary file
+        {
+            QFile outFile(invPath);
+            smallInv.write(outFile);
+        }
+
+        // Verify the file was created and has content
+        QFileInfo fi(invPath);
+        QVERIFY2(fi.exists(), "Inverse operator file was not created");
+        QVERIFY2(fi.size() > 0, "Inverse operator file is empty");
+        qDebug() << "Written inverse file size:" << fi.size() << "bytes"
+                 << "(" << (fi.size() / 1024.0 / 1024.0) << "MB)";
+
+        // Read it back
+        MNEInverseOperator invRead;
+        {
+            QFile inFile(invPath);
+            bool ok = MNEInverseOperator::read_inverse_operator(inFile, invRead);
+            QVERIFY2(ok, "Failed to read inverse operator back");
+        }
+
+        // Compare key fields
+        QCOMPARE(invRead.nchan,      smallInv.nchan);
+        QCOMPARE(invRead.nsource,    smallInv.nsource);
+        QCOMPARE(invRead.methods,    smallInv.methods);
+        QCOMPARE(invRead.source_ori, smallInv.source_ori);
+        QCOMPARE(invRead.coord_frame, smallInv.coord_frame);
+        QCOMPARE(invRead.src.size(), smallInv.src.size());
+        QCOMPARE(invRead.sing.size(), smallInv.sing.size());
+
+        // Verify singular values match within tolerance
+        for (int i = 0; i < smallInv.sing.size(); ++i) {
+            QVERIFY2(qAbs(invRead.sing(i) - smallInv.sing(i)) < 1e-4,
+                      qPrintable(QString("sing[%1] mismatch: %2 vs %3")
+                                 .arg(i).arg(invRead.sing(i)).arg(smallInv.sing(i))));
+        }
+
+        // Verify eigen_leads dimensions match
+        QCOMPARE(invRead.eigen_leads->data.rows(), smallInv.eigen_leads->data.rows());
+        QCOMPARE(invRead.eigen_leads->data.cols(), smallInv.eigen_leads->data.cols());
+
+        // Verify eigen_fields dimensions match
+        QCOMPARE(invRead.eigen_fields->data.rows(), smallInv.eigen_fields->data.rows());
+        QCOMPARE(invRead.eigen_fields->data.cols(), smallInv.eigen_fields->data.cols());
+
+        // Verify noise covariance dimensions
+        QCOMPARE(invRead.noise_cov->data.rows(), smallInv.noise_cov->data.rows());
+
+        qDebug() << "Inverse operator roundtrip: nchan=" << invRead.nchan
+                 << "nsource=" << invRead.nsource
+                 << "file_size=" << fi.size() << "bytes";
     }
 
     //=========================================================================
