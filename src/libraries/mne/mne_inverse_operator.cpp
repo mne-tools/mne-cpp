@@ -901,6 +901,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
     p_MNEInverseOperator.eigen_fields = p_eigen_fields;
     p_MNEInverseOperator.eigen_leads = p_eigen_leads;
     p_MNEInverseOperator.sing = p_sing;
+    p_MNEInverseOperator.nchan = p_sing.rows();
     p_MNEInverseOperator.nave = p_nave;
     p_MNEInverseOperator.depth_prior = p_depth_prior;
     p_MNEInverseOperator.source_cov = p_source_cov;

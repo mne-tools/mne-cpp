@@ -52,6 +52,17 @@ using namespace MNELIB;
 //=============================================================================================================
 
 MNEVolGeom::MNEVolGeom()
+: valid(0)
+, width(0)
+, height(0)
+, depth(0)
+, xsize(0.0f)
+, ysize(0.0f)
+, zsize(0.0f)
+, x_ras{0.0f, 0.0f, 0.0f}
+, y_ras{0.0f, 0.0f, 0.0f}
+, z_ras{0.0f, 0.0f, 0.0f}
+, c_ras{0.0f, 0.0f, 0.0f}
 {
 }
 

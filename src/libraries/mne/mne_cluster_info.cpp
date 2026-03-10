@@ -79,7 +79,7 @@ void MNEClusterInfo::clear()
 
 void MNEClusterInfo::write(QString p_sFileName) const
 {
-    QFile file("./"+p_sFileName);
+    QFile file(p_sFileName);
     if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qDebug("Unable to open file.");
         return;

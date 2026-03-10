@@ -21,11 +21,12 @@ private slots:
         for (int i = 0; i < 32; ++i) {
             QVERIFY(std::abs(hann(0, i) - hann(0, 63 - i)) < 1e-10);
         }
-        // Maximum at center
-        QVERIFY(hann(0, 31) > 0.9);
-        QVERIFY(hann(0, 32) > 0.9);
+        // Maximum at center (window is L2-normalized so peak is ~0.2, not 1.0)
+        double maxVal = hann.row(0).maxCoeff();
+        QVERIFY(hann(0, 31) > maxVal * 0.9);
+        QVERIFY(hann(0, 32) > maxVal * 0.9);
         // Ends near zero
-        QVERIFY(hann(0, 0) < 0.05);
+        QVERIFY(hann(0, 0) < 0.01);
     }
 
     void testGenerateTapersHanningSmall()
@@ -59,7 +60,7 @@ private slots:
     void testCalculateFFTFreqs()
     {
         VectorXd freqs = Spectral::calculateFFTFreqs(128, 1000.0);
-        QCOMPARE(freqs.size(), 128);
+        QCOMPARE(freqs.size(), 65);  // N/2+1 (half spectrum)
         // First element is DC = 0 Hz
         QVERIFY(std::abs(freqs(0)) < 1e-10);
         // Frequency resolution is sFreq/Nfft = 1000/128 ≈ 7.8125
@@ -69,7 +70,7 @@ private slots:
     void testCalculateFFTFreqs256()
     {
         VectorXd freqs = Spectral::calculateFFTFreqs(256, 500.0);
-        QCOMPARE(freqs.size(), 256);
+        QCOMPARE(freqs.size(), 129);  // N/2+1 (half spectrum)
         QVERIFY(std::abs(freqs(0)) < 1e-10);
     }
 
@@ -82,9 +83,9 @@ private slots:
         int iNfft = N;
 
         MatrixXcd result = Spectral::computeTaperedSpectraRow(data, tapers, iNfft);
-        // Result should be nTapers x iNfft
+        // Result should be nTapers x (iNfft/2+1) for half spectrum
         QCOMPARE(result.rows(), tapers.rows());
-        QCOMPARE(result.cols(), iNfft);
+        QCOMPARE(result.cols(), int(floor(iNfft / 2.0)) + 1);
     }
 
     void testComputeTaperedSpectraRowSameLength()
@@ -96,7 +97,7 @@ private slots:
         MatrixXd tapers = tapResult.first;
 
         MatrixXcd result = Spectral::computeTaperedSpectraRow(data, tapers, N);
-        QCOMPARE(result.cols(), N);
+        QCOMPARE(result.cols(), int(floor(N / 2.0)) + 1);  // half spectrum
         QCOMPARE(result.rows(), tapers.rows());
     }
 
@@ -113,7 +114,7 @@ private slots:
             data, tapers, iNfft, false /* sequential */);
         QCOMPARE(result.size(), nChannels);
         for (int ch = 0; ch < nChannels; ++ch) {
-            QCOMPARE(result[ch].cols(), iNfft);
+            QCOMPARE(result[ch].cols(), int(floor(iNfft / 2.0)) + 1);  // half spectrum
         }
     }
 
@@ -141,7 +142,7 @@ private slots:
         RowVectorXd psd = Spectral::psdFromTaperedSpectra(
             tapSpectra, tapResult.second, N, 1000.0);
 
-        QCOMPARE(psd.size(), N);
+        QCOMPARE(psd.size(), int(floor(N / 2.0)) + 1);  // half spectrum
         // PSD values should be non-negative
         for (int i = 0; i < psd.size(); ++i) {
             QVERIFY(psd(i) >= 0.0);
@@ -163,7 +164,7 @@ private slots:
             tapResult.second, tapResult.second,
             N, 1000.0);
 
-        QCOMPARE(csd.size(), N);
+        QCOMPARE(csd.size(), int(floor(N / 2.0)) + 1);  // half spectrum
     }
 
     void testPsdParseval()
@@ -209,9 +210,9 @@ private slots:
             tapResult.second, tapResult.second,
             N, 1000.0);
 
-        QCOMPARE(csd.size(), N);
+        QCOMPARE(csd.size(), int(floor(N / 2.0)) + 1);  // half spectrum
         // Auto-CSD should have non-negative real parts
-        for (int i = 0; i < N; ++i) {
+        for (int i = 0; i < csd.size(); ++i) {
             QVERIFY(csd(i).real() >= -1e-6);
         }
     }
