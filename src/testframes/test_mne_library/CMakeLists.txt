@@ -9,7 +9,9 @@ qt_standard_project_setup()
 
 qt_add_executable(test_mne_library test_mne_library.cpp)
 
-target_compile_definitions(test_mne_library PRIVATE STATICBUILD)
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(test_mne_library PRIVATE STATICBUILD)
+endif()
 
 target_link_libraries(test_mne_library PRIVATE
     mne_disp3D_rhi

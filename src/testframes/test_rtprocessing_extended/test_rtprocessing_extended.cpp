@@ -71,7 +71,7 @@ private slots:
         for (int i = 50; i < nSamples; ++i) data(0, i) = 0.0;
 
         QList<QPair<int, double>> triggers = detectTriggerFlanksGrad(
-            data, 0, 0, 1.0, true, "Falling", 5);
+            data, 0, 0, 1.0, false, "Falling", 5);
         QVERIFY(triggers.size() >= 1);
     }
 

@@ -9,7 +9,9 @@ qt_standard_project_setup()
 
 qt_add_executable(test_fwd_bem_data test_fwd_bem_data.cpp)
 
-target_compile_definitions(test_fwd_bem_data PRIVATE STATICBUILD)
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(test_fwd_bem_data PRIVATE STATICBUILD)
+endif()
 
 target_link_libraries(test_fwd_bem_data PRIVATE
     Qt6::Core Qt6::Widgets Qt6::Concurrent Qt6::Network Qt6::Test

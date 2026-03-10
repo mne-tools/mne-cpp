@@ -147,9 +147,9 @@ private slots:
         MNEEpochData e;
         QCOMPARE(e.epoch.rows(), 0);
         QCOMPARE(e.epoch.cols(), 0);
-        QCOMPARE(e.event, 0);
-        QCOMPARE(e.tmin, 0.0f);
-        QCOMPARE(e.tmax, 0.0f);
+        QCOMPARE(e.event, -1);
+        QCOMPARE(e.tmin, -1.0f);
+        QCOMPARE(e.tmax, -1.0f);
         QCOMPARE(e.bReject, false);
     }
 
@@ -310,7 +310,7 @@ private slots:
         info.ch_names.append("MEG0001");
         info.nchan = 1;
 
-        // Data well within threshold
+        // Data well within threshold (peak-to-peak = 0 since all values the same)
         MatrixXd dataOk = MatrixXd::Ones(1, 100) * 1e-13;
         QMap<QString, double> mapReject;
         mapReject["mag"] = 5e-12;
@@ -318,8 +318,10 @@ private slots:
         bool hasArtifact = MNEEpochDataList::checkForArtifact(dataOk, info, mapReject);
         QCOMPARE(hasArtifact, false);
 
-        // Data exceeding threshold
-        MatrixXd dataBad = MatrixXd::Ones(1, 100) * 1e-10;
+        // Data exceeding threshold (peak-to-peak = 2e-10 >> 5e-12)
+        MatrixXd dataBad = MatrixXd::Zero(1, 100);
+        dataBad(0, 0) = -1e-10;
+        dataBad(0, 99) = 1e-10;
         hasArtifact = MNEEpochDataList::checkForArtifact(dataBad, info, mapReject);
         QCOMPARE(hasArtifact, true);
     }
