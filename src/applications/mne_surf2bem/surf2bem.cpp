@@ -117,6 +117,7 @@ int Surf2Bem::run()
     if (!m_settings.outputFile().isEmpty())
         fprintf(stderr, "output file       : %s\n", qPrintable(m_settings.outputFile()));
     fprintf(stderr, "\n");
+    fflush(stderr);
 
     //
     // Step 1: Read all surfaces
@@ -136,12 +137,14 @@ int Surf2Bem::run()
         }
 
         if (!ok) {
-            qCritical() << "Failed to read surface" << inputs[k].fileName;
+            fprintf(stderr, "Failed to read surface %s\n", qPrintable(inputs[k].fileName));
+            fflush(stderr);
             return 1;
         }
 
         surfs[k].id = inputs[k].id;
         fprintf(stderr, "%s read. id = %d\n\n", qPrintable(inputs[k].fileName), inputs[k].id);
+        fflush(stderr);
     }
 
     //
@@ -226,7 +229,8 @@ bool Surf2Bem::readFreeSurferSurface(const SurfaceInput& input, MNEBemSurface& b
     //
     QFile file(input.fileName);
     if (!file.open(QIODevice::ReadOnly)) {
-        qCritical() << "Could not open surface file:" << input.fileName;
+        fprintf(stderr, "Could not open surface file: %s\n", qPrintable(input.fileName));
+        fflush(stderr);
         return false;
     }
 
@@ -252,6 +256,7 @@ bool Surf2Bem::readFreeSurferSurface(const SurfaceInput& input, MNEBemSurface& b
 
         fprintf(stderr, "%s: triangle file with %d vertices and %d triangles\n",
                 qPrintable(input.fileName), nvert, nface);
+        fflush(stderr);
 
         // Read vertices (stored as 3 x nvert, column-major float32 big-endian)
         verts.resize(3, nvert);
@@ -268,8 +273,9 @@ bool Surf2Bem::readFreeSurferSurface(const SurfaceInput& input, MNEBemSurface& b
             }
         }
     } else {
-        qCritical() << "Unsupported surface file format (magic =" << magic << ") in" << input.fileName;
-        qCritical() << "Only FreeSurfer triangle format (0xFFFFFE) is supported for BEM surfaces.";
+        fprintf(stderr, "Unsupported surface file format (magic = %d) in %s\n", magic, qPrintable(input.fileName));
+        fprintf(stderr, "Only FreeSurfer triangle format (0xFFFFFE) is supported for BEM surfaces.\n");
+        fflush(stderr);
         return false;
     }
 
@@ -293,6 +299,7 @@ bool Surf2Bem::readFreeSurferSurface(const SurfaceInput& input, MNEBemSurface& b
 
     fprintf(stderr, "Read FreeSurfer surface: %d vertices, %d triangles\n",
             bemSurf.np, bemSurf.ntri);
+    fflush(stderr);
 
     return true;
 }

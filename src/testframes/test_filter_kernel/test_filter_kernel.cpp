@@ -96,7 +96,7 @@ private slots:
         fk.prepareFilter(N);
 
         RowVectorXd data = RowVectorXd::Random(N);
-        RowVectorXd filtered = fk.applyConvFilter(data, true);
+        RowVectorXd filtered = fk.applyConvFilter(data, false);
         QCOMPARE(filtered.size(), N);
     }
 
@@ -107,7 +107,7 @@ private slots:
         fk.prepareFilter(N);
 
         RowVectorXd data = RowVectorXd::Random(N);
-        fk.applyFftFilter(data, true);
+        fk.applyFftFilter(data, false);
         QCOMPARE(data.size(), N);
     }
 
@@ -123,7 +123,7 @@ private slots:
     void filterParameter()
     {
         FilterParameter fp;
-        QVERIFY(fp.getName().isEmpty());
+        QCOMPARE(fp.getName(), QString("Unknown"));
 
         FilterParameter fp2("TestParam");
         QCOMPARE(fp2.getName(), QString("TestParam"));

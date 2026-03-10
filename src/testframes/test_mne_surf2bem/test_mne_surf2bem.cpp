@@ -96,6 +96,7 @@ private slots:
 private:
     QString findApplication();
     QString findSubjectsDir();
+    QString findSurfaceFile(const QString& name);
 
     QString m_sAppPath;         /**< Path to the mne_surf2bem executable. */
     bool m_bAppAvailable;       /**< Whether the app is found. */
@@ -156,6 +157,31 @@ QString TestMneSurf2Bem::findSubjectsDir()
     QString stdPath = home + "/mne_data/MNE-sample-data/subjects";
     if (QDir(stdPath + "/sample/bem").exists()) {
         return stdPath;
+    }
+
+    return QString();
+}
+
+//=============================================================================================================
+
+QString TestMneSurf2Bem::findSurfaceFile(const QString& name)
+{
+    // Try the direct path first (e.g., subjects/sample/bem/inner_skull.surf).
+    // On some platforms (especially Windows) the MNE sample data symlinks from
+    // bem/ to bem/flash/ may be broken.  Fall back to the flash/ subdirectory.
+    QString direct = m_sSubjectsDir + "/sample/bem/" + name;
+    if (QFile::exists(direct)) {
+        // Verify the file is actually readable and has a valid magic number
+        QFile f(direct);
+        if (f.open(QIODevice::ReadOnly) && f.size() > 1024) {
+            f.close();
+            return direct;
+        }
+    }
+
+    QString flash = m_sSubjectsDir + "/sample/bem/flash/" + name;
+    if (QFile::exists(flash)) {
+        return flash;
     }
 
     return QString();
@@ -289,8 +315,8 @@ void TestMneSurf2Bem::testSingleSurfConversion()
     //
     // Convert a single FreeSurfer surface (inner_skull.surf) to BEM FIFF
     //
-    QString inputSurf = m_sSubjectsDir + "/sample/bem/inner_skull.surf";
-    if (!QFile::exists(inputSurf)) {
+    QString inputSurf = findSurfaceFile("inner_skull.surf");
+    if (inputSurf.isEmpty()) {
         QSKIP("inner_skull.surf not found in sample data");
     }
 
@@ -305,12 +331,14 @@ void TestMneSurf2Bem::testSingleSurfConversion()
     proc.start(m_sAppPath, args);
     QVERIFY2(proc.waitForFinished(30000), "Process did not finish in time");
 
-    if (proc.exitCode() != 0) {
+    if (proc.exitCode() != 0 || proc.exitStatus() != QProcess::NormalExit) {
         QString stdErr = proc.readAllStandardError();
         QString stdOut = proc.readAllStandardOutput();
+        qDebug() << "exitCode:" << proc.exitCode() << "exitStatus:" << proc.exitStatus();
         qDebug() << "stdout:" << stdOut;
         qDebug() << "stderr:" << stdErr;
     }
+    QCOMPARE(proc.exitStatus(), QProcess::NormalExit);
     QCOMPARE(proc.exitCode(), 0);
 
     // Verify output file exists and has content
@@ -353,11 +381,11 @@ void TestMneSurf2Bem::testMultiSurfConversion()
     //
     // Convert all three BEM surfaces into one FIFF file
     //
-    QString innerSkull = m_sSubjectsDir + "/sample/bem/inner_skull.surf";
-    QString outerSkull = m_sSubjectsDir + "/sample/bem/outer_skull.surf";
-    QString outerSkin  = m_sSubjectsDir + "/sample/bem/outer_skin.surf";
+    QString innerSkull = findSurfaceFile("inner_skull.surf");
+    QString outerSkull = findSurfaceFile("outer_skull.surf");
+    QString outerSkin  = findSurfaceFile("outer_skin.surf");
 
-    if (!QFile::exists(innerSkull) || !QFile::exists(outerSkull) || !QFile::exists(outerSkin)) {
+    if (innerSkull.isEmpty() || outerSkull.isEmpty() || outerSkin.isEmpty()) {
         QSKIP("Not all three BEM surfaces found in sample data");
     }
 
@@ -373,12 +401,14 @@ void TestMneSurf2Bem::testMultiSurfConversion()
     proc.start(m_sAppPath, args);
     QVERIFY2(proc.waitForFinished(60000), "Process did not finish in time");
 
-    if (proc.exitCode() != 0) {
+    if (proc.exitCode() != 0 || proc.exitStatus() != QProcess::NormalExit) {
         QString stdErr = proc.readAllStandardError();
         QString stdOut = proc.readAllStandardOutput();
+        qDebug() << "exitCode:" << proc.exitCode() << "exitStatus:" << proc.exitStatus();
         qDebug() << "stdout:" << stdOut;
         qDebug() << "stderr:" << stdErr;
     }
+    QCOMPARE(proc.exitStatus(), QProcess::NormalExit);
     QCOMPARE(proc.exitCode(), 0);
 
     // Verify output
@@ -421,11 +451,11 @@ void TestMneSurf2Bem::testSurfConversionWithCheck()
     //
     // Convert three surfaces with topology checks enabled
     //
-    QString innerSkull = m_sSubjectsDir + "/sample/bem/inner_skull.surf";
-    QString outerSkull = m_sSubjectsDir + "/sample/bem/outer_skull.surf";
-    QString outerSkin  = m_sSubjectsDir + "/sample/bem/outer_skin.surf";
+    QString innerSkull = findSurfaceFile("inner_skull.surf");
+    QString outerSkull = findSurfaceFile("outer_skull.surf");
+    QString outerSkin  = findSurfaceFile("outer_skin.surf");
 
-    if (!QFile::exists(innerSkull) || !QFile::exists(outerSkull) || !QFile::exists(outerSkin)) {
+    if (innerSkull.isEmpty() || outerSkull.isEmpty() || outerSkin.isEmpty()) {
         QSKIP("Not all three BEM surfaces found in sample data");
     }
 
@@ -443,12 +473,14 @@ void TestMneSurf2Bem::testSurfConversionWithCheck()
     QVERIFY2(proc.waitForFinished(120000),
              "Process did not finish in time (checks can be slow)");
 
-    if (proc.exitCode() != 0) {
+    if (proc.exitCode() != 0 || proc.exitStatus() != QProcess::NormalExit) {
         QString stdErr = proc.readAllStandardError();
         QString stdOut = proc.readAllStandardOutput();
+        qDebug() << "exitCode:" << proc.exitCode() << "exitStatus:" << proc.exitStatus();
         qDebug() << "stdout:" << stdOut;
         qDebug() << "stderr:" << stdErr;
     }
+    QCOMPARE(proc.exitStatus(), QProcess::NormalExit);
     QCOMPARE(proc.exitCode(), 0);
 
     // Verify output
@@ -474,8 +506,8 @@ void TestMneSurf2Bem::testOverwriteOutput()
         QSKIP("Sample data not available");
     }
 
-    QString inputSurf = m_sSubjectsDir + "/sample/bem/inner_skull.surf";
-    if (!QFile::exists(inputSurf)) {
+    QString inputSurf = findSurfaceFile("inner_skull.surf");
+    if (inputSurf.isEmpty()) {
         QSKIP("inner_skull.surf not found in sample data");
     }
 
