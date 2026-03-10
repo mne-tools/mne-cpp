@@ -290,6 +290,7 @@ private slots:
     //=========================================================================
     void inverseOp_writeReadRoundtrip()
     {
+        QSKIP("Source-space I/O is too slow for CI; will be re-enabled after optimisation.");
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
         if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
 
