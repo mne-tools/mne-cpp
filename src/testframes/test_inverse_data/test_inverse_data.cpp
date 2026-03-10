@@ -290,13 +290,11 @@ private slots:
     //=========================================================================
     void inverseOp_writeReadRoundtrip()
     {
-        QSKIP("Source-space I/O is too slow for CI; will be re-enabled after optimisation.");
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
         if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
 
         // Build a small inverse operator (~500 sources instead of ~8000)
-        // to keep source-space I/O (triangulation, patch stats) feasible
-        // within CI time limits.
+        // to keep source-space I/O feasible within CI time limits.
         MNEInverseOperator smallInv = makeSmallInverseOp(m_info, m_fwd, m_noiseCov, 15);
         QVERIFY2(smallInv.nchan > 0, "Failed to build small inverse operator");
         qDebug() << "Small inverse for roundtrip: nsource=" << smallInv.nsource;

@@ -2415,7 +2415,7 @@ fiff_long_t FiffStream::write_cov(const FiffCov &p_FiffCov)
             qint32 count = 0;
             for(qint32 i = 1; i < dim; ++i)
                 for(qint32 j = 0; j < i; ++j)
-                    vals(count) = p_FiffCov.data(i,j);
+                    vals(count++) = p_FiffCov.data(i,j);
 
             this->write_double(FIFF_MNE_COV, vals.data(), vals.size());
 //        }
@@ -2609,8 +2609,18 @@ fiff_long_t FiffStream::write_double(fiff_int_t kind, const double* data, fiff_i
     *this << (qint32)datasize;
     *this << (qint32)FIFFV_NEXT_SEQ;
 
+    //
+    // Write doubles as raw 8-byte big-endian values.
+    // FiffStream sets QDataStream::SinglePrecision, which causes
+    // operator<<(double) to write only 4 bytes. We must bypass that
+    // to emit the full 8-byte IEEE 754 representation.
+    //
     for(qint32 i = 0; i < nel; ++i)
-        *this << data[i];
+    {
+        qint64 bits;
+        memcpy(&bits, &data[i], sizeof(double));
+        *this << bits;
+    }
 
     return pos;
 }
@@ -3237,6 +3247,14 @@ QList<FiffDirEntry::SPtr> FiffStream::make_dir(bool *ok)
         return dir;
     while ((pos = this->read_tag_info(t_pTag)) != -1) {
         /*
+        * Guard against reading past EOF.  When QDataStream reaches the
+        * end of the device every subsequent read silently returns zero,
+        * so read_tag_info never returns -1.  Detect this by checking
+        * whether the stream is still healthy after the header read.
+        */
+        if (this->status() != QDataStream::Ok)
+            break;
+        /*
         * Check that we haven't run into the directory
         */
         if (t_pTag->kind == FIFF_DIR)
@@ -3249,8 +3267,6 @@ QList<FiffDirEntry::SPtr> FiffStream::make_dir(bool *ok)
         t_pFiffDirEntry->type = t_pTag->type;
         t_pFiffDirEntry->size = t_pTag->size();
         t_pFiffDirEntry->pos = (fiff_long_t)pos;
-
-        //qDebug() << "Kind: " << t_pTag->kind << "| Type:" << t_pTag->type << "| Size" << t_pTag->size() << "| Next:" << t_pTag->next;
 
         dir.append(t_pFiffDirEntry);
         if (t_pTag->next < 0)
