@@ -64,6 +64,7 @@ private:
     MNEForwardSolution m_fwd;
     FiffCov m_noiseCov;
     FiffInfo m_info;
+    MNEInverseOperator m_invOp;   // Cached inverse operator (loose=0.2, depth=0.8)
     bool m_bDataLoaded;
 
     bool hasData() const {
@@ -113,6 +114,12 @@ private slots:
         }
 
         m_bDataLoaded = !m_fwd.isEmpty() && !m_noiseCov.isEmpty() && m_info.nchan > 0;
+
+        // Pre-compute the standard inverse operator (most tests share it)
+        if (m_bDataLoaded) {
+            m_invOp = MNEInverseOperator::make_inverse_operator(
+                m_info, m_fwd, m_noiseCov, 0.2f, 0.8f, false, true);
+        }
     }
 
     //=========================================================================
@@ -122,19 +129,11 @@ private slots:
     {
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
 
-        MNEInverseOperator invOp = MNEInverseOperator::make_inverse_operator(
-            m_info, m_fwd, m_noiseCov,
-            0.2f,   // loose
-            0.8f,   // depth
-            false,  // fixed
-            true    // limit_depth_chs
-        );
-
-        QVERIFY(invOp.nchan > 0);
-        QVERIFY(invOp.nsource > 0);
-        QVERIFY(invOp.nchan > 0);
-        QVERIFY(invOp.sing.size() > 0);
-        QVERIFY(invOp.src.size() > 0);
+        // Verify cached inverse operator (computed once in initTestCase)
+        QVERIFY(m_invOp.nchan > 0);
+        QVERIFY(m_invOp.nsource > 0);
+        QVERIFY(m_invOp.sing.size() > 0);
+        QVERIFY(m_invOp.src.size() > 0);
     }
 
     //=========================================================================
@@ -143,19 +142,18 @@ private slots:
     void inverseOp_writeReadRoundtrip()
     {
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
+        if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
 
-        MNEInverseOperator invOp = MNEInverseOperator::make_inverse_operator(
-            m_info, m_fwd, m_noiseCov, 0.2f, 0.8f, false, true);
-
-        if (invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+        const MNEInverseOperator& invOp = m_invOp;
 
         QTemporaryDir tmpDir;
         QVERIFY(tmpDir.isValid());
         QString tmpPath = tmpDir.path() + "/test-inv.fif";
 
-        // Write
+        // Write (non-const, so use copy)
+        MNEInverseOperator invOpWrite = m_invOp;
         QFile outFile(tmpPath);
-        invOp.write(outFile);
+        invOpWrite.write(outFile);
         QVERIFY(QFile::exists(tmpPath));
 
         // Read back
@@ -172,10 +170,9 @@ private slots:
     void inverseOp_prepareDSPM()
     {
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
+        if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
 
-        MNEInverseOperator invOp = MNEInverseOperator::make_inverse_operator(
-            m_info, m_fwd, m_noiseCov, 0.2f, 0.8f, false, true);
-        if (invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+        MNEInverseOperator invOp = m_invOp;
 
         float snr = 3.0f;
         float lambda2 = 1.0f / (snr * snr);
@@ -197,10 +194,9 @@ private slots:
     void inverseOp_prepareSLORETA()
     {
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
+        if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
 
-        MNEInverseOperator invOp = MNEInverseOperator::make_inverse_operator(
-            m_info, m_fwd, m_noiseCov, 0.2f, 0.8f, false, true);
-        if (invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+        MNEInverseOperator invOp = m_invOp;
 
         float lambda2 = 1.0f / 9.0f;
 
@@ -216,10 +212,9 @@ private slots:
     void minimumNorm_dSPM_fromEvoked()
     {
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
+        if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
 
-        MNEInverseOperator invOp = MNEInverseOperator::make_inverse_operator(
-            m_info, m_fwd, m_noiseCov, 0.2f, 0.8f, false, true);
-        if (invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+        MNEInverseOperator invOp = m_invOp;
 
         // Read evoked data
         QString evkPath = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
@@ -256,10 +251,9 @@ private slots:
     void minimumNorm_MNE_fromEvoked()
     {
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
+        if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
 
-        MNEInverseOperator invOp = MNEInverseOperator::make_inverse_operator(
-            m_info, m_fwd, m_noiseCov, 0.2f, 0.8f, false, true);
-        if (invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+        MNEInverseOperator invOp = m_invOp;
 
         QString evkPath = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
         QFile evkFile(evkPath);
@@ -290,10 +284,9 @@ private slots:
     void minimumNorm_sLORETA_fromEvoked()
     {
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
+        if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
 
-        MNEInverseOperator invOp = MNEInverseOperator::make_inverse_operator(
-            m_info, m_fwd, m_noiseCov, 0.2f, 0.8f, false, true);
-        if (invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+        MNEInverseOperator invOp = m_invOp;
 
         QString evkPath = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
         QFile evkFile(evkPath);
@@ -324,10 +317,9 @@ private slots:
     void minimumNorm_methodSwitching()
     {
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
+        if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
 
-        MNEInverseOperator invOp = MNEInverseOperator::make_inverse_operator(
-            m_info, m_fwd, m_noiseCov, 0.2f, 0.8f, false, true);
-        if (invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+        MNEInverseOperator invOp = m_invOp;
 
         float lambda2 = 1.0f / 9.0f;
         MinimumNorm mn(invOp, lambda2, QString("dSPM"));
@@ -351,10 +343,9 @@ private slots:
     void sourceEstimate_writeReadRoundtrip()
     {
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
+        if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
 
-        MNEInverseOperator invOp = MNEInverseOperator::make_inverse_operator(
-            m_info, m_fwd, m_noiseCov, 0.2f, 0.8f, false, true);
-        if (invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+        MNEInverseOperator invOp = m_invOp;
 
         // Create a small STC
         QString evkPath = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
