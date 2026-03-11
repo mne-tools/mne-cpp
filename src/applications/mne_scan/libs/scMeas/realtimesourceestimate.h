@@ -51,7 +51,7 @@
 #include <fiff/fiff_coord_trans.h>
 
 #include <mne/mne_source_spaces.h>
-#include <mne/mne_source_estimate.h>
+#include <inverse/mne_source_estimate.h>
 #include <mne/mne_forwardsolution.h>
 
 //=============================================================================================================
@@ -168,7 +168,7 @@ public:
      *
      * @param[in] v the value which is attached to the sample array vector.
      */
-    virtual void setValue(MNELIB::MNESourceEstimate &v);
+    virtual void setValue(INVERSELIB::MNESourceEstimate &v);
 
     //=========================================================================================================
     /**
@@ -177,7 +177,7 @@ public:
      *
      * @return the last attached value.
      */
-    virtual QList<MNELIB::MNESourceEstimate::SPtr>& getValue();
+    virtual QList<INVERSELIB::MNESourceEstimate::SPtr>& getValue();
 
     //=========================================================================================================
     /**
@@ -231,7 +231,7 @@ private:
 
     qint32                                  m_iSourceEstimateSize;  /**< Sample size of the multi sample array.*/
 
-    QList<MNELIB::MNESourceEstimate::SPtr>  m_pMNEStc;              /**< The source estimates. */
+    QList<INVERSELIB::MNESourceEstimate::SPtr>  m_pMNEStc;              /**< The source estimates. */
     bool                                    m_bInitialized;         /**< Is initialized. */
 };
 

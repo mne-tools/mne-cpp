@@ -75,6 +75,7 @@ set(MNE_LIBS_REQUIRED
     mne_fiff
     mne_fs
     mne_mne
+    mne_inverse
     mne_connectivity
 )
 

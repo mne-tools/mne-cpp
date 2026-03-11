@@ -43,7 +43,7 @@
 #include "../Utils/types.h"
 #include "abstractmodel.h"
 
-#include <inverse/dipoleFit/ecd_set.h>
+#include <inverse/dipole_fit/ecd_set.h>
 
 //=============================================================================================================
 // QT INCLUDES

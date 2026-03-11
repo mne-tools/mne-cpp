@@ -43,7 +43,7 @@
 #include "../../disp3D_rhi_global.h"
 
 #include "abstracttreeitem.h"
-#include <inverse/dipoleFit/ecd_set.h>
+#include <inverse/dipole_fit/ecd_set.h>
 
 /**
  * @brief Tree item representing a set of fitted dipoles in the 3-D scene hierarchy.

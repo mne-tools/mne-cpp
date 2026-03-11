@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/mne_source_estimate.h>
+#include <inverse/mne_source_estimate.h>
 #include <mne/mne_bem.h>
 
 #include <iostream>

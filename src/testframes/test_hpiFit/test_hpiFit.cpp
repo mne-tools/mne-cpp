@@ -46,9 +46,9 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_dig_point_set.h>
 
-#include <inverse/hpiFit/hpifit.h>
-#include <inverse/hpiFit/hpidataupdater.h>
-#include <inverse/hpiFit/sensorset.h>
+#include <inverse/hpi/hpi_fit.h>
+#include <inverse/hpi/hpi_data_updater.h>
+#include <inverse/hpi/sensor_set.h>
 
 #include <utils/ioutils.h>
 #include <utils/mnemath.h>

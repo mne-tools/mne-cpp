@@ -4,23 +4,22 @@
 
 #include <utils/generics/applicationlogger.h>
 
-#include <inverse/dipoleFit/ecd.h>
-#include <inverse/dipoleFit/ecd_set.h>
-#include <inverse/dipoleFit/dipole_fit_settings.h>
-#include <inverse/dipoleFit/dipole_forward.h>
-#include <inverse/dipoleFit/guess_data.h>
-#include <inverse/rapMusic/rapmusic.h>
-#include <inverse/rapMusic/pwlrapmusic.h>
-#include <inverse/rapMusic/dipole.h>
-#include <inverse/minimumNorm/minimumnorm.h>
-#include <inverse/hpiFit/hpimodelparameters.h>
-#include <inverse/hpiFit/sensorset.h>
-#include <inverse/c/mne_meas_data.h>
-#include <inverse/c/mne_meas_data_set.h>
-#include <inverse/c/mne_inverse_operator.h>
-#include <mne/mne_inverse_operator.h>
+#include <inverse/dipole_fit/ecd.h>
+#include <inverse/dipole_fit/ecd_set.h>
+#include <inverse/dipole_fit/dipole_fit_settings.h>
+#include <inverse/dipole_fit/dipole_forward.h>
+#include <inverse/dipole_fit/guess_data.h>
+#include <inverse/rap_music/rap_music.h>
+#include <inverse/rap_music/pwl_rap_music.h>
+#include <inverse/rap_music/dipole.h>
+#include <inverse/minimum_norm/minimum_norm.h>
+#include <inverse/hpi/hpi_model_parameters.h>
+#include <inverse/hpi/sensor_set.h>
+#include <inverse/mne_meas_data.h>
+#include <inverse/mne_meas_data_set.h>
+#include <inverse/mne_inverse_operator.h>
 #include <mne/mne_forwardsolution.h>
-#include <mne/mne_source_estimate.h>
+#include <inverse/mne_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 
 #include <fiff/fiff.h>
@@ -356,13 +355,13 @@ private slots:
     }
 
     //=========================================================================
-    // MNEInverseOperator (C-style)
+    // MNEInverseOperator
     //=========================================================================
     void mneInverseOp_defaultCtor()
     {
         INVERSELIB::MNEInverseOperator mio;
-        QCOMPARE(mio.nchan, 0);
-        QCOMPARE(mio.nsource, 0);
+        QCOMPARE(mio.nchan, -1);
+        QCOMPARE(mio.nsource, -1);
     }
 
     //=========================================================================
@@ -370,7 +369,7 @@ private slots:
     //=========================================================================
     void minimumNorm_construct()
     {
-        MNELIB::MNEInverseOperator invOp;
+        INVERSELIB::MNEInverseOperator invOp;
         MinimumNorm mn(invOp, 1.0f / 9.0f, QString("MNE"));
         mn.setRegularization(1.0f / 6.0f);
         mn.setMethod("dSPM");
@@ -379,7 +378,7 @@ private slots:
 
     void minimumNorm_setMethod()
     {
-        MNELIB::MNEInverseOperator invOp;
+        INVERSELIB::MNEInverseOperator invOp;
         MinimumNorm mn(invOp, 1.0f / 9.0f, false, false);
         mn.setMethod(true, false); // sLORETA
         mn.setMethod(false, true); // dSPM
@@ -408,7 +407,7 @@ private slots:
 
         if (fwd.isEmpty() || noiseCov.isEmpty()) QSKIP("Data load failed");
 
-        MNELIB::MNEInverseOperator invOp = MNELIB::MNEInverseOperator::make_inverse_operator(
+        INVERSELIB::MNEInverseOperator invOp = INVERSELIB::MNEInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
 
         QVERIFY(invOp.nchan > 0);
@@ -437,7 +436,7 @@ private slots:
         FiffCov noiseCov(covFile);
         FiffRawData raw(rawFile);
 
-        MNELIB::MNEInverseOperator invOp = MNELIB::MNEInverseOperator::make_inverse_operator(
+        INVERSELIB::MNEInverseOperator invOp = INVERSELIB::MNEInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
         if (invOp.nchan == 0) QSKIP("Inverse operator build failed");
 
@@ -480,7 +479,7 @@ private slots:
         FiffCov noiseCov(covFile);
         FiffRawData raw(rawFile);
 
-        MNELIB::MNEInverseOperator invOp = MNELIB::MNEInverseOperator::make_inverse_operator(
+        INVERSELIB::MNEInverseOperator invOp = INVERSELIB::MNEInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
         if (invOp.nchan == 0) QSKIP("Inverse operator build failed");
 
@@ -522,7 +521,7 @@ private slots:
         FiffCov noiseCov(covFile);
         FiffRawData raw(rawFile);
 
-        MNELIB::MNEInverseOperator invOp = MNELIB::MNEInverseOperator::make_inverse_operator(
+        INVERSELIB::MNEInverseOperator invOp = INVERSELIB::MNEInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
         if (invOp.nchan == 0) QSKIP("Inverse operator build failed");
 
@@ -563,7 +562,7 @@ private slots:
         FiffCov noiseCov(covFile);
         FiffRawData raw(rawFile);
 
-        MNELIB::MNEInverseOperator invOp = MNELIB::MNEInverseOperator::make_inverse_operator(
+        INVERSELIB::MNEInverseOperator invOp = INVERSELIB::MNEInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
         if (invOp.nchan == 0) QSKIP("Inverse operator build failed");
 
@@ -576,7 +575,7 @@ private slots:
         QVERIFY(QFile::exists(tmpPath));
 
         QFile inFile(tmpPath);
-        MNELIB::MNEInverseOperator invOp2(inFile);
+        INVERSELIB::MNEInverseOperator invOp2(inFile);
         QVERIFY(invOp2.nchan > 0);
         QCOMPARE(invOp2.nsource, invOp.nsource);
         QCOMPARE(invOp2.nchan, invOp.nchan);

@@ -53,7 +53,7 @@
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_dig_point.h>
 #include <mne/mne_source_spaces.h>
-#include <inverse/dipoleFit/ecd_set.h>
+#include <inverse/dipole_fit/ecd_set.h>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS

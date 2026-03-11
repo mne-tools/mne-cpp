@@ -50,12 +50,12 @@
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
-#include <mne/mne_source_estimate.h>
+#include <inverse/mne_source_estimate.h>
 #include <mne/mne_bem.h>
 
 #include <fiff/fiff_dig_point_set.h>
 
-#include <inverse/minimumNorm/minimumnorm.h>
+#include <inverse/minimum_norm/minimum_norm.h>
 
 #include <utils/generics/applicationlogger.h>
 

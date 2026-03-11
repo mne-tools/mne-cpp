@@ -44,8 +44,8 @@
 #include <fs/annotationset.h>
 
 #include <fiff/fiff_evoked.h>
-#include <mne/mne_source_estimate.h>
-#include <inverse/minimumNorm/minimumnorm.h>
+#include <inverse/mne_source_estimate.h>
+#include <inverse/minimum_norm/minimum_norm.h>
 
 #include <disp3D_rhi/view/brainview.h>
 #include <disp3D_rhi/model/braintreemodel.h>

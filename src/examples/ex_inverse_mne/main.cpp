@@ -46,11 +46,11 @@
 //=============================================================================================================
 
 #include <fiff/fiff_evoked_set.h>
-#include <mne/mne_inverse_operator.h>
+#include <inverse/mne_inverse_operator.h>
 
 #include <fiff/fiff_evoked.h>
-#include <mne/mne_source_estimate.h>
-#include <inverse/minimumNorm/minimumnorm.h>
+#include <inverse/mne_source_estimate.h>
+#include <inverse/minimum_norm/minimum_norm.h>
 
 #include <utils/generics/applicationlogger.h>
 

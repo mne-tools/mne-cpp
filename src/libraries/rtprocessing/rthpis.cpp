@@ -38,8 +38,8 @@
 
 #include "rthpis.h"
 
-#include <inverse/hpiFit/hpifit.h>
-#include <inverse/hpiFit/sensorset.h>
+#include <inverse/hpi/hpi_fit.h>
+#include <inverse/hpi/sensor_set.h>
 #include <fiff/fiff_info.h>
 
 //=============================================================================================================

@@ -11,53 +11,56 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
-    hpiFit/hpidataupdater.cpp
-    hpiFit/hpimodelparameters.cpp
-    hpiFit/signalmodel.cpp
     inverse_global.cpp
-    minimumNorm/minimumnorm.cpp
-    rapMusic/rapmusic.cpp
-    rapMusic/pwlrapmusic.cpp
-    rapMusic/dipole.cpp
-    dipoleFit/dipole_fit.cpp
-    dipoleFit/dipole_fit_data.cpp
-    dipoleFit/dipole_fit_settings.cpp
-    dipoleFit/dipole_forward.cpp
-    dipoleFit/ecd.cpp
-    dipoleFit/ecd_set.cpp
-    dipoleFit/guess_data.cpp
-    c/mne_inverse_operator.cpp
-    c/mne_meas_data.cpp
-    c/mne_meas_data_set.cpp
-    hpiFit/hpifit.cpp
-    hpiFit/hpifitdata.cpp
-    hpiFit/sensorset.cpp
+    minimum_norm/minimum_norm.cpp
+    rap_music/rap_music.cpp
+    rap_music/pwl_rap_music.cpp
+    rap_music/dipole.cpp
+    mne_inverse_operator.cpp
+    mne_meas_data.cpp
+    mne_meas_data_set.cpp
+    mne_source_estimate.cpp
+    mne_cor_source_estimate.cpp
+    dipole_fit/dipole_fit.cpp
+    dipole_fit/dipole_fit_data.cpp
+    dipole_fit/dipole_fit_settings.cpp
+    dipole_fit/dipole_forward.cpp
+    dipole_fit/ecd.cpp
+    dipole_fit/ecd_set.cpp
+    dipole_fit/guess_data.cpp
+    hpi/hpi_data_updater.cpp
+    hpi/hpi_fit.cpp
+    hpi/hpi_fit_data.cpp
+    hpi/hpi_model_parameters.cpp
+    hpi/sensor_set.cpp
+    hpi/signal_model.cpp
 )
 
 set(HEADERS
-    hpiFit/hpidataupdater.h
-    hpiFit/hpimodelparameters.h
-    hpiFit/signalmodel.h
     inverse_global.h
-    IInverseAlgorithm.h
-    minimumNorm/minimumnorm.h
-    rapMusic/rapmusic.h
-    rapMusic/pwlrapmusic.h
-    rapMusic/dipole.h
-    dipoleFit/analyze_types.h
-    dipoleFit/dipole_fit.h
-    dipoleFit/dipole_fit_data.h
-    dipoleFit/dipole_fit_settings.h
-    dipoleFit/dipole_forward.h
-    dipoleFit/ecd.h
-    dipoleFit/ecd_set.h
-    dipoleFit/guess_data.h
-    c/mne_inverse_operator.h
-    c/mne_meas_data.h
-    c/mne_meas_data_set.h
-    hpiFit/hpifit.h
-    hpiFit/hpifitdata.h
-    hpiFit/sensorset.h
+    minimum_norm/minimum_norm.h
+    rap_music/rap_music.h
+    rap_music/pwl_rap_music.h
+    rap_music/dipole.h
+    mne_inverse_operator.h
+    mne_meas_data.h
+    mne_meas_data_set.h
+    mne_source_estimate.h
+    mne_cor_source_estimate.h
+    dipole_fit/analyze_types.h
+    dipole_fit/dipole_fit.h
+    dipole_fit/dipole_fit_data.h
+    dipole_fit/dipole_fit_settings.h
+    dipole_fit/dipole_forward.h
+    dipole_fit/ecd.h
+    dipole_fit/ecd_set.h
+    dipole_fit/guess_data.h
+    hpi/hpi_data_updater.h
+    hpi/hpi_fit.h
+    hpi/hpi_fit_data.h
+    hpi/hpi_model_parameters.h
+    hpi/sensor_set.h
+    hpi/signal_model.h
 )
 
 set(FILE_TO_UPDATE inverse_global.cpp)

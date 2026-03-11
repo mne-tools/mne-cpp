@@ -37,7 +37,7 @@
 //=============================================================================================================
 
 #include <utils/generics/applicationlogger.h>
-#include <inverse/hpiFit/sensorset.h>
+#include <inverse/hpi/sensor_set.h>
 #include <fiff/fiff_raw_data.h>
 #include <fwd/fwd_coil_set.h>
 

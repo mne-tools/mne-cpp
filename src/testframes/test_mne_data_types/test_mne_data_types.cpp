@@ -8,8 +8,8 @@
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
 #include <mne/mne_forwardsolution.h>
-#include <mne/mne_inverse_operator.h>
-#include <mne/mne_source_estimate.h>
+#include <inverse/mne_inverse_operator.h>
+#include <inverse/mne_source_estimate.h>
 #include <mne/mne_epoch_data.h>
 #include <mne/mne_epoch_data_list.h>
 #include <mne/mne_named_matrix.h>
@@ -25,6 +25,7 @@
 #include <fs/label.h>
 
 using namespace MNELIB;
+using namespace INVERSELIB;
 using namespace FIFFLIB;
 using namespace FSLIB;
 using namespace Eigen;

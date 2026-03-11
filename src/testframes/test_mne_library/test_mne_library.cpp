@@ -30,8 +30,8 @@
 #include <fiff/fiff_digitizer_data.h>
 
 #include <mne/mne.h>
-#include <mne/mne_inverse_operator.h>
-#include <mne/mne_source_estimate.h>
+#include <inverse/mne_inverse_operator.h>
+#include <inverse/mne_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_source_space.h>
 #include <mne/mne_forwardsolution.h>
@@ -57,6 +57,7 @@
 
 using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace INVERSELIB;
 using namespace FWDLIB;
 using namespace UTILSLIB;
 using namespace Eigen;

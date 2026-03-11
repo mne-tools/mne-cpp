@@ -38,8 +38,8 @@
 
 #include <utils/generics/applicationlogger.h>
 #include <iostream>
-#include <inverse/hpiFit/hpidataupdater.h>
-#include <inverse/hpiFit/sensorset.h>
+#include <inverse/hpi/hpi_data_updater.h>
+#include <inverse/hpi/sensor_set.h>
 
 #include <fiff/fiff.h>
 

@@ -45,7 +45,7 @@
 #include <QVector3D>
 #include <vector>
 #include <memory>
-#include <inverse/dipoleFit/ecd_set.h>
+#include <inverse/dipole_fit/ecd_set.h>
 
 // Forward-declare QRhi types so that this header stays QRhi-free
 class QRhi;

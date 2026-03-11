@@ -40,8 +40,8 @@
 //=============================================================================================================
 
 #include "rtprocessing_global.h"
-#include <inverse/hpiFit/sensorset.h>
-#include <inverse/hpiFit/signalmodel.h>
+#include <inverse/hpi/sensor_set.h>
+#include <inverse/hpi/signal_model.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES

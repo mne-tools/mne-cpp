@@ -49,6 +49,7 @@
 
 using namespace SCMEASLIB;
 using namespace MNELIB;
+using namespace INVERSELIB;
 using namespace FSLIB;
 
 //=============================================================================================================

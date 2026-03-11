@@ -37,7 +37,7 @@
 //=============================================================================================================
 
 #include <utils/generics/applicationlogger.h>
-#include <inverse/hpiFit/signalmodel.h>
+#include <inverse/hpi/signal_model.h>
 #include <utils/mnemath.h>
 #include <iostream>
 #include <utils/ioutils.h>
