@@ -195,7 +195,7 @@ private slots:
         trans.trans = Matrix4f::Identity();
         trans.trans(0, 3) = 0.1f;
 
-        dps.applyTransform(trans, true);
+        dps.applyTransform(trans, false);
         QVERIFY(qAbs(dps[0].r[0] - 1.1f) < 1e-4f);
     }
 
@@ -285,6 +285,7 @@ private slots:
         trans.to = FIFFV_COORD_MRI;
         trans.trans = Matrix4f::Identity();
         trans.trans(0, 3) = 0.1f;
+        trans.invtrans = trans.trans.inverse();
 
         FiffCoordTrans inv = trans.inverted();
         QCOMPARE(inv.from, FIFFV_COORD_MRI);

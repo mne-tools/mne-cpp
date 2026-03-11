@@ -572,6 +572,7 @@ private slots:
 
         QFile outFile(tmpPath);
         invOp.write(outFile);
+        outFile.close();
         QVERIFY(QFile::exists(tmpPath));
 
         QFile inFile(tmpPath);
