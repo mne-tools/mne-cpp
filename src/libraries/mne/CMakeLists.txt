@@ -15,13 +15,10 @@ set(SOURCES
     mne_global.cpp
     mne_source_spaces.cpp
     mne_forwardsolution.cpp
-    mne_source_estimate.cpp
     mne_hemisphere.cpp
-    mne_inverse_operator.cpp
     mne_epoch_data.cpp
     mne_epoch_data_list.cpp
     mne_cluster_info.cpp
-    mne_corsourceestimate.cpp
     mne_bem.cpp
     mne_bem_surface.cpp
     mne_project_to_surface.cpp
@@ -67,12 +64,9 @@ set(HEADERS
     mne_source_spaces.h
     mne_hemisphere.h
     mne_forwardsolution.h
-    mne_source_estimate.h
-    mne_inverse_operator.h
     mne_epoch_data.h
     mne_epoch_data_list.h
     mne_cluster_info.h
-    mne_corsourceestimate.h
     mne_bem.h
     mne_bem_surface.h
     mne_project_to_surface.h

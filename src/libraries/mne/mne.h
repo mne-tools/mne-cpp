@@ -45,7 +45,6 @@
 
 #include "mne_global.h"
 
-#include "mne_inverse_operator.h"
 #include "mne_forwardsolution.h"
 #include "mne_hemisphere.h"
 #include "mne_source_spaces.h"
@@ -288,33 +287,6 @@ public:
         return p_Hemisphere.compute_patch_info();
     }
 
-    //=========================================================================================================
-    /**
-     * mne_prepare_inverse_operator
-     *
-     * ### MNE toolbox root function ###
-     *
-     * Wrapper for the MNEInverseOperator prepare_inverse_operator member function
-     *
-     * Prepare for actually computing the inverse
-     *
-     * @param[in] orig      The inverse operator structure read from a file.
-     * @param[in] nave      Number of averages (scales the noise covariance).
-     * @param[in] lambda2   The regularization factor.
-     * @param[in] dSPM      Compute the noise-normalization factors for dSPM?.
-     * @param[in] sLORETA   Compute the noise-normalization factors for sLORETA?.
-     *
-     * @return the prepared inverse operator.
-     */
-    inline static MNEInverseOperator prepare_inverse_operator(MNEInverseOperator& orig,
-                                                              qint32 nave,
-                                                              float lambda2,
-                                                              bool dSPM,
-                                                              bool sLORETA = false)
-    {
-        return orig.prepare_inverse_operator(nave, lambda2, dSPM, sLORETA);
-    }
-
     inline static bool read_events(const QString &t_sEventName,
                             const QString &t_fileRawName,
                             Eigen::MatrixXi& events)
@@ -537,28 +509,6 @@ public:
         return p_pStream->read_cov(p_Node,
                                    cov_kind,
                                    p_covData);
-    }
-
-    //=========================================================================================================
-    /**
-     * mne_read_inverse_operator
-     *
-     * ### MNE toolbox root function ###
-     *
-     * Wrapper for the MNEInverseOperator::read_inverse_operator static function
-     *
-     * Reads the inverse operator decomposition from a fif file
-     *
-     * @param[in] p_pIODevice   A fiff IO device like a fiff QFile or QTCPSocket.
-     * @param[in, out] inv          The read inverse operator.
-     *
-     * @return true if succeeded, false otherwise.
-     */
-    static bool read_inverse_operator(QIODevice& p_pIODevice,
-                                      MNEInverseOperator& inv)
-    {
-        return MNEInverseOperator::read_inverse_operator(p_pIODevice,
-                                                         inv);
     }
 
     //=========================================================================================================

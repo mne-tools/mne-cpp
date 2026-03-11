@@ -58,8 +58,8 @@
 #include <fs/surface.h>
 #include <fs/annotationset.h>
 #include <fiff/fiff_evoked.h>
-#include <mne/mne_source_estimate.h>
-#include <inverse/minimumNorm/minimumnorm.h>
+#include <inverse/mne_source_estimate.h>
+#include <inverse/minimum_norm/minimum_norm.h>
 
 //=============================================================================================================
 // QT INCLUDES

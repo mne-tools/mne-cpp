@@ -42,7 +42,7 @@
 #include "dipolefit_global.h"
 #include <anShared/Plugins/abstractplugin.h>
 
-#include <inverse/dipoleFit/dipole_fit_settings.h>
+#include <inverse/dipole_fit/dipole_fit_settings.h>
 
 //=============================================================================================================
 // QT INCLUDES

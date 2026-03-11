@@ -42,7 +42,7 @@
 #include "scmeas_global.h"
 #include "measurement.h"
 
-#include <inverse/hpiFit/hpifit.h>
+#include <inverse/hpi/hpi_fit.h>
 
 //=============================================================================================================
 // QT INCLUDES

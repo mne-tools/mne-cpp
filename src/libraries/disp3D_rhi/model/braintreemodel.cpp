@@ -48,7 +48,7 @@
 #include "model/items/sourcespacetreeitem.h"
 #include "model/items/digitizersettreeitem.h"
 #include "model/items/networktreeitem.h"
-#include <inverse/dipoleFit/ecd_set.h>
+#include <inverse/dipole_fit/ecd_set.h>
 #include <mne/mne_hemisphere.h>
 
 BrainTreeModel::BrainTreeModel(QObject *parent)

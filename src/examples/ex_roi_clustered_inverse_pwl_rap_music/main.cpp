@@ -46,8 +46,8 @@
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 
-#include <mne/mne_source_estimate.h>
-#include <inverse/rapMusic/pwlrapmusic.h>
+#include <inverse/mne_source_estimate.h>
+#include <inverse/rap_music/pwl_rap_music.h>
 
 #include <disp3D_rhi/view/brainview.h>
 #include <disp3D_rhi/model/braintreemodel.h>
