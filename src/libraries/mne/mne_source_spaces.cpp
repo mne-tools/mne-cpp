@@ -552,7 +552,6 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
 //    patch_info(p_Hemisphere.nearest, p_Hemisphere.pinfo);
     if (p_Hemisphere.compute_patch_info())
        printf("\tPatch information added...");
-
     //
     // Distances
     //

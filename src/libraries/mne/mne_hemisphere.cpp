@@ -562,7 +562,7 @@ void MNEHemisphere::writeToStream(FiffStream* p_pStream)
         Eigen::VectorXi nearestIdx = this->nearestVertIdx();
         Eigen::VectorXf nearestDistF = this->nearestDistVec().cast<float>();
         p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NEAREST, nearestIdx.data(), nearestIdx.size());
-        p_pStream->write_float_matrix(FIFF_MNE_SOURCE_SPACE_NEAREST_DIST, nearestDistF);
+        p_pStream->write_float(FIFF_MNE_SOURCE_SPACE_NEAREST_DIST, nearestDistF.data(), nearestDistF.size());
     }
 
     //   Distances

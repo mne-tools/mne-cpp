@@ -220,20 +220,33 @@ bool FiffEvents::read_from_ascii(QIODevice &p_IODevice,
     }
     QTextStream textStream(&p_IODevice);
 
-    QList<int> simpleList;
+    QList<int> sampleList;
+    QList<int> beforeList;
+    QList<int> afterList;
 
     while(!textStream.atEnd()){
-        int iSample;
-        textStream >> iSample;
-        simpleList.append(iSample);
-        textStream.readLine();
-        qDebug() << "Added event:" << iSample;
+        QString line = textStream.readLine().trimmed();
+        if (line.isEmpty())
+            continue;
+        QTextStream lineStream(&line);
+        int iSample = 0, iBefore = 0, iAfter = 0;
+        lineStream >> iSample;
+        if (!lineStream.atEnd())
+            lineStream >> iBefore;
+        if (!lineStream.atEnd())
+            lineStream >> iAfter;
+        sampleList.append(iSample);
+        beforeList.append(iBefore);
+        afterList.append(iAfter);
+        qDebug() << "Added event:" << iSample << iBefore << iAfter;
     }
 
-    p_Events.events.resize(simpleList.size(), 1);
+    p_Events.events.resize(sampleList.size(), 3);
 
-    for(int i = 0; i < simpleList.size(); i++){
-        p_Events.events(i,0) = simpleList[i];
+    for(int i = 0; i < sampleList.size(); i++){
+        p_Events.events(i,0) = sampleList[i];
+        p_Events.events(i,1) = beforeList[i];
+        p_Events.events(i,2) = afterList[i];
     }
     return true;
 }

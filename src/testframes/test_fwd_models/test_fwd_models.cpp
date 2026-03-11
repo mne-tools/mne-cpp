@@ -62,8 +62,8 @@ private slots:
     void bemModel_calcGamma()
     {
         double v1[3] = {1.0, 0.0, 0.0};
-        double len1 = 1.0;
-        double gamma = FwdBemModel::calc_gamma(&v1[0], &len1);
+        double v2[3] = {0.5, 0.5, 0.0};
+        double gamma = FwdBemModel::calc_gamma(v1, v2);
         QVERIFY(std::isfinite(gamma));
     }
 

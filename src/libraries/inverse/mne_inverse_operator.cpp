@@ -1407,11 +1407,11 @@ void MNEInverseOperator::writeToStream(FiffStream* p_pStream)
     //   write the various priors
     //
     printf("\tWriting orientation priors.\n");
-    if(!this->orient_prior->isEmpty())
+    if(this->orient_prior && !this->orient_prior->isEmpty())
         p_pStream->write_cov(*this->orient_prior.data());
-    if(!this->depth_prior->isEmpty())
+    if(this->depth_prior && !this->depth_prior->isEmpty())
         p_pStream->write_cov(*this->depth_prior.data());
-    if(!this->fmri_prior->isEmpty())
+    if(this->fmri_prior && !this->fmri_prior->isEmpty())
         p_pStream->write_cov(*this->fmri_prior.data());
 
     //
