@@ -77,13 +77,11 @@ jobs:
         fi
     - name: Upload release binaries
       if: steps.release-info.outputs.should_upload == 'true'
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        file: mne-cpp-macos-dynamic-arm64.tar.gz
-        asset_name: ${{ steps.release-info.outputs.prefix }}-macos-dynamic-arm64.tar.gz
-        tag: ${{ steps.release-info.outputs.tag }}
-        overwrite: true
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        cp mne-cpp-macos-dynamic-arm64.tar.gz "${{ steps.release-info.outputs.prefix }}-macos-dynamic-arm64.tar.gz"
+        gh release upload "${{ steps.release-info.outputs.tag }}" "${{ steps.release-info.outputs.prefix }}-macos-dynamic-arm64.tar.gz" --clobber
 
 
   MacOSStatic:
@@ -159,10 +157,8 @@ jobs:
         ./tools/deploy.bat static pack
     - name: Upload release binaries
       if: steps.release-info.outputs.should_upload == 'true'
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        file: mne-cpp-macos-static-arm64.tar.gz
-        asset_name: ${{ steps.release-info.outputs.prefix }}-macos-static-arm64.tar.gz
-        tag: ${{ steps.release-info.outputs.tag }}
-        overwrite: true
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        cp mne-cpp-macos-static-arm64.tar.gz "${{ steps.release-info.outputs.prefix }}-macos-static-arm64.tar.gz"
+        gh release upload "${{ steps.release-info.outputs.tag }}" "${{ steps.release-info.outputs.prefix }}-macos-static-arm64.tar.gz" --clobber

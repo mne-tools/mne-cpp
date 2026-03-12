@@ -205,14 +205,11 @@ jobs:
         ls -lh MNE-CPP-*.run
 
     - name: Upload installer
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        file: MNE-CPP-*-Linux.run
-        file_glob: true
-        asset_name: ${{ steps.tag.outputs.asset_prefix }}-linux-installer-x86_64.run
-        tag: ${{ steps.tag.outputs.tag }}
-        overwrite: true
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        cp MNE-CPP-*-Linux.run "${{ steps.tag.outputs.asset_prefix }}-linux-installer-x86_64.run"
+        gh release upload "${{ steps.tag.outputs.tag }}" "${{ steps.tag.outputs.asset_prefix }}-linux-installer-x86_64.run" --clobber
 
   # =========================================================================
   # macOS Installer  (.dmg)
@@ -540,14 +537,11 @@ jobs:
         security delete-keychain "$KEYCHAIN_PATH" 2>/dev/null || true
 
     - name: Upload installer
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        file: MNE-CPP-*-Darwin.dmg
-        file_glob: true
-        asset_name: ${{ steps.tag.outputs.asset_prefix }}-macos-installer-arm64.dmg
-        tag: ${{ steps.tag.outputs.tag }}
-        overwrite: true
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        cp MNE-CPP-*-Darwin.dmg "${{ steps.tag.outputs.asset_prefix }}-macos-installer-arm64.dmg"
+        gh release upload "${{ steps.tag.outputs.tag }}" "${{ steps.tag.outputs.asset_prefix }}-macos-installer-arm64.dmg" --clobber
 
   # =========================================================================
   # Windows Installer  (.exe)
@@ -734,11 +728,9 @@ jobs:
         Get-ChildItem MNE-CPP-*-win64.exe
 
     - name: Upload installer
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        file: MNE-CPP-*-win64.exe
-        file_glob: true
-        asset_name: ${{ steps.tag.outputs.asset_prefix }}-windows-installer-x86_64.exe
-        tag: ${{ steps.tag.outputs.tag }}
-        overwrite: true
+      shell: bash
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        cp MNE-CPP-*-win64.exe "${{ steps.tag.outputs.asset_prefix }}-windows-installer-x86_64.exe"
+        gh release upload "${{ steps.tag.outputs.tag }}" "${{ steps.tag.outputs.asset_prefix }}-windows-installer-x86_64.exe" --clobber
