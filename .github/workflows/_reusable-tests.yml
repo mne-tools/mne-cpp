@@ -163,11 +163,13 @@ jobs:
         echo "gcda files: $(find build -name '*.gcda' 2>/dev/null | wc -l)"
         lcov --capture --directory build \
              --output-file coverage.info \
-             --ignore-errors mismatch
+             --ignore-errors mismatch \
+             --ignore-errors negative \
+             --ignore-errors gcov
         # Remove external/test code from the report
         lcov --remove coverage.info \
              '*/src/external/*' '*/src/examples/*' '*/src/testframes/*' \
-             '/usr/*' '*/Qt/*' \
+             '/usr/*' '*/Qt/*' '*/eigen*' \
              --output-file coverage_filtered.info \
              --ignore-errors unused 2>/dev/null || true
         # Extract total line coverage percentage
