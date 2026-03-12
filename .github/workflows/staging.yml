@@ -131,13 +131,11 @@ jobs:
         doxygen mne-cpp_doxyfile
 
     - name: Deploy qch to dev_build release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        file: doc/doxygen/qt-creator_doc/mne-cpp.qch
-        asset_name: mne-cpp-dev-doc-qtcreator.qch
-        tag: dev_build
-        overwrite: true
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        cp doc/doxygen/qt-creator_doc/mne-cpp.qch mne-cpp-dev-doc-qtcreator.qch
+        gh release upload dev_build mne-cpp-dev-doc-qtcreator.qch --clobber
 
     - name: Deploy Doxygen to GitHub Pages (dev subdirectory)
       env:
@@ -262,10 +260,8 @@ jobs:
         tar cfz mne-cpp-wasm.tar.gz -C out/wasm .
       
     - name: Upload WASM to dev_build release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        file: mne-cpp-wasm.tar.gz
-        asset_name: mne-cpp-dev-wasm.tar.gz
-        tag: dev_build
-        overwrite: true
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        cp mne-cpp-wasm.tar.gz mne-cpp-dev-wasm.tar.gz
+        gh release upload dev_build mne-cpp-dev-wasm.tar.gz --clobber
