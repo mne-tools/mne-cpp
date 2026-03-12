@@ -177,9 +177,9 @@ public:
     float   ey[3];          /**< This stupid construction needs to be replaced with. */
     float   ez[3];          /**< a coordinate transformation. */
     int     np;             /**< Number of integration points. */
-    float   **rmag;         /**< The field point locations. */
-    float   **cosmag;       /**< The corresponding direction cosines. */
-    float   *w;             /**< The weighting coefficients. */
+    Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> rmag;    /**< The field point locations (np x 3). */
+    Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> cosmag;  /**< The corresponding direction cosines (np x 3). */
+    Eigen::VectorXf w;              /**< The weighting coefficients. */
 
 // ### OLD STRUCT ###
 //    typedef struct {

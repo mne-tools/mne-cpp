@@ -242,6 +242,28 @@ public:
 
     static int read_label(const QString& label,
                           Eigen::VectorXi& sel);
+
+    //=========================================================================================================
+    /**
+     * Write this source space to a FIFF stream.
+     *
+     * @param[in] stream         The FIFF output stream.
+     * @param[in] selected_only  If true, write only the vertices that are in use.
+     *
+     * @return FIFF_OK on success, FIFF_FAIL on error.
+     */
+    int writeToStream(FIFFLIB::FiffStream::SPtr& stream, bool selected_only) const;
+
+private:
+    /**
+     * Write volume source space information (neighbors, voxel transforms, interpolator) to a FIFF stream.
+     *
+     * @param[in] stream         The FIFF output stream.
+     * @param[in] selected_only  If true, write only selected (in-use) vertices.
+     *
+     * @return OK on success, FAIL on error.
+     */
+    int writeVolumeInfo(FIFFLIB::FiffStream::SPtr& stream, bool selected_only) const;
 };
 
 //=============================================================================================================

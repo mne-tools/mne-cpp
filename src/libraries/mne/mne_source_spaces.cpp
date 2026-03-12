@@ -42,7 +42,7 @@
 #include "mne_nearest.h"
 
 #include <utils/mnemath.h>
-#include <fs/label.h>
+#include <fs/fs_label.h>
 
 #include <iostream>
 
@@ -90,6 +90,13 @@ MNESourceSpaces::~MNESourceSpaces()
 void MNESourceSpaces::clear()
 {
     m_sourceSpaces.clear();
+}
+
+//=============================================================================================================
+
+void MNESourceSpaces::append(const MNESourceSpace& space)
+{
+    m_sourceSpaces.push_back(space.clone());
 }
 
 //=============================================================================================================

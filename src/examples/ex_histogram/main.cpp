@@ -54,9 +54,9 @@
 #include <disp/plots/spline.h>
 
 //includes for source localization data
-#include <fs/label.h>
-#include <fs/surface.h>
-#include <fs/annotationset.h>
+#include <fs/fs_label.h>
+#include <fs/fs_surface.h>
+#include <fs/fs_annotationset.h>
 #include <fiff/fiff_evoked.h>
 #include <inverse/mne_source_estimate.h>
 #include <inverse/minimum_norm/minimum_norm.h>

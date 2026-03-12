@@ -11,7 +11,7 @@
 #include <fwd/fwd_bem_solution.h>
 #include <fwd/fwd_comp_data.h>
 #include <fwd/fwd_thread_arg.h>
-#include <fwd/computeFwd/compute_fwd_settings.h>
+#include <fwd/compute_fwd/compute_fwd_settings.h>
 
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_coord_trans.h>
@@ -356,7 +356,7 @@ private slots:
     {
         FwdBemModel bem;
         FiffCoordTrans t = FiffCoordTrans::identity(FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
-        int ok = FwdBemModel::fwd_bem_set_head_mri_t(&bem, t);
+        int ok = bem.fwd_bem_set_head_mri_t(t);
         Q_UNUSED(ok);
         QVERIFY(true);
     }

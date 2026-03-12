@@ -123,7 +123,7 @@ FwdThreadArg *FwdThreadArg::create_eeg_multi_thread_duplicate(FwdThreadArg *one,
         FwdBemModel*   orig_bem = (FwdBemModel*)res->client;
 
         *new_bem    = *orig_bem;
-        new_bem->v0 = NULL;
+        new_bem->v0.resize(0);
         res->client = new_bem;
     }
     return res;
@@ -139,8 +139,7 @@ void FwdThreadArg::free_eeg_multi_thread_duplicate(FwdThreadArg *one, bool bem_m
     }
     if (bem_model) {
         FwdBemModel*    bem = (FwdBemModel*) one->client;
-        FREE_80(bem->v0);
-        FREE_80(bem);
+        delete bem;
     }
     one->client = NULL;
     if(one)
@@ -171,7 +170,7 @@ FwdThreadArg *FwdThreadArg::create_meg_multi_thread_duplicate(FwdThreadArg* one,
         FwdBemModel*   orig_bem = (FwdBemModel*)comp->client;
 
         *new_bem     = *orig_bem;
-        new_bem->v0  = NULL;
+        new_bem->v0.resize(0);
         comp->client = new_bem;
     }
     return res;
@@ -196,8 +195,7 @@ void FwdThreadArg::free_meg_multi_thread_duplicate(FwdThreadArg *one, bool bem_m
 
     if (bem_model) {
         FwdBemModel*    bem = (FwdBemModel*)comp->client;
-        FREE_80(bem->v0);
-        FREE_80(bem);
+        delete bem;
     }
     FREE_80(comp);
     one->client = NULL;

@@ -8,10 +8,10 @@
 #include <fwd/fwd_eeg_sphere_model_set.h>
 #include <fwd/fwd_coil_set.h>
 #include <fwd/fwd_coil.h>
-#include <fwd/computeFwd/compute_fwd_settings.h>
+#include <fwd/compute_fwd/compute_fwd_settings.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_constants.h>
-#include <mne/mne_forwardsolution.h>
+#include <mne/mne_forward_solution.h>
 
 using namespace FWDLIB;
 using namespace FIFFLIB;
@@ -119,7 +119,7 @@ private slots:
         trans.trans = Matrix4f::Identity();
         trans.invtrans = Matrix4f::Identity();
 
-        int result = FwdBemModel::fwd_bem_set_head_mri_t(model, trans);
+        int result = model->fwd_bem_set_head_mri_t(trans);
         QVERIFY(result >= 0);
         delete model;
     }
@@ -220,7 +220,7 @@ private slots:
         if (model) {
             QVERIFY(model->nsol > 0 || model->nsurf > 0);
             if (QFile::exists(solPath)) {
-                FwdBemModel::fwd_bem_load_solution(solPath, FWD_BEM_UNKNOWN, model);
+                model->fwd_bem_load_solution(solPath, FWD_BEM_UNKNOWN);
             }
             delete model;
         }

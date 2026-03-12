@@ -47,8 +47,8 @@
 #include <disp3D_rhi/model/items/digitizersettreeitem.h>
 #include <disp3D_rhi/model/items/bemtreeitem.h>
 
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
+#include <fs/fs_surfaceset.h>
+#include <fs/fs_annotationset.h>
 
 #include <inverse/mne_source_estimate.h>
 #include <mne/mne_bem.h>

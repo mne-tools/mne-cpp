@@ -38,8 +38,8 @@
 
 #include "connectivitysettings.h"
 
-#include <mne/mne_forwardsolution.h>
-#include <fs/surfaceset.h>
+#include <mne/mne_forward_solution.h>
+#include <fs/fs_surfaceset.h>
 #include <fiff/fiff_info.h>
 
 //=============================================================================================================

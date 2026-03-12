@@ -51,7 +51,7 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <mne/mne_bem.h>
-#include <fs/surface.h>
+#include <fs/fs_surface.h>
 
 using namespace FIFFLIB;
 using namespace MNELIB;

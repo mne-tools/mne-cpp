@@ -53,9 +53,9 @@
 
 #include <fiff/fiff_raw_data.h>
 
-#include <fs/label.h>
-#include <fs/annotationset.h>
-#include <fs/surfaceset.h>
+#include <fs/fs_label.h>
+#include <fs/fs_annotationset.h>
+#include <fs/fs_surfaceset.h>
 
 #include <inverse/mne_source_estimate.h>
 #include <mne/mne_epoch_data_list.h>

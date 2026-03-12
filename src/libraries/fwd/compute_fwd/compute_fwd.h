@@ -51,10 +51,9 @@
 #include "../fwd_eeg_sphere_model_set.h"
 #include "../fwd_bem_model.h"
 
-#include <mne/mne_named_matrix.h>
 #include <mne/mne_nearest.h>
 #include <mne/mne_source_space.h>
-#include <mne/mne_forwardsolution.h>
+#include <mne/mne_forward_solution.h>
 
 #include <fiff/fiff_sparse_matrix.h>
 
@@ -164,22 +163,21 @@ private:
 
     std::vector<std::unique_ptr<MNELIB::MNESourceSpace>> m_spaces;  /**< Source spaces. */
     int m_iNSource;                                 /**< Number of source space points. */
-    FwdCoilSet* m_templates;                        /**< The template coil set. */
-    FwdCoilSet* m_megcoils;                         /**< The MEG coil set. */
-    FwdCoilSet* m_compcoils;                        /**< The compensator coil set. */
-    FwdCoilSet* m_eegels;                           /**< The EEG eceltrode set. */
+    std::unique_ptr<FwdCoilSet> m_templates;        /**< The template coil set. */
+    std::unique_ptr<FwdCoilSet> m_megcoils;         /**< The MEG coil set. */
+    std::unique_ptr<FwdCoilSet> m_compcoils;        /**< The compensator coil set. */
+    std::unique_ptr<FwdCoilSet> m_eegels;           /**< The EEG electrode set. */
     std::unique_ptr<MNELIB::MNECTFCompDataSet> m_compData; /**< The compensator data. */
-    FwdEegSphereModelSet* m_eegModels;              /**< The EEG model set. */
-    FwdEegSphereModel* m_eegModel;                  /**< The EEG model. */
-    FwdBemModel *m_bemModel;                        /**< BEM model definition. */
-    Eigen::Vector3f *m_r0;                          /**< The Sphere model origin. */
+    std::unique_ptr<FwdEegSphereModelSet> m_eegModels; /**< The EEG model set. */
+    std::unique_ptr<FwdEegSphereModel> m_eegModel;  /**< The EEG model. */
+    std::unique_ptr<FwdBemModel> m_bemModel;        /**< BEM model definition. */
 
     QList<FIFFLIB::FiffChInfo> m_listMegChs;        /**< The MEG channel information. */
     QList<FIFFLIB::FiffChInfo> m_listEegChs;        /**< The EEG channel information. */
     QList<FIFFLIB::FiffChInfo> m_listCompChs;       /**< The Compensator Channel List. */
     int m_iNChan;                                   /**< The number of channels. */
 
-    FIFFLIB::fiffId m_mri_id;                       /**< The MRI ID. */
+    FIFFLIB::FiffId m_mri_id;                       /**< The MRI ID. */
     FIFFLIB::FiffId m_meas_id;                      /**< The Measurement ID. */
     FIFFLIB::FiffCoordTrans m_mri_head_t;       /**< The MRI->head coordinate transformation. */
     FIFFLIB::FiffCoordTrans m_meg_head_t;       /**< The MEG->head coordinate transformation. */

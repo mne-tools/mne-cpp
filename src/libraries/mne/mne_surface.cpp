@@ -262,9 +262,7 @@ Eigen::Vector3f MNESurface::project_to_triangle(int tri, float p, float q) const
     const MNETriangle* this_tri = &tris[tri];
 
     return Eigen::Vector3f(
-        this_tri->r1[0] + p * this_tri->r12[0] + q * this_tri->r13[0],
-        this_tri->r1[1] + p * this_tri->r12[1] + q * this_tri->r13[1],
-        this_tri->r1[2] + p * this_tri->r12[2] + q * this_tri->r13[2]
+        this_tri->r1 + p * this_tri->r12 + q * this_tri->r13
     );
 }
 

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     annotationset.cpp
+ * @file     fs_annotationset.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -38,8 +38,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "annotationset.h"
-#include "surfaceset.h"
+#include "fs_annotationset.h"
+#include "fs_surfaceset.h"
 
 #include <QFile>
 #include <QDebug>

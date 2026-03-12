@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     mne_forwardsolution.cpp
+ * @file     mne_forward_solution.cpp
  * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_forwardsolution.h"
+#include "mne_forward_solution.h"
 
 #include <utils/ioutils.h>
 
@@ -55,9 +55,9 @@
 // FIFF INCLUDES
 //=============================================================================================================
 
-#include <fs/colortable.h>
-#include <fs/label.h>
-#include <fs/surfaceset.h>
+#include <fs/fs_colortable.h>
+#include <fs/fs_label.h>
+#include <fs/fs_surfaceset.h>
 #include <utils/mnemath.h>
 #include <utils/kmeans.h>
 
@@ -128,6 +128,8 @@ MNEForwardSolution::MNEForwardSolution(const MNEForwardSolution &p_MNEForwardSol
 , sol(p_MNEForwardSolution.sol)
 , sol_grad(p_MNEForwardSolution.sol_grad)
 , mri_head_t(p_MNEForwardSolution.mri_head_t)
+, mri_filename(p_MNEForwardSolution.mri_filename)
+, mri_id(p_MNEForwardSolution.mri_id)
 , src(p_MNEForwardSolution.src)
 , source_rr(p_MNEForwardSolution.source_rr)
 , source_nn(p_MNEForwardSolution.source_nn)
@@ -153,9 +155,202 @@ void MNEForwardSolution::clear()
     sol = FiffNamedMatrix::SDPtr(new FiffNamedMatrix());
     sol_grad = FiffNamedMatrix::SDPtr(new FiffNamedMatrix());
     mri_head_t.clear();
+    mri_filename.clear();
+    mri_id.clear();
     src.clear();
     source_rr = MatrixX3f(0,3);
     source_nn = MatrixX3f(0,3);
+}
+
+//=============================================================================================================
+
+bool MNEForwardSolution::write(QIODevice& p_IODevice) const
+{
+    //
+    //   Classify channels into MEG and EEG index sets
+    //
+    QList<int> megIdx, eegIdx;
+    for (int k = 0; k < info.chs.size(); ++k) {
+        fiff_int_t kind = info.chs[k].kind;
+        if (kind == FIFFV_MEG_CH || kind == FIFFV_REF_MEG_CH)
+            megIdx.append(k);
+        else if (kind == FIFFV_EEG_CH)
+            eegIdx.append(k);
+    }
+    int nmeg = megIdx.size();
+    int neeg = eegIdx.size();
+
+    //
+    //   Compute the total number of active source vertices
+    //
+    int nvert = 0;
+    for (int k = 0; k < src.size(); ++k)
+        nvert += src[k].nuse;
+
+    //
+    //   Open the file, create the directory
+    //
+    FiffStream::SPtr t_pStream = FiffStream::start_file(p_IODevice);
+    t_pStream->start_block(FIFFB_MNE);
+
+    //
+    //   Information from the MRI file
+    //
+    {
+        t_pStream->start_block(FIFFB_MNE_PARENT_MRI_FILE);
+
+        if (!mri_filename.isEmpty())
+            t_pStream->write_string(FIFF_MNE_FILE_NAME, mri_filename);
+        if (!mri_id.isEmpty())
+            t_pStream->write_id(FIFF_PARENT_FILE_ID, mri_id);
+        t_pStream->write_coord_trans(mri_head_t);
+
+        t_pStream->end_block(FIFFB_MNE_PARENT_MRI_FILE);
+    }
+
+    //
+    //   Information from the measurement file
+    //
+    {
+        t_pStream->start_block(FIFFB_MNE_PARENT_MEAS_FILE);
+
+        if (!info.filename.isEmpty())
+            t_pStream->write_string(FIFF_MNE_FILE_NAME, info.filename);
+        if (!info.meas_id.isEmpty())
+            t_pStream->write_id(FIFF_PARENT_BLOCK_ID, info.meas_id);
+        t_pStream->write_coord_trans(info.dev_head_t);
+
+        int totalChan = nmeg + neeg;
+        t_pStream->write_int(FIFF_NCHAN, &totalChan);
+
+        //  Write channel infos with sequential scanNo
+        QList<FiffChInfo> allChs;
+        for (int k = 0; k < nmeg; ++k)
+            allChs.append(info.chs[megIdx[k]]);
+        for (int k = 0; k < neeg; ++k)
+            allChs.append(info.chs[eegIdx[k]]);
+        for (int p = 0; p < allChs.size(); ++p) {
+            allChs[p].scanNo = p + 1;
+            t_pStream->write_ch_info(allChs[p]);
+        }
+
+        t_pStream->write_bad_channels(info.bads);
+
+        t_pStream->end_block(FIFFB_MNE_PARENT_MEAS_FILE);
+    }
+
+    //
+    //   Write the source spaces
+    //
+    for (int k = 0; k < src.size(); ++k) {
+        if (src[k].writeToStream(t_pStream, false) == FIFF_FAIL) {
+            t_pStream->close();
+            return false;
+        }
+    }
+
+    //
+    //   Extract sub-matrices for MEG and EEG from the combined sol
+    //
+    auto extractRows = [](const FiffNamedMatrix& combined,
+                          const QList<int>& rowIdx) -> FiffNamedMatrix
+    {
+        int nRows = rowIdx.size();
+        int nCols = combined.ncol;
+        MatrixXd data(nRows, nCols);
+        QStringList row_names;
+        for (int r = 0; r < nRows; ++r) {
+            data.row(r) = combined.data.row(rowIdx[r]);
+            row_names.append(combined.row_names[rowIdx[r]]);
+        }
+        FiffNamedMatrix sub;
+        sub.nrow = nRows;
+        sub.ncol = nCols;
+        sub.row_names = row_names;
+        sub.col_names = combined.col_names;
+        sub.data = data;
+        return sub;
+    };
+
+    int ori_val = (source_ori == FIFFV_MNE_FIXED_ORI) ? FIFFV_MNE_FIXED_ORI : FIFFV_MNE_FREE_ORI;
+    int frame = coord_frame;
+
+    //
+    //   MEG forward solution
+    //
+    if (nmeg > 0) {
+        t_pStream->start_block(FIFFB_MNE_FORWARD_SOLUTION);
+
+        int val = FIFFV_MNE_MEG;
+        t_pStream->write_int(FIFF_MNE_INCLUDED_METHODS, &val);
+        t_pStream->write_int(FIFF_MNE_COORD_FRAME, &frame);
+        t_pStream->write_int(FIFF_MNE_SOURCE_ORIENTATION, &ori_val);
+        t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS, &nvert);
+        t_pStream->write_int(FIFF_NCHAN, &nmeg);
+
+        FiffNamedMatrix megSol = extractRows(*sol.data(), megIdx);
+        megSol.transpose_named_matrix();
+        t_pStream->write_named_matrix(FIFF_MNE_FORWARD_SOLUTION, megSol);
+
+        if (!sol_grad->isEmpty()) {
+            FiffNamedMatrix megGrad = extractRows(*sol_grad.data(), megIdx);
+            megGrad.transpose_named_matrix();
+            t_pStream->write_named_matrix(FIFF_MNE_FORWARD_SOLUTION_GRAD, megGrad);
+        }
+        t_pStream->end_block(FIFFB_MNE_FORWARD_SOLUTION);
+    }
+
+    //
+    //   EEG forward solution
+    //
+    if (neeg > 0) {
+        t_pStream->start_block(FIFFB_MNE_FORWARD_SOLUTION);
+
+        int val = FIFFV_MNE_EEG;
+        t_pStream->write_int(FIFF_MNE_INCLUDED_METHODS, &val);
+        t_pStream->write_int(FIFF_MNE_COORD_FRAME, &frame);
+        t_pStream->write_int(FIFF_MNE_SOURCE_ORIENTATION, &ori_val);
+        t_pStream->write_int(FIFF_NCHAN, &neeg);
+        t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS, &nvert);
+
+        FiffNamedMatrix eegSol = extractRows(*sol.data(), eegIdx);
+        eegSol.transpose_named_matrix();
+        t_pStream->write_named_matrix(FIFF_MNE_FORWARD_SOLUTION, eegSol);
+
+        if (!sol_grad->isEmpty()) {
+            FiffNamedMatrix eegGrad = extractRows(*sol_grad.data(), eegIdx);
+            eegGrad.transpose_named_matrix();
+            t_pStream->write_named_matrix(FIFF_MNE_FORWARD_SOLUTION_GRAD, eegGrad);
+        }
+        t_pStream->end_block(FIFFB_MNE_FORWARD_SOLUTION);
+    }
+
+    t_pStream->end_block(FIFFB_MNE);
+    t_pStream->end_file();
+    t_pStream->close();
+    t_pStream.clear();
+
+    //
+    //   Update the directory
+    //
+    if (auto* qf = dynamic_cast<QFile*>(&p_IODevice)) {
+        QFile fileIn(qf->fileName());
+        FiffStream::SPtr t_pStreamIn = FiffStream::open_update(fileIn);
+        if (t_pStreamIn) {
+            const auto& dir = t_pStreamIn->dir();
+            for (int i = 0; i < dir.size(); ++i) {
+                if (dir[i]->kind == FIFF_DIR_POINTER) {
+                    fiff_int_t dirpos = (fiff_int_t)t_pStreamIn->write_dir_entries(dir);
+                    if (dirpos >= 0)
+                        t_pStreamIn->write_dir_pointer(dirpos, dir[i]->pos);
+                    break;
+                }
+            }
+            t_pStreamIn->close();
+        }
+    }
+
+    return true;
 }
 
 //=============================================================================================================

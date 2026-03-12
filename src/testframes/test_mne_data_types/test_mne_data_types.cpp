@@ -7,7 +7,7 @@
 #include <mne/mne_hemisphere.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
-#include <mne/mne_forwardsolution.h>
+#include <mne/mne_forward_solution.h>
 #include <inverse/mne_inverse_operator.h>
 #include <inverse/mne_source_estimate.h>
 #include <mne/mne_epoch_data.h>
@@ -22,7 +22,7 @@
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_constants.h>
-#include <fs/label.h>
+#include <fs/fs_label.h>
 
 using namespace MNELIB;
 using namespace INVERSELIB;

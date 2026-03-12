@@ -173,13 +173,13 @@ public:
 
     static int fwd_eeg_multi_spherepot(float   *rd,	          /* Dipole position */
                        float   *Q,	          /* Dipole moment */
-                       float   **el,	  /* Electrode positions */
+                       const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& el,	  /* Electrode positions */
                        int     neeg,	  /* Number of electrodes */
                        float   *Vval,         /* The potential values */
                        void    *client);
 
-    static int fwd_eeg_multi_spherepot_coil1(float *rd,    /* Dipole position */
-                      float      *Q,                /* Dipole moment */
+    static int fwd_eeg_multi_spherepot_coil1(const Eigen::Vector3f& rd,    /* Dipole position */
+                      const Eigen::Vector3f& Q,                /* Dipole moment */
                       FwdCoilSet* els,              /* Electrode positions */
                       float      *Vval,             /* The potential values */
                       void       *client);
@@ -209,7 +209,7 @@ public:
      *
      * @return true when successful.
      */
-    static bool fwd_eeg_spherepot_vec (float *rd, float **el, int neeg, float **Vval_vec, void *client);
+    static bool fwd_eeg_spherepot_vec (float *rd, const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& el, int neeg, float **Vval_vec, void *client);
 
     //=========================================================================================================
     /**
@@ -229,10 +229,10 @@ public:
      *
      * @return true when successful.
      */
-    static int fwd_eeg_spherepot_coil_vec(float *rd, FwdCoilSet* els, float **Vval_vec, void *client);
+    static int fwd_eeg_spherepot_coil_vec(const Eigen::Vector3f& rd, FwdCoilSet* els, float **Vval_vec, void *client);
 
-    static int fwd_eeg_spherepot_grad_coil( float        *rd,      /* The dipole location */
-                                            float        Q[],      /* The dipole components (xyz) */
+    static int fwd_eeg_spherepot_grad_coil( const Eigen::Vector3f& rd,      /* The dipole location */
+                                            const Eigen::Vector3f& Q,      /* The dipole components (xyz) */
                                             FwdCoilSet*  coils,    /* The coil definitions */
                                             float        Vval[],   /* Results */
                                             float        xgrad[],  /* The derivatives with respect to */
@@ -258,7 +258,7 @@ public:
      *
      * @return true when successful.
      */
-    static int fwd_eeg_spherepot( float *rd, float *Q, float **el, int neeg, Eigen::VectorXf& Vval, void *client);
+    static int fwd_eeg_spherepot( float *rd, float *Q, const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& el, int neeg, Eigen::VectorXf& Vval, void *client);
 
     //=========================================================================================================
     /**
@@ -275,7 +275,7 @@ public:
      *
      * @return true when successful.
      */
-    static int fwd_eeg_spherepot_coil(float *rd, float *Q, FwdCoilSet* els, float *Vval, void *client);
+    static int fwd_eeg_spherepot_coil(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet* els, float *Vval, void *client);
 
     //=========================================================================================================
     /**

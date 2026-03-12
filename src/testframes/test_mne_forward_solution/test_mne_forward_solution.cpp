@@ -41,8 +41,8 @@
 
 #include <utils/generics/applicationlogger.h>
 
-#include <fwd/computeFwd/compute_fwd_settings.h>
-#include <fwd/computeFwd/compute_fwd.h>
+#include <fwd/compute_fwd/compute_fwd_settings.h>
+#include <fwd/compute_fwd/compute_fwd.h>
 #include <mne/mne.h>
 
 #include <fiff/fiff.h>

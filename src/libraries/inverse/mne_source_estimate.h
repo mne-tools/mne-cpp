@@ -44,7 +44,7 @@
 
 #include "inverse_global.h"
 
-#include <fs/label.h>
+#include <fs/fs_label.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES

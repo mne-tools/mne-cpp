@@ -51,7 +51,7 @@
 #include "watershedbem.h"
 #include "mne_watershed_bem_settings.h"
 
-#include <fs/surface.h>
+#include <fs/fs_surface.h>
 
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>

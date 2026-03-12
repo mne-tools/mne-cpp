@@ -47,10 +47,10 @@
 // MNE INCLUDES
 //=============================================================================================================
 
-#include <fs/label.h>
-#include <fs/surface.h>
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
+#include <fs/fs_label.h>
+#include <fs/fs_surface.h>
+#include <fs/fs_surfaceset.h>
+#include <fs/fs_annotationset.h>
 
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff.h>

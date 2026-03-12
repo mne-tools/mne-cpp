@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "fiff_ch_info.h"
+#include "fiff_constants.h"
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -89,5 +90,21 @@ FiffChInfo::FiffChInfo(const FiffChInfo &p_FiffChInfo)
 
 FiffChInfo::~FiffChInfo()
 {
+}
+
+//=============================================================================================================
+
+bool FiffChInfo::checkEegLocations(const QList<FiffChInfo>& chs, int nch)
+{
+    const float close = 0.02f;
+    for (int k = 0; k < nch; k++) {
+        if (chs.at(k).kind == FIFFV_EEG_CH) {
+            if (chs.at(k).chpos.r0.norm() < close) {
+                qCritical("Some EEG channels do not have locations assigned.");
+                return false;
+            }
+        }
+    }
+    return true;
 }
 

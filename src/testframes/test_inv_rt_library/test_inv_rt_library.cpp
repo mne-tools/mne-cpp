@@ -19,7 +19,7 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
 
-#include <mne/mne_forwardsolution.h>
+#include <mne/mne_forward_solution.h>
 #include <mne/mne_source_spaces.h>
 
 #include <inverse/dipole_fit/dipole_fit_settings.h>

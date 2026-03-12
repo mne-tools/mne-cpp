@@ -66,8 +66,7 @@ using namespace FWDLIB;
 //=============================================================================================================
 
 FwdBemSolution::FwdBemSolution()
-:solution(NULL)
-,ncoil(0)
+:ncoil(0)
 ,np(0)
 {
 }
@@ -76,7 +75,6 @@ FwdBemSolution::FwdBemSolution()
 
 FwdBemSolution::~FwdBemSolution()
 {
-    FREE_CMATRIX_42(solution);
 }
 
 //=============================================================================================================

@@ -53,13 +53,13 @@
 
 #include <mne/mne.h>
 #include <inverse/mne_inverse_operator.h>
-#include <mne/mne_forwardsolution.h>
+#include <mne/mne_forward_solution.h>
 #include <inverse/mne_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 
 #include <inverse/minimum_norm/minimum_norm.h>
 
-#include <fs/label.h>
+#include <fs/fs_label.h>
 
 #include <utils/generics/applicationlogger.h>
 

@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "mne_inverse_operator.h"
-#include <fs/label.h>
+#include <fs/fs_label.h>
 
 #include <iostream>
 

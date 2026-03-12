@@ -41,7 +41,7 @@
 
 #include <fiff/fiff_info.h>
 
-#include <mne/mne_forwardsolution.h>
+#include <mne/mne_forward_solution.h>
 #include <inverse/mne_inverse_operator.h>
 
 //=============================================================================================================

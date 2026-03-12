@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     mne_forwardsolution.h
+ * @file     mne_forward_solution.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -35,8 +35,8 @@
  *
  */
 
-#ifndef MNE_FORWARDSOLUTION_H
-#define MNE_FORWARDSOLUTION_H
+#ifndef MNE_FORWARD_SOLUTION_H
+#define MNE_FORWARD_SOLUTION_H
 
 //=============================================================================================================
 // INCLUDES
@@ -48,7 +48,7 @@
 #include <utils/mnemath.h>
 #include <utils/kmeans.h>
 
-#include <fs/annotationset.h>
+#include <fs/fs_annotationset.h>
 
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_coord_trans.h>
@@ -447,6 +447,22 @@ public:
 
     //=========================================================================================================
     /**
+     * Write the forward solution to a FIFF file.
+     *
+     * Formerly write_solution (SVN MNE).
+     *
+     * Splits the combined MEG/EEG forward matrix back into separate blocks
+     * for FIFF storage, writes source spaces, coordinate transforms, and
+     * parent file provenance.
+     *
+     * @param[in] p_IODevice   The I/O device (e.g. QFile) to write to.
+     *
+     * @return True if succeeded, false otherwise.
+     */
+    bool write(QIODevice& p_IODevice) const;
+
+    //=========================================================================================================
+    /**
      * reduces the forward solution and stores the result to p_fwdOut.
      *
      * @param[in]   p_iNumDipoles   Desired number of dipoles.
@@ -530,6 +546,8 @@ public:
     FIFFLIB::FiffNamedMatrix::SDPtr sol;        /**< Forward solution. */
     FIFFLIB::FiffNamedMatrix::SDPtr sol_grad;   /**< ToDo... */
     FIFFLIB::FiffCoordTrans mri_head_t;         /**< MRI head coordinate transformation. */
+    QString mri_filename;                        /**< MRI file name (parent provenance). */
+    FIFFLIB::FiffId mri_id;                      /**< MRI file ID (parent provenance). */
     MNESourceSpaces src;                         /**< Geometric description of the source spaces (hemispheres). */
     Eigen::MatrixX3f source_rr;                 /**< Source locations. */
     Eigen::MatrixX3f source_nn;                 /**< Source normals (number depends on fixed or free orientation). */
@@ -594,4 +612,4 @@ inline bool operator== (const MNEForwardSolution &a, const MNEForwardSolution &b
 }
 } // NAMESPACE
 
-#endif // MNE_FORWARDSOLUTION_H
+#endif // MNE_FORWARD_SOLUTION_H

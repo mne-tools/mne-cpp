@@ -40,14 +40,14 @@
 
 #include <disp/viewers/fwdsettingsview.h>
 
-#include <fwd/computeFwd/compute_fwd.h>
-#include <fwd/computeFwd/compute_fwd_settings.h>
+#include <fwd/compute_fwd/compute_fwd.h>
+#include <fwd/compute_fwd/compute_fwd_settings.h>
 
 #include <inverse/hpi/hpi_fit.h>
 
-#include <fs/annotationset.h>
+#include <fs/fs_annotationset.h>
 
-#include <mne/mne_forwardsolution.h>
+#include <mne/mne_forward_solution.h>
 
 #include <scMeas/realtimehpiresult.h>
 #include <scMeas/realtimefwdsolution.h>

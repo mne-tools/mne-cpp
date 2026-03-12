@@ -40,7 +40,7 @@
 #include "rtsourcedataworker.h"
 #include "rtsourceinterpolationmatworker.h"
 
-#include <fs/label.h>
+#include <fs/fs_label.h>
 
 #include <QThread>
 #include <QTimer>

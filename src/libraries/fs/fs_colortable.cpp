@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     colortable.cpp
+ * @file     fs_colortable.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "colortable.h"
+#include "fs_colortable.h"
 
 //=============================================================================================================
 // USED NAMESPACES

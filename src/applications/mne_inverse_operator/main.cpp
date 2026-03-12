@@ -58,7 +58,7 @@
 
 #include <mne/mne.h>
 #include <inverse/mne_inverse_operator.h>
-#include <mne/mne_forwardsolution.h>
+#include <mne/mne_forward_solution.h>
 
 #include <utils/generics/applicationlogger.h>
 

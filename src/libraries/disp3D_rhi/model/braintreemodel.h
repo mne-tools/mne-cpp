@@ -45,8 +45,8 @@
 #include "../disp3D_rhi_global.h"
 
 #include <QStandardItemModel>
-#include <fs/surface.h>
-#include <fs/annotation.h>
+#include <fs/fs_surface.h>
+#include <fs/fs_annotation.h>
 #include <mne/mne_bem_surface.h>
 #include <mne/mne_source_spaces.h>
 #include <fiff/fiff_dig_point.h>

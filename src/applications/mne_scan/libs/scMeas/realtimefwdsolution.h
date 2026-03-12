@@ -42,7 +42,7 @@
 #include "scmeas_global.h"
 #include "measurement.h"
 
-#include <mne/mne_forwardsolution.h>
+#include <mne/mne_forward_solution.h>
 
 //=============================================================================================================
 // QT INCLUDES

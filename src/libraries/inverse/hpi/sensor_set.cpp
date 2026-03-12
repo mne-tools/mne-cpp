@@ -103,8 +103,8 @@ void SensorSet::initFromFwdCoilSet(const QSharedPointer<FWDLIB::FwdCoilSet> pFwd
         for (int p = 0; p < m_np; p++){
             m_w(i*m_np+p) = coil->w[p];
             for (int c = 0; c < 3; c++) {
-                matRmag(p,c)   = coil->rmag[p][c];
-                matCosmag(p,c) = coil->cosmag[p][c];
+                matRmag(p,c)   = coil->rmag(p, c);
+                matCosmag(p,c) = coil->cosmag(p, c);
             }
         }
 

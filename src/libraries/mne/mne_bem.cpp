@@ -43,7 +43,7 @@
 
 #include <utils/mnemath.h>
 #include <utils/warp.h>
-#include <fs/label.h>
+#include <fs/fs_label.h>
 
 #include <iostream>
 

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     annotation.cpp
+ * @file     fs_annotation.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -38,9 +38,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "annotation.h"
-#include "label.h"
-#include "surface.h"
+#include "fs_annotation.h"
+#include "fs_label.h"
+#include "fs_surface.h"
 
 #include <iostream>
 

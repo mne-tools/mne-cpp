@@ -34,7 +34,7 @@
 #include <inverse/mne_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_source_space.h>
-#include <mne/mne_forwardsolution.h>
+#include <mne/mne_forward_solution.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
 #include <mne/mne_surface_or_volume.h>
@@ -699,9 +699,8 @@ void TestMneLibrary::inverseOp_readFullFile()
 
 void TestMneLibrary::surfOrVol_solidAngle()
 {
-    float v0[3] = {0,0,0}, v1[3] = {1,0,0}, v2[3] = {0,1,0};
     MNETriangle tri;
-    tri.r1 = v0; tri.r2 = v1; tri.r3 = v2;
+    tri.r1 = Vector3f(0,0,0); tri.r2 = Vector3f(1,0,0); tri.r3 = Vector3f(0,1,0);
     tri.r12 = Vector3f(1,0,0); tri.r13 = Vector3f(0,1,0);
     tri.nn = Vector3f(0,0,1); tri.area = 0.5f;
 

@@ -11,8 +11,8 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
-    computeFwd/compute_fwd_settings.cpp
-    computeFwd/compute_fwd.cpp
+    compute_fwd/compute_fwd_settings.cpp
+    compute_fwd/compute_fwd.cpp
     fwd_bem_model.cpp
     fwd_bem_solution.cpp
     fwd_coil.cpp
@@ -28,8 +28,8 @@ set(SOURCES
 
 set(HEADERS
     fwd_global.h
-    computeFwd/compute_fwd_settings.h
-    computeFwd/compute_fwd.h
+    compute_fwd/compute_fwd_settings.h
+    compute_fwd/compute_fwd.h
     fwd_bem_model.h
     fwd_bem_solution.h
     fwd_coil.h

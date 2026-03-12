@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     fiff_ch_info.h
+ * @file     fs_colortable.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -30,27 +30,26 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     FiffChInfo class declaration.
+ * @brief     Colortable class declaration.
  *
  */
 
-#ifndef FIFF_CH_INFO_H
-#define FIFF_CH_INFO_H
+#ifndef FS_COLORTABLE_H
+#define FS_COLORTABLE_H
 
 //=============================================================================================================
-// INCLUDES
+// FS INCLUDES
 //=============================================================================================================
 
-#include "fiff_global.h"
-#include "fiff_types.h"
-#include "fiff_ch_pos.h"
+#include "fs_global.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
 #include <QString>
+#include <QStringList>
+#include <QSharedPointer>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -59,119 +58,97 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE FSLIB
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace FSLIB
 {
 
 //=============================================================================================================
 /**
- * Channel info descriptor.
+ * Vertices label based lookup table containing colorcodes and anatomical names
  *
- * @brief Channel info descriptor.
+ * @brief Vertices label based lookup table
  */
-class FIFFSHARED_EXPORT FiffChInfo
+class FSSHARED_EXPORT Colortable
 {
 public:
-    typedef QSharedPointer<FiffChInfo> SPtr;            /**< Shared pointer type for FiffChInfo. */
-    typedef QSharedPointer<const FiffChInfo> ConstSPtr; /**< Const shared pointer type for FiffChInfo. */
+    typedef QSharedPointer<Colortable> SPtr;            /**< Shared pointer type for Colortable. */
+    typedef QSharedPointer<const Colortable> ConstSPtr; /**< Const shared pointer type for Colortable. */
 
     //=========================================================================================================
     /**
-     * Constructs the channel info descriptor.
+     * Default constructor.
      */
-    FiffChInfo();
+    explicit Colortable();
 
     //=========================================================================================================
     /**
-     * Copy constructor.
+     * Initializes colortable.
+     */
+    void clear();
+
+    //=========================================================================================================
+    /**
+     * Ids encoded in the colortable
      *
-     * @param[in] p_FiffChInfo   Channel Info descriptor which should be copied.
+     * @return ids.
      */
-    FiffChInfo(const FiffChInfo &p_FiffChInfo);
+    inline Eigen::VectorXi getLabelIds() const;
 
     //=========================================================================================================
     /**
-     * Destroys the channel info descriptor.
+     * Names encoded in the colortable
+     *
+     * @return ids.
      */
-    ~FiffChInfo();
+    inline QStringList getNames() const;
 
     //=========================================================================================================
     /**
-     * Size of the old struct (fiffChInfoRec) 20*int + 16 = 20*4 + 16 = 96
+     * RGBAs encoded in the colortable
      *
-     * @return the size of the old struct fiffChInfoRec.
+     * @return RGBAs.
      */
-    inline static qint32 storageSize();
-
-    //=========================================================================================================
-    /**
-     * Check that all EEG channels in the list have reasonable (non-origin) locations.
-     * Formerly mne_check_chinfo (MNE C).
-     *
-     * @param[in] chs  The list of channel info structures to check.
-     * @param[in] nch  The number of channels to check.
-     * @return true if all EEG channels have valid locations, false otherwise.
-     */
-    static bool checkEegLocations(const QList<FiffChInfo>& chs, int nch);
-
-    //=========================================================================================================
-    /**
-     * Overloaded == operator to compare an object to this instance.
-     *
-     * @param[in] object    The object which should be compared to.
-     *
-     * @return true if equal, false otherwise.
-     */
-    friend bool operator== (const FiffChInfo &a, const FiffChInfo &b);
+    inline Eigen::MatrixX4i getRGBAs() const;
 
 public:
-    fiff_int_t    scanNo;       /**< Scanning order number. */
-    fiff_int_t    logNo;        /**< Logical channel #. */
-    fiff_int_t    kind;         /**< Kind of channel. */
-    fiff_float_t  range;        /**< Voltmeter range (-1 = auto ranging). */
-    fiff_float_t  cal;          /**< Calibration from volts to units used. */
-    FiffChPos     chpos;        /**< Channel location. */
-    fiff_int_t    unit;         /**< Unit of measurement. */
-    fiff_int_t    unit_mul;     /**< Unit multiplier exponent. */
-    QString       ch_name;      /**< Descriptive name for the channel. */
-
-    //Convenience members - MATLAB -
-    Eigen::Matrix<float,4,4, Eigen::DontAlign>    coil_trans;     /**< Coil coordinate system transformation. */
-    Eigen::Matrix<float,3,2, Eigen::DontAlign>    eeg_loc;        /**< Channel location. */
-    fiff_int_t    coord_frame;                      /**< Coordinate Frame. */
-
+    QString orig_tab;           /**< Colortable raw data. */
+    qint32 numEntries;          /**< Number of entries. */
+    QStringList struct_names;   /**< Anatomical ROI description. */
+    Eigen::MatrixXi table;      /**< labels and corresponing colorcode. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline qint32 FiffChInfo::storageSize()
+inline Eigen::VectorXi Colortable::getLabelIds() const
 {
-    // On-disk layout: scanNo, logNo, kind, range, cal, chpos, unit, unit_mul, ch_name[16]
-    // (C++ class uses QString but on-disk stores fixed 16-char name)
-    return 3 * sizeof(fiff_int_t) + 2 * sizeof(fiff_float_t)
-         + FiffChPos::storageSize() + 2 * sizeof(fiff_int_t) + 16;
+    Eigen::VectorXi p_vecIds;
+    if (table.cols() == 5)
+        p_vecIds = table.block(0,4,table.rows(),1);
+
+    return p_vecIds;
 }
 
 //=============================================================================================================
 
-inline bool operator== (const FiffChInfo &a, const FiffChInfo &b)
+inline QStringList Colortable::getNames() const
 {
-    return (a.scanNo == b.scanNo &&
-            a.logNo == b.logNo &&
-            a.kind == b.kind &&
-            a.range == b.range &&
-            a.cal == b.cal &&
-            a.chpos == b.chpos &&
-            a.unit == b.unit &&
-            a.unit_mul == b.unit_mul &&
-            a.coil_trans.isApprox(b.coil_trans, 0.0001f) &&
-            a.eeg_loc.isApprox(b.eeg_loc, 0.0001f) &&
-            a.coord_frame == b.coord_frame);
+    return struct_names;
+}
+
+//=============================================================================================================
+
+inline Eigen::MatrixX4i Colortable::getRGBAs() const
+{
+    Eigen::MatrixX4i p_matRGBAs;
+    if (table.cols() == 5)
+        p_matRGBAs = table.block(0,0,table.rows(),4);
+
+    return p_matRGBAs;
 }
 } // NAMESPACE
 
-#endif // FIFF_CH_INFO_H
+#endif // FS_COLORTABLE_H

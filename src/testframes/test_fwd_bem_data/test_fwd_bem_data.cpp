@@ -28,7 +28,7 @@
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_info.h>
 
-#include <mne/mne_forwardsolution.h>
+#include <mne/mne_forward_solution.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
@@ -39,7 +39,7 @@
 #include <fwd/fwd_coil.h>
 #include <fwd/fwd_eeg_sphere_model.h>
 #include <fwd/fwd_eeg_sphere_model_set.h>
-#include <fwd/computeFwd/compute_fwd_settings.h>
+#include <fwd/compute_fwd/compute_fwd_settings.h>
 
 using namespace FIFFLIB;
 using namespace MNELIB;
@@ -86,8 +86,8 @@ private slots:
         QVERIFY(model != nullptr);
 
         QVERIFY(model->nsurf > 0);
-        QVERIFY(model->ntri != nullptr);
-        QVERIFY(model->np != nullptr);
+        QVERIFY(model->ntri.size() > 0);
+        QVERIFY(model->np.size() > 0);
 
         for (int i = 0; i < model->nsurf; ++i) {
             QVERIFY(model->ntri[i] > 0);
@@ -129,8 +129,7 @@ private slots:
         QString path = m_sDataPath + "/subjects/sample/bem/sample-5120-bem.fif";
         if (!QFile::exists(path)) QSKIP("BEM file not found");
 
-        int kinds[] = { FIFFV_BEM_SURF_ID_BRAIN };
-        FwdBemModel* model = FwdBemModel::fwd_bem_load_surfaces(path, kinds, 1);
+        FwdBemModel* model = FwdBemModel::fwd_bem_load_surfaces(path, {FIFFV_BEM_SURF_ID_BRAIN});
         QVERIFY(model != nullptr);
         QVERIFY(model->nsurf > 0);
 
@@ -151,8 +150,8 @@ private slots:
         FwdBemModel* model = FwdBemModel::fwd_bem_load_homog_surface(bemPath);
         QVERIFY(model != nullptr);
 
-        int result = FwdBemModel::fwd_bem_load_recompute_solution(
-            solPath, FWD_BEM_LINEAR_COLL, 0, model);
+        int result = model->fwd_bem_load_recompute_solution(
+            solPath, FWD_BEM_LINEAR_COLL, 0);
 
         QVERIFY(result == 0 || result == 1);  // 0=ok, 1=recomputed
 

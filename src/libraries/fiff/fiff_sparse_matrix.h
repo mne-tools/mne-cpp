@@ -168,6 +168,13 @@ public:
     FiffSparseMatrix::UPtr mne_add_upper_triangle_rcs();
 
     /**
+     * Extract only the lower triangle (including diagonal) from a square RCS matrix.
+     *
+     * @return A unique pointer to the newly constructed FiffSparseMatrix with lower-triangle elements.
+     */
+    FiffSparseMatrix::UPtr pickLowerTriangleRcs() const;
+
+    /**
      * Check whether this sparse matrix is empty (no non-zero elements).
      *
      * @return true if the matrix has no data.

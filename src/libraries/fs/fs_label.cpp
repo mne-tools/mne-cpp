@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     label.cpp
+ * @file     fs_label.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -38,8 +38,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "label.h"
-#include "surface.h"
+#include "fs_label.h"
+#include "fs_surface.h"
 
 //=============================================================================================================
 // QT INCLUDES

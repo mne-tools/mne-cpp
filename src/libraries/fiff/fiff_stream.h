@@ -266,6 +266,30 @@ public:
 
     //=========================================================================================================
     /**
+     * Write a bad channel list as a FIFFB_MNE_BAD_CHANNELS block.
+     *
+     * @param[in] bads The list of bad channel names.
+     */
+    void write_bad_channels(const QStringList& bads);
+
+    //=========================================================================================================
+    /**
+     * Attach environment metadata (working directory, command line) to this stream.
+     * Formerly mne_attach_env (SVN MNE).
+     *
+     * The stream must already be opened for update (via open_update).
+     * Finds the first known top-level block (MNE, MEAS, MRI, or BEM)
+     * and inserts a FIFFB_MNE_ENV block with working directory and
+     * command-line string.
+     *
+     * @param[in] workingDir  The working directory to record.
+     * @param[in] command     The command-line string to record.
+     * @return true on success, false on error.
+     */
+    bool attach_env(const QString& workingDir, const QString& command);
+
+    //=========================================================================================================
+    /**
      * mne_read_cov - also for mne_read_noise_cov
      *
      * Reads a covariance matrix from a fiff file

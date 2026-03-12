@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     surface.cpp
+ * @file     fs_surface.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "surface.h"
+#include "fs_surface.h"
 #include <utils/ioutils.h>
 
 #include <iostream>

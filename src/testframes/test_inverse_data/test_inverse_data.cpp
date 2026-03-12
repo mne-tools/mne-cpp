@@ -35,7 +35,7 @@
 #include <inverse/mne_inverse_operator.h>
 #include <inverse/mne_source_estimate.h>
 #include <mne/mne_source_spaces.h>
-#include <mne/mne_forwardsolution.h>
+#include <mne/mne_forward_solution.h>
 
 #include <inverse/minimum_norm/minimum_norm.h>
 #include <inverse/rap_music/rap_music.h>

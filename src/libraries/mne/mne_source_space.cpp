@@ -2302,3 +2302,192 @@ out : {
     }
 }
 
+//=============================================================================================================
+
+int MNESourceSpace::writeVolumeInfo(FiffStream::SPtr& stream, bool selected_only) const
+{
+    int ntot,nvert;
+    int nneigh;
+    int k,p;
+
+    if (type != FIFFV_MNE_SPACE_VOLUME)
+        return OK;
+    if (neighbor_vert.empty() || nneighbor_vert.size() == 0)
+        return OK;
+
+    Eigen::VectorXi nneighbors;
+    Eigen::VectorXi neighbors;
+
+    if (selected_only) {
+        Eigen::VectorXi inuse_map = Eigen::VectorXi::Constant(np, -1);
+        for (k = 0,p = 0, ntot = 0; k < np; k++) {
+            if (inuse[k]) {
+                ntot += nneighbor_vert[k];
+                inuse_map[k] = p++;
+            }
+        }
+        nneighbors.resize(nuse);
+        neighbors.resize(ntot);
+        for (k = 0, nvert = 0, ntot = 0; k < np; k++) {
+            if (inuse[k]) {
+                const Eigen::VectorXi& neigh = neighbor_vert[k];
+                nneigh = nneighbor_vert[k];
+                nneighbors[nvert++] = nneigh;
+                for (p = 0; p < nneigh; p++)
+                    neighbors[ntot++] = neigh[p] < 0 ? -1 : inuse_map[neigh[p]];
+            }
+        }
+    }
+    else {
+        for (k = 0, ntot = 0; k < np; k++)
+            ntot += nneighbor_vert[k];
+        nneighbors.resize(np);
+        neighbors.resize(ntot);
+        nvert     = np;
+        for (k = 0, ntot = 0; k < np; k++) {
+            const Eigen::VectorXi& neigh = neighbor_vert[k];
+            nneigh = nneighbor_vert[k];
+            nneighbors[k] = nneigh;
+            for (p = 0; p < nneigh; p++)
+                neighbors[ntot++] = neigh[p];
+        }
+    }
+
+    stream->write_int(FIFF_MNE_SOURCE_SPACE_NNEIGHBORS,nneighbors.data(),nvert);
+    stream->write_int(FIFF_MNE_SOURCE_SPACE_NEIGHBORS,neighbors.data(),ntot);
+
+    if (!selected_only) {
+        if (voxel_surf_RAS_t && !voxel_surf_RAS_t->isEmpty()) {
+            stream->write_coord_trans(*voxel_surf_RAS_t);
+            stream->write_int(FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS,vol_dims,3);
+        }
+        if (interpolator && !MRI_volume.isEmpty()) {
+            stream->start_block(FIFFB_MNE_PARENT_MRI_FILE);
+            if (MRI_surf_RAS_RAS_t && !MRI_surf_RAS_RAS_t->isEmpty())
+                stream->write_coord_trans(*MRI_surf_RAS_RAS_t);
+            if (MRI_voxel_surf_RAS_t && !MRI_voxel_surf_RAS_t->isEmpty())
+                stream->write_coord_trans(*MRI_voxel_surf_RAS_t);
+            stream->write_string(FIFF_MNE_FILE_NAME,MRI_volume);
+            if (interpolator)
+                stream->write_float_sparse_rcs(FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, interpolator->toEigenSparse().cast<float>());
+            if (MRI_vol_dims[0] > 0 && MRI_vol_dims[1] > 0 && MRI_vol_dims[2] > 0) {
+                stream->write_int(FIFF_MRI_WIDTH,&MRI_vol_dims[0]);
+                stream->write_int(FIFF_MRI_HEIGHT,&MRI_vol_dims[1]);
+                stream->write_int(FIFF_MRI_DEPTH,&MRI_vol_dims[2]);
+            }
+            stream->end_block(FIFFB_MNE_PARENT_MRI_FILE);
+        }
+    }
+    else {
+        if (interpolator && !MRI_volume.isEmpty()) {
+            stream->write_string(FIFF_MNE_SOURCE_SPACE_MRI_FILE,MRI_volume);
+            qCritical("Cannot write the interpolator for selection yet");
+            return FAIL;
+        }
+    }
+    return OK;
+}
+
+//=============================================================================================================
+
+int MNESourceSpace::writeToStream(FiffStream::SPtr& stream, bool selected_only) const
+{
+    int p, pp;
+
+    if (np <= 0) {
+        qCritical("No points in the source space being saved");
+        return FIFF_FAIL;
+    }
+
+    stream->start_block(FIFFB_MNE_SOURCE_SPACE);
+
+    if (type != FIFFV_MNE_SPACE_UNKNOWN)
+        stream->write_int(FIFF_MNE_SOURCE_SPACE_TYPE, &type);
+    if (id != FIFFV_MNE_SURF_UNKNOWN)
+        stream->write_int(FIFF_MNE_SOURCE_SPACE_ID, &id);
+    if (!subject.isEmpty() && subject.size() > 0) {
+        QString subj(subject);
+        stream->write_string(FIFF_SUBJ_HIS_ID, subj);
+    }
+
+    stream->write_int(FIFF_MNE_COORD_FRAME, &coord_frame);
+
+    if (selected_only) {
+        if (nuse == 0) {
+            qCritical("No vertices in use. Cannot write active-only vertices from this source space");
+            return FIFF_FAIL;
+        }
+
+        Eigen::MatrixXf sel(nuse, 3);
+        stream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS, &nuse);
+
+        for (p = 0, pp = 0; p < np; p++) {
+            if (inuse[p]) {
+                sel.row(pp) = rr.row(p);
+                pp++;
+            }
+        }
+        stream->write_float_matrix(FIFF_MNE_SOURCE_SPACE_POINTS, sel);
+
+        for (p = 0, pp = 0; p < np; p++) {
+            if (inuse[p]) {
+                sel.row(pp) = nn.row(p);
+                pp++;
+            }
+        }
+        stream->write_float_matrix(FIFF_MNE_SOURCE_SPACE_NORMALS, sel);
+    }
+    else {
+        stream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS, &np);
+        stream->write_float_matrix(FIFF_MNE_SOURCE_SPACE_POINTS, Eigen::MatrixXf(rr));
+        stream->write_float_matrix(FIFF_MNE_SOURCE_SPACE_NORMALS, Eigen::MatrixXf(nn));
+
+        if (nuse > 0 && inuse.size() > 0) {
+            stream->write_int(FIFF_MNE_SOURCE_SPACE_SELECTION, inuse.data(), np);
+            stream->write_int(FIFF_MNE_SOURCE_SPACE_NUSE, &nuse);
+        }
+
+        if (ntri > 0) {
+            stream->write_int(FIFF_MNE_SOURCE_SPACE_NTRI, &ntri);
+            Eigen::MatrixXi file_tris = itris.array() + 1;
+            stream->write_int_matrix(FIFF_MNE_SOURCE_SPACE_TRIANGLES, file_tris);
+        }
+
+        if (nuse_tri > 0) {
+            stream->write_int(FIFF_MNE_SOURCE_SPACE_NUSE_TRI, &nuse_tri);
+            Eigen::MatrixXi file_use_tris = use_itris.array() + 1;
+            stream->write_int_matrix(FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, file_use_tris);
+        }
+
+        if (!nearest.empty()) {
+            Eigen::VectorXi nearest_v(np);
+            Eigen::VectorXf nearest_dist_v(np);
+
+            std::sort(const_cast<std::vector<MNENearest>&>(nearest).begin(),
+                      const_cast<std::vector<MNENearest>&>(nearest).end(),
+                      [](const MNENearest& a, const MNENearest& b) { return a.vert < b.vert; });
+            for (p = 0; p < np; p++) {
+                nearest_v[p] = nearest[p].nearest;
+                nearest_dist_v[p] = nearest[p].dist;
+            }
+
+            stream->write_int(FIFF_MNE_SOURCE_SPACE_NEAREST, nearest_v.data(), np);
+            stream->write_float(FIFF_MNE_SOURCE_SPACE_NEAREST_DIST, nearest_dist_v.data(), np);
+        }
+
+        if (!dist.is_empty()) {
+            auto m = dist.pickLowerTriangleRcs();
+            if (!m)
+                return FIFF_FAIL;
+            stream->write_float_sparse_rcs(FIFF_MNE_SOURCE_SPACE_DIST, m->toEigenSparse().cast<float>());
+            stream->write_float(FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, &dist_limit);
+        }
+    }
+
+    if (writeVolumeInfo(stream, selected_only) != OK)
+        return FIFF_FAIL;
+
+    stream->end_block(FIFFB_MNE_SOURCE_SPACE);
+    return FIFF_OK;
+}
+

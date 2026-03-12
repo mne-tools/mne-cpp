@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
- * @file     surfaceset.h
+ * @file     fs_annotationset.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
- * @date     March, 2013
+ * @date     July, 2012
  *
  * @section  LICENSE
  *
- * Copyright (C) 2013, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,26 +30,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    SurfaceSet class declaration
+ * @brief    AnnotationSet class declaration
  *
  */
 
-#ifndef SURFACESET_H
-#define SURFACESET_H
+#ifndef FS_ANNOTATIONSET_H
+#define FS_ANNOTATIONSET_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "fs_global.h"
-#include "surface.h"
+#include "fs_annotation.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QString>
 #include <QSharedPointer>
 #include <QMap>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FSLIB
@@ -62,23 +69,25 @@ namespace FSLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class SurfaceSet;
+
 //=============================================================================================================
 /**
- * The set of surfaces holds right and left hemipshere surfaces
+ * Annotation set
  *
- * @brief A hemisphere set of surfaces
+ * @brief Annotation set
  */
-class FSSHARED_EXPORT SurfaceSet
+class FSSHARED_EXPORT AnnotationSet
 {
 public:
-    typedef QSharedPointer<SurfaceSet> SPtr;            /**< Shared pointer type for SurfaceSet class. */
-    typedef QSharedPointer<const SurfaceSet> ConstSPtr; /**< Const shared pointer type for SurfaceSet class. */
-    
+    typedef QSharedPointer<AnnotationSet> SPtr;            /**< Shared pointer type for AnnotationSet. */
+    typedef QSharedPointer<const AnnotationSet> ConstSPtr; /**< Const shared pointer type for AnnotationSet. */
+
     //=========================================================================================================
     /**
      * Default constructor
      */
-    SurfaceSet();
+    AnnotationSet();
 
     //=========================================================================================================
     /**
@@ -86,10 +95,10 @@ public:
      *
      * @param[in] subject_id         Name of subject.
      * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}.
-     * @param[in] surf               Name of the surface to load (eg. inflated, orig ...).
+     * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
      * @param[in] subjects_dir       Subjects directory.
      */
-    explicit SurfaceSet(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
+    explicit AnnotationSet(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir);
 
     //=========================================================================================================
     /**
@@ -97,18 +106,18 @@ public:
      *
      * @param[in] path               path to surface directory.
      * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}.
-     * @param[in] surf               Name of the surface to load (eg. inflated, orig ...).
+     * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
      */
-    explicit SurfaceSet(const QString &path, qint32 hemi, const QString &surf);
+    explicit AnnotationSet(const QString &path, qint32 hemi, const QString &atlas);
 
     //=========================================================================================================
     /**
-     * Constructs a surface set by assembling given surfaces
+     * Constructs an annotation set by assembling given annotations
      *
-     * @param[in] p_LHSurface    Left hemisphere surface.
-     * @param[in] p_RHSurface    Right hemisphere surface.
+     * @param[in] p_LHAnnotation    Left hemisphere annotation.
+     * @param[in] p_RHAnnotation    Right hemisphere annotation.
      */
-    explicit SurfaceSet(const Surface& p_LHSurface, const Surface& p_RHSurface);
+    explicit AnnotationSet(const Annotation& p_LHAnnotation, const Annotation& p_RHAnnotation);
 
     //=========================================================================================================
     /**
@@ -117,14 +126,14 @@ public:
      * @param[in] p_sLHFileName  Left hemisphere annotation file.
      * @param[in] p_sRHFileName  Right hemisphere annotation file.
      */
-    explicit SurfaceSet(const QString& p_sLHFileName, const QString& p_sRHFileName);
+    explicit AnnotationSet(const QString& p_sLHFileName, const QString& p_sRHFileName);
 
     //=========================================================================================================
     /**
-     * Destroys the SurfaceSet class.
+     * Destroys the annotation set.
      */
-    ~SurfaceSet();
-    
+    ~AnnotationSet(){}
+
     //=========================================================================================================
     /**
      * Initializes the AnnotationSet.
@@ -133,87 +142,97 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns The surface set map
+     * Returns The Annotation set map
      *
-     * @return the surface set map.
+     * @return the annotation set map.
      */
-    inline QMap<qint32, Surface>& data();
+    inline QMap<qint32, Annotation>& data();
 
     //=========================================================================================================
     /**
-     * True if SurfaceSet is empty.
+     * True if AnnotationSet is empty.
      *
-     * @return true if SurfaceSet is empty.
+     * @return true if AnnotationSet is empty.
      */
     inline bool isEmpty() const;
 
     //=========================================================================================================
     /**
-     * Insert a surface
+     * Insert an annotation
      *
-     * @param[in] p_Surface  Surface to insert.
+     * @param[in] p_Annotation  Annotation to insert.
      */
-    void insert(const Surface& p_Surface);
+    void insert(const Annotation& p_Annotation);
 
     //=========================================================================================================
     /**
-     * Reads different surface files and assembles them to a SurfaceSet
+     * Reads different annotation files and assembles them to a AnnotationSet
      *
-     * @param[in] p_sLHFileName      Left hemisphere surface file.
-     * @param[in] p_sRHFileName      Right hemisphere surface file.
-     * @param[out] p_SurfaceSet      The read surface set.
+     * @param[in] p_sLHFileName  Left hemisphere annotation file.
+     * @param[in] p_sRHFileName  Right hemisphere annotation file.
+     * @param[out] p_AnnotationSet   The read annotation set.
      *
      * @return true if succesfull, false otherwise.
      */
-    static bool read(const QString& p_sLHFileName, const QString& p_sRHFileName, SurfaceSet &p_SurfaceSet);
+    static bool read(const QString& p_sLHFileName, const QString& p_sRHFileName, AnnotationSet &p_AnnotationSet);
 
     //=========================================================================================================
     /**
-     * The kind of Surfaces which are held by the SurfaceSet (eg. inflated, orig ...)
+     * python labels_from_parc
      *
-     * @return the loaded surfaces (eg. inflated, orig ...).
+     * Converts annotation to a label list and colortable
+     *
+     * @param[in] p_surfSet              the SurfaceSet to read the vertex positions from.
+     * @param[out] p_qListLabels         the converted labels are appended to a given list. Stored data are not affected.
+     * @param[out] p_qListLabelRGBAs     the converted label RGBAs are appended to a given list. Stored data are not affected.
+     * @param[out] lLabelPicks           the label names which should be picked.
+     *
+     * @return true if successful, false otherwise.
      */
-    inline QString surf() const;
+    bool toLabels(const SurfaceSet &p_surfSet,
+                  QList<Label> &p_qListLabels,
+                  QList<Eigen::RowVector4i> &p_qListLabelRGBAs,
+                  const QStringList& lLabelPicks = QStringList()) const;
 
     //=========================================================================================================
     /**
-     * Subscript operator [] to access surface by index
+     * Subscript operator [] to access annotation by index
      *
      * @param[in] idx    the hemisphere index (0 or 1).
      *
-     * @return Surface related to the parameter index.
+     * @return Annotation related to the parameter index.
      */
-    const Surface& operator[] (qint32 idx) const;
+    Annotation& operator[] (qint32 idx);
 
     //=========================================================================================================
     /**
-     * Subscript operator [] to access surface by index
+     * Subscript operator [] to access annotation by index
      *
      * @param[in] idx    the hemisphere index (0 or 1).
      *
-     * @return Surface related to the parameter index.
+     * @return Annotation related to the parameter index.
      */
-    Surface& operator[] (qint32 idx);
+    const Annotation operator[] (qint32 idx) const;
 
     //=========================================================================================================
     /**
-     * Subscript operator [] to access surface by identifier
+     * Subscript operator [] to access annotation by identifier
      *
      * @param[in] idt    the hemisphere identifier ("lh" or "rh").
      *
-     * @return Surface related to the parameter identifier.
+     * @return Annotation related to the parameter identifier.
      */
-    const Surface& operator[] (QString idt) const;
+    Annotation& operator[] (QString idt);
 
     //=========================================================================================================
     /**
-     * Subscript operator [] to access surface by identifier
+     * Subscript operator [] to access annotation by identifier
      *
      * @param[in] idt    the hemisphere identifier ("lh" or "rh").
      *
-     * @return Surface related to the parameter identifier.
+     * @return Annotation related to the parameter identifier.
      */
-    Surface& operator[] (QString idt);
+    const Annotation operator[] (QString idt) const;
 
     //=========================================================================================================
     /**
@@ -224,48 +243,31 @@ public:
     inline qint32 size() const;
 
 private:
-    //=========================================================================================================
-    /**
-     * Calculates the offset between two Surfaces and sets the offset to each surface accordingly
-     */
-    void calcOffset();
-
-    QMap<qint32, Surface> m_qMapSurfs;  /**< Hemisphere surfaces (lh = 0; rh = 1). */
+    QMap<qint32, Annotation> m_qMapAnnots;   /**< Hemisphere annotations (lh = 0; rh = 1). */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline QMap<qint32, Surface>& SurfaceSet::data()
+inline QMap<qint32, Annotation>& AnnotationSet::data()
 {
-    return m_qMapSurfs;
+    return m_qMapAnnots;
 }
 
 //=============================================================================================================
 
-inline bool SurfaceSet::isEmpty() const
+inline bool AnnotationSet::isEmpty() const
 {
-    return m_qMapSurfs.isEmpty();
+    return m_qMapAnnots.isEmpty();
 }
 
 //=============================================================================================================
 
-inline QString SurfaceSet::surf() const
+inline qint32 AnnotationSet::size() const
 {
-    if(m_qMapSurfs.size() > 0)
-        return m_qMapSurfs.begin().value().surf();
-    else
-        return QString("");
-}
-
-//=============================================================================================================
-
-inline qint32 SurfaceSet::size() const
-{
-    return m_qMapSurfs.size();
+    return m_qMapAnnots.size();
 }
 } // NAMESPACE
 
-#endif // SURFACESET_H
-
+#endif // FS_ANNOTATIONSET_H
