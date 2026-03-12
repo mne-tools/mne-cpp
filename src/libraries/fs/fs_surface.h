@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     surface.h
+ * @file     fs_surface.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -34,8 +34,8 @@
  *
  */
 
-#ifndef SURFACE_H
-#define SURFACE_H
+#ifndef FS_SURFACE_H
+#define FS_SURFACE_H
 
 //=============================================================================================================
 // INCLUDES
@@ -374,4 +374,4 @@ inline QString Surface::fileName() const
 }
 } // NAMESPACE
 
-#endif // SURFACE_H
+#endif // FS_SURFACE_H

@@ -40,7 +40,7 @@
 #include "QtWidgets/qspinbox.h"
 #include "ui_fwdsettingsview.h"
 
-#include <fs/annotationset.h>
+#include <fs/fs_annotationset.h>
 
 //=============================================================================================================
 // QT INCLUDES

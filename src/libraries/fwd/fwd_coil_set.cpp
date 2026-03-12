@@ -347,8 +347,8 @@ FwdCoil *FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int acc, const FiffCo
     for (p = 0; p < res->np; p++) {
         res->w[p] = def->w[p];
         for (c = 0; c < 3; c++) {
-            res->rmag[p][c]   = res->r0[c] + def->rmag[p][X_6]*res->ex[c] + def->rmag[p][Y_6]*res->ey[c] + def->rmag[p][Z_6]*res->ez[c];
-            res->cosmag[p][c] = def->cosmag[p][X_6]*res->ex[c] + def->cosmag[p][Y_6]*res->ey[c] + def->cosmag[p][Z_6]*res->ez[c];
+            res->rmag(p, c)   = res->r0[c] + def->rmag(p, 0)*res->ex[c] + def->rmag(p, 1)*res->ey[c] + def->rmag(p, 2)*res->ez[c];
+            res->cosmag(p, c) = def->cosmag(p, 0)*res->ex[c] + def->cosmag(p, 1)*res->ey[c] + def->cosmag(p, 2)*res->ez[c];
         }
     }
     return res;
@@ -461,31 +461,31 @@ FwdCoilSet *FwdCoilSet::read_coil_defs(const QString &name)
             /*
            * Read and verify data for each integration point
            */
-            if (get_fval(in,def->w+p) != OK)
+            if (get_fval(in,def->w.data()+p) != OK)
                 goto bad;
-            if (get_fval(in,def->rmag[p]+X_6) != OK)
+            if (get_fval(in,&def->rmag(p, 0)) != OK)
                 goto bad;
-            if (get_fval(in,def->rmag[p]+Y_6) != OK)
+            if (get_fval(in,&def->rmag(p, 1)) != OK)
                 goto bad;
-            if (get_fval(in,def->rmag[p]+Z_6) != OK)
+            if (get_fval(in,&def->rmag(p, 2)) != OK)
                 goto bad;
-            if (get_fval(in,def->cosmag[p]+X_6) != OK)
+            if (get_fval(in,&def->cosmag(p, 0)) != OK)
                 goto bad;
-            if (get_fval(in,def->cosmag[p]+Y_6) != OK)
+            if (get_fval(in,&def->cosmag(p, 1)) != OK)
                 goto bad;
-            if (get_fval(in,def->cosmag[p]+Z_6) != OK)
+            if (get_fval(in,&def->cosmag(p, 2)) != OK)
                 goto bad;
 
-            if (VEC_LEN_6(def->rmag[p]) > BIG) {
-                qWarning("Unreasonable integration point: %f %f %f mm (coil type = %d acc = %d)", 1000*def->rmag[p][X_6],1000*def->rmag[p][Y_6],1000*def->rmag[p][Z_6], def->type,def->accuracy);
+            if (VEC_LEN_6((&def->rmag(p, 0))) > BIG) {
+                qWarning("Unreasonable integration point: %f %f %f mm (coil type = %d acc = %d)", 1000*def->rmag(p, 0),1000*def->rmag(p, 1),1000*def->rmag(p, 2), def->type,def->accuracy);
                 goto bad;
             }
-            size = VEC_LEN_6(def->cosmag[p]);
+            size = VEC_LEN_6((&def->cosmag(p, 0)));
             if (size <= 0) {
-                qWarning("Unreasonable normal: %f %f %f (coil type = %d acc = %d)", def->cosmag[p][X_6],def->cosmag[p][Y_6],def->cosmag[p][Z_6], def->type,def->accuracy);
+                qWarning("Unreasonable normal: %f %f %f (coil type = %d acc = %d)", def->cosmag(p, 0),def->cosmag(p, 1),def->cosmag(p, 2), def->type,def->accuracy);
                 goto bad;
             }
-            normalize(def->cosmag[p]);
+            def->cosmag.row(p).normalize();
         }
     }
 
@@ -535,8 +535,8 @@ FwdCoilSet* FwdCoilSet::dup_coil_set(const FiffCoordTrans& t) const
             FiffCoordTrans::apply_trans(coil->ez,t,FIFFV_NO_MOVE);
 
             for (int p = 0; p < coil->np; p++) {
-                FiffCoordTrans::apply_trans(coil->rmag[p],t,FIFFV_MOVE);
-                FiffCoordTrans::apply_trans(coil->cosmag[p],t,FIFFV_NO_MOVE);
+                FiffCoordTrans::apply_trans(&coil->rmag(p, 0),t,FIFFV_MOVE);
+                FiffCoordTrans::apply_trans(&coil->cosmag(p, 0),t,FIFFV_NO_MOVE);
             }
             coil->coord_frame = t.to;
         }

@@ -43,8 +43,8 @@
 #include "../../disp3D_rhi_global.h"
 
 #include "abstracttreeitem.h"
-#include <fs/surface.h>
-#include <fs/annotation.h>
+#include <fs/fs_surface.h>
+#include <fs/fs_annotation.h>
 
 /**
  * @brief Tree item representing a FreeSurfer cortical surface in the 3-D scene hierarchy.

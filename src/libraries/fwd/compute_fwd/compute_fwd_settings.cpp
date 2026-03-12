@@ -1,15 +1,16 @@
+
 //=============================================================================================================
 /**
- * @file     colortable.h
+ * @file     compute_fwd_settings.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
- * @date     July, 2012
+ * @date     February, 2017
  *
  * @section  LICENSE
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,125 +31,115 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     Colortable class declaration.
+ * @brief    ComputeFwdSettings class definition.
  *
  */
 
-#ifndef COLORTABLE_H
-#define COLORTABLE_H
-
 //=============================================================================================================
-// FS INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include "fs_global.h"
+#include "compute_fwd_settings.h"
 
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QString>
-#include <QStringList>
-#include <QSharedPointer>
+using namespace Eigen;
+using namespace FIFFLIB;
+using namespace FWDLIB;
 
 //=============================================================================================================
-// EIGEN INCLUDES
+// DEFINES
 //=============================================================================================================
 
-#include <Eigen/Core>
-
 //=============================================================================================================
-// DEFINE NAMESPACE FSLIB
+// STATIC DEFINITIONS
 //=============================================================================================================
 
-namespace FSLIB
-{
-
 //=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
 /**
- * Vertices label based lookup table containing colorcodes and anatomical names
- *
- * @brief Vertices label based lookup table
+ * Constructs a ComputeFwdSettings object with default member values.
  */
-class FSSHARED_EXPORT Colortable
+ComputeFwdSettings::ComputeFwdSettings()
 {
-public:
-    typedef QSharedPointer<Colortable> SPtr;            /**< Shared pointer type for Colortable. */
-    typedef QSharedPointer<const Colortable> ConstSPtr; /**< Const shared pointer type for Colortable. */
-
-    //=========================================================================================================
-    /**
-     * Default constructor.
-     */
-    explicit Colortable();
-
-    //=========================================================================================================
-    /**
-     * Initializes colortable.
-     */
-    void clear();
-
-    //=========================================================================================================
-    /**
-     * Ids encoded in the colortable
-     *
-     * @return ids.
-     */
-    inline Eigen::VectorXi getLabelIds() const;
-
-    //=========================================================================================================
-    /**
-     * Names encoded in the colortable
-     *
-     * @return ids.
-     */
-    inline QStringList getNames() const;
-
-    //=========================================================================================================
-    /**
-     * RGBAs encoded in the colortable
-     *
-     * @return RGBAs.
-     */
-    inline Eigen::MatrixX4i getRGBAs() const;
-
-public:
-    QString orig_tab;           /**< Colortable raw data. */
-    qint32 numEntries;          /**< Number of entries. */
-    QStringList struct_names;   /**< Anatomical ROI description. */
-    Eigen::MatrixXi table;      /**< labels and corresponing colorcode. */
-};
-
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-inline Eigen::VectorXi Colortable::getLabelIds() const
-{
-    Eigen::VectorXi p_vecIds;
-    if (table.cols() == 5)
-        p_vecIds = table.block(0,4,table.rows(),1);
-
-    return p_vecIds;
+    initMembers();
 }
 
 //=============================================================================================================
 
-inline QStringList Colortable::getNames() const
+/**
+ * Destroys the ComputeFwdSettings object.
+ */
+ComputeFwdSettings::~ComputeFwdSettings()
 {
-    return struct_names;
+    //ToDo Garbage collection
 }
 
 //=============================================================================================================
 
-inline Eigen::MatrixX4i Colortable::getRGBAs() const
+/**
+ * Validate that all required settings have been specified.
+ *
+ * Checks for source space name, MRI-to-head transform, measurement file,
+ * solution output name, and that at least MEG or EEG is selected.
+ */
+void ComputeFwdSettings::checkIntegrity()
 {
-    Eigen::MatrixX4i p_matRGBAs;
-    if (table.cols() == 5)
-        p_matRGBAs = table.block(0,0,table.rows(),4);
-
-    return p_matRGBAs;
+    if (srcname.isEmpty()) {
+        qCritical("Source space name is missing. Use the --src option to specify it.");
+        return;
+    }
+    if (!mri_head_ident) {
+        if (mriname.isEmpty() && transname.isEmpty()) {
+            qCritical("MRI <-> head coordinate transformation is missing. Use the --mri or --trans option to specify it.");
+            return;
+        }
+    }
+    if (measname.isEmpty()) {
+        qCritical("Source of coil and electrode locations is missing. Use the --meas option to specify it.");
+        return;
+    }
+    if (solname.isEmpty()) {
+        qCritical("Solution name is missing. Use the --fwd option to specify it.");
+        return;
+    }
+    if (! (include_meg || include_eeg)) {
+        qCritical("Employ the --meg and --eeg options to select MEG and/or EEG");
+        return;
+    }
 }
-} // NAMESPACE
 
-#endif // COLORTABLE_H
+//=============================================================================================================
+
+/**
+ * Initialize all data members to their default values.
+ */
+void ComputeFwdSettings::initMembers()
+{
+    // Init origin
+    r0 << 0.0f,0.0f,0.04f;
+
+    mri_head_ident = false;
+    filter_spaces = true;  
+    accurate = false;      
+    fixed_ori = false;     
+    include_meg = false;
+    include_eeg = false;
+    compute_grad = false;
+    mindist = 0.0f;        
+    coord_frame = FIFFV_COORD_HEAD;
+    do_all = false;
+    nlabel = 0;
+
+    eeg_sphere_rad = 0.09f;   
+    scale_eeg_pos = false;    
+    use_equiv_eeg = true;     
+    use_threads = true;
+
+    pFiffInfo = Q_NULLPTR;
+    meg_head_t = FiffCoordTrans();
+}

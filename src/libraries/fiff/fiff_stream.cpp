@@ -425,6 +425,132 @@ QStringList FiffStream::read_bad_channels(const FiffDirNode::SPtr& p_Node)
 
 //=============================================================================================================
 
+void FiffStream::write_bad_channels(const QStringList& bads)
+{
+    start_block(FIFFB_MNE_BAD_CHANNELS);
+    write_name_list(FIFF_MNE_CH_NAME_LIST, bads);
+    end_block(FIFFB_MNE_BAD_CHANNELS);
+}
+
+//=============================================================================================================
+
+bool FiffStream::attach_env(const QString& workingDir, const QString& command)
+{
+    int  insert_blocks[]  = { FIFFB_MNE , FIFFB_MEAS, FIFFB_MRI, FIFFB_BEM, -1 };
+
+    int     b, k, insert;
+    FiffTag::SPtr t_pTag;
+
+    FiffId id(FiffId::new_file_id());
+
+    /*
+     * Find an appropriate position to insert
+     */
+    for (insert = -1, b = 0; insert_blocks[b] >= 0; b++) {
+        for (k = 0; k < nent(); k++) {
+            if (dir()[k]->kind == FIFF_BLOCK_START) {
+                if (!read_tag(t_pTag, dir()[k]->pos))
+                    return false;
+                if (*(t_pTag->toInt()) == insert_blocks[b]) {
+                    insert = k;
+                    break;
+                }
+            }
+        }
+        if (insert >= 0)
+            break;
+    }
+    if (insert < 0) {
+        qCritical("Suitable place for environment insertion not found.");
+        return false;
+    }
+
+    /*
+     * Inline fiff_insert_after logic
+     */
+    int where = insert;
+    if (where < 0 || where >= nent()-1) {
+        qCritical("illegal insertion point in fiff_insert_after!");
+        return false;
+    }
+
+    FiffTag::SPtr t_pTagNext;
+    QList<FiffDirEntry::SPtr> old_dir = dir();
+    QList<FiffDirEntry::SPtr> this_ent = old_dir.mid(where);
+
+    if (!read_tag(t_pTagNext, this_ent[0]->pos))
+        return false;
+    /*
+     * Update next info to be sequential
+     */
+    qint64 next_tmp = device()->pos();
+    /*
+     * Go to the end of the file
+     */
+    device()->seek(device()->size());
+    /*
+     * Copy the beginning of old directory
+     */
+    QList<FiffDirEntry::SPtr> new_dir = old_dir.mid(0, where+1);
+
+    qint64 old_end = device()->pos();
+    /*
+     * Write the MNE_ENV block tags
+     */
+    FiffDirEntry::SPtr new_this;
+
+    new_this = FiffDirEntry::SPtr(new FiffDirEntry);
+    new_this->kind = FIFF_BLOCK_START;
+    new_this->type = FIFFT_INT;
+    new_this->size = 1 * 4;
+    new_this->pos = start_block(FIFFB_MNE_ENV);
+    new_dir.append(new_this);
+
+    new_this = FiffDirEntry::SPtr(new FiffDirEntry);
+    new_this->kind = FIFF_BLOCK_ID;
+    new_this->type = FIFFT_ID_STRUCT;
+    new_this->size =  5 * 4;
+    new_this->pos = write_id(FIFF_BLOCK_ID, id);
+    new_dir.append(new_this);
+
+    new_this = FiffDirEntry::SPtr(new FiffDirEntry);
+    new_this->kind = FIFF_MNE_ENV_WORKING_DIR;
+    new_this->type = FIFFT_STRING;
+    new_this->size =  workingDir.size();
+    new_this->pos = write_string(FIFF_MNE_ENV_WORKING_DIR, workingDir);
+    new_dir.append(new_this);
+
+    new_this = FiffDirEntry::SPtr(new FiffDirEntry);
+    new_this->kind = FIFF_MNE_ENV_COMMAND_LINE;
+    new_this->type = FIFFT_STRING;
+    new_this->size =  command.size();
+    new_this->pos = write_string(FIFF_MNE_ENV_COMMAND_LINE, command);
+    new_dir.append(new_this);
+
+    new_this = FiffDirEntry::SPtr(new FiffDirEntry);
+    new_this->kind = FIFF_BLOCK_END;
+    new_this->type = FIFFT_INT;
+    new_this->size =  1 * 4;
+    new_this->pos = end_block(FIFFB_MNE_ENV, next_tmp);
+    new_dir.append(new_this);
+
+    /*
+     * Copy the rest of the old directory
+     */
+    new_dir.append(old_dir.mid(where+1));
+    /*
+     * Update the branching tag
+     */
+    t_pTagNext->next = (qint32)old_end;
+    write_tag(t_pTagNext, this_ent[0]->pos);
+
+    dir() = new_dir;
+
+    return true;
+}
+
+//=============================================================================================================
+
 bool FiffStream::read_cov(const FiffDirNode::SPtr& p_Node, fiff_int_t cov_kind, FiffCov& p_covData)
 {
     p_covData.clear();

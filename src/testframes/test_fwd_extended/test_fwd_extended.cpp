@@ -10,8 +10,8 @@
 #include <fwd/fwd_eeg_sphere_model.h>
 #include <fwd/fwd_eeg_sphere_model_set.h>
 #include <fwd/fwd_eeg_sphere_layer.h>
-#include <fwd/computeFwd/compute_fwd_settings.h>
-#include <fwd/computeFwd/compute_fwd.h>
+#include <fwd/compute_fwd/compute_fwd_settings.h>
+#include <fwd/compute_fwd/compute_fwd.h>
 #include <fwd/fwd_coil_set.h>
 
 using namespace FWDLIB;
@@ -249,15 +249,12 @@ private slots:
 
         // 4 electrodes on the surface
         int neeg = 4;
-        float** el = new float*[neeg];
-        for (int i = 0; i < neeg; ++i) {
-            el[i] = new float[3];
-        }
+        Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> el(neeg, 3);
         // Place electrodes at various points on the outer sphere
-        el[0][0] = 0.0f; el[0][1] = 0.0f; el[0][2] = 0.09f;
-        el[1][0] = 0.09f; el[1][1] = 0.0f; el[1][2] = 0.0f;
-        el[2][0] = 0.0f; el[2][1] = 0.09f; el[2][2] = 0.0f;
-        el[3][0] = 0.0f; el[3][1] = 0.0f; el[3][2] = -0.09f;
+        el(0,0) = 0.0f; el(0,1) = 0.0f; el(0,2) = 0.09f;
+        el(1,0) = 0.09f; el(1,1) = 0.0f; el(1,2) = 0.0f;
+        el(2,0) = 0.0f; el(2,1) = 0.09f; el(2,2) = 0.0f;
+        el(3,0) = 0.0f; el(3,1) = 0.0f; el(3,2) = -0.09f;
 
         VectorXf Vval(neeg);
         Vval.setZero();
@@ -268,9 +265,6 @@ private slots:
         // Top electrode (same direction as dipole) should have highest potential
         QVERIFY(std::isfinite(Vval(0)));
 
-        for (int i = 0; i < neeg; ++i)
-            delete[] el[i];
-        delete[] el;
         delete model;
     }
 

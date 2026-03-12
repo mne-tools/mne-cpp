@@ -72,9 +72,9 @@ namespace FWDLIB
 
 //=============================================================================================================
 /**
- * Implements the compute forward setting parser
+ * Holds the parameter set for a forward-solution computation.
  *
- * @brief Compute Forward setting implementation
+ * @brief Forward-computation parameter class.
  */
 class FWDSHARED_EXPORT ComputeFwdSettings
 {
@@ -87,15 +87,6 @@ public:
      * Default Constructor
      */
     explicit ComputeFwdSettings();
-
-    //=========================================================================================================
-    /**
-     * Constructs Compute Forward Settings
-     *
-     * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-     * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-     */
-    explicit ComputeFwdSettings(int *argc,char **argv);
 
     //=========================================================================================================
     /**
@@ -145,12 +136,6 @@ public:
 
 private:
     void initMembers();
-    void usage(char *name);
-
-    static QString build_command_line(QString old, QString new_item);
-
-    bool check_unrecognized_args(int argc, char **argv);
-    bool check_args (int *argc,char **argv);
 };
 
 //=============================================================================================================

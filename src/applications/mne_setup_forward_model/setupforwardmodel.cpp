@@ -54,7 +54,7 @@
 #include "setupforwardmodel.h"
 #include "mne_setup_forward_model_settings.h"
 
-#include <fs/surface.h>
+#include <fs/fs_surface.h>
 
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
@@ -677,7 +677,7 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
 
     printf("Computing the linear collocation solution...\n");
 
-    int result = FwdBemModel::fwd_bem_compute_solution(bemModel, FWD_BEM_LINEAR_COLL);
+    int result = bemModel->fwd_bem_compute_solution(FWD_BEM_LINEAR_COLL);
     if (result != 0) {
         qCritical() << "BEM solution computation failed.";
         delete bemModel;
@@ -711,7 +711,7 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
         for (int k = 0; k < bemModel->nsurf; ++k) {
             stream->start_block(FIFFB_BEM_SURF);
 
-            MNESurface* s = bemModel->surfs[k];
+            MNESurface* s = bemModel->surfs[k].get();
 
             // Surface ID
             int surfId = s->id;
@@ -762,14 +762,8 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
         }
 
         // Write the solution matrix
-        if (bemModel->solution && bemModel->nsol > 0) {
-            MatrixXf solMat(bemModel->nsol, bemModel->nsol);
-            for (int i = 0; i < bemModel->nsol; ++i) {
-                for (int j = 0; j < bemModel->nsol; ++j) {
-                    solMat(i, j) = bemModel->solution[i][j];
-                }
-            }
-            stream->write_float_matrix(FIFF_BEM_POT_SOLUTION, solMat);
+        if (bemModel->solution.size() > 0 && bemModel->nsol > 0) {
+            stream->write_float_matrix(FIFF_BEM_POT_SOLUTION, bemModel->solution);
         }
 
         stream->end_block(FIFFB_BEM);

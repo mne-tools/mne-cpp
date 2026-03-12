@@ -45,7 +45,7 @@
 
 #include "../mne_inverse_operator.h"
 #include "../mne_source_estimate.h"
-#include <fs/label.h>
+#include <fs/fs_label.h>
 
 #include <QSharedPointer>
 

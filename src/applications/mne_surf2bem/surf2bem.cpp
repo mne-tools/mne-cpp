@@ -45,7 +45,7 @@
 #include "mne_surf2bem_settings.h"
 #include "surfacechecks.h"
 
-#include <fs/surface.h>
+#include <fs/fs_surface.h>
 
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>

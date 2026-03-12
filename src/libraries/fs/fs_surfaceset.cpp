@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     surfaceset.cpp
+ * @file     fs_surfaceset.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "surfaceset.h"
+#include "fs_surfaceset.h"
 
 //=============================================================================================================
 // QT INCLUDES

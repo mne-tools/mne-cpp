@@ -40,9 +40,9 @@
 #include <disp3D_rhi/view/brainview.h>
 #include <disp3D_rhi/model/braintreemodel.h>
 
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
-#include <mne/mne_forwardsolution.h>
+#include <fs/fs_surfaceset.h>
+#include <fs/fs_annotationset.h>
+#include <mne/mne_forward_solution.h>
 #include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================

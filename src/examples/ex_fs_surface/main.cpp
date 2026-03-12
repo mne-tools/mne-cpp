@@ -40,7 +40,7 @@
 #include <disp3D_rhi/view/brainview.h>
 #include <disp3D_rhi/model/braintreemodel.h>
 
-#include <fs/surfaceset.h>
+#include <fs/fs_surfaceset.h>
 
 #include <utils/generics/applicationlogger.h>
 

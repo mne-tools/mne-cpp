@@ -45,7 +45,7 @@
 
 #include "mne_global.h"
 
-#include "mne_forwardsolution.h"
+#include "mne_forward_solution.h"
 #include "mne_hemisphere.h"
 #include "mne_source_spaces.h"
 #include "mne_bem.h"

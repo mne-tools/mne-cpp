@@ -414,3 +414,49 @@ FiffSparseMatrix FiffSparseMatrix::fromEigenSparse(const Eigen::SparseMatrix<dou
 
     return result;
 }
+
+//=============================================================================================================
+
+FiffSparseMatrix::UPtr FiffSparseMatrix::pickLowerTriangleRcs() const
+{
+    if (coding != FIFFTS_MC_RCS) {
+        qWarning("[FiffSparseMatrix::pickLowerTriangleRcs] input must be in RCS format");
+        return nullptr;
+    }
+    if (m != n) {
+        qWarning("[FiffSparseMatrix::pickLowerTriangleRcs] input must be square");
+        return nullptr;
+    }
+
+    std::vector<int>                nnz_vec(m);
+    std::vector<std::vector<int>>   colindex(m);
+    std::vector<std::vector<float>> vals(m);
+
+    for (int i = 0; i < m; i++) {
+        int count = ptrs[i+1] - ptrs[i];
+        if (count > 0) {
+            colindex[i].resize(count);
+            vals[i].resize(count);
+            int k = 0;
+            for (int j = ptrs[i]; j < ptrs[i+1]; j++) {
+                if (inds[j] <= i) {
+                    vals[i][k]     = data[j];
+                    colindex[i][k] = inds[j];
+                    k++;
+                }
+            }
+            nnz_vec[i] = k;
+        } else {
+            nnz_vec[i] = 0;
+        }
+    }
+
+    std::vector<int*>   ci_ptrs(m);
+    std::vector<float*> val_ptrs(m);
+    for (int i = 0; i < m; i++) {
+        ci_ptrs[i]  = colindex[i].empty() ? nullptr : colindex[i].data();
+        val_ptrs[i] = vals[i].empty() ? nullptr : vals[i].data();
+    }
+
+    return create_sparse_rcs(m, n, nnz_vec.data(), ci_ptrs.data(), val_ptrs.data());
+}

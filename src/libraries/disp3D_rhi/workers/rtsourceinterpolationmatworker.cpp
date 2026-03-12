@@ -40,7 +40,7 @@
 #include "helpers/interpolation.h"
 #include "helpers/geometryinfo.h"
 
-#include <fs/label.h>
+#include <fs/fs_label.h>
 
 #include <QDebug>
 

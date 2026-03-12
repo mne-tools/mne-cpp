@@ -10,12 +10,12 @@
 #include <QTemporaryDir>
 #include <QDataStream>
 
-#include <fs/surface.h>
-#include <fs/surfaceset.h>
-#include <fs/annotation.h>
-#include <fs/annotationset.h>
-#include <fs/label.h>
-#include <fs/colortable.h>
+#include <fs/fs_surface.h>
+#include <fs/fs_surfaceset.h>
+#include <fs/fs_annotation.h>
+#include <fs/fs_annotationset.h>
+#include <fs/fs_label.h>
+#include <fs/fs_colortable.h>
 
 using namespace FSLIB;
 using namespace Eigen;

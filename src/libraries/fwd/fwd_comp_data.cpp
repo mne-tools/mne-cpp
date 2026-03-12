@@ -157,7 +157,7 @@ FwdCompData::~FwdCompData()
 
 //=============================================================================================================
 
-int FwdCompData::fwd_comp_field(float *rd, float *Q, FwdCoilSet *coils, float *res, void *client)
+int FwdCompData::fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet *coils, float *res, void *client)
 /*
           * Calculate the compensated field (one dipole component)
           */
@@ -320,7 +320,7 @@ FwdCompData *FwdCompData::fwd_make_comp_data(MNECTFCompDataSet *set,
 
 //=============================================================================================================
 
-int FwdCompData::fwd_comp_field_vec(float *rd, FwdCoilSet *coils, float **res, void *client)
+int FwdCompData::fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet *coils, float **res, void *client)
 /*
           * Calculate the compensated field (all dipole components)
           */
@@ -367,7 +367,7 @@ int FwdCompData::fwd_comp_field_vec(float *rd, FwdCoilSet *coils, float **res, v
 
 //=============================================================================================================
 
-int FwdCompData::fwd_comp_field_grad(float *rd, float *Q, FwdCoilSet* coils, float *res, float *xgrad, float *ygrad, float *zgrad, void *client)
+int FwdCompData::fwd_comp_field_grad(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet* coils, float *res, float *xgrad, float *ygrad, float *zgrad, void *client)
 /*
  * Calculate the compensated field (one dipole component)
  */

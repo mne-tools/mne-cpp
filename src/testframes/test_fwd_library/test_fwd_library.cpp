@@ -25,8 +25,8 @@
 #include <fwd/fwd_comp_data.h>
 #include <fwd/fwd_coil_set.h>
 #include <fwd/fwd_coil.h>
-#include <fwd/computeFwd/compute_fwd_settings.h>
-#include <fwd/computeFwd/compute_fwd.h>
+#include <fwd/compute_fwd/compute_fwd_settings.h>
+#include <fwd/compute_fwd/compute_fwd.h>
 
 using namespace FIFFLIB;
 using namespace MNELIB;
@@ -166,7 +166,7 @@ void TestFwdLibrary::bemModel_loadFromFile()
     if (!QFile::exists(bemPath())) QSKIP("BEM file not found");
 
     int kind = FIFFV_BEM_SURF_ID_BRAIN;
-    FwdBemModel* model = FwdBemModel::fwd_bem_load_surfaces(bemPath(), &kind, 1);
+    FwdBemModel* model = FwdBemModel::fwd_bem_load_surfaces(bemPath(), {kind});
     if (model) {
         QVERIFY(model->nsurf > 0);
         MNESurface* surf = model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN);
@@ -178,7 +178,7 @@ void TestFwdLibrary::bemModel_loadFromFile()
     QString bem3Path = m_sDataPath + "/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
     if (QFile::exists(bem3Path)) {
         int kinds[3] = {FIFFV_BEM_SURF_ID_BRAIN, FIFFV_BEM_SURF_ID_SKULL, FIFFV_BEM_SURF_ID_HEAD};
-        FwdBemModel* model3 = FwdBemModel::fwd_bem_load_surfaces(bem3Path, kinds, 3);
+        FwdBemModel* model3 = FwdBemModel::fwd_bem_load_surfaces(bem3Path, {kinds[0], kinds[1], kinds[2]});
         if (model3) {
             QVERIFY(model3->nsurf == 3);
             delete model3;
@@ -243,7 +243,7 @@ void TestFwdLibrary::bemModel_setHeadMriT()
     t.from = FIFFV_COORD_HEAD; t.to = FIFFV_COORD_MRI;
     t.trans = Matrix4f::Identity(); t.invtrans = Matrix4f::Identity();
 
-    int result = FwdBemModel::fwd_bem_set_head_mri_t(model, t);
+    int result = model->fwd_bem_set_head_mri_t(t);
     Q_UNUSED(result);
     delete model;
 }
@@ -305,7 +305,7 @@ void TestFwdLibrary::bemModel_accessors()
     QVERIFY(model->surfs[0]->ntri > 0);
     QVERIFY(model->surfs[0]->rr.rows() > 0);
 
-    if (model->gamma) QVERIFY(true);
+    if (model->gamma.size() > 0) QVERIFY(true);
 
     // Load 3-layer for more coverage
     QString bem3Path = m_sDataPath + "/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
@@ -542,13 +542,12 @@ void TestFwdLibrary::eegSphere_multiSpherepot()
     float rd[3] = {0.0f, 0.0f, 0.05f};
     float Q[3] = {1.0f, 0.0f, 0.0f};
     int neeg = 5;
-    float elData[5][3] = {
-        {0.08f, 0.0f, 0.0f}, {0.0f, 0.08f, 0.0f},
-        {-0.08f, 0.0f, 0.0f}, {0.0f, -0.08f, 0.0f},
-        {0.0f, 0.0f, 0.08f}
-    };
-    float* el[5];
-    for (int i = 0; i < neeg; i++) el[i] = elData[i];
+    Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> el(neeg, 3);
+    el << 0.08f, 0.0f, 0.0f,
+         0.0f, 0.08f, 0.0f,
+         -0.08f, 0.0f, 0.0f,
+         0.0f, -0.08f, 0.0f,
+         0.0f, 0.0f, 0.08f;
     float Vval[5] = {0.0f};
 
     int res = FwdEegSphereModel::fwd_eeg_multi_spherepot(rd, Q, el, neeg, Vval, (void*)model);
@@ -569,12 +568,11 @@ void TestFwdLibrary::eegSphere_spherepotVec()
 
     float rd[3] = {0.0f, 0.0f, 0.05f};
     int neeg = 4;
-    float elData[4][3] = {
-        {0.08f, 0.0f, 0.0f}, {0.0f, 0.08f, 0.0f},
-        {-0.08f, 0.0f, 0.0f}, {0.0f, -0.08f, 0.0f}
-    };
-    float* el[4];
-    for (int i = 0; i < neeg; i++) el[i] = elData[i];
+    Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> el(neeg, 3);
+    el << 0.08f, 0.0f, 0.0f,
+         0.0f, 0.08f, 0.0f,
+         -0.08f, 0.0f, 0.0f,
+         0.0f, -0.08f, 0.0f;
 
     float vvalData[3][4] = {{0},{0},{0}};
     float* Vval_vec[3];

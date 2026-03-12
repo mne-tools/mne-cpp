@@ -46,8 +46,8 @@
 
 #include <fiff/fiff_coord_trans.h>
 
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
+#include <fs/fs_surfaceset.h>
+#include <fs/fs_annotationset.h>
 
 //=============================================================================================================
 // QT INCLUDES

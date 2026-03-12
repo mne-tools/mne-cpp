@@ -41,11 +41,11 @@
 
 #include "../rtcmne.h"
 
-#include <fs/annotationset.h>
-#include <fs/surfaceset.h>
+#include <fs/fs_annotationset.h>
+#include <fs/fs_surfaceset.h>
 #include <fiff/fiff_coord_trans.h>
 
-#include <mne/mne_forwardsolution.h>
+#include <mne/mne_forward_solution.h>
 
 #include <scMeas/realtimesourceestimate.h>
 

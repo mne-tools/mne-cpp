@@ -59,8 +59,8 @@ MNETriangle::MNETriangle() = default;
 
 void MNETriangle::compute_data()
 {
-    r12 = Eigen::Map<const Eigen::Vector3f>(r2) - Eigen::Map<const Eigen::Vector3f>(r1);
-    r13 = Eigen::Map<const Eigen::Vector3f>(r3) - Eigen::Map<const Eigen::Vector3f>(r1);
+    r12 = r2 - r1;
+    r13 = r3 - r1;
 
     nn = r12.cross(r13);
     float size = nn.norm();
@@ -73,9 +73,7 @@ void MNETriangle::compute_data()
         sizey = 1.0f;
     ey = r13 / sizey;
 
-    cent = (Eigen::Map<const Eigen::Vector3f>(r1)
-          + Eigen::Map<const Eigen::Vector3f>(r2)
-          + Eigen::Map<const Eigen::Vector3f>(r3)) / 3.0f;
+    cent = (r1 + r2 + r3) / 3.0f;
 
     ex = ey.cross(nn);
 }

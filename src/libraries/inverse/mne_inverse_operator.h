@@ -44,7 +44,7 @@
 
 #include "inverse_global.h"
 #include <mne/mne_source_spaces.h>
-#include <mne/mne_forwardsolution.h>
+#include <mne/mne_forward_solution.h>
 
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_named_matrix.h>

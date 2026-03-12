@@ -56,7 +56,7 @@
 
 #include <inverse/minimum_norm/minimum_norm.h>
 
-#include <fs/label.h>
+#include <fs/fs_label.h>
 
 #include <utils/generics/applicationlogger.h>
 

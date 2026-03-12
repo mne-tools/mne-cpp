@@ -12,14 +12,19 @@
 
 #include <mne/mne_ctf_comp_data_set.h>
 
+#include <Eigen/Core>
+
 typedef void (*fwdUserFreeFunc)(void *);  /* General purpose */
 
 /*
  * This is a convenient generic field / potential computation function
  */
-typedef int (*fwdFieldFunc)(float *rd,float *Q,FWDLIB::FwdCoilSet* coils,float *res,void *client);
-typedef int (*fwdVecFieldFunc)(float *rd,FWDLIB::FwdCoilSet* coils,float **res,void *client);
-typedef int (*fwdFieldGradFunc)(float *rd,float *Q,FWDLIB::FwdCoilSet* coils, float *res,
+typedef int (*fwdFieldFunc)(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
+                            FWDLIB::FwdCoilSet* coils, float *res, void *client);
+typedef int (*fwdVecFieldFunc)(const Eigen::Vector3f& rd,
+                               FWDLIB::FwdCoilSet* coils, float **res, void *client);
+typedef int (*fwdFieldGradFunc)(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
+                                FWDLIB::FwdCoilSet* coils, float *res,
                                 float *xgrad, float *ygrad, float *zgrad, void *client);
 
 //#define FWD_BEM_UNKNOWN           -1

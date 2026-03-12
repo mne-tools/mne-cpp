@@ -508,7 +508,7 @@ void FwdEegSphereModel::calc_pot_components(double beta, double cgamma, double *
 
 //=============================================================================================================
 // fwd_multi_spherepot.c
-int FwdEegSphereModel::fwd_eeg_multi_spherepot(float *rd, float *Q, float **el, int neeg, float *Vval, void *client)	  /* The model definition */
+int FwdEegSphereModel::fwd_eeg_multi_spherepot(float *rd, float *Q, const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& el, int neeg, float *Vval, void *client)	  /* The model definition */
 /*
  * Compute the electric potentials in a set of electrodes in spherically
  * Symmetric head model.
@@ -584,7 +584,7 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot(float *rd, float *Q, float **el, 
     }
     for (k = 0; k < neeg; k++) {
         for (p = 0; p < 3; p++)
-            pos[p] = el[k][p] - m->r0[p];
+            pos[p] = el(k, p) - m->r0[p];
         /*
          * Should the position be scaled or not?
          */
@@ -635,7 +635,7 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot(float *rd, float *Q, float **el, 
 
 //=============================================================================================================
 // fwd_multi_spherepot.c
-int FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(float *rd, float *Q, FwdCoilSet *els, float *Vval, void *client)           /* Client data will be the sphere model definition */
+int FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet *els, float *Vval, void *client)           /* Client data will be the sphere model definition */
 /*
  * Calculate the EEG in the sphere model using the fwdCoilSet structure
  *
@@ -656,7 +656,7 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(float *rd, float *Q, FwdCoi
                 vval_one = REALLOC_1(vval_one,el->np,float);
                 nvval = el->np;
             }
-            if (fwd_eeg_multi_spherepot(rd,Q,el->rmag,el->np,vval_one,client) != OK) {
+            if (fwd_eeg_multi_spherepot(const_cast<float*>(rd.data()),const_cast<float*>(Q.data()),el->rmag,el->np,vval_one,client) != OK) {
                 FREE(vval_one);
                 return FAIL;
             }
@@ -672,7 +672,7 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(float *rd, float *Q, FwdCoi
 
 //=============================================================================================================
 // fwd_multi_spherepot.c
-bool FwdEegSphereModel::fwd_eeg_spherepot_vec( float   *rd, float   **el, int neeg, float **Vval_vec, void *client)
+bool FwdEegSphereModel::fwd_eeg_spherepot_vec( float   *rd, const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& el, int neeg, float **Vval_vec, void *client)
 {
     FwdEegSphereModel* m = (FwdEegSphereModel*)client;
     float fact = 0.25f/(float)M_PI;
@@ -695,9 +695,9 @@ bool FwdEegSphereModel::fwd_eeg_spherepot_vec( float   *rd, float   **el, int ne
    * Initialize the arrays
    */
     for (k = 0 ; k < neeg ; k++) {
-        Vval_vec[X_1][k] = 0.0;
-        Vval_vec[Y_1][k] = 0.0;
-        Vval_vec[Z_1][k] = 0.0;
+        Vval_vec[0][k] = 0.0;
+        Vval_vec[1][k] = 0.0;
+        Vval_vec[2][k] = 0.0;
     }
     /*
    * Ignore dipoles outside the innermost sphere
@@ -728,10 +728,9 @@ bool FwdEegSphereModel::fwd_eeg_spherepot_vec( float   *rd, float   **el, int ne
      * Go over all electrodes
      */
         for (k = 0; k < neeg ; k++) {
-            this_pos = el[k];
 
             for (p = 0; p < 3; p++)
-                pos[p] = this_pos[p] - m->r0[p];
+                pos[p] = el(k, p) - m->r0[p];
             /*
        * Scale location onto the surface of the sphere
        */
@@ -766,25 +765,25 @@ bool FwdEegSphereModel::fwd_eeg_spherepot_vec( float   *rd, float   **el, int ne
             m1 = (c1 - c2*rrd);
             m2 = c2*rd2;
 
-            Vval_vec[X_1][k] = Vval_vec[X_1][k] + m->lambda[eq]*rd2_inv*(m1*rd[X_1] + m2*this_pos[X_1]);
-            Vval_vec[Y_1][k] = Vval_vec[Y_1][k] + m->lambda[eq]*rd2_inv*(m1*rd[Y_1] + m2*this_pos[Y_1]);
-            Vval_vec[Z_1][k] = Vval_vec[Z_1][k] + m->lambda[eq]*rd2_inv*(m1*rd[Z_1] + m2*this_pos[Z_1]);
+            Vval_vec[0][k] = Vval_vec[0][k] + m->lambda[eq]*rd2_inv*(m1*rd[0] + m2*this_pos[0]);
+            Vval_vec[1][k] = Vval_vec[1][k] + m->lambda[eq]*rd2_inv*(m1*rd[1] + m2*this_pos[1]);
+            Vval_vec[2][k] = Vval_vec[2][k] + m->lambda[eq]*rd2_inv*(m1*rd[2] + m2*this_pos[2]);
         }             /* All electrodes done */
     }               /* All equivalent dipoles done */
     /*
    * Finish by scaling by 1/(4*M_PI);
    */
     for (k = 0; k  < neeg; k++) {
-        Vval_vec[X_1][k] = fact*Vval_vec[X_1][k];
-        Vval_vec[Y_1][k] = fact*Vval_vec[Y_1][k];
-        Vval_vec[Z_1][k] = fact*Vval_vec[Z_1][k];
+        Vval_vec[0][k] = fact*Vval_vec[0][k];
+        Vval_vec[1][k] = fact*Vval_vec[1][k];
+        Vval_vec[2][k] = fact*Vval_vec[2][k];
     }
     return true;
 }
 
 //=============================================================================================================
 // fwd_multi_spherepot.c
-int FwdEegSphereModel::fwd_eeg_spherepot_coil_vec(float *rd, FwdCoilSet* els, float **Vval_vec, void *client)
+int FwdEegSphereModel::fwd_eeg_spherepot_coil_vec(const Eigen::Vector3f& rd, FwdCoilSet* els, float **Vval_vec, void *client)
 {
     float **vval_one = NULL;
     float val;
@@ -800,7 +799,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil_vec(float *rd, FwdCoilSet* els, fl
                 vval_one = ALLOC_CMATRIX_1(3,el->np);
                 nvval = el->np;
             }
-            if (!fwd_eeg_spherepot_vec(rd,el->rmag,el->np,vval_one,client)) {
+            if (!fwd_eeg_spherepot_vec(const_cast<float*>(rd.data()),el->rmag,el->np,vval_one,client)) {
                 FREE_CMATRIX_1(vval_one);
                 return FAIL;
             }
@@ -817,7 +816,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil_vec(float *rd, FwdCoilSet* els, fl
 
 //=============================================================================================================
 
-int FwdEegSphereModel::fwd_eeg_spherepot_grad_coil(float *rd, float Q[], FwdCoilSet *coils, float Vval[], float xgrad[], float ygrad[], float zgrad[], void *client)  /* Client data to be passed to some foward modelling routines */
+int FwdEegSphereModel::fwd_eeg_spherepot_grad_coil(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet *coils, float Vval[], float xgrad[], float ygrad[], float zgrad[], void *client)  /* Client data to be passed to some foward modelling routines */
 /*
           * Quick and dirty solution: use differences
           *
@@ -839,11 +838,11 @@ int FwdEegSphereModel::fwd_eeg_spherepot_grad_coil(float *rd, float Q[], FwdCoil
     for (p = 0; p < 3; p++) {
         VEC_COPY_1(my_rd,rd);
         my_rd[p] = my_rd[p] + step;
-        if (fwd_eeg_spherepot_coil(my_rd,Q,coils,grads[p],client) == FAIL)
+        if (fwd_eeg_spherepot_coil(Eigen::Map<const Eigen::Vector3f>(my_rd),Q,coils,grads[p],client) == FAIL)
             return FAIL;
         VEC_COPY_1(my_rd,rd);
         my_rd[p] = my_rd[p] - step;
-        if (fwd_eeg_spherepot_coil(my_rd,Q,coils,Vval,client) == FAIL)
+        if (fwd_eeg_spherepot_coil(Eigen::Map<const Eigen::Vector3f>(my_rd),Q,coils,Vval,client) == FAIL)
             return FAIL;
         for (q = 0; q < coils->ncoil; q++)
             grads[p][q] = (grads[p][q]-Vval[q])/step2;
@@ -859,7 +858,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot_grad_coil(float *rd, float Q[], FwdCoil
 // fwd_multi_spherepot.c
 int FwdEegSphereModel::fwd_eeg_spherepot(   float   *rd,       /* Dipole position */
                                             float   *Q,	 /* Dipole moment */
-                                            float   **el,	 /* Electrode positions */
+                                            const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& el,	 /* Electrode positions */
                                             int     neeg,	 /* Number of electrodes */
                                             VectorXf& Vval,	 /* The potential values */
                                             void    *client)
@@ -922,10 +921,9 @@ int FwdEegSphereModel::fwd_eeg_spherepot(   float   *rd,       /* Dipole positio
      * Go over all electrodes
      */
         for (k = 0; k < neeg ; k++) {
-            this_pos = el[k];
 
             for (p = 0; p < 3; p++)
-                pos[p] = this_pos[p] - m->r0[p];
+                pos[p] = el(k, p) - m->r0[p];
             /*
        * Scale location onto the surface of the sphere
        */
@@ -974,7 +972,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot(   float   *rd,       /* Dipole positio
 
 //=============================================================================================================
 // fwd_multi_spherepot.c
-int FwdEegSphereModel::fwd_eeg_spherepot_coil(  float *rd, float *Q, FwdCoilSet* els, float *Vval, void *client)
+int FwdEegSphereModel::fwd_eeg_spherepot_coil(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet* els, float *Vval, void *client)
 {
     VectorXf vval_one;
     float val;
@@ -989,7 +987,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil(  float *rd, float *Q, FwdCoilSet*
                 vval_one.resize(el->np);
                 nvval = el->np;
             }
-            if (fwd_eeg_spherepot(rd,Q,el->rmag,el->np,vval_one,client) != OK) {
+            if (fwd_eeg_spherepot(const_cast<float*>(rd.data()),const_cast<float*>(Q.data()),el->rmag,el->np,vval_one,client) != OK) {
                 return FAIL;
             }
             for (c = 0, val = 0.0; c < el->np; c++)

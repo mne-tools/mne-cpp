@@ -42,10 +42,10 @@
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
 
-#include <fwd/computeFwd/compute_fwd_settings.h>
-#include <fwd/computeFwd/compute_fwd.h>
+#include <fwd/compute_fwd/compute_fwd_settings.h>
+#include <fwd/compute_fwd/compute_fwd.h>
 
-#include <mne/mne_forwardsolution.h>
+#include <mne/mne_forward_solution.h>
 
 #include <mne/mne.h>
 //=============================================================================================================

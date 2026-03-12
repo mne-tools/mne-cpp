@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     annotation.h
+ * @file     fs_annotation.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -34,15 +34,15 @@
  *
  */
 
-#ifndef ANNOTATION_H
-#define ANNOTATION_H
+#ifndef FS_ANNOTATION_H
+#define FS_ANNOTATION_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "fs_global.h"
-#include "colortable.h"
+#include "fs_colortable.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -353,4 +353,4 @@ inline QString Annotation::fileName() const
 }
 } // NAMESPACE
 
-#endif // ANNOTATION_H
+#endif // FS_ANNOTATION_H

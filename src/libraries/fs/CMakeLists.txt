@@ -11,23 +11,23 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
-    annotation.cpp
-    colortable.cpp
+    fs_annotation.cpp
+    fs_colortable.cpp
     fs_global.cpp
-    label.cpp
-    surface.cpp
-    annotationset.cpp
-    surfaceset.cpp
+    fs_label.cpp
+    fs_surface.cpp
+    fs_annotationset.cpp
+    fs_surfaceset.cpp
 )
 
 set(HEADERS
-    annotation.h
+    fs_annotation.h
     fs_global.h
-    colortable.h
-    label.h
-    surface.h
-    annotationset.h
-    surfaceset.h
+    fs_colortable.h
+    fs_label.h
+    fs_surface.h
+    fs_annotationset.h
+    fs_surfaceset.h
 )
 
 set(FILE_TO_UPDATE fs_global.cpp)

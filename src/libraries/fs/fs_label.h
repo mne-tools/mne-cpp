@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     label.h
+ * @file     fs_label.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -34,8 +34,8 @@
  *
  */
 
-#ifndef LABEL_H
-#define LABEL_H
+#ifndef FS_LABEL_H
+#define FS_LABEL_H
 
 //=============================================================================================================
 // INCLUDES
@@ -192,4 +192,4 @@ inline bool Label::isEmpty() const
 Q_DECLARE_METATYPE(FSLIB::Label);
 #endif
 
-#endif // LABEL_H
+#endif // FS_LABEL_H

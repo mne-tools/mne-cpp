@@ -239,6 +239,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Appends a deep copy of the given source space.
+     *
+     * @param[in] space  The source space to append.
+     */
+    void append(const MNESourceSpace& space);
+
+    //=========================================================================================================
+    /**
      * Subscript operator [] to access source spaces by index.
      *
      * @param[in] idx    the source space index (0 or 1).

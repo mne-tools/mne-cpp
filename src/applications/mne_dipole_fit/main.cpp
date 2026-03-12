@@ -50,9 +50,9 @@
 #include <disp3D_rhi/model/braintreemodel.h>
 #include <disp3D_rhi/model/items/dipoletreeitem.h>
 
-#include <fs/label.h>
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
+#include <fs/fs_label.h>
+#include <fs/fs_surfaceset.h>
+#include <fs/fs_annotationset.h>
 
 #include <iostream>
 

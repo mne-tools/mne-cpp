@@ -41,9 +41,9 @@
 #include <disp3D_rhi/model/braintreemodel.h>
 #include <disp3D_rhi/core/viewstate.h>
 
-#include <fs/surface.h>
-#include <fs/surfaceset.h>
-#include <fs/annotation.h>
+#include <fs/fs_surface.h>
+#include <fs/fs_surfaceset.h>
+#include <fs/fs_annotation.h>
 #include <mne/mne_bem.h>
 
 #include <QVBoxLayout>

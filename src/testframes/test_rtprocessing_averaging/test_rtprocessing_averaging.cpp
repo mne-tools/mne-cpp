@@ -17,7 +17,7 @@
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_evoked_set.h>
-#include <mne/mne_forwardsolution.h>
+#include <mne/mne_forward_solution.h>
 
 using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;

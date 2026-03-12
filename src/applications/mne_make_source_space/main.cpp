@@ -49,8 +49,8 @@
 #include <mne/mne_hemisphere.h>
 #include <mne/mne_source_spaces.h>
 
-#include <fs/surface.h>
-#include <fs/surfaceset.h>
+#include <fs/fs_surface.h>
+#include <fs/fs_surfaceset.h>
 
 #include <utils/generics/applicationlogger.h>
 

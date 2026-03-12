@@ -48,8 +48,8 @@
 #include <QColor>
 #include <memory>
 #include <vector>
-#include <fs/surface.h>
-#include <fs/annotation.h>
+#include <fs/fs_surface.h>
+#include <fs/fs_annotation.h>
 #include <mne/mne_bem.h>
 
 #include <Eigen/Core>

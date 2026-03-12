@@ -106,7 +106,7 @@ public:
 
     //============================= fwd_comp.c =============================
 
-    static int fwd_comp_field(float *rd,float *Q, FwdCoilSet* coils, float *res, void *client);
+    static int fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet* coils, float *res, void *client);
 
     /*
      * Routines to implement the reference channel compensation in field computations
@@ -127,9 +127,9 @@ public:
                                    void              *client,       /* Client data to be passed to the above */
                                    fwdUserFreeFunc   client_free);
 
-    static int fwd_comp_field_vec(float *rd, FwdCoilSet* coils, float **res, void *client);
+    static int fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet* coils, float **res, void *client);
 
-    static int fwd_comp_field_grad(float *rd,float *Q, FwdCoilSet* coils,
+    static int fwd_comp_field_grad(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet* coils,
                 float *res, float *xgrad, float *ygrad, float *zgrad,
                 void *client);
 

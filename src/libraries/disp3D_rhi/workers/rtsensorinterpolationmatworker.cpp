@@ -43,7 +43,7 @@
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fwd/fwd_coil_set.h>
-#include <fs/surface.h>
+#include <fs/fs_surface.h>
 
 #include <QCoreApplication>
 #include <QDebug>

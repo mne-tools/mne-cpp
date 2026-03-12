@@ -40,10 +40,10 @@
 
 #include <connectivity/network/network.h>
 
-#include <mne/mne_forwardsolution.h>
+#include <mne/mne_forward_solution.h>
 
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
+#include <fs/fs_surfaceset.h>
+#include <fs/fs_annotationset.h>
 
 #include <fiff/fiff_info.h>
 

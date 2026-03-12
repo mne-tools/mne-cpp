@@ -278,11 +278,11 @@ CoilData extractCoilData(const FwdCoil* coil, const Vector3d& r0)
     cd.w.resize(cd.np);
 
     for (int i = 0; i < cd.np; ++i) {
-        Vector3d rel = toVec3d(coil->rmag[i]) - r0;
+        Vector3d rel = coil->rmag.row(i).cast<double>().transpose() - r0;
         double len = rel.norm();
         cd.rmag[i]   = (len > 0.0) ? Vector3d(rel / len) : Vector3d::Zero();
         cd.rlen[i]   = len;
-        cd.cosmag[i] = toVec3d(coil->cosmag[i]);
+        cd.cosmag[i] = coil->cosmag.row(i).cast<double>().transpose();
         cd.w[i]      = static_cast<double>(coil->w[i]);
     }
     return cd;

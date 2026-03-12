@@ -49,6 +49,8 @@
 
 #include <Eigen/Core>
 
+#include <Eigen/Core>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -94,7 +96,7 @@ public:
     static void fwd_bem_free_coil_solution(void *user);
 
 public:
-    float **solution;                   /* The solution matrix */
+    Eigen::MatrixXf solution;          /**< Solution matrix (ncoil x np). */
     int   ncoil;                        /* Number of sensors */
     int   np;                           /* Number of potential solution points */
 

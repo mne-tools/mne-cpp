@@ -102,9 +102,9 @@ public:
 
 public:
     int              *vert = nullptr;  /**< Triangle vertex indices (non-owning; points into parent surface itris). */
-    const float      *r1 = nullptr;    /**< Position of vertex 0 (non-owning; points into parent surface rr). */
-    const float      *r2 = nullptr;    /**< Position of vertex 1 (non-owning; points into parent surface rr). */
-    const float      *r3 = nullptr;    /**< Position of vertex 2 (non-owning; points into parent surface rr). */
+    Eigen::Vector3f  r1 = Eigen::Vector3f::Zero();   /**< Position of vertex 0. */
+    Eigen::Vector3f  r2 = Eigen::Vector3f::Zero();   /**< Position of vertex 1. */
+    Eigen::Vector3f  r3 = Eigen::Vector3f::Zero();   /**< Position of vertex 2. */
     Eigen::Vector3f  r12 = Eigen::Vector3f::Zero();   /**< Edge vector from vertex 0 to vertex 1 (r2 - r1). */
     Eigen::Vector3f  r13 = Eigen::Vector3f::Zero();   /**< Edge vector from vertex 0 to vertex 2 (r3 - r1). */
     Eigen::Vector3f  nn  = Eigen::Vector3f::Zero();   /**< Unit normal vector. */

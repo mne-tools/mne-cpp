@@ -3360,11 +3360,11 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MNECTFCompDataSet* comp
             goto out;
         }
         printf("\nLoading the solution matrix...\n");
-        if (FwdBemModel::fwd_bem_load_recompute_solution(d->bemname,FWD_BEM_UNKNOWN,FALSE,d->bem_model.get()) == FAIL)
+        if (d->bem_model->fwd_bem_load_recompute_solution(d->bemname,FWD_BEM_UNKNOWN,FALSE) == FAIL)
             goto out;
         printf("Employing the head->MRI coordinate transform with the BEM model.\n");
         Q_ASSERT(d->mri_head_t);
-        if (FwdBemModel::fwd_bem_set_head_mri_t(d->bem_model.get(),*d->mri_head_t) == FAIL)
+        if (d->bem_model->fwd_bem_set_head_mri_t(*d->mri_head_t) == FAIL)
             goto out;
         printf("BEM model %s is now set up\n",d->bem_model->sol_name.toUtf8().constData());
         /*
@@ -3398,9 +3398,9 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MNECTFCompDataSet* comp
             printf("Compensation setup done.\n");
 
             printf("MEG solution matrix...");
-            if (FwdBemModel::fwd_bem_specify_coils(d->bem_model.get(),d->meg_coils.get()) == FAIL)
+            if (d->bem_model->fwd_bem_specify_coils(d->meg_coils.get()) == FAIL)
                 goto out;
-            if (FwdBemModel::fwd_bem_specify_coils(d->bem_model.get(),comp->comp_coils) == FAIL)
+            if (d->bem_model->fwd_bem_specify_coils(comp->comp_coils) == FAIL)
                 goto out;
             printf("[done]\n");
 
@@ -3411,7 +3411,7 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MNECTFCompDataSet* comp
         }
         if (d->neeg > 0) {
             printf("\tEEG solution matrix...");
-            if (FwdBemModel::fwd_bem_specify_els(d->bem_model.get(),d->eeg_els.get()) == FAIL)
+            if (d->bem_model->fwd_bem_specify_els(d->eeg_els.get()) == FAIL)
                 goto out;
             printf("[done]\n");
             f->eeg_pot     = FwdBemModel::fwd_bem_pot_els;
@@ -4729,24 +4729,25 @@ int DipoleFitData::compute_dipole_field(DipoleFitData* d, float *rd, int whiten,
  */
 {
     float *eeg_fwd[3];
-    static float Qx[] = {1.0,0.0,0.0};
-    static float Qy[] = {0.0,1.0,0.0};
-    static float Qz[] = {0.0,0.0,1.0};
+    static const Eigen::Vector3f Qx(1.0f, 0.0f, 0.0f);
+    static const Eigen::Vector3f Qy(0.0f, 1.0f, 0.0f);
+    static const Eigen::Vector3f Qz(0.0f, 0.0f, 1.0f);
+    Eigen::Map<const Eigen::Vector3f> rd_vec(rd);
     int k;
     /*
    * Compute the fields
    */
     if (d->nmeg > 0) {
         if (d->funcs->meg_vec_field) {
-            if (d->funcs->meg_vec_field(rd,d->meg_coils.get(),fwd,d->funcs->meg_client) != OK)
+            if (d->funcs->meg_vec_field(rd_vec,d->meg_coils.get(),fwd,d->funcs->meg_client) != OK)
                 goto bad;
         }
         else {
-            if (d->funcs->meg_field(rd,Qx,d->meg_coils.get(),fwd[0],d->funcs->meg_client) != OK)
+            if (d->funcs->meg_field(rd_vec,Qx,d->meg_coils.get(),fwd[0],d->funcs->meg_client) != OK)
                 goto bad;
-            if (d->funcs->meg_field(rd,Qy,d->meg_coils.get(),fwd[1],d->funcs->meg_client) != OK)
+            if (d->funcs->meg_field(rd_vec,Qy,d->meg_coils.get(),fwd[1],d->funcs->meg_client) != OK)
                 goto bad;
-            if (d->funcs->meg_field(rd,Qz,d->meg_coils.get(),fwd[2],d->funcs->meg_client) != OK)
+            if (d->funcs->meg_field(rd_vec,Qz,d->meg_coils.get(),fwd[2],d->funcs->meg_client) != OK)
                 goto bad;
         }
     }
@@ -4756,15 +4757,15 @@ int DipoleFitData::compute_dipole_field(DipoleFitData* d, float *rd, int whiten,
             eeg_fwd[0] = fwd[0]+d->nmeg;
             eeg_fwd[1] = fwd[1]+d->nmeg;
             eeg_fwd[2] = fwd[2]+d->nmeg;
-            if (d->funcs->eeg_vec_pot(rd,d->eeg_els.get(),eeg_fwd,d->funcs->eeg_client) != OK)
+            if (d->funcs->eeg_vec_pot(rd_vec,d->eeg_els.get(),eeg_fwd,d->funcs->eeg_client) != OK)
                 goto bad;
         }
         else {
-            if (d->funcs->eeg_pot(rd,Qx,d->eeg_els.get(),fwd[0]+d->nmeg,d->funcs->eeg_client) != OK)
+            if (d->funcs->eeg_pot(rd_vec,Qx,d->eeg_els.get(),fwd[0]+d->nmeg,d->funcs->eeg_client) != OK)
                 goto bad;
-            if (d->funcs->eeg_pot(rd,Qy,d->eeg_els.get(),fwd[1]+d->nmeg,d->funcs->eeg_client) != OK)
+            if (d->funcs->eeg_pot(rd_vec,Qy,d->eeg_els.get(),fwd[1]+d->nmeg,d->funcs->eeg_client) != OK)
                 goto bad;
-            if (d->funcs->eeg_pot(rd,Qz,d->eeg_els.get(),fwd[2]+d->nmeg,d->funcs->eeg_client) != OK)
+            if (d->funcs->eeg_pot(rd_vec,Qz,d->eeg_els.get(),fwd[2]+d->nmeg,d->funcs->eeg_client) != OK)
                 goto bad;
         }
     }
