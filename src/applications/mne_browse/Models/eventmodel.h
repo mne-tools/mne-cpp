@@ -51,6 +51,7 @@
 #include <QAbstractTableModel>
 #include <QBrush>
 #include <QSettings>
+#include <QFile>
 #include <QVector>
 #include <QPair>
 

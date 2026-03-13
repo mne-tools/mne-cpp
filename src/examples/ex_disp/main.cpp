@@ -64,6 +64,7 @@
 #include <QImage>
 #include <QGraphicsView>
 #include <QCommandLineParser>
+#include <QFile>
 
 //=============================================================================================================
 // USED NAMESPACES

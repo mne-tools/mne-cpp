@@ -40,14 +40,14 @@
 
 #include <disp/viewers/fwdsettingsview.h>
 
-#include <fwd/compute_fwd/compute_fwd.h>
 #include <fwd/compute_fwd/compute_fwd_settings.h>
+#include <fwd/compute_fwd/compute_fwd.h>
 
 #include <inverse/hpi/hpi_fit.h>
 
 #include <fs/fs_annotationset.h>
 
-#include <mne/mne_forward_solution.h>
+#include <fwd/fwd_forward_solution.h>
 
 #include <scMeas/realtimehpiresult.h>
 #include <scMeas/realtimefwdsolution.h>
@@ -59,6 +59,7 @@
 
 #include <QtCore/QtPlugin>
 #include <QDebug>
+#include <QFile>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -425,11 +426,10 @@ void RtFwd::run()
 
     // initialize fwd solution
     emit statusInformationChanged(0);           // initializing
-    ComputeFwd::SPtr pComputeFwd = ComputeFwd::SPtr(new ComputeFwd(m_pFwdSettings));
+    ComputeFwd::SPtr pFwdComputer = ComputeFwd::SPtr(new ComputeFwd(m_pFwdSettings));
 
-    QFile t_fSolution(m_pFwdSettings->solname);
-    MNEForwardSolution::SPtr pFwdSolution;
-    MNEForwardSolution::SPtr pClusteredFwd;
+    FwdForwardSolution::SPtr pFwdSolution;
+    FwdForwardSolution::SPtr pClusteredFwd;
 
     emit statusInformationChanged(4);           // not computed
 
@@ -456,11 +456,10 @@ void RtFwd::run()
             m_mutex.unlock();
 
             // compute and store
-            pComputeFwd->calculateFwd();
-            pComputeFwd->storeFwd();
+            pFwdSolution.reset(pFwdComputer->calculateFwd().release());
 
-            // get Mne Forward Solution (in future this is not necessary, ComputeForward will have this as member)
-            pFwdSolution = MNEForwardSolution::SPtr(new MNEForwardSolution(t_fSolution, false, true));
+            QFile fwdFile(m_pFwdSettings->solname);
+            pFwdSolution->write(fwdFile);
 
             // emit results to control widget
             emit fwdSolutionAvailable(pFwdSolution->source_ori,
@@ -503,9 +502,7 @@ void RtFwd::run()
                 transMegHead = m_pHpiFitResult->devHeadTrans;
                 m_mutex.unlock();
 
-                pComputeFwd->updateHeadPos(transMegHead);
-                pFwdSolution->sol = pComputeFwd->sol;
-                pFwdSolution->sol_grad = pComputeFwd->sol_grad;
+                pFwdComputer->updateHeadPos(transMegHead, *pFwdSolution);
 
                 m_mutex.lock();
                 m_bBusy = false;
@@ -528,7 +525,7 @@ void RtFwd::run()
 
         if(bDoClustering && bFwdReady && bNClusterChanged) {
             emit statusInformationChanged(3);               // clustering
-            pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(pFwdSolution->cluster_forward_solution(*m_pAnnotationSet.data(), m_pFwdSettings->ncluster)));
+            pClusteredFwd = FwdForwardSolution::SPtr(new FwdForwardSolution(pFwdSolution->cluster_forward_solution(*m_pAnnotationSet.data(), m_pFwdSettings->ncluster)));
             emit clusteringAvailable(pClusteredFwd->nsource);
 
             m_pRTFSOutput->measurementData()->setValue(pClusteredFwd);

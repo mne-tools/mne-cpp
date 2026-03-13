@@ -34,8 +34,8 @@
  *
  */
 
-#ifndef FWDCOIL_H
-#define FWDCOIL_H
+#ifndef FWD_COIL_H
+#define FWD_COIL_H
 
 //=============================================================================================================
 // INCLUDES
@@ -94,14 +94,12 @@ public:
     //=========================================================================================================
     /**
      * Constructs the Forward Coil
-     * Refactored: fwd_new_coil (fwd_coil_def.c)
      */
     FwdCoil(int p_np);
 
     //=========================================================================================================
     /**
      * Copy constructor.
-     * Refactored: fwd_dup_coil (fwd_coil_def.c)
      *
      * @param[in] p_FwdCoil      FwdCoil which should be copied.
      */
@@ -110,14 +108,12 @@ public:
     //=========================================================================================================
     /**
      * Destroys the Forward Coil description
-     * Refactored: fwd_free_coil
      */
     ~FwdCoil();
 
     //=========================================================================================================
     /**
      * Create an electrode definition. Transform coordinate frame if so desired.
-     * Refactored: fwd_create_eeg_el (fwd_coil_def.c)
      *
      * @param[in] ch     Channel information to use.
      * @param[in] t      Transform the points using this.
@@ -130,7 +126,6 @@ public:
     //=========================================================================================================
     /**
      * Checks if this is an axial coil.
-     * Refactored: fwd_is_axial_coil (fwd_coil_def.c)
      *
      * @return   True if axial coil, false otherwise.
      */
@@ -139,7 +134,6 @@ public:
     //=========================================================================================================
     /**
      * Checks if this is an magnetometer.
-     * Refactored: fwd_is_magnetometer_coil (fwd_coil_def.c)
      *
      * @return   True if magnetometer, false otherwise.
      */
@@ -148,7 +142,6 @@ public:
     //=========================================================================================================
     /**
      * Checks if this is an planar coil.
-     * Refactored: fwd_is_planar_coil (fwd_coil_def.c)
      *
      * @return   True if planar coil, false otherwise.
      */
@@ -157,7 +150,6 @@ public:
     //=========================================================================================================
     /**
      * Checks if this is an EEG electrode.
-     * Refactored: fwd_is_eeg_electrode (fwd_coil_def.c)
      *
      * @return   True if EEG electrode, false otherwise.
      */
@@ -180,26 +172,6 @@ public:
     Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> rmag;    /**< The field point locations (np x 3). */
     Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> cosmag;  /**< The corresponding direction cosines (np x 3). */
     Eigen::VectorXf w;              /**< The weighting coefficients. */
-
-// ### OLD STRUCT ###
-//    typedef struct {
-//      char         *chname;		/* Name of this channel */
-//      int          coord_frame;	/* Which coordinate frame are we in? */
-//      char         *desc;	        /* Description for this type of a coil */
-//      int          coil_class;	/* Coil class */
-//      int          type;		/* Coil type */
-//      int          accuracy;	/* Accuracy */
-//      float        size;		/* Coil size */
-//      float        base;		/* Baseline */
-//      float        r0[3];		/* Coil coordinate system origin */
-//      float        ex[3];		/* Coil coordinate system unit vectors */
-//      float        ey[3];		/* This stupid construction needs to be replaced with */
-//      float        ez[3];		/* a coordinate transformation */
-//      int          np;		/* Number of integration points */
-//      float        **rmag;		/* The field point locations */
-//      float        **cosmag;	/* The corresponding direction cosines */
-//      float        *w;		/* The weighting coefficients */
-//    } *fwdCoil,fwdCoilRec;
 };
 
 //=============================================================================================================
@@ -207,4 +179,4 @@ public:
 //=============================================================================================================
 } // NAMESPACE FWDLIB
 
-#endif // FWDCOIL_H
+#endif // FWD_COIL_H

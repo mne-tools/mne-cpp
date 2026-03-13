@@ -1,9 +1,40 @@
-#ifndef _fwd_fwd_types_h
-#define _fwd_fwd_types_h
-
-/*
- * Type definitions for forward calculations
+//=============================================================================================================
+/**
+ * @file     fwd_types.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @since    0.1.0
+ * @date     January, 2017
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @brief    Forward library type definitions.
  */
+//=============================================================================================================
+
+#ifndef FWD_TYPES_H
+#define FWD_TYPES_H
 
 #include <fiff/fiff_types.h>
 #include <mne/mne_types.h>
@@ -14,68 +45,17 @@
 
 #include <Eigen/Core>
 
-typedef void (*fwdUserFreeFunc)(void *);  /* General purpose */
+#include <functional>
 
 /*
- * This is a convenient generic field / potential computation function
+ * Convenient generic field / potential computation functions
  */
-typedef int (*fwdFieldFunc)(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
-                            FWDLIB::FwdCoilSet* coils, float *res, void *client);
-typedef int (*fwdVecFieldFunc)(const Eigen::Vector3f& rd,
-                               FWDLIB::FwdCoilSet* coils, float **res, void *client);
-typedef int (*fwdFieldGradFunc)(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
-                                FWDLIB::FwdCoilSet* coils, float *res,
-                                float *xgrad, float *ygrad, float *zgrad, void *client);
+using fwdFieldFunc = std::function<int(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
+                                       FWDLIB::FwdCoilSet* coils, float *res, void *client)>;
+using fwdVecFieldFunc = std::function<int(const Eigen::Vector3f& rd,
+                                          FWDLIB::FwdCoilSet* coils, float **res, void *client)>;
+using fwdFieldGradFunc = std::function<int(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
+                                           FWDLIB::FwdCoilSet* coils, float *res,
+                                           float *xgrad, float *ygrad, float *zgrad, void *client)>;
 
-//#define FWD_BEM_UNKNOWN           -1
-//#define FWD_BEM_CONSTANT_COLL     1
-//#define FWD_BEM_LINEAR_COLL       2
-
-//#define FWD_BEM_IP_APPROACH_LIMIT 0.1
-
-//#define FWD_BEM_LIN_FIELD_SIMPLE    1
-//#define FWD_BEM_LIN_FIELD_FERGUSON  2
-//#define FWD_BEM_LIN_FIELD_URANKAR   3
-
-//typedef struct {		      /* Space to store a solution matrix */
-//  float **solution;		      /* The solution matrix */
-//  int   ncoil;			      /* Number of sensors */
-//  int   np;		              /* Number of potential solution points */
-//} *fwdBemSolution,fwdBemSolutionRec;  /* Mapping from infinite medium potentials to a particular set of coils or electrodes */
-
-//typedef struct {
-//  char       *surf_name;	/* Name of the file where surfaces were loaded from */
-//  FWDLIB::MNECSurface* *surfs;   /* The interface surfaces from outside towards inside */
-//  int        *ntri;		/* Number of triangles on each surface */
-//  int        *np;		/* Number of vertices on each surface */
-//  int        nsurf;		/* How many */
-//  float      *sigma;		/* The conductivities */
-//  float      **gamma;		/* The gamma factors */
-//  float      *source_mult;	/* These multiply the infinite medium potentials */
-//  float      *field_mult;	/* Multipliers for the magnetic field */
-//  int        bem_method;	/* Which approximation method is used */
-//  char       *sol_name;		/* Name of the file where the solution was loaded from */
-
-//  float      **solution;	/* The potential solution matrix */
-//  float      *v0;		/* Space for the infinite-medium potentials */
-//  int        nsol;		/* Size of the solution matrix */
-
-//  FWDLIB::FiffCoordTransOld* head_mri_t;	/* Coordinate transformation from head to MRI coordinates */
-
-//  float      ip_approach_limit;	/* Controls whether we need to use the isolated problem approach */
-//  int        use_ip_approach;	/* Do we need it */
-//} *fwdBemModel,fwdBemModelRec;	/* Holds the BEM model definition */
-
-//typedef struct {
-//  FWDLIB::MNECTFCompDataSet* set;	         /* The compensation data set */
-//  FWDLIB::FwdCoilSet*        comp_coils;	         /* The compensation coil definitions */
-//  fwdFieldFunc      field;	         /* Computes the field of given direction dipole */
-//  fwdVecFieldFunc   vec_field;	         /* Computes the fields of all three dipole components  */
-//  fwdFieldGradFunc  field_grad;	         /* Computes the field and gradient of one dipole direction */
-//  void              *client;	         /* Client data to pass to the above functions */
-//  fwdUserFreeFunc   client_free;
-//  float             *work;	         /* The work areas */
-//  float             **vec_work;
-//} *fwdCompData,fwdCompDataRec;	         /* This structure is used in the compensated field calculations */
-
-#endif
+#endif // FWD_TYPES_H

@@ -44,7 +44,7 @@
 
 #include "dipole.h"
 
-#include <mne/mne_forward_solution.h>
+#include <fwd/fwd_forward_solution.h>
 #include <inverse/mne_source_estimate.h>
 #include <time.h>
 
@@ -130,7 +130,7 @@ public:
      *                           the strongest.
      * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
      */
-    RapMusic(MNELIB::MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
+    RapMusic(FWDLIB::FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
 
     virtual ~RapMusic();
 
@@ -145,7 +145,7 @@ public:
      * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
      * @return   true if successful initialized, false otherwise.
      */
-    bool init(MNELIB::MNEForwardSolution& p_pFwd, bool p_bSparsed = false, int p_iN = 2, double p_dThr = 0.5);
+    bool init(FWDLIB::FwdForwardSolution& p_pFwd, bool p_bSparsed = false, int p_iN = 2, double p_dThr = 0.5);
 
     virtual MNESourceEstimate calculateInverse(const FIFFLIB::FiffEvoked &p_fiffEvoked, bool pick_normal = false);
 
@@ -296,7 +296,7 @@ protected:
                         double p_valCor,
                         QList< DipolePair<double> > &p_RapDipoles);
 
-    MNELIB::MNEForwardSolution m_ForwardSolution; /**< The Forward operator which should be scanned through*/
+    FWDLIB::FwdForwardSolution m_ForwardSolution; /**< The Forward operator which should be scanned through*/
 
     int m_iN;               /**< Number of Sources to find*/
     double m_dThreshold;    /**< Threshold which defines the minimal correlation. Is the correlation of

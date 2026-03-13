@@ -38,7 +38,8 @@
 //=============================================================================================================
 
 #include <iostream>
-#include <mne/mne.h>
+#include <fwd/fwd_forward_solution.h>
+#include <fs/fs_annotationset.h>
 #include <utils/ioutils.h>
 #include <utils/generics/applicationlogger.h>
 
@@ -54,7 +55,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace FWDLIB;
 using namespace UTILSLIB;
 using namespace FSLIB;
 
@@ -99,7 +100,7 @@ int main(int argc, char *argv[])
 
     //Load data
     QFile t_fileForwardSolution(parser.value(fwdFileOption));
-    MNEForwardSolution t_Fwd(t_fileForwardSolution);
+    FwdForwardSolution t_Fwd(t_fileForwardSolution);
 
     if(t_Fwd.source_ori != -1)
     {
@@ -114,7 +115,7 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
+    FwdForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
 
     qDebug() << "==== Results ====";
     qDebug() << "nrow: " << t_clusteredFwd.sol->nrow;

@@ -34,8 +34,8 @@
  *
  */
 
-#ifndef FWDCOILSET_H
-#define FWDCOILSET_H
+#ifndef FWD_COIL_SET_H
+#define FWD_COIL_SET_H
 
 //=============================================================================================================
 // INCLUDES
@@ -57,7 +57,8 @@
 
 #include <QSharedPointer>
 
-typedef void (*fwdUserFreeFunc)(void *);  /* General purpose */
+#include <memory>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FWDLIB
@@ -65,7 +66,7 @@ typedef void (*fwdUserFreeFunc)(void *);  /* General purpose */
 
 namespace FWDLIB
 {
-
+class FwdBemSolution;
 //=============================================================================================================
 /**
  * Implements FwdCoilSet (Replaces *fwdCoilSet,fwdCoilSetRec; struct of MNE-C fwd_types.h).
@@ -81,37 +82,21 @@ public:
     //=========================================================================================================
     /**
      * Constructs the Forward Coil Set description
-     * Refactored: fwd_new_coil_set
      */
     FwdCoilSet();
-
-//    //=========================================================================================================
-//    /**
-//    * Copy constructor.
-//    *
-//    * @param[in] p_FwdCoilSet      FwdCoilSet which should be copied
-//    */
-//    FwdCoilSet(const FwdCoilSet& p_FwdCoilSet);
 
     //=========================================================================================================
     /**
      * Destroys the Forward Coil Set description
-     * Refactored: fwd_free_coil_set, fwd_free_coil_set_user_data
      */
     ~FwdCoilSet();
 
-    void fwd_free_coil_set_user_data()
-    {
-        if (user_data_free && user_data)
-            user_data_free(user_data);
-        user_data = NULL;
-    }
+    void fwd_free_coil_set_user_data();
 
     //=========================================================================================================
     /**
      * Create a MEG coil definition using a database of templates
      * Change the coordinate frame if so desired
-     * Refactored: fwd_create_meg_coil (fwd_coil_def.c)
      *
      * @param[in] ch     Channel information to use.
      * @param[in] acc    Required accuracy.
@@ -125,7 +110,6 @@ public:
     /**
      * Create a MEG coil set definition using a database of templates
      * Change the coordinate frame if so desired
-     * Refactored: fwd_create_meg_coils (fwd_coil_def.c)
      *
      * @param[in] ch     Channel information to use.
      * @param[in] nch    Number of channels.
@@ -143,7 +127,6 @@ public:
     /**
      * Create a EEG coil set definition using a channel information
      * Change the coordinate frame if so desired
-     * Refactored: fwd_create_eeg_els (fwd_coil_def.c)
      *
      * @param[in] ch     Channel information to use.
      * @param[in] nch    Number of channels.
@@ -158,7 +141,6 @@ public:
     //=========================================================================================================
     /**
      * Read a coil definitions from file
-     * Refactored: fwd_read_coil_defs (fwd_coil_def.c)
      *
      * @param[in] name   File name to read from.
      *
@@ -169,7 +151,6 @@ public:
     //=========================================================================================================
     /**
      * Make a coil set duplicate
-     * Refactored: fwd_dup_coil_set (fwd_coil_def.c)
      *
      * @param[in] t      Transformation which should be applied to the duplicate.
      *
@@ -180,7 +161,6 @@ public:
     //=========================================================================================================
     /**
      * Checks if a set of templates contains a planar coil of a specified type.
-     * Refactored: fwd_is_planar_coil_type (fwd_coil_def.c)
      *
      * @param[in] type   This is the coil type we are interested in.
      *
@@ -191,7 +171,6 @@ public:
     //=========================================================================================================
     /**
      * Checks if a set of templates contains an axial coil of a specified type.
-     * Refactored: fwd_is_axial_coil_type (fwd_coil_def.c)
      *
      * @param[in] type   This is the coil type we are interested in.
      *
@@ -202,7 +181,6 @@ public:
     //=========================================================================================================
     /**
      * Checks if a set of templates contains a magnetometer of a specified type.
-     * Refactored: fwd_is_magnetometer_coil_type (fwd_coil_def.c)
      *
      * @param[in] type   This is the coil type we are interested in.
      *
@@ -213,7 +191,6 @@ public:
     //=========================================================================================================
     /**
      * Checks if a set of templates contains an EEG electrode of a specified type.
-     * Refactored: fwd_is_eeg_electrode_type (fwd_coil_def.c)
      *
      * @param[in] type   This is the coil type we are interested in.
      *
@@ -222,20 +199,12 @@ public:
     bool is_eeg_electrode_type(int type) const;
 
 public:
-    FwdCoil **coils;                /*< The coil or electrode positions >*/
-    int     ncoil;                  /*< Number of coils >*/
-    int     coord_frame;            /*< Common coordinate frame >*/
-    void    *user_data;             /*< We can put whatever in here >*/
-    fwdUserFreeFunc user_data_free;
+    std::vector<std::unique_ptr<FwdCoil>> coils;  /**< The coil or electrode positions. */
+    int     coord_frame;            /**< Common coordinate frame. */
+    std::unique_ptr<FwdBemSolution> user_data;  /**< Coil-specific BEM solution. */
 
-// ### OLD STRUCT ###
-//    typedef struct {
-//      fwdCoil *coils;		/* The coil or electrode positions */
-//      int     ncoil;
-//      int     coord_frame;		/* Common coordinate frame */
-//      void    *user_data;		/* We can put whatever in here */
-//      fwdUserFreeFunc user_data_free;
-//    } *fwdCoilSet,fwdCoilSetRec;	/* A collection of the above */
+    /** Number of coils (convenience accessor). */
+    inline int ncoil() const { return static_cast<int>(coils.size()); }
 };
 
 //=============================================================================================================
@@ -243,4 +212,4 @@ public:
 //=============================================================================================================
 } // NAMESPACE FWDLIB
 
-#endif // FWDCOILSET_H
+#endif // FWD_COIL_SET_H

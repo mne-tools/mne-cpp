@@ -223,7 +223,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
                 goto bad;
             free_inner_skull = TRUE;
         }
-        guesses.reset((MNESourceSpace*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist));
+        guesses.reset((MNESourceSpace*)FwdBemModel::make_guesses(inner_skull,guessrad,Eigen::Map<const Eigen::Vector3f>(r0),grid,exclude,mindist).release());
         if (!guesses)
             goto bad;
         if (free_inner_skull)
@@ -322,7 +322,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
                 goto bad;
             free_inner_skull = TRUE;
         }
-        guesses.reset((MNESourceSpace*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist));
+        guesses.reset((MNESourceSpace*)FwdBemModel::make_guesses(inner_skull,guessrad,Eigen::Map<const Eigen::Vector3f>(r0),grid,exclude,mindist).release());
         if (!guesses)
             goto bad;
         if (free_inner_skull)

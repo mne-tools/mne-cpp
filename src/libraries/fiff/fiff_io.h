@@ -223,7 +223,7 @@ public:
 public:
     QList<QSharedPointer<FiffRawData> >     m_qlistRaw;     /**< List of raw data sets. */
     QList<QSharedPointer<FiffEvoked> >      m_qlistEvoked;  /**< List of evoked data sets. */
-//    QList<QSharedPointer<MNEForwardSolution> > m_qlistFwd;
+//    QList<QSharedPointer<FwdForwardSolution> > m_qlistFwd;
     //FiffCov, MNEInverseOperator, AnnotationSet,
 };
 

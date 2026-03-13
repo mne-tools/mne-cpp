@@ -60,6 +60,7 @@
 
 #include <QtCore/QCoreApplication>
 #include <QCommandLineParser>
+#include <QFile>
 
 //=============================================================================================================
 // USED NAMESPACES

@@ -485,16 +485,16 @@ void TestFieldMap::initTestCase()
     if (megChs.size() > 0) {
         m_megCoils.reset(templates->create_meg_coils(
             megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, FiffCoordTrans()));
-        m_hasMeg = (m_megCoils && m_megCoils->ncoil > 0);
-        qDebug() << "MEG coil set:" << (m_hasMeg ? m_megCoils->ncoil : 0) << "coils";
+        m_hasMeg = (m_megCoils && m_megCoils->ncoil() > 0);
+        qDebug() << "MEG coil set:" << (m_hasMeg ? m_megCoils->ncoil() : 0) << "coils";
     }
 
     // EEG electrodes (in head coords)
     if (eegChs.size() > 0) {
         m_eegCoils.reset(FwdCoilSet::create_eeg_els(
             eegChs, eegChs.size(), FiffCoordTrans()));
-        m_hasEeg = (m_eegCoils && m_eegCoils->ncoil > 0);
-        qDebug() << "EEG electrode set:" << (m_hasEeg ? m_eegCoils->ncoil : 0) << "electrodes";
+        m_hasEeg = (m_eegCoils && m_eegCoils->ncoil() > 0);
+        qDebug() << "EEG electrode set:" << (m_hasEeg ? m_eegCoils->ncoil() : 0) << "electrodes";
     }
 
     // ── Compute C++ field maps (WITH SSP projection) ──────────────────
@@ -554,7 +554,7 @@ void TestFieldMap::testMegSelfDots()
     qDebug() << "MEG self_dots reference shape:"
              << m_refMegSelfDots.rows() << "x" << m_refMegSelfDots.cols();
     QCOMPARE(m_refMegSelfDots.rows(), m_refMegSelfDots.cols());
-    QCOMPARE(m_refMegSelfDots.rows(), static_cast<int>(m_megCoils->ncoil));
+    QCOMPARE(m_refMegSelfDots.rows(), static_cast<int>(m_megCoils->ncoil()));
 
     // Check symmetry
     double asymm = (m_refMegSelfDots - m_refMegSelfDots.transpose()).norm()
@@ -658,7 +658,7 @@ void TestFieldMap::testEegSelfDots()
     qDebug() << "EEG self_dots reference shape:"
              << m_refEegSelfDots.rows() << "x" << m_refEegSelfDots.cols();
     QCOMPARE(m_refEegSelfDots.rows(), m_refEegSelfDots.cols());
-    QCOMPARE(m_refEegSelfDots.rows(), static_cast<int>(m_eegCoils->ncoil));
+    QCOMPARE(m_refEegSelfDots.rows(), static_cast<int>(m_eegCoils->ncoil()));
 
     double asymm = (m_refEegSelfDots - m_refEegSelfDots.transpose()).norm()
                  / m_refEegSelfDots.norm();
@@ -1297,8 +1297,8 @@ void TestFieldMap::testHelmetFieldMap()
     std::unique_ptr<FwdCoilSet> helmetCoils(
         templates->create_meg_coils(
             megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, m_evoked.info.dev_head_t));
-    QVERIFY(helmetCoils && helmetCoils->ncoil > 0);
-    qDebug() << "C++ MEG coils:" << helmetCoils->ncoil
+    QVERIFY(helmetCoils && helmetCoils->ncoil() > 0);
+    qDebug() << "C++ MEG coils:" << helmetCoils->ncoil()
              << "(in head coordinates)";
 
     qDebug() << "Computing C++ MEG mapping on helmet (with SSP)...";

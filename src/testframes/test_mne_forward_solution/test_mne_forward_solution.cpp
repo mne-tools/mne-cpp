@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     test_mne_forward_solution.cpp
+ * @file     test_fwd_forward_solution.cpp
  * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -43,6 +43,7 @@
 
 #include <fwd/compute_fwd/compute_fwd_settings.h>
 #include <fwd/compute_fwd/compute_fwd.h>
+#include <fwd/fwd_forward_solution.h>
 #include <mne/mne.h>
 
 #include <fiff/fiff.h>
@@ -82,8 +83,8 @@ private slots:
     void cleanupTestCase();
 
 private:
-    QSharedPointer<MNEForwardSolution> m_pFwdMEGEEGRead;
-    QSharedPointer<MNEForwardSolution> m_pFwdMEGEEGRef;
+    QSharedPointer<FwdForwardSolution> m_pFwdMEGEEGRead;
+    QSharedPointer<FwdForwardSolution> m_pFwdMEGEEGRef;
 };
 
 //=============================================================================================================
@@ -109,7 +110,7 @@ void TestMneForwardSolution::computeForward()
     // Read reference forward solution
     QString fwdMEGEEGFileRef(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
     QFile fileFwdMEGEEGRef(fwdMEGEEGFileRef);
-    m_pFwdMEGEEGRef = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(fileFwdMEGEEGRef));
+    m_pFwdMEGEEGRef = QSharedPointer<FwdForwardSolution>(new FwdForwardSolution(fileFwdMEGEEGRef));
 
     //Following is equivalent to:
     //mne_forward_solution
@@ -144,17 +145,18 @@ void TestMneForwardSolution::computeForward()
     pSettingsMEGEEG->pFiffInfo = pFiffInfo;
     pSettingsMEGEEG->checkIntegrity();
 
-    QSharedPointer<ComputeFwd> pFwdMEGEEGComputed = QSharedPointer<ComputeFwd>(new ComputeFwd(pSettingsMEGEEG));
-    pFwdMEGEEGComputed->calculateFwd();
+    QSharedPointer<ComputeFwd> pFwdComputer = QSharedPointer<ComputeFwd>(new ComputeFwd(pSettingsMEGEEG));
+    auto pFwdSolution = pFwdComputer->calculateFwd();
 
     // recalculate with same meg_head_t to check that we still get the same result
-    pFwdMEGEEGComputed->updateHeadPos(pFiffInfo->dev_head_t);
+    pFwdComputer->updateHeadPos(pFiffInfo->dev_head_t, *pFwdSolution);
 
-    pFwdMEGEEGComputed->storeFwd();
+    QFile fwdFile(pSettingsMEGEEG->solname);
+    pFwdSolution->write(fwdFile);
 
     // Read newly created fwd
     QFile fileFwdMEGEEGRead(pSettingsMEGEEG->solname);
-    m_pFwdMEGEEGRead = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(fileFwdMEGEEGRead));
+    m_pFwdMEGEEGRead = QSharedPointer<FwdForwardSolution>(new FwdForwardSolution(fileFwdMEGEEGRead));
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute/Write/Read MEG/EEG Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 

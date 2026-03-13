@@ -40,6 +40,7 @@
 
 #include "fwd_coil_set.h"
 #include "fwd_coil.h"
+#include "fwd_bem_solution.h"
 
 #include <fiff/fiff_ch_info.h>
 
@@ -244,8 +245,8 @@ static FwdCoil* fwd_add_coil_to_set(FwdCoilSet* set,
         return NULL;
     }
 
-    set->coils = REALLOC_6(set->coils,set->ncoil+1,FwdCoil*);
-    def = set->coils[set->ncoil++] = new FwdCoil(np);
+    set->coils.push_back(std::make_unique<FwdCoil>(np));
+    def = set->coils.back().get();
 
     def->type       = type;
     def->coil_class = coil_class;
@@ -264,11 +265,7 @@ static FwdCoil* fwd_add_coil_to_set(FwdCoilSet* set,
 
 FwdCoilSet::FwdCoilSet()
 {
-    coils = NULL;
-    ncoil = 0;
     coord_frame = FIFFV_COORD_UNKNOWN;
-    user_data = NULL;
-    user_data_free = NULL;
 }
 
 //=============================================================================================================
@@ -281,11 +278,13 @@ FwdCoilSet::FwdCoilSet()
 
 FwdCoilSet::~FwdCoilSet()
 {
-    for (int k = 0; k < ncoil; k++)
-        delete coils[k];
-    FREE_6(coils);
+}
 
-    this->fwd_free_coil_set_user_data();
+//=============================================================================================================
+
+void FwdCoilSet::fwd_free_coil_set_user_data()
+{
+    user_data.reset();
 }
 
 //=============================================================================================================
@@ -303,10 +302,10 @@ FwdCoil *FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int acc, const FiffCo
     /*
         * Simple linear search from the coil definitions
         */
-    for (k = 0, def = NULL; k < this->ncoil; k++) {
+    for (k = 0, def = NULL; k < this->ncoil(); k++) {
         if ((this->coils[k]->type == (ch.chpos.coil_type & 0xFFFF)) &&
                 this->coils[k]->accuracy == acc) {
-            def = this->coils[k];
+            def = this->coils[k].get();
         }
     }
     if (!def) {
@@ -372,8 +371,7 @@ FwdCoilSet *FwdCoilSet::create_meg_coils(const QList<FIFFLIB::FiffChInfo>& chs,
     for (k = 0; k < nch; k++) {
         if ((next = this->create_meg_coil(chs.at(k),acc,t)) == Q_NULLPTR)
             goto bad;
-        res->coils = REALLOC_6(res->coils,res->ncoil+1,FwdCoil*);
-        res->coils[res->ncoil++] = next;
+        res->coils.push_back(std::unique_ptr<FwdCoil>(next));
     }
     if (!t.isEmpty())
         res->coord_frame = t.to;
@@ -398,8 +396,7 @@ FwdCoilSet *FwdCoilSet::create_eeg_els(const QList<FIFFLIB::FiffChInfo>& chs,
     for (k = 0; k < nch; k++) {
         if ((next = FwdCoil::create_eeg_el(chs.at(k),t)) == Q_NULLPTR)
             goto bad;
-        res->coils = REALLOC_6(res->coils,res->ncoil+1,FwdCoil*);
-        res->coils[res->ncoil++] = next;
+        res->coils.push_back(std::unique_ptr<FwdCoil>(next));
     }
     if (!t.isEmpty())
         res->coord_frame = t.to;
@@ -491,7 +488,7 @@ FwdCoilSet *FwdCoilSet::read_coil_defs(const QString &name)
 
     fclose(in);
 
-    printf("%d coil definitions read\n",res->ncoil);
+    printf("%d coil definitions read\n",res->ncoil());
     return res;
 
 bad : {
@@ -506,7 +503,6 @@ bad : {
 FwdCoilSet* FwdCoilSet::dup_coil_set(const FiffCoordTrans& t) const
 {
     FwdCoilSet* res;
-    FwdCoil*    coil;
 
     if (!t.isEmpty()) {
         if (this->coord_frame != t.from) {
@@ -520,11 +516,10 @@ FwdCoilSet* FwdCoilSet::dup_coil_set(const FiffCoordTrans& t) const
     else
         res->coord_frame = this->coord_frame;
 
-    res->coils = MALLOC_6(this->ncoil,FwdCoil*);
-    res->ncoil = this->ncoil;
+    res->coils.reserve(this->ncoil());
 
-    for (int k = 0; k < this->ncoil; k++) {
-        coil = res->coils[k] = new FwdCoil(*(this->coils[k]));
+    for (int k = 0; k < this->ncoil(); k++) {
+        auto coil = std::make_unique<FwdCoil>(*(this->coils[k]));
         /*
      * Optional coordinate transformation
      */
@@ -540,6 +535,7 @@ FwdCoilSet* FwdCoilSet::dup_coil_set(const FiffCoordTrans& t) const
             }
             coil->coord_frame = t.to;
         }
+        res->coils.push_back(std::move(coil));
     }
     return res;
 }
@@ -550,7 +546,7 @@ bool FwdCoilSet::is_planar_coil_type(int type) const
 {
     if (type == FIFFV_COIL_EEG)
         return false;
-    for (int k = 0; k < this->ncoil; k++)
+    for (int k = 0; k < this->ncoil(); k++)
         if (this->coils[k]->type == type)
             return this->coils[k]->coil_class == FWD_COILC_PLANAR_GRAD;
     return false;
@@ -562,7 +558,7 @@ bool FwdCoilSet::is_axial_coil_type(int type) const
 {
     if (type == FIFFV_COIL_EEG)
         return false;
-    for (int k = 0; k < this->ncoil; k++)
+    for (int k = 0; k < this->ncoil(); k++)
         if (this->coils[k]->type == type)
             return (this->coils[k]->coil_class == FWD_COILC_MAG ||
                     this->coils[k]->coil_class == FWD_COILC_AXIAL_GRAD ||
@@ -576,7 +572,7 @@ bool FwdCoilSet::is_magnetometer_coil_type(int type) const
 {
     if (type == FIFFV_COIL_EEG)
         return false;
-    for (int k = 0; k < this->ncoil; k++)
+    for (int k = 0; k < this->ncoil(); k++)
         if (this->coils[k]->type == type)
             return this->coils[k]->coil_class == FWD_COILC_MAG;
     return false;

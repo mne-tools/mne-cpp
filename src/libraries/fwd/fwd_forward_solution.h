@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     mne_forward_solution.h
+ * @file     fwd_forward_solution.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -30,20 +30,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     MNEForwardSolution class declaration, which provides the forward solution including
- *           the source space (MNESourceSpaces).
+ * @brief    FwdForwardSolution class declaration.
  *
  */
 
-#ifndef MNE_FORWARD_SOLUTION_H
-#define MNE_FORWARD_SOLUTION_H
+#ifndef FWD_FORWARD_SOLUTION_H
+#define FWD_FORWARD_SOLUTION_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_global.h"
-#include "mne_source_spaces.h"
+#include "fwd_global.h"
+
+#include <mne/mne_source_spaces.h>
 
 #include <utils/mnemath.h>
 #include <utils/kmeans.h>
@@ -68,15 +68,13 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QFile>
 #include <QSharedPointer>
-#include <QDataStream>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE FWDLIB
 //=============================================================================================================
 
-namespace MNELIB
+namespace FWDLIB
 {
 
 //=========================================================================================================
@@ -171,17 +169,17 @@ static Eigen::MatrixXd defaultD;
  *
  * @brief Forward operator
  */
-class MNESHARED_EXPORT MNEForwardSolution
+class FWDSHARED_EXPORT FwdForwardSolution
 {
 public:
-    typedef QSharedPointer<MNEForwardSolution> SPtr;            /**< Shared pointer type for MNEForwardSolution. */
-    typedef QSharedPointer<const MNEForwardSolution> ConstSPtr; /**< Const shared pointer type for MNEForwardSolution. */
+    typedef QSharedPointer<FwdForwardSolution> SPtr;            /**< Shared pointer type for FwdForwardSolution. */
+    typedef QSharedPointer<const FwdForwardSolution> ConstSPtr; /**< Const shared pointer type for FwdForwardSolution. */
 
     //=========================================================================================================
     /**
      * Default constructor.
      */
-    MNEForwardSolution();
+    FwdForwardSolution();
 
     //=========================================================================================================
     /**
@@ -195,7 +193,7 @@ public:
      * @param[in] bExcludeBads  If true bads are also read; default = false (optional).
      *
      */
-    MNEForwardSolution(QIODevice &p_IODevice,
+    FwdForwardSolution(QIODevice &p_IODevice,
                        bool force_fixed = false,
                        bool surf_ori = false,
                        const QStringList& include = FIFFLIB::defaultQStringList,
@@ -206,15 +204,37 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_MNEForwardSolution   MNE forward solution.
+     * @param[in] p_FwdForwardSolution   MNE forward solution.
      */
-    MNEForwardSolution(const MNEForwardSolution &p_MNEForwardSolution);
+    FwdForwardSolution(const FwdForwardSolution &p_FwdForwardSolution);
 
     //=========================================================================================================
     /**
-     * Destroys the MNEForwardSolution.
+     * Copy assignment operator. Copies public data fields only (not computation state).
+     *
+     * @param[in] other   MNE forward solution to copy from.
+     *
+     * @return Reference to this.
      */
-    ~MNEForwardSolution();
+    FwdForwardSolution& operator=(const FwdForwardSolution &other);
+
+    //=========================================================================================================
+    /**
+     * Move constructs an FwdForwardSolution.
+     */
+    FwdForwardSolution(FwdForwardSolution &&other) = default;
+
+    //=========================================================================================================
+    /**
+     * Move assignment operator.
+     */
+    FwdForwardSolution& operator=(FwdForwardSolution &&other) = default;
+
+    //=========================================================================================================
+    /**
+     * Destroys the FwdForwardSolution.
+     */
+    ~FwdForwardSolution();
 
     //=========================================================================================================
     /**
@@ -236,7 +256,7 @@ public:
      *
      * @return clustered MNE forward solution.
      */
-    MNEForwardSolution cluster_forward_solution(const FSLIB::AnnotationSet &p_AnnotationSet,
+    FwdForwardSolution cluster_forward_solution(const FSLIB::AnnotationSet &p_AnnotationSet,
                                                 qint32 p_iClusterSize,
                                                 Eigen::MatrixXd& p_D = defaultD,
                                                 const FIFFLIB::FiffCov &p_pNoise_cov = defaultCov,
@@ -310,7 +330,7 @@ public:
      *
      * @return Forward solution restricted to selected channel types.
      */
-    MNEForwardSolution pick_channels(const QStringList& include = FIFFLIB::defaultQStringList,
+    FwdForwardSolution pick_channels(const QStringList& include = FIFFLIB::defaultQStringList,
                                      const QStringList& exclude = FIFFLIB::defaultQStringList) const;
 
     //=========================================================================================================
@@ -321,7 +341,7 @@ public:
      *
      * @return the reduced forward solution.
      */
-    MNEForwardSolution pick_regions(const QList<FSLIB::Label> &p_qListLabels) const;
+    FwdForwardSolution pick_regions(const QList<FSLIB::Label> &p_qListLabels) const;
 
     //=========================================================================================================
     /**
@@ -336,7 +356,7 @@ public:
      *
      * @return Forward solution restricted to selected channel types.
      */
-    MNEForwardSolution pick_types(bool meg,
+    FwdForwardSolution pick_types(bool meg,
                                   bool eeg,
                                   const QStringList& include = FIFFLIB::defaultQStringList,
                                   const QStringList& exclude = FIFFLIB::defaultQStringList) const;
@@ -436,7 +456,7 @@ public:
      * @return true if succeeded, false otherwise.
      */
     static bool read(QIODevice& p_IODevice,
-                     MNEForwardSolution& fwd,
+                     FwdForwardSolution& fwd,
                      bool force_fixed = false,
                      bool surf_ori = false,
                      const QStringList& include = FIFFLIB::defaultQStringList,
@@ -470,7 +490,7 @@ public:
      *
      * @return reduced MNE forward solution.
      */
-    MNEForwardSolution reduce_forward_solution(qint32 p_iNumDipoles, Eigen::MatrixXd& p_D) const;
+    FwdForwardSolution reduce_forward_solution(qint32 p_iNumDipoles, Eigen::MatrixXd& p_D) const;
 
     //=========================================================================================================
     /**
@@ -492,11 +512,11 @@ public:
      * overloading the stream out operator<<
      *
      * @param[in] out                    The stream to which the MNE forward solution should be assigned to.
-     * @param[in] p_MNEForwardSolution   MNE forward solution which should be assigned to the stream.
+     * @param[in] p_FwdForwardSolution   MNE forward solution which should be assigned to the stream.
      *
      * @return the stream with the attached fiff projector.
      */
-    friend std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolution &p_MNEForwardSolution);
+    friend std::ostream& operator<<(std::ostream& out, const FWDLIB::FwdForwardSolution &p_FwdForwardSolution);
 
     /**
      * Overloaded == operator to compare an object to this instance.
@@ -505,7 +525,7 @@ public:
      *
      * @return true if equal, false otherwise.
      */
-    friend bool operator== (const MNEForwardSolution &a, const MNEForwardSolution &b);
+    friend bool operator== (const FwdForwardSolution &a, const FwdForwardSolution &b);
 
     //=========================================================================================================
     /**
@@ -534,7 +554,7 @@ private:
      */
     static bool read_one(FIFFLIB::FiffStream::SPtr& p_pStream,
                          const FIFFLIB::FiffDirNode::SPtr& p_Node,
-                         MNEForwardSolution& one);
+                         FwdForwardSolution& one);
 
 public:
     FIFFLIB::FiffInfoBase info;                 /**< light weighted measurement info. */
@@ -548,7 +568,7 @@ public:
     FIFFLIB::FiffCoordTrans mri_head_t;         /**< MRI head coordinate transformation. */
     QString mri_filename;                        /**< MRI file name (parent provenance). */
     FIFFLIB::FiffId mri_id;                      /**< MRI file ID (parent provenance). */
-    MNESourceSpaces src;                         /**< Geometric description of the source spaces (hemispheres). */
+    MNELIB::MNESourceSpaces src;                         /**< Geometric description of the source spaces (hemispheres). */
     Eigen::MatrixX3f source_rr;                 /**< Source locations. */
     Eigen::MatrixX3f source_nn;                 /**< Source normals (number depends on fixed or free orientation). */
 };
@@ -557,7 +577,7 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool MNEForwardSolution::isClustered() const
+inline bool FwdForwardSolution::isClustered() const
 {
     auto* hemi = src.hemisphereAt(0);
     return hemi && hemi->isClustered();
@@ -565,37 +585,37 @@ inline bool MNEForwardSolution::isClustered() const
 
 //=============================================================================================================
 
-inline bool MNEForwardSolution::isEmpty() const
+inline bool FwdForwardSolution::isEmpty() const
 {
     return this->nchan <= 0;
 }
 
 //=============================================================================================================
 
-inline bool MNEForwardSolution::isFixedOrient() const
+inline bool FwdForwardSolution::isFixedOrient() const
 {
     return this->source_ori == FIFFV_MNE_FIXED_ORI;
 }
 
 //=============================================================================================================
 
-inline std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolution &p_MNEForwardSolution)
+inline std::ostream& operator<<(std::ostream& out, const FWDLIB::FwdForwardSolution &p_FwdForwardSolution)
 {
     out << "#### MNE Forward Solution ####\n";
 
-    out << "\n source_ori: " << p_MNEForwardSolution.source_ori << std::endl;
-    out << "\n coord_frame: " << p_MNEForwardSolution.coord_frame << std::endl;
-    out << "\n nsource: " << p_MNEForwardSolution.nsource << std::endl;
-    out << "\n nchan: " << p_MNEForwardSolution.nchan << std::endl;
-    out << "\n sol:\n\t" << *p_MNEForwardSolution.sol.data() << std::endl;
-    out << "\n sol_grad:\n\t" << *p_MNEForwardSolution.sol_grad.data() << std::endl;
+    out << "\n source_ori: " << p_FwdForwardSolution.source_ori << std::endl;
+    out << "\n coord_frame: " << p_FwdForwardSolution.coord_frame << std::endl;
+    out << "\n nsource: " << p_FwdForwardSolution.nsource << std::endl;
+    out << "\n nchan: " << p_FwdForwardSolution.nchan << std::endl;
+    out << "\n sol:\n\t" << *p_FwdForwardSolution.sol.data() << std::endl;
+    out << "\n sol_grad:\n\t" << *p_FwdForwardSolution.sol_grad.data() << std::endl;
 
     return out;
 }
 
 //=============================================================================================================
 
-inline bool operator== (const MNEForwardSolution &a, const MNEForwardSolution &b)
+inline bool operator== (const FwdForwardSolution &a, const FwdForwardSolution &b)
 {
     return (a.info == b.info &&
             a.source_ori == b.source_ori &&
@@ -612,4 +632,4 @@ inline bool operator== (const MNEForwardSolution &a, const MNEForwardSolution &b
 }
 } // NAMESPACE
 
-#endif // MNE_FORWARD_SOLUTION_H
+#endif // FWD_FORWARD_SOLUTION_H

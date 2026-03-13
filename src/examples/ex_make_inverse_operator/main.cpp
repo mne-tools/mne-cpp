@@ -45,6 +45,7 @@
 
 #include <iostream>
 #include <QCommandLineParser>
+#include <QFile>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -58,6 +59,7 @@
 
 using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace FWDLIB;
 using namespace INVERSELIB;
 using namespace UTILSLIB;
 
@@ -116,7 +118,7 @@ int main(int argc, char *argv[])
     if(evoked.isEmpty())
         return 1;
 
-    MNEForwardSolution t_forwardMeeg(t_fileFwdMeeg, false, true);
+    FwdForwardSolution t_forwardMeeg(t_fileFwdMeeg, false, true);
 
     FiffCov noise_cov(t_fileCov);
 
@@ -124,9 +126,9 @@ int main(int argc, char *argv[])
     noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
 
     // Restrict forward solution as necessary for MEG
-    MNEForwardSolution t_forwardMeg = t_forwardMeeg.pick_types(true, false);
+    FwdForwardSolution t_forwardMeg = t_forwardMeeg.pick_types(true, false);
     // Alternatively, you can just load a forward solution that is restricted
-    MNEForwardSolution t_forwardEeg(t_fileFwdEeg, false, true);
+    FwdForwardSolution t_forwardEeg(t_fileFwdEeg, false, true);
 
     // make an M/EEG, MEG-only, and EEG-only inverse operators
     FiffInfo info = evoked.info;

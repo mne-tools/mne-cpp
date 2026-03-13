@@ -58,7 +58,7 @@
 
 #include <mne/mne.h>
 #include <inverse/mne_inverse_operator.h>
-#include <mne/mne_forward_solution.h>
+#include <fwd/fwd_forward_solution.h>
 
 #include <utils/generics/applicationlogger.h>
 
@@ -87,6 +87,7 @@
 using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace FWDLIB;
 using namespace INVERSELIB;
 using namespace UTILSLIB;
 
@@ -106,7 +107,7 @@ using namespace UTILSLIB;
  * and populates SSP projectors from the noise covariance and/or --proj files.
  * This mirrors the original MNE-C approach where no measurement file is needed.
  */
-static FiffInfo buildInfoFromForward(const MNEForwardSolution &forward,
+static FiffInfo buildInfoFromForward(const FwdForwardSolution &forward,
                                      const FiffCov &noiseCov,
                                      const QList<FiffProj> &extraProjs)
 {
@@ -428,7 +429,7 @@ int main(int argc, char *argv[])
     printf("Reading forward solution from %s...\n", fwdName.toUtf8().constData());
 
     QFile fwdFile(fwdName);
-    MNEForwardSolution forward(fwdFile, false, true);
+    FwdForwardSolution forward(fwdFile, false, true);
 
     if (forward.isEmpty()) {
         qCritical() << "Error: Could not read forward solution from" << fwdName;

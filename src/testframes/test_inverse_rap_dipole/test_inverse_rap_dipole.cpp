@@ -18,7 +18,7 @@
 #include <inverse/mne_meas_data.h>
 #include <inverse/mne_meas_data_set.h>
 #include <inverse/mne_inverse_operator.h>
-#include <mne/mne_forward_solution.h>
+#include <fwd/fwd_forward_solution.h>
 #include <inverse/mne_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 
@@ -30,6 +30,7 @@
 
 using namespace INVERSELIB;
 using namespace MNELIB;
+using namespace FWDLIB;
 using namespace FIFFLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
@@ -401,7 +402,7 @@ private slots:
         if (!fwdFile.exists() || !covFile.exists() || !rawFile.exists())
             QSKIP("Required files not found");
 
-        MNEForwardSolution fwd(fwdFile);
+        FwdForwardSolution fwd(fwdFile);
         FiffCov noiseCov(covFile);
         FiffRawData raw(rawFile);
 
@@ -432,7 +433,7 @@ private slots:
         if (!fwdFile.exists() || !covFile.exists() || !rawFile.exists() || !QFile::exists(evkPath))
             QSKIP("Required files not found");
 
-        MNEForwardSolution fwd(fwdFile);
+        FwdForwardSolution fwd(fwdFile);
         FiffCov noiseCov(covFile);
         FiffRawData raw(rawFile);
 
@@ -475,7 +476,7 @@ private slots:
         if (!fwdFile.exists() || !covFile.exists() || !rawFile.exists() || !QFile::exists(evkPath))
             QSKIP("Required files not found");
 
-        MNEForwardSolution fwd(fwdFile);
+        FwdForwardSolution fwd(fwdFile);
         FiffCov noiseCov(covFile);
         FiffRawData raw(rawFile);
 
@@ -517,7 +518,7 @@ private slots:
         if (!fwdFile.exists() || !covFile.exists() || !rawFile.exists() || !QFile::exists(evkPath))
             QSKIP("Required files not found");
 
-        MNEForwardSolution fwd(fwdFile);
+        FwdForwardSolution fwd(fwdFile);
         FiffCov noiseCov(covFile);
         FiffRawData raw(rawFile);
 
@@ -558,7 +559,7 @@ private slots:
         if (!fwdFile.exists() || !covFile.exists() || !rawFile.exists())
             QSKIP("Required files not found");
 
-        MNEForwardSolution fwd(fwdFile);
+        FwdForwardSolution fwd(fwdFile);
         FiffCov noiseCov(covFile);
         FiffRawData raw(rawFile);
 
@@ -593,7 +594,7 @@ private slots:
         QFile fwdFile(fwdPath);
         if (!fwdFile.exists()) QSKIP("Forward solution not found");
 
-        MNEForwardSolution fwd(fwdFile);
+        FwdForwardSolution fwd(fwdFile);
         if (fwd.isEmpty()) QSKIP("Fwd load failed");
 
         RapMusic rap;

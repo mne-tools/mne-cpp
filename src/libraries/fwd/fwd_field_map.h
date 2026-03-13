@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Sphere-model field mapping.
+ * @brief    FwdFieldMap class declaration.
  *
  * C++ port of MNE-Python field mapping (BSD-3-Clause, The MNE-Python contributors).
  * Source files: mne/forward/_lead_dots.py, mne/forward/_field_interpolation.py

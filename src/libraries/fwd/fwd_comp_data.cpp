@@ -128,11 +128,10 @@ using namespace FWDLIB;
 
 FwdCompData::FwdCompData()
 :comp_coils (NULL)
-,field      (NULL)
-,vec_field  (NULL)
-,field_grad (NULL)
+,field      (nullptr)
+,vec_field  (nullptr)
+,field_grad (nullptr)
 ,client     (NULL)
-,client_free(NULL)
 ,set        (NULL)
 ,work       (NULL)
 ,vec_work   (NULL)
@@ -143,16 +142,12 @@ FwdCompData::FwdCompData()
 
 FwdCompData::~FwdCompData()
 {
-//    fwd_free_comp_data((void *)this);
     if(this->comp_coils)
         delete this->comp_coils;
     if(this->set)
         delete this->set;
     FREE_60(this->work);
     FREE_CMATRIX_60(this->vec_work);
-
-    if (this->client_free && this->client)
-        this->client_free(this->client);
 }
 
 //=============================================================================================================
@@ -176,13 +171,13 @@ int FwdCompData::fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f
     /*
        * Compensation needed?
        */
-    if (!comp->comp_coils || comp->comp_coils->ncoil <= 0 || !comp->set || !comp->set->current)
+    if (!comp->comp_coils || comp->comp_coils->ncoil() <= 0 || !comp->set || !comp->set->current)
         return OK;
     /*
        * Workspace needed?
        */
     if (!comp->work)
-        comp->work = MALLOC_60(comp->comp_coils->ncoil,float);
+        comp->work = MALLOC_60(comp->comp_coils->ncoil(),float);
     /*
        * Compute the field in the compensation coils
        */
@@ -192,29 +187,12 @@ int FwdCompData::fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f
        * Compute the compensated field
        */
     {
-        VectorXf resVec = Map<VectorXf>(res, coils->ncoil);
-        VectorXf workVec = Map<VectorXf>(comp->work, comp->comp_coils->ncoil);
+        VectorXf resVec = Map<VectorXf>(res, coils->ncoil());
+        VectorXf workVec = Map<VectorXf>(comp->work, comp->comp_coils->ncoil());
         int result = comp->set->apply(TRUE, resVec, workVec);
-        Map<VectorXf>(res, coils->ncoil) = resVec;
+        Map<VectorXf>(res, coils->ncoil()) = resVec;
         return result;
     }
-}
-
-//=============================================================================================================
-
-void FwdCompData::fwd_free_comp_data(void *d)
-{
-    FwdCompData* comp = (FwdCompData*)d;
-
-    if (!comp)
-        return;
-
-    if (comp->client_free && comp->client)
-        comp->client_free(comp->client);
-
-    if(comp)
-        delete(comp);
-    return;
 }
 
 //=============================================================================================================
@@ -242,7 +220,7 @@ int FwdCompData::fwd_make_ctf_comp_coils(MNECTFCompDataSet *set,
          */
         return OK;
     }
-    if (!coils || coils->ncoil <= 0) {
+    if (!coils || coils->ncoil() <= 0) {
         printf("Coil data missing in fwd_make_ctf_comp_coils");
         return FAIL;
     }
@@ -250,23 +228,23 @@ int FwdCompData::fwd_make_ctf_comp_coils(MNECTFCompDataSet *set,
        * Create the fake channel info which contain just enough information
        * for make_comp
        */
-    for (k = 0; k < coils->ncoil; k++) {
+    for (k = 0; k < coils->ncoil(); k++) {
         chs.append(FiffChInfo());
-        coil = coils->coils[k];
+        coil = coils->coils[k].get();
         chs[k].ch_name = coil->chname;
         chs[k].chpos.coil_type = coil->type;
         chs[k].kind = (coil->coil_class == FWD_COILC_EEG) ? FIFFV_EEG_CH : FIFFV_MEG_CH;
     }
-    nchan = coils->ncoil;
-    if (comp_coils && comp_coils->ncoil > 0) {
-        for (k = 0; k < comp_coils->ncoil; k++) {
+    nchan = coils->ncoil();
+    if (comp_coils && comp_coils->ncoil() > 0) {
+        for (k = 0; k < comp_coils->ncoil(); k++) {
             compchs.append(FiffChInfo());
-            coil = comp_coils->coils[k];
+            coil = comp_coils->coils[k].get();
             compchs[k].ch_name = coil->chname;
             compchs[k].chpos.coil_type = coil->type;
             compchs[k].kind = (coil->coil_class == FWD_COILC_EEG) ? FIFFV_EEG_CH : FIFFV_MEG_CH;
         }
-        ncomp = comp_coils->ncoil;
+        ncomp = comp_coils->ncoil();
     }
     res = set->make_comp(chs,nchan,compchs,ncomp);
 
@@ -281,8 +259,7 @@ FwdCompData *FwdCompData::fwd_make_comp_data(MNECTFCompDataSet *set,
                                              fwdFieldFunc field,
                                              fwdVecFieldFunc vec_field,
                                              fwdFieldGradFunc field_grad,
-                                             void *client,
-                                             fwdUserFreeFunc client_free)
+                                             void *client)
 /*
  * Compose a compensation data set
  */
@@ -305,12 +282,11 @@ FwdCompData *FwdCompData::fwd_make_comp_data(MNECTFCompDataSet *set,
     comp->vec_field   = vec_field;
     comp->field_grad  = field_grad;
     comp->client      = client;
-    comp->client_free = client_free;
 
     if (fwd_make_ctf_comp_coils(comp->set,
                                 coils,
                                 comp->comp_coils) != OK) {
-        fwd_free_comp_data(comp);
+        delete comp;
         return NULL;
     }
     else {
@@ -340,13 +316,13 @@ int FwdCompData::fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet *coils
     /*
        * Compensation needed?
        */
-    if (!comp->comp_coils || comp->comp_coils->ncoil <= 0 || !comp->set || !comp->set->current)
+    if (!comp->comp_coils || comp->comp_coils->ncoil() <= 0 || !comp->set || !comp->set->current)
         return OK;
     /*
        * Need workspace?
        */
     if (!comp->vec_work)
-        comp->vec_work = ALLOC_CMATRIX_60(3,comp->comp_coils->ncoil);
+        comp->vec_work = ALLOC_CMATRIX_60(3,comp->comp_coils->ncoil());
     /*
        * Compute the field at the compensation sensors
        */
@@ -356,11 +332,11 @@ int FwdCompData::fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet *coils
        * Compute the compensated field of three orthogonal dipoles
        */
     for (k = 0; k < 3; k++) {
-        VectorXf resVec = Map<VectorXf>(res[k], coils->ncoil);
-        VectorXf workVec = Map<VectorXf>(comp->vec_work[k], comp->comp_coils->ncoil);
+        VectorXf resVec = Map<VectorXf>(res[k], coils->ncoil());
+        VectorXf workVec = Map<VectorXf>(comp->vec_work[k], comp->comp_coils->ncoil());
         if (comp->set->apply(TRUE, resVec, workVec) == FAIL)
             return FAIL;
-        Map<VectorXf>(res[k], coils->ncoil) = resVec;
+        Map<VectorXf>(res[k], coils->ncoil()) = resVec;
     }
     return OK;
 }
@@ -386,15 +362,15 @@ int FwdCompData::fwd_comp_field_grad(const Eigen::Vector3f& rd, const Eigen::Vec
     /*
      * Compensation needed?
      */
-    if (!comp->comp_coils || comp->comp_coils->ncoil <= 0 || !comp->set || !comp->set->current)
+    if (!comp->comp_coils || comp->comp_coils->ncoil() <= 0 || !comp->set || !comp->set->current)
         return OK;
     /*
      * Workspace needed?
      */
     if (!comp->work)
-        comp->work = MALLOC_60(comp->comp_coils->ncoil,float);
+        comp->work = MALLOC_60(comp->comp_coils->ncoil(),float);
     if (!comp->vec_work)
-        comp->vec_work = ALLOC_CMATRIX_60(3,comp->comp_coils->ncoil);
+        comp->vec_work = ALLOC_CMATRIX_60(3,comp->comp_coils->ncoil());
     /*
      * Compute the field in the compensation coils
      */
@@ -404,8 +380,8 @@ int FwdCompData::fwd_comp_field_grad(const Eigen::Vector3f& rd, const Eigen::Vec
      * Compute the compensated field
      */
     {
-        int ncoil = coils->ncoil;
-        int ncomp_coil = comp->comp_coils->ncoil;
+        int ncoil = coils->ncoil();
+        int ncomp_coil = comp->comp_coils->ncoil();
 
         VectorXf resVec = Map<VectorXf>(res, ncoil);
         VectorXf workVec = Map<VectorXf>(comp->work, ncomp_coil);

@@ -3345,12 +3345,12 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MNECTFCompDataSet* comp
 
         printf("\nSetting up the BEM model using %s...\n",d->bemname.toUtf8().constData());
         printf("\nLoading surfaces...\n");
-        d->bem_model.reset(FwdBemModel::fwd_bem_load_three_layer_surfaces(d->bemname));
+        d->bem_model = FwdBemModel::fwd_bem_load_three_layer_surfaces(d->bemname);
         if (d->bem_model) {
             printf("Three-layer model surfaces loaded.\n");
         }
         else {
-            d->bem_model.reset(FwdBemModel::fwd_bem_load_homog_surface(d->bemname));
+            d->bem_model = FwdBemModel::fwd_bem_load_homog_surface(d->bemname);
             if (!d->bem_model)
                 goto out;
             printf("Homogeneous model surface loaded.\n");
@@ -3392,7 +3392,7 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MNECTFCompDataSet* comp
            * It works the same way independent of whether or not the compensation is in effect
            */
             comp = FwdCompData::fwd_make_comp_data(comp_data,d->meg_coils.get(),comp_coils,
-                                      FwdBemModel::fwd_bem_field,NULL,NULL,d->bem_model.get(),NULL);
+                                      FwdBemModel::fwd_bem_field,nullptr,nullptr,d->bem_model.get());
             if (!comp)
                 goto out;
             printf("Compensation setup done.\n");
@@ -3405,9 +3405,9 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MNECTFCompDataSet* comp
             printf("[done]\n");
 
             f->meg_field       = FwdCompData::fwd_comp_field;
-            f->meg_vec_field   = NULL;
+            f->meg_vec_field   = nullptr;
             f->meg_client      = comp;
-            f->meg_client_free = FwdCompData::fwd_free_comp_data;
+            f->meg_client_free = [](void* d) { delete static_cast<FwdCompData*>(d); };
         }
         if (d->neeg > 0) {
             printf("\tEEG solution matrix...");
@@ -3438,14 +3438,14 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MNECTFCompDataSet* comp
         comp = FwdCompData::fwd_make_comp_data(comp_data,d->meg_coils.get(),comp_coils,
                                   FwdBemModel::fwd_sphere_field,
                                   FwdBemModel::fwd_sphere_field_vec,
-                                  NULL,
-                                  d->r0,NULL);
+                                  nullptr,
+                                  d->r0);
         if (!comp)
             goto out;
         f->meg_field       = FwdCompData::fwd_comp_field;
         f->meg_vec_field   = FwdCompData::fwd_comp_field_vec;
         f->meg_client      = comp;
-        f->meg_client_free = FwdCompData::fwd_free_comp_data;
+        f->meg_client_free = [](void* d) { delete static_cast<FwdCompData*>(d); };
     }
     printf("Sphere model origin : %6.1f %6.1f %6.1f mm.\n",
            1000*d->r0[X_3],1000*d->r0[Y_3],1000*d->r0[Z_3]);
@@ -3461,14 +3461,14 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MNECTFCompDataSet* comp
         comp = FwdCompData::fwd_make_comp_data(comp_data,d->meg_coils.get(),comp_coils,
                                   FwdBemModel::fwd_mag_dipole_field,
                                   FwdBemModel::fwd_mag_dipole_field_vec,
-                                  NULL,
-                                  NULL,NULL);
+                                  nullptr,
+                                  nullptr);
         if (!comp)
             goto out;
         f->meg_field       = FwdCompData::fwd_comp_field;
         f->meg_vec_field   = FwdCompData::fwd_comp_field_vec;
         f->meg_client      = comp;
-        f->meg_client_free = FwdCompData::fwd_free_comp_data;
+        f->meg_client_free = [](void* d) { delete static_cast<FwdCompData*>(d); };
     }
     f->eeg_pot     = FwdBemModel::fwd_mag_dipole_field;
     f->eeg_vec_pot = FwdBemModel::fwd_mag_dipole_field_vec;
@@ -3502,15 +3502,15 @@ std::unique_ptr<MNECovMatrix> DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCo
 
     nchan = 0;
     if (meg)
-        nchan = nchan + meg->ncoil;
+        nchan = nchan + meg->ncoil();
     if (eeg)
-        nchan = nchan + eeg->ncoil;
+        nchan = nchan + eeg->ncoil();
 
     stds.resize(nchan);
 
     n = 0;
     if (meg) {
-        for (k = 0; k < meg->ncoil; k++, n++) {
+        for (k = 0; k < meg->ncoil(); k++, n++) {
             if (meg->coils[k]->is_axial_coil()) {
                 stds[n] = mag_std*mag_std;
 #ifdef TEST_REF
@@ -3526,7 +3526,7 @@ std::unique_ptr<MNECovMatrix> DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCo
         }
     }
     if (eeg) {
-        for (k = 0; k < eeg->ncoil; k++, n++) {
+        for (k = 0; k < eeg->ncoil(); k++, n++) {
             stds[n]     = eeg_std*eeg_std;
             ch_names.append(eeg->coils[k]->chname);
         }
@@ -3979,7 +3979,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
                                                           *res->meg_head_t)) == NULL) {
                 goto bad;
             }
-            printf("%d compensation channels in %s\n",comp_coils->ncoil,measname.toUtf8().data());
+            printf("%d compensation channels in %s\n",comp_coils->ncoil(),measname.toUtf8().data());
         }
     }
     else {          /* Get rid of the empty data set */

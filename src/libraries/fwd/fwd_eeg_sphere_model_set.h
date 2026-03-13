@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     FwdEegSphereModelSet class declaration.
+ * @brief    FwdEegSphereModelSet class declaration.
  *
  */
 
-#ifndef FWDEEGSPHEREMODELSET_H
-#define FWDEEGSPHEREMODELSET_H
+#ifndef FWD_EEG_SPHERE_MODEL_SET_H
+#define FWD_EEG_SPHERE_MODEL_SET_H
 
 //=============================================================================================================
 // INCLUDES
@@ -101,7 +101,6 @@ public:
     //=========================================================================================================
     /**
      * Destroys the Forward EEG Sphere Model Set description
-     * Refactored: fwd_free_eeg_sphere_model_set
      */
     ~FwdEegSphereModelSet();
 
@@ -211,25 +210,13 @@ public:
     }
 
 public:
-//    QList<FwdEegSphereModel> m_qListModels;    /**< Set of EEG sphere model definitions. */
-
     QList<FwdEegSphereModel*> models;     /**< Set of EEG sphere model definitions. */
-
-// ### OLD STRUCT ###
-//    typedef struct {
-//      fwdEegSphereModel *models;  /* Set of EEG sphere model definitions */
-//      int               nmodel;
-//    } *fwdEegSphereModelSet,fwdEegSphereModelSetRec;
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-//inline qint32 FwdEegSphereModelSet::size() const
-//{
-//    return m_qListModels.size();
-//}
 } // NAMESPACE FWDLIB
 
-#endif // FWDEEGSPHEREMODELSET_H
+#endif // FWD_EEG_SPHERE_MODEL_SET_H

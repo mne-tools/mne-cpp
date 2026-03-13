@@ -70,6 +70,7 @@
 //=============================================================================================================
 
 using namespace MNELIB;
+using namespace FWDLIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
@@ -157,7 +158,7 @@ int main(int argc, char *argv[])
 
     std::cout << "evoked first " << evoked.first << "; last " << evoked.last << std::endl;
 
-    MNEForwardSolution t_Fwd(t_fileFwd);
+    FwdForwardSolution t_Fwd(t_fileFwd);
     if(t_Fwd.isEmpty())
         return 1;
 
@@ -169,7 +170,7 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
+    FwdForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
 
 //    std::cout << "Size " << t_clusteredFwd.sol->data.rows() << " x " << t_clusteredFwd.sol->data.cols() << std::endl;
 //    std::cout << "Clustered Fwd:\n" << t_clusteredFwd.sol->data.row(0) << std::endl;

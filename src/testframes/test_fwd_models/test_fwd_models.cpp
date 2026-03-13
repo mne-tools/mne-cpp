@@ -11,7 +11,7 @@
 #include <fwd/compute_fwd/compute_fwd_settings.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_constants.h>
-#include <mne/mne_forward_solution.h>
+#include <fwd/fwd_forward_solution.h>
 
 using namespace FWDLIB;
 using namespace FIFFLIB;
@@ -53,26 +53,26 @@ private slots:
 
     void bemModel_calcBeta()
     {
-        double v1[3] = {1.0, 0.0, 0.0};
-        double v2[3] = {0.0, 1.0, 0.0};
+        Eigen::Vector3d v1(1.0, 0.0, 0.0);
+        Eigen::Vector3d v2(0.0, 1.0, 0.0);
         double beta = FwdBemModel::calc_beta(v1, v2);
         QVERIFY(std::isfinite(beta));
     }
 
     void bemModel_calcGamma()
     {
-        double v1[3] = {1.0, 0.0, 0.0};
-        double v2[3] = {0.5, 0.5, 0.0};
+        Eigen::Vector3d v1(1.0, 0.0, 0.0);
+        Eigen::Vector3d v2(0.5, 0.5, 0.0);
         double gamma = FwdBemModel::calc_gamma(v1, v2);
         QVERIFY(std::isfinite(gamma));
     }
 
     void bemModel_infField()
     {
-        float rd[3] = {0.0f, 0.0f, 0.05f};
-        float Q[3] = {1.0f, 0.0f, 0.0f};
-        float rp[3] = {0.0f, 0.05f, 0.1f};
-        float dir[3] = {0.0f, 0.0f, 1.0f};
+        Eigen::Vector3f rd(0.0f, 0.0f, 0.05f);
+        Eigen::Vector3f Q(1.0f, 0.0f, 0.0f);
+        Eigen::Vector3f rp(0.0f, 0.05f, 0.1f);
+        Eigen::Vector3f dir(0.0f, 0.0f, 1.0f);
 
         float B = FwdBemModel::fwd_bem_inf_field(rd, Q, rp, dir);
         QVERIFY(std::isfinite(B));
@@ -80,9 +80,9 @@ private slots:
 
     void bemModel_infPot()
     {
-        float rd[3] = {0.0f, 0.0f, 0.05f};
-        float Q[3] = {0.0f, 0.0f, 1.0f};
-        float rp[3] = {0.0f, 0.05f, 0.1f};
+        Eigen::Vector3f rd(0.0f, 0.0f, 0.05f);
+        Eigen::Vector3f Q(0.0f, 0.0f, 1.0f);
+        Eigen::Vector3f rp(0.0f, 0.05f, 0.1f);
 
         float V = FwdBemModel::fwd_bem_inf_pot(rd, Q, rp);
         QVERIFY(std::isfinite(V));
@@ -90,10 +90,10 @@ private slots:
 
     void bemModel_infFieldDer()
     {
-        float rd[3] = {0.0f, 0.0f, 0.05f};
-        float Q[3] = {1.0f, 0.0f, 0.0f};
-        float rp[3] = {0.0f, 0.05f, 0.1f};
-        float dir[3] = {0.0f, 0.0f, 1.0f};
+        Eigen::Vector3f rd(0.0f, 0.0f, 0.05f);
+        Eigen::Vector3f Q(1.0f, 0.0f, 0.0f);
+        Eigen::Vector3f rp(0.0f, 0.05f, 0.1f);
+        Eigen::Vector3f dir(0.0f, 0.0f, 1.0f);
 
         float dB = FwdBemModel::fwd_bem_inf_field_der(rd, Q, rp, dir, dir);
         QVERIFY(std::isfinite(dB));
@@ -101,10 +101,10 @@ private slots:
 
     void bemModel_infPotDer()
     {
-        float rd[3] = {0.0f, 0.0f, 0.05f};
-        float Q[3] = {0.0f, 0.0f, 1.0f};
-        float rp[3] = {0.0f, 0.05f, 0.1f};
-        float dir[3] = {0.0f, 0.0f, 1.0f};
+        Eigen::Vector3f rd(0.0f, 0.0f, 0.05f);
+        Eigen::Vector3f Q(0.0f, 0.0f, 1.0f);
+        Eigen::Vector3f rp(0.0f, 0.05f, 0.1f);
+        Eigen::Vector3f dir(0.0f, 0.0f, 1.0f);
 
         float dV = FwdBemModel::fwd_bem_inf_pot_der(rd, Q, rp, dir);
         QVERIFY(std::isfinite(dV));
@@ -199,7 +199,7 @@ private slots:
 
         FwdCoilSet *coilSet = FwdCoilSet::read_coil_defs(coilDefPath);
         QVERIFY(coilSet != nullptr);
-        QVERIFY(coilSet->ncoil > 0);
+        QVERIFY(coilSet->ncoil() > 0);
         delete coilSet;
     }
 
@@ -216,13 +216,12 @@ private slots:
             QSKIP("BEM file not found");
         }
 
-        FwdBemModel *model = FwdBemModel::fwd_bem_load_homog_surface(bemPath);
+        auto model = FwdBemModel::fwd_bem_load_homog_surface(bemPath);
         if (model) {
             QVERIFY(model->nsol > 0 || model->nsurf > 0);
             if (QFile::exists(solPath)) {
                 model->fwd_bem_load_solution(solPath, FWD_BEM_UNKNOWN);
             }
-            delete model;
         }
     }
 
@@ -250,7 +249,7 @@ private slots:
         }
         info.bads.clear();
 
-        FiffCov depthPrior = MNEForwardSolution::compute_depth_prior(gain, info, false);
+        FiffCov depthPrior = FwdForwardSolution::compute_depth_prior(gain, info, false);
         QVERIFY(depthPrior.dim > 0 || true);
     }
 };

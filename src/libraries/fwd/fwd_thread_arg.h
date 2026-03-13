@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Fwd Thread Argument (FwdThreadArg) class declaration.
+ * @brief    FwdThreadArg class declaration.
  *
  */
 
-#ifndef FWDTHREADARG_H
-#define FWDTHREADARG_H
+#ifndef FWD_THREAD_ARG_H
+#define FWD_THREAD_ARG_H
 
 //=============================================================================================================
 // INCLUDES
@@ -93,14 +93,12 @@ public:
     //=========================================================================================================
     /**
      * Constructs the Forward Thread Argument
-     * Refactored: new_fwd_thread_arg (compute_forward.c)
      */
     FwdThreadArg();
 
     //=========================================================================================================
     /**
      * Destroys the Forward Thread Argument
-     * Refactored: free_fwd_thread_arg (compute_forward.c)
      */
     ~FwdThreadArg();
 
@@ -125,22 +123,6 @@ public:
     int                 fixed_ori;         /* Compute fixed orientation solution? */
     int                 comp;              /* Which component to compute for free orientations */
     int                 stat;
-
-// ### OLD STRUCT ###
-//typedef struct {
-//    float            **res;             /* Destination for the solution */
-//    float            **res_grad;        /* Gradient result */
-//    int              off;               /* Offset within the result to the first source space vertex solution */
-//    fwdFieldFunc     field_pot;         /* Computes the field or potential for one dipole orientation */
-//    fwdVecFieldFunc  vec_field_pot;     /* Computes the field or potential for all dipole orientations */
-//    fwdFieldGradFunc field_pot_grad;    /* Computes the gradient of field or potential for one dipole orientation */
-//    fwdCoilSet       coils_els;         /* The coil definitions */
-//    void             *client;           /* Client data for the field computation function */
-//    mneSourceSpace   s;                 /* The source space to process */
-//    int              fixed_ori;         /* Compute fixed orientation solution? */
-//    int              comp;              /* Which component to compute for free orientations */
-//    int              stat;
-//} *fwdThreadArg,fwdThreadArgRec;
 };
 
 //=============================================================================================================
@@ -148,4 +130,4 @@ public:
 //=============================================================================================================
 } // NAMESPACE FWDLIB
 
-#endif // FWDTHREADARG_H
+#endif // FWD_THREAD_ARG_H

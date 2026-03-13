@@ -201,6 +201,30 @@ public:
     friend bool operator== (const FiffInfoBase &a, const FiffInfoBase &b);
 
     /**
+     * Read MEG, compensation, and EEG channel information from this measurement info.
+     *
+     * Classifies channels by kind (FIFFV_MEG_CH, FIFFV_REF_MEG_CH, FIFFV_EEG_CH)
+     * and returns the device-to-head transform and measurement ID.
+     *
+     * @param[out] megp         List of MEG channel info descriptors.
+     * @param[out] nmegp        Number of MEG channels found.
+     * @param[out] meg_compp    List of MEG compensation (reference) channel info descriptors.
+     * @param[out] nmeg_compp   Number of compensation channels found.
+     * @param[out] eegp         List of EEG channel info descriptors.
+     * @param[out] neegp        Number of EEG channels found.
+     * @param[out] meg_head_t   Device-to-head coordinate transformation.
+     * @param[out] idp          Measurement ID.
+     */
+    void mne_read_meg_comp_eeg_ch_info(QList<FiffChInfo>& megp,
+                                       int& nmegp,
+                                       QList<FiffChInfo>& meg_compp,
+                                       int& nmeg_compp,
+                                       QList<FiffChInfo>& eegp,
+                                       int& neegp,
+                                       FiffCoordTrans& meg_head_t,
+                                       FiffId& idp) const;
+
+    /**
      * Parses the channel info information and returns a string list of channel types.
      *
      * @return The channel types present in this fiff info (grad,mag,eeg,ecg,emg,misc,stim).

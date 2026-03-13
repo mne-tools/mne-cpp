@@ -45,7 +45,7 @@
 
 #include "dipole.h"
 
-#include <mne/mne_forward_solution.h>
+#include <fwd/fwd_forward_solution.h>
 #include <inverse/mne_source_estimate.h>
 #include <time.h>
 
@@ -99,7 +99,7 @@ public:
      *                           the strongest.
      * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
      */
-    PwlRapMusic(MNELIB::MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
+    PwlRapMusic(FWDLIB::FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
 
     virtual ~PwlRapMusic();
 

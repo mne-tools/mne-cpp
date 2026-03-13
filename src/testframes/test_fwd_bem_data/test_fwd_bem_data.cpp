@@ -28,7 +28,7 @@
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_info.h>
 
-#include <mne/mne_forward_solution.h>
+#include <fwd/fwd_forward_solution.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
@@ -82,7 +82,7 @@ private slots:
         QString path = m_sDataPath + "/subjects/sample/bem/sample-5120-bem.fif";
         if (!QFile::exists(path)) QSKIP("BEM file not found");
 
-        FwdBemModel* model = FwdBemModel::fwd_bem_load_homog_surface(path);
+        auto model = FwdBemModel::fwd_bem_load_homog_surface(path);
         QVERIFY(model != nullptr);
 
         QVERIFY(model->nsurf > 0);
@@ -93,8 +93,6 @@ private slots:
             QVERIFY(model->ntri[i] > 0);
             QVERIFY(model->np[i] > 0);
         }
-
-        delete model;
     }
 
     //=========================================================================
@@ -107,7 +105,7 @@ private slots:
         QString path = m_sDataPath + "/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
         if (!QFile::exists(path)) QSKIP("3-layer BEM file not found");
 
-        FwdBemModel* model = FwdBemModel::fwd_bem_load_three_layer_surfaces(path);
+        auto model = FwdBemModel::fwd_bem_load_three_layer_surfaces(path);
         QVERIFY(model != nullptr);
         QCOMPARE(model->nsurf, 3);
 
@@ -115,8 +113,6 @@ private slots:
             QVERIFY(model->ntri[i] > 0);
             QVERIFY(model->np[i] > 0);
         }
-
-        delete model;
     }
 
     //=========================================================================
@@ -129,11 +125,9 @@ private slots:
         QString path = m_sDataPath + "/subjects/sample/bem/sample-5120-bem.fif";
         if (!QFile::exists(path)) QSKIP("BEM file not found");
 
-        FwdBemModel* model = FwdBemModel::fwd_bem_load_surfaces(path, {FIFFV_BEM_SURF_ID_BRAIN});
+        auto model = FwdBemModel::fwd_bem_load_surfaces(path, {FIFFV_BEM_SURF_ID_BRAIN});
         QVERIFY(model != nullptr);
         QVERIFY(model->nsurf > 0);
-
-        delete model;
     }
 
     //=========================================================================
@@ -147,15 +141,13 @@ private slots:
         QString solPath = m_sDataPath + "/subjects/sample/bem/sample-5120-bem-sol.fif";
         if (!QFile::exists(bemPath) || !QFile::exists(solPath)) QSKIP("BEM files not found");
 
-        FwdBemModel* model = FwdBemModel::fwd_bem_load_homog_surface(bemPath);
+        auto model = FwdBemModel::fwd_bem_load_homog_surface(bemPath);
         QVERIFY(model != nullptr);
 
         int result = model->fwd_bem_load_recompute_solution(
             solPath, FWD_BEM_LINEAR_COLL, 0);
 
         QVERIFY(result == 0 || result == 1);  // 0=ok, 1=recomputed
-
-        delete model;
     }
 
     //=========================================================================
@@ -169,7 +161,7 @@ private slots:
         QFile file(path);
         if (!file.exists()) QSKIP("Forward solution file not found");
 
-        MNEForwardSolution fwd(file);
+        FwdForwardSolution fwd(file);
         QVERIFY(!fwd.isEmpty());
         QVERIFY(fwd.nchan > 0);
         QVERIFY(fwd.nsource > 0);
@@ -199,7 +191,7 @@ private slots:
         QFile file(path);
         if (!file.exists()) QSKIP("Forward solution not found");
 
-        MNEForwardSolution fwd(file);
+        FwdForwardSolution fwd(file);
         if (fwd.isEmpty()) QSKIP("Fwd load failed");
 
         // Pick MEG channels
@@ -209,7 +201,7 @@ private slots:
         QStringList megNames;
         for (int i = 0; i < megIdx.size(); ++i)
             megNames << fwd.info.ch_names[megIdx(i)];
-        MNEForwardSolution fwdMeg = fwd.pick_channels(megNames);
+        FwdForwardSolution fwdMeg = fwd.pick_channels(megNames);
         QCOMPARE(fwdMeg.nchan, (int)megIdx.size());
         QCOMPARE(fwdMeg.nsource, fwd.nsource); // sources unchanged
     }
@@ -225,7 +217,7 @@ private slots:
         QFile file(path);
         if (!file.exists()) QSKIP("Forward solution not found");
 
-        MNEForwardSolution fwd(file);
+        FwdForwardSolution fwd(file);
         if (fwd.isEmpty()) QSKIP("Fwd load failed");
 
         RowVectorXi eegIdx = fwd.info.pick_types(false, true, false);
@@ -234,7 +226,7 @@ private slots:
         QStringList eegNames;
         for (int i = 0; i < eegIdx.size(); ++i)
             eegNames << fwd.info.ch_names[eegIdx(i)];
-        MNEForwardSolution fwdEeg = fwd.pick_channels(eegNames);
+        FwdForwardSolution fwdEeg = fwd.pick_channels(eegNames);
         QCOMPARE(fwdEeg.nchan, (int)eegIdx.size());
     }
 
@@ -249,7 +241,7 @@ private slots:
         QFile file(path);
         if (!file.exists()) QSKIP("Forward solution not found");
 
-        MNEForwardSolution fwd(file);
+        FwdForwardSolution fwd(file);
         if (fwd.isEmpty()) QSKIP("Fwd load failed");
 
         FiffCov orientPrior = fwd.compute_orient_prior(0.2);
@@ -269,7 +261,7 @@ private slots:
         QFile rawFile(rawPath);
         if (!fwdFile.exists() || !rawFile.exists()) QSKIP("Files not found");
 
-        MNEForwardSolution fwd(fwdFile);
+        FwdForwardSolution fwd(fwdFile);
         if (fwd.isEmpty()) QSKIP("Fwd load failed");
 
         FiffRawData raw(rawFile);
