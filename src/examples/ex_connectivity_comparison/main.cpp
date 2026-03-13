@@ -88,6 +88,7 @@ using namespace CONNECTIVITYLIB;
 using namespace Eigen;
 using namespace UTILSLIB;
 using namespace MNELIB;
+using namespace FWDLIB;
 using namespace FSLIB;
 
 //=============================================================================================================
@@ -199,8 +200,8 @@ int main(int argc, char *argv[])
     MatrixXi events;
     RowVectorXi picks;
 
-    MNEForwardSolution t_clusteredFwd;
-    MNEForwardSolution t_Fwd;
+    FwdForwardSolution t_clusteredFwd;
+    FwdForwardSolution t_Fwd;
 
     SurfaceSet tSurfSetInflated (sSubj, 2, "inflated", sSubjDir);
     AnnotationSet tAnnotSet(sSubj, 2, sAnnotType, sSubjDir);
@@ -291,7 +292,7 @@ int main(int argc, char *argv[])
     } else {
         //Create source level data
         QFile t_fileFwd(sFwd);
-        t_Fwd = MNEForwardSolution(t_fileFwd, false, true);
+        t_Fwd = FwdForwardSolution(t_fileFwd, false, true);
 
         // Load data
         MNESourceEstimate sourceEstimate;

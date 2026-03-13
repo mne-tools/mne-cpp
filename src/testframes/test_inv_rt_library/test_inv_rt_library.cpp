@@ -19,7 +19,7 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
 
-#include <mne/mne_forward_solution.h>
+#include <fwd/fwd_forward_solution.h>
 #include <mne/mne_source_spaces.h>
 
 #include <inverse/dipole_fit/dipole_fit_settings.h>
@@ -46,6 +46,7 @@
 
 using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace FWDLIB;
 using namespace INVERSELIB;
 using namespace RTPROCESSINGLIB;
 using namespace CONNECTIVITYLIB;
@@ -248,7 +249,7 @@ void TestInvRtLibrary::rapMusic_mathHelpers()
     if (!QFile::exists(fwdPath())) QSKIP("Forward file not found");
 
     QFile fwdFile(fwdPath());
-    MNEForwardSolution fwd(fwdFile);
+    FwdForwardSolution fwd(fwdFile);
     if (fwd.isEmpty()) QSKIP("Could not read forward");
 
     RapMusic rap;
@@ -337,11 +338,11 @@ void TestInvRtLibrary::rtInvOp_lifecycle()
     auto pInfo = QSharedPointer<FiffInfo>::create();
     pInfo->sfreq = 1000.0; pInfo->nchan = 10;
 
-    auto pFwd = QSharedPointer<MNEForwardSolution>::create();
+    auto pFwd = QSharedPointer<FwdForwardSolution>::create();
 
     RtInvOp rtInv(pInfo, pFwd);
 
-    auto pFwd2 = QSharedPointer<MNEForwardSolution>::create();
+    auto pFwd2 = QSharedPointer<FwdForwardSolution>::create();
     rtInv.setFwdSolution(pFwd2);
 
     rtInv.stop();

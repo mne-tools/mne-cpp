@@ -57,6 +57,7 @@
 
 using namespace INVERSELIB;
 using namespace MNELIB;
+using namespace FWDLIB;
 using namespace FIFFLIB;
 using namespace UTILSLIB;
 
@@ -80,7 +81,7 @@ RapMusic::RapMusic()
 
 //=============================================================================================================
 
-RapMusic::RapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
+RapMusic::RapMusic(FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
 : m_iN(0)
 , m_dThreshold(0)
 , m_iNumGridPoints(0)
@@ -106,7 +107,7 @@ RapMusic::~RapMusic()
 
 //=============================================================================================================
 
-bool RapMusic::init(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
+bool RapMusic::init(FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
 {
     //Get available thread number
     #ifdef _OPENMP

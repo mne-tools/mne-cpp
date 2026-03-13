@@ -34,8 +34,8 @@
  *
  */
 
-#ifndef FWDEEGSPHEREMODEL_H
-#define FWDEEGSPHEREMODEL_H
+#ifndef FWD_EEG_SPHERE_MODEL_H
+#define FWD_EEG_SPHERE_MODEL_H
 
 //=============================================================================================================
 // INCLUDES
@@ -100,7 +100,6 @@ public:
     //=========================================================================================================
     /**
      * Constructs the Forward EEG Sphere Model
-     * Refactored: fwd_new_eeg_sphere_model
      *
      */
     explicit FwdEegSphereModel();
@@ -108,7 +107,6 @@ public:
     //=========================================================================================================
     /**
      * Copy constructor.
-     * Refactored: fwd_dup_eeg_sphere_model
      *
      * @param[in] p_FwdEegSphereModel      Forward EEG Sphere Model which should be copied.
      */
@@ -125,14 +123,12 @@ public:
     //=========================================================================================================
     /**
      * Destroys the Electric Current Dipole description
-     * Refactored: fwd_free_eeg_sphere_model
      */
     virtual ~FwdEegSphereModel();
 
     //=========================================================================================================
     /**
      * Set up the desired sphere model for EEG
-     * Refactored: setup_eeg_sphere_model (dipole_fit_setup.c)
      *
      * @param[in] eeg_model_file     Contains the model specifications.
      * @param[in] eeg_model_name     Name of the model to use.
@@ -148,7 +144,6 @@ public:
     /**
      * fwd_multi_spherepot.c
      * Get the model depended weighting factor for n
-     * Refactored: fwd_eeg_get_multi_sphere_model_coeff (fwd_multi_spherepot.c)
      *
      * @param[in] n  coefficient to which the expansion shopuld be calculated.
      *
@@ -199,7 +194,6 @@ public:
      * This routine uses the acceleration with help of equivalent sources
      * in the homogeneous sphere.
      *
-     * Refactored: fwd_eeg_spherepot_vec (fwd_multi_spherepot.c)
      *
      *
      * @param[in] rd         Dipole position.
@@ -337,22 +331,6 @@ public:
     Eigen::VectorXf lambda;
     int             nfit;           /**< How many?. */
     int             scale_pos;      /**< Scale the positions to the surface of the sphere?. */
-
-// ### OLD STRUCT ###
-//    typedef struct {
-//      char  *name;                /* Textual identifier */
-//      int   nlayer;               /* Number of layers */
-//      fwdEegSphereLayer layers;   /* An array of layers */
-//      float  r0[3];               /* The origin */
-
-//      double *fn;         /* Coefficients saved to speed up the computations */
-//      int    nterms;      /* How many? */
-
-//      float  *mu;         /* The Berg-Scherg equivalence parameters */
-//      float  *lambda;
-//      int    nfit;        /* How many? */
-//      int    scale_pos;   /* Scale the positions to the surface of the sphere? */
-//    } *fwdEegSphereModel,fwdEegSphereModelRec;
 };
 
 //=============================================================================================================
@@ -360,4 +338,4 @@ public:
 //=============================================================================================================
 } // NAMESPACE FWDLIB
 
-#endif // FWDEEGSPHEREMODEL_H
+#endif // FWD_EEG_SPHERE_MODEL_H

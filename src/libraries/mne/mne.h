@@ -45,7 +45,6 @@
 
 #include "mne_global.h"
 
-#include "mne_forward_solution.h"
 #include "mne_hemisphere.h"
 #include "mne_source_spaces.h"
 #include "mne_bem.h"
@@ -118,16 +117,6 @@ public:
 
     //=========================================================================================================
     /**
-     * mne_block_diag - decoding part
-     *
-     * ### MNE toolbox root function ###
-     *
-     * Wrapper for the MNEForwardSolution::extract_block_diag static function
-     */
-    //    static inline Eigen::MatrixXd extract_block_diag(MatrixXd& A, qint32 n);
-
-    //=========================================================================================================
-    /**
      * mne_find_source_space_hemi
      *
      * ### MNE toolbox root function ###
@@ -164,14 +153,13 @@ public:
         return info->get_current_comp();
     }
 
-    //ToDo Why is make_block_diag part of MNEForwardSolution - restructure this
     //=========================================================================================================
     /**
      * mne_block_diag - encoding part
      *
      * ### MNE toolbox root function ###
      *
-     * Wrapper for the MNEForwardSolution::make_block_diag static function
+     * Wrapper for the MNEMath::make_block_diag static function
      *
      * Make a sparse block diagonal matrix
      *
@@ -513,51 +501,16 @@ public:
 
     //=========================================================================================================
     /**
-     * mne_read_forward_solution
+     * mne_read_source_spaces
      *
      * ### MNE toolbox root function ###
      *
-     * Wrapper for the MNEForwardSolution::read_forward_solution static function
-     *
-     * Reads a forward solution from a fif file
-     *
-     * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket.
-     * @param[in, out] fwd A forward solution from a fif file.
-     * @param[in] force_fixed   Force fixed source orientation mode? (optional).
-     * @param[in] surf_ori      Use surface based source coordinate system? (optional).
-     * @param[in] include       Include these channels (optional).
-     * @param[in] exclude       Exclude these channels (optional).
-     *
-     * @return true if succeeded, false otherwise.
-     */
-    static inline bool read_forward_solution(QIODevice& p_IODevice,
-                                             MNEForwardSolution& fwd,
-                                             bool force_fixed = false,
-                                             bool surf_ori = false,
-                                             const QStringList& include = FIFFLIB::defaultQStringList,
-                                             const QStringList& exclude = FIFFLIB::defaultQStringList)
-    {
-        return MNEForwardSolution::read(p_IODevice,
-                                        fwd,
-                                        force_fixed,
-                                        surf_ori,
-                                        include,
-                                        exclude);
-    }
-
-    //=========================================================================================================
-    /**
-     * mne_read_forward_solution
-     *
-     * ### MNE toolbox root function ###
-     *
-     * Wrapper for the MNESourceSpaces::read_source_spaces static function
+     * Wrapper for the MNESourceSpaces::readFromStream static function
      *
      * Reads source spaces from a fif file
      *
      * @param[in] p_pStream         The open fiff file.
      * @param[in] add_geom          Add geometry information to the source spaces.
-     *
      * @param[in, out] p_SourceSpace    The read source spaces.
      *
      * @return true if succeeded, false otherwise.

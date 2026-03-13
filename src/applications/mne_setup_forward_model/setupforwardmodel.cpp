@@ -662,7 +662,7 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
     //   2. Compute the linear collocation solution
     //   3. Save the BEM model with the solution to a new FIFF file
     //
-    FwdBemModel* bemModel = nullptr;
+    std::unique_ptr<FwdBemModel> bemModel;
 
     if (m_settings.homogeneous()) {
         bemModel = FwdBemModel::fwd_bem_load_homog_surface(const_cast<QString&>(bemFile));
@@ -680,7 +680,6 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
     int result = bemModel->fwd_bem_compute_solution(FWD_BEM_LINEAR_COLL);
     if (result != 0) {
         qCritical() << "BEM solution computation failed.";
-        delete bemModel;
         return false;
     }
 
@@ -772,6 +771,6 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
 
     printf("Saved the result to %s\n", qPrintable(solFile));
 
-    delete bemModel;
+
     return true;
 }

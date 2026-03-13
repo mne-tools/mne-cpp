@@ -62,8 +62,11 @@ namespace FIFFLIB {
     class FiffInfo;
 }
 
+namespace FWDLIB {
+    class FwdForwardSolution;
+}
+
 namespace MNELIB {
-    class MNEForwardSolution;
     class MNEBem;
 }
 
@@ -159,7 +162,7 @@ public:
      *
      * @param[in] fwdSolution   the forward solution to set.
      */
-    inline void setFwdSolution(const QSharedPointer<MNELIB::MNEForwardSolution>& fwdSolution);
+    inline void setFwdSolution(const QSharedPointer<FWDLIB::FwdForwardSolution>& fwdSolution);
 
     //=========================================================================================================
     /**
@@ -167,7 +170,7 @@ public:
      *
      * @return the forward solution.
      */
-    inline QSharedPointer<MNELIB::MNEForwardSolution>& getFwdSolution();
+    inline QSharedPointer<FWDLIB::FwdForwardSolution>& getFwdSolution();
 
     //=========================================================================================================
     /**
@@ -218,7 +221,7 @@ private:
 
     QSharedPointer<FSLIB::AnnotationSet>        m_pAnnotSet;        /**< Annotation set. Needed for visualization. */
     QSharedPointer<FSLIB::SurfaceSet>           m_pSurfSet;         /**< Surface set. Needed for visualization. */
-    QSharedPointer<MNELIB::MNEForwardSolution>  m_pFwdSolution;     /**< Forward solution. Needed for visualization. */
+    QSharedPointer<FWDLIB::FwdForwardSolution>  m_pFwdSolution;     /**< Forward solution. Needed for visualization. */
     QSharedPointer<MNELIB::MNEBem>              m_pSensorSurface;   /**< The sensor surface. Needed for visualization. */
 
     QSharedPointer<CONNECTIVITYLIB::Network>    m_pNetwork;         /**< The network/connectivity estimate. */
@@ -277,7 +280,7 @@ inline QSharedPointer<FSLIB::SurfaceSet>& RealTimeConnectivityEstimate::getSurfS
 
 //=============================================================================================================
 
-inline void RealTimeConnectivityEstimate::setFwdSolution(const QSharedPointer<MNELIB::MNEForwardSolution>& fwdSolution)
+inline void RealTimeConnectivityEstimate::setFwdSolution(const QSharedPointer<FWDLIB::FwdForwardSolution>& fwdSolution)
 {
     QMutexLocker locker(&m_qMutex);
     m_pFwdSolution = fwdSolution;
@@ -285,7 +288,7 @@ inline void RealTimeConnectivityEstimate::setFwdSolution(const QSharedPointer<MN
 
 //=============================================================================================================
 
-inline QSharedPointer<MNELIB::MNEForwardSolution>& RealTimeConnectivityEstimate::getFwdSolution()
+inline QSharedPointer<FWDLIB::FwdForwardSolution>& RealTimeConnectivityEstimate::getFwdSolution()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFwdSolution;

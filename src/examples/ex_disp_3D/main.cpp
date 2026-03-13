@@ -80,6 +80,7 @@
 //=============================================================================================================
 
 using namespace MNELIB;
+using namespace FWDLIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
@@ -163,8 +164,8 @@ int main(int argc, char *argv[])
     AnnotationSet tAnnotSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
     QFile t_fileFwd(parser.value(fwdOption));
-    MNEForwardSolution t_Fwd(t_fileFwd);
-    MNEForwardSolution t_clusteredFwd;
+    FwdForwardSolution t_Fwd(t_fileFwd);
+    FwdForwardSolution t_clusteredFwd;
 
     QString t_sFileClusteredInverse(parser.value(invOpOption));
 

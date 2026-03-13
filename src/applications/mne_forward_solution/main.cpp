@@ -38,6 +38,7 @@
 
 #include <fwd/compute_fwd/compute_fwd_settings.h>
 #include <fwd/compute_fwd/compute_fwd.h>
+#include <fwd/fwd_forward_solution.h>
 
 #include <utils/generics/applicationlogger.h>
 
@@ -47,6 +48,7 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QFile>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -237,9 +239,11 @@ int main(int argc, char *argv[])
 
     settings->checkIntegrity();
 
-    ComputeFwd cmpFwd(settings);
-    cmpFwd.calculateFwd();
-    cmpFwd.storeFwd();
+    ComputeFwd computer(settings);
+    auto fwdSolution = computer.calculateFwd();
+
+    QFile fwdFile(settings->solname);
+    fwdSolution->write(fwdFile);
 
     return app.exec();
 }

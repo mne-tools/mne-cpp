@@ -77,6 +77,7 @@
 //=============================================================================================================
 
 using namespace MNELIB;
+using namespace FWDLIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
@@ -189,7 +190,7 @@ int main(int argc, char *argv[])
     //
     // Load data
     //
-    MNEForwardSolution t_Fwd(t_fileFwd);
+    FwdForwardSolution t_Fwd(t_fileFwd);
     if(t_Fwd.isEmpty())
         return 1;
 
@@ -472,7 +473,7 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
+    FwdForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
 
     //
     // Compute inverse solution

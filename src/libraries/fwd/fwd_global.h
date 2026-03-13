@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    forward library export/import macros.
+ * @brief    Forward library export/import macros.
  *
  */
 

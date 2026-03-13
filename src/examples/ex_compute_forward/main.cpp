@@ -45,7 +45,7 @@
 #include <fwd/compute_fwd/compute_fwd_settings.h>
 #include <fwd/compute_fwd/compute_fwd.h>
 
-#include <mne/mne_forward_solution.h>
+#include <fwd/fwd_forward_solution.h>
 
 #include <mne/mne.h>
 //=============================================================================================================
@@ -58,6 +58,7 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QFile>
 #include <QElapsedTimer>
 
 //=============================================================================================================
@@ -131,36 +132,30 @@ int main(int argc, char *argv[])
     pSettings->checkIntegrity();
 
     timer0.start();
-    QSharedPointer<FWDLIB::ComputeFwd> pComputeFwd = QSharedPointer<FWDLIB::ComputeFwd>(new FWDLIB::ComputeFwd(pSettings));
+    ComputeFwd::SPtr pFwdComputer = ComputeFwd::SPtr(new ComputeFwd(pSettings));
     fTime0 = timer0.elapsed();
 
     // perform the actual computation
     timer1.start();
-    pComputeFwd->calculateFwd();
+    auto pFwdSolution = pFwdComputer->calculateFwd();
     fTime1 = timer1.elapsed();
 
-    // ToDo: Refactor fwd-lib and make MNEForwardSolution a member of computeForward,
-    // so next two steps will not be necessary
-
-    // store calculated forward solution in pSettings->solname specified file
+    // store calculated forward solution
     timer2.start();
-    pComputeFwd->storeFwd();
+    QFile fwdFile(pSettings->solname);
+    pFwdSolution->write(fwdFile);
     fTime2 = timer2.elapsed();
 
-    // read as MNEForwardSolution
+    // read back to verify round-trip
     timer3.start();
     QFile t_solution(pSettings->solname);
-    QSharedPointer<MNEForwardSolution> pFwdSolution = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(t_solution));
+    FwdForwardSolution::SPtr pFwdRead = FwdForwardSolution::SPtr(new FwdForwardSolution(t_solution));
     fTime3 = timer3.elapsed();
 
-    // update head position to forward solution and only recompute necessary part
+    // update head position and recompute
     timer4.start();
-    pComputeFwd->updateHeadPos(meg_head_t);
+    pFwdComputer->updateHeadPos(meg_head_t, *pFwdSolution);
     fTime4 = timer4.elapsed();
-
-    // get updated solution
-    pFwdSolution->sol = pComputeFwd->sol;
-    pFwdSolution->sol_grad = pComputeFwd->sol_grad;
 
     // Print timer results
     qInfo() << "The initialization took: " << fTime0  << " ms.";

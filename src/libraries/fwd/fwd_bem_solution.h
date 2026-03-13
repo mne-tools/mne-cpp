@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Forward BEM Solution (FwdBemSolution) class declaration.
+ * @brief    FwdBemSolution class declaration.
  *
  */
 
-#ifndef FWDBEMSOLUTION_H
-#define FWDBEMSOLUTION_H
+#ifndef FWD_BEM_SOLUTION_H
+#define FWD_BEM_SOLUTION_H
 
 //=============================================================================================================
 // INCLUDES
@@ -46,8 +46,6 @@
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
-#include <Eigen/Core>
 
 #include <Eigen/Core>
 
@@ -79,33 +77,19 @@ public:
     //=========================================================================================================
     /**
      * Constructs the Forward BEM Solution
-     * Refactored: fwd_bem_new_coil_solution (fwd_bem_model.c)
-     *
      */
     FwdBemSolution();
 
     //=========================================================================================================
     /**
      * Destroys the Forward BEM Solution
-     * Refactored: fwd_bem_free_coil_solution (fwd_bem_model.c)
      */
     ~FwdBemSolution();
 
-    //============================= fwd_bem_model.c =============================
-    //TODO Remove later on use delete instead
-    static void fwd_bem_free_coil_solution(void *user);
-
 public:
     Eigen::MatrixXf solution;          /**< Solution matrix (ncoil x np). */
-    int   ncoil;                        /* Number of sensors */
-    int   np;                           /* Number of potential solution points */
-
-// ### OLD STRUCT ###
-//typedef struct {                        /* Space to store a solution matrix */
-//    float **solution;                   /* The solution matrix */
-//    int   ncoil;                        /* Number of sensors */
-//    int   np;                           /* Number of potential solution points */
-//} *fwdBemSolution,fwdBemSolutionRec;    /* Mapping from infinite medium potentials to a particular set of coils or electrodes */
+    int   ncoil;                        /**< Number of sensors. */
+    int   np;                           /**< Number of potential solution points. */
 };
 
 //=============================================================================================================
@@ -113,4 +97,4 @@ public:
 //=============================================================================================================
 } // NAMESPACE FWDLIB
 
-#endif // FWDBEMSOLUTION_H
+#endif // FWD_BEM_SOLUTION_H

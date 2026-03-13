@@ -240,7 +240,7 @@ private slots:
     void fwdCoilSet_defaultCtor()
     {
         FwdCoilSet cs;
-        QCOMPARE(cs.ncoil, 0);
+        QCOMPARE(cs.ncoil(), 0);
     }
 
     void fwdCoilSet_createEegEls()
@@ -259,13 +259,13 @@ private slots:
 
         FwdCoilSet* eeg = FwdCoilSet::create_eeg_els(chs, 3);
         QVERIFY(eeg != nullptr);
-        QCOMPARE(eeg->ncoil, 3);
+        QCOMPARE(eeg->ncoil(), 3);
         QVERIFY(eeg->coils[0]->is_eeg_electrode());
 
         // Test dup
         FwdCoilSet* dup = eeg->dup_coil_set();
         QVERIFY(dup != nullptr);
-        QCOMPARE(dup->ncoil, 3);
+        QCOMPARE(dup->ncoil(), 3);
 
         // Test is_eeg_electrode_type
         QVERIFY(eeg->is_eeg_electrode_type(FIFFV_COIL_EEG));
@@ -307,10 +307,10 @@ private slots:
 
     void fwdBem_infField()
     {
-        float rd[3] = {0.0f, 0.0f, 0.05f};
-        float Q[3]  = {1.0f, 0.0f, 0.0f};
-        float rp[3] = {0.06f, 0.0f, 0.09f};
-        float dir[3] = {0.0f, 0.0f, 1.0f};
+        Eigen::Vector3f rd(0.0f, 0.0f, 0.05f);
+        Eigen::Vector3f Q(1.0f, 0.0f, 0.0f);
+        Eigen::Vector3f rp(0.06f, 0.0f, 0.09f);
+        Eigen::Vector3f dir(0.0f, 0.0f, 1.0f);
 
         float B = FwdBemModel::fwd_bem_inf_field(rd, Q, rp, dir);
         QVERIFY(std::isfinite(B));
@@ -318,9 +318,9 @@ private slots:
 
     void fwdBem_infPot()
     {
-        float rd[3] = {0.0f, 0.0f, 0.05f};
-        float Q[3]  = {1.0f, 0.0f, 0.0f};
-        float rp[3] = {0.06f, 0.0f, 0.09f};
+        Eigen::Vector3f rd(0.0f, 0.0f, 0.05f);
+        Eigen::Vector3f Q(1.0f, 0.0f, 0.0f);
+        Eigen::Vector3f rp(0.06f, 0.0f, 0.09f);
 
         float V = FwdBemModel::fwd_bem_inf_pot(rd, Q, rp);
         QVERIFY(std::isfinite(V));
@@ -328,8 +328,8 @@ private slots:
 
     void fwdBem_calcBetaGamma()
     {
-        double rk[3]  = {0.0, 0.0, 0.05};
-        double rk1[3] = {0.06, 0.0, 0.09};
+        Eigen::Vector3d rk(0.0, 0.0, 0.05);
+        Eigen::Vector3d rk1(0.06, 0.0, 0.09);
 
         double beta = FwdBemModel::calc_beta(rk, rk1);
         double gamma = FwdBemModel::calc_gamma(rk, rk1);

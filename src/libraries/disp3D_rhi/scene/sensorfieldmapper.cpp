@@ -334,7 +334,7 @@ bool SensorFieldMapper::buildMapping(
                 std::unique_ptr<FWDLIB::FwdCoilSet> coils(templates->create_meg_coils(
                     megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, devToTarget));
 
-                if (coils && coils->ncoil > 0) {
+                if (coils && coils->ncoil() > 0) {
                     m_megMapping = FWDLIB::FwdFieldMap::computeMegMapping(
                         *coils, verts, norms, origin,
                         m_evoked.info, megChNames,
@@ -359,7 +359,7 @@ bool SensorFieldMapper::buildMapping(
                 FWDLIB::FwdCoilSet::create_eeg_els(
                     eegChs, eegChs.size(), headMri));
 
-            if (eegCoils && eegCoils->ncoil > 0) {
+            if (eegCoils && eegCoils->ncoil() > 0) {
                 m_eegMapping = FWDLIB::FwdFieldMap::computeEegMapping(
                     *eegCoils, verts, origin,
                     m_evoked.info, eegChNames,

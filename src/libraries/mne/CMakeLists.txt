@@ -14,7 +14,6 @@ set(SOURCES
     mne.cpp
     mne_global.cpp
     mne_source_spaces.cpp
-    mne_forward_solution.cpp
     mne_hemisphere.cpp
     mne_epoch_data.cpp
     mne_epoch_data_list.cpp
@@ -63,7 +62,6 @@ set(HEADERS
     mne_global.h
     mne_source_spaces.h
     mne_hemisphere.h
-    mne_forward_solution.h
     mne_epoch_data.h
     mne_epoch_data_list.h
     mne_cluster_info.h

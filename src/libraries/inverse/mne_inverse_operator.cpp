@@ -63,6 +63,7 @@
 
 using namespace UTILSLIB;
 using namespace MNELIB;
+using namespace FWDLIB;
 using namespace INVERSELIB;
 using namespace FIFFLIB;
 using namespace FSLIB;
@@ -104,7 +105,7 @@ MNEInverseOperator::MNEInverseOperator(QIODevice& p_IODevice)
 //=============================================================================================================
 
 MNEInverseOperator::MNEInverseOperator(const FiffInfo &info,
-                                       const MNEForwardSolution& forward,
+                                       const FwdForwardSolution& forward,
                                        const FiffCov& p_noise_cov,
                                        float loose,
                                        float depth,
@@ -681,7 +682,7 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
 //=============================================================================================================
 
 MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &info,
-                                                             MNEForwardSolution forward,
+                                                             FwdForwardSolution forward,
                                                              const FiffCov &p_noise_cov,
                                                              float loose,
                                                              float depth,
@@ -748,7 +749,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
     {
         std::cout << "ToDo: patch_areas" << std::endl;
 //        patch_areas = forward.get('patch_areas', None)
-        p_depth_prior = FiffCov::SDPtr(new FiffCov(MNEForwardSolution::compute_depth_prior(gain, gain_info, is_fixed_ori, depth, 10.0, patch_areas, limit_depth_chs)));
+        p_depth_prior = FiffCov::SDPtr(new FiffCov(FwdForwardSolution::compute_depth_prior(gain, gain_info, is_fixed_ori, depth, 10.0, patch_areas, limit_depth_chs)));
     }
     else
     {

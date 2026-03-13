@@ -35,7 +35,7 @@
 #include <inverse/mne_inverse_operator.h>
 #include <inverse/mne_source_estimate.h>
 #include <mne/mne_source_spaces.h>
-#include <mne/mne_forward_solution.h>
+#include <fwd/fwd_forward_solution.h>
 
 #include <inverse/minimum_norm/minimum_norm.h>
 #include <inverse/rap_music/rap_music.h>
@@ -49,6 +49,7 @@
 
 using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace FWDLIB;
 using namespace INVERSELIB;
 using namespace UTILSLIB;
 using namespace Eigen;
@@ -69,11 +70,11 @@ using namespace Eigen;
  * @return  Inverse operator built from the subsampled forward.
  */
 static MNEInverseOperator makeSmallInverseOp(const FiffInfo& info,
-                                             const MNEForwardSolution& fwd,
+                                             const FwdForwardSolution& fwd,
                                              const FiffCov& noiseCov,
                                              int step)
 {
-    MNEForwardSolution small(fwd);
+    FwdForwardSolution small(fwd);
     const bool isFixed = small.isFixedOrient();
     const int  orient  = isFixed ? 1 : 3;
 
@@ -210,7 +211,7 @@ class TestInverseData : public QObject
 
 private:
     QString m_sDataPath;
-    MNEForwardSolution m_fwd;
+    FwdForwardSolution m_fwd;
     FiffCov m_noiseCov;
     FiffInfo m_info;
     MNEInverseOperator m_invOp;   // Cached inverse operator (loose=0.2, depth=0.8)
@@ -246,7 +247,7 @@ private slots:
         // Read forward solution
         QFile fwdFile(fwdPath);
         if (fwdFile.exists()) {
-            m_fwd = MNEForwardSolution(fwdFile);
+            m_fwd = FwdForwardSolution(fwdFile);
         }
 
         // Read noise covariance

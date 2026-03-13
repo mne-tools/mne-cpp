@@ -34,8 +34,8 @@
  *
  */
 
-#ifndef FWDBEMMODEL_H
-#define FWDBEMMODEL_H
+#ifndef FWD_BEM_MODEL_H
+#define FWD_BEM_MODEL_H
 
 //=============================================================================================================
 // INCLUDES
@@ -103,6 +103,7 @@ namespace FWDLIB
 //=============================================================================================================
 
 class FwdEegSphereModel;
+class FwdThreadArg;
 
 //=============================================================================================================
 /**
@@ -194,9 +195,9 @@ public:
      *
      * @param[in] name   Path to the BEM FIFF file.
      * @param[in] kinds  Surface IDs to load (e.g. FIFFV_BEM_SURF_ID_BRAIN).
-     * @return Newly allocated BEM model containing the requested surfaces, or nullptr on failure. Caller owns the pointer.
+     * @return BEM model containing the requested surfaces, or nullptr on failure.
      */
-    static FwdBemModel* fwd_bem_load_surfaces(const QString& name,
+    static std::unique_ptr<FwdBemModel> fwd_bem_load_surfaces(const QString& name,
                                               const std::vector<int>& kinds);
 
     //=========================================================================================================
@@ -206,18 +207,18 @@ public:
      * Convenience wrapper that loads only the inner skull surface.
      *
      * @param[in] name  Path to the BEM FIFF file.
-     * @return Newly allocated BEM model, or nullptr on failure. Caller owns the pointer.
+     * @return BEM model, or nullptr on failure.
      */
-    static FwdBemModel* fwd_bem_load_homog_surface(const QString& name);
+    static std::unique_ptr<FwdBemModel> fwd_bem_load_homog_surface(const QString& name);
 
     //=========================================================================================================
     /**
      * @brief Load a three-layer BEM model (scalp, outer skull, inner skull) from a FIFF file.
      *
      * @param[in] name  Path to the BEM FIFF file.
-     * @return Newly allocated BEM model, or nullptr on failure. Caller owns the pointer.
+     * @return BEM model, or nullptr on failure.
      */
-    static FwdBemModel* fwd_bem_load_three_layer_surfaces(const QString& name);
+    static std::unique_ptr<FwdBemModel> fwd_bem_load_three_layer_surfaces(const QString& name);
 
     //=========================================================================================================
     /**
@@ -252,15 +253,15 @@ public:
      *
      * @param[in] guess_surf  Predefined boundary surface for the guesses (may be nullptr).
      * @param[in] guessrad    Radius for a spherical boundary if guess_surf is nullptr.
-     * @param[in] guess_r0    Origin for the spherical boundary (3-element array).
+     * @param[in] guess_r0    Origin for the spherical boundary.
      * @param[in] grid        Spacing between guess points (meters).
      * @param[in] exclude     Exclude points closer than this to the CM of the boundary.
      * @param[in] mindist     Minimum distance from the boundary surface.
-     * @return Newly allocated surface containing the guess locations. Caller owns the pointer.
+     * @return Surface containing the guess locations, or nullptr on failure.
      */
-    static MNELIB::MNESurface* make_guesses(MNELIB::MNESurface* guess_surf,
+    static std::unique_ptr<MNELIB::MNESurface> make_guesses(MNELIB::MNESurface* guess_surf,
                                             float guessrad,
-                                            float *guess_r0,
+                                            const Eigen::Vector3f& guess_r0,
                                             float grid,
                                             float exclude,
                                             float mindist);
@@ -289,13 +290,13 @@ public:
     /**
      * @brief Compute the linear potential coefficients for one source-destination pair.
      *
-     * @param[in]  from   Source point (3-element array).
+     * @param[in]  from   Source point.
      * @param[in]  to     Destination triangle.
      * @param[out] omega  Output coefficients for the three triangle vertices.
      */
-    static void lin_pot_coeff(float *from,
-                              MNELIB::MNETriangle* to,
-                              double omega[3]);
+    static void lin_pot_coeff(const Eigen::Vector3f& from,
+                              MNELIB::MNETriangle& to,
+                              Eigen::Vector3d& omega);
 
     //=========================================================================================================
     /**
@@ -304,7 +305,7 @@ public:
      * @param[in]     surf  The BEM surface.
      * @param[in,out] mat   The coefficient matrix to correct (modified in-place).
      */
-    static void correct_auto_elements(MNELIB::MNESurface* surf,
+    static void correct_auto_elements(MNELIB::MNESurface& surf,
                                       Eigen::MatrixXf& mat);
 
     //=========================================================================================================
@@ -342,7 +343,7 @@ public:
     static Eigen::MatrixXf fwd_bem_multi_solution(Eigen::MatrixXf& solids,
                                           const Eigen::MatrixXf *gamma,
                                           int nsurf,
-                                          const int *ntri);
+                                          const Eigen::VectorXi& ntri);
 
     //=========================================================================================================
     /**
@@ -487,7 +488,7 @@ public:
      */
     void fwd_bem_pot_grad_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
                                FwdCoilSet* els, int all_surfs,
-                               float *xgrad, float *ygrad, float *zgrad);
+                               Eigen::VectorXf& xgrad, Eigen::VectorXf& ygrad, Eigen::VectorXf& zgrad);
 
     //=========================================================================================================
     /**
@@ -501,7 +502,7 @@ public:
      */
     void fwd_bem_lin_pot_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
                               FwdCoilSet* els, int all_surfs,
-                              float *pot);
+                              Eigen::VectorXf& pot);
 
     //=========================================================================================================
     /**
@@ -517,7 +518,7 @@ public:
      */
     void fwd_bem_lin_pot_grad_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
                                    FwdCoilSet* els, int all_surfs,
-                                   float *xgrad, float *ygrad, float *zgrad);
+                                   Eigen::VectorXf& xgrad, Eigen::VectorXf& ygrad, Eigen::VectorXf& zgrad);
 
     //=========================================================================================================
     /**
@@ -531,7 +532,7 @@ public:
      */
     void fwd_bem_pot_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
                           FwdCoilSet* els, int all_surfs,
-                          float *pot);
+                          Eigen::VectorXf& pot);
 
     //=========================================================================================================
     /**
@@ -585,14 +586,14 @@ public:
     /**
      * @brief Compute the f0, fx, fy integration helper values from corner coordinates.
      *
-     * @param[in]  xx  Corner x-coordinates (3-element array).
-     * @param[in]  yy  Corner y-coordinates (3-element array).
+     * @param[in]  xx  Corner x-coordinates.
+     * @param[in]  yy  Corner y-coordinates.
      * @param[out] f0  Integral f0.
      * @param[out] fx  Integral fx.
      * @param[out] fy  Integral fy.
      */
-    static void calc_f(double *xx, double *yy,
-                       double *f0, double *fx, double *fy);
+    static void calc_f(const Eigen::Vector3d& xx, const Eigen::Vector3d& yy,
+                       Eigen::Vector3d& f0, Eigen::Vector3d& fx, Eigen::Vector3d& fy);
 
     //=========================================================================================================
     /**
@@ -607,13 +608,13 @@ public:
      */
     static void calc_magic(double u, double z,
                            double A, double B,
-                           double *beta, double *D);
+                           Eigen::Vector3d& beta, double& D);
 
     //=========================================================================================================
     /**
      * @brief Compute the geometry integrals for the magnetic field from a triangle.
      *
-     * @param[in]  from  Source point (3-element array).
+     * @param[in]  from  Source point.
      * @param[in]  to    Destination triangle.
      * @param[out] I1p   Monopolar integral.
      * @param[out] T     Integral T.
@@ -623,23 +624,23 @@ public:
      * @param[out] fx    Integral fx.
      * @param[out] fy    Integral fy.
      */
-    static void field_integrals(float *from,
-                                MNELIB::MNETriangle* to,
-                                double *I1p,
-                                double *T, double *S1, double *S2,
-                                double *f0, double *fx, double *fy);
+    static void field_integrals(const Eigen::Vector3f& from,
+                                MNELIB::MNETriangle& to,
+                                double& I1p,
+                                Eigen::Vector2d& T, Eigen::Vector2d& S1, Eigen::Vector2d& S2,
+                                Eigen::Vector3d& f0, Eigen::Vector3d& fx, Eigen::Vector3d& fy);
 
     //=========================================================================================================
     /**
      * @brief Compute the constant-collocation magnetic field coefficient for one triangle.
      *
-     * @param[in] dest    Destination field point (3-element array).
-     * @param[in] normal  Field direction of interest (3-element unit vector).
+     * @param[in] dest    Destination field point.
+     * @param[in] normal  Field direction of interest (unit vector).
      * @param[in] tri     Source triangle.
      * @return The field coefficient.
      */
-    static double one_field_coeff(float *dest, float *normal,
-                                  MNELIB::MNETriangle* tri);
+    static double one_field_coeff(const Eigen::Vector3f& dest, const Eigen::Vector3f& normal,
+                                  MNELIB::MNETriangle& tri);
 
     //=========================================================================================================
     /**
@@ -671,47 +672,47 @@ public:
     /**
      * @brief Compute linear field coefficients using the Ferguson method.
      *
-     * @param[in]  dest  Field point (3-element array).
-     * @param[in]  dir   Field direction of interest (3-element unit vector).
+     * @param[in]  dest  Field point.
+     * @param[in]  dir   Field direction of interest (unit vector).
      * @param[in]  tri   Destination triangle.
      * @param[out] res   Output coefficients for the three triangle vertices.
      */
-    static void fwd_bem_one_lin_field_coeff_ferg(float *dest, float *dir,
-                                                 MNELIB::MNETriangle* tri,
-                                                 double *res);
+    static void fwd_bem_one_lin_field_coeff_ferg(const Eigen::Vector3f& dest, const Eigen::Vector3f& dir,
+                                                 MNELIB::MNETriangle& tri,
+                                                 Eigen::Vector3d& res);
 
     //=========================================================================================================
     /**
      * @brief Compute linear field coefficients using the Urankar method.
      *
-     * @param[in]  dest  Field point (3-element array).
-     * @param[in]  dir   Field direction of interest (3-element unit vector).
+     * @param[in]  dest  Field point.
+     * @param[in]  dir   Field direction of interest (unit vector).
      * @param[in]  tri   Destination triangle.
      * @param[out] res   Output coefficients for the three triangle vertices.
      */
-    static void fwd_bem_one_lin_field_coeff_uran(float *dest, float *dir,
-                                                 MNELIB::MNETriangle* tri,
-                                                 double *res);
+    static void fwd_bem_one_lin_field_coeff_uran(const Eigen::Vector3f& dest, const Eigen::Vector3f& dir,
+                                                 MNELIB::MNETriangle& tri,
+                                                 Eigen::Vector3d& res);
 
     //=========================================================================================================
     /**
      * @brief Compute linear field coefficients using the simple (direct) method.
      *
-     * @param[in]  dest    Destination field point (3-element array).
-     * @param[in]  normal  Field direction of interest (3-element unit vector).
+     * @param[in]  dest    Destination field point.
+     * @param[in]  normal  Field direction of interest (unit vector).
      * @param[in]  source  Source triangle.
      * @param[out] res     Output coefficients for the three triangle vertices.
      */
-    static void fwd_bem_one_lin_field_coeff_simple(float *dest, float *normal,
-                                                   MNELIB::MNETriangle* source,
-                                                   double *res);
+    static void fwd_bem_one_lin_field_coeff_simple(const Eigen::Vector3f& dest, const Eigen::Vector3f& normal,
+                                                   MNELIB::MNETriangle& source,
+                                                   Eigen::Vector3d& res);
 
     //=========================================================================================================
     /**
      * @brief Function pointer type for linear field coefficient integration methods.
      */
-    typedef void (*linFieldIntFunc)(float *dest, float *dir,
-                                    MNELIB::MNETriangle* tri, double *res);
+    typedef void (*linFieldIntFunc)(const Eigen::Vector3f& dest, const Eigen::Vector3f& dir,
+                                    MNELIB::MNETriangle& tri, Eigen::Vector3d& res);
 
     //=========================================================================================================
     /**
@@ -747,7 +748,7 @@ public:
      * @param[out] B      Output magnetic fields (one value per coil).
      */
     void fwd_bem_lin_field_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
-                                FwdCoilSet* coils, float *B);
+                                FwdCoilSet& coils, Eigen::VectorXf& B);
 
     //=========================================================================================================
     /**
@@ -759,7 +760,7 @@ public:
      * @param[out] B      Output magnetic fields (one value per coil).
      */
     void fwd_bem_field_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
-                            FwdCoilSet* coils, float *B);
+                            FwdCoilSet& coils, Eigen::VectorXf& B);
 
     //=========================================================================================================
     /**
@@ -773,8 +774,8 @@ public:
      * @param[out] zgrad  Gradient with respect to z.
      */
     void fwd_bem_field_grad_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
-                                 FwdCoilSet *coils,
-                                 float *xgrad, float *ygrad, float *zgrad);
+                                 FwdCoilSet& coils,
+                                 Eigen::VectorXf& xgrad, Eigen::VectorXf& ygrad, Eigen::VectorXf& zgrad);
 
     //=========================================================================================================
     /**
@@ -817,8 +818,8 @@ public:
      * @param[out] zgrad  Gradient with respect to z.
      */
     void fwd_bem_lin_field_grad_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
-                                     FwdCoilSet *coils,
-                                     float *xgrad, float *ygrad, float *zgrad);
+                                     FwdCoilSet& coils,
+                                     Eigen::VectorXf& xgrad, Eigen::VectorXf& ygrad, Eigen::VectorXf& zgrad);
 
     //=========================================================================================================
     /**
@@ -868,10 +869,9 @@ public:
      * Used as a thread entry point; the argument is cast to the appropriate
      * worker struct internally.
      *
-     * @param[in] arg  Opaque pointer to the per-thread work descriptor.
-     * @return nullptr on completion.
+     * @param[in] arg  Per-thread work descriptor.
      */
-    static void *meg_eeg_fwd_one_source_space(void *arg);
+    static void meg_eeg_fwd_one_source_space(FwdThreadArg* arg);
 
     //=========================================================================================================
     /**
@@ -1045,4 +1045,4 @@ public:
 //=============================================================================================================
 } // NAMESPACE FWDLIB
 
-#endif // FWDBEMMODEL_H
+#endif // FWD_BEM_MODEL_H

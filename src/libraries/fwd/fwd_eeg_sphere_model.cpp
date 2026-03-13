@@ -48,6 +48,9 @@
 #include <qmath.h>
 
 #include <Eigen/Core>
+
+#include <algorithm>
+#include <vector>
 #include <Eigen/Dense>
 
 //=============================================================================================================
@@ -649,8 +652,8 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(const Eigen::Vector3f& rd, 
     int   k,c;
     FwdCoil* el;
 
-    for (k = 0; k < els->ncoil; k++, el++) {
-        el = els->coils[k];
+    for (k = 0; k < els->ncoil(); k++, el++) {
+        el = els->coils[k].get();
         if (el->coil_class == FWD_COILC_EEG) {
             if (el->np > nvval) {
                 vval_one = REALLOC_1(vval_one,el->np,float);
@@ -791,8 +794,8 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil_vec(const Eigen::Vector3f& rd, Fwd
     int   k,c,p;
     FwdCoil* el;
 
-    for (k = 0; k < els->ncoil; k++, el++) {
-        el = els->coils[k];
+    for (k = 0; k < els->ncoil(); k++, el++) {
+        el = els->coils[k].get();
         if (el->coil_class == FWD_COILC_EEG) {
             if (el->np > nvval) {
                 FREE_CMATRIX_1(vval_one);
@@ -844,7 +847,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot_grad_coil(const Eigen::Vector3f& rd, co
         my_rd[p] = my_rd[p] - step;
         if (fwd_eeg_spherepot_coil(Eigen::Map<const Eigen::Vector3f>(my_rd),Q,coils,Vval,client) == FAIL)
             return FAIL;
-        for (q = 0; q < coils->ncoil; q++)
+        for (q = 0; q < coils->ncoil(); q++)
             grads[p][q] = (grads[p][q]-Vval[q])/step2;
     }
     if (Vval) {
@@ -980,8 +983,8 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil(const Eigen::Vector3f& rd, const E
     int   k,c;
     FwdCoil* el;
 
-    for (k = 0; k < els->ncoil; k++, el++) {
-        el = els->coils[k];
+    for (k = 0; k < els->ncoil(); k++, el++) {
+        el = els->coils[k].get();
         if (el->coil_class == FWD_COILC_EEG) {
             if (el->np > nvval) {
                 vval_one.resize(el->np);
@@ -1061,7 +1064,6 @@ void fromDoubleEigenVector(const Eigen::VectorXd& from_vec, double *to_vec)
     fromDoubleEigenVector(from_vec, to_vec, from_vec.size());
 }
 
-//============================= fwd_fit_berg_scherg.c
 static double dot_dvectors (double *v1,
                             double *v2,
                             int   nn)
@@ -1073,7 +1075,6 @@ static double dot_dvectors (double *v1,
         result = result + v1[k]*v2[k];
     return (result);
 }
-//============================= fwd_fit_berg_scherg.c
 static int c_dsvd(double **mat,		/* The matrix */
                   int   m,int n,	/* m rows n columns */
                   double *sing,	        /* Singular values (must have size
@@ -1121,9 +1122,7 @@ static int c_dsvd(double **mat,		/* The matrix */
  * It is not too much of a problem
  */
 
-//============================= fwd_fit_berg_scherg.c
 
-//============================= fwd_fit_berg_scherg.c
 namespace FWDLIB
 {
 
@@ -1133,51 +1132,32 @@ namespace FWDLIB
 typedef struct {
     double lambda;		/* Magnitude for the apparent dipole */
     double mu;			/* Distance multiplier for the apparent dipole */
-} *bergSchergPar,bergSchergParRec;
+} bergSchergParRec;
 
 } // Namepsace
 
-//============================= fwd_fit_berg_scherg.c
-static int comp_pars(const void *p1,const void *p2)
-/*
-      * Comparison function for sorting layers
-      */
-{
-    bergSchergPar v1 = (bergSchergPar)p1;
-    bergSchergPar v2 = (bergSchergPar)p2;
-
-    if (v1->mu > v2->mu)
-        return -1;
-    else if (v1->mu < v2->mu)
-        return 1;
-    else
-        return 0;
-}
-
-//============================= fwd_fit_berg_scherg.c
 static void sort_parameters(VectorXd& mu,VectorXd& lambda,int nfit)
 /*
       * Sort the parameters so that largest mu comes first
       */
 {
-    bergSchergPar pars = MALLOC_1(nfit,bergSchergParRec);
+    std::vector<bergSchergParRec> pars(nfit);
 
     for (int k = 0; k < nfit; k++) {
         pars[k].mu = mu[k];
         pars[k].lambda = lambda[k];
     }
-    
-    qsort (pars, nfit, sizeof(bergSchergParRec), comp_pars);
+
+    std::sort(pars.begin(), pars.end(), [](const bergSchergParRec& a, const bergSchergParRec& b) {
+        return a.mu > b.mu;
+    });
 
     for (int k = 0; k < nfit; k++) {
         mu[k]     = pars[k].mu;
         lambda[k] = pars[k].lambda;
     }
-    
-    FREE(pars);
 }
 
-//============================= fwd_fit_berg_scherg.c
 static bool report_fit(int    loop,
                       const VectorXd &fitpar,
                       double Smin)
@@ -1194,7 +1174,6 @@ static bool report_fit(int    loop,
     return true;
 }
 
-//============================= fwd_fit_berg_scherg.c
 static MatrixXd get_initial_simplex(const VectorXd &pars,
                                     double simplex_size)
 

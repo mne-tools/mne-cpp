@@ -285,7 +285,7 @@ void RtSensorInterpolationMatWorker::computeMapping()
                 std::unique_ptr<FWDLIB::FwdCoilSet> coils(templates->create_meg_coils(
                     megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, devToTarget));
 
-                if (coils && coils->ncoil > 0) {
+                if (coils && coils->ncoil() > 0) {
                     auto mat = FWDLIB::FwdFieldMap::computeMegMapping(
                         *coils, megVerts, norms, origin, kIntrad, kMegMiss);
 
@@ -309,7 +309,7 @@ void RtSensorInterpolationMatWorker::computeMapping()
                 FWDLIB::FwdCoilSet::create_eeg_els(
                     eegChs, eegChs.size(), headMri));
 
-            if (eegCoils && eegCoils->ncoil > 0) {
+            if (eegCoils && eegCoils->ncoil() > 0) {
                 auto mat = FWDLIB::FwdFieldMap::computeEegMapping(
                     *eegCoils, eegVerts, origin, kIntrad, kEegMiss);
 

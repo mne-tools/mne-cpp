@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
- * @file     fwd_eeg_sphere_layer.h
+ * @file     fwd.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
- * @date     December, 2016
+ * @date     March, 2026
  *
  * @section  LICENSE
  *
- * Copyright (C) 2016, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2026, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -19,7 +19,7 @@
  *       the following disclaimer in the documentation and/or other materials provided with the distribution.
  *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
  *       to endorse or promote products derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
  * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,32 +29,28 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- *
- * @brief    FwdEegSphereLayer class declaration.
- *
+ * @brief    Fwd class declaration, which provides static wrapper functions for the forward library.
  */
+//=============================================================================================================
 
-#ifndef FWD_EEG_SPHERE_LAYER_H
-#define FWD_EEG_SPHERE_LAYER_H
+#ifndef FWD_H
+#define FWD_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "fwd_global.h"
+#include "fwd_forward_solution.h"
 
-//=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
+#include <fiff/fiff_constants.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QDebug>
+#include <QIODevice>
+#include <QStringList>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FWDLIB
@@ -65,56 +61,54 @@ namespace FWDLIB
 
 //=============================================================================================================
 /**
- * Implements FwdEegSphereLayer (Replaces *fwdEegSphereLayer,fwdEegSphereLayerRec struct of MNE-C fwd_types.h).
- *
- * @brief Single concentric sphere layer with conductivity ratio for the EEG forward model.
+ * @brief The Fwd class provides static wrapper functions for the forward library.
  */
-class FWDSHARED_EXPORT FwdEegSphereLayer
+class FWDSHARED_EXPORT Fwd
 {
 public:
-    typedef QSharedPointer<FwdEegSphereLayer> SPtr;              /**< Shared pointer type for FwdEegSphereLayer. */
-    typedef QSharedPointer<const FwdEegSphereLayer> ConstSPtr;   /**< Const shared pointer type for FwdEegSphereLayer. */
 
     //=========================================================================================================
     /**
-     * Constructs the Electric Current Dipole
+     * Destructor.
      */
-    FwdEegSphereLayer();
-
-//    //=========================================================================================================
-//    /**
-//    * Copy constructor.
-//    *
-//    * @param[in] p_FwdEegSphereLayer      FwdEegSphereLayer which should be copied
-//    */
-//    FwdEegSphereLayer(const FwdEegSphereLayer& p_FwdEegSphereLayer);
+    virtual ~Fwd()
+    { }
 
     //=========================================================================================================
     /**
-     * Destroys the Forward EEG Sphere Layer description
+     * mne_read_forward_solution
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the FwdForwardSolution::read static function
+     *
+     * Reads a forward solution from a fif file
+     *
+     * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket.
+     * @param[in, out] fwd      A forward solution from a fif file.
+     * @param[in] force_fixed   Force fixed source orientation mode? (optional).
+     * @param[in] surf_ori      Use surface based source coordinate system? (optional).
+     * @param[in] include       Include these channels (optional).
+     * @param[in] exclude       Exclude these channels (optional).
+     *
+     * @return true if succeeded, false otherwise.
      */
-    ~FwdEegSphereLayer();
-
-    static bool comp_layers(const FwdEegSphereLayer& v1,const FwdEegSphereLayer& v2)
-    /*
-          * Comparison function for sorting layers
-          */
+    static inline bool read_forward_solution(QIODevice& p_IODevice,
+                                             FwdForwardSolution& fwd,
+                                             bool force_fixed = false,
+                                             bool surf_ori = false,
+                                             const QStringList& include = FIFFLIB::defaultQStringList,
+                                             const QStringList& exclude = FIFFLIB::defaultQStringList)
     {
-        if (v1.rad < v2.rad)
-            return true;
-        else
-            return false;
+        return FwdForwardSolution::read(p_IODevice,
+                                        fwd,
+                                        force_fixed,
+                                        surf_ori,
+                                        include,
+                                        exclude);
     }
-
-public:
-    float rad;          /**< The actual rads. */
-    float rel_rad;      /**< Relative rads. */
-    float sigma;        /**< Conductivity. */
 };
 
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
 } // NAMESPACE FWDLIB
 
-#endif // FWD_EEG_SPHERE_LAYER_H
+#endif // FWD_H

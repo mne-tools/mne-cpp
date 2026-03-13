@@ -34,8 +34,8 @@
  *
  */
 
-#ifndef FWDCOMPDATA_H
-#define FWDCOMPDATA_H
+#ifndef FWD_COMP_DATA_H
+#define FWD_COMP_DATA_H
 
 //=============================================================================================================
 // INCLUDES
@@ -93,26 +93,20 @@ public:
     //=========================================================================================================
     /**
      * Constructs the Forward Compensation Data
-     * Refactored: fwd_new_comp_data (fwd_comp.c)
      */
     FwdCompData();
 
     //=========================================================================================================
     /**
      * Destroys the Forward Compensation Data
-     * Refactored: fwd_free_comp_data (fwd_comp.c)
      */
     ~FwdCompData();
-
-    //============================= fwd_comp.c =============================
 
     static int fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet* coils, float *res, void *client);
 
     /*
      * Routines to implement the reference channel compensation in field computations
      */
-
-    static void fwd_free_comp_data(void *d);
 
     static int fwd_make_ctf_comp_coils(MNELIB::MNECTFCompDataSet* set,          /* The available compensation data */
                                        FwdCoilSet*        coils,        /* The main coil set */
@@ -124,8 +118,7 @@ public:
                                    fwdFieldFunc      field,	        /* The field computation functions */
                                    fwdVecFieldFunc   vec_field,
                                    fwdFieldGradFunc  field_grad,    /* The field and gradient computation function */
-                                   void              *client,       /* Client data to be passed to the above */
-                                   fwdUserFreeFunc   client_free);
+                                   void              *client);       /* Client data to be passed to the above */
 
     static int fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet* coils, float **res, void *client);
 
@@ -140,22 +133,8 @@ public:
     fwdVecFieldFunc     vec_field;  /* Computes the fields of all three dipole components  */
     fwdFieldGradFunc    field_grad; /* Computes the field and gradient of one dipole direction */
     void                *client;    /* Client data to pass to the above functions */
-    fwdUserFreeFunc     client_free;
     float               *work;      /* The work areas */
     float               **vec_work;
-
-// ### OLD STRUCT ###
-//typedef struct {
-//    FWDLIB::MNECTFCompDataSet* set; /* The compensation data set */
-//    FWDLIB::FwdCoilSet* comp_coils; /* The compensation coil definitions */
-//    fwdFieldFunc      field;            /* Computes the field of given direction dipole */
-//    fwdVecFieldFunc   vec_field;        /* Computes the fields of all three dipole components  */
-//    fwdFieldGradFunc  field_grad;       /* Computes the field and gradient of one dipole direction */
-//    void              *client;          /* Client data to pass to the above functions */
-//    fwdUserFreeFunc   client_free;
-//    float             *work;            /* The work areas */
-//    float             **vec_work;
-//} *fwdCompData,fwdCompDataRec;          /* This structure is used in the compensated field calculations */
 };
 
 //=============================================================================================================
@@ -163,4 +142,4 @@ public:
 //=============================================================================================================
 } // NAMESPACE FWDLIB
 
-#endif // FWDCOMPDATA_H
+#endif // FWD_COMP_DATA_H

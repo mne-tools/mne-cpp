@@ -301,10 +301,10 @@ CoilData extractCoilData(const FwdCoil* coil, const Vector3d& r0)
  */
 MatrixXd doSelfDots(double intrad, const FwdCoilSet& coils, const Vector3d& r0, bool isMeg)
 {
-    const int nc = coils.ncoil;
+    const int nc = coils.ncoil();
     std::vector<CoilData> cdata(nc);
     for (int i = 0; i < nc; ++i) {
-        cdata[i] = extractCoilData(coils.coils[i], r0);
+        cdata[i] = extractCoilData(coils.coils[i].get(), r0);
     }
 
     MatrixXd products = MatrixXd::Zero(nc, nc);
@@ -348,12 +348,12 @@ MatrixXd doSurfaceDots(double intrad, const FwdCoilSet& coils,
                        const MatrixX3f& rr, const MatrixX3f& nn,
                        const Vector3d& r0, bool isMeg)
 {
-    const int nc = coils.ncoil;
+    const int nc = coils.ncoil();
     const int nv = rr.rows();
 
     std::vector<CoilData> cdata(nc);
     for (int i = 0; i < nc; ++i) {
-        cdata[i] = extractCoilData(coils.coils[i], r0);
+        cdata[i] = extractCoilData(coils.coils[i].get(), r0);
     }
 
     MatrixXd products = MatrixXd::Zero(nv, nc);
@@ -392,8 +392,8 @@ MatrixXd doSurfaceDots(double intrad, const FwdCoilSet& coils,
 /** MEG noise stds: magnetometers get kMagStd, gradiometers get kGradStd. */
 VectorXd adHocMegStds(const FwdCoilSet& coils)
 {
-    VectorXd stds(coils.ncoil);
-    for (int k = 0; k < coils.ncoil; ++k) {
+    VectorXd stds(coils.ncoil());
+    for (int k = 0; k < coils.ncoil(); ++k) {
         stds(k) = coils.coils[k]->is_axial_coil() ? static_cast<double>(kMagStd)
                                                    : static_cast<double>(kGradStd);
     }
@@ -537,7 +537,7 @@ QSharedPointer<MatrixXf> FwdFieldMap::computeMegMapping(
     float intrad,
     float miss)
 {
-    if (coils.ncoil <= 0 || vertices.rows() == 0 || normals.rows() != vertices.rows()) {
+    if (coils.ncoil() <= 0 || vertices.rows() == 0 || normals.rows() != vertices.rows()) {
         return QSharedPointer<MatrixXf>();
     }
 
@@ -565,7 +565,7 @@ QSharedPointer<MatrixXf> FwdFieldMap::computeMegMapping(
     float intrad,
     float miss)
 {
-    if (coils.ncoil <= 0 || vertices.rows() == 0 || normals.rows() != vertices.rows()) {
+    if (coils.ncoil() <= 0 || vertices.rows() == 0 || normals.rows() != vertices.rows()) {
         return QSharedPointer<MatrixXf>();
     }
 
@@ -590,7 +590,7 @@ QSharedPointer<MatrixXf> FwdFieldMap::computeEegMapping(
     float intrad,
     float miss)
 {
-    if (coils.ncoil <= 0 || vertices.rows() == 0) {
+    if (coils.ncoil() <= 0 || vertices.rows() == 0) {
         return QSharedPointer<MatrixXf>();
     }
 
@@ -609,7 +609,7 @@ QSharedPointer<MatrixXf> FwdFieldMap::computeEegMapping(
     MatrixXd surfaceDots = doSurfaceDots(eegIntrad, coils, vertices, dummyNormals, r0, /*isMeg=*/false);
 
     // Ad-hoc noise for whitening
-    VectorXd stds = adHocEegStds(coils.ncoil);
+    VectorXd stds = adHocEegStds(coils.ncoil());
 
     return computeMappingMatrix(selfDots, surfaceDots, stds, static_cast<double>(miss));
 }
@@ -623,7 +623,7 @@ QSharedPointer<MatrixXf> FwdFieldMap::computeEegMapping(
     float intrad,
     float miss)
 {
-    if (coils.ncoil <= 0 || vertices.rows() == 0) {
+    if (coils.ncoil() <= 0 || vertices.rows() == 0) {
         return QSharedPointer<MatrixXf>();
     }
 
@@ -634,7 +634,7 @@ QSharedPointer<MatrixXf> FwdFieldMap::computeEegMapping(
 
     MatrixXd selfDots = doSelfDots(eegIntrad, coils, r0, /*isMeg=*/false);
     MatrixXd surfaceDots = doSurfaceDots(eegIntrad, coils, vertices, dummyNormals, r0, /*isMeg=*/false);
-    VectorXd stds = adHocEegStds(coils.ncoil);
+    VectorXd stds = adHocEegStds(coils.ncoil());
 
     // Build SSP projector
     MatrixXd projOp;

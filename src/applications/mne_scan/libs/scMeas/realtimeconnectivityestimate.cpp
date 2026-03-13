@@ -40,7 +40,7 @@
 
 #include <connectivity/network/network.h>
 
-#include <mne/mne_forward_solution.h>
+#include <fwd/fwd_forward_solution.h>
 
 #include <fs/fs_surfaceset.h>
 #include <fs/fs_annotationset.h>
@@ -58,6 +58,7 @@
 using namespace SCMEASLIB;
 using namespace CONNECTIVITYLIB;
 using namespace MNELIB;
+using namespace FWDLIB;
 using namespace FSLIB;
 
 //=============================================================================================================
@@ -68,7 +69,7 @@ RealTimeConnectivityEstimate::RealTimeConnectivityEstimate(QObject *parent)
 : Measurement(QMetaType::fromName("RealTimeConnectivityEstimate::SPtr").id(), parent)
 , m_pAnnotSet(AnnotationSet::SPtr(new AnnotationSet))
 , m_pSurfSet(SurfaceSet::SPtr(new SurfaceSet))
-, m_pFwdSolution(MNEForwardSolution::SPtr(new MNEForwardSolution))
+, m_pFwdSolution(FwdForwardSolution::SPtr(new FwdForwardSolution))
 , m_pNetwork(Network::SPtr(new Network))
 , m_bInitialized(false)
 {

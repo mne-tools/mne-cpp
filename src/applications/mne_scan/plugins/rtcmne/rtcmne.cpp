@@ -48,7 +48,7 @@
 
 #include <fiff/fiff_info.h>
 
-#include <mne/mne_forward_solution.h>
+#include <fwd/fwd_forward_solution.h>
 #include <inverse/mne_source_estimate.h>
 #include <mne/mne_epoch_data_list.h>
 

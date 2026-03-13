@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    fwd library export/import macros.
+ * @brief    Forward library export/import macros.
  *
  */
 

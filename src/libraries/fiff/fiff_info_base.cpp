@@ -244,6 +244,33 @@ FiffInfoBase FiffInfoBase::pick_info(const RowVectorXi* sel) const
 }
 //=============================================================================================================
 
+void FiffInfoBase::mne_read_meg_comp_eeg_ch_info(QList<FiffChInfo>& megp,
+                                                  int& nmegp,
+                                                  QList<FiffChInfo>& meg_compp,
+                                                  int& nmeg_compp,
+                                                  QList<FiffChInfo>& eegp,
+                                                  int& neegp,
+                                                  FiffCoordTrans& meg_head_t,
+                                                  FiffId& idp) const
+{
+    for (int k = 0; k < nchan; k++) {
+        if (chs[k].kind == FIFFV_MEG_CH) {
+            megp.append(chs[k]);
+            nmegp++;
+        } else if (chs[k].kind == FIFFV_REF_MEG_CH) {
+            meg_compp.append(chs[k]);
+            nmeg_compp++;
+        } else if (chs[k].kind == FIFFV_EEG_CH) {
+            eegp.append(chs[k]);
+            neegp++;
+        }
+    }
+    meg_head_t = dev_head_t;
+    idp = meas_id;
+}
+
+//=============================================================================================================
+
 QStringList FiffInfoBase::get_channel_types()
 {
     QStringList lChannelTypes;

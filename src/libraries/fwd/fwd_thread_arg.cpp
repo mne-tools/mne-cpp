@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the Forward Thread Argument (FwdThreadArg) Class.
+ * @brief    FwdThreadArg class definition.
  *
  */
 
@@ -89,9 +89,9 @@ FwdThreadArg::FwdThreadArg()
 :res           (NULL)
 ,res_grad      (NULL)
 ,off           (0)
-,field_pot     (NULL)
-,vec_field_pot (NULL)
-,field_pot_grad(NULL)
+,field_pot     (nullptr)
+,vec_field_pot (nullptr)
+,field_pot_grad(nullptr)
 ,coils_els     (NULL)
 ,client        (NULL)
 ,s             (NULL)

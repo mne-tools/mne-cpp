@@ -1,7 +1,7 @@
 /**
  * @file test_mne_extended.cpp
  * @brief Comprehensive tests for MNELIB classes: MNENamedMatrix, MNEEpochData,
- *        MNEEpochDataList, MNEClusterInfo, MNESourceSpaces, MNEForwardSolution.
+ *        MNEEpochDataList, MNEClusterInfo, MNESourceSpaces, FwdForwardSolution.
  */
 #include <QTest>
 #include <QCoreApplication>
@@ -10,7 +10,7 @@
 #include <QTemporaryDir>
 
 #include <mne/mne.h>
-#include <mne/mne_forward_solution.h>
+#include <fwd/fwd_forward_solution.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_hemisphere.h>
 #include <mne/mne_cluster_info.h>
@@ -20,6 +20,7 @@
 #include <fiff/fiff.h>
 
 using namespace MNELIB;
+using namespace FWDLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
 
@@ -467,25 +468,25 @@ private slots:
     }
 
     //=========================================================================
-    // MNEForwardSolution
+    // FwdForwardSolution
     //=========================================================================
     void forwardSolution_defaultCtor()
     {
-        MNEForwardSolution fwd;
+        FwdForwardSolution fwd;
         QVERIFY(fwd.isEmpty());
         // Note: isClustered() crashes on empty forward solution (accesses empty source space)
     }
 
     void forwardSolution_clear()
     {
-        MNEForwardSolution fwd;
+        FwdForwardSolution fwd;
         fwd.clear();
         QVERIFY(fwd.isEmpty());
     }
 
     void forwardSolution_tripletSelection()
     {
-        MNEForwardSolution fwd;
+        FwdForwardSolution fwd;
         VectorXi sel(3);
         sel << 0, 1, 2;
         VectorXi tri = fwd.tripletSelection(sel);
@@ -510,8 +511,8 @@ private slots:
         }
 
         QFile file(fwdFile);
-        MNEForwardSolution fwd;
-        bool ok = MNEForwardSolution::read(file, fwd);
+        FwdForwardSolution fwd;
+        bool ok = FwdForwardSolution::read(file, fwd);
         QVERIFY(ok);
         QVERIFY(!fwd.isEmpty());
     }

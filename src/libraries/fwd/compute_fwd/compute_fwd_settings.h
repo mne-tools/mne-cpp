@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Compute Forward Setting class declaration.
+ * @brief    ComputeFwdSettings class declaration.
  *
  */
 
-#ifndef COMPUTEFWDSETTINGS_H
-#define COMPUTEFWDSETTINGS_H
+#ifndef COMPUTE_FWD_SETTINGS_H
+#define COMPUTE_FWD_SETTINGS_H
 
 //=============================================================================================================
 // INCLUDES
@@ -143,4 +143,4 @@ private:
 //=============================================================================================================
 } //NAMESPACE
 
-#endif // COMPUTEFWDSETTINGS_H
+#endif // COMPUTE_FWD_SETTINGS_H

@@ -55,6 +55,7 @@
 
 using namespace INVERSELIB;
 using namespace MNELIB;
+using namespace FWDLIB;
 using namespace FIFFLIB;
 
 //=============================================================================================================
@@ -68,7 +69,7 @@ PwlRapMusic::PwlRapMusic()
 
 //=============================================================================================================
 
-PwlRapMusic::PwlRapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
+PwlRapMusic::PwlRapMusic(FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
 : RapMusic(p_pFwd, p_bSparsed, p_iN, p_dThr)
 {
     //Init

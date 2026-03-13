@@ -46,7 +46,8 @@
 #include <mne/mne_source_space.h>
 
 #include "fwd_comp_data.h"
-#include "fwd_bem_model.h"
+
+#include <memory>
 
 #include "fwd_thread_arg.h"
 
@@ -156,7 +157,6 @@ static struct {
 #define BEM_SUFFIX     "-bem.fif"
 #define BEM_SOL_SUFFIX "-bem-sol.fif"
 
-//============================= misc_util.c =============================
 
 static QString strip_from(const QString& s, const QString& suffix)
 {
@@ -172,7 +172,6 @@ static QString strip_from(const QString& s, const QString& suffix)
     return res;
 }
 
-//============================= mne_coord_transforms.c =============================
 
 namespace FWDLIB
 {
@@ -337,7 +336,7 @@ MNESurface *FwdBemModel::fwd_bem_find_surface(int kind)
 
 //=============================================================================================================
 
-FwdBemModel *FwdBemModel::fwd_bem_load_surfaces(const QString &name, const std::vector<int>& kinds)
+std::unique_ptr<FwdBemModel> FwdBemModel::fwd_bem_load_surfaces(const QString &name, const std::vector<int>& kinds)
 /*
  * Load a set of surfaces
  */
@@ -345,33 +344,32 @@ FwdBemModel *FwdBemModel::fwd_bem_load_surfaces(const QString &name, const std::
     std::vector<std::shared_ptr<MNESurface>> surfs;
     const int nkind = static_cast<int>(kinds.size());
     Eigen::VectorXf sigma_tmp(nkind);
-    FwdBemModel *m = NULL;
     int         j,k;
 
     if (nkind <= 0) {
         qCritical("No surfaces specified to fwd_bem_load_surfaces");
-        return NULL;
+        return nullptr;
     }
 
     for (k = 0; k < nkind; k++) {
         float cond = -1.0f;
         MNESurface* s = MNESurface::read_bem_surface(name,kinds[k],TRUE,&cond);
         if (s == NULL)
-            return NULL;
+            return nullptr;
         if (cond < 0.0) {
             qCritical("No conductivity available for surface %s",fwd_bem_explain_surface(kinds[k]).toUtf8().constData());
             delete s;
-            return NULL;
+            return nullptr;
         }
         if (s->coord_frame != FIFFV_COORD_MRI) {
             qCritical("Surface %s not specified in MRI coordinates.",fwd_bem_explain_surface(kinds[k]).toUtf8().constData());
             delete s;
-            return NULL;
+            return nullptr;
         }
         sigma_tmp[k] = cond;
         surfs.push_back(std::shared_ptr<MNESurface>(s));
     }
-    m = new FwdBemModel;
+    auto m = std::make_unique<FwdBemModel>();
 
     m->surf_name = name;
     m->nsurf     = nkind;
@@ -406,7 +404,7 @@ FwdBemModel *FwdBemModel::fwd_bem_load_surfaces(const QString &name, const std::
 
 //=============================================================================================================
 
-FwdBemModel *FwdBemModel::fwd_bem_load_homog_surface(const QString &name)
+std::unique_ptr<FwdBemModel> FwdBemModel::fwd_bem_load_homog_surface(const QString &name)
 /*
  * Load surfaces for the homogeneous model
  */
@@ -416,7 +414,7 @@ FwdBemModel *FwdBemModel::fwd_bem_load_homog_surface(const QString &name)
 
 //=============================================================================================================
 
-FwdBemModel *FwdBemModel::fwd_bem_load_three_layer_surfaces(const QString &name)
+std::unique_ptr<FwdBemModel> FwdBemModel::fwd_bem_load_three_layer_surfaces(const QString &name)
 /*
  * Load surfaces for three-layer model
  */
@@ -537,21 +535,13 @@ int FwdBemModel::fwd_bem_set_head_mri_t(const FiffCoordTrans &t)
 
 //=============================================================================================================
 
-MNESurface* FwdBemModel::make_guesses(MNESurface* guess_surf, float guessrad, float *guess_r0, float grid, float exclude, float mindist)		   /* Exclude points closer than this to
-                                                        * the guess boundary surface */
-/*
-     * Make a guess space inside a sphere
-     */
+std::unique_ptr<MNESurface> FwdBemModel::make_guesses(MNESurface* guess_surf, float guessrad, const Eigen::Vector3f& guess_r0, float grid, float exclude, float mindist)
 {
     QString bemname;
     MNESurface* sphere = NULL;
-    MNESurface* res    = NULL;
+    std::unique_ptr<MNESurface> res;
     int        k;
     float      dist;
-    float      r0[] = { 0.0, 0.0, 0.0 };
-
-    if (!guess_r0)
-        guess_r0 = r0;
 
     if (!guess_surf) {
         printf("Making a spherical guess space with radius %7.1f mm...\n",1000*guessrad);
@@ -588,7 +578,7 @@ MNESurface* FwdBemModel::make_guesses(MNESurface* guess_surf, float guessrad, fl
                mne_coord_frame_name_40(guess_surf->coord_frame).toUtf8().constData());
     }
     printf("Filtering (grid = %6.f mm)...\n",1000*grid);
-    res = (MNESurface*)MNESourceSpace::make_volume_source_space(*guess_surf,grid,exclude,mindist);
+    res.reset((MNESurface*)MNESourceSpace::make_volume_source_space(*guess_surf,grid,exclude,mindist));
 
 out : {
         if(sphere)
@@ -611,7 +601,7 @@ double FwdBemModel::calc_beta(const Eigen::Vector3d& rk, const Eigen::Vector3d& 
 
 //=============================================================================================================
 
-void FwdBemModel::lin_pot_coeff(float *from, MNETriangle* to, double omega[])	/* The final result */
+void FwdBemModel::lin_pot_coeff(const Eigen::Vector3f& from, MNETriangle& to, Eigen::Vector3d& omega)	/* The final result */
 /*
           * The linear potential matrix element computations
           */
@@ -643,9 +633,9 @@ void FwdBemModel::lin_pot_coeff(float *from, MNETriangle* to, double omega[])	/*
     /*
        * The standard solid angle computation
        */
-    vec_diff(from,to->r1,y1);
-    vec_diff(from,to->r2,y2);
-    vec_diff(from,to->r3,y3);
+    vec_diff(from,to.r1,y1);
+    vec_diff(from,to.r2,y2);
+    vec_diff(from,to.r3,y3);
 
     cross_product(y1,y2,cross);
     triple = vec_dot(cross,y3);
@@ -677,12 +667,12 @@ void FwdBemModel::lin_pot_coeff(float *from, MNETriangle* to, double omega[])	/*
         /*
          * Put it all together...
          */
-        area2 = 2.0*to->area;
+        area2 = 2.0*to.area;
         n2 = 1.0/(area2*area2);
         for (k = 0; k < 3; k++) {
             cross_product(yy[k+1],yy[k-1],z);
             vec_diff(yy[k+1],yy[k-1],diff);
-            omega[k] = n2*(-area2*vec_dot(z,to->nn)*solid +
+            omega[k] = n2*(-area2*vec_dot(z,to.nn)*solid +
                            triple*vec_dot(diff,vec_omega));
         }
     }
@@ -699,7 +689,7 @@ void FwdBemModel::lin_pot_coeff(float *from, MNETriangle* to, double omega[])	/*
     for (j = 0; j < 3; j++)
         check[j] = 0;
     for (k = 0; k < 3; k++) {
-        cross_product(to->nn[to],yy[k],z);
+        cross_product(to.nn,yy[k],z);
         for (j = 0; j < 3; j++)
             check[j] = check[j] + omega[k]*z[j];
     }
@@ -718,14 +708,14 @@ void FwdBemModel::lin_pot_coeff(float *from, MNETriangle* to, double omega[])	/*
 
 //=============================================================================================================
 
-void FwdBemModel::correct_auto_elements(MNESurface *surf, Eigen::MatrixXf& mat)
+void FwdBemModel::correct_auto_elements(MNESurface& surf, Eigen::MatrixXf& mat)
 /*
           * Improve auto-element approximation...
           */
 {
     float sum,miss;
-    int   nnode = surf->np;
-    int   ntri  = surf->ntri;
+    int   nnode = surf.np;
+    int   ntri  = surf.ntri;
     int   nmemb;
     int   j,k;
     float pi2 = 2.0*M_PI;
@@ -749,7 +739,7 @@ void FwdBemModel::correct_auto_elements(MNESurface *surf, Eigen::MatrixXf& mat)
         for (k = 0; k < nnode; k++)
             sum = sum + mat(j,k);
         miss  = pi2-sum;
-        nmemb = surf->nneighbor_tri[j];
+        nmemb = surf.nneighbor_tri[j];
         /*
          * The node itself receives one half
          */
@@ -758,7 +748,7 @@ void FwdBemModel::correct_auto_elements(MNESurface *surf, Eigen::MatrixXf& mat)
          * The rest is divided evenly among the member nodes...
          */
         miss = miss/(4.0*nmemb);
-        for (k = 0,tri = surf->tris.data(); k < ntri; k++,tri++) {
+        for (k = 0,tri = surf.tris.data(); k < ntri; k++,tri++) {
             if (tri->vert[0] == j) {
                 mat(j,tri->vert[1]) = mat(j,tri->vert[1]) + miss;
                 mat(j,tri->vert[2]) = mat(j,tri->vert[2]) + miss;
@@ -793,7 +783,7 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_lin_pot_coeff(const std::vector<MNESurface*
 {
     int   np1,np2,ntri,np_tot,np_max;
     MNETriangle*   tri;
-    double omega[3];
+    Eigen::Vector3d omega;
     int    j,k,p,q,c;
     int    joff,koff;
     MNESurface* surf1;
@@ -832,7 +822,7 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_lin_pot_coeff(const std::vector<MNESurface*
                     /*
                * Otherwise do the hard job
                */
-                    lin_pot_coeff (&surf1->rr(j,0),tri,omega);
+                    lin_pot_coeff(Eigen::Map<const Eigen::Vector3f>(&surf1->rr(j,0)),*tri,omega);
                     for (c = 0; c < 3; c++)
                         row[tri->vert[c]] = row[tri->vert[c]] - omega[c];
                 }
@@ -841,7 +831,7 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_lin_pot_coeff(const std::vector<MNESurface*
             }
             if (p == q) {
                 Eigen::MatrixXf sub_mat = mat.block(joff, koff, np1, np1);
-                correct_auto_elements(surf1, sub_mat);
+                correct_auto_elements(*surf1, sub_mat);
                 mat.block(joff, koff, np1, np1) = sub_mat;
             }
             printf("[done]\n");
@@ -878,7 +868,7 @@ int FwdBemModel::fwd_bem_linear_collocation_solution()
         nsol += surfs[k]->np;
 
     fprintf (stderr,"\tInverting the coefficient matrix...\n");
-    solution = fwd_bem_multi_solution(coeff, &gamma, nsurf, np.data());
+    solution = fwd_bem_multi_solution(coeff, &gamma, nsurf, np);
     if (solution.size() == 0)
         goto bad;
 
@@ -918,7 +908,7 @@ bad : {
 
 //=============================================================================================================
 
-Eigen::MatrixXf FwdBemModel::fwd_bem_multi_solution(Eigen::MatrixXf& solids, const Eigen::MatrixXf *gamma, int nsurf, const int *ntri)
+Eigen::MatrixXf FwdBemModel::fwd_bem_multi_solution(Eigen::MatrixXf& solids, const Eigen::MatrixXf *gamma, int nsurf, const Eigen::VectorXi& ntri)
 /*
           * Invert I - solids/(2*M_PI)
           * Take deflation into account
@@ -967,7 +957,7 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_homog_solution(Eigen::MatrixXf& solids, int
           * This is the homogeneous model case
           */
 {
-    return fwd_bem_multi_solution (solids,nullptr,1,&ntri);
+    return fwd_bem_multi_solution (solids,nullptr,1,Eigen::VectorXi::Constant(1,ntri));
 }
 
 //=============================================================================================================
@@ -1140,7 +1130,7 @@ int FwdBemModel::fwd_bem_constant_collocation_solution()
         nsol += surfs[k]->ntri;
 
     fprintf (stderr,"\tInverting the coefficient matrix...\n");
-    solution = fwd_bem_multi_solution(solids, &gamma, nsurf, ntri.data());
+    solution = fwd_bem_multi_solution(solids, &gamma, nsurf, ntri);
     if (solution.size() == 0)
         goto bad;
     /*
@@ -1266,29 +1256,29 @@ int FwdBemModel::fwd_bem_specify_els(FwdCoilSet *els)
     int         best;
     MNETriangle* tri;
     float       x,y,z;
-    FwdBemSolution* sol;
+    FwdBemSolution* sol = nullptr;
 
     if (solution.size() == 0) {
         printf("Solution not computed in fwd_bem_specify_els");
         goto bad;
     }
-    if (!els || els->ncoil == 0)
+    if (!els || els->ncoil() == 0)
         return OK;
     els->fwd_free_coil_set_user_data();
     /*
        * Hard work follows
        */
-    els->user_data = sol = new FwdBemSolution();
-    els->user_data_free = FwdBemSolution::fwd_bem_free_coil_solution;
+    els->user_data = std::make_unique<FwdBemSolution>();
+    sol = els->user_data.get();
 
-    sol->ncoil = els->ncoil;
+    sol->ncoil = els->ncoil();
     sol->np    = nsol;
     sol->solution  = Eigen::MatrixXf::Zero(sol->ncoil,sol->np);
     /*
        * Go through all coils
        */
-    for (k = 0; k < els->ncoil; k++) {
-        el = els->coils[k];
+    for (k = 0; k < els->ncoil(); k++) {
+        el = els->coils[k].get();
         scalp = surfs[0].get();
         /*
          * Go through all 'integration points'
@@ -1340,7 +1330,7 @@ bad : {
 
 //=============================================================================================================
 
-void FwdBemModel::fwd_bem_pot_grad_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet* els, int all_surfs, float *xgrad, float *ygrad, float *zgrad)
+void FwdBemModel::fwd_bem_pot_grad_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet* els, int all_surfs, Eigen::VectorXf& xgrad, Eigen::VectorXf& ygrad, Eigen::VectorXf& zgrad)
 /*
  * Compute the potentials due to a current dipole
  */
@@ -1353,12 +1343,7 @@ void FwdBemModel::fwd_bem_pot_grad_calc(const Eigen::Vector3f& rd, const Eigen::
     Eigen::Vector3f mri_rd = rd;
     Eigen::Vector3f mri_Q = Q;
 
-    float  *grads[3];
-    float  *grad;
-
-    grads[X] = xgrad;
-    grads[Y] = ygrad;
-    grads[Z] = zgrad;
+    Eigen::VectorXf* grads[] = {&xgrad, &ygrad, &zgrad};
 
     if (v0.size() == 0)
         v0.resize(this->nsol);
@@ -1369,7 +1354,7 @@ void FwdBemModel::fwd_bem_pot_grad_calc(const Eigen::Vector3f& rd, const Eigen::
         FiffCoordTrans::apply_trans(mri_Q.data(),head_mri_t,FIFFV_NO_MOVE);
     }
     for (pp = X; pp <= Z; pp++) {
-        grad = grads[pp];
+        Eigen::VectorXf& grad = *grads[pp];
 
         ee = Eigen::Vector3f::Unit(pp);
         if (!head_mri_t.isEmpty())
@@ -1383,7 +1368,7 @@ void FwdBemModel::fwd_bem_pot_grad_calc(const Eigen::Vector3f& rd, const Eigen::
                 v0p[p++] = mult*fwd_bem_inf_pot_der(mri_rd,mri_Q,tri->cent,ee);
         }
         if (els) {
-            FwdBemSolution* sol = (FwdBemSolution*)els->user_data;
+            FwdBemSolution* sol = els->user_data.get();
             nsol = sol->ncoil;
             for (k = 0; k < nsol; k++)
                 grad[k] = sol->solution.row(k).dot(v0);
@@ -1399,7 +1384,7 @@ void FwdBemModel::fwd_bem_pot_grad_calc(const Eigen::Vector3f& rd, const Eigen::
 
 //=============================================================================================================
 
-void FwdBemModel::fwd_bem_lin_pot_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet *els, int all_surfs, float *pot)              /* Put the result here */
+void FwdBemModel::fwd_bem_lin_pot_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet *els, int all_surfs, Eigen::VectorXf& pot)
 /*
  * Compute the potentials due to a current dipole
  * using the linear potential approximation
@@ -1427,7 +1412,7 @@ void FwdBemModel::fwd_bem_lin_pot_calc(const Eigen::Vector3f& rd, const Eigen::V
             v0p[p++] = mult*fwd_bem_inf_pot(mri_rd,mri_Q,Eigen::Map<const Eigen::Vector3f>(&surfs[s]->rr(k,0)));
     }
     if (els) {
-        FwdBemSolution* sol = (FwdBemSolution*)els->user_data;
+        FwdBemSolution* sol = els->user_data.get();
         nsol = sol->ncoil;
         for (k = 0; k < nsol; k++)
             pot[k] = sol->solution.row(k).dot(v0);
@@ -1442,7 +1427,7 @@ void FwdBemModel::fwd_bem_lin_pot_calc(const Eigen::Vector3f& rd, const Eigen::V
 
 //=============================================================================================================
 
-void FwdBemModel::fwd_bem_lin_pot_grad_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet *els, int all_surfs, float *xgrad, float *ygrad, float *zgrad)
+void FwdBemModel::fwd_bem_lin_pot_grad_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet *els, int all_surfs, Eigen::VectorXf& xgrad, Eigen::VectorXf& ygrad, Eigen::VectorXf& zgrad)
 /*
  * Compute the derivaties of potentials due to a current dipole with respect to the dipole position
  * using the linear potential approximation
@@ -1455,12 +1440,7 @@ void FwdBemModel::fwd_bem_lin_pot_grad_calc(const Eigen::Vector3f& rd, const Eig
     Eigen::Vector3f mri_Q = Q;
     Eigen::Vector3f ee;
 
-    float  *grads[3];
-    float  *grad;
-
-    grads[X] = xgrad;
-    grads[Y] = ygrad;
-    grads[Z] = zgrad;
+    Eigen::VectorXf* grads[] = {&xgrad, &ygrad, &zgrad};
 
     if (v0.size() == 0)
         v0.resize(this->nsol);
@@ -1471,7 +1451,7 @@ void FwdBemModel::fwd_bem_lin_pot_grad_calc(const Eigen::Vector3f& rd, const Eig
         FiffCoordTrans::apply_trans(mri_Q.data(),head_mri_t,FIFFV_NO_MOVE);
     }
     for (pp = X; pp <= Z; pp++) {
-        grad = grads[pp];
+        Eigen::VectorXf& grad = *grads[pp];
 
         ee = Eigen::Vector3f::Unit(pp);
         if (!head_mri_t.isEmpty())
@@ -1484,7 +1464,7 @@ void FwdBemModel::fwd_bem_lin_pot_grad_calc(const Eigen::Vector3f& rd, const Eig
                 v0p[p++] = mult*fwd_bem_inf_pot_der(mri_rd,mri_Q,Eigen::Map<const Eigen::Vector3f>(&surfs[s]->rr(k,X)),ee);
         }
         if (els) {
-            FwdBemSolution* sol = (FwdBemSolution*)els->user_data;
+            FwdBemSolution* sol = els->user_data.get();
             nsol = sol->ncoil;
             for (k = 0; k < nsol; k++)
                 grad[k] = sol->solution.row(k).dot(v0);
@@ -1500,7 +1480,7 @@ void FwdBemModel::fwd_bem_lin_pot_grad_calc(const Eigen::Vector3f& rd, const Eig
 
 //=============================================================================================================
 
-void FwdBemModel::fwd_bem_pot_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet *els, int all_surfs, float *pot)
+void FwdBemModel::fwd_bem_pot_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet *els, int all_surfs, Eigen::VectorXf& pot)
 /*
           * Compute the potentials due to a current dipole
           */
@@ -1528,7 +1508,7 @@ void FwdBemModel::fwd_bem_pot_calc(const Eigen::Vector3f& rd, const Eigen::Vecto
             v0p[p++] = mult*fwd_bem_inf_pot(mri_rd,mri_Q,tri->cent);
     }
     if (els) {
-        FwdBemSolution* sol = (FwdBemSolution*)els->user_data;
+        FwdBemSolution* sol = els->user_data.get();
         nsol = sol->ncoil;
         for (k = 0; k < nsol; k++)
             pot[k] = sol->solution.row(k).dot(v0);
@@ -1549,7 +1529,7 @@ int FwdBemModel::fwd_bem_pot_els(const Eigen::Vector3f& rd, const Eigen::Vector3
      */
 {
     FwdBemModel*    m = (FwdBemModel*)client;
-    FwdBemSolution* sol = (FwdBemSolution*)els->user_data;
+    FwdBemSolution* sol = els->user_data.get();
 
     if (!m) {
         printf("No BEM model specified to fwd_bem_pot_els");
@@ -1559,14 +1539,20 @@ int FwdBemModel::fwd_bem_pot_els(const Eigen::Vector3f& rd, const Eigen::Vector3
         printf("No solution available for fwd_bem_pot_els");
         return FAIL;
     }
-    if (!sol || sol->ncoil != els->ncoil) {
+    if (!sol || sol->ncoil != els->ncoil()) {
         printf("No appropriate electrode-specific data available in fwd_bem_pot_coils");
         return FAIL;
     }
-    if (m->bem_method == FWD_BEM_CONSTANT_COLL)
-        m->fwd_bem_pot_calc(rd,Q,els,FALSE,pot);
-    else if (m->bem_method == FWD_BEM_LINEAR_COLL)
-        m->fwd_bem_lin_pot_calc(rd,Q,els,FALSE,pot);
+    if (m->bem_method == FWD_BEM_CONSTANT_COLL) {
+        Eigen::VectorXf potVec(els->ncoil());
+        m->fwd_bem_pot_calc(rd,Q,els,FALSE,potVec);
+        Eigen::Map<Eigen::VectorXf>(pot, els->ncoil()) = potVec;
+    }
+    else if (m->bem_method == FWD_BEM_LINEAR_COLL) {
+        Eigen::VectorXf potVec(els->ncoil());
+        m->fwd_bem_lin_pot_calc(rd,Q,els,FALSE,potVec);
+        Eigen::Map<Eigen::VectorXf>(pot, els->ncoil()) = potVec;
+    }
     else {
         printf("Unknown BEM method : %d",m->bem_method);
         return FAIL;
@@ -1582,7 +1568,7 @@ int FwdBemModel::fwd_bem_pot_grad_els(const Eigen::Vector3f& rd, const Eigen::Ve
      */
 {
     FwdBemModel*    m = (FwdBemModel*)client;
-    FwdBemSolution* sol = (FwdBemSolution*)els->user_data;
+    FwdBemSolution* sol = els->user_data.get();
 
     if (!m) {
         qCritical("No BEM model specified to fwd_bem_pot_els");
@@ -1592,19 +1578,35 @@ int FwdBemModel::fwd_bem_pot_grad_els(const Eigen::Vector3f& rd, const Eigen::Ve
         qCritical("No solution available for fwd_bem_pot_els");
         return FAIL;
     }
-    if (!sol || sol->ncoil != els->ncoil) {
+    if (!sol || sol->ncoil != els->ncoil()) {
         qCritical("No appropriate electrode-specific data available in fwd_bem_pot_coils");
         return FAIL;
     }
     if (m->bem_method == FWD_BEM_CONSTANT_COLL) {
-        if (pot)
-            m->fwd_bem_pot_calc(rd,Q,els,FALSE,pot);
-        m->fwd_bem_pot_grad_calc(rd,Q,els,FALSE,xgrad,ygrad,zgrad);
+        int n = els->ncoil();
+        if (pot) {
+            Eigen::VectorXf potVec(n);
+            m->fwd_bem_pot_calc(rd,Q,els,FALSE,potVec);
+            Eigen::Map<Eigen::VectorXf>(pot, n) = potVec;
+        }
+        Eigen::VectorXf xg(n), yg(n), zg(n);
+        m->fwd_bem_pot_grad_calc(rd,Q,els,FALSE,xg,yg,zg);
+        Eigen::Map<Eigen::VectorXf>(xgrad, n) = xg;
+        Eigen::Map<Eigen::VectorXf>(ygrad, n) = yg;
+        Eigen::Map<Eigen::VectorXf>(zgrad, n) = zg;
     }
     else if (m->bem_method == FWD_BEM_LINEAR_COLL) {
-        if (pot)
-            m->fwd_bem_lin_pot_calc(rd,Q,els,FALSE,pot);
-        m->fwd_bem_lin_pot_grad_calc(rd,Q,els,FALSE,xgrad,ygrad,zgrad);
+        int n = els->ncoil();
+        if (pot) {
+            Eigen::VectorXf potVec(n);
+            m->fwd_bem_lin_pot_calc(rd,Q,els,FALSE,potVec);
+            Eigen::Map<Eigen::VectorXf>(pot, n) = potVec;
+        }
+        Eigen::VectorXf xg(n), yg(n), zg(n);
+        m->fwd_bem_lin_pot_grad_calc(rd,Q,els,FALSE,xg,yg,zg);
+        Eigen::Map<Eigen::VectorXf>(xgrad, n) = xg;
+        Eigen::Map<Eigen::VectorXf>(ygrad, n) = yg;
+        Eigen::Map<Eigen::VectorXf>(zgrad, n) = zg;
     }
     else {
         qCritical("Unknown BEM method : %d",m->bem_method);
@@ -1617,11 +1619,10 @@ int FwdBemModel::fwd_bem_pot_grad_els(const Eigen::Vector3f& rd, const Eigen::Ve
 
 #define ARSINH(x) log((x) + sqrt(1.0+(x)*(x)))
 
-void FwdBemModel::calc_f(double *xx, double *yy, double *f0, double *fx, double *fy)	        /* The weights in the linear approximation */
+void FwdBemModel::calc_f(const Eigen::Vector3d& xx, const Eigen::Vector3d& yy, Eigen::Vector3d& f0, Eigen::Vector3d& fx, Eigen::Vector3d& fy)
 {
     double det = -xx[1]*yy[0] + xx[2]*yy[0] +
             xx[0]*yy[1] - xx[2]*yy[1] - xx[0]*yy[2] + xx[1]*yy[2];
-    int k;
 
     f0[0] = -xx[2]*yy[1] + xx[1]*yy[2];
     f0[1] = xx[2]*yy[0] - xx[0]*yy[2];
@@ -1635,36 +1636,32 @@ void FwdBemModel::calc_f(double *xx, double *yy, double *f0, double *fx, double 
     fy[1] = xx[0] - xx[2];
     fy[2] = -xx[0] + xx[1];
 
-    for (k = 0; k < 3; k++) {
-        f0[k] = f0[k]/det;
-        fx[k] = fx[k]/det;
-        fy[k] = fy[k]/det;
-    }
+    f0 /= det;
+    fx /= det;
+    fy /= det;
 }
 
 //=============================================================================================================
 
-void FwdBemModel::calc_magic(double u, double z, double A, double B, double *beta, double *D)
-/*
- * Calculate Urankar's magic numbers
- */
+void FwdBemModel::calc_magic(double u, double z, double A, double B, Eigen::Vector3d& beta, double& D)
 {
     double B2 = 1.0 + B*B;
     double ABu = A + B*u;
-     *D = sqrt(u*u + z*z + ABu*ABu);
+    D = sqrt(u*u + z*z + ABu*ABu);
     beta[0] = ABu/sqrt(u*u + z*z);
     beta[1] = (A*B + B2*u)/sqrt(A*A + B2*z*z);
-    beta[2] = (B*z*z - A*u)/(z*(*D));
+    beta[2] = (B*z*z - A*u)/(z*D);
 }
 
 //=============================================================================================================
 
-void FwdBemModel::field_integrals(float *from, MNETriangle* to, double *I1p, double *T, double *S1, double *S2, double *f0, double *fx, double *fy)
+void FwdBemModel::field_integrals(const Eigen::Vector3f& from, MNETriangle& to, double& I1p, Eigen::Vector2d& T, Eigen::Vector2d& S1, Eigen::Vector2d& S2, Eigen::Vector3d& f0, Eigen::Vector3d& fx, Eigen::Vector3d& fy)
 {
     double y1[3],y2[3],y3[3];
     double xx[4],yy[4];
     double A,B,z,dx;
-    double beta[3],I1,Tx,Ty,Txx,Tyy,Sxx,mult;
+    Eigen::Vector3d beta;
+    double I1,Tx,Ty,Txx,Tyy,Sxx,mult;
     double S1x,S1y,S2x,S2y;
     double D1,B2;
     int k;
@@ -1674,27 +1671,27 @@ void FwdBemModel::field_integrals(float *from, MNETriangle* to, double *I1p, dou
        * 1. Move origin to viewpoint...
        *
        */
-    vec_diff(from,to->r1,y1);
-    vec_diff(from,to->r2,y2);
-    vec_diff(from,to->r3,y3);
+    vec_diff(from,to.r1,y1);
+    vec_diff(from,to.r2,y2);
+    vec_diff(from,to.r3,y3);
     /*
        * 2. Calculate local xy coordinates...
        */
-    xx[0] = vec_dot(y1,to->ex);
-    xx[1] = vec_dot(y2,to->ex);
-    xx[2] = vec_dot(y3,to->ex);
+    xx[0] = vec_dot(y1,to.ex);
+    xx[1] = vec_dot(y2,to.ex);
+    xx[2] = vec_dot(y3,to.ex);
     xx[3] = xx[0];
 
-    yy[0] = vec_dot(y1,to->ey);
-    yy[1] = vec_dot(y2,to->ey);
-    yy[2] = vec_dot(y3,to->ey);
+    yy[0] = vec_dot(y1,to.ey);
+    yy[1] = vec_dot(y2,to.ey);
+    yy[2] = vec_dot(y3,to.ey);
     yy[3] = yy[0];
 
-    calc_f (xx,yy,f0,fx,fy);
+    calc_f(Eigen::Map<const Eigen::Vector3d>(xx), Eigen::Map<const Eigen::Vector3d>(yy), f0, fx, fy);
     /*
        * 3. Distance of the plane from origin...
        */
-    z = vec_dot(y1,to->nn);
+    z = vec_dot(y1,to.nn);
     /*
        * Put together the line integral...
        * We use the convention where the local y-axis
@@ -1717,7 +1714,7 @@ void FwdBemModel::field_integrals(float *from, MNETriangle* to, double *I1p, dou
         /*
          * Upper limit
          */
-        calc_magic (xx[k+1],z,A,B,beta,&D1);
+        calc_magic(xx[k+1],z,A,B,beta,D1);
         I1 = I1 - xx[k+1]*ARSINH(beta[0]) - (A/sqrt(1.0+B*B))*ARSINH(beta[1])
                 - z*atan(beta[2]);
         Txx = ARSINH(beta[1])/sqrt(B2);
@@ -1731,7 +1728,7 @@ void FwdBemModel::field_integrals(float *from, MNETriangle* to, double *I1p, dou
         /*
          * Lower limit
          */
-        calc_magic (xx[k],z,A,B,beta,&D1);
+        calc_magic(xx[k],z,A,B,beta,D1);
         I1 = I1 + xx[k]*ARSINH(beta[0]) + (A/sqrt(1.0+B*B))*ARSINH(beta[1])
                 + z*atan(beta[2]);
         Txx = ARSINH(beta[1])/sqrt(B2);
@@ -1762,23 +1759,18 @@ void FwdBemModel::field_integrals(float *from, MNETriangle* to, double *I1p, dou
     /*
        * Set return values
        */
-     *I1p = I1;
+    I1p = I1;
     T[0] = Tx;
     T[1] = Ty;
     S1[0] = S1x;
     S1[1] = S1y;
     S2[0] = S2x;
     S2[1] = -S1x;
-    return;
 }
 
 //=============================================================================================================
 
-double FwdBemModel::one_field_coeff(float *dest, float *normal, MNETriangle* tri)
-/*
- * Compute the integral over one triangle.
- * This looks magical but it is not.
- */
+double FwdBemModel::one_field_coeff(const Eigen::Vector3f& dest, const Eigen::Vector3f& normal, MNETriangle& tri)
 {
     double *yy[4];
     double y1[3],y2[3],y3[3];
@@ -1791,9 +1783,9 @@ double FwdBemModel::one_field_coeff(float *dest, float *normal, MNETriangle* tri
     yy[1] = y2;
     yy[2] = y3;
     yy[3] = y1;
-    vec_diff(dest,tri->r1,y1);
-    vec_diff(dest,tri->r2,y2);
-    vec_diff(dest,tri->r3,y3);
+    vec_diff(dest,tri.r1,y1);
+    vec_diff(dest,tri.r2,y2);
+    vec_diff(dest,tri.r3,y3);
     for (j = 0; j < 3; j++)
         beta[j] = calc_beta(Eigen::Map<const Eigen::Vector3d>(yy[j]),Eigen::Map<const Eigen::Vector3d>(yy[j+1]));
     bbeta[0] = beta[2] - beta[0];
@@ -1857,7 +1849,7 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_field_coeff(FwdCoilSet *coils)	/* Gradiomet
         }
     }
     ntri  = nsol;
-    Eigen::MatrixXf coeff = Eigen::MatrixXf::Zero(coils->ncoil, ntri);
+    Eigen::MatrixXf coeff = Eigen::MatrixXf::Zero(coils->ncoil(), ntri);
 
     for (s = 0, off = 0; s < nsurf; s++) {
         surf = surfs[s].get();
@@ -1866,11 +1858,11 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_field_coeff(FwdCoilSet *coils)	/* Gradiomet
         mult = field_mult[s];
 
         for (k = 0; k < ntri; k++,tri++) {
-            for (j = 0; j < coils->ncoil; j++) {
-                coil = coils->coils[j];
+            for (j = 0; j < coils->ncoil(); j++) {
+                coil = coils->coils[j].get();
                 res = 0.0;
                 for (p = 0; p < coil->np; p++)
-                    res = res + coil->w[p]*one_field_coeff(&coil->rmag(p, 0),&coil->cosmag(p, 0),tri);
+                    res = res + coil->w[p]*one_field_coeff(Eigen::Map<const Eigen::Vector3f>(&coil->rmag(p, 0)),Eigen::Map<const Eigen::Vector3f>(&coil->cosmag(p, 0)),*tri);
                 coeff(j,k+off) = mult*res;
             }
         }
@@ -1893,7 +1885,7 @@ double FwdBemModel::calc_gamma(const Eigen::Vector3d& rk, const Eigen::Vector3d&
 
 //=============================================================================================================
 
-void FwdBemModel::fwd_bem_one_lin_field_coeff_ferg(float *dest, float *dir, MNETriangle* tri, double *res)	/* The results */
+void FwdBemModel::fwd_bem_one_lin_field_coeff_ferg(const Eigen::Vector3f& dest, const Eigen::Vector3f& dir, MNETriangle& tri, Eigen::Vector3d& res)
 {
     double c[3];			/* Component of dest vector normal to
                                      * the triangle plane */
@@ -1911,29 +1903,29 @@ void FwdBemModel::fwd_bem_one_lin_field_coeff_ferg(float *dest, float *dir, MNET
     yy[2] = y3;   cc[2] = c3;
     yy[3] = y1;   cc[3] = c1;
 
-    vec_diff(tri->r2,tri->r3,rjk[0]);
-    vec_diff(tri->r3,tri->r1,rjk[1]);
-    vec_diff(tri->r1,tri->r2,rjk[2]);
+    vec_diff(tri.r2,tri.r3,rjk[0]);
+    vec_diff(tri.r3,tri.r1,rjk[1]);
+    vec_diff(tri.r1,tri.r2,rjk[2]);
 
     for (k = 0; k < 3; k++) {
-        y1[k] = tri->r1[k] - dest[k];
-        y2[k] = tri->r2[k] - dest[k];
-        y3[k] = tri->r3[k] - dest[k];
+        y1[k] = tri.r1[k] - dest[k];
+        y2[k] = tri.r2[k] - dest[k];
+        y3[k] = tri.r3[k] - dest[k];
     }
-    clen  = vec_dot(y1,tri->nn);
+    clen  = vec_dot(y1,tri.nn);
     for (k = 0; k < 3; k++) {
-        c[k]  = clen*tri->nn[k];
+        c[k]  = clen*tri.nn[k];
         A[k]  = dest[k] + c[k];
-        c1[k] = tri->r1[k] - A[k];
-        c2[k] = tri->r2[k] - A[k];
-        c3[k] = tri->r3[k] - A[k];
+        c1[k] = tri.r1[k] - A[k];
+        c2[k] = tri.r2[k] - A[k];
+        c3[k] = tri.r3[k] - A[k];
     }
     /*
        * beta and gamma...
        */
     for (sum = 0.0, k = 0; k < 3; k++) {
         cross_product(cc[k],cc[k+1],cross);
-        beta  = vec_dot(cross,tri->nn);
+        beta  = vec_dot(cross,tri.nn);
         gamma = calc_gamma (Eigen::Map<const Eigen::Vector3d>(yy[k]),Eigen::Map<const Eigen::Vector3d>(yy[k+1]));
         sum = sum + beta*gamma;
     }
@@ -1954,7 +1946,7 @@ void FwdBemModel::fwd_bem_one_lin_field_coeff_ferg(float *dest, float *dir, MNET
     /*
        * Now we are ready to assemble it all together
        */
-    common = (sum-clen*solid)/(2.0*tri->area);
+    common = (sum-clen*solid)/(2.0*tri.area);
     for (k = 0; k < 3; k++)
         res[k] = -vec_dot(rjk[k],dir)*common;
     return;
@@ -1962,42 +1954,35 @@ void FwdBemModel::fwd_bem_one_lin_field_coeff_ferg(float *dest, float *dir, MNET
 
 //=============================================================================================================
 
-void FwdBemModel::fwd_bem_one_lin_field_coeff_uran(float *dest, float *dir, MNETriangle* tri, double *res)	/* The results */
+void FwdBemModel::fwd_bem_one_lin_field_coeff_uran(const Eigen::Vector3f& dest, const Eigen::Vector3f& dir_in, MNETriangle& tri, Eigen::Vector3d& res)
 {
-    double      I1,T[2],S1[2],S2[2];
-    double      f0[3],fx[3],fy[3];
+    double      I1;
+    Eigen::Vector2d T, S1, S2;
+    Eigen::Vector3d f0, fx, fy;
     double      res_x,res_y;
     double      x_fac,y_fac;
     int         k;
-    double      len;
     /*
        * Compute the component integrals
        */
-    field_integrals (dest,tri,&I1,T,S1,S2,f0,fx,fy);
+    field_integrals(dest,tri,I1,T,S1,S2,f0,fx,fy);
     /*
        * Compute the coefficient for each node...
        */
-    len = vec_len(dir);
-    dir[X] = dir[X]/len;
-    dir[Y] = dir[Y]/len;
-    dir[Z] = dir[Z]/len;
+    Eigen::Vector3f dir = dir_in.normalized();
 
-    x_fac = -vec_dot(dir,tri->ex);
-    y_fac = -vec_dot(dir,tri->ey);
+    x_fac = -vec_dot(dir,tri.ex);
+    y_fac = -vec_dot(dir,tri.ey);
     for (k = 0; k < 3; k++) {
         res_x = f0[k]*T[0] + fx[k]*S1[0] + fy[k]*S2[0] + fy[k]*I1;
         res_y = f0[k]*T[1] + fx[k]*S1[1] + fy[k]*S2[1] - fx[k]*I1;
         res[k] = x_fac*res_x + y_fac*res_y;
     }
-    return;
 }
 
 //=============================================================================================================
 
-void FwdBemModel::fwd_bem_one_lin_field_coeff_simple(float *dest, float *normal, MNETriangle* source, double *res)     /* The result for each triangle node */
-/*
-          * Simple version...
-          */
+void FwdBemModel::fwd_bem_one_lin_field_coeff_simple(const Eigen::Vector3f& dest, const Eigen::Vector3f& normal, MNETriangle& source, Eigen::Vector3d& res)
 {
     float diff[3];
     float vec_result[3];
@@ -2005,15 +1990,15 @@ void FwdBemModel::fwd_bem_one_lin_field_coeff_simple(float *dest, float *normal,
     int   k;
     const Eigen::Vector3f* rr[3];
 
-    rr[0] = &source->r1;
-    rr[1] = &source->r2;
-    rr[2] = &source->r3;
+    rr[0] = &source.r1;
+    rr[1] = &source.r2;
+    rr[2] = &source.r3;
 
     for (k = 0; k < 3; k++) {
         vec_diff(*rr[k],dest,diff);
         dl = vec_dot(diff,diff);
-        cross_product(diff,source->nn,vec_result);
-        res[k] = source->area*vec_dot(vec_result,normal)/(3.0*dl*sqrt(dl));
+        cross_product(diff,source.nn,vec_result);
+        res[k] = source.area*vec_dot(vec_result,normal)/(3.0*dl*sqrt(dl));
     }
     return;
 }
@@ -2032,7 +2017,7 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_lin_field_coeff(FwdCoilSet *coils, int meth
     FwdCoilSet*  tcoils = NULL;
     int         ntri;
     int         j,k,p,pp,off,s;
-    double      res[3],one[3];
+    Eigen::Vector3d res, one;
     float       mult;
     linFieldIntFunc func;
 
@@ -2075,7 +2060,7 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_lin_field_coeff(FwdCoilSet *coils, int meth
     else
         func = fwd_bem_one_lin_field_coeff_simple;
 
-    Eigen::MatrixXf coeff = Eigen::MatrixXf::Zero(coils->ncoil, nsol);
+    Eigen::MatrixXf coeff = Eigen::MatrixXf::Zero(coils->ncoil(), nsol);
     /*
        * Process each of the surfaces
        */
@@ -2086,17 +2071,15 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_lin_field_coeff(FwdCoilSet *coils, int meth
         mult = field_mult[s];
 
         for (k = 0; k < ntri; k++,tri++) {
-            for (j = 0; j < coils->ncoil; j++) {
-                coil = coils->coils[j];
-                for (pp = 0; pp < 3; pp++)
-                    res[pp] = 0;
+            for (j = 0; j < coils->ncoil(); j++) {
+                coil = coils->coils[j].get();
+                res.setZero();
                 /*
              * Accumulate the coefficients for each triangle node...
              */
                 for (p = 0; p < coil->np; p++) {
-                    func(&coil->rmag(p, 0),&coil->cosmag(p, 0),tri,one);
-                    for (pp = 0; pp < 3; pp++)
-                        res[pp] = res[pp] + coil->w[p]*one[pp];
+                    func(Eigen::Map<const Eigen::Vector3f>(&coil->rmag(p, 0)),Eigen::Map<const Eigen::Vector3f>(&coil->cosmag(p, 0)),*tri,one);
+                    res += coil->w[p] * one;
                 }
                 /*
              * Add these to the corresponding coefficient matrix
@@ -2123,7 +2106,7 @@ int FwdBemModel::fwd_bem_specify_coils(FwdCoilSet *coils)
       */
 {
     Eigen::MatrixXf sol;
-    FwdBemSolution* csol;
+    FwdBemSolution* csol = nullptr;
 
     if (solution.size() == 0) {
         printf("Solution not computed in fwd_bem_specify_coils");
@@ -2131,7 +2114,7 @@ int FwdBemModel::fwd_bem_specify_coils(FwdCoilSet *coils)
     }
     if(coils)
         coils->fwd_free_coil_set_user_data();
-    if (!coils || coils->ncoil == 0)
+    if (!coils || coils->ncoil() == 0)
         return OK;
     if (bem_method == FWD_BEM_CONSTANT_COLL)
         sol = fwd_bem_field_coeff(coils);
@@ -2143,10 +2126,10 @@ int FwdBemModel::fwd_bem_specify_coils(FwdCoilSet *coils)
     }
     if (sol.size() == 0)
         goto bad;
-    coils->user_data = csol = new FwdBemSolution();
-    coils->user_data_free   = FwdBemSolution::fwd_bem_free_coil_solution;
+    coils->user_data = std::make_unique<FwdBemSolution>();
+    csol = coils->user_data.get();
 
-    csol->ncoil     = coils->ncoil;
+    csol->ncoil     = coils->ncoil();
     csol->np        = nsol;
     csol->solution  = sol * solution;
 
@@ -2159,7 +2142,7 @@ bad : {
 
 //=============================================================================================================
 
-void FwdBemModel::fwd_bem_lin_field_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet *coils, float *B)
+void FwdBemModel::fwd_bem_lin_field_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet& coils, Eigen::VectorXf& B)
 /*
      * Calculate the magnetic field in a set of coils
      */
@@ -2169,7 +2152,7 @@ void FwdBemModel::fwd_bem_lin_field_calc(const Eigen::Vector3f& rd, const Eigen:
     float  mult;
     Eigen::Vector3f my_rd = rd;
     Eigen::Vector3f my_Q = Q;
-    FwdBemSolution* sol = (FwdBemSolution*)coils->user_data;
+    FwdBemSolution* sol = coils.user_data.get();
     /*
        * Infinite-medium potentials
        */
@@ -2196,8 +2179,8 @@ void FwdBemModel::fwd_bem_lin_field_calc(const Eigen::Vector3f& rd, const Eigen:
        * Primary current contribution
        * (can be calculated in the coil/dipole coordinates)
        */
-    for (k = 0; k < coils->ncoil; k++) {
-        coil = coils->coils[k];
+    for (k = 0; k < coils.ncoil(); k++) {
+        coil = coils.coils[k].get();
         B[k] = 0.0;
         for (p = 0; p < coil->np; p++)
             B[k] = B[k] + coil->w[p]*fwd_bem_inf_field(
@@ -2209,19 +2192,19 @@ void FwdBemModel::fwd_bem_lin_field_calc(const Eigen::Vector3f& rd, const Eigen:
     /*
        * Volume current contribution
        */
-    for (k = 0; k < coils->ncoil; k++)
+    for (k = 0; k < coils.ncoil(); k++)
         B[k] = B[k] + sol->solution.row(k).dot(v0);
     /*
        * Scale correctly
        */
-    for (k = 0; k < coils->ncoil; k++)
+    for (k = 0; k < coils.ncoil(); k++)
         B[k] = MAG_FACTOR*B[k];
     return;
 }
 
 //=============================================================================================================
 
-void FwdBemModel::fwd_bem_field_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet *coils, float *B)
+void FwdBemModel::fwd_bem_field_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet& coils, Eigen::VectorXf& B)
 /*
      * Calculate the magnetic field in a set of coils
      */
@@ -2232,7 +2215,7 @@ void FwdBemModel::fwd_bem_field_calc(const Eigen::Vector3f& rd, const Eigen::Vec
     float   mult;
     Eigen::Vector3f my_rd = rd;
     Eigen::Vector3f my_Q = Q;
-    FwdBemSolution* sol = (FwdBemSolution*)coils->user_data;
+    FwdBemSolution* sol = coils.user_data.get();
     /*
        * Infinite-medium potentials
        */
@@ -2260,8 +2243,8 @@ void FwdBemModel::fwd_bem_field_calc(const Eigen::Vector3f& rd, const Eigen::Vec
        * Primary current contribution
        * (can be calculated in the coil/dipole coordinates)
        */
-    for (k = 0; k < coils->ncoil; k++) {
-        coil = coils->coils[k];
+    for (k = 0; k < coils.ncoil(); k++) {
+        coil = coils.coils[k].get();
         B[k] = 0.0;
         for (p = 0; p < coil->np; p++)
             B[k] = B[k] + coil->w[p]*fwd_bem_inf_field(
@@ -2273,37 +2256,32 @@ void FwdBemModel::fwd_bem_field_calc(const Eigen::Vector3f& rd, const Eigen::Vec
     /*
        * Volume current contribution
        */
-    for (k = 0; k < coils->ncoil; k++)
+    for (k = 0; k < coils.ncoil(); k++)
         B[k] = B[k] + sol->solution.row(k).dot(v0);
     /*
        * Scale correctly
        */
-    for (k = 0; k < coils->ncoil; k++)
+    for (k = 0; k < coils.ncoil(); k++)
         B[k] = MAG_FACTOR*B[k];
     return;
 }
 
 //=============================================================================================================
 
-void FwdBemModel::fwd_bem_field_grad_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet* coils, float *xgrad, float *ygrad, float *zgrad)
+void FwdBemModel::fwd_bem_field_grad_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet& coils, Eigen::VectorXf& xgrad, Eigen::VectorXf& ygrad, Eigen::VectorXf& zgrad)
 /*
  * Calculate the magnetic field in a set of coils
  */
 {
-    FwdBemSolution* sol = (FwdBemSolution*)coils->user_data;
+    FwdBemSolution* sol = coils.user_data.get();
     int            s,k,p,ntri,pp;
     FwdCoil*       coil;
     MNETriangle*   tri;
     float          mult;
-    float          *grads[3];
+    Eigen::VectorXf* grads[] = {&xgrad, &ygrad, &zgrad};
     Eigen::Vector3f ee, mri_ee;
     Eigen::Vector3f mri_rd = rd;
     Eigen::Vector3f mri_Q = Q;
-    float          *grad;
-
-    grads[X] = xgrad;
-    grads[Y] = ygrad;
-    grads[Z] = zgrad;
     /*
        * Infinite-medium potentials
        */
@@ -2318,7 +2296,7 @@ void FwdBemModel::fwd_bem_field_grad_calc(const Eigen::Vector3f& rd, const Eigen
         FiffCoordTrans::apply_trans(mri_Q.data(),head_mri_t,FIFFV_NO_MOVE);
     }
     for (pp = X; pp <= Z; pp++) {
-        grad = grads[pp];
+        Eigen::VectorXf& grad = *grads[pp];
         /*
          * Select the correct gradient component
          */
@@ -2341,8 +2319,8 @@ void FwdBemModel::fwd_bem_field_grad_calc(const Eigen::Vector3f& rd, const Eigen
          * Primary current contribution
          * (can be calculated in the coil/dipole coordinates)
          */
-        for (k = 0; k < coils->ncoil; k++) {
-            coil = coils->coils[k];
+        for (k = 0; k < coils.ncoil(); k++) {
+            coil = coils.coils[k].get();
             grad[k] = 0.0;
             for (p = 0; p < coil->np; p++)
                 grad[k] = grad[k] + coil->w[p]*fwd_bem_inf_field_der(
@@ -2355,12 +2333,12 @@ void FwdBemModel::fwd_bem_field_grad_calc(const Eigen::Vector3f& rd, const Eigen
         /*
          * Volume current contribution
          */
-        for (k = 0; k < coils->ncoil; k++)
+        for (k = 0; k < coils.ncoil(); k++)
             grad[k] = grad[k] + sol->solution.row(k).dot(v0);
         /*
          * Scale correctly
          */
-        for (k = 0; k < coils->ncoil; k++)
+        for (k = 0; k < coils.ncoil(); k++)
             grad[k] = MAG_FACTOR*grad[k];
     }
     return;
@@ -2403,12 +2381,12 @@ float FwdBemModel::fwd_bem_inf_pot_der(const Eigen::Vector3f& rd, const Eigen::V
 
 //=============================================================================================================
 
-void FwdBemModel::fwd_bem_lin_field_grad_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet *coils, float *xgrad, float *ygrad, float *zgrad)
+void FwdBemModel::fwd_bem_lin_field_grad_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet& coils, Eigen::VectorXf& xgrad, Eigen::VectorXf& ygrad, Eigen::VectorXf& zgrad)
 /*
      * Calculate the gradient with respect to dipole position coordinates in a set of coils
      */
 {
-    FwdBemSolution* sol = (FwdBemSolution*)coils->user_data;
+    FwdBemSolution* sol = coils.user_data.get();
 
     int     s,k,p,np,pp;
     FwdCoil *coil;
@@ -2416,12 +2394,7 @@ void FwdBemModel::fwd_bem_lin_field_grad_calc(const Eigen::Vector3f& rd, const E
     Eigen::Vector3f ee, mri_ee;
     Eigen::Vector3f mri_rd = rd;
     Eigen::Vector3f mri_Q = Q;
-    float   *grads[3];
-    float   *grad;
-
-    grads[X] = xgrad;
-    grads[Y] = ygrad;
-    grads[Z] = zgrad;
+    Eigen::VectorXf* grads[] = {&xgrad, &ygrad, &zgrad};
     /*
        * Space for infinite-medium potentials
        */
@@ -2436,7 +2409,7 @@ void FwdBemModel::fwd_bem_lin_field_grad_calc(const Eigen::Vector3f& rd, const E
         FiffCoordTrans::apply_trans(mri_Q.data(),head_mri_t,FIFFV_NO_MOVE);
     }
     for (pp = X; pp <= Z; pp++) {
-        grad = grads[pp];
+        Eigen::VectorXf& grad = *grads[pp];
         /*
          * Select the correct gradient component
          */
@@ -2458,8 +2431,8 @@ void FwdBemModel::fwd_bem_lin_field_grad_calc(const Eigen::Vector3f& rd, const E
          * Primary current contribution
          * (can be calculated in the coil/dipole coordinates)
          */
-        for (k = 0; k < coils->ncoil; k++) {
-            coil = coils->coils[k];
+        for (k = 0; k < coils.ncoil(); k++) {
+            coil = coils.coils[k].get();
             grad[k] = 0.0;
             for (p = 0; p < coil->np; p++)
                 grad[k] = grad[k] + coil->w[p]*fwd_bem_inf_field_der(
@@ -2472,12 +2445,12 @@ void FwdBemModel::fwd_bem_lin_field_grad_calc(const Eigen::Vector3f& rd, const E
         /*
          * Volume current contribution
          */
-        for (k = 0; k < coils->ncoil; k++)
+        for (k = 0; k < coils.ncoil(); k++)
             grad[k] = grad[k] + sol->solution.row(k).dot(v0);
         /*
          * Scale correctly
          */
-        for (k = 0; k < coils->ncoil; k++)
+        for (k = 0; k < coils.ncoil(); k++)
             grad[k] = MAG_FACTOR*grad[k];
     }
     return;
@@ -2493,20 +2466,26 @@ int FwdBemModel::fwd_bem_field(const Eigen::Vector3f& rd, const Eigen::Vector3f&
      */
 {
     FwdBemModel* m = (FwdBemModel*)client;
-    FwdBemSolution* sol = (FwdBemSolution*)coils->user_data;
+    FwdBemSolution* sol = coils->user_data.get();
 
     if (!m) {
         printf("No BEM model specified to fwd_bem_field");
         return FAIL;
     }
-    if (!sol || sol->solution.size() == 0 || sol->ncoil != coils->ncoil) {
+    if (!sol || sol->solution.size() == 0 || sol->ncoil != coils->ncoil()) {
         printf("No appropriate coil-specific data available in fwd_bem_field");
         return FAIL;
     }
-    if (m->bem_method == FWD_BEM_CONSTANT_COLL)
-        m->fwd_bem_field_calc(rd,Q,coils,B);
-    else if (m->bem_method == FWD_BEM_LINEAR_COLL)
-        m->fwd_bem_lin_field_calc(rd,Q,coils,B);
+    if (m->bem_method == FWD_BEM_CONSTANT_COLL) {
+        Eigen::VectorXf Bvec(coils->ncoil());
+        m->fwd_bem_field_calc(rd,Q,*coils,Bvec);
+        Eigen::Map<Eigen::VectorXf>(B, coils->ncoil()) = Bvec;
+    }
+    else if (m->bem_method == FWD_BEM_LINEAR_COLL) {
+        Eigen::VectorXf Bvec(coils->ncoil());
+        m->fwd_bem_lin_field_calc(rd,Q,*coils,Bvec);
+        Eigen::Map<Eigen::VectorXf>(B, coils->ncoil()) = Bvec;
+    }
     else {
         printf("Unknown BEM method : %d",m->bem_method);
         return FAIL;
@@ -2526,30 +2505,44 @@ int FwdBemModel::fwd_bem_field_grad(const Eigen::Vector3f& rd,
                                     void *client)  /* Client data to be passed to some foward modelling routines */
 {
     FwdBemModel* m = (FwdBemModel*)client;
-    FwdBemSolution* sol = (FwdBemSolution*)coils->user_data;
+    FwdBemSolution* sol = coils->user_data.get();
 
     if (!m) {
         qCritical("No BEM model specified to fwd_bem_field");
         return FAIL;
     }
 
-    if (!sol || sol->solution.size() == 0 || sol->ncoil != coils->ncoil) {
+    if (!sol || sol->solution.size() == 0 || sol->ncoil != coils->ncoil()) {
         qCritical("No appropriate coil-specific data available in fwd_bem_field");
         return FAIL;
     }
 
     if (m->bem_method == FWD_BEM_CONSTANT_COLL) {
+        int n = coils->ncoil();
         if (Bval) {
-            m->fwd_bem_field_calc(rd,Q,coils,Bval);
+            Eigen::VectorXf Bvec(n);
+            m->fwd_bem_field_calc(rd,Q,*coils,Bvec);
+            Eigen::Map<Eigen::VectorXf>(Bval, n) = Bvec;
         }
 
-        m->fwd_bem_field_grad_calc(rd,Q,coils,xgrad,ygrad,zgrad);
+        Eigen::VectorXf xg(n), yg(n), zg(n);
+        m->fwd_bem_field_grad_calc(rd,Q,*coils,xg,yg,zg);
+        Eigen::Map<Eigen::VectorXf>(xgrad, n) = xg;
+        Eigen::Map<Eigen::VectorXf>(ygrad, n) = yg;
+        Eigen::Map<Eigen::VectorXf>(zgrad, n) = zg;
     } else if (m->bem_method == FWD_BEM_LINEAR_COLL) {
+        int n = coils->ncoil();
         if (Bval) {
-            m->fwd_bem_lin_field_calc(rd,Q,coils,Bval);
+            Eigen::VectorXf Bvec(n);
+            m->fwd_bem_lin_field_calc(rd,Q,*coils,Bvec);
+            Eigen::Map<Eigen::VectorXf>(Bval, n) = Bvec;
         }
 
-        m->fwd_bem_lin_field_grad_calc(rd,Q,coils,xgrad,ygrad,zgrad);
+        Eigen::VectorXf xg(n), yg(n), zg(n);
+        m->fwd_bem_lin_field_grad_calc(rd,Q,*coils,xg,yg,zg);
+        Eigen::Map<Eigen::VectorXf>(xgrad, n) = xg;
+        Eigen::Map<Eigen::VectorXf>(ygrad, n) = yg;
+        Eigen::Map<Eigen::VectorXf>(zgrad, n) = zg;
     } else {
         qCritical("Unknown BEM method : %d",m->bem_method);
         return FAIL;
@@ -2560,13 +2553,12 @@ int FwdBemModel::fwd_bem_field_grad(const Eigen::Vector3f& rd,
 
 //=============================================================================================================
 
-void *FwdBemModel::meg_eeg_fwd_one_source_space(void *arg)
+void FwdBemModel::meg_eeg_fwd_one_source_space(FwdThreadArg* a)
 /*
  * Compute the MEG or EEG forward solution for one source space
  * and possibly for only one source component
  */
 {
-    FwdThreadArg* a = (FwdThreadArg*)arg;
     MNESourceSpace* s = a->s;
     int            j,p,q;
     float          *xyz[3];
@@ -2724,11 +2716,11 @@ void *FwdBemModel::meg_eeg_fwd_one_source_space(void *arg)
         }
     }
     a->stat = OK;
-    return NULL;
+    return;
 
 bad : {
         a->stat = FAIL;
-        return NULL;
+        return;
     }
 }
 
@@ -2763,7 +2755,7 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
     fwdVecFieldFunc     vec_field;          /* Computes the field for all dipole orientations */
     fwdFieldGradFunc    field_grad;         /* Computes the field and gradient with respect to dipole position
                                              * for one dipole orientation */
-    int                 nmeg = coils->ncoil;/* Number of channels */
+    int                 nmeg = coils->ncoil();/* Number of channels */
     int                 nsource;            /* Total number of sources */
     int                 nspace = static_cast<int>(spaces.size());
     int                 k,p,q,off;
@@ -2783,19 +2775,17 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
         comp = FwdCompData::fwd_make_comp_data(comp_data,
                                                coils,comp_coils,
                                                FwdBemModel::fwd_bem_field,
-                                               NULL,
+                                               nullptr,
                                                my_bem_field_grad,
-                                               this,
-                                               NULL);
+                                               this);
 #else
         comp = FwdCompData::fwd_make_comp_data(comp_data,
                                                coils,
                                                comp_coils,
                                                FwdBemModel::fwd_bem_field,
-                                               NULL,
+                                               nullptr,
                                                FwdBemModel::fwd_bem_field_grad,
-                                               this,
-                                               NULL);
+                                               this);
 #endif
         if (!comp)
             goto bad;
@@ -2815,7 +2805,7 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
             printf("[done]\n");
         }
         field      = FwdCompData::fwd_comp_field;
-        vec_field  = NULL;
+        vec_field  = nullptr;
         field_grad = FwdCompData::fwd_comp_field_grad;
         client     = comp;
     }
@@ -2830,13 +2820,13 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
                                                fwd_sphere_field,
                                                fwd_sphere_field_vec,
                                                my_sphere_field_grad,
-                                               const_cast<Vector3f*>(&r0),NULL);
+                                               const_cast<Vector3f*>(&r0));
 #else
         comp = FwdCompData::fwd_make_comp_data(comp_data,coils,comp_coils,
                                                fwd_sphere_field,
                                                fwd_sphere_field_vec,
                                                fwd_sphere_field_grad,
-                                               const_cast<Vector3f*>(&r0),NULL);
+                                               const_cast<Vector3f*>(&r0));
 #endif
         if (!comp)
             goto bad;
@@ -3033,7 +3023,7 @@ int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MNESourceSpace>
                                              * for one dipole orientation */
     int             nsource;                /* Total number of sources */
     int             nspace = static_cast<int>(spaces.size());
-    int             neeg = els->ncoil;      /* Number of channels */
+    int             neeg = els->ncoil();      /* Number of channels */
     int             k,p,q,off;
     QStringList     names;                  /* Channel names */
     void            *client;
@@ -3051,7 +3041,7 @@ int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MNESourceSpace>
             goto bad;
         client   = this;
         pot      = fwd_bem_pot_els;
-        vec_pot  = NULL;
+        vec_pot  = nullptr;
 #ifdef TEST
         printf("Using differences.\n");
         pot_grad = my_bem_pot_grad;
@@ -3063,8 +3053,8 @@ int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MNESourceSpace>
         if (eeg_model->nfit == 0) {
             printf("Using the standard series expansion for a multilayer sphere model for EEG\n");
             pot      = FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1;
-            vec_pot  = NULL;
-            pot_grad = NULL;
+            vec_pot  = nullptr;
+            pot_grad = nullptr;
         }
         else {
             printf("Using the equivalent source approach in the homogeneous sphere for EEG\n");
@@ -3267,7 +3257,7 @@ int FwdBemModel::fwd_sphere_field(const Eigen::Vector3f& rd, const Eigen::Vector
     /*
        * Check for a dipole at the origin
        */
-    for (k = 0 ; k < coils->ncoil ; k++)
+    for (k = 0 ; k < coils->ncoil() ; k++)
         if (FWD_IS_MEG_COIL(coils->coils[k]->coil_class))
             Bval[k] = 0.0;
     r = vec_len(myrd);
@@ -3275,8 +3265,8 @@ int FwdBemModel::fwd_sphere_field(const Eigen::Vector3f& rd, const Eigen::Vector
 
         cross_product(Q,myrd,v);
 
-        for (k = 0; k < coils->ncoil; k++) {
-            this_coil = coils->coils[k];
+        for (k = 0; k < coils->ncoil(); k++) {
+            this_coil = coils->coils[k].get();
             if (FWD_IS_MEG_COIL(this_coil->type)) {
 
                 np = this_coil->np;
@@ -3376,8 +3366,8 @@ int FwdBemModel::fwd_sphere_field_vec(const Eigen::Vector3f& rd, FwdCoilSet *coi
        * Check for a dipole at the origin
        */
     r = vec_len(myrd);
-    for (k = 0; k < coils->ncoil; k++) {
-        this_coil = coils->coils[k];
+    for (k = 0; k < coils->ncoil(); k++) {
+        this_coil = coils->coils[k].get();
         if (FWD_IS_MEG_COIL(this_coil->coil_class)) {
             if (r < EPS) {
                 Bval[0][k] = Bval[1][k] = Bval[2][k] = 0.0;
@@ -3497,7 +3487,7 @@ int FwdBemModel::fwd_sphere_field_grad(const Eigen::Vector3f& rd, const Eigen::V
     /* Check for a dipole at the origin */
 
     r = vec_len(myrd);
-    for (k = 0; k < coils->ncoil ; k++) {
+    for (k = 0; k < coils->ncoil() ; k++) {
         if (FWD_IS_MEG_COIL(coils->coils[k]->coil_class)) {
             if (do_field)
                 Bval[k] = 0.0;
@@ -3512,9 +3502,9 @@ int FwdBemModel::fwd_sphere_field_grad(const Eigen::Vector3f& rd, const Eigen::V
         v[1] = -Q[0]*myrd[2] + Q[2]*myrd[0];
         v[2] = Q[0]*myrd[1] - Q[1]*myrd[0];
 
-        for (k = 0 ; k < coils->ncoil ; k++) {
+        for (k = 0 ; k < coils->ncoil() ; k++) {
 
-            this_coil = coils->coils[k];
+            this_coil = coils->coils[k].get();
 
             if (FWD_IS_MEG_COIL(this_coil->type)) {
 
@@ -3613,8 +3603,8 @@ int FwdBemModel::fwd_mag_dipole_field(const Eigen::Vector3f& rm, const Eigen::Ve
     FwdCoil* this_coil;
     float   sum,diff[3],dist,dist2,dist5,*dir;
 
-    for (k = 0; k < coils->ncoil; k++) {
-        this_coil = coils->coils[k];
+    for (k = 0; k < coils->ncoil(); k++) {
+        this_coil = coils->coils[k].get();
         if (FWD_IS_MEG_COIL(this_coil->type)) {
             np = this_coil->np;
             /*
@@ -3650,8 +3640,8 @@ int FwdBemModel::fwd_mag_dipole_field_vec(const Eigen::Vector3f& rm, FwdCoilSet 
     FwdCoil* this_coil;
     float   sum[3],diff[3],dist,dist2,dist5,*dir;
 
-    for (k = 0; k < coils->ncoil; k++) {
-        this_coil = coils->coils[k];
+    for (k = 0; k < coils->ncoil(); k++) {
+        this_coil = coils->coils[k].get();
         if (FWD_IS_MEG_COIL(this_coil->type)) {
             np = this_coil->np;
             sum[0] = sum[1] = sum[2] = 0.0;
