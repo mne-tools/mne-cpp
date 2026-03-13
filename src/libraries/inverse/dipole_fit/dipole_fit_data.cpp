@@ -1160,7 +1160,7 @@ static void free_dipole_fit_funcs(dipoleFitFuncs f)
     if (f->eeg_client_free && f->eeg_client)
         f->eeg_client_free(f->eeg_client);
 
-    FREE_3(f);
+    delete f;
     return;
 }
 
@@ -1274,17 +1274,7 @@ void mne_regularize_cov(MNECovMatrix* c,       /* The matrix to regularize */
 static dipoleFitFuncs new_dipole_fit_funcs()
 
 {
-    dipoleFitFuncs f = MALLOC_3(1,dipoleFitFuncsRec);
-
-    f->meg_field     = NULL;
-    f->eeg_pot       = NULL;
-    f->meg_vec_field = NULL;
-    f->eeg_vec_pot   = NULL;
-    f->meg_client      = NULL;
-    f->meg_client_free = NULL;
-    f->eeg_client      = NULL;
-    f->eeg_client_free = NULL;
-
+    dipoleFitFuncs f = new dipoleFitFuncsRec{};
     return f;
 }
 
