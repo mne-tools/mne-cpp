@@ -625,6 +625,6 @@ void TestSensorStreaming::testEmptyQueueBehavior()
 
 //=============================================================================================================
 
-QTEST_MAIN(TestSensorStreaming)
+QTEST_GUILESS_MAIN(TestSensorStreaming)
 
 #include "test_sensor_streaming.moc"
