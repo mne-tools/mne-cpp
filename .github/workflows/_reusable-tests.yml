@@ -95,13 +95,13 @@ jobs:
           COV_FLAG="-DWITH_CODE_COV=ON"
         fi
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON ${COV_FLAG}
-        cmake --build build
+        cmake --build build -j $(nproc)
 
     - name: Configure and compile MNE-CPP (MacOS)
       if: matrix.os == 'macos-26'
       run: |
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
-        cmake --build build
+        cmake --build build -j $(sysctl -n hw.logicalcpu)
 
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2025'
@@ -109,13 +109,13 @@ jobs:
         cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
-        cmake --build build --config Release
+        cmake --build build --config Release --parallel
 
     # ── Run tests ──────────────────────────────────────────────────────────
     - name: Run tests (Linux)
       if: matrix.os == 'ubuntu-24.04'
       env:
-        QTEST_FUNCTION_TIMEOUT: 900000
+        QTEST_FUNCTION_TIMEOUT: ${{ inputs.with_code_coverage && 1800000 || 900000 }}
         QT_QPA_PLATFORM: offscreen
         MNE_DATA: ~/mne_data
       run: |
@@ -150,31 +150,32 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
 
     # ── Coverage: threshold & regression check (staging branch) ────────────
-    - name: Install lcov
+    - name: Install fastcov
       if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && !inputs.upload_codecov
-      run: sudo apt-get install -y -qq lcov
+      run: pip install fastcov
 
-    - name: Generate lcov report
+    - name: Generate coverage report (fastcov)
       id: lcov
       if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && !inputs.upload_codecov
       run: |
         echo "=== Coverage diagnostics ==="
         echo "gcno files: $(find build -name '*.gcno' 2>/dev/null | wc -l)"
         echo "gcda files: $(find build -name '*.gcda' 2>/dev/null | wc -l)"
-        lcov --capture --directory build \
-             --output-file coverage.info \
-             --ignore-errors mismatch \
-             --ignore-errors negative \
-             --ignore-errors gcov
-        # Remove external/test code from the report
-        lcov --remove coverage.info \
-             '*/src/external/*' '*/src/examples/*' '*/src/testframes/*' \
-             '/usr/*' '*/Qt/*' '*/eigen*' \
-             --output-file coverage_filtered.info \
-             --ignore-errors unused 2>/dev/null || true
-        # Extract total line coverage percentage
-        COVERAGE=$(lcov --summary coverage_filtered.info 2>&1 \
-                   | grep -oP 'lines\.*:\s*\K[0-9]+(\.[0-9]+)?' || echo "0")
+        # Collect coverage data with fastcov (10-100x faster than lcov)
+        fastcov -d build -o coverage.json
+        # Full report in lcov format
+        fastcov -C coverage.json --lcov -o coverage.info
+        # Filtered report excluding external/test/system code
+        fastcov -C coverage.json --lcov -o coverage_filtered.info \
+             --exclude /usr src/external src/examples src/testframes Qt eigen
+        # Extract total line coverage percentage from lcov format
+        TOTAL_LINES=$(grep -c "^DA:" coverage_filtered.info 2>/dev/null || echo "0")
+        HIT_LINES=$(grep "^DA:" coverage_filtered.info | awk -F, '$2 > 0' | wc -l 2>/dev/null || echo "0")
+        if [ "$TOTAL_LINES" -gt 0 ]; then
+          COVERAGE=$(awk "BEGIN {printf \"%.2f\", $HIT_LINES * 100.0 / $TOTAL_LINES}")
+        else
+          COVERAGE="0"
+        fi
         echo "Total line coverage: ${COVERAGE}%"
         echo "coverage=${COVERAGE}" >> "$GITHUB_OUTPUT"
 
