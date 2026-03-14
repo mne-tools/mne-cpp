@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the Annotation class.
+ * @brief    Definition of the FsAnnotation class.
  *
  */
 
@@ -64,46 +64,46 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Annotation::Annotation()
+FsAnnotation::FsAnnotation()
 : m_iHemi(-1)
 {
 }
 
 //=============================================================================================================
 
-Annotation::Annotation(const QString& p_sFileName)
+FsAnnotation::FsAnnotation(const QString& p_sFileName)
 : m_sFileName(p_sFileName)
 {
-    Annotation t_Annotation;
-    Annotation::read(m_sFileName, t_Annotation);
+    FsAnnotation t_Annotation;
+    FsAnnotation::read(m_sFileName, t_Annotation);
      *this = t_Annotation;
 }
 
 //=============================================================================================================
 
-Annotation::Annotation(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir)
+FsAnnotation::FsAnnotation(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir)
 : m_iHemi(-1)
 {
-    Annotation::read(subject_id, hemi, atlas, subjects_dir, *this);
+    FsAnnotation::read(subject_id, hemi, atlas, subjects_dir, *this);
 }
 
 //=============================================================================================================
 
-Annotation::Annotation(const QString &path, qint32 hemi, const QString &atlas)
+FsAnnotation::FsAnnotation(const QString &path, qint32 hemi, const QString &atlas)
 : m_iHemi(-1)
 {
-    Annotation::read(path, hemi, atlas, *this);
+    FsAnnotation::read(path, hemi, atlas, *this);
 }
 
 //=============================================================================================================
 
-Annotation::~Annotation()
+FsAnnotation::~FsAnnotation()
 {
 }
 
 //=============================================================================================================
 
-void Annotation::clear()
+void FsAnnotation::clear()
 {
     m_sFileName = QString("");
     m_Vertices = VectorXi::Zero(0);
@@ -113,7 +113,7 @@ void Annotation::clear()
 
 //=============================================================================================================
 
-bool Annotation::read(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir, Annotation &p_Annotation)
+bool FsAnnotation::read(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir, FsAnnotation &p_Annotation)
 {
     if(hemi != 0 && hemi != 1)
         return false;
@@ -125,7 +125,7 @@ bool Annotation::read(const QString &subject_id, qint32 hemi, const QString &atl
 
 //=============================================================================================================
 
-bool Annotation::read(const QString &path, qint32 hemi, const QString &atlas, Annotation &p_Annotation)
+bool FsAnnotation::read(const QString &path, qint32 hemi, const QString &atlas, FsAnnotation &p_Annotation)
 {
     if(hemi != 0 && hemi != 1)
         return false;
@@ -137,7 +137,7 @@ bool Annotation::read(const QString &path, qint32 hemi, const QString &atlas, An
 
 //=============================================================================================================
 
-bool Annotation::read(const QString& p_sFileName, Annotation &p_Annotation)
+bool FsAnnotation::read(const QString& p_sFileName, FsAnnotation &p_Annotation)
 {
     p_Annotation.clear();
 
@@ -285,20 +285,20 @@ bool Annotation::read(const QString& p_sFileName, Annotation &p_Annotation)
 
 //=============================================================================================================
 
-bool Annotation::toLabels(const Surface &p_surf,
-                          QList<Label> &p_qListLabels,
+bool FsAnnotation::toLabels(const FsSurface &p_surf,
+                          QList<FsLabel> &p_qListLabels,
                           QList<RowVector4i> &p_qListLabelRGBAs,
                           const QStringList& lLabelPicks) const
 {
     if(this->m_iHemi != p_surf.hemi())
     {
-        qWarning("Annotation and surface hemisphere (annot = %d; surf = %d) do not match!\n", this->m_iHemi, p_surf.hemi());
+        qWarning("FsAnnotation and surface hemisphere (annot = %d; surf = %d) do not match!\n", this->m_iHemi, p_surf.hemi());
         return false;
     }
 
     if(m_LabelIds.size() == 0)
     {
-        qWarning("Annotation doesn't' contain data!\n");
+        qWarning("FsAnnotation doesn't' contain data!\n");
         return false;
     }
 
@@ -355,12 +355,12 @@ bool Annotation::toLabels(const Surface &p_surf,
         // put it all together
         if(lLabelPicks.isEmpty()) {
             //t_tris
-            p_qListLabels.append(Label(vertices, pos, values, this->m_iHemi, name, label_id));
+            p_qListLabels.append(FsLabel(vertices, pos, values, this->m_iHemi, name, label_id));
             // store the color
             p_qListLabelRGBAs.append(label_rgba);
         } else if (lLabelPicks.indexOf(name) != -1) {
             //t_tris
-            p_qListLabels.append(Label(vertices, pos, values, this->m_iHemi, name, label_id));
+            p_qListLabels.append(FsLabel(vertices, pos, values, this->m_iHemi, name, label_id));
             // store the color
             p_qListLabelRGBAs.append(label_rgba);
         }
@@ -375,7 +375,7 @@ bool Annotation::toLabels(const Surface &p_surf,
 //        pos = vert_pos[vertices, :]
 //        values = np.zeros(len(vertices))
 //        name = label_name + '-' + hemi
-//        label = Label(vertices, pos, values, hemi, name=name)
+//        label = FsLabel(vertices, pos, values, hemi, name=name)
 //        labels.append(label)
 
 //        # store the color

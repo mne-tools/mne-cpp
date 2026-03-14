@@ -276,7 +276,7 @@ int MNESourceEstimate::samples() const
 
 //=============================================================================================================
 
-VectorXi MNESourceEstimate::getIndicesByLabel(const QList<Label> &lPickedLabels, bool bIsClustered) const
+VectorXi MNESourceEstimate::getIndicesByLabel(const QList<FsLabel> &lPickedLabels, bool bIsClustered) const
 {
     VectorXi vIndexSourceLabels;
 

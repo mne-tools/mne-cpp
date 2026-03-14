@@ -114,8 +114,8 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Disp3D Example");
     parser.addHelpOption();
 
-    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "pial");
-    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption surfOption("surfType", "FsSurface type <type>.", "type", "pial");
+    QCommandLineOption annotOption("annotType", "FsAnnotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
@@ -160,8 +160,8 @@ int main(int argc, char *argv[])
     }
 
     //Inits
-    SurfaceSet tSurfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
-    AnnotationSet tAnnotSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
+    FsSurfaceSet tSurfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
+    FsAnnotationSet tAnnotSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
     QFile t_fileFwd(parser.value(fwdOption));
     FwdForwardSolution t_Fwd(t_fileFwd);

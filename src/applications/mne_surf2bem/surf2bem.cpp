@@ -218,7 +218,7 @@ bool Surf2Bem::readFreeSurferSurface(const SurfaceInput& input, MNEBemSurface& b
     //
     // Read FreeSurfer binary surface directly.
     //
-    // We cannot use FSLIB::Surface::read() because it requires the filename
+    // We cannot use FSLIB::FsSurface::read() because it requires the filename
     // to contain "lh." or "rh." (hemisphere prefix). BEM surface files like
     // inner_skull.surf do not have this prefix.
     //
@@ -283,7 +283,7 @@ bool Surf2Bem::readFreeSurferSurface(const SurfaceInput& input, MNEBemSurface& b
 
     //
     // Populate BEM surface
-    // Vertices are in mm in the file, convert to meters (matching FSLIB::Surface behavior)
+    // Vertices are in mm in the file, convert to meters (matching FSLIB::FsSurface behavior)
     //
     verts.transposeInPlace();  // now nvert x 3
     verts.array() *= 0.001f;
@@ -295,7 +295,7 @@ bool Surf2Bem::readFreeSurferSurface(const SurfaceInput& input, MNEBemSurface& b
     bemSurf.itris = faces.block(0, 0, nface, 3);
 
     // Compute vertex normals
-    bemSurf.nn = Surface::compute_normals(Eigen::MatrixX3f(bemSurf.rr), Eigen::MatrixX3i(bemSurf.itris));
+    bemSurf.nn = FsSurface::compute_normals(Eigen::MatrixX3f(bemSurf.rr), Eigen::MatrixX3i(bemSurf.itris));
 
     fprintf(stderr, "Read FreeSurfer surface: %d vertices, %d triangles\n",
             bemSurf.np, bemSurf.ntri);
@@ -395,7 +395,7 @@ bool Surf2Bem::readAsciiTriSurface(const SurfaceInput& input, MNEBemSurface& bem
     bemSurf.itris = tris;
 
     // Compute vertex normals
-    bemSurf.nn = Surface::compute_normals(Eigen::MatrixX3f(bemSurf.rr), Eigen::MatrixX3i(bemSurf.itris));
+    bemSurf.nn = FsSurface::compute_normals(Eigen::MatrixX3f(bemSurf.rr), Eigen::MatrixX3i(bemSurf.itris));
 
     fprintf(stderr, "Read ASCII triangle surface: %d vertices, %d triangles\n",
             bemSurf.np, bemSurf.ntri);
@@ -420,7 +420,7 @@ bool Surf2Bem::shiftVertices(MNEBemSurface& surf, float shift)
     }
 
     // Recompute normals after shifting
-    surf.nn = Surface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
+    surf.nn = FsSurface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
 
     fprintf(stderr, "%s vertex locations shifted by %6.1f mm.\n",
             qPrintable(SurfaceChecks::getNameOf(surf.id)),

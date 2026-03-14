@@ -105,7 +105,7 @@ public:
     std::unique_ptr<FIFFLIB::FiffSparseMatrix> map;  /**< Sparse interpolation matrix: multiply source surface data
                                                           by this to obtain values on the target ('this') surface. */
     Eigen::VectorXi best;                            /**< Index of the closest source surface vertex for each target vertex. */
-    int from_kind = -1;                              /**< Surface kind identifier (e.g., hemisphere) of the source surface (-1 = unknown). */
+    int from_kind = -1;                              /**< FsSurface kind identifier (e.g., hemisphere) of the source surface (-1 = unknown). */
     QString from_subj;                               /**< Subject name of the source surface. */
 };
 

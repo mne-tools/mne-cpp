@@ -120,8 +120,8 @@ int main(int argc, char *argv[])
 
     QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 
-    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "inflated");
-    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption surfOption("surfType", "FsSurface type <type>.", "type", "inflated");
+    QCommandLineOption annotOption("annotType", "FsAnnotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
 
@@ -177,8 +177,8 @@ int main(int argc, char *argv[])
     QFile t_fileRaw(parser.value(inputOption));
     QString t_sEventName = parser.value(eventsFileOption);
 
-    SurfaceSet t_surfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
-    AnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
+    FsSurfaceSet t_surfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
+    FsAnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
     //
     // Settings

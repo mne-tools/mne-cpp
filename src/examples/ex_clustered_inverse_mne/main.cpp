@@ -110,8 +110,8 @@ int main(int argc, char *argv[])
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
     QCommandLineOption invFileOption("invOut", "Path to inverse <file>, which is to be written.", "file", "");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
-    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
-    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption surfOption("surfType", "FsSurface type <type>.", "type", "orig");
+    QCommandLineOption annotOption("annotType", "FsAnnotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
@@ -144,8 +144,8 @@ int main(int argc, char *argv[])
 
     double lambda2 = 1.0 / pow(snr, 2);
 
-    SurfaceSet t_surfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
-    AnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
+    FsSurfaceSet t_surfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
+    FsAnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
     qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
 

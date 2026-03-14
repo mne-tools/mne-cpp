@@ -38,7 +38,7 @@
  *             - Containment test (brain inside skull inside skin)
  *             - Triangle area reporting
  *             - Inter-surface distance measurement
- *             - Surface size validation (meters vs mm detection)
+ *             - FsSurface size validation (meters vs mm detection)
  *
  */
 

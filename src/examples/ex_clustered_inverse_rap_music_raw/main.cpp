@@ -115,8 +115,8 @@ int main(int argc, char *argv[])
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
-    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
-    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption surfOption("surfType", "FsSurface type <type>.", "type", "orig");
+    QCommandLineOption annotOption("annotType", "FsAnnotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
     QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "1");
     QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
@@ -149,8 +149,8 @@ int main(int argc, char *argv[])
     QString t_sEventName = parser.value(eventsFileOption);
     QFile t_fileFwd(parser.value(fwdOption));
 
-    SurfaceSet t_surfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
-    AnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
+    FsSurfaceSet t_surfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
+    FsAnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
     QString t_sFileNameStc(parser.value(stcFileOption));
 

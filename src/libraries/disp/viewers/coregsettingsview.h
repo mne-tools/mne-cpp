@@ -209,7 +209,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Set the the Root-Mean-Square-Error (Digitizer-Surface) after icp.
+     * Set the the Root-Mean-Square-Error (Digitizer-FsSurface) after icp.
      *
      * @param[in] fRMSE     The RMSE in m.
      */

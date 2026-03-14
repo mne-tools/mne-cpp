@@ -235,7 +235,7 @@ static int selectVerticesIco(const MatrixX3f &surfVerts,
  * Selects a subset of surface vertices such that the minimum distance
  * between any two selected vertices is approximately the given spacing.
  *
- * @param[in]  surfVerts   Surface vertex positions (np x 3).
+ * @param[in]  surfVerts   FsSurface vertex positions (np x 3).
  * @param[in]  spacing     Desired spacing in mm.
  * @param[out] inuse       Binary vector (np): 1 = selected, 0 = not.
  * @param[out] vertno      Indices of the selected vertices.
@@ -291,7 +291,7 @@ static int selectVerticesSpacing(const MatrixX3f &surfVerts,
  * @param[in]  hemiId   Hemisphere ID (FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI).
  * @return The constructed MNEHemisphere.
  */
-static MNEHemisphere buildHemisphere(const Surface &surf,
+static MNEHemisphere buildHemisphere(const FsSurface &surf,
                                      const VectorXi &inuse,
                                      const VectorXi &vertno,
                                      int hemiId)
@@ -302,7 +302,7 @@ static MNEHemisphere buildHemisphere(const Surface &surf,
     hemi.np = surf.rr().rows();
     hemi.ntri = surf.tris().rows();
     hemi.coord_frame = FIFFV_COORD_MRI;
-    hemi.type = 1;  // Surface type
+    hemi.type = 1;  // FsSurface type
 
     // Copy vertex positions and normals
     hemi.rr = surf.rr();
@@ -385,9 +385,9 @@ int main(int argc, char *argv[])
         "FreeSurfer subjects directory (default: $SUBJECTS_DIR).", "dir");
     parser.addOption(subjectsDirOpt);
 
-    // --surf: Surface name(s) (required, matching SVN MNE-C)
+    // --surf: FsSurface name(s) (required, matching SVN MNE-C)
     QCommandLineOption surfOpt(QStringList() << "surf",
-        "Surface name to use (e.g., white, pial). "
+        "FsSurface name to use (e.g., white, pial). "
         "For multiple surfaces, separate with colons (e.g., white:pial).",
         "names");
     parser.addOption(surfOpt);
@@ -536,13 +536,13 @@ int main(int argc, char *argv[])
 
         printf("Reading surface from %s...\n", surfPath.toUtf8().constData());
 
-        Surface surf;
-        if (!Surface::read(surfPath, surf)) {
+        FsSurface surf;
+        if (!FsSurface::read(surfPath, surf)) {
             qCritical() << "Error: Could not read surface" << surfPath;
             return 1;
         }
 
-        printf("  Surface: %d vertices, %d triangles\n",
+        printf("  FsSurface: %d vertices, %d triangles\n",
                (int)surf.rr().rows(), (int)surf.tris().rows());
 
         // Select source vertices

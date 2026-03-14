@@ -80,7 +80,7 @@ namespace SCDISPLIB
 enum Tool
 {
     Freeze     = 0,       /**< Freezing tool. */
-    Annotation = 1        /**< Annotation tool. */
+    FsAnnotation = 1        /**< FsAnnotation tool. */
 };
 
 //=============================================================================================================

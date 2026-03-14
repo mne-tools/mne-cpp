@@ -110,11 +110,11 @@ void RtSourceInterpolationMatWorker::setVisualizationType(int iVisType)
 //=============================================================================================================
 
 void RtSourceInterpolationMatWorker::setAnnotationInfoLeft(const Eigen::VectorXi &vecLabelIds,
-                                                            const QList<FSLIB::Label> &lLabels,
+                                                            const QList<FSLIB::FsLabel> &lLabels,
                                                             const Eigen::VectorXi &vecVertNo)
 {
     if (vecLabelIds.rows() == 0 || lLabels.isEmpty()) {
-        qDebug() << "RtSourceInterpolationMatWorker::setAnnotationInfoLeft - Annotation data is empty.";
+        qDebug() << "RtSourceInterpolationMatWorker::setAnnotationInfoLeft - FsAnnotation data is empty.";
         return;
     }
 
@@ -134,11 +134,11 @@ void RtSourceInterpolationMatWorker::setAnnotationInfoLeft(const Eigen::VectorXi
 //=============================================================================================================
 
 void RtSourceInterpolationMatWorker::setAnnotationInfoRight(const Eigen::VectorXi &vecLabelIds,
-                                                             const QList<FSLIB::Label> &lLabels,
+                                                             const QList<FSLIB::FsLabel> &lLabels,
                                                              const Eigen::VectorXi &vecVertNo)
 {
     if (vecLabelIds.rows() == 0 || lLabels.isEmpty()) {
-        qDebug() << "RtSourceInterpolationMatWorker::setAnnotationInfoRight - Annotation data is empty.";
+        qDebug() << "RtSourceInterpolationMatWorker::setAnnotationInfoRight - FsAnnotation data is empty.";
         return;
     }
 
@@ -218,8 +218,8 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
     QString interpFuncName;
     int visType;
 
-    // Annotation data snapshots
-    QList<FSLIB::Label> labelsLh, labelsRh;
+    // FsAnnotation data snapshots
+    QList<FSLIB::FsLabel> labelsLh, labelsRh;
     QMap<qint32, qint32> mapLabelIdSrcLh, mapLabelIdSrcRh;
     QList<int> vertNosLh, vertNosRh;
     bool annotLhInit, annotRhInit;
@@ -248,7 +248,7 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
         annotRhInit = m_bAnnotationRhInit;
     }
 
-    // ── Annotation-based mode ──────────────────────────────────────────
+    // ── FsAnnotation-based mode ──────────────────────────────────────────
     if (visType == AnnotationBased) {
         qDebug() << "RtSourceInterpolationMatWorker: Computing annotation matrices...";
 
@@ -270,7 +270,7 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
             }
         }
 
-        qDebug() << "RtSourceInterpolationMatWorker: Annotation matrix computation complete.";
+        qDebug() << "RtSourceInterpolationMatWorker: FsAnnotation matrix computation complete.";
         return;
     }
 
@@ -323,7 +323,7 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
 //=============================================================================================================
 
 QSharedPointer<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::computeAnnotationOperator(
-    const QList<FSLIB::Label> &lLabels,
+    const QList<FSLIB::FsLabel> &lLabels,
     const QMap<qint32, qint32> &mapLabelIdSrc,
     const QList<int> &vertNos)
 {
@@ -342,7 +342,7 @@ QSharedPointer<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::compu
 
     // For each label: assign uniform weight to all its vertices from sources in that label
     for (int i = 0; i < lLabels.size(); ++i) {
-        const FSLIB::Label &label = lLabels.at(i);
+        const FSLIB::FsLabel &label = lLabels.at(i);
         QList<qint32> listSourcesVertNoLabel = mapLabelIdSrc.keys(label.label_id);
 
         for (int j = 0; j < label.vertices.rows(); ++j) {

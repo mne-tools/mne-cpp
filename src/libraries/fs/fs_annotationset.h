@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    AnnotationSet class declaration
+ * @brief    FsAnnotationSet class declaration
  *
  */
 
@@ -69,25 +69,25 @@ namespace FSLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class SurfaceSet;
+class FsSurfaceSet;
 
 //=============================================================================================================
 /**
- * Annotation set
+ * FsAnnotation set
  *
- * @brief Annotation set
+ * @brief FsAnnotation set
  */
-class FSSHARED_EXPORT AnnotationSet
+class FSSHARED_EXPORT FsAnnotationSet
 {
 public:
-    typedef QSharedPointer<AnnotationSet> SPtr;            /**< Shared pointer type for AnnotationSet. */
-    typedef QSharedPointer<const AnnotationSet> ConstSPtr; /**< Const shared pointer type for AnnotationSet. */
+    typedef QSharedPointer<FsAnnotationSet> SPtr;            /**< Shared pointer type for FsAnnotationSet. */
+    typedef QSharedPointer<const FsAnnotationSet> ConstSPtr; /**< Const shared pointer type for FsAnnotationSet. */
 
     //=========================================================================================================
     /**
      * Default constructor
      */
-    AnnotationSet();
+    FsAnnotationSet();
 
     //=========================================================================================================
     /**
@@ -98,7 +98,7 @@ public:
      * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
      * @param[in] subjects_dir       Subjects directory.
      */
-    explicit AnnotationSet(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir);
+    explicit FsAnnotationSet(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir);
 
     //=========================================================================================================
     /**
@@ -108,7 +108,7 @@ public:
      * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}.
      * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
      */
-    explicit AnnotationSet(const QString &path, qint32 hemi, const QString &atlas);
+    explicit FsAnnotationSet(const QString &path, qint32 hemi, const QString &atlas);
 
     //=========================================================================================================
     /**
@@ -117,7 +117,7 @@ public:
      * @param[in] p_LHAnnotation    Left hemisphere annotation.
      * @param[in] p_RHAnnotation    Right hemisphere annotation.
      */
-    explicit AnnotationSet(const Annotation& p_LHAnnotation, const Annotation& p_RHAnnotation);
+    explicit FsAnnotationSet(const FsAnnotation& p_LHAnnotation, const FsAnnotation& p_RHAnnotation);
 
     //=========================================================================================================
     /**
@@ -126,33 +126,33 @@ public:
      * @param[in] p_sLHFileName  Left hemisphere annotation file.
      * @param[in] p_sRHFileName  Right hemisphere annotation file.
      */
-    explicit AnnotationSet(const QString& p_sLHFileName, const QString& p_sRHFileName);
+    explicit FsAnnotationSet(const QString& p_sLHFileName, const QString& p_sRHFileName);
 
     //=========================================================================================================
     /**
      * Destroys the annotation set.
      */
-    ~AnnotationSet(){}
+    ~FsAnnotationSet(){}
 
     //=========================================================================================================
     /**
-     * Initializes the AnnotationSet.
+     * Initializes the FsAnnotationSet.
      */
     void clear();
 
     //=========================================================================================================
     /**
-     * Returns The Annotation set map
+     * Returns The FsAnnotation set map
      *
      * @return the annotation set map.
      */
-    inline QMap<qint32, Annotation>& data();
+    inline QMap<qint32, FsAnnotation>& data();
 
     //=========================================================================================================
     /**
-     * True if AnnotationSet is empty.
+     * True if FsAnnotationSet is empty.
      *
-     * @return true if AnnotationSet is empty.
+     * @return true if FsAnnotationSet is empty.
      */
     inline bool isEmpty() const;
 
@@ -160,13 +160,13 @@ public:
     /**
      * Insert an annotation
      *
-     * @param[in] p_Annotation  Annotation to insert.
+     * @param[in] p_Annotation  FsAnnotation to insert.
      */
-    void insert(const Annotation& p_Annotation);
+    void insert(const FsAnnotation& p_Annotation);
 
     //=========================================================================================================
     /**
-     * Reads different annotation files and assembles them to a AnnotationSet
+     * Reads different annotation files and assembles them to a FsAnnotationSet
      *
      * @param[in] p_sLHFileName  Left hemisphere annotation file.
      * @param[in] p_sRHFileName  Right hemisphere annotation file.
@@ -174,7 +174,7 @@ public:
      *
      * @return true if succesfull, false otherwise.
      */
-    static bool read(const QString& p_sLHFileName, const QString& p_sRHFileName, AnnotationSet &p_AnnotationSet);
+    static bool read(const QString& p_sLHFileName, const QString& p_sRHFileName, FsAnnotationSet &p_AnnotationSet);
 
     //=========================================================================================================
     /**
@@ -182,15 +182,15 @@ public:
      *
      * Converts annotation to a label list and colortable
      *
-     * @param[in] p_surfSet              the SurfaceSet to read the vertex positions from.
+     * @param[in] p_surfSet              the FsSurfaceSet to read the vertex positions from.
      * @param[out] p_qListLabels         the converted labels are appended to a given list. Stored data are not affected.
      * @param[out] p_qListLabelRGBAs     the converted label RGBAs are appended to a given list. Stored data are not affected.
      * @param[out] lLabelPicks           the label names which should be picked.
      *
      * @return true if successful, false otherwise.
      */
-    bool toLabels(const SurfaceSet &p_surfSet,
-                  QList<Label> &p_qListLabels,
+    bool toLabels(const FsSurfaceSet &p_surfSet,
+                  QList<FsLabel> &p_qListLabels,
                   QList<Eigen::RowVector4i> &p_qListLabelRGBAs,
                   const QStringList& lLabelPicks = QStringList()) const;
 
@@ -200,9 +200,9 @@ public:
      *
      * @param[in] idx    the hemisphere index (0 or 1).
      *
-     * @return Annotation related to the parameter index.
+     * @return FsAnnotation related to the parameter index.
      */
-    Annotation& operator[] (qint32 idx);
+    FsAnnotation& operator[] (qint32 idx);
 
     //=========================================================================================================
     /**
@@ -210,9 +210,9 @@ public:
      *
      * @param[in] idx    the hemisphere index (0 or 1).
      *
-     * @return Annotation related to the parameter index.
+     * @return FsAnnotation related to the parameter index.
      */
-    const Annotation operator[] (qint32 idx) const;
+    const FsAnnotation operator[] (qint32 idx) const;
 
     //=========================================================================================================
     /**
@@ -220,9 +220,9 @@ public:
      *
      * @param[in] idt    the hemisphere identifier ("lh" or "rh").
      *
-     * @return Annotation related to the parameter identifier.
+     * @return FsAnnotation related to the parameter identifier.
      */
-    Annotation& operator[] (QString idt);
+    FsAnnotation& operator[] (QString idt);
 
     //=========================================================================================================
     /**
@@ -230,9 +230,9 @@ public:
      *
      * @param[in] idt    the hemisphere identifier ("lh" or "rh").
      *
-     * @return Annotation related to the parameter identifier.
+     * @return FsAnnotation related to the parameter identifier.
      */
-    const Annotation operator[] (QString idt) const;
+    const FsAnnotation operator[] (QString idt) const;
 
     //=========================================================================================================
     /**
@@ -243,28 +243,28 @@ public:
     inline qint32 size() const;
 
 private:
-    QMap<qint32, Annotation> m_qMapAnnots;   /**< Hemisphere annotations (lh = 0; rh = 1). */
+    QMap<qint32, FsAnnotation> m_qMapAnnots;   /**< Hemisphere annotations (lh = 0; rh = 1). */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline QMap<qint32, Annotation>& AnnotationSet::data()
+inline QMap<qint32, FsAnnotation>& FsAnnotationSet::data()
 {
     return m_qMapAnnots;
 }
 
 //=============================================================================================================
 
-inline bool AnnotationSet::isEmpty() const
+inline bool FsAnnotationSet::isEmpty() const
 {
     return m_qMapAnnots.isEmpty();
 }
 
 //=============================================================================================================
 
-inline qint32 AnnotationSet::size() const
+inline qint32 FsAnnotationSet::size() const
 {
     return m_qMapAnnots.size();
 }

@@ -467,7 +467,7 @@ bool SetupForwardModel::readAsciiTriFile(const QString& fileName, int id, float 
     surf.sigma = sigma;
 
     // Compute vertex normals
-    surf.nn = Surface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
+    surf.nn = FsSurface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
 
     // Shift vertices if requested
     if (shift != 0.0f) {
@@ -544,7 +544,7 @@ bool SetupForwardModel::readFreeSurferSurf(const QString& fileName, int id, floa
     surf.sigma = sigma;
 
     // Compute vertex normals
-    surf.nn = Surface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
+    surf.nn = FsSurface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
 
     // Shift vertices if requested
     if (shift != 0.0f) {
@@ -565,9 +565,9 @@ void SetupForwardModel::shiftVertices(MNEBemSurface& surf, float shift) const
     }
 
     // Recompute normals after shifting
-    surf.nn = Surface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
+    surf.nn = FsSurface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
 
-    printf("Surface vertices shifted by %6.1f mm.\n", 1000.0f * shift);
+    printf("FsSurface vertices shifted by %6.1f mm.\n", 1000.0f * shift);
 }
 
 //=============================================================================================================
@@ -712,7 +712,7 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
 
             MNESurface* s = bemModel->surfs[k].get();
 
-            // Surface ID
+            // FsSurface ID
             int surfId = s->id;
             stream->write_int(FIFF_BEM_SURF_ID, &surfId);
 

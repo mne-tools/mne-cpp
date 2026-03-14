@@ -136,7 +136,7 @@ QSharedPointer<AbstractPlugin> RtFwd::clone() const
 void RtFwd::init()
 {
     // Inits
-    m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
+    m_pAnnotationSet = FsAnnotationSet::SPtr(new FsAnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
 
     // Input
     m_pHpiInput = PluginInputData<RealTimeHpiResult>::create(this, "rtFwd RTHR In", "rtFwd real time HPI result input data");
@@ -385,7 +385,7 @@ void RtFwd::onClusteringStatusChanged(bool bDoClustering)
 
 //=============================================================================================================
 
-void RtFwd::onAtlasDirChanged(const QString& sDirPath, const AnnotationSet::SPtr pAnnotationSet)
+void RtFwd::onAtlasDirChanged(const QString& sDirPath, const FsAnnotationSet::SPtr pAnnotationSet)
 {
     m_mutex.lock();
     m_sAtlasDir = sDirPath;

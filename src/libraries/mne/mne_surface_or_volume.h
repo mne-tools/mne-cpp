@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MNE Surface or Volume (MNESurfaceOrVolume) class declaration.
+ * @brief    MNE FsSurface or Volume (MNESurfaceOrVolume) class declaration.
  *
  */
 
@@ -131,13 +131,13 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief Constructs the MNE Surface or Volume.
+     * @brief Constructs the MNE FsSurface or Volume.
      */
     MNESurfaceOrVolume();
 
     //=========================================================================================================
     /**
-     * @brief Destroys the MNE Surface or Volume description.
+     * @brief Destroys the MNE FsSurface or Volume description.
      */
     virtual ~MNESurfaceOrVolume();
 
@@ -275,7 +275,7 @@ public:
 public:
     int             type;          /**< Is this a volume or a surface. */
     QString         subject;       /**< Name (id) of the subject. */
-    int             id;            /**< Surface id. */
+    int             id;            /**< FsSurface id. */
     int             coord_frame;   /**< Which coordinate system the data are in now. */
     /*
      * These relate to the FreeSurfer way
@@ -287,7 +287,7 @@ public:
      */
     int              np;        /**< Number of vertices. */
     PointsT          rr;        /**< The vertex locations (np x 3, row-major). */
-    NormalsT         nn;        /**< Surface normals at these points (np x 3, row-major). */
+    NormalsT         nn;        /**< FsSurface normals at these points (np x 3, row-major). */
     float            cm[3];     /**< Center of mass of the vertex cloud. */
 
     Eigen::VectorXi   inuse;    /**< Boolean array indicating whether each vertex is in use in the source space (np elements). */

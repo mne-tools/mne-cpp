@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Annotation class declaration
+ * @brief    FsAnnotation class declaration
  *
  */
 
@@ -68,8 +68,8 @@ namespace FSLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class Label;
-class Surface;
+class FsLabel;
+class FsSurface;
 
 //=============================================================================================================
 /**
@@ -77,26 +77,26 @@ class Surface;
  *
  * @brief Free surfer annotation
  */
-class FSSHARED_EXPORT Annotation
+class FSSHARED_EXPORT FsAnnotation
 {
 
 public:
-    typedef QSharedPointer<Annotation> SPtr;            /**< Shared pointer type for Annotation. */
-    typedef QSharedPointer<const Annotation> ConstSPtr; /**< Const shared pointer type for Annotation. */
+    typedef QSharedPointer<FsAnnotation> SPtr;            /**< Shared pointer type for FsAnnotation. */
+    typedef QSharedPointer<const FsAnnotation> ConstSPtr; /**< Const shared pointer type for FsAnnotation. */
 
     //=========================================================================================================
     /**
      * Default constructor
      */
-    Annotation();
+    FsAnnotation();
 
     //=========================================================================================================
     /**
      * Construts the annotation by reading it of the given file.
      *
-     * @param[in] p_sFileName    Annotation file.
+     * @param[in] p_sFileName    FsAnnotation file.
      */
-    explicit Annotation(const QString& p_sFileName);
+    explicit FsAnnotation(const QString& p_sFileName);
 
     //=========================================================================================================
     /**
@@ -107,7 +107,7 @@ public:
      * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
      * @param[in] subjects_dir       Subjects directory.
      */
-    explicit Annotation(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
+    explicit FsAnnotation(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
 
     //=========================================================================================================
     /**
@@ -119,23 +119,23 @@ public:
      *
      * @return true if read sucessful, false otherwise.
      */
-    explicit Annotation(const QString &path, qint32 hemi, const QString &surf);
+    explicit FsAnnotation(const QString &path, qint32 hemi, const QString &surf);
 
     //=========================================================================================================
     /**
      * Destroys the annotation.
      */
-    ~Annotation();
+    ~FsAnnotation();
 
     //=========================================================================================================
     /**
-     * Initializes the Annotation.
+     * Initializes the FsAnnotation.
      */
     void clear();
 
     //=========================================================================================================
     /**
-     * Returns whether Annotation is empty.
+     * Returns whether FsAnnotation is empty.
      *
      * @return true if is empty, false otherwise.
      */
@@ -187,7 +187,7 @@ public:
      *
      * @return colortable.
      */
-    inline Colortable& getColortable();
+    inline FsColortable& getColortable();
 
     //=========================================================================================================
     /**
@@ -195,7 +195,7 @@ public:
      *
      * @return colortable.
      */
-    inline const Colortable getColortable() const;
+    inline const FsColortable getColortable() const;
 
     //=========================================================================================================
     /**
@@ -209,7 +209,7 @@ public:
      *
      * @return true if read sucessful, false otherwise.
      */
-    static bool read(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir, Annotation &p_Annotation);
+    static bool read(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir, FsAnnotation &p_Annotation);
 
     //=========================================================================================================
     /**
@@ -222,18 +222,18 @@ public:
      *
      * @return true if read sucessful, false otherwise.
      */
-    static bool read(const QString &path, qint32 hemi, const QString &atlas, Annotation &p_Annotation);
+    static bool read(const QString &path, qint32 hemi, const QString &atlas, FsAnnotation &p_Annotation);
 
     //=========================================================================================================
     /**
      * Reads an annotation of a file
      *
-     * @param[in] p_sFileName    Annotation file.
+     * @param[in] p_sFileName    FsAnnotation file.
      * @param[out] p_Annotation  the read annotation.
      *
      * @return true if successful, false otherwise.
      */
-    static bool read(const QString &p_sFileName, Annotation &p_Annotation);
+    static bool read(const QString &p_sFileName, FsAnnotation &p_Annotation);
 
     //=========================================================================================================
     /**
@@ -248,8 +248,8 @@ public:
      *
      * @return true if successful, false otherwise.
      */
-    bool toLabels(const Surface &p_surf,
-                  QList<Label> &p_qListLabels,
+    bool toLabels(const FsSurface &p_surf,
+                  QList<FsLabel> &p_qListLabels,
                   QList<Eigen::RowVector4i> &p_qListLabelRGBAs,
                   const QStringList& lLabelPicks = QStringList()) const;
 
@@ -270,84 +270,84 @@ public:
     inline QString fileName() const;
 
 private:
-    QString m_sFileName;        /**< Annotation file name. */
-    QString m_sFilePath;        /**< Annotation file path. */
+    QString m_sFileName;        /**< FsAnnotation file name. */
+    QString m_sFilePath;        /**< FsAnnotation file path. */
 
     qint32 m_iHemi;             /**< Hemisphere (lh = 0; rh = 1). */
     Eigen::VectorXi m_Vertices;        /**< Vertice indeces. */
     Eigen::VectorXi m_LabelIds;        /**< Vertice label ids. */
 
-    Colortable m_Colortable;    /**< Lookup table label colors & ids. */
+    FsColortable m_Colortable;    /**< Lookup table label colors & ids. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline qint32 Annotation::hemi() const
+inline qint32 FsAnnotation::hemi() const
 {
     return m_iHemi;
 }
 
 //=============================================================================================================
 
-inline bool Annotation::isEmpty() const
+inline bool FsAnnotation::isEmpty() const
 {
     return m_iHemi == -1;
 }
 
 //=============================================================================================================
 
-inline Eigen::VectorXi& Annotation::getVertices()
+inline Eigen::VectorXi& FsAnnotation::getVertices()
 {
     return m_Vertices;
 }
 
 //=============================================================================================================
 
-inline const Eigen::VectorXi Annotation::getVertices() const
+inline const Eigen::VectorXi FsAnnotation::getVertices() const
 {
     return m_Vertices;
 }
 
 //=============================================================================================================
 
-inline Eigen::VectorXi& Annotation::getLabelIds()
+inline Eigen::VectorXi& FsAnnotation::getLabelIds()
 {
     return m_LabelIds;
 }
 
 //=============================================================================================================
 
-inline const Eigen::VectorXi Annotation::getLabelIds() const
+inline const Eigen::VectorXi FsAnnotation::getLabelIds() const
 {
     return m_LabelIds;
 }
 
 //=============================================================================================================
 
-inline Colortable& Annotation::getColortable()
+inline FsColortable& FsAnnotation::getColortable()
 {
     return m_Colortable;
 }
 
 //=============================================================================================================
 
-inline const Colortable Annotation::getColortable() const
+inline const FsColortable FsAnnotation::getColortable() const
 {
     return m_Colortable;
 }
 
 //=============================================================================================================
 
-inline QString Annotation::filePath() const
+inline QString FsAnnotation::filePath() const
 {
     return m_sFilePath;
 }
 
 //=============================================================================================================
 
-inline QString Annotation::fileName() const
+inline QString FsAnnotation::fileName() const
 {
     return m_sFileName;
 }

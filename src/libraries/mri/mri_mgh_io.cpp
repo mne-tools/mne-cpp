@@ -119,7 +119,7 @@ bool MriMghIO::read(const QString& mgzFile,
         FIFFV_COORD_MRI_SLICE, FIFFV_COORD_MRI, vox2ras, true);
 
     if (verbose) {
-        printf("Voxel -> Surface RAS transform:\n");
+        printf("Voxel -> FsSurface RAS transform:\n");
         for (int r = 0; r < 4; ++r) {
             printf("  %10.6f %10.6f %10.6f %10.6f\n",
                    vox2ras(r, 0), vox2ras(r, 1), vox2ras(r, 2), vox2ras(r, 3));

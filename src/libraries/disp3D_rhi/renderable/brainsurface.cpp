@@ -77,7 +77,7 @@ QRhiBuffer* BrainSurface::indexBuffer()  const { return m_gpu->indexBuffer.get()
 
 //=============================================================================================================
 
-void BrainSurface::fromSurface(const FSLIB::Surface &surf)
+void BrainSurface::fromSurface(const FSLIB::FsSurface &surf)
 {
     m_vertexData.clear();
     m_indexData.clear();
@@ -134,7 +134,7 @@ void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface &surf, const QColo
     // Compute normals if missing
     Eigen::MatrixX3f nn = surf.nn;
     if (nn.rows() != nVerts) {
-        nn = FSLIB::Surface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
+        nn = FSLIB::FsSurface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
     }
     
     m_defaultColor = color;
@@ -243,7 +243,7 @@ Eigen::MatrixX3f BrainSurface::vertexNormals() const
 
 bool BrainSurface::loadAnnotation(const QString &path)
 {
-    if (!FSLIB::Annotation::read(path, m_annotation)) {
+    if (!FSLIB::FsAnnotation::read(path, m_annotation)) {
         qWarning() << "BrainSurface: Failed to load annotation from" << path;
         return false;
     }
@@ -253,7 +253,7 @@ bool BrainSurface::loadAnnotation(const QString &path)
     return true;
 }
 
-void BrainSurface::addAnnotation(const FSLIB::Annotation &annotation)
+void BrainSurface::addAnnotation(const FSLIB::FsAnnotation &annotation)
 {
     m_annotation = annotation;
     m_hasAnnotation = true;
@@ -315,7 +315,7 @@ void BrainSurface::updateVertexColors()
     //       Brain surfaces (with curvature): curvature-based gray.
     //       Non-brain surfaces (BEM, sensors, etc.): use m_baseColor.
     //       The shader uses this for Scientific mode and as a lighting base;
-    //       in Surface mode the shader overrides with white for brain tissue.
+    //       in FsSurface mode the shader overrides with white for brain tissue.
     if (!m_curvature.isEmpty() && m_curvature.size() == m_vertexData.size()) {
         for (int i = 0; i < m_vertexData.size(); ++i) {
             const uint32_t val = (m_curvature[i] > 0.0f) ? 0x40u : 0xAAu;
@@ -335,7 +335,7 @@ void BrainSurface::updateVertexColors()
     // Each viewport selects the overlay mode via a per-draw shader uniform
     // (overlayMode), so the vertex buffer must hold STC data for any
     // viewport that shows Source Estimate, regardless of this surface's
-    // m_visMode.  Annotation data lives in a separate vertex attribute
+    // m_visMode.  FsAnnotation data lives in a separate vertex attribute
     // (colorAnnotation) and is unaffected.
     if (!m_stcColors.isEmpty()) {
         for (int i = 0; i < qMin(m_stcColors.size(), m_vertexData.size()); ++i) {
@@ -351,7 +351,7 @@ void BrainSurface::updateVertexColors()
     if (m_hasAnnotation && !m_vertexData.isEmpty()) {
         const Eigen::VectorXi &vertices = m_annotation.getVertices();
         const Eigen::VectorXi &labelIds = m_annotation.getLabelIds();
-        const FSLIB::Colortable &ct = m_annotation.getColortable();
+        const FSLIB::FsColortable &ct = m_annotation.getColortable();
 
         for (int i = 0; i < labelIds.rows(); ++i) {
             int vertexIdx = vertices(i);
@@ -741,7 +741,7 @@ QString BrainSurface::getAnnotationLabel(int vertexIdx) const
 
     const Eigen::VectorXi &vertices = m_annotation.getVertices();
     const Eigen::VectorXi &labelIds = m_annotation.getLabelIds();
-    const FSLIB::Colortable &ct = m_annotation.getColortable();
+    const FSLIB::FsColortable &ct = m_annotation.getColortable();
 
     // The .annot file might not contain all vertices if it's sparse, 
     // but usually it contains a mapping for all.

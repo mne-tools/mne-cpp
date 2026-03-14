@@ -106,7 +106,7 @@ public:
         QVector3D cameraPos;
         QVector3D lightDir;
         bool lightingEnabled;
-        float overlayMode = 0.0f;       // 0=Surface, 1=Annotation, 2=Scientific, 3=STC
+        float overlayMode = 0.0f;       // 0=FsSurface, 1=FsAnnotation, 2=Scientific, 3=STC
 
         // Viewport rectangle (floating-point, pixels)
         float viewportX = 0, viewportY = 0, viewportW = 0, viewportH = 0;

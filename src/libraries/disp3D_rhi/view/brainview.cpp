@@ -245,7 +245,7 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
 
         AbstractTreeItem* absItem = dynamic_cast<AbstractTreeItem*>(item);
 
-        // Handle Surface Items
+        // Handle FsSurface Items
         if (absItem && absItem->type() == AbstractTreeItem::SurfaceItem + QStandardItem::UserType) {
             SurfaceTreeItem* surfItem = static_cast<SurfaceTreeItem*>(absItem);
             auto brainSurf = std::make_shared<BrainSurface>();
@@ -1632,7 +1632,7 @@ void BrainView::render(QRhiCommandBuffer *cb)
 
     // BEM / sensor surfaces: per-item overlayMode controls whether field
     // map colours are shown (Scientific) or the surface falls back to
-    // its default holographic shell appearance (Surface).
+    // its default holographic shell appearance (FsSurface).
     BrainRenderer::SceneData bemSceneData = sceneData;
 
     for (const auto &item : transparentItems) {

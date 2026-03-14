@@ -127,7 +127,7 @@ private:
     BrainView *m_brainView = nullptr;
     BrainTreeModel *m_model = nullptr;
 
-    // Control widgets - Surface
+    // Control widgets - FsSurface
     QComboBox *m_surfCombo = nullptr;
     QComboBox *m_overlayCombo = nullptr;
     QComboBox *m_shaderCombo = nullptr;
@@ -152,7 +152,7 @@ private:
     QLabel *m_editTargetLabel = nullptr;
     QLabel *m_cameraPresetLabel = nullptr;
 
-    // Control widgets - Brain Surface
+    // Control widgets - Brain FsSurface
     QPushButton *m_loadSurfaceBtn = nullptr;
     QPushButton *m_loadAtlasBtn = nullptr;
 

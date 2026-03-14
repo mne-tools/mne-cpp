@@ -201,8 +201,8 @@ protected:
 
     int                                                         m_iNumberBadChannels;   /**< The last received number of bad channels. */
 
-    FSLIB::AnnotationSet                                        m_annotationSet;        /**< The current annotation set. */
-    FSLIB::SurfaceSet                                           m_surfSet;              /**< The current surface set. */
+    FSLIB::FsAnnotationSet                                        m_annotationSet;        /**< The current annotation set. */
+    FSLIB::FsSurfaceSet                                           m_surfSet;              /**< The current surface set. */
 
     QMatrix4x4                                                  m_tAlignment;           /**< Transformation matrix alignment fiducials/tracked in head space. */
     FIFFLIB::FiffCoordTrans                                     m_mriHeadTrans;         /**< The mri to head transformation. */

@@ -69,7 +69,7 @@ public:
      *
      * @param[in] center     World-space center of the sphere.
      * @param[in] radius     Radius in meters.
-     * @param[in] color      Surface color.
+     * @param[in] color      FsSurface color.
      * @param[in] subdivisions  Number of subdivision passes (0 = 20 tris, 1 = 80 tris).
      * @return Shared pointer to the created BrainSurface.
      */
@@ -84,7 +84,7 @@ public:
      *
      * @param[in] center     World-space center.
      * @param[in] orientation  3×3 rotation embedded in a 4×4 matrix (coil_trans).
-     * @param[in] color      Surface color.
+     * @param[in] color      FsSurface color.
      * @param[in] size       Side length in meters (plate is size × size × thin).
      * @return Shared pointer to the created BrainSurface.
      */
@@ -100,7 +100,7 @@ public:
      *
      * @param[in] center     World-space center.
      * @param[in] orientation  3×3 rotation embedded in a 4×4 matrix (coil_trans).
-     * @param[in] color      Surface color.
+     * @param[in] color      FsSurface color.
      * @param[in] size       Overall size scale in meters.
      * @return Shared pointer to the created BrainSurface.
      */

@@ -338,7 +338,7 @@ QString shaderModeName(ShaderMode mode)
 
 VisualizationMode visualizationModeFromName(const QString &name)
 {
-    if (name == "Annotation")      return ModeAnnotation;
+    if (name == "FsAnnotation")      return ModeAnnotation;
     if (name == "Scientific")      return ModeScientific;
     if (name == "Source Estimate")  return ModeSourceEstimate;
     return ModeSurface;
@@ -348,10 +348,10 @@ VisualizationMode visualizationModeFromName(const QString &name)
 
 QString visualizationModeName(VisualizationMode mode)
 {
-    if (mode == ModeAnnotation)     return QStringLiteral("Annotation");
+    if (mode == ModeAnnotation)     return QStringLiteral("FsAnnotation");
     if (mode == ModeScientific)     return QStringLiteral("Scientific");
     if (mode == ModeSourceEstimate) return QStringLiteral("Source Estimate");
-    return QStringLiteral("Surface");
+    return QStringLiteral("FsSurface");
 }
 
 //=============================================================================================================

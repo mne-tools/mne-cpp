@@ -1,7 +1,7 @@
 /**
  * @file test_fs_io.cpp
- * @brief Tests for FSLIB I/O and processing: Surface, Annotation, Label,
- *        SurfaceSet, AnnotationSet, compute_normals, read_curv.
+ * @brief Tests for FSLIB I/O and processing: FsSurface, FsAnnotation, FsLabel,
+ *        FsSurfaceSet, FsAnnotationSet, compute_normals, read_curv.
  *        Tests both error paths (invalid files) and synthetic surface operations.
  */
 #include <QTest>
@@ -110,24 +110,24 @@ private:
 private slots:
 
     //=========================================================================
-    // Surface - default & clear
+    // FsSurface - default & clear
     //=========================================================================
     void surface_defaultCtor()
     {
-        Surface s;
+        FsSurface s;
         QVERIFY(s.isEmpty());
         QCOMPARE(s.hemi(), -1);
     }
 
     void surface_clear()
     {
-        Surface s;
+        FsSurface s;
         s.clear();
         QVERIFY(s.isEmpty());
     }
 
     //=========================================================================
-    // Surface::compute_normals
+    // FsSurface::compute_normals
     //=========================================================================
     void surface_computeNormals_singleTriangle()
     {
@@ -139,7 +139,7 @@ private slots:
         MatrixX3i tris(1, 3);
         tris << 0, 1, 2;
 
-        MatrixX3f nn = Surface::compute_normals(rr, tris);
+        MatrixX3f nn = FsSurface::compute_normals(rr, tris);
         QCOMPARE(nn.rows(), (Eigen::Index)3);
         QCOMPARE(nn.cols(), (Eigen::Index)3);
 
@@ -166,7 +166,7 @@ private slots:
                 0, 3, 1,
                 1, 3, 2;
 
-        MatrixX3f nn = Surface::compute_normals(rr, tris);
+        MatrixX3f nn = FsSurface::compute_normals(rr, tris);
         QCOMPARE(nn.rows(), (Eigen::Index)4);
 
         // Each vertex normal should be unit-ish length
@@ -181,17 +181,17 @@ private slots:
     {
         MatrixX3f rr(0, 3);
         MatrixX3i tris(0, 3);
-        MatrixX3f nn = Surface::compute_normals(rr, tris);
+        MatrixX3f nn = FsSurface::compute_normals(rr, tris);
         QCOMPARE(nn.rows(), (Eigen::Index)0);
     }
 
     //=========================================================================
-    // Surface::read - error paths
+    // FsSurface::read - error paths
     //=========================================================================
     void surface_readNonExistentFile()
     {
-        Surface s;
-        bool ok = Surface::read("/nonexistent/path/lh.white", s);
+        FsSurface s;
+        bool ok = FsSurface::read("/nonexistent/path/lh.white", s);
         QVERIFY(!ok);
         QVERIFY(s.isEmpty());
     }
@@ -214,8 +214,8 @@ private slots:
         writeSyntheticSurface(filePath, 4, 2, verts, tris);
         QVERIFY(QFile::exists(filePath));
 
-        Surface s;
-        bool ok = Surface::read(filePath, s, false);
+        FsSurface s;
+        bool ok = FsSurface::read(filePath, s, false);
         // May or may not succeed depending on format details,
         // but should not crash
         if (ok) {
@@ -226,29 +226,29 @@ private slots:
     }
 
     //=========================================================================
-    // Annotation - default & clear
+    // FsAnnotation - default & clear
     //=========================================================================
     void annotation_defaultCtor()
     {
-        Annotation a;
+        FsAnnotation a;
         QVERIFY(a.isEmpty());
         QCOMPARE(a.hemi(), -1);
     }
 
     void annotation_clear()
     {
-        Annotation a;
+        FsAnnotation a;
         a.clear();
         QVERIFY(a.isEmpty());
     }
 
     //=========================================================================
-    // Annotation::read - error paths
+    // FsAnnotation::read - error paths
     //=========================================================================
     void annotation_readNonExistentFile()
     {
-        Annotation a;
-        bool ok = Annotation::read("/nonexistent/path/lh.aparc.annot", a);
+        FsAnnotation a;
+        bool ok = FsAnnotation::read("/nonexistent/path/lh.aparc.annot", a);
         QVERIFY(!ok);
     }
 
@@ -275,11 +275,11 @@ private slots:
     }
 
     //=========================================================================
-    // Label
+    // FsLabel
     //=========================================================================
     void label_defaultCtor()
     {
-        Label l;
+        FsLabel l;
         QVERIFY(l.isEmpty());
         QCOMPARE(l.hemi, -1);
     }
@@ -295,7 +295,7 @@ private slots:
         VectorXd vals(3);
         vals << 1.0, 2.0, 3.0;
 
-        Label l(verts, pos, vals, 0, "TestLabel", 42);
+        FsLabel l(verts, pos, vals, 0, "TestLabel", 42);
         QVERIFY(!l.isEmpty());
         QCOMPARE(l.hemi, 0);
         QCOMPARE(l.name, QString("TestLabel"));
@@ -312,7 +312,7 @@ private slots:
         VectorXd vals(2);
         vals << 1, 2;
 
-        Label l(verts, pos, vals, 1, "L", 1);
+        FsLabel l(verts, pos, vals, 1, "L", 1);
         QVERIFY(!l.isEmpty());
         l.clear();
         QVERIFY(l.isEmpty());
@@ -320,8 +320,8 @@ private slots:
 
     void label_readNonExistentFile()
     {
-        Label l;
-        bool ok = Label::read("/nonexistent/label.label", l);
+        FsLabel l;
+        bool ok = FsLabel::read("/nonexistent/label.label", l);
         QVERIFY(!ok);
     }
 
@@ -334,7 +334,7 @@ private slots:
         VectorXd vals(3);
         vals << 1, 1, 1;
 
-        Label l(verts, pos, vals, 0, "tri_label");
+        FsLabel l(verts, pos, vals, 0, "tri_label");
 
         MatrixX3i allTris(4, 3);
         allTris << 0, 1, 2,
@@ -349,92 +349,92 @@ private slots:
     }
 
     //=========================================================================
-    // SurfaceSet - default
+    // FsSurfaceSet - default
     //=========================================================================
     void surfaceSet_defaultCtor()
     {
-        SurfaceSet ss;
+        FsSurfaceSet ss;
         QVERIFY(ss.isEmpty());
     }
 
     void surfaceSet_clear()
     {
-        SurfaceSet ss;
+        FsSurfaceSet ss;
         ss.clear();
         QVERIFY(ss.isEmpty());
     }
 
     void surfaceSet_insertAndAccess()
     {
-        SurfaceSet ss;
-        Surface lh;
-        Surface rh;
+        FsSurfaceSet ss;
+        FsSurface lh;
+        FsSurface rh;
         // Insert empty surfaces (still tests the container logic)
         ss.insert(lh);
-        // SurfaceSet may or may not be empty depending on implementation
+        // FsSurfaceSet may or may not be empty depending on implementation
     }
 
     void surfaceSet_readNonExistentFiles()
     {
-        SurfaceSet ss;
-        bool ok = SurfaceSet::read("/nonexistent/lh.white", "/nonexistent/rh.white", ss);
+        FsSurfaceSet ss;
+        bool ok = FsSurfaceSet::read("/nonexistent/lh.white", "/nonexistent/rh.white", ss);
         QVERIFY(!ok);
     }
 
     //=========================================================================
-    // AnnotationSet - default
+    // FsAnnotationSet - default
     //=========================================================================
     void annotationSet_defaultCtor()
     {
-        AnnotationSet as;
+        FsAnnotationSet as;
         QVERIFY(as.isEmpty());
     }
 
     void annotationSet_clear()
     {
-        AnnotationSet as;
+        FsAnnotationSet as;
         as.clear();
         QVERIFY(as.isEmpty());
     }
 
     void annotationSet_insertAndAccess()
     {
-        AnnotationSet as;
-        Annotation lh;
-        Annotation rh;
+        FsAnnotationSet as;
+        FsAnnotation lh;
+        FsAnnotation rh;
         as.insert(lh);
         // Test container logic
     }
 
     void annotationSet_readNonExistentFiles()
     {
-        AnnotationSet as;
-        bool ok = AnnotationSet::read("/nonexistent/lh.annot", "/nonexistent/rh.annot", as);
+        FsAnnotationSet as;
+        bool ok = FsAnnotationSet::read("/nonexistent/lh.annot", "/nonexistent/rh.annot", as);
         QVERIFY(!ok);
     }
 
     //=========================================================================
-    // Colortable
+    // FsColortable
     //=========================================================================
     void colortable_defaultCtor()
     {
-        Colortable ct;
+        FsColortable ct;
         QCOMPARE(ct.numEntries, 0);
     }
 
     void colortable_clear()
     {
-        Colortable ct;
+        FsColortable ct;
         ct.clear();
         QCOMPARE(ct.numEntries, 0);
     }
 
     //=========================================================================
-    // Surface::read_curv - error paths
+    // FsSurface::read_curv - error paths
     //=========================================================================
     void surface_readCurv_nonExistentFile()
     {
-        VectorXf curv = Surface::read_curv("/nonexistent/lh.curv");
+        VectorXf curv = FsSurface::read_curv("/nonexistent/lh.curv");
         QCOMPARE(curv.size(), (Eigen::Index)0);
     }
 };

@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the Label class.
+ * @brief    Definition of the FsLabel class.
  *
  */
 
@@ -66,7 +66,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Label::Label()
+FsLabel::FsLabel()
 : hemi(-1)
 , label_id(-1)
 {
@@ -74,7 +74,7 @@ Label::Label()
 
 //=============================================================================================================
 
-Label::Label(const VectorXi &p_vertices,
+FsLabel::FsLabel(const VectorXi &p_vertices,
              const MatrixX3f &p_pos,
              const VectorXd &p_values,
              qint32 p_hemi,
@@ -91,13 +91,13 @@ Label::Label(const VectorXi &p_vertices,
 
 //=============================================================================================================
 
-Label::~Label()
+FsLabel::~FsLabel()
 {
 }
 
 //=============================================================================================================
 
-void Label::clear()
+void FsLabel::clear()
 {
     comment = QString("");
     hemi = -1;
@@ -111,7 +111,7 @@ void Label::clear()
 
 //=============================================================================================================
 
-MatrixX3i Label::selectTris(const Surface & p_Surface)
+MatrixX3i FsLabel::selectTris(const FsSurface & p_Surface)
 {
 //    //check whether there are data to create the tris
 //    if(this->vertices.size() == 0)
@@ -144,7 +144,7 @@ MatrixX3i Label::selectTris(const Surface & p_Surface)
 
 //=============================================================================================================
 
-MatrixX3i Label::selectTris(const MatrixX3i &p_matTris)
+MatrixX3i FsLabel::selectTris(const MatrixX3i &p_matTris)
 {
     //check whether there are data to create the tris
     if(this->vertices.size() == 0)
@@ -177,7 +177,7 @@ MatrixX3i Label::selectTris(const MatrixX3i &p_matTris)
 
 //=============================================================================================================
 
-bool Label::read(const QString& p_sFileName, Label &p_Label)
+bool FsLabel::read(const QString& p_sFileName, FsLabel &p_Label)
 {
     p_Label.clear();
 

@@ -86,8 +86,8 @@ namespace RTPROCESSINGLIB {
 }
 
 namespace FSLIB {
-    class AnnotationSet;
-    class SurfaceSet;
+    class FsAnnotationSet;
+    class FsSurfaceSet;
 }
 
 namespace SCMEASLIB {
@@ -235,8 +235,8 @@ protected:
     QSharedPointer<RTPROCESSINGLIB::RtInvOp>                                                m_pRtInvOp;                 /**< Real-time inverse operator. */
     QSharedPointer<FWDLIB::FwdForwardSolution>                                              m_pFwd;                     /**< Forward solution. */
     QSharedPointer<FIFFLIB::FiffCov>                                                        m_pNoiseCov;                     /**< Noise Covariance Matrix. */
-    QSharedPointer<FSLIB::AnnotationSet>                                                    m_pAnnotationSet;           /**< Annotation set. */
-    QSharedPointer<FSLIB::SurfaceSet>                                                       m_pSurfaceSet;              /**< Surface set. */
+    QSharedPointer<FSLIB::FsAnnotationSet>                                                    m_pAnnotationSet;           /**< FsAnnotation set. */
+    QSharedPointer<FSLIB::FsSurfaceSet>                                                       m_pSurfaceSet;              /**< FsSurface set. */
     QSharedPointer<FIFFLIB::FiffInfoBase>                                                   m_pFiffInfoForward;         /**< Fiff information of the forward solution. */
     QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfo;                /**< Fiff information. */
     QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfoInput;           /**< Fiff information of the evoked. */
@@ -256,7 +256,7 @@ protected:
     qint32                          m_iTimePointSps;            /**< The time point to pick from the data in samples. */
 
     QString                         m_sAtlasDir;                /**< File to Atlas. */
-    QString                         m_sSurfaceDir;              /**< File to Surface. */
+    QString                         m_sSurfaceDir;              /**< File to FsSurface. */
     QString                         m_sAvrType;                 /**< The average type. */
     QString                         m_sMethod;                  /**< The method: "MNE" | "dSPM" | "sLORETA". */
     QFile                           m_fMriHeadTrans;            /**< The Head - Mri transformation. */

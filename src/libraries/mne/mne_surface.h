@@ -71,7 +71,7 @@ class MNEProjData;
 
 //=============================================================================================================
 /**
- * Implements the MNE Surface (Replaces typedef mneSurfaceOrVolume mneSurface; struct of MNE-C mne_types.h).
+ * Implements the MNE FsSurface (Replaces typedef mneSurfaceOrVolume mneSurface; struct of MNE-C mne_types.h).
  *
  * @brief This defines a surface
  */
@@ -83,18 +83,18 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs the MNE Surface
+     * Constructs the MNE FsSurface
      */
     MNESurface();
 
     //=========================================================================================================
     /**
-     * Destroys the MNE Surface
+     * Destroys the MNE FsSurface
      */
     ~MNESurface();
 
     //=========================================================================================================
-    // Surface geometry const methods
+    // FsSurface geometry const methods
     //=========================================================================================================
 
     /**
@@ -228,7 +228,7 @@ public:
      * Read a BEM surface from a FIFF file (excess-neighbor checking enabled).
      *
      * @param[in]  name           Path to the BEM FIFF file.
-     * @param[in]  which          Surface ID to load (-1 loads the first found).
+     * @param[in]  which          FsSurface ID to load (-1 loads the first found).
      * @param[in]  add_geometry   If non-zero, compute full geometry info.
      * @param[out] sigmap         If non-null, receives the surface conductivity.
      * @return The loaded surface, or NULL on failure. Caller takes ownership.
@@ -240,7 +240,7 @@ public:
      * Read a BEM surface from a FIFF file (excess-neighbor checking disabled).
      *
      * @param[in]  name           Path to the BEM FIFF file.
-     * @param[in]  which          Surface ID to load (-1 loads the first found).
+     * @param[in]  which          FsSurface ID to load (-1 loads the first found).
      * @param[in]  add_geometry   If non-zero, compute full geometry info.
      * @param[out] sigmap         If non-null, receives the surface conductivity.
      * @return The loaded surface, or NULL on failure. Caller takes ownership.
@@ -252,7 +252,7 @@ public:
      * Read a BEM surface from a FIFF file.
      *
      * @param[in]  name                      Path to the BEM FIFF file.
-     * @param[in]  which                     Surface ID to load (-1 loads the first found).
+     * @param[in]  which                     FsSurface ID to load (-1 loads the first found).
      * @param[in]  add_geometry              If non-zero, compute full geometry info.
      * @param[out] sigmap                    If non-null, receives the surface conductivity.
      * @param[in]  check_too_many_neighbors  Fail on excess neighbor count.

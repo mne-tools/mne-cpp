@@ -72,7 +72,7 @@
 
 namespace FSLIB
 {
-    class Label;
+    class FsLabel;
 }
 
 //=============================================================================================================
@@ -95,7 +95,7 @@ struct RegionMTOut
     Eigen::VectorXd    sumd;       /**< Sums of the distances to the centroid. */
     Eigen::MatrixXd    D;          /**< Distances to the centroid. */
 
-    qint32      iLabelIdxOut;   /**< Label ID. */
+    qint32      iLabelIdxOut;   /**< FsLabel ID. */
 };
 
 //=========================================================================================================
@@ -111,7 +111,7 @@ struct RegionMT
 
     qint32      nClusters;      /**< Number of clusters within this region. */
     Eigen::VectorXi    idcs;           /**< Get source space indeces. */
-    qint32      iLabelIdxIn;    /**< Label ID. */
+    qint32      iLabelIdxIn;    /**< FsLabel ID. */
 
     QString     sDistMeasure;   /**< "cityblock" or "sqeuclidean". */
 
@@ -213,7 +213,7 @@ public:
      *
      * @return the assembled kernel.
      */
-    bool assemble_kernel(const FSLIB::Label &label,
+    bool assemble_kernel(const FSLIB::FsLabel &label,
                          QString method,
                          bool pick_normal,
                          Eigen::MatrixXd &K,
@@ -234,14 +234,14 @@ public:
     /**
      * Clusters the current kernel
      *
-     * @param[in]   p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere.
+     * @param[in]   p_AnnotationSet     FsAnnotation set containing the annotation of left & right hemisphere.
      * @param[in]   p_iClusterSize      Maximal cluster size per roi.
      * @param[out]   p_D                 The cluster operator.
      * @param[in]   p_sMethod           "cityblock" or "sqeuclidean".
      *
      * @return the clustered kernel.
      */
-    Eigen::MatrixXd cluster_kernel(const FSLIB::AnnotationSet &p_AnnotationSet,
+    Eigen::MatrixXd cluster_kernel(const FSLIB::FsAnnotationSet &p_AnnotationSet,
                                    qint32 p_iClusterSize,
                                    Eigen::MatrixXd& p_D,
                                    QString p_sMethod = "cityblock") const;

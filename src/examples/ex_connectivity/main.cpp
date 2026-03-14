@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
     QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-    QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2009s");
+    QCommandLineOption annotOption("annotType", "FsAnnotation <type> (for source level usage only).", "type", "aparc.a2009s");
 
     QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
@@ -209,8 +209,8 @@ int main(int argc, char *argv[])
     FwdForwardSolution t_clusteredFwd;
     FwdForwardSolution t_Fwd;
 
-    SurfaceSet tSurfSetInflated (sSubj, 2, "inflated", sSubjDir);
-    AnnotationSet tAnnotSet(sSubj, 2, sAnnotType, sSubjDir);
+    FsSurfaceSet tSurfSetInflated (sSubj, 2, "inflated", sSubjDir);
+    FsAnnotationSet tAnnotSet(sSubj, 2, sAnnotType, sSubjDir);
 
     QFile coordTransfile(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/all-trans.fif");
 
@@ -362,7 +362,7 @@ int main(int argc, char *argv[])
         pConnectivitySettingsManager->m_matEvokedSource = sourceEstimateEvoked.data;
 
         //Generate network nodes and define ROIs
-        /*QList<Label> lLabels;
+        /*QList<FsLabel> lLabels;
         QList<RowVector4i> qListLabelRGBAs;
         QStringList lWantedLabels;
 

@@ -178,7 +178,7 @@ signals:
     /**
      * Emitted when new per-vertex color data is ready for rendering.
      *
-     * @param[in] surfaceKey  Surface key identifying the target surface.
+     * @param[in] surfaceKey  FsSurface key identifying the target surface.
      * @param[in] colors      Per-vertex ABGR color array.
      */
     void newRtSensorColors(const QString &surfaceKey,
@@ -212,7 +212,7 @@ private:
     int m_iCurrentSample = 0;                                       /**< Current sample index for loop replay. */
 
     QSharedPointer<Eigen::MatrixXf> m_mappingMat;                   /**< Dense mapping matrix (nVerts x nChans). */
-    QString m_sSurfaceKey;                                          /**< Surface key for the target surface. */
+    QString m_sSurfaceKey;                                          /**< FsSurface key for the target surface. */
 
     int m_iNumAverages = 1;                                         /**< Number of samples to average. */
     bool m_bIsLooping = true;                                       /**< Whether to loop data. */

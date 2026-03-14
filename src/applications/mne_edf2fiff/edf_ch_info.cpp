@@ -94,7 +94,7 @@ QString EDFChannelInfo::getAsString() const
 {
     QString sDescription;
     sDescription += "\n== EDF CHANNEL INFO START ==";
-    sDescription += "\nChannel Label: " + m_sLabel;
+    sDescription += "\nChannel FsLabel: " + m_sLabel;
     sDescription += "\nTransducer Type: " + m_sTransducerType;
     sDescription += "\nPhysical Dimension: " + m_sPhysicalDimension;
     sDescription += "\nPrefiltering: " + m_sPrefiltering;

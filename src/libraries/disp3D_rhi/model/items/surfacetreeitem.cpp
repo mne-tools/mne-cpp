@@ -48,16 +48,16 @@ SurfaceTreeItem::SurfaceTreeItem(const QString &text)
     setData(0, ShaderModeRole);
 }
 
-void SurfaceTreeItem::setSurfaceData(const FSLIB::Surface &surface)
+void SurfaceTreeItem::setSurfaceData(const FSLIB::FsSurface &surface)
 {
-    // Store as QVariant. We might need Q_DECLARE_METATYPE for FSLIB::Surface if not already done.
+    // Store as QVariant. We might need Q_DECLARE_METATYPE for FSLIB::FsSurface if not already done.
     // For now assuming FSLIB types are registered or we can register them.
     QVariant v;
     v.setValue(surface);
     setData(v, SurfaceDataRole);
 }
 
-void SurfaceTreeItem::setAnnotationData(const FSLIB::Annotation &annotation)
+void SurfaceTreeItem::setAnnotationData(const FSLIB::FsAnnotation &annotation)
 {
     QVariant v;
     v.setValue(annotation);
@@ -69,14 +69,14 @@ void SurfaceTreeItem::setShaderMode(int mode)
     setData(mode, ShaderModeRole);
 }
 
-FSLIB::Surface SurfaceTreeItem::surfaceData() const
+FSLIB::FsSurface SurfaceTreeItem::surfaceData() const
 {
-    return data(SurfaceDataRole).value<FSLIB::Surface>();
+    return data(SurfaceDataRole).value<FSLIB::FsSurface>();
 }
 
-FSLIB::Annotation SurfaceTreeItem::annotationData() const
+FSLIB::FsAnnotation SurfaceTreeItem::annotationData() const
 {
-    return data(AnnotationDataRole).value<FSLIB::Annotation>();
+    return data(AnnotationDataRole).value<FSLIB::FsAnnotation>();
 }
 
 int SurfaceTreeItem::shaderMode() const

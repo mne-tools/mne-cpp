@@ -66,7 +66,7 @@
 
 namespace FSLIB
 {
-class Label;
+class FsLabel;
 }
 
 //=============================================================================================================
@@ -140,7 +140,7 @@ public:
      * Reads Bem surface from a fif file
      *
      * @param[in, out] p_pStream     The opened fif file.
-     * @param[in] add_geom          Add geometry information to the Bem Surface.
+     * @param[in] add_geom          Add geometry information to the Bem FsSurface.
      *
      * @return true if succeeded, false otherwise.
      */

@@ -36,7 +36,7 @@
  *             - Running with no arguments prints usage and returns 1
  *             - Single FreeSurfer surface conversion to FIFF BEM file
  *             - Multiple surface conversion with BEM IDs
- *             - Surface topology checks
+ *             - FsSurface topology checks
  *             - Output BEM file validation via MNEBem::read()
  */
 
@@ -358,9 +358,9 @@ void TestMneSurf2Bem::testSingleSurfConversion()
         QVERIFY2(surf.id == 1,
                  "BEM surface id should be 1 (brain)");
         QVERIFY2(surf.np > 0,
-                 "Surface should have vertices");
+                 "FsSurface should have vertices");
         QVERIFY2(surf.ntri > 0,
-                 "Surface should have triangles");
+                 "FsSurface should have triangles");
         qDebug() << "Read back:" << surf.np << "vertices," << surf.ntri << "triangles";
     } else {
         qDebug() << "Could not read back FIFF file — skipping content validation";
@@ -427,9 +427,9 @@ void TestMneSurf2Bem::testMultiSurfConversion()
         // Verify each surface has vertices and triangles
         for (int k = 0; k < bem.size(); ++k) {
             QVERIFY2(bem[k].np > 0,
-                     qPrintable(QString("Surface %1 should have vertices").arg(k)));
+                     qPrintable(QString("FsSurface %1 should have vertices").arg(k)));
             QVERIFY2(bem[k].ntri > 0,
-                     qPrintable(QString("Surface %1 should have triangles").arg(k)));
+                     qPrintable(QString("FsSurface %1 should have triangles").arg(k)));
         }
         qDebug() << "Read back 3 surfaces successfully";
     } else {

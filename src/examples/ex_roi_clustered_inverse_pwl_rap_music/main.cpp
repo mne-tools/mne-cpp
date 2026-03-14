@@ -105,8 +105,8 @@ int main(int argc, char *argv[])
 
     QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
-    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption surfOption("surfType", "FsSurface type <type>.", "type", "orig");
+    QCommandLineOption annotOption("annotType", "FsAnnotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
@@ -133,8 +133,8 @@ int main(int argc, char *argv[])
     QFile t_fileRaw(parser.value(inputOption));
     QFile t_fileFwd(parser.value(fwdOption));
 
-    SurfaceSet t_surfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
-    AnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
+    FsSurfaceSet t_surfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
+    FsAnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
     QString t_sFileNameStc(parser.value(stcFileOption));
 
@@ -167,13 +167,13 @@ int main(int argc, char *argv[])
     if(t_Fwd.isEmpty())
         return 1;
 
-    QList<Label> t_qListLabels;
+    QList<FsLabel> t_qListLabels;
     QList<RowVector4i> t_qListRGBAs;
 
     //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpaces
     t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
-    QList<Label> t_qListLabelSelection;
+    QList<FsLabel> t_qListLabelSelection;
 
     //LH
     t_qListLabelSelection << t_qListLabels[28] << t_qListLabels[29] << t_qListLabels[45] << t_qListLabels[66];

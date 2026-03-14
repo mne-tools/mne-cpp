@@ -95,7 +95,7 @@ public:
      *
      * @param[in] modality    "MEG" or "EEG".
      * @param[in] fieldMapper Sensor-field mapper with built mapping data.
-     * @param[in] surfaces    Surface map for target-surface validation.
+     * @param[in] surfaces    FsSurface map for target-surface validation.
      * @return true if streaming was started successfully.
      */
     bool startStreaming(const QString &modality,

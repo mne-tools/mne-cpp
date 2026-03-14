@@ -359,7 +359,7 @@ void ConnectivitySettings::setNodePositions(const FiffInfo& fiffInfo,
 
 //*******************************************************************************************************
 
-void ConnectivitySettings::setNodePositions(const FwdForwardSolution& forwardSolution, const SurfaceSet& surfSet)
+void ConnectivitySettings::setNodePositions(const FwdForwardSolution& forwardSolution, const FsSurfaceSet& surfSet)
 {
     //Generate node vertices
     MatrixX3f matNodeVertLeft, matNodeVertRight;

@@ -58,7 +58,7 @@ BrainTreeModel::BrainTreeModel(QObject *parent)
     setHorizontalHeaderLabels(QStringList() << "Data" << "Description");
 }
 
-SurfaceTreeItem* BrainTreeModel::addSurface(const QString &subject, const QString &hemi, const QString &surfType, const FSLIB::Surface &surface)
+SurfaceTreeItem* BrainTreeModel::addSurface(const QString &subject, const QString &hemi, const QString &surfType, const FSLIB::FsSurface &surface)
 {
     QStandardItem* subjectItem = getSubjectItem(subject);
     
@@ -76,7 +76,7 @@ SurfaceTreeItem* BrainTreeModel::addSurface(const QString &subject, const QStrin
         subjectItem->appendRow(hemiItem);
     }
     
-    // Create Surface Item
+    // Create FsSurface Item
     SurfaceTreeItem* surfItem = new SurfaceTreeItem(surfType);
     surfItem->setSurfaceData(surface);
     
@@ -84,7 +84,7 @@ SurfaceTreeItem* BrainTreeModel::addSurface(const QString &subject, const QStrin
     return surfItem;
 }
 
-bool BrainTreeModel::addAnnotation(const QString &subject, const QString &hemi, const FSLIB::Annotation &annotation)
+bool BrainTreeModel::addAnnotation(const QString &subject, const QString &hemi, const FSLIB::FsAnnotation &annotation)
 {
     QStandardItem* subjectItem = getSubjectItem(subject);
     if (!subjectItem) return false;

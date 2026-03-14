@@ -157,7 +157,7 @@ MNEInverseOperator::~MNEInverseOperator()
 
 //=============================================================================================================
 
-bool MNEInverseOperator::assemble_kernel(const Label &label,
+bool MNEInverseOperator::assemble_kernel(const FsLabel &label,
                                          QString method,
                                          bool pick_normal,
                                          MatrixXd &K,
@@ -176,7 +176,7 @@ bool MNEInverseOperator::assemble_kernel(const Label &label,
 
     if(!label.isEmpty())
     {
-        qDebug() << "ToDo: Label selection needs to be debugged - not done jet!";
+        qDebug() << "ToDo: FsLabel selection needs to be debugged - not done jet!";
         VectorXi src_sel;
         vertno = this->src.label_src_vertno_sel(label, src_sel);
 
@@ -351,7 +351,7 @@ bool MNEInverseOperator::check_ch_names(const FiffInfo &info) const
 
 //=============================================================================================================
 
-MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D, QString p_sMethod) const
+MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D, QString p_sMethod) const
 {
     printf("Cluster kernel using %s.\n", p_sMethod.toUtf8().constData());
 
@@ -416,13 +416,13 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
         else
             printf("Cluster Right Hemisphere\n");
 
-        Colortable t_CurrentColorTable = p_AnnotationSet[h].getColortable();
+        FsColortable t_CurrentColorTable = p_AnnotationSet[h].getColortable();
         VectorXi label_ids = t_CurrentColorTable.getLabelIds();
 
         // Get label ids for every vertex
         VectorXi vertno_labeled = VectorXi::Zero(this->src[h].vertno.rows());
 
-        //ToDo make this more universal -> using Label instead of annotations - obsolete when using Labels
+        //ToDo make this more universal -> using FsLabel instead of annotations - obsolete when using Labels
         for(qint32 i = 0; i < vertno_labeled.rows(); ++i)
             vertno_labeled[i] = p_AnnotationSet[h].getLabelIds()[this->src[h].vertno[i]];
 
@@ -492,7 +492,7 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
                 }
                 else
                 {
-                    printf("failed! Label contains no sources.\n");
+                    printf("failed! FsLabel contains no sources.\n");
                 }
             }
         }

@@ -303,7 +303,7 @@ typedef struct {				     /* One saved timecourse */
   int           quantity;			     /* What is this all about */
   int           fixed_ori;			     /* Fixed orientations? */
   int           active;				     /* Is this to be shown */
-  mshLabel      label;	                             /* Label for this timecourse */
+  mshLabel      label;	                             /* FsLabel for this timecourse */
   float         **timecourses;			     /* Timecourses for the points in label */
   int           *sel;				     /* Vertex numbers in the complete triangulation for each time course */
   float         **rr;				     /* Locations of these points */

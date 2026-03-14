@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @brief    Comprehensive tests for the FreeSurfer (FS) library classes.
- *           Tests Surface, SurfaceSet, Annotation, AnnotationSet, Label, Colortable
+ *           Tests FsSurface, FsSurfaceSet, FsAnnotation, FsAnnotationSet, FsLabel, FsColortable
  *           using synthetic data (no FreeSurfer data files required).
  *           Inspired by mne-python test_surface.py and test_label.py.
  */
@@ -72,7 +72,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
- * @brief Tests for the FreeSurfer library: Surface, Label, Colortable, SurfaceSet, AnnotationSet.
+ * @brief Tests for the FreeSurfer library: FsSurface, FsLabel, FsColortable, FsSurfaceSet, FsAnnotationSet.
  *        Uses synthetic geometry so no test data files are needed.
  */
 class TestFS : public QObject
@@ -85,7 +85,7 @@ public:
 private slots:
     void initTestCase();
 
-    // ----- Surface -----
+    // ----- FsSurface -----
     void testSurfaceDefaultCtor();
     void testSurfaceClear();
     void testComputeNormalsTetrahedron();
@@ -93,12 +93,12 @@ private slots:
     void testComputeNormalsOrthogonality();
     void testSurfaceReadNonExistent();
 
-    // ----- SurfaceSet -----
+    // ----- FsSurfaceSet -----
     void testSurfaceSetDefaultCtor();
     void testSurfaceSetInsert();
     void testSurfaceSetSize();
 
-    // ----- Label -----
+    // ----- FsLabel -----
     void testLabelDefaultCtor();
     void testLabelFullCtor();
     void testLabelClear();
@@ -108,16 +108,16 @@ private slots:
     void testLabelReadNonLabelFile();
     void testLabelReadNonExistentFile();
 
-    // ----- Colortable -----
+    // ----- FsColortable -----
     void testColortableDefaultCtor();
     void testColortableClear();
     void testColortableAccessors();
 
-    // ----- Annotation -----
+    // ----- FsAnnotation -----
     void testAnnotationDefaultCtor();
     void testAnnotationReadNonExistent();
 
-    // ----- AnnotationSet -----
+    // ----- FsAnnotationSet -----
     void testAnnotationSetDefaultCtor();
     void testAnnotationSetInsert();
 
@@ -191,7 +191,7 @@ void TestFS::buildXYPlane(MatrixX3f &rr, MatrixX3i &tris)
 QString TestFS::createTempLabelFile(const QTemporaryDir &dir, const QString &prefix)
 {
     // Format: comment line, vertex count, then rows of: vertexId x y z value
-    // Positions in mm (will be converted to m by Label::read)
+    // Positions in mm (will be converted to m by FsLabel::read)
     QString filePath = dir.path() + "/" + prefix + ".test.label";
 
     QFile file(filePath);
@@ -213,12 +213,12 @@ QString TestFS::createTempLabelFile(const QTemporaryDir &dir, const QString &pre
 }
 
 //=============================================================================================================
-// Surface tests
+// FsSurface tests
 //=============================================================================================================
 
 void TestFS::testSurfaceDefaultCtor()
 {
-    Surface s;
+    FsSurface s;
     QVERIFY(s.isEmpty());
     QCOMPARE(s.hemi(), -1);
     QCOMPARE(s.rr().rows(), 0);
@@ -235,7 +235,7 @@ void TestFS::testSurfaceDefaultCtor()
 void TestFS::testSurfaceClear()
 {
     // Start with default, clear should be safe
-    Surface s;
+    FsSurface s;
     s.clear();
     QVERIFY(s.isEmpty());
     QCOMPARE(s.rr().rows(), 0);
@@ -249,7 +249,7 @@ void TestFS::testComputeNormalsTetrahedron()
     MatrixX3i tris;
     buildTetrahedron(rr, tris);
 
-    MatrixX3f nn = Surface::compute_normals(rr, tris);
+    MatrixX3f nn = FsSurface::compute_normals(rr, tris);
 
     // Should have one normal per vertex
     QCOMPARE(nn.rows(), rr.rows());
@@ -272,7 +272,7 @@ void TestFS::testComputeNormalsPlane()
     MatrixX3i tris;
     buildXYPlane(rr, tris);
 
-    MatrixX3f nn = Surface::compute_normals(rr, tris);
+    MatrixX3f nn = FsSurface::compute_normals(rr, tris);
 
     QCOMPARE(nn.rows(), 4);
 
@@ -296,7 +296,7 @@ void TestFS::testComputeNormalsOrthogonality()
     MatrixX3i tris;
     buildXYPlane(rr, tris);
 
-    MatrixX3f nn = Surface::compute_normals(rr, tris);
+    MatrixX3f nn = FsSurface::compute_normals(rr, tris);
 
     // Edge vectors in the plane
     Vector3f edge1 = rr.row(1) - rr.row(0);  // (1,0,0)
@@ -317,19 +317,19 @@ void TestFS::testComputeNormalsOrthogonality()
 
 void TestFS::testSurfaceReadNonExistent()
 {
-    Surface s;
-    bool ok = Surface::read("/nonexistent/path/lh.white", s);
+    FsSurface s;
+    bool ok = FsSurface::read("/nonexistent/path/lh.white", s);
     QVERIFY(!ok);
     QVERIFY(s.isEmpty());
 }
 
 //=============================================================================================================
-// SurfaceSet tests
+// FsSurfaceSet tests
 //=============================================================================================================
 
 void TestFS::testSurfaceSetDefaultCtor()
 {
-    SurfaceSet ss;
+    FsSurfaceSet ss;
     QVERIFY(ss.isEmpty());
     QCOMPARE(ss.size(), 0);
 }
@@ -338,10 +338,10 @@ void TestFS::testSurfaceSetDefaultCtor()
 
 void TestFS::testSurfaceSetInsert()
 {
-    // SurfaceSet::insert uses hemi() as key. Default Surface has hemi=-1,
+    // FsSurfaceSet::insert uses hemi() as key. Default FsSurface has hemi=-1,
     // and insert may skip invalid/empty surfaces. Just verify no crash.
-    SurfaceSet ss;
-    Surface s;
+    FsSurfaceSet ss;
+    FsSurface s;
     ss.insert(s);
     // Default surface has hemi=-1; insert may or may not accept it
     // The important thing is it doesn't crash
@@ -352,7 +352,7 @@ void TestFS::testSurfaceSetInsert()
 
 void TestFS::testSurfaceSetSize()
 {
-    SurfaceSet ss;
+    FsSurfaceSet ss;
     QCOMPARE(ss.size(), 0);
 
     // Verify the size API works on empty sets
@@ -360,12 +360,12 @@ void TestFS::testSurfaceSetSize()
 }
 
 //=============================================================================================================
-// Label tests
+// FsLabel tests
 //=============================================================================================================
 
 void TestFS::testLabelDefaultCtor()
 {
-    Label l;
+    FsLabel l;
     QVERIFY(l.isEmpty());
     QCOMPARE(l.hemi, -1);
     QCOMPARE(l.label_id, -1);
@@ -389,7 +389,7 @@ void TestFS::testLabelFullCtor()
     VectorXd vals(3);
     vals << 1.0, 0.5, 0.0;
 
-    Label l(verts, pos, vals, 0, "test_label", 42);
+    FsLabel l(verts, pos, vals, 0, "test_label", 42);
 
     QVERIFY(!l.isEmpty());
     QCOMPARE(l.hemi, 0);
@@ -412,7 +412,7 @@ void TestFS::testLabelClear()
     VectorXd vals(2);
     vals << 1.0, 0.0;
 
-    Label l(verts, pos, vals, 1, "to_clear", 10);
+    FsLabel l(verts, pos, vals, 1, "to_clear", 10);
     QVERIFY(!l.isEmpty());
 
     l.clear();
@@ -435,7 +435,7 @@ void TestFS::testLabelSelectTrisMatrix()
     allTris << 0, 1, 2,
                0, 2, 3;
 
-    // Label contains only vertices {0, 1}
+    // FsLabel contains only vertices {0, 1}
     VectorXi labelVerts(2);
     labelVerts << 0, 1;
 
@@ -446,7 +446,7 @@ void TestFS::testLabelSelectTrisMatrix()
     VectorXd vals(2);
     vals << 1.0, 1.0;
 
-    Label l(labelVerts, pos, vals, 0, "partial");
+    FsLabel l(labelVerts, pos, vals, 0, "partial");
 
     MatrixX3i selected = l.selectTris(allTris);
 
@@ -459,7 +459,7 @@ void TestFS::testLabelSelectTrisMatrix()
 
 void TestFS::testLabelSelectTrisEmptyVertices()
 {
-    Label l;  // empty label, no vertices
+    FsLabel l;  // empty label, no vertices
 
     MatrixX3i someTris(1, 3);
     someTris << 0, 1, 2;
@@ -477,8 +477,8 @@ void TestFS::testLabelReadFromFile()
 
     QString labelFile = createTempLabelFile(tmpDir, "lh");
 
-    Label l;
-    bool ok = Label::read(labelFile, l);
+    FsLabel l;
+    bool ok = FsLabel::read(labelFile, l);
 
     QVERIFY(ok);
     QVERIFY(!l.isEmpty());
@@ -520,8 +520,8 @@ void TestFS::testLabelReadNonLabelFile()
     f.write("dummy");
     f.close();
 
-    Label l;
-    bool ok = Label::read(badFile, l);
+    FsLabel l;
+    bool ok = FsLabel::read(badFile, l);
     QVERIFY(!ok);
     QVERIFY(l.isEmpty());
 }
@@ -530,19 +530,19 @@ void TestFS::testLabelReadNonLabelFile()
 
 void TestFS::testLabelReadNonExistentFile()
 {
-    Label l;
-    bool ok = Label::read("/nonexistent/path/lh.test.label", l);
+    FsLabel l;
+    bool ok = FsLabel::read("/nonexistent/path/lh.test.label", l);
     QVERIFY(!ok);
     QVERIFY(l.isEmpty());
 }
 
 //=============================================================================================================
-// Colortable tests
+// FsColortable tests
 //=============================================================================================================
 
 void TestFS::testColortableDefaultCtor()
 {
-    Colortable ct;
+    FsColortable ct;
     QCOMPARE(ct.numEntries, 0);
     QVERIFY(ct.struct_names.isEmpty());
     QCOMPARE(ct.table.rows(), 0);
@@ -552,7 +552,7 @@ void TestFS::testColortableDefaultCtor()
 
 void TestFS::testColortableClear()
 {
-    Colortable ct;
+    FsColortable ct;
     ct.numEntries = 3;
     ct.struct_names << "A" << "B" << "C";
     ct.table.resize(3, 5);
@@ -569,7 +569,7 @@ void TestFS::testColortableClear()
 
 void TestFS::testColortableAccessors()
 {
-    Colortable ct;
+    FsColortable ct;
     ct.numEntries = 2;
     ct.struct_names << "RegionA" << "RegionB";
 
@@ -603,12 +603,12 @@ void TestFS::testColortableAccessors()
 }
 
 //=============================================================================================================
-// Annotation tests
+// FsAnnotation tests
 //=============================================================================================================
 
 void TestFS::testAnnotationDefaultCtor()
 {
-    Annotation a;
+    FsAnnotation a;
     QVERIFY(a.isEmpty());
     QCOMPARE(a.hemi(), -1);
     QVERIFY(a.filePath().isEmpty());
@@ -619,19 +619,19 @@ void TestFS::testAnnotationDefaultCtor()
 
 void TestFS::testAnnotationReadNonExistent()
 {
-    Annotation a;
-    bool ok = Annotation::read("/nonexistent/path/lh.aparc.annot", a);
+    FsAnnotation a;
+    bool ok = FsAnnotation::read("/nonexistent/path/lh.aparc.annot", a);
     QVERIFY(!ok);
     QVERIFY(a.isEmpty());
 }
 
 //=============================================================================================================
-// AnnotationSet tests
+// FsAnnotationSet tests
 //=============================================================================================================
 
 void TestFS::testAnnotationSetDefaultCtor()
 {
-    AnnotationSet as;
+    FsAnnotationSet as;
     QVERIFY(as.isEmpty());
     QCOMPARE(as.size(), 0);
 }
@@ -640,10 +640,10 @@ void TestFS::testAnnotationSetDefaultCtor()
 
 void TestFS::testAnnotationSetInsert()
 {
-    // AnnotationSet::insert uses hemi() as key. Default annotation has hemi=-1,
+    // FsAnnotationSet::insert uses hemi() as key. Default annotation has hemi=-1,
     // and insert may skip invalid/empty annotations. Just verify no crash.
-    AnnotationSet as;
-    Annotation a;
+    FsAnnotationSet as;
+    FsAnnotation a;
     as.insert(a);
     QVERIFY(as.size() >= 0);
 }

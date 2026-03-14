@@ -113,7 +113,7 @@ private:
      *   2. <bem_dir>/<subject>-<name>.<ext>
      *
      * @param[in] bemDir   The BEM directory path.
-     * @param[in] name     Surface name (e.g., "inner_skull").
+     * @param[in] name     FsSurface name (e.g., "inner_skull").
      * @param[in] ext      File extension ("tri" or "surf").
      * @param[out] path    The found file path.
      *

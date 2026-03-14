@@ -77,8 +77,8 @@ public:
      * Compute MEG sensor-to-surface mapping matrix.
      *
      * @param[in] coils     MEG coils (already transformed to target coordinate frame).
-     * @param[in] vertices  Surface vertex positions (nvert × 3).
-     * @param[in] normals   Surface vertex normals (nvert × 3).
+     * @param[in] vertices  FsSurface vertex positions (nvert × 3).
+     * @param[in] normals   FsSurface vertex normals (nvert × 3).
      * @param[in] origin    Sphere origin in the target coordinate frame.
      * @param[in] intrad    Integration radius (default 0.06, matching MNE-Python _setup_dots).
      * @param[in] miss      Eigenvalue truncation threshold (default 1e-4, matching _make_surface_mapping).
@@ -95,8 +95,8 @@ public:
      * Compute MEG sensor-to-surface mapping matrix with SSP projection.
      *
      * @param[in] coils     MEG coils (already transformed to target coordinate frame).
-     * @param[in] vertices  Surface vertex positions (nvert × 3).
-     * @param[in] normals   Surface vertex normals (nvert × 3).
+     * @param[in] vertices  FsSurface vertex positions (nvert × 3).
+     * @param[in] normals   FsSurface vertex normals (nvert × 3).
      * @param[in] origin    Sphere origin in the target coordinate frame.
      * @param[in] info      FiffInfo with SSP projectors and channel names.
      * @param[in] chNames   Channel names corresponding to the coils (for projector matching).
@@ -120,7 +120,7 @@ public:
      * internal scaling in _do_self_dots / _do_surface_dots for EEG.
      *
      * @param[in] coils     EEG electrodes (already transformed to target coordinate frame).
-     * @param[in] vertices  Surface vertex positions (nvert × 3).
+     * @param[in] vertices  FsSurface vertex positions (nvert × 3).
      * @param[in] origin    Sphere origin in the target coordinate frame.
      * @param[in] intrad    Base integration radius (default 0.06, matching MNE-Python _setup_dots).
      * @param[in] miss      Eigenvalue truncation threshold (default 1e-3, matching _make_surface_mapping).
@@ -137,7 +137,7 @@ public:
      * and average reference.
      *
      * @param[in] coils     EEG electrodes (already transformed to target coordinate frame).
-     * @param[in] vertices  Surface vertex positions (nvert × 3).
+     * @param[in] vertices  FsSurface vertex positions (nvert × 3).
      * @param[in] origin    Sphere origin in the target coordinate frame.
      * @param[in] info      FiffInfo with SSP projectors and channel names.
      * @param[in] chNames   Channel names corresponding to the coils (for projector matching).

@@ -65,7 +65,7 @@ namespace FWDLIB {
 }
 
 namespace FSLIB {
-    class SurfaceSet;
+    class FsSurfaceSet;
 }
 
 namespace FIFFLIB {
@@ -167,7 +167,7 @@ public:
                           const Eigen::RowVectorXi& picks);
 
     void setNodePositions(const FWDLIB::FwdForwardSolution& forwardSolution,
-                          const FSLIB::SurfaceSet& surfSet);
+                          const FSLIB::FsSurfaceSet& surfSet);
 
     void setNodePositions(const Eigen::MatrixX3f& matNodePositions);
 

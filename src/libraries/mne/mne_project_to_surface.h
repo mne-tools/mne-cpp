@@ -102,7 +102,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Projects a set of points r on the Surface
+     * Projects a set of points r on the FsSurface
      *
      * @brief find_closest_on_surface
      *
@@ -122,7 +122,7 @@ protected:
 private:
     //=========================================================================================================
     /**
-     * Projects a point r on the Surface
+     * Projects a point r on the FsSurface
      *
      * @brief project_to_surface
      *

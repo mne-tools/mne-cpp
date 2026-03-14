@@ -70,7 +70,7 @@
 
 namespace FSLIB
 {
-    class Label;
+    class FsLabel;
 }
 
 //=============================================================================================================
@@ -160,7 +160,7 @@ public:
      *
      * @return vertno list of length 2 Vertex numbers for lh and rh.
      */
-    QList<Eigen::VectorXi> label_src_vertno_sel(const FSLIB::Label &p_label, Eigen::VectorXi &src_sel) const;
+    QList<Eigen::VectorXi> label_src_vertno_sel(const FSLIB::FsLabel &p_label, Eigen::VectorXi &src_sel) const;
 
     //=========================================================================================================
     /**
@@ -183,7 +183,7 @@ public:
      *
      * @return the reduced source space.
      */
-    MNESourceSpaces pick_regions(const QList<FSLIB::Label> &p_qListLabels) const;
+    MNESourceSpaces pick_regions(const QList<FSLIB::FsLabel> &p_qListLabels) const;
 
     //=========================================================================================================
     /**

@@ -143,17 +143,17 @@ void MainWindow::setupUI()
 
     // (Old controls moved to surfGroup/viewGroup)
 
-    // ===== Brain Surface Group =====
-    QGroupBox *surfGroup = new QGroupBox("Brain Surface");
+    // ===== Brain FsSurface Group =====
+    QGroupBox *surfGroup = new QGroupBox("Brain FsSurface");
     QVBoxLayout *surfLayout = new QVBoxLayout(surfGroup);
     surfLayout->setContentsMargins(6, 12, 6, 6);
     surfLayout->setSpacing(8);
 
-    // Surface Selector
-    m_loadSurfaceBtn = new QPushButton("Load Surface...");
+    // FsSurface Selector
+    m_loadSurfaceBtn = new QPushButton("Load FsSurface...");
     m_loadAtlasBtn = new QPushButton("Load Atlas...");
 
-    QLabel *surfLabel = new QLabel("Surface Type:");
+    QLabel *surfLabel = new QLabel("FsSurface Type:");
     m_surfCombo = new QComboBox;
     m_surfCombo->addItems({"pial", "inflated", "white"});
 
@@ -167,7 +167,7 @@ void MainWindow::setupUI()
     m_bemShaderCombo->addItems({"Standard", "Holographic", "Anatomical"});
     m_bemShaderCombo->setEnabled(false);
 
-    m_linkShadersCheck = new QCheckBox("Link Shaders to Brain Surface");
+    m_linkShadersCheck = new QCheckBox("Link Shaders to Brain FsSurface");
     m_linkShadersCheck->setChecked(true);
     m_linkShadersCheck->setToolTip("When checked, Head Shader follows Brain Shader selection.");
 
@@ -178,7 +178,7 @@ void MainWindow::setupUI()
     // Overlay
     QLabel *overlayLabel = new QLabel("Overlay:");
     m_overlayCombo = new QComboBox;
-    m_overlayCombo->addItems({"Surface", "Annotation", "Scientific"});
+    m_overlayCombo->addItems({"FsSurface", "FsAnnotation", "Scientific"});
 
     m_lhCheck = new QCheckBox("Left Hemisphere");
     m_lhCheck->setChecked(true);
@@ -187,7 +187,7 @@ void MainWindow::setupUI()
     m_rhCheck->setChecked(true);
 
     // BEM Checks
-    m_headCheck = new QCheckBox("Head Surface");
+    m_headCheck = new QCheckBox("Head FsSurface");
     m_headCheck->setChecked(true);
     m_outerCheck = new QCheckBox("Outer Skull");
     m_outerCheck->setChecked(true);
@@ -205,8 +205,8 @@ void MainWindow::setupUI()
     surfLayout->addWidget(m_lhCheck);
     surfLayout->addWidget(m_rhCheck);
 
-    // ===== BEM Surface Group =====
-    QGroupBox *bemGroup = new QGroupBox("BEM Surface");
+    // ===== BEM FsSurface Group =====
+    QGroupBox *bemGroup = new QGroupBox("BEM FsSurface");
     QVBoxLayout *bemLayout = new QVBoxLayout(bemGroup);
     bemLayout->setContentsMargins(6, 12, 6, 6);
     bemLayout->setSpacing(8);
@@ -403,7 +403,7 @@ void MainWindow::setupUI()
     m_showEegContourCheck->setChecked(false);
     m_showEegContourCheck->setEnabled(false);
 
-    QLabel *megSurfLabel = new QLabel("MEG Surface:");
+    QLabel *megSurfLabel = new QLabel("MEG FsSurface:");
     m_megHelmetCombo = new QComboBox;
     m_megHelmetCombo->addItems({"Helmet", "Head"});
     m_megHelmetCombo->setToolTip("Choose whether MEG field mapping uses the helmet or head surface.");
@@ -611,7 +611,7 @@ void MainWindow::setupUI()
 
 void MainWindow::setupConnections()
 {
-    // Surface type
+    // FsSurface type
     connect(m_surfCombo, &QComboBox::currentTextChanged, m_brainView, &BrainView::setActiveSurface);
 
     // Inflated surface logic
@@ -665,7 +665,7 @@ void MainWindow::setupConnections()
             loadBem("User", path);
         });
 #else
-        QString path = QFileDialog::getOpenFileName(this, "Select BEM Surface", "", "BEM Files (*-bem.fif *-bem-sol.fif);;FIF Files (*.fif);;All Files (*)");
+        QString path = QFileDialog::getOpenFileName(this, "Select BEM FsSurface", "", "BEM Files (*-bem.fif *-bem-sol.fif);;FIF Files (*.fif);;All Files (*)");
         if (path.isEmpty()) return;
         loadBem("User", path);
 #endif
@@ -738,10 +738,10 @@ void MainWindow::setupConnections()
         syncUIToEditTarget(target);
     });
 
-    // Brain Surface
+    // Brain FsSurface
     connect(m_loadSurfaceBtn, &QPushButton::clicked, [this]() {
 #ifdef WASMBUILD
-        QFileDialog::getOpenFileContent("FreeSurfer Surface (*.*)", [this](const QString &fileName, const QByteArray &fileContent) {
+        QFileDialog::getOpenFileContent("FreeSurfer FsSurface (*.*)", [this](const QString &fileName, const QByteArray &fileContent) {
             if (fileName.isEmpty()) return;
             QString path = wasmSaveToTemp(fileName, fileContent);
             if (path.isEmpty()) return;
@@ -753,13 +753,13 @@ void MainWindow::setupConnections()
             else if (fn.contains("white")) type = "white";
             else if (fn.contains("orig")) type = "orig";
 
-            Surface surf(path);
+            FsSurface surf(path);
             if (!surf.isEmpty()) {
                 m_model->addSurface("User", hemi, type, surf);
             }
         });
 #else
-        QString path = QFileDialog::getOpenFileName(this, "Select Surface", "", "FreeSurfer Surface (*.pial *.inflated *.white *.orig);;All Files (*)");
+        QString path = QFileDialog::getOpenFileName(this, "Select FsSurface", "", "FreeSurfer FsSurface (*.pial *.inflated *.white *.orig);;All Files (*)");
         if (path.isEmpty()) return;
 
         // Guess hemi and type
@@ -770,7 +770,7 @@ void MainWindow::setupConnections()
         else if (fileName.contains("white")) type = "white";
         else if (fileName.contains("orig")) type = "orig";
 
-        Surface surf(path);
+        FsSurface surf(path);
         if (!surf.isEmpty()) {
             m_model->addSurface("User", hemi, type, surf);
         }
@@ -779,7 +779,7 @@ void MainWindow::setupConnections()
 
     connect(m_loadAtlasBtn, &QPushButton::clicked, [this]() {
 #ifdef WASMBUILD
-        QFileDialog::getOpenFileContent("FreeSurfer Annotation (*.annot)", [this](const QString &fileName, const QByteArray &fileContent) {
+        QFileDialog::getOpenFileContent("FreeSurfer FsAnnotation (*.annot)", [this](const QString &fileName, const QByteArray &fileContent) {
             if (fileName.isEmpty()) return;
             QString path = wasmSaveToTemp(fileName, fileContent);
             if (path.isEmpty()) return;
@@ -787,20 +787,20 @@ void MainWindow::setupConnections()
             QString fn = QFileInfo(path).fileName();
             QString hemi = fn.contains("lh.") ? "lh" : (fn.contains("rh.") ? "rh" : "lh");
 
-            Annotation annot(path);
+            FsAnnotation annot(path);
             if (!annot.isEmpty()) {
                 m_model->addAnnotation("User", hemi, annot);
             }
         });
 #else
-        QString path = QFileDialog::getOpenFileName(this, "Select Atlas", "", "FreeSurfer Annotation (*.annot);;All Files (*)");
+        QString path = QFileDialog::getOpenFileName(this, "Select Atlas", "", "FreeSurfer FsAnnotation (*.annot);;All Files (*)");
         if (path.isEmpty()) return;
 
         // Guess hemi
         QString fileName = QFileInfo(path).fileName();
         QString hemi = fileName.contains("lh.") ? "lh" : (fileName.contains("rh.") ? "rh" : "lh");
 
-        Annotation annot(path);
+        FsAnnotation annot(path);
         if (!annot.isEmpty()) {
             m_model->addAnnotation("User", hemi, annot);
         }
@@ -1336,7 +1336,7 @@ void MainWindow::setupConnections()
     // what the user sees in the controls and what the renderer uses.
     const int target = m_brainView->visualizationEditTarget();
 
-    // Surface type
+    // FsSurface type
     const QString savedSurf = m_brainView->activeSurfaceForTarget(target);
     if (m_surfCombo->findText(savedSurf) >= 0) {
         m_surfCombo->blockSignals(true);
@@ -1479,14 +1479,14 @@ void MainWindow::loadInitialData(const QString &subjectPath,
         }
 
         if (!lhAnnotPath.isEmpty() && QFile::exists(lhAnnotPath)) {
-            Annotation annot(lhAnnotPath);
+            FsAnnotation annot(lhAnnotPath);
             if (!annot.isEmpty()) {
                 m_model->addAnnotation(subjectName, "lh", annot);
                 qDebug() << "Added atlas annotation for lh";
             }
         }
         if (!rhAnnotPath.isEmpty() && QFile::exists(rhAnnotPath)) {
-            Annotation annot(rhAnnotPath);
+            FsAnnotation annot(rhAnnotPath);
             if (!annot.isEmpty()) {
                 m_model->addAnnotation(subjectName, "rh", annot);
                 qDebug() << "Added atlas annotation for rh";
@@ -1638,17 +1638,17 @@ void MainWindow::loadHemisphere(const QString &subjectPath, const QString &subje
         if (!QFile::exists(surfPath)) {
             continue;
         }
-        Surface surf(surfPath);
+        FsSurface surf(surfPath);
         if (!surf.isEmpty()) {
             m_model->addSurface(subjectName, hemi, type, surf);
             qDebug() << "Added" << hemi << type;
         }
     }
 
-    // Load Atlas (Annotation)
+    // Load Atlas (FsAnnotation)
     QString annotPath = subjectPath + "/" + subjectName + "/label/" + hemi + ".aparc.annot";
     if (QFile::exists(annotPath)) {
-        Annotation annot(annotPath);
+        FsAnnotation annot(annotPath);
         if (!annot.isEmpty()) {
             m_model->addAnnotation(subjectName, hemi, annot);
             qDebug() << "Added annotation for" << hemi;

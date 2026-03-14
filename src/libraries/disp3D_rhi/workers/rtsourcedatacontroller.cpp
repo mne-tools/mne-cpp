@@ -338,7 +338,7 @@ void RtSourceDataController::setVisualizationType(int iVisType)
 //=============================================================================================================
 
 void RtSourceDataController::setAnnotationInfoLeft(const Eigen::VectorXi &vecLabelIds,
-                                                    const QList<FSLIB::Label> &lLabels,
+                                                    const QList<FSLIB::FsLabel> &lLabels,
                                                     const Eigen::VectorXi &vecVertNo)
 {
     if (m_pInterpWorker) {
@@ -349,7 +349,7 @@ void RtSourceDataController::setAnnotationInfoLeft(const Eigen::VectorXi &vecLab
 //=============================================================================================================
 
 void RtSourceDataController::setAnnotationInfoRight(const Eigen::VectorXi &vecLabelIds,
-                                                     const QList<FSLIB::Label> &lLabels,
+                                                     const QList<FSLIB::FsLabel> &lLabels,
                                                      const Eigen::VectorXi &vecVertNo)
 {
     if (m_pInterpWorker) {

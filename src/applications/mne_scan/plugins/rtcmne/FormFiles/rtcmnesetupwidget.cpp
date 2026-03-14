@@ -113,7 +113,7 @@ void RtcMneSetupWidget::showAtlasDirDialog()
 
     ui.m_qLineEdit_AtlasDirName->setText(m_pMNE->m_sAtlasDir);
 
-    AnnotationSet::SPtr t_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(t_sAtlasDir+"/lh.aparc.a2009s.annot", t_sAtlasDir+"/rh.aparc.a2009s.annot"));
+    FsAnnotationSet::SPtr t_pAnnotationSet = FsAnnotationSet::SPtr(new FsAnnotationSet(t_sAtlasDir+"/lh.aparc.a2009s.annot", t_sAtlasDir+"/rh.aparc.a2009s.annot"));
 
     if(!t_pAnnotationSet->isEmpty() && t_pAnnotationSet->size() == 2)
     {
@@ -127,7 +127,7 @@ void RtcMneSetupWidget::showAtlasDirDialog()
     }
     else
     {
-        m_pMNE->m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet());
+        m_pMNE->m_pAnnotationSet = FsAnnotationSet::SPtr(new FsAnnotationSet());
         ui.m_qLabel_atlasStat->setText("not loaded");
     }
 }
@@ -136,12 +136,12 @@ void RtcMneSetupWidget::showAtlasDirDialog()
 
 void RtcMneSetupWidget::showSurfaceDirDialog()
 {
-    QString t_sSurfaceDir = QFileDialog::getExistingDirectory(  this, tr("Open Surface Directory"),
+    QString t_sSurfaceDir = QFileDialog::getExistingDirectory(  this, tr("Open FsSurface Directory"),
                                                                 QString(),
                                                                 QFileDialog::ShowDirsOnly
                                                                 | QFileDialog::DontResolveSymlinks);
 
-    SurfaceSet::SPtr t_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(t_sSurfaceDir+"/lh.orig", t_sSurfaceDir+"/rh.orig"));
+    FsSurfaceSet::SPtr t_pSurfaceSet = FsSurfaceSet::SPtr(new FsSurfaceSet(t_sSurfaceDir+"/lh.orig", t_sSurfaceDir+"/rh.orig"));
 
     ui.m_qLineEdit_SurfaceDirName->setText(t_sSurfaceDir);
 
@@ -157,7 +157,7 @@ void RtcMneSetupWidget::showSurfaceDirDialog()
     }
     else
     {
-        m_pMNE->m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet());
+        m_pMNE->m_pSurfaceSet = FsSurfaceSet::SPtr(new FsSurfaceSet());
         ui.m_qLabel_surfaceStat->setText("not loaded");
     }
 }

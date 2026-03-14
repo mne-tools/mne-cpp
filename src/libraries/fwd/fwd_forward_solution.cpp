@@ -395,7 +395,7 @@ bool FwdForwardSolution::write(QIODevice& p_IODevice) const
 
 //=============================================================================================================
 
-FwdForwardSolution FwdForwardSolution::cluster_forward_solution(const AnnotationSet &p_AnnotationSet,
+FwdForwardSolution FwdForwardSolution::cluster_forward_solution(const FsAnnotationSet &p_AnnotationSet,
                                                                 qint32 p_iClusterSize,
                                                                 MatrixXd& p_D,
                                                                 const FiffCov &p_pNoise_cov,
@@ -432,7 +432,7 @@ FwdForwardSolution FwdForwardSolution::cluster_forward_solution(const Annotation
 //    {
 //        if(this->src[h]->vertno.rows() !=  t_listAnnotation[h]->getLabel()->rows())
 //        {
-//            printf("Error: Annotation doesn't fit to Forward Solution: Vertice number is different!");
+//            printf("Error: FsAnnotation doesn't fit to Forward Solution: Vertice number is different!");
 //            return false;
 //        }
 //    }
@@ -480,14 +480,14 @@ FwdForwardSolution FwdForwardSolution::cluster_forward_solution(const Annotation
         else
             printf("Cluster Right Hemisphere\n");
 
-        const Annotation annotation = p_AnnotationSet[h];
-        Colortable t_CurrentColorTable = annotation.getColortable();
+        const FsAnnotation annotation = p_AnnotationSet[h];
+        FsColortable t_CurrentColorTable = annotation.getColortable();
         VectorXi label_ids = t_CurrentColorTable.getLabelIds();
 
         // Get label ids for every vertex
         VectorXi vertno_labeled = VectorXi::Zero(this->src[h].vertno.rows());
 
-        //ToDo make this more universal -> using Label instead of annotations - obsolete when using Labels
+        //ToDo make this more universal -> using FsLabel instead of annotations - obsolete when using Labels
         for(qint32 i = 0; i < vertno_labeled.rows(); ++i)
             vertno_labeled[i] = p_AnnotationSet[h].getLabelIds()[this->src[h].vertno[i]];
 
@@ -573,7 +573,7 @@ FwdForwardSolution FwdForwardSolution::cluster_forward_solution(const Annotation
                 }
                 else
                 {
-                    printf("failed! Label contains no sources.\n");
+                    printf("failed! FsLabel contains no sources.\n");
                 }
             }
         }
@@ -1261,7 +1261,7 @@ FwdForwardSolution FwdForwardSolution::pick_channels(const QStringList& include,
 
 //=============================================================================================================
 
-FwdForwardSolution FwdForwardSolution::pick_regions(const QList<Label> &p_qListLabels) const
+FwdForwardSolution FwdForwardSolution::pick_regions(const QList<FsLabel> &p_qListLabels) const
 {
     VectorXi selVertices;
 
@@ -2077,7 +2077,7 @@ bool FwdForwardSolution::isClustered() const
 
 //=============================================================================================================
 
-MatrixX3f FwdForwardSolution::getSourcePositionsByLabel(const QList<Label> &lPickedLabels, const SurfaceSet& tSurfSetInflated)
+MatrixX3f FwdForwardSolution::getSourcePositionsByLabel(const QList<FsLabel> &lPickedLabels, const FsSurfaceSet& tSurfSetInflated)
 {
     MatrixX3f matSourceVertLeft, matSourceVertRight, matSourcePositions;
 

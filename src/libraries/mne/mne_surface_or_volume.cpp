@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MNE Surface or Volume (MNESurfaceOrVolume) Class.
+ * @brief    Definition of the MNE FsSurface or Volume (MNESurfaceOrVolume) Class.
  *
  */
 

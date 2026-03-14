@@ -136,7 +136,7 @@ public:
     /**
      * @brief Destroys the BEM model.
      *
-     * Surface ownership is released automatically via std::unique_ptr.
+     * FsSurface ownership is released automatically via std::unique_ptr.
      * The solution matrix is freed by fwd_bem_free_solution().
      */
     virtual ~FwdBemModel();
@@ -184,7 +184,7 @@ public:
     /**
      * @brief Find a surface of the given kind in this BEM model.
      *
-     * @param[in] kind  Surface ID to look for.
+     * @param[in] kind  FsSurface ID to look for.
      * @return Non-owning pointer to the surface, or nullptr if not found.
      */
     MNELIB::MNESurface* fwd_bem_find_surface(int kind);
@@ -194,7 +194,7 @@ public:
      * @brief Load BEM surfaces of specified kinds from a FIFF file.
      *
      * @param[in] name   Path to the BEM FIFF file.
-     * @param[in] kinds  Surface IDs to load (e.g. FIFFV_BEM_SURF_ID_BRAIN).
+     * @param[in] kinds  FsSurface IDs to load (e.g. FIFFV_BEM_SURF_ID_BRAIN).
      * @return BEM model containing the requested surfaces, or nullptr on failure.
      */
     static std::unique_ptr<FwdBemModel> fwd_bem_load_surfaces(const QString& name,
@@ -257,7 +257,7 @@ public:
      * @param[in] grid        Spacing between guess points (meters).
      * @param[in] exclude     Exclude points closer than this to the CM of the boundary.
      * @param[in] mindist     Minimum distance from the boundary surface.
-     * @return Surface containing the guess locations, or nullptr on failure.
+     * @return FsSurface containing the guess locations, or nullptr on failure.
      */
     static std::unique_ptr<MNELIB::MNESurface> make_guesses(MNELIB::MNESurface* guess_surf,
                                             float guessrad,

@@ -90,7 +90,7 @@ namespace MNELIB
 /**
  * Replaces *mshDisplaySurface, mshDisplaySurfaceRec struct (analyze_types.c).
  *
- * @brief The MNE Msh Display Surface class holds information about a surface to be rendered.
+ * @brief The MNE Msh Display FsSurface class holds information about a surface to be rendered.
  */
 class MNESHARED_EXPORT MNEMshDisplaySurface : public MNESurface
 {
@@ -223,7 +223,7 @@ public:
      * Compute and store the axis-aligned bounding box and field-of-view
      * radius by iterating all vertex positions.
      *
-     * @param[in] tag  Surface name tag (used for debug logging).
+     * @param[in] tag  FsSurface name tag (used for debug logging).
      */
     void decide_surface_extent(const QString& tag);
 
@@ -231,7 +231,7 @@ public:
      * Set the curvature display mode based on a surface type name.
      * Inflated, sphere, and white surfaces use overlay mode; others use none.
      *
-     * @param[in] name  Surface type name.
+     * @param[in] name  FsSurface type name.
      */
     void decide_curv_display(const QString& name);
 

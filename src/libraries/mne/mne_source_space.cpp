@@ -1361,10 +1361,10 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
         if (dist > maxdist)
             maxdist = dist;
     }
-    printf("Surface CM = (%6.1f %6.1f %6.1f) mm\n",
+    printf("FsSurface CM = (%6.1f %6.1f %6.1f) mm\n",
            1000*cm[X_17], 1000*cm[Y_17], 1000*cm[Z_17]);
-    printf("Surface fits inside a sphere with radius %6.1f mm\n",1000*maxdist);
-    printf("Surface extent:\n"
+    printf("FsSurface fits inside a sphere with radius %6.1f mm\n",1000*maxdist);
+    printf("FsSurface extent:\n"
            "\tx = %6.1f ... %6.1f mm\n"
            "\ty = %6.1f ... %6.1f mm\n"
            "\tz = %6.1f ... %6.1f mm\n",
@@ -2267,7 +2267,7 @@ int MNESourceSpace::read_label(const QString& label, Eigen::VectorXi& sel)
     }
     inFile.getChar(&c);
     if (c !='#') {
-        qCritical("Label file does not start correctly.");
+        qCritical("FsLabel file does not start correctly.");
         goto out;
     }
     /*

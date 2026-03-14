@@ -316,7 +316,7 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface *surface, in
     // Source vertex subset from STC (already a VectorXi)
     Eigen::VectorXi vecSourceVertices = stc->vertices;
 
-    qDebug() << "SourceEstimateOverlay: Surface has" << matVertices.rows() << "vertices,"
+    qDebug() << "SourceEstimateOverlay: FsSurface has" << matVertices.rows() << "vertices,"
              << vecSourceVertices.size() << "sources";
     
     if (vecSourceVertices.size() == 0) {

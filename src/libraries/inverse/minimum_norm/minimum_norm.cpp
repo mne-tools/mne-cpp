@@ -136,7 +136,7 @@ MNESourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, 
 //    MatrixXd K;
 //    SparseMatrix<double> noise_norm;
 //    QList<VectorXi> vertno;
-//    Label label;
+//    FsLabel label;
 //    inv.assemble_kernel(label, m_sMethod, pick_normal, K, noise_norm, vertno);
 
 //    MatrixXd sol = K * t_fiffEvoked.data; //apply imaging kernel

@@ -452,7 +452,7 @@ void TestFieldMap::initTestCase()
     QVERIFY(refNorms.rows() == refVerts.rows());
     m_surfVerts = refVerts.cast<float>();
     m_surfNorms = refNorms.cast<float>();
-    qDebug() << "Surface:" << m_surfVerts.rows() << "vertices";
+    qDebug() << "FsSurface:" << m_surfVerts.rows() << "vertices";
 
     // ── Load evoked data ───────────────────────────────────────────────
     {
@@ -586,7 +586,7 @@ void TestFieldMap::testMegSurfaceDots()
     qDebug() << "MEG surface_dots reference shape:"
              << m_refMegSurfaceDots.rows() << "x" << m_refMegSurfaceDots.cols();
 
-    // Surface dots should be (n_coils, n_surface_verts) from Python's _do_surface_dots
+    // FsSurface dots should be (n_coils, n_surface_verts) from Python's _do_surface_dots
     // In mne-cpp doSurfaceDots returns (n_verts, n_coils)
     // Python's _do_surface_dots returns (n_coils, n_surface_sel) then it gets transposed
     // Let's verify dimensions match the expected

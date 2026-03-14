@@ -80,7 +80,7 @@ namespace FWDLIB{
 }
 
 namespace FSLIB{
-    class AnnotationSet;
+    class FsAnnotationSet;
 }
 
 namespace INVERSELIB{
@@ -203,10 +203,10 @@ private:
      * Call this function whenever the atlas directory is set.
      *
      * @param[in] sDirPath              The path to the atlas directory.
-     * @param[in] pAnnotationSet        The Annotation set.
+     * @param[in] pAnnotationSet        The FsAnnotation set.
      */
     void onAtlasDirChanged(const QString& sDirPath,
-                           const QSharedPointer<FSLIB::AnnotationSet> pAnnotationSet);
+                           const QSharedPointer<FSLIB::FsAnnotationSet> pAnnotationSet);
 
     QMutex                                      m_mutex;                    /**< The threads mutex.*/
     QFuture<void>                               m_future;                   /**< The future monitoring the clustering and forward calculation. */
@@ -227,7 +227,7 @@ private:
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                /**< Fiff measurement info.*/
     FIFFLIB::FiffCoordTrans                     m_transDevHead;             /**< Updated meg->head transformation. */
 
-    QSharedPointer<FSLIB::AnnotationSet>                                        m_pAnnotationSet;       /**< Annotation set. */
+    QSharedPointer<FSLIB::FsAnnotationSet>                                        m_pAnnotationSet;       /**< FsAnnotation set. */
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeHpiResult>::SPtr            m_pHpiInput;            /**< The incoming Hpi data.*/
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pRTMSAInput;          /**< The incoming data.*/
