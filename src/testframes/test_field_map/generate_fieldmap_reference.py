@@ -30,7 +30,7 @@ Outputs (written to the directory given by --outdir):
 Usage:
     python generate_fieldmap_reference.py \\
         --evoked /path/to/sample_audvis-ave.fif \\
-        --trans  /path/to/sample_audvis_raw-trans.fif \\
+        --trans  /path/to/all-trans.fif \\
         --surf   /path/to/subjects/sample/bem/sample-head.fif \\
         --outdir /path/to/output_dir \\
         [--mode accurate]

@@ -84,6 +84,7 @@ set(MNE_LIBS_REQUIRED
     mne_fiff
     mne_fs
     mne_mne
+    mne_fwd
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
