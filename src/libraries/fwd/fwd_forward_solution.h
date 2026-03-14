@@ -301,7 +301,7 @@ public:
      *
      * @return true if forward solution is clustered, false otherwise.
      */
-    inline bool isClustered() const;
+    bool isClustered() const;
 
     //=========================================================================================================
     /**
@@ -575,14 +575,6 @@ public:
 
 //=============================================================================================================
 // INLINE DEFINITIONS
-//=============================================================================================================
-
-inline bool FwdForwardSolution::isClustered() const
-{
-    auto* hemi = src.hemisphereAt(0);
-    return hemi && hemi->isClustered();
-}
-
 //=============================================================================================================
 
 inline bool FwdForwardSolution::isEmpty() const
