@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the Colortable Class.
+ * @brief    Definition of the FsColortable Class.
  *
  */
 
@@ -51,7 +51,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Colortable::Colortable()
+FsColortable::FsColortable()
 : orig_tab("")
 , numEntries(0)
 {
@@ -59,7 +59,7 @@ Colortable::Colortable()
 
 //=============================================================================================================
 
-void Colortable::clear()
+void FsColortable::clear()
 {
     orig_tab = "";
     numEntries = 0;

@@ -409,10 +409,10 @@ void TestMneWatershedBem::testFullRun()
     for (const QString& surfName : expectedSurfaces) {
         QString surfPath = wsDir + "/" + surfName;
         QVERIFY2(QFileInfo::exists(surfPath),
-                 qPrintable("Surface not found: " + surfPath));
+                 qPrintable("FsSurface not found: " + surfPath));
         QFileInfo fi(surfPath);
         QVERIFY2(fi.size() > 0,
-                 qPrintable("Surface file is empty: " + surfPath));
+                 qPrintable("FsSurface file is empty: " + surfPath));
     }
 
     // Verify head BEM FIFF file was created

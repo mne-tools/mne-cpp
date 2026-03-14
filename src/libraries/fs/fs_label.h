@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Label class declaration
+ * @brief    FsLabel class declaration
  *
  */
 
@@ -69,7 +69,7 @@ const static Eigen::MatrixX3i defaultTris(0,3);
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class Surface;
+class FsSurface;
 
 //=============================================================================================================
 /**
@@ -77,17 +77,17 @@ class Surface;
  *
  * @brief Freesurfer/MNE label
  */
-class FSSHARED_EXPORT Label
+class FSSHARED_EXPORT FsLabel
 {
 public:
-    typedef QSharedPointer<Label> SPtr;            /**< Shared pointer type for Label class. */
-    typedef QSharedPointer<const Label> ConstSPtr; /**< Const shared pointer type for Label class. */
+    typedef QSharedPointer<FsLabel> SPtr;            /**< Shared pointer type for FsLabel class. */
+    typedef QSharedPointer<const FsLabel> ConstSPtr; /**< Const shared pointer type for FsLabel class. */
     
     //=========================================================================================================
     /**
      * Default constructor
      */
-    Label();
+    FsLabel();
 
     //=========================================================================================================
     /**
@@ -100,7 +100,7 @@ public:
      * @param[in] p_name         label names.
      * @param[in] p_id           label id (optional, default = -1).
      */
-    Label(const Eigen::VectorXi &p_vertices,
+    FsLabel(const Eigen::VectorXi &p_vertices,
           const Eigen::MatrixX3f &p_pos,
           const Eigen::VectorXd &p_values,
           qint32 p_hemi, const QString &p_name,
@@ -108,21 +108,21 @@ public:
     
     //=========================================================================================================
     /**
-     * Destroys the Label class.
+     * Destroys the FsLabel class.
      */
-    ~Label();
+    ~FsLabel();
 
     //=========================================================================================================
     /**
-     * Initializes the Label.
+     * Initializes the FsLabel.
      */
     void clear();
 
     //=========================================================================================================
     /**
-     * True if Label is empty.
+     * True if FsLabel is empty.
      *
-     * @return true if Label is empty, false otherwise.
+     * @return true if FsLabel is empty, false otherwise.
      */
     inline bool isEmpty() const;
 
@@ -134,7 +134,7 @@ public:
      *
      * @return the generated tris.
      */
-    Eigen::MatrixX3i selectTris(const Surface & p_Surface);
+    Eigen::MatrixX3i selectTris(const FsSurface & p_Surface);
 
     //=========================================================================================================
     /**
@@ -150,7 +150,7 @@ public:
     /**
      * mne_read_label_file
      *
-     * Reads a Label from a FreeSurfer label file.
+     * Reads a FsLabel from a FreeSurfer label file.
      * This is based on the FreeSurfer read_label routine
      * SUBJECTS_DIR environment variable is not consulted for the standard location
      *
@@ -159,7 +159,7 @@ public:
      *
      * @return true if successful, false otherwise.
      */
-    static bool read(const QString& p_sFileName, Label &p_Label);
+    static bool read(const QString& p_sFileName, FsLabel &p_Label);
 
 public:
     QString comment;            /**< Comment from the first line of the label file. */
@@ -169,7 +169,7 @@ public:
     qint32 hemi;                /**< Hemisphere (lh = 0; rh = 1). */
 //    qint32 hemi;                        /**< Hemisphere (lh = 0; rh = 1; both = 2). */ Don't mix both hemis - KISS principle
     QString name;               /**< Name of the label. */
-    qint32 label_id;            /**< Label id (optional). */
+    qint32 label_id;            /**< FsLabel id (optional). */
 //    Eigen::MatrixX3i tris;     /**< Tris for plotting (optional). */
 
 //    QMap<qint32, VectorXi> vertices;    /**< Vertex indices (0 based). */
@@ -181,7 +181,7 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool Label::isEmpty() const
+inline bool FsLabel::isEmpty() const
 {
     return this->hemi == -1;
 }
@@ -189,7 +189,7 @@ inline bool Label::isEmpty() const
 
 #ifndef metatype_label
 #define metatype_label
-Q_DECLARE_METATYPE(FSLIB::Label);
+Q_DECLARE_METATYPE(FSLIB::FsLabel);
 #endif
 
 #endif // FS_LABEL_H

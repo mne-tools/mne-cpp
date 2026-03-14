@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Surface key constants and type-to-key mappings.
+ * @brief    FsSurface key constants and type-to-key mappings.
  *
  */
 

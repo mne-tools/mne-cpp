@@ -100,7 +100,7 @@ typedef void (*mneUserFreeFunc)(void *);
  * @{
  */
 #define MNE_SOURCE_SPACE_UNKNOWN  -1  /**< Type not yet determined. */
-#define MNE_SOURCE_SPACE_SURFACE   1  /**< Surface-based source space. */
+#define MNE_SOURCE_SPACE_SURFACE   1  /**< FsSurface-based source space. */
 #define MNE_SOURCE_SPACE_VOLUME    2  /**< Volumetric (3-D grid) source space. */
 #define MNE_SOURCE_SPACE_DISCRETE  3  /**< Discrete point set. */
 /** @} */

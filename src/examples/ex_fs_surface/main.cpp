@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Example of an FreeSurfer Surface application
+ * @brief    Example of an FreeSurfer FsSurface application
  *
  */
 
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Fs Surface Example");
+    parser.setApplicationDescription("Fs FsSurface Example");
     parser.addHelpOption();
 
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
     //
     // pial
     //
-    SurfaceSet tSurfSetPial (subject, hemi, "pial", subjectPath);
+    FsSurfaceSet tSurfSetPial (subject, hemi, "pial", subjectPath);
 
     BrainView *pBrainView = new BrainView();
     BrainTreeModel *pModel = new BrainTreeModel();
@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
     //
     // inflated
     //
-    SurfaceSet tSurfSetInflated (subject, hemi, "inflated", subjectPath);
+    FsSurfaceSet tSurfSetInflated (subject, hemi, "inflated", subjectPath);
     for (auto it = tSurfSetInflated.data().constBegin(); it != tSurfSetInflated.data().constEnd(); ++it) {
         QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
         pModel->addSurface(subject, hemi, "inflated", it.value());
@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
     //
     // orig
     //
-    SurfaceSet tSurfSetOrig (subject, hemi, "orig", subjectPath);
+    FsSurfaceSet tSurfSetOrig (subject, hemi, "orig", subjectPath);
     for (auto it = tSurfSetOrig.data().constBegin(); it != tSurfSetOrig.data().constEnd(); ++it) {
         QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
         pModel->addSurface(subject, hemi, "orig", it.value());
@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
     //
     // white
     //
-    SurfaceSet tSurfSetWhite (subject, hemi, "white", subjectPath);
+    FsSurfaceSet tSurfSetWhite (subject, hemi, "white", subjectPath);
     for (auto it = tSurfSetWhite.data().constBegin(); it != tSurfSetWhite.data().constEnd(); ++it) {
         QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
         pModel->addSurface(subject, hemi, "white", it.value());

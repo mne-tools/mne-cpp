@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    SurfaceSet class declaration
+ * @brief    FsSurfaceSet class declaration
  *
  */
 
@@ -68,17 +68,17 @@ namespace FSLIB
  *
  * @brief A hemisphere set of surfaces
  */
-class FSSHARED_EXPORT SurfaceSet
+class FSSHARED_EXPORT FsSurfaceSet
 {
 public:
-    typedef QSharedPointer<SurfaceSet> SPtr;            /**< Shared pointer type for SurfaceSet class. */
-    typedef QSharedPointer<const SurfaceSet> ConstSPtr; /**< Const shared pointer type for SurfaceSet class. */
+    typedef QSharedPointer<FsSurfaceSet> SPtr;            /**< Shared pointer type for FsSurfaceSet class. */
+    typedef QSharedPointer<const FsSurfaceSet> ConstSPtr; /**< Const shared pointer type for FsSurfaceSet class. */
     
     //=========================================================================================================
     /**
      * Default constructor
      */
-    SurfaceSet();
+    FsSurfaceSet();
 
     //=========================================================================================================
     /**
@@ -89,7 +89,7 @@ public:
      * @param[in] surf               Name of the surface to load (eg. inflated, orig ...).
      * @param[in] subjects_dir       Subjects directory.
      */
-    explicit SurfaceSet(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
+    explicit FsSurfaceSet(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
 
     //=========================================================================================================
     /**
@@ -99,7 +99,7 @@ public:
      * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}.
      * @param[in] surf               Name of the surface to load (eg. inflated, orig ...).
      */
-    explicit SurfaceSet(const QString &path, qint32 hemi, const QString &surf);
+    explicit FsSurfaceSet(const QString &path, qint32 hemi, const QString &surf);
 
     //=========================================================================================================
     /**
@@ -108,7 +108,7 @@ public:
      * @param[in] p_LHSurface    Left hemisphere surface.
      * @param[in] p_RHSurface    Right hemisphere surface.
      */
-    explicit SurfaceSet(const Surface& p_LHSurface, const Surface& p_RHSurface);
+    explicit FsSurfaceSet(const FsSurface& p_LHSurface, const FsSurface& p_RHSurface);
 
     //=========================================================================================================
     /**
@@ -117,17 +117,17 @@ public:
      * @param[in] p_sLHFileName  Left hemisphere annotation file.
      * @param[in] p_sRHFileName  Right hemisphere annotation file.
      */
-    explicit SurfaceSet(const QString& p_sLHFileName, const QString& p_sRHFileName);
+    explicit FsSurfaceSet(const QString& p_sLHFileName, const QString& p_sRHFileName);
 
     //=========================================================================================================
     /**
-     * Destroys the SurfaceSet class.
+     * Destroys the FsSurfaceSet class.
      */
-    ~SurfaceSet();
+    ~FsSurfaceSet();
     
     //=========================================================================================================
     /**
-     * Initializes the AnnotationSet.
+     * Initializes the FsAnnotationSet.
      */
     void clear();
 
@@ -137,13 +137,13 @@ public:
      *
      * @return the surface set map.
      */
-    inline QMap<qint32, Surface>& data();
+    inline QMap<qint32, FsSurface>& data();
 
     //=========================================================================================================
     /**
-     * True if SurfaceSet is empty.
+     * True if FsSurfaceSet is empty.
      *
-     * @return true if SurfaceSet is empty.
+     * @return true if FsSurfaceSet is empty.
      */
     inline bool isEmpty() const;
 
@@ -151,13 +151,13 @@ public:
     /**
      * Insert a surface
      *
-     * @param[in] p_Surface  Surface to insert.
+     * @param[in] p_Surface  FsSurface to insert.
      */
-    void insert(const Surface& p_Surface);
+    void insert(const FsSurface& p_Surface);
 
     //=========================================================================================================
     /**
-     * Reads different surface files and assembles them to a SurfaceSet
+     * Reads different surface files and assembles them to a FsSurfaceSet
      *
      * @param[in] p_sLHFileName      Left hemisphere surface file.
      * @param[in] p_sRHFileName      Right hemisphere surface file.
@@ -165,11 +165,11 @@ public:
      *
      * @return true if succesfull, false otherwise.
      */
-    static bool read(const QString& p_sLHFileName, const QString& p_sRHFileName, SurfaceSet &p_SurfaceSet);
+    static bool read(const QString& p_sLHFileName, const QString& p_sRHFileName, FsSurfaceSet &p_SurfaceSet);
 
     //=========================================================================================================
     /**
-     * The kind of Surfaces which are held by the SurfaceSet (eg. inflated, orig ...)
+     * The kind of Surfaces which are held by the FsSurfaceSet (eg. inflated, orig ...)
      *
      * @return the loaded surfaces (eg. inflated, orig ...).
      */
@@ -181,9 +181,9 @@ public:
      *
      * @param[in] idx    the hemisphere index (0 or 1).
      *
-     * @return Surface related to the parameter index.
+     * @return FsSurface related to the parameter index.
      */
-    const Surface& operator[] (qint32 idx) const;
+    const FsSurface& operator[] (qint32 idx) const;
 
     //=========================================================================================================
     /**
@@ -191,9 +191,9 @@ public:
      *
      * @param[in] idx    the hemisphere index (0 or 1).
      *
-     * @return Surface related to the parameter index.
+     * @return FsSurface related to the parameter index.
      */
-    Surface& operator[] (qint32 idx);
+    FsSurface& operator[] (qint32 idx);
 
     //=========================================================================================================
     /**
@@ -201,9 +201,9 @@ public:
      *
      * @param[in] idt    the hemisphere identifier ("lh" or "rh").
      *
-     * @return Surface related to the parameter identifier.
+     * @return FsSurface related to the parameter identifier.
      */
-    const Surface& operator[] (QString idt) const;
+    const FsSurface& operator[] (QString idt) const;
 
     //=========================================================================================================
     /**
@@ -211,9 +211,9 @@ public:
      *
      * @param[in] idt    the hemisphere identifier ("lh" or "rh").
      *
-     * @return Surface related to the parameter identifier.
+     * @return FsSurface related to the parameter identifier.
      */
-    Surface& operator[] (QString idt);
+    FsSurface& operator[] (QString idt);
 
     //=========================================================================================================
     /**
@@ -230,28 +230,28 @@ private:
      */
     void calcOffset();
 
-    QMap<qint32, Surface> m_qMapSurfs;  /**< Hemisphere surfaces (lh = 0; rh = 1). */
+    QMap<qint32, FsSurface> m_qMapSurfs;  /**< Hemisphere surfaces (lh = 0; rh = 1). */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline QMap<qint32, Surface>& SurfaceSet::data()
+inline QMap<qint32, FsSurface>& FsSurfaceSet::data()
 {
     return m_qMapSurfs;
 }
 
 //=============================================================================================================
 
-inline bool SurfaceSet::isEmpty() const
+inline bool FsSurfaceSet::isEmpty() const
 {
     return m_qMapSurfs.isEmpty();
 }
 
 //=============================================================================================================
 
-inline QString SurfaceSet::surf() const
+inline QString FsSurfaceSet::surf() const
 {
     if(m_qMapSurfs.size() > 0)
         return m_qMapSurfs.begin().value().surf();
@@ -261,7 +261,7 @@ inline QString SurfaceSet::surf() const
 
 //=============================================================================================================
 
-inline qint32 SurfaceSet::size() const
+inline qint32 FsSurfaceSet::size() const
 {
     return m_qMapSurfs.size();
 }

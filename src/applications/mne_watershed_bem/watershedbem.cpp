@@ -261,7 +261,7 @@ bool WatershedBem::runMriWatershed(const QString& mriInput, const QString& wsDir
     // Use surface RAS coordinates
     args << "-useSRAS";
 
-    // Surface output prefix
+    // FsSurface output prefix
     args << "-surf" << (wsDir + "/" + m_settings.subject());
 
     // Input MRI and output directory
@@ -321,7 +321,7 @@ bool WatershedBem::convertSurfaces(const QString& wsDir, const QString& mgzFile)
     // geometry metadata is consistent with the source MRI volume.
     //
     // For the head surface FIFF BEM file creation step that follows,
-    // we read the surfaces via FSLIB::Surface which handles the coordinate
+    // we read the surfaces via FSLIB::FsSurface which handles the coordinate
     // system correctly, so this step primarily ensures consistency for
     // other tools that may read these surface files.
     //
@@ -336,7 +336,7 @@ bool WatershedBem::convertSurfaces(const QString& wsDir, const QString& mgzFile)
         return false;
     }
 
-    // Surface names produced by mri_watershed
+    // FsSurface names produced by mri_watershed
     QStringList surfaceNames;
     surfaceNames << m_settings.subject() + "_brain_surface"
                  << m_settings.subject() + "_inner_skull_surface"
@@ -356,10 +356,10 @@ bool WatershedBem::convertSurfaces(const QString& wsDir, const QString& mgzFile)
         }
 
         // Read surface to verify it is valid
-        Surface surf;
-        Surface::read(surfPath, surf, false);
+        FsSurface surf;
+        FsSurface::read(surfPath, surf, false);
         if (surf.rr().rows() == 0) {
-            qWarning() << "Surface" << surfPath << "has no vertices.";
+            qWarning() << "FsSurface" << surfPath << "has no vertices.";
         } else if (m_settings.verbose()) {
             printf("  %d vertices, %d triangles\n", (int)surf.rr().rows(), (int)surf.itris().rows());
         }
@@ -377,14 +377,14 @@ bool WatershedBem::createBemFif(const QString& surfFile, const QString& fifFile)
     // Equivalent to: mne_surf2bem --surf $surfFile --id 4 --fif $fifFile
     //
     // Steps:
-    //   1. Read FreeSurfer surface via FSLIB::Surface
+    //   1. Read FreeSurfer surface via FSLIB::FsSurface
     //   2. Create MNEBemSurface with head surface ID (4)
     //   3. Write BEM FIFF file via MNEBem::write()
     //
 
     // Read the FreeSurfer outer skin surface
-    Surface fsSurface;
-    Surface::read(surfFile, fsSurface, false);
+    FsSurface fsSurface;
+    FsSurface::read(surfFile, fsSurface, false);
 
     if (fsSurface.rr().rows() == 0 || fsSurface.itris().rows() == 0) {
         qCritical() << "Failed to read surface from" << surfFile;
@@ -396,7 +396,7 @@ bool WatershedBem::createBemFif(const QString& surfFile, const QString& fifFile)
 
     //
     // Create BEM surface
-    //   FSLIB::Surface stores vertices in meters (divided by 1000 during read).
+    //   FSLIB::FsSurface stores vertices in meters (divided by 1000 during read).
     //   MNEBemSurface expects vertices in meters as well.
     //
     MNEBemSurface bemSurface;
@@ -411,7 +411,7 @@ bool WatershedBem::createBemFif(const QString& surfFile, const QString& fifFile)
     bemSurface.itris = fsSurface.itris();
 
     // Compute vertex normals
-    bemSurface.nn = Surface::compute_normals(Eigen::MatrixX3f(bemSurface.rr), Eigen::MatrixX3i(bemSurface.itris));
+    bemSurface.nn = FsSurface::compute_normals(Eigen::MatrixX3f(bemSurface.rr), Eigen::MatrixX3i(bemSurface.itris));
 
     //
     // Create BEM and write to FIFF file

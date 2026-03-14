@@ -62,13 +62,13 @@ public:
     ~SurfaceTreeItem() override = default;
 
     // Setters
-    void setSurfaceData(const FSLIB::Surface &surface);
-    void setAnnotationData(const FSLIB::Annotation &annotation);
+    void setSurfaceData(const FSLIB::FsSurface &surface);
+    void setAnnotationData(const FSLIB::FsAnnotation &annotation);
     void setShaderMode(int mode); // 0=Standard, 1=Holo, 2=Glossy
 
     // Getters
-    FSLIB::Surface surfaceData() const;
-    FSLIB::Annotation annotationData() const;
+    FSLIB::FsSurface surfaceData() const;
+    FSLIB::FsAnnotation annotationData() const;
     int shaderMode() const;
 };
 

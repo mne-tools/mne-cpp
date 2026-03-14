@@ -181,7 +181,7 @@ private:
     qint32                              m_iMaxFilterTapSize;        /**< Maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
 
     QPointer<QVBoxLayout>               m_pRTESetLayout;            /**< RTE Widget layout. */
-    QPointer<QLabel>                    m_pLabelInit;               /**< Initialization Label. */
+    QPointer<QLabel>                    m_pLabelInit;               /**< Initialization FsLabel. */
     QPointer<QToolBox>                  m_pToolBox;                 /**< The toolbox which holds the butterfly and 2D layout plot. */
 
 signals:

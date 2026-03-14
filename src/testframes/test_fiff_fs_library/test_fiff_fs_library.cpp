@@ -3,7 +3,7 @@
 //
 // Covers: FiffRawData, FiffEvokedSet, FiffDigPointSet, FiffInfo, FiffInfoBase,
 //         FiffCoordTrans, FiffNamedMatrix, FiffEvents,
-//         Surface, SurfaceSet, Annotation, AnnotationSet, Label, Colortable
+//         FsSurface, FsSurfaceSet, FsAnnotation, FsAnnotationSet, FsLabel, FsColortable
 //=============================================================================================================
 
 #include <QtTest/QtTest>
@@ -111,20 +111,20 @@ private slots:
     // ── FIFF: Events ──
     void fiff_detectEventsFromRaw();
 
-    // ── FS: Surface ──
+    // ── FS: FsSurface ──
     void fs_surfaceComputeNormals();
     void fs_surfaceReadWrite();
     void fs_surfaceReadReal();
     void fs_surfaceSetReadReal();
     void fs_surfaceReadCurv();
 
-    // ── FS: Annotation ──
+    // ── FS: FsAnnotation ──
     void fs_annotationReadWrite();
     void fs_annotationReadReal();
     void fs_annotationSetReadReal();
     void fs_annotationToLabels();
 
-    // ── FS: Label & Colortable ──
+    // ── FS: FsLabel & FsColortable ──
     void fs_labelCombine();
     void fs_colorTableFromLabels();
 
@@ -541,7 +541,7 @@ void TestFiffFsLibrary::fiff_detectEventsFromRaw()
 }
 
 //=============================================================================================================
-// FS: Surface
+// FS: FsSurface
 //=============================================================================================================
 
 void TestFiffFsLibrary::fs_surfaceComputeNormals()
@@ -554,7 +554,7 @@ void TestFiffFsLibrary::fs_surfaceComputeNormals()
     MatrixX3i tris(4, 3);
     tris << 0,1,2, 0,2,3, 0,3,1, 1,3,2;
 
-    MatrixX3f normals = Surface::compute_normals(verts, tris);
+    MatrixX3f normals = FsSurface::compute_normals(verts, tris);
     QCOMPARE(normals.rows(), 4);
     for (int i = 0; i < 4; i++)
         QVERIFY(qAbs(normals.row(i).norm() - 1.0f) < 0.1f);
@@ -568,14 +568,14 @@ void TestFiffFsLibrary::fs_surfaceReadWrite()
     MatrixX3i tris(4, 3);
     tris << 0,1,2, 0,2,3, 0,3,1, 1,3,2;
 
-    Surface s1;
+    FsSurface s1;
     QVERIFY(s1.isEmpty());
 
-    SurfaceSet sSet;
+    FsSurfaceSet sSet;
     QVERIFY(sSet.isEmpty());
     QCOMPARE(sSet.size(), 0);
 
-    MatrixX3f normals = Surface::compute_normals(rr, tris);
+    MatrixX3f normals = FsSurface::compute_normals(rr, tris);
     QCOMPARE(normals.rows(), rr.rows());
     for (int i = 0; i < normals.rows(); i++) {
         float len = normals.row(i).norm();
@@ -588,8 +588,8 @@ void TestFiffFsLibrary::fs_surfaceReadReal()
     if (!hasData()) QSKIP("No test data");
     if (!QFile::exists(surfLhPath())) QSKIP("lh.white not found");
 
-    Surface surfLh;
-    bool ok = Surface::read(surfLhPath(), surfLh, false);
+    FsSurface surfLh;
+    bool ok = FsSurface::read(surfLhPath(), surfLh, false);
     QVERIFY(ok);
     QVERIFY(!surfLh.isEmpty());
     QVERIFY(surfLh.rr().rows() > 0);
@@ -597,25 +597,25 @@ void TestFiffFsLibrary::fs_surfaceReadReal()
     QCOMPARE(surfLh.hemi(), 0);
 
     if (QFile::exists(curvLhPath())) {
-        Surface surfLhCurv;
-        bool ok2 = Surface::read(surfLhPath(), surfLhCurv, true);
+        FsSurface surfLhCurv;
+        bool ok2 = FsSurface::read(surfLhPath(), surfLhCurv, true);
         QVERIFY(ok2);
         QVERIFY(surfLhCurv.curv().size() > 0);
     }
 
     if (QFile::exists(curvLhPath())) {
-        VectorXf curv = Surface::read_curv(curvLhPath());
+        VectorXf curv = FsSurface::read_curv(curvLhPath());
         QVERIFY(curv.size() > 0);
     }
 
     if (QFile::exists(surfRhPath())) {
-        Surface surfRh;
-        bool ok3 = Surface::read(surfRhPath(), surfRh, false);
+        FsSurface surfRh;
+        bool ok3 = FsSurface::read(surfRhPath(), surfRh, false);
         QVERIFY(ok3);
         QCOMPARE(surfRh.hemi(), 1);
     }
 
-    Surface surfCtor(surfLhPath());
+    FsSurface surfCtor(surfLhPath());
     QVERIFY(!surfCtor.isEmpty());
 }
 
@@ -623,32 +623,32 @@ void TestFiffFsLibrary::fs_surfaceSetReadReal()
 {
     if (!hasData()) QSKIP("No test data");
     if (!QFile::exists(surfLhPath()) || !QFile::exists(surfRhPath()))
-        QSKIP("Surface files not found");
+        QSKIP("FsSurface files not found");
 
-    SurfaceSet sSet(surfLhPath(), surfRhPath());
+    FsSurfaceSet sSet(surfLhPath(), surfRhPath());
     QVERIFY(!sSet.isEmpty());
     QCOMPARE(sSet.size(), 2);
 
-    const Surface& lh = sSet[0];
+    const FsSurface& lh = sSet[0];
     QVERIFY(!lh.isEmpty());
-    const Surface& rh = sSet[1];
+    const FsSurface& rh = sSet[1];
     QVERIFY(!rh.isEmpty());
 
-    const Surface& lhByName = sSet[QString("lh")];
+    const FsSurface& lhByName = sSet[QString("lh")];
     QVERIFY(!lhByName.isEmpty());
-    const Surface& rhByName = sSet[QString("rh")];
+    const FsSurface& rhByName = sSet[QString("rh")];
     QVERIFY(!rhByName.isEmpty());
 
-    SurfaceSet sSet2;
-    bool ok = SurfaceSet::read(surfLhPath(), surfRhPath(), sSet2);
+    FsSurfaceSet sSet2;
+    bool ok = FsSurfaceSet::read(surfLhPath(), surfRhPath(), sSet2);
     QVERIFY(ok);
     QCOMPARE(sSet2.size(), 2);
 
     QVERIFY(!sSet.surf().isEmpty());
 
-    SurfaceSet sSet3;
-    Surface s;
-    Surface::read(surfLhPath(), s, false);
+    FsSurfaceSet sSet3;
+    FsSurface s;
+    FsSurface::read(surfLhPath(), s, false);
     sSet3.insert(s);
     QCOMPARE(sSet3.size(), 1);
 }
@@ -658,7 +658,7 @@ void TestFiffFsLibrary::fs_surfaceReadCurv()
     if (!hasData()) QSKIP("No test data");
     if (!QFile::exists(curvLhPath())) QSKIP("lh.curv not found");
 
-    VectorXf curv = Surface::read_curv(curvLhPath());
+    VectorXf curv = FsSurface::read_curv(curvLhPath());
     QVERIFY(curv.size() > 0);
 
     bool hasPos = false, hasNeg = false;
@@ -671,7 +671,7 @@ void TestFiffFsLibrary::fs_surfaceReadCurv()
 }
 
 //=============================================================================================================
-// FS: Annotation
+// FS: FsAnnotation
 //=============================================================================================================
 
 void TestFiffFsLibrary::fs_annotationReadWrite()
@@ -704,11 +704,11 @@ void TestFiffFsLibrary::fs_annotationReadWrite()
         ds << (qint32)25 << (qint32)100 << (qint32)40 << (qint32)0;
     }
 
-    Annotation annot;
-    bool ok = Annotation::read(tmpPath, annot);
+    FsAnnotation annot;
+    bool ok = FsAnnotation::read(tmpPath, annot);
     QFile::remove(tmpPath);
 
-    QVERIFY2(ok, "Annotation::read failed on FreeSurfer binary");
+    QVERIFY2(ok, "FsAnnotation::read failed on FreeSurfer binary");
     QCOMPARE(annot.getVertices().size(), (Eigen::Index)nv);
 }
 
@@ -717,22 +717,22 @@ void TestFiffFsLibrary::fs_annotationReadReal()
     if (!hasData()) QSKIP("No test data");
     if (!QFile::exists(annotLhPath())) QSKIP("lh.aparc.annot not found");
 
-    Annotation annot;
-    bool ok = Annotation::read(annotLhPath(), annot);
+    FsAnnotation annot;
+    bool ok = FsAnnotation::read(annotLhPath(), annot);
     QVERIFY(ok);
     QVERIFY(!annot.isEmpty());
     QVERIFY(annot.getVertices().size() > 0);
     QVERIFY(annot.getLabelIds().size() > 0);
     QCOMPARE(annot.hemi(), 0);
 
-    Colortable ct = annot.getColortable();
+    FsColortable ct = annot.getColortable();
     QVERIFY(ct.numEntries > 0);
     QVERIFY(!ct.struct_names.isEmpty());
 
     QVERIFY(!annot.filePath().isEmpty());
     QVERIFY(!annot.fileName().isEmpty());
 
-    Annotation annotCtor(annotLhPath());
+    FsAnnotation annotCtor(annotLhPath());
     QVERIFY(!annotCtor.isEmpty());
 }
 
@@ -740,28 +740,28 @@ void TestFiffFsLibrary::fs_annotationSetReadReal()
 {
     if (!hasData()) QSKIP("No test data");
     if (!QFile::exists(annotLhPath()) || !QFile::exists(annotRhPath()))
-        QSKIP("Annotation files not found");
+        QSKIP("FsAnnotation files not found");
 
-    AnnotationSet aSet(annotLhPath(), annotRhPath());
+    FsAnnotationSet aSet(annotLhPath(), annotRhPath());
     QVERIFY(!aSet.isEmpty());
     QCOMPARE(aSet.size(), 2);
 
-    Annotation& lh = aSet[0];
+    FsAnnotation& lh = aSet[0];
     QVERIFY(!lh.isEmpty());
-    Annotation& rh = aSet[1];
+    FsAnnotation& rh = aSet[1];
     QVERIFY(!rh.isEmpty());
 
-    Annotation& lhByName = aSet[QString("lh")];
+    FsAnnotation& lhByName = aSet[QString("lh")];
     QVERIFY(!lhByName.isEmpty());
 
-    AnnotationSet aSet2;
-    bool ok = AnnotationSet::read(annotLhPath(), annotRhPath(), aSet2);
+    FsAnnotationSet aSet2;
+    bool ok = FsAnnotationSet::read(annotLhPath(), annotRhPath(), aSet2);
     QVERIFY(ok);
     QCOMPARE(aSet2.size(), 2);
 
-    AnnotationSet aSet3;
-    Annotation a;
-    Annotation::read(annotLhPath(), a);
+    FsAnnotationSet aSet3;
+    FsAnnotation a;
+    FsAnnotation::read(annotLhPath(), a);
     aSet3.insert(a);
     QCOMPARE(aSet3.size(), 1);
 }
@@ -772,15 +772,15 @@ void TestFiffFsLibrary::fs_annotationToLabels()
     if (!QFile::exists(annotLhPath()) || !QFile::exists(surfLhPath()))
         QSKIP("Required files not found");
 
-    Annotation annot;
-    Annotation::read(annotLhPath(), annot);
+    FsAnnotation annot;
+    FsAnnotation::read(annotLhPath(), annot);
     QVERIFY(!annot.isEmpty());
 
-    Surface surf;
-    Surface::read(surfLhPath(), surf, false);
+    FsSurface surf;
+    FsSurface::read(surfLhPath(), surf, false);
     QVERIFY(!surf.isEmpty());
 
-    QList<Label> labels;
+    QList<FsLabel> labels;
     QList<RowVector4i> rgbas;
     bool ok = annot.toLabels(surf, labels, rgbas);
     QVERIFY(ok);
@@ -792,12 +792,12 @@ void TestFiffFsLibrary::fs_annotationToLabels()
 }
 
 //=============================================================================================================
-// FS: Label & Colortable
+// FS: FsLabel & FsColortable
 //=============================================================================================================
 
 void TestFiffFsLibrary::fs_labelCombine()
 {
-    Label l1;
+    FsLabel l1;
     QVERIFY(l1.isEmpty());
 
     l1.name = "test_label";
@@ -809,14 +809,14 @@ void TestFiffFsLibrary::fs_labelCombine()
     QVERIFY(!l1.isEmpty());
     QCOMPARE((int)l1.vertices.size(), 10);
 
-    Label l2 = l1;
+    FsLabel l2 = l1;
     l2.clear();
     QVERIFY(l2.isEmpty());
 }
 
 void TestFiffFsLibrary::fs_colorTableFromLabels()
 {
-    Colortable ct;
+    FsColortable ct;
     QCOMPARE(ct.numEntries, 0);
 
     ct.numEntries = 2;
@@ -1415,7 +1415,7 @@ void TestFiffFsLibrary::fiff_microCoveragePush()
 
 void TestFiffFsLibrary::fs_surfaceDefaultConstruction()
 {
-    Surface surf;
+    FsSurface surf;
     QVERIFY(surf.isEmpty());
     QCOMPARE(surf.hemi(), -1);
     QVERIFY(surf.rr().rows() == 0);
@@ -1430,7 +1430,7 @@ void TestFiffFsLibrary::fs_surfaceComputeNormalsCube()
     tris << 0,1,2,  0,2,3,  4,6,5,  4,7,6,
             0,5,1,  0,4,5,  2,7,3,  2,6,7,
             0,3,7,  0,7,4,  1,5,6,  1,6,2;
-    MatrixX3f normals = Surface::compute_normals(rr, tris);
+    MatrixX3f normals = FsSurface::compute_normals(rr, tris);
     QCOMPARE(normals.rows(), 8);
     for (int i = 0; i < normals.rows(); ++i) {
         QVERIFY(normals.row(i).norm() > 0.1f);
@@ -1439,20 +1439,20 @@ void TestFiffFsLibrary::fs_surfaceComputeNormalsCube()
 
 void TestFiffFsLibrary::fs_surfaceSetDefaultConstruction()
 {
-    SurfaceSet surfSet;
+    FsSurfaceSet surfSet;
     QVERIFY(surfSet.isEmpty());
     QCOMPARE(surfSet.size(), 0);
 }
 
 void TestFiffFsLibrary::fs_surfaceSetIsEmpty()
 {
-    SurfaceSet surfSet;
+    FsSurfaceSet surfSet;
     QVERIFY(surfSet.isEmpty());
-    // Default-constructed Surface is empty (hemi == -1) and insert() rejects it.
+    // Default-constructed FsSurface is empty (hemi == -1) and insert() rejects it.
     // Read a real surface to test insert.
     if (!hasData()) QSKIP("No test data");
     QString surfPath = m_sDataPath + "/subjects/sample/surf/lh.white";
-    Surface surf(surfPath);
+    FsSurface surf(surfPath);
     if (surf.isEmpty()) QSKIP("Could not load surface");
     surfSet.insert(surf);
     QVERIFY(!surfSet.isEmpty());
@@ -1461,7 +1461,7 @@ void TestFiffFsLibrary::fs_surfaceSetIsEmpty()
 
 void TestFiffFsLibrary::fs_annotationDefaultConstruction()
 {
-    Annotation annot;
+    FsAnnotation annot;
     QVERIFY(annot.isEmpty());
     QCOMPARE(annot.hemi(), -1);
     QCOMPARE(annot.getVertices().size(), 0);
@@ -1469,26 +1469,26 @@ void TestFiffFsLibrary::fs_annotationDefaultConstruction()
 
 void TestFiffFsLibrary::fs_annotationIsEmpty()
 {
-    Annotation annot;
+    FsAnnotation annot;
     QVERIFY(annot.isEmpty());
 }
 
 void TestFiffFsLibrary::fs_annotationSetDefaultConstruction()
 {
-    AnnotationSet annotSet;
+    FsAnnotationSet annotSet;
     QVERIFY(annotSet.isEmpty());
     QCOMPARE(annotSet.size(), 0);
 }
 
 void TestFiffFsLibrary::fs_annotationSetIsEmpty()
 {
-    AnnotationSet annotSet;
+    FsAnnotationSet annotSet;
     QVERIFY(annotSet.isEmpty());
-    // Default-constructed Annotation is empty (hemi == -1) and insert() rejects it.
+    // Default-constructed FsAnnotation is empty (hemi == -1) and insert() rejects it.
     // Read a real annotation to test insert.
     if (!hasData()) QSKIP("No test data");
     QString annotPath = m_sDataPath + "/subjects/sample/label/lh.aparc.annot";
-    Annotation annot(annotPath);
+    FsAnnotation annot(annotPath);
     if (annot.isEmpty()) QSKIP("Could not load annotation");
     annotSet.insert(annot);
     QVERIFY(!annotSet.isEmpty());
@@ -1497,7 +1497,7 @@ void TestFiffFsLibrary::fs_annotationSetIsEmpty()
 
 void TestFiffFsLibrary::fs_colortableDefaultAndClear()
 {
-    Colortable ct;
+    FsColortable ct;
     QCOMPARE(ct.numEntries, 0);
     ct.numEntries = 5;
     ct.clear();
@@ -1506,7 +1506,7 @@ void TestFiffFsLibrary::fs_colortableDefaultAndClear()
 
 void TestFiffFsLibrary::fs_labelDefaultConstruction()
 {
-    Label label;
+    FsLabel label;
     QVERIFY(label.isEmpty());
     QCOMPARE(label.hemi, -1);
     QCOMPARE(label.vertices.size(), 0);
@@ -1570,19 +1570,19 @@ void TestFiffFsLibrary::fs_surfaceSetOperators()
     QString rhPath = m_tempDir.filePath("rh.test");
     writeSyntheticSurface(lhPath, 4, 2, verts, tris);
     writeSyntheticSurface(rhPath, 4, 2, verts, tris);
-    Surface lhSurf, rhSurf;
-    bool ok1 = Surface::read(lhPath, lhSurf);
-    bool ok2 = Surface::read(rhPath, rhSurf);
+    FsSurface lhSurf, rhSurf;
+    bool ok1 = FsSurface::read(lhPath, lhSurf);
+    bool ok2 = FsSurface::read(rhPath, rhSurf);
     if (ok1 && ok2) {
-        SurfaceSet surfSet;
+        FsSurfaceSet surfSet;
         surfSet.insert(lhSurf);
         surfSet.insert(rhSurf);
         QVERIFY(surfSet.size() == 2);
-        Surface& s0 = surfSet[0];
-        Surface& s1 = surfSet[1];
+        FsSurface& s0 = surfSet[0];
+        FsSurface& s1 = surfSet[1];
         Q_UNUSED(s0); Q_UNUSED(s1);
-        const SurfaceSet& constSet = surfSet;
-        const Surface& cs0 = constSet[0];
+        const FsSurfaceSet& constSet = surfSet;
+        const FsSurface& cs0 = constSet[0];
         Q_UNUSED(cs0);
     }
     QVERIFY(true);
@@ -1598,18 +1598,18 @@ void TestFiffFsLibrary::fs_annotationSetOperators()
     QString rhPath = m_tempDir.filePath("rh.aparc.annot");
     writeSyntheticAnnotation(lhPath, 4, vertIdx, labels);
     writeSyntheticAnnotation(rhPath, 4, vertIdx, labels);
-    Annotation lhAnnot, rhAnnot;
-    bool ok1 = Annotation::read(lhPath, lhAnnot);
-    bool ok2 = Annotation::read(rhPath, rhAnnot);
+    FsAnnotation lhAnnot, rhAnnot;
+    bool ok1 = FsAnnotation::read(lhPath, lhAnnot);
+    bool ok2 = FsAnnotation::read(rhPath, rhAnnot);
     if (ok1 && ok2) {
-        AnnotationSet annotSet;
+        FsAnnotationSet annotSet;
         annotSet.insert(lhAnnot);
         annotSet.insert(rhAnnot);
         QVERIFY(annotSet.size() == 2);
-        Annotation& a0 = annotSet[0];
+        FsAnnotation& a0 = annotSet[0];
         Q_UNUSED(a0);
-        const AnnotationSet& constAnnot = annotSet;
-        const Annotation ca0 = constAnnot[0];
+        const FsAnnotationSet& constAnnot = annotSet;
+        const FsAnnotation ca0 = constAnnot[0];
         VectorXi verts = ca0.getVertices();
         Q_UNUSED(verts);
     }
@@ -1626,8 +1626,8 @@ void TestFiffFsLibrary::fs_surfaceReadFromSynthetic()
     QDir().mkpath(surfDir);
     writeSyntheticSurface(surfDir + "/lh.inflated", 4, 2, verts, tris);
     writeSyntheticSurface(surfDir + "/rh.inflated", 4, 2, verts, tris);
-    Surface s1(surfDir + "/lh.inflated");
-    Surface s2(surfDir, 0, "inflated");
+    FsSurface s1(surfDir + "/lh.inflated");
+    FsSurface s2(surfDir, 0, "inflated");
     Q_UNUSED(s1); Q_UNUSED(s2);
     QVERIFY(true);
 }
@@ -1642,8 +1642,8 @@ void TestFiffFsLibrary::fs_annotationReadFromSynthetic()
     QDir().mkpath(annotDir);
     writeSyntheticAnnotation(annotDir + "/lh.aparc.annot", 4, vertIdx, labels);
     writeSyntheticAnnotation(annotDir + "/rh.aparc.annot", 4, vertIdx, labels);
-    Annotation a1(annotDir + "/lh.aparc.annot");
-    Annotation a2(annotDir, 0, "aparc");
+    FsAnnotation a1(annotDir + "/lh.aparc.annot");
+    FsAnnotation a2(annotDir, 0, "aparc");
     Q_UNUSED(a1); Q_UNUSED(a2);
     QVERIFY(true);
 }
@@ -1658,8 +1658,8 @@ void TestFiffFsLibrary::fs_surfaceSetCalcOffset()
     QDir().mkpath(surfDir);
     writeSyntheticSurface(surfDir + "/lh.inflated", 4, 2, verts, tris);
     writeSyntheticSurface(surfDir + "/rh.inflated", 4, 2, verts, tris);
-    SurfaceSet surfSet;
-    bool ok = SurfaceSet::read(surfDir + "/lh.inflated", surfDir + "/rh.inflated", surfSet);
+    FsSurfaceSet surfSet;
+    bool ok = FsSurfaceSet::read(surfDir + "/lh.inflated", surfDir + "/rh.inflated", surfSet);
     Q_UNUSED(ok);
     QVERIFY(true);
 }
@@ -1674,8 +1674,8 @@ void TestFiffFsLibrary::fs_surfaceSetReadNonInflated()
     QDir().mkpath(surfDir);
     writeSyntheticSurface(surfDir + "/lh.orig", 4, 2, verts, tris);
     writeSyntheticSurface(surfDir + "/rh.orig", 4, 2, verts, tris);
-    SurfaceSet surfSet;
-    bool ok = SurfaceSet::read(surfDir + "/lh.orig", surfDir + "/rh.orig", surfSet);
+    FsSurfaceSet surfSet;
+    bool ok = FsSurfaceSet::read(surfDir + "/lh.orig", surfDir + "/rh.orig", surfSet);
     Q_UNUSED(ok);
     QVERIFY(true);
 }
@@ -1690,8 +1690,8 @@ void TestFiffFsLibrary::fs_annotationSetReadSynthetic()
     QDir().mkpath(annotDir);
     writeSyntheticAnnotation(annotDir + "/lh.aparc.annot", 4, vertIdx, labels);
     writeSyntheticAnnotation(annotDir + "/rh.aparc.annot", 4, vertIdx, labels);
-    AnnotationSet annotSet;
-    bool ok = AnnotationSet::read(annotDir + "/lh.aparc.annot", annotDir + "/rh.aparc.annot", annotSet);
+    FsAnnotationSet annotSet;
+    bool ok = FsAnnotationSet::read(annotDir + "/lh.aparc.annot", annotDir + "/rh.aparc.annot", annotSet);
     Q_UNUSED(ok);
     QVERIFY(true);
 }
@@ -1705,15 +1705,15 @@ void TestFiffFsLibrary::fs_labelSelectTris()
     tris << 0,1,2, 0,2,3;
     QString surfPath = m_tempDir.filePath("lh.labeltest");
     writeSyntheticSurface(surfPath, 4, 2, verts, tris);
-    Surface surf;
-    bool ok = Surface::read(surfPath, surf);
+    FsSurface surf;
+    bool ok = FsSurface::read(surfPath, surf);
     if (ok) {
-        Label label;
+        FsLabel label;
         label.read(m_sDataPath + "/subjects/sample/label/lh.BA1_exvivo.label", label);
         if (!label.isEmpty()) {
             label.selectTris(surf);
         } else {
-            Label synthLabel;
+            FsLabel synthLabel;
             synthLabel.selectTris(surf);
         }
     }

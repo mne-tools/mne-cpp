@@ -132,7 +132,7 @@ PickResult RayPicker::pick(const QVector3D &rayOrigin,
                     }
                 }
 
-                // Annotation info
+                // FsAnnotation info
                 if (result.item && itemSurfaceMap.contains(result.item)) {
                     result.regionName = itemSurfaceMap[result.item]->getAnnotationLabel(vertexIdx);
                     result.regionId   = itemSurfaceMap[result.item]->getAnnotationLabelId(vertexIdx);

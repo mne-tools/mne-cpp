@@ -192,7 +192,7 @@ private:
     MNEInverseOperator inv;                 /**< The setup inverse operator. */
     Eigen::SparseMatrix<double> noise_norm;         /**< The noise normalization. */
     QList<Eigen::VectorXi> vertno;                  /**< The vertices numbers. */
-    FSLIB::Label label;                             /**< The corresponding labels. */
+    FSLIB::FsLabel label;                             /**< The corresponding labels. */
     Eigen::MatrixXd K;                              /**< Imaging kernel. */
 };
 

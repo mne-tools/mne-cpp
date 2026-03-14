@@ -40,7 +40,7 @@
  *
  *           This C++ implementation:
  *             - Calls mri_watershed via QProcess
- *             - Reads surfaces using FSLIB::Surface
+ *             - Reads surfaces using FSLIB::FsSurface
  *             - Applies voxel-to-RAS transforms from MRI volumes (MRILIB)
  *             - Writes BEM FIFF files using MNELIB::MNEBem/MNEBemSurface
  *

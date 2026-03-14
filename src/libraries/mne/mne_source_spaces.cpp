@@ -111,10 +111,10 @@ QList<VectorXi> MNESourceSpaces::get_vertno() const
 
 //=============================================================================================================
 
-QList<VectorXi> MNESourceSpaces::label_src_vertno_sel(const Label &p_label, VectorXi &src_sel) const
+QList<VectorXi> MNESourceSpaces::label_src_vertno_sel(const FsLabel &p_label, VectorXi &src_sel) const
 {
 //    if(src[0].['type'] != 'surf')
-//        return Exception('Label are only supported with surface source spaces')
+//        return Exception('FsLabel are only supported with surface source spaces')
 
     QList<VectorXi> vertno;
     vertno << this->m_sourceSpaces[0]->vertno << this->m_sourceSpaces[1]->vertno;
@@ -169,7 +169,7 @@ QList<VectorXi> MNESourceSpaces::label_src_vertno_sel(const Label &p_label, Vect
 
 //=============================================================================================================
 
-MNESourceSpaces MNESourceSpaces::pick_regions(const QList<Label> &p_qListLabels) const
+MNESourceSpaces MNESourceSpaces::pick_regions(const QList<FsLabel> &p_qListLabels) const
 {
     Q_UNUSED(p_qListLabels);
 

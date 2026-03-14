@@ -68,15 +68,15 @@ struct PickResult
     QVector3D hitPoint;                 ///< World-space intersection point
 
     QStandardItem *item     = nullptr;  ///< Tree item that was hit (nullable)
-    QString surfaceKey;                 ///< Surface map key of the hit surface
+    QString surfaceKey;                 ///< FsSurface map key of the hit surface
     int     vertexIndex     = -1;       ///< Vertex or element index at hit
 
     bool    isDipole        = false;    ///< True if a dipole was hit
     int     dipoleIndex     = -1;       ///< Index within the dipole set
 
-    // Annotation info (brain surfaces only)
-    QString regionName;                 ///< Annotation region label (if available)
-    int     regionId        = -1;       ///< Annotation label ID
+    // FsAnnotation info (brain surfaces only)
+    QString regionName;                 ///< FsAnnotation region label (if available)
+    int     regionId        = -1;       ///< FsAnnotation label ID
 
     //=========================================================================================================
     /**
@@ -147,7 +147,7 @@ public:
      *
      * @param[in] result          PickResult from pick().
      * @param[in] itemSurfaceMap  Map for reverse item → surface lookup.
-     * @param[in] surfaces        Surface map for key-based lookup.
+     * @param[in] surfaces        FsSurface map for key-based lookup.
      * @return                    Display label string.
      */
     static QString buildLabel(const PickResult &result,

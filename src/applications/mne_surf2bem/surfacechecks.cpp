@@ -148,7 +148,7 @@ bool SurfaceChecks::isCompleteSurface(const MNEBemSurface& surf)
     //
     double totAngle = sumSolids(cm, surf) / (4.0 * M_PI);
     if (fabs(totAngle - 1.0) > 1e-5) {
-        qCritical() << "Surface" << getNameOf(surf.id) << "is not complete"
+        qCritical() << "FsSurface" << getNameOf(surf.id) << "is not complete"
                      << "(sum of solid angles =" << totAngle << "* 4*PI instead).";
         return false;
     }
@@ -163,7 +163,7 @@ bool SurfaceChecks::isInside(const MNEBemSurface& from, const MNEBemSurface& to)
         Vector3f pt = from.rr.row(k);
         double totAngle = sumSolids(pt, to) / (4.0 * M_PI);
         if (fabs(totAngle - 1.0) > 1e-5) {
-            qCritical() << "Surface" << getNameOf(from.id)
+            qCritical() << "FsSurface" << getNameOf(from.id)
                          << "is not completely inside surface" << getNameOf(to.id)
                          << "(sum of solid angles =" << totAngle << "* 4*PI).";
             return false;

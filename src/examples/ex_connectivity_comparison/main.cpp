@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Connectivity Comparison Example");
     parser.addHelpOption();
 
-    QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2009s");
+    QCommandLineOption annotOption("annotType", "FsAnnotation <type> (for source level usage only).", "type", "aparc.a2009s");
     QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
@@ -203,8 +203,8 @@ int main(int argc, char *argv[])
     FwdForwardSolution t_clusteredFwd;
     FwdForwardSolution t_Fwd;
 
-    SurfaceSet tSurfSetInflated (sSubj, 2, "inflated", sSubjDir);
-    AnnotationSet tAnnotSet(sSubj, 2, sAnnotType, sSubjDir);
+    FsSurfaceSet tSurfSetInflated (sSubj, 2, "inflated", sSubjDir);
+    FsAnnotationSet tAnnotSet(sSubj, 2, sAnnotType, sSubjDir);
 
     QFile t_fileCov(sCov);
     FiffCov noise_cov(t_fileCov);

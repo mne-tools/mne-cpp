@@ -83,7 +83,7 @@ class MNESurfacePatch;
 /**
  * Replaces  *mshDisplaySurfaceSet, mshDisplaySurfaceSetRec struct (analyze_types.c). Note that another implementation can be found in movie_types.h
  *
- * @brief The MNE Msh Display Surface Set class holds information about a set of surfaces to be rendered.
+ * @brief The MNE Msh Display FsSurface Set class holds information about a set of surfaces to be rendered.
  */
 class MNESHARED_EXPORT MNEMshDisplaySurfaceSet
 {
@@ -108,7 +108,7 @@ public:
      * the subjects directory, configuring eye positions and lighting.
      *
      * @param[in] subject_id    Subject name.
-     * @param[in] surf          Surface type name (e.g. "inflated", "white").
+     * @param[in] surf          FsSurface type name (e.g. "inflated", "white").
      * @param[in] subjects_dir  Path to the FreeSurfer subjects directory.
      *
      * @return A new display surface set, or NULL on failure. Caller takes ownership.

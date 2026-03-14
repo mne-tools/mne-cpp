@@ -72,12 +72,12 @@ public:
     ~BrainTreeModel() override = default;
 
     // Helper functions to populate the tree
-    SurfaceTreeItem* addSurface(const QString &subject, const QString &hemi, const QString &surfType, const FSLIB::Surface &surface);
+    SurfaceTreeItem* addSurface(const QString &subject, const QString &hemi, const QString &surfType, const FSLIB::FsSurface &surface);
     
     // Add annotation to an existing surface item? Or separate item?
     // Usually annotation is property of a surface or child of surface.
     // Let's attach it to the surface item for now or find the surface item and update it.
-    bool addAnnotation(const QString &subject, const QString &hemi, const FSLIB::Annotation &annotation);
+    bool addAnnotation(const QString &subject, const QString &hemi, const FSLIB::FsAnnotation &annotation);
 
     // Add BEM surface
     BemTreeItem* addBemSurface(const QString &subject, const QString &bemName, const MNELIB::MNEBemSurface &bemSurf);

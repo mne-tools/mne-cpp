@@ -190,7 +190,7 @@ public:
      * Paints per-vertex colours onto the target surfaces and optionally
      * generates iso-contour line meshes.
      *
-     * @param[in,out] surfaces      Surface map (contour surfaces may be added).
+     * @param[in,out] surfaces      FsSurface map (contour surfaces may be added).
      * @param[in]     singleView    The single-view SubView for visibility flags.
      * @param[in]     subViews      The four multi-view SubViews.
      */
@@ -273,7 +273,7 @@ private:
      *
      * Three contour sets are generated per prefix: _neg, _zero, _pos.
      *
-     * @param[in,out] surfaces  Surface map (contour meshes are created/updated here).
+     * @param[in,out] surfaces  FsSurface map (contour meshes are created/updated here).
      * @param[in]     prefix    Key prefix for contour surfaces.
      * @param[in]     surface   The surface whose geometry is iso-contoured.
      * @param[in]     values    Per-vertex scalar values.

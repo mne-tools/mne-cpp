@@ -90,7 +90,7 @@ void MNEClusterInfo::write(QString p_sFileName) const
     for(qint32 i = 0; i < clusterLabelIds.size(); ++i)
     {
         out << "\nLabel : " << clusterLabelNames[i] << "\n";
-        out << "Label ID : " << clusterLabelIds[i] << "\n";
+        out << "FsLabel ID : " << clusterLabelIds[i] << "\n";
         out << "Centroid Vertno : " << centroidVertno[i] << "\n";
         out << "Centroid rr : " << centroidSource_rr[i](0) << ", " << clusterSource_rr[i](1) << ", " << clusterSource_rr[i](2) << "\n";
         out << "Vertnos :\n";

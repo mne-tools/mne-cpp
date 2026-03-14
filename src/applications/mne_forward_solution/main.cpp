@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
     QCommandLineOption allOpt("all", "Calculate forward solution in all nodes instead of selected ones only.");
 
     // Source space filtering
-    QCommandLineOption labelOpt("label", "Label file to select sources (can be specified multiple times).", "file");
+    QCommandLineOption labelOpt("label", "FsLabel file to select sources (can be specified multiple times).", "file");
     QCommandLineOption mindistOpt("mindist", "Minimum distance of sources from the inner skull surface (mm).", "dist");
     QCommandLineOption mindistoutOpt("mindistout", "Output file for omitted source space points.", "file");
     QCommandLineOption includeallOpt("includeall", "Omit all source space checks.");

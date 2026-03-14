@@ -60,7 +60,7 @@
 //=============================================================================================================
 
 namespace FSLIB {
-    class AnnotationSet;
+    class FsAnnotationSet;
 }
 
 namespace Ui {
@@ -232,10 +232,10 @@ signals:
      * Emit this signal whenever the atlas directory is set.
      *
      * @param[in] sDirPath              The path to the atlas.
-     * @param[in] pAnnotationSet        The Annotation set.
+     * @param[in] pAnnotationSet        The FsAnnotation set.
      */
     void atlasDirChanged(const QString& sDirPath,
-                         const FSLIB::AnnotationSet::SPtr pAnnotationSet);
+                         const FSLIB::FsAnnotationSet::SPtr pAnnotationSet);
 
     //=========================================================================================================
     /**

@@ -103,7 +103,7 @@ public:
      *
      * @param[in] annotSet   the annotation set to set.
      */
-    inline void setAnnotSet(FSLIB::AnnotationSet::SPtr& annotSet);
+    inline void setAnnotSet(FSLIB::FsAnnotationSet::SPtr& annotSet);
 
     //=========================================================================================================
     /**
@@ -111,7 +111,7 @@ public:
      *
      * @return the annotation set.
      */
-    inline FSLIB::AnnotationSet::SPtr& getAnnotSet();
+    inline FSLIB::FsAnnotationSet::SPtr& getAnnotSet();
 
     //=========================================================================================================
     /**
@@ -119,7 +119,7 @@ public:
      *
      * @param[in] surfSet   the surface set to set.
      */
-    inline void setSurfSet(FSLIB::SurfaceSet::SPtr& surfSet);
+    inline void setSurfSet(FSLIB::FsSurfaceSet::SPtr& surfSet);
 
     //=========================================================================================================
     /**
@@ -127,7 +127,7 @@ public:
      *
      * @return the surface set.
      */
-    inline FSLIB::SurfaceSet::SPtr& getSurfSet();
+    inline FSLIB::FsSurfaceSet::SPtr& getSurfSet();
 
     //=========================================================================================================
     /**
@@ -225,8 +225,8 @@ private:
     FIFFLIB::FiffInfo::SPtr                 m_pFiffInfo;            /**< The Fiff info. */
     FIFFLIB::FiffCoordTrans                 m_mriHeadTrans;         /**< Mri to head transformation. */
 
-    FSLIB::AnnotationSet::SPtr              m_pAnnotSet;            /**< Annotation set. */
-    FSLIB::SurfaceSet::SPtr                 m_pSurfSet;             /**< Surface set. */
+    FSLIB::FsAnnotationSet::SPtr              m_pAnnotSet;            /**< FsAnnotation set. */
+    FSLIB::FsSurfaceSet::SPtr                 m_pSurfSet;             /**< FsSurface set. */
     FWDLIB::FwdForwardSolution::SPtr        m_pFwdSolution;         /**< Forward solution. */
 
     qint32                                  m_iSourceEstimateSize;  /**< Sample size of the multi sample array.*/
@@ -239,7 +239,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void RealTimeSourceEstimate::setAnnotSet(FSLIB::AnnotationSet::SPtr& annotSet)
+inline void RealTimeSourceEstimate::setAnnotSet(FSLIB::FsAnnotationSet::SPtr& annotSet)
 {
     QMutexLocker locker(&m_qMutex);
     m_pAnnotSet = annotSet;
@@ -247,7 +247,7 @@ inline void RealTimeSourceEstimate::setAnnotSet(FSLIB::AnnotationSet::SPtr& anno
 
 //=============================================================================================================
 
-inline FSLIB::AnnotationSet::SPtr& RealTimeSourceEstimate::getAnnotSet()
+inline FSLIB::FsAnnotationSet::SPtr& RealTimeSourceEstimate::getAnnotSet()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pAnnotSet;
@@ -255,7 +255,7 @@ inline FSLIB::AnnotationSet::SPtr& RealTimeSourceEstimate::getAnnotSet()
 
 //=============================================================================================================
 
-inline void RealTimeSourceEstimate::setSurfSet(FSLIB::SurfaceSet::SPtr& surfSet)
+inline void RealTimeSourceEstimate::setSurfSet(FSLIB::FsSurfaceSet::SPtr& surfSet)
 {
     QMutexLocker locker(&m_qMutex);
     m_pSurfSet = surfSet;
@@ -263,7 +263,7 @@ inline void RealTimeSourceEstimate::setSurfSet(FSLIB::SurfaceSet::SPtr& surfSet)
 
 //=============================================================================================================
 
-inline FSLIB::SurfaceSet::SPtr& RealTimeSourceEstimate::getSurfSet()
+inline FSLIB::FsSurfaceSet::SPtr& RealTimeSourceEstimate::getSurfSet()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pSurfSet;

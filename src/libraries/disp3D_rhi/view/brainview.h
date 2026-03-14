@@ -161,7 +161,7 @@ public slots:
 
     //=========================================================================================================
     /**
-     * Set the overlay mode (Surface, Annotation, Scientific).
+     * Set the overlay mode (FsSurface, FsAnnotation, Scientific).
      *
      * @param[in] mode       The visualization mode to set.
      */
@@ -953,7 +953,7 @@ private:
     QStandardItem* m_hoveredItem = nullptr;         /**< Model item currently under the cursor. */
     int m_hoveredIndex = -1;                        /**< Vertex index at the hover point. */
     QString m_hoveredRegion;                        /**< Atlas region name at the hover point. */
-    QString m_hoveredSurfaceKey;                    /**< Surface map key at the hover point. */
+    QString m_hoveredSurfaceKey;                    /**< FsSurface map key at the hover point. */
     QLabel* m_regionLabel = nullptr;                /**< Overlay label showing the hovered region name. */
     QVector<QLabel*> m_viewportNameLabels;          /**< Per-viewport name labels (e.g. "Top", "Front"). */
     QVector<QLabel*> m_viewportInfoLabels;          /**< Per-viewport info labels (shader, surface info). */

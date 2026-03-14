@@ -255,7 +255,7 @@ void RtSensorInterpolationMatWorker::computeMapping()
         // Recompute normals if missing
         if (norms.rows() != megVerts.rows()) {
             if (megTris.rows() > 0) {
-                norms = FSLIB::Surface::compute_normals(megVerts, megTris);
+                norms = FSLIB::FsSurface::compute_normals(megVerts, megTris);
             }
         }
 

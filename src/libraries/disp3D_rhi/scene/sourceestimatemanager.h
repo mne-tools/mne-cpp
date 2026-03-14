@@ -95,7 +95,7 @@ public:
      *
      * @param[in] lhPath             Path to left-hemisphere STC file.
      * @param[in] rhPath             Path to right-hemisphere STC file.
-     * @param[in] surfaces           Surface map for finding lh/rh brain surfaces.
+     * @param[in] surfaces           FsSurface map for finding lh/rh brain surfaces.
      * @param[in] activeSurfaceType  Active surface type name (e.g. "pial").
      * @return true if loading was started, false on error.
      */
@@ -119,7 +119,7 @@ public:
      * Set the current STC time-point and apply colours to matching surfaces.
      *
      * @param[in] index      Time-point index.
-     * @param[in] surfaces   Surface map.
+     * @param[in] surfaces   FsSurface map.
      * @param[in] singleView Single-view state (for active surface type).
      * @param[in] subViews   Multi-view states.
      */
@@ -167,7 +167,7 @@ public:
      * Start real-time playback.  Feeds all STC time-points into the
      * streaming queue and begins the interpolation pipeline.
      *
-     * @param[in] surfaces   Surface map (for colour application).
+     * @param[in] surfaces   FsSurface map (for colour application).
      * @param[in] singleView Single-view state.
      * @param[in] subViews   Multi-view states.
      */

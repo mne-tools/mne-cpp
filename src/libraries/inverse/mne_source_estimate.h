@@ -194,7 +194,7 @@ public:
      *
      * @return the indices.
      */
-    Eigen::VectorXi getIndicesByLabel(const QList<FSLIB::Label> &lPickedLabels, bool bIsClustered) const;
+    Eigen::VectorXi getIndicesByLabel(const QList<FSLIB::FsLabel> &lPickedLabels, bool bIsClustered) const;
 
 public:
     Eigen::MatrixXd data;           /**< Matrix of shape [n_dipoles x n_times] which contains the data in source space. */

@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the Surface class.
+ * @brief    Definition of the FsSurface class.
  *
  */
 
@@ -63,7 +63,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Surface::Surface()
+FsSurface::FsSurface()
 : m_sFilePath("")
 , m_sFileName("")
 , m_iHemi(-1)
@@ -74,49 +74,49 @@ Surface::Surface()
 
 //=============================================================================================================
 
-Surface::Surface(const QString& p_sFile)
+FsSurface::FsSurface(const QString& p_sFile)
 : m_sFilePath("")
 , m_sFileName("")
 , m_iHemi(-1)
 , m_sSurf("")
 , m_vecOffset(Vector3f::Zero(3))
 {
-    Surface::read(p_sFile, *this);
+    FsSurface::read(p_sFile, *this);
 }
 
 //=============================================================================================================
 
-Surface::Surface(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir)
+FsSurface::FsSurface(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir)
 : m_sFilePath("")
 , m_sFileName("")
 , m_iHemi(-1)
 , m_sSurf("")
 , m_vecOffset(Vector3f::Zero(3))
 {
-    Surface::read(subject_id, hemi, surf, subjects_dir, *this);
+    FsSurface::read(subject_id, hemi, surf, subjects_dir, *this);
 }
 
 //=============================================================================================================
 
-Surface::Surface(const QString &path, qint32 hemi, const QString &surf)
+FsSurface::FsSurface(const QString &path, qint32 hemi, const QString &surf)
 : m_sFilePath("")
 , m_sFileName("")
 , m_iHemi(-1)
 , m_sSurf("")
 , m_vecOffset(Vector3f::Zero(3))
 {
-    Surface::read(path, hemi, surf, *this);
+    FsSurface::read(path, hemi, surf, *this);
 }
 
 //=============================================================================================================
 
-Surface::~Surface()
+FsSurface::~FsSurface()
 {
 }
 
 //=============================================================================================================
 
-void Surface::clear()
+void FsSurface::clear()
 {
     m_sFilePath.clear();
     m_sFileName.clear();
@@ -130,7 +130,7 @@ void Surface::clear()
 
 //=============================================================================================================
 
-MatrixX3f Surface::compute_normals(const MatrixX3f& rr, const MatrixX3i& tris)
+MatrixX3f FsSurface::compute_normals(const MatrixX3f& rr, const MatrixX3i& tris)
 {
     printf("\tcomputing normals\n");
     // first, compute triangle normals
@@ -181,7 +181,7 @@ MatrixX3f Surface::compute_normals(const MatrixX3f& rr, const MatrixX3i& tris)
 
 //=============================================================================================================
 
-bool Surface::read(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, Surface &p_Surface, bool p_bLoadCurvature)
+bool FsSurface::read(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, FsSurface &p_Surface, bool p_bLoadCurvature)
 {
     if(hemi != 0 && hemi != 1)
         return false;
@@ -193,7 +193,7 @@ bool Surface::read(const QString &subject_id, qint32 hemi, const QString &surf, 
 
 //=============================================================================================================
 
-bool Surface::read(const QString &path, qint32 hemi, const QString &surf, Surface &p_Surface, bool p_bLoadCurvature)
+bool FsSurface::read(const QString &path, qint32 hemi, const QString &surf, FsSurface &p_Surface, bool p_bLoadCurvature)
 {
     if(hemi != 0 && hemi != 1)
         return false;
@@ -205,7 +205,7 @@ bool Surface::read(const QString &path, qint32 hemi, const QString &surf, Surfac
 
 //=============================================================================================================
 
-bool Surface::read(const QString &p_sFile, Surface &p_Surface, bool p_bLoadCurvature)
+bool FsSurface::read(const QString &p_sFile, FsSurface &p_Surface, bool p_bLoadCurvature)
 {
     p_Surface.clear();
 
@@ -396,7 +396,7 @@ bool Surface::read(const QString &p_sFile, Surface &p_Surface, bool p_bLoadCurva
     {
         QString t_sCurvatureFile = QString("%1%2.curv").arg(p_Surface.m_sFilePath).arg(p_Surface.m_iHemi == 0 ? "lh" : "rh");
         printf("\t");
-        p_Surface.m_vecCurv = Surface::read_curv(t_sCurvatureFile);
+        p_Surface.m_vecCurv = FsSurface::read_curv(t_sCurvatureFile);
     }
 
     t_File.close();
@@ -407,7 +407,7 @@ bool Surface::read(const QString &p_sFile, Surface &p_Surface, bool p_bLoadCurva
 
 //=============================================================================================================
 
-VectorXf Surface::read_curv(const QString &p_sFileName)
+VectorXf FsSurface::read_curv(const QString &p_sFileName)
 {
     VectorXf curv;
 

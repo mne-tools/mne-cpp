@@ -362,7 +362,7 @@ std::unique_ptr<FwdBemModel> FwdBemModel::fwd_bem_load_surfaces(const QString &n
             return nullptr;
         }
         if (s->coord_frame != FIFFV_COORD_MRI) {
-            qCritical("Surface %s not specified in MRI coordinates.",fwd_bem_explain_surface(kinds[k]).toUtf8().constData());
+            qCritical("FsSurface %s not specified in MRI coordinates.",fwd_bem_explain_surface(kinds[k]).toUtf8().constData());
             delete s;
             return nullptr;
         }

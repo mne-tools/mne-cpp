@@ -597,12 +597,12 @@ void FiffRawView::updateTimeLabels(int iValue)
     }
 
     QString strLeft, strRight;
-    //Left Label
+    //Left FsLabel
     int iSample = static_cast<int>(m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference());
     strLeft = QString("%1 | %2 sec").arg(QString().number(iSample)).arg(QString().number(iSample / m_pModel->getFiffInfo()->sfreq, 'f', 2));
     m_pInitialTimeLabel->setText(strLeft);
 
-    //Right Label
+    //Right FsLabel
     iSample += m_iT * m_pModel->getFiffInfo()->sfreq;
     strRight = QString("%1 | %2 sec").arg(QString().number(iSample)).arg(QString().number(iSample / m_pModel->getFiffInfo()->sfreq, 'f', 2));
     m_pEndTimeLabel->setText(strRight);

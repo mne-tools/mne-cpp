@@ -160,7 +160,7 @@ struct SubView
     int                             preset           = 1;   // 0=Top,1=Perspective,...,6=Right
     bool                            enabled          = true;
 
-    // ── Surface classification helpers ─────────────────────────────────
+    // ── FsSurface classification helpers ─────────────────────────────────
 
     /**
      * True when @p key identifies a brain-tissue surface (lh_/rh_) as opposed

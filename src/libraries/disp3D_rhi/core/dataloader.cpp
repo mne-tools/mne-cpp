@@ -196,7 +196,7 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
                 if (helmetBem.size() > 0) {
                     MNEBemSurface helmetSurf = helmetBem[0];
                     if (helmetSurf.nn.rows() != helmetSurf.rr.rows()) {
-                        helmetSurf.nn = FSLIB::Surface::compute_normals(Eigen::MatrixX3f(helmetSurf.rr), Eigen::MatrixX3i(helmetSurf.itris));
+                        helmetSurf.nn = FSLIB::FsSurface::compute_normals(Eigen::MatrixX3f(helmetSurf.rr), Eigen::MatrixX3i(helmetSurf.itris));
                     }
 
                     if (hasDevHead) {
@@ -271,7 +271,7 @@ std::shared_ptr<BrainSurface> DataLoader::loadHelmetSurface(
     MNEBemSurface helmetSurf = helmetBem[0];
 
     if (helmetSurf.nn.rows() != helmetSurf.rr.rows()) {
-        helmetSurf.nn = FSLIB::Surface::compute_normals(Eigen::MatrixX3f(helmetSurf.rr), Eigen::MatrixX3i(helmetSurf.itris));
+        helmetSurf.nn = FSLIB::FsSurface::compute_normals(Eigen::MatrixX3f(helmetSurf.rr), Eigen::MatrixX3i(helmetSurf.itris));
     }
 
     if (applyTrans) {

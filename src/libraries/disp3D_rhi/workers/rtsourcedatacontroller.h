@@ -58,7 +58,7 @@ class QThread;
 class QTimer;
 
 namespace FSLIB {
-    class Label;
+    class FsLabel;
 }
 
 namespace DISP3DRHILIB {
@@ -304,7 +304,7 @@ public:
      * @param[in] vecVertNo     Source vertex numbers.
      */
     void setAnnotationInfoLeft(const Eigen::VectorXi &vecLabelIds,
-                               const QList<FSLIB::Label> &lLabels,
+                               const QList<FSLIB::FsLabel> &lLabels,
                                const Eigen::VectorXi &vecVertNo);
 
     //=========================================================================================================
@@ -316,7 +316,7 @@ public:
      * @param[in] vecVertNo     Source vertex numbers.
      */
     void setAnnotationInfoRight(const Eigen::VectorXi &vecLabelIds,
-                                const QList<FSLIB::Label> &lLabels,
+                                const QList<FSLIB::FsLabel> &lLabels,
                                 const Eigen::VectorXi &vecVertNo);
 
 signals:

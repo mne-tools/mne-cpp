@@ -37,9 +37,9 @@
  *           FIFF-format BEM surface files. Supports:
  *             - Multiple surfaces (head, skull, brain) in one BEM file
  *             - Vertex shifting along normals
- *             - Surface ordering for correct BEM nesting
+ *             - FsSurface ordering for correct BEM nesting
  *             - Topology checks (solid angle, containment, thickness)
- *             - Surface coordinate size validation
+ *             - FsSurface coordinate size validation
  *
  *           Cross-referenced with MNE-Python's mne.write_bem_surfaces().
  *
@@ -112,7 +112,7 @@ private:
     /**
      * Reads a FreeSurfer binary surface file and creates an MNEBemSurface.
      *
-     * @param[in] input  Surface input specification.
+     * @param[in] input  FsSurface input specification.
      *
      * @return true on success, false on failure. Result stored in the surfs vector.
      */
@@ -128,7 +128,7 @@ private:
      *   Line nvert+2: ntri
      *   Lines nvert+3..end: v1 v2 v3 (triangle vertex indices, 1-based)
      *
-     * @param[in] input  Surface input specification.
+     * @param[in] input  FsSurface input specification.
      *
      * @return true on success, false on failure. Result stored in the surfs vector.
      */

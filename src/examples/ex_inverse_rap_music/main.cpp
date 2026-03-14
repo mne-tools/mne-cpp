@@ -111,9 +111,9 @@ int main(int argc, char *argv[])
     QCommandLineOption subjectOption("subj", "Selected <subject>.", "subject", "sample");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");//"RapMusic.stc");
     QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.", "doMovie", "false");
-    QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption annotOption("annotType", "FsAnnotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "1");
-    QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
+    QCommandLineOption surfOption("surfType", "FsSurface type <type>.", "type", "orig");
 
     parser.addOption(fwdFileOption);
     parser.addOption(evokedFileOption);
@@ -131,8 +131,8 @@ int main(int argc, char *argv[])
     QString subject(parser.value(subjectOption));
     QString subjectDir(parser.value(subjectDirectoryOption));
 
-    AnnotationSet t_annotationSet(subject, 2, parser.value(annotOption), subjectDir);
-    SurfaceSet t_surfSet(subject, 2, parser.value(surfOption), subjectDir);
+    FsAnnotationSet t_annotationSet(subject, 2, parser.value(annotOption), subjectDir);
+    FsSurfaceSet t_surfSet(subject, 2, parser.value(surfOption), subjectDir);
 
     QString t_sFileNameStc(parser.value(stcFileOption));
 

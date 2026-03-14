@@ -339,7 +339,7 @@ MatrixXd doSelfDots(double intrad, const FwdCoilSet& coils, const Vector3d& r0, 
  *
  * For MEG, surface normals serve as cosmag1 (the "sensor direction" at each
  * surface vertex) and coil integration points provide cosmag2/weights.
- * Surface vertices have no integration weights (w1 = None in Python).
+ * FsSurface vertices have no integration weights (w1 = None in Python).
  *
  * Port of _do_surface_dots in _lead_dots.py.
  * Uses double precision throughout to match MNE-Python (float64).
@@ -358,7 +358,7 @@ MatrixXd doSurfaceDots(double intrad, const FwdCoilSet& coils,
 
     MatrixXd products = MatrixXd::Zero(nv, nc);
     for (int vi = 0; vi < nv; ++vi) {
-        // Surface vertex position relative to origin (normalised)
+        // FsSurface vertex position relative to origin (normalised)
         Vector3d rel = rr.row(vi).cast<double>() - r0.transpose();
         double lsurf = rel.norm();
         Vector3d rsurf = (lsurf > 0.0) ? Vector3d(rel / lsurf) : Vector3d::Zero();
@@ -428,7 +428,7 @@ VectorXd adHocEegStds(int ncoil)
  *   7. For EEG with average ref: subtract column means
  *
  * @param[in] selfDots      Sensor self-dot matrix (nchan × nchan)
- * @param[in] surfaceDots   Surface-to-sensor dot matrix (nvert × nchan)
+ * @param[in] surfaceDots   FsSurface-to-sensor dot matrix (nvert × nchan)
  * @param[in] noiseStds     Ad-hoc noise standard deviations (nchan)
  * @param[in] miss          Eigenvalue truncation threshold
  * @param[in] projOp        SSP projector matrix (nchan × nchan), identity if empty

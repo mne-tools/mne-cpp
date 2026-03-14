@@ -141,7 +141,7 @@ void Graph::drawLabels(qint32 p_iContentWidth, qint32 p_iContentHeight)
     painter.setPen(m_qPenAxes);
     painter.setFont(m_qFontAxes);
 
-    // X Label
+    // X FsLabel
     if(!m_sXLabel.isEmpty())
     {
         painter.save();
@@ -150,7 +150,7 @@ void Graph::drawLabels(qint32 p_iContentWidth, qint32 p_iContentHeight)
         painter.restore();
     }
 
-    //Y Label
+    //Y FsLabel
     if(!m_sYLabel.isEmpty())
     {
         painter.save();

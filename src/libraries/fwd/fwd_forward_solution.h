@@ -90,7 +90,7 @@ struct RegionDataOut
     Eigen::VectorXd sumd;           /**< Sums of the distances to the centroid. */
     Eigen::MatrixXd D;              /**< Distances to the centroid. */
 
-    qint32 iLabelIdxOut;            /**< Label ID. */
+    qint32 iLabelIdxOut;            /**< FsLabel ID. */
 };
 
 //=========================================================================================================
@@ -111,7 +111,7 @@ struct RegionData
     qint32 nClusters;      /**< Number of clusters within this region. */
 
     Eigen::VectorXi idcs;           /**< Get source space indeces. */
-    qint32 iLabelIdxIn;    /**< Label ID. */
+    qint32 iLabelIdxIn;    /**< FsLabel ID. */
     QString sDistMeasure;   /**< "cityblock" or "sqeuclidean". */
 
     RegionDataOut cluster() const
@@ -247,7 +247,7 @@ public:
      * Cluster the forward solution and stores the result to p_fwdOut.
      * The clustering is done by using the provided annotations
      *
-     * @param[in]   p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere.
+     * @param[in]   p_AnnotationSet     FsAnnotation set containing the annotation of left & right hemisphere.
      * @param[in]   p_iClusterSize      Maximal cluster size per roi.
      * @param[out]   p_D                 The cluster operator.
      * @param[in]   p_pNoise_cov.
@@ -256,7 +256,7 @@ public:
      *
      * @return clustered MNE forward solution.
      */
-    FwdForwardSolution cluster_forward_solution(const FSLIB::AnnotationSet &p_AnnotationSet,
+    FwdForwardSolution cluster_forward_solution(const FSLIB::FsAnnotationSet &p_AnnotationSet,
                                                 qint32 p_iClusterSize,
                                                 Eigen::MatrixXd& p_D = defaultD,
                                                 const FIFFLIB::FiffCov &p_pNoise_cov = defaultCov,
@@ -341,7 +341,7 @@ public:
      *
      * @return the reduced forward solution.
      */
-    FwdForwardSolution pick_regions(const QList<FSLIB::Label> &p_qListLabels) const;
+    FwdForwardSolution pick_regions(const QList<FSLIB::FsLabel> &p_qListLabels) const;
 
     //=========================================================================================================
     /**
@@ -536,8 +536,8 @@ public:
      *
      * @return the source position in 3D space.
      */
-    Eigen::MatrixX3f getSourcePositionsByLabel(const QList<FSLIB::Label> &lPickedLabels,
-                                               const FSLIB::SurfaceSet& tSurfSetInflated);
+    Eigen::MatrixX3f getSourcePositionsByLabel(const QList<FSLIB::FsLabel> &lPickedLabels,
+                                               const FSLIB::FsSurfaceSet& tSurfSetInflated);
 
 private:
     //=========================================================================================================

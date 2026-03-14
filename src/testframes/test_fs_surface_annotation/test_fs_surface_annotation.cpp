@@ -32,7 +32,7 @@ private:
 
 private slots:
     //=========================================================================
-    // Surface::compute_normals
+    // FsSurface::compute_normals
     //=========================================================================
     void surface_computeNormals_tetrahedron()
     {
@@ -40,7 +40,7 @@ private slots:
         MatrixX3i tris;
         makeTetrahedron(verts, tris);
 
-        MatrixX3f normals = Surface::compute_normals(verts, tris);
+        MatrixX3f normals = FsSurface::compute_normals(verts, tris);
         QCOMPARE(normals.rows(), 4);
         QCOMPARE(normals.cols(), 3);
 
@@ -61,7 +61,7 @@ private slots:
         tris << 0, 1, 2,
                 0, 2, 3;
 
-        MatrixX3f normals = Surface::compute_normals(verts, tris);
+        MatrixX3f normals = FsSurface::compute_normals(verts, tris);
         QCOMPARE(normals.rows(), 4);
 
         for (int i = 0; i < 4; ++i) {
@@ -78,7 +78,7 @@ private slots:
         MatrixX3i tris(1, 3);
         tris << 0, 1, 2;
 
-        MatrixX3f normals = Surface::compute_normals(verts, tris);
+        MatrixX3f normals = FsSurface::compute_normals(verts, tris);
         QCOMPARE(normals.rows(), 3);
     }
 
@@ -107,85 +107,85 @@ private slots:
             }
         }
 
-        MatrixX3f normals = Surface::compute_normals(verts, tris);
+        MatrixX3f normals = FsSurface::compute_normals(verts, tris);
         QCOMPARE(normals.rows(), nVerts);
     }
 
     //=========================================================================
-    // Surface accessors
+    // FsSurface accessors
     //=========================================================================
     void surface_defaultCtor()
     {
-        Surface s;
+        FsSurface s;
         QVERIFY(s.isEmpty());
         QCOMPARE(s.hemi(), -1);
     }
 
     void surface_offset()
     {
-        Surface s;
+        FsSurface s;
         s.offset() = Vector3f(1.0f, 2.0f, 3.0f);
         QVERIFY(qAbs(s.offset()(0) - 1.0f) < 1e-5f);
     }
 
     void surface_filePath()
     {
-        Surface s;
+        FsSurface s;
         QVERIFY(s.filePath().isEmpty());
     }
 
     //=========================================================================
-    // SurfaceSet
+    // FsSurfaceSet
     //=========================================================================
     void surfaceSet_defaultCtor()
     {
-        SurfaceSet ss;
+        FsSurfaceSet ss;
         QVERIFY(ss.isEmpty());
         QCOMPARE(ss.size(), 0);
     }
 
     void surfaceSet_insertAndAccess()
     {
-        SurfaceSet ss;
-        Surface s;
+        FsSurfaceSet ss;
+        FsSurface s;
         ss.insert(s);
         QVERIFY(ss.size() >= 0);
     }
 
     void surfaceSet_twoSurfaces()
     {
-        Surface lh, rh;
-        SurfaceSet ss(lh, rh);
+        FsSurface lh, rh;
+        FsSurfaceSet ss(lh, rh);
         QVERIFY(ss.size() >= 0);
     }
 
     void surfaceSet_clear()
     {
-        SurfaceSet ss;
+        FsSurfaceSet ss;
         ss.clear();
         QVERIFY(ss.isEmpty());
     }
 
     //=========================================================================
-    // Annotation
+    // FsAnnotation
     //=========================================================================
     void annotation_defaultCtor()
     {
-        Annotation a;
+        FsAnnotation a;
         QVERIFY(a.isEmpty());
         QCOMPARE(a.hemi(), -1);
     }
 
     void annotation_clear()
     {
-        Annotation a;
+        FsAnnotation a;
         a.clear();
         QVERIFY(a.isEmpty());
     }
 
     void annotation_getters()
     {
-        Annotation a;
+        FsAnnotation a;
         VectorXi verts = a.getVertices();
         QCOMPARE(verts.size(), 0);
         VectorXi labels = a.getLabelIds();
@@ -193,39 +193,39 @@ private slots:
     }
 
     //=========================================================================
-    // AnnotationSet
+    // FsAnnotationSet
     //=========================================================================
     void annotationSet_defaultCtor()
     {
-        AnnotationSet as;
+        FsAnnotationSet as;
         QVERIFY(as.isEmpty());
         QCOMPARE(as.size(), 0);
     }
 
     void annotationSet_twoAnnotations()
     {
-        Annotation lh, rh;
-        AnnotationSet as(lh, rh);
+        FsAnnotation lh, rh;
+        FsAnnotationSet as(lh, rh);
         QVERIFY(as.size() >= 0);
     }
 
     void annotationSet_clear()
     {
-        AnnotationSet as;
+        FsAnnotationSet as;
         as.clear();
         QVERIFY(as.isEmpty());
     }
 
     void annotationSet_insert()
     {
-        AnnotationSet as;
-        Annotation a;
+        FsAnnotationSet as;
+        FsAnnotation a;
         as.insert(a);
         QVERIFY(as.size() >= 0);
     }
 
     //=========================================================================
-    // Label
+    // FsLabel
     //=========================================================================
     void label_operations()
     {
@@ -236,7 +236,7 @@ private slots:
         VectorXd vals(5);
         vals.setOnes();
 
-        Label l(verts, pos, vals, 0, "TestLabel", 1);
+        FsLabel l(verts, pos, vals, 0, "TestLabel", 1);
         QVERIFY(!l.isEmpty());
         QCOMPARE(l.vertices.size(), (Eigen::Index)5);
 
@@ -245,17 +245,17 @@ private slots:
     }
 
     //=========================================================================
-    // Colortable
+    // FsColortable
     //=========================================================================
     void colortable_defaultCtor()
     {
-        Colortable ct;
+        FsColortable ct;
         QCOMPARE(ct.numEntries, 0);
     }
 
     void colortable_clear()
     {
-        Colortable ct;
+        FsColortable ct;
         ct.clear();
         QCOMPARE(ct.numEntries, 0);
     }

@@ -305,7 +305,7 @@ bool SensorFieldMapper::buildMapping(
                     tris(t, 1) = static_cast<int>(idx[t * 3 + 1]);
                     tris(t, 2) = static_cast<int>(idx[t * 3 + 2]);
                 }
-                norms = FSLIB::Surface::compute_normals(verts, tris);
+                norms = FSLIB::FsSurface::compute_normals(verts, tris);
             }
         }
 

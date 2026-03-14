@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Surface class declaration
+ * @brief    FsSurface class declaration
  *
  */
 
@@ -72,25 +72,25 @@ namespace FSLIB
  *
  * @brief FreeSurfer surface mesh
  */
-class FSSHARED_EXPORT Surface
+class FSSHARED_EXPORT FsSurface
 {
 public:
-    typedef QSharedPointer<Surface> SPtr;            /**< Shared pointer type for Surface class. */
-    typedef QSharedPointer<const Surface> ConstSPtr; /**< Const shared pointer type for Surface class. */
+    typedef QSharedPointer<FsSurface> SPtr;            /**< Shared pointer type for FsSurface class. */
+    typedef QSharedPointer<const FsSurface> ConstSPtr; /**< Const shared pointer type for FsSurface class. */
     
     //=========================================================================================================
     /**
      * Default constructor
      */
-    Surface();
+    FsSurface();
 
     //=========================================================================================================
     /**
      * Construts the surface by reading it of the given file.
      *
-     * @param[in] p_sFile    Surface file name with path.
+     * @param[in] p_sFile    FsSurface file name with path.
      */
-    explicit Surface(const QString& p_sFile);
+    explicit FsSurface(const QString& p_sFile);
 
     //=========================================================================================================
     /**
@@ -101,7 +101,7 @@ public:
      * @param[in] surf               Name of the surface to load (eg. inflated, orig ...).
      * @param[in] subjects_dir       Subjects directory.
      */
-    explicit Surface(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
+    explicit FsSurface(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
 
     //=========================================================================================================
     /**
@@ -113,17 +113,17 @@ public:
      *
      * @return true if read sucessful, false otherwise.
      */
-    explicit Surface(const QString &path, qint32 hemi, const QString &surf);
+    explicit FsSurface(const QString &path, qint32 hemi, const QString &surf);
 
     //=========================================================================================================
     /**
-     * Destroys the Surface class.
+     * Destroys the FsSurface class.
      */
-    ~Surface();
+    ~FsSurface();
     
     //=========================================================================================================
     /**
-     * Initializes the Surface.
+     * Initializes the FsSurface.
      */
     void clear();
 
@@ -137,7 +137,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns whether Surface is empty.
+     * Returns whether FsSurface is empty.
      *
      * @return true if is empty, false otherwise.
      */
@@ -166,7 +166,7 @@ public:
      *
      * @return true if read sucessful, false otherwise.
      */
-    static bool read(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, Surface &p_Surface, bool p_bLoadCurvature = true);
+    static bool read(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, FsSurface &p_Surface, bool p_bLoadCurvature = true);
 
     //=========================================================================================================
     /**
@@ -182,7 +182,7 @@ public:
      *
      * @return true if read sucessful, false otherwise.
      */
-    static bool read(const QString &path, qint32 hemi, const QString &surf, Surface &p_Surface, bool p_bLoadCurvature = true);
+    static bool read(const QString &path, qint32 hemi, const QString &surf, FsSurface &p_Surface, bool p_bLoadCurvature = true);
 
     //=========================================================================================================
     /**
@@ -196,7 +196,7 @@ public:
      *
      * @return true if read sucessful, false otherwise.
      */
-    static bool read(const QString &p_sFileName, Surface &p_Surface, bool p_bLoadCurvature = true);
+    static bool read(const QString &p_sFileName, FsSurface &p_Surface, bool p_bLoadCurvature = true);
 
     //=========================================================================================================
     /**
@@ -283,7 +283,7 @@ public:
 
 private:
     QString m_sFilePath;    /**< Path to surf directory. */
-    QString m_sFileName;    /**< Surface file name. */
+    QString m_sFileName;    /**< FsSurface file name. */
     qint32 m_iHemi;         /**< Hemisphere (lh = 0; rh = 1). */
     QString m_sSurf;        /**< Loaded surface (eg. inflated, orig ...). */
     Eigen::MatrixX3f m_matRR;      /**< alias verts. Vertex coordinates in meters. */
@@ -291,84 +291,84 @@ private:
     Eigen::MatrixX3f m_matNN;      /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us. */
     Eigen::VectorXf m_vecCurv;     /**< FreeSurfer curvature data. */
 
-    Eigen::Vector3f m_vecOffset; /**< Surface offset. */
+    Eigen::Vector3f m_vecOffset; /**< FsSurface offset. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline qint32 Surface::hemi() const
+inline qint32 FsSurface::hemi() const
 {
     return m_iHemi;
 }
 
 //=============================================================================================================
 
-inline bool Surface::isEmpty() const
+inline bool FsSurface::isEmpty() const
 {
     return m_iHemi == -1;
 }
 
 //=============================================================================================================
 
-inline QString Surface::surf() const
+inline QString FsSurface::surf() const
 {
     return m_sSurf;
 }
 
 //=============================================================================================================
 
-inline const Eigen::MatrixX3f& Surface::rr() const
+inline const Eigen::MatrixX3f& FsSurface::rr() const
 {
     return m_matRR;
 }
 
 //=============================================================================================================
 
-inline const Eigen::MatrixX3i& Surface::tris() const
+inline const Eigen::MatrixX3i& FsSurface::tris() const
 {
     return m_matTris;
 }
 
 //=============================================================================================================
 
-inline const Eigen::MatrixX3f& Surface::nn() const
+inline const Eigen::MatrixX3f& FsSurface::nn() const
 {
     return m_matNN;
 }
 
 //=============================================================================================================
 
-inline const Eigen::VectorXf& Surface::curv() const
+inline const Eigen::VectorXf& FsSurface::curv() const
 {
     return m_vecCurv;
 }
 
 //=============================================================================================================
 
-inline const Eigen::Vector3f& Surface::offset() const
+inline const Eigen::Vector3f& FsSurface::offset() const
 {
     return m_vecOffset;
 }
 
 //=============================================================================================================
 
-inline Eigen::Vector3f& Surface::offset()
+inline Eigen::Vector3f& FsSurface::offset()
 {
     return m_vecOffset;
 }
 
 //=============================================================================================================
 
-inline QString Surface::filePath() const
+inline QString FsSurface::filePath() const
 {
     return m_sFilePath;
 }
 
 //=============================================================================================================
 
-inline QString Surface::fileName() const
+inline QString FsSurface::fileName() const
 {
     return m_sFileName;
 }

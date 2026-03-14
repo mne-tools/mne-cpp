@@ -91,7 +91,7 @@ using namespace UTILSLIB;
  *  - dSPM inverse computation produces valid results
  *  - Evoked data without explicit baseline yields no baseline correction
  *  - STC file write/read roundtrip preserves data
- *  - Label-restricted inverse produces correct subset
+ *  - FsLabel-restricted inverse produces correct subset
  *  - sLORETA and MNE methods also produce valid results
  */
 class TestComputeRawInverse : public QObject
@@ -635,7 +635,7 @@ void TestComputeRawInverse::testLabelRestrictedInverse()
 {
     if (!m_bDataAvailable) QSKIP("No test data");
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test Label-Restricted Inverse >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test FsLabel-Restricted Inverse >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     // Check if label files are available
     QString labelDir = m_sDataPath + "/subjects/sample/label";
@@ -648,7 +648,7 @@ void TestComputeRawInverse::testLabelRestrictedInverse()
     }
 
     if (!QFile::exists(labelFile)) {
-        printf("  Label file not found, trying aparc labels...\n");
+        printf("  FsLabel file not found, trying aparc labels...\n");
         labelFile = labelDir + "/lh.aparc.annot";
     }
 
@@ -658,14 +658,14 @@ void TestComputeRawInverse::testLabelRestrictedInverse()
     }
 
     // Read label
-    Label label;
-    if (!Label::read(labelFile, label)) {
+    FsLabel label;
+    if (!FsLabel::read(labelFile, label)) {
         QSKIP("Failed to read label file");
         return;
     }
 
-    printf("  Label: %s (%ld vertices)\n", label.name.toUtf8().constData(), (long)label.vertices.rows());
-    QVERIFY2(label.vertices.rows() > 0, "Label has no vertices");
+    printf("  FsLabel: %s (%ld vertices)\n", label.name.toUtf8().constData(), (long)label.vertices.rows());
+    QVERIFY2(label.vertices.rows() > 0, "FsLabel has no vertices");
 
     // Read evoked
     QFile evokedFile(m_sEvokedFile);
@@ -682,17 +682,17 @@ void TestComputeRawInverse::testLabelRestrictedInverse()
     QVERIFY2(!stcFull.isEmpty(), "Full inverse failed");
 
     // Extract label subset using getIndicesByLabel
-    VectorXi labelIndices = stcFull.getIndicesByLabel(QList<Label>() << label, false);
-    printf("  Label vertices in STC: %d\n", (int)labelIndices.size());
+    VectorXi labelIndices = stcFull.getIndicesByLabel(QList<FsLabel>() << label, false);
+    printf("  FsLabel vertices in STC: %d\n", (int)labelIndices.size());
 
     // The label-restricted result should have fewer sources than the full result
     QVERIFY2(labelIndices.size() > 0, "No label vertices found in source estimate");
-    QVERIFY2(labelIndices.size() < stcFull.data.rows(), "Label should have fewer sources than full estimate");
+    QVERIFY2(labelIndices.size() < stcFull.data.rows(), "FsLabel should have fewer sources than full estimate");
 
     // Verify the label indices are valid
     for (int i = 0; i < labelIndices.size(); ++i) {
         QVERIFY2(labelIndices(i) >= 0 && labelIndices(i) < stcFull.data.rows(),
-                 "Label index out of bounds");
+                 "FsLabel index out of bounds");
     }
 
     // Extract label data
@@ -701,10 +701,10 @@ void TestComputeRawInverse::testLabelRestrictedInverse()
         labelData.row(i) = stcFull.data.row(labelIndices(i));
     }
 
-    QVERIFY2(labelData.allFinite(), "Label-restricted data contains NaN/Inf");
-    printf("  Label data shape: %d x %d\n", (int)labelData.rows(), (int)labelData.cols());
+    QVERIFY2(labelData.allFinite(), "FsLabel-restricted data contains NaN/Inf");
+    printf("  FsLabel data shape: %d x %d\n", (int)labelData.rows(), (int)labelData.cols());
 
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Test Label Restricted Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Test FsLabel Restricted Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
 
 //=============================================================================================================

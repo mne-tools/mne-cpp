@@ -343,7 +343,7 @@ namespace FIFFLIB
 #define FIFF_MNE_SOURCE_SPACE_NEAREST       3515    /**< Nearest source space vertex for all vertices*/
 #define FIFF_MNE_SOURCE_SPACE_NEAREST_DIST  3516    /**< Distance to the Nearest source space vertex for all vertices*/
 #define FIFF_MNE_SOURCE_SPACE_ID            3517    /**< Identifier*/
-#define FIFF_MNE_SOURCE_SPACE_TYPE          3518    /**< Surface or volume*/
+#define FIFF_MNE_SOURCE_SPACE_TYPE          3518    /**< FsSurface or volume*/
 
 #define FIFF_MNE_SOURCE_SPACE_NTRI          3590    /**< Number of triangles*/
 #define FIFF_MNE_SOURCE_SPACE_TRIANGLES     3591    /**< The triangulation*/
@@ -477,7 +477,7 @@ namespace FIFFLIB
 #define FIFFV_MNE_COORD_CTF_DEVICE  1001           /**< CTF device coordinates*/
 #define FIFFV_MNE_COORD_CTF_HEAD    1004           /**< CTF head coordinates*/
 #define FIFFV_MNE_COORD_MRI_VOXEL   2001           /**< The MRI voxel coordinates*/
-#define FIFFV_MNE_COORD_RAS         2002           /**< Surface RAS coordinates with non-zero origin*/
+#define FIFFV_MNE_COORD_RAS         2002           /**< FsSurface RAS coordinates with non-zero origin*/
 #define FIFFV_MNE_COORD_MNI_TAL     2003           /**< MNI Talairach coordinates*/
 #define FIFFV_MNE_COORD_FS_TAL_GTZ  2004           /**< FreeSurfer Talairach coordinates (MNI z > 0)*/
 #define FIFFV_MNE_COORD_FS_TAL_LTZ  2005           /**< FreeSurfer Talairach coordinates (MNI z < 0)*/

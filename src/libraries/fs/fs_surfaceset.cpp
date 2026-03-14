@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the SurfaceSet class.
+ * @brief    Definition of the FsSurfaceSet class.
  *
  */
 
@@ -57,25 +57,25 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SurfaceSet::SurfaceSet()
+FsSurfaceSet::FsSurfaceSet()
 {
 }
 
 //=============================================================================================================
 
-SurfaceSet::SurfaceSet(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir)
+FsSurfaceSet::FsSurfaceSet(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir)
 {
-    Surface t_Surface;
+    FsSurface t_Surface;
     if(hemi == 0 || hemi == 1)
     {
-        if(Surface::read(subject_id, hemi, surf, subjects_dir, t_Surface))
+        if(FsSurface::read(subject_id, hemi, surf, subjects_dir, t_Surface))
             insert(t_Surface);
     }
     else if(hemi == 2)
     {
-        if(Surface::read(subject_id, 0, surf, subjects_dir, t_Surface))
+        if(FsSurface::read(subject_id, 0, surf, subjects_dir, t_Surface))
             insert(t_Surface);
-        if(Surface::read(subject_id, 1, surf, subjects_dir, t_Surface))
+        if(FsSurface::read(subject_id, 1, surf, subjects_dir, t_Surface))
             insert(t_Surface);
     }
 
@@ -84,19 +84,19 @@ SurfaceSet::SurfaceSet(const QString &subject_id, qint32 hemi, const QString &su
 
 //=============================================================================================================
 
-SurfaceSet::SurfaceSet(const QString &path, qint32 hemi, const QString &surf)
+FsSurfaceSet::FsSurfaceSet(const QString &path, qint32 hemi, const QString &surf)
 {
-    Surface t_Surface;
+    FsSurface t_Surface;
     if(hemi == 0 || hemi == 1)
     {
-        if(Surface::read(path, hemi, surf, t_Surface))
+        if(FsSurface::read(path, hemi, surf, t_Surface))
             insert(t_Surface);
     }
     else if(hemi == 2)
     {
-        if(Surface::read(path, 0, surf, t_Surface))
+        if(FsSurface::read(path, 0, surf, t_Surface))
             insert(t_Surface);
-        if(Surface::read(path, 1, surf, t_Surface))
+        if(FsSurface::read(path, 1, surf, t_Surface))
             insert(t_Surface);
     }
 
@@ -105,7 +105,7 @@ SurfaceSet::SurfaceSet(const QString &path, qint32 hemi, const QString &surf)
 
 //=============================================================================================================
 
-SurfaceSet::SurfaceSet(const Surface& p_LHSurface, const Surface& p_RHSurface)
+FsSurfaceSet::FsSurfaceSet(const FsSurface& p_LHSurface, const FsSurface& p_RHSurface)
 {
     if(p_LHSurface.hemi() == 0)
         m_qMapSurfs.insert(0, p_LHSurface);
@@ -122,29 +122,29 @@ SurfaceSet::SurfaceSet(const Surface& p_LHSurface, const Surface& p_RHSurface)
 
 //=============================================================================================================
 
-SurfaceSet::SurfaceSet(const QString& p_sLHFileName, const QString& p_sRHFileName)
+FsSurfaceSet::FsSurfaceSet(const QString& p_sLHFileName, const QString& p_sRHFileName)
 {
-    SurfaceSet t_SurfaceSet;
-    if(SurfaceSet::read(p_sLHFileName, p_sRHFileName, t_SurfaceSet))
+    FsSurfaceSet t_SurfaceSet;
+    if(FsSurfaceSet::read(p_sLHFileName, p_sRHFileName, t_SurfaceSet))
         *this = t_SurfaceSet;
 }
 
 //=============================================================================================================
 
-SurfaceSet::~SurfaceSet()
+FsSurfaceSet::~FsSurfaceSet()
 {
 }
 
 //=============================================================================================================
 
-void SurfaceSet::clear()
+void FsSurfaceSet::clear()
 {
     m_qMapSurfs.clear();
 }
 
 //=============================================================================================================
 
-void SurfaceSet::insert(const Surface& p_Surface)
+void FsSurfaceSet::insert(const FsSurface& p_Surface)
 {
     if(p_Surface.isEmpty())
         return;
@@ -157,7 +157,7 @@ void SurfaceSet::insert(const Surface& p_Surface)
 
 //=============================================================================================================
 
-bool SurfaceSet::read(const QString& p_sLHFileName, const QString& p_sRHFileName, SurfaceSet &p_SurfaceSet)
+bool FsSurfaceSet::read(const QString& p_sLHFileName, const QString& p_sRHFileName, FsSurfaceSet &p_SurfaceSet)
 {
     p_SurfaceSet.clear();
 
@@ -166,8 +166,8 @@ bool SurfaceSet::read(const QString& p_sLHFileName, const QString& p_sRHFileName
 
     for(qint32 i = 0; i < t_qListFileName.size(); ++i)
     {
-        Surface t_Surface;
-        if(Surface::read(t_qListFileName[i], t_Surface))
+        FsSurface t_Surface;
+        if(FsSurface::read(t_qListFileName[i], t_Surface))
         {
             if(t_qListFileName[i].contains("lh."))
                 p_SurfaceSet.m_qMapSurfs.insert(0, t_Surface);
@@ -188,7 +188,7 @@ bool SurfaceSet::read(const QString& p_sLHFileName, const QString& p_sRHFileName
 
 //=============================================================================================================
 
-const Surface& SurfaceSet::operator[] (qint32 idx) const
+const FsSurface& FsSurfaceSet::operator[] (qint32 idx) const
 {
     if(idx == 0)
         return m_qMapSurfs.find(idx).value();
@@ -203,7 +203,7 @@ const Surface& SurfaceSet::operator[] (qint32 idx) const
 
 //=============================================================================================================
 
-Surface& SurfaceSet::operator[] (qint32 idx)
+FsSurface& FsSurfaceSet::operator[] (qint32 idx)
 {
     if(idx == 0)
         return m_qMapSurfs.find(idx).value();
@@ -218,7 +218,7 @@ Surface& SurfaceSet::operator[] (qint32 idx)
 
 //=============================================================================================================
 
-const Surface& SurfaceSet::operator[] (QString idt) const
+const FsSurface& FsSurfaceSet::operator[] (QString idt) const
 {
     if(idt.compare("lh") == 0)
         return m_qMapSurfs.find(0).value();
@@ -233,7 +233,7 @@ const Surface& SurfaceSet::operator[] (QString idt) const
 
 //=============================================================================================================
 
-Surface& SurfaceSet::operator[] (QString idt)
+FsSurface& FsSurfaceSet::operator[] (QString idt)
 {
     if(idt.compare("lh") == 0)
         return m_qMapSurfs.find(0).value();
@@ -248,7 +248,7 @@ Surface& SurfaceSet::operator[] (QString idt)
 
 //=============================================================================================================
 
-void SurfaceSet::calcOffset()
+void FsSurfaceSet::calcOffset()
 {
     //
     // Correct inflated offset

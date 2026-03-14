@@ -202,8 +202,8 @@ static MNESourceEstimate processLabel(const QString &labelFile,
                                       bool pickNormal)
 {
     // Read the label
-    Label label;
-    if (!Label::read(labelFile, label)) {
+    FsLabel label;
+    if (!FsLabel::read(labelFile, label)) {
         qWarning() << "Failed to read label file:" << labelFile;
         return MNESourceEstimate();
     }
@@ -215,7 +215,7 @@ static MNESourceEstimate processLabel(const QString &labelFile,
     }
     label.hemi = hemi;
 
-    printf("  Label %s: %ld vertices (%s hemisphere)\n",
+    printf("  FsLabel %s: %ld vertices (%s hemisphere)\n",
            labelFile.toUtf8().constData(),
            (long)label.vertices.size(),
            hemi == 0 ? "left" : "right");
@@ -233,7 +233,7 @@ static MNESourceEstimate processLabel(const QString &labelFile,
     }
 
     // Restrict to label vertices
-    VectorXi labelIndices = stc.getIndicesByLabel(QList<Label>() << label, false);
+    VectorXi labelIndices = stc.getIndicesByLabel(QList<FsLabel>() << label, false);
 
     if (labelIndices.size() == 0) {
         qWarning() << "No source vertices found in label:" << labelFile;
@@ -289,8 +289,8 @@ static MNESourceEstimate processLabelDir(const QString &labelDir,
 
     int validLabels = 0;
     for (int i = 0; i < labelFiles.size(); ++i) {
-        Label label;
-        if (!Label::read(labelFiles[i], label)) {
+        FsLabel label;
+        if (!FsLabel::read(labelFiles[i], label)) {
             qWarning() << "  Skipping unreadable label:" << labelFiles[i];
             continue;
         }
@@ -303,7 +303,7 @@ static MNESourceEstimate processLabelDir(const QString &labelDir,
         label.hemi = hemi;
 
         // Find label vertices in the source estimate
-        VectorXi labelIndices = fullStc.getIndicesByLabel(QList<Label>() << label, false);
+        VectorXi labelIndices = fullStc.getIndicesByLabel(QList<FsLabel>() << label, false);
 
         if (labelIndices.size() == 0) {
             qWarning() << "  No source vertices found in label:" << labelFiles[i];
@@ -325,7 +325,7 @@ static MNESourceEstimate processLabelDir(const QString &labelDir,
         QFileInfo fi(labelFiles[i]);
         labelNames.append(fi.fileName());
 
-        printf("  Label %s: %ld vertices, averaged\n",
+        printf("  FsLabel %s: %ld vertices, averaged\n",
                fi.fileName().toUtf8().constData(), (long)labelIndices.size());
 
         validLabels++;
@@ -414,9 +414,9 @@ int main(int argc, char *argv[])
         "Baseline ending time in ms.", "time/ms");
     parser.addOption(bmaxOpt);
 
-    // --label: Label file(s) to process (can be specified multiple times)
+    // --label: FsLabel file(s) to process (can be specified multiple times)
     QCommandLineOption labelOpt(QStringList() << "label",
-        "Label file to process (can have multiple).", "file");
+        "FsLabel file to process (can have multiple).", "file");
     parser.addOption(labelOpt);
 
     // --labeldir: Process all labels in this directory
@@ -549,12 +549,12 @@ int main(int argc, char *argv[])
     }
 
     if (!labelFiles.isEmpty()) {
-        printf("Label files to process :\n");
+        printf("FsLabel files to process :\n");
         for (const QString &label : labelFiles) {
             printf("  %s\n", label.toUtf8().constData());
         }
     } else if (!labelDir.isEmpty()) {
-        printf("Label directory        : %s\n", labelDir.toUtf8().constData());
+        printf("FsLabel directory        : %s\n", labelDir.toUtf8().constData());
     } else {
         printf("Full source space inverse (no label restriction)\n");
     }
@@ -588,7 +588,7 @@ int main(int argc, char *argv[])
     {
         if (!labelDir.isEmpty()) {
         //-----------------------------------------------------------------------------------------------------
-        // Label directory mode: compute average waveform for each label
+        // FsLabel directory mode: compute average waveform for each label
         //-----------------------------------------------------------------------------------------------------
         printf("\nProcessing label directory: %s\n", labelDir.toUtf8().constData());
 
@@ -598,7 +598,7 @@ int main(int argc, char *argv[])
                                                 lambda2, method, labelNames);
 
         if (stc.isEmpty()) {
-            fprintf(stderr, "Error: Label directory processing failed.\n");
+            fprintf(stderr, "Error: FsLabel directory processing failed.\n");
             return 1;
         }
 
@@ -626,7 +626,7 @@ int main(int argc, char *argv[])
                     out << name << "\n";
                 }
                 labelListFile.close();
-                printf("Label names output to %s\n", labelListName.toUtf8().constData());
+                printf("FsLabel names output to %s\n", labelListName.toUtf8().constData());
             }
         }
 

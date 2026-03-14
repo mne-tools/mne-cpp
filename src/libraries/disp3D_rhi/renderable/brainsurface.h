@@ -164,7 +164,7 @@ public:
      *
      * @param[in] surf       Input FreeSurfer surface.
      */
-    void fromSurface(const FSLIB::Surface &surf);
+    void fromSurface(const FSLIB::FsSurface &surf);
 
     //=========================================================================================================
     /**
@@ -181,7 +181,7 @@ public:
      *
      * @param[in] vertices   Nx3 matrix of vertex positions.
      * @param[in] triangles  Mx3 matrix of triangle indices.
-     * @param[in] color      Surface color.
+     * @param[in] color      FsSurface color.
      */
     void createFromData(const Eigen::MatrixX3f &vertices, const Eigen::MatrixX3i &triangles, const QColor &color);
 
@@ -192,7 +192,7 @@ public:
      * @param[in] vertices   Nx3 matrix of vertex positions.
      * @param[in] normals    Nx3 matrix of vertex normals.
      * @param[in] triangles  Mx3 matrix of triangle indices.
-     * @param[in] color      Surface color.
+     * @param[in] color      FsSurface color.
      */
     void createFromData(const Eigen::MatrixX3f &vertices, const Eigen::MatrixX3f &normals, const Eigen::MatrixX3i &triangles, const QColor &color);
 
@@ -211,11 +211,11 @@ public:
      *
      * @param[in] annotation Input annotation data.
      */
-    void addAnnotation(const FSLIB::Annotation &annotation);
+    void addAnnotation(const FSLIB::FsAnnotation &annotation);
 
     //=========================================================================================================
     /**
-     * Set the visualization mode (Surface, Annotation, Scientific).
+     * Set the visualization mode (FsSurface, FsAnnotation, Scientific).
      *
      * @param[in] mode       VisualizationMode enum.
      */
@@ -305,7 +305,7 @@ public:
      * Get the annotation label name for a given vertex.
      * 
      * @param[in] vertexIdx  Index of the vertex.
-     * @return Label name.
+     * @return FsLabel name.
      */
     QString getAnnotationLabel(int vertexIdx) const;
     int getAnnotationLabelId(int vertexIdx) const;
@@ -387,7 +387,7 @@ private:
     QColor m_defaultColor = Qt::white;
     QColor m_baseColor = Qt::white;
     
-    FSLIB::Annotation m_annotation;
+    FSLIB::FsAnnotation m_annotation;
     bool m_hasAnnotation = false;
     VisualizationMode m_visMode = ModeSurface;
     QVector<float> m_curvature;

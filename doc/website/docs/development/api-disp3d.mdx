@@ -42,7 +42,7 @@ classDiagram
 
     class DataModel {
         BrainTreeModel
-        Surface / BEM / Digitizer
+        FsSurface / BEM / Digitizer
         Dipole / Network / SourceSpace
     }
 
@@ -206,13 +206,13 @@ BrainTreeModel *model = new BrainTreeModel();
 view->setModel(model);
 
 // Load FreeSurfer surfaces
-FSLIB::Surface surfLh("sample", 0, "inflated", subjectsDir);
-FSLIB::Surface surfRh("sample", 1, "inflated", subjectsDir);
+FSLIB::FsSurface surfLh("sample", 0, "inflated", subjectsDir);
+FSLIB::FsSurface surfRh("sample", 1, "inflated", subjectsDir);
 model->addSurface("sample", "lh", "inflated", surfLh);
 model->addSurface("sample", "rh", "inflated", surfRh);
 
 // Load annotations
-FSLIB::Annotation annotLh("sample", 0, "aparc", subjectsDir);
+FSLIB::FsAnnotation annotLh("sample", 0, "aparc", subjectsDir);
 model->addAnnotation("sample", "lh", annotLh);
 
 view->show();

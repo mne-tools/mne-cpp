@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     Colortable class declaration.
+ * @brief     FsColortable class declaration.
  *
  */
 
@@ -70,17 +70,17 @@ namespace FSLIB
  *
  * @brief Vertices label based lookup table
  */
-class FSSHARED_EXPORT Colortable
+class FSSHARED_EXPORT FsColortable
 {
 public:
-    typedef QSharedPointer<Colortable> SPtr;            /**< Shared pointer type for Colortable. */
-    typedef QSharedPointer<const Colortable> ConstSPtr; /**< Const shared pointer type for Colortable. */
+    typedef QSharedPointer<FsColortable> SPtr;            /**< Shared pointer type for FsColortable. */
+    typedef QSharedPointer<const FsColortable> ConstSPtr; /**< Const shared pointer type for FsColortable. */
 
     //=========================================================================================================
     /**
      * Default constructor.
      */
-    explicit Colortable();
+    explicit FsColortable();
 
     //=========================================================================================================
     /**
@@ -113,7 +113,7 @@ public:
     inline Eigen::MatrixX4i getRGBAs() const;
 
 public:
-    QString orig_tab;           /**< Colortable raw data. */
+    QString orig_tab;           /**< FsColortable raw data. */
     qint32 numEntries;          /**< Number of entries. */
     QStringList struct_names;   /**< Anatomical ROI description. */
     Eigen::MatrixXi table;      /**< labels and corresponing colorcode. */
@@ -123,7 +123,7 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline Eigen::VectorXi Colortable::getLabelIds() const
+inline Eigen::VectorXi FsColortable::getLabelIds() const
 {
     Eigen::VectorXi p_vecIds;
     if (table.cols() == 5)
@@ -134,14 +134,14 @@ inline Eigen::VectorXi Colortable::getLabelIds() const
 
 //=============================================================================================================
 
-inline QStringList Colortable::getNames() const
+inline QStringList FsColortable::getNames() const
 {
     return struct_names;
 }
 
 //=============================================================================================================
 
-inline Eigen::MatrixX4i Colortable::getRGBAs() const
+inline Eigen::MatrixX4i FsColortable::getRGBAs() const
 {
     Eigen::MatrixX4i p_matRGBAs;
     if (table.cols() == 5)

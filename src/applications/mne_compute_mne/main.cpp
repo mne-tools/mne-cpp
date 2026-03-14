@@ -253,7 +253,7 @@ static bool readBaselines(const QString &fileName,
  * @param[in] timeBytime  Time-by-time layout (transpose).
  * @return true on success.
  */
-static bool writeLabelOutput(const Label &label,
+static bool writeLabelOutput(const FsLabel &label,
                              const MatrixXd &stcData,
                              const VectorXi &vertno,
                              int hemiOffset,
@@ -346,7 +346,7 @@ static bool writeLabelOutput(const Label &label,
     }
 
     file.close();
-    printf("  Label output: %d vertices, %d times -> %s\n",
+    printf("  FsLabel output: %d vertices, %d times -> %s\n",
            (int)srcIdx.size(), nTimes, outputFile.toUtf8().constData());
     return true;
 }
@@ -690,16 +690,16 @@ int main(int argc, char *argv[])
         "Output raw SI-unit currents (no scaling applied).");
     parser.addOption(siCurrentsOpt);
 
-    // --- Label options ---
+    // --- FsLabel options ---
 
     // --label: Restrict to label region(s) (can be specified multiple times)
     QCommandLineOption labelOpt(QStringList() << "label",
-        "Label file to restrict the output (can be repeated).", "file");
+        "FsLabel file to restrict the output (can be repeated).", "file");
     parser.addOption(labelOpt);
 
     // --labeltag: Write label-based ASCII output (appends .label to output)
     QCommandLineOption labeltagOpt(QStringList() << "labeltag",
-        "Label tag for ASCII output file. Written as <out>-<tag>-<hemi>.label.", "tag");
+        "FsLabel tag for ASCII output file. Written as <out>-<tag>-<hemi>.label.", "tag");
     parser.addOption(labeltagOpt);
 
     // --labelcoords: Include vertex coordinates in label ASCII output
@@ -808,7 +808,7 @@ int main(int argc, char *argv[])
         scaleTo = 0.0;  // scaleby overrides scaleto
     }
 
-    // Label output options
+    // FsLabel output options
     bool doLabelTag = parser.isSet(labeltagOpt);
     bool doLabelCoords = parser.isSet(labelcoordsOpt);
     bool doLabelTimeByTime = parser.isSet(labeltimeOpt);
@@ -1111,7 +1111,7 @@ int main(int argc, char *argv[])
         }
 
         //=====================================================================================
-        // Label-based ASCII output
+        // FsLabel-based ASCII output
         //=====================================================================================
 
         QStringList labelFiles = parser.values(labelOpt);
@@ -1119,17 +1119,17 @@ int main(int argc, char *argv[])
             printf("\nWriting label-based ASCII output...\n");
 
             for (const QString &labelFile : labelFiles) {
-                Label label;
-                if (!Label::read(labelFile, label)) {
+                FsLabel label;
+                if (!FsLabel::read(labelFile, label)) {
                     qWarning() << "  WARNING: Could not read label" << labelFile;
                     continue;
                 }
-                printf("  Label: %s (%d vertices, hemi=%d)\n",
+                printf("  FsLabel: %s (%d vertices, hemi=%d)\n",
                        label.name.toUtf8().constData(),
                        (int)label.vertices.size(), label.hemi);
 
                 // Determine hemisphere and write
-                // hemi: 0 = lh, 1 = rh (Label convention)
+                // hemi: 0 = lh, 1 = rh (FsLabel convention)
                 VectorXi hemiVertno;
                 int hemiOffset = 0;
                 QString hemiName;
