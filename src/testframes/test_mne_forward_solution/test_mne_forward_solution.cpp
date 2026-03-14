@@ -160,43 +160,6 @@ void TestMneForwardSolution::computeForward()
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute/Write/Read MEG/EEG Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
-    // The following verifies the forward solution round-trip:
-    // compute -> write -> read-back must reproduce the same solution
-
-    // --- Debug: compare FiffInfoBase fields individually ---
-    {
-        const auto& a = m_pFwdMEGEEGRead->info;
-        const auto& b = m_pFwdMEGEEGRef->info;
-        qDebug() << "[diag] filename match:" << (a.filename == b.filename)
-                 << "read:" << a.filename << "ref:" << b.filename;
-        qDebug() << "[diag] bads match:" << (a.bads == b.bads);
-        qDebug() << "[diag] nchan match:" << (a.nchan == b.nchan)
-                 << "read:" << a.nchan << "ref:" << b.nchan;
-        qDebug() << "[diag] ch_names match:" << (a.ch_names == b.ch_names);
-        qDebug() << "[diag] dev_head_t match:" << (a.dev_head_t == b.dev_head_t);
-        qDebug() << "[diag] ctf_head_t match:" << (a.ctf_head_t == b.ctf_head_t);
-        qDebug() << "[diag] chs.size read:" << a.chs.size() << "ref:" << b.chs.size();
-        int nChs = qMin(a.chs.size(), b.chs.size());
-        for (int i = 0; i < nChs; ++i) {
-            if (!(a.chs[i] == b.chs[i])) {
-                qDebug() << "[diag] chs MISMATCH at index" << i << a.chs[i].ch_name;
-                qDebug() << "  scanNo:" << a.chs[i].scanNo << "vs" << b.chs[i].scanNo;
-                qDebug() << "  logNo:" << a.chs[i].logNo << "vs" << b.chs[i].logNo;
-                qDebug() << "  kind:" << a.chs[i].kind << "vs" << b.chs[i].kind;
-                qDebug() << "  range:" << a.chs[i].range << "vs" << b.chs[i].range;
-                qDebug() << "  cal:" << a.chs[i].cal << "vs" << b.chs[i].cal;
-                qDebug() << "  chpos match:" << (a.chs[i].chpos == b.chs[i].chpos);
-                qDebug() << "  unit:" << a.chs[i].unit << "vs" << b.chs[i].unit;
-                qDebug() << "  unit_mul:" << a.chs[i].unit_mul << "vs" << b.chs[i].unit_mul;
-                qDebug() << "  coil_trans match:" << a.chs[i].coil_trans.isApprox(b.chs[i].coil_trans, 0.0001f);
-                qDebug() << "  eeg_loc match:" << a.chs[i].eeg_loc.isApprox(b.chs[i].eeg_loc, 0.0001f);
-                qDebug() << "  coord_frame:" << a.chs[i].coord_frame << "vs" << b.chs[i].coord_frame;
-                if (i >= 5) { qDebug() << "  ... (stopping at 5 mismatches)"; break; }
-            }
-        }
-    }
-    // --- End debug ---
-
     QVERIFY(m_pFwdMEGEEGRead->info == m_pFwdMEGEEGRef->info);
     QVERIFY(m_pFwdMEGEEGRead->source_ori == m_pFwdMEGEEGRef->source_ori);
     QVERIFY(m_pFwdMEGEEGRead->surf_ori == m_pFwdMEGEEGRef->surf_ori);
