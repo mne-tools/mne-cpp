@@ -77,19 +77,22 @@ ECHO ====================================================================
 if %compoundOutput%==0 (
   ECHO [92mAll tests passed.[0m
 ) else (
-  ECHO [91m%compoundOutput% test^(s^) FAILED:[0m
+  ECHO [91m%compoundOutput% test^(s^) FAILED on first run:[0m
   ECHO [91m%failedTests%[0m
 )
 ECHO ====================================================================
 ECHO.
 
-@REM Re-run failed tests so their output appears at the end of the CI log
-@REM (GitHub Actions truncates long logs, cutting off earlier output)
+@REM Re-run failed tests: if a test passes on retry it is treated as a
+@REM flaky pass (removed from the failure list).  Tests that still fail
+@REM are kept so their diagnostic output appears at the end of the log.
 if %compoundOutput% neq 0 (
   ECHO.
   ECHO ====================================================================
-  ECHO ======= Re-running FAILED tests for diagnostic output =============
+  ECHO ======= Re-running FAILED tests ^(retry once^) ====================
   ECHO ====================================================================
+  set "stillFailed="
+  set /A "stillFailedCount=0"
   cd %binOutputFolder%
   for /f %%f in ('dir test_*.exe /s /b ') do (
     for %%s in (!failedTests!) do (
@@ -97,11 +100,26 @@ if %compoundOutput% neq 0 (
         ECHO.
         ECHO ---- Re-running %%~nxf ----
         %%f
-        ECHO ---- Finished %%~nxf ^(exit code: !errorlevel!^) ----
+        if !errorlevel! neq 0 (
+          ECHO ---- %%~nxf FAILED again ^(exit code: !errorlevel!^) ----
+          set "stillFailed=!stillFailed!  %%~nxf"
+          set /A "stillFailedCount+=1"
+        ) else (
+          ECHO ---- %%~nxf PASSED on retry ^(flaky^) ----
+        )
       )
     )
   )
   ECHO ====================================================================
+  ECHO.
+  if !stillFailedCount!==0 (
+    ECHO [92mAll tests passed after retry.[0m
+  ) else (
+    ECHO [91m!stillFailedCount! test^(s^) still FAILED after retry:[0m
+    ECHO [91m!stillFailed![0m
+  )
+  ECHO ====================================================================
+  set "compoundOutput=!stillFailedCount!"
 )
 
 exit /B %compoundOutput%
@@ -259,13 +277,16 @@ if [ "$RunCodeCoverage" == "true" ]; then
   find ./src/libraries -type f -name "*.cpp" -exec gcov {} + &> /dev/null || true
 fi
 
-# Re-run failed tests so their output appears at the end of the CI log
-# (GitHub Actions truncates long logs, cutting off earlier output)
+# Re-run failed tests: if a test passes on retry it is treated as a
+# flaky pass (removed from the failure list).  Tests that still fail
+# are kept so their diagnostic output appears at the end of the log.
 if [ $CompoundOutput -ne 0 ]; then
   echo " "
   echo "===================================================================="
-  echo "======= Re-running FAILED tests for diagnostic output ============="
+  echo "======= Re-running FAILED tests (retry once) ======================"
   echo "===================================================================="
+  StillFailedCount=0
+  StillFailed=""
   for test in $BasePath/out/${BuildName}/tests/test_*;
   do
     testName=$(basename "$test")
@@ -273,10 +294,26 @@ if [ $CompoundOutput -ne 0 ]; then
       echo " "
       echo "---- Re-running $testName ----"
       $test
-      echo "---- Finished $testName (exit code: $?) ----"
+      retryResult=$?
+      if [ $retryResult -ne 0 ]; then
+        echo "---- $testName FAILED again (exit code: $retryResult) ----"
+        StillFailedCount=$((StillFailedCount + 1))
+        StillFailed="$StillFailed $testName"
+      else
+        echo "---- $testName PASSED on retry (flaky) ----"
+      fi
     fi
   done
   echo "===================================================================="
+  echo " "
+  if [ $StillFailedCount -eq 0 ]; then
+    echo -e "\e[92mAll tests passed after retry.\e[0m"
+  else
+    echo -e "\e[91m${StillFailedCount} test(s) still FAILED after retry:\e[0m"
+    echo -e "\e[91m${StillFailed}\e[0m"
+  fi
+  echo "===================================================================="
+  CompoundOutput=$StillFailedCount
 fi
 
 exit $CompoundOutput

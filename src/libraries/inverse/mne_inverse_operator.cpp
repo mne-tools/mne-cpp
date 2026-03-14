@@ -770,19 +770,26 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
         }
         if(!is_fixed_ori)
         {
-            // Convert to the fixed orientation forward solution now
-            qint32 count = 0;
-            for(qint32 i = 2; i < p_depth_prior->data.rows(); i+=3)
+            if(!forward.surf_ori)
             {
-                p_depth_prior->data.row(count) = p_depth_prior->data.row(i);
-                ++count;
+                qWarning("Warning: For a fixed-orientation inverse, the forward solution must be surface-oriented. Skipping fixed conversion.\n");
             }
-            p_depth_prior->data.conservativeResize(count, 1);
+            else
+            {
+                // Convert to the fixed orientation forward solution now
+                qint32 count = 0;
+                for(qint32 i = 2; i < p_depth_prior->data.rows(); i+=3)
+                {
+                    p_depth_prior->data.row(count) = p_depth_prior->data.row(i);
+                    ++count;
+                }
+                p_depth_prior->data.conservativeResize(count, 1);
 
-//            forward = deepcopy(forward)
-            forward.to_fixed_ori();
-            is_fixed_ori = forward.isFixedOrient();
-            forward.prepare_forward(info, p_outNoiseCov, false, gain_info, gain, p_outNoiseCov, whitener, n_nzero);
+//              forward = deepcopy(forward)
+                forward.to_fixed_ori();
+                is_fixed_ori = forward.isFixedOrient();
+                forward.prepare_forward(info, p_outNoiseCov, false, gain_info, gain, p_outNoiseCov, whitener, n_nzero);
+            }
         }
     }
     printf("\tComputing inverse operator with %lld channels.\n", gain_info.ch_names.size());
