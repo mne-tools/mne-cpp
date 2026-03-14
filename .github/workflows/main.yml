@@ -104,18 +104,18 @@ jobs:
         if [ -d "dev" ]; then
           cp -r dev /tmp/doxygen-dev-backup
         fi
-        git rm -rf --ignore-unmatch .
-        git commit --amend --reset-author -a -m 'Update stable API docs' --allow-empty
+        # Remove everything except .git
+        find . -maxdepth 1 ! -name '.git' ! -name '.' -exec rm -rf {} +
+        # Copy new docs
         touch .nojekyll
-        cp -r ../html/* .
+        cp -r ../html/. .
         # Restore /dev directory
         if [ -d "/tmp/doxygen-dev-backup" ]; then
           cp -r /tmp/doxygen-dev-backup dev
         fi
         git add .
-        git add .nojekyll
-        git commit --amend --reset-author -a -m 'Update stable API docs'
-        git push -f --all
+        git commit -m 'Update stable API docs' --allow-empty
+        git push origin gh-pages
 
   # ── Website (production) ─────────────────────────────────────────────────
   Website:
@@ -156,22 +156,20 @@ jobs:
           cp -r dev /tmp/website-dev-backup
         fi
 
-        git rm -rf --ignore-unmatch .
-        git commit --amend --reset-author -a -m 'Update website' --allow-empty
-        cd ..
+        # Remove everything except .git
+        find . -maxdepth 1 ! -name '.git' ! -name '.' -exec rm -rf {} +
 
-        # Copy the stable Docusaurus build
-        cp -RT doc/website/build mne-cpp.github.io
+        # Copy the stable Docusaurus build to the root
+        cp -r ../doc/website/build/. .
 
         # Restore /dev directory
         if [ -d "/tmp/website-dev-backup" ]; then
-          cp -r /tmp/website-dev-backup mne-cpp.github.io/dev
+          cp -r /tmp/website-dev-backup dev
         fi
 
-        cd mne-cpp.github.io
         git add .
-        git commit --amend --reset-author -a -m 'Update website'
-        git push -f --all
+        git commit -m 'Update website' --allow-empty
+        git push origin main
 
   # ═══════════════════════════════════════════════════════════════════════════
   # Jobs that run ONLY on version tags (v*)  — the actual release pipeline
