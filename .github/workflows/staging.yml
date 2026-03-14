@@ -39,42 +39,6 @@ env:
 
 jobs:
 
-  # ── Determine whether to run coverage analysis ──────────────────────────
-  # Skipped when:
-  #   • Commit message contains [skip-coverage]
-  #   • No source code files changed (docs/CI-only push)
-  CheckCoverage:
-    runs-on: ubuntu-24.04
-    outputs:
-      run_coverage: ${{ steps.check.outputs.run_coverage }}
-    steps:
-    - name: Clone repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 2
-
-    - name: Check for source changes and [skip-coverage]
-      id: check
-      env:
-        COMMIT_MSG: ${{ github.event.head_commit.message }}
-      run: |
-        # Check commit message for [skip-coverage]
-        if echo "$COMMIT_MSG" | grep -qi '\[skip-coverage\]'; then
-          echo "run_coverage=false" >> "$GITHUB_OUTPUT"
-          echo "Coverage skipped: [skip-coverage] in commit message"
-          exit 0
-        fi
-
-        # Check if source code changed (vs docs/CI-only changes)
-        SRC_CHANGES=$(git diff --name-only HEAD~1 HEAD -- 'src/' 'CMakeLists.txt' | wc -l)
-        if [ "$SRC_CHANGES" -eq 0 ]; then
-          echo "run_coverage=false" >> "$GITHUB_OUTPUT"
-          echo "Coverage skipped: no source code changes detected"
-        else
-          echo "run_coverage=true" >> "$GITHUB_OUTPUT"
-          echo "Coverage will run: $SRC_CHANGES source file(s) changed"
-        fi
-
   # ── Create / update dev_build pre-release ────────────────────────────────
   CreateDevRelease:
     runs-on: ubuntu-24.04
@@ -136,16 +100,15 @@ jobs:
       qt_version: '6.10.2'
 
   # ── Tests with coverage threshold & regression checks ────────────────────
-  # Coverage is skipped when CheckCoverage determines it's unnecessary
-  # (e.g. [skip-coverage] in commit message or no source changes)
+  # Add [skip-coverage] to your commit message to skip coverage analysis.
+  # Coverage is only collected on Ubuntu; macOS/Windows always run without it.
   Tests:
-    needs: CheckCoverage
     uses: ./.github/workflows/_reusable-tests.yml
     with:
-      with_code_coverage: ${{ needs.CheckCoverage.outputs.run_coverage == 'true' }}
+      with_code_coverage: ${{ !contains(github.event.head_commit.message, '[skip-coverage]') }}
       upload_codecov: false
-      coverage_threshold: ${{ needs.CheckCoverage.outputs.run_coverage == 'true' && 50 || 0 }}
-      fail_on_coverage_regression: ${{ needs.CheckCoverage.outputs.run_coverage == 'true' }}
+      coverage_threshold: ${{ contains(github.event.head_commit.message, '[skip-coverage]') && 0 || 50 }}
+      fail_on_coverage_regression: ${{ !contains(github.event.head_commit.message, '[skip-coverage]') }}
 
   # ── Doxygen API documentation (dev) ──────────────────────────────────────
   Doxygen:
