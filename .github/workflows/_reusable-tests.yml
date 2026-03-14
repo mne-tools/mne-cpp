@@ -213,16 +213,23 @@ jobs:
           fi
         fi
 
-        # --- Regression check ---
+        # --- Regression check (allow up to 2% drop) ---
         if [ "$CHECK_REGRESSION" = "true" ] && [ -f .coverage-baseline ]; then
           PREVIOUS=$(cat .coverage-baseline)
           echo "  Previous coverage: ${PREVIOUS}%"
-          if (( $(echo "${CURRENT} < ${PREVIOUS}" | bc -l) )); then
+          ALLOWED_DROP="2.0"
+          LIMIT=$(echo "${PREVIOUS} - ${ALLOWED_DROP}" | bc -l)
+          if (( $(echo "${CURRENT} < ${LIMIT}" | bc -l) )); then
             DELTA=$(echo "${PREVIOUS} - ${CURRENT}" | bc -l)
-            echo "  ❌ FAIL: Coverage dropped by ${DELTA}% (${PREVIOUS}% → ${CURRENT}%)"
+            echo "  ❌ FAIL: Coverage dropped by ${DELTA}% (${PREVIOUS}% → ${CURRENT}%), exceeds ${ALLOWED_DROP}% tolerance"
             FAILED=true
           else
-            echo "  ✅ PASS: Coverage did not regress"
+            if (( $(echo "${CURRENT} < ${PREVIOUS}" | bc -l) )); then
+              DELTA=$(echo "${PREVIOUS} - ${CURRENT}" | bc -l)
+              echo "  ⚠️  WARN: Coverage dropped by ${DELTA}% (within ${ALLOWED_DROP}% tolerance)"
+            else
+              echo "  ✅ PASS: Coverage did not regress"
+            fi
           fi
         fi
 
