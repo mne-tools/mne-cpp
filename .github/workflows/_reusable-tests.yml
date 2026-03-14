@@ -165,9 +165,10 @@ jobs:
         fastcov -d build -o coverage.json
         # Full report in lcov format
         fastcov -C coverage.json --lcov -o coverage.info
-        # Filtered report excluding external/test/system code
+        # Filtered report: only MNE-CPP libraries (no apps, tests, examples, external, Qt, Eigen)
         fastcov -C coverage.json --lcov -o coverage_filtered.info \
-             --exclude /usr src/external src/examples src/testframes Qt eigen
+             --include src/libraries/ \
+             --exclude /usr Qt eigen
         # Extract total line coverage percentage from lcov format
         TOTAL_LINES=$(grep -c "^DA:" coverage_filtered.info 2>/dev/null || echo "0")
         HIT_LINES=$(grep "^DA:" coverage_filtered.info | awk -F, '$2 > 0' | wc -l 2>/dev/null || echo "0")
