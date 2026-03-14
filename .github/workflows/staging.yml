@@ -7,6 +7,7 @@
 # This is the DEVELOPMENT pipeline:
 #   • Creates/updates a rolling "dev_build" pre-release on GitHub
 #   • Builds development binaries for Linux, macOS, Windows
+#   • Builds cross-platform installers (Linux .run, macOS .dmg, Windows .exe)
 #   • Runs full test suite with coverage threshold & regression checks
 #     (fails if coverage < minimum threshold or drops from previous run)
 #   • Deploys dev website     → mne-cpp.github.io/dev/
@@ -86,6 +87,12 @@ jobs:
   Windows:
     needs: CreateDevRelease
     uses: ./.github/workflows/release-windows.yml
+    secrets: inherit
+
+  # ── Installers (after all platform builds) ─────────────────────────────
+  Installer:
+    needs: [Linux, MacOS, Windows]
+    uses: ./.github/workflows/release-installer.yml
     secrets: inherit
 
   # ── Build compatibility matrix (min + max Qt) ───────────────────────────

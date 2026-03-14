@@ -18,4 +18,4 @@ MNE-CPP provides a cross-platform library for MEG/EEG data processing, visualiza
 ## Links
 
 - **Website:** https://mne-cpp.github.io/
-- **Source Code:** https://github.com/mne-cpp/mne-cpp
+- **Source Code:** https://github.com/mne-tools/mne-cpp
