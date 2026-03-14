@@ -2069,6 +2069,14 @@ void FwdForwardSolution::to_fixed_ori()
 
 //=============================================================================================================
 
+bool FwdForwardSolution::isClustered() const
+{
+    auto* hemi = src.hemisphereAt(0);
+    return hemi && hemi->isClustered();
+}
+
+//=============================================================================================================
+
 MatrixX3f FwdForwardSolution::getSourcePositionsByLabel(const QList<Label> &lPickedLabels, const SurfaceSet& tSurfSetInflated)
 {
     MatrixX3f matSourceVertLeft, matSourceVertRight, matSourcePositions;
