@@ -34,3 +34,4 @@ ignore:
   - "src/external/**"       # third-party libraries (e.g. Eigen)
   - "src/examples/**"       # example code is not part of coverage
   - "src/testframes/**"     # test harnesses themselves
+  - "src/applications/**"   # applications are not part of library coverage

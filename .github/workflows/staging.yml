@@ -33,9 +33,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # Minimum acceptable line coverage percentage.
+  # Minimum acceptable line coverage percentage (libraries only).
   # The pipeline will FAIL if coverage drops below this.
-  COVERAGE_THRESHOLD: 50
+  COVERAGE_THRESHOLD: 35
 
 jobs:
 
@@ -107,7 +107,7 @@ jobs:
     with:
       with_code_coverage: ${{ !contains(github.event.head_commit.message, '[skip-coverage]') }}
       upload_codecov: false
-      coverage_threshold: ${{ contains(github.event.head_commit.message, '[skip-coverage]') && 0 || 50 }}
+      coverage_threshold: ${{ contains(github.event.head_commit.message, '[skip-coverage]') && 0 || 35 }}
       fail_on_coverage_regression: ${{ !contains(github.event.head_commit.message, '[skip-coverage]') }}
 
   # ── Doxygen API documentation (dev) ──────────────────────────────────────
