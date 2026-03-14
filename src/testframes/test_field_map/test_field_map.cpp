@@ -354,7 +354,7 @@ void TestFieldMap::initTestCase()
              "Sample data not found. Set MNE_SAMPLE_DATA_DIR or place data in ~/mne_data/MNE-sample-data");
 
     QString evokedPath = m_dataDir + "/MEG/sample/sample_audvis-ave.fif";
-    QString transPath  = m_dataDir + "/MEG/sample/all-trans.fif";
+    QString transPath  = m_dataDir + "/MEG/sample/sample_audvis_raw-trans.fif";
     QString surfPath   = m_dataDir + "/subjects/sample/bem/sample-head.fif";
 
     // Check that required data files exist
@@ -811,7 +811,7 @@ void TestFieldMap::testMultiEvokedMegMapping()
                  qPrintable("Multi-evoked Python script not found: " + m_multiPythonScript));
 
         QString evokedPath = m_dataDir + "/MEG/sample/sample_audvis-ave.fif";
-        QString transPath  = m_dataDir + "/MEG/sample/all-trans.fif";
+        QString transPath  = m_dataDir + "/MEG/sample/sample_audvis_raw-trans.fif";
         QString surfPath   = m_dataDir + "/subjects/sample/bem/sample-head.fif";
 
         m_multiRefDir = QCoreApplication::applicationDirPath() + "/test_multi_evoked_ref";
