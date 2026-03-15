@@ -515,7 +515,7 @@ void RtcMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //=============================================================================================================
 
-void RtcMne::updateInvOp(const MNEInverseOperator& invOp)
+void RtcMne::updateInvOp(const InvInverseOperator& invOp)
 {
     QMutexLocker locker(&m_qMutex);
 
@@ -579,11 +579,11 @@ void RtcMne::run()
     int iDownSample = 1;
     float tstep;
     float lambda2 = 1.0f / pow(1.0f, 2); //ToDo estimate lambda using covariance
-    MNESourceEstimate sourceEstimate;
+    InvSourceEstimate sourceEstimate;
     bool bEvokedInput = false;
     bool bRawInput = false;
     bool bUpdateMinimumNorm = false;
-    QSharedPointer<INVLIB::MinimumNorm> pMinimumNorm;
+    QSharedPointer<INVLIB::InvMinimumNorm> pMinimumNorm;
     QStringList lChNamesFiffInfo;
     QStringList lChNamesInvOp;
 
@@ -603,7 +603,7 @@ void RtcMne::run()
 
         if(bUpdateMinimumNorm) {
             m_qMutex.lock();
-            pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp, lambda2, m_sMethod));
+            pMinimumNorm = InvMinimumNorm::SPtr(new InvMinimumNorm(m_invOp, lambda2, m_sMethod));
             m_bUpdateMinimumNorm = false;
             m_qMutex.unlock();
 

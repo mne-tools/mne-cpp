@@ -129,9 +129,9 @@ public:
      * Load dipole set from a .dip file.
      *
      * @param[in] dipPath  Path to the dipole file.
-     * @return The loaded ECDSet (may be empty on failure).
+     * @return The loaded InvEcdSet (may be empty on failure).
      */
-    static INVLIB::ECDSet loadDipoles(const QString &dipPath);
+    static INVLIB::InvEcdSet loadDipoles(const QString &dipPath);
 
     /**
      * Load source space from a forward-solution FIF file.

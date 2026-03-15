@@ -77,8 +77,8 @@ namespace FIFFLIB {
 }
 
 namespace INVLIB {
-    class MNEInverseOperator;
-    class MinimumNorm;
+    class InvInverseOperator;
+    class InvMinimumNorm;
 }
 
 namespace RTPROCESSINGLIB {
@@ -190,7 +190,7 @@ public:
      *
      * @param[in] invOp    The inverse operator to update.
      */
-    void updateInvOp(const INVLIB::MNEInverseOperator& invOp);
+    void updateInvOp(const INVLIB::InvInverseOperator& invOp);
 
     //=========================================================================================================
     /**
@@ -264,7 +264,7 @@ protected:
     QStringList                     m_qListCovChNames;          /**< Covariance channel names. */
     QStringList                     m_qListPickChannels;        /**< Channels to pick. */
 
-    INVLIB::MNEInverseOperator      m_invOp;                    /**< The inverse operator. */
+    INVLIB::InvInverseOperator      m_invOp;                    /**< The inverse operator. */
 
 signals:
     void responsibleTriggerTypesChanged(const QStringList& lResponsibleTriggerTypes);

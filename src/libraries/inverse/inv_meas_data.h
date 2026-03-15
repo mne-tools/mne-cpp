@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MNE Meas Data (MNEMeasData) class declaration.
+ * @brief    MNE Meas Data (InvMeasData) class declaration.
  *
  */
 
-#ifndef MNEMEASDATA_H
-#define MNEMEASDATA_H
+#ifndef INV_MEAS_DATA_H
+#define INV_MEAS_DATA_H
 
 //=============================================================================================================
 // INCLUDES
@@ -85,8 +85,8 @@ namespace INVLIB
 // INVLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MNEInverseOperator;
-class MNEMeasDataSet;
+class InvInverseOperator;
+class InvMeasDataSet;
 
 //=============================================================================================================
 /**
@@ -94,25 +94,25 @@ class MNEMeasDataSet;
  *
  * @brief Measurement data container holding multiple data sets for MNE inverse computations.
  */
-class INVSHARED_EXPORT MNEMeasData
+class INVSHARED_EXPORT InvMeasData
 {
 public:
-    typedef QSharedPointer<MNEMeasData> SPtr;              /**< Shared pointer type for MNEMeasData. */
-    typedef QSharedPointer<const MNEMeasData> ConstSPtr;   /**< Const shared pointer type for MNEMeasData. */
+    typedef QSharedPointer<InvMeasData> SPtr;              /**< Shared pointer type for InvMeasData. */
+    typedef QSharedPointer<const InvMeasData> ConstSPtr;   /**< Const shared pointer type for InvMeasData. */
 
     //=========================================================================================================
     /**
      * Constructs the MNE Meas Data
      * Refactored: mne_new_meas_data (mne_read_data.c)
      */
-    MNEMeasData();
+    InvMeasData();
 
     //=========================================================================================================
     /**
      * Destroys the MNE Meas Data description
      * Refactored: mne_free_meas_data (mne_read_data.c)
      */
-    ~MNEMeasData();
+    ~InvMeasData();
 
     //=========================================================================================================
     /**
@@ -126,17 +126,17 @@ public:
 
     //============================= mne_read_data.c =============================
 
-    static MNEMeasData* mne_read_meas_data_add(const QString&       name,       /* Name of the measurement file */
+    static InvMeasData* mne_read_meas_data_add(const QString&       name,       /* Name of the measurement file */
                                        int                  set,        /* Which data set */
-                                       MNEInverseOperator*   op,         /* For consistency checks */
+                                       InvInverseOperator*   op,         /* For consistency checks */
                                        MNELIB::MNENamedMatrix*       fwd,        /* Another option for consistency checks */
                                        const QStringList&   namesp,   /* Yet another option: explicit name list */
                                        int                  nnamesp,
-                                       MNEMeasData*          add_to);
+                                       InvMeasData*          add_to);
 
-    static MNEMeasData* mne_read_meas_data(const QString&       name,       /* Name of the measurement file */
+    static InvMeasData* mne_read_meas_data(const QString&       name,       /* Name of the measurement file */
                                    int                  set,        /* Which data set */
-                                   MNEInverseOperator*  op,         /* For consistency checks */
+                                   InvInverseOperator*  op,         /* For consistency checks */
                                    MNELIB::MNENamedMatrix*      fwd,        /* Another option for consistency checks */
                                    const QStringList&   namesp,   /* Yet another option: explicit name list */
                                    int                  nnamesp);
@@ -154,7 +154,7 @@ public:
     float                   lowpass;    /* Lowpass filter setting */
     MNELIB::MNEProjOp*  proj;       /* Associated projection operator (useful if inverse operator is not included) */
     std::unique_ptr<MNELIB::MNECTFCompDataSet> comp;   /**< The software gradient compensation data. */
-    MNEInverseOperator*     op;         /* Associated inverse operator */
+    InvInverseOperator*     op;         /* Associated inverse operator */
     MNELIB::MNENamedMatrix*         fwd;        /* Forward operator for dipole fitting */
     MNELIB::MNERawData*             raw;        /* This will be non-null if the data stems from a raw data file */
     MNELIB::mneChSelection          chsel;      /* Channel selection for raw data */
@@ -165,9 +165,9 @@ public:
      * These are the data sets loaded
      */
     int                     ch_major;   /* Rows are channels rather than times */
-    QList<MNEMeasDataSet*>  sets;       /* All loaded data sets */
+    QList<InvMeasDataSet*>  sets;       /* All loaded data sets */
     int                     nset;       /* How many */
-    MNEMeasDataSet*         current;    /* Which is the current one */
+    InvMeasDataSet*         current;    /* Which is the current one */
 };
 
 //=============================================================================================================
@@ -175,4 +175,4 @@ public:
 //=============================================================================================================
 } // NAMESPACE INVLIB
 
-#endif // MNEMEASDATA_H
+#endif // INV_MEAS_DATA_H

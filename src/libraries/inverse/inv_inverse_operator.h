@@ -31,12 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     MNEInverseOperator class declaration.
+ * @brief     InvInverseOperator class declaration.
  *
  */
 
-#ifndef MNE_INVERSE_OPERATOR_H
-#define MNE_INVERSE_OPERATOR_H
+#ifndef INV_INVERSE_OPERATOR_H
+#define INV_INVERSE_OPERATOR_H
 
 //=============================================================================================================
 // INCLUDES
@@ -142,17 +142,17 @@ struct RegionMT
  *
  * @brief Inverse operator
  */
-class INVSHARED_EXPORT MNEInverseOperator
+class INVSHARED_EXPORT InvInverseOperator
 {
 public:
-    typedef QSharedPointer<MNEInverseOperator> SPtr;            /**< Shared pointer type for MNEInverseOperator. */
-    typedef QSharedPointer<const MNEInverseOperator> ConstSPtr; /**< Const shared pointer type for MNEInverseOperator. */
+    typedef QSharedPointer<InvInverseOperator> SPtr;            /**< Shared pointer type for InvInverseOperator. */
+    typedef QSharedPointer<const InvInverseOperator> ConstSPtr; /**< Const shared pointer type for InvInverseOperator. */
 
     //=========================================================================================================
     /**
      * Default constructor
      */
-    MNEInverseOperator();
+    InvInverseOperator();
 
     //=========================================================================================================
     /**
@@ -160,7 +160,7 @@ public:
      *
      * @param[in] p_IODevice     IO device to read from the evoked data set.
      */
-    MNEInverseOperator(QIODevice& p_IODevice);
+    InvInverseOperator(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -174,7 +174,7 @@ public:
      * @param[in] fixed              Use fixed source orientations normal to the cortical mantle. If True, the loose parameter is ignored.
      * @param[in] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels.
      */
-    MNEInverseOperator(const FIFFLIB::FiffInfo &info,
+    InvInverseOperator(const FIFFLIB::FiffInfo &info,
                        const FWDLIB::FwdForwardSolution& forward,
                        const FIFFLIB::FiffCov& p_noise_cov,
                        float loose = 0.2f,
@@ -188,13 +188,13 @@ public:
      *
      * @param[in] p_MNEInverseOperator   MNE forward solution.
      */
-    MNEInverseOperator(const MNEInverseOperator &p_MNEInverseOperator);
+    InvInverseOperator(const InvInverseOperator &p_MNEInverseOperator);
 
     //=========================================================================================================
     /**
-     * Destroys the MNEInverseOperator.
+     * Destroys the InvInverseOperator.
      */
-    ~MNEInverseOperator();
+    ~InvInverseOperator();
 
     //=========================================================================================================
     /**
@@ -284,7 +284,7 @@ public:
      *
      * @return the assembled inverse operator.
      */
-    static MNEInverseOperator make_inverse_operator(const FIFFLIB::FiffInfo &info,
+    static InvInverseOperator make_inverse_operator(const FIFFLIB::FiffInfo &info,
                                                     FWDLIB::FwdForwardSolution forward,
                                                     const FIFFLIB::FiffCov& p_noise_cov,
                                                     float loose = 0.2f,
@@ -307,7 +307,7 @@ public:
      *
      * @return the prepared inverse operator.
      */
-    MNEInverseOperator prepare_inverse_operator(qint32 nave,
+    InvInverseOperator prepare_inverse_operator(qint32 nave,
                                                 float lambda2,
                                                 bool dSPM,
                                                 bool sLORETA = false) const;
@@ -325,7 +325,7 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    static bool read_inverse_operator(QIODevice &p_IODevice, MNEInverseOperator& inv);
+    static bool read_inverse_operator(QIODevice &p_IODevice, InvInverseOperator& inv);
 
     //=========================================================================================================
     /**
@@ -350,11 +350,11 @@ public:
      * overloading the stream out operator<<
      *
      * @param[in] out                    The stream to which the fiff covariance should be assigned to.
-     * @param[in] p_MNEInverseOperator   MNEInverseOperator which should be assigned to the stream.
+     * @param[in] p_MNEInverseOperator   InvInverseOperator which should be assigned to the stream.
      *
      * @return the stream with the attached fiff covariance matrix.
      */
-    friend std::ostream& operator<<(std::ostream& out, const INVLIB::MNEInverseOperator &p_MNEInverseOperator);
+    friend std::ostream& operator<<(std::ostream& out, const INVLIB::InvInverseOperator &p_MNEInverseOperator);
 
 public:
     FIFFLIB::FiffInfoBase info;                     /**< light weighted measurement info. */
@@ -390,28 +390,28 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline Eigen::MatrixXd& MNEInverseOperator::getKernel()
+inline Eigen::MatrixXd& InvInverseOperator::getKernel()
 {
     return m_K;
 }
 
 //=============================================================================================================
 
-inline Eigen::MatrixXd MNEInverseOperator::getKernel() const
+inline Eigen::MatrixXd InvInverseOperator::getKernel() const
 {
     return m_K;
 }
 
 //=============================================================================================================
 
-inline bool MNEInverseOperator::isFixedOrient() const
+inline bool InvInverseOperator::isFixedOrient() const
 {
     return this->source_ori == FIFFV_MNE_FIXED_ORI;
 }
 
 //=============================================================================================================
 
-inline std::ostream& operator<<(std::ostream& out, const INVLIB::MNEInverseOperator &p_MNEInverseOperator)
+inline std::ostream& operator<<(std::ostream& out, const INVLIB::InvInverseOperator &p_MNEInverseOperator)
 {
     out << "#### MNE Inverse Operator ####\n";
 
@@ -430,12 +430,12 @@ inline std::ostream& operator<<(std::ostream& out, const INVLIB::MNEInverseOpera
 
 #ifndef metatype_mneinverseoperatorsptr
 #define metatype_mneinverseoperatorsptr
-Q_DECLARE_METATYPE(QSharedPointer<INVLIB::MNEInverseOperator>); /**< Provides QT META type declaration of the QSharedPointer<INVLIB::MNEInverseOperator> type. For signal/slot usage.*/
+Q_DECLARE_METATYPE(QSharedPointer<INVLIB::InvInverseOperator>); /**< Provides QT META type declaration of the QSharedPointer<INVLIB::InvInverseOperator> type. For signal/slot usage.*/
 #endif
 
 #ifndef metatype_mneinverseoperators
 #define metatype_mneinverseoperators
-Q_DECLARE_METATYPE(INVLIB::MNEInverseOperator); /**< Provides QT META type declaration of the INVLIB::MNEInverseOperator type. For signal/slot usage.*/
+Q_DECLARE_METATYPE(INVLIB::InvInverseOperator); /**< Provides QT META type declaration of the INVLIB::InvInverseOperator type. For signal/slot usage.*/
 #endif
 
-#endif // MNE_INVERSE_OPERATOR_H
+#endif // INV_INVERSE_OPERATOR_H

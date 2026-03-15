@@ -192,8 +192,8 @@ static QStringList findLabelsInDir(const QString &dir)
 // Process a single label: compute source estimate for the label vertices
 //=============================================================================================================
 
-static MNESourceEstimate processLabel(const QString &labelFile,
-                                      const MNEInverseOperator &invOp,
+static InvSourceEstimate processLabel(const QString &labelFile,
+                                      const InvInverseOperator &invOp,
                                       const MatrixXd &data,
                                       float tmin,
                                       float tstep,
@@ -205,13 +205,13 @@ static MNESourceEstimate processLabel(const QString &labelFile,
     FsLabel label;
     if (!FsLabel::read(labelFile, label)) {
         qWarning() << "Failed to read label file:" << labelFile;
-        return MNESourceEstimate();
+        return InvSourceEstimate();
     }
 
     int hemi = labelHemisphere(labelFile);
     if (hemi < 0) {
         qWarning() << "Cannot determine hemisphere for label:" << labelFile;
-        return MNESourceEstimate();
+        return InvSourceEstimate();
     }
     label.hemi = hemi;
 
@@ -221,15 +221,15 @@ static MNESourceEstimate processLabel(const QString &labelFile,
            hemi == 0 ? "left" : "right");
 
     // Set up minimum norm with label restriction
-    MinimumNorm minimumNorm(invOp, lambda2, method);
+    InvMinimumNorm minimumNorm(invOp, lambda2, method);
     minimumNorm.doInverseSetup(1, pickNormal);
 
     // Compute inverse for all data
-    MNESourceEstimate stc = minimumNorm.calculateInverse(data, tmin, tstep, pickNormal);
+    InvSourceEstimate stc = minimumNorm.calculateInverse(data, tmin, tstep, pickNormal);
 
     if (stc.isEmpty()) {
         qWarning() << "Inverse computation returned empty result for label:" << labelFile;
-        return MNESourceEstimate();
+        return InvSourceEstimate();
     }
 
     // Restrict to label vertices
@@ -237,7 +237,7 @@ static MNESourceEstimate processLabel(const QString &labelFile,
 
     if (labelIndices.size() == 0) {
         qWarning() << "No source vertices found in label:" << labelFile;
-        return MNESourceEstimate();
+        return InvSourceEstimate();
     }
 
     // Extract label-restricted data
@@ -248,15 +248,15 @@ static MNESourceEstimate processLabel(const QString &labelFile,
         labelVertices(i) = stc.vertices(labelIndices(i));
     }
 
-    return MNESourceEstimate(labelData, labelVertices, stc.tmin, stc.tstep);
+    return InvSourceEstimate(labelData, labelVertices, stc.tmin, stc.tstep);
 }
 
 //=============================================================================================================
 // Process label directory: compute average waveform per label
 //=============================================================================================================
 
-static MNESourceEstimate processLabelDir(const QString &labelDir,
-                                         const MNEInverseOperator &invOp,
+static InvSourceEstimate processLabelDir(const QString &labelDir,
+                                         const InvInverseOperator &invOp,
                                          const MatrixXd &data,
                                          float tmin,
                                          float tstep,
@@ -267,19 +267,19 @@ static MNESourceEstimate processLabelDir(const QString &labelDir,
     QStringList labelFiles = findLabelsInDir(labelDir);
     if (labelFiles.isEmpty()) {
         qWarning() << "No label files found in directory:" << labelDir;
-        return MNESourceEstimate();
+        return InvSourceEstimate();
     }
 
     printf("Found %lld label files in %s\n", (long long)labelFiles.size(), labelDir.toUtf8().constData());
 
     // Compute full inverse solution first (with pickNormal=true for labeldir)
-    MinimumNorm minimumNorm(invOp, lambda2, method);
+    InvMinimumNorm minimumNorm(invOp, lambda2, method);
     minimumNorm.doInverseSetup(1, true);
 
-    MNESourceEstimate fullStc = minimumNorm.calculateInverse(data, tmin, tstep, true);
+    InvSourceEstimate fullStc = minimumNorm.calculateInverse(data, tmin, tstep, true);
     if (fullStc.isEmpty()) {
         qWarning() << "Full inverse computation returned empty result.";
-        return MNESourceEstimate();
+        return InvSourceEstimate();
     }
 
     // For each label, compute the average source waveform
@@ -333,14 +333,14 @@ static MNESourceEstimate processLabelDir(const QString &labelDir,
 
     if (validLabels == 0) {
         qWarning() << "No valid labels found.";
-        return MNESourceEstimate();
+        return InvSourceEstimate();
     }
 
     // Trim to actual number of valid labels
     avgData.conservativeResize(validLabels, avgData.cols());
     avgVertices.conservativeResize(validLabels);
 
-    return MNESourceEstimate(avgData, avgVertices, fullStc.tmin, fullStc.tstep);
+    return InvSourceEstimate(avgData, avgVertices, fullStc.tmin, fullStc.tstep);
 }
 
 //=============================================================================================================
@@ -565,7 +565,7 @@ int main(int argc, char *argv[])
 
     printf("\nReading the inverse operator...\n");
     QFile invFile(invName);
-    MNEInverseOperator inverseOperator(invFile);
+    InvInverseOperator inverseOperator(invFile);
 
     if (inverseOperator.eigen_leads->data.size() == 0) {
         fprintf(stderr, "Error: Failed to read inverse operator from %s\n", invName.toUtf8().constData());
@@ -593,7 +593,7 @@ int main(int argc, char *argv[])
         printf("\nProcessing label directory: %s\n", labelDir.toUtf8().constData());
 
         QStringList labelNames;
-        MNESourceEstimate stc = processLabelDir(labelDir, inverseOperator,
+        InvSourceEstimate stc = processLabelDir(labelDir, inverseOperator,
                                                 inputData, tmin, tstep,
                                                 lambda2, method, labelNames);
 
@@ -637,7 +637,7 @@ int main(int argc, char *argv[])
         for (const QString &labelFile : labelFiles) {
             printf("\nProcessing label: %s\n", labelFile.toUtf8().constData());
 
-            MNESourceEstimate stc = processLabel(labelFile, inverseOperator,
+            InvSourceEstimate stc = processLabel(labelFile, inverseOperator,
                                                  inputData, tmin, tstep,
                                                  lambda2, method, pickNormal);
 
@@ -679,10 +679,10 @@ int main(int argc, char *argv[])
         //-----------------------------------------------------------------------------------------------------
         printf("\nComputing full source space inverse...\n");
 
-        MinimumNorm minimumNorm(inverseOperator, lambda2, method);
+        InvMinimumNorm minimumNorm(inverseOperator, lambda2, method);
         minimumNorm.doInverseSetup(curNave, pickNormal);
 
-        MNESourceEstimate stc = minimumNorm.calculateInverse(inputData, tmin, tstep, pickNormal);
+        InvSourceEstimate stc = minimumNorm.calculateInverse(inputData, tmin, tstep, pickNormal);
 
         if (stc.isEmpty()) {
             fprintf(stderr, "Error: Full source space inverse computation failed.\n");
@@ -725,7 +725,7 @@ int main(int argc, char *argv[])
         } else {
             // Write left hemisphere STC
             if (nSrcLh > 0) {
-                MNESourceEstimate stcLh(stc.data.topRows(nSrcLh),
+                InvSourceEstimate stcLh(stc.data.topRows(nSrcLh),
                                         stc.vertices.head(nSrcLh),
                                         stc.tmin, stc.tstep);
 
@@ -741,7 +741,7 @@ int main(int argc, char *argv[])
 
             // Write right hemisphere STC
             if (nSrcRh > 0) {
-                MNESourceEstimate stcRh(stc.data.bottomRows(nSrcRh),
+                InvSourceEstimate stcRh(stc.data.bottomRows(nSrcRh),
                                         stc.vertices.tail(nSrcRh),
                                         stc.tmin, stc.tstep);
 

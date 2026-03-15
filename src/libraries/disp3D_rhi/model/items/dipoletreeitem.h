@@ -51,13 +51,13 @@
 class DISP3DRHISHARED_EXPORT DipoleTreeItem : public AbstractTreeItem
 {
 public:
-    explicit DipoleTreeItem(const QString& text, const INVLIB::ECDSet& set, int type = AbstractTreeItem::DipoleItem);
+    explicit DipoleTreeItem(const QString& text, const INVLIB::InvEcdSet& set, int type = AbstractTreeItem::DipoleItem);
     ~DipoleTreeItem() = default;
 
-    const INVLIB::ECDSet& ecdSet() const;
+    const INVLIB::InvEcdSet& ecdSet() const;
 
 private:
-    INVLIB::ECDSet m_ecdSet;
+    INVLIB::InvEcdSet m_ecdSet;
 };
 
 #endif // DIPOLETREEITEM_H

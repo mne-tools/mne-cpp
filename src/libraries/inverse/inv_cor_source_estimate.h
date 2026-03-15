@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     MNECorSourceEstimate class declaration.
+ * @brief     InvCorSourceEstimate class declaration.
  *
  */
 
-#ifndef MNECORSOURCEESTIMATE_H
-#define MNECORSOURCEESTIMATE_H
+#ifndef INV_COR_SOURCE_ESTIMATE_H
+#define INV_COR_SOURCE_ESTIMATE_H
 
 //=============================================================================================================
 // INCLUDES
@@ -74,7 +74,7 @@ namespace INVLIB
  *
  * @brief Correlated source estimation
  */
-class INVSHARED_EXPORT MNECorSourceEstimate : public MNESourceEstimate
+class INVSHARED_EXPORT InvCorSourceEstimate : public InvSourceEstimate
 {
 public:
 
@@ -82,7 +82,7 @@ public:
     /**
      * Default constructor
      */
-    MNECorSourceEstimate();
+    InvCorSourceEstimate();
 
     //=========================================================================================================
     /**
@@ -93,7 +93,7 @@ public:
      * @param[in] p_tmin.
      * @param[in] p_tstep.
      */
-    MNECorSourceEstimate(const Eigen::MatrixXd &p_sol, const Eigen::VectorXi &p_vertices, float p_tmin, float p_tstep);
+    InvCorSourceEstimate(const Eigen::MatrixXd &p_sol, const Eigen::VectorXi &p_vertices, float p_tmin, float p_tstep);
 
     //=========================================================================================================
     /**
@@ -101,7 +101,7 @@ public:
      *
      * @param[in] p_SourceEstimate    Source estimate data which should be copied.
      */
-    MNECorSourceEstimate(const MNECorSourceEstimate& p_SourceEstimate);
+    InvCorSourceEstimate(const InvCorSourceEstimate& p_SourceEstimate);
 
     //=========================================================================================================
     /**
@@ -110,7 +110,7 @@ public:
      * @param[in] p_IODevice     IO device to read from the source estimation.
      *
      */
-    MNECorSourceEstimate(QIODevice &p_IODevice);
+    InvCorSourceEstimate(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
@@ -129,7 +129,7 @@ public:
      *
      * @return true if successful, false otherwise.
      */
-    static bool read(QIODevice &p_IODevice, MNECorSourceEstimate& p_stc);
+    static bool read(QIODevice &p_IODevice, InvCorSourceEstimate& p_stc);
 
     //=========================================================================================================
     /**
@@ -149,7 +149,7 @@ public:
      *
      * @return the copied source estimate.
      */
-    MNECorSourceEstimate& operator= (const MNECorSourceEstimate &rhs);
+    InvCorSourceEstimate& operator= (const InvCorSourceEstimate &rhs);
 
 private:
     Eigen::SparseMatrix<float> m_matCorrelations;  /**< Upper triangular matrix of shape [n_dipoles x n_dipoles] which contains the dipole correlations. */
@@ -160,4 +160,4 @@ private:
 //=============================================================================================================
 } //NAMESPACE
 
-#endif // MNECORSOURCEESTIMATE_H
+#endif // INV_COR_SOURCE_ESTIMATE_H

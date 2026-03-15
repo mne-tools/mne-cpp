@@ -483,10 +483,10 @@ int main(int argc, char *argv[])
     //
     // Compute inverse solution
     //
-    PwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
+    InvPwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
 
 #ifdef BENCHMARK
-    MNESourceEstimate sourceEstimate;
+    InvSourceEstimate sourceEstimate;
     QList<qint64> qVecElapsedTime;
     for(qint32 i = 0; i < 100; ++i)
     {
@@ -523,7 +523,7 @@ int main(int argc, char *argv[])
         t_pwlRapMusic.setStcAttr(iWinSize, 0.6f);
     }
 
-    MNESourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
+    InvSourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
 
     if(doMovie) {
         //Select only the activations once
@@ -570,7 +570,7 @@ int main(int argc, char *argv[])
 
     // Write source estimate to temp files for visualization
     int nVertLh = t_clusteredFwd.src[0].nuse;
-    MNESourceEstimate stcLh, stcRh;
+    InvSourceEstimate stcLh, stcRh;
     stcLh.data = sourceEstimate.data.topRows(nVertLh);
     stcLh.vertices = sourceEstimate.vertices.head(nVertLh);
     stcLh.tmin = sourceEstimate.tmin;

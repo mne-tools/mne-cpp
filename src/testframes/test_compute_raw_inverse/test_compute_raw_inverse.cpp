@@ -124,8 +124,8 @@ private:
     bool m_bDataAvailable;         /**< Whether test data was found. */
 
     // Shared results for multi-test use
-    MNEInverseOperator m_invOp;    /**< Inverse operator. */
-    MNESourceEstimate m_stcDSPM;   /**< dSPM result for reuse. */
+    InvInverseOperator m_invOp;    /**< Inverse operator. */
+    InvSourceEstimate m_stcDSPM;   /**< dSPM result for reuse. */
 
     static const float s_fSNR;
     static const float s_fLambda2;
@@ -253,7 +253,7 @@ void TestComputeRawInverse::initTestCase()
 
     // Read the inverse operator once for reuse
     QFile invFile(m_sInvFile);
-    m_invOp = MNEInverseOperator(invFile);
+    m_invOp = InvInverseOperator(invFile);
     QVERIFY2(m_invOp.eigen_leads->data.size() > 0, "Failed to read inverse operator");
     printf("  Inverse operator: %d channels, %d sources\n", m_invOp.nchan, m_invOp.nsource);
 }
@@ -281,7 +281,7 @@ void TestComputeRawInverse::testInverseDSPM()
     int nave = evoked.nave;
 
     // Compute dSPM inverse
-    MinimumNorm minimumNorm(m_invOp, s_fLambda2, QString("dSPM"));
+    InvMinimumNorm minimumNorm(m_invOp, s_fLambda2, QString("dSPM"));
     minimumNorm.doInverseSetup(nave, false);
     m_stcDSPM = minimumNorm.calculateInverse(pickedEvoked.data, tmin, tstep, false);
 
@@ -366,9 +366,9 @@ void TestComputeRawInverse::testInverseSLORETA()
     float tmin = pickedEvoked.times(0);
     float tstep = 1.0f / pickedEvoked.info.sfreq;
 
-    MinimumNorm minimumNorm(m_invOp, s_fLambda2, QString("sLORETA"));
+    InvMinimumNorm minimumNorm(m_invOp, s_fLambda2, QString("sLORETA"));
     minimumNorm.doInverseSetup(evoked.nave, false);
-    MNESourceEstimate stc = minimumNorm.calculateInverse(pickedEvoked.data, tmin, tstep, false);
+    InvSourceEstimate stc = minimumNorm.calculateInverse(pickedEvoked.data, tmin, tstep, false);
 
     QVERIFY2(!stc.isEmpty(), "sLORETA inverse returned empty result");
     QCOMPARE((int)stc.data.rows(), m_invOp.nsource);
@@ -401,9 +401,9 @@ void TestComputeRawInverse::testInverseMNE()
     float tmin = pickedEvoked.times(0);
     float tstep = 1.0f / pickedEvoked.info.sfreq;
 
-    MinimumNorm minimumNorm(m_invOp, s_fLambda2, QString("MNE"));
+    InvMinimumNorm minimumNorm(m_invOp, s_fLambda2, QString("MNE"));
     minimumNorm.doInverseSetup(evoked.nave, false);
-    MNESourceEstimate stc = minimumNorm.calculateInverse(pickedEvoked.data, tmin, tstep, false);
+    InvSourceEstimate stc = minimumNorm.calculateInverse(pickedEvoked.data, tmin, tstep, false);
 
     QVERIFY2(!stc.isEmpty(), "MNE inverse returned empty result");
     QCOMPARE((int)stc.data.rows(), m_invOp.nsource);
@@ -534,9 +534,9 @@ void TestComputeRawInverse::testBaselineAppliedWhenRequested()
     float tmin = pickedEvoked.times(0);
     float tstep = 1.0f / pickedEvoked.info.sfreq;
 
-    MinimumNorm minimumNorm(m_invOp, s_fLambda2, QString("dSPM"));
+    InvMinimumNorm minimumNorm(m_invOp, s_fLambda2, QString("dSPM"));
     minimumNorm.doInverseSetup(evoked.nave, false);
-    MNESourceEstimate stc = minimumNorm.calculateInverse(pickedEvoked.data, tmin, tstep, false);
+    InvSourceEstimate stc = minimumNorm.calculateInverse(pickedEvoked.data, tmin, tstep, false);
 
     QVERIFY2(!stc.isEmpty(), "Inverse with baseline failed");
     QVERIFY2(stc.data.allFinite(), "Inverse with baseline contains NaN/Inf");
@@ -571,10 +571,10 @@ void TestComputeRawInverse::testStcWriteReadRoundtrip()
     printf("  Written STC file: %lld bytes\n", fi.size());
 
     // Read it back
-    MNESourceEstimate stcRead;
+    InvSourceEstimate stcRead;
     {
         QFile stcFile(stcPath);
-        QVERIFY2(MNESourceEstimate::read(stcFile, stcRead), "Failed to read STC file");
+        QVERIFY2(InvSourceEstimate::read(stcFile, stcRead), "Failed to read STC file");
     }
 
     // Compare metadata
@@ -676,9 +676,9 @@ void TestComputeRawInverse::testLabelRestrictedInverse()
     float tstep = 1.0f / pickedEvoked.info.sfreq;
 
     // Compute full inverse
-    MinimumNorm minimumNorm(m_invOp, s_fLambda2, QString("dSPM"));
+    InvMinimumNorm minimumNorm(m_invOp, s_fLambda2, QString("dSPM"));
     minimumNorm.doInverseSetup(evoked.nave, false);
-    MNESourceEstimate stcFull = minimumNorm.calculateInverse(pickedEvoked.data, tmin, tstep, false);
+    InvSourceEstimate stcFull = minimumNorm.calculateInverse(pickedEvoked.data, tmin, tstep, false);
     QVERIFY2(!stcFull.isEmpty(), "Full inverse failed");
 
     // Extract label subset using getIndicesByLabel
@@ -749,7 +749,7 @@ void TestComputeRawInverse::testStcMatchesMnePython()
 
     // Write LH
     {
-        MNESourceEstimate stcLh(m_stcDSPM.data.topRows(nSrcLh),
+        InvSourceEstimate stcLh(m_stcDSPM.data.topRows(nSrcLh),
                                 m_stcDSPM.vertices.head(nSrcLh),
                                 m_stcDSPM.tmin, m_stcDSPM.tstep);
         QFile f(cppDir + "/result-lh.stc");
@@ -757,7 +757,7 @@ void TestComputeRawInverse::testStcMatchesMnePython()
     }
     // Write RH
     {
-        MNESourceEstimate stcRh(m_stcDSPM.data.bottomRows(nSrcRh),
+        InvSourceEstimate stcRh(m_stcDSPM.data.bottomRows(nSrcRh),
                                 m_stcDSPM.vertices.tail(nSrcRh),
                                 m_stcDSPM.tmin, m_stcDSPM.tstep);
         QFile f(cppDir + "/result-rh.stc");
@@ -785,25 +785,25 @@ void TestComputeRawInverse::testStcMatchesMnePython()
 
     // --- 5. Read both sets of STCs ---
     // Read C++ STCs
-    MNESourceEstimate cppLh, cppRh;
+    InvSourceEstimate cppLh, cppRh;
     {
         QFile f(cppDir + "/result-lh.stc");
-        QVERIFY2(MNESourceEstimate::read(f, cppLh), "Failed to read C++ LH STC");
+        QVERIFY2(InvSourceEstimate::read(f, cppLh), "Failed to read C++ LH STC");
     }
     {
         QFile f(cppDir + "/result-rh.stc");
-        QVERIFY2(MNESourceEstimate::read(f, cppRh), "Failed to read C++ RH STC");
+        QVERIFY2(InvSourceEstimate::read(f, cppRh), "Failed to read C++ RH STC");
     }
 
     // Read Python reference STCs
-    MNESourceEstimate pyLh, pyRh;
+    InvSourceEstimate pyLh, pyRh;
     {
         QFile f(pyDir + "/ref-lh.stc");
-        QVERIFY2(MNESourceEstimate::read(f, pyLh), "Failed to read Python LH STC");
+        QVERIFY2(InvSourceEstimate::read(f, pyLh), "Failed to read Python LH STC");
     }
     {
         QFile f(pyDir + "/ref-rh.stc");
-        QVERIFY2(MNESourceEstimate::read(f, pyRh), "Failed to read Python RH STC");
+        QVERIFY2(InvSourceEstimate::read(f, pyRh), "Failed to read Python RH STC");
     }
 
     // --- 6. Compare LH hemisphere ---

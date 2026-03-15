@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     dipole_fit.h
+ * @file     inv_dipole_fit.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -34,8 +34,8 @@
  *
  */
 
-#ifndef DIPOLEFIT_H
-#define DIPOLEFIT_H
+#ifndef INV_DIPOLE_FIT_H
+#define INV_DIPOLE_FIT_H
 
 //=============================================================================================================
 // INCLUDES
@@ -66,9 +66,9 @@ namespace INVLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-//class DipoleFitData;
-//class GuessData;
-//class MNEMeasData
+//class InvDipoleFitData;
+//class InvGuessData;
+//class InvMeasData
 
 //=============================================================================================================
 /**
@@ -76,22 +76,22 @@ namespace INVLIB
  *
  * @brief Dipole Fit implementation
  */
-class INVSHARED_EXPORT DipoleFit
+class INVSHARED_EXPORT InvDipoleFit
 {
 public:
-    typedef QSharedPointer<DipoleFit> SPtr;             /**< Shared pointer type for DipoleFit. */
-    typedef QSharedPointer<const DipoleFit> ConstSPtr;  /**< Const shared pointer type for DipoleFit. */
+    typedef QSharedPointer<InvDipoleFit> SPtr;             /**< Shared pointer type for InvDipoleFit. */
+    typedef QSharedPointer<const InvDipoleFit> ConstSPtr;  /**< Const shared pointer type for InvDipoleFit. */
 
     //=========================================================================================================
     /**
      * Constructs Dipole Fit algorithm
      */
-    explicit DipoleFit(DipoleFitSettings* p_settings);
+    explicit InvDipoleFit(InvDipoleFitSettings* p_settings);
 
-    virtual ~DipoleFit(){}
+    virtual ~InvDipoleFit(){}
 
     //ToDo split this function into init (with settings as parameter) and the actual fit function
-    ECDSet calculateFit() const;
+    InvEcdSet calculateFit() const;
 //    virtual const char* getName() const;
 
 public:
@@ -111,11 +111,11 @@ public:
      * @param[in] tstep      Time step to use.
      * @param[in] integ      Integration time.
      * @param[in] verbose    Verbose output?.
-     * @param[out] p_set     the fitted ECD Set.
+     * @param[out] p_set     the fitted InvEcdSet.
      *
      * @return true when successful.
      */
-    static int fit_dipoles( const QString& dataname, INVLIB::MNEMeasData* data, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
+    static int fit_dipoles( const QString& dataname, INVLIB::InvMeasData* data, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, InvEcdSet& p_set);
 
     //=========================================================================================================
     /**
@@ -137,7 +137,7 @@ public:
      *
      * @return true when successful.
      */
-    static int fit_dipoles_raw(const QString& dataname, MNELIB::MNERawData* raw, MNELIB::mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
+    static int fit_dipoles_raw(const QString& dataname, MNELIB::MNERawData* raw, MNELIB::mneChSelection sel, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, InvEcdSet& p_set);
 
     //=========================================================================================================
     /**
@@ -158,10 +158,10 @@ public:
      *
      * @return true when successful.
      */
-    static int fit_dipoles_raw(const QString& dataname, MNELIB::MNERawData* raw, MNELIB::mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose);
+    static int fit_dipoles_raw(const QString& dataname, MNELIB::MNERawData* raw, MNELIB::mneChSelection sel, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose);
 
 private:
-    DipoleFitSettings* settings;
+    InvDipoleFitSettings* settings;
 };
 
 //=============================================================================================================
@@ -169,4 +169,4 @@ private:
 //=============================================================================================================
 } //NAMESPACE
 
-#endif // DIPOLEFIT_H
+#endif // INV_DIPOLE_FIT_H

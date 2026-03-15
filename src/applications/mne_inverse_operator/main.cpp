@@ -558,7 +558,7 @@ int main(int argc, char *argv[])
     }
     printf("\n");
 
-    MNEInverseOperator invOp(info, forward, noiseCov, loose, depth, useFixed, true);
+    InvInverseOperator invOp(info, forward, noiseCov, loose, depth, useFixed, true);
 
     if (invOp.nsource <= 0) {
         qCritical() << "Error: Failed to assemble inverse operator.";

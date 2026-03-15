@@ -177,7 +177,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             }
         }
     } else if(RealTimeSourceEstimate::SPtr pRTSE = qSharedPointerDynamicCast<RealTimeSourceEstimate>(pMeasurement)) {
-        QList<MNESourceEstimate::SPtr> lMNEData = pRTSE->getValue();
+        QList<InvSourceEstimate::SPtr> lMNEData = pRTSE->getValue();
 
         // Add source estimate data via BrainView's realtime streaming
         if(!lMNEData.isEmpty()) {
@@ -197,8 +197,8 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 m_mriHeadTrans = pRTSE->getMriHeadTrans();
             } else {
                 if(m_bRtSourceActive) {
-                    // Extract data column from MNESourceEstimate
-                    const MNESourceEstimate &stc = *lMNEData.first();
+                    // Extract data column from InvSourceEstimate
+                    const InvSourceEstimate &stc = *lMNEData.first();
                     if(stc.data.cols() > 0) {
                         m_p3DView->pushRealtimeSourceData(stc.data.col(0));
                     }

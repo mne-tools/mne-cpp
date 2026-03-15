@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    HPIFit class defintion.
+ * @brief    InvHpiFit class defintion.
  *
  */
 
@@ -90,16 +90,16 @@ using namespace FWDLIB;
 
 //=============================================================================================================
 
-HPIFit::HPIFit(const SensorSet& sensorSet)
+InvHpiFit::InvHpiFit(const InvSensorSet& sensorSet)
     : m_sensors(sensorSet),
-      m_signalModel(SignalModel())
+      m_signalModel(InvSignalModel())
 {
 
 }
 
 //=============================================================================================================
 
-void HPIFit::checkForUpdate(const SensorSet &sensorSet)
+void InvHpiFit::checkForUpdate(const InvSensorSet &sensorSet)
 {
     if(m_sensors != sensorSet) {
         m_sensors = sensorSet;
@@ -108,9 +108,9 @@ void HPIFit::checkForUpdate(const SensorSet &sensorSet)
 
 //=============================================================================================================
 
-void HPIFit::fit(const MatrixXd& matProjectedData,
+void InvHpiFit::fit(const MatrixXd& matProjectedData,
                  const MatrixXd& matProjectors,
-                 const HpiModelParameters& hpiModelParameters,
+                 const InvHpiModelParameters& hpiModelParameters,
                  const MatrixXd& matCoilsHead,
                  HpiFitResult& hpiFitResult)
 {
@@ -119,24 +119,24 @@ void HPIFit::fit(const MatrixXd& matProjectedData,
 
 //=============================================================================================================
 
-void HPIFit::fit(const MatrixXd& matProjectedData,
+void InvHpiFit::fit(const MatrixXd& matProjectedData,
                  const MatrixXd& matProjectors,
-                 const HpiModelParameters& hpiModelParameters,
+                 const InvHpiModelParameters& hpiModelParameters,
                  const MatrixXd& matCoilsHead,
                  const bool bOrderFrequencies,
                  HpiFitResult& hpiFitResult)
 {
     if(matProjectedData.rows() != matProjectors.rows()) {
-        std::cout<< "HPIFit::fit - Projector and data dimensions do not match. Returning."<<std::endl;
+        std::cout<< "InvHpiFit::fit - Projector and data dimensions do not match. Returning."<<std::endl;
         return;
     } else if(hpiModelParameters.iNHpiCoils()!= matCoilsHead.rows()) {
-        std::cout<< "HPIFit::fit - Number of coils and hpi digitizers do not match. Returning."<<std::endl;
+        std::cout<< "InvHpiFit::fit - Number of coils and hpi digitizers do not match. Returning."<<std::endl;
         return;
     } else if(matProjectedData.rows()==0 || matProjectors.rows()==0) {
-        std::cout<< "HPIFit::fit - No data or Projectors passed. Returning."<<std::endl;
+        std::cout<< "InvHpiFit::fit - No data or Projectors passed. Returning."<<std::endl;
         return;
     } else if(m_sensors.ncoils() != matProjectedData.rows()) {
-        std::cout<< "HPIFit::fit - Number of channels in sensors and data do not match. Returning."<<std::endl;
+        std::cout<< "InvHpiFit::fit - Number of channels in sensors and data do not match. Returning."<<std::endl;
         return;
     }
 
@@ -178,8 +178,8 @@ void HPIFit::fit(const MatrixXd& matProjectedData,
 
 //=============================================================================================================
 
-Eigen::MatrixXd HPIFit::computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
-                                          const HpiModelParameters& hpiModelParameters)
+Eigen::MatrixXd InvHpiFit::computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
+                                          const InvHpiModelParameters& hpiModelParameters)
 {
     // fit model
     MatrixXd matTopo = m_signalModel.fitData(hpiModelParameters,matProjectedData);
@@ -210,7 +210,7 @@ Eigen::MatrixXd HPIFit::computeAmplitudes(const Eigen::MatrixXd& matProjectedDat
 
 //=============================================================================================================
 
-Eigen::MatrixXd HPIFit::computeSeedPoints(const Eigen::MatrixXd& matAmplitudes,
+Eigen::MatrixXd InvHpiFit::computeSeedPoints(const Eigen::MatrixXd& matAmplitudes,
                                           const FIFFLIB::FiffCoordTrans& transDevHead,
                                           const QVector<double>& vecError,
                                           const Eigen::MatrixXd& matCoilsHead)
@@ -250,8 +250,8 @@ Eigen::MatrixXd HPIFit::computeSeedPoints(const Eigen::MatrixXd& matAmplitudes,
 
 //=============================================================================================================
 
-CoilParam HPIFit::dipfit(const MatrixXd matCoilsSeed,
-                         const SensorSet& sensors,
+CoilParam InvHpiFit::dipfit(const MatrixXd matCoilsSeed,
+                         const InvSensorSet& sensors,
                          const MatrixXd& matData,
                          const int iNumCoils,
                          const MatrixXd& matProjectors,
@@ -260,10 +260,10 @@ CoilParam HPIFit::dipfit(const MatrixXd matCoilsSeed,
 {
     //Do this in conncurrent mode
     //Generate QList structure which can be handled by the QConcurrent framework
-    QList<HPIFitData> lCoilData;
+    QList<InvHpiFitData> lCoilData;
 
     for(qint32 i = 0; i < iNumCoils; ++i) {
-        HPIFitData coilData;
+        InvHpiFitData coilData;
         coilData.m_coilPos = matCoilsSeed.row(i);
         coilData.m_sensorData = matData.col(i);
         coilData.m_sensors = sensors;
@@ -284,7 +284,7 @@ CoilParam HPIFit::dipfit(const MatrixXd matCoilsSeed,
 
         //Do concurrent
         QFuture<void> future = QtConcurrent::map(lCoilData,
-                                                 &HPIFitData::doDipfitConcurrent);
+                                                 &InvHpiFitData::doDipfitConcurrent);
         future.waitForFinished();
 
         //Transform results to final coil information
@@ -294,7 +294,7 @@ CoilParam HPIFit::dipfit(const MatrixXd matCoilsSeed,
             coil.dpfiterror(i) = lCoilData.at(i).m_errorInfo.error;
             coil.dpfitnumitr(i) = lCoilData.at(i).m_errorInfo.numIterations;
 
-            //std::cout<<std::endl<< "HPIFit::dipfit - Itr steps for coil " << i << " =" <<coil.dpfitnumitr(i);
+            //std::cout<<std::endl<< "InvHpiFit::dipfit - Itr steps for coil " << i << " =" <<coil.dpfitnumitr(i);
         }
     }
     return coil;
@@ -302,7 +302,7 @@ CoilParam HPIFit::dipfit(const MatrixXd matCoilsSeed,
 
 //=============================================================================================================
 
-std::vector<int> HPIFit::findCoilOrder(const MatrixXd& matCoilsDev,
+std::vector<int> InvHpiFit::findCoilOrder(const MatrixXd& matCoilsDev,
                                        const MatrixXd& matCoilsHead)
 {
     // extract digitized and fitted coils
@@ -340,7 +340,7 @@ std::vector<int> HPIFit::findCoilOrder(const MatrixXd& matCoilsDev,
 
 //=============================================================================================================
 
-double HPIFit::objectTrans(const MatrixXd& matHeadCoil,
+double InvHpiFit::objectTrans(const MatrixXd& matHeadCoil,
                            const MatrixXd& matCoil,
                            const MatrixXd& matTrans)
 {
@@ -368,7 +368,7 @@ double HPIFit::objectTrans(const MatrixXd& matHeadCoil,
 
 //=============================================================================================================
 
-Eigen::MatrixXd HPIFit::order(const std::vector<int>& vecOrder,
+Eigen::MatrixXd InvHpiFit::order(const std::vector<int>& vecOrder,
                               const Eigen::MatrixXd& matToOrder)
 {
     const int iNumCoils = vecOrder.size();
@@ -382,7 +382,7 @@ Eigen::MatrixXd HPIFit::order(const std::vector<int>& vecOrder,
 
 //=============================================================================================================
 
-QVector<int> HPIFit::order(const std::vector<int>& vecOrder,
+QVector<int> InvHpiFit::order(const std::vector<int>& vecOrder,
                            const QVector<int>& vecToOrder)
 {
     const int iNumCoils = vecOrder.size();
@@ -396,7 +396,7 @@ QVector<int> HPIFit::order(const std::vector<int>& vecOrder,
 
 //=============================================================================================================
 
-Eigen::VectorXd HPIFit::computeGoF(const Eigen::VectorXd& vecDipFitError)
+Eigen::VectorXd InvHpiFit::computeGoF(const Eigen::VectorXd& vecDipFitError)
 {
     VectorXd vecGoF(vecDipFitError.size());
     for(int i = 0; i < vecDipFitError.size(); ++i) {
@@ -407,7 +407,7 @@ Eigen::VectorXd HPIFit::computeGoF(const Eigen::VectorXd& vecDipFitError)
 
 //=============================================================================================================
 
-FIFFLIB::FiffCoordTrans HPIFit::computeDeviceHeadTransformation(const Eigen::MatrixXd& matCoilsDev,
+FIFFLIB::FiffCoordTrans InvHpiFit::computeDeviceHeadTransformation(const Eigen::MatrixXd& matCoilsDev,
                                                                 const Eigen::MatrixXd& matCoilsHead)
 {
     const MatrixXd matTrans = computeTransformation(matCoilsHead,matCoilsDev);
@@ -416,7 +416,7 @@ FIFFLIB::FiffCoordTrans HPIFit::computeDeviceHeadTransformation(const Eigen::Mat
 
 //=============================================================================================================
 
-Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd matNH, MatrixXd matBT)
+Eigen::Matrix4d InvHpiFit::computeTransformation(Eigen::MatrixXd matNH, MatrixXd matBT)
 {
     MatrixXd matXdiff, matYdiff, matZdiff, matC, matQ;
     Matrix4d matTransFinal = Matrix4d::Identity(4,4);
@@ -484,7 +484,7 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd matNH, MatrixXd ma
 
 //=============================================================================================================
 
-QVector<double> HPIFit::computeEstimationError(const Eigen::MatrixXd& matCoilsDev,
+QVector<double> InvHpiFit::computeEstimationError(const Eigen::MatrixXd& matCoilsDev,
                                                const Eigen::MatrixXd& matCoilsHead,
                                                const FIFFLIB::FiffCoordTrans& transDevHead)
 {
@@ -504,7 +504,7 @@ QVector<double> HPIFit::computeEstimationError(const Eigen::MatrixXd& matCoilsDe
 
 //=============================================================================================================
 
-FIFFLIB::FiffDigPointSet HPIFit::getFittedPointSet(const Eigen::MatrixXd& matCoilsDev)
+FIFFLIB::FiffDigPointSet InvHpiFit::getFittedPointSet(const Eigen::MatrixXd& matCoilsDev)
 {
     FiffDigPointSet fittedPointSet;
     const int iNumCoils = matCoilsDev.rows();
@@ -524,7 +524,7 @@ FIFFLIB::FiffDigPointSet HPIFit::getFittedPointSet(const Eigen::MatrixXd& matCoi
 
 //=============================================================================================================
 
-void HPIFit::storeHeadPosition(float fTime,
+void InvHpiFit::storeHeadPosition(float fTime,
                                const Eigen::MatrixXf& transDevHead,
                                Eigen::MatrixXd& matPosition,
                                const Eigen::VectorXd& vecGoF,

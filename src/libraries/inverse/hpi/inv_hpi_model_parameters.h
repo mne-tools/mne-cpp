@@ -28,12 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     HpiModelParameters class declaration.
+ * @brief     InvHpiModelParameters class declaration.
  *
  */
 
-#ifndef HPILIBE_HPIMODELPARAMETERS_H
-#define HPILIBE_HPIMODELPARAMETERS_H
+#ifndef INV_HPI_MODEL_PARAMETERS_H
+#define INV_HPI_MODEL_PARAMETERS_H
 
 //=============================================================================================================
 // INCLUDES
@@ -72,28 +72,28 @@ namespace INVLIB {
  *
  * @brief Configuration parameters for the HPI signal model (line frequency, coil frequencies, sample rate, buffer size)
  */
-class INVSHARED_EXPORT HpiModelParameters
+class INVSHARED_EXPORT InvHpiModelParameters
 {
 public:
-    typedef QSharedPointer<HpiModelParameters> SPtr;            /**< Shared pointer type for HpiModelParameters. */
-    typedef QSharedPointer<const HpiModelParameters> ConstSPtr; /**< Const shared pointer type for HpiModelParameters. */
+    typedef QSharedPointer<InvHpiModelParameters> SPtr;            /**< Shared pointer type for InvHpiModelParameters. */
+    typedef QSharedPointer<const InvHpiModelParameters> ConstSPtr; /**< Const shared pointer type for InvHpiModelParameters. */
 
     //=========================================================================================================
     /**
     * Defaul Constructor.
     */
-    HpiModelParameters() = default;
+    InvHpiModelParameters() = default;
 
     //=========================================================================================================
     /**
-    * Constructs a HpiModelParameters object.
+    * Constructs a InvHpiModelParameters object.
     *
     * @param[in] vecHpiFreqs     The Hpi frequencies.
     * @param[in] iSampleFreq     The sampling frequency.
     * @param[in] iLineFreq       The line Frequency
     * @param[in] bBasic          Create a basic model without line frequeny or not.
     */
-    explicit HpiModelParameters(const QVector<int> vecHpiFreqs,
+    explicit InvHpiModelParameters(const QVector<int> vecHpiFreqs,
                                 const int iSampleFreq,
                                 const int iLineFreq,
                                 const bool bBasic);
@@ -102,15 +102,15 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] hpiModelParameter   HpiModelParameters which should be copied.
+     * @param[in] hpiModelParameter   InvHpiModelParameters which should be copied.
      */
-    HpiModelParameters(const HpiModelParameters &hpiModelParameter);
+    InvHpiModelParameters(const InvHpiModelParameters &hpiModelParameter);
 
     //=========================================================================================================
 
-    HpiModelParameters operator= (const HpiModelParameters& other);
-    inline bool operator== (const HpiModelParameters &b) const;
-    inline bool operator!= (const HpiModelParameters &b) const;
+    InvHpiModelParameters operator= (const InvHpiModelParameters& other);
+    inline bool operator== (const InvHpiModelParameters &b) const;
+    inline bool operator!= (const InvHpiModelParameters &b) const;
 
     //=========================================================================================================
     /**
@@ -147,42 +147,42 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline QVector<int> HpiModelParameters::vecHpiFreqs() const
+inline QVector<int> InvHpiModelParameters::vecHpiFreqs() const
 {
     return m_vecHpiFreqs;
 }
 
 //=============================================================================================================
 
-inline int HpiModelParameters::iNHpiCoils() const
+inline int InvHpiModelParameters::iNHpiCoils() const
 {
     return m_iNHpiCoils;
 }
 
 //=============================================================================================================
 
-inline int HpiModelParameters::iSampleFreq() const
+inline int InvHpiModelParameters::iSampleFreq() const
 {
     return m_iSampleFreq;
 }
 
 //=============================================================================================================
 
-inline int HpiModelParameters::iLineFreq() const
+inline int InvHpiModelParameters::iLineFreq() const
 {
     return m_iLineFreq;
 }
 
 //=============================================================================================================
 
-inline bool HpiModelParameters::bBasic() const
+inline bool InvHpiModelParameters::bBasic() const
 {
     return m_bBasic;
 }
 
 //=============================================================================================================
 
-inline bool HpiModelParameters::operator== (const HpiModelParameters &b) const
+inline bool InvHpiModelParameters::operator== (const InvHpiModelParameters &b) const
 {
     return (this->vecHpiFreqs() == b.vecHpiFreqs() &&
             this->iNHpiCoils() == b.iNHpiCoils() &&
@@ -193,12 +193,12 @@ inline bool HpiModelParameters::operator== (const HpiModelParameters &b) const
 
 //=============================================================================================================
 
-inline bool HpiModelParameters::operator!= (const HpiModelParameters &b) const
+inline bool InvHpiModelParameters::operator!= (const InvHpiModelParameters &b) const
 {
     return !(*this==b);
 }
 
 } // namespace INVLIBE
 
-#endif // HPILIBE_HPIMODELPARAMETERS_H
+#endif // INV_HPI_MODEL_PARAMETERS_H
 

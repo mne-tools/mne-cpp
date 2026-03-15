@@ -112,9 +112,9 @@ void TestSignalModel::initTestCase()
 
 void TestSignalModel::testFitData_emptyHpiFres()
 {
-    HpiModelParameters hpiModelParameters;
+    InvHpiModelParameters hpiModelParameters;
 
-    SignalModel signalModel = SignalModel();
+    InvSignalModel signalModel = InvSignalModel();
     MatrixXd matSimData = MatrixXd::Identity(10,10);
 
     MatrixXd matAmpActual = signalModel.fitData(hpiModelParameters,matSimData);
@@ -131,9 +131,9 @@ void TestSignalModel::testFitData_emptyHpiFres()
 void TestSignalModel::testFitData_emptySFreq()
 {
     QVector<int> vecHpiFreqs = {1,2,3,4};
-    HpiModelParameters hpiModelParameters(vecHpiFreqs,0,0,true);
+    InvHpiModelParameters hpiModelParameters(vecHpiFreqs,0,0,true);
 
-    SignalModel signalModel = SignalModel();
+    InvSignalModel signalModel = InvSignalModel();
     MatrixXd matSimData = MatrixXd::Identity(10,10);
 
     MatrixXd matAmpActual = signalModel.fitData(hpiModelParameters,matSimData);
@@ -154,11 +154,11 @@ void TestSignalModel::testFitData_basic_4coils()
     int iLineFreq = 60;
     QVector<int> vecHpiFreqs = {154,158,161,166};
     bool bBasic = true;
-    HpiModelParameters hpiModelParameters(vecHpiFreqs,
+    InvHpiModelParameters hpiModelParameters(vecHpiFreqs,
                                           iSampleFreq,
                                           iLineFreq,
                                           bBasic);
-    SignalModel signalModel = SignalModel();
+    InvSignalModel signalModel = InvSignalModel();
 
     int iNumCoils = hpiModelParameters.iNHpiCoils();
     int iSamLoc = 200;
@@ -207,11 +207,11 @@ void TestSignalModel::testFitData_basic_5coils()
     int iLineFreq = 60;
     QVector<int> vecHpiFreqs = {154,158,161,166,172};
     bool bBasic = true;
-    HpiModelParameters hpiModelParameters(vecHpiFreqs,
+    InvHpiModelParameters hpiModelParameters(vecHpiFreqs,
                                           iSampleFreq,
                                           iLineFreq,
                                           bBasic);
-    SignalModel signalModel = SignalModel();
+    InvSignalModel signalModel = InvSignalModel();
 
     int iNumCoils = hpiModelParameters.iNHpiCoils();
     int iSamLoc = 200;
@@ -262,12 +262,12 @@ void TestSignalModel::testFitData_advanced_4coils()
     int iLineFreq = 60;
     QVector<int> vecHpiFreqs = {154,158,161,166};
     bool bBasic = false;
-    HpiModelParameters hpiModelParameters(vecHpiFreqs,
+    InvHpiModelParameters hpiModelParameters(vecHpiFreqs,
                                           iSampleFreq,
                                           iLineFreq,
                                           bBasic);
 
-    SignalModel signalModel = SignalModel();
+    InvSignalModel signalModel = InvSignalModel();
 
     int iNumCoils = hpiModelParameters.iNHpiCoils();
     int iSamLoc = 200;
@@ -322,11 +322,11 @@ void TestSignalModel::testFitData_advanced_5coils()
     int iLineFreq = 60;
     QVector<int> vecHpiFreqs = {154,158,161,166,172};
     bool bBasic = false;
-    HpiModelParameters hpiModelParameters(vecHpiFreqs,
+    InvHpiModelParameters hpiModelParameters(vecHpiFreqs,
                                          iSampleFreq,
                                          iLineFreq,
                                          bBasic);
-    SignalModel signalModel = SignalModel();
+    InvSignalModel signalModel = InvSignalModel();
 
     int iNumCoils = hpiModelParameters.iNHpiCoils();
     int iSamLoc = 200;

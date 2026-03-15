@@ -1,1 +1,0 @@
-The gold function provide the CPU version of the algorithm.

@@ -119,8 +119,8 @@ private:
     /** Run the application with the given arguments. Returns exit code. */
     int runApp(const QStringList &args, QString &stdoutStr, int timeoutMs = 300000);
 
-    /** Read an STC file and return a MNESourceEstimate. */
-    static bool readStc(const QString &path, MNESourceEstimate &stc);
+    /** Read an STC file and return a InvSourceEstimate. */
+    static bool readStc(const QString &path, InvSourceEstimate &stc);
 
     /**
      * Discover the LH/RH STC file pair produced by an application run.
@@ -292,10 +292,10 @@ int TestMneComputeRawInverse::runApp(const QStringList &args, QString &stdoutStr
 
 //=============================================================================================================
 
-bool TestMneComputeRawInverse::readStc(const QString &path, MNESourceEstimate &stc)
+bool TestMneComputeRawInverse::readStc(const QString &path, InvSourceEstimate &stc)
 {
     QFile f(path);
-    return MNESourceEstimate::read(f, stc);
+    return InvSourceEstimate::read(f, stc);
 }
 
 //=============================================================================================================
@@ -379,7 +379,7 @@ void TestMneComputeRawInverse::testDSPM()
              qPrintable("STC pair not found for prefix: " + outBase));
 
     // Read and validate
-    MNESourceEstimate stcLh, stcRh;
+    InvSourceEstimate stcLh, stcRh;
     QVERIFY2(readStc(lhPath, stcLh), "Failed to read LH STC");
     QVERIFY2(readStc(rhPath, stcRh), "Failed to read RH STC");
 
@@ -439,7 +439,7 @@ void TestMneComputeRawInverse::testSLORETA()
     QVERIFY2(findStcPair(outBase, lhPath, rhPath),
              qPrintable("STC pair not found for prefix: " + outBase));
 
-    MNESourceEstimate stcLh, stcRh;
+    InvSourceEstimate stcLh, stcRh;
     QVERIFY2(readStc(lhPath, stcLh), "Failed to read LH STC");
     QVERIFY2(readStc(rhPath, stcRh), "Failed to read RH STC");
 
@@ -485,7 +485,7 @@ void TestMneComputeRawInverse::testMNE()
     QVERIFY2(findStcPair(outBase, lhPath, rhPath),
              qPrintable("STC pair not found for prefix: " + outBase));
 
-    MNESourceEstimate stcLh, stcRh;
+    InvSourceEstimate stcLh, stcRh;
     QVERIFY2(readStc(lhPath, stcLh), "Failed to read LH STC");
     QVERIFY2(readStc(rhPath, stcRh), "Failed to read RH STC");
 
@@ -556,7 +556,7 @@ void TestMneComputeRawInverse::testWithBaseline()
     QVERIFY2(findStcPair(outBl, blLh, blRh),
              qPrintable("STC pair not found for: " + outBl));
 
-    MNESourceEstimate stcNobl, stcBl;
+    InvSourceEstimate stcNobl, stcBl;
     QVERIFY2(readStc(noblLh, stcNobl), "Failed to read no-baseline LH");
     QVERIFY2(readStc(blLh, stcBl), "Failed to read baseline LH");
 
@@ -702,7 +702,7 @@ void TestMneComputeRawInverse::testMatchesMnePython()
     }
 
     // --- 5. Read both sets of STCs ---
-    MNESourceEstimate cppLh, cppRh, pyLh, pyRh;
+    InvSourceEstimate cppLh, cppRh, pyLh, pyRh;
     QVERIFY2(readStc(cppLhPath, cppLh), "Failed to read C++ LH");
     QVERIFY2(readStc(cppRhPath, cppRh), "Failed to read C++ RH");
     QVERIFY2(readStc(pyDir + "/ref-lh.stc", pyLh), "Failed to read Python LH");

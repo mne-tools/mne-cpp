@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     dipole_forward.h
+ * @file     inv_dipole_forward.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    DipoleForward class declaration.
+ * @brief    InvDipoleForward class declaration.
  *
  */
 
-#ifndef DIPOLEFORWARD_H
-#define DIPOLEFORWARD_H
+#ifndef INV_DIPOLE_FORWARD_H
+#define INV_DIPOLE_FORWARD_H
 
 //=============================================================================================================
 // INCLUDES
@@ -65,37 +65,37 @@ namespace INVLIB
 
 //=============================================================================================================
 /**
- * Implements DipoleForward (Replaces *dipoleForward,dipoleForwardRec struct of MNE-C fit_types.h).
+ * Implements InvDipoleForward (Replaces *dipoleForward,dipoleForwardRec struct of MNE-C fit_types.h).
  *
  * @brief Stores forward field matrices and source space data for magnetic dipole fitting.
  */
-class INVSHARED_EXPORT DipoleForward
+class INVSHARED_EXPORT InvDipoleForward
 {
 public:
-    typedef QSharedPointer<DipoleForward> SPtr;              /**< Shared pointer type for DipoleForward. */
-    typedef QSharedPointer<const DipoleForward> ConstSPtr;   /**< Const shared pointer type for DipoleForward. */
+    typedef QSharedPointer<InvDipoleForward> SPtr;              /**< Shared pointer type for InvDipoleForward. */
+    typedef QSharedPointer<const InvDipoleForward> ConstSPtr;   /**< Const shared pointer type for InvDipoleForward. */
 
     //=========================================================================================================
     /**
-     * Constructs the Dipole Forward
+     * Constructs the InvDipole Forward
      * Refactored: new_dipole_forward (dipole_forward.c)
      */
-    DipoleForward();
+    InvDipoleForward();
 
 //    //=========================================================================================================
 //    /**
 //    * Copy constructor.
 //    *
-//    * @param[in] p_DipoleForward    DipoleForward which should be copied
+//    * @param[in] p_DipoleForward    InvDipoleForward which should be copied
 //    */
-//    DipoleForward(const DipoleForward& p_DipoleForward);
+//    InvDipoleForward(const InvDipoleForward& p_DipoleForward);
 
     //=========================================================================================================
     /**
-     * Destroys the Dipole Forward description
+     * Destroys the InvDipole Forward description
      * Refactored: free_dipole_forward_2 (dipole_fit_setup.c)
      */
-    ~DipoleForward();
+    ~InvDipoleForward();
 
 public:
     float **rd;         /**< Dipole locations. */
@@ -113,4 +113,4 @@ public:
 //=============================================================================================================
 } // NAMESPACE INVLIB
 
-#endif // DIPOLEFORWARD_H
+#endif // INV_DIPOLE_FORWARD_H

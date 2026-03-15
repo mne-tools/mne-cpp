@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     Test the HpiModelParameters class.
+ * @brief     Test the InvHpiModelParameters class.
  *
  */
 
@@ -113,7 +113,7 @@ void TestHpiModelParameters::testDefaultConsturctor()
     int iExpectedNHpiCoils = 0;
     bool bExpectedBasic = true;
 
-    HpiModelParameters actualHpiModelParameters;
+    InvHpiModelParameters actualHpiModelParameters;
     QVERIFY2(actualHpiModelParameters.vecHpiFreqs() == vecExpectedHpiFreqs,"HPI frequencies do not match.");
     QVERIFY2(actualHpiModelParameters.iNHpiCoils() == iExpectedNHpiCoils,"Number of coils does not match.");
     QVERIFY2(actualHpiModelParameters.iSampleFreq() == iExpectedSampleFreq,"Sampling frequency does not match.");
@@ -131,7 +131,7 @@ void TestHpiModelParameters::testConstructor()
     QVector<int> vecExpectedHpiFreqs = {1,2};
     bool bExpectedBasic = false;
 
-    HpiModelParameters actualHpiModelParameters(vecExpectedHpiFreqs,
+    InvHpiModelParameters actualHpiModelParameters(vecExpectedHpiFreqs,
                                                 iExpectedSampleFreq,
                                                 iExpectedLineFreq,
                                                 bExpectedBasic);
@@ -153,7 +153,7 @@ void TestHpiModelParameters::testConstructor_basicModel()
     QVector<int> vecExpectedHpiFreqs = {1,2};
     bool bExpectedBasic = true;
 
-    HpiModelParameters actualHpiModelParameters(vecExpectedHpiFreqs,
+    InvHpiModelParameters actualHpiModelParameters(vecExpectedHpiFreqs,
                                                 iExpectedSampleFreq,
                                                 iExpectedLineFreq,
                                                 false);
@@ -174,12 +174,12 @@ void TestHpiModelParameters::testCopyConstructor()
     QVector<int> vecExpectedHpiFreqs = {1,2};
     bool bExpectedBasic = true;
 
-    HpiModelParameters expectedHpiModelParameters(vecExpectedHpiFreqs,
+    InvHpiModelParameters expectedHpiModelParameters(vecExpectedHpiFreqs,
                                                   iExpectedSampleFreq,
                                                   iExpectedLineFreq,
                                                   bExpectedBasic);
 
-    HpiModelParameters actualHpiModelParameters(expectedHpiModelParameters);
+    InvHpiModelParameters actualHpiModelParameters(expectedHpiModelParameters);
 
     QVERIFY(expectedHpiModelParameters == actualHpiModelParameters);
 }
@@ -193,12 +193,12 @@ void TestHpiModelParameters::testCopyAssignment()
     QVector<int> vecExpectedHpiFreqs = {1,2};
     bool bExpectedBasic = true;
 
-    HpiModelParameters expectedHpiModelParameters(vecExpectedHpiFreqs,
+    InvHpiModelParameters expectedHpiModelParameters(vecExpectedHpiFreqs,
                                                   iExpectedSampleFreq,
                                                   iExpectedLineFreq,
                                                   bExpectedBasic);
 
-    HpiModelParameters actualHpiModelParameters = expectedHpiModelParameters;
+    InvHpiModelParameters actualHpiModelParameters = expectedHpiModelParameters;
 
     QVERIFY(expectedHpiModelParameters == actualHpiModelParameters);
 }
@@ -212,12 +212,12 @@ void TestHpiModelParameters::testCompare_equal()
     QVector<int> vecExpectedHpiFreqs = {1,2};
     bool bExpectedBasic = true;
 
-    HpiModelParameters expectedHpiModelParameters(vecExpectedHpiFreqs,
+    InvHpiModelParameters expectedHpiModelParameters(vecExpectedHpiFreqs,
                                                   iExpectedSampleFreq,
                                                   iExpectedLineFreq,
                                                   bExpectedBasic);
 
-    HpiModelParameters actualHpiModelParameters = expectedHpiModelParameters;
+    InvHpiModelParameters actualHpiModelParameters = expectedHpiModelParameters;
 
     QVERIFY(expectedHpiModelParameters == actualHpiModelParameters);
 }
@@ -230,12 +230,12 @@ void TestHpiModelParameters::testCompare_notequal()
     int iExpectedLineFreq = 2;
     QVector<int> vecExpectedHpiFreqs = {1,2};
 
-    HpiModelParameters expectedHpiModelParameters(vecExpectedHpiFreqs,
+    InvHpiModelParameters expectedHpiModelParameters(vecExpectedHpiFreqs,
                                                   iExpectedSampleFreq,
                                                   iExpectedLineFreq,
                                                   true);
 
-    HpiModelParameters actualHpiModelParameters(vecExpectedHpiFreqs,
+    InvHpiModelParameters actualHpiModelParameters(vecExpectedHpiFreqs,
                                                 iExpectedSampleFreq,
                                                 iExpectedLineFreq,
                                                 false);

@@ -68,7 +68,7 @@ using namespace Eigen;
 /**
  * DECLARE CLASS TestSensorSet
  *
- * @brief The TestSensorSet class provides tests for SensorSet
+ * @brief The TestSensorSet class provides tests for InvSensorSet
  *
  */
 class TestSensorSet: public QObject
@@ -144,7 +144,7 @@ void TestSensorSet::testSensorSet_defaultConstructor()
     int iNW = 0;
 
     /// act
-    SensorSet sensorsActual = SensorSet();
+    InvSensorSet sensorsActual = InvSensorSet();
 
     /// assert
     QVERIFY2(iNp == sensorsActual.np(),"Number of integration points does not match.");
@@ -167,7 +167,7 @@ void TestSensorSet::testSensorSet_constructor_nullptr()
     int iNW = 0;
 
     /// act
-    SensorSet sensorsActual = SensorSet(nullptr);
+    InvSensorSet sensorsActual = InvSensorSet(nullptr);
 
     /// assert
     QVERIFY2(iNp == sensorsActual.np(),"Number of integration points does not match.");
@@ -192,7 +192,7 @@ void TestSensorSet::testSensorSet_constructor_accuracyLow()
     auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy)).release());
 
     /// act
-    SensorSet sensorsActual = SensorSet(pCoilMeg);
+    InvSensorSet sensorsActual = InvSensorSet(pCoilMeg);
 
     /// assert
     QVERIFY2(iNp == sensorsActual.np(),"Number of integration points does not match.");
@@ -218,7 +218,7 @@ void TestSensorSet::testSensorSet_constructor_accuracyMedium()
     auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), iAcc).release());
 
     /// act
-    SensorSet sensorsActual = SensorSet(pCoilMeg);
+    InvSensorSet sensorsActual = InvSensorSet(pCoilMeg);
 
     /// assert
     QVERIFY2(iNp == sensorsActual.np(),"Number of integration points does not match.");
@@ -243,7 +243,7 @@ void TestSensorSet::testSensorSet_constructor_accuracyHigh()
     auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy)).release());
 
     /// act
-    SensorSet sensorsActual = SensorSet(pCoilMeg);
+    InvSensorSet sensorsActual = InvSensorSet(pCoilMeg);
 
     /// assert
     QVERIFY2(iNp == sensorsActual.np(),"Number of integration points does not match.");
@@ -260,8 +260,8 @@ void TestSensorSet::testSensorSet_equal()
 {
     Accuracy accuracy = Accuracy::medium;
     auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy)).release());
-    SensorSet sensorsA = SensorSet(pCoilMeg);
-    SensorSet sensorsB = SensorSet(pCoilMeg);
+    InvSensorSet sensorsA = InvSensorSet(pCoilMeg);
+    InvSensorSet sensorsB = InvSensorSet(pCoilMeg);
     QVERIFY(sensorsA == sensorsB);
 }
 //=============================================================================================================
@@ -274,8 +274,8 @@ void TestSensorSet::testSensorSet_notequal()
     auto pCoilMeg1 = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy1)).release());
     auto pCoilMeg2 = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy2)).release());
 
-    SensorSet sensorsA = SensorSet(pCoilMeg1);
-    SensorSet sensorsB = SensorSet(pCoilMeg2);
+    InvSensorSet sensorsA = InvSensorSet(pCoilMeg1);
+    InvSensorSet sensorsB = InvSensorSet(pCoilMeg2);
     QVERIFY(sensorsA != sensorsB);
 }
 
@@ -284,12 +284,12 @@ void TestSensorSet::testSensorSet_notequal()
 void TestSensorSet::testSensorSetCreator_channelList_empty()
 {
     // act
-    SensorSetCreator sensorSetCreator;
+    InvSensorSetCreator sensorSetCreator;
     QList<FIFFLIB::FiffChInfo> lChannels;
     Accuracy accuracy = Accuracy::medium;
 
-    SensorSet sensorsActual = sensorSetCreator.updateSensorSet(lChannels,accuracy);
-    SensorSet sensorsExpected = SensorSet();
+    InvSensorSet sensorsActual = sensorSetCreator.updateSensorSet(lChannels,accuracy);
+    InvSensorSet sensorsExpected = InvSensorSet();
 
     // assert
     QVERIFY(sensorsActual==sensorsExpected);
@@ -301,10 +301,10 @@ void TestSensorSet::testSensorSetCreator_channelList_medium()
 {
     Accuracy accuracy = Accuracy::medium;
     auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy)).release());
-    SensorSet sensorsExpected(pCoilMeg);
+    InvSensorSet sensorsExpected(pCoilMeg);
 
-    SensorSetCreator sensorSetCreator;
-    SensorSet sensorsActual = sensorSetCreator.updateSensorSet(m_lChannels,accuracy);
+    InvSensorSetCreator sensorSetCreator;
+    InvSensorSet sensorsActual = sensorSetCreator.updateSensorSet(m_lChannels,accuracy);
 
     /// assert
     QVERIFY(sensorsActual==sensorsExpected);

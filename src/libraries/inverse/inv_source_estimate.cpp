@@ -61,7 +61,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNESourceEstimate::MNESourceEstimate()
+InvSourceEstimate::InvSourceEstimate()
 : tmin(0)
 , tstep(-1)
 {
@@ -69,7 +69,7 @@ MNESourceEstimate::MNESourceEstimate()
 
 //=============================================================================================================
 
-MNESourceEstimate::MNESourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices, float p_tmin, float p_tstep)
+InvSourceEstimate::InvSourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices, float p_tmin, float p_tstep)
 : data(p_sol)
 , vertices(p_vertices)
 , tmin(p_tmin)
@@ -80,7 +80,7 @@ MNESourceEstimate::MNESourceEstimate(const MatrixXd &p_sol, const VectorXi &p_ve
 
 //=============================================================================================================
 
-MNESourceEstimate::MNESourceEstimate(const MNESourceEstimate& p_SourceEstimate)
+InvSourceEstimate::InvSourceEstimate(const InvSourceEstimate& p_SourceEstimate)
 : data(p_SourceEstimate.data)
 , vertices(p_SourceEstimate.vertices)
 , times(p_SourceEstimate.times)
@@ -91,20 +91,20 @@ MNESourceEstimate::MNESourceEstimate(const MNESourceEstimate& p_SourceEstimate)
 
 //=============================================================================================================
 
-MNESourceEstimate::MNESourceEstimate(QIODevice &p_IODevice)
+InvSourceEstimate::InvSourceEstimate(QIODevice &p_IODevice)
 : tmin(0)
 , tstep(-1)
 {
     if(!read(p_IODevice, *this))
     {
-        printf("\tSource estimation not found.\n");//ToDo Throw here
+        qWarning("Source estimation not found.");//ToDo Throw here
         return;
     }
 }
 
 //=============================================================================================================
 
-void MNESourceEstimate::clear()
+void InvSourceEstimate::clear()
 {
     data = MatrixXd();
     vertices = VectorXi();
@@ -115,9 +115,9 @@ void MNESourceEstimate::clear()
 
 //=============================================================================================================
 
-MNESourceEstimate MNESourceEstimate::reduce(qint32 start, qint32 n)
+InvSourceEstimate InvSourceEstimate::reduce(qint32 start, qint32 n)
 {
-    MNESourceEstimate p_sourceEstimateReduced;
+    InvSourceEstimate p_sourceEstimateReduced;
 
     qint32 rows = this->data.rows();
 
@@ -134,7 +134,7 @@ MNESourceEstimate MNESourceEstimate::reduce(qint32 start, qint32 n)
 
 //=============================================================================================================
 
-bool MNESourceEstimate::read(QIODevice &p_IODevice, MNESourceEstimate& p_stc)
+bool InvSourceEstimate::read(QIODevice &p_IODevice, InvSourceEstimate& p_stc)
 {
     QSharedPointer<QDataStream> t_pStream(new QDataStream(&p_IODevice));
 
@@ -147,9 +147,9 @@ bool MNESourceEstimate::read(QIODevice &p_IODevice, MNESourceEstimate& p_stc)
 
     QFile* t_pFile = qobject_cast<QFile*>(&p_IODevice);
     if(t_pFile)
-        printf("Reading source estimate from %s...", t_pFile->fileName().toUtf8().constData());
+        qInfo("Reading source estimate from %s...", t_pFile->fileName().toUtf8().constData());
     else
-        printf("Reading source estimate...");
+        qInfo("Reading source estimate...");
 
     // read start time in ms
      *t_pStream >> p_stc.tmin;
@@ -184,14 +184,14 @@ bool MNESourceEstimate::read(QIODevice &p_IODevice, MNESourceEstimate& p_stc)
     // close the file
     t_pStream->device()->close();
 
-    printf("[done]\n");
+    qInfo("[done]");
 
     return true;
 }
 
 //=============================================================================================================
 
-bool MNESourceEstimate::write(QIODevice &p_IODevice)
+bool InvSourceEstimate::write(QIODevice &p_IODevice)
 {
     // Create the file and save the essentials
     QSharedPointer<QDataStream> t_pStream(new QDataStream(&p_IODevice));
@@ -202,43 +202,43 @@ bool MNESourceEstimate::write(QIODevice &p_IODevice)
 
     if(!t_pStream->device()->open(QIODevice::WriteOnly))
     {
-        printf("Failed to write source estimate!\n");
+        qWarning("Failed to write source estimate!");
         return false;
     }
 
     QFile* t_pFile = qobject_cast<QFile*>(&p_IODevice);
     if(t_pFile)
-        printf("Write source estimate to %s...", t_pFile->fileName().toUtf8().constData());
+        qInfo("Write source estimate to %s...", t_pFile->fileName().toUtf8().constData());
     else
-        printf("Write source estimate...");
+        qInfo("Write source estimate...");
 
     // write start time in ms
-     *t_pStream << (float)1000*this->tmin;
+     *t_pStream << static_cast<float>(1000*this->tmin);
     // write sampling rate in ms
-     *t_pStream << (float)1000*this->tstep;
+     *t_pStream << static_cast<float>(1000*this->tstep);
     // write number of vertices
-     *t_pStream << (quint32)this->vertices.size();
+     *t_pStream << static_cast<quint32>(this->vertices.size());
     // write the vertex indices
     for(qint32 i = 0; i < this->vertices.size(); ++i)
-        *t_pStream << (quint32)this->vertices[i];
+        *t_pStream << static_cast<quint32>(this->vertices[i]);
     // write the number of timepts
-     *t_pStream << (quint32)this->data.cols();
+     *t_pStream << static_cast<quint32>(this->data.cols());
     //
     // write the data
     //
     for(qint32 i = 0; i < this->data.array().size(); ++i)
-        *t_pStream << (float)this->data.array()(i);
+        *t_pStream << static_cast<float>(this->data.array()(i));
 
     // close the file
     t_pStream->device()->close();
 
-    printf("[done]\n");
+    qInfo("[done]");
     return true;
 }
 
 //=============================================================================================================
 
-void MNESourceEstimate::update_times()
+void InvSourceEstimate::update_times()
 {
     if(data.cols() > 0)
     {
@@ -253,7 +253,7 @@ void MNESourceEstimate::update_times()
 
 //=============================================================================================================
 
-MNESourceEstimate& MNESourceEstimate::operator= (const MNESourceEstimate &rhs)
+InvSourceEstimate& InvSourceEstimate::operator= (const InvSourceEstimate &rhs)
 {
     if (this != &rhs) // protect against invalid self-assignment
     {
@@ -269,19 +269,19 @@ MNESourceEstimate& MNESourceEstimate::operator= (const MNESourceEstimate &rhs)
 
 //=============================================================================================================
 
-int MNESourceEstimate::samples() const
+int InvSourceEstimate::samples() const
 {
     return data.cols();
 }
 
 //=============================================================================================================
 
-VectorXi MNESourceEstimate::getIndicesByLabel(const QList<FsLabel> &lPickedLabels, bool bIsClustered) const
+VectorXi InvSourceEstimate::getIndicesByLabel(const QList<FsLabel> &lPickedLabels, bool bIsClustered) const
 {
     VectorXi vIndexSourceLabels;
 
     if(lPickedLabels.isEmpty()) {
-        qWarning() << "MNESourceEstimate::getIndicesByLabel - picked label list is empty. Returning.";
+        qWarning() << "InvSourceEstimate::getIndicesByLabel - picked label list is empty. Returning.";
         return  vIndexSourceLabels;
     }
 

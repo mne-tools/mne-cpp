@@ -478,14 +478,14 @@ int main(int argc, char *argv[])
     //
     // Compute inverse solution
     //
-    RapMusic t_rapMusic(t_clusteredFwd, false, numDipolePairs);
+    InvRapMusic t_rapMusic(t_clusteredFwd, false, numDipolePairs);
 
     int iWinSize = 200;
     if(doMovie) {
         t_rapMusic.setStcAttr(iWinSize, 0.6f);
     }
 
-    MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
+    InvSourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
 
     if(doMovie) {
         //Select only the activations once
@@ -527,7 +527,7 @@ int main(int argc, char *argv[])
 
     // Write source estimate to temp files for visualization
     int nVertLh = t_clusteredFwd.src[0].nuse;
-    MNESourceEstimate stcLh, stcRh;
+    InvSourceEstimate stcLh, stcRh;
     stcLh.data = sourceEstimate.data.topRows(nVertLh);
     stcLh.vertices = sourceEstimate.vertices.head(nVertLh);
     stcLh.tmin = sourceEstimate.tmin;

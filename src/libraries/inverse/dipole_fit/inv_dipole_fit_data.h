@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     dipole_fit_data.h
+ * @file     inv_dipole_fit_data.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -34,8 +34,8 @@
  *
  */
 
-#ifndef DIPOLEFITDATA_H
-#define DIPOLEFITDATA_H
+#ifndef INV_DIPOLE_FIT_DATA_H
+#define INV_DIPOLE_FIT_DATA_H
 
 //=============================================================================================================
 // INCLUDES
@@ -103,15 +103,15 @@ struct FitDipUserRec {
     int            report_dim;
     float          *B;
     double         B2;
-    DipoleForward*  fwd;
+    InvDipoleForward*  fwd;
 };
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class GuessData;
-class ECD;
+class InvGuessData;
+class InvEcd;
 
 //=============================================================================================================
 /**
@@ -119,28 +119,28 @@ class ECD;
  *
  * @brief Dipole Fit Data implementation
  */
-class INVSHARED_EXPORT DipoleFitData
+class INVSHARED_EXPORT InvDipoleFitData
 {
 public:
-    typedef QSharedPointer<DipoleFitData> SPtr;             /**< Shared pointer type for DipoleFitData. */
-    typedef QSharedPointer<const DipoleFitData> ConstSPtr;  /**< Const shared pointer type for DipoleFitData. */
+    typedef QSharedPointer<InvDipoleFitData> SPtr;             /**< Shared pointer type for InvDipoleFitData. */
+    typedef QSharedPointer<const InvDipoleFitData> ConstSPtr;  /**< Const shared pointer type for InvDipoleFitData. */
 
     //=========================================================================================================
     /**
      * Default Constructor
      */
-    explicit DipoleFitData();
+    explicit InvDipoleFitData();
 
     //=========================================================================================================
     /**
      * Destructs the Dipole Fit Data
      * Refactored: free_dipole_fit_data (dipole_fit_setup.c)
      */
-    virtual ~DipoleFitData();
+    virtual ~InvDipoleFitData();
 
     //============================= dipole_fit_setup.c =============================
 
-    static int setup_forward_model(DipoleFitData* d, MNELIB::MNECTFCompDataSet* comp_data, FWDLIB::FwdCoilSet* comp_coils);
+    static int setup_forward_model(InvDipoleFitData* d, MNELIB::MNECTFCompDataSet* comp_data, FWDLIB::FwdCoilSet* comp_coils);
 
     static std::unique_ptr<MNELIB::MNECovMatrix> ad_hoc_noise(FWDLIB::FwdCoilSet* meg,          /* Channel name lists to define which channels are gradiometers */
                                      FWDLIB::FwdCoilSet* eeg,
@@ -154,13 +154,13 @@ public:
                                int        nch,
                                MNELIB::MNEProjOp*  *res);
 
-    static int scale_noise_cov(DipoleFitData* f,int nave);
+    static int scale_noise_cov(InvDipoleFitData* f,int nave);
 
-    static int scale_dipole_fit_noise_cov(DipoleFitData* f,int nave);
+    static int scale_dipole_fit_noise_cov(InvDipoleFitData* f,int nave);
 
-    static int select_dipole_fit_noise_cov(DipoleFitData* f, mshMegEegData d);
+    static int select_dipole_fit_noise_cov(InvDipoleFitData* f, mshMegEegData d);
 
-    static DipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< This gives the MRI/head transform. */
+    static InvDipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< This gives the MRI/head transform. */
                                             const QString& measname,        /**< This gives the MEG/head transform and sensor locations. */
                                             const QString& bemname,         /**< BEM model. */
                                             Eigen::Vector3f *r0,            /**< Sphere model origin in head coordinates (optional). */
@@ -191,17 +191,17 @@ public:
      * @param[in] verbose.
      * @param[in] res        The fitted dipole.
      */
-    static bool fit_one(DipoleFitData* fit, GuessData* guess, float time, float *B, int verbose, ECD& res);
+    static bool fit_one(InvDipoleFitData* fit, InvGuessData* guess, float time, float *B, int verbose, InvEcd& res);
 
 //============================= dipole_forward.c
 
-    static int compute_dipole_field(DipoleFitData& d, const Eigen::Vector3f& rd, int whiten, Eigen::Ref<Eigen::MatrixXf> fwd);
+    static int compute_dipole_field(InvDipoleFitData& d, const Eigen::Vector3f& rd, int whiten, Eigen::Ref<Eigen::MatrixXf> fwd);
 
     //============================= dipole_forward.c
 
-    static DipoleForward* dipole_forward_one(DipoleFitData* d,
+    static InvDipoleForward* dipole_forward_one(InvDipoleFitData* d,
                                      float         *rd,
-                                     DipoleForward* old);
+                                     InvDipoleForward* old);
 
 public:
       std::unique_ptr<FIFFLIB::FiffCoordTrans>    mri_head_t; /**< MRI <-> head coordinate transformation. */
@@ -240,4 +240,4 @@ public:
 //=============================================================================================================
 } //NAMESPACE
 
-#endif // DIPOLEFITDATA_H
+#endif // INV_DIPOLE_FIT_DATA_H

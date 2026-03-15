@@ -54,11 +54,11 @@ private slots:
             m_sDataPath = base;
     }
     //=========================================================================
-    // ECD
+    // InvEcd
     //=========================================================================
     void ecd_defaultCtor()
     {
-        ECD d;
+        InvEcd d;
         QVERIFY(!d.valid);
         // Default time is -1.0f (unset sentinel)
         QCOMPARE(d.time, -1.0f);
@@ -66,7 +66,7 @@ private slots:
 
     void ecd_setFields()
     {
-        ECD d;
+        InvEcd d;
         d.valid = true;
         d.time = 0.1f;
         d.rd = Vector3f(0.01f, 0.02f, 0.03f);
@@ -84,7 +84,7 @@ private slots:
 
     void ecd_copyCtor()
     {
-        ECD d;
+        InvEcd d;
         d.valid = true;
         d.time = 0.5f;
         d.rd = Vector3f(1, 2, 3);
@@ -94,7 +94,7 @@ private slots:
         d.nfree = 5;
         d.neval = 20;
 
-        ECD d2(d);
+        InvEcd d2(d);
         QCOMPARE(d2.valid, d.valid);
         QCOMPARE(d2.time, d.time);
         QCOMPARE(d2.good, d.good);
@@ -103,20 +103,20 @@ private slots:
     }
 
     //=========================================================================
-    // ECDSet
+    // InvEcdSet
     //=========================================================================
     void ecdSet_defaultCtor()
     {
-        ECDSet set;
+        InvEcdSet set;
         QCOMPARE(set.size(), (qint32)0);
     }
 
     void ecdSet_addAndAccess()
     {
-        ECDSet set;
-        ECD d1; d1.time = 0.1f; d1.valid = true;
-        ECD d2; d2.time = 0.2f; d2.valid = false;
-        ECD d3; d3.time = 0.3f; d3.valid = true;
+        InvEcdSet set;
+        InvEcd d1; d1.time = 0.1f; d1.valid = true;
+        InvEcd d2; d2.time = 0.2f; d2.valid = false;
+        InvEcd d3; d3.time = 0.3f; d3.valid = true;
 
         set.addEcd(d1);
         set << d2;
@@ -132,20 +132,20 @@ private slots:
 
     void ecdSet_copyCtor()
     {
-        ECDSet set;
-        ECD d; d.time = 1.0f; d.valid = true;
+        InvEcdSet set;
+        InvEcd d; d.time = 1.0f; d.valid = true;
         set.addEcd(d);
 
-        ECDSet copy(set);
+        InvEcdSet copy(set);
         QCOMPARE(copy.size(), (qint32)1);
         QCOMPARE(copy[0].time, 1.0f);
     }
 
     void ecdSet_roundtripDip()
     {
-        ECDSet set;
+        InvEcdSet set;
         for (int i = 0; i < 5; ++i) {
-            ECD d;
+            InvEcd d;
             d.valid = true;
             d.time = 0.001f * i;
             d.rd = Vector3f(0.01f * i, 0.02f * i, 0.03f * i);
@@ -164,11 +164,11 @@ private slots:
     }
 
     //=========================================================================
-    // DipoleFitSettings
+    // InvDipoleFitSettings
     //=========================================================================
     void dipoleFitSettings_defaults()
     {
-        DipoleFitSettings settings;
+        InvDipoleFitSettings settings;
         QVERIFY(settings.measname.isEmpty());
         // Just verify these are bool; actual defaults may vary
         QVERIFY(settings.include_meg || !settings.include_meg);
@@ -177,7 +177,7 @@ private slots:
 
     void dipoleFitSettings_setFields()
     {
-        DipoleFitSettings settings;
+        InvDipoleFitSettings settings;
         settings.measname = "test.fif";
         settings.bemname = "bem.fif";
         settings.r0 = Vector3f(0, 0, 0.04f);
@@ -196,37 +196,37 @@ private slots:
 
     void dipoleFitSettings_checkIntegrity()
     {
-        DipoleFitSettings settings;
+        InvDipoleFitSettings settings;
         // checkIntegrity on defaults should not crash
         settings.checkIntegrity();
         QVERIFY(true);
     }
 
     //=========================================================================
-    // DipoleForward
+    // InvDipoleForward
     //=========================================================================
     void dipoleForward_defaultCtor()
     {
-        DipoleForward fwd;
+        InvDipoleForward fwd;
         QCOMPARE(fwd.ndip, 0);
         QCOMPARE(fwd.nch, 0);
     }
 
     //=========================================================================
-    // GuessData
+    // InvGuessData
     //=========================================================================
     void guessData_defaultCtor()
     {
-        GuessData g;
+        InvGuessData g;
         QCOMPARE(g.nguess, 0);
     }
 
     //=========================================================================
-    // Dipole<T> templates
+    // InvDipole<T> templates
     //=========================================================================
     void dipoleTemplate_float()
     {
-        Dipole<float> d;
+        InvDipole<float> d;
         d.x() = 1.0f;
         d.y() = 2.0f;
         d.z() = 3.0f;
@@ -242,7 +242,7 @@ private slots:
 
     void dipoleTemplate_double()
     {
-        Dipole<double> d;
+        InvDipole<double> d;
         d.x() = 1.5;
         d.y() = 2.5;
         d.z() = 3.5;
@@ -251,8 +251,8 @@ private slots:
 
     void dipoleTemplate_clean()
     {
-        // Dipole<T>::clean() is declared but not defined — test data members instead
-        Dipole<double> d;
+        // InvDipole<T>::clean() is declared but not defined — test data members instead
+        InvDipole<double> d;
         d.x() = 99.0;
         d.y() = 88.0;
         d.z() = 77.0;
@@ -265,7 +265,7 @@ private slots:
 
     void dipolePair_basic()
     {
-        DipolePair<double> pair;
+        InvDipolePair<double> pair;
         pair.m_iIdx1 = 0;
         pair.m_iIdx2 = 1;
         pair.m_Dipole1.x() = 1.0;
@@ -278,19 +278,19 @@ private slots:
     }
 
     //=========================================================================
-    // RapMusic static methods
+    // InvRapMusic static methods
     //=========================================================================
     void rapMusic_defaultCtor()
     {
-        RapMusic rap;
+        InvRapMusic rap;
         const char* name = rap.getName();
         QVERIFY(name != nullptr);
     }
 
     void rapMusic_getRank()
     {
-        // getRank is protected — test through RapMusic behavior instead
-        RapMusic rap;
+        // getRank is protected — test through InvRapMusic behavior instead
+        InvRapMusic rap;
         // Just verify construction and name
         QVERIFY(rap.getName() != nullptr);
     }
@@ -298,24 +298,24 @@ private slots:
     void rapMusic_makeSquareMat()
     {
         // makeSquareMat is protected — test indirectly
-        // Verify RapMusic can be constructed with valid params
-        RapMusic rap;
+        // Verify InvRapMusic can be constructed with valid params
+        InvRapMusic rap;
         QVERIFY(true);
     }
 
     void rapMusic_setStcAttr()
     {
-        RapMusic rap;
+        InvRapMusic rap;
         rap.setStcAttr(100, 0.001f);
         QVERIFY(true); // just check no crash
     }
 
     //=========================================================================
-    // PwlRapMusic static methods
+    // InvPwlRapMusic static methods
     //=========================================================================
     void pwlRapMusic_defaultCtor()
     {
-        PwlRapMusic pwl;
+        InvPwlRapMusic pwl;
         const char* name = pwl.getName();
         QVERIFY(name != nullptr);
     }
@@ -323,10 +323,10 @@ private slots:
     void pwlRapMusic_powellOffset()
     {
         // PowellOffset should return valid offsets
-        int off1 = PwlRapMusic::PowellOffset(0, 10);
+        int off1 = InvPwlRapMusic::PowellOffset(0, 10);
         QVERIFY(off1 >= 0);
 
-        int off2 = PwlRapMusic::PowellOffset(5, 10);
+        int off2 = InvPwlRapMusic::PowellOffset(5, 10);
         QVERIFY(off2 >= 0);
         QVERIFY(off2 > off1);
     }
@@ -338,40 +338,40 @@ private slots:
     }
 
     //=========================================================================
-    // MNEMeasData / MNEMeasDataSet (C-style inverse)
+    // InvMeasData / InvMeasDataSet (C-style inverse)
     //=========================================================================
     void mneMeasData_defaultCtor()
     {
-        MNEMeasData data;
+        InvMeasData data;
         QCOMPARE(data.nchan, 0);
         QVERIFY(data.filename.isEmpty());
     }
 
     void mneMeasDataSet_defaultCtor()
     {
-        MNEMeasDataSet set;
+        InvMeasDataSet set;
         QCOMPARE(set.np, 0);
         // Default nave is 1 (at least 1 average)
         QCOMPARE(set.nave, 1);
     }
 
     //=========================================================================
-    // MNEInverseOperator
+    // InvInverseOperator
     //=========================================================================
     void mneInverseOp_defaultCtor()
     {
-        INVLIB::MNEInverseOperator mio;
+        INVLIB::InvInverseOperator mio;
         QCOMPARE(mio.nchan, -1);
         QCOMPARE(mio.nsource, -1);
     }
 
     //=========================================================================
-    // MinimumNorm (construct with empty MNEInverseOperator)
+    // InvMinimumNorm (construct with empty InvInverseOperator)
     //=========================================================================
     void minimumNorm_construct()
     {
-        INVLIB::MNEInverseOperator invOp;
-        MinimumNorm mn(invOp, 1.0f / 9.0f, QString("MNE"));
+        INVLIB::InvInverseOperator invOp;
+        InvMinimumNorm mn(invOp, 1.0f / 9.0f, QString("MNE"));
         mn.setRegularization(1.0f / 6.0f);
         mn.setMethod("dSPM");
         QVERIFY(true);
@@ -379,8 +379,8 @@ private slots:
 
     void minimumNorm_setMethod()
     {
-        INVLIB::MNEInverseOperator invOp;
-        MinimumNorm mn(invOp, 1.0f / 9.0f, false, false);
+        INVLIB::InvInverseOperator invOp;
+        InvMinimumNorm mn(invOp, 1.0f / 9.0f, false, false);
         mn.setMethod(true, false); // sLORETA
         mn.setMethod(false, true); // dSPM
         mn.setMethod(false, false); // MNE
@@ -408,7 +408,7 @@ private slots:
 
         if (fwd.isEmpty() || noiseCov.isEmpty()) QSKIP("Data load failed");
 
-        INVLIB::MNEInverseOperator invOp = INVLIB::MNEInverseOperator::make_inverse_operator(
+        INVLIB::InvInverseOperator invOp = INVLIB::InvInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
 
         QVERIFY(invOp.nchan > 0);
@@ -437,7 +437,7 @@ private slots:
         FiffCov noiseCov(covFile);
         FiffRawData raw(rawFile);
 
-        INVLIB::MNEInverseOperator invOp = INVLIB::MNEInverseOperator::make_inverse_operator(
+        INVLIB::InvInverseOperator invOp = INVLIB::InvInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
         if (invOp.nchan == 0) QSKIP("Inverse operator build failed");
 
@@ -450,9 +450,9 @@ private slots:
         float tstep = 1.0f / picked.info.sfreq;
         float lambda2 = 1.0f / 9.0f;
 
-        MinimumNorm mn(invOp, lambda2, QString("dSPM"));
+        InvMinimumNorm mn(invOp, lambda2, QString("dSPM"));
         mn.doInverseSetup(evoked.nave, false);
-        MNESourceEstimate stc = mn.calculateInverse(picked.data, tmin, tstep, false);
+        InvSourceEstimate stc = mn.calculateInverse(picked.data, tmin, tstep, false);
 
         QVERIFY(!stc.isEmpty());
         QCOMPARE((int)stc.data.rows(), invOp.nsource);
@@ -480,7 +480,7 @@ private slots:
         FiffCov noiseCov(covFile);
         FiffRawData raw(rawFile);
 
-        INVLIB::MNEInverseOperator invOp = INVLIB::MNEInverseOperator::make_inverse_operator(
+        INVLIB::InvInverseOperator invOp = INVLIB::InvInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
         if (invOp.nchan == 0) QSKIP("Inverse operator build failed");
 
@@ -493,9 +493,9 @@ private slots:
         float tstep = 1.0f / picked.info.sfreq;
         float lambda2 = 1.0f / 9.0f;
 
-        MinimumNorm mn(invOp, lambda2, QString("sLORETA"));
+        InvMinimumNorm mn(invOp, lambda2, QString("sLORETA"));
         mn.doInverseSetup(evoked.nave, false);
-        MNESourceEstimate stc = mn.calculateInverse(picked.data, tmin, tstep, false);
+        InvSourceEstimate stc = mn.calculateInverse(picked.data, tmin, tstep, false);
 
         QVERIFY(!stc.isEmpty());
         QCOMPARE((int)stc.data.rows(), invOp.nsource);
@@ -522,7 +522,7 @@ private slots:
         FiffCov noiseCov(covFile);
         FiffRawData raw(rawFile);
 
-        INVLIB::MNEInverseOperator invOp = INVLIB::MNEInverseOperator::make_inverse_operator(
+        INVLIB::InvInverseOperator invOp = INVLIB::InvInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
         if (invOp.nchan == 0) QSKIP("Inverse operator build failed");
 
@@ -535,9 +535,9 @@ private slots:
         float tstep = 1.0f / picked.info.sfreq;
         float lambda2 = 1.0f / 9.0f;
 
-        MinimumNorm mn(invOp, lambda2, QString("MNE"));
+        InvMinimumNorm mn(invOp, lambda2, QString("MNE"));
         mn.doInverseSetup(evoked.nave, false);
-        MNESourceEstimate stc = mn.calculateInverse(picked.data, tmin, tstep, false);
+        InvSourceEstimate stc = mn.calculateInverse(picked.data, tmin, tstep, false);
 
         QVERIFY(!stc.isEmpty());
         QCOMPARE((int)stc.data.rows(), invOp.nsource);
@@ -563,7 +563,7 @@ private slots:
         FiffCov noiseCov(covFile);
         FiffRawData raw(rawFile);
 
-        INVLIB::MNEInverseOperator invOp = INVLIB::MNEInverseOperator::make_inverse_operator(
+        INVLIB::InvInverseOperator invOp = INVLIB::InvInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
         if (invOp.nchan == 0) QSKIP("Inverse operator build failed");
 
@@ -577,14 +577,14 @@ private slots:
         QVERIFY(QFile::exists(tmpPath));
 
         QFile inFile(tmpPath);
-        INVLIB::MNEInverseOperator invOp2(inFile);
+        INVLIB::InvInverseOperator invOp2(inFile);
         QVERIFY(invOp2.nchan > 0);
         QCOMPARE(invOp2.nsource, invOp.nsource);
         QCOMPARE(invOp2.nchan, invOp.nchan);
     }
 
     //=========================================================================
-    // DATA-DRIVEN: RapMusic init with real forward solution
+    // DATA-DRIVEN: InvRapMusic init with real forward solution
     //=========================================================================
     void data_rapMusic_initWithFwd()
     {
@@ -597,7 +597,7 @@ private slots:
         FwdForwardSolution fwd(fwdFile);
         if (fwd.isEmpty()) QSKIP("Fwd load failed");
 
-        RapMusic rap;
+        InvRapMusic rap;
         bool ok = rap.init(fwd, false, 2, 0.5);
         // Exercises init code path regardless of result
         Q_UNUSED(ok)
@@ -631,16 +631,16 @@ private slots:
     {
         QVector<int> coils;
         coils << 293 << 307 << 314 << 321;
-        HpiModelParameters params(coils, 600, 200, 4);
+        InvHpiModelParameters params(coils, 600, 200, 4);
         QVERIFY(true);
     }
 
     //=========================================================================
-    // DATA-DRIVEN: SensorSet construction
+    // DATA-DRIVEN: InvSensorSet construction
     //=========================================================================
     void data_sensorSet()
     {
-        SensorSet sensors;
+        InvSensorSet sensors;
         QVERIFY(sensors.ncoils() == 0 || true);
     }
 

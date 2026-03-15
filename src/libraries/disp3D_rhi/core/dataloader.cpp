@@ -304,9 +304,9 @@ std::shared_ptr<BrainSurface> DataLoader::loadHelmetSurface(
 
 //=============================================================================================================
 
-ECDSet DataLoader::loadDipoles(const QString &dipPath)
+InvEcdSet DataLoader::loadDipoles(const QString &dipPath)
 {
-    ECDSet ecdSet = ECDSet::read_dipoles_dip(dipPath);
+    InvEcdSet ecdSet = InvEcdSet::read_dipoles_dip(dipPath);
     if (ecdSet.size() == 0) {
         qWarning() << "DataLoader: Failed to load dipoles from" << dipPath;
     }

@@ -55,7 +55,7 @@ Q_DECLARE_METATYPE(Eigen::Vector3i);
 
 #ifndef metatype_inverselibecd
 #define metatype_inverselibecd
-Q_DECLARE_METATYPE(INVLIB::ECD);
+Q_DECLARE_METATYPE(INVLIB::InvEcd);
 #endif
 
 #ifndef metatype_ANSHAREDLIB_events

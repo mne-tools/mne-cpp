@@ -70,7 +70,7 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
- * @brief Settings panel for configuring and launching equivalent current dipole (ECD) fitting.
+ * @brief Settings panel for configuring and launching equivalent current dipole (InvEcd) fitting.
  */
 class DISPSHARED_EXPORT DipoleFitView : public AbstractView
 {

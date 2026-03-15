@@ -129,13 +129,13 @@ int main(int argc, char *argv[])
     //
     //   Then the inverse operator
     //
-    MNEInverseOperator inverse_operator(t_fileInv);
+    InvInverseOperator inverse_operator(t_fileInv);
 
     //
     // Compute inverse solution
     //
-    MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-    MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
+    InvMinimumNorm minimumNorm(inverse_operator, lambda2, method);
+    InvSourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
 
     //
     //Results
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
         sourceEstimate.write(t_fileStc);
 
         //test if everything was written correctly
-        MNESourceEstimate readSourceEstimate(t_fileStc);
+        InvSourceEstimate readSourceEstimate(t_fileStc);
 
         std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << readSourceEstimate.data.block(0,0,10,10) << std::endl;
         printf("tmin = %f s\n", readSourceEstimate.tmin);

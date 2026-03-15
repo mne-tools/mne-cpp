@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MNECorSourceEstimate Class.
+ * @brief    Definition of the InvCorSourceEstimate Class.
  *
  */
 
@@ -55,60 +55,60 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNECorSourceEstimate::MNECorSourceEstimate()
-: MNESourceEstimate()
+InvCorSourceEstimate::InvCorSourceEstimate()
+: InvSourceEstimate()
 {
 }
 
 //=============================================================================================================
 
-MNECorSourceEstimate::MNECorSourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices, float p_tmin, float p_tstep)
-: MNESourceEstimate(p_sol, p_vertices, p_tmin, p_tstep)
+InvCorSourceEstimate::InvCorSourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices, float p_tmin, float p_tstep)
+: InvSourceEstimate(p_sol, p_vertices, p_tmin, p_tstep)
 {
 }
 
 //=============================================================================================================
 
-MNECorSourceEstimate::MNECorSourceEstimate(const MNECorSourceEstimate& p_SourceEstimate)
-: MNESourceEstimate(p_SourceEstimate)
+InvCorSourceEstimate::InvCorSourceEstimate(const InvCorSourceEstimate& p_SourceEstimate)
+: InvSourceEstimate(p_SourceEstimate)
 {
 }
 
 //=============================================================================================================
 
-MNECorSourceEstimate::MNECorSourceEstimate(QIODevice &p_IODevice)
-: MNESourceEstimate(p_IODevice)
+InvCorSourceEstimate::InvCorSourceEstimate(QIODevice &p_IODevice)
+: InvSourceEstimate(p_IODevice)
 {
 }
 
 //=============================================================================================================
 
-void MNECorSourceEstimate::clear()
+void InvCorSourceEstimate::clear()
 {
-    MNESourceEstimate::clear();
+    InvSourceEstimate::clear();
 }
 
 //=============================================================================================================
 
-bool MNECorSourceEstimate::read(QIODevice &p_IODevice, MNECorSourceEstimate& p_stc)
+bool InvCorSourceEstimate::read(QIODevice &p_IODevice, InvCorSourceEstimate& p_stc)
 {
-    return MNESourceEstimate::read(p_IODevice, p_stc);
+    return InvSourceEstimate::read(p_IODevice, p_stc);
 }
 
 //=============================================================================================================
 
-bool MNECorSourceEstimate::write(QIODevice &p_IODevice)
+bool InvCorSourceEstimate::write(QIODevice &p_IODevice)
 {
-    return MNESourceEstimate::write(p_IODevice);
+    return InvSourceEstimate::write(p_IODevice);
 }
 
 //=============================================================================================================
 
-MNECorSourceEstimate& MNECorSourceEstimate::operator= (const MNECorSourceEstimate &rhs)
+InvCorSourceEstimate& InvCorSourceEstimate::operator= (const InvCorSourceEstimate &rhs)
 {
     if (this != &rhs) // protect against invalid self-assignment
     {
-        MNESourceEstimate::operator= (rhs);
+        InvSourceEstimate::operator= (rhs);
     }
     // to support chained assignment operators (a=b=c), always return *this
     return *this;

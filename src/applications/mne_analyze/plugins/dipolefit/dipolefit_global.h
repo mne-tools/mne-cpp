@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the DipoleFit library export/import macros.
+ * @brief    Contains the InvDipoleFit library export/import macros.
  *
  */
 

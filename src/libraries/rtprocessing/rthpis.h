@@ -67,10 +67,10 @@ namespace FIFFLIB {
 }
 
 namespace INVLIB {
-    class SensorSet;
-    class HPIFit;
+    class InvSensorSet;
+    class InvHpiFit;
     struct HpiFitResult;
-    class HpiModelParameters;
+    class InvHpiModelParameters;
 }
 
 //=============================================================================================================
@@ -98,7 +98,7 @@ public:
      *
      * @param[in] pFiffInfo        Associated Fiff Information.
      */
-    explicit RtHpiWorker(const INVLIB::SensorSet sensorSet);
+    explicit RtHpiWorker(const INVLIB::InvSensorSet sensorSet);
 
     //=========================================================================================================
     /**
@@ -111,12 +111,12 @@ public:
      */
     void doWork(const Eigen::MatrixXd& matData,
                 const Eigen::MatrixXd& matProjectors,
-                const INVLIB::HpiModelParameters& hpiModelParameters,
+                const INVLIB::InvHpiModelParameters& hpiModelParameters,
                 const Eigen::MatrixXd& matCoilsHead);
 
 protected:
     //=========================================================================================================
-    QSharedPointer<INVLIB::HPIFit>              m_pHpiFit;             /**< Holds the HpiFit object. */
+    QSharedPointer<INVLIB::InvHpiFit>              m_pHpiFit;             /**< Holds the HpiFit object. */
 
 signals:
     void resultReady(const INVLIB::HpiFitResult &fitResult);
@@ -143,7 +143,7 @@ public:
      * @param[in] p_pFiffInfo        Associated Fiff Information.
      * @param[in] parent     Parent QObject (optional).
      */
-    explicit RtHpi(const INVLIB::SensorSet sensorSet,
+    explicit RtHpi(const INVLIB::InvSensorSet sensorSet,
                    QObject *parent = 0);
 
     //=========================================================================================================
@@ -166,7 +166,7 @@ public:
      *
      * @param[in] vCoilFreqs  The coil frequencies.
      */
-    void setModelParameters(INVLIB::HpiModelParameters hpiModelParameters);
+    void setModelParameters(INVLIB::InvHpiModelParameters hpiModelParameters);
 
     //=========================================================================================================
     /**
@@ -206,14 +206,14 @@ protected:
     QThread m_workerThread;         /**< The worker thread. */
     Eigen::MatrixXd m_matCoilsHead;           /**< Vector contains the HPI coil frequencies. */
     Eigen::MatrixXd m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
-    INVLIB::SensorSet m_sensorSet;
-    INVLIB::HpiModelParameters m_modelParameters;
+    INVLIB::InvSensorSet m_sensorSet;
+    INVLIB::InvHpiModelParameters m_modelParameters;
 
 signals:
     void newHpiFitResultAvailable(const INVLIB::HpiFitResult &fitResult);
     void operate(const Eigen::MatrixXd& matData,
                  const Eigen::MatrixXd& matProjectors,
-                 const INVLIB::HpiModelParameters& hpiModelParameters,
+                 const INVLIB::InvHpiModelParameters& hpiModelParameters,
                  const Eigen::MatrixXd& matCoilsHead);
 };
 

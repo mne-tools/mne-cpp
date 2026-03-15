@@ -68,7 +68,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MatrixXd SignalModel::fitData(const HpiModelParameters& hpiModelParameters, const MatrixXd& matData)
+MatrixXd InvSignalModel::fitData(const InvHpiModelParameters& hpiModelParameters, const MatrixXd& matData)
 {
 
     if(checkEmpty(hpiModelParameters)) {
@@ -89,7 +89,7 @@ MatrixXd SignalModel::fitData(const HpiModelParameters& hpiModelParameters, cons
 
 //=============================================================================================================
 
-bool SignalModel::checkDataDimensions(const int iCols)
+bool InvSignalModel::checkDataDimensions(const int iCols)
 {
     bool bHasChanged = false;
     if(iCols != m_iCurrentModelCols) {
@@ -101,7 +101,7 @@ bool SignalModel::checkDataDimensions(const int iCols)
 
 //=============================================================================================================
 
-bool SignalModel::checkModelParameters(const HpiModelParameters& hpiModelParameters)
+bool InvSignalModel::checkModelParameters(const InvHpiModelParameters& hpiModelParameters)
 {
     bool bHasChanged = false;
     if((m_modelParameters.iSampleFreq() != hpiModelParameters.iSampleFreq()) ||
@@ -117,13 +117,13 @@ bool SignalModel::checkModelParameters(const HpiModelParameters& hpiModelParamet
 
 //=============================================================================================================
 
-bool SignalModel::checkEmpty(const HpiModelParameters& hpiModelParameters)
+bool InvSignalModel::checkEmpty(const InvHpiModelParameters& hpiModelParameters)
 {
     if(hpiModelParameters.vecHpiFreqs().empty()) {
-        std::cout << "SignalModel::checkEmpty - no Hpi frequencies set" << std::endl;
+        std::cout << "InvSignalModel::checkEmpty - no Hpi frequencies set" << std::endl;
         return true;
     } else if(hpiModelParameters.iSampleFreq() == 0) {
-        std::cout << "SignalModel::checkEmpty - no sampling frequencies set" << std::endl;
+        std::cout << "InvSignalModel::checkEmpty - no sampling frequencies set" << std::endl;
         return true;
     }
     return false;
@@ -131,7 +131,7 @@ bool SignalModel::checkEmpty(const HpiModelParameters& hpiModelParameters)
 
 //=============================================================================================================
 
-void SignalModel::selectModelAndCompute()
+void InvSignalModel::selectModelAndCompute()
 {
     if(m_modelParameters.bBasic()) {
         computeInverseBasicModel();
@@ -142,7 +142,7 @@ void SignalModel::selectModelAndCompute()
 
 //=============================================================================================================
 
-void SignalModel::computeInverseBasicModel()
+void InvSignalModel::computeInverseBasicModel()
 {
     const int iNumCoils = m_modelParameters.iNHpiCoils();
     MatrixXd matSimsig;
@@ -160,7 +160,7 @@ void SignalModel::computeInverseBasicModel()
 
 //=============================================================================================================
 
-void SignalModel::computeInverseAdvancedModel()
+void InvSignalModel::computeInverseAdvancedModel()
 {
     const int iNumCoils = m_modelParameters.iNHpiCoils();
     const int iSampleFreq = m_modelParameters.iSampleFreq();

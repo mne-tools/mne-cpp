@@ -67,10 +67,10 @@ SourceEstimateOverlay::~SourceEstimateOverlay()
 bool SourceEstimateOverlay::loadStc(const QString &path, int hemi)
 {
     QFile file(path);
-    // Note: MNESourceEstimate::read() opens the file internally, don't open it here
+    // Note: InvSourceEstimate::read() opens the file internally, don't open it here
 
-    INVLIB::MNESourceEstimate stc;
-    if (!INVLIB::MNESourceEstimate::read(file, stc)) {
+    INVLIB::InvSourceEstimate stc;
+    if (!INVLIB::InvSourceEstimate::read(file, stc)) {
         qWarning() << "SourceEstimateOverlay::loadStc - Failed to read STC file:" << path;
         return false;
     }
@@ -114,7 +114,7 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface *surface, int timeIndex)
     if (!surface) return;
 
     int hemi = surface->hemi();
-    const INVLIB::MNESourceEstimate *stc = nullptr;
+    const INVLIB::InvSourceEstimate *stc = nullptr;
     QSharedPointer<Eigen::SparseMatrix<float>> interpMat;
 
     if (hemi == 0 && m_hasLh) {
@@ -292,7 +292,7 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface *surface, in
 {
     if (!surface) return;
 
-    const INVLIB::MNESourceEstimate *stc = nullptr;
+    const INVLIB::InvSourceEstimate *stc = nullptr;
     QSharedPointer<Eigen::SparseMatrix<float>> *pMatPtr = nullptr;
 
     if (hemi == 0 && m_hasLh) {
@@ -359,7 +359,7 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface *surface, in
 
 //=============================================================================================================
 
-void SourceEstimateOverlay::setStcData(const INVLIB::MNESourceEstimate &stc, int hemi)
+void SourceEstimateOverlay::setStcData(const INVLIB::InvSourceEstimate &stc, int hemi)
 {
     if (hemi == 0) {
         m_stcLh = stc;

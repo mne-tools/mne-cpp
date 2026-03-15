@@ -382,7 +382,7 @@ static bool writeDipFile(const QString &fileName,
     out.setRealNumberNotation(QTextStream::ScientificNotation);
     out.setRealNumberPrecision(6);
 
-    out << "# Dipole snapshot at " << time_ms << " ms\n";
+    out << "# InvDipole snapshot at " << time_ms << " ms\n";
     out << "# vertex x(m) y(m) z(m) nx ny nz amplitude\n";
 
     int row = 0;
@@ -414,7 +414,7 @@ static bool writeDipFile(const QString &fileName,
     }
 
     file.close();
-    printf("  Dipole snapshot: %d sources at %.1f ms -> %s\n",
+    printf("  InvDipole snapshot: %d sources at %.1f ms -> %s\n",
            row, time_ms, fileName.toUtf8().constData());
     return true;
 }
@@ -712,7 +712,7 @@ int main(int argc, char *argv[])
         "Use time-by-time layout for label ASCII output.");
     parser.addOption(labeltimeOpt);
 
-    // --- Dipole output options ---
+    // --- InvDipole output options ---
 
     // --dip: Output dipole snapshot file
     QCommandLineOption dipOpt(QStringList() << "dip",
@@ -823,7 +823,7 @@ int main(int argc, char *argv[])
     printf("Reading inverse operator from %s...\n", invName.toUtf8().constData());
 
     QFile invFile(invName);
-    MNEInverseOperator invOp(invFile);
+    InvInverseOperator invOp(invFile);
 
     if (invOp.nsource <= 0) {
         qCritical() << "Error: Could not read inverse operator from" << invName;
@@ -995,10 +995,10 @@ int main(int argc, char *argv[])
     printf("\nComputing %s inverse solution (SNR=%.1f, lambda2=%.4e, nave=%d)...\n",
            method.toUtf8().constData(), snr, lambda2, nave);
 
-    MinimumNorm minimumNorm(invOp, lambda2, method);
+    InvMinimumNorm minimumNorm(invOp, lambda2, method);
     minimumNorm.doInverseSetup(nave, pickNormal);
 
-    MNESourceEstimate stc = minimumNorm.calculateInverse(data, tmin, tstep, pickNormal);
+    InvSourceEstimate stc = minimumNorm.calculateInverse(data, tmin, tstep, pickNormal);
 
     if (stc.isEmpty()) {
         qCritical() << "Error: Inverse computation returned empty result.";
@@ -1084,7 +1084,7 @@ int main(int argc, char *argv[])
             printf("\nWriting left hemisphere STC to %s...\n", lhFile.toUtf8().constData());
 
             MatrixXd lhData = stc.data.topRows(nLh);
-            MNESourceEstimate lhStc(lhData, vertno[0], stc.tmin, stc.tstep);
+            InvSourceEstimate lhStc(lhData, vertno[0], stc.tmin, stc.tstep);
 
             QFile lhOut(lhFile);
             if (!lhStc.write(lhOut)) {
@@ -1100,7 +1100,7 @@ int main(int argc, char *argv[])
             printf("Writing right hemisphere STC to %s...\n", rhFile.toUtf8().constData());
 
             MatrixXd rhData = stc.data.bottomRows(nRh);
-            MNESourceEstimate rhStc(rhData, vertno[1], stc.tmin, stc.tstep);
+            InvSourceEstimate rhStc(rhData, vertno[1], stc.tmin, stc.tstep);
 
             QFile rhOut(rhFile);
             if (!rhStc.write(rhOut)) {
@@ -1175,7 +1175,7 @@ int main(int argc, char *argv[])
     }
 
     //=========================================================================================================
-    // Dipole snapshot output (--dip / --diptime)
+    // InvDipole snapshot output (--dip / --diptime)
     //=========================================================================================================
 
     if (parser.isSet(dipOpt)) {

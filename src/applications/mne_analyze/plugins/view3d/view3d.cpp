@@ -322,7 +322,7 @@ void View3D::settingsChanged(ANSHAREDLIB::View3DParameters viewParameters)
 
 //=============================================================================================================
 
-void View3D::newDipoleFit(const INVLIB::ECDSet &ecdSet)
+void View3D::newDipoleFit(const INVLIB::InvEcdSet &ecdSet)
 {
     m_p3DModel->addDipoles(ecdSet);
 }
@@ -332,7 +332,7 @@ void View3D::newDipoleFit(const INVLIB::ECDSet &ecdSet)
 void View3D::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
     if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL) {
-        newDipoleFit(qSharedPointerCast<DipoleFitModel>(pNewModel)->data(QModelIndex()).value<INVLIB::ECDSet>());
+        newDipoleFit(qSharedPointerCast<DipoleFitModel>(pNewModel)->data(QModelIndex()).value<INVLIB::InvEcdSet>());
     }
 }
 
@@ -341,7 +341,7 @@ void View3D::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel
 void View3D::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
     if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL) {
-        QList<QStandardItem *> lItemList = m_p3DModel->findItems("Dipole Fit");
+        QList<QStandardItem *> lItemList = m_p3DModel->findItems("InvDipole Fit");
         if(!lItemList.isEmpty()){
             for(QStandardItem * pItem : lItemList){
                 QModelIndex index = m_p3DModel->indexFromItem(pItem);

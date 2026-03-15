@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     pwl_rap_music.h
+ * @file     inv_pwl_rap_music.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
@@ -29,12 +29,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    PwlRapMusic algorithm class declaration.
+ * @brief    InvPwlRapMusic algorithm class declaration.
  *
  */
 
-#ifndef PWLRAPMUSIC_H
-#define PWLRAPMUSIC_H
+#ifndef INV_PWL_RAP_MUSIC_H
+#define INV_PWL_RAP_MUSIC_H
 
 //=============================================================================================================
 // INCLUDES
@@ -79,7 +79,7 @@ namespace INVLIB
  *
  * ToDo Detailed description
  */
-class INVSHARED_EXPORT PwlRapMusic : public RapMusic
+class INVSHARED_EXPORT InvPwlRapMusic : public InvRapMusic
 {
 public:
 
@@ -87,7 +87,7 @@ public:
     /**
      * Default constructor creates an empty POWELL RAP MUSIC algorithm which still needs to be initialized.
      */
-    PwlRapMusic();
+    InvPwlRapMusic();
 
     //=========================================================================================================
     /**
@@ -99,9 +99,9 @@ public:
      *                           the strongest.
      * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
      */
-    PwlRapMusic(FWDLIB::FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
+    InvPwlRapMusic(FWDLIB::FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
 
-    virtual ~PwlRapMusic();
+    virtual ~InvPwlRapMusic();
 
     //=========================================================================================================
     /**
@@ -114,7 +114,7 @@ public:
      *
      * @return
      */
-    virtual MNESourceEstimate calculateInverse(const FIFFLIB::FiffEvoked &p_fiffEvoked, bool pick_normal = false);
+    virtual InvSourceEstimate calculateInverse(const FIFFLIB::FiffEvoked &p_fiffEvoked, bool pick_normal = false);
 
     //=========================================================================================================
     /**
@@ -128,9 +128,9 @@ public:
      *
      * @return
      */
-    virtual MNESourceEstimate calculateInverse(const Eigen::MatrixXd &data, float tmin, float tstep) const;
+    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd &data, float tmin, float tstep) const;
 
-    virtual MNESourceEstimate calculateInverse(const Eigen::MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles) const;
+    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd& p_matMeasurement, QList< InvDipolePair<double> > &p_RapDipoles) const;
 
     static int PowellOffset(int p_iRow, int p_iNumPoints);
 
@@ -144,4 +144,4 @@ public:
 //=============================================================================================================
 } //NAMESPACE
 
-#endif // PWLRAPMUSIC_H
+#endif // INV_PWL_RAP_MUSIC_H

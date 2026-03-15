@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     ecd_set.cpp
+ * @file     inv_ecd_set.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the Electric Current Dipole Set (ECDSet) Class.
+ * @brief    Definition of the Electric Current Dipole Set (InvEcdSet) Class.
  *
  */
 
@@ -121,7 +121,7 @@ typedef struct {
     float begin,end;            /* Fitting time range */
     float r0[3];                /* Sphere model origin */
     float rd[3];                /* Dipole location */
-    float Q[3];                 /* Dipole amplitude */
+    float Q[3];                 /* InvDipole amplitude */
     float goodness;             /* Goodness-of-fit */
     int   errors_computed;      /* Have we computed the errors */
     float noise_level;          /* Noise level used for error computations */
@@ -139,13 +139,13 @@ typedef struct {
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ECDSet::ECDSet()
+InvEcdSet::InvEcdSet()
 {
 }
 
 //=============================================================================================================
 
-ECDSet::ECDSet(const ECDSet &p_ECDSet)
+InvEcdSet::InvEcdSet(const InvEcdSet &p_ECDSet)
 : dataname(p_ECDSet.dataname)
 , m_qListDips(p_ECDSet.m_qListDips)
 {
@@ -153,22 +153,22 @@ ECDSet::ECDSet(const ECDSet &p_ECDSet)
 
 //=============================================================================================================
 
-ECDSet::~ECDSet()
+InvEcdSet::~InvEcdSet()
 {
 }
 
 //=============================================================================================================
 
-void ECDSet::addEcd(const ECD& p_ecd)
+void InvEcdSet::addEcd(const InvEcd& p_ecd)
 {
     m_qListDips.append(p_ecd);
 }
 
 //=============================================================================================================
 
-ECDSet ECDSet::read_dipoles_dip(const QString& fileName)
+InvEcdSet InvEcdSet::read_dipoles_dip(const QString& fileName)
 {
-    ECDSet  set;
+    InvEcdSet  set;
 
     QFile inputFile(fileName);
     if (inputFile.open(QIODevice::ReadOnly|QIODevice::Text))
@@ -183,7 +183,7 @@ ECDSet ECDSet::read_dipoles_dip(const QString& fileName)
                 continue;
             }
             else {
-                ECD     one;
+                InvEcd     one;
                 one.valid = true;
                 one.time = list[1].toFloat() / 1000.0f;
                 one.rd[X] = list[3].toFloat() / 1000.0f;
@@ -209,21 +209,21 @@ ECDSet ECDSet::read_dipoles_dip(const QString& fileName)
 
 //=============================================================================================================
 
-bool ECDSet::save_dipoles_bdip(const QString& fileName)
+bool InvEcdSet::save_dipoles_bdip(const QString& fileName)
 /*
    * Save dipoles in the bdip format employed by xfit
    */
 {
-    FILE        *out = NULL;
+    FILE        *out = nullptr;
     bdipEcdRec  one_out;
-    ECD         one;
+    InvEcd         one;
     int         k,p;
     int         nsave;
 
     if (fileName.isEmpty() || this->size() == 0)
         return true;
 
-    if ((out = fopen(fileName.toUtf8().data(),"w")) == NULL) {
+    if ((out = fopen(fileName.toUtf8().data(),"w")) == nullptr) {
         printf(fileName.toUtf8().data());
         return false;
     }
@@ -249,7 +249,7 @@ bool ECDSet::save_dipoles_bdip(const QString& fileName)
         }
     }
     if (fclose(out) != 0) {
-        out = NULL;
+        out = nullptr;
         printf(fileName.toUtf8().data());
         return false;
     }
@@ -267,15 +267,15 @@ bad : {
 
 //=============================================================================================================
 
-bool ECDSet::save_dipoles_dip(const QString& fileName) const
+bool InvEcdSet::save_dipoles_dip(const QString& fileName) const
 {
-    FILE *out = NULL;
+    FILE *out = nullptr;
     int  k,nsave;
-    ECD  one;
+    InvEcd  one;
 
     if (fileName.isEmpty() || this->size() == 0)
         return true;
-    if ((out = fopen(fileName.toUtf8().data(),"w")) == NULL) {
+    if ((out = fopen(fileName.toUtf8().data(),"w")) == nullptr) {
         printf(fileName.toUtf8().data());
         return false;
     }
@@ -294,7 +294,7 @@ bool ECDSet::save_dipoles_dip(const QString& fileName) const
     }
     fprintf(out,"## Name \"%s dipoles\" Style \"Dipoles\"\n","ALL");
     if (fclose(out) != 0) {
-        out = NULL;
+        out = nullptr;
         printf(fileName.toUtf8().data());
         goto bad;
     }
@@ -312,11 +312,11 @@ bad : {
 
 //=============================================================================================================
 
-const ECD& ECDSet::operator[] (int idx) const
+const InvEcd& InvEcdSet::operator[] (int idx) const
 {
     if (idx>=m_qListDips.length())
     {
-        qWarning("Warning: Required ECD doesn't exist! Returning ECD '0'.");
+        qWarning("Warning: Required InvEcd doesn't exist! Returning InvEcd '0'.");
         idx=0;
     }
     return m_qListDips[idx];
@@ -324,11 +324,11 @@ const ECD& ECDSet::operator[] (int idx) const
 
 //=============================================================================================================
 
-ECD& ECDSet::operator[] (int idx)
+InvEcd& InvEcdSet::operator[] (int idx)
 {
     if (idx >= m_qListDips.length())
     {
-        qWarning("Warning: Required ECD doesn't exist! Returning ECD '0'.");
+        qWarning("Warning: Required InvEcd doesn't exist! Returning InvEcd '0'.");
         idx = 0;
     }
     return m_qListDips[idx];
@@ -336,7 +336,7 @@ ECD& ECDSet::operator[] (int idx)
 
 //=============================================================================================================
 
-ECDSet &ECDSet::operator<<(const ECD &p_ecd)
+InvEcdSet &InvEcdSet::operator<<(const InvEcd &p_ecd)
 {
     this->m_qListDips.append(p_ecd);
     return *this;

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     dipole.h
+ * @file     inv_dipole.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef DIPOLE_H
-#define DIPOLE_H
+#ifndef INV_DIPOLE_H
+#define INV_DIPOLE_H
 
 //=============================================================================================================
 // INCLUDES
@@ -45,23 +45,23 @@ namespace INVLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 template<typename T>
-class Dipole;
+class InvDipole;
 
 //=============================================================================================================
 /**
- * Declares a DipolePair structure consisting of two correlated dipoles which are the result of the RAP MUSIC
+ * Declares a InvDipolePair structure consisting of two correlated dipoles which are the result of the RAP MUSIC
  * searching algorithm.
  *
  * @brief Pair of correlated dipole indices and orientations found by the RAP MUSIC scanning step
  */
 template<typename T>
-struct DipolePair
+struct InvDipolePair
 {
     int m_iIdx1;            /**< Index of dipole one. */
-    Dipole<T> m_Dipole1;    /**< Dipole one. */
+    InvDipole<T> m_Dipole1;    /**< InvDipole one. */
 
     int m_iIdx2;            /**< Index of dipole two. */
-    Dipole<T> m_Dipole2;    /**< Dipole two. */
+    InvDipole<T> m_Dipole2;    /**< InvDipole two. */
 
     T m_vCorrelation;     /**< Correlation of the dipole pair. */
 };
@@ -73,7 +73,7 @@ struct DipolePair
  * @brief Stores position, orientation, and correlation of a single current dipole estimated by RAP MUSIC
  */
 template<class T>
-class Dipole
+class InvDipole
 {
 //typedef Eigen::Matrix<T, 3, 1> Point3D;
 
@@ -83,7 +83,7 @@ public:
     /**
      * Default constructor
      */
-    Dipole();
+    InvDipole();
 
     //=========================================================================================================
     /**
@@ -91,14 +91,14 @@ public:
      *
      * @param[in] p_sDataPath the path to the directory which contains the data folder.
      */
-    /*  Dipole();*/
+    /*  InvDipole();*/
 
     //=========================================================================================================
     /**
      * dtor
      * Do garbage collecting
      */
-    virtual ~Dipole();
+    virtual ~InvDipole();
 
     inline T& x() { return m_vecPosition[0] ; }
     inline T& y() { return m_vecPosition[1] ; }
@@ -135,11 +135,11 @@ private:
 } // NAMESPACE
 
 //TypeDefs
-typedef INVLIB::Dipole<int>     Dipole_INT;
-typedef INVLIB::Dipole<float>   Dipole_FLOAT;
-typedef INVLIB::Dipole<double>  Dipole_DOUBLE;
+typedef INVLIB::InvDipole<int>     InvDipole_INT;
+typedef INVLIB::InvDipole<float>   InvDipole_FLOAT;
+typedef INVLIB::InvDipole<double>  InvDipole_DOUBLE;
 
 //Make the template definition visible to compiler in the first point of instantiation
 #include "inv_dipole.cpp"
 
-#endif // DIPOLE_H
+#endif // INV_DIPOLE_H

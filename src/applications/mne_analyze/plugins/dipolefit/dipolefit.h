@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the DipoleFit class.
+ * @brief    Contains the declaration of the InvDipoleFit class.
  *
  */
 
@@ -76,11 +76,11 @@ namespace DIPOLEFITPLUGIN
 
 //=============================================================================================================
 /**
- * DipoleFit Plugin
+ * InvDipoleFit Plugin
  *
- * @brief The DipoleFit class provides a view with all currently loaded models.
+ * @brief The InvDipoleFit class provides a view with all currently loaded models.
  */
-class DIPOLEFITSHARED_EXPORT DipoleFit : public ANSHAREDLIB::AbstractPlugin
+class DIPOLEFITSHARED_EXPORT InvDipoleFit : public ANSHAREDLIB::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "dipolefit.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
@@ -90,15 +90,15 @@ class DIPOLEFITSHARED_EXPORT DipoleFit : public ANSHAREDLIB::AbstractPlugin
 public:
     //=========================================================================================================
     /**
-     * Constructs a DipoleFit.
+     * Constructs a InvDipoleFit.
      */
-    DipoleFit();
+    InvDipoleFit();
 
     //=========================================================================================================
     /**
-     * Destroys the DipoleFit.
+     * Destroys the InvDipoleFit.
      */
-    virtual ~DipoleFit() override;
+    virtual ~InvDipoleFit() override;
 
     // AbstractPlugin functions
     virtual QSharedPointer<AbstractPlugin> clone() const override;
@@ -228,7 +228,7 @@ private:
      *
      * @param[in] set      new EDCSet to be sent.
      */
-    void newDipoleFit(INVLIB::ECDSet set, const QString& sFitName);
+    void newDipoleFit(INVLIB::InvEcdSet set, const QString& sFitName);
 
     //=========================================================================================================
     /**
@@ -266,9 +266,9 @@ private:
     /**
      * Performs dipole fit calculation. Meant to be run on separate thread.
      *
-     * @return returs ECD set resulting from dipole fit.
+     * @return returs InvEcd set resulting from dipole fit.
      */
-    INVLIB::ECDSet dipoleFitCalculation();
+    INVLIB::InvEcdSet dipoleFitCalculation();
 
     //=========================================================================================================
     /**
@@ -291,15 +291,15 @@ private:
     void triggerLoadingEnd(QString sMessage);
 
     QList<QSharedPointer<ANSHAREDLIB::AbstractModel>>       m_ModelList;            /**< List of models used in dipole fitting. Usded for storing for later selection. */
-    INVLIB::DipoleFitSettings                           m_DipoleSettings;       /**< Settings for dipole fit. */
+    INVLIB::InvDipoleFitSettings                           m_DipoleSettings;       /**< Settings for dipole fit. */
     QString                                                 m_sFitName;             /**< Fit name for dipole fit. */
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;               /**< Communicator for sending events. */
 
     QMutex                                                  m_FitMutex;             /**< Mutex for thread-safing. */
 
-    QFutureWatcher<INVLIB::ECDSet>                      m_FutureWatcher;        /**< Future watcher for notifing of completed fit calculations. */
-    QFuture<INVLIB::ECDSet>                             m_Future;               /**< Future for performing fit calculations of separate thread. */
+    QFutureWatcher<INVLIB::InvEcdSet>                      m_FutureWatcher;        /**< Future watcher for notifing of completed fit calculations. */
+    QFuture<INVLIB::InvEcdSet>                             m_Future;               /**< Future for performing fit calculations of separate thread. */
 
 signals:
 

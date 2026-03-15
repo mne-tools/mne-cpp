@@ -172,7 +172,7 @@ void BrainTreeModel::addSensors(const QString &type, const QList<QStandardItem*>
 
 //=============================================================================================================
 
-void BrainTreeModel::addDipoles(const INVLIB::ECDSet &set)
+void BrainTreeModel::addDipoles(const INVLIB::InvEcdSet &set)
 {
     DipoleTreeItem* item = new DipoleTreeItem("Dipoles", set);
     item->setCheckable(true);

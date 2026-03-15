@@ -95,7 +95,7 @@ public:
      *
      * @return The left hemisphere source estimate.
      */
-    const INVLIB::MNESourceEstimate& stcLh() const { return m_stcLh; }
+    const INVLIB::InvSourceEstimate& stcLh() const { return m_stcLh; }
 
     //=========================================================================================================
     /**
@@ -103,7 +103,7 @@ public:
      *
      * @return The right hemisphere source estimate.
      */
-    const INVLIB::MNESourceEstimate& stcRh() const { return m_stcRh; }
+    const INVLIB::InvSourceEstimate& stcRh() const { return m_stcRh; }
 
     //=========================================================================================================
     /**
@@ -178,8 +178,8 @@ private:
     BrainSurface *m_rhSurface;                                 /**< Pointer to RH surface. */
     double m_cancelDist;                                       /**< Cancel distance for interpolation. */
 
-    INVLIB::MNESourceEstimate m_stcLh;                         /**< Loaded LH source estimate. */
-    INVLIB::MNESourceEstimate m_stcRh;                         /**< Loaded RH source estimate. */
+    INVLIB::InvSourceEstimate m_stcLh;                         /**< Loaded LH source estimate. */
+    INVLIB::InvSourceEstimate m_stcRh;                         /**< Loaded RH source estimate. */
     bool m_hasLh = false;                                      /**< Flag indicating LH data loaded. */
     bool m_hasRh = false;                                      /**< Flag indicating RH data loaded. */
 

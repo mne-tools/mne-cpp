@@ -133,19 +133,19 @@ int main(int argc, char *argv[])
     // make an M/EEG, MEG-only, and EEG-only inverse operators
     FiffInfo info = evoked.info;
 
-    MNEInverseOperator inverse_operator_meeg(info, t_forwardMeeg, noise_cov, 0.2f, 0.8f);
-    MNEInverseOperator inverse_operator_meg(info, t_forwardMeg, noise_cov, 0.2f, 0.8f);
-    MNEInverseOperator inverse_operator_eeg(info, t_forwardEeg, noise_cov, 0.2f, 0.8f);
+    InvInverseOperator inverse_operator_meeg(info, t_forwardMeeg, noise_cov, 0.2f, 0.8f);
+    InvInverseOperator inverse_operator_meg(info, t_forwardMeg, noise_cov, 0.2f, 0.8f);
+    InvInverseOperator inverse_operator_eeg(info, t_forwardEeg, noise_cov, 0.2f, 0.8f);
 
     // Compute inverse solution
-    MinimumNorm minimumNorm_meeg(inverse_operator_meeg, lambda2, method);
-    MNESourceEstimate sourceEstimate_meeg = minimumNorm_meeg.calculateInverse(evoked);
+    InvMinimumNorm minimumNorm_meeg(inverse_operator_meeg, lambda2, method);
+    InvSourceEstimate sourceEstimate_meeg = minimumNorm_meeg.calculateInverse(evoked);
 
-    MinimumNorm minimumNorm_meg(inverse_operator_meg, lambda2, method);
-    MNESourceEstimate sourceEstimate_meg = minimumNorm_meg.calculateInverse(evoked);
+    InvMinimumNorm minimumNorm_meg(inverse_operator_meg, lambda2, method);
+    InvSourceEstimate sourceEstimate_meg = minimumNorm_meg.calculateInverse(evoked);
 
-    MinimumNorm minimumNorm_eeg(inverse_operator_eeg, lambda2, method);
-    MNESourceEstimate sourceEstimate_eeg = minimumNorm_eeg.calculateInverse(evoked);
+    InvMinimumNorm minimumNorm_eeg(inverse_operator_eeg, lambda2, method);
+    InvSourceEstimate sourceEstimate_eeg = minimumNorm_eeg.calculateInverse(evoked);
 
     if(sourceEstimate_meeg.isEmpty() || sourceEstimate_meg.isEmpty() || sourceEstimate_eeg.isEmpty())
         return 1;

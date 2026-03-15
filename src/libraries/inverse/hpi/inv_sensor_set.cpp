@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    SensorSet class definition.
+ * @brief    InvSensorSet class definition.
  *
  */
 
@@ -70,7 +70,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SensorSet::SensorSet(const FwdCoilSet::SPtr pFwdSensorSet)
+InvSensorSet::InvSensorSet(const FwdCoilSet::SPtr pFwdSensorSet)
 {
     if(pFwdSensorSet!=nullptr) {
         initFromFwdCoilSet(pFwdSensorSet);
@@ -79,7 +79,7 @@ SensorSet::SensorSet(const FwdCoilSet::SPtr pFwdSensorSet)
 
 //=============================================================================================================
 
-void SensorSet::initFromFwdCoilSet(const QSharedPointer<FWDLIB::FwdCoilSet> pFwdSensorSet)
+void InvSensorSet::initFromFwdCoilSet(const QSharedPointer<FWDLIB::FwdCoilSet> pFwdSensorSet)
 {
     m_ncoils = pFwdSensorSet->ncoil();
     m_np = pFwdSensorSet->coils[0]->np;
@@ -116,7 +116,7 @@ void SensorSet::initFromFwdCoilSet(const QSharedPointer<FWDLIB::FwdCoilSet> pFwd
 
 //=============================================================================================================
 
-void SensorSet::initMatrices(int ncoils, int np)
+void InvSensorSet::initMatrices(int ncoils, int np)
 {
     m_ez = MatrixXd(ncoils,3);
     m_r0 = MatrixXd(ncoils,3);
@@ -129,7 +129,7 @@ void SensorSet::initMatrices(int ncoils, int np)
 
 //=============================================================================================================
 
-SensorSetCreator::SensorSetCreator()
+InvSensorSetCreator::InvSensorSetCreator()
 {
     const QString qPath = QString(QCoreApplication::applicationDirPath() + "/../resources/general/coilDefinitions/coil_def.dat");
     m_pCoilDefinitions = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath).release());
@@ -137,14 +137,14 @@ SensorSetCreator::SensorSetCreator()
 
 //=============================================================================================================
 
-SensorSet SensorSetCreator::updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
+InvSensorSet InvSensorSetCreator::updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
                                             const Accuracy& accuracy)
 {
     if(channelList.isEmpty()) {
-        return SensorSet();
+        return InvSensorSet();
     } else {
         auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(channelList, channelList.size(), static_cast<int>(accuracy)).release());
-        return SensorSet(pCoilMeg);
+        return InvSensorSet(pCoilMeg);
     }
 }
 

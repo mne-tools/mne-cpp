@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MNE Meas Data Set (MNEMeasDataSet) class declaration.
+ * @brief    MNE Meas Data Set (InvMeasDataSet) class declaration.
  *
  */
 
-#ifndef MNEMEASDATASET_H
-#define MNEMEASDATASET_H
+#ifndef INV_MEAS_DATA_SET_H
+#define INV_MEAS_DATA_SET_H
 
 //=============================================================================================================
 // INCLUDES
@@ -75,27 +75,27 @@ class MNEMneData;
 /**
  * Implements MNE Meas Data Set (Replaces *mneMeasDataSet,mneMeasDataSetRec; struct of MNE-C mne_types.h).
  *
- * @brief Single measurement epoch or average within MNEMeasData, including data matrix and projectors.
+ * @brief Single measurement epoch or average within InvMeasData, including data matrix and projectors.
  */
-class INVSHARED_EXPORT MNEMeasDataSet
+class INVSHARED_EXPORT InvMeasDataSet
 {
 public:
-    typedef QSharedPointer<MNEMeasDataSet> SPtr;              /**< Shared pointer type for MNEMeasDataSet. */
-    typedef QSharedPointer<const MNEMeasDataSet> ConstSPtr;   /**< Const shared pointer type for MNEMeasDataSet. */
+    typedef QSharedPointer<InvMeasDataSet> SPtr;              /**< Shared pointer type for InvMeasDataSet. */
+    typedef QSharedPointer<const InvMeasDataSet> ConstSPtr;   /**< Const shared pointer type for InvMeasDataSet. */
 
     //=========================================================================================================
     /**
      * Constructs the MNE Meas Data Set
      * Refactored: mne_new_meas_data_set (mne_read_data.c)
      */
-    MNEMeasDataSet();
+    InvMeasDataSet();
 
     //=========================================================================================================
     /**
      * Destroys the MNE Meas Data Set description
      * Refactored: mne_free_meas_data_set (mne_read_data.c)
      */
-    ~MNEMeasDataSet();
+    ~InvMeasDataSet();
 
 public:
     /*
@@ -124,4 +124,4 @@ public:
 //=============================================================================================================
 } // NAMESPACE INVLIB
 
-#endif // MNEMEASDATASET_H
+#endif // INV_MEAS_DATA_SET_H

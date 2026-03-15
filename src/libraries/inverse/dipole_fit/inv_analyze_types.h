@@ -1,5 +1,5 @@
-#ifndef _analyze_types_h
-#define _analyze_types_h
+#ifndef INV_ANALYZE_TYPES_H
+#define INV_ANALYZE_TYPES_H
 
 #define SURF_UNKNOWN -1
 
@@ -345,7 +345,7 @@ typedef struct {
   char          *inv_file;                      /* Inverse operator file */
   char          *mri_trans_file;                /* Where does the MRI transform come from */
   int           nave;                           /* If nave < 0 use nave from the measurement data? */
-  INVLIB::MNEMeasData*  meas;               /* The measurement */
+  INVLIB::InvMeasData*  meas;               /* The measurement */
   float         raw_tmin,raw_tmax;		     /* Time range for raw data segments */
   int           sample;				     /* Which channel is the sample */
   int           firstp;		                     /* First data point in the current time range selection */

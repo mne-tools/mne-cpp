@@ -79,7 +79,7 @@ namespace FIFFLIB {
 }
 
 namespace INVLIB {
-    class ECDSet;
+    class InvEcdSet;
 }
 //=============================================================================================================
 // DEFINE NAMESPACE VIEW3DPLUGIN
@@ -196,7 +196,7 @@ private:
      * @brief newDipoleFit
      * @param ecdSet.
      */
-    void newDipoleFit(const INVLIB::ECDSet& ecdSet);
+    void newDipoleFit(const INVLIB::InvEcdSet& ecdSet);
 
     //=========================================================================================================
     /**

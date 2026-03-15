@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     QCommandLineOption evokedFileOption("ave", "Path to evoked <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption subjectDirectoryOption("subjDir", "Path to subject <directory>.", "directory", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
     QCommandLineOption subjectOption("subj", "Selected <subject>.", "subject", "sample");
-    QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");//"RapMusic.stc");
+    QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");//"InvRapMusic.stc");
     QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "1");
     QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.", "doMovie", "false");
     QCommandLineOption annotOption("annotType", "FsAnnotation type <type>.", "type", "aparc.a2009s");
@@ -171,14 +171,14 @@ int main(int argc, char *argv[])
 //    std::cout << "Size " << t_clusteredFwd.sol->data.rows() << " x " << t_clusteredFwd.sol->data.cols() << std::endl;
 //    std::cout << "Clustered Fwd:\n" << t_clusteredFwd.sol->data.row(0) << std::endl;
 
-    PwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
+    InvPwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
 
     int iWinSize = 200;
     if(doMovie) {
         t_pwlRapMusic.setStcAttr(iWinSize, 0.6f);
     }
 
-    MNESourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
+    InvSourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
 
     if(doMovie) {
         //Select only the activations once
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
 
     // Write source estimate to temp files for visualization
     int nVertLh = t_clusteredFwd.src[0].nuse;
-    MNESourceEstimate stcLh, stcRh;
+    InvSourceEstimate stcLh, stcRh;
     stcLh.data = sourceEstimate.data.topRows(nVertLh);
     stcLh.vertices = sourceEstimate.vertices.head(nVertLh);
     stcLh.tmin = sourceEstimate.tmin;

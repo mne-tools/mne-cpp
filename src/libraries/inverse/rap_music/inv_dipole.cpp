@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     dipole.cpp
+ * @file     inv_dipole.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
@@ -46,7 +46,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 template <class T>
-Dipole<T>::Dipole()
+InvDipole<T>::InvDipole()
 : m_vecPosition(Matrix<T, 3, 1>::Zero(3))
 , m_vecDirection(Matrix<T, 3, 1>::Zero(3))
 , m_dLength(1)
@@ -57,7 +57,7 @@ Dipole<T>::Dipole()
 //=============================================================================================================
 
 template <class T>
-Dipole<T>::~Dipole()
+InvDipole<T>::~InvDipole()
 {
 }
 }//Namespace

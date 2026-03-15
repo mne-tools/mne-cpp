@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     dipole_forward.cpp
+ * @file     inv_dipole_forward.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the DipoleForward Class.
+ * @brief    Definition of the InvDipoleForward Class.
  *
  */
 
@@ -48,7 +48,7 @@ using namespace Eigen;
 using namespace INVLIB;
 
 #define FREE_CMATRIX_4(m) mne_free_cmatrix_4((m))
-#define FREE_4(x) if ((char *)(x) != NULL) free((char *)(x))
+#define FREE_4(x) if ((char *)(x) != nullptr) free((char *)(x))
 
 void mne_free_cmatrix_4 (float **m)
 {
@@ -62,13 +62,13 @@ void mne_free_cmatrix_4 (float **m)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DipoleForward::DipoleForward()
-: rd(NULL)
-, fwd(NULL)
-, scales(NULL)
-, uu(NULL)
-, vv(NULL)
-, sing(NULL)
+InvDipoleForward::InvDipoleForward()
+: rd(nullptr)
+, fwd(nullptr)
+, scales(nullptr)
+, uu(nullptr)
+, vv(nullptr)
+, sing(nullptr)
 , nch(0)
 , ndip(0)
 {
@@ -76,13 +76,13 @@ DipoleForward::DipoleForward()
 
 ////=============================================================================================================
 
-//DipoleForward::DipoleForward(const DipoleForward& p_DipoleForward)
+//InvDipoleForward::InvDipoleForward(const InvDipoleForward& p_DipoleForward)
 //{
 //}
 
 //=============================================================================================================
 
-DipoleForward::~DipoleForward()
+InvDipoleForward::~InvDipoleForward()
 {
     if(rd)
         FREE_CMATRIX_4(rd);

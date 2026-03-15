@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     rap_music.cpp
+ * @file     inv_rap_music.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the RapMusic Algorithm Class.
+ * @brief    Definition of the InvRapMusic Algorithm Class.
  *
  */
 
@@ -65,13 +65,13 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RapMusic::RapMusic()
+InvRapMusic::InvRapMusic()
 : m_iN(0)
 , m_dThreshold(0)
 , m_iNumGridPoints(0)
 , m_iNumChannels(0)
 , m_iNumLeadFieldCombinations(0)
-, m_ppPairIdxCombinations(NULL)
+, m_ppPairIdxCombinations(nullptr)
 , m_iMaxNumThreads(1)
 , m_bIsInit(false)
 , m_iSamplesStcWindow(-1)
@@ -81,13 +81,13 @@ RapMusic::RapMusic()
 
 //=============================================================================================================
 
-RapMusic::RapMusic(FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
+InvRapMusic::InvRapMusic(FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
 : m_iN(0)
 , m_dThreshold(0)
 , m_iNumGridPoints(0)
 , m_iNumChannels(0)
 , m_iNumLeadFieldCombinations(0)
-, m_ppPairIdxCombinations(NULL)
+, m_ppPairIdxCombinations(nullptr)
 , m_iMaxNumThreads(1)
 , m_bIsInit(false)
 , m_iSamplesStcWindow(-1)
@@ -99,15 +99,15 @@ RapMusic::RapMusic(FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double
 
 //=============================================================================================================
 
-RapMusic::~RapMusic()
+InvRapMusic::~InvRapMusic()
 {
-    if(m_ppPairIdxCombinations != NULL)
+    if(m_ppPairIdxCombinations != nullptr)
         free(m_ppPairIdxCombinations);
 }
 
 //=============================================================================================================
 
-bool RapMusic::init(FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
+bool InvRapMusic::init(FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
 {
     //Get available thread number
     #ifdef _OPENMP
@@ -126,7 +126,7 @@ bool RapMusic::init(FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, doubl
     m_dThreshold = p_dThr;
 
 //    //Grid check
-//    if(p_pMatGrid != NULL)
+//    if(p_pMatGrid != nullptr)
 //    {
 //        if ( p_pMatGrid->rows() != p_pMatLeadField->cols() / 3 )
 //        {
@@ -190,25 +190,25 @@ bool RapMusic::init(FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, doubl
 
 //=============================================================================================================
 
-const char* RapMusic::getName() const
+const char* InvRapMusic::getName() const
 {
     return "RAP MUSIC";
 }
 
 //=============================================================================================================
 
-const MNESourceSpaces& RapMusic::getSourceSpace() const
+const MNESourceSpaces& InvRapMusic::getSourceSpace() const
 {
     return m_ForwardSolution.src;
 }
 
 //=============================================================================================================
 
-MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal)
+InvSourceEstimate InvRapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal)
 {
     Q_UNUSED(pick_normal);
 
-    MNESourceEstimate p_sourceEstimate;
+    InvSourceEstimate p_sourceEstimate;
 
     if(p_fiffEvoked.data.rows() != m_iNumChannels)
     {
@@ -233,7 +233,7 @@ MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
 
     if(m_iSamplesStcWindow <= 3) //if samples per stc aren't set -> use full window
     {
-        QList< DipolePair<double> > t_RapDipoles;
+        QList< InvDipolePair<double> > t_RapDipoles;
         calculateInverse(p_fiffEvoked.data, t_RapDipoles);
 
         for(qint32 i = 0; i < t_RapDipoles.size(); ++i)
@@ -272,7 +272,7 @@ MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
 
         while(!last)
         {
-            QList< DipolePair<double> > t_RapDipoles;
+            QList< InvDipolePair<double> > t_RapDipoles;
 
             //Data
             if(curSample + m_iSamplesStcWindow >= t_iNumSteps) //last
@@ -324,11 +324,11 @@ MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
 
 //=============================================================================================================
 
-MNESourceEstimate RapMusic::calculateInverse(const MatrixXd &data, float tmin, float tstep, bool pick_normal) const
+InvSourceEstimate InvRapMusic::calculateInverse(const MatrixXd &data, float tmin, float tstep, bool pick_normal) const
 {
     Q_UNUSED(pick_normal);
 
-    MNESourceEstimate p_sourceEstimate;
+    InvSourceEstimate p_sourceEstimate;
 
     if(data.rows() != m_iNumChannels)
     {
@@ -354,7 +354,7 @@ MNESourceEstimate RapMusic::calculateInverse(const MatrixXd &data, float tmin, f
     p_sourceEstimate.tmin = tmin;
     p_sourceEstimate.tstep = tstep;
 
-    QList< DipolePair<double> > t_RapDipoles;
+    QList< InvDipolePair<double> > t_RapDipoles;
     calculateInverse(data, t_RapDipoles);
 
     for(qint32 i = 0; i < t_RapDipoles.size(); ++i)
@@ -379,9 +379,9 @@ MNESourceEstimate RapMusic::calculateInverse(const MatrixXd &data, float tmin, f
 
 //=============================================================================================================
 
-MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles) const
+InvSourceEstimate InvRapMusic::calculateInverse(const MatrixXd& p_matMeasurement, QList< InvDipolePair<double> > &p_RapDipoles) const
 {
-    MNESourceEstimate p_SourceEstimate;
+    InvSourceEstimate p_SourceEstimate;
 
     //if not initialized -> break
     if(!m_bIsInit)
@@ -409,7 +409,7 @@ MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, Q
 //        p_pMatMeasurement->cols() );
 
     //Calculate the signal subspace (t_pMatPhi_s)
-    MatrixXT* t_pMatPhi_s = NULL;//(m_iNumChannels, m_iN < t_r ? m_iN : t_r);
+    MatrixXT* t_pMatPhi_s = nullptr;//(m_iNumChannels, m_iN < t_r ? m_iN : t_r);
     int t_r = calcPhi_s(/*(MatrixXT)*/p_matMeasurement, t_pMatPhi_s);
 
     int t_iMaxSearch = m_iN < t_r ? m_iN : t_r; //The smallest of Rank and Iterations
@@ -431,16 +431,16 @@ MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, Q
     MatrixXT t_matA_k_1(m_iNumChannels, t_iMaxSearch);
     t_matA_k_1.setZero();
 
-//    if (m_pMatGrid != NULL)
+//    if (m_pMatGrid != nullptr)
 //    {
-//        if(p_pRapDipoles != NULL)
+//        if(p_pRapDipoles != nullptr)
 //            p_pRapDipoles->initRapDipoles(m_pMatGrid);
 //        else
 //            p_pRapDipoles = new RapDipoles<T>(m_pMatGrid);
 //    }
 //    else
 //    {
-//        if(p_pRapDipoles != NULL)
+//        if(p_pRapDipoles != nullptr)
 //            delete p_pRapDipoles;
 
 //        p_pRapDipoles = new RapDipoles<T>();
@@ -492,9 +492,9 @@ MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, Q
                 int idx1 = m_ppPairIdxCombinations[i]->x1;
                 int idx2 = m_ppPairIdxCombinations[i]->x2;
 
-                RapMusic::getGainMatrixPair(t_matProj_LeadField, t_matProj_G, idx1, idx2);
+                InvRapMusic::getGainMatrixPair(t_matProj_LeadField, t_matProj_G, idx1, idx2);
 
-                t_vecRoh(i) = RapMusic::subcorr(t_matProj_G, t_matU_B);//t_vecRoh holds the correlations roh_k
+                t_vecRoh(i) = InvRapMusic::subcorr(t_matProj_G, t_matU_B);//t_vecRoh holds the correlations roh_k
             }
         }
 
@@ -537,7 +537,7 @@ MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, Q
 
         //Calculations with the max correlated dipole pair G_k_1 -> ToDo Obsolet when taking direkt Projected Lead Field
         MatrixX6T t_matG_k_1(m_ForwardSolution.sol->data.rows(),6);
-        RapMusic::getGainMatrixPair(m_ForwardSolution.sol->data, t_matG_k_1, t_iIdx1, t_iIdx2);
+        InvRapMusic::getGainMatrixPair(m_ForwardSolution.sol->data, t_matG_k_1, t_iIdx1, t_iIdx2);
 
         MatrixX6T t_matProj_G_k_1(t_matOrthProj.rows(), t_matG_k_1.cols());
         t_matProj_G_k_1 = t_matOrthProj * t_matG_k_1;//Subtract the found sources from the current found source
@@ -547,10 +547,10 @@ MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, Q
         //Calculate source direction
         //source direction (p_pMatPhi) for current source r (phi_k_1)
         Vector6T t_vec_phi_k_1(6);
-        RapMusic::subcorr(t_matProj_G_k_1, t_matU_B, t_vec_phi_k_1);//Correlate the current source to calculate the direction
+        InvRapMusic::subcorr(t_matProj_G_k_1, t_matU_B, t_vec_phi_k_1);//Correlate the current source to calculate the direction
 
         //Set return values
-        RapMusic::insertSource(t_iIdx1, t_iIdx2, t_vec_phi_k_1, t_val_roh_k, p_RapDipoles);
+        InvRapMusic::insertSource(t_iIdx1, t_iIdx2, t_vec_phi_k_1, t_val_roh_k, p_RapDipoles);
 
         //Stop Searching when Correlation is smaller then the Threshold
         if (t_val_roh_k < m_dThreshold)
@@ -561,7 +561,7 @@ MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, Q
         }
 
         //Calculate A_k_1 = [a_theta_1..a_theta_k_1] matrix for subtraction of found source
-        RapMusic::calcA_k_1(t_matG_k_1, t_vec_phi_k_1, r, t_matA_k_1);
+        InvRapMusic::calcA_k_1(t_matG_k_1, t_vec_phi_k_1, r, t_matA_k_1);
 
         //Calculate new orthogonal Projector (Pi_k_1)
         calcOrthProj(t_matA_k_1, t_matOrthProj);
@@ -585,7 +585,7 @@ MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, Q
 
 //=============================================================================================================
 
-int RapMusic::calcPhi_s(const MatrixXT& p_matMeasurement, MatrixXT* &p_pMatPhi_s) const
+int InvRapMusic::calcPhi_s(const MatrixXT& p_matMeasurement, MatrixXT* &p_pMatPhi_s) const
 {
     //Calculate p_pMatPhi_s
     MatrixXT t_matF;//t_matF = makeSquareMat(p_pMatMeasurement); //FF^T -> ToDo Check this
@@ -600,7 +600,7 @@ int RapMusic::calcPhi_s(const MatrixXT& p_matMeasurement, MatrixXT* &p_pMatPhi_s
 
     int t_iCols = t_r;//t_r < m_iN ? m_iN : t_r;
 
-    if (p_pMatPhi_s != NULL)
+    if (p_pMatPhi_s != nullptr)
         delete p_pMatPhi_s;
 
     //m_iNumChannels has to be equal to t_svdF.matrixU().rows()
@@ -614,7 +614,7 @@ int RapMusic::calcPhi_s(const MatrixXT& p_matMeasurement, MatrixXT* &p_pMatPhi_s
 
 //=============================================================================================================
 
-double RapMusic::subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_matU_B)
+double InvRapMusic::subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_matU_B)
 {
     //Orthogonalisierungstest wegen performance weggelassen -> ohne is es viel schneller
 
@@ -669,7 +669,7 @@ double RapMusic::subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_matU_B)
 
 //=============================================================================================================
 
-double RapMusic::subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_matU_B, Vector6T& p_vec_phi_k_1)
+double InvRapMusic::subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_matU_B, Vector6T& p_vec_phi_k_1)
 {
     //Orthogonalisierungstest wegen performance weggelassen -> ohne is es viel schneller
 
@@ -744,7 +744,7 @@ double RapMusic::subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_matU_B, Vecto
 
 //=============================================================================================================
 
-void RapMusic::calcA_k_1(   const MatrixX6T& p_matG_k_1,
+void InvRapMusic::calcA_k_1(   const MatrixX6T& p_matG_k_1,
                             const Vector6T& p_matPhi_k_1,
                             const int p_iIdxk_1,
                             MatrixXT& p_matA_k_1)
@@ -759,7 +759,7 @@ void RapMusic::calcA_k_1(   const MatrixX6T& p_matG_k_1,
 
 //=============================================================================================================
 
-void RapMusic::calcOrthProj(const MatrixXT& p_matA_k_1, MatrixXT& p_matOrthProj) const
+void InvRapMusic::calcOrthProj(const MatrixXT& p_matA_k_1, MatrixXT& p_matOrthProj) const
 {
     //Calculate OrthProj=I-A_k_1*(A_k_1'*A_k_1)^-1*A_k_1' //Wetterling -> A_k_1 = Gain
 
@@ -797,7 +797,7 @@ void RapMusic::calcOrthProj(const MatrixXT& p_matA_k_1, MatrixXT& p_matOrthProj)
 
 //=============================================================================================================
 
-void RapMusic::calcPairCombinations(    const int p_iNumPoints,
+void InvRapMusic::calcPairCombinations(    const int p_iNumPoints,
                                         const int p_iNumCombinations,
                                         Pair** p_ppPairIdxCombinations) const
 {
@@ -814,7 +814,7 @@ void RapMusic::calcPairCombinations(    const int p_iNumPoints,
     #endif
         for (int i = 0; i < p_iNumCombinations; ++i)
         {
-            RapMusic::getPointPair(p_iNumPoints, i, idx1, idx2);
+            InvRapMusic::getPointPair(p_iNumPoints, i, idx1, idx2);
 
             Pair* t_pairCombination = new Pair();
             t_pairCombination->x1 = idx1;
@@ -827,7 +827,7 @@ void RapMusic::calcPairCombinations(    const int p_iNumPoints,
 
 //=============================================================================================================
 
-void RapMusic::getPointPair(const int p_iPoints, const int p_iCurIdx, int &p_iIdx1, int &p_iIdx2)
+void InvRapMusic::getPointPair(const int p_iPoints, const int p_iCurIdx, int &p_iIdx1, int &p_iIdx2)
 {
     int ii = p_iPoints*(p_iPoints+1)/2-1-p_iCurIdx;
     int K = (int)floor((sqrt((double)(8*ii+1))-1)/2);
@@ -839,7 +839,7 @@ void RapMusic::getPointPair(const int p_iPoints, const int p_iCurIdx, int &p_iId
 
 //=============================================================================================================
 //ToDo don't make a real copy
-void RapMusic::getGainMatrixPair(   const MatrixXT& p_matGainMarix,
+void InvRapMusic::getGainMatrixPair(   const MatrixXT& p_matGainMarix,
                                     MatrixX6T& p_matGainMarix_Pair,
                                     int p_iIdx1, int p_iIdx2)
 {
@@ -850,12 +850,12 @@ void RapMusic::getGainMatrixPair(   const MatrixXT& p_matGainMarix,
 
 //=============================================================================================================
 
-void RapMusic::insertSource(    int p_iDipoleIdx1, int p_iDipoleIdx2,
+void InvRapMusic::insertSource(    int p_iDipoleIdx1, int p_iDipoleIdx2,
                                 const Vector6T &p_vec_phi_k_1,
                                 double p_valCor,
-                                QList< DipolePair<double> > &p_RapDipoles)
+                                QList< InvDipolePair<double> > &p_RapDipoles)
 {
-    DipolePair<double> t_pRapDipolePair;
+    InvDipolePair<double> t_pRapDipolePair;
 
     t_pRapDipolePair.m_iIdx1 = p_iDipoleIdx1; //p_iDipoleIdx1+1 because of MATLAB index
     t_pRapDipolePair.m_iIdx2 = p_iDipoleIdx2;
@@ -883,7 +883,7 @@ void RapMusic::insertSource(    int p_iDipoleIdx1, int p_iDipoleIdx2,
 
 //=============================================================================================================
 
-void RapMusic::setStcAttr(int p_iSampStcWin, float p_fStcOverlap)
+void InvRapMusic::setStcAttr(int p_iSampStcWin, float p_fStcOverlap)
 {
     m_iSamplesStcWindow = p_iSampStcWin;
     m_fStcOverlap = p_fStcOverlap;

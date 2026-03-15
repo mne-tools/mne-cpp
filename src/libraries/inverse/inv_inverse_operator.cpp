@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MNEInverseOperator Class.
+ * @brief    Definition of the InvInverseOperator Class.
  *
  */
 
@@ -73,7 +73,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNEInverseOperator::MNEInverseOperator()
+InvInverseOperator::InvInverseOperator()
 : methods(-1)
 , source_ori(-1)
 , nsource(-1)
@@ -89,22 +89,22 @@ MNEInverseOperator::MNEInverseOperator()
 , fmri_prior(new FiffCov)
 , nave(-1)
 {
-    qRegisterMetaType<QSharedPointer<INVLIB::MNEInverseOperator> >("QSharedPointer<INVLIB::MNEInverseOperator>");
-    qRegisterMetaType<INVLIB::MNEInverseOperator>("INVLIB::MNEInverseOperator");
+    qRegisterMetaType<QSharedPointer<INVLIB::InvInverseOperator> >("QSharedPointer<INVLIB::InvInverseOperator>");
+    qRegisterMetaType<INVLIB::InvInverseOperator>("INVLIB::InvInverseOperator");
 }
 
 //=============================================================================================================
 
-MNEInverseOperator::MNEInverseOperator(QIODevice& p_IODevice)
+InvInverseOperator::InvInverseOperator(QIODevice& p_IODevice)
 {
-    MNEInverseOperator::read_inverse_operator(p_IODevice, *this);
-    qRegisterMetaType<QSharedPointer<INVLIB::MNEInverseOperator> >("QSharedPointer<INVLIB::MNEInverseOperator>");
-    qRegisterMetaType<INVLIB::MNEInverseOperator>("INVLIB::MNEInverseOperator");
+    InvInverseOperator::read_inverse_operator(p_IODevice, *this);
+    qRegisterMetaType<QSharedPointer<INVLIB::InvInverseOperator> >("QSharedPointer<INVLIB::InvInverseOperator>");
+    qRegisterMetaType<INVLIB::InvInverseOperator>("INVLIB::InvInverseOperator");
 }
 
 //=============================================================================================================
 
-MNEInverseOperator::MNEInverseOperator(const FiffInfo &info,
+InvInverseOperator::InvInverseOperator(const FiffInfo &info,
                                        const FwdForwardSolution& forward,
                                        const FiffCov& p_noise_cov,
                                        float loose,
@@ -112,14 +112,14 @@ MNEInverseOperator::MNEInverseOperator(const FiffInfo &info,
                                        bool fixed,
                                        bool limit_depth_chs)
 {
-     *this = MNEInverseOperator::make_inverse_operator(info, forward, p_noise_cov, loose, depth, fixed, limit_depth_chs);
-    qRegisterMetaType<QSharedPointer<INVLIB::MNEInverseOperator> >("QSharedPointer<INVLIB::MNEInverseOperator>");
-    qRegisterMetaType<INVLIB::MNEInverseOperator>("INVLIB::MNEInverseOperator");
+     *this = InvInverseOperator::make_inverse_operator(info, forward, p_noise_cov, loose, depth, fixed, limit_depth_chs);
+    qRegisterMetaType<QSharedPointer<INVLIB::InvInverseOperator> >("QSharedPointer<INVLIB::InvInverseOperator>");
+    qRegisterMetaType<INVLIB::InvInverseOperator>("INVLIB::InvInverseOperator");
 }
 
 //=============================================================================================================
 
-MNEInverseOperator::MNEInverseOperator(const MNEInverseOperator &p_MNEInverseOperator)
+InvInverseOperator::InvInverseOperator(const InvInverseOperator &p_MNEInverseOperator)
 : info(p_MNEInverseOperator.info)
 , methods(p_MNEInverseOperator.methods)
 , source_ori(p_MNEInverseOperator.source_ori)
@@ -145,19 +145,19 @@ MNEInverseOperator::MNEInverseOperator(const MNEInverseOperator &p_MNEInverseOpe
 , reginv(p_MNEInverseOperator.reginv)
 , noisenorm(p_MNEInverseOperator.noisenorm)
 {
-    qRegisterMetaType<QSharedPointer<INVLIB::MNEInverseOperator> >("QSharedPointer<INVLIB::MNEInverseOperator>");
-    qRegisterMetaType<INVLIB::MNEInverseOperator>("INVLIB::MNEInverseOperator");
+    qRegisterMetaType<QSharedPointer<INVLIB::InvInverseOperator> >("QSharedPointer<INVLIB::InvInverseOperator>");
+    qRegisterMetaType<INVLIB::InvInverseOperator>("INVLIB::InvInverseOperator");
 }
 
 //=============================================================================================================
 
-MNEInverseOperator::~MNEInverseOperator()
+InvInverseOperator::~InvInverseOperator()
 {
 }
 
 //=============================================================================================================
 
-bool MNEInverseOperator::assemble_kernel(const FsLabel &label,
+bool InvInverseOperator::assemble_kernel(const FsLabel &label,
                                          QString method,
                                          bool pick_normal,
                                          MatrixXd &K,
@@ -306,7 +306,7 @@ bool MNEInverseOperator::assemble_kernel(const FsLabel &label,
 
 //=============================================================================================================
 
-bool MNEInverseOperator::check_ch_names(const FiffInfo &info) const
+bool InvInverseOperator::check_ch_names(const FiffInfo &info) const
 {
     QStringList inv_ch_names = this->eigen_fields->col_names;
 
@@ -351,7 +351,7 @@ bool MNEInverseOperator::check_ch_names(const FiffInfo &info) const
 
 //=============================================================================================================
 
-MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D, QString p_sMethod) const
+MatrixXd InvInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D, QString p_sMethod) const
 {
     printf("Cluster kernel using %s.\n", p_sMethod.toUtf8().constData());
 
@@ -471,7 +471,7 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
 
                     t_sensMT.idcs = idcs;
                     t_sensMT.iLabelIdxIn = i;
-                    t_sensMT.nClusters = ceil((double)nSources/(double)p_iClusterSize);
+                    t_sensMT.nClusters = ceil(static_cast<double>(nSources)/static_cast<double>(p_iClusterSize));
 
                     t_sensMT.matRoiMTOrig = t_MT;
 
@@ -681,7 +681,7 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
 
 //=============================================================================================================
 
-MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &info,
+InvInverseOperator InvInverseOperator::make_inverse_operator(const FiffInfo &info,
                                                              FwdForwardSolution forward,
                                                              const FiffCov &p_noise_cov,
                                                              float loose,
@@ -690,9 +690,9 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
                                                              bool limit_depth_chs)
 {
     bool is_fixed_ori = forward.isFixedOrient();
-    MNEInverseOperator p_MNEInverseOperator;
+    InvInverseOperator p_MNEInverseOperator;
 
-    std::cout << "ToDo MNEInverseOperator::make_inverse_operator: do surf_ori check" << std::endl;
+    std::cout << "ToDo InvInverseOperator::make_inverse_operator: do surf_ori check" << std::endl;
 
     //Check parameters
     if(fixed && loose > 0)
@@ -832,7 +832,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
         gain.row(i) = gain.row(i).array() * source_std.array();
 
     double trace_GRGT = (gain * gain.transpose()).trace();//pow(gain.norm(), 2);
-    double scaling_source_cov = (double)n_nzero / trace_GRGT;
+    double scaling_source_cov = static_cast<double>(n_nzero) / trace_GRGT;
 
     p_source_cov->data.array() *= scaling_source_cov;
 
@@ -937,19 +937,19 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
 
 //=============================================================================================================
 
-MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nave ,float lambda2, bool dSPM, bool sLORETA) const
+InvInverseOperator InvInverseOperator::prepare_inverse_operator(qint32 nave ,float lambda2, bool dSPM, bool sLORETA) const
 {
     if(nave <= 0)
     {
         printf("The number of averages should be positive\n");
-        return MNEInverseOperator();
+        return InvInverseOperator();
     }
     printf("Preparing the inverse operator for use...\n");
-    MNEInverseOperator inv(*this);
+    InvInverseOperator inv(*this);
     //
     //   Scale some of the stuff
     //
-    float scale     = ((float)inv.nave)/((float)nave);
+    float scale     = static_cast<float>(inv.nave)/static_cast<float>(nave);
     inv.noise_cov->data  *= scale;
     inv.noise_cov->eig   *= scale;
     inv.source_cov->data *= scale;
@@ -1111,7 +1111,7 @@ MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nave ,flo
 
 //=============================================================================================================
 
-bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverseOperator& inv)
+bool InvInverseOperator::read_inverse_operator(QIODevice& p_IODevice, InvInverseOperator& inv)
 {
     //
     //   Open the file, create directory
@@ -1151,7 +1151,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
         return false;
     }
 
-    inv = MNEInverseOperator();
+    inv = InvInverseOperator();
     inv.methods = *t_pTag->toInt();
     //
     if (!invs->find_tag(t_pStream, FIFF_MNE_SOURCE_ORIENTATION, t_pTag))
@@ -1291,7 +1291,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     //   Get the MRI <-> head coordinate transformation
     //
-    FiffCoordTrans mri_head_t;// = NULL;
+    FiffCoordTrans mri_head_t;// = nullptr;
     if (!parent_mri[0]->find_tag(t_pStream, FIFF_COORD_TRANS, t_pTag))
     {
         printf("MRI/head coordinate transformation not found\n");
@@ -1356,7 +1356,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
 
 //=============================================================================================================
 
-void MNEInverseOperator::write(QIODevice &p_IODevice)
+void InvInverseOperator::write(QIODevice &p_IODevice)
 {
     //
     //   Open the file, create directory
@@ -1371,7 +1371,7 @@ void MNEInverseOperator::write(QIODevice &p_IODevice)
 
 //=============================================================================================================
 
-void MNEInverseOperator::writeToStream(FiffStream* p_pStream)
+void InvInverseOperator::writeToStream(FiffStream* p_pStream)
 {
     p_pStream->start_block(FIFFB_MNE_INVERSE_SOLUTION);
 
