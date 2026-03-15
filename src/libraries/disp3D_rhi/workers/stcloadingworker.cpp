@@ -79,8 +79,8 @@ void StcLoadingWorker::process()
     // Load LH STC file
     if (!m_lhPath.isEmpty()) {
         QFile file(m_lhPath);
-        INVERSELIB::MNESourceEstimate stc;
-        if (INVERSELIB::MNESourceEstimate::read(file, stc)) {
+        INVLIB::MNESourceEstimate stc;
+        if (INVLIB::MNESourceEstimate::read(file, stc)) {
             m_stcLh = stc;
             m_hasLh = true;
             qDebug() << "StcLoadingWorker: Loaded LH with" << stc.data.rows() << "vertices,"
@@ -95,8 +95,8 @@ void StcLoadingWorker::process()
     // Load RH STC file
     if (!m_rhPath.isEmpty()) {
         QFile file(m_rhPath);
-        INVERSELIB::MNESourceEstimate stc;
-        if (INVERSELIB::MNESourceEstimate::read(file, stc)) {
+        INVLIB::MNESourceEstimate stc;
+        if (INVLIB::MNESourceEstimate::read(file, stc)) {
             m_stcRh = stc;
             m_hasRh = true;
             qDebug() << "StcLoadingWorker: Loaded RH with" << stc.data.rows() << "vertices,"

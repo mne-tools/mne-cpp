@@ -322,7 +322,7 @@ void View3D::settingsChanged(ANSHAREDLIB::View3DParameters viewParameters)
 
 //=============================================================================================================
 
-void View3D::newDipoleFit(const INVERSELIB::ECDSet &ecdSet)
+void View3D::newDipoleFit(const INVLIB::ECDSet &ecdSet)
 {
     m_p3DModel->addDipoles(ecdSet);
 }
@@ -332,7 +332,7 @@ void View3D::newDipoleFit(const INVERSELIB::ECDSet &ecdSet)
 void View3D::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
     if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL) {
-        newDipoleFit(qSharedPointerCast<DipoleFitModel>(pNewModel)->data(QModelIndex()).value<INVERSELIB::ECDSet>());
+        newDipoleFit(qSharedPointerCast<DipoleFitModel>(pNewModel)->data(QModelIndex()).value<INVLIB::ECDSet>());
     }
 }
 

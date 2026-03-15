@@ -51,7 +51,7 @@
 
 using namespace SCMEASLIB;
 using namespace FIFFLIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -72,7 +72,7 @@ RealTimeHpiResult::~RealTimeHpiResult()
 
 //=============================================================================================================
 
-QSharedPointer<INVERSELIB::HpiFitResult>& RealTimeHpiResult::getValue()
+QSharedPointer<INVLIB::HpiFitResult>& RealTimeHpiResult::getValue()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pHpiFitResult;

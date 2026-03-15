@@ -131,7 +131,7 @@ set(MNE_LIBS_REQUIRED
     mne_fiff
     mne_mne
     mne_fwd
-    mne_inverse
+    mne_inv
     mne_disp
     mne_rtprocessing
 )

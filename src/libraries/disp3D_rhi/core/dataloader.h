@@ -53,7 +53,7 @@
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_dig_point.h>
 #include <mne/mne_source_spaces.h>
-#include <inverse/dipole_fit/ecd_set.h>
+#include <inverse/dipole_fit/inv_ecd_set.h>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -131,7 +131,7 @@ public:
      * @param[in] dipPath  Path to the dipole file.
      * @return The loaded ECDSet (may be empty on failure).
      */
-    static INVERSELIB::ECDSet loadDipoles(const QString &dipPath);
+    static INVLIB::ECDSet loadDipoles(const QString &dipPath);
 
     /**
      * Load source space from a forward-solution FIF file.

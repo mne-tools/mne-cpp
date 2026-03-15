@@ -47,9 +47,9 @@
 #include <fiff/fiff.h>
 
 #include <mne/mne.h>
-#include <inverse/mne_source_estimate.h>
+#include <inverse/inv_source_estimate.h>
 
-#include <inverse/rap_music/pwl_rap_music.h>
+#include <inverse/rap_music/inv_pwl_rap_music.h>
 
 #include <disp3D_rhi/view/brainview.h>
 #include <disp3D_rhi/model/braintreemodel.h>
@@ -76,7 +76,7 @@ using namespace MNELIB;
 using namespace FWDLIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace UTILSLIB;
 
 //=============================================================================================================

@@ -53,9 +53,9 @@
 
 #include <disp/viewers/dipolefitview.h>
 
-#include <inverse/dipole_fit/dipole_fit_data.h>
-#include <inverse/dipole_fit/dipole_fit.h>
-#include <inverse/dipole_fit/ecd_set.h>
+#include <inverse/dipole_fit/inv_dipole_fit_data.h>
+#include <inverse/dipole_fit/inv_dipole_fit.h>
+#include <inverse/dipole_fit/inv_ecd_set.h>
 
 #include <fiff/fiff_coord_trans.h>
 
@@ -172,7 +172,7 @@ QDockWidget *DipoleFit::getControl()
     //Fit
     connect(pDipoleView, &DISPLIB::DipoleFitView::performDipoleFit,
             this, &DipoleFit::onPerformDipoleFit, Qt::UniqueConnection);
-    connect(&m_FutureWatcher, &QFutureWatcher<INVERSELIB::ECDSet>::finished,
+    connect(&m_FutureWatcher, &QFutureWatcher<INVLIB::ECDSet>::finished,
             this, &DipoleFit::dipoleFitResults, Qt::UniqueConnection);
 
     QDockWidget* pDockWidgt = new QDockWidget(getName());
@@ -305,7 +305,7 @@ void DipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
 
 //=============================================================================================================
 
-void DipoleFit::newDipoleFit(INVERSELIB::ECDSet set, const QString& sFitName)
+void DipoleFit::newDipoleFit(INVLIB::ECDSet set, const QString& sFitName)
 {
     QSharedPointer<ANSHAREDLIB::DipoleFitModel> pModel = QSharedPointer<ANSHAREDLIB::DipoleFitModel>(new ANSHAREDLIB::DipoleFitModel(set));
     m_pAnalyzeData->addModel<ANSHAREDLIB::DipoleFitModel>(pModel,
@@ -450,7 +450,7 @@ void DipoleFit::onNewMeasSelected(const QString &sName)
 
 //=============================================================================================================
 
-INVERSELIB::ECDSet DipoleFit::dipoleFitCalculation()
+INVLIB::ECDSet DipoleFit::dipoleFitCalculation()
 {
     QMutexLocker lock(&m_FitMutex);
 
@@ -458,13 +458,13 @@ INVERSELIB::ECDSet DipoleFit::dipoleFitCalculation()
     m_DipoleSettings.checkIntegrity();
 
     qInfo() << "Initializing settings...";
-    INVERSELIB::DipoleFit dipFit(&m_DipoleSettings);
+    INVLIB::DipoleFit dipFit(&m_DipoleSettings);
 
     qInfo() << "Calculating fit...";
-    INVERSELIB::ECDSet ecdSet = dipFit.calculateFit();
+    INVLIB::ECDSet ecdSet = dipFit.calculateFit();
 
     qInfo() << "Done!";
-    INVERSELIB::ECDSet ecdSetTrans = ecdSet;
+    INVLIB::ECDSet ecdSetTrans = ecdSet;
 
     QFile file(m_DipoleSettings.mriname);
 

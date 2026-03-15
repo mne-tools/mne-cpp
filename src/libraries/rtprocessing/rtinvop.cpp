@@ -42,7 +42,7 @@
 #include <fiff/fiff_info.h>
 
 #include <fwd/fwd_forward_solution.h>
-#include <inverse/mne_inverse_operator.h>
+#include <inverse/inv_inverse_operator.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -64,7 +64,7 @@ using namespace RTPROCESSINGLIB;
 using namespace Eigen;
 using namespace MNELIB;
 using namespace FWDLIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace FIFFLIB;
 
 //=============================================================================================================
@@ -145,7 +145,7 @@ void RtInvOp::setFwdSolution(QSharedPointer<FWDLIB::FwdForwardSolution> pFwd)
 
 //=============================================================================================================
 
-void RtInvOp::handleResults(const INVERSELIB::MNEInverseOperator& invOp)
+void RtInvOp::handleResults(const INVLIB::MNEInverseOperator& invOp)
 {
     emit invOperatorCalculated(invOp);
 }

@@ -28,7 +28,7 @@
 #include <fiff/fiff_cov.h>
 
 #include <mne/mne.h>
-#include <inverse/mne_source_estimate.h>
+#include <inverse/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 #include <fwd/fwd_forward_solution.h>
 #include <mne/mne_bem.h>
@@ -40,7 +40,7 @@
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace FWDLIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
 

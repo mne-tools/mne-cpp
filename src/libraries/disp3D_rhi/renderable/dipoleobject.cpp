@@ -66,7 +66,7 @@ QRhiBuffer* DipoleObject::vertexBuffer()  const { return m_gpu->vertexBuffer.get
 QRhiBuffer* DipoleObject::indexBuffer()   const { return m_gpu->indexBuffer.get(); }
 QRhiBuffer* DipoleObject::instanceBuffer() const { return m_gpu->instanceBuffer.get(); }
 
-void DipoleObject::load(const INVERSELIB::ECDSet &ecdSet)
+void DipoleObject::load(const INVLIB::ECDSet &ecdSet)
 {
     createGeometry();
     

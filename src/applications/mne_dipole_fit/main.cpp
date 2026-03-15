@@ -37,8 +37,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inverse/dipole_fit/dipole_fit_settings.h>
-#include <inverse/dipole_fit/dipole_fit.h>
+#include <inverse/dipole_fit/inv_dipole_fit_settings.h>
+#include <inverse/dipole_fit/inv_dipole_fit.h>
 
 #include <utils/generics/applicationlogger.h>
 
@@ -66,7 +66,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace FSLIB;
 using namespace MNELIB;
 using namespace UTILSLIB;

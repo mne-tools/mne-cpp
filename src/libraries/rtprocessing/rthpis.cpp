@@ -38,8 +38,8 @@
 
 #include "rthpis.h"
 
-#include <inverse/hpi/hpi_fit.h>
-#include <inverse/hpi/sensor_set.h>
+#include <inverse/hpi/inv_hpi_fit.h>
+#include <inverse/hpi/inv_sensor_set.h>
 #include <fiff/fiff_info.h>
 
 //=============================================================================================================
@@ -59,7 +59,7 @@
 using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
-using namespace INVERSELIB;
+using namespace INVLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS RtHpiWorker
@@ -67,7 +67,7 @@ using namespace INVERSELIB;
 
 RtHpiWorker::RtHpiWorker(const SensorSet sensorSet)
 {
-    m_pHpiFit = QSharedPointer<INVERSELIB::HPIFit>(new HPIFit(sensorSet));
+    m_pHpiFit = QSharedPointer<INVLIB::HPIFit>(new HPIFit(sensorSet));
 }
 
 void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
@@ -101,7 +101,7 @@ RtHpi::RtHpi(const SensorSet sensorSet, QObject *parent)
 : QObject(parent),
   m_sensorSet(sensorSet)
 {
-    qRegisterMetaType<INVERSELIB::HpiFitResult>("INVERSELIB::HpiFitResult");
+    qRegisterMetaType<INVLIB::HpiFitResult>("INVLIB::HpiFitResult");
     qRegisterMetaType<QVector<int> >("QVector<int>");
     qRegisterMetaType<QSharedPointer<FIFFLIB::FiffInfo> >("QSharedPointer<FIFFLIB::FiffInfo>");
     qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
@@ -165,7 +165,7 @@ void RtHpi::setHpiDigitizer(const Eigen::MatrixXd& matCoilsHead)
 
 //=============================================================================================================
 
-void RtHpi::handleResults(const INVERSELIB::HpiFitResult& fitResult)
+void RtHpi::handleResults(const INVLIB::HpiFitResult& fitResult)
 {
     emit newHpiFitResultAvailable(fitResult);
 }

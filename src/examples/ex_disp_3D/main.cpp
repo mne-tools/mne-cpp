@@ -50,12 +50,12 @@
 #include <fs/fs_surfaceset.h>
 #include <fs/fs_annotationset.h>
 
-#include <inverse/mne_source_estimate.h>
+#include <inverse/inv_source_estimate.h>
 #include <mne/mne_bem.h>
 
 #include <fiff/fiff_dig_point_set.h>
 
-#include <inverse/minimum_norm/minimum_norm.h>
+#include <inverse/minimum_norm/inv_minimum_norm.h>
 
 #include <utils/generics/applicationlogger.h>
 
@@ -83,7 +83,7 @@ using namespace MNELIB;
 using namespace FWDLIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
 

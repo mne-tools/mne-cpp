@@ -56,7 +56,7 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DipoleFitModel::DipoleFitModel(INVERSELIB::ECDSet ECDSet,
+DipoleFitModel::DipoleFitModel(INVLIB::ECDSet ECDSet,
                                const QString &sFilePath,
                                const QByteArray& byteLoadedData,
                                QObject* parent)

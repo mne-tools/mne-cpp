@@ -43,7 +43,7 @@
 #include "../../disp3D_rhi_global.h"
 
 #include "abstracttreeitem.h"
-#include <inverse/dipole_fit/ecd_set.h>
+#include <inverse/dipole_fit/inv_ecd_set.h>
 
 /**
  * @brief Tree item representing a set of fitted dipoles in the 3-D scene hierarchy.
@@ -51,13 +51,13 @@
 class DISP3DRHISHARED_EXPORT DipoleTreeItem : public AbstractTreeItem
 {
 public:
-    explicit DipoleTreeItem(const QString& text, const INVERSELIB::ECDSet& set, int type = AbstractTreeItem::DipoleItem);
+    explicit DipoleTreeItem(const QString& text, const INVLIB::ECDSet& set, int type = AbstractTreeItem::DipoleItem);
     ~DipoleTreeItem() = default;
 
-    const INVERSELIB::ECDSet& ecdSet() const;
+    const INVLIB::ECDSet& ecdSet() const;
 
 private:
-    INVERSELIB::ECDSet m_ecdSet;
+    INVLIB::ECDSet m_ecdSet;
 };
 
 #endif // DIPOLETREEITEM_H

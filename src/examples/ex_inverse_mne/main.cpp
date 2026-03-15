@@ -46,11 +46,11 @@
 //=============================================================================================================
 
 #include <fiff/fiff_evoked_set.h>
-#include <inverse/mne_inverse_operator.h>
+#include <inverse/inv_inverse_operator.h>
 
 #include <fiff/fiff_evoked.h>
-#include <inverse/mne_source_estimate.h>
-#include <inverse/minimum_norm/minimum_norm.h>
+#include <inverse/inv_source_estimate.h>
+#include <inverse/minimum_norm/inv_minimum_norm.h>
 
 #include <utils/generics/applicationlogger.h>
 
@@ -68,7 +68,7 @@
 
 using namespace FIFFLIB;
 using namespace MNELIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace UTILSLIB;
 
 //=============================================================================================================

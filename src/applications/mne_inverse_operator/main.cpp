@@ -57,7 +57,7 @@
 #include <fiff/fiff_proj.h>
 
 #include <mne/mne.h>
-#include <inverse/mne_inverse_operator.h>
+#include <inverse/inv_inverse_operator.h>
 #include <fwd/fwd_forward_solution.h>
 
 #include <utils/generics/applicationlogger.h>
@@ -88,7 +88,7 @@ using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace FWDLIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace UTILSLIB;
 
 //=============================================================================================================

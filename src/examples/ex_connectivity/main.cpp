@@ -57,11 +57,11 @@
 #include <fs/fs_annotationset.h>
 #include <fs/fs_surfaceset.h>
 
-#include <inverse/mne_source_estimate.h>
+#include <inverse/inv_source_estimate.h>
 #include <mne/mne_epoch_data_list.h>
 #include <mne/mne.h>
 
-#include <inverse/minimum_norm/minimum_norm.h>
+#include <inverse/minimum_norm/inv_minimum_norm.h>
 
 #include <utils/ioutils.h>
 #include <utils/generics/applicationlogger.h>
@@ -91,7 +91,7 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace Eigen;
 using namespace FIFFLIB;
 using namespace CONNECTIVITYLIB;

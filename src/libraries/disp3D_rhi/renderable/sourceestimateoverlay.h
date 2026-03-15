@@ -41,7 +41,7 @@
 
 #include "../disp3D_rhi_global.h"
 
-#include <inverse/mne_source_estimate.h>
+#include <inverse/inv_source_estimate.h>
 #include <QVector>
 #include <QString>
 #include <QSharedPointer>
@@ -197,7 +197,7 @@ public:
      * @param[in] stc        The source estimate data.
      * @param[in] hemi       Hemisphere index (0=lh, 1=rh).
      */
-    void setStcData(const INVERSELIB::MNESourceEstimate &stc, int hemi);
+    void setStcData(const INVLIB::MNESourceEstimate &stc, int hemi);
 
     //=========================================================================================================
     /**
@@ -251,8 +251,8 @@ private:
      */
     uint32_t valueToColor(double value, uint8_t alpha = 255) const;
 
-    INVERSELIB::MNESourceEstimate m_stcLh;      /**< Left hemisphere source estimate. */
-    INVERSELIB::MNESourceEstimate m_stcRh;      /**< Right hemisphere source estimate. */
+    INVLIB::MNESourceEstimate m_stcLh;      /**< Left hemisphere source estimate. */
+    INVLIB::MNESourceEstimate m_stcRh;      /**< Right hemisphere source estimate. */
     bool m_hasLh = false;                    /**< Flag indicating LH data loaded. */
     bool m_hasRh = false;                    /**< Flag indicating RH data loaded. */
 

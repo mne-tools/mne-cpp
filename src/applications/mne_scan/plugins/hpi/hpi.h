@@ -70,7 +70,7 @@ namespace FIFFLIB {
     class FiffDigitizerData;
 }
 
-namespace INVERSELIB {
+namespace INVLIB {
     class HPIFit;
 }
 

@@ -18,7 +18,7 @@ target_link_libraries(test_mne_library PRIVATE
     mne_disp
     mne_rtprocessing
     mne_connectivity
-    mne_inverse
+    mne_inv
     mne_fwd
     mne_mne
     mne_fiff

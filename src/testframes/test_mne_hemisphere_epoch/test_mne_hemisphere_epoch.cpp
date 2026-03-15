@@ -7,7 +7,7 @@
 
 #include <mne/mne_hemisphere.h>
 #include <fwd/fwd_forward_solution.h>
-#include <inverse/mne_source_estimate.h>
+#include <inverse/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
@@ -17,7 +17,7 @@
 #include <mne/mne_cov_matrix.h>
 #include <mne/mne_proj_op.h>
 #include <mne/mne_ctf_comp_data.h>
-#include <inverse/mne_inverse_operator.h>
+#include <inverse/inv_inverse_operator.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
@@ -30,7 +30,7 @@
 
 using namespace MNELIB;
 using namespace FWDLIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace FIFFLIB;
 using namespace UTILSLIB;
 using namespace Eigen;

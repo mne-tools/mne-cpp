@@ -85,7 +85,7 @@ namespace FSLIB{
     class FsAnnotationSet;
 }
 
-namespace INVERSELIB{
+namespace INVLIB{
     struct HpiFitResult;
 }
 
@@ -224,7 +224,7 @@ private:
 
     QString                                     m_sAtlasDir;                /**< File to Atlas. */
 
-    QSharedPointer<INVERSELIB::HpiFitResult>    m_pHpiFitResult;            /**< The Hpi fitting result.**/
+    QSharedPointer<INVLIB::HpiFitResult>    m_pHpiFitResult;            /**< The Hpi fitting result.**/
 
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                /**< Fiff measurement info.*/
     FIFFLIB::FiffCoordTrans                     m_transDevHead;             /**< Updated meg->head transformation. */

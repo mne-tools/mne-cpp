@@ -52,7 +52,7 @@
 #include <fiff/fiff_dig_point.h>
 #include <connectivity/network/network.h>
 
-namespace INVERSELIB {
+namespace INVLIB {
 class ECDSet;
 }
 
@@ -84,7 +84,7 @@ public:
 
     // Helpers to populate the tree
     void addSensors(const QString &type, const QList<QStandardItem*> &items);
-    void addDipoles(const INVERSELIB::ECDSet &set);
+    void addDipoles(const INVLIB::ECDSet &set);
 
     // Add digitizer points with proper categorization (Cardinal, HPI, EEG, Extra)
     void addDigitizerData(const QList<FIFFLIB::FiffDigPoint> &digitizerPoints);

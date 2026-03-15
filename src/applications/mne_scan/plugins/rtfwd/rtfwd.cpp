@@ -43,7 +43,7 @@
 #include <fwd/compute_fwd/compute_fwd_settings.h>
 #include <fwd/compute_fwd/compute_fwd.h>
 
-#include <inverse/hpi/hpi_fit.h>
+#include <inverse/hpi/inv_hpi_fit.h>
 
 #include <fs/fs_annotationset.h>
 
@@ -78,7 +78,7 @@ using namespace UTILSLIB;
 using namespace FWDLIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace MNELIB;
 using namespace DISPLIB;
 using namespace Eigen;

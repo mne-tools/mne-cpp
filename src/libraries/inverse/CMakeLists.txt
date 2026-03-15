@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(mne_inverse LANGUAGES CXX)
+project(mne_inv LANGUAGES CXX)
 
 #Handle qt uic, moc, rrc automatically
 set(CMAKE_AUTOUIC ON)
@@ -11,59 +11,59 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
-    inverse_global.cpp
-    minimum_norm/minimum_norm.cpp
-    rap_music/rap_music.cpp
-    rap_music/pwl_rap_music.cpp
-    rap_music/dipole.cpp
-    mne_inverse_operator.cpp
-    mne_meas_data.cpp
-    mne_meas_data_set.cpp
-    mne_source_estimate.cpp
-    mne_cor_source_estimate.cpp
-    dipole_fit/dipole_fit.cpp
-    dipole_fit/dipole_fit_data.cpp
-    dipole_fit/dipole_fit_settings.cpp
-    dipole_fit/dipole_forward.cpp
-    dipole_fit/ecd.cpp
-    dipole_fit/ecd_set.cpp
-    dipole_fit/guess_data.cpp
-    hpi/hpi_data_updater.cpp
-    hpi/hpi_fit.cpp
-    hpi/hpi_fit_data.cpp
-    hpi/hpi_model_parameters.cpp
-    hpi/sensor_set.cpp
-    hpi/signal_model.cpp
+    inv_global.cpp
+    minimum_norm/inv_minimum_norm.cpp
+    rap_music/inv_rap_music.cpp
+    rap_music/inv_pwl_rap_music.cpp
+    rap_music/inv_dipole.cpp
+    inv_inverse_operator.cpp
+    inv_meas_data.cpp
+    inv_meas_data_set.cpp
+    inv_source_estimate.cpp
+    inv_cor_source_estimate.cpp
+    dipole_fit/inv_dipole_fit.cpp
+    dipole_fit/inv_dipole_fit_data.cpp
+    dipole_fit/inv_dipole_fit_settings.cpp
+    dipole_fit/inv_dipole_forward.cpp
+    dipole_fit/inv_ecd.cpp
+    dipole_fit/inv_ecd_set.cpp
+    dipole_fit/inv_guess_data.cpp
+    hpi/inv_hpi_data_updater.cpp
+    hpi/inv_hpi_fit.cpp
+    hpi/inv_hpi_fit_data.cpp
+    hpi/inv_hpi_model_parameters.cpp
+    hpi/inv_sensor_set.cpp
+    hpi/inv_signal_model.cpp
 )
 
 set(HEADERS
-    inverse_global.h
-    minimum_norm/minimum_norm.h
-    rap_music/rap_music.h
-    rap_music/pwl_rap_music.h
-    rap_music/dipole.h
-    mne_inverse_operator.h
-    mne_meas_data.h
-    mne_meas_data_set.h
-    mne_source_estimate.h
-    mne_cor_source_estimate.h
-    dipole_fit/analyze_types.h
-    dipole_fit/dipole_fit.h
-    dipole_fit/dipole_fit_data.h
-    dipole_fit/dipole_fit_settings.h
-    dipole_fit/dipole_forward.h
-    dipole_fit/ecd.h
-    dipole_fit/ecd_set.h
-    dipole_fit/guess_data.h
-    hpi/hpi_data_updater.h
-    hpi/hpi_fit.h
-    hpi/hpi_fit_data.h
-    hpi/hpi_model_parameters.h
-    hpi/sensor_set.h
-    hpi/signal_model.h
+    inv_global.h
+    minimum_norm/inv_minimum_norm.h
+    rap_music/inv_rap_music.h
+    rap_music/inv_pwl_rap_music.h
+    rap_music/inv_dipole.h
+    inv_inverse_operator.h
+    inv_meas_data.h
+    inv_meas_data_set.h
+    inv_source_estimate.h
+    inv_cor_source_estimate.h
+    dipole_fit/inv_analyze_types.h
+    dipole_fit/inv_dipole_fit.h
+    dipole_fit/inv_dipole_fit_data.h
+    dipole_fit/inv_dipole_fit_settings.h
+    dipole_fit/inv_dipole_forward.h
+    dipole_fit/inv_ecd.h
+    dipole_fit/inv_ecd_set.h
+    dipole_fit/inv_guess_data.h
+    hpi/inv_hpi_data_updater.h
+    hpi/inv_hpi_fit.h
+    hpi/inv_hpi_fit_data.h
+    hpi/inv_hpi_model_parameters.h
+    hpi/inv_sensor_set.h
+    hpi/inv_signal_model.h
 )
 
-set(FILE_TO_UPDATE inverse_global.cpp)
+set(FILE_TO_UPDATE inv_global.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
@@ -106,7 +106,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     eigen
     ${FFTW_LIBS})
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_INVERSE_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_INV_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)

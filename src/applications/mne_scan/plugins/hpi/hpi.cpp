@@ -46,8 +46,8 @@
 #include <disp/viewers/hpisettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimehpiresult.h>
-#include <inverse/hpi/hpi_fit.h>
-#include <inverse/hpi/hpi_data_updater.h>
+#include <inverse/hpi/inv_hpi_fit.h>
+#include <inverse/hpi/inv_hpi_data_updater.h>
 
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_digitizer_data.h>
@@ -73,7 +73,7 @@ using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace SCSHAREDLIB;
 using namespace Eigen;
-using namespace INVERSELIB;
+using namespace INVLIB;
 
 //=============================================================================================================
 // DEFINE LOCAL CONSTANTS

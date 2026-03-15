@@ -41,7 +41,7 @@
 
 #include "../disp3D_rhi_global.h"
 
-#include <inverse/mne_source_estimate.h>
+#include <inverse/inv_source_estimate.h>
 #include <QObject>
 #include <QString>
 #include <QSharedPointer>
@@ -95,7 +95,7 @@ public:
      *
      * @return The left hemisphere source estimate.
      */
-    const INVERSELIB::MNESourceEstimate& stcLh() const { return m_stcLh; }
+    const INVLIB::MNESourceEstimate& stcLh() const { return m_stcLh; }
 
     //=========================================================================================================
     /**
@@ -103,7 +103,7 @@ public:
      *
      * @return The right hemisphere source estimate.
      */
-    const INVERSELIB::MNESourceEstimate& stcRh() const { return m_stcRh; }
+    const INVLIB::MNESourceEstimate& stcRh() const { return m_stcRh; }
 
     //=========================================================================================================
     /**
@@ -178,8 +178,8 @@ private:
     BrainSurface *m_rhSurface;                                 /**< Pointer to RH surface. */
     double m_cancelDist;                                       /**< Cancel distance for interpolation. */
 
-    INVERSELIB::MNESourceEstimate m_stcLh;                         /**< Loaded LH source estimate. */
-    INVERSELIB::MNESourceEstimate m_stcRh;                         /**< Loaded RH source estimate. */
+    INVLIB::MNESourceEstimate m_stcLh;                         /**< Loaded LH source estimate. */
+    INVLIB::MNESourceEstimate m_stcRh;                         /**< Loaded RH source estimate. */
     bool m_hasLh = false;                                      /**< Flag indicating LH data loaded. */
     bool m_hasRh = false;                                      /**< Flag indicating RH data loaded. */
 

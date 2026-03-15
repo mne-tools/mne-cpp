@@ -49,9 +49,9 @@
 
 #include <mne/mne.h>
 #include <mne/mne_epoch_data_list.h>
-#include <inverse/mne_source_estimate.h>
+#include <inverse/inv_source_estimate.h>
 
-#include <inverse/rap_music/rap_music.h>
+#include <inverse/rap_music/inv_rap_music.h>
 
 #include <disp3D_rhi/view/brainview.h>
 #include <disp3D_rhi/model/braintreemodel.h>
@@ -80,7 +80,7 @@ using namespace MNELIB;
 using namespace FWDLIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace UTILSLIB;
 
 //=============================================================================================================

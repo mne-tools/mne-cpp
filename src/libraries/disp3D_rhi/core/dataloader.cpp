@@ -55,7 +55,7 @@
 
 using namespace FIFFLIB;
 using namespace MNELIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 
 //=============================================================================================================
 // STATIC METHODS

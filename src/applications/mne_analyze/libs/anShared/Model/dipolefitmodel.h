@@ -43,7 +43,7 @@
 #include "../Utils/types.h"
 #include "abstractmodel.h"
 
-#include <inverse/dipole_fit/ecd_set.h>
+#include <inverse/dipole_fit/inv_ecd_set.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -74,7 +74,7 @@ public:
                    QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
-    DipoleFitModel(INVERSELIB::ECDSet ECDSet,
+    DipoleFitModel(INVLIB::ECDSet ECDSet,
                    const QString &sFilePath = "",
                    const QByteArray& byteLoadedData = QByteArray(),
                    QObject* parent = Q_NULLPTR);
@@ -146,7 +146,7 @@ public:
 
 private:
 
-    INVERSELIB::ECDSet      m_ECD_Set;
+    INVLIB::ECDSet      m_ECD_Set;
 
 };
 

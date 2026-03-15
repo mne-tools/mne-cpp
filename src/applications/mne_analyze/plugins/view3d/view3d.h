@@ -78,7 +78,7 @@ namespace FIFFLIB {
     class FiffDigPointSet;
 }
 
-namespace INVERSELIB {
+namespace INVLIB {
     class ECDSet;
 }
 //=============================================================================================================
@@ -196,7 +196,7 @@ private:
      * @brief newDipoleFit
      * @param ecdSet.
      */
-    void newDipoleFit(const INVERSELIB::ECDSet& ecdSet);
+    void newDipoleFit(const INVLIB::ECDSet& ecdSet);
 
     //=========================================================================================================
     /**

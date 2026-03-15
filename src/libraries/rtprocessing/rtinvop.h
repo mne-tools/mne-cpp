@@ -63,7 +63,7 @@ namespace FWDLIB {
     class FwdForwardSolution;
 }
 
-namespace INVERSELIB {
+namespace INVLIB {
     class MNEInverseOperator;
 }
 
@@ -113,7 +113,7 @@ signals:
      *
      * @param[in] invOp  The final inverser operator estimation.
      */
-    void resultReady(const INVERSELIB::MNEInverseOperator& invOp);
+    void resultReady(const INVLIB::MNEInverseOperator& invOp);
 };
 
 //=============================================================================================================
@@ -181,7 +181,7 @@ protected:
     /**
      * Handles the result
      */
-    void handleResults(const INVERSELIB::MNEInverseOperator& invOp);
+    void handleResults(const INVLIB::MNEInverseOperator& invOp);
 
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The fiff measurement information. */
     QSharedPointer<FWDLIB::FwdForwardSolution>  m_pFwd;             /**< The forward solution. */
@@ -195,7 +195,7 @@ signals:
      *
      * @param[out] invOp  The inverse operator.
      */
-    void invOperatorCalculated(const INVERSELIB::MNEInverseOperator& invOp);
+    void invOperatorCalculated(const INVLIB::MNEInverseOperator& invOp);
 
     //=========================================================================================================
     /**

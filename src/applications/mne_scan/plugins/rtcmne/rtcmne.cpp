@@ -49,10 +49,10 @@
 #include <fiff/fiff_info.h>
 
 #include <fwd/fwd_forward_solution.h>
-#include <inverse/mne_source_estimate.h>
+#include <inverse/inv_source_estimate.h>
 #include <mne/mne_epoch_data_list.h>
 
-#include <inverse/minimum_norm/minimum_norm.h>
+#include <inverse/minimum_norm/inv_minimum_norm.h>
 
 #include <rtprocessing/rtinvop.h>
 
@@ -80,7 +80,7 @@ using namespace RTCMNEPLUGIN;
 using namespace FIFFLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace RTPROCESSINGLIB;
 using namespace SCSHAREDLIB;
 using namespace UTILSLIB;
@@ -583,7 +583,7 @@ void RtcMne::run()
     bool bEvokedInput = false;
     bool bRawInput = false;
     bool bUpdateMinimumNorm = false;
-    QSharedPointer<INVERSELIB::MinimumNorm> pMinimumNorm;
+    QSharedPointer<INVLIB::MinimumNorm> pMinimumNorm;
     QStringList lChNamesFiffInfo;
     QStringList lChNamesInvOp;
 
