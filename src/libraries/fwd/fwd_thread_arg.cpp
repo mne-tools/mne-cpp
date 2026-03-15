@@ -86,8 +86,8 @@ using namespace MNELIB;
 //=============================================================================================================
 
 FwdThreadArg::FwdThreadArg()
-:res           (NULL)
-,res_grad      (NULL)
+:res           (nullptr)
+,res_grad      (nullptr)
 ,off           (0)
 ,field_pot     (nullptr)
 ,vec_field_pot (nullptr)
@@ -161,8 +161,8 @@ FwdThreadArg *FwdThreadArg::create_meg_multi_thread_duplicate(FwdThreadArg* one,
      *res = *one;
     res->client = comp = new FwdCompData;
      *comp = *orig;
-    comp->work     = NULL;
-    comp->vec_work = NULL;
+    comp->work.resize(0);
+    comp->vec_work.resize(0, 0);
     comp->set      = orig->set ? new MNECTFCompDataSet(*(orig->set)) : NULL;
 
     if (bem_model) {
@@ -188,8 +188,6 @@ void FwdThreadArg::free_meg_multi_thread_duplicate(FwdThreadArg *one, bool bem_m
 
     FwdCompData* comp = (FwdCompData*)one->client;
 
-    FREE_80(comp->work);
-    FREE_CMATRIX_80(comp->vec_work);
     if(comp->set)
         delete comp->set;
 
@@ -197,8 +195,7 @@ void FwdThreadArg::free_meg_multi_thread_duplicate(FwdThreadArg *one, bool bem_m
         FwdBemModel*    bem = (FwdBemModel*)comp->client;
         delete bem;
     }
-    FREE_80(comp);
+    delete comp;
     one->client = NULL;
-    if(one)
-        delete one;
+    delete one;
 }

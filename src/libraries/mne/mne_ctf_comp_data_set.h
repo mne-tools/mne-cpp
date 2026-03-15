@@ -168,8 +168,8 @@ public:
      * @return OK on success, FAIL on error.
      */
     int apply(int                  do_it,
-              Eigen::VectorXf&     data,
-              const Eigen::VectorXf& compdata);
+              Eigen::Ref<Eigen::VectorXf>     data,
+              Eigen::Ref<const Eigen::VectorXf> compdata);
 
     //=========================================================================================================
     /**
@@ -181,7 +181,7 @@ public:
      * @return OK on success, FAIL on error.
      */
     int apply(int                  do_it,
-              Eigen::VectorXf&     data);
+              Eigen::Ref<Eigen::VectorXf>     data);
 
     //=========================================================================================================
     /**

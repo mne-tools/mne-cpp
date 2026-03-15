@@ -195,7 +195,7 @@ public:
 
 //============================= dipole_forward.c
 
-    static int compute_dipole_field(DipoleFitData* d, float *rd, int whiten, float **fwd);
+    static int compute_dipole_field(DipoleFitData& d, const Eigen::Vector3f& rd, int whiten, Eigen::Ref<Eigen::MatrixXf> fwd);
 
     //============================= dipole_forward.c
 

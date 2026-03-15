@@ -133,8 +133,6 @@ FwdCompData::FwdCompData()
 ,field_grad (nullptr)
 ,client     (NULL)
 ,set        (NULL)
-,work       (NULL)
-,vec_work   (NULL)
 {
 }
 
@@ -146,13 +144,11 @@ FwdCompData::~FwdCompData()
         delete this->comp_coils;
     if(this->set)
         delete this->set;
-    FREE_60(this->work);
-    FREE_CMATRIX_60(this->vec_work);
 }
 
 //=============================================================================================================
 
-int FwdCompData::fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet *coils, float *res, void *client)
+int FwdCompData::fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet &coils, Eigen::Ref<Eigen::VectorXf> res, void *client)
 /*
           * Calculate the compensated field (one dipole component)
           */
@@ -176,23 +172,17 @@ int FwdCompData::fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f
     /*
        * Workspace needed?
        */
-    if (!comp->work)
-        comp->work = MALLOC_60(comp->comp_coils->ncoil(),float);
+    if (comp->work.size() == 0)
+        comp->work.resize(comp->comp_coils->ncoil());
     /*
        * Compute the field in the compensation coils
        */
-    if (comp->field(rd,Q,comp->comp_coils,comp->work,comp->client) == FAIL)
+    if (comp->field(rd,Q,*comp->comp_coils,comp->work,comp->client) == FAIL)
         return FAIL;
     /*
        * Compute the compensated field
        */
-    {
-        VectorXf resVec = Map<VectorXf>(res, coils->ncoil());
-        VectorXf workVec = Map<VectorXf>(comp->work, comp->comp_coils->ncoil());
-        int result = comp->set->apply(TRUE, resVec, workVec);
-        Map<VectorXf>(res, coils->ncoil()) = resVec;
-        return result;
-    }
+    return comp->set->apply(TRUE, res, comp->work);
 }
 
 //=============================================================================================================
@@ -296,7 +286,7 @@ FwdCompData *FwdCompData::fwd_make_comp_data(MNECTFCompDataSet *set,
 
 //=============================================================================================================
 
-int FwdCompData::fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet *coils, float **res, void *client)
+int FwdCompData::fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet &coils, Eigen::Ref<Eigen::MatrixXf> res, void *client)
 /*
           * Calculate the compensated field (all dipole components)
           */
@@ -321,29 +311,29 @@ int FwdCompData::fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet *coils
     /*
        * Need workspace?
        */
-    if (!comp->vec_work)
-        comp->vec_work = ALLOC_CMATRIX_60(3,comp->comp_coils->ncoil());
+    if (comp->vec_work.size() == 0)
+        comp->vec_work.resize(3, comp->comp_coils->ncoil());
     /*
        * Compute the field at the compensation sensors
        */
-    if (comp->vec_field(rd,comp->comp_coils,comp->vec_work,comp->client) == FAIL)
+    if (comp->vec_field(rd,*comp->comp_coils,comp->vec_work,comp->client) == FAIL)
         return FAIL;
     /*
        * Compute the compensated field of three orthogonal dipoles
        */
     for (k = 0; k < 3; k++) {
-        VectorXf resVec = Map<VectorXf>(res[k], coils->ncoil());
-        VectorXf workVec = Map<VectorXf>(comp->vec_work[k], comp->comp_coils->ncoil());
-        if (comp->set->apply(TRUE, resVec, workVec) == FAIL)
+        Eigen::VectorXf resRow = res.row(k).transpose();
+        Eigen::VectorXf workRow = comp->vec_work.row(k).transpose();
+        if (comp->set->apply(TRUE, resRow, workRow) == FAIL)
             return FAIL;
-        Map<VectorXf>(res[k], coils->ncoil()) = resVec;
+        res.row(k) = resRow.transpose();
     }
     return OK;
 }
 
 //=============================================================================================================
 
-int FwdCompData::fwd_comp_field_grad(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet* coils, float *res, float *xgrad, float *ygrad, float *zgrad, void *client)
+int FwdCompData::fwd_comp_field_grad(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> res, Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad, void *client)
 /*
  * Calculate the compensated field (one dipole component)
  */
@@ -367,45 +357,38 @@ int FwdCompData::fwd_comp_field_grad(const Eigen::Vector3f& rd, const Eigen::Vec
     /*
      * Workspace needed?
      */
-    if (!comp->work)
-        comp->work = MALLOC_60(comp->comp_coils->ncoil(),float);
-    if (!comp->vec_work)
-        comp->vec_work = ALLOC_CMATRIX_60(3,comp->comp_coils->ncoil());
+    if (comp->work.size() == 0)
+        comp->work.resize(comp->comp_coils->ncoil());
+    if (comp->vec_work.size() == 0)
+        comp->vec_work.resize(3, comp->comp_coils->ncoil());
     /*
      * Compute the field in the compensation coils
      */
-    if (comp->field_grad(rd,Q,comp->comp_coils,comp->work,comp->vec_work[0],comp->vec_work[1],comp->vec_work[2],comp->client) == FAIL)
+    Eigen::VectorXf vw0 = comp->vec_work.row(0).transpose();
+    Eigen::VectorXf vw1 = comp->vec_work.row(1).transpose();
+    Eigen::VectorXf vw2 = comp->vec_work.row(2).transpose();
+    if (comp->field_grad(rd,Q,*comp->comp_coils,comp->work,vw0,vw1,vw2,comp->client) == FAIL)
         return FAIL;
+    comp->vec_work.row(0) = vw0.transpose();
+    comp->vec_work.row(1) = vw1.transpose();
+    comp->vec_work.row(2) = vw2.transpose();
     /*
      * Compute the compensated field
      */
-    {
-        int ncoil = coils->ncoil();
-        int ncomp_coil = comp->comp_coils->ncoil();
+    if (comp->set->apply(TRUE, res, comp->work) != OK)
+        return FAIL;
 
-        VectorXf resVec = Map<VectorXf>(res, ncoil);
-        VectorXf workVec = Map<VectorXf>(comp->work, ncomp_coil);
-        if (comp->set->apply(TRUE, resVec, workVec) != OK)
-            return FAIL;
-        Map<VectorXf>(res, ncoil) = resVec;
+    vw0 = comp->vec_work.row(0).transpose();
+    if (comp->set->apply(TRUE, xgrad, vw0) != OK)
+        return FAIL;
 
-        VectorXf xgradVec = Map<VectorXf>(xgrad, ncoil);
-        VectorXf vw0Vec = Map<VectorXf>(comp->vec_work[0], ncomp_coil);
-        if (comp->set->apply(TRUE, xgradVec, vw0Vec) != OK)
-            return FAIL;
-        Map<VectorXf>(xgrad, ncoil) = xgradVec;
+    vw1 = comp->vec_work.row(1).transpose();
+    if (comp->set->apply(TRUE, ygrad, vw1) != OK)
+        return FAIL;
 
-        VectorXf ygradVec = Map<VectorXf>(ygrad, ncoil);
-        VectorXf vw1Vec = Map<VectorXf>(comp->vec_work[1], ncomp_coil);
-        if (comp->set->apply(TRUE, ygradVec, vw1Vec) != OK)
-            return FAIL;
-        Map<VectorXf>(ygrad, ncoil) = ygradVec;
+    vw2 = comp->vec_work.row(2).transpose();
+    if (comp->set->apply(TRUE, zgrad, vw2) != OK)
+        return FAIL;
 
-        VectorXf zgradVec = Map<VectorXf>(zgrad, ncoil);
-        VectorXf vw2Vec = Map<VectorXf>(comp->vec_work[2], ncomp_coil);
-        if (comp->set->apply(TRUE, zgradVec, vw2Vec) != OK)
-            return FAIL;
-        Map<VectorXf>(zgrad, ncoil) = zgradVec;
-    }
     return OK;
 }

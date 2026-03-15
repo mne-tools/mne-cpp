@@ -51,11 +51,11 @@
  * Convenient generic field / potential computation functions
  */
 using fwdFieldFunc = std::function<int(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
-                                       FWDLIB::FwdCoilSet* coils, float *res, void *client)>;
+                                       FWDLIB::FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> res, void *client)>;
 using fwdVecFieldFunc = std::function<int(const Eigen::Vector3f& rd,
-                                          FWDLIB::FwdCoilSet* coils, float **res, void *client)>;
+                                          FWDLIB::FwdCoilSet& coils, Eigen::Ref<Eigen::MatrixXf> res, void *client)>;
 using fwdFieldGradFunc = std::function<int(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
-                                           FWDLIB::FwdCoilSet* coils, float *res,
-                                           float *xgrad, float *ygrad, float *zgrad, void *client)>;
+                                           FWDLIB::FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> res,
+                                           Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad, void *client)>;
 
 #endif // FWD_TYPES_H

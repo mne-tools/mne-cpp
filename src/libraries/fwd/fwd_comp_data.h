@@ -102,7 +102,7 @@ public:
      */
     ~FwdCompData();
 
-    static int fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet* coils, float *res, void *client);
+    static int fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> res, void *client);
 
     /*
      * Routines to implement the reference channel compensation in field computations
@@ -120,10 +120,10 @@ public:
                                    fwdFieldGradFunc  field_grad,    /* The field and gradient computation function */
                                    void              *client);       /* Client data to be passed to the above */
 
-    static int fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet* coils, float **res, void *client);
+    static int fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet& coils, Eigen::Ref<Eigen::MatrixXf> res, void *client);
 
-    static int fwd_comp_field_grad(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet* coils,
-                float *res, float *xgrad, float *ygrad, float *zgrad,
+    static int fwd_comp_field_grad(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet& coils,
+                Eigen::Ref<Eigen::VectorXf> res, Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad,
                 void *client);
 
 public:
@@ -133,8 +133,8 @@ public:
     fwdVecFieldFunc     vec_field;  /* Computes the fields of all three dipole components  */
     fwdFieldGradFunc    field_grad; /* Computes the field and gradient of one dipole direction */
     void                *client;    /* Client data to pass to the above functions */
-    float               *work;      /* The work areas */
-    float               **vec_work;
+    Eigen::VectorXf     work;       /* The work area */
+    Eigen::MatrixXf     vec_work;   /* The vector work area (3 x ncoil) */
 };
 
 //=============================================================================================================
