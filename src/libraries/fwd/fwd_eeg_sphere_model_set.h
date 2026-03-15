@@ -96,6 +96,11 @@ public:
      */
     ~FwdEegSphereModelSet();
 
+    FwdEegSphereModelSet(const FwdEegSphereModelSet&) = delete;
+    FwdEegSphereModelSet& operator=(const FwdEegSphereModelSet&) = delete;
+    FwdEegSphereModelSet(FwdEegSphereModelSet&&) = default;
+    FwdEegSphereModelSet& operator=(FwdEegSphereModelSet&&) = default;
+
     //=========================================================================================================
     /**
      * Add a model to a set. The model will be owned by the set.
