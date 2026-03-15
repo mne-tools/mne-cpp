@@ -89,7 +89,7 @@ using namespace SCMEASLIB;
 using namespace DISPLIB;
 using namespace CONNECTIVITYLIB;
 using namespace MNELIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace FIFFLIB;
 
 //=============================================================================================================

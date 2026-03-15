@@ -52,12 +52,12 @@
 #include <fiff/fiff_stream.h>
 
 #include <mne/mne.h>
-#include <inverse/mne_inverse_operator.h>
+#include <inverse/inv_inverse_operator.h>
 #include <fwd/fwd_forward_solution.h>
-#include <inverse/mne_source_estimate.h>
+#include <inverse/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 
-#include <inverse/minimum_norm/minimum_norm.h>
+#include <inverse/minimum_norm/inv_minimum_norm.h>
 
 #include <fs/fs_label.h>
 
@@ -91,7 +91,7 @@ using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace FWDLIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace FSLIB;
 using namespace UTILSLIB;
 

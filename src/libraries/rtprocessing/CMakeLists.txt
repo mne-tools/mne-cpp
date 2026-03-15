@@ -83,7 +83,7 @@ set(MNE_LIBS_REQUIRED
     mne_mne
     mne_connectivity
     mne_fwd
-    mne_inverse
+    mne_inv
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

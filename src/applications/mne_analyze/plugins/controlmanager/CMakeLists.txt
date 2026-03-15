@@ -56,7 +56,7 @@ set(MNE_LIBS_REQUIRED
     mne_fs
     mne_mne
     mne_fwd
-    mne_inverse
+    mne_inv
     mne_rtprocessing
     mne_events
 )

@@ -42,7 +42,7 @@
 #include "scmeas_global.h"
 #include "measurement.h"
 
-#include <inverse/hpi/hpi_fit.h>
+#include <inverse/hpi/inv_hpi_fit.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -119,7 +119,7 @@ public:
      *
      * @param[in] v     the covariance which should be distributed.
      */
-    virtual void setValue(const INVERSELIB::HpiFitResult& v);
+    virtual void setValue(const INVLIB::HpiFitResult& v);
 
     //=========================================================================================================
     /**
@@ -128,7 +128,7 @@ public:
      *
      * @return the last attached value.
      */
-    virtual QSharedPointer<INVERSELIB::HpiFitResult>& getValue();
+    virtual QSharedPointer<INVLIB::HpiFitResult>& getValue();
 
     //=========================================================================================================
     /**
@@ -158,7 +158,7 @@ private:
     mutable QMutex          m_qMutex;                               /**< Mutex to ensure thread safety. */
     bool                    m_bInitialized;                         /**< If values are stored.*/
 
-    QSharedPointer<INVERSELIB::HpiFitResult>    m_pHpiFitResult;    /**< The HPI fit result. */
+    QSharedPointer<INVLIB::HpiFitResult>    m_pHpiFitResult;    /**< The HPI fit result. */
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The Fiff Info. */
     QSharedPointer<FIFFLIB::FiffDigitizerData>  m_pFiffDigData;     /**< The Fiff Digigtizer Data */
 };

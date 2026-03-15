@@ -50,7 +50,7 @@
 using namespace SCMEASLIB;
 using namespace MNELIB;
 using namespace FWDLIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace FSLIB;
 
 //=============================================================================================================

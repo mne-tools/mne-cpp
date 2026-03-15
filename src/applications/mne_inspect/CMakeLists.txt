@@ -66,7 +66,7 @@ set(MNE_LIBS_REQUIRED
     mne_fwd
     mne_mne
     mne_disp
-    mne_inverse
+    mne_inv
     mne_utils
     mne_connectivity
 )

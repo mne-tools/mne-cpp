@@ -17,7 +17,7 @@ target_link_libraries(test_fwd_bem_data PRIVATE
     Qt6::Core Qt6::Widgets Qt6::Concurrent Qt6::Network Qt6::Test
     mne_rtprocessing
     mne_connectivity
-    mne_inverse
+    mne_inv
     mne_fwd
     mne_mne
     mne_fiff

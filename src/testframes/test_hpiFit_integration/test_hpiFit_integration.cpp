@@ -46,8 +46,8 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_dig_point_set.h>
 
-#include <inverse/hpi/hpi_fit.h>
-#include <inverse/hpi/hpi_data_updater.h>
+#include <inverse/hpi/inv_hpi_fit.h>
+#include <inverse/hpi/inv_hpi_data_updater.h>
 
 #include <utils/ioutils.h>
 #include <utils/mnemath.h>
@@ -72,7 +72,7 @@
 
 using namespace FIFFLIB;
 using namespace UTILSLIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace Eigen;
 
 //=============================================================================================================

@@ -38,8 +38,8 @@
 
 #include <utils/generics/applicationlogger.h>
 #include <iostream>
-#include <inverse/hpi/hpi_data_updater.h>
-#include <inverse/hpi/sensor_set.h>
+#include <inverse/hpi/inv_hpi_data_updater.h>
+#include <inverse/hpi/inv_sensor_set.h>
 
 #include <fiff/fiff.h>
 
@@ -62,7 +62,7 @@
 
 using namespace FIFFLIB;
 using namespace UTILSLIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace Eigen;
 
 //=============================================================================================================

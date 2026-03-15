@@ -42,7 +42,7 @@
 #include "dipolefit_global.h"
 #include <anShared/Plugins/abstractplugin.h>
 
-#include <inverse/dipole_fit/dipole_fit_settings.h>
+#include <inverse/dipole_fit/inv_dipole_fit_settings.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -228,7 +228,7 @@ private:
      *
      * @param[in] set      new EDCSet to be sent.
      */
-    void newDipoleFit(INVERSELIB::ECDSet set, const QString& sFitName);
+    void newDipoleFit(INVLIB::ECDSet set, const QString& sFitName);
 
     //=========================================================================================================
     /**
@@ -268,7 +268,7 @@ private:
      *
      * @return returs ECD set resulting from dipole fit.
      */
-    INVERSELIB::ECDSet dipoleFitCalculation();
+    INVLIB::ECDSet dipoleFitCalculation();
 
     //=========================================================================================================
     /**
@@ -291,15 +291,15 @@ private:
     void triggerLoadingEnd(QString sMessage);
 
     QList<QSharedPointer<ANSHAREDLIB::AbstractModel>>       m_ModelList;            /**< List of models used in dipole fitting. Usded for storing for later selection. */
-    INVERSELIB::DipoleFitSettings                           m_DipoleSettings;       /**< Settings for dipole fit. */
+    INVLIB::DipoleFitSettings                           m_DipoleSettings;       /**< Settings for dipole fit. */
     QString                                                 m_sFitName;             /**< Fit name for dipole fit. */
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;               /**< Communicator for sending events. */
 
     QMutex                                                  m_FitMutex;             /**< Mutex for thread-safing. */
 
-    QFutureWatcher<INVERSELIB::ECDSet>                      m_FutureWatcher;        /**< Future watcher for notifing of completed fit calculations. */
-    QFuture<INVERSELIB::ECDSet>                             m_Future;               /**< Future for performing fit calculations of separate thread. */
+    QFutureWatcher<INVLIB::ECDSet>                      m_FutureWatcher;        /**< Future watcher for notifing of completed fit calculations. */
+    QFuture<INVLIB::ECDSet>                             m_Future;               /**< Future for performing fit calculations of separate thread. */
 
 signals:
 

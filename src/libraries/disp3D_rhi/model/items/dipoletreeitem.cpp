@@ -41,13 +41,13 @@
 
 #include "dipoletreeitem.h"
 
-DipoleTreeItem::DipoleTreeItem(const QString& text, const INVERSELIB::ECDSet& set, int type)
+DipoleTreeItem::DipoleTreeItem(const QString& text, const INVLIB::ECDSet& set, int type)
     : AbstractTreeItem(text, type)
     , m_ecdSet(set)
 {
 }
 
-const INVERSELIB::ECDSet& DipoleTreeItem::ecdSet() const
+const INVLIB::ECDSet& DipoleTreeItem::ecdSet() const
 {
     return m_ecdSet;
 }

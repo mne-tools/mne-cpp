@@ -37,7 +37,7 @@
 //=============================================================================================================
 
 #include <utils/generics/applicationlogger.h>
-#include <inverse/hpi/signal_model.h>
+#include <inverse/hpi/inv_signal_model.h>
 #include <utils/mnemath.h>
 #include <iostream>
 #include <utils/ioutils.h>
@@ -59,7 +59,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace Eigen;
 using namespace UTILSLIB;
 

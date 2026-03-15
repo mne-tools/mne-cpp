@@ -22,17 +22,17 @@
 #include <fwd/fwd_forward_solution.h>
 #include <mne/mne_source_spaces.h>
 
-#include <inverse/dipole_fit/dipole_fit_settings.h>
-#include <inverse/dipole_fit/ecd.h>
-#include <inverse/dipole_fit/ecd_set.h>
-#include <inverse/rap_music/rap_music.h>
-#include <inverse/rap_music/dipole.h>
-#include <inverse/minimum_norm/minimum_norm.h>
-#include <inverse/hpi/hpi_model_parameters.h>
-#include <inverse/hpi/sensor_set.h>
-#include <inverse/hpi/hpi_fit.h>
-#include <inverse/hpi/hpi_fit_data.h>
-#include <inverse/hpi/signal_model.h>
+#include <inverse/dipole_fit/inv_dipole_fit_settings.h>
+#include <inverse/dipole_fit/inv_ecd.h>
+#include <inverse/dipole_fit/inv_ecd_set.h>
+#include <inverse/rap_music/inv_rap_music.h>
+#include <inverse/rap_music/inv_dipole.h>
+#include <inverse/minimum_norm/inv_minimum_norm.h>
+#include <inverse/hpi/inv_hpi_model_parameters.h>
+#include <inverse/hpi/inv_sensor_set.h>
+#include <inverse/hpi/inv_hpi_fit.h>
+#include <inverse/hpi/inv_hpi_fit_data.h>
+#include <inverse/hpi/inv_signal_model.h>
 
 #include <rtprocessing/rtconnectivity.h>
 #include <rtprocessing/rthpis.h>
@@ -47,7 +47,7 @@
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace FWDLIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace RTPROCESSINGLIB;
 using namespace CONNECTIVITYLIB;
 using namespace Eigen;

@@ -45,7 +45,7 @@
 #include <QVector3D>
 #include <vector>
 #include <memory>
-#include <inverse/dipole_fit/ecd_set.h>
+#include <inverse/dipole_fit/inv_ecd_set.h>
 
 // Forward-declare QRhi types so that this header stays QRhi-free
 class QRhi;
@@ -65,7 +65,7 @@ public:
     DipoleObject();
     ~DipoleObject();
 
-    void load(const INVERSELIB::ECDSet &ecdSet);
+    void load(const INVLIB::ECDSet &ecdSet);
     
     // Apply a transformation matrix to all dipoles
     void applyTransform(const QMatrix4x4 &trans);

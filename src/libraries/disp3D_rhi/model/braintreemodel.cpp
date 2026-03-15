@@ -48,7 +48,7 @@
 #include "model/items/sourcespacetreeitem.h"
 #include "model/items/digitizersettreeitem.h"
 #include "model/items/networktreeitem.h"
-#include <inverse/dipole_fit/ecd_set.h>
+#include <inverse/dipole_fit/inv_ecd_set.h>
 #include <mne/mne_hemisphere.h>
 
 BrainTreeModel::BrainTreeModel(QObject *parent)
@@ -172,7 +172,7 @@ void BrainTreeModel::addSensors(const QString &type, const QList<QStandardItem*>
 
 //=============================================================================================================
 
-void BrainTreeModel::addDipoles(const INVERSELIB::ECDSet &set)
+void BrainTreeModel::addDipoles(const INVLIB::ECDSet &set)
 {
     DipoleTreeItem* item = new DipoleTreeItem("Dipoles", set);
     item->setCheckable(true);

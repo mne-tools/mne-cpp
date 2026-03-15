@@ -58,8 +58,8 @@
 #include <fs/fs_surface.h>
 #include <fs/fs_annotationset.h>
 #include <fiff/fiff_evoked.h>
-#include <inverse/mne_source_estimate.h>
-#include <inverse/minimum_norm/minimum_norm.h>
+#include <inverse/inv_source_estimate.h>
+#include <inverse/minimum_norm/inv_minimum_norm.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -88,7 +88,7 @@ using namespace FWDLIB;
 using namespace std;
 using namespace DISPLIB;
 using namespace FSLIB;
-using namespace INVERSELIB;
+using namespace INVLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
 
