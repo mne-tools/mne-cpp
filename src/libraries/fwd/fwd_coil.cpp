@@ -106,10 +106,10 @@ FwdCoil::FwdCoil(const FwdCoil& p_FwdCoil)
     cosmag = p_FwdCoil.cosmag;
     w      = p_FwdCoil.w;
 
-    std::copy(std::begin(p_FwdCoil.r0), std::end(p_FwdCoil.r0), std::begin(this->r0));
-    std::copy(std::begin(p_FwdCoil.ex), std::end(p_FwdCoil.ex), std::begin(this->ex));
-    std::copy(std::begin(p_FwdCoil.ey), std::end(p_FwdCoil.ey), std::begin(this->ey));
-    std::copy(std::begin(p_FwdCoil.ez), std::end(p_FwdCoil.ez), std::begin(this->ez));
+    this->r0 = p_FwdCoil.r0;
+    this->ex = p_FwdCoil.ex;
+    this->ey = p_FwdCoil.ey;
+    this->ez = p_FwdCoil.ez;
 
     this->coord_frame = p_FwdCoil.coord_frame;
 }
@@ -122,63 +122,57 @@ FwdCoil::~FwdCoil()
 
 //=============================================================================================================
 
-FwdCoil *FwdCoil::create_eeg_el(const FiffChInfo& ch, const FiffCoordTrans& t)
+std::unique_ptr<FwdCoil> FwdCoil::create_eeg_el(const FiffChInfo& ch, const FiffCoordTrans& t)
 {
-    FwdCoil*    res = NULL;
-    int        c;
-
     if (ch.kind != FIFFV_EEG_CH) {
         qWarning() << ch.ch_name << "is not an EEG channel. Cannot create an electrode definition.";
-        goto bad;
+        return nullptr;
     }
     if (!t.isEmpty() && t.from != FIFFV_COORD_HEAD) {
-        printf("Inappropriate coordinate transformation in fwd_create_eeg_el");
-        goto bad;
+        qWarning("Inappropriate coordinate transformation in fwd_create_eeg_el");
+        return nullptr;
     }
 
+    std::unique_ptr<FwdCoil> res;
     if (ch.chpos.ex.norm() < 1e-4)
-        res = new FwdCoil(1);	             /* No reference electrode */
+        res = std::make_unique<FwdCoil>(1);   /* No reference electrode */
     else
-        res = new FwdCoil(2);		     /* Reference electrode present */
+        res = std::make_unique<FwdCoil>(2);   /* Reference electrode present */
 
     res->chname     = ch.ch_name;
     res->desc       = "EEG electrode";
     res->coil_class = FWD_COILC_EEG;
     res->accuracy   = FWD_COIL_ACCURACY_NORMAL;
     res->type       = ch.chpos.coil_type;
-    std::copy(ch.chpos.r0.data(), ch.chpos.r0.data() + 3, res->r0);
-    std::copy(ch.chpos.ex.data(), ch.chpos.ex.data() + 3, res->ex);
+    res->r0 = ch.chpos.r0;
+    res->ex = ch.chpos.ex;
     /*
-       * Optional coordinate transformation
-       */
+     * Optional coordinate transformation
+     */
     if (!t.isEmpty()) {
-        FiffCoordTrans::apply_trans(res->r0,t,FIFFV_MOVE);
-        FiffCoordTrans::apply_trans(res->ex,t,FIFFV_MOVE);
+        FiffCoordTrans::apply_trans(res->r0.data(),t,FIFFV_MOVE);
+        FiffCoordTrans::apply_trans(res->ex.data(),t,FIFFV_MOVE);
         res->coord_frame = t.to;
     }
     else
         res->coord_frame = FIFFV_COORD_HEAD;
     /*
-       * The electrode location
-       */
-    for (c = 0; c < 3; c++)
-        res->rmag(0, c) = res->cosmag(0, c) = res->r0[c];
+     * The electrode location
+     */
+    res->rmag.row(0) = res->r0.transpose();
+    res->cosmag.row(0) = res->r0.transpose();
     res->cosmag.row(0).normalize();
     res->w[0] = 1.0;
     /*
-       * Add the reference electrode, if appropriate
-       */
+     * Add the reference electrode, if appropriate
+     */
     if (res->np == 2) {
-        for (c = 0; c < 3; c++)
-            res->rmag(1, c) = res->cosmag(1, c) = res->ex[c];
+        res->rmag.row(1) = res->ex.transpose();
+        res->cosmag.row(1) = res->ex.transpose();
         res->cosmag.row(1).normalize();
         res->w[1] = -1.0;
     }
     return res;
-
-bad : {
-        return NULL;
-    }
 }
 
 //=============================================================================================================

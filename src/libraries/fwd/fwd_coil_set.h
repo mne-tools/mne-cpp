@@ -91,8 +91,6 @@ public:
      */
     ~FwdCoilSet();
 
-    void fwd_free_coil_set_user_data();
-
     //=========================================================================================================
     /**
      * Create a MEG coil definition using a database of templates
@@ -197,6 +195,23 @@ public:
      * @return   True if set contains an EEG electrode of specified type, false otherwise.
      */
     bool is_eeg_electrode_type(int type) const;
+
+private:
+    //=========================================================================================================
+    /**
+     * Add a new coil template to this set.
+     *
+     * @param[in] type            Coil type identifier.
+     * @param[in] coil_class      Coil class (MAG, AXIAL_GRAD, PLANAR_GRAD, etc.).
+     * @param[in] acc             Accuracy level.
+     * @param[in] np              Number of integration points.
+     * @param[in] size            Coil size.
+     * @param[in] base            Baseline.
+     * @param[in] desc            Human-readable description.
+     *
+     * @return Non-owning pointer to the newly created coil, or nullptr on error.
+     */
+    FwdCoil* fwd_add_coil_to_set(int type, int coil_class, int acc, int np, float size, float base, const QString& desc);
 
 public:
     std::vector<std::unique_ptr<FwdCoil>> coils;  /**< The coil or electrode positions. */
