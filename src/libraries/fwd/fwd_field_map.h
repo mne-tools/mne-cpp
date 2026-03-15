@@ -45,7 +45,7 @@
 #include "fwd_global.h"
 
 #include <Eigen/Core>
-#include <QSharedPointer>
+#include <memory>
 #include "fwd_coil_set.h"
 #include <fiff/fiff_info.h>
 
@@ -84,12 +84,12 @@ public:
      * @param[in] miss      Eigenvalue truncation threshold (default 1e-4, matching _make_surface_mapping).
      * @return Mapping matrix (nvert × nchan), or null on failure.
      */
-    static QSharedPointer<Eigen::MatrixXf> computeMegMapping(const FwdCoilSet& coils,
-                                                             const Eigen::MatrixX3f& vertices,
-                                                             const Eigen::MatrixX3f& normals,
-                                                             const Eigen::Vector3f& origin,
-                                                             float intrad = 0.06f,
-                                                             float miss = 1e-4f);
+    static std::unique_ptr<Eigen::MatrixXf> computeMegMapping(const FwdCoilSet& coils,
+                                                              const Eigen::MatrixX3f& vertices,
+                                                              const Eigen::MatrixX3f& normals,
+                                                              const Eigen::Vector3f& origin,
+                                                              float intrad = 0.06f,
+                                                              float miss = 1e-4f);
 
     /**
      * Compute MEG sensor-to-surface mapping matrix with SSP projection.
@@ -104,14 +104,14 @@ public:
      * @param[in] miss      Eigenvalue truncation threshold (default 1e-4).
      * @return Mapping matrix (nvert × nchan), or null on failure.
      */
-    static QSharedPointer<Eigen::MatrixXf> computeMegMapping(const FwdCoilSet& coils,
-                                                             const Eigen::MatrixX3f& vertices,
-                                                             const Eigen::MatrixX3f& normals,
-                                                             const Eigen::Vector3f& origin,
-                                                             const FIFFLIB::FiffInfo& info,
-                                                             const QStringList& chNames,
-                                                             float intrad = 0.06f,
-                                                             float miss = 1e-4f);
+    static std::unique_ptr<Eigen::MatrixXf> computeMegMapping(const FwdCoilSet& coils,
+                                                              const Eigen::MatrixX3f& vertices,
+                                                              const Eigen::MatrixX3f& normals,
+                                                              const Eigen::Vector3f& origin,
+                                                              const FIFFLIB::FiffInfo& info,
+                                                              const QStringList& chNames,
+                                                              float intrad = 0.06f,
+                                                              float miss = 1e-4f);
 
     /**
      * Compute EEG electrode-to-surface mapping matrix.
@@ -126,11 +126,11 @@ public:
      * @param[in] miss      Eigenvalue truncation threshold (default 1e-3, matching _make_surface_mapping).
      * @return Mapping matrix (nvert × nchan), or null on failure.
      */
-    static QSharedPointer<Eigen::MatrixXf> computeEegMapping(const FwdCoilSet& coils,
-                                                             const Eigen::MatrixX3f& vertices,
-                                                             const Eigen::Vector3f& origin,
-                                                             float intrad = 0.06f,
-                                                             float miss = 1e-3f);
+    static std::unique_ptr<Eigen::MatrixXf> computeEegMapping(const FwdCoilSet& coils,
+                                                              const Eigen::MatrixX3f& vertices,
+                                                              const Eigen::Vector3f& origin,
+                                                              float intrad = 0.06f,
+                                                              float miss = 1e-3f);
 
     /**
      * Compute EEG electrode-to-surface mapping matrix with SSP projection
@@ -145,21 +145,14 @@ public:
      * @param[in] miss      Eigenvalue truncation threshold (default 1e-3).
      * @return Mapping matrix (nvert × nchan), or null on failure.
      */
-    static QSharedPointer<Eigen::MatrixXf> computeEegMapping(const FwdCoilSet& coils,
-                                                             const Eigen::MatrixX3f& vertices,
-                                                             const Eigen::Vector3f& origin,
-                                                             const FIFFLIB::FiffInfo& info,
-                                                             const QStringList& chNames,
-                                                             float intrad = 0.06f,
-                                                             float miss = 1e-3f);
+    static std::unique_ptr<Eigen::MatrixXf> computeEegMapping(const FwdCoilSet& coils,
+                                                              const Eigen::MatrixX3f& vertices,
+                                                              const Eigen::Vector3f& origin,
+                                                              const FIFFLIB::FiffInfo& info,
+                                                              const QStringList& chNames,
+                                                              float intrad = 0.06f,
+                                                              float miss = 1e-3f);
 };
-
-//=============================================================================================================
-// BACKWARD COMPATIBILITY – keep old name available
-//=============================================================================================================
-
-/** @deprecated Use FwdFieldMap instead. */
-using FieldMap = FwdFieldMap;
 
 //=============================================================================================================
 } // NAMESPACE FWDLIB

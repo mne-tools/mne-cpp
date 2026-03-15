@@ -36,6 +36,7 @@
 // INCLUDES
 //=============================================================================================================
 #include <iostream>
+#include <memory>
 
 #include <utils/generics/applicationlogger.h>
 
@@ -102,7 +103,7 @@ int main(int argc, char *argv[])
     parser.process(a);
 
     // specify necessary information for forward computation
-    ComputeFwdSettings::SPtr pSettings = ComputeFwdSettings::SPtr(new ComputeFwdSettings);
+    std::shared_ptr<ComputeFwdSettings> pSettings = std::make_shared<ComputeFwdSettings>();
 
     QFile t_fileBemName(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
     QFile t_fileSrcName(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif");
@@ -132,7 +133,7 @@ int main(int argc, char *argv[])
     pSettings->checkIntegrity();
 
     timer0.start();
-    ComputeFwd::SPtr pFwdComputer = ComputeFwd::SPtr(new ComputeFwd(pSettings));
+    std::shared_ptr<ComputeFwd> pFwdComputer = std::make_shared<ComputeFwd>(pSettings);
     fTime0 = timer0.elapsed();
 
     // perform the actual computation

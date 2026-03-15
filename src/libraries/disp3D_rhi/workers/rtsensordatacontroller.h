@@ -45,10 +45,10 @@
 #include <fiff/fiff_coord_trans.h>
 
 #include <QObject>
-#include <QSharedPointer>
 #include <QVector>
 #include <QString>
 #include <Eigen/Core>
+#include <memory>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -126,7 +126,7 @@ public:
      *
      * @param[in] mat        Dense mapping matrix.
      */
-    void setMappingMatrix(QSharedPointer<Eigen::MatrixXf> mat);
+    void setMappingMatrix(std::shared_ptr<Eigen::MatrixXf> mat);
 
     //=========================================================================================================
     /**
@@ -307,7 +307,7 @@ signals:
      * @param[in] pick          Channel indices picked for this mapping.
      */
     void newMegMappingAvailable(const QString &surfaceKey,
-                                QSharedPointer<Eigen::MatrixXf> mappingMat,
+                                std::shared_ptr<Eigen::MatrixXf> mappingMat,
                                 const QVector<int> &pick);
 
     //=========================================================================================================
@@ -319,15 +319,15 @@ signals:
      * @param[in] pick          Channel indices picked for this mapping.
      */
     void newEegMappingAvailable(const QString &surfaceKey,
-                                QSharedPointer<Eigen::MatrixXf> mappingMat,
+                                std::shared_ptr<Eigen::MatrixXf> mappingMat,
                                 const QVector<int> &pick);
 
 private slots:
     void onNewMegMapping(const QString &surfaceKey,
-                         QSharedPointer<Eigen::MatrixXf> mappingMat,
+                         std::shared_ptr<Eigen::MatrixXf> mappingMat,
                          const QVector<int> &pick);
     void onNewEegMapping(const QString &surfaceKey,
-                         QSharedPointer<Eigen::MatrixXf> mappingMat,
+                         std::shared_ptr<Eigen::MatrixXf> mappingMat,
                          const QVector<int> &pick);
 
 private:

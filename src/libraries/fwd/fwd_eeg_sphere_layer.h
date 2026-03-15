@@ -53,7 +53,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
 #include <QDebug>
 
 //=============================================================================================================
@@ -72,8 +71,6 @@ namespace FWDLIB
 class FWDSHARED_EXPORT FwdEegSphereLayer
 {
 public:
-    typedef QSharedPointer<FwdEegSphereLayer> SPtr;              /**< Shared pointer type for FwdEegSphereLayer. */
-    typedef QSharedPointer<const FwdEegSphereLayer> ConstSPtr;   /**< Const shared pointer type for FwdEegSphereLayer. */
 
     //=========================================================================================================
     /**
@@ -81,29 +78,24 @@ public:
      */
     FwdEegSphereLayer();
 
-//    //=========================================================================================================
-//    /**
-//    * Copy constructor.
-//    *
-//    * @param[in] p_FwdEegSphereLayer      FwdEegSphereLayer which should be copied
-//    */
-//    FwdEegSphereLayer(const FwdEegSphereLayer& p_FwdEegSphereLayer);
-
     //=========================================================================================================
     /**
      * Destroys the Forward EEG Sphere Layer description
      */
     ~FwdEegSphereLayer();
 
-    static bool comp_layers(const FwdEegSphereLayer& v1,const FwdEegSphereLayer& v2)
-    /*
-          * Comparison function for sorting layers
-          */
+    //=========================================================================================================
+    /**
+     * Compare two sphere layers by radius for sorting.
+     *
+     * @param[in] v1   First layer.
+     * @param[in] v2   Second layer.
+     *
+     * @return True if v1.rad < v2.rad.
+     */
+    static bool comp_layers(const FwdEegSphereLayer& v1, const FwdEegSphereLayer& v2)
     {
-        if (v1.rad < v2.rad)
-            return true;
-        else
-            return false;
+        return v1.rad < v2.rad;
     }
 
 public:

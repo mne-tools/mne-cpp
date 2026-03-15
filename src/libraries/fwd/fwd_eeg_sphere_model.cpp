@@ -43,8 +43,6 @@
 #include "fwd_eeg_sphere_model.h"
 #include "fwd_eeg_sphere_model_set.h"
 
-#include <QtAlgorithms>
-
 #include <qmath.h>
 
 #include <Eigen/Core>
@@ -61,160 +59,28 @@ using namespace Eigen;
 using namespace UTILSLIB;
 using namespace FWDLIB;
 
-#define MIN_1(a,b) ((a) < (b) ? (a) : (b))
+//=============================================================================================================
+// Local constants and helpers
+//=============================================================================================================
 
-//ToDo Remove after refactoring
-#define X_1 0
-#define Y_1 1
-#define Z_1 2
-/*
- * Dot product and length
- */
-#define VEC_DOT_1(x,y) ((x)[X_1]*(y)[X_1] + (x)[Y_1]*(y)[Y_1] + (x)[Z_1]*(y)[Z_1])
-#define VEC_LEN_1(x) sqrt(VEC_DOT_1(x,x))
-/*
- * Others...
- */
-#define VEC_DIFF_1(from,to,diff) {\
-    (diff)[X_1] = (to)[X_1] - (from)[X_1];\
-    (diff)[Y_1] = (to)[Y_1] - (from)[Y_1];\
-    (diff)[Z_1] = (to)[Z_1] - (from)[Z_1];\
-    }
-
-#define VEC_COPY_1(to,from) {\
-    (to)[X_1] = (from)[X_1];\
-    (to)[Y_1] = (from)[Y_1];\
-    (to)[Z_1] = (from)[Z_1];\
-    }
-
-#define CROSS_PRODUCT_1(x,y,xy) {\
-    (xy)[X_1] =   (x)[Y_1]*(y)[Z_1]-(y)[Y_1]*(x)[Z_1];\
-    (xy)[Y_1] = -((x)[X_1]*(y)[Z_1]-(y)[X_1]*(x)[Z_1]);\
-    (xy)[Z_1] =   (x)[X_1]*(y)[Y_1]-(y)[X_1]*(x)[Y_1];\
-    }
-
-#define MALLOC_1(x,t) (t *)malloc((x)*sizeof(t))
-
-#define REALLOC_1(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
-
-#define FREE(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#define ALLOC_DCMATRIX_1(x,y) mne_dmatrix_1((x),(y))
-#define FREE_DCMATRIX_1(m) mne_free_dcmatrix_1((m))
-
-#define ALLOC_CMATRIX_1(x,y) mne_cmatrix_1((x),(y))
-
-/*
- * float matrices
- */
-#define FREE_CMATRIX_1(m) mne_free_cmatrix_1((m))
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
-
-static void matrix_error_1(int kind, int nr, int nc)
-
-{
-    if (kind == 1)
-        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
-    else if (kind == 2)
-        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
-    else
-        printf("Allocation error for a %d x %d matrix\n",nr,nc);
-    if (sizeof(void *) == 4) {
-        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
-        printf("Please consider moving to a 64-bit platform.");
-    }
-    printf("Cannot continue. Sorry.\n");
-    exit(1);
-}
-
-float **mne_cmatrix_1(int nr,int nc)
-
-{
-    int i;
-    float **m;
-    float *whole;
-
-    m = MALLOC_1(nr,float *);
-    if (!m) matrix_error_1(1,nr,nc);
-    whole = MALLOC_1(nr*nc,float);
-    if (!whole) matrix_error_1(2,nr,nc);
-
-    for(i=0;i<nr;i++)
-        m[i] = whole + i*nc;
-    return m;
-}
-
-double **mne_dmatrix_1(int nr, int nc)
-
-{
-    int i;
-    double **m;
-    double *whole;
-
-    m = MALLOC_1(nr,double *);
-    if (!m) matrix_error_1(1,nr,nc);
-    whole = MALLOC_1(nr*nc,double);
-    if (!whole) matrix_error_1(2,nr,nc);
-
-    for(i=0;i<nr;i++)
-        m[i] = whole + i*nc;
-    return m;
-}
-
-void mne_free_cmatrix_1 (float **m)
-{
-    if (m) {
-        free(*m);
-        free(m);
-    }
-}
-
-void mne_free_dcmatrix_1 (double **m)
-
-{
-    if (m) {
-        FREE(*m);
-        FREE(m);
-    }
-}
-
-#define MAXTERMS 1000
-#define EPS      1e-10
-#define SIN_EPS  1e-3
-
-static int         terms = 0;       /* These statistics may be useful */
-static int         eval = 0;
+namespace {
+constexpr int FAIL  = -1;
+constexpr int OK    =  0;
+constexpr int MAXTERMS = 1000;
+constexpr double EPS     = 1e-10;
+constexpr double SIN_EPS = 1e-3;
+} // anonymous namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 FwdEegSphereModel::FwdEegSphereModel()
-: fn(NULL)
-, nterms  (0)
-, lambda  (NULL)
-, mu      (NULL)
-, nfit    (0)
+: nterms    (0)
+, nfit      (0)
 , scale_pos (0)
 {
-    r0[0] = 0.0;
-    r0[1] = 0.0;
-    r0[2] = 0.0;
+    r0.setZero();
 }
 
 //=============================================================================================================
@@ -227,9 +93,9 @@ FwdEegSphereModel::FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereMode
         this->name = p_FwdEegSphereModel.name;
     if (p_FwdEegSphereModel.nlayer() > 0) {
         for (k = 0; k < p_FwdEegSphereModel.nlayer(); k++)
-            this->layers.append(p_FwdEegSphereModel.layers[k]);
+            this->layers.push_back(p_FwdEegSphereModel.layers[k]);
     }
-    VEC_COPY_1(this->r0,p_FwdEegSphereModel.r0);
+    this->r0 = p_FwdEegSphereModel.r0;
     if (p_FwdEegSphereModel.nterms > 0) {
         this->fn = VectorXd(p_FwdEegSphereModel.nterms);
         this->nterms = p_FwdEegSphereModel.nterms;
@@ -250,7 +116,7 @@ FwdEegSphereModel::FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereMode
 
 //=============================================================================================================
 
-FwdEegSphereModel* FwdEegSphereModel::fwd_create_eeg_sphere_model(const QString& name,
+FwdEegSphereModel::UPtr FwdEegSphereModel::fwd_create_eeg_sphere_model(const QString& name,
                                                      int nlayer,
                                                      const VectorXf& rads,
                                                      const VectorXf& sigmas)
@@ -258,7 +124,7 @@ FwdEegSphereModel* FwdEegSphereModel::fwd_create_eeg_sphere_model(const QString&
       * Produce a new sphere model structure
       */
 {
-    FwdEegSphereModel* new_model = new FwdEegSphereModel();
+    auto new_model = std::make_unique<FwdEegSphereModel>();
 
     new_model->name   = name;
 
@@ -266,7 +132,7 @@ FwdEegSphereModel* FwdEegSphereModel::fwd_create_eeg_sphere_model(const QString&
         FwdEegSphereLayer layer;
         layer.rad = layer.rel_rad = rads[k];
         layer.sigma = sigmas[k];
-        new_model->layers.append(layer);
+        new_model->layers.push_back(layer);
     }
     /*
    * Sort...
@@ -293,33 +159,26 @@ FwdEegSphereModel::~FwdEegSphereModel()
 
 //=============================================================================================================
 
-FwdEegSphereModel* FwdEegSphereModel::setup_eeg_sphere_model(const QString& eeg_model_file, QString eeg_model_name, float eeg_sphere_rad)
+FwdEegSphereModel::UPtr FwdEegSphereModel::setup_eeg_sphere_model(const QString& eeg_model_file, QString eeg_model_name, float eeg_sphere_rad)
 {
-    FwdEegSphereModelSet* eeg_models = NULL;
-    FwdEegSphereModel*    eeg_model  = NULL;
-
     if (eeg_model_name.isEmpty())
         eeg_model_name = QString("Default");
 
-    eeg_models = FwdEegSphereModelSet::fwd_load_eeg_sphere_models(eeg_model_file,NULL);
-    eeg_models->fwd_list_eeg_sphere_models(stderr);
+    FwdEegSphereModelSet::UPtr eeg_models(FwdEegSphereModelSet::fwd_load_eeg_sphere_models(eeg_model_file, nullptr));
+    eeg_models->fwd_list_eeg_sphere_models();
 
-    if ((eeg_model = eeg_models->fwd_select_eeg_sphere_model(eeg_model_name)) == NULL)
-        goto bad;
-
-    if (!eeg_model->fwd_setup_eeg_sphere_model(eeg_sphere_rad,true,3))
-        goto bad;
-    printf("Using EEG sphere model \"%s\" with scalp radius %7.1f mm\n",
-           eeg_model->name.toUtf8().constData(),1000*eeg_sphere_rad);
-    printf("\n");
-    delete eeg_models;
-    return eeg_model;
-
-bad : {
-        delete eeg_models;
-        delete eeg_model;
-        return NULL;
+    FwdEegSphereModel::UPtr eeg_model(eeg_models->fwd_select_eeg_sphere_model(eeg_model_name));
+    if (!eeg_model) {
+        return nullptr;
     }
+
+    if (!eeg_model->fwd_setup_eeg_sphere_model(eeg_sphere_rad,true,3)) {
+        return nullptr;
+    }
+
+    qInfo("Using EEG sphere model \"%s\" with scalp radius %7.1f mm",
+           eeg_model->name.toUtf8().constData(),1000*eeg_sphere_rad);
+    return eeg_model;
 }
 
 //=============================================================================================================
@@ -327,15 +186,15 @@ bad : {
 fitUser FwdEegSphereModel::new_fit_user(int nfit, int nterms)
 
 {
-    fitUser u = MALLOC_1(1,fitUserRec);
-    u->y      = MALLOC_1(nterms-1,double);
-    u->resi   = MALLOC_1(nterms-1,double);
-    u->M      = ALLOC_DCMATRIX_1(nterms-1,nfit-1);
-    u->uu     = ALLOC_DCMATRIX_1(nfit-1,nterms-1);
-    u->vv     = ALLOC_DCMATRIX_1(nfit-1,nfit-1);
-    u->sing   = MALLOC_1(nfit,double);
-    u->fn     = MALLOC_1(nterms,double);
-    u->w      = MALLOC_1(nterms,double);
+    fitUser u = new fitUserRec();
+    u->y.resize(nterms-1);
+    u->resi.resize(nterms-1);
+    u->M      = MatrixXd::Zero(nterms-1,nfit-1);
+    u->uu     = MatrixXd::Zero(nfit-1,nterms-1);
+    u->vv     = MatrixXd::Zero(nfit-1,nfit-1);
+    u->sing.resize(nfit);
+    u->fn.resize(nterms);
+    u->w.resize(nterms);
     u->nfit   = nfit;
     u->nterms = nterms;
     return u;
@@ -448,7 +307,7 @@ double FwdEegSphereModel::fwd_eeg_get_multi_sphere_model_coeff(int n)
 
 //=============================================================================================================
 // fwd_multi_spherepot.c
-void FwdEegSphereModel::next_legen(int n, double x, double *p0, double *p01, double *p1, double *p11)        /* Input: P1(n-2) Output: P1(n-1) */
+void FwdEegSphereModel::next_legen(int n, double x, double &p0, double &p01, double &p1, double &p11)
 /*
           * Compute the next Legendre polynomials of the
           * first and second kind using the recursion formulas.
@@ -460,29 +319,29 @@ void FwdEegSphereModel::next_legen(int n, double x, double *p0, double *p01, dou
     double  help0,help1;
 
     if (n > 1) {
-        help0 = *p0;
-        help1 = *p1;
-        *p0 = ((2*n-1)*x*help0 - (n-1)*(*p01))/n;
-        *p1 = ((2*n-1)*x*help1 - n*(*p11))/(n-1);
-        *p01 = help0;
-        *p11 = help1;
+        help0 = p0;
+        help1 = p1;
+        p0 = ((2*n-1)*x*help0 - (n-1)*(p01))/n;
+        p1 = ((2*n-1)*x*help1 - n*(p11))/(n-1);
+        p01 = help0;
+        p11 = help1;
     }
     else if (n == 0) {
-        *p0   = 1.0;
-        *p1   = 0.0;
+        p0   = 1.0;
+        p1   = 0.0;
     }
     else if (n == 1) {
-        *p01  = 1.0;
-        *p0   = x;
-        *p11  = 0.0;
-        *p1   = sqrt(1.0-x*x);
+        p01  = 1.0;
+        p0   = x;
+        p11  = 0.0;
+        p1   = sqrt(1.0-x*x);
     }
     return;
 }
 
 //=============================================================================================================
 
-void FwdEegSphereModel::calc_pot_components(double beta, double cgamma, double *Vrp, double *Vtp, const Eigen::VectorXd& fn, int nterms)
+void FwdEegSphereModel::calc_pot_components(double beta, double cgamma, double &Vrp, double &Vtp, const Eigen::VectorXd& fn, int nterms)
 {
     double Vt = 0.0;
     double Vr = 0.0;
@@ -494,24 +353,22 @@ void FwdEegSphereModel::calc_pot_components(double beta, double cgamma, double *
     p0 = p01 = p1 = p11 = 0.0;
     for (n = 1; n <= nterms; n++) {
         if (betan < EPS) {
-            terms = terms + n;
-            eval  = eval + 1;
             break;
         }
-        next_legen (n,cgamma,&p0,&p01,&p1,&p11);
+        next_legen (n,cgamma,p0,p01,p1,p11);
         multn = betan*fn[n-1];	/* The 2*n + 1 factor is included in fn */
         Vr = Vr + multn*p0;
         Vt = Vt + multn*p1/n;
         betan = beta*betan;
     }
-     *Vrp = Vr;
-     *Vtp = Vt;
+    Vrp = Vr;
+    Vtp = Vt;
     return;
 }
 
 //=============================================================================================================
 // fwd_multi_spherepot.c
-int FwdEegSphereModel::fwd_eeg_multi_spherepot(float *rd, float *Q, const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& el, int neeg, float *Vval, void *client)	  /* The model definition */
+int FwdEegSphereModel::fwd_eeg_multi_spherepot(const Eigen::Vector3f& rd_in, const Eigen::Vector3f& Q_in, const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& el, int neeg, Eigen::VectorXf& Vval, void *client)
 /*
  * Compute the electric potentials in a set of electrodes in spherically
  * Symmetric head model.
@@ -533,12 +390,15 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot(float *rd, float *Q, const Eigen:
  *
  */
 {
-    FwdEegSphereModel* m = (FwdEegSphereModel*)client;
-    float  my_rd[3],pos[3];
-    int    k,p;
+    auto* m = static_cast<FwdEegSphereModel*>(client);
+    Eigen::Vector3f rd = rd_in - m->r0;
+    Eigen::Vector3f Q  = Q_in;
+    Eigen::Vector3f pos;
+    int    k;
     float  pos2,rd_len,pos_len;
     double beta,cos_gamma,Vr,Vt;
-    float  vec1[3],vec2[3],v1,v2;
+    Eigen::Vector3f vec1, vec2;
+    float  v1,v2;
     float  cos_beta,Qr,Qt,Q2,c;
     float  pi4_inv = 0.25/M_PI;
     float  sigmaM_inv;
@@ -554,11 +414,8 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot(float *rd, float *Q, const Eigen:
     /*
        * Move to the sphere coordinates
        */
-    for (p = 0; p < 3; p++)
-        my_rd[p] = rd[p] - m->r0[p];
-    rd = my_rd;
-    rd_len = VEC_LEN_1(rd);
-    Q2     = VEC_DOT_1(Q,Q);
+    rd_len = rd.norm();
+    Q2     = Q.dot(Q);
     /*
        * Ignore dipoles outside the innermost sphere
        */
@@ -570,56 +427,54 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot(float *rd, float *Q, const Eigen:
     /*
        * Special case: rd and Q are parallel
        */
-    c = VEC_DOT_1(rd,Q)/(rd_len*sqrt(Q2));
+    c = rd.dot(Q)/(rd_len*sqrt(Q2));
     if ((1.0-c*c) < SIN_EPS)	{	/* Almost parallel:
                          * Q is purely radial */
         Qr = sqrt(Q2);
         Qt = 0.0;
         cos_beta = 0.0;
         v1 = 0.0;
-        vec1[0] = vec1[1] = vec1[2] = 0.0;
+        vec1.setZero();
     }
     else {
-        CROSS_PRODUCT_1(rd,Q,vec1);
-        v1 = VEC_LEN_1(vec1);
+        vec1 = rd.cross(Q);
+        v1 = vec1.norm();
         cos_beta = 0.0;
         Qr = Qt = 0.0;
     }
     for (k = 0; k < neeg; k++) {
-        for (p = 0; p < 3; p++)
-            pos[p] = el(k, p) - m->r0[p];
+        pos = el.row(k).transpose() - m->r0;
         /*
          * Should the position be scaled or not?
          */
         if (m->scale_pos) {
-            pos_len = m->layers[m->nlayer()-1].rad/VEC_LEN_1(pos);
+            pos_len = m->layers[m->nlayer()-1].rad/pos.norm();
 #ifdef DEBUG
-            printf("%10.4f %10.4f %10.4f %10.4f\n",pos_len,1000*pos[0],1000*pos[1],1000*pos[2]);
+            qInfo("%10.4f %10.4f %10.4f %10.4f",pos_len,1000*pos[0],1000*pos[1],1000*pos[2]);
 #endif
-            for (p = 0; p < 3; p++)
-                pos[p] = pos_len*pos[p];
+            pos *= pos_len;
         }
-        pos2 = VEC_DOT_1(pos,pos);
+        pos2 = pos.dot(pos);
         pos_len = sqrt(pos2);
         /*
          * Calculate the two ingredients for the final result
          */
-        cos_gamma = VEC_DOT_1(pos,rd)/(rd_len*pos_len);
+        cos_gamma = pos.dot(rd)/(rd_len*pos_len);
         beta = rd_len/pos_len;
-        calc_pot_components(beta,cos_gamma,&Vr,&Vt,m->fn,m->nterms);
+        calc_pot_components(beta,cos_gamma,Vr,Vt,m->fn,m->nterms);
         /*
          * Then compute the combined result
          */
         if (v1 > 0.0) {
-            CROSS_PRODUCT_1(rd,pos,vec2);
-            v2 = VEC_LEN_1(vec2);
+            vec2 = rd.cross(pos);
+            v2 = vec2.norm();
 
             if (v2  > 0.0)
-                cos_beta = VEC_DOT_1(vec1,vec2)/(v1*v2);
+                cos_beta = vec1.dot(vec2)/(v1*v2);
             else
                 cos_beta = 0.0;
 
-            Qr = VEC_DOT_1(Q,rd)/rd_len;
+            Qr = Q.dot(rd)/rd_len;
             Qt = sqrt(Q2 - Qr*Qr);
         }
         Vval[k] = pi4_inv*(Qr*Vr + Qt*cos_beta*Vt)/pos2;
@@ -647,7 +502,8 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(const Eigen::Vector3f& rd, 
  *
  */
 {
-    float *vval_one = NULL,val;
+    VectorXf vval_one;
+    float val;
     int   nvval = 0;
     int   k,c;
     FwdCoil* el;
@@ -657,11 +513,10 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(const Eigen::Vector3f& rd, 
         el = els.coils[k].get();
         if (el->coil_class == FWD_COILC_EEG) {
             if (el->np > nvval) {
-                vval_one = REALLOC_1(vval_one,el->np,float);
+                vval_one.resize(el->np);
                 nvval = el->np;
             }
-            if (fwd_eeg_multi_spherepot(const_cast<float*>(rd.data()),const_cast<float*>(Q.data()),el->rmag,el->np,vval_one,client) != OK) {
-                FREE(vval_one);
+            if (fwd_eeg_multi_spherepot(rd,Q,el->rmag,el->np,vval_one,client) != OK) {
                 return FAIL;
             }
             for (c = 0, val = 0.0; c < el->np; c++)
@@ -669,43 +524,37 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(const Eigen::Vector3f& rd, 
             Vval[k] = val;
         }
     }
-    FREE(vval_one);
     return OK;
 }
 
 //=============================================================================================================
 // fwd_multi_spherepot.c
-bool FwdEegSphereModel::fwd_eeg_spherepot_vec( float   *rd, const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& el, int neeg, float **Vval_vec, void *client)
+bool FwdEegSphereModel::fwd_eeg_spherepot_vec(const Eigen::Vector3f& rd_in, const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& el, int neeg, Eigen::MatrixXf& Vval_vec, void *client)
 {
-    FwdEegSphereModel* m = (FwdEegSphereModel*)client;
-    float fact = 0.25f/(float)M_PI;
-    float a_vec[3];
+    auto* m = static_cast<FwdEegSphereModel*>(client);
+    float fact = 0.25f / static_cast<float>(M_PI);
+    Eigen::Vector3f a_vec;
     float a,a2,a3;
     float rrd,rd2,rd2_inv,r,r2,ra,rda;
     float F;
     float c1,c2,m1,m2;
-    int   k,p,eq;
-    float *this_pos;
-    float orig_rd[3],scaled_rd[3];
-    float pos[3],pos_len;
-    /*
-   * Shift to the sphere model coordinates
-   */
-    for (p = 0; p < 3; p++)
-        orig_rd[p] = rd[p] - m->r0[p];
-    rd = scaled_rd;
+    int   k,eq;
+    Eigen::Vector3f orig_rd = rd_in - m->r0;
+    Eigen::Vector3f rd;
+    Eigen::Vector3f pos;
+    float pos_len;
     /*
    * Initialize the arrays
    */
     for (k = 0 ; k < neeg ; k++) {
-        Vval_vec[0][k] = 0.0;
-        Vval_vec[1][k] = 0.0;
-        Vval_vec[2][k] = 0.0;
+        Vval_vec(0,k) = 0.0;
+        Vval_vec(1,k) = 0.0;
+        Vval_vec(2,k) = 0.0;
     }
     /*
    * Ignore dipoles outside the innermost sphere
    */
-    if (VEC_LEN_1(orig_rd) >= m->layers[0].rad)
+    if (orig_rd.norm() >= m->layers[0].rad)
         return true;
     /*
    * Default to homogeneous model if no model was previously set
@@ -721,10 +570,9 @@ bool FwdEegSphereModel::fwd_eeg_spherepot_vec( float   *rd, const Eigen::Matrix<
         /*
      * Scale the dipole position
      */
-        for (p = 0; p < 3; p++)
-            rd[p] = m->mu[eq]*orig_rd[p];
+        rd = m->mu[eq] * orig_rd;
 
-        rd2     = VEC_DOT_1(rd,rd);
+        rd2     = rd.dot(rd);
         rd2_inv = 1.0/rd2;
 
         /*
@@ -732,28 +580,25 @@ bool FwdEegSphereModel::fwd_eeg_spherepot_vec( float   *rd, const Eigen::Matrix<
      */
         for (k = 0; k < neeg ; k++) {
 
-            for (p = 0; p < 3; p++)
-                pos[p] = el(k, p) - m->r0[p];
+            pos = el.row(k).transpose() - m->r0;
             /*
        * Scale location onto the surface of the sphere
        */
             if (m->scale_pos) {
-                pos_len = m->layers[m->nlayer()-1].rad/VEC_LEN_1(pos);
-                for (p = 0; p < 3; p++)
-                    pos[p] = pos_len*pos[p];
+                pos_len = m->layers[m->nlayer()-1].rad/pos.norm();
+                pos *= pos_len;
             }
-            this_pos = pos;
 
             /* Vector from dipole to the field point */
 
-            VEC_DIFF_1 (rd,this_pos,a_vec);
+            a_vec = pos - rd;
 
             /* Compute the dot products needed */
 
-            a2  = VEC_DOT_1(a_vec,a_vec);       a = sqrt(a2);
+            a2  = a_vec.dot(a_vec);           a = sqrt(a2);
             a3  = 2.0/(a2*a);
-            r2  = VEC_DOT_1(this_pos,this_pos); r = sqrt(r2);
-            rrd = VEC_DOT_1(this_pos,rd);
+            r2  = pos.dot(pos);               r = sqrt(r2);
+            rrd = pos.dot(rd);
             ra  = r2 - rrd;
             rda = rrd - rd2;
 
@@ -768,18 +613,18 @@ bool FwdEegSphereModel::fwd_eeg_spherepot_vec( float   *rd, const Eigen::Matrix<
             m1 = (c1 - c2*rrd);
             m2 = c2*rd2;
 
-            Vval_vec[0][k] = Vval_vec[0][k] + m->lambda[eq]*rd2_inv*(m1*rd[0] + m2*this_pos[0]);
-            Vval_vec[1][k] = Vval_vec[1][k] + m->lambda[eq]*rd2_inv*(m1*rd[1] + m2*this_pos[1]);
-            Vval_vec[2][k] = Vval_vec[2][k] + m->lambda[eq]*rd2_inv*(m1*rd[2] + m2*this_pos[2]);
+            Vval_vec(0,k) = Vval_vec(0,k) + m->lambda[eq]*rd2_inv*(m1*rd[0] + m2*pos[0]);
+            Vval_vec(1,k) = Vval_vec(1,k) + m->lambda[eq]*rd2_inv*(m1*rd[1] + m2*pos[1]);
+            Vval_vec(2,k) = Vval_vec(2,k) + m->lambda[eq]*rd2_inv*(m1*rd[2] + m2*pos[2]);
         }             /* All electrodes done */
     }               /* All equivalent dipoles done */
     /*
    * Finish by scaling by 1/(4*M_PI);
    */
     for (k = 0; k  < neeg; k++) {
-        Vval_vec[0][k] = fact*Vval_vec[0][k];
-        Vval_vec[1][k] = fact*Vval_vec[1][k];
-        Vval_vec[2][k] = fact*Vval_vec[2][k];
+        Vval_vec(0,k) = fact*Vval_vec(0,k);
+        Vval_vec(1,k) = fact*Vval_vec(1,k);
+        Vval_vec(2,k) = fact*Vval_vec(2,k);
     }
     return true;
 }
@@ -788,7 +633,7 @@ bool FwdEegSphereModel::fwd_eeg_spherepot_vec( float   *rd, const Eigen::Matrix<
 // fwd_multi_spherepot.c
 int FwdEegSphereModel::fwd_eeg_spherepot_coil_vec(const Eigen::Vector3f& rd, FwdCoilSet& els, Eigen::Ref<Eigen::MatrixXf> Vval_vec, void *client)
 {
-    float **vval_one = NULL;
+    Eigen::MatrixXf vval_one;
     float val;
     int   nvval = 0;
     int   k,c,p;
@@ -798,22 +643,19 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil_vec(const Eigen::Vector3f& rd, Fwd
         el = els.coils[k].get();
         if (el->coil_class == FWD_COILC_EEG) {
             if (el->np > nvval) {
-                FREE_CMATRIX_1(vval_one);
-                vval_one = ALLOC_CMATRIX_1(3,el->np);
+                vval_one.resize(3, el->np);
                 nvval = el->np;
             }
-            if (!fwd_eeg_spherepot_vec(const_cast<float*>(rd.data()),el->rmag,el->np,vval_one,client)) {
-                FREE_CMATRIX_1(vval_one);
+            if (!fwd_eeg_spherepot_vec(rd,el->rmag,el->np,vval_one,client)) {
                 return FAIL;
             }
             for (p = 0; p < 3; p++) {
                 for (c = 0, val = 0.0; c < el->np; c++)
-                    val += el->w[c]*vval_one[p][c];
+                    val += el->w[c]*vval_one(p,c);
                 Vval_vec(p,k) = val;
             }
         }
     }
-    FREE_CMATRIX_1(vval_one);
     return OK;
 }
 
@@ -828,7 +670,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot_grad_coil(const Eigen::Vector3f& rd, co
           *
           */
 {
-    float my_rd[3];
+    Eigen::Vector3f my_rd;
     float step  = 0.0005;
     float step2 = 2*step;
     int   p,q;
@@ -836,13 +678,13 @@ int FwdEegSphereModel::fwd_eeg_spherepot_grad_coil(const Eigen::Vector3f& rd, co
     Eigen::Ref<Eigen::VectorXf>* grads[3] = { &xgrad, &ygrad, &zgrad };
 
     for (p = 0; p < 3; p++) {
-        VEC_COPY_1(my_rd,rd);
-        my_rd[p] = my_rd[p] + step;
-        if (fwd_eeg_spherepot_coil(Eigen::Map<const Eigen::Vector3f>(my_rd),Q,coils,*grads[p],client) == FAIL)
+        my_rd = rd;
+        my_rd[p] += step;
+        if (fwd_eeg_spherepot_coil(my_rd,Q,coils,*grads[p],client) == FAIL)
             return FAIL;
-        VEC_COPY_1(my_rd,rd);
-        my_rd[p] = my_rd[p] - step;
-        if (fwd_eeg_spherepot_coil(Eigen::Map<const Eigen::Vector3f>(my_rd),Q,coils,Vval,client) == FAIL)
+        my_rd = rd;
+        my_rd[p] -= step;
+        if (fwd_eeg_spherepot_coil(my_rd,Q,coils,Vval,client) == FAIL)
             return FAIL;
         for (q = 0; q < coils.ncoil(); q++)
             (*grads[p])[q] = ((*grads[p])[q]-Vval[q])/step2;
@@ -854,11 +696,11 @@ int FwdEegSphereModel::fwd_eeg_spherepot_grad_coil(const Eigen::Vector3f& rd, co
 
 //=============================================================================================================
 // fwd_multi_spherepot.c
-int FwdEegSphereModel::fwd_eeg_spherepot(   float   *rd,       /* Dipole position */
-                                            float   *Q,	 /* Dipole moment */
-                                            const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& el,	 /* Electrode positions */
-                                            int     neeg,	 /* Number of electrodes */
-                                            VectorXf& Vval,	 /* The potential values */
+int FwdEegSphereModel::fwd_eeg_spherepot(   const Eigen::Vector3f& rd_in,
+                                            const Eigen::Vector3f& Q_in,
+                                            const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& el,
+                                            int     neeg,
+                                            VectorXf& Vval,
                                             void    *client)
 /*
       * This routine calculates the potentials for a specific dipole direction
@@ -867,23 +709,19 @@ int FwdEegSphereModel::fwd_eeg_spherepot(   float   *rd,       /* Dipole positio
       * in the homogeneous sphere.
       */
 {
-    FwdEegSphereModel* m = (FwdEegSphereModel*)client;
+    auto* m = static_cast<FwdEegSphereModel*>(client);
     float fact = 0.25f/M_PI;
-    float a_vec[3];
+    Eigen::Vector3f a_vec;
     float a,a2,a3;
     float rrd,rd2,rd2_inv,r,r2,ra,rda;
     float F;
     float c1,c2,m1,m2,f1,f2;
-    int   k,p,eq;
-    float *this_pos;
-    float orig_rd[3],scaled_rd[3];
-    float pos[3],pos_len;
-    /*
-   * Shift to the sphere model coordinates
-   */
-    for (p = 0; p < 3; p++)
-        orig_rd[p] = rd[p] - m->r0[p];
-    rd = scaled_rd;
+    int   k,eq;
+    Eigen::Vector3f orig_rd = rd_in - m->r0;
+    Eigen::Vector3f rd;
+    Eigen::Vector3f Q = Q_in;
+    Eigen::Vector3f pos;
+    float pos_len;
     /*
    * Initialize the arrays
    */
@@ -892,7 +730,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot(   float   *rd,       /* Dipole positio
     /*
    * Ignore dipoles outside the innermost sphere
    */
-    if (VEC_LEN_1(orig_rd) >= m->layers[0].rad)
+    if (orig_rd.norm() >= m->layers[0].rad)
         return true;
     /*
    * Default to homogeneous model if no model was previously set
@@ -908,40 +746,36 @@ int FwdEegSphereModel::fwd_eeg_spherepot(   float   *rd,       /* Dipole positio
         /*
      * Scale the dipole position
      */
-        for (p = 0; p < 3; p++)
-            rd[p] = m->mu[eq]*orig_rd[p];
+        rd = m->mu[eq] * orig_rd;
 
-        rd2     = VEC_DOT_1(rd,rd);
+        rd2     = rd.dot(rd);
         rd2_inv = 1.0/rd2;
 
-        f1 = VEC_DOT_1(rd,Q);
+        f1 = rd.dot(Q);
         /*
      * Go over all electrodes
      */
         for (k = 0; k < neeg ; k++) {
 
-            for (p = 0; p < 3; p++)
-                pos[p] = el(k, p) - m->r0[p];
+            pos = el.row(k).transpose() - m->r0;
             /*
        * Scale location onto the surface of the sphere
        */
             if (m->scale_pos) {
-                pos_len = m->layers[m->nlayer()-1].rad/VEC_LEN_1(pos);
-                for (p = 0; p < 3; p++)
-                    pos[p] = pos_len*pos[p];
+                pos_len = m->layers[m->nlayer()-1].rad/pos.norm();
+                pos *= pos_len;
             }
-            this_pos = pos;
 
             /* Vector from dipole to the field point */
 
-            VEC_DIFF_1 (rd,this_pos,a_vec);
+            a_vec = pos - rd;
 
             /* Compute the dot products needed */
 
-            a2  = VEC_DOT_1(a_vec,a_vec);       a = sqrt(a2);
+            a2  = a_vec.dot(a_vec);           a = sqrt(a2);
             a3  = 2.0/(a2*a);
-            r2  = VEC_DOT_1(this_pos,this_pos); r = sqrt(r2);
-            rrd = VEC_DOT_1(this_pos,rd);
+            r2  = pos.dot(pos);               r = sqrt(r2);
+            rrd = pos.dot(rd);
             ra  = r2 - rrd;
             rda = rrd - rd2;
 
@@ -956,7 +790,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot(   float   *rd,       /* Dipole positio
             m1 = (c1 - c2*rrd);
             m2 = c2*rd2;
 
-            f2 = VEC_DOT_1(this_pos,Q);
+            f2 = pos.dot(Q);
             Vval[k] = Vval[k] + m->lambda[eq]*rd2_inv*(m1*f1 + m2*f2);
         }             /* All electrodes done */
     }               /* All equivalent dipoles done */
@@ -985,7 +819,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil(const Eigen::Vector3f& rd, const E
                 vval_one.resize(el->np);
                 nvval = el->np;
             }
-            if (fwd_eeg_spherepot(const_cast<float*>(rd.data()),const_cast<float*>(Q.data()),el->rmag,el->np,vval_one,client) != OK) {
+            if (fwd_eeg_spherepot(rd,Q,el->rmag,el->np,vval_one,client) != OK) {
                 return FAIL;
             }
             for (c = 0, val = 0.0; c < el->np; c++)
@@ -1011,104 +845,37 @@ bool FwdEegSphereModel::fwd_setup_eeg_sphere_model(float rad, bool fit_berg_sche
 
     if (fit_berg_scherg) {
         if (this->fwd_eeg_fit_berg_scherg(nterms,nfit,rv)) {
-            printf("Equiv. model fitting -> ");
-            printf("RV = %g %%\n",100*rv);
+            qInfo("Equiv. model fitting -> RV = %g %%",100*rv);
             for (int k = 0; k < nfit; k++)
-                printf("mu%d = %g\tlambda%d = %g\n", k+1,this->mu[k],k+1,this->layers[this->nlayer()-1].sigma*this->lambda[k]);
+                qInfo("mu%d = %g\tlambda%d = %g", k+1,this->mu[k],k+1,this->layers[this->nlayer()-1].sigma*this->lambda[k]);
         }
         else
             return false;
     }
 
-    printf("Defined EEG sphere model with rad = %7.2f mm\n", 1000.0*rad);
+    qInfo("Defined EEG sphere model with rad = %7.2f mm", 1000.0*rad);
     return true;
 }
 
-Eigen::MatrixXd toDoubleEigenMatrix(double **mat, const int m, const int n)
-{
-    Eigen::MatrixXd eigen_mat(m,n);
-
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            eigen_mat(i,j) = mat[i][j];
-
-    return eigen_mat;
-}
-
-void fromDoubleEigenMatrix(const Eigen::MatrixXd& from_mat, double **to_mat, const int m, const int n)
-{
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            to_mat[i][j] = from_mat(i,j);
-}
-
-void fromDoubleEigenMatrix(const Eigen::MatrixXd& from_mat, double **to_mat)
-{
-    fromDoubleEigenMatrix(from_mat, to_mat, from_mat.rows(), from_mat.cols());
-}
-
-void fromDoubleEigenVector(const Eigen::VectorXd& from_vec, double *to_vec, const int n)
-{
-    for ( int i = 0; i < n; ++i)
-        to_vec[i] = from_vec[i];
-}
-
-void fromDoubleEigenVector(const Eigen::VectorXd& from_vec, double *to_vec)
-{
-    fromDoubleEigenVector(from_vec, to_vec, from_vec.size());
-}
-
-static double dot_dvectors (double *v1,
-                            double *v2,
-                            int   nn)
-{
-    double result = 0.0;
-    int   k;
-
-    for (k = 0; k < nn; k++)
-        result = result + v1[k]*v2[k];
-    return (result);
-}
-static int c_dsvd(double **mat,		/* The matrix */
-                  int   m,int n,	/* m rows n columns */
-                  double *sing,	        /* Singular values (must have size
-                                                           * MIN(m,n)+1 */
-                  double **uu,		/* Left eigenvectors */
-                  double **vv)		/* Right eigenvectors */
+static void compute_svd(Eigen::MatrixXd& mat,
+                        Eigen::VectorXd& sing,
+                        Eigen::MatrixXd& uu,
+                        Eigen::MatrixXd* vv)
 /*
-      * Compute the SVD of mat.
-      * The singular vector calculations depend on whether
-      * or not u and v are given.
-      * The allocations should be done as follows
-      *
-      * mat = ALLOC_DCMATRIX(m,n);
-      * vv  = ALLOC_DCMATRIX(MIN(m,n),n);
-      * uu  = ALLOC_DCMATRIX(MIN(m,n),m);
-      * sing = MALLOC(MIN(m,n),double);
-      *
-      * mat is modified by this operation
-      *
-      * This simply allocates the workspace and calls the
-      * LAPACK Fortran routine
-      */
+ * Compute the SVD of mat.
+ * Results are stored in sing, uu, and optionally vv.
+ * mat is not modified.
+ */
 {
-    int    udim = MIN_1(m,n);
+    int udim = std::min(static_cast<int>(mat.rows()), static_cast<int>(mat.cols()));
 
-    Eigen::MatrixXd eigen_mat = toDoubleEigenMatrix(mat, m, n);
+    Eigen::JacobiSVD<Eigen::MatrixXd> svd(mat, Eigen::ComputeFullU | Eigen::ComputeFullV);
 
-    //ToDo Optimize computation depending of whether uu or vv are defined
-    Eigen::JacobiSVD< Eigen::MatrixXd > svd(eigen_mat,Eigen::ComputeFullU | Eigen::ComputeFullV);
+    sing = svd.singularValues();
+    uu = svd.matrixU().transpose().topRows(udim);
 
-    fromDoubleEigenVector(svd.singularValues(), sing, svd.singularValues().size());
-
-    if ( uu != NULL )
-        fromDoubleEigenMatrix(svd.matrixU().transpose(), uu, udim, m);
-
-    if ( vv != NULL )
-        fromDoubleEigenMatrix(svd.matrixV().transpose(), vv, n, n);
-
-    return 0;
-    //  return info;
+    if (vv != nullptr)
+        *vv = svd.matrixV().transpose();
 }
 
 /*
@@ -1123,26 +890,23 @@ namespace FWDLIB
 /**
  * @brief Berg-Scherg parameter pair (magnitude and distance multiplier) for an equivalent dipole in the EEG sphere model approximation.
  */
-typedef struct {
-    double lambda;		/* Magnitude for the apparent dipole */
-    double mu;			/* Distance multiplier for the apparent dipole */
-} bergSchergParRec;
+struct BergSchergPar {
+    double lambda;		/**< Magnitude for the apparent dipole. */
+    double mu;			/**< Distance multiplier for the apparent dipole. */
+};
 
-} // Namepsace
+} // namespace
 
 static void sort_parameters(VectorXd& mu,VectorXd& lambda,int nfit)
-/*
-      * Sort the parameters so that largest mu comes first
-      */
 {
-    std::vector<bergSchergParRec> pars(nfit);
+    std::vector<BergSchergPar> pars(nfit);
 
     for (int k = 0; k < nfit; k++) {
         pars[k].mu = mu[k];
         pars[k].lambda = lambda[k];
     }
 
-    std::sort(pars.begin(), pars.end(), [](const bergSchergParRec& a, const bergSchergParRec& b) {
+    std::sort(pars.begin(), pars.end(), [](const BergSchergPar& a, const BergSchergPar& b) {
         return a.mu > b.mu;
     });
 
@@ -1155,15 +919,11 @@ static void sort_parameters(VectorXd& mu,VectorXd& lambda,int nfit)
 static bool report_fit(int    loop,
                       const VectorXd &fitpar,
                       double Smin)
-
-/*
-      * Report our progress
-      */
 {
 #ifdef LOG_FIT
     for (int k = 0; k < fitpar.size(); k++)
-        printf("%g ",mu[k]);
-    printf("%g\n",Smin);
+        qInfo("%g ",mu[k]);
+    qInfo("%g",Smin);
 #endif
     return true;
 }
@@ -1197,7 +957,7 @@ void FwdEegSphereModel::compose_linear_fitting_data(const VectorXd& mu,fitUser u
         mu1n = pow(mu[0],k1);
         u->y[k] = u->w[k]*(u->fn[k+1] - mu1n*u->fn[0]);
         for (p = 0; p < u->nfit-1; p++)
-            u->M[k][p] = u->w[k]*(pow(mu[p+1],k1)-mu1n);
+            u->M(k,p) = u->w[k]*(pow(mu[p+1],k1)-mu1n);
     }
 }
 
@@ -1216,7 +976,7 @@ double FwdEegSphereModel::compute_linear_parameters(const VectorXd& mu,
 
     compose_linear_fitting_data(mu,u);
 
-    c_dsvd(u->M,u->nterms-1,u->nfit-1,u->sing,u->uu,u->vv);
+    compute_svd(u->M, u->sing, u->uu, &u->vv);
     /*
    * Compute the residuals
    */
@@ -1224,21 +984,21 @@ double FwdEegSphereModel::compute_linear_parameters(const VectorXd& mu,
         u->resi[k] = u->y[k];
 
     for (p = 0; p < u->nfit-1; p++) {
-        vec[p] = dot_dvectors(u->uu[p],u->y,u->nterms-1);
+        vec[p] = u->uu.row(p).head(u->nterms-1).dot(u->y.head(u->nterms-1));
         for (k = 0; k < u->nterms-1; k++)
-            u->resi[k] = u->resi[k] - u->uu[p][k]*vec[p];
+            u->resi[k] = u->resi[k] - u->uu(p,k)*vec[p];
         vec[p] = vec[p]/u->sing[p];
     }
 
     for (p = 0; p < u->nfit-1; p++) {
         for (q = 0, sum = 0.0; q < u->nfit-1; q++)
-            sum += u->vv[q][p]*vec[q];
+            sum += u->vv(q,p)*vec[q];
         lambda[p+1] = sum;
     }
     for (p = 1, sum = 0.0; p < u->nfit; p++)
         sum += lambda[p];
     lambda[0] = u->fn[0] - sum;
-    return dot_dvectors(u->resi,u->resi,u->nterms-1)/dot_dvectors(u->y,u->y,u->nterms-1);
+    return u->resi.head(u->nterms-1).squaredNorm() / u->y.head(u->nterms-1).squaredNorm();
 }
 
 // fwd_fit_berg_scherg.c
@@ -1263,21 +1023,21 @@ double FwdEegSphereModel::one_step (const VectorXd& mu, const void *user_data)
     /*
    * Compute SVD
    */
-    c_dsvd(u->M,u->nterms-1,u->nfit-1,u->sing,u->uu,NULL);
+    compute_svd(u->M, u->sing, u->uu, nullptr);
     /*
    * Compute the residuals
    */
     for (k = 0; k < u->nterms-1; k++)
         u->resi[k] = u->y[k];
     for (p = 0; p < u->nfit-1; p++) {
-        dot = dot_dvectors(u->uu[p],u->y,u->nterms-1);
+        dot = u->uu.row(p).head(u->nterms-1).dot(u->y.head(u->nterms-1));
         for (k = 0; k < u->nterms-1; k++)
-            u->resi[k] = u->resi[k] - u->uu[p][k]*dot;
+            u->resi[k] = u->resi[k] - u->uu(p,k)*dot;
     }
     /*
    * Return their sum of squares
    */
-    return dot_dvectors(u->resi,u->resi,u->nterms-1);
+    return u->resi.head(u->nterms-1).squaredNorm();
 }
 
 // fwd_fit_berg_scherg.c
@@ -1306,7 +1066,7 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Nu
     fitUser u = new_fit_user(nfit,nterms);
 
     if (nfit < 2) {
-        printf("fwd_fit_berg_scherg does not work with less than two equivalent sources.");
+        qWarning("fwd_fit_berg_scherg does not work with less than two equivalent sources.");
         return false;
     }
 
@@ -1365,57 +1125,44 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Nu
     /*
    * (5) Do the nonlinear minimization
    */
-    if (!(res = SimplexAlgorithm::simplex_minimize<double>( simplex,
-                                                            func_val,
-                                                            ftol,
-                                                            one_step,
-                                                            u,
-                                                            max_eval,
-                                                            neval,
-                                                            report,
-                                                            report_fit)))
-        goto out;
+    res = SimplexAlgorithm::simplex_minimize<double>( simplex,
+                                                      func_val,
+                                                      ftol,
+                                                      one_step,
+                                                      u,
+                                                      max_eval,
+                                                      neval,
+                                                      report,
+                                                      report_fit);
 
-    for (k = 0; k < nfit; k++)
-        mu[k] = simplex(0,k);
+    if (res) {
+        for (k = 0; k < nfit; k++)
+            mu[k] = simplex(0,k);
 
-    /*
-   * (6) Do the final step: calculation of the linear parameters
-   */
-    rv = compute_linear_parameters(mu,lambda,u);
-
-    sort_parameters(mu,lambda,nfit);
-#ifdef LOG_FIT
-    printf("RV = %g %%\n",100*rv);
-#endif
-    this->mu.resize(nfit);
-    this->lambda.resize(nfit);
-    this->nfit   = nfit;
-    for (k = 0; k < nfit; k++) {
-        this->mu[k] = mu[k];
         /*
-     * This division takes into account the actual conductivities
-     */
-        this->lambda[k] = lambda[k]/this->layers[this->nlayer()-1].sigma;
+       * (6) Do the final step: calculation of the linear parameters
+       */
+        rv = compute_linear_parameters(mu,lambda,u);
+
+        sort_parameters(mu,lambda,nfit);
 #ifdef LOG_FIT
-        printf("lambda%d = %g\tmu%d = %g\n",k+1,lambda[k],k+1,mu[k]);
+        qInfo("RV = %g %%",100*rv);
 #endif
+        this->mu.resize(nfit);
+        this->lambda.resize(nfit);
+        this->nfit   = nfit;
+        for (k = 0; k < nfit; k++) {
+            this->mu[k] = mu[k];
+            /*
+         * This division takes into account the actual conductivities
+         */
+            this->lambda[k] = lambda[k]/this->layers[this->nlayer()-1].sigma;
+#ifdef LOG_FIT
+            qInfo("lambda%d = %g\tmu%d = %g",k+1,lambda[k],k+1,mu[k]);
+#endif
+        }
     }
 
-    /*
-   * This is the cleanup code
-   */
-out : {
-        if (u) {
-            FREE(u->fn);
-            FREE_DCMATRIX_1(u->M);
-            FREE_DCMATRIX_1(u->uu);
-            FREE_DCMATRIX_1(u->vv);
-            FREE(u->y);
-            FREE(u->w);
-            FREE(u->resi);
-            FREE(u->sing);
-        }
-        return res;
-    }
+    delete u;
+    return res;
 }

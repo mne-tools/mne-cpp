@@ -54,8 +54,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-
 #include <functional>
 #include <memory>
 
@@ -90,8 +88,7 @@ class FwdCoilSet;
 class FWDSHARED_EXPORT FwdThreadArg
 {
 public:
-    typedef QSharedPointer<FwdThreadArg> SPtr;              /**< Shared pointer type for FwdThreadArg. */
-    typedef QSharedPointer<const FwdThreadArg> ConstSPtr;   /**< Const shared pointer type for FwdThreadArg. */
+    typedef std::unique_ptr<FwdThreadArg> UPtr;           /**< Unique pointer type for FwdThreadArg. */
 
     //=========================================================================================================
     /**
@@ -105,24 +102,42 @@ public:
      */
     ~FwdThreadArg();
 
-    static std::unique_ptr<FwdThreadArg> create_eeg_multi_thread_duplicate(FwdThreadArg& one, bool bem_model);
+    //=========================================================================================================
+    /**
+     * Create a thread-safe duplicate for EEG parallel forward computation.
+     *
+     * @param[in] one         Template thread argument to duplicate.
+     * @param[in] bem_model   Whether to duplicate the BEM model sub-object.
+     *
+     * @return Thread-safe duplicate.
+     */
+    static FwdThreadArg::UPtr create_eeg_multi_thread_duplicate(FwdThreadArg& one, bool bem_model);
 
-    static std::unique_ptr<FwdThreadArg> create_meg_multi_thread_duplicate(FwdThreadArg& one, bool bem_model);
+    //=========================================================================================================
+    /**
+     * Create a thread-safe duplicate for MEG parallel forward computation.
+     *
+     * @param[in] one         Template thread argument to duplicate.
+     * @param[in] bem_model   Whether to duplicate the BEM model sub-object.
+     *
+     * @return Thread-safe duplicate.
+     */
+    static FwdThreadArg::UPtr create_meg_multi_thread_duplicate(FwdThreadArg& one, bool bem_model);
 
 public:
-    Eigen::MatrixXf     *res;              /* Destination for the solution (ncoil x nsources) */
-    Eigen::MatrixXf     *res_grad;         /* Gradient result (ncoil x 3*nsources) */
-    int                 off;               /* Offset within the result to the first source space vertex solution */
-    fwdFieldFunc        field_pot;         /* Computes the field or potential for one dipole orientation */
-    fwdVecFieldFunc     vec_field_pot;     /* Computes the field or potential for all dipole orientations */
-    fwdFieldGradFunc    field_pot_grad;    /* Computes the gradient of field or potential for one dipole orientation */
-    FwdCoilSet          *coils_els;        /* The coil definitions */
-    void                *client;           /* Client data for the field computation function */
-    MNELIB::MNESourceSpace   *s;                 /* The source space to process */
-    int                 fixed_ori;         /* Compute fixed orientation solution? */
-    int                 comp;              /* Which component to compute for free orientations */
-    int                 stat;
-    std::function<void()> client_free;     /* Releases owned client sub-objects */
+    Eigen::MatrixXf     *res;              /**< Destination for the solution (ncoil x nsources). */
+    Eigen::MatrixXf     *res_grad;         /**< Gradient result (ncoil x 3*nsources). */
+    int                 off;               /**< Offset within the result to the first source space vertex solution. */
+    fwdFieldFunc        field_pot;         /**< Computes the field or potential for one dipole orientation. */
+    fwdVecFieldFunc     vec_field_pot;     /**< Computes the field or potential for all dipole orientations. */
+    fwdFieldGradFunc    field_pot_grad;    /**< Computes the gradient of field or potential for one dipole orientation. */
+    FwdCoilSet          *coils_els;        /**< The coil definitions. */
+    void                *client;           /**< Client data for the field computation function. */
+    MNELIB::MNESourceSpace   *s;           /**< The source space to process. */
+    bool                fixed_ori;         /**< Compute fixed orientation solution? */
+    int                 comp;              /**< Which component to compute for free orientations. */
+    int                 stat;              /**< Result status (OK or FAIL). */
+    std::function<void()> client_free;     /**< Releases owned client sub-objects. */
 };
 
 //=============================================================================================================

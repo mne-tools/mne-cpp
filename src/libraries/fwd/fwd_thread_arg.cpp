@@ -45,9 +45,6 @@
 #include "fwd_bem_model.h"
 #include "fwd_comp_data.h"
 
-constexpr int FAIL = -1;
-constexpr int OK   = 0;
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -71,7 +68,7 @@ FwdThreadArg::FwdThreadArg()
 ,client        (nullptr)
 ,s             (nullptr)
 ,fixed_ori     (false)
-,stat          (FAIL)
+,stat          (-1)
 ,comp          (-1)
 {
 }
@@ -86,11 +83,7 @@ FwdThreadArg::~FwdThreadArg()
 
 //=============================================================================================================
 
-std::unique_ptr<FwdThreadArg> FwdThreadArg::create_eeg_multi_thread_duplicate(FwdThreadArg& one, bool bem_model)
-/*
-          * Create a duplicate to make the data structure thread safe
-          * Do not duplicate read-only parts of the relevant structures
-          */
+FwdThreadArg::UPtr FwdThreadArg::create_eeg_multi_thread_duplicate(FwdThreadArg& one, bool bem_model)
 {
     auto res = std::make_unique<FwdThreadArg>();
 
@@ -108,11 +101,7 @@ std::unique_ptr<FwdThreadArg> FwdThreadArg::create_eeg_multi_thread_duplicate(Fw
 
 //=============================================================================================================
 
-std::unique_ptr<FwdThreadArg> FwdThreadArg::create_meg_multi_thread_duplicate(FwdThreadArg& one, bool bem_model)
-/*
- * Create a duplicate to make the data structure thread safe
- * Do not duplicate read-only parts of the relevant structures
- */
+FwdThreadArg::UPtr FwdThreadArg::create_meg_multi_thread_duplicate(FwdThreadArg& one, bool bem_model)
 {
     auto res = std::make_unique<FwdThreadArg>();
     FwdCompData*  orig = static_cast<FwdCompData*>(one.client);

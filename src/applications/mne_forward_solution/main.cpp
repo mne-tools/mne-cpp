@@ -40,6 +40,8 @@
 #include <fwd/compute_fwd/compute_fwd.h>
 #include <fwd/fwd_forward_solution.h>
 
+#include <memory>
+
 #include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
@@ -132,7 +134,7 @@ int main(int argc, char *argv[])
     // Populate settings from parsed arguments
     //=========================================================================================================
 
-    ComputeFwdSettings::SPtr settings = ComputeFwdSettings::SPtr(new ComputeFwdSettings());
+    std::shared_ptr<ComputeFwdSettings> settings = std::make_shared<ComputeFwdSettings>();
 
     // Build the command string for FIFF stamping
     settings->command = QCoreApplication::arguments().join(" ");

@@ -43,6 +43,8 @@
 
 #include "fwd_global.h"
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -52,8 +54,6 @@
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QSharedPointer>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FWDLIB
@@ -71,8 +71,7 @@ namespace FWDLIB
 class FWDSHARED_EXPORT FwdBemSolution
 {
 public:
-    typedef QSharedPointer<FwdBemSolution> SPtr;              /**< Shared pointer type for FwdBemSolution. */
-    typedef QSharedPointer<const FwdBemSolution> ConstSPtr;   /**< Const shared pointer type for FwdBemSolution. */
+    typedef std::unique_ptr<FwdBemSolution> UPtr;         /**< Unique pointer type for FwdBemSolution. */
 
     //=========================================================================================================
     /**

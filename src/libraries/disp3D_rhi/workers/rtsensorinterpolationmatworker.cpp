@@ -283,7 +283,7 @@ void RtSensorInterpolationMatWorker::computeMapping()
                 }
 
                 auto coils = templates->create_meg_coils(
-                    megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, devToTarget);
+                    megChs, megChs.size(), FWDLIB::FWD_COIL_ACCURACY_NORMAL, devToTarget);
 
                 if (coils && coils->ncoil() > 0) {
                     auto mat = FWDLIB::FwdFieldMap::computeMegMapping(
@@ -292,7 +292,8 @@ void RtSensorInterpolationMatWorker::computeMapping()
                     if (mat && mat->rows() > 0) {
                         qDebug() << "RtSensorInterpolationMatWorker: MEG mapping computed:"
                                  << mat->rows() << "x" << mat->cols();
-                        emit newMegMappingAvailable(megSurfaceKey, mat, megPick);
+                        emit newMegMappingAvailable(megSurfaceKey,
+                            std::shared_ptr<Eigen::MatrixXf>(std::move(mat)), megPick);
                     }
                 }
             }
@@ -316,7 +317,8 @@ void RtSensorInterpolationMatWorker::computeMapping()
                 if (mat && mat->rows() > 0) {
                     qDebug() << "RtSensorInterpolationMatWorker: EEG mapping computed:"
                              << mat->rows() << "x" << mat->cols();
-                    emit newEegMappingAvailable(eegSurfaceKey, mat, eegPick);
+                    emit newEegMappingAvailable(eegSurfaceKey,
+                        std::shared_ptr<Eigen::MatrixXf>(std::move(mat)), eegPick);
                 }
             }
         }

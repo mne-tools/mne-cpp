@@ -46,7 +46,6 @@
 
 #include <QObject>
 #include <QMutex>
-#include <QSharedPointer>
 #include <QVector>
 #include <QString>
 #include <QMap>
@@ -176,7 +175,7 @@ signals:
      * @param[in] pick          Channel indices picked for this mapping.
      */
     void newMegMappingAvailable(const QString &surfaceKey,
-                                QSharedPointer<Eigen::MatrixXf> mappingMat,
+                                std::shared_ptr<Eigen::MatrixXf> mappingMat,
                                 const QVector<int> &pick);
 
     //=========================================================================================================
@@ -188,7 +187,7 @@ signals:
      * @param[in] pick          Channel indices picked for this mapping.
      */
     void newEegMappingAvailable(const QString &surfaceKey,
-                                QSharedPointer<Eigen::MatrixXf> mappingMat,
+                                std::shared_ptr<Eigen::MatrixXf> mappingMat,
                                 const QVector<int> &pick);
 
 private:

@@ -556,7 +556,7 @@ ECDSet DipoleFit::calculateFit() const
 {
     std::unique_ptr<GuessData> guess;
     ECDSet              set;
-    FwdEegSphereModel*  eeg_model = NULL;
+    std::unique_ptr<FwdEegSphereModel> eeg_model;
     DipoleFitData*      fit_data = NULL;
     MNEMeasData*        data     = NULL;
     MNERawData*         raw      = NULL;
@@ -564,7 +564,8 @@ ECDSet DipoleFit::calculateFit() const
 
     printf("---- Setting up...\n\n");
     if (settings->include_eeg) {
-        if ((eeg_model = FwdEegSphereModel::setup_eeg_sphere_model(settings->eeg_model_file,settings->eeg_model_name,settings->eeg_sphere_rad)) == NULL)
+        eeg_model = FwdEegSphereModel::setup_eeg_sphere_model(settings->eeg_model_file,settings->eeg_model_name,settings->eeg_sphere_rad);
+        if (!eeg_model)
             goto out;
     }
 
@@ -572,7 +573,7 @@ ECDSet DipoleFit::calculateFit() const
                                                             settings->measname,
                                                             settings->bemname.isEmpty() ? NULL : settings->bemname.toUtf8().data(),
                                                             &settings->r0,
-                                                            eeg_model,
+                                                            eeg_model.get(),
                                                             settings->accurate,
                                                             settings->badname,
                                                             settings->noisename,

@@ -198,8 +198,8 @@ bool SensorFieldMapper::buildMapping(
     if (!m_loaded || m_evoked.isEmpty()) return false;
 
     // ── Reset state ────────────────────────────────────────────────────
-    m_megPick.clear();
-    m_eegPick.clear();
+    m_megPick.resize(0);
+    m_eegPick.resize(0);
     m_megPositions.clear();
     m_eegPositions.clear();
     m_megMapping.reset();
@@ -250,7 +250,12 @@ bool SensorFieldMapper::buildMapping(
         return m_evoked.info.bads.contains(name);
     };
 
-    for (int k = 0; k < m_evoked.info.chs.size(); ++k) {
+    const int nChs = m_evoked.info.chs.size();
+    m_megPick.resize(nChs);   // upper bound
+    m_eegPick.resize(nChs);
+    int nMeg = 0, nEeg = 0;
+
+    for (int k = 0; k < nChs; ++k) {
         const auto &ch = m_evoked.info.chs[k];
         if (isBad(ch.ch_name)) continue;
 
@@ -259,18 +264,21 @@ bool SensorFieldMapper::buildMapping(
         if (ch.kind == FIFFV_MEG_CH) {
             if (hasDevHead)                                  pos = devHeadQt.map(pos);
             if (applySensorTrans && !headToMriTrans.isEmpty()) pos = headToMri.map(pos);
-            m_megPick.append(k);
-            m_megPositions.append(Eigen::Vector3f(pos.x(), pos.y(), pos.z()));
+            m_megPick(nMeg++) = k;
+            m_megPositions.push_back(Eigen::Vector3f(pos.x(), pos.y(), pos.z()));
             megChs.append(ch);
             megChNames.append(ch.ch_name);
         } else if (ch.kind == FIFFV_EEG_CH) {
             if (applySensorTrans && !headToMriTrans.isEmpty()) pos = headToMri.map(pos);
-            m_eegPick.append(k);
-            m_eegPositions.append(Eigen::Vector3f(pos.x(), pos.y(), pos.z()));
+            m_eegPick(nEeg++) = k;
+            m_eegPositions.push_back(Eigen::Vector3f(pos.x(), pos.y(), pos.z()));
             eegChs.append(ch);
             eegChNames.append(ch.ch_name);
         }
     }
+
+    m_megPick.conservativeResize(nMeg);
+    m_eegPick.conservativeResize(nEeg);
 
     // ── Constants (matching MNE-Python) ────────────────────────────────
     constexpr float kIntrad  = 0.06f;
@@ -332,7 +340,7 @@ bool SensorFieldMapper::buildMapping(
                     origin = applyTransform(origin, headMri);
 
                 auto coils = templates->create_meg_coils(
-                    megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, devToTarget);
+                    megChs, megChs.size(), FWDLIB::FWD_COIL_ACCURACY_NORMAL, devToTarget);
 
                 if (coils && coils->ncoil() > 0) {
                     m_megMapping = FWDLIB::FwdFieldMap::computeMegMapping(
@@ -467,14 +475,14 @@ void SensorFieldMapper::computeNormRange()
     // ── Helper: find peak-GFP time for a set of channels ───────────────
     // GFP = sqrt(mean(V_i^2)).  We only need the argmax, so comparing
     // the sum-of-squares is sufficient (avoids sqrt).
-    auto peakGfpTime = [&](const QVector<int> &pick) -> int {
-        if (pick.isEmpty() || nTimes == 0) return 0;
+    auto peakGfpTime = [&](const Eigen::VectorXi &pick) -> int {
+        if (pick.size() == 0 || nTimes == 0) return 0;
         int best = 0;
         double bestSS = -1.0;
         for (int t = 0; t < nTimes; ++t) {
             double ss = 0.0;
             for (int i = 0; i < pick.size(); ++i) {
-                double v = m_evoked.data(pick[i], t);
+                double v = m_evoked.data(pick(i), t);
                 ss += v * v;
             }
             if (ss > bestSS) { bestSS = ss; best = t; }
@@ -486,22 +494,22 @@ void SensorFieldMapper::computeNormRange()
     // MNE-Python's plot_field defaults to showing the evoked peak, so its
     // vmax = max(|mapped|) is effectively computed at peak GFP.  Using
     // abs so the symmetric range [-vmax, vmax] always covers both poles.
-    if (m_megMapping && m_megMapping->rows() > 0 && !m_megPick.isEmpty()) {
+    if (m_megMapping && m_megMapping->rows() > 0 && m_megPick.size() > 0) {
         const int tPeak = peakGfpTime(m_megPick);
         Eigen::VectorXf meas(m_megPick.size());
         for (int i = 0; i < m_megPick.size(); ++i)
-            meas(i) = static_cast<float>(m_evoked.data(m_megPick[i], tPeak));
+            meas(i) = static_cast<float>(m_evoked.data(m_megPick(i), tPeak));
 
         Eigen::VectorXf mapped = (*m_megMapping) * meas;
         m_megVmax = mapped.cwiseAbs().maxCoeff();
     }
 
     // EEG: same strategy
-    if (m_eegMapping && m_eegMapping->rows() > 0 && !m_eegPick.isEmpty()) {
+    if (m_eegMapping && m_eegMapping->rows() > 0 && m_eegPick.size() > 0) {
         const int tPeak = peakGfpTime(m_eegPick);
         Eigen::VectorXf meas(m_eegPick.size());
         for (int i = 0; i < m_eegPick.size(); ++i)
-            meas(i) = static_cast<float>(m_evoked.data(m_eegPick[i], tPeak));
+            meas(i) = static_cast<float>(m_evoked.data(m_eegPick(i), tPeak));
 
         Eigen::VectorXf mapped = (*m_eegMapping) * meas;
         m_eegVmax = mapped.cwiseAbs().maxCoeff();
@@ -523,15 +531,15 @@ void SensorFieldMapper::apply(
     // ── Lambda that maps one modality onto its target surface ───────────
     auto applyMap = [&](const QString &key,
                         const QString &contourPrefix,
-                        const QVector<int> &pick,
-                        const QSharedPointer<Eigen::MatrixXf> &mat,
+                        const Eigen::VectorXi &pick,
+                        const Eigen::MatrixXf *mat,
                         float globalMaxAbs,
                         bool visible,
                         bool showContours) {
         if (key.isEmpty() || !surfaces.contains(key)) return;
 
         auto surface = surfaces[key];
-        if (!visible || !mat || pick.isEmpty()) {
+        if (!visible || !mat || pick.size() == 0) {
             surface->setVisualizationMode(BrainSurface::ModeSurface);
             updateContourSurfaces(surfaces, contourPrefix, *surface,
                                   QVector<float>(), 0.0f, false);
@@ -547,7 +555,7 @@ void SensorFieldMapper::apply(
         // Assemble measurement vector
         Eigen::VectorXf meas(pick.size());
         for (int i = 0; i < pick.size(); ++i)
-            meas(i) = static_cast<float>(m_evoked.data(pick[i], m_timePoint));
+            meas(i) = static_cast<float>(m_evoked.data(pick(i), m_timePoint));
 
         Eigen::VectorXf mapped = (*mat) * meas;
 
@@ -597,12 +605,12 @@ void SensorFieldMapper::apply(
     }
 
     applyMap(m_megSurfaceKey, m_megContourPrefix,
-             m_megPick, m_megMapping,
+             m_megPick, m_megMapping.get(),
              m_megVmax,
              anyMegField, anyMegContours);
 
     applyMap(m_eegSurfaceKey, m_eegContourPrefix,
-             m_eegPick, m_eegMapping,
+             m_eegPick, m_eegMapping.get(),
              m_eegVmax,
              anyEegField, anyEegContours);
 }

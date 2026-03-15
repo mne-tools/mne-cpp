@@ -455,7 +455,7 @@ void TestFwdLibrary::eegSphere_addDefault()
     FwdEegSphereModelSet* set = FwdEegSphereModelSet::fwd_add_default_eeg_sphere_model(nullptr);
     QVERIFY(set != nullptr);
     QVERIFY(set->nmodel() > 0);
-    set->fwd_list_eeg_sphere_models(stdout);
+    set->fwd_list_eeg_sphere_models();
     delete set;
 }
 
@@ -474,7 +474,7 @@ void TestFwdLibrary::eegSphere_selectModel()
 
 void TestFwdLibrary::eegSphere_getCoeff()
 {
-    FwdEegSphereModel* model = FwdEegSphereModel::setup_eeg_sphere_model(
+    auto model = FwdEegSphereModel::setup_eeg_sphere_model(
         QString(), QString("Default"), 0.09f);
     if (!model) QSKIP("Could not setup EEG sphere model");
 
@@ -482,7 +482,6 @@ void TestFwdLibrary::eegSphere_getCoeff()
         double coeff = model->fwd_eeg_get_multi_sphere_model_coeff(n);
         QVERIFY(std::isfinite(coeff));
     }
-    delete model;
 }
 
 void TestFwdLibrary::eegSphere_nextLegen()
@@ -490,7 +489,7 @@ void TestFwdLibrary::eegSphere_nextLegen()
     double p0 = 1.0, p01 = 0.0, p1 = 0.0, p11 = 0.0;
     double x = 0.5;
     for (int n = 1; n <= 10; n++) {
-        FwdEegSphereModel::next_legen(n, x, &p0, &p01, &p1, &p11);
+        FwdEegSphereModel::next_legen(n, x, p0, p01, p1, p11);
         QVERIFY(std::isfinite(p0));
         QVERIFY(std::isfinite(p1));
     }
@@ -503,19 +502,19 @@ void TestFwdLibrary::eegSphere_calcPotComponents()
     int nterms = 50;
     VectorXd fn = VectorXd::Ones(nterms);
 
-    FwdEegSphereModel::calc_pot_components(beta, cgamma, &Vrp, &Vtp, fn, nterms);
+    FwdEegSphereModel::calc_pot_components(beta, cgamma, Vrp, Vtp, fn, nterms);
     QVERIFY(std::isfinite(Vrp));
     QVERIFY(std::isfinite(Vtp));
 }
 
 void TestFwdLibrary::eegSphere_multiSpherepot()
 {
-    FwdEegSphereModel* model = FwdEegSphereModel::setup_eeg_sphere_model(
+    auto model = FwdEegSphereModel::setup_eeg_sphere_model(
         QString(), QString("Default"), 0.09f);
     if (!model) QSKIP("Could not setup EEG sphere model");
 
-    float rd[3] = {0.0f, 0.0f, 0.05f};
-    float Q[3] = {1.0f, 0.0f, 0.0f};
+    Eigen::Vector3f rd(0.0f, 0.0f, 0.05f);
+    Eigen::Vector3f Q(1.0f, 0.0f, 0.0f);
     int neeg = 5;
     Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> el(neeg, 3);
     el << 0.08f, 0.0f, 0.0f,
@@ -523,25 +522,24 @@ void TestFwdLibrary::eegSphere_multiSpherepot()
          -0.08f, 0.0f, 0.0f,
          0.0f, -0.08f, 0.0f,
          0.0f, 0.0f, 0.08f;
-    float Vval[5] = {0.0f};
+    Eigen::VectorXf Vval = Eigen::VectorXf::Zero(neeg);
 
-    int res = FwdEegSphereModel::fwd_eeg_multi_spherepot(rd, Q, el, neeg, Vval, (void*)model);
+    int res = FwdEegSphereModel::fwd_eeg_multi_spherepot(rd, Q, el, neeg, Vval, (void*)model.get());
     if (res == 0) {
         bool anyNonZero = false;
         for (int i = 0; i < neeg; i++)
             if (std::isfinite(Vval[i]) && Vval[i] != 0.0f) anyNonZero = true;
         QVERIFY(anyNonZero);
     }
-    delete model;
 }
 
 void TestFwdLibrary::eegSphere_spherepotVec()
 {
-    FwdEegSphereModel* model = FwdEegSphereModel::setup_eeg_sphere_model(
+    auto model = FwdEegSphereModel::setup_eeg_sphere_model(
         QString(), QString("Default"), 0.09f);
     QVERIFY(model != nullptr);
 
-    float rd[3] = {0.0f, 0.0f, 0.05f};
+    Eigen::Vector3f rd(0.0f, 0.0f, 0.05f);
     int neeg = 4;
     Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> el(neeg, 3);
     el << 0.08f, 0.0f, 0.0f,
@@ -549,36 +547,30 @@ void TestFwdLibrary::eegSphere_spherepotVec()
          -0.08f, 0.0f, 0.0f,
          0.0f, -0.08f, 0.0f;
 
-    float vvalData[3][4] = {{0},{0},{0}};
-    float* Vval_vec[3];
-    for (int i = 0; i < 3; i++) Vval_vec[i] = vvalData[i];
+    Eigen::MatrixXf Vval_vec = Eigen::MatrixXf::Zero(3, neeg);
 
-    bool ok = FwdEegSphereModel::fwd_eeg_spherepot_vec(rd, el, neeg, Vval_vec, (void*)model);
+    bool ok = FwdEegSphereModel::fwd_eeg_spherepot_vec(rd, el, neeg, Vval_vec, (void*)model.get());
     QVERIFY(ok);
 
     bool anyNonZero = false;
     for (int d = 0; d < 3; d++)
         for (int i = 0; i < neeg; i++)
-            if (Vval_vec[d][i] != 0.0f) anyNonZero = true;
+            if (Vval_vec(d, i) != 0.0f) anyNonZero = true;
     QVERIFY(anyNonZero);
-    delete model;
 }
 
 void TestFwdLibrary::eegSphere_modelSet()
 {
-    FwdEegSphereModel* m1 = FwdEegSphereModel::setup_eeg_sphere_model(
+    auto m1 = FwdEegSphereModel::setup_eeg_sphere_model(
         QString(), QString("Default"), 0.09f);
     QVERIFY(m1 != nullptr);
 
-    FwdEegSphereModel* m2 = FwdEegSphereModel::setup_eeg_sphere_model(
+    auto m2 = FwdEegSphereModel::setup_eeg_sphere_model(
         QString(), QString("Default"), 0.08f);
     QVERIFY(m2 != nullptr);
 
     FwdEegSphereModelSet modelSet;
-    QVERIFY(modelSet.models.isEmpty());
-
-    delete m1;
-    delete m2;
+    QVERIFY(modelSet.models.empty());
 }
 
 //=============================================================================================================

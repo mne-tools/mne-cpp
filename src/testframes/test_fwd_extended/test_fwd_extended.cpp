@@ -68,7 +68,7 @@ private slots:
         VectorXf sigmas(3);
         sigmas << 0.33f, 0.0042f, 0.33f;
 
-        FwdEegSphereModel* model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
+        auto model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
             "three_layer", 3, rads, sigmas);
 
         QVERIFY(model != nullptr);
@@ -82,8 +82,6 @@ private slots:
         QVERIFY(qAbs(model->layers[0].sigma - 0.33f) < 1e-6f);
         QVERIFY(qAbs(model->layers[1].rad - 0.080f/0.090f) < 1e-5f);
         QVERIFY(qAbs(model->layers[2].rad - 1.0f) < 1e-5f);
-
-        delete model;
     }
 
     void sphereModel_fourLayerModel()
@@ -94,12 +92,11 @@ private slots:
         VectorXf sigmas(4);
         sigmas << 0.33f, 1.0f, 0.0042f, 0.33f;
 
-        FwdEegSphereModel* model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
+        auto model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
             "four_layer", 4, rads, sigmas);
 
         QVERIFY(model != nullptr);
         QCOMPARE(model->nlayer(), 4);
-        delete model;
     }
 
     void sphereModel_setupAndCoeff()
@@ -110,7 +107,7 @@ private slots:
         VectorXf sigmas(3);
         sigmas << 0.33f, 0.0042f, 0.33f;
 
-        FwdEegSphereModel* model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
+        auto model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
             "test", 3, rads, sigmas);
         QVERIFY(model != nullptr);
 
@@ -129,8 +126,6 @@ private slots:
         // Coefficient for higher n
         double coeff10 = model->fwd_eeg_get_multi_sphere_model_coeff(10);
         QVERIFY(std::isfinite(coeff10));
-
-        delete model;
     }
 
     void sphereModel_bergSchergFit()
@@ -140,7 +135,7 @@ private slots:
         VectorXf sigmas(3);
         sigmas << 0.33f, 0.0042f, 0.33f;
 
-        FwdEegSphereModel* model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
+        auto model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
             "test", 3, rads, sigmas);
         QVERIFY(model != nullptr);
 
@@ -152,8 +147,6 @@ private slots:
         QCOMPARE(model->nfit, 3);
         QCOMPARE(model->mu.size(), 3);
         QCOMPARE(model->lambda.size(), 3);
-
-        delete model;
     }
 
     void sphereModel_setupWithoutBergScherg()
@@ -163,7 +156,7 @@ private slots:
         VectorXf sigmas(3);
         sigmas << 0.33f, 0.0042f, 0.33f;
 
-        FwdEegSphereModel* model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
+        auto model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
             "test_no_bs", 3, rads, sigmas);
         QVERIFY(model != nullptr);
 
@@ -172,8 +165,6 @@ private slots:
         // Without Berg-Scherg, radii are scaled but nterms is not set
         // (nterms is lazy-initialized during potential computation)
         QVERIFY(qAbs(model->layers[2].rad - 0.09f) < 1e-5f);
-
-        delete model;
     }
 
     void sphereModel_singleLayerModel()
@@ -184,12 +175,10 @@ private slots:
         VectorXf sigmas(1);
         sigmas << 0.33f;
 
-        FwdEegSphereModel* model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
+        auto model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
             "homo", 1, rads, sigmas);
         QVERIFY(model != nullptr);
         QCOMPARE(model->nlayer(), 1);
-
-        delete model;
     }
 
     //=========================================================================
@@ -205,7 +194,7 @@ private slots:
         double x = 0.5;
 
         // Step to n=1
-        FwdEegSphereModel::next_legen(1, x, &p0, &p01, &p1, &p11);
+        FwdEegSphereModel::next_legen(1, x, p0, p01, p1, p11);
         QVERIFY(qAbs(p0 - x) < 1e-10); // P0(1) = x
     }
 
@@ -220,7 +209,7 @@ private slots:
         double beta = 0.5;
         double cgamma = 0.7;
 
-        FwdEegSphereModel::calc_pot_components(beta, cgamma, &Vrp, &Vtp, fn, 10);
+        FwdEegSphereModel::calc_pot_components(beta, cgamma, Vrp, Vtp, fn, 10);
 
         QVERIFY(std::isfinite(Vrp));
         QVERIFY(std::isfinite(Vtp));
@@ -237,14 +226,14 @@ private slots:
         VectorXf sigmas(3);
         sigmas << 0.33f, 0.0042f, 0.33f;
 
-        FwdEegSphereModel* model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
+        auto model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
             "pot_test", 3, rads, sigmas);
         QVERIFY(model != nullptr);
         QVERIFY(model->fwd_setup_eeg_sphere_model(0.09f, true, 3));
 
         // Dipole at center offset
-        float rd[3] = {0.0f, 0.0f, 0.04f};
-        float Q[3] = {0.0f, 0.0f, 1e-8f}; // radial dipole
+        Eigen::Vector3f rd(0.0f, 0.0f, 0.04f);
+        Eigen::Vector3f Q(0.0f, 0.0f, 1e-8f); // radial dipole
 
         // 4 electrodes on the surface
         int neeg = 4;
@@ -258,13 +247,11 @@ private slots:
         VectorXf Vval(neeg);
         Vval.setZero();
 
-        int ret = FwdEegSphereModel::fwd_eeg_spherepot(rd, Q, el, neeg, Vval, model);
+        int ret = FwdEegSphereModel::fwd_eeg_spherepot(rd, Q, el, neeg, Vval, model.get());
         QVERIFY(ret == 0); // success
 
         // Top electrode (same direction as dipole) should have highest potential
         QVERIFY(std::isfinite(Vval(0)));
-
-        delete model;
     }
 
     //=========================================================================
