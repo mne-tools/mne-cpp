@@ -290,6 +290,13 @@ public:
     NormalsT         nn;        /**< FsSurface normals at these points (np x 3, row-major). */
     float            cm[3];     /**< Center of mass of the vertex cloud. */
 
+    /** Return a read-only map to the k-th vertex position (3 contiguous floats). */
+    Eigen::Map<const Eigen::Vector3f> point(int k) const { return Eigen::Map<const Eigen::Vector3f>(rr.row(k).data()); }
+    /** Return a mutable map to the k-th vertex position. */
+    Eigen::Map<Eigen::Vector3f> point(int k) { return Eigen::Map<Eigen::Vector3f>(rr.row(k).data()); }
+    /** Return a read-only map to the k-th vertex normal (3 contiguous floats). */
+    Eigen::Map<const Eigen::Vector3f> normal(int k) const { return Eigen::Map<const Eigen::Vector3f>(nn.row(k).data()); }
+
     Eigen::VectorXi   inuse;    /**< Boolean array indicating whether each vertex is in use in the source space (np elements). */
     Eigen::VectorXi   vertno;   /**< Vertex numbers of the used vertices in the full source space (nuse elements). */
     int              nuse;      /**< Number of vertices in use. */

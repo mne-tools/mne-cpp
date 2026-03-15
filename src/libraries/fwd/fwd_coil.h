@@ -172,6 +172,11 @@ public:
     Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> rmag;    /**< The field point locations (np x 3). */
     Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> cosmag;  /**< The corresponding direction cosines (np x 3). */
     Eigen::VectorXf w;              /**< The weighting coefficients. */
+
+    /** Return a read-only map to the j-th integration point position (3 contiguous floats). */
+    Eigen::Map<const Eigen::Vector3f> pos(int j) const { return Eigen::Map<const Eigen::Vector3f>(rmag.row(j).data()); }
+    /** Return a read-only map to the j-th integration point direction cosine. */
+    Eigen::Map<const Eigen::Vector3f> dir(int j) const { return Eigen::Map<const Eigen::Vector3f>(cosmag.row(j).data()); }
 };
 
 //=============================================================================================================
