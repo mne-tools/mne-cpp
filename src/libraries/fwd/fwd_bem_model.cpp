@@ -94,46 +94,6 @@ constexpr int Y = 1;
 constexpr int Z = 2;
 }
 
-//=============================================================================================================
-// Inline vector utility functions replacing legacy C macros
-//=============================================================================================================
-
-template<typename T1, typename T2, typename T3>
-inline void vec_diff(const T1& from, const T2& to, T3* diff)
-{
-    diff[X] = to[X] - from[X];
-    diff[Y] = to[Y] - from[Y];
-    diff[Z] = to[Z] - from[Z];
-}
-
-template<typename T1, typename T2>
-inline void vec_copy(T1* to, const T2& from)
-{
-    to[X] = from[X];
-    to[Y] = from[Y];
-    to[Z] = from[Z];
-}
-
-template<typename T1, typename T2>
-inline auto vec_dot(const T1& x, const T2& y) -> decltype(x[0]*y[0])
-{
-    return x[X]*y[X] + x[Y]*y[Y] + x[Z]*y[Z];
-}
-
-template<typename T>
-inline double vec_len(const T& x)
-{
-    return sqrt(static_cast<double>(x[X]*x[X] + x[Y]*x[Y] + x[Z]*x[Z]));
-}
-
-template<typename T1, typename T2, typename T3>
-inline void cross_product(const T1& x, const T2& y, T3* xy)
-{
-    xy[X] =   x[Y]*y[Z] - y[Y]*x[Z];
-    xy[Y] = -(x[X]*y[Z] - y[X]*x[Z]);
-    xy[Z] =   x[X]*y[Y] - y[X]*x[Y];
-}
-
 namespace FWDLIB
 {
 
@@ -563,10 +523,8 @@ std::unique_ptr<MNESurface> FwdBemModel::make_guesses(MNESurface* guess_surf, fl
             goto out;
 
         for (k = 0; k < sphere->np; k++) {
-            dist = vec_len(&sphere->rr(k,0));
-            sphere->rr(k,X) = guessrad*sphere->rr(k,X)/dist + guess_r0[X];
-            sphere->rr(k,Y) = guessrad*sphere->rr(k,Y)/dist + guess_r0[Y];
-            sphere->rr(k,Z) = guessrad*sphere->rr(k,Z)/dist + guess_r0[Z];
+            dist = Eigen::Map<const Eigen::Vector3f>(&sphere->rr(k,0)).norm();
+            sphere->rr.row(k) = (guessrad * sphere->rr.row(k) / dist) + guess_r0.transpose();
         }
         if (sphere->add_geometry_info(TRUE) == FAIL)
             goto out;
@@ -606,74 +564,65 @@ void FwdBemModel::lin_pot_coeff(const Eigen::Vector3f& from, MNETriangle& to, Ei
           * The linear potential matrix element computations
           */
 {
-    double y1[3],y2[3],y3[3];	/* Corners with origin at from */
-    double *y[5];
-    double **yy;
+    Eigen::Vector3d y1, y2, y3;	/* Corners with origin at from */
     double l1,l2,l3;		/* Lengths of y1, y2, and y3 */
     double solid;			/* The standard solid angle */
-    double vec_omega[3];		/* The cross-product integral */
-    double cross[3];		/* y1 x y2 */
-    double triple;		/* vec_dot(y1 x y2,y3) */
+    Eigen::Vector3d vec_omega;	/* The cross-product integral */
+    double triple;		/* (y1 x y2) . y3 */
     double ss;
     double beta[3],bbeta[3];
     int   j,k;
-    double z[3];
     double n2,area2;
-    double diff[3];
     static const double solid_eps = 4.0*M_PI/1.0E6;
     /*
-       * This circularity makes things easy for us...
+       * Corners with origin at from (float → double)
        */
-    y[0] = y3;
-    y[1] = y1;
-    y[2] = y2;
-    y[3] = y3;
-    y[4] = y1;
-    yy = y + 1;			/* yy can have index -1! */
+    y1 = (to.r1 - from).cast<double>();
+    y2 = (to.r2 - from).cast<double>();
+    y3 = (to.r3 - from).cast<double>();
+    /*
+       * Circular indexing for vertex access
+       */
+    const Eigen::Vector3d* y_arr[5] = { &y3, &y1, &y2, &y3, &y1 };
+    const Eigen::Vector3d** yy = y_arr + 1;	/* yy can have index -1! */
     /*
        * The standard solid angle computation
        */
-    vec_diff(from,to.r1,y1);
-    vec_diff(from,to.r2,y2);
-    vec_diff(from,to.r3,y3);
+    Eigen::Vector3d cross = y1.cross(y2);
+    triple = cross.dot(y3);
 
-    cross_product(y1,y2,cross);
-    triple = vec_dot(cross,y3);
-
-    l1 = vec_len(y1);
-    l2 = vec_len(y2);
-    l3 = vec_len(y3);
-    ss = (l1*l2*l3+vec_dot(y1,y2)*l3+vec_dot(y1,y3)*l2+vec_dot(y2,y3)*l1);
+    l1 = y1.norm();
+    l2 = y2.norm();
+    l3 = y3.norm();
+    ss = (l1*l2*l3+y1.dot(y2)*l3+y1.dot(y3)*l2+y2.dot(y3)*l1);
     solid  = 2.0*atan2(triple,ss);
     if (std::fabs(solid) < solid_eps) {
-        for (k = 0; k < 3; k++)
-            omega[k] = 0.0;
+        omega.setZero();
     }
     else {
         /*
          * Calculate the magic vector vec_omega
          */
         for (j = 0; j < 3; j++)
-            beta[j] = calc_beta(Eigen::Map<const Eigen::Vector3d>(yy[j]),Eigen::Map<const Eigen::Vector3d>(yy[j+1]));
+            beta[j] = calc_beta(*yy[j],*yy[j+1]);
         bbeta[0] = beta[2] - beta[0];
         bbeta[1] = beta[0] - beta[1];
         bbeta[2] = beta[1] - beta[2];
 
+        vec_omega.setZero();
         for (j = 0; j < 3; j++)
-            vec_omega[j] = 0.0;
-        for (j = 0; j < 3; j++)
-            for (k = 0; k < 3; k++)
-                vec_omega[k] = vec_omega[k] + bbeta[j]*yy[j][k];
+            vec_omega += bbeta[j] * (*yy[j]);
         /*
          * Put it all together...
          */
         area2 = 2.0*to.area;
         n2 = 1.0/(area2*area2);
+        Eigen::Vector3d nn_d = to.nn.cast<double>();
         for (k = 0; k < 3; k++) {
-            cross_product(yy[k+1],yy[k-1],z);
-            vec_diff(yy[k+1],yy[k-1],diff);
-            omega[k] = n2*(-area2*vec_dot(z,to.nn)*solid +
-                           triple*vec_dot(diff,vec_omega));
+            Eigen::Vector3d z = yy[k+1]->cross(*yy[k-1]);
+            Eigen::Vector3d diff = *yy[k-1] - *yy[k+1];
+            omega[k] = n2*(-area2*z.dot(nn_d)*solid +
+                           triple*diff.dot(vec_omega));
         }
     }
 #ifdef CHECK
@@ -682,25 +631,22 @@ void FwdBemModel::lin_pot_coeff(const Eigen::Vector3f& from, MNETriangle& to, Ei
        *
        * omega1 + omega2 + omega3 = solid
        */
-    rel1 = (solid + omega[0]+omega[1]+omega[2])/solid;
+    double rel1 = (solid + omega[0]+omega[1]+omega[2])/solid;
     /*
        * The other way of evaluating...
        */
-    for (j = 0; j < 3; j++)
-        check[j] = 0;
+    Eigen::Vector3d check = Eigen::Vector3d::Zero();
+    Eigen::Vector3d nn_check = to.nn.cast<double>();
     for (k = 0; k < 3; k++) {
-        cross_product(to.nn,yy[k],z);
-        for (j = 0; j < 3; j++)
-            check[j] = check[j] + omega[k]*z[j];
+        Eigen::Vector3d z = nn_check.cross(*yy[k]);
+        check += omega[k]*z;
     }
-    for (j = 0; j < 3; j++)
-        check[j] = -area2*check[j]/triple;
+    check *= -area2/triple;
     fprintf (stderr,"(%g,%g,%g) =? (%g,%g,%g)\n",
              check[0],check[1],check[2],
              vec_omega[0],vec_omega[1],vec_omega[2]);
-    for (j = 0; j < 3; j++)
-        check[j] = check[j] - vec_omega[j];
-    rel2 = sqrt(vec_dot(check,check)/vec_dot(vec_omega,vec_omega));
+    check -= vec_omega;
+    double rel2 = sqrt(check.dot(check)/vec_omega.dot(vec_omega));
     fprintf (stderr,"err1 = %g, err2 = %g\n",100*rel1,100*rel2);
 #endif
     return;
@@ -1284,7 +1230,7 @@ int FwdBemModel::fwd_bem_specify_els(FwdCoilSet *els)
          * Go through all 'integration points'
          */
         for (p = 0; p < el->np; p++) {
-            vec_copy(r,&el->rmag(p, 0));
+            r[0] = el->rmag(p, 0); r[1] = el->rmag(p, 1); r[2] = el->rmag(p, 2);
             if (!head_mri_t.isEmpty())
                 FiffCoordTrans::apply_trans(r,head_mri_t,FIFFV_MOVE);
             best = scalp->project_to_surface(nullptr,Eigen::Map<const Eigen::Vector3f>(r),dist);
@@ -1637,7 +1583,6 @@ void FwdBemModel::calc_magic(double u, double z, double A, double B, Eigen::Vect
 
 void FwdBemModel::field_integrals(const Eigen::Vector3f& from, MNETriangle& to, double& I1p, Eigen::Vector2d& T, Eigen::Vector2d& S1, Eigen::Vector2d& S2, Eigen::Vector3d& f0, Eigen::Vector3d& fx, Eigen::Vector3d& fy)
 {
-    double y1[3],y2[3],y3[3];
     double xx[4],yy[4];
     double A,B,z,dx;
     Eigen::Vector3d beta;
@@ -1651,27 +1596,29 @@ void FwdBemModel::field_integrals(const Eigen::Vector3f& from, MNETriangle& to, 
        * 1. Move origin to viewpoint...
        *
        */
-    vec_diff(from,to.r1,y1);
-    vec_diff(from,to.r2,y2);
-    vec_diff(from,to.r3,y3);
+    Eigen::Vector3d y1 = (to.r1 - from).cast<double>();
+    Eigen::Vector3d y2 = (to.r2 - from).cast<double>();
+    Eigen::Vector3d y3 = (to.r3 - from).cast<double>();
     /*
        * 2. Calculate local xy coordinates...
        */
-    xx[0] = vec_dot(y1,to.ex);
-    xx[1] = vec_dot(y2,to.ex);
-    xx[2] = vec_dot(y3,to.ex);
+    Eigen::Vector3d ex_d = to.ex.cast<double>();
+    Eigen::Vector3d ey_d = to.ey.cast<double>();
+    xx[0] = y1.dot(ex_d);
+    xx[1] = y2.dot(ex_d);
+    xx[2] = y3.dot(ex_d);
     xx[3] = xx[0];
 
-    yy[0] = vec_dot(y1,to.ey);
-    yy[1] = vec_dot(y2,to.ey);
-    yy[2] = vec_dot(y3,to.ey);
+    yy[0] = y1.dot(ey_d);
+    yy[1] = y2.dot(ey_d);
+    yy[2] = y3.dot(ey_d);
     yy[3] = yy[0];
 
     calc_f(Eigen::Map<const Eigen::Vector3d>(xx), Eigen::Map<const Eigen::Vector3d>(yy), f0, fx, fy);
     /*
        * 3. Distance of the plane from origin...
        */
-    z = vec_dot(y1,to.nn);
+    z = y1.dot(to.nn.cast<double>());
     /*
        * Put together the line integral...
        * We use the convention where the local y-axis
@@ -1752,32 +1699,25 @@ void FwdBemModel::field_integrals(const Eigen::Vector3f& from, MNETriangle& to, 
 
 double FwdBemModel::one_field_coeff(const Eigen::Vector3f& dest, const Eigen::Vector3f& normal, MNETriangle& tri)
 {
-    double *yy[4];
-    double y1[3],y2[3],y3[3];
     double beta[3];
     double bbeta[3];
-    double coeff[3];
-    int   j,k;
+    int   j;
 
-    yy[0] = y1;
-    yy[1] = y2;
-    yy[2] = y3;
-    yy[3] = y1;
-    vec_diff(dest,tri.r1,y1);
-    vec_diff(dest,tri.r2,y2);
-    vec_diff(dest,tri.r3,y3);
+    Eigen::Vector3d y1 = (tri.r1 - dest).cast<double>();
+    Eigen::Vector3d y2 = (tri.r2 - dest).cast<double>();
+    Eigen::Vector3d y3 = (tri.r3 - dest).cast<double>();
+
+    const Eigen::Vector3d* yy[4] = { &y1, &y2, &y3, &y1 };
     for (j = 0; j < 3; j++)
-        beta[j] = calc_beta(Eigen::Map<const Eigen::Vector3d>(yy[j]),Eigen::Map<const Eigen::Vector3d>(yy[j+1]));
+        beta[j] = calc_beta(*yy[j], *yy[j+1]);
     bbeta[0] = beta[2] - beta[0];
     bbeta[1] = beta[0] - beta[1];
     bbeta[2] = beta[1] - beta[2];
 
+    Eigen::Vector3d coeff = Eigen::Vector3d::Zero();
     for (j = 0; j < 3; j++)
-        coeff[j] = 0.0;
-    for (j = 0; j < 3; j++)
-        for (k = 0; k < 3; k++)
-            coeff[k] = coeff[k] + yy[j][k]*bbeta[j];
-    return (vec_dot(coeff,normal));
+        coeff += bbeta[j] * (*yy[j]);
+    return coeff.dot(normal.cast<double>());
 }
 
 //=============================================================================================================
@@ -1862,68 +1802,61 @@ double FwdBemModel::calc_gamma(const Eigen::Vector3d& rk, const Eigen::Vector3d&
 
 void FwdBemModel::fwd_bem_one_lin_field_coeff_ferg(const Eigen::Vector3f& dest, const Eigen::Vector3f& dir, MNETriangle& tri, Eigen::Vector3d& res)
 {
-    double c[3];			/* Component of dest vector normal to
-                                     * the triangle plane */
-    double A[3];			/* Projection of dest onto the triangle */
-    double c1[3],c2[3],c3[3];
-    double y1[3],y2[3],y3[3];
-    double *yy[4],*cc[4];
-    double rjk[3][3];
-    double cross[3],triple,l1,l2,l3,solid,clen;
+    double triple,l1,l2,l3,solid,clen;
     double common,sum,beta,gamma;
     int    k;
 
-    yy[0] = y1;   cc[0] = c1;
-    yy[1] = y2;   cc[1] = c2;
-    yy[2] = y3;   cc[2] = c3;
-    yy[3] = y1;   cc[3] = c1;
+    Eigen::Vector3d rjk[3];
+    rjk[0] = (tri.r3 - tri.r2).cast<double>();
+    rjk[1] = (tri.r1 - tri.r3).cast<double>();
+    rjk[2] = (tri.r2 - tri.r1).cast<double>();
 
-    vec_diff(tri.r2,tri.r3,rjk[0]);
-    vec_diff(tri.r3,tri.r1,rjk[1]);
-    vec_diff(tri.r1,tri.r2,rjk[2]);
+    Eigen::Vector3d y1 = (tri.r1 - dest).cast<double>();
+    Eigen::Vector3d y2 = (tri.r2 - dest).cast<double>();
+    Eigen::Vector3d y3 = (tri.r3 - dest).cast<double>();
 
-    for (k = 0; k < 3; k++) {
-        y1[k] = tri.r1[k] - dest[k];
-        y2[k] = tri.r2[k] - dest[k];
-        y3[k] = tri.r3[k] - dest[k];
-    }
-    clen  = vec_dot(y1,tri.nn);
-    for (k = 0; k < 3; k++) {
-        c[k]  = clen*tri.nn[k];
-        A[k]  = dest[k] + c[k];
-        c1[k] = tri.r1[k] - A[k];
-        c2[k] = tri.r2[k] - A[k];
-        c3[k] = tri.r3[k] - A[k];
-    }
+    const Eigen::Vector3d* yy[4] = { &y1, &y2, &y3, &y1 };
+
+    Eigen::Vector3d nn_d = tri.nn.cast<double>();
+    clen = y1.dot(nn_d);
+    Eigen::Vector3d c_vec = clen * nn_d;
+    Eigen::Vector3d A_vec = dest.cast<double>() + c_vec;
+
+    Eigen::Vector3d c1 = tri.r1.cast<double>() - A_vec;
+    Eigen::Vector3d c2 = tri.r2.cast<double>() - A_vec;
+    Eigen::Vector3d c3 = tri.r3.cast<double>() - A_vec;
+
+    const Eigen::Vector3d* cc[4] = { &c1, &c2, &c3, &c1 };
     /*
        * beta and gamma...
        */
     for (sum = 0.0, k = 0; k < 3; k++) {
-        cross_product(cc[k],cc[k+1],cross);
-        beta  = vec_dot(cross,tri.nn);
-        gamma = calc_gamma (Eigen::Map<const Eigen::Vector3d>(yy[k]),Eigen::Map<const Eigen::Vector3d>(yy[k+1]));
+        Eigen::Vector3d cross = cc[k]->cross(*cc[k+1]);
+        beta  = cross.dot(nn_d);
+        gamma = calc_gamma(*yy[k], *yy[k+1]);
         sum = sum + beta*gamma;
     }
     /*
        * Solid angle...
        */
-    cross_product(y1,y2,cross);
-    triple = vec_dot(cross,y3);
+    Eigen::Vector3d cross = y1.cross(y2);
+    triple = cross.dot(y3);
 
-    l1 = vec_len(y1);
-    l2 = vec_len(y2);
-    l3 = vec_len(y3);
+    l1 = y1.norm();
+    l2 = y2.norm();
+    l3 = y3.norm();
     solid = 2.0*atan2(triple,
                       (l1*l2*l3+
-                       vec_dot(y1,y2)*l3+
-                       vec_dot(y1,y3)*l2+
-                       vec_dot(y2,y3)*l1));
+                       y1.dot(y2)*l3+
+                       y1.dot(y3)*l2+
+                       y2.dot(y3)*l1));
     /*
        * Now we are ready to assemble it all together
        */
+    Eigen::Vector3d dir_d = dir.cast<double>();
     common = (sum-clen*solid)/(2.0*tri.area);
     for (k = 0; k < 3; k++)
-        res[k] = -vec_dot(rjk[k],dir)*common;
+        res[k] = -rjk[k].dot(dir_d)*common;
     return;
 }
 
@@ -1946,8 +1879,8 @@ void FwdBemModel::fwd_bem_one_lin_field_coeff_uran(const Eigen::Vector3f& dest, 
        */
     Eigen::Vector3f dir = dir_in.normalized();
 
-    x_fac = -vec_dot(dir,tri.ex);
-    y_fac = -vec_dot(dir,tri.ey);
+    x_fac = -dir.dot(tri.ex);
+    y_fac = -dir.dot(tri.ey);
     for (k = 0; k < 3; k++) {
         res_x = f0[k]*T[0] + fx[k]*S1[0] + fy[k]*S2[0] + fy[k]*I1;
         res_y = f0[k]*T[1] + fx[k]*S1[1] + fy[k]*S2[1] - fx[k]*I1;
@@ -1959,21 +1892,14 @@ void FwdBemModel::fwd_bem_one_lin_field_coeff_uran(const Eigen::Vector3f& dest, 
 
 void FwdBemModel::fwd_bem_one_lin_field_coeff_simple(const Eigen::Vector3f& dest, const Eigen::Vector3f& normal, MNETriangle& source, Eigen::Vector3d& res)
 {
-    float diff[3];
-    float vec_result[3];
-    float dl;
     int   k;
-    const Eigen::Vector3f* rr[3];
-
-    rr[0] = &source.r1;
-    rr[1] = &source.r2;
-    rr[2] = &source.r3;
+    const Eigen::Vector3f* rr[3] = { &source.r1, &source.r2, &source.r3 };
 
     for (k = 0; k < 3; k++) {
-        vec_diff(*rr[k],dest,diff);
-        dl = vec_dot(diff,diff);
-        cross_product(diff,source.nn,vec_result);
-        res[k] = source.area*vec_dot(vec_result,normal)/(3.0*dl*sqrt(dl));
+        Eigen::Vector3f diff = dest - *rr[k];
+        float dl = diff.squaredNorm();
+        Eigen::Vector3f vec_result = diff.cross(source.nn);
+        res[k] = source.area*vec_result.dot(normal)/(3.0*dl*sqrt(dl));
     }
     return;
 }
@@ -3110,33 +3036,28 @@ int FwdBemModel::fwd_sphere_field(const Eigen::Vector3f& rd, const Eigen::Vector
 
       */
     float *r0 = (float *)client;      /* The sphere model origin */
-    float v[3],a_vec[3];
     float a,a2,r,r2;
     float ar,ar0,rr0;
     float vr,ve,re,r0e;
     float F,g0,gr,result,sum;
     int   j,k,p;
     FwdCoil* this_coil;
-    float *this_pos,*this_dir;	/* These point to the coil structure! */
     int   np;
-    float myrd[3];
-    float pos[3];
 
     /*
        * Shift to the sphere model coordinates
        */
-    for (p = 0; p < 3; p++)
-        myrd[p] = rd[p] - r0[p];
+    Eigen::Vector3f myrd = rd - Eigen::Map<const Eigen::Vector3f>(r0);
     /*
        * Check for a dipole at the origin
        */
     for (k = 0 ; k < coils.ncoil() ; k++)
         if (FWD_IS_MEG_COIL(coils.coils[k]->coil_class))
             Bval[k] = 0.0;
-    r = vec_len(myrd);
+    r = myrd.norm();
     if (r > EPS)	{		/* The hard job */
 
-        cross_product(Q,myrd,v);
+        Eigen::Vector3f v = Q.cross(myrd);
 
         for (k = 0; k < coils.ncoil(); k++) {
             this_coil = coils.coils[k].get();
@@ -3146,33 +3067,31 @@ int FwdBemModel::fwd_sphere_field(const Eigen::Vector3f& rd, const Eigen::Vector
 
                 for (j = 0, sum = 0.0; j < np; j++) {
 
-                    this_pos = &this_coil->rmag(j, 0);
-                    this_dir = &this_coil->cosmag(j, 0);
+                    Eigen::Map<const Eigen::Vector3f> this_pos_raw(&this_coil->rmag(j, 0));
+                    Eigen::Map<const Eigen::Vector3f> this_dir(&this_coil->cosmag(j, 0));
 
-                    for (p = 0; p < 3; p++)
-                        pos[p] = this_pos[p] - r0[p];
-                    this_pos = pos;
+                    Eigen::Vector3f pos = this_pos_raw - Eigen::Map<const Eigen::Vector3f>(r0);
                     result = 0.0;
 
                     /* Vector from dipole to the field point */
 
-                    vec_diff(myrd,this_pos,a_vec);
+                    Eigen::Vector3f a_vec = pos - myrd;
 
                     /* Compute the dot products needed */
 
-                    a2  = vec_dot(a_vec,a_vec);       a = sqrt(a2);
+                    a2  = a_vec.squaredNorm();       a = sqrt(a2);
 
                     if (a > 0.0) {
-                        r2  = vec_dot(this_pos,this_pos); r = sqrt(r2);
+                        r2  = pos.squaredNorm(); r = sqrt(r2);
                         if (r > 0.0) {
-                            rr0 = vec_dot(this_pos,myrd);
+                            rr0 = pos.dot(myrd);
                             ar = (r2-rr0);
                             if (std::fabs(ar/(a*r)+1.0) > CEPS) { /* There is a problem on the negative 'z' axis if the dipole location
                                                     * and the field point are on the same line */
                                 ar0  = ar/a;
 
-                                ve = vec_dot(v,this_dir); vr = vec_dot(v,this_pos);
-                                re = vec_dot(this_pos,this_dir); r0e = vec_dot(rd,this_dir);
+                                ve = v.dot(this_dir); vr = v.dot(pos);
+                                re = pos.dot(this_dir); r0e = rd.dot(this_dir);
 
                                 /* The main ingredients */
 
@@ -3219,27 +3138,23 @@ int FwdBemModel::fwd_sphere_field_vec(const Eigen::Vector3f& rd, FwdCoilSet &coi
 
       */
     float *r0 = (float *)client;      /* The sphere model origin */
-    float a_vec[3],v1[3],v2[3];
     float a,a2,r,r2;
     float ar,ar0,rr0;
     float re,r0e;
-    float F,g0,gr,g,sum[3];
+    float F,g0,gr,g;
     int   j,k,p;
     FwdCoil* this_coil;
-    float *this_pos,*this_dir;	/* These point to the coil structure! */
     int   np;
-    float myrd[3];
-    float pos[3];
+    Eigen::Map<const Eigen::Vector3f> r0_vec(r0);
 
     /*
        * Shift to the sphere model coordinates
        */
-    for (p = 0; p < 3; p++)
-        myrd[p] = rd[p] - r0[p];
+    Eigen::Vector3f myrd = rd - r0_vec;
     /*
        * Check for a dipole at the origin
        */
-    r = vec_len(myrd);
+    r = myrd.norm();
     for (k = 0; k < coils.ncoil(); k++) {
         this_coil = coils.coils[k].get();
         if (FWD_IS_MEG_COIL(this_coil->coil_class)) {
@@ -3249,29 +3164,27 @@ int FwdBemModel::fwd_sphere_field_vec(const Eigen::Vector3f& rd, FwdCoilSet &coi
             else { 	/* The hard job */
 
                 np = this_coil->np;
-                sum[0] = sum[1] = sum[2] = 0.0;
+                Eigen::Vector3f sum = Eigen::Vector3f::Zero();
 
                 for (j = 0; j < np; j++) {
 
-                    this_pos = &this_coil->rmag(j, 0);
-                    this_dir = &this_coil->cosmag(j, 0);
+                    Eigen::Map<const Eigen::Vector3f> this_pos_raw(&this_coil->rmag(j, 0));
+                    Eigen::Map<const Eigen::Vector3f> this_dir(&this_coil->cosmag(j, 0));
 
-                    for (p = 0; p < 3; p++)
-                        pos[p] = this_pos[p] - r0[p];
-                    this_pos = pos;
+                    Eigen::Vector3f pos = this_pos_raw - r0_vec;
 
                     /* Vector from dipole to the field point */
 
-                    vec_diff(myrd,this_pos,a_vec);
+                    Eigen::Vector3f a_vec = pos - myrd;
 
                     /* Compute the dot products needed */
 
-                    a2  = vec_dot(a_vec,a_vec);       a = sqrt(a2);
+                    a2  = a_vec.squaredNorm();       a = sqrt(a2);
 
                     if (a > 0.0) {
-                        r2  = vec_dot(this_pos,this_pos); r = sqrt(r2);
+                        r2  = pos.squaredNorm(); r = sqrt(r2);
                         if (r > 0.0) {
-                            rr0 = vec_dot(this_pos,myrd);
+                            rr0 = pos.dot(myrd);
                             ar = (r2-rr0);
                             if (std::fabs(ar/(a*r)+1.0) > CEPS) { /* There is a problem on the negative 'z' axis if the dipole location
                                                     * and the field point are on the same line */
@@ -3283,16 +3196,15 @@ int FwdBemModel::fwd_sphere_field_vec(const Eigen::Vector3f& rd, FwdCoilSet &coi
                                 gr = a2/r + ar0 + 2.0*(a+r);
                                 g0 = a + 2*r + ar0;
 
-                                re = vec_dot(this_pos,this_dir); r0e = vec_dot(myrd,this_dir);
-                                cross_product(myrd,this_dir,v1);
-                                cross_product(myrd,this_pos,v2);
+                                re = pos.dot(this_dir); r0e = myrd.dot(this_dir);
+                                Eigen::Vector3f v1 = myrd.cross(this_dir);
+                                Eigen::Vector3f v2 = myrd.cross(pos);
 
                                 g = (g0*r0e - gr*re)/(F*F);
                                 /*
                      * Mix them together...
                      */
-                                for (p = 0; p < 3; p++)
-                                    sum[p] = sum[p] + this_coil->w[j]*(v1[p]/F + v2[p]*g);
+                                sum += this_coil->w[j]*(v1/F + v2*g);
                             }
                         }
                     }
@@ -3328,37 +3240,25 @@ int FwdBemModel::fwd_sphere_field_grad(const Eigen::Vector3f& rd, const Eigen::V
 
          */
 
-    float v[3],a_vec[3];
-    float a,a2,r,r2;
-    float ar,rr0;
     float vr,ve,re,r0e;
     float F,g0,gr,result,G,F2;
 
-    int   j,k,p;
+    int   j,k;
     float huu;
-    float ggr[3],gg0[3];		/* Gradient of gr & g0 */
-    float ga[3];			/* Grapdient of a */
-    float gar[3];			/* Gradient of ar */
-    float gFF[3];			/* Gradient of F divided by F */
-    float gresult[3];
-    float eQ[3],rQ[3];		/* e x Q and r x Q */
     FwdCoil* this_coil;
-    float *this_pos,*this_dir;
     int   np;
-    float myrd[3];
-    float pos[3];
     float *r0 = (float *)client;      /* The sphere model origin */
+    Eigen::Map<const Eigen::Vector3f> r0_vec(r0);
 
     int ncoil = coils.ncoil();
     /*
        * Shift to the sphere model coordinates
        */
-    for (p = 0; p < 3; p++)
-        myrd[p] = rd[p] - r0[p];
+    Eigen::Vector3f myrd = rd - r0_vec;
 
     /* Check for a dipole at the origin */
 
-    r = vec_len(myrd);
+    float r = myrd.norm();
     for (k = 0; k < ncoil ; k++) {
         if (FWD_IS_MEG_COIL(coils.coils[k]->coil_class)) {
             Bval[k] = 0.0;
@@ -3369,9 +3269,7 @@ int FwdBemModel::fwd_sphere_field_grad(const Eigen::Vector3f& rd, const Eigen::V
     }
     if (r > EPS) {		/* The hard job */
 
-        v[0] = Q[1]*myrd[2] - Q[2]*myrd[1];
-        v[1] = -Q[0]*myrd[2] + Q[2]*myrd[0];
-        v[2] = Q[0]*myrd[1] - Q[1]*myrd[0];
+        Eigen::Vector3f v = Q.cross(myrd);
 
         for (k = 0 ; k < ncoil ; k++) {
 
@@ -3383,43 +3281,35 @@ int FwdBemModel::fwd_sphere_field_grad(const Eigen::Vector3f& rd, const Eigen::V
 
                 for (j = 0; j < np; j++) {
 
-                    this_pos = &this_coil->rmag(j, 0);
+                    Eigen::Map<const Eigen::Vector3f> this_pos_raw(&this_coil->rmag(j, 0));
                     /*
            * Shift to the sphere model coordinates
            */
-                    for (p = 0; p < 3; p++)
-                        pos[p] = this_pos[p] - r0[p];
-                    this_pos = pos;
+                    Eigen::Vector3f pos = this_pos_raw - r0_vec;
 
-                    this_dir = &this_coil->cosmag(j, 0);
+                    Eigen::Map<const Eigen::Vector3f> this_dir(&this_coil->cosmag(j, 0));
 
                     /* Vector from dipole to the field point */
 
-                    a_vec[0] = this_pos[0] - myrd[0];
-                    a_vec[1] = this_pos[1] - myrd[1];
-                    a_vec[2] = this_pos[2] - myrd[2];
+                    Eigen::Vector3f a_vec = pos - myrd;
 
                     /* Compute the dot and cross products needed */
 
-                    a2  = vec_dot(a_vec,a_vec);       a = sqrt(a2);
-                    r2  = vec_dot(this_pos,this_pos); r = sqrt(r2);
-                    rr0 = vec_dot(this_pos,myrd);
-                    ar  = (r2 - rr0)/a;
+                    float a2  = a_vec.squaredNorm();       float a = sqrt(a2);
+                    float r2  = pos.squaredNorm(); r = sqrt(r2);
+                    float rr0 = pos.dot(myrd);
+                    float ar  = (r2 - rr0)/a;
 
-                    ve = vec_dot(v,this_dir); vr = vec_dot(v,this_pos);
-                    re = vec_dot(this_pos,this_dir); r0e = vec_dot(myrd,this_dir);
+                    ve = v.dot(this_dir); vr = v.dot(pos);
+                    re = pos.dot(this_dir); r0e = myrd.dot(this_dir);
 
                     /* eQ = this_dir x Q */
 
-                    eQ[0] = this_dir[1]*Q[2] - this_dir[2]*Q[1];
-                    eQ[1] = -this_dir[0]*Q[2] + this_dir[2]*Q[0];
-                    eQ[2] = this_dir[0]*Q[1] - this_dir[1]*Q[0];
+                    Eigen::Vector3f eQ = this_dir.cross(Q);
 
                     /* rQ = this_pos x Q */
 
-                    rQ[0] = this_pos[1]*Q[2] - this_pos[2]*Q[1];
-                    rQ[1] = -this_pos[0]*Q[2] + this_pos[2]*Q[0];
-                    rQ[2] = this_pos[0]*Q[1] - this_pos[1]*Q[0];
+                    Eigen::Vector3f rQ = pos.cross(Q);
 
                     /* The main ingredients */
 
@@ -3436,15 +3326,13 @@ int FwdBemModel::fwd_sphere_field_grad(const Eigen::Vector3f& rd, const Eigen::V
                     /* The computation of the gradient... */
 
                     huu = 2.0 + 2.0*a/r;
-                    for (p = 0; p <= 2; p++) {
-                        ga[p] = -a_vec[p]/a;
-                        gar[p] = -(ga[p]*ar + this_pos[p])/a;
-                        gg0[p] = ga[p] + gar[p];
-                        ggr[p] = huu*ga[p] + gar[p];
-                        gFF[p] = ga[p]/a - (r*a_vec[p] + a*this_pos[p])/F;
-                        gresult[p] = -2.0*result*gFF[p] + (eQ[p]+gFF[p]*ve)/F +
-                                (rQ[p]*G + vr*(gg0[p]*r0e + g0*this_dir[p] - ggr[p]*re))/F2;
-                    }
+                    Eigen::Vector3f ga = -a_vec/a;
+                    Eigen::Vector3f gar = -(ga*ar + pos)/a;
+                    Eigen::Vector3f gg0 = ga + gar;
+                    Eigen::Vector3f ggr = huu*ga + gar;
+                    Eigen::Vector3f gFF = ga/a - (r*a_vec + a*pos)/F;
+                    Eigen::Vector3f gresult = -2.0f*result*gFF + (eQ+gFF*ve)/F +
+                            (rQ*G + vr*(gg0*r0e + g0*this_dir - ggr*re))/F2;
 
                     Bval[k] = Bval[k] + this_coil->w[j]*result;
                     xgrad[k] = xgrad[k] + this_coil->w[j]*gresult[0];
@@ -3470,7 +3358,7 @@ int FwdBemModel::fwd_mag_dipole_field(const Eigen::Vector3f& rm, const Eigen::Ve
 {
     int     j,k,np;
     FwdCoil* this_coil;
-    float   sum,diff[3],dist,dist2,dist5,*dir;
+    float   sum,dist,dist2,dist5;
 
     Bval.setZero();
     for (k = 0; k < coils.ncoil(); k++) {
@@ -3481,13 +3369,13 @@ int FwdBemModel::fwd_mag_dipole_field(const Eigen::Vector3f& rm, const Eigen::Ve
            * Go through all points
            */
             for (j = 0, sum = 0.0; j < np; j++) {
-                dir = &this_coil->cosmag(j, 0);
-                vec_diff(rm,&this_coil->rmag(j, 0),diff);
-                dist = vec_len(diff);
+                Eigen::Map<const Eigen::Vector3f> dir(&this_coil->cosmag(j, 0));
+                Eigen::Vector3f diff = Eigen::Map<const Eigen::Vector3f>(&this_coil->rmag(j, 0)) - rm;
+                dist = diff.norm();
                 if (dist > EPS) {
                     dist2 = dist*dist;
                     dist5 = dist2*dist2*dist;
-                    sum = sum + this_coil->w[j]*(3*vec_dot(M,diff)*vec_dot(diff,dir) - dist2*vec_dot(M,dir))/dist5;
+                    sum = sum + this_coil->w[j]*(3*M.dot(diff)*diff.dot(dir) - dist2*M.dot(dir))/dist5;
                 }
             }				/* All points done */
             Bval[k] = MAG_FACTOR*sum;
@@ -3508,26 +3396,26 @@ int FwdBemModel::fwd_mag_dipole_field_vec(const Eigen::Vector3f& rm, FwdCoilSet 
 {
     int     j,k,p,np;
     FwdCoil* this_coil;
-    float   sum[3],diff[3],dist,dist2,dist5,*dir;
+    float   dist,dist2,dist5;
 
     Bval.setZero();
     for (k = 0; k < coils.ncoil(); k++) {
         this_coil = coils.coils[k].get();
         if (FWD_IS_MEG_COIL(this_coil->type)) {
             np = this_coil->np;
-            sum[0] = sum[1] = sum[2] = 0.0;
+            Eigen::Vector3f sum = Eigen::Vector3f::Zero();
             /*
            * Go through all points
            */
             for (j = 0; j < np; j++) {
-                dir = &this_coil->cosmag(j, 0);
-                vec_diff(rm,&this_coil->rmag(j, 0),diff);
-                dist = vec_len(diff);
+                Eigen::Map<const Eigen::Vector3f> dir(&this_coil->cosmag(j, 0));
+                Eigen::Vector3f diff = Eigen::Map<const Eigen::Vector3f>(&this_coil->rmag(j, 0)) - rm;
+                dist = diff.norm();
                 if (dist > EPS) {
                     dist2 = dist*dist;
                     dist5 = dist2*dist2*dist;
                     for (p = 0; p < 3; p++)
-                        sum[p] = sum[p] + this_coil->w[j]*(3*diff[p]*vec_dot(diff,dir) - dist2*dir[p])/dist5;
+                        sum[p] = sum[p] + this_coil->w[j]*(3*diff[p]*diff.dot(dir) - dist2*dir[p])/dist5;
                 }
             }           /* All points done */
             for (p = 0; p < 3; p++)
