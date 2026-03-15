@@ -67,8 +67,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
 #include <QSharedDataPointer>
+#include <QSharedPointer>
 #include <QString>
 
 //=============================================================================================================
@@ -104,9 +104,6 @@ namespace FWDLIB
 class FWDSHARED_EXPORT ComputeFwd
 {
 public:
-    typedef QSharedPointer<ComputeFwd> SPtr;             /**< Shared pointer type for ComputeFwd. */
-    typedef QSharedPointer<const ComputeFwd> ConstSPtr;  /**< Const shared pointer type for ComputeFwd. */
-
     //=========================================================================================================
     /**
      * Constructs a ComputeFwd and initialises all data structures needed for the
@@ -114,7 +111,7 @@ public:
      *
      * @param[in] pSettings   Shared pointer to the forward computation settings.
      */
-    explicit ComputeFwd(ComputeFwdSettings::SPtr pSettings);
+    explicit ComputeFwd(std::shared_ptr<ComputeFwdSettings> pSettings);
 
     //=========================================================================================================
     /**
@@ -161,16 +158,16 @@ private:
     // Computation state
     //=========================================================================================================
 
-    std::vector<std::unique_ptr<MNELIB::MNESourceSpace>> m_spaces;  /**< Source spaces. */
+    std::vector<MNELIB::MNESourceSpace::UPtr> m_spaces;     /**< Source spaces. */
     int m_iNSource = 0;                                 /**< Number of active source points. */
-    std::unique_ptr<FwdCoilSet> m_templates;            /**< Template coil set. */
-    std::unique_ptr<FwdCoilSet> m_megcoils;             /**< MEG coil set. */
-    std::unique_ptr<FwdCoilSet> m_compcoils;            /**< Compensator coil set. */
-    std::unique_ptr<FwdCoilSet> m_eegels;               /**< EEG electrode set. */
-    std::unique_ptr<MNELIB::MNECTFCompDataSet> m_compData; /**< CTF compensation data. */
-    std::unique_ptr<FwdEegSphereModelSet> m_eegModels;  /**< EEG sphere model set. */
-    std::unique_ptr<FwdEegSphereModel> m_eegModel;      /**< Active EEG sphere model. */
-    std::unique_ptr<FwdBemModel> m_bemModel;            /**< BEM model. */
+    FwdCoilSet::UPtr m_templates;                       /**< Template coil set. */
+    FwdCoilSet::UPtr m_megcoils;                        /**< MEG coil set. */
+    FwdCoilSet::UPtr m_compcoils;                       /**< Compensator coil set. */
+    FwdCoilSet::UPtr m_eegels;                          /**< EEG electrode set. */
+    MNELIB::MNECTFCompDataSet::UPtr m_compData;         /**< CTF compensation data. */
+    FwdEegSphereModelSet::UPtr m_eegModels;             /**< EEG sphere model set. */
+    FwdEegSphereModel::UPtr m_eegModel;                 /**< Active EEG sphere model. */
+    FwdBemModel::UPtr m_bemModel;                       /**< BEM model. */
 
     QList<FIFFLIB::FiffChInfo> m_listMegChs;             /**< MEG channel information. */
     QList<FIFFLIB::FiffChInfo> m_listEegChs;             /**< EEG channel information. */
@@ -183,7 +180,7 @@ private:
     FIFFLIB::FiffCoordTrans m_meg_head_t;                /**< MEG-to-head transform. */
 
     QSharedPointer<FIFFLIB::FiffInfoBase> m_pInfoBase;   /**< Measurement info. */
-    ComputeFwdSettings::SPtr m_pSettings;                /**< Forward computation settings. */
+    std::shared_ptr<ComputeFwdSettings> m_pSettings;     /**< Forward computation settings. */
 
     QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_meg_forward;        /**< MEG forward matrix. */
     QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_meg_forward_grad;   /**< MEG gradient forward matrix. */

@@ -57,6 +57,7 @@
 #include <fiff/fiff_cov.h>
 
 #include <math.h>
+#include <memory>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -106,7 +107,6 @@ struct RegionData
     bool bUseWhitened;                  /**< Wheather indeces of whitened gain matrix should be used to calculate centroids. */
 
     Eigen::MatrixXd matRoiGOrig;        /**< Region gain matrix sensors x sources(x,y,z)*/
-//    Eigen::MatrixXd    matRoiGOrigWhitened;    /**< Whitened region gain matrix sensors x sources(x,y,z)*/
 
     qint32 nClusters;      /**< Number of clusters within this region. */
 
@@ -174,6 +174,7 @@ class FWDSHARED_EXPORT FwdForwardSolution
 public:
     typedef QSharedPointer<FwdForwardSolution> SPtr;            /**< Shared pointer type for FwdForwardSolution. */
     typedef QSharedPointer<const FwdForwardSolution> ConstSPtr; /**< Const shared pointer type for FwdForwardSolution. */
+    typedef std::unique_ptr<FwdForwardSolution> UPtr;           /**< Unique pointer type for FwdForwardSolution. */
 
     //=========================================================================================================
     /**
@@ -383,47 +384,6 @@ public:
                          Eigen::MatrixXd &p_outWhitener,
                          qint32 &p_outNumNonZero) const;
 
-//    //=========================================================================================================
-//    /**
-//    * Prepares a forward solution, Bad channels, after clustering etc ToDo...
-//    *
-//    * @param[in] p_FiffInfo   Fif measurement info
-//    *
-//    */
-//    void prepare_forward(const FiffInfo& p_FiffInfo)
-//    {
-//        QStringList fwdChNames = this->sol->row_names;
-//        QStringList chNames;
-//        for(qint32 i = 0; i < p_FiffInfo.ch_names.size(); ++i)
-//        {
-//            bool inBads = false;
-//            bool inFwd = false;
-
-//            for(qint32 j = 0; j < p_FiffInfo.bads.size(); ++j)
-//            {
-//                if(QString::compare(p_FiffInfo.bads[j], p_FiffInfo.ch_names[i]) == 0)
-//                {
-//                    inBads = true;
-//                    break;
-//                }
-//            }
-
-//            for(qint32 j = 0; j < fwdChNames.size(); ++j)
-//            {
-//                if(QString::compare(fwdChNames[j], p_FiffInfo.ch_names[i]) == 0)
-//                {
-//                    inFwd = true;
-//                    break;
-//                }
-//            }
-
-//            if(!inBads && inFwd)
-//                chNames.append(p_FiffInfo.ch_names[i]);
-//        }
-
-//        qint32 nchan = chNames.size();
-//    }
-
     //=========================================================================================================
     /**
      *
@@ -462,8 +422,6 @@ public:
                      const QStringList& include = FIFFLIB::defaultQStringList,
                      const QStringList& exclude = FIFFLIB::defaultQStringList,
                      bool bExcludeBads = true);
-
-    //ToDo readFromStream
 
     //=========================================================================================================
     /**

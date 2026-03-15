@@ -45,8 +45,8 @@
 #include <QList>
 #include <QMutex>
 #include <QVector>
-#include <QSharedPointer>
 #include <Eigen/Core>
+#include <memory>
 
 //=============================================================================================================
 // DEFINE NAMESPACE
@@ -103,7 +103,7 @@ public:
      *
      * @param[in] mat        Dense mapping matrix.
      */
-    void setMappingMatrix(QSharedPointer<Eigen::MatrixXf> mat);
+    void setMappingMatrix(std::shared_ptr<Eigen::MatrixXf> mat);
 
     //=========================================================================================================
     /**
@@ -211,7 +211,7 @@ private:
     int m_iSampleCtr = 0;                                           /**< Sample counter for averaging. */
     int m_iCurrentSample = 0;                                       /**< Current sample index for loop replay. */
 
-    QSharedPointer<Eigen::MatrixXf> m_mappingMat;                   /**< Dense mapping matrix (nVerts x nChans). */
+    std::shared_ptr<Eigen::MatrixXf> m_mappingMat;                   /**< Dense mapping matrix (nVerts x nChans). */
     QString m_sSurfaceKey;                                          /**< FsSurface key for the target surface. */
 
     int m_iNumAverages = 1;                                         /**< Number of samples to average. */

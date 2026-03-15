@@ -49,9 +49,9 @@
 #include <Eigen/Core>
 #include <QMap>
 #include <QVector>
-#include <QSharedPointer>
 #include <QString>
 #include <memory>
+#include <vector>
 
 class BrainSurface;
 
@@ -149,22 +149,22 @@ public:
     /**
      * @return Const reference to the MEG channel pick indices.
      */
-    const QVector<int> &megPick() const { return m_megPick; }
+    const Eigen::VectorXi &megPick() const { return m_megPick; }
 
     /**
      * @return Const reference to the EEG channel pick indices.
      */
-    const QVector<int> &eegPick() const { return m_eegPick; }
+    const Eigen::VectorXi &eegPick() const { return m_eegPick; }
 
     /**
      * @return Shared pointer to the MEG mapping matrix (may be null).
      */
-    QSharedPointer<Eigen::MatrixXf> megMapping() const { return m_megMapping; }
+    std::shared_ptr<Eigen::MatrixXf> megMapping() const { return m_megMapping; }
 
     /**
      * @return Shared pointer to the EEG mapping matrix (may be null).
      */
-    QSharedPointer<Eigen::MatrixXf> eegMapping() const { return m_eegMapping; }
+    std::shared_ptr<Eigen::MatrixXf> eegMapping() const { return m_eegMapping; }
 
     //=========================================================================================================
     /**
@@ -301,12 +301,12 @@ private:
     QString m_megContourPrefix = QStringLiteral("sens_contour_meg");
     QString m_eegContourPrefix = QStringLiteral("sens_contour_eeg");
 
-    QVector<int>              m_megPick;
-    QVector<int>              m_eegPick;
-    QVector<Eigen::Vector3f>  m_megPositions;
-    QVector<Eigen::Vector3f>  m_eegPositions;
-    QSharedPointer<Eigen::MatrixXf> m_megMapping;
-    QSharedPointer<Eigen::MatrixXf> m_eegMapping;
+    Eigen::VectorXi                   m_megPick;
+    Eigen::VectorXi                   m_eegPick;
+    std::vector<Eigen::Vector3f>      m_megPositions;
+    std::vector<Eigen::Vector3f>      m_eegPositions;
+    std::shared_ptr<Eigen::MatrixXf> m_megMapping;
+    std::shared_ptr<Eigen::MatrixXf> m_eegMapping;
 
     float m_megVmax = 0.0f;      /**< Colour-map normalisation: max |mapped| at peak-GFP time for MEG. */
     float m_eegVmax = 0.0f;      /**< Colour-map normalisation: max |mapped| at peak-GFP time for EEG. */

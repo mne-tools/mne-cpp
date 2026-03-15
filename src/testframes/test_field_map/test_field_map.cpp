@@ -297,8 +297,8 @@ private:
     std::unique_ptr<FwdCoilSet> m_eegCoils;
 
     // C++ computed mapping matrices
-    QSharedPointer<MatrixXf> m_megMapping;
-    QSharedPointer<MatrixXf> m_eegMapping;
+    std::unique_ptr<MatrixXf> m_megMapping;
+    std::unique_ptr<MatrixXf> m_eegMapping;
 
     // Python reference matrices
     MatrixXd m_refMegSelfDots;
@@ -506,21 +506,21 @@ void TestFieldMap::initTestCase()
     // ── Compute C++ field maps (WITH SSP projection) ──────────────────
     if (m_hasMeg) {
         qDebug() << "Computing MEG mapping (C++ with SSP)...";
-        m_megMapping = FieldMap::computeMegMapping(
+        m_megMapping = FwdFieldMap::computeMegMapping(
             *m_megCoils, m_surfVerts, m_surfNorms, m_origin,
             m_evoked.info, megChNames,
             0.06f, 1e-4f);
-        QVERIFY(!m_megMapping.isNull());
+        QVERIFY(m_megMapping != nullptr);
         qDebug() << "MEG mapping:" << m_megMapping->rows() << "x" << m_megMapping->cols();
     }
 
     if (m_hasEeg) {
         qDebug() << "Computing EEG mapping (C++ with SSP + avg ref)...";
-        m_eegMapping = FieldMap::computeEegMapping(
+        m_eegMapping = FwdFieldMap::computeEegMapping(
             *m_eegCoils, m_surfVerts, m_origin,
             m_evoked.info, eegChNames,
             0.06f, 1e-3f);
-        QVERIFY(!m_eegMapping.isNull());
+        QVERIFY(m_eegMapping != nullptr);
         qDebug() << "EEG mapping:" << m_eegMapping->rows() << "x" << m_eegMapping->cols();
     }
 
@@ -552,7 +552,7 @@ void TestFieldMap::testMegSelfDots()
 {
     if (!m_hasMeg) QSKIP("No MEG data available");
 
-    // The C++ FieldMap::computeMegMapping internally computes self-dots.
+    // The C++ FwdFieldMap::computeMegMapping internally computes self-dots.
     // We need to re-compute them directly for comparison. Since the internal
     // doSelfDots is not exposed publicly, we verify via the final mapping
     // matrix.  However, we CAN compare dimensions and symmetry.
@@ -607,7 +607,7 @@ void TestFieldMap::testMegMapping()
 {
     if (!m_hasMeg) QSKIP("No MEG data available");
 
-    QVERIFY(!m_megMapping.isNull());
+    QVERIFY(m_megMapping != nullptr);
     QVERIFY(m_refMegMapping.rows() > 0);
 
     qDebug() << "MEG mapping C++ shape:" << m_megMapping->rows() << "x" << m_megMapping->cols();
@@ -702,7 +702,7 @@ void TestFieldMap::testEegMapping()
 {
     if (!m_hasEeg) QSKIP("No EEG data available");
 
-    QVERIFY(!m_eegMapping.isNull());
+    QVERIFY(m_eegMapping != nullptr);
     QVERIFY(m_refEegMapping.rows() > 0);
 
     qDebug() << "EEG mapping C++ shape:" << m_eegMapping->rows() << "x" << m_eegMapping->cols();
@@ -746,7 +746,7 @@ void TestFieldMap::testEegMapping()
 void TestFieldMap::testMegMappingApplySymmetry()
 {
     if (!m_hasMeg) QSKIP("No MEG data available");
-    QVERIFY(!m_megMapping.isNull());
+    QVERIFY(m_megMapping != nullptr);
 
     // Sanity check: applying a uniform measurement vector should produce
     // a smooth field.  For a constant input, the output variance should
@@ -777,7 +777,7 @@ void TestFieldMap::testMegMappingApplySymmetry()
 void TestFieldMap::testEegMappingApplySymmetry()
 {
     if (!m_hasEeg) QSKIP("No EEG data available");
-    QVERIFY(!m_eegMapping.isNull());
+    QVERIFY(m_eegMapping != nullptr);
 
     VectorXf ones = VectorXf::Ones(m_eegMapping->cols());
     VectorXf field = (*m_eegMapping) * ones;
@@ -797,7 +797,7 @@ void TestFieldMap::testEegMappingApplySymmetry()
 void TestFieldMap::testMultiEvokedMegMapping()
 {
     if (!m_hasMeg) QSKIP("No MEG data available");
-    QVERIFY(!m_megMapping.isNull());
+    QVERIFY(m_megMapping != nullptr);
 
     // ── Run multi-evoked Python reference generator ────────────────────
     if (!m_multiEvokedOk) {
@@ -1057,7 +1057,7 @@ void TestFieldMap::testMultiEvokedMegMapping()
 void TestFieldMap::testMultiEvokedEegMapping()
 {
     if (!m_hasEeg) QSKIP("No EEG data available");
-    QVERIFY(!m_eegMapping.isNull());
+    QVERIFY(m_eegMapping != nullptr);
     QVERIFY(m_multiEvokedOk);
 
     qDebug() << "\n=== Multi-Evoked EEG Cross-Validation ===";
@@ -1308,11 +1308,11 @@ void TestFieldMap::testHelmetFieldMap()
              << "(in head coordinates)";
 
     qDebug() << "Computing C++ MEG mapping on helmet (with SSP)...";
-    QSharedPointer<MatrixXf> cppMapping = FieldMap::computeMegMapping(
+    std::unique_ptr<MatrixXf> cppMapping = FwdFieldMap::computeMegMapping(
         *helmetCoils, helmetVerts, helmetNorms, helmetOrigin,
         m_evoked.info, cppMegChNames,
         0.06f, 1e-4f);
-    QVERIFY(!cppMapping.isNull());
+    QVERIFY(cppMapping != nullptr);
     qDebug() << "C++ mapping:" << cppMapping->rows() << "x" << cppMapping->cols();
 
     // ── Compare mapping matrices ───────────────────────────────────────

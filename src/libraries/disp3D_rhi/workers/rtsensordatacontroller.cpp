@@ -127,7 +127,7 @@ void RtSensorDataController::addData(const Eigen::VectorXf &data)
 
 //=============================================================================================================
 
-void RtSensorDataController::setMappingMatrix(QSharedPointer<Eigen::MatrixXf> mat)
+void RtSensorDataController::setMappingMatrix(std::shared_ptr<Eigen::MatrixXf> mat)
 {
     if (m_pWorker) {
         m_pWorker->setMappingMatrix(mat);
@@ -307,7 +307,7 @@ void RtSensorDataController::recomputeMapping()
 //=============================================================================================================
 
 void RtSensorDataController::onNewMegMapping(const QString &surfaceKey,
-                                               QSharedPointer<Eigen::MatrixXf> mappingMat,
+                                               std::shared_ptr<Eigen::MatrixXf> mappingMat,
                                                const QVector<int> &pick)
 {
     // Auto-forward the new matrix to the data worker
@@ -325,7 +325,7 @@ void RtSensorDataController::onNewMegMapping(const QString &surfaceKey,
 //=============================================================================================================
 
 void RtSensorDataController::onNewEegMapping(const QString &surfaceKey,
-                                               QSharedPointer<Eigen::MatrixXf> mappingMat,
+                                               std::shared_ptr<Eigen::MatrixXf> mappingMat,
                                                const QVector<int> &pick)
 {
     // Auto-forward the new matrix to the data worker

@@ -70,13 +70,11 @@ private slots:
         VectorXf rads(4); rads << 0.90f, 0.92f, 0.97f, 1.0f;
         VectorXf sigs(4); sigs << 0.33f, 1.0f, 0.004f, 0.33f;
 
-        FwdEegSphereModel* m = FwdEegSphereModel::fwd_create_eeg_sphere_model(
+        auto m = FwdEegSphereModel::fwd_create_eeg_sphere_model(
             "default", 4, rads, sigs);
         QVERIFY(m != nullptr);
         QCOMPARE(m->nlayer(), 4);
         QCOMPARE(m->name, QString("default"));
-
-        delete m;
     }
 
     void sphereModel_copyCtor()
@@ -84,14 +82,12 @@ private slots:
         VectorXf rads(3); rads << 0.90f, 0.97f, 1.0f;
         VectorXf sigs(3); sigs << 0.33f, 0.004f, 0.33f;
 
-        FwdEegSphereModel* orig = FwdEegSphereModel::fwd_create_eeg_sphere_model(
+        auto orig = FwdEegSphereModel::fwd_create_eeg_sphere_model(
             "test", 3, rads, sigs);
 
         FwdEegSphereModel copy(*orig);
         QCOMPARE(copy.nlayer(), orig->nlayer());
         QCOMPARE(copy.name, orig->name);
-
-        delete orig;
     }
 
     void sphereModel_getCoeff()
@@ -108,7 +104,7 @@ private slots:
         p0 = 1.0; p01 = 0.0;
         p1 = x;   p11 = 1.0;
 
-        FwdEegSphereModel::next_legen(2, x, &p0, &p01, &p1, &p11);
+        FwdEegSphereModel::next_legen(2, x, p0, p01, p1, p11);
         QVERIFY(std::isfinite(p0));
         QVERIFY(std::isfinite(p1));
     }
@@ -117,7 +113,7 @@ private slots:
     {
         VectorXd fn = VectorXd::Ones(10);
         double Vrp = 0, Vtp = 0;
-        FwdEegSphereModel::calc_pot_components(0.5, 0.3, &Vrp, &Vtp, fn, 10);
+        FwdEegSphereModel::calc_pot_components(0.5, 0.3, Vrp, Vtp, fn, 10);
         QVERIFY(std::isfinite(Vrp));
         QVERIFY(std::isfinite(Vtp));
     }
@@ -156,10 +152,10 @@ private slots:
         VectorXf rads(3); rads << 0.90f, 0.97f, 1.0f;
         VectorXf sigs(3); sigs << 0.33f, 0.004f, 0.33f;
 
-        FwdEegSphereModel* m = FwdEegSphereModel::fwd_create_eeg_sphere_model(
+        auto m = FwdEegSphereModel::fwd_create_eeg_sphere_model(
             "custom", 3, rads, sigs);
 
-        FwdEegSphereModelSet* s = FwdEegSphereModelSet::fwd_add_to_eeg_sphere_model_set(nullptr, m);
+        FwdEegSphereModelSet* s = FwdEegSphereModelSet::fwd_add_to_eeg_sphere_model_set(nullptr, std::move(m));
         QVERIFY(s != nullptr);
         QCOMPARE(s->nmodel(), 1);
 
@@ -227,11 +223,10 @@ private slots:
         ch.chpos.r0[2] = 0.09f;
         ch.chpos.coil_type = FIFFV_COIL_EEG;
 
-        FwdCoil* el = FwdCoil::create_eeg_el(ch);
+        FwdCoil::UPtr el = FwdCoil::create_eeg_el(ch);
         QVERIFY(el != nullptr);
         QCOMPARE(el->chname, QString("EEG001"));
         QCOMPARE(el->coil_class, FWD_COILC_EEG);
-        delete el;
     }
 
     //=========================================================================

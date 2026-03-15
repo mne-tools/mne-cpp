@@ -88,7 +88,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 RtFwd::RtFwd()
-: m_pFwdSettings(new ComputeFwdSettings)
+: m_pFwdSettings(std::make_shared<ComputeFwdSettings>())
 , m_bBusy(false)
 , m_bDoRecomputation(false)
 , m_bDoClustering(true)
@@ -426,7 +426,7 @@ void RtFwd::run()
 
     // initialize fwd solution
     emit statusInformationChanged(0);           // initializing
-    ComputeFwd::SPtr pFwdComputer = ComputeFwd::SPtr(new ComputeFwd(m_pFwdSettings));
+    std::shared_ptr<ComputeFwd> pFwdComputer = std::make_shared<ComputeFwd>(m_pFwdSettings);
 
     FwdForwardSolution::SPtr pFwdSolution;
     FwdForwardSolution::SPtr pClusteredFwd;

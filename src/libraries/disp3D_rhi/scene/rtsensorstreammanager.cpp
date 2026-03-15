@@ -77,8 +77,8 @@ bool RtSensorStreamManager::startStreaming(const QString &modality,
     }
 
     // Select the mapping matrix and pick vector based on modality
-    QSharedPointer<Eigen::MatrixXf> mappingMat;
-    QVector<int> pick;
+    std::shared_ptr<Eigen::MatrixXf> mappingMat;
+    Eigen::VectorXi pick;
     QString surfaceKey;
 
     if (modality == QStringLiteral("MEG")) {
@@ -94,7 +94,7 @@ bool RtSensorStreamManager::startStreaming(const QString &modality,
         return false;
     }
 
-    if (!mappingMat || mappingMat->rows() == 0 || pick.isEmpty()) {
+    if (!mappingMat || mappingMat->rows() == 0 || pick.size() == 0) {
         qWarning() << "RtSensorStreamManager: Mapping matrix not built for" << modality
                    << "— call loadSensorField() first";
         return false;
@@ -138,7 +138,7 @@ bool RtSensorStreamManager::startStreaming(const QString &modality,
     for (int t = 0; t < nTimePoints; ++t) {
         Eigen::VectorXf meas(pick.size());
         for (int i = 0; i < pick.size(); ++i) {
-            meas(i) = static_cast<float>(fieldMapper.evoked().data(pick[i], t));
+            meas(i) = static_cast<float>(fieldMapper.evoked().data(pick(i), t));
         }
         m_controller->addData(meas);
     }

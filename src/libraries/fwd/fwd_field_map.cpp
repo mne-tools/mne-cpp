@@ -65,44 +65,23 @@ using namespace Eigen;
 using namespace FWDLIB;
 
 //=============================================================================================================
-// ANONYMOUS NAMESPACE – internal helpers
+// LOCAL CONSTANTS AND HELPERS
 //=============================================================================================================
 
-namespace
-{
+namespace {
 
-//=========================================================================
-// Constants (matching MNE-Python mne/forward/_lead_dots.py)
-//=========================================================================
+constexpr int    kNCoeff         = 100;                 // Legendre polynomial terms
+constexpr double kMegConst       = 4e-14 * M_PI;        // mu_0^2 / (4*pi)
+constexpr double kEegConst       = 1.0 / (4.0 * M_PI);  // 1 / (4*pi)
+constexpr double kEegIntradScale = 0.7;                  // EEG integration radius scale
 
-/** Number of Legendre polynomial terms – matches MNE-Python "accurate" mode (n_coeff=100). */
-constexpr int kNCoeff = 100;
+constexpr float  kGradStd        = 5e-13f;              // gradiometer noise std (5 fT/cm)
+constexpr float  kMagStd         = 20e-15f;             // magnetometer noise std (20 fT)
+constexpr float  kEegStd         = 1e-6f;               // EEG noise std (1 µV)
 
-/** mu_0^2 / (4*pi)  –  _meg_const in _lead_dots.py. */
-constexpr double kMegConst = 4e-14 * M_PI;
+//=============================================================================================================
 
-/** 1 / (4*pi)  –  _eeg_const in _lead_dots.py. */
-constexpr double kEegConst = 1.0 / (4.0 * M_PI);
-
-/** EEG effective integration radius scale factor (applied inside _do_self_dots / _do_surface_dots). */
-constexpr double kEegIntradScale = 0.7;
-
-/** Ad-hoc noise standard deviations – matching MNE-Python make_ad_hoc_cov defaults. */
-constexpr float kGradStd = 5e-13f;   // 5 fT/cm  (gradiometers)
-constexpr float kMagStd  = 20e-15f;  // 20 fT    (magnetometers)
-constexpr float kEegStd  = 1e-6f;    // 0.2 µV   (EEG, but value passed is 1 µV here matching _setup_dots)
-
-//=========================================================================
-// Legendre polynomials
-// Port of _next_legen_der / _get_legen_der / _get_legen in _lead_dots.py
-//=========================================================================
-
-/**
- * Compute Legendre polynomials P_n(x) and their first and second
- * derivatives P_n'(x), P_n''(x) for n = 0 .. ncoeff-1.
- *
- * Matches the recurrence in MNE-Python _next_legen_der.
- */
+// Legendre polynomial P_n(x) with first and second derivatives for n = 0..ncoeff-1.
 void computeLegendreDer(double x, int ncoeff,
                         double* p, double* pd, double* pdd)
 {
@@ -118,11 +97,9 @@ void computeLegendreDer(double x, int ncoeff,
     }
 }
 
-/**
- * Compute Legendre polynomials P_n(x) for n = 0 .. ncoeff-1.
- *
- * Matches legendre.legvander in MNE-Python (standard three-term recurrence).
- */
+//=============================================================================================================
+
+// Legendre polynomial P_n(x) for n = 0..ncoeff-1 (three-term recurrence).
 void computeLegendreVal(double x, int ncoeff, double* p)
 {
     p[0] = 1.0;
@@ -133,20 +110,9 @@ void computeLegendreVal(double x, int ncoeff, double* p)
     }
 }
 
-//=========================================================================
-// Series sums
-// Port of _comp_sums_meg / _comp_sum_eeg in _lead_dots.py
-//=========================================================================
+//=============================================================================================================
 
-/**
- * MEG Legendre series sums (surface integral, volume_integral = false).
- *
- * The four sums (for n = 1 .. kNCoeff-1):
- *   sums[0] = Σ beta^(n+1) · n(n+1)/(2n+1)       · P_n(ct)
- *   sums[1] = Σ beta^(n+1) · n/(2n+1)             · P_n'(ct)
- *   sums[2] = Σ beta^(n+1) · n/((2n+1)(n+1))      · P_n'(ct)
- *   sums[3] = Σ beta^(n+1) · n/((2n+1)(n+1))      · P_n''(ct)
- */
+// MEG Legendre series sums (four components, n = 1..kNCoeff-1).
 void compSumsMeg(double beta, double ctheta, double sums[4])
 {
     double p[kNCoeff], pd[kNCoeff], pdd[kNCoeff];
@@ -167,10 +133,9 @@ void compSumsMeg(double beta, double ctheta, double sums[4])
     }
 }
 
-/**
- * EEG Legendre series sum (for n = 1 .. kNCoeff-1):
- *   sum = Σ beta^n · (2n+1)^2 / n · P_n(ct)
- */
+//=============================================================================================================
+
+// EEG Legendre series sum (n = 1..kNCoeff-1).
 double compSumEeg(double beta, double ctheta)
 {
     double p[kNCoeff];
@@ -187,18 +152,9 @@ double compSumEeg(double beta, double ctheta)
     return sum;
 }
 
-//=========================================================================
-// Sphere dot products
-// Port of _fast_sphere_dot_r0 in _lead_dots.py
-//=========================================================================
+//=============================================================================================================
 
-/**
- * MEG sphere dot product for two integration points.
- *
- * rr1, rr2  : normalised position vectors (relative to sphere origin)
- * lr1, lr2  : magnitudes of position vectors
- * cosmag1/2 : direction (cosmag) vectors
- */
+// MEG sphere dot product for two integration points.
 double sphereDotMeg(double intrad,
                     const Vector3d& rr1, double lr1, const Vector3d& cosmag1,
                     const Vector3d& rr2, double lr2, const Vector3d& cosmag2)
@@ -229,9 +185,9 @@ double sphereDotMeg(double intrad,
     return result;
 }
 
-/**
- * EEG sphere dot product for two integration points.
- */
+//=============================================================================================================
+
+// EEG sphere dot product for two integration points.
 double sphereDotEeg(double intrad,
                     const Vector3d& rr1, double lr1,
                     const Vector3d& rr2, double lr2)
@@ -245,60 +201,48 @@ double sphereDotEeg(double intrad,
     return kEegConst * sum / (lr1 * lr2);
 }
 
-//=========================================================================
-// Coil data extraction
-// Port of the rmag/rlens/cosmags/ws extraction in _do_self_dots
-//=========================================================================
+//=============================================================================================================
 
-/** Per-coil data: normalised positions relative to origin, magnitudes, etc. */
+// Per-coil data: normalised positions relative to sphere origin.
 struct CoilData
 {
-    std::vector<Vector3d> rmag;     // normalised position vectors
-    std::vector<double>   rlen;     // magnitudes
-    std::vector<Vector3d> cosmag;   // direction vectors
-    std::vector<double>   w;        // integration weights
-    int np;                         // number of integration points
+    Eigen::MatrixX3d rmag;     // normalised position vectors (np × 3)
+    Eigen::VectorXd  rlen;     // magnitudes (np)
+    Eigen::MatrixX3d cosmag;   // direction vectors (np × 3)
+    Eigen::VectorXd  w;        // integration weights (np)
+
+    int np() const { return static_cast<int>(rlen.size()); }
 };
 
-Vector3d toVec3d(const float* v) { return Vector3d(v[0], v[1], v[2]); }
+//=============================================================================================================
 
-/**
- * Extract & normalise coil integration-point data relative to sphere origin r0.
- *
- * Matches the "convert to normalised distances from expansion center" block
- * inside _do_self_dots / _do_surface_dots in _lead_dots.py.
- */
+// Extract and normalise coil integration-point data relative to sphere origin.
 CoilData extractCoilData(const FwdCoil* coil, const Vector3d& r0)
 {
     CoilData cd;
-    cd.np = coil->np;
-    cd.rmag.resize(cd.np);
-    cd.rlen.resize(cd.np);
-    cd.cosmag.resize(cd.np);
-    cd.w.resize(cd.np);
+    const int n = coil->np;
+    cd.rmag.resize(n, 3);
+    cd.rlen.resize(n);
+    cd.cosmag.resize(n, 3);
+    cd.w.resize(n);
 
-    for (int i = 0; i < cd.np; ++i) {
+    for (int i = 0; i < n; ++i) {
         Vector3d rel = coil->rmag.row(i).cast<double>().transpose() - r0;
         double len = rel.norm();
-        cd.rmag[i]   = (len > 0.0) ? Vector3d(rel / len) : Vector3d::Zero();
-        cd.rlen[i]   = len;
-        cd.cosmag[i] = coil->cosmag.row(i).cast<double>().transpose();
-        cd.w[i]      = static_cast<double>(coil->w[i]);
+        if (len > 0.0)
+            cd.rmag.row(i) = (rel / len).transpose();
+        else
+            cd.rmag.row(i).setZero();
+        cd.rlen(i)       = len;
+        cd.cosmag.row(i) = coil->cosmag.row(i).cast<double>();
+        cd.w(i)          = static_cast<double>(coil->w[i]);
     }
     return cd;
 }
 
-//=========================================================================
-// Self-dot and surface-dot matrices
-// Port of _do_self_dots / _do_surface_dots in _lead_dots.py
-//=========================================================================
+//=============================================================================================================
 
-/**
- * Compute the sensor self-dot-product matrix (nchan × nchan, symmetric).
- *
- * Port of _do_self_dots in _lead_dots.py.
- * Uses double precision throughout to match MNE-Python (float64).
- */
+// Compute sensor self-dot-product matrix (nchan x nchan, symmetric).
 MatrixXd doSelfDots(double intrad, const FwdCoilSet& coils, const Vector3d& r0, bool isMeg)
 {
     const int nc = coils.ncoil();
@@ -313,17 +257,17 @@ MatrixXd doSelfDots(double intrad, const FwdCoilSet& coils, const Vector3d& r0, 
             double dot = 0.0;
             const CoilData& c1 = cdata[ci1];
             const CoilData& c2 = cdata[ci2];
-            for (int i = 0; i < c1.np; ++i) {
-                for (int j = 0; j < c2.np; ++j) {
-                    double ww = c1.w[i] * c2.w[j];
+            for (int i = 0; i < c1.np(); ++i) {
+                for (int j = 0; j < c2.np(); ++j) {
+                    double ww = c1.w(i) * c2.w(j);
                     if (isMeg) {
                         dot += ww * sphereDotMeg(intrad,
-                                   c1.rmag[i], c1.rlen[i], c1.cosmag[i],
-                                   c2.rmag[j], c2.rlen[j], c2.cosmag[j]);
+                                   c1.rmag.row(i).transpose(), c1.rlen(i), c1.cosmag.row(i).transpose(),
+                                   c2.rmag.row(j).transpose(), c2.rlen(j), c2.cosmag.row(j).transpose());
                     } else {
                         dot += ww * sphereDotEeg(intrad,
-                                   c1.rmag[i], c1.rlen[i],
-                                   c2.rmag[j], c2.rlen[j]);
+                                   c1.rmag.row(i).transpose(), c1.rlen(i),
+                                   c2.rmag.row(j).transpose(), c2.rlen(j));
                     }
                 }
             }
@@ -334,16 +278,9 @@ MatrixXd doSelfDots(double intrad, const FwdCoilSet& coils, const Vector3d& r0, 
     return products;
 }
 
-/**
- * Compute the surface-to-sensor dot-product matrix (nvert × nchan).
- *
- * For MEG, surface normals serve as cosmag1 (the "sensor direction" at each
- * surface vertex) and coil integration points provide cosmag2/weights.
- * FsSurface vertices have no integration weights (w1 = None in Python).
- *
- * Port of _do_surface_dots in _lead_dots.py.
- * Uses double precision throughout to match MNE-Python (float64).
- */
+//=============================================================================================================
+
+// Compute surface-to-sensor dot-product matrix (nvert x nchan).
 MatrixXd doSurfaceDots(double intrad, const FwdCoilSet& coils,
                        const MatrixX3f& rr, const MatrixX3f& nn,
                        const Vector3d& r0, bool isMeg)
@@ -358,7 +295,7 @@ MatrixXd doSurfaceDots(double intrad, const FwdCoilSet& coils,
 
     MatrixXd products = MatrixXd::Zero(nv, nc);
     for (int vi = 0; vi < nv; ++vi) {
-        // FsSurface vertex position relative to origin (normalised)
+        // Vertex position relative to origin (normalised)
         Vector3d rel = rr.row(vi).cast<double>() - r0.transpose();
         double lsurf = rel.norm();
         Vector3d rsurf = (lsurf > 0.0) ? Vector3d(rel / lsurf) : Vector3d::Zero();
@@ -367,15 +304,15 @@ MatrixXd doSurfaceDots(double intrad, const FwdCoilSet& coils,
         for (int ci = 0; ci < nc; ++ci) {
             const CoilData& c = cdata[ci];
             double dot = 0.0;
-            for (int j = 0; j < c.np; ++j) {
+            for (int j = 0; j < c.np(); ++j) {
                 if (isMeg) {
-                    dot += c.w[j] * sphereDotMeg(intrad,
+                    dot += c.w(j) * sphereDotMeg(intrad,
                                rsurf, lsurf, nsurf,
-                               c.rmag[j], c.rlen[j], c.cosmag[j]);
+                               c.rmag.row(j).transpose(), c.rlen(j), c.cosmag.row(j).transpose());
                 } else {
-                    dot += c.w[j] * sphereDotEeg(intrad,
+                    dot += c.w(j) * sphereDotEeg(intrad,
                                rsurf, lsurf,
-                               c.rmag[j], c.rlen[j]);
+                               c.rmag.row(j).transpose(), c.rlen(j));
                 }
             }
             products(vi, ci) = dot;
@@ -384,12 +321,9 @@ MatrixXd doSurfaceDots(double intrad, const FwdCoilSet& coils,
     return products;
 }
 
-//=========================================================================
-// Ad-hoc noise standard deviations
-// Matching MNE-Python make_ad_hoc_cov (called from _setup_dots)
-//=========================================================================
+//=============================================================================================================
 
-/** MEG noise stds: magnetometers get kMagStd, gradiometers get kGradStd. */
+// MEG ad-hoc noise standard deviations.
 VectorXd adHocMegStds(const FwdCoilSet& coils)
 {
     VectorXd stds(coils.ncoil());
@@ -400,41 +334,19 @@ VectorXd adHocMegStds(const FwdCoilSet& coils)
     return stds;
 }
 
-/** EEG noise std: uniform kEegStd for all electrodes. */
+//=============================================================================================================
+
+// EEG ad-hoc noise standard deviation (uniform).
 VectorXd adHocEegStds(int ncoil)
 {
     return VectorXd::Constant(ncoil, static_cast<double>(kEegStd));
 }
 
-//=========================================================================
-// Mapping matrix computation
-// Port of _compute_mapping_matrix / _pinv_trunc in _field_interpolation.py
-//=========================================================================
+//=============================================================================================================
 
-/**
- * Compute the mapping matrix from sensor self-dots and surface-dots.
- *
- * All internal computation uses double precision to match MNE-Python (float64).
- * The final mapping matrix is returned in float for GPU-friendly rendering.
- *
- * Steps (matching MNE-Python _compute_mapping_matrix):
- *   0. Apply SSP projector: proj_dots = P^T @ self_dots @ P
- *   1. Whiten: whitener = diag(1 / noiseStds)
- *   2. whitened_dots = whitener @ proj_dots @ whitener
- *   3. SVD → truncated pseudo-inverse (_pinv_trunc)
- *   4. inv_whitened = whitener @ inv @ whitener
- *   5. inv_whitened_proj = P^T @ inv_whitened  (because surface_dots are unprojected)
- *   6. mapping = surface_dots @ inv_whitened_proj
- *   7. For EEG with average ref: subtract column means
- *
- * @param[in] selfDots      Sensor self-dot matrix (nchan × nchan)
- * @param[in] surfaceDots   FsSurface-to-sensor dot matrix (nvert × nchan)
- * @param[in] noiseStds     Ad-hoc noise standard deviations (nchan)
- * @param[in] miss          Eigenvalue truncation threshold
- * @param[in] projOp        SSP projector matrix (nchan × nchan), identity if empty
- * @param[in] applyAvgRef   Whether to apply average reference (EEG)
- */
-QSharedPointer<MatrixXf> computeMappingMatrix(const MatrixXd& selfDots,
+// Compute mapping matrix via whitened SVD pseudo-inverse.
+// Returns float for GPU-friendly rendering; all internal math is double.
+std::unique_ptr<MatrixXf> computeMappingMatrix(const MatrixXd& selfDots,
                                               const MatrixXd& surfaceDots,
                                               const VectorXd& noiseStds,
                                               double miss,
@@ -442,13 +354,12 @@ QSharedPointer<MatrixXf> computeMappingMatrix(const MatrixXd& selfDots,
                                               bool applyAvgRef = false)
 {
     if (selfDots.rows() == 0 || surfaceDots.rows() == 0) {
-        return QSharedPointer<MatrixXf>();
+        return nullptr;
     }
 
     const int nchan = selfDots.rows();
 
-    // Step 0: Apply SSP projector to self-dots
-    // proj_dots = P^T @ self_dots @ P
+    // Apply SSP projector to self-dots
     MatrixXd projDots;
     bool hasProj = (projOp.rows() == nchan && projOp.cols() == nchan);
     if (hasProj) {
@@ -457,24 +368,23 @@ QSharedPointer<MatrixXf> computeMappingMatrix(const MatrixXd& selfDots,
         projDots = selfDots;
     }
 
-    // Step 1: Build whitener = diag(1/std)
+    // Build whitener
     VectorXd whitener(nchan);
     for (int i = 0; i < nchan; ++i) {
         whitener(i) = (noiseStds(i) > 0.0) ? (1.0 / noiseStds(i)) : 0.0;
     }
 
-    // Step 2: whitened_dots = whitener @ proj_dots @ whitener
+    // Whiten self-dots
     MatrixXd whitenedDots = whitener.asDiagonal() * projDots * whitener.asDiagonal();
 
-    // Step 3: SVD → truncated pseudo-inverse (port of _pinv_trunc)
+    // SVD pseudo-inverse with eigenvalue truncation
     JacobiSVD<MatrixXd> svd(whitenedDots, ComputeFullU | ComputeFullV);
     VectorXd s = svd.singularValues();
     if (s.size() == 0 || s(0) <= 0.0) {
-        return QSharedPointer<MatrixXf>();
+        return nullptr;
     }
 
     // Eigenvalue truncation: keep components explaining >= (1-miss) of total variance
-    // varexp = cumsum(s) / sum(s);  n = first index where varexp >= (1-miss), +1
     VectorXd varexp(s.size());
     varexp(0) = s(0);
     for (int i = 1; i < s.size(); ++i) {
@@ -490,18 +400,17 @@ QSharedPointer<MatrixXf> computeMappingMatrix(const MatrixXd& selfDots,
         }
     }
 
-    // Pseudo-inverse: inv = V[:,:n] @ diag(1/s[:n]) @ U[:,:n]^T
+    // Truncated pseudo-inverse
     VectorXd sinv = VectorXd::Zero(s.size());
     for (int i = 0; i < n; ++i) {
         sinv(i) = (s(i) > 0.0) ? (1.0 / s(i)) : 0.0;
     }
     MatrixXd inv = svd.matrixV() * sinv.asDiagonal() * svd.matrixU().transpose();
 
-    // Step 4: inv_whitened = whitener @ inv @ whitener
+    // Unwhiten inverse
     MatrixXd invWhitened = whitener.asDiagonal() * inv * whitener.asDiagonal();
 
-    // Step 5: Apply projector to inverse (because surface_dots are unprojected)
-    // inv_whitened_proj = P^T @ inv_whitened
+    // Apply projector to inverse
     MatrixXd invWhitenedProj;
     if (hasProj) {
         invWhitenedProj = projOp.transpose() * invWhitened;
@@ -509,10 +418,10 @@ QSharedPointer<MatrixXf> computeMappingMatrix(const MatrixXd& selfDots,
         invWhitenedProj = invWhitened;
     }
 
-    // Step 6: mapping = surface_dots @ inv_whitened_proj
+    // Compute final mapping
     MatrixXd mapping = surfaceDots * invWhitenedProj;
 
-    // Step 7: For EEG with average reference, subtract column means
+    // Apply average reference for EEG
     if (applyAvgRef) {
         VectorXd colMeans = mapping.colwise().mean();
         mapping.rowwise() -= colMeans.transpose();
@@ -520,7 +429,7 @@ QSharedPointer<MatrixXf> computeMappingMatrix(const MatrixXd& selfDots,
 
     // Convert to float
     MatrixXf mappingF = mapping.cast<float>();
-    return QSharedPointer<MatrixXf>::create(std::move(mappingF));
+    return std::make_unique<MatrixXf>(std::move(mappingF));
 }
 
 } // anonymous namespace
@@ -529,7 +438,7 @@ QSharedPointer<MatrixXf> computeMappingMatrix(const MatrixXd& selfDots,
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QSharedPointer<MatrixXf> FwdFieldMap::computeMegMapping(
+std::unique_ptr<MatrixXf> FwdFieldMap::computeMegMapping(
     const FwdCoilSet& coils,
     const MatrixX3f& vertices,
     const MatrixX3f& normals,
@@ -538,24 +447,21 @@ QSharedPointer<MatrixXf> FwdFieldMap::computeMegMapping(
     float miss)
 {
     if (coils.ncoil() <= 0 || vertices.rows() == 0 || normals.rows() != vertices.rows()) {
-        return QSharedPointer<MatrixXf>();
+        return nullptr;
     }
 
     const Vector3d r0 = origin.cast<double>();
 
-    // Compute self-dot matrix (nchan × nchan) in double precision
     MatrixXd selfDots = doSelfDots(intrad, coils, r0, /*isMeg=*/true);
-
-    // Compute surface-dot matrix (nvert × nchan) in double precision
     MatrixXd surfaceDots = doSurfaceDots(intrad, coils, vertices, normals, r0, /*isMeg=*/true);
-
-    // Ad-hoc noise for whitening
     VectorXd stds = adHocMegStds(coils);
 
     return computeMappingMatrix(selfDots, surfaceDots, stds, static_cast<double>(miss));
 }
 
-QSharedPointer<MatrixXf> FwdFieldMap::computeMegMapping(
+//=============================================================================================================
+
+std::unique_ptr<MatrixXf> FwdFieldMap::computeMegMapping(
     const FwdCoilSet& coils,
     const MatrixX3f& vertices,
     const MatrixX3f& normals,
@@ -566,7 +472,7 @@ QSharedPointer<MatrixXf> FwdFieldMap::computeMegMapping(
     float miss)
 {
     if (coils.ncoil() <= 0 || vertices.rows() == 0 || normals.rows() != vertices.rows()) {
-        return QSharedPointer<MatrixXf>();
+        return nullptr;
     }
 
     const Vector3d r0 = origin.cast<double>();
@@ -583,7 +489,9 @@ QSharedPointer<MatrixXf> FwdFieldMap::computeMegMapping(
                                 static_cast<double>(miss), projOp, false);
 }
 
-QSharedPointer<MatrixXf> FwdFieldMap::computeEegMapping(
+//=============================================================================================================
+
+std::unique_ptr<MatrixXf> FwdFieldMap::computeEegMapping(
     const FwdCoilSet& coils,
     const MatrixX3f& vertices,
     const Vector3f& origin,
@@ -591,30 +499,25 @@ QSharedPointer<MatrixXf> FwdFieldMap::computeEegMapping(
     float miss)
 {
     if (coils.ncoil() <= 0 || vertices.rows() == 0) {
-        return QSharedPointer<MatrixXf>();
+        return nullptr;
     }
 
-    // EEG uses scaled integration radius (matching _do_self_dots / _do_surface_dots)
     const double eegIntrad = intrad * kEegIntradScale;
     const Vector3d r0 = origin.cast<double>();
 
-    // For EEG surface dots we still need normals; since the EEG sphere dot
-    // product does not use cosmag1, we supply zero normals (they are unused).
+    // EEG sphere dot does not use surface normals, so pass zeros
     MatrixX3f dummyNormals = MatrixX3f::Zero(vertices.rows(), 3);
 
-    // Compute self-dot matrix (nchan × nchan) in double precision
     MatrixXd selfDots = doSelfDots(eegIntrad, coils, r0, /*isMeg=*/false);
-
-    // Compute surface-dot matrix (nvert × nchan) in double precision
     MatrixXd surfaceDots = doSurfaceDots(eegIntrad, coils, vertices, dummyNormals, r0, /*isMeg=*/false);
-
-    // Ad-hoc noise for whitening
     VectorXd stds = adHocEegStds(coils.ncoil());
 
     return computeMappingMatrix(selfDots, surfaceDots, stds, static_cast<double>(miss));
 }
 
-QSharedPointer<MatrixXf> FwdFieldMap::computeEegMapping(
+//=============================================================================================================
+
+std::unique_ptr<MatrixXf> FwdFieldMap::computeEegMapping(
     const FwdCoilSet& coils,
     const MatrixX3f& vertices,
     const Vector3f& origin,
@@ -624,14 +527,13 @@ QSharedPointer<MatrixXf> FwdFieldMap::computeEegMapping(
     float miss)
 {
     if (coils.ncoil() <= 0 || vertices.rows() == 0) {
-        return QSharedPointer<MatrixXf>();
+        return nullptr;
     }
 
     const double eegIntrad = intrad * kEegIntradScale;
     const Vector3d r0 = origin.cast<double>();
 
     MatrixX3f dummyNormals = MatrixX3f::Zero(vertices.rows(), 3);
-
     MatrixXd selfDots = doSelfDots(eegIntrad, coils, r0, /*isMeg=*/false);
     MatrixXd surfaceDots = doSurfaceDots(eegIntrad, coils, vertices, dummyNormals, r0, /*isMeg=*/false);
     VectorXd stds = adHocEegStds(coils.ncoil());
@@ -641,10 +543,6 @@ QSharedPointer<MatrixXf> FwdFieldMap::computeEegMapping(
     FIFFLIB::FiffProj::make_projector(info.projs, chNames, projOp, info.bads);
 
     // Check for average EEG reference projection
-    // Matches MNE-Python's _has_eeg_average_ref_proj:
-    // - kind == FIFFV_PROJ_ITEM_EEG_AVREF (10), OR
-    // - desc matches "Average .* reference"
-    // Note: Python default is check_active=False, so we don't require active.
     bool hasAvgRef = false;
     for (const auto& proj : info.projs) {
         if (proj.kind == FIFFV_PROJ_ITEM_EEG_AVREF ||

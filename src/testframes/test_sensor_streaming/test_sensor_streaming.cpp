@@ -77,9 +77,9 @@ private slots:
  * Returns an (nVertices x nSensors) matrix where each vertex is mapped
  * to the nearest sensor with weight 1.0.
  */
-static QSharedPointer<Eigen::MatrixXf> createTestMapping(int nVertices, int nSensors)
+static std::shared_ptr<Eigen::MatrixXf> createTestMapping(int nVertices, int nSensors)
 {
-    auto mat = QSharedPointer<Eigen::MatrixXf>::create(nVertices, nSensors);
+    auto mat = std::make_shared<Eigen::MatrixXf>(nVertices, nSensors);
     mat->setZero();
 
     // Simple round-robin allocation: vertex i maps to sensor i % nSensors
@@ -92,9 +92,9 @@ static QSharedPointer<Eigen::MatrixXf> createTestMapping(int nVertices, int nSen
 /**
  * Create a uniform mapping matrix where every vertex gets the average of all sensors.
  */
-static QSharedPointer<Eigen::MatrixXf> createUniformMapping(int nVertices, int nSensors)
+static std::shared_ptr<Eigen::MatrixXf> createUniformMapping(int nVertices, int nSensors)
 {
-    auto mat = QSharedPointer<Eigen::MatrixXf>::create(nVertices, nSensors);
+    auto mat = std::make_shared<Eigen::MatrixXf>(nVertices, nSensors);
     mat->setConstant(1.0f / nSensors);
     return mat;
 }
@@ -310,7 +310,7 @@ void TestSensorStreaming::testWorkerColorOutput()
     const int nVertices = 4;
 
     // Create mapping where vertex 0,1 map to sensor 0, vertex 2,3 map to sensor 1
-    auto mapping = QSharedPointer<Eigen::MatrixXf>::create(nVertices, nSensors);
+    auto mapping = std::make_shared<Eigen::MatrixXf>(nVertices, nSensors);
     mapping->setZero();
     (*mapping)(0, 0) = 1.0f;
     (*mapping)(1, 0) = 1.0f;
@@ -348,7 +348,7 @@ void TestSensorStreaming::testWorkerSymmetricNormalization()
     const int nVertices = 3;
 
     // 1:1 mapping with different weights
-    auto mapping = QSharedPointer<Eigen::MatrixXf>::create(nVertices, nSensors);
+    auto mapping = std::make_shared<Eigen::MatrixXf>(nVertices, nSensors);
     (*mapping)(0, 0) = 1.0f;   // Will get +1.0 * data
     (*mapping)(1, 0) = 0.0f;   // Will get 0.0
     (*mapping)(2, 0) = -1.0f;  // Will get -1.0 * data
@@ -383,7 +383,7 @@ void TestSensorStreaming::testWorkerColormapChange()
     const int nSensors = 1;
     const int nVertices = 3;
 
-    auto mapping = QSharedPointer<Eigen::MatrixXf>::create(nVertices, nSensors);
+    auto mapping = std::make_shared<Eigen::MatrixXf>(nVertices, nSensors);
     (*mapping)(0, 0) = 1.0f;
     (*mapping)(1, 0) = 0.0f;
     (*mapping)(2, 0) = -1.0f;

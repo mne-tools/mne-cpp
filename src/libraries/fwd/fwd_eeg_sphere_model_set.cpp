@@ -46,37 +46,12 @@
 
 #include <QString>
 #include <QFile>
+#include <QRegularExpression>
+#include <QTextStream>
 
 #include <Eigen/Core>
 
 using namespace Eigen;
-
-//=============================================================================================================
-// STATIC DEFINITIONS
-//=============================================================================================================
-
-/*
- * Basics...
- */
-#define MALLOC_2(x,t) (t *)malloc((x)*sizeof(t))
-#define REALLOC_2(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
-#define FREE_2(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#define MAXLINE 500
-
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
-
-#define SEP ":\n\r"
-
-//=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -92,14 +67,6 @@ FwdEegSphereModelSet::FwdEegSphereModelSet()
 {
 }
 
-////=============================================================================================================
-
-//FwdEegSphereModelSet::FwdEegSphereModelSet(const FwdEegSphereModelSet &p_FwdEegSphereModelSet)
-//: m_qListModels(p_FwdEegSphereModelSet.m_qListModels)
-//{
-
-//}
-
 //=============================================================================================================
 
 FwdEegSphereModelSet::~FwdEegSphereModelSet()
@@ -108,32 +75,12 @@ FwdEegSphereModelSet::~FwdEegSphereModelSet()
 
 //=============================================================================================================
 
-//void FwdEegSphereModelSet::fwd_free_eeg_sphere_model_set(FwdEegSphereModelSet* s)
-
-//{
-//    if (!s)
-//        return;
-
-//    return;
-//}
-
-//=============================================================================================================
-
-//FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_new_eeg_sphere_model_set()
-//{
-//    FwdEegSphereModelSet* s = new FwdEegSphereModelSet;
-
-//    return s;
-//}
-
-//=============================================================================================================
-
-FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_add_to_eeg_sphere_model_set(FwdEegSphereModelSet* s, FwdEegSphereModel* m)
+FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_add_to_eeg_sphere_model_set(FwdEegSphereModelSet* s, FwdEegSphereModel::UPtr m)
 {
     if (!s)
         s = new FwdEegSphereModelSet;
 
-    s->models.push_back(std::unique_ptr<FwdEegSphereModel>(m));
+    s->models.push_back(std::move(m));
     return s;
 }
 
@@ -155,158 +102,89 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_add_default_eeg_sphere_model(Fwd
 //fwd_eeg_sphere_models.c
 FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_load_eeg_sphere_models(const QString& filename, FwdEegSphereModelSet* now)
 {
-    char line[MAXLINE];
-    FILE *fp = NULL;
-    QString name;
-    VectorXf rads;
-    VectorXf sigmas;
-    int   nlayer  = 0;
-    char *one, *two;
-    QString tag;
-
     if (!now)
         now = fwd_add_default_eeg_sphere_model(now);
 
     if (filename.isEmpty())
         return now;
 
-    QFile t_file(filename);
-    if (!t_file.isReadable())	/* Never mind about an unaccesible file */
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return now;
 
-    if ((fp = fopen(filename.toUtf8().data(),"r")) == NULL) {
-        printf(filename.toUtf8().data());
-        goto bad;
-    }
-    while (fgets(line,MAXLINE,fp) != NULL) {
-        if (line[0] == '#')
-            continue;
-        one = strtok(line,SEP);
-        if (one != NULL) {
-            if (tag.isEmpty() || tag.size() == 0)
-                name = one;
-            else {
-                name = QString("%1 %2").arg(one).arg(tag);
-            }
-            while (1) {
-                one = strtok(NULL,SEP);
-                if (one == NULL)
-                    break;
-                two = strtok(NULL,SEP);
-                if (two == NULL)
-                    break;
-                rads.resize(nlayer+1);
-                sigmas.resize(nlayer+1);
-                if (sscanf(one,"%g",rads[nlayer]) != 1) {
-                    nlayer = 0;
-                    break;
-                }
-                if (sscanf(two,"%g",sigmas[nlayer]) != 1) {
-                    nlayer = 0;
-                    break;
-                }
-                nlayer++;
-            }
-            if (nlayer > 0)
-                now = fwd_add_to_eeg_sphere_model_set(now,FwdEegSphereModel::fwd_create_eeg_sphere_model(name,nlayer,rads,sigmas));
-            nlayer = 0;
-        }
-    }
-    if (ferror(fp)) {
-        printf(filename.toUtf8().data());
-        goto bad;
-    }
-    fclose(fp);
-    return now;
+    QTextStream in(&file);
+    QString name;
+    VectorXf rads;
+    VectorXf sigmas;
+    int nlayer = 0;
 
-bad : {
-        if (fp)
-            fclose(fp);
-        delete now;
-        return NULL;
+    while (!in.atEnd()) {
+        QString line = in.readLine().trimmed();
+        if (line.isEmpty() || line.startsWith('#'))
+            continue;
+
+        QStringList parts = line.split(QRegularExpression("[:\\n\\r]"), Qt::SkipEmptyParts);
+        if (parts.isEmpty())
+            continue;
+
+        name = parts[0].trimmed();
+        nlayer = 0;
+
+        for (int i = 1; i + 1 < parts.size(); i += 2) {
+            bool okRad = false, okSig = false;
+            float r = parts[i].trimmed().toFloat(&okRad);
+            float s = parts[i + 1].trimmed().toFloat(&okSig);
+            if (!okRad || !okSig)
+                break;
+            rads.conservativeResize(nlayer + 1);
+            sigmas.conservativeResize(nlayer + 1);
+            rads[nlayer] = r;
+            sigmas[nlayer] = s;
+            nlayer++;
+        }
+        if (nlayer > 0)
+            now = fwd_add_to_eeg_sphere_model_set(now, FwdEegSphereModel::fwd_create_eeg_sphere_model(name, nlayer, rads, sigmas));
     }
+    return now;
 }
 
 //=============================================================================================================
 //fwd_eeg_sphere_models.c
 FwdEegSphereModel* FwdEegSphereModelSet::fwd_select_eeg_sphere_model(const QString& p_sName)
 {
-    int k;
-
     QString name("Default");
 
     if (!p_sName.isEmpty())
         name = p_sName;
 
     if (this->nmodel() == 0) {
-        printf("No EEG sphere model definitions available");
-        return NULL;
+        qWarning("No EEG sphere model definitions available");
+        return nullptr;
     }
 
-    for (k = 0; k < this->nmodel(); k++) {
+    for (int k = 0; k < this->nmodel(); k++) {
         if (this->models[k]->name.compare(name) == 0) {
-            printf("Selected model: %s\n",this->models[k]->name.toUtf8().constData());
+            qInfo("Selected model: %s",this->models[k]->name.toUtf8().constData());
             return new FwdEegSphereModel(*(this->models[k]));
         }
     }
-    printf("EEG sphere model %s not found.",name.toUtf8().constData());
-    return NULL;
+    qWarning("EEG sphere model %s not found.",name.toUtf8().constData());
+    return nullptr;
 }
 
 //=============================================================================================================
 //dipole_fit_setup.c
-void FwdEegSphereModelSet::fwd_list_eeg_sphere_models(FILE *f)
+void FwdEegSphereModelSet::fwd_list_eeg_sphere_models()
 {
-    int k,p;
-    FwdEegSphereModel* this_model;
-
-    if ( this->nmodel() < 0 )
+    if (this->nmodel() <= 0)
         return;
-    fprintf(f,"Available EEG sphere models:\n");
-    for (k = 0; k < this->nmodel(); k++) {
-        this_model = this->models[k].get();
-        fprintf(f,"\t%s : %d",this_model->name.toUtf8().constData(),this_model->nlayer());
-        for (p = 0; p < this_model->nlayer(); p++)
-            fprintf(f," : %7.3f : %7.3f",this_model->layers[p].rel_rad,this_model->layers[p].sigma);
-        fprintf(f,"\n");
+    qInfo("Available EEG sphere models:");
+    for (int k = 0; k < this->nmodel(); k++) {
+        FwdEegSphereModel* this_model = this->models[k].get();
+        QString line = QString("\t%1 : %2").arg(this_model->name).arg(this_model->nlayer());
+        for (int p = 0; p < this_model->nlayer(); p++)
+            line += QString(" : %1 : %2").arg(this_model->layers[p].rel_rad, 7, 'f', 3).arg(this_model->layers[p].sigma, 7, 'f', 3);
+        qInfo("%s", line.toUtf8().constData());
     }
 }
 
-////=============================================================================================================
-
-//void FwdEegSphereModelSet::addFwdEegSphereModel(const FwdEegSphereModel &p_FwdEegSphereModel)
-//{
-//    m_qListModels.append(p_FwdEegSphereModel);
-//}
-
-////=============================================================================================================
-
-//const FwdEegSphereModel& FwdEegSphereModelSet::operator[] (qint32 idx) const
-//{
-//    if (idx>=m_qListModels.length())
-//    {
-//        qWarning("Warning: Required FwdEegSphereModel doesn't exist! Returning FwdEegSphereModel '0'.");
-//        idx=0;
-//    }
-//    return m_qListModels[idx];
-//}
-
-////=============================================================================================================
-
-//FwdEegSphereModel& FwdEegSphereModelSet::operator[] (qint32 idx)
-//{
-//    if (idx >= m_qListModels.length())
-//    {
-//        qWarning("Warning: Required FwdEegSphereModel doesn't exist! Returning FwdEegSphereModel '0'.");
-//        idx = 0;
-//    }
-//    return m_qListModels[idx];
-//}
-
-////=============================================================================================================
-
-//FwdEegSphereModelSet &FwdEegSphereModelSet::operator<<(const FwdEegSphereModel &p_FwdEegSphereModel)
-//{
-//    this->m_qListModels.append(p_FwdEegSphereModel);
-//    return *this;
-//}

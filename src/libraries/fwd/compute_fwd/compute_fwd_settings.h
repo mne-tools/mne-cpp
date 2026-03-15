@@ -55,9 +55,11 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
 #include <QString>
 #include <QStringList>
+#include <QSharedPointer>
+
+#include <memory>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FWDLIB
@@ -79,9 +81,6 @@ namespace FWDLIB
 class FWDSHARED_EXPORT ComputeFwdSettings
 {
 public:
-    typedef QSharedPointer<ComputeFwdSettings> SPtr;             /**< Shared pointer type for ComputeFwdSettings. */
-    typedef QSharedPointer<const ComputeFwdSettings> ConstSPtr;  /**< Const shared pointer type for ComputeFwdSettings. */
-
     //=========================================================================================================
     /**
      * Default Constructor

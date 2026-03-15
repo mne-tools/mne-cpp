@@ -48,7 +48,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
 #include <QString>
 
 #include <memory>
@@ -83,8 +82,7 @@ class FWDSHARED_EXPORT FwdEegSphereModelSet
 {
 
 public:
-    typedef QSharedPointer<FwdEegSphereModelSet> SPtr;            /**< Shared pointer type for FwdEegSphereModelSet. */
-    typedef QSharedPointer<const FwdEegSphereModelSet> ConstSPtr; /**< Const shared pointer type for FwdEegSphereModelSet. */
+    typedef std::unique_ptr<FwdEegSphereModelSet> UPtr;   /**< Unique pointer type for FwdEegSphereModelSet. */
 
     //=========================================================================================================
     /**
@@ -92,32 +90,22 @@ public:
      */
     FwdEegSphereModelSet();
 
-//    //=========================================================================================================
-//    /**
-//    * Copy constructor.
-//    *
-//    * @param[in] p_FwdEegSphereModelSet     Forward EEG Sphere Model Set which should be copied
-//    */
-//    FwdEegSphereModelSet(const FwdEegSphereModelSet &p_FwdEegSphereModelSet);
-
     //=========================================================================================================
     /**
      * Destroys the Forward EEG Sphere Model Set description
      */
     ~FwdEegSphereModelSet();
 
-//    //ToDo move to destructor
-//    static void fwd_free_eeg_sphere_model_set(FwdEegSphereModelSet* s);
-
-//    static FwdEegSphereModelSet* fwd_new_eeg_sphere_model_set();
-
-    /*
-     * ToDo make non static member
-     * Add a new model to a set.
-     * The model should not be deallocated after this since it is attached to the set
+    //=========================================================================================================
+    /**
+     * Add a model to a set. The model will be owned by the set.
+     *
+     * @param[in] s   The model set (created if nullptr).
+     * @param[in] m   The model to add (ownership transferred).
+     *
+     * @return The model set.
      */
-
-    static FwdEegSphereModelSet* fwd_add_to_eeg_sphere_model_set(FwdEegSphereModelSet* s, FwdEegSphereModel* m);
+    static FwdEegSphereModelSet* fwd_add_to_eeg_sphere_model_set(FwdEegSphereModelSet* s, FwdEegSphereModel::UPtr m);
 
     //=========================================================================================================
     /**
@@ -155,64 +143,18 @@ public:
 
     //=========================================================================================================
     /**
-     * List the properties of available models
-     * Refactored from: dipole_fit_setup.c
-     *
-     * @param[in] f      std output stream.
+     * List the properties of available models via qInfo.
      */
-    void fwd_list_eeg_sphere_models(FILE *f);
+    void fwd_list_eeg_sphere_models();
 
-//    //=========================================================================================================
-//    /**
-//    * Appends an orward EEG Sphere Model to the set
-//    */
-//    void addFwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel);
-
-//    //=========================================================================================================
-//    /**
-//    * Returns the number of stored FwdEegSphereModels
-//    *
-//    * @return number of stored FwdEegSphereModels
-//    */
-//    inline qint32 size() const;
-
-//    //=========================================================================================================
-//    /**
-//    * Subscript operator [] to access FwdEegSphereModel by index
-//    *
-//    * @param[in] idx    the FwdEegSphereModel index.
-//    *
-//    * @return FwdEegSphereModel related to the parameter index.
-//    */
-//    const FwdEegSphereModel& operator[] (qint32 idx) const;
-
-//    //=========================================================================================================
-//    /**
-//    * Subscript operator [] to access FwdEegSphereModel by index
-//    *
-//    * @param[in] idx    the FwdEegSphereModel index.
-//    *
-//    * @return FwdEegSphereModel related to the parameter index.
-//    */
-//    FwdEegSphereModel& operator[] (qint32 idx);
-
-//    //=========================================================================================================
-//    /**
-//    * Subscript operator << to add a new FwdEegSphereModel
-//    *
-//    * @param[in] p_FwdEegSphereModel      FwdEegSphereModel to be added
-//    *
-//    * @return FwdEegSphereModelSet
-//    */
-//    FwdEegSphereModelSet& operator<< (const FwdEegSphereModel& p_FwdEegSphereModel);
-
+    /** Number of models in this set. */
     int nmodel() const
     {
         return models.size();
     }
 
 public:
-    std::vector<std::unique_ptr<FwdEegSphereModel>> models;     /**< Set of EEG sphere model definitions. */
+    std::vector<FwdEegSphereModel::UPtr> models;     /**< Set of EEG sphere model definitions. */
 };
 
 //=============================================================================================================

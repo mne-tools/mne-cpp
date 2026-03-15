@@ -134,10 +134,9 @@ private slots:
         Eigen::VectorXf sigmas(3);
         sigmas << 0.33f, 0.0042f, 0.33f;
 
-        FwdEegSphereModel *model = FwdEegSphereModel::fwd_create_eeg_sphere_model("test", 3, rads, sigmas);
+        auto model = FwdEegSphereModel::fwd_create_eeg_sphere_model("test", 3, rads, sigmas);
         QVERIFY(model != nullptr);
         QVERIFY(model->nlayer() >= 3);
-        delete model;
     }
 
     void sphereModel_setupAndFit()
@@ -147,11 +146,10 @@ private slots:
         Eigen::VectorXf sigmas(3);
         sigmas << 0.33f, 0.0042f, 0.33f;
 
-        FwdEegSphereModel *model = FwdEegSphereModel::fwd_create_eeg_sphere_model("test", 3, rads, sigmas);
+        auto model = FwdEegSphereModel::fwd_create_eeg_sphere_model("test", 3, rads, sigmas);
         QVERIFY(model != nullptr);
         double coeff = model->fwd_eeg_get_multi_sphere_model_coeff(1);
         QVERIFY(coeff != 0.0 || true);
-        delete model;
     }
 
     //=========================================================================

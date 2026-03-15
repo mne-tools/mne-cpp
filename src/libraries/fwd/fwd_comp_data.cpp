@@ -43,74 +43,9 @@
 #include <mne/mne_ctf_comp_data_set.h>
 #include <fiff/fiff_types.h>
 
-#include <iostream>
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
-
-#define X_60 0
-#define Y_60 1
-#define Z_60 2
-
-#define MALLOC_60(x,t) (t *)malloc((x)*sizeof(t))
-
-#define ALLOC_CMATRIX_60(x,y) mne_cmatrix_60((x),(y))
-
-#define FREE_60(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#define FREE_CMATRIX_60(m) mne_free_cmatrix_60((m))
-
-void mne_free_cmatrix_60 (float **m)
-{
-    if (m) {
-        FREE_60(*m);
-        FREE_60(m);
-    }
-}
-
-static void matrix_error_60 (int kind, int nr, int nc)
-{
-    if (kind == 1)
-        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
-    else if (kind == 2)
-        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
-    else
-        printf("Allocation error for a %d x %d matrix\n",nr,nc);
-    if (sizeof(void *) == 4) {
-        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
-        printf("Please consider moving to a 64-bit platform.");
-    }
-    printf("Cannot continue. Sorry.\n");
-    exit(1);
-}
-
-float **mne_cmatrix_60 (int nr,int nc)
-{
-    int i;
-    float **m;
-    float *whole;
-
-    m = MALLOC_60(nr,float *);
-    if (!m) matrix_error_60(1,nr,nc);
-    whole = MALLOC_60(nr*nc,float);
-    if (!whole) matrix_error_60(2,nr,nc);
-
-    for(i=0;i<nr;i++)
-        m[i] = whole + i*nc;
-    return m;
+namespace {
+constexpr int FAIL = -1;
+constexpr int OK   =  0;
 }
 
 //=============================================================================================================
@@ -127,12 +62,12 @@ using namespace FWDLIB;
 //=============================================================================================================
 
 FwdCompData::FwdCompData()
-:comp_coils (NULL)
+:comp_coils (nullptr)
 ,field      (nullptr)
 ,vec_field  (nullptr)
 ,field_grad (nullptr)
-,client     (NULL)
-,set        (NULL)
+,client     (nullptr)
+,set        (nullptr)
 {
 }
 
@@ -149,14 +84,11 @@ FwdCompData::~FwdCompData()
 //=============================================================================================================
 
 int FwdCompData::fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet &coils, Eigen::Ref<Eigen::VectorXf> res, void *client)
-/*
-          * Calculate the compensated field (one dipole component)
-          */
 {
-    FwdCompData* comp = (FwdCompData*)client;
+    FwdCompData* comp = static_cast<FwdCompData*>(client);
 
     if (!comp->field) {
-        printf("Field computation function is missing in fwd_comp_field_vec");
+        qWarning("Field computation function is missing in fwd_comp_field");
         return FAIL;
     }
     /*
@@ -182,45 +114,31 @@ int FwdCompData::fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f
     /*
        * Compute the compensated field
        */
-    return comp->set->apply(TRUE, res, comp->work);
+    return comp->set->apply(true, res, comp->work);
 }
 
 //=============================================================================================================
 
 int FwdCompData::fwd_make_ctf_comp_coils(MNECTFCompDataSet *set,
                                          FwdCoilSet *coils,
-                                         FwdCoilSet *comp_coils)   /* The compensation coil set */
-/*
- * Call make_comp using the information in the coil sets
- */
+                                         FwdCoilSet *comp_coils)
 {
     QList<FiffChInfo> chs;
     QList<FiffChInfo> compchs;
     int        nchan   = 0;
     int        ncomp   = 0;
-    FwdCoil* coil;
     int k,res;
 
-    if (!set) {
-        /*
-         * No compensation data available.
-         * The original C code (mne_make_ctf_comp) handled NULL gracefully
-         * because it was a free function. Now that make_comp is a member
-         * function we must guard against NULL here.
-         */
+    if (!set)
         return OK;
-    }
     if (!coils || coils->ncoil() <= 0) {
-        printf("Coil data missing in fwd_make_ctf_comp_coils");
+        qWarning("Coil data missing in fwd_make_ctf_comp_coils");
         return FAIL;
     }
-    /*
-       * Create the fake channel info which contain just enough information
-       * for make_comp
-       */
+
     for (k = 0; k < coils->ncoil(); k++) {
         chs.append(FiffChInfo());
-        coil = coils->coils[k].get();
+        FwdCoil* coil = coils->coils[k].get();
         chs[k].ch_name = coil->chname;
         chs[k].chpos.coil_type = coil->type;
         chs[k].kind = (coil->coil_class == FWD_COILC_EEG) ? FIFFV_EEG_CH : FIFFV_MEG_CH;
@@ -229,7 +147,7 @@ int FwdCompData::fwd_make_ctf_comp_coils(MNECTFCompDataSet *set,
     if (comp_coils && comp_coils->ncoil() > 0) {
         for (k = 0; k < comp_coils->ncoil(); k++) {
             compchs.append(FiffChInfo());
-            coil = comp_coils->coils[k].get();
+            FwdCoil* coil = comp_coils->coils[k].get();
             compchs[k].ch_name = coil->chname;
             compchs[k].chpos.coil_type = coil->type;
             compchs[k].kind = (coil->coil_class == FWD_COILC_EEG) ? FIFFV_EEG_CH : FIFFV_MEG_CH;
@@ -250,23 +168,20 @@ FwdCompData *FwdCompData::fwd_make_comp_data(MNECTFCompDataSet *set,
                                              fwdVecFieldFunc vec_field,
                                              fwdFieldGradFunc field_grad,
                                              void *client)
-/*
- * Compose a compensation data set
- */
 {
     FwdCompData* comp = new FwdCompData();
 
     if(set)
         comp->set = new MNECTFCompDataSet(*set);
     else
-        comp->set = NULL;
+        comp->set = nullptr;
 
     if (comp_coils) {
         comp->comp_coils = comp_coils->dup_coil_set().release();
     }
     else {
         qWarning("No coils to duplicate");
-        comp->comp_coils = NULL;
+        comp->comp_coils = nullptr;
     }
     comp->field       = field;
     comp->vec_field   = vec_field;
@@ -277,7 +192,7 @@ FwdCompData *FwdCompData::fwd_make_comp_data(MNECTFCompDataSet *set,
                                 coils,
                                 comp->comp_coils) != OK) {
         delete comp;
-        return NULL;
+        return nullptr;
     }
     else {
         return comp;
@@ -287,15 +202,11 @@ FwdCompData *FwdCompData::fwd_make_comp_data(MNECTFCompDataSet *set,
 //=============================================================================================================
 
 int FwdCompData::fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet &coils, Eigen::Ref<Eigen::MatrixXf> res, void *client)
-/*
-          * Calculate the compensated field (all dipole components)
-          */
 {
-    FwdCompData* comp = (FwdCompData*)client;
-    int k;
+    FwdCompData* comp = static_cast<FwdCompData*>(client);
 
     if (!comp->vec_field) {
-        printf("Field computation function is missing in fwd_comp_field_vec");
+        qWarning("Field computation function is missing in fwd_comp_field_vec");
         return FAIL;
     }
     /*
@@ -321,10 +232,10 @@ int FwdCompData::fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet &coils
     /*
        * Compute the compensated field of three orthogonal dipoles
        */
-    for (k = 0; k < 3; k++) {
+    for (int k = 0; k < 3; k++) {
         Eigen::VectorXf resRow = res.row(k).transpose();
         Eigen::VectorXf workRow = comp->vec_work.row(k).transpose();
-        if (comp->set->apply(TRUE, resRow, workRow) == FAIL)
+        if (comp->set->apply(true, resRow, workRow) == FAIL)
             return FAIL;
         res.row(k) = resRow.transpose();
     }
@@ -334,11 +245,8 @@ int FwdCompData::fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet &coils
 //=============================================================================================================
 
 int FwdCompData::fwd_comp_field_grad(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> res, Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad, void *client)
-/*
- * Calculate the compensated field (one dipole component)
- */
 {
-    FwdCompData* comp = (FwdCompData*)client;
+    FwdCompData* comp = static_cast<FwdCompData*>(client);
 
     if (!comp->field_grad) {
         qCritical("Field and gradient computation function is missing in fwd_comp_field_grad");
@@ -375,19 +283,19 @@ int FwdCompData::fwd_comp_field_grad(const Eigen::Vector3f& rd, const Eigen::Vec
     /*
      * Compute the compensated field
      */
-    if (comp->set->apply(TRUE, res, comp->work) != OK)
+    if (comp->set->apply(true, res, comp->work) != OK)
         return FAIL;
 
     vw0 = comp->vec_work.row(0).transpose();
-    if (comp->set->apply(TRUE, xgrad, vw0) != OK)
+    if (comp->set->apply(true, xgrad, vw0) != OK)
         return FAIL;
 
     vw1 = comp->vec_work.row(1).transpose();
-    if (comp->set->apply(TRUE, ygrad, vw1) != OK)
+    if (comp->set->apply(true, ygrad, vw1) != OK)
         return FAIL;
 
     vw2 = comp->vec_work.row(2).transpose();
-    if (comp->set->apply(TRUE, zgrad, vw2) != OK)
+    if (comp->set->apply(true, zgrad, vw2) != OK)
         return FAIL;
 
     return OK;

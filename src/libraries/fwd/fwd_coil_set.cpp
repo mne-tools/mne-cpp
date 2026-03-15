@@ -146,7 +146,7 @@ FwdCoilSet::~FwdCoilSet()
 
 //=============================================================================================================
 
-std::unique_ptr<FwdCoil> FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int acc, const FiffCoordTrans& t)
+FwdCoil::UPtr FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int acc, const FiffCoordTrans& t)
 {
     if (ch.kind != FIFFV_MEG_CH && ch.kind != FIFFV_REF_MEG_CH) {
         qWarning() << ch.ch_name << "is not a MEG channel. Cannot create a coil definition.";
@@ -207,7 +207,7 @@ std::unique_ptr<FwdCoil> FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int a
 
 //=============================================================================================================
 
-std::unique_ptr<FwdCoilSet> FwdCoilSet::create_meg_coils(const QList<FIFFLIB::FiffChInfo>& chs,
+FwdCoilSet::UPtr FwdCoilSet::create_meg_coils(const QList<FIFFLIB::FiffChInfo>& chs,
                                          int nch,
                                          int acc,
                                          const FiffCoordTrans& t)
@@ -227,7 +227,7 @@ std::unique_ptr<FwdCoilSet> FwdCoilSet::create_meg_coils(const QList<FIFFLIB::Fi
 
 //=============================================================================================================
 
-std::unique_ptr<FwdCoilSet> FwdCoilSet::create_eeg_els(const QList<FIFFLIB::FiffChInfo>& chs,
+FwdCoilSet::UPtr FwdCoilSet::create_eeg_els(const QList<FIFFLIB::FiffChInfo>& chs,
                                        int nch,
                                        const FiffCoordTrans& t)
 {
@@ -246,7 +246,7 @@ std::unique_ptr<FwdCoilSet> FwdCoilSet::create_eeg_els(const QList<FIFFLIB::Fiff
 
 //=============================================================================================================
 
-std::unique_ptr<FwdCoilSet> FwdCoilSet::read_coil_defs(const QString &name)
+FwdCoilSet::UPtr FwdCoilSet::read_coil_defs(const QString &name)
 {
     QFile file(name);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -331,9 +331,9 @@ std::unique_ptr<FwdCoilSet> FwdCoilSet::read_coil_defs(const QString &name)
 
 //=============================================================================================================
 
-std::unique_ptr<FwdCoilSet> FwdCoilSet::dup_coil_set(const FiffCoordTrans& t) const
+FwdCoilSet::UPtr FwdCoilSet::dup_coil_set(const FiffCoordTrans& t) const
 {
-    std::unique_ptr<FwdCoilSet> res;
+    FwdCoilSet::UPtr res;
 
     if (!t.isEmpty()) {
         if (this->coord_frame != t.from) {

@@ -44,6 +44,8 @@
 #include <fwd/compute_fwd/compute_fwd_settings.h>
 #include <fwd/compute_fwd/compute_fwd.h>
 #include <fwd/fwd_forward_solution.h>
+
+#include <memory>
 #include <mne/mne.h>
 
 #include <fiff/fiff.h>
@@ -124,7 +126,7 @@ void TestMneForwardSolution::computeForward()
     // --mindist 5
     // --fwd ../resources/data/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif
 
-    ComputeFwdSettings::SPtr pSettingsMEGEEG = ComputeFwdSettings::SPtr(new ComputeFwdSettings);
+    std::shared_ptr<ComputeFwdSettings> pSettingsMEGEEG = std::make_shared<ComputeFwdSettings>();
 
     pSettingsMEGEEG->include_meg = true;
     pSettingsMEGEEG->include_eeg = true;
@@ -145,7 +147,7 @@ void TestMneForwardSolution::computeForward()
     pSettingsMEGEEG->pFiffInfo = pFiffInfo;
     pSettingsMEGEEG->checkIntegrity();
 
-    QSharedPointer<ComputeFwd> pFwdComputer = QSharedPointer<ComputeFwd>(new ComputeFwd(pSettingsMEGEEG));
+    std::shared_ptr<ComputeFwd> pFwdComputer = std::make_shared<ComputeFwd>(pSettingsMEGEEG);
     auto pFwdSolution = pFwdComputer->calculateFwd();
 
     // recalculate with same meg_head_t to check that we still get the same result

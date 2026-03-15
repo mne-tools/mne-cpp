@@ -55,24 +55,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-
 #include <memory>
-
-#define FWD_COIL_UNKNOWN      0
-
-#define FWD_COILC_UNKNOWN     0
-#define FWD_COILC_EEG         1000
-#define FWD_COILC_MAG         1
-#define FWD_COILC_AXIAL_GRAD  2
-#define FWD_COILC_PLANAR_GRAD 3
-#define FWD_COILC_AXIAL_GRAD2 4
-
-#define FWD_COIL_ACCURACY_POINT    0
-#define FWD_COIL_ACCURACY_NORMAL   1
-#define FWD_COIL_ACCURACY_ACCURATE 2
-
-#define FWD_IS_MEG_COIL(x) ((x) != FWD_COILC_EEG && (x) != FWD_COILC_UNKNOWN)
 
 //=============================================================================================================
 // DEFINE NAMESPACE FWDLIB
@@ -80,6 +63,25 @@
 
 namespace FWDLIB
 {
+
+//=============================================================================================================
+// COIL TYPE AND ACCURACY CONSTANTS
+//=============================================================================================================
+
+constexpr int FWD_COIL_UNKNOWN      = 0;
+
+constexpr int FWD_COILC_UNKNOWN     = 0;
+constexpr int FWD_COILC_EEG         = 1000;
+constexpr int FWD_COILC_MAG         = 1;
+constexpr int FWD_COILC_AXIAL_GRAD  = 2;
+constexpr int FWD_COILC_PLANAR_GRAD = 3;
+constexpr int FWD_COILC_AXIAL_GRAD2 = 4;
+
+constexpr int FWD_COIL_ACCURACY_POINT    = 0;
+constexpr int FWD_COIL_ACCURACY_NORMAL   = 1;
+constexpr int FWD_COIL_ACCURACY_ACCURATE = 2;
+
+inline constexpr bool FWD_IS_MEG_COIL(int x) { return (x != FWD_COILC_EEG && x != FWD_COILC_UNKNOWN); }
 
 //=============================================================================================================
 /**
@@ -90,8 +92,7 @@ namespace FWDLIB
 class FWDSHARED_EXPORT FwdCoil
 {
 public:
-    typedef QSharedPointer<FwdCoil> SPtr;              /**< Shared pointer type for FwdCoil. */
-    typedef QSharedPointer<const FwdCoil> ConstSPtr;   /**< Const shared pointer type for FwdCoil. */
+    typedef std::unique_ptr<FwdCoil> UPtr;                /**< Unique pointer type for FwdCoil. */
 
     //=========================================================================================================
     /**
@@ -122,8 +123,8 @@ public:
      *
      * @return   The created coil.
      */
-    static std::unique_ptr<FwdCoil> create_eeg_el(const FIFFLIB::FiffChInfo& ch,
-                                                   const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
+    static FwdCoil::UPtr create_eeg_el(const FIFFLIB::FiffChInfo& ch,
+                                        const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
 
     //=========================================================================================================
     /**

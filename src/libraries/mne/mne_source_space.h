@@ -78,6 +78,7 @@ class MNESHARED_EXPORT MNESourceSpace : public MNESurfaceOrVolume
 public:
     using SPtr = std::shared_ptr<MNESourceSpace>;              /**< Shared pointer type for MNESourceSpace. */
     using ConstSPtr = std::shared_ptr<const MNESourceSpace>;   /**< Const shared pointer type for MNESourceSpace. */
+    using UPtr = std::unique_ptr<MNESourceSpace>;              /**< Unique pointer type for MNESourceSpace. */
 
     //=========================================================================================================
     /**

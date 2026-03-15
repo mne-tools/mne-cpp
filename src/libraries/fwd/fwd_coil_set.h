@@ -78,6 +78,7 @@ class FWDSHARED_EXPORT FwdCoilSet
 public:
     typedef QSharedPointer<FwdCoilSet> SPtr;              /**< Shared pointer type for FwdCoilSet. */
     typedef QSharedPointer<const FwdCoilSet> ConstSPtr;   /**< Const shared pointer type for FwdCoilSet. */
+    typedef std::unique_ptr<FwdCoilSet> UPtr;             /**< Unique pointer type for FwdCoilSet. */
 
     //=========================================================================================================
     /**
@@ -102,7 +103,7 @@ public:
      *
      * @return   The created meg coil.
      */
-    std::unique_ptr<FwdCoil> create_meg_coil(const FIFFLIB::FiffChInfo& ch, int acc, const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
+    FwdCoil::UPtr create_meg_coil(const FIFFLIB::FiffChInfo& ch, int acc, const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
 
     //=========================================================================================================
     /**
@@ -116,7 +117,7 @@ public:
      *
      * @return   The created meg coil set.
      */
-    std::unique_ptr<FwdCoilSet> create_meg_coils(const QList<FIFFLIB::FiffChInfo>& chs,
+    FwdCoilSet::UPtr create_meg_coils(const QList<FIFFLIB::FiffChInfo>& chs,
                                  int nch,
                                  int acc,
                                  const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
@@ -132,7 +133,7 @@ public:
      *
      * @return   The created meg coil set.
      */
-    static std::unique_ptr<FwdCoilSet> create_eeg_els(const QList<FIFFLIB::FiffChInfo>& chs,
+    static FwdCoilSet::UPtr create_eeg_els(const QList<FIFFLIB::FiffChInfo>& chs,
                                       int nch,
                                       const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
 
@@ -144,7 +145,7 @@ public:
      *
      * @return   The read meg coil set.
      */
-    static std::unique_ptr<FwdCoilSet> read_coil_defs(const QString& name);
+    static FwdCoilSet::UPtr read_coil_defs(const QString& name);
 
     //=========================================================================================================
     /**
@@ -154,7 +155,7 @@ public:
      *
      * @return   The duplicated coil set.
      */
-    std::unique_ptr<FwdCoilSet> dup_coil_set(const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans()) const;
+    FwdCoilSet::UPtr dup_coil_set(const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans()) const;
 
     //=========================================================================================================
     /**
@@ -214,7 +215,7 @@ private:
     FwdCoil* fwd_add_coil_to_set(int type, int coil_class, int acc, int np, float size, float base, const QString& desc);
 
 public:
-    std::vector<std::unique_ptr<FwdCoil>> coils;  /**< The coil or electrode positions. */
+    std::vector<FwdCoil::UPtr> coils;  /**< The coil or electrode positions. */
     int     coord_frame;            /**< Common coordinate frame. */
     std::unique_ptr<FwdBemSolution> user_data;  /**< Coil-specific BEM solution. */
 

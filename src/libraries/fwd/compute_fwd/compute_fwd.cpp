@@ -77,7 +77,7 @@ constexpr int Z = 2;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ComputeFwd::ComputeFwd(ComputeFwdSettings::SPtr pSettings)
+ComputeFwd::ComputeFwd(std::shared_ptr<ComputeFwdSettings> pSettings)
     : m_meg_forward(new FiffNamedMatrix)
     , m_meg_forward_grad(new FiffNamedMatrix)
     , m_eeg_forward(new FiffNamedMatrix)
@@ -125,33 +125,31 @@ void ComputeFwd::initFwd()
     m_meas_id.clear();
 
     QFile filteredFile;
-    QTextStream *filteredStream = Q_NULLPTR;
+    QTextStream *filteredStream = nullptr;
 
     m_eegModel.reset();
     m_bemModel.reset();
 
     // Report the setup
-    printf("\n");
-    printf("Source space                 : %s\n",m_pSettings->srcname.toUtf8().constData());
+    qInfo("Source space                 : %s",m_pSettings->srcname.toUtf8().constData());
     if (!(m_pSettings->transname.isEmpty()) || !(m_pSettings->mriname.isEmpty())) {
-        printf("MRI -> head transform source : %s\n",!(m_pSettings->mriname.isEmpty()) ? m_pSettings->mriname.toUtf8().constData() : m_pSettings->transname.toUtf8().constData());
+        qInfo("MRI -> head transform source : %s",!(m_pSettings->mriname.isEmpty()) ? m_pSettings->mriname.toUtf8().constData() : m_pSettings->transname.toUtf8().constData());
     } else {
-        printf("MRI and head coordinates are assumed to be identical.\n");
+        qInfo("MRI and head coordinates are assumed to be identical.");
     }
-    printf("Measurement data             : %s\n",m_pSettings->measname.toUtf8().constData());
+    qInfo("Measurement data             : %s",m_pSettings->measname.toUtf8().constData());
     if (!m_pSettings->bemname.isEmpty()) {
-        printf("BEM model                    : %s\n",m_pSettings->bemname.toUtf8().constData());
+        qInfo("BEM model                    : %s",m_pSettings->bemname.toUtf8().constData());
     } else {
-        printf("Sphere model                 : origin at (% 7.2f % 7.2f % 7.2f) mm\n",
+        qInfo("Sphere model                 : origin at (% 7.2f % 7.2f % 7.2f) mm",
                1000.0f*m_pSettings->r0[X],1000.0f*m_pSettings->r0[Y],1000.0f*m_pSettings->r0[Z]);
         if (m_pSettings->include_eeg) {
-            printf("\n");
 
             if (m_pSettings->eeg_model_file.isEmpty()) {
                 qCritical("!!!!!!!!!!TODO: default_eeg_model_file();");
             }
             m_eegModels.reset(FwdEegSphereModelSet::fwd_load_eeg_sphere_models(m_pSettings->eeg_model_file,m_eegModels.release()));
-            m_eegModels->fwd_list_eeg_sphere_models(stderr);
+            m_eegModels->fwd_list_eeg_sphere_models();
 
             if (m_pSettings->eeg_model_name.isEmpty()) {
                 m_pSettings->eeg_model_name = QString("Default");
@@ -165,34 +163,30 @@ void ComputeFwd::initFwd()
                 return;
             }
 
-            printf("Using EEG sphere model \"%s\" with scalp radius %7.1f mm\n",
+            qInfo("Using EEG sphere model \"%s\" with scalp radius %7.1f mm",
                    m_pSettings->eeg_model_name.toUtf8().constData(),1000*m_pSettings->eeg_sphere_rad);
-            printf("%s the electrode locations to scalp\n",m_pSettings->scale_eeg_pos ? "Scale" : "Do not scale");
+            qInfo("%s the electrode locations to scalp",m_pSettings->scale_eeg_pos ? "Scale" : "Do not scale");
 
             m_eegModel->scale_pos = m_pSettings->scale_eeg_pos;
             m_eegModel->r0 = m_pSettings->r0;
-
-            printf("\n");
         }
     }
-    printf("%s field computations\n",m_pSettings->accurate ? "Accurate" : "Standard");
-    printf("Do computations in %s coordinates.\n",FiffCoordTrans::frame_name(m_pSettings->coord_frame).toUtf8().constData());
-    printf("%s source orientations\n",m_pSettings->fixed_ori ? "Fixed" : "Free");
+    qInfo("%s field computations",m_pSettings->accurate ? "Accurate" : "Standard");
+    qInfo("Do computations in %s coordinates.",FiffCoordTrans::frame_name(m_pSettings->coord_frame).toUtf8().constData());
+    qInfo("%s source orientations",m_pSettings->fixed_ori ? "Fixed" : "Free");
     if (m_pSettings->compute_grad) {
-        printf("Compute derivatives with respect to source location coordinates\n");
+        qInfo("Compute derivatives with respect to source location coordinates");
     }
-    printf("Destination for the solution : %s\n",m_pSettings->solname.toUtf8().constData());
+    qInfo("Destination for the solution : %s",m_pSettings->solname.toUtf8().constData());
     if (m_pSettings->do_all) {
-        printf("Calculate solution for all source locations.\n");
+        qInfo("Calculate solution for all source locations.");
     }
     if (m_pSettings->nlabel > 0) {
-        printf("Source space will be restricted to sources in %d labels\n",m_pSettings->nlabel);
+        qInfo("Source space will be restricted to sources in %d labels",m_pSettings->nlabel);
     }
 
     // Read the source locations
-
-    printf("\n");
-    printf("Reading %s...\n",m_pSettings->srcname.toUtf8().constData());
+    qInfo("Reading %s...",m_pSettings->srcname.toUtf8().constData());
     if (MNESourceSpace::read_source_spaces(m_pSettings->srcname,m_spaces) != OK) {
         return;
     }
@@ -206,13 +200,12 @@ void ComputeFwd::initFwd()
         qCritical("No sources are active in these source spaces. --all option should be used.");
         return;
     }
-    printf("Read %d source spaces a total of %d active source locations\n", static_cast<int>(m_spaces.size()),m_iNSource);
+    qInfo("Read %d source spaces a total of %d active source locations", static_cast<int>(m_spaces.size()),m_iNSource);
     if (MNESourceSpace::restrict_sources_to_labels(m_spaces,m_pSettings->labels,m_pSettings->nlabel) == FAIL) {
         return;
     }
 
     // Read the MRI -> head coordinate transformation
-    printf("\n");
     if (!m_pSettings->mriname.isEmpty()) {
         m_mri_head_t = FiffCoordTrans::readMriTransform(m_pSettings->mriname);
         if (m_mri_head_t.isEmpty()) {
@@ -292,18 +285,17 @@ void ComputeFwd::initFwd()
 
     m_iNChan = iNMeg + iNEeg;
 
-    printf("\n");
     if (iNMeg > 0) {
-        printf("Read %3d MEG channels from %s\n",iNMeg,m_pSettings->measname.toUtf8().constData());
+        qInfo("Read %3d MEG channels from %s",iNMeg,m_pSettings->measname.toUtf8().constData());
     }
     if (iNComp > 0) {
-        printf("Read %3d MEG compensation channels from %s\n",iNComp,m_pSettings->measname.toUtf8().constData());
+        qInfo("Read %3d MEG compensation channels from %s",iNComp,m_pSettings->measname.toUtf8().constData());
     }
     if (iNEeg > 0) {
-        printf("Read %3d EEG channels from %s\n",iNEeg,m_pSettings->measname.toUtf8().constData());
+        qInfo("Read %3d EEG channels from %s",iNEeg,m_pSettings->measname.toUtf8().constData());
     }
     if (!m_pSettings->include_meg) {
-        printf("MEG not requested. MEG channels omitted.\n");
+        qInfo("MEG not requested. MEG channels omitted.");
         m_listMegChs.clear();
         m_listCompChs.clear();
         iNMeg = 0;
@@ -312,7 +304,7 @@ void ComputeFwd::initFwd()
     else
         m_meg_head_t.print();
     if (!m_pSettings->include_eeg) {
-        printf("EEG not requested. EEG channels omitted.\n");
+        qInfo("EEG not requested. EEG channels omitted.");
         m_listEegChs.clear();
         iNEeg = 0;
     } else {
@@ -343,7 +335,7 @@ void ComputeFwd::initFwd()
             return;
         }
         if (m_compData->ncomp > 0) {
-            printf("%d compensation data sets in %s\n",m_compData->ncomp,m_pSettings->measname.toUtf8().constData());
+            qInfo("%d compensation data sets in %s",m_compData->ncomp,m_pSettings->measname.toUtf8().constData());
         } else {
             m_listCompChs.clear();
             iNComp = 0;
@@ -380,7 +372,7 @@ void ComputeFwd::initFwd()
             return;
         }
 
-        printf("MRI coordinate coil definitions created.\n");
+        qInfo("MRI coordinate coil definitions created.");
     } else {
         m_megcoils = m_templates->create_meg_coils(m_listMegChs,
                                                         iNMeg,
@@ -403,7 +395,7 @@ void ComputeFwd::initFwd()
         if (!m_eegels) {
             return;
         }
-        printf("Head coordinate coil definitions created.\n");
+        qInfo("Head coordinate coil definitions created.");
     }
 
     // Transform the source spaces into the appropriate coordinates
@@ -412,7 +404,7 @@ void ComputeFwd::initFwd()
             return;
         }
     }
-    printf("Source spaces are now in %s coordinates.\n",FiffCoordTrans::frame_name(m_pSettings->coord_frame).toUtf8().constData());
+    qInfo("Source spaces are now in %s coordinates.",FiffCoordTrans::frame_name(m_pSettings->coord_frame).toUtf8().constData());
 
     // Prepare the BEM model if necessary
 
@@ -420,39 +412,38 @@ void ComputeFwd::initFwd()
         QString bemsolname = FwdBemModel::fwd_bem_make_bem_sol_name(m_pSettings->bemname);
         m_pSettings->bemname = bemsolname;
 
-        printf("\nSetting up the BEM model using %s...\n",m_pSettings->bemname.toUtf8().constData());
-        printf("\nLoading surfaces...\n");
+        qInfo("Setting up the BEM model using %s...",m_pSettings->bemname.toUtf8().constData());
+        qInfo("Loading surfaces...");
         m_bemModel = FwdBemModel::fwd_bem_load_three_layer_surfaces(m_pSettings->bemname);
 
         if (m_bemModel) {
-            printf("Three-layer model surfaces loaded.\n");
+            qInfo("Three-layer model surfaces loaded.");
         }
         else {
             m_bemModel = FwdBemModel::fwd_bem_load_homog_surface(m_pSettings->bemname);
             if (!m_bemModel) {
                 return;
             }
-            printf("Homogeneous model surface loaded.\n");
+            qInfo("Homogeneous model surface loaded.");
         }
         if (iNEeg > 0 && m_bemModel->nsurf == 1) {
             qCritical("Cannot use a homogeneous model in EEG calculations.");
             return;
         }
-        printf("\nLoading the solution matrix...\n");
+        qInfo("Loading the solution matrix...");
         if (m_bemModel->fwd_bem_load_recompute_solution(m_pSettings->bemname.toUtf8().data(),FWD_BEM_UNKNOWN,false) == FAIL) {
             return;
         }
         if (m_pSettings->coord_frame == FIFFV_COORD_HEAD) {
-            printf("Employing the head->MRI coordinate transform with the BEM model.\n");
+            qInfo("Employing the head->MRI coordinate transform with the BEM model.");
             if (m_bemModel->fwd_bem_set_head_mri_t(m_mri_head_t) == FAIL) {
                 return;
             }
         }
-        printf("BEM model %s is now set up\n",m_bemModel->sol_name.toUtf8().constData());
+        qInfo("BEM model %s is now set up",m_bemModel->sol_name.toUtf8().constData());
     } else {
-        printf("Using the sphere model.\n");
+        qInfo("Using the sphere model.");
     }
-    printf ("\n");
 
     // Try to circumvent numerical problems by excluding points too close or outside the inner skull surface
 
@@ -464,7 +455,7 @@ void ComputeFwd::initFwd()
                 return;
             }
             filteredStream = new QTextStream(&filteredFile);
-            printf("Omitted source space points will be output to : %s\n",m_pSettings->mindistoutname.toUtf8().constData());
+            qInfo("Omitted source space points will be output to : %s",m_pSettings->mindistoutname.toUtf8().constData());
         }
         MNESourceSpace::filter_source_spaces(m_pSettings->mindist,
                                                  m_pSettings->bemname,
@@ -472,7 +463,7 @@ void ComputeFwd::initFwd()
                                                  m_spaces,
                                                  filteredStream,m_pSettings->use_threads);
         delete filteredStream;
-        filteredStream = Q_NULLPTR;
+        filteredStream = nullptr;
     }
 }
 

@@ -62,18 +62,26 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
 #include <QString>
 
-#define FWD_BEM_UNKNOWN           -1
-#define FWD_BEM_CONSTANT_COLL     1
-#define FWD_BEM_LINEAR_COLL       2
+//=============================================================================================================
+// BEM METHOD CONSTANTS
+//=============================================================================================================
 
-#define FWD_BEM_IP_APPROACH_LIMIT 0.1
+namespace FWDLIB
+{
 
-#define FWD_BEM_LIN_FIELD_SIMPLE    1
-#define FWD_BEM_LIN_FIELD_FERGUSON  2
-#define FWD_BEM_LIN_FIELD_URANKAR   3
+constexpr int    FWD_BEM_UNKNOWN           = -1;
+constexpr int    FWD_BEM_CONSTANT_COLL     =  1;
+constexpr int    FWD_BEM_LINEAR_COLL       =  2;
+
+constexpr double FWD_BEM_IP_APPROACH_LIMIT = 0.1;
+
+constexpr int    FWD_BEM_LIN_FIELD_SIMPLE    = 1;
+constexpr int    FWD_BEM_LIN_FIELD_FERGUSON  = 2;
+constexpr int    FWD_BEM_LIN_FIELD_URANKAR   = 3;
+
+} // namespace FWDLIB
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -120,8 +128,7 @@ class FwdThreadArg;
 class FWDSHARED_EXPORT FwdBemModel
 {
 public:
-    typedef QSharedPointer<FwdBemModel> SPtr;              /**< Shared pointer type for FwdBemModel. */
-    typedef QSharedPointer<const FwdBemModel> ConstSPtr;   /**< Const shared pointer type for FwdBemModel. */
+    typedef std::unique_ptr<FwdBemModel> UPtr;            /**< Unique pointer type for FwdBemModel. */
 
     //=========================================================================================================
     /**
@@ -197,7 +204,7 @@ public:
      * @param[in] kinds  FsSurface IDs to load (e.g. FIFFV_BEM_SURF_ID_BRAIN).
      * @return BEM model containing the requested surfaces, or nullptr on failure.
      */
-    static std::unique_ptr<FwdBemModel> fwd_bem_load_surfaces(const QString& name,
+    static FwdBemModel::UPtr fwd_bem_load_surfaces(const QString& name,
                                               const std::vector<int>& kinds);
 
     //=========================================================================================================
@@ -209,7 +216,7 @@ public:
      * @param[in] name  Path to the BEM FIFF file.
      * @return BEM model, or nullptr on failure.
      */
-    static std::unique_ptr<FwdBemModel> fwd_bem_load_homog_surface(const QString& name);
+    static FwdBemModel::UPtr fwd_bem_load_homog_surface(const QString& name);
 
     //=========================================================================================================
     /**
@@ -218,7 +225,7 @@ public:
      * @param[in] name  Path to the BEM FIFF file.
      * @return BEM model, or nullptr on failure.
      */
-    static std::unique_ptr<FwdBemModel> fwd_bem_load_three_layer_surfaces(const QString& name);
+    static FwdBemModel::UPtr fwd_bem_load_three_layer_surfaces(const QString& name);
 
     //=========================================================================================================
     /**
@@ -229,7 +236,7 @@ public:
      *
      * @param[in] name        Path to the solution FIFF file.
      * @param[in] bem_method  Required BEM method (FWD_BEM_CONSTANT_COLL or FWD_BEM_LINEAR_COLL).
-     * @return OK on success, FAIL on error.
+     * @return true if loaded, false if not found, FAIL on error.
      */
     int fwd_bem_load_solution(const QString& name, int bem_method);
 
@@ -736,7 +743,7 @@ public:
      */
     int fwd_bem_specify_coils(FwdCoilSet* coils);
 
-    #define MAG_FACTOR 1e-7  /**< Magnetic constant mu_0 / (4 * pi). */
+    static constexpr double MAG_FACTOR = 1e-7;  /**< Magnetic constant mu_0 / (4 * pi). */
 
     //=========================================================================================================
     /**

@@ -49,6 +49,8 @@
 
 #include <fiff/fiff_coord_trans.h>
 
+#include <memory>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -152,7 +154,7 @@ public:
      */
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
-    QSharedPointer<FWDLIB::ComputeFwdSettings>                  m_pFwdSettings;         /**< Forward Solution Settings. */
+    std::shared_ptr<FWDLIB::ComputeFwdSettings>                 m_pFwdSettings;         /**< Forward Solution Settings. */
 
 protected:
     //=========================================================================================================

@@ -140,6 +140,6 @@ void ComputeFwdSettings::initMembers()
     use_equiv_eeg = true;     
     use_threads = true;
 
-    pFiffInfo = Q_NULLPTR;
+    pFiffInfo = nullptr;
     meg_head_t = FiffCoordTrans();
 }

@@ -91,6 +91,7 @@ class MNESHARED_EXPORT MNECTFCompDataSet
 public:
     typedef QSharedPointer<MNECTFCompDataSet> SPtr;             /**< Shared pointer type for MNECTFCompDataSet. */
     typedef QSharedPointer<const MNECTFCompDataSet> ConstSPtr;  /**< Const shared pointer type for MNECTFCompDataSet. */
+    typedef std::unique_ptr<MNECTFCompDataSet> UPtr;            /**< Unique pointer type for MNECTFCompDataSet. */
 
     //=========================================================================================================
     /**
