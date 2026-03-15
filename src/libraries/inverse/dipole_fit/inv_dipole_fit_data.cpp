@@ -72,8 +72,8 @@ using namespace INVLIB;
 #define Z_3 2
 
 #define MALLOC_3(x,t) (t *)malloc((x)*sizeof(t))
-#define REALLOC_3(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
-#define FREE_3(x) if ((char *)(x) != NULL) free((char *)(x))
+#define REALLOC_3(x,y,t) (t *)((x == nullptr) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
+#define FREE_3(x) if ((char *)(x) != nullptr) free((char *)(x))
 
 /*
  * Float, double, and int arrays
@@ -333,7 +333,7 @@ QString mne_channel_names_to_string_3(const QList<FiffChInfo>& chs, int nch)
     int  k;
 
     if (nch <= 0)
-        return NULL;
+        return nullptr;
     for (k = 0; k < nch; k++)
         names.append(chs[k].ch_name);
     res = mne_name_list_to_string_3(names);
@@ -373,7 +373,7 @@ FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* The dense mat
     int j,k;
     int nz;
     int ptr;
-    FiffSparseMatrix* sparse = NULL;
+    FiffSparseMatrix* sparse = nullptr;
 
     if (small < 0) {		/* Automatic scaling */
         float maxval = 0.0;
@@ -398,11 +398,11 @@ FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* The dense mat
 
     if (nz <= 0) {
         qWarning("No nonzero elements found.");
-        return NULL;
+        return nullptr;
     }
     if (stor_type != FIFFTS_MC_CCS && stor_type != FIFFTS_MC_RCS) {
         qWarning("Unknown sparse matrix storage type: %d",stor_type);
-        return NULL;
+        return nullptr;
     }
     sparse = new FiffSparseMatrix;
     sparse->coding = stor_type;
@@ -560,10 +560,10 @@ int mne_svd_3(float **mat,	/* The matrix */
 
     fromFloatEigenVector_3(svd.singularValues(), sing, svd.singularValues().size());
 
-    if (uu != NULL)
+    if (uu != nullptr)
         fromFloatEigenMatrix_3(svd.matrixU().transpose(), uu, udim, m);
 
-    if (vv != NULL)
+    if (vv != nullptr)
         fromFloatEigenMatrix_3(svd.matrixV().transpose(), vv, m, n);
 
     return 0;
@@ -575,7 +575,7 @@ void mne_free_cov_3(MNECovMatrix* c)
  * Free a covariance matrix and all its data
  */
 {
-    if (c == NULL)
+    if (c == nullptr)
         return;
     delete c;
     return;
@@ -830,12 +830,12 @@ int mne_add_inv_cov_3(MNECovMatrix* c)
 static int condition_cov_3(MNECovMatrix* c, float rank_threshold, int use_rank)
 
 {
-    double *scale  = NULL;
-    double *cov    = NULL;
-    double *lambda = NULL;
+    double *scale  = nullptr;
+    double *cov    = nullptr;
+    double *lambda = nullptr;
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> local_eigen;
-    double **data1 = NULL;
-    double **data2 = NULL;
+    double **data1 = nullptr;
+    double **data2 = nullptr;
     double magscale,gradscale,eegscale;
     int    nmag,ngrad,neeg,nok;
     int    j,k;
@@ -920,7 +920,7 @@ static int condition_cov_3(MNECovMatrix* c, float rank_threshold, int use_rank)
         data1 = ALLOC_DCMATRIX_3(c->ncov,c->ncov);
         for (j = 0; j < c->ncov; j++) {
 #ifdef DEBUG
-            mne_print_vector(stdout,NULL,local_eigen.row(j).data(),c->ncov);
+            mne_print_vector(stdout,nullptr,local_eigen.row(j).data(),c->ncov);
 #endif
             for (k = 0; k < c->ncov; k++)
                 data1[j][k] = sqrt(lambda[j])*local_eigen(j,k);
@@ -929,7 +929,7 @@ static int condition_cov_3(MNECovMatrix* c, float rank_threshold, int use_rank)
 #ifdef DEBUG
         printf(">>>\n");
         for (j = 0; j < c->ncov; j++)
-            mne_print_dvector(stdout,NULL,data2[j],c->ncov);
+            mne_print_dvector(stdout,nullptr,data2[j],c->ncov);
         printf(">>>\n");
 #endif
         /*
@@ -1095,10 +1095,10 @@ int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, MNEC
       */
 {
     int    j,k;
-    float  *one = NULL,*orig,*white;
+    float  *one = nullptr,*orig,*white;
     double *inv;
 
-    if (data == NULL || np <= 0)
+    if (data == nullptr || np <= 0)
         return OK;
 
     if (C->ncov != nchan) {
@@ -1353,7 +1353,7 @@ int mne_simplex_minimize(float **p,		                              /* The initia
             sum +=  p[i][j];
         psum[j] = sum;
     }
-    if (report_func != NULL && report > 0)
+    if (report_func != nullptr && report > 0)
         (void)report_func (0,p[0],ndim,-1.0);
 
     for (;;count++,loop++) {
@@ -1371,7 +1371,7 @@ int mne_simplex_minimize(float **p,		                              /* The initia
         /*
      * Report that we are proceeding...
      */
-        if (count == report && report_func != NULL) {
+        if (count == report && report_func != nullptr) {
             if (report_func (loop,p[ilo],ndim,y[ilo])) {
                 qWarning("Interation interrupted.");
                 result = -1;
@@ -1554,8 +1554,8 @@ int fit_sphere_to_points(const MNESurfaceOrVolume::PointsT& rr,
     int        max_eval        = 500;
     int        report_interval = -1;
     int        neval = 0;
-    float      **init_simplex  = NULL;
-    float      *init_vals      = NULL;
+    float      **init_simplex  = nullptr;
+    float      *init_vals      = nullptr;
 
     float      cm[3],R0;
     int        k;
@@ -1625,7 +1625,7 @@ void mne_proj_op_report_data_3(QTextStream &out,const char *tag, MNEProjOp* op, 
     MNENamedMatrix* vecs;
     int found;
 
-    if (op == NULL)
+    if (op == nullptr)
         return;
     if (op->nitems <= 0) {
         out << "Empty operator\n";
@@ -1671,7 +1671,7 @@ void mne_proj_op_report_data_3(QTextStream &out,const char *tag, MNEProjOp* op, 
 
 void mne_proj_op_report_3(QTextStream &out,const char *tag, MNEProjOp* op)
 {
-    mne_proj_op_report_data_3(out,tag,op, FALSE, NULL, 0);
+    mne_proj_op_report_data_3(out,tag,op, FALSE, nullptr, 0);
 }
 
 //============================= mne_named_vector.c =============================
@@ -1718,7 +1718,7 @@ MNEProjOp* mne_read_proj_op_from_node_3(//fiffFile in,
  * Load all the linear projection data
  */
 {
-    MNEProjOp*  op     = NULL;
+    MNEProjOp*  op     = nullptr;
     QList<FiffDirNode::SPtr> proj;
     FiffDirNode::SPtr start_node;
     QList<FiffDirNode::SPtr> items;
@@ -1856,7 +1856,7 @@ out :
 bad : {
         if(op)
             delete op;
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -1867,9 +1867,9 @@ MNEProjOp* mne_read_proj_op_3(const QString& name)
     FiffStream::SPtr stream(new FiffStream(&file));
 
     if(!stream->open())
-        return NULL;
+        return nullptr;
 
-    MNEProjOp*  res = NULL;
+    MNEProjOp*  res = nullptr;
 
     FiffDirNode::SPtr t_default;
     res = mne_read_proj_op_from_node_3(stream,t_default);
@@ -1882,7 +1882,7 @@ MNEProjOp* mne_read_proj_op_3(const QString& name)
 int mne_proj_op_chs_3(MNEProjOp* op, const QStringList& list, int nlist)
 
 {
-    if (op == NULL)
+    if (op == nullptr)
         return OK;
 
     op->free_proj();  /* These data are not valid any more */
@@ -1917,12 +1917,12 @@ int mne_proj_op_make_proj_bad(MNEProjOp* op, char **bad, int nbad)
  */
 {
     int   k,p,q,r,nvec;
-    float **vv_meg  = NULL;
-    float *sing_meg = NULL;
-    float **vv_eeg  = NULL;
-    float *sing_eeg = NULL;
-    float **mat_meg = NULL;
-    float **mat_eeg = NULL;
+    float **vv_meg  = nullptr;
+    float *sing_meg = nullptr;
+    float **vv_eeg  = nullptr;
+    float *sing_eeg = nullptr;
+    float **mat_meg = nullptr;
+    float **mat_eeg = nullptr;
     int   nvec_meg;
     int   nvec_eeg;
     MNENamedVector vec;
@@ -2004,7 +2004,7 @@ int mne_proj_op_make_proj_bad(MNEProjOp* op, char **bad, int nbad)
             nzero++;
     }
     if (nzero == nvec_meg) {
-        FREE_CMATRIX_3(mat_meg); mat_meg = NULL; nvec_meg = 0;
+        FREE_CMATRIX_3(mat_meg); mat_meg = nullptr; nvec_meg = 0;
     }
     for (p = 0, nzero = 0; p < nvec_eeg; p++) {
         size = sqrt(mne_dot_vectors_3(mat_eeg[p],mat_eeg[p],op->nch));
@@ -2016,7 +2016,7 @@ int mne_proj_op_make_proj_bad(MNEProjOp* op, char **bad, int nbad)
             nzero++;
     }
     if (nzero == nvec_eeg) {
-        FREE_CMATRIX_3(mat_eeg); mat_eeg = NULL; nvec_eeg = 0;
+        FREE_CMATRIX_3(mat_eeg); mat_eeg = nullptr; nvec_eeg = 0;
     }
     if (nvec_meg + nvec_eeg == 0) {
         printf("No projection remains after excluding bad channels. Omitting projection.\n");
@@ -2039,7 +2039,7 @@ int mne_proj_op_make_proj_bad(MNEProjOp* op, char **bad, int nbad)
 #endif
         sing_meg = MALLOC_3(nvec_meg+1,float);
         vv_meg   = ALLOC_CMATRIX_3(nvec_meg,op->nch);
-        if (mne_svd_3(mat_meg,nvec_meg,op->nch,sing_meg,NULL,vv_meg) != OK)
+        if (mne_svd_3(mat_meg,nvec_meg,op->nch,sing_meg,nullptr,vv_meg) != OK)
             goto bad;
     }
     if (nvec_eeg > 0) {
@@ -2053,7 +2053,7 @@ int mne_proj_op_make_proj_bad(MNEProjOp* op, char **bad, int nbad)
 #endif
         sing_eeg = MALLOC_3(nvec_eeg+1,float);
         vv_eeg   = ALLOC_CMATRIX_3(nvec_eeg,op->nch);
-        if (mne_svd_3(mat_eeg,nvec_eeg,op->nch,sing_eeg,NULL,vv_eeg) != OK)
+        if (mne_svd_3(mat_eeg,nvec_eeg,op->nch,sing_eeg,nullptr,vv_eeg) != OK)
             goto bad;
     }
     /*
@@ -2149,7 +2149,7 @@ int mne_proj_op_make_proj(MNEProjOp* op)
  * Do the channel picking and SVD
  */
 {
-    return mne_proj_op_make_proj_bad(op,NULL,0);
+    return mne_proj_op_make_proj_bad(op,nullptr,0);
 }
 
 //============================= mne_read_forward_solution.c =============================
@@ -2179,7 +2179,7 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
     int        nmeg_comp = 0;
     QList<FiffChInfo> eeg;
     int        neeg  = 0;
-    fiffId     id    = NULL;
+    fiffId     id    = nullptr;
     QList<FiffDirNode::SPtr> nodes;
     FiffDirNode::SPtr info;
     FiffTag::SPtr t_pTag;
@@ -2251,7 +2251,7 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
         qCritical("Some of the channel information was missing.");
         goto bad;
     }
-    if (t.isEmpty() && meg_head_t != NULL) {
+    if (t.isEmpty() && meg_head_t != nullptr) {
         /*
      * Try again in a more general fashion
      */
@@ -2290,12 +2290,12 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
     eegp = eeg;
     *neegp = neeg;
 
-    if (idp == NULL) {
+    if (idp == nullptr) {
         FREE_3(id);
     }
     else
         *idp   = id;
-    if (meg_head_t == NULL) {
+    if (meg_head_t == nullptr) {
         ; // value type, no cleanup needed
     }
     else
@@ -2342,7 +2342,7 @@ int is_selected_in_data(mshMegEegData d, const QString& ch_name)
 static int whitespace_3(char *text)
 
 {
-    if (text == NULL || strlen(text) == 0)
+    if (text == nullptr || strlen(text) == 0)
         return TRUE;
     if (strspn(text," \t\n\r") == strlen(text))
         return TRUE;
@@ -2353,7 +2353,7 @@ static char *next_line_3(char *line, int n, FILE *in)
 {
     char *res;
 
-    for (res = fgets(line,n,in); res != NULL; res = fgets(line,n,in))
+    for (res = fgets(line,n,in); res != nullptr; res = fgets(line,n,in))
         if (!whitespace_3(res))
             if (res[0] != '#')
                 break;
@@ -2367,7 +2367,7 @@ int mne_read_bad_channels_3(const QString& name, QStringList& listp, int& nlistp
  * Read bad channel names
  */
 {
-    FILE *in = NULL;
+    FILE *in = nullptr;
     QStringList list;
     char line[MAXLINE+1];
     char *next;
@@ -2375,11 +2375,11 @@ int mne_read_bad_channels_3(const QString& name, QStringList& listp, int& nlistp
     if (name.isEmpty())
         return OK;
 
-    if ((in = fopen(name.toUtf8().data(),"r")) == NULL) {
+    if ((in = fopen(name.toUtf8().data(),"r")) == nullptr) {
         qCritical() << name;
         goto bad;
     }
-    while ((next = next_line_3(line,MAXLINE,in)) != NULL) {
+    while ((next = next_line_3(line,MAXLINE,in)) != nullptr) {
         if (strlen(next) > 0) {
             if (next[strlen(next)-1] == '\n')
                 next[strlen(next)-1] = '\0';
@@ -2396,7 +2396,7 @@ int mne_read_bad_channels_3(const QString& name, QStringList& listp, int& nlistp
 
 bad : {
         list.clear();
-        if (in != NULL)
+        if (in != nullptr)
             fclose(in);
         return FAIL;
     }
@@ -2468,7 +2468,7 @@ std::unique_ptr<MNECovMatrix> mne_read_cov(const QString& name,int kind)
     int             nnames     = 0;
     Eigen::VectorXd cov;
     Eigen::VectorXd cov_diag;
-    FiffSparseMatrix* cov_sparse = NULL;
+    FiffSparseMatrix* cov_sparse = nullptr;
     Eigen::VectorXd lambda;
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> eigen;
     MatrixXf        tmp_eigen;
@@ -2481,8 +2481,8 @@ std::unique_ptr<MNECovMatrix> mne_read_cov(const QString& name,int kind)
     int            k,p,nn;
     float          *f;
     double         *d;
-    MNEProjOp*      op = NULL;
-    MNESssData*     sss = NULL;
+    MNEProjOp*      op = nullptr;
+    MNESssData*     sss = nullptr;
 
     if(!stream->open())
         goto out;
@@ -2592,12 +2592,12 @@ std::unique_ptr<MNECovMatrix> mne_read_cov(const QString& name,int kind)
         /*
         * Read the optional projection operator
         */
-        if ((op = mne_read_proj_op_from_node_3(stream,nodes[k])) == NULL)
+        if ((op = mne_read_proj_op_from_node_3(stream,nodes[k])) == nullptr)
             goto out;
         /*
         * Read the optional SSS data
         */
-        if ((sss = MNESssData::read_from_node(stream,nodes[k])) == NULL)
+        if ((sss = MNESssData::read_from_node(stream,nodes[k])) == nullptr)
             goto out;
         /*
         * Read the optional bad channel list
@@ -2615,7 +2615,7 @@ std::unique_ptr<MNECovMatrix> mne_read_cov(const QString& name,int kind)
         qCritical("mne_read_cov : covariance matrix data is not defined. How come?");
         goto out;
     }
-    cov_sparse  = NULL;
+    cov_sparse  = nullptr;
     res->eigen  = std::move(eigen);
     res->lambda = std::move(lambda);
     res->nfree  = nfree;
@@ -2633,11 +2633,11 @@ std::unique_ptr<MNECovMatrix> mne_read_cov(const QString& name,int kind)
 
     if (op && op->nitems > 0) {
         res->proj.reset(op);
-        op = NULL;
+        op = nullptr;
     }
     if (sss && sss->comp_info.size() > 0 && sss->job != FIFFV_SSS_JOB_NOTHING) {
         res->sss.reset(sss);
-        sss = NULL;
+        sss = nullptr;
     }
 
 out : {
@@ -2737,8 +2737,8 @@ static FiffDirNode::SPtr find_meas_3 (const FiffDirNode::SPtr& node)
     FiffDirNode::SPtr tmp_node = node;
 
     while (tmp_node->type != FIFFB_MEAS) {
-        if (tmp_node->parent == NULL)
-            return empty_node;//(NULL);
+        if (tmp_node->parent == nullptr)
+            return empty_node;//(nullptr);
         tmp_node = tmp_node->parent;
     }
     return (tmp_node);
@@ -2754,7 +2754,7 @@ static FiffDirNode::SPtr find_meas_info_3 (const FiffDirNode::SPtr& node)
     FiffDirNode::SPtr tmp_node = node;
 
     while (tmp_node->type != FIFFB_MEAS) {
-        if (tmp_node->parent == NULL)
+        if (tmp_node->parent == nullptr)
             return empty_node;
         tmp_node = tmp_node->parent;
     }
@@ -2786,7 +2786,7 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
     fiff_int_t kind, pos;
     FiffTag::SPtr t_pTag;
 
-    *id      = NULL;
+    *id      = nullptr;
     /*
      * Find desired parents
      */
@@ -2866,7 +2866,7 @@ static int read_ch_info(const QString&  name,
 
     QList<FiffChInfo> chs;
     int        nchan = 0;
-    fiffId     id = NULL;
+    fiffId     id = nullptr;
 
     QList<FiffDirNode::SPtr> meas;
     FiffDirNode::SPtr    node;
@@ -2952,7 +2952,7 @@ int read_meg_eeg_ch_info(const QString& name,       /* Input file */
     int        nmeg  = 0;
     QList<FiffChInfo> eeg;
     int        neeg  = 0;
-    fiffId     id    = NULL;
+    fiffId     id    = nullptr;
     int        nch;
 
     int k;
@@ -3038,11 +3038,11 @@ std::unique_ptr<MNECovMatrix> mne_pick_chs_cov_omit(MNECovMatrix* c,
  */
 {
     int j,k;
-    int *pick = NULL;
+    int *pick = nullptr;
     Eigen::VectorXd cov_local;
     Eigen::VectorXd cov_diag_local;
     QStringList names;
-    int   *is_meg = NULL;
+    int   *is_meg = nullptr;
     int   from,to;
     std::unique_ptr<MNECovMatrix> res;
 
@@ -3216,11 +3216,11 @@ int mne_proj_op_apply_cov(MNEProjOp* op, MNECovMatrix* c)
  * Apply the projection operator to a covariance matrix
  */
 {
-    double **dcov = NULL;
+    double **dcov = nullptr;
     int j,k,p;
     int do_complement = TRUE;
 
-    if (op == NULL || op->nitems == 0)
+    if (op == nullptr || op->nitems == 0)
         return OK;
 
     if (mne_name_list_match(op->names,op->nch,c->names,c->ncov) != OK) {
@@ -3285,19 +3285,19 @@ int mne_proj_op_apply_cov(MNEProjOp* op, MNECovMatrix* c)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DipoleFitData::DipoleFitData()
+InvDipoleFitData::InvDipoleFitData()
 : coord_frame(FIFFV_COORD_UNKNOWN)
 , nmeg (0)
 , neeg (0)
-, sphere_funcs (NULL)
-, bem_funcs (NULL)
-, funcs (NULL)
-, mag_dipole_funcs (NULL)
+, sphere_funcs (nullptr)
+, bem_funcs (nullptr)
+, funcs (nullptr)
+, mag_dipole_funcs (nullptr)
 , fixed_noise (FALSE)
 , nave (1)
 , column_norm (COLUMN_NORM_NONE)
 , fit_mag_dipoles (FALSE)
-, user (NULL)
+, user (nullptr)
 {
     r0[0] = 0.0f;
     r0[1] = 0.0f;
@@ -3306,7 +3306,7 @@ DipoleFitData::DipoleFitData()
 
 //=============================================================================================================
 
-DipoleFitData::~DipoleFitData()
+InvDipoleFitData::~InvDipoleFitData()
 {
     // unique_ptr members (pick, meg_coils, eeg_els, eeg_model, bem_model, noise_orig, noise, proj) auto-cleanup
 
@@ -3317,7 +3317,7 @@ DipoleFitData::~DipoleFitData()
 
 //=============================================================================================================
 
-int DipoleFitData::setup_forward_model(DipoleFitData *d, MNECTFCompDataSet* comp_data, FwdCoilSet *comp_coils)
+int InvDipoleFitData::setup_forward_model(InvDipoleFitData *d, MNECTFCompDataSet* comp_data, FwdCoilSet *comp_coils)
 /*
      * Take care of some hairy details
      */
@@ -3365,7 +3365,7 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MNECTFCompDataSet* comp
             float      simplex_size = 2e-2;
             float      R;
 
-            if ((inner_skull = d->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
+            if ((inner_skull = d->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == nullptr)
                 goto out;
 
             if (fit_sphere_to_points(inner_skull->rr,inner_skull->np,simplex_size,d->r0,&R) == FAIL)
@@ -3405,7 +3405,7 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MNECTFCompDataSet* comp
                 goto out;
             printf("[done]\n");
             f->eeg_pot     = FwdBemModel::fwd_bem_pot_els;
-            f->eeg_vec_pot = NULL;
+            f->eeg_vec_pot = nullptr;
             f->eeg_client  = d->bem_model.get();
         }
     }
@@ -3476,7 +3476,7 @@ out :
 
 //=============================================================================================================
 
-std::unique_ptr<MNECovMatrix> DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, float grad_std, float mag_std, float eeg_std)
+std::unique_ptr<MNECovMatrix> InvDipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, float grad_std, float mag_std, float eeg_std)
 /*
      * Specify constant noise values
      */
@@ -3527,7 +3527,7 @@ std::unique_ptr<MNECovMatrix> DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCo
 
 //=============================================================================================================
 
-int DipoleFitData::make_projection(const QList<QString> &projnames,
+int InvDipoleFitData::make_projection(const QList<QString> &projnames,
                                    const QList<FiffChInfo>& chs,
                                    int nch,
                                    MNEProjOp* *res)
@@ -3535,8 +3535,8 @@ int DipoleFitData::make_projection(const QList<QString> &projnames,
           * Process the projection data
           */
 {
-    MNEProjOp* all  = NULL;
-    MNEProjOp* one  = NULL;
+    MNEProjOp* all  = nullptr;
+    MNEProjOp* one  = nullptr;
     int       k,found;
     int       neeg;
 
@@ -3548,13 +3548,13 @@ int DipoleFitData::make_projection(const QList<QString> &projnames,
         return OK;
 
     for (k = 0; k < projnames.size(); k++) {
-        if ((one = mne_read_proj_op_3(projnames[k])) == NULL)
+        if ((one = mne_read_proj_op_3(projnames[k])) == nullptr)
             goto bad;
         if (one->nitems == 0) {
             printf("No linear projection information in %s.\n",projnames[k].toUtf8().data());
             if(one)
                 delete one;
-            one = NULL;
+            one = nullptr;
         }
         else {
             printf("Loaded projection from %s:\n",projnames[k].toUtf8().data());
@@ -3562,7 +3562,7 @@ int DipoleFitData::make_projection(const QList<QString> &projnames,
             all = all ? all->combine(one) : (new MNEProjOp())->combine(one);
             if(one)
                 delete one;
-            one = NULL;
+            one = nullptr;
         }
     }
 
@@ -3576,13 +3576,13 @@ int DipoleFitData::make_projection(const QList<QString> &projnames,
                 }
         }
         if (!found) {
-            if ((one = MNEProjOp::create_average_eeg_ref(chs,nch)) != NULL) {
+            if ((one = MNEProjOp::create_average_eeg_ref(chs,nch)) != nullptr) {
                 printf("Average EEG reference projection added:\n");
                 { QTextStream errStream(stderr); mne_proj_op_report_3(errStream,"\t",one); }
                 all = all ? all->combine(one) : (new MNEProjOp())->combine(one);
                 if(one)
                     delete one;
-                one = NULL;
+                one = nullptr;
             }
         }
     }
@@ -3590,7 +3590,7 @@ int DipoleFitData::make_projection(const QList<QString> &projnames,
         printf("Projection will not have any effect on selected channels. Projection omitted.\n");
         if(all)
             delete all;
-        all = NULL;
+        all = nullptr;
     }
      *res = all;
     return OK;
@@ -3598,13 +3598,13 @@ int DipoleFitData::make_projection(const QList<QString> &projnames,
 bad :
     if(all)
         delete all;
-    all = NULL;
+    all = nullptr;
     return FAIL;
 }
 
 //=============================================================================================================
 
-int DipoleFitData::scale_noise_cov(DipoleFitData *f, int nave)
+int InvDipoleFitData::scale_noise_cov(InvDipoleFitData *f, int nave)
 {
     float nave_ratio = ((float)f->nave)/(float)nave;
     int   k;
@@ -3644,7 +3644,7 @@ bad :
 
 //=============================================================================================================
 
-int DipoleFitData::scale_dipole_fit_noise_cov(DipoleFitData *f, int nave)
+int InvDipoleFitData::scale_dipole_fit_noise_cov(InvDipoleFitData *f, int nave)
 {
     float nave_ratio = ((float)f->nave)/(float)nave;
     int   k;
@@ -3694,7 +3694,7 @@ bad :
 
 //=============================================================================================================
 
-int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d)
+int InvDipoleFitData::select_dipole_fit_noise_cov(InvDipoleFitData *f, mshMegEegData d)
 /*
      * Do the channel selection and scale with nave
      */
@@ -3775,7 +3775,7 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
 
 //=============================================================================================================
 
-DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
+InvDipoleFitData *InvDipoleFitData::setup_dipole_fit_data(const QString &mriname,
                                                     const QString &measname,
                                                     const QString& bemname,
                                                     Vector3f *r0,
@@ -3797,7 +3797,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
           * Background work for modelling
           */
 {
-    DipoleFitData*  res = new DipoleFitData;
+    InvDipoleFitData*  res = new InvDipoleFitData;
     int             k;
     QStringList     badlist;
     int             nbad      = 0;
@@ -3955,13 +3955,13 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
         QList<FiffChInfo> temp;
         if (mne_read_meg_comp_eeg_ch_info_3(measname,
                                             temp,
-                                            NULL,
+                                            nullptr,
                                             comp_chs,
                                             &ncomp,
                                             temp,
-                                            NULL,
-                                            NULL,
-                                            NULL) == FAIL)
+                                            nullptr,
+                                            nullptr,
+                                            nullptr) == FAIL)
             goto bad;
         if (ncomp > 0) {
             comp_coils = templates->create_meg_coils(comp_chs,
@@ -4011,13 +4011,13 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
         * Noise covariance
         */
     if (!noisename.isEmpty()) {
-        if ((cov = mne_read_cov(noisename,FIFFV_MNE_SENSOR_COV)) == NULL)
+        if ((cov = mne_read_cov(noisename,FIFFV_MNE_SENSOR_COV)) == nullptr)
             goto bad;
         printf("Read a %s noise-covariance matrix from %s\n",
                cov->cov_diag.size() > 0 ? "diagonal" : "full", noisename.toUtf8().data());
     }
     else {
-        if ((cov = ad_hoc_noise(res->meg_coils.get(),res->eeg_els.get(),grad_std,mag_std,eeg_std)) == NULL)
+        if ((cov = ad_hoc_noise(res->meg_coils.get(),res->eeg_els.get(),grad_std,mag_std,eeg_std)) == nullptr)
             goto bad;
     }
     res->noise = mne_pick_chs_cov_omit(cov.get(),
@@ -4109,7 +4109,7 @@ bad : {
         badlist.clear();
         if(res)
             delete res;
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -4121,8 +4121,8 @@ void print_fields(float       *rd,
                   float       *Q,
                   float       time,
                   float       integ,
-                  DipoleFitData* fit,
-                  MNEMeasData* data)
+                  InvDipoleFitData* fit,
+                  InvMeasData* data)
 
 {
     float *one = MALLOC_3(data->nchan,float);
@@ -4143,7 +4143,7 @@ void print_fields(float       *rd,
 
     Eigen::MatrixXf fwd = Eigen::MatrixXf::Zero(nch, 3);
     Eigen::Map<const Eigen::Vector3f> rd_vec(rd);
-    if (DipoleFitData::compute_dipole_field(*fit,rd_vec,FALSE,fwd) == FAIL)
+    if (InvDipoleFitData::compute_dipole_field(*fit,rd_vec,FALSE,fwd) == FAIL)
         goto out;
 
     for (k = 0; k < data->nchan; k++)
@@ -4161,15 +4161,15 @@ out : {
 
 //=============================================================================================================
 
-DipoleForward* dipole_forward(DipoleFitData* d,
+InvDipoleForward* dipole_forward(InvDipoleFitData* d,
                               float         **rd,
                               int           ndip,
-                              DipoleForward* old)
+                              InvDipoleForward* old)
 /*
  * Compute the forward solution and do other nice stuff
  */
 {
-    DipoleForward* res;
+    InvDipoleForward* res;
     float         S[3];
     int           k,p;
     /*
@@ -4179,8 +4179,8 @@ DipoleForward* dipole_forward(DipoleFitData* d,
         res = old;
     }
     else {
-        delete old; old = NULL;
-        res = new DipoleForward;
+        delete old; old = nullptr;
+        res = new InvDipoleForward;
         res->fwd  = ALLOC_CMATRIX_3(3*ndip,d->nmeg+d->neeg);
         res->uu   = ALLOC_CMATRIX_3(3*ndip,d->nmeg+d->neeg);
         res->vv   = ALLOC_CMATRIX_3(3*ndip,3);
@@ -4198,7 +4198,7 @@ DipoleForward* dipole_forward(DipoleFitData* d,
      */
         Eigen::MatrixXf this_fwd(d->nmeg + d->neeg, 3);
         Eigen::Map<const Eigen::Vector3f> rd_k(rd[k]);
-        if ((DipoleFitData::compute_dipole_field(*d,rd_k,TRUE,this_fwd)) == FAIL)
+        if ((InvDipoleFitData::compute_dipole_field(*d,rd_k,TRUE,this_fwd)) == FAIL)
             goto bad;
         for (int p = 0; p < 3; p++)
             Eigen::Map<Eigen::VectorXf>(res->fwd[3*k+p], res->nch) = this_fwd.col(p);
@@ -4246,15 +4246,15 @@ DipoleForward* dipole_forward(DipoleFitData* d,
 bad : {
         if (!old)
             delete res;
-        return NULL;
+        return nullptr;
     }
 }
 
 //=============================================================================================================
 
-DipoleForward* DipoleFitData::dipole_forward_one(DipoleFitData* d,
+InvDipoleForward* InvDipoleFitData::dipole_forward_one(InvDipoleFitData* d,
                                                  float         *rd,
-                                                 DipoleForward* old)
+                                                 InvDipoleForward* old)
 /*
  * Convenience function to compute the field of one dipole
  */
@@ -4271,14 +4271,14 @@ static float fit_eval(float *rd,int npar,void *user)
  * Calculate the residual sum of squares
  */
 {
-    DipoleFitData* fit   = (DipoleFitData*)user;
-    DipoleForward* fwd;
+    InvDipoleFitData* fit   = (InvDipoleFitData*)user;
+    InvDipoleForward* fwd;
     FitDipUserRec*   fuser = fit->user;
     double        Bm2,one;
     int           ncomp,c;
     (void)npar; // avoid unused variable warning.
 
-    fwd = fuser->fwd = DipoleFitData::dipole_forward_one(fit,rd,fuser->fwd);
+    fwd = fuser->fwd = InvDipoleFitData::dipole_forward_one(fit,rd,fuser->fwd);
     ncomp = fwd->sing[2]/fwd->sing[0] > fuser->limit ? 3 : 2;
     if (fuser->report_dim)
         printf("ncomp = %d\n",ncomp);
@@ -4292,7 +4292,7 @@ static float fit_eval(float *rd,int npar,void *user)
 
 static int find_best_guess(float     *B,         /* The whitened data */
                            int       nch,
-                           GuessData* guess,	 /* Guesses */
+                           InvGuessData* guess,	 /* Guesses */
                            float     limit,	 /* Pseudoradial component omission limit */
                            int       *bestp,	 /* Which is the best */
                            float     *goodp)	 /* Best goodness of fit */
@@ -4304,7 +4304,7 @@ static int find_best_guess(float     *B,         /* The whitened data */
     double B2,Bm2,this_good,one;
     int    best = -1;
     float  good = 0.0;
-    DipoleForward* fwd;
+    InvDipoleForward* fwd;
     int    ncomp;
 
     B2 = mne_dot_vectors_3(B,B,nch);
@@ -4382,7 +4382,7 @@ static int report_func(int     loop,
     return OK;
 }
 
-static int fit_Q(DipoleFitData* fit,	     /* The fit data */
+static int fit_Q(InvDipoleFitData* fit,	     /* The fit data */
                  float *B,		     /* Measurement */
                  float *rd,		     /* Dipole position */
                  float limit,		     /* Radial component omission limit */
@@ -4394,7 +4394,7 @@ static int fit_Q(DipoleFitData* fit,	     /* The fit data */
  */
 {
     int c;
-    DipoleForward* fwd = DipoleFitData::dipole_forward_one(fit,rd,NULL);
+    InvDipoleForward* fwd = InvDipoleFitData::dipole_forward_one(fit,rd,nullptr);
     float Bm2,one;
 
     if (!fwd)
@@ -4513,7 +4513,7 @@ int simplex_minimize(float **p,		                              /* The initial si
             sum +=  p[i][j];
         psum[j] = sum;
     }
-    if (report_func != NULL && report > 0)
+    if (report_func != nullptr && report > 0)
         (void)report_func (0,p[0],ndim,-1.0,-1.0,0.0);
 
     dsum = 0.0;
@@ -4532,7 +4532,7 @@ int simplex_minimize(float **p,		                              /* The initial si
         /*
      * Report that we are proceeding...
      */
-        if (count == report && report_func != NULL) {
+        if (count == report && report_func != nullptr) {
             if (report_func (loop,p[ilo],ndim,y[ilo],y[ihi],sqrt(dsum))) {
                 printf("Interation interrupted.");
                 result = -1;
@@ -4585,15 +4585,15 @@ int simplex_minimize(float **p,		                              /* The initial si
 
 //=============================================================================================================
 // fit_dipoles.c
-bool DipoleFitData::fit_one(DipoleFitData* fit,	            /* Precomputed fitting data */
-                    GuessData*     guess,	            /* The initial guesses */
+bool InvDipoleFitData::fit_one(InvDipoleFitData* fit,	            /* Precomputed fitting data */
+                    InvGuessData*     guess,	            /* The initial guesses */
                     float         time,              /* Which time is it? */
                     float         *B,	            /* The field to fit */
                     int           verbose,
-                    ECD&          res               /* The fitted dipole */
+                    InvEcd&          res               /* The fitted dipole */
                     )
 {
-    float  **simplex       = NULL;	       /* The simplex */
+    float  **simplex       = nullptr;	       /* The simplex */
     float  vals[4];			       /* Values at the vertices */
     float  limit           = 0.2;	               /* (pseudo) radial component omission limit */
     float  size            = 1e-2;	       /* Size of the initial simplex */
@@ -4611,7 +4611,7 @@ bool DipoleFitData::fit_one(DipoleFitData* fit,	            /* Precomputed fitti
     int        fit_fail;
 
     nchan = fit->nmeg+fit->neeg;
-    user.fwd = NULL;
+    user.fwd = nullptr;
 
     if (fit->proj && fit->proj->project_vector(B,nchan,TRUE) == FAIL)
         goto bad;
@@ -4627,7 +4627,7 @@ bool DipoleFitData::fit_one(DipoleFitData* fit,	            /* Precomputed fitti
     user.limit = limit;
     user.B     = B;
     user.B2    = mne_dot_vectors_3(B,B,nchan);
-    user.fwd   = NULL;
+    user.fwd   = nullptr;
     user.report_dim = FALSE;
     fit->user  = &user;
 
@@ -4669,7 +4669,7 @@ bool DipoleFitData::fit_one(DipoleFitData* fit,	            /* Precomputed fitti
         }
         VEC_COPY_3(rd_final,simplex[0]);
         VEC_COPY_3(rd_guess,simplex[0]);
-        FREE_CMATRIX_3(simplex); simplex = NULL;
+        FREE_CMATRIX_3(simplex); simplex = nullptr;
 
         neval_tot += neval;
         final_val  = vals[0];
@@ -4713,7 +4713,7 @@ bad : {
 
 //=============================================================================================================
 
-int DipoleFitData::compute_dipole_field(DipoleFitData& d, const Eigen::Vector3f& rd, int whiten, Eigen::Ref<Eigen::MatrixXf> fwd)
+int InvDipoleFitData::compute_dipole_field(InvDipoleFitData& d, const Eigen::Vector3f& rd, int whiten, Eigen::Ref<Eigen::MatrixXf> fwd)
 /*
  * Compute the field and take whitening and projection into account
  * fwd is nch x 3 (columns = orientation axes X, Y, Z)
@@ -4729,28 +4729,50 @@ int DipoleFitData::compute_dipole_field(DipoleFitData& d, const Eigen::Vector3f&
    */
     if (d.nmeg > 0) {
         int nmeg = d.meg_coils->ncoil();
-        auto fwd0 = fwd.col(0).head(nmeg);
-        auto fwd1 = fwd.col(1).head(nmeg);
-        auto fwd2 = fwd.col(2).head(nmeg);
-        if (d.funcs->meg_field(rd,Qx,*d.meg_coils,fwd0,d.funcs->meg_client) != OK)
-            goto bad;
-        if (d.funcs->meg_field(rd,Qy,*d.meg_coils,fwd1,d.funcs->meg_client) != OK)
-            goto bad;
-        if (d.funcs->meg_field(rd,Qz,*d.meg_coils,fwd2,d.funcs->meg_client) != OK)
-            goto bad;
+        if (d.funcs->meg_vec_field) {
+            /*
+             * Use the vector field function: computes all three dipole
+             * orientations at once. Output is 3 x ncoil, we need nch x 3.
+             */
+            Eigen::MatrixXf vec_meg(3, nmeg);
+            if (d.funcs->meg_vec_field(rd,*d.meg_coils,vec_meg,d.funcs->meg_client) != OK)
+                goto bad;
+            fwd.topRows(nmeg) = vec_meg.transpose();
+        } else {
+            auto fwd0 = fwd.col(0).head(nmeg);
+            auto fwd1 = fwd.col(1).head(nmeg);
+            auto fwd2 = fwd.col(2).head(nmeg);
+            if (d.funcs->meg_field(rd,Qx,*d.meg_coils,fwd0,d.funcs->meg_client) != OK)
+                goto bad;
+            if (d.funcs->meg_field(rd,Qy,*d.meg_coils,fwd1,d.funcs->meg_client) != OK)
+                goto bad;
+            if (d.funcs->meg_field(rd,Qz,*d.meg_coils,fwd2,d.funcs->meg_client) != OK)
+                goto bad;
+        }
     }
 
     if (d.neeg > 0) {
         int neeg = d.eeg_els->ncoil();
-        auto fwd0 = fwd.col(0).segment(d.nmeg, neeg);
-        auto fwd1 = fwd.col(1).segment(d.nmeg, neeg);
-        auto fwd2 = fwd.col(2).segment(d.nmeg, neeg);
-        if (d.funcs->eeg_pot(rd,Qx,*d.eeg_els,fwd0,d.funcs->eeg_client) != OK)
-            goto bad;
-        if (d.funcs->eeg_pot(rd,Qy,*d.eeg_els,fwd1,d.funcs->eeg_client) != OK)
-            goto bad;
-        if (d.funcs->eeg_pot(rd,Qz,*d.eeg_els,fwd2,d.funcs->eeg_client) != OK)
-            goto bad;
+        if (d.funcs->eeg_vec_pot) {
+            /*
+             * Use the vector potential function: computes all three dipole
+             * orientations at once. Output is 3 x ncoil, we need nch x 3.
+             */
+            Eigen::MatrixXf vec_eeg(3, neeg);
+            if (d.funcs->eeg_vec_pot(rd,*d.eeg_els,vec_eeg,d.funcs->eeg_client) != OK)
+                goto bad;
+            fwd.block(d.nmeg, 0, neeg, 3) = vec_eeg.transpose();
+        } else {
+            auto fwd0 = fwd.col(0).segment(d.nmeg, neeg);
+            auto fwd1 = fwd.col(1).segment(d.nmeg, neeg);
+            auto fwd2 = fwd.col(2).segment(d.nmeg, neeg);
+            if (d.funcs->eeg_pot(rd,Qx,*d.eeg_els,fwd0,d.funcs->eeg_client) != OK)
+                goto bad;
+            if (d.funcs->eeg_pot(rd,Qy,*d.eeg_els,fwd1,d.funcs->eeg_client) != OK)
+                goto bad;
+            if (d.funcs->eeg_pot(rd,Qz,*d.eeg_els,fwd2,d.funcs->eeg_client) != OK)
+                goto bad;
+        }
     }
 
     /*

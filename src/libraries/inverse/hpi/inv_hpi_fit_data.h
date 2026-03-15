@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    HPIFitData class declaration.
+ * @brief    InvHpiFitData class declaration.
  *
  */
 
-#ifndef HPIFITDATA_H
-#define HPIFITDATA_H
+#ifndef INV_HPI_FIT_DATA_H
+#define INV_HPI_FIT_DATA_H
 
 //=============================================================================================================
 // INCLUDES
@@ -109,18 +109,18 @@ struct HPISortStruct {
  *
  * @brief HPI Fit algorithm data structure.
  */
-class INVSHARED_EXPORT HPIFitData
+class INVSHARED_EXPORT InvHpiFitData
 {
 
 public:
-    typedef QSharedPointer<HPIFitData> SPtr;             /**< Shared pointer type for HPIFitData. */
-    typedef QSharedPointer<const HPIFitData> ConstSPtr;  /**< Const shared pointer type for HPIFitData. */
+    typedef QSharedPointer<InvHpiFitData> SPtr;             /**< Shared pointer type for InvHpiFitData. */
+    typedef QSharedPointer<const InvHpiFitData> ConstSPtr;  /**< Const shared pointer type for InvHpiFitData. */
 
     //=========================================================================================================
     /**
      * Default constructor.
      */
-    explicit HPIFitData();
+    explicit InvHpiFitData();
 
     //=========================================================================================================
     /**
@@ -131,7 +131,7 @@ public:
     Eigen::MatrixXd         m_coilPos;
     Eigen::RowVectorXd      m_sensorData;
     DipFitError             m_errorInfo;
-    SensorSet               m_sensors;
+    InvSensorSet               m_sensors;
     Eigen::MatrixXd         m_matProjector;
 
     int                     m_iMaxIterations;
@@ -157,7 +157,7 @@ protected:
      * same output.
      */
     Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& matPos,
-                                      const SensorSet& sensors);
+                                      const InvSensorSet& sensors);
 
     //=========================================================================================================
     /**
@@ -168,7 +168,7 @@ protected:
      */
     DipFitError dipfitError(const Eigen::MatrixXd& matPos,
                             const Eigen::MatrixXd& matData,
-                            const SensorSet& sensors,
+                            const InvSensorSet& sensors,
                             const Eigen::MatrixXd& matProjectors);
 
     //=========================================================================================================
@@ -189,7 +189,7 @@ protected:
                                int iDisplay,
                                const Eigen::MatrixXd& matData,
                                const Eigen::MatrixXd& matProjectors,
-                               const SensorSet& sensors,
+                               const InvSensorSet& sensors,
                                int &iSimplexNumitr);
 };
 
@@ -198,4 +198,4 @@ protected:
 //=============================================================================================================
 } //NAMESPACE
 
-#endif // HPIFITDATA_H
+#endif // INV_HPI_FIT_DATA_H

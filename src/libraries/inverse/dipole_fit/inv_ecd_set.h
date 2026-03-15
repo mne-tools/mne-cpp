@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     ecd_set.h
+ * @file     inv_ecd_set.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -34,8 +34,8 @@
  *
  */
 
-#ifndef ECD_SET_H
-#define ECD_SET_H
+#ifndef INV_ECD_SET_H
+#define INV_ECD_SET_H
 
 //=============================================================================================================
 // INCLUDES
@@ -77,18 +77,18 @@ namespace INVLIB {
  * @brief Holds a set of Electric Current Dipoles.
  */
 
-class INVSHARED_EXPORT ECDSet
+class INVSHARED_EXPORT InvEcdSet
 {
 
 public:
-    typedef QSharedPointer<ECDSet> SPtr;            /**< Shared pointer type for ECDSet. */
-    typedef QSharedPointer<const ECDSet> ConstSPtr; /**< Const shared pointer type for ECDSet. */
+    typedef QSharedPointer<InvEcdSet> SPtr;            /**< Shared pointer type for InvEcdSet. */
+    typedef QSharedPointer<const InvEcdSet> ConstSPtr; /**< Const shared pointer type for InvEcdSet. */
 
     //=========================================================================================================
     /**
      * Constructs a Electric Current Dipole Set object.
      */
-    ECDSet();
+    InvEcdSet();
 
     //=========================================================================================================
     /**
@@ -96,19 +96,19 @@ public:
      *
      * @param[in] p_ECDSet       Electric Current Dipole Set which should be copied.
      */
-    ECDSet(const ECDSet &p_ECDSet);
+    InvEcdSet(const InvEcdSet &p_ECDSet);
 
     //=========================================================================================================
     /**
      * Destroys the Electric Current Dipole description
      */
-    ~ECDSet();
+    ~InvEcdSet();
 
     //=========================================================================================================
     /**
      * Appends an Electric Current Dipole to the set
      */
-    void addEcd(const ECD& p_ecd);
+    void addEcd(const InvEcd& p_ecd);
 
     //=========================================================================================================
     /**
@@ -116,7 +116,7 @@ public:
      *
      * @param[in] name   File name to read from.
      */
-    static ECDSet read_dipoles_dip(const QString& fileName);
+    static InvEcdSet read_dipoles_dip(const QString& fileName);
 
     //=========================================================================================================
     /**
@@ -144,46 +144,46 @@ public:
 
     //=========================================================================================================
     /**
-     * Subscript operator [] to access ECD by index
+     * Subscript operator [] to access InvEcd by index
      *
-     * @param[in] idx    the ECD index.
+     * @param[in] idx    the InvEcd index.
      *
-     * @return ECD related to the parameter index.
+     * @return InvEcd related to the parameter index.
      */
-    const ECD& operator[] (int idx) const;
+    const InvEcd& operator[] (int idx) const;
 
     //=========================================================================================================
     /**
-     * Subscript operator [] to access ECD by index
+     * Subscript operator [] to access InvEcd by index
      *
-     * @param[in] idx    the ECD index.
+     * @param[in] idx    the InvEcd index.
      *
-     * @return ECD related to the parameter index.
+     * @return InvEcd related to the parameter index.
      */
-    ECD& operator[] (int idx);
+    InvEcd& operator[] (int idx);
 
     //=========================================================================================================
     /**
-     * Subscript operator << to add a new ECD
+     * Subscript operator << to add a new InvEcd
      *
-     * @param[in] p_ecd      ECD to be added.
+     * @param[in] p_ecd      InvEcd to be added.
      *
-     * @return ECDSet.
+     * @return InvEcdSet.
      */
-    ECDSet& operator<< (const ECD& p_ecd);
+    InvEcdSet& operator<< (const InvEcd& p_ecd);
 
 public:
     QString dataname;   /**< The associated data file. */
 
 private:
-    QList<ECD> m_qListDips;     /**< List of Electric Current Dipoles. */
+    QList<InvEcd> m_qListDips;     /**< List of Electric Current Dipoles. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline qint32 ECDSet::size() const
+inline qint32 InvEcdSet::size() const
 {
     return m_qListDips.size();
 }
@@ -191,7 +191,7 @@ inline qint32 ECDSet::size() const
 
 #ifndef metatype_ecdset
 #define metatype_ecdset
-Q_DECLARE_METATYPE(INVLIB::ECDSet);
+Q_DECLARE_METATYPE(INVLIB::InvEcdSet);
 #endif
 
-#endif // ECD_SET_H
+#endif // INV_ECD_SET_H

@@ -13,7 +13,7 @@ using namespace INVLIB;
  * Basics...
  */
 #define MALLOC(x,t) (t *)malloc((x)*sizeof(t))
-#define REALLOC(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
+#define REALLOC(x,y,t) (t *)((x == nullptr) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
 
 #define X 0
 #define Y 1
@@ -31,14 +31,14 @@ using namespace INVLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DipoleFitSettings::DipoleFitSettings()
+InvDipoleFitSettings::InvDipoleFitSettings()
 {
     initMembers();
 }
 
 //=============================================================================================================
 
-DipoleFitSettings::DipoleFitSettings(int *argc,char **argv)
+InvDipoleFitSettings::InvDipoleFitSettings(int *argc,char **argv)
 {
     initMembers();
 
@@ -53,14 +53,14 @@ DipoleFitSettings::DipoleFitSettings(int *argc,char **argv)
 
 //=============================================================================================================
 
-DipoleFitSettings::~DipoleFitSettings()
+InvDipoleFitSettings::~InvDipoleFitSettings()
 {
     //ToDo Garbage collection
 }
 
 //=============================================================================================================
 
-void DipoleFitSettings::initMembers()
+void InvDipoleFitSettings::initMembers()
 {
     // Init origin
     r0 << 0.0f,0.0f,0.04f;
@@ -90,7 +90,7 @@ void DipoleFitSettings::initMembers()
     diagnoise    = false;         
 
     is_raw       = false;         
-    badname     = NULL;          
+    badname     = nullptr;          
     include_meg  = false;         
     include_eeg  = false;        
     tmin         = -2*BIG_TIME;   
@@ -118,7 +118,7 @@ void DipoleFitSettings::initMembers()
 
 //=============================================================================================================
 
-void DipoleFitSettings::checkIntegrity()
+void InvDipoleFitSettings::checkIntegrity()
 {
     do_baseline = (bmin < BIG_TIME && bmax < BIG_TIME);
 
@@ -198,7 +198,7 @@ void DipoleFitSettings::checkIntegrity()
 
 //=============================================================================================================
 
-void DipoleFitSettings::usage(char *name)
+void InvDipoleFitSettings::usage(char *name)
 {
     printf("usage: %s [options]\n",name);
     printf("This is a program for sequential single dipole fitting.\n");
@@ -274,7 +274,7 @@ void DipoleFitSettings::usage(char *name)
 
 //=============================================================================================================
 
-bool DipoleFitSettings::check_unrecognized_args(int argc, char **argv)
+bool InvDipoleFitSettings::check_unrecognized_args(int argc, char **argv)
 {
     if ( argc > 1 ) {
         printf("Unrecognized arguments : ");
@@ -289,7 +289,7 @@ bool DipoleFitSettings::check_unrecognized_args(int argc, char **argv)
 
 //=============================================================================================================
 
-bool DipoleFitSettings::check_args (int *argc,char **argv)
+bool InvDipoleFitSettings::check_args (int *argc,char **argv)
 {
     int found;
     float fval;

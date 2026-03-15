@@ -200,8 +200,8 @@ int main(int argc, char *argv[])
     // if debugging files are necessary set bDoDebug = true;
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
 
-    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(pFiffInfo);
-    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
+    InvHpiDataUpdater hpiDataUpdater = InvHpiDataUpdater(pFiffInfo);
+    InvHpiFit HPI = InvHpiFit(hpiDataUpdater.getSensors());
 
     MatrixXd matAmplitudes;
     MatrixXd matCoilLoc(4,3);
@@ -220,14 +220,14 @@ int main(int argc, char *argv[])
     const auto& matProjectedData = hpiDataUpdater.getProjectedData();
     const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
     const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
-    HpiModelParameters hpiModelParameters(vecFreqs,
+    InvHpiModelParameters hpiModelParameters(vecFreqs,
                                           pFiffInfo->sfreq,
                                           pFiffInfo->linefreq,
                                           bFast);
 
     HpiFitResult hpiFitResult;
     HPI.fit(matProjectedData,matPreparedProjectors,hpiModelParameters,matCoilsHead,true,hpiFitResult);
-    hpiModelParameters = HpiModelParameters(hpiFitResult.hpiFreqs,
+    hpiModelParameters = InvHpiModelParameters(hpiFitResult.hpiFreqs,
                                             pFiffInfo->sfreq,
                                             pFiffInfo->linefreq,
                                             bFast);
@@ -259,7 +259,7 @@ int main(int argc, char *argv[])
                 hpiFitResult);
         fTimer = timer.elapsed();
 
-        HPIFit::storeHeadPosition(vecTime(i), hpiFitResult.devHeadTrans.trans, matPosition, hpiFitResult.GoF, hpiFitResult.errorDistances);
+        InvHpiFit::storeHeadPosition(vecTime(i), hpiFitResult.devHeadTrans.trans, matPosition, hpiFitResult.GoF, hpiFitResult.errorDistances);
         matPosition(i,9) = fTimer;
         // if big head displacement occures, update debHeadTrans
         if(MNEMath::compareTransformation(transDevHead.trans, hpiFitResult.devHeadTrans.trans, fThreshRot, fThreshTrans)) {

@@ -1,7 +1,7 @@
 //=============================================================================================================
 // test_inv_rt_library.cpp — Tests for the Inverse and RT Processing libraries
 //
-// Covers: DipoleFitSettings, RapMusic, Dipole, DipolePair,
+// Covers: InvDipoleFitSettings, InvRapMusic, InvDipole, InvDipolePair,
 //         RtConnectivity, RtHpi, RtInvOp, RtAveraging, RtNoise, filterFile
 //=============================================================================================================
 
@@ -69,15 +69,15 @@ private slots:
     void initTestCase();
     void cleanupTestCase();
 
-    // ── Inverse: DipoleFitSettings ──
+    // ── Inverse: InvDipoleFitSettings ──
     void dipoleFitSettings_defaultCtor();
     void dipoleFitSettings_cliParsing();
 
-    // ── Inverse: RapMusic ──
+    // ── Inverse: InvRapMusic ──
     void rapMusic_defaultCtorAndBasics();
     void rapMusic_mathHelpers();
 
-    // ── Inverse: Dipole ──
+    // ── Inverse: InvDipole ──
     void dipole_fullExercise();
 
     // ── RT Processing: RtConnectivity ──
@@ -106,11 +106,11 @@ private slots:
     void hpiFitData_defaultConstruction();
     void hpiFitData_setMembersAndFit();
 
-    // ── HpiModelParameters (from boost) ──
+    // ── InvHpiModelParameters (from boost) ──
     void hpiModelParams_construction();
     void hpiModelParams_copyAndCompare();
 
-    // ── SignalModel (from boost) ──
+    // ── InvSignalModel (from boost) ──
     void signalModel_construction();
 
     // ── FilterKernel (from boost) ──
@@ -147,12 +147,12 @@ void TestInvRtLibrary::initTestCase()
 void TestInvRtLibrary::cleanupTestCase() {}
 
 //=============================================================================================================
-// Inverse: DipoleFitSettings
+// Inverse: InvDipoleFitSettings
 //=============================================================================================================
 
 void TestInvRtLibrary::dipoleFitSettings_defaultCtor()
 {
-    DipoleFitSettings settings;
+    InvDipoleFitSettings settings;
     QVERIFY(settings.measname.isEmpty());
     QVERIFY(!settings.include_meg);
     QVERIFY(!settings.include_eeg);
@@ -208,7 +208,7 @@ void TestInvRtLibrary::dipoleFitSettings_cliParsing()
                               "--verbose"};
         int argc = sizeof(args) / sizeof(args[0]);
         char** argv = const_cast<char**>(args);
-        DipoleFitSettings settings(&argc, argv);
+        InvDipoleFitSettings settings(&argc, argv);
         QVERIFY(settings.include_meg);
         QVERIFY(settings.include_eeg);
         QVERIFY(settings.accurate);
@@ -223,18 +223,18 @@ void TestInvRtLibrary::dipoleFitSettings_cliParsing()
                               "--guesssurf", "inner_skull.fif"};
         int argc = sizeof(args) / sizeof(args[0]);
         char** argv = const_cast<char**>(args);
-        DipoleFitSettings settings(&argc, argv);
+        InvDipoleFitSettings settings(&argc, argv);
         QVERIFY(settings.include_meg);
     }
 }
 
 //=============================================================================================================
-// Inverse: RapMusic
+// Inverse: InvRapMusic
 //=============================================================================================================
 
 void TestInvRtLibrary::rapMusic_defaultCtorAndBasics()
 {
-    RapMusic rap;
+    InvRapMusic rap;
     const char* name = rap.getName();
     QVERIFY(QString(name).contains("RAP"));
 
@@ -252,20 +252,20 @@ void TestInvRtLibrary::rapMusic_mathHelpers()
     FwdForwardSolution fwd(fwdFile);
     if (fwd.isEmpty()) QSKIP("Could not read forward");
 
-    RapMusic rap;
+    InvRapMusic rap;
     bool initOk = rap.init(fwd, false, 2, 0.5);
     QVERIFY(initOk);
     QVERIFY(QString(rap.getName()).contains("RAP"));
 }
 
 //=============================================================================================================
-// Inverse: Dipole
+// Inverse: InvDipole
 //=============================================================================================================
 
 void TestInvRtLibrary::dipole_fullExercise()
 {
     // Default constructor
-    Dipole<double> dip;
+    InvDipole<double> dip;
     QCOMPARE(dip.x(), 0.0);
     QCOMPARE(dip.y(), 0.0);
     QCOMPARE(dip.z(), 0.0);
@@ -280,14 +280,14 @@ void TestInvRtLibrary::dipole_fullExercise()
     QCOMPARE(dip.z(), 3.0);
     QCOMPARE(dip.phi_x(), 0.5);
 
-    DipolePair<double> pair;
+    InvDipolePair<double> pair;
     pair.m_iIdx1 = 0; pair.m_iIdx2 = 5; pair.m_vCorrelation = 0.95;
 
-    Dipole<float> dipF;
+    InvDipole<float> dipF;
     dipF.x() = 1.0f;
     QCOMPARE(dipF.x(), 1.0f);
 
-    Dipole<int> dipI;
+    InvDipole<int> dipI;
     dipI.x() = 42;
     QCOMPARE(dipI.x(), 42);
 }
@@ -311,10 +311,10 @@ void TestInvRtLibrary::rtConnectivity_lifecycle()
 
 void TestInvRtLibrary::rtHpi_lifecycle()
 {
-    SensorSet sensorSet;
+    InvSensorSet sensorSet;
     RtHpi rtHpi(sensorSet);
 
-    HpiModelParameters hpiParams;
+    InvHpiModelParameters hpiParams;
     rtHpi.setModelParameters(hpiParams);
 
     MatrixXd projMat = MatrixXd::Identity(10, 10);
@@ -472,9 +472,9 @@ void TestInvRtLibrary::hpiFit_constructWithSensorSet()
     if (!hasData()) QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
-    SensorSetCreator creator;
-    SensorSet sensorSet = creator.updateSensorSet(raw.info.chs, Accuracy::medium);
-    HPIFit hpiFit(sensorSet);
+    InvSensorSetCreator creator;
+    InvSensorSet sensorSet = creator.updateSensorSet(raw.info.chs, Accuracy::medium);
+    InvHpiFit hpiFit(sensorSet);
     QVERIFY(true);
 }
 
@@ -487,7 +487,7 @@ void TestInvRtLibrary::hpiFit_storeHeadPosition()
     VectorXd vecGoF(4);
     vecGoF << 0.99, 0.98, 0.97, 0.96;
     QVector<double> vecError = {0.001, 0.002, 0.001, 0.003};
-    HPIFit::storeHeadPosition(0.5f, matTransDevHead, matPosition, vecGoF, vecError);
+    InvHpiFit::storeHeadPosition(0.5f, matTransDevHead, matPosition, vecGoF, vecError);
     // storeHeadPosition appends a new row; check the last row has data
     int lastRow = matPosition.rows() - 1;
     QVERIFY(lastRow >= 0);
@@ -499,11 +499,11 @@ void TestInvRtLibrary::hpiFit_fitWithSyntheticData()
     if (!hasData()) QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
-    SensorSetCreator creator;
-    SensorSet sensorSet = creator.updateSensorSet(raw.info.chs, Accuracy::medium);
-    HPIFit hpiFit(sensorSet);
+    InvSensorSetCreator creator;
+    InvSensorSet sensorSet = creator.updateSensorSet(raw.info.chs, Accuracy::medium);
+    InvHpiFit hpiFit(sensorSet);
     QVector<int> hpiFreqs = {154, 158, 162, 166};
-    HpiModelParameters modelParams(hpiFreqs, static_cast<int>(raw.info.sfreq), 60, false);
+    InvHpiModelParameters modelParams(hpiFreqs, static_cast<int>(raw.info.sfreq), 60, false);
     RowVectorXi megPicks = raw.info.pick_types(true, false, false);
     int nMeg = megPicks.size();
     int nSamples = static_cast<int>(raw.info.sfreq);
@@ -518,7 +518,7 @@ void TestInvRtLibrary::hpiFit_fitWithSyntheticData()
 
 void TestInvRtLibrary::hpiFitData_defaultConstruction()
 {
-    HPIFitData data;
+    InvHpiFitData data;
     // m_iMaxIterations is uninitialized by default; just verify the object can be constructed
     QVERIFY(true);
 }
@@ -529,13 +529,13 @@ void TestInvRtLibrary::hpiFitData_setMembersAndFit()
 }
 
 //=============================================================================================================
-// HpiModelParameters (from boost)
+// InvHpiModelParameters (from boost)
 //=============================================================================================================
 
 void TestInvRtLibrary::hpiModelParams_construction()
 {
     QVector<int> freqs = {154, 158, 162, 166};
-    HpiModelParameters params(freqs, 1000, 60, false);
+    InvHpiModelParameters params(freqs, 1000, 60, false);
     QCOMPARE(params.vecHpiFreqs(), freqs);
     QCOMPARE(params.iSampleFreq(), 1000);
     QCOMPARE(params.iLineFreq(), 60);
@@ -546,23 +546,23 @@ void TestInvRtLibrary::hpiModelParams_construction()
 void TestInvRtLibrary::hpiModelParams_copyAndCompare()
 {
     QVector<int> freqs = {154, 158, 162, 166};
-    HpiModelParameters params1(freqs, 1000, 60, false);
-    HpiModelParameters params2(params1);
+    InvHpiModelParameters params1(freqs, 1000, 60, false);
+    InvHpiModelParameters params2(params1);
     QVERIFY(params1 == params2);
     QVERIFY(!(params1 != params2));
-    HpiModelParameters params3(freqs, 2000, 50, true);
+    InvHpiModelParameters params3(freqs, 2000, 50, true);
     QVERIFY(params1 != params3);
 }
 
 //=============================================================================================================
-// SignalModel (from boost)
+// InvSignalModel (from boost)
 //=============================================================================================================
 
 void TestInvRtLibrary::signalModel_construction()
 {
     QVector<int> freqs = {154, 158, 162, 166};
-    HpiModelParameters params(freqs, 1000, 60, false);
-    SignalModel model;
+    InvHpiModelParameters params(freqs, 1000, 60, false);
+    InvSignalModel model;
     int nSamples = 200;
     MatrixXd matData = MatrixXd::Random(1, nSamples);
     MatrixXd matFitted = model.fitData(params, matData);

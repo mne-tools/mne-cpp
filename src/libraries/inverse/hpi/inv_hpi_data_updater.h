@@ -28,12 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     HpiDataUpdater class declaration.
+ * @brief     InvHpiDataUpdater class declaration.
  *
  */
 
-#ifndef HPIDATAUPDATER_H
-#define HPIDATAUPDATER_H
+#ifndef INV_HPI_DATA_UPDATER_H
+#define INV_HPI_DATA_UPDATER_H
 
 //=============================================================================================================
 // INCLUDES
@@ -85,18 +85,18 @@ namespace INVLIB
  *
  * @brief Preprocesses raw HPI coil data (SSP projection, compensation, sinusoidal model fitting) before dipole localization
  */
-class INVSHARED_EXPORT HpiDataUpdater
+class INVSHARED_EXPORT InvHpiDataUpdater
 {
 
 public:
-    typedef QSharedPointer<HpiDataUpdater> SPtr;            /**< Shared pointer type for HpiDataUpdater. */
-    typedef QSharedPointer<const HpiDataUpdater> ConstSPtr; /**< Const shared pointer type for HpiDataUpdater. */
+    typedef QSharedPointer<InvHpiDataUpdater> SPtr;            /**< Shared pointer type for InvHpiDataUpdater. */
+    typedef QSharedPointer<const InvHpiDataUpdater> ConstSPtr; /**< Const shared pointer type for InvHpiDataUpdater. */
 
     //=========================================================================================================
     /**
-    * Constructs a HpiDataUpdater object.
+    * Constructs a InvHpiDataUpdater object.
     */
-    HpiDataUpdater(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+    InvHpiDataUpdater(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -126,7 +126,7 @@ public:
     inline const Eigen::MatrixXd& getHpiDigitizer();
     inline const Eigen::MatrixXd& getData();
     inline const Eigen::MatrixXd& getProjectedData();
-    inline const SensorSet& getSensors();
+    inline const InvSensorSet& getSensors();
 
 private:
     //=========================================================================================================
@@ -200,8 +200,8 @@ private:
     Eigen::MatrixXd m_matProjectors;        /**< The projectors ready to use*/
     Eigen::MatrixXd m_matInnerdata;         /**< The data ready to use*/
     Eigen::MatrixXd m_matDataProjected;     /**< The data with projectros applied*/
-    SensorSetCreator m_sensorSetCreator;    /**< ThesensorSetCreator to create a sensorset*/
-    SensorSet m_sensors;                    /**< The most recent SensorSet*/
+    InvSensorSetCreator m_sensorSetCreator;    /**< ThesensorSetCreator to create a sensorset*/
+    InvSensorSet m_sensors;                    /**< The most recent InvSensorSet*/
 
 };
 
@@ -209,37 +209,37 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline const QList<FIFFLIB::FiffChInfo>& HpiDataUpdater::getChannels()
+inline const QList<FIFFLIB::FiffChInfo>& InvHpiDataUpdater::getChannels()
 {
     return m_lChannels;
 }
 
-inline const Eigen::MatrixXd& HpiDataUpdater::getProjectors()
+inline const Eigen::MatrixXd& InvHpiDataUpdater::getProjectors()
 {
     return m_matProjectors;
 }
 
-inline const Eigen::MatrixXd& HpiDataUpdater::getData()
+inline const Eigen::MatrixXd& InvHpiDataUpdater::getData()
 {
     return m_matInnerdata;
 }
 
-inline const Eigen::MatrixXd& HpiDataUpdater::getProjectedData()
+inline const Eigen::MatrixXd& InvHpiDataUpdater::getProjectedData()
 {
     return m_matDataProjected;
 }
 
-inline const Eigen::MatrixXd& HpiDataUpdater::getHpiDigitizer()
+inline const Eigen::MatrixXd& InvHpiDataUpdater::getHpiDigitizer()
 {
     return m_matHpiDigitizer;
 }
 
-inline const SensorSet& HpiDataUpdater::getSensors()
+inline const InvSensorSet& InvHpiDataUpdater::getSensors()
 {
     return m_sensors;
 }
 
 } // namespace INVLIB
 
-#endif // HPIDATAUPDATER_H
+#endif // INV_HPI_DATA_UPDATER_H
 

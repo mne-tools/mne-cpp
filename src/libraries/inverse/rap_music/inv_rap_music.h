@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     rap_music.h
+ * @file     inv_rap_music.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
@@ -29,12 +29,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    RapMusic algorithm class declaration.
+ * @brief    InvRapMusic algorithm class declaration.
  *
  */
 
-#ifndef RAPMUSIC_H
-#define RAPMUSIC_H
+#ifndef INV_RAP_MUSIC_H
+#define INV_RAP_MUSIC_H
 
 //=============================================================================================================
 // INCLUDES
@@ -90,11 +90,11 @@ typedef struct Pair
  *
  * ToDo Detailed description
  */
-class INVSHARED_EXPORT RapMusic
+class INVSHARED_EXPORT InvRapMusic
 {
 public:
-    typedef QSharedPointer<RapMusic> SPtr;             /**< Shared pointer type for RapMusic. */
-    typedef QSharedPointer<const RapMusic> ConstSPtr;  /**< Const shared pointer type for RapMusic. */
+    typedef QSharedPointer<InvRapMusic> SPtr;             /**< Shared pointer type for InvRapMusic. */
+    typedef QSharedPointer<const InvRapMusic> ConstSPtr;  /**< Const shared pointer type for InvRapMusic. */
 
     //*********************************************************************************************************
     //=========================================================================================================
@@ -116,13 +116,13 @@ public:
 
     //=========================================================================================================
     /**
-     * Default constructor creates an empty RapMusic algorithm which still needs to be initialized.
+     * Default constructor creates an empty InvRapMusic algorithm which still needs to be initialized.
      */
-    RapMusic();
+    InvRapMusic();
 
     //=========================================================================================================
     /**
-     * Constructor which initializes the RapMusic algorithm with the given model.
+     * Constructor which initializes the InvRapMusic algorithm with the given model.
      *
      * @param[in] p_Fwd          The model which contains the gain matrix and its corresponding grid matrix.
      * @param[in] p_bSparsed     True when sparse matrices should be used.
@@ -130,9 +130,9 @@ public:
      *                           the strongest.
      * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
      */
-    RapMusic(FWDLIB::FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
+    InvRapMusic(FWDLIB::FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
 
-    virtual ~RapMusic();
+    virtual ~InvRapMusic();
 
     //=========================================================================================================
     /**
@@ -147,11 +147,11 @@ public:
      */
     bool init(FWDLIB::FwdForwardSolution& p_pFwd, bool p_bSparsed = false, int p_iN = 2, double p_dThr = 0.5);
 
-    virtual MNESourceEstimate calculateInverse(const FIFFLIB::FiffEvoked &p_fiffEvoked, bool pick_normal = false);
+    virtual InvSourceEstimate calculateInverse(const FIFFLIB::FiffEvoked &p_fiffEvoked, bool pick_normal = false);
 
-    virtual MNESourceEstimate calculateInverse(const Eigen::MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const;
+    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const;
 
-    virtual MNESourceEstimate calculateInverse(const Eigen::MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles) const;
+    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd& p_matMeasurement, QList< InvDipolePair<double> > &p_RapDipoles) const;
 
     virtual const char* getName() const;
 
@@ -294,7 +294,7 @@ protected:
     static void insertSource(  int p_iDipoleIdx1, int p_iDipoleIdx2,
                         const Vector6T &p_vec_phi_k_1,
                         double p_valCor,
-                        QList< DipolePair<double> > &p_RapDipoles);
+                        QList< InvDipolePair<double> > &p_RapDipoles);
 
     FWDLIB::FwdForwardSolution m_ForwardSolution; /**< The Forward operator which should be scanned through*/
 
@@ -356,7 +356,7 @@ protected:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline int RapMusic::getRank(const MatrixXT& p_matSigma)
+inline int InvRapMusic::getRank(const MatrixXT& p_matSigma)
 {
     int t_iRank;
     //if once a singularvalue is smaller than epsilon = 10^-5 the following values are also smaller
@@ -372,7 +372,7 @@ inline int RapMusic::getRank(const MatrixXT& p_matSigma)
 
 //=============================================================================================================
 
-inline int RapMusic::useFullRank(   const MatrixXT& p_Mat,
+inline int InvRapMusic::useFullRank(   const MatrixXT& p_Mat,
                                     const MatrixXT& p_matSigma_src,
                                     MatrixXT& p_matFull_Rank,
                                     int type)
@@ -389,7 +389,7 @@ inline int RapMusic::useFullRank(   const MatrixXT& p_Mat,
 
 //=============================================================================================================
 
-inline RapMusic::MatrixXT RapMusic::makeSquareMat(const MatrixXT& p_matF)
+inline InvRapMusic::MatrixXT InvRapMusic::makeSquareMat(const MatrixXT& p_matF)
 {
     //Make rectangular - p_matF*p_matF^T
     //MatrixXT FFT = p_matF*p_matF.transpose();
@@ -400,4 +400,4 @@ inline RapMusic::MatrixXT RapMusic::makeSquareMat(const MatrixXT& p_matF)
 }
 } //NAMESPACE
 
-#endif // RAPMUSIC_H
+#endif // INV_RAP_MUSIC_H

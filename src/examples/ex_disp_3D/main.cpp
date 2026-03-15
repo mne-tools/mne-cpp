@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
 
     // Load data
     QPair<float, float> baseline(-1.0f, -1.0f);
-    MNESourceEstimate sourceEstimate;
+    InvSourceEstimate sourceEstimate;
     FiffEvoked evoked(t_fileEvoked, parser.value(evokedIndexOption).toInt(), baseline);
 
     if(bAddRtSourceLoc) {
@@ -218,7 +218,7 @@ int main(int argc, char *argv[])
         //
         FiffInfo info = evoked.info;
 
-        MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+        InvInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
 
         if(!t_sFileClusteredInverse.isEmpty())
         {
@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
         //
         // Compute inverse solution
         //
-        MinimumNorm minimumNorm(inverse_operator, lambda2, method);
+        InvMinimumNorm minimumNorm(inverse_operator, lambda2, method);
         sourceEstimate = minimumNorm.calculateInverse(evoked);
 
         if(sourceEstimate.isEmpty())
@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
     if(bAddRtSourceLoc) {
         // Write source estimate to temp files for visualization
         int nVertLh = t_clusteredFwd.src[0].nuse;
-        MNESourceEstimate stcLh, stcRh;
+        InvSourceEstimate stcLh, stcRh;
         stcLh.data = sourceEstimate.data.topRows(nVertLh);
         stcLh.vertices = sourceEstimate.vertices.head(nVertLh);
         stcLh.tmin = sourceEstimate.tmin;

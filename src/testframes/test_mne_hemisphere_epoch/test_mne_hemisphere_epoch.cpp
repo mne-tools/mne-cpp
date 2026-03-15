@@ -174,11 +174,11 @@ private slots:
     }
 
     //=========================================================================
-    // MNESourceEstimate
+    // InvSourceEstimate
     //=========================================================================
     void sourceEstimate_defaultCtor()
     {
-        MNESourceEstimate se;
+        InvSourceEstimate se;
         QVERIFY(se.isEmpty());
         QCOMPARE(se.samples(), 0);
     }
@@ -189,7 +189,7 @@ private slots:
         VectorXi verts(10);
         for (int i = 0; i < 10; ++i) verts(i) = i;
 
-        MNESourceEstimate se(data, verts, 0.0f, 0.001f);
+        InvSourceEstimate se(data, verts, 0.0f, 0.001f);
         QVERIFY(!se.isEmpty());
         QCOMPARE(se.samples(), 5);
         QCOMPARE(se.data.rows(), (Eigen::Index)10);
@@ -199,9 +199,9 @@ private slots:
     {
         MatrixXd data = MatrixXd::Random(5, 3);
         VectorXi verts(5); verts << 0, 1, 2, 3, 4;
-        MNESourceEstimate se(data, verts, 0.1f, 0.002f);
+        InvSourceEstimate se(data, verts, 0.1f, 0.002f);
 
-        MNESourceEstimate copy(se);
+        InvSourceEstimate copy(se);
         QVERIFY(!copy.isEmpty());
         QCOMPARE(copy.samples(), 3);
         QVERIFY(copy.data.isApprox(se.data));
@@ -213,8 +213,8 @@ private slots:
         VectorXi verts(8);
         for (int i = 0; i < 8; ++i) verts(i) = i;
 
-        MNESourceEstimate se(data, verts, 0.0f, 0.001f);
-        MNESourceEstimate reduced = se.reduce(2, 4);
+        InvSourceEstimate se(data, verts, 0.0f, 0.001f);
+        InvSourceEstimate reduced = se.reduce(2, 4);
         QCOMPARE(reduced.samples(), 4);
         QCOMPARE(reduced.data.rows(), (Eigen::Index)8);
     }
@@ -223,7 +223,7 @@ private slots:
     {
         MatrixXd data = MatrixXd::Random(5, 3);
         VectorXi verts(5); verts << 0, 1, 2, 3, 4;
-        MNESourceEstimate se(data, verts, 0.0f, 0.001f);
+        InvSourceEstimate se(data, verts, 0.0f, 0.001f);
         QVERIFY(!se.isEmpty());
         se.clear();
         // After clear, check data is zeroed or empty
@@ -234,9 +234,9 @@ private slots:
     {
         MatrixXd data = MatrixXd::Random(5, 3);
         VectorXi verts(5); verts << 0, 1, 2, 3, 4;
-        MNESourceEstimate se(data, verts, 0.0f, 0.001f);
+        InvSourceEstimate se(data, verts, 0.0f, 0.001f);
 
-        MNESourceEstimate se2;
+        InvSourceEstimate se2;
         se2 = se;
         QVERIFY(!se2.isEmpty());
         QCOMPARE(se2.samples(), 3);
@@ -843,7 +843,7 @@ private slots:
     }
 
     //=========================================================================
-    // DATA-DRIVEN: MNEInverseOperator from fwd+cov
+    // DATA-DRIVEN: InvInverseOperator from fwd+cov
     //=========================================================================
     void data_invOp_makeFromFwdCov()
     {
@@ -865,7 +865,7 @@ private slots:
 
         if (fwd.isEmpty() || noiseCov.isEmpty()) QSKIP("Failed to load");
 
-        MNEInverseOperator invOp = MNEInverseOperator::make_inverse_operator(
+        InvInverseOperator invOp = InvInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
         QVERIFY(invOp.nchan > 0);
         QVERIFY(invOp.nsource > 0);

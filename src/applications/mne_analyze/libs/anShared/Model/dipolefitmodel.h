@@ -74,7 +74,7 @@ public:
                    QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
-    DipoleFitModel(INVLIB::ECDSet ECDSet,
+    DipoleFitModel(INVLIB::InvEcdSet InvEcdSet,
                    const QString &sFilePath = "",
                    const QByteArray& byteLoadedData = QByteArray(),
                    QObject* parent = Q_NULLPTR);
@@ -146,7 +146,7 @@ public:
 
 private:
 
-    INVLIB::ECDSet      m_ECD_Set;
+    INVLIB::InvEcdSet      m_ECD_Set;
 
 };
 

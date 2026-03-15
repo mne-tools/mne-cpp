@@ -549,7 +549,7 @@ void Hpi::run()
     }
 
     // init hpi fit
-    HpiModelParameters hpiModelParameters(m_vCoilFreqs,
+    InvHpiModelParameters hpiModelParameters(m_vCoilFreqs,
                                           m_pFiffInfo->sfreq,
                                           m_pFiffInfo->linefreq,
                                           false);
@@ -562,8 +562,8 @@ void Hpi::run()
 
     FiffCoordTrans transDevHeadRef = m_pFiffInfo->dev_head_t;
 
-    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
-    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
+    InvHpiDataUpdater hpiDataUpdater = InvHpiDataUpdater(m_pFiffInfo);
+    InvHpiFit HPI = InvHpiFit(hpiDataUpdater.getSensors());
 
     double dErrorMax = 0.0;
     double dMeanErrorDist = 0.0;
@@ -611,7 +611,7 @@ void Hpi::run()
                         matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
 
                 m_mutex.lock();
-                hpiModelParameters = HpiModelParameters(m_vCoilFreqs,
+                hpiModelParameters = InvHpiModelParameters(m_vCoilFreqs,
                                                         m_pFiffInfo->sfreq,
                                                         m_pFiffInfo->linefreq,
                                                         false);

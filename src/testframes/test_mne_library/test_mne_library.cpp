@@ -1,8 +1,8 @@
 //=============================================================================================================
 // test_mne_library.cpp — Comprehensive tests for the MNE library
 //
-// Covers: MNESourceSpace, MNESourceSpaces, MNESourceEstimate, MNEBem,
-//         MNECTFCompDataSet, MNEInverseOperator, MNESurfaceOrVolume,
+// Covers: MNESourceSpace, MNESourceSpaces, InvSourceEstimate, MNEBem,
+//         MNECTFCompDataSet, InvInverseOperator, MNESurfaceOrVolume,
 //         MNEMshDisplaySurface, MNEMshDisplaySurfaceSet, FwdForwardSolution,
 //         MNENamedMatrix, MNEHemisphere, MNEEpochDataList, misc types
 //=============================================================================================================
@@ -106,7 +106,7 @@ private slots:
     void sourceSpaces_filterAndTransform();
     void sourceSpaces_readAddGeom();
 
-    // ── MNESourceEstimate ──
+    // ── InvSourceEstimate ──
     void sourceEstimate_fullLifecycle();
     void sourceEstimate_writeReadBuffer();
     void sourceEstimate_writeReadFile();
@@ -123,7 +123,7 @@ private slots:
     void ctfComp_makeComp();
     void ctfComp_explainAndMap();
 
-    // ── MNEInverseOperator ──
+    // ── InvInverseOperator ──
     void inverseOp_readFromFile();
     void inverseOp_basicGetters();
     void inverseOp_readFullFile();
@@ -195,7 +195,7 @@ private slots:
     void forwardSolution_tripletSelection();
     void forwardSolution_readVerify();
 
-    // ── MNEInverseOperator extras (from boost) ──
+    // ── InvInverseOperator extras (from boost) ──
     void inverseOp_makeSmallChannelSet();
     void inverseOp_writeReadRoundTrip();
     void inverseOp_checkChNames();
@@ -415,12 +415,12 @@ void TestMneLibrary::sourceSpaces_readAddGeom()
 }
 
 //=============================================================================================================
-// MNESourceEstimate
+// InvSourceEstimate
 //=============================================================================================================
 
 void TestMneLibrary::sourceEstimate_fullLifecycle()
 {
-    MNESourceEstimate stc0;
+    InvSourceEstimate stc0;
     QVERIFY(stc0.isEmpty());
     QCOMPARE(stc0.samples(), 0);
 
@@ -428,18 +428,18 @@ void TestMneLibrary::sourceEstimate_fullLifecycle()
     VectorXi verts(20);
     for (int i = 0; i < 20; i++) verts[i] = i;
 
-    MNESourceEstimate stc1(sol, verts, 0.0f, 0.001f);
+    InvSourceEstimate stc1(sol, verts, 0.0f, 0.001f);
     QVERIFY(!stc1.isEmpty());
     QCOMPARE(stc1.samples(), 10);
 
-    MNESourceEstimate stc2(stc1);
+    InvSourceEstimate stc2(stc1);
     QCOMPARE(stc2.samples(), 10);
 
-    MNESourceEstimate stc3;
+    InvSourceEstimate stc3;
     stc3 = stc1;
     QCOMPARE(stc3.samples(), 10);
 
-    MNESourceEstimate reduced = stc1.reduce(2, 5);
+    InvSourceEstimate reduced = stc1.reduce(2, 5);
     QCOMPARE(reduced.samples(), 5);
 
     stc1.clear();
@@ -451,7 +451,7 @@ void TestMneLibrary::sourceEstimate_writeReadBuffer()
 {
     MatrixXd sol = MatrixXd::Random(10, 5);
     VectorXi verts = VectorXi::LinSpaced(10, 0, 9);
-    MNESourceEstimate stc(sol, verts, 0.0f, 0.001f);
+    InvSourceEstimate stc(sol, verts, 0.0f, 0.001f);
 
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
@@ -459,8 +459,8 @@ void TestMneLibrary::sourceEstimate_writeReadBuffer()
     QVERIFY(written);
 
     buffer.seek(0);
-    MNESourceEstimate stcRead;
-    bool readOk = MNESourceEstimate::read(buffer, stcRead);
+    InvSourceEstimate stcRead;
+    bool readOk = InvSourceEstimate::read(buffer, stcRead);
     QVERIFY(readOk);
     QCOMPARE(stcRead.samples(), 5);
 }
@@ -470,7 +470,7 @@ void TestMneLibrary::sourceEstimate_writeReadFile()
     int nSources = 50, nTimes = 10;
     MatrixXd data = MatrixXd::Random(nSources, nTimes);
     VectorXi vertices = VectorXi::LinSpaced(nSources, 0, nSources - 1);
-    MNESourceEstimate stc(data, vertices, 0.0f, 0.01f);
+    InvSourceEstimate stc(data, vertices, 0.0f, 0.01f);
     QVERIFY(!stc.isEmpty());
 
     QString tmpPath = QCoreApplication::applicationDirPath() + "/test_stc_tmp.stc";
@@ -483,8 +483,8 @@ void TestMneLibrary::sourceEstimate_writeReadFile()
     if (QFile::exists(tmpPath)) {
         QFile inFile(tmpPath);
         inFile.open(QIODevice::ReadOnly);
-        MNESourceEstimate stcRead;
-        MNESourceEstimate::read(inFile, stcRead);
+        InvSourceEstimate stcRead;
+        InvSourceEstimate::read(inFile, stcRead);
         inFile.close();
     }
     QFile::remove(tmpPath);
@@ -638,7 +638,7 @@ void TestMneLibrary::ctfComp_explainAndMap()
 }
 
 //=============================================================================================================
-// MNEInverseOperator
+// InvInverseOperator
 //=============================================================================================================
 
 void TestMneLibrary::inverseOp_readFromFile()
@@ -650,28 +650,28 @@ void TestMneLibrary::inverseOp_readFromFile()
     FwdForwardSolution fwd(fwdFile);
     QVERIFY(!fwd.isEmpty());
 
-    MNEInverseOperator invOp;
+    InvInverseOperator invOp;
     QVERIFY(!invOp.isFixedOrient());
 
     QFile fwdFile2(fwdPath());
-    MNEInverseOperator invOp2;
-    bool readRes = MNEInverseOperator::read_inverse_operator(fwdFile2, invOp2);
+    InvInverseOperator invOp2;
+    bool readRes = InvInverseOperator::read_inverse_operator(fwdFile2, invOp2);
     Q_UNUSED(readRes);
 }
 
 void TestMneLibrary::inverseOp_basicGetters()
 {
-    MNEInverseOperator invOp;
+    InvInverseOperator invOp;
     QVERIFY(!invOp.isFixedOrient());
 
     MatrixXd& kernel = invOp.getKernel();
     Q_UNUSED(kernel);
 
-    const MNEInverseOperator& constRef = invOp;
+    const InvInverseOperator& constRef = invOp;
     MatrixXd kernelConst = constRef.getKernel();
     Q_UNUSED(kernelConst);
 
-    MNEInverseOperator invOp2(invOp);
+    InvInverseOperator invOp2(invOp);
     QVERIFY(!invOp2.isFixedOrient());
 }
 
@@ -685,8 +685,8 @@ void TestMneLibrary::inverseOp_readFullFile()
     }
 
     QFile invFile(invPath);
-    MNEInverseOperator inv;
-    if (!MNEInverseOperator::read_inverse_operator(invFile, inv))
+    InvInverseOperator inv;
+    if (!InvInverseOperator::read_inverse_operator(invFile, inv))
         QSKIP("Could not read inverse operator");
 
     QVERIFY(inv.eigen_fields->data.rows() > 0);
@@ -1397,7 +1397,7 @@ void TestMneLibrary::forwardSolution_readVerify()
 }
 
 //=============================================================================================================
-// MNEInverseOperator extras (from boost)
+// InvInverseOperator extras (from boost)
 //=============================================================================================================
 
 void TestMneLibrary::inverseOp_makeSmallChannelSet()

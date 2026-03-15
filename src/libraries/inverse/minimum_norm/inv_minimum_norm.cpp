@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MinimumNorm Class.
+ * @brief    Definition of the InvMinimumNorm Class.
  *
  */
 
@@ -65,7 +65,7 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MinimumNorm::MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lambda, const QString method)
+InvMinimumNorm::InvMinimumNorm(const InvInverseOperator &p_inverseOperator, float lambda, const QString method)
 : m_inverseOperator(p_inverseOperator)
 , inverseSetup(false)
 {
@@ -75,7 +75,7 @@ MinimumNorm::MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lamb
 
 //=============================================================================================================
 
-MinimumNorm::MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lambda, bool dSPM, bool sLORETA)
+InvMinimumNorm::InvMinimumNorm(const InvInverseOperator &p_inverseOperator, float lambda, bool dSPM, bool sLORETA)
 : m_inverseOperator(p_inverseOperator)
 , inverseSetup(false)
 {
@@ -85,7 +85,7 @@ MinimumNorm::MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lamb
 
 //=============================================================================================================
 
-MNESourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal)
+InvSourceEstimate InvMinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal)
 {
     //
     //   Set up the inverse according to the parameters
@@ -94,7 +94,7 @@ MNESourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, 
 
     if(!m_inverseOperator.check_ch_names(p_fiffEvoked.info)) {
         qWarning("Channel name check failed.");
-        return MNESourceEstimate();
+        return InvSourceEstimate();
     }
 
     doInverseSetup(nave,pick_normal);
@@ -104,7 +104,7 @@ MNESourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, 
     //
     FiffEvoked t_fiffEvoked = p_fiffEvoked.pick_channels(inv.noise_cov->names);
 
-    printf("Picked %d channels from the data\n",t_fiffEvoked.info.nchan);
+    qInfo("Picked %d channels from the data", t_fiffEvoked.info.nchan);
 
     //Results
     float tmin = p_fiffEvoked.times[0];
@@ -124,7 +124,7 @@ MNESourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, 
 //    }
 
 //    //ToDo his could be heavily accelerated for real time calculation -> ToDo calculate inverse RT
-//    MNEInverseOperator inv = m_inverseOperator.prepare_inverse_operator(nave, m_fLambda, m_bdSPM, m_bsLORETA);
+//    InvInverseOperator inv = m_inverseOperator.prepare_inverse_operator(nave, m_fLambda, m_bdSPM, m_bsLORETA);
 //    //
 //    //   Pick the correct channels from the data
 //    //
@@ -180,24 +180,24 @@ MNESourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, 
 
 //=============================================================================================================
 
-MNESourceEstimate MinimumNorm::calculateInverse(const MatrixXd &data, float tmin, float tstep, bool pick_normal) const
+InvSourceEstimate InvMinimumNorm::calculateInverse(const MatrixXd &data, float tmin, float tstep, bool pick_normal) const
 {
     if(!inverseSetup)
     {
-        qWarning("MinimumNorm::calculateInverse - Inverse not setup -> call doInverseSetup first!");
-        return MNESourceEstimate();
+        qWarning("InvMinimumNorm::calculateInverse - Inverse not setup -> call doInverseSetup first!");
+        return InvSourceEstimate();
     }
 
     if(K.cols() != data.rows()) {
-        qWarning() << "MinimumNorm::calculateInverse - Dimension mismatch between K.cols() and data.rows() -" << K.cols() << "and" << data.rows();
-        return MNESourceEstimate();
+        qWarning() << "InvMinimumNorm::calculateInverse - Dimension mismatch between K.cols() and data.rows() -" << K.cols() << "and" << data.rows();
+        return InvSourceEstimate();
     }
 
     MatrixXd sol = K * data; //apply imaging kernel
 
     if (inv.source_ori == FIFFV_MNE_FREE_ORI && pick_normal == false)
     {
-        printf("combining the current components...\n");
+        qInfo("combining the current components...");
 
         MatrixXd sol1(sol.rows()/3,sol.cols());
         for(qint32 i = 0; i < sol.cols(); ++i)
@@ -212,15 +212,15 @@ MNESourceEstimate MinimumNorm::calculateInverse(const MatrixXd &data, float tmin
 
     if (m_bdSPM)
     {
-        printf("(dSPM)...");
+        qInfo("(dSPM)...");
         sol = inv.noisenorm*sol;
     }
     else if (m_bsLORETA)
     {
-        printf("(sLORETA)...");
+        qInfo("(sLORETA)...");
         sol = inv.noisenorm*sol;
     }
-    printf("[done]\n");
+    qInfo("[done]");
 
     //Results
     VectorXi p_vecVertices(inv.src[0].vertno.size() + inv.src[1].vertno.size());
@@ -230,19 +230,19 @@ MNESourceEstimate MinimumNorm::calculateInverse(const MatrixXd &data, float tmin
 //    for(qint32 h = 0; h < inv.src.size(); ++h)
 //        t_qListVertices.push_back(inv.src[h].vertno);
 
-    return MNESourceEstimate(sol, p_vecVertices, tmin, tstep);
+    return InvSourceEstimate(sol, p_vecVertices, tmin, tstep);
 }
 
 //=============================================================================================================
 
-void MinimumNorm::doInverseSetup(qint32 nave, bool pick_normal)
+void InvMinimumNorm::doInverseSetup(qint32 nave, bool pick_normal)
 {
     //
     //   Set up the inverse according to the parameters
     //
     inv = m_inverseOperator.prepare_inverse_operator(nave, m_fLambda, m_bdSPM, m_bsLORETA);
 
-    printf("Computing inverse...\n");
+    qInfo("Computing inverse...");
     inv.assemble_kernel(label, m_sMethod, pick_normal, K, noise_norm, vertno);
 
     std::cout << "K " << K.rows() << " x " << K.cols() << std::endl;
@@ -252,21 +252,21 @@ void MinimumNorm::doInverseSetup(qint32 nave, bool pick_normal)
 
 //=============================================================================================================
 
-const char* MinimumNorm::getName() const
+const char* InvMinimumNorm::getName() const
 {
     return "Minimum Norm Estimate";
 }
 
 //=============================================================================================================
 
-const MNESourceSpaces& MinimumNorm::getSourceSpace() const
+const MNESourceSpaces& InvMinimumNorm::getSourceSpace() const
 {
     return m_inverseOperator.src;
 }
 
 //=============================================================================================================
 
-void MinimumNorm::setMethod(QString method)
+void InvMinimumNorm::setMethod(QString method)
 {
     if(method.compare("MNE") == 0)
         setMethod(false, false);
@@ -281,12 +281,12 @@ void MinimumNorm::setMethod(QString method)
         setMethod(true, false);
     }
 
-    printf("\tSet minimum norm method to %s.\n", method.toUtf8().constData());
+    qInfo("\tSet minimum norm method to %s.", method.toUtf8().constData());
 }
 
 //=============================================================================================================
 
-void MinimumNorm::setMethod(bool dSPM, bool sLORETA)
+void InvMinimumNorm::setMethod(bool dSPM, bool sLORETA)
 {
     if(dSPM && sLORETA)
     {
@@ -310,7 +310,7 @@ void MinimumNorm::setMethod(bool dSPM, bool sLORETA)
 
 //=============================================================================================================
 
-void MinimumNorm::setRegularization(float lambda)
+void InvMinimumNorm::setRegularization(float lambda)
 {
     m_fLambda = lambda;
 }

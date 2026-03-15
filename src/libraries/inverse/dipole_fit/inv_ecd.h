@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     ecd.h
+ * @file     inv_ecd.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Electric Current Dipole (ECD) class declaration.
+ * @brief    Electric Current Dipole (InvEcd) class declaration.
  *
  */
 
-#ifndef ECD_H
-#define ECD_H
+#ifndef INV_ECD_H
+#define INV_ECD_H
 
 //=============================================================================================================
 // INCLUDES
@@ -69,17 +69,17 @@ namespace INVLIB
  *
  * @brief Single equivalent current dipole with position, orientation, amplitude, and goodness-of-fit.
  */
-class INVSHARED_EXPORT ECD
+class INVSHARED_EXPORT InvEcd
 {
 public:
-    typedef QSharedPointer<ECD> SPtr;              /**< Shared pointer type for ECD. */
-    typedef QSharedPointer<const ECD> ConstSPtr;   /**< Const shared pointer type for ECD. */
+    typedef QSharedPointer<InvEcd> SPtr;              /**< Shared pointer type for InvEcd. */
+    typedef QSharedPointer<const InvEcd> ConstSPtr;   /**< Const shared pointer type for InvEcd. */
 
     //=========================================================================================================
     /**
      * Constructs the Electric Current Dipole
      */
-    ECD();
+    InvEcd();
 
     //=========================================================================================================
     /**
@@ -87,21 +87,19 @@ public:
      *
      * @param[in] p_ECD      Electric Current Dipole which should be copied.
      */
-    ECD(const ECD& p_ECD);
+    InvEcd(const InvEcd& p_ECD);
 
     //=========================================================================================================
     /**
      * Destroys the Electric Current Dipole description
      */
-    ~ECD();
+    ~InvEcd();
 
     //=========================================================================================================
     /**
-     * prints the ECD to an stdio file stream.
-     *
-     * @param[in] f      the file stream to print to;.
+     * Prints the InvEcd dipole information to the debug output.
      */
-    void print(FILE *f) const;
+    void print() const;
 
 public:
     bool            valid;  /**< Is this dipole valid. */
@@ -119,4 +117,4 @@ public:
 //=============================================================================================================
 } // NAMESPACE INVLIB
 
-#endif // ECD_H
+#endif // INV_ECD_H

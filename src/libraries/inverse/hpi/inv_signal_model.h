@@ -28,12 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     SignalModel class declaration.
+ * @brief     InvSignalModel class declaration.
  *
  */
 
-#ifndef SIGNALMODEL_H
-#define SIGNALMODEL_H
+#ifndef INV_SIGNAL_MODEL_H
+#define INV_SIGNAL_MODEL_H
 
 //=============================================================================================================
 // INCLUDES
@@ -70,30 +70,30 @@ namespace INVLIB
  *
  * @brief Generates the forward sinusoidal model matrix for HPI coil signals at known drive frequencies
  */
-class INVSHARED_EXPORT SignalModel
+class INVSHARED_EXPORT InvSignalModel
 {
 
 public:
-    typedef QSharedPointer<SignalModel> SPtr;            /**< Shared pointer type for SignalModel. */
-    typedef QSharedPointer<const SignalModel> ConstSPtr; /**< Const shared pointer type for SignalModel. */
+    typedef QSharedPointer<InvSignalModel> SPtr;            /**< Shared pointer type for InvSignalModel. */
+    typedef QSharedPointer<const InvSignalModel> ConstSPtr; /**< Const shared pointer type for InvSignalModel. */
 
     //=========================================================================================================
     /**
-     * Constructs a SignalModel object.
+     * Constructs a InvSignalModel object.
      */
-    explicit SignalModel() = default;
+    explicit InvSignalModel() = default;
 
     //=========================================================================================================
     /**
      * Fit the data to the model constructed from given model parameters.
      *
-     * @param[in] hpiModelParameters   The HpiModelParameters.
+     * @param[in] hpiModelParameters   The InvHpiModelParameters.
      * @param[in] matData           The data matrix.
      *
      * @return the fitted data
      *
      */
-    Eigen::MatrixXd fitData(const HpiModelParameters& hpiModelParameters,
+    Eigen::MatrixXd fitData(const InvHpiModelParameters& hpiModelParameters,
                             const Eigen::MatrixXd& matData);
 
 private:
@@ -124,25 +124,25 @@ private:
 
     //=========================================================================================================
     /**
-     * Check if the HpiModelParameters changed.
+     * Check if the InvHpiModelParameters changed.
      *
      * @param[in] hpiModelParameters     The model parameters.
      * @return true if changed
      */
-    bool checkModelParameters(const HpiModelParameters& hpiModelParameters);
+    bool checkModelParameters(const InvHpiModelParameters& hpiModelParameters);
 
     //=========================================================================================================
     /**
-     * Check if the HpiModelParameters are empty. HPI and sampling frequencies need to be set.
+     * Check if the InvHpiModelParameters are empty. HPI and sampling frequencies need to be set.
      *
      * @param[in] hpiModelParameters     The model parameters.
      * @return true if empty
      */
-    bool checkEmpty(const HpiModelParameters& hpiModelParameters);
+    bool checkEmpty(const InvHpiModelParameters& hpiModelParameters);
 
     Eigen::MatrixXd m_matInverseSignalModel{Eigen::MatrixXd(0,0)};
     int m_iCurrentModelCols{0};
-    HpiModelParameters m_modelParameters{HpiModelParameters()};
+    InvHpiModelParameters m_modelParameters{InvHpiModelParameters()};
 };
 
 //=============================================================================================================

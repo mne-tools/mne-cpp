@@ -34,8 +34,8 @@
  *
  */
 
-#ifndef MINIMUMNORM_H
-#define MINIMUMNORM_H
+#ifndef INV_MINIMUM_NORM_H
+#define INV_MINIMUM_NORM_H
 
 //=============================================================================================================
 // INCLUDES
@@ -66,11 +66,11 @@ namespace INVLIB
  *
  * @brief Minimum norm estimation
  */
-class INVSHARED_EXPORT MinimumNorm
+class INVSHARED_EXPORT InvMinimumNorm
 {
 public:
-    typedef QSharedPointer<MinimumNorm> SPtr;             /**< Shared pointer type for MinimumNorm. */
-    typedef QSharedPointer<const MinimumNorm> ConstSPtr;  /**< Const shared pointer type for MinimumNorm. */
+    typedef QSharedPointer<InvMinimumNorm> SPtr;             /**< Shared pointer type for InvMinimumNorm. */
+    typedef QSharedPointer<const InvMinimumNorm> ConstSPtr;  /**< Const shared pointer type for InvMinimumNorm. */
 
     //=========================================================================================================
     /**
@@ -82,7 +82,7 @@ public:
      *
      * @return the prepared inverse operator.
      */
-    explicit MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lambda, const QString method);
+    explicit InvMinimumNorm(const InvInverseOperator &p_inverseOperator, float lambda, const QString method);
 
     //=========================================================================================================
     /**
@@ -95,9 +95,9 @@ public:
      *
      * @return the prepared inverse operator.
      */
-    explicit MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lambda, bool dSPM, bool sLORETA);
+    explicit InvMinimumNorm(const InvInverseOperator &p_inverseOperator, float lambda, bool dSPM, bool sLORETA);
 
-    virtual ~MinimumNorm(){}
+    virtual ~InvMinimumNorm(){}
 
     //=========================================================================================================
     /**
@@ -110,9 +110,9 @@ public:
      *
      * @return the calculated source estimation.
      */
-    virtual MNESourceEstimate calculateInverse(const FIFFLIB::FiffEvoked &p_fiffEvoked, bool pick_normal = false);
+    virtual InvSourceEstimate calculateInverse(const FIFFLIB::FiffEvoked &p_fiffEvoked, bool pick_normal = false);
 
-    virtual MNESourceEstimate calculateInverse(const Eigen::MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const;
+    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const;
 
     //=========================================================================================================
     /**
@@ -146,7 +146,7 @@ public:
      *
      * @return the prepared inverse operator.
      */
-    inline MNEInverseOperator& getPreparedInverseOperator();
+    inline InvInverseOperator& getPreparedInverseOperator();
 
     //=========================================================================================================
     /**
@@ -182,14 +182,14 @@ public:
     inline Eigen::MatrixXd& getKernel();
 
 private:
-    MNEInverseOperator m_inverseOperator;   /**< The inverse operator. */
+    InvInverseOperator m_inverseOperator;   /**< The inverse operator. */
     float m_fLambda;                                /**< Regularization parameter. */
     QString m_sMethod;                              /**< Selected method. */
     bool m_bsLORETA;                                /**< Do sLORETA method. */
     bool m_bdSPM;                                   /**< Do dSPM method. */
 
     bool inverseSetup;                              /**< Inverse Setup Calcluated. */
-    MNEInverseOperator inv;                 /**< The setup inverse operator. */
+    InvInverseOperator inv;                 /**< The setup inverse operator. */
     Eigen::SparseMatrix<double> noise_norm;         /**< The noise normalization. */
     QList<Eigen::VectorXi> vertno;                  /**< The vertices numbers. */
     FSLIB::FsLabel label;                             /**< The corresponding labels. */
@@ -200,17 +200,17 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline Eigen::MatrixXd& MinimumNorm::getKernel()
+inline Eigen::MatrixXd& InvMinimumNorm::getKernel()
 {
     return K;
 }
 
 //=============================================================================================================
 
-inline MNEInverseOperator& MinimumNorm::getPreparedInverseOperator()
+inline InvInverseOperator& InvMinimumNorm::getPreparedInverseOperator()
 {
     return inv;
 }
 } //NAMESPACE
 
-#endif // MINIMUMNORM_H
+#endif // INV_MINIMUM_NORM_H

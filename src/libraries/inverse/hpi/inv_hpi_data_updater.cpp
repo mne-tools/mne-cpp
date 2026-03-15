@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    HpiDataUpdater class definition.
+ * @brief    InvHpiDataUpdater class definition.
  *
  */
 
@@ -69,8 +69,8 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-HpiDataUpdater::HpiDataUpdater(const FiffInfo::SPtr pFiffInfo)
-    : m_sensors(SensorSet())
+InvHpiDataUpdater::InvHpiDataUpdater(const FiffInfo::SPtr pFiffInfo)
+    : m_sensors(InvSensorSet())
 {
     updateBadChannels(pFiffInfo);
     updateChannels(pFiffInfo);
@@ -80,14 +80,14 @@ HpiDataUpdater::HpiDataUpdater(const FiffInfo::SPtr pFiffInfo)
 
 //=============================================================================================================
 
-void HpiDataUpdater::updateBadChannels(FiffInfo::SPtr pFiffInfo)
+void InvHpiDataUpdater::updateBadChannels(FiffInfo::SPtr pFiffInfo)
 {
     m_lBads = pFiffInfo->bads;
 }
 
 //=============================================================================================================
 
-void HpiDataUpdater::updateChannels(FiffInfo::SPtr pFiffInfo)
+void InvHpiDataUpdater::updateChannels(FiffInfo::SPtr pFiffInfo)
 {
     // Get the indices of inner layer channels and exclude bad channels and create channellist
     const int iNumCh = pFiffInfo->nchan;
@@ -111,7 +111,7 @@ void HpiDataUpdater::updateChannels(FiffInfo::SPtr pFiffInfo)
 
 //=============================================================================================================
 
-void HpiDataUpdater::updateSensors(const QList<FIFFLIB::FiffChInfo>& lChannels)
+void InvHpiDataUpdater::updateSensors(const QList<FIFFLIB::FiffChInfo>& lChannels)
 {
     const Accuracy accuracy = Accuracy::high;
     m_sensors = m_sensorSetCreator.updateSensorSet(lChannels,accuracy);
@@ -119,7 +119,7 @@ void HpiDataUpdater::updateSensors(const QList<FIFFLIB::FiffChInfo>& lChannels)
 
 //=============================================================================================================
 
-void HpiDataUpdater::updateHpiDigitizer(const QList<FiffDigPoint>& lDig)
+void InvHpiDataUpdater::updateHpiDigitizer(const QList<FiffDigPoint>& lDig)
 {
     // extract hpi coils from digitizer
     QList<FiffDigPoint> lHPIPoints;
@@ -141,14 +141,14 @@ void HpiDataUpdater::updateHpiDigitizer(const QList<FiffDigPoint>& lDig)
             m_matHpiDigitizer(i,2) = lHPIPoints.at(i).r[2];
         }
     } else {
-        std::cout << "HPIFit::updateHpiDigitizer - No HPI coils digitized. Returning." << std::endl;
+        std::cout << "InvHpiFit::updateHpiDigitizer - No HPI coils digitized. Returning." << std::endl;
         return;
     }
 }
 
 //=============================================================================================================
 
-void HpiDataUpdater::checkForUpdate(const FiffInfo::SPtr pFiffInfo)
+void InvHpiDataUpdater::checkForUpdate(const FiffInfo::SPtr pFiffInfo)
 {
     const bool bUpdate = checkIfChanged(pFiffInfo->bads,pFiffInfo->chs);
     if(bUpdate)
@@ -162,7 +162,7 @@ void HpiDataUpdater::checkForUpdate(const FiffInfo::SPtr pFiffInfo)
 
 //=============================================================================================================
 
-bool HpiDataUpdater::checkIfChanged(const QList<QString>& lBads, const QList<FIFFLIB::FiffChInfo>& lChannels)
+bool InvHpiDataUpdater::checkIfChanged(const QList<QString>& lBads, const QList<FIFFLIB::FiffChInfo>& lChannels)
 {
     bool bUpdate = false;
     if(!(m_lBads == lBads) || !(m_lChannels == lChannels)) {
@@ -173,7 +173,7 @@ bool HpiDataUpdater::checkIfChanged(const QList<QString>& lBads, const QList<FIF
 
 //=============================================================================================================
 
-void HpiDataUpdater::prepareDataAndProjectors(const MatrixXd &matData, const MatrixXd &matProjectors)
+void InvHpiDataUpdater::prepareDataAndProjectors(const MatrixXd &matData, const MatrixXd &matProjectors)
 {
     prepareData(matData);
     prepareProjectors(matProjectors);
@@ -182,7 +182,7 @@ void HpiDataUpdater::prepareDataAndProjectors(const MatrixXd &matData, const Mat
 
 //=============================================================================================================
 
-void HpiDataUpdater::prepareData(const Eigen::MatrixXd& matData)
+void InvHpiDataUpdater::prepareData(const Eigen::MatrixXd& matData)
 {
     // extract data for channels to use
     m_matInnerdata = MatrixXd(m_vecInnerind.size(), matData.cols());
@@ -194,11 +194,11 @@ void HpiDataUpdater::prepareData(const Eigen::MatrixXd& matData)
 
 //=============================================================================================================
 
-void HpiDataUpdater::prepareProjectors(const Eigen::MatrixXd& matProjectors)
+void InvHpiDataUpdater::prepareProjectors(const Eigen::MatrixXd& matProjectors)
 {
     // check if m_vecInnerInd is alreadz initialized
     if(m_vecInnerind.size() == 0) {
-        std::cout << "HPIFit::updateProjectors - No channels. Returning." << std::endl;
+        std::cout << "InvHpiFit::updateProjectors - No channels. Returning." << std::endl;
         return;
     }
 

@@ -71,7 +71,7 @@ namespace FIFFLIB {
 }
 
 namespace INVLIB {
-    class HPIFit;
+    class InvHpiFit;
 }
 
 namespace SCMEASLIB{

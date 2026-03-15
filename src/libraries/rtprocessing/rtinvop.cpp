@@ -80,7 +80,7 @@ void RtInvOpWorker::doWork(const RtInvOpInput &inputData)
     // Restrict forward solution as necessary for MEG
     FwdForwardSolution forwardMeg = inputData.pFwd->pick_types(true, false);
 
-    MNEInverseOperator invOpMeg(*inputData.pFiffInfo.data(),
+    InvInverseOperator invOpMeg(*inputData.pFiffInfo.data(),
                                 forwardMeg,
                                 inputData.noiseCov,
                                 0.2f,
@@ -145,7 +145,7 @@ void RtInvOp::setFwdSolution(QSharedPointer<FWDLIB::FwdForwardSolution> pFwd)
 
 //=============================================================================================================
 
-void RtInvOp::handleResults(const INVLIB::MNEInverseOperator& invOp)
+void RtInvOp::handleResults(const INVLIB::InvInverseOperator& invOp)
 {
     emit invOperatorCalculated(invOp);
 }

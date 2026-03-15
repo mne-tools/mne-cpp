@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     dipole_fit_settings.h
+ * @file     inv_dipole_fit_settings.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -34,8 +34,8 @@
  *
  */
 
-#ifndef DIPOLEFITSETTINGS_H
-#define DIPOLEFITSETTINGS_H
+#ifndef INV_DIPOLE_FIT_SETTINGS_H
+#define INV_DIPOLE_FIT_SETTINGS_H
 
 //=============================================================================================================
 // INCLUDES
@@ -78,17 +78,17 @@ namespace INVLIB
  *
  * @brief Dipole Fit setting implementation
  */
-class INVSHARED_EXPORT DipoleFitSettings
+class INVSHARED_EXPORT InvDipoleFitSettings
 {
 public:
-    typedef QSharedPointer<DipoleFitSettings> SPtr;             /**< Shared pointer type for DipoleFitSettings. */
-    typedef QSharedPointer<const DipoleFitSettings> ConstSPtr;  /**< Const shared pointer type for DipoleFitSettings. */
+    typedef QSharedPointer<InvDipoleFitSettings> SPtr;             /**< Shared pointer type for InvDipoleFitSettings. */
+    typedef QSharedPointer<const InvDipoleFitSettings> ConstSPtr;  /**< Const shared pointer type for InvDipoleFitSettings. */
 
     //=========================================================================================================
     /**
      * Default Constructor
      */
-    explicit DipoleFitSettings();
+    explicit InvDipoleFitSettings();
 
     //=========================================================================================================
     /**
@@ -97,13 +97,13 @@ public:
      * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
      * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
      */
-    explicit DipoleFitSettings(int *argc,char **argv);
+    explicit InvDipoleFitSettings(int *argc,char **argv);
 
     //=========================================================================================================
     /**
      * Destructs the Dipole Fit Settings
      */
-    virtual ~DipoleFitSettings();
+    virtual ~InvDipoleFitSettings();
 
     //=========================================================================================================
     /**
@@ -174,4 +174,4 @@ private:
 //=============================================================================================================
 } //NAMESPACE
 
-#endif // DIPOLEFITSETTINGS_H
+#endif // INV_DIPOLE_FIT_SETTINGS_H

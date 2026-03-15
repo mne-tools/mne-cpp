@@ -65,14 +65,14 @@ using namespace INVLIB;
 // DEFINE MEMBER METHODS RtHpiWorker
 //=============================================================================================================
 
-RtHpiWorker::RtHpiWorker(const SensorSet sensorSet)
+RtHpiWorker::RtHpiWorker(const InvSensorSet sensorSet)
 {
-    m_pHpiFit = QSharedPointer<INVLIB::HPIFit>(new HPIFit(sensorSet));
+    m_pHpiFit = QSharedPointer<INVLIB::InvHpiFit>(new InvHpiFit(sensorSet));
 }
 
 void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
                          const Eigen::MatrixXd& matProjectors,
-                         const HpiModelParameters& hpiModelParameters,
+                         const InvHpiModelParameters& hpiModelParameters,
                          const Eigen::MatrixXd& matCoilsHead)
 {
     if(this->thread()->isInterruptionRequested()) {
@@ -97,7 +97,7 @@ void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
 // DEFINE MEMBER METHODS RtHpi
 //=============================================================================================================
 
-RtHpi::RtHpi(const SensorSet sensorSet, QObject *parent)
+RtHpi::RtHpi(const InvSensorSet sensorSet, QObject *parent)
 : QObject(parent),
   m_sensorSet(sensorSet)
 {
@@ -144,7 +144,7 @@ void RtHpi::append(const MatrixXd &data)
 
 //=============================================================================================================
 
-void RtHpi::setModelParameters(HpiModelParameters hpiModelParameters)
+void RtHpi::setModelParameters(InvHpiModelParameters hpiModelParameters)
 {
     m_modelParameters = hpiModelParameters;
 }

@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    HPIFit class declaration.
+ * @brief    InvHpiFit class declaration.
  *
  */
 
-#ifndef HPIFIT_H
-#define HPIFIT_H
+#ifndef INV_HPI_FIT_H
+#define INV_HPI_FIT_H
 
 //=============================================================================================================
 // INCLUDES
@@ -82,9 +82,9 @@ namespace FIFFLIB{
 
 namespace INVLIB
 {
-    class SensorSet;
-    class SignalModel;
-    class HpiModelParameters;
+    class InvSensorSet;
+    class InvSignalModel;
+    class InvHpiModelParameters;
 //=============================================================================================================
 // Declare all structures to be used
 //=============================================================================================================
@@ -135,35 +135,35 @@ struct HpiFitResult {
  *
  * @brief HPI Fit algorithms.
  */
-class INVSHARED_EXPORT HPIFit
+class INVSHARED_EXPORT InvHpiFit
 {
 
 public:
-    typedef QSharedPointer<HPIFit> SPtr;             /**< Shared pointer type for HPIFit. */
-    typedef QSharedPointer<const HPIFit> ConstSPtr;  /**< Const shared pointer type for HPIFit. */
+    typedef QSharedPointer<InvHpiFit> SPtr;             /**< Shared pointer type for InvHpiFit. */
+    typedef QSharedPointer<const InvHpiFit> ConstSPtr;  /**< Const shared pointer type for InvHpiFit. */
 
     //=========================================================================================================
     /**
      * Default constructor.
      *
      */
-    explicit HPIFit();
+    explicit InvHpiFit();
 
     //=========================================================================================================
     /**
-     * Constructs the HPI from a SensorSet.
+     * Constructs the HPI from a InvSensorSet.
      *
-     * @param[in] SensorSet     The MEG sensorSet used for the hpi fitting.
+     * @param[in] InvSensorSet     The MEG sensorSet used for the hpi fitting.
      */
-    explicit HPIFit(const SensorSet& sensorSet);
+    explicit InvHpiFit(const InvSensorSet& sensorSet);
 
     //=========================================================================================================
     /**
-     * Checks if SensorSet has changed and updates member SensorSet.
+     * Checks if InvSensorSet has changed and updates member InvSensorSet.
      *
-     * @param[in] SensorSet     The MEG sensorSet used for the hpi fitting.
+     * @param[in] InvSensorSet     The MEG sensorSet used for the hpi fitting.
      */
-    void checkForUpdate(const SensorSet& sensorSet);
+    void checkForUpdate(const InvSensorSet& sensorSet);
 
     //=========================================================================================================
     /**
@@ -178,13 +178,13 @@ public:
      */
     void fit(const Eigen::MatrixXd& matProjectedData,
              const Eigen::MatrixXd& matProjectors,
-             const HpiModelParameters& hpiModelParameters,
+             const InvHpiModelParameters& hpiModelParameters,
              const Eigen::MatrixXd& matCoilsHead,
              HpiFitResult& hpiFitResult);
 
     void fit(const Eigen::MatrixXd& matProjectedData,
              const Eigen::MatrixXd& matProjectors,
-             const HpiModelParameters& hpiModelParameters,
+             const InvHpiModelParameters& hpiModelParameters,
              const Eigen::MatrixXd& matCoilsHead,
              const bool bOrderFrequencies,
              HpiFitResult& hpiFitResult);
@@ -221,7 +221,7 @@ private:
      *
      */
     Eigen::MatrixXd computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
-                                      const HpiModelParameters& hpiModelParameters);
+                                      const InvHpiModelParameters& hpiModelParameters);
 
     //=========================================================================================================
     /**
@@ -253,7 +253,7 @@ private:
      * @return Returns the coil parameters.
      */
     CoilParam dipfit(const Eigen::MatrixXd matCoilsSeed,
-                     const SensorSet& sensors,
+                     const InvSensorSet& sensors,
                      const Eigen::MatrixXd &matData,
                      const int iNumCoils,
                      const Eigen::MatrixXd &t_matProjectors,
@@ -359,8 +359,8 @@ private:
                        const Eigen::MatrixXd& matCoilsDev,
                        const Eigen::MatrixXd& matTrans);
 
-    SensorSet m_sensors;            /**< The sensor struct that contains information about all sensors. */
-    SignalModel m_signalModel;      /**< The signal model for the Hpi signals used to compute extract the coil amplitudes */
+    InvSensorSet m_sensors;            /**< The sensor struct that contains information about all sensors. */
+    InvSignalModel m_signalModel;      /**< The signal model for the Hpi signals used to compute extract the coil amplitudes */
 
 };
 
@@ -375,4 +375,4 @@ private:
 Q_DECLARE_METATYPE(INVLIB::HpiFitResult)
 #endif
 
-#endif // HPIFIT_H
+#endif // INV_HPI_FIT_H

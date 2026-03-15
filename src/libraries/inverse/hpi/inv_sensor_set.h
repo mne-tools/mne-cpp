@@ -28,12 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     SensorSet class declaration.
+ * @brief     InvSensorSet class declaration.
  *
  */
 
-#ifndef SENSORSET_H
-#define SENSORSET_H
+#ifndef INV_SENSOR_SET_H
+#define INV_SENSOR_SET_H
 
 //=============================================================================================================
 // INCLUDES
@@ -80,26 +80,26 @@ enum class Accuracy : int{high = 2, medium = 1, low = 0};
 /**
  * @brief Stores MEG sensor geometry (positions, orientations, weights, coil count) for a single sensor type
  */
-class INVSHARED_EXPORT SensorSet {
+class INVSHARED_EXPORT InvSensorSet {
 
 public:
-    typedef QSharedPointer<SensorSet> SPtr;            /**< Shared pointer type for SensorSet. */
-    typedef QSharedPointer<const SensorSet> ConstSPtr; /**< Const shared pointer type for SensorSet. */
+    typedef QSharedPointer<InvSensorSet> SPtr;            /**< Shared pointer type for InvSensorSet. */
+    typedef QSharedPointer<const InvSensorSet> ConstSPtr; /**< Const shared pointer type for InvSensorSet. */
 
     //=========================================================================================================
     /**
      * Default Constructor.
      */
-    explicit SensorSet() = default;
+    explicit InvSensorSet() = default;
 
     //=========================================================================================================
     /**
-     * SensorSet that yiealds sensor position, orientation and weights for geometric averaging.
+     * InvSensorSet that yiealds sensor position, orientation and weights for geometric averaging.
      *
      * @param[in] pFwdCoilSet   The FwdCoilSet to extract the data from.
      *
      */
-    explicit SensorSet(const QSharedPointer<FWDLIB::FwdCoilSet> pFwdCoilSet);
+    explicit InvSensorSet(const QSharedPointer<FWDLIB::FwdCoilSet> pFwdCoilSet);
 
     inline int np() const;
     inline int ncoils() const;
@@ -121,8 +121,8 @@ public:
     inline Eigen::RowVectorXd w(int iSensor) const;
     inline Eigen::RowVectorXd w() const;
 
-    inline bool operator== (const SensorSet &b) const;
-    inline bool operator!= (const SensorSet &b) const;
+    inline bool operator== (const InvSensorSet &b) const;
+    inline bool operator!= (const InvSensorSet &b) const;
 
 private:
     //=========================================================================================================
@@ -155,73 +155,73 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline int SensorSet::np() const
+inline int InvSensorSet::np() const
 {
     return m_np;
 }
 
-inline int SensorSet::ncoils() const
+inline int InvSensorSet::ncoils() const
 {
     return m_ncoils;
 }
 
-inline Eigen::VectorXd SensorSet::ez(int iSensor) const
+inline Eigen::VectorXd InvSensorSet::ez(int iSensor) const
 {
     return m_ez.row(iSensor);
 }
 
-inline Eigen::MatrixXd SensorSet::ez() const
+inline Eigen::MatrixXd InvSensorSet::ez() const
 {
     return m_ez;
 }
 
-inline Eigen::VectorXd SensorSet::r0(int iSensor) const
+inline Eigen::VectorXd InvSensorSet::r0(int iSensor) const
 {
     return m_r0.row(iSensor);
 }
 
-inline Eigen::MatrixXd SensorSet::r0() const
+inline Eigen::MatrixXd InvSensorSet::r0() const
 {
     return m_r0;
 }
 
-inline Eigen::RowVectorXd SensorSet::w(int iSensor) const
+inline Eigen::RowVectorXd InvSensorSet::w(int iSensor) const
 {
     return m_w.segment(iSensor*m_np,m_np);
 }
 
-inline Eigen::RowVectorXd SensorSet::w() const
+inline Eigen::RowVectorXd InvSensorSet::w() const
 {
     return m_w;
 }
 
-inline Eigen::MatrixXd SensorSet::rmag(int iSensor) const
+inline Eigen::MatrixXd InvSensorSet::rmag(int iSensor) const
 {
     return m_rmag.block(iSensor*m_np,0,m_np,3);
 }
 
-inline Eigen::MatrixXd SensorSet::rmag() const
+inline Eigen::MatrixXd InvSensorSet::rmag() const
 {
     return m_rmag;
 }
 
-inline Eigen::MatrixXd SensorSet::cosmag(int iSensor) const
+inline Eigen::MatrixXd InvSensorSet::cosmag(int iSensor) const
 {
     return m_cosmag.block(iSensor*m_np,0,m_np,3);
 }
 
-inline Eigen::MatrixXd SensorSet::cosmag() const
+inline Eigen::MatrixXd InvSensorSet::cosmag() const
 {
     return m_cosmag;
 }
 
-inline Eigen::MatrixXd SensorSet::tra() const
+inline Eigen::MatrixXd InvSensorSet::tra() const
 {
     return m_tra;
 }
 //=============================================================================================================
 
-inline bool SensorSet::operator== (const SensorSet &b) const
+inline bool InvSensorSet::operator== (const InvSensorSet &b) const
 {
     return (this->ez() == b.ez() &&
             this->r0() == b.r0() &&
@@ -235,7 +235,7 @@ inline bool SensorSet::operator== (const SensorSet &b) const
 
 //=============================================================================================================
 
-inline bool SensorSet::operator!= (const SensorSet &b) const
+inline bool InvSensorSet::operator!= (const InvSensorSet &b) const
 {
     bool equal = this==&b;
     return !(equal);
@@ -243,32 +243,32 @@ inline bool SensorSet::operator!= (const SensorSet &b) const
 
 //=============================================================================================================
 /**
- * Create a SensorSet struct from a channel list with specified accuracy.
+ * Create a InvSensorSet struct from a channel list with specified accuracy.
  *
- * @brief Builds SensorSet objects from FiffInfo channel definitions, applying SSP projections and compensation
+ * @brief Builds InvSensorSet objects from FiffInfo channel definitions, applying SSP projections and compensation
  */
-class INVSHARED_EXPORT SensorSetCreator
+class INVSHARED_EXPORT InvSensorSetCreator
 {
 
 public:
-    typedef QSharedPointer<SensorSetCreator> SPtr;            /**< Shared pointer type for SensorSet. */
-    typedef QSharedPointer<const SensorSetCreator> ConstSPtr; /**< Const shared pointer type for SensorSet. */
+    typedef QSharedPointer<InvSensorSetCreator> SPtr;            /**< Shared pointer type for InvSensorSet. */
+    typedef QSharedPointer<const InvSensorSetCreator> ConstSPtr; /**< Const shared pointer type for InvSensorSet. */
 
     //=========================================================================================================
     /**
-    * Constructs a MEG SensorSet object.
+    * Constructs a MEG InvSensorSet object.
     */
-    explicit SensorSetCreator();
+    explicit InvSensorSetCreator();
 
     //=========================================================================================================
     /**
-     * Update SensorSet from new channel list with new accuracy.
+     * Update InvSensorSet from new channel list with new accuracy.
      *
      * @param[in] channelList   The channel list to create the MEG sensor set from.
      * @param[in] iAccuracy     The accuracy level to use for the sensor set.
      *
      */
-    SensorSet updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
+    InvSensorSet updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
                               const Accuracy& accuracy);
 
 private:
@@ -281,5 +281,5 @@ private:
 
 } // namespace INVLIB
 
-#endif // SENSORSET_H
+#endif // INV_SENSOR_SET_H
 

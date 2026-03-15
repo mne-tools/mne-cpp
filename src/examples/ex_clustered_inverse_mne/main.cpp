@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
     //
     FiffInfo info = evoked.info;
 
-    MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+    InvInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
 
     //
     // save clustered inverse
@@ -194,8 +194,8 @@ int main(int argc, char *argv[])
     //
     // Compute inverse solution
     //
-    MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-    MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
+    InvMinimumNorm minimumNorm(inverse_operator, lambda2, method);
+    InvSourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
 
     if(sourceEstimate.isEmpty())
         return 1;
@@ -284,7 +284,7 @@ int main(int argc, char *argv[])
 
     // Write source estimate to temp files for visualization
     int nVertLh = t_clusteredFwd.src[0].nuse;
-    MNESourceEstimate stcLh, stcRh;
+    InvSourceEstimate stcLh, stcRh;
     stcLh.data = sourceEstimate.data.topRows(nVertLh);
     stcLh.vertices = sourceEstimate.vertices.head(nVertLh);
     stcLh.tmin = sourceEstimate.tmin;

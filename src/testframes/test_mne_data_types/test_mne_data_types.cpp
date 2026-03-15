@@ -270,34 +270,34 @@ private slots:
     }
 
     //=========================================================================
-    // MNEInverseOperator
+    // InvInverseOperator
     //=========================================================================
     void invOp_defaultCtor()
     {
-        MNEInverseOperator inv;
+        InvInverseOperator inv;
         QVERIFY(!inv.isFixedOrient());
     }
 
     void invOp_copyCtor()
     {
-        MNEInverseOperator inv;
-        MNEInverseOperator copy(inv);
+        InvInverseOperator inv;
+        InvInverseOperator copy(inv);
         QVERIFY(!copy.isFixedOrient());
     }
 
     void invOp_kernel()
     {
-        MNEInverseOperator inv;
+        InvInverseOperator inv;
         MatrixXd kernel = inv.getKernel();
         QCOMPARE(kernel.rows(), 0);
     }
 
     //=========================================================================
-    // MNESourceEstimate
+    // InvSourceEstimate
     //=========================================================================
     void sourceEstimate_defaultCtor()
     {
-        MNESourceEstimate stc;
+        InvSourceEstimate stc;
         QVERIFY(stc.isEmpty());
     }
 
@@ -309,7 +309,7 @@ private slots:
         float tmin = 0.0f;
         float tstep = 0.001f;
 
-        MNESourceEstimate stc(data, vertices, tmin, tstep);
+        InvSourceEstimate stc(data, vertices, tmin, tstep);
         QVERIFY(!stc.isEmpty());
         QCOMPARE(stc.data.rows(), 100);
         QCOMPARE(stc.data.cols(), 10);

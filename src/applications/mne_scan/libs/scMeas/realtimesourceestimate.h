@@ -168,7 +168,7 @@ public:
      *
      * @param[in] v the value which is attached to the sample array vector.
      */
-    virtual void setValue(INVLIB::MNESourceEstimate &v);
+    virtual void setValue(INVLIB::InvSourceEstimate &v);
 
     //=========================================================================================================
     /**
@@ -177,7 +177,7 @@ public:
      *
      * @return the last attached value.
      */
-    virtual QList<INVLIB::MNESourceEstimate::SPtr>& getValue();
+    virtual QList<INVLIB::InvSourceEstimate::SPtr>& getValue();
 
     //=========================================================================================================
     /**
@@ -231,7 +231,7 @@ private:
 
     qint32                                  m_iSourceEstimateSize;  /**< Sample size of the multi sample array.*/
 
-    QList<INVLIB::MNESourceEstimate::SPtr>  m_pMNEStc;              /**< The source estimates. */
+    QList<INVLIB::InvSourceEstimate::SPtr>  m_pMNEStc;              /**< The source estimates. */
     bool                                    m_bInitialized;         /**< Is initialized. */
 };
 

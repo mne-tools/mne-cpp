@@ -54,7 +54,7 @@ class QRhiResourceUpdateBatch;
 
 //=============================================================================================================
 /**
- * Renderable dipole object that builds instanced arrow geometry from an ECDSet
+ * Renderable dipole object that builds instanced arrow geometry from an InvEcdSet
  * and manages GPU buffers for QRhi-based rendering.
  *
  * @brief Renderable dipole arrow set with instanced GPU rendering for QRhi.
@@ -65,7 +65,7 @@ public:
     DipoleObject();
     ~DipoleObject();
 
-    void load(const INVLIB::ECDSet &ecdSet);
+    void load(const INVLIB::InvEcdSet &ecdSet);
     
     // Apply a transformation matrix to all dipoles
     void applyTransform(const QMatrix4x4 &trans);

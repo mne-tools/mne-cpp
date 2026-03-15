@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     Unit test for the HpiDataUpdater class..
+ * @brief     Unit test for the InvHpiDataUpdater class..
  *
  */
 
@@ -182,7 +182,7 @@ void TestHpiDataUpdater::init()
 void TestHpiDataUpdater::testPrepareProj_size()
 {
     // prepare
-    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+    InvHpiDataUpdater hpiData = InvHpiDataUpdater(m_pFiffInfo);
 
     int iSizeExpected = 204;       // number of channels (204 gradiometers)
 
@@ -202,7 +202,7 @@ void TestHpiDataUpdater::testPrepareProj_size()
 void TestHpiDataUpdater::testprepareDataAndProjectors()
 {
     // prepare
-    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+    InvHpiDataUpdater hpiData = InvHpiDataUpdater(m_pFiffInfo);
     MatrixXd matProj = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
     //Create new projector based on the excluded channels, first exclude the rows then the columns
@@ -232,7 +232,7 @@ void TestHpiDataUpdater::testprepareDataAndProjectors_bads()
     // prepare
     m_pFiffInfo->bads << "MEG0113" << "MEG0112";
 
-    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+    InvHpiDataUpdater hpiData = InvHpiDataUpdater(m_pFiffInfo);
     MatrixXd matProj = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
     //Create new projector based on the excluded channels, first exclude the rows then the columns
@@ -267,7 +267,7 @@ void TestHpiDataUpdater::testPrepareData()
         matDataExpected.row(j) << m_matData.row(m_vecInnerindWithoutBads[j]);
     }
 
-    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+    InvHpiDataUpdater hpiData = InvHpiDataUpdater(m_pFiffInfo);
 
     // act
     hpiData.prepareDataAndProjectors(m_matData,m_matProjectors);
@@ -289,7 +289,7 @@ void TestHpiDataUpdater::testPrepareData_bads()
         matDataExpected.row(j) << m_matData.row(m_vecInnerindWithBads[j]);
     }
 
-    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+    InvHpiDataUpdater hpiData = InvHpiDataUpdater(m_pFiffInfo);
 
     /// act
     hpiData.prepareDataAndProjectors(m_matData,m_matProjectors);
@@ -304,13 +304,13 @@ void TestHpiDataUpdater::testPrepareData_bads()
 void TestHpiDataUpdater::testGetSensors()
 {
     // extract data for channels to use
-    SensorSetCreator sensorCreator;
-    SensorSet sensorsExpected = sensorCreator.updateSensorSet(m_lChannelsWithoutBads,Accuracy::high);
+    InvSensorSetCreator sensorCreator;
+    InvSensorSet sensorsExpected = sensorCreator.updateSensorSet(m_lChannelsWithoutBads,Accuracy::high);
 
-    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+    InvHpiDataUpdater hpiData = InvHpiDataUpdater(m_pFiffInfo);
 
     /// act
-    SensorSet sensorsActual = hpiData.getSensors();
+    InvSensorSet sensorsActual = hpiData.getSensors();
 
     /// assert
     QVERIFY(sensorsExpected==sensorsActual);
@@ -323,14 +323,14 @@ void TestHpiDataUpdater::testGetSensors_bads()
     // extract data for channels to use
     int iAccuracy = 2;
 
-    SensorSetCreator sensorCreator;
-    SensorSet sensorsExpected = sensorCreator.updateSensorSet(m_lChannelsWithBads,Accuracy::high);
+    InvSensorSetCreator sensorCreator;
+    InvSensorSet sensorsExpected = sensorCreator.updateSensorSet(m_lChannelsWithBads,Accuracy::high);
 
     m_pFiffInfo->bads << "MEG0113" << "MEG0112";
-    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+    InvHpiDataUpdater hpiData = InvHpiDataUpdater(m_pFiffInfo);
 
     /// act
-    SensorSet sensorsActual = hpiData.getSensors();
+    InvSensorSet sensorsActual = hpiData.getSensors();
 
     /// assert
     QVERIFY(sensorsExpected==sensorsActual);
@@ -340,14 +340,14 @@ void TestHpiDataUpdater::testGetSensors_bads()
 
 void TestHpiDataUpdater::testCheckForUpdates_sensors()
 {
-    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+    InvHpiDataUpdater hpiData = InvHpiDataUpdater(m_pFiffInfo);
     m_pFiffInfo->bads << "MEG0113" << "MEG0112";
-    SensorSetCreator sensorCreator;
-    SensorSet sensorsExpected = sensorCreator.updateSensorSet(m_lChannelsWithBads,Accuracy::high);
+    InvSensorSetCreator sensorCreator;
+    InvSensorSet sensorsExpected = sensorCreator.updateSensorSet(m_lChannelsWithBads,Accuracy::high);
 
     /// act
     hpiData.checkForUpdate(m_pFiffInfo);
-    SensorSet sensorsActual = hpiData.getSensors();
+    InvSensorSet sensorsActual = hpiData.getSensors();
 
     /// assert
     QVERIFY(sensorsExpected==sensorsActual);
@@ -357,7 +357,7 @@ void TestHpiDataUpdater::testCheckForUpdates_sensors()
 
 void TestHpiDataUpdater::testCheckForUpdates_data()
 {
-    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+    InvHpiDataUpdater hpiData = InvHpiDataUpdater(m_pFiffInfo);
     m_pFiffInfo->bads << "MEG0113" << "MEG0112";
     MatrixXd matDataExpected = MatrixXd(m_vecInnerindWithBads.size(), m_matData.cols());
 
@@ -378,7 +378,7 @@ void TestHpiDataUpdater::testCheckForUpdates_data()
 
 void TestHpiDataUpdater::testCheckForUpdates_projectors()
 {
-    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+    InvHpiDataUpdater hpiData = InvHpiDataUpdater(m_pFiffInfo);
     m_pFiffInfo->bads << "MEG0113" << "MEG0112";
     MatrixXd matProj = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 

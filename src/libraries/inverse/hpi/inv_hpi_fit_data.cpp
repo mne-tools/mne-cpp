@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    HPIFitData class defintion.
+ * @brief    InvHpiFitData class defintion.
  *
  */
 
@@ -71,19 +71,19 @@ using namespace INVLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-HPIFitData::HPIFitData()
-    : m_sensors(SensorSet())
+InvHpiFitData::InvHpiFitData()
+    : m_sensors(InvSensorSet())
 {
 }
 
 //=============================================================================================================
 
-void HPIFitData::doDipfitConcurrent()
+void InvHpiFitData::doDipfitConcurrent()
 {
     // Initialize variables
     Eigen::RowVectorXd vecCurrentCoil = this->m_coilPos;
     Eigen::VectorXd vecCurrentData = this->m_sensorData;
-    SensorSet currentSensors = this->m_sensors;
+    InvSensorSet currentSensors = this->m_sensors;
 
     int iDisplay = 0;
     int iMaxiter = m_iMaxIterations;
@@ -108,7 +108,7 @@ void HPIFitData::doDipfitConcurrent()
 
 //=============================================================================================================
 
-Eigen::MatrixXd HPIFitData::magnetic_dipole(Eigen::MatrixXd matPos,
+Eigen::MatrixXd InvHpiFitData::magnetic_dipole(Eigen::MatrixXd matPos,
                                             Eigen::MatrixXd matPnt,
                                             Eigen::MatrixXd matOri)
 {
@@ -163,7 +163,7 @@ Eigen::MatrixXd HPIFitData::magnetic_dipole(Eigen::MatrixXd matPos,
 
 //=============================================================================================================
 
-Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& matPos, const SensorSet& sensors)
+Eigen::MatrixXd InvHpiFitData::compute_leadfield(const Eigen::MatrixXd& matPos, const InvSensorSet& sensors)
 {
 
     Eigen::MatrixXd matPnt, matOri, matLf;
@@ -177,9 +177,9 @@ Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& matPos, con
 
 //=============================================================================================================
 
-DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& matPos,
+DipFitError InvHpiFitData::dipfitError(const Eigen::MatrixXd& matPos,
                                     const Eigen::MatrixXd& matData,
-                                    const SensorSet& sensors,
+                                    const InvSensorSet& sensors,
                                     const Eigen::MatrixXd& matProjectors)
 {
     // Variable Declaration
@@ -212,20 +212,20 @@ DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& matPos,
 
 //=============================================================================================================
 
-bool HPIFitData::compare(HPISortStruct a, HPISortStruct b)
+bool InvHpiFitData::compare(HPISortStruct a, HPISortStruct b)
 {
     return (a.base_arr < b.base_arr);
 }
 
 //=============================================================================================================
 
-Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& matPos,
+Eigen::MatrixXd InvHpiFitData::fminsearch(const Eigen::MatrixXd& matPos,
                                        int iMaxiter,
                                        int iMaxfun,
                                        int iDisplay,
                                        const Eigen::MatrixXd& matData,
                                        const Eigen::MatrixXd& matProjectors,
-                                       const SensorSet& sensors,
+                                       const InvSensorSet& sensors,
                                        int &iSimplexNumitr)
 {
     double tolx, tolf, rho, chi, psi, sigma, func_evals, usual_delta, zero_term_delta, temp1, temp2;

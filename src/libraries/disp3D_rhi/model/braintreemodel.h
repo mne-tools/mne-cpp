@@ -53,7 +53,7 @@
 #include <connectivity/network/network.h>
 
 namespace INVLIB {
-class ECDSet;
+class InvEcdSet;
 }
 
 class NetworkTreeItem;
@@ -84,7 +84,7 @@ public:
 
     // Helpers to populate the tree
     void addSensors(const QString &type, const QList<QStandardItem*> &items);
-    void addDipoles(const INVLIB::ECDSet &set);
+    void addDipoles(const INVLIB::InvEcdSet &set);
 
     // Add digitizer points with proper categorization (Cardinal, HPI, EEG, Extra)
     void addDigitizerData(const QList<FIFFLIB::FiffDigPoint> &digitizerPoints);

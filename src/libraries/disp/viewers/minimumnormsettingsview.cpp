@@ -86,7 +86,7 @@ MinimumNormSettingsView::MinimumNormSettingsView(const QString& sSettingsPath,
         m_pUi->m_comboBox_method->setEnabled(false);
     }
 
-    this->setWindowTitle("MinimumNorm Settings");
+    this->setWindowTitle("InvMinimumNorm Settings");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
 

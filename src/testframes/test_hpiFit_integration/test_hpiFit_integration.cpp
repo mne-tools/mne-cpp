@@ -175,11 +175,11 @@ void TestHpiFitIntegration::initTestCase()
     Eigen::MatrixXd mProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
 
-    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(pFiffInfo);
-    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
+    InvHpiDataUpdater hpiDataUpdater = InvHpiDataUpdater(pFiffInfo);
+    InvHpiFit HPI = InvHpiFit(hpiDataUpdater.getSensors());
     int iSampleFreq = pFiffInfo->sfreq;
     int iLineFreq = pFiffInfo->linefreq;
-    HpiModelParameters hpiModelParameters(vFreqs,
+    InvHpiModelParameters hpiModelParameters(vFreqs,
                                           iSampleFreq,
                                           iLineFreq,
                                           true);
@@ -198,7 +198,7 @@ void TestHpiFitIntegration::initTestCase()
 
     HpiFitResult hpiFitResult;
     HPI.fit(matProjectedData,matPreparedProjectors,hpiModelParameters,matCoilsHead,true,hpiFitResult);
-    hpiModelParameters = HpiModelParameters(hpiFitResult.hpiFreqs,
+    hpiModelParameters = InvHpiModelParameters(hpiFitResult.hpiFreqs,
                                             pFiffInfo->sfreq,
                                             pFiffInfo->linefreq,
                                             true);
@@ -230,12 +230,12 @@ void TestHpiFitIntegration::initTestCase()
             mHpiResult(i,2) = 1;
         }
 
-        HPIFit::storeHeadPosition(mRefPos(i,0), hpiFitResult.devHeadTrans.trans, mHpiPos, hpiFitResult.GoF, hpiFitResult.errorDistances);
+        InvHpiFit::storeHeadPosition(mRefPos(i,0), hpiFitResult.devHeadTrans.trans, mHpiPos, hpiFitResult.GoF, hpiFitResult.errorDistances);
         mHpiResult(i,0) = devHeadT.translationTo(hpiFitResult.devHeadTrans.trans);
         mHpiResult(i,1) = devHeadT.angleTo(hpiFitResult.devHeadTrans.trans);
 
     }
-    // For debug: position file for HPIFit
+    // For debug: position file for InvHpiFit
     //    UTILSLIB::IOUtils::write_eigen_matrix(mHpiPos, QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/mHpiPos.txt");
 }
 

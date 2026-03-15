@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     guess_data.cpp
+ * @file     inv_guess_data.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the GuessData Class.
+ * @brief    Definition of the InvGuessData Class.
  *
  */
 
@@ -89,7 +89,7 @@ using namespace INVLIB;
 
 #define MALLOC_16(x,t) (t *)malloc((x)*sizeof(t))
 
-#define REALLOC_16(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
+#define REALLOC_16(x,y,t) (t *)((x == nullptr) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
 
 #define ALLOC_CMATRIX_16(x,y) mne_cmatrix_16((x),(y))
 
@@ -127,7 +127,7 @@ float **mne_cmatrix_16(int nr,int nc)
     return m;
 }
 
-#define FREE_16(x) if ((char *)(x) != NULL) free((char *)(x))
+#define FREE_16(x) if ((char *)(x) != nullptr) free((char *)(x))
 #define FREE_CMATRIX_16(m) mne_free_cmatrix_16((m))
 
 void mne_free_cmatrix_16 (float **m)
@@ -167,24 +167,24 @@ void fromIntEigenMatrix_16(const Eigen::MatrixXi& from_mat, int **&to_mat)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-GuessData::GuessData()
-: rr(NULL)
-, guess_fwd(NULL)
+InvGuessData::InvGuessData()
+: rr(nullptr)
+, guess_fwd(nullptr)
 , nguess(0)
 {
 }
 
 //=============================================================================================================
 
-//GuessData::GuessData(const GuessData& p_GuessData)
+//InvGuessData::InvGuessData(const InvGuessData& p_GuessData)
 //{
 //}
 
 //=============================================================================================================
 
-GuessData::GuessData(const QString &guessname, const QString &guess_surfname, float mindist, float exclude, float grid, DipoleFitData *f)
+InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfname, float mindist, float exclude, float grid, InvDipoleFitData *f)
 {
-//    GuessData*      res = new GuessData();
+//    InvGuessData*      res = new InvGuessData();
     int            k,p;
     float          guessrad = 0.080;
     std::unique_ptr<MNESourceSpace> guesses;
@@ -205,7 +205,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         guesses = std::move(sp[0]);
     }
     else {
-        MNESurface*    inner_skull = NULL;
+        MNESurface*    inner_skull = nullptr;
         int            free_inner_skull = FALSE;
         float          r0[3];
 
@@ -214,12 +214,12 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         FiffCoordTrans::apply_inverse_trans(r0,*f->mri_head_t,TRUE);
         if (f->bem_model) {
             printf("Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
-            if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
+            if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == nullptr)
                 goto bad;
         }
         else if (!guess_surfname.isEmpty()) {
             printf("Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
-            if ((inner_skull = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
+            if ((inner_skull = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,nullptr)) == nullptr)
                 goto bad;
             free_inner_skull = TRUE;
         }
@@ -248,9 +248,9 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
     guesses.reset();
 
     printf("Go through all guess source locations...");
-    this->guess_fwd = MALLOC_16(this->nguess,DipoleForward*);
+    this->guess_fwd = MALLOC_16(this->nguess,InvDipoleForward*);
     for (k = 0; k < this->nguess; k++)
-        this->guess_fwd[k] = NULL;
+        this->guess_fwd[k] = nullptr;
     /*
         * Compute the guesses using the sphere model for speed
         */
@@ -261,7 +261,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         f->funcs = f->sphere_funcs;
 
     for (k = 0; k < this->nguess; k++) {
-        if ((this->guess_fwd[k] = DipoleFitData::dipole_forward_one(f,this->rr[k],NULL)) == NULL)
+        if ((this->guess_fwd[k] = InvDipoleFitData::dipole_forward_one(f,this->rr[k],nullptr)) == nullptr)
             goto bad;
 #ifdef DEBUG
         sing = this->guess_fwd[k]->sing;
@@ -277,13 +277,13 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
 
 bad : {
         return;
-//        return NULL;
+//        return nullptr;
     }
 }
 
 //=============================================================================================================
 
-GuessData::GuessData(const QString &guessname, const QString &guess_surfname, float mindist, float exclude, float grid, DipoleFitData *f, char *guess_save_name)
+InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfname, float mindist, float exclude, float grid, InvDipoleFitData *f, char *guess_save_name)
 {
     int             k,p;
     float           guessrad = 0.080f;
@@ -304,7 +304,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         guesses = std::move(sp[0]);
     }
     else {
-        MNESurface*     inner_skull = NULL;
+        MNESurface*     inner_skull = nullptr;
         int            free_inner_skull = FALSE;
         float          r0[3];
 
@@ -313,12 +313,12 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         FiffCoordTrans::apply_inverse_trans(r0,*f->mri_head_t,TRUE);
         if (f->bem_model) {
             printf("Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
-            if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
+            if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == nullptr)
                 goto bad;
         }
         else if (!guess_surfname.isEmpty()) {
             printf("Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
-            if ((inner_skull = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
+            if ((inner_skull = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,nullptr)) == nullptr)
                 goto bad;
             free_inner_skull = TRUE;
         }
@@ -362,9 +362,9 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         }
     guesses.reset();
 
-    this->guess_fwd = MALLOC_16(this->nguess,DipoleForward*);
+    this->guess_fwd = MALLOC_16(this->nguess,InvDipoleForward*);
     for (k = 0; k < this->nguess; k++)
-        this->guess_fwd[k] = NULL;
+        this->guess_fwd[k] = nullptr;
     /*
         * Compute the guesses using the sphere model for speed
         */
@@ -380,7 +380,7 @@ bad : {
 
 //=============================================================================================================
 
-GuessData::~GuessData()
+InvGuessData::~InvGuessData()
 {
     FREE_CMATRIX_16(rr);
     if (guess_fwd) {
@@ -393,9 +393,9 @@ GuessData::~GuessData()
 
 //=============================================================================================================
 
-bool GuessData::compute_guess_fields(DipoleFitData* f)
+bool InvGuessData::compute_guess_fields(InvDipoleFitData* f)
 {
-    dipoleFitFuncs orig = NULL;
+    dipoleFitFuncs orig = nullptr;
 
     if (!f) {
         qCritical("Data missing in compute_guess_fields");
@@ -412,7 +412,7 @@ bool GuessData::compute_guess_fields(DipoleFitData* f)
     else
         f->funcs = f->sphere_funcs;
     for (int k = 0; k < this->nguess; k++) {
-        if ((this->guess_fwd[k] = DipoleFitData::dipole_forward_one(f,this->rr[k],this->guess_fwd[k])) == NULL){
+        if ((this->guess_fwd[k] = InvDipoleFitData::dipole_forward_one(f,this->rr[k],this->guess_fwd[k])) == nullptr){
             if (orig)
                 f->funcs = orig;
             return false;

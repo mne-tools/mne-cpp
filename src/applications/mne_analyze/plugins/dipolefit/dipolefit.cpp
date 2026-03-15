@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the DipoleFit class.
+ * @brief    Definition of the InvDipoleFit class.
  *
  */
 
@@ -76,104 +76,104 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DipoleFit::DipoleFit()
+InvDipoleFit::InvDipoleFit()
 {
     m_DipoleSettings.dipname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/dip-5120-bem_fit.dat";
 }
 
 //=============================================================================================================
 
-DipoleFit::~DipoleFit()
+InvDipoleFit::~InvDipoleFit()
 {
 }
 
 //=============================================================================================================
 
-QSharedPointer<AbstractPlugin> DipoleFit::clone() const
+QSharedPointer<AbstractPlugin> InvDipoleFit::clone() const
 {
-    QSharedPointer<DipoleFit> pDipoleFitClone = QSharedPointer<DipoleFit>::create();
+    QSharedPointer<InvDipoleFit> pDipoleFitClone = QSharedPointer<InvDipoleFit>::create();
     return pDipoleFitClone;
 }
 
 //=============================================================================================================
 
-void DipoleFit::init()
+void InvDipoleFit::init()
 {
     m_pCommu = new Communicator(this);
 }
 
 //=============================================================================================================
 
-void DipoleFit::unload()
+void InvDipoleFit::unload()
 {
 }
 
 //=============================================================================================================
 
-QString DipoleFit::getName() const
+QString InvDipoleFit::getName() const
 {
-    return "Dipole Fit";
+    return "InvDipole Fit";
 }
 
 //=============================================================================================================
 
-QMenu *DipoleFit::getMenu()
+QMenu *InvDipoleFit::getMenu()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-QDockWidget *DipoleFit::getControl()
+QDockWidget *InvDipoleFit::getControl()
 {
     DISPLIB::DipoleFitView* pDipoleView = new DISPLIB::DipoleFitView();
 
     //Send Gui updates
-    connect(this, &DipoleFit::newBemModel,
+    connect(this, &InvDipoleFit::newBemModel,
             pDipoleView, &DISPLIB::DipoleFitView::addBem, Qt::UniqueConnection);
-    connect(this, &DipoleFit::newCovarianceModel,
+    connect(this, &InvDipoleFit::newCovarianceModel,
             pDipoleView, &DISPLIB::DipoleFitView::addNoise, Qt::UniqueConnection);
-    connect(this, &DipoleFit::newMriModel,
+    connect(this, &InvDipoleFit::newMriModel,
             pDipoleView, &DISPLIB::DipoleFitView::addMri, Qt::UniqueConnection);
-    connect(this, &DipoleFit::newMeasurment,
+    connect(this, &InvDipoleFit::newMeasurment,
             pDipoleView, &DISPLIB::DipoleFitView::addMeas, Qt::UniqueConnection);
-    connect(this, &DipoleFit::getUpdate,
+    connect(this, &InvDipoleFit::getUpdate,
             pDipoleView, &DISPLIB::DipoleFitView::requestParams, Qt::UniqueConnection);
-    connect(this, &DipoleFit::removeModel,
+    connect(this, &InvDipoleFit::removeModel,
             pDipoleView, &DISPLIB::DipoleFitView::removeModel, Qt::UniqueConnection);
 
     //Receive Gui updates
     connect(pDipoleView, &DISPLIB::DipoleFitView::modalityChanged,
-            this, &DipoleFit::onModalityChanged, Qt::UniqueConnection);
+            this, &InvDipoleFit::onModalityChanged, Qt::UniqueConnection);
     connect(pDipoleView, &DISPLIB::DipoleFitView::timeChanged,
-            this, &DipoleFit::onTimeChanged, Qt::UniqueConnection);
+            this, &InvDipoleFit::onTimeChanged, Qt::UniqueConnection);
     connect(pDipoleView, &DISPLIB::DipoleFitView::fittingChanged,
-            this, &DipoleFit::onFittingChanged, Qt::UniqueConnection);
+            this, &InvDipoleFit::onFittingChanged, Qt::UniqueConnection);
     connect(pDipoleView, &DISPLIB::DipoleFitView::baselineChanged,
-            this, &DipoleFit::onBaselineChanged, Qt::UniqueConnection);
+            this, &InvDipoleFit::onBaselineChanged, Qt::UniqueConnection);
     connect(pDipoleView, &DISPLIB::DipoleFitView::noiseChanged,
-            this, &DipoleFit::onNoiseChanged, Qt::UniqueConnection);
+            this, &InvDipoleFit::onNoiseChanged, Qt::UniqueConnection);
     connect(pDipoleView, &DISPLIB::DipoleFitView::regChanged,
-            this, &DipoleFit::onRegChanged, Qt::UniqueConnection);
+            this, &InvDipoleFit::onRegChanged, Qt::UniqueConnection);
     connect(pDipoleView, &DISPLIB::DipoleFitView::setChanged,
-            this, &DipoleFit::onSetChanged, Qt::UniqueConnection);
+            this, &InvDipoleFit::onSetChanged, Qt::UniqueConnection);
     connect(pDipoleView, &DISPLIB::DipoleFitView::sphereChanged,
-            this, &DipoleFit::onSphereChanged, Qt::UniqueConnection);
+            this, &InvDipoleFit::onSphereChanged, Qt::UniqueConnection);
 
     connect(pDipoleView, &DISPLIB::DipoleFitView::selectedBem,
-            this, &DipoleFit::onNewBemSelected, Qt::UniqueConnection);
+            this, &InvDipoleFit::onNewBemSelected, Qt::UniqueConnection);
     connect(pDipoleView, &DISPLIB::DipoleFitView::selectedMri,
-            this, &DipoleFit::onNewMriSelected, Qt::UniqueConnection);
+            this, &InvDipoleFit::onNewMriSelected, Qt::UniqueConnection);
     connect(pDipoleView, &DISPLIB::DipoleFitView::selectedNoise,
-            this, &DipoleFit::onNewNoiseSelected, Qt::UniqueConnection);
+            this, &InvDipoleFit::onNewNoiseSelected, Qt::UniqueConnection);
     connect(pDipoleView, &DISPLIB::DipoleFitView::selectedMeas,
-            this, &DipoleFit::onNewMeasSelected, Qt::UniqueConnection);
+            this, &InvDipoleFit::onNewMeasSelected, Qt::UniqueConnection);
 
     //Fit
     connect(pDipoleView, &DISPLIB::DipoleFitView::performDipoleFit,
-            this, &DipoleFit::onPerformDipoleFit, Qt::UniqueConnection);
-    connect(&m_FutureWatcher, &QFutureWatcher<INVLIB::ECDSet>::finished,
-            this, &DipoleFit::dipoleFitResults, Qt::UniqueConnection);
+            this, &InvDipoleFit::onPerformDipoleFit, Qt::UniqueConnection);
+    connect(&m_FutureWatcher, &QFutureWatcher<INVLIB::InvEcdSet>::finished,
+            this, &InvDipoleFit::dipoleFitResults, Qt::UniqueConnection);
 
     QDockWidget* pDockWidgt = new QDockWidget(getName());
     pDockWidgt->setWidget(pDipoleView);
@@ -187,14 +187,14 @@ QDockWidget *DipoleFit::getControl()
 
 //=============================================================================================================
 
-QWidget *DipoleFit::getView()
+QWidget *InvDipoleFit::getView()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-void DipoleFit::handleEvent(QSharedPointer<Event> e)
+void InvDipoleFit::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
     case EVENT_TYPE::SELECTED_MODEL_CHANGED:
@@ -204,14 +204,14 @@ void DipoleFit::handleEvent(QSharedPointer<Event> e)
         onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
         break;
     default:
-        qWarning() << "[DipoleFit::handleEvent] received an Event that is not handled by switch-cases";
+        qWarning() << "[InvDipoleFit::handleEvent] received an Event that is not handled by switch-cases";
         break;
     }
 }
 
 //=============================================================================================================
 
-QVector<EVENT_TYPE> DipoleFit::getEventSubscriptions(void) const
+QVector<EVENT_TYPE> InvDipoleFit::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
     temp.push_back(SELECTED_MODEL_CHANGED);
@@ -221,11 +221,11 @@ QVector<EVENT_TYPE> DipoleFit::getEventSubscriptions(void) const
 
 //=============================================================================================================
 
-void DipoleFit::onPerformDipoleFit(const QString& sFitName)
+void InvDipoleFit::onPerformDipoleFit(const QString& sFitName)
 {
     m_sFitName = sFitName;
 
-    triggerLoadingStart("Performing Dipole Fit...");
+    triggerLoadingStart("Performing InvDipole Fit...");
 
     m_Future = QtConcurrent::run([this] {
         return this->dipoleFitCalculation();
@@ -236,7 +236,7 @@ void DipoleFit::onPerformDipoleFit(const QString& sFitName)
 
 //=============================================================================================================
 
-void DipoleFit::onModalityChanged(bool bEEG, bool bMEG)
+void InvDipoleFit::onModalityChanged(bool bEEG, bool bMEG)
 {
     QMutexLocker lock(&m_FitMutex);
 
@@ -246,7 +246,7 @@ void DipoleFit::onModalityChanged(bool bEEG, bool bMEG)
 
 //=============================================================================================================
 
-void DipoleFit::onTimeChanged(int iMin,
+void InvDipoleFit::onTimeChanged(int iMin,
                               int iMax,
                               int iStep,
                               int iInt)
@@ -261,7 +261,7 @@ void DipoleFit::onTimeChanged(int iMin,
 
 //=============================================================================================================
 
-void DipoleFit::onFittingChanged(float fMinDistance,
+void InvDipoleFit::onFittingChanged(float fMinDistance,
                                  float fSize)
 {
     QMutexLocker lock(&m_FitMutex);
@@ -272,7 +272,7 @@ void DipoleFit::onFittingChanged(float fMinDistance,
 
 //=============================================================================================================
 
-void DipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+void InvDipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
     QMutexLocker lock(&m_FitMutex);
 
@@ -305,7 +305,7 @@ void DipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewMo
 
 //=============================================================================================================
 
-void DipoleFit::newDipoleFit(INVLIB::ECDSet set, const QString& sFitName)
+void InvDipoleFit::newDipoleFit(INVLIB::InvEcdSet set, const QString& sFitName)
 {
     QSharedPointer<ANSHAREDLIB::DipoleFitModel> pModel = QSharedPointer<ANSHAREDLIB::DipoleFitModel>(new ANSHAREDLIB::DipoleFitModel(set));
     m_pAnalyzeData->addModel<ANSHAREDLIB::DipoleFitModel>(pModel,
@@ -315,7 +315,7 @@ void DipoleFit::newDipoleFit(INVLIB::ECDSet set, const QString& sFitName)
 
 //=============================================================================================================
 
-void DipoleFit::onBaselineChanged(int iBMin,
+void InvDipoleFit::onBaselineChanged(int iBMin,
                                   int iBMax)
 {
     QMutexLocker lock(&m_FitMutex);
@@ -326,7 +326,7 @@ void DipoleFit::onBaselineChanged(int iBMin,
 
 //=============================================================================================================
 
-void DipoleFit::onNoiseChanged(double dGrad,
+void InvDipoleFit::onNoiseChanged(double dGrad,
                                double dMag,
                                double dEeg)
 {
@@ -340,7 +340,7 @@ void DipoleFit::onNoiseChanged(double dGrad,
 
 //=============================================================================================================
 
-void DipoleFit::onRegChanged(double dRegGrad,
+void InvDipoleFit::onRegChanged(double dRegGrad,
                              double dRegMag,
                              double dRegEeg)
 {
@@ -353,7 +353,7 @@ void DipoleFit::onRegChanged(double dRegGrad,
 
 //=============================================================================================================
 
-void DipoleFit::onSetChanged(int iSet)
+void InvDipoleFit::onSetChanged(int iSet)
 {
     QMutexLocker lock(&m_FitMutex);
 
@@ -363,7 +363,7 @@ void DipoleFit::onSetChanged(int iSet)
 
 //=============================================================================================================
 
-void DipoleFit::onSphereChanged(double dX,
+void InvDipoleFit::onSphereChanged(double dX,
                                 double dY,
                                 double dZ,
                                 double dRadius)
@@ -379,7 +379,7 @@ void DipoleFit::onSphereChanged(double dX,
 
 //=============================================================================================================
 
-void DipoleFit::onNewBemSelected(const QString &sName)
+void InvDipoleFit::onNewBemSelected(const QString &sName)
 {
     if(sName == "None"){
         m_DipoleSettings.bemname = "";
@@ -395,7 +395,7 @@ void DipoleFit::onNewBemSelected(const QString &sName)
 
 //=============================================================================================================
 
-void DipoleFit::onNewMriSelected(const QString &sName)
+void InvDipoleFit::onNewMriSelected(const QString &sName)
 {
     if(sName == "None"){
         m_DipoleSettings.mriname = "";
@@ -411,7 +411,7 @@ void DipoleFit::onNewMriSelected(const QString &sName)
 
 //=============================================================================================================
 
-void DipoleFit::onNewNoiseSelected(const QString &sName)
+void InvDipoleFit::onNewNoiseSelected(const QString &sName)
 {
     if(sName == "None"){
         m_DipoleSettings.noisename = "";
@@ -427,14 +427,14 @@ void DipoleFit::onNewNoiseSelected(const QString &sName)
 
 //=============================================================================================================
 
-void DipoleFit::onNewMeasSelected(const QString &sName)
+void InvDipoleFit::onNewMeasSelected(const QString &sName)
 {
     if(sName == "None"){
         m_DipoleSettings.measname = "";
         return;
     }
 
-    //qDebug() << "DipoleFit::onNewMeasSelected";
+    //qDebug() << "InvDipoleFit::onNewMeasSelected";
     for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
         if (QFileInfo(pModel->getModelPath()).fileName() == sName){
             if(pModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL){
@@ -450,7 +450,7 @@ void DipoleFit::onNewMeasSelected(const QString &sName)
 
 //=============================================================================================================
 
-INVLIB::ECDSet DipoleFit::dipoleFitCalculation()
+INVLIB::InvEcdSet InvDipoleFit::dipoleFitCalculation()
 {
     QMutexLocker lock(&m_FitMutex);
 
@@ -458,13 +458,13 @@ INVLIB::ECDSet DipoleFit::dipoleFitCalculation()
     m_DipoleSettings.checkIntegrity();
 
     qInfo() << "Initializing settings...";
-    INVLIB::DipoleFit dipFit(&m_DipoleSettings);
+    INVLIB::InvDipoleFit dipFit(&m_DipoleSettings);
 
     qInfo() << "Calculating fit...";
-    INVLIB::ECDSet ecdSet = dipFit.calculateFit();
+    INVLIB::InvEcdSet ecdSet = dipFit.calculateFit();
 
     qInfo() << "Done!";
-    INVLIB::ECDSet ecdSetTrans = ecdSet;
+    INVLIB::InvEcdSet ecdSetTrans = ecdSet;
 
     QFile file(m_DipoleSettings.mriname);
 
@@ -496,7 +496,7 @@ INVLIB::ECDSet DipoleFit::dipoleFitCalculation()
             ecdSetTrans[i].Q(2) = dipoles(0,2);
         }
     } else {
-        qWarning("[DipoleFit::onPerformDipoleFit] Cannot open FiffCoordTrans file");
+        qWarning("[InvDipoleFit::onPerformDipoleFit] Cannot open FiffCoordTrans file");
     }
 
     return ecdSet;
@@ -504,16 +504,16 @@ INVLIB::ECDSet DipoleFit::dipoleFitCalculation()
 
 //=============================================================================================================
 
-void DipoleFit::dipoleFitResults()
+void InvDipoleFit::dipoleFitResults()
 {
     newDipoleFit(m_Future.result(), m_sFitName);
 
-    triggerLoadingEnd("Performing Dipole Fit...");
+    triggerLoadingEnd("Performing InvDipole Fit...");
 }
 
 //=============================================================================================================
 
-void DipoleFit::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+void InvDipoleFit::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
     for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
         if (pModel == pRemovedModel){
@@ -537,21 +537,21 @@ void DipoleFit::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemov
 
 //=============================================================================================================
 
-void DipoleFit::triggerLoadingStart(QString sMessage)
+void InvDipoleFit::triggerLoadingStart(QString sMessage)
 {
     m_pCommu->publishEvent(LOADING_START, QVariant::fromValue(sMessage));
 }
 
 //=============================================================================================================
 
-void DipoleFit::triggerLoadingEnd(QString sMessage)
+void InvDipoleFit::triggerLoadingEnd(QString sMessage)
 {
     m_pCommu->publishEvent(LOADING_END, QVariant::fromValue(sMessage));
 }
 
 //=============================================================================================================
 
-QString DipoleFit::getBuildInfo()
+QString InvDipoleFit::getBuildInfo()
 {
     return QString(DIPOLEFITPLUGIN::buildDateTime()) + QString(" - ")  + QString(DIPOLEFITPLUGIN::buildHash());
 }

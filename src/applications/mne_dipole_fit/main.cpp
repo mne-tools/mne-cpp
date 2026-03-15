@@ -93,9 +93,9 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QApplication app(argc, argv);
 
-    DipoleFitSettings settings(&argc,argv);
-    DipoleFit dipFit(&settings);
-    ECDSet set = dipFit.calculateFit();
+    InvDipoleFitSettings settings(&argc,argv);
+    InvDipoleFit dipFit(&settings);
+    InvEcdSet set = dipFit.calculateFit();
 
     BrainView *pViewer = nullptr;
     if(settings.gui) {
@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     /*
      * Test - Reading again
      */
-    ECDSet::read_dipoles_dip(settings.dipname);
+    InvEcdSet::read_dipoles_dip(settings.dipname);
 
     return app.exec();
 }

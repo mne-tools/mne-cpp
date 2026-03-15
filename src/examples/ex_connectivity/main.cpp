@@ -263,7 +263,7 @@ int main(int argc, char *argv[])
                                      fTMin,
                                      fTMax);
 
-    MNESourceEstimate sourceEstimateEvoked;
+    InvSourceEstimate sourceEstimateEvoked;
     VectorXi vDataIndices;
 
     QStringList exclude;
@@ -309,7 +309,7 @@ int main(int argc, char *argv[])
         t_Fwd = FwdForwardSolution(t_fileFwd, false, true);
 
         // Load data
-        MNESourceEstimate sourceEstimate;
+        InvSourceEstimate sourceEstimate;
 
         double lambda2 = 1.0 / pow(dSnr, 2);
         QString method(sSourceLocMethod);
@@ -330,14 +330,14 @@ int main(int argc, char *argv[])
             t_clusteredFwd = t_Fwd;
         }
 
-        MNEInverseOperator inverse_operator(raw.info,
+        InvInverseOperator inverse_operator(raw.info,
                                             t_clusteredFwd,
                                             noise_cov,
                                             0.2f,
                                             0.8f);
 
         // Compute inverse solution
-        MinimumNorm minimumNorm(inverse_operator, lambda2, method);
+        InvMinimumNorm minimumNorm(inverse_operator, lambda2, method);
         minimumNorm.doInverseSetup(1, true);
 
         picks = raw.info.pick_types(QString("all"),true,false,QStringList(),exclude);
@@ -356,7 +356,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        MinimumNorm minimumNormEvoked(inverse_operator, lambda2, method);
+        InvMinimumNorm minimumNormEvoked(inverse_operator, lambda2, method);
         sourceEstimateEvoked = minimumNormEvoked.calculateInverse(evoked, false);
         pConnectivitySettingsManager->m_matEvoked = evoked.data;
         pConnectivitySettingsManager->m_matEvokedSource = sourceEstimateEvoked.data;
@@ -448,7 +448,7 @@ int main(int argc, char *argv[])
     } else {
         // Add source estimate for source-level visualization
         int nVertLh = t_clusteredFwd.src[0].nuse;
-        MNESourceEstimate stcLh, stcRh;
+        InvSourceEstimate stcLh, stcRh;
         stcLh.data = sourceEstimateEvoked.data.topRows(nVertLh);
         stcLh.vertices = sourceEstimateEvoked.vertices.head(nVertLh);
         stcLh.tmin = sourceEstimateEvoked.tmin;

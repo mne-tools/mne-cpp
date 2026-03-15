@@ -381,7 +381,7 @@ private slots:
     }
 
     //=========================================================================
-    // MNESourceEstimate: create from real data dimensions
+    // InvSourceEstimate: create from real data dimensions
     //=========================================================================
     void sourceEstimate_createFromDimensions()
     {
@@ -411,7 +411,7 @@ private slots:
         float tmin = 0.0f;
         float tstep = 0.001f;
 
-        MNESourceEstimate stc(data, allVertno, tmin, tstep);
+        InvSourceEstimate stc(data, allVertno, tmin, tstep);
         QVERIFY(!stc.isEmpty());
         QCOMPARE(stc.samples(), nTimes);
         QCOMPARE(stc.data.rows(), (Index)totalVerts);
@@ -424,8 +424,8 @@ private slots:
         VectorXi verts(100);
         for (int i = 0; i < 100; ++i) verts(i) = i;
 
-        MNESourceEstimate stc(data, verts, 0.0f, 0.001f);
-        MNESourceEstimate reduced = stc.reduce(10, 20);
+        InvSourceEstimate stc(data, verts, 0.0f, 0.001f);
+        InvSourceEstimate reduced = stc.reduce(10, 20);
         QCOMPARE(reduced.samples(), 20);
     }
 

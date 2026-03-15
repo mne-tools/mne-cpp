@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
     //
     FiffInfo info = evoked.info;
 
-    MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+    InvInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
 
     //
     // save clustered inverse
@@ -204,8 +204,8 @@ int main(int argc, char *argv[])
     //
     // Compute inverse solution
     //
-    MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-    MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
+    InvMinimumNorm minimumNorm(inverse_operator, lambda2, method);
+    InvSourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
     VectorXd sourceEstimateData = sourceEstimate.data.col(10);
 
     bool bMakeSymmetrical;

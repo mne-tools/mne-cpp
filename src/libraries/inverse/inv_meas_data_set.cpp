@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MNE Meas Data Set (MNEMeasDataSet) Class.
+ * @brief    Definition of the MNE Meas Data Set (InvMeasDataSet) Class.
  *
  */
 
@@ -51,7 +51,7 @@ using namespace Eigen;
 using namespace INVLIB;
 using namespace FIFFLIB;
 
-#define FREE_8(x) if ((char *)(x) != NULL) free((char *)(x))
+#define FREE_8(x) if ((char *)(x) != nullptr) free((char *)(x))
 
 #define FREE_CMATRIX_8(m) mne_free_cmatrix_8((m))
 
@@ -67,26 +67,26 @@ void mne_free_cmatrix_8 (float **m)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNEMeasDataSet::MNEMeasDataSet()
-:data(NULL)
-,data_filt(NULL)
-,data_proj(NULL)
-,data_white(NULL)
-,stim14(NULL)
+InvMeasDataSet::InvMeasDataSet()
+:data(nullptr)
+,data_filt(nullptr)
+,data_proj(nullptr)
+,data_white(nullptr)
+,stim14(nullptr)
 ,first(0)
 ,np(0)
 ,nave(1)
 ,kind(FIFFV_ASPECT_AVERAGE)
-,baselines(NULL)
-,mne(NULL)
-,user_data(NULL)
-,user_data_free(NULL)
+,baselines(nullptr)
+,mne(nullptr)
+,user_data(nullptr)
+,user_data_free(nullptr)
 {
 }
 
 //=============================================================================================================
 
-MNEMeasDataSet::~MNEMeasDataSet()
+InvMeasDataSet::~InvMeasDataSet()
 {
     FREE_CMATRIX_8(data);
     FREE_CMATRIX_8(data_proj);

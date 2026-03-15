@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     guess_data.h
+ * @file     inv_guess_data.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    GuessData class declaration.
+ * @brief    InvGuessData class declaration.
  *
  */
 
-#ifndef GUESSDATA_H
-#define GUESSDATA_H
+#ifndef INV_GUESS_DATA_H
+#define INV_GUESS_DATA_H
 
 //=============================================================================================================
 // INCLUDES
@@ -67,34 +67,34 @@ namespace INVLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class DipoleFitData;
+class InvDipoleFitData;
 
 //=============================================================================================================
 /**
- * Implements GuessData (Replaces *guessData,guessDataRec struct of MNE-C fit_types.h).
+ * Implements InvGuessData (Replaces *guessData,guessDataRec struct of MNE-C fit_types.h).
  *
  * @brief Precomputed guess point grid with forward fields for initial dipole position candidates.
  */
-class INVSHARED_EXPORT GuessData
+class INVSHARED_EXPORT InvGuessData
 {
 public:
-    typedef QSharedPointer<GuessData> SPtr;              /**< Shared pointer type for GuessData. */
-    typedef QSharedPointer<const GuessData> ConstSPtr;   /**< Const shared pointer type for GuessData. */
+    typedef QSharedPointer<InvGuessData> SPtr;              /**< Shared pointer type for InvGuessData. */
+    typedef QSharedPointer<const InvGuessData> ConstSPtr;   /**< Const shared pointer type for InvGuessData. */
 
     //=========================================================================================================
     /**
      * Constructs the Guess Data
      * Refactored: new_guess_data (dipole_fit_setup.c)
      */
-    GuessData();
+    InvGuessData();
 
 //    //=========================================================================================================
 //    /**
 //    * Copy constructor.
 //    *
-//    * @param[in] p_GuessData    GuessData which should be copied
+//    * @param[in] p_GuessData    InvGuessData which should be copied
 //    */
-//    GuessData(const GuessData& p_GuessData);
+//    InvGuessData(const InvGuessData& p_GuessData);
 
     //=========================================================================================================
     /**
@@ -104,7 +104,7 @@ public:
      * @param[in] guessname.
      *
      */
-    GuessData( const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, DipoleFitData* f);
+    InvGuessData( const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, InvDipoleFitData* f);
 
     //=========================================================================================================
     /**
@@ -114,14 +114,14 @@ public:
      * @param[in] guessname.
      *
      */
-    GuessData( const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, DipoleFitData* f, char *guess_save_name);
+    InvGuessData( const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, InvDipoleFitData* f, char *guess_save_name);
 
     //=========================================================================================================
     /**
      * Destroys the Guess Data description
      * Refactored: free_guess_data (dipole_fit_setup.c)
      */
-    ~GuessData();
+    ~InvGuessData();
 
     //=========================================================================================================
     /**
@@ -132,11 +132,11 @@ public:
      *
      * @return true when successful.
      */
-    bool compute_guess_fields(DipoleFitData* f);
+    bool compute_guess_fields(InvDipoleFitData* f);
 
 public:
     float          **rr;            /**< These are the guess dipole locations. */
-    DipoleForward** guess_fwd;      /**< Forward solutions for the guesses. */
+    InvDipoleForward** guess_fwd;      /**< Forward solutions for the guesses. */
     int            nguess;          /**< How many sources. */
 };
 
@@ -145,4 +145,4 @@ public:
 //=============================================================================================================
 } // NAMESPACE INVLIB
 
-#endif // GUESSDATA_H
+#endif // INV_GUESS_DATA_H

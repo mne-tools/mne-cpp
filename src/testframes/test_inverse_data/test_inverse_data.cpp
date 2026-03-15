@@ -11,7 +11,7 @@
  *
  * @brief    Data-driven tests exercising the inverse library with real .fif data.
  *           Builds inverse operator from forward+covariance, computes MNE/dSPM/sLORETA,
- *           exercises HPI model parameters, SensorSet, ECDSet, DipoleFitSettings.
+ *           exercises HPI model parameters, InvSensorSet, InvEcdSet, InvDipoleFitSettings.
  */
 //=============================================================================================================
 
@@ -69,7 +69,7 @@ using namespace Eigen;
  * @param[in] step      Keep every step-th source (e.g. 15 → ~500 sources).
  * @return  Inverse operator built from the subsampled forward.
  */
-static MNEInverseOperator makeSmallInverseOp(const FiffInfo& info,
+static InvInverseOperator makeSmallInverseOp(const FiffInfo& info,
                                              const FwdForwardSolution& fwd,
                                              const FiffCov& noiseCov,
                                              int step)
@@ -139,7 +139,7 @@ static MNEInverseOperator makeSmallInverseOp(const FiffInfo& info,
     small.source_nn = nn;
 
     // 5. Build inverse operator from the reduced forward
-    return MNEInverseOperator::make_inverse_operator(
+    return InvInverseOperator::make_inverse_operator(
         info, small, noiseCov, 0.2f, 0.8f, false, true);
 }
 
@@ -161,7 +161,7 @@ static MNEInverseOperator makeSmallInverseOp(const FiffInfo& info,
  * @param[in,out] inv   Inverse operator whose source spaces are modified
  *                       in-place.
  */
-static void stripSourceSpaceGeometry(MNEInverseOperator& inv)
+static void stripSourceSpaceGeometry(InvInverseOperator& inv)
 {
     for (qint32 h = 0; h < inv.src.size(); ++h) {
         MNESourceSpace& sp = inv.src[h];
@@ -214,7 +214,7 @@ private:
     FwdForwardSolution m_fwd;
     FiffCov m_noiseCov;
     FiffInfo m_info;
-    MNEInverseOperator m_invOp;   // Cached inverse operator (loose=0.2, depth=0.8)
+    InvInverseOperator m_invOp;   // Cached inverse operator (loose=0.2, depth=0.8)
     bool m_bDataLoaded;
 
     bool hasData() const {
@@ -267,7 +267,7 @@ private slots:
 
         // Pre-compute the standard inverse operator (most tests share it)
         if (m_bDataLoaded) {
-            m_invOp = MNEInverseOperator::make_inverse_operator(
+            m_invOp = InvInverseOperator::make_inverse_operator(
                 m_info, m_fwd, m_noiseCov, 0.2f, 0.8f, false, true);
         }
     }
@@ -296,7 +296,7 @@ private slots:
 
         // Build a small inverse operator (~500 sources instead of ~8000)
         // to keep source-space I/O feasible within CI time limits.
-        MNEInverseOperator smallInv = makeSmallInverseOp(m_info, m_fwd, m_noiseCov, 15);
+        InvInverseOperator smallInv = makeSmallInverseOp(m_info, m_fwd, m_noiseCov, 15);
         QVERIFY2(smallInv.nchan > 0, "Failed to build small inverse operator");
         qDebug() << "Small inverse for roundtrip: nsource=" << smallInv.nsource;
 
@@ -322,10 +322,10 @@ private slots:
                  << "(" << (fi.size() / 1024.0 / 1024.0) << "MB)";
 
         // Read it back
-        MNEInverseOperator invRead;
+        InvInverseOperator invRead;
         {
             QFile inFile(invPath);
-            bool ok = MNEInverseOperator::read_inverse_operator(inFile, invRead);
+            bool ok = InvInverseOperator::read_inverse_operator(inFile, invRead);
             QVERIFY2(ok, "Failed to read inverse operator back");
         }
 
@@ -369,12 +369,12 @@ private slots:
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
         if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
 
-        MNEInverseOperator invOp = m_invOp;
+        InvInverseOperator invOp = m_invOp;
 
         float snr = 3.0f;
         float lambda2 = 1.0f / (snr * snr);
 
-        MNEInverseOperator prepared = invOp.prepare_inverse_operator(
+        InvInverseOperator prepared = invOp.prepare_inverse_operator(
             1,       // nave
             lambda2,
             true,    // dSPM
@@ -393,25 +393,25 @@ private slots:
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
         if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
 
-        MNEInverseOperator invOp = m_invOp;
+        InvInverseOperator invOp = m_invOp;
 
         float lambda2 = 1.0f / 9.0f;
 
-        MNEInverseOperator prepared = invOp.prepare_inverse_operator(
+        InvInverseOperator prepared = invOp.prepare_inverse_operator(
             1, lambda2, false, true);  // sLORETA
 
         QVERIFY(prepared.nchan > 0);
     }
 
     //=========================================================================
-    // MinimumNorm dSPM from evoked
+    // InvMinimumNorm dSPM from evoked
     //=========================================================================
     void minimumNorm_dSPM_fromEvoked()
     {
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
         if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
 
-        MNEInverseOperator invOp = m_invOp;
+        InvInverseOperator invOp = m_invOp;
 
         // Read evoked data
         QString evkPath = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
@@ -430,10 +430,10 @@ private slots:
         float tstep = 1.0f / pickedEvoked.info.sfreq;
         float lambda2 = 1.0f / 9.0f;
 
-        MinimumNorm mn(invOp, lambda2, QString("dSPM"));
+        InvMinimumNorm mn(invOp, lambda2, QString("dSPM"));
         mn.doInverseSetup(evoked.nave, false);
 
-        MNESourceEstimate stc = mn.calculateInverse(
+        InvSourceEstimate stc = mn.calculateInverse(
             pickedEvoked.data, tmin, tstep, false);
 
         QVERIFY(!stc.isEmpty());
@@ -443,14 +443,14 @@ private slots:
     }
 
     //=========================================================================
-    // MinimumNorm MNE from evoked
+    // InvMinimumNorm MNE from evoked
     //=========================================================================
     void minimumNorm_MNE_fromEvoked()
     {
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
         if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
 
-        MNEInverseOperator invOp = m_invOp;
+        InvInverseOperator invOp = m_invOp;
 
         QString evkPath = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
         QFile evkFile(evkPath);
@@ -464,10 +464,10 @@ private slots:
         float tstep = 1.0f / pickedEvoked.info.sfreq;
         float lambda2 = 1.0f / 9.0f;
 
-        MinimumNorm mn(invOp, lambda2, QString("MNE"));
+        InvMinimumNorm mn(invOp, lambda2, QString("MNE"));
         mn.doInverseSetup(evoked.nave, false);
 
-        MNESourceEstimate stc = mn.calculateInverse(
+        InvSourceEstimate stc = mn.calculateInverse(
             pickedEvoked.data, tmin, tstep, false);
 
         QVERIFY(!stc.isEmpty());
@@ -476,14 +476,14 @@ private slots:
     }
 
     //=========================================================================
-    // MinimumNorm sLORETA from evoked
+    // InvMinimumNorm sLORETA from evoked
     //=========================================================================
     void minimumNorm_sLORETA_fromEvoked()
     {
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
         if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
 
-        MNEInverseOperator invOp = m_invOp;
+        InvInverseOperator invOp = m_invOp;
 
         QString evkPath = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
         QFile evkFile(evkPath);
@@ -497,10 +497,10 @@ private slots:
         float tstep = 1.0f / pickedEvoked.info.sfreq;
         float lambda2 = 1.0f / 9.0f;
 
-        MinimumNorm mn(invOp, lambda2, QString("sLORETA"));
+        InvMinimumNorm mn(invOp, lambda2, QString("sLORETA"));
         mn.doInverseSetup(evoked.nave, false);
 
-        MNESourceEstimate stc = mn.calculateInverse(
+        InvSourceEstimate stc = mn.calculateInverse(
             pickedEvoked.data, tmin, tstep, false);
 
         QVERIFY(!stc.isEmpty());
@@ -509,17 +509,17 @@ private slots:
     }
 
     //=========================================================================
-    // MinimumNorm: method switching
+    // InvMinimumNorm: method switching
     //=========================================================================
     void minimumNorm_methodSwitching()
     {
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
         if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
 
-        MNEInverseOperator invOp = m_invOp;
+        InvInverseOperator invOp = m_invOp;
 
         float lambda2 = 1.0f / 9.0f;
-        MinimumNorm mn(invOp, lambda2, QString("dSPM"));
+        InvMinimumNorm mn(invOp, lambda2, QString("dSPM"));
 
         // Switch methods
         mn.setMethod("MNE");
@@ -542,7 +542,7 @@ private slots:
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
         if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
 
-        MNEInverseOperator invOp = m_invOp;
+        InvInverseOperator invOp = m_invOp;
 
         // Create a small STC
         QString evkPath = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
@@ -557,9 +557,9 @@ private slots:
         float tstep = 1.0f / pickedEvoked.info.sfreq;
         float lambda2 = 1.0f / 9.0f;
 
-        MinimumNorm mn(invOp, lambda2, QString("dSPM"));
+        InvMinimumNorm mn(invOp, lambda2, QString("dSPM"));
         mn.doInverseSetup(evoked.nave, false);
-        MNESourceEstimate stc = mn.calculateInverse(
+        InvSourceEstimate stc = mn.calculateInverse(
             pickedEvoked.data, tmin, tstep, false);
 
         if (stc.isEmpty()) QSKIP("Failed to compute STC");
@@ -574,8 +574,8 @@ private slots:
 
         // Read back
         QFile stcInFile(basePath);
-        MNESourceEstimate stc2;
-        MNESourceEstimate::read(stcInFile, stc2);
+        InvSourceEstimate stc2;
+        InvSourceEstimate::read(stcInFile, stc2);
 
         if (!stc2.isEmpty()) {
             QCOMPARE(stc2.data.rows(), stc.data.rows());
@@ -584,14 +584,14 @@ private slots:
     }
 
     //=========================================================================
-    // RapMusic with forward solution
+    // InvRapMusic with forward solution
     //=========================================================================
     void rapMusic_initWithFwd()
     {
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
 
-        // RapMusic needs a forward solution
-        RapMusic rap;
+        // InvRapMusic needs a forward solution
+        InvRapMusic rap;
         bool ok = rap.init(m_fwd, false, 2, 0.5);
 
         // Even if init fails due to orientation, we exercised the code path
@@ -600,15 +600,15 @@ private slots:
     }
 
     //=========================================================================
-    // ECDSet: save and load roundtrip
+    // InvEcdSet: save and load roundtrip
     //=========================================================================
     void ecdSet_saveLoadRoundtrip()
     {
-        ECDSet set;
+        InvEcdSet set;
 
         // Build a set of test dipoles
         for (int i = 0; i < 5; ++i) {
-            ECD ecd;
+            InvEcd ecd;
             ecd.rd = Vector3f(0.01f * i, 0.02f, 0.03f);
             ecd.Q = Vector3f(1e-9f, 0.0f, 0.0f);
             ecd.good = (i % 2 == 0) ? 0.9 : 0.5;
@@ -637,11 +637,11 @@ private slots:
     }
 
     //=========================================================================
-    // DipoleFitSettings: exercise settings construction
+    // InvDipoleFitSettings: exercise settings construction
     //=========================================================================
     void dipoleFitSettings_construct()
     {
-        DipoleFitSettings settings;
+        InvDipoleFitSettings settings;
         settings.include_meg = true;
         settings.include_eeg = false;
         settings.tmin = 0.032f;
@@ -657,11 +657,11 @@ private slots:
     }
 
     //=========================================================================
-    // HpiModelParameters: construction and access
+    // InvHpiModelParameters: construction and access
     //=========================================================================
     void hpiModelParams_construct()
     {
-        HpiModelParameters params;
+        InvHpiModelParameters params;
         // Default construction should be valid
         QVERIFY(true);
 
@@ -669,16 +669,16 @@ private slots:
         QVector<int> hpiCoils;
         hpiCoils << 293 << 307 << 314 << 321;
 
-        HpiModelParameters params2(hpiCoils, 600, 200, 4);
+        InvHpiModelParameters params2(hpiCoils, 600, 200, 4);
         QVERIFY(true);
     }
 
     //=========================================================================
-    // SensorSet: construction
+    // InvSensorSet: construction
     //=========================================================================
     void sensorSet_construct()
     {
-        SensorSet sensors;
+        InvSensorSet sensors;
         QVERIFY(sensors.ncoils() == 0 || true);  // Default should be empty or zero
     }
 
@@ -689,7 +689,7 @@ private slots:
     {
         if (!m_bDataLoaded) QSKIP("Required data not loaded");
 
-        MNEInverseOperator invOp = MNEInverseOperator::make_inverse_operator(
+        InvInverseOperator invOp = InvInverseOperator::make_inverse_operator(
             m_info, m_fwd, m_noiseCov,
             0.0f,   // loose=0 (fixed)
             0.8f,   // depth
@@ -702,7 +702,7 @@ private slots:
             QVERIFY(invOp.nsource > 0);
 
             float lambda2 = 1.0f / 9.0f;
-            MNEInverseOperator prepared = invOp.prepare_inverse_operator(
+            InvInverseOperator prepared = invOp.prepare_inverse_operator(
                 1, lambda2, true, false);
             QVERIFY(prepared.nchan > 0);
         }

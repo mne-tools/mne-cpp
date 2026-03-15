@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     ecd.cpp
+ * @file     inv_ecd.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the Electric Current Dipole (ECD) Class.
+ * @brief    Definition of the Electric Current Dipole (InvEcd) Class.
  *
  */
 
@@ -51,7 +51,7 @@ using namespace INVLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ECD::ECD()
+InvEcd::InvEcd()
 : valid(false)
 , time(-1)
 , rd(Vector3f::Zero(3))
@@ -65,7 +65,7 @@ ECD::ECD()
 
 //=============================================================================================================
 
-ECD::ECD(const ECD& p_ECD)
+InvEcd::InvEcd(const InvEcd& p_ECD)
 : valid(p_ECD.valid)
 , time(p_ECD.time)
 , rd(p_ECD.rd)
@@ -79,25 +79,25 @@ ECD::ECD(const ECD& p_ECD)
 
 //=============================================================================================================
 
-ECD::~ECD()
+InvEcd::~InvEcd()
 {
 }
 
 //=============================================================================================================
 
-void ECD::print(FILE *f) const
+void InvEcd::print() const
 {
-    if (!f || !this->valid)
+    if (!this->valid)
         return;
 
-    fprintf(f,"%6.1f %7.2f %7.2f %7.2f %6.2f %6.2f %6.2f %6.2f %6.2f %6.2f %d\n",
-            1000*this->time,                              /* Time */
-            1000*this->rd[0],                             /* Dipole location */
-            1000*this->rd[1],
-            1000*this->rd[2],
-            1e9*this->Q.norm(),                           /* Dipole moment */
-            1e9*this->Q[0],1e9*this->Q[1],1e9*this->Q[2],
-            this->khi2/this->nfree,                       /* This is the reduced khi^2 value */
-            100*this->good,                               /* Goodness of fit */
-            this->neval);                                 /* Number of function evaluations required */
+    qInfo("%6.1f %7.2f %7.2f %7.2f %6.2f %6.2f %6.2f %6.2f %6.2f %6.2f %d",
+          1000*this->time,                              /* Time */
+          1000*this->rd[0],                             /* Dipole location */
+          1000*this->rd[1],
+          1000*this->rd[2],
+          1e9*this->Q.norm(),                           /* Dipole moment */
+          1e9*this->Q[0],1e9*this->Q[1],1e9*this->Q[2],
+          this->khi2/this->nfree,                       /* This is the reduced khi^2 value */
+          100*this->good,                               /* Goodness of fit */
+          this->neval);                                 /* Number of function evaluations required */
 }

@@ -31,12 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     MNESourceEstimate class declaration.
+ * @brief     InvSourceEstimate class declaration.
  *
  */
 
-#ifndef MNESOURCEESTIMATE_H
-#define MNESOURCEESTIMATE_H
+#ifndef INV_SOURCE_ESTIMATE_H
+#define INV_SOURCE_ESTIMATE_H
 
 //=============================================================================================================
 // INCLUDES
@@ -81,17 +81,17 @@ namespace INVLIB
  *
  * @brief Source estimation
  */
-class INVSHARED_EXPORT MNESourceEstimate
+class INVSHARED_EXPORT InvSourceEstimate
 {
 public:
-    typedef QSharedPointer<MNESourceEstimate> SPtr;             /**< Shared pointer type for MNESourceEstimate. */
-    typedef QSharedPointer<const MNESourceEstimate> ConstSPtr;  /**< Const shared pointer type for MNESourceEstimate. */
+    typedef QSharedPointer<InvSourceEstimate> SPtr;             /**< Shared pointer type for InvSourceEstimate. */
+    typedef QSharedPointer<const InvSourceEstimate> ConstSPtr;  /**< Const shared pointer type for InvSourceEstimate. */
 
     //=========================================================================================================
     /**
      * Default constructor
      */
-    MNESourceEstimate();
+    InvSourceEstimate();
 
     //=========================================================================================================
     /**
@@ -102,7 +102,7 @@ public:
      * @param[in] p_tmin.
      * @param[in] p_tstep.
      */
-    MNESourceEstimate(const Eigen::MatrixXd &p_sol, const Eigen::VectorXi &p_vertices, float p_tmin, float p_tstep);
+    InvSourceEstimate(const Eigen::MatrixXd &p_sol, const Eigen::VectorXi &p_vertices, float p_tmin, float p_tstep);
 
     //=========================================================================================================
     /**
@@ -110,7 +110,7 @@ public:
      *
      * @param[in] p_SourceEstimate    Source estimate data which should be copied.
      */
-    MNESourceEstimate(const MNESourceEstimate& p_SourceEstimate);
+    InvSourceEstimate(const InvSourceEstimate& p_SourceEstimate);
 
     //=========================================================================================================
     /**
@@ -119,7 +119,7 @@ public:
      * @param[in] p_IODevice     IO device to read from the source estimation.
      *
      */
-    MNESourceEstimate(QIODevice &p_IODevice);
+    InvSourceEstimate(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
@@ -134,7 +134,7 @@ public:
      * @param[in] start  The start index to cut the estimate from.
      * @param[in] n      Number of samples to cut from start index.
      */
-    MNESourceEstimate reduce(qint32 start, qint32 n);
+    InvSourceEstimate reduce(qint32 start, qint32 n);
 
     //=========================================================================================================
     /**
@@ -147,7 +147,7 @@ public:
      *
      * @return true if successful, false otherwise.
      */
-    static bool read(QIODevice &p_IODevice, MNESourceEstimate& p_stc);
+    static bool read(QIODevice &p_IODevice, InvSourceEstimate& p_stc);
 
     //=========================================================================================================
     /**
@@ -175,7 +175,7 @@ public:
      *
      * @return the copied source estimate.
      */
-    MNESourceEstimate& operator= (const MNESourceEstimate &rhs);
+    InvSourceEstimate& operator= (const InvSourceEstimate &rhs);
 
     //=========================================================================================================
     /**
@@ -215,10 +215,10 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool MNESourceEstimate::isEmpty() const
+inline bool InvSourceEstimate::isEmpty() const
 {
     return tstep == -1;
 }
 } //NAMESPACE
 
-#endif // MNESOURCEESTIMATE_H
+#endif // INV_SOURCE_ESTIMATE_H

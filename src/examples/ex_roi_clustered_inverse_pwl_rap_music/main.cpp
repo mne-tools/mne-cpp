@@ -292,9 +292,9 @@ int main(int argc, char *argv[])
     //
     // Compute inverse solution
     //
-    PwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
+    InvPwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
 
-    MNESourceEstimate sourceEstimate;
+    InvSourceEstimate sourceEstimate;
 
     float tstep = 1.0f/raw.info.sfreq;
 
@@ -351,7 +351,7 @@ int main(int argc, char *argv[])
             curSample -= t_iSamplesDiscard; //shift on start t_iSamplesDiscard backwards
 
         //Calculate
-        MNESourceEstimate stcData = t_pwlRapMusic.calculateInverse(measData, 0.0f, tstep);
+        InvSourceEstimate stcData = t_pwlRapMusic.calculateInverse(measData, 0.0f, tstep);
 
         //Assign Result
         if(last)
@@ -381,7 +381,7 @@ int main(int argc, char *argv[])
 
     // Write source estimate to temp files for visualization
     int nVertLh = t_clusteredFwd.src[0].nuse;
-    MNESourceEstimate stcLh, stcRh;
+    InvSourceEstimate stcLh, stcRh;
     stcLh.data = sourceEstimate.data.topRows(nVertLh);
     stcLh.vertices = sourceEstimate.vertices.head(nVertLh);
     stcLh.tmin = sourceEstimate.tmin;

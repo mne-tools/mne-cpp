@@ -54,8 +54,8 @@ using namespace FWDLIB;
 //=============================================================================================================
 
 #define MALLOC(x,t) (t *)malloc((x)*sizeof(t))
-#define REALLOC(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
-#define FREE(x) if ((char *)(x) != NULL) free((char *)(x))
+#define REALLOC(x,y,t) (t *)((x == nullptr) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
+#define FREE(x) if ((char *)(x) != nullptr) free((char *)(x))
 
 #define ALLOC_CMATRIX(x,y) mne_cmatrix((x),(y))
 
@@ -111,16 +111,16 @@ void mne_free_cmatrix (float **m)
 //    char *res;
 //    char *mne_root;
 
-//    if (filename == NULL) {
+//    if (filename == nullptr) {
 //        qCritical("No file name specified to mne_compose_mne_name");
-//        return NULL;
+//        return nullptr;
 //    }
 //    mne_root = getenv(MNE_ENV_ROOT);
-//    if (mne_root == NULL || strlen(mne_root) == 0) {
+//    if (mne_root == nullptr || strlen(mne_root) == 0) {
 //        qCritical("Environment variable MNE_ROOT not set");
-//        return NULL;
+//        return nullptr;
 //    }
-//    if (path == NULL || strlen(path) == 0) {
+//    if (path == nullptr || strlen(path) == 0) {
 //        res = MALLOC(strlen(mne_root)+strlen(filename)+2,char);
 //        strcpy(res,mne_root);
 //        strcat(res,"/");
@@ -147,7 +147,7 @@ void mne_free_name_list(char **list, int nlist)
  */
 {
     int k;
-    if (list == NULL || nlist == 0)
+    if (list == nullptr || nlist == 0)
         return;
     for (k = 0; k < nlist; k++) {
 #ifdef FOO
@@ -545,22 +545,22 @@ int mne_get_values_from_data_ch (float time,      /* Interesting time point */
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DipoleFit::DipoleFit(DipoleFitSettings* p_settings)
+InvDipoleFit::InvDipoleFit(InvDipoleFitSettings* p_settings)
 : settings(p_settings)
 {
 }
 
 //=============================================================================================================
 //todo split in initFit where the settings are handed over and the actual fit
-ECDSet DipoleFit::calculateFit() const
+InvEcdSet InvDipoleFit::calculateFit() const
 {
-    std::unique_ptr<GuessData> guess;
-    ECDSet              set;
+    std::unique_ptr<InvGuessData> guess;
+    InvEcdSet              set;
     std::unique_ptr<FwdEegSphereModel> eeg_model;
-    DipoleFitData*      fit_data = NULL;
-    MNEMeasData*        data     = NULL;
-    MNERawData*         raw      = NULL;
-    mneChSelection      sel      = NULL;
+    InvDipoleFitData*      fit_data = nullptr;
+    InvMeasData*        data     = nullptr;
+    MNERawData*         raw      = nullptr;
+    mneChSelection      sel      = nullptr;
 
     printf("---- Setting up...\n\n");
     if (settings->include_eeg) {
@@ -569,9 +569,9 @@ ECDSet DipoleFit::calculateFit() const
             goto out;
     }
 
-    if ((fit_data = DipoleFitData::setup_dipole_fit_data(   settings->mriname,
+    if ((fit_data = InvDipoleFitData::setup_dipole_fit_data(   settings->mriname,
                                                             settings->measname,
-                                                            settings->bemname.isEmpty() ? NULL : settings->bemname.toUtf8().data(),
+                                                            settings->bemname.isEmpty() ? nullptr : settings->bemname.toUtf8().data(),
                                                             &settings->r0,
                                                             eeg_model.get(),
                                                             settings->accurate,
@@ -586,7 +586,7 @@ ECDSet DipoleFit::calculateFit() const
                                                             settings->diagnoise,
                                                             settings->projnames,
                                                             settings->include_meg,
-                                                            settings->include_eeg)) == NULL)
+                                                            settings->include_eeg)) == nullptr)
         goto out;
 
     fit_data->fit_mag_dipoles = settings->fit_mag_dipoles;
@@ -595,7 +595,7 @@ ECDSet DipoleFit::calculateFit() const
         float t1,t2;
 
         printf("\n---- Opening a raw data file...\n\n");
-        if ((raw = MNERawData::open_file(settings->measname.isEmpty() ? NULL : settings->measname.toUtf8().data(),TRUE,FALSE,settings->filter)) == NULL)
+        if ((raw = MNERawData::open_file(settings->measname.isEmpty() ? nullptr : settings->measname.toUtf8().data(),TRUE,FALSE,settings->filter)) == nullptr)
             goto out;
         /*
         * A channel selection is needed to access the data
@@ -625,12 +625,12 @@ ECDSet DipoleFit::calculateFit() const
     }
     else {
         printf("\n---- Reading data...\n\n");
-        if ((data = MNEMeasData::mne_read_meas_data(settings->measname,
+        if ((data = InvMeasData::mne_read_meas_data(settings->measname,
                                                     settings->setno,
-                                                    NULL,
-                                                    NULL,
+                                                    nullptr,
+                                                    nullptr,
                                                     fit_data->ch_names,
-                                                    fit_data->nmeg+fit_data->neeg)) == NULL)
+                                                    fit_data->nmeg+fit_data->neeg)) == nullptr)
             goto out;
         if (settings->do_baseline)
             data->adjust_baselines(settings->bmin,settings->bmax);
@@ -647,7 +647,7 @@ ECDSet DipoleFit::calculateFit() const
                settings->setno,settings->measname.toUtf8().data(),fit_data->nmeg,fit_data->neeg);
         if (!settings->noisename.isEmpty()) {
             printf("\nScaling the noise covariance...\n");
-            if (DipoleFitData::scale_noise_cov(fit_data,data->current->nave) == FAIL)
+            if (InvDipoleFitData::scale_noise_cov(fit_data,data->current->nave) == FAIL)
                 goto out;
         }
     }
@@ -656,7 +656,7 @@ ECDSet DipoleFit::calculateFit() const
      * Proceed to computing the fits
      */
     printf("\n---- Computing the forward solution for the guesses...\n\n");
-    guess.reset(new GuessData( settings->guessname,
+    guess.reset(new InvGuessData( settings->guessname,
                                settings->guess_surfname,
                                settings->guess_mindist, settings->guess_exclude, settings->guess_grid, fit_data));
     if (!guess)
@@ -682,12 +682,12 @@ out : {
 
 //=============================================================================================================
 
-int DipoleFit::fit_dipoles( const QString& dataname, MNEMeasData* data, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set)
+int InvDipoleFit::fit_dipoles( const QString& dataname, InvMeasData* data, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, InvEcdSet& p_set)
 {
     float *one = MALLOC(data->nchan,float);
     float time;
-    ECDSet set;
-    ECD   dip;
+    InvEcdSet set;
+    InvEcd   dip;
     int   s;
     int   report_interval = 10;
 
@@ -704,12 +704,12 @@ int DipoleFit::fit_dipoles( const QString& dataname, MNEMeasData* data, DipoleFi
             continue;
         }
 
-        if (!DipoleFitData::fit_one(fit,guess,time,one,verbose,dip))
+        if (!InvDipoleFitData::fit_one(fit,guess,time,one,verbose,dip))
             printf("t = %7.1f ms : %s\n",1000*time,"error (tbd: catch)");
         else {
             set.addEcd(dip);
             if (verbose)
-                dip.print(stdout);
+                dip.print();
             else {
                 if (set.size() % report_interval == 0)
                     printf("%d..",set.size());
@@ -725,7 +725,7 @@ int DipoleFit::fit_dipoles( const QString& dataname, MNEMeasData* data, DipoleFi
 
 //=============================================================================================================
 
-int DipoleFit::fit_dipoles_raw(const QString& dataname, MNERawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set)
+int InvDipoleFit::fit_dipoles_raw(const QString& dataname, MNERawData* raw, mneChSelection sel, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, InvEcdSet& p_set)
 {
     float *one    = MALLOC(sel->nchan,float);
     float sfreq   = raw->info->sfreq;
@@ -738,8 +738,8 @@ int DipoleFit::fit_dipoles_raw(const QString& dataname, MNERawData* raw, mneChSe
     int   s,picks;
     float time,stime;
     float **data  = ALLOC_CMATRIX(sel->nchan,length);
-    ECD    dip;
-    ECDSet set;
+    InvEcd    dip;
+    InvEcdSet set;
     int    report_interval = 10;
 
     set.dataname = dataname;
@@ -770,12 +770,12 @@ int DipoleFit::fit_dipoles_raw(const QString& dataname, MNERawData* raw, mneChSe
         /*
      * Fit
      */
-        if (!DipoleFitData::fit_one(fit,guess,time,one,verbose,dip))
+        if (!InvDipoleFitData::fit_one(fit,guess,time,one,verbose,dip))
             qWarning() << "Error";
         else {
             set.addEcd(dip);
             if (verbose)
-                dip.print(stdout);
+                dip.print();
             else {
                 if (set.size() % report_interval == 0)
                     printf("%d..",set.size());
@@ -798,8 +798,8 @@ bad : {
 
 //=============================================================================================================
 
-int DipoleFit::fit_dipoles_raw(const QString& dataname, MNERawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose)
+int InvDipoleFit::fit_dipoles_raw(const QString& dataname, MNERawData* raw, mneChSelection sel, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose)
 {
-    ECDSet set;
+    InvEcdSet set;
     return fit_dipoles_raw(dataname, raw, sel, fit, guess, tmin, tmax, tstep, integ, verbose, set);
 }
