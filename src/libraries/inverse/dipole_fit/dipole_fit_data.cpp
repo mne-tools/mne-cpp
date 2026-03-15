@@ -4129,7 +4129,7 @@ void print_fields(float       *rd,
 {
     float *one = MALLOC_3(data->nchan,float);
     int   k;
-    float **fwd = NULL;
+    int   nch = fit->nmeg + fit->neeg;
 
     if (mne_get_values_from_data_3(time,integ,data->current->data,data->current->np,data->nchan,data->current->tmin,
                                    1.0/data->current->tstep,FALSE,one) == FAIL) {
@@ -4143,20 +4143,20 @@ void print_fields(float       *rd,
         }
     printf("\n");
 
-    fwd = ALLOC_CMATRIX_3(3,fit->nmeg+fit->neeg);
-    if (DipoleFitData::compute_dipole_field(fit,rd,FALSE,fwd) == FAIL)
+    Eigen::MatrixXf fwd = Eigen::MatrixXf::Zero(nch, 3);
+    Eigen::Map<const Eigen::Vector3f> rd_vec(rd);
+    if (DipoleFitData::compute_dipole_field(*fit,rd_vec,FALSE,fwd) == FAIL)
         goto out;
 
     for (k = 0; k < data->nchan; k++)
         if (data->chs[k].chpos.coil_type == FIFFV_COIL_CTF_REF_GRAD ||
                 data->chs[k].chpos.coil_type == FIFFV_COIL_CTF_OFFDIAG_REF_GRAD) {
-            printf("%g ",1e15*(Q[X_3]*fwd[X_3][k]+Q[Y_3]*fwd[Y_3][k]+Q[Z_3]*fwd[Z_3][k]));
+            printf("%g ",1e15*(Q[X_3]*fwd(k,X_3)+Q[Y_3]*fwd(k,Y_3)+Q[Z_3]*fwd(k,Z_3)));
         }
     printf("\n");
 
 out : {
         FREE_3(one);
-        FREE_CMATRIX_3(fwd);
     }
     return;
 }
@@ -4172,7 +4172,6 @@ DipoleForward* dipole_forward(DipoleFitData* d,
  */
 {
     DipoleForward* res;
-    float         **this_fwd;
     float         S[3];
     int           k,p;
     /*
@@ -4196,12 +4195,15 @@ DipoleForward* dipole_forward(DipoleFitData* d,
 
     for (k = 0; k < ndip; k++) {
         VEC_COPY_3(res->rd[k],rd[k]);
-        this_fwd = res->fwd + 3*k;
         /*
      * Calculate the field of three orthogonal dipoles
      */
-        if ((DipoleFitData::compute_dipole_field(d,rd[k],TRUE,this_fwd)) == FAIL)
+        Eigen::MatrixXf this_fwd(d->nmeg + d->neeg, 3);
+        Eigen::Map<const Eigen::Vector3f> rd_k(rd[k]);
+        if ((DipoleFitData::compute_dipole_field(*d,rd_k,TRUE,this_fwd)) == FAIL)
             goto bad;
+        for (int p = 0; p < 3; p++)
+            Eigen::Map<Eigen::VectorXf>(res->fwd[3*k+p], res->nch) = this_fwd.col(p);
         /*
      * Choice of column normalization
      * (componentwise normalization is not recommended)
@@ -4713,51 +4715,44 @@ bad : {
 
 //=============================================================================================================
 
-int DipoleFitData::compute_dipole_field(DipoleFitData* d, float *rd, int whiten, float **fwd)
+int DipoleFitData::compute_dipole_field(DipoleFitData& d, const Eigen::Vector3f& rd, int whiten, Eigen::Ref<Eigen::MatrixXf> fwd)
 /*
  * Compute the field and take whitening and projection into account
+ * fwd is nch x 3 (columns = orientation axes X, Y, Z)
  */
 {
-    float *eeg_fwd[3];
     static const Eigen::Vector3f Qx(1.0f, 0.0f, 0.0f);
     static const Eigen::Vector3f Qy(0.0f, 1.0f, 0.0f);
     static const Eigen::Vector3f Qz(0.0f, 0.0f, 1.0f);
-    Eigen::Map<const Eigen::Vector3f> rd_vec(rd);
+    int nch = d.nmeg + d.neeg;
     int k;
     /*
    * Compute the fields
    */
-    if (d->nmeg > 0) {
-        if (d->funcs->meg_vec_field) {
-            if (d->funcs->meg_vec_field(rd_vec,d->meg_coils.get(),fwd,d->funcs->meg_client) != OK)
-                goto bad;
-        }
-        else {
-            if (d->funcs->meg_field(rd_vec,Qx,d->meg_coils.get(),fwd[0],d->funcs->meg_client) != OK)
-                goto bad;
-            if (d->funcs->meg_field(rd_vec,Qy,d->meg_coils.get(),fwd[1],d->funcs->meg_client) != OK)
-                goto bad;
-            if (d->funcs->meg_field(rd_vec,Qz,d->meg_coils.get(),fwd[2],d->funcs->meg_client) != OK)
-                goto bad;
-        }
+    if (d.nmeg > 0) {
+        int nmeg = d.meg_coils->ncoil();
+        auto fwd0 = fwd.col(0).head(nmeg);
+        auto fwd1 = fwd.col(1).head(nmeg);
+        auto fwd2 = fwd.col(2).head(nmeg);
+        if (d.funcs->meg_field(rd,Qx,*d.meg_coils,fwd0,d.funcs->meg_client) != OK)
+            goto bad;
+        if (d.funcs->meg_field(rd,Qy,*d.meg_coils,fwd1,d.funcs->meg_client) != OK)
+            goto bad;
+        if (d.funcs->meg_field(rd,Qz,*d.meg_coils,fwd2,d.funcs->meg_client) != OK)
+            goto bad;
     }
 
-    if (d->neeg > 0) {
-        if (d->funcs->eeg_vec_pot) {
-            eeg_fwd[0] = fwd[0]+d->nmeg;
-            eeg_fwd[1] = fwd[1]+d->nmeg;
-            eeg_fwd[2] = fwd[2]+d->nmeg;
-            if (d->funcs->eeg_vec_pot(rd_vec,d->eeg_els.get(),eeg_fwd,d->funcs->eeg_client) != OK)
-                goto bad;
-        }
-        else {
-            if (d->funcs->eeg_pot(rd_vec,Qx,d->eeg_els.get(),fwd[0]+d->nmeg,d->funcs->eeg_client) != OK)
-                goto bad;
-            if (d->funcs->eeg_pot(rd_vec,Qy,d->eeg_els.get(),fwd[1]+d->nmeg,d->funcs->eeg_client) != OK)
-                goto bad;
-            if (d->funcs->eeg_pot(rd_vec,Qz,d->eeg_els.get(),fwd[2]+d->nmeg,d->funcs->eeg_client) != OK)
-                goto bad;
-        }
+    if (d.neeg > 0) {
+        int neeg = d.eeg_els->ncoil();
+        auto fwd0 = fwd.col(0).segment(d.nmeg, neeg);
+        auto fwd1 = fwd.col(1).segment(d.nmeg, neeg);
+        auto fwd2 = fwd.col(2).segment(d.nmeg, neeg);
+        if (d.funcs->eeg_pot(rd,Qx,*d.eeg_els,fwd0,d.funcs->eeg_client) != OK)
+            goto bad;
+        if (d.funcs->eeg_pot(rd,Qy,*d.eeg_els,fwd1,d.funcs->eeg_client) != OK)
+            goto bad;
+        if (d.funcs->eeg_pot(rd,Qz,*d.eeg_els,fwd2,d.funcs->eeg_client) != OK)
+            goto bad;
     }
 
     /*
@@ -4766,33 +4761,34 @@ int DipoleFitData::compute_dipole_field(DipoleFitData* d, float *rd, int whiten,
 #ifdef DEBUG
     fprintf(stdout,"orig : ");
     for (k = 0; k < 3; k++)
-        fprintf(stdout,"%g ",sqrt(mne_dot_vectors_3(fwd[k],fwd[k],d->nmeg+d->neeg)));
+        fprintf(stdout,"%g ",sqrt(mne_dot_vectors_3(fwd.col(k).data(),fwd.col(k).data(),nch)));
     fprintf(stdout,"\n");
 #endif
 
     for (k = 0; k < 3; k++)
-        if (d->proj && d->proj->project_vector(fwd[k],d->nmeg+d->neeg,TRUE) == FAIL)
+        if (d.proj && d.proj->project_vector(fwd.col(k).data(),nch,TRUE) == FAIL)
             goto bad;
 
 #ifdef DEBUG
     fprintf(stdout,"proj : ");
     for (k = 0; k < 3; k++)
-        fprintf(stdout,"%g ",sqrt(mne_dot_vectors_3(fwd[k],fwd[k],d->nmeg+d->neeg)));
+        fprintf(stdout,"%g ",sqrt(mne_dot_vectors_3(fwd.col(k).data(),fwd.col(k).data(),nch)));
     fprintf(stdout,"\n");
 #endif
 
     /*
    * Whiten
    */
-    if (d->noise && whiten) {
-        if (mne_whiten_data(fwd,fwd,3,d->nmeg+d->neeg,d->noise.get()) == FAIL)
+    if (d.noise && whiten) {
+        float *fwd_ptrs[3] = { fwd.col(0).data(), fwd.col(1).data(), fwd.col(2).data() };
+        if (mne_whiten_data(fwd_ptrs,fwd_ptrs,3,nch,d.noise.get()) == FAIL)
             goto bad;
     }
 
 #ifdef DEBUG
     fprintf(stdout,"white : ");
     for (k = 0; k < 3; k++)
-        fprintf(stdout,"%g ",sqrt(mne_dot_vectors_3(fwd[k],fwd[k],d->nmeg+d->neeg)));
+        fprintf(stdout,"%g ",sqrt(mne_dot_vectors_3(fwd.col(k).data(),fwd.col(k).data(),nch)));
     fprintf(stdout,"\n");
 #endif
 

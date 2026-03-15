@@ -111,8 +111,8 @@ public:
     static void free_meg_multi_thread_duplicate(FwdThreadArg* one,bool bem_model);
 
 public:
-    float               **res;             /* Destination for the solution */
-    float               **res_grad;        /* Gradient result */
+    Eigen::MatrixXf     *res;              /* Destination for the solution (ncoil x nsources) */
+    Eigen::MatrixXf     *res_grad;         /* Gradient result (ncoil x 3*nsources) */
     int                 off;               /* Offset within the result to the first source space vertex solution */
     fwdFieldFunc        field_pot;         /* Computes the field or potential for one dipole orientation */
     fwdVecFieldFunc     vec_field_pot;     /* Computes the field or potential for all dipole orientations */

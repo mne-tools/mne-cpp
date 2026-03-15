@@ -175,8 +175,8 @@ public:
 
     static int fwd_eeg_multi_spherepot_coil1(const Eigen::Vector3f& rd,    /* Dipole position */
                       const Eigen::Vector3f& Q,                /* Dipole moment */
-                      FwdCoilSet* els,              /* Electrode positions */
-                      float      *Vval,             /* The potential values */
+                      FwdCoilSet& els,              /* Electrode positions */
+                      Eigen::Ref<Eigen::VectorXf> Vval,        /* The potential values */
                       void       *client);
 
     //=========================================================================================================
@@ -223,15 +223,15 @@ public:
      *
      * @return true when successful.
      */
-    static int fwd_eeg_spherepot_coil_vec(const Eigen::Vector3f& rd, FwdCoilSet* els, float **Vval_vec, void *client);
+    static int fwd_eeg_spherepot_coil_vec(const Eigen::Vector3f& rd, FwdCoilSet& els, Eigen::Ref<Eigen::MatrixXf> Vval_vec, void *client);
 
     static int fwd_eeg_spherepot_grad_coil( const Eigen::Vector3f& rd,      /* The dipole location */
                                             const Eigen::Vector3f& Q,      /* The dipole components (xyz) */
-                                            FwdCoilSet*  coils,    /* The coil definitions */
-                                            float        Vval[],   /* Results */
-                                            float        xgrad[],  /* The derivatives with respect to */
-                                            float        ygrad[],  /* the dipole position coordinates */
-                                            float        zgrad[],
+                                            FwdCoilSet&  coils,    /* The coil definitions */
+                                            Eigen::Ref<Eigen::VectorXf> Vval, /* Results */
+                                            Eigen::Ref<Eigen::VectorXf> xgrad,/* The derivatives with respect to */
+                                            Eigen::Ref<Eigen::VectorXf> ygrad,/* the dipole position coordinates */
+                                            Eigen::Ref<Eigen::VectorXf> zgrad,
                                             void         *client);
 
     //=========================================================================================================
@@ -269,7 +269,7 @@ public:
      *
      * @return true when successful.
      */
-    static int fwd_eeg_spherepot_coil(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet* els, float *Vval, void *client);
+    static int fwd_eeg_spherepot_coil(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet& els, Eigen::Ref<Eigen::VectorXf> Vval, void *client);
 
     //=========================================================================================================
     /**

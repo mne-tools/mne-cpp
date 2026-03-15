@@ -638,7 +638,7 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot(float *rd, float *Q, const Eigen:
 
 //=============================================================================================================
 // fwd_multi_spherepot.c
-int FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet *els, float *Vval, void *client)           /* Client data will be the sphere model definition */
+int FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet &els, Eigen::Ref<Eigen::VectorXf> Vval, void *client)           /* Client data will be the sphere model definition */
 /*
  * Calculate the EEG in the sphere model using the fwdCoilSet structure
  *
@@ -652,8 +652,9 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(const Eigen::Vector3f& rd, 
     int   k,c;
     FwdCoil* el;
 
-    for (k = 0; k < els->ncoil(); k++, el++) {
-        el = els->coils[k].get();
+    Vval.resize(els.ncoil());
+    for (k = 0; k < els.ncoil(); k++, el++) {
+        el = els.coils[k].get();
         if (el->coil_class == FWD_COILC_EEG) {
             if (el->np > nvval) {
                 vval_one = REALLOC_1(vval_one,el->np,float);
@@ -665,9 +666,8 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(const Eigen::Vector3f& rd, 
             }
             for (c = 0, val = 0.0; c < el->np; c++)
                 val += el->w[c]*vval_one[c];
-            *Vval = val;
+            Vval[k] = val;
         }
-        Vval++;
     }
     FREE(vval_one);
     return OK;
@@ -786,7 +786,7 @@ bool FwdEegSphereModel::fwd_eeg_spherepot_vec( float   *rd, const Eigen::Matrix<
 
 //=============================================================================================================
 // fwd_multi_spherepot.c
-int FwdEegSphereModel::fwd_eeg_spherepot_coil_vec(const Eigen::Vector3f& rd, FwdCoilSet* els, float **Vval_vec, void *client)
+int FwdEegSphereModel::fwd_eeg_spherepot_coil_vec(const Eigen::Vector3f& rd, FwdCoilSet& els, Eigen::Ref<Eigen::MatrixXf> Vval_vec, void *client)
 {
     float **vval_one = NULL;
     float val;
@@ -794,8 +794,8 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil_vec(const Eigen::Vector3f& rd, Fwd
     int   k,c,p;
     FwdCoil* el;
 
-    for (k = 0; k < els->ncoil(); k++, el++) {
-        el = els->coils[k].get();
+    for (k = 0; k < els.ncoil(); k++, el++) {
+        el = els.coils[k].get();
         if (el->coil_class == FWD_COILC_EEG) {
             if (el->np > nvval) {
                 FREE_CMATRIX_1(vval_one);
@@ -809,7 +809,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil_vec(const Eigen::Vector3f& rd, Fwd
             for (p = 0; p < 3; p++) {
                 for (c = 0, val = 0.0; c < el->np; c++)
                     val += el->w[c]*vval_one[p][c];
-                Vval_vec[p][k] = val;
+                Vval_vec(p,k) = val;
             }
         }
     }
@@ -819,7 +819,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil_vec(const Eigen::Vector3f& rd, Fwd
 
 //=============================================================================================================
 
-int FwdEegSphereModel::fwd_eeg_spherepot_grad_coil(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet *coils, float Vval[], float xgrad[], float ygrad[], float zgrad[], void *client)  /* Client data to be passed to some foward modelling routines */
+int FwdEegSphereModel::fwd_eeg_spherepot_grad_coil(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet &coils, Eigen::Ref<Eigen::VectorXf> Vval, Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad, void *client)  /* Client data to be passed to some foward modelling routines */
 /*
           * Quick and dirty solution: use differences
           *
@@ -831,29 +831,24 @@ int FwdEegSphereModel::fwd_eeg_spherepot_grad_coil(const Eigen::Vector3f& rd, co
     float my_rd[3];
     float step  = 0.0005;
     float step2 = 2*step;
-    float *grads[3];
     int   p,q;
 
-    grads[0] = xgrad;
-    grads[1] = ygrad;
-    grads[2] = zgrad;
+    Eigen::Ref<Eigen::VectorXf>* grads[3] = { &xgrad, &ygrad, &zgrad };
 
     for (p = 0; p < 3; p++) {
         VEC_COPY_1(my_rd,rd);
         my_rd[p] = my_rd[p] + step;
-        if (fwd_eeg_spherepot_coil(Eigen::Map<const Eigen::Vector3f>(my_rd),Q,coils,grads[p],client) == FAIL)
+        if (fwd_eeg_spherepot_coil(Eigen::Map<const Eigen::Vector3f>(my_rd),Q,coils,*grads[p],client) == FAIL)
             return FAIL;
         VEC_COPY_1(my_rd,rd);
         my_rd[p] = my_rd[p] - step;
         if (fwd_eeg_spherepot_coil(Eigen::Map<const Eigen::Vector3f>(my_rd),Q,coils,Vval,client) == FAIL)
             return FAIL;
-        for (q = 0; q < coils->ncoil(); q++)
-            grads[p][q] = (grads[p][q]-Vval[q])/step2;
+        for (q = 0; q < coils.ncoil(); q++)
+            (*grads[p])[q] = ((*grads[p])[q]-Vval[q])/step2;
     }
-    if (Vval) {
-        if (fwd_eeg_spherepot_coil(rd,Q,coils,Vval,client) == FAIL)
-            return FAIL;
-    }
+    if (fwd_eeg_spherepot_coil(rd,Q,coils,Vval,client) == FAIL)
+        return FAIL;
     return OK;
 }
 
@@ -975,7 +970,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot(   float   *rd,       /* Dipole positio
 
 //=============================================================================================================
 // fwd_multi_spherepot.c
-int FwdEegSphereModel::fwd_eeg_spherepot_coil(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet* els, float *Vval, void *client)
+int FwdEegSphereModel::fwd_eeg_spherepot_coil(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet& els, Eigen::Ref<Eigen::VectorXf> Vval, void *client)
 {
     VectorXf vval_one;
     float val;
@@ -983,8 +978,8 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil(const Eigen::Vector3f& rd, const E
     int   k,c;
     FwdCoil* el;
 
-    for (k = 0; k < els->ncoil(); k++, el++) {
-        el = els->coils[k].get();
+    for (k = 0; k < els.ncoil(); k++, el++) {
+        el = els.coils[k].get();
         if (el->coil_class == FWD_COILC_EEG) {
             if (el->np > nvval) {
                 vval_one.resize(el->np);
@@ -995,9 +990,8 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil(const Eigen::Vector3f& rd, const E
             }
             for (c = 0, val = 0.0; c < el->np; c++)
                 val += el->w[c]*vval_one[c];
-            *Vval = val;
+            Vval[k] = val;
         }
-        Vval++;
     }
     return OK;
 }

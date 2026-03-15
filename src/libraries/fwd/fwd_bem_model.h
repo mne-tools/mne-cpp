@@ -488,7 +488,7 @@ public:
      */
     void fwd_bem_pot_grad_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
                                FwdCoilSet* els, int all_surfs,
-                               Eigen::VectorXf& xgrad, Eigen::VectorXf& ygrad, Eigen::VectorXf& zgrad);
+                               Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad);
 
     //=========================================================================================================
     /**
@@ -502,7 +502,7 @@ public:
      */
     void fwd_bem_lin_pot_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
                               FwdCoilSet* els, int all_surfs,
-                              Eigen::VectorXf& pot);
+                              Eigen::Ref<Eigen::VectorXf> pot);
 
     //=========================================================================================================
     /**
@@ -518,7 +518,7 @@ public:
      */
     void fwd_bem_lin_pot_grad_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
                                    FwdCoilSet* els, int all_surfs,
-                                   Eigen::VectorXf& xgrad, Eigen::VectorXf& ygrad, Eigen::VectorXf& zgrad);
+                                   Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad);
 
     //=========================================================================================================
     /**
@@ -532,7 +532,7 @@ public:
      */
     void fwd_bem_pot_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
                           FwdCoilSet* els, int all_surfs,
-                          Eigen::VectorXf& pot);
+                          Eigen::Ref<Eigen::VectorXf> pot);
 
     //=========================================================================================================
     /**
@@ -548,7 +548,7 @@ public:
      * @return OK on success, FAIL on error.
      */
     static int fwd_bem_pot_els(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
-                               FwdCoilSet* els, float *pot,
+                               FwdCoilSet& els, Eigen::Ref<Eigen::VectorXf> pot,
                                void *client);
 
     //=========================================================================================================
@@ -568,8 +568,8 @@ public:
      * @return OK on success, FAIL on error.
      */
     static int fwd_bem_pot_grad_els(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
-                                    FwdCoilSet* els, float *pot,
-                                    float *xgrad, float *ygrad, float *zgrad,
+                                    FwdCoilSet& els, Eigen::Ref<Eigen::VectorXf> pot,
+                                    Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad,
                                     void *client);
 
     //============================= fwd_bem_field.c =============================
@@ -748,7 +748,7 @@ public:
      * @param[out] B      Output magnetic fields (one value per coil).
      */
     void fwd_bem_lin_field_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
-                                FwdCoilSet& coils, Eigen::VectorXf& B);
+                                FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> B);
 
     //=========================================================================================================
     /**
@@ -760,7 +760,7 @@ public:
      * @param[out] B      Output magnetic fields (one value per coil).
      */
     void fwd_bem_field_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
-                            FwdCoilSet& coils, Eigen::VectorXf& B);
+                            FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> B);
 
     //=========================================================================================================
     /**
@@ -775,7 +775,7 @@ public:
      */
     void fwd_bem_field_grad_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
                                  FwdCoilSet& coils,
-                                 Eigen::VectorXf& xgrad, Eigen::VectorXf& ygrad, Eigen::VectorXf& zgrad);
+                                 Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad);
 
     //=========================================================================================================
     /**
@@ -819,7 +819,7 @@ public:
      */
     void fwd_bem_lin_field_grad_calc(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
                                      FwdCoilSet& coils,
-                                     Eigen::VectorXf& xgrad, Eigen::VectorXf& ygrad, Eigen::VectorXf& zgrad);
+                                     Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad);
 
     //=========================================================================================================
     /**
@@ -836,7 +836,7 @@ public:
      * @return OK on success, FAIL on error.
      */
     static int fwd_bem_field(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
-                             FwdCoilSet* coils, float *B,
+                             FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> B,
                              void *client);
 
     //=========================================================================================================
@@ -856,8 +856,8 @@ public:
      * @return OK on success, FAIL on error.
      */
     static int fwd_bem_field_grad(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
-                                  FwdCoilSet* coils, float Bval[],
-                                  float xgrad[], float ygrad[], float zgrad[],
+                                  FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> Bval,
+                                  Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad,
                                   void *client);
 
     //============================= compute_forward.c =============================
@@ -939,7 +939,7 @@ public:
      * @return OK on success, FAIL on error.
      */
     static int fwd_sphere_field(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
-                                FwdCoilSet* coils, float Bval[],
+                                FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> Bval,
                                 void *client);
 
     //=========================================================================================================
@@ -956,7 +956,7 @@ public:
      * @return OK on success, FAIL on error.
      */
     static int fwd_sphere_field_vec(const Eigen::Vector3f& rd,
-                                    FwdCoilSet* coils, float **Bval,
+                                    FwdCoilSet& coils, Eigen::Ref<Eigen::MatrixXf> Bval,
                                     void *client);
 
     //=========================================================================================================
@@ -976,8 +976,8 @@ public:
      * @return OK on success, FAIL on error.
      */
     static int fwd_sphere_field_grad(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
-                                     FwdCoilSet* coils, float Bval[],
-                                     float xgrad[], float ygrad[], float zgrad[],
+                                     FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> Bval,
+                                     Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad,
                                      void *client);
 
     //============================= fwd_mag_dipole_field.c =============================
@@ -994,7 +994,7 @@ public:
      * @return OK on success, FAIL on error.
      */
     static int fwd_mag_dipole_field(const Eigen::Vector3f& rm, const Eigen::Vector3f& M,
-                                    FwdCoilSet* coils, float Bval[],
+                                    FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> Bval,
                                     void *client);
 
     //=========================================================================================================
@@ -1010,7 +1010,7 @@ public:
      * @return OK on success, FAIL on error.
      */
     static int fwd_mag_dipole_field_vec(const Eigen::Vector3f& rm,
-                                        FwdCoilSet* coils, float **Bval,
+                                        FwdCoilSet& coils, Eigen::Ref<Eigen::MatrixXf> Bval,
                                         void *client);
 
 public:
