@@ -56,6 +56,8 @@
 #include <QSharedPointer>
 #include <QDebug>
 
+#include <memory>
+
 //=============================================================================================================
 // DEFINE NAMESPACE INVLIB
 //=============================================================================================================
@@ -74,6 +76,7 @@ class INVSHARED_EXPORT InvDipoleForward
 public:
     typedef QSharedPointer<InvDipoleForward> SPtr;              /**< Shared pointer type for InvDipoleForward. */
     typedef QSharedPointer<const InvDipoleForward> ConstSPtr;   /**< Const shared pointer type for InvDipoleForward. */
+    typedef std::unique_ptr<InvDipoleForward> UPtr;             /**< Unique pointer type for InvDipoleForward. */
 
     //=========================================================================================================
     /**
