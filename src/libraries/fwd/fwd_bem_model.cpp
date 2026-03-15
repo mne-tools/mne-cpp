@@ -3075,7 +3075,7 @@ int FwdBemModel::fwd_sphere_field(const Eigen::Vector3f& rd, const Eigen::Vector
                                 ar0  = ar/a;
 
                                 ve = v.dot(this_dir); vr = v.dot(pos);
-                                re = pos.dot(this_dir); r0e = rd.dot(this_dir);
+                                re = pos.dot(this_dir); r0e = myrd.dot(this_dir);
 
                                 /* The main ingredients */
 
