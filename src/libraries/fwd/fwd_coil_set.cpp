@@ -289,11 +289,11 @@ void FwdCoilSet::fwd_free_coil_set_user_data()
 
 //=============================================================================================================
 
-FwdCoil *FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int acc, const FiffCoordTrans& t)
+std::unique_ptr<FwdCoil> FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int acc, const FiffCoordTrans& t)
 {
     int        k,p,c;
     FwdCoil*    def;
-    FwdCoil*    res = NULL;
+    std::unique_ptr<FwdCoil> res;
 
     if (ch.kind != FIFFV_MEG_CH && ch.kind != FIFFV_REF_MEG_CH) {
         qWarning() << ch.ch_name << "is not a MEG channel. Cannot create a coil definition.";
@@ -315,7 +315,7 @@ FwdCoil *FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int acc, const FiffCo
     /*
         * Create the result
         */
-    res = new FwdCoil(def->np);
+    res = std::make_unique<FwdCoil>(def->np);
 
     res->chname   = ch.ch_name;
     if (!def->desc.isEmpty())
@@ -353,64 +353,54 @@ FwdCoil *FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int acc, const FiffCo
     return res;
 
 bad : {
-        return NULL;
+        return nullptr;
     }
 }
 
 //=============================================================================================================
 
-FwdCoilSet *FwdCoilSet::create_meg_coils(const QList<FIFFLIB::FiffChInfo>& chs,
+std::unique_ptr<FwdCoilSet> FwdCoilSet::create_meg_coils(const QList<FIFFLIB::FiffChInfo>& chs,
                                          int nch,
                                          int acc,
                                          const FiffCoordTrans& t)
 {
-    FwdCoilSet* res = new FwdCoilSet();
-    FwdCoil*    next;
+    auto res = std::make_unique<FwdCoilSet>();
     int        k;
 
     for (k = 0; k < nch; k++) {
-        if ((next = this->create_meg_coil(chs.at(k),acc,t)) == Q_NULLPTR)
-            goto bad;
-        res->coils.push_back(std::unique_ptr<FwdCoil>(next));
+        auto next = this->create_meg_coil(chs.at(k),acc,t);
+        if (!next)
+            return nullptr;
+        res->coils.push_back(std::move(next));
     }
     if (!t.isEmpty())
         res->coord_frame = t.to;
     return res;
-
-bad : {
-        delete res;
-        return NULL;
-    }
 }
 
 //=============================================================================================================
 
-FwdCoilSet *FwdCoilSet::create_eeg_els(const QList<FIFFLIB::FiffChInfo>& chs,
+std::unique_ptr<FwdCoilSet> FwdCoilSet::create_eeg_els(const QList<FIFFLIB::FiffChInfo>& chs,
                                        int nch,
                                        const FiffCoordTrans& t)
 {
-    FwdCoilSet* res = new FwdCoilSet();
+    auto res = std::make_unique<FwdCoilSet>();
     FwdCoil*    next;
     int        k;
 
     for (k = 0; k < nch; k++) {
         if ((next = FwdCoil::create_eeg_el(chs.at(k),t)) == Q_NULLPTR)
-            goto bad;
+            return nullptr;
         res->coils.push_back(std::unique_ptr<FwdCoil>(next));
     }
     if (!t.isEmpty())
         res->coord_frame = t.to;
     return res;
-
-bad : {
-        delete res;
-        return NULL;
-    }
 }
 
 //=============================================================================================================
 
-FwdCoilSet *FwdCoilSet::read_coil_defs(const QString &name)
+std::unique_ptr<FwdCoilSet> FwdCoilSet::read_coil_defs(const QString &name)
 /*
           * Read a coil definition file
           */
@@ -420,7 +410,7 @@ FwdCoilSet *FwdCoilSet::read_coil_defs(const QString &name)
     int     type,coil_class,acc,np;
     int     p;
     float   size,base;
-    FwdCoilSet* res = NULL;
+    std::unique_ptr<FwdCoilSet> res;
     FwdCoil* def;
 
     if (in == NULL) {
@@ -428,7 +418,7 @@ FwdCoilSet *FwdCoilSet::read_coil_defs(const QString &name)
         goto bad;
     }
 
-    res = new FwdCoilSet();
+    res = std::make_unique<FwdCoilSet>();
     while (1) {
         /*
          * Read basic info
@@ -449,7 +439,7 @@ FwdCoilSet *FwdCoilSet::read_coil_defs(const QString &name)
         if (!desc)
             goto bad;
 
-        def = fwd_add_coil_to_set(res,type,coil_class,acc,np,size,base,desc);
+        def = fwd_add_coil_to_set(res.get(),type,coil_class,acc,np,size,base,desc);
         if (!def)
             goto bad;
         FREE_6(desc); desc = NULL;
@@ -492,25 +482,24 @@ FwdCoilSet *FwdCoilSet::read_coil_defs(const QString &name)
     return res;
 
 bad : {
-        delete res;
         FREE_6(desc);
-        return NULL;
+        return nullptr;
     }
 }
 
 //=============================================================================================================
 
-FwdCoilSet* FwdCoilSet::dup_coil_set(const FiffCoordTrans& t) const
+std::unique_ptr<FwdCoilSet> FwdCoilSet::dup_coil_set(const FiffCoordTrans& t) const
 {
-    FwdCoilSet* res;
+    std::unique_ptr<FwdCoilSet> res;
 
     if (!t.isEmpty()) {
         if (this->coord_frame != t.from) {
             qWarning("Coordinate frame of the transformation does not match the coil set in fwd_dup_coil_set");
-            return NULL;
+            return nullptr;
         }
     }
-    res = new FwdCoilSet();
+    res = std::make_unique<FwdCoilSet>();
     if (!t.isEmpty())
         res->coord_frame = t.to;
     else

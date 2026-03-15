@@ -262,8 +262,8 @@ void RtSensorInterpolationMatWorker::computeMapping()
         if (megVerts.rows() > 0 && norms.rows() == megVerts.rows()) {
             const QString coilPath = QCoreApplication::applicationDirPath()
                 + "/../resources/general/coilDefinitions/coil_def.dat";
-            std::unique_ptr<FWDLIB::FwdCoilSet> templates(
-                FWDLIB::FwdCoilSet::read_coil_defs(coilPath));
+            auto templates =
+                FWDLIB::FwdCoilSet::read_coil_defs(coilPath);
 
             if (templates) {
                 FiffCoordTrans devToTarget;
@@ -282,8 +282,8 @@ void RtSensorInterpolationMatWorker::computeMapping()
                     origin = applyTransform(origin, headMri);
                 }
 
-                std::unique_ptr<FWDLIB::FwdCoilSet> coils(templates->create_meg_coils(
-                    megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, devToTarget));
+                auto coils = templates->create_meg_coils(
+                    megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, devToTarget);
 
                 if (coils && coils->ncoil() > 0) {
                     auto mat = FWDLIB::FwdFieldMap::computeMegMapping(
@@ -305,9 +305,9 @@ void RtSensorInterpolationMatWorker::computeMapping()
             Eigen::Vector3f origin = defaultOrigin;
             if (!headMri.isEmpty()) origin = applyTransform(origin, headMri);
 
-            std::unique_ptr<FWDLIB::FwdCoilSet> eegCoils(
+            auto eegCoils =
                 FWDLIB::FwdCoilSet::create_eeg_els(
-                    eegChs, eegChs.size(), headMri));
+                    eegChs, eegChs.size(), headMri);
 
             if (eegCoils && eegCoils->ncoil() > 0) {
                 auto mat = FWDLIB::FwdFieldMap::computeEegMapping(

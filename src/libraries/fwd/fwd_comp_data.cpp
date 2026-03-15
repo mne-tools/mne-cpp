@@ -262,7 +262,7 @@ FwdCompData *FwdCompData::fwd_make_comp_data(MNECTFCompDataSet *set,
         comp->set = NULL;
 
     if (comp_coils) {
-        comp->comp_coils = comp_coils->dup_coil_set();
+        comp->comp_coils = comp_coils->dup_coil_set().release();
     }
     else {
         qWarning("No coils to duplicate");

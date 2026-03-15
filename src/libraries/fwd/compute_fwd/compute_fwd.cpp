@@ -331,7 +331,7 @@ void ComputeFwd::initFwd()
             m_qPath = "../resources/general/coilDefinitions/coil_def.dat";
         }
 
-        m_templates.reset(FwdCoilSet::read_coil_defs(m_qPath));
+        m_templates = FwdCoilSet::read_coil_defs(m_qPath);
         if (!m_templates) {
             return;
         }
@@ -357,49 +357,49 @@ void ComputeFwd::initFwd()
         if (meg_mri_t.isEmpty()) {
             return;
         }
-        m_megcoils.reset(m_templates->create_meg_coils(m_listMegChs,
+        m_megcoils = m_templates->create_meg_coils(m_listMegChs,
                                                       iNMeg,
                                                       m_pSettings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
-                                                      meg_mri_t));
+                                                      meg_mri_t);
         if (!m_megcoils) {
             return;
         }
         if (iNComp > 0) {
-            m_compcoils.reset(m_templates->create_meg_coils(m_listCompChs,
+            m_compcoils = m_templates->create_meg_coils(m_listCompChs,
                                                              iNComp,
                                                              FWD_COIL_ACCURACY_NORMAL,
-                                                             meg_mri_t));
+                                                             meg_mri_t);
             if (!m_compcoils) {
                 return;
             }
         }
-        m_eegels.reset(FwdCoilSet::create_eeg_els(m_listEegChs,
+        m_eegels = FwdCoilSet::create_eeg_els(m_listEegChs,
                                                    iNEeg,
-                                                   head_mri_t));
+                                                   head_mri_t);
         if (!m_eegels) {
             return;
         }
 
         printf("MRI coordinate coil definitions created.\n");
     } else {
-        m_megcoils.reset(m_templates->create_meg_coils(m_listMegChs,
+        m_megcoils = m_templates->create_meg_coils(m_listMegChs,
                                                         iNMeg,
                                                         m_pSettings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
-                                                        m_meg_head_t));
+                                                        m_meg_head_t);
         if (!m_megcoils) {
             return;
         }
 
         if (iNComp > 0) {
-            m_compcoils.reset(m_templates->create_meg_coils(m_listCompChs,
+            m_compcoils = m_templates->create_meg_coils(m_listCompChs,
                                                              iNComp,
-                                                             FWD_COIL_ACCURACY_NORMAL,m_meg_head_t));
+                                                             FWD_COIL_ACCURACY_NORMAL,m_meg_head_t);
             if (!m_compcoils) {
                 return;
             }
         }
-        m_eegels.reset(FwdCoilSet::create_eeg_els(m_listEegChs,
-                                                   iNEeg));
+        m_eegels = FwdCoilSet::create_eeg_els(m_listEegChs,
+                                                   iNEeg);
         if (!m_eegels) {
             return;
         }
@@ -657,35 +657,35 @@ bool ComputeFwd::updateHeadPos(const FiffCoordTrans& transDevHead, FwdForwardSol
         if (meg_mri_t.isEmpty()) {
             return false;
         }
-        m_megcoils.reset(m_templates->create_meg_coils(m_listMegChs,
+        m_megcoils = m_templates->create_meg_coils(m_listMegChs,
                                                         iNMeg,
                                                         m_pSettings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
-                                                        meg_mri_t));
+                                                        meg_mri_t);
         if (!m_megcoils) {
             return false;
         }
         if (iNComp > 0) {
-            m_compcoils.reset(m_templates->create_meg_coils(m_listCompChs,
+            m_compcoils = m_templates->create_meg_coils(m_listCompChs,
                                                              iNComp,
                                                              FWD_COIL_ACCURACY_NORMAL,
-                                                             meg_mri_t));
+                                                             meg_mri_t);
             if (!m_compcoils) {
                 return false;
             }
         }
     } else {
-        m_megcoils.reset(m_templates->create_meg_coils(m_listMegChs,
+        m_megcoils = m_templates->create_meg_coils(m_listMegChs,
                                                         iNMeg,
                                                         m_pSettings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
-                                                        transDevHead));
+                                                        transDevHead);
         if (!m_megcoils) {
             return false;
         }
 
         if (iNComp > 0) {
-            m_compcoils.reset(m_templates->create_meg_coils(m_listCompChs,
+            m_compcoils = m_templates->create_meg_coils(m_listCompChs,
                                                              iNComp,
-                                                             FWD_COIL_ACCURACY_NORMAL,transDevHead));
+                                                             FWD_COIL_ACCURACY_NORMAL,transDevHead);
             if (!m_compcoils) {
                 return false;
             }

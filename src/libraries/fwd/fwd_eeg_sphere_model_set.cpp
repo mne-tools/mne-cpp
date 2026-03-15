@@ -104,8 +104,6 @@ FwdEegSphereModelSet::FwdEegSphereModelSet()
 
 FwdEegSphereModelSet::~FwdEegSphereModelSet()
 {
-    for (int k = 0; k < this->nmodel(); k++)
-        delete this->models[k];
 }
 
 //=============================================================================================================
@@ -135,7 +133,7 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_add_to_eeg_sphere_model_set(FwdE
     if (!s)
         s = new FwdEegSphereModelSet;
 
-    s->models.append(m);
+    s->models.push_back(std::unique_ptr<FwdEegSphereModel>(m));
     return s;
 }
 
@@ -266,7 +264,7 @@ void FwdEegSphereModelSet::fwd_list_eeg_sphere_models(FILE *f)
         return;
     fprintf(f,"Available EEG sphere models:\n");
     for (k = 0; k < this->nmodel(); k++) {
-        this_model = this->models[k];
+        this_model = this->models[k].get();
         fprintf(f,"\t%s : %d",this_model->name.toUtf8().constData(),this_model->nlayer());
         for (p = 0; p < this_model->nlayer(); p++)
             fprintf(f," : %7.3f : %7.3f",this_model->layers[p].rel_rad,this_model->layers[p].sigma);

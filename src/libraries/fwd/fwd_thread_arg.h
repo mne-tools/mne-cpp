@@ -56,6 +56,9 @@
 
 #include <QSharedPointer>
 
+#include <functional>
+#include <memory>
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -102,13 +105,9 @@ public:
      */
     ~FwdThreadArg();
 
-    static FwdThreadArg* create_eeg_multi_thread_duplicate(FwdThreadArg* one, bool bem_model);
+    static std::unique_ptr<FwdThreadArg> create_eeg_multi_thread_duplicate(FwdThreadArg& one, bool bem_model);
 
-    static void free_eeg_multi_thread_duplicate(FwdThreadArg* one,bool bem_model);
-
-    static FwdThreadArg* create_meg_multi_thread_duplicate(FwdThreadArg* one, bool bem_model);
-
-    static void free_meg_multi_thread_duplicate(FwdThreadArg* one,bool bem_model);
+    static std::unique_ptr<FwdThreadArg> create_meg_multi_thread_duplicate(FwdThreadArg& one, bool bem_model);
 
 public:
     Eigen::MatrixXf     *res;              /* Destination for the solution (ncoil x nsources) */
@@ -123,6 +122,7 @@ public:
     int                 fixed_ori;         /* Compute fixed orientation solution? */
     int                 comp;              /* Which component to compute for free orientations */
     int                 stat;
+    std::function<void()> client_free;     /* Releases owned client sub-objects */
 };
 
 //=============================================================================================================

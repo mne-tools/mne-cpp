@@ -3805,9 +3805,9 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
     int             file_nbad;
     int             coord_frame = FIFFV_COORD_HEAD;
     std::unique_ptr<MNECovMatrix> cov;
-    FwdCoilSet*     templates = NULL;
+    std::unique_ptr<FwdCoilSet> templates;
     std::unique_ptr<MNECTFCompDataSet> comp_data;
-    FwdCoilSet*        comp_coils = NULL;
+    std::unique_ptr<FwdCoilSet> comp_coils;
 
     /*
        * Read the coordinate transformations
@@ -3908,20 +3908,21 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
 
         if (!coilfile)
             goto bad;
-        if ((templates = FwdCoilSet::read_coil_defs(coilfile)) == NULL) {
+        templates = FwdCoilSet::read_coil_defs(coilfile);
+        if (!templates) {
             FREE_3(coilfile);
             goto bad;
         }
 
         Q_ASSERT(res->meg_head_t);
-        res->meg_coils.reset(templates->create_meg_coils(res->chs,
+        res->meg_coils = templates->create_meg_coils(res->chs,
                                                           res->nmeg,
                                                           accurate_coils ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
-                                                          *res->meg_head_t));
+                                                          *res->meg_head_t);
         if (!res->meg_coils)
             goto bad;
-        res->eeg_els.reset(FwdCoilSet::create_eeg_els(res->chs.mid(res->nmeg),
-                                                       res->neeg));
+        res->eeg_els = FwdCoilSet::create_eeg_els(res->chs.mid(res->nmeg),
+                                                       res->neeg);
         if (!res->eeg_els)
             goto bad;
         printf("Head coordinate coil definitions created.\n");
@@ -3963,10 +3964,11 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
                                             NULL) == FAIL)
             goto bad;
         if (ncomp > 0) {
-            if ((comp_coils = templates->create_meg_coils(comp_chs,
+            comp_coils = templates->create_meg_coils(comp_chs,
                                                           ncomp,
                                                           FWD_COIL_ACCURACY_NORMAL,
-                                                          *res->meg_head_t)) == NULL) {
+                                                          *res->meg_head_t);
+            if (!comp_coils) {
                 goto bad;
             }
             printf("%d compensation channels in %s\n",comp_coils->ncoil(),measname.toUtf8().data());
@@ -3978,7 +3980,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
     /*
        * Ready to set up the forward model
        */
-    if (setup_forward_model(res,comp_data.get(),comp_coils) == FAIL)
+    if (setup_forward_model(res,comp_data.get(),comp_coils.get()) == FAIL)
         goto bad;
     res->column_norm = COLUMN_NORM_LOC;
     /*
@@ -4101,14 +4103,10 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
     }
 
     badlist.clear();
-    delete templates;
-    delete comp_coils;
     return res;
 
 bad : {
         badlist.clear();
-        delete templates;
-        delete comp_coils;
         if(res)
             delete res;
         return NULL;

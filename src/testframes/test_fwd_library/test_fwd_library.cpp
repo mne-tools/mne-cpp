@@ -607,10 +607,9 @@ void TestFwdLibrary::coilSet_readDefs()
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
 
-    FwdCoilSet* eegEls = FwdCoilSet::create_eeg_els(raw.info.chs, raw.info.nchan);
+    auto eegEls = FwdCoilSet::create_eeg_els(raw.info.chs, raw.info.nchan);
     if (eegEls) {
         QVERIFY(eegEls->ncoil() > 0);
-        delete eegEls;
     } else {
         QVERIFY(true);
     }
