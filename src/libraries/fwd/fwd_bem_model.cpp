@@ -1196,7 +1196,7 @@ int FwdBemModel::fwd_bem_specify_els(FwdCoilSet *els)
     }
     if (!els || els->ncoil() == 0)
         return OK;
-    els->fwd_free_coil_set_user_data();
+    els->user_data.reset();
     /*
        * Hard work follows
        */
@@ -1255,7 +1255,7 @@ int FwdBemModel::fwd_bem_specify_els(FwdCoilSet *els)
     return OK;
 
 bad : {
-        els->fwd_free_coil_set_user_data();
+        els->user_data.reset();
         return FAIL;
     }
 }
@@ -1995,7 +1995,7 @@ int FwdBemModel::fwd_bem_specify_coils(FwdCoilSet *coils)
         goto bad;
     }
     if(coils)
-        coils->fwd_free_coil_set_user_data();
+        coils->user_data.reset();
     if (!coils || coils->ncoil() == 0)
         return OK;
     if (bem_method == FWD_BEM_CONSTANT_COLL)

@@ -57,6 +57,8 @@
 
 #include <QSharedPointer>
 
+#include <memory>
+
 #define FWD_COIL_UNKNOWN      0
 
 #define FWD_COILC_UNKNOWN     0
@@ -120,8 +122,8 @@ public:
      *
      * @return   The created coil.
      */
-    static FwdCoil* create_eeg_el(const FIFFLIB::FiffChInfo& ch,
-                                  const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
+    static std::unique_ptr<FwdCoil> create_eeg_el(const FIFFLIB::FiffChInfo& ch,
+                                                   const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
 
     //=========================================================================================================
     /**
@@ -164,10 +166,10 @@ public:
     int     accuracy;       /**< Accuracy. */
     float   size;           /**< Coil size. */
     float   base;           /**< Baseline. */
-    float   r0[3];          /**< Coil coordinate system origin. */
-    float   ex[3];          /**< Coil coordinate system unit vectors. */
-    float   ey[3];          /**< This stupid construction needs to be replaced with. */
-    float   ez[3];          /**< a coordinate transformation. */
+    Eigen::Vector3f r0;     /**< Coil coordinate system origin. */
+    Eigen::Vector3f ex;     /**< Coil coordinate system x unit vector. */
+    Eigen::Vector3f ey;     /**< Coil coordinate system y unit vector. */
+    Eigen::Vector3f ez;     /**< Coil coordinate system z unit vector. */
     int     np;             /**< Number of integration points. */
     Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> rmag;    /**< The field point locations (np x 3). */
     Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> cosmag;  /**< The corresponding direction cosines (np x 3). */
