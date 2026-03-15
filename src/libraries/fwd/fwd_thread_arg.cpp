@@ -45,33 +45,8 @@
 #include "fwd_bem_model.h"
 #include "fwd_comp_data.h"
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
-
-#define FREE_80(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#define FREE_CMATRIX_80(m) mne_free_cmatrix_80((m))
-
-void mne_free_cmatrix_80 (float **m)
-{
-    if (m) {
-        FREE_80(*m);
-        FREE_80(m);
-    }
-}
+constexpr int FAIL = -1;
+constexpr int OK   = 0;
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -92,10 +67,10 @@ FwdThreadArg::FwdThreadArg()
 ,field_pot     (nullptr)
 ,vec_field_pot (nullptr)
 ,field_pot_grad(nullptr)
-,coils_els     (NULL)
-,client        (NULL)
-,s             (NULL)
-,fixed_ori     (FALSE)
+,coils_els     (nullptr)
+,client        (nullptr)
+,s             (nullptr)
+,fixed_ori     (false)
 ,stat          (FAIL)
 ,comp          (-1)
 {
@@ -105,97 +80,73 @@ FwdThreadArg::FwdThreadArg()
 
 FwdThreadArg::~FwdThreadArg()
 {
+    if (client_free)
+        client_free();
 }
 
 //=============================================================================================================
 
-FwdThreadArg *FwdThreadArg::create_eeg_multi_thread_duplicate(FwdThreadArg *one, bool bem_model)
+std::unique_ptr<FwdThreadArg> FwdThreadArg::create_eeg_multi_thread_duplicate(FwdThreadArg& one, bool bem_model)
 /*
           * Create a duplicate to make the data structure thread safe
           * Do not duplicate read-only parts of the relevant structures
           */
 {
-    FwdThreadArg* res  = new FwdThreadArg;
+    auto res = std::make_unique<FwdThreadArg>();
 
-     *res = *one;
+     *res = one;
+    res->client_free = nullptr;  /* Don't copy the source's deleter */
     if (bem_model) {
-        FwdBemModel*   new_bem  = new FwdBemModel;
-        FwdBemModel*   orig_bem = (FwdBemModel*)res->client;
-
-        *new_bem    = *orig_bem;
-        new_bem->v0.resize(0);
-        res->client = new_bem;
+        auto bem = std::make_shared<FwdBemModel>();
+        *bem = *static_cast<FwdBemModel*>(res->client);
+        bem->v0.resize(0);
+        res->client = bem.get();
+        res->client_free = [bem]() {};  /* shared_ptr releases FwdBemModel on destruction */
     }
     return res;
 }
 
 //=============================================================================================================
 
-void FwdThreadArg::free_eeg_multi_thread_duplicate(FwdThreadArg *one, bool bem_model)
-{
-    if (!one){
-        qDebug("Pointer passed is null. Returning early.");
-        return;
-    }
-    if (bem_model) {
-        FwdBemModel*    bem = (FwdBemModel*) one->client;
-        delete bem;
-    }
-    one->client = NULL;
-    if(one)
-        delete one;
-}
-
-//=============================================================================================================
-
-FwdThreadArg *FwdThreadArg::create_meg_multi_thread_duplicate(FwdThreadArg* one, bool bem_model)
+std::unique_ptr<FwdThreadArg> FwdThreadArg::create_meg_multi_thread_duplicate(FwdThreadArg& one, bool bem_model)
 /*
  * Create a duplicate to make the data structure thread safe
  * Do not duplicate read-only parts of the relevant structures
  */
 {
-    FwdThreadArg* res  = new FwdThreadArg;
-    FwdCompData*  orig = (FwdCompData*)one->client;
-    FwdCompData*  comp = NULL;
+    auto res = std::make_unique<FwdThreadArg>();
+    FwdCompData*  orig = static_cast<FwdCompData*>(one.client);
 
-     *res = *one;
-    res->client = comp = new FwdCompData;
-     *comp = *orig;
+     *res = one;
+    res->client_free = nullptr;  /* Don't copy the source's deleter */
+
+    auto comp = std::make_shared<FwdCompData>();
+    *comp = *orig;
+    comp->comp_coils = nullptr;  /* Non-owning: shared with original, prevent ~FwdCompData from deleting */
+    comp->set        = nullptr;  /* Will be replaced below; prevent dtor from deleting orig's copy */
     comp->work.resize(0);
     comp->vec_work.resize(0, 0);
-    comp->set      = orig->set ? new MNECTFCompDataSet(*(orig->set)) : NULL;
+
+    std::shared_ptr<MNECTFCompDataSet> set_guard(
+        orig->set ? new MNECTFCompDataSet(*(orig->set)) : nullptr);
+    comp->set = set_guard.get();
+
+    res->client = comp.get();
 
     if (bem_model) {
-        FwdBemModel*   new_bem  = new FwdBemModel();
-        FwdBemModel*   orig_bem = (FwdBemModel*)comp->client;
-
-        *new_bem     = *orig_bem;
-        new_bem->v0.resize(0);
-        comp->client = new_bem;
+        auto bem = std::make_shared<FwdBemModel>();
+        *bem = *static_cast<FwdBemModel*>(comp->client);
+        bem->v0.resize(0);
+        comp->client = bem.get();
+        /* shared_ptrs release their objects when client_free is destroyed */
+        res->client_free = [comp, set_guard, bem]() {
+            comp->set = nullptr;  /* Prevent ~FwdCompData double-free; set_guard owns it */
+        };
+    }
+    else {
+        res->client_free = [comp, set_guard]() {
+            comp->set = nullptr;  /* Prevent ~FwdCompData double-free; set_guard owns it */
+        };
     }
     return res;
-}
-
-//=============================================================================================================
-
-void FwdThreadArg::free_meg_multi_thread_duplicate(FwdThreadArg *one, bool bem_model)
-
-{
-    if (!one){
-        qDebug("Pointer passed is null. Returning early.");
-        return;
-    }
-
-    FwdCompData* comp = (FwdCompData*)one->client;
-
-    if(comp->set)
-        delete comp->set;
-
-    if (bem_model) {
-        FwdBemModel*    bem = (FwdBemModel*)comp->client;
-        delete bem;
-    }
-    delete comp;
-    one->client = NULL;
-    delete one;
 }

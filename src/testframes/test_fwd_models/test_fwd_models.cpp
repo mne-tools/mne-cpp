@@ -197,10 +197,9 @@ private slots:
             QSKIP("Coil definition file not found");
         }
 
-        FwdCoilSet *coilSet = FwdCoilSet::read_coil_defs(coilDefPath);
+        auto coilSet = FwdCoilSet::read_coil_defs(coilDefPath);
         QVERIFY(coilSet != nullptr);
         QVERIFY(coilSet->ncoil() > 0);
-        delete coilSet;
     }
 
     //=========================================================================

@@ -312,8 +312,8 @@ bool SensorFieldMapper::buildMapping(
         if (verts.rows() > 0 && norms.rows() == verts.rows()) {
             const QString coilPath = QCoreApplication::applicationDirPath()
                 + "/../resources/general/coilDefinitions/coil_def.dat";
-            std::unique_ptr<FWDLIB::FwdCoilSet> templates(
-                FWDLIB::FwdCoilSet::read_coil_defs(coilPath));
+            auto templates =
+                FWDLIB::FwdCoilSet::read_coil_defs(coilPath);
 
             if (templates) {
                 FiffCoordTrans devToTarget;
@@ -331,8 +331,8 @@ bool SensorFieldMapper::buildMapping(
                 if (m_megOnHead && !headMri.isEmpty())
                     origin = applyTransform(origin, headMri);
 
-                std::unique_ptr<FWDLIB::FwdCoilSet> coils(templates->create_meg_coils(
-                    megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, devToTarget));
+                auto coils = templates->create_meg_coils(
+                    megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, devToTarget);
 
                 if (coils && coils->ncoil() > 0) {
                     m_megMapping = FWDLIB::FwdFieldMap::computeMegMapping(
@@ -355,9 +355,9 @@ bool SensorFieldMapper::buildMapping(
             Eigen::Vector3f origin = fittedOrigin;
             if (!headMri.isEmpty()) origin = applyTransform(origin, headMri);
 
-            std::unique_ptr<FWDLIB::FwdCoilSet> eegCoils(
+            auto eegCoils =
                 FWDLIB::FwdCoilSet::create_eeg_els(
-                    eegChs, eegChs.size(), headMri));
+                    eegChs, eegChs.size(), headMri);
 
             if (eegCoils && eegCoils->ncoil() > 0) {
                 m_eegMapping = FWDLIB::FwdFieldMap::computeEegMapping(

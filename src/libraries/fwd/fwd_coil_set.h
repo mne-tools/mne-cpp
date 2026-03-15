@@ -104,7 +104,7 @@ public:
      *
      * @return   The created meg coil.
      */
-    FwdCoil* create_meg_coil(const FIFFLIB::FiffChInfo& ch, int acc, const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
+    std::unique_ptr<FwdCoil> create_meg_coil(const FIFFLIB::FiffChInfo& ch, int acc, const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
 
     //=========================================================================================================
     /**
@@ -118,7 +118,7 @@ public:
      *
      * @return   The created meg coil set.
      */
-    FwdCoilSet* create_meg_coils(const QList<FIFFLIB::FiffChInfo>& chs,
+    std::unique_ptr<FwdCoilSet> create_meg_coils(const QList<FIFFLIB::FiffChInfo>& chs,
                                  int nch,
                                  int acc,
                                  const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
@@ -134,7 +134,7 @@ public:
      *
      * @return   The created meg coil set.
      */
-    static FwdCoilSet* create_eeg_els(const QList<FIFFLIB::FiffChInfo>& chs,
+    static std::unique_ptr<FwdCoilSet> create_eeg_els(const QList<FIFFLIB::FiffChInfo>& chs,
                                       int nch,
                                       const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
 
@@ -146,7 +146,7 @@ public:
      *
      * @return   The read meg coil set.
      */
-    static FwdCoilSet* read_coil_defs(const QString& name);
+    static std::unique_ptr<FwdCoilSet> read_coil_defs(const QString& name);
 
     //=========================================================================================================
     /**
@@ -156,7 +156,7 @@ public:
      *
      * @return   The duplicated coil set.
      */
-    FwdCoilSet* dup_coil_set(const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans()) const;
+    std::unique_ptr<FwdCoilSet> dup_coil_set(const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans()) const;
 
     //=========================================================================================================
     /**

@@ -132,7 +132,7 @@ void SensorSet::initMatrices(int ncoils, int np)
 SensorSetCreator::SensorSetCreator()
 {
     const QString qPath = QString(QCoreApplication::applicationDirPath() + "/../resources/general/coilDefinitions/coil_def.dat");
-    m_pCoilDefinitions = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath));
+    m_pCoilDefinitions = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath).release());
 }
 
 //=============================================================================================================
@@ -143,7 +143,7 @@ SensorSet SensorSetCreator::updateSensorSet(const QList<FIFFLIB::FiffChInfo>& ch
     if(channelList.isEmpty()) {
         return SensorSet();
     } else {
-        auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(channelList, channelList.size(), static_cast<int>(accuracy)));
+        auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(channelList, channelList.size(), static_cast<int>(accuracy)).release());
         return SensorSet(pCoilMeg);
     }
 }

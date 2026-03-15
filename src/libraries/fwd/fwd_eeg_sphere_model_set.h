@@ -49,8 +49,10 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QList>
 #include <QString>
+
+#include <memory>
+#include <vector>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -210,7 +212,7 @@ public:
     }
 
 public:
-    QList<FwdEegSphereModel*> models;     /**< Set of EEG sphere model definitions. */
+    std::vector<std::unique_ptr<FwdEegSphereModel>> models;     /**< Set of EEG sphere model definitions. */
 };
 
 //=============================================================================================================

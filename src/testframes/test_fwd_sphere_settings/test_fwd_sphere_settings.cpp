@@ -257,21 +257,18 @@ private slots:
             chs.append(ch);
         }
 
-        FwdCoilSet* eeg = FwdCoilSet::create_eeg_els(chs, 3);
+        auto eeg = FwdCoilSet::create_eeg_els(chs, 3);
         QVERIFY(eeg != nullptr);
         QCOMPARE(eeg->ncoil(), 3);
         QVERIFY(eeg->coils[0]->is_eeg_electrode());
 
         // Test dup
-        FwdCoilSet* dup = eeg->dup_coil_set();
+        auto dup = eeg->dup_coil_set();
         QVERIFY(dup != nullptr);
         QCOMPARE(dup->ncoil(), 3);
 
         // Test is_eeg_electrode_type
         QVERIFY(eeg->is_eeg_electrode_type(FIFFV_COIL_EEG));
-
-        delete dup;
-        delete eeg;
     }
 
     //=========================================================================

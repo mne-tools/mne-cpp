@@ -110,7 +110,7 @@ void TestSensorSet::initTestCase()
     qInstallMessageHandler(ApplicationLogger::customLogWriter);
 
     QString qPath = QString(QCoreApplication::applicationDirPath() + "/../resources/general/coilDefinitions/coil_def.dat");
-    m_pCoilDefinitions = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath));
+    m_pCoilDefinitions = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath).release());
 
     // Setup for reading the raw data
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
@@ -189,7 +189,7 @@ void TestSensorSet::testSensorSet_constructor_accuracyLow()
     int iNTra = iNChan*iNChan;      // size square matrix 204*204
     int iNW = iNp * iNChan;         // one weight for each point
     Accuracy accuracy = Accuracy::low;
-    auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy)));
+    auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy)).release());
 
     /// act
     SensorSet sensorsActual = SensorSet(pCoilMeg);
@@ -215,7 +215,7 @@ void TestSensorSet::testSensorSet_constructor_accuracyMedium()
     int iNW = iNp * iNChan;         // one weight for each point
     int iAcc = 1;
 
-    auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), iAcc));
+    auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), iAcc).release());
 
     /// act
     SensorSet sensorsActual = SensorSet(pCoilMeg);
@@ -240,7 +240,7 @@ void TestSensorSet::testSensorSet_constructor_accuracyHigh()
     int iNTra = iNChan*iNChan;      // size square matrix 204*204
     int iNW = iNp * iNChan;         // one weight for each point
     Accuracy accuracy = Accuracy::high;
-    auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy)));
+    auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy)).release());
 
     /// act
     SensorSet sensorsActual = SensorSet(pCoilMeg);
@@ -259,7 +259,7 @@ void TestSensorSet::testSensorSet_constructor_accuracyHigh()
 void TestSensorSet::testSensorSet_equal()
 {
     Accuracy accuracy = Accuracy::medium;
-    auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy)));
+    auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy)).release());
     SensorSet sensorsA = SensorSet(pCoilMeg);
     SensorSet sensorsB = SensorSet(pCoilMeg);
     QVERIFY(sensorsA == sensorsB);
@@ -271,8 +271,8 @@ void TestSensorSet::testSensorSet_notequal()
     Accuracy accuracy1 = Accuracy::medium;
     Accuracy accuracy2 = Accuracy::high;
 
-    auto pCoilMeg1 = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy1)));
-    auto pCoilMeg2 = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy2)));
+    auto pCoilMeg1 = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy1)).release());
+    auto pCoilMeg2 = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy2)).release());
 
     SensorSet sensorsA = SensorSet(pCoilMeg1);
     SensorSet sensorsB = SensorSet(pCoilMeg2);
@@ -300,7 +300,7 @@ void TestSensorSet::testSensorSetCreator_channelList_empty()
 void TestSensorSet::testSensorSetCreator_channelList_medium()
 {
     Accuracy accuracy = Accuracy::medium;
-    auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy)));
+    auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy)).release());
     SensorSet sensorsExpected(pCoilMeg);
 
     SensorSetCreator sensorSetCreator;

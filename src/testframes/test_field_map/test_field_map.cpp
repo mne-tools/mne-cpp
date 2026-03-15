@@ -465,8 +465,8 @@ void TestFieldMap::initTestCase()
              << "channels:" << m_evoked.info.chs.size();
 
     // ── Build coil sets ────────────────────────────────────────────────
-    std::unique_ptr<FwdCoilSet> templates(
-        FwdCoilSet::read_coil_defs(m_coilDefPath));
+    auto templates =
+        FwdCoilSet::read_coil_defs(m_coilDefPath);
     QVERIFY(templates != nullptr);
 
     // Classify channels (matching Python's pick_types)
@@ -489,16 +489,16 @@ void TestFieldMap::initTestCase()
     // MEG coils (in head coords – no device→head transform for coil creation
     // since MNE-Python _create_meg_coils with acc='normal' uses no transform)
     if (megChs.size() > 0) {
-        m_megCoils.reset(templates->create_meg_coils(
-            megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, FiffCoordTrans()));
+        m_megCoils = templates->create_meg_coils(
+            megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, FiffCoordTrans());
         m_hasMeg = (m_megCoils && m_megCoils->ncoil() > 0);
         qDebug() << "MEG coil set:" << (m_hasMeg ? m_megCoils->ncoil() : 0) << "coils";
     }
 
     // EEG electrodes (in head coords)
     if (eegChs.size() > 0) {
-        m_eegCoils.reset(FwdCoilSet::create_eeg_els(
-            eegChs, eegChs.size(), FiffCoordTrans()));
+        m_eegCoils = FwdCoilSet::create_eeg_els(
+            eegChs, eegChs.size(), FiffCoordTrans());
         m_hasEeg = (m_eegCoils && m_eegCoils->ncoil() > 0);
         qDebug() << "EEG electrode set:" << (m_hasEeg ? m_eegCoils->ncoil() : 0) << "electrodes";
     }
@@ -1296,13 +1296,13 @@ void TestFieldMap::testHelmetFieldMap()
     // Create MEG coils in head coordinates (matching _make_surface_mapping)
     // The Python reference now creates coils in head coords using dev_head_t,
     // so the C++ side must do the same.
-    std::unique_ptr<FwdCoilSet> templates(
-        FwdCoilSet::read_coil_defs(m_coilDefPath));
+    auto templates =
+        FwdCoilSet::read_coil_defs(m_coilDefPath);
     QVERIFY(templates != nullptr);
 
-    std::unique_ptr<FwdCoilSet> helmetCoils(
+    auto helmetCoils =
         templates->create_meg_coils(
-            megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, m_evoked.info.dev_head_t));
+            megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, m_evoked.info.dev_head_t);
     QVERIFY(helmetCoils && helmetCoils->ncoil() > 0);
     qDebug() << "C++ MEG coils:" << helmetCoils->ncoil()
              << "(in head coordinates)";

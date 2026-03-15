@@ -1790,7 +1790,7 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_field_coeff(FwdCoilSet *coils)	/* Gradiomet
     MNESurface*     surf;
     MNETriangle*    tri;
     FwdCoil*        coil;
-    FwdCoilSet*     tcoils = NULL;
+    std::unique_ptr<FwdCoilSet> tcoils;
     int            ntri;
     int            j,k,p,s,off;
     double         res;
@@ -1811,16 +1811,12 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_field_coeff(FwdCoilSet *coils)	/* Gradiomet
                 return Eigen::MatrixXf();
             }
             else {
-                if (!coils) {
-                    qWarning("No coils to duplicate");
-                    return Eigen::MatrixXf();
-                }
                 /*
                     * Make a transformed duplicate
                     */
                 if ((tcoils = coils->dup_coil_set(head_mri_t)) == NULL)
                     return Eigen::MatrixXf();
-                coils = tcoils;
+                coils = tcoils.get();
             }
         }
         else {
@@ -1848,7 +1844,6 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_field_coeff(FwdCoilSet *coils)	/* Gradiomet
         }
         off = off + ntri;
     }
-    delete tcoils;
     return coeff;
 }
 
@@ -1994,7 +1989,7 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_lin_field_coeff(FwdCoilSet *coils, int meth
     MNESurface*  surf;
     MNETriangle* tri;
     FwdCoil*     coil;
-    FwdCoilSet*  tcoils = NULL;
+    std::unique_ptr<FwdCoilSet> tcoils;
     int         ntri;
     int         j,k,p,pp,off,s;
     Eigen::Vector3d res, one;
@@ -2016,16 +2011,12 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_lin_field_coeff(FwdCoilSet *coils, int meth
                 return Eigen::MatrixXf();
             }
             else {
-                if (!coils) {
-                    qWarning("No coils to duplicate");
-                    return Eigen::MatrixXf();
-                }
                 /*
                     * Make a transformed duplicate
                     */
                 if ((tcoils = coils->dup_coil_set(head_mri_t)) == NULL)
                     return Eigen::MatrixXf();
-                coils = tcoils;
+                coils = tcoils.get();
             }
         }
         else {
@@ -2074,7 +2065,6 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_lin_field_coeff(FwdCoilSet *coils, int meth
     /*
        * Discard the duplicate
        */
-    delete tcoils;
     return coeff;
 }
 
@@ -2680,7 +2670,7 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
     MatrixXd            matRes;
     MatrixXd            matResGrad;
     int                 nrow = 0;
-    FwdCompData         *comp = NULL;
+    FwdCompData         *comp = nullptr;
     fwdFieldFunc        field;              /* Computes the field for one dipole orientation */
     fwdVecFieldFunc     vec_field;          /* Computes the field for all dipole orientations */
     fwdFieldGradFunc    field_grad;         /* Computes the field and gradient with respect to dipole position
@@ -2691,7 +2681,7 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
     int                 k,p,q,off;
     QStringList         names;              /* Channel names */
     void                *client;
-    FwdThreadArg*       one_arg = NULL;
+    std::unique_ptr<FwdThreadArg> one_arg;
     int                 nproc = QThread::idealThreadCount();
     QStringList         emptyList;
 
@@ -2784,13 +2774,13 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
     /*
      * Set up the argument for the field computation
      */
-    one_arg = new FwdThreadArg();
+    one_arg = std::make_unique<FwdThreadArg>();
     one_arg->res            = &res_mat;
     one_arg->res_grad       = bDoGrad ? &res_grad_mat : nullptr;
     one_arg->off            = 0;
     one_arg->coils_els      = coils;
     one_arg->client         = client;
-    one_arg->s              = NULL;
+    one_arg->s              = nullptr;
     one_arg->fixed_ori      = fixed_ori;
     one_arg->field_pot      = field;
     one_arg->vec_field_pot  = vec_field;
@@ -2801,18 +2791,18 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
 
     if (use_threads) {
         int            nthread  = (fixed_ori || vec_field || nproc < 6) ? nspace : 3*nspace;
-        QList <FwdThreadArg*> args;
+        std::vector<std::unique_ptr<FwdThreadArg>> args;
         int            stat;
         /*
         * We need copies to allocate separate workspace for each thread
         */
         if (fixed_ori || vec_field || nproc < 6) {
             for (k = 0, off = 0; k < nthread; k++) {
-                FwdThreadArg* t_arg = FwdThreadArg::create_meg_multi_thread_duplicate(one_arg,true);
+                auto t_arg = FwdThreadArg::create_meg_multi_thread_duplicate(*one_arg,true);
                 t_arg->s   = spaces[k].get();
                 t_arg->off = off;
                 off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
-                args.append(t_arg);
+                args.push_back(std::move(t_arg));
             }
             printf("%d processors. I will use one thread for each of the %d source spaces.\n",
                     nproc,nspace);
@@ -2820,11 +2810,11 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
         else {
             for (k = 0, off = 0, q = 0; k < nspace; k++) {
                 for (p = 0; p < 3; p++,q++) {
-                    FwdThreadArg* t_arg = FwdThreadArg::create_meg_multi_thread_duplicate(one_arg,true);
+                    auto t_arg = FwdThreadArg::create_meg_multi_thread_duplicate(*one_arg,true);
                     t_arg->s    = spaces[k].get();
                     t_arg->off  = off;
                     t_arg->comp = p;
-                    args.append(t_arg);
+                    args.push_back(std::move(t_arg));
                 }
                 off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
             }
@@ -2836,7 +2826,9 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
         /*
         * Ready to start the threads & Wait for them to complete
         */
-        QtConcurrent::blockingMap(args, meg_eeg_fwd_one_source_space);
+        QtConcurrent::blockingMap(args, [](std::unique_ptr<FwdThreadArg>& a) {
+            meg_eeg_fwd_one_source_space(a.get());
+        });
         /*
         * Check the results
         */
@@ -2845,8 +2837,6 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
                 stat = FAIL;
                 break;
             }
-        for (k = 0; k < args.size(); k++)//nthread == args.size()
-            FwdThreadArg::free_meg_multi_thread_duplicate(args[k],true);
         if (stat != OK)
             goto bad;
     }
@@ -2856,7 +2846,7 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
         for (k = 0, off = 0; k < nspace; k++) {
             one_arg->s   = spaces[k].get();
             one_arg->off = off;
-            meg_eeg_fwd_one_source_space(one_arg);
+            meg_eeg_fwd_one_source_space(one_arg.get());
             if (one_arg->stat != OK)
                 goto bad;
             off = fixed_ori ? off + one_arg->s->nuse : off + 3*one_arg->s->nuse;
@@ -2869,10 +2859,9 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
             orig_names.append(coils->coils[k]->chname);
         names = orig_names;
     }
-    if(one_arg)
-        delete one_arg;
-    if(comp)
-        delete comp;
+    one_arg.reset();
+    delete comp;
+    comp = nullptr;
 
     // Store solution: res_mat is (nmeg x nsources), transpose to (nsources x nmeg)
     nrow = fixed_ori ? nsource : 3*nsource;
@@ -2895,10 +2884,8 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
     return OK;
 
 bad : {
-        if(one_arg)
-            delete one_arg;
-        if(comp)
-            delete comp;
+        one_arg.reset();
+        delete comp;
         return FAIL;
     }
 }
@@ -2933,7 +2920,7 @@ int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MNESourceSpace>
     int             k,p,q,off;
     QStringList     names;                  /* Channel names */
     void            *client;
-    FwdThreadArg*   one_arg = NULL;
+    std::unique_ptr<FwdThreadArg> one_arg;
     int             nproc = QThread::idealThreadCount();
     QStringList     emptyList;
     /*
@@ -2988,13 +2975,13 @@ int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MNESourceSpace>
     /*
        * Set up the argument for the field computation
        */
-    one_arg = new FwdThreadArg();
+    one_arg = std::make_unique<FwdThreadArg>();
     one_arg->res            = &res_mat;
     one_arg->res_grad       = bDoGrad ? &res_grad_mat : nullptr;
     one_arg->off            = 0;
     one_arg->coils_els      = els;
     one_arg->client         = client;
-    one_arg->s              = NULL;
+    one_arg->s              = nullptr;
     one_arg->fixed_ori      = fixed_ori;
     one_arg->field_pot      = pot;
     one_arg->vec_field_pot  = vec_pot;
@@ -3005,29 +2992,29 @@ int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MNESourceSpace>
 
     if (use_threads) {
         int            nthread  = (fixed_ori || vec_pot || nproc < 6) ? nspace : 3*nspace;
-        QList <FwdThreadArg*> args;
+        std::vector<std::unique_ptr<FwdThreadArg>> args;
         int            stat;
         /*
         * We need copies to allocate separate workspace for each thread
         */
         if (fixed_ori || vec_pot || nproc < 6) {
             for (k = 0, off = 0; k < nthread; k++) {
-                FwdThreadArg* t_arg = FwdThreadArg::create_eeg_multi_thread_duplicate(one_arg,true);
+                auto t_arg = FwdThreadArg::create_eeg_multi_thread_duplicate(*one_arg,true);
                 t_arg->s   = spaces[k].get();
                 t_arg->off = off;
                 off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
-                args.append(t_arg);
+                args.push_back(std::move(t_arg));
             }
             printf("%d processors. I will use one thread for each of the %d source spaces.\n",nproc,nspace);
         }
         else {
             for (k = 0, off = 0, q = 0; k < nspace; k++) {
                 for (p = 0; p < 3; p++,q++) {
-                    FwdThreadArg* t_arg = FwdThreadArg::create_eeg_multi_thread_duplicate(one_arg,true);
+                    auto t_arg = FwdThreadArg::create_eeg_multi_thread_duplicate(*one_arg,true);
                     t_arg->s    = spaces[k].get();
                     t_arg->off  = off;
                     t_arg->comp = p;
-                    args.append(t_arg);
+                    args.push_back(std::move(t_arg));
                 }
                 off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
             }
@@ -3038,7 +3025,9 @@ int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MNESourceSpace>
         /*
         * Ready to start the threads & Wait for them to complete
         */
-        QtConcurrent::blockingMap(args, meg_eeg_fwd_one_source_space);
+        QtConcurrent::blockingMap(args, [](std::unique_ptr<FwdThreadArg>& a) {
+            meg_eeg_fwd_one_source_space(a.get());
+        });
         /*
         * Check the results
         */
@@ -3047,8 +3036,6 @@ int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MNESourceSpace>
                 stat = FAIL;
                 break;
             }
-        for (k = 0; k < args.size(); k++)//nthread == args.size()
-            FwdThreadArg::free_eeg_multi_thread_duplicate(args[k],true);
         if (stat != OK)
             goto bad;
     }
@@ -3058,7 +3045,7 @@ int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MNESourceSpace>
         for (k = 0, off = 0; k < nspace; k++) {
             one_arg->s   = spaces[k].get();
             one_arg->off = off;
-            meg_eeg_fwd_one_source_space(one_arg);
+            meg_eeg_fwd_one_source_space(one_arg.get());
             if (one_arg->stat != OK)
                 goto bad;
             off = fixed_ori ? off + one_arg->s->nuse : off + 3*one_arg->s->nuse;
@@ -3071,8 +3058,7 @@ int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MNESourceSpace>
             orig_names.append(els->coils[k]->chname);
         names = orig_names;
     }
-    if(one_arg)
-        delete one_arg;
+    one_arg.reset();
 
     // Store solution: res_mat is (neeg x nsources), transpose to (nsources x neeg)
     nrow = fixed_ori ? nsource : 3*nsource;
@@ -3095,8 +3081,7 @@ int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MNESourceSpace>
     return OK;
 
 bad : {
-        if(one_arg)
-            delete one_arg;
+        one_arg.reset();
         return FAIL;
     }
 }

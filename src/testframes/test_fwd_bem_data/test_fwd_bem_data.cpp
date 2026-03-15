@@ -443,11 +443,8 @@ private slots:
         // Create a FwdCoilSet and exercise basic API
         FwdCoilSet coilDefs;
         QList<FiffChInfo> emptyList;
-        FwdCoilSet* coils = coilDefs.create_meg_coils(emptyList, 0, FWD_COIL_ACCURACY_NORMAL);
+        auto coils = coilDefs.create_meg_coils(emptyList, 0, FWD_COIL_ACCURACY_NORMAL);
         // May return null or empty — that's ok, we exercise the code path
-        if (coils) {
-            delete coils;
-        }
         QVERIFY(true);
     }
 
