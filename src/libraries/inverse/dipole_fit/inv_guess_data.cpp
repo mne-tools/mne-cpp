@@ -168,9 +168,7 @@ void fromIntEigenMatrix_16(const Eigen::MatrixXi& from_mat, int **&to_mat)
 //=============================================================================================================
 
 InvGuessData::InvGuessData()
-: rr(nullptr)
-, guess_fwd(nullptr)
-, nguess(0)
+: nguess(0)
 {
 }
 
@@ -239,18 +237,16 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
     printf("Guess locations are now in %s coordinates.\n",FiffCoordTrans::frame_name(f->coord_frame).toUtf8().constData());
 
     this->nguess  = guesses->nuse;
-    this->rr      = ALLOC_CMATRIX_16(guesses->nuse,3);
+    this->rr.resize(guesses->nuse, 3);
     for (k = 0, p = 0; k < guesses->np; k++)
         if (guesses->inuse[k]) {
-            VEC_COPY_16(this->rr[p],&guesses->rr(k,0));
+            this->rr.row(p) = guesses->rr.row(k);
             p++;
         }
     guesses.reset();
 
     printf("Go through all guess source locations...");
-    this->guess_fwd = MALLOC_16(this->nguess,InvDipoleForward*);
-    for (k = 0; k < this->nguess; k++)
-        this->guess_fwd[k] = nullptr;
+    this->guess_fwd.resize(this->nguess);
     /*
         * Compute the guesses using the sphere model for speed
         */
@@ -261,7 +257,8 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
         f->funcs = f->sphere_funcs;
 
     for (k = 0; k < this->nguess; k++) {
-        if ((this->guess_fwd[k] = InvDipoleFitData::dipole_forward_one(f,this->rr[k],nullptr)) == nullptr)
+        this->guess_fwd[k].reset(InvDipoleFitData::dipole_forward_one(f,this->rr.row(k).data(),nullptr));
+        if (!this->guess_fwd[k])
             goto bad;
 #ifdef DEBUG
         sing = this->guess_fwd[k]->sing;
@@ -354,17 +351,15 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
     printf("Guess locations are now in %s coordinates.\n",FiffCoordTrans::frame_name(f->coord_frame).toUtf8().constData());
 
     this->nguess  = guesses->nuse;
-    this->rr      = ALLOC_CMATRIX_16(guesses->nuse,3);
+    this->rr.resize(guesses->nuse, 3);
     for (k = 0, p = 0; k < guesses->np; k++)
         if (guesses->inuse[k]) {
-            VEC_COPY_16(this->rr[p],&guesses->rr(k,0));
+            this->rr.row(p) = guesses->rr.row(k);
             p++;
         }
     guesses.reset();
 
-    this->guess_fwd = MALLOC_16(this->nguess,InvDipoleForward*);
-    for (k = 0; k < this->nguess; k++)
-        this->guess_fwd[k] = nullptr;
+    this->guess_fwd.resize(this->nguess);
     /*
         * Compute the guesses using the sphere model for speed
         */
@@ -380,16 +375,7 @@ bad : {
 
 //=============================================================================================================
 
-InvGuessData::~InvGuessData()
-{
-    FREE_CMATRIX_16(rr);
-    if (guess_fwd) {
-        for (int k = 0; k < nguess; k++)
-            delete guess_fwd[k];
-        FREE_16(guess_fwd);
-    }
-    return;
-}
+InvGuessData::~InvGuessData() = default;
 
 //=============================================================================================================
 
@@ -412,7 +398,8 @@ bool InvGuessData::compute_guess_fields(InvDipoleFitData* f)
     else
         f->funcs = f->sphere_funcs;
     for (int k = 0; k < this->nguess; k++) {
-        if ((this->guess_fwd[k] = InvDipoleFitData::dipole_forward_one(f,this->rr[k],this->guess_fwd[k])) == nullptr){
+        this->guess_fwd[k].reset(InvDipoleFitData::dipole_forward_one(f,this->rr.row(k).data(),this->guess_fwd[k].release()));
+        if (!this->guess_fwd[k]) {
             if (orig)
                 f->funcs = orig;
             return false;

@@ -4309,7 +4309,7 @@ static int find_best_guess(float     *B,         /* The whitened data */
 
     B2 = mne_dot_vectors_3(B,B,nch);
     for (k = 0; k < guess->nguess; k++) {
-        fwd = guess->guess_fwd[k];
+        fwd = guess->guess_fwd[k].get();
         if (fwd->nch == nch) {
             ncomp = fwd->sing[2]/fwd->sing[0] > limit ? 3 : 2;
             for (c = 0, Bm2 = 0.0; c < ncomp; c++) {
@@ -4631,8 +4631,8 @@ bool InvDipoleFitData::fit_one(InvDipoleFitData* fit,	            /* Precomputed
     user.report_dim = FALSE;
     fit->user  = &user;
 
-    VEC_COPY_3(rd_guess,guess->rr[best]);
-    VEC_COPY_3(rd_final,guess->rr[best]);
+    VEC_COPY_3(rd_guess,guess->rr.row(best).data());
+    VEC_COPY_3(rd_final,guess->rr.row(best).data());
 
     neval_tot = 0;
     fit_fail = FALSE;

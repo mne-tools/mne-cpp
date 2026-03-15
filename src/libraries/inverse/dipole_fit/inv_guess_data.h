@@ -56,6 +56,8 @@
 
 #include <QSharedPointer>
 
+#include <vector>
+
 //=============================================================================================================
 // DEFINE NAMESPACE INVLIB
 //=============================================================================================================
@@ -135,8 +137,8 @@ public:
     bool compute_guess_fields(InvDipoleFitData* f);
 
 public:
-    float          **rr;            /**< These are the guess dipole locations. */
-    InvDipoleForward** guess_fwd;      /**< Forward solutions for the guesses. */
+    Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> rr; /**< Guess dipole locations (nguess x 3, row-major). */
+    std::vector<InvDipoleForward::UPtr> guess_fwd; /**< Forward solutions for the guesses. */
     int            nguess;          /**< How many sources. */
 };
 
