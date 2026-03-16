@@ -149,14 +149,14 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
-    # ── Coverage: threshold & regression check (staging branch) ────────────
+    # ── Coverage: threshold & regression check ─────────────────────────────
     - name: Install fastcov
-      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && !inputs.upload_codecov
+      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && inputs.coverage_threshold > 0
       run: pip install fastcov
 
     - name: Generate coverage report (fastcov)
       id: lcov
-      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && !inputs.upload_codecov
+      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && inputs.coverage_threshold > 0
       run: |
         echo "=== Coverage diagnostics ==="
         echo "gcno files: $(find build -name '*.gcno' 2>/dev/null | wc -l)"
@@ -189,7 +189,7 @@ jobs:
         key: coverage-baseline-${{ github.ref_name }}
 
     - name: Check coverage threshold & regression
-      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && !inputs.upload_codecov
+      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && inputs.coverage_threshold > 0
       env:
         CURRENT: ${{ steps.lcov.outputs.coverage }}
         THRESHOLD: ${{ inputs.coverage_threshold }}

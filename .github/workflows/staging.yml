@@ -10,12 +10,12 @@
 #   • Builds cross-platform installers (Linux .run, macOS .dmg, Windows .exe)
 #   • Runs full test suite with coverage threshold & regression checks
 #     (fails if coverage < minimum threshold or drops from previous run)
+#   • Uploads coverage to Codecov (alongside local threshold checks)
 #   • Deploys dev website     → mne-cpp.github.io/dev/
 #   • Deploys dev Doxygen API → mne-cpp.github.io/doxygen-api/dev/
 #   • Builds WebAssembly dev version
 #
-# Coverage is NOT uploaded to Codecov (that's reserved for main).
-# Instead, coverage is checked via lcov with:
+# Coverage is uploaded to Codecov AND checked locally via fastcov with:
 #   1) A minimum threshold (configurable via COVERAGE_THRESHOLD env var)
 #   2) Regression detection (compares to previous run's baseline)
 #
@@ -113,9 +113,11 @@ jobs:
     uses: ./.github/workflows/_reusable-tests.yml
     with:
       with_code_coverage: ${{ !contains(github.event.head_commit.message, '[skip-coverage]') }}
-      upload_codecov: false
+      upload_codecov: ${{ !contains(github.event.head_commit.message, '[skip-coverage]') }}
       coverage_threshold: ${{ contains(github.event.head_commit.message, '[skip-coverage]') && 0 || 35 }}
       fail_on_coverage_regression: ${{ !contains(github.event.head_commit.message, '[skip-coverage]') }}
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   # ── Doxygen API documentation (dev) ──────────────────────────────────────
   Doxygen:
