@@ -67,8 +67,8 @@ namespace DISPLIB {
     class MinimumNormSettingsView;
 }
 
-namespace FWDLIB {
-    class FwdForwardSolution;
+namespace MNELIB {
+    class MNEForwardSolution;
 }
 
 namespace FIFFLIB {
@@ -233,7 +233,7 @@ protected:
     QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double >                                 m_pCircularMatrixBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
     QSharedPointer<UTILSLIB::CircularBuffer<FIFFLIB::FiffEvoked> >                          m_pCircularEvokedBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
     QSharedPointer<RTPROCESSINGLIB::RtInvOp>                                                m_pRtInvOp;                 /**< Real-time inverse operator. */
-    QSharedPointer<FWDLIB::FwdForwardSolution>                                              m_pFwd;                     /**< Forward solution. */
+    QSharedPointer<MNELIB::MNEForwardSolution>                                              m_pFwd;                     /**< Forward solution. */
     QSharedPointer<FIFFLIB::FiffCov>                                                        m_pNoiseCov;                     /**< Noise Covariance Matrix. */
     QSharedPointer<FSLIB::FsAnnotationSet>                                                    m_pAnnotationSet;           /**< FsAnnotation set. */
     QSharedPointer<FSLIB::FsSurfaceSet>                                                       m_pSurfaceSet;              /**< FsSurface set. */

@@ -17,12 +17,11 @@
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_evoked_set.h>
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 
 using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
 using namespace MNELIB;
-using namespace FWDLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
 
@@ -167,7 +166,7 @@ private slots:
     void rtInvOp_construct()
     {
         FiffInfo::SPtr info = createSyntheticFiffInfo(10, 1000.0f);
-        QSharedPointer<FwdForwardSolution> fwd(new FwdForwardSolution());
+        QSharedPointer<MNEForwardSolution> fwd(new MNEForwardSolution());
 
         RtInvOp invOp(info, fwd);
         QVERIFY(true);
@@ -176,7 +175,7 @@ private slots:
     void rtInvOp_stop()
     {
         FiffInfo::SPtr info = createSyntheticFiffInfo(10, 1000.0f);
-        QSharedPointer<FwdForwardSolution> fwd(new FwdForwardSolution());
+        QSharedPointer<MNEForwardSolution> fwd(new MNEForwardSolution());
 
         RtInvOp invOp(info, fwd);
         invOp.stop();
@@ -186,8 +185,8 @@ private slots:
     void rtInvOp_setFwd()
     {
         FiffInfo::SPtr info = createSyntheticFiffInfo(10, 1000.0f);
-        QSharedPointer<FwdForwardSolution> fwd(new FwdForwardSolution());
-        QSharedPointer<FwdForwardSolution> fwd2(new FwdForwardSolution());
+        QSharedPointer<MNEForwardSolution> fwd(new MNEForwardSolution());
+        QSharedPointer<MNEForwardSolution> fwd2(new MNEForwardSolution());
 
         RtInvOp invOp(info, fwd);
         invOp.setFwdSolution(fwd2);
@@ -255,13 +254,13 @@ private slots:
         QFile fwdFile(fwdPath), rawFile(rawPath);
         if (!fwdFile.exists() || !rawFile.exists()) QSKIP("Required files not found");
 
-        FwdForwardSolution fwdSol(fwdFile);
+        MNEForwardSolution fwdSol(fwdFile);
         FiffRawData raw(rawFile);
 
         if (fwdSol.isEmpty()) QSKIP("Forward solution empty");
 
         FiffInfo::SPtr info = FiffInfo::SPtr::create(raw.info);
-        QSharedPointer<FwdForwardSolution> fwd(new FwdForwardSolution(fwdSol));
+        QSharedPointer<MNEForwardSolution> fwd(new MNEForwardSolution(fwdSol));
 
         RtInvOp invOp(info, fwd);
         invOp.stop();

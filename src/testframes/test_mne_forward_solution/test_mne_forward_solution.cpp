@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     test_fwd_forward_solution.cpp
+ * @file     test_mne_forward_solution.cpp
  * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -43,7 +43,7 @@
 
 #include <fwd/compute_fwd/compute_fwd_settings.h>
 #include <fwd/compute_fwd/compute_fwd.h>
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 
 #include <memory>
 #include <mne/mne.h>
@@ -85,8 +85,8 @@ private slots:
     void cleanupTestCase();
 
 private:
-    QSharedPointer<FwdForwardSolution> m_pFwdMEGEEGRead;
-    QSharedPointer<FwdForwardSolution> m_pFwdMEGEEGRef;
+    QSharedPointer<MNEForwardSolution> m_pFwdMEGEEGRead;
+    QSharedPointer<MNEForwardSolution> m_pFwdMEGEEGRef;
 };
 
 //=============================================================================================================
@@ -112,7 +112,7 @@ void TestMneForwardSolution::computeForward()
     // Read reference forward solution
     QString fwdMEGEEGFileRef(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
     QFile fileFwdMEGEEGRef(fwdMEGEEGFileRef);
-    m_pFwdMEGEEGRef = QSharedPointer<FwdForwardSolution>(new FwdForwardSolution(fileFwdMEGEEGRef));
+    m_pFwdMEGEEGRef = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(fileFwdMEGEEGRef));
 
     //Following is equivalent to:
     //mne_forward_solution
@@ -158,7 +158,7 @@ void TestMneForwardSolution::computeForward()
 
     // Read newly created fwd
     QFile fileFwdMEGEEGRead(pSettingsMEGEEG->solname);
-    m_pFwdMEGEEGRead = QSharedPointer<FwdForwardSolution>(new FwdForwardSolution(fileFwdMEGEEGRead));
+    m_pFwdMEGEEGRead = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(fileFwdMEGEEGRead));
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute/Write/Read MEG/EEG Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 

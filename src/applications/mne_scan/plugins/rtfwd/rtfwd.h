@@ -77,8 +77,8 @@ namespace FWDLIB {
     class ComputeFwd;
 }
 
-namespace FWDLIB{
-    class FwdForwardSolution;
+namespace MNELIB {
+    class MNEForwardSolution;
 }
 
 namespace FSLIB{

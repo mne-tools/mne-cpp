@@ -41,7 +41,7 @@
 //=============================================================================================================
 
 #include "fwd_global.h"
-#include "fwd_forward_solution.h"
+#include <mne/mne_forward_solution.h>
 
 #include <fiff/fiff_constants.h>
 
@@ -80,7 +80,7 @@ public:
      *
      * ### MNE toolbox root function ###
      *
-     * Wrapper for the FwdForwardSolution::read static function
+     * Wrapper for the MNEForwardSolution::read static function
      *
      * Reads a forward solution from a fif file
      *
@@ -94,13 +94,13 @@ public:
      * @return true if succeeded, false otherwise.
      */
     static inline bool read_forward_solution(QIODevice& p_IODevice,
-                                             FwdForwardSolution& fwd,
+                                             MNELIB::MNEForwardSolution& fwd,
                                              bool force_fixed = false,
                                              bool surf_ori = false,
                                              const QStringList& include = FIFFLIB::defaultQStringList,
                                              const QStringList& exclude = FIFFLIB::defaultQStringList)
     {
-        return FwdForwardSolution::read(p_IODevice,
+        return MNELIB::MNEForwardSolution::read(p_IODevice,
                                         fwd,
                                         force_fixed,
                                         surf_ori,

@@ -52,7 +52,7 @@
 
 #include <mne/mne_source_spaces.h>
 #include <inverse/inv_source_estimate.h>
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -151,7 +151,7 @@ public:
      *
      * @param[in] fwdSolution   the forward solution to set.
      */
-    inline void setFwdSolution(FWDLIB::FwdForwardSolution::SPtr& fwdSolution);
+    inline void setFwdSolution(MNELIB::MNEForwardSolution::SPtr& fwdSolution);
 
     //=========================================================================================================
     /**
@@ -159,7 +159,7 @@ public:
      *
      * @return the forward solution.
      */
-    inline FWDLIB::FwdForwardSolution::SPtr& getFwdSolution();
+    inline MNELIB::MNEForwardSolution::SPtr& getFwdSolution();
 
     //=========================================================================================================
     /**
@@ -227,7 +227,7 @@ private:
 
     FSLIB::FsAnnotationSet::SPtr              m_pAnnotSet;            /**< FsAnnotation set. */
     FSLIB::FsSurfaceSet::SPtr                 m_pSurfSet;             /**< FsSurface set. */
-    FWDLIB::FwdForwardSolution::SPtr        m_pFwdSolution;         /**< Forward solution. */
+    MNELIB::MNEForwardSolution::SPtr        m_pFwdSolution;         /**< Forward solution. */
 
     qint32                                  m_iSourceEstimateSize;  /**< Sample size of the multi sample array.*/
 
@@ -286,7 +286,7 @@ inline FIFFLIB::FiffCoordTrans& RealTimeSourceEstimate::getMriHeadTrans()
 }
 //=============================================================================================================
 
-inline void RealTimeSourceEstimate::setFwdSolution(FWDLIB::FwdForwardSolution::SPtr& fwdSolution)
+inline void RealTimeSourceEstimate::setFwdSolution(MNELIB::MNEForwardSolution::SPtr& fwdSolution)
 {
     QMutexLocker locker(&m_qMutex);
     m_pFwdSolution = fwdSolution;
@@ -294,7 +294,7 @@ inline void RealTimeSourceEstimate::setFwdSolution(FWDLIB::FwdForwardSolution::S
 
 //=============================================================================================================
 
-inline FWDLIB::FwdForwardSolution::SPtr& RealTimeSourceEstimate::getFwdSolution()
+inline MNELIB::MNEForwardSolution::SPtr& RealTimeSourceEstimate::getFwdSolution()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFwdSolution;

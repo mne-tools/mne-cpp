@@ -3,7 +3,7 @@
 //
 // Covers: MNESourceSpace, MNESourceSpaces, InvSourceEstimate, MNEBem,
 //         MNECTFCompDataSet, InvInverseOperator, MNESurfaceOrVolume,
-//         MNEMshDisplaySurface, MNEMshDisplaySurfaceSet, FwdForwardSolution,
+//         MNEMshDisplaySurface, MNEMshDisplaySurfaceSet, MNEForwardSolution,
 //         MNENamedMatrix, MNEHemisphere, MNEEpochDataList, misc types
 //=============================================================================================================
 
@@ -34,7 +34,7 @@
 #include <inverse/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_source_space.h>
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
 #include <mne/mne_surface_or_volume.h>
@@ -146,7 +146,7 @@ private slots:
     void displaySurfSet_load();
     void displaySurfSet_addBem();
 
-    // ── FwdForwardSolution ──
+    // ── MNEForwardSolution ──
     void forwardSolution_pickTypes();
     void forwardSolution_clusterInfo();
     void forwardSolution_reduceForward();
@@ -191,7 +191,7 @@ private slots:
     void bemSurface_projectToSurface();
     void bemSurface_geometryInfo();
 
-    // ── FwdForwardSolution extras (from boost) ──
+    // ── MNEForwardSolution extras (from boost) ──
     void forwardSolution_tripletSelection();
     void forwardSolution_readVerify();
 
@@ -647,7 +647,7 @@ void TestMneLibrary::inverseOp_readFromFile()
     if (!QFile::exists(fwdPath())) QSKIP("Forward file not found");
 
     QFile fwdFile(fwdPath());
-    FwdForwardSolution fwd(fwdFile);
+    MNEForwardSolution fwd(fwdFile);
     QVERIFY(!fwd.isEmpty());
 
     InvInverseOperator invOp;
@@ -872,7 +872,7 @@ void TestMneLibrary::displaySurfSet_addBem()
 }
 
 //=============================================================================================================
-// FwdForwardSolution
+// MNEForwardSolution
 //=============================================================================================================
 
 void TestMneLibrary::forwardSolution_pickTypes()
@@ -881,16 +881,16 @@ void TestMneLibrary::forwardSolution_pickTypes()
     if (!QFile::exists(fwdPath())) QSKIP("Forward file not found");
 
     QFile fwdFile(fwdPath());
-    FwdForwardSolution fwd(fwdFile);
+    MNEForwardSolution fwd(fwdFile);
     if (fwd.isEmpty()) QSKIP("Could not read forward solution");
 
-    FwdForwardSolution fwdMeg = fwd.pick_types(true, false);
+    MNEForwardSolution fwdMeg = fwd.pick_types(true, false);
     QVERIFY(!fwdMeg.isEmpty());
-    FwdForwardSolution fwdEeg = fwd.pick_types(false, true);
+    MNEForwardSolution fwdEeg = fwd.pick_types(false, true);
     Q_UNUSED(fwdEeg);
 
     if (!fwd.isFixedOrient() && fwd.surf_ori) {
-        FwdForwardSolution fwdCopy(fwd);
+        MNEForwardSolution fwdCopy(fwd);
         fwdCopy.to_fixed_ori();
         QVERIFY(fwdCopy.isFixedOrient());
     }
@@ -909,11 +909,11 @@ void TestMneLibrary::forwardSolution_reduceForward()
     if (!QFile::exists(fwdPath())) QSKIP("Forward file not found");
 
     QFile fwdFile(fwdPath());
-    FwdForwardSolution fwd(fwdFile);
+    MNEForwardSolution fwd(fwdFile);
     if (fwd.isEmpty()) QSKIP("Could not read forward solution");
 
     MatrixXd D;
-    FwdForwardSolution reduced = fwd.reduce_forward_solution(100, D);
+    MNEForwardSolution reduced = fwd.reduce_forward_solution(100, D);
     QVERIFY(!reduced.isEmpty());
 }
 
@@ -923,7 +923,7 @@ void TestMneLibrary::forwardSolution_orientPrior()
     if (!QFile::exists(fwdPath())) QSKIP("Forward file not found");
 
     QFile fwdFile(fwdPath());
-    FwdForwardSolution fwd(fwdFile);
+    MNEForwardSolution fwd(fwdFile);
     if (fwd.isEmpty()) QSKIP("Could not read forward solution");
 
     FiffCov orient_prior = fwd.compute_orient_prior(0.2f);
@@ -939,7 +939,7 @@ void TestMneLibrary::forwardSolution_restrictGainMatrix()
     FiffRawData raw(rawFile);
 
     MatrixXd G = MatrixXd::Ones(raw.info.nchan, 30);
-    FwdForwardSolution::restrict_gain_matrix(G, raw.info);
+    MNEForwardSolution::restrict_gain_matrix(G, raw.info);
     QVERIFY(G.rows() > 0);
     QVERIFY(G.cols() == 30);
 }
@@ -951,7 +951,7 @@ void TestMneLibrary::forwardSolution_prepareForward()
         QSKIP("Required files not found");
 
     QFile fwdFile(fwdPath());
-    FwdForwardSolution fwd(fwdFile);
+    MNEForwardSolution fwd(fwdFile);
     if (fwd.isEmpty()) QSKIP("Could not read forward solution");
 
     QFile rawFile(rawPath());
@@ -977,10 +977,10 @@ void TestMneLibrary::forwardSolution_toFixedOri()
     if (!QFile::exists(fwdPath())) QSKIP("Forward file not found");
 
     QFile fwdFile(fwdPath());
-    FwdForwardSolution fwd(fwdFile);
+    MNEForwardSolution fwd(fwdFile);
     if (fwd.isEmpty()) QSKIP("Could not read forward solution");
 
-    FwdForwardSolution fwdMeg = fwd.pick_types(true, false);
+    MNEForwardSolution fwdMeg = fwd.pick_types(true, false);
     QVERIFY(!fwdMeg.isEmpty());
     int origCols = fwdMeg.sol->ncol;
     fwdMeg.to_fixed_ori();
@@ -993,7 +993,7 @@ void TestMneLibrary::forwardSolution_pickChannels()
     if (!QFile::exists(fwdPath())) QSKIP("Forward file not found");
 
     QFile fwdFile(fwdPath());
-    FwdForwardSolution fwd(fwdFile);
+    MNEForwardSolution fwd(fwdFile);
     if (fwd.isEmpty()) QSKIP("Could not read forward solution");
 
     QStringList include;
@@ -1001,7 +1001,7 @@ void TestMneLibrary::forwardSolution_pickChannels()
         for (int i = 0; i < 10; i++) include.append(fwd.sol->row_names[i]);
     }
     if (include.size() > 0) {
-        FwdForwardSolution fwdPicked = fwd.pick_channels(include);
+        MNEForwardSolution fwdPicked = fwd.pick_channels(include);
         QVERIFY(!fwdPicked.isEmpty());
     }
 }
@@ -1012,17 +1012,17 @@ void TestMneLibrary::forwardSolution_computeDepthPrior()
     if (!QFile::exists(fwdPath()) || !QFile::exists(rawPath())) QSKIP("Required files not found");
 
     QFile fwdFile(fwdPath());
-    FwdForwardSolution fwd(fwdFile);
+    MNEForwardSolution fwd(fwdFile);
     if (fwd.isEmpty()) QSKIP("Could not read forward solution");
 
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
 
-    FwdForwardSolution fwdMeg = fwd.pick_types(true, false);
+    MNEForwardSolution fwdMeg = fwd.pick_types(true, false);
     if (fwdMeg.isEmpty()) QSKIP("No MEG forward");
 
     Eigen::MatrixXd Gain = fwdMeg.sol->data.cast<double>();
-    FiffCov depth_prior = FwdForwardSolution::compute_depth_prior(
+    FiffCov depth_prior = MNEForwardSolution::compute_depth_prior(
         Gain, raw.info, fwdMeg.isFixedOrient(), 0.8, 10.0);
     QVERIFY(depth_prior.data.rows() > 0);
 }
@@ -1032,19 +1032,19 @@ void TestMneLibrary::forwardSolution_pickRegions()
     if (!hasData()) QSKIP("No test data");
 
     QFile fwdFile(fwdPath());
-    FwdForwardSolution fwd(fwdFile);
+    MNEForwardSolution fwd(fwdFile);
     QVERIFY(!fwd.isEmpty());
 
-    FwdForwardSolution fwdMeg = fwd.pick_types(true, false);
+    MNEForwardSolution fwdMeg = fwd.pick_types(true, false);
     QVERIFY(!fwdMeg.isEmpty());
-    FwdForwardSolution fwdEeg = fwd.pick_types(false, true);
+    MNEForwardSolution fwdEeg = fwd.pick_types(false, true);
     QVERIFY(!fwdEeg.isEmpty());
-    FwdForwardSolution fwdBoth = fwd.pick_types(true, true);
+    MNEForwardSolution fwdBoth = fwd.pick_types(true, true);
     QVERIFY(!fwdBoth.isEmpty());
 
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
-    FiffCov depthPrior = FwdForwardSolution::compute_depth_prior(
+    FiffCov depthPrior = MNEForwardSolution::compute_depth_prior(
         fwd.sol->data, raw.info, (fwd.source_ori == FIFFV_MNE_FIXED_ORI));
     QVERIFY(depthPrior.data.rows() > 0);
 
@@ -1078,7 +1078,7 @@ void TestMneLibrary::namedMatrix_readFromStream()
     if (!QFile::exists(fwdPath())) QSKIP("Forward file not found");
 
     QFile fwdFile(fwdPath());
-    FwdForwardSolution fwd(fwdFile);
+    MNEForwardSolution fwd(fwdFile);
     if (fwd.isEmpty()) QSKIP("Could not read forward solution");
 
     QVERIFY(fwd.sol->data.rows() > 0);
@@ -1364,14 +1364,14 @@ void TestMneLibrary::bemSurface_geometryInfo()
 }
 
 //=============================================================================================================
-// FwdForwardSolution extras (from boost)
+// MNEForwardSolution extras (from boost)
 //=============================================================================================================
 
 void TestMneLibrary::forwardSolution_tripletSelection()
 {
     if (!hasData()) QSKIP("No test data");
     QFile fwdFile(fwdPath());
-    FwdForwardSolution fwd(fwdFile);
+    MNEForwardSolution fwd(fwdFile);
     QVERIFY(!fwd.isEmpty());
     VectorXi sel(10);
     for (int i = 0; i < 10; ++i) sel(i) = i;
@@ -1385,7 +1385,7 @@ void TestMneLibrary::forwardSolution_readVerify()
 {
     if (!hasData()) QSKIP("No test data");
     QFile fwdFile(fwdPath());
-    FwdForwardSolution fwd(fwdFile);
+    MNEForwardSolution fwd(fwdFile);
     QVERIFY(!fwd.isEmpty());
     QVERIFY(fwd.sol->nrow > 0);
     QVERIFY(fwd.sol->ncol > 0);

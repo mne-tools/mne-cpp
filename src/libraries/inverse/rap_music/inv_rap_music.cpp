@@ -57,7 +57,6 @@
 
 using namespace INVLIB;
 using namespace MNELIB;
-using namespace FWDLIB;
 using namespace FIFFLIB;
 using namespace UTILSLIB;
 
@@ -81,7 +80,7 @@ InvRapMusic::InvRapMusic()
 
 //=============================================================================================================
 
-InvRapMusic::InvRapMusic(FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
+InvRapMusic::InvRapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
 : m_iN(0)
 , m_dThreshold(0)
 , m_iNumGridPoints(0)
@@ -107,7 +106,7 @@ InvRapMusic::~InvRapMusic()
 
 //=============================================================================================================
 
-bool InvRapMusic::init(FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
+bool InvRapMusic::init(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
 {
     //Get available thread number
     #ifdef _OPENMP

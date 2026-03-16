@@ -41,7 +41,7 @@
 
 #include <fiff/fiff_info.h>
 
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 #include <inverse/inv_inverse_operator.h>
 
 //=============================================================================================================
@@ -63,7 +63,6 @@
 using namespace RTPROCESSINGLIB;
 using namespace Eigen;
 using namespace MNELIB;
-using namespace FWDLIB;
 using namespace INVLIB;
 using namespace FIFFLIB;
 
@@ -78,7 +77,7 @@ void RtInvOpWorker::doWork(const RtInvOpInput &inputData)
     }
 
     // Restrict forward solution as necessary for MEG
-    FwdForwardSolution forwardMeg = inputData.pFwd->pick_types(true, false);
+    MNEForwardSolution forwardMeg = inputData.pFwd->pick_types(true, false);
 
     InvInverseOperator invOpMeg(*inputData.pFiffInfo.data(),
                                 forwardMeg,
@@ -94,7 +93,7 @@ void RtInvOpWorker::doWork(const RtInvOpInput &inputData)
 //=============================================================================================================
 
 RtInvOp::RtInvOp(FiffInfo::SPtr &p_pFiffInfo,
-                 FwdForwardSolution::SPtr &p_pFwd,
+                 MNEForwardSolution::SPtr &p_pFwd,
                  QObject *parent)
 : QObject(parent)
 , m_pFiffInfo(p_pFiffInfo)
@@ -138,7 +137,7 @@ void RtInvOp::append(const FIFFLIB::FiffCov &noiseCov)
 
 //=============================================================================================================
 
-void RtInvOp::setFwdSolution(QSharedPointer<FWDLIB::FwdForwardSolution> pFwd)
+void RtInvOp::setFwdSolution(QSharedPointer<MNELIB::MNEForwardSolution> pFwd)
 {
     m_pFwd = pFwd;
 }

@@ -79,8 +79,8 @@ namespace FIFFLIB {
     class FiffNamedMatrix;
 }
 
-namespace FWDLIB {
-    class FwdForwardSolution;
+namespace MNELIB {
+    class MNEForwardSolution;
 }
 
 //=============================================================================================================
@@ -97,7 +97,7 @@ namespace FWDLIB
  * ComputeFwd is a worker/factory that takes ComputeFwdSettings, initialises
  * all required data structures (coil definitions, BEM model, source spaces, …)
  * and performs the actual forward calculation.  The computed
- * FwdForwardSolution is returned by calculateFwd() and updateHeadPos().
+ * MNEForwardSolution is returned by calculateFwd() and updateHeadPos().
  *
  * @brief Forward solution computation worker.
  */
@@ -125,7 +125,7 @@ public:
      *
      * @return The computed forward solution, or nullptr on error.
      */
-    std::unique_ptr<FwdForwardSolution> calculateFwd();
+    std::unique_ptr<MNELIB::MNEForwardSolution> calculateFwd();
 
     //=========================================================================================================
     /**
@@ -136,7 +136,7 @@ public:
      * @param[in,out] fwd        The forward solution to update in place.
      * @return True on success, false on error.
      */
-    bool updateHeadPos(const FIFFLIB::FiffCoordTrans& transDevHead, FwdForwardSolution& fwd);
+    bool updateHeadPos(const FIFFLIB::FiffCoordTrans& transDevHead, MNELIB::MNEForwardSolution& fwd);
 
 private:
     //=========================================================================================================
@@ -152,7 +152,7 @@ private:
      * Populate metadata fields of a forward solution from the current
      * computation state (settings, source spaces, channel info, etc.).
      */
-    void populateMetadata(FwdForwardSolution& fwd);
+    void populateMetadata(MNELIB::MNEForwardSolution& fwd);
 
     //=========================================================================================================
     // Computation state

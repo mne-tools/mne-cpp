@@ -55,6 +55,7 @@ set(SOURCES
     mne_mgh_tag.cpp
     mne_mgh_tag_group.cpp
     mne_description_parser.cpp
+    mne_forward_solution.cpp
 )
 
 set(HEADERS
@@ -112,6 +113,7 @@ set(HEADERS
     mne_mgh_tag_group.h
     mne_process_description.h
     mne_description_parser.h
+    mne_forward_solution.h
 )
 
 set(FILE_TO_UPDATE mne_global.cpp)

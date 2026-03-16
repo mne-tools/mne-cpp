@@ -49,7 +49,6 @@
 
 using namespace SCMEASLIB;
 using namespace MNELIB;
-using namespace FWDLIB;
 using namespace INVLIB;
 using namespace FSLIB;
 
@@ -61,7 +60,7 @@ RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
 : Measurement(QMetaType::fromName("RealTimeSourceEstimate::SPtr").id(), parent)
 , m_pAnnotSet(FsAnnotationSet::SPtr(new FsAnnotationSet))
 , m_pSurfSet(FsSurfaceSet::SPtr(new FsSurfaceSet))
-, m_pFwdSolution(FwdForwardSolution::SPtr(new FwdForwardSolution))
+, m_pFwdSolution(MNEForwardSolution::SPtr(new MNEForwardSolution))
 , m_iSourceEstimateSize(1)
 , m_bInitialized(false)
 {

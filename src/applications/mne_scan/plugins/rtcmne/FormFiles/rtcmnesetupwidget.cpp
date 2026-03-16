@@ -45,7 +45,7 @@
 #include <fs/fs_surfaceset.h>
 #include <fiff/fiff_coord_trans.h>
 
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 
 #include <scMeas/realtimesourceestimate.h>
 

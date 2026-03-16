@@ -172,10 +172,10 @@ bool FiffIO::read(QIODevice& pIODevice)
 
 //    //forward solutions
 //    if(hasFwds) {
-//        FwdForwardSolution p_forwardSolution(pIODevice);
+//        MNEForwardSolution p_forwardSolution(pIODevice);
 
 //        //append to corresponding member qlist
-//        m_qlistFwd.append(QSharedPointer<FwdForwardSolution>(&p_forwardSolution));
+//        m_qlistFwd.append(QSharedPointer<MNEForwardSolution>(&p_forwardSolution));
 //    }
 
     //print summary

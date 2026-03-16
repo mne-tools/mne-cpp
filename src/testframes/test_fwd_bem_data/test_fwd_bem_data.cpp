@@ -28,7 +28,7 @@
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_info.h>
 
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
@@ -161,7 +161,7 @@ private slots:
         QFile file(path);
         if (!file.exists()) QSKIP("Forward solution file not found");
 
-        FwdForwardSolution fwd(file);
+        MNEForwardSolution fwd(file);
         QVERIFY(!fwd.isEmpty());
         QVERIFY(fwd.nchan > 0);
         QVERIFY(fwd.nsource > 0);
@@ -191,7 +191,7 @@ private slots:
         QFile file(path);
         if (!file.exists()) QSKIP("Forward solution not found");
 
-        FwdForwardSolution fwd(file);
+        MNEForwardSolution fwd(file);
         if (fwd.isEmpty()) QSKIP("Fwd load failed");
 
         // Pick MEG channels
@@ -201,7 +201,7 @@ private slots:
         QStringList megNames;
         for (int i = 0; i < megIdx.size(); ++i)
             megNames << fwd.info.ch_names[megIdx(i)];
-        FwdForwardSolution fwdMeg = fwd.pick_channels(megNames);
+        MNEForwardSolution fwdMeg = fwd.pick_channels(megNames);
         QCOMPARE(fwdMeg.nchan, (int)megIdx.size());
         QCOMPARE(fwdMeg.nsource, fwd.nsource); // sources unchanged
     }
@@ -217,7 +217,7 @@ private slots:
         QFile file(path);
         if (!file.exists()) QSKIP("Forward solution not found");
 
-        FwdForwardSolution fwd(file);
+        MNEForwardSolution fwd(file);
         if (fwd.isEmpty()) QSKIP("Fwd load failed");
 
         RowVectorXi eegIdx = fwd.info.pick_types(false, true, false);
@@ -226,7 +226,7 @@ private slots:
         QStringList eegNames;
         for (int i = 0; i < eegIdx.size(); ++i)
             eegNames << fwd.info.ch_names[eegIdx(i)];
-        FwdForwardSolution fwdEeg = fwd.pick_channels(eegNames);
+        MNEForwardSolution fwdEeg = fwd.pick_channels(eegNames);
         QCOMPARE(fwdEeg.nchan, (int)eegIdx.size());
     }
 
@@ -241,7 +241,7 @@ private slots:
         QFile file(path);
         if (!file.exists()) QSKIP("Forward solution not found");
 
-        FwdForwardSolution fwd(file);
+        MNEForwardSolution fwd(file);
         if (fwd.isEmpty()) QSKIP("Fwd load failed");
 
         FiffCov orientPrior = fwd.compute_orient_prior(0.2);
@@ -261,7 +261,7 @@ private slots:
         QFile rawFile(rawPath);
         if (!fwdFile.exists() || !rawFile.exists()) QSKIP("Files not found");
 
-        FwdForwardSolution fwd(fwdFile);
+        MNEForwardSolution fwd(fwdFile);
         if (fwd.isEmpty()) QSKIP("Fwd load failed");
 
         FiffRawData raw(rawFile);

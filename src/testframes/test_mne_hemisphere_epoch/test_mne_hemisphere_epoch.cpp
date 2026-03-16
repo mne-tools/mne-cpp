@@ -6,7 +6,7 @@
 #include <utils/generics/applicationlogger.h>
 
 #include <mne/mne_hemisphere.h>
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 #include <inverse/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_bem.h>
@@ -29,7 +29,6 @@
 #include <fiff/fiff_coord_trans.h>
 
 using namespace MNELIB;
-using namespace FWDLIB;
 using namespace INVLIB;
 using namespace FIFFLIB;
 using namespace UTILSLIB;
@@ -260,11 +259,11 @@ private slots:
     }
 
     //=========================================================================
-    // FwdForwardSolution
+    // MNEForwardSolution
     //=========================================================================
     void fwdSol_defaultCtor()
     {
-        FwdForwardSolution fwd;
+        MNEForwardSolution fwd;
         QVERIFY(fwd.isEmpty());
         QVERIFY(!fwd.isFixedOrient());
     }
@@ -273,7 +272,7 @@ private slots:
     {
         VectorXi sel(3);
         sel << 0, 2, 5;
-        FwdForwardSolution fwd;
+        MNEForwardSolution fwd;
         VectorXi result = fwd.tripletSelection(sel);
         // Expect {0,1,2, 6,7,8, 15,16,17}
         QCOMPARE(result.size(), (Eigen::Index)9);
@@ -290,7 +289,7 @@ private slots:
 
     void fwdSol_isEmpty()
     {
-        FwdForwardSolution fwd;
+        MNEForwardSolution fwd;
         QVERIFY(fwd.isEmpty());
         fwd.nchan = 5;
         QVERIFY(!fwd.isEmpty());
@@ -298,7 +297,7 @@ private slots:
 
     void fwdSol_clear()
     {
-        FwdForwardSolution fwd;
+        MNEForwardSolution fwd;
         fwd.nchan = 10;
         fwd.clear();
         QVERIFY(fwd.isEmpty());
@@ -503,11 +502,11 @@ private slots:
     }
 
     //=========================================================================
-    // FwdForwardSolution::compute_orient_prior
+    // MNEForwardSolution::compute_orient_prior
     //=========================================================================
     void fwdSol_computeOrientPrior()
     {
-        FwdForwardSolution fwd;
+        MNEForwardSolution fwd;
         fwd.nchan = 10;
         fwd.surf_ori = true;
         fwd.source_ori = FIFFV_MNE_FREE_ORI;
@@ -641,7 +640,7 @@ private slots:
     }
 
     //=========================================================================
-    // DATA-DRIVEN: FwdForwardSolution from real file
+    // DATA-DRIVEN: MNEForwardSolution from real file
     //=========================================================================
     void data_fwdSol_readFromFile()
     {
@@ -650,7 +649,7 @@ private slots:
         QFile file(path);
         if (!file.exists()) QSKIP("Forward solution not found");
 
-        FwdForwardSolution fwd(file);
+        MNEForwardSolution fwd(file);
         QVERIFY(!fwd.isEmpty());
         QVERIFY(fwd.nchan > 0);
         QVERIFY(fwd.nsource > 0);
@@ -665,14 +664,14 @@ private slots:
         QFile file(path);
         if (!file.exists()) QSKIP("Forward solution not found");
 
-        FwdForwardSolution fwd(file);
+        MNEForwardSolution fwd(file);
         if (!fwd.isEmpty() && fwd.info.nchan > 0) {
             RowVectorXi megIdx = fwd.info.pick_types(true, false, false);
             if (megIdx.size() > 0) {
                 QStringList megNames;
                 for (int i = 0; i < megIdx.size(); ++i)
                     megNames << fwd.info.ch_names[megIdx(i)];
-                FwdForwardSolution fwdMeg = fwd.pick_channels(megNames);
+                MNEForwardSolution fwdMeg = fwd.pick_channels(megNames);
                 QCOMPARE(fwdMeg.nchan, (int)megIdx.size());
             }
         }
@@ -685,7 +684,7 @@ private slots:
         QFile file(path);
         if (!file.exists()) QSKIP("Forward solution not found");
 
-        FwdForwardSolution fwd(file);
+        MNEForwardSolution fwd(file);
         if (!fwd.isEmpty()) {
             FiffCov orientPrior = fwd.compute_orient_prior(0.2);
             QVERIFY(orientPrior.data.rows() > 0);
@@ -859,7 +858,7 @@ private slots:
         if (!fwdFile.exists() || !covFile.exists() || !rawFile.exists())
             QSKIP("Required files not found");
 
-        FwdForwardSolution fwd(fwdFile);
+        MNEForwardSolution fwd(fwdFile);
         FiffCov noiseCov(covFile);
         FiffRawData raw(rawFile);
 
