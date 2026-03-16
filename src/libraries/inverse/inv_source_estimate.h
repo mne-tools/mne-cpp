@@ -43,8 +43,18 @@
 //=============================================================================================================
 
 #include "inv_global.h"
+#include "inv_types.h"
+#include "inv_focal_dipole.h"
+#include "inv_source_coupling.h"
+#include "inv_connectivity.h"
 
 #include <fs/fs_label.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -203,6 +213,63 @@ public:
     float tmin;                     /**< Time starting point. */
     float tstep;                    /**< Time steps within the times vector. */
 
+    // --- Metadata ---
+    InvEstimateMethod   method;         /**< The inverse method that produced this estimate. */
+    InvSourceSpaceType  sourceSpaceType;/**< Source space type (surface, volume, mixed, discrete). */
+    InvOrientationType  orientationType;/**< Orientation constraint used (fixed, free, loose). */
+
+    // --- Positions (for discrete source spaces: sEEG contacts, ECoG electrodes, custom ROIs) ---
+    Eigen::MatrixX3f    positions;      /**< 3D positions (m) in head coordinates, one row per source. Empty when positions live in an external source space. */
+
+    // --- Coupling layer (e.g. RAP-MUSIC correlated N-tuples on the grid) ---
+    std::vector<InvSourceCoupling> couplings;   /**< Correlated source groups overlaid on the grid. */
+
+    // --- Focal layer (e.g. ECD off-grid dipoles) ---
+    std::vector<InvFocalDipole>    focalDipoles; /**< Off-grid focal dipoles (ECD results). */
+
+    // --- Connectivity layer (pairwise source connectivity) ---
+    std::vector<InvConnectivity>   connectivity; /**< Pairwise connectivity matrices between sources (one per metric / freq band). */
+
+    //=========================================================================================================
+    /**
+     * Returns true if the estimate contains grid-based data (distributed methods or RAP-MUSIC amplitudes).
+     *
+     * @return true if grid data is present.
+     */
+    inline bool hasGridData() const;
+
+    //=========================================================================================================
+    /**
+     * Returns true if the estimate contains source coupling annotations (e.g. RAP-MUSIC pairs/N-tuples).
+     *
+     * @return true if couplings are present.
+     */
+    inline bool hasCouplings() const;
+
+    //=========================================================================================================
+    /**
+     * Returns true if the estimate contains focal (off-grid) dipole results.
+     *
+     * @return true if focal dipoles are present.
+     */
+    inline bool hasFocalDipoles() const;
+
+    //=========================================================================================================
+    /**
+     * Returns true if the estimate carries explicit source positions (discrete source space).
+     *
+     * @return true if positions are present.
+     */
+    inline bool hasPositions() const;
+
+    //=========================================================================================================
+    /**
+     * Returns true if the estimate contains connectivity results.
+     *
+     * @return true if connectivity data is present.
+     */
+    inline bool hasConnectivity() const;
+
 private:
     //=========================================================================================================
     /**
@@ -218,6 +285,41 @@ private:
 inline bool InvSourceEstimate::isEmpty() const
 {
     return tstep == -1;
+}
+
+//=============================================================================================================
+
+inline bool InvSourceEstimate::hasGridData() const
+{
+    return data.size() > 0;
+}
+
+//=============================================================================================================
+
+inline bool InvSourceEstimate::hasCouplings() const
+{
+    return !couplings.empty();
+}
+
+//=============================================================================================================
+
+inline bool InvSourceEstimate::hasFocalDipoles() const
+{
+    return !focalDipoles.empty();
+}
+
+//=============================================================================================================
+
+inline bool InvSourceEstimate::hasPositions() const
+{
+    return positions.rows() > 0;
+}
+
+//=============================================================================================================
+
+inline bool InvSourceEstimate::hasConnectivity() const
+{
+    return !connectivity.empty();
 }
 } //NAMESPACE
 

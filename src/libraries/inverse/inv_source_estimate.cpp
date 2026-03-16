@@ -64,6 +64,9 @@ using namespace Eigen;
 InvSourceEstimate::InvSourceEstimate()
 : tmin(0)
 , tstep(-1)
+, method(InvEstimateMethod::Unknown)
+, sourceSpaceType(InvSourceSpaceType::Unknown)
+, orientationType(InvOrientationType::Unknown)
 {
 }
 
@@ -74,6 +77,9 @@ InvSourceEstimate::InvSourceEstimate(const MatrixXd &p_sol, const VectorXi &p_ve
 , vertices(p_vertices)
 , tmin(p_tmin)
 , tstep(p_tstep)
+, method(InvEstimateMethod::Unknown)
+, sourceSpaceType(InvSourceSpaceType::Unknown)
+, orientationType(InvOrientationType::Unknown)
 {
     this->update_times();
 }
@@ -86,6 +92,13 @@ InvSourceEstimate::InvSourceEstimate(const InvSourceEstimate& p_SourceEstimate)
 , times(p_SourceEstimate.times)
 , tmin(p_SourceEstimate.tmin)
 , tstep(p_SourceEstimate.tstep)
+, method(p_SourceEstimate.method)
+, sourceSpaceType(p_SourceEstimate.sourceSpaceType)
+, orientationType(p_SourceEstimate.orientationType)
+, positions(p_SourceEstimate.positions)
+, couplings(p_SourceEstimate.couplings)
+, focalDipoles(p_SourceEstimate.focalDipoles)
+, connectivity(p_SourceEstimate.connectivity)
 {
 }
 
@@ -94,6 +107,9 @@ InvSourceEstimate::InvSourceEstimate(const InvSourceEstimate& p_SourceEstimate)
 InvSourceEstimate::InvSourceEstimate(QIODevice &p_IODevice)
 : tmin(0)
 , tstep(-1)
+, method(InvEstimateMethod::Unknown)
+, sourceSpaceType(InvSourceSpaceType::Unknown)
+, orientationType(InvOrientationType::Unknown)
 {
     if(!read(p_IODevice, *this))
     {
@@ -111,6 +127,13 @@ void InvSourceEstimate::clear()
     times = RowVectorXf();
     tmin = 0;
     tstep = 0;
+    method = InvEstimateMethod::Unknown;
+    sourceSpaceType = InvSourceSpaceType::Unknown;
+    orientationType = InvOrientationType::Unknown;
+    positions = MatrixX3f();
+    couplings.clear();
+    focalDipoles.clear();
+    connectivity.clear();
 }
 
 //=============================================================================================================
@@ -128,6 +151,13 @@ InvSourceEstimate InvSourceEstimate::reduce(qint32 start, qint32 n)
     p_sourceEstimateReduced.times = this->times.block(0,start,1,n);
     p_sourceEstimateReduced.tmin = p_sourceEstimateReduced.times(0);
     p_sourceEstimateReduced.tstep = this->tstep;
+    p_sourceEstimateReduced.method = this->method;
+    p_sourceEstimateReduced.sourceSpaceType = this->sourceSpaceType;
+    p_sourceEstimateReduced.orientationType = this->orientationType;
+    p_sourceEstimateReduced.positions = this->positions;
+    p_sourceEstimateReduced.couplings = this->couplings;
+    p_sourceEstimateReduced.focalDipoles = this->focalDipoles;
+    p_sourceEstimateReduced.connectivity = this->connectivity;
 
     return p_sourceEstimateReduced;
 }
@@ -262,6 +292,13 @@ InvSourceEstimate& InvSourceEstimate::operator= (const InvSourceEstimate &rhs)
         times = rhs.times;
         tmin = rhs.tmin;
         tstep = rhs.tstep;
+        method = rhs.method;
+        sourceSpaceType = rhs.sourceSpaceType;
+        orientationType = rhs.orientationType;
+        positions = rhs.positions;
+        couplings = rhs.couplings;
+        focalDipoles = rhs.focalDipoles;
+        connectivity = rhs.connectivity;
     }
     // to support chained assignment operators (a=b=c), always return *this
     return *this;
