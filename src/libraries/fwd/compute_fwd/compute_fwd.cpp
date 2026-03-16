@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "compute_fwd.h"
-#include "../fwd_forward_solution.h"
+#include <mne/mne_forward_solution.h>
 
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_info.h>
@@ -469,7 +469,7 @@ void ComputeFwd::initFwd()
 
 //=============================================================================================================
 
-void ComputeFwd::populateMetadata(FwdForwardSolution& fwd)
+void ComputeFwd::populateMetadata(MNEForwardSolution& fwd)
 {
     fwd.coord_frame  = m_pSettings->coord_frame;
     fwd.source_ori   = m_pSettings->fixed_ori ? FIFFV_MNE_FIXED_ORI : FIFFV_MNE_FREE_ORI;
@@ -529,9 +529,9 @@ void ComputeFwd::populateMetadata(FwdForwardSolution& fwd)
 
 //=============================================================================================================
 
-std::unique_ptr<FwdForwardSolution> ComputeFwd::calculateFwd()
+std::unique_ptr<MNEForwardSolution> ComputeFwd::calculateFwd()
 {
-    auto fwdSolution = std::make_unique<FwdForwardSolution>();
+    auto fwdSolution = std::make_unique<MNEForwardSolution>();
     populateMetadata(*fwdSolution);
     int iNMeg = 0;
     int iNEeg = 0;
@@ -629,7 +629,7 @@ std::unique_ptr<FwdForwardSolution> ComputeFwd::calculateFwd()
 
 //=============================================================================================================
 
-bool ComputeFwd::updateHeadPos(const FiffCoordTrans& transDevHead, FwdForwardSolution& fwd)
+bool ComputeFwd::updateHeadPos(const FiffCoordTrans& transDevHead, MNEForwardSolution& fwd)
 {
     int iNMeg = 0;
     if(m_megcoils) {

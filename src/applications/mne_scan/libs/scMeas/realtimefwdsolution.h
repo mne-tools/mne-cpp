@@ -42,7 +42,7 @@
 #include "scmeas_global.h"
 #include "measurement.h"
 
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -63,8 +63,8 @@ namespace FIFFLIB{
     class FiffInfo;
 }
 
-namespace FWDLIB{
-    class FwdForwardSolution;
+namespace MNELIB {
+    class MNEForwardSolution;
 }
 
 //=============================================================================================================
@@ -122,7 +122,7 @@ public:
      *
      * @param[in] fwdSolution     The forward solution which should be distributed.
      */
-    virtual void setValue(const FWDLIB::FwdForwardSolution::SPtr pFwdSolution);
+    virtual void setValue(const MNELIB::MNEForwardSolution::SPtr pFwdSolution);
 
     //=========================================================================================================
     /**
@@ -131,7 +131,7 @@ public:
      *
      * @return The last attached value.
      */
-    virtual QSharedPointer<FWDLIB::FwdForwardSolution> getValue();
+    virtual QSharedPointer<MNELIB::MNEForwardSolution> getValue();
 
     //=========================================================================================================
     /**
@@ -186,7 +186,7 @@ private:
     bool                    m_bInitialized;                                 /**< If values are stored.*/
     bool                    m_bClustered;                                   /**< If fwd is clustered.*/
 
-    QSharedPointer<FWDLIB::FwdForwardSolution>      m_pFwdSolution;         /**< The Mne Forward Solution. */
+    QSharedPointer<MNELIB::MNEForwardSolution>      m_pFwdSolution;         /**< The Mne Forward Solution. */
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;            /**< The Fiff Info. */
 
     QSharedDataPointer<FIFFLIB::FiffNamedMatrix>    m_pNamedMatSol;         /**< The solution matrix (LF). */

@@ -44,7 +44,7 @@
 
 #include "inv_global.h"
 #include <mne/mne_source_spaces.h>
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_named_matrix.h>
@@ -175,7 +175,7 @@ public:
      * @param[in] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels.
      */
     InvInverseOperator(const FIFFLIB::FiffInfo &info,
-                       const FWDLIB::FwdForwardSolution& forward,
+                       const MNELIB::MNEForwardSolution& forward,
                        const FIFFLIB::FiffCov& p_noise_cov,
                        float loose = 0.2f,
                        float depth = 0.8f,
@@ -285,7 +285,7 @@ public:
      * @return the assembled inverse operator.
      */
     static InvInverseOperator make_inverse_operator(const FIFFLIB::FiffInfo &info,
-                                                    FWDLIB::FwdForwardSolution forward,
+                                                    MNELIB::MNEForwardSolution forward,
                                                     const FIFFLIB::FiffCov& p_noise_cov,
                                                     float loose = 0.2f,
                                                     float depth = 0.8f,

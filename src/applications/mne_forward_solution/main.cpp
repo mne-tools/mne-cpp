@@ -38,7 +38,7 @@
 
 #include <fwd/compute_fwd/compute_fwd_settings.h>
 #include <fwd/compute_fwd/compute_fwd.h>
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 
 #include <memory>
 

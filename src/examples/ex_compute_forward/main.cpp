@@ -46,7 +46,7 @@
 #include <fwd/compute_fwd/compute_fwd_settings.h>
 #include <fwd/compute_fwd/compute_fwd.h>
 
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 
 #include <mne/mne.h>
 //=============================================================================================================
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
     // read back to verify round-trip
     timer3.start();
     QFile t_solution(pSettings->solname);
-    FwdForwardSolution::SPtr pFwdRead = FwdForwardSolution::SPtr(new FwdForwardSolution(t_solution));
+    MNEForwardSolution::SPtr pFwdRead = MNEForwardSolution::SPtr(new MNEForwardSolution(t_solution));
     fTime3 = timer3.elapsed();
 
     // update head position and recompute

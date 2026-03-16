@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     fwd_forward_solution.cpp
+ * @file     mne_forward_solution.cpp
  * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    FwdForwardSolution class definition.
+ * @brief    MNEForwardSolution class definition.
  *
  */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "fwd_forward_solution.h"
+#include "mne_forward_solution.h"
 
 #include <utils/ioutils.h>
 
@@ -56,8 +56,6 @@
 #include <unsupported/Eigen/KroneckerProduct>
 
 //=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
 
 #include <fs/fs_colortable.h>
 #include <fs/fs_label.h>
@@ -73,12 +71,11 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FWDLIB;
+using namespace MNELIB;
 using namespace UTILSLIB;
 using namespace FSLIB;
 using namespace Eigen;
 using namespace FIFFLIB;
-using namespace FWDLIB;
 
 //=============================================================================================================
 // CONSTANTS
@@ -95,7 +92,7 @@ constexpr int Z = 2;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FwdForwardSolution::FwdForwardSolution()
+MNEForwardSolution::MNEForwardSolution()
 : source_ori(-1)
 , surf_ori(false)
 , coord_frame(-1)
@@ -110,7 +107,7 @@ FwdForwardSolution::FwdForwardSolution()
 
 //=============================================================================================================
 
-FwdForwardSolution::FwdForwardSolution(QIODevice &p_IODevice, bool force_fixed, bool surf_ori, const QStringList& include, const QStringList& exclude, bool bExcludeBads)
+MNEForwardSolution::MNEForwardSolution(QIODevice &p_IODevice, bool force_fixed, bool surf_ori, const QStringList& include, const QStringList& exclude, bool bExcludeBads)
 : source_ori(-1)
 , surf_ori(surf_ori)
 , coord_frame(-1)
@@ -130,27 +127,27 @@ FwdForwardSolution::FwdForwardSolution(QIODevice &p_IODevice, bool force_fixed, 
 
 //=============================================================================================================
 
-FwdForwardSolution::FwdForwardSolution(const FwdForwardSolution &p_FwdForwardSolution)
-: info(p_FwdForwardSolution.info)
-, source_ori(p_FwdForwardSolution.source_ori)
-, surf_ori(p_FwdForwardSolution.surf_ori)
-, coord_frame(p_FwdForwardSolution.coord_frame)
-, nsource(p_FwdForwardSolution.nsource)
-, nchan(p_FwdForwardSolution.nchan)
-, sol(p_FwdForwardSolution.sol)
-, sol_grad(p_FwdForwardSolution.sol_grad)
-, mri_head_t(p_FwdForwardSolution.mri_head_t)
-, mri_filename(p_FwdForwardSolution.mri_filename)
-, mri_id(p_FwdForwardSolution.mri_id)
-, src(p_FwdForwardSolution.src)
-, source_rr(p_FwdForwardSolution.source_rr)
-, source_nn(p_FwdForwardSolution.source_nn)
+MNEForwardSolution::MNEForwardSolution(const MNEForwardSolution &p_MNEForwardSolution)
+: info(p_MNEForwardSolution.info)
+, source_ori(p_MNEForwardSolution.source_ori)
+, surf_ori(p_MNEForwardSolution.surf_ori)
+, coord_frame(p_MNEForwardSolution.coord_frame)
+, nsource(p_MNEForwardSolution.nsource)
+, nchan(p_MNEForwardSolution.nchan)
+, sol(p_MNEForwardSolution.sol)
+, sol_grad(p_MNEForwardSolution.sol_grad)
+, mri_head_t(p_MNEForwardSolution.mri_head_t)
+, mri_filename(p_MNEForwardSolution.mri_filename)
+, mri_id(p_MNEForwardSolution.mri_id)
+, src(p_MNEForwardSolution.src)
+, source_rr(p_MNEForwardSolution.source_rr)
+, source_nn(p_MNEForwardSolution.source_nn)
 {
 }
 
 //=============================================================================================================
 
-FwdForwardSolution& FwdForwardSolution::operator=(const FwdForwardSolution &other)
+MNEForwardSolution& MNEForwardSolution::operator=(const MNEForwardSolution &other)
 {
     if (this != &other) {
         info = other.info;
@@ -173,13 +170,13 @@ FwdForwardSolution& FwdForwardSolution::operator=(const FwdForwardSolution &othe
 
 //=============================================================================================================
 
-FwdForwardSolution::~FwdForwardSolution()
+MNEForwardSolution::~MNEForwardSolution()
 {
 }
 
 //=============================================================================================================
 
-void FwdForwardSolution::clear()
+void MNEForwardSolution::clear()
 {
     info.clear();
     source_ori = -1;
@@ -199,7 +196,7 @@ void FwdForwardSolution::clear()
 
 //=============================================================================================================
 
-bool FwdForwardSolution::write(QIODevice& p_IODevice) const
+bool MNEForwardSolution::write(QIODevice& p_IODevice) const
 {
     //
     //   Classify channels into MEG and EEG index sets
@@ -390,7 +387,7 @@ bool FwdForwardSolution::write(QIODevice& p_IODevice) const
 
 //=============================================================================================================
 
-FwdForwardSolution FwdForwardSolution::cluster_forward_solution(const FsAnnotationSet &p_AnnotationSet,
+MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotationSet &p_AnnotationSet,
                                                                 qint32 p_iClusterSize,
                                                                 MatrixXd& p_D,
                                                                 const FiffCov &p_pNoise_cov,
@@ -399,15 +396,15 @@ FwdForwardSolution FwdForwardSolution::cluster_forward_solution(const FsAnnotati
 {
     qInfo("Cluster forward solution using %s.", p_sMethod.toUtf8().constData());
 
-    FwdForwardSolution p_fwdOut = FwdForwardSolution(*this);
+    MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
 
     //Check if cov naming conventions are matching
     if(!IOUtils::check_matching_chnames_conventions(p_pNoise_cov.names, p_pInfo.ch_names) && !p_pNoise_cov.names.isEmpty() && !p_pInfo.ch_names.isEmpty()) {
         if(IOUtils::check_matching_chnames_conventions(p_pNoise_cov.names, p_pInfo.ch_names, true)) {
-            qWarning("FwdForwardSolution::cluster_forward_solution - Cov names do match with info channel names but have a different naming convention.");
+            qWarning("MNEForwardSolution::cluster_forward_solution - Cov names do match with info channel names but have a different naming convention.");
             //return p_fwdOut;
         } else {
-            qWarning("FwdForwardSolution::cluster_forward_solution - Cov channel names do not match with info channel names.");
+            qWarning("MNEForwardSolution::cluster_forward_solution - Cov channel names do not match with info channel names.");
             //return p_fwdOut;
         }
     }
@@ -738,9 +735,9 @@ FwdForwardSolution FwdForwardSolution::cluster_forward_solution(const FsAnnotati
 
 //=============================================================================================================
 
-FwdForwardSolution FwdForwardSolution::reduce_forward_solution(qint32 p_iNumDipoles, MatrixXd& p_D) const
+MNEForwardSolution MNEForwardSolution::reduce_forward_solution(qint32 p_iNumDipoles, MatrixXd& p_D) const
 {
-    FwdForwardSolution p_fwdOut = FwdForwardSolution(*this);
+    MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
 
     bool isFixed = p_fwdOut.isFixedOrient();
     qint32 np = isFixed ? p_fwdOut.sol->data.cols() : p_fwdOut.sol->data.cols()/3;
@@ -797,14 +794,14 @@ FwdForwardSolution FwdForwardSolution::reduce_forward_solution(qint32 p_iNumDipo
 
 //=============================================================================================================
 
-FiffCov FwdForwardSolution::compute_depth_prior(const MatrixXd &Gain, const FiffInfo &gain_info, bool is_fixed_ori, double exp, double limit, const MatrixXd &patch_areas, bool limit_depth_chs)
+FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const FiffInfo &gain_info, bool is_fixed_ori, double exp, double limit, const MatrixXd &patch_areas, bool limit_depth_chs)
 {
     qInfo("\tCreating the depth weighting matrix...");
 
     MatrixXd G(Gain);
     // If possible, pick best depth-weighting channels
     if(limit_depth_chs)
-        FwdForwardSolution::restrict_gain_matrix(G, gain_info);
+        MNEForwardSolution::restrict_gain_matrix(G, gain_info);
 
     VectorXd d;
     // Compute the gain matrix
@@ -904,7 +901,7 @@ FiffCov FwdForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
 
 //=============================================================================================================
 
-FiffCov FwdForwardSolution::compute_orient_prior(float loose)
+FiffCov MNEForwardSolution::compute_orient_prior(float loose)
 {
     bool is_fixed_ori = this->isFixedOrient();
     qint32 n_sources = this->sol->data.cols();
@@ -953,10 +950,10 @@ FiffCov FwdForwardSolution::compute_orient_prior(float loose)
 
 //=============================================================================================================
 
-FwdForwardSolution FwdForwardSolution::pick_channels(const QStringList& include,
+MNEForwardSolution MNEForwardSolution::pick_channels(const QStringList& include,
                                                      const QStringList& exclude) const
 {
-    FwdForwardSolution fwd(*this);
+    MNEForwardSolution fwd(*this);
 
     if(include.size() == 0 && exclude.size() == 0)
         return fwd;
@@ -1017,7 +1014,7 @@ FwdForwardSolution FwdForwardSolution::pick_channels(const QStringList& include,
 
 //=============================================================================================================
 
-FwdForwardSolution FwdForwardSolution::pick_regions(const QList<FsLabel> &p_qListLabels) const
+MNEForwardSolution MNEForwardSolution::pick_regions(const QList<FsLabel> &p_qListLabels) const
 {
     VectorXi selVertices;
 
@@ -1034,7 +1031,7 @@ FwdForwardSolution FwdForwardSolution::pick_regions(const QList<FsLabel> &p_qLis
 
     MNEMath::sort(selVertices, false);
 
-    FwdForwardSolution selectedFwd(*this);
+    MNEForwardSolution selectedFwd(*this);
 
     MatrixX3f rr(selVertices.size(),3);
     MatrixX3f nn(selVertices.size(),3);
@@ -1067,7 +1064,7 @@ FwdForwardSolution FwdForwardSolution::pick_regions(const QList<FsLabel> &p_qLis
 
 //=============================================================================================================
 
-FwdForwardSolution FwdForwardSolution::pick_types(bool meg, bool eeg, const QStringList& include, const QStringList& exclude) const
+MNEForwardSolution MNEForwardSolution::pick_types(bool meg, bool eeg, const QStringList& include, const QStringList& exclude) const
 {
     RowVectorXi sel = info.pick_types(meg, eeg, false, include, exclude);
 
@@ -1080,7 +1077,7 @@ FwdForwardSolution FwdForwardSolution::pick_types(bool meg, bool eeg, const QStr
 
 //=============================================================================================================
 
-void FwdForwardSolution::prepare_forward(const FiffInfo &p_info,
+void MNEForwardSolution::prepare_forward(const FiffInfo &p_info,
                                          const FiffCov &p_noise_cov,
                                          bool p_pca,
                                          FiffInfo &p_outFwdInfo,
@@ -1127,7 +1124,7 @@ void FwdForwardSolution::prepare_forward(const FiffInfo &p_info,
     {
         if (p_pca)
         {
-            qWarning("Warning in FwdForwardSolution::prepare_forward: if (p_pca) havent been debugged.");
+            qWarning("Warning in MNEForwardSolution::prepare_forward: if (p_pca) havent been debugged.");
             p_outWhitener = MatrixXd::Zero(n_chan, p_outNumNonZero);
             // Rows of eigvec are the eigenvectors
             for(qint32 i = 0; i < p_outNumNonZero; ++i)
@@ -1179,8 +1176,8 @@ void FwdForwardSolution::prepare_forward(const FiffInfo &p_info,
 
 //=============================================================================================================
 
-bool FwdForwardSolution::read(QIODevice& p_IODevice,
-                              FwdForwardSolution& fwd,
+bool MNEForwardSolution::read(QIODevice& p_IODevice,
+                              MNEForwardSolution& fwd,
                               bool force_fixed,
                               bool surf_ori,
                               const QStringList& include,
@@ -1268,7 +1265,7 @@ bool FwdForwardSolution::read(QIODevice& p_IODevice,
         }
     }
 
-    FwdForwardSolution megfwd;
+    MNEForwardSolution megfwd;
     QString ori;
     if (read_one(t_pStream, megnode, megfwd))
     {
@@ -1278,7 +1275,7 @@ bool FwdForwardSolution::read(QIODevice& p_IODevice,
             ori = QString("free");
         qInfo("\tRead MEG forward solution (%d sources, %d channels, %s orientations)", megfwd.nsource,megfwd.nchan,ori.toUtf8().constData());
     }
-    FwdForwardSolution eegfwd;
+    MNEForwardSolution eegfwd;
     if (read_one(t_pStream, eegnode, eegfwd))
     {
         if (eegfwd.source_ori == FIFFV_MNE_FIXED_ORI)
@@ -1305,7 +1302,7 @@ bool FwdForwardSolution::read(QIODevice& p_IODevice,
             return false;
         }
 
-        fwd = std::move(FwdForwardSolution(megfwd));
+        fwd = std::move(MNEForwardSolution(megfwd));
         fwd.sol->data = MatrixXd(megfwd.sol->nrow + eegfwd.sol->nrow, megfwd.sol->ncol);
 
         fwd.sol->data.block(0,0,megfwd.sol->nrow,megfwd.sol->ncol) = megfwd.sol->data;
@@ -1554,9 +1551,9 @@ bool FwdForwardSolution::read(QIODevice& p_IODevice,
 
 //=============================================================================================================
 
-bool FwdForwardSolution::read_one(FiffStream::SPtr& p_pStream,
+bool MNEForwardSolution::read_one(FiffStream::SPtr& p_pStream,
                                   const FiffDirNode::SPtr& p_Node,
-                                  FwdForwardSolution& one)
+                                  MNEForwardSolution& one)
 {
     //
     //   Read all interesting stuff for one forward solution
@@ -1641,7 +1638,7 @@ bool FwdForwardSolution::read_one(FiffStream::SPtr& p_pStream,
 
 //=============================================================================================================
 
-void FwdForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
+void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
 {
     // Figure out which ones have been used
     if(info.chs.size() != G.rows())
@@ -1686,7 +1683,7 @@ void FwdForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
 
 //=============================================================================================================
 
-void FwdForwardSolution::to_fixed_ori()
+void MNEForwardSolution::to_fixed_ori()
 {
     if(!this->surf_ori || this->isFixedOrient())
     {
@@ -1704,7 +1701,7 @@ void FwdForwardSolution::to_fixed_ori()
 
 //=============================================================================================================
 
-bool FwdForwardSolution::isClustered() const
+bool MNEForwardSolution::isClustered() const
 {
     auto* hemi = src.hemisphereAt(0);
     return hemi && hemi->isClustered();
@@ -1712,17 +1709,17 @@ bool FwdForwardSolution::isClustered() const
 
 //=============================================================================================================
 
-MatrixX3f FwdForwardSolution::getSourcePositionsByLabel(const QList<FsLabel> &lPickedLabels, const FsSurfaceSet& tSurfSetInflated)
+MatrixX3f MNEForwardSolution::getSourcePositionsByLabel(const QList<FsLabel> &lPickedLabels, const FsSurfaceSet& tSurfSetInflated)
 {
     MatrixX3f matSourceVertLeft, matSourceVertRight, matSourcePositions;
 
     if(lPickedLabels.isEmpty()) {
-        qWarning() << "FwdForwardSolution::getSourcePositionsByLabel - picked label list is empty. Returning.";
+        qWarning() << "MNEForwardSolution::getSourcePositionsByLabel - picked label list is empty. Returning.";
         return  matSourcePositions;
     }
 
     if(tSurfSetInflated.isEmpty()) {
-        qWarning() << "FwdForwardSolution::getSourcePositionsByLabel - tSurfSetInflated is empty. Returning.";
+        qWarning() << "MNEForwardSolution::getSourcePositionsByLabel - tSurfSetInflated is empty. Returning.";
         return  matSourcePositions;
     }
 

@@ -55,7 +55,6 @@
 
 using namespace INVLIB;
 using namespace MNELIB;
-using namespace FWDLIB;
 using namespace FIFFLIB;
 
 //=============================================================================================================
@@ -69,7 +68,7 @@ InvPwlRapMusic::InvPwlRapMusic()
 
 //=============================================================================================================
 
-InvPwlRapMusic::InvPwlRapMusic(FwdForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
+InvPwlRapMusic::InvPwlRapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
 : InvRapMusic(p_pFwd, p_bSparsed, p_iN, p_dThr)
 {
     //Init

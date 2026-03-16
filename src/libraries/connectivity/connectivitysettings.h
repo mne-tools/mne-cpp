@@ -60,8 +60,8 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FWDLIB {
-    class FwdForwardSolution;
+namespace MNELIB {
+    class MNEForwardSolution;
 }
 
 namespace FSLIB {
@@ -166,7 +166,7 @@ public:
     void setNodePositions(const FIFFLIB::FiffInfo& fiffInfo,
                           const Eigen::RowVectorXi& picks);
 
-    void setNodePositions(const FWDLIB::FwdForwardSolution& forwardSolution,
+    void setNodePositions(const MNELIB::MNEForwardSolution& forwardSolution,
                           const FSLIB::FsSurfaceSet& surfSet);
 
     void setNodePositions(const Eigen::MatrixX3f& matNodePositions);

@@ -53,7 +53,7 @@
 
 #include <mne/mne.h>
 #include <inverse/inv_inverse_operator.h>
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 #include <inverse/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 
@@ -90,7 +90,6 @@
 using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
-using namespace FWDLIB;
 using namespace INVLIB;
 using namespace FSLIB;
 using namespace UTILSLIB;
@@ -432,7 +431,7 @@ static bool writeDipFile(const QString &fileName,
  * @return true on success.
  */
 static bool writePredictedData(const QString &fileName,
-                               const FwdForwardSolution &forward,
+                               const MNEForwardSolution &forward,
                                const MatrixXd &stcData,
                                const VectorXd &timesVec)
 {
@@ -858,7 +857,7 @@ int main(int argc, char *argv[])
         printf("  Source amplitude: %.1f nAm\n", fwdAmp * 1e9);
 
         QFile fwdFile(fwdName);
-        FwdForwardSolution fwd(fwdFile);
+        MNEForwardSolution fwd(fwdFile);
 
         if (!fwd.sol || fwd.sol->data.rows() == 0) {
             qCritical() << "Error: Could not read forward solution from" << fwdName;
@@ -1265,13 +1264,13 @@ int main(int argc, char *argv[])
         printf("\nComputing predicted sensor data...\n");
 
         // Read forward solution for prediction
-        FwdForwardSolution predFwd;
+        MNEForwardSolution predFwd;
         if (parser.isSet(predfwdOpt)) {
             QFile fwdFile(parser.value(predfwdOpt));
-            predFwd = FwdForwardSolution(fwdFile, false, true);
+            predFwd = MNEForwardSolution(fwdFile, false, true);
         } else if (useFwdAsData) {
             QFile fwdFile(parser.value(fwdOpt));
-            predFwd = FwdForwardSolution(fwdFile, false, true);
+            predFwd = MNEForwardSolution(fwdFile, false, true);
         } else {
             printf("  NOTE: --pred requires a forward solution.\n");
             printf("         Use --predfwd to specify one, or use --fwd mode.\n");

@@ -7,7 +7,7 @@
 #include <mne/mne_hemisphere.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 #include <inverse/inv_inverse_operator.h>
 #include <inverse/inv_source_estimate.h>
 #include <mne/mne_epoch_data.h>
@@ -25,7 +25,6 @@
 #include <fs/fs_label.h>
 
 using namespace MNELIB;
-using namespace FWDLIB;
 using namespace INVLIB;
 using namespace FIFFLIB;
 using namespace FSLIB;
@@ -216,7 +215,7 @@ private slots:
     }
 
     //=========================================================================
-    // FwdForwardSolution with real data
+    // MNEForwardSolution with real data
     //=========================================================================
     void fwd_readFromFile()
     {
@@ -226,7 +225,7 @@ private slots:
             QSKIP("Forward solution file not found");
         }
         QFile file(fwdPath);
-        FwdForwardSolution fwd(file);
+        MNEForwardSolution fwd(file);
         if (fwd.isEmpty()) {
             QSKIP("Failed to read forward solution");
         }
@@ -240,7 +239,7 @@ private slots:
         VectorXi triplets = fwd.tripletSelection(testSel);
         QCOMPARE(triplets.size(), 6);
 
-        FwdForwardSolution fwdMeg = fwd.pick_types(true, false);
+        MNEForwardSolution fwdMeg = fwd.pick_types(true, false);
         QVERIFY(fwdMeg.sol->data.rows() > 0);
     }
 
@@ -265,7 +264,7 @@ private slots:
         }
         info.bads.clear();
 
-        FwdForwardSolution::restrict_gain_matrix(gain, info);
+        MNEForwardSolution::restrict_gain_matrix(gain, info);
         QCOMPARE(gain.rows(), nSensors);
     }
 

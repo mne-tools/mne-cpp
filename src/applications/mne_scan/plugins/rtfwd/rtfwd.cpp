@@ -47,7 +47,7 @@
 
 #include <fs/fs_annotationset.h>
 
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 
 #include <scMeas/realtimehpiresult.h>
 #include <scMeas/realtimefwdsolution.h>
@@ -428,8 +428,8 @@ void RtFwd::run()
     emit statusInformationChanged(0);           // initializing
     std::shared_ptr<ComputeFwd> pFwdComputer = std::make_shared<ComputeFwd>(m_pFwdSettings);
 
-    FwdForwardSolution::SPtr pFwdSolution;
-    FwdForwardSolution::SPtr pClusteredFwd;
+    MNEForwardSolution::SPtr pFwdSolution;
+    MNEForwardSolution::SPtr pClusteredFwd;
 
     emit statusInformationChanged(4);           // not computed
 
@@ -525,7 +525,7 @@ void RtFwd::run()
 
         if(bDoClustering && bFwdReady && bNClusterChanged) {
             emit statusInformationChanged(3);               // clustering
-            pClusteredFwd = FwdForwardSolution::SPtr(new FwdForwardSolution(pFwdSolution->cluster_forward_solution(*m_pAnnotationSet.data(), m_pFwdSettings->ncluster)));
+            pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(pFwdSolution->cluster_forward_solution(*m_pAnnotationSet.data(), m_pFwdSettings->ncluster)));
             emit clusteringAvailable(pClusteredFwd->nsource);
 
             m_pRTFSOutput->measurementData()->setValue(pClusteredFwd);

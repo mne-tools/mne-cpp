@@ -37,7 +37,7 @@
 //=============================================================================================================
 
 #include "realtimefwdsolution.h"
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 #include <time.h>
 
 //=============================================================================================================
@@ -51,7 +51,6 @@
 using namespace SCMEASLIB;
 using namespace FIFFLIB;
 using namespace MNELIB;
-using namespace FWDLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -61,7 +60,7 @@ RealTimeFwdSolution::RealTimeFwdSolution(QObject *parent)
 : Measurement(QMetaType::fromName("RealTimeFwdSolution::SPtr").id(), parent)
 , m_bInitialized(false)
 , m_bClustered(false)
-, m_pFwdSolution(QSharedPointer<FwdForwardSolution>(new FwdForwardSolution))
+, m_pFwdSolution(QSharedPointer<MNEForwardSolution>(new MNEForwardSolution))
 {
 }
 
@@ -87,7 +86,7 @@ QSharedPointer<FiffInfo> RealTimeFwdSolution::getFiffInfo()
 
 //=============================================================================================================
 
-QSharedPointer<FwdForwardSolution> RealTimeFwdSolution::getValue()
+QSharedPointer<MNEForwardSolution> RealTimeFwdSolution::getValue()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFwdSolution;
@@ -95,7 +94,7 @@ QSharedPointer<FwdForwardSolution> RealTimeFwdSolution::getValue()
 
 //=============================================================================================================
 
-void RealTimeFwdSolution::setValue(const FwdForwardSolution::SPtr pFwdSolution)
+void RealTimeFwdSolution::setValue(const MNEForwardSolution::SPtr pFwdSolution)
 {
     m_qMutex.lock();
     m_pFwdSolution = pFwdSolution;

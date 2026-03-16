@@ -11,7 +11,7 @@
 #include <fwd/compute_fwd/compute_fwd_settings.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_constants.h>
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 
 using namespace FWDLIB;
 using namespace FIFFLIB;
@@ -246,7 +246,7 @@ private slots:
         }
         info.bads.clear();
 
-        FiffCov depthPrior = FwdForwardSolution::compute_depth_prior(gain, info, false);
+        FiffCov depthPrior = MNEForwardSolution::compute_depth_prior(gain, info, false);
         QVERIFY(depthPrior.dim > 0 || true);
     }
 };

@@ -84,7 +84,6 @@
 //=============================================================================================================
 
 using namespace MNELIB;
-using namespace FWDLIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVLIB;
@@ -502,7 +501,7 @@ int main(int argc, char *argv[])
     //
     // Load data
     //
-    FwdForwardSolution t_Fwd(t_fileFwd);
+    MNEForwardSolution t_Fwd(t_fileFwd);
     if(t_Fwd.isEmpty())
         return 1;
 

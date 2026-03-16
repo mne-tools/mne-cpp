@@ -42,7 +42,7 @@
 
 #include <fs/fs_surfaceset.h>
 #include <fs/fs_annotationset.h>
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 #include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
@@ -59,7 +59,6 @@
 //=============================================================================================================
 
 using namespace MNELIB;
-using namespace FWDLIB;
 using namespace MNELIB;
 using namespace UTILSLIB;
 using namespace FSLIB;
@@ -109,7 +108,7 @@ int main(int argc, char *argv[])
 
     //Load data
     QFile t_File(parser.value(fwdFileOption));
-    FwdForwardSolution t_forwardSolution(t_File);
+    MNEForwardSolution t_forwardSolution(t_File);
 
     BrainView *pBrainView = new BrainView();
     BrainTreeModel *pModel = new BrainTreeModel();

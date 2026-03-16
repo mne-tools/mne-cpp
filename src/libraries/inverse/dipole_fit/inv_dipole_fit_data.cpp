@@ -30,6 +30,7 @@ using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace FWDLIB;
+using namespace FWDLIB;
 using namespace INVLIB;
 using namespace INVLIB;
 

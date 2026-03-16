@@ -30,7 +30,7 @@
 #include <mne/mne.h>
 #include <inverse/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
 #include <mne/mne_hemisphere.h>
@@ -39,7 +39,6 @@
 
 using namespace FIFFLIB;
 using namespace MNELIB;
-using namespace FWDLIB;
 using namespace INVLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
@@ -245,7 +244,7 @@ private slots:
     }
 
     //=========================================================================
-    // FwdForwardSolution: read forward solution
+    // MNEForwardSolution: read forward solution
     //=========================================================================
     void fwdSolution_readFromFile()
     {
@@ -256,7 +255,7 @@ private slots:
         if (!file.exists()) QSKIP("Forward solution file not found");
 
         // Read forward solution
-        FwdForwardSolution fwd(file);
+        MNEForwardSolution fwd(file);
         QVERIFY(!fwd.isEmpty());
         QVERIFY(fwd.sol != nullptr || true);
         QVERIFY(fwd.source_nn.rows() > 0);
@@ -272,7 +271,7 @@ private slots:
         QFile file(path);
         if (!file.exists()) QSKIP("Forward solution file not found");
 
-        FwdForwardSolution fwd(file);
+        MNEForwardSolution fwd(file);
         if (!fwd.isEmpty()) {
             // Check embedded source space
             QVERIFY(fwd.src.size() > 0);
@@ -298,7 +297,7 @@ private slots:
         QFile file(path);
         if (!file.exists()) QSKIP("Forward solution file not found");
 
-        FwdForwardSolution fwd(file);
+        MNEForwardSolution fwd(file);
         if (!fwd.isEmpty() && fwd.info.nchan > 0) {
             // Pick MEG channels only
             RowVectorXi megPicks = fwd.info.pick_types(true, false, false);
@@ -306,7 +305,7 @@ private slots:
                 QStringList megNames;
                 for (int i = 0; i < megPicks.size(); ++i)
                     megNames << fwd.info.ch_names[megPicks(i)];
-                FwdForwardSolution fwdMeg = fwd.pick_channels(megNames);
+                MNEForwardSolution fwdMeg = fwd.pick_channels(megNames);
                 QCOMPARE(fwdMeg.nchan, (int)megPicks.size());
             }
         }
@@ -430,7 +429,7 @@ private slots:
     }
 
     //=========================================================================
-    // FwdForwardSolution: compute_orient_prior
+    // MNEForwardSolution: compute_orient_prior
     //=========================================================================
     void fwdSolution_computeOrientPrior()
     {
@@ -440,7 +439,7 @@ private slots:
         QFile file(path);
         if (!file.exists()) QSKIP("Forward solution file not found");
 
-        FwdForwardSolution fwd(file);
+        MNEForwardSolution fwd(file);
         if (!fwd.isEmpty()) {
             double loose = 0.2;
             FiffCov orientPrior = fwd.compute_orient_prior(loose);

@@ -59,7 +59,6 @@
 
 using namespace FIFFLIB;
 using namespace MNELIB;
-using namespace FWDLIB;
 using namespace INVLIB;
 using namespace UTILSLIB;
 
@@ -118,7 +117,7 @@ int main(int argc, char *argv[])
     if(evoked.isEmpty())
         return 1;
 
-    FwdForwardSolution t_forwardMeeg(t_fileFwdMeeg, false, true);
+    MNEForwardSolution t_forwardMeeg(t_fileFwdMeeg, false, true);
 
     FiffCov noise_cov(t_fileCov);
 
@@ -126,9 +125,9 @@ int main(int argc, char *argv[])
     noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
 
     // Restrict forward solution as necessary for MEG
-    FwdForwardSolution t_forwardMeg = t_forwardMeeg.pick_types(true, false);
+    MNEForwardSolution t_forwardMeg = t_forwardMeeg.pick_types(true, false);
     // Alternatively, you can just load a forward solution that is restricted
-    FwdForwardSolution t_forwardEeg(t_fileFwdEeg, false, true);
+    MNEForwardSolution t_forwardEeg(t_fileFwdEeg, false, true);
 
     // make an M/EEG, MEG-only, and EEG-only inverse operators
     FiffInfo info = evoked.info;

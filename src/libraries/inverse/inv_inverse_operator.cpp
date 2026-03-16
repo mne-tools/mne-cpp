@@ -63,7 +63,6 @@
 
 using namespace UTILSLIB;
 using namespace MNELIB;
-using namespace FWDLIB;
 using namespace INVLIB;
 using namespace FIFFLIB;
 using namespace FSLIB;
@@ -105,7 +104,7 @@ InvInverseOperator::InvInverseOperator(QIODevice& p_IODevice)
 //=============================================================================================================
 
 InvInverseOperator::InvInverseOperator(const FiffInfo &info,
-                                       const FwdForwardSolution& forward,
+                                       const MNEForwardSolution& forward,
                                        const FiffCov& p_noise_cov,
                                        float loose,
                                        float depth,
@@ -682,7 +681,7 @@ MatrixXd InvInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
 //=============================================================================================================
 
 InvInverseOperator InvInverseOperator::make_inverse_operator(const FiffInfo &info,
-                                                             FwdForwardSolution forward,
+                                                             MNEForwardSolution forward,
                                                              const FiffCov &p_noise_cov,
                                                              float loose,
                                                              float depth,
@@ -749,7 +748,7 @@ InvInverseOperator InvInverseOperator::make_inverse_operator(const FiffInfo &inf
     {
         std::cout << "ToDo: patch_areas" << std::endl;
 //        patch_areas = forward.get('patch_areas', None)
-        p_depth_prior = FiffCov::SDPtr(new FiffCov(FwdForwardSolution::compute_depth_prior(gain, gain_info, is_fixed_ori, depth, 10.0, patch_areas, limit_depth_chs)));
+        p_depth_prior = FiffCov::SDPtr(new FiffCov(MNEForwardSolution::compute_depth_prior(gain, gain_info, is_fixed_ori, depth, 10.0, patch_areas, limit_depth_chs)));
     }
     else
     {

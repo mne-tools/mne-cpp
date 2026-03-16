@@ -38,7 +38,7 @@
 
 #include "connectivitysettings.h"
 
-#include <fwd/fwd_forward_solution.h>
+#include <mne/mne_forward_solution.h>
 #include <fs/fs_surfaceset.h>
 #include <fiff/fiff_info.h>
 
@@ -60,7 +60,6 @@
 
 using namespace CONNECTIVITYLIB;
 using namespace MNELIB;
-using namespace FWDLIB;
 using namespace Eigen;
 using namespace FIFFLIB;
 using namespace FSLIB;
@@ -359,7 +358,7 @@ void ConnectivitySettings::setNodePositions(const FiffInfo& fiffInfo,
 
 //*******************************************************************************************************
 
-void ConnectivitySettings::setNodePositions(const FwdForwardSolution& forwardSolution, const FsSurfaceSet& surfSet)
+void ConnectivitySettings::setNodePositions(const MNEForwardSolution& forwardSolution, const FsSurfaceSet& surfSet)
 {
     //Generate node vertices
     MatrixX3f matNodeVertLeft, matNodeVertRight;
