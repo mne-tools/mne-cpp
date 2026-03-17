@@ -329,7 +329,7 @@ int main(int argc, char *argv[])
             t_clusteredFwd = t_Fwd;
         }
 
-        InvInverseOperator inverse_operator(raw.info,
+        MNEInverseOperator inverse_operator(raw.info,
                                             t_clusteredFwd,
                                             noise_cov,
                                             0.2f,

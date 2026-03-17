@@ -28,7 +28,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Tokenization and de-tokenization functions for InvSourceEstimate.
+ * @brief    Tokenization and de-tokenization of InvSourceEstimate for foundation-model interfacing.
+ *
+ * @details  Provides free functions to serialise an InvSourceEstimate into a flat
+ *           token sequence (see inv_token.h for the vocabulary) and to
+ *           reconstruct an estimate from such a sequence.  These are the public
+ *           entry points; all vocabulary IDs, the InvToken struct, and the
+ *           InvTokenizeOptions knobs live in inv_token.h.
  *
  */
 
@@ -62,24 +68,38 @@ namespace INVLIB
 
 //=============================================================================================================
 /**
- * Serialise an InvSourceEstimate into a flat token sequence for foundation-model consumption.
- * Each token carries a vocabulary ID and an optional continuous value.
- * The options parameter controls which layers are emitted and allows sub-sampling
- * of dense data to fit context-limited attention windows.
+ * @brief Serialise an InvSourceEstimate into a flat token sequence.
+ *
+ * Converts the full multimodal content of an InvSourceEstimate (grid amplitudes,
+ * positions, couplings, focal dipoles, connectivity matrices) into a linear
+ * sequence of InvToken elements.  Each token carries a vocabulary ID and an
+ * optional continuous float value.
+ *
+ * The @p options parameter controls which data layers are emitted and allows
+ * sub-sampling of dense grids to fit context-limited attention windows.
  *
  * @param[in] estimate   The source estimate to tokenize.
- * @param[in] options    Controls layer inclusion and sub-sampling.
+ * @param[in] options    Controls layer inclusion and sub-sampling (default: all layers, no sub-sampling).
  * @return A vector of InvToken representing the serialised estimate.
+ *
+ * @sa fromTokens, InvTokenizeOptions, InvToken
  */
 INVSHARED_EXPORT std::vector<InvToken> tokenize(const InvSourceEstimate& estimate,
                                                 const InvTokenizeOptions& options = InvTokenizeOptions());
 
 //=============================================================================================================
 /**
- * Reconstruct an InvSourceEstimate from a token sequence previously produced by tokenize().
+ * @brief Reconstruct an InvSourceEstimate from a token sequence.
  *
- * @param[in] tokens    The token sequence.
+ * Parses a token stream previously produced by tokenize() and rebuilds the
+ * InvSourceEstimate fields (metadata, grid data, positions, couplings,
+ * focal dipoles, connectivity).  Unknown or out-of-order tokens are
+ * silently skipped.
+ *
+ * @param[in] tokens    The token sequence to decode.
  * @return The reconstructed source estimate.
+ *
+ * @sa tokenize, InvToken
  */
 INVSHARED_EXPORT InvSourceEstimate fromTokens(const std::vector<InvToken>& tokens);
 

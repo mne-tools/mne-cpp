@@ -50,7 +50,7 @@
 #include <fiff/fiff_dir_node.h>
 
 #include <mne/mne.h>
-#include <inverse/inv_inverse_operator.h>
+#include <mne/mne_inverse_operator.h>
 #include <inverse/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 
@@ -193,7 +193,7 @@ static QStringList findLabelsInDir(const QString &dir)
 //=============================================================================================================
 
 static InvSourceEstimate processLabel(const QString &labelFile,
-                                      const InvInverseOperator &invOp,
+                                      const MNEInverseOperator &invOp,
                                       const MatrixXd &data,
                                       float tmin,
                                       float tstep,
@@ -256,7 +256,7 @@ static InvSourceEstimate processLabel(const QString &labelFile,
 //=============================================================================================================
 
 static InvSourceEstimate processLabelDir(const QString &labelDir,
-                                         const InvInverseOperator &invOp,
+                                         const MNEInverseOperator &invOp,
                                          const MatrixXd &data,
                                          float tmin,
                                          float tstep,
@@ -565,7 +565,7 @@ int main(int argc, char *argv[])
 
     printf("\nReading the inverse operator...\n");
     QFile invFile(invName);
-    InvInverseOperator inverseOperator(invFile);
+    MNEInverseOperator inverseOperator(invFile);
 
     if (inverseOperator.eigen_leads->data.size() == 0) {
         fprintf(stderr, "Error: Failed to read inverse operator from %s\n", invName.toUtf8().constData());

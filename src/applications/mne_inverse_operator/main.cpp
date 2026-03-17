@@ -57,7 +57,7 @@
 #include <fiff/fiff_proj.h>
 
 #include <mne/mne.h>
-#include <inverse/inv_inverse_operator.h>
+#include <mne/mne_inverse_operator.h>
 #include <mne/mne_forward_solution.h>
 
 #include <utils/generics/applicationlogger.h>
@@ -87,7 +87,6 @@
 using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
-using namespace INVLIB;
 using namespace UTILSLIB;
 
 //=============================================================================================================
@@ -557,7 +556,7 @@ int main(int argc, char *argv[])
     }
     printf("\n");
 
-    InvInverseOperator invOp(info, forward, noiseCov, loose, depth, useFixed, true);
+    MNEInverseOperator invOp(info, forward, noiseCov, loose, depth, useFixed, true);
 
     if (invOp.nsource <= 0) {
         qCritical() << "Error: Failed to assemble inverse operator.";

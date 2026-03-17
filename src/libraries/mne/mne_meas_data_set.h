@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     inv_meas_data_set.h
+ * @file     mne_meas_data_set.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -30,18 +30,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MNE Meas Data Set (InvMeasDataSet) class declaration.
+ * @brief    MNEMeasDataSet class declaration.
  *
  */
 
-#ifndef INV_MEAS_DATA_SET_H
-#define INV_MEAS_DATA_SET_H
+#ifndef MNE_MEAS_DATA_SET_H
+#define MNE_MEAS_DATA_SET_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "inv_global.h"
+#include "mne_global.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -54,48 +54,43 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QDebug>
-
-typedef void (*mneUserFreeFuncTmp_1)(void *);  /* General purpose */
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
-namespace INVLIB
+namespace MNELIB
 {
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class MNEMneData;
 
 //=============================================================================================================
 /**
- * Implements MNE Meas Data Set (Replaces *mneMeasDataSet,mneMeasDataSetRec; struct of MNE-C mne_types.h).
+ * @brief Single measurement epoch or average within MNEMeasData.
  *
- * @brief Single measurement epoch or average within InvMeasData, including data matrix and projectors.
+ * Replaces @c *mneMeasDataSet / @c mneMeasDataSetRec from MNE-C @c mne_types.h.
+ * Holds the measured data matrix, optional projector / whitened / filtered copies,
+ * baseline values, and per-epoch metadata (number of averages, time range, etc.).
  */
-class INVSHARED_EXPORT InvMeasDataSet
+class MNESHARED_EXPORT MNEMeasDataSet
 {
 public:
-    typedef QSharedPointer<InvMeasDataSet> SPtr;              /**< Shared pointer type for InvMeasDataSet. */
-    typedef QSharedPointer<const InvMeasDataSet> ConstSPtr;   /**< Const shared pointer type for InvMeasDataSet. */
+    typedef QSharedPointer<MNEMeasDataSet> SPtr;              /**< Shared pointer type for MNEMeasDataSet. */
+    typedef QSharedPointer<const MNEMeasDataSet> ConstSPtr;   /**< Const shared pointer type for MNEMeasDataSet. */
 
     //=========================================================================================================
     /**
-     * Constructs the MNE Meas Data Set
-     * Refactored: mne_new_meas_data_set (mne_read_data.c)
+     * @brief Constructs an empty measurement data set.
+     *
+     * Refactored from @c mne_new_meas_data_set (mne_read_data.c).
      */
-    InvMeasDataSet();
+    MNEMeasDataSet();
 
     //=========================================================================================================
     /**
-     * Destroys the MNE Meas Data Set description
-     * Refactored: mne_free_meas_data_set (mne_read_data.c)
+     * @brief Destroys the measurement data set and frees all owned C-style arrays.
+     *
+     * Refactored from @c mne_free_meas_data_set (mne_read_data.c).
      */
-    ~InvMeasDataSet();
+    ~MNEMeasDataSet();
 
     //=========================================================================================================
     /**
@@ -138,30 +133,24 @@ public:
                                         float tmin, float sfreq, bool use_abs, float *value);
 
 public:
-    /*
-     * These are unique to each data set
-     */
-    QString         comment;       /* Comment associated with these data */
-    float           **data;         /* The measured data */
-    float           **data_proj;    /* Some programs maybe interested in keeping the data after SSP separately */
-    float           **data_filt;    /* Some programs maybe interested in putting a filtered version here */
-    float           **data_white;   /* The whitened data */
-    float           *stim14;        /* Data from the digital stimulus channel */
-    int             first;          /* First sample index for raw data processing */
-    int             np;             /* Number of times */
-    int             nave;           /* Number of averaged responses */
-    int             kind;           /* Which aspect of data */
-    float           tmin;           /* Starting time */
-    float           tstep;          /* Time step */
-    float           *baselines;     /* Baseline values currently applied to the data */
-    MNEMneData*     mne;            /* These are the data associated with MNE computations */
-    void            *user_data;     /* Anything else we want */
-    mneUserFreeFuncTmp_1 user_data_free; /* Function to set the above free */
+    QString              comment;       /**< Comment / description associated with this data set. */
+    Eigen::MatrixXf      data;          /**< Measured data matrix [np x nchan] (time-major layout). */
+    Eigen::MatrixXf      data_proj;     /**< Data after SSP projection (kept separately for some programs). */
+    Eigen::MatrixXf      data_filt;     /**< Optionally filtered copy of the data. */
+    Eigen::MatrixXf      data_white;    /**< Whitened data (noise-normalised). */
+    Eigen::VectorXf      stim14;        /**< Samples from the digital stimulus / trigger channel. */
+    int                  first;         /**< First sample index (for raw-data processing). */
+    int                  np;            /**< Number of time samples. */
+    int                  nave;          /**< Number of averaged responses. */
+    int                  kind;          /**< FIFF aspect kind (e.g. FIFFV_ASPECT_AVERAGE). */
+    float                tmin;          /**< Start time of the epoch (seconds). */
+    float                tstep;         /**< Sampling interval (seconds). */
+    Eigen::VectorXf      baselines;     /**< Per-channel baseline offsets currently applied. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE INVLIB
+} // NAMESPACE MNELIB
 
-#endif // INV_MEAS_DATA_SET_H
+#endif // MNE_MEAS_DATA_SET_H

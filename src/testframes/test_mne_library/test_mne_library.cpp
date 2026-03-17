@@ -2,7 +2,7 @@
 // test_mne_library.cpp — Comprehensive tests for the MNE library
 //
 // Covers: MNESourceSpace, MNESourceSpaces, InvSourceEstimate, MNEBem,
-//         MNECTFCompDataSet, InvInverseOperator, MNESurfaceOrVolume,
+//         MNECTFCompDataSet, MNEInverseOperator, MNESurfaceOrVolume,
 //         MNEMshDisplaySurface, MNEMshDisplaySurfaceSet, MNEForwardSolution,
 //         MNENamedMatrix, MNEHemisphere, MNEEpochDataList, misc types
 //=============================================================================================================
@@ -30,7 +30,7 @@
 #include <fiff/fiff_digitizer_data.h>
 
 #include <mne/mne.h>
-#include <inverse/inv_inverse_operator.h>
+#include <mne/mne_inverse_operator.h>
 #include <inverse/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_source_space.h>
@@ -123,7 +123,7 @@ private slots:
     void ctfComp_makeComp();
     void ctfComp_explainAndMap();
 
-    // ── InvInverseOperator ──
+    // ── MNEInverseOperator ──
     void inverseOp_readFromFile();
     void inverseOp_basicGetters();
     void inverseOp_readFullFile();
@@ -195,7 +195,7 @@ private slots:
     void forwardSolution_tripletSelection();
     void forwardSolution_readVerify();
 
-    // ── InvInverseOperator extras (from boost) ──
+    // ── MNEInverseOperator extras (from boost) ──
     void inverseOp_makeSmallChannelSet();
     void inverseOp_writeReadRoundTrip();
     void inverseOp_checkChNames();
@@ -638,7 +638,7 @@ void TestMneLibrary::ctfComp_explainAndMap()
 }
 
 //=============================================================================================================
-// InvInverseOperator
+// MNEInverseOperator
 //=============================================================================================================
 
 void TestMneLibrary::inverseOp_readFromFile()
@@ -650,28 +650,28 @@ void TestMneLibrary::inverseOp_readFromFile()
     MNEForwardSolution fwd(fwdFile);
     QVERIFY(!fwd.isEmpty());
 
-    InvInverseOperator invOp;
+    MNEInverseOperator invOp;
     QVERIFY(!invOp.isFixedOrient());
 
     QFile fwdFile2(fwdPath());
-    InvInverseOperator invOp2;
-    bool readRes = InvInverseOperator::read_inverse_operator(fwdFile2, invOp2);
+    MNEInverseOperator invOp2;
+    bool readRes = MNEInverseOperator::read_inverse_operator(fwdFile2, invOp2);
     Q_UNUSED(readRes);
 }
 
 void TestMneLibrary::inverseOp_basicGetters()
 {
-    InvInverseOperator invOp;
+    MNEInverseOperator invOp;
     QVERIFY(!invOp.isFixedOrient());
 
     MatrixXd& kernel = invOp.getKernel();
     Q_UNUSED(kernel);
 
-    const InvInverseOperator& constRef = invOp;
+    const MNEInverseOperator& constRef = invOp;
     MatrixXd kernelConst = constRef.getKernel();
     Q_UNUSED(kernelConst);
 
-    InvInverseOperator invOp2(invOp);
+    MNEInverseOperator invOp2(invOp);
     QVERIFY(!invOp2.isFixedOrient());
 }
 
@@ -685,8 +685,8 @@ void TestMneLibrary::inverseOp_readFullFile()
     }
 
     QFile invFile(invPath);
-    InvInverseOperator inv;
-    if (!InvInverseOperator::read_inverse_operator(invFile, inv))
+    MNEInverseOperator inv;
+    if (!MNEInverseOperator::read_inverse_operator(invFile, inv))
         QSKIP("Could not read inverse operator");
 
     QVERIFY(inv.eigen_fields->data.rows() > 0);
@@ -1397,7 +1397,7 @@ void TestMneLibrary::forwardSolution_readVerify()
 }
 
 //=============================================================================================================
-// InvInverseOperator extras (from boost)
+// MNEInverseOperator extras (from boost)
 //=============================================================================================================
 
 void TestMneLibrary::inverseOp_makeSmallChannelSet()

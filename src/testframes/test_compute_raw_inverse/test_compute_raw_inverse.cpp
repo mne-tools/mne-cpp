@@ -45,7 +45,7 @@
 #include <fiff/fiff_info.h>
 
 #include <mne/mne.h>
-#include <inverse/inv_inverse_operator.h>
+#include <mne/mne_inverse_operator.h>
 #include <inverse/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 
@@ -124,7 +124,7 @@ private:
     bool m_bDataAvailable;         /**< Whether test data was found. */
 
     // Shared results for multi-test use
-    InvInverseOperator m_invOp;    /**< Inverse operator. */
+    MNEInverseOperator m_invOp;    /**< Inverse operator. */
     InvSourceEstimate m_stcDSPM;   /**< dSPM result for reuse. */
 
     static const float s_fSNR;
@@ -253,7 +253,7 @@ void TestComputeRawInverse::initTestCase()
 
     // Read the inverse operator once for reuse
     QFile invFile(m_sInvFile);
-    m_invOp = InvInverseOperator(invFile);
+    m_invOp = MNEInverseOperator(invFile);
     QVERIFY2(m_invOp.eigen_leads->data.size() > 0, "Failed to read inverse operator");
     printf("  Inverse operator: %d channels, %d sources\n", m_invOp.nchan, m_invOp.nsource);
 }

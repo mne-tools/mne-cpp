@@ -44,7 +44,7 @@
 #include "../inv_global.h"
 
 #include <fiff/fiff_types.h>
-#include "inv_analyze_types.h"
+#include "../inv_analyze_types.h"
 #include <fwd/fwd_types.h>
 #include <fwd/fwd_eeg_sphere_model.h>
 #include <fwd/fwd_bem_model.h>

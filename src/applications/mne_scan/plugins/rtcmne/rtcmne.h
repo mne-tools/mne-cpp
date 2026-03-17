@@ -48,7 +48,7 @@
 
 #include <fiff/fiff_evoked.h>
 
-#include <inverse/inv_inverse_operator.h>
+#include <mne/mne_inverse_operator.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -69,6 +69,7 @@ namespace DISPLIB {
 
 namespace MNELIB {
     class MNEForwardSolution;
+    class MNEInverseOperator;
 }
 
 namespace FIFFLIB {
@@ -77,7 +78,6 @@ namespace FIFFLIB {
 }
 
 namespace INVLIB {
-    class InvInverseOperator;
     class InvMinimumNorm;
 }
 
@@ -190,7 +190,7 @@ public:
      *
      * @param[in] invOp    The inverse operator to update.
      */
-    void updateInvOp(const INVLIB::InvInverseOperator& invOp);
+    void updateInvOp(const MNELIB::MNEInverseOperator& invOp);
 
     //=========================================================================================================
     /**
@@ -264,7 +264,7 @@ protected:
     QStringList                     m_qListCovChNames;          /**< Covariance channel names. */
     QStringList                     m_qListPickChannels;        /**< Channels to pick. */
 
-    INVLIB::InvInverseOperator      m_invOp;                    /**< The inverse operator. */
+    MNELIB::MNEInverseOperator      m_invOp;                    /**< The inverse operator. */
 
 signals:
     void responsibleTriggerTypesChanged(const QStringList& lResponsibleTriggerTypes);

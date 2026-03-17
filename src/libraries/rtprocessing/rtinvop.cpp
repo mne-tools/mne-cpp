@@ -42,7 +42,7 @@
 #include <fiff/fiff_info.h>
 
 #include <mne/mne_forward_solution.h>
-#include <inverse/inv_inverse_operator.h>
+#include <mne/mne_inverse_operator.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -63,7 +63,6 @@
 using namespace RTPROCESSINGLIB;
 using namespace Eigen;
 using namespace MNELIB;
-using namespace INVLIB;
 using namespace FIFFLIB;
 
 //=============================================================================================================
@@ -79,7 +78,7 @@ void RtInvOpWorker::doWork(const RtInvOpInput &inputData)
     // Restrict forward solution as necessary for MEG
     MNEForwardSolution forwardMeg = inputData.pFwd->pick_types(true, false);
 
-    InvInverseOperator invOpMeg(*inputData.pFiffInfo.data(),
+    MNEInverseOperator invOpMeg(*inputData.pFiffInfo.data(),
                                 forwardMeg,
                                 inputData.noiseCov,
                                 0.2f,
@@ -144,7 +143,7 @@ void RtInvOp::setFwdSolution(QSharedPointer<MNELIB::MNEForwardSolution> pFwd)
 
 //=============================================================================================================
 
-void RtInvOp::handleResults(const INVLIB::InvInverseOperator& invOp)
+void RtInvOp::handleResults(const MNELIB::MNEInverseOperator& invOp)
 {
     emit invOperatorCalculated(invOp);
 }

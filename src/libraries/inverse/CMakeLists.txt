@@ -16,9 +16,6 @@ set(SOURCES
     rap_music/inv_rap_music.cpp
     rap_music/inv_pwl_rap_music.cpp
     rap_music/inv_dipole.cpp
-    inv_inverse_operator.cpp
-    inv_meas_data.cpp
-    inv_meas_data_set.cpp
     inv_source_coupling.cpp
     inv_source_estimate.cpp
     inv_source_estimate_token.cpp
@@ -43,9 +40,6 @@ set(HEADERS
     rap_music/inv_rap_music.h
     rap_music/inv_pwl_rap_music.h
     rap_music/inv_dipole.h
-    inv_inverse_operator.h
-    inv_meas_data.h
-    inv_meas_data_set.h
     inv_source_estimate.h
     inv_source_estimate_token.h
     inv_types.h
@@ -53,7 +47,7 @@ set(HEADERS
     inv_focal_dipole.h
     inv_source_coupling.h
     inv_connectivity.h
-    dipole_fit/inv_analyze_types.h
+    inv_analyze_types.h
     dipole_fit/inv_dipole_fit.h
     dipole_fit/inv_dipole_fit_data.h
     dipole_fit/inv_dipole_fit_settings.h

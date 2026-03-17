@@ -45,7 +45,7 @@
 #include "inv_ecd_set.h"
 #include "inv_dipole_fit_settings.h"
 #include "inv_dipole_fit_data.h"
-#include "../inv_meas_data.h"
+#include <mne/mne_meas_data.h>
 
 #include <mne/mne_types.h>
 
@@ -126,7 +126,7 @@ public:
      *
      * @return true when successful.
      */
-    static bool fit_dipoles(const QString& dataname, INVLIB::InvMeasData* data, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, InvEcdSet& p_set);
+    static bool fit_dipoles(const QString& dataname, MNELIB::MNEMeasData* data, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, InvEcdSet& p_set);
 
     //=========================================================================================================
     /**

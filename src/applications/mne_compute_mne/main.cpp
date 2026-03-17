@@ -52,7 +52,7 @@
 #include <fiff/fiff_stream.h>
 
 #include <mne/mne.h>
-#include <inverse/inv_inverse_operator.h>
+#include <mne/mne_inverse_operator.h>
 #include <mne/mne_forward_solution.h>
 #include <inverse/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
@@ -822,7 +822,7 @@ int main(int argc, char *argv[])
     printf("Reading inverse operator from %s...\n", invName.toUtf8().constData());
 
     QFile invFile(invName);
-    InvInverseOperator invOp(invFile);
+    MNEInverseOperator invOp(invFile);
 
     if (invOp.nsource <= 0) {
         qCritical() << "Error: Could not read inverse operator from" << invName;
