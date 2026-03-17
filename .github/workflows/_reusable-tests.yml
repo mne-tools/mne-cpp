@@ -142,22 +142,27 @@ jobs:
       run: |
         ./tools/test_all.bat Release verbose
 
-    # ── Coverage: generate libraries-only report ──────────────────────────
+    # ── Coverage: Codecov upload ──────────────────────────────────────────
+    - name: Upload coverage to Codecov
+      if: matrix.os == 'ubuntu-24.04' && inputs.upload_codecov
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+    # ── Coverage: generate libraries-only report for threshold checks ─────
     - name: Install fastcov
-      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage
+      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && inputs.coverage_threshold > 0
       run: pip install fastcov
 
     - name: Generate coverage report (fastcov)
       id: lcov
-      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage
+      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && inputs.coverage_threshold > 0
       run: |
         echo "=== Coverage diagnostics ==="
         echo "gcno files: $(find build -name '*.gcno' 2>/dev/null | wc -l)"
         echo "gcda files: $(find build -name '*.gcda' 2>/dev/null | wc -l)"
         # Collect coverage data with fastcov (10-100x faster than lcov)
         fastcov -d build -o coverage.json
-        # Full report in lcov format
-        fastcov -C coverage.json --lcov -o coverage.info
         # Filtered report: only MNE-CPP libraries (no apps, tests, examples, external, Qt, Eigen)
         fastcov -C coverage.json --lcov -o coverage_filtered.info \
              --include src/libraries/ \
@@ -172,14 +177,6 @@ jobs:
         fi
         echo "Total line coverage: ${COVERAGE}%"
         echo "coverage=${COVERAGE}" >> "$GITHUB_OUTPUT"
-
-    # ── Coverage: Codecov upload (libraries only) ──────────────────────────
-    - name: Upload coverage to Codecov
-      if: matrix.os == 'ubuntu-24.04' && inputs.upload_codecov
-      uses: codecov/codecov-action@v4
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        files: coverage_filtered.info
 
     # ── Coverage: threshold & regression check ─────────────────────────────
     - name: Restore previous coverage baseline
