@@ -47,7 +47,6 @@ set(HEADERS
     inv_focal_dipole.h
     inv_source_coupling.h
     inv_connectivity.h
-    inv_analyze_types.h
     dipole_fit/inv_dipole_fit.h
     dipole_fit/inv_dipole_fit_data.h
     dipole_fit/inv_dipole_fit_settings.h

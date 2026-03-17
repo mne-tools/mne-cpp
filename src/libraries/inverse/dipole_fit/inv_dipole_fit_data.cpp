@@ -420,30 +420,39 @@ int InvDipoleFitData::scale_dipole_fit_noise_cov(InvDipoleFitData *f, int nave)
 
 /**
  * @brief Select channels and scale the noise covariance for the dipole fit.
+ *
+ * When @p meas is non-null, channels not selected in @p sels receive
+ * an increased weight (nonsel_w) in the noise covariance, effectively
+ * down-weighting their contribution during fitting.
+ *
+ * Refactored: select_dipole_fit_noise_cov (dipole_fit_setup.c, SVN MNE)
  */
-int InvDipoleFitData::select_dipole_fit_noise_cov(InvDipoleFitData *f, mshMegEegData d)
+int InvDipoleFitData::select_dipole_fit_noise_cov(InvDipoleFitData *f,
+                                                   MNEMeasData* meas,
+                                                   int nave_in,
+                                                   const int* sels)
 {
-    int   nave,j,k;
+    int   nave, j, k;
     float nonsel_w  = 30;
     int   min_nchan = 20;
 
     if (!f || !f->noise_orig)
         return OK;
-    if (!d)
+    if (!meas)
         nave = 1;
     else {
-        if (d->nave < 0)
-            nave = d->meas->current->nave;
+        if (nave_in < 0)
+            nave = meas->current->nave;
         else
-            nave = d->nave;
+            nave = nave_in;
     }
     /*
-       * Channel selection
-       */
-    if (d) {
+     * Channel selection
+     */
+    if (meas && sels) {
         std::vector<float> wVec(f->noise_orig->ncov);
         float  *w    = wVec.data();
-        int    nomit_meg,nomit_eeg,nmeg,neeg;
+        int    nomit_meg, nomit_eeg, nmeg, neeg;
 
         nmeg = neeg = 0;
         nomit_meg = nomit_eeg = 0;
@@ -452,7 +461,17 @@ int InvDipoleFitData::select_dipole_fit_noise_cov(InvDipoleFitData *f, mshMegEeg
                 neeg++;
             else
                 nmeg++;
-            if (d->isChannelSelected(f->noise_orig->names[k]))
+            /* Check whether this channel is selected in the measurement */
+            bool selected = false;
+            for (int c = 0; c < meas->nchan; c++) {
+                if (QString::compare(f->noise_orig->names[k],
+                                     meas->chs[c].ch_name,
+                                     Qt::CaseInsensitive) == 0) {
+                    selected = sels[c] != 0;
+                    break;
+                }
+            }
+            if (selected)
                 w[k] = 1.0;
             else {
                 w[k] = nonsel_w;
@@ -463,25 +482,25 @@ int InvDipoleFitData::select_dipole_fit_noise_cov(InvDipoleFitData *f, mshMegEeg
             }
         }
         f->noise.reset();
-        if (nmeg > 0 && nmeg-nomit_meg > 0 && nmeg-nomit_meg < min_nchan) {
+        if (nmeg > 0 && nmeg - nomit_meg > 0 && nmeg - nomit_meg < min_nchan) {
             qCritical("Too few MEG channels remaining");
             return FAIL;
         }
-        if (neeg > 0 && neeg-nomit_eeg > 0 && neeg-nomit_eeg < min_nchan) {
+        if (neeg > 0 && neeg - nomit_eeg > 0 && neeg - nomit_eeg < min_nchan) {
             qCritical("Too few EEG channels remaining");
             return FAIL;
         }
         f->noise = f->noise_orig->dup();
-        if (nomit_meg+nomit_eeg > 0) {
+        if (nomit_meg + nomit_eeg > 0) {
             if (f->noise->cov.size() > 0) {
                 for (j = 0; j < f->noise->ncov; j++)
                     for (k = 0; k <= j; k++) {
-                        f->noise->cov[MNECovMatrix::lt_packed_index(j,k)] *= w[j]*w[k];
+                        f->noise->cov[MNECovMatrix::lt_packed_index(j, k)] *= w[j] * w[k];
                     }
             }
             else {
                 for (j = 0; j < f->noise->ncov; j++) {
-                    f->noise->cov_diag[j] *= w[j]*w[j];
+                    f->noise->cov_diag[j] *= w[j] * w[j];
                 }
             }
         }
@@ -492,7 +511,7 @@ int InvDipoleFitData::select_dipole_fit_noise_cov(InvDipoleFitData *f, mshMegEeg
         f->noise = f->noise_orig->dup();
     }
 
-    return scale_dipole_fit_noise_cov(f,nave);
+    return scale_dipole_fit_noise_cov(f, nave);
 }
 
 //=============================================================================================================
