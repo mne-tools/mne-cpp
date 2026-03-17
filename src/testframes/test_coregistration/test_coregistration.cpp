@@ -47,7 +47,7 @@
 #include "mne/mne_project_to_surface.h"
 
 #include <utils/generics/applicationlogger.h>
-#include "rtprocessing/icp.h"
+#include "mne/mne_icp.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -71,7 +71,6 @@
 
 using namespace Eigen;
 using namespace UTILSLIB;
-using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
 using namespace MNELIB;
 
@@ -166,7 +165,7 @@ void TestCoregistration::initTestCase()
     }
 
     // align fiducials
-    if(!RTPROCESSINGLIB::fitMatchedPoints(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
+    if(!MNELIB::fitMatchedPoints(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
         qWarning() << "Point cloud registration not succesfull.";
     }
 
@@ -194,7 +193,7 @@ void TestCoregistration::initTestCase()
     VectorXi vecTake;
 
     // discard outliers
-    if(!RTPROCESSINGLIB::discard3DPointOutliers(mneSurfacePoints, matHsp, transPerformICP, vecTake, matHspClean, fMaxDist)) {
+    if(!MNELIB::discard3DPointOutliers(mneSurfacePoints, matHsp, transPerformICP, vecTake, matHspClean, fMaxDist)) {
         qWarning() << "Discard outliers was not succesfull.";
     }
     VectorXf vecWeightsICPClean(vecTake.size());
@@ -204,7 +203,7 @@ void TestCoregistration::initTestCase()
 
     // icp
     float fRMSE = 0.0;
-    if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, transPerformICP, fRMSE, bScale, iMaxIter, fTol, vecWeightsICPClean)) {
+    if(!MNELIB::performIcp(mneSurfacePoints, matHspClean, transPerformICP, fRMSE, bScale, iMaxIter, fTol, vecWeightsICPClean)) {
         qWarning() << "ICP was not succesfull.";
     }
     transPerformICPRef = FiffCoordTrans(t_fileTransRefIcp);

@@ -47,7 +47,7 @@
 #include <fiff/fiff_dig_point_set.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_project_to_surface.h>
-#include <rtprocessing/icp.h>
+#include <mne/mne_icp.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -467,7 +467,7 @@ void CoRegistration::onFitFiducials()
     }
 
     // align fiducials
-    if(!RTPROCESSINGLIB::fitMatchedPoints(matHead,matMri,matTrans,fScale,bScale,vecWeights)) {
+    if(!MNELIB::fitMatchedPoints(matHead,matMri,matTrans,fScale,bScale,vecWeights)) {
         qWarning() << "Point cloud registration not succesfull.";
     }
 
@@ -618,12 +618,12 @@ FiffCoordTrans CoRegistration::computeICP(FiffCoordTrans transInit,
     MatrixXf matHspClean;
     VectorXi vecTake;
 
-    if(!RTPROCESSINGLIB::discard3DPointOutliers(mneSurfacePoints,
-                                                matHsp,
-                                                transInit,
-                                                vecTake,
-                                                matHspClean,
-                                                fMaxDist)) {
+    if(!MNELIB::discard3DPointOutliers(mneSurfacePoints,
+                                        matHsp,
+                                        transInit,
+                                        vecTake,
+                                        matHspClean,
+                                        fMaxDist)) {
         qWarning() << "Discard outliers was not succesfull.";
     }
     int iNDiscarded = vecWeightsICP.size() - vecTake.size();
@@ -635,9 +635,9 @@ FiffCoordTrans CoRegistration::computeICP(FiffCoordTrans transInit,
     }
 
     // icp
-    RTPROCESSINGLIB::performIcp(mneSurfacePoints,
-                                matHspClean,
-                                transInit,
+    MNELIB::performIcp(mneSurfacePoints,
+                       matHspClean,
+                       transInit,
                                 fRMSE,
                                 bScale,
                                 iMaxIter,

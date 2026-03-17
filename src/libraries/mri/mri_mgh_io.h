@@ -184,6 +184,16 @@ private:
                             QVector<FIFFLIB::FiffCoordTrans>& additionalTrans,
                             const QString& subjectMriDir,
                             bool verbose);
+
+    //=========================================================================================================
+    /**
+     * Returns the number of bytes per voxel for the given MGH data type.
+     *
+     * @param[in] type  MGH voxel data type (MRI_UCHAR, MRI_SHORT, MRI_INT, MRI_FLOAT).
+     *
+     * @return Bytes per voxel, or 0 if the type is unsupported.
+     */
+    static int bytesPerVoxel(int type);
 };
 
 } // namespace MRILIB

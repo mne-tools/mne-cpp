@@ -64,6 +64,7 @@
 
 #include <QtTest>
 #include <QFile>
+#include <QFileInfo>
 #include <QDir>
 #include <QTemporaryDir>
 #include <QDataStream>
@@ -115,14 +116,36 @@ private slots:
     void testMghSliceTransforms();
     void testMghInvalidFile();
 
-    // MriCorFifIO round-trip test
+    // MriMghIO synthetic unit tests (no sample data needed)
+    void testMghReadSyntheticUchar();
+    void testMghReadSyntheticShort();
+    void testMghReadSyntheticInt();
+    void testMghReadSyntheticFloat();
+    void testMghDefaultDirectionCosines();
+    void testMghFooterScanParams();
+    void testMghFooterTalairachTag();
+    void testMghUnsupportedDataType();
+    void testMghCorruptedMgz();
+    void testMghEmptyFile();
+
+    // MriCorFifIO round-trip tests
     void testCorFifWriteRead();
+    void testCorFifWriteReadSynthetic();
 
     void cleanupTestCase();
 
 private:
     /** Find the MNE sample data subjects directory. */
     QString findSubjectsDir();
+
+    /** Create a synthetic MGH byte array for testing. */
+    static QByteArray createSyntheticMgh(int width, int height, int depth, int type,
+                                         bool setRas, bool addScanParams = false,
+                                         float tr = 0.0f, float flipAngle = 0.0f,
+                                         float te = 0.0f, float ti = 0.0f, float fov = 0.0f);
+
+    /** Write a QByteArray to a file. */
+    bool writeToFile(const QString& path, const QByteArray& data);
 
     bool m_bDataAvailable;      /**< Whether sample data is found. */
     QString m_sSubjectsDir;     /**< Path to subjects dir. */
@@ -137,6 +160,74 @@ private:
 TestMriIO::TestMriIO()
 : m_bDataAvailable(false)
 {
+}
+
+//=============================================================================================================
+
+QByteArray TestMriIO::createSyntheticMgh(int width, int height, int depth, int type,
+                                         bool setRas, bool addScanParams,
+                                         float tr, float flipAngle,
+                                         float te, float ti, float fov)
+{
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
+    stream.setByteOrder(QDataStream::BigEndian);
+    stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+
+    // Header (7 × int32 + 1 × int16 = 30 bytes)
+    stream << qint32(MRI_MGH_VERSION)
+           << qint32(width) << qint32(height) << qint32(depth)
+           << qint32(1)       // nframes
+           << qint32(type)
+           << qint32(0);      // dof
+
+    if (setRas) {
+        stream << qint16(1);  // goodRASflag
+        stream << 1.0f << 1.0f << 1.0f;            // xsize, ysize, zsize
+        stream << -1.0f << 0.0f << 0.0f;           // x_ras
+        stream <<  0.0f << 0.0f << -1.0f;          // y_ras
+        stream <<  0.0f << 1.0f <<  0.0f;          // z_ras
+        stream <<  0.0f << 0.0f <<  0.0f;          // c_ras
+    } else {
+        stream << qint16(0);  // goodRASflag
+    }
+
+    // Pad header to 284 bytes
+    int bytesWritten = data.size();
+    for (int i = bytesWritten; i < MRI_MGH_DATA_OFFSET; ++i) {
+        stream << quint8(0);
+    }
+
+    // Voxel data
+    int nVoxels = width * height * depth;
+    for (int i = 0; i < nVoxels; ++i) {
+        switch (type) {
+            case MRI_UCHAR: stream << quint8(i % 256); break;
+            case MRI_SHORT: stream << qint16(i % 1000); break;
+            case MRI_INT:   stream << qint32(i); break;
+            case MRI_FLOAT: stream << float(i * 0.5f); break;
+            default:        stream << quint8(0); break;
+        }
+    }
+
+    // Footer: scan parameters
+    if (addScanParams) {
+        stream << tr << flipAngle << te << ti << fov;
+    }
+
+    return data;
+}
+
+//=============================================================================================================
+
+bool TestMriIO::writeToFile(const QString& path, const QByteArray& data)
+{
+    QFile f(path);
+    if (!f.open(QIODevice::WriteOnly))
+        return false;
+    f.write(data);
+    f.close();
+    return true;
 }
 
 //=============================================================================================================
@@ -359,6 +450,10 @@ void TestMriIO::testMghReadT1()
 
     // Should have 256 slices (one per depth)
     QCOMPARE(m_volT1.slices.size(), 256);
+
+    // Verify scan parameters were parsed from footer
+    QVERIFY(m_volT1.TR > 0.0f);           // T1 MPRAGE has non-zero TR
+    QVERIFY(m_volT1.flipAngle > 0.0f);    // Non-zero flip angle
 }
 
 //=============================================================================================================
@@ -547,6 +642,340 @@ void TestMriIO::testCorFifWriteRead()
     QVERIFY2(foundMriSet, "No FIFFB_MRI_SET block found");
     QCOMPARE(sliceCount, 256);
 
+    stream->close();
+}
+
+//=============================================================================================================
+// Synthetic MGH unit tests (no sample data needed)
+//=============================================================================================================
+
+void TestMriIO::testMghReadSyntheticUchar()
+{
+    // 4×4×2 UCHAR volume with RAS info
+    QByteArray mghData = createSyntheticMgh(4, 4, 2, MRI_UCHAR, true);
+    QString path = m_tempDir.path() + "/synth_uchar.mgh";
+    QVERIFY(writeToFile(path, mghData));
+
+    MriVolData vol;
+    QVector<FiffCoordTrans> trans;
+    bool ok = MriMghIO::read(path, vol, trans);
+    QVERIFY(ok);
+    QVERIFY(vol.isValid());
+    QCOMPARE(vol.width, 4);
+    QCOMPARE(vol.height, 4);
+    QCOMPARE(vol.depth, 2);
+    QCOMPARE(vol.type, MRI_UCHAR);
+    QVERIFY(vol.rasGood);
+    QCOMPARE(vol.slices.size(), 2);
+    QCOMPARE(vol.slices[0].pixelFormat, FIFFV_MRI_PIXEL_BYTE);
+    QCOMPARE(vol.slices[0].pixels.size(), 16);
+
+    // Verify first pixel values (cycling through 0..255)
+    QCOMPARE(static_cast<int>(vol.slices[0].pixels[0]), 0);
+    QCOMPARE(static_cast<int>(vol.slices[0].pixels[1]), 1);
+}
+
+//=============================================================================================================
+
+void TestMriIO::testMghReadSyntheticShort()
+{
+    QByteArray mghData = createSyntheticMgh(4, 4, 2, MRI_SHORT, true);
+    QString path = m_tempDir.path() + "/synth_short.mgh";
+    QVERIFY(writeToFile(path, mghData));
+
+    MriVolData vol;
+    QVector<FiffCoordTrans> trans;
+    bool ok = MriMghIO::read(path, vol, trans);
+    QVERIFY(ok);
+    QVERIFY(vol.isValid());
+    QCOMPARE(vol.type, MRI_SHORT);
+    QCOMPARE(vol.slices.size(), 2);
+    QCOMPARE(vol.slices[0].pixelFormat, FIFFV_MRI_PIXEL_WORD);
+    QCOMPARE(vol.slices[0].pixelsWord.size(), 16);
+
+    // Verify first pixel values
+    QCOMPARE(static_cast<int>(vol.slices[0].pixelsWord[0]), 0);
+    QCOMPARE(static_cast<int>(vol.slices[0].pixelsWord[1]), 1);
+}
+
+//=============================================================================================================
+
+void TestMriIO::testMghReadSyntheticInt()
+{
+    QByteArray mghData = createSyntheticMgh(4, 4, 2, MRI_INT, true);
+    QString path = m_tempDir.path() + "/synth_int.mgh";
+    QVERIFY(writeToFile(path, mghData));
+
+    MriVolData vol;
+    QVector<FiffCoordTrans> trans;
+    bool ok = MriMghIO::read(path, vol, trans);
+    QVERIFY(ok);
+    QVERIFY(vol.isValid());
+    QCOMPARE(vol.type, MRI_INT);
+    QCOMPARE(vol.slices.size(), 2);
+    // INT is converted to FLOAT in the reader
+    QCOMPARE(vol.slices[0].pixelFormat, FIFFV_MRI_PIXEL_FLOAT);
+    QCOMPARE(vol.slices[0].pixelsFloat.size(), 16);
+
+    // Verify conversion: voxel i -> float(i)
+    float eps = 1e-5f;
+    QVERIFY(std::abs(vol.slices[0].pixelsFloat[0] - 0.0f) < eps);
+    QVERIFY(std::abs(vol.slices[0].pixelsFloat[1] - 1.0f) < eps);
+}
+
+//=============================================================================================================
+
+void TestMriIO::testMghReadSyntheticFloat()
+{
+    QByteArray mghData = createSyntheticMgh(4, 4, 2, MRI_FLOAT, true);
+    QString path = m_tempDir.path() + "/synth_float.mgh";
+    QVERIFY(writeToFile(path, mghData));
+
+    MriVolData vol;
+    QVector<FiffCoordTrans> trans;
+    bool ok = MriMghIO::read(path, vol, trans);
+    QVERIFY(ok);
+    QVERIFY(vol.isValid());
+    QCOMPARE(vol.type, MRI_FLOAT);
+    QCOMPARE(vol.slices.size(), 2);
+    QCOMPARE(vol.slices[0].pixelFormat, FIFFV_MRI_PIXEL_FLOAT);
+    QCOMPARE(vol.slices[0].pixelsFloat.size(), 16);
+
+    // Verify values: voxel i -> i * 0.5f
+    float eps = 1e-5f;
+    QVERIFY(std::abs(vol.slices[0].pixelsFloat[0] - 0.0f) < eps);
+    QVERIFY(std::abs(vol.slices[0].pixelsFloat[1] - 0.5f) < eps);
+    QVERIFY(std::abs(vol.slices[0].pixelsFloat[2] - 1.0f) < eps);
+}
+
+//=============================================================================================================
+
+void TestMriIO::testMghDefaultDirectionCosines()
+{
+    // Create MGH with goodRASflag = 0 → defaults should be used
+    QByteArray mghData = createSyntheticMgh(4, 4, 2, MRI_UCHAR, false);
+    QString path = m_tempDir.path() + "/synth_noras.mgh";
+    QVERIFY(writeToFile(path, mghData));
+
+    MriVolData vol;
+    QVector<FiffCoordTrans> trans;
+    bool ok = MriMghIO::read(path, vol, trans);
+    QVERIFY(ok);
+    QVERIFY(vol.isValid());
+    QVERIFY(!vol.rasGood);
+
+    // Default direction cosines: x=(-1,0,0), y=(0,0,-1), z=(0,1,0)
+    float eps = 1e-6f;
+    QVERIFY(std::abs(vol.x_ras[0] - (-1.0f)) < eps);
+    QVERIFY(std::abs(vol.x_ras[1]) < eps);
+    QVERIFY(std::abs(vol.x_ras[2]) < eps);
+    QVERIFY(std::abs(vol.y_ras[0]) < eps);
+    QVERIFY(std::abs(vol.y_ras[1]) < eps);
+    QVERIFY(std::abs(vol.y_ras[2] - (-1.0f)) < eps);
+    QVERIFY(std::abs(vol.z_ras[0]) < eps);
+    QVERIFY(std::abs(vol.z_ras[1] - 1.0f) < eps);
+    QVERIFY(std::abs(vol.z_ras[2]) < eps);
+
+    // Default voxel sizes should be 1mm
+    QVERIFY(qFuzzyCompare(vol.xsize, 1.0f));
+    QVERIFY(qFuzzyCompare(vol.ysize, 1.0f));
+    QVERIFY(qFuzzyCompare(vol.zsize, 1.0f));
+}
+
+//=============================================================================================================
+
+void TestMriIO::testMghFooterScanParams()
+{
+    // Create MGH with footer containing scan parameters
+    float testTR = 2300.0f;
+    float testFlip = 0.1396f;  // ~8 degrees in radians
+    float testTE = 2.98f;
+    float testTI = 900.0f;
+    float testFoV = 256.0f;
+
+    QByteArray mghData = createSyntheticMgh(2, 2, 2, MRI_UCHAR, true,
+                                            true, testTR, testFlip, testTE, testTI, testFoV);
+    QString path = m_tempDir.path() + "/synth_footer.mgh";
+    QVERIFY(writeToFile(path, mghData));
+
+    MriVolData vol;
+    QVector<FiffCoordTrans> trans;
+    bool ok = MriMghIO::read(path, vol, trans);
+    QVERIFY(ok);
+    QVERIFY(vol.isValid());
+
+    // Verify scan parameters were read from footer
+    float eps = 1e-2f;
+    QVERIFY2(std::abs(vol.TR - testTR) < eps,
+             qPrintable(QString("TR: expected %1, got %2").arg(testTR).arg(vol.TR)));
+    QVERIFY(std::abs(vol.flipAngle - testFlip) < eps);
+    QVERIFY(std::abs(vol.TE - testTE) < eps);
+    QVERIFY(std::abs(vol.TI - testTI) < eps);
+    QVERIFY(std::abs(vol.FoV - testFoV) < eps);
+}
+
+//=============================================================================================================
+
+void TestMriIO::testMghFooterTalairachTag()
+{
+    // Create an MGH with a TAG_MGH_XFORM in the footer pointing to a dummy xfm
+    QByteArray mghData = createSyntheticMgh(2, 2, 2, MRI_UCHAR, true, true, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+
+    // Append TAG_MGH_XFORM tag
+    QByteArray xfmPath = "talairach.xfm";
+    QDataStream tagStream(&mghData, QIODevice::Append);
+    tagStream.setByteOrder(QDataStream::BigEndian);
+    tagStream << qint32(MGH_TAG_MGH_XFORM);  // tag type
+    tagStream << qint64(xfmPath.size());       // tag length (int64 for new tags)
+    tagStream.writeRawData(xfmPath.constData(), xfmPath.size());
+
+    QString path = m_tempDir.path() + "/synth_xfm.mgh";
+    QVERIFY(writeToFile(path, mghData));
+
+    // Create a dummy .xfm file in a transforms/ subdirectory
+    QString xfmDir = m_tempDir.path() + "/transforms";
+    QDir().mkpath(xfmDir);
+    QString xfmFilePath = xfmDir + "/talairach.xfm";
+    {
+        QFile f(xfmFilePath);
+        QVERIFY(f.open(QIODevice::WriteOnly | QIODevice::Text));
+        f.write("MNI Transform File\n");
+        f.write("% id\n");
+        f.write("Transform_Type = Linear;\n");
+        f.write("Linear_Transform =\n");
+        f.write("1.0 0.0 0.0 0.0\n");
+        f.write("0.0 1.0 0.0 0.0\n");
+        f.write("0.0 0.0 1.0 0.0 ;\n");
+        f.close();
+    }
+
+    MriVolData vol;
+    QVector<FiffCoordTrans> trans;
+    bool ok = MriMghIO::read(path, vol, trans, m_tempDir.path());
+    QVERIFY(ok);
+    QVERIFY(!vol.talairachXfmPath.isEmpty());
+    QCOMPARE(vol.talairachXfmPath, QString("talairach.xfm"));
+
+    // Talairach transform should have been parsed
+    QCOMPARE(trans.size(), 1);
+    QCOMPARE(trans[0].from, FIFFV_COORD_MRI);
+    QCOMPARE(trans[0].to, FIFFV_COORD_MRI_DISPLAY);
+}
+
+//=============================================================================================================
+
+void TestMriIO::testMghUnsupportedDataType()
+{
+    // Create MGH with an unsupported data type (MRI_BITMAP = 5)
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
+    stream.setByteOrder(QDataStream::BigEndian);
+    stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+    stream << qint32(MRI_MGH_VERSION)
+           << qint32(4) << qint32(4) << qint32(2)
+           << qint32(1) << qint32(MRI_BITMAP) << qint32(0);
+    stream << qint16(0);
+    // Pad header
+    for (int i = data.size(); i < MRI_MGH_DATA_OFFSET; ++i) stream << quint8(0);
+    // Write some dummy voxel data (1 byte per voxel for bitmap)
+    for (int i = 0; i < 4 * 4 * 2; ++i) stream << quint8(0);
+
+    QString path = m_tempDir.path() + "/synth_bitmap.mgh";
+    QVERIFY(writeToFile(path, data));
+
+    MriVolData vol;
+    QVector<FiffCoordTrans> trans;
+    bool ok = MriMghIO::read(path, vol, trans);
+    QVERIFY(!ok);  // Should fail for unsupported type
+}
+
+//=============================================================================================================
+
+void TestMriIO::testMghCorruptedMgz()
+{
+    // Write random bytes with .mgz extension — decompression should fail
+    QString path = m_tempDir.path() + "/corrupt.mgz";
+    {
+        QFile f(path);
+        QVERIFY(f.open(QIODevice::WriteOnly));
+        QByteArray garbage(1024, 'X');
+        f.write(garbage);
+        f.close();
+    }
+
+    MriVolData vol;
+    QVector<FiffCoordTrans> trans;
+    bool ok = MriMghIO::read(path, vol, trans);
+    QVERIFY(!ok);
+}
+
+//=============================================================================================================
+
+void TestMriIO::testMghEmptyFile()
+{
+    // Empty .mgh file
+    QString path = m_tempDir.path() + "/empty.mgh";
+    {
+        QFile f(path);
+        QVERIFY(f.open(QIODevice::WriteOnly));
+        f.close();
+    }
+
+    MriVolData vol;
+    QVector<FiffCoordTrans> trans;
+    bool ok = MriMghIO::read(path, vol, trans);
+    QVERIFY(!ok);
+
+    // Empty .mgz file
+    QString pathMgz = m_tempDir.path() + "/empty.mgz";
+    {
+        QFile f(pathMgz);
+        QVERIFY(f.open(QIODevice::WriteOnly));
+        f.close();
+    }
+    ok = MriMghIO::read(pathMgz, vol, trans);
+    QVERIFY(!ok);
+}
+
+//=============================================================================================================
+
+void TestMriIO::testCorFifWriteReadSynthetic()
+{
+    // Create a small synthetic volume AND round-trip through COR.fif
+    // This test does not require sample data
+    QByteArray mghData = createSyntheticMgh(4, 4, 3, MRI_UCHAR, true);
+    QString mghPath = m_tempDir.path() + "/synth_roundtrip.mgh";
+    QVERIFY(writeToFile(mghPath, mghData));
+
+    MriVolData vol;
+    QVector<FiffCoordTrans> trans;
+    bool ok = MriMghIO::read(mghPath, vol, trans);
+    QVERIFY(ok);
+    QCOMPARE(vol.slices.size(), 3);
+
+    // Write to COR.fif
+    QString corPath = m_tempDir.path() + "/COR_synth.fif";
+    ok = MriCorFifIO::write(corPath, vol.slices, trans);
+    QVERIFY(ok);
+    QVERIFY(QFile::exists(corPath));
+
+    // Read back and verify structure
+    QFile file(corPath);
+    FiffStream::SPtr stream(new FiffStream(&file));
+    QVERIFY(stream->open());
+
+    FiffTag::SPtr tag;
+    int sliceCount = 0;
+    stream->device()->seek(0);
+    while (!stream->device()->atEnd()) {
+        stream->read_tag(tag);
+        if (!tag) break;
+        if (tag->kind == FIFF_BLOCK_START) {
+            fiff_int_t blockKind = *tag->toInt();
+            if (blockKind == FIFFB_MRI_SLICE) sliceCount++;
+        }
+    }
+    QCOMPARE(sliceCount, 3);
     stream->close();
 }
 

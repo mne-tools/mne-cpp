@@ -11,7 +11,6 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
-    icp.cpp
     rtcov.cpp
     rtinvop.cpp
     averaging.cpp
@@ -21,7 +20,6 @@ set(SOURCES
     filter.cpp
     rtconnectivity.cpp
     rtprocessing_global.cpp
-    sphara.cpp
     detecttrigger.cpp
     helpers/cosinefilter.cpp
     helpers/parksmcclellan.cpp
@@ -30,7 +28,6 @@ set(SOURCES
 )
 
 set(HEADERS
-    icp.h
     rtprocessing_global.h
     rtcov.h
     rtinvop.h
@@ -40,7 +37,6 @@ set(HEADERS
     rthpis.h
     filter.h
     detecttrigger.h
-    sphara.h
     rtconnectivity.h
     helpers/cosinefilter.h
     helpers/parksmcclellan.h
@@ -48,7 +44,7 @@ set(HEADERS
     helpers/filterio.h
 )
 
-set(FILE_TO_UPDATE rtprocessing_global.cpp.cpp)
+set(FILE_TO_UPDATE rtprocessing_global.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")

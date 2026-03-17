@@ -23,6 +23,7 @@ set(SOURCES
   spectrogram.cpp
   warp.cpp
   sphere.cpp
+  sphara.cpp
   generics/observerpattern.cpp
   generics/applicationlogger.cpp
   spectral.cpp
@@ -43,6 +44,7 @@ set(HEADERS
   spectrogram.h
   warp.h
   sphere.h
+  sphara.h
   simplex_algorithm.h
   generics/circularbuffer.h
   generics/commandpattern.h

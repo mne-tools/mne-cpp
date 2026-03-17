@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     icp.cpp
+ * @file     mne_icp.cpp
  * @author   Ruben Dörfel <doerfelruben@aol.com>
  * @since    0.1.5
  * @date     July, 2020
@@ -36,11 +36,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "icp.h"
+#include "mne_icp.h"
 #include <iostream>
 
 #include "fiff/fiff_coord_trans.h"
-#include "mne/mne_project_to_surface.h"
+#include "mne_project_to_surface.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -63,7 +63,6 @@
 //=============================================================================================================
 
 using namespace MNELIB;
-using namespace RTPROCESSINGLIB;
 using namespace Eigen;
 using namespace FIFFLIB;
 
@@ -71,14 +70,14 @@ using namespace FIFFLIB;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-bool RTPROCESSINGLIB::performIcp(const MNEProjectToSurface::SPtr mneSurfacePoints,
-                                 const Eigen::MatrixXf& matPointCloud,
-                                 FiffCoordTrans& transFromTo,
-                                 float& fRMSE,
-                                 bool bScale,
-                                 int iMaxIter,
-                                 float fTol,
-                                 const VectorXf& vecWeitgths)
+bool MNELIB::performIcp(const MNEProjectToSurface::SPtr mneSurfacePoints,
+                        const Eigen::MatrixXf& matPointCloud,
+                        FiffCoordTrans& transFromTo,
+                        float& fRMSE,
+                        bool bScale,
+                        int iMaxIter,
+                        float fTol,
+                        const VectorXf& vecWeights)
 /**
  * Follow notation of P.J. Besl and N.D. McKay, A Method for
  * Registration of 3-D Shapes, IEEE Trans. Patt. Anal. Machine Intell., 14,
@@ -86,7 +85,7 @@ bool RTPROCESSINGLIB::performIcp(const MNEProjectToSurface::SPtr mneSurfacePoint
  */
 {
     if(matPointCloud.rows() == 0){
-        qWarning() << "[RTPROCESSINGLIB::icp] Passed point cloud is empty.";
+        qWarning() << "[MNELIB::icp] Passed point cloud is empty.";
         return false;
     }
 
@@ -113,13 +112,13 @@ bool RTPROCESSINGLIB::performIcp(const MNEProjectToSurface::SPtr mneSurfacePoint
 
         // Step a: compute the closest point on the surface; eq 29
         if(!mneSurfacePoints->find_closest_on_surface(matPk, iNP, matYk, vecNearest, vecDist)) {
-            qWarning() << "[RTPROCESSINGLIB::icp] find_closest_on_surface was not sucessfull.";
+            qWarning() << "[MNELIB::icp] find_closest_on_surface was not successful.";
             return false;
         }
 
         // Step b: compute the registration; eq 30
-        if(!fitMatchedPoints(matP0, matYk, matTrans, fScale, bScale, vecWeitgths)) {
-            qWarning() << "[RTPROCESSINGLIB::icp] point cloud registration not succesfull";
+        if(!fitMatchedPoints(matP0, matYk, matTrans, fScale, bScale, vecWeights)) {
+            qWarning() << "[MNELIB::icp] point cloud registration not successful";
         }
 
         // Step c: apply registration
@@ -133,26 +132,26 @@ bool RTPROCESSINGLIB::performIcp(const MNEProjectToSurface::SPtr mneSurfacePoint
 
         if(std::sqrt(std::fabs(fMSE - fMSEPrev)) < fTol) {
             transFromTo = transICP;
-            qInfo() << "[RTPROCESSINGLIB::icp] ICP was succesfull and exceeded after " << iIter +1 << " Iterations with RMSE dist: " << fRMSE * 1000 << " mm.";
+            qInfo() << "[MNELIB::icp] ICP was successful and converged after " << iIter +1 << " iterations with RMSE dist: " << fRMSE * 1000 << " mm.";
             return true;
         }
         fMSEPrev = fMSE;
-        qInfo() << "[RTPROCESSINGLIB::icp] ICP iteration " << iIter + 1 << " with RMSE: " << fRMSE * 1000 << " mm.";
+        qInfo() << "[MNELIB::icp] ICP iteration " << iIter + 1 << " with RMSE: " << fRMSE * 1000 << " mm.";
     }
     transFromTo = transICP;
 
-    qWarning() << "[RTPROCESSINGLIB::icp] Maximum number of " << iMaxIter << " Iterations exceeded with RMSE: " << fRMSE * 1000 << " mm.";
+    qWarning() << "[MNELIB::icp] Maximum number of " << iMaxIter << " iterations exceeded with RMSE: " << fRMSE * 1000 << " mm.";
     return true;
 }
 
 //=============================================================================================================
 
-bool RTPROCESSINGLIB::fitMatchedPoints(const MatrixXf& matSrcPoint,
-                                       const MatrixXf& matDstPoint,
-                                       Eigen::Matrix4f& matTrans,
-                                       float fScale,
-                                       bool bScale,
-                                       const VectorXf& vecWeitgths)
+bool MNELIB::fitMatchedPoints(const MatrixXf& matSrcPoint,
+                              const MatrixXf& matDstPoint,
+                              Eigen::Matrix4f& matTrans,
+                              float fScale,
+                              bool bScale,
+                              const VectorXf& vecWeights)
 /**
  * Follow notation of P.J. Besl and N.D. McKay, A Method for
  * Registration of 3-D Shapes, IEEE Trans. Patt. Anal. Machine Intell., 14,
@@ -164,7 +163,7 @@ bool RTPROCESSINGLIB::fitMatchedPoints(const MatrixXf& matSrcPoint,
     // init values
     MatrixXf matP = matSrcPoint;
     MatrixXf matX = matDstPoint;
-    VectorXf vecW = vecWeitgths;
+    VectorXf vecW = vecWeights;
     VectorXf vecMuP;                                // column wise mean - center of mass
     VectorXf vecMuX;                                // column wise mean - center of mass
     MatrixXf matDot;
@@ -180,18 +179,18 @@ bool RTPROCESSINGLIB::fitMatchedPoints(const MatrixXf& matSrcPoint,
 
     // test size of point clouds
     if(matSrcPoint.size() != matDstPoint.size()) {
-        qWarning() << "[RTPROCESSINGLIB::fitMatched] Point clouds do not match.";
+        qWarning() << "[MNELIB::fitMatchedPoints] Point clouds do not match.";
         return false;
     }
 
     // get center of mass
-    if(vecWeitgths.isZero()) {
+    if(vecWeights.isZero()) {
         vecMuP = matP.colwise().mean(); // eq 23
         vecMuX = matX.colwise().mean();
         matDot = matP.transpose() * matX;
         matDot = matDot / matP.rows();
     } else {
-        vecW = vecWeitgths / vecWeitgths.sum();
+        vecW = vecWeights / vecWeights.sum();
         vecMuP = vecW.transpose() * matP;
         vecMuX = vecW.transpose() * matX;
 
@@ -228,7 +227,7 @@ bool RTPROCESSINGLIB::fitMatchedPoints(const MatrixXf& matSrcPoint,
         matDevX = matDevX.cwiseProduct(matDevX);
         matDevP = matDevP.cwiseProduct(matDevP);
 
-        if(!vecWeitgths.isZero()) {
+        if(!vecWeights.isZero()) {
             for(int i = 0; i < (vecW.size()); ++i) {
                 matDevX.row(i) = matDevX.row(i) * vecW(i);
                 matDevP.row(i) = matDevP.row(i) * vecW(i);
@@ -252,7 +251,7 @@ bool RTPROCESSINGLIB::fitMatchedPoints(const MatrixXf& matSrcPoint,
 
 //=========================================================================================================
 
-bool RTPROCESSINGLIB::discard3DPointOutliers(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
+bool MNELIB::discard3DPointOutliers(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
                                              const MatrixXf& matPointCloud,
                                              const FiffCoordTrans& transFromTo,
                                              VectorXi& vecTake,
@@ -274,7 +273,7 @@ bool RTPROCESSINGLIB::discard3DPointOutliers(const QSharedPointer<MNELIB::MNEPro
     // discard outliers if necessary
     if(fMaxDist > 0.0) {
         if(!mneSurfacePoints->find_closest_on_surface(matP, iNP, matYk, vecNearest, vecDist)) {
-            qWarning() << "[RTPROCESSINGLIB::icp] find_closest_on_surface was not sucessfull.";
+            qWarning() << "[MNELIB::icp] find_closest_on_surface was not successful.";
             return false;
         }
 
@@ -289,7 +288,7 @@ bool RTPROCESSINGLIB::discard3DPointOutliers(const QSharedPointer<MNELIB::MNEPro
             }
         }
     }
-    qInfo() << "[RTPROCESSINGLIB::discardOutliers] " << iDiscarded << "digitizers discarded.";
+    qInfo() << "[MNELIB::discardOutliers] " << iDiscarded << "digitizers discarded.";
     return true;
 }
 

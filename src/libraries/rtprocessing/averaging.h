@@ -92,7 +92,7 @@ class FilterKernel;
  * @param[in] lExcludeChs       List of channel names to exclude.
  * @param[in] vecPicks          Which channels to pick.
  */
-RTPROCESINGSHARED_EXPORT FIFFLIB::FiffEvoked computeAverage(const FIFFLIB::FiffRawData& raw,
+RTPROCESSINGSHARED_EXPORT FIFFLIB::FiffEvoked computeAverage(const FIFFLIB::FiffRawData& raw,
                                                             const Eigen::MatrixXi& matEvents,
                                                             float fTMinS,
                                                             float fTMaxS,
@@ -121,7 +121,7 @@ RTPROCESINGSHARED_EXPORT FIFFLIB::FiffEvoked computeAverage(const FIFFLIB::FiffR
  * @param[in] lExcludeChs       List of channel names to exclude.
  * @param[in] vecPicks          Which channels to pick.
  */
-RTPROCESINGSHARED_EXPORT FIFFLIB::FiffEvoked computeFilteredAverage(const FIFFLIB::FiffRawData& raw,
+RTPROCESSINGSHARED_EXPORT FIFFLIB::FiffEvoked computeFilteredAverage(const FIFFLIB::FiffRawData& raw,
                                                                     const Eigen::MatrixXi& matEvents,
                                                                     float fTMinS,
                                                                     float fTMaxS,

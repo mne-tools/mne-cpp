@@ -80,7 +80,7 @@ namespace RTPROCESSINGLIB
  *
  * @brief Background worker thread that accumulates and averages epochs in real time.
  */
-class RTPROCESINGSHARED_EXPORT RtAveragingWorker : public QObject
+class RTPROCESSINGSHARED_EXPORT RtAveragingWorker : public QObject
 {
     Q_OBJECT
 
@@ -107,9 +107,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Perform one single HPI fit.
+     * Perform one averaging step on new incoming data.
      *
-     * @param[in] t_mat           Data to estimate the HPI positions from.
+     * @param[in] matData           Data to average.
      */
     void doWork(const Eigen::MatrixXd& matData);
 
@@ -281,7 +281,7 @@ signals:
  *
  * @brief Controller that manages RtAveragingWorker for online epoch averaging with baseline correction.
  */
-class RTPROCESINGSHARED_EXPORT RtAveraging : public QObject
+class RTPROCESSINGSHARED_EXPORT RtAveraging : public QObject
 {
     Q_OBJECT
 

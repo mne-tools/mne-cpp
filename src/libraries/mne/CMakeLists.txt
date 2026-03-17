@@ -21,6 +21,7 @@ set(SOURCES
     mne_bem.cpp
     mne_bem_surface.cpp
     mne_project_to_surface.cpp
+    mne_icp.cpp
     mne_cov_matrix.cpp
     mne_ctf_comp_data.cpp
     mne_ctf_comp_data_set.cpp
@@ -73,6 +74,7 @@ set(HEADERS
     mne_bem.h
     mne_bem_surface.h
     mne_project_to_surface.h
+    mne_icp.h
     mne_cov_matrix.h
     mne_ctf_comp_data.h
     mne_ctf_comp_data_set.h

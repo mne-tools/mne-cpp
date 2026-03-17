@@ -192,10 +192,10 @@ public:
     float       xsize;              /**< Voxel spacing in X direction (mm). */
     float       ysize;              /**< Voxel spacing in Y direction (mm). */
     float       zsize;              /**< Voxel spacing in Z direction (mm). */
-    float       x_ras[3];           /**< X-direction cosines (xr, xa, xs). Default: (-1, 0, 0). */
-    float       y_ras[3];           /**< Y-direction cosines (yr, ya, ys). Default: (0, 0, -1). */
-    float       z_ras[3];           /**< Z-direction cosines (zr, za, zs). Default: (0, 1, 0). */
-    float       c_ras[3];           /**< Center RAS coordinates (cr, ca, cs). Default: (0, 0, 0). */
+    Eigen::Vector3f  x_ras;    /**< X-direction cosines (xr, xa, xs). Default: (-1, 0, 0). */
+    Eigen::Vector3f  y_ras;    /**< Y-direction cosines (yr, ya, ys). Default: (0, 0, -1). */
+    Eigen::Vector3f  z_ras;    /**< Z-direction cosines (zr, za, zs). Default: (0, 1, 0). */
+    Eigen::Vector3f  c_ras;    /**< Center RAS coordinates (cr, ca, cs). Default: (0, 0, 0). */
 
     //=========================================================================================================
     // Coordinate Transforms
