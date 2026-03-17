@@ -152,6 +152,16 @@ public:
      */
     QString toMachidString() const;
 
+    //=========================================================================================================
+    /**
+     * Returns a human-readable string representation of this ID.
+     *
+     * Format: "major.minor 0xMACHID1MACHID2 timestamp"
+     *
+     * @return Formatted string describing the ID.
+     */
+    QString toString() const;
+
     /**
      * Compares two FiffId instances for equality.
      *

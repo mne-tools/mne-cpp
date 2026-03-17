@@ -515,7 +515,7 @@ void RtcMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //=============================================================================================================
 
-void RtcMne::updateInvOp(const InvInverseOperator& invOp)
+void RtcMne::updateInvOp(const MNEInverseOperator& invOp)
 {
     QMutexLocker locker(&m_qMutex);
 

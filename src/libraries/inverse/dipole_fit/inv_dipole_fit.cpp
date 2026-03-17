@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "inv_dipole_fit.h"
-#include "../inv_meas_data_set.h"
+#include <mne/mne_meas_data_set.h>
 #include "inv_guess_data.h"
 
 #include <memory>
@@ -228,7 +228,7 @@ InvEcdSet InvDipoleFit::calculateFit() const
     fit_data->fit_mag_dipoles = settings->fit_mag_dipoles;
 
     std::unique_ptr<MNERawData>        raw;
-    std::unique_ptr<InvMeasData>       data;
+    std::unique_ptr<MNEMeasData>       data;
     std::unique_ptr<MNEChSelection>    sel;
 
     if (settings->is_raw) {
@@ -264,7 +264,7 @@ InvEcdSet InvDipoleFit::calculateFit() const
     }
     else {
         qInfo("\n---- Reading data...\n");
-        data.reset(InvMeasData::mne_read_meas_data(settings->measname,
+        data.reset(MNEMeasData::mne_read_meas_data(settings->measname,
                                                    settings->setno,
                                                    nullptr,
                                                    nullptr,
@@ -320,7 +320,7 @@ InvEcdSet InvDipoleFit::calculateFit() const
 
 //=============================================================================================================
 
-bool InvDipoleFit::fit_dipoles( const QString& dataname, InvMeasData* data, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, InvEcdSet& p_set)
+bool InvDipoleFit::fit_dipoles( const QString& dataname, MNEMeasData* data, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, InvEcdSet& p_set)
 {
     Eigen::VectorXf one(data->nchan);
     InvEcdSet set;
@@ -401,7 +401,7 @@ bool InvDipoleFit::fit_dipoles_raw(const QString& dataname, MNERawData* raw, mne
             picks = time*sfreq - start;
             stime = start/sfreq;
         }
-        if (InvMeasDataSet::getValuesFromChannelData(time, integ, data, length, nchan, stime, sfreq, false, one.data()) < 0) {
+        if (MNEMeasDataSet::getValuesFromChannelData(time, integ, data, length, nchan, stime, sfreq, false, one.data()) < 0) {
             qWarning("Cannot pick time: %8.3f s",time);
             continue;
         }

@@ -46,7 +46,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_evoked_set.h>
-#include <inverse/inv_inverse_operator.h>
+#include <mne/mne_inverse_operator.h>
 
 #include <fiff/fiff_evoked.h>
 #include <inverse/inv_source_estimate.h>
@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
     //
     //   Then the inverse operator
     //
-    InvInverseOperator inverse_operator(t_fileInv);
+    MNEInverseOperator inverse_operator(t_fileInv);
 
     //
     // Compute inverse solution

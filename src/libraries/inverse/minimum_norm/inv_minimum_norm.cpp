@@ -65,7 +65,7 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InvMinimumNorm::InvMinimumNorm(const InvInverseOperator &p_inverseOperator, float lambda, const QString method)
+InvMinimumNorm::InvMinimumNorm(const MNEInverseOperator &p_inverseOperator, float lambda, const QString method)
 : m_inverseOperator(p_inverseOperator)
 , inverseSetup(false)
 {
@@ -75,7 +75,7 @@ InvMinimumNorm::InvMinimumNorm(const InvInverseOperator &p_inverseOperator, floa
 
 //=============================================================================================================
 
-InvMinimumNorm::InvMinimumNorm(const InvInverseOperator &p_inverseOperator, float lambda, bool dSPM, bool sLORETA)
+InvMinimumNorm::InvMinimumNorm(const MNEInverseOperator &p_inverseOperator, float lambda, bool dSPM, bool sLORETA)
 : m_inverseOperator(p_inverseOperator)
 , inverseSetup(false)
 {
@@ -124,7 +124,7 @@ InvSourceEstimate InvMinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoke
 //    }
 
 //    //ToDo his could be heavily accelerated for real time calculation -> ToDo calculate inverse RT
-//    InvInverseOperator inv = m_inverseOperator.prepare_inverse_operator(nave, m_fLambda, m_bdSPM, m_bsLORETA);
+//    MNEInverseOperator inv = m_inverseOperator.prepare_inverse_operator(nave, m_fLambda, m_bdSPM, m_bsLORETA);
 //    //
 //    //   Pick the correct channels from the data
 //    //

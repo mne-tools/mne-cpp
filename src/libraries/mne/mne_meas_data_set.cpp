@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     inv_meas_data_set.cpp
+ * @file     mne_meas_data_set.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MNE Meas Data Set (InvMeasDataSet) Class.
+ * @brief    Definition of the MNE Meas Data Set (MNEMeasDataSet) Class.
  *
  */
 
@@ -38,8 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "inv_meas_data_set.h"
-#include <mne/mne_mne_data.h>
+#include "mne_meas_data_set.h"
 
 #include <fiff/fiff_file.h>
 
@@ -50,62 +49,32 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace INVLIB;
+using namespace MNELIB;
 using namespace FIFFLIB;
-
-#define FREE_8(x) if ((char *)(x) != nullptr) free((char *)(x))
-
-#define FREE_CMATRIX_8(m) mne_free_cmatrix_8((m))
-
-void mne_free_cmatrix_8 (float **m)
-{
-    if (m) {
-        FREE_8(*m);
-        FREE_8(m);
-    }
-}
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InvMeasDataSet::InvMeasDataSet()
-:data(nullptr)
-,data_filt(nullptr)
-,data_proj(nullptr)
-,data_white(nullptr)
-,stim14(nullptr)
-,first(0)
-,np(0)
-,nave(1)
-,kind(FIFFV_ASPECT_AVERAGE)
-,baselines(nullptr)
-,mne(nullptr)
-,user_data(nullptr)
-,user_data_free(nullptr)
+MNEMeasDataSet::MNEMeasDataSet()
+: first(0)
+, np(0)
+, nave(1)
+, kind(FIFFV_ASPECT_AVERAGE)
+, tmin(0.0f)
+, tstep(0.0f)
 {
 }
 
 //=============================================================================================================
 
-InvMeasDataSet::~InvMeasDataSet()
+MNEMeasDataSet::~MNEMeasDataSet()
 {
-    FREE_CMATRIX_8(data);
-    FREE_CMATRIX_8(data_proj);
-    FREE_CMATRIX_8(data_filt);
-    FREE_CMATRIX_8(data_white);
-    FREE_8(stim14);
-    comment.clear();
-    FREE_8(baselines);
-    if(mne)
-        delete mne;
-    if (user_data && user_data_free)
-        user_data_free(user_data);
 }
 
 //=============================================================================================================
 
-int InvMeasDataSet::getValuesAtTime(float time, float integ, int nch, bool use_abs, float *value) const
+int MNEMeasDataSet::getValuesAtTime(float time, float integ, int nch, bool use_abs, float *value) const
 {
     constexpr float EPS = 0.05f;
     const float sfreq = 1.0f / tstep;
@@ -131,11 +100,11 @@ int InvMeasDataSet::getValuesAtTime(float time, float integ, int nch, bool use_a
             }
             if (f1 < 1.0f) {
                 if (use_abs)
-                    sum = f1 * std::fabs(data[n1][ch]) + (1.0f - f1) * std::fabs(data[n1 + 1][ch]);
+                    sum = f1 * std::fabs(data(n1, ch)) + (1.0f - f1) * std::fabs(data(n1 + 1, ch));
                 else
-                    sum = f1 * data[n1][ch] + (1.0f - f1) * data[n1 + 1][ch];
+                    sum = f1 * data(n1, ch) + (1.0f - f1) * data(n1 + 1, ch);
             } else {
-                sum = use_abs ? std::fabs(data[n1][ch]) : data[n1][ch];
+                sum = use_abs ? std::fabs(data(n1, ch)) : data(n1, ch);
             }
         } else {
             /* Multiple samples */
@@ -151,9 +120,9 @@ int InvMeasDataSet::getValuesAtTime(float time, float integ, int nch, bool use_a
                 float f1 = s1 - n1;
                 float f2 = s2 - n1;
                 if (use_abs)
-                    sum = 0.5f * ((f1 + f2) * std::fabs(data[n1 + 1][ch]) + (2.0f - f1 - f2) * std::fabs(data[n1][ch]));
+                    sum = 0.5f * ((f1 + f2) * std::fabs(data(n1 + 1, ch)) + (2.0f - f1 - f2) * std::fabs(data(n1, ch)));
                 else
-                    sum = 0.5f * ((f1 + f2) * data[n1 + 1][ch] + (2.0f - f1 - f2) * data[n1][ch]);
+                    sum = 0.5f * ((f1 + f2) * data(n1 + 1, ch) + (2.0f - f1 - f2) * data(n1, ch));
             } else {
                 float f1 = n1 - s1;
                 float f2 = s2 - n2;
@@ -173,28 +142,28 @@ int InvMeasDataSet::getValuesAtTime(float time, float integ, int nch, bool use_a
                 float width = 0.0f;
                 if (n2 > n1) {
                     if (use_abs) {
-                        sum = 0.5f * std::fabs(data[n1][ch]);
+                        sum = 0.5f * std::fabs(data(n1, ch));
                         for (int k = n1 + 1; k < n2; k++)
-                            sum += std::fabs(data[k][ch]);
-                        sum += 0.5f * std::fabs(data[n2][ch]);
+                            sum += std::fabs(data(k, ch));
+                        sum += 0.5f * std::fabs(data(n2, ch));
                     } else {
-                        sum = 0.5f * data[n1][ch];
+                        sum = 0.5f * data(n1, ch);
                         for (int k = n1 + 1; k < n2; k++)
-                            sum += data[k][ch];
-                        sum += 0.5f * data[n2][ch];
+                            sum += data(k, ch);
+                        sum += 0.5f * data(n2, ch);
                     }
                     width = static_cast<float>(n2 - n1);
                 }
                 if (use_abs) {
                     if (f1 != 0.0f)
-                        sum += 0.5f * f1 * (f1 * std::fabs(data[n1 - 1][ch]) + (2.0f - f1) * std::fabs(data[n1][ch]));
+                        sum += 0.5f * f1 * (f1 * std::fabs(data(n1 - 1, ch)) + (2.0f - f1) * std::fabs(data(n1, ch)));
                     if (f2 != 0.0f)
-                        sum += 0.5f * f2 * (f2 * std::fabs(data[n2 + 1][ch]) + (2.0f - f2) * std::fabs(data[n2][ch]));
+                        sum += 0.5f * f2 * (f2 * std::fabs(data(n2 + 1, ch)) + (2.0f - f2) * std::fabs(data(n2, ch)));
                 } else {
                     if (f1 != 0.0f)
-                        sum += 0.5f * f1 * (f1 * data[n1 - 1][ch] + (2.0f - f1) * data[n1][ch]);
+                        sum += 0.5f * f1 * (f1 * data(n1 - 1, ch) + (2.0f - f1) * data(n1, ch));
                     if (f2 != 0.0f)
-                        sum += 0.5f * f2 * (f2 * data[n2 + 1][ch] + (2.0f - f2) * data[n2][ch]);
+                        sum += 0.5f * f2 * (f2 * data(n2 + 1, ch) + (2.0f - f2) * data(n2, ch));
                 }
                 width += f1 + f2;
                 sum /= width;
@@ -207,7 +176,7 @@ int InvMeasDataSet::getValuesAtTime(float time, float integ, int nch, bool use_a
 
 //=============================================================================================================
 
-int InvMeasDataSet::getValuesFromChannelData(float time, float integ, float **data, int nsamp, int nch,
+int MNEMeasDataSet::getValuesFromChannelData(float time, float integ, float **data, int nsamp, int nch,
                                              float tmin, float sfreq, bool use_abs, float *value)
 {
     constexpr float EPS = 0.05f;

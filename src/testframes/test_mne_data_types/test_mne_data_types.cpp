@@ -8,7 +8,7 @@
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
 #include <mne/mne_forward_solution.h>
-#include <inverse/inv_inverse_operator.h>
+#include <mne/mne_inverse_operator.h>
 #include <inverse/inv_source_estimate.h>
 #include <mne/mne_epoch_data.h>
 #include <mne/mne_epoch_data_list.h>
@@ -269,24 +269,24 @@ private slots:
     }
 
     //=========================================================================
-    // InvInverseOperator
+    // MNEInverseOperator
     //=========================================================================
     void invOp_defaultCtor()
     {
-        InvInverseOperator inv;
+        MNEInverseOperator inv;
         QVERIFY(!inv.isFixedOrient());
     }
 
     void invOp_copyCtor()
     {
-        InvInverseOperator inv;
-        InvInverseOperator copy(inv);
+        MNEInverseOperator inv;
+        MNEInverseOperator copy(inv);
         QVERIFY(!copy.isFixedOrient());
     }
 
     void invOp_kernel()
     {
-        InvInverseOperator inv;
+        MNEInverseOperator inv;
         MatrixXd kernel = inv.getKernel();
         QCOMPARE(kernel.rows(), 0);
     }

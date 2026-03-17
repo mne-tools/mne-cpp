@@ -17,7 +17,7 @@
 #include <mne/mne_cov_matrix.h>
 #include <mne/mne_proj_op.h>
 #include <mne/mne_ctf_comp_data.h>
-#include <inverse/inv_inverse_operator.h>
+#include <mne/mne_inverse_operator.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
@@ -842,7 +842,7 @@ private slots:
     }
 
     //=========================================================================
-    // DATA-DRIVEN: InvInverseOperator from fwd+cov
+    // DATA-DRIVEN: MNEInverseOperator from fwd+cov
     //=========================================================================
     void data_invOp_makeFromFwdCov()
     {
@@ -864,7 +864,7 @@ private slots:
 
         if (fwd.isEmpty() || noiseCov.isEmpty()) QSKIP("Failed to load");
 
-        InvInverseOperator invOp = InvInverseOperator::make_inverse_operator(
+        MNEInverseOperator invOp = MNEInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
         QVERIFY(invOp.nchan > 0);
         QVERIFY(invOp.nsource > 0);

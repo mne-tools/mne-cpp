@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     inv_inverse_operator.cpp
+ * @file     mne_inverse_operator.cpp
  * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the InvInverseOperator Class.
+ * @brief    Definition of the MNEInverseOperator Class.
  *
  */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "inv_inverse_operator.h"
+#include "mne_inverse_operator.h"
 #include <fs/fs_label.h>
 
 #include <iostream>
@@ -63,7 +63,7 @@
 
 using namespace UTILSLIB;
 using namespace MNELIB;
-using namespace INVLIB;
+using namespace MNELIB;
 using namespace FIFFLIB;
 using namespace FSLIB;
 using namespace Eigen;
@@ -72,7 +72,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InvInverseOperator::InvInverseOperator()
+MNEInverseOperator::MNEInverseOperator()
 : methods(-1)
 , source_ori(-1)
 , nsource(-1)
@@ -88,22 +88,22 @@ InvInverseOperator::InvInverseOperator()
 , fmri_prior(new FiffCov)
 , nave(-1)
 {
-    qRegisterMetaType<QSharedPointer<INVLIB::InvInverseOperator> >("QSharedPointer<INVLIB::InvInverseOperator>");
-    qRegisterMetaType<INVLIB::InvInverseOperator>("INVLIB::InvInverseOperator");
+    qRegisterMetaType<QSharedPointer<MNELIB::MNEInverseOperator> >("QSharedPointer<MNELIB::MNEInverseOperator>");
+    qRegisterMetaType<MNELIB::MNEInverseOperator>("MNELIB::MNEInverseOperator");
 }
 
 //=============================================================================================================
 
-InvInverseOperator::InvInverseOperator(QIODevice& p_IODevice)
+MNEInverseOperator::MNEInverseOperator(QIODevice& p_IODevice)
 {
-    InvInverseOperator::read_inverse_operator(p_IODevice, *this);
-    qRegisterMetaType<QSharedPointer<INVLIB::InvInverseOperator> >("QSharedPointer<INVLIB::InvInverseOperator>");
-    qRegisterMetaType<INVLIB::InvInverseOperator>("INVLIB::InvInverseOperator");
+    MNEInverseOperator::read_inverse_operator(p_IODevice, *this);
+    qRegisterMetaType<QSharedPointer<MNELIB::MNEInverseOperator> >("QSharedPointer<MNELIB::MNEInverseOperator>");
+    qRegisterMetaType<MNELIB::MNEInverseOperator>("MNELIB::MNEInverseOperator");
 }
 
 //=============================================================================================================
 
-InvInverseOperator::InvInverseOperator(const FiffInfo &info,
+MNEInverseOperator::MNEInverseOperator(const FiffInfo &info,
                                        const MNEForwardSolution& forward,
                                        const FiffCov& p_noise_cov,
                                        float loose,
@@ -111,75 +111,73 @@ InvInverseOperator::InvInverseOperator(const FiffInfo &info,
                                        bool fixed,
                                        bool limit_depth_chs)
 {
-     *this = InvInverseOperator::make_inverse_operator(info, forward, p_noise_cov, loose, depth, fixed, limit_depth_chs);
-    qRegisterMetaType<QSharedPointer<INVLIB::InvInverseOperator> >("QSharedPointer<INVLIB::InvInverseOperator>");
-    qRegisterMetaType<INVLIB::InvInverseOperator>("INVLIB::InvInverseOperator");
+     *this = MNEInverseOperator::make_inverse_operator(info, forward, p_noise_cov, loose, depth, fixed, limit_depth_chs);
+    qRegisterMetaType<QSharedPointer<MNELIB::MNEInverseOperator> >("QSharedPointer<MNELIB::MNEInverseOperator>");
+    qRegisterMetaType<MNELIB::MNEInverseOperator>("MNELIB::MNEInverseOperator");
 }
 
 //=============================================================================================================
 
-InvInverseOperator::InvInverseOperator(const InvInverseOperator &p_MNEInverseOperator)
-: info(p_MNEInverseOperator.info)
-, methods(p_MNEInverseOperator.methods)
-, source_ori(p_MNEInverseOperator.source_ori)
-, nsource(p_MNEInverseOperator.nsource)
-, nchan(p_MNEInverseOperator.nchan)
-, coord_frame(p_MNEInverseOperator.coord_frame)
-, source_nn(p_MNEInverseOperator.source_nn)
-, sing(p_MNEInverseOperator.sing)
-, eigen_leads_weighted(p_MNEInverseOperator.eigen_leads_weighted)
-, eigen_leads(p_MNEInverseOperator.eigen_leads)
-, eigen_fields(p_MNEInverseOperator.eigen_fields)
-, noise_cov(p_MNEInverseOperator.noise_cov)
-, source_cov(p_MNEInverseOperator.source_cov)
-, orient_prior(p_MNEInverseOperator.orient_prior)
-, depth_prior(p_MNEInverseOperator.depth_prior)
-, fmri_prior(p_MNEInverseOperator.fmri_prior)
-, src(p_MNEInverseOperator.src)
-, mri_head_t(p_MNEInverseOperator.mri_head_t)
-, nave(p_MNEInverseOperator.nave)
-, projs(p_MNEInverseOperator.projs)
-, proj(p_MNEInverseOperator.proj)
-, whitener(p_MNEInverseOperator.whitener)
-, reginv(p_MNEInverseOperator.reginv)
-, noisenorm(p_MNEInverseOperator.noisenorm)
+MNEInverseOperator::MNEInverseOperator(const MNEInverseOperator &other)
+: info(other.info)
+, methods(other.methods)
+, source_ori(other.source_ori)
+, nsource(other.nsource)
+, nchan(other.nchan)
+, coord_frame(other.coord_frame)
+, source_nn(other.source_nn)
+, sing(other.sing)
+, eigen_leads_weighted(other.eigen_leads_weighted)
+, eigen_leads(other.eigen_leads)
+, eigen_fields(other.eigen_fields)
+, noise_cov(other.noise_cov)
+, source_cov(other.source_cov)
+, orient_prior(other.orient_prior)
+, depth_prior(other.depth_prior)
+, fmri_prior(other.fmri_prior)
+, src(other.src)
+, mri_head_t(other.mri_head_t)
+, nave(other.nave)
+, projs(other.projs)
+, proj(other.proj)
+, whitener(other.whitener)
+, reginv(other.reginv)
+, noisenorm(other.noisenorm)
 {
-    qRegisterMetaType<QSharedPointer<INVLIB::InvInverseOperator> >("QSharedPointer<INVLIB::InvInverseOperator>");
-    qRegisterMetaType<INVLIB::InvInverseOperator>("INVLIB::InvInverseOperator");
+    qRegisterMetaType<QSharedPointer<MNELIB::MNEInverseOperator> >("QSharedPointer<MNELIB::MNEInverseOperator>");
+    qRegisterMetaType<MNELIB::MNEInverseOperator>("MNELIB::MNEInverseOperator");
 }
 
 //=============================================================================================================
 
-InvInverseOperator::~InvInverseOperator()
-{
-}
+MNEInverseOperator::~MNEInverseOperator() = default;
 
 //=============================================================================================================
 
-bool InvInverseOperator::assemble_kernel(const FsLabel &label,
-                                         QString method,
+bool MNEInverseOperator::assemble_kernel(const FsLabel &label,
+                                         const QString &method,
                                          bool pick_normal,
                                          MatrixXd &K,
                                          SparseMatrix<double> &noise_norm,
                                          QList<VectorXi> &vertno)
 {
-    MatrixXd t_eigen_leads = this->eigen_leads->data;
-    MatrixXd t_source_cov = this->source_cov->data;
-    if(method.compare("MNE") != 0)
-        noise_norm = this->noisenorm;
+    MatrixXd t_eigen_leads = eigen_leads->data;
+    MatrixXd t_source_cov = source_cov->data;
+    if(method.compare(QLatin1String("MNE")) != 0)
+        noise_norm = noisenorm;
 
-    vertno = this->src.get_vertno();
+    vertno = src.get_vertno();
 
     typedef Eigen::Triplet<double> T;
     std::vector<T> tripletList;
 
     if(!label.isEmpty())
     {
-        qDebug() << "ToDo: FsLabel selection needs to be debugged - not done jet!";
+        qWarning("Label selection needs further debugging.");
         VectorXi src_sel;
-        vertno = this->src.label_src_vertno_sel(label, src_sel);
+        vertno = src.label_src_vertno_sel(label, src_sel);
 
-        if(method.compare("MNE") != 0)
+        if(method.compare(QLatin1String("MNE")) != 0)
         {
             tripletList.clear();
             tripletList.reserve(noise_norm.nonZeros());
@@ -188,11 +186,15 @@ bool InvInverseOperator::assemble_kernel(const FsLabel &label,
             {
                 for (SparseMatrix<double>::InnerIterator it(noise_norm,k); it; ++it)
                 {
-                    //ToDo bad search - increase speed by using stl search
                     qint32 row = -1;
                     for(qint32 i = 0; i < src_sel.size(); ++i)
+                    {
                         if(src_sel[i] == it.row())
+                        {
                             row = i;
+                            break;
+                        }
+                    }
                     if(row != -1)
                         tripletList.push_back(T(it.row(), it.col(), it.value()));
                 }
@@ -202,7 +204,7 @@ bool InvInverseOperator::assemble_kernel(const FsLabel &label,
             noise_norm.setFromTriplets(tripletList.begin(), tripletList.end());
         }
 
-        if(this->source_ori == FIFFV_MNE_FREE_ORI)
+        if(source_ori == FIFFV_MNE_FREE_ORI)
         {
             VectorXi src_sel_new(src_sel.size()*3);
 
@@ -226,13 +228,13 @@ bool InvInverseOperator::assemble_kernel(const FsLabel &label,
 
     if(pick_normal)
     {
-        if(this->source_ori != FIFFV_MNE_FREE_ORI)
+        if(source_ori != FIFFV_MNE_FREE_ORI)
         {
             qWarning("Warning: Pick normal can only be used with a free orientation inverse operator.\n");
             return false;
         }
 
-        bool is_loose = ((0 < this->orient_prior->data(0,0)) && (this->orient_prior->data(0,0) < 1)) ? true : false;
+        bool is_loose = (0 < orient_prior->data(0,0)) && (orient_prior->data(0,0) < 1);
         if(!is_loose)
         {
             qWarning("The pick_normal parameter is only valid when working with loose orientations.\n");
@@ -294,7 +296,7 @@ bool InvInverseOperator::assemble_kernel(const FsLabel &label,
        K = t_sourceCov*t_eigen_leads*trans;
     }
 
-    if(method.compare("MNE") == 0)
+    if(method.compare(QLatin1String("MNE")) == 0)
         noise_norm = SparseMatrix<double>();
 
     //store assembled kernel
@@ -305,7 +307,7 @@ bool InvInverseOperator::assemble_kernel(const FsLabel &label,
 
 //=============================================================================================================
 
-bool InvInverseOperator::check_ch_names(const FiffInfo &info) const
+bool MNEInverseOperator::check_ch_names(const FiffInfo &info) const
 {
     QStringList inv_ch_names = this->eigen_fields->col_names;
 
@@ -350,11 +352,11 @@ bool InvInverseOperator::check_ch_names(const FiffInfo &info) const
 
 //=============================================================================================================
 
-MatrixXd InvInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D, QString p_sMethod) const
+MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D, const QString &p_sMethod) const
 {
     printf("Cluster kernel using %s.\n", p_sMethod.toUtf8().constData());
 
-    MatrixXd p_outMT = this->m_K.transpose();
+    MatrixXd p_outMT = m_K.transpose();
 
     QList<MNEClusterInfo> t_qListMNEClusterInfo;
     MNEClusterInfo t_MNEClusterInfo;
@@ -362,34 +364,13 @@ MatrixXd InvInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
     t_qListMNEClusterInfo.append(t_MNEClusterInfo);
 
     //
-    // Check consisty
+    // Check consistency
     //
-    if(this->isFixedOrient())
+    if(isFixedOrient())
     {
-        printf("Error: Fixed orientation not implemented jet!\n");
+        printf("Error: Fixed orientation not implemented yet!\n");
         return p_outMT;
     }
-
-//    qDebug() << "p_outMT" << p_outMT.rows() << "x" << p_outMT.cols();
-
-//    MatrixXd t_G_Whitened(0,0);
-//    bool t_bUseWhitened = false;
-//    //
-//    //Whiten gain matrix before clustering -> cause diffenerent units Magnetometer, Gradiometer and EEG
-//    //
-//    if(!p_pNoise_cov.isEmpty() && !p_pInfo.isEmpty())
-//    {
-//        FiffInfo p_outFwdInfo;
-//        FiffCov p_outNoiseCov;
-//        MatrixXd p_outWhitener;
-//        qint32 p_outNumNonZero;
-//        //do whitening with noise cov
-//        this->prepare_forward(p_pInfo, p_pNoise_cov, false, p_outFwdInfo, t_G_Whitened, p_outNoiseCov, p_outWhitener, p_outNumNonZero);
-//        printf("\tWhitening the forward solution.\n");
-
-//        t_G_Whitened = p_outWhitener*t_G_Whitened;
-//        t_bUseWhitened = true;
-//    }
 
     //
     // Assemble input data
@@ -405,7 +386,6 @@ MatrixXd InvInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
         count = 0;
         offset = 0;
 
-        // Offset for continuous indexing;
         if(h > 0)
             for(qint32 j = 0; j < h; ++j)
                 offset += this->src[j].nuse;
@@ -421,7 +401,6 @@ MatrixXd InvInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
         // Get label ids for every vertex
         VectorXi vertno_labeled = VectorXi::Zero(this->src[h].vertno.rows());
 
-        //ToDo make this more universal -> using FsLabel instead of annotations - obsolete when using Labels
         for(qint32 i = 0; i < vertno_labeled.rows(); ++i)
             vertno_labeled[i] = p_AnnotationSet[h].getLabelIds()[this->src[h].vertno[i]];
 
@@ -520,18 +499,15 @@ MatrixXd InvInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
             nSens = itOut->ctrs.cols()/3;
             t_MT_partial = MatrixXd::Zero(nSens, nClusters*3);
 
-//            std::cout << "Number of Clusters: " << nClusters << " x " << nSens << std::endl;//itOut->iLabelIdcsOut << std::endl;
-
             //
             // Assign the centroid for each cluster to the partial G
             //
-            //ToDo change this use indeces found with whitened data
             for(qint32 j = 0; j < nSens; ++j)
                 for(qint32 k = 0; k < nClusters; ++k)
                     t_MT_partial.block(j, k*3, 1, 3) = itOut->ctrs.block(k,j*3,1,3);
 
             //
-            // Get cluster indizes and its distances to the centroid
+            // Get cluster indices and their distances to the centroid
             //
             for(qint32 j = 0; j < nClusters; ++j)
             {
@@ -543,8 +519,6 @@ MatrixXd InvInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
                     if(itOut->roiIdx[k] == j)
                     {
                         clusterIdcs[nClusterIdcs] = itIn->idcs[k];
-//                        qint32 offset = h == 0 ? 0 : this->src[0].nuse;
-//                        Q_UNUSED(offset)
                         clusterDistance[nClusterIdcs] = itOut->D(k,j);
                         ++nClusterIdcs;
                     }
@@ -576,7 +550,6 @@ MatrixXd InvInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
                     double sqec = sqrt((itIn->matRoiMTOrig.block(0, j*3, itIn->matRoiMTOrig.rows(), 3) - t_MT_partial.block(0, k*3, t_MT_partial.rows(), 3)).array().pow(2).sum());
                     double sqec_min = sqec;
                     qint32 j_min = 0;
-//                    MatrixXd matGainDiff;
                     for(qint32 j = 1; j < itIn->idcs.rows(); ++j)
                     {
                         sqec = sqrt((itIn->matRoiMTOrig.block(0, j*3, itIn->matRoiMTOrig.rows(), 3) - t_MT_partial.block(0, k*3, t_MT_partial.rows(), 3)).array().pow(2).sum());
@@ -585,20 +558,9 @@ MatrixXd InvInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
                         {
                             sqec_min = sqec;
                             j_min = j;
-//                            matGainDiff = itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_G_partial.block(0, k*3, t_G_partial.rows(), 3);
                         }
                     }
-                    (void)j_min; // squash compiler warning, set but unused
-
-
-//                    qListGainDist.append(matGainDiff);
-
-                    // Take the closest coordinates
-//                    qint32 sel_idx = itIn->idcs[j_min];
-//                    Q_UNUSED(sel_idx)
-
-//                    //vertices
-//                    std::cout << this->src[h].vertno[sel_idx] << ", ";
+                    (void)j_min;
 
                     ++count;
                 }
@@ -617,15 +579,12 @@ MatrixXd InvInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
     for (qint32 h = 0; h < 2; ++h)
         totalNumOfClust += t_qListMNEClusterInfo[h].clusterVertnos.size();
 
-    if(this->isFixedOrient())
+    if(isFixedOrient())
         p_D = MatrixXd::Zero(p_outMT.cols(), totalNumOfClust);
     else
         p_D = MatrixXd::Zero(p_outMT.cols(), totalNumOfClust*3);
 
-    QList<VectorXi> t_vertnos = this->src.get_vertno();
-
-//    qDebug() << "Size: " << t_vertnos[0].size()  << t_vertnos[1].size();
-//    qDebug() << "this->sol->data.cols(): " << this->sol->data.cols();
+    QList<VectorXi> t_vertnos = src.get_vertno();
 
     qint32 currentCluster = 0;
     for (qint32 h = 0; h < 2; ++h)
@@ -636,16 +595,10 @@ MatrixXd InvInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
             VectorXi idx_sel;
             MNEMath::intersect(t_vertnos[h], t_qListMNEClusterInfo[h].clusterVertnos[i], idx_sel);
 
-//            std::cout << "\nVertnos:\n" << t_vertnos[h] << std::endl;
-
-//            std::cout << "clusterVertnos[i]:\n" << t_qListMNEClusterInfo[h].clusterVertnos[i] << std::endl;
-
             idx_sel.array() += hemiOffset;
 
-//            std::cout << "idx_sel]:\n" << idx_sel << std::endl;
-
             double selectWeight = 1.0/idx_sel.size();
-            if(this->isFixedOrient())
+            if(isFixedOrient())
             {
                 for(qint32 j = 0; j < idx_sel.size(); ++j)
                     p_D.col(currentCluster)[idx_sel(j)] = selectWeight;
@@ -668,8 +621,6 @@ MatrixXd InvInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
         }
     }
 
-//    std::cout << "D:\n" << D.row(0) << std::endl << D.row(1) << std::endl << D.row(2) << std::endl << D.row(3) << std::endl << D.row(4) << std::endl << D.row(5) << std::endl;
-
     //
     // Put it all together
     //
@@ -680,7 +631,7 @@ MatrixXd InvInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
 
 //=============================================================================================================
 
-InvInverseOperator InvInverseOperator::make_inverse_operator(const FiffInfo &info,
+MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &info,
                                                              MNEForwardSolution forward,
                                                              const FiffCov &p_noise_cov,
                                                              float loose,
@@ -689,9 +640,9 @@ InvInverseOperator InvInverseOperator::make_inverse_operator(const FiffInfo &inf
                                                              bool limit_depth_chs)
 {
     bool is_fixed_ori = forward.isFixedOrient();
-    InvInverseOperator p_MNEInverseOperator;
+    MNEInverseOperator inv;
 
-    std::cout << "ToDo InvInverseOperator::make_inverse_operator: do surf_ori check" << std::endl;
+    // TODO: add surface-orientation sanity check
 
     //Check parameters
     if(fixed && loose > 0)
@@ -708,8 +659,8 @@ InvInverseOperator InvInverseOperator::make_inverse_operator(const FiffInfo &inf
 
     if(forward.source_ori == -1 && loose > 0)
     {
-        qCritical("Error: Forward solution is not oriented in surface coordinates. loose parameter should be 0 not %f.\n", loose);
-        return p_MNEInverseOperator;
+        qCritical("Forward solution is not oriented in surface coordinates. loose parameter should be 0 not %f.", loose);
+        return inv;
     }
 
     if(loose < 0 || loose > 1)
@@ -746,8 +697,7 @@ InvInverseOperator InvInverseOperator::make_inverse_operator(const FiffInfo &inf
     MatrixXd patch_areas;
     if(depth > 0)
     {
-        std::cout << "ToDo: patch_areas" << std::endl;
-//        patch_areas = forward.get('patch_areas', None)
+        // TODO: load patch_areas from forward solution
         p_depth_prior = FiffCov::SDPtr(new FiffCov(MNEForwardSolution::compute_depth_prior(gain, gain_info, is_fixed_ori, depth, 10.0, patch_areas, limit_depth_chs)));
     }
     else
@@ -764,8 +714,8 @@ InvInverseOperator InvInverseOperator::make_inverse_operator(const FiffInfo &inf
     {
         if(depth < 0 || depth > 1)
         {
-            // Convert the depth prior into a fixed-orientation one
-            printf("\tToDo: Picked elements from a free-orientation depth-weighting prior into the fixed-orientation one.\n");
+            // TODO: convert free-orientation depth prior to fixed-orientation
+            printf("\tPicking elements from free-orientation depth prior into fixed-orientation one.\n");
         }
         if(!is_fixed_ori)
         {
@@ -784,7 +734,6 @@ InvInverseOperator InvInverseOperator::make_inverse_operator(const FiffInfo &inf
                 }
                 p_depth_prior->data.conservativeResize(count, 1);
 
-//              forward = deepcopy(forward)
                 forward.to_fixed_ori();
                 is_fixed_ori = forward.isFixedOrient();
                 forward.prepare_forward(info, p_outNoiseCov, false, gain_info, gain, p_outNoiseCov, whitener, n_nzero);
@@ -830,22 +779,19 @@ InvInverseOperator InvInverseOperator::make_inverse_operator(const FiffInfo &inf
     for(qint32 i = 0; i < gain.rows(); ++i)
         gain.row(i) = gain.row(i).array() * source_std.array();
 
-    double trace_GRGT = (gain * gain.transpose()).trace();//pow(gain.norm(), 2);
+    double trace_GRGT = (gain * gain.transpose()).trace();
     double scaling_source_cov = static_cast<double>(n_nzero) / trace_GRGT;
 
     p_source_cov->data.array() *= scaling_source_cov;
 
     gain.array() *= sqrt(scaling_source_cov);
 
-    // now np.trace(np.dot(gain, gain.T)) == n_nzero
-    // logger.info(np.trace(np.dot(gain, gain.T)), n_nzero)
-
     //
     // 12. Decompose the combined matrix
     //
     printf("Computing SVD of whitened and weighted lead field matrix.\n");
     JacobiSVD<MatrixXd> svd(gain, ComputeThinU | ComputeThinV);
-    std::cout << "ToDo Sorting Necessary?" << std::endl;
+    // TODO: verify whether explicit sorting is necessary
     VectorXd p_sing = svd.singularValues();
     MatrixXd t_U = svd.matrixU();
     MNEMath::sort<double>(p_sing, t_U);
@@ -906,45 +852,43 @@ InvInverseOperator InvInverseOperator::make_inverse_operator(const FiffInfo &inf
     if(depth == 0)
         p_depth_prior = FiffCov::SDPtr();
 
-    p_MNEInverseOperator.eigen_fields = p_eigen_fields;
-    p_MNEInverseOperator.eigen_leads = p_eigen_leads;
-    p_MNEInverseOperator.sing = p_sing;
-    p_MNEInverseOperator.nchan = p_sing.rows();
-    p_MNEInverseOperator.nave = p_nave;
-    p_MNEInverseOperator.depth_prior = p_depth_prior;
-    // p_source_cov started as alias of p_depth_prior but was detached (copy-on-
-    // write) when its data was modified above.  Fix the kind so I/O roundtrips
-    // write FIFFV_MNE_SOURCE_COV instead of inheriting DEPTH_PRIOR_COV.
+    inv.eigen_fields = p_eigen_fields;
+    inv.eigen_leads = p_eigen_leads;
+    inv.sing = p_sing;
+    inv.nchan = p_sing.rows();
+    inv.nave = p_nave;
+    inv.depth_prior = p_depth_prior;
+    // Fix the kind so I/O round-trips write FIFFV_MNE_SOURCE_COV.
     p_source_cov->kind = FIFFV_MNE_SOURCE_COV;
-    p_MNEInverseOperator.source_cov = p_source_cov;
-    p_MNEInverseOperator.noise_cov = FiffCov::SDPtr(new FiffCov(p_outNoiseCov));
-    p_MNEInverseOperator.orient_prior = p_orient_prior;
-    p_MNEInverseOperator.projs = info.projs;
-    p_MNEInverseOperator.eigen_leads_weighted = false;
-    p_MNEInverseOperator.source_ori = forward.source_ori;
-    p_MNEInverseOperator.mri_head_t = forward.mri_head_t;
-    p_MNEInverseOperator.methods = p_iMethods;
-    p_MNEInverseOperator.nsource = forward.nsource;
-    p_MNEInverseOperator.coord_frame = forward.coord_frame;
-    p_MNEInverseOperator.source_nn = forward.source_nn;
-    p_MNEInverseOperator.src = forward.src;
-    p_MNEInverseOperator.info = forward.info;
-    p_MNEInverseOperator.info.bads = info.bads;
+    inv.source_cov = p_source_cov;
+    inv.noise_cov = FiffCov::SDPtr(new FiffCov(p_outNoiseCov));
+    inv.orient_prior = p_orient_prior;
+    inv.projs = info.projs;
+    inv.eigen_leads_weighted = false;
+    inv.source_ori = forward.source_ori;
+    inv.mri_head_t = forward.mri_head_t;
+    inv.methods = p_iMethods;
+    inv.nsource = forward.nsource;
+    inv.coord_frame = forward.coord_frame;
+    inv.source_nn = forward.source_nn;
+    inv.src = forward.src;
+    inv.info = forward.info;
+    inv.info.bads = info.bads;
 
-    return p_MNEInverseOperator;
+    return inv;
 }
 
 //=============================================================================================================
 
-InvInverseOperator InvInverseOperator::prepare_inverse_operator(qint32 nave ,float lambda2, bool dSPM, bool sLORETA) const
+MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nave ,float lambda2, bool dSPM, bool sLORETA) const
 {
     if(nave <= 0)
     {
         printf("The number of averages should be positive\n");
-        return InvInverseOperator();
+        return MNEInverseOperator();
     }
     printf("Preparing the inverse operator for use...\n");
-    InvInverseOperator inv(*this);
+    MNEInverseOperator inv(*this);
     //
     //   Scale some of the stuff
     //
@@ -962,8 +906,6 @@ InvInverseOperator InvInverseOperator::prepare_inverse_operator(qint32 nave ,flo
     //   Create the diagonal matrix for computing the regularized inverse
     //
     VectorXd tmp = inv.sing.cwiseProduct(inv.sing) + VectorXd::Constant(inv.sing.size(), lambda2);
-//    if(inv.reginv)
-//        delete inv.reginv;
     inv.reginv = VectorXd(inv.sing.cwiseQuotient(tmp));
     printf("\tCreated the regularized inverter\n");
     //
@@ -977,8 +919,6 @@ InvInverseOperator InvInverseOperator::prepare_inverse_operator(qint32 nave ,flo
     //
     //   Create the whitener
     //
-//    if(inv.whitener)
-//        delete inv.whitener;
     inv.whitener = MatrixXd::Zero(inv.noise_cov->dim, inv.noise_cov->dim);
 
     qint32 nnzero, k;
@@ -1042,22 +982,14 @@ InvInverseOperator InvInverseOperator::prepare_inverse_operator(qint32 nave ,flo
         }
         else
         {
-//            qDebug() << 32;
             double c;
             for (k = 0; k < inv.eigen_leads->nrow; ++k)
             {
-//                qDebug() << 321;
                 c = sqrt(inv.source_cov->data(k,0));
-//                qDebug() << 322;
-//                qDebug() << "inv.eigen_leads->data" << inv.eigen_leads->data.rows() << "x" << inv.eigen_leads->data.cols();
-//                qDebug() << "noise_weight" << noise_weight.rows() << "x" << noise_weight.cols();
-                one = c*(inv.eigen_leads->data.row(k).transpose()).cwiseProduct(noise_weight);//ToDo eigenleads data -> pointer
+                one = c*(inv.eigen_leads->data.row(k).transpose()).cwiseProduct(noise_weight);
                 noise_norm[k] = sqrt(one.dot(one));
-//                qDebug() << 324;
             }
         }
-
-//        qDebug() << 4;
 
         //
         //   Compute the final result
@@ -1065,27 +997,14 @@ InvInverseOperator InvInverseOperator::prepare_inverse_operator(qint32 nave ,flo
         VectorXd noise_norm_new;
         if (inv.source_ori == FIFFV_MNE_FREE_ORI)
         {
-            //
-            //   The three-component case is a little bit more involved
-            //   The variances at three consequtive entries must be squeared and
-            //   added together
-            //
-            //   Even in this case return only one noise-normalization factor
-            //   per source location
-            //
+            // For free orientations the variances at three consecutive entries
+            // must be squared and summed, yielding one factor per source location.
             VectorXd* t = MNEMath::combine_xyz(noise_norm.transpose());
-            noise_norm_new = t->cwiseSqrt();//double otherwise values are getting too small
+            noise_norm_new = t->cwiseSqrt();
             delete t;
-            //
-            //   This would replicate the same value on three consequtive
-            //   entries
-            //
-            //   noise_norm = kron(sqrt(mne_combine_xyz(noise_norm)),ones(3,1));
         }
         VectorXd vOnes = VectorXd::Ones(noise_norm_new.size());
         VectorXd tmp = vOnes.cwiseQuotient(noise_norm_new.cwiseAbs());
-//        if(inv.noisenorm)
-//            delete inv.noisenorm;
 
         typedef Eigen::Triplet<double> T;
         std::vector<T> tripletList;
@@ -1100,8 +1019,6 @@ InvInverseOperator InvInverseOperator::prepare_inverse_operator(qint32 nave ,flo
     }
     else
     {
-//        if(inv.noisenorm)
-//            delete inv.noisenorm;
         inv.noisenorm = SparseMatrix<double>();
     }
 
@@ -1110,7 +1027,7 @@ InvInverseOperator InvInverseOperator::prepare_inverse_operator(qint32 nave ,flo
 
 //=============================================================================================================
 
-bool InvInverseOperator::read_inverse_operator(QIODevice& p_IODevice, InvInverseOperator& inv)
+bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverseOperator& inv)
 {
     //
     //   Open the file, create directory
@@ -1150,7 +1067,7 @@ bool InvInverseOperator::read_inverse_operator(QIODevice& p_IODevice, InvInverse
         return false;
     }
 
-    inv = InvInverseOperator();
+    inv = MNEInverseOperator();
     inv.methods = *t_pTag->toInt();
     //
     if (!invs->find_tag(t_pStream, FIFF_MNE_SOURCE_ORIENTATION, t_pTag))
@@ -1185,8 +1102,6 @@ bool InvInverseOperator::read_inverse_operator(QIODevice& p_IODevice, InvInverse
         return false;
     }
 
-//    if(inv.source_nn)
-//        delete inv.source_nn;
     inv.source_nn = t_pTag->toFloatMatrix();
     inv.source_nn.transposeInPlace();
 
@@ -1201,8 +1116,6 @@ bool InvInverseOperator::read_inverse_operator(QIODevice& p_IODevice, InvInverse
         return false;
     }
 
-//    if(inv.sing)
-//        delete inv.sing;
     inv.sing = Map<VectorXf>(t_pTag->toFloat(), t_pTag->size()/4).cast<double>();
     inv.nchan = inv.sing.rows();
     //
@@ -1290,7 +1203,7 @@ bool InvInverseOperator::read_inverse_operator(QIODevice& p_IODevice, InvInverse
     //
     //   Get the MRI <-> head coordinate transformation
     //
-    FiffCoordTrans mri_head_t;// = nullptr;
+    FiffCoordTrans mri_head_t;
     if (!parent_mri[0]->find_tag(t_pStream, FIFF_COORD_TRANS, t_pTag))
     {
         printf("MRI/head coordinate transformation not found\n");
@@ -1305,8 +1218,6 @@ bool InvInverseOperator::read_inverse_operator(QIODevice& p_IODevice, InvInverse
             if (mri_head_t.from != FIFFV_COORD_MRI || mri_head_t.to != FIFFV_COORD_HEAD)
             {
                 printf("MRI/head coordinate transformation not found");
-//                if(mri_head_t)
-//                    delete mri_head_t;
                 return false;
             }
         }
@@ -1332,15 +1243,9 @@ bool InvInverseOperator::read_inverse_operator(QIODevice& p_IODevice, InvInverse
     //  We also need the SSP operator
     //
     inv.projs     = t_pStream->read_proj(t_pStream->dirtree());
-    //
-    //  Some empty fields to be filled in later
-    //
-//        inv.proj      = [];      %   This is the projector to apply to the data
-//        inv.whitener  = [];      %   This whitens the data
-//        inv.reginv    = [];      %   This the diagonal matrix implementing
-//                                 %   regularization and the inverse
-//        inv.noisenorm = [];      %   These are the noise-normalization factors
-    //
+
+    // proj, whitener, reginv, and noisenorm are filled in by prepare_inverse_operator()
+
     if(!inv.src.transform_source_space_to(inv.coord_frame, mri_head_t))
     {
         printf("Could not transform source space.\n");
@@ -1355,7 +1260,7 @@ bool InvInverseOperator::read_inverse_operator(QIODevice& p_IODevice, InvInverse
 
 //=============================================================================================================
 
-void InvInverseOperator::write(QIODevice &p_IODevice)
+void MNEInverseOperator::write(QIODevice &p_IODevice)
 {
     //
     //   Open the file, create directory
@@ -1370,7 +1275,7 @@ void InvInverseOperator::write(QIODevice &p_IODevice)
 
 //=============================================================================================================
 
-void InvInverseOperator::writeToStream(FiffStream* p_pStream)
+void MNEInverseOperator::writeToStream(FiffStream* p_pStream)
 {
     p_pStream->start_block(FIFFB_MNE_INVERSE_SOLUTION);
 

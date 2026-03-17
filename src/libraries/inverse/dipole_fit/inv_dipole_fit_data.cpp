@@ -42,8 +42,8 @@
 
 #include "inv_dipole_fit_data.h"
 #include "inv_guess_data.h"
-#include "../inv_meas_data.h"
-#include "../inv_meas_data_set.h"
+#include <mne/mne_meas_data.h>
+#include <mne/mne_meas_data_set.h>
 #include <mne/mne_proj_item.h>
 #include <mne/mne_cov_matrix.h>
 #include "inv_ecd.h"
@@ -845,7 +845,7 @@ void print_fields(const Eigen::Vector3f& rd,
                   float       time,
                   float       integ,
                   InvDipoleFitData* fit,
-                  InvMeasData* data)
+                  MNEMeasData* data)
 
 {
     Eigen::VectorXf oneVec(data->nchan);

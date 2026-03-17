@@ -44,6 +44,8 @@
 #include <QNetworkInterface>
 #include <QDateTime>
 
+#include <ctime>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -211,4 +213,20 @@ FiffId& FiffId::getDefault()
 {
     static FiffId defaultFiffId;
     return defaultFiffId;
+}
+
+//=============================================================================================================
+
+QString FiffId::toString() const
+{
+    time_t secs = time.secs;
+    struct tm *ltime = localtime(&secs);
+    char timebuf[100];
+    strftime(timebuf, sizeof(timebuf), "%c", ltime);
+    return QString("%1.%2 0x%3%4 %5")
+        .arg(version >> 16)
+        .arg(version & 0xFFFF)
+        .arg(machid[0], 0, 16)
+        .arg(machid[1], 0, 16)
+        .arg(QString::fromLatin1(timebuf));
 }

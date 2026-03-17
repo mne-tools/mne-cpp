@@ -498,7 +498,7 @@ int main(int argc, char *argv[])
     //
     FiffInfo info = evoked.info;
 
-    InvInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+    MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
 
     //
     // save clustered inverse
