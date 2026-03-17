@@ -28,6 +28,7 @@ set(SOURCES
     mne_deriv_set.cpp
     mne_mne_data.cpp
     mne_named_matrix.cpp
+    mne_named_vector.cpp
     mne_proj_item.cpp
     mne_proj_op.cpp
     mne_raw_buf_def.cpp

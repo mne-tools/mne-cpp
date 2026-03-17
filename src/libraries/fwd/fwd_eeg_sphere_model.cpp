@@ -918,7 +918,9 @@ static void sort_parameters(VectorXd& mu,VectorXd& lambda,int nfit)
 
 static bool report_fit(int    loop,
                       const VectorXd &fitpar,
-                      double Smin)
+                      double Smin,
+                      double /*fval_hi*/,
+                      double /*par_diff*/)
 {
 #ifdef LOG_FIT
     for (int k = 0; k < fitpar.size(); k++)
@@ -1128,6 +1130,7 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Nu
     res = SimplexAlgorithm::simplex_minimize<double>( simplex,
                                                       func_val,
                                                       ftol,
+                                                      0.0,
                                                       one_step,
                                                       u,
                                                       max_eval,

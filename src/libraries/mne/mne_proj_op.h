@@ -69,6 +69,8 @@
 namespace MNELIB
 {
 
+class MNECovMatrix;
+
 //=============================================================================================================
 /**
  * @brief Projection operator managing a set of linear projection items
@@ -251,6 +253,64 @@ public:
      * @param[in]      tag   Prefix string printed before each line.
      */
     void report(QTextStream &out,const char *tag);
+
+    //=========================================================================================================
+    /**
+     * Assign a channel name list to this projection operator, invalidating
+     * any previously compiled projector.
+     *
+     * @param[in] list    Channel name list.
+     * @param[in] nlist   Number of channels.
+     *
+     * @return OK on success.
+     */
+    int assign_channels(const QStringList& list, int nlist);
+
+    //=========================================================================================================
+    /**
+     * Compile the projection operator via SVD, excluding bad channels.
+     * Active projection items are picked, expanded to the assigned channel list,
+     * bad channels are zeroed, and SVD is performed to produce an orthogonal
+     * projector matrix stored in proj_data.
+     *
+     * @param[in] bad    Array of bad channel names (may be nullptr).
+     * @param[in] nbad   Number of bad channels.
+     *
+     * @return OK on success, FAIL on error.
+     */
+    int make_proj_bad(char **bad, int nbad);
+
+    //=========================================================================================================
+    /**
+     * Compile the projection operator via SVD (no bad channels).
+     * Convenience wrapper around make_proj_bad().
+     *
+     * @return OK on success, FAIL on error.
+     */
+    int make_proj();
+
+    //=========================================================================================================
+    /**
+     * Apply the compiled projection operator to a double-precision data vector.
+     *
+     * @param[in,out] vec             Data vector.
+     * @param[in]     nch             Expected length (must match operator dimension).
+     * @param[in]     do_complement   If non-zero, compute (I - P) * vec.
+     *
+     * @return OK on success, FAIL on dimension mismatch.
+     */
+    int project_dvector(Eigen::Ref<Eigen::VectorXd> vec, int nch, int do_complement);
+
+    //=========================================================================================================
+    /**
+     * Apply this projection operator to a covariance matrix from both sides:
+     * C' = (I - P) C (I - P)^T (or P C P^T if do_complement is false).
+     *
+     * @param[in,out] c   The covariance matrix to project.
+     *
+     * @return OK on success, FAIL on error.
+     */
+    int apply_cov(MNECovMatrix* c);
 
 public:
     QList<MNELIB::MNEProjItem> items;  /**< The projection items. */

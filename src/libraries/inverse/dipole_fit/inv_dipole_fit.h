@@ -66,15 +66,11 @@ namespace INVLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-//class InvDipoleFitData;
-//class InvGuessData;
-//class InvMeasData
-
 //=============================================================================================================
 /**
- * Implements all required dipole fitting routines
+ * Implements all required dipole fitting routines.
  *
- * @brief Dipole Fit implementation
+ * @brief Dipole Fit implementation.
  */
 class INVSHARED_EXPORT InvDipoleFit
 {
@@ -84,84 +80,88 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs Dipole Fit algorithm
+     * Constructs Dipole Fit algorithm.
+     *
+     * @param[in] p_settings     The dipole fit settings.
      */
     explicit InvDipoleFit(InvDipoleFitSettings* p_settings);
 
-    virtual ~InvDipoleFit(){}
+    //=========================================================================================================
+    /**
+     * Destructs the Dipole Fit.
+     */
+    virtual ~InvDipoleFit() = default;
 
-    //ToDo split this function into init (with settings as parameter) and the actual fit function
+    //=========================================================================================================
+    /**
+     * Execute the dipole fit using the stored settings.
+     *
+     * @return The fitted dipole set.
+     */
     InvEcdSet calculateFit() const;
-//    virtual const char* getName() const;
 
 public:
 
     //=========================================================================================================
     /**
+     * Fit a single dipole to each time point of the data.
      *
-     * Fit a single dipole to each time point of the data
-     * Refactored: fit_dipoles (fit_dipoles.c)
-     *
-     * @param[in] dataname.
+     * @param[in] dataname   Data file name.
      * @param[in] data       The measured data.
      * @param[in] fit        Precomputed fitting data.
      * @param[in] guess      The initial guesses.
-     * @param[in] tmin       Time range.
-     * @param[in] tmax.
-     * @param[in] tstep      Time step to use.
-     * @param[in] integ      Integration time.
-     * @param[in] verbose    Verbose output?.
-     * @param[out] p_set     the fitted InvEcdSet.
+     * @param[in] tmin       Fit start time (s).
+     * @param[in] tmax       Fit end time (s).
+     * @param[in] tstep      Time step to use (s).
+     * @param[in] integ      Integration time (s).
+     * @param[in] verbose    Verbose output.
+     * @param[out] p_set     The fitted dipole set.
      *
      * @return true when successful.
      */
-    static int fit_dipoles( const QString& dataname, INVLIB::InvMeasData* data, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, InvEcdSet& p_set);
+    static bool fit_dipoles(const QString& dataname, INVLIB::InvMeasData* data, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, InvEcdSet& p_set);
 
     //=========================================================================================================
     /**
+     * Fit a single dipole to each time point of raw data.
      *
-     * Fit a single dipole to each time point of the data
-     * Refactored: fit_dipoles_raw (fit_dipoles.c)
-     *
-     * @param[in] dataname.
+     * @param[in] dataname   Data file name.
      * @param[in] raw        The raw data description.
      * @param[in] sel        Channel selection to use.
      * @param[in] fit        Precomputed fitting data.
      * @param[in] guess      The initial guesses.
-     * @param[in] tmin       Time range.
-     * @param[in] tmax.
-     * @param[in] tstep      Time step to use.
-     * @param[in] integ      Integration time.
-     * @param[in] verbose    Verbose output?.
-     * @param[out] p_set     Return all results here. Warning: for large data files this may take a lot of memory.
+     * @param[in] tmin       Fit start time (s).
+     * @param[in] tmax       Fit end time (s).
+     * @param[in] tstep      Time step to use (s).
+     * @param[in] integ      Integration time (s).
+     * @param[in] verbose    Verbose output.
+     * @param[out] p_set     The fitted dipole set.
      *
      * @return true when successful.
      */
-    static int fit_dipoles_raw(const QString& dataname, MNELIB::MNERawData* raw, MNELIB::mneChSelection sel, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, InvEcdSet& p_set);
+    static bool fit_dipoles_raw(const QString& dataname, MNELIB::MNERawData* raw, MNELIB::mneChSelection sel, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, InvEcdSet& p_set);
 
     //=========================================================================================================
     /**
+     * Fit a single dipole to each time point of raw data (convenience overload).
      *
-     * Fit a single dipole to each time point of the data
-     * Refactored: fit_dipoles_raw (fit_dipoles.c)
-     *
-     * @param[in] dataname.
+     * @param[in] dataname   Data file name.
      * @param[in] raw        The raw data description.
      * @param[in] sel        Channel selection to use.
      * @param[in] fit        Precomputed fitting data.
      * @param[in] guess      The initial guesses.
-     * @param[in] tmin       Time range.
-     * @param[in] tmax.
-     * @param[in] tstep      Time step to use.
-     * @param[in] integ      Integration time.
-     * @param[in] verbose    Verbose output?.
+     * @param[in] tmin       Fit start time (s).
+     * @param[in] tmax       Fit end time (s).
+     * @param[in] tstep      Time step to use (s).
+     * @param[in] integ      Integration time (s).
+     * @param[in] verbose    Verbose output.
      *
      * @return true when successful.
      */
-    static int fit_dipoles_raw(const QString& dataname, MNELIB::MNERawData* raw, MNELIB::mneChSelection sel, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose);
+    static bool fit_dipoles_raw(const QString& dataname, MNELIB::MNERawData* raw, MNELIB::mneChSelection sel, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose);
 
 private:
-    InvDipoleFitSettings* settings;
+    InvDipoleFitSettings* settings;     /**< Non-owning pointer to the dipole fit settings. */
 };
 
 //=============================================================================================================

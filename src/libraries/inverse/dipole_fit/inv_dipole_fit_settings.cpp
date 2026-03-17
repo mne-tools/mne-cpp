@@ -6,28 +6,6 @@ using namespace Eigen;
 using namespace INVLIB;
 
 //=============================================================================================================
-// STATIC DEFINITIONS
-//=============================================================================================================
-
-/*
- * Basics...
- */
-#define MALLOC(x,t) (t *)malloc((x)*sizeof(t))
-#define REALLOC(x,y,t) (t *)((x == nullptr) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
-
-#define X 0
-#define Y 1
-#define Z 2
-
-#ifndef PROGRAM_VERSION
-#define PROGRAM_VERSION     "1.00"
-#endif
-
-//=============================================================================================================
-// STATIC DEFINITIONS ToDo make members
-//=============================================================================================================
-
-//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -45,9 +23,6 @@ InvDipoleFitSettings::InvDipoleFitSettings(int *argc,char **argv)
     if (!check_args(argc,argv))
         return;
 
-//    mne_print_version_info(stderr,argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
-    printf("%s version %s compiled at %s %s\n",argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
-
     checkIntegrity();
 }
 
@@ -55,7 +30,6 @@ InvDipoleFitSettings::InvDipoleFitSettings(int *argc,char **argv)
 
 InvDipoleFitSettings::~InvDipoleFitSettings()
 {
-    //ToDo Garbage collection
 }
 
 //=============================================================================================================
@@ -90,7 +64,6 @@ void InvDipoleFitSettings::initMembers()
     diagnoise    = false;         
 
     is_raw       = false;         
-    badname     = nullptr;          
     include_meg  = false;         
     include_eeg  = false;        
     tmin         = -2*BIG_TIME;   
@@ -113,7 +86,7 @@ void InvDipoleFitSettings::initMembers()
     grad_reg     = 0.1f;         
     eeg_reg      = 0.1f;                  
 
-    bool gui    = false;               
+    gui         = false;
 }
 
 //=============================================================================================================
@@ -142,134 +115,131 @@ void InvDipoleFitSettings::checkIntegrity()
     }
     if (!omit_data_proj)
         projnames.prepend(measname);
-    printf("\n");
 
     if (!bemname.isEmpty())
-        printf("BEM              : %s\n",bemname.toUtf8().data());
+        qInfo("BEM              : %s",bemname.toUtf8().data());
     else {
-        printf("Sphere model     : origin at (% 7.2f % 7.2f % 7.2f) mm\n",
-               1000*r0[X],1000*r0[Y],1000*r0[Z]);
+        qInfo("Sphere model     : origin at (% 7.2f % 7.2f % 7.2f) mm",
+               1000*r0[0],1000*r0[1],1000*r0[2]);
     }
-    printf("Using %s MEG coil definitions.\n",accurate ? "accurate" : "standard");
+    qInfo("Using %s MEG coil definitions.",accurate ? "accurate" : "standard");
     if (!mriname.isEmpty())
-        printf("MRI transform    : %s\n",mriname.toUtf8().data());
+        qInfo("MRI transform    : %s",mriname.toUtf8().data());
     if (!guessname.isEmpty())
-        printf("Guesses          : %s\n",guessname.toUtf8().data());
+        qInfo("Guesses          : %s",guessname.toUtf8().data());
     else {
         if (!guess_surfname.isEmpty())
-            printf("Guess space bounded by %s\n",guess_surfname.toUtf8().data());
+            qInfo("Guess space bounded by %s",guess_surfname.toUtf8().data());
         else
-            printf("Spherical guess space, rad = %.1f mm\n",1000*guess_rad);
-        printf("Guess grid       : %6.1f mm\n",1000*guess_grid);
+            qInfo("Spherical guess space, rad = %.1f mm",1000*guess_rad);
+        qInfo("Guess grid       : %6.1f mm",1000*guess_grid);
         if (guess_mindist > 0.0)
-            printf("Guess mindist    : %6.1f mm\n",1000*guess_mindist);
+            qInfo("Guess mindist    : %6.1f mm",1000*guess_mindist);
         if (guess_exclude > 0)
-            printf("Guess exclude    : %6.1f mm\n",1000*guess_exclude);
+            qInfo("Guess exclude    : %6.1f mm",1000*guess_exclude);
     }
-    printf("Data             : %s\n",measname.toUtf8().data());
+    qInfo("Data             : %s",measname.toUtf8().data());
     if (projnames.size() > 0) {
-        printf("SSP sources      :\n");
+        qInfo("SSP sources      :");
         for (int k = 0; k < projnames.size(); k++)
-            printf("\t%s\n",projnames[k].toUtf8().data());
+            qInfo("\t%s",projnames[k].toUtf8().data());
     }
-    if (badname)
-        printf("Bad channels     : %s\n",badname);
+    if (!badname.isEmpty())
+        qInfo("Bad channels     : %s",badname.toUtf8().data());
     if (do_baseline)
-        printf("Baseline         : %10.2f ... %10.2f ms\n", 1000*bmin,1000*bmax);
+        qInfo("Baseline         : %10.2f ... %10.2f ms", 1000*bmin,1000*bmax);
     if (!noisename.isEmpty()) {
-        printf("Noise covariance : %s\n",noisename.toUtf8().data());
+        qInfo("Noise covariance : %s",noisename.toUtf8().data());
         if (include_meg) {
             if (mag_reg > 0.0)
-                printf("\tNoise-covariange regularization (mag)     : %-5.2f\n",mag_reg);
+                qInfo("\tNoise-covariance regularization (mag)     : %-5.2f",mag_reg);
             if (grad_reg > 0.0)
-                printf("\tNoise-covariange regularization (grad)    : %-5.2f\n",grad_reg);
+                qInfo("\tNoise-covariance regularization (grad)    : %-5.2f",grad_reg);
         }
         if (include_eeg && eeg_reg > 0.0)
-            printf("\tNoise-covariange regularization (EEG)     : %-5.2f\n",eeg_reg);
+            qInfo("\tNoise-covariance regularization (EEG)     : %-5.2f",eeg_reg);
     }
     if (fit_mag_dipoles)
-        printf("Fit data with magnetic dipoles\n");
+        qInfo("Fit data with magnetic dipoles");
     if (!dipname.isEmpty())
-        printf("dip output      : %s\n",dipname.toUtf8().data());
+        qInfo("dip output      : %s",dipname.toUtf8().data());
     if (!bdipname.isEmpty())
-        printf("bdip output     : %s\n",bdipname.toUtf8().data());
-    printf("\n");
+        qInfo("bdip output     : %s",bdipname.toUtf8().data());
 }
 
 //=============================================================================================================
 
-void InvDipoleFitSettings::usage(char *name)
+void InvDipoleFitSettings::usage(const char *name)
 {
-    printf("usage: %s [options]\n",name);
-    printf("This is a program for sequential single dipole fitting.\n");
-    printf("\nInput data:\n\n");
-    printf("\t--meas name       specify an evoked-response data file\n");
-    printf("\t--set   no        evoked data set number to use (default: 1)\n");
-    printf("\t--bad name        take bad channel list from here\n");
+    qInfo("usage: %s [options]",name);
+    qInfo("This is a program for sequential single dipole fitting.");
+    qInfo("\nInput data:\n");
+    qInfo("\t--meas name       specify an evoked-response data file");
+    qInfo("\t--set   no        evoked data set number to use (default: 1)");
+    qInfo("\t--bad name        take bad channel list from here");
 
-    printf("\nModality selection:\n\n");
-    printf("\t--meg             employ MEG data in fitting\n");
-    printf("\t--eeg             employ EEG data in fitting\n");
+    qInfo("\nModality selection:\n");
+    qInfo("\t--meg             employ MEG data in fitting");
+    qInfo("\t--eeg             employ EEG data in fitting");
 
-    printf("\nTime scale selection:\n\n");
-    printf("\t--tmin  time/ms   specify the starting analysis time\n");
-    printf("\t--tmax  time/ms   specify the ending analysis time\n");
-    printf("\t--tstep time/ms   specify the time step between frames (default 1/(sampling frequency))\n");
-    printf("\t--integ time/ms   specify the time integration for each frame (default 0)\n");
+    qInfo("\nTime scale selection:\n");
+    qInfo("\t--tmin  time/ms   specify the starting analysis time");
+    qInfo("\t--tmax  time/ms   specify the ending analysis time");
+    qInfo("\t--tstep time/ms   specify the time step between frames (default 1/(sampling frequency))");
+    qInfo("\t--integ time/ms   specify the time integration for each frame (default 0)");
 
-    printf("\nPreprocessing:\n\n");
-    printf("\t--bmin  time/ms   specify the baseline starting time (evoked data only)\n");
-    printf("\t--bmax  time/ms   specify the baseline ending time (evoked data only)\n");
-    printf("\t--proj name       Load the linear projection from here\n");
-    printf("\t                  Multiple projections can be specified.\n");
-    printf("\t                  The data file will be automatically included, unless --noproj is present.\n");
-    printf("\t--noproj          Do not load the projection from the data file, just those given with the --proj option.\n");
-    printf("\n\tFiltering (raw data only):\n\n");
-    printf("\t--filtersize size desired filter length (default = %d)\n",filter.size);
-    printf("\t--highpass val/Hz highpass corner (default = %6.1f Hz)\n",filter.highpass);
-    printf("\t--lowpass  val/Hz lowpass  corner (default = %6.1f Hz)\n",filter.lowpass);
-    printf("\t--lowpassw val/Hz lowpass transition width (default = %6.1f Hz)\n",filter.lowpass_width);
-    printf("\t--filteroff       do not filter the data\n");
+    qInfo("\nPreprocessing:\n");
+    qInfo("\t--bmin  time/ms   specify the baseline starting time (evoked data only)");
+    qInfo("\t--bmax  time/ms   specify the baseline ending time (evoked data only)");
+    qInfo("\t--proj name       Load the linear projection from here");
+    qInfo("\t                  Multiple projections can be specified.");
+    qInfo("\t                  The data file will be automatically included, unless --noproj is present.");
+    qInfo("\t--noproj          Do not load the projection from the data file, just those given with the --proj option.");
+    qInfo("\n\tFiltering (raw data only):\n");
+    qInfo("\t--filtersize size desired filter length (default = %d)",filter.size);
+    qInfo("\t--highpass val/Hz highpass corner (default = %6.1f Hz)",filter.highpass);
+    qInfo("\t--lowpass  val/Hz lowpass  corner (default = %6.1f Hz)",filter.lowpass);
+    qInfo("\t--lowpassw val/Hz lowpass transition width (default = %6.1f Hz)",filter.lowpass_width);
+    qInfo("\t--filteroff       do not filter the data");
 
-    printf("\nNoise specification:\n\n");
-    printf("\t--noise name      take the noise-covariance matrix from here\n");
-    printf("\t--gradnoise val   specify a gradiometer noise value in fT/cm\n");
-    printf("\t--magnoise val    specify a gradiometer noise value in fT\n");
-    printf("\t--eegnoise val    specify an EEG value in uV\n");
-    printf("\t                  NOTE: The above will be used only if --noise is missing\n");
-    printf("\t--diagnoise       omit off-diagonal terms from the noise-covariance matrix\n");
-    printf("\t--reg amount      Apply regularization to the noise-covariance matrix (same fraction for all channels).\n");
-    printf("\t--gradreg amount  Apply regularization to the MEG noise-covariance matrix (planar gradiometers, default = %6.2f).\n",grad_reg);
-    printf("\t--magreg amount   Apply regularization to the EEG noise-covariance matrix (axial gradiometers and magnetometers, default = %6.2f).\n",mag_reg);
-    printf("\t--eegreg amount   Apply regularization to the EEG noise-covariance matrix (default = %6.2f).\n",eeg_reg);
+    qInfo("\nNoise specification:\n");
+    qInfo("\t--noise name      take the noise-covariance matrix from here");
+    qInfo("\t--gradnoise val   specify a gradiometer noise value in fT/cm");
+    qInfo("\t--magnoise val    specify a magnetometer noise value in fT");
+    qInfo("\t--eegnoise val    specify an EEG value in uV");
+    qInfo("\t                  NOTE: The above will be used only if --noise is missing");
+    qInfo("\t--diagnoise       omit off-diagonal terms from the noise-covariance matrix");
+    qInfo("\t--reg amount      Apply regularization to the noise-covariance matrix (same fraction for all channels).");
+    qInfo("\t--gradreg amount  Apply regularization to the MEG noise-covariance matrix (planar gradiometers, default = %6.2f).",grad_reg);
+    qInfo("\t--magreg amount   Apply regularization to the MEG noise-covariance matrix (axial gradiometers and magnetometers, default = %6.2f).",mag_reg);
+    qInfo("\t--eegreg amount   Apply regularization to the EEG noise-covariance matrix (default = %6.2f).",eeg_reg);
 
-    printf("\nForward model:\n\n");
-    printf("\t--mri name        take head/MRI coordinate transform from here (Neuromag MRI description file)\n");
-    printf("\t--bem  name       BEM model name\n");
-    printf("\t--origin x:y:z/mm use a sphere model with this origin (head coordinates/mm)\n");
-    printf("\t--eegscalp        scale the electrode locations to the surface of the scalp when using a sphere model\n");
-    printf("\t--eegmodels name  read EEG sphere model specifications from here.\n");
-    printf("\t--eegmodel  name  name of the EEG sphere model to use (default : Default)\n");
-    printf("\t--eegrad val      radius of the scalp surface to use in EEG sphere model (default : %7.1f mm)\n",1000*eeg_sphere_rad);
-    printf("\t--accurate        use accurate coil definitions in MEG forward computation\n");
+    qInfo("\nForward model:\n");
+    qInfo("\t--mri name        take head/MRI coordinate transform from here (Neuromag MRI description file)");
+    qInfo("\t--bem  name       BEM model name");
+    qInfo("\t--origin x:y:z/mm use a sphere model with this origin (head coordinates/mm)");
+    qInfo("\t--eegscalp        scale the electrode locations to the surface of the scalp when using a sphere model");
+    qInfo("\t--eegmodels name  read EEG sphere model specifications from here.");
+    qInfo("\t--eegmodel  name  name of the EEG sphere model to use (default : Default)");
+    qInfo("\t--eegrad val      radius of the scalp surface to use in EEG sphere model (default : %7.1f mm)",1000*eeg_sphere_rad);
+    qInfo("\t--accurate        use accurate coil definitions in MEG forward computation");
 
-    printf("\nFitting parameters:\n\n");
-    printf("\t--guess name      The source space of initial guesses.\n");
-    printf("\t                  If not present, the values below are used to generate the guess grid.\n");
-    printf("\t--guesssurf name  Read the inner skull surface from this fif file to generate the guesses.\n");
-    printf("\t--guessrad value  Radius of a spherical guess volume if neither of the above is present (default : %.1f mm)\n",1000*guess_rad);
-    printf("\t--exclude dist/mm Exclude points which are closer than this distance from the CM of the inner skull surface (default =  %6.1f mm).\n",1000*guess_exclude);
-    printf("\t--mindist dist/mm Exclude points which are closer than this distance from the inner skull surface  (default = %6.1f mm).\n",1000*guess_mindist);
-    printf("\t--grid    dist/mm Source space grid size (default = %6.1f mm).\n",1000*guess_grid);
-    printf("\t--magdip          Fit magnetic dipoles instead of current dipoles.\n");
-    printf("\nOutput:\n\n");
-    printf("\t--dip     name    xfit dip format output file name\n");
-    printf("\t--bdip    name    xfit bdip format output file name\n");
-    printf("\nGeneral:\n\n");
-    printf("\t--gui             Enables the gui.\n");
-    printf("\t--help            print this info.\n");
-    printf("\t--version         print version info.\n\n");
-    return;
+    qInfo("\nFitting parameters:\n");
+    qInfo("\t--guess name      The source space of initial guesses.");
+    qInfo("\t                  If not present, the values below are used to generate the guess grid.");
+    qInfo("\t--guesssurf name  Read the inner skull surface from this fif file to generate the guesses.");
+    qInfo("\t--guessrad value  Radius of a spherical guess volume if neither of the above is present (default : %.1f mm)",1000*guess_rad);
+    qInfo("\t--exclude dist/mm Exclude points which are closer than this distance from the CM of the inner skull surface (default = %6.1f mm).",1000*guess_exclude);
+    qInfo("\t--mindist dist/mm Exclude points which are closer than this distance from the inner skull surface (default = %6.1f mm).",1000*guess_mindist);
+    qInfo("\t--grid    dist/mm Source space grid size (default = %6.1f mm).",1000*guess_grid);
+    qInfo("\t--magdip          Fit magnetic dipoles instead of current dipoles.");
+    qInfo("\nOutput:\n");
+    qInfo("\t--dip     name    xfit dip format output file name");
+    qInfo("\t--bdip    name    xfit bdip format output file name");
+    qInfo("\nGeneral:\n");
+    qInfo("\t--gui             Enables the gui.");
+    qInfo("\t--help            print this info.");
+    qInfo("\t--version         print version info.");
 }
 
 //=============================================================================================================
@@ -277,11 +247,10 @@ void InvDipoleFitSettings::usage(char *name)
 bool InvDipoleFitSettings::check_unrecognized_args(int argc, char **argv)
 {
     if ( argc > 1 ) {
-        printf("Unrecognized arguments : ");
+        QString args;
         for (int k = 1; k < argc; k++)
-            printf("%s ",argv[k]);
-        printf("\n");
-        qCritical ("Check the command line.");
+            args += QString(argv[k]) + " ";
+        qCritical("Unrecognized arguments : %s", args.trimmed().toUtf8().data());
         return false;
     }
     return true;
@@ -302,8 +271,8 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
             gui = true;
         }
         else if (strcmp(argv[k],"--version") == 0) {
-            printf("%s version %s compiled at %s %s\n",
-                   argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
+            qInfo("%s compiled at %s %s",
+                   argv[0],__DATE__,__TIME__);
             exit(0);
         }
         else if (strcmp(argv[k],"--help") == 0) {
@@ -324,7 +293,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--gsurf: argument required.");
                 return false;
             }
-            guess_surfname = strdup(argv[k+1]);
+            guess_surfname = QString(argv[k+1]);
         }
         else if (strcmp(argv[k],"--guesssurf") == 0) {
             found = 2;
@@ -332,7 +301,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--guesssurf: argument required.");
                 return false;
             }
-            guess_surfname = strdup(argv[k+1]);
+            guess_surfname = QString(argv[k+1]);
         }
         else if (strcmp(argv[k],"--guessrad") == 0) {
             found = 2;
@@ -428,13 +397,13 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--origin: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%f:%f:%f",r0[X],r0[Y],r0[Z]) != 3) {
+            if (sscanf(argv[k+1],"%f:%f:%f",&r0[0],&r0[1],&r0[2]) != 3) {
                 qCritical ("Could not interpret the origin.");
                 return false;
             }
-            r0[X] = r0[X]/1000.0;
-            r0[Y] = r0[Y]/1000.0;
-            r0[Z] = r0[Z]/1000.0;
+            r0[0] = r0[0]/1000.0f;
+            r0[1] = r0[1]/1000.0f;
+            r0[2] = r0[2]/1000.0f;
         }
         else if (strcmp(argv[k],"--eegrad") == 0) {
             found = 2;
@@ -508,7 +477,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--bad: argument required.");
                 return false;
             }
-            badname = strdup(argv[k+1]);
+            badname = QString(argv[k+1]);
         }
         else if (strcmp(argv[k],"--noise") == 0) {
             found = 2;
