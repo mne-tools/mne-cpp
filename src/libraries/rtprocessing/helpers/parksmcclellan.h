@@ -92,7 +92,7 @@ namespace RTPROCESSINGLIB
  *
  * @brief Parks-McClellan equiripple FIR filter design algorithm (Remez exchange).
  */
-class RTPROCESINGSHARED_EXPORT ParksMcClellan : public QObject
+class RTPROCESSINGSHARED_EXPORT ParksMcClellan : public QObject
 {
     Q_OBJECT
     Q_ENUMS(TPassType) //makes enum available to the class' Qt meta object

@@ -91,7 +91,7 @@ struct RtCovComputeResult {
  *
  * @brief Controller that manages background covariance matrix estimation from streaming data.
  */
-class RTPROCESINGSHARED_EXPORT RtCov : public QObject
+class RTPROCESSINGSHARED_EXPORT RtCov : public QObject
 {
     Q_OBJECT
 

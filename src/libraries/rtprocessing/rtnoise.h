@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     RtNoise class declaration.
+ * @brief     RtNoiseWorker and RtNoise class declarations.
  *
  */
 
@@ -42,9 +42,7 @@
 
 #include "rtprocessing_global.h"
 
-#include <fiff/fiff_cov.h>
 #include <fiff/fiff_info.h>
-#include <utils/generics/circularbuffer.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -53,14 +51,12 @@
 #include <QThread>
 #include <QMutex>
 #include <QSharedPointer>
-#include <QVector>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-#include <unsupported/Eigen/FFT>
 
 //=============================================================================================================
 // DEFINE NAMESPACE RTPROCESSINGLIB
@@ -71,11 +67,62 @@ namespace RTPROCESSINGLIB
 
 //=============================================================================================================
 /**
- * Real-time noise Spectrum estimation
- *
- * @brief Controller for real-time noise covariance and power spectral density estimation from empty-room or baseline data.
+ * @brief Background worker that computes a noise power spectral density estimate from accumulated data blocks.
  */
-class RTPROCESINGSHARED_EXPORT RtNoise : public QThread
+class RTPROCESSINGSHARED_EXPORT RtNoiseWorker : public QObject
+{
+    Q_OBJECT
+
+public:
+    //=========================================================================================================
+    /**
+     * Creates the worker.
+     *
+     * @param[in] iFftLength    FFT length (number of samples per window).
+     * @param[in] pFiffInfo     Associated Fiff Information.
+     * @param[in] iDataLength   Number of blocks to accumulate before computing the spectrum.
+     */
+    explicit RtNoiseWorker(qint32 iFftLength,
+                           FIFFLIB::FiffInfo::SPtr pFiffInfo,
+                           qint32 iDataLength);
+
+    //=========================================================================================================
+    /**
+     * Process one data block, accumulate, and emit the spectrum when enough blocks are collected.
+     *
+     * @param[in] matData   The incoming data block (channels x samples).
+     */
+    void doWork(const Eigen::MatrixXd& matData);
+
+signals:
+    /**
+     * Emitted when a new power spectral density matrix is available.
+     *
+     * @param[out] matSpecData  The computed spectrum (channels x frequency bins) in dB.
+     */
+    void resultReady(const Eigen::MatrixXd& matSpecData);
+
+private:
+    static QVector<float> hanning(int N, short itype);
+
+    qint32              m_iFftLength;       /**< FFT window length. */
+    double              m_dFs;              /**< Sampling frequency. */
+    qint32              m_iDataLength;      /**< Number of blocks to accumulate. */
+    QVector<float>      m_fWin;             /**< Hanning window coefficients. */
+
+    int                 m_iNumOfBlocks = 0; /**< Total blocks to accumulate. */
+    int                 m_iBlockSize = 0;   /**< Columns per block. */
+    int                 m_iSensors = 0;     /**< Number of sensor rows. */
+    int                 m_iBlockIndex = 0;  /**< Current block write index. */
+    bool                m_bFirstBlock = true;/**< True until first block arrives. */
+    Eigen::MatrixXd     m_matCircBuf;       /**< Circular accumulation buffer. */
+};
+
+//=============================================================================================================
+/**
+ * @brief Controller that manages RtNoiseWorker for real-time noise spectrum estimation.
+ */
+class RTPROCESSINGSHARED_EXPORT RtNoise : public QObject
 {
     Q_OBJECT
 
@@ -85,119 +132,80 @@ public:
 
     //=========================================================================================================
     /**
-     * Creates the real-time covariance estimation object.
+     * Creates the real-time noise estimation object.
      *
-     * @param[in] p_iMaxSamples      Number of samples to use for each data chunk.
-     * @param[in] p_pFiffInfo        Associated Fiff Information.
-     * @param[in] parent     Parent QObject (optional).
+     * @param[in] iFftLength    Number of samples per FFT window.
+     * @param[in] pFiffInfo     Associated Fiff Information.
+     * @param[in] iDataLength   Number of blocks to accumulate before computing.
+     * @param[in] parent        Parent QObject (optional).
      */
-    explicit RtNoise(qint32 p_iMaxSamples,
-                     FIFFLIB::FiffInfo::SPtr p_pFiffInfo,
-                     qint32 p_dataLen,
-                     QObject *parent = 0);
+    explicit RtNoise(qint32 iFftLength,
+                     FIFFLIB::FiffInfo::SPtr pFiffInfo,
+                     qint32 iDataLength,
+                     QObject *parent = nullptr);
 
     //=========================================================================================================
     /**
-     * Destroys the Real-time noise estimation object.
+     * Destroys the real-time noise estimation object.
      */
     ~RtNoise();
 
     //=========================================================================================================
     /**
-     * Slot to receive incoming data.
+     * Submit incoming data for noise estimation.
      *
-     * @param[in] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer.
+     * @param[in] matData  Data block (channels x samples).
      */
-    void append(const Eigen::MatrixXd &p_DataSegment);
+    void append(const Eigen::MatrixXd& matData);
 
     //=========================================================================================================
     /**
-     * Returns true if is running, otherwise false.
-     *
-     * @return true if is running, false otherwise.
+     * Returns whether the worker thread is running.
      */
-    inline bool isRunning();
+    bool isRunning() const;
 
     //=========================================================================================================
     /**
-     * Starts the RtNoise by starting the producer's thread.
+     * Starts the worker thread.
      *
-     * @return true if succeeded, false otherwise.
+     * @return true on success.
      */
-    virtual bool start();
+    bool start();
 
     //=========================================================================================================
     /**
-     * Stops the RtNoise by stopping the producer's thread.
+     * Stops the worker thread.
      *
-     * @return true if succeeded, false otherwise.
+     * @return true on success.
      */
-    virtual bool stop();
+    bool stop();
 
-    QMutex ReadMutex;
-
-    Eigen::MatrixXd m_matSpecData;
-    bool m_bSendDataToBuffer;
-
-protected:
     //=========================================================================================================
     /**
-     * The starting point for the thread. After calling start(), the newly created thread calls this function.
-     * Returning from this method will end the execution of the thread.
-     * Pure virtual method inherited by QThread.
+     * Blocks until the worker thread has finished, or until the timeout (ms) expires.
      */
-    virtual void run();
-
-    QVector <float> hanning(int N, short itype);
-
-    int m_iNumOfBlocks;
-    int m_iBlockSize;
-    int m_iSensors;
-    int m_iBlockIndex;
-
-    Eigen::MatrixXd m_matCircBuf;
-
-private:
-    QMutex      mutex;                              /**< Provides access serialization between threads*/
-
-    FIFFLIB::FiffInfo::SPtr  m_pFiffInfo;           /**< Holds the fiff measurement information. */
-
-    bool        m_bIsRunning;                       /**< Holds if real-time Covariance estimation is running.*/
-
-    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>       m_pCircularBuffer;      /**< Holds incoming raw data. */
-
-    QVector <float> m_fWin;
-
-    double m_Fs;
-
-    qint32 m_iFftLength;
-    qint32 m_dataLength;
+    bool wait(unsigned long time = ULONG_MAX);
 
 signals:
-    //=========================================================================================================
     /**
-     * Signal which is emitted when a new data Matrix is estimated.
-     *
-     * @param[out].
+     * Emitted when a new spectrum is available. Forwarded from the worker.
      */
-    void SpecCalculated(Eigen::MatrixXd);
+    void SpecCalculated(const Eigen::MatrixXd& matSpecData);
+
+    /**
+     * Internal signal to forward data to the worker thread.
+     */
+    void operate(const Eigen::MatrixXd& matData);
+
+private:
+    QThread             m_workerThread;     /**< The worker thread. */
+    bool                m_bIsRunning = false;/**< Running state flag. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool RtNoise::isRunning()
-{
-    return m_bIsRunning;
-}
 } // NAMESPACE
-
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-#ifndef metatype_matrix
-#define metatype_matrix
-Q_DECLARE_METATYPE(Eigen::MatrixXd); /**< Provides QT META type declaration of the Eigen::MatrixXd type. For signal/slot usage.*/
-#endif
-#endif
 
 #endif // RTNOISE_RTPROCESSING_H

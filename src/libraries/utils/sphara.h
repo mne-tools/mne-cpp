@@ -28,18 +28,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Declaration of the Sphara class
+ * @brief    Declaration of SPHARA projector construction.
  *
  */
 
-#ifndef SPHARA_RTPROCESSING_H
-#define SPHARA_RTPROCESSING_H
+#ifndef SPHARA_UTILS_H
+#define SPHARA_UTILS_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rtprocessing_global.h"
+#include "utils_global.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -48,10 +48,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE RTPROCESSINGLIB
+// DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
-namespace RTPROCESSINGLIB
+namespace UTILSLIB
 {
 
 //=============================================================================================================
@@ -70,12 +70,12 @@ namespace RTPROCESSINGLIB
  *
  * @return Returns the final SPHARA operator with dimensions (iOperatorDim,iOperatorDim).
  */
-RTPROCESINGSHARED_EXPORT Eigen::MatrixXd makeSpharaProjector(const Eigen::MatrixXd& matBaseFct,
-                                                             const Eigen::VectorXi& vecIndices,
-                                                             int iOperatorDim,
-                                                             int iNBaseFct,
-                                                             int iSkip = 0);
+UTILSSHARED_EXPORT Eigen::MatrixXd makeSpharaProjector(const Eigen::MatrixXd& matBaseFct,
+                                                      const Eigen::VectorXi& vecIndices,
+                                                      int iOperatorDim,
+                                                      int iNBaseFct,
+                                                      int iSkip = 0);
 
-} // NAMESPACE RTPROCESSINGLIB
+} // NAMESPACE UTILSLIB
 
-#endif // SPHARA_RTPROCESSING_H
+#endif // SPHARA_UTILS_H

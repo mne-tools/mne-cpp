@@ -90,7 +90,7 @@ struct RtInvOpInput {
  *
  * @brief Background worker thread that recomputes the MNE inverse operator when covariance updates arrive.
  */
-class RTPROCESINGSHARED_EXPORT RtInvOpWorker : public QObject
+class RTPROCESSINGSHARED_EXPORT RtInvOpWorker : public QObject
 {
     Q_OBJECT
 
@@ -99,16 +99,16 @@ public:
     /**
      * Perform actual inverse operator creation.
      *
-     * @param[in] inputData  Data to estimate the inverser operator from.
+     * @param[in] inputData  Data to estimate the inverse operator from.
      */
     void doWork(const RtInvOpInput &inputData);
 
 signals:
     //=========================================================================================================
     /**
-     * Wmit this signal whenver a new inverser operator was estimated.
+     * Emit this signal whenever a new inverse operator was estimated.
      *
-     * @param[in] invOp  The final inverser operator estimation.
+     * @param[in] invOp  The final inverse operator estimation.
      */
     void resultReady(const MNELIB::MNEInverseOperator& invOp);
 };
@@ -119,7 +119,7 @@ signals:
  *
  * @brief Controller that manages RtInvOpWorker for online inverse operator updates.
  */
-class RTPROCESINGSHARED_EXPORT RtInvOp : public QObject
+class RTPROCESSINGSHARED_EXPORT RtInvOp : public QObject
 {
     Q_OBJECT
 

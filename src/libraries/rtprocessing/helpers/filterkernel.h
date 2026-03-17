@@ -80,7 +80,7 @@ namespace RTPROCESSINGLIB
 /**
  * @brief Named filter-design parameter descriptor holding a human-readable name and description (e.g. design method or filter type).
  */
-class RTPROCESINGSHARED_EXPORT FilterParameter{
+class RTPROCESSINGSHARED_EXPORT FilterParameter{
 
 public:
     //=========================================================================================================
@@ -129,7 +129,7 @@ protected:
  *
  * @brief The FilterKernel class provides methods to create/design a FIR filter kernel
  */
-class RTPROCESINGSHARED_EXPORT FilterKernel
+class RTPROCESSINGSHARED_EXPORT FilterKernel
 {
 
 public:

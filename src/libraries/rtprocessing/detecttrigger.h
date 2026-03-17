@@ -72,7 +72,7 @@ namespace RTPROCESSINGLIB
  *
  * @param[in]       A list of transformed Eigen matrices.
  */
-RTPROCESINGSHARED_EXPORT QList<Eigen::MatrixXi> toEventMatrix(QMap<int,QList<QPair<int,double> > > mapTriggers);
+RTPROCESSINGSHARED_EXPORT QList<Eigen::MatrixXi> toEventMatrix(QMap<int,QList<QPair<int,double> > > mapTriggers);
 
 //=========================================================================================================
 /**
@@ -89,7 +89,7 @@ RTPROCESINGSHARED_EXPORT QList<Eigen::MatrixXi> toEventMatrix(QMap<int,QList<QPa
  * @return     This map holds the indices of the channels which are to be read from data. For each
  *                   index/channel the found triggersand corresponding signal values are written to the value of the map.
  */
-RTPROCESINGSHARED_EXPORT QMap<int, QList<QPair<int, double> > > detectTriggerFlanksMax(const Eigen::MatrixXd &data,
+RTPROCESSINGSHARED_EXPORT QMap<int, QList<QPair<int, double> > > detectTriggerFlanksMax(const Eigen::MatrixXd &data,
                                                                                        const QList<int>& lTriggerChannels,
                                                                                        int iOffsetIndex,
                                                                                        double dThreshold,
@@ -109,7 +109,7 @@ RTPROCESINGSHARED_EXPORT QMap<int, QList<QPair<int, double> > > detectTriggerFla
  *
  * @return     This list holds the found trigger indices and corresponding signal values.
  */
-RTPROCESINGSHARED_EXPORT QList<QPair<int,double> > detectTriggerFlanksMax(const Eigen::MatrixXd &data,
+RTPROCESSINGSHARED_EXPORT QList<QPair<int,double> > detectTriggerFlanksMax(const Eigen::MatrixXd &data,
                                                                           int iTriggerChannelIdx,
                                                                           int iOffsetIndex,
                                                                           double dThreshold,
@@ -130,7 +130,7 @@ RTPROCESINGSHARED_EXPORT QList<QPair<int,double> > detectTriggerFlanksMax(const 
  *
  * @return     This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers and corresponding signal values are written to the value of the map.
  */
-RTPROCESINGSHARED_EXPORT QMap<int,QList<QPair<int,double> > > detectTriggerFlanksGrad(const Eigen::MatrixXd &data,
+RTPROCESSINGSHARED_EXPORT QMap<int,QList<QPair<int,double> > > detectTriggerFlanksGrad(const Eigen::MatrixXd &data,
                                                                                       const QList<int>& lTriggerChannels,
                                                                                       int iOffsetIndex,
                                                                                       double dThreshold,
@@ -152,7 +152,7 @@ RTPROCESINGSHARED_EXPORT QMap<int,QList<QPair<int,double> > > detectTriggerFlank
  *
  * @return     This list holds the found trigger indices and corresponding signal values.
  */
-RTPROCESINGSHARED_EXPORT QList<QPair<int,double> > detectTriggerFlanksGrad(const Eigen::MatrixXd &data,
+RTPROCESSINGSHARED_EXPORT QList<QPair<int,double> > detectTriggerFlanksGrad(const Eigen::MatrixXd &data,
                                                                            int iTriggerChannelIdx,
                                                                             int iOffsetIndex,
                                                                            double dThreshold,

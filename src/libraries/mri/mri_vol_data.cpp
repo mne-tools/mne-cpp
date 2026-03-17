@@ -61,18 +61,16 @@ MriVolData::MriVolData()
 , xsize(1.0f)
 , ysize(1.0f)
 , zsize(1.0f)
+, x_ras(-1.0f,  0.0f,  0.0f)   // FreeSurfer defaults when goodRASflag is false
+, y_ras( 0.0f,  0.0f, -1.0f)   // See: https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat
+, z_ras( 0.0f,  1.0f,  0.0f)
+, c_ras( 0.0f,  0.0f,  0.0f)
 , TR(0.0f)
 , flipAngle(0.0f)
 , TE(0.0f)
 , TI(0.0f)
 , FoV(0.0f)
 {
-    // Default direction cosines (FreeSurfer defaults when goodRASflag is false)
-    // See: https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat
-    x_ras[0] = -1.0f; x_ras[1] =  0.0f; x_ras[2] =  0.0f;    // xr=-1, xa=0, xs=0
-    y_ras[0] =  0.0f; y_ras[1] =  0.0f; y_ras[2] = -1.0f;    // yr=0, ya=0, ys=-1
-    z_ras[0] =  0.0f; z_ras[1] =  1.0f; z_ras[2] =  0.0f;    // zr=0, za=1, zs=0
-    c_ras[0] =  0.0f; c_ras[1] =  0.0f; c_ras[2] =  0.0f;
 }
 
 //=============================================================================================================
@@ -109,37 +107,22 @@ Matrix4f MriVolData::computeVox2Ras() const
 
     // Construct M = Mdc * D (scale direction cosines by voxel sizes)
     Matrix3f M;
-    // Column 0 (x voxel direction)
-    M(0, 0) = x_ras[0] * xsize;
-    M(1, 0) = x_ras[1] * xsize;
-    M(2, 0) = x_ras[2] * xsize;
-    // Column 1 (y voxel direction)
-    M(0, 1) = y_ras[0] * ysize;
-    M(1, 1) = y_ras[1] * ysize;
-    M(2, 1) = y_ras[2] * ysize;
-    // Column 2 (z voxel direction)
-    M(0, 2) = z_ras[0] * zsize;
-    M(1, 2) = z_ras[1] * zsize;
-    M(2, 2) = z_ras[2] * zsize;
+    M.col(0) = x_ras * xsize;
+    M.col(1) = y_ras * ysize;
+    M.col(2) = z_ras * zsize;
 
     // Compute center voxel
-    Vector3f center;
-    center(0) = static_cast<float>(width)  / 2.0f;
-    center(1) = static_cast<float>(height) / 2.0f;
-    center(2) = static_cast<float>(depth)  / 2.0f;
+    Vector3f center(static_cast<float>(width)  / 2.0f,
+                    static_cast<float>(height) / 2.0f,
+                    static_cast<float>(depth)  / 2.0f);
 
     // Compute P0 = c_ras - M * center
-    Vector3f P0;
-    P0(0) = c_ras[0] - (M(0, 0) * center(0) + M(0, 1) * center(1) + M(0, 2) * center(2));
-    P0(1) = c_ras[1] - (M(1, 0) * center(0) + M(1, 1) * center(1) + M(1, 2) * center(2));
-    P0(2) = c_ras[2] - (M(2, 0) * center(0) + M(2, 1) * center(1) + M(2, 2) * center(2));
+    Vector3f P0 = c_ras - M * center;
 
     // Build 4x4 matrix in meters (FreeSurfer uses mm, FIFF uses meters)
     Matrix4f vox2ras = Matrix4f::Identity();
     vox2ras.block<3, 3>(0, 0) = M / 1000.0f;
-    vox2ras(0, 3) = P0(0) / 1000.0f;
-    vox2ras(1, 3) = P0(1) / 1000.0f;
-    vox2ras(2, 3) = P0(2) / 1000.0f;
+    vox2ras.block<3, 1>(0, 3) = P0 / 1000.0f;
 
     return vox2ras;
 }

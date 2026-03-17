@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     icp.h
+ * @file     mne_icp.h
  * @author   Ruben Dörfel <doerfelruben@aol.com>
  * @since    0.1.5
  * @date     July, 2020
@@ -32,14 +32,14 @@
  *
  */
 
-#ifndef ICP_H
-#define ICP_H
+#ifndef MNE_ICP_H
+#define MNE_ICP_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rtprocessing_global.h"
+#include "mne_global.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -61,46 +61,44 @@ namespace FIFFLIB{
     class FiffCoordTrans;
 }
 
-namespace MNELIB{
-    class MNEProjectToSurface;
-}
-
 //=============================================================================================================
-// DEFINE NAMESPACE RTPROCESSINGLIB
+// DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
-namespace RTPROCESSINGLIB {
+namespace MNELIB {
 
 //=============================================================================================================
-// NAMESPACE FORWARD DECLARATIONS
+// MNELIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-const Eigen::VectorXf vecDefaultWeigths;
+class MNEProjectToSurface;
+
+const Eigen::VectorXf vecDefaultWeights;
 
 //=========================================================================================================
 /**
  * The ICP algorithm to register a point cloud with a surface.
  *
  * @param[in] mneSurfacePoints    The MNEProjectToSurface object that contains the surface triangles etc. (To).
- * @param[in] matPointCloud       The point cloud to be registrated (From).
- * @param[in, out] transFromTo         The forward transformation matrix. It can contain an initial transformatin (e.g. from fiducial alignment).
- * @param[in, out] fRMSE               The resulting Root-Mean-Square-Error in m.
- * @param[in] bScale              Wether to apply scaling or not. Should be false for matching data sets, defaults to false.
- * @param[in] iMaxIter            The maximum number of iterations for the icp algorithms, defaults to 20.
- * @param[in] fTol                The destination point set to be reistrated, defaults to 0.001.
- * @param[in] vecWeitgths         The weitghts to apply, defaults to zeros.
+ * @param[in] matPointCloud       The point cloud to be registered (From).
+ * @param[in, out] transFromTo    The forward transformation matrix. It can contain an initial transformation (e.g. from fiducial alignment).
+ * @param[in, out] fRMSE         The resulting Root-Mean-Square-Error in m.
+ * @param[in] bScale              Whether to apply scaling or not. Should be false for matching data sets, defaults to false.
+ * @param[in] iMaxIter            The maximum number of iterations for the ICP algorithm, defaults to 20.
+ * @param[in] fTol                The convergence tolerance, defaults to 0.001.
+ * @param[in] vecWeights          The weights to apply, defaults to zeros.
  *
- * @return Wether the registration was succesfull.
+ * @return Whether the registration was successful.
  */
 
-RTPROCESINGSHARED_EXPORT bool performIcp(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
-                                         const Eigen::MatrixXf& matPointCloud,
-                                         FIFFLIB::FiffCoordTrans& transFromTo,
-                                         float& fRMSE,
-                                         bool bScale = false,
-                                         int iMaxIter = 20,
-                                         float fTol = 0.001,
-                                         const Eigen::VectorXf& vecWeitgths = vecDefaultWeigths);
+MNESHARED_EXPORT bool performIcp(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
+                                 const Eigen::MatrixXf& matPointCloud,
+                                 FIFFLIB::FiffCoordTrans& transFromTo,
+                                 float& fRMSE,
+                                 bool bScale = false,
+                                 int iMaxIter = 20,
+                                 float fTol = 0.001,
+                                 const Eigen::VectorXf& vecWeights = vecDefaultWeights);
 
 //=========================================================================================================
 
@@ -109,47 +107,43 @@ RTPROCESINGSHARED_EXPORT bool performIcp(const QSharedPointer<MNELIB::MNEProject
  *
  * @param[in] matSrcPoint         The source point set.
  * @param[in] matDstPoint         The destination point set.
- * @param[in, out] matTrans            The forward transformation matrix.
- * @param[in, out] fScale              The scaling parameter, defaults to 1.0.
- * @param[in] bScale              Wether to apply scaling or not. Should be false for matching data sets, defaults to false.
- * @param[in] vecWeitgths         The weitghts to apply , defaults to zeros.
+ * @param[in, out] matTrans       The forward transformation matrix.
+ * @param[in, out] fScale         The scaling parameter, defaults to 1.0.
+ * @param[in] bScale              Whether to apply scaling or not. Should be false for matching data sets, defaults to false.
+ * @param[in] vecWeights          The weights to apply, defaults to zeros.
  *
- * @return Wether the matching was succesfull.
+ * @return Whether the matching was successful.
  */
 
-RTPROCESINGSHARED_EXPORT bool fitMatchedPoints(const Eigen::MatrixXf& matSrcPoint,
-                                               const Eigen::MatrixXf& matDstPoint,
-                                               Eigen::Matrix4f& matTrans,
-                                               float fScale = 1.0,
-                                               bool bScale=false,
-                                               const Eigen::VectorXf& vecWeitgths = vecDefaultWeigths);
+MNESHARED_EXPORT bool fitMatchedPoints(const Eigen::MatrixXf& matSrcPoint,
+                                       const Eigen::MatrixXf& matDstPoint,
+                                       Eigen::Matrix4f& matTrans,
+                                       float fScale = 1.0,
+                                       bool bScale=false,
+                                       const Eigen::VectorXf& vecWeights = vecDefaultWeights);
 
 //=========================================================================================================
 
 /**
- * Discard outliers compared to a given 3D surface
+ * Discard outliers compared to a given 3D surface.
  *
  * @param[in] mneSurfacePoints    The MNEProjectToSurface object that contains the surface triangles etc. (To).
- * @param[in] matPointCloud       The destination point set to be registrated (From).
- * @param[in, out] transFromTo         The forward transformation matrix.
+ * @param[in] matPointCloud       The point cloud to be registered (From).
+ * @param[in, out] transFromTo    The forward transformation matrix.
  * @param[in] vecTake             The index of taken digitizers.
- * @param[in] matTakePoint        The the digitizer points to take.
+ * @param[in] matTakePoint        The digitizer points to take.
  * @param[in] fMaxDist            The maximum distance to the surface in mm, defaults to 0 mm.
  *
- * @return Wether the discarding was succesfull.
+ * @return Whether the discarding was successful.
  */
 
-RTPROCESINGSHARED_EXPORT bool discard3DPointOutliers(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
-                                                     const Eigen::MatrixXf& matPointCloud,
-                                                     const FIFFLIB::FiffCoordTrans& transFromTo,
-                                                     Eigen::VectorXi& vecTake,
-                                                     Eigen::MatrixXf& matTakePoint,
-                                                     float fMaxDist = 0.0);
+MNESHARED_EXPORT bool discard3DPointOutliers(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
+                                             const Eigen::MatrixXf& matPointCloud,
+                                             const FIFFLIB::FiffCoordTrans& transFromTo,
+                                             Eigen::VectorXi& vecTake,
+                                             Eigen::MatrixXf& matTakePoint,
+                                             float fMaxDist = 0.0);
 
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
+} // namespace MNELIB
 
-} // namespace
-
-#endif // ICP_H
+#endif // MNE_ICP_H

@@ -161,8 +161,7 @@ bool MriMghIO::decompress(const QString& mgzFile, QByteArray& rawData)
     }
 
     // Use zlib to decompress gzip data in memory
-    z_stream strm;
-    memset(&strm, 0, sizeof(strm));
+    z_stream strm = {};
 
     // MAX_WBITS + 16 tells zlib to detect and handle gzip headers
     int ret = inflateInit2(&strm, MAX_WBITS + 16);
@@ -286,18 +285,13 @@ bool MriMghIO::readVoxelData(const QByteArray& data, MriVolData& volData)
     // Only the first frame is read.
     //
 
-    int bytesPerVoxel;
-    switch (volData.type) {
-        case MRI_UCHAR: bytesPerVoxel = 1; break;
-        case MRI_SHORT: bytesPerVoxel = 2; break;
-        case MRI_INT:   bytesPerVoxel = 4; break;
-        case MRI_FLOAT: bytesPerVoxel = 4; break;
-        default:
-            qCritical() << "MriMghIO::readVoxelData - Unsupported MGH data type:" << volData.type;
-            return false;
+    int bpv = bytesPerVoxel(volData.type);
+    if (bpv == 0) {
+        qCritical() << "MriMghIO::readVoxelData - Unsupported MGH data type:" << volData.type;
+        return false;
     }
 
-    qint64 frameSize = static_cast<qint64>(volData.width) * volData.height * volData.depth * bytesPerVoxel;
+    qint64 frameSize = static_cast<qint64>(volData.width) * volData.height * volData.depth * bpv;
     if (data.size() < MRI_MGH_DATA_OFFSET + frameSize) {
         qCritical() << "MriMghIO::readVoxelData - File too small for expected data size";
         return false;
@@ -406,21 +400,17 @@ bool MriMghIO::parseFooter(const QByteArray& data,
 {
     //
     // The footer starts after the voxel data.
-    // It may contain:
+    // It contains (in order):
     //   1. Scan parameters: TR(f32), flipAngle(f32), TE(f32), TI(f32), FoV(f32)
     //   2. Tags: tagType(i32) + tagLen(i32 or i64) + tagData
     //
 
-    int bytesPerVoxel;
-    switch (volData.type) {
-        case MRI_UCHAR: bytesPerVoxel = 1; break;
-        case MRI_SHORT: bytesPerVoxel = 2; break;
-        case MRI_INT:   bytesPerVoxel = 4; break;
-        case MRI_FLOAT: bytesPerVoxel = 4; break;
-        default: bytesPerVoxel = 1; break;
+    int bpv = bytesPerVoxel(volData.type);
+    if (bpv == 0) {
+        bpv = 1; // Fallback for footer calculation
     }
 
-    qint64 frameSize = static_cast<qint64>(volData.width) * volData.height * volData.depth * bytesPerVoxel;
+    qint64 frameSize = static_cast<qint64>(volData.width) * volData.height * volData.depth * bpv;
     qint64 footerPos = MRI_MGH_DATA_OFFSET + frameSize;
 
     if (data.size() <= footerPos) {
@@ -432,6 +422,15 @@ bool MriMghIO::parseFooter(const QByteArray& data,
     stream.setByteOrder(QDataStream::BigEndian);
     stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
     stream.device()->seek(footerPos);
+
+    // Read scan parameters (5 × float32 = 20 bytes)
+    constexpr int kScanParamBytes = 5 * sizeof(float);
+    qint64 remainingBytes = data.size() - footerPos;
+    if (remainingBytes >= kScanParamBytes) {
+        stream >> volData.TR >> volData.flipAngle >> volData.TE >> volData.TI >> volData.FoV;
+    } else {
+        return true;
+    }
 
     // Parse tags
     while (!stream.atEnd()) {
@@ -532,4 +531,17 @@ bool MriMghIO::parseFooter(const QByteArray& data,
     }
 
     return true;
+}
+
+//=============================================================================================================
+
+int MriMghIO::bytesPerVoxel(int type)
+{
+    switch (type) {
+        case MRI_UCHAR: return 1;
+        case MRI_SHORT: return 2;
+        case MRI_INT:   return 4;
+        case MRI_FLOAT: return 4;
+        default:        return 0;
+    }
 }

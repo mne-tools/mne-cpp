@@ -193,7 +193,7 @@ bool RTPROCESSINGLIB::filterFile(QIODevice &pIODevice,
 
 //=============================================================================================================
 
-MatrixXd RTPROCESSINGLIB::filterData(const MatrixXd& mataData,
+MatrixXd RTPROCESSINGLIB::filterData(const MatrixXd& matData,
                                      int type,
                                      double dCenterfreq,
                                      double bandwidth,
@@ -206,9 +206,9 @@ MatrixXd RTPROCESSINGLIB::filterData(const MatrixXd& mataData,
                                      bool bKeepOverhead)
 {
     // Check for size of data
-    if(mataData.cols() < iOrder){
+    if(matData.cols() < iOrder){
         qWarning() << QString("[Filter::filterData] Filter length/order is bigger than data length. Returning.");
-        return mataData;
+        return matData;
     }
 
     // Normalize cut off frequencies to nyquist
@@ -226,7 +226,7 @@ MatrixXd RTPROCESSINGLIB::filterData(const MatrixXd& mataData,
                                        dSFreq,
                                        designMethod);
 
-    return filterData(mataData,
+    return filterData(matData,
                       filter,
                       vecPicks,
                       bUseThreads,
@@ -235,7 +235,7 @@ MatrixXd RTPROCESSINGLIB::filterData(const MatrixXd& mataData,
 
 //=============================================================================================================
 
-MatrixXd RTPROCESSINGLIB::filterData(const MatrixXd& mataData,
+MatrixXd RTPROCESSINGLIB::filterData(const MatrixXd& matData,
                                      const FilterKernel& filterKernel,
                                      const RowVectorXi& vecPicks,
                                      bool bUseThreads,
@@ -244,58 +244,58 @@ MatrixXd RTPROCESSINGLIB::filterData(const MatrixXd& mataData,
     int iOrder = filterKernel.getFilterOrder();
 
     // Check for size of data
-    if(mataData.cols() < iOrder){
+    if(matData.cols() < iOrder){
         qWarning() << "[Filter::filterData] Filter length/order is bigger than data length. Returning.";
-        return mataData;
+        return matData;
     }
 
     // Create output matrix with size of input matrix
-    MatrixXd matDataOut(mataData.rows(), mataData.cols()+iOrder);
+    MatrixXd matDataOut(matData.rows(), matData.cols()+iOrder);
     matDataOut.setZero();
     MatrixXd sliceFiltered;
 
     // slice input data into data junks with proper length so that the slices are always >= the filter order
     float fFactor = 2.0f;
     int iSize = fFactor * iOrder;
-    int residual = mataData.cols() % iSize;
+    int residual = matData.cols() % iSize;
     while(residual < iOrder) {
         fFactor = fFactor - 0.1f;
         iSize = fFactor * iOrder;
-        residual = mataData.cols() % iSize;
+        residual = matData.cols() % iSize;
 
         if(iSize < iOrder) {
-            iSize = mataData.cols();
+            iSize = matData.cols();
             break;
         }
     }
 
-    if(mataData.cols() > iSize) {
+    if(matData.cols() > iSize) {
         int from = 0;
-        int numSlices = ceil(float(mataData.cols())/float(iSize)); //calculate number of data slices
+        int numSlices = ceil(float(matData.cols())/float(iSize)); //calculate number of data slices
 
         for (int i = 0; i < numSlices; i++) {
             if(i == numSlices-1) {
                 //catch the last one that might be shorter than the other blocks
-                iSize = mataData.cols() - (iSize * (numSlices -1));
+                iSize = matData.cols() - (iSize * (numSlices -1));
             }
 
             // Filter the data block. This will return data with a fitler delay of iOrder/2 in front and back
-            sliceFiltered = filterDataBlock(mataData.block(0,from,mataData.rows(),iSize),
+            sliceFiltered = filterDataBlock(matData.block(0,from,matData.rows(),iSize),
                                             vecPicks,
                                             filterKernel,
                                             bUseThreads);
 
             // Perform overlap add
             if(i == 0) {
-                matDataOut.block(0,0,mataData.rows(),sliceFiltered.cols()) += sliceFiltered;
+                matDataOut.block(0,0,matData.rows(),sliceFiltered.cols()) += sliceFiltered;
             } else {
-                matDataOut.block(0,from,mataData.rows(),sliceFiltered.cols()) += sliceFiltered;
+                matDataOut.block(0,from,matData.rows(),sliceFiltered.cols()) += sliceFiltered;
             }
 
             from += iSize;
         }
     } else {
-        matDataOut = filterDataBlock(mataData,
+        matDataOut = filterDataBlock(matData,
                                      vecPicks,
                                      filterKernel,
                                      bUseThreads);
@@ -304,13 +304,13 @@ MatrixXd RTPROCESSINGLIB::filterData(const MatrixXd& mataData,
     if(bKeepOverhead) {
         return matDataOut;
     } else {
-        return matDataOut.block(0,iOrder/2,matDataOut.rows(),mataData.cols());
+        return matDataOut.block(0,iOrder/2,matDataOut.rows(),matData.cols());
     }
 }
 
 //=============================================================================================================
 
-MatrixXd RTPROCESSINGLIB::filterDataBlock(const MatrixXd& mataData,
+MatrixXd RTPROCESSINGLIB::filterDataBlock(const MatrixXd& matData,
                                           const RowVectorXi& vecPicks,
                                           const FilterKernel& filterKernel,
                                           bool bUseThreads)
@@ -318,19 +318,19 @@ MatrixXd RTPROCESSINGLIB::filterDataBlock(const MatrixXd& mataData,
     int iOrder = filterKernel.getFilterOrder();
 
     // Check for size of data
-    if(mataData.cols() < iOrder){
+    if(matData.cols() < iOrder){
         qWarning() << QString("[Filter::filterDataBlock] Filter length/order is bigger than data length. Returning.");
-        return mataData;
+        return matData;
     }
 
     // Setup filters to the correct length, so we do not have to do this everytime we call the FFT filter function
     FilterKernel filterKernelSetup = filterKernel;
-    filterKernelSetup.prepareFilter(mataData.cols());
+    filterKernelSetup.prepareFilter(matData.cols());
 
     // Do the concurrent filtering
     RowVectorXi vecPicksNew = vecPicks;
     if(vecPicksNew.cols() == 0) {
-        vecPicksNew = RowVectorXi::LinSpaced(mataData.rows(), 0, mataData.rows());
+        vecPicksNew = RowVectorXi::LinSpaced(matData.rows(), 0, matData.rows());
     }
 
     // Generate QList structure which can be handled by the QConcurrent framework
@@ -341,14 +341,14 @@ MatrixXd RTPROCESSINGLIB::filterDataBlock(const MatrixXd& mataData,
     for(qint32 i = 0; i < vecPicksNew.cols(); ++i) {
         data.filterKernel = filterKernelSetup;
         data.iRow = vecPicksNew[i];
-        data.vecData = mataData.row(vecPicksNew[i]);
+        data.vecData = matData.row(vecPicksNew[i]);
         timeData.append(data);
     }
 
     // Copy in data from last data block. This is necessary in order to also delay channels which are not filtered
-    MatrixXd matDataOut(mataData.rows(), mataData.cols()+iOrder);
+    MatrixXd matDataOut(matData.rows(), matData.cols()+iOrder);
     matDataOut.setZero();
-    matDataOut.block(0, iOrder/2, mataData.rows(), mataData.cols()) = mataData;
+    matDataOut.block(0, iOrder/2, matData.rows(), matData.cols()) = matData;
 
     if(bUseThreads) {
         QFuture<void> future = QtConcurrent::map(timeData,
@@ -383,7 +383,7 @@ void RTPROCESSINGLIB::filterChannel(RTPROCESSINGLIB::FilterObject& channelDataTi
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MatrixXd FilterOverlapAdd::calculate(const MatrixXd& mataData,
+MatrixXd FilterOverlapAdd::calculate(const MatrixXd& matData,
                                      int type,
                                      double dCenterfreq,
                                      double bandwidth,
@@ -397,9 +397,9 @@ MatrixXd FilterOverlapAdd::calculate(const MatrixXd& mataData,
                                      bool bKeepOverhead)
 {
     // Check for size of data
-    if(mataData.cols() < iOrder){
+    if(matData.cols() < iOrder){
         qWarning() << QString("[Filter::filterData] Filter length/order is bigger than data length. Returning.");
-        return mataData;
+        return matData;
     }
 
     // Normalize cut off frequencies to nyquist
@@ -417,7 +417,7 @@ MatrixXd FilterOverlapAdd::calculate(const MatrixXd& mataData,
                                        dSFreq,
                                        designMethod);
 
-    return calculate(mataData,
+    return calculate(matData,
                                 filter,
                                 vecPicks,
                                 bFilterEnd,
@@ -427,7 +427,7 @@ MatrixXd FilterOverlapAdd::calculate(const MatrixXd& mataData,
 
 //=============================================================================================================
 
-MatrixXd FilterOverlapAdd::calculate(const MatrixXd& mataData,
+MatrixXd FilterOverlapAdd::calculate(const MatrixXd& matData,
                                      const FilterKernel& filterKernel,
                                      const RowVectorXi& vecPicks,
                                      bool bFilterEnd,
@@ -437,62 +437,62 @@ MatrixXd FilterOverlapAdd::calculate(const MatrixXd& mataData,
     int iOrder = filterKernel.getFilterOrder();
 
     // Check for size of data
-    if(mataData.cols() < iOrder){
+    if(matData.cols() < iOrder){
         qWarning() << "[Filter::filterData] Filter length/order is bigger than data length. Returning.";
-        return mataData;
+        return matData;
     }
 
     // Init overlaps from last block
-    if(m_matOverlapBack.cols() != iOrder || m_matOverlapBack.rows() < mataData.rows()) {
-        m_matOverlapBack.resize(mataData.rows(), iOrder);
+    if(m_matOverlapBack.cols() != iOrder || m_matOverlapBack.rows() < matData.rows()) {
+        m_matOverlapBack.resize(matData.rows(), iOrder);
         m_matOverlapBack.setZero();
     }
 
-    if(m_matOverlapFront.cols() != iOrder || m_matOverlapFront.rows() < mataData.rows()) {
-        m_matOverlapFront.resize(mataData.rows(), iOrder);
+    if(m_matOverlapFront.cols() != iOrder || m_matOverlapFront.rows() < matData.rows()) {
+        m_matOverlapFront.resize(matData.rows(), iOrder);
         m_matOverlapFront.setZero();
     }
 
     // Create output matrix with size of input matrix
-    MatrixXd matDataOut(mataData.rows(), mataData.cols()+iOrder);
+    MatrixXd matDataOut(matData.rows(), matData.cols()+iOrder);
     matDataOut.setZero();
     MatrixXd sliceFiltered;
 
     // slice input data into data junks with proper length so that the slices are always >= the filter order
     float fFactor = 2.0f;
     int iSize = fFactor * iOrder;
-    int residual = mataData.cols() % iSize;
+    int residual = matData.cols() % iSize;
     while(residual < iOrder) {
         fFactor = fFactor - 0.1f;
         iSize = fFactor * iOrder;
-        residual = mataData.cols() % iSize;
+        residual = matData.cols() % iSize;
 
         if(iSize < iOrder) {
-            iSize = mataData.cols();
+            iSize = matData.cols();
             break;
         }
     }
 
-    if(mataData.cols() > iSize) {
+    if(matData.cols() > iSize) {
         int from = 0;
-        int numSlices = ceil(float(mataData.cols())/float(iSize)); //calculate number of data slices
+        int numSlices = ceil(float(matData.cols())/float(iSize)); //calculate number of data slices
 
         for (int i = 0; i < numSlices; i++) {
             if(i == numSlices-1) {
                 //catch the last one that might be shorter than the other blocks
-                iSize = mataData.cols() - (iSize * (numSlices -1));
+                iSize = matData.cols() - (iSize * (numSlices -1));
             }
 
             // Filter the data block. This will return data with a fitler delay of iOrder/2 in front and back
-            sliceFiltered = filterDataBlock(mataData.block(0,from,mataData.rows(),iSize),
+            sliceFiltered = filterDataBlock(matData.block(0,from,matData.rows(),iSize),
                                             vecPicks,
                                             filterKernel,
                                             bUseThreads);
 
             if(i == 0) {
-                matDataOut.block(0,0,mataData.rows(),sliceFiltered.cols()) += sliceFiltered;
+                matDataOut.block(0,0,matData.rows(),sliceFiltered.cols()) += sliceFiltered;
             } else {
-                matDataOut.block(0,from,mataData.rows(),sliceFiltered.cols()) += sliceFiltered;
+                matDataOut.block(0,from,matData.rows(),sliceFiltered.cols()) += sliceFiltered;
             }
 
             if(bFilterEnd && (i == 0)) {
@@ -504,7 +504,7 @@ MatrixXd FilterOverlapAdd::calculate(const MatrixXd& mataData,
             from += iSize;
         }
     } else {
-        matDataOut = filterDataBlock(mataData,
+        matDataOut = filterDataBlock(matData,
                                      vecPicks,
                                      filterKernel,
                                      bUseThreads);
@@ -523,7 +523,7 @@ MatrixXd FilterOverlapAdd::calculate(const MatrixXd& mataData,
     if(bKeepOverhead) {
         return matDataOut;
     } else {
-        return matDataOut.block(0,0,matDataOut.rows(),mataData.cols());
+        return matDataOut.block(0,0,matDataOut.rows(),matData.cols());
     }
 }
 

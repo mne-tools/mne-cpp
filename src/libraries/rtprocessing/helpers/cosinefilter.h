@@ -65,7 +65,7 @@ namespace RTPROCESSINGLIB
  *
  * @brief Creates a cosine filter response in the frequency domain.
  */
-class RTPROCESINGSHARED_EXPORT CosineFilter
+class RTPROCESSINGSHARED_EXPORT CosineFilter
 {
 public:
     enum TPassType {LPF, HPF, BPF, NOTCH };

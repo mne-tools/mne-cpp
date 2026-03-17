@@ -47,7 +47,7 @@
 #include <utils/mnemath.h>
 #include <utils/ioutils.h>
 
-#include <rtprocessing/sphara.h>
+#include <utils/sphara.h>
 #include <rtprocessing/detecttrigger.h>
 
 //=============================================================================================================
@@ -828,16 +828,16 @@ void RtFiffRawViewModel::updateSpharaOptions(const QString& sSytemType, int nBas
         MatrixXd matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
         if(sSytemType == "VectorView" && m_matSpharaVVGradLoaded.size() != 0 && m_matSpharaVVMagLoaded.size() != 0) {
-            matSpharaMultFirst = RTPROCESSINGLIB::makeSpharaProjector(m_matSpharaVVGradLoaded, m_vecIndicesFirstVV, m_pFiffInfo->nchan, nBaseFctsFirst, 1); //GRADIOMETERS
-            matSpharaMultSecond = RTPROCESSINGLIB::makeSpharaProjector(m_matSpharaVVMagLoaded, m_vecIndicesSecondVV, m_pFiffInfo->nchan, nBaseFctsSecond, 0); //Magnetometers
+            matSpharaMultFirst = UTILSLIB::makeSpharaProjector(m_matSpharaVVGradLoaded, m_vecIndicesFirstVV, m_pFiffInfo->nchan, nBaseFctsFirst, 1); //GRADIOMETERS
+            matSpharaMultSecond = UTILSLIB::makeSpharaProjector(m_matSpharaVVMagLoaded, m_vecIndicesSecondVV, m_pFiffInfo->nchan, nBaseFctsSecond, 0); //Magnetometers
         }
 
         if(sSytemType == "BabyMEG" && m_matSpharaBabyMEGInnerLoaded.size() != 0) {
-            matSpharaMultFirst = RTPROCESSINGLIB::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, m_vecIndicesFirstBabyMEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
+            matSpharaMultFirst = UTILSLIB::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, m_vecIndicesFirstBabyMEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
         }
 
         if(sSytemType == "EEG" && m_matSpharaEEGLoaded.size() != 0) {
-            matSpharaMultFirst = RTPROCESSINGLIB::makeSpharaProjector(m_matSpharaEEGLoaded, m_vecIndicesFirstEEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
+            matSpharaMultFirst = UTILSLIB::makeSpharaProjector(m_matSpharaEEGLoaded, m_vecIndicesFirstEEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
         }
 
         //Write final operator matrices to file

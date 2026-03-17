@@ -73,7 +73,7 @@ class FilterKernel;
  *
  * @brief Processes txt files which hold filter coefficients.
  */
-class RTPROCESINGSHARED_EXPORT FilterIO
+class RTPROCESSINGSHARED_EXPORT FilterIO
 {
 public:
     typedef QSharedPointer<FilterIO> SPtr;            /**< Shared pointer type for FilterIO. */

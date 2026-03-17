@@ -52,7 +52,7 @@
 #include "mne/mne_project_to_surface.h"
 
 #include <utils/generics/applicationlogger.h>
-#include "rtprocessing/icp.h"
+#include "mne/mne_icp.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
     }
 
     // align fiducials
-    if(!RTPROCESSINGLIB::fitMatchedPoints(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
+    if(!MNELIB::fitMatchedPoints(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
         qWarning() << "Point cloud registration not succesfull.";
     }
 
@@ -205,7 +205,7 @@ int main(int argc, char *argv[])
     float fRMSE = 0.0;
 
     // discard outliers
-    if(!RTPROCESSINGLIB::discard3DPointOutliers(mneSurfacePoints, matHsp, transHeadMri, vecTake, matHspClean, fMaxDist)) {
+    if(!MNELIB::discard3DPointOutliers(mneSurfacePoints, matHsp, transHeadMri, vecTake, matHspClean, fMaxDist)) {
         qWarning() << "Discard outliers was not succesfull.";
     }
     VectorXf vecWeightsICPClean(vecTake.size());
@@ -215,7 +215,7 @@ int main(int argc, char *argv[])
     }
 
     // icp
-    if(!RTPROCESSINGLIB::performIcp(mneSurfacePoints, matHspClean, transHeadMri, fRMSE, bScale, iMaxIter, fTol, vecWeightsICPClean)) {
+    if(!MNELIB::performIcp(mneSurfacePoints, matHspClean, transHeadMri, fRMSE, bScale, iMaxIter, fTol, vecWeightsICPClean)) {
         qWarning() << "ICP was not succesfull.";
     }
     qInfo() << "transHeadMri:";
