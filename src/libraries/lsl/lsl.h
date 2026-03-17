@@ -47,9 +47,9 @@
 //=============================================================================================================
 
 #include "lsl_global.h"
-#include "stream_info.h"
-#include "stream_outlet.h"
-#include "stream_inlet.h"
-#include "stream_discovery.h"
+#include "lsl_stream_info.h"
+#include "lsl_stream_outlet.h"
+#include "lsl_stream_inlet.h"
+#include "lsl_stream_discovery.h"
 
 #endif // LSL_H

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     stream_info.cpp
+ * @file     lsl_stream_info.cpp
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    2.0.0
  * @date     February, 2026
@@ -36,7 +36,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "stream_info.h"
+#include "lsl_stream_info.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -66,7 +66,7 @@ stream_info::stream_info()
 , m_type()
 , m_channel_count(0)
 , m_nominal_srate(0.0)
-, m_channel_format(cf_undefined)
+, m_channel_format(ChannelFormat::Undefined)
 , m_source_id()
 , m_uid()
 , m_hostname()
@@ -81,7 +81,7 @@ stream_info::stream_info(const std::string& name,
                          const std::string& type,
                          int channel_count,
                          double nominal_srate,
-                         channel_format_t channel_format,
+                         ChannelFormat channel_format,
                          const std::string& source_id)
 : m_name(name)
 , m_type(type)
@@ -98,70 +98,70 @@ stream_info::stream_info(const std::string& name,
 
 //=============================================================================================================
 
-std::string stream_info::name() const
+std::string stream_info::name() const noexcept
 {
     return m_name;
 }
 
 //=============================================================================================================
 
-std::string stream_info::type() const
+std::string stream_info::type() const noexcept
 {
     return m_type;
 }
 
 //=============================================================================================================
 
-int stream_info::channel_count() const
+int stream_info::channel_count() const noexcept
 {
     return m_channel_count;
 }
 
 //=============================================================================================================
 
-double stream_info::nominal_srate() const
+double stream_info::nominal_srate() const noexcept
 {
     return m_nominal_srate;
 }
 
 //=============================================================================================================
 
-channel_format_t stream_info::channel_format() const
+ChannelFormat stream_info::channel_format() const noexcept
 {
     return m_channel_format;
 }
 
 //=============================================================================================================
 
-std::string stream_info::source_id() const
+std::string stream_info::source_id() const noexcept
 {
     return m_source_id;
 }
 
 //=============================================================================================================
 
-std::string stream_info::uid() const
+std::string stream_info::uid() const noexcept
 {
     return m_uid;
 }
 
 //=============================================================================================================
 
-std::string stream_info::hostname() const
+std::string stream_info::hostname() const noexcept
 {
     return m_hostname;
 }
 
 //=============================================================================================================
 
-int stream_info::data_port() const
+int stream_info::data_port() const noexcept
 {
     return m_data_port;
 }
 
 //=============================================================================================================
 
-std::string stream_info::data_host() const
+std::string stream_info::data_host() const noexcept
 {
     return m_data_host;
 }
@@ -227,7 +227,7 @@ stream_info stream_info::from_string(const std::string& data)
     info.m_hostname      = tokens[6];
     info.m_source_id     = tokens[7];
     info.m_data_port     = std::stoi(tokens[8]);
-    info.m_channel_format = static_cast<channel_format_t>(std::stoi(tokens[9]));
+    info.m_channel_format = static_cast<ChannelFormat>(std::stoi(tokens[9]));
 
     return info;
 }
