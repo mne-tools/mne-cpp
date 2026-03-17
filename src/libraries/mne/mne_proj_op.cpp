@@ -43,11 +43,15 @@
 
 #include "mne_proj_op.h"
 #include "mne_proj_item.h"
+#include "mne_cov_matrix.h"
+#include "mne_named_vector.h"
+#include "mne_named_matrix.h"
 
 #include <QFile>
 #include <QTextStream>
 
 #include <Eigen/Core>
+#include <Eigen/SVD>
 
 #ifndef TRUE
 #define TRUE 1
@@ -664,4 +668,281 @@ void MNEProjOp::report_data(QTextStream &out, const char *tag, int list_data, ch
 void MNEProjOp::report(QTextStream &out, const char *tag)
 {
     report_data(out,tag, FALSE, NULL, 0);
+}
+
+//=============================================================================================================
+
+int MNEProjOp::assign_channels(const QStringList& list, int nlist)
+{
+    free_proj();  /* Compiled data is no longer valid */
+
+    if (nlist == 0)
+        return OK;
+
+    names = list;
+    nch   = nlist;
+
+    return OK;
+}
+
+//=============================================================================================================
+
+namespace {
+
+void clear_channel_group(Eigen::Ref<Eigen::VectorXf> data, const QStringList& ch_names, int nnames, const QString& prefix)
+{
+    for (int k = 0; k < nnames; k++)
+        if (ch_names[k].contains(prefix))
+            data[k] = 0.0;
+}
+
+constexpr float USE_LIMIT   = 1e-5f;
+constexpr float SMALL_VALUE = 1e-4f;
+
+} // anonymous namespace
+
+int MNEProjOp::make_proj_bad(char **bad, int nbad)
+{
+    using RowMatrixXf = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+
+    int   k,p,q,r,nvec_total;
+    RowMatrixXf vv_meg_mat;
+    Eigen::VectorXf sing_meg_vec;
+    RowMatrixXf vv_eeg_mat;
+    Eigen::VectorXf sing_eeg_vec;
+    int   nvec_meg;
+    int   nvec_eeg;
+    MNENamedVector vec;
+    float size;
+    int   nzero;
+
+    proj_data.resize(0, 0);
+    nvec      = 0;
+
+    if (nch <= 0)
+        return OK;
+    if (nitems <= 0)
+        return OK;
+
+    nvec_total = affect(names,nch);
+    if (nvec_total == 0)
+        return OK;
+
+    RowMatrixXf mat_meg_mat = RowMatrixXf::Zero(nvec_total, nch);
+    RowMatrixXf mat_eeg_mat = RowMatrixXf::Zero(nvec_total, nch);
+
+    for (k = 0, nvec_meg = nvec_eeg = 0; k < nitems; k++) {
+        if (items[k].active && items[k].affect(names,nch)) {
+            vec.nvec  = items[k].vecs->ncol;
+            vec.names = items[k].vecs->collist;
+            if (items[k].has_meg) {
+                for (p = 0; p < items[k].nvec; p++, nvec_meg++) {
+                    vec.data = items[k].vecs->data.row(p);
+                    Eigen::Map<Eigen::VectorXf> res_meg(mat_meg_mat.row(nvec_meg).data(), nch);
+                    if (vec.pick(names,nch,false,res_meg) == FAIL)
+                        return FAIL;
+                }
+            }
+            else if (items[k].has_eeg) {
+                for (p = 0; p < items[k].nvec; p++, nvec_eeg++) {
+                    vec.data = items[k].vecs->data.row(p);
+                    Eigen::Map<Eigen::VectorXf> res_eeg(mat_eeg_mat.row(nvec_eeg).data(), nch);
+                    if (vec.pick(names,nch,false,res_eeg) == FAIL)
+                        return FAIL;
+                }
+            }
+        }
+    }
+    /*
+     * Replace bad channel entries with zeroes
+     */
+    for (q = 0; q < nbad; q++)
+        for (r = 0; r < nch; r++)
+            if (QString::compare(names[r],bad[q]) == 0) {
+                for (p = 0; p < nvec_meg; p++)
+                    mat_meg_mat(p,r) = 0.0;
+                for (p = 0; p < nvec_eeg; p++)
+                    mat_eeg_mat(p,r) = 0.0;
+            }
+    /*
+     * Scale the rows so that detection of linear dependence becomes easy
+     */
+    for (p = 0, nzero = 0; p < nvec_meg; p++) {
+        size = mat_meg_mat.row(p).norm();
+        if (size > 0) {
+            mat_meg_mat.row(p) /= size;
+        }
+        else
+            nzero++;
+    }
+    if (nzero == nvec_meg) {
+        mat_meg_mat.resize(0, 0); nvec_meg = 0;
+    }
+    for (p = 0, nzero = 0; p < nvec_eeg; p++) {
+        size = mat_eeg_mat.row(p).norm();
+        if (size > 0) {
+            mat_eeg_mat.row(p) /= size;
+        }
+        else
+            nzero++;
+    }
+    if (nzero == nvec_eeg) {
+        mat_eeg_mat.resize(0, 0); nvec_eeg = 0;
+    }
+    if (nvec_meg + nvec_eeg == 0) {
+        qWarning("No projection remains after excluding bad channels. Omitting projection.");
+        return OK;
+    }
+    /*
+     * Proceed to SVD
+     */
+    if (nvec_meg > 0) {
+        Eigen::JacobiSVD<Eigen::MatrixXf> svd(mat_meg_mat.topRows(nvec_meg), Eigen::ComputeFullV);
+        sing_meg_vec = svd.singularValues();
+        vv_meg_mat = svd.matrixV().transpose().topRows(nvec_meg);
+    }
+    if (nvec_eeg > 0) {
+        Eigen::JacobiSVD<Eigen::MatrixXf> svd(mat_eeg_mat.topRows(nvec_eeg), Eigen::ComputeFullV);
+        sing_eeg_vec = svd.singularValues();
+        vv_eeg_mat = svd.matrixV().transpose().topRows(nvec_eeg);
+    }
+    /*
+     * Check for linearly dependent vectors
+     */
+    for (p = 0, nvec = 0; p < nvec_meg; p++, nvec++)
+        if (sing_meg_vec[p]/sing_meg_vec[0] < USE_LIMIT)
+            break;
+    for (p = 0; p < nvec_eeg; p++, nvec++)
+        if (sing_eeg_vec[p]/sing_eeg_vec[0] < USE_LIMIT)
+            break;
+    proj_data = RowMajorMatrixXf::Zero(nvec,nch);
+    for (p = 0, nvec = 0; p < nvec_meg; p++, nvec++) {
+        if (sing_meg_vec[p]/sing_meg_vec[0] < USE_LIMIT)
+            break;
+        for (k = 0; k < nch; k++) {
+            if (std::fabs(vv_meg_mat(p,k)) < SMALL_VALUE)
+                proj_data(nvec,k) = 0.0;
+            else
+                proj_data(nvec,k) = vv_meg_mat(p,k);
+            clear_channel_group(Eigen::Map<Eigen::VectorXf>(proj_data.row(nvec).data(), nch),names,nch,"EEG");
+        }
+    }
+    for (p = 0; p < nvec_eeg; p++, nvec++) {
+        if (sing_eeg_vec[p]/sing_eeg_vec[0] < USE_LIMIT)
+            break;
+        for (k = 0; k < nch; k++) {
+            if (std::fabs(vv_eeg_mat(p,k)) < SMALL_VALUE)
+                proj_data(nvec,k) = 0.0;
+            else
+                proj_data(nvec,k) = vv_eeg_mat(p,k);
+            clear_channel_group(Eigen::Map<Eigen::VectorXf>(proj_data.row(nvec).data(), nch),names,nch,"MEG");
+        }
+    }
+    /*
+     * Make sure that the stimulus channels are not modified
+     */
+    for (k = 0; k < nch; k++)
+        if (names[k].contains("STI")) {
+            for (p = 0; p < nvec; p++)
+                proj_data(p,k) = 0.0;
+        }
+
+    return OK;
+}
+
+//=============================================================================================================
+
+int MNEProjOp::make_proj()
+{
+    return make_proj_bad(nullptr,0);
+}
+
+//=============================================================================================================
+
+int MNEProjOp::project_dvector(Eigen::Ref<Eigen::VectorXd> vec, int vec_nch, int do_complement)
+{
+    if (nvec <= 0)
+        return OK;
+
+    if (nch != vec_nch) {
+        qCritical("Data vector size does not match projection operator");
+        return FAIL;
+    }
+
+    Eigen::VectorXd proj = Eigen::VectorXd::Zero(vec_nch);
+
+    for (int p = 0; p < nvec; p++) {
+        double w = vec.dot(proj_data.row(p).cast<double>());
+        proj += w * proj_data.row(p).cast<double>().transpose();
+    }
+
+    if (do_complement)
+        vec -= proj;
+    else
+        vec = proj;
+
+    return OK;
+}
+
+//=============================================================================================================
+
+int MNEProjOp::apply_cov(MNECovMatrix* c)
+{
+    using RowMatrixXd = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+
+    int j,k,p;
+    int do_complement = true;
+
+    if (nitems == 0)
+        return OK;
+
+    if (nch != c->ncov || names != c->names) {
+        qCritical("Incompatible data in apply_cov");
+        return FAIL;
+    }
+
+    RowMatrixXd dcovMat = RowMatrixXd::Zero(c->ncov,c->ncov);
+
+    if (c->cov_diag.size() > 0) {
+        for (j = 0, p = 0; j < c->ncov; j++)
+            for (k = 0; k < c->ncov; k++)
+                dcovMat(j,k) = (j == k) ? c->cov_diag[j] : 0;
+    }
+    else {
+        for (j = 0, p = 0; j < c->ncov; j++)
+            for (k = 0; k <= j; k++)
+                dcovMat(j,k) = c->cov[p++];
+        for (j = 0; j < c->ncov; j++)
+            for (k = j+1; k < c->ncov; k++)
+                dcovMat(j,k) = dcovMat(k,j);
+    }
+
+    for (k = 0; k < c->ncov; k++) {
+        Eigen::Map<Eigen::VectorXd> row_k(dcovMat.row(k).data(), c->ncov);
+        if (project_dvector(row_k,c->ncov,do_complement) != OK)
+            return FAIL;
+    }
+
+    dcovMat.transposeInPlace();
+
+    for (k = 0; k < c->ncov; k++) {
+        Eigen::Map<Eigen::VectorXd> row_k(dcovMat.row(k).data(), c->ncov);
+        if (project_dvector(row_k,c->ncov,do_complement) != OK)
+            return FAIL;
+    }
+
+    if (c->cov_diag.size() > 0) {
+        for (j = 0; j < c->ncov; j++) {
+            c->cov_diag[j] = dcovMat(j,j);
+        }
+        c->cov.resize(0);
+    }
+    else {
+        for (j = 0, p = 0; j < c->ncov; j++)
+            for (k = 0; k <= j; k++)
+                c->cov[p++] = dcovMat(j,k);
+    }
+
+    c->nproj = affect(c->names,c->ncov);
+    return OK;
 }

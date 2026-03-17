@@ -82,11 +82,13 @@ public:
      * Refactored: mne_simplex_minimize
      *
      * Minimization with the simplex algorithm. Float implementation
-     * Modified from Numerical recipes
+     * Modified from Numerical Recipes. Supports an optional absolute spatial
+     * tolerance (stol) to detect simplex collapse.
      *
      * @param[in] p              The initial simplex.
      * @param[in] y              Function values at the vertices.
      * @param[in] ftol           Relative convergence tolerance.
+     * @param[in] stol           Absolute spatial convergence tolerance (0 to disable).
      * @param[in] func           The function to be evaluated.
      * @param[in] user_data      Data to be passed to the above function in each evaluation.
      * @param[in] max_eval       Maximum number of function evaluations.
@@ -94,18 +96,23 @@ public:
      * @param[in] report         How often to report (-1 = no_reporting).
      * @param[in] report_func    The function to be called when reporting.
      *
-     * @return True when setup was successful, false otherwise.
+     * @return True when minimization succeeded, false otherwise.
      */
     template <typename T>
     static bool simplex_minimize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& p,
                                  Eigen::Matrix<T,Eigen::Dynamic, 1>& y,
                                  T ftol,
+                                 T stol,
                                  T (*func)(const Eigen::Matrix<T,Eigen::Dynamic, 1>& x, const void *user_data),
                                  const void *user_data,
                                  int max_eval,
                                  int &neval,
                                  int report,
-                                 bool (*report_func)(int loop, const Eigen::Matrix<T,Eigen::Dynamic, 1>& fitpar, double fval));
+                                 bool (*report_func)(int loop,
+                                                     const Eigen::Matrix<T,Eigen::Dynamic, 1>& fitpar,
+                                                     double fval_lo,
+                                                     double fval_hi,
+                                                     double par_diff));
 
 private:
 
@@ -122,89 +129,6 @@ private:
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
-//=============================================================================================================
-
-template <typename T>
-bool SimplexAlgorithm::simplex_minimize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& p,
-                                        Eigen::Matrix<T,Eigen::Dynamic, 1>& y,
-                                        T ftol,
-                                        T (*func)(const Eigen::Matrix<T,Eigen::Dynamic, 1>& x, const void *user_data),
-                                        const void *user_data,
-                                        int max_eval,
-                                        int &neval,
-                                        int report,
-                                        bool (*report_func)(int loop, const Eigen::Matrix<T,Eigen::Dynamic, 1>& fitpar, double fval))
-{
-    int   ndim = p.cols();  /* Number of variables */
-    int   i,ilo,ihi,inhi;
-    int   mpts = ndim+1;
-    T ytry,ysave,rtol;
-    Eigen::Matrix<T,Eigen::Dynamic, 1> psum(ndim);
-    bool  result = true;
-    int   count = 0;
-    int   loop  = 1;
-
-    neval = 0;
-    psum = p.colwise().sum();
-
-    if (report_func != NULL && report > 0) {
-        report_func(0,static_cast< Eigen::Matrix<T,Eigen::Dynamic, 1> >(p.row(0)),-1.0);
-    }
-
-    for (;;count++,loop++) {
-        ilo = 1;
-        ihi  =  y[1]>y[2] ? (inhi = 2,1) : (inhi = 1,2);
-        for (i = 0; i < mpts; i++) {
-            if (y[i]  <  y[ilo])
-                ilo = i;
-            if (y[i] > y[ihi]) {
-                inhi = ihi;
-                ihi = i;
-            } else if (y[i] > y[inhi])
-                if (i !=  ihi)
-                    inhi = i;
-        }
-        rtol = 2.0*std::fabs(y[ihi]-y[ilo])/(std::fabs(y[ihi])+std::fabs(y[ilo]));
-        /*
-        * Report that we are proceeding...
-        */
-        if (count == report && report_func != NULL) {
-            if (!report_func(loop,static_cast< Eigen::Matrix<T,Eigen::Dynamic, 1> >(p.row(ilo)),y[ilo])) {
-                qCritical("Interation interrupted.");
-                result = false;
-                break;
-            }
-            count = 0;
-        }
-        if (rtol < ftol) break;
-        if (neval >=  max_eval) {
-            qCritical("Maximum number of evaluations exceeded.");
-            result  =  false;
-            break;
-        }
-        ytry = tryit<T>(p,y,psum,func,user_data,ihi,neval,-ALPHA);
-        if (ytry <= y[ilo])
-            tryit<T>(p,y,psum,func,user_data,ihi,neval,GAMMA);
-        else if (ytry >= y[inhi]) {
-            ysave = y[ihi];
-            ytry = tryit<T>(p,y,psum,func,user_data,ihi,neval,BETA);
-            if (ytry >= ysave) {
-                for (i = 0; i < mpts; i++) {
-                    if (i !=  ilo) {
-                        psum = 0.5 * ( p.row(i) + p.row(ilo) );
-                        p.row(i) = psum;
-                        y[i] = (*func)(psum,user_data);
-                    }
-                }
-                neval +=  ndim;
-                psum = p.colwise().sum();
-            }
-        }
-    }
-
-    return result;
-}
-
 //=============================================================================================================
 
 template <typename T>
@@ -239,6 +163,100 @@ T SimplexAlgorithm::tryit(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> &p,
 
     return ytry;
 }
+
+//=============================================================================================================
+
+template <typename T>
+bool SimplexAlgorithm::simplex_minimize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& p,
+                                        Eigen::Matrix<T,Eigen::Dynamic, 1>& y,
+                                        T ftol,
+                                        T stol,
+                                        T (*func)(const Eigen::Matrix<T,Eigen::Dynamic, 1>& x, const void *user_data),
+                                        const void *user_data,
+                                        int max_eval,
+                                        int &neval,
+                                        int report,
+                                        bool (*report_func)(int loop,
+                                                            const Eigen::Matrix<T,Eigen::Dynamic, 1>& fitpar,
+                                                            double fval_lo,
+                                                            double fval_hi,
+                                                            double par_diff))
+{
+    constexpr int MIN_STOL_LOOP = 5;
+    int   ndim = p.cols();
+    int   i,ilo,ihi,inhi;
+    int   mpts = ndim+1;
+    T ytry,ysave,rtol;
+    double dsum;
+    Eigen::Matrix<T,Eigen::Dynamic, 1> psum(ndim);
+    bool  result = true;
+    int   count = 0;
+    int   loop  = 1;
+
+    neval = 0;
+    psum = p.colwise().sum();
+
+    if (report_func != nullptr && report > 0)
+        report_func(0, static_cast<Eigen::Matrix<T,Eigen::Dynamic, 1>>(p.row(0)), -1.0, -1.0, 0.0);
+
+    dsum = 0.0;
+    for (;;count++,loop++) {
+        ilo = 1;
+        ihi  =  y[1]>y[2] ? (inhi = 2,1) : (inhi = 1,2);
+        for (i = 0; i < mpts; i++) {
+            if (y[i]  <  y[ilo]) ilo = i;
+            if (y[i] > y[ihi]) {
+                inhi = ihi;
+                ihi = i;
+            } else if (y[i] > y[inhi])
+                if (i !=  ihi) inhi = i;
+        }
+        rtol = 2.0*std::fabs(y[ihi]-y[ilo])/(std::fabs(y[ihi])+std::fabs(y[ilo]));
+        /*
+         * Report that we are proceeding...
+         */
+        if (count == report && report_func != nullptr) {
+            if (!report_func(loop, static_cast<Eigen::Matrix<T,Eigen::Dynamic, 1>>(p.row(ilo)),
+                             y[ilo], y[ihi], std::sqrt(dsum))) {
+                qWarning("Iteration interrupted.");
+                result = false;
+                break;
+            }
+            count = 0;
+        }
+        if (rtol < ftol) break;
+        if (neval >=  max_eval) {
+            qWarning("Maximum number of evaluations exceeded.");
+            result  =  false;
+            break;
+        }
+        if (stol > 0) {  /* Has the simplex collapsed? */
+            dsum = (p.row(ilo) - p.row(ihi)).squaredNorm();
+            if (loop > MIN_STOL_LOOP && std::sqrt(dsum) < stol)
+                break;
+        }
+        ytry = tryit<T>(p,y,psum,func,user_data,ihi,neval,-ALPHA);
+        if (ytry <= y[ilo])
+            tryit<T>(p,y,psum,func,user_data,ihi,neval,GAMMA);
+        else if (ytry >= y[inhi]) {
+            ysave = y[ihi];
+            ytry = tryit<T>(p,y,psum,func,user_data,ihi,neval,BETA);
+            if (ytry >= ysave) {
+                for (i = 0; i < mpts; i++) {
+                    if (i !=  ilo) {
+                        psum = static_cast<T>(0.5) * (p.row(i) + p.row(ilo));
+                        p.row(i) = psum;
+                        y[i] = (*func)(psum,user_data);
+                    }
+                }
+                neval +=  ndim;
+                psum = p.colwise().sum();
+            }
+        }
+    }
+    return result;
+}
+
 } //NAMESPACE
 
 #undef ALPHA

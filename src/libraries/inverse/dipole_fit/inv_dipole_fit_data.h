@@ -66,10 +66,9 @@
 
 namespace FIFFLIB { class FiffCoordTrans; }
 
-// ToDo move to cpp
-#define COLUMN_NORM_NONE 0	    /* No column normalization requested */
-#define COLUMN_NORM_COMP 1	    /* Componentwise normalization */
-#define COLUMN_NORM_LOC  2	    /* Dipole locationwise normalization */
+constexpr int COLUMN_NORM_NONE = 0;     /**< No column normalization requested. */
+constexpr int COLUMN_NORM_COMP = 1;     /**< Componentwise normalization. */
+constexpr int COLUMN_NORM_LOC  = 2;     /**< Dipole locationwise normalization. */
 
 //=============================================================================================================
 // DEFINE NAMESPACE INVLIB
@@ -83,17 +82,22 @@ namespace INVLIB
 /**
  * @brief Forward field computation function pointers and client data for MEG and EEG dipole fitting.
  */
-typedef struct {
-  fwdFieldFunc    meg_field;	    /* MEG forward calculation functions */
-  fwdVecFieldFunc meg_vec_field;
-  void            *meg_client;	    /* Client data for MEG field computations */
-  MNELIB::mneUserFreeFunc meg_client_free;
+struct dipoleFitFuncsRec {
+  fwdFieldFunc    meg_field = nullptr;       /**< MEG forward calculation function. */
+  fwdVecFieldFunc meg_vec_field = nullptr;   /**< MEG vectorized forward calculation function. */
+  void            *meg_client = nullptr;     /**< Client data for MEG field computations. */
+  MNELIB::mneUserFreeFunc meg_client_free = nullptr;  /**< Destructor for MEG client data. */
 
-  fwdFieldFunc    eeg_pot;	    /* EEG forward calculation functions */
-  fwdVecFieldFunc eeg_vec_pot;
-  void            *eeg_client;	    /* Client data for EEG field computations */
-  MNELIB::mneUserFreeFunc eeg_client_free;
-} *dipoleFitFuncs,dipoleFitFuncsRec;
+  fwdFieldFunc    eeg_pot = nullptr;         /**< EEG forward calculation function. */
+  fwdVecFieldFunc eeg_vec_pot = nullptr;     /**< EEG vectorized forward calculation function. */
+  void            *eeg_client = nullptr;     /**< Client data for EEG field computations. */
+  MNELIB::mneUserFreeFunc eeg_client_free = nullptr;  /**< Destructor for EEG client data. */
+};
+
+/**
+ * @brief Pointer alias for dipoleFitFuncsRec, used throughout the dipole fitting module.
+ */
+using dipoleFitFuncs = dipoleFitFuncsRec*;
 
 /**
  * @brief Workspace for the dipole fitting objective function, holding forward model, measured field, and fit limits.
@@ -137,8 +141,6 @@ public:
      * Refactored: free_dipole_fit_data (dipole_fit_setup.c)
      */
     virtual ~InvDipoleFitData();
-
-    //============================= dipole_fit_setup.c =============================
 
     static int setup_forward_model(InvDipoleFitData* d, MNELIB::MNECTFCompDataSet* comp_data, FWDLIB::FwdCoilSet* comp_coils);
 
@@ -187,20 +189,16 @@ public:
      * @param[in] fit        Precomputed fitting data.
      * @param[in] guess      The initial guesses.
      * @param[in] time       Which time is it?.
-     * @param[in] B          The field to fit.
+     * @param[in,out] B      The field to fit (modified in-place by projection and whitening).
      * @param[in] verbose.
      * @param[in] res        The fitted dipole.
      */
-    static bool fit_one(InvDipoleFitData* fit, InvGuessData* guess, float time, float *B, int verbose, InvEcd& res);
-
-//============================= dipole_forward.c
+    static bool fit_one(InvDipoleFitData* fit, InvGuessData* guess, float time, Eigen::Ref<Eigen::VectorXf> B, int verbose, InvEcd& res);
 
     static int compute_dipole_field(InvDipoleFitData& d, const Eigen::Vector3f& rd, int whiten, Eigen::Ref<Eigen::MatrixXf> fwd);
 
-    //============================= dipole_forward.c
-
     static InvDipoleForward* dipole_forward_one(InvDipoleFitData* d,
-                                     float         *rd,
+                                     const Eigen::Vector3f& rd,
                                      InvDipoleForward* old);
 
 public:
@@ -214,7 +212,7 @@ public:
       std::unique_ptr<FIFFLIB::FiffSparseMatrix> pick;   /**< Matrix to pick data from the full data set which may contain channels we are not interested in (currently unused). */
       std::unique_ptr<FWDLIB::FwdCoilSet>        meg_coils;         /**< MEG coil definitions. */
       std::unique_ptr<FWDLIB::FwdCoilSet>        eeg_els;           /**< EEG electrode definitions. */
-      float             r0[3];              /**< Sphere model origin. */
+      Eigen::Vector3f     r0;                /**< Sphere model origin. */
       QString           bemname;           /**< Using a BEM?. */
 
       std::unique_ptr<FWDLIB::FwdEegSphereModel> eeg_model;         /**< EEG sphere model definition. */

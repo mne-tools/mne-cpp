@@ -190,6 +190,7 @@ bool Sphere::fit_sphere_to_points(const MatrixXf &rr, float simplex_size, Vector
     if(!SimplexAlgorithm::simplex_minimize<float>(  init_simplex,   /* The initial simplex */
                                                     init_vals,      /* Function values at the vertices */
                                                     ftol,           /* Relative convergence tolerance */
+                                                    0.0f,           /* No spatial convergence tolerance */
                                                     fit_eval,       /* The function to be evaluated */
                                                     &user,          /* Data to be passed to the above function in each evaluation */
                                                     max_eval,       /* Maximum number of function evaluations */
@@ -208,14 +209,14 @@ bool Sphere::fit_sphere_to_points(const MatrixXf &rr, float simplex_size, Vector
 
 //=============================================================================================================
 
-bool Sphere::report_func(int loop, const VectorXf &fitpar, double fval)
+bool Sphere::report_func(int loop, const VectorXf &fitpar, double fval_lo, double /*fval_hi*/, double /*par_diff*/)
 {
     /*
      * Report periodically
      */
     const VectorXf& r0 = fitpar;
 
-    std::cout << "loop: " << loop << "; r0: " << 1000*r0[0] << ", r1: " << 1000*r0[1] << ", r2: " << 1000*r0[2] << "; fval: " << fval << std::endl;
+    std::cout << "loop: " << loop << "; r0: " << 1000*r0[0] << ", r1: " << 1000*r0[1] << ", r2: " << 1000*r0[2] << "; fval: " << fval_lo << std::endl;
 
     return true;
 }

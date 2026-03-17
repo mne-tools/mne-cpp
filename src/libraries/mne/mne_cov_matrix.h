@@ -77,6 +77,7 @@
 namespace FIFFLIB
 {
     class FiffSparseMatrix;
+    class FiffChInfo;
 }
 
 //=============================================================================================================
@@ -215,6 +216,17 @@ public:
 
     //=========================================================================================================
     /**
+     * Read a covariance matrix of the specified kind from a FIFF file.
+     *
+     * @param[in] name  Path to the FIFF file.
+     * @param[in] kind  Covariance kind (e.g. FIFFV_MNE_SENSOR_COV).
+     *
+     * @return The covariance matrix, or nullptr on failure.
+     */
+    static std::unique_ptr<MNECovMatrix> read(const QString& name, int kind);
+
+    //=========================================================================================================
+    /**
      * Check whether this covariance matrix is stored in diagonal form.
      *
      * @return Non-zero if diagonal, zero if full or sparse.
@@ -264,8 +276,6 @@ public:
      */
     int decompose_eigen();
 
-private:
-
     //=========================================================================================================
     /**
      * Compute the linear index into a symmetric lower-triangular packed
@@ -278,7 +288,64 @@ private:
      */
     static int lt_packed_index(int j, int k);
 
-public:
+    //=========================================================================================================
+    /**
+     * Assign channel-type classifications (MEG mag, MEG grad, EEG) to channels
+     * in this covariance matrix, based on channel information.
+     *
+     * @param[in] chs    Channel information list.
+     * @param[in] nchan  Number of channels in chs.
+     *
+     * @return OK on success, FAIL if channel information is not available.
+     */
+    int classify_channels(const QList<FIFFLIB::FiffChInfo>& chs, int nchan);
+
+    //=========================================================================================================
+    /**
+     * Apply whitening to a data vector using the inverse square-root
+     * eigenvalues stored in this covariance matrix.
+     *
+     * @param[in]  data           Input data vector.
+     * @param[out] whitened_data  Whitened output vector (may alias data for in-place).
+     * @param[in]  nchan          Number of channels.
+     *
+     * @return OK on success, FAIL if dimensions are incompatible.
+     */
+    int whiten_vector(Eigen::Ref<Eigen::VectorXf> data, Eigen::Ref<Eigen::VectorXf> whitened_data, int nchan) const;
+
+    //=========================================================================================================
+    /**
+     * Regularize different channel types of the covariance matrix by adding
+     * a fraction of the average diagonal value for each channel class.
+     *
+     * @param[in] regs  Regularization fractions for [MEG_MAG, MEG_GRAD, EEG].
+     */
+    void regularize(const Eigen::Vector3f& regs);
+
+    //=========================================================================================================
+    /**
+     * Revert a full (lower-triangle packed) covariance matrix to its diagonal
+     * elements, discarding off-diagonal data and eigendecomposition.
+     */
+    void revert_to_diag();
+
+    //=========================================================================================================
+    /**
+     * Pick designated channels from this covariance matrix, optionally
+     * omitting MEG-EEG cross-correlations.
+     *
+     * @param[in] new_names      Names of channels to pick.
+     * @param[in] new_ncov       Number of channels to pick.
+     * @param[in] omit_meg_eeg   If non-zero, zero out MEG-EEG cross entries.
+     * @param[in] chs            Channel information list (for MEG/EEG classification).
+     *
+     * @return A new covariance matrix with only the selected channels, or nullptr on error.
+     */
+    std::unique_ptr<MNECovMatrix> pick_chs_omit(const QStringList& new_names,
+                                                int new_ncov,
+                                                int omit_meg_eeg,
+                                                const QList<FIFFLIB::FiffChInfo>& chs) const;
+
     int         kind;                           /**< Covariance kind: sensor or source. */
     int         ncov;                           /**< Dimension (number of channels). */
     int         nfree;                          /**< Number of degrees of freedom used in estimation. */

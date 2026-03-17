@@ -1,15 +1,13 @@
 //=============================================================================================================
 /**
- * @file     inv_dipole_forward.cpp
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @file     mne_named_vector.cpp
+ * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
- * @date     December, 2016
+ * @date     January, 2017
  *
  * @section  LICENSE
  *
- * Copyright (C) 2016, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2017, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the InvDipoleForward Class.
+ * @brief    Definition of the MNENamedVector Class.
  *
  */
 
@@ -38,7 +36,53 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "inv_dipole_forward.h"
+#include "mne_named_vector.h"
 
-// Constructor and destructor are defaulted in the header.
-// Eigen members handle their own memory automatically.
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace Eigen;
+using namespace MNELIB;
+
+#ifndef FAIL
+#define FAIL -1
+#endif
+
+#ifndef OK
+#define OK 0
+#endif
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+int MNENamedVector::pick(const QStringList& pick_names, int nnames, bool require_all, Eigen::Ref<Eigen::VectorXf> res) const
+{
+    int found;
+    int k,p;
+
+    if (names.size() == 0) {
+        qCritical("No names present in vector. Cannot pick.");
+        return FAIL;
+    }
+
+    for (k = 0; k < nnames; k++)
+        res[k] = 0.0;
+
+    for (k = 0; k < nnames; k++) {
+        found = 0;
+        for (p = 0; p < nvec; p++) {
+            if (QString::compare(names[p],pick_names[k]) == 0) {
+                res[k] = data[p];
+                found = true;
+                break;
+            }
+        }
+        if (!found && require_all) {
+            qCritical("All required elements not found in named vector.");
+            return FAIL;
+        }
+    }
+    return OK;
+}

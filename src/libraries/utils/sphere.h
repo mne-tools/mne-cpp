@@ -180,7 +180,7 @@ private:
      *
      * @return true if reporting was successful.
      */
-    static bool report_func(int loop, const Eigen::VectorXf &fitpar, double fval);
+    static bool report_func(int loop, const Eigen::VectorXf &fitpar, double fval_lo, double fval_hi, double par_diff);
 
     //=========================================================================================================
     /**

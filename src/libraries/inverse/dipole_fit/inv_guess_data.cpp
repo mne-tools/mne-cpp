@@ -205,11 +205,10 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
     else {
         MNESurface*    inner_skull = nullptr;
         int            free_inner_skull = FALSE;
-        float          r0[3];
+        Eigen::Vector3f r0 = f->r0;
 
-        VEC_COPY_16(r0,f->r0);
         Q_ASSERT(f->mri_head_t);
-        FiffCoordTrans::apply_inverse_trans(r0,*f->mri_head_t,TRUE);
+        FiffCoordTrans::apply_inverse_trans(r0.data(),*f->mri_head_t,TRUE);
         if (f->bem_model) {
             printf("Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
             if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == nullptr)
@@ -221,7 +220,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
                 goto bad;
             free_inner_skull = TRUE;
         }
-        guesses.reset((MNESourceSpace*)FwdBemModel::make_guesses(inner_skull,guessrad,Eigen::Map<const Eigen::Vector3f>(r0),grid,exclude,mindist).release());
+        guesses.reset((MNESourceSpace*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist).release());
         if (!guesses)
             goto bad;
         if (free_inner_skull)
@@ -257,7 +256,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
         f->funcs = f->sphere_funcs;
 
     for (k = 0; k < this->nguess; k++) {
-        this->guess_fwd[k].reset(InvDipoleFitData::dipole_forward_one(f,this->rr.row(k).data(),nullptr));
+        this->guess_fwd[k].reset(InvDipoleFitData::dipole_forward_one(f,Eigen::Vector3f(this->rr.row(k)),nullptr));
         if (!this->guess_fwd[k])
             goto bad;
 #ifdef DEBUG
@@ -303,11 +302,10 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
     else {
         MNESurface*     inner_skull = nullptr;
         int            free_inner_skull = FALSE;
-        float          r0[3];
+        Eigen::Vector3f r0 = f->r0;
 
-        VEC_COPY_16(r0,f->r0);
         Q_ASSERT(f->mri_head_t);
-        FiffCoordTrans::apply_inverse_trans(r0,*f->mri_head_t,TRUE);
+        FiffCoordTrans::apply_inverse_trans(r0.data(),*f->mri_head_t,TRUE);
         if (f->bem_model) {
             printf("Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
             if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == nullptr)
@@ -319,7 +317,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
                 goto bad;
             free_inner_skull = TRUE;
         }
-        guesses.reset((MNESourceSpace*)FwdBemModel::make_guesses(inner_skull,guessrad,Eigen::Map<const Eigen::Vector3f>(r0),grid,exclude,mindist).release());
+        guesses.reset((MNESourceSpace*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist).release());
         if (!guesses)
             goto bad;
         if (free_inner_skull)
@@ -398,7 +396,7 @@ bool InvGuessData::compute_guess_fields(InvDipoleFitData* f)
     else
         f->funcs = f->sphere_funcs;
     for (int k = 0; k < this->nguess; k++) {
-        this->guess_fwd[k].reset(InvDipoleFitData::dipole_forward_one(f,this->rr.row(k).data(),this->guess_fwd[k].release()));
+        this->guess_fwd[k].reset(InvDipoleFitData::dipole_forward_one(f,Eigen::Vector3f(this->rr.row(k)),this->guess_fwd[k].release()));
         if (!this->guess_fwd[k]) {
             if (orig)
                 f->funcs = orig;
