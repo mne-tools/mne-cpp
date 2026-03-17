@@ -44,7 +44,6 @@
 #include "../inv_global.h"
 
 #include <fiff/fiff_types.h>
-#include "../inv_analyze_types.h"
 #include <fwd/fwd_types.h>
 #include <fwd/fwd_eeg_sphere_model.h>
 #include <fwd/fwd_bem_model.h>
@@ -65,6 +64,7 @@
 #include <memory>
 
 namespace FIFFLIB { class FiffCoordTrans; }
+namespace MNELIB { class MNEMeasData; }
 
 constexpr int COLUMN_NORM_NONE = 0;     /**< No column normalization requested. */
 constexpr int COLUMN_NORM_COMP = 1;     /**< Componentwise normalization. */
@@ -233,15 +233,23 @@ public:
      * Channels present in the measurement data selection receive unit
      * weight; omitted channels receive a reduced weight.
      *
+     * When @p meas is nullptr the function simply scales the noise
+     * covariance for nave = 1 (initial setup case).
+     *
      * Refactored: select_dipole_fit_noise_cov (dipole_fit_setup.c)
      *
-     * @param[in,out] f  Dipole fit data whose noise_orig is used to
-     *                    build the weighted noise member.
-     * @param[in]     d  Measurement data with active channel selection.
+     * @param[in,out] f     Dipole fit data whose noise_orig is used to
+     *                       build the weighted noise member.
+     * @param[in]     meas  Measurement data with channel info (may be nullptr).
+     * @param[in]     nave  Number of averages override (< 0 to use meas->current->nave).
+     * @param[in]     sels  Per-channel selection flags (size >= meas->nchan, may be nullptr).
      *
      * @return OK on success, FAIL on error.
      */
-    static int select_dipole_fit_noise_cov(InvDipoleFitData* f, mshMegEegData d);
+    static int select_dipole_fit_noise_cov(InvDipoleFitData* f,
+                                           MNELIB::MNEMeasData* meas,
+                                           int nave,
+                                           const int* sels);
 
     //=========================================================================================================
     /**
