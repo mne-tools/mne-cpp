@@ -14,19 +14,19 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 
 set(SOURCES
   lsl_global.cpp
-  stream_info.cpp
-  stream_inlet.cpp
-  stream_outlet.cpp
-  stream_discovery.cpp
+  lsl_stream_info.cpp
+  lsl_stream_inlet.cpp
+  lsl_stream_outlet.cpp
+  lsl_stream_discovery.cpp
 )
 
 set(HEADERS
   lsl.h
   lsl_global.h
-  stream_info.h
-  stream_inlet.h
-  stream_outlet.h
-  stream_discovery.h
+  lsl_stream_info.h
+  lsl_stream_inlet.h
+  lsl_stream_outlet.h
+  lsl_stream_discovery.h
 )
 
 set(FILE_TO_UPDATE lsl_global.cpp)

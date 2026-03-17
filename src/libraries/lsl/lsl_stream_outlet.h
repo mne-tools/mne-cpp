@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     stream_inlet.h
+ * @file     lsl_stream_outlet.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    2.0.0
  * @date     February, 2026
@@ -28,19 +28,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the stream_inlet class.
+ * @brief    Contains the declaration of the stream_outlet class.
  *
  */
 
-#ifndef LSL_STREAM_INLET_H
-#define LSL_STREAM_INLET_H
+#ifndef LSL_STREAM_OUTLET_H
+#define LSL_STREAM_OUTLET_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "lsl_global.h"
-#include "stream_info.h"
+#include "lsl_stream_info.h"
 
 //=============================================================================================================
 // STL INCLUDES
@@ -48,10 +48,9 @@
 
 #include <vector>
 #include <memory>
-#include <type_traits>
 
 //=============================================================================================================
-// DEFINE NAMESPACE lsl
+// DEFINE NAMESPACE LSLLIB
 //=============================================================================================================
 
 namespace LSLLIB {
@@ -61,91 +60,77 @@ namespace LSLLIB {
 //=============================================================================================================
 
 /**
- * @brief Private PIMPL implementation class for stream_inlet, managing the TCP connection and data reception.
+ * @brief Private PIMPL implementation class for stream_outlet, managing the TCP server, UDP discovery broadcasts, and sample queue.
  */
-class StreamInletPrivate;
+class StreamOutletPrivate;
 
 //=============================================================================================================
 /**
- * @brief A stream inlet to receive data from a stream_outlet on the network.
+ * @brief A stream outlet to publish data on the network.
  *
- * The stream_inlet connects to an outlet (described by a stream_info obtained from resolve_streams)
- * over TCP and reads data from it. Data is received as chunks of multichannel float samples.
+ * A stream_outlet creates a TCP server that stream_inlet instances can connect to, and periodically
+ * broadcasts its stream_info via UDP multicast so that resolve_streams() can discover it.
  *
- * This class is API-compatible with the liblsl stream_inlet to serve as a drop-in replacement.
+ * Data is pushed to connected inlets via push_sample() or push_chunk().
+ *
+ * This class is API-compatible with the liblsl stream_outlet to serve as a drop-in replacement.
  */
-class LSLSHARED_EXPORT stream_inlet
+class LSLSHARED_EXPORT stream_outlet
 {
 public:
     //=========================================================================================================
     /**
-     * Construct a new stream_inlet from a resolved stream_info.
+     * Construct a stream_outlet for the given stream_info.
      *
-     * @param[in] info  A stream_info object (typically obtained from resolve_streams).
+     * This immediately starts the TCP data server and begins UDP discovery broadcasts.
+     *
+     * @param[in] info  The stream_info describing this outlet's stream.
      */
-    explicit stream_inlet(const stream_info& info);
+    explicit stream_outlet(const stream_info& info);
 
     //=========================================================================================================
     /**
-     * Destructor. Closes the connection if still open.
+     * Destructor. Stops broadcasting and closes all connections.
      */
-    ~stream_inlet();
+    ~stream_outlet();
 
     //=========================================================================================================
     /**
-     * Open the TCP connection to the outlet and begin receiving data.
+     * Push a single multichannel sample into the outlet.
      *
-     * @throws std::runtime_error if the connection cannot be established.
+     * @param[in] sample  A vector of channel values (must match the stream's channel_count).
      */
-    void open_stream();
+    void push_sample(const std::vector<float>& sample);
 
     //=========================================================================================================
     /**
-     * Close the TCP connection to the outlet.
+     * Push a chunk of multichannel samples into the outlet.
+     *
+     * @param[in] chunk  A vector of samples, where each sample is a vector of channel values.
      */
-    void close_stream();
+    void push_chunk(const std::vector<std::vector<float>>& chunk);
 
     //=========================================================================================================
     /**
-     * Check whether new samples are available in the internal buffer.
+     * Get the stream_info associated with this outlet (including the assigned data port).
      *
-     * Also performs a non-blocking read from the TCP socket to collect any pending data.
-     *
-     * @return True if at least one complete sample is available.
+     * @return The stream_info for this outlet.
      */
-    bool samples_available();
+    [[nodiscard]] stream_info info() const;
 
     //=========================================================================================================
     /**
-     * Pull a chunk of multichannel data from the inlet.
+     * Check whether any consumers are currently connected.
      *
-     * Returns all complete samples currently in the buffer. Template is provided for API
-     * compatibility with liblsl; only float is supported in this implementation.
-     *
-     * @tparam T  The data type (must be float).
-     * @return    A vector of samples, where each sample is a vector of channel values.
+     * @return True if at least one inlet is connected.
      */
-    template<typename T>
-    std::vector<std::vector<T>> pull_chunk()
-    {
-        static_assert(std::is_same<T, float>::value,
-                      "lsl::stream_inlet::pull_chunk<T>: only float is supported");
-        return pull_chunk_float();
-    }
-
-    //=========================================================================================================
-    /**
-     * Pull a chunk of float data (non-template version).
-     *
-     * @return A vector of samples, where each sample is a vector of float channel values.
-     */
-    std::vector<std::vector<float>> pull_chunk_float();
+    [[nodiscard]] bool have_consumers() const;
 
 private:
     /** Opaque implementation pointer (PIMPL). */
-    std::unique_ptr<StreamInletPrivate> m_pImpl;
+    std::unique_ptr<StreamOutletPrivate> m_pImpl;
 };
 
 } // namespace LSLLIB
 
-#endif // LSL_STREAM_INLET_H
+#endif // LSL_STREAM_OUTLET_H

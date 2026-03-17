@@ -20,6 +20,8 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 add_subdirectory(test_coregistration)
 
+add_subdirectory(test_lsl)
+
 add_subdirectory(test_dipole_fit)
 add_subdirectory(test_fiff_coord_trans)
 add_subdirectory(test_fiff_rwr)

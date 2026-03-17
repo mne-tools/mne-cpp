@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     stream_info.h
+ * @file     lsl_stream_info.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    2.0.0
  * @date     February, 2026
@@ -46,9 +46,10 @@
 //=============================================================================================================
 
 #include <string>
+#include <string_view>
 
 //=============================================================================================================
-// DEFINE NAMESPACE lsl
+// DEFINE NAMESPACE LSLLIB
 //=============================================================================================================
 
 namespace LSLLIB {
@@ -57,15 +58,15 @@ namespace LSLLIB {
 /**
  * Data format of a channel (mirroring the values used in the original LSL protocol).
  */
-enum channel_format_t {
-    cf_undefined = 0,   /**< Undefined format. */
-    cf_float32  = 1,    /**< 32-bit IEEE 754 floating point. */
-    cf_double64 = 2,    /**< 64-bit IEEE 754 floating point. */
-    cf_string   = 3,    /**< Variable-length string. */
-    cf_int32    = 4,    /**< 32-bit signed integer. */
-    cf_int16    = 5,    /**< 16-bit signed integer. */
-    cf_int8     = 6,    /**< 8-bit signed integer. */
-    cf_int64    = 7     /**< 64-bit signed integer. */
+enum class ChannelFormat : int {
+    Undefined = 0,   /**< Undefined format. */
+    Float32   = 1,   /**< 32-bit IEEE 754 floating point. */
+    Double64  = 2,   /**< 64-bit IEEE 754 floating point. */
+    String    = 3,   /**< Variable-length string. */
+    Int32     = 4,   /**< 32-bit signed integer. */
+    Int16     = 5,   /**< 16-bit signed integer. */
+    Int8      = 6,   /**< 8-bit signed integer. */
+    Int64     = 7    /**< 64-bit signed integer. */
 };
 
 //=============================================================================================================
@@ -102,7 +103,7 @@ public:
                 const std::string& type,
                 int channel_count = 0,
                 double nominal_srate = 0.0,
-                channel_format_t channel_format = cf_float32,
+                ChannelFormat channel_format = ChannelFormat::Float32,
                 const std::string& source_id = "");
 
     //=========================================================================================================
@@ -122,22 +123,22 @@ public:
      *  @{ */
 
     /** @brief Name of the stream. */
-    std::string name() const;
+    [[nodiscard]] std::string name() const noexcept;
 
     /** @brief Content type of the stream. */
-    std::string type() const;
+    [[nodiscard]] std::string type() const noexcept;
 
     /** @brief Number of channels. */
-    int channel_count() const;
+    [[nodiscard]] int channel_count() const noexcept;
 
     /** @brief Nominal sampling rate in Hz. 0.0 means irregular. */
-    double nominal_srate() const;
+    [[nodiscard]] double nominal_srate() const noexcept;
 
     /** @brief Data format of a channel. */
-    channel_format_t channel_format() const;
+    [[nodiscard]] ChannelFormat channel_format() const noexcept;
 
     /** @brief Unique source identifier. */
-    std::string source_id() const;
+    [[nodiscard]] std::string source_id() const noexcept;
 
     /** @} */
 
@@ -146,10 +147,10 @@ public:
      *  @{ */
 
     /** @brief A unique identifier for this particular stream instance (auto-generated). */
-    std::string uid() const;
+    [[nodiscard]] std::string uid() const noexcept;
 
     /** @brief Hostname of the machine from which the stream originates. */
-    std::string hostname() const;
+    [[nodiscard]] std::string hostname() const noexcept;
 
     /** @} */
 
@@ -158,10 +159,10 @@ public:
      *  @{ */
 
     /** @brief TCP data port of the outlet. */
-    int data_port() const;
+    [[nodiscard]] int data_port() const noexcept;
 
     /** @brief Host address of the outlet (IP, set from UDP sender address during discovery). */
-    std::string data_host() const;
+    [[nodiscard]] std::string data_host() const noexcept;
 
     /** @brief Set the TCP data port (used internally during discovery / outlet creation). */
     void set_data_port(int port);
@@ -176,10 +177,10 @@ public:
      *  @{ */
 
     /** @brief Serialize stream_info into a string for network transport. */
-    std::string to_string() const;
+    [[nodiscard]] std::string to_string() const;
 
     /** @brief Deserialize a stream_info from a network transport string. */
-    static stream_info from_string(const std::string& data);
+    [[nodiscard]] static stream_info from_string(const std::string& data);
 
     /** @} */
 
@@ -188,7 +189,7 @@ private:
     std::string         m_type;             /**< Stream content type. */
     int                 m_channel_count;    /**< Number of channels. */
     double              m_nominal_srate;    /**< Nominal sampling rate (Hz). */
-    channel_format_t    m_channel_format;   /**< Channel data format. */
+    ChannelFormat       m_channel_format;   /**< Channel data format. */
     std::string         m_source_id;        /**< Source identifier. */
     std::string         m_uid;              /**< Unique per-instance identifier. */
     std::string         m_hostname;         /**< Hostname of the originating machine. */

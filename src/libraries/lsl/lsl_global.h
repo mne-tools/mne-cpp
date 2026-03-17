@@ -64,7 +64,7 @@
  * @namespace LSLLIB
  * @brief     Lab Streaming Layer (LSL) integration for real-time data exchange.
  */
-namespace LSLLIB{
+namespace LSLLIB {
 
 //=============================================================================================================
 /**
