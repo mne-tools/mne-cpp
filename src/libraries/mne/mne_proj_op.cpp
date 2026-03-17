@@ -886,6 +886,71 @@ int MNEProjOp::project_dvector(Eigen::Ref<Eigen::VectorXd> vec, int vec_nch, int
 
 //=============================================================================================================
 
+bool MNEProjOp::makeProjection(const QList<QString>& projnames,
+                               const QList<FiffChInfo>& chs,
+                               int nch,
+                               std::unique_ptr<MNEProjOp>& result)
+{
+    result.reset();
+    int neeg = 0;
+
+    for (int k = 0; k < nch; k++)
+        if (chs[k].kind == FIFFV_EEG_CH)
+            neeg++;
+
+    if (projnames.size() == 0 && neeg == 0)
+        return true;
+
+    std::unique_ptr<MNEProjOp> all;
+
+    for (int k = 0; k < projnames.size(); k++) {
+        std::unique_ptr<MNEProjOp> one(MNEProjOp::read(projnames[k]));
+        if (!one) {
+            qCritical("Failed to read projection from %s.", projnames[k].toUtf8().data());
+            return false;
+        }
+        if (one->nitems == 0) {
+            qInfo("No linear projection information in %s.", projnames[k].toUtf8().data());
+        }
+        else {
+            qInfo("Loaded projection from %s:", projnames[k].toUtf8().data());
+            { QTextStream errStream(stderr); one->report(errStream, "\t"); }
+            if (!all)
+                all = std::make_unique<MNEProjOp>();
+            all->combine(one.get());
+        }
+    }
+
+    if (neeg > 0) {
+        bool found = false;
+        if (all) {
+            for (int k = 0; k < all->nitems; k++)
+                if (all->items[k].kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
+                    found = true;
+                    break;
+                }
+        }
+        if (!found) {
+            std::unique_ptr<MNEProjOp> one(MNEProjOp::create_average_eeg_ref(chs, nch));
+            if (one) {
+                qInfo("Average EEG reference projection added:");
+                { QTextStream errStream(stderr); one->report(errStream, "\t"); }
+                if (!all)
+                    all = std::make_unique<MNEProjOp>();
+                all->combine(one.get());
+            }
+        }
+    }
+    if (all && all->affect_chs(chs, nch) == 0) {
+        qInfo("Projection will not have any effect on selected channels. Projection omitted.");
+        all.reset();
+    }
+    result = std::move(all);
+    return true;
+}
+
+//=============================================================================================================
+
 int MNEProjOp::apply_cov(MNECovMatrix* c)
 {
     using RowMatrixXd = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;

@@ -108,3 +108,12 @@ bool FiffChInfo::checkEegLocations(const QList<FiffChInfo>& chs, int nch)
     return true;
 }
 
+//=============================================================================================================
+
+bool FiffChInfo::isValidEeg() const
+{
+    constexpr float TOO_CLOSE = 1e-4f;
+    return kind == FIFFV_EEG_CH
+        && chpos.r0.norm() >= TOO_CLOSE
+        && chpos.coil_type != FIFFV_COIL_NONE;
+}

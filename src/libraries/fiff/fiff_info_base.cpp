@@ -42,6 +42,9 @@
 
 #include <iostream>
 
+#include <QFile>
+#include <QTextStream>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -343,3 +346,35 @@ QStringList FiffInfoBase::get_channel_types()
     return lChannelTypes;
 }
 
+//=============================================================================================================
+
+bool FiffInfoBase::readBadChannelsFromFile(const QString& name, QStringList& listOut)
+{
+    if (name.isEmpty()) {
+        listOut.clear();
+        return true;
+    }
+
+    QFile file(name);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qCritical() << "Cannot open bad channel file:" << name;
+        return false;
+    }
+
+    QStringList list;
+    QTextStream in(&file);
+    while (!in.atEnd()) {
+        QString line = in.readLine().trimmed();
+        if (line.isEmpty() || line.startsWith('#'))
+            continue;
+        list.append(line);
+    }
+
+    if (file.error() != QFileDevice::NoError) {
+        qCritical() << "Error reading bad channel file:" << name;
+        return false;
+    }
+
+    listOut = list;
+    return true;
+}

@@ -354,6 +354,53 @@ QList<FiffChInfo> FiffInfo::set_current_comp(QList<FiffChInfo>& listFiffChInfo, 
 
 //=============================================================================================================
 
+bool FiffInfo::readMegEegChannels(const QString& name,
+                                  bool do_meg,
+                                  bool do_eeg,
+                                  const QStringList& bads,
+                                  QList<FiffChInfo>& chsp,
+                                  int& nmegp,
+                                  int& neegp)
+{
+    QFile file(name);
+    FiffStream::SPtr stream(new FiffStream(&file));
+
+    if (!stream->open())
+        return false;
+
+    FiffInfo info;
+    FiffDirNode::SPtr infoNode;
+    if (!stream->read_meas_info(stream->dirtree(), info, infoNode)) {
+        qCritical("%s : could not read measurement info", name.toUtf8().data());
+        stream->close();
+        return false;
+    }
+    stream->close();
+
+    QList<FiffChInfo> meg;
+    QList<FiffChInfo> eeg;
+
+    for (int k = 0; k < info.chs.size(); k++) {
+        if (bads.contains(info.chs[k].ch_name))
+            continue;
+        if (do_meg && info.chs[k].kind == FIFFV_MEG_CH)
+            meg.append(info.chs[k]);
+        else if (do_eeg && info.chs[k].isValidEeg())
+            eeg.append(info.chs[k]);
+    }
+
+    chsp.clear();
+    chsp.reserve(meg.size() + eeg.size());
+    chsp.append(meg);
+    chsp.append(eeg);
+
+    nmegp = meg.size();
+    neegp = eeg.size();
+    return true;
+}
+
+//=============================================================================================================
+
 void FiffInfo::writeToStream(FiffStream* p_pStream) const
 {
     //

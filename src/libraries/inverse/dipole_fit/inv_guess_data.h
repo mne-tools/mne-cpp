@@ -90,13 +90,9 @@ public:
      */
     InvGuessData();
 
-//    //=========================================================================================================
-//    /**
-//    * Copy constructor.
-//    *
-//    * @param[in] p_GuessData    InvGuessData which should be copied
-//    */
-//    InvGuessData(const InvGuessData& p_GuessData);
+    /** Deleted — non-copyable due to unique_ptr members. */
+    InvGuessData(const InvGuessData&) = delete;
+    InvGuessData& operator=(const InvGuessData&) = delete;
 
     //=========================================================================================================
     /**

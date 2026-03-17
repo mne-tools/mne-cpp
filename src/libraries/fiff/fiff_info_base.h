@@ -231,6 +231,16 @@ public:
      */
     QStringList get_channel_types();
 
+    //=========================================================================================================
+    /**
+     * Read bad channel names from a plain text file (one name per line, '#' comments skipped).
+     *
+     * @param[in]  name    Path to the bad channel file (empty string is a no-op).
+     * @param[out] listOut The bad channel names read from the file.
+     * @return true on success, false on error.
+     */
+    static bool readBadChannelsFromFile(const QString& name, QStringList& listOut);
+
 public:
     QString filename;           /**< Filename when the info is read of a fiff file. */
     QStringList bads;           /**< List of bad channels. */

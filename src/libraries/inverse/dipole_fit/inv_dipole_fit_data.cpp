@@ -96,355 +96,6 @@ constexpr int FAIL = -1;
 constexpr int OK   = 0;
 
 //=============================================================================================================
-// Row-major Eigen matrix types and helpers for C API interop
-//=============================================================================================================
-
-using RowMatrixXf = Matrix<float,  Dynamic, Dynamic, RowMajor>;
-using RowMatrixXd = Matrix<double, Dynamic, Dynamic, RowMajor>;
-
-//=============================================================================================================
-// Vector / matrix helpers (Eigen-based replacements for MNE-C routines)
-//=============================================================================================================
-
-//=============================================================================================================
-
-constexpr float EPS_3 = 0.05f;
-
-/**
- * @brief Pick signal values at a specified time point using linear interpolation.
- *
- * @param[in]  time     Target time point (seconds).
- * @param[in]  integ    Integration window width (seconds).
- * @param[in]  data     Data matrix (nch x nsamp, stored time-by-time).
- * @param[in]  nsamp    Number of time samples.
- * @param[in]  nch      Number of channels.
- * @param[in]  tmin     Time of first sample (seconds).
- * @param[in]  sfreq    Sampling frequency (Hz).
- * @param[in]  use_abs  If non-zero, take absolute values before averaging.
- * @param[out] value    Output array of picked values (nch elements).
- * @return OK on success, FAIL on error.
- */
-int mne_get_values_from_data_3 (float time,
-                              float integ,
-                              float **data,
-                              int   nsamp,
-                              int   nch,
-                              float tmin,
-                              float sfreq,
-                              int   use_abs,
-                              float *value)
-{
-    int   n1,n2,k;
-    float s1,s2;
-    float f1,f2;
-    float sum;
-    float width;
-    int   ch;
-
-    for (ch = 0; ch < nch; ch++) {
-        /*
-     * Find out the correct samples
-     */
-        if (std::fabs(sfreq*integ) < EPS_3) { /* This is the single-sample case */
-            s1 = sfreq*(time - tmin);
-            n1 = floor(s1);
-            f1 = 1.0 + n1 - s1;
-            if (n1 < 0 || n1 > nsamp-1) {
-                qWarning("Sample value out of range %d (0..%d)",n1,nsamp-1);
-                return(-1);
-            }
-            /*
-       * Avoid rounding error
-       */
-            if (n1 == nsamp-1) {
-                if (std::fabs(f1 - 1.0) < 1e-3)
-                    f1 = 1.0;
-            }
-            if (f1 < 1.0 && n1 > nsamp-2) {
-                qWarning("Sample value out of range %d (0..%d) %.4f",n1,nsamp-1,f1);
-                return(-1);
-            }
-            if (f1 < 1.0) {
-                if (use_abs)
-                    sum = f1*std::fabs(data[n1][ch]) + (1.0-f1)*std::fabs(data[n1+1][ch]);
-                else
-                    sum = f1*data[n1][ch] + (1.0-f1)*data[n1+1][ch];
-            }
-            else {
-                if (use_abs)
-                    sum = std::fabs(data[n1][ch]);
-                else
-                    sum = data[n1][ch];
-            }
-        }
-        else {			/* Multiple samples */
-            s1 = sfreq*(time - 0.5*integ - tmin);
-            s2 = sfreq*(time + 0.5*integ - tmin);
-            n1 = ceil(s1); n2 = floor(s2);
-            if (n2 < n1) {		/* We are within one sample interval */
-                n1 = floor(s1);
-                if (n1 < 0 || n1 > nsamp-2)
-                    return (-1);
-                f1 = s1 - n1;
-                f2 = s2 - n1;
-                if (use_abs)
-                    sum = 0.5*((f1+f2)*std::fabs(data[n1+1][ch]) + (2.0-f1-f2)*std::fabs(data[n1][ch]));
-                else
-                    sum = 0.5*((f1+f2)*data[n1+1][ch] + (2.0-f1-f2)*data[n1][ch]);
-            }
-            else {
-                f1 = n1 - s1;
-                f2 = s2 - n2;
-                if (n1 < 0 || n1 > nsamp-1) {
-                    qWarning("Sample value out of range %d (0..%d)",n1,nsamp-1);
-                    return(-1);
-                }
-                if (n2 < 0 || n2 > nsamp-1) {
-                    qWarning("Sample value out of range %d (0..%d)",n2,nsamp-1);
-                    return(-1);
-                }
-                if (f1 != 0.0 && n1 < 1)
-                    return(-1);
-                if (f2 != 0.0 && n2 > nsamp-2)
-                    return(-1);
-                sum = 0.0;
-                width = 0.0;
-                if (n2 > n1) {		/* Do the whole intervals */
-                    if (use_abs) {
-                        sum = 0.5 * std::fabs(data[n1][ch]);
-                        for (k = n1+1; k < n2; k++)
-                            sum = sum + std::fabs(data[k][ch]);
-                        sum = sum + 0.5 * std::fabs(data[n2][ch]);
-                    }
-                    else {
-                        sum = 0.5*data[n1][ch];
-                        for (k = n1+1; k < n2; k++)
-                            sum = sum + data[k][ch];
-                        sum = sum + 0.5*data[n2][ch];
-                    }
-                    width = n2 - n1;
-                }
-                /*
-         * Add tails
-         */
-                if (use_abs) {
-                    if (f1 != 0.0)
-                        sum = sum + 0.5*f1*(f1*std::fabs(data[n1-1][ch]) + (2.0-f1)*std::fabs(data[n1][ch]));
-                    if (f2 != 0.0)
-                        sum = sum + 0.5*f2*(f2*std::fabs(data[n2+1][ch]) + (2.0-f2)*std::fabs(data[n2][ch]));
-                }
-                else {
-                    if (f1 != 0.0)
-                        sum = sum + 0.5*f1*(f1*data[n1-1][ch] + (2.0-f1)*data[n1][ch]);
-                    if (f2 != 0.0)
-                        sum = sum + 0.5*f2*(f2*data[n2+1][ch] + (2.0-f2)*data[n2][ch]);
-                }
-                width = width + f1 + f2;
-                sum = sum/width;
-            }
-        }
-        value[ch] = sum;
-    }
-    return (0);
-}
-
-//=============================================================================================================
-// Dipole fit setup
-
-static void free_dipole_fit_funcs(dipoleFitFuncs f)
-
-{
-    if (!f)
-        return;
-
-    if (f->meg_client_free && f->meg_client)
-        f->meg_client_free(f->meg_client);
-    if (f->eeg_client_free && f->eeg_client)
-        f->eeg_client_free(f->eeg_client);
-
-    delete f;
-    return;
-}
-
-static dipoleFitFuncs new_dipole_fit_funcs()
-
-{
-    dipoleFitFuncs f = new dipoleFitFuncsRec{};
-    return f;
-}
-
-// Data channel selection
-
-
-
-/**
- * @brief Check whether a channel is selected in the measurement data.
- */
-int is_selected_in_data(mshMegEegData d, const QString& ch_name)
-{
-    int issel = false;
-    int k;
-
-    for (k = 0; k < d->meas->nchan; k++)
-        if (QString::compare(ch_name,d->meas->chs[k].ch_name,Qt::CaseInsensitive) == 0) {
-            issel = d->sels[k];
-            break;
-        }
-    return issel;
-}
-
-// Bad channel list I/O
-
-static int whitespace_3(char *text)
-
-{
-    if (text == nullptr || strlen(text) == 0)
-        return true;
-    if (strspn(text," \t\n\r") == strlen(text))
-        return true;
-    return false;
-}
-
-static char *next_line_3(char *line, int n, FILE *in)
-{
-    char *res;
-
-    for (res = fgets(line,n,in); res != nullptr; res = fgets(line,n,in))
-        if (!whitespace_3(res))
-            if (res[0] != '#')
-                break;
-    return res;
-}
-
-constexpr int MAXLINE = 500;
-
-/**
- * @brief Read bad channel names from a plain text file.
- */
-int mne_read_bad_channels_3(const QString& name, QStringList& listp, int& nlistp)
-{
-    FILE *in = nullptr;
-    QStringList list;
-    char line[MAXLINE+1];
-    char *next;
-
-    if (name.isEmpty())
-        return OK;
-
-    if ((in = fopen(name.toUtf8().data(),"r")) == nullptr) {
-        qCritical() << name;
-        return FAIL;
-    }
-    while ((next = next_line_3(line,MAXLINE,in)) != nullptr) {
-        if (strlen(next) > 0) {
-            if (next[strlen(next)-1] == '\n')
-                next[strlen(next)-1] = '\0';
-            list.append(next);
-        }
-    }
-    if (ferror(in)) {
-        fclose(in);
-        return FAIL;
-    }
-
-    fclose(in);
-    listp  = list;
-    nlistp = list.size();
-
-    return OK;
-}
-
-constexpr float TOO_CLOSE = 1e-4f;
-
-static int at_origin (const Eigen::Vector3f& rr)
-{
-    return (rr.norm() < TOO_CLOSE);
-}
-
-/**
- * @brief Check whether a channel has valid EEG electrode position information.
- */
-static int is_valid_eeg_ch(const FiffChInfo& ch)
-{
-    if (ch.kind == FIFFV_EEG_CH) {
-        if (at_origin(ch.chpos.r0) ||
-                ch.chpos.coil_type == FIFFV_COIL_NONE)
-            return false;
-        else
-            return true;
-    }
-    return false;
-}
-
-static int accept_ch(const FiffChInfo& ch,
-                     const QStringList& bads,
-                     int        nbad)
-
-{
-    int k;
-    for (k = 0; k < nbad; k++)
-        if (QString::compare(ch.ch_name,bads[k]) == 0)
-            return false;
-    return true;
-}
-
-/**
- * @brief Read MEG and EEG channel info, split by type, excluding bad channels.
- *
- * Uses FiffStream::read_meas_info to read all channel information from the FIFF file.
- */
-static int read_meg_eeg_ch_info(const QString& name,
-                                int        do_meg,
-                                int        do_eeg,
-                                const QStringList& bads,
-                                int        nbad,
-                                QList<FiffChInfo>& chsp,
-                                int        &nmegp,
-                                int        &neegp)
-{
-    QFile file(name);
-    FiffStream::SPtr stream(new FiffStream(&file));
-
-    if (!stream->open())
-        return FIFF_FAIL;
-
-    FiffInfo info;
-    FiffDirNode::SPtr infoNode;
-    if (!stream->read_meas_info(stream->dirtree(), info, infoNode)) {
-        qCritical("%s : could not read measurement info", name.toUtf8().data());
-        stream->close();
-        return FIFF_FAIL;
-    }
-    stream->close();
-
-    QList<FiffChInfo> meg;
-    int nmeg = 0;
-    QList<FiffChInfo> eeg;
-    int neeg = 0;
-
-    for (int k = 0; k < info.chs.size(); k++) {
-        if (accept_ch(info.chs[k], bads, nbad)) {
-            if (do_meg && info.chs[k].kind == FIFFV_MEG_CH) {
-                meg.append(info.chs[k]);
-                nmeg++;
-            } else if (do_eeg && info.chs[k].kind == FIFFV_EEG_CH && is_valid_eeg_ch(info.chs[k])) {
-                eeg.append(info.chs[k]);
-                neeg++;
-            }
-        }
-    }
-
-    chsp.clear();
-    chsp.reserve(nmeg + neeg);
-    chsp.append(meg);
-    chsp.append(eeg);
-
-    nmegp = nmeg;
-    neegp = neeg;
-    return FIFF_OK;
-}
-
-//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -452,10 +103,7 @@ InvDipoleFitData::InvDipoleFitData()
 : coord_frame(FIFFV_COORD_UNKNOWN)
 , nmeg (0)
 , neeg (0)
-, sphere_funcs (nullptr)
-, bem_funcs (nullptr)
 , funcs (nullptr)
-, mag_dipole_funcs (nullptr)
 , fixed_noise (false)
 , nave (1)
 , column_norm (COLUMN_NORM_NONE)
@@ -469,11 +117,7 @@ InvDipoleFitData::InvDipoleFitData()
 
 InvDipoleFitData::~InvDipoleFitData()
 {
-    // unique_ptr members (pick, meg_coils, eeg_els, eeg_model, bem_model, noise_orig, noise, proj) auto-cleanup
-
-    free_dipole_fit_funcs(sphere_funcs);
-    free_dipole_fit_funcs(bem_funcs);
-    free_dipole_fit_funcs(mag_dipole_funcs);
+    // unique_ptr members auto-cleanup (including sphere_funcs, bem_funcs, mag_dipole_funcs)
 }
 
 //=============================================================================================================
@@ -484,7 +128,7 @@ InvDipoleFitData::~InvDipoleFitData()
 int InvDipoleFitData::setup_forward_model(InvDipoleFitData *d, MNECTFCompDataSet* comp_data, FwdCoilSet *comp_coils)
 {
     FwdCompData* comp;
-    dipoleFitFuncs f;
+    dipoleFitFuncsRec* f;
     int fit_sphere_to_bem = true;
 
     if (!d->bemname.isEmpty()) {
@@ -538,7 +182,8 @@ int InvDipoleFitData::setup_forward_model(InvDipoleFitData *d, MNECTFCompDataSet
             qInfo("Fitted sphere model origin : %6.1f %6.1f %6.1f mm rad = %6.1f mm.",
                    1000*d->r0[0],1000*d->r0[1],1000*d->r0[2],1000*R);
         }
-        d->bem_funcs = f = new_dipole_fit_funcs();
+        d->bem_funcs = std::make_unique<dipoleFitFuncsRec>();
+        f = d->bem_funcs.get();
         if (d->nmeg > 0) {
             /*
            * Use the new compensated field computation
@@ -576,7 +221,8 @@ int InvDipoleFitData::setup_forward_model(InvDipoleFitData *d, MNECTFCompDataSet
         qCritical("EEG sphere model not defined.");
         return FAIL;
     }
-    d->sphere_funcs = f = new_dipole_fit_funcs();
+    d->sphere_funcs = std::make_unique<dipoleFitFuncsRec>();
+    f = d->sphere_funcs.get();
     if (d->neeg > 0) {
         d->eeg_model->r0 = d->r0;
         f->eeg_pot     = FwdEegSphereModel::fwd_eeg_spherepot_coil;
@@ -605,7 +251,8 @@ int InvDipoleFitData::setup_forward_model(InvDipoleFitData *d, MNECTFCompDataSet
     /*
        * Finally add the magnetic dipole fitting functions (for special purposes)
        */
-    d->mag_dipole_funcs = f = new_dipole_fit_funcs();
+    d->mag_dipole_funcs = std::make_unique<dipoleFitFuncsRec>();
+    f = d->mag_dipole_funcs.get();
     if (d->nmeg > 0) {
         /*
          * Use the new compensated field computation
@@ -628,7 +275,7 @@ int InvDipoleFitData::setup_forward_model(InvDipoleFitData *d, MNECTFCompDataSet
     /*
         * Select the appropriate fitting function
         */
-    d->funcs = !d->bemname.isEmpty() ? d->bem_funcs : d->sphere_funcs;
+    d->funcs = !d->bemname.isEmpty() ? d->bem_funcs.get() : d->sphere_funcs.get();
 
     qWarning("");
     return OK;
@@ -683,79 +330,6 @@ std::unique_ptr<MNECovMatrix> InvDipoleFitData::ad_hoc_noise(FwdCoilSet *meg, Fw
     }
     names = ch_names;
     return MNECovMatrix::create(FIFFV_MNE_NOISE_COV,nchan,names,Eigen::VectorXd(),stds);
-}
-
-//=============================================================================================================
-
-/**
- * @brief Load and combine SSP projection operators from files for the selected channels.
- */
-int InvDipoleFitData::make_projection(const QList<QString> &projnames,
-                                   const QList<FiffChInfo>& chs,
-                                   int nch,
-                                   MNEProjOp* *res)
-{
-    MNEProjOp* all  = nullptr;
-    MNEProjOp* one  = nullptr;
-    int       k,found;
-    int       neeg;
-
-    for (k = 0, neeg = 0; k < nch; k++)
-        if (chs[k].kind == FIFFV_EEG_CH)
-            neeg++;
-
-    if (projnames.size() == 0 && neeg == 0)
-        return OK;
-
-    for (k = 0; k < projnames.size(); k++) {
-        if ((one = MNEProjOp::read(projnames[k])) == nullptr) {
-            delete all;
-            return FAIL;
-        }
-        if (one->nitems == 0) {
-            qInfo("No linear projection information in %s.",projnames[k].toUtf8().data());
-            if(one)
-                delete one;
-            one = nullptr;
-        }
-        else {
-            qInfo("Loaded projection from %s:",projnames[k].toUtf8().data());
-            { QTextStream errStream(stderr); one->report(errStream,"\t"); }
-            all = all ? all->combine(one) : (new MNEProjOp())->combine(one);
-            if(one)
-                delete one;
-            one = nullptr;
-        }
-    }
-
-    if (neeg > 0) {
-        found = false;
-        if (all) {
-            for (k = 0; k < all->nitems; k++)
-                if (all->items[k].kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
-                    found = true;
-                    break;
-                }
-        }
-        if (!found) {
-            if ((one = MNEProjOp::create_average_eeg_ref(chs,nch)) != nullptr) {
-                qInfo("Average EEG reference projection added:");
-                { QTextStream errStream(stderr); one->report(errStream,"\t"); }
-                all = all ? all->combine(one) : (new MNEProjOp())->combine(one);
-                if(one)
-                    delete one;
-                one = nullptr;
-            }
-        }
-    }
-    if (all && all->affect_chs(chs,nch) == 0) {
-        qInfo("Projection will not have any effect on selected channels. Projection omitted.");
-        if(all)
-            delete all;
-        all = nullptr;
-    }
-     *res = all;
-    return OK;
 }
 
 //=============================================================================================================
@@ -878,7 +452,7 @@ int InvDipoleFitData::select_dipole_fit_noise_cov(InvDipoleFitData *f, mshMegEeg
                 neeg++;
             else
                 nmeg++;
-            if (is_selected_in_data(d,f->noise_orig->names[k]))
+            if (d->isChannelSelected(f->noise_orig->names[k]))
                 w[k] = 1.0;
             else {
                 w[k] = nonsel_w;
@@ -991,9 +565,10 @@ InvDipoleFitData *InvDipoleFitData::setup_dipole_fit_data(const QString &mriname
        * Read the bad channel lists
        */
     if (!badname.isEmpty()) {
-        if (mne_read_bad_channels_3(badname,badlist,nbad) != OK)
+        if (!FiffInfoBase::readBadChannelsFromFile(badname, badlist))
             return nullptr;
-        qInfo("%d bad channels read from %s.",nbad,badname.toUtf8().data());
+        nbad = badlist.size();
+        qInfo("%d bad channels read from %s.", nbad, badname.toUtf8().data());
     }
     {
         QFile measFile(measname);
@@ -1018,14 +593,13 @@ InvDipoleFitData *InvDipoleFitData::setup_dipole_fit_data(const QString &mriname
     /*
        * Read the channel information
        */
-    if (read_meg_eeg_ch_info(measname,
-                             include_meg,
-                             include_eeg,
-                             badlist,
-                             nbad,
-                             res->chs,
-                             res->nmeg,
-                             res->neeg) != OK)
+    if (!FiffInfo::readMegEegChannels(measname,
+                                      include_meg,
+                                      include_eeg,
+                                      badlist,
+                                      res->chs,
+                                      res->nmeg,
+                                      res->neeg))
         return nullptr;
 
     if (res->nmeg > 0)
@@ -1148,15 +722,11 @@ InvDipoleFitData *InvDipoleFitData::setup_dipole_fit_data(const QString &mriname
     /*
        * Projection data should go here
        */
-    {
-        MNEProjOp* proj_raw = nullptr;
-        if (make_projection(projnames,
-                            res->chs,
-                            res->nmeg+res->neeg,
-                            &proj_raw) == FAIL)
-            return nullptr;
-        res->proj.reset(proj_raw);
-    }
+    if (!MNEProjOp::makeProjection(projnames,
+                                   res->chs,
+                                   res->nmeg+res->neeg,
+                                   res->proj))
+        return nullptr;
     if (res->proj && res->proj->nitems > 0) {
         qInfo("Final projection operator is:");
         { QTextStream errStream(stderr); res->proj->report(errStream,"\t"); }
@@ -1282,8 +852,7 @@ void print_fields(const Eigen::Vector3f& rd,
     int   k;
     int   nch = fit->nmeg + fit->neeg;
 
-    if (mne_get_values_from_data_3(time,integ,data->current->data,data->current->np,data->nchan,data->current->tmin,
-                                   1.0/data->current->tstep,false,oneVec.data()) == FAIL) {
+    if (data->current->getValuesAtTime(time, integ, data->nchan, false, oneVec.data()) == FAIL) {
         qWarning("Cannot pick time: %7.1f ms",1000*time);
         return;
     }
@@ -1638,9 +1207,9 @@ bool InvDipoleFitData::fit_one(InvDipoleFitData* fit,
      * Do first pass with the sphere model
      */
         if (k == 0)
-            fit->funcs = fit->sphere_funcs;
+            fit->funcs = fit->sphere_funcs.get();
         else
-            fit->funcs = !fit->bemname.isEmpty() ? fit->bem_funcs : fit->sphere_funcs;
+            fit->funcs = !fit->bemname.isEmpty() ? fit->bem_funcs.get() : fit->sphere_funcs.get();
 
         MatrixXf simplexMat = make_initial_dipole_simplex(rd_guess,size);
         for (int p = 0; p < 4; p++)

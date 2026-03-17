@@ -68,9 +68,14 @@ namespace INVLIB
 
 //=============================================================================================================
 /**
- * Implements all required dipole fitting routines.
+ * @brief High-level driver for sequential dipole fitting.
  *
- * @brief Dipole Fit implementation.
+ * InvDipoleFit orchestrates the complete dipole-fit pipeline: it sets up
+ * the forward model via InvDipoleFitData, computes initial guess grids
+ * via InvGuessData, reads averaged or raw data, and fits an equivalent
+ * current dipole (ECD) at each requested time point.
+ *
+ * Refactored from fit_dipoles.c / dipole_fit_setup.c (MNE-C).
  */
 class INVSHARED_EXPORT InvDipoleFit
 {
@@ -104,7 +109,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Fit a single dipole to each time point of the data.
+     * Fit a single dipole to each time point of averaged data.
+     *
+     * Refactored: fit_dipoles (fit_dipoles.c)
      *
      * @param[in] dataname   Data file name.
      * @param[in] data       The measured data.
@@ -125,6 +132,11 @@ public:
     /**
      * Fit a single dipole to each time point of raw data.
      *
+     * Reads data in overlapping segments of @c SEG_LEN seconds and
+     * extracts values at each requested time point.
+     *
+     * Refactored: fit_dipoles_raw (fit_dipoles.c)
+     *
      * @param[in] dataname   Data file name.
      * @param[in] raw        The raw data description.
      * @param[in] sel        Channel selection to use.
@@ -143,7 +155,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Fit a single dipole to each time point of raw data (convenience overload).
+     * Fit dipoles to raw data (convenience overload without output set).
+     *
+     * Refactored: fit_dipoles_raw (fit_dipoles.c)
      *
      * @param[in] dataname   Data file name.
      * @param[in] raw        The raw data description.
