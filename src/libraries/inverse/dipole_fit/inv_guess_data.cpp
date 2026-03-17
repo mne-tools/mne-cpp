@@ -251,9 +251,9 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
         */
     orig = f->funcs;
     if (f->fit_mag_dipoles)
-        f->funcs = f->mag_dipole_funcs;
+        f->funcs = f->mag_dipole_funcs.get();
     else
-        f->funcs = f->sphere_funcs;
+        f->funcs = f->sphere_funcs.get();
 
     for (k = 0; k < this->nguess; k++) {
         this->guess_fwd[k].reset(InvDipoleFitData::dipole_forward_one(f,Eigen::Vector3f(this->rr.row(k)),nullptr));
@@ -392,9 +392,9 @@ bool InvGuessData::compute_guess_fields(InvDipoleFitData* f)
     printf("Go through all guess source locations...");
     orig = f->funcs;
     if (f->fit_mag_dipoles)
-        f->funcs = f->mag_dipole_funcs;
+        f->funcs = f->mag_dipole_funcs.get();
     else
-        f->funcs = f->sphere_funcs;
+        f->funcs = f->sphere_funcs.get();
     for (int k = 0; k < this->nguess; k++) {
         this->guess_fwd[k].reset(InvDipoleFitData::dipole_forward_one(f,Eigen::Vector3f(this->rr.row(k)),this->guess_fwd[k].release()));
         if (!this->guess_fwd[k]) {

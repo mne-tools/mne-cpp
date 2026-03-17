@@ -62,6 +62,8 @@
 #include <QSharedPointer>
 #include <QTextStream>
 
+#include <memory>
+
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
 //=============================================================================================================
@@ -231,6 +233,29 @@ public:
      *         Caller takes ownership.
      */
     static MNEProjOp* read(const QString& name);
+
+    /**
+     * @brief Load and combine SSP projection operators from files for the selected channels.
+     *
+     * Reads projection items from each file in @p projnames, and if EEG
+     * channels are present adds an average EEG reference projector when none
+     * is found. Returns nullptr if the resulting projector does not affect
+     * any of the given channels.
+     *
+     * Refactored: make_projection (dipole_fit_setup.c)
+     *
+     * @param[in]  projnames  List of FIFF file paths containing projection data.
+     * @param[in]  chs        Channel information list.
+     * @param[in]  nch        Number of channels.
+     * @param[out] result     The combined projection operator (nullptr when
+     *                        no projection is needed).
+     *
+     * @return true on success, false on read error.
+     */
+    static bool makeProjection(const QList<QString>& projnames,
+                               const QList<FIFFLIB::FiffChInfo>& chs,
+                               int nch,
+                               std::unique_ptr<MNEProjOp>& result);
 
     /**
      * Write a formatted summary of all projection items to a text stream,

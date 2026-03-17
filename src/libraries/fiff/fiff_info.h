@@ -199,6 +199,31 @@ public:
      */
     static QList<FiffChInfo> set_current_comp(QList<FiffChInfo>& listFiffChInfo, fiff_int_t value);
 
+    //=========================================================================================================
+    /**
+     * Read MEG and EEG channel information from a FIFF file, excluding bad channels.
+     *
+     * Opens the file, reads measurement info, and splits channels into MEG and EEG
+     * lists (in that order), skipping channels in the bads list. EEG channels must
+     * pass FiffChInfo::isValidEeg().
+     *
+     * @param[in]  name    Path to the FIFF measurement file.
+     * @param[in]  do_meg  If true, include MEG channels.
+     * @param[in]  do_eeg  If true, include EEG channels.
+     * @param[in]  bads    List of bad channel names to exclude.
+     * @param[out] chsp    Combined list of accepted channels (MEG first, then EEG).
+     * @param[out] nmegp   Number of MEG channels in chsp.
+     * @param[out] neegp   Number of EEG channels in chsp.
+     * @return true on success, false on error.
+     */
+    static bool readMegEegChannels(const QString& name,
+                                   bool do_meg,
+                                   bool do_eeg,
+                                   const QStringList& bads,
+                                   QList<FiffChInfo>& chsp,
+                                   int& nmegp,
+                                   int& neegp);
+
 // ToDo
 //    //=========================================================================================================
 //    /**

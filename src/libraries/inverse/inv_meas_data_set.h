@@ -97,6 +97,46 @@ public:
      */
     ~InvMeasDataSet();
 
+    //=========================================================================================================
+    /**
+     * Pick signal values at a specified time point using linear interpolation.
+     *
+     * Reads from the data matrix (time-by-time layout: data[sample][channel])
+     * and writes interpolated values into the output array.
+     *
+     * Refactored: mne_get_values_from_data (mne_get_values.c)
+     *
+     * @param[in]  time     Target time point (seconds).
+     * @param[in]  integ    Integration window width (seconds).
+     * @param[in]  nch      Number of channels to pick.
+     * @param[in]  use_abs  If true, take absolute values before averaging.
+     * @param[out] value    Output array of picked values (nch elements).
+     * @return 0 on success, -1 on error.
+     */
+    int getValuesAtTime(float time, float integ, int nch, bool use_abs, float *value) const;
+
+    //=========================================================================================================
+    /**
+     * Pick signal values at a specified time point using linear interpolation (channel-major layout).
+     *
+     * Reads from a channel-by-time data matrix (data[channel][sample]).
+     *
+     * Refactored: mne_get_values_from_data_ch (mne_get_values.c)
+     *
+     * @param[in]  time     Target time point (seconds).
+     * @param[in]  integ    Integration window width (seconds).
+     * @param[in]  data     Data matrix (channel-by-time layout).
+     * @param[in]  nsamp    Number of time samples.
+     * @param[in]  nch      Number of channels.
+     * @param[in]  tmin     Time of first sample (seconds).
+     * @param[in]  sfreq    Sampling frequency (Hz).
+     * @param[in]  use_abs  If true, take absolute values before averaging.
+     * @param[out] value    Output array of picked values (nch elements).
+     * @return 0 on success, -1 on error.
+     */
+    static int getValuesFromChannelData(float time, float integ, float **data, int nsamp, int nch,
+                                        float tmin, float sfreq, bool use_abs, float *value);
+
 public:
     /*
      * These are unique to each data set

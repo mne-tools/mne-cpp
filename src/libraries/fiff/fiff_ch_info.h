@@ -118,6 +118,17 @@ public:
 
     //=========================================================================================================
     /**
+     * Check whether this channel has a valid EEG electrode position.
+     *
+     * A channel is a valid EEG channel if its kind is FIFFV_EEG_CH, its
+     * electrode position is not at the origin, and its coil type is not FIFFV_COIL_NONE.
+     *
+     * @return true if this is a valid EEG channel with proper electrode location.
+     */
+    bool isValidEeg() const;
+
+    //=========================================================================================================
+    /**
      * Overloaded == operator to compare an object to this instance.
      *
      * @param[in] object    The object which should be compared to.

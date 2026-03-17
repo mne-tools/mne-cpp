@@ -340,7 +340,7 @@ typedef struct {
 /**
  * @brief Combined MEG/EEG measurement data with inverse operator, field mapping, dipole fitting, and display state.
  */
-typedef struct {
+typedef struct mshMegEegDataRec {
   char          *meas_file;                     /* The measurement file */
   char          *inv_file;                      /* Inverse operator file */
   char          *mri_trans_file;                /* Where does the MRI transform come from */
@@ -381,6 +381,22 @@ typedef struct {
 
   void             *user_data;                       /* Can be used to store whatever */
   MNELIB::mneUserFreeFunc  user_data_free;                   /* Called to free the above object */
+
+  /**
+   * @brief Check whether a channel is selected in the measurement data.
+   *
+   * Refactored: is_selected_in_data (dipole_fit_setup.c)
+   *
+   * @param[in] ch_name   Channel name to look up (case-insensitive).
+   * @return true if the channel is found and selected.
+   */
+  bool isChannelSelected(const QString& ch_name) const
+  {
+      for (int k = 0; k < meas->nchan; k++)
+          if (QString::compare(ch_name, meas->chs[k].ch_name, Qt::CaseInsensitive) == 0)
+              return sels[k];
+      return false;
+  }
 } *mshMegEegData,mshMegEegDataRec;
 
 //typedef struct {		/* Definition of lighting */

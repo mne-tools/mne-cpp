@@ -59,12 +59,22 @@ using namespace FWDLIB;
 //=============================================================================================================
 
 static constexpr float SEG_LEN    = 10.0f;
-static constexpr float EPS_VALUES = 0.05f;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
 //=============================================================================================================
 
+/**
+ * @brief Create a channel selection containing exactly the named channels.
+ *
+ * Refactored: mne_ch_selection_these (mne_ch_selection.c)
+ *
+ * @param[in] selname  Name for the selection.
+ * @param[in] names    Channel names to include.
+ * @param[in] nch      Number of channels.
+ *
+ * @return Newly allocated channel selection. Caller takes ownership.
+ */
 static mneChSelection mne_ch_selection_these(const QString& selname, const QStringList& names, int nch)
 {
     auto sel  = new MNEChSelection();
@@ -78,6 +88,20 @@ static mneChSelection mne_ch_selection_these(const QString& selname, const QStri
     return sel;
 }
 
+/**
+ * @brief Assign raw data channels to a channel selection.
+ *
+ * Matches the selection's channel names against the raw data's channel
+ * info (including derived channels), filling the pick indices and
+ * channel-kind fields.
+ *
+ * Refactored: mne_ch_selection_assign_chs (mne_ch_selection.c)
+ *
+ * @param[in,out] sel   The channel selection to populate.
+ * @param[in]     data  The raw data whose channels are matched.
+ *
+ * @return Number of directly matched channels (excluding derivations).
+ */
 static int mne_ch_selection_assign_chs(mneChSelection sel,
                                        MNERawData*     data)
 {
@@ -155,245 +179,6 @@ static int mne_ch_selection_assign_chs(mneChSelection sel,
     return nch;
 }
 
-//============================= mne_get_values.c =============================
-
-int mne_get_values_from_data (float time,         /* Interesting time point */
-                              float integ,	  /* Time integration */
-                              float **data,	  /* The data values (time by time) */
-                              int   nsamp,	  /* How many time points? */
-                              int   nch,          /* How many channels */
-                              float tmin,	  /* Time of first sample */
-                              float sfreq,	  /* Sampling frequency */
-                              int   use_abs,      /* Use absolute values */
-                              float *value)	  /* The picked values */
-/*
-      * Pick a signal value using linear interpolation
-      */
-{
-    int   n1,n2,k;
-    float s1,s2;
-    float f1,f2;
-    float sum;
-    float width;
-    int   ch;
-
-    for (ch = 0; ch < nch; ch++) {
-        /*
-     * Find out the correct samples
-     */
-        if (std::fabs(sfreq*integ) < EPS_VALUES) { /* This is the single-sample case */
-            s1 = sfreq*(time - tmin);
-            n1 = floor(s1);
-            f1 = 1.0 + n1 - s1;
-            if (n1 < 0 || n1 > nsamp-1) {
-                qWarning("Sample value out of range %d (0..%d)",n1,nsamp-1);
-                return(-1);
-            }
-            /*
-             * Avoid rounding error
-             */
-            if (n1 == nsamp-1) {
-                if (std::fabs(f1-1.0) < 1e-3)
-                    f1 = 1.0;
-            }
-            if (f1 < 1.0 && n1 > nsamp-2) {
-                qWarning("Sample value out of range %d (0..%d) %.4f",n1,nsamp-1,f1);
-                return(-1);
-            }
-            if (f1 < 1.0) {
-                if (use_abs)
-                    sum = f1*std::fabs(data[n1][ch]) + (1.0-f1)*std::fabs(data[n1+1][ch]);
-                else
-                    sum = f1*data[n1][ch] + (1.0-f1)*data[n1+1][ch];
-            }
-            else {
-                if (use_abs)
-                    sum = std::fabs(data[n1][ch]);
-                else
-                    sum = data[n1][ch];
-            }
-        }
-        else {			/* Multiple samples */
-            s1 = sfreq*(time - 0.5*integ - tmin);
-            s2 = sfreq*(time + 0.5*integ - tmin);
-            n1 = ceil(s1); n2 = floor(s2);
-            if (n2 < n1) {		/* We are within one sample interval */
-                n1 = floor(s1);
-                if (n1 < 0 || n1 > nsamp-2)
-                    return (-1);
-                f1 = s1 - n1;
-                f2 = s2 - n1;
-                if (use_abs)
-                    sum = 0.5*((f1+f2)*std::fabs(data[n1+1][ch]) + (2.0-f1-f2)*std::fabs(data[n1][ch]));
-                else
-                    sum = 0.5*((f1+f2)*data[n1+1][ch] + (2.0-f1-f2)*data[n1][ch]);
-            }
-            else {
-                f1 = n1 - s1;
-                f2 = s2 - n2;
-                if (n1 < 0 || n1 > nsamp-1) {
-                    qWarning("Sample value out of range %d (0..%d)",n1,nsamp-1);
-                    return(-1);
-                }
-                if (n2 < 0 || n2 > nsamp-1) {
-                    qWarning("Sample value out of range %d (0..%d)",n2,nsamp-1);
-                    return(-1);
-                }
-                if (f1 != 0.0 && n1 < 1)
-                    return(-1);
-                if (f2 != 0.0 && n2 > nsamp-2)
-                    return(-1);
-                sum = 0.0;
-                width = 0.0;
-                if (n2 > n1) {		/* Do the whole intervals */
-                    if (use_abs) {
-                        sum = 0.5 * std::fabs(data[n1][ch]);
-                        for (k = n1+1; k < n2; k++)
-                            sum = sum + std::fabs(data[k][ch]);
-                        sum = sum + 0.5 * std::fabs(data[n2][ch]);
-                    }
-                    else {
-                        sum = 0.5*data[n1][ch];
-                        for (k = n1+1; k < n2; k++)
-                            sum = sum + data[k][ch];
-                        sum = sum + 0.5*data[n2][ch];
-                    }
-                    width = n2 - n1;
-                }
-                /*
-         * Add tails
-         */
-                if (use_abs) {
-                    if (f1 != 0.0)
-                        sum = sum + 0.5 * f1 * (f1 * std::fabs(data[n1-1][ch]) + (2.0 - f1) * std::fabs(data[n1][ch]));
-                    if (f2 != 0.0)
-                        sum = sum + 0.5 * f2 * (f2 * std::fabs(data[n2+1][ch]) + (2.0 - f2) * std::fabs(data[n2][ch]));
-                }
-                else {
-                    if (f1 != 0.0)
-                        sum = sum + 0.5*f1*(f1*data[n1-1][ch] + (2.0-f1)*data[n1][ch]);
-                    if (f2 != 0.0)
-                        sum = sum + 0.5*f2*(f2*data[n2+1][ch] + (2.0-f2)*data[n2][ch]);
-                }
-                width = width + f1 + f2;
-                sum = sum/width;
-            }
-        }
-        value[ch] = sum;
-    }
-    return (0);
-}
-
-int mne_get_values_from_data_ch (float time,      /* Interesting time point */
-                                 float integ,	  /* Time integration */
-                                 float **data,	  /* The data values (channel by channel) */
-                                 int   nsamp,	  /* How many time points? */
-                                 int   nch,       /* How many channels */
-                                 float tmin,	  /* Time of first sample */
-                                 float sfreq,	  /* Sampling frequency */
-                                 int   use_abs,   /* Use absolute values */
-                                 float *value)	  /* The picked values */
-/*
-      * Pick a signal value using linear interpolation
-      */
-{
-    int   n1,n2,k;
-    float s1,s2;
-    float f1,f2;
-    float sum;
-    float width;
-    int   ch;
-
-    for (ch = 0; ch < nch; ch++) {
-        /*
-     * Find out the correct samples
-     */
-        if (std::fabs(sfreq * integ) < EPS_VALUES) { /* This is the single-sample case */
-            s1 = sfreq*(time - tmin);
-            n1 = floor(s1);
-            f1 = 1.0 + n1 - s1;
-            if (n1 < 0 || n1 > nsamp-1)
-                return(-1);
-            if (f1 < 1.0 && n1 > nsamp-2)
-                return(-1);
-            if (f1 < 1.0) {
-                if (use_abs)
-                    sum = f1 * std::fabs(data[ch][n1]) + (1.0 - f1) * std::fabs(data[ch][n1+1]);
-                else
-                    sum = f1*data[ch][n1] + (1.0-f1)*data[ch][n1+1];
-            }
-            else {
-                if (use_abs)
-                    sum = std::fabs(data[ch][n1]);
-                else
-                    sum = data[ch][n1];
-            }
-        }
-        else {			/* Multiple samples */
-            s1 = sfreq*(time - 0.5*integ - tmin);
-            s2 = sfreq*(time + 0.5*integ - tmin);
-            n1 = ceil(s1); n2 = floor(s2);
-            if (n2 < n1) {		/* We are within one sample interval */
-                n1 = floor(s1);
-                if (n1 < 0 || n1 > nsamp-2)
-                    return (-1);
-                f1 = s1 - n1;
-                f2 = s2 - n1;
-                if (use_abs)
-                    sum = 0.5*((f1+f2)*std::fabs(data[ch][n1+1]) + (2.0-f1-f2)*std::fabs(data[ch][n1]));
-                else
-                    sum = 0.5*((f1+f2)*data[ch][n1+1] + (2.0-f1-f2)*data[ch][n1]);
-            }
-            else {
-                f1 = n1 - s1;
-                f2 = s2 - n2;
-                if (n1 < 0 || n1 > nsamp-1 || n2 < 0 || n2 > nsamp-1)
-                    return(-1);
-                if (f1 != 0.0 && n1 < 1)
-                    return(-1);
-                if (f2 != 0.0 && n2 > nsamp-2)
-                    return(-1);
-                sum = 0.0;
-                width = 0.0;
-                if (n2 > n1) {		/* Do the whole intervals */
-                    if (use_abs) {
-                        sum = 0.5 * std::fabs(data[ch][n1]);
-                        for (k = n1+1; k < n2; k++)
-                            sum = sum + std::fabs(data[ch][k]);
-                        sum = sum + 0.5 * std::fabs(data[ch][n2]);
-                    }
-                    else {
-                        sum = 0.5*data[ch][n1];
-                        for (k = n1+1; k < n2; k++)
-                            sum = sum + data[ch][k];
-                        sum = sum + 0.5*data[ch][n2];
-                    }
-                    width = n2 - n1;
-                }
-                /*
-         * Add tails
-         */
-                if (use_abs) {
-                    if (f1 != 0.0)
-                        sum = sum + 0.5 * f1 * (f1 * std::fabs(data[ch][n1-1]) + (2.0 - f1) * std::fabs(data[ch][n1]));
-                    if (f2 != 0.0)
-                        sum = sum + 0.5 * f2 * (f2 * std::fabs(data[ch][n2+1]) + (2.0 - f2) * std::fabs(data[ch][n2]));
-                }
-                else {
-                    if (f1 != 0.0)
-                        sum = sum + 0.5*f1*(f1*data[ch][n1-1]+ (2.0-f1)*data[ch][n1]);
-                    if (f2 != 0.0)
-                        sum = sum + 0.5*f2*(f2*data[ch][n2+1] + (2.0-f2)*data[ch][n2]);
-                }
-                width = width + f1 + f2;
-                sum = sum/width;
-            }
-        }
-        value[ch] = sum;
-    }
-    return (0);
-}
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -404,7 +189,6 @@ InvDipoleFit::InvDipoleFit(InvDipoleFitSettings* p_settings)
 }
 
 //=============================================================================================================
-//todo split in initFit where the settings are handed over and the actual fit
 InvEcdSet InvDipoleFit::calculateFit() const
 {
     InvEcdSet set;
@@ -439,6 +223,8 @@ InvEcdSet InvDipoleFit::calculateFit() const
     if (!fit_data)
         return set;
 
+    eeg_model.release();    // ownership transferred to fit_data->eeg_model
+
     fit_data->fit_mag_dipoles = settings->fit_mag_dipoles;
 
     std::unique_ptr<MNERawData>        raw;
@@ -451,8 +237,8 @@ InvEcdSet InvDipoleFit::calculateFit() const
         if (!raw)
             return set;
         /*
-         * A channel selection is needed to access the data
-         */
+     * Set up a channel selection to pick data from the raw file
+     */
         sel.reset(mne_ch_selection_these("fit",fit_data->ch_names,fit_data->nmeg+fit_data->neeg));
         mne_ch_selection_assign_chs(sel.get(),raw.get());
         for (int c = 0; c < sel->nchan; c++)
@@ -547,8 +333,7 @@ bool InvDipoleFit::fit_dipoles( const QString& dataname, InvMeasData* data, InvD
         qInfo("Fitting...");
     for (int s = 0; tmin + s*tstep < tmax; s++) {
         float time = tmin + s*tstep;
-        if (mne_get_values_from_data(time,integ,data->current->data,data->current->np,data->nchan,data->current->tmin,
-                                     1.0f/data->current->tstep,false,one.data()) < 0) {
+        if (data->current->getValuesAtTime(time, integ, data->nchan, false, one.data()) < 0) {
             qWarning("Cannot pick time: %7.1f ms",1000.0f*time);
             continue;
         }
@@ -616,7 +401,7 @@ bool InvDipoleFit::fit_dipoles_raw(const QString& dataname, MNERawData* raw, mne
             picks = time*sfreq - start;
             stime = start/sfreq;
         }
-        if (mne_get_values_from_data_ch(time,integ,data,length,nchan,stime,sfreq,false,one.data()) < 0) {
+        if (InvMeasDataSet::getValuesFromChannelData(time, integ, data, length, nchan, stime, sfreq, false, one.data()) < 0) {
             qWarning("Cannot pick time: %8.3f s",time);
             continue;
         }
