@@ -145,9 +145,10 @@ jobs:
     # ── Coverage: Codecov upload ──────────────────────────────────────────
     - name: Upload coverage to Codecov
       if: matrix.os == 'ubuntu-24.04' && inputs.upload_codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: true
 
     # ── Coverage: generate libraries-only report for threshold checks ─────
     - name: Install fastcov
