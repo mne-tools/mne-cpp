@@ -46,7 +46,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Update dev_build tag and release
       timeout-minutes: 5
@@ -126,7 +126,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Install Doxygen 1.16.1 and Graphviz
       run: |
@@ -173,12 +173,12 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: recursive
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v5
       with:
         node-version: '20'
         cache: 'npm'
@@ -218,7 +218,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Install dependencies
       run: |

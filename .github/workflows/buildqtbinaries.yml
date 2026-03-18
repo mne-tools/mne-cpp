@@ -13,7 +13,7 @@ jobs:
     
     steps:
     - name: Clone repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
     - name: Install dependencies
       run: |
         sudo apt-get update -q
@@ -36,7 +36,7 @@ jobs:
     - name: Package binaries
       run: |
         tar cfvz qt6_6102_static_binaries_linux.tar.gz -C ../Qt6_binaries .
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       with:
         name: qt6_6102_static_binaries_linux.tar.gz
         path: qt6_6102_static_binaries_linux.tar.gz
@@ -52,7 +52,7 @@ jobs:
     
     steps:
     - name: Clone repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
     - name: Install dependencies
       run: |
         brew install ninja
@@ -74,7 +74,7 @@ jobs:
     - name: Package binaries
       run: |
         tar cfvz qt6_6102_static_binaries_macos.tar.gz -C ../Qt6_binaries .
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       with:
         name: qt6_6102_static_binaries_macos.tar.gz
         path: qt6_6102_static_binaries_macos.tar.gz
@@ -90,9 +90,9 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
     - name: Install Python 3.10 version
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.10'
         architecture: 'x64'
@@ -118,7 +118,7 @@ jobs:
       run: |
         cd ..\Qt6_binaries
         7z a ..\mne-cpp\qt6_6102_static_binaries_win.zip .
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       with:
         name: qt6_6102_static_binaries_win.zip
         path: qt6_6102_static_binaries_win.zip
@@ -134,7 +134,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
     - name: Setup emscripten compiler 
       run: |
         cd ..
@@ -175,7 +175,7 @@ jobs:
     - name: Package binaries
       run: |
         tar cfvz qt6_6102_static_binaries_wasm.tar.gz -C ../Qt6_binaries .
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       with:
         name: qt6_6102_static_binaries_wasm.tar.gz
         path: qt6_6102_static_binaries_wasm.tar.gz

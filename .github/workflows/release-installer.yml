@@ -23,10 +23,10 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
 
     - name: Install Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.10'
 
@@ -219,10 +219,10 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
 
     - name: Install Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.10'
         architecture: 'arm64'
@@ -551,10 +551,10 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
 
     - name: Install Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.10'
         architecture: 'x64'
