@@ -32,7 +32,7 @@ comment:
   layout: "reach,diff,flags,tree"
   behavior: default
   require_changes: no
-  
+
 ignore:
   - "src/external/**"       # third-party libraries (e.g. Eigen)
   - "src/examples/**"       # example code is not part of coverage
