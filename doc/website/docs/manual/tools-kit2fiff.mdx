@@ -1,0 +1,53 @@
+---
+title: mne_kit2fiff
+sidebar_label: mne_kit2fiff
+sidebar_position: 36
+---
+
+# mne_kit2fiff
+
+## Overview
+
+`mne_kit2fiff` converts KIT (Yokogawa/Ricoh) MEG data to FIFF format. KIT systems store data in `.sqd` or `.con` format, and this tool enables processing KIT data with MNE tools.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_kit2fiff [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--sqd <file>` | Input KIT `.sqd` or `.con` file |
+| `--sns <file>` | Sensor layout definition file (optional) |
+| `--hpi <file>` | HPI coil positions in head coordinates (optional) |
+| `--out <file>` | Output FIFF file |
+| `--stim <list>` | Comma-separated stimulus channel indices |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+The tool reads KIT MEG data and converts it to FIFF format. Optionally, sensor layout information (`--sns`) and HPI coil positions (`--hpi`) can be provided for accurate coordinate transformations. Stimulus channels can be specified with `--stim` to be included as trigger channels in the output.
+
+### Workflow Context
+
+This tool is the entry point for processing KIT MEG data with MNE:
+
+1. **Convert KIT data → `mne_kit2fiff`**
+2. Process raw data → `mne_process_raw`
+3. Continue with forward/inverse pipeline
+
+### Example
+
+```bash
+# Convert KIT data with sensor layout and HPI information
+mne_kit2fiff --sqd recording.sqd --sns sensor_layout.txt --hpi hpi.txt --out recording-raw.fif
+
+# Convert with stimulus channels
+mne_kit2fiff --sqd recording.sqd --stim 160,161,162 --out recording-raw.fif
+```

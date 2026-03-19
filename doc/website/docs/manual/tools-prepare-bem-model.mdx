@@ -1,0 +1,57 @@
+---
+title: mne_prepare_bem_model
+sidebar_label: mne_prepare_bem_model
+sidebar_position: 21
+---
+
+# mne_prepare_bem_model
+
+## Overview
+
+`mne_prepare_bem_model` computes the BEM (Boundary Element Method) solution from a BEM surface model. The output is a FIFF file containing geometry matrices needed by the forward solver to compute MEG/EEG lead fields efficiently.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_prepare_bem_model [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--bem <file>` | Input BEM model FIFF file |
+| `--sol <file>` | Output solution FIFF file (default: derived from `--bem`) |
+| `--method <name>` | BEM method: `linear` or `constant` (default: `linear`) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+The BEM solution precomputes geometry-dependent matrices that allow the forward solver to rapidly evaluate the electric potential and magnetic field for any source configuration. Two collocation methods are available:
+
+- **linear**: Linear collocation — more accurate, uses vertex-based interpolation.
+- **constant**: Constant collocation — faster to compute but less accurate, uses triangle centroids.
+
+The linear method is recommended for final analysis. The constant method can be useful for quick exploratory forward solutions.
+
+### Workflow Context
+
+This tool is used after BEM surfaces have been created (with `mne_watershed_bem`, `mne_flash_bem`, or `mne_surf2bem`) and verified (with `mne_check_surface`). The resulting BEM solution file is then passed to `mne_forward_solution` to compute lead fields:
+
+1. Create BEM surfaces → `mne_watershed_bem` / `mne_flash_bem`
+2. Set up BEM model → `mne_setup_forward_model`
+3. **Compute BEM solution → `mne_prepare_bem_model`**
+4. Compute forward solution → `mne_forward_solution`
+
+### Example
+
+```bash
+# Compute the BEM solution using the linear method
+mne_prepare_bem_model --bem sam-bem.fif --sol sam-bem-sol.fif
+
+# Use constant collocation for a quick test
+mne_prepare_bem_model --bem sam-bem.fif --method constant
+```

@@ -1,0 +1,55 @@
+---
+title: mne_make_morph_maps
+sidebar_label: mne_make_morph_maps
+sidebar_position: 31
+---
+
+# mne_make_morph_maps
+
+## Overview
+
+`mne_make_morph_maps` precomputes surface morphing maps between two FreeSurfer subjects. These maps enable efficient morphing of source estimates from individual subjects to a common template (e.g., `fsaverage`) for group analysis.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_make_morph_maps [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--from <subject>` | Source subject name |
+| `--to <subject>` | Destination subject name |
+| `--subjects_dir <dir>` | Subjects directory (default: `$SUBJECTS_DIR`) |
+| `--out <file>` | Output morph map FIFF file |
+| `--nearest <n>` | Number of nearest neighbors (default: 5) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+Morphing maps define the correspondence between vertices on two subjects' cortical surfaces using the FreeSurfer spherical registration. By precomputing these maps, repeated morphing operations (e.g., morphing many time points or conditions) can be done efficiently.
+
+The `--nearest` parameter controls the number of nearest neighbors used for interpolation. More neighbors produce smoother results but may blur fine spatial detail.
+
+### Workflow Context
+
+Morph maps are precomputed before group analysis:
+
+1. **Compute morph maps → `mne_make_morph_maps`** (for each subject to `fsaverage`)
+2. Compute source estimates → `mne_compute_mne`
+3. Morph source estimates to template using the precomputed maps
+
+### Example
+
+```bash
+# Precompute morph map from sam to fsaverage
+mne_make_morph_maps --from sam --to fsaverage --out sam-to-fsaverage-morph.fif
+
+# Use more neighbors for smoother morphing
+mne_make_morph_maps --from sam --to fsaverage --nearest 10 --out sam-to-fsaverage-morph.fif
+```

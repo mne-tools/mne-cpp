@@ -1,0 +1,49 @@
+---
+title: mne_add_patch_info
+sidebar_label: mne_add_patch_info
+sidebar_position: 23
+---
+
+# mne_add_patch_info
+
+## Overview
+
+`mne_add_patch_info` adds cortical patch statistics to an existing source space FIFF file. Patch information describes which high-resolution surface vertices are represented by each source space point, enabling more accurate forward and inverse computations.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_add_patch_info [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--src <file>` | Input source space FIFF file |
+| `--out <file>` | Output source space FIFF file with patch info |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+When a decimated source space is created (e.g., with `mne_make_source_space`), each source point represents a patch of the high-resolution cortical surface. This tool computes and stores the mapping between the high-resolution surface vertices and their nearest source space points, along with patch areas.
+
+This information is used by the forward solver to improve the accuracy of the lead field computation by properly distributing the source current over each patch rather than treating it as a point source.
+
+### Workflow Context
+
+Run this tool after creating a source space with `mne_make_source_space` and before computing the forward solution with `mne_forward_solution`:
+
+1. Create source space → `mne_make_source_space`
+2. **Add patch info → `mne_add_patch_info`**
+3. Compute forward solution → `mne_forward_solution`
+
+### Example
+
+```bash
+# Add patch information to a source space
+mne_add_patch_info --src sam-oct-6-src.fif --out sam-oct-6-src-patch.fif
+```

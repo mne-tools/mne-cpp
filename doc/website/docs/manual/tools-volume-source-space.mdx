@@ -1,0 +1,55 @@
+---
+title: mne_volume_source_space
+sidebar_label: mne_volume_source_space
+sidebar_position: 29
+---
+
+# mne_volume_source_space
+
+## Overview
+
+`mne_volume_source_space` creates a volumetric source space by placing sources on a regular 3D grid inside the brain volume. Unlike surface-based source spaces that are confined to the cortical surface, volume source spaces can represent sources throughout the brain, including subcortical structures.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_volume_source_space [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--bem <file>` | BEM FIFF file (inner skull surface used as boundary) |
+| `--grid <mm>` | Grid spacing in mm (default: 7.0) |
+| `--exclude <mm>` | Exclude points closer to center of mass than this (default: 0) |
+| `--mindist <mm>` | Minimum distance from surface in mm (default: 5.0) |
+| `--out <file>` | Output source space FIFF file |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+The tool generates a regular 3D grid of source points inside the brain volume, bounded by the inner skull surface from a BEM model. Points too close to the inner skull surface (controlled by `--mindist`) are excluded to avoid numerical issues in forward computation.
+
+The grid spacing controls the density of the source space. Smaller values produce more source points but require more computation time for the forward solution and inverse operator.
+
+### Workflow Context
+
+Volume source spaces are used when subcortical sources are of interest or when surface-based source spaces are not appropriate:
+
+1. Create BEM model → `mne_watershed_bem` / `mne_setup_forward_model`
+2. **Create volume source space → `mne_volume_source_space`**
+3. Compute forward solution → `mne_forward_solution`
+
+### Example
+
+```bash
+# Create a volume source space with 5 mm grid spacing
+mne_volume_source_space --bem sam-inner_skull-bem.fif --grid 5.0 --out sam-vol-src.fif
+
+# Increase minimum distance from skull surface
+mne_volume_source_space --bem sam-inner_skull-bem.fif --grid 7.0 --mindist 10.0 --out sam-vol-src.fif
+```

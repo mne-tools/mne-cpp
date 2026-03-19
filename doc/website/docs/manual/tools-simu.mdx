@@ -1,0 +1,61 @@
+---
+title: mne_simu
+sidebar_label: mne_simu
+sidebar_position: 32
+---
+
+# mne_simu
+
+## Overview
+
+`mne_simu` generates simulated MEG/EEG raw data from a forward solution. A sinusoidal signal is placed at a specified source location and projected through the forward model, with optional additive noise from a noise covariance matrix. This is useful for testing inverse methods and validating processing pipelines.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_simu [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--fwd <file>` | Forward solution FIFF file |
+| `--raw <file>` | Raw FIFF file (for channel info and sampling rate) |
+| `--cov <file>` | Noise covariance FIFF file (optional) |
+| `--source <idx>` | Source index to activate (default: 0) |
+| `--snr <value>` | Signal-to-noise ratio in dB (default: 20) |
+| `--duration <sec>` | Duration of simulation in seconds (default: 1.0) |
+| `--freq <Hz>` | Signal frequency in Hz (default: 10.0) |
+| `--out <file>` | Output simulated raw FIFF file |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+The simulation generates a sinusoidal time course at a single source location, projects it through the forward solution to produce sensor-level data, and optionally adds Gaussian noise scaled to achieve the specified SNR. The channel configuration and sampling rate are taken from the template raw file.
+
+### Workflow Context
+
+Simulation is used for:
+
+- **Inverse method validation**: Generate data with known source location and verify that inverse methods recover it correctly.
+- **Pipeline testing**: Test processing pipelines end-to-end with controlled data.
+- **SNR studies**: Evaluate how source localization accuracy depends on noise levels.
+
+The typical workflow is:
+
+1. Compute forward solution → `mne_forward_solution`
+2. **Generate simulated data → `mne_simu`**
+3. Apply inverse method → `mne_compute_mne` or `mne_dipole_fit`
+4. Compare recovered source location with ground truth
+
+### Example
+
+```bash
+# Simulate 2 seconds of 10 Hz activity at source 42 with 15 dB SNR
+mne_simu --fwd sam-fwd.fif --raw sam-raw.fif --cov noise-cov.fif \
+    --source 42 --snr 15 --duration 2.0 --freq 10.0 --out simulated-raw.fif
+```

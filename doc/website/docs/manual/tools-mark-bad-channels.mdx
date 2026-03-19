@@ -1,0 +1,43 @@
+---
+title: mne_mark_bad_channels
+sidebar_label: mne_mark_bad_channels
+sidebar_position: 16
+---
+
+# mne_mark_bad_channels
+
+## Overview
+
+`mne_mark_bad_channels` marks channels as bad in a FIFF measurement file. The bad channel names are read from a text file and stored in the FIFF file's bad channel list. This is useful for excluding noisy or broken channels from subsequent processing steps such as averaging, noise covariance estimation, and source localization.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_mark_bad_channels [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--bad <file>` | Text file listing bad channel names (one per line) |
+| `--fif <file>` | FIFF file to modify |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+The bad channel file should contain one channel name per line. The channel names must match those in the FIFF measurement file exactly.
+
+### Workflow Context
+
+Bad channel marking is typically one of the first steps in an MEG/EEG processing pipeline. Channels identified as bad during data acquisition or visual inspection should be marked before computing noise covariance matrices, SSP projectors, or averages. Marked bad channels are excluded from all subsequent processing by MNE tools.
+
+### Example
+
+```bash
+# Mark channels listed in bad_channels.txt as bad in raw data
+mne_mark_bad_channels --bad bad_channels.txt --fif raw.fif
+```

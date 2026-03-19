@@ -1,0 +1,54 @@
+---
+title: mne_average_forward_solutions
+sidebar_label: mne_average_forward_solutions
+sidebar_position: 24
+---
+
+# mne_average_forward_solutions
+
+## Overview
+
+`mne_average_forward_solutions` computes a weighted average of multiple forward solutions. This is useful for combining forward solutions from different measurement conditions or head positions into a single representative forward solution for group analysis.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_average_forward_solutions [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--fwd <file>` | Forward solution FIFF file (repeat for each file to average) |
+| `--weights <w1,w2,...>` | Comma-separated weights (default: equal) |
+| `--listfile <file>` | Text file with one forward solution filename per line |
+| `--out <file>` | Output averaged forward solution FIFF file |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+When multiple forward solutions exist (e.g., from different runs with different head positions), this tool computes their weighted average. Each forward solution must share the same source space.
+
+Forward solutions can be specified individually with multiple `--fwd` options or listed in a text file via `--listfile`. Weights can be assigned to reflect the number of averages or data quality of each run.
+
+### Workflow Context
+
+This tool is used after computing individual forward solutions with `mne_forward_solution` for different recording sessions or head positions:
+
+1. Compute forward solutions for each condition → `mne_forward_solution`
+2. **Average the forward solutions → `mne_average_forward_solutions`**
+3. Compute inverse operator → `mne_inverse_operator`
+
+### Example
+
+```bash
+# Average two forward solutions with equal weight
+mne_average_forward_solutions --fwd run1-fwd.fif --fwd run2-fwd.fif --out avg-fwd.fif
+
+# Average with custom weights
+mne_average_forward_solutions --fwd run1-fwd.fif --fwd run2-fwd.fif --weights 0.6,0.4 --out avg-fwd.fif
+```

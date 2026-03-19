@@ -1,0 +1,53 @@
+---
+title: mne_cov2proj
+sidebar_label: mne_cov2proj
+sidebar_position: 26
+---
+
+# mne_cov2proj
+
+## Overview
+
+`mne_cov2proj` derives Signal-Space Projection (SSP) vectors from a noise covariance matrix. The leading eigenvectors of the noise covariance are extracted and saved as projection vectors, which can then be applied to suppress environmental noise.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_cov2proj [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--cov <file>` | Input noise covariance FIFF file |
+| `--raw <file>` | Raw FIFF file (for channel info) |
+| `--nproj <n>` | Number of projectors to create (default: 5) |
+| `--out <file>` | Output projection FIFF file |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+Signal-Space Projection (SSP) is a technique for removing environmental noise from MEG data by projecting out spatial patterns that correspond to noise sources. This tool computes SSP vectors by performing an eigenvalue decomposition of the noise covariance matrix and extracting the leading eigenvectors.
+
+The resulting projection vectors can be applied during data processing with `mne_process_raw` or as part of the inverse modeling pipeline.
+
+### Workflow Context
+
+The typical workflow for noise reduction is:
+
+1. Compute noise covariance from empty-room data → `mne_process_raw`
+2. **Derive SSP vectors → `mne_cov2proj`**
+3. Apply projections during processing → `mne_process_raw`
+
+This approach complements the SSP vectors computed directly from raw data in `mne_process_raw`.
+
+### Example
+
+```bash
+# Create 3 SSP vectors from a noise covariance matrix
+mne_cov2proj --cov noise-cov.fif --raw raw.fif --nproj 3 --out noise-proj.fif
+```

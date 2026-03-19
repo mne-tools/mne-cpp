@@ -1,0 +1,48 @@
+---
+title: mne_smooth
+sidebar_label: mne_smooth
+sidebar_position: 22
+---
+
+# mne_smooth
+
+## Overview
+
+`mne_smooth` applies spatial smoothing to source estimates on the cortical surface. It uses iterative nearest-neighbor averaging based on the surface mesh topology to spread activation across neighboring vertices.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_smooth [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--src <file>` | Source space FIFF file (for surface connectivity) |
+| `--surf <file>` | FreeSurfer surface file (alternative to `--src`) |
+| `--stc <file>` | Input STC file (text format: vertex value per time point) |
+| `--out <file>` | Output smoothed STC file |
+| `--smooth <n>` | Number of smoothing iterations (default: 5) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+Spatial smoothing of source estimates reduces noise and improves visualization by averaging each vertex's value with its neighbors on the cortical surface mesh. The number of smoothing iterations controls the spatial extent of the smoothing kernel.
+
+Either a source space FIFF file (`--src`) or a FreeSurfer surface file (`--surf`) must be provided to define the surface mesh connectivity.
+
+### Workflow Context
+
+Smoothing is typically applied after computing source estimates with `mne_compute_mne` or `mne_compute_raw_inverse`. Moderate smoothing (5–10 iterations) is often used for visualization, while analysis requiring precise spatial information may benefit from less or no smoothing.
+
+### Example
+
+```bash
+# Smooth a source estimate with 10 iterations
+mne_smooth --src sam-oct-6-src.fif --stc sam-meg --out sam-meg-smooth --smooth 10
+```

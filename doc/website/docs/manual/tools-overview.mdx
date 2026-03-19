@@ -8,7 +8,42 @@ sidebar_position: 6
 
 MNE-CPP includes a comprehensive set of command-line tools for MEG/EEG data processing, BEM model creation, forward solution computation, and inverse estimation. These tools are C++ ports of the original MNE-C tools created by Matti Hämäläinen.
 
-## BEM Model Creation
+## Typical Processing Pipeline
+
+The tools below are organized by their role in a typical MEG/EEG analysis workflow:
+
+1. **Data Import** — Convert raw data from various acquisition systems to FIFF format.
+2. **Preprocessing** — Mark bad channels, apply compensation, filter, and compute SSP projectors.
+3. **Head Model (BEM)** — Create and validate boundary-element model surfaces.
+4. **Source Space** — Set up cortical surface or volumetric source grids.
+5. **Forward &amp; Inverse Computation** — Compute lead fields and source estimates.
+6. **Morphing &amp; Group Analysis** — Map results across subjects for group studies.
+7. **Simulation &amp; Validation** — Generate synthetic data and compare files.
+
+---
+
+## Data Import and Conversion
+
+| Tool | Description |
+|---|---|
+| [mne_edf2fiff](tools-edf2fiff) | Converts EDF/EDF+ files to FIFF format |
+| [mne_brain_vision2fiff](tools-brain-vision2fiff) | Converts BrainVision EEG data (`.vhdr`) to FIFF format |
+| [mne_ctf2fiff](tools-ctf2fiff) | Converts CTF MEG datasets (`.ds`) to FIFF format |
+| [mne_kit2fiff](tools-kit2fiff) | Converts KIT/Yokogawa MEG data (`.sqd`/`.con`) to FIFF format |
+| [mne_raw2mat](tools-raw2mat) | Exports raw FIFF data to MATLAB `.mat` format |
+| [mne_show_fiff](tools-show-fiff) | Lists the contents of a FIFF file |
+| [mne_compare_fif_files](tools-compare-fif-files) | Compares two FIFF files tag by tag |
+
+## Raw Data Processing and Preprocessing
+
+| Tool | Description |
+|---|---|
+| [mne_process_raw](tools-process-raw) | Batch processing of raw data: filtering, decimation, averaging, covariance estimation, SSP, and event detection |
+| [mne_mark_bad_channels](tools-mark-bad-channels) | Marks channels as bad in a FIFF measurement file |
+| [mne_compensate_data](tools-compensate-data) | Applies or changes CTF software gradient compensation grade |
+| [mne_cov2proj](tools-cov2proj) | Derives SSP projection vectors from a noise covariance matrix |
+
+## BEM Model Creation and Validation
 
 | Tool | Description |
 |---|---|
@@ -16,6 +51,9 @@ MNE-CPP includes a comprehensive set of command-line tools for MEG/EEG data proc
 | [mne_flash_bem](tools-flash-bem) | Creates BEM surfaces using multi-echo FLASH MRI sequences |
 | [mne_surf2bem](tools-surf2bem) | Converts FreeSurfer surfaces and ASCII triangle files into BEM FIFF files |
 | [mne_setup_forward_model](tools-setup-forward-model) | Sets up the BEM for forward modeling |
+| [mne_prepare_bem_model](tools-prepare-bem-model) | Computes the BEM solution (geometry matrices) for the forward solver |
+| [mne_make_sphere_bem](tools-make-sphere-bem) | Creates a spherical BEM model from concentric shells |
+| [mne_check_surface](tools-check-surface) | Validates BEM and FreeSurfer surface meshes for topological correctness |
 
 ## MRI Setup
 
@@ -23,29 +61,41 @@ MNE-CPP includes a comprehensive set of command-line tools for MEG/EEG data proc
 |---|---|
 | [mne_setup_mri](tools-setup-mri) | Sets up FreeSurfer MRI data for MNE processing |
 
+## Source Space Setup
+
+| Tool | Description |
+|---|---|
+| [mne_make_source_space](tools-make-source-space) | Creates cortical source spaces from FreeSurfer surfaces |
+| [mne_volume_source_space](tools-volume-source-space) | Creates volumetric source spaces on a regular 3D grid |
+| [mne_add_patch_info](tools-add-patch-info) | Adds cortical patch statistics to a source space |
+| [mne_list_source_space](tools-list-source-space) | Lists the contents of a source space file |
+| [mne_annot2labels](tools-annot2labels) | Converts FreeSurfer annotation files to individual label files |
+
 ## Forward and Inverse Computation
 
 | Tool | Description |
 |---|---|
 | [mne_forward_solution](tools-forward-solution) | Computes the MEG/EEG forward solution |
-| [mne_make_source_space](tools-make-source-space) | Creates cortical source spaces from FreeSurfer surfaces |
+| [mne_average_forward_solutions](tools-average-forward-solutions) | Computes a weighted average of multiple forward solutions |
+| [mne_sensitivity_map](tools-sensitivity-map) | Computes a sensitivity map from a forward solution |
 | [mne_inverse_operator](tools-inverse-operator) | Assembles a linear inverse operator from a forward solution and noise covariance |
 | [mne_compute_mne](tools-compute-mne) | Computes MNE/dSPM/sLORETA source estimates from evoked data |
-| [mne_compute_raw_inverse](tools-compute-raw-inverse) | Computes inverse solutions (MNE/dSPM/sLORETA) |
+| [mne_compute_raw_inverse](tools-compute-raw-inverse) | Computes inverse solutions (MNE/dSPM/sLORETA) on continuous data |
 | [mne_dipole_fit](tools-dipole-fit) | Performs electric current dipole fitting |
 
-## Raw Data Processing
+## Morphing and Group Analysis
 
 | Tool | Description |
 |---|---|
-| [mne_process_raw](tools-process-raw) | Batch processing of raw data: filtering, decimation, averaging, covariance estimation, SSP, and event detection |
+| [mne_make_morph_maps](tools-make-morph-maps) | Precomputes surface morphing maps between FreeSurfer subjects |
+| [mne_morph_labels](tools-morph-labels) | Morphs cortical label files between subjects |
+| [mne_smooth](tools-smooth) | Applies spatial smoothing to cortical source estimates |
 
-## Data Conversion and Utilities
+## Simulation
 
 | Tool | Description |
 |---|---|
-| [mne_edf2fiff](tools-edf2fiff) | Converts EDF files to FIFF format |
-| [mne_show_fiff](tools-show-fiff) | Lists the contents of a FIFF file |
+| [mne_simu](tools-simu) | Generates simulated MEG/EEG data from a forward solution |
 
 ## Real-Time Streaming
 

@@ -1,0 +1,50 @@
+---
+title: mne_raw2mat
+sidebar_label: mne_raw2mat
+sidebar_position: 33
+---
+
+# mne_raw2mat
+
+## Overview
+
+`mne_raw2mat` converts raw FIFF data to MATLAB `.mat` format. This allows raw MEG/EEG data to be loaded directly into MATLAB or Octave for custom analysis.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_raw2mat [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--raw <file>` | Input raw FIFF file |
+| `--out <file>` | Output `.mat` file |
+| `--from <samp>` | First sample (default: start of file) |
+| `--to <samp>` | Last sample (default: end of file) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+The tool reads raw data from a FIFF file and writes the selected sample range to a MATLAB `.mat` file. The output contains the data matrix and associated channel information.
+
+Use `--from` and `--to` to extract a specific time window. Sample numbers are zero-based.
+
+### Workflow Context
+
+This tool is useful for interoperability when parts of an analysis pipeline use MATLAB. The data can be exported for custom processing or visualization in MATLAB and then reimported into the MNE workflow.
+
+### Example
+
+```bash
+# Convert entire raw file to MATLAB format
+mne_raw2mat --raw sam-raw.fif --out sam-raw.mat
+
+# Extract samples 1000 to 5000
+mne_raw2mat --raw sam-raw.fif --out sam-raw-segment.mat --from 1000 --to 5000
+```

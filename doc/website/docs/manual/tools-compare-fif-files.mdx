@@ -1,0 +1,51 @@
+---
+title: mne_compare_fif_files
+sidebar_label: mne_compare_fif_files
+sidebar_position: 25
+---
+
+# mne_compare_fif_files
+
+## Overview
+
+`mne_compare_fif_files` compares two FIFF files tag by tag and reports any differences found. This is a diagnostic utility for verifying that processing steps produce the expected output or for debugging file conversion issues.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_compare_fif_files [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--file1 <file>` | First FIFF file |
+| `--file2 <file>` | Second FIFF file |
+| `--verbose` | Show matching tags too |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+The tool reads both FIFF files and compares them tag by tag, reporting tags that are present in one file but not the other, or tags whose values differ. With `--verbose`, matching tags are also listed.
+
+### Workflow Context
+
+This tool is useful for:
+
+- Verifying that data conversion (e.g., `mne_ctf2fiff`, `mne_kit2fiff`) produced correct results.
+- Checking that processing steps (e.g., `mne_compensate_data`, `mne_mark_bad_channels`) modified only the expected parts of a file.
+- Debugging pipeline issues by comparing intermediate files.
+
+### Example
+
+```bash
+# Compare two FIFF files
+mne_compare_fif_files --file1 original.fif --file2 processed.fif
+
+# Show all tags including matches
+mne_compare_fif_files --file1 original.fif --file2 processed.fif --verbose
+```

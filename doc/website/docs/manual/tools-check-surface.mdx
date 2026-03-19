@@ -1,0 +1,54 @@
+---
+title: mne_check_surface
+sidebar_label: mne_check_surface
+sidebar_position: 19
+---
+
+# mne_check_surface
+
+## Overview
+
+`mne_check_surface` validates BEM surface meshes and FreeSurfer surface files for topological correctness. It checks for proper triangle orientation, manifold consistency, and optionally verifies inter-surface distances in multi-layer BEM models.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_check_surface [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--bem <file>` | BEM FIFF file to check |
+| `--surf <file>` | FreeSurfer surface file to check (standalone) |
+| `--id <id>` | Surface ID for `--surf`: 4=head, 3=skull, 1=brain (default: 1) |
+| `--thickness` | Also check inter-surface distances |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+Several conditions must be met for BEM surfaces to work correctly with forward modeling:
+
+- The surfaces must be closed (no holes).
+- Triangle normals must point outward from the volume they enclose.
+- Surfaces in multi-layer models must not intersect each other.
+
+This tool checks these conditions and reports any problems found. It can validate both FIFF BEM files (containing multiple surfaces) and standalone FreeSurfer surface files.
+
+### Workflow Context
+
+Run this tool after creating BEM surfaces with `mne_watershed_bem`, `mne_flash_bem`, or `mne_surf2bem`, and before computing the BEM solution with `mne_prepare_bem_model` or computing the forward solution. Catching surface problems early avoids numerical errors later in the pipeline.
+
+### Example
+
+```bash
+# Check a BEM FIFF file including inter-surface distances
+mne_check_surface --bem sam-bem.fif --thickness
+
+# Check a standalone FreeSurfer surface as brain surface
+mne_check_surface --surf lh.inner_skull --id 1
+```

@@ -1,0 +1,61 @@
+---
+title: mne_make_sphere_bem
+sidebar_label: mne_make_sphere_bem
+sidebar_position: 28
+---
+
+# mne_make_sphere_bem
+
+## Overview
+
+`mne_make_sphere_bem` creates a spherical BEM model consisting of concentric spherical shells. This provides a quick analytical head model for MEG/EEG forward computation when realistic BEM surfaces from MRI segmentation are not available.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_make_sphere_bem [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--out <file>` | Output BEM FIFF file |
+| `--origin <x,y,z>` | Sphere origin in mm (default: `0,0,40`) |
+| `--radii <r1,r2,r3>` | Shell radii in mm (default: `71,80,90` for 3-layer) |
+| `--conductivity <s1,s2,s3>` | Conductivities (default: `0.33,0.0042,0.33`) |
+| `--ico <n>` | Icosahedron subdivision level (default: 4) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+The spherical BEM model approximates the head as concentric spherical shells representing the brain, skull, and scalp. Default parameters create a standard three-layer model:
+
+- **Brain**: radius 71 mm, conductivity 0.33 S/m
+- **Skull**: radius 80 mm, conductivity 0.0042 S/m
+- **Scalp**: radius 90 mm, conductivity 0.33 S/m
+
+The origin parameter specifies the center of the spheres, typically set to the center of the head in head coordinates.
+
+### Workflow Context
+
+The spherical BEM is an alternative to MRI-based BEM models when:
+
+- MRI data is not available.
+- A quick approximate forward model is needed for initial analysis.
+- You want to compare spherical and realistic head models.
+
+The resulting BEM file can be used directly with `mne_forward_solution`.
+
+### Example
+
+```bash
+# Create a default 3-layer spherical BEM model
+mne_make_sphere_bem --out sphere-bem.fif
+
+# Custom origin and radii
+mne_make_sphere_bem --out sphere-bem.fif --origin 0,5,40 --radii 70,79,88
+```
