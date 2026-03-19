@@ -202,9 +202,8 @@ InvSourceEstimate InvMinimumNorm::calculateInverse(const MatrixXd &data, float t
         MatrixXd sol1(sol.rows()/3,sol.cols());
         for(qint32 i = 0; i < sol.cols(); ++i)
         {
-            VectorXd* tmp = MNEMath::combine_xyz(sol.col(i));
-            sol1.block(0,i,sol.rows()/3,1) = tmp->cwiseSqrt();
-            delete tmp;
+            VectorXd tmp = MNEMath::combine_xyz(sol.col(i));
+            sol1.block(0,i,sol.rows()/3,1) = tmp.cwiseSqrt();
         }
         sol.resize(sol1.rows(),sol1.cols());
         sol = sol1;

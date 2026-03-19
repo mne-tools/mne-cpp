@@ -59,16 +59,16 @@ namespace UTILSLIB
 //=============================================================================================================
 
 /** @brief Workspace for sphere-fitting optimisation, holding 3-D point coordinates and a report flag. */
-typedef struct {
+struct FitUser {
     Eigen::MatrixXf rr;
-     bool   report;
-} *fitUserNew,fitUserRecNew;
+    bool report;
+};
 
 //=============================================================================================================
 /**
- * Sphere descritpion
+ * Sphere description.
  *
- * @brief Describes a 3D sphere object
+ * @brief Describes a 3D sphere object.
  */
 class MATHSHARED_EXPORT Sphere
 {
@@ -106,9 +106,9 @@ public:
 
     //=========================================================================================================
     /**
-     * The radius of the sphere.
+     * The center of the sphere.
      *
-     * @return the fitted sphere.
+     * @return reference to the sphere's center.
      */
     Eigen::Vector3f& center() { return m_center; }
 
@@ -116,7 +116,7 @@ public:
     /**
      * The radius of the sphere.
      *
-     * @return the fitted sphere.
+     * @return reference to the sphere's radius.
      */
     float& radius() { return m_r; }
 
@@ -191,7 +191,7 @@ private:
      *
      * @return the optimal radius.
      */
-    static float opt_rad(const Eigen::VectorXf &r0, const fitUserNew user);
+    static float opt_rad(const Eigen::VectorXf &r0, const FitUser* user);
 };
 } // NAMESPACE
 

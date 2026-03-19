@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 #include <iostream>
 #include "mnemath.h"
 
@@ -78,24 +78,23 @@ int MNEMath::gcd(int iA, int iB)
 
 //=============================================================================================================
 
-VectorXd* MNEMath::combine_xyz(const VectorXd& vec)
+VectorXd MNEMath::combine_xyz(const VectorXd& vec)
 {
     if (vec.size() % 3 != 0)
     {
-        printf("Input must be a row or a column vector with 3N components\n");
-        return NULL;
+        qWarning("MNEMath::combine_xyz: Input must be a row or column vector with 3N components.");
+        return VectorXd();
     }
 
     MatrixXd tmp = MatrixXd(vec.transpose());
-    SparseMatrix<double>* s = make_block_diag(tmp,3);
+    SparseMatrix<double> s = make_block_diag(tmp, 3);
 
-    SparseMatrix<double> sC = *s*s->transpose();
-    VectorXd* comb = new VectorXd(sC.rows());
+    SparseMatrix<double> sC = s * s.transpose();
+    VectorXd comb(sC.rows());
 
-    for(qint32 i = 0; i < sC.rows(); ++i)
-        (*comb)[i] = sC.coeff(i,i);
+    for (qint32 i = 0; i < sC.rows(); ++i)
+        comb[i] = sC.coeff(i, i);
 
-    delete s;
     return comb;
 }
 
@@ -227,64 +226,6 @@ VectorXi MNEMath::intersect(const VectorXi &v1,
 
 //=============================================================================================================
 
-//    static inline MatrixXd extract_block_diag(MatrixXd& A, qint32 n)
-//    {
-
-//        //
-//        // Principal Investigators and Developers:
-//        // ** Richard M. Leahy, PhD, Signal & Image Processing Institute,
-//        //    University of Southern California, Los Angeles, CA
-//        // ** John C. Mosher, PhD, Biophysics Group,
-//        //    Los Alamos National Laboratory, Los Alamos, NM
-//        // ** Sylvain Baillet, PhD, Cognitive Neuroscience & Brain Imaging Laboratory,
-//        //    CNRS, Hopital de la Salpetriere, Paris, France
-//        //
-//        // Copyright (c) 2005 BrainStorm by the University of Southern California
-//        // This software distributed  under the terms of the GNU General Public License
-//        // as published by the Free Software Foundation. Further details on the GPL
-//        // license can be found at http://www.gnu.org/copyleft/gpl.html .
-//        //
-//        //FOR RESEARCH PURPOSES ONLY. THE SOFTWARE IS PROVIDED "AS IS," AND THE
-//        // UNIVERSITY OF SOUTHERN CALIFORNIA AND ITS COLLABORATORS DO NOT MAKE ANY
-//        // WARRANTY, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF
-//        // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, NOR DO THEY ASSUME ANY
-//        // LIABILITY OR RESPONSIBILITY FOR THE USE OF THIS SOFTWARE.
-//        //
-//        // Author: John C. Mosher 1993 - 2004
-//        //
-//        //
-//        // Modifications for mne Matlab toolbox
-//        //
-//        //   Matti Hamalainen
-//        //   2006
-
-//          [mA,na] = size(A);		% matrix always has na columns
-//          % how many entries in the first column?
-//          bdn = na/n;			% number of blocks
-//          ma = mA/bdn;			% rows in first block
-
-//          % blocks may themselves contain zero entries.  Build indexing as above
-//          tmp = reshape([1:(ma*bdn)]',ma,bdn);
-//          i = zeros(ma*n,bdn);
-//          for iblock = 1:n,
-//            i((iblock-1)*ma+[1:ma],:) = tmp;
-//          end
-
-//          i = i(:); 			% row indices foreach sparse bd
-
-//          j = [0:mA:(mA*(na-1))];
-//          j = j(ones(ma,1),:);
-//          j = j(:);
-
-//          i = i + j;
-
-//          bd = full(A(i)); 	% column vector
-//          bd = reshape(bd,ma,na);	% full matrix
-
-//    }
-
-//=============================================================================================================
-
 bool MNEMath::issparse(VectorXd &v)
 {
     //ToDo: Figure out how to accelerate MNEMath::issparse(VectorXd &v)
@@ -344,40 +285,35 @@ MatrixXd MNEMath::legendre(qint32 n,
 
 //=============================================================================================================
 
-SparseMatrix<double>* MNEMath::make_block_diag(const MatrixXd &A,
+SparseMatrix<double> MNEMath::make_block_diag(const MatrixXd &A,
                                                qint32 n)
 {
-
     qint32 ma = A.rows();
     qint32 na = A.cols();
-    float bdn = ((float)na)/n;      // number of submatrices
+    float bdn = static_cast<float>(na) / n;
 
-//    std::cout << std::endl << "ma " << ma << " na " << na << " bdn " << bdn << std::endl;
-
-    if(bdn - floor(bdn))
+    if (bdn - std::floor(bdn))
     {
-        printf("Width of matrix must be even multiple of n\n");
-        return NULL;
+        qWarning("MNEMath::make_block_diag: Width of matrix must be an even multiple of n.");
+        return SparseMatrix<double>();
     }
 
     typedef Eigen::Triplet<double> T;
     std::vector<T> tripletList;
-    tripletList.reserve(bdn*ma*n);
+    tripletList.reserve(static_cast<size_t>(bdn * ma * n));
 
-    qint32 current_col, current_row, i, r, c;
-    for(i = 0; i < bdn; ++i)
+    for (qint32 i = 0; i < static_cast<qint32>(bdn); ++i)
     {
-        current_col = i * n;
-        current_row = i * ma;
+        qint32 current_col = i * n;
+        qint32 current_row = i * ma;
 
-        for(r = 0; r < ma; ++r)
-            for(c = 0; c < n; ++c)
-                tripletList.push_back(T(r+current_row, c+current_col, A(r, c+current_col)));
+        for (qint32 r = 0; r < ma; ++r)
+            for (qint32 c = 0; c < n; ++c)
+                tripletList.push_back(T(r + current_row, c + current_col, A(r, c + current_col)));
     }
 
-    SparseMatrix<double>* bd = new SparseMatrix<double>((int)floor((float)ma*bdn+0.5),na);
-//    SparseMatrix<double> p_Matrix(nrow, ncol);
-    bd->setFromTriplets(tripletList.begin(), tripletList.end());
+    SparseMatrix<double> bd(static_cast<int>(std::floor(ma * bdn + 0.5f)), na);
+    bd.setFromTriplets(tripletList.begin(), tripletList.end());
 
     return bd;
 }

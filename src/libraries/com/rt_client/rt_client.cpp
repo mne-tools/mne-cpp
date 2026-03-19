@@ -38,15 +38,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtclient.h"
-#include "rtcmdclient.h"
-#include "rtdataclient.h"
+#include "rt_client.h"
+#include "rt_cmd_client.h"
+#include "rt_data_client.h"
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace COMMUNICATIONLIB;
+using namespace COMLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
 

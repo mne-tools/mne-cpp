@@ -5,7 +5,6 @@
 #include <dsp/parksmcclellan.h>
 #include <dsp/cosinefilter.h>
 
-using namespace RTPROCESSINGLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
 

@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../communication_global.h"
+#include "../com_global.h"
 
 #include <utils/generics/commandpattern.h>
 
@@ -54,10 +54,10 @@
 #include <QVariant>
 
 //=============================================================================================================
-// DEFINE NAMESPACE COMMUNICATIONLIB
+// DEFINE NAMESPACE COMLIB
 //=============================================================================================================
 
-namespace COMMUNICATIONLIB
+namespace COMLIB
 {
 
 //=============================================================================================================
@@ -66,7 +66,7 @@ namespace COMMUNICATIONLIB
  *
  * @brief Parsed but untyped command holding raw string parameters before type resolution
  */
-class COMMUNICATIONSHARED_EXPORT RawCommand : public QObject, public UTILSLIB::ICommand
+class COMSHARED_EXPORT RawCommand : public QObject, public UTILSLIB::ICommand
 {
 Q_OBJECT
 

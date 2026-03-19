@@ -5,9 +5,9 @@
 // Includes
 //=============================================================================================================
 
-#include "../communication_global.h"
+#include "../com_global.h"
 #include "command.h"
-#include "commandparser.h"
+#include "command_parser.h"
 
 #include <utils/generics/observerpattern.h>
 
@@ -19,10 +19,10 @@
 #include <QJsonDocument>
 
 //=============================================================================================================
-// DEFINE NAMESPACE COMMUNICATIONLIB
+// DEFINE NAMESPACE COMLIB
 //=============================================================================================================
 
-namespace COMMUNICATIONLIB
+namespace COMLIB
 {
 
 //=============================================================================================================
@@ -33,7 +33,7 @@ namespace COMMUNICATIONLIB
 /**
  * @brief Registry of available commands; dispatches parsed command strings to the matching Command handler
  */
-class COMMUNICATIONSHARED_EXPORT CommandManager : public QObject, public UTILSLIB::IObserver
+class COMSHARED_EXPORT CommandManager : public QObject, public UTILSLIB::IObserver
 {
     Q_OBJECT
 

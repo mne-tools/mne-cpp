@@ -1457,8 +1457,8 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
             qInfo("\tChanging to fixed-orientation forward solution...");
 
             MatrixXd tmp = fwd.source_nn.transpose().cast<double>();
-            SparseMatrix<double>* fix_rot = MNEMath::make_block_diag(tmp,1);
-            fwd.sol->data *= (*fix_rot);
+            SparseMatrix<double> fix_rot = MNEMath::make_block_diag(tmp,1);
+            fwd.sol->data *= fix_rot;
             fwd.sol->ncol  = fwd.nsource;
             fwd.source_ori = FIFFV_MNE_FIXED_ORI;
 
@@ -1468,11 +1468,10 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
                 SparseMatrix<double> t_eye(3,3);
                 for (qint32 i = 0; i < 3; ++i)
                     t_eye.insert(i,i) = 1.0f;
-                t_matKron = kroneckerProduct(*fix_rot,t_eye);//kron(fix_rot,eye(3));
+                t_matKron = kroneckerProduct(fix_rot,t_eye);//kron(fix_rot,eye(3));
                 fwd.sol_grad->data *= t_matKron;
                 fwd.sol_grad->ncol   = 3*fwd.nsource;
             }
-            delete fix_rot;
             qInfo("[done]");
         }
     }
@@ -1542,9 +1541,9 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
             nuse += t_SourceSpace[k].nuse;
         }
         MatrixXd tmp = fwd.source_nn.transpose().cast<double>();
-        SparseMatrix<double>* surf_rot = MNEMath::make_block_diag(tmp,3);
+        SparseMatrix<double> surf_rot = MNEMath::make_block_diag(tmp,3);
 
-        fwd.sol->data *= *surf_rot;
+        fwd.sol->data *= surf_rot;
 
         if (!fwd.sol_grad->isEmpty())
         {
@@ -1552,10 +1551,9 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
             SparseMatrix<double> t_eye(3,3);
             for (qint32 i = 0; i < 3; ++i)
                 t_eye.insert(i,i) = 1.0f;
-            t_matKron = kroneckerProduct(*surf_rot,t_eye);//kron(surf_rot,eye(3));
+            t_matKron = kroneckerProduct(surf_rot,t_eye);//kron(surf_rot,eye(3));
             fwd.sol_grad->data *= t_matKron;
         }
-        delete surf_rot;
         qInfo("[done]");
     }
     else

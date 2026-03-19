@@ -178,21 +178,18 @@ void TestMNEMath::testCombineXyz()
     VectorXd vec(6);
     vec << 1.0, 2.0, 3.0, 4.0, 5.0, 6.0;
 
-    VectorXd* result = MNEMath::combine_xyz(vec);
-    QVERIFY(result != NULL);
-    QCOMPARE(result->size(), (Eigen::Index)2);
+    VectorXd result = MNEMath::combine_xyz(vec);
+    QCOMPARE(result.size(), (Eigen::Index)2);
 
     // First entry: 1^2 + 2^2 + 3^2 = 14
-    QVERIFY(std::abs((*result)(0) - 14.0) < m_dEpsilon);
+    QVERIFY(std::abs(result(0) - 14.0) < m_dEpsilon);
     // Second entry: 4^2 + 5^2 + 6^2 = 77
-    QVERIFY(std::abs((*result)(1) - 77.0) < m_dEpsilon);
+    QVERIFY(std::abs(result(1) - 77.0) < m_dEpsilon);
 
-    delete result;
-
-    // Edge case: input size not multiple of 3 should return NULL
+    // Edge case: input size not multiple of 3 should return empty vector
     VectorXd badVec(5);
     badVec << 1.0, 2.0, 3.0, 4.0, 5.0;
-    QVERIFY(MNEMath::combine_xyz(badVec) == NULL);
+    QVERIFY(MNEMath::combine_xyz(badVec).size() == 0);
 }
 
 //=============================================================================================================
@@ -308,28 +305,25 @@ void TestMNEMath::testMakeBlockDiag()
     A << 1, 2, 3, 4,
          5, 6, 7, 8;
 
-    SparseMatrix<double>* bd = MNEMath::make_block_diag(A, 2);
-    QVERIFY(bd != NULL);
+    SparseMatrix<double> bd = MNEMath::make_block_diag(A, 2);
 
     // Should be 4x4 (2 blocks of 2x2 on the diagonal)
-    QCOMPARE(bd->rows(), 4);
-    QCOMPARE(bd->cols(), 4);
+    QCOMPARE(bd.rows(), 4);
+    QCOMPARE(bd.cols(), 4);
 
     // Check diagonal blocks
-    QVERIFY(std::abs(bd->coeff(0, 0) - 1.0) < m_dEpsilon);
-    QVERIFY(std::abs(bd->coeff(0, 1) - 2.0) < m_dEpsilon);
-    QVERIFY(std::abs(bd->coeff(1, 0) - 5.0) < m_dEpsilon);
-    QVERIFY(std::abs(bd->coeff(1, 1) - 6.0) < m_dEpsilon);
-    QVERIFY(std::abs(bd->coeff(2, 2) - 3.0) < m_dEpsilon);
-    QVERIFY(std::abs(bd->coeff(2, 3) - 4.0) < m_dEpsilon);
-    QVERIFY(std::abs(bd->coeff(3, 2) - 7.0) < m_dEpsilon);
-    QVERIFY(std::abs(bd->coeff(3, 3) - 8.0) < m_dEpsilon);
+    QVERIFY(std::abs(bd.coeff(0, 0) - 1.0) < m_dEpsilon);
+    QVERIFY(std::abs(bd.coeff(0, 1) - 2.0) < m_dEpsilon);
+    QVERIFY(std::abs(bd.coeff(1, 0) - 5.0) < m_dEpsilon);
+    QVERIFY(std::abs(bd.coeff(1, 1) - 6.0) < m_dEpsilon);
+    QVERIFY(std::abs(bd.coeff(2, 2) - 3.0) < m_dEpsilon);
+    QVERIFY(std::abs(bd.coeff(2, 3) - 4.0) < m_dEpsilon);
+    QVERIFY(std::abs(bd.coeff(3, 2) - 7.0) < m_dEpsilon);
+    QVERIFY(std::abs(bd.coeff(3, 3) - 8.0) < m_dEpsilon);
 
     // Off-diagonal blocks should be zero
-    QVERIFY(std::abs(bd->coeff(0, 2)) < m_dEpsilon);
-    QVERIFY(std::abs(bd->coeff(2, 0)) < m_dEpsilon);
-
-    delete bd;
+    QVERIFY(std::abs(bd.coeff(0, 2)) < m_dEpsilon);
+    QVERIFY(std::abs(bd.coeff(2, 0)) < m_dEpsilon);
 }
 
 //=============================================================================================================

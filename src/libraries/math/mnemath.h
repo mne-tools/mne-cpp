@@ -36,8 +36,6 @@
 #ifndef MNEMATH_H
 #define MNEMATH_H
 
-//ToDo move this to the new MNE math library
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -79,10 +77,9 @@ namespace UTILSLIB
 
 //=============================================================================================================
 /**
- * ToDo make this a template class
- * Generalized math methods used by mne methods
+ * Generalized math methods used by MNE-CPP.
  *
- * @brief Math methods
+ * @brief Static mathematical utility functions.
  */
 class MATHSHARED_EXPORT MNEMath
 {
@@ -91,10 +88,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Destroys the MNEMath object
+     * Destroys the MNEMath object.
      */
-    virtual ~MNEMath()
-    { }
+    ~MNEMath() = default;
 
     //=========================================================================================================
     /**
@@ -109,19 +105,13 @@ public:
 
     //=========================================================================================================
     /**
-     * ToDo make this a template function
-     *
-     * mne_combine_xyz
-     *
-     * ### MNE toolbox root function ###
-     *
-     * Compute the three Cartesian components of a vector together
+     * Compute the three Cartesian components of a vector together.
      *
      * @param[in] vec    Input row vector [ x1 y1 z1 ... x_n y_n z_n ].
      *
      * @return Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ].
      */
-    static Eigen::VectorXd* combine_xyz(const Eigen::VectorXd& vec);
+    static Eigen::VectorXd combine_xyz(const Eigen::VectorXd& vec);
 
 //    //=========================================================================================================
 //    /**
@@ -238,23 +228,19 @@ public:
 
     //=========================================================================================================
     /**
-     * ToDo make this a template function
-     *
-     * ### MNE toolbox root function ###: Definition of the mne_block_diag function - encoding part
-     *
-     * Make a sparse block diagonal matrix
+     * Make a sparse block diagonal matrix.
      *
      * Returns a sparse block diagonal, diagonalized from the elements in "A". "A" is ma x na, comprising
      * bdn=(na/"n") blocks of submatrices. Each submatrix is ma x "n", and these submatrices are placed down
      * the diagonal of the matrix.
      *
-     * @param[in, out] A Matrix which should be diagonlized.
+     * @param[in, out] A Matrix which should be diagonalized.
      * @param[in, out] n Columns of the submatrices.
      *
      * @return A sparse block diagonal, diagonalized from the elements in "A".
      */
-    static Eigen::SparseMatrix<double>* make_block_diag(const Eigen::MatrixXd &A,
-                                                        qint32 n);
+    static Eigen::SparseMatrix<double> make_block_diag(const Eigen::MatrixXd &A,
+                                                       qint32 n);
 
     //=========================================================================================================
     /**
@@ -267,12 +253,10 @@ public:
 
     //=========================================================================================================
     /**
-     * ToDo make this a template function
-     *
      * Returns the rank of a matrix A.
      *
      * @param[in] A      Matrix to get the rank from.
-     * @param[in] tol    realtive threshold: biggest singualr value multiplied with tol is smallest singular value considered non-zero.
+     * @param[in] tol    Relative threshold: biggest singular value multiplied with tol is smallest singular value considered non-zero.
      *
      * @return rank of matrix A.
      */
@@ -281,19 +265,16 @@ public:
 
     //=========================================================================================================
     /**
-     * ToDo: Maybe new processing class
-     *
-     * Rescale aka baseline correct data
+     * Rescale (baseline correct) data.
      *
      * @param[in] data           Data Matrix (m x n_time).
-     * @param[in] times          Time instants is seconds.
+     * @param[in] times          Time instants in seconds.
      * @param[in] baseline       If baseline is (a, b) the interval is between "a (s)" and "b (s)".
-     *                           If a and b are equal use interval between the beginning of the data and the time point 0 (stimulus onset).
-     * @param[in] mode           Do baseline correction with ratio (power is divided by mean power during baseline) or zscore (power is divided by standard.
-     *                           deviatio of power during baseline after substracting the mean, power = [power - mean(power_baseline)] / std(power_baseline)).
-     *                           ("logratio" | "ratio" | "zscore" | "mean" | "percent")
+     *                           If a and b are equal, use interval between the beginning of the data and time 0.
+     * @param[in] mode           Baseline correction mode:
+     *                           "logratio" | "ratio" | "zscore" | "mean" | "percent".
      *
-     * @return   rescaled data matrix rescaling.
+     * @return Rescaled data matrix.
      */
     static Eigen::MatrixXd rescale(const Eigen::MatrixXd &data,
                                    const Eigen::RowVectorXf &times,
@@ -302,19 +283,16 @@ public:
 
     //=========================================================================================================
     /**
-     * ToDo: Maybe new processing class
-     *
-     * Rescale aka baseline correct data
+     * Rescale (baseline correct) data.
      *
      * @param[in] data           Data Matrix (m x n_time).
-     * @param[in] times          Time instants is seconds.
+     * @param[in] times          Time instants in seconds.
      * @param[in] baseline       If baseline is (a, b) the interval is between "a (s)" and "b (s)".
-     *                           If a and b are equal use interval between the beginning of the data and the time point 0 (stimulus onset).
-     * @param[in] mode           Do baseline correction with ratio (power is divided by mean power during baseline) or zscore (power is divided by standard.
-     *                           deviatio of power during baseline after substracting the mean, power = [power - mean(power_baseline)] / std(power_baseline)).
-     *                           ("logratio" | "ratio" | "zscore" | "mean" | "percent")
+     *                           If a and b are equal, use interval between the beginning of the data and time 0.
+     * @param[in] mode           Baseline correction mode:
+     *                           "logratio" | "ratio" | "zscore" | "mean" | "percent".
      *
-     * @return   rescaled data matrix rescaling.
+     * @return Rescaled data matrix.
      */
     static Eigen::MatrixXd rescale(const Eigen::MatrixXd& data,
                                    const Eigen::RowVectorXf& times,
@@ -417,11 +395,11 @@ public:
 
     //=========================================================================================================
     /**
-     * Compute log2 of given number
+     * Compute log base 2 of a given number.
      *
      * @param[in] d  input value.
      *
-     * @return double result of log2 operation.
+     * @return log2 of d.
      */
     template<typename T>
     static inline double log2(const T d);

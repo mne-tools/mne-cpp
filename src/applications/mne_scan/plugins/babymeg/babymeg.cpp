@@ -75,6 +75,7 @@ using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
 using namespace RTPROCESSINGLIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

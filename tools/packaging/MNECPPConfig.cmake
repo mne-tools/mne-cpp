@@ -37,7 +37,7 @@ set(MNE_CPP_LIBRARIES
     mne_mne
     mne_fwd
     mne_inverse
-    mne_communication
+    mne_com
     mne_rtprocessing
     mne_connectivity
     mne_events
