@@ -43,8 +43,6 @@
 
 #include "helpers/filterplotscene.h"
 
-#include "math/mnemath.h"
-
 #include <dsp/filterio.h>
 
 #include <fiff/fiff_info.h>

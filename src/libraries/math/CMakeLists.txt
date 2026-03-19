@@ -14,7 +14,8 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 
 set(SOURCES
   math_global.cpp
-  mnemath.cpp
+  linalg.cpp
+  numerics.cpp
   sphere.cpp
   warp.cpp
   kmeans.cpp
@@ -23,7 +24,8 @@ set(SOURCES
 
 set(HEADERS
   math_global.h
-  mnemath.h
+  linalg.h
+  numerics.h
   sphere.h
   warp.h
   simplex_algorithm.h

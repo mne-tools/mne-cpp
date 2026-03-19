@@ -41,7 +41,7 @@
 #include "mne_source_spaces.h"
 #include "mne_nearest.h"
 
-#include <math/mnemath.h>
+#include <math/linalg.h>
 #include <fs/fs_label.h>
 
 #include <iostream>
@@ -121,13 +121,13 @@ QList<VectorXi> MNESourceSpaces::label_src_vertno_sel(const FsLabel &p_label, Ve
 
     if (p_label.hemi == 0) //lh
     {
-        VectorXi vertno_sel = MNEMath::intersect(vertno[0], p_label.vertices, src_sel);
+        VectorXi vertno_sel = Linalg::intersect(vertno[0], p_label.vertices, src_sel);
         vertno[0] = vertno_sel;
         vertno[1] = VectorXi();
     }
     else if (p_label.hemi == 1) //rh
     {
-        VectorXi vertno_sel = MNEMath::intersect(vertno[1], p_label.vertices, src_sel);
+        VectorXi vertno_sel = Linalg::intersect(vertno[1], p_label.vertices, src_sel);
         src_sel.array() += p_label.vertices.size();
         vertno[0] = VectorXi();
         vertno[1] = vertno_sel;
@@ -135,13 +135,13 @@ QList<VectorXi> MNESourceSpaces::label_src_vertno_sel(const FsLabel &p_label, Ve
 
 //    if (p_label.hemi == 0) //lh
 //    {
-//        VectorXi vertno_sel = MNEMath::intersect(vertno[0], p_label.vertices[0], src_sel);
+//        VectorXi vertno_sel = Linalg::intersect(vertno[0], p_label.vertices[0], src_sel);
 //        vertno[0] = vertno_sel;
 //        vertno[1] = VectorXi();
 //    }
 //    else if (p_label.hemi == 1) //rh
 //    {
-//        VectorXi vertno_sel = MNEMath::intersect(vertno[1], p_label.vertices[1], src_sel);
+//        VectorXi vertno_sel = Linalg::intersect(vertno[1], p_label.vertices[1], src_sel);
 //        src_sel.array() += p_label.vertices[0].size();
 //        vertno[0] = VectorXi();
 //        vertno[1] = vertno_sel;
@@ -149,8 +149,8 @@ QList<VectorXi> MNESourceSpaces::label_src_vertno_sel(const FsLabel &p_label, Ve
 //    else if (p_label.hemi == 2) //both
 //    {
 //        VectorXi src_sel_lh, src_sel_rh;
-//        VectorXi vertno_sel_lh = MNEMath::intersect(vertno[0], p_label.vertices[0], src_sel_lh);
-//        VectorXi vertno_sel_rh = MNEMath::intersect(vertno[1], p_label.vertices[1], src_sel_rh);
+//        VectorXi vertno_sel_lh = Linalg::intersect(vertno[0], p_label.vertices[0], src_sel_lh);
+//        VectorXi vertno_sel_rh = Linalg::intersect(vertno[1], p_label.vertices[1], src_sel_rh);
 //        src_sel.resize(src_sel_lh.size() + src_sel_rh.size());
 //        src_sel.block(0,0,src_sel_lh.size(),1) = src_sel_lh;
 //        src_sel.block(src_sel_lh.size(),0,src_sel_rh.size(),1) = src_sel_rh;
@@ -192,7 +192,7 @@ MNESourceSpaces MNESourceSpaces::pick_regions(const QList<FsLabel> &p_qListLabel
             {
                 VectorXi currentSelection;
 
-                MNEMath::intersect(origSpace.vertno, p_qListLabels[i].vertices, currentSelection);
+                Linalg::intersect(origSpace.vertno, p_qListLabels[i].vertices, currentSelection);
 
                 selVertices.conservativeResize(iSize+currentSelection.size());
                 selVertices.block(iSize,0,currentSelection.size(),1) = currentSelection;
@@ -200,7 +200,7 @@ MNESourceSpaces MNESourceSpaces::pick_regions(const QList<FsLabel> &p_qListLabel
             }
         }
 
-        MNEMath::sort(selVertices, false);
+        Linalg::sort(selVertices, false);
 
         VectorXi newVertno(selVertices.size());
 
@@ -223,7 +223,7 @@ MNESourceSpaces MNESourceSpaces::pick_regions(const QList<FsLabel> &p_qListLabel
         {
             VectorXi tri_dim = origSpace.use_itris.col(i);
             VectorXi idx_dim;
-            MNEMath::intersect(tri_dim, newVertno, idx_dim);
+            Linalg::intersect(tri_dim, newVertno, idx_dim);
 
             for(qint32 j = 0; j < idx_dim.size(); ++j)
                 idx_select[idx_dim[j]] = 1;

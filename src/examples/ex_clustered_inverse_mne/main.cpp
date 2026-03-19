@@ -50,7 +50,7 @@
 #include <disp3D_rhi/view/brainview.h>
 #include <disp3D_rhi/model/braintreemodel.h>
 
-#include <math/mnemath.h>
+#include <math/linalg.h>
 #include <utils/generics/applicationlogger.h>
 
 #include <iostream>
@@ -243,8 +243,8 @@ int main(int argc, char *argv[])
 
     VectorXd s;
 
-    double t_dConditionNumber = MNEMath::getConditionNumber(t_Fwd.sol->data, s);
-    double t_dConditionNumberClustered = MNEMath::getConditionNumber(t_clusteredFwd.sol->data, s);
+    double t_dConditionNumber = Linalg::getConditionNumber(t_Fwd.sol->data, s);
+    double t_dConditionNumberClustered = Linalg::getConditionNumber(t_clusteredFwd.sol->data, s);
 
     std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
     std::cout << "Clustered Condition Number:\n" << t_dConditionNumberClustered << std::endl;
@@ -253,14 +253,14 @@ int main(int argc, char *argv[])
 
     std::cout << "Clustered ForwardSolution" << t_clusteredFwd.sol->data.block(0,0,10,10) << std::endl;
 
-//    double t_dConditionNumberMags = MNEMath::getConditionNumber(mags, s);
-//    double t_dConditionNumberMagsClustered = MNEMath::getConditionNumber(magsClustered, s);
+//    double t_dConditionNumberMags = Linalg::getConditionNumber(mags, s);
+//    double t_dConditionNumberMagsClustered = Linalg::getConditionNumber(magsClustered, s);
 
 //    std::cout << "Condition Number Magnetometers:\n" << t_dConditionNumberMags << std::endl;
 //    std::cout << "Clustered Condition Number Magnetometers:\n" << t_dConditionNumberMagsClustered << std::endl;
 
-//    double t_dConditionNumberGrads = MNEMath::getConditionNumber(grads, s);
-//    double t_dConditionNumberGradsClustered = MNEMath::getConditionNumber(gradsClustered, s);
+//    double t_dConditionNumberGrads = Linalg::getConditionNumber(grads, s);
+//    double t_dConditionNumberGradsClustered = Linalg::getConditionNumber(gradsClustered, s);
 
 //    std::cout << "Condition Number Gradiometers:\n" << t_dConditionNumberGrads << std::endl;
 //    std::cout << "Clustered Condition Number Gradiometers:\n" << t_dConditionNumberGradsClustered << std::endl;

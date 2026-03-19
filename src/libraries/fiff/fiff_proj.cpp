@@ -44,7 +44,7 @@
 #include "fiff_file.h"
 #include <stdio.h>
 #include <cmath>
-#include <math/mnemath.h>
+#include <math/linalg.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -259,7 +259,7 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     //Sort singular values and singular vectors
     VectorXd S = svd.singularValues();
     MatrixXd t_U = svd.matrixU();
-    MNEMath::sort<double>(S, t_U);
+    Linalg::sort<double>(S, t_U);
 
     //
     //   Throw away the linearly dependent guys

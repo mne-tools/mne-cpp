@@ -58,7 +58,7 @@
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_raw_data.h>
 
-#include <math/mnemath.h>
+#include <math/linalg.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -102,7 +102,7 @@ public:
      *
      * ### MNE toolbox root function ###
      *
-     * Wrapper for the MNEMath::combine_xyz static function
+     * Wrapper for the Linalg::combine_xyz static function
      *
      * Compute the three Cartesian components of a vector together
      *
@@ -112,7 +112,7 @@ public:
      */
     inline static Eigen::VectorXd combine_xyz(const Eigen::VectorXd& vec)
     {
-        return UTILSLIB::MNEMath::combine_xyz(vec);
+        return UTILSLIB::Linalg::combine_xyz(vec);
     }
 
     //=========================================================================================================
@@ -159,7 +159,7 @@ public:
      *
      * ### MNE toolbox root function ###
      *
-     * Wrapper for the MNEMath::make_block_diag static function
+     * Wrapper for the Linalg::make_block_diag static function
      *
      * Make a sparse block diagonal matrix
      *
@@ -174,7 +174,7 @@ public:
      */
     static inline Eigen::SparseMatrix<double> make_block_diag(const Eigen::MatrixXd &A, qint32 n)
     {
-        return UTILSLIB::MNEMath::make_block_diag(A, n);
+        return UTILSLIB::Linalg::make_block_diag(A, n);
     }
 
     //=========================================================================================================

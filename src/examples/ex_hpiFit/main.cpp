@@ -48,7 +48,6 @@
 
 #include <utils/ioutils.h>
 #include <utils/generics/applicationlogger.h>
-#include <math/mnemath.h>
 
 #include <fwd/fwd_coil_set.h>
 
@@ -262,7 +261,7 @@ int main(int argc, char *argv[])
         InvHpiFit::storeHeadPosition(vecTime(i), hpiFitResult.devHeadTrans.trans, matPosition, hpiFitResult.GoF, hpiFitResult.errorDistances);
         matPosition(i,9) = fTimer;
         // if big head displacement occures, update debHeadTrans
-        if(MNEMath::compareTransformation(transDevHead.trans, hpiFitResult.devHeadTrans.trans, fThreshRot, fThreshTrans)) {
+        if(InvHpiFit::compareTransformation(transDevHead.trans, hpiFitResult.devHeadTrans.trans, fThreshRot, fThreshTrans)) {
             transDevHead = hpiFitResult.devHeadTrans;
             qInfo() << "dev_head_t has been updated.";
         }

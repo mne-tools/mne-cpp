@@ -44,7 +44,7 @@
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_info.h>
 
-#include <math/mnemath.h>
+#include <math/numerics.h>
 #include <utils/ioutils.h>
 
 #include <dsp/sphara.h>
@@ -1129,7 +1129,7 @@ void RtFiffRawViewModel::filterDataBlock()
     QList<FilterKernel> tempFilterList;
 
     int fftLength = m_matDataRaw.row(0).cols() + 4 * m_iMaxFilterLength;
-    int exp = ceil(MNEMath::log2(fftLength));
+    int exp = ceil(Numerics::log2(fftLength));
     fftLength = pow(2, exp) < 512 ? 512 : pow(2, exp);
 
     for(int i = 0; i<m_filterKernel.size(); ++i) {

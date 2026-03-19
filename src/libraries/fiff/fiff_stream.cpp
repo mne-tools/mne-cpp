@@ -56,7 +56,8 @@
 #include "fiff_digitizer_data.h"
 #include "fiff_dig_point.h"
 
-#include <math/mnemath.h>
+#include <math/linalg.h>
+#include <math/numerics.h>
 #include <utils/ioutils.h>
 
 #include <iostream>
@@ -655,7 +656,7 @@ bool FiffStream::read_cov(const FiffDirNode::SPtr& p_Node, fiff_int_t cov_kind, 
                     return false;
                 }
 
-                if(!MNEMath::issparse(vals))
+                if(!Numerics::issparse(vals))
                 {
                     //
                     //   Lower diagonal is stored
@@ -2832,7 +2833,7 @@ fiff_long_t FiffStream::write_float_sparse_ccs(fiff_int_t kind, const SparseMatr
         for (SparseMatrix<float>::InnerIterator it(mat,k); it; ++it)
             s.push_back(T(it.row(), it.col(), it.value()));
 
-    s = MNEMath::sortrows<float>(s, 1);
+    s = Linalg::sortrows<float>(s, 1);
 
     //[ rows, starts ] = unique(s(:,1),'first');
     std::vector<qint32> cols, starts;
@@ -2925,7 +2926,7 @@ fiff_long_t FiffStream::write_float_sparse_rcs(fiff_int_t kind, const SparseMatr
         for (SparseMatrix<float>::InnerIterator it(mat,k); it; ++it)
             s.push_back(T(it.row(), it.col(), it.value()));
 
-    s = MNEMath::sortrows<float>(s);
+    s = Linalg::sortrows<float>(s);
 
     //[ rows, starts ] = unique(s(:,1),'first');
     std::vector<qint32> rows, starts;

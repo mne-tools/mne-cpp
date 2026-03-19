@@ -3,13 +3,14 @@
  * @file     inv_hpi_fit.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Ruben Dörfel <doerfelruben@aol.com>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     March, 2017
  *
  * @section  LICENSE
  *
- * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen. All rights reserved.
+ * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -54,6 +55,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -208,6 +210,23 @@ public:
                                   Eigen::MatrixXd& matPosition,
                                   const Eigen::VectorXd& vecGoF,
                                   const QVector<double>& vecError);
+
+    //=========================================================================================================
+    /**
+     * Compares two 4x4 transformation matrices by evaluating their rotation
+     * and translation differences against given thresholds.
+     *
+     * @param[in]   mDevHeadT      The first transformation matrix.
+     * @param[in]   mDevHeadDest   The second (destination) transformation matrix.
+     * @param[in]   fThreshRot     The rotation threshold in degrees.
+     * @param[in]   fThreshTrans   The translation threshold in meters.
+     *
+     * @return True if the movement exceeds either threshold.
+     */
+    static bool compareTransformation(const Eigen::MatrixX4f& mDevHeadT,
+                                      const Eigen::MatrixX4f& mDevHeadDest,
+                                      const float& fThreshRot,
+                                      const float& fThreshTrans);
 
 private:
 

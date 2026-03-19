@@ -43,7 +43,7 @@
 #include "fiff_tag.h"
 #include "fiff_dir_node.h"
 
-#include <math/mnemath.h>
+#include <math/numerics.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -576,6 +576,6 @@ void FiffEvoked::applyBaselineCorrection(QPair<float, float>& p_baseline)
 
     // Run baseline correction
     printf("Applying baseline correction ... (mode: mean)\n");
-    this->data = MNEMath::rescale(this->data, this->times, p_baseline, QString("mean"));
+    this->data = Numerics::rescale(this->data, this->times, p_baseline, QString("mean"));
     this->baseline = p_baseline;
 }

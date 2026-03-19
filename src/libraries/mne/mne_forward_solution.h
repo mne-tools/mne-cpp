@@ -45,7 +45,6 @@
 
 #include <mne/mne_source_spaces.h>
 
-#include <math/mnemath.h>
 #include <math/kmeans.h>
 
 #include <fs/fs_annotationset.h>

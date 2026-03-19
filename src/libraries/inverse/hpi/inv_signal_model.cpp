@@ -38,7 +38,7 @@
 
 #include "inv_hpi_model_parameters.h"
 #include "inv_signal_model.h"
-#include <math/mnemath.h>
+#include <math/linalg.h>
 #include <iostream>
 
 //=============================================================================================================
@@ -155,7 +155,7 @@ void InvSignalModel::computeInverseBasicModel()
         matSimsig.col(i) = sin(2*M_PI*m_modelParameters.vecHpiFreqs()[i]*vecTime.array());
         matSimsig.col(i+iNumCoils) = cos(2*M_PI*m_modelParameters.vecHpiFreqs()[i]*vecTime.array());
     }
-    m_matInverseSignalModel = UTILSLIB::MNEMath::pinv(matSimsig);
+    m_matInverseSignalModel = UTILSLIB::Linalg::pinv(matSimsig);
 }
 
 //=============================================================================================================
@@ -179,6 +179,6 @@ void InvSignalModel::computeInverseAdvancedModel()
     }
     matSimsig.col(iNumCoils*4) = RowVectorXd::LinSpaced(m_iCurrentModelCols, -0.5, 0.5);
     matSimsig.col(iNumCoils*4+1).fill(1);
-    matSimsigInvTemp = UTILSLIB::MNEMath::pinv(matSimsig);
+    matSimsigInvTemp = UTILSLIB::Linalg::pinv(matSimsig);
     m_matInverseSignalModel = matSimsigInvTemp.block(0,0,iNumCoils*2,m_iCurrentModelCols);
 }

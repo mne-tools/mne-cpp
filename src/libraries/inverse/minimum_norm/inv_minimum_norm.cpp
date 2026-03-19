@@ -42,6 +42,7 @@
 
 #include <inverse/inv_source_estimate.h>
 #include <fiff/fiff_evoked.h>
+#include <math/linalg.h>
 
 #include <iostream>
 
@@ -147,7 +148,7 @@ InvSourceEstimate InvMinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoke
 //        MatrixXd sol1(sol.rows()/3,sol.cols());
 //        for(qint32 i = 0; i < sol.cols(); ++i)
 //        {
-//            VectorXd* tmp = MNEMath::combine_xyz(sol.block(0,i,sol.rows(),1));
+//            VectorXd* tmp = Linalg::combine_xyz(sol.block(0,i,sol.rows(),1));
 //            sol1.block(0,i,sol.rows()/3,1) = tmp->cwiseSqrt();
 //            delete tmp;
 //        }
@@ -202,7 +203,7 @@ InvSourceEstimate InvMinimumNorm::calculateInverse(const MatrixXd &data, float t
         MatrixXd sol1(sol.rows()/3,sol.cols());
         for(qint32 i = 0; i < sol.cols(); ++i)
         {
-            VectorXd tmp = MNEMath::combine_xyz(sol.col(i));
+            VectorXd tmp = Linalg::combine_xyz(sol.col(i));
             sol1.block(0,i,sol.rows()/3,1) = tmp.cwiseSqrt();
         }
         sol.resize(sol1.rows(),sol1.cols());

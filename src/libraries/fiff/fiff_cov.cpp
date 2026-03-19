@@ -45,7 +45,7 @@
 #include "fiff_dir_node.h"
 #include "fiff_file.h"
 
-#include <math/mnemath.h>
+#include <math/linalg.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -273,7 +273,7 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
         for(qint32 i = 0; i < count; ++i)
             for(qint32 j = 0; j < count; ++j)
                 C_meg(i,j) = C(C_meg_idx(i), C_meg_idx(j));
-        MNEMath::get_whitener(C_meg, false, QString("MEG"), C_meg_eig, C_meg_eigvec);
+        Linalg::get_whitener(C_meg, false, QString("MEG"), C_meg_eig, C_meg_eigvec);
     }
 
     if (has_eeg)
@@ -283,7 +283,7 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
         for(qint32 i = 0; i < count; ++i)
             for(qint32 j = 0; j < count; ++j)
                 C_eeg(i,j) = C(C_eeg_idx(i), C_eeg_idx(j));
-        MNEMath::get_whitener(C_eeg, false, QString("EEG"), C_eeg_eig, C_eeg_eigvec);
+        Linalg::get_whitener(C_eeg, false, QString("EEG"), C_eeg_eig, C_eeg_eigvec);
     }
 
     qint32 n_chan = p_ChNames.size();
@@ -429,7 +429,7 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
                 //Sort singular values and singular vectors
                 VectorXd t_s = svd.singularValues();
                 MatrixXd t_U = svd.matrixU();
-                MNEMath::sort<double>(t_s, t_U);
+                Linalg::sort<double>(t_s, t_U);
 
                 U = t_U.block(0,0, t_U.rows(), t_U.cols()-ncomp);
 

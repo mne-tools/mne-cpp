@@ -48,7 +48,6 @@
 #include <fiff/fiff.h>
 
 #include <dsp/filterkernel.h>
-#include <math/mnemath.h>
 
 #include <dsp/rt_filter.h>
 

@@ -66,7 +66,7 @@
 #include <disp3D_rhi/view/brainview.h>
 #include <disp3D_rhi/model/braintreemodel.h>
 
-#include <math/mnemath.h>
+#include <math/linalg.h>
 #include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
@@ -549,7 +549,7 @@ int main(int argc, char *argv[])
 
     VectorXd s;
 
-    double t_dConditionNumber = MNEMath::getConditionNumber(t_Fwd.sol->data, s);
+    double t_dConditionNumber = Linalg::getConditionNumber(t_Fwd.sol->data, s);
 
     std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
     std::cout << "ForwardSolution" << t_Fwd.sol->data.block(0,0,10,10) << std::endl;

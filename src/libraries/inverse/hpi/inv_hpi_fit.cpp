@@ -3,13 +3,14 @@
  * @file     inv_hpi_fit.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Ruben Dörfel <doerfelruben@aol.com>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     March, 2017
  *
  * @section  LICENSE
  *
- * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen. All rights reserved.
+ * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -46,8 +47,9 @@
 #include "inv_hpi_model_parameters.h"
 
 #include <utils/ioutils.h>
-#include <math/mnemath.h>
 
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include <iostream>
 #include <vector>
 #include <numeric>
@@ -547,5 +549,44 @@ void InvHpiFit::storeHeadPosition(float fTime,
     matPosition(matPosition.rows()-1,7) = vecGoF.mean();
     matPosition(matPosition.rows()-1,8) = dError;
     matPosition(matPosition.rows()-1,9) = 0;
+}
+
+//=============================================================================================================
+
+bool InvHpiFit::compareTransformation(const MatrixX4f& mDevHeadT,
+                                      const MatrixX4f& mDevHeadDest,
+                                      const float& fThreshRot,
+                                      const float& fThreshTrans)
+{
+    bool bState = false;
+
+    Matrix3f mRot = mDevHeadT.block(0,0,3,3);
+    Matrix3f mRotDest = mDevHeadDest.block(0,0,3,3);
+
+    VectorXf vTrans = mDevHeadT.block(0,3,3,1);
+    VectorXf vTransDest = mDevHeadDest.block(0,3,3,1);
+
+    Quaternionf quat(mRot);
+    Quaternionf quatNew(mRotDest);
+
+    // Compare Rotation
+    float fAngle = quat.angularDistance(quatNew);
+    fAngle = fAngle * 180 / M_PI;
+
+    // Compare translation
+    float fMove = (vTrans-vTransDest).norm();
+
+    // compare to thresholds and update
+    if(fMove > fThreshTrans) {
+        qInfo() << "Large movement: " << fMove*1000 << "mm";
+        bState = true;
+    } else if (fAngle > fThreshRot) {
+        qInfo() << "Large rotation: " << fAngle << "degree";
+        bState = true;
+    } else {
+        bState = false;
+    }
+
+    return bState;
 }
 
