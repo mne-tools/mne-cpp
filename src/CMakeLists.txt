@@ -62,10 +62,9 @@ if(USE_FFTW)
   set(EIGEN_FFTW_DEFAULT)
 endif()
 
-if(WITH_CODE_COV)
-  add_compile_options("--coverage" "-O1" "-g")
-  add_link_options("--coverage")
-endif()
+# NOTE: WITH_CODE_COV coverage flags are applied only to library targets
+# (in src/libraries/CMakeLists.txt) so that gcov data is generated
+# exclusively for libraries, keeping Codecov reports focused.
 
 if(MSVC)
   add_compile_options(/EHsc /MP)
