@@ -65,7 +65,7 @@ set(MNE_LIBS_REQUIRED
     mne_fwd
     mne_inv
     mne_dsp
-    mne_connectivity
+    mne_conn
     mne_events
 )
 

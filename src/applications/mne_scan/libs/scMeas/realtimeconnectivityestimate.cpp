@@ -38,7 +38,7 @@
 
 #include "realtimeconnectivityestimate.h"
 
-#include <connectivity/network/network.h>
+#include <conn/network/network.h>
 
 #include <mne/mne_forward_solution.h>
 
@@ -56,7 +56,7 @@
 //=============================================================================================================
 
 using namespace SCMEASLIB;
-using namespace CONNECTIVITYLIB;
+using namespace CONNLIB;
 using namespace MNELIB;
 using namespace FSLIB;
 

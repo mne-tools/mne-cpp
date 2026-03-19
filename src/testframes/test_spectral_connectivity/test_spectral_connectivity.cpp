@@ -41,17 +41,17 @@
 #include <utils/generics/applicationlogger.h>
 
 #include <utils/ioutils.h>
-#include <connectivity/metrics/coherency.h>
-#include <connectivity/metrics/coherence.h>
-#include <connectivity/metrics/imagcoherence.h>
-#include <connectivity/metrics/phaselockingvalue.h>
-#include <connectivity/metrics/phaselagindex.h>
-#include <connectivity/metrics/unbiasedsquaredphaselagindex.h>
-#include <connectivity/metrics/weightedphaselagindex.h>
-#include <connectivity/metrics/debiasedsquaredweightedphaselagindex.h>
-#include <connectivity/metrics/crosscorrelation.h>
-#include <connectivity/connectivitysettings.h>
-#include <connectivity/network/network.h>
+#include <conn/metrics/coherency.h>
+#include <conn/metrics/coherence.h>
+#include <conn/metrics/imagcoherence.h>
+#include <conn/metrics/phaselockingvalue.h>
+#include <conn/metrics/phaselagindex.h>
+#include <conn/metrics/unbiasedsquaredphaselagindex.h>
+#include <conn/metrics/weightedphaselagindex.h>
+#include <conn/metrics/debiasedsquaredweightedphaselagindex.h>
+#include <conn/metrics/crosscorrelation.h>
+#include <conn/connectivitysettings.h>
+#include <conn/network/network.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -70,7 +70,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace CONNECTIVITYLIB;
+using namespace CONNLIB;
 using namespace UTILSLIB;
 
 //=============================================================================================================

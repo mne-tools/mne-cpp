@@ -54,7 +54,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNLIB {
     class Network;
 }
 
@@ -179,7 +179,7 @@ public:
      *
      * @param[in] v the value which is attached to the sample array vector.
      */
-    virtual void setValue(const CONNECTIVITYLIB::Network &v);
+    virtual void setValue(const CONNLIB::Network &v);
 
     //=========================================================================================================
     /**
@@ -188,7 +188,7 @@ public:
      *
      * @return the last attached value.
      */
-    virtual QSharedPointer<CONNECTIVITYLIB::Network>& getValue();
+    virtual QSharedPointer<CONNLIB::Network>& getValue();
 
     //=========================================================================================================
     /**
@@ -224,7 +224,7 @@ private:
     QSharedPointer<MNELIB::MNEForwardSolution>  m_pFwdSolution;     /**< Forward solution. Needed for visualization. */
     QSharedPointer<MNELIB::MNEBem>              m_pSensorSurface;   /**< The sensor surface. Needed for visualization. */
 
-    QSharedPointer<CONNECTIVITYLIB::Network>    m_pNetwork;         /**< The network/connectivity estimate. */
+    QSharedPointer<CONNLIB::Network>    m_pNetwork;         /**< The network/connectivity estimate. */
     bool                                        m_bInitialized;     /**< Is initialized. */
 };
 

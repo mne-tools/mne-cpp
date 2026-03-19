@@ -47,9 +47,9 @@
 #include <disp3D_rhi/model/braintreemodel.h>
 #include <disp3D_rhi/model/items/networktreeitem.h>
 
-#include <connectivity/connectivity.h>
-#include <connectivity/connectivitysettings.h>
-#include <connectivity/network/network.h>
+#include <conn/connectivity.h>
+#include <conn/connectivitysettings.h>
+#include <conn/network/network.h>
 
 #include <fiff/fiff_raw_data.h>
 
@@ -94,7 +94,7 @@ using namespace DISPLIB;
 using namespace INVLIB;
 using namespace Eigen;
 using namespace FIFFLIB;
-using namespace CONNECTIVITYLIB;
+using namespace CONNLIB;
 using namespace Eigen;
 using namespace UTILSLIB;
 using namespace MNELIB;

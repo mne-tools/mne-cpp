@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "dsp_global.h"
-#include <connectivity/network/network.h>
+#include <conn/network/network.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -61,7 +61,7 @@ namespace FIFFLIB {
     class FiffInfo;
 }
 
-namespace CONNECTIVITYLIB {
+namespace CONNLIB {
     class ConnectivitySettings;
 }
 
@@ -73,7 +73,7 @@ namespace RTPROCESSINGLIB
 {
 
 //=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
+// CONNLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -93,10 +93,10 @@ public:
      *
      * @param[in] connectivitySettings           The connectivity settings to be used during connectivity estimation.
      */
-    void doWork(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
+    void doWork(const CONNLIB::ConnectivitySettings& connectivitySettings);
 
 signals:
-    void resultReady(const  QList<CONNECTIVITYLIB::Network>& connectivityResults, const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
+    void resultReady(const  QList<CONNLIB::Network>& connectivityResults, const CONNLIB::ConnectivitySettings& connectivitySettings);
 };
 
 //=============================================================================================================
@@ -133,7 +133,7 @@ public:
      *
      * @param[in] data  Data to estimate the connectivity from.
      */
-    void append(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
+    void append(const CONNLIB::ConnectivitySettings& connectivitySettings);
 
     //=========================================================================================================
     /**
@@ -151,9 +151,9 @@ protected:
     QThread             m_workerThread;         /**< The worker thread. */
 
 signals:
-    void newConnectivityResultAvailable(const QList<CONNECTIVITYLIB::Network>& connectivityResults, const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
+    void newConnectivityResultAvailable(const QList<CONNLIB::Network>& connectivityResults, const CONNLIB::ConnectivitySettings& connectivitySettings);
 
-    void operate(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
+    void operate(const CONNLIB::ConnectivitySettings& connectivitySettings);
 };
 
 //=============================================================================================================

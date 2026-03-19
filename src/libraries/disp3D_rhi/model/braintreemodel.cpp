@@ -234,7 +234,7 @@ void BrainTreeModel::addDigitizerData(const QList<FIFFLIB::FiffDigPoint> &digiti
 
 //=============================================================================================================
 
-NetworkTreeItem* BrainTreeModel::addNetwork(const CONNECTIVITYLIB::Network &network, const QString &name)
+NetworkTreeItem* BrainTreeModel::addNetwork(const CONNLIB::Network &network, const QString &name)
 {
     QString displayName = name;
     if (displayName.isEmpty()) {

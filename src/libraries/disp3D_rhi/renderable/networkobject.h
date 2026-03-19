@@ -47,7 +47,7 @@
 #include <vector>
 #include <memory>
 
-#include <connectivity/network/network.h>
+#include <conn/network/network.h>
 
 // Forward-declare QRhi types so that this header stays QRhi-free
 class QRhi;
@@ -83,7 +83,7 @@ public:
      * @param[in] network       The connectivity network to visualize.
      * @param[in] sColormap     Colormap name for weight-based coloring (e.g. "Viridis", "Hot").
      */
-    void load(const CONNECTIVITYLIB::Network &network, const QString &sColormap = "Viridis");
+    void load(const CONNLIB::Network &network, const QString &sColormap = "Viridis");
 
     //=========================================================================================================
     /**
@@ -165,7 +165,7 @@ private:
     void buildEdgeInstances();
 
     // ── Network data ────────────────────────────────────────────────────
-    CONNECTIVITYLIB::Network m_network;
+    CONNLIB::Network m_network;
     QString m_colormap = "Viridis";
 
     // ── Node GPU resources ──────────────────────────────────────────────
