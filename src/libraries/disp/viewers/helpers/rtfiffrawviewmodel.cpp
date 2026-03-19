@@ -44,11 +44,11 @@
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_info.h>
 
-#include <utils/mnemath.h>
+#include <math/mnemath.h>
 #include <utils/ioutils.h>
 
-#include <utils/sphara.h>
-#include <rtprocessing/detecttrigger.h>
+#include <dsp/sphara.h>
+#include <dsp/rt_detect_trigger.h>
 
 //=============================================================================================================
 // QT INCLUDES

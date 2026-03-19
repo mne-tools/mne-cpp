@@ -39,7 +39,7 @@
 
 #include <fiff/fiff.h>
 
-#include <utils/spectrogram.h>
+#include <dsp/spectrogram.h>
 #include <utils/generics/applicationlogger.h>
 
 #include <disp/plots/tfplot.h>

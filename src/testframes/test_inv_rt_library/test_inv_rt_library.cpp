@@ -1,5 +1,5 @@
 //=============================================================================================================
-// test_inv_rt_library.cpp — Tests for the Inverse and RT Processing libraries
+// test_inv_rt_library.cpp -- Tests for the Inverse and RT Processing libraries
 //
 // Covers: InvDipoleFitSettings, InvRapMusic, InvDipole, InvDipolePair,
 //         RtConnectivity, RtHpi, RtInvOp, RtAveraging, RtNoise, filterFile
@@ -34,13 +34,13 @@
 #include <inverse/hpi/inv_hpi_fit_data.h>
 #include <inverse/hpi/inv_signal_model.h>
 
-#include <rtprocessing/rtconnectivity.h>
-#include <rtprocessing/rthpis.h>
-#include <rtprocessing/rtinvop.h>
-#include <rtprocessing/rtaveraging.h>
-#include <rtprocessing/rtnoise.h>
-#include <rtprocessing/filter.h>
-#include <rtprocessing/helpers/filterkernel.h>
+#include <dsp/rt_connectivity.h>
+#include <dsp/rt_hpis.h>
+#include <dsp/rt_inv_op.h>
+#include <dsp/rt_averaging.h>
+#include <dsp/rt_noise.h>
+#include <dsp/rt_filter.h>
+#include <dsp/filterkernel.h>
 
 #include <connectivity/connectivitysettings.h>
 
@@ -48,6 +48,7 @@ using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace INVLIB;
 using namespace RTPROCESSINGLIB;
+using namespace UTILSLIB;
 using namespace CONNECTIVITYLIB;
 using namespace Eigen;
 
@@ -68,66 +69,66 @@ private slots:
     void initTestCase();
     void cleanupTestCase();
 
-    // ── Inverse: InvDipoleFitSettings ──
+    // ---- Inverse: InvDipoleFitSettings ----
     void dipoleFitSettings_defaultCtor();
     void dipoleFitSettings_cliParsing();
 
-    // ── Inverse: InvRapMusic ──
+    // ---- Inverse: InvRapMusic ----
     void rapMusic_defaultCtorAndBasics();
     void rapMusic_mathHelpers();
 
-    // ── Inverse: InvDipole ──
+    // ---- Inverse: InvDipole ----
     void dipole_fullExercise();
 
-    // ── RT Processing: RtConnectivity ──
+    // ---- RT Processing: RtConnectivity ----
     void rtConnectivity_lifecycle();
 
-    // ── RT Processing: RtHpi ──
+    // ---- RT Processing: RtHpi ----
     void rtHpi_lifecycle();
 
-    // ── RT Processing: RtInvOp ──
+    // ---- RT Processing: RtInvOp ----
     void rtInvOp_lifecycle();
 
-    // ── RT Processing: RtAveraging ──
+    // ---- RT Processing: RtAveraging ----
     void rtAveraging_moreWorkerOps();
 
-    // ── RT Processing: RtNoise ──
+    // ---- RT Processing: RtNoise ----
     void rtNoise_hanningWindow();
     void rtNoise_lifecycle();
 
-    // ── RT Processing: filterFile ──
+    // ---- RT Processing: filterFile ----
     void rtprocessing_filterFile();
 
-    // ── HPI Fit (from boost) ──
+    // ---- HPI Fit (from boost) ----
     void hpiFit_constructWithSensorSet();
     void hpiFit_storeHeadPosition();
     void hpiFit_fitWithSyntheticData();
     void hpiFitData_defaultConstruction();
     void hpiFitData_setMembersAndFit();
 
-    // ── InvHpiModelParameters (from boost) ──
+    // ---- InvHpiModelParameters (from boost) ----
     void hpiModelParams_construction();
     void hpiModelParams_copyAndCompare();
 
-    // ── InvSignalModel (from boost) ──
+    // ---- InvSignalModel (from boost) ----
     void signalModel_construction();
 
-    // ── FilterKernel (from boost) ──
+    // ---- FilterKernel (from boost) ----
     void filterKernel_design_lpf();
     void filterKernel_design_hpf();
     void filterKernel_design_bpf();
 
-    // ── Filter apply (from boost) ──
+    // ---- Filter apply (from boost) ----
     void filter_applyToRawData();
     void filter_applyWithChannelSelection();
 
-    // ── RtNoise extras (from coverage_push) ──
+    // ---- RtNoise extras (from coverage_push) ----
     void rtNoise_appendData();
 
-    // ── RtAveragingWorker extras (from coverage_push) ──
+    // ---- RtAveragingWorker extras (from coverage_push) ----
     void rtAveragingWorker_doWork();
 
-    // ── FilterOverlapAdd (from coverage_push) ──
+    // ---- FilterOverlapAdd (from coverage_push) ----
     void filterOverlapAdd_calculate();
     void filterData_paramOverload();
 };

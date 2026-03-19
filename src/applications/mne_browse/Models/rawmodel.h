@@ -107,7 +107,7 @@
 #include <fiff/fiff.h>
 #include <fiff/fiff_io.h>
 #include <mne/mne.h>
-#include <rtprocessing/helpers/parksmcclellan.h>
+#include <dsp/parksmcclellan.h>
 
 
 //*************************************************************************************************************

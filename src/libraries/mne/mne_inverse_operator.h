@@ -52,7 +52,7 @@
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_info.h>
 
-#include <utils/mnemath.h>
+#include <math/mnemath.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES

@@ -47,7 +47,7 @@
 
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-#include <utils/mnemath.h>
+#include <math/mnemath.h>
 #include <utils/generics/applicationlogger.h>
 
 #include <disp/plots/bar.h>

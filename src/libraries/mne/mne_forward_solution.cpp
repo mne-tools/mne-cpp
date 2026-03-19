@@ -41,8 +41,6 @@
 
 #include "mne_forward_solution.h"
 
-#include <utils/ioutils.h>
-
 #include <fiff/fiff.h>
 #include <fiff/fiff_coord_trans.h>
 
@@ -60,22 +58,73 @@
 #include <fs/fs_colortable.h>
 #include <fs/fs_label.h>
 #include <fs/fs_surfaceset.h>
-#include <utils/mnemath.h>
-#include <utils/kmeans.h>
+#include <math/mnemath.h>
+#include <math/kmeans.h>
 
 #include <algorithm>
 #include <QtConcurrent>
 #include <QFuture>
+#include <QRegularExpression>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace MNELIB;
-using namespace UTILSLIB;
 using namespace FSLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 using namespace FIFFLIB;
+
+//=============================================================================================================
+
+namespace {
+
+bool check_matching_chnames_conventions(const QStringList& chNamesA, const QStringList& chNamesB, bool bCheckForNewNamingConvention = false)
+{
+    bool bMatching = false;
+
+    if(chNamesA.isEmpty()) {
+        qWarning("Warning in check_matching_chnames_conventions - chNamesA list is empty. Nothing to compare");
+    }
+    if(chNamesB.isEmpty()) {
+        qWarning("Warning in check_matching_chnames_conventions - chNamesB list is empty. Nothing to compare");
+    }
+
+    QString replaceStringOldConv, replaceStringNewConv;
+
+    for(int i = 0; i < chNamesA.size(); ++i) {
+        if(chNamesB.contains(chNamesA.at(i))) {
+            bMatching = true;
+        } else if(bCheckForNewNamingConvention) {
+            replaceStringNewConv = chNamesA.at(i);
+            replaceStringNewConv.replace(" ","");
+
+            if(chNamesB.contains(replaceStringNewConv)) {
+                bMatching = true;
+            } else {
+                QRegularExpression xRegExp("[0-9]{1,100}");
+                QRegularExpressionMatch match = xRegExp.match(chNamesA.at(i));
+                QStringList xList = match.capturedTexts();
+
+                for(int k = 0; k < xList.size(); ++k) {
+                    replaceStringOldConv = chNamesA.at(i);
+                    replaceStringOldConv.replace(xList.at(k),QString("%1%2").arg(" ").arg(xList.at(k)));
+
+                    if(chNamesB.contains(replaceStringNewConv) || chNamesB.contains(replaceStringOldConv)) {
+                        bMatching = true;
+                    } else {
+                        bMatching = false;
+                    }
+                }
+            }
+        }
+    }
+
+    return bMatching;
+}
+
+} // anonymous namespace
 
 //=============================================================================================================
 // CONSTANTS
@@ -399,8 +448,8 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
     MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
 
     //Check if cov naming conventions are matching
-    if(!IOUtils::check_matching_chnames_conventions(p_pNoise_cov.names, p_pInfo.ch_names) && !p_pNoise_cov.names.isEmpty() && !p_pInfo.ch_names.isEmpty()) {
-        if(IOUtils::check_matching_chnames_conventions(p_pNoise_cov.names, p_pInfo.ch_names, true)) {
+    if(!check_matching_chnames_conventions(p_pNoise_cov.names, p_pInfo.ch_names) && !p_pNoise_cov.names.isEmpty() && !p_pInfo.ch_names.isEmpty()) {
+        if(check_matching_chnames_conventions(p_pNoise_cov.names, p_pInfo.ch_names, true)) {
             qWarning("MNEForwardSolution::cluster_forward_solution - Cov names do match with info channel names but have a different naming convention.");
             //return p_fwdOut;
         } else {

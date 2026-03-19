@@ -40,7 +40,7 @@
 
 #include "mne_epoch_data.h"
 
-#include <utils/mnemath.h>
+#include <math/mnemath.h>
 
 //=============================================================================================================
 // USED NAMESPACES

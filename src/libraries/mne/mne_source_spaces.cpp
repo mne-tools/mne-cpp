@@ -41,7 +41,7 @@
 #include "mne_source_spaces.h"
 #include "mne_nearest.h"
 
-#include <utils/mnemath.h>
+#include <math/mnemath.h>
 #include <fs/fs_label.h>
 
 #include <iostream>

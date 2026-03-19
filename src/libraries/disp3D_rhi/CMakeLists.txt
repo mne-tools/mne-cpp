@@ -132,6 +132,7 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt6::")
 
 set(MNE_LIBS_REQUIRED
     mne_utils
+    mne_math
     mne_fiff
     mne_fs
     mne_mne

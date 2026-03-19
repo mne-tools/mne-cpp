@@ -52,7 +52,7 @@
 #include <disp/viewers/scalingview.h>
 #include <disp/viewers/helpers/selectionsceneitem.h>
 
-#include <rtprocessing/helpers/filterkernel.h>
+#include <dsp/filterkernel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -68,6 +68,7 @@ using namespace RAWDATAVIEWERPLUGIN;
 using namespace ANSHAREDLIB;
 using namespace DISPLIB;
 using namespace RTPROCESSINGLIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

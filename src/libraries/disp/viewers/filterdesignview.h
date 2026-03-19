@@ -43,7 +43,7 @@
 #include "../disp_global.h"
 #include "abstractview.h"
 
-#include <rtprocessing/helpers/filterkernel.h>
+#include <dsp/filterkernel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -172,7 +172,7 @@ public:
      *
      * @return returns the current filter.
      */
-    RTPROCESSINGLIB::FilterKernel getCurrentFilter();
+    UTILSLIB::FilterKernel getCurrentFilter();
 
     //=========================================================================================================
     /**
@@ -319,13 +319,13 @@ protected:
      *
      * @param[in] filter   filter which parameters will be used to update gui and stored filter.
      */
-    void updateGuiFromFilter(const RTPROCESSINGLIB::FilterKernel& filter);
+    void updateGuiFromFilter(const UTILSLIB::FilterKernel& filter);
 
     Ui::FilterDesignViewWidget*         m_pUi;                      /**< Pointer to the qt designer generated ui class.*/
 
     QPointer<FilterPlotScene>           m_pFilterPlotScene;         /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 
-    RTPROCESSINGLIB::FilterKernel       m_filterKernel;             /**< The current filter operator.*/
+    UTILSLIB::FilterKernel       m_filterKernel;             /**< The current filter operator.*/
 
     QString                             m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
 
@@ -339,7 +339,7 @@ signals:
      *
      * @param[in] activeFilter  The currently active filters.
      */
-    void filterChanged(const RTPROCESSINGLIB::FilterKernel& activeFilter);
+    void filterChanged(const UTILSLIB::FilterKernel& activeFilter);
 
     //=========================================================================================================
     /**

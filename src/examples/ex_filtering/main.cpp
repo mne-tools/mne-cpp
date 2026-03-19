@@ -43,10 +43,10 @@
 
 #include <fiff/fiff.h>
 
-#include <rtprocessing/helpers/filterkernel.h>
+#include <dsp/filterkernel.h>
 #include <utils/generics/applicationlogger.h>
 
-#include <rtprocessing/filter.h>
+#include <dsp/rt_filter.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
                                    0.1,
                                    pRaw->info.sfreq,
                                    1024,
-                                   RTPROCESSINGLIB::FilterKernel::m_designMethods.indexOf(FilterParameter("Cosine")),
+                                   UTILSLIB::FilterKernel::m_designMethods.indexOf(FilterParameter("Cosine")),
                                    picks)) {
         printf("[done]\n");
     } else {

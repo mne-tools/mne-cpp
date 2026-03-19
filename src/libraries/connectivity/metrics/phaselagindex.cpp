@@ -45,7 +45,7 @@
 #include "../network/networkedge.h"
 #include "../network/network.h"
 
-#include <utils/spectral.h>
+#include <math/spectral.h>
 
 //=============================================================================================================
 // QT INCLUDES

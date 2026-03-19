@@ -44,7 +44,7 @@
 #include "fiff_file.h"
 #include <stdio.h>
 #include <cmath>
-#include <utils/mnemath.h>
+#include <math/mnemath.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES

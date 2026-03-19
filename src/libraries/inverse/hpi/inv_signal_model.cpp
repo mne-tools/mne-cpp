@@ -38,7 +38,7 @@
 
 #include "inv_hpi_model_parameters.h"
 #include "inv_signal_model.h"
-#include <utils/mnemath.h>
+#include <math/mnemath.h>
 #include <iostream>
 
 //=============================================================================================================

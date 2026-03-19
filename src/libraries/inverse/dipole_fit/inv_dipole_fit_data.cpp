@@ -56,8 +56,8 @@
 
 #include <fwd/fwd_comp_data.h>
 
-#include <utils/simplex_algorithm.h>
-#include <utils/sphere.h>
+#include <math/simplex_algorithm.h>
+#include <math/sphere.h>
 
 #include <Eigen/Dense>
 

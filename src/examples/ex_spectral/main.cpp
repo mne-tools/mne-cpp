@@ -39,7 +39,7 @@
 
 #include <math.h>
 #include <disp/plots/plot.h>
-#include <utils/spectral.h>
+#include <math/spectral.h>
 #include <utils/generics/applicationlogger.h>
 #include <mne/mne.h>
 

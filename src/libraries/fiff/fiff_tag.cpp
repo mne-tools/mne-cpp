@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "fiff_tag.h"
-#include <utils/ioutils.h>
+#include "fiff_byte_swap.h"
 
 #include <complex>
 
@@ -53,7 +53,6 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace UTILSLIB;
 using namespace FIFFLIB;
 
 //=============================================================================================================
@@ -273,12 +272,12 @@ QString FiffTag::getInfo() const
 void FiffTag::convert_ch_pos(FiffChPos* pos)
 {
     int k;
-    pos->coil_type  = IOUtils::swap_int(pos->coil_type);
+    pos->coil_type  = swap_int(pos->coil_type);
     for (k = 0; k < 3; k++) {
-        IOUtils::swap_floatp(&pos->r0[k]);
-        IOUtils::swap_floatp(&pos->ex[k]);
-        IOUtils::swap_floatp(&pos->ey[k]);
-        IOUtils::swap_floatp(&pos->ez[k]);
+        swap_floatp(&pos->r0[k]);
+        swap_floatp(&pos->ex[k]);
+        swap_floatp(&pos->ey[k]);
+        swap_floatp(&pos->ez[k]);
     }
     return;
 }
@@ -305,14 +304,14 @@ void FiffTag::convert_matrix_from_file_data(FiffTag::SPtr tag)
         return;
 
     dimp = ((fiff_int_t *)((tag->data())+tag->size()-sizeof(fiff_int_t)));
-    IOUtils::swap_intp(dimp);
+    swap_intp(dimp);
     ndim = *dimp;
     if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_DENSE) {
         if (tsize < (ndim+1)*sizeof(fiff_int_t))
             return;
         dimp = dimp - ndim;
         for (k = 0, np = 1; k < ndim; k++) {
-            IOUtils::swap_intp(dimp+k);
+            swap_intp(dimp+k);
             np = np*dimp[k];
         }
     }
@@ -323,7 +322,7 @@ void FiffTag::convert_matrix_from_file_data(FiffTag::SPtr tag)
             return;
         dimp = dimp - ndim - 1;
         for (k = 0; k < ndim+1; k++)
-            IOUtils::swap_intp(dimp+k);
+            swap_intp(dimp+k);
         nz = dimp[0];
         if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_CCS)
             np = nz + dimp[2] + 1; /* nz + n + 1 */
@@ -335,7 +334,7 @@ void FiffTag::convert_matrix_from_file_data(FiffTag::SPtr tag)
          * Take care of the indices
         */
         for (data = (int *)(tag->data())+nz, k = 0; k < np; k++)
-            IOUtils::swap_intp(data+k);
+            swap_intp(data+k);
         np = nz;
     }
     /*
@@ -344,15 +343,15 @@ void FiffTag::convert_matrix_from_file_data(FiffTag::SPtr tag)
     kind = fiff_type_base(tag->type);
     if (kind == FIFFT_INT) {
         for (data = (int *)(tag->data()), k = 0; k < np; k++)
-            IOUtils::swap_intp(data+k);
+            swap_intp(data+k);
     }
     else if (kind == FIFFT_FLOAT) {
         for (fdata = (float *)(tag->data()), k = 0; k < np; k++)
-            IOUtils::swap_floatp(fdata+k);
+            swap_floatp(fdata+k);
     }
     else if (kind == FIFFT_DOUBLE) {
         for (ddata = (double *)(tag->data()), k = 0; k < np; k++)
-            IOUtils::swap_doublep(ddata+k);
+            swap_doublep(ddata+k);
     }
     return;
 }
@@ -380,7 +379,7 @@ void FiffTag::convert_matrix_to_file_data(FiffTag::SPtr tag)
 
     dimp = ((fiff_int_t *)(((char *)tag->data())+tag->size()-sizeof(fiff_int_t)));
     ndim = *dimp;
-    IOUtils::swap_intp(dimp);
+    swap_intp(dimp);
 
     if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_DENSE) {
         if (tsize < (ndim+1)*sizeof(fiff_int_t))
@@ -388,7 +387,7 @@ void FiffTag::convert_matrix_to_file_data(FiffTag::SPtr tag)
         dimp = dimp - ndim;
         for (k = 0, np = 1; k < ndim; k++) {
             np = np*dimp[k];
-            IOUtils::swap_intp(dimp+k);
+            swap_intp(dimp+k);
         }
     }
     else {
@@ -404,7 +403,7 @@ void FiffTag::convert_matrix_to_file_data(FiffTag::SPtr tag)
         else
             return;			/* Don't know what to do */
         for (k = 0; k < ndim+1; k++)
-            IOUtils::swap_intp(dimp+k);
+            swap_intp(dimp+k);
     }
     /*
      * Now convert data...
@@ -412,23 +411,23 @@ void FiffTag::convert_matrix_to_file_data(FiffTag::SPtr tag)
     kind = fiff_type_base(tag->type);
     if (kind == FIFFT_INT) {
         for (data = (int *)(tag->data()), k = 0; k < np; k++)
-            IOUtils::swap_intp(data+k);
+            swap_intp(data+k);
     }
     else if (kind == FIFFT_FLOAT) {
         for (fdata = (float *)(tag->data()), k = 0; k < np; k++)
-            IOUtils::swap_floatp(fdata+k);
+            swap_floatp(fdata+k);
     }
     else if (kind == FIFFT_DOUBLE) {
         for (ddata = (double *)(tag->data()), k = 0; k < np; k++)
-            IOUtils::swap_doublep(ddata+k);
+            swap_doublep(ddata+k);
     }
     else if (kind == FIFFT_COMPLEX_FLOAT) {
         for (fdata = (float *)(tag->data()), k = 0; k < 2*np; k++)
-            IOUtils::swap_floatp(fdata+k);
+            swap_floatp(fdata+k);
     }
     else if (kind == FIFFT_COMPLEX_DOUBLE) {
         for (ddata = (double *)(tag->data()), k = 0; k < 2*np; k++)
-            IOUtils::swap_doublep(ddata+k);
+            swap_doublep(ddata+k);
     }
     return;
 }
@@ -479,14 +478,14 @@ void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian
     case FIFFT_JULIAN :
         np = tag->size()/sizeof(fiff_int_t);
         for (ithis = (fiff_int_t *)tag->data(), k = 0; k < np; k++, ithis++)
-            IOUtils::swap_intp(ithis);
+            swap_intp(ithis);
         break;
 
     case FIFFT_LONG :
     case FIFFT_ULONG :
         np = tag->size()/sizeof(fiff_long_t);
         for (lthis = (fiff_long_t *)tag->data(), k = 0; k < np; k++, lthis++)
-            IOUtils::swap_longp(lthis);
+            swap_longp(lthis);
         break;
 
     case FIFFT_SHORT :
@@ -494,21 +493,21 @@ void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian
     case FIFFT_USHORT :
         np = tag->size()/sizeof(fiff_short_t);
         for (sthis = (fiff_short_t *)tag->data(), k = 0; k < np; k++, sthis++)
-            *sthis = IOUtils::swap_short(*sthis);
+            *sthis = swap_short(*sthis);
         break;
 
     case FIFFT_FLOAT :
     case FIFFT_COMPLEX_FLOAT :
         np = tag->size()/sizeof(fiff_float_t);
         for (fthis = (fiff_float_t *)tag->data(), k = 0; k < np; k++, fthis++)
-            IOUtils::swap_floatp(fthis);
+            swap_floatp(fthis);
         break;
 
     case FIFFT_DOUBLE :
     case FIFFT_COMPLEX_DOUBLE :
         np = tag->size()/sizeof(fiff_double_t);
         for (dthis = (fiff_double_t *)tag->data(), k = 0; k < np; k++, dthis++)
-            IOUtils::swap_doublep(dthis);
+            swap_doublep(dthis);
         break;
 
     case FIFFT_OLD_PACK :
@@ -516,12 +515,12 @@ void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian
     /*
      * Offset and scale...
      */
-        IOUtils::swap_floatp(fthis+0);
-        IOUtils::swap_floatp(fthis+1);
+        swap_floatp(fthis+0);
+        swap_floatp(fthis+1);
         sthis = (short *)(fthis+2);
         np = (tag->size() - 2*sizeof(float))/sizeof(short);
         for (k = 0; k < np; k++,sthis++)
-            *sthis = IOUtils::swap_short(*sthis);
+            *sthis = swap_short(*sthis);
         break;
 
     case FIFFT_DIR_ENTRY_STRUCT :
@@ -536,10 +535,10 @@ void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian
         for (k = 0; k < np; k++) {
             offset = (char*)tag->data() + k*FiffDirEntry::storageSize();
             ithis = (fiff_int_t*) offset;
-            ithis[0] = IOUtils::swap_int(ithis[0]);//kind
-            ithis[1] = IOUtils::swap_int(ithis[1]);//type
-            ithis[2] = IOUtils::swap_int(ithis[2]);//size
-            ithis[3] = IOUtils::swap_int(ithis[3]);//pos
+            ithis[0] = swap_int(ithis[0]);//kind
+            ithis[1] = swap_int(ithis[1]);//type
+            ithis[2] = swap_int(ithis[2]);//size
+            ithis[3] = swap_int(ithis[3]);//pos
         }
         break;
 
@@ -556,11 +555,11 @@ void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian
         for (k = 0; k < np; k++) {
             offset = (char*)tag->data() + k*FiffId::storageSize();
             ithis = (fiff_int_t*) offset;
-            ithis[0] = IOUtils::swap_int(ithis[0]);//version
-            ithis[1] = IOUtils::swap_int(ithis[1]);//machid[0]
-            ithis[2] = IOUtils::swap_int(ithis[2]);//machid[1]
-            ithis[3] = IOUtils::swap_int(ithis[3]);//time.secs
-            ithis[4] = IOUtils::swap_int(ithis[4]);//time.usecs
+            ithis[0] = swap_int(ithis[0]);//version
+            ithis[1] = swap_int(ithis[1]);//machid[0]
+            ithis[2] = swap_int(ithis[2]);//machid[1]
+            ithis[3] = swap_int(ithis[3]);//time.secs
+            ithis[4] = swap_int(ithis[4]);//time.usecs
         }
         break;
 
@@ -583,16 +582,16 @@ void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian
             ithis = (fiff_int_t*) offset;
             fthis = (float*) offset;
 
-            ithis[0] = IOUtils::swap_int(ithis[0]);  //scanno
-            ithis[1] = IOUtils::swap_int(ithis[1]);  //logno
-            ithis[2] = IOUtils::swap_int(ithis[2]);  //kind
-            IOUtils::swap_floatp(&fthis[3]);         //range
-            IOUtils::swap_floatp(&fthis[4]);         //cal
-            ithis[5] = IOUtils::swap_int(ithis[5]);  //coil_type
+            ithis[0] = swap_int(ithis[0]);  //scanno
+            ithis[1] = swap_int(ithis[1]);  //logno
+            ithis[2] = swap_int(ithis[2]);  //kind
+            swap_floatp(&fthis[3]);         //range
+            swap_floatp(&fthis[4]);         //cal
+            ithis[5] = swap_int(ithis[5]);  //coil_type
             for (r = 0; r < 12; ++r)
-                IOUtils::swap_floatp(&fthis[6+r]);   //loc
-            ithis[18] = IOUtils::swap_int(ithis[18]);//unit
-            ithis[19] = IOUtils::swap_int(ithis[19]);//unit_mul
+                swap_floatp(&fthis[6+r]);   //loc
+            ithis[18] = swap_int(ithis[18]);//unit
+            ithis[19] = swap_int(ithis[19]);//unit_mul
         }
 
         break;
@@ -609,9 +608,9 @@ void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian
             ithis = (fiff_int_t*) offset;
             fthis = (float*) offset;
 
-            ithis[0] = IOUtils::swap_int(ithis[0]);    //coil_type
+            ithis[0] = swap_int(ithis[0]);    //coil_type
             for (r = 0; r < 12; r++)
-                IOUtils::swap_floatp(&fthis[1+r]);    //r0, ex, ey, ez
+                swap_floatp(&fthis[1+r]);    //r0, ex, ey, ez
         }
 
         break;
@@ -632,11 +631,11 @@ void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian
             ithis = (fiff_int_t*) offset;
             fthis = (float*) offset;
 
-            ithis[0] = IOUtils::swap_int(ithis[0]);//kind
-            ithis[1] = IOUtils::swap_int(ithis[1]);//ident
+            ithis[0] = swap_int(ithis[0]);//kind
+            ithis[1] = swap_int(ithis[1]);//ident
 
             for (r = 0; r < 3; ++r)
-                IOUtils::swap_floatp(&fthis[2+r]);        //r
+                swap_floatp(&fthis[2+r]);        //r
         }
         break;
 
@@ -663,21 +662,21 @@ void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian
             ithis = (fiff_int_t*)offset;
             fthis = (float*)offset;
 
-            ithis[0] = IOUtils::swap_int(ithis[0]);
-            ithis[1] = IOUtils::swap_int(ithis[1]);
+            ithis[0] = swap_int(ithis[0]);
+            ithis[1] = swap_int(ithis[1]);
 
             for (r = 0; r < 24; ++r)
-                IOUtils::swap_floatp(&fthis[2+r]);
+                swap_floatp(&fthis[2+r]);
         }
         break;
 
     case FIFFT_DATA_REF_STRUCT :
         np = tag->size()/FiffDataRef::storageSize();
         for (drthis = (fiffDataRef)tag->data(), k = 0; k < np; k++, drthis++) {
-            drthis->type   = IOUtils::swap_int(drthis->type);
-            drthis->endian = IOUtils::swap_int(drthis->endian);
-            drthis->size   = IOUtils::swap_long(drthis->size);
-            drthis->offset = IOUtils::swap_long(drthis->offset);
+            drthis->type   = swap_int(drthis->type);
+            drthis->endian = swap_int(drthis->endian);
+            drthis->size   = swap_long(drthis->size);
+            drthis->offset = swap_long(drthis->offset);
         }
         break;
 

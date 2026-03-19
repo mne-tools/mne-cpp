@@ -66,7 +66,6 @@
 
 using namespace DISPLIB;
 using namespace FIFFLIB;
-using namespace RTPROCESSINGLIB;
 using namespace Eigen;
 
 //=============================================================================================================

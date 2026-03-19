@@ -41,8 +41,8 @@
 
 #include "mne_bem.h"
 
-#include <utils/mnemath.h>
-#include <utils/warp.h>
+#include <math/mnemath.h>
+#include <math/warp.h>
 #include <fs/fs_label.h>
 
 #include <iostream>

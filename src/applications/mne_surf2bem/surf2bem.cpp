@@ -52,7 +52,7 @@
 
 #include <fiff/fiff_file.h>
 
-#include <utils/ioutils.h>
+#include <fiff/fiff_byte_swap.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -239,7 +239,7 @@ bool Surf2Bem::readFreeSurferSurface(const SurfaceInput& input, MNEBemSurface& b
 
     const qint32 TRIANGLE_FILE_MAGIC = 16777214;
 
-    qint32 magic = UTILSLIB::IOUtils::fread3(stream);
+    qint32 magic = FSLIB::FsSurface::fread3(stream);
 
     qint32 nvert = 0;
     qint32 nface = 0;
@@ -263,7 +263,7 @@ bool Surf2Bem::readFreeSurferSurface(const SurfaceInput& input, MNEBemSurface& b
         stream.readRawData(reinterpret_cast<char*>(verts.data()), nvert * 3 * sizeof(float));
         for (qint32 i = 0; i < 3; ++i)
             for (qint32 j = 0; j < nvert; ++j)
-                UTILSLIB::IOUtils::swap_floatp(&verts(i, j));
+                FIFFLIB::swap_floatp(&verts(i, j));
 
         // Read faces (nface x 3, int32)
         faces.resize(nface, 3);

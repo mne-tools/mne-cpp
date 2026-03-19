@@ -61,8 +61,8 @@
 
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-#include <rtprocessing/helpers/parksmcclellan.h>
-#include <rtprocessing/helpers/cosinefilter.h>
+#include <dsp/parksmcclellan.h>
+#include <dsp/cosinefilter.h>
 
 
 
@@ -89,7 +89,7 @@ using namespace MNELIB;
 using namespace Eigen;
 
 using namespace DISPLIB;
-using namespace RTPROCESSINGLIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************

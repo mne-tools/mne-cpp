@@ -69,7 +69,7 @@ namespace ANSHAREDLIB {
     class FiffRawViewModel;
 }
 
-namespace RTPROCESSINGLIB {
+namespace UTILSLIB {
     class FilterKernel;
 }
 
@@ -239,7 +239,7 @@ public:
      *
      * @param[in] filterData   the currently active filter.
      */
-    void setFilter(const RTPROCESSINGLIB::FilterKernel &filterData);
+    void setFilter(const UTILSLIB::FilterKernel &filterData);
 
     //=========================================================================================================
     /**

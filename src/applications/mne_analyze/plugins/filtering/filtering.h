@@ -60,7 +60,7 @@ namespace ANSHAREDLIB {
     class Communicator;
 }
 
-namespace RTPROCESSINGLIB {
+namespace UTILSLIB {
     class FilterKernel;
 }
 
@@ -128,7 +128,7 @@ private:
      *
      * @param[in] filterData    The currently active filter.
      */
-    void setFilter(const RTPROCESSINGLIB::FilterKernel& filterData);
+    void setFilter(const UTILSLIB::FilterKernel& filterData);
 
     //=========================================================================================================
     /**

@@ -43,8 +43,8 @@
 #include <math.h>
 
 #include <fiff/fiff.h>
-#include <rtprocessing/helpers/filterkernel.h>
-#include <rtprocessing/filter.h>
+#include <dsp/filterkernel.h>
+#include <dsp/rt_filter.h>
 
 #include <Eigen/Dense>
 
@@ -173,7 +173,7 @@ void TestFiltering::initTestCase()
                                                  dTransition,
                                                  dSFreq,
                                                  1024,
-                                                 RTPROCESSINGLIB::FilterKernel::m_designMethods.indexOf(FilterParameter("Cosine")),
+                                                 UTILSLIB::FilterKernel::m_designMethods.indexOf(FilterParameter("Cosine")),
                                                  vPicks);
     printf("[done]\n");
 

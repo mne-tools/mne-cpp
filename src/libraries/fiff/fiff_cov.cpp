@@ -45,7 +45,7 @@
 #include "fiff_dir_node.h"
 #include "fiff_file.h"
 
-#include <utils/mnemath.h>
+#include <math/mnemath.h>
 
 //=============================================================================================================
 // QT INCLUDES

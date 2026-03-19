@@ -43,9 +43,6 @@
 #include "fiff_evoked_set.h"
 #include "fiff_stream.h"
 
-#include <rtprocessing/filter.h>
-#include <rtprocessing/helpers/filterkernel.h>
-
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
@@ -58,7 +55,6 @@
 
 using namespace FIFFLIB;
 using namespace Eigen;
-using namespace RTPROCESSINGLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

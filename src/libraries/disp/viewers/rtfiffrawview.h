@@ -69,8 +69,11 @@ namespace FIFFLIB {
     class FiffInfo;
 }
 
-namespace RTPROCESSINGLIB {
+namespace UTILSLIB {
     class FilterKernel;
+}
+
+namespace RTPROCESSINGLIB {
     class EventList;
 }
 
@@ -322,7 +325,7 @@ public:
      *
      * @param[in] filterData   the currently active filter.
      */
-    void setFilter(const RTPROCESSINGLIB::FilterKernel &filterData);
+    void setFilter(const UTILSLIB::FilterKernel &filterData);
 
     //=========================================================================================================
     /**

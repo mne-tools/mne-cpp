@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "fs_surface.h"
-#include <utils/ioutils.h>
+#include <fiff/fiff_byte_swap.h>
 
 #include <iostream>
 
@@ -55,7 +55,6 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace UTILSLIB;
 using namespace FSLIB;
 using namespace Eigen;
 
@@ -244,7 +243,7 @@ bool FsSurface::read(const QString &p_sFile, FsSurface &p_Surface, bool p_bLoadC
     qint32 TRIANGLE_FILE_MAGIC_NUMBER =  16777214;
     qint32 QUAD_FILE_MAGIC_NUMBER     =  16777215;
 
-    qint32 magic = IOUtils::fread3(t_DataStream);
+    qint32 magic = FsSurface::fread3(t_DataStream);
 
     qint32 nvert = 0;
     qint32 nquad = 0;
@@ -254,8 +253,8 @@ bool FsSurface::read(const QString &p_sFile, FsSurface &p_Surface, bool p_bLoadC
 
     if(magic == QUAD_FILE_MAGIC_NUMBER || magic == NEW_QUAD_FILE_MAGIC_NUMBER)
     {
-        nvert = IOUtils::fread3(t_DataStream);
-        nquad = IOUtils::fread3(t_DataStream);
+        nvert = FsSurface::fread3(t_DataStream);
+        nquad = FsSurface::fread3(t_DataStream);
         if(magic == QUAD_FILE_MAGIC_NUMBER)
             printf("\t%s is a quad file (nvert = %d nquad = %d)\n", p_sFile.toUtf8().constData(),nvert,nquad);
         else
@@ -271,7 +270,7 @@ bool FsSurface::read(const QString &p_sFile, FsSurface &p_Surface, bool p_bLoadC
                 for(qint32 j = 0; j < 3; ++j)
                 {
                     t_DataStream >> iVal;
-                    IOUtils::swap_short(iVal);
+                    FIFFLIB::swap_short(iVal);
                     verts(i,j) = ((float)iVal) / 100;
                 }
             }
@@ -281,10 +280,10 @@ bool FsSurface::read(const QString &p_sFile, FsSurface &p_Surface, bool p_bLoadC
             t_DataStream.readRawData((char *)verts.data(), nvert*3*sizeof(float));
             for(qint32 i = 0; i < nvert; ++i)
                 for(qint32 j = 0; j < 3; ++j)
-                    IOUtils::swap_floatp(&verts(i,j));
+                    FIFFLIB::swap_floatp(&verts(i,j));
         }
 
-        MatrixXi quads = IOUtils::fread3_many(t_DataStream, nquad*4);
+        MatrixXi quads = FsSurface::fread3_many(t_DataStream, nquad*4);
         MatrixXi quads_new(4, nquad);
         qint32 count = 0;
         for(qint32 j = 0; j < quads.cols(); ++j)
@@ -336,8 +335,8 @@ bool FsSurface::read(const QString &p_sFile, FsSurface &p_Surface, bool p_bLoadC
 
         t_DataStream >> nvert;
         t_DataStream >> nface;
-        IOUtils::swap_int(nvert);
-        IOUtils::swap_int(nface);
+        FIFFLIB::swap_int(nvert);
+        FIFFLIB::swap_int(nface);
 
         printf("\t%s is a triangle file (nvert = %d ntri = %d)\n", p_sFile.toUtf8().constData(), nvert, nface);
         printf("\t%s", s.toUtf8().constData());
@@ -347,7 +346,7 @@ bool FsSurface::read(const QString &p_sFile, FsSurface &p_Surface, bool p_bLoadC
         t_DataStream.readRawData((char *)verts.data(), nvert*3*sizeof(float));
         for(qint32 i = 0; i < 3; ++i)
             for(qint32 j = 0; j < nvert; ++j)
-                IOUtils::swap_floatp(&verts(i,j));
+                FIFFLIB::swap_floatp(&verts(i,j));
 
         //faces
         faces.resize(nface, 3);
@@ -357,7 +356,7 @@ bool FsSurface::read(const QString &p_sFile, FsSurface &p_Surface, bool p_bLoadC
             for(qint32 j = 0; j < 3; ++j)
             {
                 t_DataStream >> iVal;
-                IOUtils::swap_int(iVal);
+                FIFFLIB::swap_int(iVal);
                 faces(i,j) = iVal;
             }
         }
@@ -423,7 +422,7 @@ VectorXf FsSurface::read_curv(const QString &p_sFileName)
     QDataStream t_DataStream(&t_File);
     t_DataStream.setByteOrder(QDataStream::BigEndian);
 
-    qint32 vnum = IOUtils::fread3(t_DataStream);
+    qint32 vnum = FsSurface::fread3(t_DataStream);
     qint32 NEW_VERSION_MAGIC_NUMBER = 16777215;
 
     if(vnum == NEW_VERSION_MAGIC_NUMBER)
@@ -437,18 +436,18 @@ VectorXf FsSurface::read_curv(const QString &p_sFileName)
         curv.resize(vnum, 1);
         t_DataStream.readRawData((char *)curv.data(), vnum*sizeof(float));
         for(qint32 i = 0; i < vnum; ++i)
-           IOUtils::swap_floatp(&curv(i));
+           FIFFLIB::swap_floatp(&curv(i));
     }
     else
     {
-        qint32 fnum = IOUtils::fread3(t_DataStream);
+        qint32 fnum = FsSurface::fread3(t_DataStream);
         Q_UNUSED(fnum)
         qint16 iVal;
         curv.resize(vnum, 1);
         for(qint32 i = 0; i < vnum; ++i)
         {
             t_DataStream >> iVal;
-            IOUtils::swap_short(iVal);
+            FIFFLIB::swap_short(iVal);
             curv(i) = ((float)iVal) / 100;
         }
     }
@@ -457,4 +456,42 @@ VectorXf FsSurface::read_curv(const QString &p_sFileName)
     printf("[done]\n");
 
     return curv;
+}
+
+//=============================================================================================================
+
+qint32 FsSurface::fread3(QDataStream &stream)
+{
+    char bytes[3];
+    stream.readRawData(bytes, 3);
+    return (((unsigned char)bytes[0]) << 16) + (((unsigned char)bytes[1]) << 8) + ((unsigned char)bytes[2]);
+}
+
+//=============================================================================================================
+
+qint32 FsSurface::fread3(std::iostream &stream)
+{
+    char bytes[3];
+    stream.read(bytes, 3);
+    return (((unsigned char)bytes[0]) << 16) + (((unsigned char)bytes[1]) << 8) + ((unsigned char)bytes[2]);
+}
+
+//=============================================================================================================
+
+VectorXi FsSurface::fread3_many(QDataStream &stream, qint32 count)
+{
+    VectorXi res(count);
+    for(qint32 i = 0; i < count; ++i)
+        res[i] = FsSurface::fread3(stream);
+    return res;
+}
+
+//=============================================================================================================
+
+VectorXi FsSurface::fread3_many(std::iostream &stream, qint32 count)
+{
+    VectorXi res(count);
+    for(qint32 i = 0; i < count; ++i)
+        res[i] = FsSurface::fread3(stream);
+    return res;
 }

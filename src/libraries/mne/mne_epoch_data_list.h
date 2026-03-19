@@ -203,6 +203,37 @@ public:
                                                      const QMap<QString,double> &mapReject = QMap<QString,double>(),
                                                      const QPair<float,float> &baseline = QPair<float,float>(0.0f, 0.0f),
                                                      bool proj = false);
+
+    //=========================================================================================================
+    /**
+     * Convenience function: reads epochs, optionally applies baseline correction and
+     * artifact rejection, then returns the averaged evoked response.
+     *
+     * @param[in] raw               The raw data.
+     * @param[in] matEvents         The events provided in samples and event kinds.
+     * @param[in] fTMinS            The start time relative to the event in seconds.
+     * @param[in] fTMaxS            The end time relative to the event in seconds.
+     * @param[in] eventType         The event type.
+     * @param[in] bApplyBaseline    Whether to use baseline correction (mode=mean).
+     * @param[in] fTBaselineFromS   The start baseline correction time relative to the event in seconds.
+     * @param[in] fTBaselineToS     The end baseline correction time relative to the event in seconds.
+     * @param[in] mapReject         The thresholds per channel type to reject epochs.
+     * @param[in] lExcludeChs       List of channel names to exclude.
+     * @param[in] vecPicks          Which channels to pick.
+     *
+     * @return The averaged evoked data.
+     */
+    static FIFFLIB::FiffEvoked computeAverage(const FIFFLIB::FiffRawData& raw,
+                                              const Eigen::MatrixXi& matEvents,
+                                              float fTMinS,
+                                              float fTMaxS,
+                                              qint32 eventType,
+                                              bool bApplyBaseline,
+                                              float fTBaselineFromS,
+                                              float fTBaselineToS,
+                                              const QMap<QString,double>& mapReject,
+                                              const QStringList &lExcludeChs = QStringList(),
+                                              const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi());
 };
 } // NAMESPACE
 

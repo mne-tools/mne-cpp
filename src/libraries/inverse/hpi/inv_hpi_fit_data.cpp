@@ -42,7 +42,7 @@
 #include "inv_hpi_fit.h"
 #include "inv_sensor_set.h"
 
-#include <utils/mnemath.h>
+#include <math/mnemath.h>
 
 #include <iostream>
 #include <algorithm>

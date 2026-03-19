@@ -42,7 +42,7 @@
 
 #include <connectivity/connectivity.h>
 #include <connectivity/metrics/abstractmetric.h>
-#include <rtprocessing/rtconnectivity.h>
+#include <dsp/rt_connectivity.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
 
