@@ -51,7 +51,7 @@
 #include <fiff/fiff_coord_trans.h>
 
 #include <mne/mne_source_spaces.h>
-#include <inverse/inv_source_estimate.h>
+#include <inv/inv_source_estimate.h>
 #include <mne/mne_forward_solution.h>
 
 //=============================================================================================================

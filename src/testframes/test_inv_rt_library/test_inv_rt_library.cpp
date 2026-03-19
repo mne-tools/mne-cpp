@@ -22,17 +22,17 @@
 #include <mne/mne_forward_solution.h>
 #include <mne/mne_source_spaces.h>
 
-#include <inverse/dipole_fit/inv_dipole_fit_settings.h>
-#include <inverse/dipole_fit/inv_ecd.h>
-#include <inverse/dipole_fit/inv_ecd_set.h>
-#include <inverse/rap_music/inv_rap_music.h>
-#include <inverse/rap_music/inv_dipole.h>
-#include <inverse/minimum_norm/inv_minimum_norm.h>
-#include <inverse/hpi/inv_hpi_model_parameters.h>
-#include <inverse/hpi/inv_sensor_set.h>
-#include <inverse/hpi/inv_hpi_fit.h>
-#include <inverse/hpi/inv_hpi_fit_data.h>
-#include <inverse/hpi/inv_signal_model.h>
+#include <inv/dipole_fit/inv_dipole_fit_settings.h>
+#include <inv/dipole_fit/inv_ecd.h>
+#include <inv/dipole_fit/inv_ecd_set.h>
+#include <inv/rap_music/inv_rap_music.h>
+#include <inv/rap_music/inv_dipole.h>
+#include <inv/minimum_norm/inv_minimum_norm.h>
+#include <inv/hpi/inv_hpi_model_parameters.h>
+#include <inv/hpi/inv_sensor_set.h>
+#include <inv/hpi/inv_hpi_fit.h>
+#include <inv/hpi/inv_hpi_fit_data.h>
+#include <inv/hpi/inv_signal_model.h>
 
 #include <dsp/rt_connectivity.h>
 #include <dsp/rt_hpis.h>

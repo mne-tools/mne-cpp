@@ -33,19 +33,19 @@
 
 #include <mne/mne.h>
 #include <mne/mne_inverse_operator.h>
-#include <inverse/inv_source_estimate.h>
+#include <inv/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_forward_solution.h>
 
-#include <inverse/minimum_norm/inv_minimum_norm.h>
-#include <inverse/rap_music/inv_rap_music.h>
-#include <inverse/rap_music/inv_dipole.h>
-#include <inverse/dipole_fit/inv_ecd.h>
-#include <inverse/dipole_fit/inv_ecd_set.h>
-#include <inverse/dipole_fit/inv_dipole_fit_settings.h>
-#include <inverse/hpi/inv_hpi_model_parameters.h>
-#include <inverse/hpi/inv_sensor_set.h>
-#include <inverse/hpi/inv_signal_model.h>
+#include <inv/minimum_norm/inv_minimum_norm.h>
+#include <inv/rap_music/inv_rap_music.h>
+#include <inv/rap_music/inv_dipole.h>
+#include <inv/dipole_fit/inv_ecd.h>
+#include <inv/dipole_fit/inv_ecd_set.h>
+#include <inv/dipole_fit/inv_dipole_fit_settings.h>
+#include <inv/hpi/inv_hpi_model_parameters.h>
+#include <inv/hpi/inv_sensor_set.h>
+#include <inv/hpi/inv_signal_model.h>
 
 using namespace FIFFLIB;
 using namespace MNELIB;

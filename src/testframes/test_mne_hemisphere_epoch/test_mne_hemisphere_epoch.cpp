@@ -7,7 +7,7 @@
 
 #include <mne/mne_hemisphere.h>
 #include <mne/mne_forward_solution.h>
-#include <inverse/inv_source_estimate.h>
+#include <inv/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>

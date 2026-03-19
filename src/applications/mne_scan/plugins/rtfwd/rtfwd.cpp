@@ -43,7 +43,7 @@
 #include <fwd/compute_fwd/compute_fwd_settings.h>
 #include <fwd/compute_fwd/compute_fwd.h>
 
-#include <inverse/hpi/inv_hpi_fit.h>
+#include <inv/hpi/inv_hpi_fit.h>
 
 #include <fs/fs_annotationset.h>
 

@@ -46,8 +46,8 @@ set(MNE_LIBS_REQUIRED
     mne_disp
 )
 
-if(TARGET mne_disp3D_rhi)
-  list(APPEND MNE_LIBS_REQUIRED mne_disp3D_rhi)
+if(TARGET mne_disp3D)
+  list(APPEND MNE_LIBS_REQUIRED mne_disp3D)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -72,7 +72,7 @@ if(NOT BUILD_SHARED_LIBS)
       analyze_sourcelocalization
   )
   
-  if(TARGET mne_disp3D_rhi)
+  if(TARGET mne_disp3D)
     list(APPEND MNE_ANALYZE_PLUGINS analyze_view3d)
   endif()
 

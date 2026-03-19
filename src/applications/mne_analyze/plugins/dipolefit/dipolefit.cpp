@@ -53,9 +53,9 @@
 
 #include <disp/viewers/dipolefitview.h>
 
-#include <inverse/dipole_fit/inv_dipole_fit_data.h>
-#include <inverse/dipole_fit/inv_dipole_fit.h>
-#include <inverse/dipole_fit/inv_ecd_set.h>
+#include <inv/dipole_fit/inv_dipole_fit_data.h>
+#include <inv/dipole_fit/inv_dipole_fit.h>
+#include <inv/dipole_fit/inv_ecd_set.h>
 
 #include <fiff/fiff_coord_trans.h>
 

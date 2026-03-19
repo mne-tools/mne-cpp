@@ -43,9 +43,9 @@
 
 #include "connectivitysettingsmanager.h"
 
-#include <disp3D_rhi/view/brainview.h>
-#include <disp3D_rhi/model/braintreemodel.h>
-#include <disp3D_rhi/model/items/networktreeitem.h>
+#include <disp3D/view/brainview.h>
+#include <disp3D/model/braintreemodel.h>
+#include <disp3D/model/items/networktreeitem.h>
 
 #include <conn/connectivity.h>
 #include <conn/connectivitysettings.h>
@@ -57,11 +57,11 @@
 #include <fs/fs_annotationset.h>
 #include <fs/fs_surfaceset.h>
 
-#include <inverse/inv_source_estimate.h>
+#include <inv/inv_source_estimate.h>
 #include <mne/mne_epoch_data_list.h>
 #include <mne/mne.h>
 
-#include <inverse/minimum_norm/inv_minimum_norm.h>
+#include <inv/minimum_norm/inv_minimum_norm.h>
 
 #include <utils/ioutils.h>
 #include <utils/generics/applicationlogger.h>

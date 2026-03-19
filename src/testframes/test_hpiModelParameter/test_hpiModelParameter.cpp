@@ -37,7 +37,7 @@
 //=============================================================================================================
 
 #include <utils/generics/applicationlogger.h>
-#include <inverse/hpi/inv_hpi_model_parameters.h>
+#include <inv/hpi/inv_hpi_model_parameters.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -14,7 +14,7 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 
 target_link_libraries(test_inv_rt_library PRIVATE
-    mne_disp3D_rhi
+    mne_disp3D
     mne_disp
     mne_dsp
     mne_conn

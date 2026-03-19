@@ -37,7 +37,7 @@
 //=============================================================================================================
 
 #include <utils/generics/applicationlogger.h>
-#include <inverse/hpi/inv_signal_model.h>
+#include <inv/hpi/inv_signal_model.h>
 #include <iostream>
 #include <utils/ioutils.h>
 

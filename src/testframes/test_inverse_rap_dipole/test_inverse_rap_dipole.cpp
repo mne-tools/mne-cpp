@@ -4,22 +4,22 @@
 
 #include <utils/generics/applicationlogger.h>
 
-#include <inverse/dipole_fit/inv_ecd.h>
-#include <inverse/dipole_fit/inv_ecd_set.h>
-#include <inverse/dipole_fit/inv_dipole_fit_settings.h>
-#include <inverse/dipole_fit/inv_dipole_forward.h>
-#include <inverse/dipole_fit/inv_guess_data.h>
-#include <inverse/rap_music/inv_rap_music.h>
-#include <inverse/rap_music/inv_pwl_rap_music.h>
-#include <inverse/rap_music/inv_dipole.h>
-#include <inverse/minimum_norm/inv_minimum_norm.h>
-#include <inverse/hpi/inv_hpi_model_parameters.h>
-#include <inverse/hpi/inv_sensor_set.h>
+#include <inv/dipole_fit/inv_ecd.h>
+#include <inv/dipole_fit/inv_ecd_set.h>
+#include <inv/dipole_fit/inv_dipole_fit_settings.h>
+#include <inv/dipole_fit/inv_dipole_forward.h>
+#include <inv/dipole_fit/inv_guess_data.h>
+#include <inv/rap_music/inv_rap_music.h>
+#include <inv/rap_music/inv_pwl_rap_music.h>
+#include <inv/rap_music/inv_dipole.h>
+#include <inv/minimum_norm/inv_minimum_norm.h>
+#include <inv/hpi/inv_hpi_model_parameters.h>
+#include <inv/hpi/inv_sensor_set.h>
 #include <mne/mne_meas_data.h>
 #include <mne/mne_meas_data_set.h>
 #include <mne/mne_inverse_operator.h>
 #include <mne/mne_forward_solution.h>
-#include <inverse/inv_source_estimate.h>
+#include <inv/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 
 #include <fiff/fiff.h>

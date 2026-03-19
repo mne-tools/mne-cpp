@@ -36,8 +36,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D_rhi/workers/rtsourcedataworker.h>
-#include <disp3D_rhi/workers/rtsourcedatacontroller.h>
+#include <disp3D/workers/rtsourcedataworker.h>
+#include <disp3D/workers/rtsourcedatacontroller.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -59,7 +59,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISP3DRHILIB;
+using namespace DISP3DLIB;
 using namespace Eigen;
 
 //=============================================================================================================

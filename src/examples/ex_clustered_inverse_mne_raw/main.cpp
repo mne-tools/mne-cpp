@@ -49,14 +49,14 @@
 
 #include <mne/mne.h>
 #include <mne/mne_epoch_data_list.h>
-#include <inverse/inv_source_estimate.h>
+#include <inv/inv_source_estimate.h>
 
 #include <time.h>
 
-#include <inverse/minimum_norm/inv_minimum_norm.h>
+#include <inv/minimum_norm/inv_minimum_norm.h>
 
-#include <disp3D_rhi/view/brainview.h>
-#include <disp3D_rhi/model/braintreemodel.h>
+#include <disp3D/view/brainview.h>
+#include <disp3D/model/braintreemodel.h>
 
 #include <math/linalg.h>
 #include <utils/generics/applicationlogger.h>

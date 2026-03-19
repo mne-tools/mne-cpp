@@ -40,8 +40,8 @@
 //=============================================================================================================
 
 #include "dsp_global.h"
-#include <inverse/hpi/inv_sensor_set.h>
-#include <inverse/hpi/inv_signal_model.h>
+#include <inv/hpi/inv_sensor_set.h>
+#include <inv/hpi/inv_signal_model.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES

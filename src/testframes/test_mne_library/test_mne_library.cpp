@@ -31,7 +31,7 @@
 
 #include <mne/mne.h>
 #include <mne/mne_inverse_operator.h>
-#include <inverse/inv_source_estimate.h>
+#include <inv/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_source_space.h>
 #include <mne/mne_forward_solution.h>
