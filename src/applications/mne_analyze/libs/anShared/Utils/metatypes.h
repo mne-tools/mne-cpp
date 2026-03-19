@@ -37,7 +37,7 @@
 #ifndef METATYPES_H
 #define METATYPES_H
 
-#include <inverse/dipole_fit/inv_ecd.h>
+#include <inv/dipole_fit/inv_ecd.h>
 #include <Eigen/Core>
 #include "../Management/event.h"
 #include "../Model/fiffrawviewmodel.h"

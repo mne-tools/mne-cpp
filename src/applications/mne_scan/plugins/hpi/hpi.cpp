@@ -46,8 +46,8 @@
 #include <disp/viewers/hpisettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimehpiresult.h>
-#include <inverse/hpi/inv_hpi_fit.h>
-#include <inverse/hpi/inv_hpi_data_updater.h>
+#include <inv/hpi/inv_hpi_fit.h>
+#include <inv/hpi/inv_hpi_data_updater.h>
 
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_digitizer_data.h>

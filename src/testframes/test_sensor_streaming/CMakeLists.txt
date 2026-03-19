@@ -25,7 +25,7 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 set(MNE_LIBS_REQUIRED
     mne_disp
-    mne_disp3D_rhi
+    mne_disp3D
     mne_fiff
     mne_utils
     mne_math

@@ -46,13 +46,13 @@
 #include <conn/network/network.h>
 
 #include <mne/mne_bem.h>
-#include <disp3D_rhi/view/brainview.h>
-#include <disp3D_rhi/model/braintreemodel.h>
-#include <disp3D_rhi/model/items/networktreeitem.h>
-#include <disp3D_rhi/model/items/sensortreeitem.h>
-#include <disp3D_rhi/model/items/surfacetreeitem.h>
-#include <disp3D_rhi/model/items/bemtreeitem.h>
-#include <disp3D_rhi/model/items/digitizersettreeitem.h>
+#include <disp3D/view/brainview.h>
+#include <disp3D/model/braintreemodel.h>
+#include <disp3D/model/items/networktreeitem.h>
+#include <disp3D/model/items/sensortreeitem.h>
+#include <disp3D/model/items/surfacetreeitem.h>
+#include <disp3D/model/items/bemtreeitem.h>
+#include <disp3D/model/items/digitizersettreeitem.h>
 
 #include <disp/viewers/control3dview.h>
 
@@ -159,7 +159,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             }
 
             // Note: Sensor surface visualization from FiffChInfo/MNEBem is not
-            // directly supported in disp3D_rhi's addSensors API. Use loadSensors()
+            // directly supported in disp3D's addSensors API. Use loadSensors()
             // with a .fif file path if sensor visualization is needed.
             m_iNumberBadChannels = pRTCE->getFiffInfo() ? pRTCE->getFiffInfo()->bads.size() : 0;
         } else {
@@ -171,7 +171,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             if(pRTCE->getSensorSurface() && pRTCE->getFiffInfo()) {
                 if(m_iNumberBadChannels != pRTCE->getFiffInfo()->bads.size()) {
                     // Note: Sensor update from in-memory FiffChInfo/MNEBem not
-                    // directly supported in disp3D_rhi.
+                    // directly supported in disp3D.
                     m_iNumberBadChannels = pRTCE->getFiffInfo()->bads.size();
                 }
             }
@@ -208,7 +208,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
     } else if(RealTimeHpiResult::SPtr pRTHR = qSharedPointerDynamicCast<RealTimeHpiResult>(pMeasurement)) {
         if(!m_pBemHeadAvr) {
             // Note: Loading sensor surfaces from in-memory MNEBem is not directly
-            // supported by disp3D_rhi's addSensors API. Sensor surfaces skipped.
+            // supported by disp3D's addSensors API. Sensor surfaces skipped.
 
             // Add average head surface
             QFile t_fileHeadAvr(QCoreApplication::applicationDirPath() + "/../resources/general/hpiAlignment/fsaverage-head.fif");
@@ -239,7 +239,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_pData3DModel->addDigitizerData(
                                              pHpiFitResult->fittedCoils.pickTypes(QList<int>()<<FIFFV_POINT_EEG).getList());
 
-            // Note: Per-item transforms for HPI tracking are not yet supported in disp3D_rhi.
+            // Note: Per-item transforms for HPI tracking are not yet supported in disp3D.
             // The BrainSurface renderable supports applyTransform() but tree items do not
             // expose this directly yet.
         }

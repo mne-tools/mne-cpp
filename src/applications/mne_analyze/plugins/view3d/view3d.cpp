@@ -44,12 +44,12 @@
 #include <anShared/Model/dipolefitmodel.h>
 #include <anShared/Model/abstractmodel.h>
 
-#include <disp3D_rhi/view/brainview.h>
-#include <disp3D_rhi/model/braintreemodel.h>
-#include <disp3D_rhi/model/items/digitizersettreeitem.h>
-#include <disp3D_rhi/model/items/digitizertreeitem.h>
-#include <disp3D_rhi/model/items/bemtreeitem.h>
-#include <disp3D_rhi/model/items/dipoletreeitem.h>
+#include <disp3D/view/brainview.h>
+#include <disp3D/model/braintreemodel.h>
+#include <disp3D/model/items/digitizersettreeitem.h>
+#include <disp3D/model/items/digitizertreeitem.h>
+#include <disp3D/model/items/bemtreeitem.h>
+#include <disp3D/model/items/dipoletreeitem.h>
 
 #include <disp/viewers/control3dview.h>
 
@@ -246,7 +246,7 @@ void View3D::updateCoregMriFid(FiffDigPointSet digSetFid)
 
 void View3D::updateCoregTrans(FiffCoordTrans headMriTrans)
 {
-    // Note: Per-item transforms for digitizers are not yet supported in disp3D_rhi.
+    // Note: Per-item transforms for digitizers are not yet supported in disp3D.
     // The coregistration transform will need to be applied via BrainView's scene transform
     // or by rebuilding the digitizer data in the transformed space.
     Q_UNUSED(headMriTrans)
@@ -277,7 +277,7 @@ void View3D::newPickingEvent(const QVector3D &worldIntersection)
 void View3D::onFiducialChanged(const int iFiducial)
 {
     // Note: BrainView does not have setCameraRotation(int degrees).
-    // Camera rotation for fiducial picking is not yet supported in disp3D_rhi.
+    // Camera rotation for fiducial picking is not yet supported in disp3D.
     Q_UNUSED(iFiducial)
     m_iFiducial = iFiducial;
 }

@@ -28,7 +28,7 @@
 #include <fiff/fiff_cov.h>
 
 #include <mne/mne.h>
-#include <inverse/inv_source_estimate.h>
+#include <inv/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_forward_solution.h>
 #include <mne/mne_bem.h>

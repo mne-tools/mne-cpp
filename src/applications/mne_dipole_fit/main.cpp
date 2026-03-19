@@ -37,8 +37,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inverse/dipole_fit/inv_dipole_fit_settings.h>
-#include <inverse/dipole_fit/inv_dipole_fit.h>
+#include <inv/dipole_fit/inv_dipole_fit_settings.h>
+#include <inv/dipole_fit/inv_dipole_fit.h>
 
 #include <utils/generics/applicationlogger.h>
 
@@ -46,9 +46,9 @@
 
 #include <QFile>
 
-#include <disp3D_rhi/view/brainview.h>
-#include <disp3D_rhi/model/braintreemodel.h>
-#include <disp3D_rhi/model/items/dipoletreeitem.h>
+#include <disp3D/view/brainview.h>
+#include <disp3D/model/braintreemodel.h>
+#include <disp3D/model/items/dipoletreeitem.h>
 
 #include <fs/fs_label.h>
 #include <fs/fs_surfaceset.h>

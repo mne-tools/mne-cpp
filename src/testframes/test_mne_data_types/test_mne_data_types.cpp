@@ -9,7 +9,7 @@
 #include <mne/mne_bem_surface.h>
 #include <mne/mne_forward_solution.h>
 #include <mne/mne_inverse_operator.h>
-#include <inverse/inv_source_estimate.h>
+#include <inv/inv_source_estimate.h>
 #include <mne/mne_epoch_data.h>
 #include <mne/mne_epoch_data_list.h>
 #include <mne/mne_named_matrix.h>

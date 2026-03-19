@@ -38,10 +38,10 @@
 
 #include <iostream>
 
-#include <disp3D_rhi/view/brainview.h>
-#include <disp3D_rhi/model/braintreemodel.h>
-#include <disp3D_rhi/model/items/digitizersettreeitem.h>
-#include <disp3D_rhi/model/items/bemtreeitem.h>
+#include <disp3D/view/brainview.h>
+#include <disp3D/model/braintreemodel.h>
+#include <disp3D/model/items/digitizersettreeitem.h>
+#include <disp3D/model/items/bemtreeitem.h>
 
 #include "fiff/fiff_dig_point_set.h"
 #include "fiff/fiff_dig_point.h"

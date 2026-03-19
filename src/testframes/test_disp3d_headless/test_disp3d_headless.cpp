@@ -1,6 +1,6 @@
 /**
  * @file test_disp3d_headless.cpp
- * @brief Headless tests for disp3D_rhi library: Interpolation functions,
+ * @brief Headless tests for disp3D library: Interpolation functions,
  *        GeometryInfo (surface distances & projection), MeshFactory geometry,
  *        DataLoader I/O paths, and RtSourceDataController / RtSensorDataController setters.
  */
@@ -11,16 +11,16 @@
 #include <QColor>
 #include <QFile>
 
-#include <disp3D_rhi/helpers/interpolation.h>
-#include <disp3D_rhi/helpers/geometryinfo.h>
-#include <disp3D_rhi/geometry/meshfactory.h>
-#include <disp3D_rhi/core/dataloader.h>
-#include <disp3D_rhi/workers/rtsourcedatacontroller.h>
-#include <disp3D_rhi/workers/rtsensordatacontroller.h>
+#include <disp3D/helpers/interpolation.h>
+#include <disp3D/helpers/geometryinfo.h>
+#include <disp3D/geometry/meshfactory.h>
+#include <disp3D/core/dataloader.h>
+#include <disp3D/workers/rtsourcedatacontroller.h>
+#include <disp3D/workers/rtsensordatacontroller.h>
 
 #include <fiff/fiff.h>
 
-using namespace DISP3DRHILIB;
+using namespace DISP3DLIB;
 using namespace Eigen;
 
 class TestDisp3dHeadless : public QObject

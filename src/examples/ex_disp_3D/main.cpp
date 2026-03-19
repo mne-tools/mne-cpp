@@ -42,20 +42,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D_rhi/view/brainview.h>
-#include <disp3D_rhi/model/braintreemodel.h>
-#include <disp3D_rhi/model/items/digitizersettreeitem.h>
-#include <disp3D_rhi/model/items/bemtreeitem.h>
+#include <disp3D/view/brainview.h>
+#include <disp3D/model/braintreemodel.h>
+#include <disp3D/model/items/digitizersettreeitem.h>
+#include <disp3D/model/items/bemtreeitem.h>
 
 #include <fs/fs_surfaceset.h>
 #include <fs/fs_annotationset.h>
 
-#include <inverse/inv_source_estimate.h>
+#include <inv/inv_source_estimate.h>
 #include <mne/mne_bem.h>
 
 #include <fiff/fiff_dig_point_set.h>
 
-#include <inverse/minimum_norm/inv_minimum_norm.h>
+#include <inv/minimum_norm/inv_minimum_norm.h>
 
 #include <utils/generics/applicationlogger.h>
 

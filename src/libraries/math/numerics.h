@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * @file     numerics.h
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March, 2026
  *

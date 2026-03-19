@@ -10,7 +10,7 @@ add_subdirectory(ex_averaging)
 add_subdirectory(ex_cancel_noise)
 add_subdirectory(ex_compute_forward)
 
-## Examples that link mne_disp3D_rhi but don't use 3D visualization directly
+## Examples that link mne_disp3D but don't use 3D visualization directly
 if(NOT WASM)
   add_subdirectory(ex_connectivity_performance)
   add_subdirectory(ex_disp)
@@ -34,8 +34,8 @@ if(NOT WASM)
   add_subdirectory(ex_tf_plot)
 endif()
 
-## Examples using disp3D_rhi
-if(TARGET mne_disp3D_rhi)
+## Examples using disp3D
+if(TARGET mne_disp3D)
     add_subdirectory(ex_clustered_inverse_mne)
     add_subdirectory(ex_clustered_inverse_mne_raw)
     add_subdirectory(ex_clustered_inverse_pwl_rap_music_raw)

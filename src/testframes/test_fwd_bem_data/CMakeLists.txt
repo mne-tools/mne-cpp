@@ -26,7 +26,7 @@ target_link_libraries(test_fwd_bem_data PRIVATE
     mne_math
     mne_events
     mne_disp
-    mne_disp3D_rhi
+    mne_disp3D
     eigen
 )
 

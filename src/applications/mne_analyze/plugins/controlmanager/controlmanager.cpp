@@ -47,8 +47,8 @@
 #include <disp/viewers/control3dview.h>
 #include <disp/viewers/fiffrawviewsettings.h>
 
-#ifdef MNE_DISP3D_RHI
-#include <disp3D_rhi/model/braintreemodel.h>
+#ifdef MNE_DISP3D
+#include <disp3D/model/braintreemodel.h>
 #endif
 
 //=============================================================================================================
@@ -214,7 +214,7 @@ void ControlManager::handleEvent(QSharedPointer<Event> e)
         }
         break;
 
-#ifdef MNE_DISP3D_RHI
+#ifdef MNE_DISP3D
     case EVENT_TYPE::SET_DATA3D_TREE_MODEL:
         init3DGui(e->getData().value<QSharedPointer<BrainTreeModel>>());
         break;
@@ -231,7 +231,7 @@ QVector<EVENT_TYPE> ControlManager::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
     temp.push_back(SELECTED_MODEL_CHANGED);
-#ifdef MNE_DISP3D_RHI
+#ifdef MNE_DISP3D
     temp.push_back(SET_DATA3D_TREE_MODEL);
 #endif
 
@@ -318,7 +318,7 @@ void ControlManager::onMakeScreenshot(const QString& imageType)
 
 //=============================================================================================================
 
-#ifdef MNE_DISP3D_RHI
+#ifdef MNE_DISP3D
 void ControlManager::init3DGui(QSharedPointer<BrainTreeModel> pModel)
 {
     m_pControl3DView->setModel(pModel.data());

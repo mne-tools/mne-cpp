@@ -49,8 +49,8 @@
 #include <mne/mne_inverse_operator.h>
 
 #include <fiff/fiff_evoked.h>
-#include <inverse/inv_source_estimate.h>
-#include <inverse/minimum_norm/inv_minimum_norm.h>
+#include <inv/inv_source_estimate.h>
+#include <inv/minimum_norm/inv_minimum_norm.h>
 
 #include <utils/generics/applicationlogger.h>
 

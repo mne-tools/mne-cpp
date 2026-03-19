@@ -54,10 +54,10 @@
 #include <mne/mne.h>
 #include <mne/mne_inverse_operator.h>
 #include <mne/mne_forward_solution.h>
-#include <inverse/inv_source_estimate.h>
+#include <inv/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
 
-#include <inverse/minimum_norm/inv_minimum_norm.h>
+#include <inv/minimum_norm/inv_minimum_norm.h>
 
 #include <fs/fs_label.h>
 
