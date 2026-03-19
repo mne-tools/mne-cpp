@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../communication_global.h"
+#include "../com_global.h"
 
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_info.h>
@@ -59,10 +59,10 @@
 #include <QTcpSocket>
 
 //=============================================================================================================
-// DEFINE NAMESPACE COMMUNICATIONLIB
+// DEFINE NAMESPACE COMLIB
 //=============================================================================================================
 
-namespace COMMUNICATIONLIB
+namespace COMLIB
 {
 
 //=============================================================================================================
@@ -85,7 +85,7 @@ struct MetaData{
  *
  * @brief TCP client for streaming raw MEG/EEG measurement data from mne_rt_server (port 4218)
  */
-class COMMUNICATIONSHARED_EXPORT RtDataClient : public QTcpSocket
+class COMSHARED_EXPORT RtDataClient : public QTcpSocket
 {
     Q_OBJECT
 

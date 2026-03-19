@@ -161,7 +161,7 @@ bool Sphere::fit_sphere_to_points(const MatrixXf &rr, float simplex_size, Vector
     /*
      * Find the optimal sphere origin
      */
-    fitUserRecNew user;
+    FitUser user;
     float      ftol            = 1e-5f;
     int        max_eval        = 500;
     int        report_interval = -1;
@@ -258,7 +258,7 @@ float Sphere::fit_eval(const VectorXf &fitpar, const void  *user_data)
      * Calculate the cost function value
      * Optimize for the radius inside here
      */
-    const fitUserNew& user = (fitUserNew)user_data;
+    const FitUser* user = static_cast<const FitUser*>(user_data);
     const VectorXf& r0 = fitpar;
 
     float F;
@@ -279,7 +279,7 @@ float Sphere::fit_eval(const VectorXf &fitpar, const void  *user_data)
 
 //=============================================================================================================
 
-float Sphere::opt_rad(const VectorXf &r0,const fitUserNew user)
+float Sphere::opt_rad(const VectorXf &r0,const FitUser* user)
 {
   MatrixXf diff = user->rr.rowwise() - r0.transpose();
   return diff.rowwise().norm().mean();

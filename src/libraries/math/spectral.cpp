@@ -187,14 +187,6 @@ void Spectral::reduce(QVector<MatrixXcd>& finalData,
 
 //=============================================================================================================
 
-//void Spectral::reduce(std::vector<MatrixXcd>& finalData,
-//                      const MatrixXcd& resultData)
-//{
-//    finalData.push_back(resultData);
-//}
-
-//=============================================================================================================
-
 Eigen::RowVectorXd Spectral::psdFromTaperedSpectra(const Eigen::MatrixXcd &matTapSpectrum,
                                                    const Eigen::VectorXd &vecTapWeights,
                                                    int iNfft,

@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../communication_global.h"
+#include "../com_global.h"
 
 #include <utils/generics/commandpattern.h>
 
@@ -60,10 +60,10 @@
 #include <QStringList>
 
 //=============================================================================================================
-// DEFINE NAMESPACE COMMUNICATIONLIB
+// DEFINE NAMESPACE COMLIB
 //=============================================================================================================
 
-namespace COMMUNICATIONLIB
+namespace COMLIB
 {
 
 static QVariant defaultVariant;
@@ -74,7 +74,7 @@ static QVariant defaultVariant;
  *
  * @brief Named command with typed parameters for real-time server control
  */
-class COMMUNICATIONSHARED_EXPORT Command: public QObject, public UTILSLIB::ICommand
+class COMSHARED_EXPORT Command: public QObject, public UTILSLIB::ICommand
 {
 Q_OBJECT
 

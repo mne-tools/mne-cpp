@@ -110,7 +110,7 @@ public:
      *
      * @return Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ].
      */
-    inline static Eigen::VectorXd* combine_xyz(const Eigen::VectorXd& vec)
+    inline static Eigen::VectorXd combine_xyz(const Eigen::VectorXd& vec)
     {
         return UTILSLIB::MNEMath::combine_xyz(vec);
     }
@@ -172,7 +172,7 @@ public:
      *
      * @return A sparse block diagonal, diagonalized from the elements in "A".
      */
-    static inline Eigen::SparseMatrix<double>* make_block_diag(const Eigen::MatrixXd &A, qint32 n)
+    static inline Eigen::SparseMatrix<double> make_block_diag(const Eigen::MatrixXd &A, qint32 n)
     {
         return UTILSLIB::MNEMath::make_block_diag(A, n);
     }

@@ -999,9 +999,8 @@ MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nave ,flo
         {
             // For free orientations the variances at three consecutive entries
             // must be squared and summed, yielding one factor per source location.
-            VectorXd* t = MNEMath::combine_xyz(noise_norm.transpose());
-            noise_norm_new = t->cwiseSqrt();
-            delete t;
+            VectorXd t = MNEMath::combine_xyz(noise_norm.transpose());
+            noise_norm_new = t.cwiseSqrt();
         }
         VectorXd vOnes = VectorXd::Ones(noise_norm_new.size());
         VectorXd tmp = vOnes.cwiseQuotient(noise_norm_new.cwiseAbs());

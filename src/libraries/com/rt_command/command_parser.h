@@ -41,8 +41,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../communication_global.h"
-#include "rawcommand.h"
+#include "../com_global.h"
+#include "raw_command.h"
 #include "command.h"
 
 #include <utils/generics/observerpattern.h>
@@ -56,16 +56,16 @@
 #include <QMultiMap>
 
 //=============================================================================================================
-// DEFINE NAMESPACE COMMUNICATIONLIB
+// DEFINE NAMESPACE COMLIB
 //=============================================================================================================
 
-namespace COMMUNICATIONLIB
+namespace COMLIB
 {
 
 /**
  * @brief Tokenizes and parses JSON or CLI command strings into RawCommand objects
  */
-class COMMUNICATIONSHARED_EXPORT CommandParser : public QObject, public UTILSLIB::Subject
+class COMSHARED_EXPORT CommandParser : public QObject, public UTILSLIB::Subject
 {
     Q_OBJECT
 

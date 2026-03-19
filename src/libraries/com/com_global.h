@@ -49,37 +49,37 @@
 //=============================================================================================================
 
 #if defined(STATICBUILD)
-#  define COMMUNICATIONSHARED_EXPORT
-#elif defined(MNE_COMMUNICATION_LIBRARY)
-#  define COMMUNICATIONSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#  define COMSHARED_EXPORT
+#elif defined(MNE_COM_LIBRARY)
+#  define COMSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define COMMUNICATIONSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define COMSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 //=============================================================================================================
 /**
- * @namespace COMMUNICATIONLIB
+ * @namespace COMLIB
  * @brief     Real-time client/server communication (commands, raw data streaming).
  */
-namespace COMMUNICATIONLIB{
+namespace COMLIB{
 
 //=============================================================================================================
 /**
  * Returns build date and time.
  */
-COMMUNICATIONSHARED_EXPORT const char* buildDateTime();
+COMSHARED_EXPORT const char* buildDateTime();
 
 //=============================================================================================================
 /**
  * Returns abbreviated build git hash.
  */
-COMMUNICATIONSHARED_EXPORT const char* buildHash();
+COMSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**
  * Returns full build git hash.
  */
-COMMUNICATIONSHARED_EXPORT const char* buildHashLong();
+COMSHARED_EXPORT const char* buildHashLong();
 }
 
-#endif // COMMUNICATION_GLOBAL_H
+#endif // COM_GLOBAL_H

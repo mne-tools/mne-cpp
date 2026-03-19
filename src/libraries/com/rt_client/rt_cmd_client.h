@@ -41,9 +41,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../communication_global.h"
-#include "../rtCommand/commandmanager.h"
-#include "../rtCommand/command.h"
+#include "../com_global.h"
+#include "../rt_command/command_manager.h"
+#include "../rt_command/command.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -56,10 +56,10 @@
 #include <QTcpSocket>
 
 //=============================================================================================================
-// DEFINE NAMESPACE COMMUNICATIONLIB
+// DEFINE NAMESPACE COMLIB
 //=============================================================================================================
 
-namespace COMMUNICATIONLIB
+namespace COMLIB
 {
 
 //=============================================================================================================
@@ -68,7 +68,7 @@ namespace COMMUNICATIONLIB
  *
  * @brief TCP client for sending JSON commands to and receiving responses from mne_rt_server (port 4217)
  */
-class COMMUNICATIONSHARED_EXPORT RtCmdClient : public QTcpSocket
+class COMSHARED_EXPORT RtCmdClient : public QTcpSocket
 {
     Q_OBJECT
 

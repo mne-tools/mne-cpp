@@ -40,11 +40,10 @@
 
 #include "kmeans.h"
 
-#include <math.h>
+#include <cmath>
 #include <iostream>
 #include <algorithm>
 #include <vector>
-#include <time.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -69,12 +68,13 @@ KMeans::KMeans(QString distance,
                QString emptyact,
                bool online,
                qint32 maxit)
-: m_sDistance(distance.toStdString())
-, m_sStart(start.toStdString())
-, m_iReps(replicates)
-, m_sEmptyact(emptyact.toStdString())
+: m_distance(distanceFromString(distance.toStdString()))
+, m_start(startFromString(start.toStdString()))
+, m_emptyact(emptyactFromString(emptyact.toStdString()))
+, m_iReps(std::max(replicates, qint32(1)))
 , m_iMaxit(maxit)
 , m_bOnline(online)
+, m_rng(std::random_device{}())
 , emptyErrCnt(0)
 , iter(0)
 , k(0)
@@ -83,41 +83,61 @@ KMeans::KMeans(QString distance,
 , totsumD(0)
 , prevtotsumD(0)
 {
-    // Assume one replicate
-    if (m_iReps < 1)
-        m_iReps = 1;
 }
 
 //=============================================================================================================
 
-//KMeans::KMeans(std::string distance,
-//               std::string start,
-//               qint32 replicates,
-//               std::string emptyact,
-//               bool online,
-//               qint32 maxit)
-//: m_sDistance(distance)
-//, m_sStart(start)
-//, m_iReps(replicates)
-//, m_sEmptyact(emptyact)
-//, m_iMaxit(maxit)
-//, m_bOnline(online)
-//, emptyErrCnt(0)
-//, iter(0)
-//, k(0)
-//, n(0)
-//, p(0)
-//, totsumD(0)
-//, prevtotsumD(0)
-//{
-//    // Assume one replicate
-//    if (m_iReps < 1)
-//        m_iReps = 1;
-//}
+KMeans::KMeans(KMeansDistance distance,
+               KMeansStart start,
+               qint32 replicates,
+               KMeansEmptyAction emptyact,
+               bool online,
+               qint32 maxit)
+: m_distance(distance)
+, m_start(start)
+, m_emptyact(emptyact)
+, m_iReps(std::max(replicates, qint32(1)))
+, m_iMaxit(maxit)
+, m_bOnline(online)
+, m_rng(std::random_device{}())
+, emptyErrCnt(0)
+, iter(0)
+, k(0)
+, n(0)
+, p(0)
+, totsumD(0)
+, prevtotsumD(0)
+{
+}
 
 //=============================================================================================================
 
-bool KMeans::calculate(MatrixXd X,
+KMeansDistance KMeans::distanceFromString(const std::string& name)
+{
+    if (name == "cityblock")    return KMeansDistance::CityBlock;
+    if (name == "cosine")       return KMeansDistance::Cosine;
+    if (name == "correlation")  return KMeansDistance::Correlation;
+    if (name == "hamming")      return KMeansDistance::Hamming;
+    return KMeansDistance::SquaredEuclidean;
+}
+
+KMeansStart KMeans::startFromString(const std::string& name)
+{
+    if (name == "uniform")  return KMeansStart::Uniform;
+    if (name == "cluster")  return KMeansStart::Cluster;
+    return KMeansStart::Sample;
+}
+
+KMeansEmptyAction KMeans::emptyactFromString(const std::string& name)
+{
+    if (name == "drop")       return KMeansEmptyAction::Drop;
+    if (name == "singleton")  return KMeansEmptyAction::Singleton;
+    return KMeansEmptyAction::Error;
+}
+
+//=============================================================================================================
+
+bool KMeans::calculate(const MatrixXd& X_in,
                        qint32 kClusters,
                        VectorXi& idx,
                        MatrixXd& C,
@@ -127,63 +147,37 @@ bool KMeans::calculate(MatrixXd X,
     if (kClusters < 1)
         return false;
 
-    //Init random generator
-    srand ( time(NULL) );
+    // Work on a local copy only when normalization is needed
+    MatrixXd X = X_in;
 
-// n points in p dimensional space
     k = kClusters;
     n = X.rows();
     p = X.cols();
 
-    if(m_sDistance.compare("cosine") == 0)
+    if (m_distance == KMeansDistance::Correlation)
     {
-//        Xnorm = sqrt(sum(X.^2, 2));
-//        if any(min(Xnorm) <= eps(max(Xnorm)))
-//            error(['Some points have small relative magnitudes, making them ', ...
-//                   'effectively zero.\nEither remove those points, or choose a ', ...
-//                   'distance other than ''cosine''.']);
-//        end
-//        X = X ./ Xnorm(:,ones(1,p));
+        X.array() -= (X.rowwise().sum().array() / static_cast<double>(p)).replicate(1, p);
+        MatrixXd Xnorm = X.array().pow(2).rowwise().sum().sqrt();
+        X.array() /= Xnorm.replicate(1, p).array();
     }
-    else if(m_sDistance.compare("correlation")==0)
-    {
-        X.array() -= (X.rowwise().sum().array() / (double)p).replicate(1,p); //X - X.rowwise().sum();//.repmat(mean(X,2),1,p);
-        MatrixXd Xnorm = (X.array().pow(2).rowwise().sum()).sqrt();//sqrt(sum(X.^2, 2));
-//        if any(min(Xnorm) <= eps(max(Xnorm)))
-//            error(['Some points have small relative standard deviations, making them ', ...
-//                   'effectively constant.\nEither remove those points, or choose a ', ...
-//                   'distance other than ''correlation''.']);
-//        end
-        X.array() /= Xnorm.replicate(1,p).array();
-    }
-//    else if(m_sDistance.compare('hamming')==0)
-//    {
-//        if ~all(ismember(X(:),[0 1]))
-//            error(message('NonbinaryDataForHamm'));
-//        end
-//    }
 
-    // Start
-    RowVectorXd Xmins;
-    RowVectorXd Xmaxs;
-    if (m_sStart.compare("uniform") == 0)
+    // Set up uniform initialization bounds if needed
+    RowVectorXd Xmins, Xmaxs;
+    if (m_start == KMeansStart::Uniform)
     {
-        if (m_sDistance.compare("hamming") == 0)
+        if (m_distance == KMeansDistance::Hamming)
         {
-            printf("Error: Uniform Start For Hamming\n");
+            qWarning("KMeans: Uniform initialization is not supported for Hamming distance.");
             return false;
         }
         Xmins = X.colwise().minCoeff();
         Xmaxs = X.colwise().maxCoeff();
     }
 
-    //
-    // Done with input argument processing, begin clustering
-    //
+    // Prepare online-update workspace
     if (m_bOnline)
     {
-        Del = MatrixXd(n,k);
-        Del.fill(std::numeric_limits<double>::quiet_NaN());// reassignment criterion
+        Del = MatrixXd::Constant(n, k, std::numeric_limits<double>::quiet_NaN());
     }
 
     double totsumDBest = std::numeric_limits<double>::max();
@@ -194,117 +188,91 @@ bool KMeans::calculate(MatrixXd X,
     VectorXd sumDBest;
     MatrixXd Dbest;
 
-    for(qint32 rep = 0; rep < m_iReps; ++rep)
+    std::uniform_int_distribution<qint32> sampleDist(0, n - 1);
+
+    for (qint32 rep = 0; rep < m_iReps; ++rep)
     {
-        if (m_sStart.compare("uniform") == 0)
+        // --- Initialize centroids ---
+        if (m_start == KMeansStart::Uniform)
         {
-            C = MatrixXd::Zero(k,p);
-            for(qint32 i = 0; i < k; ++i)
-                for(qint32 j = 0; j < p; ++j)
-                    C(i,j) = unifrnd(Xmins[j], Xmaxs[j]);
-            // For 'cosine' and 'correlation', these are uniform inside a subset
-            // of the unit hypersphere.  Still need to center them for
-            // 'correlation'.  (Re)normalization for 'cosine'/'correlation' is
-            // done at each iteration.
-            if (m_sDistance.compare("correlation") == 0)
-                C.array() -= (C.array().rowwise().sum()/p).replicate(1, p).array();
+            C = MatrixXd::Zero(k, p);
+            for (qint32 i = 0; i < k; ++i)
+            {
+                for (qint32 j = 0; j < p; ++j)
+                {
+                    std::uniform_real_distribution<double> dist(Xmins[j], Xmaxs[j]);
+                    C(i, j) = dist(m_rng);
+                }
+            }
+            if (m_distance == KMeansDistance::Correlation)
+                C.array() -= (C.array().rowwise().sum() / p).replicate(1, p).array();
         }
-        else if (m_sStart.compare("sample") == 0)
+        else if (m_start == KMeansStart::Sample)
         {
-            C = MatrixXd::Zero(k,p);
-            for(qint32 i = 0; i < k; ++i)
-                C.block(i,0,1,p) = X.block(rand() % n, 0, 1, p);
-            // DEBUG
-//            C.block(0,0,1,p) = X.block(2, 0, 1, p);
-//            C.block(1,0,1,p) = X.block(7, 0, 1, p);
-//            C.block(2,0,1,p) = X.block(17, 0, 1, p);
+            C = MatrixXd::Zero(k, p);
+            for (qint32 i = 0; i < k; ++i)
+                C.row(i) = X.row(sampleDist(m_rng));
         }
-    //    else if (start.compare("cluster") == 0)
-    //    {
-    //        Xsubset = X(randsample(n,floor(.1*n)),:);
-    //        [dum, C] = kmeans(Xsubset, k, varargin{:}, 'start','sample', 'replicates',1);
-    //    }
-    //    else if (start.compare("numeric") == 0)
-    //    {
-    //        C = CC(:,:,rep);
-    //    }
 
-        // Compute the distance from every point to each cluster centroid and the
-        // initial assignment of points to clusters
-        D = distfun(X, C);//, 0);
-        idx = VectorXi::Zero(D.rows());
-        d = VectorXd::Zero(D.rows());
+        // Compute initial distances and assignments
+        D = distfun(X, C);
+        idx = VectorXi::Zero(n);
+        d = VectorXd::Zero(n);
 
-        for(qint32 i = 0; i < D.rows(); ++i)
+        for (qint32 i = 0; i < n; ++i)
             d[i] = D.row(i).minCoeff(&idx[i]);
 
         m = VectorXi::Zero(k);
-        for(qint32 i = 0; i < k; ++i)
-            for (qint32 j = 0; j < idx.rows(); ++j)
-                if(idx[j] == i)
-                    ++ m[i];
+        for (qint32 i = 0; i < n; ++i)
+            ++m[idx[i]];
 
-        try // catch empty cluster errors and move on to next rep
+        try
         {
-            // Begin phase one:  batch reassignments
+            // Phase 1: batch reassignments
             bool converged = batchUpdate(X, C, idx);
 
-            // Begin phase two:  single reassignments
+            // Phase 2: single reassignments
             if (m_bOnline)
                 converged = onlineUpdate(X, C, idx);
 
             if (!converged)
-                printf("Failed To Converge during replicate %d\n", rep);
+                qWarning("KMeans: Failed to converge during replicate %d.", rep);
 
-            // Calculate cluster-wise sums of distances
-            VectorXi nonempties = VectorXi::Zero(m.rows());
-            quint32 count = 0;
-            for(qint32 i = 0; i < m.rows(); ++i)
-            {
-                if(m[i] > 0)
-                {
-                    nonempties[i] = 1;
-                    ++count;
-                }
-            }
-            MatrixXd C_tmp(count,C.cols());
-            count = 0;
-            for(qint32 i = 0; i < nonempties.rows(); ++i)
-            {
-                if(nonempties[i])
-                {
-                    C_tmp.row(count) = C.row(i);
-                    ++count;
-                }
-            }
+            // Recompute distances for non-empty clusters only
+            VectorXi nonempties = (m.array() > 0).cast<int>();
+            qint32 count = nonempties.sum();
 
-            MatrixXd D_tmp = distfun(X, C_tmp);//, iter);
-            count = 0;
-            for(qint32 i = 0; i < nonempties.rows(); ++i)
+            MatrixXd C_tmp(count, C.cols());
+            qint32 ci = 0;
+            for (qint32 i = 0; i < k; ++i)
+                if (nonempties[i])
+                    C_tmp.row(ci++) = C.row(i);
+
+            MatrixXd D_tmp = distfun(X, C_tmp);
+            ci = 0;
+            for (qint32 i = 0; i < k; ++i)
             {
-                if(nonempties[i])
+                if (nonempties[i])
                 {
-                    D.col(i) = D_tmp.col(count);
-                    C.row(i) = C_tmp.row(count);
-                    ++count;
+                    D.col(i) = D_tmp.col(ci);
+                    C.row(i) = C_tmp.row(ci);
+                    ++ci;
                 }
             }
 
+            // Per-point distance to assigned centroid
             d = VectorXd::Zero(n);
-            for(qint32 i = 0; i < n; ++i)
-                d[i] += D.array()(idx[i]*n+i);//Colum Major
+            for (qint32 i = 0; i < n; ++i)
+                d[i] = D(i, idx[i]);
 
+            // Cluster-wise sum of distances
             sumD = VectorXd::Zero(k);
-            for(qint32 i = 0; i < k; ++i)
-                for (qint32 j = 0; j < idx.rows(); ++j)
-                    if(idx[j] == i)
-                        sumD[i] += d[j];
+            for (qint32 i = 0; i < n; ++i)
+                sumD[idx[i]] += d[i];
 
-            totsumD = sumD.array().sum();
+            totsumD = sumD.sum();
 
-//            printf("%d iterations, total sum of distances = %f\n", iter, totsumD);
-
-            // Save the best solution so far
+            // Keep the best replicate
             if (totsumD < totsumDBest)
             {
                 totsumDBest = totsumD;
@@ -314,40 +282,22 @@ bool KMeans::calculate(MatrixXd X,
                 Dbest = D;
             }
         }
-        catch (int e)
+        catch (int)
         {
-            if(e == 0)
-            {
-                // If an empty cluster error occurred in one of multiple replicates, catch
-                // it, warn, and move on to next replicate.  Error only when all replicates
-                // fail.  Rethrow an other kind of error.
-                if (m_iReps == 1)
-                    return false;
-                else
-                {
-                    emptyErrCnt = emptyErrCnt + 1;
-//                    printf("Replicate %d terminated: empty cluster created at iteration %d.\n", rep, iter);
-                    if (emptyErrCnt == m_iReps)
-                    {
-//                        error(message('EmptyClusterAllReps'));
-                        return false;
-                    }
+            if (m_iReps == 1)
+                return false;
 
-                }
-            }
-        } // catch
+            ++emptyErrCnt;
+            if (emptyErrCnt == m_iReps)
+                return false;
+        }
+    }
 
-    } // replicates
-
-    // Return the best solution
     idx = idxBest;
     C = Cbest;
     sumD = sumDBest;
     D = Dbest;
 
-//if hadNaNs
-//    idx = statinsertnan(wasnan, idx);
-//end
     return true;
 }
 
@@ -358,224 +308,159 @@ bool KMeans::batchUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
     // Every point moved, every cluster will need an update
     qint32 i = 0;
     VectorXi moved(n);
-    for(i = 0; i < n; ++i)
+    for (i = 0; i < n; ++i)
         moved[i] = i;
 
     VectorXi changed(k);
-    for(i = 0; i < k; ++i)
+    for (i = 0; i < k; ++i)
         changed[i] = i;
 
     previdx = VectorXi::Zero(n);
+    prevtotsumD = std::numeric_limits<double>::max();
 
-    prevtotsumD = std::numeric_limits<double>::max();//max double
+    MatrixXd D = MatrixXd::Zero(n, k);
 
-    MatrixXd D = MatrixXd::Zero(X.rows(), k);
-
-    //
-    // Begin phase one:  batch reassignments
-    //
     iter = 0;
     bool converged = false;
-    while(true)
+    while (true)
     {
         ++iter;
 
-        // Calculate the new cluster centroids and counts, and update the
-        // distance from every point to those new cluster centroids
+        // Recompute centroids for changed clusters and their distances
         MatrixXd C_new;
         VectorXi m_new;
-        KMeans::gcentroids(X, idx, changed, C_new, m_new);
-        MatrixXd D_new = distfun(X, C_new);//, iter);
+        gcentroids(X, idx, changed, C_new, m_new);
+        MatrixXd D_new = distfun(X, C_new);
 
-        for(qint32 i = 0; i < changed.rows(); ++i)
+        for (qint32 i = 0; i < changed.rows(); ++i)
         {
             C.row(changed[i]) = C_new.row(i);
             D.col(changed[i]) = D_new.col(i);
             m[changed[i]] = m_new[i];
         }
 
-        // Deal with clusters that have just lost all their members
+        // Handle clusters that just lost all members
         VectorXi empties = VectorXi::Zero(changed.rows());
-        for(qint32 i = 0; i < changed.rows(); ++i)
-            if(m(i) == 0)
+        for (qint32 i = 0; i < changed.rows(); ++i)
+            if (m(i) == 0)
                 empties[i] = 1;
 
         if (empties.sum() > 0)
         {
-            if (m_sEmptyact.compare("error") == 0)
+            if (m_emptyact == KMeansEmptyAction::Error)
             {
                 return converged;
-//                throw 0;
             }
-            else if (m_sEmptyact.compare("drop") == 0)
-            {
-    //            // Remove the empty cluster from any further processing
-    //            D(:,empties) = NaN;
-    //            changed = changed(m(changed) > 0);
-    //            warning('Empty cluster created at iteration %d during replicate %d.',iter, rep,);
-            }
-            else if (m_sEmptyact.compare("singleton") == 0)
-            {
-    //            warning('Empty cluster created at iteration %d during replicate %d.', iter, rep);
-
-    //            for i = empties
-    //                d = D((idx-1)*n + (1:n)'); // use newly updated distances
-
-    //                % Find the point furthest away from its current cluster.
-    //                % Take that point out of its cluster and use it to create
-    //                % a new singleton cluster to replace the empty one.
-    //                [dlarge, lonely] = max(d);
-    //                from = idx(lonely); % taking from this cluster
-    //                if m(from) < 2
-    //                    % In the very unusual event that the cluster had only
-    //                    % one member, pick any other non-singleton point.
-    //                    from = find(m>1,1,'first');
-    //                    lonely = find(idx==from,1,'first');
-    //                end
-    //                C(i,:) = X(lonely,:);
-    //                m(i) = 1;
-    //                idx(lonely) = i;
-    //                D(:,i) = distfun(X, C(i,:), distance, iter);
-
-    //                % Update clusters from which points are taken
-    //                [C(from,:), m(from)] = gcentroids(X, idx, from, distance);
-    //                D(:,from) = distfun(X, C(from,:), distance, iter);
-    //                changed = unique([changed from]);
-    //            end
-            }
+            // Drop and Singleton actions: TODO — not yet implemented (kept as no-op)
         }
 
-        // Compute the total sum of distances for the current configuration.
+        // Total sum of distances for the current configuration
         totsumD = 0;
-        for(qint32 i = 0; i < n; ++i)
-            totsumD += D.array()(idx[i]*n+i);//Colum Major
-        // Test for a cycle: if objective is not decreased, back out
-        // the last step and move on to the single update phase
-        if(prevtotsumD <= totsumD)
+        for (qint32 i = 0; i < n; ++i)
+            totsumD += D(i, idx[i]);
+
+        // Cycle detection: if objective did not decrease, revert last step
+        if (prevtotsumD <= totsumD)
         {
             idx = previdx;
-            MatrixXd C_new;
-            VectorXi m_new;
-            gcentroids(X, idx, changed, C_new, m_new);
-            C.block(0,0,k,C.cols()) = C_new;
-            m.block(0,0,k,1) = m_new;
+            MatrixXd C_rev;
+            VectorXi m_rev;
+            gcentroids(X, idx, changed, C_rev, m_rev);
+            C.block(0, 0, k, C.cols()) = C_rev;
+            m.block(0, 0, k, 1) = m_rev;
             --iter;
             break;
         }
 
-//        printf("%6d\t%6d\t%8d\t%12g\n",iter,1,moved.rows(),totsumD);
         if (iter >= m_iMaxit)
             break;
 
-        // Determine closest cluster for each point and reassign points to clusters
+        // Reassign points to nearest centroid
         previdx = idx;
         prevtotsumD = totsumD;
 
-        VectorXi nidx(D.rows());
-        for(qint32 i = 0; i < D.rows(); ++i)
+        VectorXi nidx(n);
+        for (qint32 i = 0; i < n; ++i)
             d[i] = D.row(i).minCoeff(&nidx[i]);
 
         // Determine which points moved
-        VectorXi moved = VectorXi::Zero(nidx.rows());
-        qint32 count = 0;
-        for(qint32 i = 0; i < nidx.rows(); ++i)
+        std::vector<int> movedVec;
+        movedVec.reserve(n);
+        for (qint32 i = 0; i < n; ++i)
         {
-            if(nidx[i] != previdx[i])
-            {
-                moved[count] = i;
-                ++count;
-            }
-        }
-        moved.conservativeResize(count);
-
-        if (moved.rows() > 0)
-        {
-            // Resolve ties in favor of not moving
-            VectorXi moved_new = VectorXi::Zero(moved.rows());
-            count = 0;
-            for(qint32 i = 0; i < moved.rows(); ++i)
-            {
-                if(D.array()(previdx[moved[i]] * n + moved[i]) > d[moved[i]])
-                {
-                    moved_new[count] = moved[i];
-                    ++count;
-                }
-            }
-            moved_new.conservativeResize(count);
-            moved = moved_new;
+            if (nidx[i] != previdx[i])
+                movedVec.push_back(i);
         }
 
-        if (moved.rows() == 0)
+        // Resolve ties in favor of not moving
+        std::vector<int> movedFinal;
+        movedFinal.reserve(movedVec.size());
+        for (int mi : movedVec)
+        {
+            if (D(mi, previdx[mi]) > d[mi])
+                movedFinal.push_back(mi);
+        }
+
+        if (movedFinal.empty())
         {
             converged = true;
             break;
         }
 
-        for(qint32 i = 0; i < moved.rows(); ++i)
-            if(moved[i] >= 0)
-                idx[ moved[i] ] = nidx[ moved[i] ];
+        for (int mi : movedFinal)
+            idx[mi] = nidx[mi];
 
         // Find clusters that gained or lost members
         std::vector<int> tmp;
-        for(qint32 i = 0; i < moved.rows(); ++i)
-            tmp.push_back(idx[moved[i]]);
-        for(qint32 i = 0; i < moved.rows(); ++i)
-            tmp.push_back(previdx[moved[i]]);
+        tmp.reserve(2 * movedFinal.size());
+        for (int mi : movedFinal)
+        {
+            tmp.push_back(idx[mi]);
+            tmp.push_back(previdx[mi]);
+        }
+        std::sort(tmp.begin(), tmp.end());
+        tmp.erase(std::unique(tmp.begin(), tmp.end()), tmp.end());
 
-        std::sort(tmp.begin(),tmp.end());
-
-        std::vector<int>::iterator it;
-        it = std::unique(tmp.begin(),tmp.end());
-        tmp.resize( it - tmp.begin() );
-
-        changed.conservativeResize(tmp.size());
-
-        for(quint32 i = 0; i < tmp.size(); ++i)
+        changed.resize(tmp.size());
+        for (size_t i = 0; i < tmp.size(); ++i)
             changed[i] = tmp[i];
-    } // phase one
+    }
     return converged;
-} // nested function
+}
 
 //=============================================================================================================
 
 bool KMeans::onlineUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
 {
-    // Initialize some cluster information prior to phase two
-    MatrixXd Xmid1;
-    MatrixXd Xmid2;
-    if (m_sDistance.compare("cityblock") == 0)
+    // Initialize city-block median tracking if needed
+    MatrixXd Xmid1, Xmid2;
+    if (m_distance == KMeansDistance::CityBlock)
     {
-        Xmid1 = MatrixXd::Zero(k,p);
-        Xmid2 = MatrixXd::Zero(k,p);
-        for(qint32 i = 0; i < k; ++i)
+        Xmid1 = MatrixXd::Zero(k, p);
+        Xmid2 = MatrixXd::Zero(k, p);
+        for (qint32 i = 0; i < k; ++i)
         {
             if (m[i] > 0)
             {
-                // Separate out sorted coords for points in i'th cluster,
-                // and save values above and below median, component-wise
-                MatrixXd Xsorted(m[i],p);
+                MatrixXd Xsorted(m[i], p);
                 qint32 c = 0;
-                for(qint32 j = 0; j < idx.rows(); ++j)
-                {
-                    if(idx[j] == i)
-                    {
-                        Xsorted.row(c) = X.row(j);
-                        ++c;
-                    }
-                }
-                for(qint32 j = 0; j < Xsorted.cols(); ++j)
-                    std::sort(Xsorted.col(j).data(),Xsorted.col(j).data()+Xsorted.rows());
+                for (qint32 j = 0; j < n; ++j)
+                    if (idx[j] == i)
+                        Xsorted.row(c++) = X.row(j);
 
-                qint32 nn = floor(0.5*m[i])-1;
+                for (qint32 j = 0; j < p; ++j)
+                    std::sort(Xsorted.col(j).data(), Xsorted.col(j).data() + Xsorted.rows());
+
+                qint32 nn = static_cast<qint32>(std::floor(0.5 * m[i])) - 1;
                 if ((m[i] % 2) == 0)
                 {
                     Xmid1.row(i) = Xsorted.row(nn);
-                    Xmid2.row(i) = Xsorted.row(nn+1);
+                    Xmid2.row(i) = Xsorted.row(nn + 1);
                 }
                 else if (m[i] > 1)
                 {
                     Xmid1.row(i) = Xsorted.row(nn);
-                    Xmid2.row(i) = Xsorted.row(nn+2);
+                    Xmid2.row(i) = Xsorted.row(nn + 2);
                 }
                 else
                 {
@@ -585,461 +470,317 @@ bool KMeans::onlineUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
             }
         }
     }
-    else if (m_sDistance.compare("hamming") == 0)
-    {
-//    Xsum = zeros(k,p);
-//    for i = 1:k
-//        if m(i) > 0
-//            % Sum coords for points in i'th cluster, component-wise
-//            Xsum(i,:) = sum(X(idx==i,:), 1);
-//        end
-//    end
-    }
 
-    //
-    // Begin phase two:  single reassignments
-    //
-    VectorXi changed = VectorXi(m.rows());
+    // Build list of non-empty clusters
+    VectorXi changed(m.rows());
     qint32 count = 0;
-    for(qint32 i = 0; i < m.rows(); ++i)
-    {
-        if(m[i] > 0)
-        {
-            changed[count] = i;
-            ++count;
-        }
-    }
+    for (qint32 i = 0; i < m.rows(); ++i)
+        if (m[i] > 0)
+            changed[count++] = i;
     changed.conservativeResize(count);
 
     qint32 lastmoved = 0;
     qint32 nummoved = 0;
     qint32 iter1 = iter;
     bool converged = false;
+
     while (iter < m_iMaxit)
     {
-        // Calculate distances to each cluster from each point, and the
-        // potential change in total sum of errors for adding or removing
-        // each point from each cluster.  Clusters that have not changed
-        // membership need not be updated.
-        //
-        // Singleton clusters are a special case for the sum of dists
-        // calculation.  Removing their only point is never best, so the
-        // reassignment criterion had better guarantee that a singleton
-        // point will stay in its own cluster.  Happily, we get
-        // Del(i,idx(i)) == 0 automatically for them.
-
-        if (m_sDistance.compare("sqeuclidean") == 0)
+        // Compute reassignment criterion Del for changed clusters
+        if (m_distance == KMeansDistance::SquaredEuclidean)
         {
-            for(qint32 j = 0; j < changed.rows(); ++j)
+            for (qint32 j = 0; j < changed.rows(); ++j)
             {
                 qint32 i = changed[j];
-                VectorXi mbrs = VectorXi::Zero(idx.rows());
-                for(qint32 l = 0; l < idx.rows(); ++l)
-                    if(idx[l] == i)
+                VectorXi mbrs = VectorXi::Zero(n);
+                for (qint32 l = 0; l < n; ++l)
+                    if (idx[l] == i)
                         mbrs[l] = 1;
 
-                VectorXi sgn = 1 - 2 * mbrs.array(); // -1 for members, 1 for nonmembers
-
+                VectorXi sgn = 1 - 2 * mbrs.array();
                 if (m[i] == 1)
-                    for(qint32 l = 0; l < mbrs.rows(); ++l)
-                        if(mbrs[l])
-                            sgn[l] = 0; // prevent divide-by-zero for singleton mbrs
+                    for (qint32 l = 0; l < n; ++l)
+                        if (mbrs[l])
+                            sgn[l] = 0;
 
-                Del.col(i) = ((double)m[i] / ((double)m[i] + sgn.cast<double>().array()));
-
-                Del.col(i).array() *= (X - C.row(i).replicate(n,1)).array().pow(2).rowwise().sum().array();
+                Del.col(i) = (static_cast<double>(m[i]) / (static_cast<double>(m[i]) + sgn.cast<double>().array()));
+                Del.col(i).array() *= (X.rowwise() - C.row(i)).array().pow(2).rowwise().sum().array();
             }
         }
-        else if (m_sDistance.compare("cityblock") == 0)
+        else if (m_distance == KMeansDistance::CityBlock)
         {
-            for(qint32 j = 0; j < changed.rows(); ++j)
+            for (qint32 j = 0; j < changed.rows(); ++j)
             {
                 qint32 i = changed[j];
-                if (m(i) % 2 == 0) // this will never catch singleton clusters
+                if (m(i) % 2 == 0)
                 {
-                    MatrixXd ldist = Xmid1.row(i).replicate(n,1) - X;
-                    MatrixXd rdist = X - Xmid2.row(i).replicate(n,1);
-                    VectorXd mbrs = VectorXd::Zero(idx.rows());
-
-                    for(qint32 l = 0; l < idx.rows(); ++l)
-                        if(idx[l] == i)
+                    MatrixXd ldist = Xmid1.row(i).replicate(n, 1) - X;
+                    MatrixXd rdist = X - Xmid2.row(i).replicate(n, 1);
+                    VectorXd mbrs = VectorXd::Zero(n);
+                    for (qint32 l = 0; l < n; ++l)
+                        if (idx[l] == i)
                             mbrs[l] = 1;
-                    MatrixXd sgn = ((-2*mbrs).array() + 1).replicate(1, p); // -1 for members, 1 for nonmembers
-                    rdist = sgn.array()*rdist.array(); ldist = sgn.array()*ldist.array();
+                    MatrixXd sgn = ((-2 * mbrs).array() + 1).replicate(1, p);
+                    rdist = sgn.array() * rdist.array();
+                    ldist = sgn.array() * ldist.array();
 
-                    for(qint32 l = 0; l < idx.rows(); ++l)
+                    for (qint32 l = 0; l < n; ++l)
                     {
                         double sum = 0;
-                        for(qint32 h = 0; h < rdist.cols(); ++h)
-                            sum += rdist(l,h) > ldist(l,h) ? rdist(l,h) < 0 ? 0 : rdist(l,h) : ldist(l,h) < 0 ? 0 : ldist(l,h);
-                        Del(l,i) = sum;
+                        for (qint32 h = 0; h < p; ++h)
+                            sum += std::max(0.0, std::max(rdist(l, h), ldist(l, h)));
+                        Del(l, i) = sum;
                     }
                 }
                 else
-                    Del.col(i) = ((X - C.row(i).replicate(n,1)).array().abs()).rowwise().sum();
+                {
+                    Del.col(i) = (X.rowwise() - C.row(i)).array().abs().rowwise().sum();
+                }
             }
         }
-        else if (m_sDistance.compare("cosine") == 0 || m_sDistance.compare("correlation") == 0)
+        else if (m_distance == KMeansDistance::Cosine || m_distance == KMeansDistance::Correlation)
         {
-            // The points are normalized, centroids are not, so normalize them
             MatrixXd normC = C.array().pow(2).rowwise().sum().sqrt();
-//            if any(normC < eps(class(normC))) % small relative to unit-length data points
-//                error('Zero cluster centroid created at iteration %d during replicate %d.',iter, rep);
-//            end
-            // This can be done without a loop, but the loop saves memory allocations
-            MatrixXd XCi;
-            qint32 i;
-            for(qint32 j = 0; j < changed.rows(); ++j)
+            for (qint32 j = 0; j < changed.rows(); ++j)
             {
-                i = changed[j];
-                XCi = X * C.row(i).transpose();
+                qint32 i = changed[j];
+                MatrixXd XCi = X * C.row(i).transpose();
 
-                VectorXi mbrs = VectorXi::Zero(idx.rows());
-                for(qint32 l = 0; l < idx.rows(); ++l)
-                    if(idx[l] == i)
+                VectorXi mbrs = VectorXi::Zero(n);
+                for (qint32 l = 0; l < n; ++l)
+                    if (idx[l] == i)
                         mbrs[l] = 1;
 
-                VectorXi sgn = 1 - 2 * mbrs.array(); // -1 for members, 1 for nonmembers
+                VectorXi sgn = 1 - 2 * mbrs.array();
+                double A = static_cast<double>(m[i]) * normC(i, 0);
+                double B = A * A;
 
-                double A = (double)m[i] * normC(i,0);
-                double B = pow(((double)m[i] * normC(i,0)),2);
-
-                Del.col(i) = 1 + sgn.cast<double>().array()*
-                        (A - (B + 2 * sgn.cast<double>().array() * m[i] * XCi.array() + 1).sqrt());
-
-                std::cout << "Del.col(i)\n" << Del.col(i) << std::endl;
-
-//                Del(:,i) = 1 + sgn .*...
-//                      (m(i).*normC(i) - sqrt((m(i).*normC(i)).^2 + 2.*sgn.*m(i).*XCi + 1));
+                Del.col(i) = 1 + sgn.cast<double>().array() *
+                    (A - (B + 2 * sgn.cast<double>().array() * m[i] * XCi.array() + 1).sqrt());
             }
         }
-        else if (m_sDistance.compare("hamming") == 0)
-        {
-//            for i = changed
-//                if mod(m(i),2) == 0 % this will never catch singleton clusters
-//                    % coords with an unequal number of 0s and 1s have a
-//                    % different contribution than coords with an equal
-//                    % number
-//                    unequal01 = find(2*Xsum(i,:) ~= m(i));
-//                    numequal01 = p - length(unequal01);
-//                    mbrs = (idx == i);
-//                    Di = abs(X(:,unequal01) - C(repmat(i,n,1),unequal01));
-//                    Del(:,i) = (sum(Di, 2) + mbrs*numequal01) / p;
-//                else
-//                    Del(:,i) = sum(abs(X - C(repmat(i,n,1),:)), 2) / p;
-//                end
-//            end
-        }
+        // Hamming: not yet implemented
 
-        // Determine best possible move, if any, for each point.  Next we
-        // will pick one from those that actually did move.
+        // Find best move for each point
         previdx = idx;
         prevtotsumD = totsumD;
 
-        VectorXi nidx = VectorXi::Zero(Del.rows());
-        VectorXd minDel = VectorXd::Zero(Del.rows());
-
-        for(qint32 i = 0; i < Del.rows(); ++i)
+        VectorXi nidx = VectorXi::Zero(n);
+        VectorXd minDel = VectorXd::Zero(n);
+        for (qint32 i = 0; i < n; ++i)
             minDel[i] = Del.row(i).minCoeff(&nidx[i]);
 
-        VectorXi moved = VectorXi::Zero(previdx.rows());
-        qint32 count = 0;
-        for(qint32 i = 0; i < moved.rows(); ++i)
-        {
-            if(previdx[i] != nidx[i])
-            {
-                moved[count] = i;
-                ++count;
-            }
-        }
-        moved.conservativeResize(count);
+        // Identify points that would move
+        std::vector<int> movedVec;
+        movedVec.reserve(n);
+        for (qint32 i = 0; i < n; ++i)
+            if (previdx[i] != nidx[i])
+                movedVec.push_back(i);
 
-        if (moved.sum() > 0)
-        {
-            // Resolve ties in favor of not moving
-            VectorXi moved_new = VectorXi::Zero(moved.rows());
-            count = 0;
-            for(qint32 i = 0; i < moved.rows(); ++i)
-            {
-                if ( Del.array()(previdx[moved(i)]*n + moved(i)) > minDel(moved(i)))
-                {
-                    moved_new[count] = moved[i];
-                    ++count;
-                }
-            }
-            moved_new.conservativeResize(count);
-            moved = moved_new;
-        }
+        // Resolve ties in favor of not moving
+        std::vector<int> movedFinal;
+        movedFinal.reserve(movedVec.size());
+        for (int mi : movedVec)
+            if (Del(mi, previdx[mi]) > minDel(mi))
+                movedFinal.push_back(mi);
 
-        if (moved.rows() <= 0)
+        if (movedFinal.empty())
         {
-            // Count an iteration if phase 2 did nothing at all, or if we're
-            // in the middle of a pass through all the points
             if ((iter == iter1) || nummoved > 0)
-            {
                 ++iter;
-
-//                printf("%6d\t%6d\t%8d\t%12g\n",iter,2,nummoved,totsumD);
-            }
             converged = true;
             break;
         }
 
         // Pick the next move in cyclic order
-        VectorXi moved_new(moved.rows());
-        for(qint32 i = 0; i < moved.rows(); ++i)
-            moved_new[i] = ((moved[i] - lastmoved) % n) + lastmoved;
+        int bestMoved = movedFinal[0];
+        int bestDist = ((movedFinal[0] - lastmoved) % n + n) % n;
+        for (size_t i = 1; i < movedFinal.size(); ++i)
+        {
+            int d_i = ((movedFinal[i] - lastmoved) % n + n) % n;
+            if (d_i < bestDist)
+            {
+                bestDist = d_i;
+                bestMoved = movedFinal[i];
+            }
+        }
+        int movedPt = bestMoved;
 
-        moved[0] = moved_new.minCoeff() % n;//+1
-        moved.conservativeResize(1);
-
-        // If we've gone once through all the points, that's an iteration
-        if (moved[0] <= lastmoved)
+        if (movedPt <= lastmoved)
         {
             ++iter;
-//            printf("%6d\t%6d\t%8d\t%12g\n",iter,2,nummoved,totsumD);
-            if(iter >= m_iMaxit)
+            if (iter >= m_iMaxit)
                 break;
             nummoved = 0;
         }
         ++nummoved;
-        lastmoved = moved[0];
+        lastmoved = movedPt;
 
-        qint32 oidx = idx(moved[0]);
-        nidx[0] = nidx(moved[0]);
-        nidx.conservativeResize(1);
-        totsumD += Del(moved[0],nidx[0]) - Del(moved[0],oidx);
+        qint32 oidx = idx[movedPt];
+        qint32 nidx_pt = nidx[movedPt];
+        totsumD += Del(movedPt, nidx_pt) - Del(movedPt, oidx);
 
-        // Update the cluster index vector, and the old and new cluster
-        // counts and centroids
-        idx[ moved[0] ] = nidx[0];
-        m( nidx[0] ) = m( nidx[0] ) + 1;
-        m( oidx ) = m( oidx ) - 1;
+        idx[movedPt] = nidx_pt;
+        m(nidx_pt) += 1;
+        m(oidx) -= 1;
 
-        if (m_sDistance.compare("sqeuclidean") == 0)
+        // Update centroids for the affected clusters
+        if (m_distance == KMeansDistance::SquaredEuclidean)
         {
-            C.row(nidx[0]) = C.row(nidx[0]).array() + (X.row(moved[0]) - C.row(nidx[0])).array() / m[nidx[0]];
-            C.row(oidx) = C.row(oidx).array() - (X.row(moved[0]) - C.row(oidx)).array() / m[oidx];
+            C.row(nidx_pt) += (X.row(movedPt) - C.row(nidx_pt)) / m[nidx_pt];
+            C.row(oidx)    -= (X.row(movedPt) - C.row(oidx)) / m[oidx];
         }
-        else if (m_sDistance.compare("cityblock") == 0)
+        else if (m_distance == KMeansDistance::CityBlock)
         {
             VectorXi onidx(2);
-            onidx << oidx, nidx[0];//ToDo always right?
+            onidx << oidx, nidx_pt;
 
-            qint32 i;
-            for(qint32 h = 0; h < 2; ++h)
+            for (qint32 h = 0; h < 2; ++h)
             {
-                i = onidx[h];
-                // Separate out sorted coords for points in each cluster.
-                // New centroid is the coord median, save values above and
-                // below median.  All done component-wise.
-                MatrixXd Xsorted(m[i],p);
+                qint32 ci = onidx[h];
+                MatrixXd Xsorted(m[ci], p);
                 qint32 c = 0;
-                for(qint32 j = 0; j < idx.rows(); ++j)
-                {
-                    if(idx[j] == i)
-                    {
-                        Xsorted.row(c) = X.row(j);
-                        ++c;
-                    }
-                }
-                for(qint32 j = 0; j < Xsorted.cols(); ++j)
-                    std::sort(Xsorted.col(j).data(),Xsorted.col(j).data()+Xsorted.rows());
+                for (qint32 j = 0; j < n; ++j)
+                    if (idx[j] == ci)
+                        Xsorted.row(c++) = X.row(j);
 
-                qint32 nn = floor(0.5*m[i])-1;
-                if ((m[i] % 2) == 0)
+                for (qint32 j = 0; j < p; ++j)
+                    std::sort(Xsorted.col(j).data(), Xsorted.col(j).data() + Xsorted.rows());
+
+                qint32 nn = static_cast<qint32>(std::floor(0.5 * m[ci])) - 1;
+                if ((m[ci] % 2) == 0)
                 {
-                    C.row(i) = 0.5 * (Xsorted.row(nn) + Xsorted.row(nn+1));
-                    Xmid1.row(i) = Xsorted.row(nn);
-                    Xmid2.row(i) = Xsorted.row(nn+1);
+                    C.row(ci) = 0.5 * (Xsorted.row(nn) + Xsorted.row(nn + 1));
+                    Xmid1.row(ci) = Xsorted.row(nn);
+                    Xmid2.row(ci) = Xsorted.row(nn + 1);
                 }
                 else
                 {
-                    C.row(i) = Xsorted.row(nn+1);
-                    if (m(i) > 1)
+                    C.row(ci) = Xsorted.row(nn + 1);
+                    if (m(ci) > 1)
                     {
-                        Xmid1.row(i) = Xsorted.row(nn);
-                        Xmid2.row(i) = Xsorted.row(nn+2);
+                        Xmid1.row(ci) = Xsorted.row(nn);
+                        Xmid2.row(ci) = Xsorted.row(nn + 2);
                     }
                     else
                     {
-                        Xmid1.row(i) = Xsorted.row(0);
-                        Xmid2.row(i) = Xsorted.row(0);
+                        Xmid1.row(ci) = Xsorted.row(0);
+                        Xmid2.row(ci) = Xsorted.row(0);
                     }
                 }
             }
         }
-        else if (m_sDistance.compare("cosine") == 0 || m_sDistance.compare("correlation") == 0)
+        else if (m_distance == KMeansDistance::Cosine || m_distance == KMeansDistance::Correlation)
         {
-            C.row(nidx[0]).array() += (X.row(moved[0]) - C.row(nidx[0])).array() / m[nidx[0]];
-            C.row(oidx).array() += (X.row(moved[0]) - C.row(oidx)).array() / m[oidx];
-        }
-        else if (m_sDistance.compare("hamming") == 0)
-        {
-//                % Update summed coords for points in each cluster.  New
-//                % centroid is the coord median.  All done component-wise.
-//                Xsum(nidx,:) = Xsum(nidx,:) + X(moved,:);
-//                Xsum(oidx,:) = Xsum(oidx,:) - X(moved,:);
-//                C(nidx,:) = .5*sign(2*Xsum(nidx,:) - m(nidx)) + .5;
-//                C(oidx,:) = .5*sign(2*Xsum(oidx,:) - m(oidx)) + .5;
+            C.row(nidx_pt).array() += (X.row(movedPt) - C.row(nidx_pt)).array() / m[nidx_pt];
+            C.row(oidx).array()    += (X.row(movedPt) - C.row(oidx)).array() / m[oidx];
         }
 
-        VectorXi sorted_onidx(1+nidx.rows());
-        sorted_onidx << oidx, nidx;
-        std::sort(sorted_onidx.data(), sorted_onidx.data()+sorted_onidx.rows());
+        VectorXi sorted_onidx(2);
+        sorted_onidx << oidx, nidx_pt;
+        std::sort(sorted_onidx.data(), sorted_onidx.data() + sorted_onidx.rows());
         changed = sorted_onidx;
-    } // phase two
+    }
 
     return converged;
-} // nested function
+}
 
 //=============================================================================================================
-//DISTFUN Calculate point to cluster centroid distances.
-MatrixXd KMeans::distfun(const MatrixXd& X, MatrixXd& C)//, qint32 iter)
+
+MatrixXd KMeans::distfun(const MatrixXd& X, const MatrixXd& C)
 {
-    MatrixXd D = MatrixXd::Zero(n,C.rows());
-    qint32 nclusts = C.rows();
+    const qint32 nclusts = C.rows();
+    MatrixXd D = MatrixXd::Zero(n, nclusts);
 
-    if (m_sDistance.compare("sqeuclidean") == 0)
+    switch (m_distance)
     {
-        for(qint32 i = 0; i < nclusts; ++i)
-        {
-            D.col(i) = (X.col(0).array() - C(i,0)).pow(2);
+    case KMeansDistance::SquaredEuclidean:
+        for (qint32 i = 0; i < nclusts; ++i)
+            D.col(i) = (X.rowwise() - C.row(i)).rowwise().squaredNorm();
+        break;
 
-            for(qint32 j = 1; j < p; ++j)
-                D.col(i) = D.col(i).array() + (X.col(j).array() - C(i,j)).pow(2);
-        }
-    }
-    else if (m_sDistance.compare("cityblock") == 0)
+    case KMeansDistance::CityBlock:
+        for (qint32 i = 0; i < nclusts; ++i)
+            D.col(i) = (X.rowwise() - C.row(i)).cwiseAbs().rowwise().sum();
+        break;
+
+    case KMeansDistance::Cosine:
+    case KMeansDistance::Correlation:
     {
-        for(qint32 i = 0; i < nclusts; ++i)
-        {
-            D.col(i) = (X.col(0).array() - C(i,0)).array().abs();
-            for(qint32 j = 1; j < p; ++j)
-            {
-                D.col(i).array() += (X.col(j).array() - C(i,j)).array().abs();
-            }
-        }
-    }
-    else if (m_sDistance.compare("cosine") == 0 || m_sDistance.compare("correlation") == 0)
-    {
-        // The points are normalized, centroids are not, so normalize them
-        MatrixXd normC = C.array().pow(2).rowwise().sum().sqrt();
-//        if any(normC < eps(class(normC))) % small relative to unit-length data points
-//            error('Zero cluster centroid created at iteration %d.',iter);
+        VectorXd normC = C.rowwise().norm();
         for (qint32 i = 0; i < nclusts; ++i)
         {
-            MatrixXd C_tmp = (C.row(i).array() / normC(i,0)).transpose();
-            D.col(i) = X * C_tmp;//max(1 - X * (C(i,:)./normC(i))', 0);
-            for(qint32 j = 0; j < D.rows(); ++j)
-                if(D(j,i) < 0)
-                    D(j,i) = 0;
+            RowVectorXd C_normed = C.row(i) / normC(i);
+            D.col(i) = (1.0 - (X * C_normed.transpose()).array()).cwiseMax(0.0);
         }
+        break;
     }
-//case 'hamming'
-//    for i = 1:nclusts
-//        D(:,i) = abs(X(:,1) - C(i,1));
-//        for j = 2:p
-//            D(:,i) = D(:,i) + abs(X(:,j) - C(i,j));
-//        end
-//        D(:,i) = D(:,i) / p;
-//        % D(:,i) = sum(abs(X - C(repmat(i,n,1),:)), 2) / p;
-//    end
-//end
+
+    case KMeansDistance::Hamming:
+        for (qint32 i = 0; i < nclusts; ++i)
+            D.col(i) = (X.rowwise() - C.row(i)).cwiseAbs().rowwise().sum() / p;
+        break;
+    }
+
     return D;
-} // function
+}
 
 //=============================================================================================================
-//GCENTROIDS Centroids and counts stratified by group.
+
 void KMeans::gcentroids(const MatrixXd& X, const VectorXi& index, const VectorXi& clusts,
-                                          MatrixXd& centroids, VectorXi& counts)
+                        MatrixXd& centroids, VectorXi& counts)
 {
-    qint32 num = clusts.rows();
-    centroids = MatrixXd::Zero(num,p);
-    centroids.fill(std::numeric_limits<double>::quiet_NaN());
+    const qint32 num = clusts.rows();
+    centroids = MatrixXd::Constant(num, p, std::numeric_limits<double>::quiet_NaN());
     counts = VectorXi::Zero(num);
 
-    VectorXi members;
-
-    qint32 c;
-
-    for(qint32 i = 0; i < num; ++i)
+    for (qint32 i = 0; i < num; ++i)
     {
-        c = 0;
-        members = VectorXi::Zero(index.rows());
-        for(qint32 j = 0; j < index.rows(); ++j)
+        // Collect member indices for cluster clusts[i]
+        std::vector<int> members;
+        members.reserve(n);
+        for (qint32 j = 0; j < index.rows(); ++j)
+            if (index[j] == clusts[i])
+                members.push_back(j);
+
+        counts[i] = static_cast<qint32>(members.size());
+        if (members.empty())
+            continue;
+
+        switch (m_distance)
         {
-            if(index[j] == clusts[i])
-            {
-                members[c] = j;
-                ++c;
-            }
+        case KMeansDistance::SquaredEuclidean:
+        case KMeansDistance::Cosine:
+        case KMeansDistance::Correlation:
+        {
+            centroids.row(i) = RowVectorXd::Zero(p);
+            for (int j : members)
+                centroids.row(i) += X.row(j);
+            centroids.row(i) /= counts[i];
+            break;
         }
-        members.conservativeResize(c);
-        if (c > 0)
+
+        case KMeansDistance::CityBlock:
         {
-            counts[i] = c;
-            if(m_sDistance.compare("sqeuclidean") == 0)
-            {
-                //Initialize
-                if(members.rows() > 0)
-                    centroids.row(i) = RowVectorXd::Zero(centroids.cols());
+            MatrixXd Xsorted(counts[i], p);
+            qint32 c = 0;
+            for (int j : members)
+                Xsorted.row(c++) = X.row(j);
 
-                for(qint32 j = 0; j < members.rows(); ++j)
-                    centroids.row(i).array() += X.row(members[j]).array() / counts[i];
-            }
-            else if(m_sDistance.compare("cityblock") == 0)
-            {
-                // Separate out sorted coords for points in i'th cluster,
-                // and use to compute a fast median, component-wise
-                MatrixXd Xsorted(counts[i],p);
-                c = 0;
+            for (qint32 j = 0; j < p; ++j)
+                std::sort(Xsorted.col(j).data(), Xsorted.col(j).data() + Xsorted.rows());
 
-                for(qint32 j = 0; j < index.rows(); ++j)
-                {
-                    if(index[j] == clusts[i])
-                    {
-                        Xsorted.row(c) = X.row(j);
-                        ++c;
-                    }
-                }
+            qint32 nn = static_cast<qint32>(std::floor(0.5 * counts[i])) - 1;
+            if (counts[i] % 2 == 0)
+                centroids.row(i) = 0.5 * (Xsorted.row(nn) + Xsorted.row(nn + 1));
+            else
+                centroids.row(i) = Xsorted.row(nn + 1);
+            break;
+        }
 
-                for(qint32 j = 0; j < Xsorted.cols(); ++j)
-                    std::sort(Xsorted.col(j).data(),Xsorted.col(j).data()+Xsorted.rows());
-
-                qint32 nn = floor(0.5*(counts(i)))-1;
-                if (counts[i] % 2 == 0)
-                    centroids.row(i) = .5 * (Xsorted.row(nn) + Xsorted.row(nn+1));
-                else
-                    centroids.row(i) = Xsorted.row(nn+1);
-            }
-            else if(m_sDistance.compare("cosine") == 0 || m_sDistance.compare("correlation") == 0)
-            {
-                for(qint32 j = 0; j < members.rows(); ++j)
-                    centroids.row(i).array() += X.row(members[j]).array() / counts[i]; // unnormalized
-            }
-//            else if(m_sDistance.compare("hamming") == 0)
-//            {
-//                % Compute a fast median for binary data, component-wise
-//                centroids(i,:) = .5*sign(2*sum(X(members,:), 1) - counts(i)) + .5;
-//            }
+        case KMeansDistance::Hamming:
+            // Not yet implemented
+            break;
         }
     }
-}// function
-
-//=============================================================================================================
-
-double KMeans::unifrnd(double a, double b)
-{
-    if (a > b)
-        return std::numeric_limits<double>::quiet_NaN();
-
-    double a2 = a/2.0;
-    double b2 = b/2.0;
-    double mu = a2+b2;
-    double sig = b2-a2;
-
-    double r = mu + sig * (2.0* (rand() % 1000)/1000 -1.0);
-
-    return r;
 }

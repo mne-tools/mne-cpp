@@ -37,18 +37,18 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "communication_global.h"
+#include "com_global.h"
 
 //=============================================================================================================
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* COMMUNICATIONLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();}
+const char* COMLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();}
 
 //=============================================================================================================
 
-const char* COMMUNICATIONLIB::buildHash(){ return UTILSLIB::gitHash();}
+const char* COMLIB::buildHash(){ return UTILSLIB::gitHash();}
 
 //=============================================================================================================
 
-const char* COMMUNICATIONLIB::buildHashLong(){ return UTILSLIB::gitHashLong();}
+const char* COMLIB::buildHashLong(){ return UTILSLIB::gitHashLong();}

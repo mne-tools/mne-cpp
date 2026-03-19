@@ -48,12 +48,8 @@
 
 #include <Eigen/Core>
 
-#define ALPHA 1.0
-#define BETA 0.5
-#define GAMMA 2.0
-
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
 namespace UTILSLIB
@@ -63,7 +59,7 @@ namespace UTILSLIB
 /**
  * Simplex algorithm is an optimization method to solve linear optimization problems.
  *
- * @brief Simplex algorithm
+ * @brief Simplex algorithm.
  */
 class MATHSHARED_EXPORT SimplexAlgorithm
 {
@@ -71,7 +67,7 @@ class MATHSHARED_EXPORT SimplexAlgorithm
 protected:
     //=========================================================================================================
     /**
-     * Protected Constrcutor to make class non-instantiable.
+     * Protected constructor to make class non-instantiable.
      */
     SimplexAlgorithm();
 
@@ -196,6 +192,10 @@ bool SimplexAlgorithm::simplex_minimize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dy
     neval = 0;
     psum = p.colwise().sum();
 
+    constexpr T kAlpha = static_cast<T>(1.0);
+    constexpr T kBeta  = static_cast<T>(0.5);
+    constexpr T kGamma = static_cast<T>(2.0);
+
     if (report_func != nullptr && report > 0)
         report_func(0, static_cast<Eigen::Matrix<T,Eigen::Dynamic, 1>>(p.row(0)), -1.0, -1.0, 0.0);
 
@@ -235,12 +235,12 @@ bool SimplexAlgorithm::simplex_minimize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dy
             if (loop > MIN_STOL_LOOP && std::sqrt(dsum) < stol)
                 break;
         }
-        ytry = tryit<T>(p,y,psum,func,user_data,ihi,neval,-ALPHA);
+        ytry = tryit<T>(p,y,psum,func,user_data,ihi,neval,-kAlpha);
         if (ytry <= y[ilo])
-            tryit<T>(p,y,psum,func,user_data,ihi,neval,GAMMA);
+            tryit<T>(p,y,psum,func,user_data,ihi,neval,kGamma);
         else if (ytry >= y[inhi]) {
             ysave = y[ihi];
-            ytry = tryit<T>(p,y,psum,func,user_data,ihi,neval,BETA);
+            ytry = tryit<T>(p,y,psum,func,user_data,ihi,neval,kBeta);
             if (ytry >= ysave) {
                 for (i = 0; i < mpts; i++) {
                     if (i !=  ilo) {
@@ -258,9 +258,5 @@ bool SimplexAlgorithm::simplex_minimize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dy
 }
 
 } //NAMESPACE
-
-#undef ALPHA
-#undef BETA
-#undef GAMMA
 
 #endif // SIMPLEXALGORITHM_H

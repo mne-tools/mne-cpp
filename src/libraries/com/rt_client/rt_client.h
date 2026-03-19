@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../communication_global.h"
+#include "../com_global.h"
 
 #include <fiff/fiff_info.h>
 
@@ -61,10 +61,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE COMMUNICATIONLIB
+// DEFINE NAMESPACE COMLIB
 //=============================================================================================================
 
-namespace COMMUNICATIONLIB
+namespace COMLIB
 {
 
 //=============================================================================================================
@@ -77,7 +77,7 @@ namespace COMMUNICATIONLIB
  *
  * @brief Threaded client that connects to mne_rt_server, retrieves measurement info, and streams raw data buffers
  */
-class COMMUNICATIONSHARED_EXPORT RtClient : public QThread
+class COMSHARED_EXPORT RtClient : public QThread
 {
     Q_OBJECT
 

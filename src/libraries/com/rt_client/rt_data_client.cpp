@@ -38,14 +38,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtdataclient.h"
+#include "rt_data_client.h"
 #include <fiff/fiff_file.h>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace COMMUNICATIONLIB;
+using namespace COMLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
 

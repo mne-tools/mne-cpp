@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(mne_communication LANGUAGES CXX)
+project(mne_com LANGUAGES CXX)
 
 #Handle qt uic, moc, rrc automatically
 set(CMAKE_AUTOUIC ON)
@@ -11,28 +11,28 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
-    communication_global.cpp
-    rtClient/rtclient.cpp
-    rtClient/rtdataclient.cpp
-    rtClient/rtcmdclient.cpp
-    rtCommand/command.cpp
-    rtCommand/commandmanager.cpp
-    rtCommand/commandparser.cpp
-    rtCommand/rawcommand.cpp
+    com_global.cpp
+    rt_client/rt_client.cpp
+    rt_client/rt_data_client.cpp
+    rt_client/rt_cmd_client.cpp
+    rt_command/command.cpp
+    rt_command/command_manager.cpp
+    rt_command/command_parser.cpp
+    rt_command/raw_command.cpp
 )
 
 set(HEADERS
-    communication_global.h
-    rtClient/rtclient.h
-    rtClient/rtcmdclient.h
-    rtClient/rtdataclient.h
-    rtCommand/command.h
-    rtCommand/commandmanager.h
-    rtCommand/commandparser.h
-    rtCommand/rawcommand.h
+    com_global.h
+    rt_client/rt_client.h
+    rt_client/rt_cmd_client.h
+    rt_client/rt_data_client.h
+    rt_command/command.h
+    rt_command/command_manager.h
+    rt_command/command_parser.h
+    rt_command/raw_command.h
 )
 
-set(FILE_TO_UPDATE communication_global.cpp)
+set(FILE_TO_UPDATE com_global.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
@@ -73,7 +73,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     eigen
     ${FFTW_LIBS})
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_COMMUNICATION_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_COM_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
