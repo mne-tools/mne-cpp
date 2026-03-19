@@ -39,7 +39,7 @@ set(MNE_CPP_LIBRARIES
     mne_inverse
     mne_com
     mne_rtprocessing
-    mne_connectivity
+    mne_conn
     mne_events
     mne_disp
     mne_disp3D_rhi

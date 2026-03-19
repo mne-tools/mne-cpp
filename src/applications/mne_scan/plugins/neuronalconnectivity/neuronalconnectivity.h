@@ -46,8 +46,8 @@
 
 #include <utils/generics/circularbuffer.h>
 
-#include <connectivity/connectivitysettings.h>
-#include <connectivity/network/network.h>
+#include <conn/connectivitysettings.h>
+#include <conn/network/network.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -105,7 +105,7 @@ class NeuronalConnectivityYourWidget;
  *
  * @brief The NeuronalConnectivity class provides a NeuronalConnectivity plugin for online processing.
  */
-class NEURONALCONNECTIVITYSHARED_EXPORT NeuronalConnectivity : public SCSHAREDLIB::AbstractAlgorithm
+class NEURONALCONNSHARED_EXPORT NeuronalConnectivity : public SCSHAREDLIB::AbstractAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "neuronalconnectivity.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
@@ -192,8 +192,8 @@ protected:
      *
      * @param[in] connectivityResult        The new connectivity estimate.
      */
-    void onNewConnectivityResultAvailable(const QList<CONNECTIVITYLIB::Network>& connectivityResults,
-                                          const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
+    void onNewConnectivityResultAvailable(const QList<CONNLIB::Network>& connectivityResults,
+                                          const CONNLIB::ConnectivitySettings& connectivitySettings);
 
     //=========================================================================================================
     /**
@@ -251,9 +251,9 @@ private:
 
     QElapsedTimer       m_timer;                /**< The timer to evaluate performance. */
 
-    CONNECTIVITYLIB::ConnectivitySettings                                           m_connectivitySettings;         /**< The connectivity settings.*/
+    CONNLIB::ConnectivitySettings                                           m_connectivitySettings;         /**< The connectivity settings.*/
 
-    QSharedPointer<UTILSLIB::CircularBuffer<CONNECTIVITYLIB::Network> >             m_pCircularBuffer;              /**< The circular buffer holding the connectivity estimates.*/
+    QSharedPointer<UTILSLIB::CircularBuffer<CONNLIB::Network> >             m_pCircularBuffer;              /**< The circular buffer holding the connectivity estimates.*/
     QSharedPointer<RTPROCESSINGLIB::RtConnectivity>                                 m_pRtConnectivity;              /**< The real-time connectivity estimation object.*/
     QSharedPointer<FIFFLIB::FiffInfo>                                               m_pFiffInfo;                    /**< Fiff measurement info.*/
     QSharedPointer<DISPLIB::ConnectivitySettingsView>                               m_pConnectivitySettingsView;    /**< The connectivity settings widget which will be added to the Quick Control view. The QuickControlView will not take ownership. Ownership will be managed by the QSharedPointer.*/
@@ -265,13 +265,13 @@ private:
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeConnectivityEstimate>::SPtr    m_pRTCEOutput;                  /**< The RealTimeSourceEstimate output.*/
 
-    CONNECTIVITYLIB::Network    m_connectivityEstimate;         /**< The current connectivity estimate.*/
+    CONNLIB::Network    m_connectivityEstimate;         /**< The current connectivity estimate.*/
     Eigen::MatrixX3f            m_matNodeVertLeft;              /**< Holds the left hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
     Eigen::MatrixX3f            m_matNodeVertRight;             /**< Holds the right hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
     Eigen::MatrixX3f            m_matNodeVertComb;              /**< Holds both hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/ 
     Eigen::RowVectorXi          m_vecPicks;                     /**< The picked data channels. */
 
-    CONNECTIVITYLIB::Network    m_currentConnectivityResult;    /**< The current connectivity result.*/
+    CONNLIB::Network    m_currentConnectivityResult;    /**< The current connectivity result.*/
 };
 } // NAMESPACE
 

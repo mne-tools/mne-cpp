@@ -38,9 +38,9 @@
 
 #include <utils/generics/applicationlogger.h>
 
-#include <connectivity/network/network.h>
-#include <connectivity/network/networknode.h>
-#include <connectivity/network/networkedge.h>
+#include <conn/network/network.h>
+#include <conn/network/networknode.h>
+#include <conn/network/networkedge.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -60,7 +60,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace CONNECTIVITYLIB;
+using namespace CONNLIB;
 using namespace UTILSLIB;
 
 //=============================================================================================================

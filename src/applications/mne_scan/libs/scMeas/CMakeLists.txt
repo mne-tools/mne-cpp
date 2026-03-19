@@ -78,7 +78,7 @@ set(MNE_LIBS_REQUIRED
     mne_fwd
     mne_mne
     mne_inv
-    mne_connectivity
+    mne_conn
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

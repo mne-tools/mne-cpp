@@ -43,7 +43,7 @@
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimehpiresult.h>
 
-#include <connectivity/network/network.h>
+#include <conn/network/network.h>
 
 #include <mne/mne_bem.h>
 #include <disp3D_rhi/view/brainview.h>
@@ -87,7 +87,7 @@
 using namespace SCDISPLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
-using namespace CONNECTIVITYLIB;
+using namespace CONNLIB;
 using namespace MNELIB;
 using namespace INVLIB;
 using namespace FIFFLIB;

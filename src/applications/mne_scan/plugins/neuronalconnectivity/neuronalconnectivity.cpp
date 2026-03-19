@@ -40,8 +40,8 @@
 #include "neuronalconnectivity.h"
 #include "FormFiles/neuronalconnectivitysetupwidget.h"
 
-#include <connectivity/connectivity.h>
-#include <connectivity/metrics/abstractmetric.h>
+#include <conn/connectivity.h>
+#include <conn/metrics/abstractmetric.h>
 #include <dsp/rt_connectivity.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
@@ -72,7 +72,7 @@ using namespace NEURONALCONNECTIVITYPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace MNELIB;
-using namespace CONNECTIVITYLIB;
+using namespace CONNLIB;
 using namespace DISPLIB;
 using namespace UTILSLIB;
 using namespace RTPROCESSINGLIB;
@@ -92,7 +92,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_fFreqBandHigh(13.0f)
 , m_iBlockSize(1)
 , m_sAvrType("1")
-, m_pCircularBuffer(CircularBuffer<CONNECTIVITYLIB::Network>::SPtr::create(40))
+, m_pCircularBuffer(CircularBuffer<CONNLIB::Network>::SPtr::create(40))
 , m_pRtConnectivity(RtConnectivity::SPtr::create())
 , m_pActionShowYourWidget(Q_NULLPTR)
 {

@@ -14,7 +14,7 @@
 
 ////////////////////////
 
-#include <connectivity/network/network.h>
+#include <conn/network/network.h>
 
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_digitizer_data.h>
@@ -41,7 +41,7 @@
 // MAIN
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace CONNLIB;
 using namespace MNELIB;
 using namespace FIFFLIB;
 

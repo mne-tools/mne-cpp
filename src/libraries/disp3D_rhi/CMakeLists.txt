@@ -139,7 +139,7 @@ set(MNE_LIBS_REQUIRED
     mne_fwd
     mne_inv
     mne_disp
-    mne_connectivity
+    mne_conn
 )
 
 set(FFTW_LIBS "")

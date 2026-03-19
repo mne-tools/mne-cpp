@@ -41,11 +41,11 @@
 
 #include <dsp/rt_connectivity.h>
 
-#include <connectivity/metrics/abstractmetric.h>
-#include <connectivity/connectivitysettings.h>
-#include <connectivity/network/network.h>
-#include <connectivity/network/networknode.h>
-#include <connectivity/network/networkedge.h>
+#include <conn/metrics/abstractmetric.h>
+#include <conn/connectivitysettings.h>
+#include <conn/network/network.h>
+#include <conn/network/networknode.h>
+#include <conn/network/networkedge.h>
 
 #include <disp/plots/plot.h>
 #include <disp/plots/tfplot.h>
@@ -69,7 +69,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace CONNLIB;
 using namespace RTPROCESSINGLIB;
 using namespace Eigen;
 using namespace DISPLIB;

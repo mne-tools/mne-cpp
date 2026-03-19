@@ -1,11 +1,11 @@
 #include <QtTest/QtTest>
 #include <Eigen/Dense>
-#include <connectivity/connectivity.h>
-#include <connectivity/connectivitysettings.h>
-#include <connectivity/network/network.h>
-#include <connectivity/metrics/correlation.h>
+#include <conn/connectivity.h>
+#include <conn/connectivitysettings.h>
+#include <conn/network/network.h>
+#include <conn/metrics/correlation.h>
 
-using namespace CONNECTIVITYLIB;
+using namespace CONNLIB;
 using namespace Eigen;
 
 class TestConnectivityMetrics : public QObject
