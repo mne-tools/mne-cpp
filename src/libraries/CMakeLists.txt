@@ -52,6 +52,7 @@ if(WITH_CODE_COV)
   add_link_options("--coverage")
 endif()
 
+add_subdirectory(math)
 add_subdirectory(utils)
 add_subdirectory(lsl)
 
@@ -63,8 +64,8 @@ add_subdirectory(mne)
 add_subdirectory(fwd)
 add_subdirectory(inverse)
 add_subdirectory(communication)
-add_subdirectory(rtprocessing)
 add_subdirectory(connectivity)
+add_subdirectory(dsp)
 
 add_subdirectory(events)
 add_subdirectory(disp)

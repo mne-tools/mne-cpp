@@ -127,13 +127,14 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 set(MNE_LIBS_REQUIRED
     mne_utils
+    mne_math
     mne_fs
     mne_fiff
     mne_mne
     mne_fwd
     mne_inv
     mne_disp
-    mne_rtprocessing
+    mne_dsp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

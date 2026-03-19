@@ -56,7 +56,7 @@
 #include "fiff_digitizer_data.h"
 #include "fiff_dig_point.h"
 
-#include <utils/mnemath.h>
+#include <math/mnemath.h>
 #include <utils/ioutils.h>
 
 #include <iostream>

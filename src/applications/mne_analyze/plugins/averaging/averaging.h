@@ -43,7 +43,7 @@
 
 #include <anShared/Plugins/abstractplugin.h>
 
-#include <rtprocessing/helpers/filterkernel.h>
+#include <dsp/filterkernel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -239,7 +239,7 @@ private:
      */
     QSharedPointer<FIFFLIB::FiffEvokedSet> averageCalculation(FIFFLIB::FiffRawData pFiffRaw,
                                                               MatrixXi matEvents,
-                                                              RTPROCESSINGLIB::FilterKernel filterKernel,
+                                                              UTILSLIB::FilterKernel filterKernel,
                                                               FIFFLIB::FiffInfo fiffInfo);
 
     //=========================================================================================================
@@ -346,7 +346,7 @@ private:
     bool                                                    m_bAutoRecompute;           /**< Whether to auto recompute averages */
     bool                                                    m_bSavingAverage;           /**< Whether to save average */
 
-    RTPROCESSINGLIB::FilterKernel                           m_filterKernel;             /**< List of currently active filters. */
+    UTILSLIB::FilterKernel                           m_filterKernel;             /**< List of currently active filters. */
 
     QFutureWatcher<QSharedPointer<FIFFLIB::FiffEvokedSet>>  m_FutureWatcher;            /**< Future watcher for notifing of completed average calculations. */
     QFuture<QSharedPointer<FIFFLIB::FiffEvokedSet>>         m_Future;                   /**< Future for performing average calculations of separate thread. */

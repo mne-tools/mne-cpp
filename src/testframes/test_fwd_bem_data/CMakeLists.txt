@@ -15,7 +15,7 @@ endif()
 
 target_link_libraries(test_fwd_bem_data PRIVATE
     Qt6::Core Qt6::Widgets Qt6::Concurrent Qt6::Network Qt6::Test
-    mne_rtprocessing
+    mne_dsp
     mne_connectivity
     mne_inv
     mne_fwd
@@ -23,6 +23,7 @@ target_link_libraries(test_fwd_bem_data PRIVATE
     mne_fiff
     mne_fs
     mne_utils
+    mne_math
     mne_events
     mne_disp
     mne_disp3D_rhi

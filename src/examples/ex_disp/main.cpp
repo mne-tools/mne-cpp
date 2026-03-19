@@ -47,7 +47,7 @@
 
 #include <math.h>
 
-#include <utils/spectrogram.h>
+#include <dsp/spectrogram.h>
 #include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================

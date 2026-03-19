@@ -48,7 +48,7 @@
 #include <fiff/fiff_digitizer_data.h>
 #include <fiff/fiff_dig_point.h>
 
-#include <utils/sphere.h>
+#include <math/sphere.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>

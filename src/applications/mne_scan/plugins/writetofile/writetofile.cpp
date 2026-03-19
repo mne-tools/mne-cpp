@@ -44,7 +44,6 @@
 #include <disp/viewers/projectsettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <fiff/fiff_stream.h>
-#include <utils/file.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -60,7 +59,6 @@
 
 using namespace WRITETOFILEPLUGIN;
 using namespace SCMEASLIB;
-using namespace UTILSLIB;
 using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace SCSHAREDLIB;
@@ -568,17 +566,17 @@ bool WriteToFile::renameSingleFile(const QString& sCurrentFileName, const QStrin
 
     QString dir(QFileInfo(m_qFileOut).dir().absolutePath() + QString("/"));
 
-    if(File::exists(QString(dir + sFullNewName))){
+    if(QFile::exists(dir + sFullNewName)){
         int ret = popUpYesNo("A file with this name already exists.",
                              "Do you want to overwrite this file?");
         if(ret == QMessageBox::No) {
             return false;
         } else {
-            File::remove(dir + sFullNewName);
+            QFile::remove(dir + sFullNewName);
         }
     }
 
-    bool success = File::rename(dir + sCurrentFileName, dir + sFullNewName);
+    bool success = QFile::rename(dir + sCurrentFileName, dir + sFullNewName);
 
     return success;
 }

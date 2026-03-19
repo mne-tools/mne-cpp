@@ -1,11 +1,12 @@
 #include <QtTest/QtTest>
 #include <Eigen/Dense>
 
-#include <rtprocessing/helpers/filterkernel.h>
-#include <rtprocessing/helpers/parksmcclellan.h>
-#include <rtprocessing/helpers/cosinefilter.h>
+#include <dsp/filterkernel.h>
+#include <dsp/parksmcclellan.h>
+#include <dsp/cosinefilter.h>
 
 using namespace RTPROCESSINGLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 class TestFilterKernel : public QObject

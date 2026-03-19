@@ -56,7 +56,7 @@
 #include <disp3D_rhi/view/brainview.h>
 #include <disp3D_rhi/model/braintreemodel.h>
 
-#include <utils/mnemath.h>
+#include <math/mnemath.h>
 #include <utils/generics/applicationlogger.h>
 
 #include <iostream>

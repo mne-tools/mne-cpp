@@ -1,6 +1,6 @@
 #include <QtTest/QtTest>
 #include <Eigen/Dense>
-#include <utils/spectral.h>
+#include <math/spectral.h>
 #include <cmath>
 
 using namespace UTILSLIB;

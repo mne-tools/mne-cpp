@@ -43,7 +43,7 @@
 
 #include <fiff/fiff_evoked_set.h>
 
-#include <utils/mnemath.h>
+#include <math/mnemath.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -446,4 +446,41 @@ FiffEvokedSet MNEEpochDataList::averageCategories(const FiffRawData &raw,
     }
 
     return evokedSet;
+}
+
+//=============================================================================================================
+
+FiffEvoked MNEEpochDataList::computeAverage(const FiffRawData& raw,
+                                            const MatrixXi& matEvents,
+                                            float fTMinS,
+                                            float fTMaxS,
+                                            qint32 eventType,
+                                            bool bApplyBaseline,
+                                            float fTBaselineFromS,
+                                            float fTBaselineToS,
+                                            const QMap<QString,double>& mapReject,
+                                            const QStringList& lExcludeChs,
+                                            const RowVectorXi& picks)
+{
+    MNEEpochDataList lstEpochDataList = MNEEpochDataList::readEpochs(raw,
+                                                                     matEvents,
+                                                                     fTMinS,
+                                                                     fTMaxS,
+                                                                     eventType,
+                                                                     mapReject,
+                                                                     lExcludeChs,
+                                                                     picks);
+
+    if(bApplyBaseline) {
+        QPair<float, float> baselinePair(fTBaselineFromS, fTBaselineToS);
+        lstEpochDataList.applyBaselineCorrection(baselinePair);
+    }
+
+    if(!mapReject.isEmpty()) {
+        lstEpochDataList.dropRejected();
+    }
+
+    return lstEpochDataList.average(raw.info,
+                                    0,
+                                    lstEpochDataList.first()->epoch.cols());
 }

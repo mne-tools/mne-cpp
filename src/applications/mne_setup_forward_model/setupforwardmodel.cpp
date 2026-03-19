@@ -68,7 +68,7 @@
 #include <mne/mne_surface.h>
 #include <mne/mne_triangle.h>
 
-#include <utils/ioutils.h>
+#include <fiff/fiff_byte_swap.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -496,7 +496,7 @@ bool SetupForwardModel::readFreeSurferSurf(const QString& fileName, int id, floa
 
     const qint32 TRIANGLE_FILE_MAGIC = 16777214;
 
-    qint32 magic = UTILSLIB::IOUtils::fread3(stream);
+qint32 magic = FSLIB::FsSurface::fread3(stream);
 
     if (magic != TRIANGLE_FILE_MAGIC) {
         qCritical() << "Unsupported surface file format (magic =" << magic << ") in" << fileName;
@@ -516,7 +516,7 @@ bool SetupForwardModel::readFreeSurferSurf(const QString& fileName, int id, floa
     stream.readRawData(reinterpret_cast<char*>(verts.data()), nvert * 3 * sizeof(float));
     for (qint32 i = 0; i < 3; ++i)
         for (qint32 j = 0; j < nvert; ++j)
-            UTILSLIB::IOUtils::swap_floatp(&verts(i, j));
+FIFFLIB::swap_floatp(&verts(i, j));
 
     // Read faces (nface x 3, int32)
     MatrixX3i faces(nface, 3);

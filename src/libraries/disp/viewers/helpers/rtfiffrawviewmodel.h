@@ -47,7 +47,7 @@
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_proj.h>
 
-#include <rtprocessing/helpers/filterkernel.h>
+#include <dsp/filterkernel.h>
 
 #include <events/eventmanager.h>
 
@@ -340,7 +340,7 @@ public:
      *
      * @param[in] filterData    list of the new filter.
      */
-    void setFilter(QList<RTPROCESSINGLIB::FilterKernel> filterData);
+    void setFilter(QList<UTILSLIB::FilterKernel> filterData);
 
     //=========================================================================================================
     /**
@@ -556,7 +556,7 @@ private:
      */
     void initSphara();
 
-    static void doFilterPerChannelRTMSA(QPair<QList<RTPROCESSINGLIB::FilterKernel>,QPair<int,Eigen::RowVectorXd> > &channelDataTime);
+    static void doFilterPerChannelRTMSA(QPair<QList<UTILSLIB::FilterKernel>,QPair<int,Eigen::RowVectorXd> > &channelDataTime);
 
     //=========================================================================================================
     /**
@@ -643,7 +643,7 @@ private:
     QMap<int,QList<QPair<int,double> > >m_qMapDetectedTriggerOld;                   /**< Old detected trigger for each trigger channel. */
     QMap<int,QList<QPair<int,double> > >m_qMapDetectedTriggerOldFreeze;             /**< Old detected trigger for each trigger channel while display is freezed. */
     QMap<qint32,float>                  m_qMapChScaling;                            /**< Channel scaling map. */
-    QList<RTPROCESSINGLIB::FilterKernel>m_filterKernel;                             /**< List of currently active filters. */
+    QList<UTILSLIB::FilterKernel>m_filterKernel;                             /**< List of currently active filters. */
     QStringList                         m_filterChannelList;                        /**< List of channels which are to be filtered.*/
     QStringList                         m_visibleChannelList;                       /**< List of currently visible channels in the view.*/
     QMap<qint32,qint32>                 m_qMapIdxRowSelection;                      /**< Selection mapping.*/

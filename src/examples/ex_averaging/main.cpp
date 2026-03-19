@@ -47,8 +47,6 @@
 
 #include <utils/generics/applicationlogger.h>
 
-#include <rtprocessing/averaging.h>
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -65,7 +63,6 @@ using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace UTILSLIB;
 using namespace Eigen;
-using namespace RTPROCESSINGLIB;
 
 //=============================================================================================================
 // MAIN
@@ -171,7 +168,7 @@ int main(int argc, char *argv[])
     QMap<QString,double> mapReject;
     mapReject.insert("eog", 300e-06);
 
-    FiffEvoked evoked = RTPROCESSINGLIB::computeAverage(raw,
+    FiffEvoked evoked = MNEEpochDataList::computeAverage(raw,
                                                         events,
                                                         fTMin,
                                                         fTMax,

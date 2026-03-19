@@ -58,8 +58,10 @@
 
 #include <disp/viewers/helpers/selectionsceneitem.h>
 
-#include <rtprocessing/helpers/filterkernel.h>
-#include <rtprocessing/averaging.h>
+#include <dsp/filterkernel.h>
+#include <dsp/rt_filter.h>
+
+#include <mne/mne_epoch_data_list.h>
 
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_evoked.h>
@@ -82,6 +84,8 @@
 using namespace AVERAGINGPLUGIN;
 using namespace ANSHAREDLIB;
 using namespace RTPROCESSINGLIB;
+using namespace UTILSLIB;
+using namespace MNELIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -415,7 +419,7 @@ void Averaging::computeAverage()
 
 QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalculation(FIFFLIB::FiffRawData FiffRaw,
                                                                      MatrixXi matEvents,
-                                                                     RTPROCESSINGLIB::FilterKernel filterKernel,
+                                                                     UTILSLIB::FilterKernel filterKernel,
                                                                      FIFFLIB::FiffInfo fiffInfo)
 {
     QMap<QString,double> mapReject;
@@ -444,15 +448,15 @@ QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalculation(FIFFLIB::Fi
                                                                filterKernel);
     } else {
         QMutexLocker lock(&m_ParameterMutex);
-        *pFiffEvoked = RTPROCESSINGLIB::computeAverage(FiffRaw,
-                                                       matEvents,
-                                                       m_fPreStim,
-                                                       m_fPostStim,
-                                                       iType,
-                                                       m_bBaseline,
-                                                       m_fBaselineFromS,
-                                                       m_fBaselineToS,
-                                                       mapReject);
+        *pFiffEvoked = MNEEpochDataList::computeAverage(FiffRaw,
+                                                           matEvents,
+                                                           m_fPreStim,
+                                                           m_fPostStim,
+                                                           iType,
+                                                           m_bBaseline,
+                                                           m_fBaselineFromS,
+                                                           m_fBaselineToS,
+                                                           mapReject);
     }
 
     QSharedPointer<FIFFLIB::FiffEvokedSet> pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());

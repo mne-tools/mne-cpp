@@ -43,7 +43,7 @@
 
 #include <anShared/Plugins/abstractplugin.h>
 
-#include <rtprocessing/helpers/filterkernel.h>
+#include <dsp/filterkernel.h>
 
 //=============================================================================================================
 // QT INCLUDES

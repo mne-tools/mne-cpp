@@ -58,7 +58,7 @@
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_raw_data.h>
 
-#include <utils/mnemath.h>
+#include <math/mnemath.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -58,12 +58,13 @@ set(MNE_LIBS_REQUIRED
     mne_disp
     mne_disp3D_rhi
     mne_utils
+    mne_math
     mne_fiff
     mne_fs
     mne_mne
     mne_fwd
     mne_inv
-    mne_rtprocessing
+    mne_dsp
     mne_events
 )
 

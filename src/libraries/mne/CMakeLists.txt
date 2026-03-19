@@ -156,6 +156,7 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 set(MNE_LIBS_REQUIRED 
     mne_utils
+    mne_math
     mne_fiff
     mne_fs
 )
@@ -167,6 +168,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${FFTW_LIBS})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_MNE_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+
+if(MSVC)
+    set_source_files_properties(mne_forward_solution.cpp PROPERTIES COMPILE_FLAGS "/bigobj")
+endif()
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)

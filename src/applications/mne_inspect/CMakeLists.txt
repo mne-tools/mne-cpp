@@ -68,6 +68,7 @@ set(MNE_LIBS_REQUIRED
     mne_disp
     mne_inv
     mne_utils
+    mne_math
     mne_connectivity
 )
 

@@ -1,12 +1,13 @@
 #include <QtTest/QtTest>
 #include <Eigen/Dense>
 #include <cmath>
-#include <rtprocessing/detecttrigger.h>
-#include <rtprocessing/helpers/parksmcclellan.h>
-#include <rtprocessing/helpers/filterkernel.h>
-#include <rtprocessing/filter.h>
+#include <dsp/rt_detect_trigger.h>
+#include <dsp/parksmcclellan.h>
+#include <dsp/filterkernel.h>
+#include <dsp/rt_filter.h>
 
 using namespace RTPROCESSINGLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 class TestRtProcessingExtended : public QObject

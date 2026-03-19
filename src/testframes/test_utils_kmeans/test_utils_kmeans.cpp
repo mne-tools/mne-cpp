@@ -1,6 +1,6 @@
 #include <QtTest/QtTest>
 #include <Eigen/Dense>
-#include <utils/kmeans.h>
+#include <math/kmeans.h>
 
 using namespace UTILSLIB;
 using namespace Eigen;

@@ -2,13 +2,14 @@
 #include <QTemporaryDir>
 #include <Eigen/Dense>
 
-#include <rtprocessing/helpers/filterkernel.h>
-#include <rtprocessing/filter.h>
-#include <rtprocessing/detecttrigger.h>
+#include <dsp/filterkernel.h>
+#include <dsp/rt_filter.h>
+#include <dsp/rt_detect_trigger.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_info.h>
 
 using namespace RTPROCESSINGLIB;
+using namespace UTILSLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
 

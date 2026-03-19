@@ -76,6 +76,7 @@ set(HEADERS
     fiff_digitizer_data.h
     fiff_coord_trans_set.h
     fiff_file_sharer.h
+    fiff_byte_swap.h
 )
 
 set(FILE_TO_UPDATE fiff_global.cpp)
@@ -109,6 +110,7 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 set(MNE_LIBS_REQUIRED 
     mne_utils
+    mne_math
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

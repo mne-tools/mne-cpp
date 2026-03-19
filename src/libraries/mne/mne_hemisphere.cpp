@@ -41,7 +41,7 @@
 #include "mne_hemisphere.h"
 #include "mne_nearest.h"
 
-#include <utils/mnemath.h>
+#include <math/mnemath.h>
 
 #include <algorithm>
 

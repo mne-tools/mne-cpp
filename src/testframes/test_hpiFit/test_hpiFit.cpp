@@ -51,7 +51,7 @@
 #include <inverse/hpi/inv_sensor_set.h>
 
 #include <utils/ioutils.h>
-#include <utils/mnemath.h>
+#include <math/mnemath.h>
 
 #include <fwd/fwd_coil_set.h>
 

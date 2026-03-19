@@ -4,12 +4,12 @@
 
 #include <utils/generics/applicationlogger.h>
 
-#include <rtprocessing/rtaveraging.h>
-#include <rtprocessing/rtnoise.h>
-#include <rtprocessing/rtconnectivity.h>
-#include <rtprocessing/rtinvop.h>
-#include <rtprocessing/filter.h>
-#include <rtprocessing/detecttrigger.h>
+#include <dsp/rt_averaging.h>
+#include <dsp/rt_noise.h>
+#include <dsp/rt_connectivity.h>
+#include <dsp/rt_inv_op.h>
+#include <dsp/rt_filter.h>
+#include <dsp/rt_detect_trigger.h>
 
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
@@ -20,6 +20,7 @@
 #include <mne/mne_forward_solution.h>
 
 using namespace RTPROCESSINGLIB;
+using namespace UTILSLIB;
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace UTILSLIB;

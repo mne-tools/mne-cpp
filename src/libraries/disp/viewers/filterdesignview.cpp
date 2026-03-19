@@ -43,9 +43,9 @@
 
 #include "helpers/filterplotscene.h"
 
-#include "utils/mnemath.h"
+#include "math/mnemath.h"
 
-#include <rtprocessing/helpers/filterio.h>
+#include <dsp/filterio.h>
 
 #include <fiff/fiff_info.h>
 
@@ -74,7 +74,6 @@
 using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace UTILSLIB;
-using namespace RTPROCESSINGLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -573,7 +572,7 @@ double FilterDesignView::getTo()
 
 //=============================================================================================================
 
-void FilterDesignView::updateGuiFromFilter(const RTPROCESSINGLIB::FilterKernel& filter)
+void FilterDesignView::updateGuiFromFilter(const UTILSLIB::FilterKernel& filter)
 {
     m_pUi->m_doubleSpinBox_from->setValue(filter.getHighpassFreq());
     m_pUi->m_doubleSpinBox_to->setValue(filter.getLowpassFreq());

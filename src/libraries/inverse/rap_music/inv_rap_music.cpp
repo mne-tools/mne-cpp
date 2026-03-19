@@ -39,7 +39,7 @@
 
 #include "inv_rap_music.h"
 
-#include <utils/mnemath.h>
+#include <math/mnemath.h>
 
 #ifdef _OPENMP
 #include <omp.h>

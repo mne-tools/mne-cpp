@@ -42,7 +42,7 @@
 #include "networkedge.h"
 #include "networknode.h"
 
-#include <utils/spectral.h>
+#include <math/spectral.h>
 
 #include <limits>
 

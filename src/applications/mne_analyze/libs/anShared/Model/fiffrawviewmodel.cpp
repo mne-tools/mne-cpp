@@ -47,10 +47,10 @@
 
 #include <fiff/fiff.h>
 
-#include <rtprocessing/helpers/filterkernel.h>
-#include <utils/mnemath.h>
+#include <dsp/filterkernel.h>
+#include <math/mnemath.h>
 
-#include <rtprocessing/filter.h>
+#include <dsp/rt_filter.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -74,6 +74,7 @@ using namespace ANSHAREDLIB;
 using namespace FIFFLIB;
 using namespace UTILSLIB;
 using namespace RTPROCESSINGLIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS

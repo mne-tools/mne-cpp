@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "utils/simplex_algorithm.h"
+#include "math/simplex_algorithm.h"
 
 #include "fwd_eeg_sphere_model.h"
 #include "fwd_eeg_sphere_model_set.h"

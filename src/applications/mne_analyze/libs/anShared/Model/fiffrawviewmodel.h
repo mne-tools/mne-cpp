@@ -49,7 +49,7 @@
 #include <fiff/fiff_io.h>
 #include <fiff/fiff_file_sharer.h>
 
-#include <rtprocessing/helpers/filterkernel.h>
+#include <dsp/filterkernel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -456,7 +456,7 @@ public:
      *
      * @param[in] filterData    list of the new filter.
      */
-    void setFilter(const RTPROCESSINGLIB::FilterKernel& filterData);
+    void setFilter(const UTILSLIB::FilterKernel& filterData);
 
     //=========================================================================================================
     /**
@@ -464,7 +464,7 @@ public:
      *
      * @param[out] Reference to filterKernel in model.
      */
-    const RTPROCESSINGLIB::FilterKernel& getFilter();
+    const UTILSLIB::FilterKernel& getFilter();
 
     //=========================================================================================================
     /**
@@ -634,7 +634,7 @@ private:
     QSharedPointer<RTPROCESSINGLIB::FilterOverlapAdd>     m_pRtFilter;                                /**< The filter object. */
     Eigen::RowVectorXi                          m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
     bool                                        m_bPerformFiltering;                        /**< Flag whether to activate/deactivate filtering. */
-    RTPROCESSINGLIB::FilterKernel               m_filterKernel;                             /**< List of currently active filters. */
+    UTILSLIB::FilterKernel               m_filterKernel;                             /**< List of currently active filters. */
 
     // fiff stuff
     QSharedPointer<FIFFLIB::FiffIO>             m_pFiffIO;                                  /**< Fiff IO. */

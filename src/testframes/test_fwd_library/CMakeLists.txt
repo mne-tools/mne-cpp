@@ -16,7 +16,7 @@ endif()
 target_link_libraries(test_fwd_library PRIVATE
     mne_disp3D_rhi
     mne_disp
-    mne_rtprocessing
+    mne_dsp
     mne_connectivity
     mne_inv
     mne_fwd
@@ -24,6 +24,7 @@ target_link_libraries(test_fwd_library PRIVATE
     mne_fiff
     mne_fs
     mne_utils
+    mne_math
     mne_events
     eigen
     Qt6::Core

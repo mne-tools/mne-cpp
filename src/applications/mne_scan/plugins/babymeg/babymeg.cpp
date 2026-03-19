@@ -45,8 +45,8 @@
 #include "babymegclient.h"
 #include "babymeginfo.h"
 
-#include <utils/ioutils.h>
-#include <rtprocessing/detecttrigger.h>
+#include <fiff/fiff_byte_swap.h>
+#include <dsp/rt_detect_trigger.h>
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <disp/viewers/projectsettingsview.h>
@@ -69,9 +69,7 @@
 //=============================================================================================================
 
 using namespace BABYMEGPLUGIN;
-using namespace UTILSLIB;
 using namespace SCSHAREDLIB;
-using namespace UTILSLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
 using namespace FIFFLIB;
@@ -349,7 +347,7 @@ void BabyMEG::setFiffData(QByteArray data)
     MatrixXf rawData(Map<MatrixXf>( reinterpret_cast<float*>(data.data()),rows, cols ));
 
     for(qint32 i = 0; i < rows*cols; ++i) {
-        IOUtils::swap_floatp(rawData.data()+i);
+        FIFFLIB::swap_floatp(rawData.data()+i);
     }
 
     if(this->isRunning()) {

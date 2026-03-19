@@ -51,7 +51,7 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
 
-#include <utils/ioutils.h>
+#include <fiff/fiff_byte_swap.h>
 
 #include <QFile>
 #include <QTextStream>
@@ -258,7 +258,7 @@ int read_int3(QFile &in, int &ival)
         qCritical("read_int3 could not read data");
         return FAIL;
     }
-    s = (unsigned int)UTILSLIB::IOUtils::swap_int(s);
+    s = (unsigned int)FIFFLIB::swap_int(s);
     ival = ((s >> 8) & 0xffffff);
     return OK;
 }
@@ -273,7 +273,7 @@ int read_int(QFile &in, qint32 &ival)
         qCritical("read_int could not read data");
         return FAIL;
     }
-    ival = UTILSLIB::IOUtils::swap_int(s);
+    ival = FIFFLIB::swap_int(s);
     return OK;
 }
 
@@ -287,7 +287,7 @@ int read_int2(QFile &in, int &ival)
         qCritical("read_int2 could not read data");
         return FAIL;
     }
-    ival = UTILSLIB::IOUtils::swap_short(s);
+    ival = FIFFLIB::swap_short(s);
     return OK;
 }
 
@@ -301,7 +301,7 @@ int read_float(QFile &in, float &fval)
         qCritical("read_float could not read data");
         return FAIL;
     }
-    fval = UTILSLIB::IOUtils::swap_float(f);
+    fval = FIFFLIB::swap_float(f);
     return OK;
 }
 
@@ -315,7 +315,7 @@ int read_long(QFile &in, long long &lval)
         qCritical("read_long could not read data");
         return FAIL;
     }
-    lval = UTILSLIB::IOUtils::swap_long(s);
+    lval = FIFFLIB::swap_long(s);
     return OK;
 }
 

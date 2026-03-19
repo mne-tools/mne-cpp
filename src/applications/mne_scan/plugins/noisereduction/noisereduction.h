@@ -46,7 +46,7 @@
 
 #include <fiff/fiff_proj.h>
 
-#include <rtprocessing/helpers/filterkernel.h>
+#include <dsp/filterkernel.h>
 
 #include <scShared/Plugins/abstractalgorithm.h>
 
@@ -196,7 +196,7 @@ protected:
      *
      * @param[in] filterData    currently active filter.
      */
-    void setFilter(const RTPROCESSINGLIB::FilterKernel& filterData);
+    void setFilter(const UTILSLIB::FilterKernel& filterData);
 
     //=========================================================================================================
     /**
@@ -234,7 +234,7 @@ private:
     QString                         m_sCurrentSystem;                           /**< The current acquisition system (EEG, babyMEG, VectorView).*/
     QString                         m_sFilterChannelType;                       /**< Kind of channel which is to be filtered. */
 
-    RTPROCESSINGLIB::FilterKernel     m_filterKernel;                             /**< The currently active filter. */
+    UTILSLIB::FilterKernel     m_filterKernel;                             /**< The currently active filter. */
 
     Eigen::VectorXi                 m_vecIndicesFirstVV;                        /**< The indices of the channels to pick for the first SPHARA oerpator in case of a VectorView system.*/
     Eigen::VectorXi                 m_vecIndicesSecondVV;                       /**< The indices of the channels to pick for the second SPHARA oerpator in case of a VectorView system.*/

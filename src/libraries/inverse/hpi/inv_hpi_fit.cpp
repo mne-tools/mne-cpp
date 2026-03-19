@@ -46,7 +46,7 @@
 #include "inv_hpi_model_parameters.h"
 
 #include <utils/ioutils.h>
-#include <utils/mnemath.h>
+#include <math/mnemath.h>
 
 #include <iostream>
 #include <vector>

@@ -43,7 +43,7 @@
 #include "fiff_tag.h"
 #include "fiff_dir_node.h"
 
-#include <utils/mnemath.h>
+#include <math/mnemath.h>
 
 //=============================================================================================================
 // USED NAMESPACES

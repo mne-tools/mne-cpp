@@ -39,8 +39,8 @@
 //=============================================================================================================
 
 #include "layoutmaker.h"
-#include "simplex_algorithm.h"
-#include "sphere.h"
+#include <math/simplex_algorithm.h>
+#include <math/sphere.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>

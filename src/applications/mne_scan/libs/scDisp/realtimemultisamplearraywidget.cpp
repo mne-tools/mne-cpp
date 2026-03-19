@@ -54,7 +54,7 @@
 
 #include <scMeas/realtimemultisamplearray.h>
 
-#include <rtprocessing/helpers/filterkernel.h>
+#include <dsp/filterkernel.h>
 
 #include <fiff/fiff_info.h>
 

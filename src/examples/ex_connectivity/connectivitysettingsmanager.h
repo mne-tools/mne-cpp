@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <rtprocessing/rtconnectivity.h>
+#include <dsp/rt_connectivity.h>
 
 #include <connectivity/metrics/abstractmetric.h>
 #include <connectivity/connectivitysettings.h>
@@ -50,7 +50,7 @@
 #include <disp/plots/plot.h>
 #include <disp/plots/tfplot.h>
 #include <disp/plots/imagesc.h>
-#include <utils/spectrogram.h>
+#include <dsp/spectrogram.h>
 #include <mne/mne_epoch_data_list.h>
 
 //=============================================================================================================

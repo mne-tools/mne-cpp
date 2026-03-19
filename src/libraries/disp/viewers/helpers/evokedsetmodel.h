@@ -41,7 +41,7 @@
 
 #include "../../disp_global.h"
 
-#include <rtprocessing/helpers/filterkernel.h>
+#include <dsp/filterkernel.h>
 #include <fiff/fiff_types.h>
 
 //=============================================================================================================

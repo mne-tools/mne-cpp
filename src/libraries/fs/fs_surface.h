@@ -48,6 +48,13 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QDataStream>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <iostream>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -280,6 +287,44 @@ public:
      * @return the surf file name.
      */
     inline QString fileName() const;
+
+    //=========================================================================================================
+    /**
+     * Reads a 3-byte integer out of a QDataStream (FreeSurfer format).
+     *
+     * @param[in] stream  Stream to read from.
+     * @return the read 3-byte integer.
+     */
+    static qint32 fread3(QDataStream &stream);
+
+    //=========================================================================================================
+    /**
+     * Reads a 3-byte integer out of a std::iostream (FreeSurfer format).
+     *
+     * @param[in] stream  Stream to read from.
+     * @return the read 3-byte integer.
+     */
+    static qint32 fread3(std::iostream &stream);
+
+    //=========================================================================================================
+    /**
+     * Reads multiple 3-byte integers out of a QDataStream (FreeSurfer format).
+     *
+     * @param[in] stream  Stream to read from.
+     * @param[in] count   Number of elements to read.
+     * @return the read 3-byte integers.
+     */
+    static Eigen::VectorXi fread3_many(QDataStream &stream, qint32 count);
+
+    //=========================================================================================================
+    /**
+     * Reads multiple 3-byte integers out of a std::iostream (FreeSurfer format).
+     *
+     * @param[in] stream  Stream to read from.
+     * @param[in] count   Number of elements to read.
+     * @return the read 3-byte integers.
+     */
+    static Eigen::VectorXi fread3_many(std::iostream &stream, qint32 count);
 
 private:
     QString m_sFilePath;    /**< Path to surf directory. */

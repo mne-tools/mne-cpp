@@ -46,7 +46,7 @@
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/eventmodel.h>
 
-#include <rtprocessing/helpers/filterkernel.h>
+#include <dsp/filterkernel.h>
 
 //=============================================================================================================
 // Qt INCLUDES
@@ -76,6 +76,7 @@
 using namespace RAWDATAVIEWERPLUGIN;
 using namespace ANSHAREDLIB;
 using namespace RTPROCESSINGLIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

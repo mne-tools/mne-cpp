@@ -49,7 +49,7 @@
 // Fiff INCLUDES
 //=============================================================================================================
 
-#include <utils/ioutils.h>
+#include <fiff/fiff_byte_swap.h>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_tag.h>
 
@@ -63,7 +63,6 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace UTILSLIB;
 using namespace RTSERVER;
 using namespace FIFFLIB;
 
@@ -135,7 +134,7 @@ void FiffStreamThread::parseCommand(FiffTag::SPtr p_pTag)
     if(p_pTag->size() >= 4)
     {
         qint32* t_pInt = (qint32*)p_pTag->data();
-        IOUtils::swap_intp(t_pInt);
+        FIFFLIB::swap_intp(t_pInt);
         qint32 t_iCmd = t_pInt[0];
 
         if(t_iCmd == MNE_RT_SET_CLIENT_ALIAS)

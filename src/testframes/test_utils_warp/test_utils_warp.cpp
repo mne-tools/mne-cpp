@@ -1,7 +1,7 @@
 #include <QtTest/QtTest>
 #include <Eigen/Dense>
 #include <QTemporaryFile>
-#include <utils/warp.h>
+#include <math/warp.h>
 
 using namespace UTILSLIB;
 using namespace Eigen;
