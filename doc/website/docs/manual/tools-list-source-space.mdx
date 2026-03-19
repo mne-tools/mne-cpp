@@ -1,0 +1,50 @@
+---
+title: mne_list_source_space
+sidebar_label: mne_list_source_space
+sidebar_position: 17
+---
+
+# mne_list_source_space
+
+## Overview
+
+`mne_list_source_space` lists the contents of a source space FIFF file. It can output source locations in various formats suitable for visualization tools such as MRIlab or text processing.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_list_source_space [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--src <file>` | Source space FIFF file |
+| `--pnt <file>` | Output point file (MRIlab format) |
+| `--dip <file>` | Output dipole file (MRIlab format) |
+| `--vert <file>` | Output vertex file (text) |
+| `--all` | List all vertices (not just active) |
+| `--coord <name>` | Coordinate frame: `head` or `mri` (default: `mri`) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+This tool reads a source space from a FIFF file created by `mne_make_source_space` and outputs the source point locations in the requested format. By default, only active (selected) source points are listed; use `--all` to include decimated vertices as well.
+
+### Workflow Context
+
+`mne_list_source_space` is useful for verifying source space configurations before computing forward solutions. The output files can be loaded into visualization tools to check that source points are correctly distributed on the cortical surface.
+
+### Example
+
+```bash
+# List active source points as text
+mne_list_source_space --src my_source_space-src.fif --vert sources.txt
+
+# Export all vertices in head coordinates
+mne_list_source_space --src my_source_space-src.fif --pnt sources.pnt --all --coord head
+```

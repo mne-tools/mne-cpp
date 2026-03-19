@@ -1,0 +1,54 @@
+---
+title: mne_sensitivity_map
+sidebar_label: mne_sensitivity_map
+sidebar_position: 27
+---
+
+# mne_sensitivity_map
+
+## Overview
+
+`mne_sensitivity_map` computes a sensitivity map from a forward solution. The map shows how sensitive each MEG/EEG sensor configuration is to sources at each location on the cortical surface, and is useful for evaluating source space coverage.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_sensitivity_map [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--fwd <file>` | Forward solution FIFF file |
+| `--out <file>` | Output sensitivity map (text format) |
+| `--method <name>` | Method: `norm` (column norms, default) or `svd` (leading singular value) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+Sensitivity maps quantify the strength of the forward solution at each source location. Two methods are available:
+
+- **norm**: Computes the Euclidean norm of the forward solution columns for each source. This gives a measure of signal strength.
+- **svd**: Computes the leading singular value of the forward matrix at each source, providing a measure of the best-detectable component.
+
+### Workflow Context
+
+Sensitivity maps are useful for assessing the quality of a forward model before performing source localization. Regions with low sensitivity may produce unreliable source estimates. The map can be used to:
+
+- Verify that the sensor array provides adequate coverage of the cortex.
+- Identify regions where source localization results should be interpreted with caution.
+- Compare different sensor configurations.
+
+### Example
+
+```bash
+# Compute sensitivity map using column norms
+mne_sensitivity_map --fwd sam-meg-fwd.fif --out sensitivity.txt
+
+# Use SVD method
+mne_sensitivity_map --fwd sam-meg-fwd.fif --out sensitivity_svd.txt --method svd
+```

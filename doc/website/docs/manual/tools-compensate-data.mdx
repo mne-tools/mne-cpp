@@ -1,0 +1,46 @@
+---
+title: mne_compensate_data
+sidebar_label: mne_compensate_data
+sidebar_position: 20
+---
+
+# mne_compensate_data
+
+## Overview
+
+`mne_compensate_data` applies or changes the software gradient compensation grade in CTF MEG data stored in FIFF format. CTF systems use reference channels to reduce environmental noise via software gradient compensation. This tool allows switching between compensation grades.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_compensate_data [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--in <file>` | Input raw FIFF file |
+| `--out <file>` | Output FIFF file |
+| `--grade <value>` | Desired compensation grade (0, 1, 2, or 3) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+CTF MEG systems employ software gradient compensation to reduce environmental noise. The compensation grade determines the order of the spatial gradient applied. Grade 0 means no compensation, while grades 1–3 apply successively higher orders of noise cancellation using reference channels.
+
+This tool reads a raw FIFF file, applies the requested compensation grade, and writes the result. The input file must be a CTF dataset that has already been converted to FIFF format (e.g., with `mne_ctf2fiff`).
+
+### Workflow Context
+
+After converting CTF data to FIFF format with `mne_ctf2fiff`, you may need to change the compensation grade before further processing. Grade 3 is the most common choice for source localization. The compensated file can then be processed with `mne_process_raw` or used directly for inverse solutions.
+
+### Example
+
+```bash
+# Apply 3rd-order gradient compensation
+mne_compensate_data --in ctf_raw.fif --out ctf_raw_comp3.fif --grade 3
+```

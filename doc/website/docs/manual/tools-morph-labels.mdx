@@ -1,0 +1,53 @@
+---
+title: mne_morph_labels
+sidebar_label: mne_morph_labels
+sidebar_position: 30
+---
+
+# mne_morph_labels
+
+## Overview
+
+`mne_morph_labels` morphs cortical label files from one subject's surface to another using the FreeSurfer spherical registration. This enables transferring ROI definitions across subjects for group analysis.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_morph_labels [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--from <subject>` | Source subject name |
+| `--to <subject>` | Destination subject name |
+| `--subjects_dir <dir>` | Subjects directory (default: `$SUBJECTS_DIR`) |
+| `--hemi <hemi>` | Hemisphere: `lh` or `rh` |
+| `--label <file>` | Input label file |
+| `--out <file>` | Output morphed label file |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+The tool maps vertex coordinates from one subject's spherical surface registration to another's, effectively transferring cortical labels (ROIs) between subjects. This relies on the FreeSurfer `?h.sphere.reg` surfaces.
+
+### Workflow Context
+
+Label morphing is used in group analysis workflows:
+
+1. Define labels on one subject or on `fsaverage` → `mne_annot2labels` or FreeSurfer tools
+2. **Morph labels to each subject → `mne_morph_labels`**
+3. Use subject-specific labels for ROI analysis → `mne_compute_mne`
+
+This requires that the FreeSurfer spherical registration (`?h.sphere.reg`) is available for both subjects.
+
+### Example
+
+```bash
+# Morph a label from fsaverage to subject sam
+mne_morph_labels --from fsaverage --to sam --hemi lh --label V1.label --out sam-V1.label
+```

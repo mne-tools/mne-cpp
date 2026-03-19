@@ -1,0 +1,47 @@
+---
+title: mne_brain_vision2fiff
+sidebar_label: mne_brain_vision2fiff
+sidebar_position: 34
+---
+
+# mne_brain_vision2fiff
+
+## Overview
+
+`mne_brain_vision2fiff` converts BrainVision EEG data files to FIFF format. BrainVision is a widely used EEG acquisition system, and its data format consists of a header file (`.vhdr`), a data file (`.eeg`), and a marker file (`.vmrk`).
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_brain_vision2fiff [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--vhdr <file>` | Input BrainVision header file (`.vhdr`) |
+| `--out <file>` | Output FIFF file |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+The tool reads the BrainVision header file (`.vhdr`), which references the binary data file and marker file. All channels and events are converted to the FIFF format. The associated `.eeg` data file must be in the same directory as the header file.
+
+### Workflow Context
+
+This tool is used at the beginning of a processing pipeline when the source data comes from a BrainVision EEG system:
+
+1. **Convert BrainVision data → `mne_brain_vision2fiff`**
+2. Process raw data → `mne_process_raw`
+3. Continue with forward/inverse pipeline
+
+### Example
+
+```bash
+# Convert BrainVision data to FIFF
+mne_brain_vision2fiff --vhdr recording.vhdr --out recording-raw.fif
+```

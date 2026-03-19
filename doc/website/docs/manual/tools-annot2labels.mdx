@@ -1,0 +1,50 @@
+---
+title: mne_annot2labels
+sidebar_label: mne_annot2labels
+sidebar_position: 18
+---
+
+# mne_annot2labels
+
+## Overview
+
+`mne_annot2labels` converts FreeSurfer annotation files (`.annot`) into individual label files. Each parcellation region in the annotation is written as a separate label file, suitable for use with MNE source space analysis and ROI-based workflows.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_annot2labels [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--subject <name>` | Subject name |
+| `--subjects_dir <dir>` | Subjects directory (default: `$SUBJECTS_DIR`) |
+| `--annot <name>` | Annotation name (e.g., `aparc`, `aparc.a2009s`) |
+| `--hemi <hemi>` | Hemisphere: `lh` or `rh` (default: both) |
+| `--outdir <dir>` | Output directory for label files (default: subject's `label/`) |
+| `--surf <name>` | Surface to use for coordinates (default: `white`) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+FreeSurfer stores cortical parcellation information in binary annotation files. This tool reads those files and produces one label file per parcellation region. The label files contain vertex indices and their coordinates, which can be used for source-space ROI analysis.
+
+### Workflow Context
+
+This tool is typically used after FreeSurfer's `recon-all` has completed, when you need individual label files for source localization analysis. The resulting labels can be used with `mne_compute_mne` or `mne_compute_raw_inverse` to extract time courses from specific cortical regions.
+
+### Example
+
+```bash
+# Convert the aparc parcellation to label files for both hemispheres
+mne_annot2labels --subject sam --annot aparc
+
+# Convert only the left hemisphere of aparc.a2009s
+mne_annot2labels --subject sam --annot aparc.a2009s --hemi lh --outdir ./labels
+```

@@ -1,0 +1,50 @@
+---
+title: mne_ctf2fiff
+sidebar_label: mne_ctf2fiff
+sidebar_position: 35
+---
+
+# mne_ctf2fiff
+
+## Overview
+
+`mne_ctf2fiff` converts CTF MEG data (stored in a `.ds` directory) to FIFF format. CTF is a major MEG system manufacturer, and this tool enables processing CTF data with MNE tools.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_ctf2fiff [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--ds <dir>` | Input CTF `.ds` directory |
+| `--out <file>` | Output FIFF file |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+The tool reads all channels, triggers, and metadata from a CTF dataset directory and writes them in FIFF format. The CTF `.ds` directory must contain the `.meg4` data file and the `.res4` resource file.
+
+After conversion, the data retains its original compensation grade. Use `mne_compensate_data` to change the compensation grade if needed.
+
+### Workflow Context
+
+This tool is the entry point for processing CTF MEG data with MNE:
+
+1. **Convert CTF data → `mne_ctf2fiff`**
+2. Optionally adjust compensation → `mne_compensate_data`
+3. Process raw data → `mne_process_raw`
+4. Continue with forward/inverse pipeline
+
+### Example
+
+```bash
+# Convert a CTF dataset to FIFF format
+mne_ctf2fiff --ds recording.ds --out recording-raw.fif
+```
