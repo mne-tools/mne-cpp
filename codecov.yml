@@ -33,8 +33,8 @@ comment:
   behavior: default
   require_changes: no
 
-ignore:
-  - "src/external/**"       # third-party libraries (e.g. Eigen)
-  - "src/examples/**"       # example code is not part of coverage
-  - "src/testframes/**"     # test harnesses themselves
-  - "src/applications/**"   # applications are not part of library coverage
+# Only track coverage for the MNE-CPP libraries.
+# gcov data is generated exclusively for libraries (see src/libraries/CMakeLists.txt),
+# and this paths directive tells Codecov to include only library source files.
+paths:
+  - "src/libraries/**"
