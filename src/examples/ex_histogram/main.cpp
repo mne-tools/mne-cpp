@@ -47,7 +47,7 @@
 
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-#include <math/mnemath.h>
+#include <math/numerics.h>
 #include <utils/generics/applicationlogger.h>
 
 #include <disp/plots/bar.h>
@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
     dataSine = sineWaveGenerator(1.0e-6,(1.0/1.0e6), 0.0, 1.0);  //creates synthetic data using sineWaveGenerator function
     qDebug()<< "sourceEstimateData.rows = " << sourceEstimateData.rows();
     qDebug()<< "sourceEstaimateData.cols = " << sourceEstimateData.cols();
-    MNEMath::histcounts(sourceEstimateData, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax);   //user input to normalize and sort the data matrix
+    Numerics::histcounts(sourceEstimateData, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax);   //user input to normalize and sort the data matrix
     std::cout << "resultClassLimits = " << resultClassLimit << std::endl;
     std::cout << "resultFrequency = " << resultFrequency << std::endl;
     qDebug()<<"HistCounts timer:"<<myTimerHistCounts.elapsed();

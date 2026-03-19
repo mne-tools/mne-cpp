@@ -41,6 +41,7 @@
 
 #include "mne_inverse_operator.h"
 #include <fs/fs_label.h>
+#include <math/linalg.h>
 
 #include <iostream>
 
@@ -593,7 +594,7 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
         for(qint32 i = 0; i < t_qListMNEClusterInfo[h].clusterVertnos.size(); ++i)
         {
             VectorXi idx_sel;
-            MNEMath::intersect(t_vertnos[h], t_qListMNEClusterInfo[h].clusterVertnos[i], idx_sel);
+            Linalg::intersect(t_vertnos[h], t_qListMNEClusterInfo[h].clusterVertnos[i], idx_sel);
 
             idx_sel.array() += hemiOffset;
 
@@ -794,7 +795,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
     // TODO: verify whether explicit sorting is necessary
     VectorXd p_sing = svd.singularValues();
     MatrixXd t_U = svd.matrixU();
-    MNEMath::sort<double>(p_sing, t_U);
+    Linalg::sort<double>(p_sing, t_U);
     FiffNamedMatrix::SDPtr p_eigen_fields = FiffNamedMatrix::SDPtr(new FiffNamedMatrix( svd.matrixU().cols(),
                                                                                         svd.matrixU().rows(),
                                                                                         defaultQStringList,
@@ -803,7 +804,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
 
     p_sing = svd.singularValues();
     MatrixXd t_V = svd.matrixV();
-    MNEMath::sort<double>(p_sing, t_V);
+    Linalg::sort<double>(p_sing, t_V);
     FiffNamedMatrix::SDPtr p_eigen_leads = FiffNamedMatrix::SDPtr(new FiffNamedMatrix( svd.matrixV().rows(),
                                                                                        svd.matrixV().cols(),
                                                                                        defaultQStringList,
@@ -999,7 +1000,7 @@ MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nave ,flo
         {
             // For free orientations the variances at three consecutive entries
             // must be squared and summed, yielding one factor per source location.
-            VectorXd t = MNEMath::combine_xyz(noise_norm.transpose());
+            VectorXd t = Linalg::combine_xyz(noise_norm.transpose());
             noise_norm_new = t.cwiseSqrt();
         }
         VectorXd vOnes = VectorXd::Ones(noise_norm_new.size());

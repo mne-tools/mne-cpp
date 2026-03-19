@@ -41,7 +41,7 @@
 #include "mne_hemisphere.h"
 #include "mne_nearest.h"
 
-#include <math/mnemath.h>
+#include <math/linalg.h>
 
 #include <algorithm>
 
@@ -293,7 +293,7 @@ bool MNEHemisphere::compute_patch_info()
         std::pair<int,int> t_pair(static_cast<int>(i), nearest[i].nearest);
         t_vIndn.push_back(t_pair);
     }
-    std::sort(t_vIndn.begin(),t_vIndn.end(), MNEMath::compareIdxValuePairSmallerThan<int> );
+    std::sort(t_vIndn.begin(),t_vIndn.end(), Linalg::compareIdxValuePairSmallerThan<int> );
 
     VectorXi nearest_sorted(t_vIndn.size());
 

@@ -43,7 +43,7 @@
 
 #include <utils/ioutils.h>
 #include "rt_detect_trigger.h"
-#include <math/mnemath.h>
+#include <math/numerics.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -500,7 +500,7 @@ void RtAveragingWorker::generateEvoked(double dTriggerType)
     }
 
     if(m_bDoBaselineCorrection) {
-        finalAverage = MNEMath::rescale(finalAverage, evoked.times, m_pairBaselineSec, QString("mean"));
+        finalAverage = Numerics::rescale(finalAverage, evoked.times, m_pairBaselineSec, QString("mean"));
     }
 
     evoked.data = finalAverage;

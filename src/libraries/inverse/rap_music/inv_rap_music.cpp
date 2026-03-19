@@ -39,7 +39,7 @@
 
 #include "inv_rap_music.h"
 
-#include <math/mnemath.h>
+#include <math/numerics.h>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -158,7 +158,7 @@ bool InvRapMusic::init(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, do
 
     std::cout << "Calculate gain matrix combinations. \n";
 
-    m_iNumLeadFieldCombinations = MNEMath::nchoose2(m_iNumGridPoints+1);
+    m_iNumLeadFieldCombinations = Numerics::nchoose2(m_iNumGridPoints+1);
 
     m_ppPairIdxCombinations = (Pair **)malloc(m_iNumLeadFieldCombinations * sizeof(Pair *));
 

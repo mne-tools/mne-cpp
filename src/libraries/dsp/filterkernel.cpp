@@ -40,7 +40,7 @@
 
 #include "filterkernel.h"
 
-#include <math/mnemath.h>
+#include <math/numerics.h>
 
 #include "parksmcclellan.h"
 #include "cosinefilter.h"
@@ -141,7 +141,7 @@ void FilterKernel::prepareFilter(int iDataSize)
     int iFftLength, exp;
 
     iFftLength = iDataSize + m_vecCoeff.cols();
-    exp = ceil(MNEMath::log2(iFftLength));
+    exp = ceil(Numerics::log2(iFftLength));
     iFftLength = pow(2, exp);
 
     // Transform coefficients anew if needed
@@ -185,7 +185,7 @@ void FilterKernel::applyFftFilter(RowVectorXd& vecData,
 
     // Make sure we always have the correct FFT length for the given input data and filter overlap
     int iFftLength = vecData.cols() + m_vecCoeff.cols();
-    int exp = ceil(MNEMath::log2(iFftLength));
+    int exp = ceil(Numerics::log2(iFftLength));
     iFftLength = pow(2, exp);
 
     // Transform coefficients anew if needed
@@ -403,7 +403,7 @@ void FilterKernel::designFilter()
 {
     // Make sure we only use a minimum needed FFT size
     int iFftLength = m_iFilterOrder;
-    int exp = ceil(MNEMath::log2(iFftLength));
+    int exp = ceil(Numerics::log2(iFftLength));
     iFftLength = pow(2, exp);
 
     switch(m_iDesignMethod) {

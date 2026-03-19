@@ -50,7 +50,6 @@
 #include <inverse/hpi/inv_hpi_data_updater.h>
 
 #include <utils/ioutils.h>
-#include <math/mnemath.h>
 
 #include <fwd/fwd_coil_set.h>
 
@@ -226,7 +225,7 @@ void TestHpiFitIntegration::initTestCase()
                 matCoilsHead,
                 hpiFitResult);
 
-        if(MNEMath::compareTransformation(devHeadT.trans, hpiFitResult.devHeadTrans.trans, threshRot, threshTrans)) {
+        if(InvHpiFit::compareTransformation(devHeadT.trans, hpiFitResult.devHeadTrans.trans, threshRot, threshTrans)) {
             mHpiResult(i,2) = 1;
         }
 

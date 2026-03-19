@@ -40,7 +40,7 @@
 
 #include "mne_epoch_data.h"
 
-#include <math/mnemath.h>
+#include <math/numerics.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -85,7 +85,7 @@ void MNEEpochData::applyBaselineCorrection(const QPair<float, float>& baseline)
 {
     // Run baseline correction
     RowVectorXf times = RowVectorXf::LinSpaced(this->epoch.cols(), this->tmin, this->tmax);
-    this->epoch = MNEMath::rescale(this->epoch, times, baseline, QString("mean"));
+    this->epoch = Numerics::rescale(this->epoch, times, baseline, QString("mean"));
 }
 
 //=============================================================================================================

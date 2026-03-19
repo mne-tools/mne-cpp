@@ -58,7 +58,7 @@
 #include <fs/fs_colortable.h>
 #include <fs/fs_label.h>
 #include <fs/fs_surfaceset.h>
-#include <math/mnemath.h>
+#include <math/linalg.h>
 #include <math/kmeans.h>
 
 #include <algorithm>
@@ -743,7 +743,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
         for(qint32 i = 0; i < p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterVertnos.size(); ++i)
         {
             VectorXi idx_sel;
-            MNEMath::intersect(t_vertnos[h], p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterVertnos[i], idx_sel);
+            Linalg::intersect(t_vertnos[h], p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterVertnos[i], idx_sel);
 
             idx_sel.array() += hemiOffset;
 
@@ -881,7 +881,7 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
     VectorXd w = d.cwiseInverse();
     VectorXd ws = w;
     VectorXd wpp;
-    MNEMath::sort<double>(ws, false);
+    Linalg::sort<double>(ws, false);
     double weight_limit = pow(limit, 2);
     if (!limit_depth_chs)
     {
@@ -1078,7 +1078,7 @@ MNEForwardSolution MNEForwardSolution::pick_regions(const QList<FsLabel> &p_qLis
         iSize = selVertices.size();
     }
 
-    MNEMath::sort(selVertices, false);
+Linalg::sort(selVertices, false);
 
     MNEForwardSolution selectedFwd(*this);
 
@@ -1457,7 +1457,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
             qInfo("\tChanging to fixed-orientation forward solution...");
 
             MatrixXd tmp = fwd.source_nn.transpose().cast<double>();
-            SparseMatrix<double> fix_rot = MNEMath::make_block_diag(tmp,1);
+            SparseMatrix<double> fix_rot = Linalg::make_block_diag(tmp,1);
             fwd.sol->data *= fix_rot;
             fwd.sol->ncol  = fwd.nsource;
             fwd.source_ori = FIFFV_MNE_FIXED_ORI;
@@ -1528,7 +1528,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
                 //Sort singular values and singular vectors
                 VectorXf t_s = t_svd.singularValues();
                 MatrixXf U = t_svd.matrixU();
-                MNEMath::sort<float>(t_s, U);
+                Linalg::sort<float>(t_s, U);
 
                 //
                 //  Make sure that ez is in the direction of nn
@@ -1541,7 +1541,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
             nuse += t_SourceSpace[k].nuse;
         }
         MatrixXd tmp = fwd.source_nn.transpose().cast<double>();
-        SparseMatrix<double> surf_rot = MNEMath::make_block_diag(tmp,3);
+        SparseMatrix<double> surf_rot = Linalg::make_block_diag(tmp,3);
 
         fwd.sol->data *= surf_rot;
 

@@ -39,7 +39,6 @@
 
 #include "rt_filter.h"
 
-#include <math/mnemath.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_file.h>
 #include <mne/mne_epoch_data.h>
