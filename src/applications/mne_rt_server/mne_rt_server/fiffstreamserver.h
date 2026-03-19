@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
-#include <communication/rtCommand/commandmanager.h>
+#include <com/rt_command/command_manager.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -132,7 +132,7 @@ private:
      *
      * @param[in] p_command  The connector list command.
      */
-    void comClist(COMMUNICATIONLIB::Command p_command);
+    void comClist(COMLIB::Command p_command);
 
     //=========================================================================================================
     /**
@@ -140,7 +140,7 @@ private:
      *
      * @param[in] p_command  The select connector command.
      */
-    void comMeasinfo(COMMUNICATIONLIB::Command p_command);
+    void comMeasinfo(COMLIB::Command p_command);
 
     //=========================================================================================================
     /**
@@ -148,7 +148,7 @@ private:
      *
      * @param[in] p_command  The start command.
      */
-    void comStart(COMMUNICATIONLIB::Command p_command);//comMeas
+    void comStart(COMLIB::Command p_command);//comMeas
 
     //=========================================================================================================
     /**
@@ -156,7 +156,7 @@ private:
      *
      * @param[in] p_command  The stop command.
      */
-    void comStop(COMMUNICATIONLIB::Command p_command);
+    void comStop(COMLIB::Command p_command);
 
     //=========================================================================================================
     /**
@@ -164,7 +164,7 @@ private:
      *
      * @param[in] p_command  The stop all command.
      */
-    void comStopAll(COMMUNICATIONLIB::Command p_command);
+    void comStopAll(COMLIB::Command p_command);
 
     QByteArray parseToId(QString& p_sRawId, qint32& p_iParsedId);
 

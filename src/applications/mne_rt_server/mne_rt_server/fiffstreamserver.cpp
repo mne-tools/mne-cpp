@@ -52,7 +52,7 @@
 
 using namespace RTSERVER;
 using namespace FIFFLIB;
-using namespace COMMUNICATIONLIB;
+using namespace COMLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

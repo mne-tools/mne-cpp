@@ -42,7 +42,7 @@
 #include "../fiffsimulator.h"
 
 #include <fiff/fiff_info.h>
-#include <communication/rtClient/rtcmdclient.h>
+#include <com/rt_client/rt_cmd_client.h>
 
 //=============================================================================================================
 // QT INCLUDES

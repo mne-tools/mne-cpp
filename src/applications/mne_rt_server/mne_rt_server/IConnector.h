@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
-#include <communication/rtCommand/commandmanager.h>
+#include <com/rt_command/command_manager.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -116,7 +116,7 @@ public:
      *
      * @return the CommandManager.
      */
-    inline COMMUNICATIONLIB::CommandManager& getCommandManager();
+    inline COMLIB::CommandManager& getCommandManager();
 
     //=========================================================================================================
     /**
@@ -209,7 +209,7 @@ protected:
 
     QJsonObject     m_qJsonObjectMetaData;  /**< The meta data of the plugin defined in Q_PLUGIN_METADATA and the corresponding json file. */
 
-    COMMUNICATIONLIB::CommandManager  m_commandManager;       /**< The CommandManager of the connector. */
+    COMLIB::CommandManager  m_commandManager;       /**< The CommandManager of the connector. */
 
 private:
     bool        m_bIsActive;                /**< Holds the activation status. */
@@ -219,7 +219,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline COMMUNICATIONLIB::CommandManager& IConnector::getCommandManager()
+inline COMLIB::CommandManager& IConnector::getCommandManager()
 {
     return m_commandManager;
 }

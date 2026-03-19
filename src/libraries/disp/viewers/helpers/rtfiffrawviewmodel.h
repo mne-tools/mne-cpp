@@ -49,8 +49,6 @@
 
 #include <dsp/filterkernel.h>
 
-#include <events/eventmanager.h>
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -58,6 +56,9 @@
 #include <QAbstractTableModel>
 #include <QSharedPointer>
 #include <QColor>
+
+#include <functional>
+#include <vector>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -540,14 +541,24 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns events between two samples
+     * Returns event sample positions between two samples.
      *
      * @param[in] iBegin    Lower bound for sample (inclusive).
      * @param[in] iEnd      Upper bound for sample (exclusive).
      *
-     * @return  Pointer to a vector of events.
+     * @return  Vector of event sample positions.
      */
-    std::unique_ptr<std::vector<EVENTSLIB::Event> > getEventsToDisplay(int iBegin, int iEnd) const;
+    std::vector<int> getEventsToDisplay(int iBegin, int iEnd) const;
+
+    //=========================================================================================================
+    /**
+     * Sets callbacks for adding and querying events.
+     *
+     * @param[in] addFn     Callback invoked when an event is added.
+     * @param[in] getFn     Callback returning event sample positions in a range.
+     */
+    void setEventCallbacks(std::function<void(int)> addFn,
+                           std::function<std::vector<int>(int, int)> getFn);
 
 private:
     //=========================================================================================================
@@ -650,7 +661,8 @@ private:
 
     QColor                              m_colBackground;                            /**< The background color.*/
 
-    static EVENTSLIB::EventManager      m_EventManager;                             /**< Database for storing events and using shared memory. Shared between all instances */
+    std::function<void(int)>             m_fnAddEvent;                               /**< Callback for adding an event at a sample. */
+    std::function<std::vector<int>(int, int)> m_fnGetEventSamples;                  /**< Callback for querying event sample positions in a range. */
 
 signals:
     //=========================================================================================================

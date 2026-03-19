@@ -68,7 +68,7 @@ using namespace UTILSLIB;
 using namespace SCSHAREDLIB;
 using namespace UTILSLIB;
 using namespace SCMEASLIB;
-using namespace COMMUNICATIONLIB;
+using namespace COMLIB;
 using namespace Eigen;
 
 //=============================================================================================================

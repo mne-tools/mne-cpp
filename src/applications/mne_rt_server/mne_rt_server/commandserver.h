@@ -41,8 +41,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <communication/rtCommand/commandparser.h>
-#include <communication/rtCommand/commandmanager.h>
+#include <com/rt_command/command_parser.h>
+#include <com/rt_command/command_manager.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -94,7 +94,7 @@ public:
      *
      * @return the command parser.
      */
-    inline COMMUNICATIONLIB::CommandParser& getCommandParser();
+    inline COMLIB::CommandParser& getCommandParser();
 
     //=========================================================================================================
     /**
@@ -111,7 +111,7 @@ public:
      *
      * @param[in] p_commandManager   Command Manager to register.
      */
-    void registerCommandManager(COMMUNICATIONLIB::CommandManager &p_commandManager);
+    void registerCommandManager(COMLIB::CommandManager &p_commandManager);
 
     //=========================================================================================================
     /**
@@ -120,7 +120,7 @@ public:
      * @param[in] p_sReply   The reply which should be send back.
      * @param[in] p_command  Comman which evoked the reply.
      */
-    void prepareReply(QString p_sReply, COMMUNICATIONLIB::Command p_command);
+    void prepareReply(QString p_sReply, COMLIB::Command p_command);
 
 signals:
     //=========================================================================================================
@@ -148,7 +148,7 @@ protected:
 private:
     qint32 m_iThreadCount;              /**< Is incresed each time a new command client connects to mne_rt_server. */
 
-    COMMUNICATIONLIB::CommandParser m_commandParser;      /**< Command parser. */
+    COMLIB::CommandParser m_commandParser;      /**< Command parser. */
 
 //    QMultiMap<QString, qint32> m_qMultiMapCommandThreadID;//This is need when commands are processed by different threads; currently its only one command per time processed by one thread --> m_iCurrentCommandThreadID
     qint32 m_iCurrentCommandThreadID;   /**< Command Thread ID of the current command. */
@@ -158,7 +158,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline COMMUNICATIONLIB::CommandParser& CommandServer::getCommandParser()
+inline COMLIB::CommandParser& CommandServer::getCommandParser()
 {
     return m_commandParser;
 }

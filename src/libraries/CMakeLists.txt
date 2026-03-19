@@ -63,11 +63,10 @@ add_subdirectory(mri)
 add_subdirectory(mne)
 add_subdirectory(fwd)
 add_subdirectory(inverse)
-add_subdirectory(communication)
+add_subdirectory(com)
 add_subdirectory(connectivity)
 add_subdirectory(dsp)
 
-add_subdirectory(events)
 add_subdirectory(disp)
 
 add_subdirectory(disp3D_rhi)

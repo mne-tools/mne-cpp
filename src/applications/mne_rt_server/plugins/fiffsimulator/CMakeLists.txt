@@ -65,7 +65,7 @@ set(MNE_LIBS_REQUIRED
     mne_utils
     mne_math
     mne_fiff
-    mne_communication
+    mne_com
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

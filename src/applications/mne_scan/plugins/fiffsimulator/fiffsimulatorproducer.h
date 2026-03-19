@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <communication/rtClient/rtdataclient.h>
+#include <com/rt_client/rt_data_client.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -134,7 +134,7 @@ protected:
 private:
     QMutex                  m_producerMutex;                        /**< The mutex to ensure thread safety.*/
 
-    QSharedPointer<COMMUNICATIONLIB::RtDataClient> m_pRtDataClient; /**< The data client.*/
+    QSharedPointer<COMLIB::RtDataClient> m_pRtDataClient; /**< The data client.*/
 
     FiffSimulator*          m_pFiffSimulator;                       /**< Holds a pointer to corresponding MNERtClient.*/
 

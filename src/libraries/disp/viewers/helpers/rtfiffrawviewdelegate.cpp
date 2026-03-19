@@ -661,11 +661,10 @@ void RtFiffRawViewDelegate::createMarkerPath(const QModelIndex &index,
     int iEarliestDrawnSample = iOffset - iMaxSample + iTimeCursorSample;
     int iLatestDrawnSample = iOffset + iTimeCursorSample;
 
-    auto events = t_pModel->getEventsToDisplay(iEarliestDrawnSample, iLatestDrawnSample);
+    auto eventSamples = t_pModel->getEventsToDisplay(iEarliestDrawnSample, iLatestDrawnSample);
 
-    for(auto& e : *events)
+    for(int iEventSample : eventSamples)
     {
-        int iEventSample = e.sample;
         int iLastStartingSample = iOffset - iMaxSample;
         int iDrawPositionInSamples = (iEventSample - iLastStartingSample) % iMaxSample;
 

@@ -130,7 +130,7 @@ private:
      *
      * @param[in] p_command  The buffer sample size command.
      */
-    void comBufsize(COMMUNICATIONLIB::Command p_command);
+    void comBufsize(COMLIB::Command p_command);
 
     //=========================================================================================================
     /**
@@ -138,7 +138,7 @@ private:
      *
      * @param[in] p_command  The buffer sample size command.
      */
-    void comGetBufsize(COMMUNICATIONLIB::Command p_command);
+    void comGetBufsize(COMLIB::Command p_command);
 
     //=========================================================================================================
     /**
@@ -146,7 +146,7 @@ private:
      *
      * @param[in] p_command  The acceleration factor command.
      */
-    void comAccel(COMMUNICATIONLIB::Command p_command);
+    void comAccel(COMLIB::Command p_command);
 
     //=========================================================================================================
     /**
@@ -154,7 +154,7 @@ private:
      *
      * @param[in] p_command  The acceleration factor command.
      */
-    void comGetAccel(COMMUNICATIONLIB::Command p_command);
+    void comGetAccel(COMLIB::Command p_command);
 
     //=========================================================================================================
     /**
@@ -162,7 +162,7 @@ private:
      *
      * @param[in] p_command  The fiff simulation file command.
      */
-    void comSimfile(COMMUNICATIONLIB::Command p_command);
+    void comSimfile(COMLIB::Command p_command);
 
     //=========================================================================================================
     /**
