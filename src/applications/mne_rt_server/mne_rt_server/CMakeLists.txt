@@ -42,7 +42,7 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 set(MNE_LIBS_REQUIRED 
     mne_connectivity
-    mne_communication
+    mne_com
     mne_fiff
     mne_utils
     mne_math

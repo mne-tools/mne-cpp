@@ -57,7 +57,7 @@
 //=============================================================================================================
 
 using namespace RTSERVER;
-using namespace COMMUNICATIONLIB;
+using namespace COMLIB;
 
 const char* connectorDir = "/mne_rt_server_plugins";        /**< holds directory to connectors.*/
 

@@ -84,8 +84,6 @@ using namespace RTPROCESSINGLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EVENTSLIB::EventManager RtFiffRawViewModel::m_EventManager;
-
 RtFiffRawViewModel::RtFiffRawViewModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_bProjActivated(false)
@@ -113,14 +111,12 @@ RtFiffRawViewModel::RtFiffRawViewModel(QObject *parent)
 , m_pFiffInfo(FiffInfo::SPtr::create())
 , m_colBackground(Qt::white)
 {
-    m_EventManager.initSharedMemory(EVENTSLIB::SharedMemoryMode::READWRITE);
 }
 
 //=============================================================================================================
 
 RtFiffRawViewModel::~RtFiffRawViewModel()
 {
-    m_EventManager.stopSharedMemory();
 }
 
 //=============================================================================================================
@@ -1389,12 +1385,26 @@ double RtFiffRawViewModel::getMaxValueFromRawViewModel(int row) const
 
 void RtFiffRawViewModel::addEvent(int iSample)
 {
-    m_EventManager.addEvent(iSample);
+    if (m_fnAddEvent) {
+        m_fnAddEvent(iSample);
+    }
 }
 
 //=============================================================================================================
 
-std::unique_ptr<std::vector<EVENTSLIB::Event> > RtFiffRawViewModel::getEventsToDisplay(int iBegin, int iEnd) const
+std::vector<int> RtFiffRawViewModel::getEventsToDisplay(int iBegin, int iEnd) const
 {
-    return m_EventManager.getEventsBetween(iBegin, iEnd);
+    if (m_fnGetEventSamples) {
+        return m_fnGetEventSamples(iBegin, iEnd);
+    }
+    return {};
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::setEventCallbacks(std::function<void(int)> addFn,
+                                           std::function<std::vector<int>(int, int)> getFn)
+{
+    m_fnAddEvent = std::move(addFn);
+    m_fnGetEventSamples = std::move(getFn);
 }

@@ -43,7 +43,7 @@
 #include "fiffsimulator_global.h"
 
 #include <scShared/Plugins/abstractsensor.h>
-#include <communication/rtClient/rtcmdclient.h>
+#include <com/rt_client/rt_cmd_client.h>
 #include <utils/generics/circularbuffer.h>
 
 //=============================================================================================================
@@ -195,7 +195,7 @@ protected:
     QSharedPointer<FiffSimulatorProducer>                       m_pFiffSimulatorProducer;   /**< Holds the FiffSimulatorProducer.*/
     QSharedPointer<FIFFLIB::FiffInfo>                           m_pFiffInfo;                /**< Fiff measurement info.*/
     QSharedPointer<FIFFLIB::FiffDigitizerData>                  m_pFiffDigData;             /**< Fiff Digitizer Data. */
-    QSharedPointer<COMMUNICATIONLIB::RtCmdClient>               m_pRtCmdClient;             /**< The command client.*/
+    QSharedPointer<COMLIB::RtCmdClient>               m_pRtCmdClient;             /**< The command client.*/
     QSharedPointer<UTILSLIB::CircularBuffer_Matrix_float>       m_pCircularBuffer;          /**< Holds incoming raw data. */
 
     bool                    m_bCmdClientIsConnected;        /**< If the command client is connected.*/

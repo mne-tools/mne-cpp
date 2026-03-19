@@ -44,7 +44,7 @@
 #include <fiff/fiff.h>
 #include <fiff/fiff_types.h>
 
-#include <communication/rtCommand/command.h>
+#include <com/rt_command/command.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -69,7 +69,7 @@ using namespace FIFFSIMULATORRTSERVERPLUGIN;
 using namespace FIFFLIB;
 using namespace RTSERVER;
 using namespace UTILSLIB;
-using namespace COMMUNICATIONLIB;
+using namespace COMLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER CONSTANTS

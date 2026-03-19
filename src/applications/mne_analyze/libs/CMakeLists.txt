@@ -21,5 +21,6 @@ else()
   set(CMAKE_INSTALL_RPATH "\${ORIGIN}/")
 endif()
 
+add_subdirectory(events)
 add_subdirectory(anShared)
 

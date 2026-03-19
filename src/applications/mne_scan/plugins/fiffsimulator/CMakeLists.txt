@@ -73,7 +73,7 @@ set(MNE_LIBS_REQUIRED
     mne_dsp
     mne_connectivity
     mne_events
-    mne_communication
+    mne_com
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

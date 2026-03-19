@@ -46,7 +46,7 @@
 
 #include "IConnector.h"
 
-#include <communication/rtCommand/commandmanager.h>
+#include <com/rt_command/command_manager.h>
 
 #ifdef STATICBUILD
 #include "../plugins/fiffsimulator/fiffsimulator.h"
@@ -71,7 +71,7 @@
 //=============================================================================================================
 
 using namespace RTSERVER;
-using namespace COMMUNICATIONLIB;
+using namespace COMLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

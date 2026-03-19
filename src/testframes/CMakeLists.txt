@@ -106,3 +106,6 @@ add_subdirectory(test_mne_library)
 add_subdirectory(test_fwd_library)
 add_subdirectory(test_fiff_fs_library)
 add_subdirectory(test_inv_rt_library)
+
+# Communication library tests
+add_subdirectory(test_com)
