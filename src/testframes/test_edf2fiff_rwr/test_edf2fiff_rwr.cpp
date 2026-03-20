@@ -41,7 +41,7 @@
 #include <algorithm>
 
 #include <fiff/fiff.h>
-#include "../../applications/mne_edf2fiff/edf_raw_data.h"
+#include "../../tools/conversion/mne_edf2fiff/edf_raw_data.h"
 
 #include <utils/generics/applicationlogger.h>
 

@@ -43,7 +43,7 @@ jobs:
         modules: qtshadertools
     - name: Configure and compile MNE-CPP
       run: |
-        ./tools/build_project.bat
+        ./scripts/build_project.bat
     - name: Deploy binaries
       run: |
         echo "Qt environment:"
@@ -55,7 +55,7 @@ jobs:
           QT_PREFIX="$(cd "${Qt6_DIR}/../../.." 2>/dev/null && pwd)"
         fi
         ls "$QT_PREFIX/lib"/libQt6*.so* 2>/dev/null | head -5 || echo "  No Qt .so files found at $QT_PREFIX/lib"
-        ./tools/deploy.bat dynamic pack
+        ./scripts/deploy.bat dynamic pack
     - name: Upload release binaries
       if: steps.release-info.outputs.should_upload == 'true'
       env:
@@ -133,10 +133,10 @@ jobs:
     - name: Configure and compile MNE-CPP (static)
       run: |
         export CMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/../Qt6_static
-        ./tools/build_project.bat static
+        ./scripts/build_project.bat static
     - name: Deploy binaries
       run: |
-        ./tools/deploy.bat static pack
+        ./scripts/deploy.bat static pack
     - name: Upload release binaries
       if: steps.release-info.outputs.should_upload == 'true'
       env:

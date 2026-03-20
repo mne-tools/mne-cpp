@@ -1,7 +1,7 @@
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIRECTORY}/tests)
 
 if(WIN32)
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIRECTORY}/apps)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIRECTORY}/bin)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 endif()
@@ -109,3 +109,11 @@ add_subdirectory(test_inv_rt_library)
 
 # Communication library tests
 add_subdirectory(test_com)
+add_subdirectory(test_com_rt_client)
+
+# Utils, disp, and disp3D coverage tests
+add_subdirectory(test_utils_layout_selection)
+add_subdirectory(test_utils_observer_pattern)
+add_subdirectory(test_disp_plots)
+add_subdirectory(test_disp3d_viewstate)
+add_subdirectory(test_disp3d_brainsurface)
