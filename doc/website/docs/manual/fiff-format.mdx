@@ -1,0 +1,182 @@
+---
+title: FIFF File Format Reference
+sidebar_label: FIFF Format
+sidebar_position: 6
+---
+
+# FIFF File Format Reference
+
+The Functional Imaging File Format (FIFF) is the standard data format used throughout the MNE software ecosystem. Originally developed at the Neuromag/Elekta/MEGIN MEG systems group, FIFF stores MEG, EEG, and MRI data along with all associated metadata in a single, structured binary format.
+
+## Overview
+
+FIFF files use a **tag-based** hierarchical structure. Each piece of information — a data array, a string, a coordinate transformation matrix — is stored as a **tag** identified by a numeric kind and type. Tags are organized into **blocks** (also called trees) that group related information together.
+
+The MNE-CPP FIFF library (`FIFFLIB`) provides complete read/write support for FIFF files. See the [Library API](../development/api) for programmatic access.
+
+## File Types
+
+The MNE software uses FIFF files for many different purposes. The file naming conventions help identify the contents:
+
+| Suffix | Contents |
+|---|---|
+| `_raw.fif` | Raw MEG/EEG data |
+| `-ave.fif` | Averaged (evoked) data |
+| `-cov.fif` | Noise-covariance matrix |
+| `-fwd.fif` | Forward solution |
+| `-inv.fif` | Inverse operator |
+| `-src.fif` | Source space |
+| `-bem.fif` | BEM geometry |
+| `-bem-sol.fif` | BEM geometry + solution |
+| `-trans.fif` | Coordinate transformation |
+| `COR.fif` | MRI description (for Neuromag MRIlab) |
+
+## Key Data Blocks
+
+### Measurement Info
+
+The measurement info block is present in raw, averaged, and processed data files. It contains:
+
+- **Channel information** — channel names, types (MEG/EEG/STI/EOG/ECG), locations, orientations, unit, calibration, coordinate frame
+- **Digitization points** — head shape, fiducials, HPI coil locations, EEG electrode positions
+- **Projection operators** — SSP vectors for artifact rejection
+- **Compensation data** — software gradient compensation (CTF/4D)
+- **Bad channels** — list of channels marked as bad
+- **Sampling frequency**
+- **Measurement date and subject information**
+
+### Raw Data
+
+Raw data files contain continuous time-series data from all channels. The data are stored in buffers (typically 600 samples per buffer) and can optionally be split across multiple files for very large recordings.
+
+### Evoked Data
+
+Evoked (averaged) data files contain one or more averaged responses. Each response is stored with:
+- The averaged data matrix (channels × time points)
+- The number of averages
+- Baseline information
+- Stimulus category and comment
+
+### Forward Solution
+
+Forward solution files contain:
+- Source space description (vertex locations and orientations)
+- The gain matrix $G$ mapping source currents to sensor signals
+- Coordinate transformations (head-to-MRI, device-to-head)
+- BEM model information
+- Sensor and electrode locations
+
+### Inverse Operator
+
+Inverse operator files contain the SVD decomposition of the inverse operator. This decomposition allows the regularization parameter to be adjusted without recomputing the operator. The file includes:
+- The SVD components
+- Source and noise covariance information
+- Source space description
+- Forward solution reference
+
+### Source Space
+
+Source space files describe the locations and orientations of the current dipoles used in the forward and inverse calculations. They may also contain:
+- Cortical patch statistics (neighborhood information)
+- Triangle connectivity for surface-based source spaces
+- The complete surface mesh for reference
+
+### BEM Model
+
+BEM files contain the triangulated surfaces and conductivity values for the boundary-element forward model. The `-bem-sol.fif` variant also includes the geometry-dependent solution matrices.
+
+## Other File Formats Used by MNE
+
+In addition to FIFF, the MNE software works with several other file formats:
+
+### FreeSurfer Formats
+
+| Format | Extension | Contents |
+|---|---|---|
+| Surface | (no extension, e.g., `lh.white`) | Triangulated cortical surface mesh |
+| Annotation | `.annot` | Cortical parcellation (atlas labels) |
+| Label | `.label` | Vertex list for a cortical region of interest |
+| Curvature | `.curv` | Per-vertex curvature values |
+| MRI volume | `.mgz` / `.mgh` | 3D MRI volume data |
+| Morphometry | `.thickness`, `.area` | Per-vertex morphometry |
+
+### Source Estimate Formats
+
+| Format | Extension | Contents |
+|---|---|---|
+| STC | `.stc` | Dynamic source estimates (time series on cortex) — one file per hemisphere (`-lh.stc`, `-rh.stc`) |
+| W file | `.w` | Static overlay data (single time point on cortex) — one file per hemisphere (`-lh.w`, `-rh.w`) |
+
+STC files contain:
+- Vertex indices (subset of the source space)
+- Time points (start time, sample period)
+- Data matrix (vertices × time points)
+
+### Text Formats
+
+| Format | Extension | Contents |
+|---|---|---|
+| Event file | `-eve.fif` or `.eve` | Event timestamps and codes |
+| Averaging script | `.ave` | Description file for offline averaging |
+| Covariance script | `.cov` | Description file for noise-covariance computation |
+| Projection file | `.proj` | SSP operator definition |
+| Point file | `.pnt` | Surface points in text format |
+| Dipole file | `.dip` | Dipole locations and orientations |
+| Triangle file | `.tri` | ASCII surface triangulation |
+
+## Data Conversion Tools
+
+MNE-CPP provides several tools for converting data from other formats to FIFF:
+
+| Tool | Source Format |
+|---|---|
+| [`mne_edf2fiff`](tools-edf2fiff) | EDF / EDF+ / BDF |
+| [`mne_brain_vision2fiff`](tools-brain-vision2fiff) | BrainVision (`.vhdr`) |
+| [`mne_ctf2fiff`](tools-ctf2fiff) | CTF MEG (`.ds`) |
+| [`mne_kit2fiff`](tools-kit2fiff) | KIT / Yokogawa (`.sqd` / `.con`) |
+
+For exporting FIFF data:
+
+| Tool | Target Format |
+|---|---|
+| [`mne_raw2mat`](tools-raw2mat) | MATLAB (`.mat`) |
+
+## Inspecting FIFF Files
+
+Use [`mne_show_fiff`](tools-show-fiff) to list the contents of a FIFF file:
+
+```bash
+mne_show_fiff --in sample_audvis_raw.fif
+```
+
+Use [`mne_compare_fif_files`](tools-compare-fif-files) to compare two FIFF files tag by tag:
+
+```bash
+mne_compare_fif_files --in1 file_a.fif --in2 file_b.fif
+```
+
+## Conventions
+
+### Command-Line Options
+
+All MNE-CPP command-line tools employ the double-dash (`--`) option convention. Two universal options are available in all programs:
+
+| Option | Description |
+|---|---|
+| `--help` | Print concise usage information |
+| `--version` | Print the program module name, version number, and compilation date |
+
+### Environment Variables
+
+| Variable | Description |
+|---|---|
+| `MNE_ROOT` | Location of the MNE software installation |
+| `FREESURFER_HOME` | Location of the FreeSurfer software |
+| `SUBJECTS_DIR` | Location of the MRI data (FreeSurfer subject directories) |
+| `SUBJECT` | Name of the current subject |
+
+## See Also
+
+- [Tools Overview](tools-overview) — Complete list of MNE-CPP command-line tools
+- [Cookbook](cookbook) — Step-by-step processing workflow
+- [Library API](../development/api) — Programmatic access to FIFF files via `FIFFLIB`
