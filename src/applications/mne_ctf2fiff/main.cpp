@@ -41,12 +41,15 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_types.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
@@ -64,6 +67,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -122,19 +126,6 @@ struct CtfDatasetInfo {
 
     QList<CtfSensorInfo> sensors;
 };
-
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Convert CTF .ds dataset to FIFF format.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --ds <dir>         Input CTF .ds directory\n");
-    fprintf(stderr, "  --out <file>       Output FIFF file\n");
-    fprintf(stderr, "  --help             Print this help\n");
-    fprintf(stderr, "  --version          Print version\n");
-}
 
 //=============================================================================================================
 // Read big-endian integers/doubles from QDataStream
@@ -400,31 +391,29 @@ static void mapCtfToFiff(const CtfSensorInfo &sen, FiffChInfo &ch)
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_ctf2fiff");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString dsPath;
-    QString outFile;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Convert CTF .ds MEG datasets to FIFF format.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) { printf("%s version %s\n", argv[0], PROGRAM_VERSION); return 0; }
-        else if (strcmp(argv[k], "--ds") == 0) {
-            if (++k >= argc) { qCritical("--ds: argument required."); return 1; }
-            dsPath = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--out") == 0) {
-            if (++k >= argc) { qCritical("--out: argument required."); return 1; }
-            outFile = QString(argv[k]);
-        }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption dsOpt("ds", "Input CTF .ds directory.", "dir");
+    parser.addOption(dsOpt);
 
-    if (dsPath.isEmpty()) { qCritical("--ds is required."); usage(argv[0]); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); usage(argv[0]); return 1; }
+    QCommandLineOption outOpt("out", "Output FIFF file.", "file");
+    parser.addOption(outOpt);
+
+    parser.process(app);
+
+    QString dsPath = parser.value(dsOpt);
+    QString outFile = parser.value(outOpt);
+
+    if (dsPath.isEmpty()) { qCritical("--ds is required."); return 1; }
+    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
 
     // Locate res4 and meg4 files in .ds directory
     QDir dsDir(dsPath);

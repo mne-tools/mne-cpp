@@ -38,11 +38,15 @@
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_dir_entry.h>
 
+#include <utils/generics/applicationlogger.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QDebug>
 
@@ -51,6 +55,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
@@ -60,50 +65,32 @@ using namespace FIFFLIB;
 
 //=============================================================================================================
 
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Add tags from one FIFF file to the meas_info block of another.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --add <name>    FIFF file containing tags to add\n");
-    fprintf(stderr, "  --dest <name>   Destination FIFF file to receive additional tags\n");
-    fprintf(stderr, "  --help          Print this help\n");
-    fprintf(stderr, "  --version       Print version\n");
-}
-
-//=============================================================================================================
-
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_add_to_meas_info");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString addName;
-    QString destName;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Add tags from one FIFF file to the meas_info block of another.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) {
-            usage(argv[0]);
-            return 0;
-        } else if (strcmp(argv[k], "--version") == 0) {
-            fprintf(stderr, "%s version %s\n", argv[0], PROGRAM_VERSION);
-            return 0;
-        } else if (strcmp(argv[k], "--add") == 0) {
-            if (k + 1 >= argc) { qCritical("--add: argument required."); return 1; }
-            addName = QString(argv[++k]);
-        } else if (strcmp(argv[k], "--dest") == 0) {
-            if (k + 1 >= argc) { qCritical("--dest: argument required."); return 1; }
-            destName = QString(argv[++k]);
-        } else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption addOpt("add", "FIFF file containing tags to add.", "name");
+    parser.addOption(addOpt);
+
+    QCommandLineOption destOpt("dest", "Destination FIFF file to receive additional tags.", "name");
+    parser.addOption(destOpt);
+
+    parser.process(app);
+
+    QString addName = parser.value(addOpt);
+    QString destName = parser.value(destOpt);
 
     if (addName.isEmpty() || destName.isEmpty()) {
         qCritical("Both --add and --dest are required.");
-        usage(argv[0]);
-        return 1;
+        parser.showHelp(1);
     }
 
     fprintf(stderr, "Source file      : %s\n", qPrintable(addName));

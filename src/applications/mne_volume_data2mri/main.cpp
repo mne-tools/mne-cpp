@@ -38,12 +38,15 @@
 #include <mne/mne.h>
 #include <mne/mne_source_space.h>
 #include <memory>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
 #include <QDataStream>
@@ -62,6 +65,7 @@
 
 using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -69,21 +73,6 @@ using namespace Eigen;
 //=============================================================================================================
 
 #define PROGRAM_VERSION "2.0.0"
-
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Convert source estimate data to MRI overlay volume.\n\n");
-    fprintf(stderr, "  --src <file>       Source space FIFF file\n");
-    fprintf(stderr, "  --stc <file>       STC source estimate file\n");
-    fprintf(stderr, "  --w <file>         W source estimate file\n");
-    fprintf(stderr, "  --out <file>       Output MRI file (mgh format)\n");
-    fprintf(stderr, "  --tpoint <int>     Time point index for STC files (default: 0)\n");
-    fprintf(stderr, "  --help             Print this help\n\n");
-    fprintf(stderr, "  Version: %s\n", PROGRAM_VERSION);
-}
 
 //=============================================================================================================
 
@@ -171,48 +160,45 @@ static bool readStcFile(const QString& filename, MatrixXd& data, VectorXi& verti
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_volume_data2mri");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString srcFile;
-    QString stcFile;
-    QString wFile;
-    QString outFile;
-    int tpoint = 0;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Map source estimate data to MRI vertex space.\n\nReads volume source space and STC/W estimates.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--src") == 0 && i + 1 < argc) {
-            srcFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--stc") == 0 && i + 1 < argc) {
-            stcFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--w") == 0 && i + 1 < argc) {
-            wFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--out") == 0 && i + 1 < argc) {
-            outFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--tpoint") == 0 && i + 1 < argc) {
-            tpoint = atoi(argv[++i]);
-        } else if (strcmp(argv[i], "--help") == 0) {
-            usage(argv[0]);
-            return 0;
-        } else {
-            fprintf(stderr, "Unknown option: %s\n", argv[i]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption srcOpt("src", "Source space FIFF file.", "file");
+    parser.addOption(srcOpt);
+    QCommandLineOption stcOpt("stc", "STC source estimate file.", "file");
+    parser.addOption(stcOpt);
+    QCommandLineOption wOpt("w", "W source estimate file.", "file");
+    parser.addOption(wOpt);
+    QCommandLineOption outOpt("out", "Output MRI file (mgh format).", "file");
+    parser.addOption(outOpt);
+    QCommandLineOption tpointOpt("tpoint", "Time point index for STC files.", "index", "0");
+    parser.addOption(tpointOpt);
+
+    parser.process(app);
+
+    QString srcFile = parser.value(srcOpt);
+    QString stcFile = parser.value(stcOpt);
+    QString wFile = parser.value(wOpt);
+    QString outFile = parser.value(outOpt);
+    int tpoint = parser.value(tpointOpt).toInt();
 
     if (srcFile.isEmpty()) {
         fprintf(stderr, "Source space file (--src) is required.\n");
-        usage(argv[0]);
         return 1;
     }
     if (stcFile.isEmpty() && wFile.isEmpty()) {
         fprintf(stderr, "Either --stc or --w must be specified.\n");
-        usage(argv[0]);
         return 1;
     }
     if (outFile.isEmpty()) {
         fprintf(stderr, "Output file (--out) is required.\n");
-        usage(argv[0]);
         return 1;
     }
 

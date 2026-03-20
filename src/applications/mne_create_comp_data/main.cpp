@@ -36,12 +36,15 @@
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_ctf_comp.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
@@ -58,6 +61,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -65,20 +69,6 @@ using namespace Eigen;
 //=============================================================================================================
 
 #define PROGRAM_VERSION "2.0.0"
-
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Create CTF compensation data from ASCII matrix files.\n\n");
-    fprintf(stderr, "  --in <file>        Input ASCII matrix file\n");
-    fprintf(stderr, "  --kind <int>       CTF compensation kind (e.g. 101, 201, 301)\n");
-    fprintf(stderr, "  --out <file>       Output FIFF file\n");
-    fprintf(stderr, "  --calibrated       Matrix data is already calibrated\n");
-    fprintf(stderr, "  --help             Print this help\n\n");
-    fprintf(stderr, "  Version: %s\n", PROGRAM_VERSION);
-}
 
 //=============================================================================================================
 
@@ -148,40 +138,42 @@ static bool readAsciiMatrix(const QString& filename,
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_create_comp_data");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString inFile;
-    QString outFile;
-    int ctfKind = 101;
-    bool calibrated = false;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Create CTF compensation data from ASCII matrix files.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--in") == 0 && i + 1 < argc) {
-            inFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--kind") == 0 && i + 1 < argc) {
-            ctfKind = atoi(argv[++i]);
-        } else if (strcmp(argv[i], "--out") == 0 && i + 1 < argc) {
-            outFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--calibrated") == 0) {
-            calibrated = true;
-        } else if (strcmp(argv[i], "--help") == 0) {
-            usage(argv[0]);
-            return 0;
-        } else {
-            fprintf(stderr, "Unknown option: %s\n", argv[i]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption inOpt("in", "Input ASCII matrix file.", "file");
+    parser.addOption(inOpt);
+    QCommandLineOption kindOpt("kind", "CTF compensation kind (e.g. 101, 201, 301).", "kind");
+    parser.addOption(kindOpt);
+    QCommandLineOption outOpt("out", "Output FIFF file.", "file");
+    parser.addOption(outOpt);
+    QCommandLineOption calibratedOpt("calibrated", "Matrix data is already calibrated.");
+    parser.addOption(calibratedOpt);
+
+    parser.process(app);
+
+    QString inFile = parser.value(inOpt);
+    QString outFile = parser.value(outOpt);
+    int ctfKind = parser.value(kindOpt).toInt();
+    bool calibrated = parser.isSet(calibratedOpt);
 
     if (inFile.isEmpty()) {
         fprintf(stderr, "Input matrix file (--in) is required.\n");
-        usage(argv[0]);
+        return 1;
+    }
+    if (!parser.isSet(kindOpt)) {
+        fprintf(stderr, "Compensation kind (--kind) is required.\n");
         return 1;
     }
     if (outFile.isEmpty()) {
         fprintf(stderr, "Output file (--out) is required.\n");
-        usage(argv[0]);
         return 1;
     }
 

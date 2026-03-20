@@ -36,12 +36,15 @@
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_file.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
@@ -60,6 +63,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -67,21 +71,6 @@ using namespace Eigen;
 //=============================================================================================================
 
 #define PROGRAM_VERSION "2.0.0"
-
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Merge 4D Magnes WH3600 compensation reference data with FIFF file.\n\n");
-    fprintf(stderr, "  --in <file>         Input FIFF file with MEG data\n");
-    fprintf(stderr, "  --ref <file>        Reference channel data file (text)\n");
-    fprintf(stderr, "  --refpos <file>     Reference sensor positions file\n");
-    fprintf(stderr, "  --out <file>        Output FIFF file\n");
-    fprintf(stderr, "  --megpos <file>     MEG sensor positions file (for alignment)\n");
-    fprintf(stderr, "  --help              Print this help\n\n");
-    fprintf(stderr, "  Version: %s\n", PROGRAM_VERSION);
-}
 
 //=============================================================================================================
 
@@ -207,38 +196,37 @@ static bool readRefData(const QString& filename, MatrixXf& refData, int& nChanne
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_insert_4D_comp");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString inFile;
-    QString refFile;
-    QString refPosFile;
-    QString megPosFile;
-    QString outFile;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Merge 4D Magnes WH3600 compensation data with a FIFF file.\n\nSupports Procrustes alignment of sensor positions.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--in") == 0 && i + 1 < argc) {
-            inFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--ref") == 0 && i + 1 < argc) {
-            refFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--refpos") == 0 && i + 1 < argc) {
-            refPosFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--megpos") == 0 && i + 1 < argc) {
-            megPosFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--out") == 0 && i + 1 < argc) {
-            outFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--help") == 0) {
-            usage(argv[0]);
-            return 0;
-        } else {
-            fprintf(stderr, "Unknown option: %s\n", argv[i]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption inOpt("in", "Input FIFF file with MEG data.", "file");
+    parser.addOption(inOpt);
+    QCommandLineOption refOpt("ref", "Reference channel data file (text).", "file");
+    parser.addOption(refOpt);
+    QCommandLineOption refposOpt("refpos", "Reference sensor positions file.", "file");
+    parser.addOption(refposOpt);
+    QCommandLineOption outOpt("out", "Output FIFF file.", "file");
+    parser.addOption(outOpt);
+    QCommandLineOption megposOpt("megpos", "MEG sensor positions file (for alignment).", "file");
+    parser.addOption(megposOpt);
+
+    parser.process(app);
+
+    QString inFile = parser.value(inOpt);
+    QString refFile = parser.value(refOpt);
+    QString refPosFile = parser.value(refposOpt);
+    QString megPosFile = parser.value(megposOpt);
+    QString outFile = parser.value(outOpt);
 
     if (inFile.isEmpty() || refFile.isEmpty() || outFile.isEmpty()) {
         fprintf(stderr, "Required: --in, --ref, --out\n");
-        usage(argv[0]);
         return 1;
     }
 

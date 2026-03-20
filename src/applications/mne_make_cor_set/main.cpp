@@ -36,12 +36,15 @@
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_file.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QDir>
 #include <QTextStream>
@@ -61,6 +64,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -72,19 +76,6 @@ using namespace Eigen;
 #define COR_NSLICE 256
 #define COR_NPIX   256
 #define COR_SLICE_SIZE (COR_NPIX * COR_NPIX)
-
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Create MRI description FIFF from FreeSurfer COR or mgh/mgz data.\n\n");
-    fprintf(stderr, "  --dir <directory>   FreeSurfer COR directory\n");
-    fprintf(stderr, "  --mgh <file>        FreeSurfer mgh/mgz volume file\n");
-    fprintf(stderr, "  --out <file>        Output FIFF file\n");
-    fprintf(stderr, "  --help              Print this help\n\n");
-    fprintf(stderr, "  Version: %s\n", PROGRAM_VERSION);
-}
 
 //=============================================================================================================
 
@@ -190,37 +181,35 @@ static bool writeMriDescription(const QString& filename,
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_make_cor_set");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString corDir;
-    QString mghFile;
-    QString outFile;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Create MRI description FIFF from FreeSurfer COR or mgh/mgz data.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--dir") == 0 && i + 1 < argc) {
-            corDir = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--mgh") == 0 && i + 1 < argc) {
-            mghFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--out") == 0 && i + 1 < argc) {
-            outFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--help") == 0) {
-            usage(argv[0]);
-            return 0;
-        } else {
-            fprintf(stderr, "Unknown option: %s\n", argv[i]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption dirOpt("dir", "FreeSurfer COR directory.", "directory");
+    parser.addOption(dirOpt);
+    QCommandLineOption mghOpt("mgh", "FreeSurfer mgh/mgz volume file.", "file");
+    parser.addOption(mghOpt);
+    QCommandLineOption outOpt("out", "Output FIFF file.", "file");
+    parser.addOption(outOpt);
+
+    parser.process(app);
+
+    QString corDir = parser.value(dirOpt);
+    QString mghFile = parser.value(mghOpt);
+    QString outFile = parser.value(outOpt);
 
     if (corDir.isEmpty() && mghFile.isEmpty()) {
         fprintf(stderr, "Either --dir or --mgh must be specified.\n");
-        usage(argv[0]);
         return 1;
     }
     if (outFile.isEmpty()) {
         fprintf(stderr, "Output file (--out) is required.\n");
-        usage(argv[0]);
         return 1;
     }
 

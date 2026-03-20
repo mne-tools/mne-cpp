@@ -36,11 +36,14 @@
 
 #include <fs/fs_surface.h>
 #include <fs/fs_label.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QCommandLineOption>
+#include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
@@ -58,6 +61,7 @@
 //=============================================================================================================
 
 using namespace FSLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -94,74 +98,53 @@ static VectorXi buildNearestMap(const MatrixX3f& srcSphere, const MatrixX3f& dst
 
 //=============================================================================================================
 
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Morph label files between subjects using sphere registration.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --from <subject>     Source subject name\n");
-    fprintf(stderr, "  --to <subject>       Destination subject name\n");
-    fprintf(stderr, "  --subjects_dir <dir> Subjects directory (default: $SUBJECTS_DIR)\n");
-    fprintf(stderr, "  --hemi <hemi>        Hemisphere: lh or rh\n");
-    fprintf(stderr, "  --label <file>       Input label file\n");
-    fprintf(stderr, "  --out <file>         Output morphed label file\n");
-    fprintf(stderr, "  --help               Print this help\n");
-    fprintf(stderr, "  --version            Print version\n");
-}
-
-//=============================================================================================================
-
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_morph_labels");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString fromSubject;
-    QString toSubject;
-    QString subjectsDir = qEnvironmentVariable("SUBJECTS_DIR");
-    QString hemi;
-    QString labelFile;
-    QString outFile;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Morph label files between subjects using sphere registration.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) { printf("%s version %s\n", argv[0], PROGRAM_VERSION); return 0; }
-        else if (strcmp(argv[k], "--from") == 0) {
-            if (++k >= argc) { qCritical("--from: argument required."); return 1; }
-            fromSubject = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--to") == 0) {
-            if (++k >= argc) { qCritical("--to: argument required."); return 1; }
-            toSubject = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--subjects_dir") == 0) {
-            if (++k >= argc) { qCritical("--subjects_dir: argument required."); return 1; }
-            subjectsDir = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--hemi") == 0) {
-            if (++k >= argc) { qCritical("--hemi: argument required."); return 1; }
-            hemi = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--label") == 0) {
-            if (++k >= argc) { qCritical("--label: argument required."); return 1; }
-            labelFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--out") == 0) {
-            if (++k >= argc) { qCritical("--out: argument required."); return 1; }
-            outFile = QString(argv[k]);
-        }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption fromOpt("from", "Source subject name.", "subject");
+    parser.addOption(fromOpt);
+
+    QCommandLineOption toOpt("to", "Destination subject name.", "subject");
+    parser.addOption(toOpt);
+
+    QCommandLineOption subjectsDirOpt("subjects_dir", "Subjects directory.", "dir",
+                                       qEnvironmentVariable("SUBJECTS_DIR"));
+    parser.addOption(subjectsDirOpt);
+
+    QCommandLineOption hemiOpt("hemi", "Hemisphere: lh or rh.", "hemi");
+    parser.addOption(hemiOpt);
+
+    QCommandLineOption labelOpt("label", "Input label file.", "file");
+    parser.addOption(labelOpt);
+
+    QCommandLineOption outOpt("out", "Output morphed label file.", "file");
+    parser.addOption(outOpt);
+
+    parser.process(app);
+
+    QString fromSubject = parser.value(fromOpt);
+    QString toSubject = parser.value(toOpt);
+    QString subjectsDir = parser.value(subjectsDirOpt);
+    QString hemi = parser.value(hemiOpt);
+    QString labelFile = parser.value(labelOpt);
+    QString outFile = parser.value(outOpt);
 
     if (fromSubject.isEmpty() || toSubject.isEmpty()) {
-        qCritical("--from and --to are required."); usage(argv[0]); return 1;
+        qCritical("--from and --to are required.");
+        parser.showHelp(1);
     }
-    if (hemi.isEmpty()) { qCritical("--hemi is required."); usage(argv[0]); return 1; }
-    if (labelFile.isEmpty()) { qCritical("--label is required."); usage(argv[0]); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); usage(argv[0]); return 1; }
+    if (hemi.isEmpty()) { qCritical("--hemi is required."); parser.showHelp(1); }
+    if (labelFile.isEmpty()) { qCritical("--label is required."); parser.showHelp(1); }
+    if (outFile.isEmpty()) { qCritical("--out is required."); parser.showHelp(1); }
     if (subjectsDir.isEmpty()) { qCritical("$SUBJECTS_DIR not set."); return 1; }
 
     // Load sphere-registered surfaces

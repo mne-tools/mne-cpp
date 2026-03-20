@@ -39,11 +39,15 @@
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_dir_node.h>
 
+#include <utils/generics/applicationlogger.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QDebug>
 
@@ -58,26 +62,13 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
 //=============================================================================================================
 
 #define PROGRAM_VERSION "2.0.0"
-
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Collect coordinate transforms into one file.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --meas <name>   MEG measurement file (device->head transform)\n");
-    fprintf(stderr, "  --mri <name>    FIFF MRI description file (MRI->head transform)\n");
-    fprintf(stderr, "  --out <name>    Output file name\n");
-    fprintf(stderr, "  --help          Print this help\n");
-    fprintf(stderr, "  --version       Print version\n");
-}
 
 //=============================================================================================================
 
@@ -98,44 +89,34 @@ static void printTransform(const FiffCoordTrans &t)
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_collect_transforms");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString measName;
-    QString mriName;
-    QString outName;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Collect coordinate transforms from FIFF files.\n\nReads device-to-head and MRI-to-head transforms.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) {
-            usage(argv[0]);
-            return 0;
-        } else if (strcmp(argv[k], "--version") == 0) {
-            fprintf(stderr, "%s version %s\n", argv[0], PROGRAM_VERSION);
-            return 0;
-        } else if (strcmp(argv[k], "--meas") == 0) {
-            if (k + 1 >= argc) { qCritical("--meas: argument required."); return 1; }
-            measName = QString(argv[++k]);
-        } else if (strcmp(argv[k], "--mri") == 0) {
-            if (k + 1 >= argc) { qCritical("--mri: argument required."); return 1; }
-            mriName = QString(argv[++k]);
-        } else if (strcmp(argv[k], "--out") == 0) {
-            if (k + 1 >= argc) { qCritical("--out: argument required."); return 1; }
-            outName = QString(argv[++k]);
-        } else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption measOpt("meas", "MEG measurement file (device->head transform).", "name");
+    parser.addOption(measOpt);
+
+    QCommandLineOption mriOpt("mri", "FIFF MRI description file (MRI->head transform).", "name");
+    parser.addOption(mriOpt);
+
+    QCommandLineOption outOpt("out", "Output file name.", "name");
+    parser.addOption(outOpt);
+
+    parser.process(app);
+
+    QString measName = parser.value(measOpt);
+    QString mriName = parser.value(mriOpt);
+    QString outName = parser.value(outOpt);
 
     if (measName.isEmpty() && mriName.isEmpty()) {
         qCritical("At least one of --meas or --mri must be specified.");
-        usage(argv[0]);
-        return 1;
-    }
-
-    if (measName.isEmpty() && mriName.isEmpty()) {
-        usage(argv[0]);
-        return 1;
+        parser.showHelp(1);
     }
 
     if (!measName.isEmpty())

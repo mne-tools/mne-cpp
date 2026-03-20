@@ -38,11 +38,14 @@
 #include <mne/mne_surface.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_constants.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QCommandLineOption>
+#include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QFile>
 #include <QFileInfo>
@@ -54,6 +57,7 @@
 
 using namespace FWDLIB;
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
@@ -63,59 +67,44 @@ using namespace FIFFLIB;
 
 //=============================================================================================================
 
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Compute the BEM solution matrix for forward modeling.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --bem <file>       Input BEM model FIFF file\n");
-    fprintf(stderr, "  --sol <file>       Output solution FIFF file (default: derived from --bem)\n");
-    fprintf(stderr, "  --method <name>    BEM method: linear or constant (default: linear)\n");
-    fprintf(stderr, "  --help             Print this help\n");
-    fprintf(stderr, "  --version          Print version\n");
-}
-
-//=============================================================================================================
-
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_prepare_bem_model");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString bemFile;
-    QString solFile;
-    int bemMethod = FWD_BEM_LINEAR_COLL;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Compute the BEM solution matrix for forward modeling.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) { printf("%s version %s\n", argv[0], PROGRAM_VERSION); return 0; }
-        else if (strcmp(argv[k], "--bem") == 0) {
-            if (++k >= argc) { qCritical("--bem: argument required."); return 1; }
-            bemFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--sol") == 0) {
-            if (++k >= argc) { qCritical("--sol: argument required."); return 1; }
-            solFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--method") == 0) {
-            if (++k >= argc) { qCritical("--method: argument required."); return 1; }
-            QString method = QString(argv[k]).toLower();
-            if (method == "linear")
-                bemMethod = FWD_BEM_LINEAR_COLL;
-            else if (method == "constant")
-                bemMethod = FWD_BEM_CONSTANT_COLL;
-            else {
-                qCritical("Unknown method: %s (use 'linear' or 'constant')", argv[k]);
-                return 1;
-            }
-        }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
+    QCommandLineOption bemOpt("bem", "Input BEM model FIFF file.", "file");
+    parser.addOption(bemOpt);
+
+    QCommandLineOption solOpt("sol", "Output solution FIFF file (default: derived from --bem).", "file");
+    parser.addOption(solOpt);
+
+    QCommandLineOption methodOpt("method", "BEM method: linear or constant.", "name", "linear");
+    parser.addOption(methodOpt);
+
+    parser.process(app);
+
+    QString bemFile = parser.value(bemOpt);
+    QString solFile = parser.value(solOpt);
+    QString methodStr = parser.value(methodOpt).toLower();
+
+    if (bemFile.isEmpty()) { qCritical("--bem is required."); parser.showHelp(1); }
+
+    int bemMethod;
+    if (methodStr == "linear")
+        bemMethod = FWD_BEM_LINEAR_COLL;
+    else if (methodStr == "constant")
+        bemMethod = FWD_BEM_CONSTANT_COLL;
+    else {
+        qCritical("Unknown method: %s (use 'linear' or 'constant')", qPrintable(methodStr));
+        return 1;
     }
-
-    if (bemFile.isEmpty()) { qCritical("--bem is required."); usage(argv[0]); return 1; }
 
     // Derive solution filename  if not specified
     if (solFile.isEmpty())

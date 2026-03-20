@@ -31,10 +31,18 @@
  */
 
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <utils/generics/applicationlogger.h>
+
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
 #include <QProcess>
@@ -49,19 +57,10 @@
 #define PROGRAM_VERSION "2.0.0"
 
 //=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
 
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Convert eXimia EEG (.nxe) data to FIFF format.\n\n");
-    fprintf(stderr, "  --nxe <file>       eXimia .nxe data file\n");
-    fprintf(stderr, "  --dig <file>       Digitizer data file (optional)\n");
-    fprintf(stderr, "  --out <file>       Output FIFF file\n");
-    fprintf(stderr, "  --sfreq <float>    Sampling frequency (default: 1450)\n");
-    fprintf(stderr, "  --nchan <int>      Number of channels (default: 64)\n");
-    fprintf(stderr, "  --help             Print this help\n\n");
-    fprintf(stderr, "  Version: %s\n", PROGRAM_VERSION);
-}
+using namespace UTILSLIB;
 
 //=============================================================================================================
 
@@ -120,43 +119,41 @@ static bool createBrainVisionFiles(const QString& nxeFile, const QString& baseNa
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_eximia2fiff");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString nxeFile;
-    QString digFile;
-    QString outFile;
-    float sfreq = 1450.0f;
-    int nchan = 64;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Convert eXimia EEG (.nxe) data to FIFF format.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--nxe") == 0 && i + 1 < argc) {
-            nxeFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--dig") == 0 && i + 1 < argc) {
-            digFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--out") == 0 && i + 1 < argc) {
-            outFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--sfreq") == 0 && i + 1 < argc) {
-            sfreq = static_cast<float>(atof(argv[++i]));
-        } else if (strcmp(argv[i], "--nchan") == 0 && i + 1 < argc) {
-            nchan = atoi(argv[++i]);
-        } else if (strcmp(argv[i], "--help") == 0) {
-            usage(argv[0]);
-            return 0;
-        } else {
-            fprintf(stderr, "Unknown option: %s\n", argv[i]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption nxeOpt("nxe", "eXimia .nxe data file.", "file");
+    parser.addOption(nxeOpt);
+    QCommandLineOption digOpt("dig", "Digitizer data file.", "file");
+    parser.addOption(digOpt);
+    QCommandLineOption outOpt("out", "Output FIFF file.", "file");
+    parser.addOption(outOpt);
+    QCommandLineOption sfreqOpt("sfreq", "Sampling frequency.", "Hz", "1450");
+    parser.addOption(sfreqOpt);
+    QCommandLineOption nchanOpt("nchan", "Number of channels.", "count", "64");
+    parser.addOption(nchanOpt);
+
+    parser.process(app);
+
+    QString nxeFile = parser.value(nxeOpt);
+    QString digFile = parser.value(digOpt);
+    QString outFile = parser.value(outOpt);
+    float sfreq = parser.value(sfreqOpt).toFloat();
+    int nchan = parser.value(nchanOpt).toInt();
 
     if (nxeFile.isEmpty()) {
         fprintf(stderr, "eXimia .nxe file (--nxe) is required.\n");
-        usage(argv[0]);
         return 1;
     }
     if (outFile.isEmpty()) {
         fprintf(stderr, "Output file (--out) is required.\n");
-        usage(argv[0]);
         return 1;
     }
 

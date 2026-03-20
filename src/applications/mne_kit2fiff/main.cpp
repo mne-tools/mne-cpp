@@ -42,12 +42,15 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_types.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
@@ -67,6 +70,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -107,22 +111,6 @@ struct KitDatasetInfo {
     int systemId;
     QList<KitSensorInfo> sensors;
 };
-
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Convert KIT/Ricoh .sqd/.con MEG data to FIFF format.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --sqd <file>       Input KIT .sqd or .con file\n");
-    fprintf(stderr, "  --sns <file>       Sensor layout definition file (optional)\n");
-    fprintf(stderr, "  --hpi <file>       HPI coil positions in head coords (optional)\n");
-    fprintf(stderr, "  --out <file>       Output FIFF file\n");
-    fprintf(stderr, "  --stim <list>      Comma-separated stimulus channel indices\n");
-    fprintf(stderr, "  --help             Print this help\n");
-    fprintf(stderr, "  --version          Print version\n");
-}
 
 //=============================================================================================================
 // Parse KIT .sqd header
@@ -396,48 +384,46 @@ static bool readSqdData(const QString &sqdPath, const KitDatasetInfo &info, Matr
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_kit2fiff");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString sqdFile;
-    QString snsFile;
-    QString hpiFile;
-    QString outFile;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Convert KIT/Ricoh .sqd/.con MEG data to FIFF format.");
+    parser.addHelpOption();
+    parser.addVersionOption();
+
+    QCommandLineOption sqdOpt("sqd", "Input KIT .sqd or .con file.", "file");
+    parser.addOption(sqdOpt);
+
+    QCommandLineOption snsOpt("sns", "Sensor layout definition file.", "file");
+    parser.addOption(snsOpt);
+
+    QCommandLineOption hpiOpt("hpi", "HPI coil positions in head coords.", "file");
+    parser.addOption(hpiOpt);
+
+    QCommandLineOption outOpt("out", "Output FIFF file.", "file");
+    parser.addOption(outOpt);
+
+    QCommandLineOption stimOpt("stim", "Comma-separated stimulus channel indices.", "list");
+    parser.addOption(stimOpt);
+
+    parser.process(app);
+
+    QString sqdFile = parser.value(sqdOpt);
+    QString snsFile = parser.value(snsOpt);
+    QString hpiFile = parser.value(hpiOpt);
+    QString outFile = parser.value(outOpt);
     QList<int> stimChannels;
-
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) { printf("%s version %s\n", argv[0], PROGRAM_VERSION); return 0; }
-        else if (strcmp(argv[k], "--sqd") == 0) {
-            if (++k >= argc) { qCritical("--sqd: argument required."); return 1; }
-            sqdFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--sns") == 0) {
-            if (++k >= argc) { qCritical("--sns: argument required."); return 1; }
-            snsFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--hpi") == 0) {
-            if (++k >= argc) { qCritical("--hpi: argument required."); return 1; }
-            hpiFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--out") == 0) {
-            if (++k >= argc) { qCritical("--out: argument required."); return 1; }
-            outFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--stim") == 0) {
-            if (++k >= argc) { qCritical("--stim: argument required."); return 1; }
-            QStringList parts = QString(argv[k]).split(',');
-            for (const QString &p : parts)
-                stimChannels.append(p.trimmed().toInt());
-        }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
+    if (parser.isSet(stimOpt)) {
+        QStringList parts = parser.value(stimOpt).split(',');
+        for (const QString &p : parts)
+            stimChannels.append(p.trimmed().toInt());
     }
 
-    if (sqdFile.isEmpty()) { qCritical("--sqd is required."); usage(argv[0]); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); usage(argv[0]); return 1; }
+    if (sqdFile.isEmpty()) { qCritical("--sqd is required."); return 1; }
+    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
 
     // Parse SQD header
     KitDatasetInfo info;

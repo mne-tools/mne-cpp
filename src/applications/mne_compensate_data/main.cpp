@@ -39,12 +39,15 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ctf_comp.h>
 #include <fiff/fiff_stream.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QDebug>
 
@@ -59,6 +62,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -69,53 +73,36 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Apply CTF software compensation to raw FIFF data.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --in <file>        Input raw FIFF file\n");
-    fprintf(stderr, "  --out <file>       Output FIFF file\n");
-    fprintf(stderr, "  --grade <value>    Desired compensation grade (0, 1, 2, or 3)\n");
-    fprintf(stderr, "  --help             Print this help\n");
-    fprintf(stderr, "  --version          Print version\n");
-}
-
-//=============================================================================================================
-
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_compensate_data");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString inFile;
-    QString outFile;
-    int grade = -1;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Apply CTF software compensation to raw FIFF data.\n\nSets the desired compensation grade (0-3).");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) { printf("%s version %s\n", argv[0], PROGRAM_VERSION); return 0; }
-        else if (strcmp(argv[k], "--in") == 0) {
-            if (++k >= argc) { qCritical("--in: argument required."); return 1; }
-            inFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--out") == 0) {
-            if (++k >= argc) { qCritical("--out: argument required."); return 1; }
-            outFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--grade") == 0) {
-            if (++k >= argc) { qCritical("--grade: argument required."); return 1; }
-            grade = atoi(argv[k]);
-        }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption inOpt("in", "Input raw FIFF file.", "file");
+    parser.addOption(inOpt);
 
-    if (inFile.isEmpty()) { qCritical("--in is required."); usage(argv[0]); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); usage(argv[0]); return 1; }
-    if (grade < 0) { qCritical("--grade is required (0, 1, 2, or 3)."); usage(argv[0]); return 1; }
+    QCommandLineOption outOpt("out", "Output FIFF file.", "file");
+    parser.addOption(outOpt);
+
+    QCommandLineOption gradeOpt("grade", "Desired compensation grade (0, 1, 2, or 3).", "value");
+    parser.addOption(gradeOpt);
+
+    parser.process(app);
+
+    QString inFile = parser.value(inOpt);
+    QString outFile = parser.value(outOpt);
+    int grade = parser.isSet(gradeOpt) ? parser.value(gradeOpt).toInt() : -1;
+
+    if (inFile.isEmpty()) { qCritical("--in is required."); return 1; }
+    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
+    if (grade < 0) { qCritical("--grade is required (0, 1, 2, or 3)."); return 1; }
 
     // Open input file
     QFile fileIn(inFile);

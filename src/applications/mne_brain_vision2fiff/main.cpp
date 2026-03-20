@@ -37,12 +37,15 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
@@ -61,6 +64,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -107,21 +111,6 @@ struct BVHeader {
     QList<BVMarker> markers;
 };
 
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Convert BrainVision EEG files to FIFF format.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --vhdr <file>      Input BrainVision header file (.vhdr)\n");
-    fprintf(stderr, "  --out <file>       Output FIFF file\n");
-    fprintf(stderr, "  --help             Print this help\n");
-    fprintf(stderr, "  --version          Print version\n");
-}
-
-//=============================================================================================================
-// Parse BrainVision .vhdr header
 //=============================================================================================================
 
 static bool parseBVHeader(const QString &vhdrPath, BVHeader &hdr)
@@ -350,31 +339,29 @@ static bool readBVData(const QString &dataPath, const BVHeader &hdr, MatrixXd &d
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_brain_vision2fiff");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString vhdrFile;
-    QString outFile;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Convert BrainVision EEG files (.vhdr/.vmrk/.eeg) to FIFF format.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) { printf("%s version %s\n", argv[0], PROGRAM_VERSION); return 0; }
-        else if (strcmp(argv[k], "--vhdr") == 0) {
-            if (++k >= argc) { qCritical("--vhdr: argument required."); return 1; }
-            vhdrFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--out") == 0) {
-            if (++k >= argc) { qCritical("--out: argument required."); return 1; }
-            outFile = QString(argv[k]);
-        }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption vhdrOpt("vhdr", "Input BrainVision header file (.vhdr).", "file");
+    parser.addOption(vhdrOpt);
 
-    if (vhdrFile.isEmpty()) { qCritical("--vhdr is required."); usage(argv[0]); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); usage(argv[0]); return 1; }
+    QCommandLineOption outOpt("out", "Output FIFF file.", "file");
+    parser.addOption(outOpt);
+
+    parser.process(app);
+
+    QString vhdrFile = parser.value(vhdrOpt);
+    QString outFile = parser.value(outOpt);
+
+    if (vhdrFile.isEmpty()) { qCritical("--vhdr is required."); return 1; }
+    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
 
     // Parse header
     BVHeader hdr;

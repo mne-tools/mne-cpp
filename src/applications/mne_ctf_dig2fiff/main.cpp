@@ -39,11 +39,15 @@
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_coord_trans.h>
 
+#include <utils/generics/applicationlogger.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
@@ -62,6 +66,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -69,21 +74,6 @@ using namespace Eigen;
 //=============================================================================================================
 
 #define PROGRAM_VERSION "2.0.0"
-
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Convert CTF Polhemus digitization data to FIFF and hpts formats.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --ctf <name>    CTF digitization text file\n");
-    fprintf(stderr, "  --fif <name>    Output FIFF file\n");
-    fprintf(stderr, "  --hpts <name>   Output hpts file\n");
-    fprintf(stderr, "  --numfids       Fiducials are numbered (1=nasion, 2=left, 3=right)\n");
-    fprintf(stderr, "  --help          Print this help\n");
-    fprintf(stderr, "  --version       Print version\n");
-}
 
 //=============================================================================================================
 
@@ -195,47 +185,42 @@ static bool computeHeadTransform(const DigPoint &nasion, const DigPoint &lpa, co
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_ctf_dig2fiff");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString ctfName;
-    QString fifName;
-    QString hptsName;
-    bool numFids = false;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Convert CTF Polhemus digitization data to FIFF and hpts formats.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) {
-            usage(argv[0]);
-            return 0;
-        } else if (strcmp(argv[k], "--version") == 0) {
-            fprintf(stderr, "%s version %s\n", argv[0], PROGRAM_VERSION);
-            return 0;
-        } else if (strcmp(argv[k], "--ctf") == 0) {
-            if (k + 1 >= argc) { qCritical("--ctf: argument required."); return 1; }
-            ctfName = QString(argv[++k]);
-        } else if (strcmp(argv[k], "--fif") == 0) {
-            if (k + 1 >= argc) { qCritical("--fif: argument required."); return 1; }
-            fifName = QString(argv[++k]);
-        } else if (strcmp(argv[k], "--hpts") == 0) {
-            if (k + 1 >= argc) { qCritical("--hpts: argument required."); return 1; }
-            hptsName = QString(argv[++k]);
-        } else if (strcmp(argv[k], "--numfids") == 0) {
-            numFids = true;
-        } else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption ctfOpt("ctf", "CTF digitization text file.", "name");
+    parser.addOption(ctfOpt);
+
+    QCommandLineOption fifOpt("fif", "Output FIFF file.", "name");
+    parser.addOption(fifOpt);
+
+    QCommandLineOption hptsOpt("hpts", "Output hpts file.", "name");
+    parser.addOption(hptsOpt);
+
+    QCommandLineOption numfidsOpt("numfids", "Fiducials are numbered (1=nasion, 2=left, 3=right).");
+    parser.addOption(numfidsOpt);
+
+    parser.process(app);
+
+    QString ctfName = parser.value(ctfOpt);
+    QString fifName = parser.value(fifOpt);
+    QString hptsName = parser.value(hptsOpt);
+    bool numFids = parser.isSet(numfidsOpt);
 
     if (ctfName.isEmpty()) {
         qCritical("--ctf is required.");
-        usage(argv[0]);
-        return 1;
+        parser.showHelp(1);
     }
     if (fifName.isEmpty() && hptsName.isEmpty()) {
         qCritical("At least one of --fif or --hpts must be specified.");
-        usage(argv[0]);
-        return 1;
+        parser.showHelp(1);
     }
 
     QList<DigPoint> points = readCtfDig(ctfName, numFids);

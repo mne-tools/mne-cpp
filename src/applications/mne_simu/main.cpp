@@ -38,11 +38,14 @@
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_stream.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QCommandLineOption>
+#include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QFile>
 #include <QDebug>
@@ -66,6 +69,7 @@
 
 using namespace MNELIB;
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -76,83 +80,56 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Simulate sensor data from a forward model.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --fwd <file>       Forward solution FIFF file\n");
-    fprintf(stderr, "  --raw <file>       Raw FIFF file (for channel info & sampling rate)\n");
-    fprintf(stderr, "  --cov <file>       Noise covariance FIFF file (optional)\n");
-    fprintf(stderr, "  --source <idx>     Source index to activate (default: 0)\n");
-    fprintf(stderr, "  --snr <value>      Signal-to-noise ratio in dB (default: 20)\n");
-    fprintf(stderr, "  --duration <sec>   Duration of simulation in seconds (default: 1.0)\n");
-    fprintf(stderr, "  --freq <Hz>        Signal frequency in Hz (default: 10.0)\n");
-    fprintf(stderr, "  --out <file>       Output simulated raw FIFF file\n");
-    fprintf(stderr, "  --help             Print this help\n");
-    fprintf(stderr, "  --version          Print version\n");
-}
-
-//=============================================================================================================
-
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_simu");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString fwdFile;
-    QString rawFile;
-    QString covFile;
-    QString outFile;
-    int sourceIdx = 0;
-    double snrDb = 20.0;
-    double duration = 1.0;
-    double signalFreq = 10.0;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Simulate sensor data from a forward model.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) { printf("%s version %s\n", argv[0], PROGRAM_VERSION); return 0; }
-        else if (strcmp(argv[k], "--fwd") == 0) {
-            if (++k >= argc) { qCritical("--fwd: argument required."); return 1; }
-            fwdFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--raw") == 0) {
-            if (++k >= argc) { qCritical("--raw: argument required."); return 1; }
-            rawFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--cov") == 0) {
-            if (++k >= argc) { qCritical("--cov: argument required."); return 1; }
-            covFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--source") == 0) {
-            if (++k >= argc) { qCritical("--source: argument required."); return 1; }
-            sourceIdx = atoi(argv[k]);
-        }
-        else if (strcmp(argv[k], "--snr") == 0) {
-            if (++k >= argc) { qCritical("--snr: argument required."); return 1; }
-            snrDb = atof(argv[k]);
-        }
-        else if (strcmp(argv[k], "--duration") == 0) {
-            if (++k >= argc) { qCritical("--duration: argument required."); return 1; }
-            duration = atof(argv[k]);
-        }
-        else if (strcmp(argv[k], "--freq") == 0) {
-            if (++k >= argc) { qCritical("--freq: argument required."); return 1; }
-            signalFreq = atof(argv[k]);
-        }
-        else if (strcmp(argv[k], "--out") == 0) {
-            if (++k >= argc) { qCritical("--out: argument required."); return 1; }
-            outFile = QString(argv[k]);
-        }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption fwdOpt("fwd", "Forward solution FIFF file.", "file");
+    parser.addOption(fwdOpt);
 
-    if (fwdFile.isEmpty()) { qCritical("--fwd is required."); usage(argv[0]); return 1; }
-    if (rawFile.isEmpty()) { qCritical("--raw is required."); usage(argv[0]); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); usage(argv[0]); return 1; }
+    QCommandLineOption rawOpt("raw", "Raw FIFF file (for channel info & sampling rate).", "file");
+    parser.addOption(rawOpt);
+
+    QCommandLineOption covOpt("cov", "Noise covariance FIFF file.", "file");
+    parser.addOption(covOpt);
+
+    QCommandLineOption sourceOpt("source", "Source index to activate.", "idx", "0");
+    parser.addOption(sourceOpt);
+
+    QCommandLineOption snrOpt("snr", "Signal-to-noise ratio in dB.", "value", "20");
+    parser.addOption(snrOpt);
+
+    QCommandLineOption durationOpt("duration", "Duration of simulation in seconds.", "sec", "1.0");
+    parser.addOption(durationOpt);
+
+    QCommandLineOption freqOpt("freq", "Signal frequency in Hz.", "Hz", "10.0");
+    parser.addOption(freqOpt);
+
+    QCommandLineOption outOpt("out", "Output simulated raw FIFF file.", "file");
+    parser.addOption(outOpt);
+
+    parser.process(app);
+
+    QString fwdFile = parser.value(fwdOpt);
+    QString rawFile = parser.value(rawOpt);
+    QString covFile = parser.value(covOpt);
+    QString outFile = parser.value(outOpt);
+    int sourceIdx = parser.value(sourceOpt).toInt();
+    double snrDb = parser.value(snrOpt).toDouble();
+    double duration = parser.value(durationOpt).toDouble();
+    double signalFreq = parser.value(freqOpt).toDouble();
+
+    if (fwdFile.isEmpty()) { qCritical("--fwd is required."); parser.showHelp(1); }
+    if (rawFile.isEmpty()) { qCritical("--raw is required."); parser.showHelp(1); }
+    if (outFile.isEmpty()) { qCritical("--out is required."); parser.showHelp(1); }
 
     // Load forward solution
     QFile fFwd(fwdFile);

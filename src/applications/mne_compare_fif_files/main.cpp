@@ -38,12 +38,15 @@
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_constants.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QDebug>
 
@@ -52,6 +55,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
@@ -87,49 +91,35 @@ static QString tagName(int kind)
 
 //=============================================================================================================
 
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Compare two FIFF files tag by tag.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --file1 <file>     First FIFF file\n");
-    fprintf(stderr, "  --file2 <file>     Second FIFF file\n");
-    fprintf(stderr, "  --verbose          Show matching tags too\n");
-    fprintf(stderr, "  --help             Print this help\n");
-    fprintf(stderr, "  --version          Print version\n");
-}
-
-//=============================================================================================================
-
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_compare_fif_files");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString file1, file2;
-    bool verbose = false;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Compare two FIFF files tag by tag.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) { printf("%s version %s\n", argv[0], PROGRAM_VERSION); return 0; }
-        else if (strcmp(argv[k], "--file1") == 0) {
-            if (++k >= argc) { qCritical("--file1: argument required."); return 1; }
-            file1 = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--file2") == 0) {
-            if (++k >= argc) { qCritical("--file2: argument required."); return 1; }
-            file2 = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--verbose") == 0) { verbose = true; }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption file1Opt("file1", "First FIFF file.", "file");
+    parser.addOption(file1Opt);
+
+    QCommandLineOption file2Opt("file2", "Second FIFF file.", "file");
+    parser.addOption(file2Opt);
+
+    QCommandLineOption verboseOpt("verbose", "Show matching tags too.");
+    parser.addOption(verboseOpt);
+
+    parser.process(app);
+
+    QString file1 = parser.value(file1Opt);
+    QString file2 = parser.value(file2Opt);
+    bool verbose = parser.isSet(verboseOpt);
 
     if (file1.isEmpty() || file2.isEmpty()) {
         qCritical("Both --file1 and --file2 are required.");
-        usage(argv[0]);
         return 1;
     }
 

@@ -36,11 +36,14 @@
 
 #include <mne/mne_forward_solution.h>
 #include <fiff/fiff_stream.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QCommandLineOption>
+#include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QFile>
 #include <QTextStream>
@@ -59,6 +62,7 @@
 
 using namespace MNELIB;
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -69,52 +73,35 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Compute sensitivity maps from forward solution gain matrix.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --fwd <file>       Forward solution FIFF file\n");
-    fprintf(stderr, "  --out <file>       Output sensitivity map (text format)\n");
-    fprintf(stderr, "  --method <name>    Method: 'norm' (column norms, default) or 'svd' (leading singular value)\n");
-    fprintf(stderr, "  --help             Print this help\n");
-    fprintf(stderr, "  --version          Print version\n");
-}
-
-//=============================================================================================================
-
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_sensitivity_map");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString fwdFile;
-    QString outFile;
-    QString method = "norm";
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Compute sensitivity maps from forward solution gain matrix.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) { printf("%s version %s\n", argv[0], PROGRAM_VERSION); return 0; }
-        else if (strcmp(argv[k], "--fwd") == 0) {
-            if (++k >= argc) { qCritical("--fwd: argument required."); return 1; }
-            fwdFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--out") == 0) {
-            if (++k >= argc) { qCritical("--out: argument required."); return 1; }
-            outFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--method") == 0) {
-            if (++k >= argc) { qCritical("--method: argument required."); return 1; }
-            method = QString(argv[k]).toLower();
-        }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption fwdOpt("fwd", "Forward solution FIFF file.", "file");
+    parser.addOption(fwdOpt);
 
-    if (fwdFile.isEmpty()) { qCritical("--fwd is required."); usage(argv[0]); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); usage(argv[0]); return 1; }
+    QCommandLineOption outOpt("out", "Output sensitivity map (text format).", "file");
+    parser.addOption(outOpt);
+
+    QCommandLineOption methodOpt("method", "Method: 'norm' (column norms) or 'svd' (leading singular value).", "name", "norm");
+    parser.addOption(methodOpt);
+
+    parser.process(app);
+
+    QString fwdFile = parser.value(fwdOpt);
+    QString outFile = parser.value(outOpt);
+    QString method = parser.value(methodOpt).toLower();
+
+    if (fwdFile.isEmpty()) { qCritical("--fwd is required."); parser.showHelp(1); }
+    if (outFile.isEmpty()) { qCritical("--out is required."); parser.showHelp(1); }
 
     // Load forward solution
     QFile f(fwdFile);

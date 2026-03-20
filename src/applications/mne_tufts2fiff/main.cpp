@@ -36,12 +36,15 @@
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_file.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
 #include <QDataStream>
@@ -61,6 +64,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -79,21 +83,6 @@ struct TuftsHeader {
     float sFreq;
     qint32 dataOffset;
 };
-
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Convert Tufts University EEG data to FIFF format.\n\n");
-    fprintf(stderr, "  --raw <file>       Tufts raw data file\n");
-    fprintf(stderr, "  --cal <file>       Calibration file (optional)\n");
-    fprintf(stderr, "  --elp <file>       Electrode position file (optional)\n");
-    fprintf(stderr, "  --out <file>       Output FIFF file\n");
-    fprintf(stderr, "  --sfreq <float>    Override sampling frequency\n");
-    fprintf(stderr, "  --help             Print this help\n\n");
-    fprintf(stderr, "  Version: %s\n", PROGRAM_VERSION);
-}
 
 //=============================================================================================================
 
@@ -195,43 +184,41 @@ static bool readCalibration(const QString& filename, VectorXf& cals)
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_tufts2fiff");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString rawFile;
-    QString calFile;
-    QString elpFile;
-    QString outFile;
-    float sfreqOverride = 0.0f;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Convert Tufts University EEG data to FIFF format.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--raw") == 0 && i + 1 < argc) {
-            rawFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--cal") == 0 && i + 1 < argc) {
-            calFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--elp") == 0 && i + 1 < argc) {
-            elpFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--out") == 0 && i + 1 < argc) {
-            outFile = QString(argv[++i]);
-        } else if (strcmp(argv[i], "--sfreq") == 0 && i + 1 < argc) {
-            sfreqOverride = static_cast<float>(atof(argv[++i]));
-        } else if (strcmp(argv[i], "--help") == 0) {
-            usage(argv[0]);
-            return 0;
-        } else {
-            fprintf(stderr, "Unknown option: %s\n", argv[i]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption rawOpt("raw", "Tufts raw data file.", "file");
+    parser.addOption(rawOpt);
+    QCommandLineOption calOpt("cal", "Calibration file.", "file");
+    parser.addOption(calOpt);
+    QCommandLineOption elpOpt("elp", "Electrode position file.", "file");
+    parser.addOption(elpOpt);
+    QCommandLineOption outOpt("out", "Output FIFF file.", "file");
+    parser.addOption(outOpt);
+    QCommandLineOption sfreqOpt("sfreq", "Override sampling frequency.", "Hz");
+    parser.addOption(sfreqOpt);
+
+    parser.process(app);
+
+    QString rawFile = parser.value(rawOpt);
+    QString calFile = parser.value(calOpt);
+    QString elpFile = parser.value(elpOpt);
+    QString outFile = parser.value(outOpt);
+    float sfreqOverride = parser.isSet(sfreqOpt) ? parser.value(sfreqOpt).toFloat() : 0.0f;
 
     if (rawFile.isEmpty()) {
         fprintf(stderr, "Raw data file (--raw) is required.\n");
-        usage(argv[0]);
         return 1;
     }
     if (outFile.isEmpty()) {
         fprintf(stderr, "Output file (--out) is required.\n");
-        usage(argv[0]);
         return 1;
     }
 
