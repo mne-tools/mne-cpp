@@ -64,7 +64,7 @@ git rebase upstream/staging
 Navigate to the `mne-cpp` root folder. We provide a cross-platform build script that automatically detects your platform, finds Qt, configures CMake, and builds:
 
 ```bash
-./tools/build_project.bat
+./scripts/build_project.bat
 ```
 
 Common options:
@@ -80,7 +80,7 @@ Common options:
 
 Example — build everything in Release mode:
 ```bash
-./tools/build_project.bat all
+./scripts/build_project.bat all
 ```
 
 Alternatively, you can invoke CMake directly:
@@ -136,7 +136,7 @@ To verify your build, download the [MNE-Sample-Data-Set](https://osf.io/86qa2/do
 To build and run the unit tests:
 
 ```bash
-./tools/build_project.bat all
+./scripts/build_project.bat all
 cd build/Release
 ctest --output-on-failure
 ```
@@ -146,8 +146,8 @@ ctest --output-on-failure
 To run compiled applications outside of Qt Creator (e.g. from the terminal or file manager), Qt runtime libraries must be bundled. MNE-CPP provides a cross-platform deployment script:
 
 ```bash
-./tools/deploy.bat dynamic pack    # dynamic linking (recommended for development)
-./tools/deploy.bat static pack     # static linking
+./scripts/deploy.bat dynamic pack    # dynamic linking (recommended for development)
+./scripts/deploy.bat static pack     # static linking
 ```
 
 The dynamically linked version is recommended for development. For more details, see the [Deployment](ci-deployment.mdx) page.
