@@ -10,10 +10,11 @@
 # │ Push to main       │ Tests + Codecov, build matrix (min/max Qt),       │
 # │                    │ deploy production website + Doxygen API docs      │
 # ├────────────────────┼────────────────────────────────────────────────────┤
-# │ Tag v* on main     │ Everything above, PLUS:                           │
-# │                    │ GitHub Release, platform binaries (Linux/macOS/   │
+# │ Tag v* on main     │ GitHub Release, platform binaries (Linux/macOS/   │
 # │                    │ Windows, dynamic+static), cross-platform          │
-# │                    │ installers, WebAssembly build                     │
+# │                    │ installers, WebAssembly build, release Doxygen    │
+# │                    │ qch upload. Non-release jobs are SKIPPED to       │
+# │                    │ avoid duplicate runs and release-creation races.  │
 # └────────────────────┴────────────────────────────────────────────────────┘
 #
 # To cut a release:
@@ -37,23 +38,27 @@ concurrency:
   cancel-in-progress: true
 
 # ═══════════════════════════════════════════════════════════════════════════
-# Jobs that run on EVERY push to main (and also on tags)
+# Jobs that run ONLY on branch pushes to main (skipped on tag pushes to
+# avoid duplicate runs when both main push and tag push trigger together)
 # ═══════════════════════════════════════════════════════════════════════════
 jobs:
 
   # ── Build compatibility matrix (min + max Qt) ───────────────────────────
   BuildMinQt:
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     uses: ./.github/workflows/_reusable-build.yml
     with:
       qt_version: '6.10.0'
 
   BuildMaxQt:
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     uses: ./.github/workflows/_reusable-build.yml
     with:
       qt_version: '6.10.2'
 
   # ── Tests with Codecov coverage ──────────────────────────────────────────
   Tests:
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     uses: ./.github/workflows/_reusable-tests.yml
     with:
       with_code_coverage: true
@@ -63,6 +68,7 @@ jobs:
 
   # ── Doxygen API documentation (production) ───────────────────────────────
   Doxygen:
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     runs-on: ubuntu-24.04
 
     steps:
@@ -81,14 +87,6 @@ jobs:
       run: |
         cd doc/doxygen
         doxygen mne-cpp_doxyfile
-
-    - name: Deploy qch to GitHub Release
-      if: startsWith(github.ref, 'refs/tags/')
-      env:
-        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-      run: |
-        cp doc/doxygen/qt-creator_doc/mne-cpp.qch "mne-cpp-${{ github.ref_name }}-doc-qtcreator.qch"
-        gh release upload "${{ github.ref_name }}" "mne-cpp-${{ github.ref_name }}-doc-qtcreator.qch" --clobber
 
     - name: Deploy Doxygen to GitHub Pages (production)
       env:
@@ -119,6 +117,7 @@ jobs:
 
   # ── Website (production) ─────────────────────────────────────────────────
   Website:
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     runs-on: ubuntu-24.04
 
     steps:
@@ -204,6 +203,36 @@ jobs:
           --title "MNE-CPP $TAG" \
           --generate-notes \
           --target ${{ github.sha }}
+
+  # ── Release Doxygen qch (depends on CreateRelease) ────────────────────────
+  ReleaseDocs:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: CreateRelease
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+
+    - name: Install Doxygen 1.16.1 and Graphviz
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qq qttools5-dev-tools graphviz
+        wget -q https://github.com/doxygen/doxygen/releases/download/Release_1_16_1/doxygen-1.16.1.linux.bin.tar.gz
+        tar xzf doxygen-1.16.1.linux.bin.tar.gz
+        sudo install -m 755 doxygen-1.16.1/bin/doxygen /usr/local/bin/doxygen
+
+    - name: Run Doxygen
+      run: |
+        cd doc/doxygen
+        doxygen mne-cpp_doxyfile
+
+    - name: Upload qch to GitHub Release
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        cp doc/doxygen/qt-creator_doc/mne-cpp.qch "mne-cpp-${{ github.ref_name }}-doc-qtcreator.qch"
+        gh release upload "${{ github.ref_name }}" "mne-cpp-${{ github.ref_name }}-doc-qtcreator.qch" --clobber
 
   # ── Platform release builds (parallel) ───────────────────────────────────
   Linux:
