@@ -113,6 +113,7 @@ int main(int argc, char *argv[])
     //set application settings
     QCoreApplication::setOrganizationName(CInfo::OrganizationName());
     QCoreApplication::setApplicationName(CInfo::AppNameShort());
+    QCoreApplication::setApplicationVersion(CInfo::AppVersion());
 
     //show splash screen for 1 second
     QPixmap pixmap(":/Resources/Images/splashscreen_mne_browse.png");

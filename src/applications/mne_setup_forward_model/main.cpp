@@ -55,6 +55,8 @@
 #include "mne_setup_forward_model_settings.h"
 #include "setupforwardmodel.h"
 
+#include <utils/generics/applicationlogger.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -66,6 +68,13 @@
 //=============================================================================================================
 
 using namespace MNESETUPFORWARDMODEL;
+using namespace UTILSLIB;
+
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
+
+#define PROGRAM_VERSION "1.0"
 
 //=============================================================================================================
 // MAIN
@@ -82,9 +91,10 @@ using namespace MNESETUPFORWARDMODEL;
  */
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_setup_forward_model");
-    QCoreApplication::setApplicationVersion("1.0");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
     MNESetupForwardModelSettings settings(&argc, argv);
     SetupForwardModel setupFwdModel(settings);

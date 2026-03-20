@@ -50,6 +50,8 @@
 #include "mne_surf2bem_settings.h"
 #include "surf2bem.h"
 
+#include <utils/generics/applicationlogger.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -61,6 +63,13 @@
 //=============================================================================================================
 
 using namespace MNESURF2BEM;
+using namespace UTILSLIB;
+
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
+
+#define PROGRAM_VERSION "1.0"
 
 //=============================================================================================================
 // MAIN
@@ -77,9 +86,10 @@ using namespace MNESURF2BEM;
  */
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_surf2bem");
-    QCoreApplication::setApplicationVersion("1.0");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
     MNESurf2BemSettings settings(&argc, argv);
     Surf2Bem surf2bem(settings);

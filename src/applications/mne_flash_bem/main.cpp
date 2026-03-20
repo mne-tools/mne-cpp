@@ -50,6 +50,8 @@
 #include "mne_flash_bem_settings.h"
 #include "flashbem.h"
 
+#include <utils/generics/applicationlogger.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -61,6 +63,13 @@
 //=============================================================================================================
 
 using namespace MNEFLASHBEM;
+using namespace UTILSLIB;
+
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
+
+#define PROGRAM_VERSION "1.0"
 
 //=============================================================================================================
 // MAIN
@@ -77,9 +86,10 @@ using namespace MNEFLASHBEM;
  */
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_flash_bem");
-    QCoreApplication::setApplicationVersion("1.0");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
     MNEFlashBemSettings settings(&argc, argv);
     FlashBem flashBem(settings);

@@ -54,6 +54,8 @@
 #include "mne_watershed_bem_settings.h"
 #include "watershedbem.h"
 
+#include <utils/generics/applicationlogger.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -65,6 +67,13 @@
 //=============================================================================================================
 
 using namespace MNEWATERSHEDBEM;
+using namespace UTILSLIB;
+
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
+
+#define PROGRAM_VERSION "1.0"
 
 //=============================================================================================================
 // MAIN
@@ -81,9 +90,10 @@ using namespace MNEWATERSHEDBEM;
  */
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_watershed_bem");
-    QCoreApplication::setApplicationVersion("1.0");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
     MNEWatershedBemSettings settings(&argc, argv);
     WatershedBem watershedBem(settings);

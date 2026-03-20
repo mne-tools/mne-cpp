@@ -43,6 +43,7 @@
 #include "mne_fiff_exp_set.h"
 #include <stdio.h>
 
+#include <utils/generics/applicationlogger.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -58,6 +59,14 @@
 //=============================================================================================================
 
 using namespace SHOWFIFF;
+using namespace UTILSLIB;
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
+
+#define PROGRAM_VERSION "1.0"
 
 
 //*************************************************************************************************************
@@ -76,7 +85,10 @@ using namespace SHOWFIFF;
  */
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_show_fiff");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
     MNEShowFiffSettings settings(&argc,argv);
     MNEFiffExpSet expSet = MNEFiffExpSet::read_fiff_explanations(QCoreApplication::applicationDirPath()+"/resources/general/explanations/fiff_explanations.txt");
