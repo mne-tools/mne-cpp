@@ -50,8 +50,8 @@ const funders = [
 ];
 
 const contributors = [
-    { login: 'LorenzE', contributions: 3902 },
-    { login: 'chdinh', contributions: 2868 },
+    { login: 'LorenzE', contributions: 3904 },
+    { login: 'chdinh', contributions: 3011 },
     { login: 'gabrielbmotta', contributions: 1326 },
     { login: 'juangpc', contributions: 1207 },
     { login: 'RDoerfel', contributions: 626 },
