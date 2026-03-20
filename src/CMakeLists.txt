@@ -172,6 +172,13 @@ execute_process(
 set(PROJECT_RESOURCES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources)
 
 ##==============================================================================
+## SDK export set — disabled for WASM (bundled Eigen target + Qt resource
+## targets cannot be exported).
+if(NOT WASM)
+    set(MNE_CPP_EXPORT_SET EXPORT MNECPPTargets)
+endif()
+
+##==============================================================================
 ## Add subdirectories
 
 add_subdirectory(libraries)
@@ -198,6 +205,10 @@ endif()
 
 ##==============================================================================
 ## CMake package config for find_package(MNE-CPP) — SDK discovery
+## (Not applicable for WASM builds which use a bundled Eigen target and
+##  Qt-generated resource targets that cannot be exported.)
+
+if(NOT WASM)
 
 include(CMakePackageConfigHelpers)
 
@@ -230,6 +241,8 @@ install(FILES
     DESTINATION lib/cmake/MNE-CPP
     COMPONENT sdk
 )
+
+endif() # NOT WASM
 
   
 ##==============================================================================
