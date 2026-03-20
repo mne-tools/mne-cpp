@@ -120,9 +120,9 @@ jobs:
         MNE_DATA: ~/mne_data
       run: |
         if [ "${{ inputs.with_code_coverage }}" = "true" ]; then
-          ./tools/test_all.bat verbose withCoverage
+          ./scripts/test_all.bat verbose withCoverage
         else
-          ./tools/test_all.bat verbose
+          ./scripts/test_all.bat verbose
         fi
 
     - name: Run tests (MacOS)
@@ -132,7 +132,7 @@ jobs:
         QT_QPA_PLATFORM: offscreen
         MNE_DATA: ~/mne_data
       run: |
-        ./tools/test_all.bat Release verbose
+        ./scripts/test_all.bat Release verbose
 
     - name: Run tests (Windows)
       if: matrix.os == 'windows-2025'
@@ -140,7 +140,7 @@ jobs:
         QTEST_FUNCTION_TIMEOUT: 900000
         MNE_DATA: ~/mne_data
       run: |
-        ./tools/test_all.bat Release verbose
+        ./scripts/test_all.bat Release verbose
 
     # ── Coverage: Codecov upload ──────────────────────────────────────────
     - name: Upload coverage to Codecov

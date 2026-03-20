@@ -63,22 +63,22 @@ jobs:
     - name: Build WASM
       run: |
         source ../emsdk/emsdk_env.sh
-        ./tools/wasm.sh --emsdk 4.0.7
+        ./scripts/wasm.sh --emsdk 4.0.7
     - name: Prepare WASM artifacts
       run: |
         # Delete folders which we do not want to ship
-        rm -rf out/wasm/apps/mne_analyze_plugins
+        rm -rf out/wasm/bin/mne_analyze_plugins
         rm -rf resources/data
         # Replace logo
-        cp resources/design/logos/qtlogo.svg out/wasm/apps/qtlogo.svg
+        cp resources/design/logos/qtlogo.svg out/wasm/bin/qtlogo.svg
         if [ -d "out/wasm/examples" ]; then
           cp resources/design/logos/qtlogo.svg out/wasm/examples/qtlogo.svg
         fi
         # Inject COOP/COEP service worker for cross-origin isolation
         # (required for SharedArrayBuffer / multi-threaded Wasm in Chrome & Safari)
-        ./tools/wasm/wasm_postbuild.sh out/wasm/apps
+        ./scripts/wasm/wasm_postbuild.sh out/wasm/bin
         if [ -d "out/wasm/examples" ]; then
-          ./tools/wasm/wasm_postbuild.sh out/wasm/examples
+          ./scripts/wasm/wasm_postbuild.sh out/wasm/examples
         fi
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
@@ -90,7 +90,7 @@ jobs:
         git config --global user.email christoph.dinh@mne-cpp.org
         git config --global user.name chdinh
         # Save the wasm files first
-        cp -RT out/wasm/apps ../bin
+        cp -RT out/wasm/bin ../bin
         if [ -d "out/wasm/examples" ]; then
           cp -RT out/wasm/examples ../bin_examples
         fi

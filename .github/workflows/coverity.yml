@@ -21,6 +21,6 @@ jobs:
           modules: qtshadertools
       - name: Coverity scripts
         run: |
-          ./tools/coverity_scan.sh "$COVTOKEN"
+          ./scripts/coverity_scan.sh "$COVTOKEN"
         env:
           COVTOKEN: ${{ secrets.COVERITY_TOKEN }}

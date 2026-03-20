@@ -47,14 +47,14 @@ jobs:
       run: |
         cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        ./tools/build_project.bat
+        ./scripts/build_project.bat
     - name: Deploy binaries (Windows)
       run: |
         echo "Qt environment:"
         echo "  QT_ROOT_DIR=$env:QT_ROOT_DIR"
         echo "  Qt6_DIR=$env:Qt6_DIR"
         Get-Command windeployqt -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source
-        ./tools/deploy.bat dynamic pack
+        ./scripts/deploy.bat dynamic pack
         # Verify archive size
         $archive = Get-Item mne-cpp-windows-dynamic-x86_64.zip -ErrorAction SilentlyContinue
         if ($archive) {
@@ -149,10 +149,10 @@ jobs:
         cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         $env:CMAKE_PREFIX_PATH = "$env:GITHUB_WORKSPACE\..\Qt6_static"
-        ./tools/build_project.bat static
+        ./scripts/build_project.bat static
     - name: Deploy binaries (Windows)
       run: |
-        ./tools/deploy.bat static pack
+        ./scripts/deploy.bat static pack
     - name: Upload release binaries
       if: steps.release-info.outputs.should_upload == 'true'
       shell: bash

@@ -12,12 +12,12 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 
 set(SOURCES
     test_edf2fiff_rwr.cpp
-    ../../applications/mne_edf2fiff/edf_raw_data.cpp
-    ../../applications/mne_edf2fiff/edf_info.cpp
-    ../../applications/mne_edf2fiff/edf_ch_info.cpp
-    ../../applications/mne_edf2fiff/edf_raw_data.h
-    ../../applications/mne_edf2fiff/edf_info.h
-    ../../applications/mne_edf2fiff/edf_ch_info.h
+    ../../tools/conversion/mne_edf2fiff/edf_raw_data.cpp
+    ../../tools/conversion/mne_edf2fiff/edf_info.cpp
+    ../../tools/conversion/mne_edf2fiff/edf_ch_info.cpp
+    ../../tools/conversion/mne_edf2fiff/edf_raw_data.h
+    ../../tools/conversion/mne_edf2fiff/edf_info.h
+    ../../tools/conversion/mne_edf2fiff/edf_ch_info.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

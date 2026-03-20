@@ -274,13 +274,13 @@ jobs:
     - name: Build WASM
       run: |
         source ../emsdk/emsdk_env.sh
-        ./tools/wasm.sh --emsdk 4.0.7
+        ./scripts/wasm.sh --emsdk 4.0.7
 
     - name: Prepare WASM artifacts
       run: |
-        rm -rf out/wasm/apps/mne_analyze_plugins
+        rm -rf out/wasm/bin/mne_analyze_plugins
         rm -rf resources/data
-        cp resources/design/logos/qtlogo.svg out/wasm/apps/qtlogo.svg
+        cp resources/design/logos/qtlogo.svg out/wasm/bin/qtlogo.svg
         if [ -d "out/wasm/examples" ]; then
           cp resources/design/logos/qtlogo.svg out/wasm/examples/qtlogo.svg
         fi
@@ -314,7 +314,7 @@ jobs:
         git rm -rf --ignore-unmatch .
         git clean -f -d
         git commit --allow-empty -m 'Update wasm builds'
-        cp -RT ../out/wasm/apps .
+        cp -RT ../out/wasm/bin .
         if [ -d "../out/wasm/examples" ]; then
           mkdir -p examples
           cp -RT ../out/wasm/examples examples
@@ -332,7 +332,7 @@ jobs:
         git rm -rf --ignore-unmatch .
         git clean -f -d
         git commit --allow-empty -m 'Update wasm builds'
-        cp -RT ../out/wasm/apps .
+        cp -RT ../out/wasm/bin .
         if [ -d "../out/wasm/examples" ]; then
           mkdir -p examples
           cp -RT ../out/wasm/examples examples

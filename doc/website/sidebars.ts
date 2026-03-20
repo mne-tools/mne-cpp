@@ -63,7 +63,6 @@ const sidebars: SidebarsConfig = {
                                 'manual/analyze-realtime',
                             ],
                         },
-                        'manual/anonymize',
                         'manual/inspect',
                         'manual/browse-raw',
                         'manual/online',
@@ -74,6 +73,7 @@ const sidebars: SidebarsConfig = {
                     label: 'Command-Line Tools',
                     link: { type: 'doc', id: 'manual/tools-overview' },
                     items: [
+                        'manual/anonymize',
                         'manual/tools-watershed-bem',
                         'manual/tools-flash-bem',
                         'manual/tools-surf2bem',

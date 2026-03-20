@@ -43,7 +43,7 @@ jobs:
         modules: qtshadertools
     - name: Configure and compile MNE-CPP
       run: |
-        ./tools/build_project.bat
+        ./scripts/build_project.bat
     - name: Free up disk space before packaging
       run: |
         echo "Disk usage before cleanup:" && df -h
@@ -58,7 +58,7 @@ jobs:
         echo "  QT_ROOT_DIR=${QT_ROOT_DIR:-<not set>}"
         echo "  Qt6_DIR=${Qt6_DIR:-<not set>}"
         which macdeployqt || echo "WARNING: macdeployqt not on PATH"
-        ./tools/deploy.bat dynamic pack
+        ./scripts/deploy.bat dynamic pack
         # Verify archive contains Qt frameworks
         echo ""
         echo "=== Archive verification ==="
@@ -151,10 +151,10 @@ jobs:
     - name: Configure and compile MNE-CPP (static)
       run: |
         export CMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/../Qt6_static
-        ./tools/build_project.bat static
+        ./scripts/build_project.bat static
     - name: Deploy binaries (MacOS)
       run: |
-        ./tools/deploy.bat static pack
+        ./scripts/deploy.bat static pack
     - name: Upload release binaries
       if: steps.release-info.outputs.should_upload == 'true'
       env:

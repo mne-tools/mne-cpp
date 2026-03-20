@@ -39,8 +39,8 @@
 
 #include <utils/generics/applicationlogger.h>
 
-#include "../../applications/mne_anonymize/fiffanonymizer.h"
-#include "../../applications/mne_anonymize/settingscontrollercl.h"
+#include "../../tools/preprocessing/mne_anonymize/fiffanonymizer.h"
+#include "../../tools/preprocessing/mne_anonymize/settingscontrollercl.h"
 
 //=============================================================================================================
 // QT INCLUDES

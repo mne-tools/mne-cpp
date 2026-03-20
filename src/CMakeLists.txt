@@ -175,6 +175,7 @@ add_subdirectory(external)
 
 if(BUILD_APPLICATIONS)
   add_subdirectory(applications)
+  add_subdirectory(tools)
 endif()
 
 if(BUILD_EXAMPLES)
@@ -188,7 +189,7 @@ endif()
 
 option(MNE_ENABLE_INSTALLER "Enable building the installer" OFF)
 if(MNE_ENABLE_INSTALLER)
-    include(${CMAKE_CURRENT_SOURCE_DIR}/../tools/packaging/Installer.cmake)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/../scripts/packaging/Installer.cmake)
 endif()
 
   
