@@ -377,10 +377,12 @@ export default function Download(): JSX.Element {
 
                                             {stableRelease.assets.length > 0 && (
                                                 <>
+                                                    <AssetList assets={stableRelease.assets} platforms={INSTALLER_PLATFORMS} heading="Installers" />
                                                     <AssetList assets={stableRelease.assets} platforms={STABLE_DYNAMIC} heading="Dynamic Binaries" />
                                                     <p className="dl-variant-note">Shared libraries. Smaller download. Full plugin support.</p>
                                                     <AssetList assets={stableRelease.assets} platforms={STABLE_STATIC} heading="Static Binaries" />
                                                     <p className="dl-variant-note">Self-contained. No external dependencies. No plugin support.</p>
+                                                    <AssetList assets={stableRelease.assets} platforms={DEV_WASM} heading="WebAssembly" />
                                                 </>
                                             )}
 
