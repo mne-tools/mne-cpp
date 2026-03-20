@@ -361,7 +361,7 @@ bool WatershedBem::convertSurfaces(const QString& wsDir, const QString& mgzFile)
         if (surf.rr().rows() == 0) {
             qWarning() << "FsSurface" << surfPath << "has no vertices.";
         } else if (m_settings.verbose()) {
-            printf("  %d vertices, %d triangles\n", (int)surf.rr().rows(), (int)surf.itris().rows());
+            printf("  %d vertices, %d triangles\n", (int)surf.rr().rows(), (int)surf.tris().rows());
         }
     }
 
@@ -386,13 +386,13 @@ bool WatershedBem::createBemFif(const QString& surfFile, const QString& fifFile)
     FsSurface fsSurface;
     FsSurface::read(surfFile, fsSurface, false);
 
-    if (fsSurface.rr().rows() == 0 || fsSurface.itris().rows() == 0) {
+    if (fsSurface.rr().rows() == 0 || fsSurface.tris().rows() == 0) {
         qCritical() << "Failed to read surface from" << surfFile;
         return false;
     }
 
     printf("Read surface: %d vertices, %d triangles\n",
-           (int)fsSurface.rr().rows(), (int)fsSurface.itris().rows());
+           (int)fsSurface.rr().rows(), (int)fsSurface.tris().rows());
 
     //
     // Create BEM surface
@@ -402,13 +402,13 @@ bool WatershedBem::createBemFif(const QString& surfFile, const QString& fifFile)
     MNEBemSurface bemSurface;
     bemSurface.id = FIFFV_BEM_SURF_ID_HEAD;   // 4 = head surface
     bemSurface.np = fsSurface.rr().rows();
-    bemSurface.ntri = fsSurface.itris().rows();
+    bemSurface.ntri = fsSurface.tris().rows();
     bemSurface.coord_frame = FIFFV_COORD_MRI;
     bemSurface.sigma = 0.0f;                   // Default conductivity
 
     // Copy vertex coordinates and triangles
     bemSurface.rr = fsSurface.rr();
-    bemSurface.itris = fsSurface.itris();
+    bemSurface.itris = fsSurface.tris();
 
     // Compute vertex normals
     bemSurface.nn = FsSurface::compute_normals(Eigen::MatrixX3f(bemSurface.rr), Eigen::MatrixX3i(bemSurface.itris));

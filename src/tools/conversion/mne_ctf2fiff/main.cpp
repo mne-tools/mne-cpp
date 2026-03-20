@@ -74,7 +74,7 @@ using namespace Eigen;
 // STATIC DEFINITIONS
 //=============================================================================================================
 
-#define PROGRAM_VERSION "2.0.0"
+#define PROGRAM_VERSION MNE_CPP_VERSION
 
 // CTF sensor types (from res4 file)
 #define CTF_SEN_TYPE_MEG        5     // MEG magnetometer/gradiometer

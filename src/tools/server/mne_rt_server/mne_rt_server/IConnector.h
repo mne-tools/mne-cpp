@@ -248,7 +248,7 @@ inline void IConnector::setStatus(bool status)
 } //Namespace
 
 #ifndef IConnector_iid
-#define IConnector_iid "mne_rt_server/1.0"
+#define IConnector_iid "mne_rt_server/2.0"
 #endif
 Q_DECLARE_INTERFACE(RTSERVER::IConnector, IConnector_iid)
 

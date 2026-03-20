@@ -201,7 +201,7 @@ if(USE_FFTW)
   endif()
 endif()
 
-target_include_directories(${PROJECT_NAME} PUBLIC ../)
+target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..> $<INSTALL_INTERFACE:include>)
 
 target_include_directories(${PROJECT_NAME} PRIVATE . ${FFTW_LIBS})
 
@@ -231,7 +231,7 @@ if(NOT BUILD_SHARED_LIBS)
   target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
 
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS ${PROJECT_NAME} EXPORT MNECPPTargets
     RUNTIME DESTINATION bin COMPONENT runtime
     LIBRARY DESTINATION lib COMPONENT runtime
     ARCHIVE DESTINATION lib COMPONENT sdk
@@ -241,7 +241,7 @@ install(TARGETS ${PROJECT_NAME}
 foreach(_header ${HEADERS})
     get_filename_component(_dir "${_header}" DIRECTORY)
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/${_header}"
-        DESTINATION include/${PROJECT_NAME}/${_dir}
+        DESTINATION include/disp/${_dir}
         COMPONENT sdk
     )
 endforeach()

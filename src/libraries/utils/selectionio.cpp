@@ -119,7 +119,7 @@ bool SelectionIO::readMNESelFile(QString path, QMultiMap<QString,QStringList> &s
 bool SelectionIO::readMNESelFile(const std::string& path, std::multimap<std::string,std::vector<std::string>> &selectionMap)
 {
     //Open .sel file
-    if(path.find(".sel") != std::string::npos)
+    if(path.find(".sel") == std::string::npos)
         return false;
 
     //clear the map first
@@ -135,21 +135,25 @@ bool SelectionIO::readMNESelFile(const std::string& path, std::multimap<std::str
 
     while(std::getline(inFile, line)){
         if(line.find('%') == std::string::npos && line.find(':') != std::string::npos){
-            std::stringstream stream{line};
-            std::vector<std::string> firstSplit;
-            for (std::string element; std::getline(stream, line, ':');){
-                firstSplit.push_back(element);
-            }
-            std::string key = firstSplit.at(0);
+            // Split on ':' → key : channels
+            auto colonPos = line.find(':');
+            std::string key = line.substr(0, colonPos);
+            std::string channelsPart = line.substr(colonPos + 1);
 
-            std::vector<std::string> secondSplit;
-            for (std::string element; std::getline(stream, line, '|');){
-                secondSplit.push_back(element);
+            // Split channels on '|'
+            std::vector<std::string> channels;
+            std::stringstream stream{channelsPart};
+            std::string token;
+            while(std::getline(stream, token, '|')){
+                channels.push_back(token);
             }
-            if(secondSplit.back() == ""){
-                secondSplit.pop_back();
+
+            // Remove trailing empty element
+            if(!channels.empty() && channels.back().empty()){
+                channels.pop_back();
             }
-            selectionMap.insert({key, secondSplit});
+
+            selectionMap.insert({key, channels});
         }
     }
 
@@ -201,7 +205,7 @@ bool SelectionIO::readBrainstormMonFile(QString path, QMultiMap<QString,QStringL
 bool SelectionIO::readBrainstormMonFile(const std::string& path, std::multimap<std::string,std::vector<std::string>>& selectionMap)
 {
     //Open file
-    if(path.find(".mon") != std::string::npos)
+    if(path.find(".mon") == std::string::npos)
         return false;
 
     //clear the map first
@@ -220,12 +224,9 @@ bool SelectionIO::readBrainstormMonFile(const std::string& path, std::multimap<s
     std::string line;
     while(std::getline(inFile, line)){
         if(line.find(':') != std::string::npos){
-            std::stringstream stream{line};
-            std::vector<std::string> split;
-            for (std::string element; std::getline(stream, line, ':');){
-                split.push_back(std::move(element));
-            }
-            channels.push_back(split.at(0));
+            auto colonPos = line.find(':');
+            std::string channelName = line.substr(0, colonPos);
+            channels.push_back(channelName);
         }
     }
 
@@ -277,7 +278,7 @@ bool SelectionIO::writeMNESelFile(const std::string& path, const std::map<std::s
         return false;
 
     std::ofstream outFile(path);
-    if (outFile.is_open()){
+    if (!outFile.is_open()){
         qDebug()<<"Error opening sel file for writing";
         return false;
     }
@@ -297,10 +298,6 @@ bool SelectionIO::writeMNESelFile(const std::string& path, const std::map<std::s
 
 bool SelectionIO::writeBrainstormMonFiles(QString path, const QMultiMap<QString,QStringList> &selectionMap)
 {
-    //Open .sel file
-    if(!path.contains(".mon"))
-        return false;
-
     for(auto i = selectionMap.constBegin(); i != selectionMap.constEnd(); i++) {
         QFileInfo fileInfo(path);
 
@@ -332,12 +329,7 @@ bool SelectionIO::writeBrainstormMonFiles(QString path, const QMultiMap<QString,
 
 bool SelectionIO::writeBrainstormMonFiles(const std::string& path, const std::map<std::string,std::vector<std::string>>& selectionMap)
 {
-    //Open file
-    if(path.find(".mon") == std::string::npos)
-        return false;
-
     for(auto& mapElement : selectionMap){
-        //logic of using parent_path here might not be "correct"
         std::string newPath{path.substr(0, path.find_last_of("/") + 1) + mapElement.first + ".mon"};
         std::ofstream outFile(newPath);
         if(!outFile.is_open()){

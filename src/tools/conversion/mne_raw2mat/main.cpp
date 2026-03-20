@@ -68,7 +68,7 @@ using namespace Eigen;
 // STATIC DEFINITIONS
 //=============================================================================================================
 
-#define PROGRAM_VERSION "2.0.0"
+#define PROGRAM_VERSION MNE_CPP_VERSION
 
 // MAT-file Level 5 constants
 static const quint32 miDOUBLE   = 9;

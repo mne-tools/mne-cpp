@@ -42,23 +42,9 @@ option(BUILD_MNE_CHECK_SURFACE "Build MNE Check Surface" ON)
 option(BUILD_MNE_AVERAGE_FORWARD_SOLUTIONS "Build MNE Average Forward Solutions" ON)
 option(BUILD_MNE_MAKE_SOURCE_SPACE "Build MNE Make Source Space" ON)
 
-# FreeSurfer-dependent forward tools
-set(FREESURFER_FOUND FALSE)
-if(DEFINED ENV{FREESURFER_HOME} AND EXISTS "$ENV{FREESURFER_HOME}/bin/mri_watershed")
-  set(FREESURFER_FOUND TRUE)
-  message(STATUS "FreeSurfer found at $ENV{FREESURFER_HOME}")
-else()
-  find_program(MRI_WATERSHED_BIN mri_watershed)
-  if(MRI_WATERSHED_BIN)
-    set(FREESURFER_FOUND TRUE)
-    message(STATUS "FreeSurfer mri_watershed found at ${MRI_WATERSHED_BIN}")
-  else()
-    message(STATUS "FreeSurfer not found — skipping mne_watershed_bem and mne_flash_bem")
-  endif()
-endif()
-
-option(BUILD_MNE_WATERSHED_BEM "Build MNE Watershed BEM (requires FreeSurfer)" ${FREESURFER_FOUND})
-option(BUILD_MNE_FLASH_BEM "Build MNE Flash BEM (requires FreeSurfer)" ${FREESURFER_FOUND})
+# FreeSurfer forward tools (FreeSurfer is only needed at runtime, not at compile time)
+option(BUILD_MNE_WATERSHED_BEM "Build MNE Watershed BEM" ON)
+option(BUILD_MNE_FLASH_BEM "Build MNE Flash BEM" ON)
 
 # Inverse solution tools
 option(BUILD_MNE_INVERSE_OPERATOR "Build MNE Inverse Operator" ON)

@@ -53,6 +53,8 @@
 #include <Eigen/Core>
 #include <Eigen/SVD>
 
+#include <vector>
+
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -401,8 +403,7 @@ int MNEProjOp::project_vector(float *vec, int nvec, int do_complement)
      * Assume that all dimension checking etc. has been done before
      */
 {
-    static float *res = NULL;
-    int    res_size   = 0;
+    thread_local std::vector<float> res;
     float *pvec;
     float  w;
     int k,p;
@@ -415,9 +416,8 @@ int MNEProjOp::project_vector(float *vec, int nvec, int do_complement)
         return FAIL;
     }
 
-    if (nch > res_size) {
-        res = REALLOC_23(res,nch,float);
-        res_size = nch;
+    if (nch > static_cast<int>(res.size())) {
+        res.resize(nch);
     }
 
     for (k = 0; k < nch; k++)

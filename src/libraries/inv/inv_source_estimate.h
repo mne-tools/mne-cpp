@@ -208,7 +208,7 @@ public:
 
 public:
     Eigen::MatrixXd data;           /**< Matrix of shape [n_dipoles x n_times] which contains the data in source space. */
-    Eigen::VectorXi vertices;       /**< The indices of the dipoles in the different source spaces. */ //ToDo define is_clustered_result; in clustered case vertices holds the ROI idcs
+    Eigen::VectorXi vertices;       /**< The indices of the dipoles in the different source spaces. In the clustered case, holds the ROI indices. */
     Eigen::RowVectorXf times;       /**< The time vector with n_times steps. */
     float tmin;                     /**< Time starting point. */
     float tstep;                    /**< Time steps within the times vector. */

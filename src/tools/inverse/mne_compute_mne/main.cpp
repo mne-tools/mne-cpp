@@ -98,7 +98,7 @@ using namespace UTILSLIB;
 // DEFINES
 //=============================================================================================================
 
-#define PROGRAM_VERSION "1.0"
+#define PROGRAM_VERSION MNE_CPP_VERSION
 
 // Collapse modes (matching SVN MNE-C)
 #define COLLAPSE_MAX   1

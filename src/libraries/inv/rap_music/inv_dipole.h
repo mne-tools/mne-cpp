@@ -15,7 +15,7 @@
  * prior written consent of the author.
  *
  *
- * @brief    ToDo Documentation...
+ * @brief    InvDipole class declaration for RAP MUSIC dipole results.
  *
  */
 

@@ -135,11 +135,5 @@ install(
     PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
 )
 
-# CMake package configuration for SDK consumers
-if(MNE_ENABLE_INSTALLER)
-    install(
-        FILES "${CMAKE_CURRENT_SOURCE_DIR}/../tools/packaging/MNECPPConfig.cmake"
-        DESTINATION lib/cmake/MNE-CPP
-        COMPONENT sdk
-    )
-endif()
+# CMake package configuration for SDK consumers is now handled by
+# the generated MNE-CPPConfig.cmake (see src/CMakeLists.txt).

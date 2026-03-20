@@ -140,10 +140,11 @@ private slots:
 
 void TestDispPlots::testJetMonotonicity()
 {
-    // Test that the red channel of Jet generally increases from 0 to 1
+    // Jet red channel increases from 0.375 to 0.625, holds at 255 until 0.875,
+    // then decreases. Test the increasing region only (0.375 to 0.875).
     int prevR = 0;
     bool generallyIncreasing = true;
-    for (double v = 0.5; v <= 1.0; v += 0.05) {
+    for (double v = 0.375; v <= 0.875; v += 0.05) {
         QRgb c = ColorMap::valueToJet(v);
         int r = qRed(c);
         if (r < prevR - 10) { // Allow small dips due to interpolation
@@ -226,13 +227,28 @@ void TestDispPlots::testViridisLUT()
 
 void TestDispPlots::testViridisNegatedInverse()
 {
-    // ViridisNegated should swap the LUT: viridis(v) == viridisNegated(1-v)
-    for (double v = 0.0; v <= 1.0; v += 0.1) {
+    // ViridisNegated reverses the 256-entry LUT direction.
+    // Due to floor-based discretization, floor(v*255)+floor((1-v)*255)
+    // can equal 254 instead of 255, producing ±1 index offset.
+    // Verify exact equality at endpoints and near-equality elsewhere.
+    QRgb v0 = ColorMap::valueToViridis(0.0);
+    QRgb n1 = ColorMap::valueToViridisNegated(1.0);
+    QCOMPARE(qRed(v0), qRed(n1));
+    QCOMPARE(qGreen(v0), qGreen(n1));
+    QCOMPARE(qBlue(v0), qBlue(n1));
+
+    QRgb v1 = ColorMap::valueToViridis(1.0);
+    QRgb n0 = ColorMap::valueToViridisNegated(0.0);
+    QCOMPARE(qRed(v1), qRed(n0));
+    QCOMPARE(qGreen(v1), qGreen(n0));
+    QCOMPARE(qBlue(v1), qBlue(n0));
+
+    for (double v = 0.1; v < 1.0; v += 0.1) {
         QRgb normal = ColorMap::valueToViridis(v);
         QRgb negated = ColorMap::valueToViridisNegated(1.0 - v);
-        QCOMPARE(qRed(normal), qRed(negated));
-        QCOMPARE(qGreen(normal), qGreen(negated));
-        QCOMPARE(qBlue(normal), qBlue(negated));
+        QVERIFY(std::abs(qRed(normal) - qRed(negated)) <= 3);
+        QVERIFY(std::abs(qGreen(normal) - qGreen(negated)) <= 3);
+        QVERIFY(std::abs(qBlue(normal) - qBlue(negated)) <= 3);
     }
 }
 

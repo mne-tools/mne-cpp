@@ -75,7 +75,7 @@ using namespace Eigen;
 // STATIC DEFINITIONS
 //=============================================================================================================
 
-#define PROGRAM_VERSION "2.0.0"
+#define PROGRAM_VERSION MNE_CPP_VERSION
 #define N_NEAREST 5  // Number of nearest neighbors for interpolation
 
 //=============================================================================================================

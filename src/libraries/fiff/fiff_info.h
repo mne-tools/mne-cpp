@@ -224,15 +224,6 @@ public:
                                    int& nmegp,
                                    int& neegp);
 
-// ToDo
-//    //=========================================================================================================
-//    /**
-//    * Writes the fiff information to an I/O Device, e.g. fiff file
-//    *
-//    * @param[in] p_IODevice   IO device to write the fiff info to.
-//    */
-//    void write(QIODevice &p_IODevice);
-
     //=========================================================================================================
     /**
      * Writes the fiff information to a FIF stream.
@@ -263,7 +254,7 @@ private:
 
 public: //Public because it's a mne struct
     FiffId file_id;                 /**< File ID. */
-    fiff_int_t  meas_date[2];       /**< Measurement date. TODO: use FiffTime instead to be MNE-C consistent*/
+    fiff_int_t  meas_date[2];       /**< Measurement date. */
     float sfreq;                    /**< Sample frequency. */
     float linefreq;                 /**< Power line frequency. */
     float highpass;                 /**< Highpass frequency. */

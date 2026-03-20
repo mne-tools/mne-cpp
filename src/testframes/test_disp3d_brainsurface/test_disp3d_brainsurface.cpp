@@ -267,16 +267,32 @@ void TestDisp3dBrainSurface::testVertexPositions()
 
 void TestDisp3dBrainSurface::testVertexNormals()
 {
+    // createFromData without explicit normals computes spherical normals
+    // (position-based), so a triangle at z=0 won't have Z-pointing normals.
+    // Test with explicit normals to verify round-trip.
+    Eigen::MatrixX3f verts(3, 3);
+    verts << 0.0f, 0.0f, 0.0f,
+             1.0f, 0.0f, 0.0f,
+             0.5f, 1.0f, 0.0f;
+
+    Eigen::MatrixX3f normals(3, 3);
+    normals << 0.0f, 0.0f, 1.0f,
+               0.0f, 0.0f, 1.0f,
+               0.0f, 0.0f, 1.0f;
+
+    Eigen::MatrixX3i tris(1, 3);
+    tris << 0, 1, 2;
+
     BrainSurface surf;
-    createMinimalSurface(surf);
+    surf.createFromData(verts, normals, tris, Qt::gray);
 
-    Eigen::MatrixX3f normals = surf.vertexNormals();
-    QCOMPARE(normals.rows(), 3);
-    QCOMPARE(normals.cols(), 3);
+    Eigen::MatrixX3f readNormals = surf.vertexNormals();
+    QCOMPARE(readNormals.rows(), 3);
+    QCOMPARE(readNormals.cols(), 3);
 
-    // For a triangle in the XY plane, normal should point in Z direction
+    // For a triangle in the XY plane with explicit Z normals
     for (int i = 0; i < 3; ++i) {
-        float nz = normals(i, 2);
+        float nz = readNormals(i, 2);
         QVERIFY(qAbs(nz) > 0.5f); // Should have significant Z component
     }
 }

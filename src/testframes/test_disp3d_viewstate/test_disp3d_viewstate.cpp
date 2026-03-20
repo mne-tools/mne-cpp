@@ -285,12 +285,16 @@ void TestDisp3dViewState::testShouldRenderSurface()
     sv.visibility.lh = true;
     sv.visibility.rh = false;
 
-    // LH pial should render (lh visible, matches surface type)
+    // LH pial should render (lh visible)
     QVERIFY(sv.shouldRenderSurface("lh_pial"));
     // RH pial should not render (rh not visible)
     QVERIFY(!sv.shouldRenderSurface("rh_pial"));
-    // LH inflated should not render (doesn't match surface type)
-    QVERIFY(!sv.shouldRenderSurface("lh_inflated"));
+    // LH inflated still renders because shouldRenderSurface checks visibility, not surface type
+    QVERIFY(sv.shouldRenderSurface("lh_inflated"));
+    // BEM head should render by default
+    QVERIFY(sv.shouldRenderSurface("bem_head"));
+    // Sensors are not visible by default
+    QVERIFY(!sv.shouldRenderSurface("sens_meg_grad_0"));
 }
 
 //=============================================================================================================

@@ -139,7 +139,7 @@
     IF "%Rebuild%"=="False" (
         ECHO.
         ECHO Configuring build project
-        %MockText%cmake -B %BuildFolder% -S %SourceFolder% -DCMAKE_BUILD_TYPE=%BuildType% -DBINARY_OUTPUT_DIRECTORY=%OutFolder% -DCMAKE_CXX_FLAGS="/EHsc /MP" %CMakeConfigFlags% %ExtraArgs%
+        %MockText%cmake -B %BuildFolder% -S %SourceFolder% -DCMAKE_BUILD_TYPE=%BuildType% -DBINARY_OUTPUT_DIRECTORY=%OutFolder% -DCMAKE_CXX_FLAGS="/EHsc /MP" -DEIGEN_BUILD_CMAKE_PACKAGE=ON %CMakeConfigFlags% %ExtraArgs%
     )
 
     %MockText%cmake --build %BuildFolder% --config %BuildType% && call:buildSuccessful || call:buildFailed
@@ -510,12 +510,18 @@ if [ "${BuildAll}" == "true" ]; then
   CMakeConfigFlags="${CMakeConfigFlags} -DBUILD_ALL=ON"
 fi
 
+# On macOS, build GUI apps as .app bundles
+if [[ "$(uname)" == "Darwin" ]]; then
+  CMakeConfigFlags="${CMakeConfigFlags} -DBUILD_MAC_APP_BUNDLE=ON"
+fi
+
 if [ "${Rebuild}" == "false" ]; then
   echo " "
   echo "Configuring Build System:" 
   ${MockText}cmake -B ${BuildFolder} -S ${SourceFolder} \
     -DCMAKE_BUILD_TYPE=${BuildType} \
     -DBINARY_OUTPUT_DIRECTORY=${OutFolder} \
+    -DEIGEN_BUILD_CMAKE_PACKAGE=ON \
     ${CoverageOption} \
     ${CMakeConfigFlags} \
     ${ExtraArgs}
