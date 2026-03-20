@@ -1,0 +1,122 @@
+---
+title: Glossary
+sidebar_label: Glossary
+sidebar_position: 9
+---
+
+# Glossary
+
+A reference of key terms, abbreviations, and concepts used throughout the MNE-CPP documentation.
+
+## General Concepts
+
+| Term | Definition |
+|---|---|
+| **BEM** | Boundary-Element Model. A numerical method for computing the forward solution by discretizing the boundaries between tissue compartments of different electrical conductivity (scalp, skull, brain). |
+| **Coregistration** | The process of aligning the MEG/EEG head coordinate system with the MRI coordinate system using fiducial landmarks. Stored in a `-trans.fif` file. |
+| **dSPM** | Dynamic Statistical Parametric Mapping. A noise-normalized variant of the minimum-norm estimate that produces statistical maps (F-statistic) rather than current amplitudes. |
+| **ECD** | Equivalent Current Dipole. A point-source model used in dipole fitting to localize focal brain activity. |
+| **eLORETA** | Exact Low-Resolution Electromagnetic Tomography. A distributed source localization method with exact zero localization error for single-dipole sources. |
+| **Evoked response** | The averaged brain response time-locked to a stimulus event. Also called event-related field (ERF) for MEG and event-related potential (ERP) for EEG. |
+| **Forward solution** | The theoretical prediction of the magnetic fields and electric potentials at the sensor locations given a set of source dipoles in the brain. |
+| **Inverse operator** | A matrix that maps measured sensor data to estimated source activity on the cortex or in a volume. Computed from the forward solution and noise-covariance matrix. |
+| **MNE** | Minimum-Norm Estimate. A distributed source localization method that finds the source distribution with minimum overall power that explains the measured data. |
+| **Morphing** | The process of mapping source estimates from one subject's cortical surface to another (e.g., `fsaverage`) for group analysis. |
+| **Noise-covariance matrix** | A matrix characterizing the spatial noise statistics of the sensor data. Used to weight channels appropriately in the inverse solution. |
+| **Regularization** | A mathematical technique to stabilize the ill-posed inverse problem by trading off data fit against solution smoothness. Controlled by the regularization parameter (related to assumed SNR). |
+| **sLORETA** | Standardized Low-Resolution Electromagnetic Tomography. A noise-normalized variant of the minimum-norm estimate with near-zero localization bias for point spread. |
+| **SNR** | Signal-to-Noise Ratio. In MNE, the assumed SNR controls the regularization parameter $\lambda^2 = 1 / \text{SNR}^2$. |
+| **Source space** | The set of candidate dipole locations (and orientations) on the cortical surface or in a volume where source currents are estimated. |
+| **SSP** | Signal-Space Projection. A method for removing environmental noise and artifacts by projecting data away from known noise subspaces. See [Signal-Space Projection](ssp). |
+
+## MEG/EEG Systems and Sensors
+
+| Term | Definition |
+|---|---|
+| **CTF** | A MEG system manufacturer. CTF systems use axial gradiometers and software gradient compensation with reference channels. Uses a different head coordinate convention than Neuromag. |
+| **EEG** | Electroencephalography. Measures electrical potentials on the scalp using electrode caps. |
+| **Gradiometer** | A MEG sensor that measures the spatial gradient of the magnetic field. Planar gradiometers measure the gradient tangential to the helmet surface; axial gradiometers measure the radial gradient. |
+| **KIT** | A 160-channel MEG system (also known as Yokogawa). Data can be imported with [`mne_kit2fiff`](tools-kit2fiff). |
+| **Magnetometer** | A MEG sensor that measures the absolute magnetic field strength at a single point. More sensitive to deep and distant sources than gradiometers, but also more sensitive to environmental noise. |
+| **MEG** | Magnetoencephalography. Measures the magnetic fields produced by neuronal currents using superconducting sensors (SQUIDs) in a magnetically shielded room. |
+| **Neuromag / Vectorview** | A 306-channel MEG system (Elekta / MEGIN) with 102 sensor triplets, each containing one magnetometer and two planar gradiometers. The MNE head coordinate convention originates from this system. |
+| **SQUID** | Superconducting Quantum Interference Device. The ultra-sensitive magnetic sensor used in MEG systems, operating at liquid helium temperatures. |
+
+## Channel Types
+
+| Type Abbreviation | Full Name | Unit | Description |
+|---|---|---|---|
+| **MEG (mag)** | Magnetometer | T (Tesla) | Measures absolute magnetic field |
+| **MEG (grad)** | Planar gradiometer | T/m | Measures tangential field gradient |
+| **EEG** | Electroencephalography | V (Volt) | Scalp electrical potential |
+| **EOG** | Electrooculography | V | Eye movement channels |
+| **ECG** | Electrocardiography | V | Heart activity channel |
+| **EMG** | Electromyography | V | Muscle activity channels |
+| **STI** | Stimulus / Trigger | — | Digital trigger channel (e.g., STI 014) |
+| **MISC** | Miscellaneous | — | Unclassified or auxiliary channels |
+| **REF** | Reference | T | Reference magnetometer channels (used in software gradient compensation) |
+
+## Coordinate Systems
+
+| Coordinate System | Description |
+|---|---|
+| **Head coordinates** | Defined by three fiducial landmarks: nasion (N), left auricular point (LAP), and right auricular point (RAP). Origin midway between LAP and RAP; x-axis toward nasion; y-axis toward LAP; z-axis upward. See [Forward Solution — Coordinate Systems](forward#megeeg-and-mri-coordinate-systems). |
+| **Device coordinates** | The MEG sensor coordinate system, defined by the MEG instrument. Relationship to head coordinates established via head position indicator (HPI) coils. |
+| **MRI (Surface RAS)** | FreeSurfer surface coordinates. Origin at the center of the MRI volume; axes aligned with anatomical directions (Right, Anterior, Superior). |
+| **MNI Talairach** | A standardized brain coordinate system based on the MNI152 template. Used for reporting source locations across subjects. |
+| **FreeSurfer Talairach** | FreeSurfer's own Talairach transformation, which differs slightly from the MNI Talairach. |
+
+For details on coordinate transformations ($T^-$, $T^+$, $T_1$–$T_4$), see [Forward Solution](forward).
+
+## File Formats and Extensions
+
+| Extension | Format | Description |
+|---|---|---|
+| `.fif` | FIFF | Functional Imaging File Format. The native binary format for all MNE data. See [FIFF Format](fiff-format). |
+| `-raw.fif` | FIFF | Raw continuous MEG/EEG data |
+| `-ave.fif` | FIFF | Averaged evoked response data |
+| `-cov.fif` | FIFF | Noise-covariance matrix |
+| `-fwd.fif` | FIFF | Forward solution |
+| `-inv.fif` | FIFF | Inverse operator decomposition |
+| `-src.fif` | FIFF | Source space description |
+| `-bem.fif` | FIFF | BEM geometry |
+| `-bem-sol.fif` | FIFF | BEM solution (precomputed geometry matrices) |
+| `-trans.fif` | FIFF | Coordinate transformation (head-to-MRI) |
+| `-sol.fif` | FIFF | BEM solution matrix |
+| `.stc` | STC | Source Time Course. Binary file with source amplitudes over time for one hemisphere. |
+| `.w` | W file | A single time-point snapshot of source amplitudes for one hemisphere. |
+| `.label` | Label | FreeSurfer label file defining a region of interest (ROI) on the cortical surface. |
+| `.annot` | Annotation | FreeSurfer cortical parcellation (atlas) file. |
+| `.surf` | Surface | FreeSurfer binary surface file (vertices + triangles). |
+| `.mgh` / `.mgz` | MRI volume | FreeSurfer MRI volume format (uncompressed / compressed). |
+| `.hpts` | Head points | Text file with digitization point coordinates. See [Data Conversion — hpts format](data-conversion#the-hpts-format). |
+
+## Environment Variables
+
+| Variable | Purpose |
+|---|---|
+| `SUBJECTS_DIR` | Directory containing FreeSurfer subject directories with anatomical MRI data. |
+| `SUBJECT` | Name of the current subject's directory under `SUBJECTS_DIR`. |
+| `FREESURFER_HOME` | Root directory of the FreeSurfer installation. |
+| `MNE_ROOT` | Root directory of the MNE-C software installation. |
+| `MNE_TRIGGER_CH_NAME` | Override the default trigger channel name (default: `STI 014`). |
+| `MNE_TRIGGER_CH_MASK` | Bit mask applied to the trigger channel (useful for BDF files: `0xff`). |
+
+## Rejection Thresholds
+
+Default units for artifact rejection thresholds used in epoching:
+
+| Channel type | Unit | Typical threshold |
+|---|---|---|
+| Gradiometer | T/m | 2000e-13 – 4000e-13 |
+| Magnetometer | T | 4e-12 – 6e-12 |
+| EEG | V | 100e-6 – 200e-6 |
+| EOG | V | 150e-6 – 250e-6 |
+
+## See Also
+
+- [Workflow](workflow) — The MEG/EEG processing workflow
+- [Forward Solution](forward) — Coordinate systems and the forward problem
+- [Inverse Estimation](inverse) — MNE, dSPM, sLORETA mathematics
+- [FIFF Format](fiff-format) — File format reference
+- [Data Conversion](data-conversion) — Importing data from other systems
