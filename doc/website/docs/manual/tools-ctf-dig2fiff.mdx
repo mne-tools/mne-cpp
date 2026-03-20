@@ -1,0 +1,46 @@
+---
+title: mne_ctf_dig2fiff
+sidebar_label: mne_ctf_dig2fiff
+sidebar_position: 42
+---
+
+# mne_ctf_dig2fiff
+
+## Overview
+
+`mne_ctf_dig2fiff` converts CTF Polhemus digitization data to FIFF and/or hpts format. It computes the head coordinate frame from fiducial points.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_ctf_dig2fiff [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--ctf <name>` | CTF digitization text file **(required)** |
+| `--fif <name>` | Output FIFF file |
+| `--hpts <name>` | Output hpts text file |
+| `--numfids` | Fiducials are numbered (1=nasion, 2=left ear, 3=right ear) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+At least one of `--fif` or `--hpts` must be specified.
+
+## Description
+
+This utility reads CTF digitization text files and converts the data to FIFF and/or hpts format. It automatically identifies the three fiducial points (nasion, left pre-auricular, right pre-auricular) to compute the head coordinate transformation, then transforms all digitization points to the head coordinate frame.
+
+### Example
+
+```bash
+# Convert CTF digitization to FIFF
+mne_ctf_dig2fiff --ctf dig.txt --fif dig.fif
+
+# Convert to both formats with numbered fiducials
+mne_ctf_dig2fiff --ctf dig.txt --fif dig.fif --hpts dig.hpts --numfids
+```

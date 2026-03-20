@@ -1,0 +1,54 @@
+---
+title: mne_volume_data2mri
+sidebar_label: mne_volume_data2mri
+sidebar_position: 51
+---
+
+# mne_volume_data2mri
+
+## Overview
+
+`mne_volume_data2mri` maps volume source estimate data (STC or W format) to MRI voxel space for visualization.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_volume_data2mri [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--src <file>` | Source space FIFF file **(required)** |
+| `--stc <file>` | STC source estimate file |
+| `--w <file>` | W source estimate file |
+| `--out <file>` | Output file **(required)** |
+| `--tpoint <index>` | Time point index for STC files (default: 0) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+Either `--stc` or `--w` must be specified.
+
+## Description
+
+This utility reads a volume source space and a source estimate (in STC or W format), and maps the estimate values to the MRI voxel grid. For STC files, you can select which time point to extract using `--tpoint`. The output contains the non-zero source estimate values mapped to their corresponding MRI locations.
+
+### Workflow Context
+
+Use this tool after computing volume-based inverse solutions to create overlays for MRI visualization.
+
+### Example
+
+```bash
+# Map STC to MRI at default time point 0
+mne_volume_data2mri --src vol-src.fif --stc estimate-vol --out overlay.mgh
+
+# Map a specific time point
+mne_volume_data2mri --src vol-src.fif --stc estimate-vol --out overlay.mgh --tpoint 42
+
+# Map W format estimate
+mne_volume_data2mri --src vol-src.fif --w estimate-vol --out overlay.mgh
+```

@@ -1,0 +1,54 @@
+---
+title: mne_list_bem
+sidebar_label: mne_list_bem
+sidebar_position: 46
+---
+
+# mne_list_bem
+
+## Overview
+
+`mne_list_bem` exports BEM surface data from a FIFF file to ASCII text format. It supports several output formats including Oostendorp and xfit.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_list_bem [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--bem <name>` | BEM model FIFF file **(required)** |
+| `--out <name>` | Output text file **(required)** |
+| `--id <id>` | Surface ID to list (default: 4 = head) |
+| `--gdipoli` | Oostendorp format (vertices + triangles) |
+| `--xfit` | xfit format (same as `--gdipoli --meters`) |
+| `--old` | Old stream format |
+| `--meters` | Output in meters (default: millimeters) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+This utility reads BEM surface data from a FIFF file and exports vertex coordinates and triangle lists to ASCII text. Surface IDs follow the FIFF convention: 4 = scalp, 3 = outer skull, 1 = inner skull (brain).
+
+### Output Formats
+
+- **Default** — Vertex coordinates only (x, y, z per line)
+- **Oostendorp (`--gdipoli`)** — Header with counts, then vertices and triangles
+- **xfit (`--xfit`)** — Oostendorp format in meters
+- **Old stream (`--old`)** — Legacy format
+
+### Example
+
+```bash
+# List head surface in default format
+mne_list_bem --bem sam-bem.fif --out head.txt
+
+# Export in Oostendorp format for external BEM solvers
+mne_list_bem --bem sam-bem.fif --out inner_skull.txt --id 1 --gdipoli
+```

@@ -1,0 +1,45 @@
+---
+title: mne_insert_4D_comp
+sidebar_label: mne_insert_4D_comp
+sidebar_position: 45
+---
+
+# mne_insert_4D_comp
+
+## Overview
+
+`mne_insert_4D_comp` merges 4D Neuroimaging (BTi) Magnes WH3600 reference channel compensation data with a FIFF file. It supports optional Procrustes alignment of sensor positions.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_insert_4D_comp [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--in <file>` | Input FIFF file with MEG data **(required)** |
+| `--ref <file>` | Reference channel data file (text) **(required)** |
+| `--out <file>` | Output FIFF file **(required)** |
+| `--refpos <file>` | Reference sensor positions file |
+| `--megpos <file>` | MEG sensor positions file (for alignment) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+This utility merges 4D Neuroimaging reference magnetometer compensation channels with MEG data stored in FIFF format. When sensor position files are provided, the tool performs Procrustes transformation to align reference sensor positions with the MEG sensor coordinate frame using SVD-based optimization.
+
+### Example
+
+```bash
+mne_insert_4D_comp --in raw.fif --ref ref_data.txt --out raw_comp.fif
+
+# With sensor position alignment
+mne_insert_4D_comp --in raw.fif --ref ref_data.txt --out raw_comp.fif \
+    --refpos ref_positions.txt --megpos meg_positions.txt
+```

@@ -1,0 +1,49 @@
+---
+title: mne_collect_transforms
+sidebar_label: mne_collect_transforms
+sidebar_position: 38
+---
+
+# mne_collect_transforms
+
+## Overview
+
+`mne_collect_transforms` collects coordinate transforms from FIFF files. It reads device-to-head and MRI-to-head transforms and optionally writes them to an output file.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_collect_transforms [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--meas <name>` | MEG measurement file (device→head transform) |
+| `--mri <name>` | FIFF MRI description file (MRI→head transform) |
+| `--out <name>` | Output file name |
+| `--help` | Print help |
+| `--version` | Print version |
+
+At least one of `--meas` or `--mri` must be specified.
+
+## Description
+
+This utility extracts coordinate transformation matrices from FIFF files. It reads the device-to-head transform from a MEG measurement file and the MRI-to-head transform from an MRI description file. The transforms can be written to a single output FIFF file for later use.
+
+### Workflow Context
+
+Use this tool to gather transforms for visualization or when transforms need to be applied in scripts that combine MEG measurements with MRI data.
+
+### Example
+
+```bash
+# Collect both transforms into one file
+mne_collect_transforms --meas raw.fif --mri T1-neuromag.fif --out transforms.fif
+
+# Collect only the device-to-head transform
+mne_collect_transforms --meas raw.fif --out dev_head.fif
+```

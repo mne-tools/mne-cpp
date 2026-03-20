@@ -1,0 +1,44 @@
+---
+title: mne_eximia2fiff
+sidebar_label: mne_eximia2fiff
+sidebar_position: 43
+---
+
+# mne_eximia2fiff
+
+## Overview
+
+`mne_eximia2fiff` converts Nexstim eXimia EEG data (`.nxe` format) to FIFF format.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_eximia2fiff [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--nxe <file>` | eXimia .nxe data file **(required)** |
+| `--dig <file>` | Digitizer data file |
+| `--out <file>` | Output FIFF file **(required)** |
+| `--sfreq <Hz>` | Sampling frequency (default: 1450) |
+| `--nchan <count>` | Number of channels (default: 64) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+This utility converts Nexstim eXimia EEG data to FIFF format. It works by creating an intermediate Brain Vision header file and then invoking `mne_brain_vision2fiff` for the final conversion. Digitization data can be included via the `--dig` option.
+
+### Example
+
+```bash
+mne_eximia2fiff --nxe recording.nxe --out recording.fif
+
+# With digitizer data and custom sampling rate
+mne_eximia2fiff --nxe recording.nxe --dig digitizer.txt --out recording.fif --sfreq 1000
+```
