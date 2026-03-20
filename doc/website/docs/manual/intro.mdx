@@ -26,25 +26,99 @@ The MNE-CPP software suite includes the following main components:
 |---|---|
 | [**mne_scan**](scan) | Real-time acquisition and processing of MEG/EEG data with plugin-based architecture |
 | [**mne_analyze**](analyze) | Sensor- and source-level analysis of pre-recorded MEG/EEG data *(under development)* |
-| [**mne_anonymize**](tools-anonymize) | Removes or modifies personal health information from FIFF files (GUI and CLI) |
 | [**mne_inspect**](inspect) | 3D brain visualization and source analysis |
 | [**mne_browse**](browse-raw) | Browsing and visualization of raw MEG/EEG FIFF data files *(under development)* |
 
 ### Command-Line Tools
 
+See the [Command-Line Tools Overview](tools-overview) for full details. The tools are organized by domain:
+
+#### Forward Modeling
+
 | Tool | Description |
 |---|---|
-| [**mne_compute_raw_inverse**](tools-compute-raw-inverse) | Computes inverse solutions (MNE/dSPM/sLORETA) from raw or evoked data |
-| [**mne_dipole_fit**](tools-dipole-fit) | Performs electric current dipole fitting on MEG/EEG data |
-| [**mne_edf2fiff**](tools-edf2fiff) | Converts EDF (European Data Format) files to FIFF format |
-| [**mne_forward_solution**](tools-forward-solution) | Computes the MEG/EEG forward solution |
-| [**mne_show_fiff**](tools-show-fiff) | Lists the contents of a FIFF file |
+| [**mne_watershed_bem**](tools-watershed-bem) | Creates BEM surfaces using FreeSurfer's watershed algorithm |
 | [**mne_flash_bem**](tools-flash-bem) | Creates BEM surfaces using multi-echo FLASH MRI sequences |
+| [**mne_surf2bem**](tools-surf2bem) | Converts FreeSurfer surfaces to BEM FIFF files |
 | [**mne_setup_forward_model**](tools-setup-forward-model) | Sets up the BEM for forward modeling |
 | [**mne_setup_mri**](tools-setup-mri) | Sets up FreeSurfer MRI data for MNE processing |
-| [**mne_surf2bem**](tools-surf2bem) | Converts FreeSurfer surfaces to BEM FIFF files |
-| [**mne_watershed_bem**](tools-watershed-bem) | Creates BEM surfaces using FreeSurfer's watershed algorithm |
+| [**mne_forward_solution**](tools-forward-solution) | Computes the MEG/EEG forward solution |
+| [**mne_make_source_space**](tools-make-source-space) | Creates a source space for forward/inverse computations |
+| [**mne_make_sphere_bem**](tools-make-sphere-bem) | Creates a spherically symmetric BEM model |
+| [**mne_prepare_bem_model**](tools-prepare-bem-model) | Prepares a BEM model for forward computation |
+| [**mne_average_forward_solutions**](tools-average-forward-solutions) | Averages forward solutions |
+| [**mne_check_surface**](tools-check-surface) | Checks BEM surface integrity |
+
+#### Inverse
+
+| Tool | Description |
+|---|---|
+| [**mne_inverse_operator**](tools-inverse-operator) | Assembles the inverse operator |
+| [**mne_compute_mne**](tools-compute-mne) | Computes MNE/dSPM/sLORETA from evoked data |
+| [**mne_compute_raw_inverse**](tools-compute-raw-inverse) | Computes inverse solutions from raw or evoked data |
+| [**mne_dipole_fit**](tools-dipole-fit) | Performs electric current dipole fitting |
+| [**mne_sensitivity_map**](tools-sensitivity-map) | Computes sensitivity maps for MEG/EEG |
+| [**mne_smooth**](tools-smooth) | Smooths source estimates on the cortical surface |
+| [**mne_volume_data2mri**](tools-volume-data2mri) | Converts volumetric source estimates to MRI coordinates |
+
+#### Preprocessing
+
+| Tool | Description |
+|---|---|
+| [**mne_anonymize**](tools-anonymize) | Removes or modifies personal health information from FIFF files |
+| [**mne_process_raw**](tools-process-raw) | Filters, averages, and processes raw MEG/EEG data |
+| [**mne_mark_bad_channels**](tools-mark-bad-channels) | Marks bad channels in a FIFF file |
+| [**mne_compensate_data**](tools-compensate-data) | Applies or removes software gradient compensation |
+| [**mne_cov2proj**](tools-cov2proj) | Converts a noise covariance matrix to a projection operator |
+| [**mne_add_to_meas_info**](tools-add-to-meas-info) | Adds information to a FIFF measurement file |
+| [**mne_create_comp_data**](tools-create-comp-data) | Creates compensation data for CTF systems |
+| [**mne_fix_mag_coil_types**](tools-fix-mag-coil-types) | Fixes magnetometer coil type entries |
+| [**mne_insert_4D_comp**](tools-insert-4d-comp) | Inserts 4D compensation data into a FIFF file |
+| [**mne_rename_channels**](tools-rename-channels) | Renames channels in a FIFF file |
+
+#### Conversion
+
+| Tool | Description |
+|---|---|
+| [**mne_edf2fiff**](tools-edf2fiff) | Converts EDF (European Data Format) files to FIFF |
+| [**mne_brain_vision2fiff**](tools-brain-vision2fiff) | Converts Brain Vision files to FIFF |
+| [**mne_ctf2fiff**](tools-ctf2fiff) | Converts CTF data to FIFF |
+| [**mne_ctf_dig2fiff**](tools-ctf-dig2fiff) | Converts CTF digitization data to FIFF |
+| [**mne_kit2fiff**](tools-kit2fiff) | Converts KIT/Yokogawa data to FIFF |
+| [**mne_raw2mat**](tools-raw2mat) | Converts raw FIFF data to MATLAB format |
+| [**mne_eximia2fiff**](tools-eximia2fiff) | Converts Nexstim eXimia data to FIFF |
+| [**mne_tufts2fiff**](tools-tufts2fiff) | Converts Tufts University data to FIFF |
+| [**mne_convert_dig_data**](tools-convert-dig-data) | Converts digitizer data between formats |
+| [**mne_convert_surface**](tools-convert-surface) | Converts surface files between formats |
+| [**mne_make_cor_set**](tools-make-cor-set) | Creates a set of COR files from MRI data |
+
+#### Surface
+
+| Tool | Description |
+|---|---|
+| [**mne_annot2labels**](tools-annot2labels) | Converts FreeSurfer annotation files to label files |
+| [**mne_add_patch_info**](tools-add-patch-info) | Adds patch information to a source space |
+| [**mne_volume_source_space**](tools-volume-source-space) | Creates a volumetric source space |
+| [**mne_morph_labels**](tools-morph-labels) | Morphs label files between subjects |
+| [**mne_make_morph_maps**](tools-make-morph-maps) | Creates morphing maps between subjects |
+| [**mne_make_eeg_layout**](tools-make-eeg-layout) | Creates EEG channel layout files |
+
+#### Info
+
+| Tool | Description |
+|---|---|
+| [**mne_show_fiff**](tools-show-fiff) | Lists the contents of a FIFF file |
+| [**mne_list_source_space**](tools-list-source-space) | Lists source space information |
+| [**mne_compare_fif_files**](tools-compare-fif-files) | Compares two FIFF files |
+| [**mne_collect_transforms**](tools-collect-transforms) | Collects coordinate transforms from a FIFF file |
+| [**mne_list_bem**](tools-list-bem) | Lists BEM surface information |
+
+#### Server & Simulation
+
+| Tool | Description |
+|---|---|
 | [**mne_rt_server**](tools-rt-server) | Real-time FIFF data streaming server |
+| [**mne_simu**](tools-simu) | Simulates MEG/EEG data |
 
 ## Prerequisites
 
