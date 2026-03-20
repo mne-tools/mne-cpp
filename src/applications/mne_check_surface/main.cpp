@@ -38,12 +38,15 @@
 #include <mne/mne_bem_surface.h>
 #include <fiff/fiff_constants.h>
 #include <fs/fs_surface.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QDebug>
 
@@ -61,6 +64,7 @@
 using namespace MNELIB;
 using namespace FIFFLIB;
 using namespace FSLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -199,57 +203,42 @@ static float minSurfaceDist(const MNEBemSurface& s1, const MNEBemSurface& s2)
 }
 
 //=============================================================================================================
-// USAGE
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Check BEM surface topology.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --bem <file>       BEM FIFF file to check\n");
-    fprintf(stderr, "  --surf <file>      FreeSurfer surface file to check (standalone)\n");
-    fprintf(stderr, "  --id <id>          Surface ID for --surf: 4=head, 3=skull, 1=brain (default: 1)\n");
-    fprintf(stderr, "  --thickness        Also check inter-surface distances\n");
-    fprintf(stderr, "  --help             Print this help\n");
-    fprintf(stderr, "  --version          Print version\n");
-}
-
-//=============================================================================================================
 // MAIN
 //=============================================================================================================
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_check_surface");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString bemFile;
-    QString surfFile;
-    int surfId = FIFFV_BEM_SURF_ID_BRAIN;
-    bool doThickness = false;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Check BEM surface topology (completeness, nesting, thickness).\n\nUse --bem for BEM FIFF files or --surf for FreeSurfer surface files.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) { printf("%s version %s\n", argv[0], PROGRAM_VERSION); return 0; }
-        else if (strcmp(argv[k], "--bem") == 0) {
-            if (++k >= argc) { qCritical("--bem: argument required."); return 1; }
-            bemFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--surf") == 0) {
-            if (++k >= argc) { qCritical("--surf: argument required."); return 1; }
-            surfFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--id") == 0) {
-            if (++k >= argc) { qCritical("--id: argument required."); return 1; }
-            surfId = atoi(argv[k]);
-        }
-        else if (strcmp(argv[k], "--thickness") == 0) { doThickness = true; }
-        else { qCritical("Unrecognized option: %s", argv[k]); usage(argv[0]); return 1; }
-    }
+    QCommandLineOption bemOpt("bem", "BEM FIFF file to check.", "file");
+    parser.addOption(bemOpt);
+
+    QCommandLineOption surfOpt("surf", "FreeSurfer surface file to check (standalone).", "file");
+    parser.addOption(surfOpt);
+
+    QCommandLineOption idOpt("id", "Surface ID for --surf: 4=head, 3=skull, 1=brain.", "id", "1");
+    parser.addOption(idOpt);
+
+    QCommandLineOption thicknessOpt("thickness", "Also check inter-surface distances.");
+    parser.addOption(thicknessOpt);
+
+    parser.process(app);
+
+    QString bemFile = parser.value(bemOpt);
+    QString surfFile = parser.value(surfOpt);
+    int surfId = parser.value(idOpt).toInt();
+    bool doThickness = parser.isSet(thicknessOpt);
 
     if (bemFile.isEmpty() && surfFile.isEmpty()) {
         qCritical("Either --bem or --surf is required.");
-        usage(argv[0]);
         return 1;
     }
 

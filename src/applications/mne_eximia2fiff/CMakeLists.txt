@@ -14,6 +14,7 @@ qt_add_executable(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
+    mne_utils
 )
 
 qt_finalize_target(${PROJECT_NAME})

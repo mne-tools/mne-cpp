@@ -36,12 +36,15 @@
 
 #include <mne/mne_forward_solution.h>
 #include <fiff/fiff_stream.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QFileInfo>
 #include <QDebug>
@@ -59,6 +62,7 @@
 
 using namespace MNELIB;
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -69,55 +73,36 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Average multiple forward solutions.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --fwd <file>       Forward solution FIFF file (repeat for each)\n");
-    fprintf(stderr, "  --weights <w1,w2,...>  Comma-separated weights (default: equal)\n");
-    fprintf(stderr, "  --listfile <file>  Text file with one fwd filename per line\n");
-    fprintf(stderr, "  --out <file>       Output averaged forward solution FIFF file\n");
-    fprintf(stderr, "  --help             Print this help\n");
-    fprintf(stderr, "  --version          Print version\n");
-}
-
-//=============================================================================================================
-
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_average_forward_solutions");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QStringList fwdFiles;
-    QString weightStr;
-    QString listFile;
-    QString outFile;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Average multiple forward solutions.\n\nUse --fwd multiple times or --listfile to specify input files.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) { printf("%s version %s\n", argv[0], PROGRAM_VERSION); return 0; }
-        else if (strcmp(argv[k], "--fwd") == 0) {
-            if (++k >= argc) { qCritical("--fwd: argument required."); return 1; }
-            fwdFiles.append(QString(argv[k]));
-        }
-        else if (strcmp(argv[k], "--weights") == 0) {
-            if (++k >= argc) { qCritical("--weights: argument required."); return 1; }
-            weightStr = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--listfile") == 0) {
-            if (++k >= argc) { qCritical("--listfile: argument required."); return 1; }
-            listFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--out") == 0) {
-            if (++k >= argc) { qCritical("--out: argument required."); return 1; }
-            outFile = QString(argv[k]);
-        }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption fwdOpt("fwd", "Forward solution FIFF file (repeat for each).", "file");
+    parser.addOption(fwdOpt);
+
+    QCommandLineOption weightsOpt("weights", "Comma-separated weights (default: equal).", "w1,w2,...");
+    parser.addOption(weightsOpt);
+
+    QCommandLineOption listfileOpt("listfile", "Text file with one fwd filename per line.", "file");
+    parser.addOption(listfileOpt);
+
+    QCommandLineOption outOpt("out", "Output averaged forward solution FIFF file.", "file");
+    parser.addOption(outOpt);
+
+    parser.process(app);
+
+    QStringList fwdFiles = parser.values(fwdOpt);
+    QString weightStr = parser.value(weightsOpt);
+    QString listFile = parser.value(listfileOpt);
+    QString outFile = parser.value(outOpt);
 
     // Read files from listfile if specified
     if (!listFile.isEmpty()) {
@@ -134,8 +119,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (fwdFiles.size() < 2) { qCritical("At least 2 forward solutions are required."); usage(argv[0]); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); usage(argv[0]); return 1; }
+    if (fwdFiles.size() < 2) { qCritical("At least 2 forward solutions are required."); return 1; }
+    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
 
     // Parse weights
     QList<double> weights;

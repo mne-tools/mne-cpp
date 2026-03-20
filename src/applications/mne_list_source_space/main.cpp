@@ -39,12 +39,15 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_types.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QDebug>
 
@@ -60,6 +63,7 @@
 
 using namespace MNELIB;
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -67,23 +71,6 @@ using namespace Eigen;
 //=============================================================================================================
 
 #define PROGRAM_VERSION "2.0.0"
-
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "List source space information.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --src <file>    Source space FIFF file\n");
-    fprintf(stderr, "  --pnt <file>    Output point file (MRIlab format)\n");
-    fprintf(stderr, "  --dip <file>    Output dipole file (MRIlab format)\n");
-    fprintf(stderr, "  --vert <file>   Output vertex file (text)\n");
-    fprintf(stderr, "  --all           List all vertices (not just active)\n");
-    fprintf(stderr, "  --coord <name>  Coordinate frame: head or mri (default: mri)\n");
-    fprintf(stderr, "  --help          Print this help\n");
-    fprintf(stderr, "  --version       Print version\n");
-}
 
 //=============================================================================================================
 
@@ -114,54 +101,49 @@ static const char *spaceTypeName(int type)
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_list_source_space");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString srcName;
-    QString pntName;
-    QString dipName;
-    QString vertName;
-    bool listAll = false;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("List source space information in various output formats.");
+    parser.addHelpOption();
+    parser.addVersionOption();
+
+    QCommandLineOption srcOpt("src", "Source space FIFF file.", "file");
+    parser.addOption(srcOpt);
+
+    QCommandLineOption pntOpt("pnt", "Output point file (MRIlab format).", "file");
+    parser.addOption(pntOpt);
+
+    QCommandLineOption dipOpt("dip", "Output dipole file (MRIlab format).", "file");
+    parser.addOption(dipOpt);
+
+    QCommandLineOption vertOpt("vert", "Output vertex file (text).", "file");
+    parser.addOption(vertOpt);
+
+    QCommandLineOption allOpt("all", "List all vertices (not just active).");
+    parser.addOption(allOpt);
+
+    QCommandLineOption coordOpt("coord", "Coordinate frame: head or mri.", "name", "mri");
+    parser.addOption(coordOpt);
+
+    parser.process(app);
+
+    QString srcName = parser.value(srcOpt);
+    QString pntName = parser.value(pntOpt);
+    QString dipName = parser.value(dipOpt);
+    QString vertName = parser.value(vertOpt);
+    bool listAll = parser.isSet(allOpt);
     int coordFrame = FIFFV_COORD_MRI;
-
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) {
-            fprintf(stderr, "%s version %s\n", argv[0], PROGRAM_VERSION);
-            return 0;
-        }
-        else if (strcmp(argv[k], "--src") == 0) {
-            if (++k >= argc) { qCritical("--src: argument required."); return 1; }
-            srcName = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--pnt") == 0) {
-            if (++k >= argc) { qCritical("--pnt: argument required."); return 1; }
-            pntName = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--dip") == 0) {
-            if (++k >= argc) { qCritical("--dip: argument required."); return 1; }
-            dipName = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--vert") == 0) {
-            if (++k >= argc) { qCritical("--vert: argument required."); return 1; }
-            vertName = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--all") == 0) { listAll = true; }
-        else if (strcmp(argv[k], "--coord") == 0) {
-            if (++k >= argc) { qCritical("--coord: argument required."); return 1; }
-            if (strcmp(argv[k], "head") == 0) coordFrame = FIFFV_COORD_HEAD;
-            else if (strcmp(argv[k], "mri") == 0) coordFrame = FIFFV_COORD_MRI;
-            else { qCritical("Unknown coordinate frame: %s (use head or mri)", argv[k]); return 1; }
-        }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QString coordStr = parser.value(coordOpt);
+    if (coordStr == "head") coordFrame = FIFFV_COORD_HEAD;
+    else if (coordStr == "mri") coordFrame = FIFFV_COORD_MRI;
+    else { qCritical("Unknown coordinate frame: %s (use head or mri)", qPrintable(coordStr)); return 1; }
 
     if (srcName.isEmpty()) {
         qCritical("--src is required.");
-        usage(argv[0]);
         return 1;
     }
 

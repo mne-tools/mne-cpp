@@ -42,12 +42,15 @@
 #include <fs/fs_surface.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_constants.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QDir>
 #include <QDebug>
@@ -65,6 +68,7 @@
 
 using namespace FSLIB;
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -122,64 +126,43 @@ static SparseMatrix<double> computeMorphMap(const MatrixX3f& srcSphere,
 
 //=============================================================================================================
 
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Compute morphing maps between two subjects.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --from <subject>     Source subject name\n");
-    fprintf(stderr, "  --to <subject>       Destination subject name\n");
-    fprintf(stderr, "  --subjects_dir <dir> Subjects directory (default: $SUBJECTS_DIR)\n");
-    fprintf(stderr, "  --out <file>         Output morph map FIFF file\n");
-    fprintf(stderr, "  --nearest <n>        Number of nearest neighbors (default: 5)\n");
-    fprintf(stderr, "  --help               Print this help\n");
-    fprintf(stderr, "  --version            Print version\n");
-}
-
-//=============================================================================================================
-
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_make_morph_maps");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString fromSubject;
-    QString toSubject;
-    QString subjectsDir = qEnvironmentVariable("SUBJECTS_DIR");
-    QString outFile;
-    int nNearest = N_NEAREST;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Compute morphing maps between two subjects.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) { printf("%s version %s\n", argv[0], PROGRAM_VERSION); return 0; }
-        else if (strcmp(argv[k], "--from") == 0) {
-            if (++k >= argc) { qCritical("--from: argument required."); return 1; }
-            fromSubject = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--to") == 0) {
-            if (++k >= argc) { qCritical("--to: argument required."); return 1; }
-            toSubject = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--subjects_dir") == 0) {
-            if (++k >= argc) { qCritical("--subjects_dir: argument required."); return 1; }
-            subjectsDir = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--out") == 0) {
-            if (++k >= argc) { qCritical("--out: argument required."); return 1; }
-            outFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--nearest") == 0) {
-            if (++k >= argc) { qCritical("--nearest: argument required."); return 1; }
-            nNearest = atoi(argv[k]);
-        }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption fromOpt("from", "Source subject name.", "subject");
+    parser.addOption(fromOpt);
+
+    QCommandLineOption toOpt("to", "Destination subject name.", "subject");
+    parser.addOption(toOpt);
+
+    QCommandLineOption subjDirOpt("subjects_dir", "Subjects directory.", "dir", qEnvironmentVariable("SUBJECTS_DIR"));
+    parser.addOption(subjDirOpt);
+
+    QCommandLineOption outOpt("out", "Output morph map FIFF file.", "file");
+    parser.addOption(outOpt);
+
+    QCommandLineOption nearestOpt("nearest", "Number of nearest neighbors.", "n", "5");
+    parser.addOption(nearestOpt);
+
+    parser.process(app);
+
+    QString fromSubject = parser.value(fromOpt);
+    QString toSubject = parser.value(toOpt);
+    QString subjectsDir = parser.value(subjDirOpt);
+    QString outFile = parser.value(outOpt);
+    int nNearest = parser.value(nearestOpt).toInt();
 
     if (fromSubject.isEmpty() || toSubject.isEmpty()) {
-        qCritical("--from and --to are required."); usage(argv[0]); return 1;
+        qCritical("--from and --to are required."); return 1;
     }
     if (subjectsDir.isEmpty()) { qCritical("$SUBJECTS_DIR not set."); return 1; }
     if (outFile.isEmpty()) {

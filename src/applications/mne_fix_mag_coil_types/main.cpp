@@ -39,11 +39,15 @@
 #include <fiff/fiff_dir_entry.h>
 #include <fiff/fiff_ch_info.h>
 
+#include <utils/generics/applicationlogger.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QDebug>
 
@@ -52,26 +56,13 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
 //=============================================================================================================
 
 #define PROGRAM_VERSION "2.0.0"
-
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options] <fiff file> ...\n", name);
-    fprintf(stderr, "Fix magnetometer coil types in FIFF files.\n\n");
-    fprintf(stderr, "  Replaces FIFFV_COIL_VV_MAG_T1 with FIFFV_COIL_VV_MAG_T3.\n");
-    fprintf(stderr, "  Sets FIFFV_COIL_NONE for non-MEG/EEG channels.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --magnes     Also fix Magnes WH magnetometer coil types\n");
-    fprintf(stderr, "  --help       Print this help\n");
-    fprintf(stderr, "  --version    Print version\n");
-}
 
 //=============================================================================================================
 
@@ -149,38 +140,39 @@ static int processFile(const QString &name, bool doMagnes)
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_fix_mag_coil_types");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    if (argc < 2) {
-        usage(argv[0]);
-        return 1;
+    QCommandLineParser parser;
+    parser.setApplicationDescription(
+        "Fix magnetometer coil types in FIFF files.\n\n"
+        "Replaces FIFFV_COIL_VV_MAG_T1 with FIFFV_COIL_VV_MAG_T3.\n"
+        "Sets FIFFV_COIL_NONE for non-MEG/EEG channels."
+    );
+    parser.addHelpOption();
+    parser.addVersionOption();
+
+    QCommandLineOption magnesOpt("magnes",
+        "Also fix Magnes WH magnetometer coil types.");
+    parser.addOption(magnesOpt);
+
+    parser.addPositionalArgument("files", "FIFF file(s) to process.", "<file> ...");
+
+    parser.process(app);
+
+    bool doMagnes = parser.isSet(magnesOpt);
+    QStringList files = parser.positionalArguments();
+
+    if (files.isEmpty()) {
+        qCritical("No input files specified.");
+        parser.showHelp(1);
     }
 
-    bool doMagnes = false;
-    int start = 1;
-
-    if (strcmp(argv[1], "--magnes") == 0) {
-        doMagnes = true;
-        start++;
-    } else if (strcmp(argv[1], "--help") == 0) {
-        usage(argv[0]);
-        return 0;
-    } else if (strcmp(argv[1], "--version") == 0) {
-        fprintf(stderr, "%s version %s\n", argv[0], PROGRAM_VERSION);
-        return 0;
-    }
-
-    for (int k = start; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) {
-            usage(argv[0]);
-            return 0;
-        }
-        if (strcmp(argv[k], "--version") == 0) {
-            fprintf(stderr, "%s version %s\n", argv[0], PROGRAM_VERSION);
-            return 0;
-        }
-        fprintf(stderr, "%s ... ", argv[k]);
-        if (processFile(QString(argv[k]), doMagnes) != 0) {
+    for (const QString &fname : files) {
+        fprintf(stderr, "%s ... ", qPrintable(fname));
+        if (processFile(fname, doMagnes) != 0) {
             fprintf(stderr, "[failed]\n");
         } else {
             fprintf(stderr, "[ok]\n");

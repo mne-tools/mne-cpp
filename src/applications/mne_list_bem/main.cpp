@@ -39,11 +39,15 @@
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
 
+#include <utils/generics/applicationlogger.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QDebug>
 
@@ -59,6 +63,7 @@
 
 using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -69,77 +74,68 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Produces ASCII data from a BEM FIFF file.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --bem <name>    BEM model file\n");
-    fprintf(stderr, "  --out <name>    Output text file\n");
-    fprintf(stderr, "  --id <id>       Surface id to list (default: %d)\n", FIFFV_BEM_SURF_ID_HEAD);
-    fprintf(stderr, "                  %d = outer skin (scalp)\n", FIFFV_BEM_SURF_ID_HEAD);
-    fprintf(stderr, "                  %d = outer skull\n", FIFFV_BEM_SURF_ID_SKULL);
-    fprintf(stderr, "                  %d = inner skull\n", FIFFV_BEM_SURF_ID_BRAIN);
-    fprintf(stderr, "  --gdipoli       Oostendorp format (vertices + triangles)\n");
-    fprintf(stderr, "  --xfit          xfit format (same as --gdipoli --meters)\n");
-    fprintf(stderr, "  --old           Old stream format\n");
-    fprintf(stderr, "  --meters        Output in meters (default: millimeters)\n");
-    fprintf(stderr, "  --help          Print this help\n");
-    fprintf(stderr, "  --version       Print version\n");
-}
-
-//=============================================================================================================
-
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_list_bem");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString bemName;
-    QString outName;
-    int surfId = FIFFV_BEM_SURF_ID_HEAD;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Produce ASCII data from a BEM FIFF file.\n\nLists vertices and triangles of specified BEM surfaces.");
+    parser.addHelpOption();
+    parser.addVersionOption();
+
+    QCommandLineOption bemOpt("bem", "BEM model file.", "name");
+    parser.addOption(bemOpt);
+
+    QCommandLineOption outOpt("out", "Output text file.", "name");
+    parser.addOption(outOpt);
+
+    QCommandLineOption idOpt("id", "Surface id to list.", "id", "4");
+    parser.addOption(idOpt);
+
+    QCommandLineOption gdipoliOpt("gdipoli", "Oostendorp format (vertices + triangles).");
+    parser.addOption(gdipoliOpt);
+
+    QCommandLineOption xfitOpt("xfit", "xfit format (same as --gdipoli --meters).");
+    parser.addOption(xfitOpt);
+
+    QCommandLineOption oldOpt("old", "Old stream format.");
+    parser.addOption(oldOpt);
+
+    QCommandLineOption metersOpt("meters", "Output in meters (default: millimeters).");
+    parser.addOption(metersOpt);
+
+    parser.process(app);
+
+    QString bemName = parser.value(bemOpt);
+    QString outName = parser.value(outOpt);
+    int surfId = parser.value(idOpt).toInt();
     bool thomOutput = false;
     bool oldOutput = false;
     float lengthMult = 1000.0f;
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) {
-            usage(argv[0]);
-            return 0;
-        } else if (strcmp(argv[k], "--version") == 0) {
-            fprintf(stderr, "%s version %s\n", argv[0], PROGRAM_VERSION);
-            return 0;
-        } else if (strcmp(argv[k], "--bem") == 0) {
-            if (k + 1 >= argc) { qCritical("--bem: argument required."); return 1; }
-            bemName = QString(argv[++k]);
-        } else if (strcmp(argv[k], "--out") == 0) {
-            if (k + 1 >= argc) { qCritical("--out: argument required."); return 1; }
-            outName = QString(argv[++k]);
-        } else if (strcmp(argv[k], "--id") == 0) {
-            if (k + 1 >= argc) { qCritical("--id: argument required."); return 1; }
-            surfId = atoi(argv[++k]);
-        } else if (strcmp(argv[k], "--gdipoli") == 0) {
-            thomOutput = true;
-            oldOutput = false;
-        } else if (strcmp(argv[k], "--xfit") == 0) {
-            thomOutput = true;
-            oldOutput = false;
-            lengthMult = 1.0f;
-        } else if (strcmp(argv[k], "--old") == 0) {
-            thomOutput = false;
-            oldOutput = true;
-        } else if (strcmp(argv[k], "--meters") == 0) {
-            lengthMult = 1.0f;
-        } else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
+    if (parser.isSet(gdipoliOpt)) {
+        thomOutput = true;
+        oldOutput = false;
+    }
+    if (parser.isSet(xfitOpt)) {
+        thomOutput = true;
+        oldOutput = false;
+        lengthMult = 1.0f;
+    }
+    if (parser.isSet(oldOpt)) {
+        thomOutput = false;
+        oldOutput = true;
+    }
+    if (parser.isSet(metersOpt)) {
+        lengthMult = 1.0f;
     }
 
     if (bemName.isEmpty() || outName.isEmpty()) {
         qCritical("Both --bem and --out are required.");
-        usage(argv[0]);
-        return 1;
+        parser.showHelp(1);
     }
 
     fprintf(stderr, "input  file : %s\n", qPrintable(bemName));

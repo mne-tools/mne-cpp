@@ -36,11 +36,14 @@
 
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_stream.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QCommandLineOption>
+#include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QFile>
 #include <QDebug>
@@ -58,6 +61,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -73,21 +77,6 @@ static const quint32 miUINT32   = 6;
 static const quint32 miINT8     = 1;
 static const quint32 miMATRIX   = 14;
 static const quint32 mxDOUBLE_CLASS = 6;
-
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Export raw FIFF data to MATLAB .mat file.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --raw <file>       Input raw FIFF file\n");
-    fprintf(stderr, "  --out <file>       Output .mat file\n");
-    fprintf(stderr, "  --from <samp>      First sample (default: start of file)\n");
-    fprintf(stderr, "  --to <samp>        Last sample (default: end of file)\n");
-    fprintf(stderr, "  --help             Print this help\n");
-    fprintf(stderr, "  --version          Print version\n");
-}
 
 //=============================================================================================================
 // MAT-file writing helpers
@@ -187,41 +176,37 @@ static void writeMatrixVariable(QDataStream &ds, const QString &name, const Matr
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_raw2mat");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString rawFile;
-    QString outFile;
-    int fromSamp = -1;
-    int toSamp = -1;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Export raw FIFF data to MATLAB Level 5 MAT file format.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) { printf("%s version %s\n", argv[0], PROGRAM_VERSION); return 0; }
-        else if (strcmp(argv[k], "--raw") == 0) {
-            if (++k >= argc) { qCritical("--raw: argument required."); return 1; }
-            rawFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--out") == 0) {
-            if (++k >= argc) { qCritical("--out: argument required."); return 1; }
-            outFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--from") == 0) {
-            if (++k >= argc) { qCritical("--from: argument required."); return 1; }
-            fromSamp = atoi(argv[k]);
-        }
-        else if (strcmp(argv[k], "--to") == 0) {
-            if (++k >= argc) { qCritical("--to: argument required."); return 1; }
-            toSamp = atoi(argv[k]);
-        }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption rawOpt("raw", "Input raw FIFF file.", "file");
+    parser.addOption(rawOpt);
 
-    if (rawFile.isEmpty()) { qCritical("--raw is required."); usage(argv[0]); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); usage(argv[0]); return 1; }
+    QCommandLineOption outOpt("out", "Output .mat file.", "file");
+    parser.addOption(outOpt);
+
+    QCommandLineOption fromOpt("from", "First sample.", "samp", "-1");
+    parser.addOption(fromOpt);
+
+    QCommandLineOption toOpt("to", "Last sample.", "samp", "-1");
+    parser.addOption(toOpt);
+
+    parser.process(app);
+
+    QString rawFile = parser.value(rawOpt);
+    QString outFile = parser.value(outOpt);
+    int fromSamp = parser.value(fromOpt).toInt();
+    int toSamp = parser.value(toOpt).toInt();
+
+    if (rawFile.isEmpty()) { qCritical("--raw is required."); parser.showHelp(1); }
+    if (outFile.isEmpty()) { qCritical("--out is required."); parser.showHelp(1); }
 
     // Load raw data
     QFile fRaw(rawFile);

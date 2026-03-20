@@ -40,12 +40,15 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_raw_data.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QDebug>
 
@@ -61,6 +64,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -71,58 +75,39 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Convert noise covariance eigenvectors to SSP projection operators.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --cov <file>       Input noise covariance FIFF file\n");
-    fprintf(stderr, "  --raw <file>       Raw FIFF file (for channel info)\n");
-    fprintf(stderr, "  --nproj <n>        Number of projectors to create (default: 5)\n");
-    fprintf(stderr, "  --out <file>       Output projection FIFF file\n");
-    fprintf(stderr, "  --help             Print this help\n");
-    fprintf(stderr, "  --version          Print version\n");
-}
-
-//=============================================================================================================
-
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_cov2proj");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString covFile;
-    QString rawFile;
-    QString outFile;
-    int nProj = 5;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Convert noise covariance eigenvectors to SSP projection operators.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) { printf("%s version %s\n", argv[0], PROGRAM_VERSION); return 0; }
-        else if (strcmp(argv[k], "--cov") == 0) {
-            if (++k >= argc) { qCritical("--cov: argument required."); return 1; }
-            covFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--raw") == 0) {
-            if (++k >= argc) { qCritical("--raw: argument required."); return 1; }
-            rawFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--nproj") == 0) {
-            if (++k >= argc) { qCritical("--nproj: argument required."); return 1; }
-            nProj = atoi(argv[k]);
-        }
-        else if (strcmp(argv[k], "--out") == 0) {
-            if (++k >= argc) { qCritical("--out: argument required."); return 1; }
-            outFile = QString(argv[k]);
-        }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption covOpt("cov", "Input noise covariance FIFF file.", "file");
+    parser.addOption(covOpt);
 
-    if (covFile.isEmpty()) { qCritical("--cov is required."); usage(argv[0]); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); usage(argv[0]); return 1; }
+    QCommandLineOption rawOpt("raw", "Raw FIFF file (for channel info).", "file");
+    parser.addOption(rawOpt);
+
+    QCommandLineOption nprojOpt("nproj", "Number of projectors to create.", "n", "5");
+    parser.addOption(nprojOpt);
+
+    QCommandLineOption outOpt("out", "Output projection FIFF file.", "file");
+    parser.addOption(outOpt);
+
+    parser.process(app);
+
+    QString covFile = parser.value(covOpt);
+    QString rawFile = parser.value(rawOpt);
+    QString outFile = parser.value(outOpt);
+    int nProj = parser.value(nprojOpt).toInt();
+
+    if (covFile.isEmpty()) { qCritical("--cov is required."); return 1; }
+    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
 
     // Read covariance
     QFile fCov(covFile);

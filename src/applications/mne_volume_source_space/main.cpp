@@ -38,11 +38,14 @@
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
 #include <fiff/fiff_constants.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QCommandLineOption>
+#include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QFile>
 #include <QDebug>
@@ -59,6 +62,7 @@
 
 using namespace MNELIB;
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -69,64 +73,43 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Create a volumetric source space inside a BEM surface.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --bem <file>       BEM FIFF file (inner skull surface used as boundary)\n");
-    fprintf(stderr, "  --grid <mm>        Grid spacing in mm (default: 7.0)\n");
-    fprintf(stderr, "  --exclude <mm>     Exclude points closer to CM than this (default: 0)\n");
-    fprintf(stderr, "  --mindist <mm>     Minimum distance from surface in mm (default: 5.0)\n");
-    fprintf(stderr, "  --out <file>       Output source space FIFF file\n");
-    fprintf(stderr, "  --help             Print this help\n");
-    fprintf(stderr, "  --version          Print version\n");
-}
-
-//=============================================================================================================
-
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_volume_source_space");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString bemFile;
-    QString outFile;
-    float gridMm = 7.0f;
-    float excludeMm = 0.0f;
-    float mindistMm = 5.0f;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Create a volumetric source space inside a BEM surface.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) { printf("%s version %s\n", argv[0], PROGRAM_VERSION); return 0; }
-        else if (strcmp(argv[k], "--bem") == 0) {
-            if (++k >= argc) { qCritical("--bem: argument required."); return 1; }
-            bemFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--grid") == 0) {
-            if (++k >= argc) { qCritical("--grid: argument required."); return 1; }
-            gridMm = atof(argv[k]);
-        }
-        else if (strcmp(argv[k], "--exclude") == 0) {
-            if (++k >= argc) { qCritical("--exclude: argument required."); return 1; }
-            excludeMm = atof(argv[k]);
-        }
-        else if (strcmp(argv[k], "--mindist") == 0) {
-            if (++k >= argc) { qCritical("--mindist: argument required."); return 1; }
-            mindistMm = atof(argv[k]);
-        }
-        else if (strcmp(argv[k], "--out") == 0) {
-            if (++k >= argc) { qCritical("--out: argument required."); return 1; }
-            outFile = QString(argv[k]);
-        }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption bemOpt("bem", "BEM FIFF file (inner skull surface used as boundary).", "file");
+    parser.addOption(bemOpt);
 
-    if (bemFile.isEmpty()) { qCritical("--bem is required."); usage(argv[0]); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); usage(argv[0]); return 1; }
+    QCommandLineOption gridOpt("grid", "Grid spacing in mm.", "mm", "7.0");
+    parser.addOption(gridOpt);
+
+    QCommandLineOption excludeOpt("exclude", "Exclude points closer to CM than this (mm).", "mm", "0");
+    parser.addOption(excludeOpt);
+
+    QCommandLineOption mindistOpt("mindist", "Minimum distance from surface in mm.", "mm", "5.0");
+    parser.addOption(mindistOpt);
+
+    QCommandLineOption outOpt("out", "Output source space FIFF file.", "file");
+    parser.addOption(outOpt);
+
+    parser.process(app);
+
+    QString bemFile = parser.value(bemOpt);
+    QString outFile = parser.value(outOpt);
+    float gridMm = parser.value(gridOpt).toFloat();
+    float excludeMm = parser.value(excludeOpt).toFloat();
+    float mindistMm = parser.value(mindistOpt).toFloat();
+
+    if (bemFile.isEmpty()) { qCritical("--bem is required."); parser.showHelp(1); }
+    if (outFile.isEmpty()) { qCritical("--out is required."); parser.showHelp(1); }
 
     // Convert mm to meters
     float grid = gridMm / 1000.0f;

@@ -37,12 +37,15 @@
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
 #include <fiff/fiff_constants.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QDebug>
 
@@ -59,6 +62,7 @@
 
 using namespace MNELIB;
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -131,74 +135,60 @@ static void makeIcosphere(int nSubdiv, MatrixX3f& verts, MatrixX3i& tris)
 
 //=============================================================================================================
 
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Create a spherical BEM model.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --out <file>       Output BEM FIFF file\n");
-    fprintf(stderr, "  --origin <x,y,z>  Sphere origin in mm (default: 0,0,40)\n");
-    fprintf(stderr, "  --radii <r1,r2,r3> Shell radii in mm (default: 71,80,90 for 3-layer)\n");
-    fprintf(stderr, "  --conductivity <s1,s2,s3> Conductivities (default: 0.33,0.0042,0.33)\n");
-    fprintf(stderr, "  --ico <n>          Icosahedron subdivision level (default: 4)\n");
-    fprintf(stderr, "  --help             Print this help\n");
-    fprintf(stderr, "  --version          Print version\n");
-}
-
-//=============================================================================================================
-
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_make_sphere_bem");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString outFile;
-    Vector3f origin(0.0f, 0.0f, 0.040f); // 40mm up, in meters
-    QList<float> radii = {0.071f, 0.080f, 0.090f}; // default 3-layer, in meters
-    QList<float> sigmas = {0.33f, 0.0042f, 0.33f};
-    int icoLevel = 4;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Create a spherical BEM model.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) { printf("%s version %s\n", argv[0], PROGRAM_VERSION); return 0; }
-        else if (strcmp(argv[k], "--out") == 0) {
-            if (++k >= argc) { qCritical("--out: argument required."); return 1; }
-            outFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--origin") == 0) {
-            if (++k >= argc) { qCritical("--origin: argument required."); return 1; }
-            QStringList parts = QString(argv[k]).split(',');
-            if (parts.size() != 3) { qCritical("--origin: need x,y,z"); return 1; }
-            origin = Vector3f(parts[0].toFloat() / 1000.0f,
-                            parts[1].toFloat() / 1000.0f,
-                            parts[2].toFloat() / 1000.0f);
-        }
-        else if (strcmp(argv[k], "--radii") == 0) {
-            if (++k >= argc) { qCritical("--radii: argument required."); return 1; }
-            radii.clear();
-            QStringList parts = QString(argv[k]).split(',');
-            for (const QString& p : parts) radii.append(p.toFloat() / 1000.0f); // mm to m
-        }
-        else if (strcmp(argv[k], "--conductivity") == 0) {
-            if (++k >= argc) { qCritical("--conductivity: argument required."); return 1; }
-            sigmas.clear();
-            QStringList parts = QString(argv[k]).split(',');
-            for (const QString& p : parts) sigmas.append(p.toFloat());
-        }
-        else if (strcmp(argv[k], "--ico") == 0) {
-            if (++k >= argc) { qCritical("--ico: argument required."); return 1; }
-            icoLevel = atoi(argv[k]);
-        }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption outOpt("out", "Output BEM FIFF file.", "file");
+    parser.addOption(outOpt);
 
-    if (outFile.isEmpty()) { qCritical("--out is required."); usage(argv[0]); return 1; }
+    QCommandLineOption originOpt("origin", "Sphere origin in mm (x,y,z).", "x,y,z", "0,0,40");
+    parser.addOption(originOpt);
+
+    QCommandLineOption radiiOpt("radii", "Shell radii in mm.", "r1,r2,r3", "71,80,90");
+    parser.addOption(radiiOpt);
+
+    QCommandLineOption condOpt("conductivity", "Conductivities.", "s1,s2,s3", "0.33,0.0042,0.33");
+    parser.addOption(condOpt);
+
+    QCommandLineOption icoOpt("ico", "Icosahedron subdivision level.", "n", "4");
+    parser.addOption(icoOpt);
+
+    parser.process(app);
+
+    QString outFile = parser.value(outOpt);
+
+    // Parse origin
+    QStringList originParts = parser.value(originOpt).split(',');
+    if (originParts.size() != 3) { qCritical("--origin: need x,y,z"); return 1; }
+    Vector3f origin(originParts[0].toFloat() / 1000.0f,
+                    originParts[1].toFloat() / 1000.0f,
+                    originParts[2].toFloat() / 1000.0f);
+
+    // Parse radii
+    QList<float> radii;
+    QStringList radiiParts = parser.value(radiiOpt).split(',');
+    for (const QString& p : radiiParts) radii.append(p.toFloat() / 1000.0f);
+
+    // Parse conductivities
+    QList<float> sigmas;
+    QStringList sigmaParts = parser.value(condOpt).split(',');
+    for (const QString& p : sigmaParts) sigmas.append(p.toFloat());
+
+    int icoLevel = parser.value(icoOpt).toInt();
+
+    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
     if (radii.size() != sigmas.size()) {
-        qCritical("Number of radii (%d) must match number of conductivities (%d)",
-                  radii.size(), sigmas.size());
+        qCritical("Number of radii (%lld) must match number of conductivities (%lld)",
+                  static_cast<long long>(radii.size()), static_cast<long long>(sigmas.size()));
         return 1;
     }
 

@@ -39,11 +39,14 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_constants.h>
 #include <fs/fs_surface.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QCommandLineOption>
+#include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QFile>
 #include <QTextStream>
@@ -64,6 +67,7 @@
 using namespace MNELIB;
 using namespace FIFFLIB;
 using namespace FSLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -115,69 +119,47 @@ static SparseMatrix<double> buildSmoothingOperator(const MatrixX3i& tris, int nV
 
 //=============================================================================================================
 
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Smooth source estimate data on a cortical surface.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --src <file>       Source space FIFF file (for surface connectivity)\n");
-    fprintf(stderr, "  --surf <file>      FreeSurfer surface file (alternative to --src)\n");
-    fprintf(stderr, "  --stc <file>       Input STC file (text format: vertex value [per time])\n");
-    fprintf(stderr, "  --out <file>       Output smoothed STC file\n");
-    fprintf(stderr, "  --smooth <n>       Number of smoothing iterations (default: 5)\n");
-    fprintf(stderr, "  --help             Print this help\n");
-    fprintf(stderr, "  --version          Print version\n");
-}
-
-//=============================================================================================================
-
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_smooth");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString srcFile;
-    QString surfFile;
-    QString stcFile;
-    QString outFile;
-    int nSmooth = 5;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Smooth source estimate data on a cortical surface.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) { printf("%s version %s\n", argv[0], PROGRAM_VERSION); return 0; }
-        else if (strcmp(argv[k], "--src") == 0) {
-            if (++k >= argc) { qCritical("--src: argument required."); return 1; }
-            srcFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--surf") == 0) {
-            if (++k >= argc) { qCritical("--surf: argument required."); return 1; }
-            surfFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--stc") == 0) {
-            if (++k >= argc) { qCritical("--stc: argument required."); return 1; }
-            stcFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--out") == 0) {
-            if (++k >= argc) { qCritical("--out: argument required."); return 1; }
-            outFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--smooth") == 0) {
-            if (++k >= argc) { qCritical("--smooth: argument required."); return 1; }
-            nSmooth = atoi(argv[k]);
-        }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption srcOpt("src", "Source space FIFF file (for surface connectivity).", "file");
+    parser.addOption(srcOpt);
+
+    QCommandLineOption surfOpt("surf", "FreeSurfer surface file (alternative to --src).", "file");
+    parser.addOption(surfOpt);
+
+    QCommandLineOption stcOpt("stc", "Input STC file (text format: vertex value [per time]).", "file");
+    parser.addOption(stcOpt);
+
+    QCommandLineOption outOpt("out", "Output smoothed STC file.", "file");
+    parser.addOption(outOpt);
+
+    QCommandLineOption smoothOpt("smooth", "Number of smoothing iterations.", "n", "5");
+    parser.addOption(smoothOpt);
+
+    parser.process(app);
+
+    QString srcFile = parser.value(srcOpt);
+    QString surfFile = parser.value(surfOpt);
+    QString stcFile = parser.value(stcOpt);
+    QString outFile = parser.value(outOpt);
+    int nSmooth = parser.value(smoothOpt).toInt();
 
     if (srcFile.isEmpty() && surfFile.isEmpty()) {
         qCritical("Either --src or --surf is required.");
-        usage(argv[0]);
-        return 1;
+        parser.showHelp(1);
     }
-    if (stcFile.isEmpty()) { qCritical("--stc is required."); usage(argv[0]); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); usage(argv[0]); return 1; }
+    if (stcFile.isEmpty()) { qCritical("--stc is required."); parser.showHelp(1); }
+    if (outFile.isEmpty()) { qCritical("--out is required."); parser.showHelp(1); }
 
     // Get surface triangulation
     MatrixX3i tris;

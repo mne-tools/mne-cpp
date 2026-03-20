@@ -39,12 +39,15 @@
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_types.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
@@ -60,25 +63,13 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
 //=============================================================================================================
 
 #define PROGRAM_VERSION "2.0.0"
-
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Mark or update bad channels in a FIFF file.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --bad <file>    Text file listing bad channel names (one per line)\n");
-    fprintf(stderr, "  --fif <file>    FIFF file to modify\n");
-    fprintf(stderr, "  --help          Print this help\n");
-    fprintf(stderr, "  --version       Print version\n");
-}
 
 //=============================================================================================================
 
@@ -103,34 +94,29 @@ static QStringList readBadChannelList(const QString &filename)
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_mark_bad_channels");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString fifName;
-    QString badName;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Mark or update bad channels in a FIFF file.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) {
-            usage(argv[0]);
-            return 0;
-        } else if (strcmp(argv[k], "--version") == 0) {
-            fprintf(stderr, "%s version %s\n", argv[0], PROGRAM_VERSION);
-            return 0;
-        } else if (strcmp(argv[k], "--bad") == 0) {
-            if (k + 1 >= argc) { qCritical("--bad: argument required."); return 1; }
-            badName = QString(argv[++k]);
-        } else if (strcmp(argv[k], "--fif") == 0) {
-            if (k + 1 >= argc) { qCritical("--fif: argument required."); return 1; }
-            fifName = QString(argv[++k]);
-        } else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption badOpt("bad", "Text file listing bad channel names (one per line).", "file");
+    parser.addOption(badOpt);
+
+    QCommandLineOption fifOpt("fif", "FIFF file to modify.", "file");
+    parser.addOption(fifOpt);
+
+    parser.process(app);
+
+    QString badName = parser.value(badOpt);
+    QString fifName = parser.value(fifOpt);
 
     if (fifName.isEmpty() || badName.isEmpty()) {
         qCritical("Both --fif and --bad are required.");
-        usage(argv[0]);
         return 1;
     }
 

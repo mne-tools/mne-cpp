@@ -38,11 +38,15 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_raw_data.h>
 
+#include <utils/generics/applicationlogger.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
@@ -58,6 +62,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -65,21 +70,6 @@ using namespace Eigen;
 //=============================================================================================================
 
 #define PROGRAM_VERSION "2.0.0"
-
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Create a topographical EEG layout file from electrode positions.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --fif <name>    FIFF file with EEG channel info\n");
-    fprintf(stderr, "  --out <name>    Output layout file (.lout)\n");
-    fprintf(stderr, "  --width <val>   Channel box width (default: 5.0)\n");
-    fprintf(stderr, "  --height <val>  Channel box height (default: 4.0)\n");
-    fprintf(stderr, "  --help          Print this help\n");
-    fprintf(stderr, "  --version       Print version\n");
-}
 
 //=============================================================================================================
 
@@ -107,43 +97,38 @@ static void azimuthalProjection(const Vector3f &pos, const Vector3f &center,
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_make_eeg_layout");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString fifName;
-    QString outName;
-    float width = 5.0f;
-    float height = 4.0f;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Create a topographical EEG layout file from electrode positions in a FIFF file.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) {
-            usage(argv[0]);
-            return 0;
-        } else if (strcmp(argv[k], "--version") == 0) {
-            fprintf(stderr, "%s version %s\n", argv[0], PROGRAM_VERSION);
-            return 0;
-        } else if (strcmp(argv[k], "--fif") == 0) {
-            if (k + 1 >= argc) { qCritical("--fif: argument required."); return 1; }
-            fifName = QString(argv[++k]);
-        } else if (strcmp(argv[k], "--out") == 0) {
-            if (k + 1 >= argc) { qCritical("--out: argument required."); return 1; }
-            outName = QString(argv[++k]);
-        } else if (strcmp(argv[k], "--width") == 0) {
-            if (k + 1 >= argc) { qCritical("--width: argument required."); return 1; }
-            width = atof(argv[++k]);
-        } else if (strcmp(argv[k], "--height") == 0) {
-            if (k + 1 >= argc) { qCritical("--height: argument required."); return 1; }
-            height = atof(argv[++k]);
-        } else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption fifOpt("fif", "FIFF file with EEG channel info.", "name");
+    parser.addOption(fifOpt);
+
+    QCommandLineOption outOpt("out", "Output layout file (.lout).", "name");
+    parser.addOption(outOpt);
+
+    QCommandLineOption widthOpt("width", "Channel box width.", "val", "5.0");
+    parser.addOption(widthOpt);
+
+    QCommandLineOption heightOpt("height", "Channel box height.", "val", "4.0");
+    parser.addOption(heightOpt);
+
+    parser.process(app);
+
+    QString fifName = parser.value(fifOpt);
+    QString outName = parser.value(outOpt);
+    float width = parser.value(widthOpt).toDouble();
+    float height = parser.value(heightOpt).toDouble();
 
     if (fifName.isEmpty() || outName.isEmpty()) {
         qCritical("Both --fif and --out are required.");
-        usage(argv[0]);
-        return 1;
+        parser.showHelp(1);
     }
 
     // Read the FIFF file to get channel info

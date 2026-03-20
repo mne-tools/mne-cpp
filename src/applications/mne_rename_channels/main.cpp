@@ -39,11 +39,15 @@
 #include <fiff/fiff_dir_entry.h>
 #include <fiff/fiff_ch_info.h>
 
+#include <utils/generics/applicationlogger.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
@@ -53,6 +57,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
@@ -67,20 +72,6 @@ struct ChannelAlias {
     QString to;
     int toKind;   // -1 means do not change kind
 };
-
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Give new names to selected channels.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --fif <name>     FIFF file to modify\n");
-    fprintf(stderr, "  --alias <name>   Alias file (<old>:<new>[:<kind>])\n");
-    fprintf(stderr, "  --revert         Swap old/new in the alias file\n");
-    fprintf(stderr, "  --help           Print this help\n");
-    fprintf(stderr, "  --version        Print version\n");
-}
 
 //=============================================================================================================
 
@@ -161,38 +152,34 @@ static QList<ChannelAlias> readAliases(const QString &filename, bool reverse)
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_rename_channels");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString fifName;
-    QString aliasName;
-    bool reverse = false;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Give new names to selected channels in a FIFF file.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) {
-            usage(argv[0]);
-            return 0;
-        } else if (strcmp(argv[k], "--version") == 0) {
-            fprintf(stderr, "%s version %s\n", argv[0], PROGRAM_VERSION);
-            return 0;
-        } else if (strcmp(argv[k], "--fif") == 0) {
-            if (k + 1 >= argc) { qCritical("--fif: argument required."); return 1; }
-            fifName = QString(argv[++k]);
-        } else if (strcmp(argv[k], "--alias") == 0) {
-            if (k + 1 >= argc) { qCritical("--alias: argument required."); return 1; }
-            aliasName = QString(argv[++k]);
-        } else if (strcmp(argv[k], "--revert") == 0 || strcmp(argv[k], "--reverse") == 0) {
-            reverse = true;
-        } else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption fifOpt("fif", "FIFF file to modify.", "name");
+    parser.addOption(fifOpt);
+
+    QCommandLineOption aliasOpt("alias", "Alias file (<old>:<new>[:<kind>]).", "name");
+    parser.addOption(aliasOpt);
+
+    QCommandLineOption revertOpt(QStringList() << "revert" << "reverse", "Swap old/new in the alias file.");
+    parser.addOption(revertOpt);
+
+    parser.process(app);
+
+    QString fifName = parser.value(fifOpt);
+    QString aliasName = parser.value(aliasOpt);
+    bool reverse = parser.isSet(revertOpt);
 
     if (fifName.isEmpty() || aliasName.isEmpty()) {
         qCritical("Both --fif and --alias are required.");
-        usage(argv[0]);
-        return 1;
+        parser.showHelp(1);
     }
 
     fprintf(stderr, "fif file   : %s\n", qPrintable(fifName));

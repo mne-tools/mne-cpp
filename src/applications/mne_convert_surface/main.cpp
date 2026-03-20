@@ -37,12 +37,15 @@
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <fs/fs_surface.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
@@ -63,6 +66,7 @@
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace FSLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -90,28 +94,6 @@ static bool readSmfFile(const QString& filename, MatrixX3f& rr, MatrixX3i& tris)
 static bool writeSmfFile(const QString& filename, const MatrixX3f& rr, const MatrixX3i& tris);
 static bool readFifSurface(const QString& filename, MatrixX3f& rr, MatrixX3i& tris);
 static bool writeFifSurface(const QString& filename, const MatrixX3f& rr, const MatrixX3i& tris, int surfId);
-
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Convert between surface file formats.\n\n");
-    fprintf(stderr, "  --surf <file>       Input surface file\n");
-    fprintf(stderr, "  --fif <file>        Input FIF surface file\n");
-    fprintf(stderr, "  --tri <file>        Input ASCII tri format file\n");
-    fprintf(stderr, "  --smf <file>        Input SMF format file\n");
-    fprintf(stderr, "  --out <file>        Output file (format detected from extension)\n");
-    fprintf(stderr, "  --outtri <file>     Output as ASCII tri format\n");
-    fprintf(stderr, "  --outfif <file>     Output as FIF format\n");
-    fprintf(stderr, "  --outsurf <file>    Output as FreeSurfer surface format\n");
-    fprintf(stderr, "  --outsmf <file>     Output as SMF format\n");
-    fprintf(stderr, "  --surfid <id>       Surface ID for FIF output (default: 4=head)\n");
-    fprintf(stderr, "  --meters            Input coordinates are in meters\n");
-    fprintf(stderr, "  --millimeters       Input coordinates are in millimeters\n");
-    fprintf(stderr, "  --help              Print this help\n\n");
-    fprintf(stderr, "  Version: %s\n", PROGRAM_VERSION);
-}
 
 //=============================================================================================================
 
@@ -325,70 +307,97 @@ static bool writeFifSurface(const QString& filename, const MatrixX3f& rr, const 
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_convert_surface");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Convert between surface file formats (FreeSurfer, FIFF, tri, SMF).");
+    parser.addHelpOption();
+    parser.addVersionOption();
+
+    QCommandLineOption surfOpt("surf", "Input FreeSurfer surface file.", "file");
+    parser.addOption(surfOpt);
+    QCommandLineOption fifOpt("fif", "Input FIF surface file.", "file");
+    parser.addOption(fifOpt);
+    QCommandLineOption triOpt("tri", "Input ASCII tri format file.", "file");
+    parser.addOption(triOpt);
+    QCommandLineOption smfOpt("smf", "Input SMF format file.", "file");
+    parser.addOption(smfOpt);
+    QCommandLineOption outOpt("out", "Output file (format detected from extension).", "file");
+    parser.addOption(outOpt);
+    QCommandLineOption outtriOpt("outtri", "Output as ASCII tri format.", "file");
+    parser.addOption(outtriOpt);
+    QCommandLineOption outfifOpt("outfif", "Output as FIF format.", "file");
+    parser.addOption(outfifOpt);
+    QCommandLineOption outsurfOpt("outsurf", "Output as FreeSurfer surface format.", "file");
+    parser.addOption(outsurfOpt);
+    QCommandLineOption outsmfOpt("outsmf", "Output as SMF format.", "file");
+    parser.addOption(outsmfOpt);
+    QCommandLineOption surfidOpt("surfid", "Surface ID for FIF output (default: 4=head).", "id", "4");
+    parser.addOption(surfidOpt);
+    QCommandLineOption metersOpt("meters", "Input coordinates are in meters.");
+    parser.addOption(metersOpt);
+    QCommandLineOption millimetersOpt("millimeters", "Input coordinates are in millimeters.");
+    parser.addOption(millimetersOpt);
+
+    parser.process(app);
 
     QString inputFile;
     SurfaceFormat inputFormat = FORMAT_UNKNOWN;
     QString outputFile;
     SurfaceFormat outputFormat = FORMAT_UNKNOWN;
-    int surfId = FIFFV_BEM_SURF_ID_HEAD;
-    float scaleFactor = 1.0f; // Default: assume meters
+    int surfId = parser.value(surfidOpt).toInt();
+    float scaleFactor = 1.0f;
     bool scaleSet = false;
 
-    for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--surf") == 0 && i + 1 < argc) {
-            inputFile = QString(argv[++i]);
-            inputFormat = FORMAT_FREESURFER;
-        } else if (strcmp(argv[i], "--fif") == 0 && i + 1 < argc) {
-            inputFile = QString(argv[++i]);
-            inputFormat = FORMAT_FIF;
-        } else if (strcmp(argv[i], "--tri") == 0 && i + 1 < argc) {
-            inputFile = QString(argv[++i]);
-            inputFormat = FORMAT_TRI;
-        } else if (strcmp(argv[i], "--smf") == 0 && i + 1 < argc) {
-            inputFile = QString(argv[++i]);
-            inputFormat = FORMAT_SMF;
-        } else if (strcmp(argv[i], "--out") == 0 && i + 1 < argc) {
-            outputFile = QString(argv[++i]);
-            outputFormat = detectFormat(outputFile);
-        } else if (strcmp(argv[i], "--outtri") == 0 && i + 1 < argc) {
-            outputFile = QString(argv[++i]);
-            outputFormat = FORMAT_TRI;
-        } else if (strcmp(argv[i], "--outfif") == 0 && i + 1 < argc) {
-            outputFile = QString(argv[++i]);
-            outputFormat = FORMAT_FIF;
-        } else if (strcmp(argv[i], "--outsurf") == 0 && i + 1 < argc) {
-            outputFile = QString(argv[++i]);
-            outputFormat = FORMAT_FREESURFER;
-        } else if (strcmp(argv[i], "--outsmf") == 0 && i + 1 < argc) {
-            outputFile = QString(argv[++i]);
-            outputFormat = FORMAT_SMF;
-        } else if (strcmp(argv[i], "--surfid") == 0 && i + 1 < argc) {
-            surfId = atoi(argv[++i]);
-        } else if (strcmp(argv[i], "--meters") == 0) {
-            scaleFactor = 1.0f;
-            scaleSet = true;
-        } else if (strcmp(argv[i], "--millimeters") == 0) {
-            scaleFactor = 0.001f;
-            scaleSet = true;
-        } else if (strcmp(argv[i], "--help") == 0) {
-            usage(argv[0]);
-            return 0;
-        } else {
-            fprintf(stderr, "Unknown option: %s\n", argv[i]);
-            usage(argv[0]);
-            return 1;
-        }
+    if (parser.isSet(surfOpt)) {
+        inputFile = parser.value(surfOpt);
+        inputFormat = FORMAT_FREESURFER;
+    } else if (parser.isSet(fifOpt)) {
+        inputFile = parser.value(fifOpt);
+        inputFormat = FORMAT_FIF;
+    } else if (parser.isSet(triOpt)) {
+        inputFile = parser.value(triOpt);
+        inputFormat = FORMAT_TRI;
+    } else if (parser.isSet(smfOpt)) {
+        inputFile = parser.value(smfOpt);
+        inputFormat = FORMAT_SMF;
+    }
+
+    if (parser.isSet(outOpt)) {
+        outputFile = parser.value(outOpt);
+        outputFormat = detectFormat(outputFile);
+    } else if (parser.isSet(outtriOpt)) {
+        outputFile = parser.value(outtriOpt);
+        outputFormat = FORMAT_TRI;
+    } else if (parser.isSet(outfifOpt)) {
+        outputFile = parser.value(outfifOpt);
+        outputFormat = FORMAT_FIF;
+    } else if (parser.isSet(outsurfOpt)) {
+        outputFile = parser.value(outsurfOpt);
+        outputFormat = FORMAT_FREESURFER;
+    } else if (parser.isSet(outsmfOpt)) {
+        outputFile = parser.value(outsmfOpt);
+        outputFormat = FORMAT_SMF;
+    }
+
+    if (parser.isSet(metersOpt)) {
+        scaleFactor = 1.0f;
+        scaleSet = true;
+    }
+    if (parser.isSet(millimetersOpt)) {
+        scaleFactor = 0.001f;
+        scaleSet = true;
     }
 
     if (inputFile.isEmpty()) {
         fprintf(stderr, "No input file specified.\n");
-        usage(argv[0]);
         return 1;
     }
     if (outputFile.isEmpty()) {
         fprintf(stderr, "No output file specified.\n");
-        usage(argv[0]);
         return 1;
     }
     if (outputFormat == FORMAT_UNKNOWN) {

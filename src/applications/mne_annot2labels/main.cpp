@@ -37,12 +37,15 @@
 #include <fs/fs_annotation.h>
 #include <fs/fs_surface.h>
 #include <fs/fs_label.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QDir>
 #include <QFile>
 #include <QTextStream>
@@ -59,6 +62,7 @@
 //=============================================================================================================
 
 using namespace FSLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -66,23 +70,6 @@ using namespace Eigen;
 //=============================================================================================================
 
 #define PROGRAM_VERSION "2.0.0"
-
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Convert FreeSurfer annotation file to individual label files.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --subject <name>     Subject name\n");
-    fprintf(stderr, "  --subjects_dir <dir> Subjects directory (default: $SUBJECTS_DIR)\n");
-    fprintf(stderr, "  --annot <name>       Annotation name (e.g., aparc, aparc.a2009s)\n");
-    fprintf(stderr, "  --hemi <hemi>        Hemisphere: lh or rh (default: both)\n");
-    fprintf(stderr, "  --outdir <dir>       Output directory for label files (default: subject's label/)\n");
-    fprintf(stderr, "  --surf <name>        Surface to use for coordinates (default: white)\n");
-    fprintf(stderr, "  --help               Print this help\n");
-    fprintf(stderr, "  --version            Print version\n");
-}
 
 //=============================================================================================================
 
@@ -175,53 +162,44 @@ static bool processHemisphere(const QString &subjectsDir, const QString &subject
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_annot2labels");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString subject;
-    QString subjectsDir = qEnvironmentVariable("SUBJECTS_DIR");
-    QString annotName = "aparc";
-    QString surfName = "white";
-    QString outDir;
-    QString hemi;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Convert FreeSurfer annotation file to individual label files.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) {
-            fprintf(stderr, "%s version %s\n", argv[0], PROGRAM_VERSION);
-            return 0;
-        }
-        else if (strcmp(argv[k], "--subject") == 0) {
-            if (++k >= argc) { qCritical("--subject: argument required."); return 1; }
-            subject = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--subjects_dir") == 0) {
-            if (++k >= argc) { qCritical("--subjects_dir: argument required."); return 1; }
-            subjectsDir = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--annot") == 0) {
-            if (++k >= argc) { qCritical("--annot: argument required."); return 1; }
-            annotName = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--hemi") == 0) {
-            if (++k >= argc) { qCritical("--hemi: argument required."); return 1; }
-            hemi = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--outdir") == 0) {
-            if (++k >= argc) { qCritical("--outdir: argument required."); return 1; }
-            outDir = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--surf") == 0) {
-            if (++k >= argc) { qCritical("--surf: argument required."); return 1; }
-            surfName = QString(argv[k]);
-        }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption subjectOpt("subject", "Subject name.", "name");
+    parser.addOption(subjectOpt);
 
-    if (subject.isEmpty()) { qCritical("--subject is required."); usage(argv[0]); return 1; }
+    QCommandLineOption subjectsDirOpt("subjects_dir", "Subjects directory.", "dir", qEnvironmentVariable("SUBJECTS_DIR"));
+    parser.addOption(subjectsDirOpt);
+
+    QCommandLineOption annotOpt("annot", "Annotation name (e.g., aparc, aparc.a2009s).", "name", "aparc");
+    parser.addOption(annotOpt);
+
+    QCommandLineOption hemiOpt("hemi", "Hemisphere: lh or rh (default: both).", "hemi");
+    parser.addOption(hemiOpt);
+
+    QCommandLineOption outdirOpt("outdir", "Output directory for label files.", "dir");
+    parser.addOption(outdirOpt);
+
+    QCommandLineOption surfOpt("surf", "Surface to use for coordinates.", "name", "white");
+    parser.addOption(surfOpt);
+
+    parser.process(app);
+
+    QString subject = parser.value(subjectOpt);
+    QString subjectsDir = parser.value(subjectsDirOpt);
+    QString annotName = parser.value(annotOpt);
+    QString hemi = parser.value(hemiOpt);
+    QString outDir = parser.value(outdirOpt);
+    QString surfName = parser.value(surfOpt);
+
+    if (subject.isEmpty()) { qCritical("--subject is required."); return 1; }
     if (subjectsDir.isEmpty()) { qCritical("--subjects_dir or $SUBJECTS_DIR is required."); return 1; }
 
     // Default output dir

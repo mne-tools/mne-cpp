@@ -38,12 +38,15 @@
 #include <mne/mne_source_space.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_constants.h>
+#include <utils/generics/applicationlogger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QDebug>
 
@@ -69,6 +72,7 @@
 
 using namespace MNELIB;
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -156,46 +160,31 @@ static void multiSourceDijkstra(
 
 //=============================================================================================================
 
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Add patch information to a source space.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --src <file>       Input source space FIFF file\n");
-    fprintf(stderr, "  --out <file>       Output source space FIFF file with patch info\n");
-    fprintf(stderr, "  --help             Print this help\n");
-    fprintf(stderr, "  --version          Print version\n");
-}
-
-//=============================================================================================================
-
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_add_patch_info");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString srcFile;
-    QString outFile;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Add patch information to a source space.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) { usage(argv[0]); return 0; }
-        else if (strcmp(argv[k], "--version") == 0) { printf("%s version %s\n", argv[0], PROGRAM_VERSION); return 0; }
-        else if (strcmp(argv[k], "--src") == 0) {
-            if (++k >= argc) { qCritical("--src: argument required."); return 1; }
-            srcFile = QString(argv[k]);
-        }
-        else if (strcmp(argv[k], "--out") == 0) {
-            if (++k >= argc) { qCritical("--out: argument required."); return 1; }
-            outFile = QString(argv[k]);
-        }
-        else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption srcOpt("src", "Input source space FIFF file.", "file");
+    parser.addOption(srcOpt);
 
-    if (srcFile.isEmpty()) { qCritical("--src is required."); usage(argv[0]); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); usage(argv[0]); return 1; }
+    QCommandLineOption outOpt("out", "Output source space FIFF file with patch info.", "file");
+    parser.addOption(outOpt);
+
+    parser.process(app);
+
+    QString srcFile = parser.value(srcOpt);
+    QString outFile = parser.value(outOpt);
+
+    if (srcFile.isEmpty()) { qCritical("--src is required."); return 1; }
+    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
 
     // Read source space
     QFile file(srcFile);

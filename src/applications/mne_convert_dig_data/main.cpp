@@ -40,11 +40,15 @@
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_dir_entry.h>
 
+#include <utils/generics/applicationlogger.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
@@ -61,27 +65,13 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
 //=============================================================================================================
 
 #define PROGRAM_VERSION "2.0.0"
-
-//=============================================================================================================
-
-static void usage(const char *name)
-{
-    fprintf(stderr, "Usage: %s [options]\n", name);
-    fprintf(stderr, "Convert Polhemus digitization data between formats.\n\n");
-    fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  --fif <name>     Input FIFF file with digitization data\n");
-    fprintf(stderr, "  --hpts <name>    Input hpts text file\n");
-    fprintf(stderr, "  --fifout <name>  Output FIFF file\n");
-    fprintf(stderr, "  --hptsout <name> Output hpts file\n");
-    fprintf(stderr, "  --help           Print this help\n");
-    fprintf(stderr, "  --version        Print version\n");
-}
 
 //=============================================================================================================
 
@@ -220,45 +210,42 @@ static bool writeHpts(const QString &filename, const QList<DigPt> &points)
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_convert_dig_data");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    QString fifIn, hptsIn, fifOut, hptsOut;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Convert Polhemus digitization data between FIFF and hpts formats.");
+    parser.addHelpOption();
+    parser.addVersionOption();
 
-    for (int k = 1; k < argc; k++) {
-        if (strcmp(argv[k], "--help") == 0) {
-            usage(argv[0]);
-            return 0;
-        } else if (strcmp(argv[k], "--version") == 0) {
-            fprintf(stderr, "%s version %s\n", argv[0], PROGRAM_VERSION);
-            return 0;
-        } else if (strcmp(argv[k], "--fif") == 0) {
-            if (k + 1 >= argc) { qCritical("--fif: argument required."); return 1; }
-            fifIn = QString(argv[++k]);
-        } else if (strcmp(argv[k], "--hpts") == 0) {
-            if (k + 1 >= argc) { qCritical("--hpts: argument required."); return 1; }
-            hptsIn = QString(argv[++k]);
-        } else if (strcmp(argv[k], "--fifout") == 0) {
-            if (k + 1 >= argc) { qCritical("--fifout: argument required."); return 1; }
-            fifOut = QString(argv[++k]);
-        } else if (strcmp(argv[k], "--hptsout") == 0) {
-            if (k + 1 >= argc) { qCritical("--hptsout: argument required."); return 1; }
-            hptsOut = QString(argv[++k]);
-        } else {
-            qCritical("Unrecognized option: %s", argv[k]);
-            usage(argv[0]);
-            return 1;
-        }
-    }
+    QCommandLineOption fifOpt("fif", "Input FIFF file with digitization data.", "name");
+    parser.addOption(fifOpt);
+
+    QCommandLineOption hptsOpt("hpts", "Input hpts text file.", "name");
+    parser.addOption(hptsOpt);
+
+    QCommandLineOption fifoutOpt("fifout", "Output FIFF file.", "name");
+    parser.addOption(fifoutOpt);
+
+    QCommandLineOption hptsoutOpt("hptsout", "Output hpts file.", "name");
+    parser.addOption(hptsoutOpt);
+
+    parser.process(app);
+
+    QString fifIn = parser.value(fifOpt);
+    QString hptsIn = parser.value(hptsOpt);
+    QString fifOut = parser.value(fifoutOpt);
+    QString hptsOut = parser.value(hptsoutOpt);
 
     if (fifIn.isEmpty() && hptsIn.isEmpty()) {
         qCritical("Specify input with --fif or --hpts.");
-        usage(argv[0]);
-        return 1;
+        parser.showHelp(1);
     }
     if (fifOut.isEmpty() && hptsOut.isEmpty()) {
         qCritical("Specify output with --fifout or --hptsout.");
-        usage(argv[0]);
-        return 1;
+        parser.showHelp(1);
     }
 
     // Read input
