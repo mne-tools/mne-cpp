@@ -1,0 +1,45 @@
+---
+title: mne_make_eeg_layout
+sidebar_label: mne_make_eeg_layout
+sidebar_position: 48
+---
+
+# mne_make_eeg_layout
+
+## Overview
+
+`mne_make_eeg_layout` creates a 2D topographical EEG electrode layout file from the 3D electrode positions stored in a FIFF file.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_make_eeg_layout [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--fif <name>` | FIFF file with EEG channel information **(required)** |
+| `--out <name>` | Output layout file (.lout) **(required)** |
+| `--width <val>` | Channel box width (default: 5.0) |
+| `--height <val>` | Channel box height (default: 4.0) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+This utility extracts EEG electrode positions from a FIFF file and projects them to a 2D plane using azimuthal equidistant projection. The resulting layout file (.lout) can be used by visualization tools to display topographical maps of EEG data.
+
+The width and height parameters control the size of the rectangular box drawn around each channel marker in the layout.
+
+### Example
+
+```bash
+mne_make_eeg_layout --fif raw.fif --out eeg_layout.lout
+
+# With custom box dimensions
+mne_make_eeg_layout --fif raw.fif --out eeg_layout.lout --width 3.0 --height 2.5
+```

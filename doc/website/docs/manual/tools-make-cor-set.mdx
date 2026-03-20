@@ -1,0 +1,49 @@
+---
+title: mne_make_cor_set
+sidebar_label: mne_make_cor_set
+sidebar_position: 47
+---
+
+# mne_make_cor_set
+
+## Overview
+
+`mne_make_cor_set` creates a FIFF MRI description file from FreeSurfer COR slices or mgh/mgz volume data.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_make_cor_set [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--dir <directory>` | FreeSurfer COR directory |
+| `--mgh <file>` | FreeSurfer mgh/mgz volume file |
+| `--out <file>` | Output FIFF file **(required)** |
+| `--help` | Print help |
+| `--version` | Print version |
+
+Either `--dir` or `--mgh` must be specified.
+
+## Description
+
+This utility converts FreeSurfer MRI data to the FIFF format used by MNE tools. It reads either a directory of COR slice files or an mgh/mgz volume file, and writes a FIFF file containing the MRI data with proper coordinate transforms and voxel metadata.
+
+### Workflow Context
+
+Use this tool as part of MRI setup when `mne_setup_mri` does not handle your specific data layout. The output FIFF file can be used by `mne_setup_forward_model` and other MNE tools that require MRI information.
+
+### Example
+
+```bash
+# From COR slices
+mne_make_cor_set --dir subjects/sam/mri/T1-neuromag/sets/COR-sam --out sam-mri.fif
+
+# From mgh/mgz volume
+mne_make_cor_set --mgh subjects/sam/mri/T1.mgz --out sam-mri.fif
+```

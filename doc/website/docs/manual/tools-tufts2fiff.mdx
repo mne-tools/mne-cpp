@@ -1,0 +1,44 @@
+---
+title: mne_tufts2fiff
+sidebar_label: mne_tufts2fiff
+sidebar_position: 50
+---
+
+# mne_tufts2fiff
+
+## Overview
+
+`mne_tufts2fiff` converts Tufts University EEG data files to FIFF format.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_tufts2fiff [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--raw <file>` | Tufts raw data file **(required)** |
+| `--cal <file>` | Calibration file |
+| `--elp <file>` | Electrode position file |
+| `--out <file>` | Output FIFF file **(required)** |
+| `--sfreq <Hz>` | Override sampling frequency |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+This utility reads Tufts University raw EEG data format and converts it to FIFF. It applies calibration factors when provided and includes electrode positions as digitization points in the output file.
+
+### Example
+
+```bash
+mne_tufts2fiff --raw recording.raw --out recording.fif
+
+# With calibration and electrode positions
+mne_tufts2fiff --raw recording.raw --cal calibration.txt --elp electrodes.elp --out recording.fif
+```

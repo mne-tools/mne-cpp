@@ -1,0 +1,38 @@
+---
+title: mne_add_to_meas_info
+sidebar_label: mne_add_to_meas_info
+sidebar_position: 37
+---
+
+# mne_add_to_meas_info
+
+## Overview
+
+`mne_add_to_meas_info` adds tags from one FIFF file to the measurement info block of another FIFF file.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_add_to_meas_info [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--add <name>` | FIFF file containing the tags to add **(required)** |
+| `--dest <name>` | Destination FIFF file to receive the additional tags **(required)** |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+This utility reads all tags from a source FIFF file and appends them to the measurement info block of a destination FIFF file. This is useful for adding metadata (e.g., digitization points, coordinate transforms) to an existing measurement file.
+
+### Example
+
+```bash
+mne_add_to_meas_info --add extra_info.fif --dest raw.fif
+```

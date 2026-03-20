@@ -1,0 +1,40 @@
+---
+title: mne_create_comp_data
+sidebar_label: mne_create_comp_data
+sidebar_position: 41
+---
+
+# mne_create_comp_data
+
+## Overview
+
+`mne_create_comp_data` creates CTF compensation data from an ASCII matrix file and writes it as a FIFF file.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_create_comp_data [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--in <file>` | Input ASCII matrix file **(required)** |
+| `--kind <kind>` | CTF compensation kind (e.g., 101, 201, 301) **(required)** |
+| `--out <file>` | Output FIFF file **(required)** |
+| `--calibrated` | Matrix data is already calibrated |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+This utility reads an ASCII matrix file containing compensation data (with row and column names) and writes it as FIFF-formatted CTF compensation data. The compensation kind parameter specifies the gradient compensation order (e.g., 101 for first-order, 201 for second-order, 301 for third-order).
+
+### Example
+
+```bash
+mne_create_comp_data --in comp_matrix.txt --kind 301 --out comp.fif --calibrated
+```

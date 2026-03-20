@@ -30,7 +30,12 @@ The tools below are organized by their role in a typical MEG/EEG analysis workfl
 | [mne_brain_vision2fiff](tools-brain-vision2fiff) | Converts BrainVision EEG data (`.vhdr`) to FIFF format |
 | [mne_ctf2fiff](tools-ctf2fiff) | Converts CTF MEG datasets (`.ds`) to FIFF format |
 | [mne_kit2fiff](tools-kit2fiff) | Converts KIT/Yokogawa MEG data (`.sqd`/`.con`) to FIFF format |
+| [mne_tufts2fiff](tools-tufts2fiff) | Converts Tufts University EEG data to FIFF format |
+| [mne_eximia2fiff](tools-eximia2fiff) | Converts Nexstim eXimia EEG data (`.nxe`) to FIFF format |
 | [mne_raw2mat](tools-raw2mat) | Exports raw FIFF data to MATLAB `.mat` format |
+| [mne_convert_surface](tools-convert-surface) | Converts surface meshes between FIFF, FreeSurfer, .tri, and .smf formats |
+| [mne_convert_dig_data](tools-convert-dig-data) | Converts digitization data between FIFF and hpts formats |
+| [mne_ctf_dig2fiff](tools-ctf-dig2fiff) | Converts CTF Polhemus digitization data to FIFF/hpts format |
 | [mne_show_fiff](tools-show-fiff) | Lists the contents of a FIFF file |
 | [mne_compare_fif_files](tools-compare-fif-files) | Compares two FIFF files tag by tag |
 
@@ -40,8 +45,11 @@ The tools below are organized by their role in a typical MEG/EEG analysis workfl
 |---|---|
 | [mne_process_raw](tools-process-raw) | Batch processing of raw data: filtering, decimation, averaging, covariance estimation, SSP, and event detection |
 | [mne_mark_bad_channels](tools-mark-bad-channels) | Marks channels as bad in a FIFF measurement file |
+| [mne_rename_channels](tools-rename-channels) | Renames channels in a FIFF file using an alias mapping |
+| [mne_fix_mag_coil_types](tools-fix-mag-coil-types) | Fixes magnetometer coil type definitions in FIFF files |
 | [mne_compensate_data](tools-compensate-data) | Applies or changes CTF software gradient compensation grade |
 | [mne_cov2proj](tools-cov2proj) | Derives SSP projection vectors from a noise covariance matrix |
+| [mne_anonymize](tools-anonymize) | Removes or modifies personal health information from FIFF files |
 
 ## BEM Model Creation and Validation
 
@@ -54,12 +62,14 @@ The tools below are organized by their role in a typical MEG/EEG analysis workfl
 | [mne_prepare_bem_model](tools-prepare-bem-model) | Computes the BEM solution (geometry matrices) for the forward solver |
 | [mne_make_sphere_bem](tools-make-sphere-bem) | Creates a spherical BEM model from concentric shells |
 | [mne_check_surface](tools-check-surface) | Validates BEM and FreeSurfer surface meshes for topological correctness |
+| [mne_list_bem](tools-list-bem) | Exports BEM surface data from FIFF to ASCII text |
 
 ## MRI Setup
 
 | Tool | Description |
 |---|---|
 | [mne_setup_mri](tools-setup-mri) | Sets up FreeSurfer MRI data for MNE processing |
+| [mne_make_cor_set](tools-make-cor-set) | Creates a FIFF MRI description file from FreeSurfer COR or mgh/mgz data |
 
 ## Source Space Setup
 
@@ -82,6 +92,7 @@ The tools below are organized by their role in a typical MEG/EEG analysis workfl
 | [mne_compute_mne](tools-compute-mne) | Computes MNE/dSPM/sLORETA source estimates from evoked data |
 | [mne_compute_raw_inverse](tools-compute-raw-inverse) | Computes inverse solutions (MNE/dSPM/sLORETA) on continuous data |
 | [mne_dipole_fit](tools-dipole-fit) | Performs electric current dipole fitting |
+| [mne_volume_data2mri](tools-volume-data2mri) | Maps volume source estimates to MRI voxel space |
 
 ## Morphing and Group Analysis
 
@@ -90,6 +101,16 @@ The tools below are organized by their role in a typical MEG/EEG analysis workfl
 | [mne_make_morph_maps](tools-make-morph-maps) | Precomputes surface morphing maps between FreeSurfer subjects |
 | [mne_morph_labels](tools-morph-labels) | Morphs cortical label files between subjects |
 | [mne_smooth](tools-smooth) | Applies spatial smoothing to cortical source estimates |
+
+## Utilities
+
+| Tool | Description |
+|---|---|
+| [mne_add_to_meas_info](tools-add-to-meas-info) | Adds tags from one FIFF file to the measurement info of another |
+| [mne_collect_transforms](tools-collect-transforms) | Collects coordinate transforms from FIFF files |
+| [mne_create_comp_data](tools-create-comp-data) | Creates CTF compensation data from ASCII matrix files |
+| [mne_insert_4D_comp](tools-insert-4d-comp) | Merges 4D Neuroimaging reference channel compensation data with FIFF |
+| [mne_make_eeg_layout](tools-make-eeg-layout) | Creates 2D topographical EEG layout from electrode positions |
 
 ## Simulation
 

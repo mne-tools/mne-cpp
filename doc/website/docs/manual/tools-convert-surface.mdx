@@ -1,0 +1,55 @@
+---
+title: mne_convert_surface
+sidebar_label: mne_convert_surface
+sidebar_position: 40
+---
+
+# mne_convert_surface
+
+## Overview
+
+`mne_convert_surface` converts surface meshes between multiple formats: FIFF/BEM, Triangle (.tri), Surface Mesh Format (.smf), and FreeSurfer surfaces.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_convert_surface [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--tri <file>` | Input/output Triangle format surface (.tri) |
+| `--smf <file>` | Input/output Surface Mesh Format file (.smf) |
+| `--fif <file>` | Input/output FIFF BEM surface file |
+| `--surf <file>` | Input/output FreeSurfer surface file |
+| `--meters` | Coordinates are in meters (default: millimeters) |
+| `--swap` | Swap triangle vertex ordering |
+| `--help` | Print help |
+| `--version` | Print version |
+
+Specify one input and one output using different format flags.
+
+## Description
+
+This utility converts between the surface mesh formats commonly used in MEG/EEG source analysis:
+
+- **FIFF BEM** — Standard MNE BEM surface format
+- **Triangle (.tri)** — Simple ASCII format with vertex and triangle lists
+- **SMF (.smf)** — Surface Mesh Format
+- **FreeSurfer** — Native FreeSurfer surface binary format
+
+The tool handles vertex coordinates and triangle connectivity, with optional coordinate scaling and vertex order swapping.
+
+### Example
+
+```bash
+# Convert FreeSurfer surface to FIFF BEM
+mne_convert_surface --surf lh.inner_skull --fif inner_skull.fif
+
+# Convert FIFF BEM to Triangle format
+mne_convert_surface --fif bem.fif --tri surface.tri
+```

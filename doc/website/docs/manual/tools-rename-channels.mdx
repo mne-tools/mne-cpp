@@ -1,0 +1,49 @@
+---
+title: mne_rename_channels
+sidebar_label: mne_rename_channels
+sidebar_position: 49
+---
+
+# mne_rename_channels
+
+## Overview
+
+`mne_rename_channels` renames selected channels in a FIFF file using an alias mapping file. The file is modified in-place.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_rename_channels [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--fif <name>` | FIFF file to modify **(required)** |
+| `--alias <name>` | Alias file with channel name mappings **(required)** |
+| `--revert` | Swap old and new names (reverse the mapping) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+This utility opens a FIFF file for in-place modification and renames channels based on an alias mapping file. Each line of the alias file has the format:
+
+```
+old_name:new_name[:kind]
+```
+
+Where `kind` is an optional channel type code. The `--revert` flag swaps the old and new names, which is useful for undoing a previous rename operation.
+
+### Example
+
+```bash
+# Rename channels according to alias file
+mne_rename_channels --fif raw.fif --alias channel_aliases.txt
+
+# Revert a previous rename
+mne_rename_channels --fif raw.fif --alias channel_aliases.txt --revert
+```

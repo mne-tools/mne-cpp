@@ -1,0 +1,48 @@
+---
+title: mne_convert_dig_data
+sidebar_label: mne_convert_dig_data
+sidebar_position: 39
+---
+
+# mne_convert_dig_data
+
+## Overview
+
+`mne_convert_dig_data` converts Polhemus digitization data between FIFF binary format and hpts text format.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_convert_dig_data [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--fif <name>` | Input FIFF file with digitization data |
+| `--hpts <name>` | Input hpts text file |
+| `--fifout <name>` | Output FIFF file |
+| `--hptsout <name>` | Output hpts text file |
+| `--help` | Print help |
+| `--version` | Print version |
+
+An input must be specified with `--fif` or `--hpts`, and an output with `--fifout` or `--hptsout`.
+
+## Description
+
+This utility converts digitization point data between FIFF binary format and hpts text format. It supports bidirectional conversion with proper coordinate system handling.
+
+The hpts text format contains one point per line with format: `<kind> <ident> <x> <y> <z>` where coordinates are in millimeters.
+
+### Example
+
+```bash
+# Convert FIFF digitization to hpts
+mne_convert_dig_data --fif raw.fif --hptsout dig.hpts
+
+# Convert hpts to FIFF
+mne_convert_dig_data --hpts dig.hpts --fifout dig.fif
+```

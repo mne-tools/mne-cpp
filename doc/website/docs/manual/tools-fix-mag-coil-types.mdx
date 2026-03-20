@@ -1,0 +1,47 @@
+---
+title: mne_fix_mag_coil_types
+sidebar_label: mne_fix_mag_coil_types
+sidebar_position: 44
+---
+
+# mne_fix_mag_coil_types
+
+## Overview
+
+`mne_fix_mag_coil_types` fixes magnetometer coil type definitions in FIFF files. It replaces deprecated coil types with their correct modern counterparts.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_fix_mag_coil_types [options] <file> [file ...]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--magnes` | Also fix Magnes WH magnetometer coil types |
+| `--help` | Print help |
+| `--version` | Print version |
+
+One or more FIFF files are given as positional arguments.
+
+## Description
+
+Some older Vectorview MEG data files contain incorrect magnetometer coil type definitions (`FIFFV_COIL_VV_MAG_T1`). This tool replaces them with the correct type (`FIFFV_COIL_VV_MAG_T3`) and sets `FIFFV_COIL_NONE` for non-MEG/EEG channels.
+
+The files are modified in-place.
+
+With the `--magnes` flag, the tool also corrects Magnes WH magnetometer coil types.
+
+### Example
+
+```bash
+# Fix coil types in one or more files
+mne_fix_mag_coil_types raw.fif
+
+# Also fix Magnes WH types
+mne_fix_mag_coil_types --magnes raw.fif ssp.fif
+```
