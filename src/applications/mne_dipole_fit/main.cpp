@@ -72,6 +72,12 @@ using namespace MNELIB;
 using namespace UTILSLIB;
 
 //=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
+
+#define PROGRAM_VERSION "1.0"
+
+//=============================================================================================================
 // MAIN
 //=============================================================================================================
 
@@ -92,6 +98,8 @@ int main(int argc, char *argv[])
 
     qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QApplication app(argc, argv);
+    QCoreApplication::setApplicationName("mne_dipole_fit");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
     InvDipoleFitSettings settings(&argc,argv);
     InvDipoleFit dipFit(&settings);

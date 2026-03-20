@@ -39,7 +39,17 @@
 #include <QApplication>
 #include <QCommandLineParser>
 
+#include <utils/generics/applicationlogger.h>
+
 #include "app/mainwindow.h"
+
+using namespace UTILSLIB;
+
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
+
+#define PROGRAM_VERSION "1.0"
 
 //=============================================================================================================
 // MAIN
@@ -47,8 +57,10 @@
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QApplication app(argc, argv);
     QCoreApplication::setApplicationName("MNE Inspect");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
     QCoreApplication::setOrganizationName("MNE-CPP");
     QCoreApplication::setOrganizationDomain("mne-cpp.org");
 

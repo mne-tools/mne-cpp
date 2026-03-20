@@ -51,6 +51,8 @@
 #include "mne_setup_mri_settings.h"
 #include "setupmri.h"
 
+#include <utils/generics/applicationlogger.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -62,6 +64,13 @@
 //=============================================================================================================
 
 using namespace MNESETUPMRI;
+using namespace UTILSLIB;
+
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
+
+#define PROGRAM_VERSION "1.0"
 
 //=============================================================================================================
 // MAIN
@@ -78,9 +87,10 @@ using namespace MNESETUPMRI;
  */
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_setup_mri");
-    QCoreApplication::setApplicationVersion("1.0");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
     MNESetupMriSettings settings(&argc, argv);
     SetupMri setupMri(settings);

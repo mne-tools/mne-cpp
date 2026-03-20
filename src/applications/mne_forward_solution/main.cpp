@@ -59,6 +59,12 @@
 using namespace FWDLIB;
 
 //=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
+
+#define PROGRAM_VERSION "2.10"
+
+//=============================================================================================================
 // MAIN
 //=============================================================================================================
 
@@ -75,7 +81,8 @@ int main(int argc, char *argv[])
 {
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     QApplication app(argc, argv);
-    app.setApplicationVersion("2.10");
+    QCoreApplication::setApplicationName("mne_forward_solution");
+    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
     //=========================================================================================================
     // Command line parser
