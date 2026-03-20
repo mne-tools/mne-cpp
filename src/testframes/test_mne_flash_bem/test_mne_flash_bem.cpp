@@ -115,10 +115,8 @@ QString TestMneFlashBem::findApplication()
     QStringList candidates;
 #ifdef Q_OS_WIN
     candidates << appDir + "/../apps/mne_flash_bem.exe"
-               << appDir + "/mne_flash_bem.exe";
-#elif defined(Q_OS_MAC)
-    candidates << appDir + "/../apps/mne_flash_bem"
-               << appDir + "/mne_flash_bem";
+               << appDir + "/mne_flash_bem.exe"
+               << appDir + "/../bin/mne_flash_bem.exe";
 #else
     candidates << appDir + "/../apps/mne_flash_bem"
                << appDir + "/mne_flash_bem"
@@ -240,8 +238,9 @@ void TestMneFlashBem::testMissingFreeSurferHome()
     QVERIFY2(proc.exitCode() != 0,
              "Should fail when FREESURFER_HOME is not set");
 
-    QString stdErr = proc.readAllStandardError();
-    QVERIFY2(stdErr.contains("FREESURFER_HOME") || stdErr.contains("FreeSurfer"),
+    // ApplicationLogger routes all output (including qCritical) to stdout
+    QString stdOut = proc.readAllStandardOutput();
+    QVERIFY2(stdOut.contains("FREESURFER_HOME") || stdOut.contains("FreeSurfer"),
              "Error message should mention FREESURFER_HOME");
 }
 
@@ -266,8 +265,9 @@ void TestMneFlashBem::testMissingSubjectsDir()
     QVERIFY2(proc.exitCode() != 0,
              "Should fail when SUBJECTS_DIR is not set");
 
-    QString stdErr = proc.readAllStandardError();
-    QVERIFY2(stdErr.contains("SUBJECTS_DIR"),
+    // ApplicationLogger routes all output (including qCritical) to stdout
+    QString stdOut = proc.readAllStandardOutput();
+    QVERIFY2(stdOut.contains("SUBJECTS_DIR"),
              "Error message should mention SUBJECTS_DIR");
 }
 
@@ -292,8 +292,9 @@ void TestMneFlashBem::testMissingSubject()
     QVERIFY2(proc.exitCode() != 0,
              "Should fail when SUBJECT is not set");
 
-    QString stdErr = proc.readAllStandardError();
-    QVERIFY2(stdErr.contains("SUBJECT"),
+    // ApplicationLogger routes all output (including qCritical) to stdout
+    QString stdOut = proc.readAllStandardOutput();
+    QVERIFY2(stdOut.contains("SUBJECT"),
              "Error message should mention SUBJECT");
 }
 
