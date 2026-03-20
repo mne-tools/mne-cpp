@@ -559,11 +559,14 @@ void TestDispPlots::testTFplotConstruction()
 
 void TestDispPlots::testTFplotWithFreqRange()
 {
-    MatrixXd tfMatrix(10, 20);
+    // Use enough frequency bins so the requested range [1..40] Hz maps to
+    // at least one pixel row.  sample_rate=100 → max_frq=50 Hz,
+    // 50 rows → frq_per_px=1 Hz → lower_px=1, upper_px=40 → 39 rows.
+    MatrixXd tfMatrix(50, 20);
     tfMatrix.setRandom();
     tfMatrix = tfMatrix.cwiseAbs();
 
-    TFplot* tf = new TFplot(tfMatrix, 1000.0, 1.0, 40.0, ColorMaps::Hot);
+    TFplot* tf = new TFplot(tfMatrix, 100.0, 1.0, 40.0, ColorMaps::Hot);
     QVERIFY(tf != nullptr);
     delete tf;
 }
@@ -589,13 +592,15 @@ void TestDispPlots::testGetDefaultScalingValue()
 void TestDispPlots::testGetScalingValueFromMap()
 {
     QMap<qint32, float> scaleMap;
-    scaleMap.insert(1, 42.0f);
-    scaleMap.insert(2, 84.0f);
+    // Use EEG (kind=2) and STIM (kind=3) — non-MEG kinds so the lookup
+    // uses iChannelKind directly (MEG channels look up by unit instead).
+    scaleMap.insert(2, 42.0f);
+    scaleMap.insert(3, 84.0f);
 
-    float val = getScalingValue(scaleMap, 1, 0);
+    float val = getScalingValue(scaleMap, 2, 0);
     QCOMPARE(val, 42.0f);
 
-    float val2 = getScalingValue(scaleMap, 2, 0);
+    float val2 = getScalingValue(scaleMap, 3, 0);
     QCOMPARE(val2, 84.0f);
 
     // Non-existent key should return a default

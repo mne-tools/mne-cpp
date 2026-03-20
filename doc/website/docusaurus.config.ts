@@ -153,7 +153,9 @@ const config: Config = {
                     items: [
                         { label: 'Build from Source', to: '/docs/development/buildguide-cmake' },
                         { label: 'Contribute', to: '/docs/development/contribute' },
-                        { label: 'API Reference', href: 'https://mne-cpp.github.io/doxygen-api/' },
+                        { label: 'API Reference', href: isDev
+                            ? 'https://mne-cpp.github.io/doxygen-api/dev/'
+                            : 'https://mne-cpp.github.io/doxygen-api/' },
                     ],
                 },
                 {
