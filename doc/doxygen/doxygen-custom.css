@@ -110,6 +110,68 @@ html.dark-mode .version-badge {
     color: var(--primary-color);
 }
 
+/* ── Version dropdown (mirrors Docusaurus version switcher) ────── */
+.version-dropdown {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+}
+
+.version-dropdown-btn {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.version-dropdown-btn::after {
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 0.35rem;
+    vertical-align: middle;
+    border-top: 4px solid;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+}
+
+.version-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    z-index: 1000;
+    min-width: 200px;
+    padding: 0.25rem 0;
+    margin: 0;
+    list-style: none;
+    background: var(--page-background-color);
+    border: 1px solid var(--separator-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.version-dropdown-menu li a {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: var(--page-foreground-color) !important;
+    text-decoration: none !important;
+    font-size: 0.875rem;
+    font-weight: 400;
+    white-space: nowrap;
+    transition: background 0.15s;
+}
+
+.version-dropdown-menu li a:hover {
+    background: var(--menu-selected-background);
+}
+
+.version-dropdown-menu li a.active {
+    font-weight: 600;
+    color: var(--primary-color) !important;
+}
+
 /* ── Navigation links: Docusaurus-style semibold ───────────────── */
 .sm-dox a,
 .sm-dox a:hover,
@@ -196,7 +258,7 @@ html.dark-mode .version-badge {
         gap: 0.375rem;
     }
 
-    #searchBoxPos2 .version-badge {
+    #searchBoxPos2 .version-dropdown {
         order: 1;
     }
 
@@ -320,7 +382,7 @@ html.dark-mode .version-badge {
 
     /* Badge, GitHub, dark toggle are now in the hamburger wrapper
        (not in #searchBoxPos2) — hide any strays that might remain */
-    #searchBoxPos2 .version-badge,
+    #searchBoxPos2 .version-dropdown,
     #searchBoxPos2 .github-link {
         display: none !important;
     }
@@ -338,14 +400,14 @@ html.dark-mode .version-badge {
 
     /* ── Mobile toolbar: badge + GitHub + dark-toggle in
          the hamburger wrapper row, visible next to the logo ───── */
-    #top>div.sm.sm-dox .version-badge,
+    #top>div.sm.sm-dox .version-dropdown,
     #top>div.sm.sm-dox .github-link,
     #top>div.sm.sm-dox doxygen-awesome-dark-mode-toggle {
         display: inline-flex !important;
         align-items: center;
     }
 
-    #top>div.sm.sm-dox .version-badge {
+    #top>div.sm.sm-dox .version-dropdown {
         order: -3;
         margin-right: 0.25rem;
     }
