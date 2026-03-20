@@ -404,8 +404,8 @@ export default function Download(): JSX.Element {
                                     <Heading as="h2">Development Builds</Heading>
                                     <p className="dl-card__desc">
                                         Automated nightly builds from the{' '}
-                                        <a href="https://github.com/mne-tools/mne-cpp/tree/v2.0-dev" target="_blank" rel="noopener noreferrer">
-                                            v2.0-dev
+                                        <a href="https://github.com/mne-tools/mne-cpp/tree/staging" target="_blank" rel="noopener noreferrer">
+                                            staging
                                         </a>{' '}
                                         branch. Latest features and fixes; may be less stable.
                                     </p>
