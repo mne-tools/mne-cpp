@@ -88,7 +88,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<float> > &inputPoints,
      * Automatically make a layout according to the
      * channel locations in inputPoints
      */
-    VectorXf    r0(3);
+    VectorXf    r0 = VectorXf::Zero(3);
     VectorXf    rr(3);
     float       rad,th,phi;
 
@@ -238,7 +238,7 @@ bool LayoutMaker::makeLayout(const std::vector<std::vector<float> > &inputPoints
      * Automatically make a layout according to the
      * channel locations in inputPoints
      */
-    VectorXf    r0(3);
+    VectorXf    r0 = VectorXf::Zero(3);
     VectorXf    rr(3);
     float       rad,th,phi;
 
