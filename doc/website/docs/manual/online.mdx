@@ -37,7 +37,7 @@ MNE-CPP's Wasm build is produced with the [Emscripten](https://emscripten.org/) 
 **No data are uploaded to any server.** The WebAssembly application runs locally within the browser process. File I/O is handled through the browser's in-memory virtual file system; loaded data remain in RAM and are not transmitted over the network.
 :::
 
-Because MEG/EEG recordings frequently contain **Protected Health Information (PHI)** and **Personally Identifiable Information (PII)** — patient names, birth dates, hospital IDs, measurement dates, and more (see [MNE Anonymize](anonymize) for the full list) — data privacy is paramount. The WebAssembly architecture provides the following guarantees:
+Because MEG/EEG recordings frequently contain **Protected Health Information (PHI)** and **Personally Identifiable Information (PII)** — patient names, birth dates, hospital IDs, measurement dates, and more (see [MNE Anonymize](tools-anonymize) for the full list) — data privacy is paramount. The WebAssembly architecture provides the following guarantees:
 
 1. **Local execution only.** The Wasm binary is downloaded once (like any web page asset) and then executes entirely within the browser process on the user's device. There is no server-side processing of user data.
 2. **No network upload of data files.** When you use the file picker to load a `.fif` file, the browser reads the file into local memory. The data are **not** sent to GitHub Pages, any MNE server, or any third party.
@@ -47,7 +47,7 @@ Because MEG/EEG recordings frequently contain **Protected Health Information (PH
 In summary, using MNE-CPP via WebAssembly is, from a data-flow perspective, equivalent to running a desktop application. The browser serves as a cross-platform runtime; it does not act as an intermediary for data transfer.
 
 :::caution Anonymize before sharing
-While the Wasm application itself does not upload data, always ensure that files are properly anonymized with [MNE Anonymize](anonymize) before transferring them to any third party — regardless of transport method.
+While the Wasm application itself does not upload data, always ensure that files are properly anonymized with [MNE Anonymize](tools-anonymize) before transferring them to any third party — regardless of transport method.
 :::
 
 ---
@@ -111,12 +111,12 @@ MNE Inspect is a 3D brain visualization and source analysis application. The Web
 ### MNE Anonymize {#anonymize}
 
 <div style={{display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem'}}>
-  <span>[Full documentation](anonymize) &nbsp;·&nbsp; **[Launch in browser](https://mne-cpp.github.io/wasm/mne_anonymize.html)**</span>
+  <span>[Full documentation](tools-anonymize) &nbsp;·&nbsp; **[Launch in browser](https://mne-cpp.github.io/wasm/mne_anonymize.html)**</span>
 </div>
 
 MNE Anonymize removes or substitutes Protected Health Information (PHI) and Personally Identifiable Information (PII) from FIFF files, following the HIPAA Safe Harbor approach. Handled fields include measurement dates, subject demographics, experimenter name, HIS IDs, project metadata, and hardware MAC addresses. The output file is completely rewritten — hidden or unlinked FIFF tags are never carried over.
 
-The WebAssembly build allows loading, anonymizing, and downloading a FIFF file entirely within the browser, with no data leaving the local machine. See the [full documentation](anonymize) for details on GUI and CLI modes.
+The WebAssembly build allows loading, anonymizing, and downloading a FIFF file entirely within the browser, with no data leaving the local machine. See the [full documentation](tools-anonymize) for details on GUI and CLI modes.
 
 ---
 
@@ -182,5 +182,5 @@ If you want to build MNE-CPP for WebAssembly yourself — for development, testi
 - [MNE Analyze](analyze) — Full desktop documentation
 - [MNE Browse Raw](browse-raw) — Raw data browser documentation
 - [MNE Inspect](inspect) — 3D visualization documentation
-- [MNE Anonymize](anonymize) — De-identification tool documentation
+- [MNE Anonymize](tools-anonymize) — De-identification tool documentation
 - [Download Page](/download) — Native desktop installers and development packages
