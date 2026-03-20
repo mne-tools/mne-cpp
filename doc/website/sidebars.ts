@@ -107,7 +107,7 @@ const sidebars: SidebarsConfig = {
                             type: 'category',
                             label: 'Preprocessing',
                             items: [
-                                'manual/anonymize',
+                                'manual/tools-anonymize',
                                 'manual/tools-process-raw',
                                 'manual/tools-mark-bad-channels',
                                 'manual/tools-compensate-data',
