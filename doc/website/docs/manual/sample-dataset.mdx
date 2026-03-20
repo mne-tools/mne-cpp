@@ -1,0 +1,238 @@
+---
+title: Sample Dataset
+sidebar_label: Sample Dataset
+sidebar_position: 7
+---
+
+# The Sample Dataset
+
+This chapter gives a detailed description of the processing of the MNE sample dataset, which can be employed to familiarize with the [Cookbook](cookbook) workflow.
+
+:::important
+Going through this analysis exercise is not a substitute for reading other chapters of this manual and understanding the concepts underlying MNE software.
+:::
+
+## Overview
+
+The MNE software is accompanied by a sample dataset which includes:
+- **MRI reconstructions** — created with FreeSurfer
+- **MEG/EEG data** — acquired with the Neuromag Vectorview system at the MGH/HMS/MIT Athinoula A. Martinos Center for Biomedical Imaging
+
+EEG data from a 60-channel electrode cap was acquired simultaneously with MEG. The original MRI dataset was acquired with a Siemens 1.5 T Sonata scanner using an MPRAGE sequence.
+
+## Experimental Paradigm
+
+In the MEG/EEG experiment, checkerboard patterns were presented into the left and right visual field, interspersed by tones to the left or right ear. The interval between stimuli was 750 ms. Occasionally a smiley face was presented at the center of the visual field. The subject was asked to press a key with the right index finger as soon as possible after the appearance of the face.
+
+### Trigger Codes
+
+| Name | Code | Contents |
+|---|---|---|
+| LA | 1 | Response to left-ear auditory stimulus |
+| RA | 2 | Response to right-ear auditory stimulus |
+| LV | 3 | Response to left visual field stimulus |
+| RV | 4 | Response to right visual field stimulus |
+| Smiley | 5 | Response to the smiley face |
+| Button | 32 | Response triggered by the button press |
+
+## Dataset Contents
+
+### MEG/EEG Data (`MEG/sample/`)
+
+| File | Contents |
+|---|---|
+| `sample_audvis_raw.fif` | The raw MEG/EEG data |
+| `audvis.ave` | Template script for off-line averaging |
+| `audvis.cov` | Template script for noise-covariance matrix computation |
+
+### MRI Data (`subjects/sample/`)
+
+| File / Directory | Contents |
+|---|---|
+| `bem/` | Directory for the forward modelling data |
+| `bem/watershed/` | BEM surface segmentation data (watershed algorithm) |
+| `bem/inner_skull.surf` | Inner skull surface for BEM |
+| `bem/outer_skull.surf` | Outer skull surface for BEM |
+| `bem/outer_skin.surf` | Skin surface for BEM |
+| `sample-head.fif` | Skin surface in FIFF format for visualizations |
+| `surf/` | Surface reconstructions |
+| `mri/T1/` | The T1-weighted MRI data for visualizations |
+
+A second subject (`morph`) is provided for demonstrating surface morphing capabilities.
+
+### Preprocessing Already Completed
+
+The following steps have been already accomplished in the sample dataset:
+
+1. MRI surface reconstructions computed using FreeSurfer
+2. BEM surfaces created with the watershed algorithm
+3. MEG/EEG raw data checked and corrected
+4. Template scripts for averaging and noise-covariance written
+
+## Step-by-Step Walkthrough
+
+### 1. Setting Up
+
+```bash
+# Set environment variables
+export SUBJECTS_DIR=<yourdir>/subjects
+export SUBJECT=sample
+```
+
+### 2. Setting Up Subject-Specific Data
+
+**Structural MRIs:**
+```bash
+mne_setup_mri
+```
+
+**Source space** (octahedron subdivision 6 ≈ 4098 sources/hemisphere):
+```bash
+mne_make_source_space --ico -6
+```
+
+**Boundary-element models:**
+```bash
+# Single-layer BEM (MEG only, faster)
+mne_setup_forward_model --homog --surf --ico 4
+
+# Three-layer BEM (MEG + EEG)
+mne_setup_forward_model --surf --ico 4
+```
+
+### 3. Previewing the Data
+
+Before averaging, preview the raw data:
+
+1. Examine all channels and identify noisy or flat channels
+2. Mark bad channels using [`mne_mark_bad_channels`](tools-mark-bad-channels) or interactively
+3. Verify that the bad channels are correctly excluded
+
+:::tip
+You should be able to identify two problematic channels among the MEG and EEG channels in this dataset — one flat and one noisy.
+:::
+
+### 4. Off-Line Averaging
+
+Compute averaged evoked responses using the averaging script:
+
+```bash
+mne_process_raw --raw sample_audvis_raw.fif \
+    --lowpass 40 --projoff \
+    --saveavetag -ave --ave audvis.ave
+```
+
+This creates `sample_audvis-ave.fif` containing averages for left and right auditory as well as left and right visual field stimuli.
+
+### 5. Inspecting the Averages
+
+Load the averaged data in [MNE Analyze](analyze) or a compatible viewer and observe:
+
+**Auditory responses:**
+- The main deflection occurs around 100 ms over the left and right temporal areas
+- The left-ear response is stronger on the right hemisphere; the opposite for the right-ear response
+
+**Visual responses:**
+- Left and right visual field responses have quite different spatial distributions in the occipital area
+- A later response in the right parietal area is almost identical for both visual stimuli
+
+### 6. Computing the Noise-Covariance Matrix
+
+```bash
+mne_process_raw --raw sample_audvis_raw.fif \
+    --lowpass 40 --projon \
+    --savecovtag -cov --cov audvis.cov
+```
+
+This creates `sample_audvis-cov.fif`. The projections are set on, and the projection information is attached to the noise-covariance matrix.
+
+### 7. MEG-MRI Coordinate Alignment
+
+Use [MNE Analyze](analyze) for the coordinate alignment. The process involves:
+
+1. Load the raw data file (provides digitizer data)
+2. Load an inflated surface for subject `sample`
+3. Identify the fiducial landmarks (nasion, LAP, RAP) on the MRI surface
+4. Click **Align using fiducials** for an initial alignment
+5. Discard outlier digitizer points (> 10 mm from surface)
+6. Use ICP (Iterative Closest Point) alignment to refine (10–20 iterations)
+7. Save the coordinate transformation
+
+:::warning
+Use the ICP alignment with caution. The iteration will not converge to a reasonable solution unless an initial alignment is performed first using fiducials.
+:::
+
+### 8. Computing the Forward Solution
+
+```bash
+cd MEG/sample
+
+mne_forward_solution \
+    --src $SUBJECTS_DIR/sample/bem/sample-oct-6-src.fif \
+    --bem $SUBJECTS_DIR/sample/bem/sample-5120-5120-5120-bem-sol.fif \
+    --meas sample_audvis-ave.fif \
+    --trans sample-trans.fif \
+    --meg --eeg --mindist 5 \
+    --fwd sample_audvis-ave-oct-6-fwd.fif
+```
+
+For MEG-only analysis with the single-compartment BEM:
+
+```bash
+mne_forward_solution \
+    --src $SUBJECTS_DIR/sample/bem/sample-oct-6-src.fif \
+    --bem $SUBJECTS_DIR/sample/bem/sample-5120-bem-sol.fif \
+    --meas sample_audvis-ave.fif \
+    --trans sample-trans.fif \
+    --meg --mindist 5 \
+    --fwd sample_audvis-ave-oct-6-meg-fwd.fif
+```
+
+### 9. Computing the Inverse Operator
+
+Combined MEG+EEG inverse operator with depth weighting and loose orientation constraint:
+
+```bash
+mne_inverse_operator \
+    --fwd sample_audvis-ave-oct-6-fwd.fif \
+    --noisecov sample_audvis-cov.fif \
+    --depth --loose 0.2 --meg --eeg
+```
+
+Separate MEG-only and EEG-only inverse operators:
+
+```bash
+# MEG only
+mne_inverse_operator \
+    --fwd sample_audvis-ave-oct-6-fwd.fif \
+    --noisecov sample_audvis-cov.fif \
+    --depth --loose 0.2 --meg
+
+# EEG only
+mne_inverse_operator \
+    --fwd sample_audvis-ave-oct-6-fwd.fif \
+    --noisecov sample_audvis-cov.fif \
+    --depth --loose 0.2 --eeg
+```
+
+:::note
+If you computed the forward solution with a single-compartment BEM, you can only compute the MEG inverse operator.
+:::
+
+### 10. Interactive Analysis
+
+Explore the data and current estimates in [MNE Analyze](analyze) or [MNE Inspect](inspect):
+
+1. **Load surfaces** — inflated surface for subject `sample`
+2. **Load data** — select `sample_audvis-ave.fif` and the inverse operator
+3. **View field maps** — observe magnetic field and potential maps at the N100m peak
+4. **View current estimates** — investigate the effects of regularization and other parameter settings
+5. **Create labels** — define ROIs at the auditory cortices and examine time courses
+6. **Try morphing** — load the `morph` subject and switch between original and morphed surfaces
+
+## See Also
+
+- [Cookbook](cookbook) — The general processing workflow
+- [Forward Solution](forward) — Theory of coordinate systems and the forward problem
+- [Inverse Estimation](inverse) — Mathematical details of MNE, dSPM, and sLORETA
+- [Tools Overview](tools-overview) — Complete list of command-line tools

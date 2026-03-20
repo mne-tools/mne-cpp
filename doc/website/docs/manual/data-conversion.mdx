@@ -1,0 +1,179 @@
+---
+title: Data Conversion
+sidebar_label: Data Conversion
+sidebar_position: 8
+---
+
+# Data Conversion
+
+This chapter describes the data conversion utilities included with MNE software for importing data from various MEG/EEG systems and converting between different file and coordinate formats.
+
+## Importing MEG/EEG System Data
+
+### 4-D Neuroimaging (Magnes)
+
+The 4-D Magnes software can export data in FIFF format. However, the exported files lack compensation channel information. The complete conversion process involves:
+
+1. Export the raw data FIFF file from the Magnes system
+2. If the primary sensors are gradiometers (not magnetometers), run `mne_fix_mag_coil_types --magnes` to correct channel information
+3. Export a text file containing the Magnes compensation sensor data
+4. Create a text file containing the compensation channel weights
+5. Run `mne_insert_4D_comp` to merge compensation channel data with the original FIFF file
+6. Run `mne_create_comp_data` to create a FIFF file with the compensation weight matrix
+7. Run `mne_add_to_meas_info` to combine the files into a complete FIFF file
+
+:::note
+Including compensation channel data is recommended but not mandatory. If the data are already compensated in the Magnes system, there will be a small error in the forward calculations.
+:::
+
+### CTF Data
+
+Use [`mne_ctf2fiff`](tools-ctf2fiff) to convert CTF ds directories to FIFF format. Key options:
+
+| Option | Description |
+|---|---|
+| `--ds <directory>` | Read data from this CTF ds directory |
+| `--fif <filename>` | Output FIFF file name |
+| `--omit <filename>` | File listing channels to omit from conversion |
+| `--evoked` | Produce an evoked-response file instead of raw data |
+| `--infoonly` | Write only measurement info, no data |
+
+During conversion, the utility reads `.res4` (header info), `.hc` (HPI coil locations), `.meg4` (MEG data), and optionally `.eeg` (EEG electrode locations) from the ds directory.
+
+:::important
+The conversion includes a transformation from the CTF head coordinate system convention to the Neuromag convention. Epoch mode files with time gaps between epochs are not recommended as they produce discontinuities in the output.
+:::
+
+**CTF Polhemus data** can be converted with `mne_ctf_dig2fiff`, which reads digitization data in CTF text format and outputs FIFF and hpts formats. Use `--numfids` if fiducial locations are numbered (1 = nasion, 2 = left auricular, 3 = right auricular) rather than labeled.
+
+### Software Gradient Compensation
+
+CTF and 4-D systems use software gradient compensation to suppress external disturbances using reference channel data. The compensation matrices relate uncompensated data $\mathbf{x}^{(0)}$ to compensated data $\mathbf{x}^{(k)}$:
+
+$$
+\mathbf{x}^{(k)} = \mathbf{M}^{(k)} \mathbf{x}^{(0)}
+$$
+
+where $\mathbf{M}^{(k)}$ is a composite compensation matrix containing the $n_1 \times n_2$ compensation data matrix $\mathbf{C}^{(k)}$ for grade $k$.
+
+Use [`mne_compensate_data`](tools-compensate-data) to change the compensation grade in evoked-response files. For raw data, use [`mne_process_raw`](tools-process-raw) with the desired compensation grade.
+
+### KIT MEG System
+
+Use [`mne_kit2fiff`](tools-kit2fiff) to import 160-channel KIT MEG system data. Required input files:
+
+1. **Polhemus data file** (`.elp`) — fiducial and HPI coil locations
+2. **HPI coil device locations** — HPI coil positions in MEG device coordinates
+3. **Sensor data file** (`.sns`) — sensor locations and orientations
+
+Optional files include a head shape data file (`.hsp`) and raw data in text format.
+
+The digital trigger channel (STI 014) can be synthesized from analog trigger channels using `--stim`, with an adjustable threshold (`--stimthresh`, default 1.0).
+
+### EDF, EDF+, and BDF Formats
+
+Use [`mne_edf2fiff`](tools-edf2fiff) to convert European Data Format (EDF/EDF+, 16-bit) and BioSemi BDF (24-bit) files. Key considerations:
+
+- **Electrode locations** must be provided separately via `--hpts` or `--elp` files (fiducial locations are mandatory)
+- **EDF+ annotation channels** can be converted to trigger channel (STI 014) using `--annotmap`
+- **BDF trigger data**: use `--digtrigmask 0xff` to select the significant bytes
+
+Post-conversion steps:
+1. Set correct channel types (EOG, EMG) with `mne_rename_channels`
+2. Create topographical layout with `mne_make_eeg_layout`
+3. For BDF files, specify trigger channel name "Status" via `--digtrig`
+
+:::warning
+BDF 3-byte samples are converted to 4-byte integers. The maximum convertible BDF file size is approximately 1.5 GB. Channel-dependent sampling rates are not supported.
+:::
+
+### BrainVision EEG Data
+
+Use [`mne_brain_vision2fiff`](tools-brain-vision2fiff) to import BrainVision data:
+
+| Option | Description |
+|---|---|
+| `--header <name>` | BrainVision header file (`.vhdr`) |
+| `--dig <name>` | FIFF file with digitization data |
+| `--orignames` | Keep original EEG channel labels |
+| `--eximia` | Interpret as eXimia data (threshold first 3 channels as triggers) |
+| `--split <size/MB>` | Split output at specified file size |
+
+The `mne_eximia2fiff` script provides a convenient wrapper for converting Nexstim eXimia EEG data.
+
+### Tufts University Format
+
+The `mne_tufts2fiff` utility imports Tufts University EEG data from three files:
+- Raw data file (`.raw`)
+- Calibration raw data file (`c.raw`) — needed for physical unit scaling
+- Electrode location file (`.elp`) — fiducial locations are mandatory
+
+## Converting Digitization Data
+
+The `mne_convert_dig_data` utility converts Polhemus digitization data between FIFF, hpts, and elp formats.
+
+### The hpts Format
+
+The hpts text format uses lines of the form:
+
+```
+<category> <identifier> <x/mm> <y/mm> <z/mm>
+```
+
+| Category | Description |
+|---|---|
+| `cardinal` (or `fiducial`) | Fiducial landmarks (1 = left auricular, 2 = nasion, 3 = right auricular) |
+| `hpi` | Head-position indicator coil locations |
+| `eeg` | EEG electrode locations (identifier 0 = reference electrode) |
+| `extra` | Additional head surface points |
+
+Coordinates are typically in the MEG head coordinate system in millimeters.
+
+## Converting Volumetric Data
+
+The `mne_volume_data2mri` utility converts source estimate data (`.w` or `.stc` files) from a volumetric source space into FreeSurfer MRI overlay format (`.mgh` or `.mgz`). The volumetric source space must have been created with the `--mri` option in [`mne_volume_source_space`](tools-volume-source-space).
+
+## Converting Surface Data
+
+The `mne_convert_surface` utility converts surface data between multiple formats:
+
+| Input Formats | Output Formats |
+|---|---|
+| FIFF (`--fif`) | FIFF (`--fifout`) |
+| FreeSurfer (`--surf`) | FreeSurfer (`--surfout`) |
+| Text triangle file (`--tri`) | ASCII triangle (`--triout`) |
+| BrainSuite DFS (`--dfs`) | ASCII points (`--pntout`) |
+| | SMF (`--smfout`) |
+
+For DFS files, use `--mghmri` or `--fifmri` to specify the MRI volume for coordinate transformation. The `--flip` option handles left-right coordinate system differences.
+
+## Converting MRI Data to FIFF
+
+The `mne_make_cor_set` utility creates FIFF format MRI description files from FreeSurfer MRI volumes:
+
+```bash
+# From COR format directory
+mne_make_cor_set --dir <directory> --out <output.fif>
+
+# From mgh/mgz format (includes pixel data and transformations)
+mne_make_cor_set --mgh <volume.mgz> --out <output.fif>
+```
+
+With `--mgh` input, the output includes the $T_3$, $T_4$ (Talairach), $T^-$, and $T^+$ coordinate transformations.
+
+## Collecting Coordinate Transformations
+
+The `mne_collect_transforms` utility gathers coordinate transformations from various sources into a single FIFF file. This is useful for assembling all the transformations needed for the analysis pipeline:
+
+| Option | Provides |
+|---|---|
+| `--meas <name>` | Head-to-device transformation $T_1$ |
+| `--mri <name>` | Head-to-MRI transformation $T_2$, plus $T_3$, $T_4$, $T^-$, $T^+$ |
+| `--mgh <name>` | MRI volume geometry and Talairach transformation |
+
+## See Also
+
+- [FIFF Format](fiff-format) — Details on the FIFF file format
+- [Forward Solution](forward) — Coordinate systems and transformations
+- [Cookbook](cookbook) — Step-by-step processing workflow
+- [Tools Overview](tools-overview) — Complete list of command-line tools

@@ -12,10 +12,14 @@ const sidebars: SidebarsConfig = {
                     type: 'category',
                     label: 'Background',
                     items: [
+                        'manual/cookbook',
                         'manual/workflow',
                         'manual/forward',
                         'manual/inverse',
                         'manual/ssp',
+                        'manual/fiff-format',
+                        'manual/sample-dataset',
+                        'manual/data-conversion',
                     ],
                 },
                 {
