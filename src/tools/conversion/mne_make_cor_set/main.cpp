@@ -71,7 +71,7 @@ using namespace Eigen;
 // DEFINES
 //=============================================================================================================
 
-#define PROGRAM_VERSION "2.0.0"
+#define PROGRAM_VERSION MNE_CPP_VERSION
 
 #define COR_NSLICE 256
 #define COR_NPIX   256

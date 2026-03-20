@@ -70,7 +70,7 @@ class BrainSurface;
  * visibility profile so that each pane can show a different combination of
  * objects.
  */
-struct ViewVisibilityProfile
+struct DISP3DSHARED_EXPORT ViewVisibilityProfile
 {
     bool lh              = true;
     bool rh              = true;
@@ -144,7 +144,7 @@ struct ViewVisibilityProfile
  * zoom, pan, camera rotation, and view preset — everything that can differ
  * between two viewports showing the same scene.
  */
-struct SubView
+struct DISP3DSHARED_EXPORT SubView
 {
     // ── Per-view render configuration ──────────────────────────────────
     QString                         surfaceType      = "pial";

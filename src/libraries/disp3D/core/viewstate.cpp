@@ -168,6 +168,7 @@ void ViewVisibilityProfile::save(QSettings &settings, const QString &prefix) con
 
 bool SubView::isBrainSurfaceKey(const QString &key)
 {
+    if (key.isEmpty())            return false;
     if (key.startsWith("bem_"))   return false;
     if (key.startsWith("sens_"))  return false;
     if (key.startsWith("srcsp_")) return false;
@@ -322,6 +323,7 @@ ShaderMode shaderModeFromName(const QString &name)
 {
     if (name == "Holographic") return Holographic;
     if (name == "Anatomical")  return Anatomical;
+    if (name == "XRay")        return XRay;
     return Standard;
 }
 

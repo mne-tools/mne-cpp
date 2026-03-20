@@ -8,7 +8,7 @@
  *
  * @section  LICENSE
  *
- * Copyright (C) 2015, Christoph Dinh, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2015-2026, Christoph Dinh, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -119,7 +119,7 @@ public:
      */
     static int MajorVersion()
     {
-        return 0;
+        return 1;
     }
 
     //=========================================================================================================
@@ -130,7 +130,7 @@ public:
      */
     static int MinorVersion()
     {
-        return 1;
+        return 0;
     }
 
     //=========================================================================================================
@@ -141,7 +141,7 @@ public:
      */
     static int RevisionVersion()
     {
-        return 9;
+        return 0;
     }
 
     //=========================================================================================================
@@ -152,7 +152,7 @@ public:
      */
     static int BuildVersion()
     {
-        return 224;
+        return 0;
     }
 
     //=========================================================================================================

@@ -124,7 +124,15 @@
         IF "%PACK_OPTION%"=="true" (
             cd /d %BASE_PATH%
             REM Delete folders which we do not want to ship
-            %MOCK_TEXT%rmdir %OUT_DIR_NAME%\resources\data /s /q 
+            %MOCK_TEXT%rmdir %OUT_DIR_NAME%\resources\data /s /q
+
+            REM Install SDK components (headers + CMake config) into the output tree
+            ECHO.
+            ECHO === Installing SDK components (headers + CMake config) ===
+            %MOCK_TEXT%cmake --install %BASE_PATH%\build\%BUILD_NAME% --prefix %OUT_DIR_NAME% --component sdk
+            REM Install Eigen headers and CMake config (used by MNE-CPP public headers)
+            %MOCK_TEXT%cmake --install %BASE_PATH%\build\%BUILD_NAME% --prefix %OUT_DIR_NAME% --component Devel
+
             REM Creating archive from inside output directory for clean top-level layout
             cd /d %OUT_DIR_NAME%
             ECHO.
@@ -141,9 +149,9 @@
             )
             ECHO.
             REM Only include lib if it exists (on Windows, DLLs are in bin/)
-            SET "PACK_DIRS=bin resources"
+            SET "PACK_DIRS=bin include share resources"
             IF EXIST lib (
-                SET "PACK_DIRS=bin lib resources"
+                SET "PACK_DIRS=bin lib include share resources"
             )
             %MOCK_TEXT%7z a %BASE_PATH%\mne-cpp-windows-dynamic-x86_64.zip %PACK_DIRS%
             cd /d %BASE_PATH%
@@ -503,11 +511,23 @@ if [[ ${LinkOption} == "dynamic" ]]; then
         echo "Total output size:"
         du -sh ${BasePath}/out/${BuildName}/bin/ ${BasePath}/out/${BuildName}/lib/ 2>/dev/null
 
+        # Install SDK components (headers + CMake config) into the output tree
+        echo ""
+        echo "=== Installing SDK components (headers + CMake config) ==="
+        ${MockText}cmake --install ${BasePath}/build/${BuildName} --prefix ${BasePath}/out/${BuildName} --component sdk
+        # Install Eigen headers and CMake config (used by MNE-CPP public headers)
+        ${MockText}cmake --install ${BasePath}/build/${BuildName} --prefix ${BasePath}/out/${BuildName} --component Devel
+        echo "SDK headers:"
+        find ${BasePath}/out/${BuildName}/include -name "*.h" 2>/dev/null | wc -l
+        echo "CMake config files:"
+        ls ${BasePath}/out/${BuildName}/lib/cmake/MNE-CPP/ 2>/dev/null
+
         # Creating archive of all macos deployed applications.
         # Include bin/ (with Qt frameworks inside .app bundles), lib/
         # (MNE-CPP shared libraries + Qt frameworks for CLI tools),
+        # include/ (public headers for SDK users), share/ (Eigen cmake config),
         # and resources/ (config files needed by CLI tools like mne_rt_server).
-        ${MockText}tar cfvz mne-cpp-macos-dynamic-arm64.tar.gz -C ${BasePath}/out/${BuildName} bin lib resources
+        ${MockText}tar cfvz mne-cpp-macos-dynamic-arm64.tar.gz -C ${BasePath}/out/${BuildName} bin lib include share resources
     fi
 
 elif [[ ${LinkOption} == "static" ]]; then
@@ -741,6 +761,13 @@ if [[ ${LinkOption} == "dynamic" ]]; then
             echo
             echo ldd ${BasePath}/out/${BuildName}/bin/mne_scan
             ${MockText}ldd ${BasePath}/out/${BuildName}/bin/mne_scan
+
+            # Install SDK components (headers + CMake config) into the output tree
+            echo ""
+            echo "=== Installing SDK components (headers + CMake config) ==="
+            ${MockText}cmake --install ${BasePath}/build/${BuildName} --prefix ${BasePath}/out/${BuildName} --component sdk
+            # Install Eigen headers and CMake config (used by MNE-CPP public headers)
+            ${MockText}cmake --install ${BasePath}/build/${BuildName} --prefix ${BasePath}/out/${BuildName} --component Devel
 
             # Delete folders which we do not want to ship
             ${MockText}cp -r ${BasePath}/out/${BuildName}/ mne-cpp

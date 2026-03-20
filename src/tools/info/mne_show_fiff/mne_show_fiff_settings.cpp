@@ -56,7 +56,7 @@ using namespace SHOWFIFF;
 //=============================================================================================================
 
 #ifndef PROGRAM_VERSION
-#define PROGRAM_VERSION     "1.9"
+#define PROGRAM_VERSION MNE_CPP_VERSION
 #endif
 
 #define DEFAULT_INDENT 3

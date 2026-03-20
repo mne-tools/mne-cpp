@@ -4,6 +4,10 @@ project(mne_cpp LANGUAGES CXX)
 set(MNE_CPP_VERSION_MAJOR 2)
 set(MNE_CPP_VERSION_MINOR 0)
 set(MNE_CPP_VERSION_PATCH 0)
+set(MNE_CPP_VERSION "${MNE_CPP_VERSION_MAJOR}.${MNE_CPP_VERSION_MINOR}.${MNE_CPP_VERSION_PATCH}")
+
+# Make the project version available as a compile definition for CLI tools
+add_compile_definitions(MNE_CPP_VERSION="${MNE_CPP_VERSION}")
 
 
 ##==============================================================================
@@ -98,12 +102,12 @@ if(NOT DEFINED BINARY_OUTPUT_DIRECTORY)
 endif()
 
 ##==============================================================================
-## Dissalow in-soure builds by default
+## Disallow in-source builds by default
 
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   if(NOT DEFINED FORCE_IN_SOURCE_BUILD)
     message(FATAL_ERROR
-      "We dissalow in-sourec builds by default because they are typically"
+      "We disallow in-source builds by default because they are typically"
       " a bad idea."
       "\n Remove \"${CMAKE_SOURCE_DIR}/CMakeCache.txt\" and "
       "\"${CMAKE_SOURCE_DIR}/CMakeFiles\" and try again from another folder:"
@@ -111,8 +115,8 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
       "\n mkdir build"
       "\n cmake -S . -B build"
       "\n "
-      "\n If you are absolutley sure of what you are doing, you can pass in "
-      "FORCE_IN_SOURCE_BUILD to CMake to force in-soure building "
+      "\n If you are absolutely sure of what you are doing, you can pass in "
+      "FORCE_IN_SOURCE_BUILD to CMake to force in-source building "
       "(not recommended!)"
     )
   endif()
@@ -191,6 +195,41 @@ option(MNE_ENABLE_INSTALLER "Enable building the installer" OFF)
 if(MNE_ENABLE_INSTALLER)
     include(${CMAKE_CURRENT_SOURCE_DIR}/../scripts/packaging/Installer.cmake)
 endif()
+
+##==============================================================================
+## CMake package config for find_package(MNE-CPP) — SDK discovery
+
+include(CMakePackageConfigHelpers)
+
+# Generate MNE-CPPConfig.cmake from template
+configure_package_config_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/../scripts/packaging/MNECPPConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/MNE-CPPConfig.cmake"
+    INSTALL_DESTINATION lib/cmake/MNE-CPP
+)
+
+# Generate version file for find_package(MNE-CPP 2.0.0)
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/MNE-CPPConfigVersion.cmake"
+    VERSION ${MNE_CPP_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+
+# Install the export set (MNECPPTargets.cmake with imported targets)
+install(EXPORT MNECPPTargets
+    FILE MNECPPTargets.cmake
+    NAMESPACE MNE-CPP::
+    DESTINATION lib/cmake/MNE-CPP
+    COMPONENT sdk
+)
+
+# Install the config and version files
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/MNE-CPPConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/MNE-CPPConfigVersion.cmake"
+    DESTINATION lib/cmake/MNE-CPP
+    COMPONENT sdk
+)
 
   
 ##==============================================================================

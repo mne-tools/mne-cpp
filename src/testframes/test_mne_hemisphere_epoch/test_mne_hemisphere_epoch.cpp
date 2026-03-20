@@ -82,9 +82,9 @@ private slots:
 
     void hemisphere_equalityEmpty()
     {
-        // operator== on empty hemispheres may crash due to
-        // uninitialized sparse matrices — skip
-        QSKIP("operator== crashes on default-constructed sparse members");
+        MNEHemisphere a;
+        MNEHemisphere b;
+        QVERIFY(a == b);
     }
 
     void hemisphere_equalityPopulated()

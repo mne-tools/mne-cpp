@@ -62,7 +62,15 @@ namespace INVLIB
 
 //=============================================================================================================
 /**
- * Minimum norm estimation algorithm ToDo: Paper references.
+ * Minimum norm estimation algorithm.
+ *
+ * Computes L2 minimum-norm, dSPM, or sLORETA source estimates from MEG/EEG data
+ * using a pre-computed inverse operator.
+ *
+ * References:
+ * - Hamalainen & Ilmoniemi, Med. & Biol. Eng. & Comput. 32, 35-42, 1994.
+ * - Dale et al., Neuron 26, 55-67, 2000 (dSPM).
+ * - Pascual-Marqui, Methods Find. Exp. Clin. Pharmacol. 24D, 5-12, 2002 (sLORETA).
  *
  * @brief Minimum norm estimation
  */

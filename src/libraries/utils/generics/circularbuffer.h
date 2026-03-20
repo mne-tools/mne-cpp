@@ -191,15 +191,17 @@ CircularBuffer<_Tp>::~CircularBuffer()
 template<typename _Tp>
 inline bool CircularBuffer<_Tp>::push(const _Tp* pArray, unsigned int size)
 {
-    if(!m_bPause) {
-        if(m_pFreeElements->tryAcquire(size, m_iTimeout)) {
-            for(unsigned int i = 0; i < size; ++i) {
-                m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = pArray[i];
-            }
-            const QSemaphoreReleaser releaser(m_pUsedElements, size);
-        } else {
-            return false;
+    if(m_bPause) {
+        return false;
+    }
+
+    if(m_pFreeElements->tryAcquire(size, m_iTimeout)) {
+        for(unsigned int i = 0; i < size; ++i) {
+            m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = pArray[i];
         }
+        const QSemaphoreReleaser releaser(m_pUsedElements, size);
+    } else {
+        return false;
     }
 
     return true;
@@ -210,6 +212,10 @@ inline bool CircularBuffer<_Tp>::push(const _Tp* pArray, unsigned int size)
 template<typename _Tp>
 inline bool CircularBuffer<_Tp>::push(const _Tp& newElement)
 {
+    if(m_bPause) {
+        return false;
+    }
+
     if(m_pFreeElements->tryAcquire(1, m_iTimeout)) {
         m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = newElement;
         const QSemaphoreReleaser releaser(m_pUsedElements, 1);
@@ -225,13 +231,15 @@ inline bool CircularBuffer<_Tp>::push(const _Tp& newElement)
 template<typename _Tp>
 inline bool CircularBuffer<_Tp>::pop(_Tp& element)
 {
-    if(!m_bPause) {
-        if(m_pUsedElements->tryAcquire(1, m_iTimeout)) {
-            element = m_pBuffer[mapIndex(m_iCurrentReadIndex)];
-            const QSemaphoreReleaser releaser(m_pFreeElements, 1);
-        } else {
-            return false;
-        }
+    if(m_bPause) {
+        return false;
+    }
+
+    if(m_pUsedElements->tryAcquire(1, m_iTimeout)) {
+        element = m_pBuffer[mapIndex(m_iCurrentReadIndex)];
+        const QSemaphoreReleaser releaser(m_pFreeElements, 1);
+    } else {
+        return false;
     }
 
     return true;

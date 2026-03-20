@@ -77,7 +77,7 @@ using namespace Eigen;
 // STATIC DEFINITIONS
 //=============================================================================================================
 
-#define PROGRAM_VERSION "2.0.0"
+#define PROGRAM_VERSION MNE_CPP_VERSION
 
 // KIT system constants
 #define KIT_HEADER_SIZE    16384   // Typical header size

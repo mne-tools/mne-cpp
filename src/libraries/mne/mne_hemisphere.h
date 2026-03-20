@@ -283,7 +283,13 @@ inline bool operator== (const MNEHemisphere &a, const MNEHemisphere &b)
             a.nearestDistVec().isApprox(b.nearestDistVec(), 0.0001) &&
             a.patch_inds.isApprox(b.patch_inds) &&
             //a.dist_limit == b.dist_limit && //TODO: We still not sure if dist_limit can also be a matrix. This needs to be debugged
-            a.dist.toEigenSparse().isApprox(b.dist.toEigenSparse(), 0.0001) &&
+            [&a, &b]() {
+                auto sa = a.dist.toEigenSparse();
+                auto sb = b.dist.toEigenSparse();
+                if (sa.rows() == 0 && sb.rows() == 0 && sa.cols() == 0 && sb.cols() == 0)
+                    return true;
+                return sa.isApprox(sb, 0.0001);
+            }() &&
             a.tri_cent.isApprox(b.tri_cent, 0.0001) &&
             a.tri_nn.isApprox(b.tri_nn, 0.0001) &&
             a.tri_area.isApprox(b.tri_area, 0.0001) &&

@@ -88,7 +88,13 @@ typedef struct Pair
 /**
  * @brief RAP MUSIC (Recursively Applied and Projected Multiple Signal Classification) source localization algorithm
  *
- * ToDo Detailed description
+ * Implements the RAP MUSIC scanning algorithm which iteratively identifies correlated
+ * source pairs by projecting the signal subspace and re-scanning the lead field.
+ * Each iteration finds one dipole (or dipole pair), projects it out of the signal
+ * subspace, and repeats until the desired number of sources is found or the
+ * residual correlation drops below threshold.
+ *
+ * Reference: Mosher & Leahy, IEEE Trans. Signal Process. 47(2), 332-340, 1999.
  */
 class INVSHARED_EXPORT InvRapMusic
 {

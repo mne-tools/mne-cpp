@@ -308,26 +308,31 @@ bool LayoutLoader::readMNELoutFile(const std::string &path, QMap<std::string, QP
 
     std::string line;
 
+    // Skip first line (bounding box)
+    std::getline(inFile, line);
+
     while(std::getline(inFile, line)){
-        if(line.find('#') != std::string::npos){
-            std::vector<std::string> elements;
-            std::stringstream stream{line};
-            std::string element;
+        if(line.empty()) continue;
 
+        std::vector<std::string> elements;
+        std::stringstream stream{line};
+        std::string element;
+
+        stream >> std::ws;
+        while(stream >> element){
+            elements.push_back(std::move(element));
             stream >> std::ws;
-            while(stream >> element){
-                elements.push_back(std::move(element));
-                stream >> std::ws;
-            }
-
-            QPointF posTemp;
-            posTemp.setX(std::stod(elements.at(1)));      //x
-            posTemp.setY(std::stod(elements.at(2)));      //y
-
-            //Create channel data map entry
-            std::string key{elements.at(elements.size() - 2) + " " + elements.at(elements.size() - 1)};
-            channelData.insert(key, posTemp);
         }
+
+        if(elements.size() < 4) continue;
+
+        QPointF posTemp;
+        posTemp.setX(std::stod(elements.at(1)));      //x
+        posTemp.setY(std::stod(elements.at(2)));      //y
+
+        //Create channel data map entry
+        std::string key{elements.at(elements.size() - 2) + " " + elements.at(elements.size() - 1)};
+        channelData.insert(key, posTemp);
     }
 
     return true;

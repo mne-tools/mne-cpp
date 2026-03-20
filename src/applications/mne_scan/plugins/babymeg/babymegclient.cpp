@@ -126,6 +126,10 @@ void BabyMEGClient::DisplayError(int socketError, const QString &message)
 
 int BabyMEGClient::MGH_LM_Byte2Int(QByteArray b)
 {
+    if (b.size() < 4) {
+        qWarning("MGH_LM_Byte2Int: input too short (%lld bytes, need 4)", static_cast<long long>(b.size()));
+        return 0;
+    }
     int value= 0;
     for (int i=0;i<2;i++)
     {
@@ -158,6 +162,10 @@ QByteArray BabyMEGClient::MGH_LM_Int2Byte(int a)
 
 double BabyMEGClient::MGH_LM_Byte2Double(QByteArray b)
 {
+    if (b.size() < 8) {
+        qWarning("MGH_LM_Byte2Double: input too short (%lld bytes, need 8)", static_cast<long long>(b.size()));
+        return 0.0;
+    }
     double value= 1.0;
     // reverse the byte order
     for (int i=0;i<4;i++)
@@ -323,6 +331,12 @@ void BabyMEGClient::handleBuffer()
 //        qDebug() << "Command[" << CMD <<"]";
 //        qDebug() << "Body Length[" << tmp << "]";
 
+        if (tmp < 0) {
+            qWarning("handleBuffer: negative body length %d, discarding", tmp);
+            buffer.clear();
+            return;
+        }
+
         if (tmp <= (buffer.size() - 8))
         {
             buffer.remove(0,8);
@@ -465,6 +479,12 @@ void BabyMEGClient::ReadNextBlock(int tmp)
             qDebug() << "[2]First 4 bytes + length" << CMD1 << "["<<CMD1.toHex()<<"]";
             qDebug() << "[2]Command[" << CMD1 <<"]";
             qDebug() << "[2]Body Length[" << tmp1 << "]";
+
+            if (tmp1 < 0) {
+                qWarning("ReadNextBlock: negative body length %d, discarding", tmp1);
+                buffer.clear();
+                break;
+            }
 
             buffer.remove(0,8);
             DATA1 = buffer.left(tmp1);

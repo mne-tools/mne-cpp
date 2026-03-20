@@ -107,7 +107,7 @@ void CommandThread::run()
     }
 
     QDataStream t_FiffStreamIn(&t_qTcpSocket);
-    t_FiffStreamIn.setVersion(QDataStream::Qt_5_1);
+    t_FiffStreamIn.setVersion(QDataStream::Qt_6_0);
 
 #ifndef USENEWSERVER
     qint64 t_iMaxBufSize = 1024;
@@ -123,7 +123,7 @@ void CommandThread::run()
         {
             QByteArray block;
             QDataStream out(&block, QIODevice::WriteOnly);
-            out.setVersion(QDataStream::Qt_5_1);
+            out.setVersion(QDataStream::Qt_6_0);
             out << (quint16)0;
             m_qMutex.lock();
             out << m_qSendData;

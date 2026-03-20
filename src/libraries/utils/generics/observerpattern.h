@@ -136,9 +136,9 @@ public:
     //=========================================================================================================
     /**
      * Holds the status whether notification is enabled.
-     * This is used to block notify() to make the observer pattern thread safe. It's working like a mutex. The different is that data aren't stored. -> it's okay when values are queued in their own buffer.
+     * Used to block notify() and prevent re-entrant notification loops.
      */
-    static bool notifyEnabled; //ToDo move this to obeservers + make it thread safe
+    static bool notifyEnabled;
 
     //=========================================================================================================
     /**
@@ -159,7 +159,6 @@ public:
     //=========================================================================================================
     /**
      * Returns number of attached observers.
-     * ToDo only for debug purpose -> could be removed
      *
      * @return the number of attached observers.
      */

@@ -71,7 +71,7 @@ using namespace Eigen;
 // DEFINE CONSTANTS
 //=============================================================================================================
 
-#define PROGRAM_VERSION "2.0.0"
+#define PROGRAM_VERSION MNE_CPP_VERSION
 
 //=============================================================================================================
 // STATIC HELPERS (ported from SurfaceChecks in mne_surf2bem)

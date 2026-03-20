@@ -202,8 +202,6 @@ public:
      * @param[out]  matPosition         The matrix to store the results.
      * @param[in]   vecGoF              The goodness of fit per coil.
      * @param[in]   vecError            The Hpi estimation Error per coil.
-     *
-     * ToDo: get estimated movement velocity and store it in channel 9
      */
     static void storeHeadPosition(float fTime,
                                   const Eigen::MatrixXf& matTransDevHead,

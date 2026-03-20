@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>MNE-Python (pip install mne)</DisplayName>
+    <Description>Installs the MNE-Python package via pip so you can use Python alongside MNE-CPP for analysis and visualization. Requires Python 3 and pip already installed on your system. You will be asked whether to install for the current user only or system-wide.</Description>
+    <Version>2.0.0</Version>
+    <ReleaseDate>2026-02-17</ReleaseDate>
+    <Default>false</Default>
+    <SortingPriority>50</SortingPriority>
+    <Script>installscript.qs</Script>
+</Package>
