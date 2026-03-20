@@ -1,14 +1,14 @@
 ---
-title: The Typical MEG/EEG Workflow
+title: The MEG/EEG Processing Workflow
 sidebar_label: Workflow
-sidebar_position: 2
+sidebar_position: 1
 ---
 
-# The Typical MEG/EEG Workflow
+# The MEG/EEG Processing Workflow
 
 ## Overview
 
-This section describes the typical MEG/EEG workflow — from raw data preprocessing through to source reconstruction — as originally outlined in the MNE-C manual cookbook (Hämäläinen, 2009). The workflow applies to both MNE-CPP command-line tools and the GUI applications.
+This section describes the typical MEG/EEG processing workflow — from raw data through to source reconstruction — as originally outlined in the MNE software manual (Hämäläinen, 2009). It serves as both a conceptual overview and a practical step-by-step guide with concrete command examples. The workflow applies to both MNE-CPP command-line tools and the GUI applications.
 
 The following diagram shows the complete workflow of the MNE software. The MEG/EEG data path and the MRI processing path converge at the forward solution computation.
 
@@ -118,7 +118,11 @@ The following MEG and EEG data preprocessing steps are recommended:
 
 ### Marking Bad Channels
 
-Sometimes some MEG or EEG channels are not functioning properly for various reasons. These channels should be excluded from analysis by marking them as bad. Use **[mne_mark_bad_channels](tools-mark-bad-channels)** to store the bad channel list directly in the FIFF file.
+Sometimes some MEG or EEG channels are not functioning properly for various reasons. These channels should be excluded from analysis by marking them as bad. Use **[mne_mark_bad_channels](tools-mark-bad-channels)** to store the bad channel list directly in the FIFF file:
+
+```bash
+mne_mark_bad_channels --bad MEG2332 --bad EEG053 sample_audvis_raw.fif
+```
 
 It is especially important to exclude flat channels (channels that do not show a signal at all) from the analysis, since their noise estimate will be unrealistically low and thus the current estimate calculations will give a strong weight to the zero signal on the flat channels, causing the estimates to essentially vanish. It is also important to exclude noisy channels because they can affect others when signal-space projections or EEG average electrode reference is employed. Noisy bad channels can also adversely affect averaging and noise-covariance matrix estimation by causing unnecessary rejections of epochs.
 
@@ -153,6 +157,16 @@ The minimum practical sampling frequency of the Vectorview system is 600 Hz. Low
 
 It is recommended that the original raw file is called `<name>_raw.fif` and the downsampled version `<name>_ds_raw.fif`.
 
+### Off-Line Averaging
+
+The recommended tool for off-line averaging is [`mne_process_raw`](tools-process-raw):
+
+```bash
+mne_process_raw --raw sample_audvis_raw.fif \
+    --lowpass 40 --projoff \
+    --saveavetag -ave --ave audvis.ave
+```
+
 ## Epoching and Evoked Data
 
 Epoching of raw data is done using events, which define a `t=0` for data segments. Event times stamped to the acquisition software can be extracted from the raw data file. The events array can then be modified, extended, or changed if necessary.
@@ -177,6 +191,20 @@ MNE makes extensive use of the FreeSurfer file structure for analysis. Before st
 
 The first processing stage is the creation of various surface reconstructions with FreeSurfer. The recommended FreeSurfer workflow is summarized on the [FreeSurfer wiki](https://surfer.nmr.mgh.harvard.edu/fswiki/RecommendedReconstruction).
 
+#### Setting Up the Anatomical MR Images
+
+The FIFF files describing the anatomical MRI data are created using [mne_setup_mri](tools-setup-mri):
+
+```bash
+mne_setup_mri --subject duck_donald --mri T1
+```
+
+This creates the directories `mri/<name>-neuromag/slices` and `mri/<name>-neuromag/sets` and a corresponding `COR.fif` in the appropriate sets directory. If the input MRI data are in MGZ format, the output FIFF file will include the MRI pixel data and coordinate transformations between MRI (Surface RAS), MNI, and FreeSurfer Talairach coordinates.
+
+:::tip
+If the `SUBJECT` environment variable is set, it is usually sufficient to run `mne_setup_mri` without any options.
+:::
+
 #### Setting Up the Source Space
 
 This stage consists of:
@@ -196,6 +224,20 @@ The following table shows recommended subdivisions for the creation of source sp
 | `ico4` | 2562 | 6.2 | 39 |
 | `oct6` | 4098 | 4.9 | 24 |
 | `ico5` | 10242 | 3.1 | 9.8 |
+
+Example using [mne_make_source_space](tools-make-source-space):
+
+```bash
+mne_make_source_space --subject duck_donald --spacing 5
+```
+
+The files are created in the `bem` directory:
+- `<subject>-<spacing>-src.fif` — source space description in FIFF format
+- `<subject>-<spacing>-lh.pnt` / `rh.pnt` — source space points in text format
+
+:::tip
+After the geometry is set up, verify that the source space points are located on the cortical surface by loading the `COR.fif` file and overlaying the corresponding `.pnt` or `.dip` files.
+:::
 
 ### Creating the BEM Model Meshes
 
@@ -217,13 +259,23 @@ After creating the BEM surfaces, use **[mne_check_surface](tools-check-surface)*
 
 The segmentation algorithms produce either FreeSurfer surfaces or triangulation data in text. Before proceeding to the creation of the boundary element model, the following standard FreeSurfer surface files must be present:
 
-1. **inner_skull.surf** — Contains the inner skull triangulation
-2. **outer_skull.surf** — Contains the outer skull triangulation
-3. **outer_skin.surf** — Contains the head surface triangulation
+| FreeSurfer surface | ASCII equivalent | Contents |
+|---|---|---|
+| `inner_skull.surf` | `inner_skull.tri` | Inner skull triangulation |
+| `outer_skull.surf` | `outer_skull.tri` | Outer skull triangulation |
+| `outer_skin.surf` | `outer_skin.tri` | Head surface triangulation |
 
 ### Setting Up the BEM
 
-This stage sets up the subject-dependent data for computing the forward solutions using **[mne_setup_forward_model](tools-setup-forward-model)**.
+This stage sets up the subject-dependent data for computing the forward solutions using **[mne_setup_forward_model](tools-setup-forward-model)**:
+
+```bash
+# Three-layer BEM model (for MEG + EEG)
+mne_setup_forward_model --subject duck_donald --surf --ico 4
+
+# Single-compartment model (for MEG only, faster)
+mne_setup_forward_model --subject duck_donald --surf --ico 4 --homog
+```
 
 This step assigns the conductivity values to the BEM compartments:
 
@@ -257,7 +309,30 @@ This step is important. If the alignment of the coordinate frames is inaccurate,
 
 ### Computing the Forward Solution
 
-After the MRI-MEG/EEG alignment has been set, the forward solution — the magnetic fields and electric potentials at the measurement sensors and electrodes due to dipole sources located on the cortex — can be calculated using **[mne_forward_solution](tools-forward-solution)**.
+After the MRI-MEG/EEG alignment has been set, the forward solution — the magnetic fields and electric potentials at the measurement sensors and electrodes due to dipole sources located on the cortex — can be calculated using **[mne_forward_solution](tools-forward-solution)**:
+
+```bash
+mne_forward_solution \
+    --src sample-oct6-src.fif \
+    --bem sample-5120-5120-5120-bem-sol.fif \
+    --meas sample_audvis_raw.fif \
+    --trans sample-trans.fif \
+    --meg --eeg \
+    --fwd sample-meg-eeg-fwd.fif
+```
+
+| Option | Description |
+|---|---|
+| `--src` | Source space file |
+| `--bem` | BEM model file |
+| `--meas` | Measurement file (provides sensor locations) |
+| `--trans` | Head-to-MRI coordinate transform |
+| `--meg` / `--eeg` | Include MEG/EEG forward calculation |
+| `--mindist` | Minimum source-to-inner-skull distance (mm) |
+
+:::note
+It is not possible to calculate an EEG forward solution with a single-layer BEM.
+:::
 
 When multiple forward solutions exist from different head positions or sessions, they can be combined with **[mne_average_forward_solutions](tools-average-forward-solutions)**. Use **[mne_sensitivity_map](tools-sensitivity-map)** to evaluate the spatial coverage of the sensor array.
 
@@ -273,20 +348,49 @@ The noise covariance matrix can be calculated in several ways using **[mne_proce
 
 - **From continuous raw data**: Employ a section of continuous raw data collected in the presence of the subject. This is the recommended approach for analyzing epileptic activity. The data should be free of technical artifacts and epileptic activity of interest. The length of the data segment should be at least 20 seconds.
 
+```bash
+mne_process_raw --raw sample_audvis_raw.fif \
+    --lowpass 40 --projon \
+    --savecovtag -cov --cov audvis.cov
+```
+
 ### Calculating the Inverse Operator
 
 The MNE software doesn't calculate the inverse operator explicitly but rather computes an SVD of a matrix composed of the noise-covariance matrix, the result of the forward calculation, and the source covariance matrix. This approach has the benefit that the regularization parameter (SNR) can be adjusted easily when the final source estimates or dSPMs are computed.
 
 For mathematical details, see [The Minimum-Norm Estimates](inverse).
 
+Use [mne_inverse_operator](tools-inverse-operator):
+
+```bash
+mne_inverse_operator \
+    --fwd sample_audvis-ave-oct-6-fwd.fif \
+    --noisecov sample_audvis-cov.fif \
+    --depth --loose 0.2 --meg --eeg
+```
+
+| Option | Description |
+|---|---|
+| `--fwd` | Forward solution file |
+| `--noisecov` | Noise-covariance matrix file |
+| `--meg` / `--eeg` | Include MEG/EEG channels |
+| `--fixed` | Fixed source orientations (normal to cortex) |
+| `--loose <amount>` | Loose orientation constraint (recommended: 0.1–0.6) |
+| `--depth` | Employ depth weighting |
+| `--megreg` / `--eegreg` | Regularization amount (0.05–0.2) |
+
+:::important
+If bad channels are included in the calculation, strange results may ensue. Carefully inspect data and assign bad channels correctly.
+:::
+
 ### Creating Source Estimates
 
 Once all the preprocessing steps described above have been completed, the inverse operator can be applied to the MEG and EEG data and the results can be viewed and stored in several ways:
 
-- The interactive analysis tool **[MNE Analyze](analyze)** can be used to explore the data and to produce quantitative analysis results, screen snapshots, and movies.
-
-- The command-line tool **[mne_compute_raw_inverse](tools-compute-raw-inverse)** can be used to produce files containing source estimates at selected ROIs. The input data file can be either a raw data or evoked response MEG/EEG file.
-
+- **[MNE Analyze](analyze)** — Interactive analysis tool for exploring data, producing quantitative results, screen snapshots, and movies.
+- **[`mne_compute_mne`](tools-compute-mne)** / **[`mne_compute_raw_inverse`](tools-compute-raw-inverse)** — Command-line tools for computing source estimates (MNE, dSPM, sLORETA) from evoked or raw data.
+- **[MNE Inspect](inspect)** — 3D visualization of source estimates on cortical surfaces, with atlas overlays, connectivity networks, and animated playback.
+- **Label-based analysis** — Use `mne_compute_raw_inverse --labeldir` to extract time courses for cortical regions of interest (ROIs).
 - Source estimates are stored in **stc** (source time course) and **w** (snapshot) file formats for subsequent processing, morphing, and visualization.
 
 ### Group Analyses
@@ -313,6 +417,16 @@ Use **[mne_show_fiff](tools-show-fiff)** and **[mne_compare_fif_files](tools-com
 ### Simulation
 
 **[mne_simu](tools-simu)** generates synthetic MEG/EEG data from a forward solution with controlled source location, frequency, and noise level. This is useful for validating inverse methods and testing processing pipelines end-to-end.
+
+## See Also
+
+- [Forward Solution](forward) — Detailed theory of coordinate systems, BEM, and the forward problem
+- [Inverse Estimation](inverse) — Mathematical details of MNE, dSPM, and sLORETA
+- [Signal-Space Projection](ssp) — Theory and application of SSP for artifact removal
+- [FIFF Format](fiff-format) — File format reference and conventions
+- [Sample Dataset](sample-dataset) — Step-by-step walkthrough with the MNE sample data
+- [Data Conversion](data-conversion) — Importing data from other MEG/EEG systems
+- [Glossary](glossary) — MEG/EEG terminology and definitions
 
 ## References
 
