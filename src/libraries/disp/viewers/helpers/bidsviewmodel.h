@@ -56,11 +56,14 @@
 #define BIDS_FUNCTIONALDATA         10
 #define BIDS_ANATOMICALDATA         11
 #define BIDS_BEHAVIORALDATA         12
+#define BIDS_IEEGDATA               13
 
 //SUB-ITEMS
 #define BIDS_AVERAGE                20
 #define BIDS_EVENT             21
 #define BIDS_DIPOLE                 22
+#define BIDS_ELECTRODES             23
+#define BIDS_COORDSYSTEM            24
 
 #define BIDS_UNKNOWN                99
 
