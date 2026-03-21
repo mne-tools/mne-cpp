@@ -449,7 +449,7 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
         {
             if(testArg == "BruteMode")
             {
-                fiff_int_t intAnonSubjWeight(*pTag.data()->toInt());
+                fiff_int_t intAnonSubjWeight(*pTag->toInt());
                 QVERIFY(intAnonSubjWeight == 0);
             }
             break;
@@ -458,7 +458,7 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
         {
             if(testArg == "BruteMode")
             {
-                fiff_int_t intAnonSubjHeight(*pTag.data()->toInt());
+                fiff_int_t intAnonSubjHeight(*pTag->toInt());
                 QVERIFY(intAnonSubjHeight == 0);
             }
             break;
@@ -482,7 +482,7 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
         {
             if(testArg == "BruteMode")
             {
-                fiff_int_t intAnonProjId(*pTag.data()->toInt());
+                fiff_int_t intAnonProjId(*pTag->toInt());
                 QVERIFY(intAnonProjId == 0);
             }
             break;
@@ -520,7 +520,7 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
             if(testArg == "BruteMode")
             {
                 QString defaultComment("mne_anonymize");
-                QString intAnonProjComment(pTag.data()->toString());
+                QString intAnonProjComment(pTag->toString());
                 QVERIFY(intAnonProjComment == defaultComment);
             }
             break;
