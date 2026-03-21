@@ -43,7 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <disp3D/helpers/geometryinfo.h>
 #include <disp3D/helpers/interpolation.h>
@@ -107,7 +107,7 @@ TestInterpolation::TestInterpolation()
 
 void TestInterpolation::initTestCase()
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
     //acquire real data
     QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);

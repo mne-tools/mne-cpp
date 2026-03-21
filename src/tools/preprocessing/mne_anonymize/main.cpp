@@ -42,7 +42,7 @@
 
 #include "mne_anonymize.h"
 #include "apphandler.h"
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -82,7 +82,7 @@ namespace MNEANONYMIZE {
  */
 int main(int argc, char* argv[])
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
 
     QScopedPointer<MNEANONYMIZE::AppHandler> h(new MNEANONYMIZE::AppHandler);
     QScopedPointer<QCoreApplication> qtApp(h->createApplication(argc, argv));

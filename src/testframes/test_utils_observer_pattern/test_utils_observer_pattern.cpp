@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @brief    Tests for Observer/Subject pattern, CircularBuffer edge cases,
- *           and ApplicationLogger — the generic utility design patterns in utils.
+ *           and MNELogger — the generic utility design patterns in utils.
  */
 
 //=============================================================================================================
@@ -37,7 +37,7 @@
 
 #include <utils/generics/observerpattern.h>
 #include <utils/generics/circularbuffer.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -91,7 +91,7 @@ public:
 
 //=============================================================================================================
 /**
- * @brief Tests for Observer/Subject pattern, CircularBuffer, and ApplicationLogger.
+ * @brief Tests for Observer/Subject pattern, CircularBuffer, and MNELogger.
  */
 class TestUtilsObserverPattern : public QObject
 {
@@ -113,8 +113,8 @@ private slots:
     void testCircularBufferEigenMatrix();
     void testCircularBufferFillAndDrain();
 
-    // ── ApplicationLogger ─────────────────────────────────────────────
-    void testApplicationLoggerInstall();
+    // ── MNELogger ─────────────────────────────────────────────
+    void testMNELoggerInstall();
 
     void cleanupTestCase();
 };
@@ -123,7 +123,7 @@ private slots:
 
 void TestUtilsObserverPattern::initTestCase()
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
 }
 
 //=============================================================================================================
@@ -323,17 +323,17 @@ void TestUtilsObserverPattern::testCircularBufferFillAndDrain()
 }
 
 //=============================================================================================================
-// ApplicationLogger
+// MNELogger
 //=============================================================================================================
 
-void TestUtilsObserverPattern::testApplicationLoggerInstall()
+void TestUtilsObserverPattern::testMNELoggerInstall()
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
 
     // Trigger different log levels
-    qDebug() << "Test debug message from ApplicationLogger test";
-    qInfo() << "Test info message from ApplicationLogger test";
-    qWarning() << "Test warning message from ApplicationLogger test";
+    qDebug() << "Test debug message from MNELogger test";
+    qInfo() << "Test info message from MNELogger test";
+    qWarning() << "Test warning message from MNELogger test";
 
     // If we got here without crashing, the logger works
     QVERIFY(true);

@@ -38,7 +38,7 @@
 #include <mne/mne.h>
 #include <mne/mne_source_space.h>
 #include <memory>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -160,7 +160,7 @@ static bool readStcFile(const QString& filename, MatrixXd& data, VectorXi& verti
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_volume_data2mri");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

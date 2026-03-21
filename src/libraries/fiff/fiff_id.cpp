@@ -45,6 +45,7 @@
 #include <QDateTime>
 
 #include <ctime>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -137,9 +138,9 @@ bool FiffId::get_machid(int *fixed_id)
     if ( !ifaces.isEmpty() ) {
         for(int i = 0; i < ifaces.size(); ++i) {
             unsigned int flags = ifaces[i].flags();
-            bool isLoopback = (bool)(flags & QNetworkInterface::IsLoopBack);
-            bool isP2P = (bool)(flags & QNetworkInterface::IsPointToPoint);
-            bool isRunning = (bool)(flags & QNetworkInterface::IsRunning);
+            bool isLoopback = static_cast<bool>(flags & QNetworkInterface::IsLoopBack);
+            bool isP2P = static_cast<bool>(flags & QNetworkInterface::IsPointToPoint);
+            bool isRunning = static_cast<bool>(flags & QNetworkInterface::IsRunning);
             // If this interface isn't running, we don't care about it
             if ( !isRunning ) continue;
             // We only want valid interfaces that aren't loopback/virtual and not point to point
@@ -166,9 +167,7 @@ bool FiffId::get_machid(int *fixed_id)
 void FiffId::print() const
 {
     if(!isEmpty()) {
-        printf ("\t%d.%d ",this->version>>16,this->version & 0xFFFF);
-        printf ("0x%x%x ",this->machid[0],this->machid[1]);
-        printf ("%d %d ",this->time.secs,this->time.usecs);
+        qInfo("\t%d.%d 0x%x%x %d %d\n",this->version>>16,this->version & 0xFFFF,this->machid[0],this->machid[1],this->time.secs,this->time.usecs);
     }
 }
 

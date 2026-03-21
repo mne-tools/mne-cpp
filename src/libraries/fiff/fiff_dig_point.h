@@ -51,6 +51,7 @@
 
 #include <QSharedPointer>
 #include <QDebug>
+#include <memory>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFLIB
@@ -68,8 +69,10 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffDigPoint
 {
 public:
-    typedef QSharedPointer<FiffDigPoint> SPtr;              /**< Shared pointer type for FiffDigPoint. */
-    typedef QSharedPointer<const FiffDigPoint> ConstSPtr;   /**< Const shared pointer type for FiffDigPoint. */
+    using SPtr = QSharedPointer<FiffDigPoint>;            /**< Shared pointer type for FiffDigPoint. */
+    using ConstSPtr = QSharedPointer<const FiffDigPoint>; /**< Const shared pointer type for FiffDigPoint. */
+    using UPtr = std::unique_ptr<FiffDigPoint>;             /**< Unique pointer type for FiffDigPoint. */
+    using ConstUPtr = std::unique_ptr<const FiffDigPoint>;  /**< Const unique pointer type for FiffDigPoint. */
 
     //=========================================================================================================
     /**

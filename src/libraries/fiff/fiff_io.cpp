@@ -48,6 +48,7 @@
 //=============================================================================================================
 
 #include <iostream>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -98,7 +99,7 @@ bool FiffIO::setup_read(QIODevice& pIODevice,
     FiffStream::SPtr p_pStream(new FiffStream(&pIODevice));
     QString t_sFileName = p_pStream->streamName();
 
-    printf("Opening fiff data %s...\n",t_sFileName.toUtf8().constData());
+    qInfo("Opening fiff data %s...\n",t_sFileName.toUtf8().constData());
 
     if(!p_pStream->open())
         return false;
@@ -152,7 +153,7 @@ bool FiffIO::read(QIODevice& pIODevice)
         //append to corresponding member qlist
         m_qlistRaw.append(p_fiffRawData);
 
-        printf( "Finished reading raw data!\n");
+        qInfo( "Finished reading raw data!\n");
     }
 
     //evoked data + projections
@@ -203,7 +204,7 @@ bool FiffIO::write(QIODevice& pIODevice,
 bool FiffIO::write(QFile& p_QFile,
                    const fiff_int_t type,
                    const fiff_int_t idx) const {
-    qDebug("------------------------ Writing fiff data ------------------------");
+    qInfo("------------------------ Writing fiff data ------------------------");
 
     switch(type) {
         case FIFFB_RAW_DATA: {
@@ -217,7 +218,7 @@ bool FiffIO::write(QFile& p_QFile,
                 t_fname = p_QFile.fileName().insert(p,QString("_"+t_nameoftype+"-"+QString::number(i)));
 
                 //assign new file name
-                qDebug("\nWriting set with index %i to file %s ...",i,t_fname.toUtf8().constData());
+                qInfo("\nWriting set with index %i to file %s ...\n",i,t_fname.toUtf8().constData());
                 QFile t_file(t_fname);
 
                 FiffIO::write_raw(t_file,i);
@@ -226,7 +227,7 @@ bool FiffIO::write(QFile& p_QFile,
         else {
             FiffIO::write_raw(p_QFile,idx);
         }
-        qDebug("\nFinished Writing %lli raw data sets!\n",m_qlistRaw.size());
+        qInfo("\nFinished Writing %lli raw data sets!\n",m_qlistRaw.size());
         }
         case FIFFB_EVOKED:
 
@@ -269,18 +270,18 @@ bool FiffIO::write_raw(QIODevice &pIODevice,
             last = to;
 
         if (!m_qlistRaw[idx]->read_raw_segment(data, times, mult, first, last, sel)) {
-            qDebug("error during read_raw_segment\n");
+            qWarning("error during read_raw_segment\n");
             return false;
         }
 
-        qDebug("Writing...");
+        qInfo("Writing...");
         if (first_buffer) {
            if (first > 0)
                outfid->write_int(FIFF_FIRST_SAMPLE,&first);
            first_buffer = false;
         }
         outfid->write_raw_buffer(data, cals);
-        qDebug("[done]\n");
+        qInfo("[done]\n");
     }
 
     outfid->finish_writing_raw();

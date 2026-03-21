@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_evoked.h>
@@ -233,7 +233,7 @@ QString TestComputeRawInverse::findGenerateScript()
 
 void TestComputeRawInverse::initTestCase()
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute Raw Inverse Test Init >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 

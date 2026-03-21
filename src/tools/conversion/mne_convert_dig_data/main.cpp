@@ -40,7 +40,7 @@
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_dir_entry.h>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -95,7 +95,7 @@ static QList<DigPt> readFifDig(const QString &filename)
 
     for (int k = 0; k < stream->nent(); k++) {
         if (stream->dir()[k]->kind == FIFF_DIG_POINT) {
-            FiffTag::SPtr tag;
+            FiffTag::UPtr tag;
             stream->read_tag(tag, stream->dir()[k]->pos);
             FiffDigPoint dp = tag->toDigPoint();
             DigPt p;
@@ -210,7 +210,7 @@ static bool writeHpts(const QString &filename, const QList<DigPt> &points)
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_convert_dig_data");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

@@ -96,30 +96,30 @@ bool FiffEvents::read(const QString &t_sEventName,
         if (p > 0) {
             eventName.replace(p, 4, "-eve.fif");
         } else {
-            printf("Raw file name does not end properly\n");
+            qWarning("Raw file name does not end properly\n");
             return false;
         }
 
         t_EventFile.setFileName(eventName);
         if(!read_from_fif(t_EventFile, p_Events)) {
-            printf("Error while read events.\n");
+            qWarning("Error while read events.\n");
             return false;
         }
-        printf("Events read from %s\n",eventName.toUtf8().constData());
+        qInfo("Events read from %s\n",eventName.toUtf8().constData());
     } else {
         // Binary file
         if (eventName.contains(".fif")) {
             t_EventFile.setFileName(eventName);
             if(!read_from_fif(t_EventFile, p_Events)) {
-                printf("Error while read events.\n");
+                qWarning("Error while read events.\n");
                 return false;
             }
-            printf("Binary event file %s read\n",eventName.toUtf8().constData());
+            qInfo("Binary event file %s read\n",eventName.toUtf8().constData());
         } else if(eventName.contains(".eve")){
 
         } else {
             // Text file
-            printf("Text file %s is not supported jet.\n",eventName.toUtf8().constData());
+            qWarning("Text file %s is not supported jet.\n",eventName.toUtf8().constData());
         }
     }
 
@@ -147,13 +147,13 @@ bool FiffEvents::read_from_fif(QIODevice &p_IODevice,
 
     if (eventsBlocks.size() == 0)
     {
-        printf("Could not find event data\n");
+        qWarning("Could not find event data\n");
         return false;
     }
 
     qint32 k, nelem;
     fiff_int_t kind, pos;
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     quint32* serial_eventlist_uint = nullptr;
     qint32* serial_eventlist_int = nullptr;
 
@@ -182,7 +182,7 @@ bool FiffEvents::read_from_fif(QIODevice &p_IODevice,
 
     if(serial_eventlist_uint == nullptr && serial_eventlist_int == nullptr)
     {
-        printf("Could not find any events\n");
+        qWarning("Could not find any events\n");
         return false;
     }
 

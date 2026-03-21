@@ -187,7 +187,7 @@ bool FsLabel::read(const QString& p_sFileName, FsLabel &p_Label)
         return false;
     }
 
-    printf("Reading label...");
+    qInfo("Reading label...");
     QFile t_File(p_sFileName);
 
     if (!t_File.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -252,7 +252,7 @@ bool FsLabel::read(const QString& p_sFileName, FsLabel &p_Label)
     else if(t_File.fileName().contains("lh."))
         p_Label.name = t_File.fileName().split("lh.")[1].split(QRegularExpression("\\W+"))[0];
 
-    printf("[done]\n");
+    qInfo("[done]\n");
 
     t_File.close();
 

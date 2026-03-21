@@ -45,6 +45,7 @@
 
 #include <utils/ioutils.h>
 #include <iostream>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -148,7 +149,7 @@ qint32 FiffInfo::get_current_comp()
             if (first_comp < 0)
                 first_comp = comp;
             else if (comp != first_comp)
-                printf("Compensation is not set equally on all MEG channels");
+                qWarning("Compensation is not set equally on all MEG channels");
         }
     }
     return comp;
@@ -176,8 +177,8 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
     {
         if (!this->make_compensator(from, C1))
         {
-            printf("Cannot create compensator C1\n");
-            printf("Desired compensation matrix (kind = %d) not found\n",from);
+            qWarning("Cannot create compensator C1\n");
+            qWarning("Desired compensation matrix (kind = %d) not found\n",from);
             return false;
         }
     }
@@ -188,8 +189,8 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
     {
         if (!this->make_compensator(to, C2))
         {
-            printf("Cannot create compensator C2\n");
-            printf("Desired compensation matrix (kind = %d) not found\n",to);
+            qWarning("Cannot create compensator C2\n");
+            qWarning("Desired compensation matrix (kind = %d) not found\n",to);
             return false;
         }
     }
@@ -215,7 +216,7 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
         }
         if (npick == 0)
         {
-            printf("Nothing remains after excluding the compensation channels\n");
+            qWarning("Nothing remains after excluding the compensation channels\n");
             return false;
         }
 
@@ -261,12 +262,12 @@ bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const//pri
                 }
                 if (channelAvailable == 0)
                 {
-                    printf("Channel %s is not available in data\n",this_data->col_names.at(col).toUtf8().constData());
+                    qWarning("Channel %s is not available in data\n",this_data->col_names.at(col).toUtf8().constData());
                     return false;
                 }
                 else if (channelAvailable > 1)
                 {
-                    printf("Ambiguous channel %s",this_data->col_names.at(col).toUtf8().constData());
+                    qWarning("Ambiguous channel %s",this_data->col_names.at(col).toUtf8().constData());
                     return false;
                 }
                 presel(col,ch) = 1.0;
@@ -289,7 +290,7 @@ bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const//pri
                 }
                 if (channelAvailable > 1)
                 {
-                    printf("Ambiguous channel %s", this->ch_names.at(c).toUtf8().constData());
+                    qWarning("Ambiguous channel %s", this->ch_names.at(c).toUtf8().constData());
                     return false;
                 }
                 else if (channelAvailable == 1)

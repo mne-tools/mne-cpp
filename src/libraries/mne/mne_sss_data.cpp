@@ -133,7 +133,7 @@ MNESssData *MNESssData::read_from_node(QSharedPointer<FiffStream> &stream, const
     MNESssData* s  = new MNESssData();
     QList<FiffDirNode::SPtr> sss;
     FiffDirNode::SPtr node;
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     float       *r0;
     int j,p,q,n;
     /*

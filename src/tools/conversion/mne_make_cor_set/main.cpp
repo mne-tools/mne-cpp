@@ -36,7 +36,7 @@
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_file.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -161,7 +161,7 @@ static bool writeMriDescription(const QString& filename,
                              static_cast<int>(slices[k].size()));
 
         // Write as FIFF_MRI_PIXEL_DATA
-        FiffTag::SPtr tag(new FiffTag());
+        auto tag = std::make_unique<FiffTag>();
         tag->kind = FIFF_MRI_PIXEL_DATA;
         tag->type = FIFFT_BYTE;
         tag->resize(sliceData.size());
@@ -181,7 +181,7 @@ static bool writeMriDescription(const QString& filename,
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_cor_set");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

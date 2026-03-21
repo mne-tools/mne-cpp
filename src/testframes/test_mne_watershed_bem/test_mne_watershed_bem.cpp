@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -170,7 +170,7 @@ bool TestMneWatershedBem::hasFreeSurfer()
 
 void TestMneWatershedBem::initTestCase()
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
 
     QVERIFY(m_tempDir.isValid());
 

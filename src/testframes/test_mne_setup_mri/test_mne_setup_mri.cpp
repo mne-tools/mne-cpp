@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -196,7 +196,7 @@ QString TestMneSetupMri::findSubjectsDir()
 
 void TestMneSetupMri::initTestCase()
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
 
     QVERIFY(m_tempDir.isValid());
 

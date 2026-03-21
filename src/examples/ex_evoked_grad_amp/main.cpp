@@ -41,7 +41,7 @@
 #include <vector>
 #include <math.h>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <fiff/fiff.h>
 #include <mne/mne.h>
@@ -80,7 +80,7 @@ using namespace Eigen;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

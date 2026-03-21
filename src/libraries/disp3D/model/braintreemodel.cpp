@@ -227,7 +227,7 @@ void BrainTreeModel::addDigitizerData(const QList<FIFFLIB::FiffDigPoint> &digiti
     auto *setItem = new DigitizerSetTreeItem("Digitizer", digitizerPoints);
     this->appendRow(setItem);
 
-    qDebug() << "BrainTreeModel: Added digitizer set with"
+    qInfo() << "BrainTreeModel: Added digitizer set with"
              << setItem->totalPointCount() << "points in"
              << setItem->rowCount() << "categories";
 }

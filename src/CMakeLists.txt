@@ -16,7 +16,11 @@ add_compile_definitions(MNE_CPP_VERSION="${MNE_CPP_VERSION}")
 set(CMAKE_CXX_STANDARD 20)
 
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
-option(BUILD_MAC_APP_BUNDLE "Build app bundle on macos" OFF)
+if(APPLE)
+    option(BUILD_MAC_APP_BUNDLE "Build app bundle on macos" ON)
+else()
+    option(BUILD_MAC_APP_BUNDLE "Build app bundle on macos" OFF)
+endif()
 
 option(BUILD_EXAMPLES "Build examples" ON)
 option(BUILD_APPLICATIONS "Build applications" ON)
@@ -33,6 +37,12 @@ option(WASM "Setup build for wasm" OFF)
 option(NO_OPENGL "Build without QOpenGLWidget support" OFF)
 
 option(USE_FFTW "Use fftw backend for eigen" OFF)
+
+set(MNE_LOG_LEVEL "INFO" CACHE STRING "Minimum log level: DEBUG, INFO, WARN, CRIT, FATAL")
+set_property(CACHE MNE_LOG_LEVEL PROPERTY STRINGS DEBUG INFO WARN CRIT FATAL)
+
+set(MNE_LOG_MODE "PLAIN" CACHE STRING "Log output mode: PLAIN (raw text), FORMATTED (colored level prefixes)")
+set_property(CACHE MNE_LOG_MODE PROPERTY STRINGS PLAIN FORMATTED)
 
 ##==============================================================================
 ## Set up compilation based on options
@@ -59,6 +69,30 @@ endif()
 if(NO_IPC)
     add_compile_definitions(NO_IPC)
 endif()
+
+# Map MNE_LOG_LEVEL string to numeric compile definition
+# 0=DEBUG, 1=INFO, 2=WARN, 3=CRIT, 4=FATAL
+if(MNE_LOG_LEVEL STREQUAL "DEBUG")
+    add_compile_definitions(MNE_LOG_LEVEL=0)
+elseif(MNE_LOG_LEVEL STREQUAL "INFO")
+    add_compile_definitions(MNE_LOG_LEVEL=1)
+elseif(MNE_LOG_LEVEL STREQUAL "WARN")
+    add_compile_definitions(MNE_LOG_LEVEL=2)
+elseif(MNE_LOG_LEVEL STREQUAL "CRIT")
+    add_compile_definitions(MNE_LOG_LEVEL=3)
+elseif(MNE_LOG_LEVEL STREQUAL "FATAL")
+    add_compile_definitions(MNE_LOG_LEVEL=4)
+else()
+    message(WARNING "Unknown MNE_LOG_LEVEL '${MNE_LOG_LEVEL}', defaulting to INFO")
+    add_compile_definitions(MNE_LOG_LEVEL=1)
+endif()
+message(STATUS "[MNE-CPP] Log level: ${MNE_LOG_LEVEL}")
+
+# Map MNE_LOG_MODE to compile definition
+if(MNE_LOG_MODE STREQUAL "FORMATTED")
+    add_compile_definitions(MNE_LOG_MODE_FORMATTED)
+endif()
+message(STATUS "[MNE-CPP] Log mode: ${MNE_LOG_MODE}")
 
 set(FFTW_DIR_LIBS "${PROJECT_SOURCE_DIR}/external/fftw")
 set(FFTW_DIR_INCLUDE "${PROJECT_SOURCE_DIR}/external/fftw")

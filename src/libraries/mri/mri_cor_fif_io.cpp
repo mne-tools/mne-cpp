@@ -154,7 +154,7 @@ bool MriCorFifIO::write(const QString& fileName,
         stream->write_int(FIFF_MRI_PIXEL_ENCODING, &encoding);
 
         // Pixel data
-        QSharedPointer<FiffTag> pixelTag(new FiffTag());
+        auto pixelTag = std::make_unique<FiffTag>();
         pixelTag->kind = FIFF_MRI_PIXEL_DATA;
 
         int nPixels = slice.width * slice.height;

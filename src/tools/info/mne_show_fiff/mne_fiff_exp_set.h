@@ -228,13 +228,13 @@ private:
      */
     void sort_fiff_explanations();
 
-    void print_file_id (FILE *out, FIFFLIB::FiffTag::SPtr tag);
+    void print_file_id (FILE *out, const FIFFLIB::FiffTag::UPtr& tag);
 
-    void print_ch_info (FILE *out, FIFFLIB::FiffTag::SPtr tag);
+    void print_ch_info (FILE *out, const FIFFLIB::FiffTag::UPtr& tag);
 
-    void print_transform(FILE *out, FIFFLIB::FiffTag::SPtr tag);
+    void print_transform(FILE *out, const FIFFLIB::FiffTag::UPtr& tag);
 
-    void print_dig_point(FILE *out, FIFFLIB::FiffTag::SPtr tag);
+    void print_dig_point(FILE *out, const FIFFLIB::FiffTag::UPtr& tag);
 
     void print_matrix(FILE *out, FIFFLIB::FiffStream::SPtr stream, FIFFLIB::FiffDirEntry::SPtr this_ent);
 

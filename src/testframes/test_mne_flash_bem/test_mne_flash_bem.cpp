@@ -43,7 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -149,7 +149,7 @@ bool TestMneFlashBem::hasFreeSurfer()
 
 void TestMneFlashBem::initTestCase()
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
 
     QVERIFY(m_tempDir.isValid());
 
@@ -238,7 +238,7 @@ void TestMneFlashBem::testMissingFreeSurferHome()
     QVERIFY2(proc.exitCode() != 0,
              "Should fail when FREESURFER_HOME is not set");
 
-    // ApplicationLogger routes all output (including qCritical) to stdout
+    // MNELogger routes all output (including qCritical) to stdout
     QString stdOut = proc.readAllStandardOutput();
     QVERIFY2(stdOut.contains("FREESURFER_HOME") || stdOut.contains("FreeSurfer"),
              "Error message should mention FREESURFER_HOME");
@@ -265,7 +265,7 @@ void TestMneFlashBem::testMissingSubjectsDir()
     QVERIFY2(proc.exitCode() != 0,
              "Should fail when SUBJECTS_DIR is not set");
 
-    // ApplicationLogger routes all output (including qCritical) to stdout
+    // MNELogger routes all output (including qCritical) to stdout
     QString stdOut = proc.readAllStandardOutput();
     QVERIFY2(stdOut.contains("SUBJECTS_DIR"),
              "Error message should mention SUBJECTS_DIR");
@@ -292,7 +292,7 @@ void TestMneFlashBem::testMissingSubject()
     QVERIFY2(proc.exitCode() != 0,
              "Should fail when SUBJECT is not set");
 
-    // ApplicationLogger routes all output (including qCritical) to stdout
+    // MNELogger routes all output (including qCritical) to stdout
     QString stdOut = proc.readAllStandardOutput();
     QVERIFY2(stdOut.contains("SUBJECT"),
              "Error message should mention SUBJECT");

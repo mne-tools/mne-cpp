@@ -38,7 +38,7 @@
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_constants.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -93,7 +93,7 @@ static QString tagName(int kind)
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_compare_fif_files");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
     int minEntries = (int)std::min(dir1.size(), dir2.size());
 
     for (int i = 0; i < minEntries; ++i) {
-        FiffTag::SPtr tag1, tag2;
+        FiffTag::UPtr tag1, tag2;
         stream1->read_tag(tag1, dir1[i]->pos);
         stream2->read_tag(tag2, dir2[i]->pos);
 

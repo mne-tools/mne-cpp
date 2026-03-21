@@ -212,7 +212,7 @@ std::unique_ptr<MNENamedMatrix> MNENamedMatrix::read(FiffStream::SPtr& stream,
     qint32 ndim;
     QVector<qint32> dims;
     MatrixXf data;
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     bool dataFound = false;
 
     FiffDirNode::SPtr tmp_node = node;

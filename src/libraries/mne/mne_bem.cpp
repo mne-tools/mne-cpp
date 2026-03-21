@@ -162,20 +162,20 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, MNEBem& 
     for(int k = 0; k < bemsurf.size(); ++k)
     {
         MNEBemSurface  p_BemSurface;
-        printf("\tReading a BEM surface...");
+        qInfo("\tReading a BEM surface...");
         MNEBem::readBemSurface(p_pStream, bemsurf[k], p_BemSurface);
         p_BemSurface.addTriangleData();
         if (add_geom)
         {
            p_BemSurface.addVertexNormals();
         }
-        printf("\t[done]\n" );
+        qInfo("\t[done]\n" );
 
         p_Bem.m_qListBemSurface.append(p_BemSurface);
 //           src(k) = this;
     }
 
-    printf("\t%lld bem surfaces read\n", bemsurf.size());
+    qInfo("\t%lld bem surfaces read\n", bemsurf.size());
 
     if(open_here)
     {
@@ -190,7 +190,7 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
 {
     p_BemSurface.clear();
 
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
 
     //=====================================================================
     if(!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_ID, t_pTag))
@@ -365,7 +365,7 @@ void MNEBem::write(QIODevice &p_IODevice)
 
     // Create the file and save the essentials
     FiffStream::SPtr t_pStream = FiffStream::start_file(p_IODevice);
-    printf("Write BEM surface in %s...\n", t_pStream->streamName().toUtf8().constData());
+    qInfo("Write BEM surface in %s...\n", t_pStream->streamName().toUtf8().constData());
     this->writeToStream(t_pStream.data());
     t_pStream->end_file();
 }
@@ -377,13 +377,13 @@ void MNEBem::writeToStream(FiffStream* p_pStream)
     p_pStream->start_block(FIFFB_BEM);
     for(qint32 h = 0; h < m_qListBemSurface.size(); ++h)
     {
-        printf("\tWrite a bem surface... ");
+        qInfo("\tWrite a bem surface... ");
         p_pStream->start_block(FIFFB_BEM_SURF);
         m_qListBemSurface[h].writeToStream(p_pStream);
         p_pStream->end_block(FIFFB_BEM_SURF);
-        printf("[done]\n");
+        qInfo("[done]\n");
     }
-    printf("\t%lld bem surfaces written\n", m_qListBemSurface.size());
+    qInfo("\t%lld bem surfaces written\n", m_qListBemSurface.size());
     p_pStream->end_block(FIFFB_BEM);
 }
 

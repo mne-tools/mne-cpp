@@ -44,7 +44,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
 
@@ -191,7 +191,7 @@ QString TestMneSurf2Bem::findSurfaceFile(const QString& name)
 
 void TestMneSurf2Bem::initTestCase()
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
 
     QVERIFY(m_tempDir.isValid());
 

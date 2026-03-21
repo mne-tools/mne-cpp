@@ -141,7 +141,7 @@ bool FsAnnotation::read(const QString& p_sFileName, FsAnnotation &p_Annotation)
 {
     p_Annotation.clear();
 
-    printf("Reading annotation...\n");
+    qInfo("Reading annotation...\n");
     QFile t_File(p_sFileName);
     QFileInfo fileInfo(t_File.fileName());
 
@@ -150,7 +150,7 @@ bool FsAnnotation::read(const QString& p_sFileName, FsAnnotation &p_Annotation)
 
     if (!t_File.open(QIODevice::ReadOnly))
     {
-        printf("\tError: Couldn't open the file\n");
+        qWarning("\tError: Couldn't open the file");
         return false;
     }
 
@@ -182,7 +182,7 @@ bool FsAnnotation::read(const QString& p_sFileName, FsAnnotation &p_Annotation)
         if(numEntries > 0)
         {
 
-            printf("\tReading from Original Version\n");
+            qInfo("\tReading from Original Version\n");
             p_Annotation.m_Colortable.numEntries = numEntries;
             t_Stream >> len;
             QByteArray tmp;
@@ -216,9 +216,9 @@ bool FsAnnotation::read(const QString& p_sFileName, FsAnnotation &p_Annotation)
         {
             qint32 version = -numEntries;
             if(version != 2)
-                printf("\tError! Does not handle version %d\n", version);
+                qWarning("\tError! Does not handle version %d", version);
             else
-                printf("\tReading from version %d\n", version);
+                qInfo("\tReading from version %d\n", version);
 
             t_Stream >> numEntries;
             p_Annotation.m_Colortable.numEntries = numEntries;
@@ -243,10 +243,10 @@ bool FsAnnotation::read(const QString& p_sFileName, FsAnnotation &p_Annotation)
 
                 t_Stream >> structure;
                 if (structure < 0)
-                    printf("\tError! Read entry, index %d\n", structure);
+                    qWarning("\tError! Read entry, index %d", structure);
 
                 if(!p_Annotation.m_Colortable.struct_names[structure].isEmpty())
-                    printf("Error! Duplicate Structure %d", structure);
+                    qWarning("Error! Duplicate Structure %d", structure);
 
                 t_Stream >> len;
                 tmp.resize(len);
@@ -263,11 +263,11 @@ bool FsAnnotation::read(const QString& p_sFileName, FsAnnotation &p_Annotation)
                         + p_Annotation.m_Colortable.table(structure,3) * 16777216; //(2^24);
             }
         }
-        printf("\tcolortable with %d entries read\n\t(originally %s)\n", p_Annotation.m_Colortable.numEntries, p_Annotation.m_Colortable.orig_tab.toUtf8().constData());
+        qInfo("\tcolortable with %d entries read\n\t(originally %s)\n", p_Annotation.m_Colortable.numEntries, p_Annotation.m_Colortable.orig_tab.toUtf8().constData());
     }
     else
     {
-        printf("\tError! No colortable stored\n");
+        qWarning("\tError! No colortable stored");
     }
 
     // hemi info
@@ -276,7 +276,7 @@ bool FsAnnotation::read(const QString& p_sFileName, FsAnnotation &p_Annotation)
     else
         p_Annotation.m_iHemi = 1;
 
-    printf("[done]\n");
+    qInfo("[done]\n");
 
     t_File.close();
 
@@ -302,7 +302,7 @@ bool FsAnnotation::toLabels(const FsSurface &p_surf,
         return false;
     }
 
-    printf("Converting labels from annotation...");
+    qInfo("Converting labels from annotation...");
 
 //n_read = 0
 //labels = list()
@@ -393,7 +393,7 @@ bool FsAnnotation::toLabels(const FsSurface &p_surf,
 //labels = list(labels)
 //label_colors = list(label_colors)
 
-    printf("[done]\n");
+    qInfo("[done]\n");
 
     return true;
 }

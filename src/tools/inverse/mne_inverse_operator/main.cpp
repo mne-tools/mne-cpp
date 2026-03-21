@@ -60,7 +60,7 @@
 #include <mne/mne_inverse_operator.h>
 #include <mne/mne_forward_solution.h>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -238,7 +238,7 @@ static QStringList readBadFile(const QString &fileName)
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_inverse_operator");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

@@ -59,6 +59,7 @@
 #include <QSharedData>
 #include <QSharedDataPointer>
 #include <QSharedPointer>
+#include <memory>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFLIB
@@ -76,9 +77,11 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffNamedMatrix : public QSharedData
 {
 public:
-    typedef QSharedPointer<FiffNamedMatrix> SPtr;               /**< Shared pointer type for FiffNamedMatrix. */
-    typedef QSharedPointer<const FiffNamedMatrix> ConstSPtr;    /**< Const shared pointer type for FiffNamedMatrix. */
-    typedef QSharedDataPointer<FiffNamedMatrix> SDPtr;          /**< Shared data pointer type for FiffNamedMatrix. */
+    using SPtr = QSharedPointer<FiffNamedMatrix>;            /**< Shared pointer type for FiffNamedMatrix. */
+    using ConstSPtr = QSharedPointer<const FiffNamedMatrix>; /**< Const shared pointer type for FiffNamedMatrix. */
+    using UPtr = std::unique_ptr<FiffNamedMatrix>;             /**< Unique pointer type for FiffNamedMatrix. */
+    using ConstUPtr = std::unique_ptr<const FiffNamedMatrix>;  /**< Const unique pointer type for FiffNamedMatrix. */
+    using SDPtr = QSharedDataPointer<FiffNamedMatrix>;       /**< Shared data pointer type for FiffNamedMatrix. */
 
     //=========================================================================================================
     /**

@@ -118,7 +118,7 @@ bool MNEBemSurface::addTriangleData()
     //
     //   Main triangulation
     //
-    printf("\tCompleting triangulation info...");
+    qInfo("\tCompleting triangulation info...");
     this->tri_cent = MatrixX3d::Zero(this->ntri,3);
     this->tri_nn = MatrixX3d::Zero(this->ntri,3);
     this->tri_area = VectorXd::Zero(this->ntri);
@@ -166,10 +166,10 @@ bool MNEBemSurface::addTriangleData()
       doc.close();
     }
 
-    printf("Adding additional geometry info\n");
+    qInfo("Adding additional geometry info\n");
     add_geometry_info();
 
-    printf("[done]\n");
+    qInfo("[done]\n");
 
     return true;
 }

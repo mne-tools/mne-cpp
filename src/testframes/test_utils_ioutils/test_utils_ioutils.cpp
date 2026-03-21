@@ -35,7 +35,7 @@
 //=============================================================================================================
 
 #include <utils/ioutils.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -94,7 +94,7 @@ TestIOUtils::TestIOUtils()
 
 void TestIOUtils::initTestCase()
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
     QVERIFY(m_tempDir.isValid());
 }
 

@@ -80,10 +80,10 @@ class FiffTag;
 class FIFFSHARED_EXPORT FiffCoordTrans
 {
 public:
-    typedef QSharedPointer<FiffCoordTrans> SPtr;            /**< Shared pointer type for FiffCoordTrans. */
-    typedef QSharedPointer<const FiffCoordTrans> ConstSPtr; /**< Const shared pointer type for FiffCoordTrans. */
-    typedef std::unique_ptr<FiffCoordTrans> UPtr;           /**< Unique pointer type for FiffCoordTrans. */
-    typedef std::unique_ptr<const FiffCoordTrans> ConstUPtr;/**< Const unique pointer type for FiffCoordTrans. */
+    using SPtr = QSharedPointer<FiffCoordTrans>;            /**< Shared pointer type for FiffCoordTrans. */
+    using ConstSPtr = QSharedPointer<const FiffCoordTrans>; /**< Const shared pointer type for FiffCoordTrans. */
+    using UPtr = std::unique_ptr<FiffCoordTrans>;           /**< Unique pointer type for FiffCoordTrans. */
+    using ConstUPtr = std::unique_ptr<const FiffCoordTrans>;/**< Const unique pointer type for FiffCoordTrans. */
 
     //=========================================================================================================
     /**
@@ -433,7 +433,7 @@ public:
      *
      * @return The coordinate transform, or an empty transform if the tag is invalid.
      */
-    static FiffCoordTrans readFromTag(const QSharedPointer<FiffTag>& tag);
+    static FiffCoordTrans readFromTag(const std::unique_ptr<FiffTag>& tag);
 
     //========================================================================================================
     /**

@@ -40,7 +40,7 @@
 #include <inv/dipole_fit/inv_dipole_fit_settings.h>
 #include <inv/dipole_fit/inv_dipole_fit.h>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <mne/mne_bem.h>
 
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     // Q_INIT_RESOURCE(mne_disp3d);
     // #endif
 
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_dipole_fit");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

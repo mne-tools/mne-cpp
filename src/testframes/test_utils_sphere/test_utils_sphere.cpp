@@ -35,7 +35,7 @@
 //=============================================================================================================
 
 #include <math/sphere.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -120,7 +120,7 @@ TestSphere::TestSphere()
 
 void TestSphere::initTestCase()
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
 }
 
 //=============================================================================================================

@@ -60,7 +60,7 @@
 #include <inv/minimum_norm/inv_minimum_norm.h>
 
 #include <utils/ioutils.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
 
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     // Q_INIT_RESOURCE(mne_disp3d);
     #endif
 
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QApplication a(argc, argv);
 
     AbstractMetric::m_bStorageModeIsActive = false;

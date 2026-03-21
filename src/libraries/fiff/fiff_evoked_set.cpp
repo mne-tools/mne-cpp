@@ -60,6 +60,7 @@
 //=============================================================================================================
 
 #include <QFile>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -87,7 +88,7 @@ FiffEvokedSet::FiffEvokedSet(QIODevice& p_IODevice)
 
     if(!FiffEvokedSet::read(p_IODevice, *this))
     {
-        printf("\tFiff evoked data set not found.\n");//ToDo Throw here
+        qWarning("\tFiff evoked data set not found.\n");//ToDo Throw here
         return;
     }
 }
@@ -148,7 +149,7 @@ bool FiffEvokedSet::compensate_to(FiffEvokedSet& p_FiffEvokedSet,
 
     if(now == to)
     {
-        printf("Data is already compensated as desired.\n");
+        qInfo("Data is already compensated as desired.\n");
         return false;
     }
 
@@ -171,14 +172,14 @@ bool FiffEvokedSet::compensate_to(FiffEvokedSet& p_FiffEvokedSet,
 bool FiffEvokedSet::find_evoked(const FiffEvokedSet& p_FiffEvokedSet) const
 {
     if(!p_FiffEvokedSet.evoked.size()) {
-        printf("No evoked response data sets in %s\n",p_FiffEvokedSet.info.filename.toUtf8().constData());
+        qWarning("No evoked response data sets in %s\n",p_FiffEvokedSet.info.filename.toUtf8().constData());
         return false;
     }
     else
-        printf("\nFound %lld evoked response data sets in %s :\n",p_FiffEvokedSet.evoked.size(),p_FiffEvokedSet.info.filename.toUtf8().constData());
+        qInfo("\nFound %lld evoked response data sets in %s :\n",p_FiffEvokedSet.evoked.size(),p_FiffEvokedSet.info.filename.toUtf8().constData());
 
     for(qint32 i = 0; i < p_FiffEvokedSet.evoked.size(); ++i) {
-        printf("%s (%s)\n",p_FiffEvokedSet.evoked.at(i).comment.toUtf8().constData(),p_FiffEvokedSet.evoked.at(i).aspectKindToString().toUtf8().constBegin());
+        qInfo("%s (%s)\n",p_FiffEvokedSet.evoked.at(i).comment.toUtf8().constData(),p_FiffEvokedSet.evoked.at(i).aspectKindToString().toUtf8().constBegin());
     }
 
     return true;
@@ -198,7 +199,7 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice,
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
     QString t_sFileName = t_pStream->streamName();
 
-    printf("Exploring %s ...\n",t_sFileName.toUtf8().constData());
+    qInfo("Exploring %s ...\n",t_sFileName.toUtf8().constData());
 
     if(!t_pStream->open())
         return false;
@@ -231,12 +232,12 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice,
     QString t;
     if(!t_pStream->get_evoked_entries(evoked_node, comments, aspect_kinds, t))
         t = QString("None found, must use integer");
-    printf("\tFound %lld datasets\n", evoked_node.size());
+    qInfo("\tFound %lld datasets\n", evoked_node.size());
 
     for(qint32 i = 0; i < comments.size(); ++i)
     {
         QFile t_file(p_FiffEvokedSet.info.filename);
-        printf(">> Processing %s <<\n", comments[i].toUtf8().constData());
+        qInfo(">> Processing %s <<\n", comments[i].toUtf8().constData());
         FiffEvoked t_FiffEvoked;
         if(FiffEvoked::read(t_file, t_FiffEvoked, i, baseline, proj))
             p_FiffEvokedSet.evoked.push_back(t_FiffEvoked);

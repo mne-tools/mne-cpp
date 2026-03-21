@@ -57,6 +57,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <memory>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFLIB
@@ -74,8 +75,10 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffChInfo
 {
 public:
-    typedef QSharedPointer<FiffChInfo> SPtr;            /**< Shared pointer type for FiffChInfo. */
-    typedef QSharedPointer<const FiffChInfo> ConstSPtr; /**< Const shared pointer type for FiffChInfo. */
+    using SPtr = QSharedPointer<FiffChInfo>;            /**< Shared pointer type for FiffChInfo. */
+    using ConstSPtr = QSharedPointer<const FiffChInfo>; /**< Const shared pointer type for FiffChInfo. */
+    using UPtr = std::unique_ptr<FiffChInfo>;             /**< Unique pointer type for FiffChInfo. */
+    using ConstUPtr = std::unique_ptr<const FiffChInfo>;  /**< Const unique pointer type for FiffChInfo. */
 
     //=========================================================================================================
     /**

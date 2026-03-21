@@ -501,7 +501,7 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
                           int          npick)       /* How many */
 
 {
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
 //    fiffTagRec   tag;
     fiff_short_t *this_samples;
     fiff_float_t *this_samplef;
@@ -595,7 +595,7 @@ int mne_read_bad_channel_list_from_node(FiffStream::SPtr& stream,
     QList<FiffDirNode::SPtr> temp;
     QStringList list;
     int  nlist  = 0;
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     QString names;
 
     if (pNode->isEmpty())
@@ -1459,7 +1459,7 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
     FiffDirEntry::SPtr dir;
     QList<FiffDirEntry::SPtr> dir0;
     //    fiffTagRec   tag;
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     FiffChInfo   ch;
     int k, b, nbuf, ndir, nnames;
     int current_dir0 = 0;

@@ -60,6 +60,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <memory>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -83,9 +84,11 @@ class FiffRawData;
 class FIFFSHARED_EXPORT FiffCov : public QSharedData
 {
 public:
-    typedef QSharedPointer<FiffCov> SPtr;               /**< Shared pointer type for FiffCov. */
-    typedef QSharedPointer<const FiffCov> ConstSPtr;    /**< Const shared pointer type for FiffCov. */
-    typedef QSharedDataPointer<FiffCov> SDPtr;       /**< Shared data pointer type for FiffCov. */
+    using SPtr = QSharedPointer<FiffCov>;            /**< Shared pointer type for FiffCov. */
+    using ConstSPtr = QSharedPointer<const FiffCov>; /**< Const shared pointer type for FiffCov. */
+    using UPtr = std::unique_ptr<FiffCov>;             /**< Unique pointer type for FiffCov. */
+    using ConstUPtr = std::unique_ptr<const FiffCov>;  /**< Const unique pointer type for FiffCov. */
+    using SDPtr = QSharedDataPointer<FiffCov>;       /**< Shared data pointer type for FiffCov. */
 
     //=========================================================================================================
     /**

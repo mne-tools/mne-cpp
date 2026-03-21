@@ -15,7 +15,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_stream.h>
@@ -205,7 +205,7 @@ private slots:
 
 void TestMneLibrary::initTestCase()
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QString base = QCoreApplication::applicationDirPath()
                    + "/../resources/data/mne-cpp-test-data";
     if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))

@@ -45,7 +45,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <disp3D/helpers/geometryinfo.h>
 #include <mne/mne_bem.h>

@@ -310,9 +310,9 @@ bool MNESourceSpaces::readFromStream(FiffStream::SPtr& p_pStream,
     for(int k = 0; k < spaces.size(); ++k)
     {
         auto p_Hemisphere = std::make_shared<MNEHemisphere>();
-        printf("\tReading a source space...");
+        qInfo("\tReading a source space...");
         MNESourceSpaces::read_source_space(p_pStream, spaces[k], *p_Hemisphere);
-        printf("\t[done]\n" );
+        qInfo("\t[done]\n" );
         if (add_geom)
             p_Hemisphere->complete_source_space_info();
 
@@ -321,7 +321,7 @@ bool MNESourceSpaces::readFromStream(FiffStream::SPtr& p_pStream,
 //           src(k) = this;
     }
 
-    printf("\t%lld source spaces read\n", spaces.size());
+    qInfo("\t%lld source spaces read\n", spaces.size());
 
     if(open_here)
         p_pStream->close();
@@ -346,7 +346,7 @@ bool MNESourceSpaces::transform_source_space_to(fiff_int_t dest, FiffCoordTrans&
         if(hemi) {
             if(!hemi->transform_hemisphere_to(dest,trans))
             {
-                printf("Could not transform source space.\n");
+                qWarning("Could not transform source space.");
                 return false;
             }
         }
@@ -360,7 +360,7 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
 {
     p_Hemisphere.clear();
 
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
 
     //=====================================================================
     if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_ID, t_pTag))
@@ -525,8 +525,8 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
     //
     //   Use triangulation
     //
-    FiffTag::SPtr t_pTag1;
-    FiffTag::SPtr t_pTag2;
+    FiffTag::UPtr t_pTag1;
+    FiffTag::UPtr t_pTag2;
     if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NUSE_TRI, t_pTag1) || !p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, t_pTag2))
     {
         MatrixX3i p_defaultMatrix;
@@ -558,7 +558,7 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
 
 //    patch_info(p_Hemisphere.nearest, p_Hemisphere.pinfo);
     if (p_Hemisphere.compute_patch_info())
-       printf("\tPatch information added...");
+       qInfo("\tPatch information added...");
     //
     // Distances
     //
@@ -602,15 +602,15 @@ void MNESourceSpaces::writeToStream(FiffStream* p_pStream)
 {
     for(size_t h = 0; h < m_sourceSpaces.size(); ++h)
     {
-        printf("\tWrite a source space... ");
+        qInfo("\tWrite a source space... ");
         p_pStream->start_block(FIFFB_MNE_SOURCE_SPACE);
         auto* hemi = dynamic_cast<MNEHemisphere*>(m_sourceSpaces[h].get());
         if (hemi)
             hemi->writeToStream(p_pStream);
         p_pStream->end_block(FIFFB_MNE_SOURCE_SPACE);
-        printf("[done]\n");
+        qInfo("[done]\n");
     }
-    printf("\t%zu source spaces written\n", m_sourceSpaces.size());
+    qInfo("\t%zu source spaces written\n", m_sourceSpaces.size());
 }
 
 //=============================================================================================================

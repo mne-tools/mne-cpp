@@ -43,6 +43,7 @@
 #include <fiff/fiff_types.h>
 
 #include <vector>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -74,7 +75,7 @@ fiff_int_t fiff_type_matrix_coding(fiff_int_t type)
 
 //============================= fiff_matrix.c =============================
 
-std::vector<int> fiff_get_matrix_dims(FiffTag::SPtr& tag)
+std::vector<int> fiff_get_matrix_dims(const FiffTag::UPtr& tag)
 /*
       * Interpret dimensions from matrix data (dense and sparse)
       */
@@ -151,14 +152,14 @@ FiffSparseMatrix::FiffSparseMatrix()
 
 //=============================================================================================================
 
-std::vector<int> FiffSparseMatrix::fiff_get_matrix_sparse_dims(FiffTag::SPtr &tag)
+std::vector<int> FiffSparseMatrix::fiff_get_matrix_sparse_dims(const FiffTag::UPtr& tag)
 {
     return fiff_get_matrix_dims(tag);
 }
 
 //=============================================================================================================
 
-FiffSparseMatrix::UPtr FiffSparseMatrix::fiff_get_float_sparse_matrix(FiffTag::SPtr &tag)
+FiffSparseMatrix::UPtr FiffSparseMatrix::fiff_get_float_sparse_matrix(const FiffTag::UPtr& tag)
 {
     int   m,n,nz;
     int   coding,correct_size;
@@ -338,7 +339,7 @@ Eigen::SparseMatrix<double> FiffSparseMatrix::toEigenSparse() const
     if (is_empty())
         return Eigen::SparseMatrix<double>();
 
-    typedef Eigen::Triplet<double> T;
+    using T = Eigen::Triplet<double>;
     std::vector<T> tripletList;
     tripletList.reserve(nz);
 
@@ -384,7 +385,7 @@ FiffSparseMatrix FiffSparseMatrix::fromEigenSparse(const Eigen::SparseMatrix<dou
     result.ptrs = Eigen::VectorXi::Zero(result.m + 1);
 
     // Collect triplets sorted by row
-    typedef Eigen::Triplet<double> T;
+    using T = Eigen::Triplet<double>;
     std::vector<T> triplets;
     triplets.reserve(mat.nonZeros());
     for (int k = 0; k < mat.outerSize(); ++k) {

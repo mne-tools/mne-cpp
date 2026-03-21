@@ -459,7 +459,7 @@ MNEProjOp *MNEProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode
     int         item_kind;
     int         item_nvec;
     int         item_active;
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
 
     if (!stream) {
         qCritical("File not open read_from_node");

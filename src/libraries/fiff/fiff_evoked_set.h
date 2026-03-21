@@ -62,6 +62,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <memory>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -140,8 +141,10 @@ class FIFFSHARED_EXPORT FiffEvokedSet
 {
 
 public:
-    typedef QSharedPointer<FiffEvokedSet> SPtr;             /**< Shared pointer type for FiffEvokedSet. */
-    typedef QSharedPointer<const FiffEvokedSet> ConstSPtr;  /**< Const shared pointer type for FiffEvokedSet. */
+    using SPtr = QSharedPointer<FiffEvokedSet>;            /**< Shared pointer type for FiffEvokedSet. */
+    using ConstSPtr = QSharedPointer<const FiffEvokedSet>; /**< Const shared pointer type for FiffEvokedSet. */
+    using UPtr = std::unique_ptr<FiffEvokedSet>;             /**< Unique pointer type for FiffEvokedSet. */
+    using ConstUPtr = std::unique_ptr<const FiffEvokedSet>;  /**< Const unique pointer type for FiffEvokedSet. */
 
     //=========================================================================================================
     /**

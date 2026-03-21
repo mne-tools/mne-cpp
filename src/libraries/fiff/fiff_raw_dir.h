@@ -50,6 +50,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <memory>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFLIB
@@ -68,8 +69,10 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffRawDir {
 
 public:
-    typedef QSharedPointer<FiffRawDir> SPtr;            /**< Shared pointer type for FiffRawDir. */
-    typedef QSharedPointer<const FiffRawDir> ConstSPtr; /**< Const shared pointer type for FiffRawDir. */
+    using SPtr = QSharedPointer<FiffRawDir>;            /**< Shared pointer type for FiffRawDir. */
+    using ConstSPtr = QSharedPointer<const FiffRawDir>; /**< Const shared pointer type for FiffRawDir. */
+    using UPtr = std::unique_ptr<FiffRawDir>;             /**< Unique pointer type for FiffRawDir. */
+    using ConstUPtr = std::unique_ptr<const FiffRawDir>;  /**< Const unique pointer type for FiffRawDir. */
 
     //=========================================================================================================
     /**

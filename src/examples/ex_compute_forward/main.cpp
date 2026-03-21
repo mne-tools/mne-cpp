@@ -38,7 +38,7 @@
 #include <iostream>
 #include <memory>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
@@ -86,7 +86,7 @@ using namespace Eigen;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
     QCoreApplication a(argc, argv);
 
     QElapsedTimer timer0, timer1, timer2, timer3, timer4;

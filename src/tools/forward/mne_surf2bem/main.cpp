@@ -50,7 +50,7 @@
 #include "mne_surf2bem_settings.h"
 #include "surf2bem.h"
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -86,7 +86,7 @@ using namespace UTILSLIB;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_surf2bem");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

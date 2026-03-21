@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <fiff/fiff_cov.h>
 
@@ -100,7 +100,7 @@ TestFiffCov::TestFiffCov()
 
 void TestFiffCov::initTestCase()
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
     qDebug() << "Epsilon" << dEpsilon;
     //Read the results produced with MNE-CPP
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif");

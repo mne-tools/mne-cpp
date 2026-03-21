@@ -70,7 +70,7 @@ FiffRawData::FiffRawData(QIODevice &p_IODevice)
     //setup FiffRawData object
     if(!FiffStream::setup_read_raw(p_IODevice, *this))
     {
-        printf("\tError during fiff setup raw read.\n");
+        qWarning("\tError during fiff setup raw read.\n");
         //exit(EXIT_FAILURE); //ToDo Throw here, e.g.: throw std::runtime_error("IO Error! File not found");
         return;
     }
@@ -85,7 +85,7 @@ FiffRawData::FiffRawData(QIODevice &p_IODevice, bool b_littleEndian)
     //setup FiffRawData object
     if(!FiffStream::setup_read_raw(p_IODevice, *this, false, b_littleEndian))
     {
-        printf("\tError during fiff setup raw read.\n");
+        qWarning("\tError during fiff setup raw read.\n");
         //exit(EXIT_FAILURE); //ToDo Throw here, e.g.: throw std::runtime_error("IO Error! File not found");
         return;
     }
@@ -155,10 +155,10 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
     //
     if(from > to)
     {
-        printf("No data in this range %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/this->info.sfreq, ((float)to)/this->info.sfreq);
+        qWarning("No data in this range %d ... %d  =  %9.3f ... %9.3f secs...", from, to, (static_cast<float>(from))/this->info.sfreq, (static_cast<float>(to))/this->info.sfreq);
         return false;
     }
-    //printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/this->info.sfreq, ((float)to)/this->info.sfreq);
+    //printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, (static_cast<float>(from))/this->info.sfreq, (static_cast<float>(to))/this->info.sfreq);
     //
     //  Initialize the data and calibration vector
     //
@@ -166,7 +166,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
     qint32 dest  = 0;//1;
     qint32 i, k, r;
 
-    typedef Eigen::Triplet<double> T;
+    using T = Eigen::Triplet<double>;
     std::vector<T> tripletList;
     tripletList.reserve(nchan);
     for(i = 0; i < nchan; ++i)
@@ -257,7 +257,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
     {
         if (!this->file->device()->open(QIODevice::ReadOnly))
         {
-            printf("Cannot open file %s",this->info.filename.toUtf8().constData());
+            qWarning("Cannot open file %s",this->info.filename.toUtf8().constData());
         }
         fid = this->file;
     }
@@ -268,7 +268,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
 
     MatrixXd one, newData, tmp_data;
     FiffRawDir thisRawDir;
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     fiff_int_t first_pick, last_pick, picksamp;
     for(k = 0; k < this->rawdir.size(); ++k)
     {
@@ -284,7 +284,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                 //  Take the easy route: skip is translated to zeros
                 //
                 if(do_debug)
-                    printf("S");
+                    qDebug("S");
                 if (sel.cols() <= 0)
                     one.resize(nchan,thisRawDir.nsamp);
                 else
@@ -312,7 +312,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                         else if(t_pTag->type == FIFFT_SHORT)
                             one = cal*(Map< MatrixShort >( t_pTag->toShort(),nchan, thisRawDir.nsamp)).cast<double>();
                         else
-                            printf("Data Storage Format not known yet [1]!! Type: %d\n", t_pTag->type);
+                            qWarning("Data Storage Format not known yet [1]!! Type: %d\n", t_pTag->type);
                     }
                     else
                     {
@@ -349,7 +349,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                         }
                         else
                         {
-                            printf("Data Storage Format not known yet [2]!! Type: %d\n", t_pTag->type);
+                            qWarning("Data Storage Format not known yet [2]!! Type: %d\n", t_pTag->type);
                         }
 
                         one = cal*newData;
@@ -364,7 +364,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                     else if(t_pTag->type == FIFFT_FLOAT)
                         one = mult*(Map< MatrixXf >( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
                     else
-                        printf("Data Storage Format not known yet [3]!! Type: %d\n", t_pTag->type);
+                        qWarning("Data Storage Format not known yet [3]!! Type: %d\n", t_pTag->type);
                 }
             }
             //
@@ -378,7 +378,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                 first_pick = 0;//1;
                 last_pick  = thisRawDir.nsamp - 1;
                 if (do_debug)
-                    printf("W");
+                    qDebug("W");
             }
             else if (from > thisRawDir.first)
             {
@@ -391,7 +391,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
 //                    qDebug() << "This needs to be debugged!";
                     last_pick = thisRawDir.nsamp + to - thisRawDir.last - 1;//is this alright?
                     if (do_debug)
-                        printf("M");
+                        qDebug("M");
                 }
                 else
                 {
@@ -400,7 +400,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                     //
                     last_pick = thisRawDir.nsamp - 1;
                     if (do_debug)
-                        printf("E");
+                        qDebug("E");
                 }
             }
             else
@@ -411,7 +411,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                 first_pick = 0;//1;
                 last_pick  = to - thisRawDir.first;// + 1;
                 if (do_debug)
-                    printf("B");
+                    qDebug("B");
             }
             //
             //  Now we are ready to pick
@@ -452,7 +452,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
     times = MatrixXd(1, to-from+1);
 
     for (i = 0; i < times.cols(); ++i)
-        times(0, i) = ((float)(from+i)) / this->info.sfreq;
+        times(0, i) = static_cast<float>(from+i) / this->info.sfreq;
 
     return true;
 }
@@ -488,10 +488,10 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
     //
     if(from > to)
     {
-        printf("No data in this range\n");
+        qWarning("No data in this range\n");
         return false;
     }
-    //printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/this->info.sfreq, ((float)to)/this->info.sfreq);
+    //printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, (static_cast<float>(from))/this->info.sfreq, (static_cast<float>(to))/this->info.sfreq);
     //
     //  Initialize the data and calibration vector
     //
@@ -499,7 +499,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
     qint32 dest  = 0;//1;
     qint32 i, k, r;
 
-    typedef Eigen::Triplet<double> T;
+    using T = Eigen::Triplet<double>;
     std::vector<T> tripletList;
     tripletList.reserve(nchan);
     for(i = 0; i < nchan; ++i)
@@ -592,7 +592,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
     {
         if (!this->file->device()->open(QIODevice::ReadOnly))
         {
-            printf("Cannot open file %s",this->info.filename.toUtf8().constData());
+            qWarning("Cannot open file %s",this->info.filename.toUtf8().constData());
         }
         fid = this->file;
     }
@@ -617,7 +617,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                 //  Take the easy route: skip is translated to zeros
                 //
                 if(do_debug)
-                    printf("S");
+                    qDebug("S");
                 if (sel.cols() <= 0)
                     one.resize(nchan,thisRawDir.nsamp);
                 else
@@ -627,7 +627,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
             }
             else
             {
-                FiffTag::SPtr t_pTag;
+                FiffTag::UPtr t_pTag;
                 fid->read_tag(t_pTag, thisRawDir.ent->pos);
                 //
                 //   Depending on the state of the projection and selection
@@ -646,7 +646,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                         else if(t_pTag->type == FIFFT_SHORT)
                             one = cal*(Map< MatrixShort >( t_pTag->toShort(),nchan, thisRawDir.nsamp)).cast<double>();
                         else
-                            printf("Data Storage Format not known yet [1]!! Type: %d\n", t_pTag->type);
+                            qWarning("Data Storage Format not known yet [1]!! Type: %d\n", t_pTag->type);
                     }
                     else
                     {
@@ -684,7 +684,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                         }
                         else
                         {
-                            printf("Data Storage Format not known yet [2]!! Type: %d\n", t_pTag->type);
+                            qWarning("Data Storage Format not known yet [2]!! Type: %d\n", t_pTag->type);
                         }
 
                         one = cal*newData;
@@ -699,7 +699,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                     else if(t_pTag->type == FIFFT_FLOAT)
                         one = mult*(Map< MatrixXf >( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
                     else
-                        printf("Data Storage Format not known yet [3]!! Type: %d\n", t_pTag->type);
+                        qWarning("Data Storage Format not known yet [3]!! Type: %d\n", t_pTag->type);
                 }
             }
             //
@@ -713,7 +713,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                 first_pick = 0;//1;
                 last_pick  = thisRawDir.nsamp - 1;
                 if (do_debug)
-                    printf("W");
+                    qDebug("W");
             }
             else if (from > thisRawDir.first)
             {
@@ -726,7 +726,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
 //                    qDebug() << "This needs to be debugged!";
                     last_pick = thisRawDir.nsamp + to - thisRawDir.last - 1;//is this alright?
                     if (do_debug)
-                        printf("M");
+                        qDebug("M");
                 }
                 else
                 {
@@ -735,7 +735,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                     //
                     last_pick = thisRawDir.nsamp - 1;
                     if (do_debug)
-                        printf("E");
+                        qDebug("E");
                 }
             }
             else
@@ -746,7 +746,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                 first_pick = 0;//1;
                 last_pick  = to - thisRawDir.first;// + 1;
                 if (do_debug)
-                    printf("B");
+                    qDebug("B");
             }
             //
             //  Now we are ready to pick
@@ -792,7 +792,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
     times = MatrixXd(1, to-from+1);
 
     for (i = 0; i < times.cols(); ++i)
-        times(0, i) = ((float)(from+i)) / this->info.sfreq;
+        times(0, i) = static_cast<float>(from+i) / this->info.sfreq;
 
     return true;
 }

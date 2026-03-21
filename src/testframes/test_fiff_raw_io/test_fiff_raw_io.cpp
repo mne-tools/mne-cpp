@@ -20,7 +20,7 @@
 #include <QTemporaryFile>
 #include <Eigen/Dense>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_stream.h>
@@ -65,7 +65,7 @@ private slots:
     //=========================================================================
     void initTestCase()
     {
-        qInstallMessageHandler(ApplicationLogger::customLogWriter);
+        qInstallMessageHandler(MNELogger::customLogWriter);
         QString base = QCoreApplication::applicationDirPath()
                        + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif")) {
@@ -134,7 +134,7 @@ private slots:
         // Read first few tags from directory
         int nTags = qMin((int)stream->dir().size(), 20);
         for (int i = 0; i < nTags; ++i) {
-            FiffTag::SPtr tag;
+            FiffTag::UPtr tag;
             stream->read_tag(tag, stream->dir()[i]->pos);
             QVERIFY(tag != nullptr);
             QVERIFY(tag->kind > 0 || tag->kind == 0);
@@ -442,7 +442,7 @@ private slots:
         // Read tags to find FIFF_COORD_TRANS
         for (int i = 0; i < stream->dir().size(); ++i) {
             if (stream->dir()[i]->kind == FIFF_COORD_TRANS) {
-                FiffTag::SPtr tag;
+                FiffTag::UPtr tag;
                 stream->read_tag(tag, stream->dir()[i]->pos);
                 QVERIFY(tag != nullptr);
                 FiffCoordTrans trans = tag->toCoordTrans();
@@ -469,7 +469,7 @@ private slots:
 
         for (int i = 0; i < stream->dir().size(); ++i) {
             if (stream->dir()[i]->kind == FIFF_COORD_TRANS) {
-                FiffTag::SPtr tag;
+                FiffTag::UPtr tag;
                 stream->read_tag(tag, stream->dir()[i]->pos);
                 FiffCoordTrans trans = tag->toCoordTrans();
 
@@ -530,7 +530,7 @@ private slots:
 
         // Read specific tags from measurement info
         if (measInfo.size() > 0) {
-            FiffTag::SPtr tag;
+            FiffTag::UPtr tag;
             for (int i = 0; i < measInfo[0]->dir.size(); ++i) {
                 stream->read_tag(tag, measInfo[0]->dir[i]->pos);
                 QVERIFY(tag != nullptr);
@@ -610,7 +610,7 @@ private slots:
 
         // Read tags from first source space
         if (srcBlocks.size() > 0) {
-            FiffTag::SPtr tag;
+            FiffTag::UPtr tag;
             for (int i = 0; i < qMin((int)srcBlocks[0]->dir.size(), 30); ++i) {
                 stream->read_tag(tag, srcBlocks[0]->dir[i]->pos);
                 QVERIFY(tag != nullptr);

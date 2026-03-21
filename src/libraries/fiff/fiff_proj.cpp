@@ -51,6 +51,7 @@
 //=============================================================================================================
 
 #include <Eigen/SVD>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -111,7 +112,7 @@ void FiffProj::activate_projs(QList<FiffProj> &p_qListFiffProj)
     for(it = p_qListFiffProj.begin(); it != p_qListFiffProj.end(); ++it)
         it->active = true;
 
-    printf("\t%lld projection items activated.\n", p_qListFiffProj.size());
+    qInfo("\t%lld projection items activated.\n", p_qListFiffProj.size());
 }
 
 //=============================================================================================================
@@ -121,7 +122,7 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     fiff_int_t nchan = ch_names.size();
     if (nchan == 0)
     {
-        printf("No channel names specified\n");//ToDo throw here
+        qWarning("No channel names specified\n");//ToDo throw here
         return 0;
     }
 
@@ -149,12 +150,12 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     }
 
     if (nproj == 0) {
-        printf("FiffProj::make_projector - No projectors nproj=0\n");
+        qWarning("FiffProj::make_projector - No projectors nproj=0\n");
         return 0;
     }
 
     if (nvec <= 0) {
-        printf("FiffProj::make_projector - No rows in projector matrices found nvec<=0\n");
+        qWarning("FiffProj::make_projector - No rows in projector matrices found nvec<=0\n");
         return 0;
     }
 
@@ -183,7 +184,7 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
 
             if (one.data->col_names.size() != uniqueMap.keys().size())
             {
-                printf("Channel name list in projection item %d contains duplicate items",k);
+                qWarning("Channel name list in projection item %d contains duplicate items",k);
                 return 0;
             }
 

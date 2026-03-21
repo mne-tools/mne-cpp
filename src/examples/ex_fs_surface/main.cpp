@@ -42,7 +42,7 @@
 
 #include <fs/fs_surfaceset.h>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
     // Q_INIT_RESOURCE(mne_disp3d);
     #endif
     
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
     QApplication a(argc, argv);
 
     // Command Line Parser

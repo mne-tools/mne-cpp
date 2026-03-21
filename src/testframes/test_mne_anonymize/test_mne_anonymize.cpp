@@ -37,7 +37,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include "../../tools/preprocessing/mne_anonymize/fiffanonymizer.h"
 #include "../../tools/preprocessing/mne_anonymize/settingscontrollercl.h"
@@ -106,7 +106,7 @@ TestMneAnonymize::TestMneAnonymize()
 
 void TestMneAnonymize::initTestCase()
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
 }
 
 //=============================================================================================================
@@ -318,7 +318,7 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
                                   QString testArg)
 {
 
-    FiffTag::SPtr pTag = FiffTag::SPtr::create();
+    FiffTag::UPtr pTag = std::make_unique<FiffTag>();
 
     stream->device()->seek(0);
 

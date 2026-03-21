@@ -111,7 +111,7 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
     std::unique_ptr<FiffId> id;
     QList<FiffDirNode::SPtr> nodes;
     FiffDirNode::SPtr info;
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     FIFFLIB::FiffChInfo   this_ch;
     FiffCoordTrans t;
     fiff_int_t kind, pos;
@@ -481,7 +481,7 @@ std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
     QList<FiffDirNode::SPtr> comps;
     int ncomp;
     int kind,k;
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     QList<FiffChInfo> chs;
     int nch = 0;
     int calibrated;

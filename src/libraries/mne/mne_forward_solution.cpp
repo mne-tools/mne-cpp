@@ -1291,7 +1291,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
     //
     //   Locate and read the forward solutions
     //
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     FiffDirNode::SPtr megnode;
     FiffDirNode::SPtr eegnode;
     for(qint32 k = 0; k < fwds.size(); ++k)
@@ -1609,7 +1609,7 @@ bool MNEForwardSolution::read_one(FiffStream::SPtr& p_pStream,
         return false;
 
     one.clear();
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
 
     if(!p_Node->find_tag(p_pStream, FIFF_MNE_SOURCE_ORIENTATION, t_pTag))
     {

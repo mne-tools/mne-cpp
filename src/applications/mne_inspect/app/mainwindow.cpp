@@ -1452,19 +1452,19 @@ void MainWindow::loadInitialData(const QString &subjectPath,
     QString subjectDir = subjectPath + "/" + subjectName + "/surf";
     QDir surfDir(subjectDir);
     if (!surfDir.exists()) {
-        qDebug() << "No surface data found. Subject directory does not exist:" << subjectDir;
-        qDebug() << "Use --subjectPath and --subject options to specify data location,";
-        qDebug() << "or load data interactively through the UI.";
+        qWarning() << "No surface data found. Subject directory does not exist:" << subjectDir;
+        qWarning() << "Use --subjectPath and --subject options to specify data location,";
+        qWarning() << "or load data interactively through the UI.";
     } else {
-        qDebug() << "Loading surfaces...";
+        qInfo() << "Loading surfaces...";
         loadHemisphere(subjectPath, subjectName, "lh");
         loadHemisphere(subjectPath, subjectName, "rh");
-        qDebug() << "Surfaces loaded.";
+        qInfo() << "Surfaces loaded.";
     }
 
     // Auto-load atlas annotation (explicit path overrides auto-discovery in loadHemisphere)
     if (!atlasPath.isEmpty() && QFile::exists(atlasPath)) {
-        qDebug() << "Auto-loading atlas from:" << atlasPath;
+        qInfo() << "Auto-loading atlas from:" << atlasPath;
         QString fileName = QFileInfo(atlasPath).fileName();
         QString lhAnnotPath, rhAnnotPath;
 
@@ -1482,14 +1482,14 @@ void MainWindow::loadInitialData(const QString &subjectPath,
             FsAnnotation annot(lhAnnotPath);
             if (!annot.isEmpty()) {
                 m_model->addAnnotation(subjectName, "lh", annot);
-                qDebug() << "Added atlas annotation for lh";
+                qInfo() << "Added atlas annotation for lh";
             }
         }
         if (!rhAnnotPath.isEmpty() && QFile::exists(rhAnnotPath)) {
             FsAnnotation annot(rhAnnotPath);
             if (!annot.isEmpty()) {
                 m_model->addAnnotation(subjectName, "rh", annot);
-                qDebug() << "Added atlas annotation for rh";
+                qInfo() << "Added atlas annotation for rh";
             }
         }
     }
@@ -1500,7 +1500,7 @@ void MainWindow::loadInitialData(const QString &subjectPath,
 
     // Auto-load digitizer
     if (!digitizerPath.isEmpty() && QFile::exists(digitizerPath)) {
-        qDebug() << "Auto-loading digitizer from:" << digitizerPath;
+        qInfo() << "Auto-loading digitizer from:" << digitizerPath;
         if (m_brainView->loadSensors(digitizerPath)) {
             m_showMegCheck->setEnabled(true);
             m_showEegCheck->setEnabled(true);
@@ -1531,13 +1531,13 @@ void MainWindow::loadInitialData(const QString &subjectPath,
 
     // Auto-load transformation
     if (!transPath.isEmpty() && QFile::exists(transPath)) {
-        qDebug() << "Auto-loading transformation from:" << transPath;
+        qInfo() << "Auto-loading transformation from:" << transPath;
         m_brainView->loadTransformation(transPath);
     }
 
     // Auto-load source space
     if (!srcSpacePath.isEmpty() && QFile::exists(srcSpacePath)) {
-        qDebug() << "Auto-loading source space from:" << srcSpacePath;
+        qInfo() << "Auto-loading source space from:" << srcSpacePath;
         if (m_brainView->loadSourceSpace(srcSpacePath)) {
             m_showSrcSpaceCheck->setEnabled(true);
             m_showSrcSpaceCheck->setChecked(false);
@@ -1549,14 +1549,14 @@ void MainWindow::loadInitialData(const QString &subjectPath,
     for (int i = 0; i < stcPaths.size(); ++i) {
         const QString &stcPath = stcPaths[i];
         if (!stcPath.isEmpty() && QFile::exists(stcPath)) {
-            qDebug() << "Auto-loading source estimate from:" << stcPath;
+            qInfo() << "Auto-loading source estimate from:" << stcPath;
             addStcEntry(stcPath, /*activate=*/ (i == 0));
         }
     }
 
     // Auto-load evoked
     if (!evokedPath.isEmpty() && QFile::exists(evokedPath)) {
-        qDebug() << "Auto-loading evoked from:" << evokedPath;
+        qInfo() << "Auto-loading evoked from:" << evokedPath;
 
         QStringList sets = BrainView::probeEvokedSets(evokedPath);
         m_evokedSetCombo->blockSignals(true);
@@ -1641,7 +1641,7 @@ void MainWindow::loadHemisphere(const QString &subjectPath, const QString &subje
         FsSurface surf(surfPath);
         if (!surf.isEmpty()) {
             m_model->addSurface(subjectName, hemi, type, surf);
-            qDebug() << "Added" << hemi << type;
+            qInfo() << "Added" << hemi << type;
         }
     }
 
@@ -1651,7 +1651,7 @@ void MainWindow::loadHemisphere(const QString &subjectPath, const QString &subje
         FsAnnotation annot(annotPath);
         if (!annot.isEmpty()) {
             m_model->addAnnotation(subjectName, hemi, annot);
-            qDebug() << "Added annotation for" << hemi;
+            qInfo() << "Added annotation for" << hemi;
         }
     }
 }
@@ -1672,10 +1672,10 @@ void MainWindow::loadBem(const QString &subjectName, const QString &bemPath)
                 default: name = QString("%1").arg(i); break;
             }
             m_model->addBemSurface(subjectName, name, bem[i]);
-            qDebug() << "Added BEM:" << name;
+            qInfo() << "Added BEM:" << name;
         }
     } else {
-        qDebug() << "BEM path provided but file not found:" << bemPath;
+        qWarning() << "BEM path provided but file not found:" << bemPath;
     }
 }
 

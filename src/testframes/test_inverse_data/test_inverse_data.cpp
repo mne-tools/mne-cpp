@@ -21,7 +21,7 @@
 #include <QTemporaryDir>
 #include <Eigen/Dense>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_stream.h>
@@ -225,7 +225,7 @@ private slots:
     //=========================================================================
     void initTestCase()
     {
-        qInstallMessageHandler(ApplicationLogger::customLogWriter);
+        qInstallMessageHandler(MNELogger::customLogWriter);
         m_bDataLoaded = false;
 
         QString base = QCoreApplication::applicationDirPath()

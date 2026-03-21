@@ -81,9 +81,10 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffSparseMatrix
 {
 public:
-    typedef QSharedPointer<FiffSparseMatrix> SPtr;              /**< Shared pointer type for FiffSparseMatrix. */
-    typedef QSharedPointer<const FiffSparseMatrix> ConstSPtr;   /**< Const shared pointer type for FiffSparseMatrix. */
-    typedef std::unique_ptr<FiffSparseMatrix> UPtr;             /**< Unique pointer type for FiffSparseMatrix. */
+    using SPtr = QSharedPointer<FiffSparseMatrix>;            /**< Shared pointer type for FiffSparseMatrix. */
+    using ConstSPtr = QSharedPointer<const FiffSparseMatrix>; /**< Const shared pointer type for FiffSparseMatrix. */
+    using UPtr = std::unique_ptr<FiffSparseMatrix>;           /**< Unique pointer type for FiffSparseMatrix. */
+    using ConstUPtr = std::unique_ptr<const FiffSparseMatrix>;  /**< Const unique pointer type for FiffSparseMatrix. */
 
     //=========================================================================================================
     /**
@@ -130,7 +131,7 @@ public:
      *
      * @return A vector with the matrix dimension info, or empty on error.
      */
-    static std::vector<int> fiff_get_matrix_sparse_dims(FIFFLIB::FiffTag::SPtr& tag);
+    static std::vector<int> fiff_get_matrix_sparse_dims(const FIFFLIB::FiffTag::UPtr& tag);
 
     /**
      * Conversion of tag data into the standard sparse representation.
@@ -139,7 +140,7 @@ public:
      *
      * @return A unique pointer to the newly constructed FiffSparseMatrix, or nullptr on error.
      */
-    static FiffSparseMatrix::UPtr fiff_get_float_sparse_matrix(FIFFLIB::FiffTag::SPtr& tag);
+    static FiffSparseMatrix::UPtr fiff_get_float_sparse_matrix(const FIFFLIB::FiffTag::UPtr& tag);
 
     //============================= mne_sparse_matop.c =============================
 

@@ -20,7 +20,7 @@
 #include <QDir>
 #include <Eigen/Dense>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_stream.h>
@@ -63,7 +63,7 @@ private slots:
     //=========================================================================
     void initTestCase()
     {
-        qInstallMessageHandler(ApplicationLogger::customLogWriter);
+        qInstallMessageHandler(MNELogger::customLogWriter);
         QString base = QCoreApplication::applicationDirPath()
                        + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
@@ -360,7 +360,7 @@ private slots:
         // Read tags to exercise parsing
         int nTags = qMin((int)stream->dir().size(), 100);
         for (int i = 0; i < nTags; ++i) {
-            FiffTag::SPtr tag;
+            FiffTag::UPtr tag;
             stream->read_tag(tag, stream->dir()[i]->pos);
             QVERIFY(tag != nullptr);
             QVERIFY(tag->kind >= 0);
@@ -391,7 +391,7 @@ private slots:
         // Read any coord transform tags
         for (int i = 0; i < stream->dir().size(); ++i) {
             if (stream->dir()[i]->kind == FIFF_COORD_TRANS) {
-                FiffTag::SPtr tag;
+                FiffTag::UPtr tag;
                 stream->read_tag(tag, stream->dir()[i]->pos);
                 trans = tag->toCoordTrans();
                 break;

@@ -48,7 +48,7 @@
 #include <math.h>
 
 #include <dsp/spectrogram.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // Eigen
@@ -91,7 +91,7 @@ using namespace UTILSLIB;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QApplication a(argc, argv);
 
     // Command Line Parser

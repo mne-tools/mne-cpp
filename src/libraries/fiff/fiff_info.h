@@ -61,6 +61,7 @@
 #include <QList>
 #include <QStringList>
 #include <QSharedPointer>
+#include <memory>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFLIB
@@ -84,8 +85,10 @@ class FiffStream;
 class FIFFSHARED_EXPORT FiffInfo : public FiffInfoBase
 {
 public:
-    typedef QSharedPointer<FiffInfo> SPtr;              /**< Shared pointer type for FiffInfo. */
-    typedef QSharedPointer<const FiffInfo> ConstSPtr;   /**< Const shared pointer type for FiffInfo. */
+    using SPtr = QSharedPointer<FiffInfo>;            /**< Shared pointer type for FiffInfo. */
+    using ConstSPtr = QSharedPointer<const FiffInfo>; /**< Const shared pointer type for FiffInfo. */
+    using UPtr = std::unique_ptr<FiffInfo>;             /**< Unique pointer type for FiffInfo. */
+    using ConstUPtr = std::unique_ptr<const FiffInfo>;  /**< Const unique pointer type for FiffInfo. */
 
     //=========================================================================================================
     /**

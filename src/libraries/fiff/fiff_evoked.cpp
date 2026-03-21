@@ -44,6 +44,7 @@
 #include "fiff_dir_node.h"
 
 #include <math/numerics.h>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -79,7 +80,7 @@ FiffEvoked::FiffEvoked(QIODevice& p_IODevice,
     {
         baseline = t_baseline;
 
-        printf("\tFiff evoked data not found.\n");//ToDo Throw here
+        qWarning("\tFiff evoked data not found.\n");//ToDo Throw here
         return;
     }
 }
@@ -181,7 +182,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
     QString t_sFileName = t_pStream->streamName();
 
-    printf("Reading %s ...\n",t_sFileName.toUtf8().constData());
+    qInfo("Reading %s ...\n",t_sFileName.toUtf8().constData());
 
     if(!t_pStream->open())
         return false;
@@ -276,7 +277,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
     QList<FiffDirNode::SPtr> aspects = my_evoked->dir_tree_find(FIFFB_ASPECT);
 
     if(aspects.size() > 1)
-        printf("\tMultiple (%lld) aspects found. Taking first one.\n", aspects.size());
+        qInfo("\tMultiple (%lld) aspects found. Taking first one.\n", aspects.size());
 
     FiffDirNode::SPtr my_aspect = aspects[0];
 
@@ -287,7 +288,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
     float sfreq = -1.0f;
     QList<FiffChInfo> chs;
     fiff_int_t kind, pos, first=0, last=0;
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     QString comment("");
     qint32 k;
     for (k = 0; k < my_evoked->nent(); ++k)
@@ -342,15 +343,15 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
         }
         info.chs   = chs;
         info.nchan = nchan;
-        printf("\tFound channel information in evoked data. nchan = %d\n",nchan);
+        qInfo("\tFound channel information in evoked data. nchan = %d\n",nchan);
         if (sfreq > 0.0f)
             info.sfreq = sfreq;
     }
     qint32 nsamp = last-first+1;
-    printf("\tFound the data of interest:\n");
-    printf("\t\tt = %10.2f ... %10.2f ms (%s)\n", 1000*(float)first/info.sfreq, 1000*(float)last/info.sfreq,comment.toUtf8().constData());
+    qInfo("\tFound the data of interest:\n");
+    qInfo("\t\tt = %10.2f ... %10.2f ms (%s)\n", 1000*static_cast<float>(first)/info.sfreq, 1000*static_cast<float>(last)/info.sfreq,comment.toUtf8().constData());
     if (info.comps.size() > 0)
-        printf("\t\t%lld CTF compensation matrices available\n", info.comps.size());
+        qInfo("\t\t%lld CTF compensation matrices available\n", info.comps.size());
 
     //
     // Read the data in the aspect block
@@ -385,7 +386,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
     }
     if (nave == -1)
         nave = 1;
-    printf("\t\tnave = %d - aspect type = %d\n", nave, aspect_kind);
+    qInfo("\t\tnave = %d - aspect type = %d\n", nave, aspect_kind);
 
     qint32 nepoch = epoch.size();
     MatrixXd all_data;
@@ -428,10 +429,10 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
     //
     //   Calibrate
     //
-    printf("\n\tPreprocessing...\n");
-    printf("\t%d channels remain after picking\n",info.nchan);
+    qInfo("\n\tPreprocessing...\n");
+    qInfo("\t%d channels remain after picking\n",info.nchan);
 
-    typedef Eigen::Triplet<double> T;
+    using T = Eigen::Triplet<double>;
     std::vector<T> tripletList;
     tripletList.reserve(info.nchan);
     for(k = 0; k < info.nchan; ++k)
@@ -443,14 +444,14 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
 
     RowVectorXf times = RowVectorXf(last-first+1);
     for (k = 0; k < times.size(); ++k)
-        times[k] = ((float)(first+k)) / info.sfreq;
+        times[k] = static_cast<float>(first+k) / info.sfreq;
 
     //
     // Set up projection
     //
     if(info.projs.size() == 0 || !proj)
     {
-        printf("\tNo projector specified for these data.\n");
+        qInfo("\tNo projector specified for these data.\n");
         p_FiffEvoked.proj = MatrixXd();
     }
     else
@@ -460,12 +461,12 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
         qint32 nproj = info.make_projector(projection);
         if(nproj == 0)
         {
-            printf("\tThe projection vectors do not apply to these channels\n");
+            qWarning("\tThe projection vectors do not apply to these channels\n");
             p_FiffEvoked.proj = MatrixXd();
         }
         else
         {
-            printf("\tCreated an SSP operator (subspace dimension = %d)\n", nproj);
+            qInfo("\tCreated an SSP operator (subspace dimension = %d)\n", nproj);
             p_FiffEvoked.proj = projection;
         }
 
@@ -476,7 +477,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
     if(p_FiffEvoked.proj.rows() > 0)
     {
         all_data = p_FiffEvoked.proj * all_data;
-        printf("\tSSP projectors applied to the evoked data\n");
+        qInfo("\tSSP projectors applied to the evoked data\n");
     }
 
     // Put it all together
@@ -496,7 +497,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
         p_FiffEvoked.applyBaselineCorrection(t_baseline);
     } else {
         p_FiffEvoked.baseline = t_baseline;
-        printf("\tNo baseline correction applied\n");
+        qInfo("\tNo baseline correction applied\n");
     }
 
     return true;
@@ -513,7 +514,7 @@ void FiffEvoked::setInfo(const FiffInfo &p_info,
     //
     if(info.projs.size() == 0 || !proj)
     {
-        printf("\tNo projector specified for these data.\n");
+        qInfo("\tNo projector specified for these data.\n");
         this->proj = MatrixXd();
     }
     else
@@ -523,12 +524,12 @@ void FiffEvoked::setInfo(const FiffInfo &p_info,
         qint32 nproj = info.make_projector(projection);
         if(nproj == 0)
         {
-            printf("\tThe projection vectors do not apply to these channels\n");
+            qWarning("\tThe projection vectors do not apply to these channels\n");
             this->proj = MatrixXd();
         }
         else
         {
-            printf("\tCreated an SSP operator (subspace dimension = %d)\n", nproj);
+            qInfo("\tCreated an SSP operator (subspace dimension = %d)\n", nproj);
             this->proj = projection;
         }
 
@@ -570,12 +571,12 @@ void FiffEvoked::applyBaselineCorrection(QPair<float, float>& p_baseline)
 {
     // Skip baseline correction if sentinel value (-1, -1) or equal bounds are passed
     if (p_baseline.first == p_baseline.second) {
-        printf("\tNo baseline correction applied\n");
+        qInfo("\tNo baseline correction applied\n");
         return;
     }
 
     // Run baseline correction
-    printf("Applying baseline correction ... (mode: mean)\n");
+    qInfo("Applying baseline correction ... (mode: mean)\n");
     this->data = Numerics::rescale(this->data, this->times, p_baseline, QString("mean"));
     this->baseline = p_baseline;
 }

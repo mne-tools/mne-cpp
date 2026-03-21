@@ -41,7 +41,7 @@
 #include <mne/mne_forward_solution.h>
 #include <fs/fs_annotationset.h>
 #include <utils/ioutils.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -74,7 +74,7 @@ using namespace FSLIB;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
 
     // Command Line Parser

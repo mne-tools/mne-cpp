@@ -44,6 +44,7 @@
 
 #include <QFile>
 #include <QTextStream>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -112,7 +113,7 @@ QString FiffInfoBase::channel_type(qint32 idx) const
              || kind == FIFFV_QUAT_3 || kind == FIFFV_QUAT_4 || kind == FIFFV_QUAT_5
              || kind == FIFFV_QUAT_6 || kind == FIFFV_HPI_G || kind == FIFFV_HPI_ERR || kind == FIFFV_HPI_MOV)
         return "chpi";  // channels relative to head position monitoring
-    printf("Unknown channel type\n"); //ToDo Throw
+    qWarning("Unknown channel type\n"); //ToDo Throw
     return "";
 }
 

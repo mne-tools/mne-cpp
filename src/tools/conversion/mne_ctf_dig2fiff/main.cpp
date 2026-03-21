@@ -39,7 +39,7 @@
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_coord_trans.h>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -185,7 +185,7 @@ static bool computeHeadTransform(const DigPoint &nasion, const DigPoint &lpa, co
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_ctf_dig2fiff");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

@@ -82,7 +82,7 @@ public:
 
 //    void deactivateRawBufferSending();
 
-    void parseCommand(QSharedPointer<FIFFLIB::FiffTag> p_pTag);
+    void parseCommand(const std::unique_ptr<FIFFLIB::FiffTag>& p_pTag);
 
     void writeClientId();
 

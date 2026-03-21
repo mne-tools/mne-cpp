@@ -38,7 +38,7 @@
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
 #include <fiff/fiff_constants.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -75,7 +75,7 @@ using namespace Eigen;
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_volume_source_space");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
