@@ -36,7 +36,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 #include <fiff/fiff_coord_trans.h>
 
 //=============================================================================================================
@@ -94,7 +94,7 @@ TestFiffCoordTrans::TestFiffCoordTrans()
 
 void TestFiffCoordTrans::initTestCase()
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
 
     // Reference file (Read) and test file (Write)
     QFile fileTransRef(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif");

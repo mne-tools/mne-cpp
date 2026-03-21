@@ -38,7 +38,9 @@
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_dir_entry.h>
 
-#include <utils/generics/applicationlogger.h>
+#include <vector>
+
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -67,7 +69,7 @@ using namespace UTILSLIB;
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_add_to_meas_info");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -104,7 +106,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    QList<FiffTag::SPtr> tagsToAdd;
+    std::vector<FiffTag::UPtr> tagsToAdd;
     for (int k = 0; k < addStream->nent(); k++) {
         fiff_int_t kind = addStream->dir()[k]->kind;
         // Skip file-level structural tags
@@ -113,15 +115,15 @@ int main(int argc, char *argv[])
             kind == FIFF_BLOCK_START || kind == FIFF_BLOCK_END) {
             continue;
         }
-        FiffTag::SPtr tag;
+        FiffTag::UPtr tag;
         addStream->read_tag(tag, addStream->dir()[k]->pos);
-        tagsToAdd.append(tag);
+        tagsToAdd.push_back(std::move(tag));
     }
     addStream->close();
 
-    fprintf(stderr, "%d tags to add\n", tagsToAdd.size());
+    fprintf(stderr, "%d tags to add\n", static_cast<int>(tagsToAdd.size()));
 
-    if (tagsToAdd.isEmpty()) {
+    if (tagsToAdd.empty()) {
         fprintf(stderr, "No tags to add.\n");
         return 0;
     }
@@ -136,7 +138,7 @@ int main(int argc, char *argv[])
 
     // Append all tags at the end
     int nAdded = 0;
-    for (const FiffTag::SPtr &tag : tagsToAdd) {
+    for (const FiffTag::UPtr &tag : tagsToAdd) {
         destStream->write_tag(tag);
         nAdded++;
     }

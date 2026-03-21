@@ -37,7 +37,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <mne/mne_msh_display_surface_set.h>
 #include <mne/mne_msh_display_surface.h>
@@ -95,7 +95,7 @@ TestMneMshDisplaySurfaceSet::TestMneMshDisplaySurfaceSet()
 
 void TestMneMshDisplaySurfaceSet::initTestCase()
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
     //qDebug() << "dEpsilon" << dEpsilon;
 
     //Read the results produced with MNE-CPP

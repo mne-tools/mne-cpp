@@ -42,7 +42,7 @@
 
 #include <utils/layoutmaker.h>
 #include <utils/layoutloader.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <fiff/fiff.h>
 
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
     // Please notice that this example only works in release mode.
     // Debug mode somehow corrupts the simplex coder. ToDo: Fix this!
     //
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

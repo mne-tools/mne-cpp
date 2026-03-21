@@ -42,6 +42,7 @@
 #include "fiff_stream.h"
 #include "fiff_tag.h"
 #include "fiff_explain.h"
+#include <QDebug>
 //#include "fiff_ctf_comp.h"
 //#include "fiff_proj.h"
 //#include "fiff_info.h"
@@ -119,12 +120,12 @@ bool FiffDirNode::copy_tree(FiffStream::SPtr& p_pStreamIn, const FiffId& in_id, 
             //
             if (!p_pStreamIn->device()->seek(p_Nodes[k]->dir[p]->pos)) //fseek(fidin, nodes(k).dir(p).pos, 'bof') == -1
             {
-                printf("Could not seek to the tag\n");
+                qWarning("Could not seek to the tag\n");
                 return false;
             }
 
             //ToDo this is the same like read_tag
-            FiffTag::SPtr tag(new FiffTag());
+            auto tag = std::make_unique<FiffTag>();
             //QDataStream in(fidin);
             FiffStream::SPtr in = p_pStreamIn;
             in->setByteOrder(QDataStream::BigEndian);
@@ -147,7 +148,7 @@ bool FiffDirNode::copy_tree(FiffStream::SPtr& p_pStreamIn, const FiffId& in_id, 
                 in->readRawData(tag->data(), tag->size());
                 // Don't do this conversion because it breaks the writing on
                 // little endian systems (i.e., OSX, Linux, Windows...)
-                // FiffTag::convert_tag_data(tag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
+                // FiffTag::convert_tag_data(tag.get(),FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
             }
 
             //QDataStream out(p_pStreamOut);
@@ -189,7 +190,7 @@ QList<FiffDirNode::SPtr> FiffDirNode::dir_tree_find(fiff_int_t p_kind) const
 
 //=============================================================================================================
 
-bool FiffDirNode::find_tag(FiffStream* p_pStream, fiff_int_t findkind, FiffTag::SPtr& p_pTag) const
+bool FiffDirNode::find_tag(FiffStream* p_pStream, fiff_int_t findkind, FiffTag::UPtr& p_pTag) const
 {
     for (qint32 p = 0; p < this->nent(); ++p)
     {
@@ -200,7 +201,7 @@ bool FiffDirNode::find_tag(FiffStream* p_pStream, fiff_int_t findkind, FiffTag::
         }
     }
     if (p_pTag)
-        p_pTag.clear();
+        p_pTag.reset();
 
     return false;
 }
@@ -240,15 +241,15 @@ void FiffDirNode::print(int indent) const
     for (int k = 0; k < indent; k++)
         putchar(' ');
     explain_block (this->type);
-    printf (" { ");
+    qDebug(" { ");
     if (!this->id.isEmpty())
         this->id.print();
-    printf ("\n");
+    qDebug("\n");
 
     for (j = 0, prev_kind = -1, count = 0; j < this->nent(); j++) {
         if (dentry[j]->kind != prev_kind) {
             if (count > 1)
-                printf (" [%d]\n",count);
+                qDebug(" [%d]\n",count);
             else if (j > 0)
                 putchar('\n');
             for (int k = 0; k < indent+2; k++)
@@ -262,14 +263,14 @@ void FiffDirNode::print(int indent) const
         prev_kind = dentry[j]->kind;
     }
     if (count > 1)
-        printf (" [%d]\n",count);
+        qDebug(" [%d]\n",count);
     else if (j > 0)
         putchar ('\n');
     for (j = 0; j < this->nchild(); j++)
         this->children[j]->print(indent+5);
     for (int k = 0; k < indent; k++)
         putchar(' ');
-    printf ("}\n");
+    qDebug("}\n");
 }
 
 //=============================================================================================================
@@ -278,11 +279,11 @@ void FiffDirNode::explain_block(int kind)
 {
     for (int k = 0; _fiff_block_explanations[k].kind >= 0; k++) {
         if (_fiff_block_explanations[k].kind == kind) {
-            printf ("%d = %s",kind,_fiff_block_explanations[k].text);
+            qDebug("%d = %s",kind,_fiff_block_explanations[k].text);
             return;
         }
     }
-    printf ("Cannot explain: %d",kind);
+    qWarning("Cannot explain: %d",kind);
 }
 
 //=============================================================================================================
@@ -292,11 +293,11 @@ void FiffDirNode::explain(int kind)
     int k;
     for (k = 0; _fiff_explanations[k].kind >= 0; k++) {
         if (_fiff_explanations[k].kind == kind) {
-            printf ("%d = %s",kind,_fiff_explanations[k].text);
+            qDebug("%d = %s",kind,_fiff_explanations[k].text);
             return;
         }
     }
-    printf ("Cannot explain: %d",kind);
+    qWarning("Cannot explain: %d",kind);
 }
 
 //=============================================================================================================

@@ -47,6 +47,7 @@
 #include "fiff_dir_node.h"
 #include "fiff_tag.h"
 #include "fiff_types.h"
+#include <QDebug>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -128,7 +129,7 @@ bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_pStream, FiffDigPointSe
         if(!p_pStream->open())
             return false;
 
-        printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
+        qInfo("Opening header data %s...\n",t_sFileName.toUtf8().constData());
 
         open_here = true;
     }
@@ -139,7 +140,7 @@ bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_pStream, FiffDigPointSe
     //read_hpi_info(p_pStream,p_Tree, info);
     fiff_int_t kind = -1;
     fiff_int_t pos = -1;
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
 
     //
     //   Locate the Electrodes
@@ -203,7 +204,7 @@ void FiffDigPointSet::write(QIODevice &p_IODevice)
 
     // Create the file and save the essentials
     FiffStream::SPtr t_pStream = FiffStream::start_file(p_IODevice);
-    printf("Write Digitizer Points in %s...\n", t_pStream->streamName().toUtf8().constData());
+    qInfo("Write Digitizer Points in %s...\n", t_pStream->streamName().toUtf8().constData());
     this->writeToStream(t_pStream.data());
     t_pStream->end_file();
 }
@@ -221,7 +222,7 @@ void FiffDigPointSet::writeToStream(FiffStream* p_pStream)
         p_pStream->write_dig_point(m_qListDigPoint[h]);
     }
 
-    printf("\t%lld digitizer points written\n", m_qListDigPoint.size());
+    qInfo("\t%lld digitizer points written\n", m_qListDigPoint.size());
     p_pStream->end_block(FIFFB_ISOTRAK);
     p_pStream->end_block(FIFFB_MEAS_INFO);
     p_pStream->end_block(FIFFB_MEAS);

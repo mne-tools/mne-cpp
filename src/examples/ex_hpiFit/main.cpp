@@ -47,7 +47,7 @@
 #include <inv/hpi/inv_hpi_data_updater.h>
 
 #include <utils/ioutils.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <fwd/fwd_coil_set.h>
 
@@ -90,7 +90,7 @@ using namespace Eigen;
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QElapsedTimer timer;
     QCoreApplication a(argc, argv);
 

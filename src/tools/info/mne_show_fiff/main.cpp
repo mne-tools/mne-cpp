@@ -43,7 +43,7 @@
 #include "mne_fiff_exp_set.h"
 #include <stdio.h>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -85,7 +85,7 @@ using namespace UTILSLIB;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_show_fiff");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

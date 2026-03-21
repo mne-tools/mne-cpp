@@ -49,7 +49,7 @@
 #include <scShared/Management/plugininputdata.h>
 #include <scShared/Plugins/abstractplugin.h>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
     #endif
     #endif
 
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
     QApplication app(argc, argv);
     //app.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings, true);
 

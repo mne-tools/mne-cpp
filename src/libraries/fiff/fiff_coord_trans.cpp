@@ -57,6 +57,7 @@
 //=============================================================================================================
 
 #include <Eigen/Dense>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -87,7 +88,7 @@ FiffCoordTrans::FiffCoordTrans(QIODevice &p_IODevice)
 {
     if(!read(p_IODevice, *this))
     {
-        printf("\tCoordindate transform not found.\n");//ToDo Throw here
+        qWarning("\tCoordindate transform not found.\n");//ToDo Throw here
         return;
     }
 }
@@ -137,14 +138,14 @@ bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
 {
     FiffStream::SPtr pStream(new FiffStream(&p_IODevice));
 
-    printf("Reading coordinate transform from %s...\n", pStream->streamName().toUtf8().constData());
+    qInfo("Reading coordinate transform from %s...\n", pStream->streamName().toUtf8().constData());
     if(!pStream->open())
         return false;
 
     //
     //   Locate and read the coordinate transformation
     //
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     bool success = false;
 
     //
@@ -169,7 +170,7 @@ void FiffCoordTrans::write(QIODevice &qIODevice)
 {
     // Create the file and save the essentials
     FiffStream::SPtr pStream = FiffStream::start_file(qIODevice);
-    printf("Write coordinate transform in %s...\n", pStream->streamName().toUtf8().constData());
+    qInfo("Write coordinate transform in %s...\n", pStream->streamName().toUtf8().constData());
     this->writeToStream(pStream.data());
     pStream->end_file();
     qIODevice.close();
@@ -282,8 +283,8 @@ void FiffCoordTrans::print() const
     std::cout << (QString("%1 -> %2\n").arg(frame_name(this->from)).arg(frame_name(this->to))).toUtf8().data();
 
     for (int p = 0; p < 3; p++)
-        printf("\t% 8.6f % 8.6f % 8.6f\t% 7.2f mm\n", trans(p,0),trans(p,1),trans(p,2),1000*trans(p,3));
-    printf("\t% 8.6f % 8.6f % 8.6f   % 7.2f\n",trans(3,0),trans(3,1),trans(3,2),trans(3,3));
+        qDebug("\t% 8.6f % 8.6f % 8.6f\t% 7.2f mm\n", trans(p,0),trans(p,1),trans(p,2),1000*trans(p,3));
+    qDebug("\t% 8.6f % 8.6f % 8.6f   % 7.2f\n",trans(3,0),trans(3,1),trans(3,2),trans(3,3));
 }
 
 //=============================================================================================================
@@ -450,7 +451,7 @@ FiffCoordTrans FiffCoordTrans::readTransform(const QString& name, int from, int 
         return FiffCoordTrans();
     }
 
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     for (int k = 0; k < stream->dir().size(); k++) {
         if (stream->dir()[k]->kind == FIFF_COORD_TRANS) {
             if (!stream->read_tag(t_pTag, stream->dir()[k]->pos))
@@ -551,7 +552,7 @@ FiffCoordTrans FiffCoordTrans::readFShead2mriTransform(const QString& name)
 
 //=============================================================================================================
 
-FiffCoordTrans FiffCoordTrans::readFromTag(const QSharedPointer<FiffTag>& tag)
+FiffCoordTrans FiffCoordTrans::readFromTag(const FiffTag::UPtr& tag)
 {
     FiffCoordTrans t;
     if (tag->isMatrix() || tag->getType() != FIFFT_COORD_TRANS_STRUCT || tag->data() == nullptr)
@@ -592,7 +593,7 @@ FiffCoordTrans FiffCoordTrans::readTransformFromNode(FiffStream::SPtr& stream,
                                                      const FiffDirNode::SPtr& node,
                                                      int from, int to)
 {
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     fiff_int_t kind, pos;
     int k;
 
@@ -612,7 +613,7 @@ FiffCoordTrans FiffCoordTrans::readTransformFromNode(FiffStream::SPtr& stream,
             return res.inverted();
         }
     }
-    printf("No suitable coordinate transformation found");
+    qWarning("No suitable coordinate transformation found");
     return FiffCoordTrans();
 }
 
@@ -665,7 +666,7 @@ FiffCoordTrans FiffCoordTrans::procrustesAlign(int   from_frame,
         Eigen::Vector3f rr = R * fromPts.row(p).transpose() + moveVec;
         float diff = (toPts.row(p).transpose() - rr).norm();
         if (diff > max_diff) {
-            printf("Too large difference in matching : %7.1f > %7.1f mm",
+            qWarning("Too large difference in matching : %7.1f > %7.1f mm",
                    1000.0f * diff, 1000.0f * max_diff);
             return FiffCoordTrans();
         }

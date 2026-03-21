@@ -42,7 +42,7 @@
 
 #include <memory>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -79,7 +79,7 @@ using namespace FWDLIB;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
     QApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_forward_solution");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

@@ -76,8 +76,10 @@ class FiffCoordTrans;
 class FIFFSHARED_EXPORT FiffCoordTransSet
 {
 public:
-    typedef QSharedPointer<FiffCoordTransSet> SPtr;              /**< Shared pointer type for FiffCoordTransSet. */
-    typedef QSharedPointer<const FiffCoordTransSet> ConstSPtr;   /**< Const shared pointer type for FiffCoordTransSet. */
+    using SPtr = QSharedPointer<FiffCoordTransSet>;            /**< Shared pointer type for FiffCoordTransSet. */
+    using ConstSPtr = QSharedPointer<const FiffCoordTransSet>; /**< Const shared pointer type for FiffCoordTransSet. */
+    using UPtr = std::unique_ptr<FiffCoordTransSet>;             /**< Unique pointer type for FiffCoordTransSet. */
+    using ConstUPtr = std::unique_ptr<const FiffCoordTransSet>;  /**< Const unique pointer type for FiffCoordTransSet. */
 
     //=========================================================================================================
     /**

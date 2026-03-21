@@ -37,7 +37,7 @@
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <fs/fs_surface.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -307,7 +307,7 @@ static bool writeFifSurface(const QString& filename, const MatrixX3f& rr, const 
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_convert_surface");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

@@ -37,7 +37,7 @@
 #include <fs/fs_annotation.h>
 #include <fs/fs_surface.h>
 #include <fs/fs_label.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -162,7 +162,7 @@ static bool processHemisphere(const QString &subjectsDir, const QString &subject
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_annot2labels");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

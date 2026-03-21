@@ -66,6 +66,7 @@
 #include <QSharedPointer>
 #include <QString>
 #include <QStringList>
+#include <memory>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFLIB
@@ -105,8 +106,10 @@ class FiffDigitizerData;
 class FIFFSHARED_EXPORT FiffStream : public QDataStream
 {
 public:
-    typedef QSharedPointer<FiffStream> SPtr;            /**< Shared pointer type for FiffStream. */
-    typedef QSharedPointer<const FiffStream> ConstSPtr; /**< Const shared pointer type for FiffStream. */
+    using SPtr = QSharedPointer<FiffStream>;            /**< Shared pointer type for FiffStream. */
+    using ConstSPtr = QSharedPointer<const FiffStream>; /**< Const shared pointer type for FiffStream. */
+    using UPtr = std::unique_ptr<FiffStream>;             /**< Unique pointer type for FiffStream. */
+    using ConstUPtr = std::unique_ptr<const FiffStream>;  /**< Const unique pointer type for FiffStream. */
 
     //=========================================================================================================
     /**
@@ -390,7 +393,7 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    bool read_tag_data(QSharedPointer<FiffTag>& p_pTag, fiff_long_t pos = -1);
+    bool read_tag_data(std::unique_ptr<FiffTag>& p_pTag, fiff_long_t pos = -1);
 
     //=========================================================================================================
     /**
@@ -402,7 +405,7 @@ public:
      *
      * @return the position where the tag info was read from.
      */
-    fiff_long_t read_tag_info(QSharedPointer<FiffTag>& p_pTag, bool p_bDoSkip = true);
+    fiff_long_t read_tag_info(std::unique_ptr<FiffTag>& p_pTag, bool p_bDoSkip = true);
 
     //=========================================================================================================
     /**
@@ -413,7 +416,7 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    bool read_rt_tag(QSharedPointer<FiffTag>& p_pTag);
+    bool read_rt_tag(std::unique_ptr<FiffTag>& p_pTag);
 
     //=========================================================================================================
     /**
@@ -425,7 +428,7 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    bool read_tag(QSharedPointer<FiffTag>& p_pTag,
+    bool read_tag(std::unique_ptr<FiffTag>& p_pTag,
                   fiff_long_t pos = -1);
 
     //=========================================================================================================
@@ -517,7 +520,7 @@ public:
      *
      * @return the position where the tag struct was written to.
      */
-    fiff_long_t write_tag(const QSharedPointer<FiffTag>& p_pTag, fiff_long_t pos = -1);
+    fiff_long_t write_tag(const std::unique_ptr<FiffTag>& p_pTag, fiff_long_t pos = -1);
 
     //=========================================================================================================
     /**
@@ -839,7 +842,7 @@ private:
      *
      * @return true if beginning is correct, false otherwise.
      */
-    bool check_beginning(QSharedPointer<FiffTag>& p_pTag);
+    bool check_beginning(std::unique_ptr<FiffTag>& p_pTag);
 
     //=========================================================================================================
     /**

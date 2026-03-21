@@ -131,7 +131,7 @@ void FsSurface::clear()
 
 MatrixX3f FsSurface::compute_normals(const MatrixX3f& rr, const MatrixX3i& tris)
 {
-    printf("\tcomputing normals\n");
+    qInfo("\tcomputing normals\n");
     // first, compute triangle normals
     MatrixX3f r1(tris.rows(),3); MatrixX3f r2(tris.rows(),3); MatrixX3f r3(tris.rows(),3);
 
@@ -212,11 +212,11 @@ bool FsSurface::read(const QString &p_sFile, FsSurface &p_Surface, bool p_bLoadC
 
     if (!t_File.open(QIODevice::ReadOnly))
     {
-        printf("\tError: Couldn't open the surface file\n");
+        qWarning("\tError: Couldn't open the surface file");
         return false;
     }
 
-    printf("Reading surface...\n");
+    qInfo("Reading surface...\n");
 
     //Strip file name and path
     qint32 t_NameIdx = 0;
@@ -256,9 +256,9 @@ bool FsSurface::read(const QString &p_sFile, FsSurface &p_Surface, bool p_bLoadC
         nvert = FsSurface::fread3(t_DataStream);
         nquad = FsSurface::fread3(t_DataStream);
         if(magic == QUAD_FILE_MAGIC_NUMBER)
-            printf("\t%s is a quad file (nvert = %d nquad = %d)\n", p_sFile.toUtf8().constData(),nvert,nquad);
+            qInfo("\t%s is a quad file (nvert = %d nquad = %d)\n", p_sFile.toUtf8().constData(),nvert,nquad);
         else
-            printf("\t%s is a new quad file (nvert = %d nquad = %d)\n", p_sFile.toUtf8().constData(),nvert,nquad);
+            qInfo("\t%s is a new quad file (nvert = %d nquad = %d)\n", p_sFile.toUtf8().constData(),nvert,nquad);
 
         //vertices
         verts.resize(nvert, 3);
@@ -338,8 +338,8 @@ bool FsSurface::read(const QString &p_sFile, FsSurface &p_Surface, bool p_bLoadC
         FIFFLIB::swap_int(nvert);
         FIFFLIB::swap_int(nface);
 
-        printf("\t%s is a triangle file (nvert = %d ntri = %d)\n", p_sFile.toUtf8().constData(), nvert, nface);
-        printf("\t%s", s.toUtf8().constData());
+        qInfo("\t%s is a triangle file (nvert = %d ntri = %d)\n", p_sFile.toUtf8().constData(), nvert, nface);
+        qInfo("\t%s", s.toUtf8().constData());
 
         //vertices
         verts.resize(3, nvert);
@@ -394,12 +394,12 @@ bool FsSurface::read(const QString &p_sFile, FsSurface &p_Surface, bool p_bLoadC
     if(p_bLoadCurvature)
     {
         QString t_sCurvatureFile = QString("%1%2.curv").arg(p_Surface.m_sFilePath).arg(p_Surface.m_iHemi == 0 ? "lh" : "rh");
-        printf("\t");
+        qInfo("\t");
         p_Surface.m_vecCurv = FsSurface::read_curv(t_sCurvatureFile);
     }
 
     t_File.close();
-    printf("\tRead a surface with %d vertices from %s\n[done]\n",nvert,p_sFile.toUtf8().constData());
+    qInfo("\tRead a surface with %d vertices from %s\n[done]\n",nvert,p_sFile.toUtf8().constData());
 
     return true;
 }
@@ -410,12 +410,12 @@ VectorXf FsSurface::read_curv(const QString &p_sFileName)
 {
     VectorXf curv;
 
-    printf("Reading curvature...");
+    qInfo("Reading curvature...");
     QFile t_File(p_sFileName);
 
     if (!t_File.open(QIODevice::ReadOnly))
     {
-        printf("\tError: Couldn't open the curvature file\n");
+        qWarning("\tError: Couldn't open the curvature file");
         return curv;
     }
 
@@ -453,7 +453,7 @@ VectorXf FsSurface::read_curv(const QString &p_sFileName)
     }
     t_File.close();
 
-    printf("[done]\n");
+    qInfo("[done]\n");
 
     return curv;
 }

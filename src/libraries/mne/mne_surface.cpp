@@ -422,7 +422,7 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, int add
     QList<FiffDirNode::SPtr> surfs;
     QList<FiffDirNode::SPtr> bems;
     FiffDirNode::SPtr node;
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
 
     int     id = -1;
     int     nnode, ntri_count;

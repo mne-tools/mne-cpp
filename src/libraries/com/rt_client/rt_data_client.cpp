@@ -83,7 +83,7 @@ qint32 RtDataClient::getClientId()
 
         this->waitForReadyRead(100);
         // ID is send as answer
-        FiffTag::SPtr t_pTag;
+        FiffTag::UPtr t_pTag;
         t_fiffStream.read_tag(t_pTag);
         if (t_pTag->kind == FIFF_MNE_RT_CLIENT_ID)
             m_clientID = *t_pTag->toInt();
@@ -104,7 +104,7 @@ FiffInfo::SPtr RtDataClient::readInfo()
     //
     // Find the start
     //
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     while(!t_bReadMeasBlockStart)
     {
         t_fiffStream.read_rt_tag(t_pTag);
@@ -379,7 +379,7 @@ MetaData RtDataClient::readMetadata()
     //
     // Find the start
     //
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     while(!t_bReadMeasBlockStart)
     {
         t_fiffStream.read_rt_tag(t_pTag);
@@ -661,7 +661,7 @@ void RtDataClient::readRawBuffer(qint32 p_nChannels,
     //
     // Find the start
     //
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
 
     t_fiffStream.read_rt_tag(t_pTag);
 

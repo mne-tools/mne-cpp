@@ -48,6 +48,7 @@
 //=============================================================================================================
 
 #include <QTcpSocket>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -284,7 +285,7 @@ void FiffTag::convert_ch_pos(FiffChPos* pos)
 
 //=============================================================================================================
 
-void FiffTag::convert_matrix_from_file_data(FiffTag::SPtr tag)
+void FiffTag::convert_matrix_from_file_data(const FiffTag::UPtr& tag)
 /*
  * Assumes that the input is in the non-native byte order and needs to be swapped to the other one
  */
@@ -358,7 +359,7 @@ void FiffTag::convert_matrix_from_file_data(FiffTag::SPtr tag)
 
 //=============================================================================================================
 
-void FiffTag::convert_matrix_to_file_data(FiffTag::SPtr tag)
+void FiffTag::convert_matrix_to_file_data(const FiffTag::UPtr& tag)
 /*
  * Assumes that the input is in the NATIVE_ENDIAN byte order and needs to be swapped to the other one
  */
@@ -434,7 +435,7 @@ void FiffTag::convert_matrix_to_file_data(FiffTag::SPtr tag)
 
 //=============================================================================================================
 //ToDo remove this function by swapping -> define little endian big endian, QByteArray
-void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian)
+void FiffTag::convert_tag_data(const FiffTag::UPtr& tag, int from_endian, int to_endian)
 {
     int            np;
     int            k,r;//,c;
@@ -533,7 +534,7 @@ void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian
 //        }
         np = tag->size()/FiffDirEntry::storageSize();
         for (k = 0; k < np; k++) {
-            offset = (char*)tag->data() + k*FiffDirEntry::storageSize();
+            offset = static_cast<char*>(tag->data()) + k*FiffDirEntry::storageSize();
             ithis = (fiff_int_t*) offset;
             ithis[0] = swap_int(ithis[0]);//kind
             ithis[1] = swap_int(ithis[1]);//type
@@ -553,7 +554,7 @@ void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian
 //        }
         np = tag->size()/FiffId::storageSize();
         for (k = 0; k < np; k++) {
-            offset = (char*)tag->data() + k*FiffId::storageSize();
+            offset = static_cast<char*>(tag->data()) + k*FiffId::storageSize();
             ithis = (fiff_int_t*) offset;
             ithis[0] = swap_int(ithis[0]);//version
             ithis[1] = swap_int(ithis[1]);//machid[0]
@@ -578,7 +579,7 @@ void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian
 
         np = tag->size()/FiffChInfo::storageSize();
         for (k = 0; k < np; k++) {
-            offset = (char*)tag->data() + k*FiffChInfo::storageSize();
+            offset = static_cast<char*>(tag->data()) + k*FiffChInfo::storageSize();
             ithis = (fiff_int_t*) offset;
             fthis = (float*) offset;
 
@@ -604,7 +605,7 @@ void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian
         np = tag->size()/FiffChPos::storageSize();
         for (k = 0; k < np; ++k)
         {
-            offset = (char*)tag->data() + k*FiffChPos::storageSize();
+            offset = static_cast<char*>(tag->data()) + k*FiffChPos::storageSize();
             ithis = (fiff_int_t*) offset;
             fthis = (float*) offset;
 

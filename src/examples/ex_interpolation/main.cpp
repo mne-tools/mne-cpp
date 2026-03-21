@@ -50,7 +50,7 @@
 #include <disp3D/helpers/interpolation.h>
 #include <fiff/fiff_constants.h>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
     // Q_INIT_RESOURCE(mne_disp3d);
     #endif
     
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

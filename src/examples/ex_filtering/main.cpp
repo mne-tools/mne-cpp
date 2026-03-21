@@ -44,7 +44,7 @@
 #include <fiff/fiff.h>
 
 #include <dsp/filterkernel.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <dsp/rt_filter.h>
 
@@ -80,7 +80,7 @@ using namespace Eigen;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

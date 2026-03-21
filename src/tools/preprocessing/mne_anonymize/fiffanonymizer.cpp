@@ -70,7 +70,7 @@ using namespace MNEANONYMIZE;
 //=============================================================================================================
 
 FiffAnonymizer::FiffAnonymizer()
-: m_pTag(FIFFLIB::FiffTag::SPtr::create())
+: m_pTag(std::make_unique<FIFFLIB::FiffTag>())
 , m_bFileInSet(false)
 , m_bFileOutSet(false)
 , m_bVerboseMode(false)
@@ -119,7 +119,7 @@ FiffAnonymizer::FiffAnonymizer()
 //=============================================================================================================
 
 FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
-: m_pTag(FIFFLIB::FiffTag::SPtr::create())
+: m_pTag(std::make_unique<FIFFLIB::FiffTag>())
 , m_bFileInSet(obj.m_bFileInSet)
 , m_bFileOutSet(obj.m_bFileOutSet)
 , m_bVerboseMode(obj.m_bVerboseMode)
@@ -166,7 +166,7 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 //=============================================================================================================
 
 FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
-: m_pTag(FIFFLIB::FiffTag::SPtr::create())
+: m_pTag(std::make_unique<FIFFLIB::FiffTag>())
 , m_bFileInSet(obj.m_bFileInSet)
 , m_bFileOutSet(obj.m_bFileOutSet)
 , m_bVerboseMode(obj.m_bVerboseMode)

@@ -36,7 +36,7 @@
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_file.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -196,7 +196,7 @@ static bool readRefData(const QString& filename, MatrixXf& refData, int& nChanne
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_insert_4D_comp");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

@@ -145,7 +145,7 @@ int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
                               FiffCoordTrans& trans,
                               FiffTime* *start_time)
 {
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     QList<FiffChInfo> ch;
     FiffChInfo this_ch;
     FiffCoordTrans t;

@@ -39,7 +39,7 @@
 #include <fiff/fiff_dir_entry.h>
 #include <fiff/fiff_ch_info.h>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -81,7 +81,7 @@ static int processFile(const QString &name, bool doMagnes)
 
     for (int k = 0; k < stream->nent(); k++) {
         if (stream->dir()[k]->kind == FIFF_CH_INFO) {
-            FiffTag::SPtr tag;
+            FiffTag::UPtr tag;
             stream->read_tag(tag, stream->dir()[k]->pos);
             FiffChInfo ch = tag->toChInfo();
 
@@ -140,7 +140,7 @@ static int processFile(const QString &name, bool doMagnes)
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_fix_mag_coil_types");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

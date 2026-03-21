@@ -44,7 +44,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <mri/mri_types.h>
 #include <mri/mri_vol_data.h>
@@ -254,7 +254,7 @@ QString TestMriIO::findSubjectsDir()
 
 void TestMriIO::initTestCase()
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
 
     QVERIFY(m_tempDir.isValid());
 
@@ -619,7 +619,7 @@ void TestMriIO::testCorFifWriteRead()
 
     // Find and verify blocks
     // The file should have FIFFB_MRI block
-    FiffTag::SPtr tag;
+    FiffTag::UPtr tag;
     bool foundMriBlock = false;
     bool foundMriSet = false;
     int sliceCount = 0;
@@ -964,7 +964,7 @@ void TestMriIO::testCorFifWriteReadSynthetic()
     FiffStream::SPtr stream(new FiffStream(&file));
     QVERIFY(stream->open());
 
-    FiffTag::SPtr tag;
+    FiffTag::UPtr tag;
     int sliceCount = 0;
     stream->device()->seek(0);
     while (!stream->device()->atEnd()) {

@@ -48,7 +48,7 @@
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <math/numerics.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <disp/plots/bar.h>
 #include <disp/plots/spline.h>
@@ -117,7 +117,7 @@ Eigen::VectorXd sineWaveGenerator(double amplitude, double xStep, int xNow, int 
 int main(int argc, char *argv[])
 {
     //code to generate source localization data
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QApplication a(argc, argv);
 
     // Command Line Parser

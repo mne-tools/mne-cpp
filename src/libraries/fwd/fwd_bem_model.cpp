@@ -260,7 +260,7 @@ int FwdBemModel::get_int(FiffStream::SPtr &stream, const FiffDirNode::SPtr &node
      * Wrapper to get int's
      */
 {
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     if(node->find_tag(stream, what, t_pTag)) {
         if (t_pTag->getType() != FIFFT_INT) {
             qWarning("Expected an integer tag : %d (found data type %d instead)",what,t_pTag->getType() );
@@ -383,7 +383,7 @@ int FwdBemModel::fwd_bem_load_solution(const QString &name, int bem_method)
 
     FiffDirNode::SPtr bem_node;
     int         method;
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     int         nsol;
 
     if(!stream->open()) {

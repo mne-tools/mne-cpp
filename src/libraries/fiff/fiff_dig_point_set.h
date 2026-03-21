@@ -52,6 +52,7 @@
 
 #include "fiff_stream.h"
 #include "fiff_dig_point.h"
+#include <memory>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -85,8 +86,10 @@ class FIFFSHARED_EXPORT FiffDigPointSet
 {
 
 public:
-    typedef QSharedPointer<FiffDigPointSet> SPtr;            /**< Shared pointer type for FiffDigPointSet. */
-    typedef QSharedPointer<const FiffDigPointSet> ConstSPtr; /**< Const shared pointer type for FiffDigPointSet. */
+    using SPtr = QSharedPointer<FiffDigPointSet>;            /**< Shared pointer type for FiffDigPointSet. */
+    using ConstSPtr = QSharedPointer<const FiffDigPointSet>; /**< Const shared pointer type for FiffDigPointSet. */
+    using UPtr = std::unique_ptr<FiffDigPointSet>;             /**< Unique pointer type for FiffDigPointSet. */
+    using ConstUPtr = std::unique_ptr<const FiffDigPointSet>;  /**< Const unique pointer type for FiffDigPointSet. */
 
     //=========================================================================================================
     /**

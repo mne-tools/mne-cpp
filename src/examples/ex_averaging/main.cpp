@@ -45,7 +45,7 @@
 #include <mne/mne.h>
 #include <mne/mne_epoch_data_list.h>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 
 #endif
 
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

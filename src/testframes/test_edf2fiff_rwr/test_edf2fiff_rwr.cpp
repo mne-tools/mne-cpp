@@ -43,7 +43,7 @@
 #include <fiff/fiff.h>
 #include "../../tools/conversion/mne_edf2fiff/edf_raw_data.h"
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -112,7 +112,7 @@ TestEDF2FIFFRWR::TestEDF2FIFFRWR()
 
 void TestEDF2FIFFRWR::initTestCase()
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
 
     m_pFileIn = new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/EEG/test_reduced.edf");
     m_pFileOut = new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/EEG/test_reduced_temporary.fif");

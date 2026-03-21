@@ -2,7 +2,7 @@
 #include <QTemporaryDir>
 #include <Eigen/Dense>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <inv/dipole_fit/inv_ecd.h>
 #include <inv/dipole_fit/inv_ecd_set.h>
@@ -46,7 +46,7 @@ private:
 private slots:
     void initTestCase()
     {
-        qInstallMessageHandler(ApplicationLogger::customLogWriter);
+        qInstallMessageHandler(MNELogger::customLogWriter);
         QString base = QCoreApplication::applicationDirPath()
                        + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))

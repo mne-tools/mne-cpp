@@ -36,7 +36,7 @@
 
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_stream.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -176,7 +176,7 @@ static void writeMatrixVariable(QDataStream &ds, const QString &name, const Matr
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_raw2mat");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

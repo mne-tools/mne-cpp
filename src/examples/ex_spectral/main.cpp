@@ -40,7 +40,7 @@
 #include <math.h>
 #include <disp/plots/plot.h>
 #include <math/spectral.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 #include <mne/mne.h>
 
 //=============================================================================================================
@@ -79,7 +79,7 @@ using namespace UTILSLIB;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QApplication a(argc, argv);
 
     // Generate input data

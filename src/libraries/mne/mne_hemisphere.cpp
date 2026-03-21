@@ -181,7 +181,7 @@ bool MNEHemisphere::complete_source_space_info()
     //
     //   Main triangulation
     //
-    printf("\tCompleting triangulation info...");
+    qInfo("\tCompleting triangulation info...");
     tri_cent = MatrixX3d::Zero(ntri,3);
     tri_nn = MatrixX3d::Zero(ntri,3);
     tri_area = VectorXd::Zero(ntri);
@@ -221,12 +221,12 @@ bool MNEHemisphere::complete_source_space_info()
         tri_nn.row(i) /= size;
 
     }
-    printf("[done]\n");
+    qInfo("[done]\n");
 
     //
     //   Selected triangles
     //
-    printf("\tCompleting selection triangulation info...");
+    qInfo("\tCompleting selection triangulation info...");
     if (nuse_tri > 0)
     {
         use_tri_cent = MatrixX3d::Zero(nuse_tri,3);
@@ -264,11 +264,11 @@ bool MNEHemisphere::complete_source_space_info()
         }
 
     }
-    printf("[done]\n");
+    qInfo("[done]\n");
 
-    printf("\tCompleting triangle and vertex neighboring info...");
+    qInfo("\tCompleting triangle and vertex neighboring info...");
     add_geometry_info();
-    printf("[done]\n");
+    qInfo("[done]\n");
 
     return true;
 }
@@ -284,7 +284,7 @@ bool MNEHemisphere::compute_patch_info()
        return false;
     }
 
-    printf("\tComputing patch statistics...");
+    qInfo("\tComputing patch statistics...");
 
     std::vector< std::pair<int,int> > t_vIndn;
 
@@ -479,7 +479,7 @@ bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, const FiffCoordTran
         trans.invert_transform();
     else if(trans.from != this->coord_frame || trans.to != dest)
     {
-        printf("Cannot transform the source space using this coordinate transformation");//Consider throw
+        qWarning("Cannot transform the source space using this coordinate transformation");//Consider throw
         return false;
     }
 
@@ -504,7 +504,7 @@ void MNEHemisphere::writeToStream(FiffStream* p_pStream)
     if(this->type == 1 || this->type == 2)
         p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_TYPE, &this->type);
     else
-        printf("Unknown source space type (%d)\n", this->type);
+        qWarning("Unknown source space type (%d)", this->type);
     p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_ID, &this->id);
 
 //    data = this.get('subject_his_id', None)

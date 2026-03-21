@@ -245,7 +245,7 @@ QList<MNEFiffExp>::const_iterator MNEFiffExpSet::constEnd() const
 
 //*************************************************************************************************************
 
-void MNEFiffExpSet::print_file_id (FILE *out, FiffTag::SPtr tag)
+void MNEFiffExpSet::print_file_id (FILE *out, const FiffTag::UPtr& tag)
 {
     FiffId id = tag->toFiffID();
     struct tm *ltime;
@@ -265,7 +265,7 @@ void MNEFiffExpSet::print_file_id (FILE *out, FiffTag::SPtr tag)
 
 //*************************************************************************************************************
 
-void MNEFiffExpSet::print_ch_info (FILE *out, FiffTag::SPtr tag)
+void MNEFiffExpSet::print_ch_info (FILE *out, const FiffTag::UPtr& tag)
 {
     FiffChInfo info = tag->toChInfo();
     QList<MNEFiffExp>::const_iterator exp;
@@ -287,7 +287,7 @@ void MNEFiffExpSet::print_ch_info (FILE *out, FiffTag::SPtr tag)
 
 //*************************************************************************************************************
 
-void MNEFiffExpSet::print_transform(FILE *out, FiffTag::SPtr tag)
+void MNEFiffExpSet::print_transform(FILE *out, const FiffTag::UPtr& tag)
 {
     FiffCoordTrans t = tag->toCoordTrans();
     int k, p;
@@ -311,7 +311,7 @@ void MNEFiffExpSet::print_transform(FILE *out, FiffTag::SPtr tag)
 
 //*************************************************************************************************************
 
-void MNEFiffExpSet::print_dig_point(FILE *out, FiffTag::SPtr tag)
+void MNEFiffExpSet::print_dig_point(FILE *out, const FiffTag::UPtr& tag)
 {
     FiffDigPoint point = tag->toDigPoint();
     switch (point.kind) {
@@ -358,7 +358,7 @@ bool MNEFiffExpSet::show_fiff_contents(FILE *out, const QString &name, bool verb
     FiffStream::SPtr stream(new FiffStream(&file));
 
     FiffDirEntry::SPtr this_ent;
-    FiffTag::SPtr   tag;
+    FiffTag::UPtr tag;
     int             day,month,year;
     int             block;
     int             count = 0;

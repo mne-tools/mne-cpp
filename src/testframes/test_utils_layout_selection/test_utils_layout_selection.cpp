@@ -39,7 +39,7 @@
 #include <utils/layoutloader.h>
 #include <utils/layoutmaker.h>
 #include <utils/selectionio.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -120,7 +120,7 @@ TestUtilsLayoutSelection::TestUtilsLayoutSelection()
 
 void TestUtilsLayoutSelection::initTestCase()
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
     QVERIFY(m_tempDir.isValid());
 }
 

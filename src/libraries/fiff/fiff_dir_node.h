@@ -54,6 +54,7 @@
 #include <QList>
 #include <QSharedPointer>
 #include <QStringList>
+#include <memory>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFLIB
@@ -73,8 +74,10 @@ class FiffTag;
  */
 class FIFFSHARED_EXPORT FiffDirNode {
 public:
-    typedef QSharedPointer<FiffDirNode> SPtr;               /**< Shared pointer type for FiffDirNode. */
-    typedef QSharedPointer<const FiffDirNode> ConstSPtr;    /**< Const shared pointer type for FiffDirNode. */
+    using SPtr = QSharedPointer<FiffDirNode>;            /**< Shared pointer type for FiffDirNode. */
+    using ConstSPtr = QSharedPointer<const FiffDirNode>; /**< Const shared pointer type for FiffDirNode. */
+    using UPtr = std::unique_ptr<FiffDirNode>;             /**< Unique pointer type for FiffDirNode. */
+    using ConstUPtr = std::unique_ptr<const FiffDirNode>;  /**< Const unique pointer type for FiffDirNode. */
 
     //=========================================================================================================
     /**
@@ -144,7 +147,7 @@ public:
      *
      * @return true if found, false otherwise.
      */
-    inline bool find_tag(QSharedPointer<FiffStream>& p_pStream, fiff_int_t findkind, QSharedPointer<FiffTag>& p_pTag) const;
+    inline bool find_tag(QSharedPointer<FiffStream>& p_pStream, fiff_int_t findkind, std::unique_ptr<FiffTag>& p_pTag) const;
 
     //=========================================================================================================
     /**
@@ -160,7 +163,7 @@ public:
      *
      * @return true if found, false otherwise.
      */
-    bool find_tag(FiffStream* p_pStream, fiff_int_t findkind, QSharedPointer<FiffTag>& p_pTag) const;
+    bool find_tag(FiffStream* p_pStream, fiff_int_t findkind, std::unique_ptr<FiffTag>& p_pTag) const;
 
     //=========================================================================================================
     /**
@@ -251,7 +254,7 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool FiffDirNode::find_tag(QSharedPointer<FiffStream> &p_pStream, fiff_int_t findkind, QSharedPointer<FiffTag> &p_pTag) const
+inline bool FiffDirNode::find_tag(QSharedPointer<FiffStream> &p_pStream, fiff_int_t findkind, std::unique_ptr<FiffTag> &p_pTag) const
 {
     return find_tag(p_pStream.data(), findkind, p_pTag);
 }

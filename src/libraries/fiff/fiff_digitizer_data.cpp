@@ -43,6 +43,7 @@
 #include "fiff_stream.h"
 #include "fiff_dig_point.h"
 #include <iostream>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES

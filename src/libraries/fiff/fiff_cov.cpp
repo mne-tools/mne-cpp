@@ -59,6 +59,7 @@
 //=============================================================================================================
 
 #include <Eigen/SVD>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -94,12 +95,12 @@ FiffCov::FiffCov(QIODevice &p_IODevice)
 
     if(!t_pStream->open())
     {
-        printf("\tNot able to open IODevice.\n");//ToDo Throw here
+        qWarning("\tNot able to open IODevice.\n");//ToDo Throw here
         return;
     }
 
     if(!t_pStream->read_cov(t_pStream->dirtree(), FIFFV_MNE_NOISE_COV, *this))
-        printf("\tFiff covariance not found.\n");//ToDo Throw here
+        qWarning("\tFiff covariance not found.\n");//ToDo Throw here
 
     qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov> >("QSharedPointer<FIFFLIB::FiffCov>");
     qRegisterMetaType<FIFFLIB::FiffCov>("FIFFLIB::FiffCov");
@@ -213,7 +214,7 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
     //Create the projection operator
     if (ncomp > 0 && proj.rows() == count)
     {
-        printf("Created an SSP operator (subspace dimension = %d)\n", ncomp);
+        qInfo("Created an SSP operator (subspace dimension = %d)\n", ncomp);
         C = proj * (C * proj.transpose());
     } else {
         qWarning("Warning in FiffCov::prepare_noise_cov: No projections applied since no projectors specified or projector dimensions do not match!");
@@ -309,7 +310,7 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
 
     if (C_meg_idx.size() + C_eeg_idx.size() != n_chan)
     {
-        printf("Error in FiffCov::prepare_noise_cov: channel sizes do no match!\n");//ToDo Throw here
+        qWarning("Error in FiffCov::prepare_noise_cov: channel sizes do no match!\n");//ToDo Throw here
         return FiffCov();
     }
 
@@ -378,7 +379,7 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
 
     //Subtract number of found stim channels because they are still in C but not the idx_eeg, idx_mag or idx_grad
     if((unsigned) C.rows() - iNoStimCh != idx_eeg.size() + idx_mag.size() + idx_grad.size()) {
-        printf("Error in FiffCov::regularize: Channel dimensions do not fit.\n");//ToDo Throw
+        qWarning("Error in FiffCov::regularize: Channel dimensions do not fit.\n");//ToDo Throw
     }
 
     QList<FiffProj> t_listProjs;
@@ -405,10 +406,10 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
         std::vector<qint32> idx = it.value().second;
 
         if(idx.size() == 0 || reg == 0.0)
-            printf("\tNothing to regularize within %s data.\n", desc.toUtf8().constData());
+            qInfo("\tNothing to regularize within %s data.\n", desc.toUtf8().constData());
         else
         {
-            printf("\tRegularize %s: %f\n", desc.toUtf8().constData(), reg);
+            qInfo("\tRegularize %s: %f\n", desc.toUtf8().constData(), reg);
             MatrixXd this_C(idx.size(), idx.size());
             for(quint32 i = 0; i < idx.size(); ++i)
                 for(quint32 j = 0; j < idx.size(); ++j)
@@ -435,7 +436,7 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
 
                 if (ncomp > 0)
                 {
-                    printf("\tCreated an SSP operator for %s (dimension = %d).\n", desc.toUtf8().constData(), ncomp);
+                    qInfo("\tCreated an SSP operator for %s (dimension = %d).\n", desc.toUtf8().constData(), ncomp);
                     this_C = U.transpose() * (this_C * U);
                 }
             }

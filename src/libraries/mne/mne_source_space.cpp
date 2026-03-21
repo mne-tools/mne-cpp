@@ -1847,7 +1847,7 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
     std::unique_ptr<MNESourceSpace> new_space;
     QList<FiffDirNode::SPtr> sources;
     FiffDirNode::SPtr     node;
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     int             j,k,p,q;
     int             ntri;
     int             *nearest = NULL;

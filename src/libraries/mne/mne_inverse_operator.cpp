@@ -1060,7 +1060,7 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     //   Methods and source orientations
     //
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     if (!invs->find_tag(t_pStream, FIFF_MNE_INCLUDED_METHODS, t_pTag))
     {
         printf("Modalities not found\n");

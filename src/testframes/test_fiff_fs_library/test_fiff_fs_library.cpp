@@ -13,7 +13,7 @@
 #include <QCoreApplication>
 #include <Eigen/Dense>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 // FIFF
 #include <fiff/fiff.h>
@@ -204,7 +204,7 @@ private slots:
 
 void TestFiffFsLibrary::initTestCase()
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
     QString base = QCoreApplication::applicationDirPath()
                    + "/../resources/data/mne-cpp-test-data";
     if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
@@ -1355,15 +1355,15 @@ void TestFiffFsLibrary::fiffStream_readTagInfoAndData()
     buffer.seek(0);
     FiffStream readStream(&buffer);
     readStream.open(QIODevice::ReadOnly);
-    FiffTag::SPtr pTag(new FiffTag());
+    auto pTag = std::make_unique<FiffTag>();
     fiff_long_t tagPos = readStream.read_tag_info(pTag, false);
     if (tagPos >= 0) {
         bool readOk = readStream.read_tag_data(pTag);
         Q_UNUSED(readOk);
     }
-    FiffTag::SPtr pTag2(new FiffTag());
+    auto pTag2 = std::make_unique<FiffTag>();
     readStream.read_tag_info(pTag2, true);
-    FiffTag::SPtr pTag3;
+    FiffTag::UPtr pTag3;
     readStream.read_tag(pTag3, 0);
 }
 

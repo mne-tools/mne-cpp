@@ -38,7 +38,7 @@
 //=============================================================================================================
 
 #include <stdio.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include "info.h"
 #include "analyzecore.h"

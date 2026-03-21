@@ -60,6 +60,7 @@
 #include <QVariant>
 #include <QPair>
 #include <QSharedPointer>
+#include <memory>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -77,8 +78,10 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffEvoked
 {
 public:
-    typedef QSharedPointer<FiffEvoked> SPtr;            /**< Shared pointer type for FiffEvoked. */
-    typedef QSharedPointer<const FiffEvoked> ConstSPtr; /**< Const shared pointer type for FiffEvoked. */
+    using SPtr = QSharedPointer<FiffEvoked>;            /**< Shared pointer type for FiffEvoked. */
+    using ConstSPtr = QSharedPointer<const FiffEvoked>; /**< Const shared pointer type for FiffEvoked. */
+    using UPtr = std::unique_ptr<FiffEvoked>;             /**< Unique pointer type for FiffEvoked. */
+    using ConstUPtr = std::unique_ptr<const FiffEvoked>;  /**< Const unique pointer type for FiffEvoked. */
 
     //=========================================================================================================
     /**

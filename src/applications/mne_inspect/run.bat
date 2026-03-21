@@ -21,7 +21,7 @@ set "EvokedFile=%SampleDir%\sample_audvis-ave.fif"
 
 :: Default build path relative to script location
 set "ScriptDir=%~dp0"
-set "BuildPath=%ScriptDir%..\..\..\out\Release\apps\mne_inspect.exe"
+set "BuildPath=%ScriptDir%..\..\..\out\Release\bin\mne_inspect.exe"
 
 :: Kill any existing instances
 taskkill /f /im mne_inspect.exe >nul 2>&1

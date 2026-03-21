@@ -39,7 +39,7 @@
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_types.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -94,7 +94,7 @@ static QStringList readBadChannelList(const QString &filename)
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_mark_bad_channels");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

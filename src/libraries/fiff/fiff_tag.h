@@ -113,6 +113,7 @@
 //=============================================================================================================
 
 #include <iostream>
+#include <memory>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFLIB
@@ -152,8 +153,10 @@ class FIFFSHARED_EXPORT FiffTag : public QByteArray
 {
 
 public:
-    typedef QSharedPointer<FiffTag> SPtr;            /**< Shared pointer type for FiffTag. */
-    typedef QSharedPointer<const FiffTag> ConstSPtr; /**< Const shared pointer type for FiffTag. */
+    using SPtr = QSharedPointer<FiffTag>;            /**< Shared pointer type for FiffTag. */
+    using ConstSPtr = QSharedPointer<const FiffTag>; /**< Const shared pointer type for FiffTag. */
+    using UPtr = std::unique_ptr<FiffTag>;             /**< Unique pointer type for FiffTag. */
+    using ConstUPtr = std::unique_ptr<const FiffTag>;  /**< Const unique pointer type for FiffTag. */
 
     //=========================================================================================================
     /**
@@ -432,7 +435,7 @@ public:
      * Either of these may be specified as FIFFV_LITTLE_ENDIAN, FIFFV_BIG_ENDIAN, or FIFFV_NATIVE_ENDIAN.
      * The last choice means that the native byte order value will be substituted here before proceeding
      */
-    static void convert_matrix_from_file_data(FiffTag::SPtr tag);
+    static void convert_matrix_from_file_data(const FiffTag::UPtr& tag);
 
     //=========================================================================================================
     /**
@@ -440,7 +443,7 @@ public:
      *
      * @param[in, out] tag    matrix data to convert.
      */
-    static void convert_matrix_to_file_data(FiffTag::SPtr tag);
+    static void convert_matrix_to_file_data(const FiffTag::UPtr& tag);
 
     //
     // Data type conversions for the little endian systems.
@@ -459,7 +462,7 @@ public:
      * @param[in] from_endian    from endian encoding.
      * @param[in] to_endian      to endian encoding.
      */
-    static void convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian);
+    static void convert_tag_data(const FiffTag::UPtr& tag, int from_endian, int to_endian);
 
     //
     // from fiff_type_spec.c
@@ -837,7 +840,7 @@ inline FiffChInfo FiffTag::toChInfo() const
         //
         //   Handle the channel name
         //
-        char* orig = (char*)this->data();
+        const char* orig = static_cast<const char*>(this->data());
         p_FiffChInfo.ch_name = QString::fromUtf8(orig + 80).replace(" ","");
 
         return p_FiffChInfo;
@@ -962,7 +965,7 @@ inline Eigen::SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
     qint32 nrow = dims[1];
     qint32 ncol = dims[2];
 
-    typedef Eigen::Triplet<double> T;
+    using T = Eigen::Triplet<double>;
     std::vector<T> tripletList;
     tripletList.reserve(nnz);
 
@@ -982,7 +985,7 @@ inline Eigen::SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
             while( p < t_pInt[offset2+j+1])
             {
 //                tripletList[p] = T(tripletList[p].row(), j, tripletList[p].value());
-                tripletList.push_back(T(t_pInt[offset1+p], j, (double)(t_pFloat[p])));
+                tripletList.push_back(T(t_pInt[offset1+p], j, static_cast<double>(t_pFloat[p])));
                 ++p;
             }
         }
@@ -998,7 +1001,7 @@ inline Eigen::SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
             while( p < t_pInt[offset2+j+1])
             {
 //                tripletList[p] = T(j, tripletList[p].col(), tripletList[p].value());
-                tripletList.push_back(T(j, t_pInt[offset1+p], (double)(t_pFloat[p])));
+                tripletList.push_back(T(j, t_pInt[offset1+p], static_cast<double>(t_pFloat[p])));
                 ++p;
             }
         }

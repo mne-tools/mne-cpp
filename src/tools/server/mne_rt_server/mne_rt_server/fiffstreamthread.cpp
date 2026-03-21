@@ -129,7 +129,7 @@ void FiffStreamThread::stopMeas(qint32 ID)
 
 //=============================================================================================================
 
-void FiffStreamThread::parseCommand(FiffTag::SPtr p_pTag)
+void FiffStreamThread::parseCommand(const FiffTag::UPtr& p_pTag)
 {
     if(p_pTag->size() >= 4)
     {
@@ -253,7 +253,7 @@ void FiffStreamThread::writeClientId()
 //    if (p_qTcpSocket.bytesAvailable() >= (int)sizeof(qint32)*4)
 //    {
 //        qDebug() << "goes to read bytes " ;
-//        FiffTag::SPtr t_pTag;
+//        FiffTag::UPtr t_pTag;
 //        FiffTag::read_tag_info(&t_FiffStreamIn, t_pTag, false);
 
 //        //
@@ -342,7 +342,7 @@ void FiffStreamThread::run()
         if (t_qTcpSocket.bytesAvailable() >= (int)sizeof(qint32)*4)
         {
 //            qDebug() << "goes to read bytes " ;
-            FiffTag::SPtr t_pTag;
+            FiffTag::UPtr t_pTag;
             t_FiffStreamIn.read_tag_info(t_pTag, false);
 
             //

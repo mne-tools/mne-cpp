@@ -36,7 +36,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <conn/network/network.h>
 #include <conn/network/networknode.h>
@@ -212,7 +212,7 @@ TestNetworkVisualization::TestNetworkVisualization()
 
 void TestNetworkVisualization::initTestCase()
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
 
     m_fullNet4  = buildTestNetwork(4);
     m_fullNet10 = buildTestNetwork(10);

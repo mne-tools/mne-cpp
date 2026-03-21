@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     applicationlogger.h
+ * @file     mne_logger.h
  * @author   Mainak Jas <mjas@mgh.harvard.edu>;
  *           Ruben Dörfel <rdorfel@mgh.harvard.edu>
  * @since    0.1.0
@@ -29,12 +29,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the ApplicationLogger class.
+ * @brief    Contains the declaration of the MNELogger class.
  *
  */
 
-#ifndef APPLICATIONLOGGER_H
-#define APPLICATIONLOGGER_H
+#ifndef MNE_LOGGER_H
+#define MNE_LOGGER_H
 
 //=============================================================================================================
 // INCLUDES
@@ -63,7 +63,7 @@ namespace UTILSLIB
  *
  * @brief Custom Qt message handler that formats and routes qDebug/qWarning/qCritical output to file or console.
  */
-class UTILSSHARED_EXPORT ApplicationLogger
+class UTILSSHARED_EXPORT MNELogger
 {
 public:
     //=========================================================================================================
@@ -80,4 +80,4 @@ private:
     static std::mutex m_mutex;
 };
 }
-#endif // APPLICATIONLOGGER_H
+#endif // MNE_LOGGER_H

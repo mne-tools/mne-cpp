@@ -18,7 +18,7 @@ set(SOURCES
   layoutmaker.cpp
   selectionio.cpp
   generics/observerpattern.cpp
-  generics/applicationlogger.cpp
+  generics/mne_logger.cpp
   utils_global.cpp
 )
 
@@ -32,7 +32,7 @@ set(HEADERS
   generics/circularbuffer.h
   generics/commandpattern.h
   generics/observerpattern.h
-  generics/applicationlogger.h
+  generics/mne_logger.h
 )
 
 set(FILE_TO_UPDATE utils_global.cpp)

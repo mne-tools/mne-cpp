@@ -155,7 +155,7 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::read(const QString& name, int kind)
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
 
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     QList<FiffDirNode::SPtr> nodes;
     FiffDirNode::SPtr covnode;
 

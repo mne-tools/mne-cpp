@@ -60,6 +60,7 @@
 #include <QList>
 #include <QSharedPointer>
 #include <QString>
+#include <memory>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFLIB
@@ -79,8 +80,10 @@ class FiffRawData;
 class FIFFSHARED_EXPORT FiffRawData
 {
 public:
-    typedef QSharedPointer<FiffRawData> SPtr;               /**< Shared pointer type for FiffRawData. */
-    typedef QSharedPointer<const FiffRawData> ConstSPtr;    /**< Const shared pointer type for FiffRawData. */
+    using SPtr = QSharedPointer<FiffRawData>;            /**< Shared pointer type for FiffRawData. */
+    using ConstSPtr = QSharedPointer<const FiffRawData>; /**< Const shared pointer type for FiffRawData. */
+    using UPtr = std::unique_ptr<FiffRawData>;             /**< Unique pointer type for FiffRawData. */
+    using ConstUPtr = std::unique_ptr<const FiffRawData>;  /**< Const unique pointer type for FiffRawData. */
 
     //=========================================================================================================
     /**

@@ -39,7 +39,7 @@
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_dir_node.h>
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -89,7 +89,7 @@ static void printTransform(const FiffCoordTrans &t)
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_collect_transforms");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
         // Search for device->head transform in the file
         for (int k = 0; k < stream->nent(); k++) {
             if (stream->dir()[k]->kind == FIFF_COORD_TRANS) {
-                FiffTag::SPtr tag;
+                FiffTag::UPtr tag;
                 stream->read_tag(tag, stream->dir()[k]->pos);
                 FiffCoordTrans t = tag->toCoordTrans();
                 if (t.from == FIFFV_COORD_DEVICE && t.to == FIFFV_COORD_HEAD) {
@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
         // Search for MRI->head transform
         for (int k = 0; k < stream->nent(); k++) {
             if (stream->dir()[k]->kind == FIFF_COORD_TRANS) {
-                FiffTag::SPtr tag;
+                FiffTag::UPtr tag;
                 stream->read_tag(tag, stream->dir()[k]->pos);
                 FiffCoordTrans t = tag->toCoordTrans();
                 if (t.from == FIFFV_COORD_MRI && t.to == FIFFV_COORD_HEAD) {

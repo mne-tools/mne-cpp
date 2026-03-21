@@ -36,7 +36,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 #include <iostream>
 #include <inv/hpi/inv_hpi_data_updater.h>
 #include <inv/hpi/inv_sensor_set.h>
@@ -117,7 +117,7 @@ TestHpiDataUpdater::TestHpiDataUpdater()
 
 void TestHpiDataUpdater::initTestCase()
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
 
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
 

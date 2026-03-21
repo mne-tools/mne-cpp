@@ -43,7 +43,7 @@
 
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -78,7 +78,7 @@ using namespace Eigen;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
 
     // Command Line Parser

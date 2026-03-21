@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <fiff/fiff.h>
 #include "fiff_types_ref.h"
@@ -95,7 +95,7 @@ TestFiffMneTypesIO::TestFiffMneTypesIO()
 
 void TestFiffMneTypesIO::initTestCase()
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
     qDebug() << "Epsilon" << dEpsilon;
     qDebug() << "Raw File Name" << sRawName;
     qDebug() << "Evoked File Name" << sEvokedName;
@@ -110,7 +110,7 @@ void TestFiffMneTypesIO::checkFiffCoordTrans()
     if(!stream->open())
         QFAIL("Failed to open data file.");
 
-    FiffTag::SPtr t_pTag;
+    FiffTag::UPtr t_pTag;
     fiffCoordTransRec_REF refTransReference;
     FiffCoordTrans transTest;
 

@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/applicationlogger.h>
+#include <utils/generics/mne_logger.h>
 
 #include <utils/ioutils.h>
 #include <conn/metrics/coherency.h>
@@ -119,7 +119,7 @@ TestSpectralConnectivity::TestSpectralConnectivity()
 
 void TestSpectralConnectivity::initTestCase()
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
     //*********************************************************************************************************
     // Load and Setup Testing Data
     //*********************************************************************************************************
