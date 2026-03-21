@@ -275,6 +275,20 @@ namespace FIFFLIB
 #define FIFFV_RESP_CH    602   /**< Respiration monitoring*/
 
 /*
+ * Intracranial EEG channel types
+ */
+#define FIFFV_ECOG_CH    2001  /**< Electrocorticography (subdural grids/strips). */
+#define FIFFV_SEEG_CH    2002  /**< Stereoelectroencephalography (depth electrodes). */
+#define FIFFV_DBS_CH     2003  /**< Deep brain stimulation electrodes. */
+
+/*
+ * Coil types for intracranial EEG
+ */
+#define FIFFV_COIL_EEG_ECOG          140  /**< ECoG electrode position in r0. */
+#define FIFFV_COIL_EEG_SEEG          150  /**< sEEG electrode position in r0. */
+#define FIFFV_COIL_EEG_DBS           160  /**< DBS electrode position in r0. */
+
+/*
  * More of those defined in MNE
  */
 #define FIFFV_MNE_SURF_UNKNOWN       -1
