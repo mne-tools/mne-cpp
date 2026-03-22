@@ -160,7 +160,7 @@ flowchart LR
 
 ### Current Limitations
 
-- **3D visualization.** The RHI-based `disp3D_rhi` library provides 3D rendering in the browser via WebGL. Some advanced 3D features may behave differently across browsers.
+- **3D visualization.** The RHI-based `disp3D` library provides 3D rendering in the browser via WebGL. Some advanced 3D features may behave differently across browsers.
 - **Static linking only.** The Wasm build uses `BUILD_SHARED_LIBS=OFF` — all libraries are linked statically into the final binary.
 - **Initial load time.** The Wasm binary and supporting JavaScript can be several tens of megabytes. First load requires a reasonably fast connection; subsequent loads benefit from browser caching.
 - **File size.** Very large FIFF files may approach browser memory limits, particularly on 32-bit browser processes.
