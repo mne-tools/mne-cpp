@@ -54,7 +54,7 @@
 
 #include <inv/minimum_norm/inv_minimum_norm.h>
 
-#include <dsp/rt_inv_op.h>
+#include <dsp/rt/rt_inv_op.h>
 
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimemultisamplearray.h>

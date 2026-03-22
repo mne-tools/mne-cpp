@@ -33,3 +33,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
 endif()
+
+# Register with CTest
+enable_testing()
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})

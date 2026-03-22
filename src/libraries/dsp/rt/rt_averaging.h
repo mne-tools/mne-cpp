@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "dsp_global.h"
+#include "../dsp_global.h"
 
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_info.h>

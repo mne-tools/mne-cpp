@@ -61,7 +61,7 @@ class DipoleObject;
  *
  * Describes the result of a ray-pick operation.
  */
-struct PickResult
+struct DISP3DSHARED_EXPORT PickResult
 {
     bool    hit             = false;     ///< True if something was hit
     float   distance        = 0.0f;     ///< Distance along ray to hit point

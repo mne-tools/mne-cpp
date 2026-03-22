@@ -47,7 +47,7 @@
 #include <disp/viewers/compensatorview.h>
 #include <disp/viewers/spharasettingsview.h>
 
-#include <dsp/rt_filter.h>
+#include <dsp/rt/rt_filter.h>
 #include <dsp/sphara.h>
 
 #include <utils/ioutils.h>

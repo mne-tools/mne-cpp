@@ -1,10 +1,10 @@
 #include <QtTest/QtTest>
 #include <Eigen/Dense>
 #include <cmath>
-#include <dsp/rt_detect_trigger.h>
+#include <dsp/rt/rt_detect_trigger.h>
 #include <dsp/parksmcclellan.h>
 #include <dsp/filterkernel.h>
-#include <dsp/rt_filter.h>
+#include <dsp/rt/rt_filter.h>
 
 using namespace RTPROCESSINGLIB;
 using namespace UTILSLIB;

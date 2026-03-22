@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
- * @file     rtnoise.h
+ * @file     rtinvop.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
- * @date     August, 2014
+ * @date     July, 2012
  *
  * @section  LICENSE
  *
- * Copyright (C) 2014, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2012, Lorenz Esch, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,34 +29,40 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     RtNoiseWorker and RtNoise class declarations.
+ * @brief     RtInvOp class declaration.
  *
  */
 
-#ifndef RT_NOISE_RTPROCESSING_H
-#define RT_NOISE_RTPROCESSING_H
+#ifndef RT_INV_OP_RTPROCESSING_H
+#define RT_INV_OP_RTPROCESSING_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "dsp_global.h"
+#include "../dsp_global.h"
 
-#include <fiff/fiff_info.h>
+#include <fiff/fiff_cov.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QThread>
-#include <QMutex>
 #include <QSharedPointer>
 
 //=============================================================================================================
-// EIGEN INCLUDES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-#include <Eigen/Core>
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
+namespace MNELIB {
+    class MNEForwardSolution;
+    class MNEInverseOperator;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE RTPROCESSINGLIB
@@ -66,146 +72,140 @@ namespace RTPROCESSINGLIB
 {
 
 //=============================================================================================================
+// RTPROCESSINGLIB FORWARD DECLARATIONS
+//=============================================================================================================
+
 /**
- * @brief Background worker that computes a noise power spectral density estimate from accumulated data blocks.
+ * @brief Input bundle for the real-time inverse operator worker containing noise covariance, forward solution, and settings.
  */
-class DSPSHARED_EXPORT RtNoiseWorker : public QObject
-{
-    Q_OBJECT
-
-public:
-    //=========================================================================================================
-    /**
-     * Creates the worker.
-     *
-     * @param[in] iFftLength    FFT length (number of samples per window).
-     * @param[in] pFiffInfo     Associated Fiff Information.
-     * @param[in] iDataLength   Number of blocks to accumulate before computing the spectrum.
-     */
-    explicit RtNoiseWorker(qint32 iFftLength,
-                           FIFFLIB::FiffInfo::SPtr pFiffInfo,
-                           qint32 iDataLength);
-
-    //=========================================================================================================
-    /**
-     * Process one data block, accumulate, and emit the spectrum when enough blocks are collected.
-     *
-     * @param[in] matData   The incoming data block (channels x samples).
-     */
-    void doWork(const Eigen::MatrixXd& matData);
-
-signals:
-    /**
-     * Emitted when a new power spectral density matrix is available.
-     *
-     * @param[out] matSpecData  The computed spectrum (channels x frequency bins) in dB.
-     */
-    void resultReady(const Eigen::MatrixXd& matSpecData);
-
-private:
-    static QVector<float> hanning(int N, short itype);
-
-    qint32              m_iFftLength;       /**< FFT window length. */
-    double              m_dFs;              /**< Sampling frequency. */
-    qint32              m_iDataLength;      /**< Number of blocks to accumulate. */
-    QVector<float>      m_fWin;             /**< Hanning window coefficients. */
-
-    int                 m_iNumOfBlocks = 0; /**< Total blocks to accumulate. */
-    int                 m_iBlockSize = 0;   /**< Columns per block. */
-    int                 m_iSensors = 0;     /**< Number of sensor rows. */
-    int                 m_iBlockIndex = 0;  /**< Current block write index. */
-    bool                m_bFirstBlock = true;/**< True until first block arrives. */
-    Eigen::MatrixXd     m_matCircBuf;       /**< Circular accumulation buffer. */
+struct RtInvOpInput {
+    QSharedPointer<FIFFLIB::FiffInfo>           pFiffInfo;
+    QSharedPointer<MNELIB::MNEForwardSolution>  pFwd;
+    FIFFLIB::FiffCov                            noiseCov;
 };
 
 //=============================================================================================================
 /**
- * @brief Controller that manages RtNoiseWorker for real-time noise spectrum estimation.
+ * Real-time inverse operator worker.
+ *
+ * @brief Background worker thread that recomputes the MNE inverse operator when covariance updates arrive.
  */
-class DSPSHARED_EXPORT RtNoise : public QObject
+class DSPSHARED_EXPORT RtInvOpWorker : public QObject
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RtNoise> SPtr;             /**< Shared pointer type for RtNoise. */
-    typedef QSharedPointer<const RtNoise> ConstSPtr;  /**< Const shared pointer type for RtNoise. */
-
     //=========================================================================================================
     /**
-     * Creates the real-time noise estimation object.
+     * Perform actual inverse operator creation.
      *
-     * @param[in] iFftLength    Number of samples per FFT window.
-     * @param[in] pFiffInfo     Associated Fiff Information.
-     * @param[in] iDataLength   Number of blocks to accumulate before computing.
-     * @param[in] parent        Parent QObject (optional).
+     * @param[in] inputData  Data to estimate the inverse operator from.
      */
-    explicit RtNoise(qint32 iFftLength,
-                     FIFFLIB::FiffInfo::SPtr pFiffInfo,
-                     qint32 iDataLength,
-                     QObject *parent = nullptr);
-
-    //=========================================================================================================
-    /**
-     * Destroys the real-time noise estimation object.
-     */
-    ~RtNoise();
-
-    //=========================================================================================================
-    /**
-     * Submit incoming data for noise estimation.
-     *
-     * @param[in] matData  Data block (channels x samples).
-     */
-    void append(const Eigen::MatrixXd& matData);
-
-    //=========================================================================================================
-    /**
-     * Returns whether the worker thread is running.
-     */
-    bool isRunning() const;
-
-    //=========================================================================================================
-    /**
-     * Starts the worker thread.
-     *
-     * @return true on success.
-     */
-    bool start();
-
-    //=========================================================================================================
-    /**
-     * Stops the worker thread.
-     *
-     * @return true on success.
-     */
-    bool stop();
-
-    //=========================================================================================================
-    /**
-     * Blocks until the worker thread has finished, or until the timeout (ms) expires.
-     */
-    bool wait(unsigned long time = ULONG_MAX);
+    void doWork(const RtInvOpInput &inputData);
 
 signals:
+    //=========================================================================================================
     /**
-     * Emitted when a new spectrum is available. Forwarded from the worker.
+     * Emit this signal whenever a new inverse operator was estimated.
+     *
+     * @param[in] invOp  The final inverse operator estimation.
      */
-    void SpecCalculated(const Eigen::MatrixXd& matSpecData);
+    void resultReady(const MNELIB::MNEInverseOperator& invOp);
+};
 
+//=============================================================================================================
+/**
+ * Real-time inverse dSPM, sLoreta inverse operator estimation
+ *
+ * @brief Controller that manages RtInvOpWorker for online inverse operator updates.
+ */
+class DSPSHARED_EXPORT RtInvOp : public QObject
+{
+    Q_OBJECT
+
+public:
+    typedef QSharedPointer<RtInvOp> SPtr;             /**< Shared pointer type for RtInvOp. */
+    typedef QSharedPointer<const RtInvOp> ConstSPtr;  /**< Const shared pointer type for RtInvOp. */
+
+    //=========================================================================================================
     /**
-     * Internal signal to forward data to the worker thread.
+     * Creates the real-time inverse operator estimation object
+     *
+     * @param[in] p_pFiffInfo    Fiff measurement info.
+     * @param[in] p_pFwd         Forward solution.
+     * @param[in] parent         Parent QObject (optional).
      */
-    void operate(const Eigen::MatrixXd& matData);
+    explicit RtInvOp(QSharedPointer<FIFFLIB::FiffInfo> &p_pFiffInfo,
+                     QSharedPointer<MNELIB::MNEForwardSolution> &p_pFwd,
+                     QObject *parent = 0);
 
-private:
-    QThread             m_workerThread;     /**< The worker thread. */
-    bool                m_bIsRunning = false;/**< Running state flag. */
+    //=========================================================================================================
+    /**
+     * Destroys the inverse operator estimation object.
+     */
+    ~RtInvOp();
+
+    //=========================================================================================================
+    /**
+     * Slot to receive incoming noise covariance estimations.
+     *
+     * @param[in] noiseCov     Noise covariance estimation.
+     */
+    void append(const FIFFLIB::FiffCov &noiseCov);
+
+    //=========================================================================================================
+    /**
+     * Slot to receive incoming forward solution.
+     *
+     * @param[in] pFwd     Forward solution.
+     */
+    void setFwdSolution(QSharedPointer<MNELIB::MNEForwardSolution> pFwd);
+
+    //=========================================================================================================
+    /**
+     * Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
+     */
+    void restart();
+
+    //=========================================================================================================
+    /**
+     * Stops the thread by interrupting its computation queue, quitting and waiting.
+     */
+    void stop();
+
+protected:
+    //=========================================================================================================
+    /**
+     * Handles the result
+     */
+    void handleResults(const MNELIB::MNEInverseOperator& invOp);
+
+    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The fiff measurement information. */
+    QSharedPointer<MNELIB::MNEForwardSolution>  m_pFwd;             /**< The forward solution. */
+
+    QThread                                     m_workerThread;     /**< The worker thread. */
+
+signals:
+    //=========================================================================================================
+    /**
+     * Signal which is emitted when a inverse operator is calculated.
+     *
+     * @param[out] invOp  The inverse operator.
+     */
+    void invOperatorCalculated(const MNELIB::MNEInverseOperator& invOp);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenver the worker should create a new inverse operator estimation.
+     *
+     * @param[in] inputData  The new covariance estimation.
+     */
+    void operate(const RtInvOpInput &inputData);
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } // NAMESPACE
 
-#endif // RT_NOISE_RTPROCESSING_H
+#endif // RT_INV_OP_RTPROCESSING_H

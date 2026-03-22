@@ -34,12 +34,12 @@
 #include <inv/hpi/inv_hpi_fit_data.h>
 #include <inv/hpi/inv_signal_model.h>
 
-#include <dsp/rt_connectivity.h>
-#include <dsp/rt_hpis.h>
-#include <dsp/rt_inv_op.h>
-#include <dsp/rt_averaging.h>
-#include <dsp/rt_noise.h>
-#include <dsp/rt_filter.h>
+#include <dsp/rt/rt_connectivity.h>
+#include <dsp/rt/rt_hpis.h>
+#include <dsp/rt/rt_inv_op.h>
+#include <dsp/rt/rt_averaging.h>
+#include <dsp/rt/rt_noise.h>
+#include <dsp/rt/rt_filter.h>
 #include <dsp/filterkernel.h>
 
 #include <conn/connectivitysettings.h>

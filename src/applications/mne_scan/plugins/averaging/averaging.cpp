@@ -46,7 +46,7 @@
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimemultisamplearray.h>
 
-#include <dsp/rt_averaging.h>
+#include <dsp/rt/rt_averaging.h>
 
 //=============================================================================================================
 // QT INCLUDES

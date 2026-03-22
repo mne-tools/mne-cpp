@@ -20,14 +20,22 @@ set(SOURCES
   filterio.cpp
   spectrogram.cpp
   sphara.cpp
-  rt_cov.cpp
-  rt_inv_op.cpp
-  rt_averaging.cpp
-  rt_noise.cpp
-  rt_hpis.cpp
-  rt_filter.cpp
-  rt_connectivity.cpp
-  rt_detect_trigger.cpp
+  rt/rt_cov.cpp
+  rt/rt_inv_op.cpp
+  rt/rt_averaging.cpp
+  rt/rt_noise.cpp
+  rt/rt_hpis.cpp
+  rt/rt_filter.cpp
+  rt/rt_connectivity.cpp
+  rt/rt_detect_trigger.cpp
+  ica.cpp
+  iirfilter.cpp
+  sss.cpp
+  artifact_detect.cpp
+  firfilter.cpp
+  resample.cpp
+  epoch_extractor.cpp
+  bad_channel_detect.cpp
 )
 
 set(HEADERS
@@ -38,14 +46,22 @@ set(HEADERS
   filterio.h
   spectrogram.h
   sphara.h
-  rt_cov.h
-  rt_inv_op.h
-  rt_averaging.h
-  rt_noise.h
-  rt_hpis.h
-  rt_filter.h
-  rt_detect_trigger.h
-  rt_connectivity.h
+  rt/rt_cov.h
+  rt/rt_inv_op.h
+  rt/rt_averaging.h
+  rt/rt_noise.h
+  rt/rt_hpis.h
+  rt/rt_filter.h
+  rt/rt_detect_trigger.h
+  rt/rt_connectivity.h
+  ica.h
+  iirfilter.h
+  sss.h
+  artifact_detect.h
+  firfilter.h
+  resample.h
+  epoch_extractor.h
+  bad_channel_detect.h
 )
 
 set(FILE_TO_UPDATE dsp_global.cpp)

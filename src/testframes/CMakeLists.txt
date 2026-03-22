@@ -93,6 +93,16 @@ add_subdirectory(test_fs_surface_annotation)
 add_subdirectory(test_mne_data_types)
 add_subdirectory(test_fwd_models)
 
+# DSP preprocessing gap closures (ICA, IIR, SSS/tSSS, artifact detection, FIR façade)
+add_subdirectory(test_dsp_ica)
+add_subdirectory(test_dsp_iirfilter)
+add_subdirectory(test_dsp_sss)
+add_subdirectory(test_dsp_artifact_detect)
+add_subdirectory(test_dsp_firfilter)
+add_subdirectory(test_dsp_resample)
+add_subdirectory(test_dsp_epoch_extractor)
+add_subdirectory(test_dsp_bad_channel_detect)
+
 # Coverage boost tests
 add_subdirectory(test_inverse_rap_dipole)
 add_subdirectory(test_fiff_coord_transform)

@@ -9,6 +9,10 @@ qt_standard_project_setup()
 
 qt_add_executable(test_inv_rt_library test_inv_rt_library.cpp)
 
+
+# Register with CTest
+enable_testing()
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(test_inv_rt_library PRIVATE STATICBUILD)
 endif()
