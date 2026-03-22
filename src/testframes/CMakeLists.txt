@@ -102,6 +102,8 @@ add_subdirectory(test_dsp_firfilter)
 add_subdirectory(test_dsp_resample)
 add_subdirectory(test_dsp_epoch_extractor)
 add_subdirectory(test_dsp_bad_channel_detect)
+add_subdirectory(test_dsp_welch_psd)
+add_subdirectory(test_dsp_morlet_tfr)
 
 # Coverage boost tests
 add_subdirectory(test_inverse_rap_dipole)

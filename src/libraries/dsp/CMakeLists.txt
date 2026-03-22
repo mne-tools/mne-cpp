@@ -36,6 +36,8 @@ set(SOURCES
   resample.cpp
   epoch_extractor.cpp
   bad_channel_detect.cpp
+  welch_psd.cpp
+  morlet_tfr.cpp
 )
 
 set(HEADERS
@@ -62,6 +64,8 @@ set(HEADERS
   resample.h
   epoch_extractor.h
   bad_channel_detect.h
+  welch_psd.h
+  morlet_tfr.h
 )
 
 set(FILE_TO_UPDATE dsp_global.cpp)
