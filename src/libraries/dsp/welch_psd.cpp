@@ -61,6 +61,11 @@
 using namespace UTILSLIB;
 using namespace Eigen;
 
+namespace
+{
+constexpr double WELCH_PI = 3.14159265358979323846;
+}
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -68,7 +73,7 @@ using namespace Eigen;
 VectorXd WelchPsd::buildWindow(int iN, WindowType window)
 {
     VectorXd w(iN);
-    const double pi2 = 2.0 * M_PI;
+    const double pi2 = 2.0 * WELCH_PI;
 
     for (int n = 0; n < iN; ++n) {
         const double t = static_cast<double>(n) / static_cast<double>(iN - 1);

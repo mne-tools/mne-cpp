@@ -62,6 +62,11 @@
 using namespace UTILSLIB;
 using namespace Eigen;
 
+namespace
+{
+constexpr double MORLET_PI = 3.14159265358979323846;
+}
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -78,7 +83,7 @@ int MorletTfr::nextPow2(int n)
 VectorXcd MorletTfr::buildWavelet(double dFreq, double dSFreq, double dNCycles, int& halfLen)
 {
     // Time-domain standard deviation: σ_t = nCycles / (2π·f)
-    const double sigma_t = dNCycles / (2.0 * M_PI * dFreq);
+    const double sigma_t = dNCycles / (2.0 * MORLET_PI * dFreq);
 
     // Truncate at ±4σ — captures > 99.99 % of energy
     halfLen = static_cast<int>(std::round(4.0 * sigma_t * dSFreq));
@@ -87,12 +92,12 @@ VectorXcd MorletTfr::buildWavelet(double dFreq, double dSFreq, double dNCycles, 
     VectorXcd    wavelet(nWav);
 
     // L2-energy normalisation: A = (σ_t · √(2π))^(-0.5)
-    const double A = std::pow(sigma_t * std::sqrt(2.0 * M_PI), -0.5);
+    const double A = std::pow(sigma_t * std::sqrt(2.0 * MORLET_PI), -0.5);
 
     for (int i = 0; i < nWav; ++i) {
         const double t     = static_cast<double>(i - halfLen) / dSFreq;
         const double gauss = std::exp(-t * t / (2.0 * sigma_t * sigma_t));
-        const double phase = 2.0 * M_PI * dFreq * t;
+        const double phase = 2.0 * MORLET_PI * dFreq * t;
         wavelet[i] = std::complex<double>(A * gauss * std::cos(phase),
                                           A * gauss * std::sin(phase));
     }
