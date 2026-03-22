@@ -232,7 +232,7 @@ void TestDspFirFilter::highPass_frequencySelectivity()
 
     RowVectorXd sig = makeSine(5.0, sFreq, nSamp) + makeSine(200.0, sFreq, nSamp);
 
-    FilterKernel k = FirFilter::design(256, FirFilter::HighPass, cutoff, 0.0, sFreq, 5.0, FirFilter::Cosine);
+    FilterKernel k = FirFilter::design(256, FirFilter::HighPass, cutoff, 0.0, sFreq, 5.0, FirFilter::ParksMcClellan);
     RowVectorXd filtered = FirFilter::applyZeroPhase(sig, k);
 
     double passband = bandPower(filtered, sFreq, cutoff + 30.0, sFreq / 2.0);
@@ -256,7 +256,7 @@ void TestDspFirFilter::bandPass_frequencySelectivity()
                     + makeSine(40.0, sFreq, nSamp)
                     + makeSine(200.0, sFreq, nSamp);
 
-    FilterKernel k = FirFilter::design(256, FirFilter::BandPass, fLow, fHigh, sFreq, 5.0, FirFilter::Cosine);
+    FilterKernel k = FirFilter::design(256, FirFilter::BandPass, fLow, fHigh, sFreq, 5.0, FirFilter::ParksMcClellan);
     RowVectorXd filtered = FirFilter::applyZeroPhase(sig, k);
 
     double passband  = bandPower(filtered, sFreq, fLow + 5.0, fHigh - 5.0);
