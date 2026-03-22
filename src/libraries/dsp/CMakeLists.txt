@@ -31,6 +31,7 @@ set(SOURCES
   ica.cpp
   iirfilter.cpp
   sss.cpp
+  xdawn.cpp
   artifact_detect.cpp
   firfilter.cpp
   resample.cpp
@@ -59,6 +60,7 @@ set(HEADERS
   ica.h
   iirfilter.h
   sss.h
+  xdawn.h
   artifact_detect.h
   firfilter.h
   resample.h
