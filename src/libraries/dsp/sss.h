@@ -98,20 +98,19 @@ namespace UTILSLIB
  *   Eigen::MatrixXd tSssData  = SSS::applyTemporal(rawMegData, basis);
  * @endcode
  */
+/** @brief Configuration parameters for SSS/tSSS (defined outside class to work around a Clang default-argument/nested-struct limitation). */
+struct DSPSHARED_EXPORT SSSParams
+{
+    int    iOrderIn  = 8;                      /**< Internal spherical-harmonic expansion order (default 8). N_in = iOrderIn*(iOrderIn+2) = 80. */
+    int    iOrderOut = 3;                      /**< External spherical-harmonic expansion order (default 3). N_out = iOrderOut*(iOrderOut+2) = 15. */
+    Eigen::Vector3d origin{0.0, 0.0, 0.04};   /**< Expansion origin in metres, head-coordinate frame (default: 4 cm superior to head origin). */
+    double dRegIn  = 1e-5;                     /**< Tikhonov regularisation for the combined-basis pseudoinverse. */
+};
+
 class DSPSHARED_EXPORT SSS
 {
 public:
-    //=========================================================================================================
-    /**
-     * @brief Configuration parameters for SSS/tSSS.
-     */
-    struct Params
-    {
-        int    iOrderIn  = 8;                      /**< Internal spherical-harmonic expansion order (default 8). N_in = iOrderIn*(iOrderIn+2) = 80. */
-        int    iOrderOut = 3;                      /**< External spherical-harmonic expansion order (default 3). N_out = iOrderOut*(iOrderOut+2) = 15. */
-        Eigen::Vector3d origin{0.0, 0.0, 0.04};   /**< Expansion origin in metres, head-coordinate frame (default: 4 cm superior to head origin). */
-        double dRegIn  = 1e-5;                     /**< Tikhonov regularisation for the combined-basis pseudoinverse. */
-    };
+    using Params = SSSParams; /**< Convenience alias so callers can still write SSS::Params. */
 
     //=========================================================================================================
     /**

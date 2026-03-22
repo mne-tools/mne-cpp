@@ -70,6 +70,19 @@ namespace UTILSLIB
 {
 
 //=============================================================================================================
+/** @brief Epoch extraction parameters (defined outside class to avoid Clang/GCC default-argument issues with nested structs). */
+struct DSPSHARED_EXPORT EpochExtractorParams
+{
+    double dTmin      = -0.2;   /**< Epoch start relative to event in seconds (negative = pre-stimulus). */
+    double dTmax      =  0.5;   /**< Epoch end relative to event in seconds. */
+    double dBaseMin   = -0.2;   /**< Baseline start in seconds (relative to event). */
+    double dBaseMax   =  0.0;   /**< Baseline end in seconds (relative to event). Set both to 0 to skip. */
+    double dThreshold =  0.0;   /**< Peak-to-peak amplitude rejection threshold (SI units, e.g. V or T).
+                                     0 = no rejection. Applied per-channel across all channels. */
+    bool   bApplyBaseline = true; /**< Whether to apply baseline correction. */
+};
+
+//=============================================================================================================
 /**
  * @brief Segments continuous raw data into fixed-length epochs locked to events.
  *
@@ -92,20 +105,7 @@ namespace UTILSLIB
 class DSPSHARED_EXPORT EpochExtractor
 {
 public:
-    //=========================================================================================================
-    /**
-     * @brief Parameters controlling epoch extraction, baseline correction, and rejection.
-     */
-    struct Params
-    {
-        double dTmin      = -0.2;   /**< Epoch start relative to event in seconds (negative = pre-stimulus). */
-        double dTmax      =  0.5;   /**< Epoch end relative to event in seconds. */
-        double dBaseMin   = -0.2;   /**< Baseline start in seconds (relative to event). */
-        double dBaseMax   =  0.0;   /**< Baseline end in seconds (relative to event). Set both to 0 to skip. */
-        double dThreshold =  0.0;   /**< Peak-to-peak amplitude rejection threshold (SI units, e.g. V or T).
-                                         0 = no rejection. Applied per-channel across all channels. */
-        bool   bApplyBaseline = true; /**< Whether to apply baseline correction. */
-    };
+    using Params = EpochExtractorParams; /**< Convenience alias so callers can still write EpochExtractor::Params. */
 
     //=========================================================================================================
     /**
