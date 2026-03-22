@@ -32,6 +32,10 @@ set(SOURCES
     hpi/inv_hpi_model_parameters.cpp
     hpi/inv_sensor_set.cpp
     hpi/inv_signal_model.cpp
+    beamformer/inv_beamformer.cpp
+    beamformer/inv_beamformer_compute.cpp
+    beamformer/inv_lcmv.cpp
+    beamformer/inv_dics.cpp
 )
 
 set(HEADERS
@@ -60,6 +64,11 @@ set(HEADERS
     hpi/inv_hpi_model_parameters.h
     hpi/inv_sensor_set.h
     hpi/inv_signal_model.h
+    beamformer/inv_beamformer.h
+    beamformer/inv_beamformer_compute.h
+    beamformer/inv_beamformer_settings.h
+    beamformer/inv_lcmv.h
+    beamformer/inv_dics.h
 )
 
 set(FILE_TO_UPDATE inv_global.cpp)

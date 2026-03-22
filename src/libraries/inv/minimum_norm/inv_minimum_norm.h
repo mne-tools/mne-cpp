@@ -158,20 +158,21 @@ public:
 
     //=========================================================================================================
     /**
-     * Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA")
+     * Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA" | "eLORETA")
      *
-     * @param[in] method   Use mininum norm, dSPM or sLORETA.
+     * @param[in] method   Use minimum norm, dSPM, sLORETA, or eLORETA.
      */
     void setMethod(QString method);
 
     //=========================================================================================================
     /**
-     * Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA")
+     * Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA" | "eLORETA")
      *
      * @param[in] dSPM      Compute the noise-normalization factors for dSPM?.
      * @param[in] sLORETA   Compute the noise-normalization factors for sLORETA?.
+     * @param[in] eLoreta   Compute the eLORETA source weights?.
      */
-    void setMethod(bool dSPM, bool sLORETA);
+    void setMethod(bool dSPM, bool sLORETA, bool eLoreta = false);
 
     //=========================================================================================================
     /**
@@ -183,6 +184,16 @@ public:
 
     //=========================================================================================================
     /**
+     * Set eLORETA options.
+     *
+     * @param[in] maxIter   Maximum number of eLORETA weight iterations (default: 20).
+     * @param[in] eps       Convergence threshold for weight fitting (default: 1e-6).
+     * @param[in] forceEqual  If true, use uniform orientation weights (default: false).
+     */
+    void setELoretaOptions(int maxIter = 20, double eps = 1e-6, bool forceEqual = false);
+
+    //=========================================================================================================
+    /**
      * Get the assembled kernel
      *
      * @return the assembled kernel.
@@ -190,13 +201,31 @@ public:
     inline Eigen::MatrixXd& getKernel();
 
 private:
+    //=========================================================================================================
+    /**
+     * Compute the eLORETA optimized source covariance and update the inverse operator.
+     *
+     * Iteratively adjusts source weights R so that the spatial resolution is uniform
+     * across depth, providing exact localization for single dipoles.
+     *
+     * Reference: Pascual-Marqui, 2007. Discrete, 3D distributed, linear imaging
+     * methods of electric neuronal activity.
+     */
+    void computeELoreta();
+
     MNELIB::MNEInverseOperator m_inverseOperator;   /**< The inverse operator. */
     float m_fLambda;                                /**< Regularization parameter. */
     QString m_sMethod;                              /**< Selected method. */
     bool m_bsLORETA;                                /**< Do sLORETA method. */
     bool m_bdSPM;                                   /**< Do dSPM method. */
+    bool m_beLoreta;                                /**< Do eLORETA method. */
 
-    bool inverseSetup;                              /**< Inverse Setup Calcluated. */
+    // eLORETA parameters
+    int m_iELoretaMaxIter;                          /**< eLORETA max iterations. */
+    double m_dELoretaEps;                           /**< eLORETA convergence threshold. */
+    bool m_bELoretaForceEqual;                      /**< eLORETA uniform orientation weights. */
+
+    bool inverseSetup;                              /**< Inverse Setup Calculated. */
     MNELIB::MNEInverseOperator inv;                 /**< The setup inverse operator. */
     Eigen::SparseMatrix<double> noise_norm;         /**< The noise normalization. */
     QList<Eigen::VectorXi> vertno;                  /**< The vertices numbers. */

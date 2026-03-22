@@ -90,3 +90,7 @@ scripts/packaging/installer/packages/*/data/
 *.tar.gz
 
 codecov
+
+# Coverage artifacts
+*.gcov
+coverage_*.info
