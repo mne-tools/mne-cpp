@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <dsp/rt_connectivity.h>
+#include <dsp/rt/rt_connectivity.h>
 
 #include <conn/metrics/abstractmetric.h>
 #include <conn/connectivitysettings.h>

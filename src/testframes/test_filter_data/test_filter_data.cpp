@@ -3,8 +3,8 @@
 #include <Eigen/Dense>
 
 #include <dsp/filterkernel.h>
-#include <dsp/rt_filter.h>
-#include <dsp/rt_detect_trigger.h>
+#include <dsp/rt/rt_filter.h>
+#include <dsp/rt/rt_detect_trigger.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_info.h>
 

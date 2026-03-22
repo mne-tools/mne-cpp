@@ -40,9 +40,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "dsp_global.h"
+#include "../dsp_global.h"
 
-#include "filterkernel.h"
+#include "../filterkernel.h"
 
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_evoked.h>

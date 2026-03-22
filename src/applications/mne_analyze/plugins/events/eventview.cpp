@@ -42,7 +42,7 @@
 #include "ui_eventview.h"
 
 #include <fiff/fiff.h>
-#include <dsp/rt_detect_trigger.h>
+#include <dsp/rt/rt_detect_trigger.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <disp/viewers/triggerdetectionview.h>
 

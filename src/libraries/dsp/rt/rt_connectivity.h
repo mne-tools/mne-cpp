@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
- * @file     rtcov.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @file     rtconnectivity.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
  * @since    0.1.0
- * @date     July, 2012
+ * @date     July, 2018
  *
  * @section  LICENSE
  *
- * Copyright (C) 2012, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2018, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,34 +28,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     RtCov class declaration.
+ * @brief     RtConnectivity class declaration.
  *
  */
 
-#ifndef RT_COV_RTPROCESSING_H
-#define RT_COV_RTPROCESSING_H
+#ifndef RT_CONNECTIVITY_RTPROCESSING_H
+#define RT_CONNECTIVITY_RTPROCESSING_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "dsp_global.h"
-
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_info.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QSharedPointer>
-#include <QThread>
+#include "../dsp_global.h"
+#include <conn/network/network.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QObject>
+#include <QThread>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -64,6 +59,10 @@
 
 namespace FIFFLIB {
     class FiffInfo;
+}
+
+namespace CONNLIB {
+    class ConnectivitySettings;
 }
 
 //=============================================================================================================
@@ -74,64 +73,87 @@ namespace RTPROCESSINGLIB
 {
 
 //=============================================================================================================
-// RTPROCESSINGLIB FORWARD DECLARATIONS
+// CONNLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-/**
- * @brief Bundled output of a real-time covariance computation step containing the covariance matrix and sample count.
- */
-struct RtCovComputeResult {
-    Eigen::VectorXd mu;
-    Eigen::MatrixXd matData;
-};
 
 //=============================================================================================================
 /**
- * Real-time covariance worker.
+ * Real-time connectivity worker.
  *
- * @brief Controller that manages background covariance matrix estimation from streaming data.
+ * @brief Background worker thread that computes functional connectivity metrics in real time.
  */
-class DSPSHARED_EXPORT RtCov : public QObject
+class DSPSHARED_EXPORT RtConnectivityWorker : public QObject
 {
     Q_OBJECT
 
 public:
-    RtCov(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+    //=========================================================================================================
+    /**
+     * Perform actual connectivity estimation.
+     *
+     * @param[in] connectivitySettings           The connectivity settings to be used during connectivity estimation.
+     */
+    void doWork(const CONNLIB::ConnectivitySettings& connectivitySettings);
+
+signals:
+    void resultReady(const  QList<CONNLIB::Network>& connectivityResults, const CONNLIB::ConnectivitySettings& connectivitySettings);
+};
+
+//=============================================================================================================
+/**
+ * Real-time connectivity estimation.
+ *
+ * @brief Controller that manages RtConnectivityWorker for online connectivity computation.
+ */
+class DSPSHARED_EXPORT RtConnectivity : public QObject
+{
+    Q_OBJECT
+
+public:
+    typedef QSharedPointer<RtConnectivity> SPtr;             /**< Shared pointer type for RtConnectivity. */
+    typedef QSharedPointer<const RtConnectivity> ConstSPtr;  /**< Const shared pointer type for RtConnectivity. */
 
     //=========================================================================================================
     /**
-     * Perform actual covariance estimation.
+     * Creates the real-time connectivity estimation object.
      *
-     * @param[in] inputData  Data to estimate the covariance from.
+     * @param[in] parent     Parent QObject (optional).
      */
-    FIFFLIB::FiffCov estimateCovariance(const Eigen::MatrixXd& matData,
-                                        int iNewMaxSamples);
+    explicit RtConnectivity(QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+     * Destroys the real-time connectivity estimation object.
+     */
+    ~RtConnectivity();
+
+    //=========================================================================================================
+    /**
+     * Slot to receive incoming data.
+     *
+     * @param[in] data  Data to estimate the connectivity from.
+     */
+    void append(const CONNLIB::ConnectivitySettings& connectivitySettings);
+
+    //=========================================================================================================
+    /**
+     * Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
+     */
+    void restart();
+
+    //=========================================================================================================
+    /**
+     * Stops the thread by interrupting its computation queue, quitting and waiting.
+     */
+    void stop();
 
 protected:
-    //=========================================================================================================
-    /**
-     * Computer multiplication with transposed.
-     *
-     * @param[in] matData  Data to self multiply with.
-     *
-     * @return   The multiplication result.
-     */
-    static RtCovComputeResult compute(const Eigen::MatrixXd &matData);
+    QThread             m_workerThread;         /**< The worker thread. */
 
-    //=========================================================================================================
-    /**
-     * Computer multiplication with transposed.
-     *
-     * @param[out]   finalResult     The final covariance estimation.
-     * @param[in]   tempResult      The intermediate result from the compute function.
-     */
-    static void reduce(RtCovComputeResult& finalResult, const RtCovComputeResult &tempResult);
+signals:
+    void newConnectivityResultAvailable(const QList<CONNLIB::Network>& connectivityResults, const CONNLIB::ConnectivitySettings& connectivitySettings);
 
-    int                     m_iSamples;                 /**< The number of stored samples. */
-
-    QList<Eigen::MatrixXd>  m_lData;                    /**< The stored data blocks. */
-
-    FIFFLIB::FiffInfo       m_fiffInfo;                 /**< Holds the fiff measurement information. */
+    void operate(const CONNLIB::ConnectivitySettings& connectivitySettings);
 };
 
 //=============================================================================================================
@@ -139,4 +161,4 @@ protected:
 //=============================================================================================================
 } // NAMESPACE
 
-#endif // RT_COV_RTPROCESSING_H
+#endif // RT_CONNECTIVITY_RTPROCESSING_H

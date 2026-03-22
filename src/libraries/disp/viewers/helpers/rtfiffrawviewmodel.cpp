@@ -48,7 +48,7 @@
 #include <utils/ioutils.h>
 
 #include <dsp/sphara.h>
-#include <dsp/rt_detect_trigger.h>
+#include <dsp/rt/rt_detect_trigger.h>
 
 //=============================================================================================================
 // QT INCLUDES

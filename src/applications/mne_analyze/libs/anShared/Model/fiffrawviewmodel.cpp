@@ -49,7 +49,7 @@
 
 #include <dsp/filterkernel.h>
 
-#include <dsp/rt_filter.h>
+#include <dsp/rt/rt_filter.h>
 
 //=============================================================================================================
 // QT INCLUDES

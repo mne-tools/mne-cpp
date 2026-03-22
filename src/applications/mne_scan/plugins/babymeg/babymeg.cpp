@@ -46,7 +46,7 @@
 #include "babymeginfo.h"
 
 #include <fiff/fiff_byte_swap.h>
-#include <dsp/rt_detect_trigger.h>
+#include <dsp/rt/rt_detect_trigger.h>
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <disp/viewers/projectsettingsview.h>

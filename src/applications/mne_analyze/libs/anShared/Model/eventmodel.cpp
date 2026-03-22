@@ -44,7 +44,7 @@
 #include <iomanip>
 #include <iostream>
 
-#include <dsp/rt_detect_trigger.h>
+#include <dsp/rt/rt_detect_trigger.h>
 
 //=============================================================================================================
 // QT INCLUDES

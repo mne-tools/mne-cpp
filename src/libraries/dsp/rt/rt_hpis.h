@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "dsp_global.h"
+#include "../dsp_global.h"
 #include <inv/hpi/inv_sensor_set.h>
 #include <inv/hpi/inv_signal_model.h>
 

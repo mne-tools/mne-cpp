@@ -4,12 +4,12 @@
 
 #include <utils/generics/mne_logger.h>
 
-#include <dsp/rt_averaging.h>
-#include <dsp/rt_noise.h>
-#include <dsp/rt_connectivity.h>
-#include <dsp/rt_inv_op.h>
-#include <dsp/rt_filter.h>
-#include <dsp/rt_detect_trigger.h>
+#include <dsp/rt/rt_averaging.h>
+#include <dsp/rt/rt_noise.h>
+#include <dsp/rt/rt_connectivity.h>
+#include <dsp/rt/rt_inv_op.h>
+#include <dsp/rt/rt_filter.h>
+#include <dsp/rt/rt_detect_trigger.h>
 
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>

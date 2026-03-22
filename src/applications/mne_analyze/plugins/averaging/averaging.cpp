@@ -59,7 +59,7 @@
 #include <disp/viewers/helpers/selectionsceneitem.h>
 
 #include <dsp/filterkernel.h>
-#include <dsp/rt_filter.h>
+#include <dsp/rt/rt_filter.h>
 
 #include <mne/mne_epoch_data_list.h>
 
