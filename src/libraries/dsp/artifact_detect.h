@@ -69,6 +69,27 @@ namespace UTILSLIB
 {
 
 //=============================================================================================================
+/** @brief ECG R-peak detection parameters (defined outside class to avoid Clang/GCC default-argument issues with nested structs). */
+struct DSPSHARED_EXPORT ArtifactDetectEcgParams
+{
+    double dFilterLow    =  5.0;    /**< Bandpass lower cutoff (Hz). */
+    double dFilterHigh   = 40.0;    /**< Bandpass upper cutoff (Hz). */
+    int    iFilterOrder  =  4;      /**< Butterworth order for the bandpass pre-filter. */
+    double dThreshFactor =  0.5;    /**< R-peak threshold = dThreshFactor * (max − min) + min of the filtered signal. */
+    double dMinRRSec     =  0.35;   /**< Minimum R–R interval in seconds (caps detection rate at ~170 bpm). */
+};
+
+//=============================================================================================================
+/** @brief EOG blink / saccade detection parameters (defined outside class to avoid Clang/GCC default-argument issues with nested structs). */
+struct DSPSHARED_EXPORT ArtifactDetectEogParams
+{
+    double dFilterHigh   = 10.0;    /**< Low-pass cutoff (Hz). */
+    int    iFilterOrder  =  4;      /**< Butterworth order for the low-pass pre-filter. */
+    double dThresholdV   = 150e-6;  /**< Absolute voltage threshold (V). Events are detected when the signal exceeds ±threshold. */
+    double dMinGapSec    =  0.3;    /**< Minimum gap between successive events in seconds. */
+};
+
+//=============================================================================================================
 /**
  * @brief ECG and EOG physiological artifact event detection.
  *
@@ -83,30 +104,8 @@ namespace UTILSLIB
 class DSPSHARED_EXPORT ArtifactDetect
 {
 public:
-    //=========================================================================================================
-    /**
-     * @brief Parameters for ECG R-peak detection.
-     */
-    struct EcgParams
-    {
-        double dFilterLow    =  5.0;    /**< Bandpass lower cutoff (Hz). */
-        double dFilterHigh   = 40.0;    /**< Bandpass upper cutoff (Hz). */
-        int    iFilterOrder  =  4;      /**< Butterworth order for the bandpass pre-filter. */
-        double dThreshFactor =  0.5;    /**< R-peak threshold = dThreshFactor * (max − min) + min of the filtered signal. */
-        double dMinRRSec     =  0.35;   /**< Minimum R–R interval in seconds (caps detection rate at ~170 bpm). */
-    };
-
-    //=========================================================================================================
-    /**
-     * @brief Parameters for EOG blink / saccade detection.
-     */
-    struct EogParams
-    {
-        double dFilterHigh   = 10.0;    /**< Low-pass cutoff (Hz). */
-        int    iFilterOrder  =  4;      /**< Butterworth order for the low-pass pre-filter. */
-        double dThresholdV   = 150e-6;  /**< Absolute voltage threshold (V). Events are detected when the signal exceeds ±threshold. */
-        double dMinGapSec    =  0.3;    /**< Minimum gap between successive events in seconds. */
-    };
+    using EcgParams = ArtifactDetectEcgParams; /**< Convenience alias so callers can still write ArtifactDetect::EcgParams. */
+    using EogParams = ArtifactDetectEogParams; /**< Convenience alias so callers can still write ArtifactDetect::EogParams. */
 
     //=========================================================================================================
     /**

@@ -76,6 +76,21 @@ namespace UTILSLIB
 {
 
 //=============================================================================================================
+/** @brief Bad-channel detection parameters (defined outside class to avoid Clang/GCC default-argument issues with nested structs). */
+struct DSPSHARED_EXPORT BadChannelDetectParams
+{
+    // Flat signal
+    double dFlatThreshold = 1e-13;  /**< Peak-to-peak below this -> flat (SI units; ~0.1 fT for MEG). */
+
+    // High variance
+    double dVarZThresh    = 4.0;    /**< Z-score of std-dev above this -> noisy. */
+
+    // Low correlation
+    double dCorrThresh    = 0.4;    /**< Mean absolute neighbour correlation below this -> isolated. */
+    int    iNeighbours    = 5;      /**< Number of channels on each side to use as neighbours. */
+};
+
+//=============================================================================================================
 /**
  * @brief Automated detection of bad MEG/EEG channels using flat, variance, and correlation criteria.
  *
@@ -93,22 +108,7 @@ namespace UTILSLIB
 class DSPSHARED_EXPORT BadChannelDetect
 {
 public:
-    //=========================================================================================================
-    /**
-     * @brief Combined detection parameters.
-     */
-    struct Params
-    {
-        // Flat signal
-        double dFlatThreshold = 1e-13;  /**< Peak-to-peak below this → flat (SI units; ~0.1 fT for MEG). */
-
-        // High variance
-        double dVarZThresh    = 4.0;    /**< Z-score of std-dev above this → noisy. */
-
-        // Low correlation
-        double dCorrThresh    = 0.4;    /**< Mean absolute neighbour correlation below this → isolated. */
-        int    iNeighbours    = 5;      /**< Number of channels on each side to use as neighbours. */
-    };
+    using Params = BadChannelDetectParams; /**< Convenience alias so callers can still write BadChannelDetect::Params. */
 
     //=========================================================================================================
     /**
