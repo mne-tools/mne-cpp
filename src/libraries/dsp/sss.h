@@ -105,7 +105,7 @@ public:
     /**
      * @brief Configuration parameters for SSS/tSSS.
      */
-    struct DSPSHARED_EXPORT Params
+    struct Params
     {
         int    iOrderIn  = 8;                      /**< Internal spherical-harmonic expansion order (default 8). N_in = iOrderIn*(iOrderIn+2) = 80. */
         int    iOrderOut = 3;                      /**< External spherical-harmonic expansion order (default 3). N_out = iOrderOut*(iOrderOut+2) = 15. */
@@ -119,7 +119,7 @@ public:
      *
      * Call computeBasis() once; then re-use across many data segments.
      */
-    struct DSPSHARED_EXPORT Basis
+    struct Basis
     {
         Eigen::MatrixXd matSin;           /**< Internal basis S_in   (n_meg × N_in). */
         Eigen::MatrixXd matSout;          /**< External basis S_out  (n_meg × N_out). */

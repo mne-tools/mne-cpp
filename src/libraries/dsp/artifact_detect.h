@@ -87,7 +87,7 @@ public:
     /**
      * @brief Parameters for ECG R-peak detection.
      */
-    struct DSPSHARED_EXPORT EcgParams
+    struct EcgParams
     {
         double dFilterLow    =  5.0;    /**< Bandpass lower cutoff (Hz). */
         double dFilterHigh   = 40.0;    /**< Bandpass upper cutoff (Hz). */
@@ -100,7 +100,7 @@ public:
     /**
      * @brief Parameters for EOG blink / saccade detection.
      */
-    struct DSPSHARED_EXPORT EogParams
+    struct EogParams
     {
         double dFilterHigh   = 10.0;    /**< Low-pass cutoff (Hz). */
         int    iFilterOrder  =  4;      /**< Butterworth order for the low-pass pre-filter. */
