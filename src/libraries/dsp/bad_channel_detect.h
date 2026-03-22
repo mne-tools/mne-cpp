@@ -97,7 +97,7 @@ public:
     /**
      * @brief Combined detection parameters.
      */
-    struct DSPSHARED_EXPORT Params
+    struct Params
     {
         // Flat signal
         double dFlatThreshold = 1e-13;  /**< Peak-to-peak below this → flat (SI units; ~0.1 fT for MEG). */

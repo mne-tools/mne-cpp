@@ -96,7 +96,7 @@ public:
     /**
      * @brief Parameters controlling epoch extraction, baseline correction, and rejection.
      */
-    struct DSPSHARED_EXPORT Params
+    struct Params
     {
         double dTmin      = -0.2;   /**< Epoch start relative to event in seconds (negative = pre-stimulus). */
         double dTmax      =  0.5;   /**< Epoch end relative to event in seconds. */
