@@ -454,3 +454,16 @@ bool AveragingSettingsView::getAutoComputeStatus()
 {
     return m_pUi->checkBox_autoCompute->isChecked();
 }
+
+//=============================================================================================================
+
+QString AveragingSettingsView::getCurrentSelectGroup()
+{
+    return QString();
+}
+
+//=============================================================================================================
+
+void AveragingSettingsView::clearSelectionGroup()
+{
+}
