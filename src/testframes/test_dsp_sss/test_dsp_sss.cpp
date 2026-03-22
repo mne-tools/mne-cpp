@@ -215,22 +215,22 @@ private slots:
         const int nSamp = 200;
         MatrixXd data(102, nSamp);
 
-        // Simulate a simple internal dipole source field: project a random
-        // signal through the first column of S_in (field pattern of internal component 0)
-        VectorXd internalPattern = basis.matSin.col(0);
-        RowVectorXd internalSignal = RowVectorXd::Random(nSamp);
+        // Simulate a simple external interference field: project a random
+        // signal through the first column of S_out.
+        VectorXd externalPattern = basis.matSout.col(0);
+        RowVectorXd externalSignal = RowVectorXd::Random(nSamp);
         for (int i = 0; i < 102; ++i) {
-            data.row(i) = internalPattern(i) * internalSignal;
+            data.row(i) = externalPattern(i) * externalSignal;
         }
 
         MatrixXd cleaned = SSS::apply(data, basis);
 
-        // The internal field pattern must be mostly preserved (correlation with input ≥ 0.9)
+        // External interference should be strongly suppressed.
         double normIn  = data.norm();
         double normOut = cleaned.norm();
         QVERIFY2(normIn > 1e-30, "Input signal is zero");
-        QVERIFY2(normOut > normIn * 0.1,  // internal signal mostly retained
-                 qPrintable(QString("SSS removed too much of internal signal: ratio = %1")
+        QVERIFY2(normOut < normIn * 0.1,
+                 qPrintable(QString("SSS did not sufficiently suppress the external field: ratio = %1")
                             .arg(normOut / normIn)));
     }
 

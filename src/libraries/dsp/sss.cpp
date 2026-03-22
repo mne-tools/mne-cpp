@@ -100,6 +100,26 @@ MatrixXd regPinv(const MatrixXd& A, double reg = 1e-5)
     return svd.matrixV() * invSv.asDiagonal() * svd.matrixU().transpose();
 }
 
+//=============================================================================================================
+/**
+ * @brief Compute a thin orthonormal basis for the column space of A.
+ */
+MatrixXd orthonormalCols(const MatrixXd& A)
+{
+    if (A.size() == 0) {
+        return MatrixXd(A.rows(), 0);
+    }
+
+    ColPivHouseholderQR<MatrixXd> qr(A);
+    qr.setThreshold(1e-12);
+    const int rank = qr.rank();
+    if (rank <= 0) {
+        return MatrixXd(A.rows(), 0);
+    }
+
+    return qr.householderQ() * MatrixXd::Identity(A.rows(), rank);
+}
+
 } // anonymous namespace
 
 //=============================================================================================================
@@ -379,7 +399,22 @@ SSS::Basis SSS::computeBasis(const FiffInfo& fiffInfo, const Params& params)
     S.rightCols(basis.iNout) = basis.matSout;
 
     basis.matPinvAll = regPinv(S, params.dRegIn);          // (N_in+N_out) × n_meg
-    basis.matProjIn  = basis.matSin * basis.matPinvAll.topRows(basis.iNin); // n_meg × n_meg
+
+    // Build an oblique projector onto the internal subspace along the external
+    // subspace. This preserves internal components better than the direct
+    // joint-fit projector while still annihilating pure external components.
+    const MatrixXd Qin = orthonormalCols(basis.matSin);
+    const MatrixXd Qout = orthonormalCols(basis.matSout);
+
+    if (Qin.cols() == 0) {
+        basis.matProjIn = MatrixXd::Zero(nMeg, nMeg);
+        return basis;
+    }
+
+    const MatrixXd I = MatrixXd::Identity(nMeg, nMeg);
+    const MatrixXd QoutPerp = Qout.cols() > 0 ? (I - Qout * Qout.transpose()) : I;
+    const MatrixXd gram = Qin.transpose() * QoutPerp * Qin;
+    basis.matProjIn = Qin * regPinv(gram, params.dRegIn) * Qin.transpose() * QoutPerp;
 
     return basis;
 }

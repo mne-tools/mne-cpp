@@ -149,8 +149,25 @@ QVector<int> BadChannelDetect::detectHighVariance(const MatrixXd& matData,
         absDevs[ch] = std::abs(stds[ch] - med);
     double mad = median(absDevs);
 
-    // Consistency factor: MAD → σ for Gaussian = 1.4826
-    const double sigma = 1.4826 * mad;
+    // Consistency factor: MAD -> sigma for Gaussian = 1.4826
+    double sigma = 1.4826 * mad;
+
+    // If the robust scale collapses because most channels are identical and only
+    // a few are outliers, fall back to the classical std-dev across channel stds.
+    if (sigma < 1e-30) {
+        double meanStd = 0.0;
+        for (double value : stds) {
+            meanStd += value;
+        }
+        meanStd /= static_cast<double>(nCh);
+
+        double varStd = 0.0;
+        for (double value : stds) {
+            const double diff = value - meanStd;
+            varStd += diff * diff;
+        }
+        sigma = std::sqrt(varStd / static_cast<double>(nCh));
+    }
 
     if (sigma < 1e-30) return {};  // All channels identical (e.g. all zeros)
 
