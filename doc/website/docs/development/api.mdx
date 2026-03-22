@@ -15,29 +15,33 @@ The libraries are organized in layers: low-level I/O and math utilities at the b
 
 | Library | Namespace | Purpose |
 |---------|-----------|---------|
-| **Utils** | `UTILSLIB` | Math routines (`MNEMath`), spectral analysis (FFT, CSD, PSD), spectrogram, TPS surface warping, sphere fitting, simplex solver, K-Means clustering, I/O helpers, `CircularBuffer`, application logger |
-| **Fs** | `FSLIB` | Load and save FreeSurfer surfaces and annotations |
-| **Fiff** | `FIFFLIB` | Read and write FIFF (Functional Imaging File Format) files |
-| **Mne** | `MNELIB` | Core data structures matching MNE-C: `ForwardSolution`, `InverseOperator`, `SourceEstimate`, `SourceSpace`, `BemSurface`, `EpochData`, and more |
+| **Utils** | `UTILSLIB` | Shared utilities: I/O helpers, spectral analysis, layout management, and warp algorithms |
+| **Math** | `MATHLIB` | Mathematical algorithms and geometry: linear algebra, optimization, spectral estimation, K-Means, sphere fitting |
+| **Fs** | `FSLIB` | FreeSurfer surface and annotation I/O |
+| **Fiff** | `FIFFLIB` | FIFF file I/O and data structures (raw, epochs, evoked, covariance, forward) |
+| **Mne** | `MNELIB` | Core MNE data structures: source spaces, source estimates, hemispheres |
+| **Mri** | `MRILIB` | MRI volume and coordinate-system I/O (volumes, voxel geometry, transforms) |
+| **Bids** | `BIDSLIB` | BIDS dataset reading, writing, path construction, and sidecar metadata handling for iEEG/EEG/MEG |
 
 ### Processing Libraries
 
 | Library | Namespace | Purpose |
 |---------|-----------|---------|
-| **Fwd** | `FWDLIB` | Forward solution computation from FreeSurfer reconstructions for MEG/EEG source localization |
-| **Inverse** | `INVERSELIB` | Source localization: MNE estimation, single dipole fitting, HPI coil fitting, RAP-MUSIC (with optional GPU/CUDA) |
-| **RtProcessing** | `RTPROCESSINGLIB` | Real-time processing: averaging, filtering, ICP, trigger detection, SPHARA; asynchronous workers for connectivity, HPI fitting, inverse computation, and noise estimation |
-| **Connectivity** | `CONNECTIVITYLIB` | Functional connectivity metrics (Correlation, Cross-Correlation, Coherence, Imaginary Coherence, PLV, PLI, WPLI, and variants) with network storage, graph measures, and thresholding |
-| **Communication** | `COMMUNICATIONLIB` | Client/command interface for communicating with `mne_rt_server` |
+| **Fwd** | `FWDLIB` | Forward modelling: BEM and MEG/EEG lead field computation |
+| **Inv** | `INVLIB` | Inverse source estimation: MNE, dSPM, sLORETA, beamforming, dipole fitting, HPI fitting, RAP-MUSIC |
+| **Dsp** | `DSPLIB` | Digital signal processing: filtering, spectrograms, real-time averaging, trigger detection, SPHARA, HPI, noise reduction |
+| **Conn** | `CONNLIB` | Functional connectivity metrics: Coherence, Cross-Correlation, PLV, PLI, WPLI, and variants |
+| **Lsl** | `LSLLIB` | Lab Streaming Layer (LSL) integration for real-time data exchange |
+| **Com** | `COMLIB` | Real-time client/server communication (commands, raw data streaming) with `mne_rt_server` |
 
 ### Visualization Libraries
 
 | Library | Namespace | Purpose |
 |---------|-----------|---------|
-| **Disp** | `DISPLIB` | 2D plot types (bar, graph, imagesc, lineplot, spline, tfplot) and ready-to-use `QWidget`-based viewers with GUI controls |
-| **Disp3D (RHI)** | `DISP3DRHILIB` | RHI-based 3D visualization: cortical surfaces, connectivity networks, digitizers, BEM models, source estimates, dipoles — supports Metal, Vulkan, D3D, and OpenGL backends |
+| **Disp** | `DISPLIB` | 2D display widgets and visualization helpers: charts, topography, colour maps, `QWidget`-based viewers |
+| **Disp3D** | `DISP3DLIB` | 3D brain visualization using the Qt RHI rendering backend: cortical surfaces, connectivity networks, BEM models, source estimates, digitizers — supports Metal, Vulkan, D3D, and OpenGL backends |
 
-For in-depth guides on specific libraries, see the [Connectivity](api-connectivity.mdx) and [Disp3D (RHI)](api-disp3d.mdx) pages.
+For in-depth guides on specific libraries, see the [Conn](api-connectivity.mdx) and [Disp3D](api-disp3d.mdx) pages.
 
 ## API Reference (Doxygen)
 
