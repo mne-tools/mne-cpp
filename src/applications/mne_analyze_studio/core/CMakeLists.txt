@@ -15,6 +15,7 @@ set(SOURCES
     fiffbuffer.cpp
     interfaces.cpp
     jsonrpcmessage.cpp
+    llmtoolplanner.cpp
     mcprouter.cpp
     scenecontextregistry.cpp
     viewmanager.cpp
@@ -25,6 +26,7 @@ set(HEADERS
     ibuffer.h
     imcpneuroskill.h
     jsonrpcmessage.h
+    llmtoolplanner.h
     mcprouter.h
     scenecontextregistry.h
     studio_core_global.h

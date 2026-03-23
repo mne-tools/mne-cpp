@@ -22,6 +22,7 @@ using namespace MNEANALYZESTUDIO;
 AgentChatDockWidget::AgentChatDockWidget(QWidget* parent)
 : QWidget(parent)
 , m_titleLabel(new QLabel("Agentic Coworker"))
+, m_statusLabel(new QLabel("LLM: Deterministic fallback only"))
 , m_transcript(new QTextEdit)
 , m_input(new QLineEdit)
 , m_sendButton(new QPushButton("Send"))
@@ -31,6 +32,8 @@ AgentChatDockWidget::AgentChatDockWidget(QWidget* parent)
     layout->setSpacing(10);
 
     m_titleLabel->setObjectName("agentChatTitle");
+    m_statusLabel->setObjectName("agentChatStatus");
+    m_statusLabel->setWordWrap(true);
     m_transcript->setReadOnly(true);
     m_transcript->setPlaceholderText("Agent history will appear here.");
     m_input->setPlaceholderText("Ask the agent or call tools/call...");
@@ -42,6 +45,7 @@ AgentChatDockWidget::AgentChatDockWidget(QWidget* parent)
     composerLayout->addWidget(m_sendButton);
 
     layout->addWidget(m_titleLabel);
+    layout->addWidget(m_statusLabel);
     layout->addWidget(m_transcript, 1);
     layout->addLayout(composerLayout);
 
@@ -55,6 +59,11 @@ AgentChatDockWidget::AgentChatDockWidget(QWidget* parent)
         emit commandSubmitted(text);
         m_input->clear();
     });
+}
+
+void AgentChatDockWidget::setPlannerStatus(const QString& statusText)
+{
+    m_statusLabel->setText(statusText);
 }
 
 void AgentChatDockWidget::appendTranscript(const QString& text)

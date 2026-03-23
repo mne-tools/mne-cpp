@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     agentchatdockwidget.h
+ * @file     llmtoolplanner.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @version  dev
  * @date     March, 2026
@@ -27,47 +27,77 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @brief    Declares the agent chat widget used by the workbench sidebar.
+ * @brief    Declares an OpenAI-compatible LLM planner adapter for studio tool selection.
  */
 
-#ifndef MNE_ANALYZE_STUDIO_AGENTCHATDOCKWIDGET_H
-#define MNE_ANALYZE_STUDIO_AGENTCHATDOCKWIDGET_H
+#ifndef MNE_ANALYZE_STUDIO_LLMTOOLPLANNER_H
+#define MNE_ANALYZE_STUDIO_LLMTOOLPLANNER_H
 
-#include <QWidget>
+#include "studio_core_global.h"
 
-class QLineEdit;
-class QLabel;
-class QPushButton;
-class QTextEdit;
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QObject>
+#include <QStringList>
+
+class QNetworkAccessManager;
 
 namespace MNEANALYZESTUDIO
 {
 
+struct LlmPlannerConfig
+{
+    QString mode;
+    QString providerName;
+    QString endpoint;
+    QString apiKey;
+    QString model;
+};
+
+struct LlmPlanResult
+{
+    bool usedModel = false;
+    bool success = false;
+    QString providerName;
+    QString summary;
+    QString errorMessage;
+    QString rawResponse;
+    QStringList plannedCommands;
+};
+
 /**
- * @brief Sidebar chat widget that captures agent prompts and displays transcript history.
+ * @brief OpenAI-compatible HTTP adapter that asks an LLM to plan tool calls.
  */
-class AgentChatDockWidget : public QWidget
+class STUDIOCORESHARED_EXPORT LlmToolPlanner : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit AgentChatDockWidget(QWidget* parent = nullptr);
-    void setPlannerStatus(const QString& statusText);
+    explicit LlmToolPlanner(QObject* parent = nullptr);
 
-signals:
-    void commandSubmitted(const QString& commandText);
-
-public slots:
-    void appendTranscript(const QString& text);
+    void setConfiguration(const LlmPlannerConfig& config);
+    LlmPlannerConfig configuration() const;
+    bool isConfigured() const;
+    bool isMockMode() const;
+    QString providerName() const;
+    QString statusSummary() const;
+    LlmPlanResult plan(const QString& userCommand,
+                       const QJsonArray& toolDefinitions,
+                       const QJsonObject& context) const;
 
 private:
-    QLabel* m_titleLabel;
-    QLabel* m_statusLabel;
-    QTextEdit* m_transcript;
-    QLineEdit* m_input;
-    QPushButton* m_sendButton;
+    QString configOrEnv(const QString& configuredValue, const char* envName) const;
+    QString mode() const;
+    QString endpoint() const;
+    QString apiKey() const;
+    QString model() const;
+    QString extractContentString(const QJsonObject& response) const;
+    QString extractJsonPayload(const QString& text) const;
+
+    LlmPlannerConfig m_config;
+    mutable QNetworkAccessManager* m_networkAccessManager;
 };
 
 } // namespace MNEANALYZESTUDIO
 
-#endif // MNE_ANALYZE_STUDIO_AGENTCHATDOCKWIDGET_H
+#endif // MNE_ANALYZE_STUDIO_LLMTOOLPLANNER_H

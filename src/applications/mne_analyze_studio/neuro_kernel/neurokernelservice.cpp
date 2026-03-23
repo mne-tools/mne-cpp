@@ -27,6 +27,96 @@
 
 using namespace MNEANALYZESTUDIO;
 
+namespace
+{
+
+QJsonObject objectSchema(const QJsonObject& properties,
+                         const QJsonArray& required = QJsonArray())
+{
+    return QJsonObject{
+        {"type", "object"},
+        {"properties", properties},
+        {"required", required}
+    };
+}
+
+QJsonObject numberSchema(const QString& title,
+                         const QString& description = QString())
+{
+    QJsonObject schema{
+        {"type", "number"},
+        {"title", title}
+    };
+
+    if(!description.isEmpty()) {
+        schema.insert("description", description);
+    }
+
+    return schema;
+}
+
+QJsonObject integerSchema(const QString& title,
+                          int minimum,
+                          int maximum,
+                          int defaultValue,
+                          const QString& description = QString())
+{
+    QJsonObject schema{
+        {"type", "integer"},
+        {"title", title},
+        {"minimum", minimum},
+        {"maximum", maximum},
+        {"default", defaultValue}
+    };
+
+    if(!description.isEmpty()) {
+        schema.insert("description", description);
+    }
+
+    return schema;
+}
+
+QJsonObject stringSchema(const QString& title,
+                         const QJsonArray& values = QJsonArray(),
+                         const QString& defaultValue = QString(),
+                         const QString& description = QString())
+{
+    QJsonObject schema{
+        {"type", "string"},
+        {"title", title},
+        {"default", defaultValue}
+    };
+
+    if(!values.isEmpty()) {
+        schema.insert("enum", values);
+    }
+
+    if(!description.isEmpty()) {
+        schema.insert("description", description);
+    }
+
+    return schema;
+}
+
+QJsonObject arraySchema(const QString& title,
+                        const QJsonObject& itemSchema,
+                        const QString& description = QString())
+{
+    QJsonObject schema{
+        {"type", "array"},
+        {"title", title},
+        {"items", itemSchema}
+    };
+
+    if(!description.isEmpty()) {
+        schema.insert("description", description);
+    }
+
+    return schema;
+}
+
+}
+
 NeuroKernelService::NeuroKernelService(QObject* parent)
 : QObject(parent)
 , m_router(this)
@@ -151,6 +241,7 @@ QJsonObject NeuroKernelService::handleToolCall(const QJsonObject& params) const
 
         return QJsonObject{
             {"status", "ok"},
+            {"tool_name", toolName},
             {"message", QString("Raw stats for %1 samples %2-%3: RMS=%4, mean|x|=%5, peak|x|=%6, top channels=%7")
                             .arg(QFileInfo(filePath).fileName())
                             .arg(fromSample)
@@ -251,6 +342,7 @@ QJsonObject NeuroKernelService::handleToolCall(const QJsonObject& params) const
 
         return QJsonObject{
             {"status", "ok"},
+            {"tool_name", toolName},
             {"message", QString("Channel stats for %1 samples %2-%3: %4")
                             .arg(QFileInfo(filePath).fileName())
                             .arg(fromSample)
@@ -268,9 +360,91 @@ QJsonObject NeuroKernelService::handleToolCall(const QJsonObject& params) const
         };
     }
 
+    if(toolName == "neurokernel.find_peak_window") {
+        const QString filePath = arguments.value("file").toString();
+        if(!QFileInfo::exists(filePath)) {
+            return QJsonObject{
+                {"status", "error"},
+                {"message", QString("Neuro-Kernel could not find raw file: %1").arg(filePath)}
+            };
+        }
+
+        QFile file(filePath);
+        FIFFLIB::FiffRawData raw(file);
+        if(raw.isEmpty()) {
+            return QJsonObject{
+                {"status", "error"},
+                {"message", QString("Neuro-Kernel could not parse raw file: %1").arg(filePath)}
+            };
+        }
+
+        const int requestedFrom = arguments.value("from_sample").toInt(raw.first_samp);
+        const int requestedTo = arguments.value("to_sample").toInt(raw.last_samp);
+        const int fromSample = std::max<int>(raw.first_samp, requestedFrom);
+        const int toSample = std::min<int>(raw.last_samp, requestedTo);
+        const QString match = arguments.value("match").toString().trimmed();
+
+        Eigen::MatrixXd data;
+        Eigen::MatrixXd times;
+        if(!raw.read_raw_segment(data, times, fromSample, toSample)) {
+            return QJsonObject{
+                {"status", "error"},
+                {"message", QString("Neuro-Kernel could not read raw segment for %1").arg(filePath)}
+            };
+        }
+
+        double peakValue = -1.0;
+        int peakRow = -1;
+        int peakColumn = -1;
+        for(int row = 0; row < data.rows(); ++row) {
+            const QString channelName = raw.info.ch_names.value(row);
+            if(!match.isEmpty() && !channelName.contains(match, Qt::CaseInsensitive)) {
+                continue;
+            }
+
+            Eigen::Index localColumn = 0;
+            const double localPeak = data.row(row).array().abs().maxCoeff(&localColumn);
+            if(localPeak > peakValue) {
+                peakValue = localPeak;
+                peakRow = row;
+                peakColumn = static_cast<int>(localColumn);
+            }
+        }
+
+        if(peakRow < 0 || peakColumn < 0) {
+            return QJsonObject{
+                {"status", "error"},
+                {"message", QString("Neuro-Kernel could not find a matching peak window for %1").arg(filePath)}
+            };
+        }
+
+        const int peakSample = fromSample + peakColumn;
+        const QString peakChannel = raw.info.ch_names.value(peakRow);
+        return QJsonObject{
+            {"status", "ok"},
+            {"tool_name", toolName},
+            {"message", QString("Peak window for %1: sample %2 on %3 with |x|=%4")
+                            .arg(QFileInfo(filePath).fileName())
+                            .arg(peakSample)
+                            .arg(peakChannel)
+                            .arg(peakValue, 0, 'g', 4)},
+            {"file", filePath},
+            {"from_sample", fromSample},
+            {"to_sample", toSample},
+            {"match", match},
+            {"peak_sample", peakSample},
+            {"peak_channel", peakChannel},
+            {"peak_abs", peakValue},
+            {"plane", "data"},
+            {"transport", "local_socket"},
+            {"protocol", "mcp-over-json-rpc-2.0"}
+        };
+    }
+
     if(toolName == "neurokernel.execute") {
         return QJsonObject{
             {"status", "ok"},
+            {"tool_name", toolName},
             {"message", QString("Neuro-Kernel executed command: %1").arg(arguments.value("command").toString())},
             {"plane", "data"},
             {"transport", "local_socket"},
@@ -288,6 +462,7 @@ QJsonObject NeuroKernelService::handleToolsList() const
 {
     return QJsonObject{
         {"status", "ok"},
+        {"tool_name", "tools/list"},
         {"message", QString("Kernel tools: %1").arg(toolDefinitions().size())},
         {"tools", toolDefinitions()},
         {"plane", "data"},
@@ -301,15 +476,111 @@ QJsonArray NeuroKernelService::toolDefinitions() const
     return QJsonArray{
         QJsonObject{
             {"name", "neurokernel.execute"},
-            {"description", "Execute a generic neuro-kernel command string."}
+            {"description", "Execute a generic neuro-kernel command string."},
+            {"input_schema", objectSchema(QJsonObject{
+                 {"command", stringSchema("Command",
+                                          QJsonArray(),
+                                          "help",
+                                          "Generic Neuro-Kernel command string for debugging or fallback execution.")}
+             }, QJsonArray{"command"})},
+            {"result_schema", objectSchema(QJsonObject{
+                 {"status", stringSchema("Status", QJsonArray{"ok", "error", "ignored"})},
+                 {"tool_name", stringSchema("Tool Name")},
+                 {"message", stringSchema("Message")}
+             }, QJsonArray{"status", "tool_name", "message"})}
         },
         QJsonObject{
             {"name", "neurokernel.raw_stats"},
-            {"description", "Compute RMS, mean absolute value, peak absolute value, and top channels for a raw sample window."}
+            {"description", "Compute RMS, mean absolute value, peak absolute value, and top channels for a raw sample window."},
+            {"input_schema", objectSchema(QJsonObject{
+                 {"window_samples", integerSchema("Window Samples",
+                                                  1,
+                                                  1000000,
+                                                  600,
+                                                  "Number of samples around the current cursor to include in the analysis window.")}
+             }, QJsonArray{"window_samples"})},
+            {"result_schema", objectSchema(QJsonObject{
+                 {"status", stringSchema("Status", QJsonArray{"ok", "error"})},
+                 {"tool_name", stringSchema("Tool Name")},
+                 {"message", stringSchema("Message")},
+                 {"file", stringSchema("File")},
+                 {"from_sample", integerSchema("From Sample", 0, 1000000000, 0)},
+                 {"to_sample", integerSchema("To Sample", 0, 1000000000, 0)},
+                 {"channel_count", integerSchema("Channel Count", 0, 1000000, 0)},
+                 {"sample_count", integerSchema("Sample Count", 0, 1000000000, 0)},
+                 {"rms", numberSchema("RMS", "Root mean square value over the selected raw window.")},
+                 {"mean_abs", numberSchema("Mean Absolute", "Mean absolute amplitude over the selected raw window.")},
+                 {"peak_abs", numberSchema("Peak Absolute", "Peak absolute amplitude over the selected raw window.")},
+                 {"top_channels", arraySchema("Top Channels",
+                                              objectSchema(QJsonObject{
+                                                  {"name", stringSchema("Channel Name")},
+                                                  {"rms", numberSchema("Channel RMS")}
+                                              }, QJsonArray{"name", "rms"}))}
+             }, QJsonArray{"status", "tool_name", "message", "rms", "mean_abs", "peak_abs"})}
         },
         QJsonObject{
             {"name", "neurokernel.channel_stats"},
-            {"description", "Compute per-channel RMS, mean absolute value, and peak absolute value for a raw sample window."}
+            {"description", "Compute per-channel RMS, mean absolute value, and peak absolute value for a raw sample window."},
+            {"input_schema", objectSchema(QJsonObject{
+                 {"window_samples", integerSchema("Window Samples",
+                                                  1,
+                                                  1000000,
+                                                  600,
+                                                  "Number of samples around the current cursor to analyze.")},
+                 {"limit", integerSchema("Channel Limit",
+                                         1,
+                                         512,
+                                         5,
+                                         "Maximum number of channels to return in the result.")},
+                 {"match", stringSchema("Channel Match",
+                                        QJsonArray{"", "EEG", "MEG", "EOG"},
+                                        "EEG",
+                                        "Optional channel-name filter applied before ranking channels.")}
+             }, QJsonArray{"window_samples"})},
+            {"result_schema", objectSchema(QJsonObject{
+                 {"status", stringSchema("Status", QJsonArray{"ok", "error"})},
+                 {"tool_name", stringSchema("Tool Name")},
+                 {"message", stringSchema("Message")},
+                 {"file", stringSchema("File")},
+                 {"from_sample", integerSchema("From Sample", 0, 1000000000, 0)},
+                 {"to_sample", integerSchema("To Sample", 0, 1000000000, 0)},
+                 {"match", stringSchema("Channel Match")},
+                 {"channel_count", integerSchema("Channel Count", 0, 1000000, 0)},
+                 {"channels", arraySchema("Channels",
+                                          objectSchema(QJsonObject{
+                                              {"name", stringSchema("Channel Name")},
+                                              {"rms", numberSchema("Channel RMS")},
+                                              {"mean_abs", numberSchema("Mean Absolute")},
+                                              {"peak_abs", numberSchema("Peak Absolute")}
+                                          }, QJsonArray{"name", "rms", "mean_abs", "peak_abs"}))}
+             }, QJsonArray{"status", "tool_name", "message", "channels"})}
+        },
+        QJsonObject{
+            {"name", "neurokernel.find_peak_window"},
+            {"description", "Find the strongest absolute-amplitude sample inside a raw window, optionally filtered by channel name match."},
+            {"input_schema", objectSchema(QJsonObject{
+                 {"window_samples", integerSchema("Window Samples",
+                                                  1,
+                                                  1000000,
+                                                  4000,
+                                                  "Number of samples to search for the strongest absolute-amplitude event.")},
+                 {"match", stringSchema("Channel Match",
+                                        QJsonArray{"", "EEG", "MEG", "EOG"},
+                                        "EEG",
+                                        "Optional channel-name filter used while searching for the peak window.")}
+             }, QJsonArray{"window_samples"})},
+            {"result_schema", objectSchema(QJsonObject{
+                 {"status", stringSchema("Status", QJsonArray{"ok", "error"})},
+                 {"tool_name", stringSchema("Tool Name")},
+                 {"message", stringSchema("Message")},
+                 {"file", stringSchema("File")},
+                 {"from_sample", integerSchema("From Sample", 0, 1000000000, 0)},
+                 {"to_sample", integerSchema("To Sample", 0, 1000000000, 0)},
+                 {"match", stringSchema("Channel Match")},
+                 {"peak_sample", integerSchema("Peak Sample", 0, 1000000000, 0)},
+                 {"peak_channel", stringSchema("Peak Channel")},
+                 {"peak_abs", numberSchema("Peak Absolute")}
+             }, QJsonArray{"status", "tool_name", "message", "peak_sample", "peak_channel", "peak_abs"})}
         }
     };
 }

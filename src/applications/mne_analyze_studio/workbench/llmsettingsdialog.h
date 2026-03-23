@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     agentchatdockwidget.h
+ * @file     llmsettingsdialog.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @version  dev
  * @date     March, 2026
@@ -27,47 +27,54 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @brief    Declares the agent chat widget used by the workbench sidebar.
+ * @brief    Declares the in-app LLM planner settings dialog.
  */
 
-#ifndef MNE_ANALYZE_STUDIO_AGENTCHATDOCKWIDGET_H
-#define MNE_ANALYZE_STUDIO_AGENTCHATDOCKWIDGET_H
+#ifndef MNE_ANALYZE_STUDIO_LLMSETTINGSDIALOG_H
+#define MNE_ANALYZE_STUDIO_LLMSETTINGSDIALOG_H
 
-#include <QWidget>
+#include <llmtoolplanner.h>
 
-class QLineEdit;
+#include <QDialog>
+
+class QComboBox;
 class QLabel;
+class QLineEdit;
 class QPushButton;
 class QTextEdit;
 
 namespace MNEANALYZESTUDIO
 {
 
-/**
- * @brief Sidebar chat widget that captures agent prompts and displays transcript history.
- */
-class AgentChatDockWidget : public QWidget
+class LlmSettingsDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit AgentChatDockWidget(QWidget* parent = nullptr);
-    void setPlannerStatus(const QString& statusText);
+    explicit LlmSettingsDialog(const LlmPlannerConfig& config, QWidget* parent = nullptr);
 
-signals:
-    void commandSubmitted(const QString& commandText);
+    LlmPlannerConfig configuration() const;
+    void setTestScenario(const QString& prompt,
+                         const QJsonArray& toolDefinitions,
+                         const QJsonObject& context);
 
-public slots:
-    void appendTranscript(const QString& text);
+private slots:
+    void runPlannerTest();
 
 private:
-    QLabel* m_titleLabel;
-    QLabel* m_statusLabel;
-    QTextEdit* m_transcript;
-    QLineEdit* m_input;
-    QPushButton* m_sendButton;
+    QComboBox* m_modeComboBox;
+    QLineEdit* m_providerLineEdit;
+    QLineEdit* m_endpointLineEdit;
+    QLineEdit* m_modelLineEdit;
+    QLineEdit* m_apiKeyLineEdit;
+    QTextEdit* m_toolInventoryView;
+    QLabel* m_testStatusLabel;
+    QPushButton* m_testButton;
+    QString m_testPrompt;
+    QJsonArray m_testToolDefinitions;
+    QJsonObject m_testContext;
 };
 
 } // namespace MNEANALYZESTUDIO
 
-#endif // MNE_ANALYZE_STUDIO_AGENTCHATDOCKWIDGET_H
+#endif // MNE_ANALYZE_STUDIO_LLMSETTINGSDIALOG_H

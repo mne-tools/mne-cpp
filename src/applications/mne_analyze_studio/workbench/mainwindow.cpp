@@ -11,12 +11,16 @@
 #include "mainwindow.h"
 
 #include "agentchatdockwidget.h"
+#include "editortabbar.h"
+#include "editortabwidget.h"
+#include "llmsettingsdialog.h"
 #include "rawdatabrowserwidget.h"
 
 #include <jsonrpcmessage.h>
 
 #include <QApplication>
 #include <QCloseEvent>
+#include <QComboBox>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QAction>
@@ -30,11 +34,21 @@
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QLocalSocket>
+#include <QInputDialog>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QDoubleSpinBox>
+#include <QFormLayout>
 #include <QMenu>
 #include <QMenuBar>
+#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QSettings>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+#include <QSpinBox>
 #include <QFrame>
+#include <QHeaderView>
 #include <QSplitter>
 #include <QStatusBar>
 #include <QStackedWidget>
@@ -69,6 +83,151 @@ QString formatToolDefinitions(const QJsonArray& tools)
     return entries.join(" | ");
 }
 
+QTreeWidgetItem* makeToolTreeItem(const QJsonObject& tool)
+{
+    const QString name = tool.value("name").toString().trimmed();
+    const QString description = tool.value("description").toString().trimmed();
+
+    QTreeWidgetItem* item = new QTreeWidgetItem(QStringList() << (name.isEmpty() ? QString("Unnamed Tool") : name));
+    item->setToolTip(0, description);
+    item->setData(0, Qt::UserRole, name);
+    item->setData(0, Qt::UserRole + 1, tool);
+
+    return item;
+}
+
+QTreeWidgetItem* buildJsonTreeItem(const QString& key, const QJsonValue& value)
+{
+    QString displayValue;
+    if(value.isObject()) {
+        displayValue = "{...}";
+    } else if(value.isArray()) {
+        displayValue = QString("[%1]").arg(value.toArray().size());
+    } else if(value.isString()) {
+        displayValue = value.toString();
+    } else if(value.isDouble()) {
+        displayValue = QString::number(value.toDouble(), 'g', 8);
+    } else if(value.isBool()) {
+        displayValue = value.toBool() ? QString("true") : QString("false");
+    } else if(value.isNull()) {
+        displayValue = "null";
+    } else {
+        displayValue = QString::fromUtf8(QJsonDocument::fromVariant(value.toVariant()).toJson(QJsonDocument::Compact));
+    }
+
+    QTreeWidgetItem* item = new QTreeWidgetItem(QStringList() << key << displayValue);
+    if(value.isObject()) {
+        const QJsonObject object = value.toObject();
+        for(auto it = object.constBegin(); it != object.constEnd(); ++it) {
+            item->addChild(buildJsonTreeItem(it.key(), it.value()));
+        }
+    } else if(value.isArray()) {
+        const QJsonArray array = value.toArray();
+        for(int i = 0; i < array.size(); ++i) {
+            item->addChild(buildJsonTreeItem(QString("[%1]").arg(i), array.at(i)));
+        }
+    }
+
+    return item;
+}
+
+QJsonObject objectSchema(const QJsonObject& properties,
+                         const QJsonArray& required = QJsonArray())
+{
+    return QJsonObject{
+        {"type", "object"},
+        {"properties", properties},
+        {"required", required}
+    };
+}
+
+QJsonObject integerSchema(const QString& title,
+                          int minimum,
+                          int maximum,
+                          int defaultValue,
+                          const QString& description = QString())
+{
+    QJsonObject schema{
+        {"type", "integer"},
+        {"title", title},
+        {"minimum", minimum},
+        {"maximum", maximum},
+        {"default", defaultValue}
+    };
+
+    if(!description.isEmpty()) {
+        schema.insert("description", description);
+    }
+
+    return schema;
+}
+
+QJsonObject numberSchema(const QString& title,
+                         double minimum,
+                         double maximum,
+                         double defaultValue,
+                         const QString& description = QString())
+{
+    QJsonObject schema{
+        {"type", "number"},
+        {"title", title},
+        {"minimum", minimum},
+        {"maximum", maximum},
+        {"default", defaultValue}
+    };
+
+    if(!description.isEmpty()) {
+        schema.insert("description", description);
+    }
+
+    return schema;
+}
+
+QJsonObject stringSchema(const QString& title,
+                         const QJsonArray& values = QJsonArray(),
+                         const QString& defaultValue = QString(),
+                         const QString& description = QString())
+{
+    QJsonObject schema{
+        {"type", "string"},
+        {"title", title},
+        {"default", defaultValue}
+    };
+
+    if(!values.isEmpty()) {
+        schema.insert("enum", values);
+    }
+
+    if(!description.isEmpty()) {
+        schema.insert("description", description);
+    }
+
+    return schema;
+}
+
+QJsonObject resultStringSchema(const QString& title,
+                               const QString& description = QString())
+{
+    return stringSchema(title, QJsonArray(), QString(), description);
+}
+
+QJsonObject arraySchema(const QString& title,
+                        const QJsonObject& itemSchema,
+                        const QString& description = QString())
+{
+    QJsonObject schema{
+        {"type", "array"},
+        {"title", title},
+        {"items", itemSchema}
+    };
+
+    if(!description.isEmpty()) {
+        schema.insert("description", description);
+    }
+
+    return schema;
+}
+
 }
 
 MainWindow::MainWindow(QWidget* parent)
@@ -80,13 +239,23 @@ MainWindow::MainWindow(QWidget* parent)
 , m_skillsButton(new QToolButton)
 , m_workspaceExplorer(new QTreeWidget)
 , m_skillsExplorer(new QTreeWidget)
+, m_skillsPage(new QWidget(this))
+, m_skillDetailsView(new QPlainTextEdit(this))
+, m_skillRunButton(new QPushButton("Run Tool...", this))
 , m_leftSidebarStack(new QStackedWidget)
 , m_mainSplitter(new QSplitter(Qt::Horizontal))
 , m_centerSplitter(new QSplitter(Qt::Vertical))
-, m_centerTabs(new QTabWidget)
+, m_centerTabs(new EditorTabWidget)
+, m_centerTabBar(new EditorTabBar(this))
 , m_bottomPanelTabs(new QTabWidget)
 , m_outputPanel(new QListWidget)
 , m_problemPanel(new QListWidget)
+, m_resultsTab(new QWidget(this))
+, m_resultsTitleLabel(new QLabel("No structured results yet."))
+, m_resultsActionButton(new QPushButton("Run Action", this))
+, m_resultsStack(new QStackedWidget(this))
+, m_resultsTree(new QTreeWidget(this))
+, m_resultsTable(new QTableWidget(this))
 , m_terminalTab(new QWidget(this))
 , m_terminalStatusLabel(new QLabel("Active view state: idle"))
 , m_terminalPanel(new QTextEdit)
@@ -94,6 +263,7 @@ MainWindow::MainWindow(QWidget* parent)
 , m_terminalRunButton(new QPushButton("Run"))
 , m_activeStateItem(new QListWidgetItem("Active view state: idle"))
 , m_kernelSocket(new QLocalSocket(this))
+, m_llmPlanner(this)
 , m_sceneRegistry(this)
 , m_viewManager(&m_sceneRegistry, this)
 {
@@ -102,9 +272,12 @@ MainWindow::MainWindow(QWidget* parent)
 
     createLayout();
     createConnections();
+    loadAgentSettings();
     restoreWorkspace();
     applyWorkbenchStyle();
+    refreshAgentPlannerStatus();
 
+    connect(m_kernelSocket, &QLocalSocket::connected, this, &MainWindow::requestKernelToolDefinitions);
     m_kernelSocket->connectToServer(kKernelSocketName);
 }
 
@@ -160,14 +333,23 @@ void MainWindow::createLayout()
     m_workspaceExplorer->setAlternatingRowColors(true);
     m_workspaceExplorer->setContextMenuPolicy(Qt::CustomContextMenu);
     m_skillsExplorer->setHeaderLabel("Extensions");
-    QTreeWidgetItem* skillsRoot = new QTreeWidgetItem(QStringList() << "Installed Skills");
-    skillsRoot->addChild(new QTreeWidgetItem(QStringList() << "MCP Tool Registry (planned)"));
-    skillsRoot->addChild(new QTreeWidgetItem(QStringList() << "Visualizer Skills (planned)"));
-    m_skillsExplorer->addTopLevelItem(skillsRoot);
-    skillsRoot->setExpanded(true);
+    m_skillsExplorer->setAlternatingRowColors(true);
+    m_skillsExplorer->setContextMenuPolicy(Qt::CustomContextMenu);
+    m_skillDetailsView->setReadOnly(true);
+    m_skillDetailsView->setPlaceholderText("Select a workbench or Neuro-Kernel tool to inspect it here.");
+    m_skillRunButton->setEnabled(false);
+
+    QVBoxLayout* skillsPageLayout = new QVBoxLayout(m_skillsPage);
+    skillsPageLayout->setContentsMargins(0, 0, 0, 0);
+    skillsPageLayout->setSpacing(8);
+    skillsPageLayout->addWidget(m_skillsExplorer, 2);
+    skillsPageLayout->addWidget(new QLabel("Tool Inspector", m_skillsPage));
+    skillsPageLayout->addWidget(m_skillDetailsView, 1);
+    skillsPageLayout->addWidget(m_skillRunButton);
+    rebuildSkillsExplorer();
 
     m_leftSidebarStack->addWidget(m_workspaceExplorer);
-    m_leftSidebarStack->addWidget(m_skillsExplorer);
+    m_leftSidebarStack->addWidget(m_skillsPage);
 
     leftSidebarLayout->addWidget(m_activityBar);
     leftSidebarLayout->addWidget(m_leftSidebarStack, 1);
@@ -177,16 +359,40 @@ void MainWindow::createLayout()
     m_centerTabs->setDocumentMode(true);
     m_centerTabs->setTabsClosable(true);
     m_centerTabs->setMovable(true);
+    m_centerTabs->setTabBar(m_centerTabBar);
     m_centerTabs->tabBar()->setExpanding(false);
 
     m_bottomPanelTabs->setDocumentMode(true);
     m_bottomPanelTabs->setMovable(false);
     m_bottomPanelTabs->addTab(m_outputPanel, "Output");
     m_bottomPanelTabs->addTab(m_problemPanel, "Problems");
+    m_bottomPanelTabs->addTab(m_resultsTab, "Results");
     m_bottomPanelTabs->addTab(m_terminalTab, "Terminal");
     m_outputPanel->setAlternatingRowColors(true);
     m_problemPanel->setAlternatingRowColors(true);
     m_outputPanel->addItem(m_activeStateItem);
+    m_resultsActionButton->setVisible(false);
+    m_resultsActionButton->setEnabled(false);
+    m_resultsTable->setColumnCount(4);
+    m_resultsTable->setHorizontalHeaderLabels(QStringList() << "Name" << "RMS" << "Mean |x|" << "Peak |x|");
+    m_resultsTable->setSortingEnabled(true);
+    m_resultsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_resultsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    m_resultsTable->horizontalHeader()->setStretchLastSection(true);
+    m_resultsTree->setColumnCount(2);
+    m_resultsTree->setHeaderLabels(QStringList() << "Field" << "Value");
+    m_resultsTree->setAlternatingRowColors(true);
+    m_resultsTitleLabel->setObjectName("terminalStatusLabel");
+    m_resultsStack->addWidget(m_resultsTree);
+    m_resultsStack->addWidget(m_resultsTable);
+
+    QVBoxLayout* resultsLayout = new QVBoxLayout(m_resultsTab);
+    resultsLayout->setContentsMargins(0, 0, 0, 0);
+    resultsLayout->setSpacing(8);
+    resultsLayout->addWidget(m_resultsTitleLabel);
+    resultsLayout->addWidget(m_resultsActionButton);
+    resultsLayout->addWidget(m_resultsStack, 1);
+
     m_terminalPanel->setReadOnly(true);
     m_terminalPanel->setLineWrapMode(QTextEdit::NoWrap);
     m_terminalStatusLabel->setObjectName("terminalStatusLabel");
@@ -249,6 +455,10 @@ void MainWindow::createLayout()
         openFileInView(filePath);
     });
 
+    QMenu* agentMenu = menuBar()->addMenu("Agent");
+    QAction* agentSettingsAction = agentMenu->addAction("Planner Settings...");
+    connect(agentSettingsAction, &QAction::triggered, this, &MainWindow::openAgentSettings);
+
     statusBar()->showMessage("Workbench online");
     appendOutputMessage("Workbench online");
     appendTerminalMessage("$ studio boot complete");
@@ -263,6 +473,35 @@ void MainWindow::createConnections()
     connect(m_skillsButton, &QToolButton::clicked, this, [this]() {
         switchPrimarySidebar("skills");
     });
+    connect(m_skillsExplorer, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem* current) {
+        updateSelectedSkillTool(current);
+    });
+    connect(m_skillsExplorer, &QTreeWidget::itemDoubleClicked, this, [this](QTreeWidgetItem* item) {
+        updateSelectedSkillTool(item);
+        if(!m_selectedSkillToolName.isEmpty()) {
+            runSelectedSkillTool();
+        }
+    });
+    connect(m_skillsExplorer, &QWidget::customContextMenuRequested, this, [this](const QPoint& position) {
+        QMenu contextMenu(this);
+        QTreeWidgetItem* item = m_skillsExplorer->itemAt(position);
+        if(item) {
+            updateSelectedSkillTool(item);
+        }
+
+        QAction* refreshToolsAction = contextMenu.addAction("Refresh Tool Registry");
+        connect(refreshToolsAction, &QAction::triggered, this, &MainWindow::requestKernelToolDefinitions);
+
+        if(!m_selectedSkillToolName.isEmpty()) {
+            QAction* runToolAction = contextMenu.addAction("Run Tool...");
+            connect(runToolAction, &QAction::triggered, this, &MainWindow::runSelectedSkillTool);
+        }
+
+        contextMenu.exec(m_skillsExplorer->viewport()->mapToGlobal(position));
+    });
+    connect(m_skillRunButton, &QPushButton::clicked, this, &MainWindow::runSelectedSkillTool);
+    connect(m_resultsActionButton, &QPushButton::clicked, this, &MainWindow::runResultPrimaryAction);
+    connect(m_resultsTable, &QTableWidget::itemSelectionChanged, this, &MainWindow::updateResultPrimaryActionForSelection);
     connect(m_workspaceExplorer, &QTreeWidget::itemDoubleClicked, this, [this](QTreeWidgetItem* item) {
         openWorkspaceItem(item);
     });
@@ -286,11 +525,8 @@ void MainWindow::createConnections()
         });
         contextMenu.exec(m_workspaceExplorer->viewport()->mapToGlobal(position));
     });
-    connect(m_centerTabs, &QTabWidget::tabCloseRequested, this, [this](int index) {
-        QWidget* widget = m_centerTabs->widget(index);
-        m_centerTabs->removeTab(index);
-        delete widget;
-    });
+    connect(m_centerTabs, &QTabWidget::tabCloseRequested, this, &MainWindow::closeCenterTab);
+    connect(m_centerTabBar, &EditorTabBar::closeButtonClicked, this, &MainWindow::closeCenterTab);
     connect(m_terminalRunButton, &QPushButton::clicked, this, [this]() {
         const QString commandText = m_terminalInput->text().trimmed();
         if(commandText.isEmpty()) {
@@ -317,6 +553,16 @@ void MainWindow::createConnections()
                     appendTerminalMessage(QString("> %1").arg(message));
                 } else {
                     const QJsonObject result = response.value("result").toObject();
+                    const QString toolName = result.value("tool_name").toString();
+                    if(toolName == "tools/list" && result.value("tools").isArray()) {
+                        m_cachedKernelToolDefinitions = result.value("tools").toArray();
+                        rebuildSkillsExplorer();
+                        statusBar()->showMessage(QString("Discovered %1 Neuro-Kernel tools.")
+                                                     .arg(result.value("tools").toArray().size()),
+                                                 4000);
+                        continue;
+                    }
+                    rememberToolResult(toolName, result);
                     QString message = result.value("message").toString(QJsonDocument(result).toJson(QJsonDocument::Compact));
                     if(result.contains("tools") && result.value("tools").isArray()) {
                         message = QString("%1 | %2").arg(message, formatToolDefinitions(result.value("tools").toArray()));
@@ -474,6 +720,7 @@ void MainWindow::applyWorkbenchStyle()
         "#sidebarTitle, #agentChatTitle {"
         "  background: #181c22; color: #c9d1d9; font-weight: 600; padding: 8px 12px;"
         "  border-bottom: 1px solid #30363d; }"
+        "#agentChatStatus { background: #181c22; color: #8b949e; padding: 8px 12px; border-bottom: 1px solid #30363d; }"
         "QTreeWidget, QListWidget, QTextEdit, QLineEdit, QTabWidget::pane {"
         "  background: #22272e; color: #d7dce2; border: none; }"
         "#terminalStatusLabel { background: #181c22; color: #8b949e; padding: 6px 8px; border: 1px solid #30363d; }"
@@ -496,7 +743,7 @@ void MainWindow::switchPrimarySidebar(const QString& sectionName)
     m_explorerButton->setChecked(workspaceSelected);
     m_skillsButton->setChecked(!workspaceSelected);
     m_leftSidebarStack->setCurrentWidget(workspaceSelected ? static_cast<QWidget*>(m_workspaceExplorer)
-                                                           : static_cast<QWidget*>(m_skillsExplorer));
+                                                           : static_cast<QWidget*>(m_skillsPage));
 
     if(workspaceSelected) {
         statusBar()->showMessage("Workspace explorer active");
@@ -526,6 +773,53 @@ void MainWindow::sendToolCall(const QString& commandText)
         return;
     }
 
+    bool plannedSteps = false;
+    QStringList plannedCommands;
+    const QString multiStepNote = planAgentSteps(commandText, plannedCommands, plannedSteps);
+    if(plannedSteps) {
+        if(!multiStepNote.isEmpty()) {
+            m_agentChatDock->appendTranscript(QString("Planner> %1").arg(multiStepNote));
+            appendTerminalMessage(QString("> %1").arg(multiStepNote));
+        }
+
+        for(int i = 0; i < plannedCommands.size(); ++i) {
+            const QString plannedCommand = resolvePlannerReferences(plannedCommands.at(i));
+            const QString stepNote = QString("Running step %1/%2: %3")
+                                         .arg(i + 1)
+                                         .arg(plannedCommands.size())
+                                         .arg(plannedCommand);
+            m_agentChatDock->appendTranscript(QString("Planner> %1").arg(stepNote));
+            appendTerminalMessage(QString("> %1").arg(stepNote));
+            sendToolCall(plannedCommand);
+        }
+        return;
+    }
+
+    if(m_llmPlanner.isConfigured()) {
+        const LlmPlanResult llmPlan = m_llmPlanner.plan(commandText,
+                                                       availableToolDefinitions(),
+                                                       llmPlanningContext(commandText));
+        if(llmPlan.success) {
+            const QString plannerMessage = llmPlan.summary.isEmpty()
+                ? QString("LLM planner (%1) proposed %2 steps.").arg(llmPlan.providerName).arg(llmPlan.plannedCommands.size())
+                : QString("LLM planner (%1): %2").arg(llmPlan.providerName, llmPlan.summary);
+            m_agentChatDock->appendTranscript(QString("Planner> %1").arg(plannerMessage));
+            appendTerminalMessage(QString("> %1").arg(plannerMessage));
+
+            for(int i = 0; i < llmPlan.plannedCommands.size(); ++i) {
+                const QString plannedCommand = resolvePlannerReferences(llmPlan.plannedCommands.at(i));
+                const QString stepNote = QString("Running LLM step %1/%2: %3")
+                                             .arg(i + 1)
+                                             .arg(llmPlan.plannedCommands.size())
+                                             .arg(plannedCommand);
+                m_agentChatDock->appendTranscript(QString("Planner> %1").arg(stepNote));
+                appendTerminalMessage(QString("> %1").arg(stepNote));
+                sendToolCall(plannedCommand);
+            }
+            return;
+        }
+    }
+
     bool planned = false;
     QString plannedCommand;
     const QString planningNote = planAgentIntent(commandText, plannedCommand, planned);
@@ -540,6 +834,235 @@ void MainWindow::sendToolCall(const QString& commandText)
 
     sendKernelToolCall("neurokernel.execute", QJsonObject{{"command", commandText}});
     appendTerminalMessage(QString("$ mcp tools/call %1").arg(commandText));
+}
+
+void MainWindow::closeCenterTab(int index)
+{
+    if(index < 0 || index >= m_centerTabs->count()) {
+        return;
+    }
+
+    QWidget* widget = m_centerTabs->widget(index);
+    m_centerTabs->removeTab(index);
+    delete widget;
+}
+
+QString MainWindow::planAgentSteps(const QString& commandText, QStringList& plannedCommands, bool& planned) const
+{
+    planned = false;
+    plannedCommands.clear();
+
+    const QString trimmed = commandText.trimmed();
+    if(trimmed.isEmpty()) {
+        return QString();
+    }
+
+    const QRegularExpression stepSeparator("\\s*(?:,\\s*then\\s+|;\\s*|\\s+and then\\s+|\\s+then\\s+)\\s*",
+                                           QRegularExpression::CaseInsensitiveOption);
+    const QStringList rawSteps = trimmed.split(stepSeparator, Qt::SkipEmptyParts);
+    if(rawSteps.size() <= 1) {
+        return QString();
+    }
+
+    QStringList mappedDescriptions;
+    for(const QString& rawStep : rawSteps) {
+        const QString stepLower = rawStep.trimmed().toLower();
+        const bool asksForGoto = stepLower.contains("go to") || stepLower.contains("goto")
+                                 || stepLower.contains("jump to") || stepLower.contains("move to");
+        const bool asksForPeak = stepLower.contains("strongest") || stepLower.contains("peak")
+                                 || stepLower.contains("burst");
+        if(asksForGoto && asksForPeak) {
+            const QRegularExpression windowPattern("(\\d+)\\s*(?:samples|sample)");
+            const QRegularExpressionMatch windowMatch = windowPattern.match(stepLower);
+            const int windowSamples = windowMatch.hasMatch() ? windowMatch.captured(1).toInt() : 4000;
+
+            QStringList jsonParts;
+            jsonParts << QString("\"window_samples\":%1").arg(windowSamples);
+            if(stepLower.contains("eeg")) {
+                jsonParts << "\"match\":\"EEG\"";
+            } else if(stepLower.contains("meg")) {
+                jsonParts << "\"match\":\"MEG\"";
+            } else if(stepLower.contains("eog")) {
+                jsonParts << "\"match\":\"EOG\"";
+            }
+
+            plannedCommands << QString("tools.call neurokernel.find_peak_window {%1}").arg(jsonParts.join(","));
+            plannedCommands << "tools.call view.raw.goto {\"sample\":${last_peak_sample}}";
+            mappedDescriptions << "Mapped strongest-burst search to `neurokernel.find_peak_window` and `view.raw.goto`.";
+            continue;
+        }
+
+        bool stepPlanned = false;
+        QString plannedCommand;
+        const QString stepNote = planAgentIntent(rawStep.trimmed(), plannedCommand, stepPlanned);
+        if(!stepPlanned || plannedCommand.isEmpty()) {
+            plannedCommands.clear();
+            return QString();
+        }
+
+        plannedCommands << plannedCommand;
+        mappedDescriptions << (stepNote.isEmpty() ? plannedCommand : stepNote);
+    }
+
+    planned = true;
+    return QString("Mapped your request into %1 steps: %2")
+        .arg(plannedCommands.size())
+        .arg(mappedDescriptions.join(" | "));
+}
+
+QString MainWindow::resolvePlannerReferences(const QString& commandText) const
+{
+    QString resolved = commandText;
+
+    if(resolved.contains("${last_peak_sample}")) {
+        const int peakSample = m_lastToolResult.value("peak_sample").toInt(-1);
+        if(peakSample >= 0) {
+            resolved.replace("${last_peak_sample}", QString::number(peakSample));
+        }
+    }
+
+    if(resolved.contains("${last_cursor_sample}")) {
+        RawDataBrowserWidget* rawBrowser = activeRawBrowser();
+        const int cursorSample = rawBrowser ? rawBrowser->cursorSample() : -1;
+        if(cursorSample >= 0) {
+            resolved.replace("${last_cursor_sample}", QString::number(cursorSample));
+        }
+    }
+
+    return resolved;
+}
+
+void MainWindow::rememberToolResult(const QString& toolName, const QJsonObject& result)
+{
+    if(toolName.isEmpty()) {
+        return;
+    }
+
+    m_lastToolName = toolName;
+    m_lastToolResult = result;
+    updateStructuredResultView(toolName, result);
+}
+
+void MainWindow::updateStructuredResultView(const QString& toolName, const QJsonObject& result)
+{
+    if(!m_resultsTree || !m_resultsTitleLabel || !m_resultsStack || !m_resultsTable || !m_resultsActionButton) {
+        return;
+    }
+
+    m_resultsTitleLabel->setText(QString("Latest structured result: %1").arg(toolName));
+    m_resultsCurrentToolName = toolName;
+    m_resultPrimaryActionCommand.clear();
+    m_resultsActionButton->setVisible(false);
+    m_resultsActionButton->setEnabled(false);
+    m_resultsTree->clear();
+    m_resultsTable->setRowCount(0);
+    m_resultsStack->setCurrentWidget(m_resultsTree);
+
+    if(result.isEmpty()) {
+        m_resultsTree->addTopLevelItem(new QTreeWidgetItem(QStringList() << "status" << "No result payload."));
+        return;
+    }
+
+    if(toolName == "neurokernel.channel_stats" && result.value("channels").isArray()) {
+        const QJsonArray channels = result.value("channels").toArray();
+        m_resultsTitleLabel->setText(result.value("message").toString(QString("Latest structured result: %1").arg(toolName)));
+        m_resultsTable->setRowCount(channels.size());
+        for(int row = 0; row < channels.size(); ++row) {
+            const QJsonObject channel = channels.at(row).toObject();
+            m_resultsTable->setItem(row, 0, new QTableWidgetItem(channel.value("name").toString()));
+            m_resultsTable->setItem(row, 1, new QTableWidgetItem(QString::number(channel.value("rms").toDouble(), 'g', 8)));
+            m_resultsTable->setItem(row, 2, new QTableWidgetItem(QString::number(channel.value("mean_abs").toDouble(), 'g', 8)));
+            m_resultsTable->setItem(row, 3, new QTableWidgetItem(QString::number(channel.value("peak_abs").toDouble(), 'g', 8)));
+        }
+        m_resultsStack->setCurrentWidget(m_resultsTable);
+        m_resultsActionButton->setText("Find Peak For Selected Channel");
+        m_resultsActionButton->setVisible(true);
+        updateResultPrimaryActionForSelection();
+        m_bottomPanelTabs->setCurrentWidget(m_resultsTab);
+        return;
+    }
+
+    if(toolName == "neurokernel.raw_stats" && result.value("top_channels").isArray()) {
+        const QJsonArray channels = result.value("top_channels").toArray();
+        m_resultsTitleLabel->setText(result.value("message").toString(QString("Latest structured result: %1").arg(toolName)));
+        m_resultsTable->setRowCount(channels.size());
+        for(int row = 0; row < channels.size(); ++row) {
+            const QJsonObject channel = channels.at(row).toObject();
+            m_resultsTable->setItem(row, 0, new QTableWidgetItem(channel.value("name").toString()));
+            m_resultsTable->setItem(row, 1, new QTableWidgetItem(QString::number(channel.value("rms").toDouble(), 'g', 8)));
+            m_resultsTable->setItem(row, 2, new QTableWidgetItem("-"));
+            m_resultsTable->setItem(row, 3, new QTableWidgetItem("-"));
+        }
+        m_resultsStack->setCurrentWidget(m_resultsTable);
+        m_resultsActionButton->setText("Find Peak For Selected Channel");
+        m_resultsActionButton->setVisible(true);
+        updateResultPrimaryActionForSelection();
+        m_bottomPanelTabs->setCurrentWidget(m_resultsTab);
+        return;
+    }
+
+    if(toolName == "neurokernel.find_peak_window") {
+        const int peakSample = result.value("peak_sample").toInt(-1);
+        if(peakSample >= 0) {
+            m_resultPrimaryActionCommand = QString("tools.call view.raw.goto {\"sample\":%1}").arg(peakSample);
+            m_resultsActionButton->setText(QString("Jump To Peak Sample %1").arg(peakSample));
+            m_resultsActionButton->setVisible(true);
+            m_resultsActionButton->setEnabled(true);
+        }
+    }
+
+    for(auto it = result.constBegin(); it != result.constEnd(); ++it) {
+        m_resultsTree->addTopLevelItem(buildJsonTreeItem(it.key(), it.value()));
+    }
+    m_resultsTree->expandToDepth(1);
+    for(int column = 0; column < m_resultsTree->columnCount(); ++column) {
+        m_resultsTree->resizeColumnToContents(column);
+    }
+    m_bottomPanelTabs->setCurrentWidget(m_resultsTab);
+}
+
+void MainWindow::updateResultPrimaryActionForSelection()
+{
+    if(!m_resultsActionButton || !m_resultsTable) {
+        return;
+    }
+
+    if(m_resultsCurrentToolName != "neurokernel.channel_stats"
+       && m_resultsCurrentToolName != "neurokernel.raw_stats") {
+        return;
+    }
+
+    const QList<QTableWidgetItem*> items = m_resultsTable->selectedItems();
+    if(items.isEmpty()) {
+        m_resultPrimaryActionCommand.clear();
+        m_resultsActionButton->setEnabled(false);
+        return;
+    }
+
+    const int row = items.first()->row();
+    QTableWidgetItem* nameItem = m_resultsTable->item(row, 0);
+    if(!nameItem || nameItem->text().trimmed().isEmpty()) {
+        m_resultPrimaryActionCommand.clear();
+        m_resultsActionButton->setEnabled(false);
+        return;
+    }
+
+    const QString channelName = nameItem->text().trimmed();
+    m_resultPrimaryActionCommand = QString("tools.call neurokernel.find_peak_window {\"window_samples\":4000,\"match\":\"%1\"}")
+                                       .arg(channelName);
+    m_resultsActionButton->setText(QString("Find Peak For %1").arg(channelName));
+    m_resultsActionButton->setVisible(true);
+    m_resultsActionButton->setEnabled(true);
+}
+
+void MainWindow::runResultPrimaryAction()
+{
+    if(m_resultPrimaryActionCommand.isEmpty()) {
+        return;
+    }
+
+    appendTerminalMessage(QString("$ %1").arg(m_resultPrimaryActionCommand));
+    sendToolCall(m_resultPrimaryActionCommand);
 }
 
 QString MainWindow::planAgentIntent(const QString& commandText, QString& plannedCommand, bool& planned) const
@@ -635,6 +1158,21 @@ QString MainWindow::planAgentIntent(const QString& commandText, QString& planned
         return "Mapped your request to `neurokernel.channel_stats`.";
     }
 
+    if(containsAny({"strongest burst", "peak burst", "strongest eeg burst", "peak eeg burst"})) {
+        planned = true;
+        QStringList jsonParts;
+        jsonParts << QString("\"window_samples\":%1").arg(windowSamples > 0 ? windowSamples : 4000);
+        if(lower.contains("eeg")) {
+            jsonParts << "\"match\":\"EEG\"";
+        } else if(lower.contains("meg")) {
+            jsonParts << "\"match\":\"MEG\"";
+        } else if(lower.contains("eog")) {
+            jsonParts << "\"match\":\"EOG\"";
+        }
+        plannedCommand = QString("tools.call neurokernel.find_peak_window {%1}").arg(jsonParts.join(","));
+        return "Mapped your request to `neurokernel.find_peak_window`.";
+    }
+
     if(containsAny({"raw stats", "signal stats", "compute stats", "window stats", "rms"})) {
         planned = true;
         plannedCommand = QString("tools.call neurokernel.raw_stats {\"window_samples\":%1}").arg(windowSamples);
@@ -650,13 +1188,13 @@ QString MainWindow::handleStructuredToolCommand(const QString& commandText, bool
 
     const QString trimmed = commandText.trimmed();
     if(trimmed == "tools.list") {
-        sendKernelToolCall("tools/list", QJsonObject());
+        requestKernelToolDefinitions();
         return QString("Studio tools: %1 | Requested kernel tools list.")
             .arg(formatToolDefinitions(localToolDefinitions()));
     }
 
     if(trimmed == "kernel.tools.list") {
-        sendKernelToolCall("tools/list", QJsonObject());
+        requestKernelToolDefinitions();
         return "Requested kernel tools list.";
     }
 
@@ -692,15 +1230,27 @@ QString MainWindow::handleStructuredToolCommand(const QString& commandText, bool
         for(int i = 0; i < m_centerTabs->count(); ++i) {
             views << QString("%1: %2").arg(i + 1).arg(m_centerTabs->tabText(i));
         }
+        rememberToolResult(toolName, QJsonObject{
+            {"tool_name", toolName},
+            {"views", QJsonArray::fromStringList(views)}
+        });
         return views.isEmpty() ? "No open views." : QString("Open views: %1").arg(views.join(" | "));
     }
 
     RawDataBrowserWidget* rawBrowser = activeRawBrowser();
     if(toolName == "view.raw.summary") {
+        rememberToolResult(toolName, QJsonObject{
+            {"tool_name", toolName},
+            {"summary", rawBrowser ? rawBrowser->summaryText() : QString("No active raw browser.")}
+        });
         return rawBrowser ? rawBrowser->summaryText() : "No active raw browser.";
     }
 
     if(toolName == "view.raw.state") {
+        rememberToolResult(toolName, QJsonObject{
+            {"tool_name", toolName},
+            {"state", rawBrowser ? rawBrowser->stateText() : QString("No active raw browser.")}
+        });
         return rawBrowser ? rawBrowser->stateText() : "No active raw browser.";
     }
 
@@ -716,6 +1266,11 @@ QString MainWindow::handleStructuredToolCommand(const QString& commandText, bool
             return QString("Tool %1 received an invalid sample.").arg(toolName);
         }
         rawBrowser->gotoSample(sample);
+        rememberToolResult(toolName, QJsonObject{
+            {"tool_name", toolName},
+            {"sample", rawBrowser->cursorSample()},
+            {"cursor_sample", rawBrowser->cursorSample()}
+        });
         return QString("Moved raw browser cursor to sample %1.").arg(rawBrowser->cursorSample());
     }
 
@@ -728,6 +1283,10 @@ QString MainWindow::handleStructuredToolCommand(const QString& commandText, bool
             return "Tool view.raw.zoom requires {\"pixels_per_sample\": <positive number>}.";
         }
         rawBrowser->setZoomPixelsPerSample(pixelsPerSample);
+        rememberToolResult(toolName, QJsonObject{
+            {"tool_name", toolName},
+            {"pixels_per_sample", rawBrowser->pixelsPerSample()}
+        });
         return QString("Raw browser zoom set to %1 px/sample.")
             .arg(QString::number(rawBrowser->pixelsPerSample(), 'f', 2));
     }
@@ -750,6 +1309,19 @@ QString MainWindow::handleStructuredToolCommand(const QString& commandText, bool
         if(arguments.contains("limit")) {
             kernelArguments.insert("limit", arguments.value("limit").toInt(10));
         }
+        if(arguments.contains("match")) {
+            kernelArguments.insert("match", arguments.value("match").toString());
+        }
+        sendKernelToolCall(toolName, kernelArguments);
+        return QString("Requested %1 for %2.")
+            .arg(toolName, QFileInfo(rawBrowser->filePath()).fileName());
+    }
+
+    if(toolName == "neurokernel.find_peak_window") {
+        if(!rawBrowser) {
+            return "No active raw browser.";
+        }
+        QJsonObject kernelArguments = buildRawWindowArguments(arguments.value("window_samples").toInt(4000));
         if(arguments.contains("match")) {
             kernelArguments.insert("match", arguments.value("match").toString());
         }
@@ -893,25 +1465,503 @@ QJsonArray MainWindow::localToolDefinitions() const
     return QJsonArray{
         QJsonObject{
             {"name", "studio.views.list"},
-            {"description", "List open center views in the workbench."}
+            {"description", "List open center views in the workbench."},
+            {"input_schema", objectSchema(QJsonObject())},
+            {"result_schema", objectSchema(QJsonObject{
+                 {"views", arraySchema("Open Views", resultStringSchema("View Description"))}
+             }, QJsonArray{"views"})}
         },
         QJsonObject{
             {"name", "view.raw.summary"},
-            {"description", "Return summary metadata for the active raw browser."}
+            {"description", "Return summary metadata for the active raw browser."},
+            {"input_schema", objectSchema(QJsonObject())},
+            {"result_schema", objectSchema(QJsonObject{
+                 {"summary", resultStringSchema("Summary", "Human-readable summary of the active raw browser dataset.")}
+             }, QJsonArray{"summary"})}
         },
         QJsonObject{
             {"name", "view.raw.state"},
-            {"description", "Return visible range, cursor, and zoom for the active raw browser."}
+            {"description", "Return visible range, cursor, and zoom for the active raw browser."},
+            {"input_schema", objectSchema(QJsonObject())},
+            {"result_schema", objectSchema(QJsonObject{
+                 {"state", resultStringSchema("State", "Human-readable state of the active raw browser, including cursor and zoom.")}
+             }, QJsonArray{"state"})}
         },
         QJsonObject{
             {"name", "view.raw.goto"},
-            {"description", "Move the active raw browser to a given sample with {\"sample\": <int>}."}
+            {"description", "Move the active raw browser to a given sample with {\"sample\": <int>}."},
+            {"input_schema", objectSchema(QJsonObject{
+                 {"sample", integerSchema("Sample",
+                                          0,
+                                          std::numeric_limits<int>::max(),
+                                          0,
+                                          "Absolute sample index to move the active raw browser cursor to.")}
+             }, QJsonArray{"sample"})},
+            {"result_schema", objectSchema(QJsonObject{
+                 {"sample", integerSchema("Sample", 0, std::numeric_limits<int>::max(), 0)},
+                 {"cursor_sample", integerSchema("Cursor Sample", 0, std::numeric_limits<int>::max(), 0)}
+             }, QJsonArray{"sample", "cursor_sample"})}
         },
         QJsonObject{
             {"name", "view.raw.zoom"},
-            {"description", "Set raw browser zoom with {\"pixels_per_sample\": <number>}."}
+            {"description", "Set raw browser zoom with {\"pixels_per_sample\": <number>}."},
+            {"input_schema", objectSchema(QJsonObject{
+                 {"pixels_per_sample", numberSchema("Pixels / Sample",
+                                                    0.01,
+                                                    100.0,
+                                                    1.0,
+                                                    "Horizontal zoom density of the raw browser in pixels per sample.")}
+             }, QJsonArray{"pixels_per_sample"})},
+            {"result_schema", objectSchema(QJsonObject{
+                 {"pixels_per_sample", numberSchema("Pixels / Sample", 0.01, 100.0, 1.0)}
+             }, QJsonArray{"pixels_per_sample"})}
         }
     };
+}
+
+QJsonArray MainWindow::kernelToolDefinitions() const
+{
+    if(!m_cachedKernelToolDefinitions.isEmpty()) {
+        return m_cachedKernelToolDefinitions;
+    }
+
+    return QJsonArray{
+        QJsonObject{
+            {"name", "neurokernel.raw_stats"},
+            {"description", "Compute RMS, mean absolute value, peak absolute value, and top channels for a raw sample window."},
+            {"input_schema", objectSchema(QJsonObject{
+                 {"window_samples", integerSchema("Window Samples",
+                                                  1,
+                                                  1000000,
+                                                  600,
+                                                  "Number of samples around the current cursor to include in the analysis window.")}
+             }, QJsonArray{"window_samples"})}
+        },
+        QJsonObject{
+            {"name", "neurokernel.channel_stats"},
+            {"description", "Compute per-channel RMS, mean absolute value, and peak absolute value for a raw sample window."},
+            {"input_schema", objectSchema(QJsonObject{
+                 {"window_samples", integerSchema("Window Samples",
+                                                  1,
+                                                  1000000,
+                                                  600,
+                                                  "Number of samples around the current cursor to analyze.")},
+                 {"limit", integerSchema("Channel Limit",
+                                         1,
+                                         512,
+                                         5,
+                                         "Maximum number of channels to return in the result.")},
+                 {"match", stringSchema("Channel Match",
+                                        QJsonArray{"", "EEG", "MEG", "EOG"},
+                                        "EEG",
+                                        "Optional channel-name filter applied before ranking channels.")}
+             }, QJsonArray{"window_samples"})}
+        },
+        QJsonObject{
+            {"name", "neurokernel.find_peak_window"},
+            {"description", "Find the strongest absolute-amplitude sample inside a raw window, optionally filtered by channel name match."},
+            {"input_schema", objectSchema(QJsonObject{
+                 {"window_samples", integerSchema("Window Samples",
+                                                  1,
+                                                  1000000,
+                                                  4000,
+                                                  "Number of samples to search for the strongest absolute-amplitude event.")},
+                 {"match", stringSchema("Channel Match",
+                                        QJsonArray{"", "EEG", "MEG", "EOG"},
+                                        "EEG",
+                                        "Optional channel-name filter used while searching for the peak window.")}
+             }, QJsonArray{"window_samples"})}
+        }
+    };
+}
+
+void MainWindow::requestKernelToolDefinitions()
+{
+    if(!m_kernelSocket || m_kernelSocket->state() != QLocalSocket::ConnectedState) {
+        appendProblemMessage("Kernel tool discovery requested before the Neuro-Kernel socket was connected.");
+        return;
+    }
+
+    const QJsonObject message = JsonRpcMessage::createRequest("workbench-tools-list", "tools/list");
+    m_kernelSocket->write(JsonRpcMessage::serialize(message));
+    m_kernelSocket->flush();
+}
+
+QJsonArray MainWindow::availableToolDefinitions() const
+{
+    QJsonArray tools = localToolDefinitions();
+    const QJsonArray kernelTools = kernelToolDefinitions();
+    for(const QJsonValue& tool : kernelTools) {
+        tools.append(tool);
+    }
+    return tools;
+}
+
+QJsonObject MainWindow::toolDefinition(const QString& toolName) const
+{
+    const QJsonArray tools = availableToolDefinitions();
+    for(const QJsonValue& value : tools) {
+        const QJsonObject tool = value.toObject();
+        if(tool.value("name").toString() == toolName) {
+            return tool;
+        }
+    }
+
+    return QJsonObject();
+}
+
+QJsonObject MainWindow::llmPlanningContext(const QString& commandText) const
+{
+    Q_UNUSED(commandText)
+
+    QJsonObject context{
+        {"last_tool_name", m_lastToolName},
+        {"last_tool_result", m_lastToolResult},
+        {"tool_schema_summary", availableToolDefinitions()}
+    };
+
+    if(RawDataBrowserWidget* rawBrowser = activeRawBrowser()) {
+        context.insert("active_view", "raw_browser");
+        context.insert("active_file", rawBrowser->filePath());
+        context.insert("raw_summary", rawBrowser->summaryText());
+        context.insert("raw_state", rawBrowser->stateText());
+        context.insert("cursor_sample", rawBrowser->cursorSample());
+        context.insert("pixels_per_sample", rawBrowser->pixelsPerSample());
+    } else {
+        context.insert("active_view", "none");
+    }
+
+    return context;
+}
+
+QJsonObject MainWindow::defaultArgumentsForTool(const QString& toolName) const
+{
+    if(toolName == "studio.views.list" || toolName == "view.raw.summary" || toolName == "view.raw.state") {
+        return QJsonObject();
+    }
+
+    if(toolName == "view.raw.goto" || toolName == "view.raw.cursor") {
+        RawDataBrowserWidget* rawBrowser = activeRawBrowser();
+        return QJsonObject{{"sample", rawBrowser ? rawBrowser->cursorSample() : 0}};
+    }
+
+    if(toolName == "view.raw.zoom") {
+        RawDataBrowserWidget* rawBrowser = activeRawBrowser();
+        return QJsonObject{{"pixels_per_sample", rawBrowser ? rawBrowser->pixelsPerSample() : 1.0}};
+    }
+
+    if(toolName == "neurokernel.raw_stats") {
+        return QJsonObject{{"window_samples", 600}};
+    }
+
+    if(toolName == "neurokernel.channel_stats") {
+        return QJsonObject{{"window_samples", 600}, {"limit", 5}, {"match", "EEG"}};
+    }
+
+    if(toolName == "neurokernel.find_peak_window") {
+        return QJsonObject{{"window_samples", 4000}, {"match", "EEG"}};
+    }
+
+    if(toolName == "neurokernel.execute") {
+        return QJsonObject{{"command", "help"}};
+    }
+
+    return QJsonObject();
+}
+
+bool MainWindow::editArgumentsForTool(const QString& toolName, QJsonObject& arguments)
+{
+    const QJsonObject definition = toolDefinition(toolName);
+    const QJsonObject schema = definition.value("input_schema").toObject();
+    const QJsonObject properties = schema.value("properties").toObject();
+    const QJsonArray required = schema.value("required").toArray();
+
+    if(properties.isEmpty()) {
+        arguments = QJsonObject();
+        return true;
+    }
+
+    struct FieldBinding {
+        QString name;
+        QString type;
+        bool required = false;
+        QWidget* widget = nullptr;
+        QJsonObject schema;
+    };
+
+    QDialog dialog(this);
+    dialog.setWindowTitle(QString("Run %1").arg(toolName));
+    QFormLayout* layout = new QFormLayout(&dialog);
+    QList<FieldBinding> bindings;
+
+    for(auto it = properties.constBegin(); it != properties.constEnd(); ++it) {
+        const QString propertyName = it.key();
+        const QJsonObject propertySchema = it.value().toObject();
+        const QString type = propertySchema.value("type").toString();
+        const QString title = propertySchema.value("title").toString(propertyName);
+        const QString description = propertySchema.value("description").toString().trimmed();
+
+        bool isRequired = false;
+        for(const QJsonValue& requiredValue : required) {
+            if(requiredValue.toString() == propertyName) {
+                isRequired = true;
+                break;
+            }
+        }
+
+        QWidget* fieldWidget = nullptr;
+        if(type == "integer") {
+            QSpinBox* spinBox = new QSpinBox(&dialog);
+            spinBox->setRange(propertySchema.value("minimum").toInt(0),
+                              propertySchema.value("maximum").toInt(std::numeric_limits<int>::max()));
+            spinBox->setToolTip(description);
+            spinBox->setValue(arguments.contains(propertyName)
+                                  ? arguments.value(propertyName).toInt()
+                                  : propertySchema.value("default").toInt(propertySchema.value("minimum").toInt(0)));
+            fieldWidget = spinBox;
+        } else if(type == "number") {
+            QDoubleSpinBox* spinBox = new QDoubleSpinBox(&dialog);
+            spinBox->setRange(propertySchema.value("minimum").toDouble(0.0),
+                              propertySchema.value("maximum").toDouble(1000000.0));
+            spinBox->setDecimals(2);
+            spinBox->setSingleStep(0.25);
+            spinBox->setToolTip(description);
+            spinBox->setValue(arguments.contains(propertyName)
+                                  ? arguments.value(propertyName).toDouble()
+                                  : propertySchema.value("default").toDouble(propertySchema.value("minimum").toDouble(0.0)));
+            fieldWidget = spinBox;
+        } else if(type == "boolean") {
+            QComboBox* comboBox = new QComboBox(&dialog);
+            comboBox->addItem("false", false);
+            comboBox->addItem("true", true);
+            comboBox->setToolTip(description);
+            comboBox->setCurrentIndex(arguments.value(propertyName).toBool(false) ? 1 : 0);
+            fieldWidget = comboBox;
+        } else {
+            const QJsonArray enumValues = propertySchema.value("enum").toArray();
+            if(!enumValues.isEmpty()) {
+                QComboBox* comboBox = new QComboBox(&dialog);
+                for(const QJsonValue& enumValue : enumValues) {
+                    comboBox->addItem(enumValue.toString(), enumValue.toString());
+                }
+                comboBox->setToolTip(description);
+                const QString currentValue = arguments.contains(propertyName)
+                    ? arguments.value(propertyName).toString()
+                    : propertySchema.value("default").toString();
+                const int currentIndex = comboBox->findData(currentValue);
+                if(currentIndex >= 0) {
+                    comboBox->setCurrentIndex(currentIndex);
+                }
+                fieldWidget = comboBox;
+            } else {
+                QLineEdit* lineEdit = new QLineEdit(&dialog);
+                lineEdit->setToolTip(description);
+                lineEdit->setPlaceholderText(description);
+                lineEdit->setText(arguments.contains(propertyName)
+                                      ? arguments.value(propertyName).toString()
+                                      : propertySchema.value("default").toString());
+                fieldWidget = lineEdit;
+            }
+        }
+
+        if(!fieldWidget) {
+            continue;
+        }
+
+        const QString labelText = isRequired
+            ? QString("%1 *").arg(title)
+            : (description.isEmpty() ? title : QString("%1 (%2)").arg(title, description));
+        layout->addRow(labelText, fieldWidget);
+        bindings.append(FieldBinding{propertyName, type, isRequired, fieldWidget, propertySchema});
+    }
+
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
+    connect(buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    layout->addWidget(buttonBox);
+    if(dialog.exec() != QDialog::Accepted) {
+        return false;
+    }
+
+    QJsonObject editedArguments;
+    for(const FieldBinding& binding : std::as_const(bindings)) {
+        if(binding.type == "integer") {
+            editedArguments.insert(binding.name, qobject_cast<QSpinBox*>(binding.widget)->value());
+            continue;
+        }
+
+        if(binding.type == "number") {
+            editedArguments.insert(binding.name, qobject_cast<QDoubleSpinBox*>(binding.widget)->value());
+            continue;
+        }
+
+        if(binding.type == "boolean") {
+            editedArguments.insert(binding.name, qobject_cast<QComboBox*>(binding.widget)->currentData().toBool());
+            continue;
+        }
+
+        if(QComboBox* comboBox = qobject_cast<QComboBox*>(binding.widget)) {
+            const QString value = comboBox->currentData().toString();
+            if(binding.required || !value.isEmpty()) {
+                editedArguments.insert(binding.name, value);
+            }
+            continue;
+        }
+
+        if(QLineEdit* lineEdit = qobject_cast<QLineEdit*>(binding.widget)) {
+            const QString value = lineEdit->text().trimmed();
+            if(binding.required || !value.isEmpty()) {
+                editedArguments.insert(binding.name, value);
+            }
+        }
+    }
+
+    arguments = editedArguments;
+    return true;
+}
+
+void MainWindow::rebuildSkillsExplorer()
+{
+    if(!m_skillsExplorer) {
+        return;
+    }
+
+    m_skillsExplorer->clear();
+
+    QTreeWidgetItem* localRoot = new QTreeWidgetItem(QStringList() << "Workbench Tools");
+    const QJsonArray localTools = localToolDefinitions();
+    for(const QJsonValue& value : localTools) {
+        localRoot->addChild(makeToolTreeItem(value.toObject()));
+    }
+    localRoot->setExpanded(true);
+    m_skillsExplorer->addTopLevelItem(localRoot);
+
+    QTreeWidgetItem* kernelRoot = new QTreeWidgetItem(QStringList() << "Neuro-Kernel Tools");
+    const QJsonArray kernelTools = kernelToolDefinitions();
+    if(kernelTools.isEmpty()) {
+        kernelRoot->addChild(new QTreeWidgetItem(QStringList() << "No tools discovered yet."));
+    } else {
+        for(const QJsonValue& value : kernelTools) {
+            kernelRoot->addChild(makeToolTreeItem(value.toObject()));
+        }
+    }
+    kernelRoot->setExpanded(true);
+    m_skillsExplorer->addTopLevelItem(kernelRoot);
+
+    QTreeWidgetItem* statusRoot = new QTreeWidgetItem(QStringList() << "Planner Context");
+    statusRoot->addChild(new QTreeWidgetItem(QStringList() << m_llmPlanner.statusSummary()));
+    statusRoot->setExpanded(true);
+    m_skillsExplorer->addTopLevelItem(statusRoot);
+}
+
+void MainWindow::updateSelectedSkillTool(QTreeWidgetItem* item)
+{
+    m_selectedSkillToolName.clear();
+    m_skillRunButton->setEnabled(false);
+
+    if(!item) {
+        m_skillDetailsView->setPlainText("Select a workbench or Neuro-Kernel tool to inspect it here.");
+        return;
+    }
+
+    const QString toolName = item->data(0, Qt::UserRole).toString().trimmed();
+    const QJsonObject toolDefinition = item->data(0, Qt::UserRole + 1).toJsonObject();
+    if(toolName.isEmpty() || toolDefinition.isEmpty()) {
+        m_skillDetailsView->setPlainText(item->text(0));
+        return;
+    }
+
+    m_selectedSkillToolName = toolName;
+    m_skillRunButton->setEnabled(true);
+
+    const QJsonObject preview{
+        {"tool", toolName},
+        {"definition", toolDefinition},
+        {"suggested_arguments", defaultArgumentsForTool(toolName)}
+    };
+    m_skillDetailsView->setPlainText(QString::fromUtf8(QJsonDocument(preview).toJson(QJsonDocument::Indented)));
+}
+
+void MainWindow::runSelectedSkillTool()
+{
+    if(m_selectedSkillToolName.isEmpty()) {
+        return;
+    }
+
+    QJsonObject selectedArguments = defaultArgumentsForTool(m_selectedSkillToolName);
+    if(editArgumentsForTool(m_selectedSkillToolName, selectedArguments)) {
+        const QString commandText = QString("tools.call %1 %2")
+            .arg(m_selectedSkillToolName,
+                 QString::fromUtf8(QJsonDocument(selectedArguments).toJson(QJsonDocument::Compact)));
+        appendTerminalMessage(QString("$ %1").arg(commandText));
+        sendToolCall(commandText);
+        return;
+    }
+
+    const QString initialArguments = QString::fromUtf8(QJsonDocument(selectedArguments)
+                                                           .toJson(QJsonDocument::Indented)).trimmed();
+    bool accepted = false;
+    const QString argumentsText = QInputDialog::getMultiLineText(this,
+                                                                 "Run Tool",
+                                                                 QString("JSON arguments for %1").arg(m_selectedSkillToolName),
+                                                                 initialArguments,
+                                                                 &accepted);
+    if(!accepted) {
+        return;
+    }
+
+    const QString trimmedArguments = argumentsText.trimmed();
+    const QString commandText = trimmedArguments.isEmpty()
+        ? QString("tools.call %1 {}").arg(m_selectedSkillToolName)
+        : QString("tools.call %1 %2").arg(m_selectedSkillToolName, trimmedArguments);
+
+    appendTerminalMessage(QString("$ %1").arg(commandText));
+    sendToolCall(commandText);
+}
+
+void MainWindow::openAgentSettings()
+{
+    LlmSettingsDialog dialog(m_llmPlanner.configuration(), this);
+    dialog.setTestScenario("go to the strongest EEG burst and then show me the top EEG channels there",
+                           availableToolDefinitions(),
+                           llmPlanningContext("planner settings test"));
+    if(dialog.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    m_llmPlanner.setConfiguration(dialog.configuration());
+    persistAgentSettings();
+    refreshAgentPlannerStatus();
+    appendOutputMessage("Updated agent planner settings.");
+    appendTerminalMessage("> Updated agent planner settings.");
+}
+
+void MainWindow::loadAgentSettings()
+{
+    QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
+    LlmPlannerConfig config;
+    config.mode = settings.value("agent/mode").toString();
+    config.providerName = settings.value("agent/provider").toString();
+    config.endpoint = settings.value("agent/endpoint").toString();
+    config.apiKey = settings.value("agent/api_key").toString();
+    config.model = settings.value("agent/model").toString();
+    m_llmPlanner.setConfiguration(config);
+}
+
+void MainWindow::persistAgentSettings() const
+{
+    const LlmPlannerConfig config = m_llmPlanner.configuration();
+    QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
+    settings.setValue("agent/mode", config.mode);
+    settings.setValue("agent/provider", config.providerName);
+    settings.setValue("agent/endpoint", config.endpoint);
+    settings.setValue("agent/api_key", config.apiKey);
+    settings.setValue("agent/model", config.model);
+}
+
+void MainWindow::refreshAgentPlannerStatus()
+{
+    m_agentChatDock->setPlannerStatus(m_llmPlanner.statusSummary());
 }
 
 QJsonObject MainWindow::buildRawWindowArguments(int windowSamples) const
