@@ -35,6 +35,7 @@
 
 #include <scenecontextregistry.h>
 #include <viewmanager.h>
+#include <llmtoolplanner.h>
 
 #include <QMainWindow>
 #include <QJsonArray>
@@ -48,6 +49,9 @@ class QListWidget;
 class QListWidgetItem;
 class QLineEdit;
 class QPushButton;
+class QPlainTextEdit;
+class QTableWidget;
+class QTreeWidget;
 class QSplitter;
 class QTextEdit;
 class QToolButton;
@@ -60,6 +64,8 @@ namespace MNEANALYZESTUDIO
 {
 
 class AgentChatDockWidget;
+class EditorTabBar;
+class EditorTabWidget;
 class RawDataBrowserWidget;
 
 /**
@@ -78,10 +84,30 @@ protected:
 
 private:
     RawDataBrowserWidget* activeRawBrowser() const;
+    QString planAgentSteps(const QString& commandText, QStringList& plannedCommands, bool& planned) const;
     QString planAgentIntent(const QString& commandText, QString& plannedCommand, bool& planned) const;
+    QString resolvePlannerReferences(const QString& commandText) const;
+    void rememberToolResult(const QString& toolName, const QJsonObject& result);
+    void updateStructuredResultView(const QString& toolName, const QJsonObject& result);
+    void updateResultPrimaryActionForSelection();
+    void runResultPrimaryAction();
     QString handleLocalAgentCommand(const QString& commandText, bool& handled);
     QString handleStructuredToolCommand(const QString& commandText, bool& handled);
     QJsonArray localToolDefinitions() const;
+    QJsonArray kernelToolDefinitions() const;
+    void requestKernelToolDefinitions();
+    QJsonArray availableToolDefinitions() const;
+    QJsonObject toolDefinition(const QString& toolName) const;
+    QJsonObject llmPlanningContext(const QString& commandText) const;
+    QJsonObject defaultArgumentsForTool(const QString& toolName) const;
+    bool editArgumentsForTool(const QString& toolName, QJsonObject& arguments);
+    void rebuildSkillsExplorer();
+    void updateSelectedSkillTool(QTreeWidgetItem* item);
+    void runSelectedSkillTool();
+    void openAgentSettings();
+    void loadAgentSettings();
+    void persistAgentSettings() const;
+    void refreshAgentPlannerStatus();
     QJsonObject buildRawWindowArguments(int windowSamples) const;
     void sendKernelToolCall(const QString& toolName, const QJsonObject& arguments);
     QWidget* createSidebarSection(const QString& title, QWidget* contentWidget);
@@ -93,6 +119,7 @@ private:
     void applyWorkbenchStyle();
     void switchPrimarySidebar(const QString& sectionName);
     void sendToolCall(const QString& commandText);
+    void closeCenterTab(int index);
     void appendOutputMessage(const QString& message);
     void appendProblemMessage(const QString& message);
     void appendTerminalMessage(const QString& message);
@@ -108,13 +135,23 @@ private:
     QToolButton* m_skillsButton;
     QTreeWidget* m_workspaceExplorer;
     QTreeWidget* m_skillsExplorer;
+    QWidget* m_skillsPage;
+    QPlainTextEdit* m_skillDetailsView;
+    QPushButton* m_skillRunButton;
     QStackedWidget* m_leftSidebarStack;
     QSplitter* m_mainSplitter;
     QSplitter* m_centerSplitter;
-    QTabWidget* m_centerTabs;
+    EditorTabWidget* m_centerTabs;
+    EditorTabBar* m_centerTabBar;
     QTabWidget* m_bottomPanelTabs;
     QListWidget* m_outputPanel;
     QListWidget* m_problemPanel;
+    QWidget* m_resultsTab;
+    QLabel* m_resultsTitleLabel;
+    QPushButton* m_resultsActionButton;
+    QStackedWidget* m_resultsStack;
+    QTreeWidget* m_resultsTree;
+    QTableWidget* m_resultsTable;
     QWidget* m_terminalTab;
     QLabel* m_terminalStatusLabel;
     QTextEdit* m_terminalPanel;
@@ -122,6 +159,13 @@ private:
     QPushButton* m_terminalRunButton;
     QListWidgetItem* m_activeStateItem;
     QLocalSocket* m_kernelSocket;
+    QString m_lastToolName;
+    QJsonObject m_lastToolResult;
+    QString m_resultsCurrentToolName;
+    QString m_resultPrimaryActionCommand;
+    QString m_selectedSkillToolName;
+    QJsonArray m_cachedKernelToolDefinitions;
+    LlmToolPlanner m_llmPlanner;
     SceneContextRegistry m_sceneRegistry;
     ViewManager m_viewManager;
 };

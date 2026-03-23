@@ -13,6 +13,8 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 
 set(SOURCES
     agentchatdockwidget.cpp
+    editortabbar.cpp
+    llmsettingsdialog.cpp
     main.cpp
     mainwindow.cpp
     mnebrowserrawdelegate.cpp
@@ -24,6 +26,9 @@ set(SOURCES
 
 set(HEADERS
     agentchatdockwidget.h
+    editortabbar.h
+    editortabwidget.h
+    llmsettingsdialog.h
     mainwindow.h
     mnebrowserrawdelegate.h
     rawdatabrowserwidget.h
