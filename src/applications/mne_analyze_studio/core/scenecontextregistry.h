@@ -63,14 +63,18 @@ class STUDIOCORESHARED_EXPORT SceneContextRegistry : public QObject
 public:
     explicit SceneContextRegistry(QObject* parent = nullptr);
 
+    QString createScene(const QString& subjectId, const QString& title);
     QString ensureScene(const QString& subjectId, const QString& title);
     QString activeSceneForSubject(const QString& subjectId) const;
+    QString sceneForLayer(const QString& filePath) const;
+    QStringList layersForScene(const QString& sceneId) const;
     bool addLayerToScene(const QString& sceneId, const QString& filePath);
     QJsonArray serialize() const;
     void restore(const QJsonArray& serializedScenes);
 
 private:
     QHash<QString, SceneContext> m_scenes;
+    QHash<QString, QString> m_activeScenesBySubject;
 };
 
 } // namespace MNEANALYZESTUDIO

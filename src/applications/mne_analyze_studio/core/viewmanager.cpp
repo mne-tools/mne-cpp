@@ -20,7 +20,7 @@ using namespace MNEANALYZESTUDIO;
 namespace
 {
 
-const QStringList kThreeDExtensions = {".surf", ".pial", ".white"};
+const QStringList kThreeDExtensions = {".surf", ".pial", ".white", ".inflated", ".orig", ".bem"};
 const QStringList kTextExtensions = {".py", ".cpp", ".json"};
 
 }
@@ -52,10 +52,13 @@ QJsonObject ViewManager::dispatchFileSelection(const QString& filePath, const QJ
             if(provider.value("supports_scene_merging").toBool(false)) {
                 const QString subjectId = inferSubjectId(filePath, metadata);
                 const QString sceneId = m_sceneRegistry
-                    ? m_sceneRegistry->ensureScene(subjectId, QFileInfo(filePath).fileName())
+                    ? m_sceneRegistry->sceneForLayer(filePath)
                     : QString();
-                dispatch.insert("sceneId", sceneId);
-                dispatch.insert("mode", sceneId.isEmpty() ? "new_scene" : "merge_or_prompt");
+                dispatch.insert("subjectId", subjectId);
+                if(!sceneId.isEmpty()) {
+                    dispatch.insert("sceneId", sceneId);
+                }
+                dispatch.insert("mode", sceneId.isEmpty() ? "merge_or_prompt" : "restore_scene");
             }
 
             return dispatch;
@@ -75,10 +78,13 @@ QJsonObject ViewManager::dispatchFileSelection(const QString& filePath, const QJ
             break;
         case ViewKind::ThreeDScene: {
             const QString subjectId = inferSubjectId(filePath, metadata);
-            const QString sceneId = m_sceneRegistry ? m_sceneRegistry->ensureScene(subjectId, QFileInfo(filePath).fileName()) : QString();
+            const QString sceneId = m_sceneRegistry ? m_sceneRegistry->sceneForLayer(filePath) : QString();
             dispatch.insert("view", "ThreeDView");
-            dispatch.insert("sceneId", sceneId);
-            dispatch.insert("mode", sceneId.isEmpty() ? "new_scene" : "merge_or_prompt");
+            dispatch.insert("subjectId", subjectId);
+            if(!sceneId.isEmpty()) {
+                dispatch.insert("sceneId", sceneId);
+            }
+            dispatch.insert("mode", sceneId.isEmpty() ? "merge_or_prompt" : "restore_scene");
             dispatch.insert("agentSuggestion", QString("I see you're opening %1; I can add it to the active 3D scene.").arg(QFileInfo(filePath).fileName()));
             break;
         }
