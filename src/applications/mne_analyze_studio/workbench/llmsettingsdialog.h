@@ -60,6 +60,7 @@ public:
 
 private slots:
     void runPlannerTest();
+    void updateModeDefaults();
 
 private:
     QComboBox* m_modeComboBox;
