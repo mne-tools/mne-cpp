@@ -15,7 +15,26 @@
           ".ave",
           ".edf"
         ],
-        "supports_scene_merging": false
+        "supports_scene_merging": false,
+        "initial_state": {
+          "buffer_kind": "fiff",
+          "session_role": "signal_browser"
+        },
+        "state_schema": {
+          "type": "object",
+          "properties": {
+            "buffer_kind": {
+              "type": "string"
+            },
+            "session_role": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "buffer_kind",
+            "session_role"
+          ]
+        }
       }
     ],
     "tools": [
@@ -52,7 +71,36 @@
         {
           "id": "raw_browser_preferences",
           "title": "Raw Browser Preferences",
-          "description": "Placeholder settings tab contributed by the FIFF browser extension."
+          "description": "Settings contributed by the FIFF browser extension.",
+          "fields": [
+            {
+              "id": "default_zoom",
+              "label": "Default Zoom",
+              "type": "number",
+              "minimum": 0.25,
+              "maximum": 8.0,
+              "step": 0.25,
+              "default": 1.0,
+              "description": "Default pixels-per-sample zoom for newly opened raw browser views."
+            },
+            {
+              "id": "show_status_messages",
+              "label": "Show Browser Status Messages",
+              "type": "boolean",
+              "default": true,
+              "description": "Controls whether browser state updates are echoed into the studio output panels."
+            }
+          ],
+          "actions": [
+            {
+              "id": "save",
+              "label": "Save Settings"
+            },
+            {
+              "id": "restore_defaults",
+              "label": "Restore Defaults"
+            }
+          ]
         }
       ]
     }

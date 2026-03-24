@@ -110,6 +110,51 @@ QJsonArray ViewProviderRegistry::toolDefinitions() const
     return tools;
 }
 
+QJsonArray ViewProviderRegistry::resultRendererDefinitions() const
+{
+    QJsonArray renderers;
+    for(const ExtensionManifest& manifest : manifests()) {
+        for(const ResultRendererContribution& renderer : manifest.resultRenderers) {
+            renderers.append(QJsonObject{
+                {"id", renderer.id},
+                {"display_name", renderer.displayName},
+                {"widget_type", renderer.widgetType},
+                {"tool_names", QJsonArray::fromStringList(renderer.toolNames)},
+                {"controls", renderer.controls},
+                {"actions", renderer.actions},
+                {"runtime_context_schema", renderer.runtimeContextSchema},
+                {"history_schema", renderer.historySchema},
+                {"extension_id", manifest.id},
+                {"extension_display_name", manifest.displayName}
+            });
+        }
+    }
+
+    return renderers;
+}
+
+QJsonArray ViewProviderRegistry::analysisPipelineDefinitions() const
+{
+    QJsonArray pipelines;
+    for(const ExtensionManifest& manifest : manifests()) {
+        for(const AnalysisPipelineContribution& pipeline : manifest.analysisPipelines) {
+            pipelines.append(QJsonObject{
+                {"id", pipeline.id},
+                {"display_name", pipeline.displayName},
+                {"description", pipeline.description},
+                {"input_schema", pipeline.inputSchema},
+                {"output_schema", pipeline.outputSchema},
+                {"steps", pipeline.steps},
+                {"follow_up_actions", pipeline.followUpActions},
+                {"extension_id", manifest.id},
+                {"extension_display_name", manifest.displayName}
+            });
+        }
+    }
+
+    return pipelines;
+}
+
 QJsonObject ViewProviderRegistry::providerForFile(const QString& filePath, const QJsonObject& metadata) const
 {
     Q_UNUSED(metadata)

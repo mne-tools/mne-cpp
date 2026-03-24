@@ -35,6 +35,138 @@
         }
       }
     ],
+    "result_renderers": [
+      {
+        "id": "psd.result_renderer",
+        "display_name": "PSD Result Renderer",
+        "widget_type": "psd_result_renderer",
+        "tool_names": [
+          "neurokernel.psd_summary"
+        ],
+        "controls": [
+          {
+            "id": "match",
+            "label": "Channel Family",
+            "type": "enum",
+            "target_argument": "match",
+            "default": "EEG",
+            "options": [
+              "EEG",
+              "MEG",
+              "EOG"
+            ],
+            "description": "Filters the PSD rerun to a channel family."
+          },
+          {
+            "id": "nfft",
+            "label": "FFT Size",
+            "type": "integer",
+            "target_argument": "nfft",
+            "default": 512,
+            "minimum": 128,
+            "maximum": 8192,
+            "description": "Controls the FFT size used for the PSD summary."
+          },
+          {
+            "id": "compare",
+            "label": "Compare With",
+            "type": "history_selector",
+            "description": "Lets the renderer overlay a previous PSD result from history."
+          }
+        ],
+        "actions": [
+          {
+            "id": "rerun_psd",
+            "label": "Update PSD",
+            "kind": "tool_call",
+            "tool_name": "neurokernel.psd_summary",
+            "description": "Reruns the PSD using the current control values and active raw view context."
+          }
+        ],
+        "runtime_context_schema": {
+          "type": "object",
+          "properties": {
+            "has_active_raw_view": {
+              "type": "boolean"
+            },
+            "active_raw_file": {
+              "type": "string"
+            },
+            "cursor_sample": {
+              "type": "integer"
+            },
+            "pixels_per_sample": {
+              "type": "number"
+            }
+          }
+        },
+        "history_schema": {
+          "type": "array",
+          "description": "Recent PSD result payloads for comparison overlays."
+        }
+      }
+    ],
+    "analysis_pipelines": [
+      {
+        "id": "psd.inspect_active_window",
+        "display_name": "Inspect PSD For Active Window",
+        "description": "Compute a PSD over the active raw window and expose compare-ready results in the result panel.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "window_samples": {
+              "type": "integer",
+              "default": 1200
+            },
+            "match": {
+              "type": "string",
+              "default": "EEG"
+            },
+            "nfft": {
+              "type": "integer",
+              "default": 512
+            }
+          },
+          "required": [
+            "window_samples"
+          ]
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "tool_name": {
+              "type": "string"
+            },
+            "frequencies": {
+              "type": "array"
+            },
+            "psd": {
+              "type": "array"
+            }
+          }
+        },
+        "steps": [
+          {
+            "tool_name": "neurokernel.psd_summary",
+            "arguments_template": {
+              "window_samples": "${window_samples}",
+              "match": "${match}",
+              "nfft": "${nfft}"
+            }
+          }
+        ],
+        "follow_up_actions": [
+          {
+            "label": "Compare With Previous PSD",
+            "description": "Overlay a previous PSD result from history."
+          },
+          {
+            "label": "Adjust FFT Size",
+            "description": "Rerun the PSD with a different spectral resolution."
+          }
+        ]
+      }
+    ],
     "ui": {
       "sidebar_items": [
         "PSD"
@@ -43,7 +175,40 @@
         {
           "id": "psd_preferences",
           "title": "PSD Preferences",
-          "description": "Settings contributed by the PSD analysis extension."
+          "description": "Settings contributed by the PSD analysis extension.",
+          "fields": [
+            {
+              "id": "default_match",
+              "label": "Default Channel Family",
+              "type": "enum",
+              "default": "EEG",
+              "options": [
+                "EEG",
+                "MEG",
+                "EOG"
+              ],
+              "description": "Default channel family used by PSD reruns."
+            },
+            {
+              "id": "default_nfft",
+              "label": "Default FFT Size",
+              "type": "integer",
+              "minimum": 128,
+              "maximum": 8192,
+              "default": 512,
+              "description": "Default FFT size for PSD calculations."
+            }
+          ],
+          "actions": [
+            {
+              "id": "save",
+              "label": "Save Settings"
+            },
+            {
+              "id": "restore_defaults",
+              "label": "Restore Defaults"
+            }
+          ]
         }
       ]
     }

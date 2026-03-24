@@ -62,6 +62,10 @@ ExtensionManifest ManifestParser::parseFile(const QString& manifestFilePath, QSt
         contribution.widgetType = object.value("widget_type").toString("placeholder");
         contribution.slot = object.value("slot").toString("center");
         contribution.supportsSceneMerging = object.value("supports_scene_merging").toBool(false);
+        contribution.controls = object.value("controls").toObject();
+        contribution.actions = object.value("actions").toArray();
+        contribution.stateSchema = object.value("state_schema").toObject();
+        contribution.initialState = object.value("initial_state").toObject();
         const QJsonArray fileExtensions = object.value("file_extensions").toArray();
         for(const QJsonValue& extensionValue : fileExtensions) {
             contribution.fileExtensions.append(extensionValue.toString().trimmed().toLower());
@@ -80,6 +84,45 @@ ExtensionManifest ManifestParser::parseFile(const QString& manifestFilePath, QSt
         manifest.tools.append(tool);
     }
 
+    const QJsonArray resultRenderers = contributes.value("result_renderers").toArray();
+    for(const QJsonValue& value : resultRenderers) {
+        const QJsonObject object = value.toObject();
+        ResultRendererContribution renderer;
+        renderer.id = object.value("id").toString().trimmed();
+        renderer.displayName = object.value("display_name").toString(renderer.id);
+        renderer.widgetType = object.value("widget_type").toString("result_renderer");
+        const QJsonArray toolNames = object.value("tool_names").toArray();
+        for(const QJsonValue& toolValue : toolNames) {
+            const QString toolName = toolValue.toString().trimmed();
+            if(!toolName.isEmpty()) {
+                renderer.toolNames.append(toolName);
+            }
+        }
+        renderer.controls = object.value("controls").toArray();
+        renderer.actions = object.value("actions").toArray();
+        renderer.runtimeContextSchema = object.value("runtime_context_schema").toObject();
+        renderer.historySchema = object.value("history_schema").toObject();
+        if(!renderer.id.isEmpty()) {
+            manifest.resultRenderers.append(renderer);
+        }
+    }
+
+    const QJsonArray analysisPipelines = contributes.value("analysis_pipelines").toArray();
+    for(const QJsonValue& value : analysisPipelines) {
+        const QJsonObject object = value.toObject();
+        AnalysisPipelineContribution pipeline;
+        pipeline.id = object.value("id").toString().trimmed();
+        pipeline.displayName = object.value("display_name").toString(pipeline.id);
+        pipeline.description = object.value("description").toString().trimmed();
+        pipeline.inputSchema = object.value("input_schema").toObject();
+        pipeline.outputSchema = object.value("output_schema").toObject();
+        pipeline.steps = object.value("steps").toArray();
+        pipeline.followUpActions = object.value("follow_up_actions").toArray();
+        if(!pipeline.id.isEmpty()) {
+            manifest.analysisPipelines.append(pipeline);
+        }
+    }
+
     const QJsonObject ui = contributes.value("ui").toObject();
     const QJsonArray sidebarItems = ui.value("sidebar_items").toArray();
     for(const QJsonValue& value : sidebarItems) {
@@ -96,6 +139,8 @@ ExtensionManifest ManifestParser::parseFile(const QString& manifestFilePath, QSt
         tab.id = object.value("id").toString().trimmed();
         tab.title = object.value("title").toString(tab.id);
         tab.description = object.value("description").toString().trimmed();
+        tab.fields = object.value("fields").toArray();
+        tab.actions = object.value("actions").toArray();
         if(!tab.id.isEmpty()) {
             manifest.ui.settingsTabs.append(tab);
         }

@@ -74,7 +74,6 @@ class EditorTabBar;
 class EditorTabWidget;
 class ExtensionHostedViewWidget;
 class IRawDataView;
-class SpectrumPlotWidget;
 class ViewProviderRegistry;
 
 /**
@@ -95,20 +94,65 @@ private slots:
     void handleHostedExtensionViewOutput(const QString& message);
     void handleHostedExtensionViewStatus(const QString& message);
     void handleHostedExtensionViewCommand(const QString& sessionId, const QString& commandName, const QJsonObject& arguments);
+    void handleResultRendererToolCommand(const QString& commandText);
+    void handleResultRendererSelectionContext(const QJsonObject& context);
+    void approvePlannerConfirmation(const QString& commandText);
+    void dismissPlannerConfirmation(const QString& commandText);
 
 private:
     IRawDataView* activeRawDataView() const;
     QString planAgentSteps(const QString& commandText, QStringList& plannedCommands, bool& planned) const;
     QString planAgentIntent(const QString& commandText, QString& plannedCommand, bool& planned) const;
     QString resolvePlannerReferences(const QString& commandText) const;
+    QJsonObject normalizedToolResultEnvelope(const QString& toolName,
+                                            const QJsonObject& result,
+                                            const QString& source = QString()) const;
+    QJsonObject normalizedToolErrorEnvelope(const QString& toolName,
+                                           const QString& message,
+                                           const QString& source,
+                                           const QString& failureKind,
+                                           const QString& recoverability,
+                                           const QJsonObject& details = QJsonObject()) const;
     void rememberToolResult(const QString& toolName, const QJsonObject& result);
+    void updateActivePipelineArtifact(const QString& status, const QString& currentStep = QString());
+    void failActivePipeline(const QString& failureMessage);
+    QJsonObject analysisPipelineContract(const QString& pipelineId) const;
+    QJsonObject defaultInputsForPipeline(const QJsonObject& pipeline) const;
+    QJsonValue pipelineTemplateValueToJson(const QString& resolvedText) const;
+    QJsonObject resolvePipelineStepArguments(const QJsonObject& step,
+                                            const QJsonObject& pipelineInputs) const;
+    QString buildToolCallCommand(const QString& toolName, const QJsonObject& arguments) const;
+    QJsonObject pipelineRunArtifact(const QString& runId) const;
+    QString rerunPipelineStepCommand(const QString& runId,
+                                    int stepNumber,
+                                    const QString& mode,
+                                    QString* errorMessage = nullptr) const;
+    QString resolvePipelineCommandTemplate(const QString& commandTemplate,
+                                          const QJsonObject& pipelineInputs) const;
+    bool executeAnalysisPipeline(const QString& pipelineId,
+                                 const QJsonObject& pipelineInputs,
+                                 const QJsonObject& inputOverrides = QJsonObject());
+    bool resumeAnalysisPipeline(const QJsonObject& artifactResult);
+    void continuePendingPipelineExecution();
     void refreshStructuredResultHistoryUi();
     void updateStructuredResultView(const QString& toolName, const QJsonObject& result);
-    void updateResultPrimaryActionForSelection();
-    void updateResultPsdControls(const QJsonObject& result);
-    void updateResultPsdComparison();
-    void runResultPrimaryAction();
-    void runResultPsdAction();
+    QJsonArray resultHistoryForTool(const QString& toolName) const;
+    QJsonObject resultRendererRuntimeContext() const;
+    QJsonArray resultRendererContracts() const;
+    QJsonArray extensionSettingsContracts() const;
+    QJsonArray extensionSettingsState() const;
+    QJsonArray analysisPipelineContracts() const;
+    QJsonArray extensionSettingsToolDefinitions() const;
+    QJsonObject resolveExtensionSettingsTool(const QString& toolName) const;
+    QVariant extensionSettingValue(const QString& extensionId,
+                                   const QString& tabId,
+                                   const QJsonObject& field) const;
+    QStringList candidateSettingFieldIds(const QString& inputName) const;
+    QJsonObject applyExtensionSettingDefaults(const QString& extensionId,
+                                              const QJsonObject& schemaProperties,
+                                              const QJsonObject& currentValues) const;
+    QStringList extensionIdsForTool(const QString& toolName) const;
+    QWidget* ensureBottomResultRenderer(const QString& toolName);
     QString handleLocalAgentCommand(const QString& commandText, bool& handled);
     QString handleStructuredToolCommand(const QString& commandText, bool& handled);
     QJsonArray localToolDefinitions() const;
@@ -117,8 +161,30 @@ private:
     void requestExtensionHostState();
     void requestExtensionHostReload();
     QJsonArray availableToolDefinitions() const;
+    QJsonObject plannerSafetyMetadata(const QString& toolName) const;
+    QJsonObject plannerReadinessMetadata(const QString& toolName) const;
+    QJsonObject plannerExecutionMetadata(const QString& toolName) const;
+    QJsonArray plannerSafeToolDefinitions() const;
+    QJsonArray plannerReadyToolDefinitions() const;
+    QJsonArray plannerBlockedToolDefinitions() const;
     QJsonObject toolDefinition(const QString& toolName) const;
     QJsonObject llmPlanningContext(const QString& commandText) const;
+    QString toolNameFromCommand(const QString& commandText) const;
+    QJsonObject toolArgumentsFromCommand(const QString& commandText) const;
+    QJsonObject plannerConfirmationPresentation(const QString& commandText,
+                                               int stepIndex,
+                                               int totalSteps,
+                                               const QString& fallbackDetails,
+                                               const QString& plannerSummary,
+                                               const QString& previousPlannedCommand) const;
+    QJsonObject plannerConfirmationSnapshot(const QString& commandText) const;
+    QJsonObject plannerConfirmationStaleness(const QJsonObject& confirmation) const;
+    void refreshPlannerConfirmationsUi();
+    void queuePlannerConfirmation(const QString& commandText,
+                                  const QString& summary,
+                                  const QString& details,
+                                  const QString& reason = QString());
+    bool removePlannerConfirmation(const QString& commandText);
     QJsonObject defaultArgumentsForTool(const QString& toolName) const;
     QJsonObject activeHostedViewSession() const;
     QJsonArray activeHostedViewToolDefinitions() const;
@@ -191,16 +257,10 @@ private:
     QWidget* m_resultsTab;
     QLabel* m_resultsTitleLabel;
     QComboBox* m_resultsHistoryCombo;
-    QWidget* m_resultsPsdControlsWidget;
-    QComboBox* m_resultsPsdMatchCombo;
-    QSpinBox* m_resultsPsdNfftSpin;
-    QComboBox* m_resultsPsdCompareCombo;
-    QPushButton* m_resultsPsdRunButton;
-    QPushButton* m_resultsActionButton;
     QStackedWidget* m_resultsStack;
     QTreeWidget* m_resultsTree;
     QTableWidget* m_resultsTable;
-    SpectrumPlotWidget* m_resultsSpectrumPlot;
+    QWidget* m_resultsExtensionRenderer;
     QWidget* m_terminalTab;
     QLabel* m_terminalStatusLabel;
     QTextEdit* m_terminalPanel;
@@ -212,11 +272,23 @@ private:
     QString m_lastToolName;
     QJsonObject m_lastToolResult;
     QString m_resultsCurrentToolName;
-    QString m_resultPrimaryActionCommand;
+    QJsonObject m_resultSelectionContext;
+    QJsonArray m_pendingPlannerConfirmations;
     QString m_selectedSkillToolName;
+    QString m_selectedPipelineId;
     QString m_selectedExtensionId;
     QList<QJsonObject> m_psdResultHistory;
     QList<QJsonObject> m_structuredResultHistory;
+    QString m_activePipelineId;
+    QString m_activePipelineRunId;
+    QString m_activePipelineDisplayName;
+    QJsonObject m_activePipelineInputs;
+    QJsonObject m_activePipelineInputOverrides;
+    QStringList m_pendingPipelineCommands;
+    QJsonArray m_activePipelineStepHistory;
+    int m_activePipelineTotalSteps;
+    QString m_activePipelineLastStatus;
+    bool m_isAdvancingPipeline;
     QJsonArray m_cachedKernelToolDefinitions;
     QJsonArray m_cachedExtensionToolDefinitions;
     QJsonArray m_cachedExtensionResources;

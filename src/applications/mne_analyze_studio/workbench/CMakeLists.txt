@@ -15,6 +15,7 @@ set(SOURCES
     analysisresultwidget.cpp
     agentchatdockwidget.cpp
     editortabbar.cpp
+    extensionsettingswidget.cpp
     extensionhostedviewwidget.cpp
     llmsettingsdialog.cpp
     main.cpp
@@ -25,6 +26,7 @@ set(HEADERS
     analysisresultwidget.h
     agentchatdockwidget.h
     editortabbar.h
+    extensionsettingswidget.h
     extensionhostedviewwidget.h
     editortabwidget.h
     llmsettingsdialog.h
@@ -46,6 +48,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
+    mne_analyze_studio_analysis_results_extension_widgets
     mne_analyze_studio_core
     mne_analyze_studio_dummy_3d_extension_widgets
     mne_analyze_studio_fiff_browser_extension_widgets

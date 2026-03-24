@@ -16,7 +16,102 @@
           ".white",
           ".bem"
         ],
-        "supports_scene_merging": true
+        "supports_scene_merging": true,
+        "controls": {
+          "opacity": {
+            "type": "number",
+            "label": "Opacity",
+            "description": "Opacity of the dummy 3D scene.",
+            "command": "set_opacity",
+            "target_argument": "opacity",
+            "state_key": "opacity",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "step": 0.05,
+            "value": 0.8,
+            "result_schema": {
+              "type": "object",
+              "properties": {
+                "session_id": {
+                  "type": "string"
+                },
+                "command": {
+                  "type": "string"
+                },
+                "state_before": {
+                  "type": "object"
+                },
+                "state_after": {
+                  "type": "object"
+                }
+              },
+              "required": [
+                "session_id",
+                "command"
+              ]
+            }
+          }
+        },
+        "actions": [
+          {
+            "command": "focus_left",
+            "label": "Left Hemisphere",
+            "description": "Rotate the hosted 3D view toward the left hemisphere.",
+            "state_patch": {
+              "hemisphere": "left",
+              "camera": "left_lateral"
+            },
+            "success_message": "Rotated hosted extension view to the left hemisphere."
+          },
+          {
+            "command": "focus_right",
+            "label": "Right Hemisphere",
+            "description": "Rotate the hosted 3D view toward the right hemisphere.",
+            "state_patch": {
+              "hemisphere": "right",
+              "camera": "right_lateral"
+            },
+            "success_message": "Rotated hosted extension view to the right hemisphere."
+          },
+          {
+            "command": "reset_view",
+            "label": "Reset View",
+            "description": "Reset camera and opacity to the default placeholder scene state.",
+            "reset_to_initial_state": true,
+            "success_message": "Reset hosted extension view to the default placeholder scene state."
+          }
+        ],
+        "initial_state": {
+          "opacity": 0.8,
+          "hemisphere": "both",
+          "camera": "default"
+        },
+        "state_schema": {
+          "type": "object",
+          "properties": {
+            "opacity": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            },
+            "hemisphere": {
+              "type": "string",
+              "enum": [
+                "left",
+                "right",
+                "both"
+              ]
+            },
+            "camera": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "opacity",
+            "hemisphere",
+            "camera"
+          ]
+        }
       }
     ],
     "tools": [
@@ -69,7 +164,41 @@
         {
           "id": "surface_preferences",
           "title": "Surface Preferences",
-          "description": "Placeholder settings contributed by the dummy 3D extension."
+          "description": "Settings contributed by the dummy 3D extension.",
+          "fields": [
+            {
+              "id": "default_opacity",
+              "label": "Default Opacity",
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0,
+              "step": 0.05,
+              "default": 0.8,
+              "description": "Default opacity used when a new dummy 3D surface session is opened."
+            },
+            {
+              "id": "default_hemisphere",
+              "label": "Default Hemisphere",
+              "type": "enum",
+              "default": "both",
+              "options": [
+                "both",
+                "left",
+                "right"
+              ],
+              "description": "Initial hemisphere focus for newly opened dummy 3D views."
+            }
+          ],
+          "actions": [
+            {
+              "id": "save",
+              "label": "Save Settings"
+            },
+            {
+              "id": "restore_defaults",
+              "label": "Restore Defaults"
+            }
+          ]
         }
       ]
     }

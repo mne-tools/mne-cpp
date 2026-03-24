@@ -11,6 +11,7 @@
 #ifndef MNE_ANALYZE_STUDIO_ANALYSISRESULTWIDGET_H
 #define MNE_ANALYZE_STUDIO_ANALYSISRESULTWIDGET_H
 
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QWidget>
 
@@ -18,11 +19,10 @@ class QLabel;
 class QStackedWidget;
 class QTableWidget;
 class QTreeWidget;
+class QWidget;
 
 namespace MNEANALYZESTUDIO
 {
-
-class SpectrumPlotWidget;
 
 /**
  * @brief Read-only viewer widget used to open persisted analysis artifacts in center tabs.
@@ -35,19 +35,28 @@ public:
     explicit AnalysisResultWidget(QWidget* parent = nullptr);
 
     void setResult(const QString& toolName, const QJsonObject& result);
+    void setResultHistory(const QJsonArray& history);
+    void setRuntimeContext(const QJsonObject& context);
     QString toolName() const;
     QJsonObject result() const;
 
+signals:
+    void toolCommandRequested(const QString& commandText);
+    void selectionContextChanged(const QJsonObject& context);
+
 private:
     QTreeWidget* buildJsonTree(const QJsonObject& result) const;
+    QWidget* ensureExtensionRenderer(const QString& toolName);
 
     QString m_toolName;
     QJsonObject m_result;
+    QJsonArray m_history;
+    QJsonObject m_runtimeContext;
     QLabel* m_titleLabel;
     QStackedWidget* m_stack;
     QTreeWidget* m_tree;
     QTableWidget* m_table;
-    SpectrumPlotWidget* m_spectrum;
+    QWidget* m_extensionRenderer;
 };
 
 } // namespace MNEANALYZESTUDIO

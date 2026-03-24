@@ -11,6 +11,7 @@
 #ifndef MNE_ANALYZE_STUDIO_EXTENSIONMANIFEST_H
 #define MNE_ANALYZE_STUDIO_EXTENSIONMANIFEST_H
 
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QString>
 #include <QStringList>
@@ -35,6 +36,33 @@ struct ViewProviderContribution
     QString slot;
     QStringList fileExtensions;
     bool supportsSceneMerging = false;
+    QJsonObject controls;
+    QJsonArray actions;
+    QJsonObject stateSchema;
+    QJsonObject initialState;
+};
+
+struct ResultRendererContribution
+{
+    QString id;
+    QString displayName;
+    QString widgetType;
+    QStringList toolNames;
+    QJsonArray controls;
+    QJsonArray actions;
+    QJsonObject runtimeContextSchema;
+    QJsonObject historySchema;
+};
+
+struct AnalysisPipelineContribution
+{
+    QString id;
+    QString displayName;
+    QString description;
+    QJsonObject inputSchema;
+    QJsonObject outputSchema;
+    QJsonArray steps;
+    QJsonArray followUpActions;
 };
 
 struct UiContribution
@@ -44,6 +72,8 @@ struct UiContribution
         QString id;
         QString title;
         QString description;
+        QJsonArray fields;
+        QJsonArray actions;
     };
 
     QStringList sidebarItems;
@@ -59,6 +89,8 @@ struct ExtensionManifest
     QString rootPath;
     QString entryPoint;
     QVector<ViewProviderContribution> viewProviders;
+    QVector<ResultRendererContribution> resultRenderers;
+    QVector<AnalysisPipelineContribution> analysisPipelines;
     QVector<ToolContribution> tools;
     UiContribution ui;
     QJsonObject rawManifest;

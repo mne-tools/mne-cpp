@@ -10,12 +10,15 @@
 
 #include "analysisresultwidget.h"
 
-#include "spectrumplotwidget.h"
+#include <iresultrendererfactory.h>
+#include <iresultrendererwidget.h>
+#include <resultrendererfactoryregistry.h>
 
 #include <QHeaderView>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QLabel>
+#include <QMetaObject>
 #include <QStackedWidget>
 #include <QTableWidget>
 #include <QTreeWidget>
@@ -28,6 +31,15 @@ using namespace MNEANALYZESTUDIO;
 
 namespace
 {
+
+bool hasQtSignal(const QObject* object, const char* normalizedSignal)
+{
+    if(!object || !normalizedSignal) {
+        return false;
+    }
+
+    return object->metaObject()->indexOfSignal(normalizedSignal) >= 0;
+}
 
 QTreeWidgetItem* buildJsonTreeItem(const QString& key, const QJsonValue& value)
 {
@@ -72,7 +84,7 @@ AnalysisResultWidget::AnalysisResultWidget(QWidget* parent)
 , m_stack(new QStackedWidget(this))
 , m_tree(new QTreeWidget(this))
 , m_table(new QTableWidget(this))
-, m_spectrum(new SpectrumPlotWidget(this))
+, m_extensionRenderer(nullptr)
 {
     m_titleLabel->setObjectName("terminalStatusLabel");
     m_tree->setColumnCount(2);
@@ -88,7 +100,6 @@ AnalysisResultWidget::AnalysisResultWidget(QWidget* parent)
 
     m_stack->addWidget(m_tree);
     m_stack->addWidget(m_table);
-    m_stack->addWidget(m_spectrum);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -105,8 +116,17 @@ void AnalysisResultWidget::setResult(const QString& toolName, const QJsonObject&
     m_tree->clear();
     m_table->clearContents();
     m_table->setRowCount(0);
-    m_spectrum->clear();
     m_stack->setCurrentWidget(m_tree);
+
+    if(QWidget* renderer = ensureExtensionRenderer(toolName)) {
+        if(IResultRendererWidget* resultRenderer = dynamic_cast<IResultRendererWidget*>(renderer)) {
+            resultRenderer->setResult(toolName, result);
+            resultRenderer->setResultHistory(m_history);
+            resultRenderer->setRuntimeContext(m_runtimeContext);
+            m_stack->setCurrentWidget(renderer);
+            return;
+        }
+    }
 
     if(toolName == "neurokernel.channel_stats" && result.value("channels").isArray()) {
         const QJsonArray channels = result.value("channels").toArray();
@@ -136,32 +156,30 @@ void AnalysisResultWidget::setResult(const QString& toolName, const QJsonObject&
         return;
     }
 
-    if(toolName == "neurokernel.psd_summary"
-       && result.value("frequencies").isArray()
-       && result.value("psd").isArray()) {
-        QVector<double> frequencies;
-        QVector<double> values;
-        const QJsonArray freqArray = result.value("frequencies").toArray();
-        const QJsonArray valueArray = result.value("psd").toArray();
-        const int pointCount = std::min(freqArray.size(), valueArray.size());
-        frequencies.reserve(pointCount);
-        values.reserve(pointCount);
-        for(int i = 0; i < pointCount; ++i) {
-            frequencies.append(freqArray.at(i).toDouble());
-            values.append(valueArray.at(i).toDouble());
-        }
-
-        m_spectrum->setSpectrum(frequencies, values, result.value("message").toString(toolName));
-        m_stack->setCurrentWidget(m_spectrum);
-        return;
-    }
-
     for(auto it = result.constBegin(); it != result.constEnd(); ++it) {
         m_tree->addTopLevelItem(buildJsonTreeItem(it.key(), it.value()));
     }
     m_tree->expandToDepth(1);
     for(int column = 0; column < m_tree->columnCount(); ++column) {
         m_tree->resizeColumnToContents(column);
+    }
+}
+
+void AnalysisResultWidget::setResultHistory(const QJsonArray& history)
+{
+    m_history = history;
+
+    if(IResultRendererWidget* resultRenderer = dynamic_cast<IResultRendererWidget*>(m_extensionRenderer)) {
+        resultRenderer->setResultHistory(m_history);
+    }
+}
+
+void AnalysisResultWidget::setRuntimeContext(const QJsonObject& context)
+{
+    m_runtimeContext = context;
+
+    if(IResultRendererWidget* resultRenderer = dynamic_cast<IResultRendererWidget*>(m_extensionRenderer)) {
+        resultRenderer->setRuntimeContext(m_runtimeContext);
     }
 }
 
@@ -173,4 +191,49 @@ QString AnalysisResultWidget::toolName() const
 QJsonObject AnalysisResultWidget::result() const
 {
     return m_result;
+}
+
+QWidget* AnalysisResultWidget::ensureExtensionRenderer(const QString& toolName)
+{
+    const IResultRendererFactory* factory = ResultRendererFactoryRegistry::instance().factoryForToolName(toolName);
+    if(!factory) {
+        if(m_extensionRenderer) {
+            m_stack->removeWidget(m_extensionRenderer);
+            m_extensionRenderer->deleteLater();
+            m_extensionRenderer = nullptr;
+        }
+        return nullptr;
+    }
+
+    if(m_extensionRenderer
+       && m_extensionRenderer->property("mne_result_renderer_tool").toString() == toolName) {
+        return m_extensionRenderer;
+    }
+
+    if(m_extensionRenderer) {
+        m_stack->removeWidget(m_extensionRenderer);
+        m_extensionRenderer->deleteLater();
+        m_extensionRenderer = nullptr;
+    }
+
+    m_extensionRenderer = factory->createRenderer(this);
+    if(!m_extensionRenderer) {
+        return nullptr;
+    }
+
+    m_extensionRenderer->setProperty("mne_result_renderer_tool", toolName);
+    if(hasQtSignal(m_extensionRenderer, "toolCommandRequested(QString)")) {
+        QObject::connect(m_extensionRenderer,
+                         SIGNAL(toolCommandRequested(QString)),
+                         this,
+                         SIGNAL(toolCommandRequested(QString)));
+    }
+    if(hasQtSignal(m_extensionRenderer, "selectionContextChanged(QJsonObject)")) {
+        QObject::connect(m_extensionRenderer,
+                         SIGNAL(selectionContextChanged(QJsonObject)),
+                         this,
+                         SIGNAL(selectionContextChanged(QJsonObject)));
+    }
+    m_stack->addWidget(m_extensionRenderer);
+    return m_extensionRenderer;
 }
