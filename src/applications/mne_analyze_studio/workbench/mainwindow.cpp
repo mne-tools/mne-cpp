@@ -1671,6 +1671,21 @@ void MainWindow::sendToolCall(const QString& commandText)
             }
             return;
         }
+
+        const QString errorSummary = llmPlan.errorMessage.isEmpty()
+            ? QString("unknown planner error")
+            : llmPlan.errorMessage;
+        QString plannerFailureNote = QString("LLM planner (%1) failed: %2")
+                                         .arg(llmPlan.providerName, errorSummary);
+        if(llmPlan.httpStatusCode > 0) {
+            plannerFailureNote += QString(" | HTTP %1").arg(llmPlan.httpStatusCode);
+        }
+        if(!llmPlan.providerErrorType.isEmpty()) {
+            plannerFailureNote += QString(" | type=%1").arg(llmPlan.providerErrorType);
+        }
+        m_agentChatDock->appendTranscript(QString("Planner> %1").arg(plannerFailureNote));
+        appendProblemMessage(plannerFailureNote);
+        appendTerminalMessage(QString("> %1").arg(plannerFailureNote));
     }
 
     bool planned = false;

@@ -13,9 +13,13 @@
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QFormLayout>
+#include <QHBoxLayout>
+#include <QInputDialog>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QSettings>
+#include <QSignalBlocker>
 #include <QTextEdit>
 #include <QVBoxLayout>
 
@@ -43,25 +47,56 @@ QString formatToolInventory(const QJsonArray& toolDefinitions)
     return lines.isEmpty() ? QString("No tools available.") : lines.join("\n\n");
 }
 
+QStringList suggestedModelsForMode(const QString& mode)
+{
+    if(mode == QLatin1String("openai_responses")) {
+        return QStringList() << "gpt-5-mini" << "gpt-5" << "gpt-4.1-mini";
+    }
+
+    if(mode == QLatin1String("github_models")) {
+        return QStringList() << "openai/gpt-4.1-mini"
+                             << "openai/gpt-4.1"
+                             << "anthropic/claude-sonnet-4"
+                             << "meta/llama-3.3-70b-instruct";
+    }
+
+    if(mode == QLatin1String("anthropic_messages")) {
+        return QStringList() << "claude-sonnet-4-5" << "claude-opus-4-1" << "claude-haiku-3-5";
+    }
+
+    if(mode == QLatin1String("http")) {
+        return QStringList() << "gpt-4.1-mini" << "llama3.1:8b" << "qwen2.5-coder:7b";
+    }
+
+    return QStringList();
+}
+
 }
 
 LlmSettingsDialog::LlmSettingsDialog(const LlmPlannerConfig& config, QWidget* parent)
 : QDialog(parent)
+, m_profileComboBox(new QComboBox(this))
+, m_saveProfileButton(new QPushButton("Save Profile", this))
+, m_deleteProfileButton(new QPushButton("Delete Profile", this))
 , m_modeComboBox(new QComboBox(this))
 , m_providerLineEdit(new QLineEdit(this))
 , m_endpointLineEdit(new QLineEdit(this))
 , m_modelLineEdit(new QLineEdit(this))
 , m_apiKeyLineEdit(new QLineEdit(this))
+, m_suggestedModelComboBox(new QComboBox(this))
+, m_applySuggestedModelButton(new QPushButton("Use Suggested Model", this))
 , m_toolInventoryView(new QTextEdit(this))
 , m_testStatusLabel(new QLabel("No planner test run yet.", this))
-, m_testButton(new QPushButton("Test Planner", this))
+, m_testButton(new QPushButton("Validate Connection", this))
 {
     setWindowTitle("Agent Settings");
-    resize(640, 520);
+    resize(700, 560);
 
     m_modeComboBox->addItem("Deterministic Fallback", "disabled");
     m_modeComboBox->addItem("Mock Planner", "mock");
     m_modeComboBox->addItem("OpenAI Responses API", "openai_responses");
+    m_modeComboBox->addItem("GitHub Models", "github_models");
+    m_modeComboBox->addItem("Anthropic Claude", "anthropic_messages");
     m_modeComboBox->addItem("OpenAI-Compatible HTTP", "http");
 
     const QString mode = config.mode.trimmed().isEmpty() ? QString("disabled") : config.mode.trimmed().toLower();
@@ -73,16 +108,33 @@ LlmSettingsDialog::LlmSettingsDialog(const LlmPlannerConfig& config, QWidget* pa
     m_modelLineEdit->setText(config.model);
     m_apiKeyLineEdit->setText(config.apiKey);
     m_apiKeyLineEdit->setEchoMode(QLineEdit::PasswordEchoOnEdit);
+    m_profileComboBox->setPlaceholderText("Saved provider profiles");
+    m_suggestedModelComboBox->setMinimumContentsLength(28);
     m_toolInventoryView->setReadOnly(true);
     m_toolInventoryView->setLineWrapMode(QTextEdit::NoWrap);
     m_toolInventoryView->setPlaceholderText("Available planner tools will appear here.");
     m_testStatusLabel->setWordWrap(true);
 
+    QHBoxLayout* profileRow = new QHBoxLayout;
+    profileRow->setContentsMargins(0, 0, 0, 0);
+    profileRow->setSpacing(8);
+    profileRow->addWidget(m_profileComboBox, 1);
+    profileRow->addWidget(m_saveProfileButton);
+    profileRow->addWidget(m_deleteProfileButton);
+
+    QHBoxLayout* modelRow = new QHBoxLayout;
+    modelRow->setContentsMargins(0, 0, 0, 0);
+    modelRow->setSpacing(8);
+    modelRow->addWidget(m_modelLineEdit, 1);
+    modelRow->addWidget(m_suggestedModelComboBox);
+    modelRow->addWidget(m_applySuggestedModelButton);
+
     QFormLayout* formLayout = new QFormLayout;
+    formLayout->addRow("Profile", profileRow);
     formLayout->addRow("Mode", m_modeComboBox);
     formLayout->addRow("Provider", m_providerLineEdit);
     formLayout->addRow("Endpoint", m_endpointLineEdit);
-    formLayout->addRow("Model", m_modelLineEdit);
+    formLayout->addRow("Model", modelRow);
     formLayout->addRow("API Key", m_apiKeyLineEdit);
     formLayout->addRow("Status", m_testStatusLabel);
 
@@ -94,6 +146,13 @@ LlmSettingsDialog::LlmSettingsDialog(const LlmPlannerConfig& config, QWidget* pa
             qOverload<int>(&QComboBox::currentIndexChanged),
             this,
             &LlmSettingsDialog::updateModeDefaults);
+    connect(m_profileComboBox,
+            qOverload<int>(&QComboBox::currentIndexChanged),
+            this,
+            &LlmSettingsDialog::applySelectedProfile);
+    connect(m_saveProfileButton, &QPushButton::clicked, this, &LlmSettingsDialog::saveCurrentProfile);
+    connect(m_deleteProfileButton, &QPushButton::clicked, this, &LlmSettingsDialog::deleteCurrentProfile);
+    connect(m_applySuggestedModelButton, &QPushButton::clicked, this, &LlmSettingsDialog::applySuggestedModel);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addLayout(formLayout);
@@ -102,6 +161,7 @@ LlmSettingsDialog::LlmSettingsDialog(const LlmPlannerConfig& config, QWidget* pa
     layout->addWidget(m_testButton);
     layout->addWidget(buttonBox);
 
+    refreshProfiles();
     updateModeDefaults();
 }
 
@@ -163,13 +223,25 @@ void LlmSettingsDialog::runPlannerTest()
         return;
     }
 
-    m_testStatusLabel->setText(QString("Planner failed: %1")
-                               .arg(result.errorMessage.isEmpty() ? QString("unknown error") : result.errorMessage));
+    QString failureText = QString("Planner failed: %1")
+                              .arg(result.errorMessage.isEmpty() ? QString("unknown error") : result.errorMessage);
+    if(result.httpStatusCode > 0) {
+        failureText += QString(" | HTTP %1").arg(result.httpStatusCode);
+    }
+    if(!result.providerErrorType.isEmpty()) {
+        failureText += QString(" | type=%1").arg(result.providerErrorType);
+    }
+    if(!result.rawResponse.trimmed().isEmpty()) {
+        const QString compactResponse = result.rawResponse.simplified();
+        failureText += QString(" | response=%1").arg(compactResponse.left(220));
+    }
+    m_testStatusLabel->setText(failureText);
 }
 
 void LlmSettingsDialog::updateModeDefaults()
 {
     const QString mode = m_modeComboBox->currentData().toString();
+    refreshSuggestedModels();
     if(mode == QLatin1String("openai_responses")) {
         if(m_providerLineEdit->text().trimmed().isEmpty()) {
             m_providerLineEdit->setText("OpenAI");
@@ -178,6 +250,28 @@ void LlmSettingsDialog::updateModeDefaults()
         m_endpointLineEdit->setPlaceholderText("https://api.openai.com/v1/responses");
         m_modelLineEdit->setPlaceholderText("gpt-5-mini");
         m_apiKeyLineEdit->setPlaceholderText("Required for OpenAI");
+        return;
+    }
+
+    if(mode == QLatin1String("github_models")) {
+        if(m_providerLineEdit->text().trimmed().isEmpty()) {
+            m_providerLineEdit->setText("GitHub Models");
+        }
+        m_providerLineEdit->setPlaceholderText("GitHub Models");
+        m_endpointLineEdit->setPlaceholderText("https://models.inference.ai.azure.com/chat/completions");
+        m_modelLineEdit->setPlaceholderText("openai/gpt-4.1-mini or anthropic/claude-sonnet-4");
+        m_apiKeyLineEdit->setPlaceholderText("Required GitHub token");
+        return;
+    }
+
+    if(mode == QLatin1String("anthropic_messages")) {
+        if(m_providerLineEdit->text().trimmed().isEmpty()) {
+            m_providerLineEdit->setText("Anthropic");
+        }
+        m_providerLineEdit->setPlaceholderText("Anthropic");
+        m_endpointLineEdit->setPlaceholderText("https://api.anthropic.com/v1/messages");
+        m_modelLineEdit->setPlaceholderText("claude-sonnet-4-5");
+        m_apiKeyLineEdit->setPlaceholderText("Required for Anthropic");
         return;
     }
 
@@ -196,4 +290,128 @@ void LlmSettingsDialog::updateModeDefaults()
     m_endpointLineEdit->setPlaceholderText("Optional");
     m_modelLineEdit->setPlaceholderText("Optional");
     m_apiKeyLineEdit->setPlaceholderText("Optional");
+}
+
+void LlmSettingsDialog::saveCurrentProfile()
+{
+    bool accepted = false;
+    const QString initialName = m_profileComboBox->currentData().toString();
+    const QString profileName = QInputDialog::getText(this,
+                                                      "Save Provider Profile",
+                                                      "Profile name",
+                                                      QLineEdit::Normal,
+                                                      initialName,
+                                                      &accepted).trimmed();
+    if(!accepted || profileName.isEmpty()) {
+        return;
+    }
+
+    QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
+    const QString baseKey = QString("agent/profiles/%1").arg(profileName);
+    settings.setValue(QString("%1/mode").arg(baseKey), m_modeComboBox->currentData().toString());
+    settings.setValue(QString("%1/provider").arg(baseKey), m_providerLineEdit->text().trimmed());
+    settings.setValue(QString("%1/endpoint").arg(baseKey), m_endpointLineEdit->text().trimmed());
+    settings.setValue(QString("%1/model").arg(baseKey), m_modelLineEdit->text().trimmed());
+    settings.setValue(QString("%1/api_key").arg(baseKey), m_apiKeyLineEdit->text().trimmed());
+    settings.setValue("agent/selected_profile", profileName);
+    refreshProfiles();
+    const int index = m_profileComboBox->findData(profileName);
+    if(index >= 0) {
+        m_profileComboBox->setCurrentIndex(index);
+    }
+    m_testStatusLabel->setText(QString("Saved provider profile `%1`.").arg(profileName));
+}
+
+void LlmSettingsDialog::deleteCurrentProfile()
+{
+    const QString profileName = m_profileComboBox->currentData().toString().trimmed();
+    if(profileName.isEmpty()) {
+        return;
+    }
+
+    QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
+    settings.remove(QString("agent/profiles/%1").arg(profileName));
+    if(settings.value("agent/selected_profile").toString() == profileName) {
+        settings.remove("agent/selected_profile");
+    }
+    refreshProfiles();
+    m_testStatusLabel->setText(QString("Deleted provider profile `%1`.").arg(profileName));
+}
+
+void LlmSettingsDialog::applySelectedProfile(int index)
+{
+    if(index < 0) {
+        return;
+    }
+
+    const QString profileName = m_profileComboBox->itemData(index).toString().trimmed();
+    if(profileName.isEmpty()) {
+        return;
+    }
+
+    QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
+    const QString baseKey = QString("agent/profiles/%1").arg(profileName);
+    const QString mode = settings.value(QString("%1/mode").arg(baseKey)).toString().trimmed();
+    const int modeIndex = m_modeComboBox->findData(mode);
+    if(modeIndex >= 0) {
+        m_modeComboBox->setCurrentIndex(modeIndex);
+    }
+    m_providerLineEdit->setText(settings.value(QString("%1/provider").arg(baseKey)).toString());
+    m_endpointLineEdit->setText(settings.value(QString("%1/endpoint").arg(baseKey)).toString());
+    m_modelLineEdit->setText(settings.value(QString("%1/model").arg(baseKey)).toString());
+    m_apiKeyLineEdit->setText(settings.value(QString("%1/api_key").arg(baseKey)).toString());
+    settings.setValue("agent/selected_profile", profileName);
+    updateModeDefaults();
+    m_testStatusLabel->setText(QString("Loaded provider profile `%1`.").arg(profileName));
+}
+
+void LlmSettingsDialog::applySuggestedModel()
+{
+    const QString modelName = m_suggestedModelComboBox->currentData().toString().trimmed();
+    if(modelName.isEmpty()) {
+        return;
+    }
+
+    m_modelLineEdit->setText(modelName);
+}
+
+void LlmSettingsDialog::refreshProfiles()
+{
+    QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
+    const QString selectedProfile = settings.value("agent/selected_profile").toString().trimmed();
+    settings.beginGroup("agent/profiles");
+    const QStringList profileNames = settings.childGroups();
+    settings.endGroup();
+
+    QSignalBlocker blocker(m_profileComboBox);
+    m_profileComboBox->clear();
+    for(const QString& groupName : profileNames) {
+        const QString profileName = groupName.trimmed();
+        if(profileName.isEmpty()) {
+            continue;
+        }
+        m_profileComboBox->addItem(profileName, profileName);
+    }
+
+    const int index = m_profileComboBox->findData(selectedProfile);
+    if(index >= 0) {
+        m_profileComboBox->setCurrentIndex(index);
+    }
+}
+
+void LlmSettingsDialog::refreshSuggestedModels()
+{
+    const QString mode = m_modeComboBox->currentData().toString();
+    const QStringList suggestions = suggestedModelsForMode(mode);
+
+    QSignalBlocker blocker(m_suggestedModelComboBox);
+    m_suggestedModelComboBox->clear();
+    for(const QString& modelName : suggestions) {
+        m_suggestedModelComboBox->addItem(modelName, modelName);
+    }
+
+    const int currentIndex = m_suggestedModelComboBox->findData(m_modelLineEdit->text().trimmed());
+    if(currentIndex >= 0) {
+        m_suggestedModelComboBox->setCurrentIndex(currentIndex);
+    }
 }
