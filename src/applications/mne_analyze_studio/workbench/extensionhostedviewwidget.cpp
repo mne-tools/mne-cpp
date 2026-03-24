@@ -74,10 +74,13 @@ ExtensionHostedViewWidget::ExtensionHostedViewWidget(QWidget* parent)
             return;
         }
 
+        const QJsonObject opacityControl = m_descriptor.value("controls").toObject().value("opacity").toObject();
+        const QString commandName = opacityControl.value("command").toString("set_opacity").trimmed();
+        const QString argumentName = opacityControl.value("target_argument").toString("opacity").trimmed();
         const double opacity = static_cast<double>(m_opacitySlider->value()) / 100.0;
         emit viewCommandRequested(currentSessionId,
-                                  "set_opacity",
-                                  QJsonObject{{"opacity", opacity}});
+                                  commandName,
+                                  QJsonObject{{argumentName, opacity}});
     });
 
     rebuildUi();

@@ -110,8 +110,11 @@ Dummy3DHostedViewWidget::Dummy3DHostedViewWidget(QWidget* parent)
             return;
         }
 
+        const QJsonObject opacityControl = m_descriptor.value("controls").toObject().value("opacity").toObject();
+        const QString commandName = opacityControl.value("command").toString("set_opacity").trimmed();
+        const QString argumentName = opacityControl.value("target_argument").toString("opacity").trimmed();
         const double opacity = static_cast<double>(m_opacitySlider->value()) / 100.0;
-        emit viewCommandRequested(sessionId(), "set_opacity", QJsonObject{{"opacity", opacity}});
+        emit viewCommandRequested(sessionId(), commandName, QJsonObject{{argumentName, opacity}});
     });
 
     rebuildUi();

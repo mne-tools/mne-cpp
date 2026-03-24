@@ -33,12 +33,15 @@
 #ifndef MNE_ANALYZE_STUDIO_AGENTCHATDOCKWIDGET_H
 #define MNE_ANALYZE_STUDIO_AGENTCHATDOCKWIDGET_H
 
+#include <QJsonArray>
 #include <QWidget>
 
 class QLineEdit;
 class QLabel;
 class QPushButton;
 class QTextEdit;
+class QVBoxLayout;
+class QWidget;
 
 namespace MNEANALYZESTUDIO
 {
@@ -56,13 +59,19 @@ public:
 
 signals:
     void commandSubmitted(const QString& commandText);
+    void confirmationRequested(const QString& commandText);
+    void confirmationDismissed(const QString& commandText);
 
 public slots:
     void appendTranscript(const QString& text);
+    void setPendingConfirmations(const QJsonArray& confirmations);
 
 private:
     QLabel* m_titleLabel;
     QLabel* m_statusLabel;
+    QLabel* m_confirmationLabel;
+    QWidget* m_confirmationPanel;
+    QVBoxLayout* m_confirmationLayout;
     QTextEdit* m_transcript;
     QLineEdit* m_input;
     QPushButton* m_sendButton;

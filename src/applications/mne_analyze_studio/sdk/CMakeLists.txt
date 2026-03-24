@@ -11,7 +11,11 @@ add_library(${PROJECT_NAME} SHARED
     extensionviewfactoryregistry.cpp
     extensionviewfactoryregistry.h
     iextensionviewfactory.h
+    iresultrendererfactory.h
+    iresultrendererwidget.h
     irawdataview.h
+    resultrendererfactoryregistry.cpp
+    resultrendererfactoryregistry.h
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

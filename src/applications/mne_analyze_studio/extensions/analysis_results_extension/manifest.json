@@ -1,0 +1,226 @@
+{
+  "id": "analysis-results-extension",
+  "display_name": "Analysis Results Extension",
+  "version": "0.1.0",
+  "entry_point": "analysis_results_renderer",
+  "contributes": {
+    "result_renderers": [
+      {
+        "id": "analysis.channel_and_peak_renderer",
+        "display_name": "Analysis Result Renderer",
+        "widget_type": "analysis_result_renderer",
+        "tool_names": [
+          "neurokernel.channel_stats",
+          "neurokernel.raw_stats",
+          "neurokernel.find_peak_window",
+          "studio.pipeline.run"
+        ],
+        "actions": [
+          {
+            "id": "jump_to_peak",
+            "label": "Jump To Peak Sample",
+            "kind": "tool_call",
+            "tool_name": "view.raw.goto",
+            "description": "Moves the active raw browser cursor to the returned peak sample."
+          },
+          {
+            "id": "analyze_selected_channel_peak",
+            "label": "Find Peak For Selected Channel",
+            "kind": "tool_call",
+            "tool_name": "neurokernel.find_peak_window",
+            "description": "Runs peak detection again using the currently selected channel name as a match filter."
+          },
+          {
+            "id": "rerun_pipeline",
+            "label": "Rerun Pipeline",
+            "kind": "tool_call",
+            "tool_name": "studio.pipeline.run",
+            "description": "Queues the same manifest-defined analysis workflow again."
+          },
+          {
+            "id": "rerun_pipeline_step",
+            "label": "Run Selected Step",
+            "kind": "tool_call",
+            "tool_name": "tools.call",
+            "description": "Replays the selected pipeline step command from the workflow timeline."
+          }
+        ],
+        "runtime_context_schema": {
+          "type": "object",
+          "properties": {
+            "has_active_raw_view": {
+              "type": "boolean"
+            },
+            "active_raw_file": {
+              "type": "string"
+            },
+            "cursor_sample": {
+              "type": "integer"
+            }
+          }
+        },
+        "history_schema": {
+          "type": "array",
+          "description": "Recent structured result payloads for the same tool."
+        }
+      }
+    ],
+    "analysis_pipelines": [
+      {
+        "id": "analysis.find_peak_and_jump",
+        "display_name": "Find Peak And Jump",
+        "description": "Detect the strongest event in the active window and move the raw browser cursor there.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "window_samples": {
+              "type": "integer",
+              "default": 4000
+            },
+            "match": {
+              "type": "string",
+              "default": "EEG"
+            }
+          },
+          "required": [
+            "window_samples"
+          ]
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "peak_sample": {
+              "type": "integer"
+            },
+            "peak_channel": {
+              "type": "string"
+            }
+          }
+        },
+        "steps": [
+          {
+            "tool_name": "neurokernel.find_peak_window",
+            "arguments_template": {
+              "window_samples": "${window_samples}",
+              "match": "${match}"
+            }
+          },
+          {
+            "tool_name": "view.raw.goto",
+            "arguments_template": {
+              "sample": "${last_peak_sample}"
+            }
+          }
+        ],
+        "follow_up_actions": [
+          {
+            "label": "Compute Raw Stats There",
+            "description": "Use the new cursor position for a focused raw statistics pass."
+          },
+          {
+            "label": "Inspect Strongest Channels",
+            "description": "Run per-channel statistics around the detected event."
+          }
+        ]
+      },
+      {
+        "id": "analysis.rank_channels_then_peak",
+        "display_name": "Rank Channels Then Find Peak",
+        "description": "Find the strongest channels in the active window and then search for a peak around the preferred family.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "window_samples": {
+              "type": "integer",
+              "default": 600
+            },
+            "match": {
+              "type": "string",
+              "default": "EEG"
+            },
+            "limit": {
+              "type": "integer",
+              "default": 5
+            }
+          }
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "channels": {
+              "type": "array"
+            }
+          }
+        },
+        "steps": [
+          {
+            "tool_name": "neurokernel.channel_stats",
+            "arguments_template": {
+              "window_samples": "${window_samples}",
+              "match": "${match}",
+              "limit": "${limit}"
+            }
+          },
+          {
+            "tool_name": "neurokernel.find_peak_window",
+            "arguments_template": {
+              "window_samples": "${window_samples}",
+              "match": "${match}"
+            }
+          }
+        ],
+        "follow_up_actions": [
+          {
+            "label": "Jump To Peak",
+            "description": "Move the raw browser to the strongest detected point."
+          }
+        ]
+      }
+    ],
+    "ui": {
+      "sidebar_items": [
+        "Analysis Results"
+      ],
+      "settings_tabs": [
+        {
+          "id": "analysis_results_preferences",
+          "title": "Analysis Results Preferences",
+          "description": "Settings contributed by the analysis results extension.",
+          "fields": [
+            {
+              "id": "default_peak_window_samples",
+              "label": "Default Peak Window Samples",
+              "type": "integer",
+              "minimum": 128,
+              "maximum": 20000,
+              "default": 4000,
+              "description": "Default window size used for peak-finding follow-up actions."
+            },
+            {
+              "id": "preferred_channel_family",
+              "label": "Preferred Channel Family",
+              "type": "enum",
+              "default": "EEG",
+              "options": [
+                "EEG",
+                "MEG",
+                "EOG"
+              ],
+              "description": "Preferred channel family for analysis follow-up actions."
+            }
+          ],
+          "actions": [
+            {
+              "id": "save",
+              "label": "Save Settings"
+            },
+            {
+              "id": "restore_defaults",
+              "label": "Restore Defaults"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

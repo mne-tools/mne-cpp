@@ -106,6 +106,49 @@ bool SkillHostService::reloadExtensions(const QString& extensionsDirectory, cons
     return true;
 }
 
+QJsonObject SkillHostService::sessionCapabilitiesForProvider(const ViewProviderContribution& provider) const
+{
+    QJsonObject capabilities;
+
+    const QJsonObject controls = provider.controls;
+    for(auto it = controls.constBegin(); it != controls.constEnd(); ++it) {
+        const QJsonObject control = it.value().toObject();
+        const QString commandName = control.value("command").toString().trimmed();
+        if(!commandName.isEmpty()) {
+            capabilities.insert(commandName, true);
+        }
+    }
+
+    const QJsonArray actions = provider.actions;
+    for(const QJsonValue& value : actions) {
+        const QJsonObject action = value.toObject();
+        const QString commandName = action.value("command").toString().trimmed();
+        if(!commandName.isEmpty()) {
+            capabilities.insert(commandName, true);
+        }
+    }
+
+    if(provider.widgetType == "embedded_raw_browser") {
+        capabilities.insert("raw_browser_embedded", true);
+    }
+
+    return capabilities;
+}
+
+QJsonObject SkillHostService::viewCommandResultSchema(const QJsonObject& stateSchema) const
+{
+    return QJsonObject{
+        {"type", "object"},
+        {"properties", QJsonObject{
+             {"session_id", QJsonObject{{"type", "string"}}},
+             {"command", QJsonObject{{"type", "string"}}},
+             {"state_before", stateSchema.isEmpty() ? QJsonObject{{"type", "object"}} : stateSchema},
+             {"state_after", stateSchema.isEmpty() ? QJsonObject{{"type", "object"}} : stateSchema}
+         }},
+        {"required", QJsonArray{"session_id", "command"}}
+    };
+}
+
 QJsonObject SkillHostService::handleResourcesList() const
 {
     QJsonArray resources;
@@ -240,24 +283,17 @@ QJsonObject SkillHostService::handleViewsOpen(const QJsonObject& params)
             }
 
             const QString sessionId = QUuid::createUuid().toString(QUuid::WithoutBraces);
-            const QJsonObject dummy3dStateSchema{
-                {"type", "object"},
-                {"properties", QJsonObject{
-                     {"opacity", QJsonObject{{"type", "number"}, {"minimum", 0.0}, {"maximum", 1.0}}},
-                     {"hemisphere", QJsonObject{{"type", "string"}, {"enum", QJsonArray{"left", "right", "both"}}}},
-                     {"camera", QJsonObject{{"type", "string"}}}
-                 }},
-                {"required", QJsonArray{"opacity", "hemisphere", "camera"}}
-            };
-            const QJsonObject dummy3dActionResultSchema{
-                {"type", "object"},
-                {"properties", QJsonObject{
-                     {"session_id", QJsonObject{{"type", "string"}}},
-                     {"command", QJsonObject{{"type", "string"}}},
-                     {"state_before", dummy3dStateSchema},
-                     {"state_after", dummy3dStateSchema}
-                 }}
-            };
+            const QJsonObject stateSchema = provider.stateSchema;
+            const QJsonObject actionResultSchema = viewCommandResultSchema(stateSchema);
+            QJsonArray actions = provider.actions;
+            for(int i = 0; i < actions.size(); ++i) {
+                QJsonObject action = actions.at(i).toObject();
+                if(action.value("result_schema").toObject().isEmpty()) {
+                    action.insert("result_schema", actionResultSchema);
+                }
+                actions[i] = action;
+            }
+
             descriptor = QJsonObject{
                 {"tool_name", "views/open"},
                 {"status", "ok"},
@@ -273,78 +309,17 @@ QJsonObject SkillHostService::handleViewsOpen(const QJsonObject& params)
                 {"title", QString("%1").arg(provider.displayName)},
                 {"message", QString("Opened hosted view session for %1 via %2.")
                                 .arg(filePath, manifest.displayName)},
-                {"capabilities", QJsonObject{
-                     {"set_opacity", provider.id == "dummy3d.surface_view"},
-                     {"focus_left", provider.id == "dummy3d.surface_view"},
-                     {"focus_right", provider.id == "dummy3d.surface_view"},
-                     {"reset_view", provider.id == "dummy3d.surface_view"}
-                 }},
-                {"controls", QJsonObject{
-                     {"opacity", QJsonObject{
-                          {"minimum", 0.0},
-                          {"maximum", 1.0},
-                          {"step", 0.05},
-                          {"value", 0.8}
-                      }}
-                 }},
-                {"actions", QJsonArray{
-                     QJsonObject{
-                         {"command", "focus_left"},
-                         {"label", "Left Hemisphere"},
-                         {"description", "Rotate the hosted 3D view toward the left hemisphere."},
-                         {"result_schema", dummy3dActionResultSchema}
-                     },
-                     QJsonObject{
-                         {"command", "focus_right"},
-                         {"label", "Right Hemisphere"},
-                         {"description", "Rotate the hosted 3D view toward the right hemisphere."},
-                         {"result_schema", dummy3dActionResultSchema}
-                     },
-                     QJsonObject{
-                         {"command", "reset_view"},
-                         {"label", "Reset View"},
-                         {"description", "Reset camera and opacity to the default placeholder scene state."},
-                         {"result_schema", dummy3dActionResultSchema}
-                     }
-                 }},
-                {"state", QJsonObject{
-                     {"opacity", 0.8},
-                     {"hemisphere", "both"},
-                     {"camera", "default"}
-                 }},
-                {"state_schema", dummy3dStateSchema}
+                {"capabilities", sessionCapabilitiesForProvider(provider)},
+                {"controls", provider.controls},
+                {"actions", actions},
+                {"state", provider.initialState},
+                {"initial_state", provider.initialState},
+                {"state_schema", stateSchema}
             };
 
-            if(provider.id == "fiffbrowser.raw_view") {
-                descriptor = QJsonObject{
-                    {"tool_name", "views/open"},
-                    {"status", "ok"},
-                    {"session_id", sessionId},
-                    {"file", filePath},
-                    {"provider_id", provider.id},
-                    {"provider_display_name", provider.displayName},
-                    {"widget_type", provider.widgetType},
-                    {"slot", provider.slot},
-                    {"extension_id", manifest.id},
-                    {"extension_display_name", manifest.displayName},
-                    {"title", QFileInfo(filePath).fileName()},
-                    {"message", QString("Opened FIFF browser extension session for %1.").arg(filePath)},
-                    {"capabilities", QJsonObject{
-                         {"raw_browser_embedded", true}
-                     }},
-                    {"state", QJsonObject{
-                         {"buffer_kind", "fiff"},
-                         {"session_role", "signal_browser"}
-                     }},
-                    {"state_schema", QJsonObject{
-                         {"type", "object"},
-                         {"properties", QJsonObject{
-                              {"buffer_kind", QJsonObject{{"type", "string"}}},
-                              {"session_role", QJsonObject{{"type", "string"}}}
-                          }},
-                         {"required", QJsonArray{"buffer_kind", "session_role"}}
-                     }}
-                };
+            if(provider.widgetType == "embedded_raw_browser") {
+                descriptor.insert("title", QFileInfo(filePath).fileName());
+                descriptor.insert("message", QString("Opened FIFF browser extension session for %1.").arg(filePath));
             }
 
             m_viewSessions.insert(sessionId, descriptor);
@@ -401,18 +376,66 @@ QJsonObject SkillHostService::handleViewsCommand(const QJsonObject& params)
     QJsonObject state = stateBefore;
     QJsonObject controls = descriptor.value("controls").toObject();
     const QJsonObject stateSchema = descriptor.value("state_schema").toObject();
+    QJsonObject matchedCommandDefinition;
+    QString matchedControlKey;
+    bool isControlCommand = false;
 
-    if(commandName == "set_opacity") {
-        const double opacity = std::max(0.0, std::min(1.0, arguments.value("opacity").toDouble(0.8)));
-        state.insert("opacity", opacity);
-        if(controls.contains("opacity")) {
-            QJsonObject opacityControl = controls.value("opacity").toObject();
-            opacityControl.insert("value", opacity);
-            controls.insert("opacity", opacityControl);
+    for(auto it = controls.constBegin(); it != controls.constEnd(); ++it) {
+        const QJsonObject control = it.value().toObject();
+        if(control.value("command").toString().trimmed() == commandName) {
+            matchedCommandDefinition = control;
+            matchedControlKey = it.key();
+            isControlCommand = true;
+            break;
         }
+    }
+
+    if(matchedCommandDefinition.isEmpty()) {
+        const QJsonArray actions = descriptor.value("actions").toArray();
+        for(const QJsonValue& value : actions) {
+            const QJsonObject action = value.toObject();
+            if(action.value("command").toString().trimmed() == commandName) {
+                matchedCommandDefinition = action;
+                break;
+            }
+        }
+    }
+
+    if(!matchedCommandDefinition.isEmpty()) {
+        if(isControlCommand) {
+            const QString targetArgument = matchedCommandDefinition.value("target_argument").toString().trimmed();
+            const QString stateKey = matchedCommandDefinition.value("state_key").toString(targetArgument).trimmed();
+            QJsonValue nextValue = arguments.value(targetArgument);
+            if(matchedCommandDefinition.value("type").toString() == "number") {
+                const double minimum = matchedCommandDefinition.value("minimum").toDouble(0.0);
+                const double maximum = matchedCommandDefinition.value("maximum").toDouble(1.0);
+                const double bounded = std::max(minimum, std::min(maximum, nextValue.toDouble(matchedCommandDefinition.value("value").toDouble())));
+                nextValue = bounded;
+            }
+            if(!stateKey.isEmpty()) {
+                state.insert(stateKey, nextValue);
+            }
+            QJsonObject updatedControl = matchedCommandDefinition;
+            updatedControl.insert("value", nextValue);
+            if(!matchedControlKey.isEmpty()) {
+                controls.insert(matchedControlKey, updatedControl);
+            }
+            descriptor.insert("controls", controls);
+        } else {
+            if(matchedCommandDefinition.value("reset_to_initial_state").toBool(false)) {
+                state = descriptor.value("initial_state").toObject();
+            }
+            const QJsonObject statePatch = matchedCommandDefinition.value("state_patch").toObject();
+            for(auto it = statePatch.constBegin(); it != statePatch.constEnd(); ++it) {
+                state.insert(it.key(), it.value());
+            }
+        }
+
         descriptor.insert("state", state);
-        descriptor.insert("controls", controls);
-        descriptor.insert("message", QString("Updated extension view opacity to %1.").arg(QString::number(opacity, 'f', 2)));
+        const QString message = matchedCommandDefinition.value("success_message").toString().trimmed().isEmpty()
+            ? QString("Applied hosted view command %1.").arg(commandName)
+            : matchedCommandDefinition.value("success_message").toString().trimmed();
+        descriptor.insert("message", message);
         m_viewSessions.insert(sessionId, descriptor);
 
         return QJsonObject{
@@ -425,72 +448,8 @@ QJsonObject SkillHostService::handleViewsCommand(const QJsonObject& params)
             {"state", state},
             {"state_schema", stateSchema},
             {"controls", controls},
-            {"message", descriptor.value("message").toString()}
-        };
-    }
-
-    if(commandName == "focus_left") {
-        state.insert("hemisphere", "left");
-        state.insert("camera", "left_lateral");
-        descriptor.insert("state", state);
-        descriptor.insert("message", "Rotated hosted extension view to the left hemisphere.");
-        m_viewSessions.insert(sessionId, descriptor);
-        return QJsonObject{
-            {"tool_name", "views/command"},
-            {"status", "ok"},
-            {"session_id", sessionId},
-            {"command", commandName},
-            {"state_before", stateBefore},
-            {"state_after", state},
-            {"state", state},
-            {"state_schema", stateSchema},
-            {"message", descriptor.value("message").toString()}
-        };
-    }
-
-    if(commandName == "focus_right") {
-        state.insert("hemisphere", "right");
-        state.insert("camera", "right_lateral");
-        descriptor.insert("state", state);
-        descriptor.insert("message", "Rotated hosted extension view to the right hemisphere.");
-        m_viewSessions.insert(sessionId, descriptor);
-        return QJsonObject{
-            {"tool_name", "views/command"},
-            {"status", "ok"},
-            {"session_id", sessionId},
-            {"command", commandName},
-            {"state_before", stateBefore},
-            {"state_after", state},
-            {"state", state},
-            {"state_schema", stateSchema},
-            {"message", descriptor.value("message").toString()}
-        };
-    }
-
-    if(commandName == "reset_view") {
-        state.insert("hemisphere", "both");
-        state.insert("camera", "default");
-        state.insert("opacity", 0.8);
-        if(controls.contains("opacity")) {
-            QJsonObject opacityControl = controls.value("opacity").toObject();
-            opacityControl.insert("value", 0.8);
-            controls.insert("opacity", opacityControl);
-        }
-        descriptor.insert("state", state);
-        descriptor.insert("controls", controls);
-        descriptor.insert("message", "Reset hosted extension view to the default placeholder scene state.");
-        m_viewSessions.insert(sessionId, descriptor);
-        return QJsonObject{
-            {"tool_name", "views/command"},
-            {"status", "ok"},
-            {"session_id", sessionId},
-            {"command", commandName},
-            {"state_before", stateBefore},
-            {"state_after", state},
-            {"state", state},
-            {"state_schema", stateSchema},
-            {"controls", controls},
-            {"message", descriptor.value("message").toString()}
+            {"message", descriptor.value("message").toString()},
+            {"result_schema", matchedCommandDefinition.value("result_schema").toObject()}
         };
     }
 

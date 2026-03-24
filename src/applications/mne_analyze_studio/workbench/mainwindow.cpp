@@ -14,19 +14,23 @@
 #include "agentchatdockwidget.h"
 #include "editortabbar.h"
 #include "editortabwidget.h"
+#include "extensionsettingswidget.h"
 #include "extensionhostedviewwidget.h"
 #include "llmsettingsdialog.h"
-#include "spectrumplotwidget.h"
 
 #include <extensionviewfactoryregistry.h>
 #include <iextensionviewfactory.h>
 #include <irawdataview.h>
+#include <iresultrendererfactory.h>
+#include <iresultrendererwidget.h>
 #include <jsonrpcmessage.h>
+#include <resultrendererfactoryregistry.h>
 #include <viewproviderregistry.h>
 
 #include <QApplication>
 #include <QCloseEvent>
 #include <QComboBox>
+#include <QDateTime>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QAction>
@@ -83,6 +87,19 @@ const char* kKernelSocketName = "mne_analyze_studio.neuro_kernel";
 const char* kExtensionSocketName = "mne_analyze_studio.extension_host";
 const char* kWorkspaceArtifactRoot = "__mne_analyze_studio_analysis_root__";
 const char* kWorkspaceArtifactEntry = "__mne_analyze_studio_analysis_entry__";
+const char* kWorkspaceArtifactStepEntry = "__mne_analyze_studio_analysis_step_entry__";
+
+QString extensionSettingsToolName(const QString& extensionId,
+                                  const QString& tabId,
+                                  const QString& fieldId,
+                                  const QString& verb)
+{
+    return QString("settings.%1.%2.%3.%4")
+        .arg(extensionId.trimmed(),
+             tabId.trimmed(),
+             fieldId.trimmed(),
+             verb.trimmed());
+}
 
 QString resolveStudioExtensionsDirectory()
 {
@@ -143,6 +160,9 @@ bool copyDirectoryRecursively(const QString& sourcePath, const QString& targetPa
 
 QString artifactTypeLabel(const QString& toolName)
 {
+    if(toolName == "studio.pipeline.run") {
+        return "Pipeline Run";
+    }
     if(toolName == "neurokernel.psd_summary") {
         return "PSD";
     }
@@ -162,8 +182,32 @@ QString artifactTypeLabel(const QString& toolName)
     return "Result";
 }
 
+QString pipelineArtifactStatusBadge(const QString& status)
+{
+    if(status == QLatin1String("completed")) {
+        return "[done]";
+    }
+    if(status == QLatin1String("failed")) {
+        return "[failed]";
+    }
+    if(status == QLatin1String("running")) {
+        return "[running]";
+    }
+    if(status == QLatin1String("resumed")) {
+        return "[resumed]";
+    }
+    if(status == QLatin1String("queued")) {
+        return "[queued]";
+    }
+
+    return "[saved]";
+}
+
 QStyle::StandardPixmap artifactIconType(const QString& toolName)
 {
+    if(toolName == "studio.pipeline.run") {
+        return QStyle::SP_FileDialogContentsView;
+    }
     if(toolName == "neurokernel.psd_summary") {
         return QStyle::SP_ComputerIcon;
     }
@@ -175,6 +219,24 @@ QStyle::StandardPixmap artifactIconType(const QString& toolName)
     }
 
     return QStyle::SP_FileDialogInfoView;
+}
+
+QStyle::StandardPixmap pipelineArtifactIconType(const QString& status)
+{
+    if(status == QLatin1String("completed")) {
+        return QStyle::SP_DialogApplyButton;
+    }
+    if(status == QLatin1String("failed")) {
+        return QStyle::SP_MessageBoxCritical;
+    }
+    if(status == QLatin1String("running") || status == QLatin1String("resumed")) {
+        return QStyle::SP_BrowserReload;
+    }
+    if(status == QLatin1String("queued")) {
+        return QStyle::SP_MediaPlay;
+    }
+
+    return QStyle::SP_FileDialogContentsView;
 }
 
 QString formatToolDefinitions(const QJsonArray& tools)
@@ -330,6 +392,50 @@ QJsonObject stringSchema(const QString& title,
     return schema;
 }
 
+QJsonObject fieldSchemaForSettingsTool(const QJsonObject& field)
+{
+    const QString type = field.value("type").toString("string").trimmed().toLower();
+    const QString label = field.value("label").toString(field.value("id").toString());
+    const QString description = field.value("description").toString();
+
+    if(type == "boolean" || type == "bool") {
+        return QJsonObject{
+            {"type", "boolean"},
+            {"title", label},
+            {"default", field.value("default").toBool(false)},
+            {"description", description}
+        };
+    }
+
+    if(type == "integer" || type == "int") {
+        return integerSchema(label,
+                             field.value("minimum").toInt(std::numeric_limits<int>::min()),
+                             field.value("maximum").toInt(std::numeric_limits<int>::max()),
+                             field.value("default").toInt(0),
+                             description);
+    }
+
+    if(type == "number" || type == "double") {
+        return numberSchema(label,
+                            field.value("minimum").toDouble(-1e12),
+                            field.value("maximum").toDouble(1e12),
+                            field.value("default").toDouble(0.0),
+                            description);
+    }
+
+    if(type == "enum") {
+        return stringSchema(label,
+                            field.value("options").toArray(),
+                            field.value("default").toString(),
+                            description);
+    }
+
+    return stringSchema(label,
+                        QJsonArray(),
+                        field.value("default").toString(),
+                        description);
+}
+
 QJsonObject resultStringSchema(const QString& title,
                                const QString& description = QString())
 {
@@ -385,16 +491,10 @@ MainWindow::MainWindow(QWidget* parent)
 , m_resultsTab(new QWidget(this))
 , m_resultsTitleLabel(new QLabel("Run a tool or open an Analysis artifact to populate Recent Results."))
 , m_resultsHistoryCombo(new QComboBox(this))
-, m_resultsPsdControlsWidget(new QWidget(this))
-, m_resultsPsdMatchCombo(new QComboBox(this))
-, m_resultsPsdNfftSpin(new QSpinBox(this))
-, m_resultsPsdCompareCombo(new QComboBox(this))
-, m_resultsPsdRunButton(new QPushButton("Update PSD", this))
-, m_resultsActionButton(new QPushButton("Run Action", this))
 , m_resultsStack(new QStackedWidget(this))
 , m_resultsTree(new QTreeWidget(this))
 , m_resultsTable(new QTableWidget(this))
-, m_resultsSpectrumPlot(new SpectrumPlotWidget(this))
+, m_resultsExtensionRenderer(nullptr)
 , m_terminalTab(new QWidget(this))
 , m_terminalStatusLabel(new QLabel("Active view state: idle"))
 , m_terminalPanel(new QTextEdit)
@@ -407,6 +507,8 @@ MainWindow::MainWindow(QWidget* parent)
 , m_sceneRegistry(this)
 , m_viewProviderRegistry(new ViewProviderRegistry(this))
 , m_viewManager(&m_sceneRegistry, m_viewProviderRegistry, this)
+, m_activePipelineTotalSteps(0)
+, m_isAdvancingPipeline(false)
 {
     setWindowTitle("MNE Analyze Studio");
     resize(1440, 900);
@@ -545,28 +647,6 @@ void MainWindow::createLayout()
     m_resultsHistoryCombo->addItem("Latest Result");
     m_resultsHistoryCombo->setToolTip("Recent Results: reopen a recently computed structured result.");
     m_resultsHistoryCombo->setMinimumWidth(320);
-    m_resultsPsdControlsWidget->setVisible(false);
-    m_resultsPsdMatchCombo->addItems(QStringList() << "EEG" << "MEG" << "EOG" << "All");
-    m_resultsPsdMatchCombo->setToolTip("Channel family used for the PSD summary.");
-    m_resultsPsdNfftSpin->setRange(32, 8192);
-    m_resultsPsdNfftSpin->setSingleStep(32);
-    m_resultsPsdNfftSpin->setValue(256);
-    m_resultsPsdNfftSpin->setToolTip("FFT length used for the Welch PSD estimate.");
-    m_resultsPsdCompareCombo->addItem("No comparison");
-    m_resultsPsdCompareCombo->setToolTip("Overlay one previous PSD result on top of the current run.");
-    QHBoxLayout* resultsPsdControlsLayout = new QHBoxLayout(m_resultsPsdControlsWidget);
-    resultsPsdControlsLayout->setContentsMargins(0, 0, 0, 0);
-    resultsPsdControlsLayout->setSpacing(8);
-    resultsPsdControlsLayout->addWidget(new QLabel("PSD Match", m_resultsPsdControlsWidget));
-    resultsPsdControlsLayout->addWidget(m_resultsPsdMatchCombo);
-    resultsPsdControlsLayout->addWidget(new QLabel("FFT", m_resultsPsdControlsWidget));
-    resultsPsdControlsLayout->addWidget(m_resultsPsdNfftSpin);
-    resultsPsdControlsLayout->addWidget(new QLabel("Compare", m_resultsPsdControlsWidget));
-    resultsPsdControlsLayout->addWidget(m_resultsPsdCompareCombo, 1);
-    resultsPsdControlsLayout->addWidget(m_resultsPsdRunButton);
-    resultsPsdControlsLayout->addStretch(1);
-    m_resultsActionButton->setVisible(false);
-    m_resultsActionButton->setEnabled(false);
     m_resultsTable->setColumnCount(4);
     m_resultsTable->setHorizontalHeaderLabels(QStringList() << "Name" << "RMS" << "Mean |x|" << "Peak |x|");
     m_resultsTable->setSortingEnabled(true);
@@ -579,7 +659,6 @@ void MainWindow::createLayout()
     m_resultsTitleLabel->setObjectName("terminalStatusLabel");
     m_resultsStack->addWidget(m_resultsTree);
     m_resultsStack->addWidget(m_resultsTable);
-    m_resultsStack->addWidget(m_resultsSpectrumPlot);
 
     QVBoxLayout* resultsLayout = new QVBoxLayout(m_resultsTab);
     resultsLayout->setContentsMargins(0, 0, 0, 0);
@@ -593,8 +672,6 @@ void MainWindow::createLayout()
     resultsHistoryLayout->addWidget(m_resultsHistoryCombo, 1);
     resultsLayout->addLayout(resultsHistoryLayout);
     resultsLayout->addWidget(m_resultsTitleLabel);
-    resultsLayout->addWidget(m_resultsPsdControlsWidget);
-    resultsLayout->addWidget(m_resultsActionButton);
     resultsLayout->addWidget(m_resultsStack, 1);
 
     m_terminalPanel->setReadOnly(true);
@@ -671,6 +748,8 @@ void MainWindow::createLayout()
 void MainWindow::createConnections()
 {
     connect(m_agentChatDock, &AgentChatDockWidget::commandSubmitted, this, &MainWindow::sendToolCall);
+    connect(m_agentChatDock, &AgentChatDockWidget::confirmationRequested, this, &MainWindow::approvePlannerConfirmation);
+    connect(m_agentChatDock, &AgentChatDockWidget::confirmationDismissed, this, &MainWindow::dismissPlannerConfirmation);
     connect(m_explorerButton, &QToolButton::clicked, this, [this]() {
         switchPrimarySidebar("workspace");
     });
@@ -719,8 +798,6 @@ void MainWindow::createConnections()
     connect(m_extensionInstallButton, &QPushButton::clicked, this, &MainWindow::installExtensionFromDirectory);
     connect(m_extensionToggleButton, &QPushButton::clicked, this, &MainWindow::toggleSelectedExtensionEnabled);
     connect(m_extensionSettingsButton, &QPushButton::clicked, this, &MainWindow::openSelectedExtensionSettingsTab);
-    connect(m_resultsActionButton, &QPushButton::clicked, this, &MainWindow::runResultPrimaryAction);
-    connect(m_resultsPsdRunButton, &QPushButton::clicked, this, &MainWindow::runResultPsdAction);
     connect(m_resultsHistoryCombo,
             qOverload<int>(&QComboBox::currentIndexChanged),
             this,
@@ -732,11 +809,6 @@ void MainWindow::createConnections()
                 const QJsonObject entry = m_structuredResultHistory.at(index - 1);
                 updateStructuredResultView(entry.value("tool_name").toString(), entry.value("result").toObject());
             });
-    connect(m_resultsPsdCompareCombo,
-            qOverload<int>(&QComboBox::currentIndexChanged),
-            this,
-            [this](int) { updateResultPsdComparison(); });
-    connect(m_resultsTable, &QTableWidget::itemSelectionChanged, this, &MainWindow::updateResultPrimaryActionForSelection);
     connect(m_workspaceExplorer, &QTreeWidget::itemDoubleClicked, this, [this](QTreeWidgetItem* item) {
         openWorkspaceItem(item);
     });
@@ -760,6 +832,32 @@ void MainWindow::createConnections()
                 openWorkspaceItem(item);
             });
 
+            if(toolName == "studio.pipeline.run") {
+                const QString runId = result.value("run_id").toString().trimmed();
+                const QString pipelineId = result.value("pipeline_id").toString().trimmed();
+                const int pendingSteps = result.value("pending_steps").toInt();
+
+                if(pendingSteps > 0 && !runId.isEmpty()) {
+                    QAction* resumeAction = contextMenu.addAction("Resume Pipeline");
+                    connect(resumeAction, &QAction::triggered, this, [this, runId]() {
+                        const QString commandText = QString("tools.call studio.pipeline.resume {\"run_id\":\"%1\"}")
+                                                        .arg(runId);
+                        appendTerminalMessage(QString("$ %1").arg(commandText));
+                        sendToolCall(commandText);
+                    });
+                }
+
+                if(!pipelineId.isEmpty()) {
+                    QAction* rerunAction = contextMenu.addAction("Rerun Pipeline");
+                    connect(rerunAction, &QAction::triggered, this, [this, pipelineId]() {
+                        const QString commandText = QString("tools.call studio.pipeline.run {\"pipeline_id\":\"%1\"}")
+                                                        .arg(pipelineId);
+                        appendTerminalMessage(QString("$ %1").arg(commandText));
+                        sendToolCall(commandText);
+                    });
+                }
+            }
+
             if(toolName == "neurokernel.find_peak_window" && result.value("peak_sample").toInt(-1) >= 0) {
                 QAction* jumpToPeakAction = contextMenu.addAction("Jump To Peak In Active View");
                 connect(jumpToPeakAction, &QAction::triggered, this, [this, result]() {
@@ -777,10 +875,35 @@ void MainWindow::createConnections()
                 QAction* overlayAction = contextMenu.addAction("Open Result And Enable PSD Compare");
                 connect(overlayAction, &QAction::triggered, this, [this, item, entry]() {
                     openAnalysisArtifact(entry, true);
-                    const int compareIndex = m_resultsPsdCompareCombo->findData(entry);
-                    if(compareIndex >= 0) {
-                        m_resultsPsdCompareCombo->setCurrentIndex(compareIndex);
-                    }
+                });
+            }
+        } else if(specialType == QLatin1String(kWorkspaceArtifactStepEntry)) {
+            const QJsonObject entry = item->data(0, Qt::UserRole + 1).toJsonObject();
+            const QJsonObject step = item->data(0, Qt::UserRole + 2).toJsonObject();
+
+            QAction* openPipelineAction = contextMenu.addAction("Open Pipeline Session");
+            connect(openPipelineAction, &QAction::triggered, this, [this, entry]() {
+                openAnalysisArtifact(entry, true);
+            });
+
+            const QString commandText = step.value("command").toString().trimmed();
+            const QString runId = step.value("run_id").toString().trimmed();
+            const int stepNumber = step.value("step_number").toInt(-1);
+            if(!runId.isEmpty() && stepNumber > 0) {
+                QAction* rehydrateStepAction = contextMenu.addAction("Run Step With Current Defaults");
+                connect(rehydrateStepAction, &QAction::triggered, this, [this, runId, stepNumber]() {
+                    const QString rerunText = QString("tools.call studio.pipeline.rerun_step {\"run_id\":\"%1\",\"step_number\":%2,\"mode\":\"rehydrate\"}")
+                                                  .arg(runId)
+                                                  .arg(stepNumber);
+                    appendTerminalMessage(QString("$ %1").arg(rerunText));
+                    sendToolCall(rerunText);
+                });
+            }
+            if(!commandText.isEmpty()) {
+                QAction* runStepAction = contextMenu.addAction("Replay Exact Step");
+                connect(runStepAction, &QAction::triggered, this, [this, commandText]() {
+                    appendTerminalMessage(QString("$ %1").arg(commandText));
+                    sendToolCall(commandText);
                 });
             }
         } else {
@@ -820,11 +943,22 @@ void MainWindow::createConnections()
             if(JsonRpcMessage::deserialize(payload, response, errorString)) {
                 if(response.contains("error")) {
                     const QString message = response.value("error").toObject().value("message").toString();
+                    rememberToolResult("kernel.error",
+                                     normalizedToolErrorEnvelope("kernel.error",
+                                                                 message,
+                                                                 "kernel",
+                                                                 "rpc_error",
+                                                                 "retry"));
+                    if(!m_activePipelineId.isEmpty()) {
+                        failActivePipeline(QString("Kernel error: %1").arg(message));
+                    }
                     m_agentChatDock->appendTranscript(QString("Kernel> %1").arg(message));
                     appendProblemMessage(QString("Kernel error: %1").arg(message));
                     appendTerminalMessage(QString("> %1").arg(message));
                 } else {
-                    const QJsonObject result = response.value("result").toObject();
+                    const QJsonObject result = normalizedToolResultEnvelope(response.value("result").toObject().value("tool_name").toString(),
+                                                                           response.value("result").toObject(),
+                                                                           "kernel");
                     const QString toolName = result.value("tool_name").toString();
                     if(toolName == "tools/list" && result.value("tools").isArray()) {
                         m_cachedKernelToolDefinitions = result.value("tools").toArray();
@@ -859,12 +993,23 @@ void MainWindow::createConnections()
             if(JsonRpcMessage::deserialize(payload, response, errorString)) {
                 if(response.contains("error")) {
                     const QString message = response.value("error").toObject().value("message").toString();
+                    rememberToolResult("extension_host.error",
+                                     normalizedToolErrorEnvelope("extension_host.error",
+                                                                 message,
+                                                                 "extension_host",
+                                                                 "rpc_error",
+                                                                 "retry"));
+                    if(!m_activePipelineId.isEmpty()) {
+                        failActivePipeline(QString("Extension host error: %1").arg(message));
+                    }
                     m_agentChatDock->appendTranscript(QString("Extension Host> %1").arg(message));
                     appendProblemMessage(QString("Extension host error: %1").arg(message));
                     appendTerminalMessage(QString("> %1").arg(message));
                 } else {
                     const QString requestId = response.value("id").toString();
-                    const QJsonObject result = response.value("result").toObject();
+                    const QJsonObject result = normalizedToolResultEnvelope(response.value("result").toObject().value("tool_name").toString(),
+                                                                           response.value("result").toObject(),
+                                                                           "extension_host");
                     const QString toolName = result.value("tool_name").toString();
                     if(toolName == "views/open" && m_pendingExtensionViewOpens.contains(requestId)) {
                         const QJsonObject dispatch = m_pendingExtensionViewOpens.take(requestId);
@@ -1063,6 +1208,14 @@ void MainWindow::refreshWorkspaceArtifacts()
     QTreeWidgetItem* analysisRoot = new QTreeWidgetItem(QStringList() << "Analysis");
     analysisRoot->setData(0, Qt::UserRole, QString::fromLatin1(kWorkspaceArtifactRoot));
     analysisRoot->setExpanded(true);
+    QTreeWidgetItem* pipelineRoot = nullptr;
+    QTreeWidgetItem* resultRoot = nullptr;
+    int pipelineCount = 0;
+    int runningPipelineCount = 0;
+    int queuedPipelineCount = 0;
+    int failedPipelineCount = 0;
+    int completedPipelineCount = 0;
+    int resultCount = 0;
 
     for(int i = m_structuredResultHistory.size() - 1; i >= 0; --i) {
         const QJsonObject entry = m_structuredResultHistory.at(i);
@@ -1070,10 +1223,32 @@ void MainWindow::refreshWorkspaceArtifacts()
         const QJsonObject result = entry.value("result").toObject();
         const QString fileName = QFileInfo(result.value("file").toString()).fileName();
         const QString message = result.value("message").toString().trimmed();
+        const QString displayName = result.value("display_name").toString().trimmed();
+        const QString status = result.value("status").toString().trimmed();
+        const QString currentStep = result.value("current_step").toString().trimmed();
+        const int completedSteps = result.value("completed_steps").toInt();
+        const int totalSteps = result.value("total_steps").toInt();
+        const int pendingSteps = result.value("pending_steps").toInt();
 
         QString label = artifactTypeLabel(toolName);
+        if(toolName == "studio.pipeline.run" && !displayName.isEmpty()) {
+            label += QString(" | %1").arg(displayName);
+        }
         if(!fileName.isEmpty()) {
             label += QString(" | %1").arg(fileName);
+        }
+        if(toolName == "studio.pipeline.run" && !status.isEmpty()) {
+            label += QString(" %1").arg(pipelineArtifactStatusBadge(status));
+            if(totalSteps > 0) {
+                label += QString(" %1/%2").arg(completedSteps).arg(totalSteps);
+            }
+            if(pendingSteps > 0) {
+                label += QString(" | %1 pending").arg(pendingSteps);
+            }
+            if((status == QLatin1String("running") || status == QLatin1String("resumed"))
+               && !currentStep.isEmpty()) {
+                label += QString(" | active: %1").arg(currentStep.left(72));
+            }
         }
         if(!message.isEmpty()) {
             label += QString(" | %1").arg(message.left(80));
@@ -1081,10 +1256,114 @@ void MainWindow::refreshWorkspaceArtifacts()
 
         QTreeWidgetItem* artifactItem = new QTreeWidgetItem(QStringList() << label);
         artifactItem->setToolTip(0, message);
-        artifactItem->setIcon(0, style()->standardIcon(artifactIconType(toolName)));
+        if(toolName == "studio.pipeline.run") {
+            artifactItem->setIcon(0, style()->standardIcon(pipelineArtifactIconType(status)));
+        } else {
+            artifactItem->setIcon(0, style()->standardIcon(artifactIconType(toolName)));
+        }
         artifactItem->setData(0, Qt::UserRole, QString::fromLatin1(kWorkspaceArtifactEntry));
         artifactItem->setData(0, Qt::UserRole + 1, entry);
-        analysisRoot->addChild(artifactItem);
+
+        if(toolName == "studio.pipeline.run") {
+            ++pipelineCount;
+            if(status == QLatin1String("running") || status == QLatin1String("resumed")) {
+                ++runningPipelineCount;
+            } else if(status == QLatin1String("queued")) {
+                ++queuedPipelineCount;
+            } else if(status == QLatin1String("failed")) {
+                ++failedPipelineCount;
+            } else if(status == QLatin1String("completed")) {
+                ++completedPipelineCount;
+            }
+            if(!pipelineRoot) {
+                pipelineRoot = new QTreeWidgetItem(QStringList() << "Pipeline Sessions");
+                pipelineRoot->setExpanded(true);
+                analysisRoot->addChild(pipelineRoot);
+            }
+
+            const QJsonArray steps = result.value("steps").toArray();
+            for(int stepIndex = 0; stepIndex < steps.size(); ++stepIndex) {
+                QJsonObject step = steps.at(stepIndex).toObject();
+                if(!result.value("run_id").toString().trimmed().isEmpty() && !step.contains("run_id")) {
+                    step.insert("run_id", result.value("run_id").toString());
+                }
+                if(!result.value("pipeline_id").toString().trimmed().isEmpty() && !step.contains("pipeline_id")) {
+                    step.insert("pipeline_id", result.value("pipeline_id").toString());
+                }
+                const QString stepStatus = step.value("status").toString().trimmed();
+                const QString stepTool = step.value("tool_name").toString().trimmed();
+                const QString stepCommand = step.value("command").toString().trimmed();
+                const bool isActiveStep = stepStatus == QLatin1String("running");
+                QString stepLabel = QString("Step %1").arg(step.value("step_number").toInt(stepIndex + 1));
+                if(!stepStatus.isEmpty()) {
+                    stepLabel += QString(" %1").arg(pipelineArtifactStatusBadge(stepStatus));
+                }
+                if(!stepTool.isEmpty()) {
+                    stepLabel += QString(" | %1").arg(stepTool);
+                }
+                if(!stepCommand.isEmpty()) {
+                    stepLabel += QString(" | %1").arg(stepCommand.left(96));
+                }
+
+                QTreeWidgetItem* stepItem = new QTreeWidgetItem(QStringList() << stepLabel);
+                stepItem->setData(0, Qt::UserRole, QString::fromLatin1(kWorkspaceArtifactStepEntry));
+                stepItem->setData(0, Qt::UserRole + 1, entry);
+                stepItem->setData(0, Qt::UserRole + 2, step);
+                stepItem->setToolTip(0, QString::fromUtf8(QJsonDocument(step).toJson(QJsonDocument::Indented)));
+                stepItem->setIcon(0, style()->standardIcon(pipelineArtifactIconType(stepStatus)));
+                if(isActiveStep) {
+                    QFont stepFont = stepItem->font(0);
+                    stepFont.setBold(true);
+                    stepItem->setFont(0, stepFont);
+                    stepItem->setForeground(0, m_workspaceExplorer->palette().brush(QPalette::Link));
+                }
+                artifactItem->addChild(stepItem);
+            }
+
+            artifactItem->setExpanded(status == QLatin1String("running")
+                                      || status == QLatin1String("resumed")
+                                      || status == QLatin1String("queued"));
+            if(status == QLatin1String("running") || status == QLatin1String("resumed")) {
+                QFont artifactFont = artifactItem->font(0);
+                artifactFont.setBold(true);
+                artifactItem->setFont(0, artifactFont);
+                artifactItem->setForeground(0, m_workspaceExplorer->palette().brush(QPalette::Highlight));
+            }
+            pipelineRoot->addChild(artifactItem);
+        } else {
+            ++resultCount;
+            if(!resultRoot) {
+                resultRoot = new QTreeWidgetItem(QStringList() << "Tool Results");
+                resultRoot->setExpanded(true);
+                analysisRoot->addChild(resultRoot);
+            }
+            resultRoot->addChild(artifactItem);
+        }
+    }
+
+    if(pipelineRoot) {
+        QString pipelineLabel = QString("Pipeline Sessions (%1)").arg(pipelineCount);
+        QStringList summaryParts;
+        if(runningPipelineCount > 0) {
+            summaryParts << QString("%1 running").arg(runningPipelineCount);
+        }
+        if(queuedPipelineCount > 0) {
+            summaryParts << QString("%1 queued").arg(queuedPipelineCount);
+        }
+        if(failedPipelineCount > 0) {
+            summaryParts << QString("%1 failed").arg(failedPipelineCount);
+        }
+        if(completedPipelineCount > 0) {
+            summaryParts << QString("%1 completed").arg(completedPipelineCount);
+        }
+        if(!summaryParts.isEmpty()) {
+            pipelineLabel += QString(" | %1").arg(summaryParts.join(", "));
+        }
+        pipelineRoot->setText(0, pipelineLabel);
+    }
+
+    if(resultRoot) {
+        resultRoot->setText(0, QString("Tool Results (%1)").arg(resultCount));
     }
 
     m_workspaceExplorer->insertTopLevelItem(0, analysisRoot);
@@ -1098,10 +1377,18 @@ void MainWindow::openAnalysisArtifact(const QJsonObject& entry, bool focusBottom
         return;
     }
 
-    const QString artifactKey = QString("analysis:%1")
-                                    .arg(QString::fromUtf8(QJsonDocument(entry).toJson(QJsonDocument::Compact)));
+    const QString runId = result.value("run_id").toString().trimmed();
+    const QString artifactKey = !runId.isEmpty()
+        ? QString("analysis:%1:%2").arg(toolName, runId)
+        : QString("analysis:%1")
+              .arg(QString::fromUtf8(QJsonDocument(entry).toJson(QJsonDocument::Compact)));
     for(int i = 0; i < m_centerTabs->count(); ++i) {
         if(m_centerTabs->tabToolTip(i) == artifactKey) {
+            if(AnalysisResultWidget* resultWidget = qobject_cast<AnalysisResultWidget*>(m_centerTabs->widget(i))) {
+                resultWidget->setResultHistory(resultHistoryForTool(toolName));
+                resultWidget->setRuntimeContext(resultRendererRuntimeContext());
+                resultWidget->setResult(toolName, result);
+            }
             m_centerTabs->setCurrentIndex(i);
             if(focusBottomResults) {
                 m_lastToolName = toolName;
@@ -1114,9 +1401,21 @@ void MainWindow::openAnalysisArtifact(const QJsonObject& entry, bool focusBottom
     }
 
     AnalysisResultWidget* resultWidget = new AnalysisResultWidget;
+    connect(resultWidget, &AnalysisResultWidget::toolCommandRequested, this, &MainWindow::handleResultRendererToolCommand);
+    connect(resultWidget, &AnalysisResultWidget::selectionContextChanged, this, &MainWindow::handleResultRendererSelectionContext);
+    resultWidget->setResultHistory(resultHistoryForTool(toolName));
+    resultWidget->setRuntimeContext(resultRendererRuntimeContext());
     resultWidget->setResult(toolName, result);
     const QString fileName = QFileInfo(result.value("file").toString()).fileName();
+    const QString displayName = result.value("display_name").toString().trimmed();
     QString tabLabel = artifactTypeLabel(toolName);
+    if(toolName == "studio.pipeline.run" && !displayName.isEmpty()) {
+        const QString status = result.value("status").toString().trimmed();
+        tabLabel += QString(": %1").arg(displayName);
+        if(!status.isEmpty()) {
+            tabLabel += QString(" [%1]").arg(status);
+        }
+    }
     if(!fileName.isEmpty()) {
         tabLabel += QString(": %1").arg(fileName);
     }
@@ -1133,6 +1432,17 @@ void MainWindow::openAnalysisArtifact(const QJsonObject& entry, bool focusBottom
     }
 }
 
+void MainWindow::handleResultRendererToolCommand(const QString& commandText)
+{
+    const QString trimmed = commandText.trimmed();
+    if(trimmed.isEmpty()) {
+        return;
+    }
+
+    appendTerminalMessage(QString("$ %1").arg(trimmed));
+    sendToolCall(trimmed);
+}
+
 void MainWindow::openWorkspaceItem(QTreeWidgetItem* item)
 {
     if(!item) {
@@ -1141,6 +1451,11 @@ void MainWindow::openWorkspaceItem(QTreeWidgetItem* item)
 
     const QString specialType = item->data(0, Qt::UserRole).toString();
     if(specialType == QLatin1String(kWorkspaceArtifactEntry)) {
+        const QJsonObject entry = item->data(0, Qt::UserRole + 1).toJsonObject();
+        openAnalysisArtifact(entry, true);
+        return;
+    }
+    if(specialType == QLatin1String(kWorkspaceArtifactStepEntry)) {
         const QJsonObject entry = item->data(0, Qt::UserRole + 1).toJsonObject();
         openAnalysisArtifact(entry, true);
         return;
@@ -1302,7 +1617,7 @@ void MainWindow::sendToolCall(const QString& commandText)
 
     if(m_llmPlanner.isConfigured()) {
         const LlmPlanResult llmPlan = m_llmPlanner.plan(commandText,
-                                                       availableToolDefinitions(),
+                                                       plannerReadyToolDefinitions(),
                                                        llmPlanningContext(commandText));
         if(llmPlan.success) {
             const QString plannerMessage = llmPlan.summary.isEmpty()
@@ -1313,13 +1628,46 @@ void MainWindow::sendToolCall(const QString& commandText)
 
             for(int i = 0; i < llmPlan.plannedCommands.size(); ++i) {
                 const QString plannedCommand = resolvePlannerReferences(llmPlan.plannedCommands.at(i));
-                const QString stepNote = QString("Running LLM step %1/%2: %3")
-                                             .arg(i + 1)
-                                             .arg(llmPlan.plannedCommands.size())
-                                             .arg(plannedCommand);
-                m_agentChatDock->appendTranscript(QString("Planner> %1").arg(stepNote));
-                appendTerminalMessage(QString("> %1").arg(stepNote));
-                sendToolCall(plannedCommand);
+                const QString plannedToolName = toolNameFromCommand(plannedCommand);
+                const QJsonObject execution = plannerExecutionMetadata(plannedToolName);
+                const QString executionMode = execution.value("execution_mode").toString("suggestion_only");
+                if(executionMode == QLatin1String("auto_run")) {
+                    const QString stepNote = QString("Running LLM step %1/%2: %3")
+                                                 .arg(i + 1)
+                                                 .arg(llmPlan.plannedCommands.size())
+                                                 .arg(plannedCommand);
+                    m_agentChatDock->appendTranscript(QString("Planner> %1").arg(stepNote));
+                    appendTerminalMessage(QString("> %1").arg(stepNote));
+                    sendToolCall(plannedCommand);
+                    continue;
+                }
+
+                const QString policyNote = executionMode == QLatin1String("confirm_required")
+                    ? QString("LLM step %1/%2 requires confirmation and was not auto-run: %3 | %4")
+                          .arg(i + 1)
+                          .arg(llmPlan.plannedCommands.size())
+                          .arg(plannedCommand,
+                               execution.value("execution_reason").toString())
+                    : QString("LLM step %1/%2 is suggestion-only and was not auto-run: %3 | %4")
+                          .arg(i + 1)
+                          .arg(llmPlan.plannedCommands.size())
+                          .arg(plannedCommand,
+                               execution.value("execution_reason").toString());
+                m_agentChatDock->appendTranscript(QString("Planner> %1").arg(policyNote));
+                appendTerminalMessage(QString("> %1").arg(policyNote));
+                if(executionMode == QLatin1String("confirm_required")) {
+                    const QJsonObject presentation = plannerConfirmationPresentation(plannedCommand,
+                                                                                     i + 1,
+                                                                                     llmPlan.plannedCommands.size(),
+                                                                                     policyNote,
+                                                                                     llmPlan.summary,
+                                                                                     i > 0 ? resolvePlannerReferences(llmPlan.plannedCommands.at(i - 1))
+                                                                                           : QString());
+                    queuePlannerConfirmation(plannedCommand,
+                                             presentation.value("title").toString(),
+                                             presentation.value("details").toString(),
+                                             presentation.value("reason").toString());
+                }
             }
             return;
         }
@@ -1339,6 +1687,118 @@ void MainWindow::sendToolCall(const QString& commandText)
 
     sendKernelToolCall("neurokernel.execute", QJsonObject{{"command", commandText}});
     appendTerminalMessage(QString("$ mcp tools/call %1").arg(commandText));
+}
+
+void MainWindow::refreshPlannerConfirmationsUi()
+{
+    if(m_agentChatDock) {
+        QJsonArray decoratedConfirmations;
+        for(const QJsonValue& value : m_pendingPlannerConfirmations) {
+            QJsonObject confirmation = value.toObject();
+            const QJsonObject staleness = plannerConfirmationStaleness(confirmation);
+            for(auto it = staleness.constBegin(); it != staleness.constEnd(); ++it) {
+                confirmation.insert(it.key(), it.value());
+            }
+            decoratedConfirmations.append(confirmation);
+        }
+        m_agentChatDock->setPendingConfirmations(decoratedConfirmations);
+    }
+}
+
+void MainWindow::queuePlannerConfirmation(const QString& commandText,
+                                          const QString& summary,
+                                          const QString& details,
+                                          const QString& reason)
+{
+    const QString trimmedCommand = commandText.trimmed();
+    if(trimmedCommand.isEmpty()) {
+        return;
+    }
+
+    for(int i = 0; i < m_pendingPlannerConfirmations.size(); ++i) {
+        const QJsonObject existing = m_pendingPlannerConfirmations.at(i).toObject();
+        if(existing.value("command").toString().trimmed() == trimmedCommand) {
+            m_pendingPlannerConfirmations[i] = QJsonObject{
+                {"command", trimmedCommand},
+                {"title", summary},
+                {"details", details},
+                {"reason", reason},
+                {"context_snapshot", plannerConfirmationSnapshot(trimmedCommand)},
+                {"created_at", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)}
+            };
+            refreshPlannerConfirmationsUi();
+            return;
+        }
+    }
+
+    m_pendingPlannerConfirmations.append(QJsonObject{
+        {"command", trimmedCommand},
+        {"title", summary},
+        {"details", details},
+        {"reason", reason},
+        {"context_snapshot", plannerConfirmationSnapshot(trimmedCommand)},
+        {"created_at", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)}
+    });
+    refreshPlannerConfirmationsUi();
+}
+
+bool MainWindow::removePlannerConfirmation(const QString& commandText)
+{
+    const QString trimmedCommand = commandText.trimmed();
+    for(int i = 0; i < m_pendingPlannerConfirmations.size(); ++i) {
+        const QJsonObject existing = m_pendingPlannerConfirmations.at(i).toObject();
+        if(existing.value("command").toString().trimmed() == trimmedCommand) {
+            m_pendingPlannerConfirmations.removeAt(i);
+            refreshPlannerConfirmationsUi();
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void MainWindow::approvePlannerConfirmation(const QString& commandText)
+{
+    const QString trimmedCommand = commandText.trimmed();
+    if(trimmedCommand.isEmpty()) {
+        return;
+    }
+
+    QJsonObject confirmation;
+    for(const QJsonValue& value : m_pendingPlannerConfirmations) {
+        const QJsonObject candidate = value.toObject();
+        if(candidate.value("command").toString().trimmed() == trimmedCommand) {
+            confirmation = candidate;
+            break;
+        }
+    }
+    const QJsonObject staleness = plannerConfirmationStaleness(confirmation);
+    removePlannerConfirmation(trimmedCommand);
+    const QString note = QString("Approved planner action: %1").arg(trimmedCommand);
+    m_agentChatDock->appendTranscript(QString("Planner> %1").arg(note));
+    appendTerminalMessage(QString("> %1").arg(note));
+    if(staleness.value("stale").toBool(false)) {
+        const QString staleNote = QString("Planner confirmation was stale when approved: %1")
+                                      .arg(staleness.value("stale_reason").toString());
+        m_agentChatDock->appendTranscript(QString("Planner> %1").arg(staleNote));
+        appendTerminalMessage(QString("> %1").arg(staleNote));
+    }
+    appendTerminalMessage(QString("$ %1").arg(trimmedCommand));
+    sendToolCall(trimmedCommand);
+}
+
+void MainWindow::dismissPlannerConfirmation(const QString& commandText)
+{
+    const QString trimmedCommand = commandText.trimmed();
+    if(trimmedCommand.isEmpty()) {
+        return;
+    }
+
+    if(removePlannerConfirmation(trimmedCommand)) {
+        const QString note = QString("Dismissed planner action: %1").arg(trimmedCommand);
+        m_agentChatDock->appendTranscript(QString("Planner> %1").arg(note));
+        appendTerminalMessage(QString("> %1").arg(note));
+    }
 }
 
 void MainWindow::closeCenterTab(int index)
@@ -1440,41 +1900,158 @@ QString MainWindow::resolvePlannerReferences(const QString& commandText) const
     return resolved;
 }
 
+QJsonObject MainWindow::normalizedToolResultEnvelope(const QString& toolName,
+                                                     const QJsonObject& result,
+                                                     const QString& source) const
+{
+    QJsonObject envelope = result;
+    const QString normalizedToolName = toolName.trimmed().isEmpty()
+        ? result.value("tool_name").toString().trimmed()
+        : toolName.trimmed();
+    const QString normalizedSource = source.trimmed().isEmpty() ? QString("workbench") : source.trimmed();
+
+    QString status = result.value("status").toString().trimmed().toLower();
+    if(status.isEmpty()) {
+        status = "ok";
+    }
+
+    QString severity = "info";
+    if(status == QLatin1String("error") || status == QLatin1String("failed")) {
+        severity = "error";
+    } else if(status == QLatin1String("ignored")) {
+        severity = "warning";
+    }
+
+    QString recoverability = "none";
+    if(status == QLatin1String("error") || status == QLatin1String("failed")) {
+        recoverability = "retry";
+    } else if(status == QLatin1String("ignored")) {
+        recoverability = "alternative";
+    }
+
+    QJsonArray suggestedTools;
+    if((normalizedToolName == QLatin1String("neurokernel.find_peak_window")
+        || normalizedToolName == QLatin1String("view.raw.goto"))
+       && activeRawDataView()) {
+        suggestedTools.append("view.raw.state");
+    }
+    if(normalizedToolName == QLatin1String("neurokernel.channel_stats")) {
+        suggestedTools.append("neurokernel.find_peak_window");
+    }
+    if(normalizedToolName == QLatin1String("neurokernel.psd_summary")) {
+        suggestedTools.append("studio.pipeline.run");
+    }
+    if(normalizedToolName == QLatin1String("studio.pipeline.run")
+       && result.value("pending_steps").toInt() > 0) {
+        suggestedTools.append("studio.pipeline.resume");
+    }
+
+    envelope.insert("tool_name", normalizedToolName);
+    envelope.insert("status", status);
+    envelope.insert("severity", severity);
+    envelope.insert("recoverability", recoverability);
+    envelope.insert("source", normalizedSource);
+    envelope.insert("normalized", true);
+    envelope.insert("next_suggested_tools", suggestedTools);
+    return envelope;
+}
+
+QJsonObject MainWindow::normalizedToolErrorEnvelope(const QString& toolName,
+                                                    const QString& message,
+                                                    const QString& source,
+                                                    const QString& failureKind,
+                                                    const QString& recoverability,
+                                                    const QJsonObject& details) const
+{
+    QJsonObject envelope{
+        {"tool_name", toolName.trimmed().isEmpty() ? QString("unknown") : toolName.trimmed()},
+        {"status", "error"},
+        {"severity", "error"},
+        {"recoverability", recoverability.trimmed().isEmpty() ? QString("retry") : recoverability.trimmed()},
+        {"source", source.trimmed().isEmpty() ? QString("workbench") : source.trimmed()},
+        {"failure_kind", failureKind.trimmed().isEmpty() ? QString("unknown") : failureKind.trimmed()},
+        {"message", message.trimmed()},
+        {"normalized", true},
+        {"next_suggested_tools", QJsonArray()}
+    };
+
+    if(!details.isEmpty()) {
+        envelope.insert("details", details);
+    }
+
+    if(envelope.value("recoverability").toString() == QLatin1String("retry")) {
+        envelope.insert("next_suggested_tools", QJsonArray{"studio.views.list", "view.raw.state"});
+    }
+
+    return envelope;
+}
+
 void MainWindow::rememberToolResult(const QString& toolName, const QJsonObject& result)
 {
-    if(toolName.isEmpty()) {
+    const QString effectiveToolName = toolName.trimmed().isEmpty()
+        ? result.value("tool_name").toString().trimmed()
+        : toolName.trimmed();
+    if(effectiveToolName.isEmpty()) {
         return;
     }
 
-    m_lastToolName = toolName;
-    m_lastToolResult = result;
+    const QJsonObject normalizedResult = normalizedToolResultEnvelope(effectiveToolName, result);
 
-    if(toolName == "neurokernel.psd_summary" && !result.isEmpty()) {
+    m_lastToolName = effectiveToolName;
+    m_lastToolResult = normalizedResult;
+
+    if(effectiveToolName != QLatin1String("studio.pipeline.run")
+       && !m_activePipelineId.isEmpty()
+       && !m_activePipelineStepHistory.isEmpty()) {
+        QJsonObject step = m_activePipelineStepHistory.last().toObject();
+        if(step.value("status").toString() == QLatin1String("running")) {
+            step.insert("status", "completed");
+            step.insert("tool_name", effectiveToolName);
+            step.insert("result", normalizedResult);
+            step.insert("message", normalizedResult.value("message").toString());
+            step.insert("completed_at", QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+            m_activePipelineStepHistory.removeAt(m_activePipelineStepHistory.size() - 1);
+            m_activePipelineStepHistory.append(step);
+            updateActivePipelineArtifact("running", step.value("command").toString());
+        }
+    }
+
+    if(effectiveToolName == "neurokernel.psd_summary" && !normalizedResult.isEmpty()) {
         bool alreadyTracked = false;
         for(int i = m_psdResultHistory.size() - 1; i >= 0; --i) {
-            if(m_psdResultHistory.at(i) == result) {
+            if(m_psdResultHistory.at(i) == normalizedResult) {
                 alreadyTracked = true;
                 break;
             }
         }
 
         if(!alreadyTracked) {
-            m_psdResultHistory.append(result);
+            m_psdResultHistory.append(normalizedResult);
             while(m_psdResultHistory.size() > 8) {
                 m_psdResultHistory.removeFirst();
             }
         }
     }
 
-    if(!result.isEmpty()) {
+    if(!normalizedResult.isEmpty()) {
         const QJsonObject historyEntry{
-            {"tool_name", toolName},
-            {"result", result}
+            {"tool_name", effectiveToolName},
+            {"result", normalizedResult}
         };
 
         bool alreadyTracked = false;
+        const QString runId = normalizedResult.value("run_id").toString().trimmed();
         for(int i = m_structuredResultHistory.size() - 1; i >= 0; --i) {
-            if(m_structuredResultHistory.at(i) == historyEntry) {
+            const QJsonObject existingEntry = m_structuredResultHistory.at(i);
+            if(!runId.isEmpty()
+               && existingEntry.value("tool_name").toString() == effectiveToolName
+               && existingEntry.value("result").toObject().value("run_id").toString() == runId) {
+                m_structuredResultHistory[i] = historyEntry;
+                alreadyTracked = true;
+                break;
+            }
+
+            if(existingEntry == historyEntry) {
                 alreadyTracked = true;
                 break;
             }
@@ -1490,6 +2067,115 @@ void MainWindow::rememberToolResult(const QString& toolName, const QJsonObject& 
 
     refreshStructuredResultHistoryUi();
     updateStructuredResultView(toolName, result);
+
+    if(toolName == "studio.pipeline.run") {
+        return;
+    }
+
+    if(!m_activePipelineId.isEmpty() && !m_pendingPipelineCommands.isEmpty()) {
+        continuePendingPipelineExecution();
+    } else if(!m_activePipelineId.isEmpty() && m_pendingPipelineCommands.isEmpty()) {
+        continuePendingPipelineExecution();
+    }
+}
+
+void MainWindow::updateActivePipelineArtifact(const QString& status, const QString& currentStep)
+{
+    if(m_activePipelineId.isEmpty() || m_activePipelineRunId.isEmpty()) {
+        return;
+    }
+
+    const int pendingSteps = static_cast<int>(m_pendingPipelineCommands.size());
+    const int completedSteps = std::max(0, m_activePipelineTotalSteps - pendingSteps);
+    QJsonObject artifactResult{
+        {"tool_name", QString("studio.pipeline.run")},
+        {"run_id", m_activePipelineRunId},
+        {"pipeline_id", m_activePipelineId},
+        {"display_name", m_activePipelineDisplayName},
+        {"status", status},
+        {"current_step", currentStep},
+        {"completed_steps", completedSteps},
+        {"total_steps", m_activePipelineTotalSteps},
+        {"pending_steps", pendingSteps},
+        {"pending_commands", QJsonArray::fromStringList(m_pendingPipelineCommands)},
+        {"inputs", m_activePipelineInputs},
+        {"input_overrides", m_activePipelineInputOverrides},
+        {"steps", m_activePipelineStepHistory},
+        {"updated_at", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
+        {"message", QString("%1 | %2/%3 steps")
+                        .arg(status,
+                             QString::number(completedSteps),
+                             QString::number(m_activePipelineTotalSteps))}
+    };
+
+    if(!m_activePipelineStepHistory.isEmpty()) {
+        artifactResult.insert("started_at",
+                              m_activePipelineStepHistory.first().toObject().value("started_at").toString());
+    }
+    if(status == QLatin1String("completed")) {
+        artifactResult.insert("completed_at", QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+    }
+    if(status == QLatin1String("failed")) {
+        artifactResult.insert("failed_at", QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+    }
+
+    const QJsonObject historyEntry{
+        {"tool_name", QString("studio.pipeline.run")},
+        {"result", artifactResult}
+    };
+
+    bool alreadyTracked = false;
+    for(int i = m_structuredResultHistory.size() - 1; i >= 0; --i) {
+        const QJsonObject existingEntry = m_structuredResultHistory.at(i);
+        if(existingEntry.value("tool_name").toString() == QLatin1String("studio.pipeline.run")
+           && existingEntry.value("result").toObject().value("run_id").toString() == m_activePipelineRunId) {
+            m_structuredResultHistory[i] = historyEntry;
+            alreadyTracked = true;
+            break;
+        }
+    }
+
+    if(!alreadyTracked) {
+        m_structuredResultHistory.append(historyEntry);
+        while(m_structuredResultHistory.size() > 20) {
+            m_structuredResultHistory.removeFirst();
+        }
+    }
+
+    refreshStructuredResultHistoryUi();
+    if(m_resultsCurrentToolName == QLatin1String("studio.pipeline.run")) {
+        updateStructuredResultView("studio.pipeline.run", artifactResult);
+    }
+}
+
+void MainWindow::failActivePipeline(const QString& failureMessage)
+{
+    if(m_activePipelineId.isEmpty()) {
+        return;
+    }
+
+    if(!m_activePipelineStepHistory.isEmpty()) {
+        QJsonObject step = m_activePipelineStepHistory.last().toObject();
+        if(step.value("status").toString() == QLatin1String("running")) {
+            step.insert("status", "failed");
+            step.insert("error", failureMessage);
+            step.insert("failed_at", QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+            m_activePipelineStepHistory.removeAt(m_activePipelineStepHistory.size() - 1);
+            m_activePipelineStepHistory.append(step);
+        }
+    }
+
+    m_pendingPipelineCommands.clear();
+    m_activePipelineLastStatus = failureMessage;
+    updateActivePipelineArtifact("failed", failureMessage);
+    rebuildSkillsExplorer();
+    m_activePipelineId.clear();
+    m_activePipelineRunId.clear();
+    m_activePipelineDisplayName.clear();
+    m_activePipelineInputs = QJsonObject();
+    m_activePipelineInputOverrides = QJsonObject();
+    m_activePipelineStepHistory = QJsonArray();
+    m_activePipelineTotalSteps = 0;
 }
 
 void MainWindow::refreshStructuredResultHistoryUi()
@@ -1508,10 +2194,23 @@ void MainWindow::refreshStructuredResultHistoryUi()
         const QJsonObject result = entry.value("result").toObject();
         const QString message = result.value("message").toString().trimmed();
         const QString fileName = QFileInfo(result.value("file").toString()).fileName();
+        const QString displayName = result.value("display_name").toString().trimmed();
+        const QString status = result.value("status").toString().trimmed();
+        const int completedSteps = result.value("completed_steps").toInt();
+        const int totalSteps = result.value("total_steps").toInt();
 
         QString label = toolName;
+        if(toolName == "studio.pipeline.run" && !displayName.isEmpty()) {
+            label = QString("studio.pipeline.run | %1").arg(displayName);
+        }
         if(!fileName.isEmpty()) {
             label += QString(" | %1").arg(fileName);
+        }
+        if(toolName == "studio.pipeline.run" && !status.isEmpty()) {
+            label += QString(" | %1").arg(status);
+            if(totalSteps > 0) {
+                label += QString(" %1/%2").arg(completedSteps).arg(totalSteps);
+            }
         }
         if(!message.isEmpty()) {
             label += QString(" | %1").arg(message);
@@ -1524,102 +2223,898 @@ void MainWindow::refreshStructuredResultHistoryUi()
     refreshWorkspaceArtifacts();
 }
 
+QJsonArray MainWindow::resultHistoryForTool(const QString& toolName) const
+{
+    QJsonArray history;
+
+    if(toolName == "neurokernel.psd_summary") {
+        for(const QJsonObject& result : m_psdResultHistory) {
+            history.append(result);
+        }
+        return history;
+    }
+
+    for(const QJsonObject& entry : m_structuredResultHistory) {
+        if(entry.value("tool_name").toString() == toolName) {
+            history.append(entry.value("result").toObject());
+        }
+    }
+
+    return history;
+}
+
+QJsonObject MainWindow::resultRendererRuntimeContext() const
+{
+    QJsonObject context{
+        {"has_active_raw_view", activeRawDataView() != nullptr},
+        {"current_result_selection", m_resultSelectionContext}
+    };
+
+    if(IRawDataView* rawBrowser = activeRawDataView()) {
+        context.insert("active_raw_file", rawBrowser->filePath());
+        context.insert("cursor_sample", rawBrowser->cursorSample());
+        context.insert("pixels_per_sample", rawBrowser->pixelsPerSample());
+    }
+
+    context.insert("tool_defaults", QJsonObject{
+        {"neurokernel.psd_summary", defaultArgumentsForTool("neurokernel.psd_summary")},
+        {"neurokernel.find_peak_window", defaultArgumentsForTool("neurokernel.find_peak_window")},
+        {"studio.pipeline.run", defaultArgumentsForTool("studio.pipeline.run")}
+    });
+
+    return context;
+}
+
+void MainWindow::handleResultRendererSelectionContext(const QJsonObject& context)
+{
+    m_resultSelectionContext = context;
+}
+
+QJsonArray MainWindow::resultRendererContracts() const
+{
+    if(!m_viewProviderRegistry) {
+        return QJsonArray();
+    }
+
+    return m_viewProviderRegistry->resultRendererDefinitions();
+}
+
+QJsonArray MainWindow::extensionSettingsContracts() const
+{
+    QJsonArray contracts;
+    if(!m_viewProviderRegistry) {
+        return contracts;
+    }
+
+    for(const ExtensionManifest& manifest : m_viewProviderRegistry->manifests()) {
+        for(const UiContribution::SettingsTabContribution& settingsTab : manifest.ui.settingsTabs) {
+            contracts.append(QJsonObject{
+                {"extension_id", manifest.id},
+                {"extension_display_name", manifest.displayName},
+                {"id", settingsTab.id},
+                {"title", settingsTab.title},
+                {"description", settingsTab.description},
+                {"fields", settingsTab.fields},
+                {"actions", settingsTab.actions}
+            });
+        }
+    }
+
+    return contracts;
+}
+
+QJsonArray MainWindow::analysisPipelineContracts() const
+{
+    if(!m_viewProviderRegistry) {
+        return QJsonArray();
+    }
+
+    return m_viewProviderRegistry->analysisPipelineDefinitions();
+}
+
+QJsonArray MainWindow::extensionSettingsState() const
+{
+    QJsonArray state;
+
+    if(!m_viewProviderRegistry) {
+        return state;
+    }
+
+    for(const ExtensionManifest& manifest : m_viewProviderRegistry->manifests()) {
+        for(const UiContribution::SettingsTabContribution& settingsTab : manifest.ui.settingsTabs) {
+            QJsonArray fields;
+            for(const QJsonValue& value : settingsTab.fields) {
+                const QJsonObject field = value.toObject();
+                const QString fieldId = field.value("id").toString().trimmed();
+                if(fieldId.isEmpty()) {
+                    continue;
+                }
+
+                fields.append(QJsonObject{
+                    {"id", fieldId},
+                    {"value", QJsonValue::fromVariant(extensionSettingValue(manifest.id, settingsTab.id, field))},
+                    {"default", field.value("default")}
+                });
+            }
+
+            state.append(QJsonObject{
+                {"extension_id", manifest.id},
+                {"tab_id", settingsTab.id},
+                {"fields", fields}
+            });
+        }
+    }
+
+    return state;
+}
+
+QJsonArray MainWindow::extensionSettingsToolDefinitions() const
+{
+    QJsonArray tools;
+
+    tools.append(QJsonObject{
+        {"name", "studio.settings.list"},
+        {"description", "List manifest-declared extension settings tabs, fields, and current values."},
+        {"input_schema", objectSchema(QJsonObject())},
+        {"result_schema", objectSchema(QJsonObject{
+             {"settings", arraySchema("Extension Settings Contracts", objectSchema(QJsonObject()))}
+         }, QJsonArray{"settings"})}
+    });
+
+    tools.append(QJsonObject{
+        {"name", "studio.pipelines.list"},
+        {"description", "List extension-contributed analysis pipelines, including steps and recommended follow-up actions."},
+        {"input_schema", objectSchema(QJsonObject())},
+        {"result_schema", objectSchema(QJsonObject{
+             {"pipelines", arraySchema("Analysis Pipelines", objectSchema(QJsonObject()))}
+         }, QJsonArray{"pipelines"})}
+    });
+
+    tools.append(QJsonObject{
+        {"name", "studio.pipeline.run"},
+        {"description", "Run an extension-contributed analysis pipeline by id, with optional input overrides."},
+        {"input_schema", objectSchema(QJsonObject{
+             {"pipeline_id", stringSchema("Pipeline ID", QJsonArray(), QString(), "Identifier of the analysis pipeline to execute.")},
+             {"inputs", objectSchema(QJsonObject())}
+         }, QJsonArray{"pipeline_id"})},
+        {"result_schema", objectSchema(QJsonObject{
+             {"status", stringSchema("Status", QJsonArray{"queued", "error"})},
+             {"pipeline_id", stringSchema("Pipeline ID")},
+             {"queued_steps", integerSchema("Queued Steps", 0, 1000, 0)}
+         }, QJsonArray{"status", "pipeline_id", "queued_steps"})}
+    });
+
+    tools.append(QJsonObject{
+        {"name", "studio.pipeline.resume"},
+        {"description", "Resume a saved analysis pipeline run from its remaining pending steps."},
+        {"input_schema", objectSchema(QJsonObject{
+             {"run_id", stringSchema("Run ID", QJsonArray(), QString(), "Identifier of the saved pipeline run to resume.")}
+         }, QJsonArray{"run_id"})},
+        {"result_schema", objectSchema(QJsonObject{
+             {"status", stringSchema("Status", QJsonArray{"queued", "error"})},
+             {"run_id", stringSchema("Run ID")},
+             {"pipeline_id", stringSchema("Pipeline ID")},
+             {"pending_steps", integerSchema("Pending Steps", 0, 1000, 0)}
+         }, QJsonArray{"status", "run_id", "pipeline_id", "pending_steps"})}
+    });
+
+    tools.append(QJsonObject{
+        {"name", "studio.pipeline.rerun_step"},
+        {"description", "Rerun a saved pipeline step either exactly as recorded or rehydrated through current defaults."},
+        {"input_schema", objectSchema(QJsonObject{
+             {"run_id", stringSchema("Run ID", QJsonArray(), QString(), "Identifier of the saved pipeline run.")},
+             {"step_number", integerSchema("Step Number", 1, 1000, 1, "1-based pipeline step index.")},
+             {"mode", stringSchema("Rerun Mode", QJsonArray{"rehydrate", "exact"}, "rehydrate",
+                                    "Use `rehydrate` to rebuild the step from the current pipeline/tool defaults, or `exact` to replay the recorded command.")}
+         }, QJsonArray{"run_id", "step_number"})},
+        {"result_schema", objectSchema(QJsonObject{
+             {"status", stringSchema("Status", QJsonArray{"queued", "error"})},
+             {"run_id", stringSchema("Run ID")},
+             {"step_number", integerSchema("Step Number", 1, 1000, 1)},
+             {"mode", stringSchema("Rerun Mode", QJsonArray{"rehydrate", "exact"})},
+             {"command", stringSchema("Command")}
+         }, QJsonArray{"status", "run_id", "step_number", "mode", "command"})}
+    });
+
+    if(!m_viewProviderRegistry) {
+        return tools;
+    }
+
+    for(const ExtensionManifest& manifest : m_viewProviderRegistry->manifests()) {
+        for(const UiContribution::SettingsTabContribution& settingsTab : manifest.ui.settingsTabs) {
+            for(const QJsonValue& value : settingsTab.fields) {
+                const QJsonObject field = value.toObject();
+                const QString fieldId = field.value("id").toString().trimmed();
+                if(fieldId.isEmpty()) {
+                    continue;
+                }
+
+                const QString getName = extensionSettingsToolName(manifest.id, settingsTab.id, fieldId, "get");
+                const QString setName = extensionSettingsToolName(manifest.id, settingsTab.id, fieldId, "set");
+                const QString fieldLabel = field.value("label").toString(fieldId);
+                const QString baseDescription = QString("%1 / %2 / %3")
+                                                    .arg(manifest.displayName,
+                                                         settingsTab.title,
+                                                         fieldLabel);
+
+                tools.append(QJsonObject{
+                    {"name", getName},
+                    {"description", QString("Read extension setting %1.").arg(baseDescription)},
+                    {"input_schema", objectSchema(QJsonObject())},
+                    {"result_schema", objectSchema(QJsonObject{
+                         {"extension_id", stringSchema("Extension ID")},
+                         {"tab_id", stringSchema("Settings Tab ID")},
+                         {"field_id", stringSchema("Field ID")},
+                         {"value", fieldSchemaForSettingsTool(field)}
+                     }, QJsonArray{"extension_id", "tab_id", "field_id", "value"})}
+                });
+
+                tools.append(QJsonObject{
+                    {"name", setName},
+                    {"description", QString("Update extension setting %1.").arg(baseDescription)},
+                    {"input_schema", objectSchema(QJsonObject{
+                         {"value", fieldSchemaForSettingsTool(field)}
+                     }, QJsonArray{"value"})},
+                    {"result_schema", objectSchema(QJsonObject{
+                         {"status", stringSchema("Status", QJsonArray{"ok"})},
+                         {"extension_id", stringSchema("Extension ID")},
+                         {"tab_id", stringSchema("Settings Tab ID")},
+                         {"field_id", stringSchema("Field ID")},
+                         {"value", fieldSchemaForSettingsTool(field)}
+                     }, QJsonArray{"status", "extension_id", "tab_id", "field_id", "value"})}
+                });
+            }
+        }
+    }
+
+    return tools;
+}
+
+QJsonObject MainWindow::resolveExtensionSettingsTool(const QString& toolName) const
+{
+    if(toolName == "studio.settings.list" || !toolName.startsWith("settings.")) {
+        return QJsonObject();
+    }
+
+    const bool isGet = toolName.endsWith(".get");
+    const bool isSet = toolName.endsWith(".set");
+    if(!isGet && !isSet) {
+        return QJsonObject();
+    }
+
+    if(!m_viewProviderRegistry) {
+        return QJsonObject();
+    }
+
+    for(const ExtensionManifest& manifest : m_viewProviderRegistry->manifests()) {
+        for(const UiContribution::SettingsTabContribution& settingsTab : manifest.ui.settingsTabs) {
+            for(const QJsonValue& value : settingsTab.fields) {
+                const QJsonObject field = value.toObject();
+                const QString fieldId = field.value("id").toString().trimmed();
+                if(fieldId.isEmpty()) {
+                    continue;
+                }
+
+                if(toolName == extensionSettingsToolName(manifest.id, settingsTab.id, fieldId, "get")
+                   || toolName == extensionSettingsToolName(manifest.id, settingsTab.id, fieldId, "set")) {
+                    return QJsonObject{
+                        {"extension_id", manifest.id},
+                        {"extension_display_name", manifest.displayName},
+                        {"tab_id", settingsTab.id},
+                        {"tab_title", settingsTab.title},
+                        {"field", field},
+                        {"mode", isGet ? "get" : "set"}
+                    };
+                }
+            }
+        }
+    }
+
+    return QJsonObject();
+}
+
+QVariant MainWindow::extensionSettingValue(const QString& extensionId,
+                                          const QString& tabId,
+                                          const QJsonObject& field) const
+{
+    const QString fieldId = field.value("id").toString().trimmed();
+    if(fieldId.isEmpty()) {
+        return QVariant();
+    }
+
+    QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
+    return settings.value(QString("extensions/settings/%1/%2/%3").arg(extensionId, tabId, fieldId),
+                          field.value("default").toVariant());
+}
+
+QStringList MainWindow::candidateSettingFieldIds(const QString& inputName) const
+{
+    const QString trimmedName = inputName.trimmed().toLower();
+    if(trimmedName.isEmpty()) {
+        return QStringList();
+    }
+
+    QStringList candidates{
+        trimmedName,
+        QString("default_%1").arg(trimmedName),
+        QString("preferred_%1").arg(trimmedName)
+    };
+
+    if(trimmedName == QLatin1String("match")) {
+        candidates << "preferred_channel_family";
+    }
+
+    if(trimmedName == QLatin1String("window_samples")) {
+        candidates << "default_peak_window_samples";
+    }
+
+    return candidates;
+}
+
+QJsonObject MainWindow::applyExtensionSettingDefaults(const QString& extensionId,
+                                                      const QJsonObject& schemaProperties,
+                                                      const QJsonObject& currentValues) const
+{
+    if(extensionId.trimmed().isEmpty() || !m_viewProviderRegistry) {
+        return currentValues;
+    }
+
+    QJsonObject mergedValues = currentValues;
+
+    for(const ExtensionManifest& manifest : m_viewProviderRegistry->manifests()) {
+        if(manifest.id != extensionId) {
+            continue;
+        }
+
+        for(auto propertyIt = schemaProperties.constBegin(); propertyIt != schemaProperties.constEnd(); ++propertyIt) {
+            const QString inputName = propertyIt.key().trimmed();
+            if(inputName.isEmpty()) {
+                continue;
+            }
+
+            const QStringList candidateIds = candidateSettingFieldIds(inputName);
+            for(const UiContribution::SettingsTabContribution& settingsTab : manifest.ui.settingsTabs) {
+                bool matched = false;
+                for(const QJsonValue& value : settingsTab.fields) {
+                    const QJsonObject field = value.toObject();
+                    const QString fieldId = field.value("id").toString().trimmed().toLower();
+                    if(fieldId.isEmpty()) {
+                        continue;
+                    }
+
+                    if(candidateIds.contains(fieldId)
+                       || fieldId.endsWith(QString("_%1").arg(inputName.toLower()))) {
+                        mergedValues.insert(inputName,
+                                            QJsonValue::fromVariant(extensionSettingValue(manifest.id, settingsTab.id, field)));
+                        matched = true;
+                        break;
+                    }
+                }
+
+                if(matched) {
+                    break;
+                }
+            }
+        }
+
+        break;
+    }
+
+    return mergedValues;
+}
+
+QStringList MainWindow::extensionIdsForTool(const QString& toolName) const
+{
+    QStringList extensionIds;
+    if(toolName.trimmed().isEmpty() || !m_viewProviderRegistry) {
+        return extensionIds;
+    }
+
+    for(const ExtensionManifest& manifest : m_viewProviderRegistry->manifests()) {
+        bool matchesTool = false;
+
+        for(const ResultRendererContribution& renderer : manifest.resultRenderers) {
+            if(renderer.toolNames.contains(toolName)) {
+                matchesTool = true;
+                break;
+            }
+        }
+
+        if(!matchesTool) {
+            for(const AnalysisPipelineContribution& pipeline : manifest.analysisPipelines) {
+                for(const QJsonValue& stepValue : pipeline.steps) {
+                    if(stepValue.toObject().value("tool_name").toString().trimmed() == toolName) {
+                        matchesTool = true;
+                        break;
+                    }
+                }
+
+                if(matchesTool) {
+                    break;
+                }
+            }
+        }
+
+        if(matchesTool) {
+            extensionIds.append(manifest.id);
+        }
+    }
+
+    return extensionIds;
+}
+
+QJsonObject MainWindow::defaultInputsForPipeline(const QJsonObject& pipeline) const
+{
+    QJsonObject defaults;
+    const QJsonObject properties = pipeline.value("input_schema").toObject().value("properties").toObject();
+    for(auto it = properties.constBegin(); it != properties.constEnd(); ++it) {
+        const QJsonObject property = it.value().toObject();
+        if(property.contains("default")) {
+            defaults.insert(it.key(), property.value("default"));
+        }
+    }
+
+    return applyExtensionSettingDefaults(pipeline.value("extension_id").toString(), properties, defaults);
+}
+
+QJsonValue MainWindow::pipelineTemplateValueToJson(const QString& resolvedText) const
+{
+    const QString trimmed = resolvedText.trimmed();
+    if(trimmed.isEmpty()) {
+        return QJsonValue(QString());
+    }
+
+    if(trimmed == QLatin1String("true")) {
+        return QJsonValue(true);
+    }
+    if(trimmed == QLatin1String("false")) {
+        return QJsonValue(false);
+    }
+    if(trimmed == QLatin1String("null")) {
+        return QJsonValue(QJsonValue::Null);
+    }
+
+    if(QRegularExpression("^-?\\d+$").match(trimmed).hasMatch()) {
+        return QJsonValue(trimmed.toDouble());
+    }
+    if(QRegularExpression("^-?\\d+(?:\\.\\d+)?$").match(trimmed).hasMatch()) {
+        return QJsonValue(trimmed.toDouble());
+    }
+
+    if(trimmed.startsWith('{') || trimmed.startsWith('[') || trimmed.startsWith('"')) {
+        QJsonParseError error;
+        const QByteArray payload = trimmed.startsWith('"')
+            ? QByteArray("{\"value\":") + trimmed.toUtf8() + QByteArray("}")
+            : trimmed.toUtf8();
+        const QJsonDocument document = QJsonDocument::fromJson(payload, &error);
+        if(error.error == QJsonParseError::NoError) {
+            if(trimmed.startsWith('"')) {
+                return document.object().value("value");
+            }
+            if(document.isObject()) {
+                return document.object();
+            }
+            if(document.isArray()) {
+                return document.array();
+            }
+        }
+    }
+
+    return QJsonValue(trimmed);
+}
+
+QJsonObject MainWindow::resolvePipelineStepArguments(const QJsonObject& step,
+                                                    const QJsonObject& pipelineInputs) const
+{
+    QJsonObject arguments;
+    const QJsonObject argumentsTemplate = step.value("arguments_template").toObject();
+    for(auto it = argumentsTemplate.constBegin(); it != argumentsTemplate.constEnd(); ++it) {
+        if(it.value().isString()) {
+            arguments.insert(it.key(), pipelineTemplateValueToJson(resolvePipelineCommandTemplate(it.value().toString(),
+                                                                                                pipelineInputs)));
+        } else {
+            arguments.insert(it.key(), it.value());
+        }
+    }
+
+    return arguments;
+}
+
+QString MainWindow::buildToolCallCommand(const QString& toolName, const QJsonObject& arguments) const
+{
+    return QString("tools.call %1 %2")
+        .arg(toolName,
+             QString::fromUtf8(QJsonDocument(arguments).toJson(QJsonDocument::Compact)));
+}
+
+QJsonObject MainWindow::pipelineRunArtifact(const QString& runId) const
+{
+    const QString trimmedRunId = runId.trimmed();
+    if(trimmedRunId.isEmpty()) {
+        return QJsonObject();
+    }
+
+    for(int i = m_structuredResultHistory.size() - 1; i >= 0; --i) {
+        const QJsonObject entry = m_structuredResultHistory.at(i);
+        if(entry.value("tool_name").toString() == QLatin1String("studio.pipeline.run")
+           && entry.value("result").toObject().value("run_id").toString() == trimmedRunId) {
+            return entry.value("result").toObject();
+        }
+    }
+
+    return QJsonObject();
+}
+
+QString MainWindow::rerunPipelineStepCommand(const QString& runId,
+                                             int stepNumber,
+                                             const QString& mode,
+                                             QString* errorMessage) const
+{
+    const QJsonObject artifact = pipelineRunArtifact(runId);
+    if(artifact.isEmpty()) {
+        if(errorMessage) {
+            *errorMessage = QString("Unknown pipeline run id: %1").arg(runId);
+        }
+        return QString();
+    }
+
+    const QJsonArray executedSteps = artifact.value("steps").toArray();
+    QJsonObject executedStep;
+    for(const QJsonValue& value : executedSteps) {
+        const QJsonObject candidate = value.toObject();
+        if(candidate.value("step_number").toInt() == stepNumber) {
+            executedStep = candidate;
+            break;
+        }
+    }
+
+    if(executedStep.isEmpty()) {
+        if(errorMessage) {
+            *errorMessage = QString("Pipeline run %1 has no step %2.").arg(runId).arg(stepNumber);
+        }
+        return QString();
+    }
+
+    if(mode.trimmed().compare("exact", Qt::CaseInsensitive) == 0) {
+        const QString exactCommand = executedStep.value("command").toString().trimmed();
+        if(exactCommand.isEmpty() && errorMessage) {
+            *errorMessage = QString("Pipeline step %1 has no exact replay command.").arg(stepNumber);
+        }
+        return exactCommand;
+    }
+
+    const QString pipelineId = artifact.value("pipeline_id").toString().trimmed();
+    const QJsonObject pipeline = analysisPipelineContract(pipelineId);
+    if(pipeline.isEmpty()) {
+        if(errorMessage) {
+            *errorMessage = QString("Unknown pipeline contract for %1.").arg(pipelineId);
+        }
+        return QString();
+    }
+
+    const QJsonArray stepContracts = pipeline.value("steps").toArray();
+    if(stepNumber <= 0 || stepNumber > stepContracts.size()) {
+        if(errorMessage) {
+            *errorMessage = QString("Pipeline contract %1 has no step %2.").arg(pipelineId).arg(stepNumber);
+        }
+        return QString();
+    }
+
+    const QJsonObject stepContract = stepContracts.at(stepNumber - 1).toObject();
+    const QString toolName = stepContract.value("tool_name").toString().trimmed();
+    if(toolName.isEmpty()) {
+        if(errorMessage) {
+            *errorMessage = QString("Pipeline step %1 is missing a tool name.").arg(stepNumber);
+        }
+        return QString();
+    }
+
+    QJsonObject pipelineInputs = defaultInputsForPipeline(pipeline);
+    const QJsonObject inputOverrides = artifact.value("input_overrides").toObject();
+    for(auto it = inputOverrides.constBegin(); it != inputOverrides.constEnd(); ++it) {
+        pipelineInputs.insert(it.key(), it.value());
+    }
+    const QJsonObject rehydratedArguments = resolvePipelineStepArguments(stepContract, pipelineInputs);
+    const QString command = buildToolCallCommand(toolName, rehydratedArguments);
+    if(command.contains("${")) {
+        if(errorMessage) {
+            *errorMessage = QString("Pipeline step %1 still contains unresolved placeholders.").arg(stepNumber);
+        }
+        return QString();
+    }
+
+    return command;
+}
+
+QJsonObject MainWindow::analysisPipelineContract(const QString& pipelineId) const
+{
+    const QJsonArray pipelines = analysisPipelineContracts();
+    for(const QJsonValue& value : pipelines) {
+        const QJsonObject pipeline = value.toObject();
+        if(pipeline.value("id").toString() == pipelineId) {
+            return pipeline;
+        }
+    }
+
+    return QJsonObject();
+}
+
+QString MainWindow::resolvePipelineCommandTemplate(const QString& commandTemplate,
+                                                   const QJsonObject& pipelineInputs) const
+{
+    QString resolved = commandTemplate;
+    resolved = resolvePlannerReferences(resolved);
+
+    for(auto it = pipelineInputs.constBegin(); it != pipelineInputs.constEnd(); ++it) {
+        const QString placeholder = QString("${%1}").arg(it.key());
+        if(resolved.contains(placeholder)) {
+            QString replacement;
+            if(it.value().isString()) {
+                replacement = it.value().toString();
+            } else if(it.value().isDouble()) {
+                replacement = QString::number(it.value().toDouble(), 'g', 12);
+            } else if(it.value().isBool()) {
+                replacement = it.value().toBool() ? "true" : "false";
+            } else {
+                replacement = QString::fromUtf8(QJsonDocument::fromVariant(it.value().toVariant()).toJson(QJsonDocument::Compact));
+            }
+            resolved.replace(placeholder, replacement);
+        }
+    }
+
+    if(resolved.contains("${last_peak_channel}")) {
+        const QString peakChannel = m_lastToolResult.value("peak_channel").toString().trimmed();
+        if(!peakChannel.isEmpty()) {
+            resolved.replace("${last_peak_channel}", peakChannel);
+        }
+    }
+
+    return resolved;
+}
+
+bool MainWindow::resumeAnalysisPipeline(const QJsonObject& artifactResult)
+{
+    const QString runId = artifactResult.value("run_id").toString().trimmed();
+    const QString pipelineId = artifactResult.value("pipeline_id").toString().trimmed();
+    const QString displayName = artifactResult.value("display_name").toString(pipelineId);
+    const QStringList pendingCommands = qvariant_cast<QStringList>(artifactResult.value("pending_commands").toVariant());
+    if(runId.isEmpty() || pipelineId.isEmpty() || pendingCommands.isEmpty()) {
+        appendProblemMessage(QString("Cannot resume pipeline %1: missing run id or pending commands.").arg(displayName));
+        return false;
+    }
+
+    if(!m_activePipelineId.isEmpty()) {
+        appendProblemMessage(QString("Cannot resume %1 while pipeline %2 is still active.")
+                                 .arg(displayName, m_activePipelineDisplayName));
+        return false;
+    }
+
+    m_activePipelineId = pipelineId;
+    m_activePipelineRunId = runId;
+    m_activePipelineDisplayName = displayName;
+    m_activePipelineInputs = artifactResult.value("inputs").toObject();
+    m_activePipelineInputOverrides = artifactResult.value("input_overrides").toObject();
+    m_pendingPipelineCommands = pendingCommands;
+    m_activePipelineStepHistory = artifactResult.value("steps").toArray();
+    m_activePipelineTotalSteps = artifactResult.value("total_steps").toInt(m_activePipelineStepHistory.size() + m_pendingPipelineCommands.size());
+    m_activePipelineLastStatus = QString("Resumed with %1 pending steps.").arg(m_pendingPipelineCommands.size());
+
+    appendOutputMessage(QString("Resuming analysis pipeline %1 with %2 pending steps.")
+                            .arg(m_activePipelineDisplayName)
+                            .arg(m_pendingPipelineCommands.size()));
+    appendTerminalMessage(QString("> Pipeline %1 resumed with %2 pending steps.")
+                              .arg(m_activePipelineDisplayName)
+                              .arg(m_pendingPipelineCommands.size()));
+    updateActivePipelineArtifact("resumed");
+    continuePendingPipelineExecution();
+    return true;
+}
+
+bool MainWindow::executeAnalysisPipeline(const QString& pipelineId,
+                                         const QJsonObject& pipelineInputs,
+                                         const QJsonObject& inputOverrides)
+{
+    const QJsonObject pipeline = analysisPipelineContract(pipelineId);
+    if(pipeline.isEmpty()) {
+        appendProblemMessage(QString("Unknown analysis pipeline: %1").arg(pipelineId));
+        return false;
+    }
+
+    QJsonArray preparedSteps;
+    const QJsonArray steps = pipeline.value("steps").toArray();
+    for(int index = 0; index < steps.size(); ++index) {
+        const QJsonObject step = steps.at(index).toObject();
+        const QString toolName = step.value("tool_name").toString().trimmed();
+        if(toolName.isEmpty()) {
+            continue;
+        }
+
+        const QJsonObject resolvedArguments = resolvePipelineStepArguments(step, pipelineInputs);
+        const QString command = buildToolCallCommand(toolName, resolvedArguments);
+        preparedSteps.append(QJsonObject{
+            {"step_number", index + 1},
+            {"tool_name", toolName},
+            {"arguments", resolvedArguments},
+            {"arguments_template", step.value("arguments_template").toObject()},
+            {"replay_command", command}
+        });
+    }
+
+    if(preparedSteps.isEmpty()) {
+        appendProblemMessage(QString("Pipeline %1 did not define any executable steps.").arg(pipelineId));
+        return false;
+    }
+
+    m_activePipelineId = pipelineId;
+    m_activePipelineRunId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    m_activePipelineDisplayName = pipeline.value("display_name").toString(pipelineId);
+    m_activePipelineInputs = pipelineInputs;
+    m_activePipelineInputOverrides = inputOverrides;
+    m_pendingPipelineCommands.clear();
+    for(const QJsonValue& value : preparedSteps) {
+        m_pendingPipelineCommands.append(value.toObject().value("replay_command").toString());
+    }
+    m_activePipelineStepHistory = QJsonArray();
+    m_activePipelineTotalSteps = preparedSteps.size();
+    m_activePipelineLastStatus = QString("Queued %1 steps.").arg(preparedSteps.size());
+
+    appendOutputMessage(QString("Starting analysis pipeline %1 with %2 steps.")
+                            .arg(m_activePipelineDisplayName)
+                            .arg(preparedSteps.size()));
+    appendTerminalMessage(QString("> Pipeline %1 queued with %2 steps.")
+                              .arg(m_activePipelineDisplayName)
+                              .arg(preparedSteps.size()));
+    updateActivePipelineArtifact("queued");
+    continuePendingPipelineExecution();
+    return true;
+}
+
+void MainWindow::continuePendingPipelineExecution()
+{
+    if(m_isAdvancingPipeline) {
+        return;
+    }
+
+    if(m_pendingPipelineCommands.isEmpty()) {
+        if(!m_activePipelineId.isEmpty()) {
+            appendOutputMessage(QString("Analysis pipeline %1 completed.").arg(m_activePipelineDisplayName));
+            appendTerminalMessage(QString("> Pipeline %1 completed.").arg(m_activePipelineDisplayName));
+            m_activePipelineLastStatus = "Completed.";
+            updateActivePipelineArtifact("completed");
+            rebuildSkillsExplorer();
+        }
+        m_activePipelineId.clear();
+        m_activePipelineRunId.clear();
+        m_activePipelineDisplayName.clear();
+        m_activePipelineInputs = QJsonObject();
+        m_activePipelineInputOverrides = QJsonObject();
+        m_activePipelineStepHistory = QJsonArray();
+        m_activePipelineTotalSteps = 0;
+        return;
+    }
+
+    m_isAdvancingPipeline = true;
+    const int remainingBefore = m_pendingPipelineCommands.size();
+    const QString commandTemplate = m_pendingPipelineCommands.takeFirst();
+    const QString resolvedCommand = resolvePipelineCommandTemplate(commandTemplate, m_activePipelineInputs);
+
+    if(resolvedCommand.contains("${")) {
+        appendProblemMessage(QString("Pipeline %1 could not resolve step placeholder(s): %2")
+                                 .arg(m_activePipelineDisplayName, resolvedCommand));
+        failActivePipeline(QString("Failed to resolve placeholders in %1").arg(resolvedCommand));
+        m_isAdvancingPipeline = false;
+        return;
+    }
+
+    const int stepNumber = m_activePipelineTotalSteps - remainingBefore + 1;
+    m_activePipelineStepHistory.append(QJsonObject{
+        {"step_number", stepNumber},
+        {"pipeline_id", m_activePipelineId},
+        {"run_id", m_activePipelineRunId},
+        {"command", resolvedCommand},
+        {"replay_command", commandTemplate},
+        {"status", "running"},
+        {"started_at", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)}
+    });
+    const QString note = QString("Pipeline %1 | Step %2: %3")
+                             .arg(m_activePipelineDisplayName)
+                             .arg(stepNumber)
+                             .arg(resolvedCommand);
+    m_activePipelineLastStatus = note;
+    updateActivePipelineArtifact("running", resolvedCommand);
+    rebuildSkillsExplorer();
+    appendTerminalMessage(QString("> %1").arg(note));
+    m_agentChatDock->appendTranscript(QString("Planner> %1").arg(note));
+
+    sendToolCall(resolvedCommand);
+    m_isAdvancingPipeline = false;
+}
+
+QWidget* MainWindow::ensureBottomResultRenderer(const QString& toolName)
+{
+    const IResultRendererFactory* factory = ResultRendererFactoryRegistry::instance().factoryForToolName(toolName);
+    if(!factory) {
+        if(m_resultsExtensionRenderer) {
+            m_resultsStack->removeWidget(m_resultsExtensionRenderer);
+            m_resultsExtensionRenderer->deleteLater();
+            m_resultsExtensionRenderer = nullptr;
+        }
+        return nullptr;
+    }
+
+    if(m_resultsExtensionRenderer
+       && m_resultsExtensionRenderer->property("mne_result_renderer_tool").toString() == toolName) {
+        return m_resultsExtensionRenderer;
+    }
+
+    if(m_resultsExtensionRenderer) {
+        m_resultsStack->removeWidget(m_resultsExtensionRenderer);
+        m_resultsExtensionRenderer->deleteLater();
+        m_resultsExtensionRenderer = nullptr;
+    }
+
+    m_resultsExtensionRenderer = factory->createRenderer(m_resultsTab);
+    if(!m_resultsExtensionRenderer) {
+        return nullptr;
+    }
+
+    m_resultsExtensionRenderer->setProperty("mne_result_renderer_tool", toolName);
+    if(hasQtSignal(m_resultsExtensionRenderer, "toolCommandRequested(QString)")) {
+        QObject::connect(m_resultsExtensionRenderer,
+                         SIGNAL(toolCommandRequested(QString)),
+                         this,
+                         SLOT(handleResultRendererToolCommand(QString)));
+    }
+    if(hasQtSignal(m_resultsExtensionRenderer, "selectionContextChanged(QJsonObject)")) {
+        QObject::connect(m_resultsExtensionRenderer,
+                         SIGNAL(selectionContextChanged(QJsonObject)),
+                         this,
+                         SLOT(handleResultRendererSelectionContext(QJsonObject)));
+    }
+    m_resultsStack->addWidget(m_resultsExtensionRenderer);
+    return m_resultsExtensionRenderer;
+}
+
 void MainWindow::updateStructuredResultView(const QString& toolName, const QJsonObject& result)
 {
-    if(!m_resultsTree || !m_resultsTitleLabel || !m_resultsStack || !m_resultsTable || !m_resultsActionButton) {
+    if(!m_resultsTree || !m_resultsTitleLabel || !m_resultsStack || !m_resultsTable) {
         return;
     }
 
     m_resultsTitleLabel->setText(QString("Latest structured result: %1").arg(toolName));
     m_resultsCurrentToolName = toolName;
-    m_resultPrimaryActionCommand.clear();
-    m_resultsPsdControlsWidget->setVisible(false);
-    m_resultsActionButton->setVisible(false);
-    m_resultsActionButton->setEnabled(false);
+    m_resultSelectionContext = QJsonObject{
+        {"tool_name", toolName}
+    };
     m_resultsTree->clear();
     m_resultsTable->setRowCount(0);
-    m_resultsSpectrumPlot->clear();
     m_resultsStack->setCurrentWidget(m_resultsTree);
 
     if(result.isEmpty()) {
+        m_resultSelectionContext = QJsonObject();
         m_resultsTree->addTopLevelItem(new QTreeWidgetItem(QStringList()
                                                            << "hint"
                                                            << "Run a tool or open an Analysis artifact to populate Recent Results."));
         return;
     }
 
-    if(toolName == "neurokernel.channel_stats" && result.value("channels").isArray()) {
-        const QJsonArray channels = result.value("channels").toArray();
-        m_resultsTitleLabel->setText(result.value("message").toString(QString("Latest structured result: %1").arg(toolName)));
-        m_resultsTable->setRowCount(channels.size());
-        for(int row = 0; row < channels.size(); ++row) {
-            const QJsonObject channel = channels.at(row).toObject();
-            m_resultsTable->setItem(row, 0, new QTableWidgetItem(channel.value("name").toString()));
-            m_resultsTable->setItem(row, 1, new QTableWidgetItem(QString::number(channel.value("rms").toDouble(), 'g', 8)));
-            m_resultsTable->setItem(row, 2, new QTableWidgetItem(QString::number(channel.value("mean_abs").toDouble(), 'g', 8)));
-            m_resultsTable->setItem(row, 3, new QTableWidgetItem(QString::number(channel.value("peak_abs").toDouble(), 'g', 8)));
-        }
-        m_resultsStack->setCurrentWidget(m_resultsTable);
-        m_resultsActionButton->setText("Find Peak For Selected Channel");
-        m_resultsActionButton->setVisible(true);
-        updateResultPrimaryActionForSelection();
-        m_bottomPanelTabs->setCurrentWidget(m_resultsTab);
-        return;
-    }
-
-    if(toolName == "neurokernel.raw_stats" && result.value("top_channels").isArray()) {
-        const QJsonArray channels = result.value("top_channels").toArray();
-        m_resultsTitleLabel->setText(result.value("message").toString(QString("Latest structured result: %1").arg(toolName)));
-        m_resultsTable->setRowCount(channels.size());
-        for(int row = 0; row < channels.size(); ++row) {
-            const QJsonObject channel = channels.at(row).toObject();
-            m_resultsTable->setItem(row, 0, new QTableWidgetItem(channel.value("name").toString()));
-            m_resultsTable->setItem(row, 1, new QTableWidgetItem(QString::number(channel.value("rms").toDouble(), 'g', 8)));
-            m_resultsTable->setItem(row, 2, new QTableWidgetItem("-"));
-            m_resultsTable->setItem(row, 3, new QTableWidgetItem("-"));
-        }
-        m_resultsStack->setCurrentWidget(m_resultsTable);
-        m_resultsActionButton->setText("Find Peak For Selected Channel");
-        m_resultsActionButton->setVisible(true);
-        updateResultPrimaryActionForSelection();
-        m_bottomPanelTabs->setCurrentWidget(m_resultsTab);
-        return;
-    }
-
-    if(toolName == "neurokernel.find_peak_window") {
-        const int peakSample = result.value("peak_sample").toInt(-1);
-        if(peakSample >= 0) {
-            m_resultPrimaryActionCommand = QString("tools.call view.raw.goto {\"sample\":%1}").arg(peakSample);
-            m_resultsActionButton->setText(QString("Jump To Peak Sample %1").arg(peakSample));
-            m_resultsActionButton->setVisible(true);
-            m_resultsActionButton->setEnabled(true);
+    if(QWidget* renderer = ensureBottomResultRenderer(toolName)) {
+        if(IResultRendererWidget* resultRenderer = dynamic_cast<IResultRendererWidget*>(renderer)) {
+            resultRenderer->setResultHistory(resultHistoryForTool(toolName));
+            resultRenderer->setRuntimeContext(resultRendererRuntimeContext());
+            resultRenderer->setResult(toolName, result);
+            m_resultsStack->setCurrentWidget(renderer);
+            m_bottomPanelTabs->setCurrentWidget(m_resultsTab);
+            return;
         }
     }
 
-    if(toolName == "neurokernel.psd_summary"
-       && result.value("frequencies").isArray()
-       && result.value("psd").isArray()) {
-        updateResultPsdControls(result);
-        QVector<double> frequencies;
-        QVector<double> values;
-        const QJsonArray freqArray = result.value("frequencies").toArray();
-        const QJsonArray valueArray = result.value("psd").toArray();
-        const int pointCount = std::min(freqArray.size(), valueArray.size());
-        frequencies.reserve(pointCount);
-        values.reserve(pointCount);
-        for(int i = 0; i < pointCount; ++i) {
-            frequencies.append(freqArray.at(i).toDouble());
-            values.append(valueArray.at(i).toDouble());
-        }
-
-        m_resultsSpectrumPlot->setSpectrum(frequencies,
-                                           values,
-                                           result.value("message").toString(QString("Spectrum summary for %1").arg(toolName)));
-        updateResultPsdComparison();
-        m_resultsStack->setCurrentWidget(m_resultsSpectrumPlot);
-        m_bottomPanelTabs->setCurrentWidget(m_resultsTab);
-        return;
-    }
+    m_resultSelectionContext = QJsonObject{
+        {"tool_name", toolName},
+        {"selection_kind", "result"},
+        {"has_primary_action", false},
+        {"has_secondary_action", false}
+    };
 
     for(auto it = result.constBegin(); it != result.constEnd(); ++it) {
         m_resultsTree->addTopLevelItem(buildJsonTreeItem(it.key(), it.value()));
@@ -1629,148 +3124,6 @@ void MainWindow::updateStructuredResultView(const QString& toolName, const QJson
         m_resultsTree->resizeColumnToContents(column);
     }
     m_bottomPanelTabs->setCurrentWidget(m_resultsTab);
-}
-
-void MainWindow::updateResultPrimaryActionForSelection()
-{
-    if(!m_resultsActionButton || !m_resultsTable) {
-        return;
-    }
-
-    if(m_resultsCurrentToolName != "neurokernel.channel_stats"
-       && m_resultsCurrentToolName != "neurokernel.raw_stats") {
-        return;
-    }
-
-    const QList<QTableWidgetItem*> items = m_resultsTable->selectedItems();
-    if(items.isEmpty()) {
-        m_resultPrimaryActionCommand.clear();
-        m_resultsActionButton->setEnabled(false);
-        return;
-    }
-
-    const int row = items.first()->row();
-    QTableWidgetItem* nameItem = m_resultsTable->item(row, 0);
-    if(!nameItem || nameItem->text().trimmed().isEmpty()) {
-        m_resultPrimaryActionCommand.clear();
-        m_resultsActionButton->setEnabled(false);
-        return;
-    }
-
-    const QString channelName = nameItem->text().trimmed();
-    m_resultPrimaryActionCommand = QString("tools.call neurokernel.find_peak_window {\"window_samples\":4000,\"match\":\"%1\"}")
-                                       .arg(channelName);
-    m_resultsActionButton->setText(QString("Find Peak For %1").arg(channelName));
-    m_resultsActionButton->setVisible(true);
-    m_resultsActionButton->setEnabled(true);
-}
-
-void MainWindow::updateResultPsdControls(const QJsonObject& result)
-{
-    if(!m_resultsPsdControlsWidget || !m_resultsPsdMatchCombo || !m_resultsPsdNfftSpin || !m_resultsPsdRunButton) {
-        return;
-    }
-
-    const QString match = result.value("match").toString().trimmed().toUpper();
-    const int matchIndex = m_resultsPsdMatchCombo->findText(match.isEmpty() ? "All" : match, Qt::MatchFixedString);
-    m_resultsPsdMatchCombo->setCurrentIndex(matchIndex >= 0 ? matchIndex : m_resultsPsdMatchCombo->findText("All"));
-
-    const int nfft = result.value("nfft").toInt(256);
-    m_resultsPsdNfftSpin->setValue(std::max(m_resultsPsdNfftSpin->minimum(),
-                                            std::min(m_resultsPsdNfftSpin->maximum(), nfft)));
-    const QSignalBlocker blocker(m_resultsPsdCompareCombo);
-    m_resultsPsdCompareCombo->clear();
-    m_resultsPsdCompareCombo->addItem("No comparison");
-    for(int i = m_psdResultHistory.size() - 1; i >= 0; --i) {
-        const QJsonObject entry = m_psdResultHistory.at(i);
-        if(entry == result) {
-            continue;
-        }
-
-        const QString label = QString("%1 | %2 | nfft %3 | %4 ch")
-                                  .arg(entry.value("match").toString().trimmed().isEmpty() ? QString("All") : entry.value("match").toString().trimmed(),
-                                       QFileInfo(entry.value("file").toString()).fileName())
-                                  .arg(entry.value("nfft").toInt(0))
-                                  .arg(entry.value("channel_count").toInt(0));
-        m_resultsPsdCompareCombo->addItem(label, entry);
-    }
-    m_resultsPsdControlsWidget->setVisible(true);
-    m_resultsPsdRunButton->setEnabled(activeRawDataView() != nullptr);
-}
-
-void MainWindow::updateResultPsdComparison()
-{
-    if(!m_resultsSpectrumPlot || m_resultsCurrentToolName != "neurokernel.psd_summary") {
-        return;
-    }
-
-    if(!m_resultsPsdCompareCombo || m_resultsPsdCompareCombo->currentIndex() <= 0) {
-        m_resultsSpectrumPlot->clearComparisonSpectrum();
-        return;
-    }
-
-    const QJsonObject comparison = m_resultsPsdCompareCombo->currentData().toJsonObject();
-    if(!comparison.value("frequencies").isArray() || !comparison.value("psd").isArray()) {
-        m_resultsSpectrumPlot->clearComparisonSpectrum();
-        return;
-    }
-
-    QVector<double> frequencies;
-    QVector<double> values;
-    const QJsonArray freqArray = comparison.value("frequencies").toArray();
-    const QJsonArray valueArray = comparison.value("psd").toArray();
-    const int pointCount = std::min(freqArray.size(), valueArray.size());
-    frequencies.reserve(pointCount);
-    values.reserve(pointCount);
-    for(int i = 0; i < pointCount; ++i) {
-        frequencies.append(freqArray.at(i).toDouble());
-        values.append(valueArray.at(i).toDouble());
-    }
-
-    const QString label = QString("%1 | nfft %2")
-                              .arg(comparison.value("match").toString().trimmed().isEmpty()
-                                       ? QString("All")
-                                       : comparison.value("match").toString().trimmed())
-                              .arg(comparison.value("nfft").toInt(0));
-    m_resultsSpectrumPlot->setComparisonSpectrum(frequencies, values, label);
-}
-
-void MainWindow::runResultPrimaryAction()
-{
-    if(m_resultPrimaryActionCommand.isEmpty()) {
-        return;
-    }
-
-    appendTerminalMessage(QString("$ %1").arg(m_resultPrimaryActionCommand));
-    sendToolCall(m_resultPrimaryActionCommand);
-}
-
-void MainWindow::runResultPsdAction()
-{
-    if(m_resultsCurrentToolName != "neurokernel.psd_summary") {
-        return;
-    }
-
-    IRawDataView* rawBrowser = activeRawDataView();
-    if(!rawBrowser) {
-        appendProblemMessage("PSD rerun requested without an active raw browser.");
-        return;
-    }
-
-    const int fromSample = m_lastToolResult.value("from_sample").toInt(rawBrowser->cursorSample());
-    const int toSample = m_lastToolResult.value("to_sample").toInt(fromSample);
-    const int windowSamples = std::max(32, toSample - fromSample);
-    QJsonObject arguments = buildRawWindowArguments(windowSamples);
-    arguments.insert("nfft", m_resultsPsdNfftSpin->value());
-
-    const QString selectedMatch = m_resultsPsdMatchCombo->currentText().trimmed();
-    arguments.insert("match", selectedMatch.compare("All", Qt::CaseInsensitive) == 0 ? QString() : selectedMatch);
-
-    appendTerminalMessage(QString("$ tools.call neurokernel.psd_summary {\"window_samples\":%1,\"nfft\":%2,\"match\":\"%3\"}")
-                              .arg(windowSamples)
-                              .arg(m_resultsPsdNfftSpin->value())
-                              .arg(arguments.value("match").toString()));
-    sendKernelToolCall("neurokernel.psd_summary", arguments);
 }
 
 QString MainWindow::planAgentIntent(const QString& commandText, QString& plannedCommand, bool& planned) const
@@ -1798,6 +3151,49 @@ QString MainWindow::planAgentIntent(const QString& commandText, QString& planned
         planned = true;
         plannedCommand = "tools.list";
         return "Mapped your request to `tools.list`.";
+    }
+
+    if(containsAny({"list settings", "show settings", "available settings", "which settings"})) {
+        planned = true;
+        plannedCommand = "tools.call studio.settings.list {}";
+        return "Mapped your request to `studio.settings.list`.";
+    }
+
+    if(containsAny({"list pipelines", "show pipelines", "available pipelines", "which pipelines", "list workflows", "available workflows"})) {
+        planned = true;
+        plannedCommand = "tools.call studio.pipelines.list {}";
+        return "Mapped your request to `studio.pipelines.list`.";
+    }
+
+    if(containsAny({"run pipeline", "start pipeline", "execute pipeline", "run workflow", "start workflow"})) {
+        const QJsonArray pipelines = analysisPipelineContracts();
+        for(const QJsonValue& value : pipelines) {
+            const QJsonObject pipeline = value.toObject();
+            const QString pipelineId = pipeline.value("id").toString();
+            const QString displayName = pipeline.value("display_name").toString().toLower();
+            if(lower.contains(pipelineId.toLower()) || (!displayName.isEmpty() && lower.contains(displayName))) {
+                planned = true;
+                plannedCommand = QString("tools.call studio.pipeline.run {\"pipeline_id\":\"%1\"}").arg(pipelineId);
+                return QString("Mapped your request to `studio.pipeline.run` for %1.").arg(pipelineId);
+            }
+        }
+    }
+
+    if(containsAny({"resume pipeline", "continue pipeline", "resume workflow", "continue workflow"})) {
+        for(int i = m_structuredResultHistory.size() - 1; i >= 0; --i) {
+            const QJsonObject entry = m_structuredResultHistory.at(i);
+            if(entry.value("tool_name").toString() != QLatin1String("studio.pipeline.run")) {
+                continue;
+            }
+            const QJsonObject result = entry.value("result").toObject();
+            if(result.value("pending_steps").toInt() > 0) {
+                planned = true;
+                plannedCommand = QString("tools.call studio.pipeline.resume {\"run_id\":\"%1\"}")
+                                     .arg(result.value("run_id").toString());
+                return QString("Mapped your request to `studio.pipeline.resume` for %1.")
+                    .arg(result.value("display_name").toString(result.value("pipeline_id").toString()));
+            }
+        }
     }
 
     if(containsAny({"what views", "open views", "which views", "what is open"})) {
@@ -1987,27 +3383,216 @@ QString MainWindow::handleStructuredToolCommand(const QString& commandText, bool
         for(int i = 0; i < m_centerTabs->count(); ++i) {
             views << QString("%1: %2").arg(i + 1).arg(m_centerTabs->tabText(i));
         }
-        rememberToolResult(toolName, QJsonObject{
+        rememberToolResult(toolName, normalizedToolResultEnvelope(toolName, QJsonObject{
             {"tool_name", toolName},
             {"views", QJsonArray::fromStringList(views)}
-        });
+        }, "workbench"));
         return views.isEmpty() ? "No open views." : QString("Open views: %1").arg(views.join(" | "));
+    }
+
+    if(toolName == "studio.settings.list") {
+        const QJsonArray settingsContracts = extensionSettingsContracts();
+        const QJsonArray settingsState = extensionSettingsState();
+        rememberToolResult(toolName, normalizedToolResultEnvelope(toolName, QJsonObject{
+            {"tool_name", toolName},
+            {"settings", settingsContracts},
+            {"state", settingsState}
+        }, "workbench"));
+        return QString("Extension settings contracts: %1 tabs across %2 extensions.")
+            .arg(settingsContracts.size())
+            .arg(m_viewProviderRegistry ? m_viewProviderRegistry->manifests().size() : 0);
+    }
+
+    if(toolName == "studio.pipelines.list") {
+        const QJsonArray pipelineContracts = analysisPipelineContracts();
+        rememberToolResult(toolName, normalizedToolResultEnvelope(toolName, QJsonObject{
+            {"tool_name", toolName},
+            {"pipelines", pipelineContracts}
+        }, "workbench"));
+        return QString("Analysis pipelines: %1").arg(pipelineContracts.size());
+    }
+
+    if(toolName == "studio.pipeline.run") {
+        const QString pipelineId = arguments.value("pipeline_id").toString().trimmed();
+        if(pipelineId.isEmpty()) {
+            return "Tool studio.pipeline.run requires {\"pipeline_id\": \"...\"}.";
+        }
+
+        const QJsonObject pipeline = analysisPipelineContract(pipelineId);
+        if(pipeline.isEmpty()) {
+            return QString("Unknown analysis pipeline: %1").arg(pipelineId);
+        }
+
+        QJsonObject pipelineInputs = defaultInputsForPipeline(pipeline);
+        const QJsonObject requestedInputs = arguments.value("inputs").toObject();
+        for(auto it = requestedInputs.constBegin(); it != requestedInputs.constEnd(); ++it) {
+            pipelineInputs.insert(it.key(), it.value());
+        }
+
+        const bool started = executeAnalysisPipeline(pipelineId, pipelineInputs, requestedInputs);
+        if(!started) {
+            rememberToolResult(toolName, normalizedToolResultEnvelope(toolName, QJsonObject{
+                {"tool_name", toolName},
+                {"status", QString("error")},
+                {"pipeline_id", pipelineId},
+                {"display_name", pipeline.value("display_name").toString(pipelineId)},
+                {"queued_steps", pipeline.value("steps").toArray().size()},
+                {"inputs", pipelineInputs},
+                {"message", QString("Failed to queue pipeline %1").arg(pipeline.value("display_name").toString(pipelineId))}
+            }, "workbench"));
+        }
+        return started
+            ? QString("Queued analysis pipeline %1.").arg(pipeline.value("display_name").toString(pipelineId))
+            : QString("Failed to queue analysis pipeline %1.").arg(pipelineId);
+    }
+
+    if(toolName == "studio.pipeline.resume") {
+        const QString runId = arguments.value("run_id").toString().trimmed();
+        if(runId.isEmpty()) {
+            return "Tool studio.pipeline.resume requires {\"run_id\": \"...\"}.";
+        }
+
+        QJsonObject artifactResult;
+        for(int i = m_structuredResultHistory.size() - 1; i >= 0; --i) {
+            const QJsonObject entry = m_structuredResultHistory.at(i);
+            if(entry.value("tool_name").toString() == QLatin1String("studio.pipeline.run")
+               && entry.value("result").toObject().value("run_id").toString() == runId) {
+                artifactResult = entry.value("result").toObject();
+                break;
+            }
+        }
+
+        if(artifactResult.isEmpty()) {
+            return QString("Unknown pipeline run id: %1").arg(runId);
+        }
+
+        const bool started = resumeAnalysisPipeline(artifactResult);
+        if(!started) {
+            rememberToolResult(toolName, normalizedToolResultEnvelope(toolName, QJsonObject{
+                {"status", QString("error")},
+                {"run_id", runId},
+                {"pipeline_id", artifactResult.value("pipeline_id").toString()},
+                {"pending_steps", artifactResult.value("pending_steps").toInt()},
+                {"message", QString("Failed to resume pipeline run %1").arg(runId)}
+            }, "workbench"));
+        }
+        return started
+            ? QString("Resumed analysis pipeline %1.")
+                  .arg(artifactResult.value("display_name").toString(artifactResult.value("pipeline_id").toString()))
+            : QString("Failed to resume analysis pipeline %1.").arg(runId);
+    }
+
+    if(toolName == "studio.pipeline.rerun_step") {
+        const QString runId = arguments.value("run_id").toString().trimmed();
+        const int stepNumber = arguments.value("step_number").toInt(-1);
+        const QString mode = arguments.value("mode").toString("rehydrate").trimmed().toLower();
+        if(runId.isEmpty() || stepNumber <= 0) {
+            return "Tool studio.pipeline.rerun_step requires {\"run_id\": \"...\", \"step_number\": <int>}.";
+        }
+
+        QString errorMessage;
+        const QString rerunCommand = rerunPipelineStepCommand(runId, stepNumber, mode, &errorMessage);
+        if(rerunCommand.isEmpty()) {
+            rememberToolResult(toolName, normalizedToolResultEnvelope(toolName, QJsonObject{
+                {"tool_name", toolName},
+                {"status", "error"},
+                {"run_id", runId},
+                {"step_number", stepNumber},
+                {"mode", mode},
+                {"message", errorMessage}
+            }, "workbench"));
+            return errorMessage.isEmpty() ? "Failed to rerun pipeline step." : errorMessage;
+        }
+
+        rememberToolResult(toolName, normalizedToolResultEnvelope(toolName, QJsonObject{
+            {"tool_name", toolName},
+            {"status", "queued"},
+            {"run_id", runId},
+            {"step_number", stepNumber},
+            {"mode", mode},
+            {"command", rerunCommand},
+            {"message", QString("Queued pipeline step %1 in %2 mode.").arg(stepNumber).arg(mode)}
+        }, "workbench"));
+        appendTerminalMessage(QString("$ %1").arg(rerunCommand));
+        sendToolCall(rerunCommand);
+        return QString("Queued pipeline step %1 using %2 mode.").arg(stepNumber).arg(mode);
+    }
+
+    const QJsonObject resolvedSettingsTool = resolveExtensionSettingsTool(toolName);
+    if(!resolvedSettingsTool.isEmpty()) {
+        const QString extensionId = resolvedSettingsTool.value("extension_id").toString();
+        const QString tabId = resolvedSettingsTool.value("tab_id").toString();
+        const QString mode = resolvedSettingsTool.value("mode").toString();
+        const QJsonObject field = resolvedSettingsTool.value("field").toObject();
+        const QString fieldId = field.value("id").toString();
+        const QVariant currentValue = extensionSettingValue(extensionId, tabId, field);
+
+        if(mode == "get") {
+            rememberToolResult(toolName, normalizedToolResultEnvelope(toolName, QJsonObject{
+                {"tool_name", toolName},
+                {"extension_id", extensionId},
+                {"tab_id", tabId},
+                {"field_id", fieldId},
+                {"value", QJsonValue::fromVariant(currentValue)}
+            }, "workbench"));
+            return QString("%1 / %2 / %3 = %4")
+                .arg(resolvedSettingsTool.value("extension_display_name").toString(),
+                     resolvedSettingsTool.value("tab_title").toString(),
+                     field.value("label").toString(fieldId),
+                     currentValue.toString());
+        }
+
+        if(mode == "set") {
+            if(!arguments.contains("value")) {
+                return QString("Tool %1 requires {\"value\": ...}.").arg(toolName);
+            }
+
+            QVariant nextValue = arguments.value("value").toVariant();
+            const QString fieldType = field.value("type").toString("string").trimmed().toLower();
+            if(fieldType == "boolean" || fieldType == "bool") {
+                nextValue = arguments.value("value").toBool();
+            } else if(fieldType == "integer" || fieldType == "int") {
+                nextValue = arguments.value("value").toInt();
+            } else if(fieldType == "number" || fieldType == "double") {
+                nextValue = arguments.value("value").toDouble();
+            } else {
+                nextValue = arguments.value("value").toString();
+            }
+
+            QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
+            settings.setValue(QString("extensions/settings/%1/%2/%3").arg(extensionId, tabId, fieldId), nextValue);
+
+            rememberToolResult(toolName, normalizedToolResultEnvelope(toolName, QJsonObject{
+                {"tool_name", toolName},
+                {"status", "ok"},
+                {"extension_id", extensionId},
+                {"tab_id", tabId},
+                {"field_id", fieldId},
+                {"value", QJsonValue::fromVariant(nextValue)}
+            }, "workbench"));
+
+            return QString("Updated %1 / %2 / %3 to %4.")
+                .arg(resolvedSettingsTool.value("extension_display_name").toString(),
+                     resolvedSettingsTool.value("tab_title").toString(),
+                     field.value("label").toString(fieldId),
+                     nextValue.toString());
+        }
     }
 
     IRawDataView* rawBrowser = activeRawDataView();
     if(toolName == "view.raw.summary") {
-        rememberToolResult(toolName, QJsonObject{
+        rememberToolResult(toolName, normalizedToolResultEnvelope(toolName, QJsonObject{
             {"tool_name", toolName},
             {"summary", rawBrowser ? rawBrowser->summaryText() : QString("No active raw browser.")}
-        });
+        }, "workbench"));
         return rawBrowser ? rawBrowser->summaryText() : "No active raw browser.";
     }
 
     if(toolName == "view.raw.state") {
-        rememberToolResult(toolName, QJsonObject{
+        rememberToolResult(toolName, normalizedToolResultEnvelope(toolName, QJsonObject{
             {"tool_name", toolName},
             {"state", rawBrowser ? rawBrowser->stateText() : QString("No active raw browser.")}
-        });
+        }, "workbench"));
         return rawBrowser ? rawBrowser->stateText() : "No active raw browser.";
     }
 
@@ -2023,11 +3608,11 @@ QString MainWindow::handleStructuredToolCommand(const QString& commandText, bool
             return QString("Tool %1 received an invalid sample.").arg(toolName);
         }
         rawBrowser->gotoSample(sample);
-        rememberToolResult(toolName, QJsonObject{
+        rememberToolResult(toolName, normalizedToolResultEnvelope(toolName, QJsonObject{
             {"tool_name", toolName},
             {"sample", rawBrowser->cursorSample()},
             {"cursor_sample", rawBrowser->cursorSample()}
-        });
+        }, "workbench"));
         return QString("Moved raw browser cursor to sample %1.").arg(rawBrowser->cursorSample());
     }
 
@@ -2040,10 +3625,10 @@ QString MainWindow::handleStructuredToolCommand(const QString& commandText, bool
             return "Tool view.raw.zoom requires {\"pixels_per_sample\": <positive number>}.";
         }
         rawBrowser->setZoomPixelsPerSample(pixelsPerSample);
-        rememberToolResult(toolName, QJsonObject{
+        rememberToolResult(toolName, normalizedToolResultEnvelope(toolName, QJsonObject{
             {"tool_name", toolName},
             {"pixels_per_sample", rawBrowser->pixelsPerSample()}
-        });
+        }, "workbench"));
         return QString("Raw browser zoom set to %1 px/sample.")
             .arg(QString::number(rawBrowser->pixelsPerSample(), 'f', 2));
     }
@@ -2061,12 +3646,12 @@ QString MainWindow::handleStructuredToolCommand(const QString& commandText, bool
         }
 
         sendExtensionViewCommand(sessionId, commandName, arguments);
-        rememberToolResult(toolName, QJsonObject{
+        rememberToolResult(toolName, normalizedToolResultEnvelope(toolName, QJsonObject{
             {"tool_name", toolName},
             {"session_id", sessionId},
             {"command", commandName},
             {"arguments", arguments}
-        });
+        }, "workbench"));
         return QString("Requested hosted view command `%1` for session %2.").arg(commandName, sessionId);
     }
 
@@ -2152,7 +3737,7 @@ QString MainWindow::handleLocalAgentCommand(const QString& commandText, bool& ha
     const QString command = parts.first().toLower();
 
     if(command == "help" || command == "agent.help") {
-        return "Commands: help, tools.list, tools.call <tool> {json}, views.list, raw.summary, raw.state, raw.goto_sample <n>, raw.cursor <n>, raw.zoom <px_per_sample>, kernel.raw_stats [window_samples], kernel.channel_stats [window_samples], kernel.psd [window_samples] [match].";
+        return "Commands: help, tools.list, tools.call <tool> {json}, views.list, settings.list, pipelines.list, pipeline.run <id>, pipeline.resume <run_id>, pipeline.rerun_step <run_id> <step>, raw.summary, raw.state, raw.goto_sample <n>, raw.cursor <n>, raw.zoom <px_per_sample>, kernel.raw_stats [window_samples], kernel.channel_stats [window_samples], kernel.psd [window_samples] [match].";
     }
 
     if(command == "views.list") {
@@ -2161,6 +3746,67 @@ QString MainWindow::handleLocalAgentCommand(const QString& commandText, bool& ha
             views << QString("%1: %2").arg(i + 1).arg(m_centerTabs->tabText(i));
         }
         return views.isEmpty() ? "No open views." : QString("Open views: %1").arg(views.join(" | "));
+    }
+
+    if(command == "settings.list") {
+        return QString("Extension settings tabs available: %1").arg(extensionSettingsContracts().size());
+    }
+
+    if(command == "pipelines.list") {
+        return QString("Analysis pipelines available: %1").arg(analysisPipelineContracts().size());
+    }
+
+    if(command == "pipeline.run") {
+        if(parts.size() < 2) {
+            return "Usage: pipeline.run <pipeline_id>";
+        }
+
+        const QString pipelineId = parts.at(1).trimmed();
+        const QJsonObject pipeline = analysisPipelineContract(pipelineId);
+        const bool started = executeAnalysisPipeline(pipelineId, defaultInputsForPipeline(pipeline));
+        return started
+            ? QString("Queued pipeline %1.").arg(pipelineId)
+            : QString("Failed to queue pipeline %1.").arg(pipelineId);
+    }
+
+    if(command == "pipeline.resume") {
+        if(parts.size() < 2) {
+            return "Usage: pipeline.resume <run_id>";
+        }
+
+        QJsonObject artifactResult;
+        const QString runId = parts.at(1).trimmed();
+        for(int i = m_structuredResultHistory.size() - 1; i >= 0; --i) {
+            const QJsonObject entry = m_structuredResultHistory.at(i);
+            if(entry.value("tool_name").toString() == QLatin1String("studio.pipeline.run")
+               && entry.value("result").toObject().value("run_id").toString() == runId) {
+                artifactResult = entry.value("result").toObject();
+                break;
+            }
+        }
+        const bool started = !artifactResult.isEmpty() && resumeAnalysisPipeline(artifactResult);
+        return started
+            ? QString("Resumed pipeline %1.").arg(artifactResult.value("display_name").toString(artifactResult.value("pipeline_id").toString()))
+            : QString("Failed to resume pipeline %1.").arg(runId);
+    }
+
+    if(command == "pipeline.rerun_step") {
+        if(parts.size() < 3) {
+            return "Usage: pipeline.rerun_step <run_id> <step_number> [rehydrate|exact]";
+        }
+
+        const QString runId = parts.at(1).trimmed();
+        const int stepNumber = parts.at(2).toInt();
+        const QString mode = parts.size() >= 4 ? parts.at(3).trimmed().toLower() : QString("rehydrate");
+        QString errorMessage;
+        const QString rerunCommand = rerunPipelineStepCommand(runId, stepNumber, mode, &errorMessage);
+        if(rerunCommand.isEmpty()) {
+            return errorMessage.isEmpty() ? "Failed to rerun pipeline step." : errorMessage;
+        }
+
+        appendTerminalMessage(QString("$ %1").arg(rerunCommand));
+        sendToolCall(rerunCommand);
+        return QString("Queued pipeline step %1 using %2 mode.").arg(stepNumber).arg(mode);
     }
 
     IRawDataView* rawBrowser = activeRawDataView();
@@ -2294,7 +3940,7 @@ QString MainWindow::handleLocalAgentCommand(const QString& commandText, bool& ha
 
 QJsonArray MainWindow::localToolDefinitions() const
 {
-    return QJsonArray{
+    QJsonArray tools{
         QJsonObject{
             {"name", "studio.views.list"},
             {"description", "List open center views in the workbench."},
@@ -2349,6 +3995,13 @@ QJsonArray MainWindow::localToolDefinitions() const
              }, QJsonArray{"pixels_per_sample"})}
         }
     };
+
+    const QJsonArray settingsTools = extensionSettingsToolDefinitions();
+    for(const QJsonValue& value : settingsTools) {
+        tools.append(value);
+    }
+
+    return tools;
 }
 
 QJsonArray MainWindow::kernelToolDefinitions() const
@@ -2518,11 +4171,389 @@ QJsonArray MainWindow::availableToolDefinitions() const
     return tools;
 }
 
+QJsonObject MainWindow::plannerSafetyMetadata(const QString& toolName) const
+{
+    const QString trimmedName = toolName.trimmed();
+    if(trimmedName.isEmpty()) {
+        return QJsonObject{
+            {"planner_safe", false},
+            {"risk_level", "blocked"},
+            {"reason", "Unnamed tools are not exposed to the LLM planner."}
+        };
+    }
+
+    if(trimmedName.endsWith(".set") && trimmedName.startsWith("settings.")) {
+        return QJsonObject{
+            {"planner_safe", false},
+            {"risk_level", "high"},
+            {"reason", "Mutates persisted extension settings."}
+        };
+    }
+
+    if(trimmedName.startsWith("view.hosted.")
+       || trimmedName.startsWith("dummy3d.")
+       || trimmedName.startsWith("extension.")) {
+        return QJsonObject{
+            {"planner_safe", false},
+            {"risk_level", "medium"},
+            {"reason", "Requires active hosted extension sessions with side effects that are harder for the planner to validate."}
+        };
+    }
+
+    if(trimmedName == QLatin1String("studio.pipeline.rerun_step")) {
+        return QJsonObject{
+            {"planner_safe", false},
+            {"risk_level", "medium"},
+            {"reason", "Replays historical pipeline state and is better triggered from explicit user intent."}
+        };
+    }
+
+    if(trimmedName == QLatin1String("studio.pipeline.resume")) {
+        return QJsonObject{
+            {"planner_safe", true},
+            {"risk_level", "medium"},
+            {"requires_active_context", false},
+            {"reason", "Resumes an existing pipeline run and is safe when explicitly chosen from known saved runs."}
+        };
+    }
+
+    if(trimmedName == QLatin1String("studio.pipeline.run")
+       || trimmedName == QLatin1String("view.raw.goto")
+       || trimmedName == QLatin1String("view.raw.zoom")) {
+        return QJsonObject{
+            {"planner_safe", true},
+            {"risk_level", "medium"},
+            {"requires_active_context", true},
+            {"reason", "State-changing but reversible workbench action."}
+        };
+    }
+
+    if(trimmedName == QLatin1String("view.raw.summary")
+       || trimmedName == QLatin1String("view.raw.state")
+       || trimmedName == QLatin1String("studio.views.list")
+       || trimmedName == QLatin1String("studio.settings.list")
+       || trimmedName == QLatin1String("studio.pipelines.list")
+       || trimmedName.endsWith(".get")) {
+        return QJsonObject{
+            {"planner_safe", true},
+            {"risk_level", "low"},
+            {"requires_active_context", trimmedName.startsWith("view.raw.")},
+            {"reason", "Read-only inspection tool."}
+        };
+    }
+
+    if(trimmedName.startsWith("neurokernel.")) {
+        return QJsonObject{
+            {"planner_safe", true},
+            {"risk_level", "low"},
+            {"requires_active_context", true},
+            {"reason", "Analytical computation on the active dataset without mutating persistent workspace state."}
+        };
+    }
+
+    return QJsonObject{
+        {"planner_safe", false},
+        {"risk_level", "blocked"},
+        {"reason", "Tool is outside the curated planner-safe profile."}
+    };
+}
+
+QJsonObject MainWindow::plannerReadinessMetadata(const QString& toolName) const
+{
+    const QString trimmedName = toolName.trimmed();
+    const bool hasRawBrowser = activeRawDataView() != nullptr;
+    const QJsonObject hostedSession = activeHostedViewSession();
+    const QJsonArray pipelines = analysisPipelineContracts();
+    const QString selectedChannelName = m_resultSelectionContext.value("selected_channel_name").toString().trimmed();
+    const QJsonObject selectedPipelineStep = m_resultSelectionContext.value("selected_pipeline_step").toObject();
+    const QString selectedPipelineRunId = m_resultSelectionContext.value("selected_pipeline_run_id").toString().trimmed();
+    const QString selectedPipelineId = m_resultSelectionContext.value("selected_pipeline_id").toString().trimmed();
+
+    int resumablePipelineRuns = 0;
+    int rerunnablePipelineRuns = 0;
+    for(int i = m_structuredResultHistory.size() - 1; i >= 0; --i) {
+        const QJsonObject entry = m_structuredResultHistory.at(i);
+        if(entry.value("tool_name").toString() != QLatin1String("studio.pipeline.run")) {
+            continue;
+        }
+
+        const QJsonObject result = entry.value("result").toObject();
+        if(result.value("pending_steps").toInt() > 0) {
+            ++resumablePipelineRuns;
+        }
+        if(!result.value("steps").toArray().isEmpty()) {
+            ++rerunnablePipelineRuns;
+        }
+    }
+
+    auto readyEnvelope = [](bool ready,
+                            const QString& reason,
+                            const QJsonArray& requiredContext = QJsonArray(),
+                            const QJsonObject& details = QJsonObject()) {
+        QJsonObject readiness{
+            {"planner_ready", ready},
+            {"readiness_reason", reason},
+            {"required_context", requiredContext}
+        };
+
+        if(!details.isEmpty()) {
+            readiness.insert("readiness_details", details);
+        }
+
+        return readiness;
+    };
+
+    if(trimmedName.isEmpty()) {
+        return readyEnvelope(false, "Tool has no stable name and cannot be reasoned about.");
+    }
+
+    if(trimmedName == QLatin1String("studio.views.list")
+       || trimmedName == QLatin1String("studio.settings.list")
+       || trimmedName == QLatin1String("studio.pipelines.list")
+       || trimmedName.endsWith(".get")) {
+        return readyEnvelope(true,
+                             "Available without additional workspace context.",
+                             QJsonArray(),
+                             QJsonObject{{"has_raw_browser", hasRawBrowser},
+                                         {"analysis_pipeline_count", pipelines.size()}});
+    }
+
+    if(trimmedName.startsWith("view.raw.") || trimmedName.startsWith("neurokernel.")) {
+        QJsonObject details{{"has_raw_browser", hasRawBrowser}};
+        QString reason = hasRawBrowser
+            ? "Active raw browser is available."
+            : "Requires an active raw browser with a loaded dataset.";
+        if(trimmedName == QLatin1String("neurokernel.find_peak_window") && hasRawBrowser && !selectedChannelName.isEmpty()) {
+            details.insert("selected_channel_name", selectedChannelName);
+            details.insert("selection_grounded", true);
+            reason = QString("Active raw browser is available and the selected channel `%1` grounds a peak follow-up.")
+                         .arg(selectedChannelName);
+        }
+
+        return readyEnvelope(hasRawBrowser,
+                             reason,
+                             QJsonArray{"active_raw_browser"},
+                             details);
+    }
+
+    if(trimmedName == QLatin1String("studio.pipeline.run")) {
+        const bool hasPipelines = !pipelines.isEmpty();
+        const bool ready = hasPipelines && hasRawBrowser;
+        QString reason = "Ready to run manifest-declared pipelines against the active dataset.";
+        if(!hasPipelines) {
+            reason = "No manifest-declared analysis pipelines are currently available.";
+        } else if(!hasRawBrowser) {
+            reason = "Requires an active raw browser before dataset-bound pipelines can run.";
+        }
+
+        return readyEnvelope(ready,
+                             reason,
+                             QJsonArray{"analysis_pipeline_contract", "active_raw_browser"},
+                             QJsonObject{{"analysis_pipeline_count", pipelines.size()},
+                                         {"has_raw_browser", hasRawBrowser}});
+    }
+
+    if(trimmedName == QLatin1String("studio.pipeline.resume")) {
+        const bool hasSelectedPendingRun = !selectedPipelineRunId.isEmpty()
+            && pipelineRunArtifact(selectedPipelineRunId).value("pending_steps").toInt() > 0;
+        const bool ready = resumablePipelineRuns > 0;
+        QJsonObject details{{"resumable_run_count", resumablePipelineRuns}};
+        QString reason = ready
+            ? "Saved pipeline runs with pending steps are available."
+            : "No saved pipeline runs currently have pending steps to resume.";
+        if(hasSelectedPendingRun) {
+            details.insert("selected_pipeline_run_id", selectedPipelineRunId);
+            details.insert("selected_pipeline_id", selectedPipelineId);
+            details.insert("selection_grounded", true);
+            reason = QString("The selected pipeline run `%1` still has pending steps and can be resumed.")
+                         .arg(selectedPipelineRunId);
+        }
+        return readyEnvelope(ready,
+                             reason,
+                             QJsonArray{"resumable_pipeline_run"},
+                             details);
+    }
+
+    if(trimmedName == QLatin1String("studio.pipeline.rerun_step")) {
+        const bool ready = rerunnablePipelineRuns > 0;
+        QJsonObject details{{"rerunnable_run_count", rerunnablePipelineRuns}};
+        QString reason = ready
+            ? "Saved pipeline history contains executable steps."
+            : "No saved pipeline steps are available to rerun.";
+        if(!selectedPipelineStep.isEmpty()) {
+            details.insert("selected_pipeline_step", selectedPipelineStep);
+            details.insert("selection_grounded", true);
+            reason = QString("The selected pipeline step #%1 is available for rerun.")
+                         .arg(selectedPipelineStep.value("step_number").toInt());
+        }
+        return readyEnvelope(ready,
+                             reason,
+                             QJsonArray{"saved_pipeline_step"},
+                             details);
+    }
+
+    if(trimmedName.startsWith("view.hosted.")) {
+        const bool ready = !hostedSession.isEmpty();
+        return readyEnvelope(ready,
+                             ready
+                                 ? "Active hosted extension session is available."
+                                 : "Requires an active hosted extension view session.",
+                             QJsonArray{"active_hosted_view"},
+                             QJsonObject{{"has_hosted_session", ready},
+                                         {"session_id", hostedSession.value("session_id").toString()}});
+    }
+
+    if(trimmedName.startsWith("settings.")) {
+        const bool ready = !resolveExtensionSettingsTool(trimmedName).isEmpty();
+        return readyEnvelope(ready,
+                             ready
+                                 ? "Resolved to a manifest-declared extension settings field."
+                                 : "Referenced settings field is not available in the loaded extension manifests.",
+                             QJsonArray{"extension_settings_contract"},
+                             QJsonObject{{"resolved", ready}});
+    }
+
+    return readyEnvelope(true, "No additional runtime context required.");
+}
+
+QJsonObject MainWindow::plannerExecutionMetadata(const QString& toolName) const
+{
+    const QString trimmedName = toolName.trimmed();
+    if(trimmedName.isEmpty()) {
+        return QJsonObject{
+            {"execution_mode", "suggestion_only"},
+            {"execution_reason", "Unnamed tools cannot be safely executed by the planner."}
+        };
+    }
+
+    if(trimmedName == QLatin1String("studio.views.list")
+       || trimmedName == QLatin1String("studio.settings.list")
+       || trimmedName == QLatin1String("studio.pipelines.list")
+       || trimmedName == QLatin1String("view.raw.summary")
+       || trimmedName == QLatin1String("view.raw.state")
+       || trimmedName.endsWith(".get")
+       || trimmedName.startsWith("neurokernel.")) {
+        return QJsonObject{
+            {"execution_mode", "auto_run"},
+            {"execution_reason", "Read-only inspection or dataset analysis is safe to execute automatically."}
+        };
+    }
+
+    if(trimmedName == QLatin1String("view.raw.goto")
+       || trimmedName == QLatin1String("view.raw.zoom")
+       || trimmedName == QLatin1String("studio.pipeline.run")
+       || trimmedName == QLatin1String("studio.pipeline.resume")) {
+        return QJsonObject{
+            {"execution_mode", "confirm_required"},
+            {"execution_reason", "This action changes visible workspace state and should be surfaced before auto-execution."}
+        };
+    }
+
+    return QJsonObject{
+        {"execution_mode", "suggestion_only"},
+        {"execution_reason", "This tool should be suggested rather than auto-executed by the planner."}
+    };
+}
+
+QJsonArray MainWindow::plannerSafeToolDefinitions() const
+{
+    QJsonArray safeTools;
+    const QJsonArray tools = availableToolDefinitions();
+    for(const QJsonValue& value : tools) {
+        QJsonObject tool = value.toObject();
+        if(tool.isEmpty()) {
+            continue;
+        }
+
+        const QJsonObject safety = plannerSafetyMetadata(tool.value("name").toString());
+        for(auto it = safety.constBegin(); it != safety.constEnd(); ++it) {
+            tool.insert(it.key(), it.value());
+        }
+        const QJsonObject readiness = plannerReadinessMetadata(tool.value("name").toString());
+        for(auto it = readiness.constBegin(); it != readiness.constEnd(); ++it) {
+            tool.insert(it.key(), it.value());
+        }
+        const QJsonObject execution = plannerExecutionMetadata(tool.value("name").toString());
+        for(auto it = execution.constBegin(); it != execution.constEnd(); ++it) {
+            tool.insert(it.key(), it.value());
+        }
+
+        if(safety.value("planner_safe").toBool(false)) {
+            safeTools.append(tool);
+        }
+    }
+
+    return safeTools;
+}
+
+QJsonArray MainWindow::plannerReadyToolDefinitions() const
+{
+    QJsonArray readyTools;
+    const QJsonArray tools = plannerSafeToolDefinitions();
+    for(const QJsonValue& value : tools) {
+        const QJsonObject tool = value.toObject();
+        if(tool.value("planner_ready").toBool(true)) {
+            readyTools.append(tool);
+        }
+    }
+
+    return readyTools;
+}
+
+QJsonArray MainWindow::plannerBlockedToolDefinitions() const
+{
+    QJsonArray blockedTools;
+    const QJsonArray tools = availableToolDefinitions();
+    for(const QJsonValue& value : tools) {
+        QJsonObject tool = value.toObject();
+        if(tool.isEmpty()) {
+            continue;
+        }
+
+        const QJsonObject safety = plannerSafetyMetadata(tool.value("name").toString());
+        for(auto it = safety.constBegin(); it != safety.constEnd(); ++it) {
+            tool.insert(it.key(), it.value());
+        }
+
+        const QJsonObject readiness = plannerReadinessMetadata(tool.value("name").toString());
+        for(auto it = readiness.constBegin(); it != readiness.constEnd(); ++it) {
+            tool.insert(it.key(), it.value());
+        }
+        const QJsonObject execution = plannerExecutionMetadata(tool.value("name").toString());
+        for(auto it = execution.constBegin(); it != execution.constEnd(); ++it) {
+            tool.insert(it.key(), it.value());
+        }
+
+        if(!tool.value("planner_safe").toBool(false) || !tool.value("planner_ready").toBool(true)) {
+            blockedTools.append(tool);
+        }
+    }
+
+    return blockedTools;
+}
+
 QJsonObject MainWindow::toolDefinition(const QString& toolName) const
 {
     const QJsonArray tools = availableToolDefinitions();
     for(const QJsonValue& value : tools) {
-        const QJsonObject tool = value.toObject();
+        QJsonObject tool = value.toObject();
+        if(tool.isEmpty()) {
+            continue;
+        }
+
+        const QJsonObject safety = plannerSafetyMetadata(tool.value("name").toString());
+        for(auto it = safety.constBegin(); it != safety.constEnd(); ++it) {
+            tool.insert(it.key(), it.value());
+        }
+        const QJsonObject readiness = plannerReadinessMetadata(tool.value("name").toString());
+        for(auto it = readiness.constBegin(); it != readiness.constEnd(); ++it) {
+            tool.insert(it.key(), it.value());
+        }
+        const QJsonObject execution = plannerExecutionMetadata(tool.value("name").toString());
+        for(auto it = execution.constBegin(); it != execution.constEnd(); ++it) {
+            tool.insert(it.key(), it.value());
+        }
+
         if(tool.value("name").toString() == toolName) {
             return tool;
         }
@@ -2531,14 +4562,263 @@ QJsonObject MainWindow::toolDefinition(const QString& toolName) const
     return QJsonObject();
 }
 
+QString MainWindow::toolNameFromCommand(const QString& commandText) const
+{
+    const QRegularExpression commandPattern("^\\s*tools\\.call\\s+([^\\s]+)");
+    const QRegularExpressionMatch match = commandPattern.match(commandText.trimmed());
+    return match.hasMatch() ? match.captured(1).trimmed() : QString();
+}
+
+QJsonObject MainWindow::toolArgumentsFromCommand(const QString& commandText) const
+{
+    const QString trimmedCommand = commandText.trimmed();
+    const QString toolName = toolNameFromCommand(trimmedCommand);
+    if(toolName.isEmpty()) {
+        return QJsonObject();
+    }
+
+    const int toolStart = trimmedCommand.indexOf(toolName);
+    if(toolStart < 0) {
+        return QJsonObject();
+    }
+
+    const QString argumentsText = trimmedCommand.mid(toolStart + toolName.size()).trimmed();
+    if(argumentsText.isEmpty()) {
+        return QJsonObject();
+    }
+
+    QJsonParseError error;
+    const QJsonDocument document = QJsonDocument::fromJson(argumentsText.toUtf8(), &error);
+    if(error.error == QJsonParseError::NoError && document.isObject()) {
+        return document.object();
+    }
+
+    return QJsonObject();
+}
+
+QJsonObject MainWindow::plannerConfirmationPresentation(const QString& commandText,
+                                                        int stepIndex,
+                                                        int totalSteps,
+                                                        const QString& fallbackDetails,
+                                                        const QString& plannerSummary,
+                                                        const QString& previousPlannedCommand) const
+{
+    const QString toolName = toolNameFromCommand(commandText);
+    const QJsonObject arguments = toolArgumentsFromCommand(commandText);
+    QString title = QString("Approve LLM Step %1/%2").arg(stepIndex).arg(totalSteps);
+    QString details = fallbackDetails;
+    QString reason = plannerSummary.trimmed();
+
+    if(toolName == QLatin1String("view.raw.goto")) {
+        const int sample = arguments.value("sample").toInt(-1);
+        title = sample >= 0
+            ? QString("Jump Raw Browser To Sample %1").arg(sample)
+            : QString("Jump Raw Browser");
+        details = sample >= 0
+            ? QString("Move the active raw browser cursor to sample %1.").arg(sample)
+            : QString("Move the active raw browser cursor to the requested sample.");
+    } else if(toolName == QLatin1String("view.raw.zoom")) {
+        const double pixelsPerSample = arguments.value("pixels_per_sample").toDouble(-1.0);
+        title = pixelsPerSample > 0.0
+            ? QString("Set Raw Browser Zoom To %1 px/sample").arg(QString::number(pixelsPerSample, 'f', 2))
+            : QString("Adjust Raw Browser Zoom");
+        details = pixelsPerSample > 0.0
+            ? QString("Change the raw browser zoom to %1 pixels per sample.")
+                  .arg(QString::number(pixelsPerSample, 'f', 2))
+            : QString("Change the zoom level of the active raw browser.");
+    } else if(toolName == QLatin1String("studio.pipeline.run")) {
+        const QString pipelineId = arguments.value("pipeline_id").toString().trimmed();
+        const QJsonObject pipeline = analysisPipelineContract(pipelineId);
+        const QString displayName = pipeline.value("display_name").toString(pipelineId);
+        title = displayName.isEmpty()
+            ? QString("Run Analysis Pipeline")
+            : QString("Run Pipeline %1").arg(displayName);
+        details = displayName.isEmpty()
+            ? QString("Start the requested analysis pipeline.")
+            : QString("Start the analysis pipeline `%1`.").arg(displayName);
+        if(arguments.contains("inputs") && arguments.value("inputs").isObject()) {
+            details += QString(" Inputs: %1")
+                .arg(QString::fromUtf8(QJsonDocument(arguments.value("inputs").toObject())
+                                           .toJson(QJsonDocument::Compact)));
+        }
+    } else if(toolName == QLatin1String("studio.pipeline.resume")) {
+        const QString runId = arguments.value("run_id").toString().trimmed();
+        const QJsonObject artifact = pipelineRunArtifact(runId);
+        const QString displayName = artifact.value("display_name").toString(artifact.value("pipeline_id").toString());
+        title = displayName.isEmpty()
+            ? QString("Resume Pipeline Run")
+            : QString("Resume Pipeline %1").arg(displayName);
+        details = displayName.isEmpty()
+            ? QString("Resume the saved pipeline run `%1`.").arg(runId)
+            : QString("Resume the saved pipeline `%1` with remaining steps.").arg(displayName);
+    }
+
+    if(reason.isEmpty()) {
+        reason = QString("The planner marked step %1 of %2 as the next state-changing action.")
+                     .arg(stepIndex)
+                     .arg(totalSteps);
+    } else if(stepIndex > 1) {
+        reason = QString("%1 This is step %2 of %3.").arg(reason).arg(stepIndex).arg(totalSteps);
+    }
+
+    const QString previousToolName = toolNameFromCommand(previousPlannedCommand);
+    if(!previousToolName.isEmpty()) {
+        if(toolName == QLatin1String("view.raw.goto")
+           && previousToolName == QLatin1String("neurokernel.find_peak_window")) {
+            reason += " It follows peak detection and would move the raw view to the detected sample.";
+        } else if(toolName == QLatin1String("studio.pipeline.resume")) {
+            reason += " It follows the planner's decision to continue an existing saved workflow.";
+        } else if(toolName == QLatin1String("studio.pipeline.run")) {
+            reason += " It follows the planner's decision that a structured pipeline is the best next workflow step.";
+        }
+    }
+
+    if(details.trimmed().isEmpty()) {
+        details = fallbackDetails;
+    }
+
+    return QJsonObject{
+        {"title", title},
+        {"details", details},
+        {"reason", reason}
+    };
+}
+
+QJsonObject MainWindow::plannerConfirmationSnapshot(const QString& commandText) const
+{
+    const QString toolName = toolNameFromCommand(commandText);
+    const QJsonObject arguments = toolArgumentsFromCommand(commandText);
+    QJsonObject snapshot{
+        {"tool_name", toolName},
+        {"result_selection_context", m_resultSelectionContext}
+    };
+
+    if(IRawDataView* rawBrowser = activeRawDataView()) {
+        snapshot.insert("raw_file", rawBrowser->filePath());
+        snapshot.insert("cursor_sample", rawBrowser->cursorSample());
+    }
+
+    if(toolName == QLatin1String("view.raw.goto")) {
+        snapshot.insert("target_sample", arguments.value("sample").toInt(-1));
+    } else if(toolName == QLatin1String("studio.pipeline.run")) {
+        const QString pipelineId = arguments.value("pipeline_id").toString().trimmed();
+        snapshot.insert("pipeline_id", pipelineId);
+        snapshot.insert("inputs", arguments.value("inputs").toObject());
+    } else if(toolName == QLatin1String("studio.pipeline.resume")) {
+        const QString runId = arguments.value("run_id").toString().trimmed();
+        snapshot.insert("run_id", runId);
+        const QJsonObject artifact = pipelineRunArtifact(runId);
+        snapshot.insert("pipeline_id", artifact.value("pipeline_id").toString());
+        snapshot.insert("pending_steps", artifact.value("pending_steps").toInt());
+    }
+
+    return snapshot;
+}
+
+QJsonObject MainWindow::plannerConfirmationStaleness(const QJsonObject& confirmation) const
+{
+    const QJsonObject snapshot = confirmation.value("context_snapshot").toObject();
+    const QString toolName = confirmation.value("command").toString().trimmed().isEmpty()
+        ? snapshot.value("tool_name").toString().trimmed()
+        : toolNameFromCommand(confirmation.value("command").toString());
+
+    QStringList reasons;
+
+    const QString snapshotRawFile = snapshot.value("raw_file").toString().trimmed();
+    const QString currentRawFile = activeRawDataView() ? activeRawDataView()->filePath().trimmed() : QString();
+    if(!snapshotRawFile.isEmpty() && snapshotRawFile != currentRawFile) {
+        reasons << QString("raw file changed from `%1` to `%2`.")
+                       .arg(QFileInfo(snapshotRawFile).fileName(),
+                            currentRawFile.isEmpty() ? QString("none") : QFileInfo(currentRawFile).fileName());
+    }
+
+    const QJsonObject snapshotSelection = snapshot.value("result_selection_context").toObject();
+    const QString snapshotChannel = snapshotSelection.value("selected_channel_name").toString().trimmed();
+    const QString currentChannel = m_resultSelectionContext.value("selected_channel_name").toString().trimmed();
+    if(!snapshotChannel.isEmpty() && snapshotChannel != currentChannel) {
+        reasons << QString("selected channel changed from `%1` to `%2`.")
+                       .arg(snapshotChannel,
+                            currentChannel.isEmpty() ? QString("none") : currentChannel);
+    }
+
+    const QString snapshotRunId = snapshot.value("run_id").toString().trimmed();
+    if(toolName == QLatin1String("studio.pipeline.resume") && !snapshotRunId.isEmpty()) {
+        const QJsonObject artifact = pipelineRunArtifact(snapshotRunId);
+        if(artifact.isEmpty()) {
+            reasons << QString("saved pipeline run `%1` is no longer available.").arg(snapshotRunId);
+        } else if(artifact.value("pending_steps").toInt() <= 0) {
+            reasons << QString("pipeline run `%1` no longer has pending steps.").arg(snapshotRunId);
+        }
+    }
+
+    const int snapshotStepNumber = snapshotSelection.value("selected_step_number").toInt(-1);
+    const int currentStepNumber = m_resultSelectionContext.value("selected_step_number").toInt(-1);
+    if(snapshotStepNumber > 0 && snapshotStepNumber != currentStepNumber) {
+        reasons << QString("selected pipeline step changed from %1 to %2.")
+                       .arg(snapshotStepNumber)
+                       .arg(currentStepNumber > 0 ? QString::number(currentStepNumber) : QString("none"));
+    }
+
+    const bool stale = !reasons.isEmpty();
+    return QJsonObject{
+        {"stale", stale},
+        {"stale_reason", reasons.join(" ")},
+        {"stale_severity", stale ? QString("warning") : QString("ok")}
+    };
+}
+
 QJsonObject MainWindow::llmPlanningContext(const QString& commandText) const
 {
     Q_UNUSED(commandText)
 
+    const QJsonArray plannerSafeTools = plannerSafeToolDefinitions();
+    const QJsonArray plannerReadyTools = plannerReadyToolDefinitions();
+    const QJsonArray plannerBlockedTools = plannerBlockedToolDefinitions();
+    QJsonArray normalizedRecentResults;
+    const int recentResultStart = std::max(0, static_cast<int>(m_structuredResultHistory.size()) - 8);
+    for(int i = recentResultStart; i < m_structuredResultHistory.size(); ++i) {
+        const QJsonObject entry = m_structuredResultHistory.at(i);
+        normalizedRecentResults.append(normalizedToolResultEnvelope(entry.value("tool_name").toString(),
+                                                                   entry.value("result").toObject()));
+    }
     QJsonObject context{
         {"last_tool_name", m_lastToolName},
-        {"last_tool_result", m_lastToolResult},
-        {"tool_schema_summary", availableToolDefinitions()}
+        {"last_tool_result", normalizedToolResultEnvelope(m_lastToolName, m_lastToolResult)},
+        {"recent_normalized_results", normalizedRecentResults},
+        {"tool_schema_summary", availableToolDefinitions()},
+        {"planner_safe_tools", plannerSafeTools},
+        {"planner_ready_tools", plannerReadyTools},
+        {"planner_blocked_tools", plannerBlockedTools},
+        {"planner_tool_count", plannerReadyTools.size()},
+        {"planner_policy", QJsonObject{
+             {"allowed_tool_classes", QJsonArray{"read_only_inspection", "dataset_analysis", "reversible_navigation", "pipeline_run"}},
+             {"blocked_tool_classes", QJsonArray{"settings_mutation", "hosted_extension_actions", "historical_step_replay"}},
+             {"execution_modes", QJsonArray{"auto_run", "confirm_required", "suggestion_only"}},
+             {"notes", QJsonArray{
+                  "Prefer read-only or analytical tools first.",
+                  "Only use state-changing workbench tools when they are reversible and clearly advance the user request.",
+                  "Do not mutate extension settings.",
+                  "Do not use hosted extension session tools unless the user explicitly asks for them.",
+                  "Treat planner_ready false as unavailable in the current workspace state.",
+                  "Only auto-run tools whose execution_mode is auto_run.",
+                  "Treat confirm_required tools as proposals that need user confirmation before execution.",
+                  "Treat suggestion_only tools as ideas, not executable steps."
+              }}
+         }},
+        {"planner_context_readiness", QJsonObject{
+             {"has_raw_browser", activeRawDataView() != nullptr},
+             {"has_hosted_session", !activeHostedViewSession().isEmpty()},
+             {"analysis_pipeline_count", analysisPipelineContracts().size()},
+             {"planner_safe_tool_count", plannerSafeTools.size()},
+             {"planner_ready_tool_count", plannerReadyTools.size()},
+             {"planner_blocked_tool_count", plannerBlockedTools.size()}
+         }},
+        {"pending_planner_confirmations", m_pendingPlannerConfirmations},
+        {"current_result_selection", m_resultSelectionContext},
+        {"result_renderer_contracts", resultRendererContracts()},
+        {"analysis_pipeline_contracts", analysisPipelineContracts()},
+        {"extension_settings_contracts", extensionSettingsContracts()},
+        {"extension_settings_state", extensionSettingsState()}
     };
 
     if(IRawDataView* rawBrowser = activeRawDataView()) {
@@ -2576,6 +4856,69 @@ QJsonObject MainWindow::defaultArgumentsForTool(const QString& toolName) const
         return QJsonObject{{"pixels_per_sample", rawBrowser ? rawBrowser->pixelsPerSample() : 1.0}};
     }
 
+    if(toolName == "studio.pipeline.run") {
+        const QJsonArray pipelines = analysisPipelineContracts();
+        if(!pipelines.isEmpty()) {
+            const QJsonObject firstPipeline = pipelines.first().toObject();
+            return QJsonObject{
+                {"pipeline_id", firstPipeline.value("id").toString()},
+                {"inputs", defaultInputsForPipeline(firstPipeline)}
+            };
+        }
+        return QJsonObject{
+            {"pipeline_id", QString()},
+            {"inputs", QJsonObject()}
+        };
+    }
+
+    if(toolName == "studio.pipeline.resume") {
+        for(int i = m_structuredResultHistory.size() - 1; i >= 0; --i) {
+            const QJsonObject entry = m_structuredResultHistory.at(i);
+            if(entry.value("tool_name").toString() == QLatin1String("studio.pipeline.run")) {
+                const QJsonObject result = entry.value("result").toObject();
+                if(result.value("pending_steps").toInt() > 0) {
+                    return QJsonObject{{"run_id", result.value("run_id").toString()}};
+                }
+            }
+        }
+        return QJsonObject{{"run_id", QString()}};
+    }
+
+    if(toolName == "studio.pipeline.rerun_step") {
+        for(int i = m_structuredResultHistory.size() - 1; i >= 0; --i) {
+            const QJsonObject entry = m_structuredResultHistory.at(i);
+            if(entry.value("tool_name").toString() != QLatin1String("studio.pipeline.run")) {
+                continue;
+            }
+
+            const QJsonObject result = entry.value("result").toObject();
+            const QJsonArray steps = result.value("steps").toArray();
+            if(!steps.isEmpty()) {
+                return QJsonObject{
+                    {"run_id", result.value("run_id").toString()},
+                    {"step_number", steps.last().toObject().value("step_number").toInt(1)},
+                    {"mode", "rehydrate"}
+                };
+            }
+        }
+
+        return QJsonObject{
+            {"run_id", QString()},
+            {"step_number", 1},
+            {"mode", "rehydrate"}
+        };
+    }
+
+    const QJsonObject resolvedSettingsTool = resolveExtensionSettingsTool(toolName);
+    if(!resolvedSettingsTool.isEmpty() && resolvedSettingsTool.value("mode").toString() == "set") {
+        const QString extensionId = resolvedSettingsTool.value("extension_id").toString();
+        const QString tabId = resolvedSettingsTool.value("tab_id").toString();
+        const QJsonObject field = resolvedSettingsTool.value("field").toObject();
+        return QJsonObject{
+            {"value", QJsonValue::fromVariant(extensionSettingValue(extensionId, tabId, field))}
+        };
+    }
+
     if(toolName == "neurokernel.raw_stats") {
         QJsonObject arguments = buildRawWindowArguments(600);
         arguments.insert("window_samples", 600);
@@ -2587,6 +4930,10 @@ QJsonObject MainWindow::defaultArgumentsForTool(const QString& toolName) const
         arguments.insert("window_samples", 600);
         arguments.insert("limit", 5);
         arguments.insert("match", "EEG");
+        const QJsonObject properties = toolDefinition(toolName).value("input_schema").toObject().value("properties").toObject();
+        for(const QString& extensionId : extensionIdsForTool(toolName)) {
+            arguments = applyExtensionSettingDefaults(extensionId, properties, arguments);
+        }
         return arguments;
     }
 
@@ -2594,6 +4941,10 @@ QJsonObject MainWindow::defaultArgumentsForTool(const QString& toolName) const
         QJsonObject arguments = buildRawWindowArguments(4000);
         arguments.insert("window_samples", 4000);
         arguments.insert("match", "EEG");
+        const QJsonObject properties = toolDefinition(toolName).value("input_schema").toObject().value("properties").toObject();
+        for(const QString& extensionId : extensionIdsForTool(toolName)) {
+            arguments = applyExtensionSettingDefaults(extensionId, properties, arguments);
+        }
         return arguments;
     }
 
@@ -2602,6 +4953,10 @@ QJsonObject MainWindow::defaultArgumentsForTool(const QString& toolName) const
         arguments.insert("window_samples", 1200);
         arguments.insert("nfft", 256);
         arguments.insert("match", "EEG");
+        const QJsonObject properties = toolDefinition(toolName).value("input_schema").toObject().value("properties").toObject();
+        for(const QString& extensionId : extensionIdsForTool(toolName)) {
+            arguments = applyExtensionSettingDefaults(extensionId, properties, arguments);
+        }
         return arguments;
     }
 
@@ -2694,27 +5049,58 @@ QJsonArray MainWindow::activeHostedViewToolDefinitions() const
         });
     }
 
-    if(controls.contains("opacity") || state.contains("opacity")) {
+    for(auto it = controls.constBegin(); it != controls.constEnd(); ++it) {
+        const QString controlId = it.key();
+        const QJsonObject control = it.value().toObject();
+        const QString commandName = control.value("command").toString().trimmed();
+        if(commandName.isEmpty()) {
+            continue;
+        }
+
+        QJsonObject inputSchema = objectSchema(QJsonObject());
+        const QString controlType = control.value("type").toString().trimmed().toLower();
+        const QString label = control.value("label").toString(controlId);
+        const QString description = control.value("description").toString(
+            QString("Set %1 on the active hosted view for %2 from %3.").arg(label, providerName, extensionName));
+
+        if(controlType == "number") {
+            inputSchema = objectSchema(QJsonObject{
+                 {control.value("target_argument").toString(controlId),
+                  numberSchema(label,
+                               control.value("minimum").toDouble(0.0),
+                               control.value("maximum").toDouble(1.0),
+                               state.value(control.value("state_key").toString(control.value("target_argument").toString(controlId)))
+                                   .toDouble(control.value("value").toDouble(0.0)),
+                               description)}
+             }, QJsonArray{control.value("target_argument").toString(controlId)});
+        } else if(controlType == "integer") {
+            inputSchema = objectSchema(QJsonObject{
+                 {control.value("target_argument").toString(controlId),
+                  integerSchema(label,
+                                control.value("minimum").toInt(0),
+                                control.value("maximum").toInt(100),
+                                state.value(control.value("state_key").toString(control.value("target_argument").toString(controlId)))
+                                    .toInt(control.value("value").toInt(0)),
+                                description)}
+             }, QJsonArray{control.value("target_argument").toString(controlId)});
+        }
+
+        QJsonObject resultSchema = objectSchema(QJsonObject{
+            {"session_id", resultStringSchema("Session ID")},
+            {"command", resultStringSchema("Command")},
+            {"state_before", stateSchema.isEmpty() ? objectSchema(QJsonObject()) : stateSchema},
+            {"state_after", stateSchema.isEmpty() ? objectSchema(QJsonObject()) : stateSchema}
+        }, QJsonArray{"session_id", "command"});
+        const QJsonObject controlResultSchema = control.value("result_schema").toObject();
+        if(!controlResultSchema.isEmpty()) {
+            resultSchema = controlResultSchema;
+        }
+
         tools.append(QJsonObject{
-            {"name", "view.hosted.set_opacity"},
-            {"description", QString("Set the opacity of the active hosted view for %1 from %2.")
-                                .arg(providerName, extensionName)},
-            {"input_schema", objectSchema(QJsonObject{
-                 {"opacity", numberSchema("Opacity",
-                                          0.0,
-                                          1.0,
-                                          state.value("opacity").toDouble(0.8),
-                                          "Opacity for the active hosted extension view.")}
-             }, QJsonArray{"opacity"})},
-            {"result_schema", objectSchema(QJsonObject{
-                 {"session_id", resultStringSchema("Session ID")},
-                 {"command", resultStringSchema("Command")},
-                 {"state_before", stateSchema.isEmpty() ? objectSchema(QJsonObject()) : stateSchema},
-                 {"state_after", stateSchema.isEmpty() ? objectSchema(QJsonObject()) : stateSchema},
-                 {"arguments", objectSchema(QJsonObject{
-                      {"opacity", numberSchema("Opacity", 0.0, 1.0, 0.8)}
-                  })}
-             }, QJsonArray{"session_id", "command"})}
+            {"name", QString("view.hosted.%1").arg(commandName)},
+            {"description", description},
+            {"input_schema", inputSchema},
+            {"result_schema", resultSchema}
         });
     }
 
@@ -2926,6 +5312,27 @@ void MainWindow::rebuildSkillsExplorer()
     hostedToolsRoot->setExpanded(true);
     m_skillsExplorer->addTopLevelItem(hostedToolsRoot);
 
+    QTreeWidgetItem* pipelinesRoot = new QTreeWidgetItem(QStringList() << "Analysis Pipelines");
+    const QJsonArray pipelines = analysisPipelineContracts();
+    if(pipelines.isEmpty()) {
+        pipelinesRoot->addChild(new QTreeWidgetItem(QStringList() << "No analysis pipelines discovered yet."));
+    } else {
+        for(const QJsonValue& value : pipelines) {
+            const QJsonObject pipeline = value.toObject();
+            const QString label = QString("%1 (%2)")
+                                      .arg(pipeline.value("display_name").toString(pipeline.value("id").toString()),
+                                           pipeline.value("extension_display_name").toString());
+            QTreeWidgetItem* item = new QTreeWidgetItem(QStringList() << label);
+            item->setToolTip(0, pipeline.value("description").toString());
+            item->setData(0, Qt::UserRole, "studio.pipeline.run");
+            item->setData(0, Qt::UserRole + 1, pipeline);
+            item->setData(0, Qt::UserRole + 2, pipeline.value("id").toString());
+            pipelinesRoot->addChild(item);
+        }
+    }
+    pipelinesRoot->setExpanded(true);
+    m_skillsExplorer->addTopLevelItem(pipelinesRoot);
+
     QTreeWidgetItem* resourceRoot = new QTreeWidgetItem(QStringList() << "Extension Resources");
     if(m_cachedExtensionResources.isEmpty()) {
         resourceRoot->addChild(new QTreeWidgetItem(QStringList() << "No extension manifests discovered yet."));
@@ -2969,6 +5376,24 @@ void MainWindow::rebuildSkillsExplorer()
     sessionsRoot->setExpanded(true);
     m_skillsExplorer->addTopLevelItem(sessionsRoot);
 
+    QTreeWidgetItem* activePipelinesRoot = new QTreeWidgetItem(QStringList() << "Active Pipelines");
+    if(m_activePipelineId.isEmpty()) {
+        activePipelinesRoot->addChild(new QTreeWidgetItem(QStringList() << "No pipeline currently running."));
+    } else {
+        const int pendingSteps = static_cast<int>(m_pendingPipelineCommands.size());
+        const int completedSteps = std::max(0, m_activePipelineTotalSteps - pendingSteps);
+        activePipelinesRoot->addChild(new QTreeWidgetItem(QStringList()
+                                                          << QString("%1 | %2/%3 steps")
+                                                                 .arg(m_activePipelineDisplayName)
+                                                                 .arg(completedSteps)
+                                                                 .arg(m_activePipelineTotalSteps)));
+        if(!m_activePipelineLastStatus.isEmpty()) {
+            activePipelinesRoot->addChild(new QTreeWidgetItem(QStringList() << m_activePipelineLastStatus));
+        }
+    }
+    activePipelinesRoot->setExpanded(true);
+    m_skillsExplorer->addTopLevelItem(activePipelinesRoot);
+
     QTreeWidgetItem* statusRoot = new QTreeWidgetItem(QStringList() << "Planner Context");
     statusRoot->addChild(new QTreeWidgetItem(QStringList() << m_llmPlanner.statusSummary()));
     statusRoot->addChild(new QTreeWidgetItem(QStringList() << QString("View Providers: %1")
@@ -2982,6 +5407,7 @@ void MainWindow::rebuildSkillsExplorer()
 void MainWindow::updateSelectedSkillTool(QTreeWidgetItem* item)
 {
     m_selectedSkillToolName.clear();
+    m_selectedPipelineId.clear();
     m_skillRunButton->setEnabled(false);
 
     if(!item) {
@@ -2991,6 +5417,7 @@ void MainWindow::updateSelectedSkillTool(QTreeWidgetItem* item)
 
     const QString toolName = item->data(0, Qt::UserRole).toString().trimmed();
     const QJsonObject toolDefinition = item->data(0, Qt::UserRole + 1).toJsonObject();
+    const QString pipelineId = item->data(0, Qt::UserRole + 2).toString().trimmed();
     if(toolName.isEmpty() || toolDefinition.isEmpty()) {
         const QJsonObject payload = item->data(0, Qt::UserRole + 1).toJsonObject();
         if(!payload.isEmpty()) {
@@ -3002,19 +5429,62 @@ void MainWindow::updateSelectedSkillTool(QTreeWidgetItem* item)
     }
 
     m_selectedSkillToolName = toolName;
+    m_selectedPipelineId = pipelineId;
     m_skillRunButton->setEnabled(true);
 
-    const QJsonObject preview{
-        {"tool", toolName},
-        {"definition", toolDefinition},
-        {"suggested_arguments", defaultArgumentsForTool(toolName)}
-    };
+    QJsonObject preview;
+    if(!pipelineId.isEmpty()) {
+        preview = QJsonObject{
+            {"pipeline_id", pipelineId},
+            {"contract", toolDefinition},
+            {"run_tool", "studio.pipeline.run"},
+            {"suggested_arguments", QJsonObject{
+                 {"pipeline_id", pipelineId},
+                 {"inputs", defaultInputsForPipeline(toolDefinition)}
+             }}
+        };
+    } else {
+        preview = QJsonObject{
+            {"tool", toolName},
+            {"definition", toolDefinition},
+            {"suggested_arguments", defaultArgumentsForTool(toolName)}
+        };
+    }
     m_skillDetailsView->setPlainText(QString::fromUtf8(QJsonDocument(preview).toJson(QJsonDocument::Indented)));
 }
 
 void MainWindow::runSelectedSkillTool()
 {
-    if(m_selectedSkillToolName.isEmpty()) {
+    if(m_selectedSkillToolName.isEmpty() && m_selectedPipelineId.isEmpty()) {
+        return;
+    }
+
+    if(!m_selectedPipelineId.isEmpty()) {
+        const QJsonObject pipeline = analysisPipelineContract(m_selectedPipelineId);
+        QJsonObject arguments{
+            {"pipeline_id", m_selectedPipelineId},
+            {"inputs", defaultInputsForPipeline(pipeline)}
+        };
+
+        const QString initialArguments = QString::fromUtf8(QJsonDocument(arguments)
+                                                               .toJson(QJsonDocument::Indented)).trimmed();
+        bool accepted = false;
+        const QString argumentsText = QInputDialog::getMultiLineText(this,
+                                                                     "Run Pipeline",
+                                                                     QString("JSON arguments for pipeline %1").arg(m_selectedPipelineId),
+                                                                     initialArguments,
+                                                                     &accepted);
+        if(!accepted) {
+            return;
+        }
+
+        const QString trimmedArguments = argumentsText.trimmed();
+        const QString commandText = trimmedArguments.isEmpty()
+            ? QString("tools.call studio.pipeline.run {}")
+            : QString("tools.call studio.pipeline.run %1").arg(trimmedArguments);
+
+        appendTerminalMessage(QString("$ %1").arg(commandText));
+        sendToolCall(commandText);
         return;
     }
 
@@ -3053,7 +5523,7 @@ void MainWindow::openAgentSettings()
 {
     LlmSettingsDialog dialog(m_llmPlanner.configuration(), this);
     dialog.setTestScenario("go to the strongest EEG burst and then show me the top EEG channels there",
-                           availableToolDefinitions(),
+                           plannerReadyToolDefinitions(),
                            llmPlanningContext("planner settings test"));
     if(dialog.exec() != QDialog::Accepted) {
         return;
@@ -3180,6 +5650,8 @@ void MainWindow::refreshExtensionManagerUi()
         extensionItem->addChild(new QTreeWidgetItem(QStringList() << QString("Version: %1").arg(manifest.version)));
         extensionItem->addChild(new QTreeWidgetItem(QStringList() << QString("Entry Point: %1").arg(manifest.entryPoint)));
         extensionItem->addChild(new QTreeWidgetItem(QStringList() << QString("View Providers: %1").arg(manifest.viewProviders.size())));
+        extensionItem->addChild(new QTreeWidgetItem(QStringList() << QString("Result Renderers: %1").arg(manifest.resultRenderers.size())));
+        extensionItem->addChild(new QTreeWidgetItem(QStringList() << QString("Analysis Pipelines: %1").arg(manifest.analysisPipelines.size())));
         extensionItem->addChild(new QTreeWidgetItem(QStringList() << QString("Tools: %1").arg(manifest.tools.size())));
 
         if(!manifest.ui.settingsTabs.isEmpty()) {
@@ -3255,10 +5727,71 @@ void MainWindow::updateSelectedExtension(QTreeWidgetItem* item)
             {"root_path", manifest.rootPath},
             {"entry_point", manifest.entryPoint},
             {"view_provider_count", static_cast<int>(manifest.viewProviders.size())},
+            {"result_renderer_count", static_cast<int>(manifest.resultRenderers.size())},
             {"tool_count", static_cast<int>(manifest.tools.size())},
             {"settings_tabs", static_cast<int>(manifest.ui.settingsTabs.size())},
+            {"view_providers", QJsonArray()},
+            {"result_renderers", QJsonArray()},
             {"manifest", manifest.rawManifest}
         };
+
+        QJsonArray providerContracts;
+        for(const ViewProviderContribution& provider : manifest.viewProviders) {
+            providerContracts.append(QJsonObject{
+                {"id", provider.id},
+                {"display_name", provider.displayName},
+                {"widget_type", provider.widgetType},
+                {"slot", provider.slot},
+                {"file_extensions", QJsonArray::fromStringList(provider.fileExtensions)},
+                {"supports_scene_merging", provider.supportsSceneMerging},
+                {"controls", provider.controls},
+                {"actions", provider.actions},
+                {"state_schema", provider.stateSchema},
+                {"initial_state", provider.initialState}
+            });
+        }
+        details.insert("view_providers", providerContracts);
+
+        QJsonArray rendererContracts;
+        for(const ResultRendererContribution& renderer : manifest.resultRenderers) {
+            rendererContracts.append(QJsonObject{
+                {"id", renderer.id},
+                {"display_name", renderer.displayName},
+                {"widget_type", renderer.widgetType},
+                {"tool_names", QJsonArray::fromStringList(renderer.toolNames)},
+                {"controls", renderer.controls},
+                {"actions", renderer.actions},
+                {"runtime_context_schema", renderer.runtimeContextSchema},
+                {"history_schema", renderer.historySchema}
+            });
+        }
+        details.insert("result_renderers", rendererContracts);
+
+        QJsonArray settingsContracts;
+        for(const UiContribution::SettingsTabContribution& settingsTab : manifest.ui.settingsTabs) {
+            settingsContracts.append(QJsonObject{
+                {"id", settingsTab.id},
+                {"title", settingsTab.title},
+                {"description", settingsTab.description},
+                {"fields", settingsTab.fields},
+                {"actions", settingsTab.actions}
+            });
+        }
+        details.insert("settings_tab_contracts", settingsContracts);
+
+        QJsonArray pipelineContracts;
+        for(const AnalysisPipelineContribution& pipeline : manifest.analysisPipelines) {
+            pipelineContracts.append(QJsonObject{
+                {"id", pipeline.id},
+                {"display_name", pipeline.displayName},
+                {"description", pipeline.description},
+                {"input_schema", pipeline.inputSchema},
+                {"output_schema", pipeline.outputSchema},
+                {"steps", pipeline.steps},
+                {"follow_up_actions", pipeline.followUpActions}
+            });
+        }
+        details.insert("analysis_pipelines", pipelineContracts);
         m_extensionDetailsView->setPlainText(QString::fromUtf8(QJsonDocument(details).toJson(QJsonDocument::Indented)));
         return;
     }
@@ -3366,38 +5899,10 @@ void MainWindow::openExtensionSettingsTab(const QString& extensionId, const QStr
             }
 
             QWidget* container = new QWidget;
-            QVBoxLayout* layout = new QVBoxLayout(container);
-            layout->setContentsMargins(16, 16, 16, 16);
-            layout->setSpacing(12);
-
-            QLabel* titleLabel = new QLabel(QString("%1 Settings").arg(manifest.displayName), container);
-            titleLabel->setObjectName("terminalStatusLabel");
-            QLabel* subtitleLabel = new QLabel(QString("%1 | %2").arg(tab.title, tab.description), container);
-            subtitleLabel->setWordWrap(true);
-            QTextEdit* detailsView = new QTextEdit(container);
-            detailsView->setReadOnly(true);
-
-            QJsonArray settingsTabs;
-            for(const UiContribution::SettingsTabContribution& settingsTab : manifest.ui.settingsTabs) {
-                settingsTabs.append(QJsonObject{
-                    {"id", settingsTab.id},
-                    {"title", settingsTab.title},
-                    {"description", settingsTab.description}
-                });
-            }
-
-            const QJsonObject payload{
-                {"extension_id", manifest.id},
-                {"display_name", manifest.displayName},
-                {"active_settings_tab", settingsTabId},
-                {"settings_tabs", settingsTabs},
-                {"message", "This extension contributes a manifest-defined settings tab. The next step is wiring provider-owned settings forms into this slot."}
-            };
-            detailsView->setPlainText(QString::fromUtf8(QJsonDocument(payload).toJson(QJsonDocument::Indented)));
-
-            layout->addWidget(titleLabel);
-            layout->addWidget(subtitleLabel);
-            layout->addWidget(detailsView, 1);
+            ExtensionSettingsWidget* settingsWidget = new ExtensionSettingsWidget(manifest, tab, nullptr);
+            connect(settingsWidget, &ExtensionSettingsWidget::outputMessage, this, &MainWindow::appendOutputMessage);
+            connect(settingsWidget, &ExtensionSettingsWidget::statusMessage, this, &MainWindow::setActivePanelState);
+            container = settingsWidget;
 
             const int tabIndex = m_centerTabs->addTab(container, QString("%1: %2").arg(manifest.displayName, tab.title));
             m_centerTabs->setTabToolTip(tabIndex, tabKey);
@@ -3669,6 +6174,21 @@ void MainWindow::restoreWorkspace()
     }
     refreshStructuredResultHistoryUi();
 
+    m_pendingPlannerConfirmations = QJsonArray();
+    const QByteArray pendingConfirmationsPayload = settings.value("workspace/pending_planner_confirmations").toByteArray();
+    if(!pendingConfirmationsPayload.isEmpty()) {
+        const QJsonDocument document = QJsonDocument::fromJson(pendingConfirmationsPayload);
+        if(document.isArray()) {
+            const QJsonArray confirmationsArray = document.array();
+            for(const QJsonValue& value : confirmationsArray) {
+                if(value.isObject()) {
+                    m_pendingPlannerConfirmations.append(value.toObject());
+                }
+            }
+        }
+    }
+    refreshPlannerConfirmationsUi();
+
     const QStringList workspaceFiles = settings.value("workspace/files").toStringList();
     const QStringList workspaceDirectories = settings.value("workspace/directories").toStringList();
     for(const QString& directoryPath : workspaceDirectories) {
@@ -3680,6 +6200,14 @@ void MainWindow::restoreWorkspace()
 
     m_lastToolName = settings.value("workspace/latest_tool_name").toString();
     m_lastToolResult = QJsonObject();
+    m_resultSelectionContext = QJsonObject();
+    const QByteArray resultSelectionPayload = settings.value("workspace/result_selection_context").toByteArray();
+    if(!resultSelectionPayload.isEmpty()) {
+        const QJsonDocument document = QJsonDocument::fromJson(resultSelectionPayload);
+        if(document.isObject()) {
+            m_resultSelectionContext = document.object();
+        }
+    }
     const QByteArray latestToolPayload = settings.value("workspace/latest_tool_result").toByteArray();
     if(!latestToolPayload.isEmpty()) {
         const QJsonDocument document = QJsonDocument::fromJson(latestToolPayload);
@@ -3727,6 +6255,10 @@ void MainWindow::persistWorkspace() const
     settings.setValue("workspace/result_history", QJsonDocument(resultHistoryArray).toJson(QJsonDocument::Compact));
     settings.setValue("workspace/latest_tool_name", m_lastToolName);
     settings.setValue("workspace/latest_tool_result", QJsonDocument(m_lastToolResult).toJson(QJsonDocument::Compact));
+    settings.setValue("workspace/pending_planner_confirmations",
+                      QJsonDocument(m_pendingPlannerConfirmations).toJson(QJsonDocument::Compact));
+    settings.setValue("workspace/result_selection_context",
+                      QJsonDocument(m_resultSelectionContext).toJson(QJsonDocument::Compact));
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)

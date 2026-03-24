@@ -58,6 +58,8 @@ public:
 
 private:
     bool reloadExtensions(const QString& extensionsDirectory, const QStringList& disabledExtensionIds);
+    QJsonObject sessionCapabilitiesForProvider(const ViewProviderContribution& provider) const;
+    QJsonObject viewCommandResultSchema(const QJsonObject& stateSchema) const;
     QJsonObject handleResourcesList() const;
     QJsonObject handleToolsList() const;
     QJsonObject handleToolCall(const QJsonObject& params) const;

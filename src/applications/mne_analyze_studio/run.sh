@@ -70,9 +70,11 @@ echo "Launching Skill-Host from $SKILL_PATH"
 SKILL_PID=$!
 
 cleanup() {
-    kill "$KERNEL_PID" "$SKILL_PID" 2>/dev/null || true
+    kill -TERM "$KERNEL_PID" "$SKILL_PID" 2>/dev/null || true
+    wait "$KERNEL_PID" 2>/dev/null || true
+    wait "$SKILL_PID" 2>/dev/null || true
 }
-trap cleanup EXIT
+trap cleanup EXIT INT TERM
 
 echo "Launching Workbench from $WORKBENCH_PATH"
 "$WORKBENCH_PATH" "$@"
