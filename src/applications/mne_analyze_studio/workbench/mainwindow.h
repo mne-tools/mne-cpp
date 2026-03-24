@@ -40,6 +40,8 @@
 #include <QMainWindow>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QHash>
+#include <QList>
 #include <QLocalSocket>
 #include <QStringList>
 
@@ -49,10 +51,13 @@ class QListWidget;
 class QListWidgetItem;
 class QLineEdit;
 class QPushButton;
+class QComboBox;
 class QPlainTextEdit;
+class QSpinBox;
 class QTableWidget;
 class QTreeWidget;
 class QSplitter;
+class QWidget;
 class QTextEdit;
 class QToolButton;
 class QTabWidget;
@@ -64,9 +69,13 @@ namespace MNEANALYZESTUDIO
 {
 
 class AgentChatDockWidget;
+class AnalysisResultWidget;
 class EditorTabBar;
 class EditorTabWidget;
-class RawDataBrowserWidget;
+class ExtensionHostedViewWidget;
+class IRawDataView;
+class SpectrumPlotWidget;
+class ViewProviderRegistry;
 
 /**
  * @brief Main workbench window coordinating workspace, views, output panels, and agent chat.
@@ -82,25 +91,48 @@ public:
 protected:
     void closeEvent(QCloseEvent* event) override;
 
+private slots:
+    void handleHostedExtensionViewOutput(const QString& message);
+    void handleHostedExtensionViewStatus(const QString& message);
+    void handleHostedExtensionViewCommand(const QString& sessionId, const QString& commandName, const QJsonObject& arguments);
+
 private:
-    RawDataBrowserWidget* activeRawBrowser() const;
+    IRawDataView* activeRawDataView() const;
     QString planAgentSteps(const QString& commandText, QStringList& plannedCommands, bool& planned) const;
     QString planAgentIntent(const QString& commandText, QString& plannedCommand, bool& planned) const;
     QString resolvePlannerReferences(const QString& commandText) const;
     void rememberToolResult(const QString& toolName, const QJsonObject& result);
+    void refreshStructuredResultHistoryUi();
     void updateStructuredResultView(const QString& toolName, const QJsonObject& result);
     void updateResultPrimaryActionForSelection();
+    void updateResultPsdControls(const QJsonObject& result);
+    void updateResultPsdComparison();
     void runResultPrimaryAction();
+    void runResultPsdAction();
     QString handleLocalAgentCommand(const QString& commandText, bool& handled);
     QString handleStructuredToolCommand(const QString& commandText, bool& handled);
     QJsonArray localToolDefinitions() const;
     QJsonArray kernelToolDefinitions() const;
     void requestKernelToolDefinitions();
+    void requestExtensionHostState();
+    void requestExtensionHostReload();
     QJsonArray availableToolDefinitions() const;
     QJsonObject toolDefinition(const QString& toolName) const;
     QJsonObject llmPlanningContext(const QString& commandText) const;
     QJsonObject defaultArgumentsForTool(const QString& toolName) const;
+    QJsonObject activeHostedViewSession() const;
+    QJsonArray activeHostedViewToolDefinitions() const;
     bool editArgumentsForTool(const QString& toolName, QJsonObject& arguments);
+    void reloadExtensionRegistry();
+    void refreshExtensionManagerUi();
+    void updateSelectedExtension(QTreeWidgetItem* item);
+    void installExtensionFromDirectory();
+    void toggleSelectedExtensionEnabled();
+    void openSelectedExtensionSettingsTab();
+    void openExtensionSettingsTab(const QString& extensionId, const QString& settingsTabId);
+    void requestExtensionViewOpen(const QString& filePath, const QJsonObject& dispatch);
+    void finalizeExtensionViewOpen(const QString& filePath, const QJsonObject& sessionDescriptor);
+    void sendExtensionViewCommand(const QString& sessionId, const QString& commandName, const QJsonObject& arguments);
     void rebuildSkillsExplorer();
     void updateSelectedSkillTool(QTreeWidgetItem* item);
     void runSelectedSkillTool();
@@ -110,10 +142,13 @@ private:
     void refreshAgentPlannerStatus();
     QJsonObject buildRawWindowArguments(int windowSamples) const;
     void sendKernelToolCall(const QString& toolName, const QJsonObject& arguments);
+    void sendExtensionToolCall(const QString& toolName, const QJsonObject& arguments);
     QWidget* createSidebarSection(const QString& title, QWidget* contentWidget);
     void createLayout();
     void createConnections();
     void addWorkspaceDirectory(const QString& directoryPath);
+    void refreshWorkspaceArtifacts();
+    void openAnalysisArtifact(const QJsonObject& entry, bool focusBottomResults = false);
     void openWorkspaceItem(QTreeWidgetItem* item);
     void openFileInView(const QString& filePath);
     void applyWorkbenchStyle();
@@ -133,11 +168,18 @@ private:
     QWidget* m_activityBar;
     QToolButton* m_explorerButton;
     QToolButton* m_skillsButton;
+    QToolButton* m_extensionsButton;
     QTreeWidget* m_workspaceExplorer;
     QTreeWidget* m_skillsExplorer;
     QWidget* m_skillsPage;
     QPlainTextEdit* m_skillDetailsView;
     QPushButton* m_skillRunButton;
+    QWidget* m_extensionsPage;
+    QTreeWidget* m_extensionsExplorer;
+    QPlainTextEdit* m_extensionDetailsView;
+    QPushButton* m_extensionInstallButton;
+    QPushButton* m_extensionToggleButton;
+    QPushButton* m_extensionSettingsButton;
     QStackedWidget* m_leftSidebarStack;
     QSplitter* m_mainSplitter;
     QSplitter* m_centerSplitter;
@@ -148,10 +190,17 @@ private:
     QListWidget* m_problemPanel;
     QWidget* m_resultsTab;
     QLabel* m_resultsTitleLabel;
+    QComboBox* m_resultsHistoryCombo;
+    QWidget* m_resultsPsdControlsWidget;
+    QComboBox* m_resultsPsdMatchCombo;
+    QSpinBox* m_resultsPsdNfftSpin;
+    QComboBox* m_resultsPsdCompareCombo;
+    QPushButton* m_resultsPsdRunButton;
     QPushButton* m_resultsActionButton;
     QStackedWidget* m_resultsStack;
     QTreeWidget* m_resultsTree;
     QTableWidget* m_resultsTable;
+    SpectrumPlotWidget* m_resultsSpectrumPlot;
     QWidget* m_terminalTab;
     QLabel* m_terminalStatusLabel;
     QTextEdit* m_terminalPanel;
@@ -159,14 +208,26 @@ private:
     QPushButton* m_terminalRunButton;
     QListWidgetItem* m_activeStateItem;
     QLocalSocket* m_kernelSocket;
+    QLocalSocket* m_extensionSocket;
     QString m_lastToolName;
     QJsonObject m_lastToolResult;
     QString m_resultsCurrentToolName;
     QString m_resultPrimaryActionCommand;
     QString m_selectedSkillToolName;
+    QString m_selectedExtensionId;
+    QList<QJsonObject> m_psdResultHistory;
+    QList<QJsonObject> m_structuredResultHistory;
     QJsonArray m_cachedKernelToolDefinitions;
+    QJsonArray m_cachedExtensionToolDefinitions;
+    QJsonArray m_cachedExtensionResources;
+    QJsonArray m_cachedExtensionViewSessions;
+    QJsonObject m_lastExtensionReloadResult;
+    QHash<QString, QJsonObject> m_pendingExtensionViewOpens;
+    QHash<QString, QString> m_pendingExtensionViewFiles;
+    QHash<QString, QWidget*> m_extensionViewWidgetsBySessionId;
     LlmToolPlanner m_llmPlanner;
     SceneContextRegistry m_sceneRegistry;
+    ViewProviderRegistry* m_viewProviderRegistry;
     ViewManager m_viewManager;
 };
 

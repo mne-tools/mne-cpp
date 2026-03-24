@@ -1,0 +1,77 @@
+{
+  "id": "dummy-3d-extension",
+  "display_name": "Dummy 3D Extension",
+  "version": "0.1.0",
+  "entry_point": "dummy_3d_placeholder",
+  "contributes": {
+    "view_providers": [
+      {
+        "id": "dummy3d.surface_view",
+        "display_name": "Dummy Surface View",
+        "widget_type": "placeholder_3d",
+        "slot": "center",
+        "file_extensions": [
+          ".surf",
+          ".pial",
+          ".white",
+          ".bem"
+        ],
+        "supports_scene_merging": true
+      }
+    ],
+    "tools": [
+      {
+        "name": "dummy3d.set_opacity",
+        "description": "Set the opacity of the dummy 3D extension placeholder view.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "opacity": {
+              "type": "number",
+              "title": "Opacity",
+              "minimum": 0.0,
+              "maximum": 1.0,
+              "default": 0.8,
+              "description": "Opacity of the placeholder 3D scene content."
+            }
+          },
+          "required": [
+            "opacity"
+          ]
+        },
+        "result_schema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "title": "Status"
+            },
+            "opacity": {
+              "type": "number",
+              "title": "Opacity"
+            }
+          },
+          "required": [
+            "status",
+            "opacity"
+          ]
+        }
+      }
+    ],
+    "ui": {
+      "sidebar_items": [
+        "Dummy 3D"
+      ],
+      "menu_items": [
+        "View/Dummy 3D"
+      ],
+      "settings_tabs": [
+        {
+          "id": "surface_preferences",
+          "title": "Surface Preferences",
+          "description": "Placeholder settings contributed by the dummy 3D extension."
+        }
+      ]
+    }
+  }
+}

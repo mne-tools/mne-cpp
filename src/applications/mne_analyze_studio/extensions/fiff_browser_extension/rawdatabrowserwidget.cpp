@@ -5,12 +5,15 @@
  * @version  dev
  * @date     March, 2026
  *
- * @brief    Implements the studio raw FIFF browser widget.
+ * @brief    Implements the embedded raw FIFF browser widget for the FIFF extension.
  */
 
 #include "rawdatabrowserwidget.h"
 
 #include "mnebrowserrawdelegate.h"
+
+#include <extensionviewfactoryregistry.h>
+#include <iextensionviewfactory.h>
 
 #include <QEvent>
 #include <QHeaderView>
@@ -27,6 +30,45 @@
 #include <QVBoxLayout>
 
 using namespace MNEANALYZESTUDIO;
+
+namespace
+{
+
+class FiffBrowserExtensionViewFactory final : public IExtensionViewFactory
+{
+public:
+    QString widgetType() const override
+    {
+        return "embedded_raw_browser";
+    }
+
+    QWidget* createView(const QJsonObject& sessionDescriptor, QWidget* parent) const override
+    {
+        RawDataBrowserWidget* rawBrowser = new RawDataBrowserWidget(parent);
+        if(!rawBrowser->loadFile(sessionDescriptor.value("file").toString())) {
+            delete rawBrowser;
+            return nullptr;
+        }
+
+        return rawBrowser;
+    }
+};
+
+class FiffBrowserExtensionViewFactoryRegistration
+{
+public:
+    FiffBrowserExtensionViewFactoryRegistration()
+    {
+        ExtensionViewFactoryRegistry::instance().registerFactory(&m_factory);
+    }
+
+private:
+    FiffBrowserExtensionViewFactory m_factory;
+};
+
+FiffBrowserExtensionViewFactoryRegistration s_fiffBrowserFactoryRegistration;
+
+}
 
 RawDataBrowserWidget::RawDataBrowserWidget(QWidget* parent)
 : QWidget(parent)

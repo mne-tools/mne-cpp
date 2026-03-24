@@ -11,6 +11,7 @@
 #include "viewmanager.h"
 
 #include "scenecontextregistry.h"
+#include "viewproviderregistry.h"
 
 #include <QFileInfo>
 
@@ -19,20 +20,48 @@ using namespace MNEANALYZESTUDIO;
 namespace
 {
 
-const QStringList kSignalExtensions = {".fif", ".ave", ".edf"};
 const QStringList kThreeDExtensions = {".surf", ".pial", ".white"};
 const QStringList kTextExtensions = {".py", ".cpp", ".json"};
 
 }
 
-ViewManager::ViewManager(SceneContextRegistry* sceneRegistry, QObject* parent)
+ViewManager::ViewManager(SceneContextRegistry* sceneRegistry,
+                         ViewProviderRegistry* viewProviderRegistry,
+                         QObject* parent)
 : QObject(parent)
 , m_sceneRegistry(sceneRegistry)
+, m_viewProviderRegistry(viewProviderRegistry)
 {
 }
 
 QJsonObject ViewManager::dispatchFileSelection(const QString& filePath, const QJsonObject& metadata) const
 {
+    if(m_viewProviderRegistry) {
+        const QJsonObject provider = m_viewProviderRegistry->providerForFile(filePath, metadata);
+        if(!provider.isEmpty()) {
+            QJsonObject dispatch{
+                {"file", filePath},
+                {"view", "ExtensionView"},
+                {"mode", "extension_slot"}
+            };
+
+            for(auto it = provider.constBegin(); it != provider.constEnd(); ++it) {
+                dispatch.insert(it.key(), it.value());
+            }
+
+            if(provider.value("supports_scene_merging").toBool(false)) {
+                const QString subjectId = inferSubjectId(filePath, metadata);
+                const QString sceneId = m_sceneRegistry
+                    ? m_sceneRegistry->ensureScene(subjectId, QFileInfo(filePath).fileName())
+                    : QString();
+                dispatch.insert("sceneId", sceneId);
+                dispatch.insert("mode", sceneId.isEmpty() ? "new_scene" : "merge_or_prompt");
+            }
+
+            return dispatch;
+        }
+    }
+
     const ViewKind kind = viewKindForFile(filePath);
     QJsonObject dispatch{
         {"file", filePath}
@@ -71,9 +100,6 @@ ViewManager::ViewKind ViewManager::viewKindForFile(const QString& filePath)
     const QString suffix = QFileInfo(filePath).suffix().toLower();
     const QString extension = QString(".%1").arg(suffix);
 
-    if(kSignalExtensions.contains(extension)) {
-        return ViewKind::SignalBrowser2D;
-    }
     if(kThreeDExtensions.contains(extension)) {
         return ViewKind::ThreeDScene;
     }

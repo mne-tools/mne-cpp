@@ -5,7 +5,7 @@
  * @version  dev
  * @date     March, 2026
  *
- * @brief    Implements the waveform delegate for the embedded raw browser.
+ * @brief    Implements the waveform delegate for the FIFF browser extension widget.
  */
 
 #include "mnebrowserrawdelegate.h"

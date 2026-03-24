@@ -1,0 +1,60 @@
+{
+  "id": "fiff-browser-extension",
+  "display_name": "FIFF Browser Extension",
+  "version": "0.1.0",
+  "entry_point": "fiff_browser_embedded",
+  "contributes": {
+    "view_providers": [
+      {
+        "id": "fiffbrowser.raw_view",
+        "display_name": "FIFF Raw Browser",
+        "widget_type": "embedded_raw_browser",
+        "slot": "center",
+        "file_extensions": [
+          ".fif",
+          ".ave",
+          ".edf"
+        ],
+        "supports_scene_merging": false
+      }
+    ],
+    "tools": [
+      {
+        "name": "fiffbrowser.reveal_active_state",
+        "description": "Reveal the currently active FIFF browser state in the hosted view session.",
+        "input_schema": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "result_schema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "title": "Status"
+            }
+          },
+          "required": [
+            "status"
+          ]
+        }
+      }
+    ],
+    "ui": {
+      "sidebar_items": [
+        "FIFF Browser"
+      ],
+      "menu_items": [
+        "View/FIFF Browser"
+      ],
+      "settings_tabs": [
+        {
+          "id": "raw_browser_preferences",
+          "title": "Raw Browser Preferences",
+          "description": "Placeholder settings tab contributed by the FIFF browser extension."
+        }
+      ]
+    }
+  }
+}

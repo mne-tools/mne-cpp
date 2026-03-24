@@ -16,9 +16,11 @@ set(SOURCES
     interfaces.cpp
     jsonrpcmessage.cpp
     llmtoolplanner.cpp
+    manifestparser.cpp
     mcprouter.cpp
     scenecontextregistry.cpp
     viewmanager.cpp
+    viewproviderregistry.cpp
 )
 
 set(HEADERS
@@ -27,10 +29,12 @@ set(HEADERS
     imcpneuroskill.h
     jsonrpcmessage.h
     llmtoolplanner.h
+    manifestparser.h
     mcprouter.h
     scenecontextregistry.h
     studio_core_global.h
     viewmanager.h
+    viewproviderregistry.h
 )
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
@@ -52,6 +56,7 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
     ${QT_REQUIRED_COMPONENT_LIBS}
+    mne_analyze_studio_sdk
     mne_fiff
     mne_bids
     mne_fs

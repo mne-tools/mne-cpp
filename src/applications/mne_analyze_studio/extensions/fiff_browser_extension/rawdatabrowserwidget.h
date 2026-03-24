@@ -27,13 +27,15 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @brief    Declares the embedded raw FIFF browser widget for the studio workbench.
+ * @brief    Declares the embedded raw FIFF browser widget contributed by the FIFF extension.
  */
 
 #ifndef MNE_ANALYZE_STUDIO_RAWDATABROWSERWIDGET_H
 #define MNE_ANALYZE_STUDIO_RAWDATABROWSERWIDGET_H
 
-#include "../../mne_browse/Models/rawmodel.h"
+#include <irawdataview.h>
+
+#include "../../../mne_browse/Models/rawmodel.h"
 
 #include <QWidget>
 
@@ -51,9 +53,9 @@ namespace MNEANALYZESTUDIO
 class MneBrowseRawDelegate;
 
 /**
- * @brief Workbench widget that hosts the existing MNE browse raw signal view.
+ * @brief Extension-owned widget that hosts the existing MNE browse raw signal view.
  */
-class RawDataBrowserWidget : public QWidget
+class RawDataBrowserWidget : public QWidget, public IRawDataView
 {
     Q_OBJECT
 
@@ -61,13 +63,13 @@ public:
     explicit RawDataBrowserWidget(QWidget* parent = nullptr);
 
     bool loadFile(const QString& filePath);
-    QString filePath() const;
-    QString summaryText() const;
-    QString stateText() const;
-    bool gotoSample(int sample);
-    bool setZoomPixelsPerSample(double pixelsPerSample);
-    double pixelsPerSample() const;
-    int cursorSample() const;
+    QString filePath() const override;
+    QString summaryText() const override;
+    QString stateText() const override;
+    bool gotoSample(int sample) override;
+    bool setZoomPixelsPerSample(double pixelsPerSample) override;
+    double pixelsPerSample() const override;
+    int cursorSample() const override;
 
 signals:
     void outputMessage(const QString& message);
