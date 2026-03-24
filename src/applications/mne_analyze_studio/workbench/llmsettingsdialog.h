@@ -40,8 +40,10 @@
 class QComboBox;
 class QLabel;
 class QLineEdit;
+class QNetworkAccessManager;
 class QPushButton;
 class QTextEdit;
+class QTextBrowser;
 
 namespace MNEANALYZESTUDIO
 {
@@ -65,10 +67,16 @@ private slots:
     void deleteCurrentProfile();
     void applySelectedProfile(int index);
     void applySuggestedModel();
+    void browseModels();
+    void openProviderConsole();
+    void openProviderDocs();
 
 private:
     void refreshProfiles();
     void refreshSuggestedModels();
+    void refreshProviderInstructions();
+    QString resolvedEndpointForMode(const QString& mode) const;
+    QStringList fetchAvailableModels(QString* errorMessage = nullptr) const;
 
     QComboBox* m_profileComboBox;
     QPushButton* m_saveProfileButton;
@@ -80,12 +88,17 @@ private:
     QLineEdit* m_apiKeyLineEdit;
     QComboBox* m_suggestedModelComboBox;
     QPushButton* m_applySuggestedModelButton;
+    QPushButton* m_browseModelsButton;
+    QTextBrowser* m_providerInstructionsView;
+    QPushButton* m_openConsoleButton;
+    QPushButton* m_openDocsButton;
     QTextEdit* m_toolInventoryView;
     QLabel* m_testStatusLabel;
     QPushButton* m_testButton;
     QString m_testPrompt;
     QJsonArray m_testToolDefinitions;
     QJsonObject m_testContext;
+    QNetworkAccessManager* m_networkAccessManager;
 };
 
 } // namespace MNEANALYZESTUDIO
