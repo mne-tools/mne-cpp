@@ -12,26 +12,23 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
+    analysisresultwidget.cpp
     agentchatdockwidget.cpp
     editortabbar.cpp
+    extensionhostedviewwidget.cpp
     llmsettingsdialog.cpp
     main.cpp
     mainwindow.cpp
-    mnebrowserrawdelegate.cpp
-    rawdatabrowserwidget.cpp
-    ../../mne_browse/Models/rawmodel.cpp
-    ../../mne_browse/Utils/datapackage.cpp
-    ../../mne_browse/Utils/filteroperator.cpp
 )
 
 set(HEADERS
+    analysisresultwidget.h
     agentchatdockwidget.h
     editortabbar.h
+    extensionhostedviewwidget.h
     editortabwidget.h
     llmsettingsdialog.h
     mainwindow.h
-    mnebrowserrawdelegate.h
-    rawdatabrowserwidget.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -45,12 +42,14 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../mne_browse
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     mne_analyze_studio_core
+    mne_analyze_studio_dummy_3d_extension_widgets
+    mne_analyze_studio_fiff_browser_extension_widgets
+    mne_analyze_studio_psd_analysis_extension_widgets
     mne_disp
     mne_dsp
     mne_fiff

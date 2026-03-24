@@ -16,6 +16,8 @@
 
 #include <jsonrpcmessage.h>
 
+#include <dsp/welch_psd.h>
+
 #include <QJsonArray>
 #include <QFile>
 #include <QFileInfo>
@@ -441,6 +443,98 @@ QJsonObject NeuroKernelService::handleToolCall(const QJsonObject& params) const
         };
     }
 
+    if(toolName == "neurokernel.psd_summary") {
+        const QString filePath = arguments.value("file").toString();
+        if(!QFileInfo::exists(filePath)) {
+            return QJsonObject{
+                {"status", "error"},
+                {"message", QString("Neuro-Kernel could not find raw file: %1").arg(filePath)}
+            };
+        }
+
+        QFile file(filePath);
+        FIFFLIB::FiffRawData raw(file);
+        if(raw.isEmpty()) {
+            return QJsonObject{
+                {"status", "error"},
+                {"message", QString("Neuro-Kernel could not parse raw file: %1").arg(filePath)}
+            };
+        }
+
+        const int requestedFrom = arguments.value("from_sample").toInt(raw.first_samp);
+        const int requestedTo = arguments.value("to_sample").toInt(raw.last_samp);
+        const int fromSample = std::max<int>(raw.first_samp, requestedFrom);
+        const int toSample = std::min<int>(raw.last_samp, requestedTo);
+        const QString match = arguments.value("match").toString().trimmed();
+        const int nfft = std::max(32, arguments.value("nfft").toInt(256));
+
+        Eigen::MatrixXd data;
+        Eigen::MatrixXd times;
+        if(!raw.read_raw_segment(data, times, fromSample, toSample)) {
+            return QJsonObject{
+                {"status", "error"},
+                {"message", QString("Neuro-Kernel could not read raw segment for %1").arg(filePath)}
+            };
+        }
+
+        Eigen::RowVectorXi picks(data.rows());
+        int pickCount = 0;
+        QStringList matchedChannels;
+        for(int row = 0; row < data.rows(); ++row) {
+            const QString channelName = raw.info.ch_names.value(row);
+            if(!match.isEmpty() && !channelName.contains(match, Qt::CaseInsensitive)) {
+                continue;
+            }
+
+            picks[pickCount++] = row;
+            matchedChannels << channelName;
+        }
+
+        if(pickCount == 0) {
+            return QJsonObject{
+                {"status", "error"},
+                {"message", QString("Neuro-Kernel could not find matching channels for PSD in %1").arg(filePath)}
+            };
+        }
+
+        const Eigen::RowVectorXi selectedPicks = picks.head(pickCount);
+        const UTILSLIB::WelchPsdResult psdResult =
+            UTILSLIB::WelchPsd::compute(data,
+                                        raw.info.sfreq,
+                                        std::min(nfft, static_cast<int>(data.cols())),
+                                        0.5,
+                                        UTILSLIB::WelchPsd::Hann,
+                                        selectedPicks);
+
+        const Eigen::RowVectorXd meanPsd = psdResult.matPsd.colwise().mean();
+        QJsonArray frequencies;
+        QJsonArray psdValues;
+        for(int i = 0; i < psdResult.vecFreqs.size(); ++i) {
+            frequencies.append(psdResult.vecFreqs[i]);
+            psdValues.append(meanPsd[i]);
+        }
+
+        return QJsonObject{
+            {"status", "ok"},
+            {"tool_name", toolName},
+            {"message", QString("PSD summary for %1 using %2 channels.")
+                            .arg(QFileInfo(filePath).fileName())
+                            .arg(pickCount)},
+            {"file", filePath},
+            {"from_sample", fromSample},
+            {"to_sample", toSample},
+            {"match", match},
+            {"nfft", std::min(nfft, static_cast<int>(data.cols()))},
+            {"channel_count", pickCount},
+            {"channels", QJsonArray::fromStringList(matchedChannels)},
+            {"frequencies", frequencies},
+            {"psd", psdValues},
+            {"plane", "data"},
+            {"transport", "local_socket"},
+            {"protocol", "mcp-over-json-rpc-2.0"}
+        };
+    }
+
     if(toolName == "neurokernel.execute") {
         return QJsonObject{
             {"status", "ok"},
@@ -554,6 +648,36 @@ QJsonArray NeuroKernelService::toolDefinitions() const
                                               {"peak_abs", numberSchema("Peak Absolute")}
                                           }, QJsonArray{"name", "rms", "mean_abs", "peak_abs"}))}
              }, QJsonArray{"status", "tool_name", "message", "channels"})}
+        },
+        QJsonObject{
+            {"name", "neurokernel.psd_summary"},
+            {"description", "Compute a Welch PSD summary for the active raw sample window and optional channel match."},
+            {"input_schema", objectSchema(QJsonObject{
+                 {"window_samples", integerSchema("Window Samples",
+                                                  32,
+                                                  1000000,
+                                                  1200,
+                                                  "Number of samples around the current cursor to include in the PSD window.")},
+                 {"nfft", integerSchema("FFT Size",
+                                        32,
+                                        8192,
+                                        256,
+                                        "FFT length used for the Welch PSD estimate.")},
+                 {"match", stringSchema("Channel Match",
+                                        QJsonArray{"", "EEG", "MEG", "EOG"},
+                                        "EEG",
+                                        "Optional channel-name filter applied before averaging PSDs.")}
+             }, QJsonArray{"window_samples"})},
+            {"result_schema", objectSchema(QJsonObject{
+                 {"status", stringSchema("Status", QJsonArray{"ok", "error"})},
+                 {"tool_name", stringSchema("Tool Name")},
+                 {"message", stringSchema("Message")},
+                 {"file", stringSchema("File")},
+                 {"channel_count", integerSchema("Channel Count", 0, 1000000, 0)},
+                 {"channels", arraySchema("Channels", stringSchema("Channel Name"))},
+                 {"frequencies", arraySchema("Frequencies", numberSchema("Frequency"))},
+                 {"psd", arraySchema("PSD", numberSchema("Power Spectral Density"))}
+             }, QJsonArray{"status", "tool_name", "message", "frequencies", "psd"})}
         },
         QJsonObject{
             {"name", "neurokernel.find_peak_window"},

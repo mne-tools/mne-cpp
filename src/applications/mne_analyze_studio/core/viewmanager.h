@@ -43,6 +43,7 @@ namespace MNEANALYZESTUDIO
 {
 
 class SceneContextRegistry;
+class ViewProviderRegistry;
 
 /**
  * @brief Dispatches selected workspace files to the appropriate studio view type.
@@ -60,7 +61,9 @@ public:
     };
     Q_ENUM(ViewKind)
 
-    explicit ViewManager(SceneContextRegistry* sceneRegistry, QObject* parent = nullptr);
+    explicit ViewManager(SceneContextRegistry* sceneRegistry,
+                         ViewProviderRegistry* viewProviderRegistry = nullptr,
+                         QObject* parent = nullptr);
 
     QJsonObject dispatchFileSelection(const QString& filePath, const QJsonObject& metadata = QJsonObject()) const;
     static ViewKind viewKindForFile(const QString& filePath);
@@ -69,6 +72,7 @@ private:
     QString inferSubjectId(const QString& filePath, const QJsonObject& metadata) const;
 
     SceneContextRegistry* m_sceneRegistry;
+    ViewProviderRegistry* m_viewProviderRegistry;
 };
 
 } // namespace MNEANALYZESTUDIO

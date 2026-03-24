@@ -1,0 +1,51 @@
+{
+  "id": "psd-analysis-extension",
+  "display_name": "PSD Analysis Extension",
+  "version": "0.1.0",
+  "entry_point": "psd_result_renderer",
+  "contributes": {
+    "tools": [
+      {
+        "name": "psd.render_result",
+        "description": "Render PSD result artifacts through the PSD analysis extension renderer.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "tool_name": {
+              "type": "string",
+              "title": "Tool Name",
+              "default": "neurokernel.psd_summary"
+            }
+          },
+          "required": [
+            "tool_name"
+          ]
+        },
+        "result_schema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "title": "Status"
+            }
+          },
+          "required": [
+            "status"
+          ]
+        }
+      }
+    ],
+    "ui": {
+      "sidebar_items": [
+        "PSD"
+      ],
+      "settings_tabs": [
+        {
+          "id": "psd_preferences",
+          "title": "PSD Preferences",
+          "description": "Settings contributed by the PSD analysis extension."
+        }
+      ]
+    }
+  }
+}

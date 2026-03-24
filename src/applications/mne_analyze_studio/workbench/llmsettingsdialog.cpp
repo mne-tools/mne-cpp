@@ -136,6 +136,7 @@ void LlmSettingsDialog::runPlannerTest()
         ? QJsonArray{
               QJsonObject{{"name", "view.raw.summary"}, {"description", "Return summary metadata for the active raw browser."}},
               QJsonObject{{"name", "neurokernel.channel_stats"}, {"description", "Compute per-channel statistics for a raw sample window."}},
+              QJsonObject{{"name", "neurokernel.psd_summary"}, {"description", "Compute a Welch PSD summary for a raw sample window."}},
               QJsonObject{{"name", "neurokernel.find_peak_window"}, {"description", "Find the strongest absolute-amplitude sample inside a raw window."}}
           }
         : m_testToolDefinitions;

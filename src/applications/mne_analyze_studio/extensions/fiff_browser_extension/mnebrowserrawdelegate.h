@@ -27,14 +27,14 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @brief    Declares the waveform delegate used by the studio raw data browser.
+ * @brief    Declares the waveform delegate used by the FIFF browser extension widget.
  */
 
 #ifndef MNE_ANALYZE_STUDIO_MNEBROWSERRAWDELEGATE_H
 #define MNE_ANALYZE_STUDIO_MNEBROWSERRAWDELEGATE_H
 
-#include "../../mne_browse/Models/rawmodel.h"
-#include "../../mne_browse/Utils/types.h"
+#include "../../../mne_browse/Models/rawmodel.h"
+#include "../../../mne_browse/Utils/types.h"
 
 #include <QAbstractItemDelegate>
 #include <QMap>

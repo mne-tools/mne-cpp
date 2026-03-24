@@ -33,7 +33,13 @@
 #ifndef MNE_ANALYZE_STUDIO_SKILLHOSTSERVICE_H
 #define MNE_ANALYZE_STUDIO_SKILLHOSTSERVICE_H
 
+#include <mcprouter.h>
+#include <viewproviderregistry.h>
+
+#include <QJsonObject>
 #include <QObject>
+#include <QHash>
+#include <QLocalServer>
 
 namespace MNEANALYZESTUDIO
 {
@@ -47,6 +53,24 @@ class SkillHostService : public QObject
 
 public:
     explicit SkillHostService(QObject* parent = nullptr);
+
+    bool start(const QString& socketName, const QString& extensionsDirectory);
+
+private:
+    bool reloadExtensions(const QString& extensionsDirectory, const QStringList& disabledExtensionIds);
+    QJsonObject handleResourcesList() const;
+    QJsonObject handleToolsList() const;
+    QJsonObject handleToolCall(const QJsonObject& params) const;
+    QJsonObject handleExtensionsReload(const QJsonObject& params);
+    QJsonObject handleViewsOpen(const QJsonObject& params);
+    QJsonObject handleViewsList() const;
+    QJsonObject handleViewsCommand(const QJsonObject& params);
+
+    McpRouter m_router;
+    QLocalServer m_server;
+    ViewProviderRegistry m_registry;
+    QString m_extensionsDirectory;
+    QHash<QString, QJsonObject> m_viewSessions;
 };
 
 } // namespace MNEANALYZESTUDIO
