@@ -133,7 +133,7 @@ bool LlmToolPlanner::isConfigured() const
         return true;
     }
 
-    if(isOpenAIResponsesMode() || isGitHubModelsMode() || isAnthropicMessagesMode()) {
+    if(isOpenAIResponsesMode() || isGeminiOpenAICompatMode() || isGitHubModelsMode() || isAnthropicMessagesMode()) {
         return !apiKey().isEmpty() && !model().isEmpty();
     }
 
@@ -155,6 +155,9 @@ QString LlmToolPlanner::providerName() const
     if(isOpenAIResponsesMode()) {
         return QString("OpenAI");
     }
+    if(isGeminiOpenAICompatMode()) {
+        return QString("Google Gemini");
+    }
     if(isGitHubModelsMode()) {
         return QString("GitHub Models");
     }
@@ -175,6 +178,8 @@ QString LlmToolPlanner::statusSummary() const
         QString modeLabel = QString("HTTP");
         if(isOpenAIResponsesMode()) {
             modeLabel = QString("Responses API");
+        } else if(isGeminiOpenAICompatMode()) {
+            modeLabel = QString("Gemini OpenAI Compat");
         } else if(isGitHubModelsMode()) {
             modeLabel = QString("GitHub Models");
         } else if(isAnthropicMessagesMode()) {
@@ -186,6 +191,9 @@ QString LlmToolPlanner::statusSummary() const
 
     if(isOpenAIResponsesMode()) {
         return "LLM: Deterministic fallback only | Set MNE_ANALYZE_STUDIO_LLM_API_KEY and MNE_ANALYZE_STUDIO_LLM_MODEL.";
+    }
+    if(isGeminiOpenAICompatMode()) {
+        return "LLM: Deterministic fallback only | Set Gemini API key and model.";
     }
     if(isGitHubModelsMode()) {
         return "LLM: Deterministic fallback only | Set GitHub token and model for GitHub Models.";
@@ -441,6 +449,11 @@ bool LlmToolPlanner::isOpenAIResponsesMode() const
     return mode().compare("openai_responses", Qt::CaseInsensitive) == 0;
 }
 
+bool LlmToolPlanner::isGeminiOpenAICompatMode() const
+{
+    return mode().compare("gemini_openai", Qt::CaseInsensitive) == 0;
+}
+
 bool LlmToolPlanner::isGitHubModelsMode() const
 {
     return mode().compare("github_models", Qt::CaseInsensitive) == 0;
@@ -460,6 +473,9 @@ QString LlmToolPlanner::endpoint() const
 
     if(isOpenAIResponsesMode()) {
         return QString("https://api.openai.com/v1/responses");
+    }
+    if(isGeminiOpenAICompatMode()) {
+        return QString("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions");
     }
     if(isGitHubModelsMode()) {
         return QString("https://models.inference.ai.azure.com/chat/completions");

@@ -98,6 +98,9 @@ private slots:
     void handleResultRendererSelectionContext(const QJsonObject& context);
     void approvePlannerConfirmation(const QString& commandText);
     void dismissPlannerConfirmation(const QString& commandText);
+    void handleAgentConnectionProfileSelected(const QString& profileName);
+    void handleAgentConnectionModeSelected(const QString& mode);
+    void handleAgentConnectionModelSelected(const QString& model);
 
 private:
     IRawDataView* activeRawDataView() const;
@@ -206,6 +209,7 @@ private:
     void loadAgentSettings();
     void persistAgentSettings() const;
     void refreshAgentPlannerStatus();
+    void refreshAgentConnectionSelectors();
     QJsonObject buildRawWindowArguments(int windowSamples) const;
     void sendKernelToolCall(const QString& toolName, const QJsonObject& arguments);
     void sendExtensionToolCall(const QString& toolName, const QJsonObject& arguments);

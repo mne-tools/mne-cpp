@@ -54,6 +54,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QPlainTextEdit>
+#include <QProcess>
 #include <QPushButton>
 #include <QSettings>
 #include <QTableWidget>
@@ -88,6 +89,88 @@ const char* kExtensionSocketName = "mne_analyze_studio.extension_host";
 const char* kWorkspaceArtifactRoot = "__mne_analyze_studio_analysis_root__";
 const char* kWorkspaceArtifactEntry = "__mne_analyze_studio_analysis_entry__";
 const char* kWorkspaceArtifactStepEntry = "__mne_analyze_studio_analysis_step_entry__";
+
+#ifdef Q_OS_MACOS
+QString llmKeychainService()
+{
+    return QString("org.mnecpp.mne_analyze_studio.llm");
+}
+
+QString readSecretFromKeychain(const QString& accountName)
+{
+    if(accountName.trimmed().isEmpty()) {
+        return QString();
+    }
+
+    QProcess process;
+    process.start("/usr/bin/security",
+                  QStringList() << "find-generic-password"
+                                << "-s" << llmKeychainService()
+                                << "-a" << accountName.trimmed()
+                                << "-w");
+    process.waitForFinished();
+    if(process.exitStatus() != QProcess::NormalExit || process.exitCode() != 0) {
+        return QString();
+    }
+
+    return QString::fromUtf8(process.readAllStandardOutput()).trimmed();
+}
+
+bool writeSecretToKeychain(const QString& accountName, const QString& secret)
+{
+    if(accountName.trimmed().isEmpty()) {
+        return false;
+    }
+
+    QProcess process;
+    process.start("/usr/bin/security",
+                  QStringList() << "add-generic-password"
+                                << "-U"
+                                << "-s" << llmKeychainService()
+                                << "-a" << accountName.trimmed()
+                                << "-w" << secret);
+    process.waitForFinished();
+    return process.exitStatus() == QProcess::NormalExit && process.exitCode() == 0;
+}
+
+void deleteSecretFromKeychain(const QString& accountName)
+{
+    if(accountName.trimmed().isEmpty()) {
+        return;
+    }
+
+    QProcess process;
+    process.start("/usr/bin/security",
+                  QStringList() << "delete-generic-password"
+                                << "-s" << llmKeychainService()
+                                << "-a" << accountName.trimmed());
+    process.waitForFinished();
+}
+#else
+QString readSecretFromKeychain(const QString&)
+{
+    return QString();
+}
+
+bool writeSecretToKeychain(const QString&, const QString&)
+{
+    return false;
+}
+
+void deleteSecretFromKeychain(const QString&)
+{
+}
+#endif
+
+QString activeAgentSecretAccountName()
+{
+    return QString("active");
+}
+
+QString providerSecretAccountName(const QString& profileName)
+{
+    return QString("profile:%1").arg(profileName.trimmed());
+}
 
 QString extensionSettingsToolName(const QString& extensionId,
                                   const QString& tabId,
@@ -750,6 +833,10 @@ void MainWindow::createConnections()
     connect(m_agentChatDock, &AgentChatDockWidget::commandSubmitted, this, &MainWindow::sendToolCall);
     connect(m_agentChatDock, &AgentChatDockWidget::confirmationRequested, this, &MainWindow::approvePlannerConfirmation);
     connect(m_agentChatDock, &AgentChatDockWidget::confirmationDismissed, this, &MainWindow::dismissPlannerConfirmation);
+    connect(m_agentChatDock, &AgentChatDockWidget::connectionProfileSelected, this, &MainWindow::handleAgentConnectionProfileSelected);
+    connect(m_agentChatDock, &AgentChatDockWidget::connectionModeSelected, this, &MainWindow::handleAgentConnectionModeSelected);
+    connect(m_agentChatDock, &AgentChatDockWidget::connectionModelSelected, this, &MainWindow::handleAgentConnectionModelSelected);
+    connect(m_agentChatDock, &AgentChatDockWidget::openConnectionSettingsRequested, this, &MainWindow::openAgentSettings);
     connect(m_explorerButton, &QToolButton::clicked, this, [this]() {
         switchPrimarySidebar("workspace");
     });
@@ -5547,6 +5634,7 @@ void MainWindow::openAgentSettings()
     m_llmPlanner.setConfiguration(dialog.configuration());
     persistAgentSettings();
     refreshAgentPlannerStatus();
+    refreshAgentConnectionSelectors();
     appendOutputMessage("Updated agent planner settings.");
     appendTerminalMessage("> Updated agent planner settings.");
 }
@@ -5558,9 +5646,13 @@ void MainWindow::loadAgentSettings()
     config.mode = settings.value("agent/mode").toString();
     config.providerName = settings.value("agent/provider").toString();
     config.endpoint = settings.value("agent/endpoint").toString();
-    config.apiKey = settings.value("agent/api_key").toString();
+    const QString storedApiKey = readSecretFromKeychain(activeAgentSecretAccountName());
+    config.apiKey = storedApiKey.isEmpty()
+        ? settings.value("agent/api_key").toString()
+        : storedApiKey;
     config.model = settings.value("agent/model").toString();
     m_llmPlanner.setConfiguration(config);
+    refreshAgentConnectionSelectors();
 }
 
 void MainWindow::persistAgentSettings() const
@@ -5570,13 +5662,147 @@ void MainWindow::persistAgentSettings() const
     settings.setValue("agent/mode", config.mode);
     settings.setValue("agent/provider", config.providerName);
     settings.setValue("agent/endpoint", config.endpoint);
-    settings.setValue("agent/api_key", config.apiKey);
+    if(!config.apiKey.trimmed().isEmpty() && writeSecretToKeychain(activeAgentSecretAccountName(), config.apiKey.trimmed())) {
+        settings.remove("agent/api_key");
+    } else {
+        if(config.apiKey.trimmed().isEmpty()) {
+            deleteSecretFromKeychain(activeAgentSecretAccountName());
+        }
+        settings.setValue("agent/api_key", config.apiKey);
+    }
     settings.setValue("agent/model", config.model);
 }
 
 void MainWindow::refreshAgentPlannerStatus()
 {
     m_agentChatDock->setPlannerStatus(m_llmPlanner.statusSummary());
+}
+
+void MainWindow::refreshAgentConnectionSelectors()
+{
+    if(!m_agentChatDock) {
+        return;
+    }
+
+    QList<QPair<QString, QString>> modes;
+    modes << qMakePair(QString("Disabled"), QString("disabled"))
+          << qMakePair(QString("Mock"), QString("mock"))
+          << qMakePair(QString("OpenAI"), QString("openai_responses"))
+          << qMakePair(QString("Gemini"), QString("gemini_openai"))
+          << qMakePair(QString("GitHub Models"), QString("github_models"))
+          << qMakePair(QString("Claude"), QString("anthropic_messages"))
+          << qMakePair(QString("Compatible HTTP"), QString("http"));
+    m_agentChatDock->setConnectionModes(modes, m_llmPlanner.configuration().mode);
+
+    const QString currentMode = m_llmPlanner.configuration().mode.trimmed();
+    QStringList suggestedModels;
+    if(currentMode == QLatin1String("openai_responses")) {
+        suggestedModels << "gpt-5-mini" << "gpt-5" << "gpt-4.1-mini";
+    } else if(currentMode == QLatin1String("gemini_openai")) {
+        suggestedModels << "gemini-2.5-flash" << "gemini-2.5-pro" << "gemini-2.0-flash";
+    } else if(currentMode == QLatin1String("github_models")) {
+        suggestedModels << "openai/gpt-4.1-mini" << "openai/gpt-4.1" << "anthropic/claude-sonnet-4";
+    } else if(currentMode == QLatin1String("anthropic_messages")) {
+        suggestedModels << "claude-sonnet-4-5" << "claude-opus-4-1" << "claude-haiku-3-5";
+    } else if(currentMode == QLatin1String("http")) {
+        suggestedModels << "gpt-4.1-mini" << "llama3.1:8b" << "qwen2.5-coder:7b";
+    }
+    m_agentChatDock->setSuggestedModels(suggestedModels, m_llmPlanner.configuration().model);
+
+    QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
+    settings.beginGroup("agent/profiles");
+    const QStringList profiles = settings.childGroups();
+    settings.endGroup();
+    m_agentChatDock->setConnectionProfiles(profiles, settings.value("agent/selected_profile").toString());
+
+    const LlmPlannerConfig config = m_llmPlanner.configuration();
+    const bool localMode = currentMode == QLatin1String("disabled")
+                           || currentMode == QLatin1String("mock");
+    const bool needsEndpoint = currentMode == QLatin1String("http");
+    const bool missingKey = !localMode
+                            && config.apiKey.trimmed().isEmpty();
+    const bool missingModel = !localMode
+                              && config.model.trimmed().isEmpty();
+    const bool missingEndpoint = needsEndpoint
+                                 && config.endpoint.trimmed().isEmpty();
+
+    QString stateText = QString("Ready");
+    bool warning = false;
+    if(localMode) {
+        stateText = currentMode == QLatin1String("mock") ? QString("Mock") : QString("Local");
+    } else if(missingKey) {
+        stateText = QString("Missing key");
+        warning = true;
+    } else if(missingModel) {
+        stateText = QString("Pick model");
+        warning = true;
+    } else if(missingEndpoint) {
+        stateText = QString("Set endpoint");
+        warning = true;
+    }
+
+    m_agentChatDock->setConnectionState(stateText, warning);
+}
+
+void MainWindow::handleAgentConnectionProfileSelected(const QString& profileName)
+{
+    const QString trimmedProfile = profileName.trimmed();
+    if(trimmedProfile.isEmpty() || trimmedProfile == QLatin1String("No Profile")) {
+        return;
+    }
+
+    QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
+    const QString baseKey = QString("agent/profiles/%1").arg(trimmedProfile);
+    LlmPlannerConfig config = m_llmPlanner.configuration();
+    config.mode = settings.value(QString("%1/mode").arg(baseKey), config.mode).toString();
+    config.providerName = settings.value(QString("%1/provider").arg(baseKey), config.providerName).toString();
+    config.endpoint = settings.value(QString("%1/endpoint").arg(baseKey), config.endpoint).toString();
+    const QString storedApiKey = readSecretFromKeychain(providerSecretAccountName(trimmedProfile));
+    config.apiKey = storedApiKey.isEmpty()
+        ? settings.value(QString("%1/api_key").arg(baseKey), config.apiKey).toString()
+        : storedApiKey;
+    config.model = settings.value(QString("%1/model").arg(baseKey), config.model).toString();
+    settings.setValue("agent/selected_profile", trimmedProfile);
+    m_llmPlanner.setConfiguration(config);
+    persistAgentSettings();
+    refreshAgentPlannerStatus();
+    refreshAgentConnectionSelectors();
+}
+
+void MainWindow::handleAgentConnectionModeSelected(const QString& mode)
+{
+    if(mode.trimmed().isEmpty()) {
+        return;
+    }
+
+    LlmPlannerConfig config = m_llmPlanner.configuration();
+    if(config.mode == mode) {
+        return;
+    }
+
+    config.mode = mode;
+    m_llmPlanner.setConfiguration(config);
+    persistAgentSettings();
+    refreshAgentPlannerStatus();
+    refreshAgentConnectionSelectors();
+}
+
+void MainWindow::handleAgentConnectionModelSelected(const QString& model)
+{
+    const QString trimmedModel = model.trimmed();
+    if(trimmedModel.isEmpty()) {
+        return;
+    }
+
+    LlmPlannerConfig config = m_llmPlanner.configuration();
+    if(config.model == trimmedModel) {
+        return;
+    }
+
+    config.model = trimmedModel;
+    m_llmPlanner.setConfiguration(config);
+    persistAgentSettings();
+    refreshAgentPlannerStatus();
 }
 
 void MainWindow::reloadExtensionRegistry()

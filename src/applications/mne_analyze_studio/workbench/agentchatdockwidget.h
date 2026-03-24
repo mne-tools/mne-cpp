@@ -40,6 +40,7 @@ class QLineEdit;
 class QLabel;
 class QPushButton;
 class QTextEdit;
+class QComboBox;
 class QVBoxLayout;
 class QWidget;
 
@@ -56,11 +57,19 @@ class AgentChatDockWidget : public QWidget
 public:
     explicit AgentChatDockWidget(QWidget* parent = nullptr);
     void setPlannerStatus(const QString& statusText);
+    void setConnectionProfiles(const QStringList& profiles, const QString& currentProfile);
+    void setConnectionModes(const QList<QPair<QString, QString>>& modes, const QString& currentMode);
+    void setSuggestedModels(const QStringList& models, const QString& currentModel);
+    void setConnectionState(const QString& stateText, bool warning);
 
 signals:
     void commandSubmitted(const QString& commandText);
     void confirmationRequested(const QString& commandText);
     void confirmationDismissed(const QString& commandText);
+    void connectionProfileSelected(const QString& profileName);
+    void connectionModeSelected(const QString& mode);
+    void connectionModelSelected(const QString& model);
+    void openConnectionSettingsRequested();
 
 public slots:
     void appendTranscript(const QString& text);
@@ -69,6 +78,13 @@ public slots:
 private:
     QLabel* m_titleLabel;
     QLabel* m_statusLabel;
+    QLabel* m_connectionLabel;
+    QLabel* m_connectionHintLabel;
+    QComboBox* m_profileComboBox;
+    QComboBox* m_modeComboBox;
+    QComboBox* m_modelComboBox;
+    QLabel* m_connectionStateLabel;
+    QPushButton* m_connectionSettingsButton;
     QLabel* m_confirmationLabel;
     QWidget* m_confirmationPanel;
     QVBoxLayout* m_confirmationLayout;

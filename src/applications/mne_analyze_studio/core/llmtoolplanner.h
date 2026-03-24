@@ -91,6 +91,7 @@ private:
     QString configOrEnv(const QString& configuredValue, const char* envName) const;
     QString mode() const;
     bool isOpenAIResponsesMode() const;
+    bool isGeminiOpenAICompatMode() const;
     bool isGitHubModelsMode() const;
     bool isAnthropicMessagesMode() const;
     QString endpoint() const;
