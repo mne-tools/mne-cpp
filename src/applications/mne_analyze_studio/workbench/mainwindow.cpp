@@ -700,6 +700,8 @@ void MainWindow::openInitialFiles(const QStringList& filePaths)
 QWidget* MainWindow::createSidebarSection(const QString& title, QWidget* contentWidget)
 {
     QWidget* container = new QWidget(this);
+    container->setSizePolicy(contentWidget->sizePolicy());
+    container->setMaximumWidth(QWIDGETSIZE_MAX);
     QVBoxLayout* layout = new QVBoxLayout(container);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -785,15 +787,18 @@ void MainWindow::createLayout()
     leftSidebarLayout->addWidget(m_leftSidebarStack, 1);
 
     QWidget* leftPanel = createSidebarSection("Primary Sidebar", leftSidebar);
+    leftPanel->setMinimumWidth(220);
 
     m_centerTabs->setDocumentMode(true);
     m_centerTabs->setTabsClosable(true);
     m_centerTabs->setMovable(true);
     m_centerTabs->setTabBar(m_centerTabBar);
     m_centerTabs->tabBar()->setExpanding(false);
+    m_centerTabs->setMinimumWidth(0);
 
     m_bottomPanelTabs->setDocumentMode(true);
     m_bottomPanelTabs->setMovable(false);
+    m_bottomPanelTabs->setMinimumWidth(0);
     m_bottomPanelTabs->addTab(m_outputPanel, "Output");
     m_bottomPanelTabs->addTab(m_problemPanel, "Problems");
     m_bottomPanelTabs->addTab(m_resultsTab, "Results");
@@ -813,7 +818,7 @@ void MainWindow::createLayout()
     m_resultsTree->setColumnCount(2);
     m_resultsTree->setHeaderLabels(QStringList() << "Field" << "Value");
     m_resultsTree->setAlternatingRowColors(true);
-    m_resultsTitleLabel->setObjectName("terminalStatusLabel");
+    m_resultsTitleLabel->setObjectName("resultsMetaLabel");
     m_resultsStack->addWidget(m_resultsTree);
     m_resultsStack->addWidget(m_resultsTable);
 
@@ -824,7 +829,7 @@ void MainWindow::createLayout()
     resultsHistoryLayout->setContentsMargins(0, 0, 0, 0);
     resultsHistoryLayout->setSpacing(8);
     QLabel* resultsHistoryLabel = new QLabel("Recent Results", m_resultsTab);
-    resultsHistoryLabel->setObjectName("terminalStatusLabel");
+    resultsHistoryLabel->setObjectName("resultsSectionLabel");
     resultsHistoryLayout->addWidget(resultsHistoryLabel);
     resultsHistoryLayout->addWidget(m_resultsHistoryCombo, 1);
     resultsLayout->addLayout(resultsHistoryLayout);
@@ -852,9 +857,14 @@ void MainWindow::createLayout()
 
     QWidget* activitySection = createSidebarSection("Panel", m_bottomPanelTabs);
     QWidget* chatSection = createSidebarSection("Coworker", m_agentChatDock);
+    activitySection->setMinimumWidth(0);
+    chatSection->setMinimumWidth(380);
+    chatSection->setMaximumWidth(QWIDGETSIZE_MAX);
+    chatSection->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
 
     m_centerSplitter->addWidget(m_centerTabs);
     m_centerSplitter->addWidget(activitySection);
+    m_centerSplitter->setMinimumWidth(0);
     m_centerSplitter->setStretchFactor(0, 1);
     m_centerSplitter->setStretchFactor(1, 0);
     m_centerSplitter->setSizes({700, 180});
@@ -862,10 +872,12 @@ void MainWindow::createLayout()
     m_mainSplitter->addWidget(leftPanel);
     m_mainSplitter->addWidget(m_centerSplitter);
     m_mainSplitter->addWidget(chatSection);
+    m_mainSplitter->setChildrenCollapsible(false);
+    m_mainSplitter->setHandleWidth(14);
     m_mainSplitter->setStretchFactor(0, 0);
     m_mainSplitter->setStretchFactor(1, 1);
-    m_mainSplitter->setStretchFactor(2, 0);
-    m_mainSplitter->setSizes({280, 860, 320});
+    m_mainSplitter->setStretchFactor(2, 2);
+    m_mainSplitter->setSizes({220, 560, 640});
 
     QHBoxLayout* rootLayout = new QHBoxLayout(m_rootWidget);
     rootLayout->setContentsMargins(0, 0, 0, 0);
@@ -1871,6 +1883,8 @@ void MainWindow::applyWorkbenchStyle()
         "QTreeWidget, QListWidget, QTextEdit, QLineEdit, QTabWidget::pane {"
         "  background: #22272e; color: #d7dce2; border: none; }"
         "#terminalStatusLabel { background: #181c22; color: #8b949e; padding: 6px 8px; border: 1px solid #30363d; }"
+        "#resultsSectionLabel { color: #c9d1d9; font-weight: 600; padding: 0; background: transparent; border: none; }"
+        "#resultsMetaLabel { color: #8b949e; padding: 2px 0 6px 0; background: transparent; border: none; }"
         "QTreeWidget, QListWidget { alternate-background-color: #262c34; }"
         "QTreeWidget::item:selected, QListWidget::item:selected { background: #2f81f7; color: white; }"
         "QTabBar::tab { background: #181c22; color: #9da7b3; padding: 8px 12px; border: none; }"
@@ -5874,7 +5888,8 @@ void MainWindow::runSelectedSkillTool()
 
 void MainWindow::openAgentSettings()
 {
-    LlmSettingsDialog dialog(m_llmPlanner.configuration(), this);
+    const LlmPlannerConfig previousConfig = m_llmPlanner.configuration();
+    LlmSettingsDialog dialog(previousConfig, this);
     dialog.setTestScenario("go to the strongest EEG burst and then show me the top EEG channels there",
                            plannerReadyToolDefinitions(),
                            llmPlanningContext("planner settings test"));
@@ -5882,8 +5897,18 @@ void MainWindow::openAgentSettings()
         return;
     }
 
-    m_llmPlanner.setConfiguration(dialog.configuration());
+    const LlmPlannerConfig updatedConfig = dialog.configuration();
+    m_llmPlanner.setConfiguration(updatedConfig);
     persistAgentSettings();
+    if(dialog.hasValidationResult()) {
+        persistAgentValidationState(true, dialog.lastValidationSucceeded(), dialog.lastValidationMessage());
+    } else if(previousConfig.mode != updatedConfig.mode
+              || previousConfig.apiKey != updatedConfig.apiKey
+              || previousConfig.model != updatedConfig.model
+              || previousConfig.endpoint != updatedConfig.endpoint
+              || previousConfig.providerName != updatedConfig.providerName) {
+        persistAgentValidationState(false, false, QString());
+    }
     refreshAgentPlannerStatus();
     refreshAgentConnectionSelectors();
     appendOutputMessage("Updated agent planner settings.");
@@ -5924,6 +5949,14 @@ void MainWindow::persistAgentSettings() const
     settings.setValue("agent/model", config.model);
 }
 
+void MainWindow::persistAgentValidationState(bool hasResult, bool succeeded, const QString& message) const
+{
+    QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
+    settings.setValue("agent/validation/has_result", hasResult);
+    settings.setValue("agent/validation/succeeded", succeeded);
+    settings.setValue("agent/validation/message", message.trimmed());
+}
+
 void MainWindow::refreshAgentPlannerStatus()
 {
     m_agentChatDock->setPlannerStatus(m_llmPlanner.statusSummary());
@@ -5936,29 +5969,24 @@ void MainWindow::refreshAgentConnectionSelectors()
     }
 
     QList<QPair<QString, QString>> modes;
-    modes << qMakePair(QString("Disabled"), QString("disabled"))
-          << qMakePair(QString("Mock"), QString("mock"))
+    modes << qMakePair(QString("Rule-Based"), QString("disabled"))
           << qMakePair(QString("OpenAI"), QString("openai_responses"))
-          << qMakePair(QString("Gemini"), QString("gemini_openai"))
-          << qMakePair(QString("GitHub Models"), QString("github_models"))
-          << qMakePair(QString("Claude"), QString("anthropic_messages"))
-          << qMakePair(QString("Compatible HTTP"), QString("http"));
+          << qMakePair(QString("Gemini"), QString("gemini_openai"));
     m_agentChatDock->setConnectionModes(modes, m_llmPlanner.configuration().mode);
 
-    const QString currentMode = m_llmPlanner.configuration().mode.trimmed();
-    QStringList suggestedModels;
+    const LlmPlannerConfig config = m_llmPlanner.configuration();
+    const QString currentMode = config.mode.trimmed();
+    QStringList modelChoices;
     if(currentMode == QLatin1String("openai_responses")) {
-        suggestedModels << "gpt-5-mini" << "gpt-5" << "gpt-4.1-mini";
+        modelChoices << "gpt-5-mini" << "gpt-5" << "gpt-4.1-mini";
     } else if(currentMode == QLatin1String("gemini_openai")) {
-        suggestedModels << "gemini-2.5-flash" << "gemini-2.5-pro" << "gemini-2.0-flash";
-    } else if(currentMode == QLatin1String("github_models")) {
-        suggestedModels << "openai/gpt-4.1-mini" << "openai/gpt-4.1" << "anthropic/claude-sonnet-4";
-    } else if(currentMode == QLatin1String("anthropic_messages")) {
-        suggestedModels << "claude-sonnet-4-5" << "claude-opus-4-1" << "claude-haiku-3-5";
-    } else if(currentMode == QLatin1String("http")) {
-        suggestedModels << "gpt-4.1-mini" << "llama3.1:8b" << "qwen2.5-coder:7b";
+        modelChoices << "gemini-2.5-flash" << "gemini-2.5-pro" << "gemini-2.0-flash";
     }
-    m_agentChatDock->setSuggestedModels(suggestedModels, m_llmPlanner.configuration().model);
+    const QString currentModel = config.model.trimmed();
+    if(!currentModel.isEmpty() && !modelChoices.contains(currentModel)) {
+        modelChoices.prepend(currentModel);
+    }
+    m_agentChatDock->setSuggestedModels(modelChoices, currentModel);
 
     QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
     settings.beginGroup("agent/profiles");
@@ -5966,7 +5994,6 @@ void MainWindow::refreshAgentConnectionSelectors()
     settings.endGroup();
     m_agentChatDock->setConnectionProfiles(profiles, settings.value("agent/selected_profile").toString());
 
-    const LlmPlannerConfig config = m_llmPlanner.configuration();
     const bool localMode = currentMode == QLatin1String("disabled")
                            || currentMode == QLatin1String("mock");
     const bool needsEndpoint = currentMode == QLatin1String("http");
@@ -5977,22 +6004,41 @@ void MainWindow::refreshAgentConnectionSelectors()
     const bool missingEndpoint = needsEndpoint
                                  && config.endpoint.trimmed().isEmpty();
 
-    QString stateText = QString("Ready");
+    const bool hasValidationResult = settings.value("agent/validation/has_result", false).toBool();
+    const bool validationSucceeded = settings.value("agent/validation/succeeded", false).toBool();
+    const QString validationMessage = settings.value("agent/validation/message").toString().trimmed();
+
+    QString stateText = QString("Connected");
     bool warning = false;
+    QString detailMessage;
     if(localMode) {
-        stateText = currentMode == QLatin1String("mock") ? QString("Mock") : QString("Local");
+        stateText = QString("Rule-based");
+        warning = true;
     } else if(missingKey) {
-        stateText = QString("Missing key");
+        stateText = QString("Connect");
         warning = true;
+        detailMessage = QString("Add an API key in Connect Model to use %1.").arg(currentMode == QLatin1String("gemini_openai") ? QString("Gemini") : QString("OpenAI"));
     } else if(missingModel) {
-        stateText = QString("Pick model");
+        stateText = QString("Choose model");
         warning = true;
+        detailMessage = QString("Pick a model for the selected provider.");
     } else if(missingEndpoint) {
-        stateText = QString("Set endpoint");
+        stateText = QString("Configure");
         warning = true;
+        detailMessage = QString("Complete the provider setup before validating the connection.");
+    } else if(!hasValidationResult) {
+        stateText = QString("Needs validation");
+        warning = true;
+        detailMessage = QString("Open Connect Model and run Validate Connection.");
+    } else if(!validationSucceeded) {
+        stateText = QString("Validation failed");
+        warning = true;
+        detailMessage = validationMessage;
+    } else if(validationSucceeded) {
+        detailMessage = validationMessage.isEmpty() ? QString("Connection validated successfully.") : validationMessage;
     }
 
-    m_agentChatDock->setConnectionState(stateText, warning);
+    m_agentChatDock->setConnectionState(stateText, warning, detailMessage);
 }
 
 void MainWindow::handleAgentConnectionProfileSelected(const QString& profileName)
@@ -6016,6 +6062,7 @@ void MainWindow::handleAgentConnectionProfileSelected(const QString& profileName
     settings.setValue("agent/selected_profile", trimmedProfile);
     m_llmPlanner.setConfiguration(config);
     persistAgentSettings();
+    persistAgentValidationState(false, false, QString());
     refreshAgentPlannerStatus();
     refreshAgentConnectionSelectors();
 }
@@ -6032,8 +6079,20 @@ void MainWindow::handleAgentConnectionModeSelected(const QString& mode)
     }
 
     config.mode = mode;
+    config.model.clear();
+    if(mode == QLatin1String("openai_responses")) {
+        config.providerName = QString("OpenAI");
+        config.endpoint = QString("https://api.openai.com/v1/responses");
+    } else if(mode == QLatin1String("gemini_openai")) {
+        config.providerName = QString("Google Gemini");
+        config.endpoint = QString("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions");
+    } else {
+        config.providerName = QString("Rule-Based");
+        config.endpoint.clear();
+    }
     m_llmPlanner.setConfiguration(config);
     persistAgentSettings();
+    persistAgentValidationState(false, false, QString());
     refreshAgentPlannerStatus();
     refreshAgentConnectionSelectors();
 }
@@ -6053,7 +6112,9 @@ void MainWindow::handleAgentConnectionModelSelected(const QString& model)
     config.model = trimmedModel;
     m_llmPlanner.setConfiguration(config);
     persistAgentSettings();
+    persistAgentValidationState(false, false, QString());
     refreshAgentPlannerStatus();
+    refreshAgentConnectionSelectors();
 }
 
 void MainWindow::reloadExtensionRegistry()
@@ -6687,6 +6748,24 @@ void MainWindow::restoreWorkspace()
     }
     refreshPlannerConfirmationsUi();
 
+    QJsonArray currentConversationEntries;
+    QJsonArray archivedConversationSessions;
+    const QByteArray currentConversationPayload = settings.value("workspace/current_conversation_entries").toByteArray();
+    if(!currentConversationPayload.isEmpty()) {
+        const QJsonDocument document = QJsonDocument::fromJson(currentConversationPayload);
+        if(document.isArray()) {
+            currentConversationEntries = document.array();
+        }
+    }
+    const QByteArray archivedConversationPayload = settings.value("workspace/archived_conversation_sessions").toByteArray();
+    if(!archivedConversationPayload.isEmpty()) {
+        const QJsonDocument document = QJsonDocument::fromJson(archivedConversationPayload);
+        if(document.isArray()) {
+            archivedConversationSessions = document.array();
+        }
+    }
+    m_agentChatDock->restoreConversationState(currentConversationEntries, archivedConversationSessions);
+
     const QStringList workspaceFiles = settings.value("workspace/files").toStringList();
     const QStringList workspaceDirectories = settings.value("workspace/directories").toStringList();
     for(const QString& directoryPath : workspaceDirectories) {
@@ -6757,6 +6836,13 @@ void MainWindow::persistWorkspace() const
                       QJsonDocument(m_pendingPlannerConfirmations).toJson(QJsonDocument::Compact));
     settings.setValue("workspace/result_selection_context",
                       QJsonDocument(m_resultSelectionContext).toJson(QJsonDocument::Compact));
+
+    const QJsonArray currentConversationEntries = m_agentChatDock ? m_agentChatDock->currentConversationEntries() : QJsonArray();
+    const QJsonArray archivedConversationSessions = m_agentChatDock ? m_agentChatDock->archivedConversationSessions() : QJsonArray();
+
+    settings.setValue("workspace/current_conversation_entries", QJsonDocument(currentConversationEntries).toJson(QJsonDocument::Compact));
+    settings.setValue("workspace/archived_conversation_sessions",
+                      QJsonDocument(archivedConversationSessions).toJson(QJsonDocument::Compact));
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)

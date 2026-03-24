@@ -20,6 +20,7 @@ set(SOURCES
     llmsettingsdialog.cpp
     main.cpp
     mainwindow.cpp
+    pillselectorwidget.cpp
 )
 
 set(HEADERS
@@ -31,6 +32,7 @@ set(HEADERS
     editortabwidget.h
     llmsettingsdialog.h
     mainwindow.h
+    pillselectorwidget.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
