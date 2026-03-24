@@ -209,6 +209,7 @@ private:
     void openAgentSettings();
     void loadAgentSettings();
     void persistAgentSettings() const;
+    void persistAgentValidationState(bool hasResult, bool succeeded, const QString& message) const;
     void refreshAgentPlannerStatus();
     void refreshAgentConnectionSelectors();
     QJsonObject buildRawWindowArguments(int windowSamples) const;

@@ -37,7 +37,6 @@
 
 #include <QDialog>
 
-class QComboBox;
 class QLabel;
 class QLineEdit;
 class QNetworkAccessManager;
@@ -48,6 +47,8 @@ class QTextBrowser;
 namespace MNEANALYZESTUDIO
 {
 
+class PillSelectorWidget;
+
 class LlmSettingsDialog : public QDialog
 {
     Q_OBJECT
@@ -56,6 +57,9 @@ public:
     explicit LlmSettingsDialog(const LlmPlannerConfig& config, QWidget* parent = nullptr);
 
     LlmPlannerConfig configuration() const;
+    bool hasValidationResult() const;
+    bool lastValidationSucceeded() const;
+    QString lastValidationMessage() const;
     void setTestScenario(const QString& prompt,
                          const QJsonArray& toolDefinitions,
                          const QJsonObject& context);
@@ -65,8 +69,9 @@ private slots:
     void updateModeDefaults();
     void saveCurrentProfile();
     void deleteCurrentProfile();
-    void applySelectedProfile(int index);
+    void applySelectedProfile(const QString& profileName);
     void applySuggestedModel();
+    void editModelManually();
     void browseModels();
     void openProviderConsole();
     void openProviderDocs();
@@ -75,18 +80,18 @@ private:
     void refreshProfiles();
     void refreshSuggestedModels();
     void refreshProviderInstructions();
+    void updateDialogVisibility();
     QString resolvedEndpointForMode(const QString& mode) const;
     QStringList fetchAvailableModels(QString* errorMessage = nullptr) const;
 
-    QComboBox* m_profileComboBox;
+    PillSelectorWidget* m_profileSelector;
     QPushButton* m_saveProfileButton;
     QPushButton* m_deleteProfileButton;
-    QComboBox* m_modeComboBox;
-    QLineEdit* m_providerLineEdit;
-    QLineEdit* m_endpointLineEdit;
+    PillSelectorWidget* m_modeSelector;
     QLineEdit* m_modelLineEdit;
     QLineEdit* m_apiKeyLineEdit;
-    QComboBox* m_suggestedModelComboBox;
+    PillSelectorWidget* m_suggestedModelSelector;
+    QPushButton* m_editModelButton;
     QPushButton* m_applySuggestedModelButton;
     QPushButton* m_browseModelsButton;
     QTextBrowser* m_providerInstructionsView;
@@ -95,6 +100,10 @@ private:
     QTextEdit* m_toolInventoryView;
     QLabel* m_testStatusLabel;
     QPushButton* m_testButton;
+    bool m_hasValidationResult = false;
+    bool m_lastValidationSucceeded = false;
+    QString m_lastValidationMessage;
+    QString m_lastAppliedMode;
     QString m_testPrompt;
     QJsonArray m_testToolDefinitions;
     QJsonObject m_testContext;

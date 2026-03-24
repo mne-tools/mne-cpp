@@ -39,13 +39,18 @@
 class QLineEdit;
 class QLabel;
 class QPushButton;
+class QScrollArea;
+class QStackedWidget;
+class QTabWidget;
 class QTextEdit;
-class QComboBox;
 class QVBoxLayout;
+class QFrame;
 class QWidget;
 
 namespace MNEANALYZESTUDIO
 {
+
+class PillSelectorWidget;
 
 /**
  * @brief Sidebar chat widget that captures agent prompts and displays transcript history.
@@ -60,7 +65,10 @@ public:
     void setConnectionProfiles(const QStringList& profiles, const QString& currentProfile);
     void setConnectionModes(const QList<QPair<QString, QString>>& modes, const QString& currentMode);
     void setSuggestedModels(const QStringList& models, const QString& currentModel);
-    void setConnectionState(const QString& stateText, bool warning);
+    void setConnectionState(const QString& stateText, bool warning, const QString& detailMessage = QString());
+    QJsonArray archivedConversationSessions() const;
+    QJsonArray currentConversationEntries() const;
+    void restoreConversationState(const QJsonArray& currentEntries, const QJsonArray& archivedSessions);
 
 signals:
     void commandSubmitted(const QString& commandText);
@@ -76,21 +84,49 @@ public slots:
     void setPendingConfirmations(const QJsonArray& confirmations);
 
 private:
+    void archiveCurrentConversation();
+    void refreshCurrentTranscriptView();
+    void refreshArchivedSessions();
+    void refreshArchivedSessionView();
+    void showCurrentConversation();
+    void showArchivedSessionList();
+    void showArchivedSession(int index);
+
+    QFrame* m_transcriptPanel;
+    QTabWidget* m_conversationTabs;
+    QWidget* m_currentConversationPage;
+    QWidget* m_priorSessionsPage;
     QLabel* m_titleLabel;
     QLabel* m_statusLabel;
-    QLabel* m_connectionLabel;
+    QLabel* m_currentConversationLabel;
+    QLabel* m_archivedConversationLabel;
+    QLabel* m_transcriptContextLabel;
+    QLabel* m_archivedTranscriptContextLabel;
     QLabel* m_connectionHintLabel;
-    QComboBox* m_profileComboBox;
-    QComboBox* m_modeComboBox;
-    QComboBox* m_modelComboBox;
+    QLabel* m_validationHintLabel;
+    PillSelectorWidget* m_profileSelector;
+    PillSelectorWidget* m_modeSelector;
+    PillSelectorWidget* m_modelSelector;
     QLabel* m_connectionStateLabel;
     QPushButton* m_connectionSettingsButton;
     QLabel* m_confirmationLabel;
     QWidget* m_confirmationPanel;
     QVBoxLayout* m_confirmationLayout;
+    QStackedWidget* m_archivedSessionsStack;
+    QWidget* m_archivedSessionsListPage;
+    QWidget* m_archivedSessionViewerPage;
+    QScrollArea* m_archivedSessionsScrollArea;
+    QWidget* m_archivedSessionsPanel;
+    QVBoxLayout* m_archivedSessionsLayout;
     QTextEdit* m_transcript;
+    QTextEdit* m_archivedTranscript;
+    QPushButton* m_backToSessionsButton;
     QLineEdit* m_input;
     QPushButton* m_sendButton;
+    QJsonArray m_pendingConfirmations;
+    QJsonArray m_currentConversationEntries;
+    QJsonArray m_archivedConversationSessions;
+    int m_activeArchivedSessionIndex = -1;
 };
 
 } // namespace MNEANALYZESTUDIO
