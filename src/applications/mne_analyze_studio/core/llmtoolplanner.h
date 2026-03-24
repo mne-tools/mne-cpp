@@ -88,6 +88,7 @@ public:
 private:
     QString configOrEnv(const QString& configuredValue, const char* envName) const;
     QString mode() const;
+    bool isOpenAIResponsesMode() const;
     QString endpoint() const;
     QString apiKey() const;
     QString model() const;

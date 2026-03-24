@@ -129,7 +129,15 @@ LlmPlannerConfig LlmToolPlanner::configuration() const
 
 bool LlmToolPlanner::isConfigured() const
 {
-    return isMockMode() || (!endpoint().isEmpty() && !model().isEmpty());
+    if(isMockMode()) {
+        return true;
+    }
+
+    if(isOpenAIResponsesMode()) {
+        return !apiKey().isEmpty() && !model().isEmpty();
+    }
+
+    return !endpoint().isEmpty() && !model().isEmpty();
 }
 
 bool LlmToolPlanner::isMockMode() const
@@ -140,7 +148,15 @@ bool LlmToolPlanner::isMockMode() const
 QString LlmToolPlanner::providerName() const
 {
     const QString configured = configOrEnv(m_config.providerName, "MNE_ANALYZE_STUDIO_LLM_PROVIDER");
-    return configured.isEmpty() ? QString("openai-compatible") : configured;
+    if(!configured.isEmpty()) {
+        return configured;
+    }
+
+    if(isOpenAIResponsesMode()) {
+        return QString("OpenAI");
+    }
+
+    return QString("openai-compatible");
 }
 
 QString LlmToolPlanner::statusSummary() const
@@ -150,8 +166,13 @@ QString LlmToolPlanner::statusSummary() const
     }
 
     if(isConfigured()) {
-        return QString("LLM: Connected | Provider: %1 | Model: %2")
-            .arg(providerName(), model());
+        const QString modeLabel = isOpenAIResponsesMode() ? QString("Responses API") : QString("HTTP");
+        return QString("LLM: Connected | Provider: %1 | Mode: %2 | Model: %3")
+            .arg(providerName(), modeLabel, model());
+    }
+
+    if(isOpenAIResponsesMode()) {
+        return "LLM: Deterministic fallback only | Set MNE_ANALYZE_STUDIO_LLM_API_KEY and MNE_ANALYZE_STUDIO_LLM_MODEL.";
     }
 
     return "LLM: Deterministic fallback only | Set MNE_ANALYZE_STUDIO_LLM_ENDPOINT and MNE_ANALYZE_STUDIO_LLM_MODEL.";
@@ -232,14 +253,52 @@ LlmPlanResult LlmToolPlanner::plan(const QString& userCommand,
         {"context", context}
     };
 
-    const QJsonObject payload{
-        {"model", model()},
-        {"temperature", 0.0},
-        {"messages", QJsonArray{
-            QJsonObject{{"role", "system"}, {"content", systemPrompt}},
-            QJsonObject{{"role", "user"}, {"content", QString::fromUtf8(QJsonDocument(userPayload).toJson(QJsonDocument::Compact))}}
-        }}
+    const QJsonObject planSchema{
+        {"type", "object"},
+        {"additionalProperties", false},
+        {"properties", QJsonObject{
+             {"summary", QJsonObject{{"type", "string"}}},
+             {"steps", QJsonObject{
+                  {"type", "array"},
+                  {"items", QJsonObject{
+                       {"type", "object"},
+                       {"additionalProperties", false},
+                       {"properties", QJsonObject{
+                            {"tool_name", QJsonObject{{"type", "string"}}},
+                            {"arguments", QJsonObject{{"type", "object"}}}
+                        }},
+                       {"required", QJsonArray{"tool_name", "arguments"}}
+                   }}
+              }}
+         }},
+        {"required", QJsonArray{"summary", "steps"}}
     };
+
+    QJsonObject payload;
+    if(isOpenAIResponsesMode()) {
+        payload = QJsonObject{
+            {"model", model()},
+            {"instructions", systemPrompt},
+            {"input", QString::fromUtf8(QJsonDocument(userPayload).toJson(QJsonDocument::Compact))},
+            {"text", QJsonObject{
+                 {"format", QJsonObject{
+                      {"type", "json_schema"},
+                      {"name", "studio_plan"},
+                      {"strict", true},
+                      {"schema", planSchema}
+                  }}
+             }}
+        };
+    } else {
+        payload = QJsonObject{
+            {"model", model()},
+            {"temperature", 0.0},
+            {"messages", QJsonArray{
+                QJsonObject{{"role", "system"}, {"content", systemPrompt}},
+                QJsonObject{{"role", "user"}, {"content", QString::fromUtf8(QJsonDocument(userPayload).toJson(QJsonDocument::Compact))}}
+            }}
+        };
+    }
 
     QNetworkRequest request{QUrl(endpoint())};
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -271,7 +330,13 @@ LlmPlanResult LlmToolPlanner::plan(const QString& userCommand,
         return result;
     }
 
-    const QString contentString = extractContentString(responseDocument.object());
+    const QJsonObject responseObject = responseDocument.object();
+    if(responseObject.contains("error")) {
+        result.errorMessage = responseObject.value("error").toObject().value("message").toString("OpenAI request failed.");
+        return result;
+    }
+
+    const QString contentString = extractContentString(responseObject);
     const QString jsonPayload = extractJsonPayload(contentString);
     if(jsonPayload.isEmpty()) {
         result.errorMessage = "LLM response did not contain a JSON plan.";
@@ -312,9 +377,23 @@ QString LlmToolPlanner::mode() const
     return configOrEnv(m_config.mode, "MNE_ANALYZE_STUDIO_LLM_MODE");
 }
 
+bool LlmToolPlanner::isOpenAIResponsesMode() const
+{
+    return mode().compare("openai_responses", Qt::CaseInsensitive) == 0;
+}
+
 QString LlmToolPlanner::endpoint() const
 {
-    return configOrEnv(m_config.endpoint, "MNE_ANALYZE_STUDIO_LLM_ENDPOINT");
+    const QString resolvedEndpoint = configOrEnv(m_config.endpoint, "MNE_ANALYZE_STUDIO_LLM_ENDPOINT");
+    if(!resolvedEndpoint.isEmpty()) {
+        return resolvedEndpoint;
+    }
+
+    if(isOpenAIResponsesMode()) {
+        return QString("https://api.openai.com/v1/responses");
+    }
+
+    return QString();
 }
 
 QString LlmToolPlanner::apiKey() const
@@ -334,6 +413,30 @@ QString LlmToolPlanner::configOrEnv(const QString& configuredValue, const char* 
 
 QString LlmToolPlanner::extractContentString(const QJsonObject& response) const
 {
+    const QString outputText = response.value("output_text").toString().trimmed();
+    if(!outputText.isEmpty()) {
+        return outputText;
+    }
+
+    const QJsonArray output = response.value("output").toArray();
+    if(!output.isEmpty()) {
+        QStringList textParts;
+        for(const QJsonValue& itemValue : output) {
+            const QJsonObject item = itemValue.toObject();
+            const QJsonArray content = item.value("content").toArray();
+            for(const QJsonValue& contentValue : content) {
+                const QJsonObject contentPart = contentValue.toObject();
+                if(contentPart.value("type").toString() == QLatin1String("output_text")) {
+                    textParts << contentPart.value("text").toString();
+                }
+            }
+        }
+
+        if(!textParts.isEmpty()) {
+            return textParts.join("\n");
+        }
+    }
+
     const QJsonArray choices = response.value("choices").toArray();
     if(choices.isEmpty()) {
         return QString();

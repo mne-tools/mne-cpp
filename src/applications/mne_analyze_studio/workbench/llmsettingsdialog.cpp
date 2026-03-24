@@ -61,6 +61,7 @@ LlmSettingsDialog::LlmSettingsDialog(const LlmPlannerConfig& config, QWidget* pa
 
     m_modeComboBox->addItem("Deterministic Fallback", "disabled");
     m_modeComboBox->addItem("Mock Planner", "mock");
+    m_modeComboBox->addItem("OpenAI Responses API", "openai_responses");
     m_modeComboBox->addItem("OpenAI-Compatible HTTP", "http");
 
     const QString mode = config.mode.trimmed().isEmpty() ? QString("disabled") : config.mode.trimmed().toLower();
@@ -68,14 +69,10 @@ LlmSettingsDialog::LlmSettingsDialog(const LlmPlannerConfig& config, QWidget* pa
     m_modeComboBox->setCurrentIndex(modeIndex);
 
     m_providerLineEdit->setText(config.providerName);
-    m_providerLineEdit->setPlaceholderText("openai-compatible");
     m_endpointLineEdit->setText(config.endpoint);
-    m_endpointLineEdit->setPlaceholderText("http://localhost:11434/v1/chat/completions");
     m_modelLineEdit->setText(config.model);
-    m_modelLineEdit->setPlaceholderText("gpt-4.1-mini or local model name");
     m_apiKeyLineEdit->setText(config.apiKey);
     m_apiKeyLineEdit->setEchoMode(QLineEdit::PasswordEchoOnEdit);
-    m_apiKeyLineEdit->setPlaceholderText("Optional");
     m_toolInventoryView->setReadOnly(true);
     m_toolInventoryView->setLineWrapMode(QTextEdit::NoWrap);
     m_toolInventoryView->setPlaceholderText("Available planner tools will appear here.");
@@ -93,6 +90,10 @@ LlmSettingsDialog::LlmSettingsDialog(const LlmPlannerConfig& config, QWidget* pa
     connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
     connect(m_testButton, &QPushButton::clicked, this, &LlmSettingsDialog::runPlannerTest);
+    connect(m_modeComboBox,
+            qOverload<int>(&QComboBox::currentIndexChanged),
+            this,
+            &LlmSettingsDialog::updateModeDefaults);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addLayout(formLayout);
@@ -100,6 +101,8 @@ LlmSettingsDialog::LlmSettingsDialog(const LlmPlannerConfig& config, QWidget* pa
     layout->addWidget(m_toolInventoryView, 1);
     layout->addWidget(m_testButton);
     layout->addWidget(buttonBox);
+
+    updateModeDefaults();
 }
 
 LlmPlannerConfig LlmSettingsDialog::configuration() const
@@ -162,4 +165,35 @@ void LlmSettingsDialog::runPlannerTest()
 
     m_testStatusLabel->setText(QString("Planner failed: %1")
                                .arg(result.errorMessage.isEmpty() ? QString("unknown error") : result.errorMessage));
+}
+
+void LlmSettingsDialog::updateModeDefaults()
+{
+    const QString mode = m_modeComboBox->currentData().toString();
+    if(mode == QLatin1String("openai_responses")) {
+        if(m_providerLineEdit->text().trimmed().isEmpty()) {
+            m_providerLineEdit->setText("OpenAI");
+        }
+        m_providerLineEdit->setPlaceholderText("OpenAI");
+        m_endpointLineEdit->setPlaceholderText("https://api.openai.com/v1/responses");
+        m_modelLineEdit->setPlaceholderText("gpt-5-mini");
+        m_apiKeyLineEdit->setPlaceholderText("Required for OpenAI");
+        return;
+    }
+
+    if(mode == QLatin1String("http")) {
+        if(m_providerLineEdit->text().trimmed().isEmpty()) {
+            m_providerLineEdit->setText("openai-compatible");
+        }
+        m_providerLineEdit->setPlaceholderText("openai-compatible");
+        m_endpointLineEdit->setPlaceholderText("http://localhost:11434/v1/chat/completions");
+        m_modelLineEdit->setPlaceholderText("gpt-4.1-mini or local model name");
+        m_apiKeyLineEdit->setPlaceholderText("Optional");
+        return;
+    }
+
+    m_providerLineEdit->setPlaceholderText("openai-compatible");
+    m_endpointLineEdit->setPlaceholderText("Optional");
+    m_modelLineEdit->setPlaceholderText("Optional");
+    m_apiKeyLineEdit->setPlaceholderText("Optional");
 }
