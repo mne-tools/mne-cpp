@@ -15,6 +15,7 @@
 #include "editortabbar.h"
 #include "editortabwidget.h"
 #include "extensionsettingswidget.h"
+#include <dummy3dhostedviewwidget.h>
 #include "extensionhostedviewwidget.h"
 #include "llmsettingsdialog.h"
 
@@ -89,6 +90,79 @@ const char* kExtensionSocketName = "mne_analyze_studio.extension_host";
 const char* kWorkspaceArtifactRoot = "__mne_analyze_studio_analysis_root__";
 const char* kWorkspaceArtifactEntry = "__mne_analyze_studio_analysis_entry__";
 const char* kWorkspaceArtifactStepEntry = "__mne_analyze_studio_analysis_step_entry__";
+
+enum class ThreeDOpenChoice {
+    Cancel,
+    OpenNew,
+    AddToExisting
+};
+
+struct ThreeDViewSelection {
+    ThreeDOpenChoice choice = ThreeDOpenChoice::Cancel;
+    int tabIndex = -1;
+};
+
+ThreeDViewSelection promptForThreeDTargetView(QWidget* parent,
+                                              const QString& filePath,
+                                              const QList<QPair<int, QString>>& viewOptions)
+{
+    ThreeDViewSelection selection;
+
+    QDialog dialog(parent);
+    dialog.setWindowTitle("Open 3D Surface");
+
+    QVBoxLayout* layout = new QVBoxLayout(&dialog);
+    QLabel* description = new QLabel(
+        QString("Choose where to add %1.").arg(QFileInfo(filePath).fileName()),
+        &dialog);
+    description->setWordWrap(true);
+    layout->addWidget(description);
+
+    QListWidget* viewList = new QListWidget(&dialog);
+    for(const QPair<int, QString>& option : viewOptions) {
+        QListWidgetItem* item = new QListWidgetItem(option.second, viewList);
+        item->setData(Qt::UserRole, option.first);
+    }
+    if(viewList->count() > 0) {
+        viewList->setCurrentRow(0);
+    }
+    layout->addWidget(viewList, 1);
+
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(&dialog);
+    QPushButton* addToSelectedButton = buttonBox->addButton("Add To Selected View", QDialogButtonBox::AcceptRole);
+    QPushButton* openNewButton = buttonBox->addButton("Open New View", QDialogButtonBox::ActionRole);
+    QPushButton* cancelButton = buttonBox->addButton(QDialogButtonBox::Cancel);
+    addToSelectedButton->setEnabled(viewList->count() > 0);
+    layout->addWidget(buttonBox);
+
+    QObject::connect(addToSelectedButton, &QPushButton::clicked, &dialog, [&dialog, &selection, viewList]() {
+        if(QListWidgetItem* item = viewList->currentItem()) {
+            selection.choice = ThreeDOpenChoice::AddToExisting;
+            selection.tabIndex = item->data(Qt::UserRole).toInt();
+            dialog.accept();
+        }
+    });
+    QObject::connect(openNewButton, &QPushButton::clicked, &dialog, [&dialog, &selection]() {
+        selection.choice = ThreeDOpenChoice::OpenNew;
+        dialog.accept();
+    });
+    QObject::connect(cancelButton, &QPushButton::clicked, &dialog, [&dialog, &selection]() {
+        selection.choice = ThreeDOpenChoice::Cancel;
+        dialog.reject();
+    });
+    QObject::connect(viewList, &QListWidget::itemDoubleClicked, &dialog, [&dialog, &selection](QListWidgetItem* item) {
+        if(!item) {
+            return;
+        }
+
+        selection.choice = ThreeDOpenChoice::AddToExisting;
+        selection.tabIndex = item->data(Qt::UserRole).toInt();
+        dialog.accept();
+    });
+
+    dialog.exec();
+    return selection;
+}
 
 #ifdef Q_OS_MACOS
 QString llmKeychainService()
@@ -1562,6 +1636,17 @@ void MainWindow::openWorkspaceItem(QTreeWidgetItem* item)
 void MainWindow::openFileInView(const QString& filePath)
 {
     const QJsonObject dispatch = m_viewManager.dispatchFileSelection(filePath);
+    if(Dummy3DHostedViewWidget* existingThreeDView = threeDViewContainingFile(filePath)) {
+        const int existingTabIndex = centerTabIndexForWidget(existingThreeDView);
+        if(existingTabIndex >= 0) {
+            m_centerTabs->setCurrentIndex(existingTabIndex);
+            statusBar()->showMessage(QString("%1 is already loaded in the selected 3D scene.")
+                                         .arg(QFileInfo(filePath).fileName()),
+                                     4000);
+            return;
+        }
+    }
+
     for(int i = 0; i < m_centerTabs->count(); ++i) {
         if(IRawDataView* rawDataView = dynamic_cast<IRawDataView*>(m_centerTabs->widget(i))) {
             if(rawDataView->filePath() == filePath) {
@@ -1577,6 +1662,10 @@ void MainWindow::openFileInView(const QString& filePath)
 
     QWidget* viewWidget = nullptr;
     if(dispatch.value("view").toString() == "ExtensionView") {
+        if(dispatch.value("supports_scene_merging").toBool(false) && handleThreeDFileOpen(filePath, dispatch)) {
+            return;
+        }
+
         requestExtensionViewOpen(filePath, dispatch);
         statusBar()->showMessage(QString("Opening hosted extension view for %1...")
                                      .arg(QFileInfo(filePath).fileName()),
@@ -1602,6 +1691,168 @@ void MainWindow::openFileInView(const QString& filePath)
     m_centerTabs->setCurrentIndex(tabIndex);
     appendOutputMessage(QString("Opened %1 in %2").arg(filePath, dispatch.value("view").toString()));
     appendTerminalMessage(QString("$ open %1").arg(filePath));
+}
+
+bool MainWindow::handleThreeDFileOpen(const QString& filePath, const QJsonObject& dispatch)
+{
+    if(Dummy3DHostedViewWidget* activeView = currentThreeDView()) {
+        return addFileToThreeDView(activeView, filePath);
+    }
+
+    const QList<Dummy3DHostedViewWidget*> availableViews = openThreeDViews();
+    if(availableViews.isEmpty()) {
+        const QJsonObject sceneDispatch = dispatchForNewThreeDScene(filePath, dispatch);
+        requestExtensionViewOpen(filePath, sceneDispatch);
+        statusBar()->showMessage(QString("Opening new 3D view for %1...")
+                                     .arg(QFileInfo(filePath).fileName()),
+                                 4000);
+        appendOutputMessage(QString("Opening new 3D scene for %1").arg(filePath));
+        appendTerminalMessage(QString("$ extension view open %1").arg(filePath));
+        return true;
+    }
+
+    QList<QPair<int, QString>> viewOptions;
+    for(Dummy3DHostedViewWidget* view : availableViews) {
+        const int tabIndex = centerTabIndexForWidget(view);
+        if(tabIndex < 0) {
+            continue;
+        }
+
+        const QString label = QString("%1 | %2 layers")
+                                  .arg(m_centerTabs->tabText(tabIndex),
+                                       QString::number(view->loadedFiles().size()));
+        viewOptions.append(qMakePair(tabIndex, label));
+    }
+
+    const ThreeDViewSelection selection = promptForThreeDTargetView(this, filePath, viewOptions);
+    if(selection.choice == ThreeDOpenChoice::Cancel) {
+        statusBar()->showMessage(QString("Canceled opening %1").arg(QFileInfo(filePath).fileName()), 3000);
+        return true;
+    }
+
+    if(selection.choice == ThreeDOpenChoice::OpenNew) {
+        const QJsonObject sceneDispatch = dispatchForNewThreeDScene(filePath, dispatch);
+        requestExtensionViewOpen(filePath, sceneDispatch);
+        statusBar()->showMessage(QString("Opening new 3D view for %1...")
+                                     .arg(QFileInfo(filePath).fileName()),
+                                 4000);
+        appendOutputMessage(QString("Opening new 3D scene for %1").arg(filePath));
+        appendTerminalMessage(QString("$ extension view open %1").arg(filePath));
+        return true;
+    }
+
+    if(selection.tabIndex >= 0 && selection.tabIndex < m_centerTabs->count()) {
+        if(Dummy3DHostedViewWidget* targetView = dynamic_cast<Dummy3DHostedViewWidget*>(m_centerTabs->widget(selection.tabIndex))) {
+            return addFileToThreeDView(targetView, filePath);
+        }
+    }
+
+    appendProblemMessage(QString("The selected 3D target view for %1 is no longer available.").arg(filePath));
+    return true;
+}
+
+bool MainWindow::addFileToThreeDView(Dummy3DHostedViewWidget* targetView, const QString& filePath)
+{
+    if(!targetView) {
+        return false;
+    }
+
+    const int tabIndex = centerTabIndexForWidget(targetView);
+    if(tabIndex >= 0) {
+        m_centerTabs->setCurrentIndex(tabIndex);
+    }
+
+    if(!targetView->addFileToScene(filePath)) {
+        appendProblemMessage(QString("Failed to add %1 to the target 3D view.").arg(filePath));
+        statusBar()->showMessage(QString("Could not add %1 to the 3D view.")
+                                     .arg(QFileInfo(filePath).fileName()),
+                                 5000);
+        return true;
+    }
+
+    if(!targetView->sceneId().isEmpty()) {
+        m_sceneRegistry.addLayerToScene(targetView->sceneId(), filePath);
+    }
+
+    statusBar()->showMessage(QString("Added %1 to %2.")
+                                 .arg(QFileInfo(filePath).fileName(), targetView->displayTitle()),
+                             4000);
+    appendOutputMessage(QString("Added %1 to 3D scene %2").arg(filePath, targetView->displayTitle()));
+    appendTerminalMessage(QString("$ add-to-3d %1").arg(filePath));
+    return true;
+}
+
+QJsonObject MainWindow::dispatchForNewThreeDScene(const QString& filePath, const QJsonObject& dispatch)
+{
+    QJsonObject updatedDispatch = dispatch;
+
+    QString sceneId = updatedDispatch.value("sceneId").toString().trimmed();
+    if(sceneId.isEmpty()) {
+        const QString subjectId = updatedDispatch.value("subjectId").toString();
+        sceneId = m_sceneRegistry.createScene(subjectId, QFileInfo(filePath).fileName());
+        updatedDispatch.insert("sceneId", sceneId);
+    }
+
+    if(!sceneId.isEmpty()) {
+        m_sceneRegistry.addLayerToScene(sceneId, filePath);
+        updatedDispatch.insert("sceneLayers", QJsonArray::fromStringList(m_sceneRegistry.layersForScene(sceneId)));
+    }
+
+    return updatedDispatch;
+}
+
+Dummy3DHostedViewWidget* MainWindow::currentThreeDView() const
+{
+    return dynamic_cast<Dummy3DHostedViewWidget*>(m_centerTabs ? m_centerTabs->currentWidget() : nullptr);
+}
+
+Dummy3DHostedViewWidget* MainWindow::threeDViewContainingFile(const QString& filePath) const
+{
+    const QString normalizedPath = filePath.trimmed();
+    if(normalizedPath.isEmpty() || !m_centerTabs) {
+        return nullptr;
+    }
+
+    for(int i = 0; i < m_centerTabs->count(); ++i) {
+        if(Dummy3DHostedViewWidget* threeDView = dynamic_cast<Dummy3DHostedViewWidget*>(m_centerTabs->widget(i))) {
+            if(threeDView->hasLoadedFile(normalizedPath)) {
+                return threeDView;
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+QList<Dummy3DHostedViewWidget*> MainWindow::openThreeDViews() const
+{
+    QList<Dummy3DHostedViewWidget*> views;
+    if(!m_centerTabs) {
+        return views;
+    }
+
+    for(int i = 0; i < m_centerTabs->count(); ++i) {
+        if(Dummy3DHostedViewWidget* threeDView = dynamic_cast<Dummy3DHostedViewWidget*>(m_centerTabs->widget(i))) {
+            views.append(threeDView);
+        }
+    }
+
+    return views;
+}
+
+int MainWindow::centerTabIndexForWidget(QWidget* widget) const
+{
+    if(!m_centerTabs || !widget) {
+        return -1;
+    }
+
+    for(int i = 0; i < m_centerTabs->count(); ++i) {
+        if(m_centerTabs->widget(i) == widget) {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 void MainWindow::applyWorkbenchStyle()
@@ -6204,12 +6455,15 @@ void MainWindow::finalizeExtensionViewOpen(const QString& filePath, const QJsonO
             m_centerTabs->setCurrentIndex(i);
             if(!sessionId.isEmpty()) {
                 if(QWidget* widget = m_centerTabs->widget(i)) {
+                    const QJsonObject effectiveDescriptor = widget->property("mne_session_descriptor").toJsonObject().isEmpty()
+                        ? sessionDescriptor
+                        : widget->property("mne_session_descriptor").toJsonObject();
                     widget->setProperty("mne_session_id", sessionId);
-                    widget->setProperty("mne_session_descriptor", sessionDescriptor);
+                    widget->setProperty("mne_session_descriptor", effectiveDescriptor);
                     QMetaObject::invokeMethod(widget,
                                               "setSessionDescriptor",
                                               Qt::DirectConnection,
-                                              Q_ARG(QJsonObject, sessionDescriptor));
+                                              Q_ARG(QJsonObject, effectiveDescriptor));
                     m_extensionViewWidgetsBySessionId.insert(sessionId, widget);
                 }
             }
@@ -6226,8 +6480,11 @@ void MainWindow::finalizeExtensionViewOpen(const QString& filePath, const QJsonO
             return;
         }
 
+        const QJsonObject effectiveDescriptor = viewWidget->property("mne_session_descriptor").toJsonObject().isEmpty()
+            ? sessionDescriptor
+            : viewWidget->property("mne_session_descriptor").toJsonObject();
         viewWidget->setProperty("mne_session_id", sessionId);
-        viewWidget->setProperty("mne_session_descriptor", sessionDescriptor);
+        viewWidget->setProperty("mne_session_descriptor", effectiveDescriptor);
 
         if(hasQtSignal(viewWidget, "outputMessage(QString)")) {
             QObject::connect(viewWidget, SIGNAL(outputMessage(QString)), this, SLOT(handleHostedExtensionViewOutput(QString)));

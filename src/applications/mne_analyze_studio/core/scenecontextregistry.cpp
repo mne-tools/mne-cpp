@@ -20,6 +20,21 @@ SceneContextRegistry::SceneContextRegistry(QObject* parent)
 {
 }
 
+QString SceneContextRegistry::createScene(const QString& subjectId, const QString& title)
+{
+    SceneContext context;
+    context.id = QString("scene_%1").arg(QUuid::createUuid().toString(QUuid::WithoutBraces));
+    context.subjectId = subjectId;
+    context.title = title;
+    m_scenes.insert(context.id, context);
+
+    if(!subjectId.isEmpty()) {
+        m_activeScenesBySubject.insert(subjectId, context.id);
+    }
+
+    return context.id;
+}
+
 QString SceneContextRegistry::ensureScene(const QString& subjectId, const QString& title)
 {
     const QString existingId = activeSceneForSubject(subjectId);
@@ -27,16 +42,16 @@ QString SceneContextRegistry::ensureScene(const QString& subjectId, const QStrin
         return existingId;
     }
 
-    SceneContext context;
-    context.id = QString("scene_%1").arg(QUuid::createUuid().toString(QUuid::WithoutBraces));
-    context.subjectId = subjectId;
-    context.title = title;
-    m_scenes.insert(context.id, context);
-    return context.id;
+    return createScene(subjectId, title);
 }
 
 QString SceneContextRegistry::activeSceneForSubject(const QString& subjectId) const
 {
+    const QString activeSceneId = m_activeScenesBySubject.value(subjectId);
+    if(!activeSceneId.isEmpty() && m_scenes.contains(activeSceneId)) {
+        return activeSceneId;
+    }
+
     for(auto it = m_scenes.cbegin(); it != m_scenes.cend(); ++it) {
         if(it.value().subjectId == subjectId) {
             return it.key();
@@ -46,6 +61,22 @@ QString SceneContextRegistry::activeSceneForSubject(const QString& subjectId) co
     return QString();
 }
 
+QString SceneContextRegistry::sceneForLayer(const QString& filePath) const
+{
+    for(auto it = m_scenes.cbegin(); it != m_scenes.cend(); ++it) {
+        if(it.value().layers.contains(filePath)) {
+            return it.key();
+        }
+    }
+
+    return QString();
+}
+
+QStringList SceneContextRegistry::layersForScene(const QString& sceneId) const
+{
+    return m_scenes.value(sceneId).layers;
+}
+
 bool SceneContextRegistry::addLayerToScene(const QString& sceneId, const QString& filePath)
 {
     auto it = m_scenes.find(sceneId);
@@ -53,8 +84,20 @@ bool SceneContextRegistry::addLayerToScene(const QString& sceneId, const QString
         return false;
     }
 
+    for(auto sceneIt = m_scenes.begin(); sceneIt != m_scenes.end(); ++sceneIt) {
+        if(sceneIt.key() == sceneId) {
+            continue;
+        }
+
+        sceneIt->layers.removeAll(filePath);
+    }
+
     if(!it->layers.contains(filePath)) {
         it->layers.append(filePath);
+    }
+
+    if(!it->subjectId.isEmpty()) {
+        m_activeScenesBySubject.insert(it->subjectId, sceneId);
     }
 
     return true;
@@ -73,6 +116,7 @@ QJsonArray SceneContextRegistry::serialize() const
             {"id", it.value().id},
             {"subjectId", it.value().subjectId},
             {"title", it.value().title},
+            {"active", m_activeScenesBySubject.value(it.value().subjectId) == it.value().id},
             {"layers", layers}
         });
     }
@@ -83,6 +127,8 @@ QJsonArray SceneContextRegistry::serialize() const
 void SceneContextRegistry::restore(const QJsonArray& serializedScenes)
 {
     m_scenes.clear();
+    m_activeScenesBySubject.clear();
+
     for(const QJsonValue& value : serializedScenes) {
         const QJsonObject sceneObject = value.toObject();
         SceneContext context;
@@ -94,5 +140,9 @@ void SceneContextRegistry::restore(const QJsonArray& serializedScenes)
             context.layers.append(layer.toString());
         }
         m_scenes.insert(context.id, context);
+
+        if(sceneObject.value("active").toBool(false) && !context.subjectId.isEmpty()) {
+            m_activeScenesBySubject.insert(context.subjectId, context.id);
+        }
     }
 }

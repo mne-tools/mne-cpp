@@ -5,7 +5,7 @@
  * @version  dev
  * @date     March, 2026
  *
- * @brief    Implements the dummy 3D hosted view widget and registers its hosted view factory.
+ * @brief    Implements the hosted 3D surface widget backed by the MNE Inspect brain view.
  */
 
 #include "dummy3dhostedviewwidget.h"
@@ -13,14 +13,21 @@
 #include <extensionviewfactoryregistry.h>
 #include <iextensionviewfactory.h>
 
+#include <disp3D/model/braintreemodel.h>
+#include <disp3D/view/brainview.h>
+#include <fs/fs_surface.h>
+#include <mne/mne_bem.h>
+
+#include <QComboBox>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #include <QHBoxLayout>
 #include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonValue>
 #include <QLabel>
-#include <QPushButton>
-#include <QSlider>
-#include <QTextEdit>
+#include <QListWidget>
+#include <QSignalBlocker>
+#include <QSplitter>
 #include <QVBoxLayout>
 
 using namespace MNEANALYZESTUDIO;
@@ -28,18 +35,52 @@ using namespace MNEANALYZESTUDIO;
 namespace
 {
 
+QStringList jsonArrayToStringList(const QJsonArray& values)
+{
+    QStringList result;
+    for(const QJsonValue& value : values) {
+        const QString text = value.toString().trimmed();
+        if(!text.isEmpty() && !result.contains(text)) {
+            result.append(text);
+        }
+    }
+
+    return result;
+}
+
+QString bemSurfaceName(const MNELIB::MNEBemSurface& bemSurface, int index)
+{
+    switch(bemSurface.id) {
+        case 4:
+            return "head";
+        case 3:
+            return "outer_skull";
+        case 1:
+            return "inner_skull";
+        default:
+            return QString("bem_%1").arg(index);
+    }
+}
+
 class Dummy3DExtensionViewFactory final : public IExtensionViewFactory
 {
 public:
     QString widgetType() const override
     {
-        return "placeholder_3d";
+        return "inspect_3d_surface";
     }
 
     QWidget* createView(const QJsonObject& sessionDescriptor, QWidget* parent) const override
     {
         Dummy3DHostedViewWidget* widget = new Dummy3DHostedViewWidget(parent);
         widget->setSessionDescriptor(sessionDescriptor);
+
+        const QString requestedFile = sessionDescriptor.value("file").toString().trimmed();
+        if(!requestedFile.isEmpty() && !widget->hasLoadedFile(requestedFile)) {
+            delete widget;
+            return nullptr;
+        }
+
         return widget;
     }
 };
@@ -65,57 +106,65 @@ Dummy3DHostedViewWidget::Dummy3DHostedViewWidget(QWidget* parent)
 , m_titleLabel(new QLabel(this))
 , m_summaryLabel(new QLabel(this))
 , m_statusLabel(new QLabel(this))
-, m_stateLabel(new QLabel(this))
-, m_opacityValueLabel(new QLabel(this))
-, m_opacitySlider(new QSlider(Qt::Horizontal, this))
-, m_actionsWidget(new QWidget(this))
-, m_actionsLayout(new QVBoxLayout(m_actionsWidget))
-, m_detailsView(new QTextEdit(this))
+, m_surfaceTypeCombo(new QComboBox(this))
+, m_loadedFilesList(new QListWidget(this))
+, m_brainView(new BrainView(this))
+, m_model(new BrainTreeModel(this))
 {
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(16, 16, 16, 16);
-    layout->setSpacing(12);
+    setMinimumSize(920, 640);
 
     m_titleLabel->setObjectName("terminalStatusLabel");
     m_summaryLabel->setWordWrap(true);
     m_statusLabel->setWordWrap(true);
     m_statusLabel->setObjectName("terminalStatusLabel");
-    m_stateLabel->setWordWrap(true);
-    m_stateLabel->setObjectName("terminalStatusLabel");
 
-    QWidget* opacityRow = new QWidget(this);
-    QHBoxLayout* opacityLayout = new QHBoxLayout(opacityRow);
-    opacityLayout->setContentsMargins(0, 0, 0, 0);
-    opacityLayout->setSpacing(8);
-    opacityLayout->addWidget(new QLabel("Opacity", opacityRow));
-    opacityLayout->addWidget(m_opacitySlider, 1);
-    opacityLayout->addWidget(m_opacityValueLabel);
+    QLabel* surfaceTypeLabel = new QLabel("Surface", this);
+    surfaceTypeLabel->setObjectName("terminalStatusLabel");
 
-    m_opacitySlider->setRange(0, 100);
-    m_opacitySlider->setSingleStep(5);
-    m_actionsLayout->setContentsMargins(0, 0, 0, 0);
-    m_actionsLayout->setSpacing(8);
-    m_detailsView->setReadOnly(true);
+    QWidget* headerRow = new QWidget(this);
+    QHBoxLayout* headerLayout = new QHBoxLayout(headerRow);
+    headerLayout->setContentsMargins(0, 0, 0, 0);
+    headerLayout->setSpacing(12);
+    headerLayout->addWidget(m_titleLabel, 1);
+    headerLayout->addWidget(surfaceTypeLabel);
+    headerLayout->addWidget(m_surfaceTypeCombo);
 
-    layout->addWidget(m_titleLabel);
+    QWidget* sidePanel = new QWidget(this);
+    QVBoxLayout* sideLayout = new QVBoxLayout(sidePanel);
+    sideLayout->setContentsMargins(0, 0, 0, 0);
+    sideLayout->setSpacing(8);
+
+    QLabel* layersTitle = new QLabel("Scene Layers", sidePanel);
+    layersTitle->setObjectName("terminalStatusLabel");
+    m_loadedFilesList->setSelectionMode(QAbstractItemView::NoSelection);
+    sideLayout->addWidget(layersTitle);
+    sideLayout->addWidget(m_loadedFilesList, 1);
+
+    QSplitter* splitter = new QSplitter(Qt::Horizontal, this);
+    splitter->addWidget(sidePanel);
+    splitter->addWidget(m_brainView);
+    splitter->setStretchFactor(0, 0);
+    splitter->setStretchFactor(1, 1);
+    splitter->setSizes(QList<int>() << 240 << 900);
+
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(12, 12, 12, 12);
+    layout->setSpacing(8);
+    layout->addWidget(headerRow);
     layout->addWidget(m_summaryLabel);
     layout->addWidget(m_statusLabel);
-    layout->addWidget(m_stateLabel);
-    layout->addWidget(opacityRow);
-    layout->addWidget(m_actionsWidget);
-    layout->addWidget(m_detailsView, 1);
+    layout->addWidget(splitter, 1);
 
-    connect(m_opacitySlider, &QSlider::sliderReleased, this, [this]() {
-        if(sessionId().isEmpty()) {
-            return;
-        }
+    m_brainView->setModel(m_model);
 
-        const QJsonObject opacityControl = m_descriptor.value("controls").toObject().value("opacity").toObject();
-        const QString commandName = opacityControl.value("command").toString("set_opacity").trimmed();
-        const QString argumentName = opacityControl.value("target_argument").toString("opacity").trimmed();
-        const double opacity = static_cast<double>(m_opacitySlider->value()) / 100.0;
-        emit viewCommandRequested(sessionId(), commandName, QJsonObject{{argumentName, opacity}});
-    });
+    connect(m_surfaceTypeCombo,
+            &QComboBox::currentTextChanged,
+            this,
+            [this](const QString& surfaceType) {
+                if(!surfaceType.trimmed().isEmpty()) {
+                    m_brainView->setActiveSurface(surfaceType.trimmed());
+                }
+            });
 
     rebuildUi();
 }
@@ -123,6 +172,29 @@ Dummy3DHostedViewWidget::Dummy3DHostedViewWidget(QWidget* parent)
 void Dummy3DHostedViewWidget::setSessionDescriptor(const QJsonObject& descriptor)
 {
     m_descriptor = descriptor;
+
+    QStringList filesToLoad = requestedSceneFiles();
+    if(filesToLoad.isEmpty()) {
+        const QString requestedFile = descriptor.value("file").toString().trimmed();
+        if(!requestedFile.isEmpty()) {
+            filesToLoad.append(requestedFile);
+        }
+    }
+
+    QStringList loadErrors;
+    for(const QString& sceneFile : std::as_const(filesToLoad)) {
+        QString errorMessage;
+        if(!loadFileInternal(sceneFile, &errorMessage, false) && !errorMessage.isEmpty()) {
+            loadErrors.append(errorMessage);
+        }
+    }
+
+    if(!loadErrors.isEmpty()) {
+        const QString message = loadErrors.join(" | ");
+        m_descriptor.insert("message", message);
+        m_statusLabel->setText(message);
+    }
+
     rebuildUi();
 }
 
@@ -131,9 +203,58 @@ QString Dummy3DHostedViewWidget::sessionId() const
     return m_descriptor.value("session_id").toString();
 }
 
+QString Dummy3DHostedViewWidget::sceneId() const
+{
+    return m_descriptor.value("scene_id").toString();
+}
+
 QString Dummy3DHostedViewWidget::filePath() const
 {
     return m_descriptor.value("file").toString();
+}
+
+QStringList Dummy3DHostedViewWidget::loadedFiles() const
+{
+    return m_loadedFiles;
+}
+
+QString Dummy3DHostedViewWidget::displayTitle() const
+{
+    const QString descriptorTitle = m_descriptor.value("title").toString().trimmed();
+    if(!descriptorTitle.isEmpty()) {
+        return descriptorTitle;
+    }
+
+    if(!m_loadedFiles.isEmpty()) {
+        return QFileInfo(m_loadedFiles.constFirst()).fileName();
+    }
+
+    return m_descriptor.value("provider_display_name").toString("Inspect Surface View");
+}
+
+bool Dummy3DHostedViewWidget::addFileToScene(const QString& filePath)
+{
+    const QString normalizedPath = filePath.trimmed();
+    if(normalizedPath.isEmpty()) {
+        return false;
+    }
+
+    if(hasLoadedFile(normalizedPath)) {
+        const QString message = QString("%1 is already loaded in this 3D scene.")
+                                    .arg(QFileInfo(normalizedPath).fileName());
+        m_descriptor.insert("message", message);
+        rebuildUi();
+        emit statusMessage(message);
+        return true;
+    }
+
+    QString errorMessage;
+    return loadFileInternal(normalizedPath, &errorMessage, true);
+}
+
+bool Dummy3DHostedViewWidget::hasLoadedFile(const QString& filePath) const
+{
+    return m_loadedFiles.contains(filePath.trimmed());
 }
 
 void Dummy3DHostedViewWidget::applySessionUpdate(const QJsonObject& update)
@@ -142,91 +263,262 @@ void Dummy3DHostedViewWidget::applySessionUpdate(const QJsonObject& update)
         m_descriptor.insert(it.key(), it.value());
     }
 
+    const QStringList filesToLoad = requestedSceneFiles();
+    for(const QString& sceneFile : filesToLoad) {
+        loadFileInternal(sceneFile, nullptr, false);
+    }
+
     rebuildUi();
-    emit statusMessage(m_descriptor.value("message").toString("Dummy 3D session updated."));
+}
+
+bool Dummy3DHostedViewWidget::loadFileInternal(const QString& filePath,
+                                               QString* errorMessage,
+                                               bool notifyUser)
+{
+    const QString normalizedPath = filePath.trimmed();
+    if(normalizedPath.isEmpty()) {
+        if(errorMessage) {
+            *errorMessage = "No surface file path was provided.";
+        }
+        return false;
+    }
+
+    if(m_loadedFiles.contains(normalizedPath)) {
+        return true;
+    }
+
+    bool loaded = false;
+    QString localError;
+    const QString suffix = QFileInfo(normalizedPath).suffix().toLower();
+    if(suffix == "bem") {
+        loaded = loadBemFile(normalizedPath, &localError);
+    } else {
+        loaded = loadSurfaceFile(normalizedPath, &localError);
+    }
+
+    if(!loaded) {
+        if(errorMessage) {
+            *errorMessage = localError;
+        }
+
+        if(notifyUser && !localError.isEmpty()) {
+            m_descriptor.insert("message", localError);
+            rebuildUi();
+            emit statusMessage(localError);
+            emit outputMessage(localError);
+        }
+        return false;
+    }
+
+    m_loadedFiles.append(normalizedPath);
+    m_descriptor.insert("message",
+                        QString("Loaded %1 into the 3D scene.")
+                            .arg(QFileInfo(normalizedPath).fileName()));
+    updateDescriptorProperties();
+    rebuildUi();
+
+    if(notifyUser) {
+        emit statusMessage(m_descriptor.value("message").toString());
+        emit outputMessage(QString("3D view added %1").arg(normalizedPath));
+    }
+
+    return true;
+}
+
+bool Dummy3DHostedViewWidget::loadSurfaceFile(const QString& filePath, QString* errorMessage)
+{
+    FSLIB::FsSurface surface(filePath);
+    if(surface.isEmpty()) {
+        if(errorMessage) {
+            *errorMessage = QString("Failed to load FreeSurfer surface %1.").arg(filePath);
+        }
+        return false;
+    }
+
+    const QString hemi = inferHemisphere(filePath);
+    const QString surfaceType = inferSurfaceType(filePath);
+    const QString subjectName = inferSubjectName(filePath);
+
+    m_model->addSurface(subjectName, hemi, surfaceType, surface);
+    if(!m_surfaceTypes.contains(surfaceType)) {
+        m_surfaceTypes.append(surfaceType);
+    }
+
+    m_brainView->setActiveSurface(surfaceType);
+    return true;
+}
+
+bool Dummy3DHostedViewWidget::loadBemFile(const QString& filePath, QString* errorMessage)
+{
+    QFile file(filePath);
+    if(!file.exists()) {
+        if(errorMessage) {
+            *errorMessage = QString("BEM file not found: %1").arg(filePath);
+        }
+        return false;
+    }
+
+    MNELIB::MNEBem bem(file);
+    if(bem.isEmpty()) {
+        if(errorMessage) {
+            *errorMessage = QString("Failed to load BEM surface set %1.").arg(filePath);
+        }
+        return false;
+    }
+
+    const QString subjectName = inferSubjectName(filePath);
+    for(int i = 0; i < bem.size(); ++i) {
+        m_model->addBemSurface(subjectName, bemSurfaceName(bem[i], i), bem[i]);
+    }
+
+    return true;
 }
 
 void Dummy3DHostedViewWidget::rebuildUi()
 {
-    const QString providerName = m_descriptor.value("provider_display_name").toString("Dummy 3D View");
-    const QString extensionName = m_descriptor.value("extension_display_name").toString("Dummy 3D Extension");
-    const QString sceneId = m_descriptor.value("scene_id").toString();
-    const QString fileName = m_descriptor.value("file").toString();
+    refreshSurfaceTypeSelector();
+    refreshLoadedFileList();
+    updateDescriptorProperties();
 
-    m_titleLabel->setText(providerName);
+    m_titleLabel->setText(displayTitle());
 
-    QString summary = QString("Hosted by %1").arg(extensionName);
-    if(!fileName.isEmpty()) {
-        summary += QString(" | File: %1").arg(fileName);
+    QStringList summaryParts;
+    summaryParts << QString("Provider: %1")
+                        .arg(m_descriptor.value("provider_display_name").toString("Inspect Surface View"));
+    if(!sceneId().isEmpty()) {
+        summaryParts << QString("Scene: %1").arg(sceneId());
     }
-    if(!sceneId.isEmpty()) {
-        summary += QString(" | Scene: %1").arg(sceneId);
-    }
-    m_summaryLabel->setText(summary);
+    summaryParts << QString("Layers: %1").arg(m_loadedFiles.size());
+    m_summaryLabel->setText(summaryParts.join(" | "));
 
-    const QString message = m_descriptor.value("message").toString("Dummy 3D session ready.");
-    m_statusLabel->setText(message);
-
-    const QJsonObject state = m_descriptor.value("state").toObject();
-    QStringList stateParts;
-    stateParts << QString("Hemisphere: %1").arg(state.value("hemisphere").toString("both"));
-    stateParts << QString("Camera: %1").arg(state.value("camera").toString("default"));
-    stateParts << QString("Opacity: %1").arg(QString::number(state.value("opacity").toDouble(0.8), 'f', 2));
-    m_stateLabel->setText(QString("State | %1").arg(stateParts.join(" | ")));
-
-    const double opacity = state.value("opacity").toDouble(0.8);
-    m_opacitySlider->setValue(static_cast<int>(opacity * 100.0));
-    m_opacityValueLabel->setText(QString::number(opacity, 'f', 2));
-
-    rebuildActionButtons(m_descriptor.value("actions").toArray());
-    m_detailsView->setPlainText(QString::fromUtf8(QJsonDocument(m_descriptor).toJson(QJsonDocument::Indented)));
+    m_statusLabel->setText(m_descriptor.value("message").toString("Inspect 3D scene ready."));
 }
 
-void Dummy3DHostedViewWidget::rebuildActionButtons(const QJsonArray& actions)
+void Dummy3DHostedViewWidget::refreshLoadedFileList()
 {
-    while(QLayoutItem* item = m_actionsLayout->takeAt(0)) {
-        if(QWidget* widget = item->widget()) {
-            widget->deleteLater();
+    m_loadedFilesList->clear();
+    for(const QString& loadedFile : std::as_const(m_loadedFiles)) {
+        QListWidgetItem* item = new QListWidgetItem(QFileInfo(loadedFile).fileName(), m_loadedFilesList);
+        item->setToolTip(loadedFile);
+    }
+}
+
+void Dummy3DHostedViewWidget::refreshSurfaceTypeSelector()
+{
+    const QSignalBlocker blocker(m_surfaceTypeCombo);
+    const QString currentSurfaceType = m_surfaceTypeCombo->currentText();
+
+    m_surfaceTypeCombo->clear();
+    for(const QString& surfaceType : std::as_const(m_surfaceTypes)) {
+        m_surfaceTypeCombo->addItem(surfaceType);
+    }
+
+    m_surfaceTypeCombo->setEnabled(m_surfaceTypeCombo->count() > 0);
+
+    if(!currentSurfaceType.isEmpty()) {
+        const int existingIndex = m_surfaceTypeCombo->findText(currentSurfaceType);
+        if(existingIndex >= 0) {
+            m_surfaceTypeCombo->setCurrentIndex(existingIndex);
+            return;
         }
-        delete item;
     }
 
-    if(actions.isEmpty()) {
-        m_actionsWidget->setVisible(false);
-        return;
+    if(m_surfaceTypeCombo->count() > 0) {
+        m_surfaceTypeCombo->setCurrentIndex(m_surfaceTypeCombo->count() - 1);
     }
+}
 
-    m_actionsWidget->setVisible(true);
-    QLabel* titleLabel = new QLabel("Session Actions", m_actionsWidget);
-    titleLabel->setObjectName("terminalStatusLabel");
-    m_actionsLayout->addWidget(titleLabel);
+void Dummy3DHostedViewWidget::updateDescriptorProperties()
+{
+    const QJsonArray sceneLayers = QJsonArray::fromStringList(m_loadedFiles);
+    m_descriptor.insert("scene_layers", sceneLayers);
+    m_descriptor.insert("layer_count", m_loadedFiles.size());
+    setProperty("mne_loaded_files", m_loadedFiles);
+    setProperty("mne_session_descriptor", m_descriptor);
+}
 
-    QWidget* buttonRow = new QWidget(m_actionsWidget);
-    QHBoxLayout* buttonLayout = new QHBoxLayout(buttonRow);
-    buttonLayout->setContentsMargins(0, 0, 0, 0);
-    buttonLayout->setSpacing(8);
+QStringList Dummy3DHostedViewWidget::requestedSceneFiles() const
+{
+    QStringList files = jsonArrayToStringList(m_descriptor.value("scene_layers").toArray());
 
-    const QString currentSessionId = sessionId();
-    for(const QJsonValue& value : actions) {
-        const QJsonObject action = value.toObject();
-        const QString commandName = action.value("command").toString().trimmed();
-        if(commandName.isEmpty()) {
-            continue;
+    const QStringList alternateFiles = jsonArrayToStringList(m_descriptor.value("sceneLayers").toArray());
+    for(const QString& alternateFile : alternateFiles) {
+        if(!files.contains(alternateFile)) {
+            files.append(alternateFile);
         }
-
-        QPushButton* button = new QPushButton(action.value("label").toString(commandName), buttonRow);
-        button->setToolTip(action.value("description").toString());
-        const QJsonObject arguments = action.value("arguments").toObject();
-        connect(button, &QPushButton::clicked, this, [this, currentSessionId, commandName, arguments]() {
-            if(currentSessionId.isEmpty()) {
-                return;
-            }
-
-            emit viewCommandRequested(currentSessionId, commandName, arguments);
-        });
-        buttonLayout->addWidget(button);
     }
 
-    buttonLayout->addStretch(1);
-    m_actionsLayout->addWidget(buttonRow);
+    const QString primaryFile = m_descriptor.value("file").toString().trimmed();
+    if(!primaryFile.isEmpty() && !files.contains(primaryFile)) {
+        files.prepend(primaryFile);
+    }
+
+    return files;
+}
+
+QString Dummy3DHostedViewWidget::inferHemisphere(const QString& filePath) const
+{
+    const QString lowerFileName = QFileInfo(filePath).fileName().toLower();
+    if(lowerFileName.contains("lh.") || lowerFileName.startsWith("lh_") || lowerFileName.startsWith("lh.")) {
+        return "lh";
+    }
+    if(lowerFileName.contains("rh.") || lowerFileName.startsWith("rh_") || lowerFileName.startsWith("rh.")) {
+        return "rh";
+    }
+    if(lowerFileName.contains("left")) {
+        return "lh";
+    }
+    if(lowerFileName.contains("right")) {
+        return "rh";
+    }
+
+    return "unknown";
+}
+
+QString Dummy3DHostedViewWidget::inferSurfaceType(const QString& filePath) const
+{
+    const QString lowerFileName = QFileInfo(filePath).fileName().toLower();
+    if(lowerFileName.contains("inflated")) {
+        return "inflated";
+    }
+    if(lowerFileName.contains("white")) {
+        return "white";
+    }
+    if(lowerFileName.contains("orig")) {
+        return "orig";
+    }
+    if(lowerFileName.contains("pial")) {
+        return "pial";
+    }
+
+    const QString suffix = QFileInfo(filePath).suffix().toLower();
+    if(!suffix.isEmpty()) {
+        return suffix;
+    }
+
+    return "surface";
+}
+
+QString Dummy3DHostedViewWidget::inferSubjectName(const QString& filePath) const
+{
+    const QString descriptorSubject = m_descriptor.value("subjectId").toString().trimmed();
+    if(!descriptorSubject.isEmpty()) {
+        return descriptorSubject;
+    }
+
+    QDir parentDir = QFileInfo(filePath).dir();
+    const QString parentName = parentDir.dirName().toLower();
+    if((parentName == "surf" || parentName == "bem" || parentName == "label") && parentDir.cdUp()) {
+        const QString subjectName = parentDir.dirName().trimmed();
+        if(!subjectName.isEmpty()) {
+            return subjectName;
+        }
+    }
+
+    const QString directParentName = QFileInfo(filePath).dir().dirName().trimmed();
+    if(!directParentName.isEmpty()) {
+        return directParentName;
+    }
+
+    return "User";
 }

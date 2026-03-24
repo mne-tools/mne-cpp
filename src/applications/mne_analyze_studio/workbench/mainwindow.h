@@ -70,6 +70,7 @@ namespace MNEANALYZESTUDIO
 
 class AgentChatDockWidget;
 class AnalysisResultWidget;
+class Dummy3DHostedViewWidget;
 class EditorTabBar;
 class EditorTabWidget;
 class ExtensionHostedViewWidget;
@@ -221,6 +222,13 @@ private:
     void openAnalysisArtifact(const QJsonObject& entry, bool focusBottomResults = false);
     void openWorkspaceItem(QTreeWidgetItem* item);
     void openFileInView(const QString& filePath);
+    bool handleThreeDFileOpen(const QString& filePath, const QJsonObject& dispatch);
+    bool addFileToThreeDView(Dummy3DHostedViewWidget* targetView, const QString& filePath);
+    QJsonObject dispatchForNewThreeDScene(const QString& filePath, const QJsonObject& dispatch);
+    Dummy3DHostedViewWidget* currentThreeDView() const;
+    Dummy3DHostedViewWidget* threeDViewContainingFile(const QString& filePath) const;
+    QList<Dummy3DHostedViewWidget*> openThreeDViews() const;
+    int centerTabIndexForWidget(QWidget* widget) const;
     void applyWorkbenchStyle();
     void switchPrimarySidebar(const QString& sectionName);
     void sendToolCall(const QString& commandText);
