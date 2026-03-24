@@ -61,13 +61,25 @@ public:
 private slots:
     void runPlannerTest();
     void updateModeDefaults();
+    void saveCurrentProfile();
+    void deleteCurrentProfile();
+    void applySelectedProfile(int index);
+    void applySuggestedModel();
 
 private:
+    void refreshProfiles();
+    void refreshSuggestedModels();
+
+    QComboBox* m_profileComboBox;
+    QPushButton* m_saveProfileButton;
+    QPushButton* m_deleteProfileButton;
     QComboBox* m_modeComboBox;
     QLineEdit* m_providerLineEdit;
     QLineEdit* m_endpointLineEdit;
     QLineEdit* m_modelLineEdit;
     QLineEdit* m_apiKeyLineEdit;
+    QComboBox* m_suggestedModelComboBox;
+    QPushButton* m_applySuggestedModelButton;
     QTextEdit* m_toolInventoryView;
     QLabel* m_testStatusLabel;
     QPushButton* m_testButton;

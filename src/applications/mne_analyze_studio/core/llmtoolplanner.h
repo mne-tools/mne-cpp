@@ -58,9 +58,11 @@ struct LlmPlanResult
 {
     bool usedModel = false;
     bool success = false;
+    int httpStatusCode = 0;
     QString providerName;
     QString summary;
     QString errorMessage;
+    QString providerErrorType;
     QString rawResponse;
     QStringList plannedCommands;
 };
@@ -89,9 +91,12 @@ private:
     QString configOrEnv(const QString& configuredValue, const char* envName) const;
     QString mode() const;
     bool isOpenAIResponsesMode() const;
+    bool isGitHubModelsMode() const;
+    bool isAnthropicMessagesMode() const;
     QString endpoint() const;
     QString apiKey() const;
     QString model() const;
+    QString extractApiErrorMessage(const QJsonObject& response, QString* errorType = nullptr) const;
     QString extractContentString(const QJsonObject& response) const;
     QString extractJsonPayload(const QString& text) const;
 
