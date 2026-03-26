@@ -73,8 +73,8 @@ DataWindow::DataWindow(QWidget *parent)
     //------------------------
     //--- Setup data model ---
     //------------------------
-    if(m_pMainWindow->m_qFileRaw.exists())
-        m_pRawModel = new RawModel(m_pMainWindow->m_qFileRaw, this);
+    if(m_pMainWindow->rawFile().exists())
+        m_pRawModel = new RawModel(m_pMainWindow->rawFile(), this);
     else
         m_pRawModel = new RawModel(this);
 }
@@ -84,7 +84,6 @@ DataWindow::DataWindow(QWidget *parent)
 
 DataWindow::~DataWindow()
 {
-    delete ui;
 }
 
 
@@ -222,7 +221,7 @@ void DataWindow::initMVCSettings()
     ui->m_tableView_rawTableView->setItemDelegate(m_pRawDelegate);
 
     //set some settings for m_pRawTableView
-    ui->m_tableView_rawTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_iDefaultPlotHeight);
+    ui->m_tableView_rawTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->defaultPlotHeight());
     ui->m_tableView_rawTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
     ui->m_tableView_rawTableView->setColumnHidden(2,true); //because we do not want to plot the mean values
     ui->m_tableView_rawTableView->resizeColumnsToContents();
@@ -251,8 +250,8 @@ void DataWindow::initMVCSettings()
             this, &DataWindow::updateDataTableViews);
 
     //Set MVC in delegate
-    m_pRawDelegate->setModelView(m_pMainWindow->m_pEventWindow->getEventModel(),
-                                 m_pMainWindow->m_pEventWindow->getEventTableView(),
+    m_pRawDelegate->setModelView(m_pMainWindow->eventWindow()->getEventModel(),
+                                 m_pMainWindow->eventWindow()->getEventTableView(),
                                  ui->m_tableView_rawTableView);
 
     //Install event filter to overcome QGrabGesture and QScrollBar/QHeader problem
@@ -299,7 +298,7 @@ void DataWindow::initMarker()
             this,&DataWindow::updateMarkerPosition);
 
     //If no file has been loaded yet dont show the marker and its label
-    if(!m_pRawModel->m_bFileloaded) {
+    if(!m_pRawModel->isFileLoaded()) {
         m_pDataMarker->hide();
         m_pCurrentDataMarkerLabel->hide();
         ui->m_label_sampleMin->hide();
@@ -308,11 +307,11 @@ void DataWindow::initMarker()
 
     //Connect current marker to loading a fiff file - no loaded file - no visible marker
     connect(m_pRawModel, &RawModel::fileLoaded,[this](){
-        bool state = m_pRawModel->m_bFileloaded;
+        bool state = m_pRawModel->isFileLoaded();
         if(state) {
             //Inital position of the marker
-            m_pDataMarker->move(74, m_pDataMarker->y());
-            m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (DATA_MARKER_WIDTH/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
+            m_pDataMarker->move(DATA_MARKER_INITIAL_X, m_pDataMarker->y());
+            m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (DATA_MARKER_WIDTH/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - DATA_MARKER_LABEL_V_OFFSET);
 
             m_pDataMarker->show();
             m_pCurrentDataMarkerLabel->show();
@@ -393,10 +392,10 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
 
     switch(event->key()) {
     case Qt::Key_Left:
-        horizontalScrollBar->setValue(horizontalScrollBar->value() - 25);
+        horizontalScrollBar->setValue(horizontalScrollBar->value() - RAWVIEW_KEYBOARD_SCROLL_STEP);
         break;
     case Qt::Key_Right:
-        horizontalScrollBar->setValue(horizontalScrollBar->value() + 25);
+        horizontalScrollBar->setValue(horizontalScrollBar->value() + RAWVIEW_KEYBOARD_SCROLL_STEP);
         break;
     }
 
@@ -478,7 +477,7 @@ void DataWindow::customContextMenuRequested(QPoint pos)
     //**************** FilterOperators ****************
     //selected channels
     QMenu *filtOpSubMenu = new QMenu("Apply FilterOperator to selected channel",menu);
-    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pRawModel->m_Operators);
+    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pRawModel->operators());
     while(it.hasNext()) {
         it.next();
         QAction* doApplyFilter = filtOpSubMenu->addAction(tr("%1").arg(it.key()));
@@ -555,9 +554,9 @@ void DataWindow::setRangeSampleLabels()
 
     //Set values as string
     QString stringTemp;
-    int minSampleRangeSec = (minSampleRange/m_pRawModel->m_pFiffInfo->sfreq)*1000;
+    int minSampleRangeSec = (minSampleRange/m_pRawModel->fiffInfo()->sfreq)*1000;
     ui->m_label_sampleMin->setText(QString("%1 / %2 sec").arg(stringTemp.number(minSampleRange)).arg(stringTemp.number((double)minSampleRangeSec/1000,'g')));
-    int maxSampleRangeSec = (maxSampleRange/m_pRawModel->m_pFiffInfo->sfreq)*1000;
+    int maxSampleRangeSec = (maxSampleRange/m_pRawModel->fiffInfo()->sfreq)*1000;
     ui->m_label_sampleMax->setText(QString("%1 / %2 sec").arg(stringTemp.number(maxSampleRange)).arg(stringTemp.number((double)maxSampleRangeSec/1000,'g')));
 }
 
@@ -572,15 +571,15 @@ void DataWindow::setMarkerSampleLabel()
     m_iCurrentMarkerSample = ui->m_tableView_rawTableView->horizontalScrollBar()->value() +
             (m_pDataMarker->geometry().x() - ui->m_tableView_rawTableView->geometry().x() - ui->m_tableView_rawTableView->verticalHeader()->width());
 
-    int currentSeconds = (m_iCurrentMarkerSample/m_pRawModel->m_pFiffInfo->sfreq)*1000;
+    int currentSeconds = (m_iCurrentMarkerSample/m_pRawModel->fiffInfo()->sfreq)*1000;
 
     QString numberString = QString("%1 / %2 sec").arg(QString().number(m_iCurrentMarkerSample)).arg(QString().number((double)currentSeconds/1000,'g'));
     m_pCurrentDataMarkerLabel->setText(numberString);
 
-    m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (DATA_MARKER_WIDTH/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
+    m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (DATA_MARKER_WIDTH/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - DATA_MARKER_LABEL_V_OFFSET);
 
     //Set current marker posisiton in event model
-    m_pMainWindow->m_pEventWindow->getEventModel()->setCurrentMarkerPos(m_iCurrentMarkerSample);
+    m_pMainWindow->eventWindow()->getEventModel()->setCurrentMarkerPos(m_iCurrentMarkerSample);
 }
 
 
@@ -618,7 +617,7 @@ void DataWindow::updateMarkerPosition()
                           boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);
 
     //Update current marker sample lable
-    m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
+    m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - DATA_MARKER_LABEL_V_OFFSET);
 }
 
 
@@ -626,10 +625,10 @@ void DataWindow::updateMarkerPosition()
 
 void DataWindow::highlightChannelsInSelectionManager()
 {
-    if(m_pMainWindow->m_pChannelSelectionView->isVisible()) {
+    if(m_pMainWindow->channelSelectionView()->isVisible()) {
         QModelIndexList selectedIndexes = ui->m_tableView_rawTableView->selectionModel()->selectedIndexes();
 
-        m_pMainWindow->m_pChannelSelectionView->highlightChannels(selectedIndexes);
+        m_pMainWindow->channelSelectionView()->highlightChannels(selectedIndexes);
     }
 }
 
@@ -653,13 +652,11 @@ bool DataWindow::pinchTriggered(QPinchGesture *gesture)
     QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
     if (changeFlags & QPinchGesture::ScaleFactorChanged) {
         emit scaleChannels(gesture->scaleFactor());
-        qDebug()<<"ungrab";
         ui->m_tableView_rawTableView->setSelectionMode(QAbstractItemView::NoSelection);
         QScroller::ungrabGesture(ui->m_tableView_rawTableView);
     }
 
     if (gesture->state() == Qt::GestureFinished) {
-        qDebug()<<"Finished gesture - grab again";
         ui->m_tableView_rawTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
         QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
     }

@@ -103,6 +103,28 @@
 //Data marker
 #define DATA_MARKER_WIDTH 3 // in pixels
 #define DATA_MARKER_OPACITY 200 // opacity of the data marker and backgorunds in the table columns. Range: 0...255
+#define DATA_MARKER_INITIAL_X 74 // initial x-pixel of the data marker after a file is loaded
+#define DATA_MARKER_LABEL_V_OFFSET 20 // vertical pixel offset of the marker sample label above the marker line
+
+//RawDelegate: initial/fallback scaling
+#define DELEGATE_INITIAL_MAX_VALUE 65530.0 // placeholder max-value before a file is loaded
+#define DELEGATE_FALLBACK_SCALE 1e-9 // fallback amplitude scale for unknown/unhandled channel types
+
+//Raw view keyboard navigation
+#define RAWVIEW_KEYBOARD_SCROLL_STEP 25 // pixels per Left/Right key press
+
+//Filter design
+#define FILTER_DEFAULT_TRANS_BW_RATIO 0.2 // default transition-band width as fraction of Nyquist
+
+//Default channel amplitude scales (used to initialize the scale map)
+#define DELEGATE_SCALE_MEG_GRAD  (400e-15 * 100)  // fT/m (*100 because fiff stores fT/cm)
+#define DELEGATE_SCALE_MEG_MAG   1.2e-12
+#define DELEGATE_SCALE_EEG       30e-6
+#define DELEGATE_SCALE_EOG       150e-6
+#define DELEGATE_SCALE_EMG       1e-3
+#define DELEGATE_SCALE_ECG       1e-3
+#define DELEGATE_SCALE_MISC      1.0
+#define DELEGATE_SCALE_STIM      5.0
 
 //*************************************************************************************************************
 //=============================================================================================================

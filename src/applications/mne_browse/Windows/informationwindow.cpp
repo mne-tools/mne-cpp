@@ -69,7 +69,6 @@ InformationWindow::InformationWindow(QWidget *parent)
 
 InformationWindow::~InformationWindow()
 {
-    delete ui;
 }
 
 

@@ -220,9 +220,10 @@ public:
      */
     void addNewEventType(const QString &eventType, const QColor &typeColor);
 
-    bool            m_bFileloaded;              /**< True when a Fiff event file is loaded. */
+    bool isFileLoaded() const { return m_bFileloaded; }
 
 private:
+    bool            m_bFileloaded;              /**< True when a Fiff event file is loaded. */
     QVector<int>        m_dataSamples;              /**< Vector that holds the sample alues for each loaded event. */
     QVector<int>        m_dataTypes;                /**< Vector that holds the type alues for each loaded event. */
     QVector<int>        m_dataIsUserEvent;          /**< Vector that holds the flag whether the event is user defined or loaded from file. */

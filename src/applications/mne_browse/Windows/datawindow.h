@@ -59,6 +59,8 @@
 #include <QGesture>
 #include <QScroller>
 
+#include <memory>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -220,7 +222,7 @@ private:
      */
     bool pinchTriggered(QPinchGesture *gesture);
 
-    Ui::DataWindowDockWidget *ui;                   /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::DataWindowDockWidget> ui;           /**< Pointer to the qt designer generated ui class.*/
 
     MainWindow*     m_pMainWindow;                  /**< pointer to the main window (parent). */
 

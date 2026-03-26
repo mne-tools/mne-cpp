@@ -146,9 +146,10 @@ public:
      */
     const FiffInfo getFiffInfo();
 
-    bool                        m_bFileloaded;          /**< true when a Fiff evoked file is loaded. */
+    bool isFileLoaded() const { return m_bFileloaded; }
 
 protected:
+    bool                        m_bFileloaded;          /**< true when a Fiff evoked file is loaded. */
     FiffEvokedSet::SPtr         m_pEvokedDataSet;       /**< QList<FiffEvoked> that holds the evoked data sets which are to be organised and handled by this model. */
     QSharedPointer<FiffIO>      m_pfiffIO;              /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!). */
 

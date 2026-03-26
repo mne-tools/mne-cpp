@@ -49,7 +49,10 @@
 
 #include <QtGui>
 #include <QApplication>
+#include <QCommandLineOption>
+#include <QCommandLineParser>
 #include <QDateTime>
+#include <QDir>
 #include <QSplashScreen>
 #include <QThread>
 
@@ -115,6 +118,78 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName(CInfo::AppNameShort());
     QCoreApplication::setApplicationVersion(CInfo::AppVersion());
 
+    // -------------------------------------------------------------------------
+    // Command-line argument parsing
+    // -------------------------------------------------------------------------
+    QCommandLineParser parser;
+    parser.setApplicationDescription(
+        "MNE Browse — raw FIFF data viewer and processor.\n"
+        "Qt equivalent of the MNE C tool mne_browse_raw.");
+    parser.addHelpOption();
+    parser.addVersionOption();
+
+    // --cd <dir>  Change the initial working directory
+    QCommandLineOption cdOption("cd",
+        "Change the initial working directory to <dir>.",
+        "dir");
+    parser.addOption(cdOption);
+
+    // --raw <file>  Open a raw FIFF file on startup
+    QCommandLineOption rawOption("raw",
+        "Raw FIFF input file to open on startup.",
+        "file");
+    parser.addOption(rawOption);
+
+    // --events <file>  Load an event/trigger file on startup
+    QCommandLineOption eventsOption("events",
+        "FIFF event file (*-eve.fif) to load alongside the raw data.",
+        "file");
+    parser.addOption(eventsOption);
+
+    // --highpass <Hz>  High-pass corner frequency
+    QCommandLineOption highpassOption(QStringList() << "highpass" << "hp",
+        "High-pass filter corner frequency in Hz.",
+        "Hz");
+    parser.addOption(highpassOption);
+
+    // --lowpass <Hz>  Low-pass corner frequency
+    QCommandLineOption lowpassOption(QStringList() << "lowpass" << "lp",
+        "Low-pass filter corner frequency in Hz.",
+        "Hz");
+    parser.addOption(lowpassOption);
+
+    parser.process(a);
+
+    // Apply --cd before anything else
+    if(parser.isSet(cdOption)) {
+        const QString dir = parser.value(cdOption);
+        if(!QDir::setCurrent(dir)) {
+            qWarning("[mne_browse] --cd: could not change to directory: %s",
+                     dir.toUtf8().data());
+        }
+    }
+
+    // Collect remaining options to hand to the window after it is shown
+    const QString rawFile    = parser.isSet(rawOption)      ? parser.value(rawOption)    : QString();
+    const QString eventsFile = parser.isSet(eventsOption)   ? parser.value(eventsOption) : QString();
+
+    bool hpOk = false, lpOk = false;
+    double highpass = parser.isSet(highpassOption) ? parser.value(highpassOption).toDouble(&hpOk) : -1.0;
+    double lowpass  = parser.isSet(lowpassOption)  ? parser.value(lowpassOption).toDouble(&lpOk)  : -1.0;
+    if(parser.isSet(highpassOption) && !hpOk) {
+        qWarning("[mne_browse] --highpass: invalid value '%s', ignoring.",
+                 parser.value(highpassOption).toUtf8().data());
+        highpass = -1.0;
+    }
+    if(parser.isSet(lowpassOption) && !lpOk) {
+        qWarning("[mne_browse] --lowpass: invalid value '%s', ignoring.",
+                 parser.value(lowpassOption).toUtf8().data());
+        lowpass = -1.0;
+    }
+
+    // -------------------------------------------------------------------------
+    // Launch main window
+    // -------------------------------------------------------------------------
     //show splash screen for 1 second
     QPixmap pixmap(":/Resources/Images/splashscreen_mne_browse.png");
     QSplashScreen splash(pixmap);
@@ -125,6 +200,11 @@ int main(int argc, char *argv[])
     mainWindow->show();
 
     splash.finish(mainWindow);
+
+    // Apply CLI options after the window is fully shown so all sub-windows and
+    // models are initialised (filter window needs sfreq from a loaded file, etc.)
+    if(!rawFile.isEmpty() || highpass >= 0.0 || lowpass >= 0.0)
+        mainWindow->applyCommandLineOptions(rawFile, eventsFile, highpass, lowpass);
 
     return a.exec();
 }

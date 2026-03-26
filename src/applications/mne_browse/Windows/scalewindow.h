@@ -52,6 +52,8 @@
 
 #include <QDockWidget>
 
+#include <memory>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -140,7 +142,7 @@ signals:
     void scalingViewValueChanged(int);
 
 private:
-    Ui::ScaleWindow *ui;            /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::ScaleWindow> ui;                    /**< Pointer to the qt designer generated ui class.*/
 
     //=========================================================================================================
     /**

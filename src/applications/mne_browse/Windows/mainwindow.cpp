@@ -64,6 +64,7 @@ MainWindow::MainWindow(QWidget *parent)
 , m_qSettings()
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
+, m_pStatusLabel(nullptr)
 {
     ui->setupUi(this);
 
@@ -85,6 +86,14 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+}
+
+
+//*************************************************************************************************************
+
+RawModel* MainWindow::rawModel() const
+{
+    return m_pDataWindow ? m_pDataWindow->getDataModel() : nullptr;
 }
 
 
@@ -175,10 +184,10 @@ void MainWindow::setupWindowWidgets()
             m_pAverageWindow, &AverageWindow::channelSelectionManagerChanged);
 
     //Connect channel info window with raw data model, layout manager, average manager and the data window
-    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
+    connect(rawModel(), &RawModel::fileLoaded,
             m_pChInfoWindow->getDataModel().data(), &ChannelInfoModel::setFiffInfo);
 
-    connect(m_pDataWindow->getDataModel(), &RawModel::assignedOperatorsChanged,
+    connect(rawModel(), &RawModel::assignedOperatorsChanged,
             m_pChInfoWindow->getDataModel().data(), &ChannelInfoModel::assignedOperatorsChanged);
 
     connect(m_pChannelSelectionView, &ChannelSelectionView::loadedLayoutMap,
@@ -191,32 +200,32 @@ void MainWindow::setupWindowWidgets()
             m_pAverageWindow, &AverageWindow::setMappedChannelNames);
 
     //Connect selection manager with a new file loaded signal
-    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
+    connect(rawModel(), &RawModel::fileLoaded,
             m_pChannelSelectionView, &ChannelSelectionView::newFiffFileLoaded);
 
     //Connect filter window with new file loaded signal
-    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
+    connect(rawModel(), &RawModel::fileLoaded,
             m_pFilterWindow, &FilterWindow::newFileLoaded);
 
     //Connect noise reduction manager with fif file loading
-    connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
+    connect(rawModel(), &RawModel::fileLoaded,
             m_pNoiseReductionWindow, &NoiseReductionWindow::setFiffInfo);
 
     connect(m_pNoiseReductionWindow, &NoiseReductionWindow::projSelectionChanged,
-            m_pDataWindow->getDataModel(), &RawModel::updateProjections);
+            rawModel(), &RawModel::updateProjections);
 
     connect(m_pNoiseReductionWindow, &NoiseReductionWindow::compSelectionChanged,
-            m_pDataWindow->getDataModel(), &RawModel::updateCompensator);
+            rawModel(), &RawModel::updateCompensator);
 
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
-    if(m_pDataWindow->getDataModel()->m_bFileloaded) {
-        m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_pFiffInfo);
-        m_pChInfoWindow->getDataModel()->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
+    if(rawModel()->isFileLoaded()) {
+        m_pScaleWindow->hideSpinBoxes(rawModel()->fiffInfo());
+        m_pChInfoWindow->getDataModel()->setFiffInfo(rawModel()->fiffInfo());
         m_pChInfoWindow->getDataModel()->layoutChanged(m_pChannelSelectionView->getLayoutMap());
         m_pChannelSelectionView->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
-        m_pChannelSelectionView->newFiffFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
-        m_pFilterWindow->newFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
-        m_pNoiseReductionWindow->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
+        m_pChannelSelectionView->newFiffFileLoaded(rawModel()->fiffInfo());
+        m_pFilterWindow->newFileLoaded(rawModel()->fiffInfo());
+        m_pNoiseReductionWindow->setFiffInfo(rawModel()->fiffInfo());
     }
 }
 
@@ -234,17 +243,17 @@ void MainWindow::createToolBar()
     m_pRemoveDCAction = new QAction(QIcon(":/Resources/Images/removeDC.png"),tr("Remove DC component"), this);
     m_pRemoveDCAction->setStatusTip(tr("Remove the DC component by subtracting the channel mean"));
     connect(m_pRemoveDCAction,&QAction::triggered, [this](){
-        if(m_pDataWindow->getDataDelegate()->m_bRemoveDC) {
+        if(m_pDataWindow->getDataDelegate()->isRemoveDC()) {
             m_pRemoveDCAction->setIcon(QIcon(":/Resources/Images/removeDC.png"));
             m_pRemoveDCAction->setToolTip("Remove DC component");
             m_pDataWindow->setStatusTip(tr("Remove the DC component by subtracting the channel mean"));
-            m_pDataWindow->getDataDelegate()->m_bRemoveDC = false;
+            m_pDataWindow->getDataDelegate()->setRemoveDC(false);
         }
         else {
             m_pRemoveDCAction->setIcon(QIcon(":/Resources/Images/addDC.png"));
             m_pRemoveDCAction->setToolTip("Add DC component");
             m_pRemoveDCAction->setStatusTip(tr("Add the DC component"));
-            m_pDataWindow->getDataDelegate()->m_bRemoveDC = true;
+            m_pDataWindow->getDataDelegate()->setRemoveDC(true);
         }
 
         m_pDataWindow->updateDataTableViews();
@@ -414,16 +423,16 @@ void MainWindow::setWindowStatus()
 
     //Set status bar
     //Set data file informations
-    if(m_pDataWindow->getDataModel()->m_bFileloaded) {
+    if(rawModel()->isFileLoaded()) {
         int idx = m_qFileRaw.fileName().lastIndexOf("/");
         QString filename = m_qFileRaw.fileName().remove(0,idx+1);
-        title = QString("Data file: %1  /  First sample: %2  /  Sample frequency: %3Hz").arg(filename).arg(m_pDataWindow->getDataModel()->firstSample()).arg(m_pDataWindow->getDataModel()->m_pFiffInfo->sfreq);
+        title = QString("Data file: %1  /  First sample: %2  /  Sample frequency: %3Hz").arg(filename).arg(rawModel()->firstSample()).arg(rawModel()->fiffInfo()->sfreq);
     }
     else
         title = QString("No data file");
 
     //Set event file informations
-    if(m_pEventWindow->getEventModel()->m_bFileloaded) {
+    if(m_pEventWindow->getEventModel()->isFileLoaded()) {
         int idx = m_qEventFile.fileName().lastIndexOf("/");
         QString filename = m_qEventFile.fileName().remove(0,idx+1);
 
@@ -433,7 +442,7 @@ void MainWindow::setWindowStatus()
         title.append("  -  No event file");
 
     //Set evoked file informations
-    if(m_pAverageWindow->getAverageModel()->m_bFileloaded) {
+    if(m_pAverageWindow->getAverageModel()->isFileLoaded()) {
         int idx = m_qEvokedFile.fileName().lastIndexOf("/");
         QString filename = m_qEvokedFile.fileName().remove(0,idx+1);
 
@@ -442,14 +451,11 @@ void MainWindow::setWindowStatus()
     else
         title.append("  -  No evoked file");
 
-    //Add permanent widget to status bar after deleting old one
-    QObjectList cildrenList = statusBar()->children();
-
-    for(int i = 0; i< cildrenList.size(); i++)
-        statusBar()->removeWidget((QWidget*)cildrenList.at(i));
-
-    QLabel* label = new QLabel(title);
-    statusBar()->addWidget(label);
+    if(!m_pStatusLabel) {
+        m_pStatusLabel = new QLabel(this);
+        statusBar()->addWidget(m_pStatusLabel, 1);
+    }
+    m_pStatusLabel->setText(title);
 }
 
 
@@ -487,19 +493,19 @@ void MainWindow::openFile()
 
             s_wasmByteArray = fileContent;
             QBuffer* buffer = new QBuffer(&s_wasmByteArray);
-            if(m_pDataWindow->getDataModel()->loadFiffData(buffer))
-                qDebug() << "Fiff data file" << fileName << "loaded.";
+            if(rawModel()->loadFiffData(buffer))
+                qInfo() << "Fiff data file" << fileName << "loaded.";
             else
-                qDebug("ERROR loading fiff data file %s",fileName.toUtf8().data());
+                qWarning() << "ERROR loading fiff data file" << fileName;
 
             //set position of QScrollArea
             m_pDataWindow->getDataTableView()->horizontalScrollBar()->setValue(0);
             m_pDataWindow->initMVCSettings();
 
             //Set fiffInfo in event model
-            m_pEventWindow->getEventModel()->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
-            m_pEventWindow->getEventModel()->setFirstLastSample(m_pDataWindow->getDataModel()->firstSample(),
-                                                                m_pDataWindow->getDataModel()->lastSample());
+            m_pEventWindow->getEventModel()->setFiffInfo(rawModel()->fiffInfo());
+            m_pEventWindow->getEventModel()->setFirstLastSample(rawModel()->firstSample(),
+                                                                rawModel()->lastSample());
 
             //resize columns to contents - needs to be done because the new data file can be shorter than the old one
             m_pDataWindow->updateDataTableViews();
@@ -509,7 +515,7 @@ void MainWindow::openFile()
             setWindowStatus();
 
             //Hide not presented channel types and their spin boxes in the scale window
-            m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_pFiffInfo);
+            m_pScaleWindow->hideSpinBoxes(rawModel()->fiffInfo());
 
             m_qFileRaw.close();
         }
@@ -522,76 +528,9 @@ void MainWindow::openFile()
                                                     tr("fif data files (*.fif)"));
 
     if(filename.isEmpty())
-    {
-        qDebug("User aborted opening of fiff data file");
         return;
-    }
 
-    if(m_qFileRaw.isOpen())
-        m_qFileRaw.close();
-
-    m_qFileRaw.setFileName(filename);
-
-    //Clear event model
-    m_pEventWindow->getEventModel()->clearModel();
-
-    // This thread based opening code does not properly work because the .exec blocks all other windows and their threads.
-    // However, the function loadFiffData communicates with these windows and their threads. Therefore chrashes occur.
-//    QFutureWatcher<bool> writeFileFutureWatcher;
-//    QProgressDialog progressDialog("Loading fif file...", QString(), 0, 0, this, Qt::Dialog);
-
-//    //Connect future watcher and dialog
-//    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::finished,
-//            &progressDialog, &QProgressDialog::reset);
-
-//    connect(&progressDialog, &QProgressDialog::canceled,
-//            &writeFileFutureWatcher, &QFutureWatcher<bool>::cancel);
-
-//    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::progressRangeChanged,
-//            &progressDialog, &QProgressDialog::setRange);
-
-//    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::progressValueChanged,
-//            &progressDialog, &QProgressDialog::setValue);
-
-//    //Run the file writing in seperate thread
-//    writeFileFutureWatcher.setFuture(QtConcurrent::run(m_pDataWindow->getDataModel(),
-//                                                         &RawModel::loadFiffData,
-//                                                         &m_qFileRaw));
-
-//    progressDialog.exec();
-
-//    writeFileFutureWatcher.waitForFinished();
-
-//    if(!writeFileFutureWatcher.future().result())
-//        qDebug() << "Fiff data file" << filename << "loaded.";
-//    else
-//        qDebug("ERROR loading fiff data file %s",filename.toUtf8().data());
-
-    if(m_pDataWindow->getDataModel()->loadFiffData(&m_qFileRaw))
-        qDebug() << "Fiff data file" << filename << "loaded.";
-    else
-        qDebug("ERROR loading fiff data file %s",filename.toUtf8().data());
-
-    //set position of QScrollArea
-    m_pDataWindow->getDataTableView()->horizontalScrollBar()->setValue(0);
-    m_pDataWindow->initMVCSettings();
-
-    //Set fiffInfo in event model
-    m_pEventWindow->getEventModel()->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
-    m_pEventWindow->getEventModel()->setFirstLastSample(m_pDataWindow->getDataModel()->firstSample(),
-                                                        m_pDataWindow->getDataModel()->lastSample());
-
-    //resize columns to contents - needs to be done because the new data file can be shorter than the old one
-    m_pDataWindow->updateDataTableViews();
-    m_pDataWindow->getDataTableView()->resizeColumnsToContents();
-
-    //Update status bar
-    setWindowStatus();
-
-    //Hide not presented channel types and their spin boxes in the scale window
-    m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_pFiffInfo);
-
-    m_qFileRaw.close();
+    loadRawFile(filename);
 #endif
 }
 
@@ -605,10 +544,8 @@ void MainWindow::writeFile()
                                                     QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),
                                                     tr("fif data files (*.fif)"));
 
-    if(filename.isEmpty()) {
-        qDebug("User aborted saving to fiff data file");
+    if(filename.isEmpty())
         return;
-    }
 
     if(filename == m_qFileRaw.fileName()) {
         QMessageBox msgBox;
@@ -632,15 +569,15 @@ void MainWindow::writeFile()
     connect(&progressDialog, &QProgressDialog::canceled,
             &writeFileFutureWatcher, &QFutureWatcher<bool>::cancel);
 
-    connect(m_pDataWindow->getDataModel(), &RawModel::writeProgressRangeChanged,
+    connect(rawModel(), &RawModel::writeProgressRangeChanged,
             &progressDialog, &QProgressDialog::setRange);
 
-    connect(m_pDataWindow->getDataModel(), &RawModel::writeProgressChanged,
+    connect(rawModel(), &RawModel::writeProgressChanged,
             &progressDialog, &QProgressDialog::setValue);
 
     //Run the file writing in seperate thread
     writeFileFutureWatcher.setFuture(QtConcurrent::run([this, &qFileOutput](){
-        return m_pDataWindow->getDataModel()->writeFiffData(&qFileOutput);
+        return rawModel()->writeFiffData(&qFileOutput);
     }));
 
     progressDialog.exec();
@@ -648,9 +585,9 @@ void MainWindow::writeFile()
     writeFileFutureWatcher.waitForFinished();
 
     if(!writeFileFutureWatcher.future().result())
-        qDebug() << "MainWindow: ERROR writing fiff data file" << qFileOutput.fileName() << "!";
+        qWarning() << "MainWindow: ERROR writing fiff data file" << qFileOutput.fileName();
     else
-        qDebug() << "MainWindow: Successfully written to" << qFileOutput.fileName() << "!";
+        qInfo() << "MainWindow: Successfully written to" << qFileOutput.fileName();
 }
 
 
@@ -664,27 +601,9 @@ void MainWindow::loadEvents()
                                                     tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
 
     if(filename.isEmpty())
-    {
-        qDebug("User aborted loading fiff event file");
         return;
-    }
 
-    if(m_qEventFile.isOpen())
-        m_qEventFile.close();
-
-    m_qEventFile.setFileName(filename);
-
-    if(m_pEventWindow->getEventModel()->loadEventData(m_qEventFile))
-        qDebug() << "Fiff event data file" << filename << "loaded.";
-    else
-        qDebug("ERROR loading fiff event data file %s",filename.toUtf8().data());
-
-    //Update status bar
-    setWindowStatus();
-
-    //Show event window
-    if(!m_pEventWindow->isVisible())
-        m_pEventWindow->show();
+    loadEventsFile(filename);
 }
 
 
@@ -697,20 +616,108 @@ void MainWindow::saveEvents()
                                                     QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),
                                                     tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
     if(filename.isEmpty())
-    {
-        qDebug("User aborted saving to fiff event data file");
         return;
-    }
 
     if(m_qEventFile.isOpen())
         m_qEventFile.close();
     m_qEventFile.setFileName(filename);
 
-    if(m_pEventWindow->getEventModel()->saveEventData(m_qEventFile)) {
-        qDebug() << "Fiff event data file" << filename << "saved.";
-    }
+    if(m_pEventWindow->getEventModel()->saveEventData(m_qEventFile))
+        qInfo() << "Fiff event data file" << filename << "saved.";
     else
-        qDebug("ERROR saving fiff event data file %s",filename.toUtf8().data());
+        qWarning() << "ERROR saving fiff event data file" << filename;
+}
+
+
+//*************************************************************************************************************
+
+bool MainWindow::loadRawFile(const QString& filename)
+{
+    if(m_qFileRaw.isOpen())
+        m_qFileRaw.close();
+
+    m_qFileRaw.setFileName(filename);
+
+    m_pEventWindow->getEventModel()->clearModel();
+
+    const bool ok = rawModel()->loadFiffData(&m_qFileRaw);
+    if(ok)
+        qInfo() << "Fiff data file" << filename << "loaded.";
+    else
+        qWarning() << "ERROR loading fiff data file" << filename;
+
+    m_pDataWindow->getDataTableView()->horizontalScrollBar()->setValue(0);
+    m_pDataWindow->initMVCSettings();
+
+    m_pEventWindow->getEventModel()->setFiffInfo(rawModel()->fiffInfo());
+    m_pEventWindow->getEventModel()->setFirstLastSample(rawModel()->firstSample(),
+                                                        rawModel()->lastSample());
+
+    m_pDataWindow->updateDataTableViews();
+    m_pDataWindow->getDataTableView()->resizeColumnsToContents();
+
+    setWindowStatus();
+
+    m_pScaleWindow->hideSpinBoxes(rawModel()->fiffInfo());
+
+    m_qFileRaw.close();
+    return ok;
+}
+
+
+//*************************************************************************************************************
+
+bool MainWindow::loadEventsFile(const QString& filename)
+{
+    if(m_qEventFile.isOpen())
+        m_qEventFile.close();
+
+    m_qEventFile.setFileName(filename);
+
+    const bool ok = m_pEventWindow->getEventModel()->loadEventData(m_qEventFile);
+    if(ok)
+        qInfo() << "Fiff event data file" << filename << "loaded.";
+    else
+        qWarning() << "ERROR loading fiff event data file" << filename;
+
+    setWindowStatus();
+
+    if(ok && !m_pEventWindow->isVisible())
+        m_pEventWindow->show();
+
+    return ok;
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::applyCommandLineOptions(const QString& rawFile,
+                                         const QString& eventsFile,
+                                         double highpass,
+                                         double lowpass)
+{
+    if(!rawFile.isEmpty()) {
+        if(!QFile::exists(rawFile)) {
+            qWarning() << "[mne_browse] --raw: file not found:" << rawFile;
+        } else {
+            loadRawFile(rawFile);
+        }
+    }
+
+    if(!eventsFile.isEmpty()) {
+        if(!QFile::exists(eventsFile)) {
+            qWarning() << "[mne_browse] --events: file not found:" << eventsFile;
+        } else {
+            loadEventsFile(eventsFile);
+        }
+    }
+
+    if(highpass >= 0.0 || lowpass >= 0.0) {
+        m_pFilterWindow->setFrequencies(highpass, lowpass);
+        m_pFilterWindow->applyFilter();
+        if(!m_pFilterWindow->isVisible())
+            m_pFilterWindow->show();
+    }
 }
 
 
@@ -721,10 +728,7 @@ void MainWindow::loadEvoked()
     QString filename = QFileDialog::getOpenFileName(this,QString("Open evoked fiff data file"),QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),tr("fif evoked data files (*-ave.fif);;fif data files (*.fif)"));
 
     if(filename.isEmpty())
-    {
-        qDebug("User aborted loading fiff evoked file");
         return;
-    }
 
     if(m_qEvokedFile.isOpen())
         m_qEvokedFile.close();
@@ -732,9 +736,9 @@ void MainWindow::loadEvoked()
     m_qEvokedFile.setFileName(filename);
 
     if(m_pAverageWindow->getAverageModel()->loadEvokedData(m_qEvokedFile))
-        qDebug() << "Fiff evoked data file" << filename << "loaded.";
+        qInfo() << "Fiff evoked data file" << filename << "loaded.";
     else
-        qDebug("ERROR loading evoked data file %s",filename.toUtf8().data());
+        qWarning() << "ERROR loading evoked data file" << filename;
 
     //Update status bar
     setWindowStatus();

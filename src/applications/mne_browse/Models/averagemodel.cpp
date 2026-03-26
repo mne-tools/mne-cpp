@@ -332,12 +332,10 @@ bool AverageModel::loadEvokedData(QFile& qFile)
 
     FiffEvokedSet::read(qFile, *m_pEvokedDataSet.data());
 
-    qDebug()<<"m_pEvokedDataSet->evoked.size()"<<m_pEvokedDataSet->evoked.size();
-
     if(!m_pEvokedDataSet->evoked.empty())
         m_bFileloaded = true;
     else {
-        qDebug("AverageModel: ERROR! Data set does not contain any evoked data!");
+        qWarning("AverageModel: ERROR! Data set does not contain any evoked data!");
         endResetModel();
         m_bFileloaded = false;
         emit fileLoaded(false);
@@ -389,5 +387,5 @@ void AverageModel::clearModel()
 
     endResetModel();
 
-    qDebug("AverageModel cleared.");
+    qInfo("AverageModel cleared.");
 }

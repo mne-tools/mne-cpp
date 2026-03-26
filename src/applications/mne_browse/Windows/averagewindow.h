@@ -62,6 +62,8 @@
 #include <QStandardPaths>
 #include <QSvgGenerator>
 
+#include <memory>
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -227,7 +229,7 @@ private:
      */
     void resizeEvent(QResizeEvent * event);
 
-    Ui::AverageWindow*      ui;                     /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::AverageWindow> ui;                  /**< Pointer to the qt designer generated ui class.*/
 
     QList<QColor>           m_lButterflyColors;     /**< List which holds 500 randomly generated colors.*/
 

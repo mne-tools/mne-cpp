@@ -52,6 +52,8 @@
 #include <QDockWidget>
 #include <QScrollBar>
 
+#include <memory>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -110,7 +112,7 @@ public:
     void setLogLevel(LogLevel lvl);
 
 private:
-    Ui::InformationWindowWidget *ui;                    /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::InformationWindowWidget> ui;        /**< Pointer to the qt designer generated ui class.*/
 
     //Log
     QTextBrowser*           m_pTextBrowser_Log;         /** A textbox being part of the log feature. */

@@ -179,12 +179,32 @@ public:
      */
     bool writeFiffData(QIODevice *p_IODevice);
 
-    //VARIABLES
-    bool                                        m_bFileloaded;  /**< true when a Fiff file is loaded */
-    QList<FiffChInfo>                           m_chInfolist;   /**< List of FiffChInfo objects that holds the corresponding channels information */
-    FiffInfo::SPtr                              m_pFiffInfo;    /**< fiff info of whole fiff file */
-    QSharedPointer<FIFFLIB::FiffIO>             m_pfiffIO;      /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
-    QMap<QString,QSharedPointer<MNEOperator> >  m_Operators;    /**< generated MNEOperator types (FilterOperator,PCA etc.) */
+    //=========================================================================================================
+    /** Returns true when a Fiff file is loaded. */
+    bool isFileLoaded() const { return m_bFileloaded; }
+
+    //=========================================================================================================
+    /** Returns the list of channel info objects for the loaded file. */
+    const QList<FiffChInfo>& channelInfoList() const { return m_chInfolist; }
+
+    //=========================================================================================================
+    /** Returns the FiffInfo shared pointer for the loaded file. */
+    FiffInfo::SPtr fiffInfo() const { return m_pFiffInfo; }
+
+    //=========================================================================================================
+    /**
+     * Returns the FIFF unit code for a given channel row.
+     * Needed by delegates to distinguish gradiometers (FIFF_UNIT_T_M) from magnetometers.
+     *
+     * @param row  Channel index.
+     * @return     FIFF unit code, or FIFF_UNIT_NONE if not available.
+     */
+    inline qint32 channelUnit(int row) const;
+
+    //=========================================================================================================
+    /** Returns the operator map (non-const for filter application). */
+    QMap<QString,QSharedPointer<MNEOperator> >& operators() { return m_Operators; }
+    const QMap<QString,QSharedPointer<MNEOperator> >& operators() const { return m_Operators; }
 
 private:
     //=========================================================================================================
@@ -233,6 +253,12 @@ private:
     QPair<MatrixXd,MatrixXd> readSegment(fiff_int_t from, fiff_int_t to);
 
     //VARIABLES
+    bool                                        m_bFileloaded;  /**< true when a Fiff file is loaded */
+    QList<FiffChInfo>                           m_chInfolist;   /**< List of FiffChInfo objects that holds the corresponding channels information */
+    FiffInfo::SPtr                              m_pFiffInfo;    /**< fiff info of whole fiff file */
+    QSharedPointer<FIFFLIB::FiffIO>             m_pfiffIO;      /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
+    QMap<QString,QSharedPointer<MNEOperator> >  m_Operators;    /**< generated MNEOperator types (FilterOperator,PCA etc.) */
+
     //Reload control
     bool                                    m_bStartReached;            /**< signals, whether the start of the fiff data file is reached. */
     bool                                    m_bEndReached;              /**< signals, whether the end of the fiff data file is reached. */
@@ -564,6 +590,15 @@ inline qint32 RawModel::relFiffCursor() const {
 
 inline qint32 RawModel::absFiffCursor() const {
     return m_iAbsFiffCursor;
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 RawModel::channelUnit(int row) const {
+    if(!m_pfiffIO || m_pfiffIO->m_qlistRaw.isEmpty())
+        return FIFF_UNIT_NONE;
+    return m_pfiffIO->m_qlistRaw[0]->info.chs[row].unit;
 }
 
 } // NAMESPACE

@@ -68,27 +68,26 @@ RawDelegate::RawDelegate(QObject *parent)
 , m_bShowSelectedEventsOnly(false)
 , m_bActivateEvents(true)
 , m_bRemoveDC(false)
-, m_dMaxValue(65530)
+, m_dMaxValue(DELEGATE_INITIAL_MAX_VALUE)
 , m_dScaleY(1)
-, m_pScaleWindow(Q_NULLPTR)
 {
     m_iDefaultPlotHeight = DELEGATE_PLOT_HEIGHT;
     m_dDx = DELEGATE_DX;
     m_nhlines = DELEGATE_NHLINES;
 
-    m_pEventModel = new EventModel(NULL);
-    m_pEventView = new QTableView(NULL);
-    m_pRawView = new QTableView(NULL);
+    m_pEventModel = nullptr;
+    m_pEventView = nullptr;
+    m_pRawView = nullptr;
 
     //Init m_scaleMap
-    m_scaleMap["MEG_grad"] = 400 * 1e-15 * 100; //*100 because data in fiff files is stored as fT/m not fT/cm
-    m_scaleMap["MEG_mag"] = 1.2 * 1e-12;
-    m_scaleMap["MEG_EEG"] = 30 * 1e-06;
-    m_scaleMap["MEG_EOG"] = 150 * 1e-06;
-    m_scaleMap["MEG_EMG"] = 1 * 1e-03;
-    m_scaleMap["MEG_ECG"] = 1 * 1e-03;
-    m_scaleMap["MEG_MISC"] = 1 * 1;
-    m_scaleMap["MEG_STIM"] = 5 * 1;
+    m_scaleMap["MEG_grad"] = DELEGATE_SCALE_MEG_GRAD;
+    m_scaleMap["MEG_mag"]  = DELEGATE_SCALE_MEG_MAG;
+    m_scaleMap["MEG_EEG"]  = DELEGATE_SCALE_EEG;
+    m_scaleMap["MEG_EOG"]  = DELEGATE_SCALE_EOG;
+    m_scaleMap["MEG_EMG"]  = DELEGATE_SCALE_EMG;
+    m_scaleMap["MEG_ECG"]  = DELEGATE_SCALE_ECG;
+    m_scaleMap["MEG_MISC"] = DELEGATE_SCALE_MISC;
+    m_scaleMap["MEG_STIM"] = DELEGATE_SCALE_STIM;
 }
 
 
@@ -164,7 +163,7 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         //Plot events
         painter->save();
-        if(m_pEventModel->rowCount()!=0 && m_bActivateEvents)
+        if(m_pEventModel && m_pEventModel->rowCount()!=0 && m_bActivateEvents)
             plotEvents(index, option, painter);
         painter->restore();
 
@@ -221,12 +220,13 @@ void RawDelegate::setScaleMap(const QMap<QString,double> &scaleMap)
 void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs, double channelMean) const
 {
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
-    qint32 kind = (static_cast<const RawModel*>(index.model()))->m_chInfolist[index.row()].kind;
-    double dMaxValue = 1e-9;
+    const RawModel* t_model = static_cast<const RawModel*>(index.model());
+    qint32 kind = t_model->channelInfoList()[index.row()].kind;
+    double dMaxValue = DELEGATE_FALLBACK_SCALE;
 
     switch(kind) {
     case FIFFV_MEG_CH: {
-        qint32 unit = (static_cast<const RawModel*>(index.model()))->m_pfiffIO->m_qlistRaw[0]->info.chs[index.row()].unit;
+        qint32 unit = t_model->channelUnit(index.row());
         if(unit == FIFF_UNIT_T_M) {
             dMaxValue = m_scaleMap["MEG_grad"];
         }
@@ -283,7 +283,6 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
         }
     }
 
-//    qDebug("Plot-PainterPath created!");
 }
 
 
@@ -303,7 +302,6 @@ void RawDelegate::createGridPath(QPainterPath& path, const QStyleOptionViewItem 
         path.lineTo(endpoint);
     }
 
-//    qDebug("Grid-PainterPath created!");
 }
 
 
@@ -342,17 +340,15 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
             } // END for statement
         } // END if statement event in data range
     } // END if statement plot all
-    else { //Only plot selected events
+    else if(m_pEventView) { //Only plot selected events
         QModelIndexList indexes = m_pEventView->selectionModel()->selectedIndexes();
 
         for(int i = 0; i<indexes.size(); i++) {
-            qDebug()<<indexes.at(i).row();
             int currentRow = indexes.at(i).row();
             int sampleValue = m_pEventModel->data(m_pEventModel->index(currentRow,0)).toInt();
             int type = m_pEventModel->data(m_pEventModel->index(currentRow,2)).toInt();
 
             if(sampleValue>=sampleRangeLow && sampleValue<=sampleRangeHigh) {
-                //qDebug()<<"currentRow"<<currentRow<<"sampleValue"<<sampleValue<<"sampleRangeLow"<<sampleRangeLow<<"sampleRangeHigh"<<sampleRangeHigh;
 
                 //Set color for pen depending on current event type
                 pen.setColor(eventTypeColor.value(type, Qt::black));

@@ -59,7 +59,7 @@ EventWindow::EventWindow(QWidget *parent)
 , ui(new Ui::EventWindowDockWidget)
 , m_pMainWindow(static_cast<MainWindow*>(parent))
 , m_pColordialog(new QColorDialog(this))
-, m_pEventDelegate(new EventDelegate(this))
+, m_pEventDelegate(nullptr)
 {
     ui->setupUi(this);
 
@@ -69,8 +69,8 @@ EventWindow::EventWindow(QWidget *parent)
     //------------------------
     //--- Setup data model ---
     //------------------------
-    if(m_pMainWindow->m_qEventFile.exists())
-        m_pEventModel = new EventModel(m_pMainWindow->m_qEventFile, this);
+    if(m_pMainWindow->eventFile().exists())
+        m_pEventModel = new EventModel(m_pMainWindow->eventFile(), this);
     else
         m_pEventModel = new EventModel(this);
 }
@@ -80,7 +80,6 @@ EventWindow::EventWindow(QWidget *parent)
 
 EventWindow::~EventWindow()
 {
-    delete ui;
 }
 
 
@@ -125,9 +124,9 @@ EventDelegate* EventWindow::getEventDelegate()
 void EventWindow::initMVCSettings()
 {
     //Set fiffInfo and first/last sample in the event model
-    m_pEventModel->setFiffInfo(m_pMainWindow->m_pDataWindow->getDataModel()->m_pFiffInfo);
-    m_pEventModel->setFirstLastSample(m_pMainWindow->m_pDataWindow->getDataModel()->firstSample(),
-                                      m_pMainWindow->m_pDataWindow->getDataModel()->lastSample());
+    m_pEventModel->setFiffInfo(m_pMainWindow->rawModel()->fiffInfo());
+    m_pEventModel->setFirstLastSample(m_pMainWindow->rawModel()->firstSample(),
+                                      m_pMainWindow->rawModel()->lastSample());
 
     //set MVC model
     ui->m_tableView_eventTableView->setModel(m_pEventModel);
@@ -146,7 +145,7 @@ void EventWindow::initMVCSettings()
 
     //Update the data views whenever the data in the event model changes
     connect(m_pEventModel,&EventModel::dataChanged,
-                m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
+                m_pMainWindow->dataWindow(),&DataWindow::updateDataTableViews);
 }
 
 
@@ -155,15 +154,15 @@ void EventWindow::initMVCSettings()
 void EventWindow::initCheckBoxes()
 {
     connect(ui->m_checkBox_activateEvents,&QCheckBox::checkStateChanged, [this](Qt::CheckState state){
-        m_pMainWindow->m_pDataWindow->getDataDelegate()->m_bActivateEvents = (state == Qt::Checked);
+        m_pMainWindow->dataWindow()->getDataDelegate()->setActivateEvents(state == Qt::Checked);
         jumpToEvent(ui->m_tableView_eventTableView->selectionModel()->currentIndex(), QModelIndex());
-        m_pMainWindow->m_pDataWindow->updateDataTableViews();
+        m_pMainWindow->dataWindow()->updateDataTableViews();
     });
 
     connect(ui->m_checkBox_showSelectedEventsOnly,&QCheckBox::checkStateChanged, [this](Qt::CheckState state){
-        m_pMainWindow->m_pDataWindow->getDataDelegate()->m_bShowSelectedEventsOnly = (state == Qt::Checked);
+        m_pMainWindow->dataWindow()->getDataDelegate()->setShowSelectedEventsOnly(state == Qt::Checked);
         jumpToEvent(ui->m_tableView_eventTableView->selectionModel()->currentIndex(), QModelIndex());
-        m_pMainWindow->m_pDataWindow->updateDataTableViews();
+        m_pMainWindow->dataWindow()->updateDataTableViews();
     });
 }
 
@@ -179,7 +178,7 @@ void EventWindow::initComboBoxes()
     //Connect filter types to event model
     connect(ui->m_comboBox_filterTypes, &QComboBox::currentTextChanged,[this](QString string){
         m_pEventModel->setEventFilterType(string);
-        m_pMainWindow->m_pDataWindow->updateDataTableViews();
+        m_pMainWindow->dataWindow()->updateDataTableViews();
     });
 
     connect(m_pEventModel,&EventModel::updateEventTypes,
@@ -240,7 +239,6 @@ bool EventWindow::event(QEvent * event)
 {
     //On resize event center marker again
     if(event->type() == QEvent::Resize) {
-        qDebug()<<"resize";
         jumpToEvent(ui->m_tableView_eventTableView->selectionModel()->currentIndex(), QModelIndex());
     }
 
@@ -269,18 +267,16 @@ void EventWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & p
         int sample = m_pEventModel->data(index, Qt::DisplayRole).toInt();
 
         //Jump to sample - put sample in the middle of the view - the viewport holds the width of the are which is changed through scrolling
-        int rawTableViewColumnWidth = m_pMainWindow->m_pDataWindow->getDataTableView()->viewport()->width();
+        int rawTableViewColumnWidth = m_pMainWindow->dataWindow()->getDataTableView()->viewport()->width();
 
         if(sample-rawTableViewColumnWidth/2 < rawTableViewColumnWidth/2) //events lie in the first half of the data window at the beginning of the loaded data -> cannot centralize view on event
-            m_pMainWindow->m_pDataWindow->getDataTableView()->horizontalScrollBar()->setValue(0);
-        else if(sample+rawTableViewColumnWidth/2 > m_pMainWindow->m_pDataWindow->getDataModel()->lastSample()-rawTableViewColumnWidth/2) //events lie in the last half of the data window at the end of the loaded data -> cannot centralize view on event
-            m_pMainWindow->m_pDataWindow->getDataTableView()->horizontalScrollBar()->setValue(m_pMainWindow->m_pDataWindow->getDataTableView()->maximumWidth());
+            m_pMainWindow->dataWindow()->getDataTableView()->horizontalScrollBar()->setValue(0);
+        else if(sample+rawTableViewColumnWidth/2 > m_pMainWindow->rawModel()->lastSample()-rawTableViewColumnWidth/2) //events lie in the last half of the data window at the end of the loaded data -> cannot centralize view on event
+            m_pMainWindow->dataWindow()->getDataTableView()->horizontalScrollBar()->setValue(m_pMainWindow->dataWindow()->getDataTableView()->maximumWidth());
         else //centralize view on event
-            m_pMainWindow->m_pDataWindow->getDataTableView()->horizontalScrollBar()->setValue(sample-rawTableViewColumnWidth/2);
+            m_pMainWindow->dataWindow()->getDataTableView()->horizontalScrollBar()->setValue(sample-rawTableViewColumnWidth/2);
 
-        qDebug()<<"Jumping to Event at sample "<<sample<<"rawTableViewColumnWidth"<<rawTableViewColumnWidth;
-
-        m_pMainWindow->m_pDataWindow->updateDataTableViews();
+        m_pMainWindow->dataWindow()->updateDataTableViews();
     }
 }
 
@@ -311,5 +307,5 @@ void EventWindow::addNewEventType()
     //Open add event type dialog
     m_pEventModel->addNewEventType(QString().number(ui->m_spinBox_addEventType->value()), m_pColordialog->getColor(Qt::black, this));
     m_pEventModel->setEventFilterType(QString().number(ui->m_spinBox_addEventType->value()));
-    m_pMainWindow->m_pDataWindow->updateDataTableViews();
+    m_pMainWindow->dataWindow()->updateDataTableViews();
 }

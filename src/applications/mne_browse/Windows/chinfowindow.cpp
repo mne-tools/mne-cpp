@@ -69,7 +69,6 @@ ChInfoWindow::ChInfoWindow(QWidget *parent)
 
 ChInfoWindow::~ChInfoWindow()
 {
-    delete ui;
 }
 
 

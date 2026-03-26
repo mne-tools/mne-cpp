@@ -99,11 +99,13 @@
 #include <QScroller>
 #include <QTextBrowser>
 #include <QMessageBox>
+#include <QLabel>
 #include <QPixmap>
-#include <QSignalMapper>
 #include <QFutureWatcher>
 #include <QProgressDialog>
 #include <QMessageBox>
+
+#include <memory>
 
 
 //*************************************************************************************************************
@@ -156,11 +158,7 @@ class DataWindow;
  * DECLARE CLASS MainWindow
  */
 class MainWindow : public QMainWindow
-{    
-    friend class FilterWindow;
-    friend class EventWindow;
-    friend class DataWindow;
-
+{
     Q_OBJECT
 public:
     MainWindow(QWidget *parent = 0);
@@ -200,6 +198,55 @@ private:
      * saveEvents saves the event data to file.
      */
     void saveEvents();
+
+public:
+    //=========================================================================================================
+    /**
+     * Sub-window and file accessors — used by FilterWindow, EventWindow, DataWindow.
+     * These replace the former friend class declarations.
+     */
+    DataWindow*             dataWindow()            const { return m_pDataWindow; }
+    EventWindow*            eventWindow()           const { return m_pEventWindow; }
+    ChannelSelectionView*   channelSelectionView()  const { return m_pChannelSelectionView; }
+    ChInfoWindow*           chInfoWindow()          const { return m_pChInfoWindow; }
+    QFile&                  rawFile()                     { return m_qFileRaw; }
+    QFile&                  eventFile()                   { return m_qEventFile; }
+
+    /** Convenience accessor — collapses the dataWindow()->getDataModel() chain. */
+    RawModel*               rawModel()              const;
+
+    //=========================================================================================================
+    /**
+     * applyCommandLineOptions applies options parsed from the command line after the window is shown.
+     *
+     * @param [in] rawFile     Path to raw FIFF file to open, or empty.
+     * @param [in] eventsFile  Path to event FIFF file to load, or empty.
+     * @param [in] highpass    High-pass corner frequency in Hz, or -1 to skip.
+     * @param [in] lowpass     Low-pass corner frequency in Hz, or -1 to skip.
+     */
+    void applyCommandLineOptions(const QString& rawFile,
+                                 const QString& eventsFile,
+                                 double highpass,
+                                 double lowpass);
+
+private:
+    //=========================================================================================================
+    /**
+     * loadRawFile loads a raw FIFF file without a dialog.
+     *
+     * @param [in] filename  Absolute path to the raw FIFF file.
+     * @return true on success.
+     */
+    bool loadRawFile(const QString& filename);
+
+    //=========================================================================================================
+    /**
+     * loadEventsFile loads an event FIFF file without a dialog.
+     *
+     * @param [in] filename  Absolute path to the event file.
+     * @return true on success.
+     */
+    bool loadEventsFile(const QString& filename);
 
     //=========================================================================================================
     /**
@@ -248,14 +295,13 @@ private:
 
     //=========================================================================================================
     /**
-     * setWindowStatus sets the window status depending on m_pRawModel->m_bFileloaded
+     * setWindowStatus sets the window status depending on the loaded file state
      */
     void setWindowStatus();
 
     QFile                   m_qFileRaw;                     /**< Fiff data file to read (set for convenience). */
     QFile                   m_qEventFile;                   /**< Fiff event data file to read (set for convenience). */
     QFile                   m_qEvokedFile;                  /**< Fiff event data file to read (set for convenience). */
-    QSignalMapper*          m_qSignalMapper;                /**< Signal mapper used for signal-slot mapping. */
 
     //Window widgets
     EventWindow*            m_pEventWindow;                 /**< Event widget which display the event view. */
@@ -275,8 +321,9 @@ private:
     QSettings               m_qSettings;                    /**< QSettings variable used to write or read from independent application sessions. */
     RawSettings             m_rawSettings;                  /**< The software specific mne brose raw qt settings. */
 
-    Ui::MainWindowWidget*   ui;                             /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::MainWindowWidget> ui;               /**< Pointer to the qt designer generated ui class.*/
 
+    QLabel*                 m_pStatusLabel;                 /**< Persistent status bar label, updated in place to avoid repeated allocation. */
     QAction*                m_pRemoveDCAction;              /**< The action which is used to control DC removal. */
     QAction*                m_pHideBadAction;               /**< The action which is used to control hide bad channel functionality. */
 };

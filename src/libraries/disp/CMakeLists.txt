@@ -24,6 +24,20 @@ if(NOT WASM)
     endif()
 endif()
 
+# ── Optional QRhi support for ChannelDataView / ChannelRhiView ──────────────
+# Requires Qt6 with GuiPrivate (for <rhi/qrhi.h>) and ShaderTools (for qt_add_shaders).
+# Falls back silently to the QPainter path when either is unavailable.
+set(MNE_DISP_HAS_RHIWIDGET FALSE)
+if(Qt6_FOUND)
+    find_package(Qt6 QUIET COMPONENTS GuiPrivate ShaderTools)
+    if(Qt6GuiPrivate_FOUND AND Qt6ShaderTools_FOUND)
+        set(MNE_DISP_HAS_RHIWIDGET TRUE)
+        message(STATUS "mne_disp: QRhi ChannelDataView enabled (Qt6::GuiPrivate + ShaderTools found)")
+    else()
+        message(STATUS "mne_disp: QRhi ChannelDataView disabled (Qt6::GuiPrivate or ShaderTools not found — QPainter fallback)")
+    endif()
+endif()
+
 set(SOURCES
     disp_global.cpp
     plots/imagesc.cpp
@@ -64,12 +78,15 @@ set(SOURCES
     viewers/control3dview.cpp
     viewers/tfsettingsview.cpp
     viewers/artifactsettingsview.cpp
+    viewers/channeldataview.cpp
     viewers/rtfiffrawview.cpp
     viewers/multiviewwindow.cpp
     viewers/multiview.cpp
     viewers/hpisettingsview.cpp
     viewers/covariancesettingsview.cpp
     viewers/bidsview.cpp
+    viewers/helpers/channeldatamodel.cpp
+    viewers/helpers/channelrhiview.cpp
     viewers/helpers/rtfiffrawviewmodel.cpp
     viewers/helpers/rtfiffrawviewdelegate.cpp
     viewers/helpers/evokedsetmodel.cpp
@@ -127,12 +144,15 @@ set(HEADERS
     viewers/control3dview.h
     viewers/tfsettingsview.h
     viewers/artifactsettingsview.h
+    viewers/channeldataview.h
     viewers/rtfiffrawview.h
     viewers/multiviewwindow.h
     viewers/multiview.h
     viewers/hpisettingsview.h
     viewers/covariancesettingsview.h
     viewers/bidsview.h
+    viewers/helpers/channeldatamodel.h
+    viewers/helpers/channelrhiview.h
     viewers/helpers/rtfiffrawviewdelegate.h
     viewers/helpers/rtfiffrawviewmodel.h
     viewers/helpers/evokedsetmodel.h
@@ -184,6 +204,22 @@ list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI})
+
+# ── QRhi / shader compilation ───────────────────────────────────────────────
+if(MNE_DISP_HAS_RHIWIDGET)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_DISP_RHIWIDGET)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::GuiPrivate)
+
+    qt_add_shaders(${PROJECT_NAME} "channeldata_shaders"
+        BATCHABLE
+        PRECOMPILE
+        OPTIMIZED
+        PREFIX "/disp/shaders"
+        FILES
+            viewers/helpers/shaders/channeldata.vert
+            viewers/helpers/shaders/channeldata.frag
+    )
+endif()
 
 set(FFTW_LIBS "")
 

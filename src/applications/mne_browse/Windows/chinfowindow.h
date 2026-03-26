@@ -55,6 +55,8 @@
 
 #include <QDockWidget>
 
+#include <memory>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -126,7 +128,7 @@ private:
      */
     void initTableViews();
 
-    Ui::ChInfoWindow*   ui;                 /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::ChInfoWindow> ui;               /**< Pointer to the qt designer generated ui class.*/
 
     ChannelInfoModel::SPtr   m_pChannelInfoModel;     /**< The channel info model.*/
 };
