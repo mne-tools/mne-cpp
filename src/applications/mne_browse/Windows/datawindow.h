@@ -45,6 +45,9 @@
 #include "ui_datawindowdock.h"
 #include "../Delegates/rawdelegate.h"
 #include "../Models/rawmodel.h"
+#include "../Models/fiffblockreader.h"
+
+#include <disp/viewers/channeldataview.h>
 
 
 //*************************************************************************************************************
@@ -58,6 +61,8 @@
 #include <QColor>
 #include <QGesture>
 #include <QScroller>
+
+#include <Eigen/Core>
 
 #include <memory>
 
@@ -114,6 +119,16 @@ public:
      * Setup the model view controller of the data window
      */
     void initMVCSettings();
+
+    //=========================================================================================================
+    /**
+     * Load a raw FIFF file into the ChannelDataView.
+     * Only the file header is read immediately; data is demand-paged as the user scrolls.
+     *
+     * @param[in] path  Absolute path to the .fif file.
+     * @return true on success.
+     */
+    bool loadFiffFile(const QString &path);
 
     //=========================================================================================================
     /**
@@ -241,6 +256,15 @@ private:
 
     bool            m_bHideBadChannels;             /**< hide bad channels flag. */
 
+    // ── ChannelDataView (GPU-accelerated renderer) ─────────────────────
+    DISPLIB::ChannelDataView* m_pChannelDataView  = nullptr; /**< GPU-accelerated signal renderer. */
+    FiffBlockReader*          m_pFiffReader       = nullptr; /**< Demand-paging FIFF reader. */
+    int                       m_iNextLoadSample   = 0;       /**< First sample of the next block to preload. */
+    bool                      m_bLoadingBlock     = false;   /**< Async load in progress. */
+
+    static constexpr float kBlockSeconds  = 30.f;  /**< Seconds of data per demand-load block. */
+    static constexpr int   kMaxBlocks     = 5;     /**< Ring-buffer depth in blocks. */
+
 signals:
     //=========================================================================================================
     /**
@@ -255,6 +279,24 @@ protected slots:
      * @param pos is the position, where the right-click occurred
      */
     void customContextMenuRequested(QPoint pos);
+
+    //=========================================================================================================
+    /**
+     * Called when the ChannelDataView scroll position changes.
+     * Triggers demand-loading of the next block when approaching the buffer edge.
+     *
+     * @param[in] sample  Current left-edge sample index.
+     */
+    void onChannelViewScrollChanged(int sample);
+
+    //=========================================================================================================
+    /**
+     * Called when an async block has been loaded by FiffBlockReader.
+     *
+     * @param[in] data         channels × samples matrix.
+     * @param[in] firstSample  Absolute sample index of column 0.
+     */
+    void onBlockLoaded(const Eigen::MatrixXd &data, int firstSample);
 
     //=========================================================================================================
     /**
