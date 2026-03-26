@@ -72,6 +72,10 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_ANALYZE_STUDIO_CORE_LIBRARY)
 
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC STATICBUILD)
+endif()
+
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin COMPONENT runtime
     LIBRARY DESTINATION lib COMPONENT runtime

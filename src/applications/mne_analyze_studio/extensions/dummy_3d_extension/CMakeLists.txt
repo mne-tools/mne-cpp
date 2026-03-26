@@ -11,7 +11,7 @@ set(QT_REQUIRED_COMPONENTS Core Widgets)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-add_library(mne_analyze_studio_dummy_3d_extension_widgets SHARED
+add_library(mne_analyze_studio_dummy_3d_extension_widgets ${MNE_ANALYZE_STUDIO_LIB_TYPE}
     dummy3dhostedviewwidget.cpp
     dummy3dhostedviewwidget.h
 )
@@ -24,6 +24,10 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 target_include_directories(mne_analyze_studio_dummy_3d_extension_widgets PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(mne_analyze_studio_dummy_3d_extension_widgets PRIVATE STATICBUILD)
+endif()
 
 target_link_libraries(mne_analyze_studio_dummy_3d_extension_widgets PUBLIC
     ${QT_REQUIRED_COMPONENT_LIBS}

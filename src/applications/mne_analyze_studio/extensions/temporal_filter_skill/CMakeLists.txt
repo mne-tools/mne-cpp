@@ -11,7 +11,7 @@ set(QT_REQUIRED_COMPONENTS Core)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-add_library(mne_analyze_studio_temporal_filter_skill SHARED
+add_library(mne_analyze_studio_temporal_filter_skill ${MNE_ANALYZE_STUDIO_LIB_TYPE}
     temporalfilterskill.cpp
     temporalfilterskill.h
 )
