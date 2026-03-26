@@ -21,6 +21,7 @@ set(SOURCES
     main.cpp
     mainwindow.cpp
     pillselectorwidget.cpp
+    workflowminimapwidget.cpp
 )
 
 set(HEADERS
@@ -33,6 +34,7 @@ set(HEADERS
     llmsettingsdialog.h
     mainwindow.h
     pillselectorwidget.h
+    workflowminimapwidget.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

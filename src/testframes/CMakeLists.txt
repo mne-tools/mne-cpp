@@ -141,3 +141,7 @@ add_subdirectory(test_disp_plots)
 add_subdirectory(test_disp3d_viewstate)
 add_subdirectory(test_disp3d_brainsurface)
 add_subdirectory(test_disp3d_brainview)
+
+# MNE Analyze Studio coverage tests
+add_subdirectory(test_mne_analyze_studio_core_capabilities)
+add_subdirectory(test_mne_analyze_studio_workflow_integration)

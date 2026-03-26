@@ -1,0 +1,13 @@
+{
+  "id": "temporal-filter-skill",
+  "display_name": "Temporal Filter Skill",
+  "version": "0.1.0",
+  "entry_point": "temporal_filter_skill",
+  "contributes": {
+    "ui": {
+      "sidebar_items": [
+        "Workflow Skills"
+      ]
+    }
+  }
+}

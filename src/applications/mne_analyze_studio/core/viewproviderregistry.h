@@ -41,6 +41,7 @@ public:
     QVector<ExtensionManifest> manifests() const;
     QVector<ExtensionManifest> allManifests() const;
     QJsonArray toolDefinitions() const;
+    QJsonArray analysisPipelineToolDefinitions() const;
     QJsonArray resultRendererDefinitions() const;
     QJsonArray analysisPipelineDefinitions() const;
     QJsonObject providerForFile(const QString& filePath, const QJsonObject& metadata = QJsonObject()) const;

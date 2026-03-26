@@ -18,11 +18,7 @@ add_library(mne_analyze_studio_psd_analysis_extension_widgets SHARED
     spectrumplotwidget.h
 )
 
-set_target_properties(mne_analyze_studio_psd_analysis_extension_widgets PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIRECTORY}/lib
-    ARCHIVE_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIRECTORY}/lib
-    RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIRECTORY}/lib
-)
+mne_analyze_studio_configure_library_target(mne_analyze_studio_psd_analysis_extension_widgets)
 
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")

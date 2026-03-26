@@ -36,15 +36,13 @@
 #include <QJsonArray>
 #include <QWidget>
 
-class QLineEdit;
 class QLabel;
+class QLineEdit;
 class QPushButton;
 class QScrollArea;
 class QStackedWidget;
-class QTabWidget;
 class QTextEdit;
 class QVBoxLayout;
-class QFrame;
 class QWidget;
 
 namespace MNEANALYZESTUDIO
@@ -54,6 +52,9 @@ class PillSelectorWidget;
 
 /**
  * @brief Sidebar chat widget that captures agent prompts and displays transcript history.
+ *        Layout follows VS Code's chat panel conventions: a header toolbar with New Chat /
+ *        History navigation, a stacked content area (current chat | history list | session
+ *        detail), and a compact composer footer with connection + safety-level controls.
  */
 class AgentChatDockWidget : public QWidget
 {
@@ -61,11 +62,16 @@ class AgentChatDockWidget : public QWidget
 
 public:
     explicit AgentChatDockWidget(QWidget* parent = nullptr);
+
+    // Connection / LLM status
     void setPlannerStatus(const QString& statusText);
     void setConnectionProfiles(const QStringList& profiles, const QString& currentProfile);
     void setConnectionModes(const QList<QPair<QString, QString>>& modes, const QString& currentMode);
     void setSuggestedModels(const QStringList& models, const QString& currentModel);
     void setConnectionState(const QString& stateText, bool warning, const QString& detailMessage = QString());
+    void setPlannerSafetyLevel(const QString& level);
+
+    // Conversation state
     QJsonArray archivedConversationSessions() const;
     QJsonArray currentConversationEntries() const;
     void restoreConversationState(const QJsonArray& currentEntries, const QJsonArray& archivedSessions);
@@ -78,6 +84,7 @@ signals:
     void connectionModeSelected(const QString& mode);
     void connectionModelSelected(const QString& model);
     void openConnectionSettingsRequested();
+    void plannerSafetyLevelSelected(const QString& level); ///< "auto" | "confirm" | "safe"
 
 public slots:
     void appendTranscript(const QString& text);
@@ -89,44 +96,53 @@ private:
     void refreshArchivedSessions();
     void refreshArchivedSessionView();
     void showCurrentConversation();
-    void showArchivedSessionList();
+    void showHistoryList();
     void showArchivedSession(int index);
+    void updateHeaderForPage(int pageIndex);
 
-    QFrame* m_transcriptPanel;
-    QTabWidget* m_conversationTabs;
-    QWidget* m_currentConversationPage;
-    QWidget* m_priorSessionsPage;
-    QLabel* m_titleLabel;
-    QLabel* m_statusLabel;
-    QLabel* m_currentConversationLabel;
-    QLabel* m_archivedConversationLabel;
-    QLabel* m_transcriptContextLabel;
-    QLabel* m_archivedTranscriptContextLabel;
-    QLabel* m_connectionHintLabel;
-    QLabel* m_validationHintLabel;
-    PillSelectorWidget* m_profileSelector;
+    // Header
+    QLabel*      m_titleLabel;
+    QPushButton* m_newChatButton;
+    QPushButton* m_historyButton;
+
+    // Main stacked area: 0=current chat, 1=history list, 2=session detail
+    QStackedWidget* m_mainStack;
+    QWidget*        m_currentConversationPage;
+    QWidget*        m_historyListPage;
+    QWidget*        m_historyDetailPage;
+
+    // Current conversation page
+    QLabel*          m_confirmationLabel;
+    QWidget*         m_confirmationPanel;
+    QVBoxLayout*     m_confirmationLayout;
+    QTextEdit*       m_transcript;
+
+    // History list page
+    QScrollArea*  m_archivedSessionsScrollArea;
+    QWidget*      m_archivedSessionsPanel;
+    QVBoxLayout*  m_archivedSessionsLayout;
+
+    // History detail page
+    QLabel*       m_archivedTranscriptContextLabel;
+    QPushButton*  m_backToSessionsButton;
+    QTextEdit*    m_archivedTranscript;
+
+    // Composer footer
     PillSelectorWidget* m_modeSelector;
     PillSelectorWidget* m_modelSelector;
-    QLabel* m_connectionStateLabel;
-    QPushButton* m_connectionSettingsButton;
-    QLabel* m_confirmationLabel;
-    QWidget* m_confirmationPanel;
-    QVBoxLayout* m_confirmationLayout;
-    QStackedWidget* m_archivedSessionsStack;
-    QWidget* m_archivedSessionsListPage;
-    QWidget* m_archivedSessionViewerPage;
-    QScrollArea* m_archivedSessionsScrollArea;
-    QWidget* m_archivedSessionsPanel;
-    QVBoxLayout* m_archivedSessionsLayout;
-    QTextEdit* m_transcript;
-    QTextEdit* m_archivedTranscript;
-    QPushButton* m_backToSessionsButton;
-    QLineEdit* m_input;
-    QPushButton* m_sendButton;
+    PillSelectorWidget* m_safetySelector;
+    PillSelectorWidget* m_profileSelector;
+    QPushButton*        m_connectionSettingsButton;
+    QLabel*             m_validationHintLabel;
+    QLabel*             m_statusLabel;
+    QLineEdit*          m_input;
+    QPushButton*        m_sendButton;
+
+    // State
     QJsonArray m_pendingConfirmations;
     QJsonArray m_currentConversationEntries;
     QJsonArray m_archivedConversationSessions;
-    int m_activeArchivedSessionIndex = -1;
+    int        m_activeArchivedSessionIndex = -1;
 };
 
 } // namespace MNEANALYZESTUDIO

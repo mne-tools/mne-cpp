@@ -21,7 +21,7 @@ namespace
 {
 
 const QStringList kThreeDExtensions = {".surf", ".pial", ".white", ".inflated", ".orig", ".bem"};
-const QStringList kTextExtensions = {".py", ".cpp", ".json"};
+const QStringList kTextExtensions = {".py", ".cpp", ".json", ".mne", ".h", ".hpp", ".md", ".tex"};
 
 }
 

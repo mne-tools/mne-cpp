@@ -65,6 +65,7 @@ struct LlmPlanResult
     QString providerErrorType;
     QString rawResponse;
     QStringList plannedCommands;
+    QStringList plannedStepDescriptions; // one entry per plannedCommands entry; may be empty strings
 };
 
 /**

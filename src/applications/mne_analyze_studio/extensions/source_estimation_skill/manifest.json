@@ -1,0 +1,13 @@
+{
+  "id": "source-estimation-skill",
+  "display_name": "Source Estimation Skill",
+  "version": "0.1.0",
+  "entry_point": "source_estimation_skill",
+  "contributes": {
+    "ui": {
+      "sidebar_items": [
+        "Workflow Skills"
+      ]
+    }
+  }
+}

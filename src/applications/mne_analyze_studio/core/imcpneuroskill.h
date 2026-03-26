@@ -27,41 +27,21 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @brief    Declares the MCP-compatible skill interface used by MNE Analyze Studio.
+ * @brief    Backward-compatible wrapper for the legacy skill include.
  */
 
 #ifndef MNE_ANALYZE_STUDIO_IMCPNEUROSKILL_H
 #define MNE_ANALYZE_STUDIO_IMCPNEUROSKILL_H
 
-#include "studio_core_global.h"
-
-#include <QJsonObject>
-#include <QObject>
+#include "iskilloperator.h"
 
 namespace MNEANALYZESTUDIO
 {
 
-class IBuffer;
-
-/**
- * @brief Base class for studio skills that expose MCP tool metadata and execution hooks.
- */
-class STUDIOCORESHARED_EXPORT IMcpNeuroSkill : public QObject
-{
-    Q_OBJECT
-
-public:
-    explicit IMcpNeuroSkill(QObject* parent = nullptr);
-    ~IMcpNeuroSkill() override;
-
-    virtual QJsonObject getMetadata() const = 0;
-    virtual QJsonObject execute(const QJsonObject& arguments) = 0;
-    virtual void onBufferAttached(IBuffer* buffer) = 0;
-};
+using IMcpNeuroSkill = ISkillOperator;
 
 } // namespace MNEANALYZESTUDIO
 
-#define IMcpNeuroSkill_iid "org.mnecpp.mne-analyze-studio.IMcpNeuroSkill/1.0"
-Q_DECLARE_INTERFACE(MNEANALYZESTUDIO::IMcpNeuroSkill, IMcpNeuroSkill_iid)
+#define IMcpNeuroSkill_iid ISkillOperator_iid
 
 #endif // MNE_ANALYZE_STUDIO_IMCPNEUROSKILL_H

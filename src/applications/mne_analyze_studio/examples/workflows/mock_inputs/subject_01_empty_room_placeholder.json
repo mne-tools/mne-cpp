@@ -1,0 +1,6 @@
+{
+  "kind": "mock_meg_noise_input",
+  "subject": "subject_01",
+  "session": "empty_room",
+  "description": "Placeholder empty-room recording used for noise covariance branches in workflow DAG prototyping."
+}

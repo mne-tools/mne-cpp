@@ -12,38 +12,45 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
+    capabilitycatalog.cpp
+    capabilityutils.cpp
     fiffbuffer.cpp
     interfaces.cpp
     jsonrpcmessage.cpp
     llmtoolplanner.cpp
     manifestparser.cpp
     mcprouter.cpp
+    pipelineparser.cpp
     scenecontextregistry.cpp
     viewmanager.cpp
     viewproviderregistry.cpp
+    workflowgraph.cpp
+    workflowmanager.cpp
 )
 
 set(HEADERS
+    capabilitycatalog.h
+    capabilityutils.h
     fiffbuffer.h
     ibuffer.h
+    iskilloperator.h
     imcpneuroskill.h
     jsonrpcmessage.h
     llmtoolplanner.h
     manifestparser.h
     mcprouter.h
+    pipelineparser.h
     scenecontextregistry.h
     studio_core_global.h
     viewmanager.h
     viewproviderregistry.h
+    workflowgraph.h
+    workflowmanager.h
 )
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIRECTORY}/lib
-    ARCHIVE_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIRECTORY}/lib
-    RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIRECTORY}/lib
-)
+mne_analyze_studio_configure_library_target(${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

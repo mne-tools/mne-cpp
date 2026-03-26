@@ -1,0 +1,6 @@
+{
+  "kind": "mock_mri_input",
+  "subject": "subject_01",
+  "modality": "T1w",
+  "description": "Placeholder anatomical MRI used for workflow DAG and UI prototyping."
+}

@@ -32,6 +32,7 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     mne_analyze_studio_core
+    mne_analyze_studio_temporal_filter_skill
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)
