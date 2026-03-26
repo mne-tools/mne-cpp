@@ -97,4 +97,4 @@ echo "Launching MNE Browse from $BuildPath..."
 EXTRA_ARGS=()
 [ -f "$EventsFile" ] && EXTRA_ARGS+=(--events "$EventsFile")
 
-"$BuildPath" --raw "$RawFile" "${EXTRA_ARGS[@]}"
+"$BuildPath" --raw "$RawFile" ${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"}
