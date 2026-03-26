@@ -421,13 +421,15 @@ void TestRtSourceStreaming::testControllerStreamingInterval()
         controller.addData(VectorXd::Constant(totalSources, 0.7));
     }
 
-    // Stream at 50ms interval — expect fewer frames than 10ms
-    QSignalSpy spy50(&controller, &RtSourceDataController::newSmoothedDataAvailable);
-    controller.setTimeInterval(50);
+    // Stream at 500ms interval — expect fewer frames than 100ms.
+    // Use intervals well above typical CI timer granularity (~70ms on loaded macOS)
+    // and a generous wait window so the comparison is reliable.
+    QSignalSpy spy500(&controller, &RtSourceDataController::newSmoothedDataAvailable);
+    controller.setTimeInterval(500);
     controller.setStreamingState(true);
-    QTest::qWait(500);
+    QTest::qWait(3000);
     controller.setStreamingState(false);
-    int count50 = spy50.count();
+    int count500 = spy500.count();
 
     // Re-add data for second run
     controller.clearData();
@@ -435,18 +437,18 @@ void TestRtSourceStreaming::testControllerStreamingInterval()
         controller.addData(VectorXd::Constant(totalSources, 0.7));
     }
 
-    // Stream at 10ms interval — expect more frames
-    QSignalSpy spy10(&controller, &RtSourceDataController::newSmoothedDataAvailable);
-    controller.setTimeInterval(10);
+    // Stream at 100ms interval — expect more frames
+    QSignalSpy spy100(&controller, &RtSourceDataController::newSmoothedDataAvailable);
+    controller.setTimeInterval(100);
     controller.setStreamingState(true);
-    QTest::qWait(500);
+    QTest::qWait(3000);
     controller.setStreamingState(false);
-    int count10 = spy10.count();
+    int count100 = spy100.count();
 
-    qDebug() << "Frames at 50ms interval:" << count50 << ", at 10ms interval:" << count10;
-    // 10ms interval should produce more frames than 50ms
-    QVERIFY2(count10 > count50,
-             qPrintable(QString("Expected more frames at 10ms (%1) than 50ms (%2)").arg(count10).arg(count50)));
+    qDebug() << "Frames at 500ms interval:" << count500 << ", at 100ms interval:" << count100;
+    // 100ms interval should produce more frames than 500ms
+    QVERIFY2(count100 > count500,
+             qPrintable(QString("Expected more frames at 100ms (%1) than 500ms (%2)").arg(count100).arg(count500)));
 }
 
 //=============================================================================================================
