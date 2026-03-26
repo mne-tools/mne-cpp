@@ -1,0 +1,64 @@
+{
+  "version": "1.0",
+  "analysis_name": "Filter_Then_Source_Estimation_Demo",
+  "description": "Two-node pipeline: band-pass filter the raw MEG/EEG recording, then apply a pre-computed MNE inverse operator to produce distributed source timecourses (STC).",
+  "resources": [
+    {
+      "uid": "raw_meg",
+      "type": "fiff_raw",
+      "uri": "file:///path/to/your/subject_raw.fif",
+      "metadata": {
+        "label": "Raw MEG/EEG Data",
+        "description": "Replace this URI with the absolute path to your FIFF raw file."
+      }
+    },
+    {
+      "uid": "inv_op",
+      "type": "fiff_inv",
+      "uri": "file:///path/to/your/subject-inv.fif",
+      "metadata": {
+        "label": "Pre-computed Inverse Operator",
+        "description": "Replace this URI with the absolute path to your MNE inverse operator (.fif)."
+      }
+    }
+  ],
+  "pipeline": [
+    {
+      "uid": "bandpass",
+      "label": "Band-pass Filter (1–40 Hz)",
+      "stage": "Preprocessing",
+      "description": "Apply a 1–40 Hz band-pass filter to remove slow drifts and high-frequency noise.",
+      "skill_id": "mne.skills.temporal_filter",
+      "inputs": {
+        "raw_data": "raw_meg"
+      },
+      "parameters": {
+        "highpass": 1.0,
+        "lowpass": 40.0
+      },
+      "outputs": {
+        "filtered_data": "bandpass_out"
+      }
+    },
+    {
+      "uid": "source_est",
+      "label": "dSPM Source Estimation",
+      "stage": "Source Estimation",
+      "description": "Apply the pre-computed inverse operator to the band-passed recording and write distributed source timecourses to an STC file.",
+      "skill_id": "mne.skills.source_estimation",
+      "inputs": {
+        "raw_data": "bandpass_out",
+        "inverse_operator": "inv_op"
+      },
+      "parameters": {
+        "method": "dSPM",
+        "snr": 3.0,
+        "tmin": 0.0,
+        "tmax": 1.0
+      },
+      "outputs": {
+        "source_estimate": "source_est_out"
+      }
+    }
+  ]
+}

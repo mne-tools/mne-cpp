@@ -6,6 +6,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 BIN_DIR="$SCRIPT_DIR/../../../out/Release/bin"
+BUILD_DIR="$SCRIPT_DIR/../../../build"
 
 WORKBENCH_APP="$BIN_DIR/mne_analyze_studio_workbench.app/Contents/MacOS/mne_analyze_studio_workbench"
 WORKBENCH_BIN="$BIN_DIR/mne_analyze_studio_workbench"
@@ -44,17 +45,37 @@ fi
 if [[ "$OSTYPE" == "darwin"* ]]; then
     unset QT_PLUGIN_PATH
     unset QT_QPA_PLATFORM_PLUGIN_PATH
+    unset DYLD_FRAMEWORK_PATH
+    unset DYLD_LIBRARY_PATH
 
-    if [ -d "/opt/homebrew/share/qt/plugins" ]; then
-        export QT_PLUGIN_PATH="/opt/homebrew/share/qt/plugins"
-        export QT_QPA_PLATFORM_PLUGIN_PATH="/opt/homebrew/share/qt/plugins/platforms"
-    elif [ -d "/opt/homebrew/Cellar/qtbase/6.10.2/share/qt/plugins" ]; then
-        export QT_PLUGIN_PATH="/opt/homebrew/Cellar/qtbase/6.10.2/share/qt/plugins"
-        export QT_QPA_PLATFORM_PLUGIN_PATH="/opt/homebrew/Cellar/qtbase/6.10.2/share/qt/plugins/platforms"
+    QT_ROOT=""
+    if [ -f "$BUILD_DIR/CMakeCache.txt" ]; then
+        QT6_DIR=$(sed -n 's/^Qt6_DIR:PATH=//p' "$BUILD_DIR/CMakeCache.txt" | head -n 1)
+        if [ -n "$QT6_DIR" ] && [ -d "$QT6_DIR" ]; then
+            QT_ROOT="$(cd "$QT6_DIR/../../.." && pwd)"
+        fi
     fi
 
-    export DYLD_FRAMEWORK_PATH="/opt/homebrew/opt/qtbase/lib"
-    export DYLD_LIBRARY_PATH="$BIN_DIR/../lib:/opt/homebrew/opt/qtbase/lib:/opt/homebrew/lib"
+    if [ -z "$QT_ROOT" ] && command -v qmake6 >/dev/null 2>&1; then
+        QT_ROOT="$(qmake6 -query QT_INSTALL_PREFIX 2>/dev/null || true)"
+    fi
+
+    if [ -n "$QT_ROOT" ] && [ -d "$QT_ROOT" ]; then
+        QT_PLUGIN_DIR="$QT_ROOT/plugins"
+        QT_LIB_DIR="$QT_ROOT/lib"
+
+        if [ -d "$QT_PLUGIN_DIR" ]; then
+            export QT_PLUGIN_PATH="$QT_PLUGIN_DIR"
+            if [ -d "$QT_PLUGIN_DIR/platforms" ]; then
+                export QT_QPA_PLATFORM_PLUGIN_PATH="$QT_PLUGIN_DIR/platforms"
+            fi
+        fi
+
+        if [ -d "$QT_LIB_DIR" ]; then
+            export DYLD_FRAMEWORK_PATH="$QT_LIB_DIR"
+            export DYLD_LIBRARY_PATH="$BIN_DIR/../lib:$QT_LIB_DIR"
+        fi
+    fi
 fi
 
 pkill -f mne_analyze_studio_neuro_kernel || true

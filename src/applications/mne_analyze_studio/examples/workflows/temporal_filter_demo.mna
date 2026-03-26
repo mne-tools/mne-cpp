@@ -1,0 +1,71 @@
+{
+  "resources": [
+    {
+      "uid": "raw_01",
+      "type": "fiff_raw",
+      "uri": "mne://workspace/mock_inputs/subject_01_raw_placeholder.json",
+      "metadata": {
+        "label": "Mock subject 01 raw input",
+        "note": "This placeholder resource is intended for workflow graph and UI testing."
+      }
+    }
+  ],
+  "pipeline": [
+    {
+      "uid": "op_preclean",
+      "skill_id": "mne.skills.temporal_filter",
+      "inputs": {
+        "raw_data": "raw_01"
+      },
+      "parameters": {
+        "highpass": 1.0,
+        "lowpass": 80.0
+      },
+      "outputs": {
+        "filtered_data": "filt_preclean_01"
+      }
+    },
+    {
+      "uid": "op_alpha_band",
+      "skill_id": "mne.skills.temporal_filter",
+      "inputs": {
+        "raw_data": "filt_preclean_01"
+      },
+      "parameters": {
+        "highpass": 8.0,
+        "lowpass": 13.0
+      },
+      "outputs": {
+        "filtered_data": "alpha_band_01"
+      }
+    },
+    {
+      "uid": "op_beta_band",
+      "skill_id": "mne.skills.temporal_filter",
+      "inputs": {
+        "raw_data": "filt_preclean_01"
+      },
+      "parameters": {
+        "highpass": 13.0,
+        "lowpass": 30.0
+      },
+      "outputs": {
+        "filtered_data": "beta_band_01"
+      }
+    },
+    {
+      "uid": "op_beta_refine",
+      "skill_id": "mne.skills.temporal_filter",
+      "inputs": {
+        "raw_data": "beta_band_01"
+      },
+      "parameters": {
+        "highpass": 18.0,
+        "lowpass": 24.0
+      },
+      "outputs": {
+        "filtered_data": "beta_refined_01"
+      }
+    }
+  ]
+}

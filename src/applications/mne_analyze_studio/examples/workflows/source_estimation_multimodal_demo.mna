@@ -1,0 +1,267 @@
+{
+  "version": "1.0",
+  "analysis_name": "Auditory_Source_Estimation_Demo",
+  "resources": [
+    {
+      "uid": "raw_run1",
+      "type": "fiff_raw",
+      "uri": "mne://workspace/mock_inputs/subject_01_meg_run_01_placeholder.json",
+      "metadata": {
+        "label": "MEG/EEG Data",
+        "description": "Raw auditory recording placeholder."
+      }
+    },
+    {
+      "uid": "empty_room_meg",
+      "type": "fiff_raw",
+      "uri": "mne://workspace/mock_inputs/subject_01_empty_room_placeholder.json",
+      "metadata": {
+        "label": "Noise Recording",
+        "description": "Empty-room placeholder for covariance estimation."
+      }
+    },
+    {
+      "uid": "mri_raw_anatomical",
+      "type": "mri_volume",
+      "uri": "mne://workspace/mock_inputs/subject_01_t1_placeholder.json",
+      "metadata": {
+        "label": "MRI Data",
+        "description": "Raw anatomical MRI placeholder."
+      }
+    }
+  ],
+  "pipeline": [
+    {
+      "uid": "op_noise_covariance",
+      "label": "Noise Covariance",
+      "stage": "MEG/EEG Processing",
+      "description": "Estimate noise covariance from the empty-room recording.",
+      "skill_id": "mne.skills.temporal_filter",
+      "inputs": {
+        "raw_data": "empty_room_meg"
+      },
+      "parameters": {
+        "highpass": 0.1,
+        "lowpass": 40.0,
+        "conceptual_operator": "mne_compute_raw_covariance"
+      },
+      "outputs": {
+        "noise_covariance": "noise_cov_01"
+      }
+    },
+    {
+      "uid": "op_filtered_evoked",
+      "label": "Filtered & Averaged",
+      "stage": "MEG/EEG Processing",
+      "description": "Epoch and average the auditory recording into an evoked response artifact.",
+      "skill_id": "mne.skills.temporal_filter",
+      "inputs": {
+        "raw_data": "raw_run1"
+      },
+      "parameters": {
+        "highpass": 1.0,
+        "lowpass": 30.0,
+        "conceptual_operator": "mne_process_raw"
+      },
+      "outputs": {
+        "evoked_data": "evoked_auditory_01"
+      }
+    },
+    {
+      "uid": "op_reconstructed_mri",
+      "label": "Reconstructed MRI",
+      "stage": "MRI Processing",
+      "description": "Reconstruct the anatomical MRI into a subject-space derivative tree.",
+      "skill_id": "mne.skills.temporal_filter",
+      "inputs": {
+        "raw_data": "mri_raw_anatomical"
+      },
+      "parameters": {
+        "highpass": 0.5,
+        "lowpass": 60.0,
+        "conceptual_operator": "FreeSurfer"
+      },
+      "outputs": {
+        "reconstructed_mri": "reconstructed_mri_01"
+      }
+    },
+    {
+      "uid": "op_cor_brain",
+      "label": "COR.fif (brain)",
+      "stage": "MRI Processing",
+      "description": "Prepare the COR-aligned anatomical representation used for BEM generation.",
+      "skill_id": "mne.skills.temporal_filter",
+      "inputs": {
+        "raw_data": "reconstructed_mri_01",
+        "reconstructed_mri": "reconstructed_mri_01"
+      },
+      "parameters": {
+        "highpass": 0.5,
+        "lowpass": 70.0,
+        "conceptual_operator": "mne_setup_mri"
+      },
+      "outputs": {
+        "brain_mri": "cor_brain_01"
+      }
+    },
+    {
+      "uid": "op_source_space",
+      "label": "Source Space",
+      "stage": "MRI Processing",
+      "description": "Create the cortical source space used by the forward model.",
+      "skill_id": "mne.skills.temporal_filter",
+      "inputs": {
+        "raw_data": "reconstructed_mri_01",
+        "reconstructed_mri": "reconstructed_mri_01"
+      },
+      "parameters": {
+        "highpass": 0.6,
+        "lowpass": 70.0,
+        "conceptual_operator": "mne_setup_source_space"
+      },
+      "outputs": {
+        "source_space": "source_space_01"
+      }
+    },
+    {
+      "uid": "op_bem_mesh",
+      "label": "BEM Mesh",
+      "stage": "MRI Processing",
+      "description": "Generate the BEM mesh from the MRI-derived brain surfaces.",
+      "skill_id": "mne.skills.temporal_filter",
+      "inputs": {
+        "raw_data": "cor_brain_01",
+        "brain_mri": "cor_brain_01"
+      },
+      "parameters": {
+        "highpass": 0.7,
+        "lowpass": 80.0,
+        "conceptual_operator": "mne_watershed_bem"
+      },
+      "outputs": {
+        "bem_mesh": "bem_mesh_01"
+      }
+    },
+    {
+      "uid": "op_bem_model",
+      "label": "BEM Model",
+      "stage": "MRI Processing",
+      "description": "Assemble the BEM model that participates in the forward solution.",
+      "skill_id": "mne.skills.temporal_filter",
+      "inputs": {
+        "raw_data": "bem_mesh_01",
+        "bem_mesh": "bem_mesh_01"
+      },
+      "parameters": {
+        "highpass": 0.8,
+        "lowpass": 80.0,
+        "conceptual_operator": "mne_setup_forward_model"
+      },
+      "outputs": {
+        "bem_model": "bem_model_01"
+      }
+    },
+    {
+      "uid": "op_cor_t1",
+      "label": "COR.fif (T1)",
+      "stage": "MRI Processing",
+      "description": "Prepare the T1-oriented COR representation used for coregistration.",
+      "skill_id": "mne.skills.temporal_filter",
+      "inputs": {
+        "raw_data": "reconstructed_mri_01",
+        "reconstructed_mri": "reconstructed_mri_01"
+      },
+      "parameters": {
+        "highpass": 0.9,
+        "lowpass": 85.0,
+        "conceptual_operator": "mne_setup_mri"
+      },
+      "outputs": {
+        "t1_mri": "cor_t1_01"
+      }
+    },
+    {
+      "uid": "op_coregistration",
+      "label": "COR-aligned.fif",
+      "stage": "MRI Processing",
+      "description": "Coregister the MEG sensor geometry to the MRI coordinate frame.",
+      "skill_id": "mne.skills.temporal_filter",
+      "inputs": {
+        "raw_data": "cor_t1_01",
+        "t1_mri": "cor_t1_01",
+        "meg_info": "raw_run1"
+      },
+      "parameters": {
+        "highpass": 1.0,
+        "lowpass": 90.0,
+        "conceptual_operator": "mne_setup_mri"
+      },
+      "outputs": {
+        "coreg_transform": "coreg_aligned_01"
+      }
+    },
+    {
+      "uid": "op_forward_solution",
+      "label": "Forward Solution",
+      "stage": "Source Estimation",
+      "description": "Combine MRI and MEG/EEG branches into the forward operator.",
+      "skill_id": "mne.skills.temporal_filter",
+      "inputs": {
+        "raw_data": "evoked_auditory_01",
+        "evoked_data": "evoked_auditory_01",
+        "source_space": "source_space_01",
+        "bem_model": "bem_model_01",
+        "coreg_transform": "coreg_aligned_01"
+      },
+      "parameters": {
+        "highpass": 1.1,
+        "lowpass": 95.0,
+        "conceptual_operator": "mne_forward_solution"
+      },
+      "outputs": {
+        "forward_solution": "forward_solution_01"
+      }
+    },
+    {
+      "uid": "op_inverse_operator",
+      "label": "Inverse Operator",
+      "stage": "Source Estimation",
+      "description": "Build the inverse operator from the forward model and noise covariance.",
+      "skill_id": "mne.skills.temporal_filter",
+      "inputs": {
+        "raw_data": "forward_solution_01",
+        "forward_solution": "forward_solution_01",
+        "noise_covariance": "noise_cov_01",
+        "meg_info": "raw_run1"
+      },
+      "parameters": {
+        "highpass": 1.2,
+        "lowpass": 100.0,
+        "conceptual_operator": "mne_inverse_operator"
+      },
+      "outputs": {
+        "inverse_operator": "inverse_operator_01"
+      }
+    },
+    {
+      "uid": "op_analyze_visualize",
+      "label": "Analyze & Visualize",
+      "stage": "Source Estimation",
+      "description": "Combine the inverse operator and evoked response into final source estimates.",
+      "skill_id": "mne.skills.temporal_filter",
+      "inputs": {
+        "raw_data": "inverse_operator_01",
+        "inverse_operator": "inverse_operator_01",
+        "evoked_data": "evoked_auditory_01"
+      },
+      "parameters": {
+        "highpass": 1.3,
+        "lowpass": 110.0,
+        "conceptual_operator": "MNE Analyze"
+      },
+      "outputs": {
+        "source_estimates": "source_estimates_01"
+      }
+    }
+  ]
+}

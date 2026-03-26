@@ -18,7 +18,10 @@
 #include <dummy3dhostedviewwidget.h>
 #include "extensionhostedviewwidget.h"
 #include "llmsettingsdialog.h"
+#include "workflowminimapwidget.h"
 
+#include <capabilitycatalog.h>
+#include <capabilityutils.h>
 #include <extensionviewfactoryregistry.h>
 #include <iextensionviewfactory.h>
 #include <irawdataview.h>
@@ -35,14 +38,18 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QAction>
+#include <QBrush>
+#include <QColor>
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
+#include <QFont>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QLabel>
+#include <QLibraryInfo>
 #include <QLineEdit>
 #include <QListWidget>
 #include <QListWidgetItem>
@@ -56,8 +63,10 @@
 #include <QMenuBar>
 #include <QPlainTextEdit>
 #include <QProcess>
+#include <QProcessEnvironment>
 #include <QPushButton>
 #include <QSettings>
+#include <QSet>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QSpinBox>
@@ -90,6 +99,13 @@ const char* kExtensionSocketName = "mne_analyze_studio.extension_host";
 const char* kWorkspaceArtifactRoot = "__mne_analyze_studio_analysis_root__";
 const char* kWorkspaceArtifactEntry = "__mne_analyze_studio_analysis_entry__";
 const char* kWorkspaceArtifactStepEntry = "__mne_analyze_studio_analysis_step_entry__";
+const char* kActiveWorkflowGraphUri = "mne://workspace/active_graph";
+const char* kWorkflowWorkspaceUriPrefix = "mne://workspace/";
+const char* kWorkflowCenterTabKey = "__mne_analyze_studio_workflow_graph__";
+constexpr int kWorkflowItemKindRole = Qt::UserRole + 20;
+constexpr int kWorkflowPayloadRole = Qt::UserRole + 21;
+constexpr int kWorkflowOpenPathRole = Qt::UserRole + 22;
+constexpr int kWorkflowStableIdRole = Qt::UserRole + 23;
 
 enum class ThreeDOpenChoice {
     Cancel,
@@ -101,6 +117,413 @@ struct ThreeDViewSelection {
     ThreeDOpenChoice choice = ThreeDOpenChoice::Cancel;
     int tabIndex = -1;
 };
+
+bool isWorkflowAnalysisFile(const QString& filePath)
+{
+    return QFileInfo(filePath).suffix().compare(QStringLiteral("mna"), Qt::CaseInsensitive) == 0;
+}
+
+QString loadTextFileForDisplay(const QString& filePath)
+{
+    QFile file(filePath);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return QStringLiteral("Could not open %1 for display.").arg(filePath);
+    }
+
+    return QString::fromUtf8(file.readAll());
+}
+
+QString qtPluginsPath()
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    return QLibraryInfo::path(QLibraryInfo::PluginsPath);
+#else
+    return QLibraryInfo::location(QLibraryInfo::PluginsPath);
+#endif
+}
+
+QString qtLibrariesPath()
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    return QLibraryInfo::path(QLibraryInfo::LibrariesPath);
+#else
+    return QLibraryInfo::location(QLibraryInfo::LibrariesPath);
+#endif
+}
+
+QProcessEnvironment studioBackendProcessEnvironment(const QString& executablePath)
+{
+    QProcessEnvironment environment = QProcessEnvironment::systemEnvironment();
+    environment.remove(QStringLiteral("QT_PLUGIN_PATH"));
+    environment.remove(QStringLiteral("QT_QPA_PLATFORM_PLUGIN_PATH"));
+
+#ifdef Q_OS_MACOS
+    environment.remove(QStringLiteral("DYLD_FRAMEWORK_PATH"));
+    environment.remove(QStringLiteral("DYLD_LIBRARY_PATH"));
+#endif
+
+    const QString pluginsPath = qtPluginsPath();
+    if(QDir(pluginsPath).exists()) {
+        environment.insert(QStringLiteral("QT_PLUGIN_PATH"), pluginsPath);
+
+        const QString platformPluginsPath = QDir(pluginsPath).filePath(QStringLiteral("platforms"));
+        if(QDir(platformPluginsPath).exists()) {
+            environment.insert(QStringLiteral("QT_QPA_PLATFORM_PLUGIN_PATH"), platformPluginsPath);
+        }
+    }
+
+#ifdef Q_OS_MACOS
+    QStringList dyldLibraryPaths;
+
+    const QString librariesPath = qtLibrariesPath();
+    if(QDir(librariesPath).exists()) {
+        environment.insert(QStringLiteral("DYLD_FRAMEWORK_PATH"), librariesPath);
+        dyldLibraryPaths << QDir::cleanPath(librariesPath);
+    }
+
+    const QFileInfo executableInfo(executablePath);
+    if(executableInfo.exists()) {
+        const QString studioLibraryPath = QFileInfo(QDir(executableInfo.absolutePath()).filePath(QStringLiteral("../lib")))
+                                              .absoluteFilePath();
+        if(QDir(studioLibraryPath).exists() && !dyldLibraryPaths.contains(studioLibraryPath)) {
+            dyldLibraryPaths.prepend(studioLibraryPath);
+        }
+    }
+
+    if(!dyldLibraryPaths.isEmpty()) {
+        environment.insert(QStringLiteral("DYLD_LIBRARY_PATH"), dyldLibraryPaths.join(QLatin1Char(':')));
+    }
+#else
+    Q_UNUSED(executablePath)
+#endif
+
+    return environment;
+}
+
+void insertSortedUnique(QStringList& values, const QString& value)
+{
+    if(value.isEmpty() || values.contains(value)) {
+        return;
+    }
+
+    const auto insertPosition = std::lower_bound(values.begin(), values.end(), value);
+    values.insert(std::distance(values.begin(), insertPosition), value);
+}
+
+QString summarizeJsonValue(const QJsonValue& value)
+{
+    if(value.isString()) {
+        return value.toString();
+    }
+    if(value.isBool()) {
+        return value.toBool() ? QStringLiteral("true") : QStringLiteral("false");
+    }
+    if(value.isDouble()) {
+        return QString::number(value.toDouble());
+    }
+    if(value.isNull() || value.isUndefined()) {
+        return QStringLiteral("<null>");
+    }
+    if(value.isObject()) {
+        return QString::fromUtf8(QJsonDocument(value.toObject()).toJson(QJsonDocument::Compact));
+    }
+    if(value.isArray()) {
+        return QString::fromUtf8(QJsonDocument(value.toArray()).toJson(QJsonDocument::Compact));
+    }
+
+    return QStringLiteral("<value>");
+}
+
+QString resolveWorkflowUriToLocalPath(const QString& uri, const QString& sourceFilePath)
+{
+    const QString trimmedUri = uri.trimmed();
+    if(trimmedUri.isEmpty()) {
+        return QString();
+    }
+
+    const QFileInfo directFileInfo(trimmedUri);
+    if(directFileInfo.isFile()) {
+        return directFileInfo.absoluteFilePath();
+    }
+
+    if(sourceFilePath.trimmed().isEmpty()) {
+        return QString();
+    }
+
+    const QString workspacePrefix = QString::fromLatin1(kWorkflowWorkspaceUriPrefix);
+    if(!trimmedUri.startsWith(workspacePrefix)) {
+        return QString();
+    }
+
+    QString relativePath = trimmedUri.mid(workspacePrefix.size());
+    while(relativePath.startsWith(QLatin1Char('/'))) {
+        relativePath.remove(0, 1);
+    }
+
+    if(relativePath.isEmpty()) {
+        return QString();
+    }
+
+    const QString candidatePath = QDir(QFileInfo(sourceFilePath).absolutePath()).filePath(relativePath);
+    const QFileInfo candidateInfo(candidatePath);
+    return candidateInfo.isFile() ? candidateInfo.absoluteFilePath() : QString();
+}
+
+QString rawToolNameFromCommandText(const QString& commandText)
+{
+    const QRegularExpression commandPattern("^\\s*tools\\.call\\s+([^\\s]+)");
+    const QRegularExpressionMatch match = commandPattern.match(commandText.trimmed());
+    return match.hasMatch() ? match.captured(1).trimmed() : QString();
+}
+
+QHash<QString, QJsonObject> workflowResourceMap(const QJsonObject& graph)
+{
+    QHash<QString, QJsonObject> resourceByUid;
+    const QJsonArray resources = graph.value(QStringLiteral("resources")).toArray();
+    for(const QJsonValue& value : resources) {
+        const QJsonObject resource = value.toObject();
+        const QString uid = resource.value(QStringLiteral("uid")).toString().trimmed();
+        if(!uid.isEmpty()) {
+            resourceByUid.insert(uid, resource);
+        }
+    }
+
+    return resourceByUid;
+}
+
+QHash<QString, QString> workflowOutputProducerMap(const QJsonObject& graph)
+{
+    QHash<QString, QString> producerByOutputUid;
+    const QJsonArray pipeline = graph.value(QStringLiteral("pipeline")).toArray();
+    for(const QJsonValue& value : pipeline) {
+        const QJsonObject node = value.toObject();
+        const QString nodeUid = node.value(QStringLiteral("uid")).toString().trimmed();
+        const QJsonObject outputs = node.value(QStringLiteral("outputs")).toObject();
+        for(auto it = outputs.constBegin(); it != outputs.constEnd(); ++it) {
+            const QString outputUid = it.value().toString().trimmed();
+            if(!nodeUid.isEmpty() && !outputUid.isEmpty()) {
+                producerByOutputUid.insert(outputUid, nodeUid);
+            }
+        }
+    }
+
+    return producerByOutputUid;
+}
+
+QStringList workflowDependencyNodeUids(const QJsonObject& node, const QHash<QString, QString>& outputProducerByUid)
+{
+    QStringList dependencyNodeUids;
+    const QJsonObject inputs = node.value(QStringLiteral("inputs")).toObject();
+    for(auto it = inputs.constBegin(); it != inputs.constEnd(); ++it) {
+        const QString inputUid = it.value().toString().trimmed();
+        const QString producerNodeUid = outputProducerByUid.value(inputUid);
+        if(!producerNodeUid.isEmpty()) {
+            insertSortedUnique(dependencyNodeUids, producerNodeUid);
+        }
+    }
+
+    return dependencyNodeUids;
+}
+
+QVector<QJsonObject> workflowNodesTopologicallyOrdered(const QJsonObject& graph)
+{
+    const QJsonArray pipeline = graph.value(QStringLiteral("pipeline")).toArray();
+    QHash<QString, QJsonObject> nodeByUid;
+    QStringList sortedNodeUids;
+    for(const QJsonValue& value : pipeline) {
+        const QJsonObject node = value.toObject();
+        const QString nodeUid = node.value(QStringLiteral("uid")).toString().trimmed();
+        if(nodeUid.isEmpty()) {
+            continue;
+        }
+
+        nodeByUid.insert(nodeUid, node);
+        insertSortedUnique(sortedNodeUids, nodeUid);
+    }
+
+    const QHash<QString, QString> outputProducerByUid = workflowOutputProducerMap(graph);
+    QHash<QString, QStringList> dependentNodeUidsByNodeUid;
+    QHash<QString, int> indegreeByNodeUid;
+    for(const QString& nodeUid : sortedNodeUids) {
+        indegreeByNodeUid.insert(nodeUid, 0);
+    }
+
+    for(const QString& nodeUid : sortedNodeUids) {
+        const QStringList dependencies = workflowDependencyNodeUids(nodeByUid.value(nodeUid), outputProducerByUid);
+        indegreeByNodeUid[nodeUid] = dependencies.size();
+        for(const QString& dependencyNodeUid : dependencies) {
+            insertSortedUnique(dependentNodeUidsByNodeUid[dependencyNodeUid], nodeUid);
+        }
+    }
+
+    QStringList readyNodeUids;
+    for(const QString& nodeUid : sortedNodeUids) {
+        if(indegreeByNodeUid.value(nodeUid) == 0) {
+            insertSortedUnique(readyNodeUids, nodeUid);
+        }
+    }
+
+    QVector<QJsonObject> orderedNodes;
+    orderedNodes.reserve(sortedNodeUids.size());
+    while(!readyNodeUids.isEmpty()) {
+        const QString nodeUid = readyNodeUids.takeFirst();
+        orderedNodes.append(nodeByUid.value(nodeUid));
+
+        const QStringList dependents = dependentNodeUidsByNodeUid.value(nodeUid);
+        for(const QString& dependentNodeUid : dependents) {
+            const int remainingDependencies = indegreeByNodeUid.value(dependentNodeUid) - 1;
+            indegreeByNodeUid[dependentNodeUid] = remainingDependencies;
+            if(remainingDependencies == 0) {
+                insertSortedUnique(readyNodeUids, dependentNodeUid);
+            }
+        }
+    }
+
+    if(orderedNodes.size() == sortedNodeUids.size()) {
+        return orderedNodes;
+    }
+
+    QVector<QJsonObject> fallbackNodes;
+    fallbackNodes.reserve(pipeline.size());
+    for(const QJsonValue& value : pipeline) {
+        fallbackNodes.append(value.toObject());
+    }
+    return fallbackNodes;
+}
+
+QString workflowNodeStatus(const QJsonObject& node)
+{
+    const QString status = node.value(QStringLiteral("runtime")).toObject().value(QStringLiteral("status")).toString().trimmed();
+    return status.isEmpty() ? QStringLiteral("pending") : status;
+}
+
+QString workflowNodeDisplayLabel(const QJsonObject& node)
+{
+    const QString label = node.value(QStringLiteral("label")).toString().trimmed();
+    return label.isEmpty() ? node.value(QStringLiteral("uid")).toString().trimmed() : label;
+}
+
+QHash<QString, QJsonObject> workflowNodeMap(const QJsonObject& graph)
+{
+    QHash<QString, QJsonObject> nodeByUid;
+    const QJsonArray pipeline = graph.value(QStringLiteral("pipeline")).toArray();
+    for(const QJsonValue& value : pipeline) {
+        const QJsonObject node = value.toObject();
+        const QString nodeUid = node.value(QStringLiteral("uid")).toString().trimmed();
+        if(!nodeUid.isEmpty()) {
+            nodeByUid.insert(nodeUid, node);
+        }
+    }
+
+    return nodeByUid;
+}
+
+QHash<QString, QStringList> workflowDependencyNodeMap(const QJsonObject& graph)
+{
+    QHash<QString, QStringList> dependenciesByNodeUid;
+    const QHash<QString, QJsonObject> nodeByUid = workflowNodeMap(graph);
+    const QHash<QString, QString> outputProducerByUid = workflowOutputProducerMap(graph);
+
+    for(auto it = nodeByUid.constBegin(); it != nodeByUid.constEnd(); ++it) {
+        dependenciesByNodeUid.insert(it.key(), workflowDependencyNodeUids(it.value(), outputProducerByUid));
+    }
+
+    return dependenciesByNodeUid;
+}
+
+QHash<QString, QStringList> workflowDependentNodeMap(const QJsonObject& graph)
+{
+    QHash<QString, QStringList> dependentsByNodeUid;
+    const QHash<QString, QStringList> dependenciesByNodeUid = workflowDependencyNodeMap(graph);
+    for(auto it = dependenciesByNodeUid.constBegin(); it != dependenciesByNodeUid.constEnd(); ++it) {
+        if(!dependentsByNodeUid.contains(it.key())) {
+            dependentsByNodeUid.insert(it.key(), QStringList());
+        }
+
+        for(const QString& dependencyNodeUid : it.value()) {
+            insertSortedUnique(dependentsByNodeUid[dependencyNodeUid], it.key());
+        }
+    }
+
+    return dependentsByNodeUid;
+}
+
+QStringList workflowReachableNodeUids(const QString& startNodeUid, const QHash<QString, QStringList>& adjacencyByNodeUid)
+{
+    QStringList visitedNodeUids;
+    QStringList pendingNodeUids = adjacencyByNodeUid.value(startNodeUid);
+    QSet<QString> seenNodeUids;
+
+    while(!pendingNodeUids.isEmpty()) {
+        const QString nodeUid = pendingNodeUids.takeFirst();
+        if(nodeUid.isEmpty() || seenNodeUids.contains(nodeUid)) {
+            continue;
+        }
+
+        seenNodeUids.insert(nodeUid);
+        insertSortedUnique(visitedNodeUids, nodeUid);
+        for(const QString& adjacentNodeUid : adjacencyByNodeUid.value(nodeUid)) {
+            if(!adjacentNodeUid.isEmpty() && !seenNodeUids.contains(adjacentNodeUid)) {
+                insertSortedUnique(pendingNodeUids, adjacentNodeUid);
+            }
+        }
+    }
+
+    return visitedNodeUids;
+}
+
+QString workflowFocusNodeUid(const QJsonObject& payload)
+{
+    return payload.value(QStringLiteral("node_uid")).toString().trimmed();
+}
+
+bool workflowItemRepresentsPipelineNode(const QTreeWidgetItem* item, QString* nodeUid = nullptr)
+{
+    if(!item) {
+        return false;
+    }
+
+    const QJsonObject payload = item->data(0, kWorkflowPayloadRole).toJsonObject();
+    if(payload.value(QStringLiteral("kind")).toString() != QLatin1String("node")) {
+        return false;
+    }
+
+    const QString resolvedNodeUid = workflowFocusNodeUid(payload);
+    if(resolvedNodeUid.isEmpty()) {
+        return false;
+    }
+
+    if(nodeUid) {
+        *nodeUid = resolvedNodeUid;
+    }
+
+    return true;
+}
+
+QTreeWidgetItem* findWorkflowItemByStableId(QTreeWidget* tree, const QString& stableId)
+{
+    if(!tree || stableId.trimmed().isEmpty()) {
+        return nullptr;
+    }
+
+    QList<QTreeWidgetItem*> pendingItems;
+    for(int i = 0; i < tree->topLevelItemCount(); ++i) {
+        pendingItems.append(tree->topLevelItem(i));
+    }
+
+    while(!pendingItems.isEmpty()) {
+        QTreeWidgetItem* item = pendingItems.takeFirst();
+        if(item->data(0, kWorkflowStableIdRole).toString() == stableId) {
+            return item;
+        }
+
+        for(int childIndex = 0; childIndex < item->childCount(); ++childIndex) {
+            pendingItems.append(item->child(childIndex));
+        }
+    }
+
+    return nullptr;
+}
 
 ThreeDViewSelection promptForThreeDTargetView(QWidget* parent,
                                               const QString& filePath,
@@ -427,6 +850,27 @@ bool hasQtMethod(const QObject* object, const char* normalizedMethod)
     return object->metaObject()->indexOfMethod(normalizedMethod) >= 0;
 }
 
+bool isAnalysisPipelineCapability(const QJsonObject& tool)
+{
+    return tool.value("capability_kind").toString().trimmed() == QLatin1String("analysis_pipeline")
+           || !tool.value("pipeline_id").toString().trimmed().isEmpty();
+}
+
+bool isWorkflowSkillCapability(const QJsonObject& tool)
+{
+    return tool.value("workflow_operator").toBool(false)
+           || tool.value("capability_kind").toString().trimmed() == QLatin1String("workflow_skill");
+}
+
+bool isWorkflowIoCapability(const QJsonObject& tool)
+{
+    const QString capabilityKind = tool.value("capability_kind").toString().trimmed();
+    const QString toolName = tool.value("name").toString().trimmed();
+    return capabilityKind == QLatin1String("workflow_io")
+           || toolName == QLatin1String("studio.workflow.load")
+           || toolName == QLatin1String("studio.workflow.save");
+}
+
 QTreeWidgetItem* makeToolTreeItem(const QJsonObject& tool)
 {
     const QString name = tool.value("name").toString().trimmed();
@@ -616,6 +1060,251 @@ QJsonObject arraySchema(const QString& title,
     return schema;
 }
 
+// Compose a human-readable Studio narration for a completed tool call.
+// Returns an empty string when there is nothing interesting to add beyond the
+// existing "message" bubble already shown by the Kernel/Extension Host line.
+QString narrateToolResult(const QString& toolName, const QJsonObject& result)
+{
+    const QString status = result.value(QStringLiteral("status")).toString();
+
+    // -----------------------------------------------------------------------
+    // neurokernel.raw_stats
+    // -----------------------------------------------------------------------
+    if(toolName == QLatin1String("neurokernel.raw_stats")) {
+        const QJsonObject stats = result.value(QStringLiteral("stats")).toObject();
+        if(stats.isEmpty()) {
+            return QString();
+        }
+        const int nChannels    = stats.value(QStringLiteral("n_channels")).toInt();
+        const int nSamples     = stats.value(QStringLiteral("n_samples")).toInt();
+        const double sfreq     = stats.value(QStringLiteral("sfreq")).toDouble();
+        const double durationS = stats.value(QStringLiteral("duration_s")).toDouble();
+        const double globalRms = stats.value(QStringLiteral("global_rms")).toDouble();
+        const QJsonArray topCh = result.value(QStringLiteral("top_rms_channels")).toArray();
+
+        QString narration = QString("Raw data stats computed: %1 channels × %2 samples at %3 Hz "
+                                    "(%4 s). Global RMS = %5.")
+                                .arg(nChannels)
+                                .arg(nSamples)
+                                .arg(sfreq, 0, 'f', 1)
+                                .arg(durationS, 0, 'f', 2)
+                                .arg(globalRms, 0, 'g', 4);
+
+        if(!topCh.isEmpty()) {
+            QStringList chNames;
+            for(const QJsonValue& v : topCh) {
+                const QJsonObject ch = v.toObject();
+                const QString name = ch.value(QStringLiteral("channel")).toString();
+                const double rms   = ch.value(QStringLiteral("rms")).toDouble();
+                if(!name.isEmpty()) {
+                    chNames << QString("%1 (%2)").arg(name).arg(rms, 0, 'g', 3);
+                }
+            }
+            if(!chNames.isEmpty()) {
+                narration += QString(" Top channels by RMS: %1.").arg(chNames.join(QStringLiteral(", ")));
+            }
+        }
+        return narration;
+    }
+
+    // -----------------------------------------------------------------------
+    // neurokernel.channel_stats
+    // -----------------------------------------------------------------------
+    if(toolName == QLatin1String("neurokernel.channel_stats")) {
+        const QJsonArray channels = result.value(QStringLiteral("channels")).toArray();
+        if(channels.isEmpty()) {
+            return QString();
+        }
+        QStringList summaries;
+        for(const QJsonValue& v : channels) {
+            const QJsonObject ch = v.toObject();
+            const QString name = ch.value(QStringLiteral("channel")).toString();
+            const double rms   = ch.value(QStringLiteral("rms")).toDouble();
+            const double peak  = ch.value(QStringLiteral("peak")).toDouble();
+            if(!name.isEmpty()) {
+                summaries << QString("%1: RMS=%2, peak=%3").arg(name)
+                                 .arg(rms, 0, 'g', 3)
+                                 .arg(peak, 0, 'g', 3);
+            }
+        }
+        return QString("Channel stats for %1 channel(s): %2.")
+            .arg(channels.size())
+            .arg(summaries.join(QStringLiteral("; ")));
+    }
+
+    // -----------------------------------------------------------------------
+    // neurokernel.find_peak_window
+    // -----------------------------------------------------------------------
+    if(toolName == QLatin1String("neurokernel.find_peak_window")) {
+        const double tStart = result.value(QStringLiteral("window_start_s")).toDouble(-1.0);
+        const double tEnd   = result.value(QStringLiteral("window_end_s")).toDouble(-1.0);
+        const QString ch    = result.value(QStringLiteral("channel")).toString();
+        const double peak   = result.value(QStringLiteral("peak_value")).toDouble();
+        if(tStart < 0.0 && tEnd < 0.0) {
+            return QString();
+        }
+        return QString("Peak window found on channel %1: [%2 s, %3 s], peak amplitude = %4.")
+            .arg(ch.isEmpty() ? QStringLiteral("(unknown)") : ch)
+            .arg(tStart, 0, 'f', 4)
+            .arg(tEnd, 0, 'f', 4)
+            .arg(peak, 0, 'g', 4);
+    }
+
+    // -----------------------------------------------------------------------
+    // neurokernel.psd_summary
+    // -----------------------------------------------------------------------
+    if(toolName == QLatin1String("neurokernel.psd_summary")) {
+        const double dominantFreq   = result.value(QStringLiteral("dominant_frequency_hz")).toDouble(-1.0);
+        const double dominantPower  = result.value(QStringLiteral("dominant_power")).toDouble();
+        const int nChannels         = result.value(QStringLiteral("n_channels")).toInt();
+        const double freqRes        = result.value(QStringLiteral("frequency_resolution_hz")).toDouble(-1.0);
+        if(dominantFreq < 0.0) {
+            return QString();
+        }
+        QString narration = QString("PSD computed for %1 channel(s). Dominant frequency: %2 Hz "
+                                    "(power = %3).")
+                                .arg(nChannels)
+                                .arg(dominantFreq, 0, 'f', 2)
+                                .arg(dominantPower, 0, 'g', 4);
+        if(freqRes > 0.0) {
+            narration += QString(" Frequency resolution: %1 Hz.").arg(freqRes, 0, 'f', 3);
+        }
+        return narration;
+    }
+
+    // -----------------------------------------------------------------------
+    // neurokernel.execute  (help / status / version)
+    // -----------------------------------------------------------------------
+    if(toolName == QLatin1String("neurokernel.execute")) {
+        const QString command   = result.value(QStringLiteral("command")).toString();
+        const int toolCount     = result.value(QStringLiteral("tool_count")).toInt(-1);
+        const QString version   = result.value(QStringLiteral("kernel_version")).toString();
+        if(command.compare(QLatin1String("status"), Qt::CaseInsensitive) == 0) {
+            return QString("Neuro-Kernel status: running. %1 tools available. Version %2.")
+                .arg(toolCount < 0 ? QStringLiteral("?") : QString::number(toolCount))
+                .arg(version.isEmpty() ? QStringLiteral("unknown") : version);
+        }
+        if(command.compare(QLatin1String("version"), Qt::CaseInsensitive) == 0) {
+            return QString("Neuro-Kernel version: %1.").arg(version.isEmpty() ? QStringLiteral("unknown") : version);
+        }
+        if(command.compare(QLatin1String("help"), Qt::CaseInsensitive) == 0 || command.isEmpty()) {
+            const QJsonArray tools = result.value(QStringLiteral("available_tools")).toArray();
+            if(!tools.isEmpty()) {
+                QStringList names;
+                for(const QJsonValue& v : tools) {
+                    names << v.toString();
+                }
+                return QString("Neuro-Kernel exposes %1 tool(s): %2.")
+                    .arg(tools.size())
+                    .arg(names.join(QStringLiteral(", ")));
+            }
+        }
+        return QString();
+    }
+
+    // -----------------------------------------------------------------------
+    // apply_filter  (temporal filter skill)
+    // -----------------------------------------------------------------------
+    if(toolName == QLatin1String("apply_filter")) {
+        if(status != QLatin1String("completed")) {
+            return QString();
+        }
+        const QJsonObject params = result.value(QStringLiteral("parameters_used")).toObject();
+        const QString filterType  = params.value(QStringLiteral("filter_type")).toString();
+        const double highpass     = params.value(QStringLiteral("highpass")).toDouble(-1.0);
+        const double lowpass      = params.value(QStringLiteral("lowpass")).toDouble(-1.0);
+        const int filterOrder     = params.value(QStringLiteral("filter_order")).toInt(-1);
+        const double sfreq        = params.value(QStringLiteral("sampling_frequency")).toDouble(-1.0);
+        const QString outputPath  = result.value(QStringLiteral("output_path")).toString();
+        const QJsonObject outputs = result.value(QStringLiteral("outputs")).toObject();
+        const QString outputUri   = outputs.value(QStringLiteral("filtered_data")).toString();
+
+        QString narration = QString("Temporal filter applied successfully. Type: %1").arg(filterType.isEmpty() ? QStringLiteral("unknown") : filterType);
+        if(highpass >= 0.0) {
+            narration += QString(", highpass = %1 Hz").arg(highpass, 0, 'f', 2);
+        }
+        if(lowpass >= 0.0) {
+            narration += QString(", lowpass = %1 Hz").arg(lowpass, 0, 'f', 2);
+        }
+        if(filterOrder > 0) {
+            narration += QString(", order = %1").arg(filterOrder);
+        }
+        if(sfreq > 0.0) {
+            narration += QString(", sfreq = %1 Hz").arg(sfreq, 0, 'f', 1);
+        }
+        narration += QStringLiteral(".");
+        if(!outputPath.isEmpty()) {
+            narration += QString(" Output written to: %1.").arg(QFileInfo(outputPath).fileName());
+        }
+        if(!outputUri.isEmpty()) {
+            narration += QString(" Output URI: %1.").arg(outputUri);
+        }
+        return narration;
+    }
+
+    // -----------------------------------------------------------------------
+    // fiffbrowser.reveal_active_state
+    // -----------------------------------------------------------------------
+    if(toolName == QLatin1String("fiffbrowser.reveal_active_state")) {
+        const int sessionCount = result.value(QStringLiteral("session_count")).toInt(0);
+        if(sessionCount == 0) {
+            return QStringLiteral("No FIFF browser session is currently open.");
+        }
+        const QJsonArray sessions = result.value(QStringLiteral("sessions")).toArray();
+        QStringList fileNames;
+        for(const QJsonValue& v : sessions) {
+            const QString file = v.toObject().value(QStringLiteral("file")).toString();
+            if(!file.isEmpty()) {
+                fileNames << QFileInfo(file).fileName();
+            }
+        }
+        return QString("FIFF browser has %1 active session(s). Open file(s): %2.")
+            .arg(sessionCount)
+            .arg(fileNames.isEmpty() ? QStringLiteral("(unknown)") : fileNames.join(QStringLiteral(", ")));
+    }
+
+    // -----------------------------------------------------------------------
+    // dummy3d.set_opacity
+    // -----------------------------------------------------------------------
+    if(toolName == QLatin1String("dummy3d.set_opacity")) {
+        const double opacity = result.value(QStringLiteral("opacity")).toDouble(-1.0);
+        const QJsonArray updated = result.value(QStringLiteral("updated_sessions")).toArray();
+        if(opacity < 0.0) {
+            return QString();
+        }
+        return QString("3D surface opacity set to %1 across %2 session(s).")
+            .arg(opacity, 0, 'f', 2)
+            .arg(updated.size());
+    }
+
+    // -----------------------------------------------------------------------
+    // studio.workflow.load / studio.workflow.save
+    // -----------------------------------------------------------------------
+    if(toolName == QLatin1String("studio.workflow.load")) {
+        const QJsonObject graph = result.value(QStringLiteral("graph")).toObject();
+        const QString workflowName = graph.value(QStringLiteral("name")).toString();
+        const QJsonArray pipeline  = graph.value(QStringLiteral("pipeline")).toArray();
+        const QJsonArray resources = graph.value(QStringLiteral("resources")).toArray();
+        if(workflowName.isEmpty() && pipeline.isEmpty()) {
+            return QString();
+        }
+        return QString("Workflow loaded: \"%1\" — %2 node(s), %3 resource(s).")
+            .arg(workflowName.isEmpty() ? QStringLiteral("(unnamed)") : workflowName)
+            .arg(pipeline.size())
+            .arg(resources.size());
+    }
+
+    if(toolName == QLatin1String("studio.workflow.save")) {
+        const QString savedPath = result.value(QStringLiteral("path")).toString();
+        if(savedPath.isEmpty()) {
+            return QString();
+        }
+        return QString("Workflow saved to: %1.").arg(QFileInfo(savedPath).fileName());
+    }
+
+    return QString();
+}
+
 }
 
 MainWindow::MainWindow(QWidget* parent)
@@ -624,9 +1313,29 @@ MainWindow::MainWindow(QWidget* parent)
 , m_agentChatDock(new AgentChatDockWidget(this))
 , m_activityBar(new QWidget(this))
 , m_explorerButton(new QToolButton)
+, m_workflowButton(new QToolButton)
 , m_skillsButton(new QToolButton)
 , m_extensionsButton(new QToolButton)
 , m_workspaceExplorer(new QTreeWidget)
+, m_workflowExplorer(new QTreeWidget)
+, m_workflowPage(new QWidget(this))
+, m_workflowStatusBanner(new QLabel(this))
+, m_workflowMiniMapDockStateLabel(new QLabel(this))
+, m_workflowOpenGraphButton(new QPushButton("Open In Center", this))
+, m_workflowCenterView(nullptr)
+, m_workflowCenterSummaryLabel(nullptr)
+, m_workflowCenterMiniMap(nullptr)
+, m_workflowCenterDetailsView(nullptr)
+, m_workflowCenterOpenSourceButton(nullptr)
+, m_workflowCenterDockButton(nullptr)
+, m_workflowCenterAddStepButton(nullptr)
+, m_workflowCenterSaveButton(nullptr)
+, m_workflowMiniMap(new WorkflowMiniMapWidget(this))
+, m_workflowDetailsView(new QPlainTextEdit(this))
+, m_workflowAddStepButton(new QPushButton("Add Step...", this))
+, m_workflowSaveButton(new QPushButton("Save Workflow", this))
+, m_workflowOpenFileButton(new QPushButton("Open Selected File", this))
+, m_workflowRefreshButton(new QPushButton("Refresh Graph", this))
 , m_skillsExplorer(new QTreeWidget)
 , m_skillsPage(new QWidget(this))
 , m_skillDetailsView(new QPlainTextEdit(this))
@@ -660,15 +1369,19 @@ MainWindow::MainWindow(QWidget* parent)
 , m_activeStateItem(new QListWidgetItem("Active view state: idle"))
 , m_kernelSocket(new QLocalSocket(this))
 , m_extensionSocket(new QLocalSocket(this))
+, m_kernelProcess(new QProcess(this))
+, m_extensionHostProcess(new QProcess(this))
 , m_llmPlanner(this)
 , m_sceneRegistry(this)
 , m_viewProviderRegistry(new ViewProviderRegistry(this))
 , m_viewManager(&m_sceneRegistry, m_viewProviderRegistry, this)
 , m_activePipelineTotalSteps(0)
 , m_isAdvancingPipeline(false)
+, m_isShuttingDown(false)
 {
     setWindowTitle("MNE Analyze Studio");
     resize(1440, 900);
+    m_activeWorkflowHasUnsavedChanges = false;
 
     reloadExtensionRegistry();
 
@@ -681,8 +1394,63 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(m_kernelSocket, &QLocalSocket::connected, this, &MainWindow::requestKernelToolDefinitions);
     connect(m_extensionSocket, &QLocalSocket::connected, this, &MainWindow::requestExtensionHostState);
-    m_kernelSocket->connectToServer(kKernelSocketName);
-    m_extensionSocket->connectToServer(kExtensionSocketName);
+    connect(qApp, &QCoreApplication::aboutToQuit, this, &MainWindow::shutdownManagedBackends);
+
+    const auto configureBackendProcess = [this](QProcess* process, const QString& displayName) {
+        if(!process) {
+            return;
+        }
+
+        process->setProcessChannelMode(QProcess::MergedChannels);
+        connect(process, &QProcess::readyReadStandardOutput, this, [this, process, displayName]() {
+            const QString output = QString::fromUtf8(process->readAllStandardOutput()).trimmed();
+            if(!output.isEmpty()) {
+                appendOutputMessage(QString("%1: %2").arg(displayName, output));
+            }
+        });
+        connect(process,
+                qOverload<int, QProcess::ExitStatus>(&QProcess::finished),
+                this,
+                [this, displayName](int exitCode, QProcess::ExitStatus exitStatus) {
+                    if(m_isShuttingDown) {
+                        return;
+                    }
+
+                    const QString message = QString("%1 exited (%2, code %3).")
+                                                .arg(displayName,
+                                                     exitStatus == QProcess::NormalExit ? QString("normal") : QString("crashed"))
+                                                .arg(exitCode);
+                    appendProblemMessage(message);
+                    statusBar()->showMessage(message, 6000);
+        });
+        connect(process, &QProcess::errorOccurred, this, [this, displayName](QProcess::ProcessError error) {
+            if(m_isShuttingDown) {
+                return;
+            }
+
+            if(error == QProcess::FailedToStart || error == QProcess::Crashed) {
+                const QString message = QString("%1 backend error: %2")
+                                            .arg(displayName)
+                                            .arg(static_cast<int>(error));
+                appendProblemMessage(message);
+                statusBar()->showMessage(message, 6000);
+            }
+        });
+    };
+
+    configureBackendProcess(m_kernelProcess, "Neuro-Kernel");
+    configureBackendProcess(m_extensionHostProcess, "Extension Host");
+
+    ensureBackendConnection(m_kernelSocket,
+                            QString::fromLatin1(kKernelSocketName),
+                            QStringLiteral("mne_analyze_studio_neuro_kernel"),
+                            m_kernelProcess,
+                            QStringLiteral("Neuro-Kernel"));
+    ensureBackendConnection(m_extensionSocket,
+                            QString::fromLatin1(kExtensionSocketName),
+                            QStringLiteral("mne_analyze_studio_skill_host"),
+                            m_extensionHostProcess,
+                            QStringLiteral("Extension Host"));
 }
 
 void MainWindow::openInitialFiles(const QStringList& filePaths)
@@ -725,16 +1493,20 @@ void MainWindow::createLayout()
     activityLayout->setContentsMargins(6, 8, 6, 8);
     activityLayout->setSpacing(6);
     m_explorerButton->setText("Files");
+    m_workflowButton->setText("Flow");
     m_skillsButton->setText("Skills");
     m_extensionsButton->setText("Ext");
     m_explorerButton->setToolTip("Explorer");
+    m_workflowButton->setToolTip("Workflow graph navigator");
     m_skillsButton->setToolTip("Tools and skills");
     m_extensionsButton->setToolTip("Extensions");
     m_explorerButton->setCheckable(true);
+    m_workflowButton->setCheckable(true);
     m_skillsButton->setCheckable(true);
     m_extensionsButton->setCheckable(true);
     m_explorerButton->setChecked(true);
     activityLayout->addWidget(m_explorerButton);
+    activityLayout->addWidget(m_workflowButton);
     activityLayout->addWidget(m_skillsButton);
     activityLayout->addWidget(m_extensionsButton);
     activityLayout->addStretch(1);
@@ -742,6 +1514,19 @@ void MainWindow::createLayout()
     m_workspaceExplorer->setHeaderLabel("Workspace");
     m_workspaceExplorer->setAlternatingRowColors(true);
     m_workspaceExplorer->setContextMenuPolicy(Qt::CustomContextMenu);
+    m_workflowExplorer->setHeaderLabel("Workflow");
+    m_workflowExplorer->setAlternatingRowColors(true);
+    m_workflowExplorer->setContextMenuPolicy(Qt::CustomContextMenu);
+    m_workflowStatusBanner->setWordWrap(true);
+    m_workflowStatusBanner->setVisible(false);
+    m_workflowMiniMapDockStateLabel->setWordWrap(true);
+    m_workflowMiniMapDockStateLabel->setVisible(false);
+    m_workflowMiniMap->setToolTip("Compact dependency map for the active workflow DAG. Click a node to focus it.");
+    m_workflowDetailsView->setReadOnly(true);
+    m_workflowDetailsView->setPlaceholderText("Select a workflow resource or pipeline node to inspect it here.");
+    m_workflowOpenGraphButton->setToolTip("Open the workflow dependency map in a dedicated center tab.");
+    m_workflowAddStepButton->setToolTip("Append a new skill operator node to the active workflow graph.");
+    m_workflowSaveButton->setToolTip("Persist the current active workflow DAG back to a .mne file.");
     m_skillsExplorer->setHeaderLabel("Tools");
     m_skillsExplorer->setAlternatingRowColors(true);
     m_skillsExplorer->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -754,6 +1539,34 @@ void MainWindow::createLayout()
     m_extensionDetailsView->setPlaceholderText("Select an extension to inspect its manifest, tools, view providers, and settings tabs.");
     m_extensionToggleButton->setEnabled(false);
     m_extensionSettingsButton->setEnabled(false);
+
+    QVBoxLayout* workflowPageLayout = new QVBoxLayout(m_workflowPage);
+    workflowPageLayout->setContentsMargins(0, 0, 0, 0);
+    workflowPageLayout->setSpacing(8);
+    workflowPageLayout->addWidget(m_workflowStatusBanner);
+    workflowPageLayout->addWidget(m_workflowExplorer, 2);
+    QHBoxLayout* workflowGraphHeaderLayout = new QHBoxLayout;
+    workflowGraphHeaderLayout->setContentsMargins(0, 0, 0, 0);
+    workflowGraphHeaderLayout->setSpacing(8);
+    QLabel* workflowGraphLabel = new QLabel("Dependency Map", m_workflowPage);
+    workflowGraphHeaderLayout->addWidget(workflowGraphLabel);
+    workflowGraphHeaderLayout->addStretch(1);
+    workflowGraphHeaderLayout->addWidget(m_workflowOpenGraphButton);
+    workflowPageLayout->addLayout(workflowGraphHeaderLayout);
+    workflowPageLayout->addWidget(m_workflowMiniMapDockStateLabel);
+    workflowPageLayout->addWidget(m_workflowMiniMap, 1);
+    workflowPageLayout->addWidget(new QLabel("Workflow Inspector", m_workflowPage));
+    workflowPageLayout->addWidget(m_workflowDetailsView, 1);
+    QHBoxLayout* workflowButtonsLayout = new QHBoxLayout;
+    workflowButtonsLayout->setContentsMargins(0, 0, 0, 0);
+    workflowButtonsLayout->setSpacing(8);
+    workflowButtonsLayout->addWidget(m_workflowAddStepButton);
+    workflowButtonsLayout->addWidget(m_workflowSaveButton);
+    workflowButtonsLayout->addWidget(m_workflowOpenFileButton);
+    workflowButtonsLayout->addWidget(m_workflowRefreshButton);
+    workflowPageLayout->addLayout(workflowButtonsLayout);
+    rebuildWorkflowNavigatorUi();
+    refreshWorkflowGraphDockingUi();
 
     QVBoxLayout* skillsPageLayout = new QVBoxLayout(m_skillsPage);
     skillsPageLayout->setContentsMargins(0, 0, 0, 0);
@@ -780,6 +1593,7 @@ void MainWindow::createLayout()
     refreshExtensionManagerUi();
 
     m_leftSidebarStack->addWidget(m_workspaceExplorer);
+    m_leftSidebarStack->addWidget(m_workflowPage);
     m_leftSidebarStack->addWidget(m_skillsPage);
     m_leftSidebarStack->addWidget(m_extensionsPage);
 
@@ -896,7 +1710,11 @@ void MainWindow::createLayout()
 
     QAction* openAction = fileMenu->addAction("Open File...");
     connect(openAction, &QAction::triggered, this, [this]() {
-        const QString filePath = QFileDialog::getOpenFileName(this, "Open neuroscience asset");
+        const QString filePath = QFileDialog::getOpenFileName(
+            this,
+            "Open neuroscience asset",
+            QString(),
+            "Workflow Files (*.mne);;Signal Files (*.fif *.ave *.edf);;Source Files (*.cpp *.h *.json *.py *.tex *.md);;All Files (*)");
         if(filePath.isEmpty()) {
             return;
         }
@@ -923,14 +1741,99 @@ void MainWindow::createConnections()
     connect(m_agentChatDock, &AgentChatDockWidget::connectionModeSelected, this, &MainWindow::handleAgentConnectionModeSelected);
     connect(m_agentChatDock, &AgentChatDockWidget::connectionModelSelected, this, &MainWindow::handleAgentConnectionModelSelected);
     connect(m_agentChatDock, &AgentChatDockWidget::openConnectionSettingsRequested, this, &MainWindow::openAgentSettings);
+    connect(m_agentChatDock, &AgentChatDockWidget::plannerSafetyLevelSelected, this, &MainWindow::handleAgentPlannerSafetyLevelSelected);
     connect(m_explorerButton, &QToolButton::clicked, this, [this]() {
         switchPrimarySidebar("workspace");
+    });
+    connect(m_workflowButton, &QToolButton::clicked, this, [this]() {
+        switchPrimarySidebar("workflow");
     });
     connect(m_skillsButton, &QToolButton::clicked, this, [this]() {
         switchPrimarySidebar("skills");
     });
     connect(m_extensionsButton, &QToolButton::clicked, this, [this]() {
         switchPrimarySidebar("extensions");
+    });
+    connect(m_workflowExplorer, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem* current) {
+        updateSelectedWorkflowItem(current);
+    });
+    connect(m_workflowExplorer, &QTreeWidget::itemDoubleClicked, this, [this](QTreeWidgetItem* item) {
+        updateSelectedWorkflowItem(item);
+        if(!openableWorkflowPathForItem(item).isEmpty()) {
+            openSelectedWorkflowFile();
+        }
+    });
+    connect(m_workflowExplorer, &QWidget::customContextMenuRequested, this, [this](const QPoint& position) {
+        QMenu contextMenu(this);
+        QTreeWidgetItem* item = m_workflowExplorer->itemAt(position);
+        if(item) {
+            m_workflowExplorer->setCurrentItem(item);
+            updateSelectedWorkflowItem(item);
+        }
+
+        QAction* refreshGraphAction = contextMenu.addAction("Refresh Workflow Graph");
+        connect(refreshGraphAction, &QAction::triggered, this, [this]() {
+            if(!m_activeWorkflowFilePath.trimmed().isEmpty() && QFileInfo::exists(m_activeWorkflowFilePath)) {
+                requestWorkflowLoad(m_activeWorkflowFilePath);
+                statusBar()->showMessage(QString("Refreshing workflow graph from %1...")
+                                             .arg(QFileInfo(m_activeWorkflowFilePath).fileName()),
+                                         4000);
+            } else {
+                requestActiveWorkflowGraph();
+                statusBar()->showMessage("Refreshing active workflow graph...", 4000);
+            }
+        });
+
+        QAction* openCenterGraphAction = contextMenu.addAction("Open Workflow Graph");
+        connect(openCenterGraphAction, &QAction::triggered, this, [this]() {
+            openWorkflowCenterView(true);
+        });
+
+        QAction* appendStepAction = contextMenu.addAction("Append Workflow Step...");
+        appendStepAction->setEnabled(m_workflowAddStepButton->isEnabled());
+        connect(appendStepAction, &QAction::triggered, this, &MainWindow::appendWorkflowStep);
+
+        QAction* saveWorkflowAction = contextMenu.addAction("Save Workflow");
+        saveWorkflowAction->setEnabled(m_workflowSaveButton->isEnabled());
+        connect(saveWorkflowAction, &QAction::triggered, this, &MainWindow::saveActiveWorkflowGraph);
+
+        if(item && !openableWorkflowPathForItem(item).isEmpty()) {
+            QAction* openFileAction = contextMenu.addAction("Open Selected File");
+            connect(openFileAction, &QAction::triggered, this, &MainWindow::openSelectedWorkflowFile);
+        }
+
+        contextMenu.exec(m_workflowExplorer->viewport()->mapToGlobal(position));
+    });
+    connect(m_workflowMiniMap, &WorkflowMiniMapWidget::nodeActivated, this, [this](const QString& nodeUid) {
+        if(QTreeWidgetItem* nodeItem = findWorkflowItemByStableId(m_workflowExplorer, QStringLiteral("node:%1").arg(nodeUid))) {
+            m_workflowExplorer->setCurrentItem(nodeItem);
+            m_workflowExplorer->scrollToItem(nodeItem);
+            updateSelectedWorkflowItem(nodeItem);
+        }
+    });
+    connect(m_workflowAddStepButton, &QPushButton::clicked, this, &MainWindow::appendWorkflowStep);
+    connect(m_workflowOpenGraphButton, &QPushButton::clicked, this, [this]() {
+        if(isWorkflowCenterViewOpen()) {
+            openWorkflowCenterView(true);
+            return;
+        }
+
+        openWorkflowCenterView(true);
+    });
+    connect(m_workflowSaveButton, &QPushButton::clicked, this, &MainWindow::saveActiveWorkflowGraph);
+    connect(m_workflowOpenFileButton, &QPushButton::clicked, this, &MainWindow::openSelectedWorkflowFile);
+    connect(m_workflowRefreshButton, &QPushButton::clicked, this, [this]() {
+        if(!m_activeWorkflowFilePath.trimmed().isEmpty() && QFileInfo::exists(m_activeWorkflowFilePath)) {
+            requestWorkflowLoad(m_activeWorkflowFilePath);
+            appendOutputMessage(QString("Refreshing workflow graph from %1").arg(m_activeWorkflowFilePath));
+            statusBar()->showMessage(QString("Refreshing workflow graph from %1...")
+                                         .arg(QFileInfo(m_activeWorkflowFilePath).fileName()),
+                                     4000);
+        } else {
+            requestActiveWorkflowGraph();
+            appendOutputMessage("Refreshing active workflow graph");
+            statusBar()->showMessage("Refreshing active workflow graph...", 4000);
+        }
     });
     connect(m_skillsExplorer, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem* current) {
         updateSelectedSkillTool(current);
@@ -1149,6 +2052,10 @@ void MainWindow::createConnections()
                     m_agentChatDock->appendTranscript(QString("Kernel> %1").arg(message));
                     appendOutputMessage(QString("Kernel: %1").arg(message));
                     appendTerminalMessage(QString("> %1").arg(message));
+                    const QString kernelNarration = narrateToolResult(toolName, result);
+                    if(!kernelNarration.isEmpty()) {
+                        m_agentChatDock->appendTranscript(QString("Studio> %1").arg(kernelNarration));
+                    }
                 }
             } else {
                 const QString message = QString::fromUtf8(payload).trimmed();
@@ -1165,6 +2072,8 @@ void MainWindow::createConnections()
             QString errorString;
             if(JsonRpcMessage::deserialize(payload, response, errorString)) {
                 if(response.contains("error")) {
+                    const QString requestId = response.value("id").toString();
+                    const QString workflowFilePath = m_pendingWorkflowLoads.take(requestId);
                     const QString message = response.value("error").toObject().value("message").toString();
                     rememberToolResult("extension_host.error",
                                      normalizedToolErrorEnvelope("extension_host.error",
@@ -1178,12 +2087,23 @@ void MainWindow::createConnections()
                     m_agentChatDock->appendTranscript(QString("Extension Host> %1").arg(message));
                     appendProblemMessage(QString("Extension host error: %1").arg(message));
                     appendTerminalMessage(QString("> %1").arg(message));
+                    if(!workflowFilePath.isEmpty()) {
+                        const QString workflowLabel = QFileInfo(workflowFilePath).fileName().isEmpty()
+                            ? workflowFilePath
+                            : QFileInfo(workflowFilePath).fileName();
+                        setWorkflowStatusBanner(QString("Failed to activate %1: %2").arg(workflowLabel, message),
+                                               QStringLiteral("error"));
+                        if(m_activeWorkflowGraph.isEmpty()) {
+                            rebuildWorkflowNavigatorUi();
+                        }
+                    }
                 } else {
                     const QString requestId = response.value("id").toString();
                     const QJsonObject result = normalizedToolResultEnvelope(response.value("result").toObject().value("tool_name").toString(),
                                                                            response.value("result").toObject(),
                                                                            "extension_host");
                     const QString toolName = result.value("tool_name").toString();
+                    const QString workflowFilePath = m_pendingWorkflowLoads.take(requestId);
                     if(toolName == "views/open" && m_pendingExtensionViewOpens.contains(requestId)) {
                         const QJsonObject dispatch = m_pendingExtensionViewOpens.take(requestId);
                         const QString filePath = m_pendingExtensionViewFiles.take(requestId);
@@ -1201,7 +2121,10 @@ void MainWindow::createConnections()
                         QJsonArray filteredTools;
                         for(const QJsonValue& value : result.value("tools").toArray()) {
                             const QJsonObject tool = value.toObject();
-                            if(m_viewProviderRegistry->isExtensionEnabled(tool.value("extension_id").toString())) {
+                            const QString extensionId = tool.value("extension_id").toString().trimmed();
+                            if(!m_viewProviderRegistry
+                               || extensionId.isEmpty()
+                               || m_viewProviderRegistry->isExtensionEnabled(extensionId)) {
                                 filteredTools.append(tool);
                             }
                         }
@@ -1211,23 +2134,37 @@ void MainWindow::createConnections()
                                                      .arg(m_cachedExtensionToolDefinitions.size()),
                                                  4000);
                         refreshExtensionManagerUi();
+                        rebuildWorkflowNavigatorUi();
                         continue;
                     }
                     if(toolName == "resources/list" && result.value("resources").isArray()) {
                         QJsonArray filteredResources;
                         for(const QJsonValue& value : result.value("resources").toArray()) {
                             const QJsonObject resource = value.toObject();
-                            if(m_viewProviderRegistry->isExtensionEnabled(resource.value("id").toString())) {
+                            const QString extensionId = resource.value("extension_id").toString().trimmed();
+                            const QString resourceId = resource.value("id").toString().trimmed();
+                            const QString resourceUri = resource.value("uri").toString().trimmed();
+                            const bool isWorkflowGraphResource = resourceUri == QLatin1String(kActiveWorkflowGraphUri)
+                                || resource.value("kind").toString().trimmed() == QLatin1String("workflow_graph");
+                            const QString visibilityId = extensionId.isEmpty() ? resourceId : extensionId;
+                            if(isWorkflowGraphResource
+                               || !m_viewProviderRegistry
+                               || visibilityId.isEmpty()
+                               || m_viewProviderRegistry->isExtensionEnabled(visibilityId)) {
                                 filteredResources.append(resource);
                             }
                         }
                         m_cachedExtensionResources = filteredResources;
                         rebuildSkillsExplorer();
-                        statusBar()->showMessage(QString("Discovered %1 extension manifests.")
+                        statusBar()->showMessage(QString("Discovered %1 live extension/workflow resources.")
                                                      .arg(m_cachedExtensionResources.size()),
                                                  4000);
                         refreshExtensionManagerUi();
                         continue;
+                    }
+                    if(toolName == "resources/read"
+                       && result.value("uri").toString().trimmed() == QLatin1String(kActiveWorkflowGraphUri)) {
+                        adoptWorkflowGraph(result);
                     }
                     if(toolName == "extensions/reload") {
                         m_lastExtensionReloadResult = result;
@@ -1254,6 +2191,55 @@ void MainWindow::createConnections()
                         refreshExtensionManagerUi();
                         continue;
                     }
+                    const QString resultStatus = result.value("status").toString().trimmed().toLower();
+                    const QJsonObject workflowOperatorDefinition = workflowOperatorToolDefinition(toolName);
+                    if(toolName == "studio.workflow.load") {
+                        const QString effectiveWorkflowFilePath = !workflowFilePath.isEmpty()
+                            ? workflowFilePath
+                            : result.value("source_file").toString().trimmed();
+                        const QString workflowLabel = QFileInfo(effectiveWorkflowFilePath).fileName().isEmpty()
+                            ? effectiveWorkflowFilePath
+                            : QFileInfo(effectiveWorkflowFilePath).fileName();
+                        const QString resultMessage = result.value("message").toString().trimmed();
+
+                        if(resultStatus == QLatin1String("error") || resultStatus == QLatin1String("failed")) {
+                            const QString bannerMessage = workflowLabel.isEmpty()
+                                ? (resultMessage.isEmpty()
+                                       ? QStringLiteral("Failed to activate workflow graph.")
+                                       : resultMessage)
+                                : QString("Failed to activate %1: %2")
+                                      .arg(workflowLabel,
+                                           resultMessage.isEmpty()
+                                               ? QStringLiteral("Unknown workflow load error.")
+                                               : resultMessage);
+                            setWorkflowStatusBanner(bannerMessage, QStringLiteral("error"));
+                            if(m_activeWorkflowGraph.isEmpty()) {
+                                rebuildWorkflowNavigatorUi();
+                            }
+                        }
+                    }
+                    if(toolName == "studio.workflow.save"
+                       && (resultStatus == QLatin1String("error") || resultStatus == QLatin1String("failed"))) {
+                        const QString targetPath = result.value("source_file").toString().trimmed();
+                        const QString targetLabel = QFileInfo(targetPath).fileName().isEmpty()
+                            ? targetPath
+                            : QFileInfo(targetPath).fileName();
+                        const QString bannerMessage = targetLabel.isEmpty()
+                            ? result.value("message").toString(QStringLiteral("Failed to save the active workflow graph."))
+                            : QString("Failed to save %1: %2")
+                                  .arg(targetLabel,
+                                       result.value("message").toString(QStringLiteral("Unknown workflow save error.")));
+                        setWorkflowStatusBanner(bannerMessage, QStringLiteral("error"));
+                    }
+                    if(!workflowOperatorDefinition.isEmpty()
+                       && (resultStatus == QLatin1String("error") || resultStatus == QLatin1String("failed"))) {
+                        const QString operatorLabel = workflowOperatorDefinition.value("display_name")
+                            .toString(workflowOperatorDefinition.value("name").toString(toolName));
+                        setWorkflowStatusBanner(QString("Failed to append workflow step via %1: %2")
+                                                    .arg(operatorLabel,
+                                                         result.value("message").toString(QStringLiteral("Unknown operator error."))),
+                                               QStringLiteral("error"));
+                    }
                     if(toolName == "views/command") {
                         const QString sessionId = result.value("session_id").toString();
                         if(QWidget* widget = m_extensionViewWidgetsBySessionId.value(sessionId, nullptr)) {
@@ -1269,10 +2255,24 @@ void MainWindow::createConnections()
                         }
                         requestExtensionHostState();
                     }
+                    const bool isHousekeepingMethod = toolName == QLatin1String("tools/list")
+                        || toolName == QLatin1String("resources/list")
+                        || toolName == QLatin1String("resources/read")
+                        || toolName == QLatin1String("views/list");
+                    if(toolName != QLatin1String("views/command") && !isHousekeepingMethod) {
+                        rememberToolResult(toolName, result);
+                    }
+                    if(!workflowFilePath.isEmpty() || result.value("graph").isObject()) {
+                        adoptWorkflowGraph(result, workflowFilePath);
+                    }
                     const QString message = result.value("message").toString(QJsonDocument(result).toJson(QJsonDocument::Compact));
                     m_agentChatDock->appendTranscript(QString("Extension Host> %1").arg(message));
                     appendOutputMessage(QString("Extension Host: %1").arg(message));
                     appendTerminalMessage(QString("> %1").arg(message));
+                    const QString extNarration = narrateToolResult(toolName, result);
+                    if(!extNarration.isEmpty()) {
+                        m_agentChatDock->appendTranscript(QString("Studio> %1").arg(extNarration));
+                    }
                 }
             } else {
                 const QString message = QString::fromUtf8(payload).trimmed();
@@ -1647,6 +2647,10 @@ void MainWindow::openWorkspaceItem(QTreeWidgetItem* item)
 
 void MainWindow::openFileInView(const QString& filePath)
 {
+    if(isWorkflowAnalysisFile(filePath)) {
+        requestWorkflowLoad(filePath);
+    }
+
     const QJsonObject dispatch = m_viewManager.dispatchFileSelection(filePath);
     if(Dummy3DHostedViewWidget* existingThreeDView = threeDViewContainingFile(filePath)) {
         const int existingTabIndex = centerTabIndexForWidget(existingThreeDView);
@@ -1689,7 +2693,12 @@ void MainWindow::openFileInView(const QString& filePath)
     } else {
         QTextEdit* editor = new QTextEdit;
         editor->setReadOnly(true);
-        editor->setPlainText(QJsonDocument(dispatch).toJson(QJsonDocument::Indented));
+        if(dispatch.value("view").toString() == QLatin1String("CodeEditorView")
+           || isWorkflowAnalysisFile(filePath)) {
+            editor->setPlainText(loadTextFileForDisplay(filePath));
+        } else {
+            editor->setPlainText(QJsonDocument(dispatch).toJson(QJsonDocument::Indented));
+        }
         viewWidget = editor;
     }
 
@@ -1901,14 +2910,18 @@ void MainWindow::applyWorkbenchStyle()
 void MainWindow::switchPrimarySidebar(const QString& sectionName)
 {
     const bool workspaceSelected = sectionName == "workspace";
+    const bool workflowSelected = sectionName == "workflow";
     const bool skillsSelected = sectionName == "skills";
     const bool extensionsSelected = sectionName == "extensions";
     m_explorerButton->setChecked(workspaceSelected);
+    m_workflowButton->setChecked(workflowSelected);
     m_skillsButton->setChecked(skillsSelected);
     m_extensionsButton->setChecked(extensionsSelected);
 
     if(workspaceSelected) {
         m_leftSidebarStack->setCurrentWidget(m_workspaceExplorer);
+    } else if(workflowSelected) {
+        m_leftSidebarStack->setCurrentWidget(m_workflowPage);
     } else if(skillsSelected) {
         m_leftSidebarStack->setCurrentWidget(m_skillsPage);
     } else {
@@ -1917,6 +2930,8 @@ void MainWindow::switchPrimarySidebar(const QString& sectionName)
 
     if(workspaceSelected) {
         statusBar()->showMessage("Workspace explorer active");
+    } else if(workflowSelected) {
+        statusBar()->showMessage("Workflow navigator active");
     } else if(skillsSelected) {
         statusBar()->showMessage("Skill explorer active");
     } else {
@@ -1983,6 +2998,15 @@ void MainWindow::sendToolCall(const QString& commandText)
                 const QString plannedToolName = toolNameFromCommand(plannedCommand);
                 const QJsonObject execution = plannerExecutionMetadata(plannedToolName);
                 const QString executionMode = execution.value("execution_mode").toString("suggestion_only");
+                const QString stepDescription = i < llmPlan.plannedStepDescriptions.size()
+                    ? llmPlan.plannedStepDescriptions.at(i).trimmed()
+                    : QString();
+                if(!stepDescription.isEmpty()) {
+                    m_agentChatDock->appendTranscript(QString("Planner> Step %1/%2 — %3")
+                                                          .arg(i + 1)
+                                                          .arg(llmPlan.plannedCommands.size())
+                                                          .arg(stepDescription));
+                }
                 if(executionMode == QLatin1String("auto_run")) {
                     const QString stepNote = QString("Running LLM step %1/%2: %3")
                                                  .arg(i + 1)
@@ -2175,11 +3199,22 @@ void MainWindow::closeCenterTab(int index)
     }
 
     QWidget* widget = m_centerTabs->widget(index);
+    if(widget == m_workflowCenterView) {
+        m_workflowCenterView = nullptr;
+        m_workflowCenterSummaryLabel = nullptr;
+        m_workflowCenterMiniMap = nullptr;
+        m_workflowCenterDetailsView = nullptr;
+        m_workflowCenterOpenSourceButton = nullptr;
+        m_workflowCenterDockButton = nullptr;
+        m_workflowCenterAddStepButton = nullptr;
+        m_workflowCenterSaveButton = nullptr;
+    }
     if(ExtensionHostedViewWidget* hostedView = qobject_cast<ExtensionHostedViewWidget*>(widget)) {
         m_extensionViewWidgetsBySessionId.remove(hostedView->sessionId());
     }
     m_centerTabs->removeTab(index);
     delete widget;
+    refreshWorkflowGraphDockingUi();
 }
 
 QString MainWindow::planAgentSteps(const QString& commandText, QStringList& plannedCommands, bool& planned) const
@@ -2272,9 +3307,9 @@ QJsonObject MainWindow::normalizedToolResultEnvelope(const QString& toolName,
                                                      const QString& source) const
 {
     QJsonObject envelope = result;
-    const QString normalizedToolName = toolName.trimmed().isEmpty()
+    const QString normalizedToolName = normalizedPlannerToolName(toolName.trimmed().isEmpty()
         ? result.value("tool_name").toString().trimmed()
-        : toolName.trimmed();
+        : toolName.trimmed());
     const QString normalizedSource = source.trimmed().isEmpty() ? QString("workbench") : source.trimmed();
 
     QString status = result.value("status").toString().trimmed().toLower();
@@ -2307,6 +3342,9 @@ QJsonObject MainWindow::normalizedToolResultEnvelope(const QString& toolName,
     }
     if(normalizedToolName == QLatin1String("neurokernel.psd_summary")) {
         suggestedTools.append("studio.pipeline.run");
+    }
+    if(normalizedToolName == QLatin1String("studio.workflow.load")) {
+        suggestedTools.append("studio.workflow.active_graph");
     }
     if(normalizedToolName == QLatin1String("studio.pipeline.run")
        && result.value("pending_steps").toInt() > 0) {
@@ -2355,9 +3393,9 @@ QJsonObject MainWindow::normalizedToolErrorEnvelope(const QString& toolName,
 
 void MainWindow::rememberToolResult(const QString& toolName, const QJsonObject& result)
 {
-    const QString effectiveToolName = toolName.trimmed().isEmpty()
+    const QString effectiveToolName = normalizedPlannerToolName(toolName.trimmed().isEmpty()
         ? result.value("tool_name").toString().trimmed()
-        : toolName.trimmed();
+        : toolName.trimmed());
     if(effectiveToolName.isEmpty()) {
         return;
     }
@@ -2677,6 +3715,28 @@ QJsonArray MainWindow::analysisPipelineContracts() const
     }
 
     return m_viewProviderRegistry->analysisPipelineDefinitions();
+}
+
+QJsonArray MainWindow::analysisPipelineToolDefinitions() const
+{
+    if(!m_cachedExtensionToolDefinitions.isEmpty()) {
+        QJsonArray tools;
+        for(const QJsonValue& value : m_cachedExtensionToolDefinitions) {
+            const QJsonObject tool = value.toObject();
+            if(isAnalysisPipelineCapability(tool)) {
+                tools.append(tool);
+            }
+        }
+        if(!tools.isEmpty()) {
+            return tools;
+        }
+    }
+
+    if(!m_viewProviderRegistry) {
+        return QJsonArray();
+    }
+
+    return m_viewProviderRegistry->analysisPipelineToolDefinitions();
 }
 
 QJsonArray MainWindow::extensionSettingsState() const
@@ -3112,6 +4172,73 @@ QJsonObject MainWindow::pipelineRunArtifact(const QString& runId) const
     return QJsonObject();
 }
 
+QString MainWindow::validateAnalysisPipelineContract(const QJsonObject& pipeline,
+                                                    const QJsonObject& pipelineInputs) const
+{
+    const QString pipelineId = pipeline.value("id").toString().trimmed();
+    const QJsonArray requiredInputs = pipeline.value("input_schema").toObject().value("required").toArray();
+    for(const QJsonValue& requiredValue : requiredInputs) {
+        const QString inputName = requiredValue.toString().trimmed();
+        if(inputName.isEmpty()) {
+            continue;
+        }
+        if(!pipelineInputs.contains(inputName) || pipelineInputs.value(inputName).isUndefined() || pipelineInputs.value(inputName).isNull()) {
+            return QString("Pipeline `%1` is missing required input `%2`.").arg(pipelineId, inputName);
+        }
+    }
+
+    const QJsonArray steps = pipeline.value("steps").toArray();
+    if(steps.isEmpty()) {
+        return pipelineId.isEmpty()
+            ? QString("Pipeline defines no executable steps.")
+            : QString("Pipeline `%1` defines no executable steps.").arg(pipelineId);
+    }
+
+    const QStringList resolvablePlaceholders = QStringList(pipelineInputs.keys())
+        << QStringLiteral("last_peak_sample")
+        << QStringLiteral("last_cursor_sample");
+
+    for(int index = 0; index < steps.size(); ++index) {
+        const QJsonObject step = steps.at(index).toObject();
+        const QString toolName = step.value("tool_name").toString().trimmed();
+        if(toolName.isEmpty()) {
+            return QString("Step %1 in pipeline `%2` is missing `tool_name`.")
+                .arg(index + 1)
+                .arg(pipelineId);
+        }
+
+        if(normalizedPlannerToolName(toolName) == QLatin1String("studio.pipeline.run")) {
+            return QString("Step %1 in pipeline `%2` recursively invokes another pipeline run, which is not supported.")
+                .arg(index + 1)
+                .arg(pipelineId);
+        }
+
+        if(toolDefinition(toolName).isEmpty()) {
+            return QString("Step %1 in pipeline `%2` references unknown tool `%3`.")
+                .arg(index + 1)
+                .arg(pipelineId, toolName);
+        }
+
+        const QJsonObject argumentsTemplate = step.value("arguments_template").toObject();
+        for(auto it = argumentsTemplate.constBegin(); it != argumentsTemplate.constEnd(); ++it) {
+            if(!it.value().isString()) {
+                continue;
+            }
+
+            const QStringList placeholders = extractTemplatePlaceholders(it.value().toString());
+            for(const QString& placeholder : placeholders) {
+                if(!resolvablePlaceholders.contains(placeholder)) {
+                    return QString("Step %1 in pipeline `%2` uses unresolved placeholder `${%3}`.")
+                        .arg(index + 1)
+                        .arg(pipelineId, placeholder);
+                }
+            }
+        }
+    }
+
+    return QString();
+}
+
 QString MainWindow::rerunPipelineStepCommand(const QString& runId,
                                              int stepNumber,
                                              const QString& mode,
@@ -3284,6 +4411,12 @@ bool MainWindow::executeAnalysisPipeline(const QString& pipelineId,
     const QJsonObject pipeline = analysisPipelineContract(pipelineId);
     if(pipeline.isEmpty()) {
         appendProblemMessage(QString("Unknown analysis pipeline: %1").arg(pipelineId));
+        return false;
+    }
+
+    const QString validationError = validateAnalysisPipelineContract(pipeline, pipelineInputs);
+    if(!validationError.isEmpty()) {
+        appendProblemMessage(validationError);
         return false;
     }
 
@@ -3540,8 +4673,8 @@ QString MainWindow::planAgentIntent(const QString& commandText, QString& planned
             const QString displayName = pipeline.value("display_name").toString().toLower();
             if(lower.contains(pipelineId.toLower()) || (!displayName.isEmpty() && lower.contains(displayName))) {
                 planned = true;
-                plannedCommand = QString("tools.call studio.pipeline.run {\"pipeline_id\":\"%1\"}").arg(pipelineId);
-                return QString("Mapped your request to `studio.pipeline.run` for %1.").arg(pipelineId);
+                plannedCommand = QString("tools.call %1 {}").arg(pipelineRunAliasToolName(pipelineId));
+                return QString("Mapped your request to pipeline capability `%1`.").arg(pipelineId);
             }
         }
     }
@@ -3704,13 +4837,9 @@ QString MainWindow::handleStructuredToolCommand(const QString& commandText, bool
     const QString trimmed = commandText.trimmed();
     if(trimmed == "tools.list") {
         requestKernelToolDefinitions();
-        QJsonArray studioTools = localToolDefinitions();
-        const QJsonArray hostedTools = activeHostedViewToolDefinitions();
-        for(const QJsonValue& value : hostedTools) {
-            studioTools.append(value);
-        }
-        return QString("Studio tools: %1 | Requested kernel tools list.")
-            .arg(formatToolDefinitions(studioTools));
+        requestExtensionHostState();
+        return QString("Studio tools: %1 | Requested kernel and extension-host tool lists.")
+            .arg(formatToolDefinitions(availableToolDefinitions()));
     }
 
     if(trimmed == "kernel.tools.list") {
@@ -3726,14 +4855,17 @@ QString MainWindow::handleStructuredToolCommand(const QString& commandText, bool
 
     const QString invocation = trimmed.mid(prefix.size()).trimmed();
     const int separatorIndex = invocation.indexOf(' ');
-    const QString toolName = separatorIndex >= 0 ? invocation.left(separatorIndex).trimmed()
-                                                 : invocation;
+    const QString rawToolName = separatorIndex >= 0 ? invocation.left(separatorIndex).trimmed()
+                                                    : invocation;
     const QString argumentsText = separatorIndex >= 0 ? invocation.mid(separatorIndex + 1).trimmed()
                                                       : QString();
 
-    if(toolName.isEmpty()) {
+    if(rawToolName.isEmpty()) {
         return "Usage: tools.call <tool_name> {json_arguments}";
     }
+
+    const QString toolName = normalizedPlannerToolName(rawToolName);
+    const QString pipelineAliasId = pipelineIdFromPipelineRunAliasToolName(rawToolName);
 
     QJsonObject arguments;
     if(!argumentsText.isEmpty()) {
@@ -3755,6 +4887,43 @@ QString MainWindow::handleStructuredToolCommand(const QString& commandText, bool
             {"views", QJsonArray::fromStringList(views)}
         }, "workbench"));
         return views.isEmpty() ? "No open views." : QString("Open views: %1").arg(views.join(" | "));
+    }
+
+    if(toolName == "studio.workflow.active_graph") {
+        rememberToolResult(toolName, normalizedToolResultEnvelope(toolName, QJsonObject{
+            {"tool_name", toolName},
+            {"source_file", m_activeWorkflowFilePath},
+            {"graph_resource_uri", kActiveWorkflowGraphUri},
+            {"graph", m_activeWorkflowGraph}
+        }, "workbench"));
+
+        if(m_activeWorkflowGraph.isEmpty()) {
+            return "No active workflow graph.";
+        }
+
+        return QString("Active workflow graph: %1 resources, %2 nodes.")
+            .arg(m_activeWorkflowGraph.value("resources").toArray().size())
+            .arg(m_activeWorkflowGraph.value("pipeline").toArray().size());
+    }
+
+    if(toolName == "studio.workflow.load") {
+        const QString filePath = arguments.value("file").toString().trimmed();
+        if(filePath.isEmpty()) {
+            return "Tool studio.workflow.load requires {\"file\": \"/absolute/path/to/workflow.mne\"}.";
+        }
+
+        if(!QFileInfo::exists(filePath)) {
+            return QString("Workflow file does not exist: %1").arg(filePath);
+        }
+
+        requestWorkflowLoad(filePath);
+        rememberToolResult(toolName, normalizedToolResultEnvelope(toolName, QJsonObject{
+            {"tool_name", toolName},
+            {"status", "queued"},
+            {"source_file", filePath},
+            {"message", QString("Requested workflow activation for %1.").arg(QFileInfo(filePath).fileName())}
+        }, "workbench"));
+        return QString("Requested workflow activation for %1.").arg(QFileInfo(filePath).fileName());
     }
 
     if(toolName == "studio.settings.list") {
@@ -3780,7 +4949,9 @@ QString MainWindow::handleStructuredToolCommand(const QString& commandText, bool
     }
 
     if(toolName == "studio.pipeline.run") {
-        const QString pipelineId = arguments.value("pipeline_id").toString().trimmed();
+        const QString pipelineId = pipelineAliasId.isEmpty()
+            ? arguments.value("pipeline_id").toString().trimmed()
+            : pipelineAliasId;
         if(pipelineId.isEmpty()) {
             return "Tool studio.pipeline.run requires {\"pipeline_id\": \"...\"}.";
         }
@@ -3791,7 +4962,12 @@ QString MainWindow::handleStructuredToolCommand(const QString& commandText, bool
         }
 
         QJsonObject pipelineInputs = defaultInputsForPipeline(pipeline);
-        const QJsonObject requestedInputs = arguments.value("inputs").toObject();
+        QJsonObject requestedInputs = arguments.value("inputs").toObject();
+        if(!pipelineAliasId.isEmpty()) {
+            requestedInputs = arguments.value("inputs").isObject() ? arguments.value("inputs").toObject()
+                                                                   : arguments;
+            requestedInputs.remove(QStringLiteral("pipeline_id"));
+        }
         for(auto it = requestedInputs.constBegin(); it != requestedInputs.constEnd(); ++it) {
             pipelineInputs.insert(it.key(), it.value());
         }
@@ -4077,7 +5253,7 @@ QString MainWindow::handleStructuredToolCommand(const QString& commandText, bool
             .arg(toolName, QFileInfo(rawBrowser->filePath()).fileName());
     }
 
-    if(toolName.startsWith("dummy3d.") || toolName.startsWith("extension.")) {
+    if(toolName.startsWith("dummy3d.") || toolName.startsWith("extension.") || isExtensionHostTool(toolName)) {
         sendExtensionToolCall(toolName, arguments);
         return QString("Forwarded extension tool call: %1").arg(toolName);
     }
@@ -4104,7 +5280,7 @@ QString MainWindow::handleLocalAgentCommand(const QString& commandText, bool& ha
     const QString command = parts.first().toLower();
 
     if(command == "help" || command == "agent.help") {
-        return "Commands: help, tools.list, tools.call <tool> {json}, views.list, settings.list, pipelines.list, pipeline.run <id>, pipeline.resume <run_id>, pipeline.rerun_step <run_id> <step>, raw.summary, raw.state, raw.goto_sample <n>, raw.cursor <n>, raw.zoom <px_per_sample>, kernel.raw_stats [window_samples], kernel.channel_stats [window_samples], kernel.psd [window_samples] [match].";
+        return "Commands: help, tools.list, tools.call <tool> {json}, views.list, workflow.graph, settings.list, pipelines.list, pipeline.run <id>, pipeline.resume <run_id>, pipeline.rerun_step <run_id> <step>, raw.summary, raw.state, raw.goto_sample <n>, raw.cursor <n>, raw.zoom <px_per_sample>, kernel.raw_stats [window_samples], kernel.channel_stats [window_samples], kernel.psd [window_samples] [match].";
     }
 
     if(command == "views.list") {
@@ -4113,6 +5289,16 @@ QString MainWindow::handleLocalAgentCommand(const QString& commandText, bool& ha
             views << QString("%1: %2").arg(i + 1).arg(m_centerTabs->tabText(i));
         }
         return views.isEmpty() ? "No open views." : QString("Open views: %1").arg(views.join(" | "));
+    }
+
+    if(command == "workflow.graph") {
+        if(m_activeWorkflowGraph.isEmpty()) {
+            return "No active workflow graph.";
+        }
+
+        return QString("Active workflow graph: %1 resources, %2 nodes.")
+            .arg(m_activeWorkflowGraph.value("resources").toArray().size())
+            .arg(m_activeWorkflowGraph.value("pipeline").toArray().size());
     }
 
     if(command == "settings.list") {
@@ -4317,6 +5503,16 @@ QJsonArray MainWindow::localToolDefinitions() const
              }, QJsonArray{"views"})}
         },
         QJsonObject{
+            {"name", "studio.workflow.active_graph"},
+            {"description", "Return the active declarative workflow graph currently loaded in the studio."},
+            {"input_schema", objectSchema(QJsonObject())},
+            {"result_schema", objectSchema(QJsonObject{
+                 {"source_file", stringSchema("Workflow File")},
+                 {"graph_resource_uri", stringSchema("Graph Resource URI")},
+                 {"graph", objectSchema(QJsonObject())}
+             }, QJsonArray{"graph_resource_uri", "graph"})}
+        },
+        QJsonObject{
             {"name", "view.raw.summary"},
             {"description", "Return summary metadata for the active raw browser."},
             {"input_schema", objectSchema(QJsonObject())},
@@ -4493,6 +5689,10 @@ void MainWindow::requestExtensionHostState()
     const QJsonObject viewsMessage = JsonRpcMessage::createRequest("workbench-extension-views-list", "views/list");
     m_extensionSocket->write(JsonRpcMessage::serialize(viewsMessage));
     m_extensionSocket->flush();
+    requestActiveWorkflowGraph();
+    if(m_activeWorkflowGraph.isEmpty() && !m_activeWorkflowFilePath.trimmed().isEmpty() && QFileInfo::exists(m_activeWorkflowFilePath)) {
+        requestWorkflowLoad(m_activeWorkflowFilePath);
+    }
 }
 
 void MainWindow::requestExtensionHostReload()
@@ -4520,27 +5720,115 @@ void MainWindow::requestExtensionHostReload()
 
 QJsonArray MainWindow::availableToolDefinitions() const
 {
-    QJsonArray tools = localToolDefinitions();
-    const QJsonArray hostedTools = activeHostedViewToolDefinitions();
-    for(const QJsonValue& tool : hostedTools) {
-        tools.append(tool);
+    QVector<CapabilityCatalogSource> sources;
+    sources.append(CapabilityCatalogSource{
+        QStringLiteral("workbench_local"),
+        QStringLiteral("Workbench Tools"),
+        localToolDefinitions()
+    });
+    sources.append(CapabilityCatalogSource{
+        QStringLiteral("hosted_view"),
+        QStringLiteral("Active Hosted View Tools"),
+        activeHostedViewToolDefinitions()
+    });
+    sources.append(CapabilityCatalogSource{
+        QStringLiteral("neurokernel"),
+        QStringLiteral("Neuro-Kernel Tools"),
+        kernelToolDefinitions()
+    });
+
+    QJsonArray workflowSkillTools;
+    QJsonArray workflowIoTools;
+    QJsonArray extensionTools;
+    if(!m_cachedExtensionToolDefinitions.isEmpty()) {
+        for(const QJsonValue& value : m_cachedExtensionToolDefinitions) {
+            const QJsonObject tool = value.toObject();
+            if(isAnalysisPipelineCapability(tool)) {
+                continue;
+            }
+
+            if(isWorkflowSkillCapability(tool)) {
+                workflowSkillTools.append(tool);
+                continue;
+            }
+
+            if(isWorkflowIoCapability(tool)) {
+                workflowIoTools.append(tool);
+                continue;
+            }
+
+            extensionTools.append(tool);
+        }
+    } else if(m_viewProviderRegistry) {
+        extensionTools = m_viewProviderRegistry->toolDefinitions();
     }
-    const QJsonArray kernelTools = kernelToolDefinitions();
-    for(const QJsonValue& tool : kernelTools) {
-        tools.append(tool);
+    sources.append(CapabilityCatalogSource{
+        QStringLiteral("workflow_skill"),
+        QStringLiteral("Workflow Skills"),
+        workflowSkillTools
+    });
+    sources.append(CapabilityCatalogSource{
+        QStringLiteral("workflow_io"),
+        QStringLiteral("Workflow Actions"),
+        workflowIoTools
+    });
+    sources.append(CapabilityCatalogSource{
+        QStringLiteral("extension_host"),
+        QStringLiteral("Extension Tools"),
+        extensionTools
+    });
+    sources.append(CapabilityCatalogSource{
+        QStringLiteral("analysis_pipeline"),
+        QStringLiteral("Analysis Pipelines"),
+        analysisPipelineToolDefinitions()
+    });
+
+    return buildCapabilityCatalog(sources);
+}
+
+QJsonObject MainWindow::plannerAnnotatedToolDefinition(const QJsonObject& rawTool) const
+{
+    QJsonObject tool = rawTool;
+    if(tool.isEmpty()) {
+        return tool;
     }
-    const QJsonArray extensionTools = !m_cachedExtensionToolDefinitions.isEmpty()
-        ? m_cachedExtensionToolDefinitions
-        : (m_viewProviderRegistry ? m_viewProviderRegistry->toolDefinitions() : QJsonArray());
-    for(const QJsonValue& tool : extensionTools) {
-        tools.append(tool);
+
+    const QJsonObject safety = plannerSafetyMetadata(tool.value("name").toString());
+    for(auto it = safety.constBegin(); it != safety.constEnd(); ++it) {
+        tool.insert(it.key(), it.value());
     }
-    return tools;
+
+    const QJsonObject readiness = plannerReadinessMetadata(tool.value("name").toString());
+    for(auto it = readiness.constBegin(); it != readiness.constEnd(); ++it) {
+        tool.insert(it.key(), it.value());
+    }
+
+    const QJsonObject execution = plannerExecutionMetadata(tool.value("name").toString());
+    for(auto it = execution.constBegin(); it != execution.constEnd(); ++it) {
+        tool.insert(it.key(), it.value());
+    }
+
+    return tool;
+}
+
+QJsonArray MainWindow::plannerAnnotatedToolDefinitions() const
+{
+    QJsonArray annotatedTools;
+    const QJsonArray tools = availableToolDefinitions();
+    for(const QJsonValue& value : tools) {
+        const QJsonObject tool = plannerAnnotatedToolDefinition(value.toObject());
+        if(!tool.isEmpty()) {
+            annotatedTools.append(tool);
+        }
+    }
+
+    return annotatedTools;
 }
 
 QJsonObject MainWindow::plannerSafetyMetadata(const QString& toolName) const
 {
     const QString trimmedName = toolName.trimmed();
+    const QString normalizedName = normalizedPlannerToolName(trimmedName);
     if(trimmedName.isEmpty()) {
         return QJsonObject{
             {"planner_safe", false},
@@ -4549,7 +5837,7 @@ QJsonObject MainWindow::plannerSafetyMetadata(const QString& toolName) const
         };
     }
 
-    if(trimmedName.endsWith(".set") && trimmedName.startsWith("settings.")) {
+    if(normalizedName.endsWith(".set") && normalizedName.startsWith("settings.")) {
         return QJsonObject{
             {"planner_safe", false},
             {"risk_level", "high"},
@@ -4557,9 +5845,9 @@ QJsonObject MainWindow::plannerSafetyMetadata(const QString& toolName) const
         };
     }
 
-    if(trimmedName.startsWith("view.hosted.")
-       || trimmedName.startsWith("dummy3d.")
-       || trimmedName.startsWith("extension.")) {
+    if(normalizedName.startsWith("view.hosted.")
+       || normalizedName.startsWith("dummy3d.")
+       || normalizedName.startsWith("extension.")) {
         return QJsonObject{
             {"planner_safe", false},
             {"risk_level", "medium"},
@@ -4567,7 +5855,7 @@ QJsonObject MainWindow::plannerSafetyMetadata(const QString& toolName) const
         };
     }
 
-    if(trimmedName == QLatin1String("studio.pipeline.rerun_step")) {
+    if(normalizedName == QLatin1String("studio.pipeline.rerun_step")) {
         return QJsonObject{
             {"planner_safe", false},
             {"risk_level", "medium"},
@@ -4575,7 +5863,7 @@ QJsonObject MainWindow::plannerSafetyMetadata(const QString& toolName) const
         };
     }
 
-    if(trimmedName == QLatin1String("studio.pipeline.resume")) {
+    if(normalizedName == QLatin1String("studio.pipeline.resume")) {
         return QJsonObject{
             {"planner_safe", true},
             {"risk_level", "medium"},
@@ -4584,9 +5872,9 @@ QJsonObject MainWindow::plannerSafetyMetadata(const QString& toolName) const
         };
     }
 
-    if(trimmedName == QLatin1String("studio.pipeline.run")
-       || trimmedName == QLatin1String("view.raw.goto")
-       || trimmedName == QLatin1String("view.raw.zoom")) {
+    if(normalizedName == QLatin1String("studio.pipeline.run")
+       || normalizedName == QLatin1String("view.raw.goto")
+       || normalizedName == QLatin1String("view.raw.zoom")) {
         return QJsonObject{
             {"planner_safe", true},
             {"risk_level", "medium"},
@@ -4595,21 +5883,31 @@ QJsonObject MainWindow::plannerSafetyMetadata(const QString& toolName) const
         };
     }
 
-    if(trimmedName == QLatin1String("view.raw.summary")
-       || trimmedName == QLatin1String("view.raw.state")
-       || trimmedName == QLatin1String("studio.views.list")
-       || trimmedName == QLatin1String("studio.settings.list")
-       || trimmedName == QLatin1String("studio.pipelines.list")
-       || trimmedName.endsWith(".get")) {
+    if(normalizedName == QLatin1String("view.raw.summary")
+       || normalizedName == QLatin1String("view.raw.state")
+       || normalizedName == QLatin1String("studio.views.list")
+       || normalizedName == QLatin1String("studio.workflow.active_graph")
+       || normalizedName == QLatin1String("studio.settings.list")
+       || normalizedName == QLatin1String("studio.pipelines.list")
+       || normalizedName.endsWith(".get")) {
         return QJsonObject{
             {"planner_safe", true},
             {"risk_level", "low"},
-            {"requires_active_context", trimmedName.startsWith("view.raw.")},
+            {"requires_active_context", normalizedName.startsWith("view.raw.")},
             {"reason", "Read-only inspection tool."}
         };
     }
 
-    if(trimmedName.startsWith("neurokernel.")) {
+    if(normalizedName == QLatin1String("studio.workflow.load")) {
+        return QJsonObject{
+            {"planner_safe", true},
+            {"risk_level", "medium"},
+            {"requires_active_context", false},
+            {"reason", "Activates a declarative workflow file while preserving direct file browsing."}
+        };
+    }
+
+    if(normalizedName.startsWith("neurokernel.")) {
         return QJsonObject{
             {"planner_safe", true},
             {"risk_level", "low"},
@@ -4628,6 +5926,8 @@ QJsonObject MainWindow::plannerSafetyMetadata(const QString& toolName) const
 QJsonObject MainWindow::plannerReadinessMetadata(const QString& toolName) const
 {
     const QString trimmedName = toolName.trimmed();
+    const QString normalizedName = normalizedPlannerToolName(trimmedName);
+    const QString pipelineAliasId = pipelineIdFromPipelineRunAliasToolName(trimmedName);
     const bool hasRawBrowser = activeRawDataView() != nullptr;
     const QJsonObject hostedSession = activeHostedViewSession();
     const QJsonArray pipelines = analysisPipelineContracts();
@@ -4674,10 +5974,11 @@ QJsonObject MainWindow::plannerReadinessMetadata(const QString& toolName) const
         return readyEnvelope(false, "Tool has no stable name and cannot be reasoned about.");
     }
 
-    if(trimmedName == QLatin1String("studio.views.list")
-       || trimmedName == QLatin1String("studio.settings.list")
-       || trimmedName == QLatin1String("studio.pipelines.list")
-       || trimmedName.endsWith(".get")) {
+    if(normalizedName == QLatin1String("studio.views.list")
+       || normalizedName == QLatin1String("studio.workflow.active_graph")
+       || normalizedName == QLatin1String("studio.settings.list")
+       || normalizedName == QLatin1String("studio.pipelines.list")
+       || normalizedName.endsWith(".get")) {
         return readyEnvelope(true,
                              "Available without additional workspace context.",
                              QJsonArray(),
@@ -4685,12 +5986,12 @@ QJsonObject MainWindow::plannerReadinessMetadata(const QString& toolName) const
                                          {"analysis_pipeline_count", pipelines.size()}});
     }
 
-    if(trimmedName.startsWith("view.raw.") || trimmedName.startsWith("neurokernel.")) {
+    if(normalizedName.startsWith("view.raw.") || normalizedName.startsWith("neurokernel.")) {
         QJsonObject details{{"has_raw_browser", hasRawBrowser}};
         QString reason = hasRawBrowser
             ? "Active raw browser is available."
             : "Requires an active raw browser with a loaded dataset.";
-        if(trimmedName == QLatin1String("neurokernel.find_peak_window") && hasRawBrowser && !selectedChannelName.isEmpty()) {
+        if(normalizedName == QLatin1String("neurokernel.find_peak_window") && hasRawBrowser && !selectedChannelName.isEmpty()) {
             details.insert("selected_channel_name", selectedChannelName);
             details.insert("selection_grounded", true);
             reason = QString("Active raw browser is available and the selected channel `%1` grounds a peak follow-up.")
@@ -4703,24 +6004,46 @@ QJsonObject MainWindow::plannerReadinessMetadata(const QString& toolName) const
                              details);
     }
 
-    if(trimmedName == QLatin1String("studio.pipeline.run")) {
-        const bool hasPipelines = !pipelines.isEmpty();
+    if(normalizedName == QLatin1String("studio.pipeline.run")) {
+        const QJsonObject pipeline = pipelineAliasId.isEmpty() ? QJsonObject() : analysisPipelineContract(pipelineAliasId);
+        const bool hasPipelines = pipelineAliasId.isEmpty() ? !pipelines.isEmpty() : !pipeline.isEmpty();
         const bool ready = hasPipelines && hasRawBrowser;
-        QString reason = "Ready to run manifest-declared pipelines against the active dataset.";
+        QString reason = pipelineAliasId.isEmpty()
+            ? QString("Ready to run manifest-declared pipelines against the active dataset.")
+            : QString("Ready to run pipeline `%1` against the active dataset.").arg(pipelineAliasId);
         if(!hasPipelines) {
-            reason = "No manifest-declared analysis pipelines are currently available.";
+            reason = pipelineAliasId.isEmpty()
+                ? QString("No manifest-declared analysis pipelines are currently available.")
+                : QString("Pipeline capability `%1` is not available in the loaded manifests.").arg(pipelineAliasId);
         } else if(!hasRawBrowser) {
             reason = "Requires an active raw browser before dataset-bound pipelines can run.";
+        }
+
+        QJsonObject details{
+            {"analysis_pipeline_count", pipelines.size()},
+            {"has_raw_browser", hasRawBrowser}
+        };
+        if(!pipelineAliasId.isEmpty()) {
+            details.insert("pipeline_id", pipelineAliasId);
+        }
+        if(ready && !pipeline.isEmpty()) {
+            const QString validationError = validateAnalysisPipelineContract(pipeline, defaultInputsForPipeline(pipeline));
+            if(!validationError.isEmpty()) {
+                details.insert("validation_error", validationError);
+                return readyEnvelope(false,
+                                     QString("Pipeline `%1` is currently invalid: %2").arg(pipelineAliasId, validationError),
+                                     QJsonArray{"analysis_pipeline_contract", "active_raw_browser"},
+                                     details);
+            }
         }
 
         return readyEnvelope(ready,
                              reason,
                              QJsonArray{"analysis_pipeline_contract", "active_raw_browser"},
-                             QJsonObject{{"analysis_pipeline_count", pipelines.size()},
-                                         {"has_raw_browser", hasRawBrowser}});
+                             details);
     }
 
-    if(trimmedName == QLatin1String("studio.pipeline.resume")) {
+    if(normalizedName == QLatin1String("studio.pipeline.resume")) {
         const bool hasSelectedPendingRun = !selectedPipelineRunId.isEmpty()
             && pipelineRunArtifact(selectedPipelineRunId).value("pending_steps").toInt() > 0;
         const bool ready = resumablePipelineRuns > 0;
@@ -4741,7 +6064,7 @@ QJsonObject MainWindow::plannerReadinessMetadata(const QString& toolName) const
                              details);
     }
 
-    if(trimmedName == QLatin1String("studio.pipeline.rerun_step")) {
+    if(normalizedName == QLatin1String("studio.pipeline.rerun_step")) {
         const bool ready = rerunnablePipelineRuns > 0;
         QJsonObject details{{"rerunnable_run_count", rerunnablePipelineRuns}};
         QString reason = ready
@@ -4759,7 +6082,7 @@ QJsonObject MainWindow::plannerReadinessMetadata(const QString& toolName) const
                              details);
     }
 
-    if(trimmedName.startsWith("view.hosted.")) {
+    if(normalizedName.startsWith("view.hosted.")) {
         const bool ready = !hostedSession.isEmpty();
         return readyEnvelope(ready,
                              ready
@@ -4770,8 +6093,8 @@ QJsonObject MainWindow::plannerReadinessMetadata(const QString& toolName) const
                                          {"session_id", hostedSession.value("session_id").toString()}});
     }
 
-    if(trimmedName.startsWith("settings.")) {
-        const bool ready = !resolveExtensionSettingsTool(trimmedName).isEmpty();
+    if(normalizedName.startsWith("settings.")) {
+        const bool ready = !resolveExtensionSettingsTool(normalizedName).isEmpty();
         return readyEnvelope(ready,
                              ready
                                  ? "Resolved to a manifest-declared extension settings field."
@@ -4780,12 +6103,23 @@ QJsonObject MainWindow::plannerReadinessMetadata(const QString& toolName) const
                              QJsonObject{{"resolved", ready}});
     }
 
+    if(normalizedName == QLatin1String("studio.workflow.load")) {
+        const bool ready = !m_activeWorkflowFilePath.trimmed().isEmpty();
+        return readyEnvelope(ready,
+                             ready
+                                 ? "A workflow file is already known and can be reactivated."
+                                 : "Requires an explicit .mne file path.",
+                             QJsonArray{"workflow_file_path"},
+                             QJsonObject{{"active_workflow_file", m_activeWorkflowFilePath}});
+    }
+
     return readyEnvelope(true, "No additional runtime context required.");
 }
 
 QJsonObject MainWindow::plannerExecutionMetadata(const QString& toolName) const
 {
     const QString trimmedName = toolName.trimmed();
+    const QString normalizedName = normalizedPlannerToolName(trimmedName);
     if(trimmedName.isEmpty()) {
         return QJsonObject{
             {"execution_mode", "suggestion_only"},
@@ -4793,23 +6127,39 @@ QJsonObject MainWindow::plannerExecutionMetadata(const QString& toolName) const
         };
     }
 
-    if(trimmedName == QLatin1String("studio.views.list")
-       || trimmedName == QLatin1String("studio.settings.list")
-       || trimmedName == QLatin1String("studio.pipelines.list")
-       || trimmedName == QLatin1String("view.raw.summary")
-       || trimmedName == QLatin1String("view.raw.state")
-       || trimmedName.endsWith(".get")
-       || trimmedName.startsWith("neurokernel.")) {
+    // Global safety level override: "confirm" demotes auto_run → confirm_required;
+    // "safe" demotes everything → suggestion_only.
+    const QString safetyLevel = m_plannerSafetyLevel.trimmed().toLower();
+    if(safetyLevel == QLatin1String("safe")) {
         return QJsonObject{
-            {"execution_mode", "auto_run"},
-            {"execution_reason", "Read-only inspection or dataset analysis is safe to execute automatically."}
+            {"execution_mode", "suggestion_only"},
+            {"execution_reason", "Safety level is set to Safe — all steps are suggestions only."}
         };
     }
 
-    if(trimmedName == QLatin1String("view.raw.goto")
-       || trimmedName == QLatin1String("view.raw.zoom")
-       || trimmedName == QLatin1String("studio.pipeline.run")
-       || trimmedName == QLatin1String("studio.pipeline.resume")) {
+    if(normalizedName == QLatin1String("studio.views.list")
+       || normalizedName == QLatin1String("studio.workflow.active_graph")
+       || normalizedName == QLatin1String("studio.settings.list")
+       || normalizedName == QLatin1String("studio.pipelines.list")
+       || normalizedName == QLatin1String("view.raw.summary")
+       || normalizedName == QLatin1String("view.raw.state")
+       || normalizedName.endsWith(".get")
+       || normalizedName.startsWith("neurokernel.")) {
+        // "confirm" level demotes auto_run to confirm_required
+        const QString mode = (safetyLevel == QLatin1String("confirm"))
+            ? QStringLiteral("confirm_required")
+            : QStringLiteral("auto_run");
+        const QString reason = (safetyLevel == QLatin1String("confirm"))
+            ? QStringLiteral("Safety level is set to Confirm — all steps require user approval.")
+            : QStringLiteral("Read-only inspection or dataset analysis is safe to execute automatically.");
+        return QJsonObject{{"execution_mode", mode}, {"execution_reason", reason}};
+    }
+
+    if(normalizedName == QLatin1String("view.raw.goto")
+       || normalizedName == QLatin1String("view.raw.zoom")
+       || normalizedName == QLatin1String("studio.workflow.load")
+       || normalizedName == QLatin1String("studio.pipeline.run")
+       || normalizedName == QLatin1String("studio.pipeline.resume")) {
         return QJsonObject{
             {"execution_mode", "confirm_required"},
             {"execution_reason", "This action changes visible workspace state and should be surfaced before auto-execution."}
@@ -4825,27 +6175,10 @@ QJsonObject MainWindow::plannerExecutionMetadata(const QString& toolName) const
 QJsonArray MainWindow::plannerSafeToolDefinitions() const
 {
     QJsonArray safeTools;
-    const QJsonArray tools = availableToolDefinitions();
+    const QJsonArray tools = plannerAnnotatedToolDefinitions();
     for(const QJsonValue& value : tools) {
-        QJsonObject tool = value.toObject();
-        if(tool.isEmpty()) {
-            continue;
-        }
-
-        const QJsonObject safety = plannerSafetyMetadata(tool.value("name").toString());
-        for(auto it = safety.constBegin(); it != safety.constEnd(); ++it) {
-            tool.insert(it.key(), it.value());
-        }
-        const QJsonObject readiness = plannerReadinessMetadata(tool.value("name").toString());
-        for(auto it = readiness.constBegin(); it != readiness.constEnd(); ++it) {
-            tool.insert(it.key(), it.value());
-        }
-        const QJsonObject execution = plannerExecutionMetadata(tool.value("name").toString());
-        for(auto it = execution.constBegin(); it != execution.constEnd(); ++it) {
-            tool.insert(it.key(), it.value());
-        }
-
-        if(safety.value("planner_safe").toBool(false)) {
+        const QJsonObject tool = value.toObject();
+        if(tool.value("planner_safe").toBool(false)) {
             safeTools.append(tool);
         }
     }
@@ -4870,27 +6203,9 @@ QJsonArray MainWindow::plannerReadyToolDefinitions() const
 QJsonArray MainWindow::plannerBlockedToolDefinitions() const
 {
     QJsonArray blockedTools;
-    const QJsonArray tools = availableToolDefinitions();
+    const QJsonArray tools = plannerAnnotatedToolDefinitions();
     for(const QJsonValue& value : tools) {
-        QJsonObject tool = value.toObject();
-        if(tool.isEmpty()) {
-            continue;
-        }
-
-        const QJsonObject safety = plannerSafetyMetadata(tool.value("name").toString());
-        for(auto it = safety.constBegin(); it != safety.constEnd(); ++it) {
-            tool.insert(it.key(), it.value());
-        }
-
-        const QJsonObject readiness = plannerReadinessMetadata(tool.value("name").toString());
-        for(auto it = readiness.constBegin(); it != readiness.constEnd(); ++it) {
-            tool.insert(it.key(), it.value());
-        }
-        const QJsonObject execution = plannerExecutionMetadata(tool.value("name").toString());
-        for(auto it = execution.constBegin(); it != execution.constEnd(); ++it) {
-            tool.insert(it.key(), it.value());
-        }
-
+        const QJsonObject tool = value.toObject();
         if(!tool.value("planner_safe").toBool(false) || !tool.value("planner_ready").toBool(true)) {
             blockedTools.append(tool);
         }
@@ -4901,63 +6216,56 @@ QJsonArray MainWindow::plannerBlockedToolDefinitions() const
 
 QJsonObject MainWindow::toolDefinition(const QString& toolName) const
 {
-    const QJsonArray tools = availableToolDefinitions();
-    for(const QJsonValue& value : tools) {
-        QJsonObject tool = value.toObject();
-        if(tool.isEmpty()) {
-            continue;
-        }
-
-        const QJsonObject safety = plannerSafetyMetadata(tool.value("name").toString());
-        for(auto it = safety.constBegin(); it != safety.constEnd(); ++it) {
-            tool.insert(it.key(), it.value());
-        }
-        const QJsonObject readiness = plannerReadinessMetadata(tool.value("name").toString());
-        for(auto it = readiness.constBegin(); it != readiness.constEnd(); ++it) {
-            tool.insert(it.key(), it.value());
-        }
-        const QJsonObject execution = plannerExecutionMetadata(tool.value("name").toString());
-        for(auto it = execution.constBegin(); it != execution.constEnd(); ++it) {
-            tool.insert(it.key(), it.value());
-        }
-
-        if(tool.value("name").toString() == toolName) {
-            return tool;
-        }
-    }
-
-    return QJsonObject();
+    return plannerAnnotatedToolDefinition(capabilityFromCatalog(availableToolDefinitions(), toolName));
 }
 
 QString MainWindow::toolNameFromCommand(const QString& commandText) const
 {
-    const QRegularExpression commandPattern("^\\s*tools\\.call\\s+([^\\s]+)");
-    const QRegularExpressionMatch match = commandPattern.match(commandText.trimmed());
-    return match.hasMatch() ? match.captured(1).trimmed() : QString();
+    return normalizedPlannerToolName(rawToolNameFromCommandText(commandText));
 }
 
 QJsonObject MainWindow::toolArgumentsFromCommand(const QString& commandText) const
 {
     const QString trimmedCommand = commandText.trimmed();
-    const QString toolName = toolNameFromCommand(trimmedCommand);
-    if(toolName.isEmpty()) {
+    const QString rawToolName = rawToolNameFromCommandText(trimmedCommand);
+    if(rawToolName.isEmpty()) {
         return QJsonObject();
     }
 
-    const int toolStart = trimmedCommand.indexOf(toolName);
+    const int toolStart = trimmedCommand.indexOf(rawToolName);
     if(toolStart < 0) {
         return QJsonObject();
     }
 
-    const QString argumentsText = trimmedCommand.mid(toolStart + toolName.size()).trimmed();
+    const QString argumentsText = trimmedCommand.mid(toolStart + rawToolName.size()).trimmed();
     if(argumentsText.isEmpty()) {
+        const QString pipelineId = pipelineIdFromPipelineRunAliasToolName(rawToolName);
+        if(!pipelineId.isEmpty()) {
+            return QJsonObject{
+                {"pipeline_id", pipelineId},
+                {"inputs", QJsonObject()}
+            };
+        }
         return QJsonObject();
     }
 
     QJsonParseError error;
     const QJsonDocument document = QJsonDocument::fromJson(argumentsText.toUtf8(), &error);
     if(error.error == QJsonParseError::NoError && document.isObject()) {
-        return document.object();
+        QJsonObject arguments = document.object();
+        const QString pipelineId = pipelineIdFromPipelineRunAliasToolName(rawToolName);
+        if(!pipelineId.isEmpty()) {
+            QJsonObject pipelineInputs = arguments;
+            if(arguments.value("inputs").isObject()) {
+                pipelineInputs = arguments.value("inputs").toObject();
+            }
+            pipelineInputs.remove(QStringLiteral("pipeline_id"));
+            return QJsonObject{
+                {"pipeline_id", pipelineId},
+                {"inputs", pipelineInputs}
+            };
+        }
+        return arguments;
     }
 
     return QJsonObject();
@@ -5018,6 +6326,14 @@ QJsonObject MainWindow::plannerConfirmationPresentation(const QString& commandTe
         details = displayName.isEmpty()
             ? QString("Resume the saved pipeline run `%1`.").arg(runId)
             : QString("Resume the saved pipeline `%1` with remaining steps.").arg(displayName);
+    } else if(toolName == QLatin1String("studio.workflow.load")) {
+        const QString filePath = arguments.value("file").toString().trimmed();
+        title = filePath.isEmpty()
+            ? QString("Activate Workflow File")
+            : QString("Activate Workflow %1").arg(QFileInfo(filePath).fileName());
+        details = filePath.isEmpty()
+            ? QString("Load the requested .mne workflow file.")
+            : QString("Load `%1` as the active declarative workflow graph.").arg(filePath);
     }
 
     if(reason.isEmpty()) {
@@ -5077,6 +6393,8 @@ QJsonObject MainWindow::plannerConfirmationSnapshot(const QString& commandText) 
         const QJsonObject artifact = pipelineRunArtifact(runId);
         snapshot.insert("pipeline_id", artifact.value("pipeline_id").toString());
         snapshot.insert("pending_steps", artifact.value("pending_steps").toInt());
+    } else if(toolName == QLatin1String("studio.workflow.load")) {
+        snapshot.insert("workflow_file", arguments.value("file").toString().trimmed());
     }
 
     return snapshot;
@@ -5126,6 +6444,16 @@ QJsonObject MainWindow::plannerConfirmationStaleness(const QJsonObject& confirma
                        .arg(currentStepNumber > 0 ? QString::number(currentStepNumber) : QString("none"));
     }
 
+    const QString snapshotWorkflowFile = snapshot.value("workflow_file").toString().trimmed();
+    if(toolName == QLatin1String("studio.workflow.load")
+       && !snapshotWorkflowFile.isEmpty()
+       && snapshotWorkflowFile != m_activeWorkflowFilePath.trimmed()
+       && !m_activeWorkflowFilePath.trimmed().isEmpty()) {
+        reasons << QString("active workflow changed from `%1` to `%2`.")
+                       .arg(QFileInfo(snapshotWorkflowFile).fileName(),
+                            QFileInfo(m_activeWorkflowFilePath).fileName());
+    }
+
     const bool stale = !reasons.isEmpty();
     return QJsonObject{
         {"stale", stale},
@@ -5138,6 +6466,7 @@ QJsonObject MainWindow::llmPlanningContext(const QString& commandText) const
 {
     Q_UNUSED(commandText)
 
+    const QJsonArray capabilityCatalog = availableToolDefinitions();
     const QJsonArray plannerSafeTools = plannerSafeToolDefinitions();
     const QJsonArray plannerReadyTools = plannerReadyToolDefinitions();
     const QJsonArray plannerBlockedTools = plannerBlockedToolDefinitions();
@@ -5152,7 +6481,12 @@ QJsonObject MainWindow::llmPlanningContext(const QString& commandText) const
         {"last_tool_name", m_lastToolName},
         {"last_tool_result", normalizedToolResultEnvelope(m_lastToolName, m_lastToolResult)},
         {"recent_normalized_results", normalizedRecentResults},
-        {"tool_schema_summary", availableToolDefinitions()},
+        {"has_active_workflow_graph", !m_activeWorkflowGraph.isEmpty()},
+        {"active_workflow_file", m_activeWorkflowFilePath},
+        {"active_workflow_graph_resource_uri", kActiveWorkflowGraphUri},
+        {"active_workflow_graph", m_activeWorkflowGraph},
+        {"capability_catalog", capabilityCatalog},
+        {"tool_schema_summary", capabilityCatalog},
         {"planner_safe_tools", plannerSafeTools},
         {"planner_ready_tools", plannerReadyTools},
         {"planner_blocked_tools", plannerBlockedTools},
@@ -5209,8 +6543,27 @@ QJsonObject MainWindow::llmPlanningContext(const QString& commandText) const
 
 QJsonObject MainWindow::defaultArgumentsForTool(const QString& toolName) const
 {
-    if(toolName == "studio.views.list" || toolName == "view.raw.summary" || toolName == "view.raw.state") {
+    const QString pipelineAliasId = pipelineIdFromPipelineRunAliasToolName(toolName);
+    if(!pipelineAliasId.isEmpty()) {
+        const QJsonObject pipeline = analysisPipelineContract(pipelineAliasId);
+        return pipeline.isEmpty() ? QJsonObject() : defaultInputsForPipeline(pipeline);
+    }
+
+    if(toolName == "studio.views.list"
+       || toolName == "studio.workflow.active_graph"
+       || toolName == "view.raw.summary"
+       || toolName == "view.raw.state") {
         return QJsonObject();
+    }
+
+    if(toolName == "studio.workflow.load") {
+        return QJsonObject{{"file", m_activeWorkflowFilePath}};
+    }
+
+    if(toolName == "studio.workflow.save") {
+        return m_activeWorkflowFilePath.trimmed().isEmpty()
+            ? QJsonObject()
+            : QJsonObject{{"file", m_activeWorkflowFilePath}};
     }
 
     if(toolName == "view.raw.goto" || toolName == "view.raw.cursor") {
@@ -5633,8 +6986,10 @@ void MainWindow::rebuildSkillsExplorer()
 
     m_skillsExplorer->clear();
 
+    const QJsonArray capabilityCatalog = availableToolDefinitions();
+
     QTreeWidgetItem* localRoot = new QTreeWidgetItem(QStringList() << "Workbench Tools");
-    const QJsonArray localTools = localToolDefinitions();
+    const QJsonArray localTools = capabilitiesFromCatalogBySource(capabilityCatalog, QStringLiteral("workbench_local"));
     for(const QJsonValue& value : localTools) {
         localRoot->addChild(makeToolTreeItem(value.toObject()));
     }
@@ -5642,7 +6997,7 @@ void MainWindow::rebuildSkillsExplorer()
     m_skillsExplorer->addTopLevelItem(localRoot);
 
     QTreeWidgetItem* kernelRoot = new QTreeWidgetItem(QStringList() << "Neuro-Kernel Tools");
-    const QJsonArray kernelTools = kernelToolDefinitions();
+    const QJsonArray kernelTools = capabilitiesFromCatalogBySource(capabilityCatalog, QStringLiteral("neurokernel"));
     if(kernelTools.isEmpty()) {
         kernelRoot->addChild(new QTreeWidgetItem(QStringList() << "No tools discovered yet."));
     } else {
@@ -5653,10 +7008,32 @@ void MainWindow::rebuildSkillsExplorer()
     kernelRoot->setExpanded(true);
     m_skillsExplorer->addTopLevelItem(kernelRoot);
 
-    QTreeWidgetItem* extensionRoot = new QTreeWidgetItem(QStringList() << "Extension Host Tools");
-    const QJsonArray extensionTools = !m_cachedExtensionToolDefinitions.isEmpty()
-        ? m_cachedExtensionToolDefinitions
-        : (m_viewProviderRegistry ? m_viewProviderRegistry->toolDefinitions() : QJsonArray());
+    QTreeWidgetItem* workflowSkillsRoot = new QTreeWidgetItem(QStringList() << "Workflow Skills");
+    const QJsonArray workflowSkillTools = capabilitiesFromCatalogBySource(capabilityCatalog, QStringLiteral("workflow_skill"));
+    if(workflowSkillTools.isEmpty()) {
+        workflowSkillsRoot->addChild(new QTreeWidgetItem(QStringList() << "No workflow skills discovered yet."));
+    } else {
+        for(const QJsonValue& value : workflowSkillTools) {
+            workflowSkillsRoot->addChild(makeToolTreeItem(value.toObject()));
+        }
+    }
+    workflowSkillsRoot->setExpanded(true);
+    m_skillsExplorer->addTopLevelItem(workflowSkillsRoot);
+
+    QTreeWidgetItem* workflowActionsRoot = new QTreeWidgetItem(QStringList() << "Workflow Actions");
+    const QJsonArray workflowIoTools = capabilitiesFromCatalogBySource(capabilityCatalog, QStringLiteral("workflow_io"));
+    if(workflowIoTools.isEmpty()) {
+        workflowActionsRoot->addChild(new QTreeWidgetItem(QStringList() << "No workflow graph actions discovered yet."));
+    } else {
+        for(const QJsonValue& value : workflowIoTools) {
+            workflowActionsRoot->addChild(makeToolTreeItem(value.toObject()));
+        }
+    }
+    workflowActionsRoot->setExpanded(true);
+    m_skillsExplorer->addTopLevelItem(workflowActionsRoot);
+
+    QTreeWidgetItem* extensionRoot = new QTreeWidgetItem(QStringList() << "Extension Tools");
+    const QJsonArray extensionTools = capabilitiesFromCatalogBySource(capabilityCatalog, QStringLiteral("extension_host"));
     if(extensionTools.isEmpty()) {
         extensionRoot->addChild(new QTreeWidgetItem(QStringList() << "No extension tools discovered yet."));
     } else {
@@ -5668,7 +7045,7 @@ void MainWindow::rebuildSkillsExplorer()
     m_skillsExplorer->addTopLevelItem(extensionRoot);
 
     QTreeWidgetItem* hostedToolsRoot = new QTreeWidgetItem(QStringList() << "Active Hosted View Tools");
-    const QJsonArray hostedTools = activeHostedViewToolDefinitions();
+    const QJsonArray hostedTools = capabilitiesFromCatalogBySource(capabilityCatalog, QStringLiteral("hosted_view"));
     if(hostedTools.isEmpty()) {
         hostedToolsRoot->addChild(new QTreeWidgetItem(QStringList() << "No active hosted view actions exposed as tools."));
     } else {
@@ -5680,35 +7057,38 @@ void MainWindow::rebuildSkillsExplorer()
     m_skillsExplorer->addTopLevelItem(hostedToolsRoot);
 
     QTreeWidgetItem* pipelinesRoot = new QTreeWidgetItem(QStringList() << "Analysis Pipelines");
-    const QJsonArray pipelines = analysisPipelineContracts();
-    if(pipelines.isEmpty()) {
+    const QJsonArray pipelineTools = capabilitiesFromCatalogBySource(capabilityCatalog, QStringLiteral("analysis_pipeline"));
+    if(pipelineTools.isEmpty()) {
         pipelinesRoot->addChild(new QTreeWidgetItem(QStringList() << "No analysis pipelines discovered yet."));
     } else {
-        for(const QJsonValue& value : pipelines) {
-            const QJsonObject pipeline = value.toObject();
+        for(const QJsonValue& value : pipelineTools) {
+            const QJsonObject pipelineTool = value.toObject();
             const QString label = QString("%1 (%2)")
-                                      .arg(pipeline.value("display_name").toString(pipeline.value("id").toString()),
-                                           pipeline.value("extension_display_name").toString());
+                                      .arg(pipelineTool.value("display_name").toString(pipelineTool.value("pipeline_id").toString()),
+                                           pipelineTool.value("extension_display_name").toString());
             QTreeWidgetItem* item = new QTreeWidgetItem(QStringList() << label);
-            item->setToolTip(0, pipeline.value("description").toString());
-            item->setData(0, Qt::UserRole, "studio.pipeline.run");
-            item->setData(0, Qt::UserRole + 1, pipeline);
-            item->setData(0, Qt::UserRole + 2, pipeline.value("id").toString());
+            item->setToolTip(0, pipelineTool.value("description").toString());
+            item->setData(0, Qt::UserRole, pipelineTool.value("name").toString());
+            item->setData(0, Qt::UserRole + 1, pipelineTool);
+            item->setData(0, Qt::UserRole + 2, pipelineTool.value("pipeline_id").toString());
             pipelinesRoot->addChild(item);
         }
     }
     pipelinesRoot->setExpanded(true);
     m_skillsExplorer->addTopLevelItem(pipelinesRoot);
 
-    QTreeWidgetItem* resourceRoot = new QTreeWidgetItem(QStringList() << "Extension Resources");
+    QTreeWidgetItem* resourceRoot = new QTreeWidgetItem(QStringList() << "Live Resources");
     if(m_cachedExtensionResources.isEmpty()) {
-        resourceRoot->addChild(new QTreeWidgetItem(QStringList() << "No extension manifests discovered yet."));
+        resourceRoot->addChild(new QTreeWidgetItem(QStringList() << "No live extension or workflow resources discovered yet."));
     } else {
         for(const QJsonValue& value : m_cachedExtensionResources) {
             const QJsonObject resource = value.toObject();
+            const QString detail = resource.value("version").toString().trimmed().isEmpty()
+                ? resource.value("kind").toString(resource.value("uri").toString())
+                : resource.value("version").toString();
             const QString label = QString("%1 (%2)")
                                       .arg(resource.value("display_name").toString(),
-                                           resource.value("version").toString());
+                                           detail);
             QTreeWidgetItem* item = new QTreeWidgetItem(QStringList() << label);
             item->setToolTip(0, resource.value("root_path").toString());
             item->setData(0, Qt::UserRole + 1, resource);
@@ -5765,7 +7145,7 @@ void MainWindow::rebuildSkillsExplorer()
     statusRoot->addChild(new QTreeWidgetItem(QStringList() << m_llmPlanner.statusSummary()));
     statusRoot->addChild(new QTreeWidgetItem(QStringList() << QString("View Providers: %1")
                                                     .arg(m_viewProviderRegistry ? m_viewProviderRegistry->manifests().size() : 0)));
-    statusRoot->addChild(new QTreeWidgetItem(QStringList() << QString("Extension Resources: %1").arg(m_cachedExtensionResources.size())));
+    statusRoot->addChild(new QTreeWidgetItem(QStringList() << QString("Live Resources: %1").arg(m_cachedExtensionResources.size())));
     statusRoot->addChild(new QTreeWidgetItem(QStringList() << QString("Hosted Sessions: %1").arg(m_cachedExtensionViewSessions.size())));
     statusRoot->setExpanded(true);
     m_skillsExplorer->addTopLevelItem(statusRoot);
@@ -5788,7 +7168,15 @@ void MainWindow::updateSelectedSkillTool(QTreeWidgetItem* item)
     if(toolName.isEmpty() || toolDefinition.isEmpty()) {
         const QJsonObject payload = item->data(0, Qt::UserRole + 1).toJsonObject();
         if(!payload.isEmpty()) {
-            m_skillDetailsView->setPlainText(QString::fromUtf8(QJsonDocument(payload).toJson(QJsonDocument::Indented)));
+            if(payload.value("uri").toString().trimmed() == QLatin1String(kActiveWorkflowGraphUri)
+               && !m_activeWorkflowGraph.isEmpty()) {
+                QJsonObject details = payload;
+                details.insert("graph", m_activeWorkflowGraph);
+                details.insert("source_file", m_activeWorkflowFilePath);
+                m_skillDetailsView->setPlainText(QString::fromUtf8(QJsonDocument(details).toJson(QJsonDocument::Indented)));
+            } else {
+                m_skillDetailsView->setPlainText(QString::fromUtf8(QJsonDocument(payload).toJson(QJsonDocument::Indented)));
+            }
         } else {
             m_skillDetailsView->setPlainText(item->text(0));
         }
@@ -5804,17 +7192,16 @@ void MainWindow::updateSelectedSkillTool(QTreeWidgetItem* item)
         preview = QJsonObject{
             {"pipeline_id", pipelineId},
             {"contract", toolDefinition},
-            {"run_tool", "studio.pipeline.run"},
-            {"suggested_arguments", QJsonObject{
-                 {"pipeline_id", pipelineId},
-                 {"inputs", defaultInputsForPipeline(toolDefinition)}
-             }}
+            {"run_tool", pipelineRunAliasToolName(pipelineId)},
+            {"suggested_arguments", defaultInputsForPipeline(toolDefinition)}
         };
     } else {
         preview = QJsonObject{
             {"tool", toolName},
             {"definition", toolDefinition},
-            {"suggested_arguments", defaultArgumentsForTool(toolName)}
+            {"suggested_arguments", workflowOperatorToolDefinition(toolName).isEmpty()
+                                      ? defaultArgumentsForTool(toolName)
+                                      : defaultArgumentsForWorkflowTool(toolName)}
         };
     }
     m_skillDetailsView->setPlainText(QString::fromUtf8(QJsonDocument(preview).toJson(QJsonDocument::Indented)));
@@ -5828,10 +7215,8 @@ void MainWindow::runSelectedSkillTool()
 
     if(!m_selectedPipelineId.isEmpty()) {
         const QJsonObject pipeline = analysisPipelineContract(m_selectedPipelineId);
-        QJsonObject arguments{
-            {"pipeline_id", m_selectedPipelineId},
-            {"inputs", defaultInputsForPipeline(pipeline)}
-        };
+        const QString pipelineToolName = pipelineRunAliasToolName(m_selectedPipelineId);
+        QJsonObject arguments = defaultInputsForPipeline(pipeline);
 
         const QString initialArguments = QString::fromUtf8(QJsonDocument(arguments)
                                                                .toJson(QJsonDocument::Indented)).trimmed();
@@ -5847,15 +7232,17 @@ void MainWindow::runSelectedSkillTool()
 
         const QString trimmedArguments = argumentsText.trimmed();
         const QString commandText = trimmedArguments.isEmpty()
-            ? QString("tools.call studio.pipeline.run {}")
-            : QString("tools.call studio.pipeline.run %1").arg(trimmedArguments);
+            ? QString("tools.call %1 {}").arg(pipelineToolName)
+            : QString("tools.call %1 %2").arg(pipelineToolName, trimmedArguments);
 
         appendTerminalMessage(QString("$ %1").arg(commandText));
         sendToolCall(commandText);
         return;
     }
 
-    QJsonObject selectedArguments = defaultArgumentsForTool(m_selectedSkillToolName);
+    QJsonObject selectedArguments = workflowOperatorToolDefinition(m_selectedSkillToolName).isEmpty()
+        ? defaultArgumentsForTool(m_selectedSkillToolName)
+        : defaultArgumentsForWorkflowTool(m_selectedSkillToolName);
     if(editArgumentsForTool(m_selectedSkillToolName, selectedArguments)) {
         const QString commandText = QString("tools.call %1 %2")
             .arg(m_selectedSkillToolName,
@@ -5994,6 +7381,16 @@ void MainWindow::refreshAgentConnectionSelectors()
     settings.endGroup();
     m_agentChatDock->setConnectionProfiles(profiles, settings.value("agent/selected_profile").toString());
 
+    // Restore persisted safety level
+    const QString persistedSafetyLevel =
+        settings.value("agent/planner_safety_level", "auto").toString().trimmed().toLower();
+    if(m_plannerSafetyLevel.isEmpty()) {
+        m_plannerSafetyLevel = persistedSafetyLevel;
+    }
+    m_agentChatDock->setPlannerSafetyLevel(m_plannerSafetyLevel.isEmpty()
+                                                ? QStringLiteral("auto")
+                                                : m_plannerSafetyLevel);
+
     const bool localMode = currentMode == QLatin1String("disabled")
                            || currentMode == QLatin1String("mock");
     const bool needsEndpoint = currentMode == QLatin1String("http");
@@ -6115,6 +7512,26 @@ void MainWindow::handleAgentConnectionModelSelected(const QString& model)
     persistAgentValidationState(false, false, QString());
     refreshAgentPlannerStatus();
     refreshAgentConnectionSelectors();
+}
+
+void MainWindow::handleAgentPlannerSafetyLevelSelected(const QString& level)
+{
+    const QString normalized = level.trimmed().toLower();
+    if(normalized != QLatin1String("auto")
+       && normalized != QLatin1String("confirm")
+       && normalized != QLatin1String("safe")) {
+        return;
+    }
+    if(m_plannerSafetyLevel == normalized) {
+        return;
+    }
+    m_plannerSafetyLevel = normalized;
+    if(m_agentChatDock) {
+        m_agentChatDock->setPlannerSafetyLevel(normalized);
+    }
+    // Persist so the setting survives restarts.
+    QSettings persistSettings("MNE-CPP", "MNEAnalyzeStudio");
+    persistSettings.setValue("agent/planner_safety_level", normalized);
 }
 
 void MainWindow::reloadExtensionRegistry()
@@ -6585,6 +8002,1266 @@ void MainWindow::finalizeExtensionViewOpen(const QString& filePath, const QJsonO
     appendTerminalMessage(QString("> Hosted extension view ready for %1").arg(QFileInfo(filePath).fileName()));
 }
 
+bool MainWindow::isWorkflowCenterViewOpen() const
+{
+    return m_workflowCenterView
+        && m_centerTabs
+        && m_centerTabs->indexOf(m_workflowCenterView) >= 0;
+}
+
+void MainWindow::refreshWorkflowGraphDockingUi()
+{
+    const bool graphOpenInCenter = isWorkflowCenterViewOpen();
+    const bool hasActiveGraph = !m_activeWorkflowGraph.isEmpty();
+
+    if(m_workflowMiniMap) {
+        m_workflowMiniMap->setVisible(!graphOpenInCenter);
+        m_workflowMiniMap->setMinimumHeight(graphOpenInCenter ? 0 : 180);
+    }
+
+    if(m_workflowMiniMapDockStateLabel) {
+        m_workflowMiniMapDockStateLabel->setVisible(graphOpenInCenter);
+        m_workflowMiniMapDockStateLabel->setText(graphOpenInCenter
+                                                     ? QStringLiteral("Dependency map is open in the center view. Close or dock that tab to bring it back here.")
+                                                     : QString());
+    }
+
+    if(m_workflowOpenGraphButton) {
+        m_workflowOpenGraphButton->setEnabled(hasActiveGraph || graphOpenInCenter);
+        m_workflowOpenGraphButton->setText(graphOpenInCenter
+                                               ? QStringLiteral("Focus Graph Tab")
+                                               : QStringLiteral("Open In Center"));
+        m_workflowOpenGraphButton->setToolTip(graphOpenInCenter
+                                                  ? QStringLiteral("Focus the workflow graph tab in the center view.")
+                                                  : QStringLiteral("Open the workflow dependency map in a dedicated center tab."));
+    }
+}
+
+void MainWindow::openWorkflowCenterView(bool focusTab)
+{
+    if(!m_workflowCenterView) {
+        m_workflowCenterView = new QWidget(this);
+        QVBoxLayout* containerLayout = new QVBoxLayout(m_workflowCenterView);
+        containerLayout->setContentsMargins(10, 10, 10, 10);
+        containerLayout->setSpacing(10);
+
+        m_workflowCenterSummaryLabel = new QLabel(m_workflowCenterView);
+        m_workflowCenterSummaryLabel->setWordWrap(true);
+        m_workflowCenterSummaryLabel->setObjectName("resultsSectionLabel");
+        containerLayout->addWidget(m_workflowCenterSummaryLabel);
+
+        QSplitter* centerSplitter = new QSplitter(Qt::Horizontal, m_workflowCenterView);
+        m_workflowCenterMiniMap = new WorkflowMiniMapWidget(centerSplitter);
+        m_workflowCenterMiniMap->setMinimumHeight(420);
+        m_workflowCenterMiniMap->setToolTip("Large dependency map for the active workflow DAG. Click a node to focus it.");
+
+        QWidget* inspectorPane = new QWidget(centerSplitter);
+        QVBoxLayout* inspectorLayout = new QVBoxLayout(inspectorPane);
+        inspectorLayout->setContentsMargins(0, 0, 0, 0);
+        inspectorLayout->setSpacing(8);
+        QLabel* inspectorTitle = new QLabel("Workflow Inspector", inspectorPane);
+        inspectorTitle->setObjectName("resultsSectionLabel");
+        inspectorLayout->addWidget(inspectorTitle);
+
+        m_workflowCenterDetailsView = new QPlainTextEdit(inspectorPane);
+        m_workflowCenterDetailsView->setReadOnly(true);
+        m_workflowCenterDetailsView->setPlaceholderText("Select a workflow resource or pipeline node to inspect it here.");
+        inspectorLayout->addWidget(m_workflowCenterDetailsView, 1);
+
+        centerSplitter->setStretchFactor(0, 3);
+        centerSplitter->setStretchFactor(1, 2);
+        containerLayout->addWidget(centerSplitter, 1);
+
+        QHBoxLayout* buttonLayout = new QHBoxLayout;
+        buttonLayout->setContentsMargins(0, 0, 0, 0);
+        buttonLayout->setSpacing(8);
+        m_workflowCenterOpenSourceButton = new QPushButton("Open Source File", m_workflowCenterView);
+        m_workflowCenterDockButton = new QPushButton("Dock To Sidebar", m_workflowCenterView);
+        m_workflowCenterAddStepButton = new QPushButton("Add Step...", m_workflowCenterView);
+        m_workflowCenterSaveButton = new QPushButton("Save Workflow", m_workflowCenterView);
+        buttonLayout->addWidget(m_workflowCenterOpenSourceButton);
+        buttonLayout->addWidget(m_workflowCenterDockButton);
+        buttonLayout->addWidget(m_workflowCenterAddStepButton);
+        buttonLayout->addWidget(m_workflowCenterSaveButton);
+        buttonLayout->addStretch(1);
+        containerLayout->addLayout(buttonLayout);
+
+        connect(m_workflowCenterMiniMap, &WorkflowMiniMapWidget::nodeActivated, this, [this](const QString& nodeUid) {
+            if(QTreeWidgetItem* nodeItem = findWorkflowItemByStableId(m_workflowExplorer, QStringLiteral("node:%1").arg(nodeUid))) {
+                m_workflowExplorer->setCurrentItem(nodeItem);
+                m_workflowExplorer->scrollToItem(nodeItem);
+                updateSelectedWorkflowItem(nodeItem);
+            }
+        });
+        connect(m_workflowCenterOpenSourceButton, &QPushButton::clicked, this, [this]() {
+            if(QFileInfo(m_activeWorkflowFilePath).isFile()) {
+                openFileInView(m_activeWorkflowFilePath);
+            }
+        });
+        connect(m_workflowCenterDockButton, &QPushButton::clicked, this, [this]() {
+            QWidget* workflowCenterView = m_workflowCenterView;
+            if(workflowCenterView) {
+                QMetaObject::invokeMethod(this, [this, workflowCenterView]() {
+                    const int tabIndex = m_centerTabs ? m_centerTabs->indexOf(workflowCenterView) : -1;
+                    if(tabIndex >= 0) {
+                        closeCenterTab(tabIndex);
+                    }
+                }, Qt::QueuedConnection);
+            }
+        });
+        connect(m_workflowCenterAddStepButton, &QPushButton::clicked, this, &MainWindow::appendWorkflowStep);
+        connect(m_workflowCenterSaveButton, &QPushButton::clicked, this, &MainWindow::saveActiveWorkflowGraph);
+    }
+
+    int tabIndex = m_centerTabs->indexOf(m_workflowCenterView);
+    if(tabIndex < 0) {
+        tabIndex = m_centerTabs->addTab(m_workflowCenterView, "Workflow Graph");
+        m_centerTabs->setTabToolTip(tabIndex, QString::fromLatin1(kWorkflowCenterTabKey));
+    }
+
+    refreshWorkflowCenterView();
+    refreshWorkflowGraphDockingUi();
+    if(focusTab && tabIndex >= 0) {
+        m_centerTabs->setCurrentIndex(tabIndex);
+    }
+}
+
+void MainWindow::refreshWorkflowCenterView()
+{
+    if(!m_workflowCenterView) {
+        return;
+    }
+
+    const bool hasActiveGraph = !m_activeWorkflowGraph.isEmpty();
+    const QString sourceFileLabel = QFileInfo(m_activeWorkflowFilePath).fileName().isEmpty()
+        ? QStringLiteral("Workflow Graph")
+        : QFileInfo(m_activeWorkflowFilePath).fileName();
+    const QString tabLabel = hasActiveGraph
+        ? QString("Graph: %1").arg(sourceFileLabel)
+        : QStringLiteral("Workflow Graph");
+    const int tabIndex = m_centerTabs->indexOf(m_workflowCenterView);
+    if(tabIndex >= 0) {
+        m_centerTabs->setTabText(tabIndex, tabLabel);
+        m_centerTabs->setTabToolTip(tabIndex, QString::fromLatin1(kWorkflowCenterTabKey));
+    }
+
+    if(m_workflowCenterMiniMap) {
+        m_workflowCenterMiniMap->setWorkflowGraph(m_activeWorkflowGraph);
+    }
+
+    const bool extensionConnected = m_extensionSocket && m_extensionSocket->state() == QLocalSocket::ConnectedState;
+    if(m_workflowCenterOpenSourceButton) {
+        m_workflowCenterOpenSourceButton->setEnabled(QFileInfo(m_activeWorkflowFilePath).isFile());
+    }
+    if(m_workflowCenterAddStepButton) {
+        m_workflowCenterAddStepButton->setEnabled(extensionConnected
+                                                  && hasActiveGraph
+                                                  && !workflowOperatorToolDefinitions().isEmpty());
+    }
+    if(m_workflowCenterSaveButton) {
+        m_workflowCenterSaveButton->setEnabled(extensionConnected && hasActiveGraph);
+    }
+
+    if(m_workflowCenterSummaryLabel) {
+        if(!hasActiveGraph) {
+            m_workflowCenterSummaryLabel->setText("No active workflow graph. Load a .mne file to open the graph canvas here.");
+        } else {
+            QString summary = QString("%1 | %2 resources | %3 pipeline nodes")
+                                  .arg(sourceFileLabel)
+                                  .arg(m_activeWorkflowGraph.value(QStringLiteral("resources")).toArray().size())
+                                  .arg(m_activeWorkflowGraph.value(QStringLiteral("pipeline")).toArray().size());
+            if(m_activeWorkflowHasUnsavedChanges) {
+                summary += QStringLiteral(" | unsaved runtime edits");
+            }
+            m_workflowCenterSummaryLabel->setText(summary);
+        }
+    }
+
+    if(!hasActiveGraph && m_workflowCenterDetailsView) {
+        m_workflowCenterDetailsView->setPlainText("Open a .mne file to inspect the workflow graph in the center view.");
+    }
+
+    refreshWorkflowGraphDockingUi();
+}
+
+QJsonArray MainWindow::workflowOperatorToolDefinitions() const
+{
+    QJsonArray workflowTools;
+    QSet<QString> seenToolNames;
+
+    const QJsonArray tools = availableToolDefinitions();
+    for(const QJsonValue& value : tools) {
+        const QJsonObject tool = value.toObject();
+        const QString toolName = tool.value("name").toString().trimmed();
+        if(!tool.value("workflow_operator").toBool(false) || toolName.isEmpty() || seenToolNames.contains(toolName)) {
+            continue;
+        }
+
+        workflowTools.append(tool);
+        seenToolNames.insert(toolName);
+    }
+
+    return workflowTools;
+}
+
+QJsonObject MainWindow::workflowOperatorToolDefinition(const QString& toolName) const
+{
+    const QString trimmedToolName = toolName.trimmed();
+    if(trimmedToolName.isEmpty()) {
+        return QJsonObject();
+    }
+
+    const QJsonArray workflowTools = workflowOperatorToolDefinitions();
+    for(const QJsonValue& value : workflowTools) {
+        const QJsonObject tool = value.toObject();
+        if(tool.value("name").toString().trimmed() == trimmedToolName) {
+            return tool;
+        }
+    }
+
+    return QJsonObject();
+}
+
+QString MainWindow::selectedWorkflowArtifactUid() const
+{
+    if(!m_workflowExplorer || !m_workflowExplorer->currentItem()) {
+        return QString();
+    }
+
+    const QJsonObject payload = m_workflowExplorer->currentItem()->data(0, kWorkflowPayloadRole).toJsonObject();
+    const QString kind = payload.value("kind").toString().trimmed();
+    if(kind == QLatin1String("resource")) {
+        return payload.value("resource").toObject().value("uid").toString().trimmed();
+    }
+    if(kind == QLatin1String("input")) {
+        return payload.value("input_uid").toString().trimmed();
+    }
+    if(kind == QLatin1String("output")) {
+        return payload.value("output_uid").toString().trimmed();
+    }
+    if(kind == QLatin1String("node")) {
+        const QJsonObject outputs = payload.value("node").toObject().value("outputs").toObject();
+        if(outputs.size() == 1) {
+            return outputs.constBegin().value().toString().trimmed();
+        }
+    }
+
+    return QString();
+}
+
+QJsonObject MainWindow::defaultArgumentsForWorkflowTool(const QString& toolName) const
+{
+    QJsonObject arguments = defaultArgumentsForTool(toolName);
+    const QJsonObject definition = workflowOperatorToolDefinition(toolName);
+    if(definition.isEmpty()) {
+        return arguments;
+    }
+
+    const QString selectedArtifactUid = selectedWorkflowArtifactUid();
+    if(selectedArtifactUid.isEmpty()) {
+        return arguments;
+    }
+
+    QStringList inputFields;
+    const QJsonObject properties = definition.value("input_schema").toObject().value("properties").toObject();
+    for(auto it = properties.constBegin(); it != properties.constEnd(); ++it) {
+        if(it.value().toObject().value("x_workflow_section").toString() == QLatin1String("inputs")) {
+            inputFields.append(it.key());
+        }
+    }
+
+    if(inputFields.size() == 1 && !arguments.contains(inputFields.first())) {
+        arguments.insert(inputFields.first(), selectedArtifactUid);
+    }
+
+    return arguments;
+}
+
+QString MainWindow::resolveStudioCompanionExecutable(const QString& executableName) const
+{
+    const QString trimmedExecutableName = executableName.trimmed();
+    if(trimmedExecutableName.isEmpty()) {
+        return QString();
+    }
+
+    const QStringList relativeCandidates{
+        trimmedExecutableName,
+        QStringLiteral("../bin/%1").arg(trimmedExecutableName),
+        QStringLiteral("../../bin/%1").arg(trimmedExecutableName),
+        QStringLiteral("out/Release/bin/%1").arg(trimmedExecutableName),
+        QStringLiteral("../out/Release/bin/%1").arg(trimmedExecutableName),
+        QStringLiteral("../../out/Release/bin/%1").arg(trimmedExecutableName),
+        QStringLiteral("build/out/Release/bin/%1").arg(trimmedExecutableName),
+        QStringLiteral("../build/out/Release/bin/%1").arg(trimmedExecutableName)
+    };
+
+    const QStringList seedDirectories{
+        QApplication::applicationDirPath(),
+        QDir::currentPath()
+    };
+
+    for(const QString& seedDirectory : seedDirectories) {
+        QDir searchDir(seedDirectory);
+        for(int depth = 0; depth < 8; ++depth) {
+            for(const QString& relativeCandidate : relativeCandidates) {
+                const QFileInfo candidateInfo(searchDir.filePath(relativeCandidate));
+                if(candidateInfo.exists() && candidateInfo.isFile() && candidateInfo.isExecutable()) {
+                    return candidateInfo.absoluteFilePath();
+                }
+            }
+
+            if(!searchDir.cdUp()) {
+                break;
+            }
+        }
+    }
+
+    return QString();
+}
+
+void MainWindow::ensureBackendConnection(QLocalSocket* socket,
+                                         const QString& socketName,
+                                         const QString& executableName,
+                                         QProcess* process,
+                                         const QString& displayName)
+{
+    if(!socket || m_isShuttingDown) {
+        return;
+    }
+
+    socket->abort();
+    socket->connectToServer(socketName);
+    if(socket->waitForConnected(150)) {
+        appendOutputMessage(QString("%1 connected.").arg(displayName));
+        return;
+    }
+
+    const QString executablePath = resolveStudioCompanionExecutable(executableName);
+    if(executablePath.isEmpty()) {
+        appendProblemMessage(QString("%1 binary could not be resolved for auto-start: %2")
+                                 .arg(displayName, executableName));
+        statusBar()->showMessage(QString("%1 is not connected and could not be auto-started.").arg(displayName), 6000);
+        return;
+    }
+
+    if(process && process->state() == QProcess::NotRunning) {
+        process->setProgram(executablePath);
+        process->setArguments(QStringList());
+        process->setWorkingDirectory(QFileInfo(executablePath).absolutePath());
+        process->setProcessEnvironment(studioBackendProcessEnvironment(executablePath));
+        process->start();
+        if(!process->waitForStarted(1500)) {
+            appendProblemMessage(QString("Failed to start %1 at %2")
+                                     .arg(displayName, executablePath));
+            statusBar()->showMessage(QString("Failed to start %1.").arg(displayName), 6000);
+            return;
+        }
+
+        appendOutputMessage(QString("Started %1 at %2").arg(displayName, executablePath));
+    }
+
+    socket->abort();
+    socket->connectToServer(socketName);
+    if(!socket->waitForConnected(1500)) {
+        appendProblemMessage(QString("%1 did not connect on socket %2 after launch.")
+                                 .arg(displayName, socketName));
+        statusBar()->showMessage(QString("%1 did not connect after launch.").arg(displayName), 6000);
+    }
+}
+
+void MainWindow::shutdownManagedBackends()
+{
+    if(m_isShuttingDown) {
+        return;
+    }
+
+    m_isShuttingDown = true;
+    shutdownManagedBackend(m_extensionSocket, m_extensionHostProcess, QStringLiteral("Extension Host"));
+    shutdownManagedBackend(m_kernelSocket, m_kernelProcess, QStringLiteral("Neuro-Kernel"));
+}
+
+void MainWindow::shutdownManagedBackend(QLocalSocket* socket,
+                                        QProcess* process,
+                                        const QString& displayName)
+{
+    if(socket) {
+        if(socket->state() == QLocalSocket::ConnectedState) {
+            socket->flush();
+            socket->disconnectFromServer();
+            if(socket->state() != QLocalSocket::UnconnectedState) {
+                socket->waitForDisconnected(500);
+            }
+        } else {
+            socket->abort();
+        }
+    }
+
+    if(!process || process->state() == QProcess::NotRunning) {
+        return;
+    }
+
+    process->terminate();
+    if(process->waitForFinished(2500)) {
+        return;
+    }
+
+    appendOutputMessage(QString("%1 did not exit after terminate(); forcing shutdown.").arg(displayName));
+    process->kill();
+    process->waitForFinished(1000);
+}
+
+void MainWindow::setWorkflowStatusBanner(const QString& message, const QString& severity)
+{
+    m_workflowStatusMessage = message.trimmed();
+    m_workflowStatusSeverity = severity.trimmed().toLower();
+    if(m_workflowStatusSeverity.isEmpty()) {
+        m_workflowStatusSeverity = QStringLiteral("info");
+    }
+
+    refreshWorkflowStatusBanner();
+}
+
+void MainWindow::refreshWorkflowStatusBanner()
+{
+    if(!m_workflowStatusBanner) {
+        return;
+    }
+
+    const bool hasMessage = !m_workflowStatusMessage.isEmpty();
+    m_workflowStatusBanner->setVisible(hasMessage);
+    if(!hasMessage) {
+        m_workflowStatusBanner->clear();
+        m_workflowStatusBanner->setStyleSheet(QString());
+        return;
+    }
+
+    QString backgroundColor = QStringLiteral("#172534");
+    QString foregroundColor = QStringLiteral("#8ab4f8");
+    QString borderColor = QStringLiteral("#244a6b");
+
+    if(m_workflowStatusSeverity == QLatin1String("error")) {
+        backgroundColor = QStringLiteral("#3d1f26");
+        foregroundColor = QStringLiteral("#ffb3ba");
+        borderColor = QStringLiteral("#8b3446");
+    } else if(m_workflowStatusSeverity == QLatin1String("success")) {
+        backgroundColor = QStringLiteral("#153421");
+        foregroundColor = QStringLiteral("#9be9a8");
+        borderColor = QStringLiteral("#2b8250");
+    } else if(m_workflowStatusSeverity == QLatin1String("warning")) {
+        backgroundColor = QStringLiteral("#3c2f16");
+        foregroundColor = QStringLiteral("#f2cc60");
+        borderColor = QStringLiteral("#8c6a20");
+    }
+
+    m_workflowStatusBanner->setText(m_workflowStatusMessage);
+    m_workflowStatusBanner->setStyleSheet(QString("QLabel {"
+                                                  "background: %1;"
+                                                  "color: %2;"
+                                                  "border: 1px solid %3;"
+                                                  "border-radius: 10px;"
+                                                  "padding: 8px 10px;"
+                                                  "font-weight: 600;"
+                                                  "}")
+                                              .arg(backgroundColor, foregroundColor, borderColor));
+}
+
+void MainWindow::requestWorkflowLoad(const QString& filePath)
+{
+    const QString trimmedFilePath = filePath.trimmed();
+    if(trimmedFilePath.isEmpty()) {
+        setWorkflowStatusBanner(QStringLiteral("Workflow activation requires a non-empty .mne file path."),
+                                QStringLiteral("error"));
+        return;
+    }
+
+    const QFileInfo requestedInfo(trimmedFilePath);
+    const QString normalizedRequestedPath = requestedInfo.exists()
+        ? requestedInfo.absoluteFilePath()
+        : trimmedFilePath;
+    const QFileInfo previousInfo(m_activeWorkflowFilePath.trimmed());
+    const QString previousWorkflowPath = previousInfo.exists()
+        ? previousInfo.absoluteFilePath()
+        : m_activeWorkflowFilePath.trimmed();
+    const bool switchingWorkflowFiles = !previousWorkflowPath.isEmpty()
+        && previousWorkflowPath != normalizedRequestedPath;
+
+    m_activeWorkflowFilePath = normalizedRequestedPath;
+    m_activeWorkflowHasUnsavedChanges = false;
+    if(m_activeWorkflowGraph.isEmpty() || switchingWorkflowFiles) {
+        m_activeWorkflowGraph = QJsonObject();
+    }
+
+    const QString workflowLabel = QFileInfo(normalizedRequestedPath).fileName().isEmpty()
+        ? normalizedRequestedPath
+        : QFileInfo(normalizedRequestedPath).fileName();
+    setWorkflowStatusBanner(QString("Loading workflow graph from %1...").arg(workflowLabel),
+                            QStringLiteral("info"));
+    rebuildWorkflowNavigatorUi();
+
+    if(m_pendingWorkflowLoads.values().contains(normalizedRequestedPath)) {
+        return;
+    }
+
+    if(!m_extensionSocket || m_extensionSocket->state() != QLocalSocket::ConnectedState) {
+        setWorkflowStatusBanner(QString("Extension Host is not connected, so %1 could not be activated as a workflow graph.")
+                                    .arg(workflowLabel),
+                                QStringLiteral("error"));
+        return;
+    }
+
+    const QString requestId = QString("workbench-extension-workflow-load-%1")
+                                  .arg(QUuid::createUuid().toString(QUuid::WithoutBraces));
+    m_pendingWorkflowLoads.insert(requestId, normalizedRequestedPath);
+
+    const QJsonObject params{
+        {"name", "studio.workflow.load"},
+        {"arguments", QJsonObject{{"file", normalizedRequestedPath}}}
+    };
+    const QJsonObject message = JsonRpcMessage::createRequest(requestId, "tools/call", params);
+    m_extensionSocket->write(JsonRpcMessage::serialize(message));
+    m_extensionSocket->flush();
+}
+
+void MainWindow::requestActiveWorkflowGraph()
+{
+    if(!m_extensionSocket || m_extensionSocket->state() != QLocalSocket::ConnectedState) {
+        if(m_activeWorkflowGraph.isEmpty()) {
+            setWorkflowStatusBanner(QStringLiteral("Extension Host is not connected. Live workflow graph is unavailable."),
+                                    QStringLiteral("warning"));
+        }
+        return;
+    }
+
+    const QString requestId = QString("workbench-extension-resource-read-%1")
+                                  .arg(QUuid::createUuid().toString(QUuid::WithoutBraces));
+    const QJsonObject message = JsonRpcMessage::createRequest(requestId,
+                                                             "resources/read",
+                                                             QJsonObject{{"uri", kActiveWorkflowGraphUri}});
+    m_extensionSocket->write(JsonRpcMessage::serialize(message));
+    m_extensionSocket->flush();
+}
+
+void MainWindow::adoptWorkflowGraph(const QJsonObject& result, const QString& fallbackFilePath)
+{
+    const QJsonObject graph = result.value("graph").toObject();
+    if(graph.isEmpty()) {
+        if(result.value("tool_name").toString() == QLatin1String("resources/read")
+           && result.value("uri").toString().trimmed() == QLatin1String(kActiveWorkflowGraphUri)) {
+            m_activeWorkflowGraph = QJsonObject();
+            rebuildWorkflowNavigatorUi();
+            if(m_pendingWorkflowLoads.isEmpty() && m_activeWorkflowFilePath.trimmed().isEmpty()) {
+                setWorkflowStatusBanner(QStringLiteral("No active workflow graph is currently published."),
+                                        QStringLiteral("info"));
+            }
+            if(m_pendingWorkflowLoads.isEmpty()
+               && !m_activeWorkflowFilePath.trimmed().isEmpty()
+               && QFileInfo::exists(m_activeWorkflowFilePath)) {
+                requestWorkflowLoad(m_activeWorkflowFilePath);
+            }
+        }
+        return;
+    }
+
+    m_activeWorkflowGraph = graph;
+
+    const QString sourceFilePath = result.value("source_file").toString().trimmed().isEmpty()
+        ? fallbackFilePath.trimmed()
+        : result.value("source_file").toString().trimmed();
+    if(!sourceFilePath.isEmpty()) {
+        m_activeWorkflowFilePath = sourceFilePath;
+    }
+
+    const QString toolName = result.value("tool_name").toString().trimmed();
+    if(toolName == QLatin1String("studio.workflow.load")
+       || toolName == QLatin1String("studio.workflow.save")) {
+        m_activeWorkflowHasUnsavedChanges = false;
+    } else if(result.contains("node_uid")) {
+        m_activeWorkflowHasUnsavedChanges = true;
+    }
+
+    const QString workflowLabel = QFileInfo(m_activeWorkflowFilePath).fileName().isEmpty()
+        ? m_activeWorkflowFilePath
+        : QFileInfo(m_activeWorkflowFilePath).fileName();
+    QString bannerMessage = QString("%1 active: %2 resources, %3 pipeline nodes.")
+                                .arg(workflowLabel.isEmpty() ? QStringLiteral("Workflow graph") : workflowLabel)
+                                .arg(graph.value(QStringLiteral("resources")).toArray().size())
+                                .arg(graph.value(QStringLiteral("pipeline")).toArray().size());
+    QString bannerSeverity = QStringLiteral("success");
+    if(m_activeWorkflowHasUnsavedChanges) {
+        bannerMessage += QStringLiteral(" Runtime changes are not saved yet.");
+        bannerSeverity = QStringLiteral("warning");
+    }
+    setWorkflowStatusBanner(bannerMessage, bannerSeverity);
+    rebuildWorkflowNavigatorUi();
+    refreshWorkflowCenterView();
+}
+
+void MainWindow::rebuildWorkflowNavigatorUi()
+{
+    if(!m_workflowExplorer) {
+        return;
+    }
+
+    if(m_workflowMiniMap) {
+        m_workflowMiniMap->setWorkflowGraph(m_activeWorkflowGraph);
+    }
+
+    const QString previousStableId = m_workflowExplorer->currentItem()
+        ? m_workflowExplorer->currentItem()->data(0, kWorkflowStableIdRole).toString()
+        : QString();
+
+    QTreeWidgetItem* selectedItem = nullptr;
+    {
+        QSignalBlocker blocker(m_workflowExplorer);
+        m_workflowExplorer->clear();
+
+        const bool hasLocalWorkflowFile = QFileInfo(m_activeWorkflowFilePath).isFile();
+        const bool extensionConnected = m_extensionSocket && m_extensionSocket->state() == QLocalSocket::ConnectedState;
+        m_workflowRefreshButton->setEnabled((m_extensionSocket && m_extensionSocket->state() == QLocalSocket::ConnectedState)
+                                            || hasLocalWorkflowFile);
+        m_workflowAddStepButton->setEnabled(extensionConnected
+                                            && !m_activeWorkflowGraph.isEmpty()
+                                            && !workflowOperatorToolDefinitions().isEmpty());
+        m_workflowSaveButton->setEnabled(extensionConnected && !m_activeWorkflowGraph.isEmpty());
+
+        if(m_activeWorkflowGraph.isEmpty()) {
+            const QString message = m_activeWorkflowFilePath.trimmed().isEmpty()
+                ? QStringLiteral("No active workflow graph. Open a .mne file to populate the workflow navigator.")
+                : QStringLiteral("Awaiting workflow graph activation for %1.")
+                      .arg(QFileInfo(m_activeWorkflowFilePath).fileName());
+            QTreeWidgetItem* statusItem = new QTreeWidgetItem(QStringList() << message);
+            const QJsonObject payload{
+                {"kind", "workflow_status"},
+                {"message", message},
+                {"source_file", m_activeWorkflowFilePath},
+                {"graph_resource_uri", kActiveWorkflowGraphUri}
+            };
+            statusItem->setData(0, kWorkflowPayloadRole, payload);
+            statusItem->setData(0, kWorkflowOpenPathRole, hasLocalWorkflowFile ? m_activeWorkflowFilePath : QString());
+            statusItem->setData(0, kWorkflowStableIdRole, QStringLiteral("workflow:status"));
+            m_workflowExplorer->addTopLevelItem(statusItem);
+            selectedItem = statusItem;
+        } else {
+            const QString sourceFilePath = m_activeWorkflowFilePath;
+            const QFileInfo sourceInfo(sourceFilePath);
+            const QHash<QString, QJsonObject> resourceByUid = workflowResourceMap(m_activeWorkflowGraph);
+            const QHash<QString, QString> outputProducerByUid = workflowOutputProducerMap(m_activeWorkflowGraph);
+            const QVector<QJsonObject> orderedNodes = workflowNodesTopologicallyOrdered(m_activeWorkflowGraph);
+
+            QHash<QString, QStringList> dependentNodeUidsByNodeUid;
+            QJsonObject statusCounts;
+            QJsonArray topologicalOrder;
+            for(const QJsonObject& node : orderedNodes) {
+                const QString nodeUid = node.value(QStringLiteral("uid")).toString().trimmed();
+                const QString status = workflowNodeStatus(node);
+                statusCounts.insert(status, statusCounts.value(status).toInt() + 1);
+                topologicalOrder.append(nodeUid);
+
+                const QStringList dependencies = workflowDependencyNodeUids(node, outputProducerByUid);
+                for(const QString& dependencyNodeUid : dependencies) {
+                    insertSortedUnique(dependentNodeUidsByNodeUid[dependencyNodeUid], nodeUid);
+                }
+            }
+
+            const QJsonObject summaryPayload{
+                {"kind", "workflow_summary"},
+                {"source_file", sourceFilePath},
+                {"graph_resource_uri", kActiveWorkflowGraphUri},
+                {"source_file_exists", sourceInfo.isFile()},
+                {"resource_count", m_activeWorkflowGraph.value(QStringLiteral("resources")).toArray().size()},
+                {"node_count", orderedNodes.size()},
+                {"status_counts", statusCounts},
+                {"topological_order", topologicalOrder},
+                {"graph", m_activeWorkflowGraph}
+            };
+            QTreeWidgetItem* summaryItem = new QTreeWidgetItem(QStringList()
+                                                               << QString("Active Workflow | %1 resources | %2 nodes")
+                                                                      .arg(summaryPayload.value(QStringLiteral("resource_count")).toInt())
+                                                                      .arg(summaryPayload.value(QStringLiteral("node_count")).toInt()));
+            summaryItem->setToolTip(0, sourceFilePath);
+            summaryItem->setData(0, kWorkflowPayloadRole, summaryPayload);
+            summaryItem->setData(0, kWorkflowOpenPathRole, sourceInfo.isFile() ? sourceInfo.absoluteFilePath() : QString());
+            summaryItem->setData(0, kWorkflowStableIdRole, QStringLiteral("workflow:summary"));
+            summaryItem->addChild(new QTreeWidgetItem(QStringList()
+                                                      << QString("Source: %1")
+                                                             .arg(sourceInfo.fileName().isEmpty() ? sourceFilePath : sourceInfo.fileName())));
+            summaryItem->addChild(new QTreeWidgetItem(QStringList()
+                                                      << QString("Graph Resource: %1").arg(kActiveWorkflowGraphUri)));
+            summaryItem->setExpanded(true);
+            m_workflowExplorer->addTopLevelItem(summaryItem);
+
+            QTreeWidgetItem* sourceRoot = new QTreeWidgetItem(QStringList() << "Source File");
+            const QJsonObject sourcePayload{
+                {"kind", "source_file"},
+                {"source_file", sourceFilePath},
+                {"exists", sourceInfo.isFile()},
+                {"graph_resource_uri", kActiveWorkflowGraphUri}
+            };
+            QTreeWidgetItem* sourceItem = new QTreeWidgetItem(QStringList()
+                                                              << (sourceInfo.fileName().isEmpty()
+                                                                      ? QStringLiteral("Unresolved workflow file")
+                                                                      : sourceInfo.fileName()));
+            sourceItem->setToolTip(0, sourceFilePath);
+            sourceItem->setData(0, kWorkflowPayloadRole, sourcePayload);
+            sourceItem->setData(0, kWorkflowOpenPathRole, sourceInfo.isFile() ? sourceInfo.absoluteFilePath() : QString());
+            sourceItem->setData(0, kWorkflowStableIdRole, QStringLiteral("workflow:source"));
+            sourceRoot->addChild(sourceItem);
+            sourceRoot->setExpanded(true);
+            m_workflowExplorer->addTopLevelItem(sourceRoot);
+
+            const QJsonArray resources = m_activeWorkflowGraph.value(QStringLiteral("resources")).toArray();
+            QTreeWidgetItem* resourcesRoot = new QTreeWidgetItem(QStringList()
+                                                                 << QString("Resources (%1)").arg(resources.size()));
+            for(const QJsonValue& value : resources) {
+                const QJsonObject resource = value.toObject();
+                const QString resourceUid = resource.value(QStringLiteral("uid")).toString().trimmed();
+                const QString resourceType = resource.value(QStringLiteral("type")).toString().trimmed();
+                const QString resourceUri = resource.value(QStringLiteral("uri")).toString().trimmed();
+                const QString resolvedLocalPath = resolveWorkflowUriToLocalPath(resourceUri, sourceFilePath);
+
+                QString label = QString("%1 [%2]")
+                                    .arg(resourceUid, resourceType.isEmpty() ? QStringLiteral("resource") : resourceType);
+                if(!resolvedLocalPath.isEmpty()) {
+                    label += QString(" | %1").arg(QFileInfo(resolvedLocalPath).fileName());
+                } else if(!resourceUri.isEmpty()) {
+                    label += QString(" | %1").arg(resourceUri);
+                }
+
+                const QJsonObject payload{
+                    {"kind", "resource"},
+                    {"source_file", sourceFilePath},
+                    {"resource", resource},
+                    {"resolved_local_path", resolvedLocalPath}
+                };
+                QTreeWidgetItem* resourceItem = new QTreeWidgetItem(QStringList() << label);
+                resourceItem->setToolTip(0, resolvedLocalPath.isEmpty() ? resourceUri : resolvedLocalPath);
+                resourceItem->setData(0, kWorkflowPayloadRole, payload);
+                resourceItem->setData(0, kWorkflowOpenPathRole, resolvedLocalPath.isEmpty()
+                                                                 ? (sourceInfo.isFile() ? sourceInfo.absoluteFilePath() : QString())
+                                                                 : resolvedLocalPath);
+                resourceItem->setData(0, kWorkflowStableIdRole, QStringLiteral("resource:%1").arg(resourceUid));
+                resourcesRoot->addChild(resourceItem);
+            }
+            resourcesRoot->setExpanded(true);
+            m_workflowExplorer->addTopLevelItem(resourcesRoot);
+
+            QTreeWidgetItem* pipelineRoot = new QTreeWidgetItem(QStringList()
+                                                                << QString("Pipeline (%1 nodes)").arg(orderedNodes.size()));
+            for(int index = 0; index < orderedNodes.size(); ++index) {
+                const QJsonObject node = orderedNodes.at(index);
+                const QString nodeUid = node.value(QStringLiteral("uid")).toString().trimmed();
+                const QString nodeLabel = workflowNodeDisplayLabel(node);
+                const QString nodeStage = node.value(QStringLiteral("stage")).toString().trimmed();
+                const QString skillId = node.value(QStringLiteral("skill_id")).toString().trimmed();
+                const QString status = workflowNodeStatus(node);
+                const QStringList dependencyNodeUids = workflowDependencyNodeUids(node, outputProducerByUid);
+                const QStringList dependentNodeUids = dependentNodeUidsByNodeUid.value(nodeUid);
+
+                const QJsonObject nodePayload{
+                    {"kind", "node"},
+                    {"source_file", sourceFilePath},
+                    {"node_index", index + 1},
+                    {"node_uid", nodeUid},
+                    {"label", nodeLabel},
+                    {"stage", nodeStage},
+                    {"skill_id", skillId},
+                    {"status", status},
+                    {"dependency_node_uids", QJsonArray::fromStringList(dependencyNodeUids)},
+                    {"dependent_node_uids", QJsonArray::fromStringList(dependentNodeUids)},
+                    {"node", node}
+                };
+                QString nodeTitle = QString("%1. [%2] %3")
+                                        .arg(index + 1, 2, 10, QLatin1Char('0'))
+                                        .arg(status)
+                                        .arg(nodeLabel.isEmpty() ? nodeUid : nodeLabel);
+                if(!nodeStage.isEmpty()) {
+                    nodeTitle += QString(" | %1").arg(nodeStage);
+                }
+                if(nodeLabel != nodeUid && !nodeUid.isEmpty()) {
+                    nodeTitle += QString(" | %1").arg(nodeUid);
+                }
+                QTreeWidgetItem* nodeItem = new QTreeWidgetItem(QStringList()
+                                                                << nodeTitle);
+                const QString nodeDescription = node.value(QStringLiteral("description")).toString().trimmed();
+                nodeItem->setToolTip(0, nodeDescription.isEmpty()
+                                            ? skillId
+                                            : QString("%1\n%2").arg(skillId, nodeDescription));
+                nodeItem->setData(0, kWorkflowPayloadRole, nodePayload);
+                nodeItem->setData(0, kWorkflowOpenPathRole, sourceInfo.isFile() ? sourceInfo.absoluteFilePath() : QString());
+                nodeItem->setData(0, kWorkflowStableIdRole, QStringLiteral("node:%1").arg(nodeUid));
+
+                const QJsonObject inputs = node.value(QStringLiteral("inputs")).toObject();
+                if(!inputs.isEmpty()) {
+                    QTreeWidgetItem* inputsRoot = new QTreeWidgetItem(QStringList() << "Inputs");
+                    for(auto it = inputs.constBegin(); it != inputs.constEnd(); ++it) {
+                        const QString inputUid = it.value().toString().trimmed();
+                        const QJsonObject resolvedResource = resourceByUid.value(inputUid);
+                        const QString resolvedLocalPath = resolveWorkflowUriToLocalPath(resolvedResource.value(QStringLiteral("uri")).toString(),
+                                                                                        sourceFilePath);
+                        const QJsonObject payload{
+                            {"kind", "input"},
+                            {"source_file", sourceFilePath},
+                            {"node_uid", nodeUid},
+                            {"role", it.key()},
+                            {"value", it.value()},
+                            {"input_uid", inputUid},
+                            {"resolved_resource", resolvedResource},
+                            {"resolved_local_path", resolvedLocalPath}
+                        };
+                        QString label = QString("%1 -> %2").arg(it.key(), summarizeJsonValue(it.value()));
+                        if(!resolvedResource.isEmpty()) {
+                            label += QString(" [%1]").arg(resolvedResource.value(QStringLiteral("type")).toString());
+                        }
+                        QTreeWidgetItem* inputItem = new QTreeWidgetItem(QStringList() << label);
+                        inputItem->setToolTip(0, resolvedLocalPath.isEmpty()
+                                                 ? resolvedResource.value(QStringLiteral("uri")).toString()
+                                                 : resolvedLocalPath);
+                        inputItem->setData(0, kWorkflowPayloadRole, payload);
+                        inputItem->setData(0, kWorkflowOpenPathRole, resolvedLocalPath.isEmpty()
+                                                                          ? (sourceInfo.isFile() ? sourceInfo.absoluteFilePath() : QString())
+                                                                          : resolvedLocalPath);
+                        inputItem->setData(0,
+                                           kWorkflowStableIdRole,
+                                           QStringLiteral("node:%1:input:%2").arg(nodeUid, it.key()));
+                        inputsRoot->addChild(inputItem);
+                    }
+                    nodeItem->addChild(inputsRoot);
+                }
+
+                const QJsonObject parameters = node.value(QStringLiteral("parameters")).toObject();
+                if(!parameters.isEmpty()) {
+                    QTreeWidgetItem* parametersRoot = new QTreeWidgetItem(QStringList() << "Parameters");
+                    for(auto it = parameters.constBegin(); it != parameters.constEnd(); ++it) {
+                        const QJsonObject payload{
+                            {"kind", "parameter"},
+                            {"source_file", sourceFilePath},
+                            {"node_uid", nodeUid},
+                            {"name", it.key()},
+                            {"value", it.value()}
+                        };
+                        QTreeWidgetItem* parameterItem = new QTreeWidgetItem(QStringList()
+                                                                            << QString("%1 = %2")
+                                                                                   .arg(it.key(), summarizeJsonValue(it.value())));
+                        parameterItem->setData(0, kWorkflowPayloadRole, payload);
+                        parameterItem->setData(0, kWorkflowOpenPathRole, sourceInfo.isFile() ? sourceInfo.absoluteFilePath() : QString());
+                        parameterItem->setData(0,
+                                               kWorkflowStableIdRole,
+                                               QStringLiteral("node:%1:parameter:%2").arg(nodeUid, it.key()));
+                        parametersRoot->addChild(parameterItem);
+                    }
+                    nodeItem->addChild(parametersRoot);
+                }
+
+                const QJsonObject declaredOutputs = node.value(QStringLiteral("outputs")).toObject();
+                if(!declaredOutputs.isEmpty()) {
+                    const QJsonObject resolvedOutputs = node.value(QStringLiteral("runtime"))
+                                                           .toObject()
+                                                           .value(QStringLiteral("resolved_outputs"))
+                                                           .toObject();
+                    QTreeWidgetItem* outputsRoot = new QTreeWidgetItem(QStringList() << "Outputs");
+                    for(auto it = declaredOutputs.constBegin(); it != declaredOutputs.constEnd(); ++it) {
+                        const QString outputUid = it.value().toString().trimmed();
+                        QJsonObject resolvedResource = resolvedOutputs.value(it.key()).toObject();
+                        if(resolvedResource.isEmpty()) {
+                            resolvedResource = resourceByUid.value(outputUid);
+                        }
+                        const QString resolvedLocalPath = resolveWorkflowUriToLocalPath(resolvedResource.value(QStringLiteral("uri")).toString(),
+                                                                                        sourceFilePath);
+                        const QJsonObject payload{
+                            {"kind", "output"},
+                            {"source_file", sourceFilePath},
+                            {"node_uid", nodeUid},
+                            {"role", it.key()},
+                            {"output_uid", outputUid},
+                            {"resolved_resource", resolvedResource},
+                            {"resolved_local_path", resolvedLocalPath}
+                        };
+                        QString label = QString("%1 -> %2").arg(it.key(), outputUid);
+                        if(!resolvedResource.isEmpty()) {
+                            label += QString(" [%1]").arg(resolvedResource.value(QStringLiteral("type")).toString());
+                        }
+                        QTreeWidgetItem* outputItem = new QTreeWidgetItem(QStringList() << label);
+                        outputItem->setToolTip(0, resolvedLocalPath.isEmpty()
+                                                  ? resolvedResource.value(QStringLiteral("uri")).toString()
+                                                  : resolvedLocalPath);
+                        outputItem->setData(0, kWorkflowPayloadRole, payload);
+                        outputItem->setData(0, kWorkflowOpenPathRole, resolvedLocalPath.isEmpty()
+                                                                           ? (sourceInfo.isFile() ? sourceInfo.absoluteFilePath() : QString())
+                                                                           : resolvedLocalPath);
+                        outputItem->setData(0,
+                                            kWorkflowStableIdRole,
+                                            QStringLiteral("node:%1:output:%2").arg(nodeUid, it.key()));
+                        outputsRoot->addChild(outputItem);
+                    }
+                    nodeItem->addChild(outputsRoot);
+                }
+
+                const QJsonObject lastResult = node.value(QStringLiteral("runtime"))
+                                                   .toObject()
+                                                   .value(QStringLiteral("last_result"))
+                                                   .toObject();
+                if(!lastResult.isEmpty()) {
+                    const QJsonObject payload{
+                        {"kind", "result"},
+                        {"source_file", sourceFilePath},
+                        {"node_uid", nodeUid},
+                        {"result", lastResult}
+                    };
+                    QTreeWidgetItem* resultItem = new QTreeWidgetItem(QStringList() << "Last Result");
+                    resultItem->setData(0, kWorkflowPayloadRole, payload);
+                    resultItem->setData(0, kWorkflowOpenPathRole, sourceInfo.isFile() ? sourceInfo.absoluteFilePath() : QString());
+                    resultItem->setData(0,
+                                        kWorkflowStableIdRole,
+                                        QStringLiteral("node:%1:last_result").arg(nodeUid));
+                    nodeItem->addChild(resultItem);
+                }
+
+                pipelineRoot->addChild(nodeItem);
+            }
+            pipelineRoot->setExpanded(true);
+            m_workflowExplorer->addTopLevelItem(pipelineRoot);
+
+            selectedItem = findWorkflowItemByStableId(m_workflowExplorer, previousStableId);
+            if(!selectedItem) {
+                selectedItem = summaryItem;
+            }
+        }
+
+        if(selectedItem) {
+            m_workflowExplorer->setCurrentItem(selectedItem);
+        }
+    }
+
+    updateSelectedWorkflowItem(selectedItem);
+    refreshWorkflowCenterView();
+}
+
+void MainWindow::appendWorkflowStep()
+{
+    if(!m_extensionSocket || m_extensionSocket->state() != QLocalSocket::ConnectedState) {
+        setWorkflowStatusBanner(QStringLiteral("Extension Host is not connected, so workflow steps cannot be appended right now."),
+                                QStringLiteral("error"));
+        appendProblemMessage(QStringLiteral("Workflow authoring requires a connected Extension Host."));
+        return;
+    }
+
+    if(m_activeWorkflowGraph.isEmpty()) {
+        setWorkflowStatusBanner(QStringLiteral("Open or activate a workflow graph before appending new steps."),
+                                QStringLiteral("warning"));
+        appendProblemMessage(QStringLiteral("No active workflow graph is available for runtime extension."));
+        return;
+    }
+
+    const QJsonArray workflowTools = workflowOperatorToolDefinitions();
+    if(workflowTools.isEmpty()) {
+        setWorkflowStatusBanner(QStringLiteral("No workflow operator tools are currently available for runtime graph edits."),
+                                QStringLiteral("warning"));
+        appendProblemMessage(QStringLiteral("No workflow operator tools were discovered from the Extension Host."));
+        return;
+    }
+
+    openWorkflowCenterView(true);
+
+    QString selectedToolName;
+    QJsonObject selectedToolDefinition;
+    if(workflowTools.size() == 1) {
+        selectedToolDefinition = workflowTools.first().toObject();
+        selectedToolName = selectedToolDefinition.value("name").toString().trimmed();
+    } else {
+        QStringList labels;
+        QHash<QString, QJsonObject> toolByLabel;
+        for(const QJsonValue& value : workflowTools) {
+            const QJsonObject tool = value.toObject();
+            const QString toolName = tool.value("name").toString().trimmed();
+            if(toolName.isEmpty()) {
+                continue;
+            }
+
+            const QString label = QString("%1 (%2)")
+                                      .arg(tool.value("display_name").toString(toolName), toolName);
+            labels.append(label);
+            toolByLabel.insert(label, tool);
+        }
+
+        std::sort(labels.begin(), labels.end());
+        bool accepted = false;
+        const QString chosenLabel = QInputDialog::getItem(this,
+                                                          QStringLiteral("Append Workflow Step"),
+                                                          QStringLiteral("Choose a workflow operator"),
+                                                          labels,
+                                                          0,
+                                                          false,
+                                                          &accepted);
+        if(!accepted || chosenLabel.trimmed().isEmpty()) {
+            return;
+        }
+
+        selectedToolDefinition = toolByLabel.value(chosenLabel);
+        selectedToolName = selectedToolDefinition.value("name").toString().trimmed();
+    }
+
+    if(selectedToolName.isEmpty()) {
+        appendProblemMessage(QStringLiteral("The chosen workflow operator is missing a tool name."));
+        return;
+    }
+
+    QJsonObject arguments = defaultArgumentsForWorkflowTool(selectedToolName);
+    if(!editArgumentsForTool(selectedToolName, arguments)) {
+        return;
+    }
+
+    const QString commandText = QString("tools.call %1 %2")
+        .arg(selectedToolName,
+             QString::fromUtf8(QJsonDocument(arguments).toJson(QJsonDocument::Compact)));
+    appendTerminalMessage(QString("$ %1").arg(commandText));
+    appendOutputMessage(QString("Appending workflow step via %1").arg(selectedToolDefinition.value("display_name")
+                                                                          .toString(selectedToolName)));
+    sendExtensionToolCall(selectedToolName, arguments);
+}
+
+void MainWindow::saveActiveWorkflowGraph()
+{
+    if(m_activeWorkflowGraph.isEmpty()) {
+        setWorkflowStatusBanner(QStringLiteral("There is no active workflow graph to save."),
+                                QStringLiteral("warning"));
+        appendProblemMessage(QStringLiteral("No active workflow graph is available to save."));
+        return;
+    }
+
+    if(!m_extensionSocket || m_extensionSocket->state() != QLocalSocket::ConnectedState) {
+        setWorkflowStatusBanner(QStringLiteral("Extension Host is not connected, so the workflow graph cannot be saved right now."),
+                                QStringLiteral("error"));
+        appendProblemMessage(QStringLiteral("Workflow saving requires a connected Extension Host."));
+        return;
+    }
+
+    QString targetPath = m_activeWorkflowFilePath.trimmed();
+    if(targetPath.isEmpty()) {
+        targetPath = QFileDialog::getSaveFileName(this,
+                                                  QStringLiteral("Save Workflow Graph"),
+                                                  QDir::current().filePath(QStringLiteral("untitled.mne")),
+                                                  QStringLiteral("MNE Analysis (*.mne);;JSON Files (*.json);;All Files (*)"));
+        if(targetPath.trimmed().isEmpty()) {
+            return;
+        }
+    }
+
+    if(QFileInfo(targetPath).suffix().trimmed().isEmpty()) {
+        targetPath += QStringLiteral(".mne");
+    }
+
+    m_activeWorkflowFilePath = QFileInfo(targetPath).absoluteFilePath();
+    setWorkflowStatusBanner(QString("Saving workflow graph to %1...")
+                                .arg(QFileInfo(m_activeWorkflowFilePath).fileName()),
+                            QStringLiteral("info"));
+    appendOutputMessage(QString("Saving active workflow graph to %1").arg(m_activeWorkflowFilePath));
+    sendExtensionToolCall(QStringLiteral("studio.workflow.save"),
+                          QJsonObject{{"file", m_activeWorkflowFilePath}});
+}
+
+void MainWindow::updateSelectedWorkflowItem(QTreeWidgetItem* item)
+{
+    m_workflowOpenFileButton->setEnabled(!openableWorkflowPathForItem(item).isEmpty());
+
+    const QJsonObject payload = item ? item->data(0, kWorkflowPayloadRole).toJsonObject() : QJsonObject();
+    const QString focusNodeUid = workflowFocusNodeUid(payload);
+    if(m_workflowMiniMap) {
+        m_workflowMiniMap->setFocusNodeUid(focusNodeUid);
+    }
+    if(m_workflowCenterMiniMap) {
+        m_workflowCenterMiniMap->setFocusNodeUid(focusNodeUid);
+    }
+
+    const auto setWorkflowDetailText = [this](const QString& text) {
+        m_workflowDetailsView->setPlainText(text);
+        if(m_workflowCenterDetailsView) {
+            m_workflowCenterDetailsView->setPlainText(text);
+        }
+    };
+
+    const QHash<QString, QStringList> dependenciesByNodeUid = m_activeWorkflowGraph.isEmpty()
+        ? QHash<QString, QStringList>()
+        : workflowDependencyNodeMap(m_activeWorkflowGraph);
+    const QHash<QString, QStringList> dependentsByNodeUid = m_activeWorkflowGraph.isEmpty()
+        ? QHash<QString, QStringList>()
+        : workflowDependentNodeMap(m_activeWorkflowGraph);
+
+    const QStringList directDependencies = focusNodeUid.isEmpty()
+        ? QStringList()
+        : dependenciesByNodeUid.value(focusNodeUid);
+    const QStringList directDependents = focusNodeUid.isEmpty()
+        ? QStringList()
+        : dependentsByNodeUid.value(focusNodeUid);
+    const QStringList upstreamNodeUids = focusNodeUid.isEmpty()
+        ? QStringList()
+        : workflowReachableNodeUids(focusNodeUid, dependenciesByNodeUid);
+    const QStringList downstreamNodeUids = focusNodeUid.isEmpty()
+        ? QStringList()
+        : workflowReachableNodeUids(focusNodeUid, dependentsByNodeUid);
+
+    if(m_workflowExplorer) {
+        QList<QTreeWidgetItem*> pendingItems;
+        for(int i = 0; i < m_workflowExplorer->topLevelItemCount(); ++i) {
+            pendingItems.append(m_workflowExplorer->topLevelItem(i));
+        }
+
+        while(!pendingItems.isEmpty()) {
+            QTreeWidgetItem* candidate = pendingItems.takeFirst();
+            QString candidateNodeUid;
+            if(workflowItemRepresentsPipelineNode(candidate, &candidateNodeUid)) {
+                candidate->setBackground(0, QBrush());
+                candidate->setForeground(0, QBrush());
+                QFont font = candidate->font(0);
+                font.setBold(false);
+                font.setItalic(false);
+                font.setUnderline(false);
+
+                if(candidateNodeUid == focusNodeUid) {
+                    font.setBold(true);
+                    candidate->setForeground(0, QBrush(Qt::white));
+                    candidate->setBackground(0, QBrush(QColor(47, 129, 247, 185)));
+                } else if(directDependencies.contains(candidateNodeUid)) {
+                    font.setBold(true);
+                    candidate->setForeground(0, QBrush(QColor(242, 204, 96)));
+                    candidate->setBackground(0, QBrush(QColor(173, 114, 24, 72)));
+                } else if(directDependents.contains(candidateNodeUid)) {
+                    font.setBold(true);
+                    candidate->setForeground(0, QBrush(QColor(86, 211, 100)));
+                    candidate->setBackground(0, QBrush(QColor(35, 134, 54, 80)));
+                } else if(upstreamNodeUids.contains(candidateNodeUid)) {
+                    font.setItalic(true);
+                    candidate->setForeground(0, QBrush(QColor(227, 179, 65)));
+                    candidate->setBackground(0, QBrush(QColor(173, 114, 24, 34)));
+                } else if(downstreamNodeUids.contains(candidateNodeUid)) {
+                    font.setItalic(true);
+                    candidate->setForeground(0, QBrush(QColor(63, 185, 80)));
+                    candidate->setBackground(0, QBrush(QColor(35, 134, 54, 38)));
+                }
+
+                candidate->setFont(0, font);
+            }
+
+            for(int childIndex = 0; childIndex < candidate->childCount(); ++childIndex) {
+                pendingItems.append(candidate->child(childIndex));
+            }
+        }
+    }
+
+    if(!item) {
+        if(m_activeWorkflowGraph.isEmpty()) {
+            setWorkflowDetailText("Open a .mne file to inspect resources and pipeline nodes here.");
+        } else {
+            setWorkflowDetailText("Select a workflow resource or pipeline node to inspect it here.");
+        }
+        return;
+    }
+
+    if(payload.isEmpty()) {
+        setWorkflowDetailText(item->text(0));
+        return;
+    }
+
+    QJsonObject details = payload;
+    if(!focusNodeUid.isEmpty()) {
+        details.insert(QStringLiteral("dependency_view"),
+                       QJsonObject{
+                           {"focus_node_uid", focusNodeUid},
+                           {"direct_dependencies", QJsonArray::fromStringList(directDependencies)},
+                           {"direct_dependents", QJsonArray::fromStringList(directDependents)},
+                           {"upstream_nodes", QJsonArray::fromStringList(upstreamNodeUids)},
+                           {"downstream_nodes", QJsonArray::fromStringList(downstreamNodeUids)},
+                           {"legend", QJsonObject{
+                                {"selected_node", "blue"},
+                                {"direct_upstream", "amber"},
+                                {"direct_downstream", "green"},
+                                {"transitive_upstream", "light_amber"},
+                                {"transitive_downstream", "light_green"}
+                            }}
+                       });
+    }
+
+    setWorkflowDetailText(QString::fromUtf8(QJsonDocument(details).toJson(QJsonDocument::Indented)));
+
+    if(!focusNodeUid.isEmpty()) {
+        statusBar()->showMessage(QString("Workflow focus: %1 | %2 upstream | %3 downstream")
+                                     .arg(focusNodeUid)
+                                     .arg(upstreamNodeUids.size())
+                                     .arg(downstreamNodeUids.size()),
+                                 4000);
+    }
+}
+
+QString MainWindow::openableWorkflowPathForItem(QTreeWidgetItem* item) const
+{
+    if(!item && m_workflowExplorer) {
+        item = m_workflowExplorer->currentItem();
+    }
+    if(!item) {
+        return QString();
+    }
+
+    const QString directPath = item->data(0, kWorkflowOpenPathRole).toString().trimmed();
+    if(QFileInfo(directPath).isFile()) {
+        return QFileInfo(directPath).absoluteFilePath();
+    }
+
+    const QJsonObject payload = item->data(0, kWorkflowPayloadRole).toJsonObject();
+    const QString resolvedLocalPath = payload.value(QStringLiteral("resolved_local_path")).toString().trimmed();
+    if(QFileInfo(resolvedLocalPath).isFile()) {
+        return QFileInfo(resolvedLocalPath).absoluteFilePath();
+    }
+
+    const QJsonObject resource = payload.value(QStringLiteral("resource")).toObject();
+    const QString resourceUri = resource.value(QStringLiteral("uri")).toString().trimmed();
+    const QString resourcePath = resolveWorkflowUriToLocalPath(resourceUri, m_activeWorkflowFilePath);
+    if(QFileInfo(resourcePath).isFile()) {
+        return QFileInfo(resourcePath).absoluteFilePath();
+    }
+
+    const QJsonObject resolvedResource = payload.value(QStringLiteral("resolved_resource")).toObject();
+    const QString resolvedResourceUri = resolvedResource.value(QStringLiteral("uri")).toString().trimmed();
+    const QString resolvedResourcePath = resolveWorkflowUriToLocalPath(resolvedResourceUri, m_activeWorkflowFilePath);
+    if(QFileInfo(resolvedResourcePath).isFile()) {
+        return QFileInfo(resolvedResourcePath).absoluteFilePath();
+    }
+
+    const QString sourceFilePath = payload.value(QStringLiteral("source_file")).toString().trimmed().isEmpty()
+        ? m_activeWorkflowFilePath.trimmed()
+        : payload.value(QStringLiteral("source_file")).toString().trimmed();
+    return QFileInfo(sourceFilePath).isFile() ? QFileInfo(sourceFilePath).absoluteFilePath() : QString();
+}
+
+void MainWindow::openSelectedWorkflowFile()
+{
+    const QString filePath = openableWorkflowPathForItem(m_workflowExplorer ? m_workflowExplorer->currentItem() : nullptr);
+    if(filePath.isEmpty()) {
+        appendProblemMessage("The selected workflow item is not backed by a local file that can be opened.");
+        statusBar()->showMessage("No openable local file for the selected workflow item.", 4000);
+        return;
+    }
+
+    addWorkspaceDirectory(QFileInfo(filePath).absolutePath());
+    openFileInView(filePath);
+}
+
+bool MainWindow::isExtensionHostTool(const QString& toolName) const
+{
+    const QString trimmedToolName = toolName.trimmed();
+    if(trimmedToolName.isEmpty()) {
+        return false;
+    }
+
+    if(trimmedToolName == QLatin1String("studio.workflow.load")) {
+        return true;
+    }
+
+    if(trimmedToolName.startsWith(QLatin1String("view.hosted.")) || trimmedToolName.startsWith(QLatin1String("settings."))) {
+        return false;
+    }
+
+    return !toolDefinition(trimmedToolName).value("extension_id").toString().trimmed().isEmpty();
+}
+
 void MainWindow::sendKernelToolCall(const QString& toolName, const QJsonObject& arguments)
 {
     QJsonObject params{
@@ -6592,7 +9269,9 @@ void MainWindow::sendKernelToolCall(const QString& toolName, const QJsonObject& 
         {"arguments", arguments}
     };
 
-    const QJsonObject message = JsonRpcMessage::createRequest("workbench-1", "tools/call", params);
+    const QString requestId = QString("workbench-kernel-tool-%1")
+                                  .arg(QUuid::createUuid().toString(QUuid::WithoutBraces));
+    const QJsonObject message = JsonRpcMessage::createRequest(requestId, "tools/call", params);
     m_kernelSocket->write(JsonRpcMessage::serialize(message));
     m_kernelSocket->flush();
 }
@@ -6628,7 +9307,9 @@ void MainWindow::sendExtensionToolCall(const QString& toolName, const QJsonObjec
         {"arguments", arguments}
     };
 
-    const QJsonObject message = JsonRpcMessage::createRequest("workbench-extension-1", "tools/call", params);
+    const QString requestId = QString("workbench-extension-tool-%1")
+                                  .arg(QUuid::createUuid().toString(QUuid::WithoutBraces));
+    const QJsonObject message = JsonRpcMessage::createRequest(requestId, "tools/call", params);
     m_extensionSocket->write(JsonRpcMessage::serialize(message));
     m_extensionSocket->flush();
 }
@@ -6768,6 +9449,8 @@ void MainWindow::restoreWorkspace()
 
     const QStringList workspaceFiles = settings.value("workspace/files").toStringList();
     const QStringList workspaceDirectories = settings.value("workspace/directories").toStringList();
+    m_activeWorkflowFilePath = settings.value("workspace/active_workflow_file").toString();
+    rebuildWorkflowNavigatorUi();
     for(const QString& directoryPath : workspaceDirectories) {
         addWorkspaceDirectory(directoryPath);
     }
@@ -6812,13 +9495,14 @@ void MainWindow::persistWorkspace() const
     }
     for(int i = 0; i < m_centerTabs->count(); ++i) {
         const QString filePath = m_centerTabs->tabToolTip(i);
-        if(!filePath.isEmpty()) {
-            workspaceFiles.append(filePath);
+        if(QFileInfo(filePath).isFile()) {
+            workspaceFiles.append(QFileInfo(filePath).absoluteFilePath());
         }
     }
 
     settings.setValue("workspace/directories", workspaceDirectories);
     settings.setValue("workspace/files", workspaceFiles);
+    settings.setValue("workspace/active_workflow_file", m_activeWorkflowFilePath);
     settings.setValue("workspace/scenes", QJsonDocument(m_sceneRegistry.serialize()).toJson(QJsonDocument::Compact));
     QJsonArray psdHistoryArray;
     for(const QJsonObject& result : m_psdResultHistory) {
@@ -6848,11 +9532,16 @@ void MainWindow::persistWorkspace() const
 void MainWindow::closeEvent(QCloseEvent* event)
 {
     persistWorkspace();
+    shutdownManagedBackends();
     QMainWindow::closeEvent(event);
 }
 
 bool MainWindow::isSupportedWorkspaceFile(const QString& filePath) const
 {
+    if(isWorkflowAnalysisFile(filePath)) {
+        return true;
+    }
+
     const QString extension = QString(".%1").arg(QFileInfo(filePath).suffix().toLower());
     if(extension == ".fif" || extension == ".ave" || extension == ".edf") {
         return true;

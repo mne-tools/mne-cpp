@@ -1,0 +1,7 @@
+{
+  "kind": "mock_meg_raw_input",
+  "subject": "subject_01",
+  "session": "auditory",
+  "run": "01",
+  "description": "Placeholder MEG/EEG raw recording used for workflow DAG and UI prototyping."
+}

@@ -35,6 +35,7 @@
 
 #include <mcprouter.h>
 #include <viewproviderregistry.h>
+#include <workflowmanager.h>
 
 #include <QJsonObject>
 #include <QObject>
@@ -60,9 +61,12 @@ private:
     bool reloadExtensions(const QString& extensionsDirectory, const QStringList& disabledExtensionIds);
     QJsonObject sessionCapabilitiesForProvider(const ViewProviderContribution& provider) const;
     QJsonObject viewCommandResultSchema(const QJsonObject& stateSchema) const;
+    QJsonObject workflowLoadToolDefinition() const;
+    QJsonObject workflowSaveToolDefinition() const;
     QJsonObject handleResourcesList() const;
+    QJsonObject handleResourcesRead(const QJsonObject& params) const;
     QJsonObject handleToolsList() const;
-    QJsonObject handleToolCall(const QJsonObject& params) const;
+    QJsonObject handleToolCall(const QJsonObject& params);
     QJsonObject handleExtensionsReload(const QJsonObject& params);
     QJsonObject handleViewsOpen(const QJsonObject& params);
     QJsonObject handleViewsList() const;
@@ -71,6 +75,7 @@ private:
     McpRouter m_router;
     QLocalServer m_server;
     ViewProviderRegistry m_registry;
+    WorkflowManager m_workflowManager;
     QString m_extensionsDirectory;
     QHash<QString, QJsonObject> m_viewSessions;
 };

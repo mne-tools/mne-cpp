@@ -1,0 +1,7 @@
+{
+  "kind": "mock_fiff_input",
+  "display_name": "Subject 01 Raw Placeholder",
+  "note": "This is a placeholder file used to exercise workflow browsing, provenance, and dependency visualization in MNE Analyze Studio.",
+  "intended_loader": "Temporal Filter Skill",
+  "source_format": "AFIFF placeholder"
+}

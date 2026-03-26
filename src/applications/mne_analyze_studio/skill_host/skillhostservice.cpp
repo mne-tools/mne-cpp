@@ -10,12 +10,15 @@
 
 #include "skillhostservice.h"
 
+#include <capabilityutils.h>
 #include <jsonrpcmessage.h>
+#include <temporalfilterskill.h>
 
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QFileInfo>
 #include <QLocalSocket>
+#include <QSet>
 #include <QStringList>
 #include <QUuid>
 
@@ -23,13 +26,47 @@
 
 using namespace MNEANALYZESTUDIO;
 
+namespace
+{
+
+QJsonObject objectSchema(const QJsonObject& properties, const QJsonArray& required = QJsonArray())
+{
+    return QJsonObject{
+        {"type", "object"},
+        {"properties", properties},
+        {"required", required}
+    };
+}
+
+QJsonObject stringSchema(const QString& title, const QString& description = QString())
+{
+    QJsonObject schema{
+        {"type", "string"},
+        {"title", title}
+    };
+
+    if(!description.isEmpty()) {
+        schema.insert("description", description);
+    }
+
+    return schema;
+}
+
+}
+
 SkillHostService::SkillHostService(QObject* parent)
 : QObject(parent)
 , m_router(this)
 , m_registry(this)
+, m_workflowManager(this)
 {
+    m_workflowManager.registerOperator(new TemporalFilterSkill(this));
+
     m_router.registerMethod("resources/list", [this](const QJsonObject&) {
         return handleResourcesList();
+    });
+    m_router.registerMethod("resources/read", [this](const QJsonObject& params) {
+        return handleResourcesRead(params);
     });
     m_router.registerMethod("tools/list", [this](const QJsonObject&) {
         return handleToolsList();
@@ -149,6 +186,61 @@ QJsonObject SkillHostService::viewCommandResultSchema(const QJsonObject& stateSc
     };
 }
 
+QJsonObject SkillHostService::workflowLoadToolDefinition() const
+{
+    return annotateCapabilityMetadata(annotatePlannerMetadata(QJsonObject{
+        {"name", "studio.workflow.load"},
+        {"description", "Load a .mne file, activate the DAG, and execute pending workflow nodes."},
+        {"input_schema", objectSchema(QJsonObject{
+             {"file", stringSchema("Workflow File",
+                                   "Absolute path to the .mne workflow file to activate.")}
+         }, QJsonArray{"file"})},
+        {"result_schema", objectSchema(QJsonObject{
+             {"status", stringSchema("Status")},
+             {"source_file", stringSchema("Workflow File")},
+             {"graph_resource_uri", stringSchema("Graph Resource URI")}
+         }, QJsonArray{"status", "source_file", "graph_resource_uri"})},
+        {"capability_kind", "workflow_io"},
+        {"graph_mutation", "activate_graph"},
+        {"extension_id", "temporal-filter-skill"},
+        {"extension_display_name", "Workflow Manager"}
+    },
+    true,
+    QStringLiteral("medium"),
+    QStringLiteral("Activates a declarative workflow graph in the current workspace."),
+    QStringLiteral("confirm_required"),
+    QStringLiteral("Workflow activation changes workspace state and should be confirmed before execution."),
+    false));
+}
+
+QJsonObject SkillHostService::workflowSaveToolDefinition() const
+{
+    return annotateCapabilityMetadata(annotatePlannerMetadata(QJsonObject{
+        {"name", "studio.workflow.save"},
+        {"description", "Persist the active workflow DAG back to a .mne file."},
+        {"input_schema", objectSchema(QJsonObject{
+             {"file", stringSchema("Workflow File",
+                                   "Optional absolute save path. If omitted, the active workflow source file is updated.")}
+         })},
+        {"result_schema", objectSchema(QJsonObject{
+             {"status", stringSchema("Status")},
+             {"source_file", stringSchema("Workflow File")},
+             {"graph_resource_uri", stringSchema("Graph Resource URI")}
+         }, QJsonArray{"status", "source_file", "graph_resource_uri"})},
+        {"capability_kind", "workflow_io"},
+        {"graph_mutation", "persist_graph"},
+        {"extension_id", "temporal-filter-skill"},
+        {"extension_display_name", "Workflow Manager"}
+    },
+    false,
+    QStringLiteral("high"),
+    QStringLiteral("Persists workflow graph changes to disk and should only run with explicit user intent."),
+    QStringLiteral("suggestion_only"),
+    QStringLiteral("Workflow saves should be proposed explicitly rather than auto-executed."),
+    false,
+    QJsonArray{QStringLiteral("active_workflow_graph")}));
+}
+
 QJsonObject SkillHostService::handleResourcesList() const
 {
     QJsonArray resources;
@@ -165,16 +257,67 @@ QJsonObject SkillHostService::handleResourcesList() const
         });
     }
 
+    const QJsonArray workflowResources = m_workflowManager.resourceDefinitions();
+    for(const QJsonValue& value : workflowResources) {
+        resources.append(value.toObject());
+    }
+
     return QJsonObject{
         {"tool_name", "resources/list"},
-        {"message", QString("Extension host discovered %1 extension manifests.").arg(resources.size())},
+        {"message", QString("Extension host resources: %1").arg(resources.size())},
         {"resources", resources}
     };
 }
 
+QJsonObject SkillHostService::handleResourcesRead(const QJsonObject& params) const
+{
+    const QString resourceUri = params.value("uri").toString().trimmed().isEmpty()
+        ? params.value("id").toString().trimmed()
+        : params.value("uri").toString().trimmed();
+
+    return m_workflowManager.readResource(resourceUri);
+}
+
 QJsonObject SkillHostService::handleToolsList() const
 {
-    const QJsonArray tools = m_registry.toolDefinitions();
+    QJsonArray tools = m_registry.toolDefinitions();
+    QSet<QString> toolNames;
+    for(const QJsonValue& value : tools) {
+        toolNames.insert(value.toObject().value("name").toString());
+    }
+
+    const QJsonArray pipelineTools = m_registry.analysisPipelineToolDefinitions();
+    for(const QJsonValue& value : pipelineTools) {
+        const QJsonObject tool = value.toObject();
+        const QString toolName = tool.value("name").toString();
+        if(!toolNames.contains(toolName)) {
+            tools.append(tool);
+            toolNames.insert(toolName);
+        }
+    }
+
+    const QJsonArray workflowTools = m_workflowManager.toolDefinitions();
+    for(const QJsonValue& value : workflowTools) {
+        const QJsonObject tool = value.toObject();
+        const QString toolName = tool.value("name").toString();
+        if(!toolNames.contains(toolName)) {
+            tools.append(tool);
+            toolNames.insert(toolName);
+        }
+    }
+
+    const QJsonObject workflowLoadTool = workflowLoadToolDefinition();
+    if(!toolNames.contains(workflowLoadTool.value("name").toString())) {
+        tools.append(workflowLoadTool);
+        toolNames.insert(workflowLoadTool.value("name").toString());
+    }
+
+    const QJsonObject workflowSaveTool = workflowSaveToolDefinition();
+    if(!toolNames.contains(workflowSaveTool.value("name").toString())) {
+        tools.append(workflowSaveTool);
+        toolNames.insert(workflowSaveTool.value("name").toString());
+    }
+
     return QJsonObject{
         {"tool_name", "tools/list"},
         {"message", QString("Extension host tools: %1").arg(tools.size())},
@@ -182,27 +325,141 @@ QJsonObject SkillHostService::handleToolsList() const
     };
 }
 
-QJsonObject SkillHostService::handleToolCall(const QJsonObject& params) const
+QJsonObject SkillHostService::handleToolCall(const QJsonObject& params)
 {
     const QString toolName = params.value("name").toString();
     const QJsonObject arguments = params.value("arguments").toObject();
 
+    if(toolName == "studio.workflow.load") {
+        const QString filePath = arguments.value("file").toString().trimmed();
+        if(filePath.isEmpty()) {
+            return QJsonObject{
+                {"tool_name", toolName},
+                {"status", "error"},
+                {"message", "Workflow load requires a non-empty `file` argument."}
+            };
+        }
+
+        try {
+            m_workflowManager.loadAnalysisFile(filePath);
+            return QJsonObject{
+                {"tool_name", toolName},
+                {"status", "ok"},
+                {"message", QString("Activated workflow graph from %1.").arg(QFileInfo(filePath).fileName())},
+                {"source_file", filePath},
+                {"graph_resource_uri", m_workflowManager.activeGraphResourceUri()},
+                {"graph", m_workflowManager.activeGraph().toJson()}
+            };
+        } catch(const std::exception& error) {
+            return QJsonObject{
+                {"tool_name", toolName},
+                {"status", "error"},
+                {"source_file", filePath},
+                {"message", QString::fromUtf8(error.what())}
+            };
+        }
+    }
+
+    if(toolName == "studio.workflow.save") {
+        const QString filePath = arguments.value("file").toString().trimmed();
+        try {
+            m_workflowManager.saveAnalysisFile(filePath);
+            return QJsonObject{
+                {"tool_name", toolName},
+                {"status", "ok"},
+                {"message", QString("Saved workflow graph to %1.")
+                                .arg(QFileInfo(m_workflowManager.activeGraphSourceFile()).fileName())},
+                {"source_file", m_workflowManager.activeGraphSourceFile()},
+                {"graph_resource_uri", m_workflowManager.activeGraphResourceUri()},
+                {"graph", m_workflowManager.activeGraph().toJson()}
+            };
+        } catch(const std::exception& error) {
+            return QJsonObject{
+                {"tool_name", toolName},
+                {"status", "error"},
+                {"source_file", filePath},
+                {"message", QString::fromUtf8(error.what())}
+            };
+        }
+    }
+
+    if(m_workflowManager.canHandleTool(toolName)) {
+        try {
+            return m_workflowManager.appendNodeAndExecute(toolName, arguments);
+        } catch(const std::exception& error) {
+            return QJsonObject{
+                {"tool_name", toolName},
+                {"status", "error"},
+                {"message", QString::fromUtf8(error.what())}
+            };
+        }
+    }
+
     if(toolName == "dummy3d.set_opacity") {
-        const double opacity = arguments.value("opacity").toDouble(1.0);
+        const double opacity = std::max(0.0, std::min(1.0, arguments.value("opacity").toDouble(1.0)));
+
+        QJsonArray updatedSessions;
+        for(auto it = m_viewSessions.begin(); it != m_viewSessions.end(); ++it) {
+            QJsonObject session = it.value();
+            if(session.value("widget_type").toString() == QLatin1String("inspect_3d_surface")) {
+                QJsonObject state = session.value("state").toObject();
+                state.insert(QStringLiteral("opacity"), opacity);
+                session.insert(QStringLiteral("state"), state);
+                it.value() = session;
+                updatedSessions.append(QJsonObject{
+                    {"session_id", it.key()},
+                    {"provider_id", session.value("provider_id").toString()},
+                    {"opacity", opacity}
+                });
+            }
+        }
+
         return QJsonObject{
             {"tool_name", toolName},
             {"status", "ok"},
-            {"message", QString("Dummy 3D extension opacity set to %1.").arg(QString::number(opacity, 'f', 2))},
-            {"opacity", opacity}
+            {"message", updatedSessions.isEmpty()
+                ? QString("No 3D scene session is currently open; opacity %1 will apply to the next session.")
+                      .arg(QString::number(opacity, 'f', 2))
+                : QString("Set opacity to %1 across %2 active 3D scene session(s).")
+                      .arg(QString::number(opacity, 'f', 2))
+                      .arg(updatedSessions.size())},
+            {"opacity", opacity},
+            {"updated_sessions", updatedSessions}
         };
     }
 
     if(toolName == "fiffbrowser.reveal_active_state") {
         Q_UNUSED(arguments)
+
+        QJsonArray browserSessions;
+        for(auto it = m_viewSessions.constBegin(); it != m_viewSessions.constEnd(); ++it) {
+            const QJsonObject session = it.value();
+            if(session.value("extension_id").toString() == QLatin1String("fiff-browser-extension")) {
+                browserSessions.append(QJsonObject{
+                    {"session_id", it.key()},
+                    {"file", session.value("file").toString()},
+                    {"provider_id", session.value("provider_id").toString()},
+                    {"state", session.value("state").toObject()}
+                });
+            }
+        }
+
+        if(browserSessions.isEmpty()) {
+            return QJsonObject{
+                {"tool_name", toolName},
+                {"status", "ok"},
+                {"message", "No FIFF browser session is currently open."},
+                {"session_count", 0},
+                {"sessions", QJsonArray{}}
+            };
+        }
+
         return QJsonObject{
             {"tool_name", toolName},
             {"status", "ok"},
-            {"message", "FIFF browser extension is ready to expose the active browser session state through the hosted view."}
+            {"message", QString("Revealed state for %1 active FIFF browser session(s).").arg(browserSessions.size())},
+            {"session_count", browserSessions.size()},
+            {"sessions", browserSessions}
         };
     }
 

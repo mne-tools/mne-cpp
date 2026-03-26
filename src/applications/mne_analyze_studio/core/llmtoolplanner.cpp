@@ -62,6 +62,14 @@ QString formatToolContracts(const QJsonArray& toolDefinitions)
         const QJsonObject tool = value.toObject();
         const QString name = tool.value("name").toString();
         const QString description = tool.value("description").toString();
+        const QString capabilityId = tool.value("capability_id").toString().trimmed();
+        const QString capabilityKind = tool.value("capability_kind").toString().trimmed();
+        const QString capabilitySource = tool.value("capability_source_display_name").toString().trimmed();
+        const QString skillId = tool.value("skill_id").toString().trimmed();
+        const QString pipelineId = tool.value("pipeline_id").toString().trimmed();
+        const QJsonArray aliases = tool.value("capability_aliases").toArray();
+        const QJsonArray lookupAliases = tool.value("capability_lookup_aliases").toArray();
+        const QJsonArray sharedAliases = tool.value("capability_shared_aliases").toArray();
         const QJsonObject inputSchema = tool.value("input_schema").toObject();
         const QJsonObject outputSchema = tool.value("result_schema").toObject();
         const QJsonObject properties = inputSchema.value("properties").toObject();
@@ -72,6 +80,10 @@ QString formatToolContracts(const QJsonArray& toolDefinitions)
         for(auto it = properties.constBegin(); it != properties.constEnd(); ++it) {
             const QJsonObject property = it.value().toObject();
             QString part = QString("%1:%2").arg(it.key(), property.value("type").toString("string"));
+            const QString sectionName = property.value("x_workflow_section").toString().trimmed();
+            if(!sectionName.isEmpty()) {
+                part += QString(" section=%1").arg(sectionName);
+            }
             if(property.contains("default")) {
                 part += QString(" default=%1").arg(jsonValueToCompactString(property.value("default")));
             }
@@ -98,9 +110,60 @@ QString formatToolContracts(const QJsonArray& toolDefinitions)
             requiredFields << requiredValue.toString();
         }
 
-        lines << QString("%1 | %2 | required: %3 | input: %4 | output: %5")
+        QStringList aliasValues;
+        for(const QJsonValue& aliasValue : aliases) {
+            const QString alias = aliasValue.toString().trimmed();
+            if(!alias.isEmpty()) {
+                aliasValues << alias;
+            }
+        }
+
+        QStringList lookupAliasValues;
+        for(const QJsonValue& aliasValue : lookupAliases) {
+            const QString alias = aliasValue.toString().trimmed();
+            if(!alias.isEmpty()) {
+                lookupAliasValues << alias;
+            }
+        }
+
+        QStringList sharedAliasValues;
+        for(const QJsonValue& aliasValue : sharedAliases) {
+            const QString alias = aliasValue.toString().trimmed();
+            if(!alias.isEmpty()) {
+                sharedAliasValues << alias;
+            }
+        }
+
+        QStringList capabilityParts;
+        if(!capabilitySource.isEmpty()) {
+            capabilityParts << QString("source=%1").arg(capabilitySource);
+        }
+        if(!capabilityKind.isEmpty()) {
+            capabilityParts << QString("kind=%1").arg(capabilityKind);
+        }
+        if(!capabilityId.isEmpty()) {
+            capabilityParts << QString("id=%1").arg(capabilityId);
+        }
+        if(!skillId.isEmpty()) {
+            capabilityParts << QString("skill=%1").arg(skillId);
+        }
+        if(!pipelineId.isEmpty()) {
+            capabilityParts << QString("pipeline=%1").arg(pipelineId);
+        }
+        if(!aliasValues.isEmpty()) {
+            capabilityParts << QString("aliases=%1").arg(aliasValues.join(", "));
+        }
+        if(!lookupAliasValues.isEmpty()) {
+            capabilityParts << QString("lookup_aliases=%1").arg(lookupAliasValues.join(", "));
+        }
+        if(!sharedAliasValues.isEmpty()) {
+            capabilityParts << QString("shared_aliases=%1").arg(sharedAliasValues.join(", "));
+        }
+
+        lines << QString("%1 | %2 | capability: %3 | required: %4 | input: %5 | output: %6")
                      .arg(name,
                           description,
+                          capabilityParts.isEmpty() ? QString("none") : capabilityParts.join("; "),
                           requiredFields.isEmpty() ? QString("none") : requiredFields.join(", "),
                           propertyParts.isEmpty() ? QString("none") : propertyParts.join("; "),
                           resultParts.isEmpty() ? QString("none") : resultParts.join("; "));
@@ -270,8 +333,13 @@ LlmPlanResult LlmToolPlanner::plan(const QString& userCommand,
         "Respect each tool's input_schema, especially required fields, defaults, enums, and numeric bounds. "
         "Use result_schema to understand which fields a tool returns and how later steps may reference them. "
         "Use placeholders like ${last_peak_sample} only when a previous step will produce that field. "
+        "Write a detailed, conversational `summary` that explains the plan to a neuroscientist: "
+        "what the plan will do, why those tools were chosen, what the user should expect to see, "
+        "and any important parameter choices (e.g. filter cutoffs, window sizes). "
+        "For each step, write a short `description` sentence (1-2 sentences) that narrates what that specific "
+        "step does in plain language — what data it operates on, what it produces, and why. "
         "Output format: "
-        "{\"summary\":\"...\",\"steps\":[{\"tool_name\":\"...\",\"arguments\":{}}]}.";
+        "{\"summary\":\"...\",\"steps\":[{\"tool_name\":\"...\",\"description\":\"...\",\"arguments\":{}}]}.";
 
     const QJsonObject userPayload{
         {"request", userCommand},
@@ -292,9 +360,10 @@ LlmPlanResult LlmToolPlanner::plan(const QString& userCommand,
                        {"additionalProperties", false},
                        {"properties", QJsonObject{
                             {"tool_name", QJsonObject{{"type", "string"}}},
+                            {"description", QJsonObject{{"type", "string"}}},
                             {"arguments", QJsonObject{{"type", "object"}}}
                         }},
-                       {"required", QJsonArray{"tool_name", "arguments"}}
+                       {"required", QJsonArray{"tool_name", "description", "arguments"}}
                    }}
               }}
          }},
@@ -429,6 +498,7 @@ LlmPlanResult LlmToolPlanner::plan(const QString& userCommand,
 
         const QString arguments = QString::fromUtf8(QJsonDocument(step.value("arguments").toObject()).toJson(QJsonDocument::Compact));
         result.plannedCommands << QString("tools.call %1 %2").arg(toolName, arguments);
+        result.plannedStepDescriptions << step.value("description").toString();
     }
 
     result.success = !result.plannedCommands.isEmpty();

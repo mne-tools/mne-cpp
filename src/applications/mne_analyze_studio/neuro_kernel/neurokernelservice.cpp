@@ -15,6 +15,7 @@
 #include <fiff/fiff_raw_data.h>
 
 #include <jsonrpcmessage.h>
+#include <capabilityutils.h>
 
 #include <dsp/welch_psd.h>
 
@@ -536,10 +537,58 @@ QJsonObject NeuroKernelService::handleToolCall(const QJsonObject& params) const
     }
 
     if(toolName == "neurokernel.execute") {
+        const QString command = arguments.value("command").toString().trimmed();
+
+        if(command.isEmpty() || command.compare(QLatin1String("help"), Qt::CaseInsensitive) == 0) {
+            QJsonArray toolNames;
+            for(const QJsonValue& tool : toolDefinitions()) {
+                toolNames.append(tool.toObject().value("name").toString());
+            }
+            return QJsonObject{
+                {"status", "ok"},
+                {"tool_name", toolName},
+                {"command", command.isEmpty() ? "help" : command},
+                {"message", QString("Neuro-Kernel exposes %1 tools. Use tools/list for full definitions.")
+                                .arg(toolNames.size())},
+                {"available_tools", toolNames},
+                {"plane", "data"},
+                {"transport", "local_socket"},
+                {"protocol", "mcp-over-json-rpc-2.0"}
+            };
+        }
+
+        if(command.compare(QLatin1String("status"), Qt::CaseInsensitive) == 0) {
+            return QJsonObject{
+                {"status", "ok"},
+                {"tool_name", toolName},
+                {"command", command},
+                {"message", "Neuro-Kernel is running."},
+                {"kernel_version", "2.0.0"},
+                {"tool_count", static_cast<int>(toolDefinitions().size())},
+                {"plane", "data"},
+                {"transport", "local_socket"},
+                {"protocol", "mcp-over-json-rpc-2.0"}
+            };
+        }
+
+        if(command.compare(QLatin1String("version"), Qt::CaseInsensitive) == 0) {
+            return QJsonObject{
+                {"status", "ok"},
+                {"tool_name", toolName},
+                {"command", command},
+                {"message", "Neuro-Kernel version 2.0.0."},
+                {"version", "2.0.0"},
+                {"plane", "data"},
+                {"transport", "local_socket"},
+                {"protocol", "mcp-over-json-rpc-2.0"}
+            };
+        }
+
         return QJsonObject{
-            {"status", "ok"},
+            {"status", "error"},
             {"tool_name", toolName},
-            {"message", QString("Neuro-Kernel executed command: %1").arg(arguments.value("command").toString())},
+            {"command", command},
+            {"message", QString("Unknown Neuro-Kernel command `%1`. Run `help` for available commands.").arg(command)},
             {"plane", "data"},
             {"transport", "local_socket"},
             {"protocol", "mcp-over-json-rpc-2.0"}
@@ -567,7 +616,7 @@ QJsonObject NeuroKernelService::handleToolsList() const
 
 QJsonArray NeuroKernelService::toolDefinitions() const
 {
-    return QJsonArray{
+    const QJsonArray rawTools{
         QJsonObject{
             {"name", "neurokernel.execute"},
             {"description", "Execute a generic neuro-kernel command string."},
@@ -703,8 +752,15 @@ QJsonArray NeuroKernelService::toolDefinitions() const
                  {"match", stringSchema("Channel Match")},
                  {"peak_sample", integerSchema("Peak Sample", 0, 1000000000, 0)},
                  {"peak_channel", stringSchema("Peak Channel")},
-                 {"peak_abs", numberSchema("Peak Absolute")}
+                {"peak_abs", numberSchema("Peak Absolute")}
              }, QJsonArray{"status", "tool_name", "message", "peak_sample", "peak_channel", "peak_abs"})}
         }
     };
+
+    QJsonArray tools;
+    for(const QJsonValue& value : rawTools) {
+        tools.append(annotateCapabilityMetadata(value.toObject()));
+    }
+
+    return tools;
 }

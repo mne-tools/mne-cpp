@@ -9,7 +9,7 @@
  */
 
 #include "ibuffer.h"
-#include "imcpneuroskill.h"
+#include "iskilloperator.h"
 
 using namespace MNEANALYZESTUDIO;
 
@@ -20,9 +20,9 @@ IBuffer::IBuffer(QObject* parent)
 
 IBuffer::~IBuffer() = default;
 
-IMcpNeuroSkill::IMcpNeuroSkill(QObject* parent)
+ISkillOperator::ISkillOperator(QObject* parent)
 : QObject(parent)
 {
 }
 
-IMcpNeuroSkill::~IMcpNeuroSkill() = default;
+ISkillOperator::~ISkillOperator() = default;

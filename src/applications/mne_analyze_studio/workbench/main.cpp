@@ -12,14 +12,18 @@
 
 #include <QApplication>
 #include <QSocketNotifier>
+#include <QtGlobal>
 
 #include <csignal>
 
+#ifdef Q_OS_UNIX
 #include <unistd.h>
+#endif
 
 namespace
 {
 
+#ifdef Q_OS_UNIX
 int g_signalPipe[2] = {-1, -1};
 
 void handleUnixSignal(int signalValue)
@@ -48,6 +52,11 @@ void installUnixSignalHandlers(QApplication& application)
     std::signal(SIGINT, handleUnixSignal);
     std::signal(SIGTERM, handleUnixSignal);
 }
+#else
+void installUnixSignalHandlers(QApplication&)
+{
+}
+#endif
 
 }
 

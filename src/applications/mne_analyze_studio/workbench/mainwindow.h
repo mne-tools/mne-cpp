@@ -64,6 +64,7 @@ class QTabWidget;
 class QStackedWidget;
 class QTreeWidget;
 class QTreeWidgetItem;
+class QProcess;
 
 namespace MNEANALYZESTUDIO
 {
@@ -76,6 +77,7 @@ class EditorTabWidget;
 class ExtensionHostedViewWidget;
 class IRawDataView;
 class ViewProviderRegistry;
+class WorkflowMiniMapWidget;
 
 /**
  * @brief Main workbench window coordinating workspace, views, output panels, and agent chat.
@@ -102,6 +104,7 @@ private slots:
     void handleAgentConnectionProfileSelected(const QString& profileName);
     void handleAgentConnectionModeSelected(const QString& mode);
     void handleAgentConnectionModelSelected(const QString& model);
+    void handleAgentPlannerSafetyLevelSelected(const QString& level);
 
 private:
     IRawDataView* activeRawDataView() const;
@@ -127,6 +130,8 @@ private:
                                             const QJsonObject& pipelineInputs) const;
     QString buildToolCallCommand(const QString& toolName, const QJsonObject& arguments) const;
     QJsonObject pipelineRunArtifact(const QString& runId) const;
+    QString validateAnalysisPipelineContract(const QJsonObject& pipeline,
+                                            const QJsonObject& pipelineInputs) const;
     QString rerunPipelineStepCommand(const QString& runId,
                                     int stepNumber,
                                     const QString& mode,
@@ -146,6 +151,7 @@ private:
     QJsonArray extensionSettingsContracts() const;
     QJsonArray extensionSettingsState() const;
     QJsonArray analysisPipelineContracts() const;
+    QJsonArray analysisPipelineToolDefinitions() const;
     QJsonArray extensionSettingsToolDefinitions() const;
     QJsonObject resolveExtensionSettingsTool(const QString& toolName) const;
     QVariant extensionSettingValue(const QString& extensionId,
@@ -165,6 +171,8 @@ private:
     void requestExtensionHostState();
     void requestExtensionHostReload();
     QJsonArray availableToolDefinitions() const;
+    QJsonObject plannerAnnotatedToolDefinition(const QJsonObject& tool) const;
+    QJsonArray plannerAnnotatedToolDefinitions() const;
     QJsonObject plannerSafetyMetadata(const QString& toolName) const;
     QJsonObject plannerReadinessMetadata(const QString& toolName) const;
     QJsonObject plannerExecutionMetadata(const QString& toolName) const;
@@ -203,6 +211,36 @@ private:
     void requestExtensionViewOpen(const QString& filePath, const QJsonObject& dispatch);
     void finalizeExtensionViewOpen(const QString& filePath, const QJsonObject& sessionDescriptor);
     void sendExtensionViewCommand(const QString& sessionId, const QString& commandName, const QJsonObject& arguments);
+    void requestWorkflowLoad(const QString& filePath);
+    void requestActiveWorkflowGraph();
+    void adoptWorkflowGraph(const QJsonObject& result, const QString& fallbackFilePath = QString());
+    void openWorkflowCenterView(bool focusTab = true);
+    void refreshWorkflowCenterView();
+    bool isWorkflowCenterViewOpen() const;
+    void refreshWorkflowGraphDockingUi();
+    QJsonArray workflowOperatorToolDefinitions() const;
+    QJsonObject workflowOperatorToolDefinition(const QString& toolName) const;
+    QJsonObject defaultArgumentsForWorkflowTool(const QString& toolName) const;
+    QString selectedWorkflowArtifactUid() const;
+    QString resolveStudioCompanionExecutable(const QString& executableName) const;
+    void ensureBackendConnection(QLocalSocket* socket,
+                                 const QString& socketName,
+                                 const QString& executableName,
+                                 QProcess* process,
+                                 const QString& displayName);
+    void shutdownManagedBackends();
+    void shutdownManagedBackend(QLocalSocket* socket,
+                                QProcess* process,
+                                const QString& displayName);
+    void setWorkflowStatusBanner(const QString& message, const QString& severity = QStringLiteral("info"));
+    void refreshWorkflowStatusBanner();
+    void rebuildWorkflowNavigatorUi();
+    void updateSelectedWorkflowItem(QTreeWidgetItem* item);
+    void appendWorkflowStep();
+    void saveActiveWorkflowGraph();
+    void openSelectedWorkflowFile();
+    QString openableWorkflowPathForItem(QTreeWidgetItem* item) const;
+    bool isExtensionHostTool(const QString& toolName) const;
     void rebuildSkillsExplorer();
     void updateSelectedSkillTool(QTreeWidgetItem* item);
     void runSelectedSkillTool();
@@ -246,9 +284,29 @@ private:
     AgentChatDockWidget* m_agentChatDock;
     QWidget* m_activityBar;
     QToolButton* m_explorerButton;
+    QToolButton* m_workflowButton;
     QToolButton* m_skillsButton;
     QToolButton* m_extensionsButton;
     QTreeWidget* m_workspaceExplorer;
+    QTreeWidget* m_workflowExplorer;
+    QWidget* m_workflowPage;
+    QLabel* m_workflowStatusBanner;
+    QLabel* m_workflowMiniMapDockStateLabel;
+    QPushButton* m_workflowOpenGraphButton;
+    QWidget* m_workflowCenterView;
+    QLabel* m_workflowCenterSummaryLabel;
+    WorkflowMiniMapWidget* m_workflowCenterMiniMap;
+    QPlainTextEdit* m_workflowCenterDetailsView;
+    QPushButton* m_workflowCenterOpenSourceButton;
+    QPushButton* m_workflowCenterDockButton;
+    QPushButton* m_workflowCenterAddStepButton;
+    QPushButton* m_workflowCenterSaveButton;
+    WorkflowMiniMapWidget* m_workflowMiniMap;
+    QPlainTextEdit* m_workflowDetailsView;
+    QPushButton* m_workflowAddStepButton;
+    QPushButton* m_workflowSaveButton;
+    QPushButton* m_workflowOpenFileButton;
+    QPushButton* m_workflowRefreshButton;
     QTreeWidget* m_skillsExplorer;
     QWidget* m_skillsPage;
     QPlainTextEdit* m_skillDetailsView;
@@ -282,6 +340,8 @@ private:
     QListWidgetItem* m_activeStateItem;
     QLocalSocket* m_kernelSocket;
     QLocalSocket* m_extensionSocket;
+    QProcess* m_kernelProcess;
+    QProcess* m_extensionHostProcess;
     QString m_lastToolName;
     QJsonObject m_lastToolResult;
     QString m_resultsCurrentToolName;
@@ -302,13 +362,21 @@ private:
     int m_activePipelineTotalSteps;
     QString m_activePipelineLastStatus;
     bool m_isAdvancingPipeline;
+    bool m_isShuttingDown;
     QJsonArray m_cachedKernelToolDefinitions;
     QJsonArray m_cachedExtensionToolDefinitions;
     QJsonArray m_cachedExtensionResources;
     QJsonArray m_cachedExtensionViewSessions;
     QJsonObject m_lastExtensionReloadResult;
+    QString m_plannerSafetyLevel; ///< "auto" | "confirm" | "safe" — global override for plannerExecutionMetadata
+    QString m_activeWorkflowFilePath;
+    QJsonObject m_activeWorkflowGraph;
+    QString m_workflowStatusMessage;
+    QString m_workflowStatusSeverity;
+    bool m_activeWorkflowHasUnsavedChanges;
     QHash<QString, QJsonObject> m_pendingExtensionViewOpens;
     QHash<QString, QString> m_pendingExtensionViewFiles;
+    QHash<QString, QString> m_pendingWorkflowLoads;
     QHash<QString, QWidget*> m_extensionViewWidgetsBySessionId;
     LlmToolPlanner m_llmPlanner;
     SceneContextRegistry m_sceneRegistry;

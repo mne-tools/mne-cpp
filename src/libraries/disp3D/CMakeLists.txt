@@ -182,7 +182,14 @@ if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
 
-install(TARGETS ${PROJECT_NAME} ${MNE_CPP_EXPORT_SET}
+set(_mne_disp3d_export_args ${MNE_CPP_EXPORT_SET})
+if(WIN32 AND NOT BUILD_SHARED_LIBS)
+    # Static Qt shaders create an internal helper target on MSVC that cannot
+    # participate in the exported install target set.
+    set(_mne_disp3d_export_args)
+endif()
+
+install(TARGETS ${PROJECT_NAME} ${_mne_disp3d_export_args}
     RUNTIME DESTINATION bin COMPONENT runtime
     LIBRARY DESTINATION lib COMPONENT runtime
     ARCHIVE DESTINATION lib COMPONENT sdk
