@@ -3,6 +3,15 @@
 cmake_minimum_required(VERSION 3.15)
 project(mne_analyze_studio LANGUAGES CXX)
 
+# WASM (Emscripten) does not support traditional shared libraries: side-module
+# .so files embed their static dependencies which causes duplicate-symbol errors
+# at final link time. Build everything as STATIC when targeting WASM.
+if(EMSCRIPTEN OR WASM)
+    set(MNE_ANALYZE_STUDIO_LIB_TYPE STATIC)
+else()
+    set(MNE_ANALYZE_STUDIO_LIB_TYPE SHARED)
+endif()
+
 function(mne_analyze_studio_configure_library_target target_name)
     set(_studio_library_output_directory "${BINARY_OUTPUT_DIRECTORY}/lib")
 

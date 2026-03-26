@@ -11,7 +11,7 @@ set(QT_REQUIRED_COMPONENTS Core Concurrent Network Widgets)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-add_library(mne_analyze_studio_fiff_browser_extension_widgets SHARED
+add_library(mne_analyze_studio_fiff_browser_extension_widgets ${MNE_ANALYZE_STUDIO_LIB_TYPE}
     mnebrowserrawdelegate.cpp
     rawdatabrowserwidget.cpp
     mnebrowserrawdelegate.h
@@ -30,6 +30,10 @@ target_include_directories(mne_analyze_studio_fiff_browser_extension_widgets PUB
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../mne_browse
 )
+
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(mne_analyze_studio_fiff_browser_extension_widgets PRIVATE STATICBUILD)
+endif()
 
 target_link_libraries(mne_analyze_studio_fiff_browser_extension_widgets PUBLIC
     ${QT_REQUIRED_COMPONENT_LIBS}

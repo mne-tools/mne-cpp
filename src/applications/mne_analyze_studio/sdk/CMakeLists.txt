@@ -7,7 +7,7 @@ set(QT_REQUIRED_COMPONENTS Core)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME} ${MNE_ANALYZE_STUDIO_LIB_TYPE}
     extensionviewfactoryregistry.cpp
     extensionviewfactoryregistry.h
     iextensionviewfactory.h
