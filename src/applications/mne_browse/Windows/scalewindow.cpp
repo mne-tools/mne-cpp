@@ -66,7 +66,6 @@ ScaleWindow::ScaleWindow(QWidget *parent) :
 
 ScaleWindow::~ScaleWindow()
 {
-    delete ui;
 }
 
 
@@ -205,8 +204,6 @@ void ScaleWindow::hideSpinBoxes(FiffInfo::SPtr& pCurrentFiffInfo)
 
 void ScaleWindow::scaleAllChannels(double scaleValue)
 {
-    qDebug()<<scaleValue;
-
     scaleValue = (scaleValue - 1)*-4;
 
     ui->m_doubleSpinBox_MEG_grad->setValue((scaleValue*ui->m_doubleSpinBox_MEG_grad->singleStep()) + ui->m_doubleSpinBox_MEG_grad->value());

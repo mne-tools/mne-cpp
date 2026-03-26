@@ -253,8 +253,6 @@ void NoiseReductionWindow::checkProjStatusChanged(bool status)
 
 void NoiseReductionWindow::checkCompStatusChanged(const QString & compName)
 {
-    qDebug()<<compName;
-
     bool currentState = false;
 
     for(int i = 0; i < m_qListCompCheckBox.size(); ++i)

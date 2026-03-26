@@ -105,7 +105,6 @@ AverageWindow::AverageWindow(QWidget *parent)
 
 AverageWindow::~AverageWindow()
 {
-    delete ui;
 }
 
 
@@ -269,7 +268,6 @@ void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QIt
 {
     Q_UNUSED(deselected);
 
-    qDebug()<<"AverageWindow::onSelectionChanged";
     //Get current items from the average scene
     QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
 

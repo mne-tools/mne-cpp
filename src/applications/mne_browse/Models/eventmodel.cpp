@@ -85,7 +85,6 @@ EventModel::EventModel(QObject *parent)
     m_eventTypeColor[998] = QColor(Qt::darkBlue);
     m_eventTypeColor[999] = QColor(Qt::darkCyan);
 
-    //m_eventTypeList<<"1"<<"2"<<"3"<<"4"<<"4"<<"5"<<"32"<<"998"<<"999";
 }
 
 
@@ -388,13 +387,11 @@ bool EventModel::loadEventData(QFile& qFile)
     }
 
     if(!readSuccess) {
-        qDebug() << "Error while reading events.";
+        qWarning() << "Error while reading events.";
         return false;
     }
 
-    //std::cout << events << endl;
-
-    qDebug() << QString("Events read from %1").arg(qFile.fileName());
+    qInfo() << QString("Events read from %1").arg(qFile.fileName());
 
     //set loaded fiff event data
     for(int i = 0; i < events.rows(); i++) {
@@ -549,7 +546,7 @@ void EventModel::clearModel()
 
     endResetModel();
 
-    qDebug("EventModel cleared.");
+    qInfo("EventModel cleared.");
 }
 
 

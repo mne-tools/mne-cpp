@@ -53,8 +53,6 @@
 #include "../Utils/types.h"
 #include "../Utils/rawsettings.h"
 
-#include "../Windows/scalewindow.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -110,9 +108,6 @@ namespace MNEBROWSE
 // DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
 
-class ScaleWindow;
-
-
 //=============================================================================================================
 /**
  * DECLARE CLASS RawDelegate
@@ -149,11 +144,18 @@ public:
      */
     void setScaleMap(const QMap<QString, double> &scaleMap);
 
+    void setActivateEvents(bool activate)         { m_bActivateEvents = activate; }
+    void setShowSelectedEventsOnly(bool showOnly) { m_bShowSelectedEventsOnly = showOnly; }
+    void setRemoveDC(bool removeDC)               { m_bRemoveDC = removeDC; }
+    bool isRemoveDC() const                       { return m_bRemoveDC; }
+    int  defaultPlotHeight() const                { return m_iDefaultPlotHeight; }
+
+private:
     QMap<QString,double> m_scaleMap;        /**< Map with all channel types and their current scaling value.*/
 
-    // Plots settings
+    // Plot settings
     int         m_iDefaultPlotHeight;       /**< The height of the plot. */
-    bool        m_bShowSelectedEventsOnly;  /**< When true all events are plotted otherwise only plot selected event. */
+    bool        m_bShowSelectedEventsOnly;  /**< When true only selected events are plotted. */
     bool        m_bActivateEvents;          /**< Flag for plotting events. */
     bool        m_bRemoveDC;                /**< Flag for DC removal. */
 
@@ -161,8 +163,6 @@ public:
     double      m_dMaxValue;                /**< Maximum value of the data to plot. */
     double      m_dScaleY;                  /**< Maximum amplitude of plot (max is m_dPlotHeight/2). */
     double      m_dDx;                      /**< pixel difference to the next sample. */
-
-private:
     //=========================================================================================================
     /**
      * createPlotPath creates the QPointer path for the data plot.
@@ -198,7 +198,6 @@ private:
     EventModel*     m_pEventModel;           /**< Pointer to the event model. */
     QTableView*     m_pEventView;            /**< Pointer to the event view. */
     QTableView*     m_pRawView;              /**< Pointer to the raw view. */
-    ScaleWindow*    m_pScaleWindow;          /**< Pointer to the scale window. */
 };
 
 } // NAMESPACE

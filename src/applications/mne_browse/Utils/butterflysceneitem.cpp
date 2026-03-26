@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "butterflysceneitem.h"
+#include "rawsettings.h"
 
 
 //*************************************************************************************************************
@@ -63,14 +64,14 @@ ButterflySceneItem::ButterflySceneItem(QString setName, int setKind, int setUnit
 , m_pFiffInfo(Q_NULLPTR)
 {
     //Init m_scaleMap
-    m_scaleMap["MEG_grad"] = 400 * 1e-15 * 100; //*100 because data in fiff files is stored as fT/m not fT/cm
-    m_scaleMap["MEG_mag"] = 1.2 * 1e-12;
-    m_scaleMap["MEG_EEG"] = 30 * 1e-06;
-    m_scaleMap["MEG_EOG"] = 150 * 1e-06;
-    m_scaleMap["MEG_EMG"] = 1 * 1e-03;
-    m_scaleMap["MEG_ECG"] = 1 * 1e-03;
-    m_scaleMap["MEG_MISC"] = 1 * 1;
-    m_scaleMap["MEG_STIM"] = 5 * 1;
+    m_scaleMap["MEG_grad"] = DELEGATE_SCALE_MEG_GRAD;
+    m_scaleMap["MEG_mag"]  = DELEGATE_SCALE_MEG_MAG;
+    m_scaleMap["MEG_EEG"]  = DELEGATE_SCALE_EEG;
+    m_scaleMap["MEG_EOG"]  = DELEGATE_SCALE_EOG;
+    m_scaleMap["MEG_EMG"]  = DELEGATE_SCALE_EMG;
+    m_scaleMap["MEG_ECG"]  = DELEGATE_SCALE_ECG;
+    m_scaleMap["MEG_MISC"] = DELEGATE_SCALE_MISC;
+    m_scaleMap["MEG_STIM"] = DELEGATE_SCALE_STIM;
 }
 
 

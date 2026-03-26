@@ -51,6 +51,8 @@
 
 #include <QWidget>
 
+#include <memory>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -87,7 +89,7 @@ public:
     ~AboutWindow();
 
 private:
-    Ui::AboutWindow *ui;        /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::AboutWindow> ui;                    /**< Pointer to the qt designer generated ui class.*/
 };
 
 } // NAMESPACE MNEBROWSE

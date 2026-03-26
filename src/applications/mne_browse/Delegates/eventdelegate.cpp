@@ -91,8 +91,7 @@ QWidget *EventDelegate::createEditor(QWidget *parent,
         }
     }
 
-    QWidget *returnWidget = new QWidget();
-    return returnWidget;
+    return new QWidget(parent);
 }
 
 
@@ -117,8 +116,8 @@ void EventDelegate::setEditorData(QWidget *editor, const QModelIndex &index) con
 
         case 2: {
             int value = index.model()->data(index, Qt::DisplayRole).toInt();
-            QComboBox *spinBox = static_cast<QComboBox*>(editor);
-            spinBox->setCurrentText(QString().number(value));
+            QComboBox *comboBox = static_cast<QComboBox*>(editor);
+            comboBox->setCurrentText(QString().number(value));
             break;
         }
     }
@@ -150,8 +149,8 @@ void EventDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
         }
 
         case 2: {
-            QComboBox *spinBox = static_cast<QComboBox*>(editor);
-            QString value = spinBox->currentText();
+            QComboBox *comboBox = static_cast<QComboBox*>(editor);
+            QString value = comboBox->currentText();
 
             model->setData(index, value.toInt(), Qt::EditRole);
             break;

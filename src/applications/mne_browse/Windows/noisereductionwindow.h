@@ -55,6 +55,8 @@
 #include <QCheckBox>
 #include <QSignalMapper>
 
+#include <memory>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -166,7 +168,7 @@ private:
      */
     void remove(QLayout* layout);
 
-    Ui::NoiseReductionWindow *ui;                       /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::NoiseReductionWindow> ui;           /**< Pointer to the qt designer generated ui class.*/
 
     QList<QCheckBox*>   m_qListProjCheckBox;            /**< List of projection CheckBox. */
     QList<QCheckBox*>   m_qListCompCheckBox;            /**< List of compensator CheckBox. */

@@ -55,6 +55,8 @@
 #include <QDockWidget>
 #include <QColorDialog>
 
+#include <memory>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -163,7 +165,7 @@ private:
      */
     bool event(QEvent * event);
 
-    Ui::EventWindowDockWidget *ui;                  /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::EventWindowDockWidget> ui;          /**< Pointer to the qt designer generated ui class.*/
 
     MainWindow*         m_pMainWindow;              /**< Pointer to the parent, the MainWindow class.*/
 

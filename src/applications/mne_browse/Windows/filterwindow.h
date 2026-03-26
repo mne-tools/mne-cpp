@@ -56,6 +56,8 @@
 #include <QGraphicsScene>
 #include <QSvgGenerator>
 
+#include <memory>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -104,6 +106,23 @@ public:
      * On new file loaded.
      */
     void newFileLoaded(FiffInfo::SPtr& pFiffInfo);
+
+    //=========================================================================================================
+    /**
+     * setFrequencies configures the filter type and corner frequencies.
+     * Pass -1 for a frequency to leave it as a passthrough (e.g., only highpass: setFrequencies(1.0, -1)).
+     *
+     * @param [in] highpass  High-pass corner frequency in Hz, or -1 to skip.
+     * @param [in] lowpass   Low-pass corner frequency in Hz, or -1 to skip.
+     */
+    void setFrequencies(double highpass, double lowpass);
+
+    //=========================================================================================================
+    /**
+     * applyFilter applies the currently configured filter to the data.
+     * Also callable programmatically (e.g. from command-line option handling).
+     */
+    void applyFilter();
 
 private:
     //=========================================================================================================
@@ -160,7 +179,7 @@ private:
      */
     void updateFilterPlot();
 
-    Ui::FilterWindowDockWidget *ui;             /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::FilterWindowDockWidget> ui;         /**< Pointer to the qt designer generated ui class.*/
 
     MainWindow*         m_pMainWindow;          /**< Pointer to the parent, the MainWindow class.*/
 
@@ -169,7 +188,7 @@ private:
 
     QSettings           m_qSettings;            /**< QSettings variable used to write or read from independent application sessions.*/
 
-    FilterPlotScene*    m_pFilterPlotScene;     /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
+    std::unique_ptr<FilterPlotScene> m_pFilterPlotScene;    /**< Owns the QGraphicsScene which holds the filter plotting.*/
 
 protected slots:
     //=========================================================================================================
@@ -185,12 +204,6 @@ protected slots:
      * This function gets called whenever the filter parameters are altered by the user via the gui.
      */
     void filterParametersChanged();
-
-    //=========================================================================================================
-    /**
-     * This function applies the user defined filter to all channels.
-     */
-    void applyFilter();
 
     //=========================================================================================================
     /**

@@ -109,10 +109,6 @@ void DataMarker::mouseMoveEvent(QMouseEvent *event)
 
         if(event->scenePosition().x() > m_movableRegion.boundingRect().right())
             move(m_movableRegion.boundingRect().right()-2, y());
-
-//        qDebug()<<"globalPos"<<event->globalPos().x()<<event->globalPos().y();
-//        qDebug()<<"newPosition"<<newPosition.x()<<newPosition.y()<<newPosition.width()<<newPosition.height();
-//        qDebug()<<"m_movableRegion"<<m_movableRegion.boundingRect().x()<<m_movableRegion.boundingRect().y()<<m_movableRegion.boundingRect().width()<<m_movableRegion.boundingRect().height();
     }
 }
 
