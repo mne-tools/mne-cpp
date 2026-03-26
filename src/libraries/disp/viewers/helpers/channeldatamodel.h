@@ -150,6 +150,16 @@ public:
 
     //=========================================================================================================
     /**
+     * Set the maximum number of samples to keep in the ring buffer.
+     * When samples are appended beyond this limit, the oldest are dropped.
+     * Set to 0 (default) for unlimited storage.
+     *
+     * @param[in] n  Maximum sample count per channel, or 0 for unlimited.
+     */
+    void setMaxStoredSamples(int n);
+
+    //=========================================================================================================
+    /**
      * Mark/unmark a channel as bad.
      *
      * @param[in] channelIdx  Zero-based channel index.

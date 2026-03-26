@@ -640,25 +640,26 @@ bool MainWindow::loadRawFile(const QString& filename)
 
     m_pEventWindow->getEventModel()->clearModel();
 
-    const bool ok = rawModel()->loadFiffData(&m_qFileRaw);
+    // ── ChannelDataView path: demand-paged, opens header only (fast) ──
+    const bool ok = m_pDataWindow->loadFiffFile(filename);
     if(ok)
-        qInfo() << "Fiff data file" << filename << "loaded.";
+        qInfo() << "Fiff data file" << filename << "loaded (ChannelDataView).";
     else
         qWarning() << "ERROR loading fiff data file" << filename;
 
-    m_pDataWindow->getDataTableView()->horizontalScrollBar()->setValue(0);
-    m_pDataWindow->initMVCSettings();
+    // ── Legacy RawModel path: kept for filter/event sub-systems ──────
+    // Runs in parallel; the QTableView is hidden so the user never sees
+    // the legacy rendering but filtering and event logic still work.
+    rawModel()->loadFiffData(&m_qFileRaw);
 
     m_pEventWindow->getEventModel()->setFiffInfo(rawModel()->fiffInfo());
     m_pEventWindow->getEventModel()->setFirstLastSample(rawModel()->firstSample(),
                                                         rawModel()->lastSample());
 
-    m_pDataWindow->updateDataTableViews();
-    m_pDataWindow->getDataTableView()->resizeColumnsToContents();
-
     setWindowStatus();
 
-    m_pScaleWindow->hideSpinBoxes(rawModel()->fiffInfo());
+    if(rawModel()->fiffInfo())
+        m_pScaleWindow->hideSpinBoxes(rawModel()->fiffInfo());
 
     m_qFileRaw.close();
     return ok;

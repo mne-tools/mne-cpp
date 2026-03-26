@@ -33,6 +33,7 @@ set(SOURCES
     Models/averagemodel.cpp
     Models/rawmodel.cpp
     Models/eventmodel.cpp
+    Models/fiffblockreader.cpp
     Delegates/averagedelegate.cpp
     Delegates/rawdelegate.cpp
     Delegates/eventdelegate.cpp
@@ -61,6 +62,7 @@ set(HEADERS
     Models/averagemodel.h
     Models/rawmodel.h
     Models/eventmodel.h
+    Models/fiffblockreader.h
     Delegates/averagedelegate.h
     Delegates/rawdelegate.h
     Delegates/eventdelegate.h

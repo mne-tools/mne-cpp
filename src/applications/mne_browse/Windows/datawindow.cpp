@@ -204,15 +204,22 @@ void DataWindow::initMVCSettings()
     //------ Init data window view ------
     //-----------------------------------
 
-#if !defined(NO_QOPENGLWIDGET)
-    //Use GPU rendering
-    QSurfaceFormat currentFormat;
-    currentFormat.setSamples(10);
-    QOpenGLWidget* pGLWidget = new QOpenGLWidget();
-    pGLWidget->setFormat(currentFormat);
-    ui->m_tableView_rawTableView->setViewport(pGLWidget);
-#endif
+    // ── ChannelDataView (GPU-accelerated, demand-paged) ───────────────
+    m_pFiffReader = new FiffBlockReader(this);
+    connect(m_pFiffReader, &FiffBlockReader::blockLoaded,
+            this, &DataWindow::onBlockLoaded);
 
+    m_pChannelDataView = new DISPLIB::ChannelDataView("DataWindow", this);
+    m_pChannelDataView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    connect(m_pChannelDataView, &DISPLIB::ChannelDataView::scrollPositionChanged,
+            this, &DataWindow::onChannelViewScrollChanged);
+
+    // Insert ChannelDataView into the grid at the same slot as the legacy QTableView
+    // (row 1, col 0, rowspan 2, colspan 4) then hide the old widget.
+    ui->m_gridLayout->addWidget(m_pChannelDataView, 1, 0, 2, 4);
+    ui->m_tableView_rawTableView->hide();
+
+    // ── Legacy RawModel / QTableView (kept for filter / event sub-systems) ──
     //Set MVC model
     ui->m_tableView_rawTableView->setModel(m_pRawModel);
 
@@ -222,49 +229,91 @@ void DataWindow::initMVCSettings()
 
     //set some settings for m_pRawTableView
     ui->m_tableView_rawTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->defaultPlotHeight());
-    ui->m_tableView_rawTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
-    ui->m_tableView_rawTableView->setColumnHidden(2,true); //because we do not want to plot the mean values
+    ui->m_tableView_rawTableView->setColumnHidden(0,true);
+    ui->m_tableView_rawTableView->setColumnHidden(2,true);
     ui->m_tableView_rawTableView->resizeColumnsToContents();
 
-    //set context menu
-    ui->m_tableView_rawTableView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->m_tableView_rawTableView,&QWidget::customContextMenuRequested,
-            this,&DataWindow::customContextMenuRequested);
-
-    //activate kinetic scrolling
-    QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
-    m_pKineticScroller = QScroller::scroller(ui->m_tableView_rawTableView);
-    m_pKineticScroller->setSnapPositionsX(100,100);
-    //m_pKineticScroller->setSnapPositionsY(100,100);
-
-    //connect QScrollBar with model in order to reload data samples
+    //connect QScrollBar with model in order to reload data samples (keeps filter/event logic alive)
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(), &QScrollBar::valueChanged,
             m_pRawModel, &RawModel::updateScrollPos);
-
-    //connect selection of a channel to selection manager
-    connect(ui->m_tableView_rawTableView->selectionModel(), &QItemSelectionModel::selectionChanged,
-            this, &DataWindow::highlightChannelsInSelectionManager);
-
-    //connect selection change to update data views
-    connect(ui->m_tableView_rawTableView->selectionModel(), &QItemSelectionModel::selectionChanged,
-            this, &DataWindow::updateDataTableViews);
 
     //Set MVC in delegate
     m_pRawDelegate->setModelView(m_pMainWindow->eventWindow()->getEventModel(),
                                  m_pMainWindow->eventWindow()->getEventTableView(),
                                  ui->m_tableView_rawTableView);
+}
 
-    //Install event filter to overcome QGrabGesture and QScrollBar/QHeader problem
-    ui->m_tableView_rawTableView->horizontalScrollBar()->installEventFilter(this);
-    ui->m_tableView_rawTableView->verticalScrollBar()->installEventFilter(this);
-    ui->m_tableView_rawTableView->verticalHeader()->installEventFilter(this);
+//=============================================================================================================
 
-    //Enable gestures for the view
-    ui->m_tableView_rawTableView->grabGesture(Qt::PinchGesture);
-    ui->m_tableView_rawTableView->installEventFilter(this);
+bool DataWindow::loadFiffFile(const QString &path)
+{
+    m_pChannelDataView->clearView();
 
-    //Enable event fitlering for the viewport in order to intercept mouse events
-    ui->m_tableView_rawTableView->viewport()->installEventFilter(this);
+    if (!m_pFiffReader->open(path))
+        return false;
+
+    auto fiffInfo = m_pFiffReader->fiffInfo();
+    m_pChannelDataView->init(fiffInfo);
+
+    // Ring-buffer size: kMaxBlocks × kBlockSeconds of data
+    int blockSamples = static_cast<int>(kBlockSeconds * fiffInfo->sfreq);
+    m_pChannelDataView->model()->setMaxStoredSamples(kMaxBlocks * blockSamples);
+
+    // Scroll to start
+    m_pChannelDataView->scrollToSample(m_pFiffReader->firstSample(), false);
+
+    // Load the first block asynchronously
+    m_iNextLoadSample = m_pFiffReader->firstSample();
+    m_bLoadingBlock   = true;
+    int blockEnd = qMin(m_iNextLoadSample + blockSamples - 1, m_pFiffReader->lastSample());
+    m_pFiffReader->loadBlockAsync(m_iNextLoadSample, blockEnd);
+
+    return true;
+}
+
+//=============================================================================================================
+
+void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
+{
+    m_bLoadingBlock = false;
+
+    if (data.rows() == 0 || data.cols() == 0)
+        return;
+
+    // First block → replace; subsequent → append (ring buffer handles trimming)
+    auto *model = m_pChannelDataView->model();
+    if (model->totalSamples() == 0)
+        m_pChannelDataView->setData(data, firstSample);
+    else
+        m_pChannelDataView->addData(data);
+
+    // Advance the preload cursor
+    m_iNextLoadSample = firstSample + static_cast<int>(data.cols());
+}
+
+//=============================================================================================================
+
+void DataWindow::onChannelViewScrollChanged(int sample)
+{
+    if (m_bLoadingBlock || !m_pFiffReader || !m_pFiffReader->isOpen())
+        return;
+    if (m_iNextLoadSample > m_pFiffReader->lastSample())
+        return; // all data loaded
+
+    auto *model = m_pChannelDataView->model();
+    int bufferEnd = model->firstSample() + model->totalSamples();
+
+    // Trigger prefetch when the scroll position is within half a block of the buffer edge
+    float sfreq      = static_cast<float>(m_pFiffReader->fiffInfo()->sfreq);
+    int   halfBlock  = static_cast<int>(kBlockSeconds * sfreq * 0.5f);
+    int   triggerAt  = bufferEnd - halfBlock;
+
+    if (sample >= triggerAt) {
+        m_bLoadingBlock = true;
+        int blockSamples = static_cast<int>(kBlockSeconds * sfreq);
+        int blockEnd = qMin(m_iNextLoadSample + blockSamples - 1, m_pFiffReader->lastSample());
+        m_pFiffReader->loadBlockAsync(m_iNextLoadSample, blockEnd);
+    }
 }
 
 

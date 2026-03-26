@@ -189,6 +189,14 @@ void ChannelDataModel::setSignalColor(const QColor &color)
 
 //=============================================================================================================
 
+void ChannelDataModel::setMaxStoredSamples(int n)
+{
+    QWriteLocker lk(&m_lock);
+    m_maxStoredSamples = (n > 0) ? n : 0;
+}
+
+//=============================================================================================================
+
 void ChannelDataModel::setChannelBad(int channelIdx, bool bad)
 {
     QWriteLocker lk(&m_lock);

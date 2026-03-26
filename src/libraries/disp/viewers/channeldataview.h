@@ -248,6 +248,13 @@ public:
      */
     int firstVisibleSample() const;
 
+    //=========================================================================================================
+    /**
+     * Returns the underlying data model (non-owning pointer).
+     * Use for advanced configuration such as setMaxStoredSamples().
+     */
+    ChannelDataModel* model() const { return m_pModel.data(); }
+
 signals:
     //=========================================================================================================
     /**
