@@ -104,6 +104,7 @@
 #include <QFutureWatcher>
 #include <QProgressDialog>
 #include <QMessageBox>
+#include <QtConcurrent>
 
 #include <memory>
 
@@ -151,6 +152,7 @@ namespace MNEBROWSE
 class FilterWindow;
 class EventWindow;
 class DataWindow;
+class RawModel;
 
 
 //=============================================================================================================
@@ -326,6 +328,7 @@ private:
     QLabel*                 m_pStatusLabel;                 /**< Persistent status bar label, updated in place to avoid repeated allocation. */
     QAction*                m_pRemoveDCAction;              /**< The action which is used to control DC removal. */
     QAction*                m_pHideBadAction;               /**< The action which is used to control hide bad channel functionality. */
+    QFutureWatcher<bool>    m_legacyLoadWatcher;            /**< Watches async legacy RawModel load so the UI stays responsive. */
 };
 
 } //NAMESPACE

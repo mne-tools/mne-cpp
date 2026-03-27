@@ -1,0 +1,243 @@
+//=============================================================================================================
+/**
+ * @file     timerulerwidget.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March, 2026
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    Definition of the TimeRulerWidget class.
+ *
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "timerulerwidget.h"
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QPainter>
+#include <QPaintEvent>
+#include <QFontDatabase>
+#include <QtMath>
+#include <cmath>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace DISPLIB;
+
+//=============================================================================================================
+// CONSTANTS
+//=============================================================================================================
+
+namespace {
+// Same nice-interval table used by the render grid — guarantees perfect alignment.
+static const double kNiceIntervals[] = { 0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 30.0, 60.0 };
+constexpr double kMinMajorPx = 80.0; // minimum px spacing between major ticks
+constexpr int    kMajorH     = 10;   // tick mark height in px (downward from bottom border)
+constexpr int    kMinorH     =  5;
+constexpr int    kLabelGap   =  3;   // gap between label bottom and tick top
+} // namespace
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+TimeRulerWidget::TimeRulerWidget(QWidget *parent)
+    : QWidget(parent)
+{
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    setFixedHeight(28);
+}
+
+//=============================================================================================================
+
+void TimeRulerWidget::setSfreq(double sfreq)
+{
+    m_sfreq = (sfreq > 0.0) ? sfreq : 1.0;
+    update();
+}
+
+//=============================================================================================================
+
+void TimeRulerWidget::setFirstFileSample(int firstFileSample)
+{
+    m_firstFileSample = firstFileSample;
+    update();
+}
+
+//=============================================================================================================
+
+void TimeRulerWidget::setScrollSample(float sample)
+{
+    if (qFuzzyCompare(m_scrollSample, sample))
+        return;
+    m_scrollSample = sample;
+    update();
+}
+
+//=============================================================================================================
+
+void TimeRulerWidget::setSamplesPerPixel(float spp)
+{
+    if (qFuzzyCompare(m_spp, spp))
+        return;
+    m_spp = spp;
+    update();
+}
+
+//=============================================================================================================
+
+QString TimeRulerWidget::formatTime(double seconds)
+{
+    if (seconds < 0.0)
+        seconds = 0.0;
+
+    if (seconds >= 3600.0) {
+        int h = static_cast<int>(seconds) / 3600;
+        int m = (static_cast<int>(seconds) % 3600) / 60;
+        int s = static_cast<int>(seconds) % 60;
+        return QString("%1:%2:%3")
+            .arg(h)
+            .arg(m, 2, 10, QChar('0'))
+            .arg(s, 2, 10, QChar('0'));
+    } else if (seconds >= 60.0) {
+        int    m = static_cast<int>(seconds) / 60;
+        double s = seconds - m * 60.0;
+        return QString("%1:%2").arg(m).arg(s, 4, 'f', 1, QChar('0'));
+    } else if (seconds >= 10.0) {
+        return QString("%1 s").arg(static_cast<int>(std::round(seconds)));
+    } else if (seconds >= 1.0) {
+        return QString("%1 s").arg(seconds, 0, 'f', 1);
+    } else if (seconds >= 0.1) {
+        return QString("%1 s").arg(seconds, 0, 'f', 2);
+    } else if (seconds >= 0.001) {
+        return QString("%1 ms").arg(seconds * 1e3, 0, 'f', 1);
+    } else {
+        return QString("%1 ms").arg(seconds * 1e3, 0, 'f', 2);
+    }
+}
+
+//=============================================================================================================
+
+void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
+{
+    const int    W   = width();
+    const int    H   = height();
+    const double spp = static_cast<double>(m_spp);
+
+    if (W <= 0 || spp <= 0.0 || m_sfreq <= 0.0)
+        return;
+
+    // ── Choose tick interval (same algorithm as ChannelRhiView grid) ──
+    const double pxPerSec = m_sfreq / spp;
+    double tickIntervalS = kNiceIntervals[0];
+    for (double iv : kNiceIntervals) {
+        tickIntervalS = iv;
+        if (iv * pxPerSec >= kMinMajorPx)
+            break;
+    }
+
+    const double tickSamples  = tickIntervalS * m_sfreq;
+    const double minorFraction = 5.0;
+    const double minorSamples = tickSamples / minorFraction;
+
+    // Align to file start exactly like the render grid
+    const double origin = static_cast<double>(m_firstFileSample);
+
+    // ── Setup painter ─────────────────────────────────────────────────
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing, false);
+
+    // Background — very light warm gray, matches ChannelLabelPanel
+    p.fillRect(rect(), QColor(245, 245, 247));
+
+    // Bottom border line that visually "caps" the ruler
+    p.setPen(QPen(QColor(185, 185, 195), 1));
+    p.drawLine(0, H - 1, W, H - 1);
+
+    // ── Font ─────────────────────────────────────────────────────────
+    QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    font.setPointSizeF(8.0);
+    p.setFont(font);
+    const QFontMetrics fm(font);
+
+    // ── Minor ticks ──────────────────────────────────────────────────
+    {
+        double firstMinorS = std::ceil((m_scrollSample - origin - minorSamples) / minorSamples)
+                             * minorSamples + origin;
+        p.setPen(QPen(QColor(165, 165, 175), 1));
+        for (double s = firstMinorS; ; s += minorSamples) {
+            double xPx = (s - m_scrollSample) / spp;
+            if (xPx > W + 2) break;
+            if (xPx < -2)    continue;
+            int xi = static_cast<int>(std::round(xPx));
+            // Draw tick downward from the bottom border
+            p.drawLine(xi, H - 1 - kMinorH, xi, H - 2);
+        }
+    }
+
+    // ── Major ticks + labels ─────────────────────────────────────────
+    {
+        double firstMajorS = std::ceil((m_scrollSample - origin - tickSamples) / tickSamples)
+                             * tickSamples + origin;
+        p.setPen(QPen(QColor(100, 100, 115), 1));
+        for (double s = firstMajorS; ; s += tickSamples) {
+            double xPx = (s - m_scrollSample) / spp;
+            if (xPx > W + 2) break;
+            if (xPx < -2)    continue;
+
+            int xi = static_cast<int>(std::round(xPx));
+
+            // Major tick
+            p.setPen(QPen(QColor(100, 100, 115), 1));
+            p.drawLine(xi, H - 1 - kMajorH, xi, H - 2);
+
+            // Label — elapsed time from file start
+            double elapsedSec = (s - origin) / m_sfreq;
+            if (elapsedSec >= -tickIntervalS * 0.5) { // skip labels for negative time
+                QString label = formatTime(elapsedSec);
+                const int lw  = fm.horizontalAdvance(label);
+                const int lh  = fm.ascent();
+
+                // Center label over tick; clamp to widget edges
+                int lx = xi - lw / 2;
+                lx = qBound(2, lx, W - lw - 2);
+
+                // Baseline sits above the tick top, with a small gap
+                int ly = H - 1 - kMajorH - kLabelGap;
+
+                p.setPen(QColor(65, 65, 80));
+                p.drawText(lx, ly, label);
+            }
+        }
+    }
+}

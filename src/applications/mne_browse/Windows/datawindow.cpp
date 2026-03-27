@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "datawindow.h"
+#include <disp/viewers/helpers/channeldatamodel.h>
 
 #if !defined(NO_QOPENGLWIDGET)
 #include <QOpenGLWidget>
@@ -247,10 +248,16 @@ void DataWindow::initMVCSettings()
 
 bool DataWindow::loadFiffFile(const QString &path)
 {
+    // Block spurious scheduleNextLoad() calls that clearView() will trigger
+    // synchronously via the scrollPositionChanged → onChannelViewScrollChanged chain.
+    m_bLoadingBlock = true;
+
     m_pChannelDataView->clearView();
 
-    if (!m_pFiffReader->open(path))
+    if (!m_pFiffReader->open(path)) {
+        m_bLoadingBlock = false;
         return false;
+    }
 
     auto fiffInfo = m_pFiffReader->fiffInfo();
     m_pChannelDataView->init(fiffInfo);
@@ -259,14 +266,22 @@ bool DataWindow::loadFiffFile(const QString &path)
     int blockSamples = static_cast<int>(kBlockSeconds * fiffInfo->sfreq);
     m_pChannelDataView->model()->setMaxStoredSamples(kMaxBlocks * blockSamples);
 
-    // Scroll to start
-    m_pChannelDataView->scrollToSample(m_pFiffReader->firstSample(), false);
+    // Hold off all loading while we set up state.  Both clearView() above
+    // and scrollToSample() below emit scrollPositionChanged synchronously,
+    // which would invoke scheduleNextLoad() with stale / wrong indices.
+    m_bLoadingBlock = true;
 
-    // Load the first block asynchronously
-    m_iNextLoadSample = m_pFiffReader->firstSample();
-    m_bLoadingBlock   = true;
-    int blockEnd = qMin(m_iNextLoadSample + blockSamples - 1, m_pFiffReader->lastSample());
-    m_pFiffReader->loadBlockAsync(m_iNextLoadSample, blockEnd);
+    // Seed the loading state before any signal can reach scheduleNextLoad
+    m_iCurrentScrollSample = m_pFiffReader->firstSample();
+    m_iNextLoadSample      = m_iCurrentScrollSample;
+
+    m_pChannelDataView->scrollToSample(m_iCurrentScrollSample, false);
+
+    // All state is correct now — release the guard and start the first block.
+    // onBlockLoaded() will chain subsequent blocks until kLookaheadBlocks of
+    // data are buffered ahead of the current scroll position.
+    m_bLoadingBlock = false;
+    scheduleNextLoad();
 
     return true;
 }
@@ -287,31 +302,42 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
     else
         m_pChannelDataView->addData(data);
 
-    // Advance the preload cursor
+    // Advance the frontier and immediately chain the next load if we're still
+    // within the lookahead window.  This keeps blocks flowing back-to-back during
+    // startup and after fast inertial scrolling without waiting for the next
+    // scroll event to re-trigger loading.
     m_iNextLoadSample = firstSample + static_cast<int>(data.cols());
+    scheduleNextLoad();
 }
 
 //=============================================================================================================
 
 void DataWindow::onChannelViewScrollChanged(int sample)
 {
+    m_iCurrentScrollSample = sample;
+    scheduleNextLoad();
+}
+
+//=============================================================================================================
+
+void DataWindow::scheduleNextLoad()
+{
     if (m_bLoadingBlock || !m_pFiffReader || !m_pFiffReader->isOpen())
         return;
     if (m_iNextLoadSample > m_pFiffReader->lastSample())
-        return; // all data loaded
+        return; // entire file already loaded into the ring buffer
 
-    auto *model = m_pChannelDataView->model();
-    int bufferEnd = model->firstSample() + model->totalSamples();
+    const float sfreq        = static_cast<float>(m_pFiffReader->fiffInfo()->sfreq);
+    const int   blockSamples = static_cast<int>(kBlockSeconds * sfreq);
+    const int   lookahead    = static_cast<int>(kLookaheadBlocks * blockSamples);
 
-    // Trigger prefetch when the scroll position is within half a block of the buffer edge
-    float sfreq      = static_cast<float>(m_pFiffReader->fiffInfo()->sfreq);
-    int   halfBlock  = static_cast<int>(kBlockSeconds * sfreq * 0.5f);
-    int   triggerAt  = bufferEnd - halfBlock;
-
-    if (sample >= triggerAt) {
-        m_bLoadingBlock = true;
-        int blockSamples = static_cast<int>(kBlockSeconds * sfreq);
-        int blockEnd = qMin(m_iNextLoadSample + blockSamples - 1, m_pFiffReader->lastSample());
+    // Fire a load whenever the unloaded frontier is inside our lookahead window.
+    // kLookaheadBlocks × kBlockSeconds = 3 × 60 s = 3 min ahead — enough headroom
+    // for any realistic inertial scroll speed.
+    if (m_iNextLoadSample < m_iCurrentScrollSample + lookahead) {
+        m_bLoadingBlock  = true;
+        const int blockEnd = qMin(m_iNextLoadSample + blockSamples - 1,
+                                  m_pFiffReader->lastSample());
         m_pFiffReader->loadBlockAsync(m_iNextLoadSample, blockEnd);
     }
 }
@@ -355,7 +381,7 @@ void DataWindow::initMarker()
     }
 
     //Connect current marker to loading a fiff file - no loaded file - no visible marker
-    connect(m_pRawModel, &RawModel::fileLoaded,[this](){
+    connect(m_pRawModel, &RawModel::fileLoaded, this, [this](){
         bool state = m_pRawModel->isFileLoaded();
         if(state) {
             //Inital position of the marker
@@ -602,10 +628,13 @@ void DataWindow::setRangeSampleLabels()
     int maxSampleRange = minSampleRange + ui->m_tableView_rawTableView->viewport()->width();
 
     //Set values as string
+    auto fiffInfo = m_pRawModel->fiffInfo();
+    if (!fiffInfo)
+        return;
     QString stringTemp;
-    int minSampleRangeSec = (minSampleRange/m_pRawModel->fiffInfo()->sfreq)*1000;
+    int minSampleRangeSec = (minSampleRange/fiffInfo->sfreq)*1000;
     ui->m_label_sampleMin->setText(QString("%1 / %2 sec").arg(stringTemp.number(minSampleRange)).arg(stringTemp.number((double)minSampleRangeSec/1000,'g')));
-    int maxSampleRangeSec = (maxSampleRange/m_pRawModel->fiffInfo()->sfreq)*1000;
+    int maxSampleRangeSec = (maxSampleRange/fiffInfo->sfreq)*1000;
     ui->m_label_sampleMax->setText(QString("%1 / %2 sec").arg(stringTemp.number(maxSampleRange)).arg(stringTemp.number((double)maxSampleRangeSec/1000,'g')));
 }
 
@@ -620,7 +649,10 @@ void DataWindow::setMarkerSampleLabel()
     m_iCurrentMarkerSample = ui->m_tableView_rawTableView->horizontalScrollBar()->value() +
             (m_pDataMarker->geometry().x() - ui->m_tableView_rawTableView->geometry().x() - ui->m_tableView_rawTableView->verticalHeader()->width());
 
-    int currentSeconds = (m_iCurrentMarkerSample/m_pRawModel->fiffInfo()->sfreq)*1000;
+    auto fiffInfo = m_pRawModel->fiffInfo();
+    if (!fiffInfo)
+        return;
+    int currentSeconds = (m_iCurrentMarkerSample/fiffInfo->sfreq)*1000;
 
     QString numberString = QString("%1 / %2 sec").arg(QString().number(m_iCurrentMarkerSample)).arg(QString().number((double)currentSeconds/1000,'g'));
     m_pCurrentDataMarkerLabel->setText(numberString);

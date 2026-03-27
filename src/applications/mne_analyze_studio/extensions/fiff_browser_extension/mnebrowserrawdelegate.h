@@ -34,9 +34,11 @@
 #define MNE_ANALYZE_STUDIO_MNEBROWSERRAWDELEGATE_H
 
 #include "../../../mne_browse/Models/rawmodel.h"
+#include "../../../mne_browse/Models/eventmodel.h"
 #include "../../../mne_browse/Utils/types.h"
 
 #include <QAbstractItemDelegate>
+#include <QColor>
 #include <QMap>
 
 namespace MNEANALYZESTUDIO
@@ -58,6 +60,11 @@ public:
     int plotHeight() const;
     double pixelsPerSample() const;
     void setPixelsPerSample(double pixelsPerSample);
+    double amplitudeScale() const;
+    void setAmplitudeScale(double scale);
+    bool removeDC() const;
+    void setRemoveDC(bool remove);
+    void setEventModel(MNEBROWSE::EventModel* eventModel);
 
 private:
     void createGridPath(QPainterPath& path,
@@ -67,12 +74,21 @@ private:
                         const QStyleOptionViewItem& option,
                         QPainterPath& path,
                         const QList<MNEBROWSE::RowVectorPair>& listPairs) const;
+    void drawEvents(const QModelIndex& index,
+                    const QStyleOptionViewItem& option,
+                    QPainter* painter,
+                    const MNEBROWSE::RawModel* rawModel) const;
     double scaleForChannel(const MNEBROWSE::RawModel* model, int row) const;
+    QColor colorForChannel(const MNEBROWSE::RawModel* model, int row) const;
 
     int m_plotHeight;
     int m_gridLineCount;
     double m_dx;
+    double m_amplitudeScale;
+    bool m_removeDC;
+    MNEBROWSE::EventModel* m_eventModel;
     QMap<QString, double> m_scaleMap;
+    QMap<qint32, QColor> m_colorMap;
 };
 
 } // namespace MNEANALYZESTUDIO

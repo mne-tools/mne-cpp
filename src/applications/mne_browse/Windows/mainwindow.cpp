@@ -219,13 +219,14 @@ void MainWindow::setupWindowWidgets()
 
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
     if(rawModel()->isFileLoaded()) {
-        m_pScaleWindow->hideSpinBoxes(rawModel()->fiffInfo());
-        m_pChInfoWindow->getDataModel()->setFiffInfo(rawModel()->fiffInfo());
+        auto fiffInfo = rawModel()->fiffInfo();
+        m_pScaleWindow->hideSpinBoxes(fiffInfo);
+        m_pChInfoWindow->getDataModel()->setFiffInfo(fiffInfo);
         m_pChInfoWindow->getDataModel()->layoutChanged(m_pChannelSelectionView->getLayoutMap());
         m_pChannelSelectionView->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
-        m_pChannelSelectionView->newFiffFileLoaded(rawModel()->fiffInfo());
-        m_pFilterWindow->newFileLoaded(rawModel()->fiffInfo());
-        m_pNoiseReductionWindow->setFiffInfo(rawModel()->fiffInfo());
+        m_pChannelSelectionView->newFiffFileLoaded(fiffInfo);
+        m_pFilterWindow->newFileLoaded(fiffInfo);
+        m_pNoiseReductionWindow->setFiffInfo(fiffInfo);
     }
 }
 
@@ -423,7 +424,7 @@ void MainWindow::setWindowStatus()
 
     //Set status bar
     //Set data file informations
-    if(rawModel()->isFileLoaded()) {
+    if(rawModel()->isFileLoaded() && rawModel()->fiffInfo()) {
         int idx = m_qFileRaw.fileName().lastIndexOf("/");
         QString filename = m_qFileRaw.fileName().remove(0,idx+1);
         title = QString("Data file: %1  /  First sample: %2  /  Sample frequency: %3Hz").arg(filename).arg(rawModel()->firstSample()).arg(rawModel()->fiffInfo()->sfreq);
@@ -648,20 +649,34 @@ bool MainWindow::loadRawFile(const QString& filename)
         qWarning() << "ERROR loading fiff data file" << filename;
 
     // ── Legacy RawModel path: kept for filter/event sub-systems ──────
-    // Runs in parallel; the QTableView is hidden so the user never sees
-    // the legacy rendering but filtering and event logic still work.
-    rawModel()->loadFiffData(&m_qFileRaw);
+    // Runs in a background thread so the ChannelDataView path (above) can
+    // display data immediately while the full FIFF index is parsed.
+    // Wait for any previous in-flight load to finish before starting a new one
+    // to avoid concurrent access to RawModel internals.
+    if (m_legacyLoadWatcher.isRunning())
+        m_legacyLoadWatcher.waitForFinished();
 
-    m_pEventWindow->getEventModel()->setFiffInfo(rawModel()->fiffInfo());
-    m_pEventWindow->getEventModel()->setFirstLastSample(rawModel()->firstSample(),
-                                                        rawModel()->lastSample());
+    // Disconnect any stale finished connection from a prior load
+    disconnect(&m_legacyLoadWatcher, &QFutureWatcher<bool>::finished, nullptr, nullptr);
+
+    connect(&m_legacyLoadWatcher, &QFutureWatcher<bool>::finished, this, [this]() {
+        auto fiffInfo = rawModel()->fiffInfo();
+        m_pEventWindow->getEventModel()->setFiffInfo(fiffInfo);
+        m_pEventWindow->getEventModel()->setFirstLastSample(rawModel()->firstSample(),
+                                                            rawModel()->lastSample());
+        setWindowStatus();
+        if (fiffInfo)
+            m_pScaleWindow->hideSpinBoxes(fiffInfo);
+        m_qFileRaw.close();
+    });
+
+    m_legacyLoadWatcher.setFuture(
+        QtConcurrent::run([this]() -> bool {
+            return rawModel()->loadFiffData(&m_qFileRaw);
+        })
+    );
 
     setWindowStatus();
-
-    if(rawModel()->fiffInfo())
-        m_pScaleWindow->hideSpinBoxes(rawModel()->fiffInfo());
-
-    m_qFileRaw.close();
     return ok;
 }
 

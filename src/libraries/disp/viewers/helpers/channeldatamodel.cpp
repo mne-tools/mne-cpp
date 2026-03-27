@@ -62,14 +62,14 @@ using namespace Eigen;
 //=============================================================================================================
 
 namespace {
-    constexpr float kScaleMEGGrad = 400e-13f;   // T/m
-    constexpr float kScaleMEGMag  = 1.2e-12f;   // T
-    constexpr float kScaleEEG     = 30e-6f;     // V
-    constexpr float kScaleEOG     = 150e-6f;    // V
-    constexpr float kScaleEMG     = 1e-3f;      // V
-    constexpr float kScaleECG     = 1e-3f;      // V
-    constexpr float kScaleSTIM    = 5.0f;       // AU
-    constexpr float kScaleMISC    = 1.0f;       // AU
+    constexpr float kScaleMEGGrad  = 400e-13f;   // T/m
+    constexpr float kScaleMEGMag   = 1.2e-12f;   // T
+    constexpr float kScaleEEG      = 30e-6f;     // V
+    constexpr float kScaleEOG      = 150e-6f;    // V
+    constexpr float kScaleEMG      = 1e-3f;      // V
+    constexpr float kScaleECG      = 1e-3f;      // V
+    constexpr float kScaleSTIM     = 5.0f;       // AU
+    constexpr float kScaleMISC     = 1.0f;       // AU
     constexpr float kScaleFallback = 1.0f;
 }
 
@@ -197,6 +197,17 @@ void ChannelDataModel::setMaxStoredSamples(int n)
 
 //=============================================================================================================
 
+void ChannelDataModel::setRemoveDC(bool remove)
+{
+    {
+        QWriteLocker lk(&m_lock);
+        m_removeDC = remove;
+    }
+    emit dataChanged();
+}
+
+//=============================================================================================================
+
 void ChannelDataModel::setChannelBad(int channelIdx, bool bad)
 {
     QWriteLocker lk(&m_lock);
@@ -250,7 +261,7 @@ QVector<float> ChannelDataModel::decimatedVertices(int   channelIdx,
 {
     QReadLocker lk(&m_lock);
 
-    vboFirstSample = firstSample;
+    vboFirstSample = firstSample; // may be updated below after clamping
 
     if (channelIdx < 0 || channelIdx >= m_channelData.size()
         || pixelWidth <= 0 || firstSample >= lastSample) {
@@ -266,18 +277,33 @@ QVector<float> ChannelDataModel::decimatedVertices(int   channelIdx,
     bufFirst = qBound(0, bufFirst, src.size());
     bufLast  = qBound(0, bufLast,  src.size());
 
+    // Update to the actual absolute sample index at vertex 0 after clamping.
+    // When firstSample < m_firstSample (tile extends before buffer start),
+    // bufFirst is clamped to 0 so vboFirstSample must reflect m_firstSample,
+    // not the original (possibly negative) firstSample.
+    vboFirstSample = m_firstSample + bufFirst;
+
     if (bufLast <= bufFirst)
         return {};
 
     int nSamples = bufLast - bufFirst;
+
+    // ── DC removal: compute mean over the window ────────────────────────
+    float dcOffset = 0.f;
+    if (m_removeDC) {
+        double sum = 0.0;
+        for (int i = bufFirst; i < bufLast; ++i)
+            sum += src[i];
+        dcOffset = static_cast<float>(sum / nSamples);
+    }
 
     if (nSamples <= pixelWidth * 2) {
         // ── Raw path: one vertex per sample ────────────────────────────
         QVector<float> result;
         result.reserve(nSamples * 2);
         for (int i = 0; i < nSamples; ++i) {
-            result.append(static_cast<float>(i));        // x offset
-            result.append(src[bufFirst + i]);             // y amplitude
+            result.append(static_cast<float>(i));
+            result.append(src[bufFirst + i] - dcOffset);
         }
         return result;
     }
@@ -304,8 +330,10 @@ QVector<float> ChannelDataModel::decimatedVertices(int   channelIdx,
             if (src[s] < minV) minV = src[s];
             if (src[s] > maxV) maxV = src[s];
         }
+        minV -= dcOffset;
+        maxV -= dcOffset;
 
-        float xOffset = px * spp; // relative to bufFirst (= firstSample - m_firstSample)
+        float xOffset = px * spp;
 
         // Emit max first, then min: draws ascending spike first
         result.append(xOffset); result.append(maxV);
@@ -331,6 +359,7 @@ void ChannelDataModel::rebuildDisplayInfo()
             m_displayInfo[ch].name = m_pFiffInfo->ch_names[ch];
         else
             m_displayInfo[ch].name = QString("CH %1").arg(ch + 1);
+        m_displayInfo[ch].typeLabel = typeLabelForChannel(ch);
         m_displayInfo[ch].bad = false;
     }
 }
@@ -364,13 +393,39 @@ QColor ChannelDataModel::colorForChannel(int ch) const
     if (!m_pFiffInfo || ch >= m_pFiffInfo->nchan)
         return m_signalColor;
 
+    // Dark colours chosen to be readable on a light (near-white) background
     switch (m_pFiffInfo->chs[ch].kind) {
-    case FIFFV_MEG_CH:  return QColor(0, 160, 220);   // teal-blue for MEG
-    case FIFFV_EEG_CH:  return QColor(220, 80, 20);   // orange for EEG
-    case FIFFV_EOG_CH:  return QColor(180, 0, 180);   // purple for EOG
-    case FIFFV_ECG_CH:  return QColor(220, 20, 60);   // crimson for ECG
-    case FIFFV_EMG_CH:  return QColor(34, 139, 34);   // forest-green for EMG
-    case FIFFV_STIM_CH: return QColor(255, 165, 0);   // orange for STIM
+    case FIFFV_MEG_CH:  return QColor(20,  90, 180);   // dark blue for MEG
+    case FIFFV_EEG_CH:  return QColor(170, 55,  10);   // dark orange for EEG
+    case FIFFV_EOG_CH:  return QColor(130,   0, 130);   // dark purple for EOG
+    case FIFFV_ECG_CH:  return QColor(190,  15,  45);   // dark crimson for ECG
+    case FIFFV_EMG_CH:  return QColor(20,  110,  20);   // dark green for EMG
+    case FIFFV_STIM_CH: return QColor(180, 100,   0);   // dark amber for STIM
     default:            return m_signalColor;
     }
+}
+
+//=============================================================================================================
+
+QString ChannelDataModel::typeLabelForChannel(int ch) const
+{
+    if (!m_pFiffInfo || ch >= m_pFiffInfo->nchan)
+        return QStringLiteral("MISC");
+    switch (m_pFiffInfo->chs[ch].kind) {
+    case FIFFV_MEG_CH:  return QStringLiteral("MEG");
+    case FIFFV_EEG_CH:  return QStringLiteral("EEG");
+    case FIFFV_EOG_CH:  return QStringLiteral("EOG");
+    case FIFFV_ECG_CH:  return QStringLiteral("ECG");
+    case FIFFV_EMG_CH:  return QStringLiteral("EMG");
+    case FIFFV_STIM_CH: return QStringLiteral("STIM");
+    default:            return QStringLiteral("MISC");
+    }
+}
+
+//=============================================================================================================
+
+float ChannelDataModel::sfreq() const
+{
+    QReadLocker lk(&m_lock);
+    return m_pFiffInfo ? static_cast<float>(m_pFiffInfo->sfreq) : 0.f;
 }

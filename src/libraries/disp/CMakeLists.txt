@@ -87,6 +87,8 @@ set(SOURCES
     viewers/bidsview.cpp
     viewers/helpers/channeldatamodel.cpp
     viewers/helpers/channelrhiview.cpp
+    viewers/helpers/channellabelpanel.cpp
+    viewers/helpers/timerulerwidget.cpp
     viewers/helpers/rtfiffrawviewmodel.cpp
     viewers/helpers/rtfiffrawviewdelegate.cpp
     viewers/helpers/evokedsetmodel.cpp
@@ -153,6 +155,8 @@ set(HEADERS
     viewers/bidsview.h
     viewers/helpers/channeldatamodel.h
     viewers/helpers/channelrhiview.h
+    viewers/helpers/channellabelpanel.h
+    viewers/helpers/timerulerwidget.h
     viewers/helpers/rtfiffrawviewdelegate.h
     viewers/helpers/rtfiffrawviewmodel.h
     viewers/helpers/evokedsetmodel.h

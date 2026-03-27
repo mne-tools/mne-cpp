@@ -40,8 +40,8 @@
 
 #ifdef MNE_DISP_RHIWIDGET
 #  include <rhi/qrhi.h>
+#  include <rhi/qshader.h>
 #  include <QFile>
-#  include <QShader>
 #endif
 
 //=============================================================================================================
@@ -53,7 +53,7 @@
 #include <QMouseEvent>
 #include <QResizeEvent>
 #include <QPainter>
-#include <QPainterPath>
+#include <QPolygonF>
 #include <QtMath>
 
 //=============================================================================================================
@@ -124,8 +124,35 @@ ChannelRhiView::ChannelRhiView(QWidget *parent)
 #endif
 {
     setFocusPolicy(Qt::StrongFocus);
-    setAttribute(Qt::WA_OpaquePaintEvent);
     setMouseTracking(true);
+
+    // ── Async tile rebuild: swap in finished tile without blocking paintEvent ──
+    connect(&m_tileWatcher, &QFutureWatcher<TileResult>::finished, this, [this]() {
+        m_tileRebuildPending = false;
+        // Check BEFORE we clear the flag: was data dirtied while we were building?
+        bool dirtiedDuringBuild = m_tileDirty;
+
+        if (!m_tileWatcher.isCanceled()) {
+            TileResult r = m_tileWatcher.result();
+            if (!r.image.isNull()) {
+                m_tileImage           = std::move(r.image);
+                m_tileSampleFirst     = r.sampleFirst;
+                m_tileSamplesPerPixel = r.samplesPerPixel;
+                m_tileFirstChannel    = r.firstChannel;
+                m_tileVisibleCount    = r.visibleCount;
+                m_tileDirty           = false;
+            }
+        }
+
+        // Always repaint so the newly accepted tile is shown immediately.
+        // If data/meta changed during the build, mark dirty so the next
+        // paintEvent triggers a fresh rebuild.  Doing it via paintEvent
+        // (rather than calling scheduleTileRebuild() here directly) coalesces
+        // rapid dataChanged signals into one rebuild cycle per paint frame.
+        update();
+        if (dirtiedDuringBuild)
+            m_tileDirty = true;
+    });
 
 #ifdef MNE_DISP_RHIWIDGET
     // Platform-specific backend selection
@@ -139,6 +166,17 @@ ChannelRhiView::ChannelRhiView(QWidget *parent)
     setApi(QRhiWidget::Api::OpenGL);
 #  endif
     setSampleCount(1);
+
+    // When Metal/OpenGL init fails, fall back to QPainter for all subsequent paint events
+    connect(this, &QRhiWidget::renderFailed, this, [this]() {
+        if (!m_rhiFailed) {
+            m_rhiFailed = true;
+            update(); // trigger paintEvent() which will use QPainter path
+        }
+    });
+
+    // Use QPainter tile cache as primary rendering path (Metal pipeline not needed)
+    m_rhiFailed = true;
 #endif
 }
 
@@ -162,13 +200,15 @@ void ChannelRhiView::setModel(ChannelDataModel *model)
 #ifdef MNE_DISP_RHIWIDGET
             m_vboDirty = true;
 #endif
+            m_tileDirty = true;
             update();
         });
         connect(m_model, &ChannelDataModel::metaChanged, this, [this] {
 #ifdef MNE_DISP_RHIWIDGET
-            m_vboDirty    = true;
-            m_pipelineDirty = true; // channel count may have changed
+            m_vboDirty      = true;
+            m_pipelineDirty = true;
 #endif
+            m_tileDirty = true;
             update();
         });
     }
@@ -183,11 +223,28 @@ void ChannelRhiView::setModel(ChannelDataModel *model)
 
 void ChannelRhiView::setScrollSample(float sample)
 {
+    // Never scroll before the first available sample
+    if (m_model && m_model->totalSamples() > 0)
+        sample = qMax(sample, static_cast<float>(m_model->firstSample()));
+    else
+        sample = qMax(sample, 0.f);
+
     if (qFuzzyCompare(m_scrollSample, sample))
         return;
 
-    float oldScroll = m_scrollSample;
     m_scrollSample = sample;
+
+    // Mark tile dirty when the new scroll position falls outside the tile's
+    // comfortable range.  This ensures a rebuild is queued even if another
+    // build is currently in-flight (the finished handler will see dirtiedDuringBuild
+    // and let the next paintEvent restart for the new position).
+    if (!m_tileImage.isNull() && m_tileSamplesPerPixel > 0.f) {
+        float vis     = width() * m_samplesPerPixel;
+        float tileEnd = m_tileSampleFirst + m_tileImage.width() * m_tileSamplesPerPixel;
+        if (m_scrollSample < m_tileSampleFirst + vis ||
+            m_scrollSample + vis > tileEnd - vis)
+            m_tileDirty = true;
+    }
 
 #ifdef MNE_DISP_RHIWIDGET
     // Check whether the prefetch window is still valid
@@ -197,8 +254,6 @@ void ChannelRhiView::setScrollSample(float sample)
         sample + visible > m_vboWindowLast - margin) {
         m_vboDirty = true;
     }
-#else
-    Q_UNUSED(oldScroll)
 #endif
 
     emit scrollSampleChanged(m_scrollSample);
@@ -216,6 +271,7 @@ void ChannelRhiView::setSamplesPerPixel(float spp)
 #ifdef MNE_DISP_RHIWIDGET
     m_vboDirty = true; // zoom change → decimation changes
 #endif
+    m_tileDirty = true;
     emit samplesPerPixelChanged(m_samplesPerPixel);
     update();
 }
@@ -258,6 +314,7 @@ void ChannelRhiView::zoomTo(float targetSpp, int durationMs)
 void ChannelRhiView::setBackgroundColor(const QColor &color)
 {
     m_bgColor = color;
+    m_tileDirty = true;
     update();
 }
 
@@ -280,6 +337,81 @@ int ChannelRhiView::visibleFirstSample() const
 int ChannelRhiView::visibleSampleCount() const
 {
     return static_cast<int>(width() * m_samplesPerPixel);
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::setFirstVisibleChannel(int ch)
+{
+    int maxFirst = m_model ? qMax(0, m_model->channelCount() - m_visibleChannelCount) : 0;
+    ch = qBound(0, ch, maxFirst);
+    if (ch == m_firstVisibleChannel)
+        return;
+    m_firstVisibleChannel = ch;
+    m_tileDirty = true;
+    emit channelOffsetChanged(m_firstVisibleChannel);
+    update();
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::setVisibleChannelCount(int count)
+{
+    count = qMax(1, count);
+    if (count == m_visibleChannelCount)
+        return;
+    m_visibleChannelCount = count;
+    m_tileDirty = true;
+    update();
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::setFrozen(bool frozen)
+{
+    m_frozen = frozen;
+    if (m_frozen && m_pInertialAnim) {
+        m_pInertialAnim->stop();
+        m_pInertialAnim = nullptr;
+    }
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::setGridVisible(bool visible)
+{
+    if (visible == m_gridVisible)
+        return;
+    m_gridVisible = visible;
+    m_tileDirty   = true;
+    update();
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::setSfreq(float sfreq)
+{
+    m_sfreq = qMax(sfreq, 0.f);
+    m_tileDirty = true;
+    update();
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::setFirstFileSample(int first)
+{
+    if (first == m_firstFileSample)
+        return;
+    m_firstFileSample = first;
+    m_tileDirty = true;
+    update();
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::setWheelScrollsChannels(bool channelsMode)
+{
+    m_wheelScrollsChannels = channelsMode;
 }
 
 //=============================================================================================================
@@ -326,15 +458,18 @@ void ChannelRhiView::ensurePipeline()
     nCh = qMin(nCh, kMaxChannels);
 
     // ── Uniform buffer ──────────────────────────────────────────────────
+    bool uboRecreated = false;
     if (!m_ubo || m_ubo->size() < nCh * m_uboStride) {
         m_ubo.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
                                    QRhiBuffer::UniformBuffer,
                                    nCh * m_uboStride));
         m_ubo->create();
+        uboRecreated = true;
     }
 
     // ── Shader resource bindings ────────────────────────────────────────
-    if (!m_srb) {
+    // Recreate if the UBO pointer changed — SRB holds a raw pointer to the UBO.
+    if (!m_srb || uboRecreated) {
         m_srb.reset(rhi->newShaderResourceBindings());
         m_srb->setBindings({
             QRhiShaderResourceBinding::uniformBufferWithDynamicOffset(
@@ -349,8 +484,9 @@ void ChannelRhiView::ensurePipeline()
     }
 
     // ── Shaders ─────────────────────────────────────────────────────────
-    QShader vs = loadShader(QStringLiteral(":/disp/shaders/channeldata.vert.qsb"));
-    QShader fs = loadShader(QStringLiteral(":/disp/shaders/channeldata.frag.qsb"));
+    // Resource path matches qt_add_shaders PREFIX + file path (including subdirectory).
+    QShader vs = loadShader(QStringLiteral(":/disp/shaders/viewers/helpers/shaders/channeldata.vert.qsb"));
+    QShader fs = loadShader(QStringLiteral(":/disp/shaders/viewers/helpers/shaders/channeldata.frag.qsb"));
 
     if (!vs.isValid() || !fs.isValid()) {
         qWarning() << "ChannelRhiView: shaders not found. "
@@ -359,6 +495,8 @@ void ChannelRhiView::ensurePipeline()
     }
 
     // ── Graphics pipeline ───────────────────────────────────────────────
+    // Destroy any existing pipeline before creating a new one.
+    m_pipeline.reset();
     m_pipeline.reset(rhi->newGraphicsPipeline());
     m_pipeline->setShaderStages({
         { QRhiShaderStage::Vertex,   vs },
@@ -371,7 +509,7 @@ void ChannelRhiView::ensurePipeline()
 
     m_pipeline->setVertexInputLayout(il);
     m_pipeline->setShaderResourceBindings(m_srb.get());
-    m_pipeline->setRenderPassDescriptor(renderPassDescriptor());
+    m_pipeline->setRenderPassDescriptor(renderTarget()->renderPassDescriptor());
     m_pipeline->setTopology(QRhiGraphicsPipeline::LineStrip);
     m_pipeline->setDepthTest(false);
     m_pipeline->setDepthWrite(false);
@@ -540,16 +678,22 @@ void ChannelRhiView::render(QRhiCommandBuffer *cb)
         // Clear to background colour only
         QRhiResourceUpdateBatch *u = rhi()->nextResourceUpdateBatch();
         QColor bg = m_bgColor;
-        QRhiColorClearValue clear(bg.redF(), bg.greenF(), bg.blueF(), 1.f);
-        cb->beginPass(renderTarget(), clear, {1.f, 0}, u);
+        cb->beginPass(renderTarget(), bg, {1.f, 0}, u);
         cb->endPass();
         return;
     }
 
     // ── Ensure GPU resources ─────────────────────────────────────────────
     ensurePipeline();
-    if (!m_pipeline)
+    if (!m_pipeline) {
+        // Pipeline not ready (shaders still loading or creation failed).
+        // Still clear to the background color so the widget isn't left white.
+        QRhiResourceUpdateBatch *u = rhi()->nextResourceUpdateBatch();
+        QColor bg = m_bgColor;
+        cb->beginPass(renderTarget(), bg, {1.f, 0}, u);
+        cb->endPass();
         return;
+    }
 
     QRhiResourceUpdateBatch *batch = rhi()->nextResourceUpdateBatch();
 
@@ -560,9 +704,7 @@ void ChannelRhiView::render(QRhiCommandBuffer *cb)
 
     // ── Render pass ──────────────────────────────────────────────────────
     QColor bg = m_bgColor;
-    QRhiColorClearValue clear(bg.redF(), bg.greenF(), bg.blueF(), 1.f);
-
-    cb->beginPass(renderTarget(), clear, {1.f, 0}, batch);
+    cb->beginPass(renderTarget(), bg, {1.f, 0}, batch);
 
     cb->setGraphicsPipeline(m_pipeline.get());
 
@@ -591,59 +733,238 @@ void ChannelRhiView::render(QRhiCommandBuffer *cb)
     cb->endPass();
 }
 
+#endif // MNE_DISP_RHIWIDGET
+
+//=============================================================================================================
+// QPainter fallback paintEvent – never blocks: schedules async tile rebuild if stale.
+//=============================================================================================================
+
+static void doPaintTile(QWidget *widget, const QImage &tileImage,
+                        float tileSampleFirst, float tileSamplesPerPixel,
+                        float scrollSample, const QColor &bgColor)
+{
+    QPainter p(widget);
+    if (tileImage.isNull() || tileSamplesPerPixel <= 0.f) {
+        p.fillRect(widget->rect(), bgColor);
+        return;
+    }
+    float tileXPx = (tileSampleFirst - scrollSample) / tileSamplesPerPixel;
+    p.drawImage(QPointF(tileXPx, 0.f), tileImage);
+}
+
+#ifdef MNE_DISP_RHIWIDGET
+void ChannelRhiView::paintEvent(QPaintEvent *event)
+{
+    if (!m_rhiFailed) {
+        QRhiWidget::paintEvent(event);
+        return;
+    }
+
+    if (!isTileFresh() && !m_tileRebuildPending)
+        scheduleTileRebuild();
+
+    doPaintTile(this, m_tileImage, m_tileSampleFirst, m_tileSamplesPerPixel,
+                m_scrollSample, m_bgColor);
+}
+
 #else // !MNE_DISP_RHIWIDGET
-//=============================================================================================================
-// QPainter fallback
-//=============================================================================================================
 
 void ChannelRhiView::paintEvent(QPaintEvent *)
 {
-    QPainter p(this);
-    p.setRenderHint(QPainter::Antialiasing, false); // speed
-    p.fillRect(rect(), m_bgColor);
+    if (!isTileFresh() && !m_tileRebuildPending)
+        scheduleTileRebuild();
 
-    if (!m_model || m_model->channelCount() == 0)
-        return;
-
-    int nCh = m_model->channelCount();
-    float laneH = static_cast<float>(height()) / nCh;
-    int px = width();
-    int firstSample = static_cast<int>(m_scrollSample);
-    int lastSample  = firstSample + static_cast<int>(px * m_samplesPerPixel) + 1;
-
-    for (int ch = 0; ch < nCh; ++ch) {
-        int vboFirst = 0;
-        QVector<float> verts = m_model->decimatedVertices(
-            ch, firstSample, lastSample, px, vboFirst);
-        if (verts.size() < 4)
-            continue;
-
-        auto info  = m_model->channelInfo(ch);
-        QColor col = info.bad ? QColor(200, 60, 60) : info.color;
-        p.setPen(col);
-
-        float yMid = (ch + 0.5f) * laneH;
-        float yScale = (laneH * 0.45f) / (info.amplitudeMax > 0.f ? info.amplitudeMax : 1.f);
-
-        QPainterPath path;
-        bool first = true;
-        int nVerts = verts.size() / 2;
-        for (int v = 0; v < nVerts; ++v) {
-            float xOff = verts[v * 2 + 0];
-            float yAmp = verts[v * 2 + 1];
-
-            float samplePos = vboFirst + xOff;
-            float xPx = (samplePos - m_scrollSample) / m_samplesPerPixel;
-            float yPx = yMid - yAmp * yScale;
-
-            if (first) { path.moveTo(xPx, yPx); first = false; }
-            else        { path.lineTo(xPx, yPx); }
-        }
-        p.drawPath(path);
-    }
+    doPaintTile(this, m_tileImage, m_tileSampleFirst, m_tileSamplesPerPixel,
+                m_scrollSample, m_bgColor);
 }
 
 #endif // MNE_DISP_RHIWIDGET
+
+//=============================================================================================================
+// Tile cache helpers (used by both QPainter paths)
+//=============================================================================================================
+
+bool ChannelRhiView::isTileFresh() const
+{
+    if (m_tileDirty || m_tileImage.isNull() || m_tileSamplesPerPixel <= 0.f)
+        return false;
+    if (!qFuzzyCompare(m_tileSamplesPerPixel, m_samplesPerPixel))
+        return false;
+    if (m_tileFirstChannel != m_firstVisibleChannel)
+        return false;
+    int totalCh      = m_model ? m_model->channelCount() : 0;
+    int visibleCount = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
+    if (m_tileVisibleCount != visibleCount)
+        return false;
+
+    // Tile is stale if current scroll is within one visible-width of either edge
+    float visibleSamples = width() * m_samplesPerPixel;
+    float tileEnd = m_tileSampleFirst + m_tileImage.width() * m_tileSamplesPerPixel;
+    if (m_scrollSample < m_tileSampleFirst + visibleSamples)
+        return false;
+    if (m_scrollSample + visibleSamples > tileEnd - visibleSamples)
+        return false;
+
+    return true;
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::scheduleTileRebuild()
+{
+    // Guard: already a rebuild in flight — it will re-check m_tileDirty when done
+    if (m_tileRebuildPending)
+        return;
+
+    if (!m_model || width() <= 0 || height() <= 0) {
+        // No model or zero-size: produce a blank tile synchronously
+        m_tileImage = QImage(qMax(width(), 1), qMax(height(), 1), QImage::Format_RGB32);
+        m_tileImage.fill(m_bgColor.rgb());
+        m_tileSampleFirst     = m_scrollSample;
+        m_tileSamplesPerPixel = qMax(m_samplesPerPixel, 1e-4f);
+        m_tileFirstChannel    = m_firstVisibleChannel;
+        m_tileVisibleCount    = 0;
+        m_tileDirty           = false;
+        return;
+    }
+
+    // Snapshot all view state for the worker (worker must NOT touch 'this')
+    ChannelDataModel *model           = m_model.data();
+    float             scrollSample    = m_scrollSample;
+    float             spp             = m_samplesPerPixel;
+    int               firstCh         = m_firstVisibleChannel;
+    int               visCnt          = m_visibleChannelCount;
+    int               pw              = width();
+    int               ph              = height();
+    QColor            bg              = m_bgColor;
+    bool              gridVis         = m_gridVisible;
+    float             sfreq           = m_sfreq;
+    int               firstFileSample = m_firstFileSample;
+
+    m_tileDirty          = false; // cleared now — any new event will set it true again
+    m_tileRebuildPending = true;
+    m_tileWatcher.setFuture(QtConcurrent::run([=]() {
+        return ChannelRhiView::buildTile(model, scrollSample, spp, firstCh, visCnt,
+                                         pw, ph, bg, gridVis, sfreq, firstFileSample);
+    }));
+}
+
+//=============================================================================================================
+
+ChannelRhiView::TileResult ChannelRhiView::buildTile(
+    ChannelDataModel *model,
+    float scrollSample, float spp,
+    int firstCh, int visCnt,
+    int pw, int ph,
+    QColor bgColor, bool gridVisible,
+    float sfreq, int firstFileSample)
+{
+    TileResult out;
+    out.samplesPerPixel = spp;
+    out.firstChannel    = firstCh;
+
+    if (!model || pw <= 0 || ph <= 0 || spp <= 0.f)
+        return out;
+
+    int totalCh      = model->channelCount();
+    int visibleCount = qMin(visCnt, totalCh - firstCh);
+    if (visibleCount <= 0)
+        return out;
+
+    out.visibleCount = visibleCount;
+
+    const int kTileMult  = 5;
+    int   tilePixWidth   = pw * kTileMult;
+    float visibleSamples = pw * spp;
+    float tileStart      = scrollSample - 2.f * visibleSamples;
+
+    out.sampleFirst = tileStart;
+
+    QImage img(tilePixWidth, ph, QImage::Format_RGB32);
+    img.fill(bgColor.rgb());
+
+    QPainter p(&img);
+    p.setRenderHint(QPainter::Antialiasing, false);
+
+    float laneH     = static_cast<float>(ph) / visibleCount;
+    int firstSample = static_cast<int>(tileStart);
+    int lastSample  = firstSample + static_cast<int>(tilePixWidth * spp) + 1;
+
+    // ── Grid pass ──────────────────────────────────────────────────────
+    if (gridVisible) {
+        for (int i = 0; i < visibleCount; ++i) {
+            float yMid = (i + 0.5f) * laneH;
+            float yTop = i * laneH;
+
+            if (i > 0) {
+                p.setPen(QPen(QColor(205, 205, 215), 1));
+                p.drawLine(QPointF(0, yTop), QPointF(tilePixWidth, yTop));
+            }
+
+            QPen guidePen(QColor(228, 228, 235), 1, Qt::DotLine);
+            guidePen.setDashPattern({3, 4});
+            p.setPen(guidePen);
+            p.drawLine(QPointF(0, yMid - laneH * 0.44f), QPointF(tilePixWidth, yMid - laneH * 0.44f));
+            p.drawLine(QPointF(0, yMid + laneH * 0.44f), QPointF(tilePixWidth, yMid + laneH * 0.44f));
+
+            p.setPen(QPen(QColor(210, 210, 218), 1));
+            p.drawLine(QPointF(0, yMid), QPointF(tilePixWidth, yMid));
+        }
+
+        if (sfreq > 0.f) {
+            static const float kNiceIntervals[] = {
+                0.05f, 0.1f, 0.2f, 0.5f, 1.f, 2.f, 5.f, 10.f, 30.f, 60.f
+            };
+            float pxPerSecond   = sfreq / spp;
+            float tickIntervalS = kNiceIntervals[0];
+            for (float iv : kNiceIntervals) {
+                tickIntervalS = iv;
+                if (iv * pxPerSecond >= 80.f)
+                    break;
+            }
+            float tickSamples = tickIntervalS * sfreq;
+            float origin    = static_cast<float>(firstFileSample);
+            float firstTick = std::ceil((tileStart - origin) / tickSamples) * tickSamples + origin;
+
+            p.setPen(QPen(QColor(205, 205, 210), 1));
+            for (float s = firstTick; s < lastSample; s += tickSamples) {
+                float xPx = (s - tileStart) / spp;
+                p.drawLine(QPointF(xPx, 0), QPointF(xPx, ph));
+            }
+        }
+    }
+
+    // ── Channel waveform pass ───────────────────────────────────────────
+    for (int i = 0; i < visibleCount; ++i) {
+        int ch = firstCh + i;
+        int vboFirst = 0;
+        QVector<float> verts = model->decimatedVertices(
+            ch, firstSample, lastSample, tilePixWidth, vboFirst);
+        if (verts.size() < 4)
+            continue;
+
+        auto info  = model->channelInfo(ch);
+        QColor col = info.bad ? QColor(190, 40, 40) : info.color;
+        p.setPen(QPen(col, 1.2));
+
+        float yMid   = (i + 0.5f) * laneH;
+        float yScale = (laneH * 0.45f) / (info.amplitudeMax > 0.f ? info.amplitudeMax : 1.f);
+
+        int nVerts = verts.size() / 2;
+        QPolygonF poly;
+        poly.reserve(nVerts);
+        for (int v = 0; v < nVerts; ++v) {
+            float samplePos = vboFirst + verts[v * 2];
+            float xPx = (samplePos - tileStart) / spp;
+            float yPx = yMid - verts[v * 2 + 1] * yScale;
+            poly.append(QPointF(xPx, yPx));
+        }
+        p.drawPolyline(poly);
+    }
+
+    out.image = std::move(img);
+    return out;
+}
 
 //=============================================================================================================
 // Shared event handlers (both paths)
@@ -656,26 +977,44 @@ void ChannelRhiView::resizeEvent(QResizeEvent *event)
     m_vboDirty = true;
 #else
     QWidget::resizeEvent(event);
-    update();
 #endif
+    m_tileDirty = true;
+    update();
 }
 
 //=============================================================================================================
 
 void ChannelRhiView::wheelEvent(QWheelEvent *event)
 {
-    // Horizontal scroll: one wheel step = 10 % of visible window
+    const QPoint delta = event->angleDelta();
+
     if (event->modifiers() & Qt::ControlModifier) {
-        // Ctrl + wheel = zoom
-        float factor = (event->angleDelta().y() > 0) ? 0.8f : 1.25f;
+        // Ctrl + wheel → zoom time axis
+        float factor = (delta.y() > 0) ? 0.8f : 1.25f;
         zoomTo(m_samplesPerPixel * factor, 150);
+
+    } else if (qAbs(delta.x()) > qAbs(delta.y())) {
+        // Predominantly horizontal gesture (trackpad swipe left/right) → scroll time
+        if (!m_frozen) {
+            float step = width() * m_samplesPerPixel * 0.1f
+                         * (delta.x() > 0 ? -1.f : 1.f);
+            scrollTo(m_scrollSample + step, 100);
+        }
+
+    } else if (m_wheelScrollsChannels) {
+        // Vertical wheel → scroll channels (up = earlier, down = later)
+        int channelStep = (delta.y() > 0) ? -1 : 1;
+        int maxFirst = m_model ? qMax(0, m_model->channelCount() - m_visibleChannelCount) : 0;
+        setFirstVisibleChannel(qBound(0, m_firstVisibleChannel + channelStep, maxFirst));
     } else {
-        float step = width() * m_samplesPerPixel * 0.1f;
-        if (event->angleDelta().y() > 0)
-            scrollTo(m_scrollSample - step, 150);
-        else
-            scrollTo(m_scrollSample + step, 150);
+        // Vertical wheel → scroll time
+        if (!m_frozen) {
+            float step = width() * m_samplesPerPixel * 0.15f
+                         * (delta.y() > 0 ? -1.f : 1.f);
+            scrollTo(m_scrollSample + step, 100);
+        }
     }
+
     event->accept();
 }
 
@@ -683,8 +1022,9 @@ void ChannelRhiView::wheelEvent(QWheelEvent *event)
 
 void ChannelRhiView::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::MiddleButton ||
-        (event->button() == Qt::LeftButton && (event->modifiers() & Qt::AltModifier))) {
+    if (!m_frozen &&
+        (event->button() == Qt::MiddleButton ||
+         (event->button() == Qt::LeftButton && (event->modifiers() & Qt::AltModifier)))) {
         m_dragging        = true;
         m_dragStartX      = event->position().toPoint().x();
         m_dragStartScroll = m_scrollSample;
@@ -692,9 +1032,29 @@ void ChannelRhiView::mousePressEvent(QMouseEvent *event)
         return;
     }
     if (event->button() == Qt::LeftButton) {
-        float samplePos = m_scrollSample
-            + static_cast<float>(event->position().x()) * m_samplesPerPixel;
-        emit sampleClicked(static_cast<int>(samplePos));
+        // Stop any running inertial scroll
+        if (m_pInertialAnim) {
+            m_pInertialAnim->stop();
+            m_pInertialAnim = nullptr;
+        }
+        if (m_frozen) {
+            // Frozen: clicks still emit sampleClicked but no drag
+            float samplePos = m_scrollSample
+                + static_cast<float>(event->position().x()) * m_samplesPerPixel;
+            emit sampleClicked(static_cast<int>(samplePos));
+            event->accept();
+            return;
+        }
+        // Record start position; activate drag on move (threshold in mouseMoveEvent)
+        m_leftButtonDown    = true;
+        m_leftDragActivated = false;
+        m_leftDownX         = event->position().toPoint().x();
+        m_leftDownScroll    = m_scrollSample;
+        m_velocityHistory.clear();
+        m_dragTimer.start();
+        m_velocityHistory.append({m_leftDownX, 0});
+        event->accept();
+        return;
     }
 #ifdef MNE_DISP_RHIWIDGET
     QRhiWidget::mousePressEvent(event);
@@ -714,6 +1074,26 @@ void ChannelRhiView::mouseMoveEvent(QMouseEvent *event)
         event->accept();
         return;
     }
+    if (m_leftButtonDown) {
+        int x = event->position().toPoint().x();
+        int dx = x - m_leftDownX;
+        if (!m_leftDragActivated && qAbs(dx) > 5)
+            m_leftDragActivated = true;
+        if (m_leftDragActivated) {
+            float newScroll = m_leftDownScroll - static_cast<float>(dx) * m_samplesPerPixel;
+            setScrollSample(newScroll);
+
+            // Record velocity sample; keep only the last 100 ms
+            qint64 now = m_dragTimer.elapsed();
+            m_velocityHistory.append({x, now});
+            while (m_velocityHistory.size() > 1 &&
+                   now - m_velocityHistory.first().t > 100)
+                m_velocityHistory.removeFirst();
+
+            event->accept();
+            return;
+        }
+    }
 #ifdef MNE_DISP_RHIWIDGET
     QRhiWidget::mouseMoveEvent(event);
 #else
@@ -728,6 +1108,47 @@ void ChannelRhiView::mouseReleaseEvent(QMouseEvent *event)
     if (m_dragging && (event->button() == Qt::MiddleButton ||
                        event->button() == Qt::LeftButton)) {
         m_dragging = false;
+        event->accept();
+        return;
+    }
+    if (event->button() == Qt::LeftButton && m_leftButtonDown) {
+        if (!m_leftDragActivated) {
+            // Short tap — emit click position, no inertia
+            float samplePos = m_leftDownScroll
+                + static_cast<float>(event->position().x()) * m_samplesPerPixel;
+            emit sampleClicked(static_cast<int>(samplePos));
+        } else {
+            // Compute velocity from recent history and launch inertial animation
+            if (m_velocityHistory.size() >= 2) {
+                auto oldest = m_velocityHistory.first();
+                auto newest = m_velocityHistory.last();
+                float dt = static_cast<float>(newest.t - oldest.t);
+                if (dt > 5.f) {
+                    float dx = static_cast<float>(newest.x - oldest.x);
+                    // px/ms → samples/ms (positive dx = dragging right = going backward)
+                    float velSampPerMs = -(dx / dt) * m_samplesPerPixel;
+                    float speed = qAbs(velSampPerMs);
+                    if (speed > 0.3f) { // threshold: ~300 samples/s minimum
+                        float durationMs = qBound(200.f, speed * 0.35f, 1800.f);
+                        // With OutQuad the effective travel ≈ velocity × duration / 2
+                        float targetScroll = m_scrollSample + velSampPerMs * durationMs * 0.5f;
+                        targetScroll = qMax(targetScroll, 0.f);
+
+                        m_pInertialAnim = new QPropertyAnimation(this, "scrollSample", this);
+                        m_pInertialAnim->setDuration(static_cast<int>(durationMs));
+                        m_pInertialAnim->setEasingCurve(QEasingCurve::OutQuad);
+                        m_pInertialAnim->setStartValue(m_scrollSample);
+                        m_pInertialAnim->setEndValue(targetScroll);
+                        connect(m_pInertialAnim, &QPropertyAnimation::finished, this, [this]() {
+                            m_pInertialAnim = nullptr;
+                        });
+                        m_pInertialAnim->start(QAbstractAnimation::DeleteWhenStopped);
+                    }
+                }
+            }
+        }
+        m_leftButtonDown    = false;
+        m_leftDragActivated = false;
         event->accept();
         return;
     }
