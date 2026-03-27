@@ -55,6 +55,7 @@
 #include <QDir>
 #include <QSplashScreen>
 #include <QThread>
+#include <QTimer>
 
 
 //*************************************************************************************************************
@@ -79,30 +80,53 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 {
     Q_UNUSED(context);
 
-    QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
+    if (!mainWindow)
+        return;
+
+    QString dt  = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
     QString txt = QString("[%1] ").arg(dt);
 
-    if(mainWindow) {
-        switch (type) {
-        case QtDebugMsg:
-           txt += QString("{Debug} \t\t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndMessage, _LogLvMax);
-           break;
-        case QtWarningMsg:
-           txt += QString("{Warning} \t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndWarning, _LogLvNormal);
-           break;
-        case QtCriticalMsg:
-           txt += QString("{Critical} \t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndError, _LogLvMin);
-           break;
-        case QtFatalMsg:
-           txt += QString("{Fatal} \t\t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndError, _LogLvMin);
-           abort();
-           break;
-        }
+    LogKind  kind  = _LogKndMessage;
+    LogLevel level = _LogLvMax;
+    bool doAbort   = false;
+
+    switch (type) {
+    case QtDebugMsg:
+        txt  += QString("{Debug} \t\t %1").arg(msg);
+        kind  = _LogKndMessage; level = _LogLvMax;
+        break;
+    case QtWarningMsg:
+        txt  += QString("{Warning} \t %1").arg(msg);
+        kind  = _LogKndWarning; level = _LogLvNormal;
+        break;
+    case QtCriticalMsg:
+        txt  += QString("{Critical} \t %1").arg(msg);
+        kind  = _LogKndError;   level = _LogLvMin;
+        break;
+    case QtFatalMsg:
+        txt  += QString("{Fatal} \t\t %1").arg(msg);
+        kind  = _LogKndError;   level = _LogLvMin;
+        doAbort = true;
+        break;
+    default:
+        return;
     }
+
+    // writeToLog() modifies a QTextEdit — safe only from the GUI thread.
+    // Messages emitted on background threads are queued to the main thread.
+    if (QThread::currentThread() == qApp->thread()) {
+        mainWindow->writeToLog(txt, kind, level);
+    } else {
+        QString capturedTxt   = txt;
+        LogKind  capturedKind  = kind;
+        LogLevel capturedLevel = level;
+        QMetaObject::invokeMethod(mainWindow, [capturedTxt, capturedKind, capturedLevel]() {
+            mainWindow->writeToLog(capturedTxt, capturedKind, capturedLevel);
+        }, Qt::QueuedConnection);
+    }
+
+    if (doAbort)
+        abort();
 }
 
 
@@ -201,10 +225,15 @@ int main(int argc, char *argv[])
 
     splash.finish(mainWindow);
 
-    // Apply CLI options after the window is fully shown so all sub-windows and
-    // models are initialised (filter window needs sfreq from a loaded file, etc.)
-    if(!rawFile.isEmpty() || highpass >= 0.0 || lowpass >= 0.0)
-        mainWindow->applyCommandLineOptions(rawFile, eventsFile, highpass, lowpass);
+    // Defer CLI option application until after the first event-loop iteration.
+    // This ensures the window is fully laid out (widgets have non-zero sizes) before
+    // ChannelDataView::updateSamplesPerPixel() is called, which needs a valid width.
+    if(!rawFile.isEmpty() || highpass >= 0.0 || lowpass >= 0.0) {
+        MainWindow *win = mainWindow;
+        QTimer::singleShot(0, win, [win, rawFile, eventsFile, highpass, lowpass]() {
+            win->applyCommandLineOptions(rawFile, eventsFile, highpass, lowpass);
+        });
+    }
 
     return a.exec();
 }

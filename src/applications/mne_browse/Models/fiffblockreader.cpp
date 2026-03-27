@@ -61,12 +61,28 @@ FiffBlockReader::FiffBlockReader(QObject *parent)
     , m_file(new QFile(this))
 {
     connect(&m_watcher, &QFutureWatcher<MatrixXd>::finished, this, [this]() {
-        if (!m_loading)
-            return;
+        bool shouldEmit  = m_loading;
+        int  emitFrom    = m_inFlightFrom;
         m_loading = false;
+
+        if (m_hasPending) {
+            // A newer request arrived while we were reading — start it now.
+            int from = m_pendingFrom;
+            int to   = m_pendingTo;
+            m_hasPending   = false;
+            m_inFlightFrom = from;
+            m_loading      = true;
+            m_watcher.setFuture(QtConcurrent::run([this, from, to]() {
+                return doRead(from, to);
+            }));
+            return; // discard the superseded result
+        }
+
+        if (!shouldEmit)
+            return;
         MatrixXd result = m_watcher.result();
         if (result.rows() > 0 && result.cols() > 0)
-            emit blockLoaded(result, m_pendingFrom);
+            emit blockLoaded(result, emitFrom);
     });
 }
 
@@ -85,17 +101,23 @@ bool FiffBlockReader::open(const QString &path)
 {
     close();
 
+    // FiffStream::open() calls device->open() internally, so the QFile must NOT
+    // be pre-opened here. Just set the file name and pass it to FiffRawData.
     m_file->setFileName(path);
-    if (!m_file->open(QIODevice::ReadOnly)) {
-        qWarning() << "[FiffBlockReader] Cannot open file:" << path;
+    if (!QFile::exists(path)) {
+        qWarning() << "[FiffBlockReader] File not found:" << path;
         return false;
     }
 
-    m_raw = QSharedPointer<FiffRawData>(new FiffRawData(*m_file));
+    try {
+        m_raw = QSharedPointer<FiffRawData>(new FiffRawData(*m_file));
+    } catch (const std::exception &e) {
+        qWarning() << "[FiffBlockReader] Exception constructing FiffRawData:" << e.what();
+        return false;
+    }
     if (m_raw->isEmpty()) {
         qWarning() << "[FiffBlockReader] Not a valid FIFF raw file:" << path;
         m_raw.reset();
-        m_file->close();
         return false;
     }
 
@@ -133,23 +155,26 @@ void FiffBlockReader::loadBlockAsync(int from, int to)
 {
     if (!m_raw) return;
 
-    // Clamp to file boundaries
     from = qBound(m_firstSample, from, m_lastSample);
     to   = qBound(m_firstSample, to,   m_lastSample);
     if (from > to) return;
 
-    // If a previous load is still running, discard its result when it finishes
-    m_loading = false;
-    if (m_watcher.isRunning())
-        m_watcher.waitForFinished();
+    if (m_watcher.isRunning()) {
+        // A read is already in flight — queue this request instead of blocking.
+        // The finished handler will start it immediately when the current read ends.
+        m_pendingFrom = from;
+        m_pendingTo   = to;
+        m_hasPending  = true;
+        m_loading     = false; // discard the in-flight result
+        return;
+    }
 
-    m_pendingFrom = from;
-    m_loading     = true;
-
-    QFuture<MatrixXd> future = QtConcurrent::run([this, from, to]() {
+    m_hasPending   = false;
+    m_inFlightFrom = from;
+    m_loading      = true;
+    m_watcher.setFuture(QtConcurrent::run([this, from, to]() {
         return doRead(from, to);
-    });
-    m_watcher.setFuture(future);
+    }));
 }
 
 //=============================================================================================================
@@ -167,6 +192,15 @@ MatrixXd FiffBlockReader::readBlockSync(int from, int to)
 
 MatrixXd FiffBlockReader::doRead(int from, int to)
 {
+    // FiffRawData closes the QFile after parsing the header.
+    // Re-open it so read_raw_segment can seek and read data blocks.
+    if (!m_file->isOpen()) {
+        if (!m_file->open(QIODevice::ReadOnly)) {
+            qWarning() << "[FiffBlockReader] Cannot reopen file:" << m_file->fileName();
+            return {};
+        }
+    }
+
     MatrixXd data, times;
     if (!m_raw->read_raw_segment(data, times, from, to)) {
         qWarning() << "[FiffBlockReader] read_raw_segment failed for"

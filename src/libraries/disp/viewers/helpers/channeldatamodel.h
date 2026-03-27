@@ -79,6 +79,7 @@ namespace DISPLIB
  */
 struct ChannelDisplayInfo {
     QString name;           /**< Channel name for the label. */
+    QString typeLabel;      /**< Short type string: "MEG", "EEG", "EOG", "ECG", "EMG", "STIM", "MISC". */
     QColor  color;          /**< Line colour to use in the GPU renderer. */
     float   amplitudeMax;   /**< Amplitude value (physical units) that maps to full row height. */
     bool    bad;            /**< Whether the channel is currently marked bad. */
@@ -167,11 +168,22 @@ public:
      */
     void setChannelBad(int channelIdx, bool bad);
 
+    //=========================================================================================================
+    /**
+     * Enable or disable DC (mean) removal applied on-the-fly during rendering.
+     * When enabled each channel's mean amplitude over the requested window is subtracted.
+     *
+     * @param[in] remove  true = subtract mean, false = raw data.
+     */
+    void setRemoveDC(bool remove);
+    bool removeDC() const { return m_removeDC; }
+
     // ── Accessors (all thread-safe read) ──────────────────────────────
 
     int     channelCount()  const;
     int     firstSample()   const;
     int     totalSamples()  const;
+    float   sfreq()         const; /**< Sampling frequency in Hz; 0 if no FiffInfo attached. */
 
     //=========================================================================================================
     /**
@@ -219,9 +231,10 @@ signals:
     void metaChanged();
 
 private:
-    void rebuildDisplayInfo();
-    float amplitudeMaxForChannel(int ch) const;
-    QColor colorForChannel(int ch) const;
+    void    rebuildDisplayInfo();
+    float   amplitudeMaxForChannel(int ch) const;
+    QColor  colorForChannel(int ch) const;
+    QString typeLabelForChannel(int ch) const;
 
     mutable QReadWriteLock                    m_lock;
 
@@ -234,6 +247,7 @@ private:
     QColor                                    m_signalColor { Qt::darkGreen };
 
     QVector<ChannelDisplayInfo>               m_displayInfo;  // pre-computed, rebuild on meta change
+    bool                                      m_removeDC = false;
 };
 
 } // namespace DISPLIB

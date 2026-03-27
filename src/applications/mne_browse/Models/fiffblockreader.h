@@ -106,7 +106,7 @@ public:
      */
     void close();
 
-    bool isOpen() const { return m_file && m_file->isOpen(); }
+    bool isOpen() const { return !m_raw.isNull() && !m_raw->isEmpty(); }
 
     // ── File metadata ─────────────────────────────────────────────────
 
@@ -159,8 +159,15 @@ private:
     int                                 m_lastSample  = 0;
 
     QFutureWatcher<Eigen::MatrixXd>     m_watcher;
-    int                                 m_pendingFrom = 0; // first sample of in-flight request
-    bool                                m_loading     = false;
+    int                                 m_inFlightFrom = 0; // firstSample of the currently running read
+    bool                                m_loading      = false;
+
+    // Queued-up request: set when loadBlockAsync() is called while a read is running.
+    // The in-flight read is allowed to complete (no waitForFinished), but its result
+    // is discarded; then the pending request is started immediately.
+    bool                                m_hasPending   = false;
+    int                                 m_pendingFrom  = 0;
+    int                                 m_pendingTo    = 0;
 };
 
 } // namespace MNEBROWSE

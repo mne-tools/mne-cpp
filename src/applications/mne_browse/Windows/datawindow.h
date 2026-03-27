@@ -257,13 +257,20 @@ private:
     bool            m_bHideBadChannels;             /**< hide bad channels flag. */
 
     // ── ChannelDataView (GPU-accelerated renderer) ─────────────────────
-    DISPLIB::ChannelDataView* m_pChannelDataView  = nullptr; /**< GPU-accelerated signal renderer. */
-    FiffBlockReader*          m_pFiffReader       = nullptr; /**< Demand-paging FIFF reader. */
-    int                       m_iNextLoadSample   = 0;       /**< First sample of the next block to preload. */
-    bool                      m_bLoadingBlock     = false;   /**< Async load in progress. */
+    DISPLIB::ChannelDataView* m_pChannelDataView    = nullptr; /**< GPU-accelerated signal renderer. */
+    FiffBlockReader*          m_pFiffReader         = nullptr; /**< Demand-paging FIFF reader. */
+    int                       m_iNextLoadSample     = 0;       /**< First sample of the next forward block to load. */
+    int                       m_iCurrentScrollSample = 0;      /**< Last known scroll position (absolute sample). */
+    bool                      m_bLoadingBlock       = false;   /**< Async load in progress. */
 
-    static constexpr float kBlockSeconds  = 30.f;  /**< Seconds of data per demand-load block. */
-    static constexpr int   kMaxBlocks     = 5;     /**< Ring-buffer depth in blocks. */
+    // ── Buffer sizing ──────────────────────────────────────────────────
+    // Each block is 60 s.  Buffer holds kMaxBlocks = 10 blocks = 10 min.
+    // Prefetch is triggered whenever the unloaded frontier is within
+    // kLookaheadBlocks × kBlockSeconds ahead of the current scroll position,
+    // so loading chains greedily and keeps at least ~3 min of data ahead.
+    static constexpr float kBlockSeconds    = 60.f;  /**< Seconds of data per demand-load block. */
+    static constexpr int   kMaxBlocks       = 10;    /**< Ring-buffer depth in blocks (10 × 60 s = 10 min). */
+    static constexpr float kLookaheadBlocks = 3.f;   /**< Keep this many blocks loaded ahead of scroll. */
 
 signals:
     //=========================================================================================================
@@ -288,6 +295,14 @@ protected slots:
      * @param[in] sample  Current left-edge sample index.
      */
     void onChannelViewScrollChanged(int sample);
+
+    //=========================================================================================================
+    /**
+     * Starts the next async block load if the loaded frontier is within the lookahead
+     * window of the current scroll position.  Safe to call at any time; no-op when a
+     * load is already in-flight or all data has been read.
+     */
+    void scheduleNextLoad();
 
     //=========================================================================================================
     /**

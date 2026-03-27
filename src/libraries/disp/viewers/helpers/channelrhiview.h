@@ -47,10 +47,19 @@
 //=============================================================================================================
 
 #include <QColor>
+#include <QElapsedTimer>
+#include <QFutureWatcher>
+#include <QImage>
 #include <QPointer>
+#include <QPropertyAnimation>
+#include <QtConcurrent>
+
+#include <memory>
+#include <vector>
 
 #ifdef MNE_DISP_RHIWIDGET
 #  include <QRhiWidget>
+#  include <rhi/qrhi.h>
 #endif
 
 //=============================================================================================================
@@ -169,9 +178,75 @@ public:
      */
     int visibleSampleCount() const;
 
+    //=========================================================================================================
+    /**
+     * Set the index of the first visible channel row.
+     *
+     * @param[in] ch  Zero-based channel index.
+     */
+    void setFirstVisibleChannel(int ch);
+    int  firstVisibleChannel() const { return m_firstVisibleChannel; }
+
+    //=========================================================================================================
+    /**
+     * Set how many channel rows are displayed simultaneously.
+     *
+     * @param[in] count  Number of channels to show (clamped to 1–model count).
+     */
+    void setVisibleChannelCount(int count);
+    int  visibleChannelCount() const { return m_visibleChannelCount; }
+
+    //=========================================================================================================
+    /**
+     * Freeze or unfreeze drag-panning (mouse drag and inertia).
+     * Wheel scroll and the scrollbar remain active when frozen.
+     */
+    void setFrozen(bool frozen);
+    bool isFrozen() const { return m_frozen; }
+
+    //=========================================================================================================
+    /**
+     * Show or hide the time and amplitude grid overlay.
+     */
+    void setGridVisible(bool visible);
+    bool gridVisible() const { return m_gridVisible; }
+
+    //=========================================================================================================
+    /**
+     * Set the sampling frequency (Hz) used to place time-grid tick lines.
+     * Call this from ChannelDataView::init() after FiffInfo is available.
+     */
+    void setSfreq(float sfreq);
+
+    //=========================================================================================================
+    /**
+     * Set the absolute sample index of the first sample in the file.
+     * Used to align grid tick lines with the time ruler labels.
+     *
+     * @param[in] first  Absolute sample index of the file's first sample.
+     */
+    void setFirstFileSample(int first);
+
+    //=========================================================================================================
+    /**
+     * Control what the vertical mouse wheel scrolls.
+     * When @p channelsMode is true the vertical wheel scrolls through channels.
+     * When false the vertical wheel scrolls through time (same as horizontal).
+     *
+     * @param[in] channelsMode  true = vertical wheel → channels, false → time.
+     */
+    void setWheelScrollsChannels(bool channelsMode);
+    bool wheelScrollsChannels() const { return m_wheelScrollsChannels; }
+
 signals:
     void scrollSampleChanged(float sample);
     void samplesPerPixelChanged(float spp);
+
+    //=========================================================================================================
+    /**
+     * Emitted whenever the first visible channel index changes.
+     */
+    void channelOffsetChanged(int firstChannel);
 
     //=========================================================================================================
     /**
@@ -184,6 +259,7 @@ protected:
     void initialize(QRhiCommandBuffer *cb) override;
     void render(QRhiCommandBuffer *cb) override;
     void releaseResources() override;
+    void paintEvent(QPaintEvent *event) override; // QPainter fallback when RHI fails
 #else
     void paintEvent(QPaintEvent *event) override;
 #endif
@@ -207,14 +283,53 @@ private:
     void rebuildVBOs(QRhiResourceUpdateBatch *batch);
     void updateUBO(QRhiResourceUpdateBatch *batch);
     bool isVboDirty() const;
+#endif
+
+    // ── Tile cache (QPainter paths) ────────────────────────────────────
+
+    // Result produced by the async tile worker
+    struct TileResult {
+        QImage image;
+        float  sampleFirst     = 0.f;
+        float  samplesPerPixel = 0.f;
+        int    firstChannel    = 0;
+        int    visibleCount    = 0;
+    };
+
+    void scheduleTileRebuild();          // kick off async rebuild (non-blocking)
+    static TileResult buildTile(        // pure function, runs on worker thread
+        ChannelDataModel *model,
+        float scrollSample,
+        float samplesPerPixel,
+        int   firstVisibleChannel,
+        int   visibleChannelCount,
+        int   viewWidth, int viewHeight,
+        QColor bgColor,
+        bool  gridVisible,
+        float sfreq,
+        int   firstFileSample);
+    bool isTileFresh() const;
+
+    QImage m_tileImage;
+    float  m_tileSampleFirst     = 0.f;
+    float  m_tileSamplesPerPixel = 0.f;
+    int    m_tileFirstChannel    = -1;
+    int    m_tileVisibleCount    = 0;
+    bool   m_tileDirty           = true;
+
+    QFutureWatcher<TileResult>  m_tileWatcher;
+    bool                        m_tileRebuildPending = false;
+
+#ifdef MNE_DISP_RHIWIDGET
 
     std::unique_ptr<QRhiBuffer>                  m_ubo;
     std::unique_ptr<QRhiShaderResourceBindings>  m_srb;
     std::unique_ptr<QRhiGraphicsPipeline>        m_pipeline;
-    QVector<ChannelGpuData>                      m_gpuChannels;
+    std::vector<ChannelGpuData>                  m_gpuChannels;
     int                                          m_uboStride = 256;
     bool                                         m_pipelineDirty = true;
     bool                                         m_vboDirty      = true;
+    bool                                         m_rhiFailed     = false; // set on renderFailed
 #endif
 
     // ── State shared by both paths ─────────────────────────────────────
@@ -222,12 +337,33 @@ private:
     float                      m_scrollSample     = 0.f;
     float                      m_samplesPerPixel  = 1.f;
     float                      m_prefetchFactor   = 1.0f;
-    QColor                     m_bgColor          { 30, 30, 30 };
+    QColor                     m_bgColor          { 250, 250, 250 }; // light default
+
+    bool   m_frozen               = false;
+    bool   m_gridVisible          = true;
+    float  m_sfreq                = 1000.f;
+    int    m_firstFileSample      = 0;
+    bool   m_wheelScrollsChannels = true; // default: vertical wheel → channels
+
+    // ── Vertical channel windowing ────────────────────────────────────
+    int   m_firstVisibleChannel  = 0;
+    int   m_visibleChannelCount  = 12;
 
     // ── Drag scroll support ────────────────────────────────────────────
     bool  m_dragging        = false;
     int   m_dragStartX      = 0;
     float m_dragStartScroll = 0.f;
+
+    // ── Left-button drag (panning) + inertial scroll ──────────────────
+    bool  m_leftButtonDown    = false;
+    int   m_leftDownX         = 0;
+    float m_leftDownScroll    = 0.f;
+    bool  m_leftDragActivated = false;
+
+    struct VelocitySample { int x; qint64 t; };
+    QVector<VelocitySample> m_velocityHistory;
+    QElapsedTimer           m_dragTimer;
+    QPropertyAnimation*     m_pInertialAnim = nullptr;
 
     // ── Prefetch window tracking ───────────────────────────────────────
     int   m_vboWindowFirst  = 0;

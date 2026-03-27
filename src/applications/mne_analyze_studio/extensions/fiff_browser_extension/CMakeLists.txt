@@ -17,8 +17,10 @@ add_library(mne_analyze_studio_fiff_browser_extension_widgets ${MNE_ANALYZE_STUD
     mnebrowserrawdelegate.h
     rawdatabrowserwidget.h
     ../../../mne_browse/Models/rawmodel.cpp
+    ../../../mne_browse/Models/eventmodel.cpp
     ../../../mne_browse/Utils/datapackage.cpp
     ../../../mne_browse/Utils/filteroperator.cpp
+    ../../../mne_browse/Utils/rawsettings.cpp
 )
 
 mne_analyze_studio_configure_library_target(mne_analyze_studio_fiff_browser_extension_widgets)

@@ -36,6 +36,7 @@
 #include <irawdataview.h>
 
 #include "../../../mne_browse/Models/rawmodel.h"
+#include "../../../mne_browse/Models/eventmodel.h"
 
 #include <QWidget>
 
@@ -46,11 +47,14 @@ class QPushButton;
 class QFrame;
 class QTableView;
 class QScrollBar;
+class QPaintEvent;
+class QWheelEvent;
 
 namespace MNEANALYZESTUDIO
 {
 
 class MneBrowseRawDelegate;
+class TimeRulerWidget;
 
 /**
  * @brief Extension-owned widget that hosts the existing MNE browse raw signal view.
@@ -80,10 +84,12 @@ protected:
 
 private:
     void updateScrollConfiguration();
+    void updateTimeRuler();
     QString formatSeconds(int sample) const;
     void setMarkerSample(int sample);
     void updateMarkerOverlay();
     void adjustZoom(double factor);
+    void adjustAmplitude(double factor);
     QString currentVisibleRangeText() const;
     QString currentCursorText() const;
     void publishBrowserState(bool appendToOutput);
@@ -93,9 +99,12 @@ private:
     QPushButton* m_zoomOutButton;
     QPushButton* m_zoomResetButton;
     QPushButton* m_zoomInButton;
+    QPushButton* m_dcButton;
     QTableView* m_tableView;
     QFrame* m_markerLine;
+    TimeRulerWidget* m_timeRuler;
     MNEBROWSE::RawModel* m_rawModel;
+    MNEBROWSE::EventModel* m_eventModel;
     MneBrowseRawDelegate* m_delegate;
     int m_markerSample;
 };

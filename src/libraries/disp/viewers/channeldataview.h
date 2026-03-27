@@ -46,7 +46,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QPointer>
 #include <QMap>
 #include <QSharedPointer>
 
@@ -62,6 +61,7 @@
 
 class QScrollBar;
 class QSplitter;
+class QToolButton;
 
 namespace FIFFLIB {
     class FiffInfo;
@@ -79,7 +79,9 @@ namespace DISPLIB
 //=============================================================================================================
 
 class ChannelDataModel;
+class ChannelLabelPanel;
 class ChannelRhiView;
+class TimeRulerWidget;
 
 //=============================================================================================================
 /**
@@ -237,6 +239,15 @@ public:
     void hideBadChannels(bool hide);
     bool badChannelsHidden() const;
 
+    //=========================================================================================================
+    /**
+     * Enable or disable DC (mean) removal applied at render time.
+     * Takes effect immediately — the view redraws with the current data.
+     *
+     * @param[in] dc  true = subtract per-channel mean from each rendered window.
+     */
+    void setRemoveDC(bool dc);
+
     // ── AbstractView overrides ────────────────────────────────────────
     void saveSettings() override;
     void loadSettings() override;
@@ -282,6 +293,9 @@ private slots:
     void onScrollBarMoved(int value);
     void onRhiScrollChanged(float sample);
     void updateScrollBarRange();
+    void onChannelScrollBarMoved(int value);
+    void onChannelOffsetChanged(int firstChannel);
+    void updateChannelScrollBarRange();
 
 private:
     void setupLayout();
@@ -289,13 +303,19 @@ private:
 
     QString                          m_sSettingsPath;
     QSharedPointer<ChannelDataModel> m_pModel;
-    QPointer<ChannelRhiView>         m_pRhiView;
-    QPointer<QScrollBar>             m_pScrollBar;
+    ChannelLabelPanel*               m_pLabelPanel          = nullptr;
+    ChannelRhiView*                  m_pRhiView             = nullptr;
+    TimeRulerWidget*                 m_pTimeRuler           = nullptr;
+    QScrollBar*                      m_pScrollBar           = nullptr;
+    QScrollBar*                      m_pChannelScrollBar    = nullptr;
+    QToolButton*                     m_pScrollModeButton    = nullptr;
+
+    bool m_channelScrollBarUpdating = false;
 
     QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;
     QMap<qint32, float>               m_scaleMap;
     QColor                            m_signalColor { Qt::darkGreen };
-    QColor                            m_bgColor     { 30, 30, 30 };
+    QColor                            m_bgColor     { 250, 250, 250 };
 
     float  m_windowSizeSeconds  = 10.f;
     double m_zoomFactor         = 1.0;

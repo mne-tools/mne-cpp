@@ -38,7 +38,9 @@
 
 #include "channeldataview.h"
 #include "helpers/channeldatamodel.h"
+#include "helpers/channellabelpanel.h"
 #include "helpers/channelrhiview.h"
+#include "helpers/timerulerwidget.h"
 
 #include <fiff/fiff_info.h>
 
@@ -49,6 +51,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QScrollBar>
+#include <QToolButton>
 #include <QKeyEvent>
 #include <QResizeEvent>
 #include <QSettings>
@@ -93,14 +96,78 @@ void ChannelDataView::setupLayout()
     outerLayout->setContentsMargins(0, 0, 0, 0);
     outerLayout->setSpacing(0);
 
-    // ── Render surface ───────────────────────────────────────────────────
+    // ── Render area ──────────────────────────────────────────────────────
+    // Layout:
+    //   renderRow (HBox)
+    //     leftCol  (VBox): [rulerSpacer(28px) | labelPanel]
+    //     traceCol (VBox): [ruler(28px)       | rhiView   ]
+    //     rightCol (VBox): [scrollModeButton  | channelScrollBar]
+
+    auto *renderRow = new QHBoxLayout();
+    renderRow->setContentsMargins(0, 0, 0, 0);
+    renderRow->setSpacing(0);
+
+    // ── Left column: spacer aligned with ruler + label panel below ───────
+    auto *leftCol = new QVBoxLayout();
+    leftCol->setContentsMargins(0, 0, 0, 0);
+    leftCol->setSpacing(0);
+
+    // Invisible spacer whose height matches the time ruler (28 px fixed).
+    auto *rulerSpacer = new QWidget(this);
+    rulerSpacer->setFixedHeight(28);
+    rulerSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    leftCol->addWidget(rulerSpacer, 0);
+
+    m_pLabelPanel = new ChannelLabelPanel(this);
+    leftCol->addWidget(m_pLabelPanel, 1);
+
+    renderRow->addLayout(leftCol, 0);
+
+    // ── Centre column: time ruler + RHI view ─────────────────────────────
+    auto *traceColumn = new QVBoxLayout();
+    traceColumn->setContentsMargins(0, 0, 0, 0);
+    traceColumn->setSpacing(0);
+
+    m_pTimeRuler = new TimeRulerWidget(this);
+    traceColumn->addWidget(m_pTimeRuler, 0);
+
     m_pRhiView = new ChannelRhiView(this);
     m_pRhiView->setModel(m_pModel.data());
     m_pRhiView->setBackgroundColor(m_bgColor);
     m_pRhiView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_pRhiView->setFocusPolicy(Qt::NoFocus);
+    traceColumn->addWidget(m_pRhiView, 1);
 
-    outerLayout->addWidget(m_pRhiView, 1);
+    renderRow->addLayout(traceColumn, 1);
+
+    // ── Right column: scroll-mode toggle + channel scrollbar ─────────────
+    auto *rightCol = new QVBoxLayout();
+    rightCol->setContentsMargins(0, 0, 0, 0);
+    rightCol->setSpacing(0);
+
+    m_pScrollModeButton = new QToolButton(this);
+    m_pScrollModeButton->setCheckable(true);
+    m_pScrollModeButton->setChecked(true);  // default: ↕ = channels
+    m_pScrollModeButton->setText(QStringLiteral("\u2195 Ch"));
+    m_pScrollModeButton->setFixedHeight(28); // aligns with ruler
+    m_pScrollModeButton->setToolTip(QStringLiteral(
+        "Vertical mouse wheel:\n"
+        "\u2195 Ch  \u2013 scroll through channels\n"
+        "\u21c4 Time \u2013 scroll through time"));
+    rightCol->addWidget(m_pScrollModeButton, 0);
+
+    m_pChannelScrollBar = new QScrollBar(Qt::Vertical, this);
+    m_pChannelScrollBar->setMinimum(0);
+    m_pChannelScrollBar->setMaximum(0);
+    m_pChannelScrollBar->setValue(0);
+    m_pChannelScrollBar->setSingleStep(1);
+    m_pChannelScrollBar->setPageStep(12);
+    m_pChannelScrollBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    rightCol->addWidget(m_pChannelScrollBar, 1);
+
+    renderRow->addLayout(rightCol, 0);
+
+    outerLayout->addLayout(renderRow, 1);
 
     // ── Horizontal scroll bar ────────────────────────────────────────────
     m_pScrollBar = new QScrollBar(Qt::Horizontal, this);
@@ -116,14 +183,42 @@ void ChannelDataView::setupLayout()
     connect(m_pScrollBar, &QScrollBar::valueChanged,
             this, &ChannelDataView::onScrollBarMoved);
 
+    connect(m_pChannelScrollBar, &QScrollBar::valueChanged,
+            this, &ChannelDataView::onChannelScrollBarMoved);
+
     connect(m_pRhiView, &ChannelRhiView::scrollSampleChanged,
             this, &ChannelDataView::onRhiScrollChanged);
+
+    connect(m_pRhiView, &ChannelRhiView::channelOffsetChanged,
+            this, &ChannelDataView::onChannelOffsetChanged);
+
+    connect(m_pLabelPanel, &ChannelLabelPanel::channelScrollRequested,
+            m_pRhiView, &ChannelRhiView::setFirstVisibleChannel);
+
+    connect(m_pRhiView, &ChannelRhiView::channelOffsetChanged,
+            m_pLabelPanel, &ChannelLabelPanel::setFirstVisibleChannel);
+
+    connect(m_pScrollModeButton, &QToolButton::toggled, this, [this](bool checked) {
+        // checked = ↕ channels mode; unchecked = ⟷ time mode
+        m_pRhiView->setWheelScrollsChannels(checked);
+        m_pScrollModeButton->setText(checked ? QStringLiteral("\u2195 Ch")
+                                             : QStringLiteral("\u21c4 Time"));
+    });
 
     connect(m_pRhiView, &ChannelRhiView::sampleClicked,
             this, &ChannelDataView::sampleClicked);
 
+    connect(m_pRhiView, &ChannelRhiView::scrollSampleChanged,
+            m_pTimeRuler, &TimeRulerWidget::setScrollSample);
+
+    connect(m_pRhiView, &ChannelRhiView::samplesPerPixelChanged,
+            m_pTimeRuler, &TimeRulerWidget::setSamplesPerPixel);
+
     connect(m_pModel.data(), &ChannelDataModel::dataChanged,
             this, &ChannelDataView::updateScrollBarRange);
+
+    connect(m_pModel.data(), &ChannelDataModel::metaChanged,
+            this, &ChannelDataView::updateChannelScrollBarRange);
 
     setFocusProxy(m_pRhiView);
     setFocusPolicy(Qt::StrongFocus);
@@ -141,8 +236,21 @@ void ChannelDataView::init(QSharedPointer<FiffInfo> pInfo)
         m_pModel->setScaleMap(m_scaleMap);
     m_pModel->setSignalColor(m_signalColor);
 
+    if (pInfo) {
+        if (m_pTimeRuler)
+            m_pTimeRuler->setSfreq(pInfo->sfreq);
+        if (m_pRhiView)
+            m_pRhiView->setSfreq(static_cast<float>(pInfo->sfreq));
+    }
+
+    if (m_pLabelPanel) {
+        m_pLabelPanel->setModel(m_pModel.data());
+        m_pLabelPanel->setVisibleChannelCount(m_pRhiView ? m_pRhiView->visibleChannelCount() : 12);
+    }
+
     updateSamplesPerPixel();
     updateScrollBarRange();
+    updateChannelScrollBarRange();
 }
 
 //=============================================================================================================
@@ -150,6 +258,10 @@ void ChannelDataView::init(QSharedPointer<FiffInfo> pInfo)
 void ChannelDataView::setData(const MatrixXd &data, int firstSample)
 {
     m_pModel->setData(data, firstSample);
+    if (m_pTimeRuler)
+        m_pTimeRuler->setFirstFileSample(firstSample);
+    if (m_pRhiView)
+        m_pRhiView->setFirstFileSample(firstSample);
     updateScrollBarRange();
 }
 
@@ -265,6 +377,13 @@ bool ChannelDataView::badChannelsHidden() const
 
 //=============================================================================================================
 
+void ChannelDataView::setRemoveDC(bool dc)
+{
+    m_pModel->setRemoveDC(dc);
+}
+
+//=============================================================================================================
+
 int ChannelDataView::firstVisibleSample() const
 {
     return m_pRhiView ? m_pRhiView->visibleFirstSample() : 0;
@@ -290,10 +409,22 @@ void ChannelDataView::loadSettings()
     if (m_sSettingsPath.isEmpty())
         return;
     QSettings s;
-    m_windowSizeSeconds = s.value(m_sSettingsPath + "/windowSizeSeconds", 10.f).toFloat();
-    m_zoomFactor        = s.value(m_sSettingsPath + "/zoomFactor",        1.0).toDouble();
-    m_bgColor           = s.value(m_sSettingsPath + "/backgroundColor",   QColor(30, 30, 30)).value<QColor>();
-    m_signalColor       = s.value(m_sSettingsPath + "/signalColor",       QColor(Qt::darkGreen)).value<QColor>();
+    float rawWindowSec  = s.value(m_sSettingsPath + "/windowSizeSeconds", 10.f).toFloat();
+    m_windowSizeSeconds = qBound(0.5f, rawWindowSec, 120.f);
+    // Remove stale out-of-range value so next session starts clean.
+    if (rawWindowSec != m_windowSizeSeconds)
+        s.remove(m_sSettingsPath + "/windowSizeSeconds");
+
+    m_zoomFactor  = s.value(m_sSettingsPath + "/zoomFactor",        1.0).toDouble();
+    m_bgColor     = s.value(m_sSettingsPath + "/backgroundColor",   QColor(250, 250, 250)).value<QColor>();
+    m_signalColor = s.value(m_sSettingsPath + "/signalColor",       QColor(Qt::darkGreen)).value<QColor>();
+
+    // Propagate loaded colors to the sub-views (they may have been created
+    // with defaults in setupLayout() before loadSettings() ran).
+    if (m_pRhiView)
+        m_pRhiView->setBackgroundColor(m_bgColor);
+    if (m_pModel)
+        m_pModel->setSignalColor(m_signalColor);
 }
 
 //=============================================================================================================
@@ -307,6 +438,10 @@ void ChannelDataView::clearView()
     }
     if (m_pRhiView)
         m_pRhiView->setScrollSample(0.f);
+    if (m_pTimeRuler) {
+        m_pTimeRuler->setFirstFileSample(0);
+        m_pTimeRuler->setScrollSample(0.f);
+    }
 }
 
 //=============================================================================================================
@@ -404,11 +539,14 @@ void ChannelDataView::updateScrollBarRange()
     if (!m_pScrollBar || !m_pRhiView)
         return;
 
-    int total   = m_pModel->totalSamples();
-    int visible = m_pRhiView->visibleSampleCount();
-    int maxVal  = qMax(0, total - visible);
+    int firstSamp = m_pModel->firstSample();
+    int total     = m_pModel->totalSamples();
+    int visible   = m_pRhiView->visibleSampleCount();
+    int minVal    = firstSamp;
+    int maxVal    = qMax(firstSamp, firstSamp + total - visible);
 
     m_scrollBarUpdating = true;
+    m_pScrollBar->setMinimum(minVal);
     m_pScrollBar->setMaximum(maxVal);
     m_pScrollBar->setPageStep(visible);
     m_scrollBarUpdating = false;
@@ -430,4 +568,41 @@ void ChannelDataView::updateSamplesPerPixel()
     float spp = (m_windowSizeSeconds * sfreq) / viewPx / static_cast<float>(m_zoomFactor);
     m_pRhiView->setSamplesPerPixel(qMax(spp, 1e-4f));
     updateScrollBarRange();
+}
+
+//=============================================================================================================
+
+void ChannelDataView::onChannelScrollBarMoved(int value)
+{
+    if (m_channelScrollBarUpdating || !m_pRhiView)
+        return;
+    m_pRhiView->setFirstVisibleChannel(value);
+}
+
+//=============================================================================================================
+
+void ChannelDataView::onChannelOffsetChanged(int firstChannel)
+{
+    if (!m_pChannelScrollBar)
+        return;
+    m_channelScrollBarUpdating = true;
+    m_pChannelScrollBar->setValue(firstChannel);
+    m_channelScrollBarUpdating = false;
+}
+
+//=============================================================================================================
+
+void ChannelDataView::updateChannelScrollBarRange()
+{
+    if (!m_pChannelScrollBar || !m_pRhiView)
+        return;
+
+    int totalCh    = m_pModel->channelCount();
+    int visibleCnt = m_pRhiView->visibleChannelCount();
+    int maxVal     = qMax(0, totalCh - visibleCnt);
+
+    m_channelScrollBarUpdating = true;
+    m_pChannelScrollBar->setMaximum(maxVal);
+    m_pChannelScrollBar->setPageStep(visibleCnt);
+    m_channelScrollBarUpdating = false;
 }
