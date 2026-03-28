@@ -918,6 +918,11 @@ void RawModel::updateProjections()
     //  Update the SSP projector
     if(m_pFiffInfo)
     {
+        if(!m_bFileloaded || !m_pfiffIO || m_pfiffIO->m_qlistRaw.isEmpty()) {
+            qInfo() << "RawModel::updateProjections skipped because raw data is not loaded yet.";
+            return;
+        }
+
         //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
         bool bProjActivated = false;
         for(qint32 i = 0; i < this->m_pFiffInfo->projs.size(); ++i) {
@@ -982,6 +987,11 @@ void RawModel::updateCompensator(int to)
     //
     if(m_pFiffInfo)
     {
+        if(!m_bFileloaded || !m_pfiffIO || m_pfiffIO->m_qlistRaw.isEmpty()) {
+            qInfo() << "RawModel::updateCompensator skipped because raw data is not loaded yet.";
+            return;
+        }
+
         FiffCtfComp newComp;
 
         if(to != 0) {

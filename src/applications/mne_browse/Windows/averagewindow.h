@@ -225,6 +225,12 @@ private:
 
     //=========================================================================================================
     /**
+     * Selects all loaded evoked sets so newly loaded/computed data is shown immediately.
+     */
+    void selectLoadedSets();
+
+    //=========================================================================================================
+    /**
      * reimplemented resize event.
      */
     void resizeEvent(QResizeEvent * event);
@@ -241,6 +247,12 @@ private:
 
     ButterflyScene*         m_pButterflyScene;      /**< The pointer to the butterfly scene. */
 
+signals:
+    //=========================================================================================================
+    /**
+     * Emitted when the user requests a new evoked computation from the average manager UI.
+     */
+    void addAverageRequested();
 };
 
 } // NAMESPACE MNEBROWSE

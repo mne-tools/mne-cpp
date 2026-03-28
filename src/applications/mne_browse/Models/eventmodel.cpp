@@ -47,6 +47,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <iostream>
 
 
@@ -525,6 +526,39 @@ QStringList EventModel::getEventTypeList() const
 const QMap<int, QColor> & EventModel::getEventTypeColors()
 {
     return m_eventTypeColor;
+}
+
+
+//*************************************************************************************************************
+
+MatrixXi EventModel::getEventMatrix() const
+{
+    if(m_dataSamples.isEmpty() || m_dataSamples.size() != m_dataTypes.size()) {
+        return MatrixXi();
+    }
+
+    QVector<QPair<int, int> > sortedEvents;
+    sortedEvents.reserve(m_dataSamples.size());
+
+    for(int i = 0; i < m_dataSamples.size(); ++i) {
+        sortedEvents.append(qMakePair(m_dataSamples.at(i), m_dataTypes.at(i)));
+    }
+
+    std::stable_sort(sortedEvents.begin(),
+                     sortedEvents.end(),
+                     [](const QPair<int, int> &left, const QPair<int, int> &right) {
+        return left.first < right.first;
+    });
+
+    MatrixXi events(sortedEvents.size(), 3);
+
+    for(int i = 0; i < sortedEvents.size(); ++i) {
+        events(i, 0) = sortedEvents.at(i).first;
+        events(i, 1) = 0;
+        events(i, 2) = sortedEvents.at(i).second;
+    }
+
+    return events;
 }
 
 

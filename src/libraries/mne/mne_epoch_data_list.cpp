@@ -421,6 +421,12 @@ FiffEvokedSet MNEEpochDataList::averageCategories(const FiffRawData &raw,
                                                                     eventCode,
                                                                     mapReject);
 
+        if (epochList.isEmpty()) {
+            qWarning() << "[MNEEpochDataList::averageCategories] No epochs found for event"
+                       << eventCode << "- skipping category.";
+            continue;
+        }
+
         // Apply baseline correction
         if (doBaseline) {
             epochList.applyBaselineCorrection(baseline);
@@ -428,6 +434,12 @@ FiffEvokedSet MNEEpochDataList::averageCategories(const FiffRawData &raw,
 
         // Drop rejected epochs
         epochList.dropRejected();
+
+        if (epochList.isEmpty()) {
+            qWarning() << "[MNEEpochDataList::averageCategories] All epochs rejected for event"
+                       << eventCode << "- skipping category.";
+            continue;
+        }
 
         // Compute the average
         int minSamp = static_cast<int>(std::round(tmin * sfreq));
