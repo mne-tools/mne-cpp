@@ -204,6 +204,19 @@ public:
 
     //=========================================================================================================
     /**
+     * Compute the RMS amplitude of a channel over a sample window.
+     * Samples outside the buffer are silently ignored.
+     * Capped internally at 1000 samples for rendering-thread safety.
+     *
+     * @param[in] channelIdx   Zero-based channel index.
+     * @param[in] firstSample  Absolute first sample (inclusive).
+     * @param[in] lastSample   Absolute last  sample (exclusive).
+     * @return RMS in raw (physical) units, or 0 if no data is available.
+     */
+    float channelRms(int channelIdx, int firstSample, int lastSample) const;
+
+    //=========================================================================================================
+    /**
      * Return a flat float array ready for VBO upload.
      * The array contains interleaved (x_offset, y_amplitude) pairs.
      *
