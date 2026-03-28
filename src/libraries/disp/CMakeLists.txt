@@ -221,11 +221,12 @@ if(MNE_DISP_HAS_RHIWIDGET)
     qt_add_shaders(${PROJECT_NAME} "channeldata_shaders"
         BATCHABLE
         PRECOMPILE
-        OPTIMIZED
         PREFIX "/disp/shaders"
         FILES
             viewers/helpers/shaders/channeldata.vert
             viewers/helpers/shaders/channeldata.frag
+            viewers/helpers/shaders/overlay.vert
+            viewers/helpers/shaders/overlay.frag
     )
 endif()
 

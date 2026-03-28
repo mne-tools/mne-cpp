@@ -378,19 +378,36 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
         };
         constexpr int kPaletteSize = static_cast<int>(sizeof(kEventPalette) / sizeof(kEventPalette[0]));
 
-        for (int ch = 0; ch < data.rows() && ch < fiffInfo->nchan; ++ch) {
+        // Prefer the combined trigger channel ("STI 014" for Neuromag Vectorview).
+        // Scanning all individual STIM bit channels leads to spurious events from
+        // analog inputs (e.g. photosensors) that share the STIM channel type but
+        // carry a constant non-zero voltage rather than discrete trigger codes.
+        // MNE Python's find_events() also defaults to STI 014 for this reason.
+        int stimCh = -1;
+        for (int ch = 0; ch < fiffInfo->nchan; ++ch) {
             if (fiffInfo->chs[ch].kind != FIFFV_STIM_CH)
                 continue;
+            // Match "STI 014" or "STI014" or similar combined channel naming.
+            // Fall back to the first STIM channel found if no match.
+            QString name = fiffInfo->ch_names[ch].trimmed();
+            if (name.endsWith(QLatin1String("014"), Qt::CaseInsensitive) ||
+                name.endsWith(QLatin1String("101"), Qt::CaseInsensitive)) {
+                stimCh = ch;
+                break;
+            }
+            if (stimCh == -1)
+                stimCh = ch; // remember first STIM channel as fallback
+        }
 
+        if (stimCh >= 0 && stimCh < data.rows()) {
             for (int s = 0; s < data.cols(); ++s) {
-                double val = data(ch, s);
-                double prev = (s > 0) ? data(ch, s - 1) : 0.0;
+                double val  = data(stimCh, s);
+                double prev = (s > 0) ? data(stimCh, s - 1) : 0.0;
                 // Rising edge: previous is 0 (or lower), current is non-zero positive integer
                 if (val > 0.5 && prev < 0.5) {
-                    int type       = static_cast<int>(val + 0.5);
-                    int absSample  = firstSample + s;
+                    int type      = static_cast<int>(val + 0.5);
+                    int absSample = firstSample + s;
 
-                    // Assign a stable colour per type
                     if (!m_eventTypeColors.contains(type)) {
                         int idx = m_eventTypeColors.size() % kPaletteSize;
                         m_eventTypeColors[type] = kEventPalette[idx];
@@ -407,25 +424,12 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
         }
 
         if (!m_stimEvents.isEmpty() && m_pChannelDataView) {
-            // Sort by (sample ASC, type DESC) so that for events at the same
-            // sample the highest-type entry comes first (STI 014 combined
-            // trigger > individual bit channels).  After deduplication only
-            // the highest-type event per sample survives, giving the correct
-            // label and colour instead of always showing type "1".
-            std::stable_sort(m_stimEvents.begin(), m_stimEvents.end(),
-                             [](const DISPLIB::ChannelRhiView::EventMarker &a,
-                                const DISPLIB::ChannelRhiView::EventMarker &b) {
-                                 if (a.sample != b.sample)
-                                     return a.sample < b.sample;
-                                 return a.type > b.type; // higher type first
-                             });
-            // Remove duplicate samples — keep the first occurrence (= highest type).
-            auto last = std::unique(m_stimEvents.begin(), m_stimEvents.end(),
-                                    [](const DISPLIB::ChannelRhiView::EventMarker &a,
-                                       const DISPLIB::ChannelRhiView::EventMarker &b) {
-                                        return a.sample == b.sample;
-                                    });
-            m_stimEvents.erase(last, m_stimEvents.end());
+            // Sort by ascending sample for correct left-to-right chip rendering.
+            std::sort(m_stimEvents.begin(), m_stimEvents.end(),
+                      [](const DISPLIB::ChannelRhiView::EventMarker &a,
+                         const DISPLIB::ChannelRhiView::EventMarker &b) {
+                          return a.sample < b.sample;
+                      });
             m_pChannelDataView->setEvents(m_stimEvents);
         }
     }

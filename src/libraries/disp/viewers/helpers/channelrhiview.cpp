@@ -287,6 +287,7 @@ void ChannelRhiView::setScrollSample(float sample)
         sample + visible > m_vboWindowLast - margin) {
         m_vboDirty = true;
     }
+    m_overlayDirty = true;
 #endif
 
     emit scrollSampleChanged(m_scrollSample);
@@ -303,6 +304,7 @@ void ChannelRhiView::setSamplesPerPixel(float spp)
     m_samplesPerPixel = spp;
 #ifdef MNE_DISP_RHIWIDGET
     m_vboDirty = true; // zoom change → decimation changes
+    m_overlayDirty = true;
 #endif
     m_tileDirty = true;
     emit samplesPerPixelChanged(m_samplesPerPixel);
@@ -425,6 +427,7 @@ void ChannelRhiView::setGridVisible(bool visible)
         return;
     m_gridVisible = visible;
     m_tileDirty   = true;
+    m_overlayDirty = true;
     update();
 }
 
@@ -434,6 +437,7 @@ void ChannelRhiView::setSfreq(float sfreq)
 {
     m_sfreq = qMax(sfreq, 0.f);
     m_tileDirty = true;
+    m_overlayDirty = true;
     update();
 }
 
@@ -445,6 +449,7 @@ void ChannelRhiView::setFirstFileSample(int first)
         return;
     m_firstFileSample = first;
     m_tileDirty = true;
+    m_overlayDirty = true;
     update();
 }
 
@@ -518,6 +523,7 @@ void ChannelRhiView::setEvents(const QVector<EventMarker> &events)
 {
     m_events = events;
     m_tileDirty = true;
+    m_overlayDirty = true;
     update();
 }
 
@@ -544,6 +550,13 @@ void ChannelRhiView::releaseResources()
     m_gpuChannels.clear();
     m_pipelineDirty = true;
     m_vboDirty      = true;
+
+    m_overlayPipeline.reset();
+    m_overlaySrb.reset();
+    m_overlaySampler.reset();
+    m_overlayTex.reset();
+    m_overlayVbo.reset();
+    m_overlayDirty = true;
 }
 
 //=============================================================================================================
@@ -800,6 +813,164 @@ void ChannelRhiView::updateUBO(QRhiResourceUpdateBatch *batch)
 }
 
 //=============================================================================================================
+// Overlay blit — bands + event lines baked into a QImage and uploaded as a QRhiTexture
+// so they are part of the Metal texture and remain visible even when the app loses focus.
+//=============================================================================================================
+
+void ChannelRhiView::rebuildOverlayImage(int pw, int ph)
+{
+    m_overlayImage = QImage(pw, ph, QImage::Format_RGBA8888);
+    m_overlayImage.fill(Qt::transparent);
+
+    if (m_sfreq <= 0.f || m_samplesPerPixel <= 0.f) {
+        m_overlayDirty = false;
+        return;
+    }
+
+    QPainter p(&m_overlayImage);
+    p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+
+    // ── Alternating per-second bands ────────────────────────────────
+    if (m_gridVisible) {
+        const float samplesPerSec = m_sfreq;
+        const float origin        = static_cast<float>(m_firstFileSample);
+        float firstBound = std::floor((m_scrollSample - origin) / samplesPerSec)
+                           * samplesPerSec + origin;
+        long long bandIdx = static_cast<long long>((firstBound - origin) / samplesPerSec);
+        bool oddBand      = (bandIdx & 1) != 0;
+
+        QColor tint(0, 0, 0, 20); // 8 % opacity dark tint on odd seconds
+        const float vw = static_cast<float>(pw);
+        const float vh = static_cast<float>(ph);
+        const float sppF = m_samplesPerPixel;
+
+        for (float s = firstBound;
+             s < m_scrollSample + pw * sppF + samplesPerSec;
+             s += samplesPerSec, oddBand = !oddBand) {
+            if (!oddBand) continue;
+            float xStart = (s - m_scrollSample) / sppF;
+            float xEnd   = xStart + samplesPerSec / sppF;
+            xStart = qBound(0.f, xStart, vw);
+            xEnd   = qBound(0.f, xEnd,   vw);
+            if (xEnd > xStart)
+                p.fillRect(QRectF(xStart, 0, xEnd - xStart, vh), tint);
+        }
+    }
+
+    // ── Event / stimulus marker lines ───────────────────────────────
+    if (!m_events.isEmpty()) {
+        for (const EventMarker &ev : m_events) {
+            float xF = (static_cast<float>(ev.sample) - m_scrollSample) / m_samplesPerPixel;
+            if (xF < -2.f || xF > pw + 2.f)
+                continue;
+            int ix = static_cast<int>(xF);
+            QColor lineColor = ev.color;
+            lineColor.setAlpha(180);
+            p.setPen(QPen(lineColor, 1));
+            p.drawLine(ix, 0, ix, ph);
+        }
+    }
+
+    m_overlayDirty = false;
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::ensureOverlayPipeline()
+{
+    QRhi *rhi = this->rhi();
+    if (!rhi || !renderTarget())
+        return;
+    if (m_overlayPipeline)
+        return;
+
+    // Full-screen quad VBO: (pos.x, pos.y, uv.x, uv.y) per vertex, TriangleStrip.
+    // Dynamic so it can be uploaded in render() via the existing batch.
+    // NDC Y+ = top. Image UV Y=0 = top.
+    //   NDC(-1,-1)=bottom-left → UV(0,1)
+    //   NDC(-1, 1)=top-left    → UV(0,0)
+    //   NDC( 1,-1)=bottom-right→ UV(1,1)
+    //   NDC( 1, 1)=top-right   → UV(1,0)
+    static constexpr int kQuadBytes = 4 * 4 * sizeof(float);
+    m_overlayVbo.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
+                                      QRhiBuffer::VertexBuffer,
+                                      kQuadBytes));
+    if (!m_overlayVbo->create()) {
+        m_overlayVbo.reset();
+        return;
+    }
+
+    // Texture — placeholder 1×1; resized lazily in render() when pw/ph are known.
+    m_overlayTex.reset(rhi->newTexture(QRhiTexture::RGBA8, QSize(1, 1)));
+    m_overlayTex->create();
+
+    m_overlaySampler.reset(rhi->newSampler(
+        QRhiSampler::Linear, QRhiSampler::Linear,
+        QRhiSampler::None,
+        QRhiSampler::ClampToEdge, QRhiSampler::ClampToEdge));
+    m_overlaySampler->create();
+
+    // SRB: binding 1 = combined image sampler
+    m_overlaySrb.reset(rhi->newShaderResourceBindings());
+    m_overlaySrb->setBindings({
+        QRhiShaderResourceBinding::sampledTexture(
+            1, QRhiShaderResourceBinding::FragmentStage,
+            m_overlayTex.get(), m_overlaySampler.get())
+    });
+    m_overlaySrb->create();
+
+    auto loadShader = [](const QString &path) -> QShader {
+        QFile f(path);
+        if (!f.open(QIODevice::ReadOnly)) {
+            qWarning() << "ChannelRhiView: cannot open shader" << path;
+            return {};
+        }
+        return QShader::fromSerialized(f.readAll());
+    };
+
+    QShader vs = loadShader(QStringLiteral(":/disp/shaders/overlay.vert.qsb"));
+    QShader fs = loadShader(QStringLiteral(":/disp/shaders/overlay.frag.qsb"));
+    if (!vs.isValid() || !fs.isValid()) {
+        m_overlayVbo.reset();
+        m_overlaySrb.reset();
+        m_overlaySampler.reset();
+        m_overlayTex.reset();
+        return;
+    }
+
+    m_overlayPipeline.reset(rhi->newGraphicsPipeline());
+    QRhiGraphicsPipeline::TargetBlend blend;
+    blend.enable   = true;
+    blend.srcColor = QRhiGraphicsPipeline::SrcAlpha;
+    blend.dstColor = QRhiGraphicsPipeline::OneMinusSrcAlpha;
+    blend.srcAlpha = QRhiGraphicsPipeline::One;
+    blend.dstAlpha = QRhiGraphicsPipeline::OneMinusSrcAlpha;
+    m_overlayPipeline->setTargetBlends({ blend });
+    m_overlayPipeline->setTopology(QRhiGraphicsPipeline::TriangleStrip);
+    m_overlayPipeline->setDepthTest(false);
+    m_overlayPipeline->setDepthWrite(false);
+    m_overlayPipeline->setShaderStages({
+        { QRhiShaderStage::Vertex,   vs },
+        { QRhiShaderStage::Fragment, fs },
+    });
+
+    QRhiVertexInputLayout inputLayout;
+    inputLayout.setBindings({ QRhiVertexInputBinding(4 * sizeof(float)) });
+    inputLayout.setAttributes({
+        QRhiVertexInputAttribute(0, 0, QRhiVertexInputAttribute::Float2, 0),
+        QRhiVertexInputAttribute(0, 1, QRhiVertexInputAttribute::Float2, 2 * sizeof(float))
+    });
+    m_overlayPipeline->setVertexInputLayout(inputLayout);
+    m_overlayPipeline->setShaderResourceBindings(m_overlaySrb.get());
+    m_overlayPipeline->setRenderPassDescriptor(renderTarget()->renderPassDescriptor());
+
+    if (!m_overlayPipeline->create()) {
+        qWarning() << "ChannelRhiView: overlay pipeline create failed";
+        m_overlayPipeline.reset();
+    }
+}
+
+//=============================================================================================================
 
 void ChannelRhiView::render(QRhiCommandBuffer *cb)
 {
@@ -822,6 +993,10 @@ void ChannelRhiView::render(QRhiCommandBuffer *cb)
         return;
     }
 
+    QSize ps = renderTarget()->pixelSize();
+    const int pw = ps.width();
+    const int ph = ps.height();
+
     QRhiResourceUpdateBatch *batch = rhi()->nextResourceUpdateBatch();
 
     if (isVboDirty())
@@ -829,31 +1004,64 @@ void ChannelRhiView::render(QRhiCommandBuffer *cb)
 
     updateUBO(batch);
 
+    // ── Overlay image (bands + event lines) ──────────────────────────────
+    ensureOverlayPipeline();
+    bool overlayReady = false;
+    if (m_overlayPipeline && m_overlayVbo && pw > 0 && ph > 0) {
+        // Rebuild the overlay QImage if dirty or resized
+        if (m_overlayDirty || QSize(pw, ph) != m_overlayTexSize) {
+            rebuildOverlayImage(pw, ph);
+            // (Re)create texture at the correct pixel size
+            if (QSize(pw, ph) != m_overlayTexSize) {
+                m_overlayTex.reset(rhi()->newTexture(QRhiTexture::RGBA8, QSize(pw, ph)));
+                m_overlayTex->create();
+                // Re-create SRB because it references the texture
+                m_overlaySrb->setBindings({
+                    QRhiShaderResourceBinding::sampledTexture(
+                        1, QRhiShaderResourceBinding::FragmentStage,
+                        m_overlayTex.get(), m_overlaySampler.get())
+                });
+                m_overlaySrb->create();
+                m_overlayTexSize = QSize(pw, ph);
+            }
+            QRhiTextureUploadEntry entry(0, 0, QRhiTextureSubresourceUploadDescription(m_overlayImage));
+            batch->uploadTexture(m_overlayTex.get(), entry);
+        }
+
+        // Upload quad VBO (dynamic, 4 vertices × 4 floats)
+        static const float kQuadVerts[] = {
+            -1.f, -1.f,  0.f, 1.f,
+            -1.f,  1.f,  0.f, 0.f,
+             1.f, -1.f,  1.f, 1.f,
+             1.f,  1.f,  1.f, 0.f,
+        };
+        batch->updateDynamicBuffer(m_overlayVbo.get(), 0, sizeof(kQuadVerts), kQuadVerts);
+        overlayReady = true;
+    }
+
     // ── Render pass ──────────────────────────────────────────────────────
     QColor bg = m_bgColor;
     cb->beginPass(renderTarget(), bg, {1.f, 0}, batch);
 
+    cb->setViewport(QRhiViewport(0.f, 0.f, static_cast<float>(pw),
+                                             static_cast<float>(ph)));
+
+    // ── Waveform traces ──────────────────────────────────────────────────
     cb->setGraphicsPipeline(m_pipeline.get());
 
-    QSize ps = renderTarget()->pixelSize();
-    cb->setViewport(QRhiViewport(0.f, 0.f, static_cast<float>(ps.width()),
-                                             static_cast<float>(ps.height())));
-
-    // Render only the visible channel window
     int totalCh = totalLogicalChannels();
     int firstCh = qBound(0, m_firstVisibleChannel, totalCh);
     int visCnt  = qMin(m_visibleChannelCount, totalCh - firstCh);
     int nToRender = qMin(visCnt, kMaxChannels);
 
     for (int i = 0; i < nToRender; ++i) {
-        int logCh = firstCh + i; // logical (filtered) index → VBO index
+        int logCh = firstCh + i;
         if (logCh >= static_cast<int>(m_gpuChannels.size()))
             break;
         auto &gd = m_gpuChannels[logCh];
         if (!gd.vbo || gd.vertexCount < 2)
             continue;
 
-        // UBO slot i corresponds to visible row i (set in updateUBO)
         quint32 dynOffset = static_cast<quint32>(i * m_uboStride);
         QRhiCommandBuffer::DynamicOffset dynOff{0, dynOffset};
         cb->setShaderResources(m_srb.get(), 1, &dynOff);
@@ -861,6 +1069,15 @@ void ChannelRhiView::render(QRhiCommandBuffer *cb)
         QRhiCommandBuffer::VertexInput vi(gd.vbo.get(), 0);
         cb->setVertexInput(0, 1, &vi);
         cb->draw(static_cast<quint32>(gd.vertexCount));
+    }
+
+    // ── Overlay blit (bands + event lines) — drawn after waveforms ───────
+    if (overlayReady) {
+        cb->setGraphicsPipeline(m_overlayPipeline.get());
+        cb->setShaderResources(m_overlaySrb.get());
+        QRhiCommandBuffer::VertexInput overlayVi(m_overlayVbo.get(), 0);
+        cb->setVertexInput(0, 1, &overlayVi);
+        cb->draw(4); // TriangleStrip: 4 vertices = 2 triangles = full-screen quad
     }
 
     cb->endPass();
@@ -889,9 +1106,12 @@ static void doPaintTile(QWidget *widget, const QImage &tileImage,
 void ChannelRhiView::paintEvent(QPaintEvent *event)
 {
     if (!m_rhiFailed) {
+        // Bands and event lines are rendered inside the Metal texture by render()
+        // via the overlay blit pipeline — no QPainter overlay needed here.
         QRhiWidget::paintEvent(event);
-        // QPainter-based overlays drawn on top of the GPU-rendered content
-        drawOverlays();
+        // Only the ruler overlay (Shift+drag measurement) still uses QPainter.
+        if (m_rulerActive)
+            drawOverlays();
         return;
     }
 
@@ -1174,59 +1394,6 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
 
 void ChannelRhiView::drawOverlays()
 {
-    // ── Alternating per-second bands (GPU path only — QPainter path bakes them into buildTile) ──
-    // For the GPU/RHI path we draw bands as semi-transparent rectangles on top of the signal traces.
-    // Alpha is low so traces remain visible through the tinted bands.
-#ifdef MNE_DISP_RHIWIDGET
-    if (!m_rhiFailed && m_sfreq > 0.f && m_samplesPerPixel > 0.f) {
-        QPainter bp(this);
-        bp.setCompositionMode(QPainter::CompositionMode_SourceOver);
-
-        float samplesPerSec = m_sfreq;
-        float origin        = static_cast<float>(m_firstFileSample);
-        float firstBound    = std::floor((m_scrollSample - origin) / samplesPerSec)
-                              * samplesPerSec + origin;
-        long long bandIdx   = static_cast<long long>((firstBound - origin) / samplesPerSec);
-        bool oddBand        = (bandIdx & 1) != 0;
-
-        // 8 % opacity dark tint on odd seconds — subtle but noticeable on light backgrounds
-        QColor tint(0, 0, 0, 20);
-
-        float vw = static_cast<float>(width());
-        float vh = static_cast<float>(height());
-        int   pw = width();
-
-        for (float s = firstBound; s < m_scrollSample + pw * m_samplesPerPixel + samplesPerSec;
-             s += samplesPerSec, oddBand = !oddBand) {
-            if (!oddBand)
-                continue;
-            float xStart = (s - m_scrollSample) / m_samplesPerPixel;
-            float xEnd   = xStart + samplesPerSec / m_samplesPerPixel;
-            xStart = qBound(0.f, xStart, vw);
-            xEnd   = qBound(0.f, xEnd,   vw);
-            if (xEnd > xStart)
-                bp.fillRect(QRectF(xStart, 0, xEnd - xStart, vh), tint);
-        }
-    }
-#endif
-
-    // ── Event / stimulus marker overlay ──────────────────────────────
-    // Full-height coloured vertical lines.  Label chips are in TimeRulerWidget.
-    if (!m_events.isEmpty() && m_samplesPerPixel > 0.f) {
-        QPainter ep(this);
-        const int yEnd = height() - 2;
-        for (const EventMarker &ev : m_events) {
-            float xF = (static_cast<float>(ev.sample) - m_scrollSample) / m_samplesPerPixel;
-            if (xF < -2.f || xF > width() + 2.f)
-                continue;
-            int ix = static_cast<int>(xF);
-            QColor lineColor = ev.color;
-            lineColor.setAlpha(180);
-            ep.setPen(QPen(lineColor, 1));
-            ep.drawLine(ix, 0, ix, yEnd);
-        }
-    }
-
     // ── Ruler / measurement overlay ──────────────────────────────────
     if (!m_rulerActive)
         return;
