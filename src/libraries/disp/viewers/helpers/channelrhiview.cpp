@@ -366,7 +366,7 @@ int ChannelRhiView::visibleSampleCount() const
 
 void ChannelRhiView::setFirstVisibleChannel(int ch)
 {
-    int maxFirst = m_model ? qMax(0, m_model->channelCount() - m_visibleChannelCount) : 0;
+    int maxFirst = qMax(0, totalLogicalChannels() - m_visibleChannelCount);
     ch = qBound(0, ch, maxFirst);
     if (ch == m_firstVisibleChannel)
         return;
@@ -467,6 +467,42 @@ void ChannelRhiView::setWheelScrollsChannels(bool channelsMode)
 }
 
 //=============================================================================================================
+
+void ChannelRhiView::setChannelIndices(const QVector<int> &indices)
+{
+    m_filteredChannels = indices;
+    // Clamp scroll to new range
+    int maxFirst = qMax(0, totalLogicalChannels() - m_visibleChannelCount);
+    m_firstVisibleChannel = qBound(0, m_firstVisibleChannel, maxFirst);
+#ifdef MNE_DISP_RHIWIDGET
+    m_vboDirty      = true;
+    m_pipelineDirty = true;
+#endif
+    m_tileDirty = true;
+    update();
+}
+
+//=============================================================================================================
+
+int ChannelRhiView::totalLogicalChannels() const
+{
+    if (!m_filteredChannels.isEmpty())
+        return m_filteredChannels.size();
+    return m_model ? m_model->channelCount() : 0;
+}
+
+//=============================================================================================================
+
+int ChannelRhiView::actualChannelAt(int logicalIdx) const
+{
+    if (m_filteredChannels.isEmpty())
+        return logicalIdx;
+    if (logicalIdx < 0 || logicalIdx >= m_filteredChannels.size())
+        return -1;
+    return m_filteredChannels[logicalIdx];
+}
+
+//=============================================================================================================
 // QRhiWidget path
 //=============================================================================================================
 
@@ -506,7 +542,7 @@ void ChannelRhiView::ensurePipeline()
         (48 + rhi->ubufAlignment() - 1) & ~(rhi->ubufAlignment() - 1));
 
     // UBO has one slot per *visible* channel row, not all channels
-    int totalCh = m_model ? m_model->channelCount() : 0;
+    int totalCh = totalLogicalChannels();
     int nCh = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
     nCh = qMax(nCh, 1);
     nCh = qMin(nCh, kMaxChannels);
@@ -610,7 +646,7 @@ void ChannelRhiView::rebuildVBOs(QRhiResourceUpdateBatch *batch)
     if (!rhi)
         return;
 
-    int nCh      = m_model->channelCount();
+    int nCh      = totalLogicalChannels();
     int px       = width();
     float visible = px * m_samplesPerPixel;
 
@@ -629,6 +665,7 @@ void ChannelRhiView::rebuildVBOs(QRhiResourceUpdateBatch *batch)
     m_vboWindowFirst = iFirst;
     m_vboWindowLast  = iLast;
 
+    // VBOs are indexed by logical (filtered) channel index, not model channel index
     m_gpuChannels.resize(nCh);
 
     // Compute the max vertex count across channels to right-size allocations
@@ -636,21 +673,27 @@ void ChannelRhiView::rebuildVBOs(QRhiResourceUpdateBatch *batch)
     // With decimation, vertices ≤ 2 * px * prefetchFactor * (1 + prefetchFactor)
     // Use a conservative upper bound
     int maxVertices = qMax(prefetchedSamples * 2, 2 * px * 4);
+    Q_UNUSED(maxVertices)
 
-    for (int ch = 0; ch < nCh; ++ch) {
+    for (int logCh = 0; logCh < nCh; ++logCh) {
+        int ch = actualChannelAt(logCh); // actual model channel index
+        if (ch < 0) {
+            m_gpuChannels[logCh].vertexCount = 0;
+            continue;
+        }
         int vboFirst = 0;
         QVector<float> verts = m_model->decimatedVertices(
             ch, iFirst, iLast, static_cast<int>(prefetchedSamples / m_samplesPerPixel), vboFirst);
 
         if (verts.isEmpty()) {
-            m_gpuChannels[ch].vertexCount  = 0;
+            m_gpuChannels[logCh].vertexCount  = 0;
             continue;
         }
 
         int vertexCount = verts.size() / 2; // each vertex is (x, y) = 2 floats
         quint32 byteSize = static_cast<quint32>(verts.size() * sizeof(float));
 
-        auto &gd = m_gpuChannels[ch];
+        auto &gd = m_gpuChannels[logCh];
 
         // Re-create buffer if size changed significantly
         if (!gd.vbo || static_cast<quint32>(gd.vbo->size()) < byteSize) {
@@ -658,7 +701,7 @@ void ChannelRhiView::rebuildVBOs(QRhiResourceUpdateBatch *batch)
                                         QRhiBuffer::VertexBuffer,
                                         byteSize));
             if (!gd.vbo->create()) {
-                qWarning() << "ChannelRhiView: VBO create failed for channel" << ch;
+                qWarning() << "ChannelRhiView: VBO create failed for channel" << logCh;
                 gd.vertexCount = 0;
                 continue;
             }
@@ -680,7 +723,7 @@ void ChannelRhiView::updateUBO(QRhiResourceUpdateBatch *batch)
     if (!m_model || !m_ubo)
         return;
 
-    int totalCh = m_model->channelCount();
+    int totalCh = totalLogicalChannels();
     int firstCh = qBound(0, m_firstVisibleChannel, totalCh);
     int visCnt  = qMin(m_visibleChannelCount, totalCh - firstCh);
     int nCh     = qMin(visCnt, kMaxChannels);
@@ -694,11 +737,12 @@ void ChannelRhiView::updateUBO(QRhiResourceUpdateBatch *batch)
     QVarLengthArray<quint8> buf(m_uboStride, 0);
 
     for (int i = 0; i < nCh; ++i) {
-        int ch = firstCh + i;
+        int logCh  = firstCh + i;                   // logical (filtered) index
+        int ch     = actualChannelAt(logCh);         // actual model channel index
         memset(buf.data(), 0, m_uboStride);
 
-        auto info  = m_model->channelInfo(ch);
-        bool hideThis = m_hideBadChannels && info.bad;
+        auto info  = (ch >= 0) ? m_model->channelInfo(ch) : ChannelDisplayInfo{};
+        bool hideThis = (ch < 0) || (m_hideBadChannels && info.bad);
         // When hiding: use background colour so no trace is painted
         QColor col = hideThis ? m_bgColor
                               : (info.bad ? QColor(200, 60, 60, 180) : info.color);
@@ -717,8 +761,9 @@ void ChannelRhiView::updateUBO(QRhiResourceUpdateBatch *batch)
 
         auto *d = buf.data();
         writeFloats(d, kUboOffsetColor,          rgba, 4);
-        writeFloat (d, kUboOffsetFirstSample,    static_cast<float>(static_cast<int>(m_gpuChannels.size()) > ch
-                                                                      ? m_gpuChannels[ch].vboFirstSample : 0));
+        // VBO indexed by logical channel (logCh), not model channel
+        writeFloat (d, kUboOffsetFirstSample,    static_cast<float>(logCh < static_cast<int>(m_gpuChannels.size())
+                                                                      ? m_gpuChannels[logCh].vboFirstSample : 0));
         writeFloat (d, kUboOffsetScrollSample,   m_scrollSample);
         writeFloat (d, kUboOffsetSampPerPixel,   m_samplesPerPixel);
         writeFloat (d, kUboOffsetViewWidth,      vw);
@@ -739,7 +784,7 @@ void ChannelRhiView::updateUBO(QRhiResourceUpdateBatch *batch)
 
 void ChannelRhiView::render(QRhiCommandBuffer *cb)
 {
-    if (!m_model || m_model->channelCount() == 0) {
+    if (!m_model || totalLogicalChannels() == 0) {
         // Clear to background colour only
         QRhiResourceUpdateBatch *u = rhi()->nextResourceUpdateBatch();
         QColor bg = m_bgColor;
@@ -776,16 +821,16 @@ void ChannelRhiView::render(QRhiCommandBuffer *cb)
                                              static_cast<float>(ps.height())));
 
     // Render only the visible channel window
-    int totalCh = m_model->channelCount();
+    int totalCh = totalLogicalChannels();
     int firstCh = qBound(0, m_firstVisibleChannel, totalCh);
     int visCnt  = qMin(m_visibleChannelCount, totalCh - firstCh);
     int nToRender = qMin(visCnt, kMaxChannels);
 
     for (int i = 0; i < nToRender; ++i) {
-        int ch = firstCh + i;
-        if (ch >= static_cast<int>(m_gpuChannels.size()))
+        int logCh = firstCh + i; // logical (filtered) index → VBO index
+        if (logCh >= static_cast<int>(m_gpuChannels.size()))
             break;
-        auto &gd = m_gpuChannels[ch];
+        auto &gd = m_gpuChannels[logCh];
         if (!gd.vbo || gd.vertexCount < 2)
             continue;
 
@@ -826,6 +871,8 @@ void ChannelRhiView::paintEvent(QPaintEvent *event)
 {
     if (!m_rhiFailed) {
         QRhiWidget::paintEvent(event);
+        // QPainter-based overlays drawn on top of the GPU-rendered content
+        drawOverlays();
         return;
     }
 
@@ -834,6 +881,7 @@ void ChannelRhiView::paintEvent(QPaintEvent *event)
 
     doPaintTile(this, m_tileImage, m_tileSampleFirst, m_tileSamplesPerPixel,
                 m_scrollSample, m_bgColor);
+    drawOverlays();
 }
 
 #else // !MNE_DISP_RHIWIDGET
@@ -845,6 +893,7 @@ void ChannelRhiView::paintEvent(QPaintEvent *)
 
     doPaintTile(this, m_tileImage, m_tileSampleFirst, m_tileSamplesPerPixel,
                 m_scrollSample, m_bgColor);
+    drawOverlays();
 }
 
 #endif // MNE_DISP_RHIWIDGET
@@ -861,7 +910,7 @@ bool ChannelRhiView::isTileFresh() const
         return false;
     if (m_tileFirstChannel != m_firstVisibleChannel)
         return false;
-    int totalCh      = m_model ? m_model->channelCount() : 0;
+    int totalCh      = totalLogicalChannels();
     int visibleCount = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
     if (m_tileVisibleCount != visibleCount)
         return false;
@@ -885,7 +934,7 @@ void ChannelRhiView::scheduleTileRebuild()
     if (m_tileRebuildPending)
         return;
 
-    if (!m_model || m_model->channelCount() == 0 || width() <= 0 || height() <= 0) {
+    if (!m_model || totalLogicalChannels() == 0 || width() <= 0 || height() <= 0) {
         // No model / no channels / zero-size: produce a stable blank tile synchronously.
         // This prevents an infinite repaint loop: the async worker would return a null
         // image → watcher fires update() → paintEvent → rebuild → repeat.
@@ -912,13 +961,14 @@ void ChannelRhiView::scheduleTileRebuild()
     float             sfreq           = m_sfreq;
     int               firstFileSample = m_firstFileSample;
     bool              hideBad         = m_hideBadChannels;
+    QVector<int>      chIndices       = m_filteredChannels; // snapshot for worker
 
     m_tileDirty          = false; // cleared now — any new event will set it true again
     m_tileRebuildPending = true;
     m_tileWatcher.setFuture(QtConcurrent::run([=]() {
         return ChannelRhiView::buildTile(model, scrollSample, spp, firstCh, visCnt,
                                          pw, ph, bg, gridVis, sfreq, firstFileSample,
-                                         hideBad);
+                                         hideBad, chIndices);
     }));
 }
 
@@ -931,7 +981,8 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
     int pw, int ph,
     QColor bgColor, bool gridVisible,
     float sfreq, int firstFileSample,
-    bool hideBadChannels)
+    bool hideBadChannels,
+    const QVector<int> &channelIndices)
 {
     TileResult out;
     out.samplesPerPixel = spp;
@@ -940,7 +991,7 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
     if (!model || pw <= 0 || ph <= 0 || spp <= 0.f)
         return out;
 
-    int totalCh      = model->channelCount();
+    int totalCh      = channelIndices.isEmpty() ? model->channelCount() : channelIndices.size();
     int visibleCount = qMin(visCnt, totalCh - firstCh);
     if (visibleCount <= 0)
         return out;
@@ -963,6 +1014,38 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
     float laneH     = static_cast<float>(ph) / visibleCount;
     int firstSample = static_cast<int>(tileStart);
     int lastSample  = firstSample + static_cast<int>(tilePixWidth * spp) + 1;
+
+    // ── Alternating per-second background bands ─────────────────────
+    // Draw subtle alternating grey/white bands every second, like MNE-Python browser.
+    if (sfreq > 0.f) {
+        float samplesPerSec = sfreq;
+        float firstBound = std::floor(
+            (tileStart - static_cast<float>(firstFileSample)) / samplesPerSec
+        ) * samplesPerSec + static_cast<float>(firstFileSample);
+
+        // Determine parity of the first band (0 = even, 1 = odd)
+        long long bandIndex = static_cast<long long>(
+            (firstBound - static_cast<float>(firstFileSample)) / samplesPerSec);
+        bool oddBand = (bandIndex & 1) != 0;
+
+        // Compute a slightly darker shade for odd bands relative to bgColor
+        QColor altColor(
+            qBound(0, bgColor.red()   - 10, 255),
+            qBound(0, bgColor.green() - 10, 255),
+            qBound(0, bgColor.blue()  - 10, 255)
+        );
+
+        for (float s = firstBound; s < lastSample; s += samplesPerSec, oddBand = !oddBand) {
+            if (!oddBand)
+                continue; // even seconds use the regular bgColor already filled
+            float xStart = (s - tileStart) / spp;
+            float xEnd   = xStart + samplesPerSec / spp;
+            xStart = qBound(0.f, xStart, static_cast<float>(tilePixWidth));
+            xEnd   = qBound(0.f, xEnd,   static_cast<float>(tilePixWidth));
+            if (xEnd > xStart)
+                p.fillRect(QRectF(xStart, 0, xEnd - xStart, ph), altColor);
+        }
+    }
 
     // ── Grid pass ──────────────────────────────────────────────────────
     if (gridVisible) {
@@ -1010,7 +1093,11 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
 
     // ── Channel waveform pass ───────────────────────────────────────────
     for (int i = 0; i < visibleCount; ++i) {
-        int ch = firstCh + i;
+        int logIdx = firstCh + i;
+        int ch = channelIndices.isEmpty() ? logIdx
+               : (logIdx < channelIndices.size() ? channelIndices[logIdx] : -1);
+        if (ch < 0)
+            continue;
         auto info = model->channelInfo(ch);
 
         // Skip trace for bad channels when hiding
@@ -1043,6 +1130,168 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
 
     out.image = std::move(img);
     return out;
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::drawOverlays()
+{
+    // ── Alternating per-second bands (GPU path only — QPainter path bakes them into buildTile) ──
+    // For the GPU/RHI path we draw bands as semi-transparent rectangles on top of the signal traces.
+    // Alpha is low so traces remain visible through the tinted bands.
+#ifdef MNE_DISP_RHIWIDGET
+    if (!m_rhiFailed && m_sfreq > 0.f && m_samplesPerPixel > 0.f) {
+        QPainter bp(this);
+        bp.setCompositionMode(QPainter::CompositionMode_SourceOver);
+
+        float samplesPerSec = m_sfreq;
+        float origin        = static_cast<float>(m_firstFileSample);
+        float firstBound    = std::floor((m_scrollSample - origin) / samplesPerSec)
+                              * samplesPerSec + origin;
+        long long bandIdx   = static_cast<long long>((firstBound - origin) / samplesPerSec);
+        bool oddBand        = (bandIdx & 1) != 0;
+
+        // 8 % opacity dark tint on odd seconds — subtle but noticeable on light backgrounds
+        QColor tint(0, 0, 0, 20);
+
+        float vw = static_cast<float>(width());
+        float vh = static_cast<float>(height());
+        int   pw = width();
+
+        for (float s = firstBound; s < m_scrollSample + pw * m_samplesPerPixel + samplesPerSec;
+             s += samplesPerSec, oddBand = !oddBand) {
+            if (!oddBand)
+                continue;
+            float xStart = (s - m_scrollSample) / m_samplesPerPixel;
+            float xEnd   = xStart + samplesPerSec / m_samplesPerPixel;
+            xStart = qBound(0.f, xStart, vw);
+            xEnd   = qBound(0.f, xEnd,   vw);
+            if (xEnd > xStart)
+                bp.fillRect(QRectF(xStart, 0, xEnd - xStart, vh), tint);
+        }
+    }
+#endif
+
+    // ── Ruler / measurement overlay ──────────────────────────────────
+    if (!m_rulerActive)
+        return;
+
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing, false);
+
+    int x0 = m_rulerX0, y0 = m_rulerY0;
+    int x1 = m_rulerX1, y1 = m_rulerY1;
+
+    // Vertical guide lines at the two X positions
+    QPen vLinePen(QColor(40, 120, 200, 200), 1, Qt::DashLine);
+    p.setPen(vLinePen);
+    p.drawLine(x0, 0, x0, height());
+    p.drawLine(x1, 0, x1, height());
+
+    // Horizontal span line at y0
+    QPen hLinePen(QColor(40, 120, 200, 200), 1);
+    p.setPen(hLinePen);
+    p.drawLine(qMin(x0, x1), y0, qMax(x0, x1), y0);
+
+    // Vertical span line at x0
+    p.drawLine(x0, qMin(y0, y1), x0, qMax(y0, y1));
+
+    // End tick marks
+    int tickLen = 5;
+    p.drawLine(x0 - tickLen, y0, x0 + tickLen, y0);
+    p.drawLine(x1 - tickLen, y0, x1 + tickLen, y0);
+    p.drawLine(x0, y0 - tickLen, x0, y0 + tickLen);
+    p.drawLine(x0, y1 - tickLen, x0, y1 + tickLen);
+
+    // ── Measurement labels ────────────────────────────────────────────
+    // Time difference (horizontal)
+    float deltaSamples = static_cast<float>(x1 - x0) * m_samplesPerPixel;
+    float deltaSec     = (m_sfreq > 0.f) ? deltaSamples / m_sfreq : 0.f;
+
+    // Amplitude difference (vertical, relative to the channel under x0/y0)
+    float deltaAmp  = 0.f;
+    QString ampUnit = QStringLiteral("AU");
+    if (m_model && totalLogicalChannels() > 0) {
+        int totalCh = totalLogicalChannels();
+        int visCnt  = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
+        if (visCnt > 0) {
+            float laneH = static_cast<float>(height()) / visCnt;
+            int   row   = qBound(0, static_cast<int>(y0 / laneH), visCnt - 1);
+            int   ch    = actualChannelAt(m_firstVisibleChannel + row);
+            if (ch < 0) ch = 0;
+            auto  info  = m_model->channelInfo(ch);
+            if (info.amplitudeMax > 0.f) {
+                float yCenter = (row + 0.5f) * laneH;
+                // positive y on screen → downward → negative amplitude
+                float dyPx      = static_cast<float>(y1 - y0);
+                float yScale    = info.amplitudeMax / (laneH * 0.45f);
+                deltaAmp = -dyPx * yScale;
+
+                // Choose a sensible unit suffix
+                if (info.typeLabel == QStringLiteral("MEG"))
+                    ampUnit = QStringLiteral("T");
+                else if (info.typeLabel == QStringLiteral("EEG") ||
+                         info.typeLabel == QStringLiteral("EOG") ||
+                         info.typeLabel == QStringLiteral("ECG") ||
+                         info.typeLabel == QStringLiteral("EMG"))
+                    ampUnit = QStringLiteral("V");
+                else
+                    ampUnit = QStringLiteral("AU");
+                Q_UNUSED(yCenter)
+            }
+        }
+    }
+
+    // Format labels
+    auto fmtTime = [](float sec) -> QString {
+        float absSec = qAbs(sec);
+        if (absSec < 1.f)
+            return QString::number(sec * 1000.f, 'f', 1) + QStringLiteral(" ms");
+        return QString::number(sec, 'f', 3) + QStringLiteral(" s");
+    };
+    auto fmtAmp = [](float amp, const QString &unit) -> QString {
+        float absAmp = qAbs(amp);
+        if (absAmp < 1e-6f)
+            return QString::number(amp * 1e9f, 'f', 1) + QStringLiteral(" n") + unit;
+        if (absAmp < 1e-3f)
+            return QString::number(amp * 1e6f, 'f', 1) + QStringLiteral(" µ") + unit;
+        if (absAmp < 1.f)
+            return QString::number(amp * 1e3f, 'f', 1) + QStringLiteral(" m") + unit;
+        return QString::number(amp, 'f', 3) + QStringLiteral(" ") + unit;
+    };
+
+    QString timeLabel = QStringLiteral("ΔT = ") + fmtTime(deltaSec);
+    QString ampLabel  = QStringLiteral("ΔA = ") + fmtAmp(deltaAmp, ampUnit);
+
+    QFont f = font();
+    f.setPointSizeF(9.0);
+    f.setBold(true);
+    p.setFont(f);
+
+    // Position label near the midpoint of the horizontal span
+    int labelX = (x0 + x1) / 2;
+    int labelY = y0 - 6;
+    if (labelY < 14)
+        labelY = y0 + 16;
+
+    // Draw white background pill behind time label
+    QFontMetrics fm(f);
+    QRect tRect = fm.boundingRect(timeLabel);
+    tRect.moveCenter(QPoint(labelX, labelY));
+    tRect.adjust(-4, -2, 4, 2);
+    p.fillRect(tRect, QColor(255, 255, 255, 210));
+    p.setPen(QColor(20, 80, 160));
+    p.drawText(tRect, Qt::AlignCenter, timeLabel);
+
+    // Amplitude label below the vertical span
+    int aLabelX = x0 + 8;
+    int aLabelY = (y0 + y1) / 2;
+    QRect aRect = fm.boundingRect(ampLabel);
+    aRect.moveCenter(QPoint(aLabelX + aRect.width() / 2, aLabelY));
+    aRect.adjust(-4, -2, 4, 2);
+    p.fillRect(aRect, QColor(255, 255, 255, 210));
+    p.setPen(QColor(20, 80, 160));
+    p.drawText(aRect, Qt::AlignCenter, ampLabel);
 }
 
 //=============================================================================================================
@@ -1083,7 +1332,7 @@ void ChannelRhiView::wheelEvent(QWheelEvent *event)
     } else if (m_wheelScrollsChannels) {
         // Vertical wheel → scroll channels (up = earlier, down = later)
         int channelStep = (delta.y() > 0) ? -1 : 1;
-        int maxFirst = m_model ? qMax(0, m_model->channelCount() - m_visibleChannelCount) : 0;
+        int maxFirst = qMax(0, totalLogicalChannels() - m_visibleChannelCount);
         setFirstVisibleChannel(qBound(0, m_firstVisibleChannel + channelStep, maxFirst));
     } else {
         // Vertical wheel → scroll time
@@ -1101,6 +1350,21 @@ void ChannelRhiView::wheelEvent(QWheelEvent *event)
 
 void ChannelRhiView::mousePressEvent(QMouseEvent *event)
 {
+    // Shift + left-click → start ruler measurement (takes priority over pan/drag)
+    if (event->button() == Qt::LeftButton && (event->modifiers() & Qt::ShiftModifier)) {
+        // Stop any running inertial scroll before measuring
+        if (m_pInertialAnim) {
+            m_pInertialAnim->stop();
+            m_pInertialAnim = nullptr;
+        }
+        m_rulerActive = true;
+        m_rulerX0 = m_rulerX1 = event->position().toPoint().x();
+        m_rulerY0 = m_rulerY1 = event->position().toPoint().y();
+        update();
+        event->accept();
+        return;
+    }
+
     if (!m_frozen &&
         (event->button() == Qt::MiddleButton ||
          (event->button() == Qt::LeftButton && (event->modifiers() & Qt::AltModifier)))) {
@@ -1146,6 +1410,14 @@ void ChannelRhiView::mousePressEvent(QMouseEvent *event)
 
 void ChannelRhiView::mouseMoveEvent(QMouseEvent *event)
 {
+    if (m_rulerActive) {
+        m_rulerX1 = event->position().toPoint().x();
+        m_rulerY1 = event->position().toPoint().y();
+        update();
+        event->accept();
+        return;
+    }
+
     if (m_dragging) {
         int dx = event->position().toPoint().x() - m_dragStartX;
         float newScroll = m_dragStartScroll - static_cast<float>(dx) * m_samplesPerPixel;
@@ -1184,6 +1456,15 @@ void ChannelRhiView::mouseMoveEvent(QMouseEvent *event)
 
 void ChannelRhiView::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (m_rulerActive && event->button() == Qt::LeftButton) {
+        m_rulerX1 = event->position().toPoint().x();
+        m_rulerY1 = event->position().toPoint().y();
+        m_rulerActive = false;
+        update();
+        event->accept();
+        return;
+    }
+
     if (m_dragging && (event->button() == Qt::MiddleButton ||
                        event->button() == Qt::LeftButton)) {
         m_dragging = false;
@@ -1237,4 +1518,34 @@ void ChannelRhiView::mouseReleaseEvent(QMouseEvent *event)
 #else
     QWidget::mouseReleaseEvent(event);
 #endif
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (!m_model || event->button() != Qt::LeftButton) {
+#ifdef MNE_DISP_RHIWIDGET
+        QRhiWidget::mouseDoubleClickEvent(event);
+#else
+        QWidget::mouseDoubleClickEvent(event);
+#endif
+        return;
+    }
+
+    int totalCh = totalLogicalChannels();
+    int visCnt  = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
+    if (visCnt <= 0)
+        return;
+
+    float laneH = static_cast<float>(height()) / visCnt;
+    int   row   = static_cast<int>(event->position().y() / laneH);
+    if (row >= 0 && row < visCnt) {
+        int  ch   = actualChannelAt(m_firstVisibleChannel + row);
+        if (ch >= 0) {
+            auto info = m_model->channelInfo(ch);
+            m_model->setChannelBad(ch, !info.bad);
+        }
+    }
+    event->accept();
 }

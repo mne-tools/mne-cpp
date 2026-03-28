@@ -48,6 +48,8 @@
 
 #include <QMap>
 #include <QSharedPointer>
+#include <QStringList>
+#include <QVector>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -238,6 +240,16 @@ public:
      */
     void hideBadChannels(bool hide);
     bool badChannelsHidden() const;
+
+    //=========================================================================================================
+    /**
+     * Restrict the view to a named subset of channels.
+     * Channels not in @p names are hidden immediately.
+     * Pass an empty list to restore all channels.
+     *
+     * @param[in] names  List of channel names to show (case-sensitive).
+     */
+    void setChannelFilter(const QStringList &names);
 
     //=========================================================================================================
     /**

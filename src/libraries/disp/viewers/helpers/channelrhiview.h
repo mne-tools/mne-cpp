@@ -180,9 +180,26 @@ public:
 
     //=========================================================================================================
     /**
+     * Restrict rendering to a specific subset of channel indices.
+     * When @p indices is empty all channels in the model are shown (no filter).
+     * When set, scrolling and visible-channel-count are relative to this subset.
+     *
+     * @param[in] indices  Ordered list of model channel indices to display.
+     *                     Pass an empty vector to clear the filter.
+     */
+    void setChannelIndices(const QVector<int> &indices);
+
+    //=========================================================================================================
+    /**
+     * Total number of logical channels available for scrolling (respects active filter).
+     */
+    int totalLogicalChannels() const;
+
+    //=========================================================================================================
+    /**
      * Set the index of the first visible channel row.
      *
-     * @param[in] ch  Zero-based channel index.
+     * @param[in] ch  Zero-based channel index (within the active filter if any).
      */
     void setFirstVisibleChannel(int ch);
     int  firstVisibleChannel() const { return m_firstVisibleChannel; }
@@ -292,6 +309,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 private:
     // ── GPU resource management (QRhi path only) ──────────────────────
@@ -331,7 +349,8 @@ private:
         bool  gridVisible,
         float sfreq,
         int   firstFileSample,
-        bool  hideBadChannels);
+        bool  hideBadChannels,
+        const QVector<int> &channelIndices); // empty = identity (all channels)
     bool isTileFresh() const;
 
     QImage m_tileImage;
@@ -391,9 +410,26 @@ private:
     QElapsedTimer           m_dragTimer;
     QPropertyAnimation*     m_pInertialAnim = nullptr;
 
+    // ── Channel index filter ──────────────────────────────────────────
+    // When non-empty, only these model channel indices are rendered/scrolled.
+    QVector<int> m_filteredChannels;
+
+    // Helper — use instead of firstCh+i for actual model channel index
+    int actualChannelAt(int logicalIdx) const; // maps logical → model channel index
+
     // ── Prefetch window tracking ───────────────────────────────────────
     int   m_vboWindowFirst  = 0;
     int   m_vboWindowLast   = 0;
+
+    // ── Ruler / measurement overlay ───────────────────────────────────
+    // Active while Shift+Left-button is held.
+    bool  m_rulerActive   = false;
+    int   m_rulerX0       = 0;   // press position (screen px)
+    int   m_rulerY0       = 0;
+    int   m_rulerX1       = 0;   // current cursor position
+    int   m_rulerY1       = 0;
+
+    void drawOverlays();   // QPainter-based overlays (bands + ruler) on top of both rendering paths
 };
 
 } // namespace DISPLIB

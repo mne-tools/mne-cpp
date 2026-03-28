@@ -407,6 +407,28 @@ bool ChannelDataView::badChannelsHidden() const
 
 //=============================================================================================================
 
+void ChannelDataView::setChannelFilter(const QStringList &names)
+{
+    QVector<int> indices;
+    if (!names.isEmpty() && m_pModel) {
+        int total = m_pModel->channelCount();
+        for (int i = 0; i < total; ++i) {
+            if (names.contains(m_pModel->channelInfo(i).name))
+                indices.append(i);
+        }
+    }
+
+    if (m_pRhiView)
+        m_pRhiView->setChannelIndices(indices);
+    if (m_pLabelPanel)
+        m_pLabelPanel->setChannelIndices(indices);
+
+    // Reset scroll to start of filtered set and update scrollbar range
+    updateChannelScrollBarRange();
+}
+
+//=============================================================================================================
+
 void ChannelDataView::setRemoveDC(bool dc)
 {
     m_pModel->setRemoveDC(dc);
@@ -636,7 +658,9 @@ void ChannelDataView::updateChannelScrollBarRange()
     if (!m_pChannelScrollBar || !m_pRhiView)
         return;
 
-    int totalCh    = m_pModel->channelCount();
+    // Use the view's logical channel count (respects active filter)
+    int totalCh    = m_pRhiView ? m_pRhiView->totalLogicalChannels()
+                                : m_pModel->channelCount();
     int visibleCnt = m_pRhiView->visibleChannelCount();
     int maxVal     = qMax(0, totalCh - visibleCnt);
 

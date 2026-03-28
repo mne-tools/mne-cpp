@@ -47,6 +47,7 @@
 //=============================================================================================================
 
 #include <QPointer>
+#include <QVector>
 #include <QWidget>
 
 //=============================================================================================================
@@ -95,6 +96,16 @@ public:
 
     //=========================================================================================================
     /**
+     * Restrict the panel to a subset of model channel indices.
+     * When @p indices is empty all model channels are available (no filter).
+     * Must be kept in sync with ChannelRhiView::setChannelIndices().
+     *
+     * @param[in] indices  Ordered list of model channel indices to display.
+     */
+    void setChannelIndices(const QVector<int> &indices);
+
+    //=========================================================================================================
+    /**
      * Show or hide bad-channel rows.  When @p hide is true, bad channels are
      * collapsed to a minimal strip so that good channels fill the panel.
      */
@@ -133,6 +144,7 @@ private:
     int  m_firstVisibleChannel = 0;
     int  m_visibleChannelCount = 12;
 
+    QVector<int> m_channelIndices; // empty = identity (all channels)
     bool  m_hideBadChannels = false;
     int   m_visSampleFirst  = 0;
     int   m_visSampleLast   = 0;
