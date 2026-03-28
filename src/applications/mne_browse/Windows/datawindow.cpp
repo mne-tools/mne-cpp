@@ -311,6 +311,28 @@ double DataWindow::fiffFileDurationSeconds() const
 
 //=============================================================================================================
 
+QSharedPointer<FIFFLIB::FiffInfo> DataWindow::fiffInfo() const
+{
+    return (m_pFiffReader && m_pFiffReader->isOpen()) ? m_pFiffReader->fiffInfo()
+                                                      : QSharedPointer<FIFFLIB::FiffInfo>();
+}
+
+//=============================================================================================================
+
+int DataWindow::firstSample() const
+{
+    return (m_pFiffReader && m_pFiffReader->isOpen()) ? m_pFiffReader->firstSample() : 0;
+}
+
+//=============================================================================================================
+
+int DataWindow::lastSample() const
+{
+    return (m_pFiffReader && m_pFiffReader->isOpen()) ? m_pFiffReader->lastSample() : 0;
+}
+
+//=============================================================================================================
+
 QString DataWindow::fiffFileName() const
 {
     if (!m_pFiffReader || !m_pFiffReader->isOpen())
