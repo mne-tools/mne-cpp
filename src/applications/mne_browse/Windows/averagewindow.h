@@ -159,6 +159,36 @@ public:
      */
     void setMappedChannelNames(QStringList mappedChannelNames);
 
+    //=========================================================================================================
+    /**
+     * Set the covariance used for whitening butterfly plots.
+     *
+     * @param covariance the active noise covariance.
+     */
+    void setNoiseCovariance(const FIFFLIB::FiffCov& covariance);
+
+    //=========================================================================================================
+    /**
+     * Clear the covariance used for whitening butterfly plots.
+     */
+    void clearNoiseCovariance();
+
+    //=========================================================================================================
+    /**
+     * Enable or disable whitening in the butterfly plot.
+     *
+     * @param enabled true to whiten the butterfly plot.
+     */
+    void setButterflyWhiteningEnabled(bool enabled);
+
+    //=========================================================================================================
+    /**
+     * Returns whether butterfly whitening is currently enabled.
+     *
+     * @return true when whitening is active.
+     */
+    bool isButterflyWhiteningEnabled() const;
+
 private:
 
     //=========================================================================================================
@@ -213,6 +243,12 @@ private:
 
     //=========================================================================================================
     /**
+     * Rebuild plots from the current selection and display settings.
+     */
+    void refreshPlots();
+
+    //=========================================================================================================
+    /**
      * saves the current layout average plot as png or svg to file
      */
     void exportAverageLayoutPlot();
@@ -246,6 +282,8 @@ private:
     AverageScene*           m_pAverageScene;        /**< The pointer to the average scene. */
 
     ButterflyScene*         m_pButterflyScene;      /**< The pointer to the butterfly scene. */
+    FIFFLIB::FiffCov        m_noiseCovariance;      /**< Optional covariance used to whiten butterfly plots. */
+    bool                    m_bWhitenButterfly = false; /**< Whether the butterfly plot should be whitened. */
 
 signals:
     //=========================================================================================================

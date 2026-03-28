@@ -42,6 +42,7 @@
 
 #include <disp/viewers/helpers/averagesceneitem.h>
 
+#include <cmath>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -64,6 +65,137 @@
 //=============================================================================================================
 
 using namespace MNEBROWSE;
+
+namespace
+{
+
+constexpr double kDefaultWhitenRegMag = 0.1;
+constexpr double kDefaultWhitenRegGrad = 0.1;
+constexpr double kDefaultWhitenRegEeg = 0.1;
+
+bool matchesButterflySelection(const FIFFLIB::FiffChInfo& channelInfo,
+                               const QString& selectionText)
+{
+    if(selectionText == QLatin1String("EEG")) {
+        return channelInfo.kind == FIFFV_EEG_CH;
+    }
+
+    if(channelInfo.kind != FIFFV_MEG_CH) {
+        return false;
+    }
+
+    if(selectionText == QLatin1String("MEG_mag")) {
+        return channelInfo.unit == FIFF_UNIT_T;
+    }
+
+    return channelInfo.unit == FIFF_UNIT_T_M;
+}
+
+QStringList selectedButterflyChannels(const FIFFLIB::FiffInfo& info,
+                                      const QString& selectionText)
+{
+    QStringList channelNames;
+
+    for(const auto& channelInfo : info.chs) {
+        if(info.bads.contains(channelInfo.ch_name)) {
+            continue;
+        }
+
+        if(matchesButterflySelection(channelInfo, selectionText)) {
+            channelNames << channelInfo.ch_name;
+        }
+    }
+
+    return channelNames;
+}
+
+Eigen::MatrixXd createWhitener(const FIFFLIB::FiffCov& covariance)
+{
+    if(covariance.dim <= 0) {
+        return Eigen::MatrixXd();
+    }
+
+    if(covariance.diag) {
+        Eigen::MatrixXd whitener = Eigen::MatrixXd::Zero(covariance.dim, covariance.dim);
+        for(int i = 0; i < covariance.dim; ++i) {
+            const double variance = covariance.data(i, 0);
+            if(variance > 1e-30) {
+                whitener(i, i) = 1.0 / std::sqrt(variance);
+            }
+        }
+
+        return whitener;
+    }
+
+    if(covariance.eig.size() == 0 || covariance.eigvec.size() == 0) {
+        return Eigen::MatrixXd();
+    }
+
+    Eigen::MatrixXd whitener = Eigen::MatrixXd::Zero(covariance.dim, covariance.dim);
+    for(int i = 0; i < covariance.eig.size(); ++i) {
+        if(covariance.eig(i) > 1e-30) {
+            whitener(i, i) = 1.0 / std::sqrt(covariance.eig(i));
+        }
+    }
+
+    whitener *= covariance.eigvec;
+    return whitener;
+}
+
+bool whitenButterflyEvoked(FIFFLIB::FiffEvoked& evoked,
+                           const FIFFLIB::FiffCov& covariance)
+{
+    if(covariance.isEmpty() || evoked.isEmpty() || evoked.data.rows() == 0) {
+        return false;
+    }
+
+    const FIFFLIB::FiffCov regularizedCov =
+        covariance.regularize(evoked.info,
+                              kDefaultWhitenRegMag,
+                              kDefaultWhitenRegGrad,
+                              kDefaultWhitenRegEeg,
+                              true);
+
+    const FIFFLIB::FiffCov preparedCov =
+        regularizedCov.prepare_noise_cov(evoked.info, evoked.info.ch_names);
+
+    if(preparedCov.isEmpty() || preparedCov.dim != evoked.data.rows()) {
+        return false;
+    }
+
+    const Eigen::MatrixXd whitener = createWhitener(preparedCov);
+    if(whitener.rows() != evoked.data.rows() || whitener.cols() != evoked.data.rows()) {
+        return false;
+    }
+
+    evoked.data = whitener * evoked.data;
+    return true;
+}
+
+FIFFLIB::FiffEvoked buildButterflyEvoked(const FIFFLIB::FiffEvoked& sourceEvoked,
+                                         const QString& selectionText,
+                                         const FIFFLIB::FiffCov& covariance,
+                                         bool whiten,
+                                         bool* whiteningApplied)
+{
+    const QStringList includeChannels = selectedButterflyChannels(sourceEvoked.info, selectionText);
+
+    FIFFLIB::FiffEvoked displayEvoked =
+        sourceEvoked.pick_channels(includeChannels, sourceEvoked.info.bads);
+
+    bool didApplyWhitening = false;
+    if(whiten) {
+        didApplyWhitening = whitenButterflyEvoked(displayEvoked, covariance);
+    }
+
+    if(whiteningApplied) {
+        *whiteningApplied = didApplyWhitening;
+    }
+
+    return displayEvoked;
+}
+
+} // namespace
 
 
 //*************************************************************************************************************
@@ -158,6 +290,46 @@ void AverageWindow::scaleAveragedData(const QMap<QString,double> &scaleMap)
 void AverageWindow::setMappedChannelNames(QStringList mappedChannelNames)
 {
     m_mappedChannelNames = mappedChannelNames;
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::setNoiseCovariance(const FIFFLIB::FiffCov& covariance)
+{
+    m_noiseCovariance = covariance;
+    refreshPlots();
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::clearNoiseCovariance()
+{
+    m_noiseCovariance.clear();
+    m_bWhitenButterfly = false;
+    refreshPlots();
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::setButterflyWhiteningEnabled(bool enabled)
+{
+    if(enabled && m_noiseCovariance.isEmpty()) {
+        return;
+    }
+
+    m_bWhitenButterfly = enabled;
+    refreshPlots();
+}
+
+
+//*************************************************************************************************************
+
+bool AverageWindow::isButterflyWhiteningEnabled() const
+{
+    return m_bWhitenButterfly;
 }
 
 
@@ -271,8 +443,7 @@ void AverageWindow::initComboBoxes()
 {
     connect(ui->m_comboBox_channelKind, &QComboBox::currentTextChanged,
             this, [this](){
-            this->onSelectionChanged(ui->m_tableView_loadedSets->selectionModel()->selection(),
-                                     ui->m_tableView_loadedSets->selectionModel()->selection());
+        refreshPlots();
     });
 }
 
@@ -284,6 +455,14 @@ void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QIt
     Q_UNUSED(deselected);
     Q_UNUSED(selected);
 
+    refreshPlots();
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::refreshPlots()
+{
     QModelIndexList selectedRows;
     if(ui->m_tableView_loadedSets->selectionModel()) {
         selectedRows = ui->m_tableView_loadedSets->selectionModel()->selectedRows(0);
@@ -329,16 +508,14 @@ void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QIt
     m_pButterflyScene->clear();
 
     for(int i = 0; i < selectedRows.size(); ++i) {
-        //Get only the necessary data from the average model (use column 4)
         QModelIndex index = selectedRows.at(i);
-
-        const FiffInfo* fiffInfo = m_pAverageModel->data(m_pAverageModel->index(index.row(), 4), AverageModelRoles::GetFiffInfo).value<const FiffInfo*>();
-        RowVectorPair averageData = m_pAverageModel->data(m_pAverageModel->index(index.row(), 4), AverageModelRoles::GetAverageData).value<RowVectorPair>();
-        int first = m_pAverageModel->data(m_pAverageModel->index(index.row(), 2), AverageModelRoles::GetFirstSample).toInt();
-        int last = m_pAverageModel->data(m_pAverageModel->index(index.row(), 3), AverageModelRoles::GetLastSample).toInt();
         QString setName = m_pAverageModel->data(m_pAverageModel->index(index.row(), 0), Qt::DisplayRole).toString();
+        const FIFFLIB::FiffEvoked* sourceEvoked = m_pAverageModel->getEvoked(index.row());
 
-        //Create new butterfly scene item
+        if(!sourceEvoked) {
+            continue;
+        }
+
         fiff_int_t setUnit, setKind;
         if(ui->m_comboBox_channelKind->currentText() == "MEG_grad")
             setUnit = FIFF_UNIT_T_M;
@@ -350,16 +527,27 @@ void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QIt
         else
             setKind = FIFFV_MEG_CH;
 
+        bool whiteningApplied = false;
+        FIFFLIB::FiffEvoked displayEvoked = buildButterflyEvoked(*sourceEvoked,
+                                                                 ui->m_comboBox_channelKind->currentText(),
+                                                                 m_noiseCovariance,
+                                                                 m_bWhitenButterfly,
+                                                                 &whiteningApplied);
+
+        if(displayEvoked.data.rows() == 0 || displayEvoked.data.cols() == 0) {
+            continue;
+        }
+
+        if(whiteningApplied) {
+            setName.append(" [whitened]");
+        }
+
         ButterflySceneItem* butterflySceneItemTemp = new ButterflySceneItem(setName,
                                                                             setKind,
                                                                             setUnit,
                                                                             m_lButterflyColors);
 
-        butterflySceneItemTemp->m_lAverageData.first = averageData.first;
-        butterflySceneItemTemp->m_lAverageData.second = averageData.second;
-        butterflySceneItemTemp->m_pFiffInfo = fiffInfo;
-        butterflySceneItemTemp->m_firstLastSample.first = first;
-        butterflySceneItemTemp->m_firstLastSample.second = last;
+        butterflySceneItemTemp->setEvokedData(displayEvoked);
 
         m_pButterflyScene->addItem(butterflySceneItemTemp);
     }

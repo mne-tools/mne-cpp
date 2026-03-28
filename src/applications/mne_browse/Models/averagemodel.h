@@ -149,6 +149,15 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns a pointer to a single evoked set entry.
+     *
+     * @param row the evoked-set row.
+     * @return the evoked entry or nullptr when the row is invalid.
+     */
+    const FiffEvoked* getEvoked(int row) const;
+
+    //=========================================================================================================
+    /**
      * getFiffInfo returns the fiff info
      *
      * @param FiffInfo of the evoked file
