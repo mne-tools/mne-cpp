@@ -279,6 +279,11 @@ void ChannelDataView::setupLayout()
     connect(m_pRhiView, &ChannelRhiView::samplesPerPixelChanged,
             m_pTimeRuler, &TimeRulerWidget::setSamplesPerPixel);
 
+    // Recompute samples-per-pixel when the RHI view itself is resized so the
+    // time window stays constant regardless of the widget's pixel width.
+    connect(m_pRhiView, &ChannelRhiView::viewResized,
+            this, [this](int, int) { updateSamplesPerPixel(); });
+
     connect(m_pModel.data(), &ChannelDataModel::dataChanged,
             this, &ChannelDataView::updateScrollBarRange);
 

@@ -1201,9 +1201,12 @@ void ChannelRhiView::drawOverlays()
 #endif
 
     // ── Event / stimulus marker overlay ──────────────────────────────
-    // Full-height coloured vertical lines.  Label chips are in StimEventStrip above.
+    // Full-height coloured vertical lines.  Label chips are in TimeRulerWidget above.
+    // Lines end 2 px before the bottom edge so they don't visually bleed into the
+    // ruler widget beneath due to QRhiWidget GPU texture compositing.
     if (!m_events.isEmpty() && m_samplesPerPixel > 0.f) {
         QPainter ep(this);
+        const int yEnd = height() - 2;
         for (const EventMarker &ev : m_events) {
             float xF = (static_cast<float>(ev.sample) - m_scrollSample) / m_samplesPerPixel;
             if (xF < -2.f || xF > width() + 2.f)
@@ -1212,7 +1215,7 @@ void ChannelRhiView::drawOverlays()
             QColor lineColor = ev.color;
             lineColor.setAlpha(150);
             ep.setPen(QPen(lineColor, 1));
-            ep.drawLine(ix, 0, ix, height());
+            ep.drawLine(ix, 0, ix, yEnd);
         }
     }
 
@@ -1351,6 +1354,7 @@ void ChannelRhiView::resizeEvent(QResizeEvent *event)
     QWidget::resizeEvent(event);
 #endif
     m_tileDirty = true;
+    emit viewResized(width(), height());
     update();
 }
 
