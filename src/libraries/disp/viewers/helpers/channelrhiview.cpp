@@ -1141,7 +1141,7 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
 
     // ── Event / stimulus marker pass ─────────────────────────────────
     // Draw coloured vertical lines spanning the full channel area.
-    // Label chips are shown in the dedicated StimEventStrip above the ruler.
+    // Label chips are shown in the TimeRulerWidget stim lane.
     if (!events.isEmpty() && spp > 0.f) {
         for (const EventMarker &ev : events) {
             float xF = (static_cast<float>(ev.sample) - tileStart) / spp;
@@ -1150,8 +1150,8 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
             int ix = static_cast<int>(xF);
 
             QColor lineColor = ev.color;
-            lineColor.setAlpha(150);
-            p.setPen(QPen(lineColor, 1));
+            lineColor.setAlpha(180);
+            p.setPen(QPen(lineColor, 2));
             p.drawLine(ix, 0, ix, ph);
         }
     }
@@ -1201,9 +1201,7 @@ void ChannelRhiView::drawOverlays()
 #endif
 
     // ── Event / stimulus marker overlay ──────────────────────────────
-    // Full-height coloured vertical lines.  Label chips are in TimeRulerWidget above.
-    // Lines end 2 px before the bottom edge so they don't visually bleed into the
-    // ruler widget beneath due to QRhiWidget GPU texture compositing.
+    // Full-height coloured vertical lines.  Label chips are in TimeRulerWidget.
     if (!m_events.isEmpty() && m_samplesPerPixel > 0.f) {
         QPainter ep(this);
         const int yEnd = height() - 2;
@@ -1213,8 +1211,8 @@ void ChannelRhiView::drawOverlays()
                 continue;
             int ix = static_cast<int>(xF);
             QColor lineColor = ev.color;
-            lineColor.setAlpha(150);
-            ep.setPen(QPen(lineColor, 1));
+            lineColor.setAlpha(180);
+            ep.setPen(QPen(lineColor, 2));
             ep.drawLine(ix, 0, ix, yEnd);
         }
     }
