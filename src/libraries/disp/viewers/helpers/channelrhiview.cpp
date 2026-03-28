@@ -1140,37 +1140,19 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
     }
 
     // ── Event / stimulus marker pass ─────────────────────────────────
+    // Draw coloured vertical lines spanning the full channel area.
+    // Label chips are shown in the dedicated StimEventStrip above the ruler.
     if (!events.isEmpty() && spp > 0.f) {
-        constexpr int kLabelH = 16;   // height of bottom label strip (px)
-        const int lineH = ph - kLabelH;
-
-        QFont evFont;
-        evFont.setPixelSize(9);
-        evFont.setBold(true);
-        p.setFont(evFont);
-
         for (const EventMarker &ev : events) {
             float xF = (static_cast<float>(ev.sample) - tileStart) / spp;
             if (xF < -2.f || xF > tilePixWidth + 2.f)
                 continue;
             int ix = static_cast<int>(xF);
 
-            // Semi-transparent vertical line spanning the channel area
             QColor lineColor = ev.color;
-            lineColor.setAlpha(180);
+            lineColor.setAlpha(150);
             p.setPen(QPen(lineColor, 1));
-            p.drawLine(ix, 0, ix, lineH);
-
-            // Bottom label chip: filled rect + white type text
-            constexpr int kChipW = 24, kChipH = kLabelH - 2;
-            int chipX = qBound(0, ix - kChipW / 2, tilePixWidth - kChipW);
-            QRectF chip(chipX, lineH + 1, kChipW, kChipH);
-            QColor chipColor = ev.color;
-            chipColor.setAlpha(220);
-            p.fillRect(chip, chipColor);
-            p.setPen(Qt::white);
-            QString lbl = ev.label.isEmpty() ? QString::number(ev.type) : ev.label;
-            p.drawText(chip, Qt::AlignCenter, lbl);
+            p.drawLine(ix, 0, ix, ph);
         }
     }
 
@@ -1219,42 +1201,18 @@ void ChannelRhiView::drawOverlays()
 #endif
 
     // ── Event / stimulus marker overlay ──────────────────────────────
-    // Drawn on both GPU and QPainter paths (buildTile bakes them in for QPainter,
-    // but here we also draw them on the GPU path without rebuilding VBOs/tiles).
+    // Full-height coloured vertical lines.  Label chips are in StimEventStrip above.
     if (!m_events.isEmpty() && m_samplesPerPixel > 0.f) {
-        constexpr int kLabelH = 16;
-        int lineH = height() - kLabelH;
-
         QPainter ep(this);
-        ep.setRenderHint(QPainter::TextAntialiasing, true);
-
-        QFont evFont;
-        evFont.setPixelSize(9);
-        evFont.setBold(true);
-        ep.setFont(evFont);
-
         for (const EventMarker &ev : m_events) {
             float xF = (static_cast<float>(ev.sample) - m_scrollSample) / m_samplesPerPixel;
             if (xF < -2.f || xF > width() + 2.f)
                 continue;
             int ix = static_cast<int>(xF);
-
-            // Vertical line spanning channel area
             QColor lineColor = ev.color;
-            lineColor.setAlpha(180);
+            lineColor.setAlpha(150);
             ep.setPen(QPen(lineColor, 1));
-            ep.drawLine(ix, 0, ix, lineH);
-
-            // Bottom chip
-            constexpr int kChipW = 24, kChipH = kLabelH - 2;
-            int chipX = qBound(0, ix - kChipW / 2, width() - kChipW);
-            QRectF chip(chipX, lineH + 1, kChipW, kChipH);
-            QColor chipColor = ev.color;
-            chipColor.setAlpha(220);
-            ep.fillRect(chip, chipColor);
-            ep.setPen(Qt::white);
-            QString lbl = ev.label.isEmpty() ? QString::number(ev.type) : ev.label;
-            ep.drawText(chip, Qt::AlignCenter, lbl);
+            ep.drawLine(ix, 0, ix, height());
         }
     }
 
