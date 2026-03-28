@@ -339,6 +339,7 @@ private:
     ChannelLabelPanel*               m_pLabelPanel          = nullptr;
     ChannelRhiView*                  m_pRhiView             = nullptr;
     TimeRulerWidget*                 m_pTimeRuler           = nullptr;
+    QWidget*                         m_pStimStrip           = nullptr; ///< StimEventStrip (defined in .cpp)
     QScrollBar*                      m_pScrollBar           = nullptr;
     QScrollBar*                      m_pChannelScrollBar    = nullptr;
     QToolButton*                     m_pScrollModeButton    = nullptr;
