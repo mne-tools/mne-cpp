@@ -147,6 +147,24 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns the measurement info of the currently loaded FIFF file, or null if none loaded.
+     */
+    QSharedPointer<FIFFLIB::FiffInfo> fiffInfo() const;
+
+    //=========================================================================================================
+    /**
+     * Returns the first sample of the currently loaded FIFF file, or 0 if none loaded.
+     */
+    int firstSample() const;
+
+    //=========================================================================================================
+    /**
+     * Returns the last sample of the currently loaded FIFF file, or 0 if none loaded.
+     */
+    int lastSample() const;
+
+    //=========================================================================================================
+    /**
      * Returns the base file name of the currently loaded FIFF file, or empty string if none.
      */
     QString fiffFileName() const;

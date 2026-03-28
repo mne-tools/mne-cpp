@@ -301,6 +301,16 @@ private:
      */
     void setWindowStatus();
 
+    //=========================================================================================================
+    /**
+     * Seed auxiliary windows from the currently available FIFF header information.
+     * This keeps selection/layout-driven UI responsive even before the legacy RawModel
+     * background load has finished.
+     */
+    void syncAuxWindowsToFiffInfo(FIFFLIB::FiffInfo::SPtr fiffInfo,
+                                  int firstSample,
+                                  int lastSample);
+
     QFile                   m_qFileRaw;                     /**< Fiff data file to read (set for convenience). */
     QFile                   m_qEventFile;                   /**< Fiff event data file to read (set for convenience). */
     QFile                   m_qEvokedFile;                  /**< Fiff event data file to read (set for convenience). */

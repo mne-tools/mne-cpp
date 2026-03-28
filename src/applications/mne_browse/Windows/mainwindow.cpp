@@ -472,6 +472,29 @@ void MainWindow::setWindowStatus()
     m_pStatusLabel->setText(title);
 }
 
+//*************************************************************************************************************
+
+void MainWindow::syncAuxWindowsToFiffInfo(FiffInfo::SPtr fiffInfo,
+                                          int firstSample,
+                                          int lastSample)
+{
+    if (!fiffInfo)
+        return;
+
+    m_pEventWindow->getEventModel()->setFiffInfo(fiffInfo);
+    m_pEventWindow->getEventModel()->setFirstLastSample(firstSample, lastSample);
+
+    m_pScaleWindow->hideSpinBoxes(fiffInfo);
+
+    m_pChInfoWindow->getDataModel()->setFiffInfo(fiffInfo);
+    m_pChInfoWindow->getDataModel()->layoutChanged(m_pChannelSelectionView->getLayoutMap());
+    m_pChannelSelectionView->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
+    m_pChannelSelectionView->newFiffFileLoaded(fiffInfo);
+
+    m_pFilterWindow->newFileLoaded(fiffInfo);
+    m_pNoiseReductionWindow->setFiffInfo(fiffInfo);
+}
+
 
 //*************************************************************************************************************
 //Log
@@ -661,6 +684,11 @@ bool MainWindow::loadRawFile(const QString& filename)
     else
         qWarning() << "ERROR loading fiff data file" << filename;
 
+    if (ok)
+        syncAuxWindowsToFiffInfo(m_pDataWindow->fiffInfo(),
+                                 m_pDataWindow->firstSample(),
+                                 m_pDataWindow->lastSample());
+
     // ── Legacy RawModel path: kept for filter/event sub-systems ──────
     // Runs in a background thread so the ChannelDataView path (above) can
     // display data immediately while the full FIFF index is parsed.
@@ -674,12 +702,10 @@ bool MainWindow::loadRawFile(const QString& filename)
 
     connect(&m_legacyLoadWatcher, &QFutureWatcher<bool>::finished, this, [this]() {
         auto fiffInfo = rawModel()->fiffInfo();
-        m_pEventWindow->getEventModel()->setFiffInfo(fiffInfo);
-        m_pEventWindow->getEventModel()->setFirstLastSample(rawModel()->firstSample(),
-                                                            rawModel()->lastSample());
+        syncAuxWindowsToFiffInfo(fiffInfo,
+                                 rawModel()->firstSample(),
+                                 rawModel()->lastSample());
         setWindowStatus();
-        if (fiffInfo)
-            m_pScaleWindow->hideSpinBoxes(fiffInfo);
         m_qFileRaw.close();
     });
 
