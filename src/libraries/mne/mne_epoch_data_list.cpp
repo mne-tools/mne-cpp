@@ -144,6 +144,7 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
             }
 
             epoch->event = event;
+            epoch->eventSample = event_samp;
             epoch->tmin = tmin;
             epoch->tmax = tmax;
 
@@ -180,7 +181,7 @@ FiffEvoked MNEEpochDataList::average(const FiffInfo& info,
                                      fiff_int_t first,
                                      fiff_int_t last,
                                      VectorXi sel,
-                                     bool proj)
+                                     bool proj) const
 {
     FiffEvoked p_evoked;
 
@@ -252,7 +253,7 @@ void MNEEpochDataList::dropRejected()
 {
     QMutableListIterator<MNEEpochData::SPtr> i(*this);
     while (i.hasNext()) {
-        if (i.next()->bReject) {
+        if (i.next()->isRejected()) {
             i.remove();
         }
     }
@@ -452,6 +453,7 @@ FiffEvokedSet MNEEpochDataList::averageCategories(const FiffRawData &raw,
                                               proj);
 
         evoked.comment = comment;
+        evoked.baseline = doBaseline ? baseline : QPair<float,float>(0.0f, 0.0f);
         evokedSet.evoked.append(evoked);
     }
 
@@ -490,7 +492,10 @@ FiffEvoked MNEEpochDataList::computeAverage(const FiffRawData& raw,
         lstEpochDataList.dropRejected();
     }
 
-    return lstEpochDataList.average(raw.info,
-                                    0,
-                                    lstEpochDataList.first()->epoch.cols());
+    FiffEvoked evoked = lstEpochDataList.average(raw.info,
+                                                 0,
+                                                 lstEpochDataList.first()->epoch.cols());
+    evoked.baseline = bApplyBaseline ? QPair<float,float>(fTBaselineFromS, fTBaselineToS)
+                                     : QPair<float,float>(0.0f, 0.0f);
+    return evoked;
 }

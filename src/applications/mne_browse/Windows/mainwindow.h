@@ -76,6 +76,7 @@
 #include "filterwindow.h"
 #include "eventwindow.h"
 #include "annotationwindow.h"
+#include "epochwindow.h"
 #include "virtualchannelwindow.h"
 #include "datawindow.h"
 #include "aboutwindow.h"
@@ -320,6 +321,15 @@ private:
 
     //=========================================================================================================
     /**
+     * Rebuild the in-memory evoked set from the currently reviewed epochs.
+     *
+     * @param [in] statusMessage  Optional status-bar text shown on success.
+     * @return true on success.
+     */
+    bool refreshReviewedEvokedSet(const QString& statusMessage = QString());
+
+    //=========================================================================================================
+    /**
      * Compute a covariance matrix from the currently loaded raw file and available events.
      */
     void computeCovariance();
@@ -341,6 +351,12 @@ private:
      * Prompt for an annotation label and create an annotation from the selected raw-view span.
      */
     void handleAnnotationRangeSelected(int startSample, int endSample);
+
+    //=========================================================================================================
+    /**
+     * Clear the current epoch-review session.
+     */
+    void clearEpochReviewSession();
 
     //=========================================================================================================
     /**
@@ -417,6 +433,7 @@ private:
     //Window widgets
     EventWindow*            m_pEventWindow;                 /**< Event widget which display the event view. */
     AnnotationWindow*       m_pAnnotationWindow;            /**< Annotation widget which displays browser annotations. */
+    EpochWindow*            m_pEpochWindow;                 /**< Dock widget which reviews epochs before averaging. */
     VirtualChannelWindow*   m_pVirtualChannelWindow;        /**< Dock widget which manages browser-level derived channels. */
     FilterWindow*           m_pFilterWindow;                /**< Filter widget which display the filter options for the user. */
     DataWindow*             m_pDataWindow;                  /**< Data widget which display the data for the user. */
@@ -442,6 +459,11 @@ private:
     QAction*                m_pWhitenButterflyAction;       /**< Toggle whitening in the average butterfly plot. */
     QAction*                m_pAnnotationModeAction;        /**< Toggle Shift-drag annotation selection in the raw browser. */
     QFutureWatcher<bool>    m_legacyLoadWatcher;            /**< Watches async legacy RawModel load so the UI stays responsive. */
+    QList<MNELIB::MNEEpochDataList> m_epochReviewLists;     /**< Reviewed epochs grouped by event code. */
+    QList<int>              m_epochReviewEventCodes;        /**< Event codes for the current review session. */
+    QStringList             m_epochReviewComments;          /**< Display comments for the current review session. */
+    FIFFLIB::FiffInfo::SPtr m_pEpochReviewInfo;             /**< Raw info used to rebuild evoked responses from reviewed epochs. */
+    QPair<float,float>      m_epochReviewBaseline;          /**< Baseline metadata of the current review session. */
 };
 
 } //NAMESPACE

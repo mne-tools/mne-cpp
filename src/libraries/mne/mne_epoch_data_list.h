@@ -132,7 +132,7 @@ public:
                                 FIFFLIB::fiff_int_t first,
                                 FIFFLIB::fiff_int_t last,
                                 Eigen::VectorXi sel = FIFFLIB::defaultVectorXi,
-                                bool proj = false);
+                                bool proj = false) const;
 
     //=========================================================================================================
     /**

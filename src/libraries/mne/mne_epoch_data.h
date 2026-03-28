@@ -125,17 +125,34 @@ public:
     {
         return (a.epoch == b.epoch &&
                 a.event == b.event&&
+                a.eventSample == b.eventSample &&
                 a.tmin == b.tmin&&
                 a.tmax == b.tmax&&
-                a.bReject == b.bReject);
+                a.bReject == b.bReject &&
+                a.bUserReject == b.bUserReject);
+    }
+
+    //=========================================================================================================
+    /**
+     * Returns whether this epoch should be excluded from averaging.
+     *
+     * @param[in] respectAutoReject  Whether automatic artifact rejection should be honored.
+     *
+     * @return true when the epoch should be excluded.
+     */
+    inline bool isRejected(bool respectAutoReject = true) const
+    {
+        return bUserReject || (respectAutoReject && bReject);
     }
 
 public:
     Eigen::MatrixXd     epoch;          /**< The data. */
     FIFFLIB::fiff_int_t event;          /**< The event code. */
+    FIFFLIB::fiff_int_t eventSample;    /**< The sample index of the triggering event. */
     float               tmin;           /**< New start time (must be >= 0). */
     float               tmax;           /**< New end time of the data (cannot exceed data duration). */
     bool                bReject;        /**< Whether this epoch is to be rejected. */
+    bool                bUserReject;    /**< Whether this epoch was manually excluded by the user. */
 };
 } // NAMESPACE
 
