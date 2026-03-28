@@ -83,6 +83,7 @@ struct ChannelDisplayInfo {
     QColor  color;          /**< Line colour to use in the GPU renderer. */
     float   amplitudeMax;   /**< Amplitude value (physical units) that maps to full row height. */
     bool    bad;            /**< Whether the channel is currently marked bad. */
+    bool    isVirtualChannel = false; /**< Browser-level derived channel without a direct FIFF row. */
 };
 
 //=============================================================================================================
@@ -147,6 +148,14 @@ public:
     void clearData();
 
     void setScaleMap(const QMap<qint32, float> &scaleMap);
+
+    //=========================================================================================================
+    /**
+     * Set extra browser-level virtual channels appended after the FIFF channels.
+     *
+     * @param[in] virtualChannels  Display metadata for each appended virtual channel.
+     */
+    void setVirtualChannels(const QVector<ChannelDisplayInfo> &virtualChannels);
 
     //=========================================================================================================
     /**
@@ -267,6 +276,7 @@ private:
     QMap<qint32, float>                       m_scaleMap;
     QColor                                    m_signalColor { Qt::darkGreen };
 
+    QVector<ChannelDisplayInfo>               m_virtualDisplayInfo;
     QVector<ChannelDisplayInfo>               m_displayInfo;  // pre-computed, rebuild on meta change
     bool                                      m_removeDC = false;
 };

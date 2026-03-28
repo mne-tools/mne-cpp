@@ -76,6 +76,7 @@
 #include "filterwindow.h"
 #include "eventwindow.h"
 #include "annotationwindow.h"
+#include "virtualchannelwindow.h"
 #include "datawindow.h"
 #include "aboutwindow.h"
 #include "informationwindow.h"
@@ -214,6 +215,18 @@ private:
      */
     void saveAnnotations();
 
+    //=========================================================================================================
+    /**
+     * loadVirtualChannels opens a file dialog that picks the virtual-channel sidecar file.
+     */
+    void loadVirtualChannels();
+
+    //=========================================================================================================
+    /**
+     * saveVirtualChannels saves the virtual-channel sidecar file.
+     */
+    void saveVirtualChannels();
+
 public:
     //=========================================================================================================
     /**
@@ -271,6 +284,15 @@ private:
      * @param [in] showWindow  True when the annotation manager should be shown on success.
      */
     bool loadAnnotationsFile(const QString& filename, bool showWindow = true);
+
+    //=========================================================================================================
+    /**
+     * loadVirtualChannelsFile loads a browser virtual-channel JSON file without a dialog.
+     *
+     * @param [in] filename  Absolute path to the virtual-channel file.
+     * @param [in] showWindow  True when the manager should be shown on success.
+     */
+    bool loadVirtualChannelsFile(const QString& filename, bool showWindow = true);
 
     //=========================================================================================================
     /**
@@ -372,6 +394,7 @@ private:
     QFile                   m_qFileRaw;                     /**< Fiff data file to read (set for convenience). */
     QFile                   m_qEventFile;                   /**< Fiff event data file to read (set for convenience). */
     QFile                   m_qAnnotationFile;              /**< Browser annotation sidecar file. */
+    QFile                   m_qVirtualChannelFile;          /**< Browser virtual-channel sidecar file. */
     QFile                   m_qEvokedFile;                  /**< Fiff event data file to read (set for convenience). */
     QFile                   m_qCovFile;                     /**< Fiff covariance file to write (set for convenience). */
     FIFFLIB::FiffCov        m_covariance;                   /**< Last computed covariance matrix. */
@@ -379,6 +402,7 @@ private:
     //Window widgets
     EventWindow*            m_pEventWindow;                 /**< Event widget which display the event view. */
     AnnotationWindow*       m_pAnnotationWindow;            /**< Annotation widget which displays browser annotations. */
+    VirtualChannelWindow*   m_pVirtualChannelWindow;        /**< Dock widget which manages browser-level derived channels. */
     FilterWindow*           m_pFilterWindow;                /**< Filter widget which display the filter options for the user. */
     DataWindow*             m_pDataWindow;                  /**< Data widget which display the data for the user. */
     AboutWindow*            m_pAboutWindow;                 /**< About widget which displays information about this application.*/

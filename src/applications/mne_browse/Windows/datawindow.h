@@ -85,6 +85,7 @@ namespace MNEBROWSE
 
 class MainWindow;
 class RawDelegate;
+struct VirtualChannelDefinition;
 
 /**
  * DECLARE CLASS DataWindow
@@ -245,6 +246,16 @@ public:
      */
     void setAnnotationSelectionEnabled(bool enabled);
 
+    //=========================================================================================================
+    /**
+     * Set browser-level virtual bipolar channels appended to the raw view.
+     *
+     * @param[in] virtualChannels  Virtual channel definitions to apply.
+     * @param[in] reloadIfOpen     True to refresh the current browser immediately.
+     */
+    void setVirtualChannels(const QVector<VirtualChannelDefinition> &virtualChannels,
+                            bool reloadIfOpen = true);
+
 private:
     //=========================================================================================================
     /**
@@ -257,6 +268,24 @@ private:
      * Setup the sample labels of the data window
      */
     void initLabels();
+
+    //=========================================================================================================
+    /**
+     * Build channel-view metadata for the currently configured virtual channels.
+     */
+    void rebuildVirtualChannels();
+
+    //=========================================================================================================
+    /**
+     * Append the currently active virtual channels to a raw data block.
+     */
+    Eigen::MatrixXd appendVirtualChannels(const Eigen::MatrixXd &data) const;
+
+    //=========================================================================================================
+    /**
+     * Reinitialize the browser view and resume block loading at the requested sample.
+     */
+    void restartChannelView(int initialSample, bool clearAnnotations);
 
     //=========================================================================================================
     /**
@@ -328,6 +357,16 @@ private:
     int                                           m_iStimChannel       = -1; /**< Selected trigger channel index (prefer STI 014). */
     int                                           m_iStimLastSample    = std::numeric_limits<int>::min(); /**< Last scanned sample on the trigger channel. */
     int                                           m_iStimLastValue     = 0; /**< Trigger value at m_iStimLastSample. */
+
+    struct ResolvedVirtualChannel {
+        QString                     name;
+        int                         positiveChannel = -1;
+        int                         negativeChannel = -1;
+        DISPLIB::ChannelDisplayInfo displayInfo;
+    };
+
+    QVector<VirtualChannelDefinition>             m_virtualChannelDefinitions; /**< Requested virtual-channel definitions. */
+    QVector<ResolvedVirtualChannel>               m_resolvedVirtualChannels; /**< Definitions resolved against the current FIFF header. */
 
     // ── Buffer sizing ──────────────────────────────────────────────────
     // Each block is 60 s.  Buffer holds kMaxBlocks = 10 blocks = 10 min.
