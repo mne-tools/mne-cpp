@@ -91,7 +91,9 @@ namespace AverageModelRoles
                   GetLastSample = Qt::UserRole + 1005,
                   GetComment = Qt::UserRole + 1006,
                   GetTimeData = Qt::UserRole + 1007,
-                  GetProjections = Qt::UserRole + 1008};
+                  GetProjections = Qt::UserRole + 1008,
+                  GetNumAverages = Qt::UserRole + 1009,
+                  GetBaselineText = Qt::UserRole + 1010};
 }
 
 namespace ChannelInfoModelRoles

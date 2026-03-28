@@ -56,6 +56,22 @@
 using namespace MNEBROWSE;
 using namespace FIFFLIB;
 
+namespace
+{
+
+QString baselineTextForEvoked(const FiffEvoked& evoked)
+{
+    if(evoked.baseline.first == 0.0f && evoked.baseline.second == 0.0f) {
+        return QStringLiteral("off");
+    }
+
+    return QStringLiteral("[%1, %2] ms")
+        .arg(evoked.baseline.first * 1000.0f, 0, 'f', 0)
+        .arg(evoked.baseline.second * 1000.0f, 0, 'f', 0);
+}
+
+} // namespace
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -100,7 +116,7 @@ int AverageModel::rowCount(const QModelIndex & /*parent*/) const
 
 int AverageModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 5;
+    return 6;
 }
 
 
@@ -125,18 +141,22 @@ QVariant AverageModel::headerData(int section, Qt::Orientation orientation, int 
                 break;
 
             case 1:
-                return QString("%1").arg("Aspect kind");
+                return QString("%1").arg("Epochs");
                 break;
 
             case 2:
-                return QString("%1").arg("First sample");
+                return QString("%1").arg("Baseline");
                 break;
 
             case 3:
-                return QString("%1").arg("Last sample");
+                return QString("%1").arg("First sample");
                 break;
 
             case 4:
+                return QString("%1").arg("Last sample");
+                break;
+
+            case 5:
                 return QString("%1").arg("Data types");
                 break;
         }
@@ -150,127 +170,95 @@ QVariant AverageModel::headerData(int section, Qt::Orientation orientation, int 
 
 QVariant AverageModel::data(const QModelIndex &index, int role) const
 {
-    if(index.row() >= m_pEvokedDataSet->evoked.size())
+    if(!index.isValid() || index.row() >= m_pEvokedDataSet->evoked.size())
         return QVariant();
+
+    const FiffEvoked& evoked = m_pEvokedDataSet->evoked.at(index.row());
+
+    if(role == Qt::TextAlignmentRole) {
+        return QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
+    }
+
+    switch(role) {
+        case AverageModelRoles::GetComment:
+            return QVariant(evoked.comment);
+        case AverageModelRoles::GetAspectKind:
+            return QVariant(evoked.aspect_kind);
+        case AverageModelRoles::GetFirstSample:
+            return QVariant(evoked.first);
+        case AverageModelRoles::GetLastSample:
+            return QVariant(evoked.last);
+        case AverageModelRoles::GetNumAverages:
+            return QVariant(evoked.nave);
+        case AverageModelRoles::GetBaselineText:
+            return QVariant(baselineTextForEvoked(evoked));
+        case AverageModelRoles::GetAverageData: {
+            QVariant v;
+            RowVectorPair averagedData;
+            averagedData.first = evoked.data.data();
+            averagedData.second = evoked.data.cols();
+            v.setValue(averagedData);
+            return v;
+        }
+        case AverageModelRoles::GetFiffInfo: {
+            QVariant v;
+            const FiffInfo *fiffInfo = &evoked.info;
+            v.setValue(fiffInfo);
+            return v;
+        }
+        case AverageModelRoles::GetTimeData: {
+            QVariant v;
+            RowVectorPairF timeData;
+            timeData.first = evoked.times.data();
+            timeData.second = evoked.times.cols();
+            v.setValue(timeData);
+            return v;
+        }
+        case AverageModelRoles::GetProjections: {
+            QVariant v;
+            RowVectorPair projections;
+            projections.first = evoked.proj.data();
+            projections.second = evoked.proj.cols();
+            v.setValue(projections);
+            return v;
+        }
+        default:
+            break;
+    }
+
+    if(role != Qt::DisplayRole) {
+        return QVariant();
+    }
 
     if (index.isValid()) {
         //******** first column (evoked set comment) ********
         if(index.column()==0) {
-            QVariant v;
-
-            switch(role) {
-                case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_pEvokedDataSet->evoked.at(index.row()).comment));
-                    return v;
-                    break;
-
-                case AverageModelRoles::GetComment:
-                    v.setValue(m_pEvokedDataSet->evoked.at(index.row()).comment);
-                    return v;
-                    break;
-
-                case Qt::TextAlignmentRole:
-                    return QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
-            }
+            return QString("%1").arg(evoked.comment);
         }//end column check
 
-        //******** second column (evoked set aspect kind) ********
+        //******** second column (kept epochs) ********
         if(index.column()==1) {
-            QVariant v;
-
-            switch(role) {
-                case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_pEvokedDataSet->evoked.at(index.row()).aspect_kind));
-                    return v;
-                    break;
-
-                case AverageModelRoles::GetAspectKind:
-                    v.setValue(m_pEvokedDataSet->evoked.at(index.row()).aspect_kind);
-                    return v;
-                    break;
-
-                case Qt::TextAlignmentRole:
-                    return QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
-            }
+            return QString::number(evoked.nave);
         }//end column check
 
-        //******** third column (evoked set first sample) ********
+        //******** third column (baseline window) ********
         if(index.column()==2) {
-            QVariant v;
-
-            switch(role) {
-                case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_pEvokedDataSet->evoked.at(index.row()).first));
-                    return v;
-                    break;
-
-            case AverageModelRoles::GetFirstSample:
-                v.setValue(m_pEvokedDataSet->evoked.at(index.row()).first);
-                return v;
-                break;
-
-            case Qt::TextAlignmentRole:
-                return QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
-            }
+            return baselineTextForEvoked(evoked);
         }//end column check
 
-        //******** fourth column (evoked set last sample) ********
+        //******** fourth column (evoked set first sample) ********
         if(index.column()==3) {
-            QVariant v;
-
-            switch(role) {
-                case Qt::DisplayRole:
-                    v.setValue(QString("%1").arg(m_pEvokedDataSet->evoked.at(index.row()).last));
-                    return v;
-                    break;
-
-            case AverageModelRoles::GetLastSample:
-                v.setValue(m_pEvokedDataSet->evoked.at(index.row()).last);
-                return v;
-                break;
-
-            case Qt::TextAlignmentRole:
-                return QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
-            }
+            return QString("%1").arg(evoked.first);
         }//end column check
 
-        //******** fifth column (evoked set data types) ********
+        //******** fifth column (evoked set last sample) ********
         if(index.column()==4) {
-            QVariant v;
-            RowVectorPair averagedData;
-            const FiffInfo *fiffInfo;
-            RowVectorPairF timeData;
-            RowVectorPair projections;
+            return QString("%1").arg(evoked.last);
+        }//end column check
 
-            switch(role) {
-                case AverageModelRoles::GetAverageData:
-                    averagedData.first = m_pEvokedDataSet->evoked.at(index.row()).data.data();
-                    averagedData.second = m_pEvokedDataSet->evoked.at(index.row()).data.cols();
-                    v.setValue(averagedData);
-                    break;
-
-                case AverageModelRoles::GetFiffInfo:
-                    fiffInfo = &m_pEvokedDataSet->evoked.at(index.row()).info;
-                    v.setValue(fiffInfo);
-                    break;
-
-                case AverageModelRoles::GetTimeData:
-                    timeData.first = m_pEvokedDataSet->evoked.at(index.row()).times.data();
-                    timeData.second = m_pEvokedDataSet->evoked.at(index.row()).times.cols();
-                    v.setValue(timeData);
-                    break;
-
-                case AverageModelRoles::GetProjections:
-                    projections.first = m_pEvokedDataSet->evoked.at(index.row()).proj.data();
-                    projections.second = m_pEvokedDataSet->evoked.at(index.row()).proj.cols();
-                    v.setValue(projections);
-                    break;
-
-                case Qt::TextAlignmentRole:
-                    return QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
-            }
-
-            return v;
+        //******** sixth column (evoked set internal data handle) ********
+        if(index.column()==5) {
+            return QStringLiteral("data");
         }//end column check
     } // end index.valid() check
 

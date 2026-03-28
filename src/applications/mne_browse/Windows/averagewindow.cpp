@@ -50,6 +50,7 @@
 //=============================================================================================================
 
 #include <QDate>
+#include <QMenu>
 #include <QRandomGenerator>
 
 
@@ -332,6 +333,15 @@ bool AverageWindow::isButterflyWhiteningEnabled() const
     return m_bWhitenButterfly;
 }
 
+//*************************************************************************************************************
+
+void AverageWindow::setRecomputeAvailable(bool available)
+{
+    if(m_pRecomputeAverageAction) {
+        m_pRecomputeAverageAction->setEnabled(available);
+    }
+}
+
 
 //*************************************************************************************************************
 
@@ -377,8 +387,7 @@ void AverageWindow::initTableViewWidgets()
     //Set average model to list widget
     ui->m_tableView_loadedSets->setModel(m_pAverageModel);
     ui->m_tableView_loadedSets->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    ui->m_tableView_loadedSets->setColumnHidden(1,true); //hide second column because the average model holds the aspect kind for this column
-    ui->m_tableView_loadedSets->setColumnHidden(4,true); //hide last column because the average model holds the data types for this column
+    ui->m_tableView_loadedSets->setColumnHidden(5,true); //hide last column because the average model holds internal data handles here
     ui->m_tableView_loadedSets->resizeColumnsToContents();
 
     ui->m_tableView_loadedSets->adjustSize();
@@ -390,6 +399,7 @@ void AverageWindow::initTableViewWidgets()
     connect(m_pAverageModel, &AverageModel::fileLoaded,
             this, [this](bool loaded) {
         if(loaded) {
+            ui->m_tableView_loadedSets->resizeColumnsToContents();
             selectLoadedSets();
         } else {
             m_pAverageScene->update();
@@ -424,9 +434,24 @@ void AverageWindow::initAverageSceneView()
 
 void AverageWindow::initButtons()
 {
+    m_pComputeAverageAction = new QAction(tr("Compute evoked..."), this);
+    connect(m_pComputeAverageAction, &QAction::triggered,
+            this, &AverageWindow::addAverageRequested);
+
+    m_pRecomputeAverageAction = new QAction(tr("Recompute last settings"), this);
+    m_pRecomputeAverageAction->setEnabled(false);
+    connect(m_pRecomputeAverageAction, &QAction::triggered,
+            this, &AverageWindow::recomputeAverageRequested);
+
+    QMenu* averageMenu = new QMenu(ui->m_toolbutton_addAverage);
+    averageMenu->addAction(m_pComputeAverageAction);
+    averageMenu->addAction(m_pRecomputeAverageAction);
+
+    ui->m_toolbutton_addAverage->setMenu(averageMenu);
+    ui->m_toolbutton_addAverage->setPopupMode(QToolButton::MenuButtonPopup);
     ui->m_toolbutton_addAverage->setText("+");
-    ui->m_toolbutton_addAverage->setToolTip("Compute evoked responses from the current raw file");
-    connect(ui->m_toolbutton_addAverage, &QToolButton::released,
+    ui->m_toolbutton_addAverage->setToolTip("Compute evoked responses from the current raw file, or rerun the last evoked setup.");
+    connect(ui->m_toolbutton_addAverage, &QToolButton::clicked,
             this, &AverageWindow::addAverageRequested);
 
     connect(ui->m_pushButton_exportLayoutPlot, &QPushButton::released,
@@ -482,10 +507,11 @@ void AverageWindow::refreshPlots()
             //Get only the necessary data from the average model (use column 4)
             QModelIndex index = selectedRows.at(u);
 
-            const FiffInfo* fiffInfo = m_pAverageModel->data(m_pAverageModel->index(index.row(), 4), AverageModelRoles::GetFiffInfo).value<const FiffInfo*>();
-            RowVectorPair averageData = m_pAverageModel->data(m_pAverageModel->index(index.row(), 4), AverageModelRoles::GetAverageData).value<RowVectorPair>();
-            int first = m_pAverageModel->data(m_pAverageModel->index(index.row(), 2), AverageModelRoles::GetFirstSample).toInt();
-            int last = m_pAverageModel->data(m_pAverageModel->index(index.row(), 3), AverageModelRoles::GetLastSample).toInt();
+            const QModelIndex modelIndex = m_pAverageModel->index(index.row(), 0);
+            const FiffInfo* fiffInfo = m_pAverageModel->data(modelIndex, AverageModelRoles::GetFiffInfo).value<const FiffInfo*>();
+            RowVectorPair averageData = m_pAverageModel->data(modelIndex, AverageModelRoles::GetAverageData).value<RowVectorPair>();
+            int first = m_pAverageModel->data(modelIndex, AverageModelRoles::GetFirstSample).toInt();
+            int last = m_pAverageModel->data(modelIndex, AverageModelRoles::GetLastSample).toInt();
 
             //Get the averageScenItem specific data row
             int channelNumber = m_mappedChannelNames.indexOf(averageSceneItemTemp->m_sChannelName);
