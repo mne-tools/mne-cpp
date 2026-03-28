@@ -245,6 +245,13 @@ void ChannelRhiView::setScrollSample(float sample)
     else
         sample = qMax(sample, 0.f);
 
+    // Never scroll past the file end (clamp upper bound when file bounds are known)
+    if (m_lastFileSample >= 0) {
+        float maxScroll = static_cast<float>(m_lastFileSample - visibleSampleCount() + 1);
+        maxScroll = qMax(maxScroll, static_cast<float>(m_firstFileSample));
+        sample = qMin(sample, maxScroll);
+    }
+
     if (qFuzzyCompare(m_scrollSample, sample))
         return;
 
@@ -429,6 +436,13 @@ void ChannelRhiView::setFirstFileSample(int first)
     m_firstFileSample = first;
     m_tileDirty = true;
     update();
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::setLastFileSample(int last)
+{
+    m_lastFileSample = last;
 }
 
 //=============================================================================================================
@@ -1167,14 +1181,15 @@ void ChannelRhiView::mouseReleaseEvent(QMouseEvent *event)
                     float velSampPerMs = -(dx / dt) * m_samplesPerPixel;
                     float speed = qAbs(velSampPerMs);
                     if (speed > 0.3f) { // threshold: ~300 samples/s minimum
-                        float durationMs = qBound(200.f, speed * 0.35f, 1800.f);
-                        // With OutQuad the effective travel ≈ velocity × duration / 2
-                        float targetScroll = m_scrollSample + velSampPerMs * durationMs * 0.5f;
-                        targetScroll = qMax(targetScroll, 0.f);
+                        // OutCubic: f'(0) = 3, so travel = v × duration / 3.
+                        // Longer duration and distance for a smooth, phone-like glide.
+                        float durationMs = qBound(500.f, speed * 1.0f, 5000.f);
+                        float targetScroll = m_scrollSample + velSampPerMs * durationMs / 3.f;
+                        targetScroll = qMax(targetScroll, static_cast<float>(m_firstFileSample));
 
                         m_pInertialAnim = new QPropertyAnimation(this, "scrollSample", this);
                         m_pInertialAnim->setDuration(static_cast<int>(durationMs));
-                        m_pInertialAnim->setEasingCurve(QEasingCurve::OutQuad);
+                        m_pInertialAnim->setEasingCurve(QEasingCurve::OutCubic);
                         m_pInertialAnim->setStartValue(m_scrollSample);
                         m_pInertialAnim->setEndValue(targetScroll);
                         connect(m_pInertialAnim, &QPropertyAnimation::finished, this, [this]() {

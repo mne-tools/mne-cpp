@@ -132,6 +132,24 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns true when the FiffBlockReader has a file open.
+     */
+    bool isFiffFileLoaded() const;
+
+    //=========================================================================================================
+    /**
+     * Returns the duration of the loaded file in seconds, or 0 if none loaded.
+     */
+    double fiffFileDurationSeconds() const;
+
+    //=========================================================================================================
+    /**
+     * Returns the base file name of the currently loaded FIFF file, or empty string if none.
+     */
+    QString fiffFileName() const;
+
+    //=========================================================================================================
+    /**
      * Returns the data QTableView of this window
      */
     QTableView* getDataTableView();
@@ -262,6 +280,7 @@ private:
     int                       m_iNextLoadSample     = 0;       /**< First sample of the next forward block to load. */
     int                       m_iCurrentScrollSample = 0;      /**< Last known scroll position (absolute sample). */
     bool                      m_bLoadingBlock       = false;   /**< Async load in progress. */
+    QString                   m_sFiffFilePath;                 /**< Path of the currently open FIFF file. */
 
     // ── Buffer sizing ──────────────────────────────────────────────────
     // Each block is 60 s.  Buffer holds kMaxBlocks = 10 blocks = 10 min.

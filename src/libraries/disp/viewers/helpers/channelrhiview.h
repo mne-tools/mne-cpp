@@ -229,6 +229,17 @@ public:
 
     //=========================================================================================================
     /**
+     * Set the absolute sample index of the last sample in the file.
+     * Used to clamp scrolling so mouse pan cannot exceed the file end.
+     * Pass -1 (default) for unlimited.
+     *
+     * @param[in] last  Absolute sample index of the file's last sample.
+     */
+    void setLastFileSample(int last);
+    int  lastFileSample() const { return m_lastFileSample; }
+
+    //=========================================================================================================
+    /**
      * Control what the vertical mouse wheel scrolls.
      * When @p channelsMode is true the vertical wheel scrolls through channels.
      * When false the vertical wheel scrolls through time (same as horizontal).
@@ -343,6 +354,7 @@ private:
     bool   m_gridVisible          = true;
     float  m_sfreq                = 1000.f;
     int    m_firstFileSample      = 0;
+    int    m_lastFileSample       = -1;   // -1 = no limit (file not yet known)
     bool   m_wheelScrollsChannels = true; // default: vertical wheel → channels
 
     // ── Vertical channel windowing ────────────────────────────────────

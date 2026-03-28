@@ -248,6 +248,17 @@ public:
      */
     void setRemoveDC(bool dc);
 
+    //=========================================================================================================
+    /**
+     * Set the absolute sample indices of the file's first and last samples.
+     * The scrollbar range and mouse-pan clamp use these to prevent scrolling
+     * outside the actual file boundaries regardless of the ring-buffer state.
+     *
+     * @param[in] first  Absolute sample index of the file's first sample.
+     * @param[in] last   Absolute sample index of the file's last sample.
+     */
+    void setFileBounds(int first, int last);
+
     // ── AbstractView overrides ────────────────────────────────────────
     void saveSettings() override;
     void loadSettings() override;
@@ -321,6 +332,9 @@ private:
     double m_zoomFactor         = 1.0;
     bool   m_hideBadChannels    = false;
     bool   m_scrollBarUpdating  = false; // re-entrance guard
+
+    int    m_firstFileSample    = -1;    // -1 = not yet set (fall back to model)
+    int    m_lastFileSample     = -1;    // -1 = not yet set
 };
 
 } // namespace DISPLIB

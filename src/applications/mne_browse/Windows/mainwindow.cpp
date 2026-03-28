@@ -424,13 +424,22 @@ void MainWindow::setWindowStatus()
 
     //Set status bar
     //Set data file informations
-    if(rawModel()->isFileLoaded() && rawModel()->fiffInfo()) {
+    if (m_pDataWindow->isFiffFileLoaded()) {
+        double dur = m_pDataWindow->fiffFileDurationSeconds();
+        int durMin = static_cast<int>(dur) / 60;
+        double durSec = dur - durMin * 60.0;
+        QString durStr = durMin > 0
+            ? QString("%1 min %2 s").arg(durMin).arg(durSec, 0, 'f', 1)
+            : QString("%1 s").arg(dur, 0, 'f', 1);
+        title = QString("Data file: %1  |  Duration: %2")
+            .arg(m_pDataWindow->fiffFileName(), durStr);
+    } else if (rawModel()->isFileLoaded() && rawModel()->fiffInfo()) {
         int idx = m_qFileRaw.fileName().lastIndexOf("/");
         QString filename = m_qFileRaw.fileName().remove(0,idx+1);
         title = QString("Data file: %1  /  First sample: %2  /  Sample frequency: %3Hz").arg(filename).arg(rawModel()->firstSample()).arg(rawModel()->fiffInfo()->sfreq);
-    }
-    else
+    } else {
         title = QString("No data file");
+    }
 
     //Set event file informations
     if(m_pEventWindow->getEventModel()->isFileLoaded()) {
