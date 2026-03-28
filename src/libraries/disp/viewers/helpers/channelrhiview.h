@@ -347,6 +347,19 @@ private:
     void rebuildVBOs(QRhiResourceUpdateBatch *batch);
     void updateUBO(QRhiResourceUpdateBatch *batch);
     bool isVboDirty() const;
+
+    // ── Overlay blit (bands + event lines baked into Metal texture) ───
+    void ensureOverlayPipeline();
+    void rebuildOverlayImage(int pw, int ph);
+
+    std::unique_ptr<QRhiBuffer>                  m_overlayVbo;
+    std::unique_ptr<QRhiTexture>                 m_overlayTex;
+    std::unique_ptr<QRhiSampler>                 m_overlaySampler;
+    std::unique_ptr<QRhiShaderResourceBindings>  m_overlaySrb;
+    std::unique_ptr<QRhiGraphicsPipeline>        m_overlayPipeline;
+    QImage                                       m_overlayImage;
+    bool                                         m_overlayDirty = true;
+    QSize                                        m_overlayTexSize;
 #endif
 
     // ── Tile cache (QPainter paths) ────────────────────────────────────
