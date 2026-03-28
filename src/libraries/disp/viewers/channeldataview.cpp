@@ -68,38 +68,19 @@ using namespace FIFFLIB;
 using namespace Eigen;
 
 //=============================================================================================================
-// PRIVATE HELPER WIDGET — StimEventStrip
-// A thin horizontal strip placed above the time ruler that draws coloured
-// event-type chips at the sample positions of loaded stimulus events.
+// PRIVATE HELPER WIDGET — RulerHeaderWidget
+// Left-column header that spans the full height of the TimeRulerWidget (stim
+// lane + time zone).  The top portion is labelled "Stim" and the bottom portion
+// shows "Time" with a "mm:ss·ms" sub-label — mirroring the two zones of the ruler.
 //=============================================================================================================
 
-class StimEventStrip : public QWidget
+class RulerHeaderWidget : public QWidget
 {
 public:
-    static constexpr int kHeight = 22; // px — fixed height of the strip
-
-    explicit StimEventStrip(QWidget *parent = nullptr) : QWidget(parent)
+    explicit RulerHeaderWidget(QWidget *parent = nullptr) : QWidget(parent)
     {
-        setFixedHeight(kHeight);
+        setFixedHeight(TimeRulerWidget::kTotalH);
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    }
-
-    void setEvents(const QVector<ChannelRhiView::EventMarker> &ev)
-    {
-        m_events = ev;
-        update();
-    }
-
-    void setScrollSample(float s)
-    {
-        m_scrollSample = s;
-        update();
-    }
-
-    void setSamplesPerPixel(float spp)
-    {
-        if (spp > 0.f) m_spp = spp;
-        update();
     }
 
 protected:
@@ -108,140 +89,47 @@ protected:
         QPainter p(this);
         p.setRenderHint(QPainter::TextAntialiasing, true);
 
-        // Background: slightly distinct from both the channel area and the ruler
-        p.fillRect(rect(), QColor(232, 232, 240));
+        const int kStimH = TimeRulerWidget::kStimZoneH;
+        const int kTimeH = TimeRulerWidget::kTimeZoneH;
+        const int W      = width();
 
-        // Bottom border line
+        // Stim zone background — matches ruler stim lane
+        p.fillRect(QRect(0, 0, W, kStimH), QColor(238, 238, 246));
+
+        // Time zone background — matches ruler time lane
+        p.fillRect(QRect(0, kStimH, W, kTimeH), QColor(245, 245, 247));
+
+        // Separator between zones
         p.setPen(QPen(QColor(190, 190, 205), 1));
-        p.drawLine(0, kHeight - 1, width(), kHeight - 1);
+        p.drawLine(0, kStimH, W - 1, kStimH);
 
-        if (m_events.isEmpty() || m_spp <= 0.f)
-            return;
+        // Right-side separator (between header and ruler)
+        p.setPen(QPen(QColor(185, 185, 195), 1));
+        p.drawLine(W - 1, 0, W - 1, height());
 
-        QFont f;
-        f.setPixelSize(9);
-        f.setBold(true);
-        p.setFont(f);
+        // "Stim" label in the stim zone
+        QFont sf = font();
+        sf.setPointSizeF(7.5);
+        sf.setBold(true);
+        p.setFont(sf);
+        p.setPen(QColor(80, 80, 100));
+        p.drawText(QRect(0, 0, W, kStimH), Qt::AlignCenter, QStringLiteral("Stim"));
 
-        // Track occupied x-ranges to avoid complete chip overlap; shift a duplicate
-        // a few pixels to the right so stacked events remain readable.
-        QVector<int> usedX;
-
-        for (const ChannelRhiView::EventMarker &ev : m_events) {
-            float xF = (static_cast<float>(ev.sample) - m_scrollSample) / m_spp;
-            if (xF < -2.f || xF > width() + 2.f)
-                continue;
-            int ix = static_cast<int>(xF);
-
-            // Tick mark at the bottom of the strip (will align with the ruler below)
-            QColor tickCol = ev.color;
-            tickCol.setAlpha(200);
-            p.setPen(QPen(tickCol, 1));
-            p.drawLine(ix, kHeight - 4, ix, kHeight - 1);
-
-            // Colour chip: centred on ix, shifted right if already occupied
-            constexpr int kChipW = 26, kChipH = 14;
-            int chipX = qBound(0, ix - kChipW / 2, width() - kChipW);
-            // nudge right if overlapping a previous chip
-            while (usedX.contains(chipX / 4)) chipX = qMin(chipX + 4, width() - kChipW);
-            usedX.append(chipX / 4);
-
-            const int chipY = (kHeight - kChipH) / 2 - 1;
-            QRectF chip(chipX, chipY, kChipW, kChipH);
-            QColor col = ev.color;
-            col.setAlpha(220);
-            p.fillRect(chip, col);
-            p.setPen(Qt::white);
-            QString lbl = ev.label.isEmpty() ? QString::number(ev.type) : ev.label;
-            p.drawText(chip, Qt::AlignCenter, lbl);
-        }
-    }
-
-private:
-    QVector<ChannelRhiView::EventMarker> m_events;
-    float m_scrollSample = 0.f;
-    float m_spp          = 1.f;
-};
-
-//=============================================================================================================
-// PRIVATE HELPER WIDGET — TimeHeaderLabel
-// Left-column header that labels the time ruler row with "Time" and the unit.
-//=============================================================================================================
-
-class TimeHeaderLabel : public QWidget
-{
-public:
-    explicit TimeHeaderLabel(QWidget *parent = nullptr) : QWidget(parent)
-    {
-        setFixedHeight(28); // matches TimeRulerWidget::sizeHint height
-        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    }
-
-protected:
-    void paintEvent(QPaintEvent *) override
-    {
-        QPainter p(this);
-        p.setRenderHint(QPainter::TextAntialiasing, true);
-        p.fillRect(rect(), QColor(242, 242, 242));
-
-        // Right-side separator
-        p.setPen(QPen(QColor(200, 200, 200), 1));
-        p.drawLine(width() - 1, 0, width() - 1, height());
-
-        // "Time" bold
-        QFont boldF = font();
-        boldF.setPointSizeF(8.0);
-        boldF.setBold(true);
-        p.setFont(boldF);
+        // "Time" bold in upper half of the time zone
+        QFont tf = font();
+        tf.setPointSizeF(8.0);
+        tf.setBold(true);
+        p.setFont(tf);
         p.setPen(QColor(60, 60, 70));
-        p.drawText(QRect(0, 1, width(), height() / 2), Qt::AlignCenter, QStringLiteral("Time"));
+        p.drawText(QRect(0, kStimH, W, kTimeH / 2 + 2), Qt::AlignCenter, QStringLiteral("Time"));
 
-        // "mm:ss·ms" sub-label
-        QFont subF = font();
-        subF.setPointSizeF(6.5);
-        p.setFont(subF);
+        // "mm:ss·ms" sub-label in lower half of the time zone
+        QFont subf = font();
+        subf.setPointSizeF(6.5);
+        p.setFont(subf);
         p.setPen(QColor(130, 130, 145));
-        p.drawText(QRect(0, height() / 2, width(), height() / 2), Qt::AlignCenter,
-                   QStringLiteral("mm:ss\u00B7ms"));  // · = U+00B7
-    }
-};
-
-//=============================================================================================================
-// PRIVATE HELPER WIDGET — StimHeaderLabel
-// Left-column header that labels the stimulus strip row.
-//=============================================================================================================
-
-class StimHeaderLabel : public QWidget
-{
-public:
-    explicit StimHeaderLabel(QWidget *parent = nullptr) : QWidget(parent)
-    {
-        setFixedHeight(StimEventStrip::kHeight);
-        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    }
-
-protected:
-    void paintEvent(QPaintEvent *) override
-    {
-        QPainter p(this);
-        p.setRenderHint(QPainter::TextAntialiasing, true);
-        p.fillRect(rect(), QColor(236, 236, 244));
-
-        // Right-side separator
-        p.setPen(QPen(QColor(200, 200, 200), 1));
-        p.drawLine(width() - 1, 0, width() - 1, height());
-
-        // Bottom border to match the strip
-        p.setPen(QPen(QColor(190, 190, 205), 1));
-        p.drawLine(0, height() - 1, width() - 1, height() - 1);
-
-        // "Stim" label
-        QFont f = font();
-        f.setPointSizeF(8.0);
-        f.setBold(true);
-        p.setFont(f);
-        p.setPen(QColor(80, 80, 95));
-        p.drawText(rect(), Qt::AlignCenter, QStringLiteral("Stim"));
+        p.drawText(QRect(0, kStimH + kTimeH / 2, W, kTimeH / 2),
+                   Qt::AlignCenter, QStringLiteral("mm:ss\u00B7ms"));
     }
 };
 
@@ -291,26 +179,19 @@ void ChannelDataView::setupLayout()
     leftCol->setContentsMargins(0, 0, 0, 0);
     leftCol->setSpacing(0);
 
-    // Header aligned with stimulus strip
-    auto *stimHdr = new StimHeaderLabel(this);
-    leftCol->addWidget(stimHdr, 0);
-
-    // Header aligned with time ruler — shows "Time" + unit sub-label
-    auto *timeHdr = new TimeHeaderLabel(this);
-    leftCol->addWidget(timeHdr, 0);
+    // Combined header spanning the full ruler height (stim + time zones)
+    auto *rulerHdr = new RulerHeaderWidget(this);
+    leftCol->addWidget(rulerHdr, 0);
 
     m_pLabelPanel = new ChannelLabelPanel(this);
     leftCol->addWidget(m_pLabelPanel, 1);
 
     renderRow->addLayout(leftCol, 0);
 
-    // ── Centre column: stim strip + time ruler + RHI view ────────────────
+    // ── Centre column: unified ruler (stim+time) + RHI view ──────────────
     auto *traceColumn = new QVBoxLayout();
     traceColumn->setContentsMargins(0, 0, 0, 0);
     traceColumn->setSpacing(0);
-
-    m_pStimStrip = new StimEventStrip(this);
-    traceColumn->addWidget(m_pStimStrip, 0);
 
     m_pTimeRuler = new TimeRulerWidget(this);
     traceColumn->addWidget(m_pTimeRuler, 0);
@@ -324,22 +205,16 @@ void ChannelDataView::setupLayout()
 
     renderRow->addLayout(traceColumn, 1);
 
-    // ── Right column: spacer + scroll-mode toggle + channel scrollbar ─────
+    // ── Right column: scroll-mode toggle (full ruler height) + channel scrollbar ─
     auto *rightCol = new QVBoxLayout();
     rightCol->setContentsMargins(0, 0, 0, 0);
     rightCol->setSpacing(0);
-
-    // Blank spacer matching stim strip height
-    auto *stimRightSpacer = new QWidget(this);
-    stimRightSpacer->setFixedHeight(StimEventStrip::kHeight);
-    stimRightSpacer->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    rightCol->addWidget(stimRightSpacer, 0);
 
     m_pScrollModeButton = new QToolButton(this);
     m_pScrollModeButton->setCheckable(true);
     m_pScrollModeButton->setChecked(true);  // default: ↕ = channels
     m_pScrollModeButton->setText(QStringLiteral("\u2195 Ch"));
-    m_pScrollModeButton->setFixedHeight(28); // aligns with ruler
+    m_pScrollModeButton->setFixedHeight(TimeRulerWidget::kTotalH); // spans full ruler
     m_pScrollModeButton->setToolTip(QStringLiteral(
         "Vertical mouse wheel:\n"
         "\u2195 Ch  \u2013 scroll through channels\n"
@@ -403,16 +278,6 @@ void ChannelDataView::setupLayout()
 
     connect(m_pRhiView, &ChannelRhiView::samplesPerPixelChanged,
             m_pTimeRuler, &TimeRulerWidget::setSamplesPerPixel);
-
-    // Keep stim strip in sync with scroll / zoom
-    connect(m_pRhiView, &ChannelRhiView::scrollSampleChanged,
-            this, [this](float s) {
-                static_cast<StimEventStrip*>(m_pStimStrip)->setScrollSample(s);
-            });
-    connect(m_pRhiView, &ChannelRhiView::samplesPerPixelChanged,
-            this, [this](float spp) {
-                static_cast<StimEventStrip*>(m_pStimStrip)->setSamplesPerPixel(spp);
-            });
 
     connect(m_pModel.data(), &ChannelDataModel::dataChanged,
             this, &ChannelDataView::updateScrollBarRange);
@@ -640,8 +505,14 @@ void ChannelDataView::setEvents(const QVector<ChannelRhiView::EventMarker> &even
 {
     if (m_pRhiView)
         m_pRhiView->setEvents(events);
-    if (m_pStimStrip)
-        static_cast<StimEventStrip*>(m_pStimStrip)->setEvents(events);
+
+    if (m_pTimeRuler) {
+        QVector<TimeRulerEventMark> rulerMarks;
+        rulerMarks.reserve(events.size());
+        for (const auto &ev : events)
+            rulerMarks.append({ev.sample, ev.color, ev.label});
+        m_pTimeRuler->setEvents(rulerMarks);
+    }
 }
 
 //=============================================================================================================

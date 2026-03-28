@@ -46,6 +46,8 @@
 //=============================================================================================================
 
 #include <QWidget>
+#include <QColor>
+#include <QVector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
@@ -53,6 +55,16 @@
 
 namespace DISPLIB
 {
+
+//=============================================================================================================
+/**
+ * @brief Lightweight event mark passed to TimeRulerWidget for the stim lane.
+ */
+struct TimeRulerEventMark {
+    int     sample = 0;   ///< Absolute sample index.
+    QColor  color;        ///< Display colour.
+    QString label;        ///< Short text (event type number).
+};
 
 //=============================================================================================================
 /**
@@ -92,8 +104,21 @@ public:
      */
     void setFirstFileSample(int firstFileSample);
 
-    QSize sizeHint() const override { return QSize(100, 28); }
-    QSize minimumSizeHint() const override { return QSize(50, 28); }
+    static constexpr int kStimZoneH = 16;  ///< Height of the stimulus lane (px).
+    static constexpr int kTimeZoneH = 28;  ///< Height of the time-tick zone (px).
+    static constexpr int kTotalH    = kStimZoneH + kTimeZoneH; ///< Total widget height (px).
+
+    QSize sizeHint() const override { return QSize(100, kTotalH); }
+    QSize minimumSizeHint() const override { return QSize(50, kTotalH); }
+
+    //=========================================================================================================
+    /**
+     * Set the list of stimulus / event marks to display in the stim lane.
+     * Pass an empty vector to clear all marks.
+     *
+     * @param[in] events  Event marks (sample position + colour + label).
+     */
+    void setEvents(const QVector<TimeRulerEventMark> &events);
 
 public slots:
     //=========================================================================================================
@@ -139,6 +164,8 @@ private:
     int    m_firstFileSample = 0;
     float  m_scrollSample    = 0.f;
     float  m_spp             = 1.f;     // samples per pixel
+
+    QVector<TimeRulerEventMark> m_events;
 };
 
 } // namespace DISPLIB

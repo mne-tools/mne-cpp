@@ -75,7 +75,7 @@ TimeRulerWidget::TimeRulerWidget(QWidget *parent)
     : QWidget(parent)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    setFixedHeight(28);
+    setFixedHeight(kTotalH);
 }
 
 //=============================================================================================================
@@ -91,6 +91,14 @@ void TimeRulerWidget::setSfreq(double sfreq)
 void TimeRulerWidget::setFirstFileSample(int firstFileSample)
 {
     m_firstFileSample = firstFileSample;
+    update();
+}
+
+//=============================================================================================================
+
+void TimeRulerWidget::setEvents(const QVector<TimeRulerEventMark> &events)
+{
+    m_events = events;
     update();
 }
 
@@ -151,13 +159,77 @@ QString TimeRulerWidget::formatTime(double seconds)
 void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
 {
     const int    W   = width();
-    const int    H   = height();
+    const int    H   = height();   // == kTotalH == kStimZoneH + kTimeZoneH
     const double spp = static_cast<double>(m_spp);
 
     if (W <= 0 || spp <= 0.0 || m_sfreq <= 0.0)
         return;
 
-    // ── Choose tick interval (same algorithm as ChannelRhiView grid) ──
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing, false);
+    p.setRenderHint(QPainter::TextAntialiasing, true);
+
+    // ── Stim lane background (top kStimZoneH px) ─────────────────────
+    p.fillRect(QRect(0, 0, W, kStimZoneH), QColor(238, 238, 246));
+
+    // ── Time zone background (bottom kTimeZoneH px) ───────────────────
+    p.fillRect(QRect(0, kStimZoneH, W, kTimeZoneH), QColor(245, 245, 247));
+
+    // Separator line between the two zones
+    p.setPen(QPen(QColor(190, 190, 205), 1));
+    p.drawLine(0, kStimZoneH, W, kStimZoneH);
+
+    // Bottom border
+    p.setPen(QPen(QColor(185, 185, 195), 1));
+    p.drawLine(0, H - 1, W, H - 1);
+
+    // ── Stim event chips ─────────────────────────────────────────────
+    if (!m_events.isEmpty()) {
+        QFont evFont;
+        evFont.setPixelSize(9);
+        evFont.setBold(true);
+        p.setFont(evFont);
+
+        constexpr int kChipW = 26;
+        constexpr int kChipH = 11;
+        constexpr int kChipY = (kStimZoneH - kChipH) / 2;
+
+        // Track the rightmost x edge drawn so we can nudge a duplicate label
+        // slightly right rather than drawing it on top — but we do NOT loop,
+        // which was the source of the earlier crash.
+        int lastChipRight = -kChipW;
+
+        for (const TimeRulerEventMark &ev : m_events) {
+            float xF = (static_cast<float>(ev.sample) - m_scrollSample) / static_cast<float>(spp);
+            if (xF < -2.f || xF > W + 2.f)
+                continue;
+            int ix = static_cast<int>(xF);
+
+            // Tick mark at the bottom of the stim zone (points toward time area)
+            QColor col = ev.color;
+            col.setAlpha(200);
+            p.setPen(QPen(col, 1));
+            p.drawLine(ix, kStimZoneH - 3, ix, kStimZoneH);
+
+            // Chip: shift right by one chip width if it would overlap the previous one
+            int chipX = ix - kChipW / 2;
+            if (chipX < lastChipRight + 2)
+                chipX = lastChipRight + 2;
+            chipX = qBound(0, chipX, qMax(0, W - kChipW));
+
+            QRectF chip(chipX, kChipY, kChipW, kChipH);
+            QColor fill = ev.color;
+            fill.setAlpha(215);
+            p.fillRect(chip, fill);
+            p.setPen(Qt::white);
+            QString lbl = ev.label.isEmpty() ? QStringLiteral("?") : ev.label;
+            p.drawText(chip, Qt::AlignCenter, lbl);
+
+            lastChipRight = chipX + kChipW;
+        }
+    }
+
+    // ── Choose tick interval ──────────────────────────────────────────
     const double pxPerSec = m_sfreq / spp;
     double tickIntervalS = kNiceIntervals[0];
     for (double iv : kNiceIntervals) {
@@ -166,23 +238,9 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
             break;
     }
 
-    const double tickSamples  = tickIntervalS * m_sfreq;
-    const double minorFraction = 5.0;
-    const double minorSamples = tickSamples / minorFraction;
-
-    // Align to file start exactly like the render grid
-    const double origin = static_cast<double>(m_firstFileSample);
-
-    // ── Setup painter ─────────────────────────────────────────────────
-    QPainter p(this);
-    p.setRenderHint(QPainter::Antialiasing, false);
-
-    // Background — very light warm gray, matches ChannelLabelPanel
-    p.fillRect(rect(), QColor(245, 245, 247));
-
-    // Bottom border line that visually "caps" the ruler
-    p.setPen(QPen(QColor(185, 185, 195), 1));
-    p.drawLine(0, H - 1, W, H - 1);
+    const double tickSamples   = tickIntervalS * m_sfreq;
+    const double minorSamples  = tickSamples / 5.0;
+    const double origin        = static_cast<double>(m_firstFileSample);
 
     // ── Font ─────────────────────────────────────────────────────────
     QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
@@ -190,7 +248,7 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
     p.setFont(font);
     const QFontMetrics fm(font);
 
-    // ── Minor ticks ──────────────────────────────────────────────────
+    // ── Minor ticks (in time zone) ────────────────────────────────────
     {
         double firstMinorS = std::ceil((m_scrollSample - origin - minorSamples) / minorSamples)
                              * minorSamples + origin;
@@ -200,7 +258,6 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
             if (xPx > W + 2) break;
             if (xPx < -2)    continue;
             int xi = static_cast<int>(std::round(xPx));
-            // Draw tick downward from the bottom border
             p.drawLine(xi, H - 1 - kMinorH, xi, H - 2);
         }
     }
@@ -209,7 +266,6 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
     {
         double firstMajorS = std::ceil((m_scrollSample - origin - tickSamples) / tickSamples)
                              * tickSamples + origin;
-        p.setPen(QPen(QColor(100, 100, 115), 1));
         for (double s = firstMajorS; ; s += tickSamples) {
             double xPx = (s - m_scrollSample) / spp;
             if (xPx > W + 2) break;
@@ -217,22 +273,16 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
 
             int xi = static_cast<int>(std::round(xPx));
 
-            // Major tick
             p.setPen(QPen(QColor(100, 100, 115), 1));
             p.drawLine(xi, H - 1 - kMajorH, xi, H - 2);
 
-            // Label — elapsed time from file start
             double elapsedSec = (s - origin) / m_sfreq;
-            if (elapsedSec >= -tickIntervalS * 0.5) { // skip labels for negative time
+            if (elapsedSec >= -tickIntervalS * 0.5) {
                 QString label = formatTime(elapsedSec);
                 const int lw  = fm.horizontalAdvance(label);
-                const int lh  = fm.ascent();
 
-                // Center label over tick; clamp to widget edges
                 int lx = xi - lw / 2;
                 lx = qBound(2, lx, W - lw - 2);
-
-                // Baseline sits above the tick top, with a small gap
                 int ly = H - 1 - kMajorH - kLabelGap;
 
                 p.setPen(QColor(65, 65, 80));
