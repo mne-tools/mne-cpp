@@ -246,6 +246,33 @@ void DataWindow::initMVCSettings()
 
 //=============================================================================================================
 
+bool DataWindow::isFiffFileLoaded() const
+{
+    return m_pFiffReader && m_pFiffReader->isOpen();
+}
+
+//=============================================================================================================
+
+double DataWindow::fiffFileDurationSeconds() const
+{
+    if (!m_pFiffReader || !m_pFiffReader->isOpen() || !m_pFiffReader->fiffInfo())
+        return 0.0;
+    int nSamples = m_pFiffReader->lastSample() - m_pFiffReader->firstSample() + 1;
+    return static_cast<double>(nSamples) / m_pFiffReader->fiffInfo()->sfreq;
+}
+
+//=============================================================================================================
+
+QString DataWindow::fiffFileName() const
+{
+    if (!m_pFiffReader || !m_pFiffReader->isOpen())
+        return QString();
+    int idx = m_sFiffFilePath.lastIndexOf('/');
+    return (idx >= 0) ? m_sFiffFilePath.mid(idx + 1) : m_sFiffFilePath;
+}
+
+//=============================================================================================================
+
 bool DataWindow::loadFiffFile(const QString &path)
 {
     // Block spurious scheduleNextLoad() calls that clearView() will trigger
@@ -258,9 +285,12 @@ bool DataWindow::loadFiffFile(const QString &path)
         m_bLoadingBlock = false;
         return false;
     }
+    m_sFiffFilePath = path;
 
     auto fiffInfo = m_pFiffReader->fiffInfo();
     m_pChannelDataView->init(fiffInfo);
+    m_pChannelDataView->setFileBounds(m_pFiffReader->firstSample(),
+                                      m_pFiffReader->lastSample());
 
     // Ring-buffer size: kMaxBlocks × kBlockSeconds of data
     int blockSamples = static_cast<int>(kBlockSeconds * fiffInfo->sfreq);

@@ -255,13 +255,24 @@ void ChannelDataView::init(QSharedPointer<FiffInfo> pInfo)
 
 //=============================================================================================================
 
+void ChannelDataView::setFileBounds(int first, int last)
+{
+    m_firstFileSample = first;
+    m_lastFileSample  = last;
+    if (m_pRhiView) {
+        m_pRhiView->setFirstFileSample(first);
+        m_pRhiView->setLastFileSample(last);
+    }
+    if (m_pTimeRuler)
+        m_pTimeRuler->setFirstFileSample(first);
+    updateScrollBarRange();
+}
+
+//=============================================================================================================
+
 void ChannelDataView::setData(const MatrixXd &data, int firstSample)
 {
     m_pModel->setData(data, firstSample);
-    if (m_pTimeRuler)
-        m_pTimeRuler->setFirstFileSample(firstSample);
-    if (m_pRhiView)
-        m_pRhiView->setFirstFileSample(firstSample);
     updateScrollBarRange();
 }
 
@@ -539,11 +550,20 @@ void ChannelDataView::updateScrollBarRange()
     if (!m_pScrollBar || !m_pRhiView)
         return;
 
-    int firstSamp = m_pModel->firstSample();
-    int total     = m_pModel->totalSamples();
-    int visible   = m_pRhiView->visibleSampleCount();
-    int minVal    = firstSamp;
-    int maxVal    = qMax(firstSamp, firstSamp + total - visible);
+    int visible = m_pRhiView->visibleSampleCount();
+    int minVal, maxVal;
+
+    if (m_firstFileSample >= 0 && m_lastFileSample >= 0) {
+        // File bounds known: allow scrolling across the whole file
+        minVal = m_firstFileSample;
+        maxVal = qMax(m_firstFileSample, m_lastFileSample - visible + 1);
+    } else {
+        // Fall back to ring-buffer bounds
+        int firstSamp = m_pModel->firstSample();
+        int total     = m_pModel->totalSamples();
+        minVal = firstSamp;
+        maxVal = qMax(firstSamp, firstSamp + total - visible);
+    }
 
     m_scrollBarUpdating = true;
     m_pScrollBar->setMinimum(minVal);
