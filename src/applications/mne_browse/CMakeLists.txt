@@ -33,6 +33,7 @@ set(SOURCES
     Models/averagemodel.cpp
     Models/rawmodel.cpp
     Models/eventmodel.cpp
+    Models/annotationmodel.cpp
     Models/fiffblockreader.cpp
     Delegates/averagedelegate.cpp
     Delegates/rawdelegate.cpp
@@ -40,6 +41,7 @@ set(SOURCES
     Windows/mainwindow.cpp
     Windows/filterwindow.cpp
     Windows/eventwindow.cpp
+    Windows/annotationwindow.cpp
     Windows/datawindow.cpp
     Windows/aboutwindow.cpp
     Windows/informationwindow.cpp
@@ -62,6 +64,7 @@ set(HEADERS
     Models/averagemodel.h
     Models/rawmodel.h
     Models/eventmodel.h
+    Models/annotationmodel.h
     Models/fiffblockreader.h
     Delegates/averagedelegate.h
     Delegates/rawdelegate.h
@@ -69,6 +72,7 @@ set(HEADERS
     Windows/mainwindow.h
     Windows/filterwindow.h
     Windows/eventwindow.h
+    Windows/annotationwindow.h
     Windows/datawindow.h
     Windows/aboutwindow.h
     Windows/informationwindow.h

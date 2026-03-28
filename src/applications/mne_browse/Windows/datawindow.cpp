@@ -238,6 +238,24 @@ void DataWindow::hideBadChannels(bool hideChannels)
     updateDataTableViews();
 }
 
+//*************************************************************************************************************
+
+void DataWindow::setAnnotations(const QVector<DISPLIB::ChannelRhiView::AnnotationSpan> &annotations)
+{
+    if(m_pChannelDataView) {
+        m_pChannelDataView->setAnnotations(annotations);
+    }
+}
+
+//*************************************************************************************************************
+
+void DataWindow::setAnnotationSelectionEnabled(bool enabled)
+{
+    if(m_pChannelDataView) {
+        m_pChannelDataView->setAnnotationSelectionEnabled(enabled);
+    }
+}
+
 
 //*************************************************************************************************************
 
@@ -262,6 +280,8 @@ void DataWindow::initMVCSettings()
     m_pChannelDataView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(m_pChannelDataView, &DISPLIB::ChannelDataView::scrollPositionChanged,
             this, &DataWindow::onChannelViewScrollChanged);
+    connect(m_pChannelDataView, &DISPLIB::ChannelDataView::sampleRangeSelected,
+            this, &DataWindow::annotationRangeSelected);
 
     // Insert ChannelDataView into the grid at the same slot as the legacy QTableView
     // (row 1, col 0, rowspan 2, colspan 4) then hide the old widget.
@@ -356,6 +376,7 @@ bool DataWindow::loadFiffFile(const QString &path)
     m_iStimLastSample = std::numeric_limits<int>::min();
     m_iStimLastValue  = 0;
     m_pChannelDataView->setEvents({});
+    m_pChannelDataView->setAnnotations({});
     m_pChannelDataView->clearView();
 
     if (!m_pFiffReader->open(path)) {

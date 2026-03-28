@@ -75,6 +75,7 @@
 
 #include "filterwindow.h"
 #include "eventwindow.h"
+#include "annotationwindow.h"
 #include "datawindow.h"
 #include "aboutwindow.h"
 #include "informationwindow.h"
@@ -201,6 +202,18 @@ private:
      */
     void saveEvents();
 
+    //=========================================================================================================
+    /**
+     * loadAnnotations opens a file dialog that picks the annotation sidecar file.
+     */
+    void loadAnnotations();
+
+    //=========================================================================================================
+    /**
+     * saveAnnotations saves the annotation sidecar file.
+     */
+    void saveAnnotations();
+
 public:
     //=========================================================================================================
     /**
@@ -252,6 +265,15 @@ private:
 
     //=========================================================================================================
     /**
+     * loadAnnotationsFile loads a browser annotation JSON file without a dialog.
+     *
+     * @param [in] filename  Absolute path to the annotation file.
+     * @param [in] showWindow  True when the annotation manager should be shown on success.
+     */
+    bool loadAnnotationsFile(const QString& filename, bool showWindow = true);
+
+    //=========================================================================================================
+    /**
      * loadEvoked load the evoked data from file.
      */
     void loadEvoked();
@@ -285,6 +307,12 @@ private:
      * Save the currently computed covariance matrix to a FIF file.
      */
     void saveCovariance();
+
+    //=========================================================================================================
+    /**
+     * Prompt for an annotation label and create an annotation from the selected raw-view span.
+     */
+    void handleAnnotationRangeSelected(int startSample, int endSample);
 
     //=========================================================================================================
     /**
@@ -343,12 +371,14 @@ private:
 
     QFile                   m_qFileRaw;                     /**< Fiff data file to read (set for convenience). */
     QFile                   m_qEventFile;                   /**< Fiff event data file to read (set for convenience). */
+    QFile                   m_qAnnotationFile;              /**< Browser annotation sidecar file. */
     QFile                   m_qEvokedFile;                  /**< Fiff event data file to read (set for convenience). */
     QFile                   m_qCovFile;                     /**< Fiff covariance file to write (set for convenience). */
     FIFFLIB::FiffCov        m_covariance;                   /**< Last computed covariance matrix. */
 
     //Window widgets
     EventWindow*            m_pEventWindow;                 /**< Event widget which display the event view. */
+    AnnotationWindow*       m_pAnnotationWindow;            /**< Annotation widget which displays browser annotations. */
     FilterWindow*           m_pFilterWindow;                /**< Filter widget which display the filter options for the user. */
     DataWindow*             m_pDataWindow;                  /**< Data widget which display the data for the user. */
     AboutWindow*            m_pAboutWindow;                 /**< About widget which displays information about this application.*/
@@ -371,6 +401,7 @@ private:
     QAction*                m_pRemoveDCAction;              /**< The action which is used to control DC removal. */
     QAction*                m_pHideBadAction;               /**< The action which is used to control hide bad channel functionality. */
     QAction*                m_pWhitenButterflyAction;       /**< Toggle whitening in the average butterfly plot. */
+    QAction*                m_pAnnotationModeAction;        /**< Toggle Shift-drag annotation selection in the raw browser. */
     QFutureWatcher<bool>    m_legacyLoadWatcher;            /**< Watches async legacy RawModel load so the UI stays responsive. */
 };
 
