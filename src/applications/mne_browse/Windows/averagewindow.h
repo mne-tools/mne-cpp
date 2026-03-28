@@ -58,6 +58,7 @@
 //=============================================================================================================
 
 #include <QDockWidget>
+#include <QAction>
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QSvgGenerator>
@@ -189,6 +190,14 @@ public:
      */
     bool isButterflyWhiteningEnabled() const;
 
+    //=========================================================================================================
+    /**
+     * Enable or disable the quick "recompute last evoked" action in the average manager.
+     *
+     * @param available true when a previously used evoked setup is available.
+     */
+    void setRecomputeAvailable(bool available);
+
 private:
 
     //=========================================================================================================
@@ -291,6 +300,16 @@ signals:
      * Emitted when the user requests a new evoked computation from the average manager UI.
      */
     void addAverageRequested();
+
+    //=========================================================================================================
+    /**
+     * Emitted when the user requests recomputation with the last-used evoked settings.
+     */
+    void recomputeAverageRequested();
+
+private:
+    QAction*                m_pComputeAverageAction = nullptr; /**< Default evoked-compute action shown by the add button. */
+    QAction*                m_pRecomputeAverageAction = nullptr; /**< Quick recompute action using the last saved settings. */
 };
 
 } // NAMESPACE MNEBROWSE

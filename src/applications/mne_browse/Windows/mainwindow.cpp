@@ -180,6 +180,35 @@ bool detectFallbackStimEvents(const FIFFLIB::FiffRawData& raw,
     return false;
 }
 
+QStringList evokedEventCodesToSettingValue(const QList<int>& selectedEventCodes)
+{
+    QStringList codes;
+    codes.reserve(selectedEventCodes.size());
+
+    for(int code : selectedEventCodes) {
+        codes << QString::number(code);
+    }
+
+    return codes;
+}
+
+QList<int> evokedEventCodesFromSettings(const QSettings& settings)
+{
+    QList<int> selectedEventCodes;
+    const QStringList savedCodes =
+        settings.value("MainWindow/Averaging/eventCodes").toStringList();
+
+    for(const QString& codeText : savedCodes) {
+        bool ok = false;
+        const int code = codeText.toInt(&ok);
+        if(ok) {
+            selectedEventCodes.append(code);
+        }
+    }
+
+    return selectedEventCodes;
+}
+
 bool showComputeEvokedDialog(QWidget* parent,
                              QSettings& settings,
                              const QMap<int, int>& eventCounts,
@@ -317,6 +346,8 @@ bool showComputeEvokedDialog(QWidget* parent,
     settings.setValue("MainWindow/Averaging/baselineFromMs", baselineFromSpinBox->value());
     settings.setValue("MainWindow/Averaging/baselineToMs", baselineToSpinBox->value());
     settings.setValue("MainWindow/Averaging/dropRejected", rejectCheckBox->isChecked());
+    settings.setValue("MainWindow/Averaging/eventCodes",
+                      evokedEventCodesToSettingValue(selectedEventCodes));
 
     tmin = -static_cast<float>(preStimSpinBox->value()) / 1000.0f;
     tmax = static_cast<float>(postStimSpinBox->value()) / 1000.0f;
@@ -604,6 +635,7 @@ void MainWindow::setupWindowWidgets()
 
     //Create the toolbar after all indows have been initiliased
     createToolBar();
+    m_pAverageWindow->setRecomputeAvailable(!evokedEventCodesFromSettings(m_qSettings).isEmpty());
 
     //Connect window signals
     //Change scaling of the data and averaged data whenever a spinbox value changed or the user performs a pinch gesture on the view
@@ -629,6 +661,9 @@ void MainWindow::setupWindowWidgets()
 
     connect(m_pAverageWindow, &AverageWindow::addAverageRequested,
             this, &MainWindow::computeEvoked);
+
+    connect(m_pAverageWindow, &AverageWindow::recomputeAverageRequested,
+            this, &MainWindow::recomputeEvoked);
 
     connect(m_pAnnotationWindow->getAnnotationModel(), &AnnotationModel::annotationsChanged,
             this, [this]() {
@@ -848,6 +883,9 @@ void MainWindow::connectMenus()
     QAction* computeEvokedAction = new QAction(tr("Compute Evoked..."), this);
     ui->menuTest->insertAction(ui->m_loadEvokedAction, computeEvokedAction);
 
+    QAction* recomputeEvokedAction = new QAction(tr("Recompute Last Evoked"), this);
+    ui->menuTest->insertAction(ui->m_loadEvokedAction, recomputeEvokedAction);
+
     QAction* saveEvokedAction = new QAction(tr("Save Evoked (fif)..."), this);
     ui->menuTest->insertAction(ui->m_quitAction, saveEvokedAction);
 
@@ -891,6 +929,7 @@ void MainWindow::connectMenus()
     connect(computeCovarianceAction, &QAction::triggered, this, &MainWindow::computeCovariance);
     connect(saveCovarianceAction, &QAction::triggered, this, &MainWindow::saveCovariance);
     connect(computeEvokedAction, &QAction::triggered, this, &MainWindow::computeEvoked);
+    connect(recomputeEvokedAction, &QAction::triggered, this, &MainWindow::recomputeEvoked);
     connect(ui->m_loadEvokedAction, &QAction::triggered, this, &MainWindow::loadEvoked);
     connect(saveEvokedAction, &QAction::triggered, this, &MainWindow::saveEvoked);
     connect(m_pWhitenButterflyAction, &QAction::toggled, this, [this](bool checked){
@@ -1596,11 +1635,31 @@ void MainWindow::handleAnnotationRangeSelected(int startSample, int endSample)
 
 void MainWindow::computeEvoked()
 {
+    runEvokedComputation(true);
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::recomputeEvoked()
+{
+    runEvokedComputation(false);
+}
+
+
+//*************************************************************************************************************
+
+bool MainWindow::runEvokedComputation(bool promptForSettings)
+{
+    const QString title = promptForSettings
+        ? QStringLiteral("Compute Evoked")
+        : QStringLiteral("Recompute Evoked");
+
     if(m_qFileRaw.fileName().isEmpty() || !QFile::exists(m_qFileRaw.fileName())) {
         QMessageBox::warning(this,
-                             "Compute Evoked",
+                             title,
                              "Load a raw FIF file before computing evoked responses.");
-        return;
+        return false;
     }
 
     QFile rawFile(m_qFileRaw.fileName());
@@ -1608,9 +1667,9 @@ void MainWindow::computeEvoked()
 
     if(raw.isEmpty()) {
         QMessageBox::warning(this,
-                             "Compute Evoked",
+                             title,
                              QString("Could not open raw data from %1.").arg(m_qFileRaw.fileName()));
-        return;
+        return false;
     }
 
     MatrixXi events = m_pEventWindow->getEventModel()->getEventMatrix();
@@ -1621,17 +1680,17 @@ void MainWindow::computeEvoked()
                                      .arg(events.rows());
     } else if(!detectFallbackStimEvents(raw, events, eventSourceDescription)) {
         QMessageBox::warning(this,
-                             "Compute Evoked",
+                             title,
                              "No events were loaded, and no trigger events could be detected from STI 014 or STI 101.");
-        return;
+        return false;
     }
 
     const QMap<int, int> eventCounts = countEventsByType(events);
     if(eventCounts.isEmpty()) {
         QMessageBox::warning(this,
-                             "Compute Evoked",
+                             title,
                              "No non-zero event codes were found for averaging.");
-        return;
+        return false;
     }
 
     QList<int> selectedEventCodes;
@@ -1642,18 +1701,53 @@ void MainWindow::computeEvoked()
     float baselineTo = 0.0f;
     bool dropRejected = true;
 
-    if(!showComputeEvokedDialog(this,
-                                m_qSettings,
-                                eventCounts,
-                                eventSourceDescription,
-                                selectedEventCodes,
-                                tmin,
-                                tmax,
-                                applyBaseline,
-                                baselineFrom,
-                                baselineTo,
-                                dropRejected)) {
-        return;
+    if(promptForSettings) {
+        if(!showComputeEvokedDialog(this,
+                                    m_qSettings,
+                                    eventCounts,
+                                    eventSourceDescription,
+                                    selectedEventCodes,
+                                    tmin,
+                                    tmax,
+                                    applyBaseline,
+                                    baselineFrom,
+                                    baselineTo,
+                                    dropRejected)) {
+            return false;
+        }
+    } else {
+        selectedEventCodes = evokedEventCodesFromSettings(m_qSettings);
+        if(selectedEventCodes.isEmpty()) {
+            statusBar()->showMessage(QStringLiteral("No saved evoked setup found. Opening the full evoked dialog instead."),
+                                     4000);
+            return runEvokedComputation(true);
+        }
+
+        const int preStimMs = m_qSettings.value("MainWindow/Averaging/preStimMs", 100).toInt();
+        const int postStimMs = m_qSettings.value("MainWindow/Averaging/postStimMs", 400).toInt();
+        tmin = -static_cast<float>(preStimMs) / 1000.0f;
+        tmax = static_cast<float>(postStimMs) / 1000.0f;
+        applyBaseline = m_qSettings.value("MainWindow/Averaging/applyBaseline", true).toBool();
+        baselineFrom = static_cast<float>(m_qSettings.value("MainWindow/Averaging/baselineFromMs",
+                                                            -preStimMs).toInt()) / 1000.0f;
+        baselineTo = static_cast<float>(m_qSettings.value("MainWindow/Averaging/baselineToMs", 0).toInt()) / 1000.0f;
+        dropRejected = m_qSettings.value("MainWindow/Averaging/dropRejected", true).toBool();
+
+        QList<int> filteredEventCodes;
+        for(int eventCode : selectedEventCodes) {
+            if(eventCounts.contains(eventCode)) {
+                filteredEventCodes.append(eventCode);
+            }
+        }
+
+        if(filteredEventCodes.isEmpty()) {
+            QMessageBox::information(this,
+                                     title,
+                                     "The last evoked setup references event codes that are not available for the current data. Choose a new setup.");
+            return runEvokedComputation(true);
+        }
+
+        selectedEventCodes = filteredEventCodes;
     }
 
     QStringList comments;
@@ -1689,9 +1783,9 @@ void MainWindow::computeEvoked()
 
     if(evokedSet.evoked.isEmpty()) {
         QMessageBox::warning(this,
-                             "Compute Evoked",
+                             title,
                              "No evoked responses could be computed. The selected events may have been rejected or out of bounds.");
-        return;
+        return false;
     }
 
     if(m_qEvokedFile.isOpen()) {
@@ -1701,14 +1795,24 @@ void MainWindow::computeEvoked()
 
     if(!m_pAverageWindow->getAverageModel()->setEvokedData(evokedSet)) {
         QMessageBox::warning(this,
-                             "Compute Evoked",
+                             title,
                              "The computed evoked set could not be loaded into the average manager.");
-        return;
+        return false;
     }
 
+    m_pAverageWindow->setRecomputeAvailable(true);
     setWindowStatus();
-    m_pAverageWindow->show();
+    statusBar()->showMessage(promptForSettings
+                             ? QStringLiteral("Evoked responses computed.")
+                             : QStringLiteral("Evoked responses recomputed from the last saved setup."),
+                             4000);
+
+    if(!m_pAverageWindow->isVisible()) {
+        m_pAverageWindow->show();
+    }
     m_pAverageWindow->raise();
+
+    return true;
 }
 
 

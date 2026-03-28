@@ -308,6 +308,12 @@ private:
 
     //=========================================================================================================
     /**
+     * Recompute evoked responses using the last saved evoked settings.
+     */
+    void recomputeEvoked();
+
+    //=========================================================================================================
+    /**
      * Save the currently displayed evoked set to a FIF file.
      */
     void saveEvoked();
@@ -341,6 +347,15 @@ private:
      * showFilterWindow shows the filtering window
      */
     void showWindow(QWidget *window);
+
+    //=========================================================================================================
+    /**
+     * Shared evoked-computation implementation used for both prompted and quick-recompute flows.
+     *
+     * @param [in] promptForSettings  True to show the settings dialog, false to reuse the last saved setup.
+     * @return true on success.
+     */
+    bool runEvokedComputation(bool promptForSettings);
 
 private:
     //=========================================================================================================
