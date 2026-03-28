@@ -431,7 +431,7 @@ void ChannelDataView::loadSettings()
 
 void ChannelDataView::clearView()
 {
-    m_pModel->setData(MatrixXd(), 0);
+    m_pModel->clearData();
     if (m_pScrollBar) {
         m_pScrollBar->setMaximum(0);
         m_pScrollBar->setValue(0);

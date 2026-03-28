@@ -165,6 +165,19 @@ void ChannelDataModel::appendData(const MatrixXd &data)
 
 //=============================================================================================================
 
+void ChannelDataModel::clearData()
+{
+    {
+        QWriteLocker lk(&m_lock);
+        for (auto &ch : m_channelData)
+            ch.clear();
+        m_firstSample = 0;
+    }
+    emit dataChanged();
+}
+
+//=============================================================================================================
+
 void ChannelDataModel::setScaleMap(const QMap<qint32, float> &scaleMap)
 {
     {
