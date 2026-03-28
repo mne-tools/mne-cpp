@@ -93,43 +93,43 @@ protected:
         const int kTimeH = TimeRulerWidget::kTimeZoneH;
         const int W      = width();
 
-        // Stim zone background — matches ruler stim lane
-        p.fillRect(QRect(0, 0, W, kStimH), QColor(238, 238, 246));
+        // Time zone background (top) — matches ruler time lane
+        p.fillRect(QRect(0, 0, W, kTimeH), QColor(245, 245, 247));
 
-        // Time zone background — matches ruler time lane
-        p.fillRect(QRect(0, kStimH, W, kTimeH), QColor(245, 245, 247));
+        // Stim zone background (bottom) — matches ruler stim lane
+        p.fillRect(QRect(0, kTimeH, W, kStimH), QColor(238, 238, 246));
 
         // Separator between zones
         p.setPen(QPen(QColor(190, 190, 205), 1));
-        p.drawLine(0, kStimH, W - 1, kStimH);
+        p.drawLine(0, kTimeH, W - 1, kTimeH);
 
         // Right-side separator (between header and ruler)
         p.setPen(QPen(QColor(185, 185, 195), 1));
         p.drawLine(W - 1, 0, W - 1, height());
 
-        // "Stim" label in the stim zone
-        QFont sf = font();
-        sf.setPointSizeF(7.5);
-        sf.setBold(true);
-        p.setFont(sf);
-        p.setPen(QColor(80, 80, 100));
-        p.drawText(QRect(0, 0, W, kStimH), Qt::AlignCenter, QStringLiteral("Stim"));
-
-        // "Time" bold in upper half of the time zone
+        // "Time" bold in upper half of the time zone (top)
         QFont tf = font();
         tf.setPointSizeF(8.0);
         tf.setBold(true);
         p.setFont(tf);
         p.setPen(QColor(60, 60, 70));
-        p.drawText(QRect(0, kStimH, W, kTimeH / 2 + 2), Qt::AlignCenter, QStringLiteral("Time"));
+        p.drawText(QRect(0, 0, W, kTimeH / 2 + 2), Qt::AlignCenter, QStringLiteral("Time"));
 
         // "mm:ss·ms" sub-label in lower half of the time zone
         QFont subf = font();
         subf.setPointSizeF(6.5);
         p.setFont(subf);
         p.setPen(QColor(130, 130, 145));
-        p.drawText(QRect(0, kStimH + kTimeH / 2, W, kTimeH / 2),
+        p.drawText(QRect(0, kTimeH / 2, W, kTimeH / 2),
                    Qt::AlignCenter, QStringLiteral("mm:ss\u00B7ms"));
+
+        // "Stim" label in the stim zone (bottom)
+        QFont sf = font();
+        sf.setPointSizeF(7.5);
+        sf.setBold(true);
+        p.setFont(sf);
+        p.setPen(QColor(80, 80, 100));
+        p.drawText(QRect(0, kTimeH, W, kStimH), Qt::AlignCenter, QStringLiteral("Stim"));
     }
 };
 
@@ -205,21 +205,17 @@ void ChannelDataView::setupLayout()
 
     renderRow->addLayout(traceColumn, 1);
 
-    // ── Right column: scroll-mode toggle (full ruler height) + channel scrollbar ─
+    // ── Right column: spacer (ruler height) + channel scrollbar ─────────
     auto *rightCol = new QVBoxLayout();
     rightCol->setContentsMargins(0, 0, 0, 0);
     rightCol->setSpacing(0);
 
-    m_pScrollModeButton = new QToolButton(this);
-    m_pScrollModeButton->setCheckable(true);
-    m_pScrollModeButton->setChecked(true);  // default: ↕ = channels
-    m_pScrollModeButton->setText(QStringLiteral("\u2195 Ch"));
-    m_pScrollModeButton->setFixedHeight(TimeRulerWidget::kTotalH); // spans full ruler
-    m_pScrollModeButton->setToolTip(QStringLiteral(
-        "Vertical mouse wheel:\n"
-        "\u2195 Ch  \u2013 scroll through channels\n"
-        "\u21c4 Time \u2013 scroll through time"));
-    rightCol->addWidget(m_pScrollModeButton, 0);
+    // Spacer that aligns with the ruler height so the channel scrollbar
+    // starts exactly where the channel area begins.
+    auto *rulerSpacer = new QWidget(this);
+    rulerSpacer->setFixedHeight(TimeRulerWidget::kTotalH);
+    rulerSpacer->setVisible(true);
+    rightCol->addWidget(rulerSpacer, 0);
 
     m_pChannelScrollBar = new QScrollBar(Qt::Vertical, this);
     m_pChannelScrollBar->setMinimum(0);
@@ -234,7 +230,13 @@ void ChannelDataView::setupLayout()
 
     outerLayout->addLayout(renderRow, 1);
 
-    // ── Horizontal scroll bar ────────────────────────────────────────────
+    // ── Bottom row: horizontal scroll bar + scroll-mode toggle ───────────
+    // The scroll-mode button lives at the bottom-right corner, between the
+    // horizontal and vertical scrollbars, so it doesn't crowd the ruler area.
+    auto *bottomRow = new QHBoxLayout();
+    bottomRow->setContentsMargins(0, 0, 0, 0);
+    bottomRow->setSpacing(0);
+
     m_pScrollBar = new QScrollBar(Qt::Horizontal, this);
     m_pScrollBar->setMinimum(0);
     m_pScrollBar->setMaximum(0);
@@ -242,7 +244,19 @@ void ChannelDataView::setupLayout()
     m_pScrollBar->setSingleStep(1);
     m_pScrollBar->setPageStep(100);
     m_pScrollBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    outerLayout->addWidget(m_pScrollBar, 0);
+    bottomRow->addWidget(m_pScrollBar, 1);
+
+    m_pScrollModeButton = new QToolButton(this);
+    m_pScrollModeButton->setCheckable(true);
+    m_pScrollModeButton->setChecked(true);  // default: ↕ = channels
+    m_pScrollModeButton->setText(QStringLiteral("\u2195 Ch"));
+    m_pScrollModeButton->setToolTip(QStringLiteral(
+        "Vertical mouse wheel:\n"
+        "\u2195 Ch  \u2013 scroll through channels\n"
+        "\u21c4 Time \u2013 scroll through time"));
+    bottomRow->addWidget(m_pScrollModeButton, 0);
+
+    outerLayout->addLayout(bottomRow, 0);
 
     // ── Connections ──────────────────────────────────────────────────────
     connect(m_pScrollBar, &QScrollBar::valueChanged,

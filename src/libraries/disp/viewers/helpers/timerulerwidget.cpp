@@ -169,15 +169,19 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
     p.setRenderHint(QPainter::Antialiasing, false);
     p.setRenderHint(QPainter::TextAntialiasing, true);
 
-    // ── Stim lane background (top kStimZoneH px) ─────────────────────
-    p.fillRect(QRect(0, 0, W, kStimZoneH), QColor(238, 238, 246));
+    // Layout (top → bottom):
+    //   [0 .. kTimeZoneH)  — time zone: tick marks + labels
+    //   [kTimeZoneH .. kTotalH) — stim zone: event chips
 
-    // ── Time zone background (bottom kTimeZoneH px) ───────────────────
-    p.fillRect(QRect(0, kStimZoneH, W, kTimeZoneH), QColor(245, 245, 247));
+    // ── Time zone background (top kTimeZoneH px) ──────────────────────
+    p.fillRect(QRect(0, 0, W, kTimeZoneH), QColor(245, 245, 247));
+
+    // ── Stim lane background (bottom kStimZoneH px) ───────────────────
+    p.fillRect(QRect(0, kTimeZoneH, W, kStimZoneH), QColor(238, 238, 246));
 
     // Separator line between the two zones
     p.setPen(QPen(QColor(190, 190, 205), 1));
-    p.drawLine(0, kStimZoneH, W, kStimZoneH);
+    p.drawLine(0, kTimeZoneH, W, kTimeZoneH);
 
     // Bottom border
     p.setPen(QPen(QColor(185, 185, 195), 1));
@@ -192,7 +196,8 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
 
         constexpr int kChipW = 26;
         constexpr int kChipH = 11;
-        constexpr int kChipY = (kStimZoneH - kChipH) / 2;
+        // Chips sit centred vertically in the stim zone (bottom strip)
+        constexpr int kChipY = kTimeZoneH + (kStimZoneH - kChipH) / 2;
 
         // Track the rightmost x edge drawn so far.  When a chip would overlap,
         // we skip it entirely (only the tick mark is kept).  Events must be
@@ -205,11 +210,11 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
                 continue;
             int ix = static_cast<int>(xF);
 
-            // Tick mark at the bottom of the stim zone (points toward time area)
+            // Tick mark at the top of the stim zone (bridging separator into stim area)
             QColor col = ev.color;
             col.setAlpha(200);
             p.setPen(QPen(col, 1));
-            p.drawLine(ix, kStimZoneH - 3, ix, kStimZoneH);
+            p.drawLine(ix, kTimeZoneH, ix, kTimeZoneH + 3);
 
             // Chip: only draw if it fits without overlapping the previous chip.
             // When events are too close, we drop the chip (keeping only the tick mark)
@@ -252,7 +257,7 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
     p.setFont(font);
     const QFontMetrics fm(font);
 
-    // ── Minor ticks (in time zone) ────────────────────────────────────
+    // ── Minor ticks (bottom of time zone, pointing down) ─────────────
     {
         double firstMinorS = std::ceil((m_scrollSample - origin - minorSamples) / minorSamples)
                              * minorSamples + origin;
@@ -262,7 +267,7 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
             if (xPx > W + 2) break;
             if (xPx < -2)    continue;
             int xi = static_cast<int>(std::round(xPx));
-            p.drawLine(xi, H - 1 - kMinorH, xi, H - 2);
+            p.drawLine(xi, kTimeZoneH - 1 - kMinorH, xi, kTimeZoneH - 2);
         }
     }
 
@@ -278,7 +283,7 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
             int xi = static_cast<int>(std::round(xPx));
 
             p.setPen(QPen(QColor(100, 100, 115), 1));
-            p.drawLine(xi, H - 1 - kMajorH, xi, H - 2);
+            p.drawLine(xi, kTimeZoneH - 1 - kMajorH, xi, kTimeZoneH - 2);
 
             double elapsedSec = (s - origin) / m_sfreq;
             if (elapsedSec >= -tickIntervalS * 0.5) {
@@ -287,7 +292,7 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
 
                 int lx = xi - lw / 2;
                 lx = qBound(2, lx, W - lw - 2);
-                int ly = H - 1 - kMajorH - kLabelGap;
+                int ly = kTimeZoneH - 1 - kMajorH - kLabelGap;
 
                 p.setPen(QColor(65, 65, 80));
                 p.drawText(lx, ly, label);
