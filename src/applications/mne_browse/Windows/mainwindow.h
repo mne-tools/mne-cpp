@@ -76,6 +76,7 @@
 #include "filterwindow.h"
 #include "eventwindow.h"
 #include "annotationwindow.h"
+#include "covariancewindow.h"
 #include "epochwindow.h"
 #include "virtualchannelwindow.h"
 #include "datawindow.h"
@@ -348,6 +349,21 @@ private:
 
     //=========================================================================================================
     /**
+     * Returns the current covariance-whitening settings.
+     */
+    WhiteningSettings covarianceWhiteningSettings() const;
+
+    //=========================================================================================================
+    /**
+     * Apply covariance-whitening settings to the browser UI and optionally persist them.
+     *
+     * @param [in] settings      Whitening settings to apply.
+     * @param [in] saveSettings  True to store the settings in QSettings.
+     */
+    void setCovarianceWhiteningSettings(const WhiteningSettings& settings, bool saveSettings = true);
+
+    //=========================================================================================================
+    /**
      * Prompt for an annotation label and create an annotation from the selected raw-view span.
      */
     void handleAnnotationRangeSelected(int startSample, int endSample);
@@ -433,6 +449,7 @@ private:
     //Window widgets
     EventWindow*            m_pEventWindow;                 /**< Event widget which display the event view. */
     AnnotationWindow*       m_pAnnotationWindow;            /**< Annotation widget which displays browser annotations. */
+    CovarianceWindow*       m_pCovarianceWindow;            /**< Dock widget which inspects covariance data and drives whitening. */
     EpochWindow*            m_pEpochWindow;                 /**< Dock widget which reviews epochs before averaging. */
     VirtualChannelWindow*   m_pVirtualChannelWindow;        /**< Dock widget which manages browser-level derived channels. */
     FilterWindow*           m_pFilterWindow;                /**< Filter widget which display the filter options for the user. */

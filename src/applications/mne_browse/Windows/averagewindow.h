@@ -176,6 +176,22 @@ public:
 
     //=========================================================================================================
     /**
+     * Update whitening settings used by the covariance-aware display paths.
+     *
+     * @param settings The new whitening settings.
+     */
+    void setWhiteningSettings(const WhiteningSettings& settings);
+
+    //=========================================================================================================
+    /**
+     * Returns the current whitening settings.
+     *
+     * @return Active whitening settings.
+     */
+    WhiteningSettings whiteningSettings() const;
+
+    //=========================================================================================================
+    /**
      * Enable or disable whitening in the butterfly plot.
      *
      * @param enabled true to whiten the butterfly plot.
@@ -292,7 +308,8 @@ private:
 
     ButterflyScene*         m_pButterflyScene;      /**< The pointer to the butterfly scene. */
     FIFFLIB::FiffCov        m_noiseCovariance;      /**< Optional covariance used to whiten butterfly plots. */
-    bool                    m_bWhitenButterfly = false; /**< Whether the butterfly plot should be whitened. */
+    WhiteningSettings       m_whiteningSettings;    /**< Whitening controls shared with the covariance manager. */
+    QVector<FIFFLIB::FiffEvoked> m_layoutDisplayEvokeds; /**< Cached display evokeds so layout plots can reference transformed data. */
 
 signals:
     //=========================================================================================================
