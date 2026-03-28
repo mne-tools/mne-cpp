@@ -350,6 +350,9 @@ void ChannelRhiView::setBackgroundColor(const QColor &color)
 {
     m_bgColor = color;
     m_tileDirty = true;
+#ifdef MNE_DISP_RHIWIDGET
+    m_overlayDirty = true;
+#endif
     update();
 }
 
@@ -817,12 +820,17 @@ void ChannelRhiView::updateUBO(QRhiResourceUpdateBatch *batch)
 // so they are part of the Metal texture and remain visible even when the app loses focus.
 //=============================================================================================================
 
-void ChannelRhiView::rebuildOverlayImage(int pw, int ph)
+void ChannelRhiView::rebuildOverlayImage(int logicalWidth, int logicalHeight, qreal devicePixelRatio)
 {
-    m_overlayImage = QImage(pw, ph, QImage::Format_RGBA8888);
+    const qreal dpr = qMax(devicePixelRatio, 1.0);
+    const int pixelWidth  = qMax(1, qRound(logicalWidth * dpr));
+    const int pixelHeight = qMax(1, qRound(logicalHeight * dpr));
+
+    m_overlayImage = QImage(pixelWidth, pixelHeight, QImage::Format_RGBA8888);
+    m_overlayImage.setDevicePixelRatio(dpr);
     m_overlayImage.fill(Qt::transparent);
 
-    if (m_sfreq <= 0.f || m_samplesPerPixel <= 0.f) {
+    if (logicalWidth <= 0 || logicalHeight <= 0 || m_sfreq <= 0.f || m_samplesPerPixel <= 0.f) {
         m_overlayDirty = false;
         return;
     }
@@ -840,12 +848,12 @@ void ChannelRhiView::rebuildOverlayImage(int pw, int ph)
         bool oddBand      = (bandIdx & 1) != 0;
 
         QColor tint(0, 0, 0, 20); // 8 % opacity dark tint on odd seconds
-        const float vw = static_cast<float>(pw);
-        const float vh = static_cast<float>(ph);
+        const float vw = static_cast<float>(logicalWidth);
+        const float vh = static_cast<float>(logicalHeight);
         const float sppF = m_samplesPerPixel;
 
         for (float s = firstBound;
-             s < m_scrollSample + pw * sppF + samplesPerSec;
+             s < m_scrollSample + logicalWidth * sppF + samplesPerSec;
              s += samplesPerSec, oddBand = !oddBand) {
             if (!oddBand) continue;
             float xStart = (s - m_scrollSample) / sppF;
@@ -861,13 +869,12 @@ void ChannelRhiView::rebuildOverlayImage(int pw, int ph)
     if (!m_events.isEmpty()) {
         for (const EventMarker &ev : m_events) {
             float xF = (static_cast<float>(ev.sample) - m_scrollSample) / m_samplesPerPixel;
-            if (xF < -2.f || xF > pw + 2.f)
+            if (xF < -2.f || xF > logicalWidth + 2.f)
                 continue;
-            int ix = static_cast<int>(xF);
             QColor lineColor = ev.color;
             lineColor.setAlpha(180);
             p.setPen(QPen(lineColor, 1));
-            p.drawLine(ix, 0, ix, ph);
+            p.drawLine(QPointF(xF, 0.f), QPointF(xF, static_cast<float>(logicalHeight)));
         }
     }
 
@@ -928,8 +935,8 @@ void ChannelRhiView::ensureOverlayPipeline()
         return QShader::fromSerialized(f.readAll());
     };
 
-    QShader vs = loadShader(QStringLiteral(":/disp/shaders/overlay.vert.qsb"));
-    QShader fs = loadShader(QStringLiteral(":/disp/shaders/overlay.frag.qsb"));
+    QShader vs = loadShader(QStringLiteral(":/disp/shaders/viewers/helpers/shaders/overlay.vert.qsb"));
+    QShader fs = loadShader(QStringLiteral(":/disp/shaders/viewers/helpers/shaders/overlay.frag.qsb"));
     if (!vs.isValid() || !fs.isValid()) {
         m_overlayVbo.reset();
         m_overlaySrb.reset();
@@ -996,6 +1003,9 @@ void ChannelRhiView::render(QRhiCommandBuffer *cb)
     QSize ps = renderTarget()->pixelSize();
     const int pw = ps.width();
     const int ph = ps.height();
+    const int logicalW = width();
+    const int logicalH = height();
+    const qreal overlayDpr = (logicalW > 0) ? (static_cast<qreal>(pw) / static_cast<qreal>(logicalW)) : 1.0;
 
     QRhiResourceUpdateBatch *batch = rhi()->nextResourceUpdateBatch();
 
@@ -1007,10 +1017,10 @@ void ChannelRhiView::render(QRhiCommandBuffer *cb)
     // ── Overlay image (bands + event lines) ──────────────────────────────
     ensureOverlayPipeline();
     bool overlayReady = false;
-    if (m_overlayPipeline && m_overlayVbo && pw > 0 && ph > 0) {
+    if (m_overlayPipeline && m_overlayVbo && pw > 0 && ph > 0 && logicalW > 0 && logicalH > 0) {
         // Rebuild the overlay QImage if dirty or resized
         if (m_overlayDirty || QSize(pw, ph) != m_overlayTexSize) {
-            rebuildOverlayImage(pw, ph);
+            rebuildOverlayImage(logicalW, logicalH, overlayDpr);
             // (Re)create texture at the correct pixel size
             if (QSize(pw, ph) != m_overlayTexSize) {
                 m_overlayTex.reset(rhi()->newTexture(QRhiTexture::RGBA8, QSize(pw, ph)));
@@ -1525,6 +1535,7 @@ void ChannelRhiView::resizeEvent(QResizeEvent *event)
 #ifdef MNE_DISP_RHIWIDGET
     QRhiWidget::resizeEvent(event);
     m_vboDirty = true;
+    m_overlayDirty = true;
 #else
     QWidget::resizeEvent(event);
 #endif

@@ -55,6 +55,38 @@
 
 using namespace MNEBROWSE;
 
+namespace {
+
+int resolveStimChannelIndex(const FIFFLIB::FiffInfo& info)
+{
+    int fallbackStim = -1;
+
+    for (int ch = 0; ch < info.nchan; ++ch) {
+        if (info.chs[ch].kind != FIFFV_STIM_CH)
+            continue;
+
+        if (fallbackStim < 0)
+            fallbackStim = ch;
+
+        QString normalizedName = info.ch_names[ch].trimmed().toUpper();
+        normalizedName.remove(QLatin1Char(' '));
+        if (normalizedName == QLatin1String("STI014") ||
+            normalizedName == QLatin1String("STI101")) {
+            return ch;
+        }
+    }
+
+    return fallbackStim;
+}
+
+quint64 makeStimEventKey(int sample, int type)
+{
+    return (static_cast<quint64>(static_cast<quint32>(sample)) << 32)
+           | static_cast<quint32>(type);
+}
+
+} // namespace
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -297,6 +329,10 @@ bool DataWindow::loadFiffFile(const QString &path)
 
     m_stimEvents.clear();
     m_eventTypeColors.clear();
+    m_seenStimEventKeys.clear();
+    m_iStimChannel    = -1;
+    m_iStimLastSample = std::numeric_limits<int>::min();
+    m_iStimLastValue  = 0;
     m_pChannelDataView->setEvents({});
     m_pChannelDataView->clearView();
 
@@ -307,6 +343,7 @@ bool DataWindow::loadFiffFile(const QString &path)
     m_sFiffFilePath = path;
 
     auto fiffInfo = m_pFiffReader->fiffInfo();
+    m_iStimChannel = fiffInfo ? resolveStimChannelIndex(*fiffInfo) : -1;
     m_pChannelDataView->init(fiffInfo);
     m_pChannelDataView->setFileBounds(m_pFiffReader->firstSample(),
                                       m_pFiffReader->lastSample());
@@ -364,7 +401,7 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
 
     // ── Scan STIM channels for rising-edge events ─────────────────────
     auto fiffInfo = m_pFiffReader->fiffInfo();
-    if (fiffInfo) {
+    if (fiffInfo && m_iStimChannel >= 0) {
         // Fixed colour palette for event types (cycled by type index)
         static const QColor kEventPalette[] = {
             QColor(220, 50,  50),   // red
@@ -379,58 +416,63 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
         constexpr int kPaletteSize = static_cast<int>(sizeof(kEventPalette) / sizeof(kEventPalette[0]));
 
         // Prefer the combined trigger channel ("STI 014" for Neuromag Vectorview).
-        // Scanning all individual STIM bit channels leads to spurious events from
-        // analog inputs (e.g. photosensors) that share the STIM channel type but
-        // carry a constant non-zero voltage rather than discrete trigger codes.
-        // MNE Python's find_events() also defaults to STI 014 for this reason.
-        int stimCh = -1;
-        for (int ch = 0; ch < fiffInfo->nchan; ++ch) {
-            if (fiffInfo->chs[ch].kind != FIFFV_STIM_CH)
-                continue;
-            // Match "STI 014" or "STI014" or similar combined channel naming.
-            // Fall back to the first STIM channel found if no match.
-            QString name = fiffInfo->ch_names[ch].trimmed();
-            if (name.endsWith(QLatin1String("014"), Qt::CaseInsensitive) ||
-                name.endsWith(QLatin1String("101"), Qt::CaseInsensitive)) {
-                stimCh = ch;
-                break;
-            }
-            if (stimCh == -1)
-                stimCh = ch; // remember first STIM channel as fallback
-        }
-
-        if (stimCh >= 0 && stimCh < data.rows()) {
-            for (int s = 0; s < data.cols(); ++s) {
-                double val  = data(stimCh, s);
-                double prev = (s > 0) ? data(stimCh, s - 1) : 0.0;
-                // Rising edge: previous is 0 (or lower), current is non-zero positive integer
-                if (val > 0.5 && prev < 0.5) {
-                    int type      = static_cast<int>(val + 0.5);
-                    int absSample = firstSample + s;
-
-                    if (!m_eventTypeColors.contains(type)) {
-                        int idx = m_eventTypeColors.size() % kPaletteSize;
-                        m_eventTypeColors[type] = kEventPalette[idx];
-                    }
-
-                    DISPLIB::ChannelRhiView::EventMarker ev;
-                    ev.sample = absSample;
-                    ev.type   = type;
-                    ev.color  = m_eventTypeColors[type];
-                    ev.label  = QString::number(type);
-                    m_stimEvents.append(ev);
+        // The remaining edge case is block boundaries and revisit loads: if we
+        // always assume the previous value is zero, we can invent a false event
+        // at the start of a block or duplicate an event when a region is loaded twice.
+        if (m_iStimChannel < data.rows()) {
+            int prevValue = 0;
+            if (firstSample > m_pFiffReader->firstSample()) {
+                if (m_iStimLastSample == firstSample - 1) {
+                    prevValue = m_iStimLastValue;
+                } else {
+                    const Eigen::MatrixXd prevSampleData =
+                        m_pFiffReader->readBlockSync(firstSample - 1, firstSample - 1);
+                    if (m_iStimChannel < prevSampleData.rows() && prevSampleData.cols() > 0)
+                        prevValue = qRound(prevSampleData(m_iStimChannel, 0));
                 }
             }
-        }
 
-        if (!m_stimEvents.isEmpty() && m_pChannelDataView) {
-            // Sort by ascending sample for correct left-to-right chip rendering.
-            std::sort(m_stimEvents.begin(), m_stimEvents.end(),
-                      [](const DISPLIB::ChannelRhiView::EventMarker &a,
-                         const DISPLIB::ChannelRhiView::EventMarker &b) {
-                          return a.sample < b.sample;
-                      });
-            m_pChannelDataView->setEvents(m_stimEvents);
+            bool eventsChanged = false;
+            for (int s = 0; s < data.cols(); ++s) {
+                const int currValue = qRound(data(m_iStimChannel, s));
+
+                if (currValue > 0 && prevValue <= 0) {
+                    const int type      = currValue;
+                    const int absSample = firstSample + s;
+                    const quint64 key   = makeStimEventKey(absSample, type);
+
+                    if (!m_seenStimEventKeys.contains(key)) {
+                        if (!m_eventTypeColors.contains(type)) {
+                            const int idx = m_eventTypeColors.size() % kPaletteSize;
+                            m_eventTypeColors[type] = kEventPalette[idx];
+                        }
+
+                        DISPLIB::ChannelRhiView::EventMarker ev;
+                        ev.sample = absSample;
+                        ev.type   = type;
+                        ev.color  = m_eventTypeColors[type];
+                        ev.label  = QString::number(type);
+
+                        m_seenStimEventKeys.insert(key);
+                        m_stimEvents.append(ev);
+                        eventsChanged = true;
+                    }
+                }
+
+                prevValue = currValue;
+            }
+
+            m_iStimLastSample = firstSample + data.cols() - 1;
+            m_iStimLastValue  = prevValue;
+
+            if (eventsChanged && m_pChannelDataView) {
+                std::sort(m_stimEvents.begin(), m_stimEvents.end(),
+                          [](const DISPLIB::ChannelRhiView::EventMarker &a,
+                             const DISPLIB::ChannelRhiView::EventMarker &b) {
+                              return a.sample < b.sample;
+                          });
+                m_pChannelDataView->setEvents(m_stimEvents);
+            }
         }
     }
 
