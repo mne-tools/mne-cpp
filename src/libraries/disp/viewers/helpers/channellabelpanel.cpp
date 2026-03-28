@@ -104,6 +104,14 @@ void ChannelLabelPanel::setModel(ChannelDataModel *model)
 
 //=============================================================================================================
 
+void ChannelLabelPanel::setChannelIndices(const QVector<int> &indices)
+{
+    m_channelIndices = indices;
+    update();
+}
+
+//=============================================================================================================
+
 void ChannelLabelPanel::setFirstVisibleChannel(int ch)
 {
     if (ch == m_firstVisibleChannel)
@@ -154,7 +162,8 @@ void ChannelLabelPanel::paintEvent(QPaintEvent *)
     if (!m_model)
         return;
 
-    int totalCh      = m_model->channelCount();
+    int totalCh      = m_channelIndices.isEmpty() ? m_model->channelCount()
+                                                  : m_channelIndices.size();
     int visibleCount = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
     if (visibleCount <= 0)
         return;
@@ -176,9 +185,17 @@ void ChannelLabelPanel::paintEvent(QPaintEvent *)
     typeFont.setPointSizeF(qBound(6.0, static_cast<double>(fullLaneH) * 0.15, 8.5));
     typeFont.setBold(false);
 
+    auto resolveChannel = [this](int logicalIdx) -> int {
+        if (m_channelIndices.isEmpty()) return logicalIdx;
+        if (logicalIdx < 0 || logicalIdx >= m_channelIndices.size()) return -1;
+        return m_channelIndices[logicalIdx];
+    };
+
     float yTop = 0.f;
     for (int i = 0; i < visibleCount; ++i) {
-        int ch = m_firstVisibleChannel + i;
+        int logIdx = m_firstVisibleChannel + i;
+        int ch = resolveChannel(logIdx);
+        if (ch < 0) { yTop += (m_hideBadChannels ? 6.f : (static_cast<float>(height()) / visibleCount)); continue; }
         auto info = m_model->channelInfo(ch);
 
         bool collapsed = m_hideBadChannels && info.bad;
@@ -293,7 +310,8 @@ void ChannelLabelPanel::mouseMoveEvent(QMouseEvent *event)
         return;
     }
 
-    const int totalCh    = m_model ? m_model->channelCount() : 0;
+    const int totalCh    = m_model ? (m_channelIndices.isEmpty() ? m_model->channelCount()
+                                                                 : m_channelIndices.size()) : 0;
     const int maxFirst   = qMax(0, totalCh - m_visibleChannelCount);
     const float laneH    = (m_visibleChannelCount > 0 && height() > 0)
                            ? static_cast<float>(height()) / m_visibleChannelCount
@@ -343,14 +361,18 @@ bool ChannelLabelPanel::event(QEvent *e)
 {
     if (e->type() == QEvent::ToolTip && m_model) {
         auto *he = static_cast<QHelpEvent *>(e);
-        int totalCh      = m_model->channelCount();
+        int totalCh      = m_channelIndices.isEmpty() ? m_model->channelCount()
+                                                     : m_channelIndices.size();
         int visibleCount = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
         if (visibleCount > 0) {
             float fullLaneH = static_cast<float>(height()) / visibleCount;
             int   i = rowAtY(static_cast<float>(he->pos().y()), visibleCount,
                               m_firstVisibleChannel, m_model, fullLaneH, m_hideBadChannels);
             if (i >= 0) {
-                int ch = m_firstVisibleChannel + i;
+                int logIdx = m_firstVisibleChannel + i;
+                int ch = m_channelIndices.isEmpty() ? logIdx
+                       : (logIdx < m_channelIndices.size() ? m_channelIndices[logIdx] : -1);
+                if (ch < 0) return QWidget::event(e);
                 auto info = m_model->channelInfo(ch);
                 float rms = (m_visSampleFirst < m_visSampleLast)
                             ? m_model->channelRms(ch, m_visSampleFirst, m_visSampleLast)

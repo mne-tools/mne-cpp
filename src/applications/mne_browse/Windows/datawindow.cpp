@@ -160,6 +160,10 @@ void DataWindow::showSelectedChannelsOnly(QStringList selectedChannels)
             ui->m_tableView_rawTableView->hideRow(i);
     }
 
+    // Also apply the filter to the GPU-accelerated ChannelDataView
+    if (m_pChannelDataView)
+        m_pChannelDataView->setChannelFilter(selectedChannels);
+
     updateDataTableViews();
 }
 
