@@ -303,6 +303,7 @@ public:
 signals:
     void scrollSampleChanged(float sample);
     void samplesPerPixelChanged(float spp);
+    void viewResized(int newWidth, int newHeight);
 
     //=========================================================================================================
     /**

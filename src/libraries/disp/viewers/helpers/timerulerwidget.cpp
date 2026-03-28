@@ -211,11 +211,15 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
             p.setPen(QPen(col, 1));
             p.drawLine(ix, kStimZoneH - 3, ix, kStimZoneH);
 
-            // Chip: shift right by one chip width if it would overlap the previous one
+            // Chip: only draw if it fits without overlapping the previous chip.
+            // When events are too close, we drop the chip (keeping only the tick mark)
+            // so labels never pile up at the right edge.
             int chipX = ix - kChipW / 2;
+            chipX = qMax(0, chipX); // don't go off left edge
+            if (chipX + kChipW > W)
+                continue; // would spill off right edge — skip entirely
             if (chipX < lastChipRight + 2)
-                chipX = lastChipRight + 2;
-            chipX = qBound(0, chipX, qMax(0, W - kChipW));
+                continue; // would overlap previous chip — skip
 
             QRectF chip(chipX, kChipY, kChipW, kChipH);
             QColor fill = ev.color;
