@@ -95,6 +95,17 @@ class DISPSHARED_EXPORT ChannelRhiView : public QWidget
     Q_PROPERTY(float samplesPerPixel READ samplesPerPixel WRITE setSamplesPerPixel NOTIFY samplesPerPixelChanged)
 
 public:
+    //=========================================================================================================
+    /**
+     * @brief Stimulus / event marker — a coloured vertical line at a given sample.
+     */
+    struct EventMarker {
+        int     sample = 0;   ///< Absolute sample index of the event onset.
+        int     type   = 1;   ///< Numeric event type (stimulus code).
+        QColor  color;        ///< Display colour of the line and label chip.
+        QString label;        ///< Short text label (shown at the bottom strip); defaults to type number.
+    };
+
     explicit ChannelRhiView(QWidget *parent = nullptr);
     ~ChannelRhiView() override;
 
@@ -105,6 +116,17 @@ public:
      * @param[in] model  The channel data model to render.
      */
     void setModel(ChannelDataModel *model);
+
+    //=========================================================================================================
+    /**
+     * Set the list of stimulus / event markers to overlay on the traces.
+     * Each marker is drawn as a coloured vertical line spanning all channel rows,
+     * with a small colour-coded label chip at the bottom of the view.
+     * Pass an empty vector to clear all markers.
+     *
+     * @param[in] events  List of EventMarker objects.
+     */
+    void setEvents(const QVector<EventMarker> &events);
 
     // ── Scroll / zoom ─────────────────────────────────────────────────
 
@@ -350,7 +372,8 @@ private:
         float sfreq,
         int   firstFileSample,
         bool  hideBadChannels,
-        const QVector<int> &channelIndices); // empty = identity (all channels)
+        const QVector<int> &channelIndices, // empty = identity (all channels)
+        const QVector<EventMarker> &events);   // empty = no markers
     bool isTileFresh() const;
 
     QImage m_tileImage;
@@ -413,6 +436,9 @@ private:
     // ── Channel index filter ──────────────────────────────────────────
     // When non-empty, only these model channel indices are rendered/scrolled.
     QVector<int> m_filteredChannels;
+
+    // ── Event / stimulus markers ──────────────────────────────────────
+    QVector<EventMarker> m_events;
 
     // Helper — use instead of firstCh+i for actual model channel index
     int actualChannelAt(int logicalIdx) const; // maps logical → model channel index

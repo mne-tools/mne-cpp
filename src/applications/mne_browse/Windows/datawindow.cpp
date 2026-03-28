@@ -40,6 +40,7 @@
 
 #include "datawindow.h"
 #include <disp/viewers/helpers/channeldatamodel.h>
+#include <fiff/fiff_constants.h>
 
 #if !defined(NO_QOPENGLWIDGET)
 #include <QOpenGLWidget>
@@ -197,6 +198,9 @@ void DataWindow::hideBadChannels(bool hideChannels)
             ui->m_tableView_rawTableView->showRow(i);
     }
 
+    if (m_pChannelDataView)
+        m_pChannelDataView->hideBadChannels(hideChannels);
+
     updateDataTableViews();
 }
 
@@ -208,6 +212,12 @@ void DataWindow::initMVCSettings()
     //-----------------------------------
     //------ Init data window view ------
     //-----------------------------------
+
+    // ── Zero out layout margins so the view fills the dock edge-to-edge ─
+    ui->verticalLayout->setContentsMargins(0, 0, 0, 0);
+    ui->verticalLayout->setSpacing(0);
+    ui->m_gridLayout->setContentsMargins(0, 0, 0, 0);
+    ui->m_gridLayout->setSpacing(0);
 
     // ── ChannelDataView (GPU-accelerated, demand-paged) ───────────────
     m_pFiffReader = new FiffBlockReader(this);
@@ -283,6 +293,9 @@ bool DataWindow::loadFiffFile(const QString &path)
     // synchronously via the scrollPositionChanged → onChannelViewScrollChanged chain.
     m_bLoadingBlock = true;
 
+    m_stimEvents.clear();
+    m_eventTypeColors.clear();
+    m_pChannelDataView->setEvents({});
     m_pChannelDataView->clearView();
 
     if (!m_pFiffReader->open(path)) {
@@ -346,6 +359,54 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
         m_pChannelDataView->setData(data, firstSample);
     else
         m_pChannelDataView->addData(data);
+
+    // ── Scan STIM channels for rising-edge events ─────────────────────
+    auto fiffInfo = m_pFiffReader->fiffInfo();
+    if (fiffInfo) {
+        // Fixed colour palette for event types (cycled by type index)
+        static const QColor kEventPalette[] = {
+            QColor(220, 50,  50),   // red
+            QColor( 50, 140, 220),  // blue
+            QColor( 50, 180,  80),  // green
+            QColor(210, 130,  30),  // orange
+            QColor(140,  60, 200),  // purple
+            QColor( 30, 180, 180),  // teal
+            QColor(200,  50, 160),  // pink
+            QColor(100, 160,  40),  // olive
+        };
+        constexpr int kPaletteSize = static_cast<int>(sizeof(kEventPalette) / sizeof(kEventPalette[0]));
+
+        for (int ch = 0; ch < data.rows() && ch < fiffInfo->nchan; ++ch) {
+            if (fiffInfo->chs[ch].kind != FIFFV_STIM_CH)
+                continue;
+
+            for (int s = 0; s < data.cols(); ++s) {
+                double val = data(ch, s);
+                double prev = (s > 0) ? data(ch, s - 1) : 0.0;
+                // Rising edge: previous is 0 (or lower), current is non-zero positive integer
+                if (val > 0.5 && prev < 0.5) {
+                    int type       = static_cast<int>(val + 0.5);
+                    int absSample  = firstSample + s;
+
+                    // Assign a stable colour per type
+                    if (!m_eventTypeColors.contains(type)) {
+                        int idx = m_eventTypeColors.size() % kPaletteSize;
+                        m_eventTypeColors[type] = kEventPalette[idx];
+                    }
+
+                    DISPLIB::ChannelRhiView::EventMarker ev;
+                    ev.sample = absSample;
+                    ev.type   = type;
+                    ev.color  = m_eventTypeColors[type];
+                    ev.label  = QString::number(type);
+                    m_stimEvents.append(ev);
+                }
+            }
+        }
+
+        if (!m_stimEvents.isEmpty() && m_pChannelDataView)
+            m_pChannelDataView->setEvents(m_stimEvents);
+    }
 
     // Advance the frontier only if this block moved it forward — never regress.
     // This preserves a jump-redirect written by onChannelViewScrollChanged()

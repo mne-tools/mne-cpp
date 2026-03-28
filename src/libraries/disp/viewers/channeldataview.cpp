@@ -436,6 +436,14 @@ void ChannelDataView::setRemoveDC(bool dc)
 
 //=============================================================================================================
 
+void ChannelDataView::setEvents(const QVector<ChannelRhiView::EventMarker> &events)
+{
+    if (m_pRhiView)
+        m_pRhiView->setEvents(events);
+}
+
+//=============================================================================================================
+
 int ChannelDataView::firstVisibleSample() const
 {
     return m_pRhiView ? m_pRhiView->visibleFirstSample() : 0;
