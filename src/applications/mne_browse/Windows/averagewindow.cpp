@@ -165,8 +165,8 @@ void AverageWindow::setMappedChannelNames(QStringList mappedChannelNames)
 
 void AverageWindow::init()
 {
-    initTableViewWidgets();
     initAverageSceneView();
+    initTableViewWidgets();
     initButtons();
     initComboBoxes();
 }
@@ -204,19 +204,29 @@ void AverageWindow::initTableViewWidgets()
 {
     //Set average model to list widget
     ui->m_tableView_loadedSets->setModel(m_pAverageModel);
+    ui->m_tableView_loadedSets->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui->m_tableView_loadedSets->setColumnHidden(1,true); //hide second column because the average model holds the aspect kind for this column
     ui->m_tableView_loadedSets->setColumnHidden(4,true); //hide last column because the average model holds the data types for this column
     ui->m_tableView_loadedSets->resizeColumnsToContents();
 
     ui->m_tableView_loadedSets->adjustSize();
 
-    //Set initial selection
-    ui->m_tableView_loadedSets->selectionModel()->select(QItemSelection(m_pAverageModel->index(0,0,QModelIndex()), m_pAverageModel->index(0,3,QModelIndex())),
-                                                         QItemSelectionModel::Select);
-
     //Connect selection of the loaded evoked files
     connect(ui->m_tableView_loadedSets->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &AverageWindow::onSelectionChanged);
+
+    connect(m_pAverageModel, &AverageModel::fileLoaded,
+            this, [this](bool loaded) {
+        if(loaded) {
+            selectLoadedSets();
+        } else {
+            m_pAverageScene->update();
+            m_pButterflyScene->clear();
+            m_pButterflyScene->update();
+        }
+    });
+
+    selectLoadedSets();
 }
 
 
@@ -242,6 +252,11 @@ void AverageWindow::initAverageSceneView()
 
 void AverageWindow::initButtons()
 {
+    ui->m_toolbutton_addAverage->setText("+");
+    ui->m_toolbutton_addAverage->setToolTip("Compute evoked responses from the current raw file");
+    connect(ui->m_toolbutton_addAverage, &QToolButton::released,
+            this, &AverageWindow::addAverageRequested);
+
     connect(ui->m_pushButton_exportLayoutPlot, &QPushButton::released,
             this, &AverageWindow::exportAverageLayoutPlot);
 
@@ -267,6 +282,12 @@ void AverageWindow::initComboBoxes()
 void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
     Q_UNUSED(deselected);
+    Q_UNUSED(selected);
+
+    QModelIndexList selectedRows;
+    if(ui->m_tableView_loadedSets->selectionModel()) {
+        selectedRows = ui->m_tableView_loadedSets->selectionModel()->selectedRows(0);
+    }
 
     //Get current items from the average scene
     QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
@@ -278,9 +299,9 @@ void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QIt
         averageSceneItemTemp->m_lAverageData.clear();
 
         //Do for all selected evoked sets
-        for(int u = 0; u<selected.indexes().size(); u++) {
+        for(int u = 0; u < selectedRows.size(); ++u) {
             //Get only the necessary data from the average model (use column 4)
-            QModelIndex index = selected.indexes().at(u);
+            QModelIndex index = selectedRows.at(u);
 
             const FiffInfo* fiffInfo = m_pAverageModel->data(m_pAverageModel->index(index.row(), 4), AverageModelRoles::GetFiffInfo).value<const FiffInfo*>();
             RowVectorPair averageData = m_pAverageModel->data(m_pAverageModel->index(index.row(), 4), AverageModelRoles::GetAverageData).value<RowVectorPair>();
@@ -307,9 +328,9 @@ void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QIt
     //Draw butterfly plot
     m_pButterflyScene->clear();
 
-    for(int i = 0; i<selected.indexes().size(); i++) {
+    for(int i = 0; i < selectedRows.size(); ++i) {
         //Get only the necessary data from the average model (use column 4)
-        QModelIndex index = selected.indexes().at(i);
+        QModelIndex index = selectedRows.at(i);
 
         const FiffInfo* fiffInfo = m_pAverageModel->data(m_pAverageModel->index(index.row(), 4), AverageModelRoles::GetFiffInfo).value<const FiffInfo*>();
         RowVectorPair averageData = m_pAverageModel->data(m_pAverageModel->index(index.row(), 4), AverageModelRoles::GetAverageData).value<RowVectorPair>();
@@ -344,6 +365,26 @@ void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QIt
     }
 
     m_pButterflyScene->update();
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::selectLoadedSets()
+{
+    if(!ui->m_tableView_loadedSets->selectionModel() || m_pAverageModel->rowCount() <= 0) {
+        return;
+    }
+
+    const QModelIndex first = m_pAverageModel->index(0, 0, QModelIndex());
+    const QModelIndex last = m_pAverageModel->index(m_pAverageModel->rowCount() - 1, 0, QModelIndex());
+    const QItemSelection selection(first, last);
+
+    ui->m_tableView_loadedSets->selectionModel()->clearSelection();
+    ui->m_tableView_loadedSets->selectionModel()->select(selection,
+                                                         QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    ui->m_tableView_loadedSets->selectionModel()->setCurrentIndex(first,
+                                                                  QItemSelectionModel::Current | QItemSelectionModel::Rows);
 }
 
 

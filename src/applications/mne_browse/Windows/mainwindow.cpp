@@ -41,6 +41,16 @@
 #include "mainwindow.h"
 
 #include <QBuffer>
+#include <QApplication>
+#include <QCheckBox>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QFormLayout>
+#include <QGroupBox>
+#include <QLabel>
+#include <QListWidget>
+#include <QSpinBox>
+#include <QVBoxLayout>
 
 
 //*************************************************************************************************************
@@ -49,6 +59,396 @@
 //=============================================================================================================
 
 using namespace MNEBROWSE;
+
+namespace
+{
+
+QString defaultEvokedFilePath(const QString& rawFilePath)
+{
+    if(rawFilePath.isEmpty()) {
+        return QString();
+    }
+
+    if(rawFilePath.endsWith(".fif", Qt::CaseInsensitive)) {
+        return rawFilePath.left(rawFilePath.size() - 4) + "-ave.fif";
+    }
+
+    return rawFilePath + "-ave.fif";
+}
+
+QString defaultCovFilePath(const QString& rawFilePath)
+{
+    if(rawFilePath.isEmpty()) {
+        return QString();
+    }
+
+    if(rawFilePath.endsWith(".fif", Qt::CaseInsensitive)) {
+        return rawFilePath.left(rawFilePath.size() - 4) + "-cov.fif";
+    }
+
+    return rawFilePath + "-cov.fif";
+}
+
+QMap<int, int> countEventsByType(const MatrixXi& events)
+{
+    QMap<int, int> counts;
+
+    if(events.cols() < 3) {
+        return counts;
+    }
+
+    for(int row = 0; row < events.rows(); ++row) {
+        const int eventCode = events(row, 2);
+        if(eventCode != 0) {
+            counts[eventCode] = counts.value(eventCode) + 1;
+        }
+    }
+
+    return counts;
+}
+
+QString normalizeStimChannelName(const QString& channelName)
+{
+    QString normalizedName = channelName.trimmed().toUpper();
+    normalizedName.remove(QLatin1Char(' '));
+    return normalizedName;
+}
+
+bool detectFallbackStimEvents(const FIFFLIB::FiffRawData& raw,
+                              MatrixXi& events,
+                              QString& sourceDescription)
+{
+    QStringList preferredStimChannels;
+    QStringList fallbackStimChannels;
+
+    for(int channelIndex = 0; channelIndex < raw.info.nchan; ++channelIndex) {
+        if(raw.info.chs[channelIndex].kind != FIFFV_STIM_CH) {
+            continue;
+        }
+
+        const QString stimChannel = raw.info.ch_names.value(channelIndex);
+        const QString normalizedName = normalizeStimChannelName(stimChannel);
+
+        if(normalizedName == QLatin1String("STI014") ||
+           normalizedName == QLatin1String("STI101")) {
+            preferredStimChannels.append(stimChannel);
+        } else {
+            fallbackStimChannels.append(stimChannel);
+        }
+    }
+
+    const QStringList stimChannels = preferredStimChannels + fallbackStimChannels;
+    for(const QString& stimChannel : stimChannels) {
+        FIFFLIB::FiffEvents detectedEvents;
+        if(FIFFLIB::FiffEvents::detect_from_raw(raw, detectedEvents, stimChannel)) {
+            events = detectedEvents.events;
+            sourceDescription = QString("Using trigger events detected from %1.").arg(stimChannel);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool showComputeEvokedDialog(QWidget* parent,
+                             QSettings& settings,
+                             const QMap<int, int>& eventCounts,
+                             const QString& sourceDescription,
+                             QList<int>& selectedEventCodes,
+                             float& tmin,
+                             float& tmax,
+                             bool& applyBaseline,
+                             float& baselineFrom,
+                             float& baselineTo,
+                             bool& dropRejected)
+{
+    QDialog dialog(parent);
+    dialog.setWindowTitle("Compute Evoked");
+
+    QVBoxLayout* mainLayout = new QVBoxLayout(&dialog);
+
+    QLabel* sourceLabel = new QLabel(sourceDescription, &dialog);
+    sourceLabel->setWordWrap(true);
+    mainLayout->addWidget(sourceLabel);
+
+    QGroupBox* timingGroup = new QGroupBox("Epoch Settings", &dialog);
+    QFormLayout* timingLayout = new QFormLayout(timingGroup);
+
+    QSpinBox* preStimSpinBox = new QSpinBox(timingGroup);
+    preStimSpinBox->setRange(0, 10000);
+    preStimSpinBox->setSingleStep(10);
+    preStimSpinBox->setPrefix("-");
+    preStimSpinBox->setValue(settings.value("MainWindow/Averaging/preStimMs", 100).toInt());
+
+    QSpinBox* postStimSpinBox = new QSpinBox(timingGroup);
+    postStimSpinBox->setRange(10, 10000);
+    postStimSpinBox->setSingleStep(10);
+    postStimSpinBox->setValue(settings.value("MainWindow/Averaging/postStimMs", 400).toInt());
+
+    QCheckBox* baselineCheckBox = new QCheckBox("Apply baseline correction", timingGroup);
+    baselineCheckBox->setChecked(settings.value("MainWindow/Averaging/applyBaseline", true).toBool());
+
+    QSpinBox* baselineFromSpinBox = new QSpinBox(timingGroup);
+    baselineFromSpinBox->setSingleStep(10);
+    baselineFromSpinBox->setRange(-preStimSpinBox->value(), postStimSpinBox->value());
+    baselineFromSpinBox->setValue(settings.value("MainWindow/Averaging/baselineFromMs",
+                                                 -preStimSpinBox->value()).toInt());
+
+    QSpinBox* baselineToSpinBox = new QSpinBox(timingGroup);
+    baselineToSpinBox->setSingleStep(10);
+    baselineToSpinBox->setRange(-preStimSpinBox->value(), postStimSpinBox->value());
+    baselineToSpinBox->setValue(settings.value("MainWindow/Averaging/baselineToMs", 0).toInt());
+
+    QCheckBox* rejectCheckBox = new QCheckBox("Drop rejected epochs", timingGroup);
+    rejectCheckBox->setChecked(settings.value("MainWindow/Averaging/dropRejected", true).toBool());
+
+    timingLayout->addRow("Pre-stimulus (ms)", preStimSpinBox);
+    timingLayout->addRow("Post-stimulus (ms)", postStimSpinBox);
+    timingLayout->addRow(baselineCheckBox);
+    timingLayout->addRow("Baseline from (ms)", baselineFromSpinBox);
+    timingLayout->addRow("Baseline to (ms)", baselineToSpinBox);
+    timingLayout->addRow(rejectCheckBox);
+    mainLayout->addWidget(timingGroup);
+
+    auto syncSpinBoxBounds = [=]() {
+        const int minValue = -preStimSpinBox->value();
+        const int maxValue = postStimSpinBox->value();
+
+        baselineFromSpinBox->setRange(minValue, maxValue);
+        baselineToSpinBox->setRange(minValue, maxValue);
+
+        if(baselineFromSpinBox->value() > baselineToSpinBox->value()) {
+            baselineFromSpinBox->setValue(minValue);
+            baselineToSpinBox->setValue(0);
+        }
+    };
+
+    syncSpinBoxBounds();
+
+    QObject::connect(preStimSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+                     &dialog, [=](int) { syncSpinBoxBounds(); });
+    QObject::connect(postStimSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+                     &dialog, [=](int) { syncSpinBoxBounds(); });
+    QObject::connect(baselineCheckBox, &QCheckBox::toggled,
+                     baselineFromSpinBox, &QSpinBox::setEnabled);
+    QObject::connect(baselineCheckBox, &QCheckBox::toggled,
+                     baselineToSpinBox, &QSpinBox::setEnabled);
+    baselineFromSpinBox->setEnabled(baselineCheckBox->isChecked());
+    baselineToSpinBox->setEnabled(baselineCheckBox->isChecked());
+
+    QGroupBox* eventGroup = new QGroupBox("Event Types", &dialog);
+    QVBoxLayout* eventLayout = new QVBoxLayout(eventGroup);
+    QLabel* eventHint = new QLabel("Select one or more event codes to average.", eventGroup);
+    eventHint->setWordWrap(true);
+    eventLayout->addWidget(eventHint);
+
+    QListWidget* eventListWidget = new QListWidget(eventGroup);
+    eventListWidget->setSelectionMode(QAbstractItemView::MultiSelection);
+
+    for(auto it = eventCounts.constBegin(); it != eventCounts.constEnd(); ++it) {
+        QListWidgetItem* item = new QListWidgetItem(QString("%1 (%2 epochs)").arg(it.key()).arg(it.value()),
+                                                    eventListWidget);
+        item->setData(Qt::UserRole, it.key());
+        item->setSelected(true);
+    }
+
+    eventLayout->addWidget(eventListWidget);
+    mainLayout->addWidget(eventGroup);
+
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                                                       Qt::Horizontal,
+                                                       &dialog);
+    QObject::connect(buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    QObject::connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    mainLayout->addWidget(buttonBox);
+
+    if(dialog.exec() != QDialog::Accepted) {
+        return false;
+    }
+
+    selectedEventCodes.clear();
+    for(int row = 0; row < eventListWidget->count(); ++row) {
+        QListWidgetItem* item = eventListWidget->item(row);
+        if(item->isSelected()) {
+            selectedEventCodes.append(item->data(Qt::UserRole).toInt());
+        }
+    }
+
+    if(selectedEventCodes.isEmpty()) {
+        QMessageBox::warning(parent,
+                             "Compute Evoked",
+                             "Select at least one event type to compute an evoked response.");
+        return false;
+    }
+
+    settings.setValue("MainWindow/Averaging/preStimMs", preStimSpinBox->value());
+    settings.setValue("MainWindow/Averaging/postStimMs", postStimSpinBox->value());
+    settings.setValue("MainWindow/Averaging/applyBaseline", baselineCheckBox->isChecked());
+    settings.setValue("MainWindow/Averaging/baselineFromMs", baselineFromSpinBox->value());
+    settings.setValue("MainWindow/Averaging/baselineToMs", baselineToSpinBox->value());
+    settings.setValue("MainWindow/Averaging/dropRejected", rejectCheckBox->isChecked());
+
+    tmin = -static_cast<float>(preStimSpinBox->value()) / 1000.0f;
+    tmax = static_cast<float>(postStimSpinBox->value()) / 1000.0f;
+    applyBaseline = baselineCheckBox->isChecked();
+    baselineFrom = static_cast<float>(baselineFromSpinBox->value()) / 1000.0f;
+    baselineTo = static_cast<float>(baselineToSpinBox->value()) / 1000.0f;
+    dropRejected = rejectCheckBox->isChecked();
+
+    return true;
+}
+
+bool showComputeCovarianceDialog(QWidget* parent,
+                                 QSettings& settings,
+                                 const QMap<int, int>& eventCounts,
+                                 const QString& sourceDescription,
+                                 QList<int>& selectedEventCodes,
+                                 float& tmin,
+                                 float& tmax,
+                                 bool& applyBaseline,
+                                 float& baselineFrom,
+                                 float& baselineTo,
+                                 bool& removeMean)
+{
+    QDialog dialog(parent);
+    dialog.setWindowTitle("Compute Covariance");
+
+    QVBoxLayout* mainLayout = new QVBoxLayout(&dialog);
+
+    QLabel* sourceLabel = new QLabel(sourceDescription, &dialog);
+    sourceLabel->setWordWrap(true);
+    mainLayout->addWidget(sourceLabel);
+
+    QGroupBox* timingGroup = new QGroupBox("Covariance Window", &dialog);
+    QFormLayout* timingLayout = new QFormLayout(timingGroup);
+
+    QSpinBox* fromSpinBox = new QSpinBox(timingGroup);
+    fromSpinBox->setRange(-10000, 10000);
+    fromSpinBox->setSingleStep(10);
+    fromSpinBox->setValue(settings.value("MainWindow/Covariance/tminMs", -200).toInt());
+
+    QSpinBox* toSpinBox = new QSpinBox(timingGroup);
+    toSpinBox->setRange(-10000, 10000);
+    toSpinBox->setSingleStep(10);
+    toSpinBox->setValue(settings.value("MainWindow/Covariance/tmaxMs", 0).toInt());
+
+    QCheckBox* baselineCheckBox = new QCheckBox("Apply baseline correction", timingGroup);
+    baselineCheckBox->setChecked(settings.value("MainWindow/Covariance/applyBaseline", false).toBool());
+
+    QSpinBox* baselineFromSpinBox = new QSpinBox(timingGroup);
+    baselineFromSpinBox->setRange(-10000, 10000);
+    baselineFromSpinBox->setSingleStep(10);
+    baselineFromSpinBox->setValue(settings.value("MainWindow/Covariance/baselineFromMs", -200).toInt());
+
+    QSpinBox* baselineToSpinBox = new QSpinBox(timingGroup);
+    baselineToSpinBox->setRange(-10000, 10000);
+    baselineToSpinBox->setSingleStep(10);
+    baselineToSpinBox->setValue(settings.value("MainWindow/Covariance/baselineToMs", 0).toInt());
+
+    QCheckBox* removeMeanCheckBox = new QCheckBox("Remove sample mean", timingGroup);
+    removeMeanCheckBox->setChecked(settings.value("MainWindow/Covariance/removeMean", true).toBool());
+
+    timingLayout->addRow("Window from (ms)", fromSpinBox);
+    timingLayout->addRow("Window to (ms)", toSpinBox);
+    timingLayout->addRow(baselineCheckBox);
+    timingLayout->addRow("Baseline from (ms)", baselineFromSpinBox);
+    timingLayout->addRow("Baseline to (ms)", baselineToSpinBox);
+    timingLayout->addRow(removeMeanCheckBox);
+    mainLayout->addWidget(timingGroup);
+
+    auto syncRanges = [=]() {
+        if(fromSpinBox->value() > toSpinBox->value()) {
+            toSpinBox->setValue(fromSpinBox->value());
+        }
+
+        baselineFromSpinBox->setMinimum(fromSpinBox->value());
+        baselineFromSpinBox->setMaximum(toSpinBox->value());
+        baselineToSpinBox->setMinimum(fromSpinBox->value());
+        baselineToSpinBox->setMaximum(toSpinBox->value());
+
+        if(baselineFromSpinBox->value() > baselineToSpinBox->value()) {
+            baselineFromSpinBox->setValue(fromSpinBox->value());
+            baselineToSpinBox->setValue(toSpinBox->value());
+        }
+    };
+
+    syncRanges();
+
+    QObject::connect(fromSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+                     &dialog, [=](int) { syncRanges(); });
+    QObject::connect(toSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+                     &dialog, [=](int) { syncRanges(); });
+    QObject::connect(baselineCheckBox, &QCheckBox::toggled,
+                     baselineFromSpinBox, &QSpinBox::setEnabled);
+    QObject::connect(baselineCheckBox, &QCheckBox::toggled,
+                     baselineToSpinBox, &QSpinBox::setEnabled);
+    baselineFromSpinBox->setEnabled(baselineCheckBox->isChecked());
+    baselineToSpinBox->setEnabled(baselineCheckBox->isChecked());
+
+    QGroupBox* eventGroup = new QGroupBox("Event Types", &dialog);
+    QVBoxLayout* eventLayout = new QVBoxLayout(eventGroup);
+    QLabel* eventHint = new QLabel("Select one or more event codes whose epochs should contribute to the covariance estimate.",
+                                   eventGroup);
+    eventHint->setWordWrap(true);
+    eventLayout->addWidget(eventHint);
+
+    QListWidget* eventListWidget = new QListWidget(eventGroup);
+    eventListWidget->setSelectionMode(QAbstractItemView::MultiSelection);
+
+    for(auto it = eventCounts.constBegin(); it != eventCounts.constEnd(); ++it) {
+        QListWidgetItem* item = new QListWidgetItem(QString("%1 (%2 epochs)").arg(it.key()).arg(it.value()),
+                                                    eventListWidget);
+        item->setData(Qt::UserRole, it.key());
+        item->setSelected(true);
+    }
+
+    eventLayout->addWidget(eventListWidget);
+    mainLayout->addWidget(eventGroup);
+
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                                                       Qt::Horizontal,
+                                                       &dialog);
+    QObject::connect(buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    QObject::connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    mainLayout->addWidget(buttonBox);
+
+    if(dialog.exec() != QDialog::Accepted) {
+        return false;
+    }
+
+    selectedEventCodes.clear();
+    for(int row = 0; row < eventListWidget->count(); ++row) {
+        QListWidgetItem* item = eventListWidget->item(row);
+        if(item->isSelected()) {
+            selectedEventCodes.append(item->data(Qt::UserRole).toInt());
+        }
+    }
+
+    if(selectedEventCodes.isEmpty()) {
+        QMessageBox::warning(parent,
+                             "Compute Covariance",
+                             "Select at least one event type to compute a covariance matrix.");
+        return false;
+    }
+
+    settings.setValue("MainWindow/Covariance/tminMs", fromSpinBox->value());
+    settings.setValue("MainWindow/Covariance/tmaxMs", toSpinBox->value());
+    settings.setValue("MainWindow/Covariance/applyBaseline", baselineCheckBox->isChecked());
+    settings.setValue("MainWindow/Covariance/baselineFromMs", baselineFromSpinBox->value());
+    settings.setValue("MainWindow/Covariance/baselineToMs", baselineToSpinBox->value());
+    settings.setValue("MainWindow/Covariance/removeMean", removeMeanCheckBox->isChecked());
+
+    tmin = static_cast<float>(fromSpinBox->value()) / 1000.0f;
+    tmax = static_cast<float>(toSpinBox->value()) / 1000.0f;
+    applyBaseline = baselineCheckBox->isChecked();
+    baselineFrom = static_cast<float>(baselineFromSpinBox->value()) / 1000.0f;
+    baselineTo = static_cast<float>(baselineToSpinBox->value()) / 1000.0f;
+    removeMean = removeMeanCheckBox->isChecked();
+
+    return true;
+}
+
+} // namespace
 
 
 //*************************************************************************************************************
@@ -182,6 +582,9 @@ void MainWindow::setupWindowWidgets()
     //Connect selection manager with average manager
     connect(m_pChannelSelectionView, &ChannelSelectionView::selectionChanged,
             m_pAverageWindow, &AverageWindow::channelSelectionManagerChanged);
+
+    connect(m_pAverageWindow, &AverageWindow::addAverageRequested,
+            this, &MainWindow::computeEvoked);
 
     //Connect channel info window with raw data model, layout manager, average manager and the data window
     connect(rawModel(), &RawModel::fileLoaded,
@@ -360,12 +763,28 @@ void MainWindow::createToolBar()
 
 void MainWindow::connectMenus()
 {
+    QAction* computeCovarianceAction = new QAction(tr("Compute Covariance..."), this);
+    ui->menuTest->insertAction(ui->m_loadEvokedAction, computeCovarianceAction);
+
+    QAction* saveCovarianceAction = new QAction(tr("Save Covariance (fif)..."), this);
+    ui->menuTest->insertAction(ui->m_loadEvokedAction, saveCovarianceAction);
+
+    QAction* computeEvokedAction = new QAction(tr("Compute Evoked..."), this);
+    ui->menuTest->insertAction(ui->m_loadEvokedAction, computeEvokedAction);
+
+    QAction* saveEvokedAction = new QAction(tr("Save Evoked (fif)..."), this);
+    ui->menuTest->insertAction(ui->m_quitAction, saveEvokedAction);
+
     //File
     connect(ui->m_openAction, &QAction::triggered, this, &MainWindow::openFile);
     connect(ui->m_writeAction, &QAction::triggered, this, &MainWindow::writeFile);
     connect(ui->m_loadEvents, &QAction::triggered, this, &MainWindow::loadEvents);
     connect(ui->m_saveEvents, &QAction::triggered, this, &MainWindow::saveEvents);
+    connect(computeCovarianceAction, &QAction::triggered, this, &MainWindow::computeCovariance);
+    connect(saveCovarianceAction, &QAction::triggered, this, &MainWindow::saveCovariance);
+    connect(computeEvokedAction, &QAction::triggered, this, &MainWindow::computeEvoked);
     connect(ui->m_loadEvokedAction, &QAction::triggered, this, &MainWindow::loadEvoked);
+    connect(saveEvokedAction, &QAction::triggered, this, &MainWindow::saveEvoked);
     connect(ui->m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
     //Adjust
@@ -457,13 +876,28 @@ void MainWindow::setWindowStatus()
 
     //Set evoked file informations
     if(m_pAverageWindow->getAverageModel()->isFileLoaded()) {
-        int idx = m_qEvokedFile.fileName().lastIndexOf("/");
-        QString filename = m_qEvokedFile.fileName().remove(0,idx+1);
-
-        title.append(QString("  -  Evoked file: %1").arg(filename));
+        if(m_qEvokedFile.fileName().isEmpty()) {
+            title.append("  -  Evoked data: unsaved");
+        } else {
+            int idx = m_qEvokedFile.fileName().lastIndexOf("/");
+            QString filename = m_qEvokedFile.fileName().remove(0,idx+1);
+            title.append(QString("  -  Evoked file: %1").arg(filename));
+        }
     }
     else
         title.append("  -  No evoked file");
+
+    if(!m_covariance.isEmpty()) {
+        if(m_qCovFile.fileName().isEmpty()) {
+            title.append("  -  Covariance: unsaved");
+        } else {
+            int idx = m_qCovFile.fileName().lastIndexOf("/");
+            QString filename = m_qCovFile.fileName().remove(0,idx+1);
+            title.append(QString("  -  Covariance file: %1").arg(filename));
+        }
+    } else {
+        title.append("  -  No covariance");
+    }
 
     if(!m_pStatusLabel) {
         m_pStatusLabel = new QLabel(this);
@@ -674,6 +1108,10 @@ bool MainWindow::loadRawFile(const QString& filename)
         m_qFileRaw.close();
 
     m_qFileRaw.setFileName(filename);
+    m_covariance.clear();
+    if(m_qCovFile.isOpen())
+        m_qCovFile.close();
+    m_qCovFile.setFileName(QString());
 
     m_pEventWindow->getEventModel()->clearModel();
 
@@ -746,6 +1184,310 @@ bool MainWindow::loadEventsFile(const QString& filename)
 
 //*************************************************************************************************************
 
+void MainWindow::computeEvoked()
+{
+    if(m_qFileRaw.fileName().isEmpty() || !QFile::exists(m_qFileRaw.fileName())) {
+        QMessageBox::warning(this,
+                             "Compute Evoked",
+                             "Load a raw FIF file before computing evoked responses.");
+        return;
+    }
+
+    QFile rawFile(m_qFileRaw.fileName());
+    FIFFLIB::FiffRawData raw(rawFile);
+
+    if(raw.isEmpty()) {
+        QMessageBox::warning(this,
+                             "Compute Evoked",
+                             QString("Could not open raw data from %1.").arg(m_qFileRaw.fileName()));
+        return;
+    }
+
+    MatrixXi events = m_pEventWindow->getEventModel()->getEventMatrix();
+    QString eventSourceDescription;
+
+    if(events.rows() > 0) {
+        eventSourceDescription = QString("Using %1 event(s) from the event manager.")
+                                     .arg(events.rows());
+    } else if(!detectFallbackStimEvents(raw, events, eventSourceDescription)) {
+        QMessageBox::warning(this,
+                             "Compute Evoked",
+                             "No events were loaded, and no trigger events could be detected from STI 014 or STI 101.");
+        return;
+    }
+
+    const QMap<int, int> eventCounts = countEventsByType(events);
+    if(eventCounts.isEmpty()) {
+        QMessageBox::warning(this,
+                             "Compute Evoked",
+                             "No non-zero event codes were found for averaging.");
+        return;
+    }
+
+    QList<int> selectedEventCodes;
+    float tmin = -0.1f;
+    float tmax = 0.4f;
+    bool applyBaseline = true;
+    float baselineFrom = -0.1f;
+    float baselineTo = 0.0f;
+    bool dropRejected = true;
+
+    if(!showComputeEvokedDialog(this,
+                                m_qSettings,
+                                eventCounts,
+                                eventSourceDescription,
+                                selectedEventCodes,
+                                tmin,
+                                tmax,
+                                applyBaseline,
+                                baselineFrom,
+                                baselineTo,
+                                dropRejected)) {
+        return;
+    }
+
+    QStringList comments;
+    for(int eventCode : selectedEventCodes) {
+        comments << QString::number(eventCode);
+    }
+
+    QMap<QString,double> rejectMap;
+    if(dropRejected) {
+        rejectMap.insert("grad", 2000e-13);
+        rejectMap.insert("mag", 3e-12);
+        rejectMap.insert("eeg", 100e-6);
+        rejectMap.insert("eog", 150e-6);
+    }
+
+    const QPair<float, float> baseline = applyBaseline
+        ? QPair<float, float>(baselineFrom, baselineTo)
+        : QPair<float, float>(0.0f, 0.0f);
+
+    QApplication::setOverrideCursor(Qt::BusyCursor);
+    qApp->processEvents();
+
+    const FIFFLIB::FiffEvokedSet evokedSet = MNELIB::MNEEpochDataList::averageCategories(raw,
+                                                                                           events,
+                                                                                           selectedEventCodes,
+                                                                                           comments,
+                                                                                           tmin,
+                                                                                           tmax,
+                                                                                           rejectMap,
+                                                                                           baseline);
+
+    QApplication::restoreOverrideCursor();
+
+    if(evokedSet.evoked.isEmpty()) {
+        QMessageBox::warning(this,
+                             "Compute Evoked",
+                             "No evoked responses could be computed. The selected events may have been rejected or out of bounds.");
+        return;
+    }
+
+    if(m_qEvokedFile.isOpen()) {
+        m_qEvokedFile.close();
+    }
+    m_qEvokedFile.setFileName(QString());
+
+    if(!m_pAverageWindow->getAverageModel()->setEvokedData(evokedSet)) {
+        QMessageBox::warning(this,
+                             "Compute Evoked",
+                             "The computed evoked set could not be loaded into the average manager.");
+        return;
+    }
+
+    setWindowStatus();
+    m_pAverageWindow->show();
+    m_pAverageWindow->raise();
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::saveEvoked()
+{
+    if(!m_pAverageWindow->getAverageModel()->isFileLoaded()) {
+        QMessageBox::warning(this,
+                             "Save Evoked",
+                             "There is no evoked data to save.");
+        return;
+    }
+
+    const QString defaultPath = !m_qEvokedFile.fileName().isEmpty()
+        ? m_qEvokedFile.fileName()
+        : defaultEvokedFilePath(m_qFileRaw.fileName());
+
+    const QString filename = QFileDialog::getSaveFileName(this,
+                                                          QString("Save evoked fiff data file"),
+                                                          defaultPath,
+                                                          tr("fif evoked data files (*-ave.fif);;fif data files (*.fif)"));
+
+    if(filename.isEmpty()) {
+        return;
+    }
+
+    if(m_qEvokedFile.isOpen()) {
+        m_qEvokedFile.close();
+    }
+    m_qEvokedFile.setFileName(filename);
+
+    if(m_pAverageWindow->getAverageModel()->saveEvokedData(m_qEvokedFile)) {
+        qInfo() << "Fiff evoked data file" << filename << "saved.";
+        setWindowStatus();
+    } else {
+        qWarning() << "ERROR saving evoked data file" << filename;
+        QMessageBox::warning(this,
+                             "Save Evoked",
+                             QString("Could not save evoked data to %1.").arg(filename));
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::computeCovariance()
+{
+    if(m_qFileRaw.fileName().isEmpty() || !QFile::exists(m_qFileRaw.fileName())) {
+        QMessageBox::warning(this,
+                             "Compute Covariance",
+                             "Load a raw FIF file before computing a covariance matrix.");
+        return;
+    }
+
+    QFile rawFile(m_qFileRaw.fileName());
+    FIFFLIB::FiffRawData raw(rawFile);
+
+    if(raw.isEmpty()) {
+        QMessageBox::warning(this,
+                             "Compute Covariance",
+                             QString("Could not open raw data from %1.").arg(m_qFileRaw.fileName()));
+        return;
+    }
+
+    MatrixXi events = m_pEventWindow->getEventModel()->getEventMatrix();
+    QString eventSourceDescription;
+
+    if(events.rows() > 0) {
+        eventSourceDescription = QString("Using %1 event(s) from the event manager.")
+                                     .arg(events.rows());
+    } else if(!detectFallbackStimEvents(raw, events, eventSourceDescription)) {
+        QMessageBox::warning(this,
+                             "Compute Covariance",
+                             "No events were loaded, and no trigger events could be detected from STI 014 or STI 101.");
+        return;
+    }
+
+    const QMap<int, int> eventCounts = countEventsByType(events);
+    if(eventCounts.isEmpty()) {
+        QMessageBox::warning(this,
+                             "Compute Covariance",
+                             "No non-zero event codes were found for covariance computation.");
+        return;
+    }
+
+    QList<int> selectedEventCodes;
+    float tmin = -0.2f;
+    float tmax = 0.0f;
+    bool applyBaseline = false;
+    float baselineFrom = -0.2f;
+    float baselineTo = 0.0f;
+    bool removeMean = true;
+
+    if(!showComputeCovarianceDialog(this,
+                                    m_qSettings,
+                                    eventCounts,
+                                    eventSourceDescription,
+                                    selectedEventCodes,
+                                    tmin,
+                                    tmax,
+                                    applyBaseline,
+                                    baselineFrom,
+                                    baselineTo,
+                                    removeMean)) {
+        return;
+    }
+
+    QApplication::setOverrideCursor(Qt::BusyCursor);
+    qApp->processEvents();
+
+    const FIFFLIB::FiffCov covariance = FIFFLIB::FiffCov::compute_from_epochs(raw,
+                                                                               events,
+                                                                               selectedEventCodes,
+                                                                               tmin,
+                                                                               tmax,
+                                                                               baselineFrom,
+                                                                               baselineTo,
+                                                                               applyBaseline,
+                                                                               removeMean);
+
+    QApplication::restoreOverrideCursor();
+
+    if(covariance.isEmpty()) {
+        QMessageBox::warning(this,
+                             "Compute Covariance",
+                             "No covariance matrix could be computed. Check the selected events and time window.");
+        return;
+    }
+
+    m_covariance = covariance;
+    if(m_qCovFile.isOpen()) {
+        m_qCovFile.close();
+    }
+    m_qCovFile.setFileName(QString());
+
+    setWindowStatus();
+
+    QMessageBox::information(this,
+                             "Compute Covariance",
+                             QString("Computed a %1 x %1 covariance matrix with %2 degrees of freedom.\nUse File > Save Covariance (fif)... to store it.")
+                                 .arg(m_covariance.dim)
+                                 .arg(m_covariance.nfree));
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::saveCovariance()
+{
+    if(m_covariance.isEmpty()) {
+        QMessageBox::warning(this,
+                             "Save Covariance",
+                             "There is no covariance matrix to save.");
+        return;
+    }
+
+    const QString defaultPath = !m_qCovFile.fileName().isEmpty()
+        ? m_qCovFile.fileName()
+        : defaultCovFilePath(m_qFileRaw.fileName());
+
+    const QString filename = QFileDialog::getSaveFileName(this,
+                                                          QString("Save covariance fiff data file"),
+                                                          defaultPath,
+                                                          tr("fif covariance data files (*-cov.fif);;fif data files (*.fif)"));
+
+    if(filename.isEmpty()) {
+        return;
+    }
+
+    if(m_qCovFile.isOpen()) {
+        m_qCovFile.close();
+    }
+    m_qCovFile.setFileName(filename);
+
+    if(m_covariance.save(filename)) {
+        qInfo() << "Fiff covariance data file" << filename << "saved.";
+        setWindowStatus();
+    } else {
+        qWarning() << "ERROR saving covariance data file" << filename;
+        QMessageBox::warning(this,
+                             "Save Covariance",
+                             QString("Could not save covariance data to %1.").arg(filename));
+    }
+}
+
+
+//*************************************************************************************************************
+
 void MainWindow::applyCommandLineOptions(const QString& rawFile,
                                          const QString& eventsFile,
                                          double highpass,
@@ -798,9 +1540,8 @@ void MainWindow::loadEvoked()
     //Update status bar
     setWindowStatus();
 
-    //Show average window
-//    if(!m_pAverageWindow->isVisible())
-//        m_pAverageWindow->show();
+    m_pAverageWindow->show();
+    m_pAverageWindow->raise();
 }
 
 

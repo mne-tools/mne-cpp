@@ -132,6 +132,15 @@ public:
 
     //=========================================================================================================
     /**
+     * Replaces the currently displayed evoked set with computed in-memory data.
+     *
+     * @param evokedSet the evoked data to display.
+     * @return true if the set contains at least one evoked response.
+     */
+    bool setEvokedData(const FiffEvokedSet& evokedSet);
+
+    //=========================================================================================================
+    /**
      * saveEvokedData saves the fiff evoked data file
      *
      * @param p_IODevice fiff data evoked file to save to

@@ -258,6 +258,30 @@ private:
 
     //=========================================================================================================
     /**
+     * Compute evoked responses from the currently loaded raw file and available events.
+     */
+    void computeEvoked();
+
+    //=========================================================================================================
+    /**
+     * Save the currently displayed evoked set to a FIF file.
+     */
+    void saveEvoked();
+
+    //=========================================================================================================
+    /**
+     * Compute a covariance matrix from the currently loaded raw file and available events.
+     */
+    void computeCovariance();
+
+    //=========================================================================================================
+    /**
+     * Save the currently computed covariance matrix to a FIF file.
+     */
+    void saveCovariance();
+
+    //=========================================================================================================
+    /**
      * showFilterWindow shows the filtering window
      */
     void showWindow(QWidget *window);
@@ -314,6 +338,8 @@ private:
     QFile                   m_qFileRaw;                     /**< Fiff data file to read (set for convenience). */
     QFile                   m_qEventFile;                   /**< Fiff event data file to read (set for convenience). */
     QFile                   m_qEvokedFile;                  /**< Fiff event data file to read (set for convenience). */
+    QFile                   m_qCovFile;                     /**< Fiff covariance file to write (set for convenience). */
+    FIFFLIB::FiffCov        m_covariance;                   /**< Last computed covariance matrix. */
 
     //Window widgets
     EventWindow*            m_pEventWindow;                 /**< Event widget which display the event view. */

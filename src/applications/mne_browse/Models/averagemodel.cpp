@@ -327,25 +327,34 @@ bool AverageModel::setData(const QModelIndex & index, const QVariant & value, in
 
 bool AverageModel::loadEvokedData(QFile& qFile)
 {
+    FiffEvokedSet evokedSet;
+    FiffEvokedSet::read(qFile, evokedSet);
+
+    return setEvokedData(evokedSet);
+}
+
+
+//*************************************************************************************************************
+
+bool AverageModel::setEvokedData(const FiffEvokedSet& evokedSet)
+{
     beginResetModel();
-    clearModel();
 
-    FiffEvokedSet::read(qFile, *m_pEvokedDataSet.data());
+    m_pEvokedDataSet->clear();
+    *m_pEvokedDataSet = evokedSet;
 
-    if(!m_pEvokedDataSet->evoked.empty())
-        m_bFileloaded = true;
-    else {
+    m_bFileloaded = !m_pEvokedDataSet->evoked.empty();
+
+    endResetModel();
+
+    if(!m_bFileloaded) {
         qWarning("AverageModel: ERROR! Data set does not contain any evoked data!");
-        endResetModel();
-        m_bFileloaded = false;
         emit fileLoaded(false);
         return false;
     }
 
-    endResetModel();
-
     emit fileLoaded(true);
-    emit dataChanged(createIndex(0,0), createIndex(rowCount(),columnCount()));
+    emit dataChanged(createIndex(0,0), createIndex(rowCount() - 1,columnCount() - 1));
 
     return true;
 }
@@ -355,15 +364,12 @@ bool AverageModel::loadEvokedData(QFile& qFile)
 
 bool AverageModel::saveEvokedData(QFile& qFile)
 {
-    Q_UNUSED(qFile);
+    if(!m_bFileloaded || !m_pEvokedDataSet || m_pEvokedDataSet->evoked.isEmpty()) {
+        qWarning("AverageModel: ERROR! No evoked data available for saving.");
+        return false;
+    }
 
-    beginResetModel();
-    clearModel();
-
-    //TODO: Save evoked to file
-
-    endResetModel();
-    return true;
+    return m_pEvokedDataSet->save(qFile.fileName());
 }
 
 

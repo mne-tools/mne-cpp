@@ -206,6 +206,13 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns all currently stored events as an Nx3 matrix in FIFF/MNE format: [sample, before, after].
+     * Browser/user events do not track the previous trigger state, so the middle column is set to 0.
+     */
+    Eigen::MatrixXi getEventMatrix() const;
+
+    //=========================================================================================================
+    /**
      * clearModel clears all model's members
      *
      */
@@ -257,5 +264,4 @@ signals:
 } // NAMESPACE
 
 #endif // EVEMODEL_H
-
 
