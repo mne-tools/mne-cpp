@@ -42,6 +42,8 @@
 #include <disp/viewers/helpers/channeldatamodel.h>
 #include <fiff/fiff_constants.h>
 
+#include <algorithm>
+
 #if !defined(NO_QOPENGLWIDGET)
 #include <QOpenGLWidget>
 #endif
@@ -404,8 +406,17 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
             }
         }
 
-        if (!m_stimEvents.isEmpty() && m_pChannelDataView)
+        if (!m_stimEvents.isEmpty() && m_pChannelDataView) {
+            // Sort by ascending sample so the ruler's lastChipRight overlap-skip
+            // logic works correctly when events come from multiple STIM channels
+            // (the scan above is channel-major, not sample-major).
+            std::stable_sort(m_stimEvents.begin(), m_stimEvents.end(),
+                             [](const DISPLIB::ChannelRhiView::EventMarker &a,
+                                const DISPLIB::ChannelRhiView::EventMarker &b) {
+                                 return a.sample < b.sample;
+                             });
             m_pChannelDataView->setEvents(m_stimEvents);
+        }
     }
 
     // Advance the frontier only if this block moved it forward — never regress.

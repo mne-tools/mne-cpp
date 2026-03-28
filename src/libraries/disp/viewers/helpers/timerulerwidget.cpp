@@ -194,9 +194,9 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
         constexpr int kChipH = 11;
         constexpr int kChipY = (kStimZoneH - kChipH) / 2;
 
-        // Track the rightmost x edge drawn so we can nudge a duplicate label
-        // slightly right rather than drawing it on top — but we do NOT loop,
-        // which was the source of the earlier crash.
+        // Track the rightmost x edge drawn so far.  When a chip would overlap,
+        // we skip it entirely (only the tick mark is kept).  Events must be
+        // sorted by ascending sample for this to work correctly.
         int lastChipRight = -kChipW;
 
         for (const TimeRulerEventMark &ev : m_events) {
