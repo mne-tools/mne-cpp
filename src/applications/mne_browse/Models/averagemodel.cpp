@@ -375,6 +375,18 @@ bool AverageModel::saveEvokedData(QFile& qFile)
 
 //*************************************************************************************************************
 
+const FiffEvoked* AverageModel::getEvoked(int row) const
+{
+    if(!m_bFileloaded || !m_pEvokedDataSet || row < 0 || row >= m_pEvokedDataSet->evoked.size()) {
+        return nullptr;
+    }
+
+    return &m_pEvokedDataSet->evoked.at(row);
+}
+
+
+//*************************************************************************************************************
+
 const FiffInfo AverageModel::getFiffInfo()
 {
     return m_pEvokedDataSet->info;

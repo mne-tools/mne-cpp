@@ -106,8 +106,25 @@ void ButterflySceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
 
 //*************************************************************************************************************
 
+void ButterflySceneItem::setEvokedData(const FiffEvoked& evoked)
+{
+    m_displayEvoked = evoked;
+    m_pFiffInfo = &m_displayEvoked.info;
+    m_lAverageData.first = m_displayEvoked.data.data();
+    m_lAverageData.second = m_displayEvoked.data.cols();
+    m_firstLastSample.first = m_displayEvoked.first;
+    m_firstLastSample.second = m_displayEvoked.last;
+}
+
+
+//*************************************************************************************************************
+
 void ButterflySceneItem::paintAveragePaths(QPainter *painter)
 {
+    if(!m_pFiffInfo) {
+        return;
+    }
+
     //Create path for all channels
     for(int i = 0; i < m_pFiffInfo->chs.size() ;i++) {
 
@@ -175,7 +192,6 @@ void ButterflySceneItem::paintAveragePaths(QPainter *painter)
         }
     }
 }
-
 
 
 

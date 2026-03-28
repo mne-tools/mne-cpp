@@ -465,6 +465,7 @@ MainWindow::MainWindow(QWidget *parent)
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
 , m_pStatusLabel(nullptr)
+, m_pWhitenButterflyAction(nullptr)
 {
     ui->setupUi(this);
 
@@ -763,6 +764,9 @@ void MainWindow::createToolBar()
 
 void MainWindow::connectMenus()
 {
+    QAction* loadCovarianceAction = new QAction(tr("Load Covariance..."), this);
+    ui->menuTest->insertAction(ui->m_loadEvokedAction, loadCovarianceAction);
+
     QAction* computeCovarianceAction = new QAction(tr("Compute Covariance..."), this);
     ui->menuTest->insertAction(ui->m_loadEvokedAction, computeCovarianceAction);
 
@@ -775,16 +779,36 @@ void MainWindow::connectMenus()
     QAction* saveEvokedAction = new QAction(tr("Save Evoked (fif)..."), this);
     ui->menuTest->insertAction(ui->m_quitAction, saveEvokedAction);
 
+    m_pWhitenButterflyAction = new QAction(tr("Whiten Butterfly Plot"), this);
+    m_pWhitenButterflyAction->setCheckable(true);
+    ui->menuTest->insertAction(ui->m_quitAction, m_pWhitenButterflyAction);
+
     //File
     connect(ui->m_openAction, &QAction::triggered, this, &MainWindow::openFile);
     connect(ui->m_writeAction, &QAction::triggered, this, &MainWindow::writeFile);
     connect(ui->m_loadEvents, &QAction::triggered, this, &MainWindow::loadEvents);
     connect(ui->m_saveEvents, &QAction::triggered, this, &MainWindow::saveEvents);
+    connect(loadCovarianceAction, &QAction::triggered, this, &MainWindow::loadCovariance);
     connect(computeCovarianceAction, &QAction::triggered, this, &MainWindow::computeCovariance);
     connect(saveCovarianceAction, &QAction::triggered, this, &MainWindow::saveCovariance);
     connect(computeEvokedAction, &QAction::triggered, this, &MainWindow::computeEvoked);
     connect(ui->m_loadEvokedAction, &QAction::triggered, this, &MainWindow::loadEvoked);
     connect(saveEvokedAction, &QAction::triggered, this, &MainWindow::saveEvoked);
+    connect(m_pWhitenButterflyAction, &QAction::toggled, this, [this](bool checked){
+        if(checked && m_covariance.isEmpty()) {
+            QMessageBox::warning(this,
+                                 "Whiten Butterfly Plot",
+                                 "Load or compute a covariance matrix before enabling whitening.");
+            m_pWhitenButterflyAction->setChecked(false);
+            return;
+        }
+
+        m_pAverageWindow->setButterflyWhiteningEnabled(checked);
+
+        if(checked && !m_pAverageWindow->isVisible()) {
+            showWindow(m_pAverageWindow);
+        }
+    });
     connect(ui->m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
     //Adjust
@@ -1112,6 +1136,10 @@ bool MainWindow::loadRawFile(const QString& filename)
     if(m_qCovFile.isOpen())
         m_qCovFile.close();
     m_qCovFile.setFileName(QString());
+    m_pAverageWindow->clearNoiseCovariance();
+    if(m_pWhitenButterflyAction) {
+        m_pWhitenButterflyAction->setChecked(false);
+    }
 
     m_pEventWindow->getEventModel()->clearModel();
 
@@ -1434,6 +1462,7 @@ void MainWindow::computeCovariance()
         m_qCovFile.close();
     }
     m_qCovFile.setFileName(QString());
+    m_pAverageWindow->setNoiseCovariance(m_covariance);
 
     setWindowStatus();
 
@@ -1442,6 +1471,41 @@ void MainWindow::computeCovariance()
                              QString("Computed a %1 x %1 covariance matrix with %2 degrees of freedom.\nUse File > Save Covariance (fif)... to store it.")
                                  .arg(m_covariance.dim)
                                  .arg(m_covariance.nfree));
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::loadCovariance()
+{
+    const QString filename = QFileDialog::getOpenFileName(this,
+                                                          QString("Open covariance fiff data file"),
+                                                          QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),
+                                                          tr("fif covariance data files (*-cov.fif);;fif data files (*.fif)"));
+
+    if(filename.isEmpty()) {
+        return;
+    }
+
+    QFile covarianceFile(filename);
+    FIFFLIB::FiffCov covariance(covarianceFile);
+
+    if(covariance.isEmpty()) {
+        QMessageBox::warning(this,
+                             "Load Covariance",
+                             QString("Could not load covariance data from %1.").arg(filename));
+        return;
+    }
+
+    if(m_qCovFile.isOpen()) {
+        m_qCovFile.close();
+    }
+
+    m_qCovFile.setFileName(filename);
+    m_covariance = covariance;
+    m_pAverageWindow->setNoiseCovariance(m_covariance);
+
+    setWindowStatus();
 }
 
 
