@@ -295,18 +295,31 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
     if (data.rows() == 0 || data.cols() == 0)
         return;
 
-    // First block → replace; subsequent → append (ring buffer handles trimming)
     auto *model = m_pChannelDataView->model();
-    if (model->totalSamples() == 0)
+
+    // Determine whether this block is contiguous with existing model data.
+    // If not (e.g. jump happened while the block was in-flight), start fresh
+    // at this position so the ring buffer stays coherent.
+    bool useSetData = (model->totalSamples() == 0);
+    if (!useSetData) {
+        int modelEnd = model->firstSample() + model->totalSamples();
+        // Allow a 1-sample gap for rounding
+        useSetData = (firstSample < model->firstSample() - 1 ||
+                      firstSample > modelEnd + 1);
+    }
+
+    if (useSetData)
         m_pChannelDataView->setData(data, firstSample);
     else
         m_pChannelDataView->addData(data);
 
-    // Advance the frontier and immediately chain the next load if we're still
-    // within the lookahead window.  This keeps blocks flowing back-to-back during
-    // startup and after fast inertial scrolling without waiting for the next
-    // scroll event to re-trigger loading.
-    m_iNextLoadSample = firstSample + static_cast<int>(data.cols());
+    // Advance the frontier only if this block moved it forward — never regress.
+    // This preserves a jump-redirect written by onChannelViewScrollChanged()
+    // that may have been set while this block was in-flight.
+    int newFrontier = firstSample + static_cast<int>(data.cols());
+    if (m_iNextLoadSample < newFrontier)
+        m_iNextLoadSample = newFrontier;
+
     scheduleNextLoad();
 }
 
@@ -315,6 +328,26 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
 void DataWindow::onChannelViewScrollChanged(int sample)
 {
     m_iCurrentScrollSample = sample;
+
+    // If the scroll jumped outside the currently loaded data range, redirect
+    // the load frontier so the data at the jump target loads immediately.
+    // We update m_iNextLoadSample even when a load is in-flight; the in-flight
+    // block will complete, onBlockLoaded will detect non-contiguity and call
+    // setData, and scheduleNextLoad will then load from the redirected position.
+    if (m_pFiffReader && m_pFiffReader->isOpen()) {
+        auto *model = m_pChannelDataView->model();
+        if (model && model->totalSamples() > 0) {
+            int modelFirst = model->firstSample();
+            int modelEnd   = modelFirst + model->totalSamples();
+            // Jump detected when scroll is outside the loaded range
+            if (sample < modelFirst || sample >= modelEnd) {
+                m_iNextLoadSample = qBound(m_pFiffReader->firstSample(),
+                                           sample,
+                                           m_pFiffReader->lastSample());
+            }
+        }
+    }
+
     scheduleNextLoad();
 }
 

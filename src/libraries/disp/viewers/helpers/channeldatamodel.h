@@ -138,6 +138,14 @@ public:
      *
      * @param[in] scaleMap  Map from FIFF kind to amplitude max.
      */
+    //=========================================================================================================
+    /**
+     * Clear all stored sample data without affecting channel metadata.
+     * After this call totalSamples() == 0 and firstSample() == 0.
+     * Emits dataChanged().
+     */
+    void clearData();
+
     void setScaleMap(const QMap<qint32, float> &scaleMap);
 
     //=========================================================================================================

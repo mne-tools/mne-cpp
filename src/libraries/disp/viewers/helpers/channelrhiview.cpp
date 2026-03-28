@@ -131,6 +131,7 @@ ChannelRhiView::ChannelRhiView(QWidget *parent)
         m_tileRebuildPending = false;
         // Check BEFORE we clear the flag: was data dirtied while we were building?
         bool dirtiedDuringBuild = m_tileDirty;
+        bool tileAccepted = false;
 
         if (!m_tileWatcher.isCanceled()) {
             TileResult r = m_tileWatcher.result();
@@ -141,17 +142,19 @@ ChannelRhiView::ChannelRhiView(QWidget *parent)
                 m_tileFirstChannel    = r.firstChannel;
                 m_tileVisibleCount    = r.visibleCount;
                 m_tileDirty           = false;
+                tileAccepted = true;
             }
         }
 
-        // Always repaint so the newly accepted tile is shown immediately.
-        // If data/meta changed during the build, mark dirty so the next
-        // paintEvent triggers a fresh rebuild.  Doing it via paintEvent
-        // (rather than calling scheduleTileRebuild() here directly) coalesces
-        // rapid dataChanged signals into one rebuild cycle per paint frame.
-        update();
-        if (dirtiedDuringBuild)
-            m_tileDirty = true;
+        // Only repaint when we have something new to show: a freshly accepted tile,
+        // or new data that arrived while the build was in-flight (needs a fresh build).
+        // When the build returned null (no channels/data yet) and nothing changed,
+        // skipping update() avoids a CPU-burning infinite repaint loop.
+        if (tileAccepted || dirtiedDuringBuild) {
+            if (dirtiedDuringBuild)
+                m_tileDirty = true;
+            update();
+        }
     });
 
 #ifdef MNE_DISP_RHIWIDGET
@@ -166,17 +169,30 @@ ChannelRhiView::ChannelRhiView(QWidget *parent)
     setApi(QRhiWidget::Api::OpenGL);
 #  endif
     setSampleCount(1);
+    // Force a native window so Metal/OpenGL can create their backing surface.
+    // Without this, QRhiWidget may fail to obtain an NSView handle on macOS.
+    setAttribute(Qt::WA_NativeWindow);
 
     // When Metal/OpenGL init fails, fall back to QPainter for all subsequent paint events
     connect(this, &QRhiWidget::renderFailed, this, [this]() {
+        // Zero-size failures are transient – the widget just hasn't been laid out yet.
+        // QRhiWidget will retry automatically on the next non-zero-size frame.
+        if (width() <= 0 || height() <= 0)
+            return;
+
         if (!m_rhiFailed) {
+            // Non-zero size + Metal failed → try OpenGL before giving up
+            if (api() == QRhiWidget::Api::Metal) {
+                setApi(QRhiWidget::Api::OpenGL);
+                update();
+                return;
+            }
+            // Both Metal and OpenGL failed → QPainter fallback
             m_rhiFailed = true;
-            update(); // trigger paintEvent() which will use QPainter path
+            update();
         }
     });
 
-    // Use QPainter tile cache as primary rendering path (Metal pipeline not needed)
-    m_rhiFailed = true;
 #endif
 }
 
@@ -349,6 +365,10 @@ void ChannelRhiView::setFirstVisibleChannel(int ch)
         return;
     m_firstVisibleChannel = ch;
     m_tileDirty = true;
+#ifdef MNE_DISP_RHIWIDGET
+    m_vboDirty      = true;
+    m_pipelineDirty = true;
+#endif
     emit channelOffsetChanged(m_firstVisibleChannel);
     update();
 }
@@ -362,6 +382,10 @@ void ChannelRhiView::setVisibleChannelCount(int count)
         return;
     m_visibleChannelCount = count;
     m_tileDirty = true;
+#ifdef MNE_DISP_RHIWIDGET
+    m_vboDirty      = true;
+    m_pipelineDirty = true;
+#endif
     update();
 }
 
@@ -453,7 +477,9 @@ void ChannelRhiView::ensurePipeline()
     m_uboStride = static_cast<int>(
         (48 + rhi->ubufAlignment() - 1) & ~(rhi->ubufAlignment() - 1));
 
-    int nCh = m_model ? m_model->channelCount() : 0;
+    // UBO has one slot per *visible* channel row, not all channels
+    int totalCh = m_model ? m_model->channelCount() : 0;
+    int nCh = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
     nCh = qMax(nCh, 1);
     nCh = qMin(nCh, kMaxChannels);
 
@@ -626,15 +652,21 @@ void ChannelRhiView::updateUBO(QRhiResourceUpdateBatch *batch)
     if (!m_model || !m_ubo)
         return;
 
-    int nCh  = m_model->channelCount();
-    nCh      = qMin(nCh, kMaxChannels);
-    float vw = static_cast<float>(width());
-    float vh = static_cast<float>(height());
-    float laneRange = (nCh > 0) ? (2.f / nCh) : 2.f; // NDC height of one channel row
+    int totalCh = m_model->channelCount();
+    int firstCh = qBound(0, m_firstVisibleChannel, totalCh);
+    int visCnt  = qMin(m_visibleChannelCount, totalCh - firstCh);
+    int nCh     = qMin(visCnt, kMaxChannels);
+    if (nCh <= 0)
+        return;
+
+    float vw        = static_cast<float>(width());
+    float vh        = static_cast<float>(height());
+    float laneRange = 2.f / nCh; // NDC height of one visible channel row
 
     QVarLengthArray<quint8> buf(m_uboStride, 0);
 
-    for (int ch = 0; ch < nCh; ++ch) {
+    for (int i = 0; i < nCh; ++i) {
+        int ch = firstCh + i;
         memset(buf.data(), 0, m_uboStride);
 
         auto info  = m_model->channelInfo(ch);
@@ -647,13 +679,12 @@ void ChannelRhiView::updateUBO(QRhiResourceUpdateBatch *batch)
             static_cast<float>(col.alphaF())
         };
 
-        // Channel y-center in NDC: top channel at +1 - laneRange/2, bottom at -1 + laneRange/2
-        // NDC y = +1 is the top of the screen
-        float yCenter = 1.f - laneRange * (ch + 0.5f);
+        // Visible row i: top at NDC +1, bottom at NDC -1
+        float yCenter = 1.f - laneRange * (i + 0.5f);
 
         auto *d = buf.data();
         writeFloats(d, kUboOffsetColor,          rgba, 4);
-        writeFloat (d, kUboOffsetFirstSample,    static_cast<float>(m_gpuChannels.size() > ch
+        writeFloat (d, kUboOffsetFirstSample,    static_cast<float>(static_cast<int>(m_gpuChannels.size()) > ch
                                                                       ? m_gpuChannels[ch].vboFirstSample : 0));
         writeFloat (d, kUboOffsetScrollSample,   m_scrollSample);
         writeFloat (d, kUboOffsetSampPerPixel,   m_samplesPerPixel);
@@ -663,8 +694,9 @@ void ChannelRhiView::updateUBO(QRhiResourceUpdateBatch *batch)
         writeFloat (d, kUboOffsetChannelYRange,  laneRange);
         writeFloat (d, kUboOffsetAmplitudeMax,   info.amplitudeMax);
 
+        // UBO slot i corresponds to visible row i
         batch->updateDynamicBuffer(m_ubo.get(),
-                                   ch * m_uboStride,
+                                   i * m_uboStride,
                                    m_uboStride,
                                    buf.constData());
     }
@@ -686,11 +718,9 @@ void ChannelRhiView::render(QRhiCommandBuffer *cb)
     // ── Ensure GPU resources ─────────────────────────────────────────────
     ensurePipeline();
     if (!m_pipeline) {
-        // Pipeline not ready (shaders still loading or creation failed).
-        // Still clear to the background color so the widget isn't left white.
+        // Pipeline not ready: show RED background so the failure is visible
         QRhiResourceUpdateBatch *u = rhi()->nextResourceUpdateBatch();
-        QColor bg = m_bgColor;
-        cb->beginPass(renderTarget(), bg, {1.f, 0}, u);
+        cb->beginPass(renderTarget(), QColor(220, 0, 0), {1.f, 0}, u);
         cb->endPass();
         return;
     }
@@ -712,16 +742,22 @@ void ChannelRhiView::render(QRhiCommandBuffer *cb)
     cb->setViewport(QRhiViewport(0.f, 0.f, static_cast<float>(ps.width()),
                                              static_cast<float>(ps.height())));
 
-    int nCh = qMin(m_model->channelCount(), kMaxChannels);
+    // Render only the visible channel window
+    int totalCh = m_model->channelCount();
+    int firstCh = qBound(0, m_firstVisibleChannel, totalCh);
+    int visCnt  = qMin(m_visibleChannelCount, totalCh - firstCh);
+    int nToRender = qMin(visCnt, kMaxChannels);
 
-    for (int ch = 0; ch < nCh; ++ch) {
-        if (ch >= m_gpuChannels.size())
+    for (int i = 0; i < nToRender; ++i) {
+        int ch = firstCh + i;
+        if (ch >= static_cast<int>(m_gpuChannels.size()))
             break;
         auto &gd = m_gpuChannels[ch];
         if (!gd.vbo || gd.vertexCount < 2)
             continue;
 
-        quint32 dynOffset = static_cast<quint32>(ch * m_uboStride);
+        // UBO slot i corresponds to visible row i (set in updateUBO)
+        quint32 dynOffset = static_cast<quint32>(i * m_uboStride);
         QRhiCommandBuffer::DynamicOffset dynOff{0, dynOffset};
         cb->setShaderResources(m_srb.get(), 1, &dynOff);
 
@@ -744,10 +780,10 @@ static void doPaintTile(QWidget *widget, const QImage &tileImage,
                         float scrollSample, const QColor &bgColor)
 {
     QPainter p(widget);
-    if (tileImage.isNull() || tileSamplesPerPixel <= 0.f) {
-        p.fillRect(widget->rect(), bgColor);
+    // Always fill background first so uncovered areas are clean
+    p.fillRect(widget->rect(), bgColor);
+    if (tileImage.isNull() || tileSamplesPerPixel <= 0.f)
         return;
-    }
     float tileXPx = (tileSampleFirst - scrollSample) / tileSamplesPerPixel;
     p.drawImage(QPointF(tileXPx, 0.f), tileImage);
 }
@@ -816,8 +852,10 @@ void ChannelRhiView::scheduleTileRebuild()
     if (m_tileRebuildPending)
         return;
 
-    if (!m_model || width() <= 0 || height() <= 0) {
-        // No model or zero-size: produce a blank tile synchronously
+    if (!m_model || m_model->channelCount() == 0 || width() <= 0 || height() <= 0) {
+        // No model / no channels / zero-size: produce a stable blank tile synchronously.
+        // This prevents an infinite repaint loop: the async worker would return a null
+        // image → watcher fires update() → paintEvent → rebuild → repeat.
         m_tileImage = QImage(qMax(width(), 1), qMax(height(), 1), QImage::Format_RGB32);
         m_tileImage.fill(m_bgColor.rgb());
         m_tileSampleFirst     = m_scrollSample;
