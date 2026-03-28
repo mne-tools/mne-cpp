@@ -350,7 +350,7 @@ private:
 
     // ── Overlay blit (bands + event lines baked into Metal texture) ───
     void ensureOverlayPipeline();
-    void rebuildOverlayImage(int pw, int ph);
+    void rebuildOverlayImage(int logicalWidth, int logicalHeight, qreal devicePixelRatio);
 
     std::unique_ptr<QRhiBuffer>                  m_overlayVbo;
     std::unique_ptr<QRhiTexture>                 m_overlayTex;

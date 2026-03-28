@@ -62,10 +62,12 @@
 #include <QColor>
 #include <QGesture>
 #include <QScroller>
+#include <QSet>
 
 #include <Eigen/Core>
 
 #include <memory>
+#include <limits>
 
 
 //*************************************************************************************************************
@@ -292,6 +294,10 @@ private:
     // ── STIM event cache ───────────────────────────────────────────────
     QVector<DISPLIB::ChannelRhiView::EventMarker> m_stimEvents; /**< Accumulated STIM-channel events across loaded blocks. */
     QMap<int, QColor>                             m_eventTypeColors; /**< Per-type colour palette (built on demand). */
+    QSet<quint64>                                 m_seenStimEventKeys; /**< De-duplicates events when blocks are revisited. */
+    int                                           m_iStimChannel       = -1; /**< Selected trigger channel index (prefer STI 014). */
+    int                                           m_iStimLastSample    = std::numeric_limits<int>::min(); /**< Last scanned sample on the trigger channel. */
+    int                                           m_iStimLastValue     = 0; /**< Trigger value at m_iStimLastSample. */
 
     // ── Buffer sizing ──────────────────────────────────────────────────
     // Each block is 60 s.  Buffer holds kMaxBlocks = 10 blocks = 10 min.
