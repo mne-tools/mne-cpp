@@ -220,6 +220,22 @@ void ChannelDataView::setupLayout()
     connect(m_pModel.data(), &ChannelDataModel::metaChanged,
             this, &ChannelDataView::updateChannelScrollBarRange);
 
+    // Keep label panel in sync with model changes so status pills update immediately.
+    connect(m_pModel.data(), &ChannelDataModel::metaChanged,
+            m_pLabelPanel, QOverload<>::of(&QWidget::update));
+    connect(m_pModel.data(), &ChannelDataModel::dataChanged,
+            m_pLabelPanel, QOverload<>::of(&QWidget::update));
+
+    // Feed current visible sample window to the label panel for the RMS level bar.
+    connect(m_pRhiView, &ChannelRhiView::scrollSampleChanged,
+            this, [this](float sample) {
+                if (m_pLabelPanel && m_pRhiView) {
+                    m_pLabelPanel->setVisibleSampleRange(
+                        static_cast<int>(sample),
+                        static_cast<int>(sample) + m_pRhiView->visibleSampleCount());
+                }
+            });
+
     setFocusProxy(m_pRhiView);
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -376,7 +392,10 @@ QMap<qint32, float> ChannelDataView::scalingMap() const
 void ChannelDataView::hideBadChannels(bool hide)
 {
     m_hideBadChannels = hide;
-    // Future: collapse zero-height lanes for bad channels in the renderer.
+    if (m_pRhiView)
+        m_pRhiView->setHideBadChannels(hide);
+    if (m_pLabelPanel)
+        m_pLabelPanel->setHideBadChannels(hide);
 }
 
 //=============================================================================================================

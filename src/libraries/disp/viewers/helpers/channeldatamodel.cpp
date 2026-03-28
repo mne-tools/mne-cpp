@@ -266,6 +266,28 @@ ChannelDisplayInfo ChannelDataModel::channelInfo(int channelIdx) const
 
 //=============================================================================================================
 
+float ChannelDataModel::channelRms(int channelIdx, int first, int last) const
+{
+    QReadLocker lk(&m_lock);
+    if (channelIdx < 0 || channelIdx >= m_channelData.size())
+        return 0.f;
+    const QVector<float> &src = m_channelData[channelIdx];
+    int bufFirst = qBound(0, first - m_firstSample, src.size());
+    int bufLast  = qBound(0, last  - m_firstSample, src.size());
+    if (bufLast <= bufFirst)
+        return 0.f;
+    // Cap at 1000 samples: use the last kMax samples of the window for speed
+    constexpr int kMax = 1000;
+    if (bufLast - bufFirst > kMax)
+        bufFirst = bufLast - kMax;
+    double sum = 0.0;
+    for (int i = bufFirst; i < bufLast; ++i)
+        sum += static_cast<double>(src[i]) * src[i];
+    return static_cast<float>(qSqrt(sum / (bufLast - bufFirst)));
+}
+
+//=============================================================================================================
+
 QVector<float> ChannelDataModel::decimatedVertices(int   channelIdx,
                                                     int   firstSample,
                                                     int   lastSample,

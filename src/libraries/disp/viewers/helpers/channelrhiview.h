@@ -249,6 +249,18 @@ public:
     void setWheelScrollsChannels(bool channelsMode);
     bool wheelScrollsChannels() const { return m_wheelScrollsChannels; }
 
+    //=========================================================================================================
+    /**
+     * Show or hide waveform traces of channels marked bad.
+     * When @p hide is true the bad-channel traces are suppressed (rendered as flat
+     * centre lines) so the renderer gives immediate visual feedback when the flag
+     * is toggled.  The label panel collapses those rows simultaneously.
+     *
+     * @param[in] hide  true = suppress bad-channel traces.
+     */
+    void setHideBadChannels(bool hide);
+    bool hideBadChannels() const { return m_hideBadChannels; }
+
 signals:
     void scrollSampleChanged(float sample);
     void samplesPerPixelChanged(float spp);
@@ -318,7 +330,8 @@ private:
         QColor bgColor,
         bool  gridVisible,
         float sfreq,
-        int   firstFileSample);
+        int   firstFileSample,
+        bool  hideBadChannels);
     bool isTileFresh() const;
 
     QImage m_tileImage;
@@ -356,6 +369,7 @@ private:
     int    m_firstFileSample      = 0;
     int    m_lastFileSample       = -1;   // -1 = no limit (file not yet known)
     bool   m_wheelScrollsChannels = true; // default: vertical wheel → channels
+    bool   m_hideBadChannels      = false;
 
     // ── Vertical channel windowing ────────────────────────────────────
     int   m_firstVisibleChannel  = 0;

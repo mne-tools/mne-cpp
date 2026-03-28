@@ -447,6 +447,20 @@ void ChannelRhiView::setLastFileSample(int last)
 
 //=============================================================================================================
 
+void ChannelRhiView::setHideBadChannels(bool hide)
+{
+    if (m_hideBadChannels == hide)
+        return;
+    m_hideBadChannels = hide;
+#ifdef MNE_DISP_RHIWIDGET
+    m_vboDirty = true;
+#endif
+    m_tileDirty = true;
+    update();
+}
+
+//=============================================================================================================
+
 void ChannelRhiView::setWheelScrollsChannels(bool channelsMode)
 {
     m_wheelScrollsChannels = channelsMode;
@@ -684,7 +698,12 @@ void ChannelRhiView::updateUBO(QRhiResourceUpdateBatch *batch)
         memset(buf.data(), 0, m_uboStride);
 
         auto info  = m_model->channelInfo(ch);
-        QColor col = info.bad ? QColor(200, 60, 60, 180) : info.color;
+        bool hideThis = m_hideBadChannels && info.bad;
+        // When hiding: use background colour so no trace is painted
+        QColor col = hideThis ? m_bgColor
+                              : (info.bad ? QColor(200, 60, 60, 180) : info.color);
+        // When hiding bad channel: zero amplitude range → flat invisible line
+        float  yRng = hideThis ? 0.f : laneRange;
 
         float rgba[4] = {
             static_cast<float>(col.redF()),
@@ -705,7 +724,7 @@ void ChannelRhiView::updateUBO(QRhiResourceUpdateBatch *batch)
         writeFloat (d, kUboOffsetViewWidth,      vw);
         writeFloat (d, kUboOffsetViewHeight,     vh);
         writeFloat (d, kUboOffsetChannelYCenter, yCenter);
-        writeFloat (d, kUboOffsetChannelYRange,  laneRange);
+        writeFloat (d, kUboOffsetChannelYRange,  yRng);
         writeFloat (d, kUboOffsetAmplitudeMax,   info.amplitudeMax);
 
         // UBO slot i corresponds to visible row i
@@ -892,12 +911,14 @@ void ChannelRhiView::scheduleTileRebuild()
     bool              gridVis         = m_gridVisible;
     float             sfreq           = m_sfreq;
     int               firstFileSample = m_firstFileSample;
+    bool              hideBad         = m_hideBadChannels;
 
     m_tileDirty          = false; // cleared now — any new event will set it true again
     m_tileRebuildPending = true;
     m_tileWatcher.setFuture(QtConcurrent::run([=]() {
         return ChannelRhiView::buildTile(model, scrollSample, spp, firstCh, visCnt,
-                                         pw, ph, bg, gridVis, sfreq, firstFileSample);
+                                         pw, ph, bg, gridVis, sfreq, firstFileSample,
+                                         hideBad);
     }));
 }
 
@@ -909,7 +930,8 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
     int firstCh, int visCnt,
     int pw, int ph,
     QColor bgColor, bool gridVisible,
-    float sfreq, int firstFileSample)
+    float sfreq, int firstFileSample,
+    bool hideBadChannels)
 {
     TileResult out;
     out.samplesPerPixel = spp;
@@ -989,13 +1011,18 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
     // ── Channel waveform pass ───────────────────────────────────────────
     for (int i = 0; i < visibleCount; ++i) {
         int ch = firstCh + i;
+        auto info = model->channelInfo(ch);
+
+        // Skip trace for bad channels when hiding
+        if (hideBadChannels && info.bad)
+            continue;
+
         int vboFirst = 0;
         QVector<float> verts = model->decimatedVertices(
             ch, firstSample, lastSample, tilePixWidth, vboFirst);
         if (verts.size() < 4)
             continue;
 
-        auto info  = model->channelInfo(ch);
         QColor col = info.bad ? QColor(190, 40, 40) : info.color;
         p.setPen(QPen(col, 1.2));
 

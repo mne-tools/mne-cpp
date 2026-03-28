@@ -93,6 +93,23 @@ public:
      */
     void setVisibleChannelCount(int count);
 
+    //=========================================================================================================
+    /**
+     * Show or hide bad-channel rows.  When @p hide is true, bad channels are
+     * collapsed to a minimal strip so that good channels fill the panel.
+     */
+    void setHideBadChannels(bool hide);
+
+    //=========================================================================================================
+    /**
+     * Update the visible sample window used for the per-channel RMS level bar.
+     * Call this whenever the horizontal scroll position changes.
+     *
+     * @param[in] firstSample  Absolute first sample in the visible window.
+     * @param[in] lastSample   Absolute last  sample (exclusive) in the visible window.
+     */
+    void setVisibleSampleRange(int firstSample, int lastSample);
+
     QSize sizeHint()        const override;
     QSize minimumSizeHint() const override;
 
@@ -115,6 +132,10 @@ private:
     QPointer<ChannelDataModel> m_model;
     int  m_firstVisibleChannel = 0;
     int  m_visibleChannelCount = 12;
+
+    bool  m_hideBadChannels = false;
+    int   m_visSampleFirst  = 0;
+    int   m_visSampleLast   = 0;
 
     bool  m_dragging       = false;
     int   m_dragStartY     = 0;
