@@ -77,6 +77,16 @@ typedef QPair<const double*,qint32> RowVectorPair;
 typedef QPair<const float*,qint32> RowVectorPairF;
 typedef QPair<int,int> QPairInts;
 
+struct WhiteningSettings
+{
+    double regMag = 0.1;
+    double regGrad = 0.1;
+    double regEeg = 0.1;
+    bool useProj = true;
+    bool enableButterfly = false;
+    bool enableLayout = false;
+};
+
 namespace RawModelRoles
 {
     enum ItemRole{GetChannelMean = Qt::UserRole + 1000};
@@ -128,5 +138,6 @@ Q_DECLARE_METATYPE(MNEBROWSE::MatrixXdR);
 Q_DECLARE_METATYPE(MNEBROWSE::RowVectorPair);
 Q_DECLARE_METATYPE(QList<MNEBROWSE::RowVectorPair>);
 Q_DECLARE_METATYPE(QSharedPointer<DISPLIB::MNEOperator>);
+Q_DECLARE_METATYPE(MNEBROWSE::WhiteningSettings);
 
 #endif // TYPES_H

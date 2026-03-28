@@ -70,10 +70,6 @@ using namespace MNEBROWSE;
 namespace
 {
 
-constexpr double kDefaultWhitenRegMag = 0.1;
-constexpr double kDefaultWhitenRegGrad = 0.1;
-constexpr double kDefaultWhitenRegEeg = 0.1;
-
 bool matchesButterflySelection(const FIFFLIB::FiffChInfo& channelInfo,
                                const QString& selectionText)
 {
@@ -144,7 +140,8 @@ Eigen::MatrixXd createWhitener(const FIFFLIB::FiffCov& covariance)
 }
 
 bool whitenButterflyEvoked(FIFFLIB::FiffEvoked& evoked,
-                           const FIFFLIB::FiffCov& covariance)
+                           const FIFFLIB::FiffCov& covariance,
+                           const WhiteningSettings& settings)
 {
     if(covariance.isEmpty() || evoked.isEmpty() || evoked.data.rows() == 0) {
         return false;
@@ -152,10 +149,10 @@ bool whitenButterflyEvoked(FIFFLIB::FiffEvoked& evoked,
 
     const FIFFLIB::FiffCov regularizedCov =
         covariance.regularize(evoked.info,
-                              kDefaultWhitenRegMag,
-                              kDefaultWhitenRegGrad,
-                              kDefaultWhitenRegEeg,
-                              true);
+                              settings.regMag,
+                              settings.regGrad,
+                              settings.regEeg,
+                              settings.useProj);
 
     const FIFFLIB::FiffCov preparedCov =
         regularizedCov.prepare_noise_cov(evoked.info, evoked.info.ch_names);
@@ -176,6 +173,7 @@ bool whitenButterflyEvoked(FIFFLIB::FiffEvoked& evoked,
 FIFFLIB::FiffEvoked buildButterflyEvoked(const FIFFLIB::FiffEvoked& sourceEvoked,
                                          const QString& selectionText,
                                          const FIFFLIB::FiffCov& covariance,
+                                         const WhiteningSettings& settings,
                                          bool whiten,
                                          bool* whiteningApplied)
 {
@@ -186,7 +184,7 @@ FIFFLIB::FiffEvoked buildButterflyEvoked(const FIFFLIB::FiffEvoked& sourceEvoked
 
     bool didApplyWhitening = false;
     if(whiten) {
-        didApplyWhitening = whitenButterflyEvoked(displayEvoked, covariance);
+        didApplyWhitening = whitenButterflyEvoked(displayEvoked, covariance, settings);
     }
 
     if(whiteningApplied) {
@@ -308,8 +306,26 @@ void AverageWindow::setNoiseCovariance(const FIFFLIB::FiffCov& covariance)
 void AverageWindow::clearNoiseCovariance()
 {
     m_noiseCovariance.clear();
-    m_bWhitenButterfly = false;
+    m_whiteningSettings.enableButterfly = false;
+    m_whiteningSettings.enableLayout = false;
     refreshPlots();
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::setWhiteningSettings(const WhiteningSettings& settings)
+{
+    m_whiteningSettings = settings;
+    refreshPlots();
+}
+
+
+//*************************************************************************************************************
+
+WhiteningSettings AverageWindow::whiteningSettings() const
+{
+    return m_whiteningSettings;
 }
 
 
@@ -321,7 +337,7 @@ void AverageWindow::setButterflyWhiteningEnabled(bool enabled)
         return;
     }
 
-    m_bWhitenButterfly = enabled;
+    m_whiteningSettings.enableButterfly = enabled;
     refreshPlots();
 }
 
@@ -330,7 +346,7 @@ void AverageWindow::setButterflyWhiteningEnabled(bool enabled)
 
 bool AverageWindow::isButterflyWhiteningEnabled() const
 {
-    return m_bWhitenButterfly;
+    return m_whiteningSettings.enableButterfly;
 }
 
 //*************************************************************************************************************
@@ -493,6 +509,26 @@ void AverageWindow::refreshPlots()
         selectedRows = ui->m_tableView_loadedSets->selectionModel()->selectedRows(0);
     }
 
+    m_layoutDisplayEvokeds.clear();
+    m_layoutDisplayEvokeds.reserve(selectedRows.size());
+
+    for(int rowIndex = 0; rowIndex < selectedRows.size(); ++rowIndex) {
+        const QModelIndex index = selectedRows.at(rowIndex);
+        const FIFFLIB::FiffEvoked* sourceEvoked = m_pAverageModel->getEvoked(index.row());
+
+        if(!sourceEvoked) {
+            m_layoutDisplayEvokeds.append(FIFFLIB::FiffEvoked());
+            continue;
+        }
+
+        FIFFLIB::FiffEvoked displayEvoked(*sourceEvoked);
+        if(m_whiteningSettings.enableLayout) {
+            whitenButterflyEvoked(displayEvoked, m_noiseCovariance, m_whiteningSettings);
+        }
+
+        m_layoutDisplayEvokeds.append(displayEvoked);
+    }
+
     //Get current items from the average scene
     QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
 
@@ -504,17 +540,25 @@ void AverageWindow::refreshPlots()
 
         //Do for all selected evoked sets
         for(int u = 0; u < selectedRows.size(); ++u) {
-            //Get only the necessary data from the average model (use column 4)
-            QModelIndex index = selectedRows.at(u);
+            if(u >= m_layoutDisplayEvokeds.size()) {
+                continue;
+            }
 
-            const QModelIndex modelIndex = m_pAverageModel->index(index.row(), 0);
-            const FiffInfo* fiffInfo = m_pAverageModel->data(modelIndex, AverageModelRoles::GetFiffInfo).value<const FiffInfo*>();
-            RowVectorPair averageData = m_pAverageModel->data(modelIndex, AverageModelRoles::GetAverageData).value<RowVectorPair>();
-            int first = m_pAverageModel->data(modelIndex, AverageModelRoles::GetFirstSample).toInt();
-            int last = m_pAverageModel->data(modelIndex, AverageModelRoles::GetLastSample).toInt();
+            const QModelIndex index = selectedRows.at(u);
+            const FIFFLIB::FiffEvoked& displayEvoked = m_layoutDisplayEvokeds.at(u);
+            if(displayEvoked.isEmpty() || displayEvoked.data.rows() == 0) {
+                continue;
+            }
+
+            const FiffInfo* fiffInfo = &displayEvoked.info;
+            RowVectorPair averageData;
+            averageData.first = displayEvoked.data.data();
+            averageData.second = displayEvoked.data.cols();
+            const int first = displayEvoked.first;
+            const int last = displayEvoked.last;
 
             //Get the averageScenItem specific data row
-            int channelNumber = m_mappedChannelNames.indexOf(averageSceneItemTemp->m_sChannelName);
+            int channelNumber = fiffInfo->ch_names.indexOf(averageSceneItemTemp->m_sChannelName);
 
             if(channelNumber != -1) {
                 averageSceneItemTemp->m_firstLastSample.first = first;
@@ -523,7 +567,8 @@ void AverageWindow::refreshPlots()
                 averageSceneItemTemp->m_iChannelUnit = fiffInfo->chs.at(channelNumber).unit;;
                 averageSceneItemTemp->m_iChannelNumber = channelNumber;
                 averageSceneItemTemp->m_iTotalNumberChannels = fiffInfo->ch_names.size();
-                averageSceneItemTemp->m_lAverageData.append(QPair<QString, RowVectorPair>("0",averageData));
+                averageSceneItemTemp->m_lAverageData.append(QPair<QString, RowVectorPair>(index.data(Qt::DisplayRole).toString(),
+                                                                                           averageData));
             }
         }
     }
@@ -557,7 +602,8 @@ void AverageWindow::refreshPlots()
         FIFFLIB::FiffEvoked displayEvoked = buildButterflyEvoked(*sourceEvoked,
                                                                  ui->m_comboBox_channelKind->currentText(),
                                                                  m_noiseCovariance,
-                                                                 m_bWhitenButterfly,
+                                                                 m_whiteningSettings,
+                                                                 m_whiteningSettings.enableButterfly,
                                                                  &whiteningApplied);
 
         if(displayEvoked.data.rows() == 0 || displayEvoked.data.cols() == 0) {

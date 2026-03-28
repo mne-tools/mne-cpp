@@ -211,6 +211,24 @@ QList<int> evokedEventCodesFromSettings(const QSettings& settings)
     return selectedEventCodes;
 }
 
+WhiteningSettings whiteningSettingsFromSettings(const QSettings& settings)
+{
+    WhiteningSettings whiteningSettings;
+    whiteningSettings.regMag = settings.value("MainWindow/Covariance/whitenRegMag", whiteningSettings.regMag).toDouble();
+    whiteningSettings.regGrad = settings.value("MainWindow/Covariance/whitenRegGrad", whiteningSettings.regGrad).toDouble();
+    whiteningSettings.regEeg = settings.value("MainWindow/Covariance/whitenRegEeg", whiteningSettings.regEeg).toDouble();
+    whiteningSettings.useProj = settings.value("MainWindow/Covariance/whitenUseProj", whiteningSettings.useProj).toBool();
+    return whiteningSettings;
+}
+
+void saveWhiteningSettings(QSettings& settings, const WhiteningSettings& whiteningSettings)
+{
+    settings.setValue("MainWindow/Covariance/whitenRegMag", whiteningSettings.regMag);
+    settings.setValue("MainWindow/Covariance/whitenRegGrad", whiteningSettings.regGrad);
+    settings.setValue("MainWindow/Covariance/whitenRegEeg", whiteningSettings.regEeg);
+    settings.setValue("MainWindow/Covariance/whitenUseProj", whiteningSettings.useProj);
+}
+
 Eigen::VectorXi reviewedEpochSelection(const MNELIB::MNEEpochDataList& epochList,
                                        bool respectAutoRejects)
 {
@@ -585,6 +603,38 @@ RawModel* MainWindow::rawModel() const
 
 //*************************************************************************************************************
 
+WhiteningSettings MainWindow::covarianceWhiteningSettings() const
+{
+    return m_pAverageWindow ? m_pAverageWindow->whiteningSettings()
+                            : whiteningSettingsFromSettings(m_qSettings);
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::setCovarianceWhiteningSettings(const WhiteningSettings& settings, bool saveSettings)
+{
+    if(saveSettings) {
+        saveWhiteningSettings(m_qSettings, settings);
+    }
+
+    if(m_pAverageWindow) {
+        m_pAverageWindow->setWhiteningSettings(settings);
+    }
+
+    if(m_pCovarianceWindow) {
+        m_pCovarianceWindow->setWhiteningSettings(settings);
+    }
+
+    if(m_pWhitenButterflyAction) {
+        QSignalBlocker blocker(m_pWhitenButterflyAction);
+        m_pWhitenButterflyAction->setChecked(settings.enableButterfly);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void MainWindow::setupWindowWidgets()
 {
     //Create data window
@@ -599,6 +649,11 @@ void MainWindow::setupWindowWidgets()
     m_pAnnotationWindow = new AnnotationWindow(this);
     addDockWidget(Qt::LeftDockWidgetArea, m_pAnnotationWindow);
     m_pAnnotationWindow->hide();
+
+    //Create dockable covariance window
+    m_pCovarianceWindow = new CovarianceWindow(this);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pCovarianceWindow);
+    m_pCovarianceWindow->hide();
 
     //Create dockable epoch-review window
     m_pEpochWindow = new EpochWindow(this);
@@ -658,6 +713,7 @@ void MainWindow::setupWindowWidgets()
     m_pDataWindow->init();
     m_pEventWindow->init();
     m_pAnnotationWindow->init();
+    m_pCovarianceWindow->init();
     m_pEpochWindow->init();
     m_pVirtualChannelWindow->init();
     m_pScaleWindow->init();
@@ -665,6 +721,7 @@ void MainWindow::setupWindowWidgets()
     //Create the toolbar after all indows have been initiliased
     createToolBar();
     m_pAverageWindow->setRecomputeAvailable(!evokedEventCodesFromSettings(m_qSettings).isEmpty());
+    setCovarianceWhiteningSettings(whiteningSettingsFromSettings(m_qSettings), false);
 
     //Connect window signals
     //Change scaling of the data and averaged data whenever a spinbox value changed or the user performs a pinch gesture on the view
@@ -716,6 +773,16 @@ void MainWindow::setupWindowWidgets()
     connect(m_pEpochWindow->getEpochModel(), &EpochModel::epochsChanged,
             this, [this]() {
                 refreshReviewedEvokedSet(QStringLiteral("Evoked responses updated from the reviewed epochs."));
+            });
+
+    connect(m_pCovarianceWindow, &CovarianceWindow::whiteningSettingsChanged,
+            this, [this](const WhiteningSettings& settings) {
+                setCovarianceWhiteningSettings(settings);
+                if((settings.enableButterfly || settings.enableLayout)
+                   && !m_covariance.isEmpty()
+                   && !m_pAverageWindow->isVisible()) {
+                    showWindow(m_pAverageWindow);
+                }
             });
 
     connect(m_pDataWindow, &DataWindow::annotationRangeSelected,
@@ -942,6 +1009,9 @@ void MainWindow::connectMenus()
     QAction* annotationManagerAction = new QAction(tr("Annotation manager..."), this);
     ui->menuWindows->insertAction(ui->m_informationAction, annotationManagerAction);
 
+    QAction* covarianceManagerAction = new QAction(tr("Covariance manager..."), this);
+    ui->menuWindows->insertAction(ui->m_informationAction, covarianceManagerAction);
+
     QAction* epochManagerAction = new QAction(tr("Epoch manager..."), this);
     ui->menuWindows->insertAction(ui->m_informationAction, epochManagerAction);
 
@@ -978,7 +1048,9 @@ void MainWindow::connectMenus()
             return;
         }
 
-        m_pAverageWindow->setButterflyWhiteningEnabled(checked);
+        WhiteningSettings settings = covarianceWhiteningSettings();
+        settings.enableButterfly = checked;
+        setCovarianceWhiteningSettings(settings);
 
         if(checked && !m_pAverageWindow->isVisible()) {
             showWindow(m_pAverageWindow);
@@ -1004,6 +1076,9 @@ void MainWindow::connectMenus()
     });
     connect(annotationManagerAction, &QAction::triggered, this, [this](){
         showWindow(m_pAnnotationWindow);
+    });
+    connect(covarianceManagerAction, &QAction::triggered, this, [this](){
+        showWindow(m_pCovarianceWindow);
     });
     connect(epochManagerAction, &QAction::triggered, this, [this](){
         showWindow(m_pEpochWindow);
@@ -1159,6 +1234,12 @@ void MainWindow::syncAuxWindowsToFiffInfo(FiffInfo::SPtr fiffInfo,
     m_pAnnotationWindow->getAnnotationModel()->setFiffInfo(fiffInfo);
     m_pAnnotationWindow->getAnnotationModel()->setFirstLastSample(firstSample, lastSample);
     m_pVirtualChannelWindow->setAvailableChannelNames(fiffInfo->ch_names);
+    if(!m_covariance.isEmpty()) {
+        const QString covarianceSource = m_qCovFile.fileName().isEmpty()
+            ? QStringLiteral("Computed during this session")
+            : QStringLiteral("Loaded from %1").arg(QFileInfo(m_qCovFile.fileName()).fileName());
+        m_pCovarianceWindow->setCovariance(m_covariance, covarianceSource, fiffInfo);
+    }
 
     m_pScaleWindow->hideSpinBoxes(fiffInfo);
 
@@ -1484,6 +1565,11 @@ bool MainWindow::loadRawFile(const QString& filename)
         m_qVirtualChannelFile.close();
     m_qVirtualChannelFile.setFileName(QString());
     m_pAverageWindow->clearNoiseCovariance();
+    m_pCovarianceWindow->clearCovariance();
+    WhiteningSettings whiteningSettings = covarianceWhiteningSettings();
+    whiteningSettings.enableButterfly = false;
+    whiteningSettings.enableLayout = false;
+    setCovarianceWhiteningSettings(whiteningSettings, false);
     if(m_pWhitenButterflyAction) {
         m_pWhitenButterflyAction->setChecked(false);
     }
@@ -2094,6 +2180,9 @@ void MainWindow::computeCovariance()
     }
     m_qCovFile.setFileName(QString());
     m_pAverageWindow->setNoiseCovariance(m_covariance);
+    m_pCovarianceWindow->setCovariance(m_covariance,
+                                       QStringLiteral("Computed from %1").arg(QFileInfo(m_qFileRaw.fileName()).fileName()),
+                                       FIFFLIB::FiffInfo::SPtr(new FIFFLIB::FiffInfo(raw.info)));
 
     setWindowStatus();
 
@@ -2102,6 +2191,11 @@ void MainWindow::computeCovariance()
                              QString("Computed a %1 x %1 covariance matrix with %2 degrees of freedom.\nUse File > Save Covariance (fif)... to store it.")
                                  .arg(m_covariance.dim)
                                  .arg(m_covariance.nfree));
+
+    if(!m_pCovarianceWindow->isVisible()) {
+        m_pCovarianceWindow->show();
+    }
+    m_pCovarianceWindow->raise();
 }
 
 
@@ -2135,8 +2229,16 @@ void MainWindow::loadCovariance()
     m_qCovFile.setFileName(filename);
     m_covariance = covariance;
     m_pAverageWindow->setNoiseCovariance(m_covariance);
+    m_pCovarianceWindow->setCovariance(m_covariance,
+                                       QStringLiteral("Loaded from %1").arg(QFileInfo(filename).fileName()),
+                                       m_pDataWindow->fiffInfo());
 
     setWindowStatus();
+
+    if(!m_pCovarianceWindow->isVisible()) {
+        m_pCovarianceWindow->show();
+    }
+    m_pCovarianceWindow->raise();
 }
 
 
