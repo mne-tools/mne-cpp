@@ -249,12 +249,16 @@ void MainWindow::createToolBar()
             m_pRemoveDCAction->setToolTip("Remove DC component");
             m_pDataWindow->setStatusTip(tr("Remove the DC component by subtracting the channel mean"));
             m_pDataWindow->getDataDelegate()->setRemoveDC(false);
+            if (m_pDataWindow->getChannelDataView())
+                m_pDataWindow->getChannelDataView()->setRemoveDC(false);
         }
         else {
             m_pRemoveDCAction->setIcon(QIcon(":/Resources/Images/addDC.png"));
             m_pRemoveDCAction->setToolTip("Add DC component");
             m_pRemoveDCAction->setStatusTip(tr("Add the DC component"));
             m_pDataWindow->getDataDelegate()->setRemoveDC(true);
+            if (m_pDataWindow->getChannelDataView())
+                m_pDataWindow->getChannelDataView()->setRemoveDC(true);
         }
 
         m_pDataWindow->updateDataTableViews();

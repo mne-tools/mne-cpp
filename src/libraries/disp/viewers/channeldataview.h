@@ -51,6 +51,8 @@
 #include <QStringList>
 #include <QVector>
 
+#include "helpers/channelrhiview.h"
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -82,7 +84,6 @@ namespace DISPLIB
 
 class ChannelDataModel;
 class ChannelLabelPanel;
-class ChannelRhiView;
 class TimeRulerWidget;
 
 //=============================================================================================================
@@ -270,6 +271,15 @@ public:
      * @param[in] last   Absolute sample index of the file's last sample.
      */
     void setFileBounds(int first, int last);
+
+    //=========================================================================================================
+    /**
+     * Set the list of event / stimulus markers to display as coloured vertical lines.
+     * Pass an empty vector to clear all markers.
+     *
+     * @param[in] events  List of EventMarker objects.
+     */
+    void setEvents(const QVector<ChannelRhiView::EventMarker> &events);
 
     // ── AbstractView overrides ────────────────────────────────────────
     void saveSettings() override;

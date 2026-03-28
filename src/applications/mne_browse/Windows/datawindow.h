@@ -48,6 +48,7 @@
 #include "../Models/fiffblockreader.h"
 
 #include <disp/viewers/channeldataview.h>
+#include <disp/viewers/helpers/channelrhiview.h>
 
 
 //*************************************************************************************************************
@@ -206,6 +207,12 @@ public:
      */
     void hideBadChannels(bool hideChannels);
 
+    //=========================================================================================================
+    /**
+     * Returns the GPU-accelerated ChannelDataView (may be nullptr before loadFiffFile).
+     */
+    DISPLIB::ChannelDataView* getChannelDataView() { return m_pChannelDataView; }
+
 private:
     //=========================================================================================================
     /**
@@ -281,6 +288,10 @@ private:
     int                       m_iCurrentScrollSample = 0;      /**< Last known scroll position (absolute sample). */
     bool                      m_bLoadingBlock       = false;   /**< Async load in progress. */
     QString                   m_sFiffFilePath;                 /**< Path of the currently open FIFF file. */
+
+    // ── STIM event cache ───────────────────────────────────────────────
+    QVector<DISPLIB::ChannelRhiView::EventMarker> m_stimEvents; /**< Accumulated STIM-channel events across loaded blocks. */
+    QMap<int, QColor>                             m_eventTypeColors; /**< Per-type colour palette (built on demand). */
 
     // ── Buffer sizing ──────────────────────────────────────────────────
     // Each block is 60 s.  Buffer holds kMaxBlocks = 10 blocks = 10 min.
