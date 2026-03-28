@@ -51,6 +51,7 @@
 #include <QInputDialog>
 #include <QListWidget>
 #include <QLineEdit>
+#include <QSignalBlocker>
 #include <QSpinBox>
 #include <QVBoxLayout>
 #include <QFileInfo>
@@ -103,6 +104,19 @@ QString defaultAnnotationFilePath(const QString& rawFilePath)
     }
 
     return rawFilePath + "-annot.json";
+}
+
+QString defaultVirtualChannelFilePath(const QString& rawFilePath)
+{
+    if(rawFilePath.isEmpty()) {
+        return QString();
+    }
+
+    if(rawFilePath.endsWith(".fif", Qt::CaseInsensitive)) {
+        return rawFilePath.left(rawFilePath.size() - 4) + "-virtchan.json";
+    }
+
+    return rawFilePath + "-virtchan.json";
 }
 
 QMap<int, int> countEventsByType(const MatrixXi& events)
@@ -532,6 +546,11 @@ void MainWindow::setupWindowWidgets()
     addDockWidget(Qt::LeftDockWidgetArea, m_pAnnotationWindow);
     m_pAnnotationWindow->hide();
 
+    //Create dockable virtual-channel window
+    m_pVirtualChannelWindow = new VirtualChannelWindow(this);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pVirtualChannelWindow);
+    m_pVirtualChannelWindow->hide();
+
     //Create dockable information window - QTDesigner used - see / FormFiles
     m_pInformationWindow = new InformationWindow(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pInformationWindow);
@@ -580,6 +599,7 @@ void MainWindow::setupWindowWidgets()
     m_pDataWindow->init();
     m_pEventWindow->init();
     m_pAnnotationWindow->init();
+    m_pVirtualChannelWindow->init();
     m_pScaleWindow->init();
 
     //Create the toolbar after all indows have been initiliased
@@ -631,6 +651,13 @@ void MainWindow::setupWindowWidgets()
 
     connect(m_pDataWindow, &DataWindow::annotationRangeSelected,
             this, &MainWindow::handleAnnotationRangeSelected);
+
+    connect(m_pVirtualChannelWindow->getVirtualChannelModel(), &VirtualChannelModel::virtualChannelsChanged,
+            this, [this]() {
+                m_pDataWindow->setVirtualChannels(
+                    m_pVirtualChannelWindow->getVirtualChannelModel()->virtualChannels());
+                setWindowStatus();
+            });
 
     //Connect channel info window with raw data model, layout manager, average manager and the data window
     connect(rawModel(), &RawModel::fileLoaded,
@@ -830,12 +857,21 @@ void MainWindow::connectMenus()
     QAction* saveAnnotationsAction = new QAction(tr("Save Annotations..."), this);
     ui->menuTest->insertAction(ui->m_loadEvokedAction, saveAnnotationsAction);
 
+    QAction* loadVirtualChannelsAction = new QAction(tr("Load Virtual Channels..."), this);
+    ui->menuTest->insertAction(ui->m_loadEvokedAction, loadVirtualChannelsAction);
+
+    QAction* saveVirtualChannelsAction = new QAction(tr("Save Virtual Channels..."), this);
+    ui->menuTest->insertAction(ui->m_loadEvokedAction, saveVirtualChannelsAction);
+
     m_pWhitenButterflyAction = new QAction(tr("Whiten Butterfly Plot"), this);
     m_pWhitenButterflyAction->setCheckable(true);
     ui->menuTest->insertAction(ui->m_quitAction, m_pWhitenButterflyAction);
 
     QAction* annotationManagerAction = new QAction(tr("Annotation manager..."), this);
     ui->menuWindows->insertAction(ui->m_informationAction, annotationManagerAction);
+
+    QAction* virtualChannelManagerAction = new QAction(tr("Virtual channel manager..."), this);
+    ui->menuWindows->insertAction(ui->m_informationAction, virtualChannelManagerAction);
 
     m_pAnnotationModeAction = new QAction(tr("Annotation Mode"), this);
     m_pAnnotationModeAction->setCheckable(true);
@@ -849,6 +885,8 @@ void MainWindow::connectMenus()
     connect(ui->m_saveEvents, &QAction::triggered, this, &MainWindow::saveEvents);
     connect(loadAnnotationsAction, &QAction::triggered, this, &MainWindow::loadAnnotations);
     connect(saveAnnotationsAction, &QAction::triggered, this, &MainWindow::saveAnnotations);
+    connect(loadVirtualChannelsAction, &QAction::triggered, this, &MainWindow::loadVirtualChannels);
+    connect(saveVirtualChannelsAction, &QAction::triggered, this, &MainWindow::saveVirtualChannels);
     connect(loadCovarianceAction, &QAction::triggered, this, &MainWindow::loadCovariance);
     connect(computeCovarianceAction, &QAction::triggered, this, &MainWindow::computeCovariance);
     connect(saveCovarianceAction, &QAction::triggered, this, &MainWindow::saveCovariance);
@@ -890,6 +928,9 @@ void MainWindow::connectMenus()
     });
     connect(annotationManagerAction, &QAction::triggered, this, [this](){
         showWindow(m_pAnnotationWindow);
+    });
+    connect(virtualChannelManagerAction, &QAction::triggered, this, [this](){
+        showWindow(m_pVirtualChannelWindow);
     });
     connect(ui->m_informationAction, &QAction::triggered, this, [this](){
         showWindow(m_pInformationWindow);
@@ -981,6 +1022,18 @@ void MainWindow::setWindowStatus()
         title.append("  -  No annotations");
     }
 
+    if(m_pVirtualChannelWindow->getVirtualChannelModel()->rowCount() > 0) {
+        if(m_qVirtualChannelFile.fileName().isEmpty()) {
+            title.append("  -  Virtual channels: unsaved");
+        } else {
+            int idx = m_qVirtualChannelFile.fileName().lastIndexOf("/");
+            QString filename = m_qVirtualChannelFile.fileName().remove(0,idx+1);
+            title.append(QString("  -  Virtual channels: %1").arg(filename));
+        }
+    } else {
+        title.append("  -  No virtual channels");
+    }
+
     //Set evoked file informations
     if(m_pAverageWindow->getAverageModel()->isFileLoaded()) {
         if(m_qEvokedFile.fileName().isEmpty()) {
@@ -1026,6 +1079,7 @@ void MainWindow::syncAuxWindowsToFiffInfo(FiffInfo::SPtr fiffInfo,
     m_pEventWindow->getEventModel()->setFirstLastSample(firstSample, lastSample);
     m_pAnnotationWindow->getAnnotationModel()->setFiffInfo(fiffInfo);
     m_pAnnotationWindow->getAnnotationModel()->setFirstLastSample(firstSample, lastSample);
+    m_pVirtualChannelWindow->setAvailableChannelNames(fiffInfo->ch_names);
 
     m_pScaleWindow->hideSpinBoxes(fiffInfo);
 
@@ -1270,6 +1324,67 @@ void MainWindow::saveAnnotations()
     setWindowStatus();
 }
 
+//*************************************************************************************************************
+
+void MainWindow::loadVirtualChannels()
+{
+    if(m_qFileRaw.fileName().isEmpty()) {
+        QMessageBox::warning(this,
+                             "Load Virtual Channels",
+                             "Load a raw FIF file before opening virtual channels.");
+        return;
+    }
+
+    const QString filename = QFileDialog::getOpenFileName(this,
+                                                          QString("Open virtual-channel file"),
+                                                          QFileInfo(defaultVirtualChannelFilePath(m_qFileRaw.fileName())).absolutePath(),
+                                                          tr("virtual channel files (*-virtchan.json *.json)"));
+
+    if(filename.isEmpty()) {
+        return;
+    }
+
+    loadVirtualChannelsFile(filename);
+}
+
+//*************************************************************************************************************
+
+void MainWindow::saveVirtualChannels()
+{
+    if(m_pVirtualChannelWindow->getVirtualChannelModel()->rowCount() == 0) {
+        QMessageBox::warning(this,
+                             "Save Virtual Channels",
+                             "Create or load at least one virtual channel before saving.");
+        return;
+    }
+
+    QString defaultPath = m_qVirtualChannelFile.fileName();
+    if(defaultPath.isEmpty()) {
+        defaultPath = defaultVirtualChannelFilePath(m_qFileRaw.fileName());
+    }
+
+    const QString filename = QFileDialog::getSaveFileName(this,
+                                                          QString("Save virtual-channel file"),
+                                                          defaultPath,
+                                                          tr("virtual channel files (*-virtchan.json *.json)"));
+
+    if(filename.isEmpty()) {
+        return;
+    }
+
+    if(m_qVirtualChannelFile.isOpen()) {
+        m_qVirtualChannelFile.close();
+    }
+    m_qVirtualChannelFile.setFileName(filename);
+
+    if(m_pVirtualChannelWindow->getVirtualChannelModel()->saveVirtualChannels(m_qVirtualChannelFile)) {
+        qInfo() << "Virtual-channel file" << filename << "saved.";
+        setWindowStatus();
+    } else {
+        qWarning() << "ERROR saving virtual-channel file" << filename;
+    }
+}
+
 
 //*************************************************************************************************************
 
@@ -1286,6 +1401,9 @@ bool MainWindow::loadRawFile(const QString& filename)
     if(m_qAnnotationFile.isOpen())
         m_qAnnotationFile.close();
     m_qAnnotationFile.setFileName(QString());
+    if(m_qVirtualChannelFile.isOpen())
+        m_qVirtualChannelFile.close();
+    m_qVirtualChannelFile.setFileName(QString());
     m_pAverageWindow->clearNoiseCovariance();
     if(m_pWhitenButterflyAction) {
         m_pWhitenButterflyAction->setChecked(false);
@@ -1293,6 +1411,12 @@ bool MainWindow::loadRawFile(const QString& filename)
 
     m_pEventWindow->getEventModel()->clearModel();
     m_pAnnotationWindow->getAnnotationModel()->clearModel();
+    {
+        QSignalBlocker blocker(m_pVirtualChannelWindow->getVirtualChannelModel());
+        m_pVirtualChannelWindow->getVirtualChannelModel()->clearModel();
+    }
+    m_pVirtualChannelWindow->setAvailableChannelNames(QStringList());
+    m_pDataWindow->setVirtualChannels({}, false);
 
     // ── ChannelDataView path: demand-paged, opens header only (fast) ──
     const bool ok = m_pDataWindow->loadFiffFile(filename);
@@ -1310,6 +1434,11 @@ bool MainWindow::loadRawFile(const QString& filename)
         const QString defaultAnnotationPath = defaultAnnotationFilePath(filename);
         if(QFileInfo::exists(defaultAnnotationPath)) {
             loadAnnotationsFile(defaultAnnotationPath, false);
+        }
+
+        const QString defaultVirtualChannelPath = defaultVirtualChannelFilePath(filename);
+        if(QFileInfo::exists(defaultVirtualChannelPath)) {
+            loadVirtualChannelsFile(defaultVirtualChannelPath, false);
         }
     }
 
@@ -1388,6 +1517,32 @@ bool MainWindow::loadAnnotationsFile(const QString& filename, bool showWindow)
 
     if(ok && showWindow && !m_pAnnotationWindow->isVisible()) {
         m_pAnnotationWindow->show();
+    }
+
+    return ok;
+}
+
+//*************************************************************************************************************
+
+bool MainWindow::loadVirtualChannelsFile(const QString& filename, bool showWindow)
+{
+    if(m_qVirtualChannelFile.isOpen()) {
+        m_qVirtualChannelFile.close();
+    }
+
+    m_qVirtualChannelFile.setFileName(filename);
+
+    const bool ok = m_pVirtualChannelWindow->getVirtualChannelModel()->loadVirtualChannels(m_qVirtualChannelFile);
+    if(ok) {
+        qInfo() << "Virtual-channel file" << filename << "loaded.";
+    } else {
+        qWarning() << "ERROR loading virtual-channel file" << filename;
+    }
+
+    setWindowStatus();
+
+    if(ok && showWindow && !m_pVirtualChannelWindow->isVisible()) {
+        m_pVirtualChannelWindow->show();
     }
 
     return ok;

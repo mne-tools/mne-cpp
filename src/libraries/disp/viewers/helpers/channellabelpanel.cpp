@@ -244,6 +244,8 @@ void ChannelLabelPanel::paintEvent(QPaintEvent *)
             QString statusLine = info.typeLabel;
             if (info.bad)
                 statusLine += QStringLiteral(" \u00B7 bad");   // · bad
+            if (info.isVirtualChannel)
+                statusLine += QStringLiteral(" \u00B7 deriv");
             if (dcActive)
                 statusLine += QStringLiteral(" \u00B7 dc");    // · dc
 
@@ -384,12 +386,14 @@ bool ChannelLabelPanel::event(QEvent *e)
                                               "Type: %2<br>"
                                               "Scale: %3<br>"
                                               "Level: %4 %<br>"
-                                              "Bad: %5")
+                                              "Bad: %5<br>"
+                                              "Virtual: %6")
                     .arg(info.name)
                     .arg(info.typeLabel)
                     .arg(info.amplitudeMax, 0, 'e', 2)
                     .arg(static_cast<int>(level))
-                    .arg(info.bad ? QStringLiteral("yes") : QStringLiteral("no"));
+                    .arg(info.bad ? QStringLiteral("yes") : QStringLiteral("no"))
+                    .arg(info.isVirtualChannel ? QStringLiteral("yes") : QStringLiteral("no"));
                 QToolTip::showText(he->globalPos(), tip, this);
                 return true;
             }

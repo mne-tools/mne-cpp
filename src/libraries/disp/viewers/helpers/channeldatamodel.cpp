@@ -97,7 +97,7 @@ void ChannelDataModel::init(QSharedPointer<FiffInfo> pFiffInfo)
     QWriteLocker lk(&m_lock);
     m_pFiffInfo = pFiffInfo;
 
-    int nCh = pFiffInfo ? pFiffInfo->nchan : 0;
+    int nCh = (pFiffInfo ? pFiffInfo->nchan : 0) + m_virtualDisplayInfo.size();
     m_channelData.resize(nCh);
     for (auto &ch : m_channelData)
         ch.clear();
@@ -190,6 +190,24 @@ void ChannelDataModel::setScaleMap(const QMap<qint32, float> &scaleMap)
 
 //=============================================================================================================
 
+void ChannelDataModel::setVirtualChannels(const QVector<ChannelDisplayInfo> &virtualChannels)
+{
+    {
+        QWriteLocker lk(&m_lock);
+        m_virtualDisplayInfo = virtualChannels;
+
+        const int realChannelCount = m_pFiffInfo ? m_pFiffInfo->nchan : 0;
+        const int totalChannelCount = realChannelCount + m_virtualDisplayInfo.size();
+        m_channelData.resize(totalChannelCount);
+    }
+
+    rebuildDisplayInfo();
+    emit metaChanged();
+    emit dataChanged();
+}
+
+//=============================================================================================================
+
 void ChannelDataModel::setSignalColor(const QColor &color)
 {
     {
@@ -235,7 +253,8 @@ void ChannelDataModel::setChannelBad(int channelIdx, bool bad)
 int ChannelDataModel::channelCount() const
 {
     QReadLocker lk(&m_lock);
-    return m_channelData.size();
+    const int realChannelCount = m_pFiffInfo ? m_pFiffInfo->nchan : 0;
+    return qMax(m_channelData.size(), realChannelCount + m_virtualDisplayInfo.size());
 }
 
 //=============================================================================================================
@@ -385,17 +404,34 @@ QVector<float> ChannelDataModel::decimatedVertices(int   channelIdx,
 void ChannelDataModel::rebuildDisplayInfo()
 {
     QWriteLocker lk(&m_lock);
-    int nCh = m_channelData.size();
+    const int realChannelCount = m_pFiffInfo ? m_pFiffInfo->nchan : 0;
+    const int nCh = qMax(m_channelData.size(), realChannelCount + m_virtualDisplayInfo.size());
     m_displayInfo.resize(nCh);
     for (int ch = 0; ch < nCh; ++ch) {
+        if (ch >= realChannelCount && ch - realChannelCount < m_virtualDisplayInfo.size()) {
+            ChannelDisplayInfo info = m_virtualDisplayInfo.at(ch - realChannelCount);
+            if (info.name.isEmpty())
+                info.name = QString("Virtual %1").arg(ch - realChannelCount + 1);
+            if (info.typeLabel.isEmpty())
+                info.typeLabel = QStringLiteral("MISC");
+            if (!info.color.isValid())
+                info.color = m_signalColor;
+            if (info.amplitudeMax <= 0.f)
+                info.amplitudeMax = kScaleFallback;
+            m_displayInfo[ch] = info;
+            m_displayInfo[ch].isVirtualChannel = true;
+            continue;
+        }
+
         m_displayInfo[ch].amplitudeMax = amplitudeMaxForChannel(ch);
         m_displayInfo[ch].color        = colorForChannel(ch);
-        if (m_pFiffInfo && ch < m_pFiffInfo->nchan)
+        if (m_pFiffInfo && ch < realChannelCount)
             m_displayInfo[ch].name = m_pFiffInfo->ch_names[ch];
         else
             m_displayInfo[ch].name = QString("CH %1").arg(ch + 1);
         m_displayInfo[ch].typeLabel = typeLabelForChannel(ch);
         m_displayInfo[ch].bad = false;
+        m_displayInfo[ch].isVirtualChannel = false;
     }
 }
 

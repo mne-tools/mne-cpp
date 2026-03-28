@@ -39,10 +39,12 @@
 //=============================================================================================================
 
 #include "datawindow.h"
+#include "../Models/virtualchannelmodel.h"
 #include <disp/viewers/helpers/channeldatamodel.h>
 #include <fiff/fiff_constants.h>
 
 #include <algorithm>
+#include <QHash>
 
 #if !defined(NO_QOPENGLWIDGET)
 #include <QOpenGLWidget>
@@ -256,6 +258,35 @@ void DataWindow::setAnnotationSelectionEnabled(bool enabled)
     }
 }
 
+//*************************************************************************************************************
+
+void DataWindow::setVirtualChannels(const QVector<VirtualChannelDefinition> &virtualChannels,
+                                    bool reloadIfOpen)
+{
+    m_virtualChannelDefinitions = virtualChannels;
+    m_resolvedVirtualChannels.clear();
+
+    if(!m_pChannelDataView || !m_pChannelDataView->model()) {
+        return;
+    }
+
+    if(!reloadIfOpen) {
+        m_pChannelDataView->model()->setVirtualChannels({});
+        return;
+    }
+
+    if(!m_pFiffReader || !m_pFiffReader->isOpen()) {
+        return;
+    }
+
+    rebuildVirtualChannels();
+
+    const int targetSample = qBound(m_pFiffReader->firstSample(),
+                                    m_pChannelDataView->firstVisibleSample(),
+                                    m_pFiffReader->lastSample());
+    restartChannelView(targetSample, false);
+}
+
 
 //*************************************************************************************************************
 
@@ -365,52 +396,15 @@ QString DataWindow::fiffFileName() const
 
 bool DataWindow::loadFiffFile(const QString &path)
 {
-    // Block spurious scheduleNextLoad() calls that clearView() will trigger
-    // synchronously via the scrollPositionChanged → onChannelViewScrollChanged chain.
-    m_bLoadingBlock = true;
-
-    m_stimEvents.clear();
-    m_eventTypeColors.clear();
-    m_seenStimEventKeys.clear();
-    m_iStimChannel    = -1;
-    m_iStimLastSample = std::numeric_limits<int>::min();
-    m_iStimLastValue  = 0;
-    m_pChannelDataView->setEvents({});
-    m_pChannelDataView->setAnnotations({});
-    m_pChannelDataView->clearView();
-
     if (!m_pFiffReader->open(path)) {
-        m_bLoadingBlock = false;
         return false;
     }
     m_sFiffFilePath = path;
 
     auto fiffInfo = m_pFiffReader->fiffInfo();
     m_iStimChannel = fiffInfo ? resolveStimChannelIndex(*fiffInfo) : -1;
-    m_pChannelDataView->init(fiffInfo);
-    m_pChannelDataView->setFileBounds(m_pFiffReader->firstSample(),
-                                      m_pFiffReader->lastSample());
-
-    // Ring-buffer size: kMaxBlocks × kBlockSeconds of data
-    int blockSamples = static_cast<int>(kBlockSeconds * fiffInfo->sfreq);
-    m_pChannelDataView->model()->setMaxStoredSamples(kMaxBlocks * blockSamples);
-
-    // Hold off all loading while we set up state.  Both clearView() above
-    // and scrollToSample() below emit scrollPositionChanged synchronously,
-    // which would invoke scheduleNextLoad() with stale / wrong indices.
-    m_bLoadingBlock = true;
-
-    // Seed the loading state before any signal can reach scheduleNextLoad
-    m_iCurrentScrollSample = m_pFiffReader->firstSample();
-    m_iNextLoadSample      = m_iCurrentScrollSample;
-
-    m_pChannelDataView->scrollToSample(m_iCurrentScrollSample, false);
-
-    // All state is correct now — release the guard and start the first block.
-    // onBlockLoaded() will chain subsequent blocks until kLookaheadBlocks of
-    // data are buffered ahead of the current scroll position.
-    m_bLoadingBlock = false;
-    scheduleNextLoad();
+    rebuildVirtualChannels();
+    restartChannelView(m_pFiffReader->firstSample(), true);
 
     return true;
 }
@@ -424,6 +418,7 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
     if (data.rows() == 0 || data.cols() == 0)
         return;
 
+    const Eigen::MatrixXd displayData = appendVirtualChannels(data);
     auto *model = m_pChannelDataView->model();
 
     // Determine whether this block is contiguous with existing model data.
@@ -438,9 +433,9 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
     }
 
     if (useSetData)
-        m_pChannelDataView->setData(data, firstSample);
+        m_pChannelDataView->setData(displayData, firstSample);
     else
-        m_pChannelDataView->addData(data);
+        m_pChannelDataView->addData(displayData);
 
     // ── Scan STIM channels for rising-edge events ─────────────────────
     auto fiffInfo = m_pFiffReader->fiffInfo();
@@ -526,6 +521,198 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
     if (m_iNextLoadSample < newFrontier)
         m_iNextLoadSample = newFrontier;
 
+    scheduleNextLoad();
+}
+
+//=============================================================================================================
+
+void DataWindow::rebuildVirtualChannels()
+{
+    m_resolvedVirtualChannels.clear();
+
+    if(!m_pFiffReader || !m_pFiffReader->isOpen() || !m_pChannelDataView || !m_pChannelDataView->model()) {
+        return;
+    }
+
+    const auto fiffInfo = m_pFiffReader->fiffInfo();
+    if(!fiffInfo) {
+        return;
+    }
+
+    QHash<QString, int> channelIndexByName;
+    for(int channelIndex = 0; channelIndex < fiffInfo->ch_names.size(); ++channelIndex) {
+        channelIndexByName.insert(fiffInfo->ch_names.at(channelIndex).trimmed(), channelIndex);
+    }
+
+    QVector<DISPLIB::ChannelDisplayInfo> virtualDisplayInfo;
+    virtualDisplayInfo.reserve(m_virtualChannelDefinitions.size());
+
+    for(const VirtualChannelDefinition& definition : std::as_const(m_virtualChannelDefinitions)) {
+        const int positiveChannel = channelIndexByName.value(definition.positiveChannel.trimmed(), -1);
+        const int negativeChannel = channelIndexByName.value(definition.negativeChannel.trimmed(), -1);
+
+        if(positiveChannel < 0 || negativeChannel < 0 || positiveChannel == negativeChannel) {
+            qWarning() << "DataWindow: could not resolve virtual channel"
+                       << definition.name
+                       << definition.positiveChannel
+                       << definition.negativeChannel;
+            continue;
+        }
+
+        const auto& positiveChannelInfo = fiffInfo->chs.at(positiveChannel);
+        const auto& negativeChannelInfo = fiffInfo->chs.at(negativeChannel);
+
+        const auto amplitudeForChannel = [](const FIFFLIB::FiffChInfo& channelInfo) -> float {
+            switch(channelInfo.kind) {
+                case FIFFV_MEG_CH:
+                    return channelInfo.unit == FIFF_UNIT_T_M ? 400e-13f : 1.2e-12f;
+                case FIFFV_EEG_CH:
+                    return 30e-6f;
+                case FIFFV_EOG_CH:
+                    return 150e-6f;
+                case FIFFV_EMG_CH:
+                case FIFFV_ECG_CH:
+                    return 1e-3f;
+                case FIFFV_STIM_CH:
+                    return 5.0f;
+                default:
+                    return 1.0f;
+            }
+        };
+
+        const auto colorForKind = [](qint32 kind) -> QColor {
+            switch(kind) {
+                case FIFFV_MEG_CH:
+                    return QColor(20, 90, 180);
+                case FIFFV_EEG_CH:
+                    return QColor(170, 55, 10);
+                case FIFFV_EOG_CH:
+                    return QColor(130, 0, 130);
+                case FIFFV_ECG_CH:
+                    return QColor(190, 15, 45);
+                case FIFFV_EMG_CH:
+                    return QColor(20, 110, 20);
+                case FIFFV_STIM_CH:
+                    return QColor(180, 100, 0);
+                default:
+                    return QColor(Qt::darkGreen);
+            }
+        };
+
+        const auto typeLabelForKind = [](qint32 kind) -> QString {
+            switch(kind) {
+                case FIFFV_MEG_CH:
+                    return QStringLiteral("MEG");
+                case FIFFV_EEG_CH:
+                    return QStringLiteral("EEG");
+                case FIFFV_EOG_CH:
+                    return QStringLiteral("EOG");
+                case FIFFV_ECG_CH:
+                    return QStringLiteral("ECG");
+                case FIFFV_EMG_CH:
+                    return QStringLiteral("EMG");
+                case FIFFV_STIM_CH:
+                    return QStringLiteral("STIM");
+                default:
+                    return QStringLiteral("MISC");
+            }
+        };
+
+        ResolvedVirtualChannel resolvedChannel;
+        resolvedChannel.name = definition.name;
+        resolvedChannel.positiveChannel = positiveChannel;
+        resolvedChannel.negativeChannel = negativeChannel;
+        resolvedChannel.displayInfo.name = definition.name;
+        resolvedChannel.displayInfo.typeLabel =
+            (positiveChannelInfo.kind == negativeChannelInfo.kind)
+            ? typeLabelForKind(positiveChannelInfo.kind)
+            : QStringLiteral("MISC");
+        resolvedChannel.displayInfo.color = colorForKind(positiveChannelInfo.kind).darker(115);
+        resolvedChannel.displayInfo.amplitudeMax =
+            qMax(amplitudeForChannel(positiveChannelInfo), amplitudeForChannel(negativeChannelInfo));
+        if(resolvedChannel.displayInfo.amplitudeMax <= 0.f) {
+            resolvedChannel.displayInfo.amplitudeMax = 1.f;
+        }
+        resolvedChannel.displayInfo.bad = false;
+        resolvedChannel.displayInfo.isVirtualChannel = true;
+
+        m_resolvedVirtualChannels.append(resolvedChannel);
+        virtualDisplayInfo.append(resolvedChannel.displayInfo);
+    }
+
+    m_pChannelDataView->model()->setVirtualChannels(virtualDisplayInfo);
+}
+
+//=============================================================================================================
+
+Eigen::MatrixXd DataWindow::appendVirtualChannels(const Eigen::MatrixXd &data) const
+{
+    if(m_resolvedVirtualChannels.isEmpty()) {
+        return data;
+    }
+
+    Eigen::MatrixXd displayData(data.rows() + m_resolvedVirtualChannels.size(), data.cols());
+    displayData.topRows(data.rows()) = data;
+
+    for(int row = 0; row < m_resolvedVirtualChannels.size(); ++row) {
+        const ResolvedVirtualChannel& virtualChannel = m_resolvedVirtualChannels.at(row);
+        if(virtualChannel.positiveChannel < 0 || virtualChannel.negativeChannel < 0
+           || virtualChannel.positiveChannel >= data.rows()
+           || virtualChannel.negativeChannel >= data.rows()) {
+            displayData.row(data.rows() + row).setZero();
+            continue;
+        }
+
+        displayData.row(data.rows() + row) =
+            data.row(virtualChannel.positiveChannel) - data.row(virtualChannel.negativeChannel);
+    }
+
+    return displayData;
+}
+
+//=============================================================================================================
+
+void DataWindow::restartChannelView(int initialSample, bool clearAnnotations)
+{
+    if(!m_pFiffReader || !m_pFiffReader->isOpen() || !m_pChannelDataView) {
+        return;
+    }
+
+    auto fiffInfo = m_pFiffReader->fiffInfo();
+    if(!fiffInfo) {
+        return;
+    }
+
+    m_bLoadingBlock = true;
+
+    m_stimEvents.clear();
+    m_eventTypeColors.clear();
+    m_seenStimEventKeys.clear();
+    m_iStimLastSample = std::numeric_limits<int>::min();
+    m_iStimLastValue = 0;
+
+    m_pChannelDataView->setEvents({});
+    if(clearAnnotations) {
+        m_pChannelDataView->setAnnotations({});
+    }
+    m_pChannelDataView->clearView();
+    m_pChannelDataView->init(fiffInfo);
+    m_pChannelDataView->setFileBounds(m_pFiffReader->firstSample(),
+                                      m_pFiffReader->lastSample());
+    m_pChannelDataView->hideBadChannels(m_bHideBadChannels);
+    m_pChannelDataView->setChannelFilter(m_slSelectedChannels);
+
+    const int blockSamples = static_cast<int>(kBlockSeconds * fiffInfo->sfreq);
+    m_pChannelDataView->model()->setMaxStoredSamples(kMaxBlocks * blockSamples);
+
+    m_iCurrentScrollSample = qBound(m_pFiffReader->firstSample(),
+                                    initialSample,
+                                    m_pFiffReader->lastSample());
+    m_iNextLoadSample = m_iCurrentScrollSample;
+
+    m_pChannelDataView->scrollToSample(m_iCurrentScrollSample, false);
+
+    m_bLoadingBlock = false;
     scheduleNextLoad();
 }
 

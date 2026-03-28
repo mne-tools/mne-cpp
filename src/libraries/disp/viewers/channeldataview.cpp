@@ -500,7 +500,8 @@ void ChannelDataView::setChannelFilter(const QStringList &names)
     if (!names.isEmpty() && m_pModel) {
         int total = m_pModel->channelCount();
         for (int i = 0; i < total; ++i) {
-            if (names.contains(m_pModel->channelInfo(i).name))
+            const ChannelDisplayInfo info = m_pModel->channelInfo(i);
+            if (info.isVirtualChannel || names.contains(info.name))
                 indices.append(i);
         }
     }
