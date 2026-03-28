@@ -56,9 +56,11 @@ using namespace UTILSLIB;
 
 MNEEpochData::MNEEpochData()
 : event(-1)
+, eventSample(-1)
 , tmin(-1)
 , tmax(-1)
 , bReject(false)
+, bUserReject(false)
 {
 }
 
@@ -67,9 +69,11 @@ MNEEpochData::MNEEpochData()
 MNEEpochData::MNEEpochData(const MNEEpochData &p_MNEEpochData)
 : epoch(p_MNEEpochData.epoch)
 , event(p_MNEEpochData.event)
+, eventSample(p_MNEEpochData.eventSample)
 , tmin(p_MNEEpochData.tmin)
 , tmax(p_MNEEpochData.tmax)
 , bReject(p_MNEEpochData.bReject)
+, bUserReject(p_MNEEpochData.bUserReject)
 {
 }
 

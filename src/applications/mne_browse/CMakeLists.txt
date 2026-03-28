@@ -34,6 +34,7 @@ set(SOURCES
     Models/rawmodel.cpp
     Models/eventmodel.cpp
     Models/annotationmodel.cpp
+    Models/epochmodel.cpp
     Models/virtualchannelmodel.cpp
     Models/fiffblockreader.cpp
     Delegates/averagedelegate.cpp
@@ -43,6 +44,7 @@ set(SOURCES
     Windows/filterwindow.cpp
     Windows/eventwindow.cpp
     Windows/annotationwindow.cpp
+    Windows/epochwindow.cpp
     Windows/virtualchannelwindow.cpp
     Windows/datawindow.cpp
     Windows/aboutwindow.cpp
@@ -67,6 +69,7 @@ set(HEADERS
     Models/rawmodel.h
     Models/eventmodel.h
     Models/annotationmodel.h
+    Models/epochmodel.h
     Models/virtualchannelmodel.h
     Models/fiffblockreader.h
     Delegates/averagedelegate.h
@@ -76,6 +79,7 @@ set(HEADERS
     Windows/filterwindow.h
     Windows/eventwindow.h
     Windows/annotationwindow.h
+    Windows/epochwindow.h
     Windows/virtualchannelwindow.h
     Windows/datawindow.h
     Windows/aboutwindow.h

@@ -56,6 +56,8 @@
 #include <QVBoxLayout>
 #include <QFileInfo>
 
+#include <cmath>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -207,6 +209,27 @@ QList<int> evokedEventCodesFromSettings(const QSettings& settings)
     }
 
     return selectedEventCodes;
+}
+
+Eigen::VectorXi reviewedEpochSelection(const MNELIB::MNEEpochDataList& epochList,
+                                       bool respectAutoRejects)
+{
+    QList<int> selectedIndices;
+    selectedIndices.reserve(epochList.size());
+
+    for(int index = 0; index < epochList.size(); ++index) {
+        const auto& epoch = epochList.at(index);
+        if(epoch && !epoch->isRejected(respectAutoRejects)) {
+            selectedIndices.append(index);
+        }
+    }
+
+    Eigen::VectorXi selection(selectedIndices.size());
+    for(int index = 0; index < selectedIndices.size(); ++index) {
+        selection(index) = selectedIndices.at(index);
+    }
+
+    return selection;
 }
 
 bool showComputeEvokedDialog(QWidget* parent,
@@ -577,6 +600,11 @@ void MainWindow::setupWindowWidgets()
     addDockWidget(Qt::LeftDockWidgetArea, m_pAnnotationWindow);
     m_pAnnotationWindow->hide();
 
+    //Create dockable epoch-review window
+    m_pEpochWindow = new EpochWindow(this);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pEpochWindow);
+    m_pEpochWindow->hide();
+
     //Create dockable virtual-channel window
     m_pVirtualChannelWindow = new VirtualChannelWindow(this);
     addDockWidget(Qt::LeftDockWidgetArea, m_pVirtualChannelWindow);
@@ -630,6 +658,7 @@ void MainWindow::setupWindowWidgets()
     m_pDataWindow->init();
     m_pEventWindow->init();
     m_pAnnotationWindow->init();
+    m_pEpochWindow->init();
     m_pVirtualChannelWindow->init();
     m_pScaleWindow->init();
 
@@ -682,6 +711,11 @@ void MainWindow::setupWindowWidgets()
 
                 m_pDataWindow->setAnnotations(spans);
                 setWindowStatus();
+            });
+
+    connect(m_pEpochWindow->getEpochModel(), &EpochModel::epochsChanged,
+            this, [this]() {
+                refreshReviewedEvokedSet(QStringLiteral("Evoked responses updated from the reviewed epochs."));
             });
 
     connect(m_pDataWindow, &DataWindow::annotationRangeSelected,
@@ -908,6 +942,9 @@ void MainWindow::connectMenus()
     QAction* annotationManagerAction = new QAction(tr("Annotation manager..."), this);
     ui->menuWindows->insertAction(ui->m_informationAction, annotationManagerAction);
 
+    QAction* epochManagerAction = new QAction(tr("Epoch manager..."), this);
+    ui->menuWindows->insertAction(ui->m_informationAction, epochManagerAction);
+
     QAction* virtualChannelManagerAction = new QAction(tr("Virtual channel manager..."), this);
     ui->menuWindows->insertAction(ui->m_informationAction, virtualChannelManagerAction);
 
@@ -967,6 +1004,9 @@ void MainWindow::connectMenus()
     });
     connect(annotationManagerAction, &QAction::triggered, this, [this](){
         showWindow(m_pAnnotationWindow);
+    });
+    connect(epochManagerAction, &QAction::triggered, this, [this](){
+        showWindow(m_pEpochWindow);
     });
     connect(virtualChannelManagerAction, &QAction::triggered, this, [this](){
         showWindow(m_pVirtualChannelWindow);
@@ -1450,6 +1490,7 @@ bool MainWindow::loadRawFile(const QString& filename)
 
     m_pEventWindow->getEventModel()->clearModel();
     m_pAnnotationWindow->getAnnotationModel()->clearModel();
+    clearEpochReviewSession();
     {
         QSignalBlocker blocker(m_pVirtualChannelWindow->getVirtualChannelModel());
         m_pVirtualChannelWindow->getVirtualChannelModel()->clearModel();
@@ -1630,6 +1671,92 @@ void MainWindow::handleAnnotationRangeSelected(int startSample, int endSample)
     }
 }
 
+//*************************************************************************************************************
+
+void MainWindow::clearEpochReviewSession()
+{
+    m_epochReviewLists.clear();
+    m_epochReviewEventCodes.clear();
+    m_epochReviewComments.clear();
+    m_pEpochReviewInfo.clear();
+    m_epochReviewBaseline = QPair<float,float>(0.0f, 0.0f);
+
+    if(m_pEpochWindow) {
+        m_pEpochWindow->setRespectAutoRejects(true);
+        m_pEpochWindow->getEpochModel()->clearModel();
+    }
+}
+
+//*************************************************************************************************************
+
+bool MainWindow::refreshReviewedEvokedSet(const QString& statusMessage)
+{
+    if(!m_pEpochReviewInfo || m_epochReviewLists.isEmpty()) {
+        return false;
+    }
+
+    FIFFLIB::FiffEvokedSet evokedSet;
+    evokedSet.info = *m_pEpochReviewInfo;
+
+    const bool respectAutoRejects =
+        m_pEpochWindow && m_pEpochWindow->getEpochModel()->respectAutoRejects();
+
+    for(int index = 0; index < m_epochReviewLists.size(); ++index) {
+        const MNELIB::MNEEpochDataList& epochList = m_epochReviewLists.at(index);
+        if(epochList.isEmpty()) {
+            continue;
+        }
+
+        const Eigen::VectorXi selection = reviewedEpochSelection(epochList, respectAutoRejects);
+        if(selection.size() == 0) {
+            continue;
+        }
+
+        const auto& firstEpoch = epochList.first();
+        if(!firstEpoch) {
+            continue;
+        }
+
+        const int minSamp = static_cast<int>(std::round(firstEpoch->tmin * m_pEpochReviewInfo->sfreq));
+        const int maxSamp = static_cast<int>(std::round(firstEpoch->tmax * m_pEpochReviewInfo->sfreq));
+
+        FIFFLIB::FiffEvoked evoked = epochList.average(*m_pEpochReviewInfo,
+                                                       minSamp,
+                                                       maxSamp,
+                                                       selection);
+        evoked.comment = index < m_epochReviewComments.size()
+            ? m_epochReviewComments.at(index)
+            : QString::number(index < m_epochReviewEventCodes.size() ? m_epochReviewEventCodes.at(index) : index);
+        evoked.baseline = m_epochReviewBaseline;
+        evokedSet.evoked.append(evoked);
+    }
+
+    if(m_qEvokedFile.isOpen()) {
+        m_qEvokedFile.close();
+    }
+    m_qEvokedFile.setFileName(QString());
+
+    m_pAverageWindow->getAverageModel()->setEvokedData(evokedSet);
+    m_pAverageWindow->setRecomputeAvailable(true);
+    setWindowStatus();
+
+    if(!statusMessage.isEmpty()) {
+        const QString message = evokedSet.evoked.isEmpty()
+            ? QStringLiteral("All reviewed epochs are currently excluded.")
+            : statusMessage;
+        statusBar()->showMessage(message, 4000);
+    }
+
+    if(!evokedSet.evoked.isEmpty()) {
+        if(!m_pAverageWindow->isVisible()) {
+            m_pAverageWindow->show();
+        }
+        m_pAverageWindow->raise();
+    }
+
+    return !evokedSet.evoked.isEmpty();
+}
+
 
 //*************************************************************************************************************
 
@@ -1750,11 +1877,6 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
         selectedEventCodes = filteredEventCodes;
     }
 
-    QStringList comments;
-    for(int eventCode : selectedEventCodes) {
-        comments << QString::number(eventCode);
-    }
-
     QMap<QString,double> rejectMap;
     if(dropRejected) {
         rejectMap.insert("grad", 2000e-13);
@@ -1770,47 +1892,70 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
     QApplication::setOverrideCursor(Qt::BusyCursor);
     qApp->processEvents();
 
-    const FIFFLIB::FiffEvokedSet evokedSet = MNELIB::MNEEpochDataList::averageCategories(raw,
-                                                                                           events,
-                                                                                           selectedEventCodes,
-                                                                                           comments,
-                                                                                           tmin,
-                                                                                           tmax,
-                                                                                           rejectMap,
-                                                                                           baseline);
+    QList<MNELIB::MNEEpochDataList> epochLists;
+    QList<int> epochEventCodes;
+    QStringList epochComments;
+
+    for(int eventCode : selectedEventCodes) {
+        MNELIB::MNEEpochDataList epochList = MNELIB::MNEEpochDataList::readEpochs(raw,
+                                                                                   events,
+                                                                                   tmin,
+                                                                                   tmax,
+                                                                                   eventCode,
+                                                                                   rejectMap);
+
+        if(epochList.isEmpty()) {
+            continue;
+        }
+
+        if(applyBaseline) {
+            epochList.applyBaselineCorrection(baseline);
+        }
+
+        epochLists.append(epochList);
+        epochEventCodes.append(eventCode);
+        epochComments.append(QString::number(eventCode));
+    }
 
     QApplication::restoreOverrideCursor();
 
-    if(evokedSet.evoked.isEmpty()) {
+    if(epochLists.isEmpty()) {
         QMessageBox::warning(this,
                              title,
                              "No evoked responses could be computed. The selected events may have been rejected or out of bounds.");
         return false;
     }
 
-    if(m_qEvokedFile.isOpen()) {
-        m_qEvokedFile.close();
+    clearEpochReviewSession();
+    m_epochReviewLists = epochLists;
+    m_epochReviewEventCodes = epochEventCodes;
+    m_epochReviewComments = epochComments;
+    m_pEpochReviewInfo = FIFFLIB::FiffInfo::SPtr(new FIFFLIB::FiffInfo(raw.info));
+    m_epochReviewBaseline = applyBaseline ? baseline : QPair<float,float>(0.0f, 0.0f);
+    {
+        QSignalBlocker blocker(m_pEpochWindow->getEpochModel());
+        m_pEpochWindow->setRespectAutoRejects(dropRejected);
+        m_pEpochWindow->getEpochModel()->setEpochs(m_epochReviewLists,
+                                                   m_epochReviewEventCodes,
+                                                   raw.first_samp,
+                                                   raw.info.sfreq);
     }
-    m_qEvokedFile.setFileName(QString());
+    m_pEpochWindow->refreshFromModel();
 
-    if(!m_pAverageWindow->getAverageModel()->setEvokedData(evokedSet)) {
+    if(!m_pEpochWindow->isVisible()) {
+        m_pEpochWindow->show();
+    }
+    m_pEpochWindow->raise();
+
+    const bool refreshed = refreshReviewedEvokedSet(promptForSettings
+                                                    ? QStringLiteral("Evoked responses computed.")
+                                                    : QStringLiteral("Evoked responses recomputed from the last saved setup."));
+    if(!refreshed) {
         QMessageBox::warning(this,
                              title,
-                             "The computed evoked set could not be loaded into the average manager.");
+                             "All reviewed epochs are currently excluded.");
         return false;
     }
-
-    m_pAverageWindow->setRecomputeAvailable(true);
-    setWindowStatus();
-    statusBar()->showMessage(promptForSettings
-                             ? QStringLiteral("Evoked responses computed.")
-                             : QStringLiteral("Evoked responses recomputed from the last saved setup."),
-                             4000);
-
-    if(!m_pAverageWindow->isVisible()) {
-        m_pAverageWindow->show();
-    }
-    m_pAverageWindow->raise();
 
     return true;
 }
@@ -2076,6 +2221,8 @@ void MainWindow::loadEvoked()
 
     if(filename.isEmpty())
         return;
+
+    clearEpochReviewSession();
 
     if(m_qEvokedFile.isOpen())
         m_qEvokedFile.close();
