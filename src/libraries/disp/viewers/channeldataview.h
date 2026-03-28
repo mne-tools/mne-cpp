@@ -281,6 +281,20 @@ public:
      */
     void setEvents(const QVector<ChannelRhiView::EventMarker> &events);
 
+    //=========================================================================================================
+    /**
+     * Set the list of annotation spans to display as translucent overlays.
+     *
+     * @param[in] annotations  List of AnnotationSpan objects.
+     */
+    void setAnnotations(const QVector<ChannelRhiView::AnnotationSpan> &annotations);
+
+    //=========================================================================================================
+    /**
+     * Enable or disable annotation span selection in the raw browser.
+     */
+    void setAnnotationSelectionEnabled(bool enabled);
+
     // ── AbstractView overrides ────────────────────────────────────────
     void saveSettings() override;
     void loadSettings() override;
@@ -315,6 +329,12 @@ signals:
      * @param[in] sample  Current left-edge sample index.
      */
     void scrollPositionChanged(int sample);
+
+    //=========================================================================================================
+    /**
+     * Emitted when the user selected a sample range for annotation creation.
+     */
+    void sampleRangeSelected(int startSample, int endSample);
 
 protected:
     void updateGuiMode(GuiMode mode) override;

@@ -287,6 +287,9 @@ void ChannelDataView::setupLayout()
     connect(m_pRhiView, &ChannelRhiView::sampleClicked,
             this, &ChannelDataView::sampleClicked);
 
+    connect(m_pRhiView, &ChannelRhiView::sampleRangeSelected,
+            this, &ChannelDataView::sampleRangeSelected);
+
     connect(m_pRhiView, &ChannelRhiView::scrollSampleChanged,
             m_pTimeRuler, &TimeRulerWidget::setScrollSample);
 
@@ -532,6 +535,22 @@ void ChannelDataView::setEvents(const QVector<ChannelRhiView::EventMarker> &even
             rulerMarks.append({ev.sample, ev.color, ev.label});
         m_pTimeRuler->setEvents(rulerMarks);
     }
+}
+
+//=============================================================================================================
+
+void ChannelDataView::setAnnotations(const QVector<ChannelRhiView::AnnotationSpan> &annotations)
+{
+    if (m_pRhiView)
+        m_pRhiView->setAnnotations(annotations);
+}
+
+//=============================================================================================================
+
+void ChannelDataView::setAnnotationSelectionEnabled(bool enabled)
+{
+    if (m_pRhiView)
+        m_pRhiView->setAnnotationSelectionEnabled(enabled);
 }
 
 //=============================================================================================================

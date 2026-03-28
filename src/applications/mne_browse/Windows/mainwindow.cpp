@@ -48,9 +48,12 @@
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QLabel>
+#include <QInputDialog>
 #include <QListWidget>
+#include <QLineEdit>
 #include <QSpinBox>
 #include <QVBoxLayout>
+#include <QFileInfo>
 
 
 //*************************************************************************************************************
@@ -87,6 +90,19 @@ QString defaultCovFilePath(const QString& rawFilePath)
     }
 
     return rawFilePath + "-cov.fif";
+}
+
+QString defaultAnnotationFilePath(const QString& rawFilePath)
+{
+    if(rawFilePath.isEmpty()) {
+        return QString();
+    }
+
+    if(rawFilePath.endsWith(".fif", Qt::CaseInsensitive)) {
+        return rawFilePath.left(rawFilePath.size() - 4) + "-annot.json";
+    }
+
+    return rawFilePath + "-annot.json";
 }
 
 QMap<int, int> countEventsByType(const MatrixXi& events)
@@ -466,6 +482,7 @@ MainWindow::MainWindow(QWidget *parent)
 , ui(new Ui::MainWindowWidget)
 , m_pStatusLabel(nullptr)
 , m_pWhitenButterflyAction(nullptr)
+, m_pAnnotationModeAction(nullptr)
 {
     ui->setupUi(this);
 
@@ -509,6 +526,11 @@ void MainWindow::setupWindowWidgets()
     m_pEventWindow = new EventWindow(this);
     addDockWidget(Qt::LeftDockWidgetArea, m_pEventWindow);
     m_pEventWindow->hide();
+
+    //Create dockable annotation window
+    m_pAnnotationWindow = new AnnotationWindow(this);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pAnnotationWindow);
+    m_pAnnotationWindow->hide();
 
     //Create dockable information window - QTDesigner used - see / FormFiles
     m_pInformationWindow = new InformationWindow(this);
@@ -557,6 +579,7 @@ void MainWindow::setupWindowWidgets()
     //Init windows - TODO: get rid of this here, do this inside the window classes
     m_pDataWindow->init();
     m_pEventWindow->init();
+    m_pAnnotationWindow->init();
     m_pScaleWindow->init();
 
     //Create the toolbar after all indows have been initiliased
@@ -586,6 +609,28 @@ void MainWindow::setupWindowWidgets()
 
     connect(m_pAverageWindow, &AverageWindow::addAverageRequested,
             this, &MainWindow::computeEvoked);
+
+    connect(m_pAnnotationWindow->getAnnotationModel(), &AnnotationModel::annotationsChanged,
+            this, [this]() {
+                QVector<DISPLIB::ChannelRhiView::AnnotationSpan> spans;
+                const QVector<AnnotationSpanData> modelSpans =
+                    m_pAnnotationWindow->getAnnotationModel()->getAnnotationSpans();
+                spans.reserve(modelSpans.size());
+                for(const AnnotationSpanData& modelSpan : modelSpans) {
+                    DISPLIB::ChannelRhiView::AnnotationSpan span;
+                    span.startSample = modelSpan.startSample;
+                    span.endSample = modelSpan.endSample;
+                    span.color = modelSpan.color;
+                    span.label = modelSpan.label;
+                    spans.append(span);
+                }
+
+                m_pDataWindow->setAnnotations(spans);
+                setWindowStatus();
+            });
+
+    connect(m_pDataWindow, &DataWindow::annotationRangeSelected,
+            this, &MainWindow::handleAnnotationRangeSelected);
 
     //Connect channel info window with raw data model, layout manager, average manager and the data window
     connect(rawModel(), &RawModel::fileLoaded,
@@ -779,15 +824,31 @@ void MainWindow::connectMenus()
     QAction* saveEvokedAction = new QAction(tr("Save Evoked (fif)..."), this);
     ui->menuTest->insertAction(ui->m_quitAction, saveEvokedAction);
 
+    QAction* loadAnnotationsAction = new QAction(tr("Load Annotations..."), this);
+    ui->menuTest->insertAction(ui->m_loadEvokedAction, loadAnnotationsAction);
+
+    QAction* saveAnnotationsAction = new QAction(tr("Save Annotations..."), this);
+    ui->menuTest->insertAction(ui->m_loadEvokedAction, saveAnnotationsAction);
+
     m_pWhitenButterflyAction = new QAction(tr("Whiten Butterfly Plot"), this);
     m_pWhitenButterflyAction->setCheckable(true);
     ui->menuTest->insertAction(ui->m_quitAction, m_pWhitenButterflyAction);
+
+    QAction* annotationManagerAction = new QAction(tr("Annotation manager..."), this);
+    ui->menuWindows->insertAction(ui->m_informationAction, annotationManagerAction);
+
+    m_pAnnotationModeAction = new QAction(tr("Annotation Mode"), this);
+    m_pAnnotationModeAction->setCheckable(true);
+    m_pAnnotationModeAction->setStatusTip(tr("When enabled, Shift-drag in the raw browser creates annotation spans."));
+    ui->menuAdjust->addAction(m_pAnnotationModeAction);
 
     //File
     connect(ui->m_openAction, &QAction::triggered, this, &MainWindow::openFile);
     connect(ui->m_writeAction, &QAction::triggered, this, &MainWindow::writeFile);
     connect(ui->m_loadEvents, &QAction::triggered, this, &MainWindow::loadEvents);
     connect(ui->m_saveEvents, &QAction::triggered, this, &MainWindow::saveEvents);
+    connect(loadAnnotationsAction, &QAction::triggered, this, &MainWindow::loadAnnotations);
+    connect(saveAnnotationsAction, &QAction::triggered, this, &MainWindow::saveAnnotations);
     connect(loadCovarianceAction, &QAction::triggered, this, &MainWindow::loadCovariance);
     connect(computeCovarianceAction, &QAction::triggered, this, &MainWindow::computeCovariance);
     connect(saveCovarianceAction, &QAction::triggered, this, &MainWindow::saveCovariance);
@@ -815,10 +876,20 @@ void MainWindow::connectMenus()
     connect(ui->m_filterAction, &QAction::triggered, this, [this](){
         showWindow(m_pFilterWindow);
     });
+    connect(m_pAnnotationModeAction, &QAction::toggled, this, [this](bool checked) {
+        m_pDataWindow->setAnnotationSelectionEnabled(checked);
+        statusBar()->showMessage(checked
+                                 ? QStringLiteral("Annotation mode enabled: Shift-drag in the raw browser to create spans.")
+                                 : QStringLiteral("Annotation mode disabled."),
+                                 4000);
+    });
 
     //Windows
     connect(ui->m_eventAction, &QAction::triggered, this, [this](){
         showWindow(m_pEventWindow);
+    });
+    connect(annotationManagerAction, &QAction::triggered, this, [this](){
+        showWindow(m_pAnnotationWindow);
     });
     connect(ui->m_informationAction, &QAction::triggered, this, [this](){
         showWindow(m_pInformationWindow);
@@ -898,6 +969,18 @@ void MainWindow::setWindowStatus()
     else
         title.append("  -  No event file");
 
+    if(m_pAnnotationWindow->getAnnotationModel()->rowCount() > 0) {
+        if(m_qAnnotationFile.fileName().isEmpty()) {
+            title.append("  -  Annotations: unsaved");
+        } else {
+            int idx = m_qAnnotationFile.fileName().lastIndexOf("/");
+            QString filename = m_qAnnotationFile.fileName().remove(0,idx+1);
+            title.append(QString("  -  Annotations: %1").arg(filename));
+        }
+    } else {
+        title.append("  -  No annotations");
+    }
+
     //Set evoked file informations
     if(m_pAverageWindow->getAverageModel()->isFileLoaded()) {
         if(m_qEvokedFile.fileName().isEmpty()) {
@@ -941,6 +1024,8 @@ void MainWindow::syncAuxWindowsToFiffInfo(FiffInfo::SPtr fiffInfo,
 
     m_pEventWindow->getEventModel()->setFiffInfo(fiffInfo);
     m_pEventWindow->getEventModel()->setFirstLastSample(firstSample, lastSample);
+    m_pAnnotationWindow->getAnnotationModel()->setFiffInfo(fiffInfo);
+    m_pAnnotationWindow->getAnnotationModel()->setFirstLastSample(firstSample, lastSample);
 
     m_pScaleWindow->hideSpinBoxes(fiffInfo);
 
@@ -1123,6 +1208,68 @@ void MainWindow::saveEvents()
         qWarning() << "ERROR saving fiff event data file" << filename;
 }
 
+//*************************************************************************************************************
+
+void MainWindow::loadAnnotations()
+{
+    if(m_qFileRaw.fileName().isEmpty()) {
+        QMessageBox::warning(this,
+                             "Load Annotations",
+                             "Load a raw FIF file before opening annotations.");
+        return;
+    }
+
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    QString("Open annotation file"),
+                                                    QFileInfo(defaultAnnotationFilePath(m_qFileRaw.fileName())).absolutePath(),
+                                                    tr("annotation files (*-annot.json *.json)"));
+
+    if(filename.isEmpty()) {
+        return;
+    }
+
+    loadAnnotationsFile(filename);
+}
+
+//*************************************************************************************************************
+
+void MainWindow::saveAnnotations()
+{
+    if(m_pAnnotationWindow->getAnnotationModel()->rowCount() == 0) {
+        QMessageBox::warning(this,
+                             "Save Annotations",
+                             "Create or load at least one annotation before saving.");
+        return;
+    }
+
+    QString defaultPath = m_qAnnotationFile.fileName();
+    if(defaultPath.isEmpty()) {
+        defaultPath = defaultAnnotationFilePath(m_qFileRaw.fileName());
+    }
+
+    QString filename = QFileDialog::getSaveFileName(this,
+                                                    QString("Save annotation file"),
+                                                    defaultPath,
+                                                    tr("annotation files (*-annot.json *.json)"));
+
+    if(filename.isEmpty()) {
+        return;
+    }
+
+    if(m_qAnnotationFile.isOpen()) {
+        m_qAnnotationFile.close();
+    }
+    m_qAnnotationFile.setFileName(filename);
+
+    if(m_pAnnotationWindow->getAnnotationModel()->saveAnnotationData(m_qAnnotationFile)) {
+        qInfo() << "Annotation file" << filename << "saved.";
+    } else {
+        qWarning() << "ERROR saving annotation file" << filename;
+    }
+
+    setWindowStatus();
+}
+
 
 //*************************************************************************************************************
 
@@ -1136,12 +1283,16 @@ bool MainWindow::loadRawFile(const QString& filename)
     if(m_qCovFile.isOpen())
         m_qCovFile.close();
     m_qCovFile.setFileName(QString());
+    if(m_qAnnotationFile.isOpen())
+        m_qAnnotationFile.close();
+    m_qAnnotationFile.setFileName(QString());
     m_pAverageWindow->clearNoiseCovariance();
     if(m_pWhitenButterflyAction) {
         m_pWhitenButterflyAction->setChecked(false);
     }
 
     m_pEventWindow->getEventModel()->clearModel();
+    m_pAnnotationWindow->getAnnotationModel()->clearModel();
 
     // ── ChannelDataView path: demand-paged, opens header only (fast) ──
     const bool ok = m_pDataWindow->loadFiffFile(filename);
@@ -1154,6 +1305,13 @@ bool MainWindow::loadRawFile(const QString& filename)
         syncAuxWindowsToFiffInfo(m_pDataWindow->fiffInfo(),
                                  m_pDataWindow->firstSample(),
                                  m_pDataWindow->lastSample());
+
+    if (ok) {
+        const QString defaultAnnotationPath = defaultAnnotationFilePath(filename);
+        if(QFileInfo::exists(defaultAnnotationPath)) {
+            loadAnnotationsFile(defaultAnnotationPath, false);
+        }
+    }
 
     // ── Legacy RawModel path: kept for filter/event sub-systems ──────
     // Runs in a background thread so the ChannelDataView path (above) can
@@ -1207,6 +1365,75 @@ bool MainWindow::loadEventsFile(const QString& filename)
         m_pEventWindow->show();
 
     return ok;
+}
+
+//*************************************************************************************************************
+
+bool MainWindow::loadAnnotationsFile(const QString& filename, bool showWindow)
+{
+    if(m_qAnnotationFile.isOpen()) {
+        m_qAnnotationFile.close();
+    }
+
+    m_qAnnotationFile.setFileName(filename);
+
+    const bool ok = m_pAnnotationWindow->getAnnotationModel()->loadAnnotationData(m_qAnnotationFile);
+    if(ok) {
+        qInfo() << "Annotation file" << filename << "loaded.";
+    } else {
+        qWarning() << "ERROR loading annotation file" << filename;
+    }
+
+    setWindowStatus();
+
+    if(ok && showWindow && !m_pAnnotationWindow->isVisible()) {
+        m_pAnnotationWindow->show();
+    }
+
+    return ok;
+}
+
+//*************************************************************************************************************
+
+void MainWindow::handleAnnotationRangeSelected(int startSample, int endSample)
+{
+    if(startSample > endSample) {
+        std::swap(startSample, endSample);
+    }
+
+    if(startSample == endSample) {
+        return;
+    }
+
+    const QString defaultLabel = m_qSettings.value("MainWindow/Annotations/defaultLabel",
+                                                   QStringLiteral("BAD_manual")).toString();
+
+    bool accepted = false;
+    QString label = QInputDialog::getText(this,
+                                          QStringLiteral("Add Annotation"),
+                                          QStringLiteral("Annotation label"),
+                                          QLineEdit::Normal,
+                                          defaultLabel,
+                                          &accepted).trimmed();
+
+    if(!accepted) {
+        return;
+    }
+
+    if(label.isEmpty()) {
+        label = defaultLabel;
+    }
+
+    m_qSettings.setValue("MainWindow/Annotations/defaultLabel", label);
+
+    m_pAnnotationWindow->addAnnotation(startSample, endSample, label);
+    if(!m_pAnnotationWindow->isVisible()) {
+        showWindow(m_pAnnotationWindow);
+    }
+
+    if(m_qAnnotationFile.fileName().isEmpty()) {
+        setWindowStatus();
+    }
 }
 
 

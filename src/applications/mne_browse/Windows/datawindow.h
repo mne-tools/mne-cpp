@@ -233,6 +233,18 @@ public:
      */
     DISPLIB::ChannelDataView* getChannelDataView() { return m_pChannelDataView; }
 
+    //=========================================================================================================
+    /**
+     * Set the browser annotation spans shown in the GPU raw view.
+     */
+    void setAnnotations(const QVector<DISPLIB::ChannelRhiView::AnnotationSpan> &annotations);
+
+    //=========================================================================================================
+    /**
+     * Enable or disable Shift-drag annotation creation in the raw browser.
+     */
+    void setAnnotationSelectionEnabled(bool enabled);
+
 private:
     //=========================================================================================================
     /**
@@ -332,6 +344,12 @@ signals:
      * scaleChannels gets called whenever the user performed a scaling gesture (pinch)
      */
     void scaleChannels(double);
+
+    //=========================================================================================================
+    /**
+     * Forwarded when the user selects a time range in annotation mode.
+     */
+    void annotationRangeSelected(int startSample, int endSample);
 
 protected slots:
     //=========================================================================================================

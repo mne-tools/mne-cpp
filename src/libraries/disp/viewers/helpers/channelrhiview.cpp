@@ -531,6 +531,23 @@ void ChannelRhiView::setEvents(const QVector<EventMarker> &events)
 }
 
 //=============================================================================================================
+
+void ChannelRhiView::setAnnotations(const QVector<AnnotationSpan> &annotations)
+{
+    m_annotations = annotations;
+    m_tileDirty = true;
+    m_overlayDirty = true;
+    update();
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::setAnnotationSelectionEnabled(bool enabled)
+{
+    m_annotationSelectionEnabled = enabled;
+}
+
+//=============================================================================================================
 // QRhiWidget path
 //=============================================================================================================
 
@@ -862,6 +879,55 @@ void ChannelRhiView::rebuildOverlayImage(int logicalWidth, int logicalHeight, qr
             xEnd   = qBound(0.f, xEnd,   vw);
             if (xEnd > xStart)
                 p.fillRect(QRectF(xStart, 0, xEnd - xStart, vh), tint);
+        }
+    }
+
+    // ── Annotation spans ────────────────────────────────────────────
+    if (!m_annotations.isEmpty()) {
+        QFont font = p.font();
+        font.setPointSizeF(8.0);
+        font.setBold(true);
+        p.setFont(font);
+
+        for (const AnnotationSpan &annotation : m_annotations) {
+            const float xStart = (static_cast<float>(annotation.startSample) - m_scrollSample) / m_samplesPerPixel;
+            const float xEnd = (static_cast<float>(annotation.endSample + 1) - m_scrollSample) / m_samplesPerPixel;
+            if (xEnd < -2.f || xStart > logicalWidth + 2.f) {
+                continue;
+            }
+
+            const float clippedStart = qBound(0.f, xStart, static_cast<float>(logicalWidth));
+            const float clippedEnd = qBound(0.f, xEnd, static_cast<float>(logicalWidth));
+            if (clippedEnd <= clippedStart) {
+                continue;
+            }
+
+            QColor fillColor = annotation.color;
+            fillColor.setAlpha(48);
+            p.fillRect(QRectF(clippedStart, 0.f, clippedEnd - clippedStart, static_cast<float>(logicalHeight)),
+                       fillColor);
+
+            QColor borderColor = annotation.color;
+            borderColor.setAlpha(165);
+            p.setPen(QPen(borderColor, 1));
+            p.drawLine(QPointF(clippedStart, 0.f), QPointF(clippedStart, static_cast<float>(logicalHeight)));
+            p.drawLine(QPointF(clippedEnd, 0.f), QPointF(clippedEnd, static_cast<float>(logicalHeight)));
+
+            if (!annotation.label.trimmed().isEmpty()) {
+                QString label = annotation.label.trimmed();
+                QFontMetrics metrics(font);
+                QRect labelRect = metrics.boundingRect(label);
+                labelRect.adjust(-6, -2, 6, 2);
+                const int labelX = qBound(4,
+                                          static_cast<int>(clippedStart) + 4,
+                                          qMax(4, logicalWidth - labelRect.width() - 4));
+                labelRect.moveTopLeft(QPoint(labelX, 4));
+                QColor pillColor = annotation.color;
+                pillColor.setAlpha(215);
+                p.fillRect(labelRect, pillColor);
+                p.setPen(Qt::white);
+                p.drawText(labelRect, Qt::AlignCenter, label);
+            }
         }
     }
 
@@ -1209,16 +1275,17 @@ void ChannelRhiView::scheduleTileRebuild()
     bool              gridVis         = m_gridVisible;
     float             sfreq           = m_sfreq;
     int               firstFileSample = m_firstFileSample;
-    bool                  hideBad         = m_hideBadChannels;
-    QVector<int>          chIndices       = m_filteredChannels; // snapshot for worker
-    QVector<EventMarker>  eventsSnap      = m_events;           // snapshot for worker
+    bool              hideBad         = m_hideBadChannels;
+    QVector<int>      chIndices       = m_filteredChannels; // snapshot for worker
+    QVector<EventMarker> eventsSnap   = m_events;           // snapshot for worker
+    QVector<AnnotationSpan> annotationsSnap = m_annotations;
 
     m_tileDirty          = false; // cleared now — any new event will set it true again
     m_tileRebuildPending = true;
     m_tileWatcher.setFuture(QtConcurrent::run([=]() {
         return ChannelRhiView::buildTile(model, scrollSample, spp, firstCh, visCnt,
                                          pw, ph, bg, gridVis, sfreq, firstFileSample,
-                                         hideBad, chIndices, eventsSnap);
+                                         hideBad, chIndices, eventsSnap, annotationsSnap);
     }));
 }
 
@@ -1233,7 +1300,8 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
     float sfreq, int firstFileSample,
     bool hideBadChannels,
     const QVector<int> &channelIndices,
-    const QVector<EventMarker> &events)
+    const QVector<EventMarker> &events,
+    const QVector<AnnotationSpan> &annotations)
 {
     TileResult out;
     out.samplesPerPixel = spp;
@@ -1338,6 +1406,55 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
             for (float s = firstTick; s < lastSample; s += tickSamples) {
                 float xPx = (s - tileStart) / spp;
                 p.drawLine(QPointF(xPx, 0), QPointF(xPx, ph));
+            }
+        }
+    }
+
+    // ── Annotation span pass ────────────────────────────────────────
+    if (!annotations.isEmpty()) {
+        QFont font = p.font();
+        font.setPointSizeF(8.0);
+        font.setBold(true);
+        p.setFont(font);
+
+        for (const AnnotationSpan &annotation : annotations) {
+            float xStart = (static_cast<float>(annotation.startSample) - tileStart) / spp;
+            float xEnd = (static_cast<float>(annotation.endSample + 1) - tileStart) / spp;
+
+            if (xEnd < -2.f || xStart > tilePixWidth + 2.f) {
+                continue;
+            }
+
+            xStart = qBound(0.f, xStart, static_cast<float>(tilePixWidth));
+            xEnd = qBound(0.f, xEnd, static_cast<float>(tilePixWidth));
+            if (xEnd <= xStart) {
+                continue;
+            }
+
+            QColor fillColor = annotation.color;
+            fillColor.setAlpha(48);
+            p.fillRect(QRectF(xStart, 0.f, xEnd - xStart, static_cast<float>(ph)), fillColor);
+
+            QColor borderColor = annotation.color;
+            borderColor.setAlpha(165);
+            p.setPen(QPen(borderColor, 1));
+            p.drawLine(QPointF(xStart, 0.f), QPointF(xStart, static_cast<float>(ph)));
+            p.drawLine(QPointF(xEnd, 0.f), QPointF(xEnd, static_cast<float>(ph)));
+
+            if (!annotation.label.trimmed().isEmpty()) {
+                const QString label = annotation.label.trimmed();
+                QFontMetrics metrics(font);
+                QRect labelRect = metrics.boundingRect(label);
+                labelRect.adjust(-6, -2, 6, 2);
+                const int labelX = qBound(4,
+                                          static_cast<int>(xStart) + 4,
+                                          qMax(4, tilePixWidth - labelRect.width() - 4));
+                labelRect.moveTopLeft(QPoint(labelX, 4));
+                QColor pillColor = annotation.color;
+                pillColor.setAlpha(215);
+                p.fillRect(labelRect, pillColor);
+                p.setPen(Qt::white);
+                p.drawText(labelRect, Qt::AlignCenter, label);
             }
         }
     }
@@ -1693,8 +1810,25 @@ void ChannelRhiView::mouseReleaseEvent(QMouseEvent *event)
     if (m_rulerActive && event->button() == Qt::LeftButton) {
         m_rulerX1 = event->position().toPoint().x();
         m_rulerY1 = event->position().toPoint().y();
+        const int x0 = qMin(m_rulerX0, m_rulerX1);
+        const int x1 = qMax(m_rulerX0, m_rulerX1);
         m_rulerActive = false;
         update();
+
+        if (m_annotationSelectionEnabled && qAbs(x1 - x0) > 3) {
+            int startSample = static_cast<int>(m_scrollSample + static_cast<float>(x0) * m_samplesPerPixel);
+            int endSample = static_cast<int>(m_scrollSample + static_cast<float>(x1) * m_samplesPerPixel);
+
+            startSample = qMax(startSample, m_firstFileSample);
+            if (m_lastFileSample >= 0) {
+                endSample = qMin(endSample, m_lastFileSample);
+            }
+
+            if (endSample >= startSample) {
+                emit sampleRangeSelected(startSample, endSample);
+            }
+        }
+
         event->accept();
         return;
     }

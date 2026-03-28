@@ -106,6 +106,17 @@ public:
         QString label;        ///< Short text label (shown at the bottom strip); defaults to type number.
     };
 
+    //=========================================================================================================
+    /**
+     * @brief Time-span annotation overlay.
+     */
+    struct AnnotationSpan {
+        int     startSample = 0; ///< Absolute first sample covered by the annotation.
+        int     endSample   = 0; ///< Absolute last sample covered by the annotation.
+        QColor  color;           ///< Fill / border colour for the highlighted span.
+        QString label;           ///< Annotation label shown near the top edge.
+    };
+
     explicit ChannelRhiView(QWidget *parent = nullptr);
     ~ChannelRhiView() override;
 
@@ -127,6 +138,21 @@ public:
      * @param[in] events  List of EventMarker objects.
      */
     void setEvents(const QVector<EventMarker> &events);
+
+    //=========================================================================================================
+    /**
+     * Set the list of time-span annotations to overlay on the traces.
+     *
+     * @param[in] annotations  List of AnnotationSpan objects.
+     */
+    void setAnnotations(const QVector<AnnotationSpan> &annotations);
+
+    //=========================================================================================================
+    /**
+     * Enable or disable annotation range selection. When enabled, Shift+drag emits
+     * sampleRangeSelected on mouse release instead of acting as a pure measurement tool.
+     */
+    void setAnnotationSelectionEnabled(bool enabled);
 
     // ── Scroll / zoom ─────────────────────────────────────────────────
 
@@ -317,6 +343,12 @@ signals:
      */
     void sampleClicked(int sample);
 
+    //=========================================================================================================
+    /**
+     * Emitted when the user selects a time span with Shift+drag in annotation mode.
+     */
+    void sampleRangeSelected(int startSample, int endSample);
+
 protected:
 #ifdef MNE_DISP_RHIWIDGET
     void initialize(QRhiCommandBuffer *cb) override;
@@ -387,7 +419,8 @@ private:
         int   firstFileSample,
         bool  hideBadChannels,
         const QVector<int> &channelIndices, // empty = identity (all channels)
-        const QVector<EventMarker> &events);   // empty = no markers
+        const QVector<EventMarker> &events,    // empty = no markers
+        const QVector<AnnotationSpan> &annotations); // empty = no annotations
     bool isTileFresh() const;
 
     QImage m_tileImage;
@@ -453,6 +486,8 @@ private:
 
     // ── Event / stimulus markers ──────────────────────────────────────
     QVector<EventMarker> m_events;
+    QVector<AnnotationSpan> m_annotations;
+    bool m_annotationSelectionEnabled = false;
 
     // Helper — use instead of firstCh+i for actual model channel index
     int actualChannelAt(int logicalIdx) const; // maps logical → model channel index
