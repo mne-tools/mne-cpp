@@ -228,7 +228,7 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
 
             QRectF chip(chipX, kChipY, kChipW, kChipH);
             QColor fill = ev.color;
-            fill.setAlpha(215);
+            fill.setAlpha(150);
             p.fillRect(chip, fill);
             p.setPen(Qt::white);
             QString lbl = ev.label.isEmpty() ? QStringLiteral("?") : ev.label;

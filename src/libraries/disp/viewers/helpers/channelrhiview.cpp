@@ -48,6 +48,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QApplication>
 #include <QPropertyAnimation>
 #include <QWheelEvent>
 #include <QMouseEvent>
@@ -194,6 +195,15 @@ ChannelRhiView::ChannelRhiView(QWidget *parent)
     });
 
 #endif
+
+    // Repaint overlays (bands + event lines) when the app regains focus.
+    // On macOS/Metal the GPU texture stays composited but QPainter overlay
+    // layers are not repainted on focus restore without an explicit update().
+    connect(qApp, &QApplication::applicationStateChanged,
+            this, [this](Qt::ApplicationState s) {
+                if (s == Qt::ApplicationActive)
+                    update();
+            });
 }
 
 //=============================================================================================================
@@ -1151,7 +1161,7 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
 
             QColor lineColor = ev.color;
             lineColor.setAlpha(180);
-            p.setPen(QPen(lineColor, 2));
+            p.setPen(QPen(lineColor, 1));
             p.drawLine(ix, 0, ix, ph);
         }
     }
@@ -1212,7 +1222,7 @@ void ChannelRhiView::drawOverlays()
             int ix = static_cast<int>(xF);
             QColor lineColor = ev.color;
             lineColor.setAlpha(180);
-            ep.setPen(QPen(lineColor, 2));
+            ep.setPen(QPen(lineColor, 1));
             ep.drawLine(ix, 0, ix, yEnd);
         }
     }

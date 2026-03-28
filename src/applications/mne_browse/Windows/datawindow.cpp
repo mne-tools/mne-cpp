@@ -407,14 +407,25 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
         }
 
         if (!m_stimEvents.isEmpty() && m_pChannelDataView) {
-            // Sort by ascending sample so the ruler's lastChipRight overlap-skip
-            // logic works correctly when events come from multiple STIM channels
-            // (the scan above is channel-major, not sample-major).
+            // Sort by (sample ASC, type DESC) so that for events at the same
+            // sample the highest-type entry comes first (STI 014 combined
+            // trigger > individual bit channels).  After deduplication only
+            // the highest-type event per sample survives, giving the correct
+            // label and colour instead of always showing type "1".
             std::stable_sort(m_stimEvents.begin(), m_stimEvents.end(),
                              [](const DISPLIB::ChannelRhiView::EventMarker &a,
                                 const DISPLIB::ChannelRhiView::EventMarker &b) {
-                                 return a.sample < b.sample;
+                                 if (a.sample != b.sample)
+                                     return a.sample < b.sample;
+                                 return a.type > b.type; // higher type first
                              });
+            // Remove duplicate samples — keep the first occurrence (= highest type).
+            auto last = std::unique(m_stimEvents.begin(), m_stimEvents.end(),
+                                    [](const DISPLIB::ChannelRhiView::EventMarker &a,
+                                       const DISPLIB::ChannelRhiView::EventMarker &b) {
+                                        return a.sample == b.sample;
+                                    });
+            m_stimEvents.erase(last, m_stimEvents.end());
             m_pChannelDataView->setEvents(m_stimEvents);
         }
     }
