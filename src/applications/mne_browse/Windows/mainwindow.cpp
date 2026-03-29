@@ -247,6 +247,29 @@ bool detectFallbackStimEvents(const FIFFLIB::FiffRawData& raw,
     return false;
 }
 
+bool populateEventModelFromRaw(const QString& rawFilePath,
+                               MNEBROWSE::EventModel* eventModel,
+                               QString& sourceDescription)
+{
+    if(!eventModel || rawFilePath.isEmpty() || !QFile::exists(rawFilePath)) {
+        return false;
+    }
+
+    QFile rawFile(rawFilePath);
+    FIFFLIB::FiffRawData raw(rawFile);
+    if(raw.isEmpty()) {
+        return false;
+    }
+
+    MatrixXi events;
+    if(!detectFallbackStimEvents(raw, events, sourceDescription) || events.rows() == 0) {
+        return false;
+    }
+
+    eventModel->setEventMatrix(events, false);
+    return true;
+}
+
 QStringList evokedEventCodesToSettingValue(const QList<int>& selectedEventCodes)
 {
     QStringList codes;
@@ -1980,6 +2003,13 @@ bool MainWindow::loadRawFile(const QString& filename)
         syncAuxWindowsToFiffInfo(m_pDataWindow->fiffInfo(),
                                  m_pDataWindow->firstSample(),
                                  m_pDataWindow->lastSample());
+
+    if (ok) {
+        QString detectedEventSource;
+        if(populateEventModelFromRaw(filename, m_pEventWindow->getEventModel(), detectedEventSource)) {
+            statusBar()->showMessage(detectedEventSource, 5000);
+        }
+    }
 
     if (ok) {
         const QStringList annotationCandidates = defaultAnnotationCandidatePaths(filename);
