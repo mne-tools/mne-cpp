@@ -34,11 +34,15 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v4
-      with:
-        version: 6.11.0
-        modules: qtshadertools
+    - name: Download Qt toolchain
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind qt \
+          --version "6.11.0" \
+          --linkage dynamic \
+          --output-dir "$RUNNER_TEMP/qt"
 
     # Initialize CodeQL tools for scanning.
     - name: Initialize CodeQL

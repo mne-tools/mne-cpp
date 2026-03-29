@@ -29,26 +29,28 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v5
 
-    - name: Install Python 3.10
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.10'
-        architecture: ${{ matrix.os == 'macos-26' && 'arm64' || 'x64' }}
-
-    - name: Install Qt (Linux|MacOS)
+    - name: Download Qt toolchain (Linux|MacOS)
       if: matrix.os == 'ubuntu-24.04' || matrix.os == 'macos-26'
-      uses: jurplel/install-qt-action@v4
-      with:
-        version: ${{ inputs.qt_version }}
-        modules: qtshadertools
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind qt \
+          --version "${{ inputs.qt_version }}" \
+          --linkage dynamic \
+          --output-dir "$RUNNER_TEMP/qt"
 
-    - name: Install Qt (Windows)
+    - name: Download Qt toolchain (Windows)
       if: matrix.os == 'windows-2025'
-      uses: jurplel/install-qt-action@v4
-      with:
-        version: ${{ inputs.qt_version }}
-        arch: win64_msvc2022_64
-        modules: qtshadertools
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.ps1 `
+          -Kind qt `
+          -Version '${{ inputs.qt_version }}' `
+          -Linkage dynamic `
+          -OutputDir "$env:RUNNER_TEMP\qt"
 
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: matrix.os == 'ubuntu-24.04' || matrix.os == 'macos-26'

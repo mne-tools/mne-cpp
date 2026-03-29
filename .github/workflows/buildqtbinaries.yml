@@ -9,8 +9,251 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+  QT_BINARY_RELEASE_TAG: qt_binaries
+  QT_MIN_VERSION: '6.10.0'
+  QT_MAX_VERSION: '6.11.0'
+  QIF_VERSION: '4.7'
+  QIF_TOOL_ID: 'qt.tools.ifw.47'
 
 jobs:
+  GenerateLinuxDynamicBinaries:
+    runs-on: ubuntu-24.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - qt_version: '6.10.0'
+            version_token: '6100'
+          - qt_version: '6.11.0'
+            version_token: '6110'
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+    - name: Install Python 3.10 version
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.10'
+        architecture: 'x64'
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: ${{ matrix.qt_version }}
+        modules: qtshadertools qttools
+    - name: Package binaries
+      shell: bash
+      run: |
+        tar cfvz "qt6_${{ matrix.version_token }}_dynamic_binaries_linux.tar.gz" -C "$RUNNER_WORKSPACE/Qt/${{ matrix.qt_version }}/gcc_64" .
+    - uses: actions/upload-artifact@v7
+      with:
+        name: qt6_${{ matrix.version_token }}_dynamic_binaries_linux.tar.gz
+        path: qt6_${{ matrix.version_token }}_dynamic_binaries_linux.tar.gz
+    - name: Create toolchain release and upload
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>/dev/null || true
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt6_${{ matrix.version_token }}_dynamic_binaries_linux.tar.gz" --clobber
+
+  GenerateMacOSDynamicBinaries:
+    runs-on: macos-26
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - qt_version: '6.10.0'
+            version_token: '6100'
+          - qt_version: '6.11.0'
+            version_token: '6110'
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+    - name: Install Python 3.10 version
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.10'
+        architecture: 'arm64'
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: ${{ matrix.qt_version }}
+        modules: qtshadertools qttools
+    - name: Package binaries
+      shell: bash
+      run: |
+        tar cfvz "qt6_${{ matrix.version_token }}_dynamic_binaries_macos.tar.gz" -C "$RUNNER_WORKSPACE/Qt/${{ matrix.qt_version }}/macos" .
+    - uses: actions/upload-artifact@v7
+      with:
+        name: qt6_${{ matrix.version_token }}_dynamic_binaries_macos.tar.gz
+        path: qt6_${{ matrix.version_token }}_dynamic_binaries_macos.tar.gz
+    - name: Create toolchain release and upload
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>/dev/null || true
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt6_${{ matrix.version_token }}_dynamic_binaries_macos.tar.gz" --clobber
+
+  GenerateWinDynamicBinaries:
+    runs-on: windows-2025
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - qt_version: '6.10.0'
+            version_token: '6100'
+            source_build: false
+          - qt_version: '6.11.0'
+            version_token: '6110'
+            source_build: true
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+    - name: Install Python 3.10 version
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.10'
+        architecture: 'x64'
+    - name: Install Qt (pre-built)
+      if: ${{ !matrix.source_build }}
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: ${{ matrix.qt_version }}
+        arch: win64_msvc2022_64
+        modules: qtshadertools qttools
+    - name: Install ninja
+      if: ${{ matrix.source_build }}
+      run: |
+        choco install ninja
+    - name: Compile dynamic Qt version from source
+      if: ${{ matrix.source_build }}
+      run: |
+        cd ..
+        git clone https://code.qt.io/qt/qt5.git -b v${{ matrix.qt_version }}
+        mkdir qt6_shadow
+        cd qt6_shadow
+        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        ..\qt5\configure.bat -init-submodules -submodules qtbase,qtsvg,qtshadertools,qttools -release -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "..\Qt6_binaries" -skip webengine -nomake tests -nomake examples -opensource -confirm-license
+        cmake --build . --parallel $env:NUMBER_OF_PROCESSORS
+        cmake --install .
+    - name: Package binaries
+      run: |
+        if ('${{ matrix.source_build }}' -eq 'true') {
+          $qtDir = (Resolve-Path "$env:GITHUB_WORKSPACE\..\Qt6_binaries").Path
+        } else {
+          $qtDir = "$env:RUNNER_WORKSPACE\Qt\${{ matrix.qt_version }}\msvc2022_64"
+        }
+        Push-Location $qtDir
+        7z a "$env:GITHUB_WORKSPACE\qt6_${{ matrix.version_token }}_dynamic_binaries_win.zip" .
+        Pop-Location
+    - uses: actions/upload-artifact@v7
+      with:
+        name: qt6_${{ matrix.version_token }}_dynamic_binaries_win.zip
+        path: qt6_${{ matrix.version_token }}_dynamic_binaries_win.zip
+    - name: Upload to toolchain release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>$null
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt6_${{ matrix.version_token }}_dynamic_binaries_win.zip" --clobber
+
+  GenerateLinuxInstallerFramework:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+    - name: Install Python 3.10 version
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.10'
+        architecture: 'x64'
+    - name: Download Qt Installer Framework
+      run: |
+        python -m pip install --upgrade pip
+        pip install aqtinstall
+        aqt install-tool linux desktop tools_ifw ${{ env.QIF_TOOL_ID }} --outputdir "$RUNNER_TOOL_CACHE/Qt"
+    - name: Package binaries
+      run: |
+        tar cfvz "qt_ifw_47_linux.tar.gz" -C "$RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/${{ env.QIF_VERSION }}" .
+    - uses: actions/upload-artifact@v7
+      with:
+        name: qt_ifw_47_linux.tar.gz
+        path: qt_ifw_47_linux.tar.gz
+    - name: Upload to toolchain release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>/dev/null || true
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt_ifw_47_linux.tar.gz --clobber
+
+  GenerateMacOSInstallerFramework:
+    runs-on: macos-26
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+    - name: Install Python 3.10 version
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.10'
+        architecture: 'arm64'
+    - name: Download Qt Installer Framework
+      run: |
+        python -m pip install --upgrade pip
+        pip install aqtinstall
+        aqt install-tool mac desktop tools_ifw ${{ env.QIF_TOOL_ID }} --outputdir "$RUNNER_TOOL_CACHE/Qt"
+    - name: Package binaries
+      run: |
+        tar cfvz "qt_ifw_47_macos.tar.gz" -C "$RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/${{ env.QIF_VERSION }}" .
+    - uses: actions/upload-artifact@v7
+      with:
+        name: qt_ifw_47_macos.tar.gz
+        path: qt_ifw_47_macos.tar.gz
+    - name: Upload to toolchain release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>/dev/null || true
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt_ifw_47_macos.tar.gz --clobber
+
+  GenerateWinInstallerFramework:
+    runs-on: windows-2025
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+    - name: Install Python 3.10 version
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.10'
+        architecture: 'x64'
+    - name: Download Qt Installer Framework
+      run: |
+        python -m pip install --upgrade pip
+        pip install aqtinstall
+        aqt install-tool windows desktop tools_ifw ${{ env.QIF_TOOL_ID }} --outputdir "$env:RUNNER_TOOL_CACHE\Qt"
+    - name: Package binaries
+      run: |
+        Push-Location "$env:RUNNER_TOOL_CACHE\Qt\Tools\QtInstallerFramework\${{ env.QIF_VERSION }}"
+        7z a "$env:GITHUB_WORKSPACE\qt_ifw_47_win.zip" .
+        Pop-Location
+    - uses: actions/upload-artifact@v7
+      with:
+        name: qt_ifw_47_win.zip
+        path: qt_ifw_47_win.zip
+    - name: Upload to toolchain release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>$null
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt_ifw_47_win.zip --clobber
+
   GenerateLinuxStaticBinaries:
     runs-on: ubuntu-24.04
     
@@ -47,8 +290,8 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        gh release create qt_binaries --title "Static Qt Binaries" --notes "Pre-built static Qt 6.11.0 binaries for CI" 2>/dev/null || true
-        gh release upload qt_binaries qt6_6110_static_binaries_linux.tar.gz --clobber
+        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>/dev/null || true
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6110_static_binaries_linux.tar.gz --clobber
 
   GenerateMacOSStaticBinaries:
     runs-on: macos-26
@@ -85,8 +328,8 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        gh release create qt_binaries --title "Static Qt Binaries" --notes "Pre-built static Qt 6.11.0 binaries for CI" 2>/dev/null || true
-        gh release upload qt_binaries qt6_6110_static_binaries_macos.tar.gz --clobber
+        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>/dev/null || true
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6110_static_binaries_macos.tar.gz --clobber
 
   GenerateWinStaticBinaries:
     runs-on: windows-2025
@@ -129,8 +372,8 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        gh release create qt_binaries --title "Static Qt Binaries" --notes "Pre-built static Qt 6.11.0 binaries for CI" 2>$null
-        gh release upload qt_binaries qt6_6110_static_binaries_win.zip --clobber
+        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>$null
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6110_static_binaries_win.zip --clobber
 
   GenerateWasmBinaries:
     runs-on: ubuntu-24.04
@@ -186,5 +429,5 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        gh release create qt_binaries --title "Static Qt Binaries" --notes "Pre-built static Qt 6.11.0 binaries for CI" 2>/dev/null || true
-        gh release upload qt_binaries qt6_6110_static_binaries_wasm.tar.gz --clobber
+        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>/dev/null || true
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6110_static_binaries_wasm.tar.gz --clobber
