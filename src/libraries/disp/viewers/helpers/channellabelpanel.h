@@ -107,7 +107,7 @@ public:
     //=========================================================================================================
     /**
      * Show or hide bad-channel rows.  When @p hide is true, bad channels are
-     * collapsed to a minimal strip so that good channels fill the panel.
+     * removed from the visible row list so the panel stays aligned with the trace view.
      */
     void setHideBadChannels(bool hide);
 
@@ -140,6 +140,8 @@ protected:
     bool event(QEvent *e) override;   // for QEvent::ToolTip
 
 private:
+    QVector<int> effectiveChannelIndices() const;
+
     QPointer<ChannelDataModel> m_model;
     int  m_firstVisibleChannel = 0;
     int  m_visibleChannelCount = 12;

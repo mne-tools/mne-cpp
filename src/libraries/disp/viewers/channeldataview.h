@@ -53,6 +53,7 @@
 #include <QVector>
 
 #include "helpers/channelrhiview.h"
+#include "helpers/timerulerwidget.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -284,6 +285,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Set the list of persistent sample/reference markers shown in the time ruler.
+     *
+     * @param[in] markers  Reference markers to display in the ruler.
+     */
+    void setReferenceMarkers(const QVector<TimeRulerReferenceMark> &markers);
+
+    //=========================================================================================================
+    /**
      * Set the list of annotation spans to display as translucent overlays.
      *
      * @param[in] annotations  List of AnnotationSpan objects.
@@ -361,6 +370,24 @@ signals:
      * Emitted when the user selected a sample range for annotation creation.
      */
     void sampleRangeSelected(int startSample, int endSample);
+
+    //=========================================================================================================
+    /**
+     * Emitted when the ruler context menu requests a new sample marker.
+     */
+    void referenceMarkerAddRequested(int sample);
+
+    //=========================================================================================================
+    /**
+     * Emitted when the ruler context menu requests removal of a nearby sample marker.
+     */
+    void referenceMarkerRemoveRequested(int sample);
+
+    //=========================================================================================================
+    /**
+     * Emitted when the ruler context menu requests clearing all sample markers.
+     */
+    void referenceMarkersClearRequested();
 
 protected:
     void updateGuiMode(GuiMode mode) override;

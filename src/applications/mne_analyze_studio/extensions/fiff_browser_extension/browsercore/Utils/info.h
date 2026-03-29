@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
- * @file     datamarker.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
+ * @file     info.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @version  2.1.0
- * @date     August, 2014
+ * @date     January, 2014
  *
  * @section  LICENSE
  *
- * Copyright (C) 2014, Christoph Dinh, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2014, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,33 +28,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the DataMarker class.
+ * @brief    Contains general application information like: application name and version number.
  *
  */
-#ifndef DATAMARKER_H
-#define DATAMARKER_H
+
+#ifndef INFO_H
+#define INFO_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include "rawsettings.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QWidget>
-#include <QPalette>
-#include <QMouseEvent>
-#include <QRect>
-#include <QRegion>
-#include <QDebug>
-#include <QEvent>
-#include <QSettings>
+#include <QString>
+#include <QObject>
 
 
 //*************************************************************************************************************
@@ -66,96 +52,126 @@
 namespace MNEBROWSE
 {
 
+//=============================================================================================================
 /**
- * DECLARE CLASS DataMarker
- *
- * @brief The DataWindow class provides the data dock window
+ * Log level
  */
-class DataMarker : public QWidget
+enum LogLevel
 {
-    Q_OBJECT
+    _LogLvMin,      /**< Minimal log information */
+    _LogLvNormal,   /**< Normal amount of log information */
+    _LogLvMax       /**< Accurate logging */
+};
+
+
+//=============================================================================================================
+/**
+ * Log kind
+ */
+enum LogKind
+{
+    _LogKndMessage,     /**< Normal log message */
+    _LogKndWarning,     /**< Warning log message */
+    _LogKndError        /**< Error log message */
+};
+
+
+//=============================================================================================================
+/**
+ * DECLARE CLASS CInfo
+ *
+ * @brief The CInfo class provides application information.
+ */
+class CInfo
+{
 public:
     //=========================================================================================================
     /**
-     * Constructs a DataMarker dialog which is a child of parent
+     * Returns the short form of the application name.
      *
-     * @param [in] parent pointer to parent widget; If parent is 0, the new DataMarker becomes a window. If parent is another widget, DataMarker becomes a child window inside parent. DataWindow is deleted when its parent is deleted.
+     * @return a string containing the short application name.
      */
-    DataMarker(QWidget *parent = 0);
+    const static QString AppNameShort()
+    {
+        return QObject::tr("mne_analyze_studio_fiff_browser");
+    }
 
     //=========================================================================================================
     /**
-     * set the m_movementBoundary
+     * Returns the application name.
      *
-     * @param [in] QRect Hols the bounding rect
+     * @return a string containing application name.
      */
-    void setMovementBoundary(QRegion rect);
+    const static QString AppName()
+    {
+        return QObject::tr("Embedded FIFF raw browser for MNE Analyze Studio.");
+    }
 
     //=========================================================================================================
     /**
-     * Set the marker colour used for the vertical line.
      *
-     * @param[in] color  Marker colour.
      */
-    void setMarkerColor(const QColor &color);
-
-private:
-    //=========================================================================================================
-    /**
-     * Reimplemnted mouse press event handler
-     */
-    void mousePressEvent(QMouseEvent *event);
+    const static QString OrganizationName()
+    {
+        return QObject::tr("MNE-CPP");
+    }
 
     //=========================================================================================================
     /**
-     * Reimplemnted mouse move event handler
+     * Returns the major version number of the application which indicates larger changes of the application.
+     *
+     * @return the major version number.
      */
-    void mouseMoveEvent(QMouseEvent *event);
+    static int MajorVersion()
+    {
+        return 1;
+    }
 
     //=========================================================================================================
     /**
-     * Reimplemnted enter event handler
+     * Returns the minor version number of the application which indicates smaller changes of the application.
+     *
+     * @return the minor version number.
      */
-    void enterEvent(QEvent *event);
+    static int MinorVersion()
+    {
+        return 2;
+    }
 
     //=========================================================================================================
     /**
-     * Reimplemented leave event handler.
+     * Returns the revision number which indicates the bug fix level.
+     *
+     * @return the revision number.
      */
-    void leaveEvent(QEvent *event);
+    static int RevisionVersion()
+    {
+        return 0;
+    }
 
     //=========================================================================================================
     /**
-     * Reimplemnted move event handler
+     * Returns the build number which corresponds to the SVN revision control number.
+     *
+     * @return the build number.
      */
-    void moveEvent(QMoveEvent *event);
-
-    QPoint      m_oldPos;               /**< The old mouse position */
-    QRegion     m_movableRegion;        /**< The movement boundary */
-
-    QSettings   m_qSettings;            /**< QSettings variable used to write or read from independent application sessions */
-
-
-signals:
-    //=========================================================================================================
-    /**
-     * markerMoved is emmitted whenever the data marker was moved
-     */
-    void markerMoved();
+    static int BuildVersion()
+    {
+        return 224;
+    }
 
     //=========================================================================================================
     /**
-     * Emitted when the user presses the marker, making it the active marker.
+     * Returns the version number (major.minor.build-revision) of the application.
+     *
+     * @return the full version number.
      */
-    void markerPressed();
-
-    //=========================================================================================================
-    /**
-     * Emitted when the user requests that the marker be removed.
-     */
-    void removeRequested();
+    const static QString AppVersion()
+    {
+        return QString("%1.%2.%3-%4").arg(MajorVersion()).arg(MinorVersion()).arg(RevisionVersion()).arg(BuildVersion());
+    }
 };
 
-} // NAMESPACE MNEBROWSE
+} //NAMESPACE
 
-#endif // DATAMARKER_H
+#endif // INFO_H

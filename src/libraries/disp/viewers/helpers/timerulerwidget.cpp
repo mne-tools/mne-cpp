@@ -42,11 +42,14 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QContextMenuEvent>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QFontDatabase>
+#include <QMenu>
 #include <QtMath>
 #include <cmath>
+#include <limits>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -104,6 +107,14 @@ void TimeRulerWidget::setEvents(const QVector<TimeRulerEventMark> &events)
 
 //=============================================================================================================
 
+void TimeRulerWidget::setReferenceMarkers(const QVector<TimeRulerReferenceMark> &markers)
+{
+    m_referenceMarkers = markers;
+    update();
+}
+
+//=============================================================================================================
+
 void TimeRulerWidget::setScrollSample(float sample)
 {
     if (qFuzzyCompare(m_scrollSample, sample))
@@ -156,6 +167,39 @@ QString TimeRulerWidget::formatTime(double seconds)
 
 //=============================================================================================================
 
+int TimeRulerWidget::sampleAtX(int x) const
+{
+    const int clampedX = qBound(0, x, qMax(0, width() - 1));
+    const double sample = static_cast<double>(m_scrollSample)
+                        + static_cast<double>(clampedX) * static_cast<double>(m_spp);
+    return qRound(sample);
+}
+
+//=============================================================================================================
+
+int TimeRulerWidget::nearestReferenceMarkerIndex(int sample, int tolerancePixels) const
+{
+    if (m_referenceMarkers.isEmpty() || m_spp <= 0.f) {
+        return -1;
+    }
+
+    int nearestIndex = -1;
+    double nearestDistance = std::numeric_limits<double>::max();
+    const double toleranceSamples = static_cast<double>(tolerancePixels) * static_cast<double>(m_spp);
+
+    for (int i = 0; i < m_referenceMarkers.size(); ++i) {
+        const double distance = qAbs(static_cast<double>(m_referenceMarkers.at(i).sample - sample));
+        if (distance <= toleranceSamples && distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestIndex = i;
+        }
+    }
+
+    return nearestIndex;
+}
+
+//=============================================================================================================
+
 void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
 {
     const int    W   = width();
@@ -186,6 +230,44 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
     // Bottom border
     p.setPen(QPen(QColor(185, 185, 195), 1));
     p.drawLine(0, H - 1, W, H - 1);
+
+    // ── Persistent sample markers ────────────────────────────────────
+    if (!m_referenceMarkers.isEmpty()) {
+        QFont markerFont = p.font();
+        markerFont.setPixelSize(9);
+        markerFont.setBold(true);
+        p.setFont(markerFont);
+
+        constexpr int kMarkerChipH = 12;
+        constexpr int kMarkerPadX = 5;
+        const int markerChipY = 2;
+
+        for (const TimeRulerReferenceMark &marker : m_referenceMarkers) {
+            const float xF = (static_cast<float>(marker.sample) - m_scrollSample) / static_cast<float>(spp);
+            if (xF < -2.f || xF > W + 2.f) {
+                continue;
+            }
+
+            const int xi = static_cast<int>(std::round(xF));
+            QColor markerColor = marker.color;
+            markerColor.setAlpha(210);
+            p.setPen(QPen(markerColor, 1));
+            p.drawLine(xi, 0, xi, H - 1);
+
+            const QString label = marker.label.isEmpty()
+                                ? QString::number(marker.sample)
+                                : marker.label;
+            const int chipW = qMax(20, p.fontMetrics().horizontalAdvance(label) + 2 * kMarkerPadX);
+            QRect chipRect(xi - chipW / 2, markerChipY, chipW, kMarkerChipH);
+            chipRect.moveLeft(qBound(2, chipRect.left(), qMax(2, W - chipRect.width() - 2)));
+
+            QColor fillColor = marker.color;
+            fillColor.setAlpha(220);
+            p.fillRect(chipRect, fillColor);
+            p.setPen(Qt::white);
+            p.drawText(chipRect, Qt::AlignCenter, label);
+        }
+    }
 
     // ── Stim event chips ─────────────────────────────────────────────
     if (!m_events.isEmpty()) {
@@ -298,5 +380,45 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
                 p.drawText(lx, ly, label);
             }
         }
+    }
+}
+
+//=============================================================================================================
+
+void TimeRulerWidget::contextMenuEvent(QContextMenuEvent *event)
+{
+    if (m_sfreq <= 0.0 || m_spp <= 0.0f) {
+        QWidget::contextMenuEvent(event);
+        return;
+    }
+
+    const int sample = sampleAtX(event->pos().x());
+    const int nearbyMarkerIndex = nearestReferenceMarkerIndex(sample);
+
+    QMenu menu(this);
+    QAction *addMarkerAction = menu.addAction(tr("Add Marker Here"));
+    QAction *removeMarkerAction = nullptr;
+    QAction *clearMarkersAction = nullptr;
+
+    if (nearbyMarkerIndex >= 0) {
+        removeMarkerAction = menu.addAction(tr("Remove Nearest Marker"));
+    }
+
+    if (!m_referenceMarkers.isEmpty()) {
+        menu.addSeparator();
+        clearMarkersAction = menu.addAction(tr("Clear All Markers"));
+    }
+
+    QAction *selectedAction = menu.exec(event->globalPos());
+    if (!selectedAction) {
+        return;
+    }
+
+    if (selectedAction == addMarkerAction) {
+        emit addReferenceMarkerRequested(sample);
+    } else if (selectedAction == removeMarkerAction) {
+        emit removeReferenceMarkerRequested(sample);
+    } else if (selectedAction == clearMarkersAction) {
+        emit clearReferenceMarkersRequested();
     }
 }

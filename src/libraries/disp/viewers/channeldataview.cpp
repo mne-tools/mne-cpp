@@ -296,6 +296,13 @@ void ChannelDataView::setupLayout()
     connect(m_pRhiView, &ChannelRhiView::samplesPerPixelChanged,
             m_pTimeRuler, &TimeRulerWidget::setSamplesPerPixel);
 
+    connect(m_pTimeRuler, &TimeRulerWidget::addReferenceMarkerRequested,
+            this, &ChannelDataView::referenceMarkerAddRequested);
+    connect(m_pTimeRuler, &TimeRulerWidget::removeReferenceMarkerRequested,
+            this, &ChannelDataView::referenceMarkerRemoveRequested);
+    connect(m_pTimeRuler, &TimeRulerWidget::clearReferenceMarkersRequested,
+            this, &ChannelDataView::referenceMarkersClearRequested);
+
     // Recompute samples-per-pixel when the RHI view itself is resized so the
     // time window stays constant regardless of the widget's pixel width.
     connect(m_pRhiView, &ChannelRhiView::viewResized,
@@ -483,6 +490,7 @@ void ChannelDataView::hideBadChannels(bool hide)
         m_pRhiView->setHideBadChannels(hide);
     if (m_pLabelPanel)
         m_pLabelPanel->setHideBadChannels(hide);
+    updateChannelScrollBarRange();
 }
 
 //=============================================================================================================
@@ -536,6 +544,14 @@ void ChannelDataView::setEvents(const QVector<ChannelRhiView::EventMarker> &even
             rulerMarks.append({ev.sample, ev.color, ev.label});
         m_pTimeRuler->setEvents(rulerMarks);
     }
+}
+
+//=============================================================================================================
+
+void ChannelDataView::setReferenceMarkers(const QVector<TimeRulerReferenceMark> &markers)
+{
+    if (m_pTimeRuler)
+        m_pTimeRuler->setReferenceMarkers(markers);
 }
 
 //=============================================================================================================
@@ -665,6 +681,7 @@ void ChannelDataView::clearView()
     if (m_pTimeRuler) {
         m_pTimeRuler->setFirstFileSample(0);
         m_pTimeRuler->setScrollSample(0.f);
+        m_pTimeRuler->setReferenceMarkers({});
     }
 }
 

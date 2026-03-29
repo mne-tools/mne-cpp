@@ -1015,12 +1015,12 @@ bool MainWindow::ensureLegacyRawModelLoaded(const QString& featureName)
     }
 
     QBuffer rawBuffer(&s_wasmByteArray);
-    if (!model->loadFiffData(&rawBuffer)) {
-        QMessageBox::warning(this,
+        if (!model->loadFiffData(&rawBuffer)) {
+            QMessageBox::warning(this,
                              dialogTitle,
-                             QStringLiteral("The legacy processing model could not be initialized from the loaded raw buffer."));
-        return false;
-    }
+                             QStringLiteral("The compatibility processing model could not be initialized from the loaded raw buffer."));
+            return false;
+        }
 #else
     if (m_qFileRaw.fileName().isEmpty() || !QFile::exists(m_qFileRaw.fileName())) {
         QMessageBox::warning(this,
@@ -1033,7 +1033,7 @@ bool MainWindow::ensureLegacyRawModelLoaded(const QString& featureName)
     if (!model->loadFiffData(&rawFile)) {
         QMessageBox::warning(this,
                              dialogTitle,
-                             QStringLiteral("The legacy processing model could not be initialized from %1.")
+                             QStringLiteral("The compatibility processing model could not be initialized from %1.")
                                  .arg(m_qFileRaw.fileName()));
         return false;
     }

@@ -18,6 +18,7 @@
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_evoked_set.h>
 #include <mne/mne_forward_solution.h>
+#include <mne/mne_epoch_data_list.h>
 
 using namespace RTPROCESSINGLIB;
 using namespace UTILSLIB;
@@ -55,6 +56,73 @@ static FiffInfo::SPtr createSyntheticFiffInfo(int nChannels, float sfreq)
 
     info->nchan = info->chs.size();
     return info;
+}
+
+static MatrixXi deriveStimEvents(const FiffRawData& raw)
+{
+    int stimIdx = -1;
+    for (int channelIndex = 0; channelIndex < raw.info.nchan; ++channelIndex) {
+        if (raw.info.chs[channelIndex].kind == FIFFV_STIM_CH) {
+            stimIdx = channelIndex;
+            if (raw.info.ch_names.value(channelIndex).remove(QLatin1Char(' ')) == QLatin1String("STI014")) {
+                break;
+            }
+        }
+    }
+
+    if (stimIdx < 0) {
+        return MatrixXi();
+    }
+
+    RowVectorXi picks(1);
+    picks << stimIdx;
+
+    MatrixXd stimData;
+    MatrixXd stimTimes;
+    if (!raw.read_raw_segment(stimData, stimTimes, raw.first_samp, raw.last_samp, picks) || stimData.rows() != 1) {
+        return MatrixXi();
+    }
+
+    QVector<Vector3i> detectedEvents;
+    detectedEvents.reserve(static_cast<int>(stimData.cols() / 32));
+
+    int previousValue = 0;
+    for (int sampleOffset = 0; sampleOffset < stimData.cols(); ++sampleOffset) {
+        const int currentValue = qRound(stimData(0, sampleOffset));
+        if (currentValue != previousValue && currentValue != 0) {
+            detectedEvents.append(Vector3i(raw.first_samp + sampleOffset,
+                                           previousValue,
+                                           currentValue));
+        }
+        previousValue = currentValue;
+    }
+
+    MatrixXi events(detectedEvents.size(), 3);
+    for (int row = 0; row < detectedEvents.size(); ++row) {
+        events(row, 0) = detectedEvents.at(row)(0);
+        events(row, 1) = detectedEvents.at(row)(1);
+        events(row, 2) = detectedEvents.at(row)(2);
+    }
+
+    return events;
+}
+
+static QList<int> uniqueEventCodes(const MatrixXi& events, int maxCodes = -1)
+{
+    QList<int> codes;
+    for (int row = 0; row < events.rows(); ++row) {
+        const int code = events(row, 2);
+        if (code == 0 || codes.contains(code)) {
+            continue;
+        }
+
+        codes.append(code);
+        if (maxCodes > 0 && codes.size() >= maxCodes) {
+            break;
+        }
+    }
+
+    return codes;
 }
 
 class TestRtProcessingAveraging : public QObject
@@ -303,6 +371,111 @@ private slots:
 
         QVERIFY(filtered.allFinite());
         QCOMPARE(filtered.rows(), (Index)nCh);
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Compute an evoked response from raw-trigger events
+    //=========================================================================
+    void data_computeAverageFromRawEvents()
+    {
+        if (!hasData()) QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        if (!file.exists()) QSKIP("Raw file not found");
+
+        FiffRawData raw(file);
+        const MatrixXi events = deriveStimEvents(raw);
+        QVERIFY(events.rows() > 0);
+
+        const QList<int> codes = uniqueEventCodes(events, 1);
+        QVERIFY(!codes.isEmpty());
+
+        const FiffEvoked evoked = MNEEpochDataList::computeAverage(raw,
+                                                                   events,
+                                                                   -0.1f,
+                                                                   0.3f,
+                                                                   codes.first(),
+                                                                   true,
+                                                                   -0.1f,
+                                                                   0.0f,
+                                                                   {});
+
+        QVERIFY(evoked.data.size() > 0);
+        QCOMPARE(evoked.data.rows(), static_cast<Index>(raw.info.nchan));
+        QVERIFY(evoked.nave > 0);
+        QVERIFY(qAbs(evoked.baseline.first + 0.1f) < 1e-6f);
+        QVERIFY(qAbs(evoked.baseline.second - 0.0f) < 1e-6f);
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Compute a multi-condition evoked set from raw-trigger events
+    //=========================================================================
+    void data_averageCategoriesFromRawEvents()
+    {
+        if (!hasData()) QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        if (!file.exists()) QSKIP("Raw file not found");
+
+        FiffRawData raw(file);
+        const MatrixXi events = deriveStimEvents(raw);
+        QVERIFY(events.rows() > 0);
+
+        const QList<int> codes = uniqueEventCodes(events, 4);
+        QVERIFY(codes.size() >= 2);
+
+        QStringList comments;
+        for (int code : codes) {
+            comments.append(QStringLiteral("event_%1").arg(code));
+        }
+
+        const FiffEvokedSet evokedSet = MNEEpochDataList::averageCategories(raw,
+                                                                            events,
+                                                                            codes,
+                                                                            comments,
+                                                                            -0.1f,
+                                                                            0.3f,
+                                                                            {},
+                                                                            qMakePair(-0.1f, 0.0f),
+                                                                            false);
+
+        QCOMPARE(evokedSet.evoked.size(), codes.size());
+        for (int index = 0; index < evokedSet.evoked.size(); ++index) {
+            QVERIFY(evokedSet.evoked.at(index).data.size() > 0);
+            QCOMPARE(evokedSet.evoked.at(index).comment, comments.at(index));
+            QVERIFY(evokedSet.evoked.at(index).nave > 0);
+        }
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Compute covariance from raw-trigger events
+    //=========================================================================
+    void data_computeCovarianceFromRawEvents()
+    {
+        if (!hasData()) QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        if (!file.exists()) QSKIP("Raw file not found");
+
+        FiffRawData raw(file);
+        const MatrixXi events = deriveStimEvents(raw);
+        QVERIFY(events.rows() > 0);
+
+        const QList<int> codes = uniqueEventCodes(events, 4);
+        QVERIFY(!codes.isEmpty());
+
+        const FiffCov cov = FiffCov::compute_from_epochs(raw,
+                                                         events,
+                                                         codes,
+                                                         -0.2f,
+                                                         0.0f,
+                                                         -0.2f,
+                                                         0.0f,
+                                                         true,
+                                                         true);
+
+        QVERIFY(!cov.isEmpty());
+        QCOMPARE(cov.dim, raw.info.nchan);
+        QCOMPARE(cov.data.rows(), static_cast<Index>(raw.info.nchan));
+        QCOMPARE(cov.data.cols(), static_cast<Index>(raw.info.nchan));
+        QVERIFY(cov.nfree > 0);
     }
 
     //=========================================================================

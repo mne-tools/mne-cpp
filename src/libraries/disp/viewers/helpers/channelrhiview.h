@@ -317,11 +317,11 @@ public:
     //=========================================================================================================
     /**
      * Show or hide waveform traces of channels marked bad.
-     * When @p hide is true the bad-channel traces are suppressed (rendered as flat
-     * centre lines) so the renderer gives immediate visual feedback when the flag
-     * is toggled.  The label panel collapses those rows simultaneously.
+     * When @p hide is true bad channels are removed from the logical channel list
+     * used for scrolling and rendering so the trace lanes collapse upward in sync
+     * with the label panel.
      *
-     * @param[in] hide  true = suppress bad-channel traces.
+     * @param[in] hide  true = remove bad channels from the visible trace list.
      */
     void setHideBadChannels(bool hide);
     bool hideBadChannels() const { return m_hideBadChannels; }
@@ -478,6 +478,7 @@ private:
 
     // Helper — use instead of firstCh+i for actual model channel index
     int actualChannelAt(int logicalIdx) const; // maps logical → model channel index
+    QVector<int> effectiveChannelIndices() const;
 
     // ── Prefetch window tracking ───────────────────────────────────────
     int   m_vboWindowFirst  = 0;

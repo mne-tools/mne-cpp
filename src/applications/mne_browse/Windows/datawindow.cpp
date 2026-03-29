@@ -45,6 +45,8 @@
 
 #include <algorithm>
 #include <QHash>
+#include <QSignalBlocker>
+#include <utility>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -83,6 +85,76 @@ quint64 makeStimEventKey(int sample, int type)
            | static_cast<quint32>(type);
 }
 
+QColor markerColorForIndex(int index)
+{
+    static const QVector<QColor> kMarkerColors = {
+        QColor(93, 177, 47),
+        QColor(52, 152, 219),
+        QColor(231, 126, 35),
+        QColor(155, 89, 182),
+        QColor(231, 76, 60),
+        QColor(26, 188, 156)
+    };
+
+    if (kMarkerColors.isEmpty()) {
+        return QColor(93, 177, 47);
+    }
+
+    return kMarkerColors.at(index % kMarkerColors.size());
+}
+
+bool channelMatchesFilterScope(const FIFFLIB::FiffInfo& info, int channelIndex, const QString& applyTo)
+{
+    const QString normalizedScope = applyTo.trimmed().toUpper();
+    if (normalizedScope.isEmpty() || normalizedScope == QLatin1String("ALL")) {
+        return true;
+    }
+
+    if (channelIndex < 0 || channelIndex >= info.ch_names.size() || channelIndex >= info.chs.size()) {
+        return false;
+    }
+
+    const QString channelName = info.ch_names.at(channelIndex).trimmed().toUpper();
+    const int kind = info.chs.at(channelIndex).kind;
+
+    if (normalizedScope == QLatin1String("MEG")) {
+        return kind == FIFFV_MEG_CH;
+    }
+    if (normalizedScope == QLatin1String("EEG")) {
+        return kind == FIFFV_EEG_CH;
+    }
+    if (normalizedScope == QLatin1String("ECG")) {
+        return kind == FIFFV_ECG_CH || channelName.contains(QLatin1String("ECG"));
+    }
+    if (normalizedScope == QLatin1String("EOG")) {
+        return kind == FIFFV_EOG_CH || channelName.contains(QLatin1String("EOG"));
+    }
+    if (normalizedScope == QLatin1String("EMG")) {
+        return kind == FIFFV_EMG_CH || channelName.contains(QLatin1String("EMG"));
+    }
+
+    return channelName.contains(normalizedScope);
+}
+
+QMultiMap<int, QSharedPointer<MNEOperator> > browserAssignedOperators(const QSharedPointer<FIFFLIB::FiffInfo>& info,
+                                                                      const QSharedPointer<FilterOperator>& filterOperator,
+                                                                      const QString& applyTo)
+{
+    QMultiMap<int, QSharedPointer<MNEOperator> > assignedOperators;
+    if (!info || filterOperator.isNull()) {
+        return assignedOperators;
+    }
+
+    const QSharedPointer<MNEOperator> operatorBase = filterOperator.staticCast<MNEOperator>();
+    for (int channelIndex = 0; channelIndex < info->nchan; ++channelIndex) {
+        if (channelMatchesFilterScope(*info, channelIndex, applyTo)) {
+            assignedOperators.insert(channelIndex, operatorBase);
+        }
+    }
+
+    return assignedOperators;
+}
+
 } // namespace
 
 
@@ -95,9 +167,6 @@ DataWindow::DataWindow(QWidget *parent)
 : QWidget(parent)
 , ui(new Ui::DataWindowDockWidget)
 , m_pMainWindow(static_cast<MainWindow*>(parent))
-, m_pDataMarker(new DataMarker(this))
-, m_pCurrentDataMarkerLabel(new QLabel(this))
-, m_iCurrentMarkerSample(0)
 , m_bHideBadChannels(false)
 , m_pRawDelegate(Q_NULLPTR)
 , m_pKineticScroller(Q_NULLPTR)
@@ -249,6 +318,250 @@ void DataWindow::setAnnotationSelectionEnabled(bool enabled)
 
 //*************************************************************************************************************
 
+void DataWindow::addMarkerAtSample(int sample)
+{
+    const QRect viewportRect = markerViewportRect();
+    if (viewportRect.isEmpty()) {
+        return;
+    }
+
+    int clampedSample = sample;
+    if (m_pFiffReader && m_pFiffReader->isOpen()) {
+        clampedSample = qBound(m_pFiffReader->firstSample(), sample, m_pFiffReader->lastSample());
+    }
+
+    PersistentMarker marker;
+    marker.id = m_iNextMarkerId++;
+    marker.sample = clampedSample;
+    marker.color = markerColorForIndex(m_dataMarkers.size());
+    marker.line = new DataMarker(this);
+    marker.line->setMarkerColor(marker.color);
+    marker.line->resize(DATA_MARKER_WIDTH, viewportRect.height());
+    marker.line->raise();
+
+    marker.label = new QLabel(this);
+    marker.label->setMinimumWidth(90);
+    marker.label->setMargin(4);
+    marker.label->setAlignment(Qt::AlignHCenter);
+    marker.label->setAttribute(Qt::WA_TransparentForMouseEvents);
+
+    const int markerId = marker.id;
+    connect(marker.line, &DataMarker::markerMoved, this, [this, markerId]() {
+        PersistentMarker *m = findMarker(markerId);
+        if (!m || !m->line || !m_pChannelDataView) {
+            return;
+        }
+
+        const QRect viewportRect = markerViewportRect();
+        if (viewportRect.isEmpty()) {
+            return;
+        }
+
+        const int markerCenterX = m->line->geometry().left() + (DATA_MARKER_WIDTH / 2);
+        const int localMarkerX = m_pChannelDataView->mapFrom(this, QPoint(markerCenterX, viewportRect.center().y())).x();
+        m->sample = m_pChannelDataView->viewportXToSample(localMarkerX);
+        if (m_pFiffReader && m_pFiffReader->isOpen()) {
+            m->sample = qBound(m_pFiffReader->firstSample(), m->sample, m_pFiffReader->lastSample());
+        }
+
+        setActiveMarker(markerId);
+        setMarkerSampleLabel();
+        updateTimeRulerMarkers();
+    });
+    connect(marker.line, &DataMarker::markerPressed, this, [this, markerId]() {
+        setActiveMarker(markerId);
+    });
+    connect(marker.line, &DataMarker::removeRequested, this, [this, markerId]() {
+        removeMarker(markerId);
+    });
+
+    m_dataMarkers.append(marker);
+    setActiveMarker(marker.id);
+    syncMarkersToViewport();
+}
+
+//*************************************************************************************************************
+
+void DataWindow::removeMarker(int markerId)
+{
+    for (int i = 0; i < m_dataMarkers.size(); ++i) {
+        if (m_dataMarkers.at(i).id != markerId) {
+            continue;
+        }
+
+        PersistentMarker marker = m_dataMarkers.takeAt(i);
+        if (marker.line) {
+            marker.line->deleteLater();
+        }
+        if (marker.label) {
+            marker.label->deleteLater();
+        }
+        break;
+    }
+
+    if (m_iActiveMarkerId == markerId) {
+        m_iActiveMarkerId = m_dataMarkers.isEmpty() ? -1 : m_dataMarkers.last().id;
+    }
+
+    setMarkerSampleLabel();
+    updateTimeRulerMarkers();
+}
+
+//*************************************************************************************************************
+
+void DataWindow::removeMarkerNearSample(int sample)
+{
+    if (m_dataMarkers.isEmpty()) {
+        return;
+    }
+
+    int nearestMarkerId = -1;
+    int nearestDistance = std::numeric_limits<int>::max();
+    for (const PersistentMarker &marker : std::as_const(m_dataMarkers)) {
+        const int distance = qAbs(marker.sample - sample);
+        if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestMarkerId = marker.id;
+        }
+    }
+
+    removeMarker(nearestMarkerId);
+}
+
+//*************************************************************************************************************
+
+void DataWindow::clearMarkers()
+{
+    while (!m_dataMarkers.isEmpty()) {
+        PersistentMarker marker = m_dataMarkers.takeLast();
+        if (marker.line) {
+            marker.line->deleteLater();
+        }
+        if (marker.label) {
+            marker.label->deleteLater();
+        }
+    }
+
+    m_iActiveMarkerId = -1;
+    updateTimeRulerMarkers();
+    m_pMainWindow->eventWindow()->getEventModel()->setCurrentMarkerPos(m_iCurrentScrollSample);
+}
+
+//*************************************************************************************************************
+
+void DataWindow::setActiveMarker(int markerId)
+{
+    m_iActiveMarkerId = markerId;
+    setMarkerSampleLabel();
+}
+
+//*************************************************************************************************************
+
+int DataWindow::activeMarkerSample() const
+{
+    const PersistentMarker *marker = findMarker(m_iActiveMarkerId);
+    if (marker) {
+        return marker->sample;
+    }
+
+    return m_pChannelDataView ? m_pChannelDataView->firstVisibleSample() : m_iCurrentScrollSample;
+}
+
+//*************************************************************************************************************
+
+void DataWindow::syncMarkersToViewport()
+{
+    const QRect viewportRect = markerViewportRect();
+    if (viewportRect.isEmpty()) {
+        return;
+    }
+
+    for (PersistentMarker &marker : m_dataMarkers) {
+        if (!marker.line || !marker.label) {
+            continue;
+        }
+
+        QRegion region(viewportRect);
+        marker.line->setMovementBoundary(region);
+
+        bool visible = true;
+        int markerX = viewportRect.left();
+        if (m_pChannelDataView) {
+            const int localViewportX = m_pChannelDataView->sampleToViewportX(marker.sample);
+            markerX = m_pChannelDataView->mapTo(this, QPoint(localViewportX, 0)).x() - (DATA_MARKER_WIDTH / 2);
+            visible = marker.sample >= m_pChannelDataView->firstVisibleSample()
+                   && marker.sample <= (m_pChannelDataView->firstVisibleSample() + m_pChannelDataView->visibleSampleCount());
+        }
+
+        const int maxMarkerX = qMax(viewportRect.left(), viewportRect.right() - DATA_MARKER_WIDTH + 1);
+        markerX = qBound(viewportRect.left(), markerX, maxMarkerX);
+
+        {
+            QSignalBlocker blocker(marker.line);
+            marker.line->setGeometry(markerX,
+                                     viewportRect.y(),
+                                     DATA_MARKER_WIDTH,
+                                     viewportRect.height());
+        }
+
+        marker.line->setVisible(visible);
+        marker.line->raise();
+        marker.label->setVisible(visible);
+    }
+
+    setMarkerSampleLabel();
+    updateTimeRulerMarkers();
+}
+
+//*************************************************************************************************************
+
+void DataWindow::updateTimeRulerMarkers()
+{
+    if (!m_pChannelDataView) {
+        return;
+    }
+
+    QVector<DISPLIB::TimeRulerReferenceMark> marks;
+    marks.reserve(m_dataMarkers.size());
+    for (const PersistentMarker &marker : std::as_const(m_dataMarkers)) {
+        QString label = QStringLiteral("M%1").arg(marker.id);
+        if (marker.id == m_iActiveMarkerId) {
+            label.append(QLatin1Char('*'));
+        }
+        marks.append({marker.sample, marker.color, label});
+    }
+
+    m_pChannelDataView->setReferenceMarkers(marks);
+}
+
+//*************************************************************************************************************
+
+DataWindow::PersistentMarker* DataWindow::findMarker(int markerId)
+{
+    for (PersistentMarker &marker : m_dataMarkers) {
+        if (marker.id == markerId) {
+            return &marker;
+        }
+    }
+
+    return nullptr;
+}
+
+//*************************************************************************************************************
+
+const DataWindow::PersistentMarker* DataWindow::findMarker(int markerId) const
+{
+    for (const PersistentMarker &marker : m_dataMarkers) {
+        if (marker.id == markerId) {
+            return &marker;
+        }
+    }
+
+    return nullptr;
+}
+
+//*************************************************************************************************************
+
 void DataWindow::setVirtualChannels(const QVector<VirtualChannelDefinition> &virtualChannels,
                                     bool reloadIfOpen)
 {
@@ -276,6 +589,40 @@ void DataWindow::setVirtualChannels(const QVector<VirtualChannelDefinition> &vir
     restartChannelView(targetSample, false);
 }
 
+//*************************************************************************************************************
+
+void DataWindow::setUserDefinedFilter(const QSharedPointer<FilterOperator>& filterOperator,
+                                      const QString& applyTo)
+{
+    m_pUserDefinedFilter = filterOperator;
+    m_sUserDefinedFilterApplyTo = applyTo;
+
+    if (m_pMainWindow && m_pMainWindow->chInfoWindow() && m_pMainWindow->chInfoWindow()->getDataModel()) {
+        m_pMainWindow->chInfoWindow()->getDataModel()->assignedOperatorsChanged(
+            browserAssignedOperators(fiffInfo(), m_pUserDefinedFilter, m_sUserDefinedFilterApplyTo));
+    }
+
+    if (m_pFiffReader && m_pFiffReader->isOpen()) {
+        restartChannelView(m_iCurrentScrollSample, false);
+    }
+}
+
+//*************************************************************************************************************
+
+void DataWindow::clearUserDefinedFilter()
+{
+    m_pUserDefinedFilter.clear();
+    m_sUserDefinedFilterApplyTo.clear();
+
+    if (m_pMainWindow && m_pMainWindow->chInfoWindow() && m_pMainWindow->chInfoWindow()->getDataModel()) {
+        m_pMainWindow->chInfoWindow()->getDataModel()->assignedOperatorsChanged({});
+    }
+
+    if (m_pFiffReader && m_pFiffReader->isOpen()) {
+        restartChannelView(m_iCurrentScrollSample, false);
+    }
+}
+
 
 //*************************************************************************************************************
 
@@ -300,10 +647,14 @@ void DataWindow::initMVCSettings()
     m_pChannelDataView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(m_pChannelDataView, &DISPLIB::ChannelDataView::scrollPositionChanged,
             this, &DataWindow::onChannelViewScrollChanged);
-    connect(m_pChannelDataView, &DISPLIB::ChannelDataView::sampleClicked,
-            this, &DataWindow::moveMarkerToSample);
     connect(m_pChannelDataView, &DISPLIB::ChannelDataView::sampleRangeSelected,
             this, &DataWindow::annotationRangeSelected);
+    connect(m_pChannelDataView, &DISPLIB::ChannelDataView::referenceMarkerAddRequested,
+            this, &DataWindow::addMarkerAtSample);
+    connect(m_pChannelDataView, &DISPLIB::ChannelDataView::referenceMarkerRemoveRequested,
+            this, &DataWindow::removeMarkerNearSample);
+    connect(m_pChannelDataView, &DISPLIB::ChannelDataView::referenceMarkersClearRequested,
+            this, &DataWindow::clearMarkers);
 
     // Insert ChannelDataView into the grid at the same slot as the legacy QTableView
     // (row 1, col 0, rowspan 2, colspan 4) then hide the old widget.
@@ -427,7 +778,8 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
     if (data.rows() == 0 || data.cols() == 0)
         return;
 
-    const Eigen::MatrixXd displayData = appendVirtualChannels(data);
+    const Eigen::MatrixXd filteredData = applyUserDefinedFilter(data);
+    const Eigen::MatrixXd displayData = appendVirtualChannels(filteredData);
     auto *model = m_pChannelDataView->model();
 
     // Determine whether this block is contiguous with existing model data.
@@ -729,6 +1081,32 @@ Eigen::MatrixXd DataWindow::appendVirtualChannels(const Eigen::MatrixXd &data) c
 
 //=============================================================================================================
 
+Eigen::MatrixXd DataWindow::applyUserDefinedFilter(const Eigen::MatrixXd &data) const
+{
+    if (m_pUserDefinedFilter.isNull() || !m_pFiffReader || !m_pFiffReader->fiffInfo()) {
+        return data;
+    }
+
+    Eigen::MatrixXd filteredData = data;
+    const auto info = m_pFiffReader->fiffInfo();
+
+    for (int channelIndex = 0; channelIndex < filteredData.rows(); ++channelIndex) {
+        if (!channelMatchesFilterScope(*info, channelIndex, m_sUserDefinedFilterApplyTo)) {
+            continue;
+        }
+
+        if (channelIndex < info->chs.size() && info->chs.at(channelIndex).kind == FIFFV_STIM_CH) {
+            continue;
+        }
+
+        filteredData.row(channelIndex) = m_pUserDefinedFilter->applyFFTFilter(filteredData.row(channelIndex));
+    }
+
+    return filteredData;
+}
+
+//=============================================================================================================
+
 void DataWindow::restartChannelView(int initialSample, bool clearAnnotations)
 {
     if(!m_pFiffReader || !m_pFiffReader->isOpen() || !m_pChannelDataView) {
@@ -751,6 +1129,7 @@ void DataWindow::restartChannelView(int initialSample, bool clearAnnotations)
     m_pChannelDataView->setEvents({});
     if(clearAnnotations) {
         m_pChannelDataView->setAnnotations({});
+        clearMarkers();
     }
     m_pChannelDataView->clearView();
     m_pChannelDataView->init(fiffInfo);
@@ -768,11 +1147,9 @@ void DataWindow::restartChannelView(int initialSample, bool clearAnnotations)
     m_iNextLoadSample = m_iCurrentScrollSample;
 
     m_pChannelDataView->scrollToSample(m_iCurrentScrollSample, false);
-    updateMarkerPosition();
+    syncMarkersToViewport();
     setRangeSampleLabels();
     setMarkerSampleLabel();
-    m_pDataMarker->show();
-    m_pCurrentDataMarkerLabel->show();
     ui->m_label_sampleMin->show();
     ui->m_label_sampleMax->show();
 
@@ -786,7 +1163,10 @@ void DataWindow::onChannelViewScrollChanged(int sample)
 {
     m_iCurrentScrollSample = sample;
     setRangeSampleLabels();
-    setMarkerSampleLabel();
+    syncMarkersToViewport();
+    if(m_dataMarkers.isEmpty()) {
+        m_pMainWindow->eventWindow()->getEventModel()->setCurrentMarkerPos(sample);
+    }
 
     // If the scroll jumped outside the currently loaded data range, redirect
     // the load frontier so the data at the jump target loads immediately.
@@ -839,26 +1219,7 @@ void DataWindow::scheduleNextLoad()
 
 void DataWindow::initMarker()
 {
-    //Set marker as front top-most widget
-    m_pDataMarker->raise();
-
-    const QRect boundingRect = markerViewportRect();
-
-    //Inital position of the marker
-    m_pDataMarker->move(boundingRect.x(), boundingRect.y());
-
-    //Create Region from bounding rect - this region is used to restrain the marker inside the data view
-    QRegion region(boundingRect);
-    m_pDataMarker->setMovementBoundary(region);
-
-    //Set marker size to table view size minus horizontal scroll bar height
-    m_pDataMarker->resize(DATA_MARKER_WIDTH,
-                          boundingRect.height());
-
-    //If no file has been loaded yet dont show the marker and its label
     if(!isFiffFileLoaded()) {
-        m_pDataMarker->hide();
-        m_pCurrentDataMarkerLabel->hide();
         ui->m_label_sampleMin->hide();
         ui->m_label_sampleMax->hide();
     }
@@ -873,35 +1234,6 @@ void DataWindow::initLabels()
     if (m_pChannelDataView) {
         connect(m_pChannelDataView, &DISPLIB::ChannelDataView::scrollPositionChanged,
                 this, &DataWindow::setRangeSampleLabels);
-    }
-
-    //Setup marker label
-    //Set current marker sample label to vertical spacer position and initalize text
-    m_pCurrentDataMarkerLabel->setMinimumWidth(150);
-    m_pCurrentDataMarkerLabel->setMargin(4);
-    m_pCurrentDataMarkerLabel->setAlignment(Qt::AlignHCenter);
-    m_pCurrentDataMarkerLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
-    m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left(), m_pDataMarker->geometry().top() + 5);
-    QString numberString = QString().number(m_iCurrentMarkerSample);
-    m_pCurrentDataMarkerLabel->setText(numberString.append(QString(" / %1").arg("0 sec")));
-
-    //Set color
-    QColor textColor = m_qSettings.value("DataMarker/data_marker_color", QColor(93,177,47)).value<QColor>();
-    m_pCurrentDataMarkerLabel->setStyleSheet(QStringLiteral(
-        "QLabel {"
-        " color: %1;"
-        " background-color: rgba(255, 255, 255, 220);"
-        " border: 1px solid %1;"
-        " border-radius: 3px;"
-        " font-weight: 600;"
-        " }").arg(textColor.name()));
-    m_pCurrentDataMarkerLabel->adjustSize();
-
-    //Connect current marker sample label to marker move signal
-    connect(m_pDataMarker,&DataMarker::markerMoved,
-            this,&DataWindow::setMarkerSampleLabel);
-
-    if (m_pChannelDataView) {
         connect(m_pChannelDataView, &DISPLIB::ChannelDataView::scrollPositionChanged,
                 this, &DataWindow::setMarkerSampleLabel);
     }
@@ -913,7 +1245,7 @@ void DataWindow::initLabels()
 void DataWindow::resizeEvent(QResizeEvent * event)
 {
     //On every resize update marker position
-    updateMarkerPosition();
+    syncMarkersToViewport();
 
     //On every resize set sample informaiton
     setRangeSampleLabels();
@@ -948,17 +1280,6 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
 
 bool DataWindow::eventFilter(QObject *object, QEvent *event)
 {    
-    //Detect double mouse clicks and move data marker to current mouse position
-    if (object == ui->m_tableView_rawTableView->viewport() && event->type() == QEvent::MouseButtonDblClick) {
-        QMouseEvent* mouseEventCast = static_cast<QMouseEvent*>(event);
-        if(mouseEventCast->button() == Qt::LeftButton) {
-            m_pDataMarker->move(mouseEventCast->position().x() + ui->m_tableView_rawTableView->verticalHeader()->width() + ui->m_tableView_rawTableView->x(), m_pDataMarker->y());
-
-            //Deselect channel which was selected through the double click -> dirty hack
-            //ui->m_tableView_rawTableView->selectionModel()->select(ui->m_tableView_rawTableView->selectionModel()->currentIndex(), QItemSelectionModel::Deselect);
-        }
-    }
-
     //Deactivate grabbing gesture when scrollbars or vertical header are selected
     if ((object == ui->m_tableView_rawTableView->horizontalScrollBar() ||
          object == ui->m_tableView_rawTableView->verticalScrollBar() ||
@@ -1108,43 +1429,63 @@ void DataWindow::setRangeSampleLabels()
 
 void DataWindow::setMarkerSampleLabel()
 {
-    m_pCurrentDataMarkerLabel->raise();
-
     const QRect viewportRect = markerViewportRect();
     if(viewportRect.isEmpty()) {
         return;
     }
 
-    //Update the text and position in the current sample marker label
-    const int markerCenterX = m_pDataMarker->geometry().left() + (DATA_MARKER_WIDTH / 2);
-    if(m_pChannelDataView) {
-        const int localMarkerX = m_pChannelDataView->mapFrom(this, QPoint(markerCenterX, viewportRect.center().y())).x();
-        m_iCurrentMarkerSample = m_pChannelDataView->viewportXToSample(localMarkerX);
-    } else {
-        const int scrollSample = 0;
-        const int browserLeft = ui->m_tableView_rawTableView->geometry().x();
-        m_iCurrentMarkerSample = scrollSample + (markerCenterX - browserLeft);
-    }
-
     auto fiffInfo = m_pFiffReader ? m_pFiffReader->fiffInfo() : QSharedPointer<FIFFLIB::FiffInfo>();
     if (!fiffInfo)
         return;
-    int currentSeconds = (m_iCurrentMarkerSample/fiffInfo->sfreq)*1000;
 
-    QString numberString = QString("%1 / %2 sec").arg(QString().number(m_iCurrentMarkerSample)).arg(QString().number((double)currentSeconds/1000,'g'));
-    m_pCurrentDataMarkerLabel->setText(numberString);
-    m_pCurrentDataMarkerLabel->adjustSize();
+    for (int i = 0; i < m_dataMarkers.size(); ++i) {
+        PersistentMarker &marker = m_dataMarkers[i];
+        if (!marker.line || !marker.label) {
+            continue;
+        }
 
-    const int labelX = qBound(viewportRect.left(),
-                              markerCenterX - (m_pCurrentDataMarkerLabel->width() / 2),
-                              qMax(viewportRect.left(),
-                                   viewportRect.right() - m_pCurrentDataMarkerLabel->width() + 1));
-    const int labelY = qMax(0,
-                            viewportRect.top() - m_pCurrentDataMarkerLabel->height() - 4);
-    m_pCurrentDataMarkerLabel->move(labelX, labelY);
+        const bool visible = marker.line->isVisible();
+        marker.label->setVisible(visible);
+        if (!visible) {
+            continue;
+        }
 
-    //Set current marker posisiton in event model
-    m_pMainWindow->eventWindow()->getEventModel()->setCurrentMarkerPos(m_iCurrentMarkerSample);
+        const int markerCenterX = marker.line->geometry().left() + (DATA_MARKER_WIDTH / 2);
+        const int currentMilliseconds = static_cast<int>((static_cast<double>(marker.sample) / fiffInfo->sfreq) * 1000.0);
+        QString markerText = QString("%1 / %2 sec")
+                                 .arg(QString::number(marker.sample))
+                                 .arg(QString::number(static_cast<double>(currentMilliseconds) / 1000.0, 'g'));
+        if (marker.id == m_iActiveMarkerId) {
+            markerText.prepend(QStringLiteral("Active "));
+        }
+
+        marker.label->setText(markerText);
+        marker.label->adjustSize();
+        marker.label->raise();
+
+        const int labelX = qBound(viewportRect.left(),
+                                  markerCenterX - (marker.label->width() / 2),
+                                  qMax(viewportRect.left(),
+                                       viewportRect.right() - marker.label->width() + 1));
+        const int labelStack = i % 2;
+        const int labelY = qMax(0,
+                                viewportRect.top() - marker.label->height() - 4 - labelStack * (marker.label->height() + 2));
+        marker.label->move(labelX, labelY);
+
+        marker.label->setStyleSheet(QStringLiteral(
+            "QLabel {"
+            " color: %1;"
+            " background-color: rgba(255, 255, 255, 220);"
+            " border: 1px solid %1;"
+            " border-radius: 3px;"
+            " font-weight: %2;"
+            " }")
+            .arg(marker.color.name())
+            .arg(marker.id == m_iActiveMarkerId ? QStringLiteral("700")
+                                                : QStringLiteral("500")));
+    }
+
+    m_pMainWindow->eventWindow()->getEventModel()->setCurrentMarkerPos(activeMarkerSample());
 }
 
 
@@ -1152,59 +1493,30 @@ void DataWindow::setMarkerSampleLabel()
 
 void DataWindow::moveMarkerToSample(int sample)
 {
-    const QRect viewportRect = markerViewportRect();
-    if(viewportRect.isEmpty()) {
+    if (m_dataMarkers.isEmpty()) {
+        addMarkerAtSample(sample);
+        return;
+    }
+
+    PersistentMarker *marker = findMarker(m_iActiveMarkerId);
+    if (!marker) {
+        addMarkerAtSample(sample);
         return;
     }
 
     int clampedSample = sample;
-    if(m_pFiffReader && m_pFiffReader->isOpen()) {
-        clampedSample = qBound(m_pFiffReader->firstSample(),
-                               sample,
-                               m_pFiffReader->lastSample());
+    if (m_pFiffReader && m_pFiffReader->isOpen()) {
+        clampedSample = qBound(m_pFiffReader->firstSample(), sample, m_pFiffReader->lastSample());
     }
-
-    int markerX = viewportRect.left();
-    if(m_pChannelDataView) {
-        const int localViewportX = m_pChannelDataView->sampleToViewportX(clampedSample);
-        markerX = m_pChannelDataView->mapTo(this, QPoint(localViewportX, 0)).x()
-                - (DATA_MARKER_WIDTH / 2);
-    }
-
-    const int maxMarkerX = qMax(viewportRect.left(),
-                                viewportRect.right() - DATA_MARKER_WIDTH + 1);
-    markerX = qBound(viewportRect.left(), markerX, maxMarkerX);
-
-    m_pDataMarker->move(markerX, viewportRect.top());
-    setMarkerSampleLabel();
+    marker->sample = clampedSample;
+    syncMarkersToViewport();
 }
 
 //*************************************************************************************************************
 
 void DataWindow::updateMarkerPosition()
 {
-    const QRect boundingRect = markerViewportRect();
-    if(boundingRect.isEmpty()) {
-        return;
-    }
-
-    //Create Region from bounding rect - this region is used to restrain the marker inside the data view
-    QRegion region(boundingRect);
-    m_pDataMarker->setMovementBoundary(region);
-
-    //If marker is outside of the bounding rect move to edges of bounding rect
-    const int maxMarkerX = qMax(boundingRect.left(),
-                                boundingRect.right() - DATA_MARKER_WIDTH + 1);
-    const int markerX = qBound(boundingRect.left(),
-                               m_pDataMarker->pos().x(),
-                               maxMarkerX);
-    m_pDataMarker->setGeometry(markerX,
-                               boundingRect.y(),
-                               DATA_MARKER_WIDTH,
-                               boundingRect.height());
-
-    //Set marker size to table view size minus horizontal scroll bar height
-    setMarkerSampleLabel();
+    syncMarkersToViewport();
 }
 
 

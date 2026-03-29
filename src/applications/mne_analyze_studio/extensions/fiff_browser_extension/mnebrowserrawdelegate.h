@@ -2,7 +2,7 @@
 /**
  * @file     mnebrowserrawdelegate.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @version  dev
+ * @version  2.1.0
  * @date     March, 2026
  *
  * @section  LICENSE
@@ -33,9 +33,9 @@
 #ifndef MNE_ANALYZE_STUDIO_MNEBROWSERRAWDELEGATE_H
 #define MNE_ANALYZE_STUDIO_MNEBROWSERRAWDELEGATE_H
 
-#include "../../../mne_browse/Models/rawmodel.h"
-#include "../../../mne_browse/Models/eventmodel.h"
-#include "../../../mne_browse/Utils/types.h"
+#include "Models/rawmodel.h"
+#include "Models/eventmodel.h"
+#include "Utils/types.h"
 
 #include <QAbstractItemDelegate>
 #include <QColor>

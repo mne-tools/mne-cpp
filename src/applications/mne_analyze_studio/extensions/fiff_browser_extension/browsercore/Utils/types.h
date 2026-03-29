@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
- * @file     datamarker.cpp
+ * @file     types.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
  * @version  2.1.0
- * @date     August, 2014
+ * @date     January, 2014
  *
  * @section  LICENSE
  *
@@ -29,16 +29,31 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the DataWindow class.
+ * @brief    Contains general application specific types
  *
  */
+#ifndef TYPES_H
+#define TYPES_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "datamarker.h"
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
+#include <fiff/fiff.h>
+#include "filteroperator.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QPair>
+#include <QList>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -46,102 +61,83 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEBROWSE;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE MNEBROWSE
 //=============================================================================================================
 
-DataMarker::DataMarker(QWidget *parent) :
-    QWidget(parent),
-    m_oldPos(QPoint(0,0)),
-    m_movableRegion(QRegion())
+namespace MNEBROWSE
 {
-    QColor color = m_qSettings.value("DataMarker/data_marker_color", QColor(93,177,47)).value<QColor>();
-    setMarkerColor(color);
+
+typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
+typedef QPair<const double*,qint32> RowVectorPair;
+typedef QPair<const float*,qint32> RowVectorPairF;
+typedef QPair<int,int> QPairInts;
+
+struct WhiteningSettings
+{
+    double regMag = 0.1;
+    double regGrad = 0.1;
+    double regEeg = 0.1;
+    bool useProj = true;
+    bool enableButterfly = false;
+    bool enableLayout = false;
+};
+
+namespace RawModelRoles
+{
+    enum ItemRole{GetChannelMean = Qt::UserRole + 1000};
 }
 
-
-//*************************************************************************************************************
-
-void DataMarker::setMovementBoundary(QRegion rect)
+namespace AverageModelRoles
 {
-    m_movableRegion = rect;
+    enum ItemRole{GetAverageData = Qt::UserRole + 1001,
+                  GetFiffInfo = Qt::UserRole + 1002,
+                  GetAspectKind = Qt::UserRole + 1003,
+                  GetFirstSample = Qt::UserRole + 1004,
+                  GetLastSample = Qt::UserRole + 1005,
+                  GetComment = Qt::UserRole + 1006,
+                  GetTimeData = Qt::UserRole + 1007,
+                  GetProjections = Qt::UserRole + 1008,
+                  GetNumAverages = Qt::UserRole + 1009,
+                  GetBaselineText = Qt::UserRole + 1010};
 }
 
-//*************************************************************************************************************
-
-void DataMarker::setMarkerColor(const QColor &color)
+namespace ChannelInfoModelRoles
 {
-    QPalette pal(palette());
-    QColor alphaColor = color;
-    alphaColor.setAlpha(DATA_MARKER_OPACITY);
-    pal.setColor(QPalette::Window, alphaColor);
-    setAutoFillBackground(true);
-    setPalette(pal);
+    enum ItemRole{GetOrigChName = Qt::UserRole + 1009,
+                  GetMappedLayoutChName = Qt::UserRole + 1010,
+                  GetChNumber = Qt::UserRole + 1011,
+                  GetChKind = Qt::UserRole + 1012,
+                  GetMEGType = Qt::UserRole + 1013,
+                  GetChUnit = Qt::UserRole + 1014,
+                  GetChAlias = Qt::UserRole + 1015,
+                  GetChPosition = Qt::UserRole + 1016,
+                  GetChDigitizer = Qt::UserRole + 1017,
+                  GetChActiveFilter = Qt::UserRole + 1018,
+                  GetChCoilType = Qt::UserRole + 1019};
 }
 
-
-//*************************************************************************************************************
-
-void DataMarker::mousePressEvent(QMouseEvent *event)
+namespace ProjectionModelRoles
 {
-    if(event->button() == Qt::LeftButton) {
-        m_oldPos = event->position().toPoint();
-        emit markerPressed();
-    } else if(event->button() == Qt::RightButton) {
-        emit markerPressed();
-        emit removeRequested();
-    }
+    enum ItemRole{GetProjectionData = Qt::UserRole + 1019,
+                  GetProjectionName = Qt::UserRole + 1020,
+                  GetProjectionState = Qt::UserRole + 1021,
+                  GetProjectionDimension = Qt::UserRole + 1022};
 }
 
+} //NAMESPACE
 
-//*************************************************************************************************************
+Q_DECLARE_METATYPE(FIFFLIB::fiff_int_t);
+Q_DECLARE_METATYPE(MNEBROWSE::RowVectorPairF);
+Q_DECLARE_METATYPE(const FIFFLIB::FiffInfo*);
+Q_DECLARE_METATYPE(MNEBROWSE::MatrixXdR);
+Q_DECLARE_METATYPE(MNEBROWSE::RowVectorPair);
+Q_DECLARE_METATYPE(QList<MNEBROWSE::RowVectorPair>);
+Q_DECLARE_METATYPE(QSharedPointer<DISPLIB::MNEOperator>);
+Q_DECLARE_METATYPE(MNEBROWSE::WhiteningSettings);
 
-void DataMarker::mouseMoveEvent(QMouseEvent *event)
-{
-    if(event->buttons() & Qt::LeftButton) {
-        const QRect boundaryRect = m_movableRegion.boundingRect();
-        if(boundaryRect.isEmpty()) {
-            return;
-        }
-
-        const QPoint parentCursorPos = mapToParent(event->position().toPoint());
-        const int minX = boundaryRect.left();
-        const int maxX = qMax(minX, boundaryRect.right() - width() + 1);
-        const int nextX = qBound(minX,
-                                 parentCursorPos.x() - m_oldPos.x(),
-                                 maxX);
-
-        move(nextX, boundaryRect.top());
-    }
-}
-
-
-//*************************************************************************************************************
-
-void DataMarker::enterEvent(QEvent *event)
-{
-    Q_UNUSED(event);
-    setCursor(QCursor(Qt::SizeHorCursor));
-}
-
-
-//*************************************************************************************************************
-
-void DataMarker::leaveEvent(QEvent *event)
-{
-    Q_UNUSED(event);
-    unsetCursor();
-}
-
-
-//*************************************************************************************************************
-
-void DataMarker::moveEvent(QMoveEvent *event)
-{
-    Q_UNUSED(event);
-    emit markerMoved();
-}
+#endif // TYPES_H

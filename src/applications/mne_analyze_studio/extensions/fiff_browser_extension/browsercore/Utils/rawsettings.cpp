@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
- * @file     datamarker.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
+ * @file     rawsettings.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @version  2.1.0
- * @date     August, 2014
+ * @date     January, 2014
  *
  * @section  LICENSE
  *
- * Copyright (C) 2014, Christoph Dinh, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2014, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the DataWindow class.
+ * @brief    Contains all application settings.
  *
  */
 
@@ -38,7 +37,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "datamarker.h"
+#include "rawsettings.h"
 
 
 //*************************************************************************************************************
@@ -54,94 +53,100 @@ using namespace MNEBROWSE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DataMarker::DataMarker(QWidget *parent) :
-    QWidget(parent),
-    m_oldPos(QPoint(0,0)),
-    m_movableRegion(QRegion())
+RawSettings::RawSettings(QObject *parent)
+: QObject(parent)
+, m_qSettings("mne-cpp","mne_analyze_studio_fiff_browser")
 {
-    QColor color = m_qSettings.value("DataMarker/data_marker_color", QColor(93,177,47)).value<QColor>();
-    setMarkerColor(color);
+    init();
 }
 
 
 //*************************************************************************************************************
 
-void DataMarker::setMovementBoundary(QRegion rect)
+RawSettings::~RawSettings()
 {
-    m_movableRegion = rect;
-}
-
-//*************************************************************************************************************
-
-void DataMarker::setMarkerColor(const QColor &color)
-{
-    QPalette pal(palette());
-    QColor alphaColor = color;
-    alphaColor.setAlpha(DATA_MARKER_OPACITY);
-    pal.setColor(QPalette::Window, alphaColor);
-    setAutoFillBackground(true);
-    setPalette(pal);
 }
 
 
 //*************************************************************************************************************
 
-void DataMarker::mousePressEvent(QMouseEvent *event)
+void RawSettings::write()
 {
-    if(event->button() == Qt::LeftButton) {
-        m_oldPos = event->position().toPoint();
-        emit markerPressed();
-    } else if(event->button() == Qt::RightButton) {
-        emit markerPressed();
-        emit removeRequested();
-    }
+    //MainWindow
+    //ToDo: ask for already stored setting in OS environment before setting them
+    //e.g. if(!m_qSettings.contains("RawModel/window_size")) m_qSettings.setValue("window_size",MODEL_WINDOW_SIZE);
+
+    //Window settings
+    m_qSettings.beginGroup("MainWindow");
+
+        m_qSettings.setValue("size",QSize(m_mainwindow_size_w, m_mainwindow_size_h));
+        m_qSettings.setValue("position",QPoint(m_mainwindow_position_x, m_mainwindow_position_y));
+
+    m_qSettings.endGroup();
+
+    //EventDesignParameters
+    m_qSettings.beginGroup("EventDesignParameters");
+
+        //Event colors
+        QVariant variant;
+        variant = m_event_color_default;
+        m_qSettings.setValue("event_color_default",variant);
+
+        variant = m_event_color_1;
+        m_qSettings.setValue("event_color_1",variant);
+
+        variant = m_event_color_2;
+        m_qSettings.setValue("event_color_2",variant);
+
+        variant = m_event_color_3;
+        m_qSettings.setValue("event_color_3",variant);
+
+        variant = m_event_color_4;
+        m_qSettings.setValue("event_color_4",variant);
+
+        variant = m_event_color_5;
+        m_qSettings.setValue("event_color_5",variant);
+
+        variant = m_event_color_32;
+        m_qSettings.setValue("event_color_32",variant);
+
+        variant = m_event_color_998;
+        m_qSettings.setValue("event_color_998",variant);
+
+        variant = m_event_color_999;
+        m_qSettings.setValue("event_color_999",variant);
+
+    m_qSettings.endGroup();
+
+    //Data window marker
+    m_qSettings.beginGroup("DataMarker");
+
+        //data marker color and width colors
+        variant = m_data_marker_color;
+        m_qSettings.setValue("data_marker_color",variant);
+
+    m_qSettings.endGroup();
 }
 
 
 //*************************************************************************************************************
 
-void DataMarker::mouseMoveEvent(QMouseEvent *event)
+void RawSettings::init()
 {
-    if(event->buttons() & Qt::LeftButton) {
-        const QRect boundaryRect = m_movableRegion.boundingRect();
-        if(boundaryRect.isEmpty()) {
-            return;
-        }
+    m_mainwindow_size_w = MAINWINDOW_WINDOW_SIZE_W;
+    m_mainwindow_size_h = MAINWINDOW_WINDOW_SIZE_H;
+    m_mainwindow_position_x = MAINWINDOW_WINDOW_POSITION_X;
+    m_mainwindow_position_y = MAINWINDOW_WINDOW_POSITION_Y;
 
-        const QPoint parentCursorPos = mapToParent(event->position().toPoint());
-        const int minX = boundaryRect.left();
-        const int maxX = qMax(minX, boundaryRect.right() - width() + 1);
-        const int nextX = qBound(minX,
-                                 parentCursorPos.x() - m_oldPos.x(),
-                                 maxX);
-
-        move(nextX, boundaryRect.top());
-    }
-}
-
-
-//*************************************************************************************************************
-
-void DataMarker::enterEvent(QEvent *event)
-{
-    Q_UNUSED(event);
-    setCursor(QCursor(Qt::SizeHorCursor));
-}
-
-
-//*************************************************************************************************************
-
-void DataMarker::leaveEvent(QEvent *event)
-{
-    Q_UNUSED(event);
-    unsetCursor();
-}
-
-
-//*************************************************************************************************************
-
-void DataMarker::moveEvent(QMoveEvent *event)
-{
-    Q_UNUSED(event);
-    emit markerMoved();
+    m_event_color_default = Qt::black;
+    m_event_color_1 = Qt::black;
+    m_event_color_2 = Qt::magenta;
+    m_event_color_3 = Qt::green;
+    m_event_color_4 = Qt::red;
+    m_event_color_5 = Qt::cyan;
+    m_event_color_32 = Qt::yellow;
+    m_event_color_998 = Qt::darkBlue;
+    m_event_color_999 = Qt::darkCyan;
+    m_data_marker_color = QColor (93,177,47); //green
+    //m_data_marker_color = QColor (227,6,19); //red
 }

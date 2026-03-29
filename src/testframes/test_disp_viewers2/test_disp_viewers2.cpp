@@ -50,6 +50,7 @@
 #include <disp/viewers/projectsettingsview.h>
 #include <disp/viewers/bidsview.h>
 #include <disp/viewers/channelselectionview.h>
+#include <disp/viewers/channeldataview.h>
 #include <disp/viewers/averagelayoutview.h>
 #include <disp/viewers/averageselectionview.h>
 #include <disp/viewers/butterflyview.h>
@@ -67,9 +68,11 @@
 #include <disp/viewers/helpers/frequencyspectrumdelegate.h>
 #include <disp/viewers/helpers/bidsviewmodel.h>
 #include <disp/viewers/helpers/mneoperator.h>
+#include <disp/viewers/helpers/channelrhiview.h>
 
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
+#include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_dig_point.h>
 
@@ -79,7 +82,10 @@
 
 #include <QtTest>
 #include <QApplication>
+#include <QFile>
+#include <QLayout>
 #include <QSharedPointer>
+#include <QScrollBar>
 #include <QStringList>
 #include <QTableView>
 
@@ -91,6 +97,57 @@
 
 using namespace DISPLIB;
 using namespace FIFFLIB;
+
+namespace {
+
+QSharedPointer<FiffInfo> createBrowserTestInfo()
+{
+    QSharedPointer<FiffInfo> info(new FiffInfo);
+    info->sfreq = 1000.0f;
+    info->nchan = 4;
+    info->ch_names = QStringList({
+        QStringLiteral("MEG0111"),
+        QStringLiteral("MEG0112"),
+        QStringLiteral("MEG0113"),
+        QStringLiteral("STI014")
+    });
+
+    info->chs.clear();
+    info->chs.resize(info->nchan);
+
+    for (int i = 0; i < info->nchan; ++i) {
+        FiffChInfo channelInfo;
+        channelInfo.ch_name = info->ch_names.at(i);
+        channelInfo.scanNo = i + 1;
+        channelInfo.logNo = i + 1;
+        channelInfo.chpos.coil_type = FIFFV_COIL_VV_MAG_T3;
+        channelInfo.coord_frame = FIFFV_COORD_DEVICE;
+        channelInfo.cal = 1.0f;
+        channelInfo.range = 1.0f;
+        channelInfo.unit_mul = 0;
+        channelInfo.kind = (i == info->nchan - 1) ? FIFFV_STIM_CH : FIFFV_MEG_CH;
+        channelInfo.unit = (i == info->nchan - 1) ? FIFF_UNIT_NONE : FIFF_UNIT_T;
+        info->chs[i] = channelInfo;
+    }
+
+    info->bads = QStringList({QStringLiteral("MEG0112")});
+    return info;
+}
+
+Eigen::MatrixXd createBrowserTestData()
+{
+    Eigen::MatrixXd data(4, 200);
+    data.setZero();
+    for (int sample = 0; sample < data.cols(); ++sample) {
+        data(0, sample) = std::sin(static_cast<double>(sample) * 0.05);
+        data(1, sample) = std::cos(static_cast<double>(sample) * 0.08);
+        data(2, sample) = (sample % 25 == 0) ? 1.0 : 0.0;
+        data(3, sample) = (sample % 50 == 0) ? 3.0 : 0.0;
+    }
+    return data;
+}
+
+}
 
 //=============================================================================================================
 /**
@@ -172,6 +229,13 @@ private slots:
 
     //=========================================================================================================
     /**
+     * Verifies that the initial layout selection resolves the actual .lout resource
+     * immediately when a FIFF file is loaded, instead of requiring a manual layout switch.
+     */
+    void channelSelectionView_initialLayoutLoads();
+
+    //=========================================================================================================
+    /**
      * Verifies that AverageLayoutView constructs and survives all lifecycle transitions.
      */
     void averageLayoutView_lifecycle();
@@ -215,6 +279,13 @@ private slots:
      * columnCount return sensible values, and basic data() queries do not crash.
      */
     void channelInfoModel_basics();
+
+    //=========================================================================================================
+    /**
+     * Verifies that ChannelDataView keeps the QRHI trace list in sync with the bad-channel
+     * visibility filter and viewport/sample mapping.
+     */
+    void channelDataView_hideBadChannelsAndMapping();
 
     //=========================================================================================================
     /**
@@ -468,6 +539,32 @@ void TestDispViewers2::channelSelectionView_lifecycle()
 
 //=============================================================================================================
 
+void TestDispViewers2::channelSelectionView_initialLayoutLoads()
+{
+    const QString layoutPath = QCoreApplication::applicationDirPath()
+        + QStringLiteral("/../resources/general/2DLayouts/Vectorview-all.lout");
+    if (!QFile::exists(layoutPath)) {
+        QSKIP("Vectorview-all.lout not available in test environment");
+    }
+
+    auto info = createBrowserTestInfo();
+    ChannelInfoModel::SPtr infoModel(new ChannelInfoModel);
+    infoModel->setFiffInfo(info);
+
+    ChannelSelectionView view(QStringLiteral("test_disp_viewers2_selection"),
+                              nullptr,
+                              infoModel,
+                              Qt::Widget);
+    view.setCurrentLayoutFile(QStringLiteral("Vectorview-all.lout"));
+    view.newFiffFileLoaded(info);
+
+    QVERIFY(!view.getLayoutMap().isEmpty());
+
+    QApplication::processEvents();
+}
+
+//=============================================================================================================
+
 void TestDispViewers2::averageLayoutView_lifecycle()
 {
     AverageLayoutView view("test_disp_viewers2");
@@ -636,6 +733,47 @@ void TestDispViewers2::channelInfoModel_basics()
     // setFiffInfo with empty FiffInfo — calls mapLayoutToChannels (no channels)
     FiffInfo::SPtr pInfo(new FiffInfo);
     model.setFiffInfo(pInfo);
+
+    QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::channelDataView_hideBadChannelsAndMapping()
+{
+    ChannelDataView view(QStringLiteral("test_disp_viewers2_channeldata"));
+    const auto info = createBrowserTestInfo();
+
+    view.resize(900, 500);
+    view.init(info);
+    view.setFileBounds(100, 299);
+    view.setData(createBrowserTestData(), 100);
+    view.setWindowSize(0.2f);
+    view.scrollToSample(100, false);
+    if (view.layout()) {
+        view.layout()->activate();
+    }
+
+    auto *rhiView = view.findChild<ChannelRhiView*>();
+    QVERIFY(rhiView != nullptr);
+    QCOMPARE(rhiView->totalLogicalChannels(), 4);
+
+    view.hideBadChannels(true);
+    QCOMPARE(rhiView->totalLogicalChannels(), 3);
+
+    view.setChannelFilter(QStringList() << QStringLiteral("MEG0111") << QStringLiteral("MEG0113"));
+    QCOMPARE(rhiView->totalLogicalChannels(), 2);
+
+    view.setChannelFilter(QStringList());
+    QCOMPARE(rhiView->totalLogicalChannels(), 3);
+
+    const QRect viewport = view.signalViewportRect();
+    QVERIFY(viewport.width() > 0);
+
+    const int sample = 150;
+    const int x = view.sampleToViewportX(sample);
+    const int roundTripSample = view.viewportXToSample(x);
+    QVERIFY(qAbs(roundTripSample - sample) <= 2);
 
     QApplication::processEvents();
 }

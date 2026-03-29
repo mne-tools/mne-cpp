@@ -55,6 +55,8 @@
 #include <QPolygonF>
 #include <QtMath>
 
+#include <utility>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -421,8 +423,16 @@ void ChannelRhiView::setHideBadChannels(bool hide)
 {
     if (m_hideBadChannels == hide)
         return;
+
+    const int previousFirstVisibleChannel = m_firstVisibleChannel;
     m_hideBadChannels = hide;
+    const int maxFirst = qMax(0, totalLogicalChannels() - m_visibleChannelCount);
+    m_firstVisibleChannel = qBound(0, m_firstVisibleChannel, maxFirst);
+    if (m_firstVisibleChannel != previousFirstVisibleChannel) {
+        emit channelOffsetChanged(m_firstVisibleChannel);
+    }
     m_vboDirty = true;
+    m_pipelineDirty = true;
     m_tileDirty = true;
     update();
 }
@@ -438,10 +448,14 @@ void ChannelRhiView::setWheelScrollsChannels(bool channelsMode)
 
 void ChannelRhiView::setChannelIndices(const QVector<int> &indices)
 {
+    const int previousFirstVisibleChannel = m_firstVisibleChannel;
     m_filteredChannels = indices;
     // Clamp scroll to new range
     int maxFirst = qMax(0, totalLogicalChannels() - m_visibleChannelCount);
     m_firstVisibleChannel = qBound(0, m_firstVisibleChannel, maxFirst);
+    if (m_firstVisibleChannel != previousFirstVisibleChannel) {
+        emit channelOffsetChanged(m_firstVisibleChannel);
+    }
     m_vboDirty      = true;
     m_pipelineDirty = true;
     m_tileDirty = true;
@@ -452,20 +466,56 @@ void ChannelRhiView::setChannelIndices(const QVector<int> &indices)
 
 int ChannelRhiView::totalLogicalChannels() const
 {
-    if (!m_filteredChannels.isEmpty())
-        return m_filteredChannels.size();
-    return m_model ? m_model->channelCount() : 0;
+    return effectiveChannelIndices().size();
 }
 
 //=============================================================================================================
 
 int ChannelRhiView::actualChannelAt(int logicalIdx) const
 {
-    if (m_filteredChannels.isEmpty())
-        return logicalIdx;
-    if (logicalIdx < 0 || logicalIdx >= m_filteredChannels.size())
+    const QVector<int> indices = effectiveChannelIndices();
+    if (logicalIdx < 0 || logicalIdx >= indices.size())
         return -1;
-    return m_filteredChannels[logicalIdx];
+    return indices.at(logicalIdx);
+}
+
+//=============================================================================================================
+
+QVector<int> ChannelRhiView::effectiveChannelIndices() const
+{
+    QVector<int> indices;
+
+    if (!m_model) {
+        return indices;
+    }
+
+    if (m_filteredChannels.isEmpty()) {
+        indices.reserve(m_model->channelCount());
+        for (int channelIndex = 0; channelIndex < m_model->channelCount(); ++channelIndex) {
+            indices.append(channelIndex);
+        }
+    } else {
+        indices = m_filteredChannels;
+    }
+
+    if (!m_hideBadChannels) {
+        return indices;
+    }
+
+    QVector<int> visibleIndices;
+    visibleIndices.reserve(indices.size());
+    for (int channelIndex : std::as_const(indices)) {
+        if (channelIndex < 0) {
+            continue;
+        }
+
+        const ChannelDisplayInfo info = m_model->channelInfo(channelIndex);
+        if (!info.bad) {
+            visibleIndices.append(channelIndex);
+        }
+    }
+
+    return visibleIndices;
 }
 
 //=============================================================================================================
