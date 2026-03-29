@@ -563,6 +563,58 @@ int ChannelDataView::firstVisibleSample() const
 
 //=============================================================================================================
 
+int ChannelDataView::visibleSampleCount() const
+{
+    return m_pRhiView ? m_pRhiView->visibleSampleCount() : 0;
+}
+
+//=============================================================================================================
+
+QRect ChannelDataView::signalViewportRect() const
+{
+    return m_pRhiView ? m_pRhiView->geometry() : QRect();
+}
+
+//=============================================================================================================
+
+int ChannelDataView::sampleToViewportX(int sample) const
+{
+    const QRect viewportRect = signalViewportRect();
+    const int visibleSamples = qMax(1, visibleSampleCount());
+
+    if(viewportRect.width() <= 0) {
+        return viewportRect.left();
+    }
+
+    const double samplesPerPixel = static_cast<double>(visibleSamples)
+                                 / static_cast<double>(viewportRect.width());
+    const double xOffset = static_cast<double>(sample - firstVisibleSample()) / samplesPerPixel;
+
+    return viewportRect.left()
+           + qBound(0, qRound(xOffset), viewportRect.width() - 1);
+}
+
+//=============================================================================================================
+
+int ChannelDataView::viewportXToSample(int x) const
+{
+    const QRect viewportRect = signalViewportRect();
+    const int visibleSamples = qMax(1, visibleSampleCount());
+
+    if(viewportRect.width() <= 0) {
+        return firstVisibleSample();
+    }
+
+    const int clampedX = qBound(viewportRect.left(), x, viewportRect.right());
+    const double samplesPerPixel = static_cast<double>(visibleSamples)
+                                 / static_cast<double>(viewportRect.width());
+
+    return firstVisibleSample()
+           + qRound(static_cast<double>(clampedX - viewportRect.left()) * samplesPerPixel);
+}
+
+//=============================================================================================================
+
 void ChannelDataView::saveSettings()
 {
     if (m_sSettingsPath.isEmpty())

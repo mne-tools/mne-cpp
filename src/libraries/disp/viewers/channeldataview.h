@@ -47,6 +47,7 @@
 //=============================================================================================================
 
 #include <QMap>
+#include <QRect>
 #include <QSharedPointer>
 #include <QStringList>
 #include <QVector>
@@ -305,6 +306,31 @@ public:
      * Returns the first currently visible sample.
      */
     int firstVisibleSample() const;
+    int visibleSampleCount() const;
+
+    //=========================================================================================================
+    /**
+     * Returns the geometry of the actual QRHI signal viewport in ChannelDataView-local coordinates.
+     */
+    QRect signalViewportRect() const;
+
+    //=========================================================================================================
+    /**
+     * Maps an absolute sample index to an x coordinate inside the signal viewport.
+     *
+     * @param[in] sample  Absolute sample index.
+     * @return x position in ChannelDataView-local coordinates.
+     */
+    int sampleToViewportX(int sample) const;
+
+    //=========================================================================================================
+    /**
+     * Maps a ChannelDataView-local x coordinate inside the signal viewport to an absolute sample index.
+     *
+     * @param[in] x  ChannelDataView-local x coordinate.
+     * @return Absolute sample index at the requested x position.
+     */
+    int viewportXToSample(int x) const;
 
     //=========================================================================================================
     /**

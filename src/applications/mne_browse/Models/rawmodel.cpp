@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
  * @file     rawmodel.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Gabriel B Motta <gabrielbenmotta@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @version  2.1.0
  * @date     January, 2014
  *
  * @section  LICENSE
@@ -364,7 +364,37 @@ bool RawModel::loadFiffData(QIODevice* qFile)
     MatrixXd t_data,t_times; //type is later on (when append to m_data) casted into MatrixXdR (Row-Major)
     QSharedPointer<DataPackage> newDataPackage;
 
-    m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(*qFile));
+    if(!qFile) {
+        endResetModel();
+        return false;
+    }
+
+    if(QFile* sourceFile = qobject_cast<QFile*>(qFile)) {
+        QSharedPointer<QFile> persistentFile(new QFile(sourceFile->fileName()));
+        if(!persistentFile->open(QIODevice::ReadOnly)) {
+            qWarning() << "RawModel: ERROR! Could not open source file" << sourceFile->fileName();
+            endResetModel();
+            return false;
+        }
+        m_pSourceDevice = persistentFile;
+    } else {
+        if(!qFile->isOpen() && !qFile->open(QIODevice::ReadOnly)) {
+            qWarning() << "RawModel: ERROR! Could not open source device.";
+            endResetModel();
+            return false;
+        }
+
+        if(!qFile->isSequential()) {
+            qFile->seek(0);
+        }
+
+        m_sourceBuffer = qFile->readAll();
+        QSharedPointer<QBuffer> persistentBuffer(new QBuffer(&m_sourceBuffer));
+        persistentBuffer->open(QIODevice::ReadOnly);
+        m_pSourceDevice = persistentBuffer;
+    }
+
+    m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(*m_pSourceDevice));
     if(!m_pfiffIO->m_qlistRaw.empty()) {
         m_iAbsFiffCursor = m_pfiffIO->m_qlistRaw[0]->first_samp; //Set cursor somewhere into fiff file [in samples]
         m_iCurAbsScrollPos = 0;
@@ -394,8 +424,6 @@ bool RawModel::loadFiffData(QIODevice* qFile)
     genStdFilterOps();
 
     endResetModel();
-
-    qFile->close();
 
     emit fileLoaded(m_pFiffInfo);
     emit assignedOperatorsChanged(m_assignedOperators);
@@ -481,6 +509,13 @@ void RawModel::clearModel()
 {
     //FiffIO object
     m_pfiffIO.clear();
+    if(m_pSourceDevice) {
+        m_pSourceDevice->close();
+        m_pSourceDevice.clear();
+    }
+    m_sourceBuffer.clear();
+    m_pFiffInfo = FiffInfo::SPtr(new FiffInfo());
+    m_bFileloaded = false;
     m_chInfolist.clear();
 
     //data model structure

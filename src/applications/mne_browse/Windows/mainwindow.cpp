@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
  * @file     mainwindow.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @version  2.1.0
  * @date     January, 2014
  *
  * @section  LICENSE
@@ -75,6 +75,10 @@
 //=============================================================================================================
 
 using namespace MNEBROWSE;
+
+#ifdef WASMBUILD
+static QByteArray s_wasmByteArray;
+#endif
 
 namespace
 {
@@ -987,6 +991,72 @@ RawModel* MainWindow::rawModel() const
 
 //*************************************************************************************************************
 
+bool MainWindow::ensureLegacyRawModelLoaded(const QString& featureName)
+{
+    RawModel* model = rawModel();
+    if (!model) {
+        return false;
+    }
+
+    if (model->isFileLoaded() && model->fiffInfo() && !model->fiffInfo()->chs.isEmpty()) {
+        return true;
+    }
+
+    const QString dialogTitle = featureName.isEmpty()
+        ? QStringLiteral("mne_browse")
+        : featureName;
+
+#ifdef WASMBUILD
+    if (s_wasmByteArray.isEmpty()) {
+        QMessageBox::warning(this,
+                             dialogTitle,
+                             QStringLiteral("Load a raw FIFF file before using this feature."));
+        return false;
+    }
+
+    QBuffer rawBuffer(&s_wasmByteArray);
+    if (!model->loadFiffData(&rawBuffer)) {
+        QMessageBox::warning(this,
+                             dialogTitle,
+                             QStringLiteral("The legacy processing model could not be initialized from the loaded raw buffer."));
+        return false;
+    }
+#else
+    if (m_qFileRaw.fileName().isEmpty() || !QFile::exists(m_qFileRaw.fileName())) {
+        QMessageBox::warning(this,
+                             dialogTitle,
+                             QStringLiteral("Load a raw FIF file before using this feature."));
+        return false;
+    }
+
+    QFile rawFile(m_qFileRaw.fileName());
+    if (!model->loadFiffData(&rawFile)) {
+        QMessageBox::warning(this,
+                             dialogTitle,
+                             QStringLiteral("The legacy processing model could not be initialized from %1.")
+                                 .arg(m_qFileRaw.fileName()));
+        return false;
+    }
+#endif
+
+    if (model->fiffInfo() && m_pDataWindow && m_pDataWindow->fiffInfo()) {
+        model->fiffInfo()->bads = m_pDataWindow->fiffInfo()->bads;
+        model->fiffInfo()->projs = m_pDataWindow->fiffInfo()->projs;
+        model->fiffInfo()->comps = m_pDataWindow->fiffInfo()->comps;
+    }
+
+    if (model->fiffInfo()) {
+        syncAuxWindowsToFiffInfo(model->fiffInfo(),
+                                 model->firstSample(),
+                                 model->lastSample());
+    }
+
+    return model->isFileLoaded();
+}
+
+
+//*************************************************************************************************************
+
 WhiteningSettings MainWindow::covarianceWhiteningSettings() const
 {
     return m_pAverageWindow ? m_pAverageWindow->whiteningSettings()
@@ -1179,10 +1249,7 @@ void MainWindow::setupWindowWidgets()
                 setWindowStatus();
             });
 
-    //Connect channel info window with raw data model, layout manager, average manager and the data window
-    connect(rawModel(), &RawModel::fileLoaded,
-            m_pChInfoWindow->getDataModel().data(), &ChannelInfoModel::setFiffInfo);
-
+    //Connect channel info window with legacy processing updates, layout manager, average manager and the data window
     connect(rawModel(), &RawModel::assignedOperatorsChanged,
             m_pChInfoWindow->getDataModel().data(), &ChannelInfoModel::assignedOperatorsChanged);
 
@@ -1195,27 +1262,22 @@ void MainWindow::setupWindowWidgets()
     connect(m_pChInfoWindow->getDataModel().data(), &ChannelInfoModel::channelsMappedToLayout,
             m_pAverageWindow, &AverageWindow::setMappedChannelNames);
 
-    //Connect selection manager with a new file loaded signal
-    connect(rawModel(), &RawModel::fileLoaded,
-            m_pChannelSelectionView, &ChannelSelectionView::newFiffFileLoaded);
-
-    //Connect filter window with new file loaded signal
-    connect(rawModel(), &RawModel::fileLoaded,
-            m_pFilterWindow, &FilterWindow::newFileLoaded);
-
-    //Connect noise reduction manager with fif file loading
-    connect(rawModel(), &RawModel::fileLoaded,
-            m_pNoiseReductionWindow, &NoiseReductionWindow::setFiffInfo);
-
     connect(m_pNoiseReductionWindow, &NoiseReductionWindow::projSelectionChanged,
-            rawModel(), &RawModel::updateProjections);
+            this, [this]() {
+                if (ensureLegacyRawModelLoaded(QStringLiteral("Noise Reduction"))) {
+                    rawModel()->updateProjections();
+                }
+            });
 
     connect(m_pNoiseReductionWindow, &NoiseReductionWindow::compSelectionChanged,
-            rawModel(), &RawModel::updateCompensator);
+            this, [this](int to) {
+                if (ensureLegacyRawModelLoaded(QStringLiteral("Noise Reduction"))) {
+                    rawModel()->updateCompensator(to);
+                }
+            });
 
-    //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
-    if(rawModel()->isFileLoaded()) {
-        auto fiffInfo = rawModel()->fiffInfo();
+    if(m_pDataWindow->isFiffFileLoaded()) {
+        auto fiffInfo = m_pDataWindow->fiffInfo();
         m_pScaleWindow->hideSpinBoxes(fiffInfo);
         m_pChInfoWindow->getDataModel()->setFiffInfo(fiffInfo);
         m_pChInfoWindow->getDataModel()->layoutChanged(m_pChannelSelectionView->getLayoutMap());
@@ -1538,10 +1600,6 @@ void MainWindow::setWindowStatus()
             : QString("%1 s").arg(dur, 0, 'f', 1);
         title = QString("Data file: %1  |  Duration: %2")
             .arg(m_pDataWindow->fiffFileName(), durStr);
-    } else if (rawModel()->isFileLoaded() && rawModel()->fiffInfo()) {
-        int idx = m_qFileRaw.fileName().lastIndexOf("/");
-        QString filename = m_qFileRaw.fileName().remove(0,idx+1);
-        title = QString("Data file: %1  /  First sample: %2  /  Sample frequency: %3Hz").arg(filename).arg(rawModel()->firstSample()).arg(rawModel()->fiffInfo()->sfreq);
     } else {
         title = QString("No data file");
     }
@@ -1675,46 +1733,75 @@ void MainWindow::setLogLevel(LogLevel lvl)
 
 //*************************************************************************************************************
 // SLOTS
-#ifdef WASMBUILD
-static QByteArray s_wasmByteArray;
-#endif
-
 void MainWindow::openFile()
 {
 #ifdef WASMBUILD
     auto fileContentReady = [&](const QString &fileName, const QByteArray &fileContent) {
         if (!fileName.isEmpty()) {
-            m_qFileRaw.setFileName(fileName);
+            if(m_qFileRaw.isOpen())
+                m_qFileRaw.close();
 
-            //Clear event model
+            m_qFileRaw.setFileName(fileName);
+            m_covariance.clear();
+            if(m_qCovFile.isOpen())
+                m_qCovFile.close();
+            m_qCovFile.setFileName(QString());
+            if(m_qInverseOperatorFile.isOpen())
+                m_qInverseOperatorFile.close();
+            m_qInverseOperatorFile.setFileName(QString());
+            m_inverseOperator = MNELIB::MNEInverseOperator();
+            if(m_qAnnotationFile.isOpen())
+                m_qAnnotationFile.close();
+            m_qAnnotationFile.setFileName(QString());
+            if(m_qVirtualChannelFile.isOpen())
+                m_qVirtualChannelFile.close();
+            m_qVirtualChannelFile.setFileName(QString());
+            m_pAverageWindow->clearNoiseCovariance();
+            m_pCovarianceWindow->clearCovariance();
+            WhiteningSettings whiteningSettings = covarianceWhiteningSettings();
+            whiteningSettings.enableButterfly = false;
+            whiteningSettings.enableLayout = false;
+            setCovarianceWhiteningSettings(whiteningSettings, false);
+            if(m_pWhitenButterflyAction) {
+                m_pWhitenButterflyAction->setChecked(false);
+            }
+
+            rawModel()->clearModel();
             m_pEventWindow->getEventModel()->clearModel();
+            m_pAnnotationWindow->getAnnotationModel()->clearModel();
+            clearEpochReviewSession();
+            {
+                QSignalBlocker blocker(m_pVirtualChannelWindow->getVirtualChannelModel());
+                m_pVirtualChannelWindow->getVirtualChannelModel()->clearModel();
+            }
+            m_pVirtualChannelWindow->setAvailableChannelNames(QStringList());
+            m_pDataWindow->setVirtualChannels({}, false);
 
             s_wasmByteArray = fileContent;
-            QBuffer* buffer = new QBuffer(&s_wasmByteArray);
-            if(rawModel()->loadFiffData(buffer))
-                qInfo() << "Fiff data file" << fileName << "loaded.";
+            const bool ok = m_pDataWindow->loadFiffBuffer(fileContent, fileName);
+            if(ok)
+                qInfo() << "Fiff data file" << fileName << "loaded (ChannelDataView).";
             else
                 qWarning() << "ERROR loading fiff data file" << fileName;
 
-            //set position of QScrollArea
-            m_pDataWindow->getDataTableView()->horizontalScrollBar()->setValue(0);
-            m_pDataWindow->initMVCSettings();
+            if (ok) {
+                syncAuxWindowsToFiffInfo(m_pDataWindow->fiffInfo(),
+                                         m_pDataWindow->firstSample(),
+                                         m_pDataWindow->lastSample());
 
-            //Set fiffInfo in event model
-            m_pEventWindow->getEventModel()->setFiffInfo(rawModel()->fiffInfo());
-            m_pEventWindow->getEventModel()->setFirstLastSample(rawModel()->firstSample(),
-                                                                rawModel()->lastSample());
+                QBuffer rawBuffer(&s_wasmByteArray);
+                FIFFLIB::FiffRawData raw(rawBuffer);
+                MatrixXi events;
+                QString detectedEventSource;
+                if(!raw.isEmpty()
+                   && detectFallbackStimEvents(raw, events, detectedEventSource)
+                   && events.rows() > 0) {
+                    m_pEventWindow->getEventModel()->setEventMatrix(events, false);
+                    statusBar()->showMessage(detectedEventSource, 5000);
+                }
+            }
 
-            //resize columns to contents - needs to be done because the new data file can be shorter than the old one
-            m_pDataWindow->updateDataTableViews();
-            m_pDataWindow->getDataTableView()->resizeColumnsToContents();
-
-            //Update status bar
             setWindowStatus();
-
-            //Hide not presented channel types and their spin boxes in the scale window
-            m_pScaleWindow->hideSpinBoxes(rawModel()->fiffInfo());
-
             m_qFileRaw.close();
         }
     };
@@ -1737,6 +1824,10 @@ void MainWindow::openFile()
 
 void MainWindow::writeFile()
 {
+    if(!ensureLegacyRawModelLoaded(QStringLiteral("Write FIFF File"))) {
+        return;
+    }
+
     QString filename = QFileDialog::getSaveFileName(this,
                                                     QString("Write fiff data file"),
                                                     QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),
@@ -1982,6 +2073,7 @@ bool MainWindow::loadRawFile(const QString& filename)
         m_pWhitenButterflyAction->setChecked(false);
     }
 
+    rawModel()->clearModel();
     m_pEventWindow->getEventModel()->clearModel();
     m_pAnnotationWindow->getAnnotationModel()->clearModel();
     clearEpochReviewSession();
@@ -2025,32 +2117,6 @@ bool MainWindow::loadRawFile(const QString& filename)
             loadVirtualChannelsFile(defaultVirtualChannelPath, false);
         }
     }
-
-    // ── Legacy RawModel path: kept for filter/event sub-systems ──────
-    // Runs in a background thread so the ChannelDataView path (above) can
-    // display data immediately while the full FIFF index is parsed.
-    // Wait for any previous in-flight load to finish before starting a new one
-    // to avoid concurrent access to RawModel internals.
-    if (m_legacyLoadWatcher.isRunning())
-        m_legacyLoadWatcher.waitForFinished();
-
-    // Disconnect any stale finished connection from a prior load
-    disconnect(&m_legacyLoadWatcher, &QFutureWatcher<bool>::finished, nullptr, nullptr);
-
-    connect(&m_legacyLoadWatcher, &QFutureWatcher<bool>::finished, this, [this]() {
-        auto fiffInfo = rawModel()->fiffInfo();
-        syncAuxWindowsToFiffInfo(fiffInfo,
-                                 rawModel()->firstSample(),
-                                 rawModel()->lastSample());
-        setWindowStatus();
-        m_qFileRaw.close();
-    });
-
-    m_legacyLoadWatcher.setFuture(
-        QtConcurrent::run([this]() -> bool {
-            return rawModel()->loadFiffData(&m_qFileRaw);
-        })
-    );
 
     setWindowStatus();
     return ok;

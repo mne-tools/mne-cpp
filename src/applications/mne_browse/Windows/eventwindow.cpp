@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
  * @file     eventwindow.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @version  2.1.0
  * @date     August, 2014
  *
  * @section  LICENSE
@@ -124,10 +124,10 @@ EventDelegate* EventWindow::getEventDelegate()
 void EventWindow::initMVCSettings()
 {
     //Set fiffInfo and first/last sample in the event model
-    auto fiffInfo = m_pMainWindow->rawModel()->fiffInfo();
+    auto fiffInfo = m_pMainWindow->dataWindow()->fiffInfo();
     m_pEventModel->setFiffInfo(fiffInfo);
-    m_pEventModel->setFirstLastSample(m_pMainWindow->rawModel()->firstSample(),
-                                      m_pMainWindow->rawModel()->lastSample());
+    m_pEventModel->setFirstLastSample(m_pMainWindow->dataWindow()->firstSample(),
+                                      m_pMainWindow->dataWindow()->lastSample());
 
     //set MVC model
     ui->m_tableView_eventTableView->setModel(m_pEventModel);
@@ -264,18 +264,18 @@ void EventWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & p
         //Always get the first column 0 (sample) of the model - Note: Need to map index from sorting model back to source model
         QModelIndex index = m_pEventModel->index(current.row(), 0);
 
-        //Get the sample value
-        int sample = m_pEventModel->data(index, Qt::DisplayRole).toInt();
+        const int relativeSample = m_pEventModel->data(index, Qt::DisplayRole).toInt();
+        const int absoluteSample = relativeSample + m_pEventModel->getFirstLastSample().first;
 
-        //Jump to sample - put sample in the middle of the view - the viewport holds the width of the are which is changed through scrolling
-        int rawTableViewColumnWidth = m_pMainWindow->dataWindow()->getDataTableView()->viewport()->width();
-
-        if(sample-rawTableViewColumnWidth/2 < rawTableViewColumnWidth/2) //events lie in the first half of the data window at the beginning of the loaded data -> cannot centralize view on event
-            m_pMainWindow->dataWindow()->getDataTableView()->horizontalScrollBar()->setValue(0);
-        else if(sample+rawTableViewColumnWidth/2 > m_pMainWindow->rawModel()->lastSample()-rawTableViewColumnWidth/2) //events lie in the last half of the data window at the end of the loaded data -> cannot centralize view on event
-            m_pMainWindow->dataWindow()->getDataTableView()->horizontalScrollBar()->setValue(m_pMainWindow->dataWindow()->getDataTableView()->maximumWidth());
-        else //centralize view on event
-            m_pMainWindow->dataWindow()->getDataTableView()->horizontalScrollBar()->setValue(sample-rawTableViewColumnWidth/2);
+        if(auto* channelView = m_pMainWindow->dataWindow()->getChannelDataView()) {
+            const int visibleSamples = qMax(1, channelView->visibleSampleCount());
+            const int firstFileSample = m_pMainWindow->dataWindow()->firstSample();
+            const int lastFileSample = m_pMainWindow->dataWindow()->lastSample();
+            const int centeredSample = qBound(firstFileSample,
+                                              absoluteSample - visibleSamples / 2,
+                                              qMax(firstFileSample, lastFileSample - visibleSamples + 1));
+            channelView->scrollToSample(centeredSample, true);
+        }
 
         m_pMainWindow->dataWindow()->updateDataTableViews();
     }

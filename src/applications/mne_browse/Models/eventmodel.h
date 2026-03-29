@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
  * @file     eventmodel.h
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @version  2.1.0
  * @date     January, 2014
  *
  * @section  LICENSE
@@ -147,9 +147,9 @@ public:
     /**
      * setFiffInfo sets the fiff info variabel
      *
-     * @param fiffInfo fiff info variabel
+     * @param[in] pFiffInfo  Fiff info variable.
      */
-    void setFiffInfo(FiffInfo::SPtr& pFiffInfo);
+    void setFiffInfo(const FiffInfo::SPtr& pFiffInfo);
 
     //=========================================================================================================
     /**

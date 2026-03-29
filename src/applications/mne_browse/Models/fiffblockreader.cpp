@@ -2,6 +2,7 @@
 /**
  * @file     fiffblockreader.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @version  2.1.0
  * @since    2.0.0
  * @date     March, 2026
  *
@@ -59,6 +60,7 @@ using namespace Eigen;
 FiffBlockReader::FiffBlockReader(QObject *parent)
     : QObject(parent)
     , m_file(new QFile(this))
+    , m_buffer(new QBuffer(this))
 {
     connect(&m_watcher, &QFutureWatcher<MatrixXd>::finished, this, [this]() {
         bool shouldEmit  = m_loading;
@@ -135,6 +137,52 @@ bool FiffBlockReader::open(const QString &path)
 
 //=============================================================================================================
 
+bool FiffBlockReader::openBuffer(const QByteArray &data, const QString &displayName)
+{
+    Q_UNUSED(displayName)
+
+    close();
+    m_file->setFileName(QString());
+
+    m_bufferData = data;
+    m_buffer->setData(m_bufferData);
+    if (!m_buffer->open(QIODevice::ReadOnly)) {
+        qWarning() << "[FiffBlockReader] Could not open in-memory FIFF buffer";
+        m_bufferData.clear();
+        return false;
+    }
+
+    try {
+        m_raw = QSharedPointer<FiffRawData>(new FiffRawData(*m_buffer));
+    } catch (const std::exception &e) {
+        qWarning() << "[FiffBlockReader] Exception constructing FiffRawData from buffer:" << e.what();
+        m_buffer->close();
+        m_bufferData.clear();
+        return false;
+    }
+
+    if (m_raw->isEmpty()) {
+        qWarning() << "[FiffBlockReader] Not a valid FIFF raw buffer";
+        m_raw.reset();
+        m_buffer->close();
+        m_bufferData.clear();
+        return false;
+    }
+
+    m_fiffInfo    = QSharedPointer<FiffInfo>(new FiffInfo(m_raw->info));
+    m_firstSample = m_raw->first_samp;
+    m_lastSample  = m_raw->last_samp;
+
+    qInfo() << "[FiffBlockReader] Opened in-memory raw buffer"
+            << "| channels:" << m_fiffInfo->nchan
+            << "| samples:" << (m_lastSample - m_firstSample + 1)
+            << "| sfreq:" << m_fiffInfo->sfreq;
+
+    return true;
+}
+
+//=============================================================================================================
+
 void FiffBlockReader::close()
 {
     if (m_watcher.isRunning()) {
@@ -147,6 +195,9 @@ void FiffBlockReader::close()
     m_lastSample  = 0;
     if (m_file->isOpen())
         m_file->close();
+    if (m_buffer->isOpen())
+        m_buffer->close();
+    m_bufferData.clear();
 }
 
 //=============================================================================================================
@@ -192,12 +243,24 @@ MatrixXd FiffBlockReader::readBlockSync(int from, int to)
 
 MatrixXd FiffBlockReader::doRead(int from, int to)
 {
-    // FiffRawData closes the QFile after parsing the header.
+    // FiffRawData closes the underlying device after parsing the header.
     // Re-open it so read_raw_segment can seek and read data blocks.
-    if (!m_file->isOpen()) {
-        if (!m_file->open(QIODevice::ReadOnly)) {
-            qWarning() << "[FiffBlockReader] Cannot reopen file:" << m_file->fileName();
-            return {};
+    if (!m_file->fileName().isEmpty()) {
+        if (!m_file->isOpen()) {
+            if (!m_file->open(QIODevice::ReadOnly)) {
+                qWarning() << "[FiffBlockReader] Cannot reopen file:" << m_file->fileName();
+                return {};
+            }
+        }
+    } else {
+        m_buffer->setData(m_bufferData);
+        if (!m_buffer->isOpen()) {
+            if (!m_buffer->open(QIODevice::ReadOnly)) {
+                qWarning() << "[FiffBlockReader] Cannot reopen in-memory buffer";
+                return {};
+            }
+        } else {
+            m_buffer->seek(0);
         }
     }
 

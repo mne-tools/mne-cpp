@@ -50,44 +50,44 @@
 #include <QElapsedTimer>
 #include <QFutureWatcher>
 #include <QImage>
+#include <QMouseEvent>
+#include <QPaintEvent>
 #include <QPointer>
 #include <QPropertyAnimation>
+#include <QRhiWidget>
+#include <QResizeEvent>
+#include <QWheelEvent>
 #include <QtConcurrent>
 
 #include <memory>
 #include <vector>
 
-#ifdef MNE_DISP_RHIWIDGET
-#  include <QRhiWidget>
-#  include <rhi/qrhi.h>
-#endif
-
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
+
+class QRhi;
+class QRhiBuffer;
+class QRhiCommandBuffer;
+class QRhiGraphicsPipeline;
+class QRhiResourceUpdateBatch;
+class QRhiSampler;
+class QRhiShaderResourceBindings;
+class QRhiTexture;
 
 namespace DISPLIB
 {
 
 //=============================================================================================================
 /**
- * @brief ChannelRhiView – GPU-accelerated (or QPainter-fallback) channel signal renderer.
+ * @brief ChannelRhiView – QRhiWidget-based channel signal renderer.
  *
- * When compiled with Qt6 + GuiPrivate (MNE_DISP_RHIWIDGET defined) this widget
- * subclasses QRhiWidget and renders all channel traces via a custom GLSL pipeline
- * with min/max decimation.  Smooth scrolling and zoom animations are driven by
- * Q_PROPERTY so that QPropertyAnimation can be used directly.
- *
- * When MNE_DISP_RHIWIDGET is not defined the widget falls back to a QPainter
- * implementation that still applies min/max decimation for fast rendering.
- *
- * In both cases the public interface is identical.
+ * The raw browser uses QRhiWidget as its only supported rendering backend.
+ * It renders channel traces via a custom GLSL pipeline with min/max decimation,
+ * while smooth scrolling and zoom animations are driven by Q_PROPERTY so that
+ * QPropertyAnimation can be used directly.
  */
-#ifdef MNE_DISP_RHIWIDGET
 class DISPSHARED_EXPORT ChannelRhiView : public QRhiWidget
-#else
-class DISPSHARED_EXPORT ChannelRhiView : public QWidget
-#endif
 {
     Q_OBJECT
 
@@ -350,14 +350,10 @@ signals:
     void sampleRangeSelected(int startSample, int endSample);
 
 protected:
-#ifdef MNE_DISP_RHIWIDGET
     void initialize(QRhiCommandBuffer *cb) override;
     void render(QRhiCommandBuffer *cb) override;
     void releaseResources() override;
-    void paintEvent(QPaintEvent *event) override; // QPainter fallback when RHI fails
-#else
     void paintEvent(QPaintEvent *event) override;
-#endif
 
     void resizeEvent(QResizeEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
@@ -367,8 +363,7 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 private:
-    // ── GPU resource management (QRhi path only) ──────────────────────
-#ifdef MNE_DISP_RHIWIDGET
+    // ── GPU resource management ────────────────────────────────────────
     struct ChannelGpuData {
         std::unique_ptr<QRhiBuffer> vbo;
         int                         vertexCount  = 0;
@@ -392,11 +387,8 @@ private:
     QImage                                       m_overlayImage;
     bool                                         m_overlayDirty = true;
     QSize                                        m_overlayTexSize;
-#endif
 
-    // ── Tile cache (QPainter paths) ────────────────────────────────────
-
-    // Result produced by the async tile worker
+    // ── Legacy async tile helpers retained for staging/reuse ──────────
     struct TileResult {
         QImage image;
         float  sampleFirst     = 0.f;
@@ -405,22 +397,21 @@ private:
         int    visibleCount    = 0;
     };
 
-    void scheduleTileRebuild();          // kick off async rebuild (non-blocking)
-    static TileResult buildTile(        // pure function, runs on worker thread
-        ChannelDataModel *model,
-        float scrollSample,
-        float samplesPerPixel,
-        int   firstVisibleChannel,
-        int   visibleChannelCount,
-        int   viewWidth, int viewHeight,
-        QColor bgColor,
-        bool  gridVisible,
-        float sfreq,
-        int   firstFileSample,
-        bool  hideBadChannels,
-        const QVector<int> &channelIndices, // empty = identity (all channels)
-        const QVector<EventMarker> &events,    // empty = no markers
-        const QVector<AnnotationSpan> &annotations); // empty = no annotations
+    void scheduleTileRebuild();
+    static TileResult buildTile(ChannelDataModel *model,
+                                float scrollSample,
+                                float samplesPerPixel,
+                                int   firstVisibleChannel,
+                                int   visibleChannelCount,
+                                int   viewWidth, int viewHeight,
+                                QColor bgColor,
+                                bool  gridVisible,
+                                float sfreq,
+                                int   firstFileSample,
+                                bool  hideBadChannels,
+                                const QVector<int> &channelIndices,
+                                const QVector<EventMarker> &events,
+                                const QVector<AnnotationSpan> &annotations);
     bool isTileFresh() const;
 
     QImage m_tileImage;
@@ -433,8 +424,6 @@ private:
     QFutureWatcher<TileResult>  m_tileWatcher;
     bool                        m_tileRebuildPending = false;
 
-#ifdef MNE_DISP_RHIWIDGET
-
     std::unique_ptr<QRhiBuffer>                  m_ubo;
     std::unique_ptr<QRhiShaderResourceBindings>  m_srb;
     std::unique_ptr<QRhiGraphicsPipeline>        m_pipeline;
@@ -442,10 +431,8 @@ private:
     int                                          m_uboStride = 256;
     bool                                         m_pipelineDirty = true;
     bool                                         m_vboDirty      = true;
-    bool                                         m_rhiFailed     = false; // set on renderFailed
-#endif
 
-    // ── State shared by both paths ─────────────────────────────────────
+    // ── Shared browser state ───────────────────────────────────────────
     QPointer<ChannelDataModel> m_model;
     float                      m_scrollSample     = 0.f;
     float                      m_samplesPerPixel  = 1.f;
@@ -504,7 +491,7 @@ private:
     int   m_rulerX1       = 0;   // current cursor position
     int   m_rulerY1       = 0;
 
-    void drawOverlays();   // QPainter-based overlays (bands + ruler) on top of both rendering paths
+    void drawOverlays();   // QPainter-based overlays on top of the QRHI-rendered traces
 };
 
 } // namespace DISPLIB

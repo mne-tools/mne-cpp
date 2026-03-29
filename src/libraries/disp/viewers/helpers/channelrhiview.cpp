@@ -38,11 +38,9 @@
 
 #include "channelrhiview.h"
 
-#ifdef MNE_DISP_RHIWIDGET
-#  include <rhi/qrhi.h>
-#  include <rhi/qshader.h>
-#  include <QFile>
-#endif
+#include <rhi/qrhi.h>
+#include <rhi/qshader.h>
+#include <QFile>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -91,7 +89,6 @@ constexpr float kDefaultPrefetch = 1.0f;
 // HELPERS
 //=============================================================================================================
 
-#ifdef MNE_DISP_RHIWIDGET
 static QShader loadShader(const QString &filename)
 {
     QFile f(filename);
@@ -111,18 +108,13 @@ static void writeFloats(quint8 *base, int byteOffset, const float *data, int cou
 {
     memcpy(base + byteOffset, data, count * sizeof(float));
 }
-#endif
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 ChannelRhiView::ChannelRhiView(QWidget *parent)
-#ifdef MNE_DISP_RHIWIDGET
     : QRhiWidget(parent)
-#else
-    : QWidget(parent)
-#endif
 {
     setFocusPolicy(Qt::StrongFocus);
     setMouseTracking(true);
@@ -158,7 +150,6 @@ ChannelRhiView::ChannelRhiView(QWidget *parent)
         }
     });
 
-#ifdef MNE_DISP_RHIWIDGET
     // Platform-specific backend selection
 #  if defined(WASMBUILD) || defined(__EMSCRIPTEN__)
     setApi(QRhiWidget::Api::OpenGL);  // WebGL 2
@@ -174,31 +165,8 @@ ChannelRhiView::ChannelRhiView(QWidget *parent)
     // Without this, QRhiWidget may fail to obtain an NSView handle on macOS.
     setAttribute(Qt::WA_NativeWindow);
 
-    // When Metal/OpenGL init fails, fall back to QPainter for all subsequent paint events
-    connect(this, &QRhiWidget::renderFailed, this, [this]() {
-        // Zero-size failures are transient – the widget just hasn't been laid out yet.
-        // QRhiWidget will retry automatically on the next non-zero-size frame.
-        if (width() <= 0 || height() <= 0)
-            return;
-
-        if (!m_rhiFailed) {
-            // Non-zero size + Metal failed → try OpenGL before giving up
-            if (api() == QRhiWidget::Api::Metal) {
-                setApi(QRhiWidget::Api::OpenGL);
-                update();
-                return;
-            }
-            // Both Metal and OpenGL failed → QPainter fallback
-            m_rhiFailed = true;
-            update();
-        }
-    });
-
-#endif
-
     // Repaint overlays (bands + event lines) when the app regains focus.
-    // On macOS/Metal the GPU texture stays composited but QPainter overlay
-    // layers are not repainted on focus restore without an explicit update().
+    // The ruler overlay still uses QPainter and needs an explicit refresh.
     connect(qApp, &QApplication::applicationStateChanged,
             this, [this](Qt::ApplicationState s) {
                 if (s == Qt::ApplicationActive)
@@ -223,25 +191,19 @@ void ChannelRhiView::setModel(ChannelDataModel *model)
     m_model = model;
     if (m_model) {
         connect(m_model, &ChannelDataModel::dataChanged, this, [this] {
-#ifdef MNE_DISP_RHIWIDGET
             m_vboDirty = true;
-#endif
             m_tileDirty = true;
             update();
         });
         connect(m_model, &ChannelDataModel::metaChanged, this, [this] {
-#ifdef MNE_DISP_RHIWIDGET
             m_vboDirty      = true;
             m_pipelineDirty = true;
-#endif
             m_tileDirty = true;
             update();
         });
     }
-#ifdef MNE_DISP_RHIWIDGET
     m_vboDirty    = true;
     m_pipelineDirty = true;
-#endif
     update();
 }
 
@@ -279,7 +241,6 @@ void ChannelRhiView::setScrollSample(float sample)
             m_tileDirty = true;
     }
 
-#ifdef MNE_DISP_RHIWIDGET
     // Check whether the prefetch window is still valid
     float visible = width() * m_samplesPerPixel;
     float margin  = m_prefetchFactor * visible;
@@ -288,7 +249,6 @@ void ChannelRhiView::setScrollSample(float sample)
         m_vboDirty = true;
     }
     m_overlayDirty = true;
-#endif
 
     emit scrollSampleChanged(m_scrollSample);
     update();
@@ -302,10 +262,8 @@ void ChannelRhiView::setSamplesPerPixel(float spp)
     if (qFuzzyCompare(m_samplesPerPixel, spp))
         return;
     m_samplesPerPixel = spp;
-#ifdef MNE_DISP_RHIWIDGET
     m_vboDirty = true; // zoom change → decimation changes
     m_overlayDirty = true;
-#endif
     m_tileDirty = true;
     emit samplesPerPixelChanged(m_samplesPerPixel);
     update();
@@ -350,9 +308,7 @@ void ChannelRhiView::setBackgroundColor(const QColor &color)
 {
     m_bgColor = color;
     m_tileDirty = true;
-#ifdef MNE_DISP_RHIWIDGET
     m_overlayDirty = true;
-#endif
     update();
 }
 
@@ -387,10 +343,8 @@ void ChannelRhiView::setFirstVisibleChannel(int ch)
         return;
     m_firstVisibleChannel = ch;
     m_tileDirty = true;
-#ifdef MNE_DISP_RHIWIDGET
     m_vboDirty      = true;
     m_pipelineDirty = true;
-#endif
     emit channelOffsetChanged(m_firstVisibleChannel);
     update();
 }
@@ -404,10 +358,8 @@ void ChannelRhiView::setVisibleChannelCount(int count)
         return;
     m_visibleChannelCount = count;
     m_tileDirty = true;
-#ifdef MNE_DISP_RHIWIDGET
     m_vboDirty      = true;
     m_pipelineDirty = true;
-#endif
     update();
 }
 
@@ -470,9 +422,7 @@ void ChannelRhiView::setHideBadChannels(bool hide)
     if (m_hideBadChannels == hide)
         return;
     m_hideBadChannels = hide;
-#ifdef MNE_DISP_RHIWIDGET
     m_vboDirty = true;
-#endif
     m_tileDirty = true;
     update();
 }
@@ -492,10 +442,8 @@ void ChannelRhiView::setChannelIndices(const QVector<int> &indices)
     // Clamp scroll to new range
     int maxFirst = qMax(0, totalLogicalChannels() - m_visibleChannelCount);
     m_firstVisibleChannel = qBound(0, m_firstVisibleChannel, maxFirst);
-#ifdef MNE_DISP_RHIWIDGET
     m_vboDirty      = true;
     m_pipelineDirty = true;
-#endif
     m_tileDirty = true;
     update();
 }
@@ -548,11 +496,6 @@ void ChannelRhiView::setAnnotationSelectionEnabled(bool enabled)
 }
 
 //=============================================================================================================
-// QRhiWidget path
-//=============================================================================================================
-
-#ifdef MNE_DISP_RHIWIDGET
-
 void ChannelRhiView::initialize(QRhiCommandBuffer *cb)
 {
     Q_UNUSED(cb);
@@ -1159,62 +1102,14 @@ void ChannelRhiView::render(QRhiCommandBuffer *cb)
     cb->endPass();
 }
 
-#endif // MNE_DISP_RHIWIDGET
-
-//=============================================================================================================
-// QPainter fallback paintEvent – never blocks: schedules async tile rebuild if stale.
-//=============================================================================================================
-
-static void doPaintTile(QWidget *widget, const QImage &tileImage,
-                        float tileSampleFirst, float tileSamplesPerPixel,
-                        float scrollSample, const QColor &bgColor)
-{
-    QPainter p(widget);
-    // Always fill background first so uncovered areas are clean
-    p.fillRect(widget->rect(), bgColor);
-    if (tileImage.isNull() || tileSamplesPerPixel <= 0.f)
-        return;
-    float tileXPx = (tileSampleFirst - scrollSample) / tileSamplesPerPixel;
-    p.drawImage(QPointF(tileXPx, 0.f), tileImage);
-}
-
-#ifdef MNE_DISP_RHIWIDGET
 void ChannelRhiView::paintEvent(QPaintEvent *event)
 {
-    if (!m_rhiFailed) {
-        // Bands and event lines are rendered inside the Metal texture by render()
-        // via the overlay blit pipeline — no QPainter overlay needed here.
-        QRhiWidget::paintEvent(event);
-        // Only the ruler overlay (Shift+drag measurement) still uses QPainter.
-        if (m_rulerActive)
-            drawOverlays();
-        return;
-    }
-
-    if (!isTileFresh() && !m_tileRebuildPending)
-        scheduleTileRebuild();
-
-    doPaintTile(this, m_tileImage, m_tileSampleFirst, m_tileSamplesPerPixel,
-                m_scrollSample, m_bgColor);
+    QRhiWidget::paintEvent(event);
     drawOverlays();
 }
-
-#else // !MNE_DISP_RHIWIDGET
-
-void ChannelRhiView::paintEvent(QPaintEvent *)
-{
-    if (!isTileFresh() && !m_tileRebuildPending)
-        scheduleTileRebuild();
-
-    doPaintTile(this, m_tileImage, m_tileSampleFirst, m_tileSamplesPerPixel,
-                m_scrollSample, m_bgColor);
-    drawOverlays();
-}
-
-#endif // MNE_DISP_RHIWIDGET
 
 //=============================================================================================================
-// Tile cache helpers (used by both QPainter paths)
+// Tile cache helpers retained for off-thread waveform staging.
 //=============================================================================================================
 
 bool ChannelRhiView::isTileFresh() const
@@ -1644,18 +1539,14 @@ void ChannelRhiView::drawOverlays()
 }
 
 //=============================================================================================================
-// Shared event handlers (both paths)
+// Shared event handlers
 //=============================================================================================================
 
 void ChannelRhiView::resizeEvent(QResizeEvent *event)
 {
-#ifdef MNE_DISP_RHIWIDGET
     QRhiWidget::resizeEvent(event);
     m_vboDirty = true;
     m_overlayDirty = true;
-#else
-    QWidget::resizeEvent(event);
-#endif
     m_tileDirty = true;
     emit viewResized(width(), height());
     update();
@@ -1750,11 +1641,7 @@ void ChannelRhiView::mousePressEvent(QMouseEvent *event)
         event->accept();
         return;
     }
-#ifdef MNE_DISP_RHIWIDGET
     QRhiWidget::mousePressEvent(event);
-#else
-    QWidget::mousePressEvent(event);
-#endif
 }
 
 //=============================================================================================================
@@ -1796,11 +1683,7 @@ void ChannelRhiView::mouseMoveEvent(QMouseEvent *event)
             return;
         }
     }
-#ifdef MNE_DISP_RHIWIDGET
     QRhiWidget::mouseMoveEvent(event);
-#else
-    QWidget::mouseMoveEvent(event);
-#endif
 }
 
 //=============================================================================================================
@@ -1881,11 +1764,7 @@ void ChannelRhiView::mouseReleaseEvent(QMouseEvent *event)
         event->accept();
         return;
     }
-#ifdef MNE_DISP_RHIWIDGET
     QRhiWidget::mouseReleaseEvent(event);
-#else
-    QWidget::mouseReleaseEvent(event);
-#endif
 }
 
 //=============================================================================================================
@@ -1893,11 +1772,7 @@ void ChannelRhiView::mouseReleaseEvent(QMouseEvent *event)
 void ChannelRhiView::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (!m_model || event->button() != Qt::LeftButton) {
-#ifdef MNE_DISP_RHIWIDGET
         QRhiWidget::mouseDoubleClickEvent(event);
-#else
-        QWidget::mouseDoubleClickEvent(event);
-#endif
         return;
     }
 

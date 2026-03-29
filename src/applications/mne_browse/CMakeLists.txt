@@ -24,6 +24,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 
 set(SOURCES
     main.cpp
+    Views/rawview.cpp
     Utils/datamarker.cpp
     Utils/rawsettings.cpp
     Utils/filteroperator.cpp
@@ -58,6 +59,7 @@ set(SOURCES
 )
 
 set(HEADERS
+    Views/rawview.h
     Utils/datamarker.h
     Utils/rawsettings.h
     Utils/filteroperator.h

@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
  * @file     datamarker.h
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @version  2.1.0
  * @date     August, 2014
  *
  * @section  LICENSE

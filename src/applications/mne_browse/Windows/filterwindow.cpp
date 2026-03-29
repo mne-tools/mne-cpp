@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
  * @file     filterwindow.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @version  2.1.0
  * @date     August, 2014
  *
  * @section  LICENSE
@@ -41,6 +41,7 @@
 #include "filterwindow.h"
 
 #include <math/numerics.h>
+#include <QSignalBlocker>
 
 
 //*************************************************************************************************************
@@ -90,15 +91,24 @@ FilterWindow::~FilterWindow()
 
 void FilterWindow::newFileLoaded(FiffInfo::SPtr& pFiffInfo)
 {
-    Q_UNUSED(pFiffInfo);
-    filterParametersChanged();
-
     //Update min max of spin boxes to nyquist
-    double samplingFrequency = m_pMainWindow->rawModel()->fiffInfo()->sfreq;
+    if(!pFiffInfo) {
+        return;
+    }
+
+    double samplingFrequency = pFiffInfo->sfreq;
     double nyquistFrequency = samplingFrequency/2;
 
+    QSignalBlocker lowpassBlocker(ui->m_doubleSpinBox_lowpass);
+    QSignalBlocker highpassBlocker(ui->m_doubleSpinBox_highpass);
     ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
     ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
+
+    // Keep raw-load sync passive. The legacy RawModel is initialized on demand
+    // when the user actually edits/applies a filter.
+    if(m_pMainWindow->rawModel()->isFileLoaded()) {
+        filterParametersChanged();
+    }
 }
 
 
@@ -231,6 +241,10 @@ void FilterWindow::setFrequencies(double highpass, double lowpass)
 
 void FilterWindow::updateFilterPlot()
 {
+    if(!m_pMainWindow->ensureLegacyRawModelLoaded(QStringLiteral("Filter Window"))) {
+        return;
+    }
+
     //Update the filter of the scene
     QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->rawModel()->operators());
     while(it.hasNext()) {
@@ -354,6 +368,11 @@ void FilterWindow::changeStateSpinBoxes(int currentIndex)
 
 void FilterWindow::filterParametersChanged()
 {
+    auto fiffInfo = m_pMainWindow->dataWindow()->fiffInfo();
+    if(!fiffInfo) {
+        return;
+    }
+
     //User defined filter parameters
     double lowpassHz = ui->m_doubleSpinBox_lowpass->value();
     double highpassHz = ui->m_doubleSpinBox_highpass->value();
@@ -363,7 +382,7 @@ void FilterWindow::filterParametersChanged()
     double bw = highpassHz-lowpassHz;
     double center = lowpassHz+bw/2;
 
-    double samplingFrequency = m_pMainWindow->rawModel()->fiffInfo()->sfreq;
+    double samplingFrequency = fiffInfo->sfreq;
     double nyquistFrequency = samplingFrequency/2;
 
     //Calculate the needed fft length
@@ -412,6 +431,10 @@ void FilterWindow::filterParametersChanged()
     }
 
     //Replace old with new filter operator
+    if(!m_pMainWindow->ensureLegacyRawModelLoaded(QStringLiteral("Filter Window"))) {
+        return;
+    }
+
     QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->rawModel()->operators());
     while(it.hasNext()) {
         it.next();
@@ -429,6 +452,10 @@ void FilterWindow::filterParametersChanged()
 
 void FilterWindow::applyFilter()
 {
+    if(!m_pMainWindow->ensureLegacyRawModelLoaded(QStringLiteral("Filter Window"))) {
+        return;
+    }
+
     //Undo all previous filters first
     m_pMainWindow->rawModel()->undoFilter(ui->m_comboBox_filterApplyTo->currentText());
 
@@ -449,6 +476,10 @@ void FilterWindow::applyFilter()
 
 void FilterWindow::undoFilter()
 {
+    if(!m_pMainWindow->ensureLegacyRawModelLoaded(QStringLiteral("Filter Window"))) {
+        return;
+    }
+
     m_pMainWindow->rawModel()->undoFilter(ui->m_comboBox_filterUndoTo->currentText());
 
     m_pMainWindow->dataWindow()->updateDataTableViews();
@@ -500,6 +531,10 @@ void FilterWindow::exportFilterPlot()
 
 void FilterWindow::exportFilterCoefficients()
 {
+    if(!m_pMainWindow->ensureLegacyRawModelLoaded(QStringLiteral("Filter Window"))) {
+        return;
+    }
+
     // Open file dialog
     QDate date;
     QString fileName = QFileDialog::getSaveFileName(this,
@@ -534,6 +569,3 @@ void FilterWindow::exportFilterCoefficients()
         file.close();
     }
 }
-
-
-

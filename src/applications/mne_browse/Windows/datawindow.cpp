@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
  * @file     datawindow.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @version  2.1.0
  * @date     August, 2014
  *
  * @section  LICENSE
@@ -45,10 +45,6 @@
 
 #include <algorithm>
 #include <QHash>
-
-#if !defined(NO_QOPENGLWIDGET)
-#include <QOpenGLWidget>
-#endif
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -107,14 +103,7 @@ DataWindow::DataWindow(QWidget *parent)
 , m_pKineticScroller(Q_NULLPTR)
 {
     ui->setupUi(this);
-
-    //------------------------
-    //--- Setup data model ---
-    //------------------------
-    if(m_pMainWindow->rawFile().exists())
-        m_pRawModel = new RawModel(m_pMainWindow->rawFile(), this);
-    else
-        m_pRawModel = new RawModel(this);
+    m_pRawModel = new RawModel(this);
 }
 
 
@@ -307,10 +296,12 @@ void DataWindow::initMVCSettings()
     connect(m_pFiffReader, &FiffBlockReader::blockLoaded,
             this, &DataWindow::onBlockLoaded);
 
-    m_pChannelDataView = new DISPLIB::ChannelDataView("DataWindow", this);
+    m_pChannelDataView = new RawView("DataWindow", this);
     m_pChannelDataView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(m_pChannelDataView, &DISPLIB::ChannelDataView::scrollPositionChanged,
             this, &DataWindow::onChannelViewScrollChanged);
+    connect(m_pChannelDataView, &DISPLIB::ChannelDataView::sampleClicked,
+            this, &DataWindow::moveMarkerToSample);
     connect(m_pChannelDataView, &DISPLIB::ChannelDataView::sampleRangeSelected,
             this, &DataWindow::annotationRangeSelected);
 
@@ -400,6 +391,24 @@ bool DataWindow::loadFiffFile(const QString &path)
         return false;
     }
     m_sFiffFilePath = path;
+
+    auto fiffInfo = m_pFiffReader->fiffInfo();
+    m_iStimChannel = fiffInfo ? resolveStimChannelIndex(*fiffInfo) : -1;
+    rebuildVirtualChannels();
+    restartChannelView(m_pFiffReader->firstSample(), true);
+
+    return true;
+}
+
+//=============================================================================================================
+
+bool DataWindow::loadFiffBuffer(const QByteArray &data, const QString &displayName)
+{
+    if (!m_pFiffReader->openBuffer(data, displayName)) {
+        return false;
+    }
+
+    m_sFiffFilePath = displayName;
 
     auto fiffInfo = m_pFiffReader->fiffInfo();
     m_iStimChannel = fiffInfo ? resolveStimChannelIndex(*fiffInfo) : -1;
@@ -759,6 +768,13 @@ void DataWindow::restartChannelView(int initialSample, bool clearAnnotations)
     m_iNextLoadSample = m_iCurrentScrollSample;
 
     m_pChannelDataView->scrollToSample(m_iCurrentScrollSample, false);
+    updateMarkerPosition();
+    setRangeSampleLabels();
+    setMarkerSampleLabel();
+    m_pDataMarker->show();
+    m_pCurrentDataMarkerLabel->show();
+    ui->m_label_sampleMin->show();
+    ui->m_label_sampleMax->show();
 
     m_bLoadingBlock = false;
     scheduleNextLoad();
@@ -769,6 +785,8 @@ void DataWindow::restartChannelView(int initialSample, bool clearAnnotations)
 void DataWindow::onChannelViewScrollChanged(int sample)
 {
     m_iCurrentScrollSample = sample;
+    setRangeSampleLabels();
+    setMarkerSampleLabel();
 
     // If the scroll jumped outside the currently loaded data range, redirect
     // the load frontier so the data at the jump target loads immediately.
@@ -824,15 +842,10 @@ void DataWindow::initMarker()
     //Set marker as front top-most widget
     m_pDataMarker->raise();
 
-    //Get boundary rect coordinates for table view
-    double boundingLeft = ui->m_tableView_rawTableView->verticalHeader()->geometry().right() + ui->m_tableView_rawTableView->geometry().left();
-    double boundingRight = ui->m_tableView_rawTableView->geometry().right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1;
-    QRect boundingRect;
-    boundingRect.setLeft(boundingLeft);
-    boundingRect.setRight(boundingRight);
+    const QRect boundingRect = markerViewportRect();
 
     //Inital position of the marker
-    m_pDataMarker->move(boundingRect.x(), boundingRect.y() + 1);
+    m_pDataMarker->move(boundingRect.x(), boundingRect.y());
 
     //Create Region from bounding rect - this region is used to restrain the marker inside the data view
     QRegion region(boundingRect);
@@ -840,42 +853,15 @@ void DataWindow::initMarker()
 
     //Set marker size to table view size minus horizontal scroll bar height
     m_pDataMarker->resize(DATA_MARKER_WIDTH,
-                          boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);
-
-    //Connect current marker to marker move signal
-    connect(m_pDataMarker,&DataMarker::markerMoved,
-            this,&DataWindow::updateMarkerPosition);
+                          boundingRect.height());
 
     //If no file has been loaded yet dont show the marker and its label
-    if(!m_pRawModel->isFileLoaded()) {
+    if(!isFiffFileLoaded()) {
         m_pDataMarker->hide();
         m_pCurrentDataMarkerLabel->hide();
         ui->m_label_sampleMin->hide();
         ui->m_label_sampleMax->hide();
     }
-
-    //Connect current marker to loading a fiff file - no loaded file - no visible marker
-    connect(m_pRawModel, &RawModel::fileLoaded, this, [this](){
-        bool state = m_pRawModel->isFileLoaded();
-        if(state) {
-            //Inital position of the marker
-            m_pDataMarker->move(DATA_MARKER_INITIAL_X, m_pDataMarker->y());
-            m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (DATA_MARKER_WIDTH/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - DATA_MARKER_LABEL_V_OFFSET);
-
-            m_pDataMarker->show();
-            m_pCurrentDataMarkerLabel->show();
-
-            ui->m_label_sampleMin->show();
-            ui->m_label_sampleMax->show();
-        }
-        else {
-            m_pDataMarker->hide();
-            m_pCurrentDataMarkerLabel->hide();
-
-            ui->m_label_sampleMin->hide();
-            ui->m_label_sampleMax->hide();
-        }
-    });
 }
 
 
@@ -884,38 +870,41 @@ void DataWindow::initMarker()
 void DataWindow::initLabels()
 {
     //Setup range samples
-    //Connect range sample labels to horizontal sroll bar changes
-    connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
-            this,&DataWindow::setRangeSampleLabels);
+    if (m_pChannelDataView) {
+        connect(m_pChannelDataView, &DISPLIB::ChannelDataView::scrollPositionChanged,
+                this, &DataWindow::setRangeSampleLabels);
+    }
 
     //Setup marker label
     //Set current marker sample label to vertical spacer position and initalize text
-    m_pCurrentDataMarkerLabel->resize(150, m_pCurrentDataMarkerLabel->height());
+    m_pCurrentDataMarkerLabel->setMinimumWidth(150);
+    m_pCurrentDataMarkerLabel->setMargin(4);
     m_pCurrentDataMarkerLabel->setAlignment(Qt::AlignHCenter);
+    m_pCurrentDataMarkerLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
     m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left(), m_pDataMarker->geometry().top() + 5);
     QString numberString = QString().number(m_iCurrentMarkerSample);
     m_pCurrentDataMarkerLabel->setText(numberString.append(QString(" / %1").arg("0 sec")));
 
     //Set color
-    QPalette palette;
     QColor textColor = m_qSettings.value("DataMarker/data_marker_color", QColor(93,177,47)).value<QColor>();
-    //textColor.setAlpha(DATA_MARKER_OPACITY);
-    palette.setColor(QPalette::WindowText, textColor);
-
-    QColor windowColor;
-    windowColor.setAlpha(0); //make qlabel bounding rect fully transparent
-    palette.setColor(QPalette::Window, windowColor);
-
-    m_pCurrentDataMarkerLabel->setAutoFillBackground(true);
-    m_pCurrentDataMarkerLabel->setPalette(palette);
+    m_pCurrentDataMarkerLabel->setStyleSheet(QStringLiteral(
+        "QLabel {"
+        " color: %1;"
+        " background-color: rgba(255, 255, 255, 220);"
+        " border: 1px solid %1;"
+        " border-radius: 3px;"
+        " font-weight: 600;"
+        " }").arg(textColor.name()));
+    m_pCurrentDataMarkerLabel->adjustSize();
 
     //Connect current marker sample label to marker move signal
     connect(m_pDataMarker,&DataMarker::markerMoved,
             this,&DataWindow::setMarkerSampleLabel);
 
-    //Connect current marker sample label to horizontal scroll bar changes
-    connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
-            this,&DataWindow::setMarkerSampleLabel);
+    if (m_pChannelDataView) {
+        connect(m_pChannelDataView, &DISPLIB::ChannelDataView::scrollPositionChanged,
+                this, &DataWindow::setMarkerSampleLabel);
+    }
 }
 
 
@@ -937,15 +926,15 @@ void DataWindow::resizeEvent(QResizeEvent * event)
 
 void DataWindow::keyPressEvent(QKeyEvent* event)
 {
-    QScrollBar* horizontalScrollBar = ui->m_tableView_rawTableView->horizontalScrollBar();
-
-    switch(event->key()) {
-    case Qt::Key_Left:
-        horizontalScrollBar->setValue(horizontalScrollBar->value() - RAWVIEW_KEYBOARD_SCROLL_STEP);
-        break;
-    case Qt::Key_Right:
-        horizontalScrollBar->setValue(horizontalScrollBar->value() + RAWVIEW_KEYBOARD_SCROLL_STEP);
-        break;
+    if (m_pChannelDataView) {
+        switch(event->key()) {
+        case Qt::Key_Left:
+            m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() - RAWVIEW_KEYBOARD_SCROLL_STEP, false);
+            break;
+        case Qt::Key_Right:
+            m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() + RAWVIEW_KEYBOARD_SCROLL_STEP, false);
+            break;
+        }
     }
 
     if((event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_D))
@@ -1001,6 +990,10 @@ bool DataWindow::eventFilter(QObject *object, QEvent *event)
 
 void DataWindow::customContextMenuRequested(QPoint pos)
 {
+    if(!m_pMainWindow->ensureLegacyRawModelLoaded(QStringLiteral("Raw Browser Context Menu"))) {
+        return;
+    }
+
     //obtain index where index was clicked
     //QModelIndex index = m_pRawTableView->indexAt(pos);
 
@@ -1092,17 +1085,15 @@ void DataWindow::customContextMenuRequested(QPoint pos)
 
 void DataWindow::setRangeSampleLabels()
 {
-    //Set sapce width so that min sample and max sample are in line with the data plot
-    ui->m_horizontalSpacer_Min->setFixedWidth(ui->m_tableView_rawTableView->verticalHeader()->width());
-    ui->m_horizontalSpacer_Max->setFixedWidth(ui->m_tableView_rawTableView->verticalScrollBar()->width());
+    ui->m_horizontalSpacer_Min->setFixedWidth(0);
+    ui->m_horizontalSpacer_Max->setFixedWidth(0);
 
-    //calculate sample range which is currently displayed in the view
-    //Note: the viewport holds the width of the area which is changed through scrolling
-    int minSampleRange = ui->m_tableView_rawTableView->horizontalScrollBar()->value()/* + m_pMainWindow->m_pRawModel->firstSample()*/;
-    int maxSampleRange = minSampleRange + ui->m_tableView_rawTableView->viewport()->width();
+    const int minSampleRange = m_pChannelDataView ? m_pChannelDataView->firstVisibleSample() : 0;
+    const int maxSampleRange = minSampleRange
+        + (m_pChannelDataView ? m_pChannelDataView->visibleSampleCount() : 0);
 
     //Set values as string
-    auto fiffInfo = m_pRawModel->fiffInfo();
+    auto fiffInfo = m_pFiffReader ? m_pFiffReader->fiffInfo() : QSharedPointer<FIFFLIB::FiffInfo>();
     if (!fiffInfo)
         return;
     QString stringTemp;
@@ -1119,19 +1110,38 @@ void DataWindow::setMarkerSampleLabel()
 {
     m_pCurrentDataMarkerLabel->raise();
 
-    //Update the text and position in the current sample marker label
-    m_iCurrentMarkerSample = ui->m_tableView_rawTableView->horizontalScrollBar()->value() +
-            (m_pDataMarker->geometry().x() - ui->m_tableView_rawTableView->geometry().x() - ui->m_tableView_rawTableView->verticalHeader()->width());
+    const QRect viewportRect = markerViewportRect();
+    if(viewportRect.isEmpty()) {
+        return;
+    }
 
-    auto fiffInfo = m_pRawModel->fiffInfo();
+    //Update the text and position in the current sample marker label
+    const int markerCenterX = m_pDataMarker->geometry().left() + (DATA_MARKER_WIDTH / 2);
+    if(m_pChannelDataView) {
+        const int localMarkerX = m_pChannelDataView->mapFrom(this, QPoint(markerCenterX, viewportRect.center().y())).x();
+        m_iCurrentMarkerSample = m_pChannelDataView->viewportXToSample(localMarkerX);
+    } else {
+        const int scrollSample = 0;
+        const int browserLeft = ui->m_tableView_rawTableView->geometry().x();
+        m_iCurrentMarkerSample = scrollSample + (markerCenterX - browserLeft);
+    }
+
+    auto fiffInfo = m_pFiffReader ? m_pFiffReader->fiffInfo() : QSharedPointer<FIFFLIB::FiffInfo>();
     if (!fiffInfo)
         return;
     int currentSeconds = (m_iCurrentMarkerSample/fiffInfo->sfreq)*1000;
 
     QString numberString = QString("%1 / %2 sec").arg(QString().number(m_iCurrentMarkerSample)).arg(QString().number((double)currentSeconds/1000,'g'));
     m_pCurrentDataMarkerLabel->setText(numberString);
+    m_pCurrentDataMarkerLabel->adjustSize();
 
-    m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (DATA_MARKER_WIDTH/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - DATA_MARKER_LABEL_V_OFFSET);
+    const int labelX = qBound(viewportRect.left(),
+                              markerCenterX - (m_pCurrentDataMarkerLabel->width() / 2),
+                              qMax(viewportRect.left(),
+                                   viewportRect.right() - m_pCurrentDataMarkerLabel->width() + 1));
+    const int labelY = qMax(0,
+                            viewportRect.top() - m_pCurrentDataMarkerLabel->height() - 4);
+    m_pCurrentDataMarkerLabel->move(labelX, labelY);
 
     //Set current marker posisiton in event model
     m_pMainWindow->eventWindow()->getEventModel()->setCurrentMarkerPos(m_iCurrentMarkerSample);
@@ -1140,41 +1150,78 @@ void DataWindow::setMarkerSampleLabel()
 
 //*************************************************************************************************************
 
+void DataWindow::moveMarkerToSample(int sample)
+{
+    const QRect viewportRect = markerViewportRect();
+    if(viewportRect.isEmpty()) {
+        return;
+    }
+
+    int clampedSample = sample;
+    if(m_pFiffReader && m_pFiffReader->isOpen()) {
+        clampedSample = qBound(m_pFiffReader->firstSample(),
+                               sample,
+                               m_pFiffReader->lastSample());
+    }
+
+    int markerX = viewportRect.left();
+    if(m_pChannelDataView) {
+        const int localViewportX = m_pChannelDataView->sampleToViewportX(clampedSample);
+        markerX = m_pChannelDataView->mapTo(this, QPoint(localViewportX, 0)).x()
+                - (DATA_MARKER_WIDTH / 2);
+    }
+
+    const int maxMarkerX = qMax(viewportRect.left(),
+                                viewportRect.right() - DATA_MARKER_WIDTH + 1);
+    markerX = qBound(viewportRect.left(), markerX, maxMarkerX);
+
+    m_pDataMarker->move(markerX, viewportRect.top());
+    setMarkerSampleLabel();
+}
+
+//*************************************************************************************************************
+
 void DataWindow::updateMarkerPosition()
 {
-    //Get boundary rect coordinates for table view
-    QRect boundingRect = ui->m_tableView_rawTableView->geometry();
-
-    m_pDataMarker->move(m_pDataMarker->x(), boundingRect.y()+1);
-
-    double boundingLeft = ui->m_tableView_rawTableView->verticalHeader()->geometry().right() + ui->m_tableView_rawTableView->geometry().left();
-    double boundingRight = ui->m_tableView_rawTableView->geometry().right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1;
-    boundingRect.setLeft(boundingLeft);
-    boundingRect.setRight(boundingRight);
+    const QRect boundingRect = markerViewportRect();
+    if(boundingRect.isEmpty()) {
+        return;
+    }
 
     //Create Region from bounding rect - this region is used to restrain the marker inside the data view
     QRegion region(boundingRect);
     m_pDataMarker->setMovementBoundary(region);
 
     //If marker is outside of the bounding rect move to edges of bounding rect
-    if(m_pDataMarker->pos().x() < boundingRect.left()) {
-        m_pDataMarker->move(boundingRect.left(), boundingRect.y()+1);
-        setMarkerSampleLabel();
-    }
-
-    if(m_pDataMarker->pos().x() > boundingRect.right()) {
-        m_pDataMarker->move(boundingRect.right()-2, boundingRect.y()+1);
-        setMarkerSampleLabel();
-    }
+    const int maxMarkerX = qMax(boundingRect.left(),
+                                boundingRect.right() - DATA_MARKER_WIDTH + 1);
+    const int markerX = qBound(boundingRect.left(),
+                               m_pDataMarker->pos().x(),
+                               maxMarkerX);
+    m_pDataMarker->setGeometry(markerX,
+                               boundingRect.y(),
+                               DATA_MARKER_WIDTH,
+                               boundingRect.height());
 
     //Set marker size to table view size minus horizontal scroll bar height
-    m_pDataMarker->resize(DATA_MARKER_WIDTH,
-                          boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);
-
-    //Update current marker sample lable
-    m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - DATA_MARKER_LABEL_V_OFFSET);
+    setMarkerSampleLabel();
 }
 
+
+//*************************************************************************************************************
+
+QRect DataWindow::markerViewportRect() const
+{
+    if(m_pChannelDataView) {
+        const QRect localViewportRect = m_pChannelDataView->signalViewportRect();
+        if(!localViewportRect.isEmpty()) {
+            return QRect(m_pChannelDataView->mapTo(const_cast<DataWindow*>(this), localViewportRect.topLeft()),
+                         localViewportRect.size());
+        }
+    }
+
+    return ui->m_tableView_rawTableView->geometry();
+}
 
 //*************************************************************************************************************
 
