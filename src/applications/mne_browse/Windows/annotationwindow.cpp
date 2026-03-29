@@ -104,7 +104,7 @@ void AnnotationWindow::setupUi()
     m_pLayout->setContentsMargins(6, 6, 6, 6);
     m_pLayout->setSpacing(6);
 
-    m_pHintLabel = new QLabel(QStringLiteral("Enable annotation mode and Shift-drag in the raw view to create time spans. The manager can edit MNE-style descriptions, channels, comments, and import/export JSON, CSV, or TXT annotation files."), m_pContents);
+    m_pHintLabel = new QLabel(QStringLiteral("Enable annotation mode and Shift-drag in the raw view to create time spans. The manager can edit MNE-style descriptions, channels, comments, and import/export JSON, CSV, TXT, or FIF annotation files."), m_pContents);
     m_pHintLabel->setWordWrap(true);
     m_pLayout->addWidget(m_pHintLabel);
 
