@@ -37,5 +37,3 @@ target_link_libraries(test_fwd_library PRIVATE
     Qt6::Network
     Qt6::Test
 )
-
-qt_finalize_executable(test_fwd_library)

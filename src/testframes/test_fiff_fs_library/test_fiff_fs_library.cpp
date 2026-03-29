@@ -1520,7 +1520,9 @@ static void writeSyntheticSurface(const QString &path, int nvert, int ntri,
                                    const MatrixX3f &verts, const MatrixX3i &tris)
 {
     QFile f(path);
-    f.open(QIODevice::WriteOnly);
+    if (!f.open(QIODevice::WriteOnly)) {
+        qFatal("Cannot open synthetic surface file: %s", qPrintable(path));
+    }
     QDataStream ds(&f);
     ds.setByteOrder(QDataStream::BigEndian);
     ds.setFloatingPointPrecision(QDataStream::SinglePrecision);
@@ -1540,7 +1542,9 @@ static void writeSyntheticAnnotation(const QString &path, int nvert,
                                       const VectorXi &labels)
 {
     QFile f(path);
-    f.open(QIODevice::WriteOnly);
+    if (!f.open(QIODevice::WriteOnly)) {
+        qFatal("Cannot open synthetic annotation file: %s", qPrintable(path));
+    }
     QDataStream ds(&f);
     ds.setByteOrder(QDataStream::BigEndian);
     ds << (qint32)nvert;

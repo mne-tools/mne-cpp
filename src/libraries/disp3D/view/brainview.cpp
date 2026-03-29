@@ -246,7 +246,7 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
         AbstractTreeItem* absItem = dynamic_cast<AbstractTreeItem*>(item);
 
         // Handle FsSurface Items
-        if (absItem && absItem->type() == AbstractTreeItem::SurfaceItem + QStandardItem::UserType) {
+        if (absItem && absItem->type() == AbstractTreeItem::itemTypeId(AbstractTreeItem::SurfaceItem)) {
             SurfaceTreeItem* surfItem = static_cast<SurfaceTreeItem*>(absItem);
             auto brainSurf = std::make_shared<BrainSurface>();
 
@@ -321,7 +321,7 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
         }
 
         // Handle Sensor Items
-        if (absItem && absItem->type() == AbstractTreeItem::SensorItem + QStandardItem::UserType) {
+        if (absItem && absItem->type() == AbstractTreeItem::itemTypeId(AbstractTreeItem::SensorItem)) {
             SensorTreeItem* sensItem = static_cast<SensorTreeItem*>(absItem);
 
             std::shared_ptr<BrainSurface> brainSurf;
@@ -364,7 +364,7 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
         }
 
         // Handle Dipole Items
-        if (absItem && absItem->type() == AbstractTreeItem::DipoleItem + QStandardItem::UserType) {
+        if (absItem && absItem->type() == AbstractTreeItem::itemTypeId(AbstractTreeItem::DipoleItem)) {
             DipoleTreeItem* dipItem = static_cast<DipoleTreeItem*>(absItem);
             auto dipObject = std::make_shared<DipoleObject>();
             dipObject->load(dipItem->ecdSet());
@@ -374,7 +374,7 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
         }
 
         // Handle Source Space Items (one item per hemisphere, batched mesh)
-        if (absItem && absItem->type() == AbstractTreeItem::SourceSpaceItem + QStandardItem::UserType) {
+        if (absItem && absItem->type() == AbstractTreeItem::itemTypeId(AbstractTreeItem::SourceSpaceItem)) {
             SourceSpaceTreeItem* srcItem = static_cast<SourceSpaceTreeItem*>(absItem);
             const QVector<QVector3D>& positions = srcItem->positions();
             if (positions.isEmpty()) continue;
@@ -389,7 +389,7 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
         }
 
         // Handle Digitizer Items (batched sphere mesh per category)
-        if (absItem && absItem->type() == AbstractTreeItem::DigitizerItem + QStandardItem::UserType) {
+        if (absItem && absItem->type() == AbstractTreeItem::itemTypeId(AbstractTreeItem::DigitizerItem)) {
             DigitizerTreeItem* digItem = static_cast<DigitizerTreeItem*>(absItem);
             const QVector<QVector3D>& positions = digItem->positions();
             if (positions.isEmpty()) continue;
@@ -2479,7 +2479,7 @@ void BrainView::castRay(const QPoint &pos)
                  // Check if this is a digitizer batched mesh — highlight single sphere
                  AbstractTreeItem* absHitSel = dynamic_cast<AbstractTreeItem*>(m_hoveredItem);
                  bool isDigitizer = absHitSel &&
-                     (absHitSel->type() == AbstractTreeItem::DigitizerItem + QStandardItem::UserType);
+                     (absHitSel->type() == AbstractTreeItem::itemTypeId(AbstractTreeItem::DigitizerItem));
 
                  if (isDigitizer && m_hoveredIndex >= 0) {
                      const int vertsPerSphere = MeshFactory::sphereVertexCount();
@@ -2503,7 +2503,7 @@ void BrainView::castRay(const QPoint &pos)
     } else if (m_hoveredItem && m_itemSurfaceMap.contains(m_hoveredItem)) {
         AbstractTreeItem* absHitUpd = dynamic_cast<AbstractTreeItem*>(m_hoveredItem);
         bool isDigitizer = absHitUpd &&
-            (absHitUpd->type() == AbstractTreeItem::DigitizerItem + QStandardItem::UserType);
+            (absHitUpd->type() == AbstractTreeItem::itemTypeId(AbstractTreeItem::DigitizerItem));
 
         if (isDigitizer && m_hoveredIndex >= 0) {
             const int vertsPerSphere = MeshFactory::sphereVertexCount();

@@ -405,9 +405,13 @@ void MainWindow::changeStyle()
             emit guiStyleChanged(DISPLIB::AbstractView::StyleMode::Default);
         } else if (m_sCurrentStyle == "dark") {
             QFile file(":/dark.qss");
-            file.open(QFile::ReadOnly);
-            QTextStream stream(&file);
-            pApp->setStyleSheet(stream.readAll());
+            if (file.open(QFile::ReadOnly)) {
+                QTextStream stream(&file);
+                pApp->setStyleSheet(stream.readAll());
+            } else {
+                qWarning() << "Could not open dark theme stylesheet.";
+                pApp->setStyleSheet("");
+            }
             emit guiStyleChanged(DISPLIB::AbstractView::StyleMode::Dark);
         }
 

@@ -100,6 +100,8 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
             txt += QString("%1").arg(msg);
             writeToLog=true;
             break;
+        default:
+            break;
     }
 
     if(!writeToLog) {

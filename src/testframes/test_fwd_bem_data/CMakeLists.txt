@@ -33,5 +33,3 @@ target_link_libraries(test_fwd_bem_data PRIVATE
     mne_disp3D
     eigen
 )
-
-qt_finalize_executable(test_fwd_bem_data)

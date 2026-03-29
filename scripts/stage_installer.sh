@@ -67,8 +67,8 @@ if [ -n "${QT_ROOT_DIR}" ] && [ -d "${QT_ROOT_DIR}/plugins" ]; then
   QT_PLUGINS_SRC="${QT_ROOT_DIR}/plugins"
 elif [ -n "${Qt6_DIR}" ] && [ -d "$(cd "${Qt6_DIR}/../../.." 2>/dev/null && pwd)/plugins" ]; then
   QT_PLUGINS_SRC="$(cd "${Qt6_DIR}/../../.." 2>/dev/null && pwd)/plugins"
-elif [ -d "$HOME/Qt/6.10.2/macos/plugins" ]; then
-  QT_PLUGINS_SRC="$HOME/Qt/6.10.2/macos/plugins"
+elif QT_PLUGINS_FALLBACK=$(ls -d "$HOME"/Qt/[0-9]*.[0-9]*.[0-9]*/macos/plugins 2>/dev/null | sort -V | tail -n 1); then
+  QT_PLUGINS_SRC="${QT_PLUGINS_FALLBACK}"
 fi
 if [ -n "${QT_PLUGINS_SRC}" ] && [ -d "${QT_PLUGINS_SRC}" ]; then
   mkdir -p "${RT_DATA}/lib/plugins"

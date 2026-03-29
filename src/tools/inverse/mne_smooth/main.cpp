@@ -177,7 +177,10 @@ int main(int argc, char *argv[])
     } else {
         // Read source space
         QFile file(srcFile);
-        file.open(QIODevice::ReadOnly);
+        if (!file.open(QIODevice::ReadOnly)) {
+            qCritical("Cannot open source space file: %s", qPrintable(srcFile));
+            return 1;
+        }
         FiffStream::SPtr stream(new FiffStream(&file));
         MNESourceSpaces srcSpaces;
         if (!MNESourceSpaces::readFromStream(stream, true, srcSpaces) || srcSpaces.size() == 0) {

@@ -163,7 +163,8 @@ int main(int argc, char *argv[])
         for (k = 0; k < raw.info.projs.size(); ++k)
             raw.info.projs[k].active = true;
 
-        printf("%d projection items activated\n",raw.info.projs.size());
+        printf("%lld projection items activated\n",
+               static_cast<long long>(raw.info.projs.size()));
         //
         //   Create the projector
         //

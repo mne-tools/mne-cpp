@@ -125,7 +125,7 @@ void ProjectorsView::redrawGUI()
 
     qint32 i = 0;
 
-    for(i; i < m_pProjs.size(); ++i) {
+    for(; i < m_pProjs.size(); ++i) {
         QCheckBox* checkBox = new QCheckBox(m_pProjs.at(i).desc);
 
         if(m_pProjs.at(i).active == false) {

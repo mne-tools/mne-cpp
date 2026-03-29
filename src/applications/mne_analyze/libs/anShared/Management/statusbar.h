@@ -138,7 +138,7 @@ private:
      *
      * @param[in] event    event of type QHoverEvent that holds mouse position.
      */
-    void leaveEvent(QEvent* event);
+    void leaveEvent(QEvent* event) override;
 
     ANSHAREDLIB::Communicator*          m_pCommunicator;            /**< Vector containing all plugins. */
 

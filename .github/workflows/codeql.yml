@@ -8,6 +8,9 @@ on:
   schedule:
     - cron: '28 15 * * 1'
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 jobs:
   analyze:
     name: Analyze
@@ -34,7 +37,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: 6.10.2
+        version: 6.11.0
         modules: qtshadertools
 
     # Initialize CodeQL tools for scanning.

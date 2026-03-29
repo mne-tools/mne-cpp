@@ -10,6 +10,7 @@ set(QT_REQUIRED_COMPONENTS Core Gui Widgets ShaderTools)
 
 # GuiPrivate is needed for QRhi headers — check availability (may be absent in some WASM builds)
 find_package(Qt6 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
+set(QT_NO_PRIVATE_MODULE_WARNING ON)
 find_package(Qt6 QUIET COMPONENTS GuiPrivate)
 if(NOT Qt6GuiPrivate_FOUND)
   message(WARNING "Qt6::GuiPrivate not found — disp3D will not be built (required for QRhi)")

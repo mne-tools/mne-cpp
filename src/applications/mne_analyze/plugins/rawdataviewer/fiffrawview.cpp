@@ -485,7 +485,10 @@ bool FiffRawView::eventFilter(QObject *object, QEvent *event)
                                      ((float)pos.x() / m_pModel->pixelDifference())))); //accounting for mouse position offset
             m_pTableView->viewport()->repaint();
             }
+            break;
         }
+        default:
+            break;
         }
 
     }

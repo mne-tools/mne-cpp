@@ -109,7 +109,7 @@ void DraggableFramelessWidget::mouseMoveEvent(QMouseEvent *event)
         return QWidget::mouseMoveEvent(event);
     }
 
-    if (event->buttons() && Qt::LeftButton && m_bMousePressed) {
+    if ((event->buttons() & Qt::LeftButton) && m_bMousePressed) {
         move(event->globalPosition().toPoint() - m_dragPosition);
         event->accept();
     }

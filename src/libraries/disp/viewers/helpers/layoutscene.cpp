@@ -120,6 +120,8 @@ void LayoutScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
         //return so that no selection event is called
         return;
+    default:
+        break;
     }
 
     QGraphicsScene::mousePressEvent(mouseEvent);

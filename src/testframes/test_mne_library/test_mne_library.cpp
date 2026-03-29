@@ -476,13 +476,13 @@ void TestMneLibrary::sourceEstimate_writeReadFile()
     QString tmpPath = QCoreApplication::applicationDirPath() + "/test_stc_tmp.stc";
     {
         QFile outFile(tmpPath);
-        outFile.open(QIODevice::WriteOnly);
+        QVERIFY(outFile.open(QIODevice::WriteOnly));
         stc.write(outFile);
         outFile.close();
     }
     if (QFile::exists(tmpPath)) {
         QFile inFile(tmpPath);
-        inFile.open(QIODevice::ReadOnly);
+        QVERIFY(inFile.open(QIODevice::ReadOnly));
         InvSourceEstimate stcRead;
         InvSourceEstimate::read(inFile, stcRead);
         inFile.close();

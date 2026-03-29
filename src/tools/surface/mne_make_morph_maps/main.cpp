@@ -173,7 +173,10 @@ int main(int argc, char *argv[])
     QStringList hemis = {"lh", "rh"};
 
     QFile outF(outFile);
-    outF.open(QIODevice::WriteOnly);
+    if (!outF.open(QIODevice::WriteOnly)) {
+        qCritical("Cannot open output file: %s", qPrintable(outFile));
+        return 1;
+    }
     FiffStream::SPtr stream = FiffStream::start_file(outF);
     if (!stream) {
         qCritical("Cannot open output file: %s", qPrintable(outFile));

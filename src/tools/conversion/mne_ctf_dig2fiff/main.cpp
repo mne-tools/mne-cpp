@@ -224,12 +224,13 @@ int main(int argc, char *argv[])
     }
 
     QList<DigPoint> points = readCtfDig(ctfName, numFids);
+    const auto pointCount = static_cast<long long>(points.size());
     if (points.size() < 3) {
-        qCritical("Need at least 3 fiducial points, got %d", points.size());
+        qCritical("Need at least 3 fiducial points, got %lld", pointCount);
         return 1;
     }
 
-    fprintf(stderr, "Read %d digitization points from %s\n", points.size(), qPrintable(ctfName));
+    fprintf(stderr, "Read %lld digitization points from %s\n", pointCount, qPrintable(ctfName));
 
     // Compute head coordinate transform from fiducials
     Matrix4f headTrans;
@@ -266,7 +267,7 @@ int main(int argc, char *argv[])
         }
         outStream->end_block(FIFFB_ISOTRAK);
         outStream->end_file();
-        fprintf(stderr, "Wrote %d points to %s\n", points.size(), qPrintable(fifName));
+        fprintf(stderr, "Wrote %lld points to %s\n", pointCount, qPrintable(fifName));
     }
 
     // Write hpts output
@@ -284,13 +285,13 @@ int main(int argc, char *argv[])
             else if (p.kind == FIFFV_POINT_EEG) cat = "eeg";
             else cat = "extra";
 
-            out << cat << " " << p.ident << " "
-                << QString::number(1000.0f * p.r[0], 'f', 1) << " "
-                << QString::number(1000.0f * p.r[1], 'f', 1) << " "
-                << QString::number(1000.0f * p.r[2], 'f', 1) << "\n";
+        out << cat << " " << p.ident << " "
+            << QString::number(1000.0f * p.r[0], 'f', 1) << " "
+            << QString::number(1000.0f * p.r[1], 'f', 1) << " "
+            << QString::number(1000.0f * p.r[2], 'f', 1) << "\n";
         }
         hptsFile.close();
-        fprintf(stderr, "Wrote %d points to %s\n", points.size(), qPrintable(hptsName));
+        fprintf(stderr, "Wrote %lld points to %s\n", pointCount, qPrintable(hptsName));
     }
 
     return 0;

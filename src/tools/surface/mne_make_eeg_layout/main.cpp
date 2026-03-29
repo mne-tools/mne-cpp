@@ -161,8 +161,9 @@ int main(int argc, char *argv[])
         qCritical("No EEG channels found in %s", qPrintable(fifName));
         return 1;
     }
+    const auto eegChannelCount = static_cast<long long>(eegChannels.size());
 
-    fprintf(stderr, "%d EEG channels found.\n", eegChannels.size());
+    fprintf(stderr, "%lld EEG channels found.\n", eegChannelCount);
 
     // Compute center of mass for a simple sphere fit
     Vector3f center = Vector3f::Zero();
@@ -225,7 +226,7 @@ int main(int argc, char *argv[])
     }
 
     outFile.close();
-    fprintf(stderr, "Layout written to %s (%d channels)\n", qPrintable(outName), eegChannels.size());
+    fprintf(stderr, "Layout written to %s (%lld channels)\n", qPrintable(outName), eegChannelCount);
 
     return 0;
 }

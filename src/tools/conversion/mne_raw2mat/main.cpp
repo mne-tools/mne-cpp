@@ -231,7 +231,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("Read %lld channels x %lld samples\n", data.rows(), data.cols());
+    const auto rowCount = static_cast<long long>(data.rows());
+    const auto sampleCount = static_cast<long long>(data.cols());
+    printf("Read %lld channels x %lld samples\n", rowCount, sampleCount);
 
     // Build channel names
     QStringList chNames;
@@ -277,7 +279,9 @@ int main(int argc, char *argv[])
     outF.close();
     printf("Written MAT file: %s\n", qPrintable(outFile));
     printf("Variables: data (%d x %lld), sfreq (1x1), times (1 x %lld)\n",
-           nChan, data.cols(), times.cols());
+           nChan,
+           sampleCount,
+           static_cast<long long>(times.cols()));
 
     return 0;
 }

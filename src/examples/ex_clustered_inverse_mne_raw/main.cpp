@@ -229,7 +229,8 @@ int main(int argc, char *argv[])
         for (k = 0; k < raw.info.projs.size(); ++k)
             raw.info.projs[k].active = true;
 
-        printf("%d projection items activated\n",raw.info.projs.size());
+        printf("%lld projection items activated\n",
+               static_cast<long long>(raw.info.projs.size()));
         //
         //   Create the projector
         //
@@ -421,7 +422,9 @@ int main(int argc, char *argv[])
 
     if(data.size() > 0)
     {
-        printf("Read %d epochs, %d samples each.\n",data.size(),(qint32)data[0]->epoch.cols());
+        printf("Read %lld epochs, %d samples each.\n",
+               static_cast<long long>(data.size()),
+               static_cast<qint32>(data[0]->epoch.cols()));
 
         //DEBUG
         std::cout << data[0]->epoch.block(0,0,10,10) << std::endl;

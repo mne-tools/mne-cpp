@@ -129,8 +129,9 @@ int main(int argc, char *argv[])
         for (const QString& p : parts)
             weights.append(p.toDouble());
         if (weights.size() != fwdFiles.size()) {
-            qCritical("Number of weights (%d) doesn't match number of files (%d)",
-                      weights.size(), fwdFiles.size());
+            qCritical("Number of weights (%lld) doesn't match number of files (%lld)",
+                      static_cast<long long>(weights.size()),
+                      static_cast<long long>(fwdFiles.size()));
             return 1;
         }
     } else {
@@ -145,7 +146,7 @@ int main(int argc, char *argv[])
     for (int i = 0; i < weights.size(); ++i) weights[i] /= wSum;
 
     // Load first forward solution as template
-    printf("Loading %d forward solutions...\n", fwdFiles.size());
+    printf("Loading %lld forward solutions...\n", static_cast<long long>(fwdFiles.size()));
 
     QFile f0(fwdFiles[0]);
     MNEForwardSolution fwd0(f0);
