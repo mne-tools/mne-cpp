@@ -208,6 +208,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns the currently selected evoked-set rows.
+     *
+     * @return Selected row indices in the loaded-set table.
+     */
+    QList<int> selectedSetRows() const;
+
+    //=========================================================================================================
+    /**
      * Enable or disable the quick "recompute last evoked" action in the average manager.
      *
      * @param available true when a previously used evoked setup is available.

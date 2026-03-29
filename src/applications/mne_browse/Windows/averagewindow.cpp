@@ -351,6 +351,27 @@ bool AverageWindow::isButterflyWhiteningEnabled() const
 
 //*************************************************************************************************************
 
+QList<int> AverageWindow::selectedSetRows() const
+{
+    QList<int> rows;
+
+    if(!ui->m_tableView_loadedSets->selectionModel()) {
+        return rows;
+    }
+
+    const QModelIndexList selectedRows =
+        ui->m_tableView_loadedSets->selectionModel()->selectedRows(0);
+
+    rows.reserve(selectedRows.size());
+    for(const QModelIndex& index : selectedRows) {
+        rows.append(index.row());
+    }
+
+    return rows;
+}
+
+//*************************************************************************************************************
+
 void AverageWindow::setRecomputeAvailable(bool available)
 {
     if(m_pRecomputeAverageAction) {
