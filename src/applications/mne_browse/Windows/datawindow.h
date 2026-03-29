@@ -360,8 +360,9 @@ private:
 
     struct ResolvedVirtualChannel {
         QString                     name;
-        int                         positiveChannel = -1;
-        int                         negativeChannel = -1;
+        VirtualChannelKind          kind = VirtualChannelKind::Bipolar;
+        int                         primaryChannel = -1;
+        QVector<int>                referenceChannels;
         DISPLIB::ChannelDisplayInfo displayInfo;
     };
 
