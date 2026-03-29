@@ -293,6 +293,7 @@ jobs:
           -no-cups \
           -no-sql-sqlite \
           -no-qml-debug \
+          -no-opengl \
           -nomake examples \
           -nomake tests \
           -no-freetype \
