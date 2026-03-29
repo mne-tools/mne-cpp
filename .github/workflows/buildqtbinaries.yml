@@ -10,6 +10,8 @@ on:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
   QT_BINARY_RELEASE_TAG: qt_binaries
+  QT_BINARY_RELEASE_TITLE: Qt Toolchain Artifacts
+  QT_BINARY_RELEASE_NOTES: Reusable Qt runtime, static, WASM and Installer Framework assets for CI.
   QT_MIN_VERSION: '6.10.0'
   QT_MAX_VERSION: '6.11.0'
   QIF_VERSION: '4.7'
@@ -63,8 +65,9 @@ jobs:
     - name: Create toolchain release and upload
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
       run: |
-        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>/dev/null || true
+        bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt6_${{ matrix.version_token }}_dynamic_binaries_linux.tar.gz" --clobber
 
   GenerateMacOSDynamicBinaries:
@@ -113,8 +116,9 @@ jobs:
     - name: Create toolchain release and upload
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
       run: |
-        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>/dev/null || true
+        bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt6_${{ matrix.version_token }}_dynamic_binaries_macos.tar.gz" --clobber
 
   GenerateWinDynamicBinaries:
@@ -164,8 +168,9 @@ jobs:
     - name: Upload to toolchain release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
       run: |
-        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>$null
+        bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt6_${{ matrix.version_token }}_dynamic_binaries_win.zip" --clobber
 
   GenerateLinuxInstallerFramework:
@@ -194,8 +199,9 @@ jobs:
     - name: Upload to toolchain release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
       run: |
-        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>/dev/null || true
+        bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt_ifw_47_linux.tar.gz --clobber
 
   GenerateMacOSInstallerFramework:
@@ -224,8 +230,9 @@ jobs:
     - name: Upload to toolchain release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
       run: |
-        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>/dev/null || true
+        bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt_ifw_47_macos.tar.gz --clobber
 
   GenerateWinInstallerFramework:
@@ -256,8 +263,9 @@ jobs:
     - name: Upload to toolchain release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
       run: |
-        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>$null
+        bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt_ifw_47_win.zip --clobber
 
   GenerateLinuxStaticBinaries:
@@ -295,8 +303,9 @@ jobs:
     - name: Create qt_binaries release and upload
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
       run: |
-        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>/dev/null || true
+        bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6110_static_binaries_linux.tar.gz --clobber
 
   GenerateMacOSStaticBinaries:
@@ -333,8 +342,9 @@ jobs:
     - name: Upload to qt_binaries release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
       run: |
-        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>/dev/null || true
+        bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6110_static_binaries_macos.tar.gz --clobber
 
   GenerateWinStaticBinaries:
@@ -377,8 +387,9 @@ jobs:
     - name: Upload to qt_binaries release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
       run: |
-        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>$null
+        bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6110_static_binaries_win.zip --clobber
 
   GenerateWasmBinaries:
@@ -434,6 +445,7 @@ jobs:
     - name: Upload to qt_binaries release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
       run: |
-        gh release create "${{ env.QT_BINARY_RELEASE_TAG }}" --title "Qt Toolchain Artifacts" --notes "Reusable Qt runtime, static, WASM and Installer Framework assets for CI." 2>/dev/null || true
+        bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6110_static_binaries_wasm.tar.gz --clobber
