@@ -150,9 +150,12 @@ jobs:
         git clone -b main --single-branch "https://${GIT_CREDENTIALS}@github.com/mne-cpp/mne-cpp.github.io.git"
         cd mne-cpp.github.io
 
-        # Preserve /dev directory (staging website)
+        # Preserve /dev directory (staging website) and online installer repos.
         if [ -d "dev" ]; then
           cp -r dev /tmp/website-dev-backup
+        fi
+        if [ -d "installer" ]; then
+          cp -r installer /tmp/website-installer-backup
         fi
 
         # Remove everything except .git
@@ -164,6 +167,9 @@ jobs:
         # Restore /dev directory
         if [ -d "/tmp/website-dev-backup" ]; then
           cp -r /tmp/website-dev-backup dev
+        fi
+        if [ -d "/tmp/website-installer-backup" ]; then
+          cp -r /tmp/website-installer-backup installer
         fi
 
         git add .

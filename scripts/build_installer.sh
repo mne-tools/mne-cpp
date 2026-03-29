@@ -1,10 +1,9 @@
 #!/bin/bash
 #
-# Build a lightweight MNE-CPP installer with the Qt Installer Framework.
+# Build an MNE-CPP online installer with the Qt Installer Framework.
 #
-# The generated installer no longer bundles MNE-CPP binaries directly.
-# Instead it embeds the selected GitHub release metadata and downloads the
-# chosen platform archive during installation.
+# The generated installer stays lightweight and installs from a local or remote
+# Qt IFW repository instead of embedding the full MNE-CPP payload.
 #
 # Usage:
 #   ./scripts/build_installer.sh
@@ -73,8 +72,10 @@ else
     PLATFORM="linux"
 fi
 
+REPOSITORY_URL="file://${OUTPUT_DIR}/repository"
+
 echo "-----------------------------------------------------------------"
-echo "   MNE-CPP Bootstrap Installer Generation                         "
+echo "   MNE-CPP Online Installer Generation                            "
 echo "-----------------------------------------------------------------"
 echo ""
 echo "  Platform      : ${PLATFORM}"
@@ -83,8 +84,10 @@ echo "  Asset prefix  : ${ASSET_PREFIX}"
 echo "  Version       : ${MNE_CPP_VERSION}"
 echo "  Output dir    : ${OUTPUT_DIR}"
 echo ""
+echo "  Repository URL: ${REPOSITORY_URL}"
+echo ""
 echo "  Components:"
-echo "    [required] MNE-CPP Core Binaries (dynamic/static selected during install)"
+echo "    [required] MNE-CPP Core Payload (dynamic/static selected during install)"
 echo "    [opt-in]  MNE Sample Dataset"
 echo "    [opt-in]  MNE Python"
 echo "    [opt-in]  PATH Configuration"
@@ -112,19 +115,28 @@ if ! command -v binarycreator >/dev/null 2>&1; then
     fi
 fi
 
-echo "1. Preparing bootstrap installer payload..."
+echo "1. Preparing online installer payload..."
 "${SCRIPT_DIR}/prepare_bootstrap_installer.sh" \
     --release-tag "${GH_TAG}" \
     --asset-prefix "${ASSET_PREFIX}" \
+    --platform "${PLATFORM}" \
+    --repository-url "${REPOSITORY_URL}" \
     --output-dir "${STAGING_DIR}"
 echo ""
 
-echo "2. Building installer with binarycreator..."
+echo "2. Generating local online repository with repogen..."
 mkdir -p "${OUTPUT_DIR}"
+repogen \
+    --archive-format zip \
+    -p "${STAGING_DIR}/packages" \
+    "${OUTPUT_DIR}/repository"
+echo ""
+
+echo "3. Building installer with binarycreator..."
 INSTALLER_FILE="${OUTPUT_DIR}/MNE-CPP-${MNE_CPP_VERSION}-${INSTALLER_SUFFIX}"
 
 binarycreator \
-    --offline-only \
+    --online-only \
     -c "${STAGING_DIR}/config/config.xml" \
     -p "${STAGING_DIR}/packages" \
     "${INSTALLER_FILE}"
@@ -134,6 +146,6 @@ echo "-----------------------------------------------------------------"
 echo "  Success! Installer generated:"
 echo "    ${INSTALLER_FILE}"
 echo ""
-echo "  The installer is a lightweight bootstrapper and downloads the"
-echo "  selected MNE-CPP release archive during installation."
+echo "  The installer is configured for online installation and will"
+echo "  fetch selected components from the configured IFW repository."
 echo "-----------------------------------------------------------------"
