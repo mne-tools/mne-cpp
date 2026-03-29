@@ -213,6 +213,15 @@ public:
 
     //=========================================================================================================
     /**
+     * Replace all currently stored events from an Nx3 FIFF/MNE event matrix: [sample, before, after].
+     *
+     * @param[in] events             Event matrix to load into the manager.
+     * @param[in] markAsFileLoaded   True when the events came from an explicit event file.
+     */
+    void setEventMatrix(const Eigen::MatrixXi& events, bool markAsFileLoaded = false);
+
+    //=========================================================================================================
+    /**
      * clearModel clears all model's members
      *
      */
@@ -230,6 +239,8 @@ public:
     bool isFileLoaded() const { return m_bFileloaded; }
 
 private:
+    void replaceEventData(const Eigen::MatrixXi& events, bool markAsFileLoaded);
+
     bool            m_bFileloaded;              /**< True when a Fiff event file is loaded. */
     QVector<int>        m_dataSamples;              /**< Vector that holds the sample alues for each loaded event. */
     QVector<int>        m_dataTypes;                /**< Vector that holds the type alues for each loaded event. */
@@ -264,4 +275,3 @@ signals:
 } // NAMESPACE
 
 #endif // EVEMODEL_H
-

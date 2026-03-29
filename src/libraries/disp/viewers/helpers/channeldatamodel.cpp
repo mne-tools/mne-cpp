@@ -244,6 +244,19 @@ void ChannelDataModel::setChannelBad(int channelIdx, bool bad)
     QWriteLocker lk(&m_lock);
     if (channelIdx >= 0 && channelIdx < m_displayInfo.size())
         m_displayInfo[channelIdx].bad = bad;
+
+    if (m_pFiffInfo && channelIdx >= 0 && channelIdx < m_pFiffInfo->nchan) {
+        const QString channelName = m_pFiffInfo->ch_names.value(channelIdx);
+        const int badIndex = m_pFiffInfo->bads.indexOf(channelName);
+
+        if (bad) {
+            if (badIndex < 0)
+                m_pFiffInfo->bads.append(channelName);
+        } else if (badIndex >= 0) {
+            m_pFiffInfo->bads.removeAt(badIndex);
+        }
+    }
+
     lk.unlock();
     emit metaChanged();
 }
@@ -430,7 +443,9 @@ void ChannelDataModel::rebuildDisplayInfo()
         else
             m_displayInfo[ch].name = QString("CH %1").arg(ch + 1);
         m_displayInfo[ch].typeLabel = typeLabelForChannel(ch);
-        m_displayInfo[ch].bad = false;
+        m_displayInfo[ch].bad = (m_pFiffInfo && ch < realChannelCount)
+            ? m_pFiffInfo->bads.contains(m_displayInfo[ch].name)
+            : false;
         m_displayInfo[ch].isVirtualChannel = false;
     }
 }

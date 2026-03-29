@@ -373,9 +373,6 @@ bool EventModel::setData(const QModelIndex & index, const QVariant & value, int 
 
 bool EventModel::loadEventData(QFile& qFile)
 {
-    beginResetModel();
-    clearModel();
-
     // Read events
     MatrixXi events;
 
@@ -393,31 +390,7 @@ bool EventModel::loadEventData(QFile& qFile)
     }
 
     qInfo() << QString("Events read from %1").arg(qFile.fileName());
-
-    //set loaded fiff event data
-    for(int i = 0; i < events.rows(); i++) {
-        m_dataSamples.append(events(i,0));
-        m_dataTypes.append(events(i,2));
-        m_dataIsUserEvent.append(0);
-    }
-
-    //Set filtered events to original
-    m_dataSamples_Filtered = m_dataSamples;
-    m_dataTypes_Filtered = m_dataTypes;
-    m_dataIsUserEvent_Filtered = m_dataIsUserEvent;
-
-    //Create type string list
-    m_eventTypeList.clear();
-    for(int i = 0; i<m_dataTypes.size(); i++)
-        if(!m_eventTypeList.contains(QString().number(m_dataTypes[i])))
-            m_eventTypeList<<QString().number(m_dataTypes[i]);
-
-    emit updateEventTypes("All");
-
-    endResetModel();
-
-    m_bFileloaded = true;
-
+    replaceEventData(events, true);
     return true;
 }
 
@@ -564,10 +537,18 @@ MatrixXi EventModel::getEventMatrix() const
 
 //*************************************************************************************************************
 
+void EventModel::setEventMatrix(const MatrixXi& events, bool markAsFileLoaded)
+{
+    replaceEventData(events, markAsFileLoaded);
+}
+
+
+//*************************************************************************************************************
+
 void EventModel::clearModel()
 {
     beginResetModel();
-    //clear event data model structure
+
     m_dataSamples.clear();
     m_dataTypes.clear();
     m_dataIsUserEvent.clear();
@@ -575,10 +556,13 @@ void EventModel::clearModel()
     m_dataSamples_Filtered.clear();
     m_dataTypes_Filtered.clear();
     m_dataIsUserEvent_Filtered.clear();
+    m_eventTypeList.clear();
 
     m_bFileloaded = false;
+    m_sFilterEventType = "All";
 
     endResetModel();
+    emit updateEventTypes("All");
 
     qInfo("EventModel cleared.");
 }
@@ -596,4 +580,41 @@ void EventModel::addNewEventType(const QString &eventType, const QColor &typeCol
         m_eventTypeList<<eventType;
 
     emit updateEventTypes(eventType);
+}
+
+
+//*************************************************************************************************************
+
+void EventModel::replaceEventData(const MatrixXi& events, bool markAsFileLoaded)
+{
+    beginResetModel();
+
+    m_dataSamples.clear();
+    m_dataTypes.clear();
+    m_dataIsUserEvent.clear();
+    m_dataSamples_Filtered.clear();
+    m_dataTypes_Filtered.clear();
+    m_dataIsUserEvent_Filtered.clear();
+    m_eventTypeList.clear();
+    m_sFilterEventType = "All";
+
+    if(events.cols() >= 3) {
+        for(int i = 0; i < events.rows(); ++i) {
+            m_dataSamples.append(events(i, 0));
+            m_dataTypes.append(events(i, 2));
+            m_dataIsUserEvent.append(0);
+
+            const QString eventType = QString::number(events(i, 2));
+            if(!m_eventTypeList.contains(eventType))
+                m_eventTypeList << eventType;
+        }
+    }
+
+    m_dataSamples_Filtered = m_dataSamples;
+    m_dataTypes_Filtered = m_dataTypes;
+    m_dataIsUserEvent_Filtered = m_dataIsUserEvent;
+    m_bFileloaded = markAsFileLoaded;
+
+    endResetModel();
+    emit updateEventTypes("All");
 }
