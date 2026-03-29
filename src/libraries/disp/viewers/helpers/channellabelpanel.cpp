@@ -50,6 +50,8 @@
 #include <QToolTip>
 #include <QtMath>
 
+#include <utility>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -162,44 +164,36 @@ void ChannelLabelPanel::paintEvent(QPaintEvent *)
     if (!m_model)
         return;
 
-    int totalCh      = m_channelIndices.isEmpty() ? m_model->channelCount()
-                                                  : m_channelIndices.size();
+    const QVector<int> displayChannels = effectiveChannelIndices();
+    const int totalCh = displayChannels.size();
     int visibleCount = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
     if (visibleCount <= 0)
         return;
 
     const int   pw         = width();
-    const float fullLaneH  = static_cast<float>(height()) / visibleCount;
-    // Collapsed height used for bad channels when m_hideBadChannels is true
-    constexpr float kCollapsedH = 6.f;
+    const float laneH      = static_cast<float>(height()) / visibleCount;
 
     // Whether DC removal is active (shown as a pill in the status line)
     const bool dcActive = m_model->removeDC();
 
     // Font sizes proportional to lane height, clamped for readability
     QFont nameFont = font();
-    nameFont.setPointSizeF(qBound(7.0, static_cast<double>(fullLaneH) * 0.22, 11.0));
+    nameFont.setPointSizeF(qBound(7.0, static_cast<double>(laneH) * 0.22, 11.0));
     nameFont.setBold(true);
 
     QFont typeFont = nameFont;
-    typeFont.setPointSizeF(qBound(6.0, static_cast<double>(fullLaneH) * 0.15, 8.5));
+    typeFont.setPointSizeF(qBound(6.0, static_cast<double>(laneH) * 0.15, 8.5));
     typeFont.setBold(false);
-
-    auto resolveChannel = [this](int logicalIdx) -> int {
-        if (m_channelIndices.isEmpty()) return logicalIdx;
-        if (logicalIdx < 0 || logicalIdx >= m_channelIndices.size()) return -1;
-        return m_channelIndices[logicalIdx];
-    };
 
     float yTop = 0.f;
     for (int i = 0; i < visibleCount; ++i) {
         int logIdx = m_firstVisibleChannel + i;
-        int ch = resolveChannel(logIdx);
-        if (ch < 0) { yTop += (m_hideBadChannels ? 6.f : (static_cast<float>(height()) / visibleCount)); continue; }
+        int ch = (logIdx >= 0 && logIdx < displayChannels.size()) ? displayChannels.at(logIdx) : -1;
+        if (ch < 0) {
+            yTop += laneH;
+            continue;
+        }
         auto info = m_model->channelInfo(ch);
-
-        bool collapsed = m_hideBadChannels && info.bad;
-        float laneH = collapsed ? kCollapsedH : fullLaneH;
         float yBot  = yTop + laneH;
 
         // Lane separator
@@ -207,84 +201,77 @@ void ChannelLabelPanel::paintEvent(QPaintEvent *)
         if (i > 0)
             p.drawLine(QPointF(0, yTop), QPointF(pw, yTop));
 
-        // Bad channel background (not when collapsed — it's just a thin strip then)
-        if (info.bad && !collapsed)
+        // Bad channel background
+        if (info.bad)
             p.fillRect(QRectF(0, yTop, pw, laneH), QColor(255, 225, 225));
 
         // Type-colour strip
-        QColor stripColor = (info.bad && collapsed) ? QColor(180, 180, 180) : info.color;
-        p.fillRect(QRectF(0, yTop, kStripWidth, laneH), stripColor);
+        p.fillRect(QRectF(0, yTop, kStripWidth, laneH), info.color);
 
-        if (!collapsed) {
-            // ── BAD badge (top-right corner) ─────────────────────────────────
-            if (info.bad) {
-                QRectF badRect(pw - kBadBadgeW - 2, yTop + 2, kBadBadgeW, kBadBadgeH);
-                p.fillRect(badRect, QColor(210, 30, 30));
-                QFont badFont = typeFont;
-                badFont.setPointSizeF(6.0);
-                badFont.setBold(true);
-                p.setFont(badFont);
-                p.setPen(Qt::white);
-                p.drawText(badRect, Qt::AlignCenter, QStringLiteral("BAD"));
-            }
+        // ── BAD badge (top-right corner) ─────────────────────────────────
+        if (info.bad) {
+            QRectF badRect(pw - kBadBadgeW - 2, yTop + 2, kBadBadgeW, kBadBadgeH);
+            p.fillRect(badRect, QColor(210, 30, 30));
+            QFont badFont = typeFont;
+            badFont.setPointSizeF(6.0);
+            badFont.setBold(true);
+            p.setFont(badFont);
+            p.setPen(Qt::white);
+            p.drawText(badRect, Qt::AlignCenter, QStringLiteral("BAD"));
+        }
 
-            // ── Channel name (bold, elided) ───────────────────────────────────
-            p.setFont(nameFont);
-            p.setPen(info.bad ? QColor(180, 20, 20) : QColor(25, 25, 25));
-            int nameBadgeGap = info.bad ? (kBadBadgeW + 4) : 4;
-            QRectF nameRect(kStripWidth + 4, yTop + 1,
-                            pw - kStripWidth - nameBadgeGap - 4,
-                            laneH * 0.48f);
-            QString elidedName = p.fontMetrics().elidedText(
-                info.name, Qt::ElideRight, static_cast<int>(nameRect.width()));
-            p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elidedName);
+        // ── Channel name (bold, elided) ───────────────────────────────────
+        p.setFont(nameFont);
+        p.setPen(info.bad ? QColor(180, 20, 20) : QColor(25, 25, 25));
+        int nameBadgeGap = info.bad ? (kBadBadgeW + 4) : 4;
+        QRectF nameRect(kStripWidth + 4, yTop + 1,
+                        pw - kStripWidth - nameBadgeGap - 4,
+                        laneH * 0.48f);
+        QString elidedName = p.fontMetrics().elidedText(
+            info.name, Qt::ElideRight, static_cast<int>(nameRect.width()));
+        p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elidedName);
 
-            // ── Status line: type · bad · dc ─────────────────────────────────
-            // Build composite string, e.g. "MEG · bad · dc"
-            QString statusLine = info.typeLabel;
+        // ── Status line: type · bad · dc ─────────────────────────────────
+        QString statusLine = info.typeLabel;
+        if (info.bad)
+            statusLine += QStringLiteral(" \u00B7 bad");
+        if (info.isVirtualChannel)
+            statusLine += QStringLiteral(" \u00B7 deriv");
+        if (dcActive)
+            statusLine += QStringLiteral(" \u00B7 dc");
+
+        p.setFont(typeFont);
+        p.setPen(info.bad ? QColor(190, 60, 60) : QColor(110, 110, 120));
+        QRectF statusRect(kStripWidth + 4, yTop + laneH * 0.50f,
+                          pw - kStripWidth - 8, laneH * 0.28f);
+        p.drawText(statusRect, Qt::AlignLeft | Qt::AlignVCenter, statusLine);
+
+        // ── RMS level bar ─────────────────────────────────────────────────
+        float rms   = 0.f;
+        if (m_visSampleFirst < m_visSampleLast)
+            rms = m_model->channelRms(ch, m_visSampleFirst, m_visSampleLast);
+        float level = (info.amplitudeMax > 0.f)
+                      ? qBound(0.f, rms / info.amplitudeMax, 1.f)
+                      : 0.f;
+
+        const float barY  = yTop + laneH * 0.80f;
+        const float barH  = qMax(2.f, laneH * 0.14f);
+        const float barX0 = kStripWidth + 4.f;
+        const float barW  = pw - kStripWidth - 8.f;
+
+        p.fillRect(QRectF(barX0, barY, barW, barH), QColor(215, 215, 215));
+
+        if (level > 0.f) {
+            QColor barColor;
+            if (level < 0.5f)
+                barColor = QColor(50, 180, 80);
+            else if (level < 0.85f)
+                barColor = QColor(220, 160, 30);
+            else
+                barColor = QColor(210, 50, 40);
             if (info.bad)
-                statusLine += QStringLiteral(" \u00B7 bad");   // · bad
-            if (info.isVirtualChannel)
-                statusLine += QStringLiteral(" \u00B7 deriv");
-            if (dcActive)
-                statusLine += QStringLiteral(" \u00B7 dc");    // · dc
-
-            p.setFont(typeFont);
-            p.setPen(info.bad ? QColor(190, 60, 60) : QColor(110, 110, 120));
-            QRectF statusRect(kStripWidth + 4, yTop + laneH * 0.50f,
-                              pw - kStripWidth - 8, laneH * 0.28f);
-            p.drawText(statusRect, Qt::AlignLeft | Qt::AlignVCenter, statusLine);
-
-            // ── RMS level bar ─────────────────────────────────────────────────
-            // Normalized signal level in [0, 1] relative to amplitudeMax
-            float rms   = 0.f;
-            if (m_visSampleFirst < m_visSampleLast)
-                rms = m_model->channelRms(ch, m_visSampleFirst, m_visSampleLast);
-            float level = (info.amplitudeMax > 0.f)
-                          ? qBound(0.f, rms / info.amplitudeMax, 1.f)
-                          : 0.f;
-
-            const float barY  = yTop + laneH * 0.80f;
-            const float barH  = qMax(2.f, laneH * 0.14f);
-            const float barX0 = kStripWidth + 4.f;
-            const float barW  = pw - kStripWidth - 8.f;
-
-            // Track
-            p.fillRect(QRectF(barX0, barY, barW, barH), QColor(215, 215, 215));
-
-            // Fill — colour green → amber → red by level
-            if (level > 0.f) {
-                QColor barColor;
-                if (level < 0.5f)
-                    barColor = QColor(50, 180, 80);
-                else if (level < 0.85f)
-                    barColor = QColor(220, 160, 30);
-                else
-                    barColor = QColor(210, 50, 40);
-                if (info.bad)
-                    barColor = barColor.darker(115);
-                p.fillRect(QRectF(barX0, barY, barW * level, barH), barColor);
-            }
+                barColor = barColor.darker(115);
+            p.fillRect(QRectF(barX0, barY, barW * level, barH), barColor);
         }
 
         yTop = yBot;
@@ -312,8 +299,7 @@ void ChannelLabelPanel::mouseMoveEvent(QMouseEvent *event)
         return;
     }
 
-    const int totalCh    = m_model ? (m_channelIndices.isEmpty() ? m_model->channelCount()
-                                                                 : m_channelIndices.size()) : 0;
+    const int totalCh    = effectiveChannelIndices().size();
     const int maxFirst   = qMax(0, totalCh - m_visibleChannelCount);
     const float laneH    = (m_visibleChannelCount > 0 && height() > 0)
                            ? static_cast<float>(height()) / m_visibleChannelCount
@@ -341,39 +327,58 @@ void ChannelLabelPanel::mouseReleaseEvent(QMouseEvent *event)
 
 //=============================================================================================================
 
-// Helper: return the row index (0-based within visibleCount) that contains pixel y,
-// accounting for collapsed bad-channel lanes.
-static int rowAtY(float y, int visibleCount, int firstCh,
-                  ChannelDataModel *model, float fullLaneH, bool hideBad)
+QVector<int> ChannelLabelPanel::effectiveChannelIndices() const
 {
-    constexpr float kCollapsedH = 6.f;
-    float top = 0.f;
-    for (int i = 0; i < visibleCount; ++i) {
-        int   ch      = firstCh + i;
-        auto  info    = model->channelInfo(ch);
-        float laneH   = (hideBad && info.bad) ? kCollapsedH : fullLaneH;
-        if (y >= top && y < top + laneH)
-            return i;
-        top += laneH;
+    QVector<int> indices;
+
+    if (!m_model) {
+        return indices;
     }
-    return -1;
+
+    if (m_channelIndices.isEmpty()) {
+        indices.reserve(m_model->channelCount());
+        for (int channelIndex = 0; channelIndex < m_model->channelCount(); ++channelIndex) {
+            indices.append(channelIndex);
+        }
+    } else {
+        indices = m_channelIndices;
+    }
+
+    if (!m_hideBadChannels) {
+        return indices;
+    }
+
+    QVector<int> visibleIndices;
+    visibleIndices.reserve(indices.size());
+    for (int channelIndex : std::as_const(indices)) {
+        if (channelIndex < 0) {
+            continue;
+        }
+
+        const ChannelDisplayInfo info = m_model->channelInfo(channelIndex);
+        if (!info.bad) {
+            visibleIndices.append(channelIndex);
+        }
+    }
+
+    return visibleIndices;
 }
 
 bool ChannelLabelPanel::event(QEvent *e)
 {
     if (e->type() == QEvent::ToolTip && m_model) {
         auto *he = static_cast<QHelpEvent *>(e);
-        int totalCh      = m_channelIndices.isEmpty() ? m_model->channelCount()
-                                                     : m_channelIndices.size();
+        const QVector<int> displayChannels = effectiveChannelIndices();
+        int totalCh = displayChannels.size();
         int visibleCount = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
         if (visibleCount > 0) {
-            float fullLaneH = static_cast<float>(height()) / visibleCount;
-            int   i = rowAtY(static_cast<float>(he->pos().y()), visibleCount,
-                              m_firstVisibleChannel, m_model, fullLaneH, m_hideBadChannels);
-            if (i >= 0) {
-                int logIdx = m_firstVisibleChannel + i;
-                int ch = m_channelIndices.isEmpty() ? logIdx
-                       : (logIdx < m_channelIndices.size() ? m_channelIndices[logIdx] : -1);
+            const float laneH = static_cast<float>(height()) / visibleCount;
+            const int i = qBound(0, static_cast<int>(he->pos().y() / laneH), visibleCount - 1);
+            if (i >= 0 && i < visibleCount) {
+                const int logIdx = m_firstVisibleChannel + i;
+                const int ch = (logIdx >= 0 && logIdx < displayChannels.size())
+                    ? displayChannels.at(logIdx)
+                    : -1;
                 if (ch < 0) return QWidget::event(e);
                 auto info = m_model->channelInfo(ch);
                 float rms = (m_visSampleFirst < m_visSampleLast)

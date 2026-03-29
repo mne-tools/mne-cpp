@@ -63,10 +63,12 @@
 #include <QDate>
 #include <QVector3D>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QListWidgetItem>
 #include <QSettings>
 #include <QApplication>
 #include <QKeyEvent>
+#include <QSignalBlocker>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -319,7 +321,7 @@ void ChannelSelectionView::newFiffFileLoaded(QSharedPointer<FiffInfo> &pFiffInfo
 {
     Q_UNUSED(pFiffInfo);
 
-    loadLayout(m_pUi->m_comboBox_layoutFile->currentText());
+    loadLayout(resolveLayoutPath(m_pUi->m_comboBox_layoutFile->currentText()));
 }
 
 //=============================================================================================================
@@ -341,8 +343,10 @@ QString ChannelSelectionView::getCurrentGroupFile()
 void ChannelSelectionView::setCurrentLayoutFile(QString currentLayoutFile)
 {
     qDebug() << "setCurrentLayoutFile:" << currentLayoutFile;
+    const QSignalBlocker blocker(m_pUi->m_comboBox_layoutFile);
     m_pUi->m_comboBox_layoutFile->setCurrentText(currentLayoutFile);
 
+    loadLayout(resolveLayoutPath(currentLayoutFile));
     updateBadChannels();
 }
 
@@ -573,6 +577,23 @@ bool ChannelSelectionView::loadLayout(QString path)
 
 //=============================================================================================================
 
+QString ChannelSelectionView::resolveLayoutPath(const QString& layoutFile) const
+{
+    if(layoutFile.isEmpty()) {
+        return QString();
+    }
+
+    if(QFileInfo(layoutFile).isAbsolute()) {
+        return layoutFile;
+    }
+
+    return QCoreApplication::applicationDirPath()
+           + QStringLiteral("/../resources/general/2DLayouts/")
+           + layoutFile;
+}
+
+//=============================================================================================================
+
 bool ChannelSelectionView::loadSelectionGroups(QString path)
 {
 
@@ -781,7 +802,7 @@ void ChannelSelectionView::onBtnAddToSelectionGroups()
 void ChannelSelectionView::onComboBoxLayoutChanged()
 {
     QString selectionName(m_pUi->m_comboBox_layoutFile->currentText());
-    loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/../resources/general/2DLayouts/"));
+    loadLayout(resolveLayoutPath(selectionName));
     updateBadChannels();
 }
 

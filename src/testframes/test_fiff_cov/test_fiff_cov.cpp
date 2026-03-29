@@ -41,6 +41,7 @@
 #include <utils/generics/mne_logger.h>
 
 #include <fiff/fiff_cov.h>
+#include <fiff/fiff_raw_data.h>
 
 #include <iostream>
 #include <utils/ioutils.h>
@@ -50,6 +51,7 @@
 //=============================================================================================================
 
 #include <QtTest>
+#include <QTemporaryDir>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -58,6 +60,81 @@
 using namespace FIFFLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
+
+namespace {
+
+QString sampleDataPath()
+{
+    return QCoreApplication::applicationDirPath()
+           + "/../resources/data/mne-cpp-test-data/MEG/sample";
+}
+
+MatrixXi deriveStimEvents(const FiffRawData& raw)
+{
+    int stimIdx = -1;
+    for (int channelIndex = 0; channelIndex < raw.info.nchan; ++channelIndex) {
+        if (raw.info.chs[channelIndex].kind == FIFFV_STIM_CH) {
+            stimIdx = channelIndex;
+            if (raw.info.ch_names.value(channelIndex).remove(QLatin1Char(' ')) == QLatin1String("STI014")) {
+                break;
+            }
+        }
+    }
+
+    if (stimIdx < 0) {
+        return MatrixXi();
+    }
+
+    RowVectorXi picks(1);
+    picks << stimIdx;
+
+    MatrixXd stimData;
+    MatrixXd stimTimes;
+    if (!raw.read_raw_segment(stimData, stimTimes, raw.first_samp, raw.last_samp, picks) || stimData.rows() != 1) {
+        return MatrixXi();
+    }
+
+    QVector<Vector3i> detectedEvents;
+    int previousValue = 0;
+    for (int sampleOffset = 0; sampleOffset < stimData.cols(); ++sampleOffset) {
+        const int currentValue = qRound(stimData(0, sampleOffset));
+        if (currentValue != previousValue && currentValue != 0) {
+            detectedEvents.append(Vector3i(raw.first_samp + sampleOffset,
+                                           previousValue,
+                                           currentValue));
+        }
+        previousValue = currentValue;
+    }
+
+    MatrixXi events(detectedEvents.size(), 3);
+    for (int row = 0; row < detectedEvents.size(); ++row) {
+        events(row, 0) = detectedEvents.at(row)(0);
+        events(row, 1) = detectedEvents.at(row)(1);
+        events(row, 2) = detectedEvents.at(row)(2);
+    }
+
+    return events;
+}
+
+QList<int> uniqueEventCodes(const MatrixXi& events, int maxCodes = -1)
+{
+    QList<int> codes;
+    for (int row = 0; row < events.rows(); ++row) {
+        const int code = events(row, 2);
+        if (code == 0 || codes.contains(code)) {
+            continue;
+        }
+
+        codes.append(code);
+        if (maxCodes > 0 && codes.size() >= maxCodes) {
+            break;
+        }
+    }
+
+    return codes;
+}
+
+}
 
 //=============================================================================================================
 /**
@@ -80,6 +157,8 @@ private slots:
     void compareDiag();
     void compareDim();
     void compareNfree();
+    void computeFromEpochs_sampleRaw();
+    void saveRoundTrip_computedCovariance();
     void cleanupTestCase();
 
 private:
@@ -158,6 +237,81 @@ void TestFiffCov::compareDim()
 void TestFiffCov::compareNfree()
 {
     QVERIFY( covResult.nfree == covLoaded.nfree );
+}
+
+//=============================================================================================================
+
+void TestFiffCov::computeFromEpochs_sampleRaw()
+{
+    QFile rawFile(sampleDataPath() + "/sample_audvis_trunc_raw.fif");
+    if (!rawFile.exists()) {
+        QSKIP("Sample raw file not found");
+    }
+
+    FiffRawData raw(rawFile);
+    const MatrixXi events = deriveStimEvents(raw);
+    QVERIFY(events.rows() > 0);
+
+    const QList<int> codes = uniqueEventCodes(events, 4);
+    QVERIFY(!codes.isEmpty());
+
+    const FiffCov cov = FiffCov::compute_from_epochs(raw,
+                                                     events,
+                                                     codes,
+                                                     -0.2f,
+                                                     0.0f,
+                                                     -0.2f,
+                                                     0.0f,
+                                                     true,
+                                                     true);
+
+    QVERIFY(!cov.isEmpty());
+    QCOMPARE(cov.dim, raw.info.nchan);
+    QCOMPARE(cov.data.rows(), static_cast<Index>(raw.info.nchan));
+    QCOMPARE(cov.data.cols(), static_cast<Index>(raw.info.nchan));
+    QVERIFY(cov.nfree > 0);
+}
+
+//=============================================================================================================
+
+void TestFiffCov::saveRoundTrip_computedCovariance()
+{
+    QFile rawFile(sampleDataPath() + "/sample_audvis_trunc_raw.fif");
+    if (!rawFile.exists()) {
+        QSKIP("Sample raw file not found");
+    }
+
+    FiffRawData raw(rawFile);
+    const MatrixXi events = deriveStimEvents(raw);
+    QVERIFY(events.rows() > 0);
+
+    const QList<int> codes = uniqueEventCodes(events, 4);
+    QVERIFY(!codes.isEmpty());
+
+    const FiffCov cov = FiffCov::compute_from_epochs(raw,
+                                                     events,
+                                                     codes,
+                                                     -0.2f,
+                                                     0.0f,
+                                                     -0.2f,
+                                                     0.0f,
+                                                     true,
+                                                     true);
+    QVERIFY(!cov.isEmpty());
+
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+
+    const QString outPath = tempDir.path() + "/computed-cov.fif";
+    QVERIFY(cov.save(outPath));
+    QVERIFY(QFile::exists(outPath));
+
+    QFile savedFile(outPath);
+    FiffCov roundTrip(savedFile);
+    QVERIFY(!roundTrip.isEmpty());
+    QCOMPARE(roundTrip.dim, cov.dim);
+    QCOMPARE(roundTrip.names, cov.names);
+    QVERIFY(roundTrip.data.isApprox(cov.data, 1e-9));
 }
 
 //=============================================================================================================

@@ -16,11 +16,18 @@ add_library(mne_analyze_studio_fiff_browser_extension_widgets ${MNE_ANALYZE_STUD
     rawdatabrowserwidget.cpp
     mnebrowserrawdelegate.h
     rawdatabrowserwidget.h
-    ../../../mne_browse/Models/rawmodel.cpp
-    ../../../mne_browse/Models/eventmodel.cpp
-    ../../../mne_browse/Utils/datapackage.cpp
-    ../../../mne_browse/Utils/filteroperator.cpp
-    ../../../mne_browse/Utils/rawsettings.cpp
+    browsercore/Models/rawmodel.cpp
+    browsercore/Models/eventmodel.cpp
+    browsercore/Utils/datapackage.cpp
+    browsercore/Utils/filteroperator.cpp
+    browsercore/Utils/rawsettings.cpp
+    browsercore/Models/rawmodel.h
+    browsercore/Models/eventmodel.h
+    browsercore/Utils/datapackage.h
+    browsercore/Utils/filteroperator.h
+    browsercore/Utils/rawsettings.h
+    browsercore/Utils/types.h
+    browsercore/Utils/info.h
 )
 
 mne_analyze_studio_configure_library_target(mne_analyze_studio_fiff_browser_extension_widgets)
@@ -30,7 +37,7 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 target_include_directories(mne_analyze_studio_fiff_browser_extension_widgets PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../mne_browse
+    ${CMAKE_CURRENT_SOURCE_DIR}/browsercore
 )
 
 if(NOT BUILD_SHARED_LIBS)

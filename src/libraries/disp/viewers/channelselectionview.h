@@ -309,6 +309,7 @@ private:
      * @param[in] path holds file pathloll.
      */
     bool loadLayout(QString path);
+    QString resolveLayoutPath(const QString& layoutFile) const;
 
     //=========================================================================================================
     /**

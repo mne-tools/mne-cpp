@@ -2,7 +2,7 @@
 /**
  * @file     rawdatabrowserwidget.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @version  dev
+ * @version  2.1.0
  * @date     March, 2026
  *
  * @section  LICENSE
@@ -35,8 +35,8 @@
 
 #include <irawdataview.h>
 
-#include "../../../mne_browse/Models/rawmodel.h"
-#include "../../../mne_browse/Models/eventmodel.h"
+#include "Models/rawmodel.h"
+#include "Models/eventmodel.h"
 
 #include <QWidget>
 

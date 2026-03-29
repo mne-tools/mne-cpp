@@ -104,11 +104,7 @@ void FilterWindow::newFileLoaded(FiffInfo::SPtr& pFiffInfo)
     ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
     ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
 
-    // Keep raw-load sync passive. The legacy RawModel is initialized on demand
-    // when the user actually edits/applies a filter.
-    if(m_pMainWindow->rawModel()->isFileLoaded()) {
-        filterParametersChanged();
-    }
+    filterParametersChanged();
 }
 
 
@@ -241,21 +237,15 @@ void FilterWindow::setFrequencies(double highpass, double lowpass)
 
 void FilterWindow::updateFilterPlot()
 {
-    if(!m_pMainWindow->ensureLegacyRawModelLoaded(QStringLiteral("Filter Window"))) {
+    const auto fiffInfo = m_pMainWindow->dataWindow()->fiffInfo();
+    if(!fiffInfo || m_pUserDefinedFilter.isNull()) {
         return;
     }
 
-    //Update the filter of the scene
-    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->rawModel()->operators());
-    while(it.hasNext()) {
-        it.next();
-        if(it.key() == "User defined (See 'Adjust/Filter')") {
-            m_pFilterPlotScene->updateFilter(it.value(),
-                                             m_pMainWindow->rawModel()->fiffInfo()->sfreq,
-                                             ui->m_doubleSpinBox_lowpass->value(),
-                                             ui->m_doubleSpinBox_highpass->value());
-        }
-    }
+    m_pFilterPlotScene->updateFilter(m_pUserDefinedFilter.staticCast<MNEOperator>(),
+                                     fiffInfo->sfreq,
+                                     ui->m_doubleSpinBox_lowpass->value(),
+                                     ui->m_doubleSpinBox_highpass->value());
 
     ui->m_graphicsView_filterPlot->fitInView(m_pFilterPlotScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
@@ -368,82 +358,22 @@ void FilterWindow::changeStateSpinBoxes(int currentIndex)
 
 void FilterWindow::filterParametersChanged()
 {
-    auto fiffInfo = m_pMainWindow->dataWindow()->fiffInfo();
+    const auto fiffInfo = m_pMainWindow->dataWindow()->fiffInfo();
     if(!fiffInfo) {
         return;
     }
 
-    //User defined filter parameters
-    double lowpassHz = ui->m_doubleSpinBox_lowpass->value();
-    double highpassHz = ui->m_doubleSpinBox_highpass->value();
+    const double nyquistFrequency = fiffInfo->sfreq / 2.0;
 
-    double trans_width = ui->m_doubleSpinBox_transitionband->value();
-
-    double bw = highpassHz-lowpassHz;
-    double center = lowpassHz+bw/2;
-
-    double samplingFrequency = fiffInfo->sfreq;
-    double nyquistFrequency = samplingFrequency/2;
-
-    //Calculate the needed fft length
-    int filterTaps = ui->m_spinBox_filterTaps->value();
-    int fftLength = m_iWindowSize;
-    int exp = ceil(Numerics::log2(fftLength));
-    fftLength = pow(2, exp+1);
-
-    //set maximum and minimum for cut off frequency spin boxes
     if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
         ui->m_doubleSpinBox_highpass->setMinimum(ui->m_doubleSpinBox_lowpass->value());
         ui->m_doubleSpinBox_lowpass->setMaximum(ui->m_doubleSpinBox_highpass->value());
-    }
-    else {
+    } else {
         ui->m_doubleSpinBox_highpass->setMaximum(nyquistFrequency);
         ui->m_doubleSpinBox_lowpass->setMaximum(nyquistFrequency);
     }
 
-    //set current fft length info label
-    ui->m_label_fftLength->setText(QString().number(fftLength));
-
-    //set filter design method
-    FilterOperator::DesignMethod dMethod = FilterOperator::Tschebyscheff;
-    if(ui->m_comboBox_designMethod->currentText() == "Tschebyscheff")
-        dMethod = FilterOperator::Tschebyscheff;
-
-    if(ui->m_comboBox_designMethod->currentText() == "Cosine")
-        dMethod = FilterOperator::Cosine;
-
-    //Generate filters
-    QSharedPointer<MNEOperator> userDefinedFilterOperator;
-
-    if(ui->m_comboBox_filterType->currentText() == "Lowpass") {
-        userDefinedFilterOperator = QSharedPointer<MNEOperator>(
-                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::LPF,filterTaps,lowpassHz/nyquistFrequency,FILTER_DEFAULT_TRANS_BW_RATIO,(double)trans_width/nyquistFrequency,samplingFrequency,fftLength,dMethod));
-    }
-
-    if(ui->m_comboBox_filterType->currentText() == "Highpass") {
-        userDefinedFilterOperator = QSharedPointer<MNEOperator>(
-                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::HPF,filterTaps,highpassHz/nyquistFrequency,FILTER_DEFAULT_TRANS_BW_RATIO,(double)trans_width/nyquistFrequency,samplingFrequency,fftLength,dMethod));
-    }
-
-    if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
-        userDefinedFilterOperator = QSharedPointer<MNEOperator>(
-                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::BPF,filterTaps,(double)center/nyquistFrequency,(double)bw/nyquistFrequency,(double)trans_width/nyquistFrequency,samplingFrequency,fftLength,dMethod));
-    }
-
-    //Replace old with new filter operator
-    if(!m_pMainWindow->ensureLegacyRawModelLoaded(QStringLiteral("Filter Window"))) {
-        return;
-    }
-
-    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->rawModel()->operators());
-    while(it.hasNext()) {
-        it.next();
-        if(it.key() == "User defined (See 'Adjust/Filter')") {
-            it.setValue(userDefinedFilterOperator);
-        }
-    }
-
-    //update filter plot
+    m_pUserDefinedFilter = buildUserDefinedFilter();
     updateFilterPlot();
 }
 
@@ -452,22 +382,20 @@ void FilterWindow::filterParametersChanged()
 
 void FilterWindow::applyFilter()
 {
-    if(!m_pMainWindow->ensureLegacyRawModelLoaded(QStringLiteral("Filter Window"))) {
+    if(m_pMainWindow->dataWindow()->fiffInfo().isNull()) {
         return;
     }
 
-    //Undo all previous filters first
-    m_pMainWindow->rawModel()->undoFilter(ui->m_comboBox_filterApplyTo->currentText());
-
-    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->rawModel()->operators());
-
-    while(it.hasNext()) {
-        it.next();
-        if(it.key() == "User defined (See 'Adjust/Filter')") {
-            m_pMainWindow->rawModel()->applyOperator(QModelIndexList(), it.value(), ui->m_comboBox_filterApplyTo->currentText());
-        }
+    if(m_pUserDefinedFilter.isNull()) {
+        m_pUserDefinedFilter = buildUserDefinedFilter();
     }
 
+    if(m_pUserDefinedFilter.isNull()) {
+        return;
+    }
+
+    m_pMainWindow->dataWindow()->setUserDefinedFilter(m_pUserDefinedFilter,
+                                                      ui->m_comboBox_filterApplyTo->currentText());
     m_pMainWindow->dataWindow()->updateDataTableViews();
 }
 
@@ -476,12 +404,7 @@ void FilterWindow::applyFilter()
 
 void FilterWindow::undoFilter()
 {
-    if(!m_pMainWindow->ensureLegacyRawModelLoaded(QStringLiteral("Filter Window"))) {
-        return;
-    }
-
-    m_pMainWindow->rawModel()->undoFilter(ui->m_comboBox_filterUndoTo->currentText());
-
+    m_pMainWindow->dataWindow()->clearUserDefinedFilter();
     m_pMainWindow->dataWindow()->updateDataTableViews();
 }
 
@@ -531,7 +454,11 @@ void FilterWindow::exportFilterPlot()
 
 void FilterWindow::exportFilterCoefficients()
 {
-    if(!m_pMainWindow->ensureLegacyRawModelLoaded(QStringLiteral("Filter Window"))) {
+    if(m_pUserDefinedFilter.isNull()) {
+        m_pUserDefinedFilter = buildUserDefinedFilter();
+    }
+
+    if(m_pUserDefinedFilter.isNull()) {
         return;
     }
 
@@ -548,24 +475,73 @@ void FilterWindow::exportFilterCoefficients()
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
             return;
 
-        //get user defined filter oeprator
-        QSharedPointer<FilterOperator> currentFilter;
-
-        QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->rawModel()->operators());
-        while(it.hasNext()) {
-            it.next();
-            if(it.key() == "User defined (See 'Adjust/Filter')") {
-                if(it.value()->m_OperatorType == MNEOperator::FILTER) {
-                    currentFilter = it.value().staticCast<FilterOperator>();
-
-                    //Write coefficients to file
-                    QTextStream out(&file);
-                    for(int i = 0 ; i<currentFilter->m_dCoeffA.cols() ;i++)
-                        out << currentFilter->m_dCoeffA(i) << "\n";
-                }
-            }
+        QTextStream out(&file);
+        for(int i = 0 ; i<m_pUserDefinedFilter->m_dCoeffA.cols() ;i++) {
+            out << m_pUserDefinedFilter->m_dCoeffA(i) << "\n";
         }
 
         file.close();
     }
+}
+
+//*************************************************************************************************************
+
+QSharedPointer<FilterOperator> FilterWindow::buildUserDefinedFilter() const
+{
+    const auto fiffInfo = m_pMainWindow->dataWindow()->fiffInfo();
+    if(!fiffInfo) {
+        return {};
+    }
+
+    const double lowpassHz = ui->m_doubleSpinBox_lowpass->value();
+    const double highpassHz = ui->m_doubleSpinBox_highpass->value();
+    const double transWidth = ui->m_doubleSpinBox_transitionband->value();
+    const double samplingFrequency = fiffInfo->sfreq;
+    const double nyquistFrequency = samplingFrequency / 2.0;
+    const int filterTaps = ui->m_spinBox_filterTaps->value();
+
+    int fftLength = m_iWindowSize;
+    const int exp = ceil(Numerics::log2(fftLength));
+    fftLength = pow(2, exp + 1);
+    ui->m_label_fftLength->setText(QString::number(fftLength));
+
+    FilterOperator::DesignMethod designMethod = ui->m_comboBox_designMethod->currentText() == "Tschebyscheff"
+        ? FilterOperator::Tschebyscheff
+        : FilterOperator::Cosine;
+
+    if(ui->m_comboBox_filterType->currentText() == "Lowpass") {
+        return QSharedPointer<FilterOperator>::create(QStringLiteral("User defined (Filter Window)"),
+                                                      FilterOperator::LPF,
+                                                      filterTaps,
+                                                      lowpassHz / nyquistFrequency,
+                                                      FILTER_DEFAULT_TRANS_BW_RATIO,
+                                                      transWidth / nyquistFrequency,
+                                                      samplingFrequency,
+                                                      fftLength,
+                                                      designMethod);
+    }
+
+    if(ui->m_comboBox_filterType->currentText() == "Highpass") {
+        return QSharedPointer<FilterOperator>::create(QStringLiteral("User defined (Filter Window)"),
+                                                      FilterOperator::HPF,
+                                                      filterTaps,
+                                                      highpassHz / nyquistFrequency,
+                                                      FILTER_DEFAULT_TRANS_BW_RATIO,
+                                                      transWidth / nyquistFrequency,
+                                                      samplingFrequency,
+                                                      fftLength,
+                                                      designMethod);
+    }
+
+    const double bandwidth = highpassHz - lowpassHz;
+    const double center = lowpassHz + bandwidth / 2.0;
+    return QSharedPointer<FilterOperator>::create(QStringLiteral("User defined (Filter Window)"),
+                                                  FilterOperator::BPF,
+                                                  filterTaps,
+                                                  center / nyquistFrequency,
+                                                  bandwidth / nyquistFrequency,
+                                                  transWidth / nyquistFrequency,
+                                                  samplingFrequency,
+                                                  fftLength,
+                                                  designMethod);
 }

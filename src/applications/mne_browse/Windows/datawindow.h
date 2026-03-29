@@ -63,8 +63,10 @@
 #include <QPainter>
 #include <QColor>
 #include <QGesture>
+#include <QLabel>
 #include <QScroller>
 #include <QSet>
+#include <QVector>
 
 #include <Eigen/Core>
 
@@ -275,7 +277,25 @@ public:
     void setVirtualChannels(const QVector<VirtualChannelDefinition> &virtualChannels,
                             bool reloadIfOpen = true);
 
+    //=========================================================================================================
+    /**
+     * Apply a browser-side FIR filter to newly loaded raw blocks.
+     *
+     * @param[in] filterOperator  Filter definition to apply. Pass a null pointer to clear filtering.
+     * @param[in] applyTo         Channel group label from the filter UI ("All", "MEG", "EEG", ...).
+     */
+    void setUserDefinedFilter(const QSharedPointer<FilterOperator>& filterOperator,
+                              const QString& applyTo);
+
+    //=========================================================================================================
+    /**
+     * Clear any browser-side FIR filter and reload the current view unfiltered.
+     */
+    void clearUserDefinedFilter();
+
 private:
+    struct PersistentMarker;
+
     //=========================================================================================================
     /**
      * Setup the tool bar of the data window.
@@ -290,6 +310,72 @@ private:
 
     //=========================================================================================================
     /**
+     * Add a persistent sample marker at the requested absolute sample.
+     *
+     * @param[in] sample  Absolute sample index.
+     */
+    void addMarkerAtSample(int sample);
+
+    //=========================================================================================================
+    /**
+     * Remove the marker with the requested internal id.
+     *
+     * @param[in] markerId  Internal marker id.
+     */
+    void removeMarker(int markerId);
+
+    //=========================================================================================================
+    /**
+     * Remove the marker nearest to the requested sample.
+     *
+     * @param[in] sample  Absolute sample index near the marker to remove.
+     */
+    void removeMarkerNearSample(int sample);
+
+    //=========================================================================================================
+    /**
+     * Remove all persistent sample markers.
+     */
+    void clearMarkers();
+
+    //=========================================================================================================
+    /**
+     * Make the requested marker the active one.
+     *
+     * @param[in] markerId  Internal marker id.
+     */
+    void setActiveMarker(int markerId);
+
+    //=========================================================================================================
+    /**
+     * Returns the active marker sample or the first visible sample when no marker exists.
+     */
+    int activeMarkerSample() const;
+
+    //=========================================================================================================
+    /**
+     * Sync all marker widgets and labels with the current viewport and scroll position.
+     */
+    void syncMarkersToViewport();
+
+    //=========================================================================================================
+    /**
+     * Rebuild the ruler marker summary from the current persistent markers.
+     */
+    void updateTimeRulerMarkers();
+
+    //=========================================================================================================
+    /**
+     * Find a marker entry by its internal id.
+     *
+     * @param[in] markerId  Internal marker id.
+     * @return Pointer to the marker entry, or nullptr when not found.
+     */
+    struct PersistentMarker* findMarker(int markerId);
+    const struct PersistentMarker* findMarker(int markerId) const;
+
+    //=========================================================================================================
+    /**
      * Build channel-view metadata for the currently configured virtual channels.
      */
     void rebuildVirtualChannels();
@@ -299,6 +385,12 @@ private:
      * Append the currently active virtual channels to a raw data block.
      */
     Eigen::MatrixXd appendVirtualChannels(const Eigen::MatrixXd &data) const;
+
+    //=========================================================================================================
+    /**
+     * Apply the currently active browser-side FIR filter to a loaded raw block.
+     */
+    Eigen::MatrixXd applyUserDefinedFilter(const Eigen::MatrixXd &data) const;
 
     //=========================================================================================================
     /**
@@ -348,9 +440,17 @@ private:
 
     QSettings       m_qSettings;                    /**< QSettings variable used to write or read from independent application sessions. */
 
-    DataMarker*     m_pDataMarker;                  /**< pointer to the data marker. */
-    QLabel*         m_pCurrentDataMarkerLabel;      /**< the current data marker label to display the marker's position. */
-    int             m_iCurrentMarkerSample;         /**< the current data marker sample value to display the marker's position. */
+    struct PersistentMarker {
+        int         id = -1;                        /**< Internal marker id. */
+        int         sample = 0;                     /**< Absolute sample position the marker is anchored to. */
+        QColor      color;                          /**< Marker colour used for the line and label. */
+        DataMarker* line = nullptr;                 /**< Draggable line widget rendered over the signal viewport. */
+        QLabel*     label = nullptr;                /**< Small floating label with sample/time information. */
+    };
+
+    QVector<PersistentMarker> m_dataMarkers;        /**< All persistent sample markers in the raw browser. */
+    int             m_iNextMarkerId = 1;            /**< Next internal marker id. */
+    int             m_iActiveMarkerId = -1;         /**< Active marker used for event insertion. */
 
     RawDelegate*    m_pRawDelegate;                 /**< the QAbstractDelegate being part of the raw model/view framework of Qt. */
     RawModel*       m_pRawModel;                    /**< the QAbstractTable model being part of the model/view framework of Qt. */
@@ -388,6 +488,8 @@ private:
 
     QVector<VirtualChannelDefinition>             m_virtualChannelDefinitions; /**< Requested virtual-channel definitions. */
     QVector<ResolvedVirtualChannel>               m_resolvedVirtualChannels; /**< Definitions resolved against the current FIFF header. */
+    QSharedPointer<FilterOperator>                m_pUserDefinedFilter; /**< Optional FIR filter applied directly in the QRHI browser path. */
+    QString                                       m_sUserDefinedFilterApplyTo; /**< Channel group targeted by m_pUserDefinedFilter. */
 
     // ── Buffer sizing ──────────────────────────────────────────────────
     // Each block is 60 s.  Buffer holds kMaxBlocks = 10 blocks = 10 min.
@@ -453,13 +555,14 @@ protected slots:
 
     //=========================================================================================================
     /**
-     * Set the sample labels of the data window
+     * Update all marker labels in the raw browser.
      */
     void setMarkerSampleLabel();
 
     //=========================================================================================================
     /**
-     * Moves the marker to the requested absolute sample in the visible raw viewport.
+     * Moves the active marker to the requested absolute sample in the visible raw viewport.
+     * If no marker exists yet, a new marker is created.
      *
      * @param[in] sample  Absolute sample index to place the marker at.
      */

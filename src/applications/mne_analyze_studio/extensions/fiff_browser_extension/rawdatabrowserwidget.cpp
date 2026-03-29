@@ -2,7 +2,7 @@
 /**
  * @file     rawdatabrowserwidget.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @version  dev
+ * @version  2.1.0
  * @date     March, 2026
  *
  * @brief    Implements the embedded raw FIFF browser widget for the FIFF extension.

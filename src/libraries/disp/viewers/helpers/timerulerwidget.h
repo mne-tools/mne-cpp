@@ -49,6 +49,8 @@
 #include <QColor>
 #include <QVector>
 
+class QContextMenuEvent;
+
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
@@ -64,6 +66,16 @@ struct TimeRulerEventMark {
     int     sample = 0;   ///< Absolute sample index.
     QColor  color;        ///< Display colour.
     QString label;        ///< Short text (event type number).
+};
+
+//=============================================================================================================
+/**
+ * @brief Lightweight reference/sample marker passed to TimeRulerWidget.
+ */
+struct TimeRulerReferenceMark {
+    int     sample = 0;   ///< Absolute sample index.
+    QColor  color;        ///< Display colour.
+    QString label;        ///< Short text identifier, e.g. M1.
 };
 
 //=============================================================================================================
@@ -120,6 +132,14 @@ public:
      */
     void setEvents(const QVector<TimeRulerEventMark> &events);
 
+    //=========================================================================================================
+    /**
+     * Set the list of persistent sample markers to display in the ruler.
+     *
+     * @param[in] markers  Reference/sample markers.
+     */
+    void setReferenceMarkers(const QVector<TimeRulerReferenceMark> &markers);
+
 public slots:
     //=========================================================================================================
     /**
@@ -137,8 +157,28 @@ public slots:
      */
     void setSamplesPerPixel(float spp);
 
+signals:
+    //=========================================================================================================
+    /**
+     * Emitted when the user requests a new sample marker from the ruler context menu.
+     */
+    void addReferenceMarkerRequested(int sample);
+
+    //=========================================================================================================
+    /**
+     * Emitted when the user requests removal of the nearest sample marker from the ruler context menu.
+     */
+    void removeReferenceMarkerRequested(int sample);
+
+    //=========================================================================================================
+    /**
+     * Emitted when the user requests that all sample markers be cleared.
+     */
+    void clearReferenceMarkersRequested();
+
 protected:
     void paintEvent(QPaintEvent *event) override;
+    void contextMenuEvent(QContextMenuEvent *event) override;
 
 private:
     //=========================================================================================================
@@ -160,12 +200,32 @@ private:
      */
     static QString formatTime(double seconds);
 
+    //=========================================================================================================
+    /**
+     * Map a local X position to the corresponding absolute sample index.
+     *
+     * @param[in] x  Local widget X position in pixels.
+     * @return Absolute sample index.
+     */
+    int sampleAtX(int x) const;
+
+    //=========================================================================================================
+    /**
+     * Find the nearest reference marker to a sample position.
+     *
+     * @param[in] sample              Absolute sample index to test against.
+     * @param[in] tolerancePixels     Maximum X distance in pixels.
+     * @return Index of the nearest marker, or -1 when none is close enough.
+     */
+    int nearestReferenceMarkerIndex(int sample, int tolerancePixels = 8) const;
+
     double m_sfreq           = 1.0;
     int    m_firstFileSample = 0;
     float  m_scrollSample    = 0.f;
     float  m_spp             = 1.f;     // samples per pixel
 
     QVector<TimeRulerEventMark> m_events;
+    QVector<TimeRulerReferenceMark> m_referenceMarkers;
 };
 
 } // namespace DISPLIB

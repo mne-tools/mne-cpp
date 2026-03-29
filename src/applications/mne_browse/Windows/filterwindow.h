@@ -179,6 +179,14 @@ private:
      */
     void updateFilterPlot();
 
+    //=========================================================================================================
+    /**
+     * Rebuild the currently configured user-defined FIR filter from the UI state.
+     *
+     * @return Shared filter operator or null when no raw metadata is available yet.
+     */
+    QSharedPointer<FilterOperator> buildUserDefinedFilter() const;
+
     std::unique_ptr<Ui::FilterWindowDockWidget> ui;         /**< Pointer to the qt designer generated ui class.*/
 
     MainWindow*         m_pMainWindow;          /**< Pointer to the parent, the MainWindow class.*/
@@ -189,6 +197,7 @@ private:
     QSettings           m_qSettings;            /**< QSettings variable used to write or read from independent application sessions.*/
 
     std::unique_ptr<FilterPlotScene> m_pFilterPlotScene;    /**< Owns the QGraphicsScene which holds the filter plotting.*/
+    QSharedPointer<FilterOperator>   m_pUserDefinedFilter;  /**< Current browser-side FIR filter definition. */
 
 protected slots:
     //=========================================================================================================
