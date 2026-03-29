@@ -120,9 +120,16 @@ QStringList defaultAnnotationCandidatePaths(const QString& rawFilePath)
         basePath.chop(5);
     }
 
-    return {defaultJsonPath,
-            basePath + QStringLiteral(".csv"),
-            basePath + QStringLiteral(".txt")};
+    QStringList candidates = {defaultJsonPath,
+                              basePath + QStringLiteral(".fif")};
+
+    if(rawFilePath.endsWith(QStringLiteral(".fif"), Qt::CaseInsensitive)) {
+        candidates.append(rawFilePath.left(rawFilePath.size() - 4) + QStringLiteral("_annot.fif"));
+    }
+
+    candidates.append(basePath + QStringLiteral(".csv"));
+    candidates.append(basePath + QStringLiteral(".txt"));
+    return candidates;
 }
 
 QString defaultVirtualChannelFilePath(const QString& rawFilePath)
@@ -1453,7 +1460,7 @@ void MainWindow::loadAnnotations()
     QString filename = QFileDialog::getOpenFileName(this,
                                                     QString("Open annotation file"),
                                                     QFileInfo(defaultAnnotationFilePath(m_qFileRaw.fileName())).absolutePath(),
-                                                    tr("annotation files (*-annot.json *.json *.csv *.txt)"));
+                                                    tr("annotation files (*-annot.json *_annot.fif *-annot.fif *.json *.csv *.txt *.fif)"));
 
     if(filename.isEmpty()) {
         return;
@@ -1481,7 +1488,7 @@ void MainWindow::saveAnnotations()
     QString filename = QFileDialog::getSaveFileName(this,
                                                     QString("Save annotation file"),
                                                     defaultPath,
-                                                    tr("annotation files (*-annot.json *.json *.csv *.txt)"));
+                                                    tr("annotation files (*-annot.json *_annot.fif *-annot.fif *.json *.csv *.txt *.fif)"));
 
     if(filename.isEmpty()) {
         return;

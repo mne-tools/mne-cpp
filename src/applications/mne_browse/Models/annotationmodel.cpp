@@ -48,6 +48,11 @@ enum AnnotationColumn {
     AnnotationColumnCount
 };
 
+constexpr int FiffBlockMneAnnotations = 3810;
+constexpr int FiffMneBaselineMin = 3568;
+constexpr int FiffMneBaselineMax = 3569;
+constexpr int FiffMneEpochsDropLog = 3801;
+
 QString defaultAnnotationDescription()
 {
     return QStringLiteral("BAD_manual");
@@ -567,6 +572,10 @@ QVector<AnnotationSpanData> AnnotationModel::getAnnotationSpans() const
 bool AnnotationModel::loadAnnotationData(QFile& qFile)
 {
     const QString suffix = QFileInfo(qFile.fileName()).suffix().trimmed().toLower();
+    if(suffix == QStringLiteral("fif")) {
+        return loadAnnotationFif(qFile);
+    }
+
     if(suffix == QStringLiteral("csv")) {
         return loadAnnotationCsv(qFile);
     }
@@ -589,6 +598,10 @@ bool AnnotationModel::saveAnnotationData(QFile& qFile) const
     }
 
     const QString suffix = fileInfo.suffix().trimmed().toLower();
+    if(suffix == QStringLiteral("fif")) {
+        return saveAnnotationFif(qFile);
+    }
+
     if(suffix == QStringLiteral("csv")) {
         return saveAnnotationCsv(qFile);
     }
@@ -658,6 +671,122 @@ bool AnnotationModel::loadAnnotationJson(QFile& qFile)
 
         QVariantMap extras = object.value(QStringLiteral("extras")).toObject().toVariantMap();
         parsedEntries.append(normalizeEntry(startSample, endSample, description, channelNames, comment, extras));
+    }
+
+    beginResetModel();
+    m_annotations = parsedEntries;
+    sortEntries();
+    m_bFileLoaded = true;
+    endResetModel();
+
+    notifyAnnotationsChanged();
+    return true;
+}
+
+//=============================================================================================================
+
+bool AnnotationModel::loadAnnotationFif(QFile& qFile)
+{
+    FIFFLIB::FiffStream::SPtr stream(new FIFFLIB::FiffStream(&qFile));
+    if(!stream->open()) {
+        qWarning() << "AnnotationModel: could not open annotation fif" << qFile.fileName();
+        return false;
+    }
+
+    const QList<FIFFLIB::FiffDirNode::SPtr> annotationBlocks =
+        stream->dirtree()->dir_tree_find(FiffBlockMneAnnotations);
+
+    if(annotationBlocks.isEmpty()) {
+        qFile.close();
+        qWarning() << "AnnotationModel: could not find annotation block in" << qFile.fileName();
+        return false;
+    }
+
+    QVector<double> onsetSeconds;
+    QVector<double> endSeconds;
+    QStringList descriptions;
+    QVector<QStringList> channelNames;
+    QVector<QVariantMap> extras;
+
+    for(int entryIndex = 0; entryIndex < annotationBlocks.first()->nent(); ++entryIndex) {
+        const auto& directoryEntry = annotationBlocks.first()->dir.at(entryIndex);
+        FIFFLIB::FiffTag::UPtr tag;
+        if(!stream->read_tag(tag, directoryEntry->pos) || !tag) {
+            continue;
+        }
+
+        if(directoryEntry->kind == FiffMneBaselineMin) {
+            if(float* values = tag->toFloat()) {
+                const int count = tag->size() / static_cast<int>(sizeof(float));
+                onsetSeconds.resize(count);
+                for(int index = 0; index < count; ++index) {
+                    onsetSeconds[index] = values[index];
+                }
+            }
+        } else if(directoryEntry->kind == FiffMneBaselineMax) {
+            if(float* values = tag->toFloat()) {
+                const int count = tag->size() / static_cast<int>(sizeof(float));
+                endSeconds.resize(count);
+                for(int index = 0; index < count; ++index) {
+                    endSeconds[index] = values[index];
+                }
+            }
+        } else if(directoryEntry->kind == FIFF_COMMENT) {
+            descriptions = decodeMneChannelNames(tag->toString());
+        } else if(directoryEntry->kind == FiffMneEpochsDropLog) {
+            const QJsonDocument document = QJsonDocument::fromJson(tag->toString().toUtf8());
+            const QJsonArray rows = document.array();
+            channelNames.resize(rows.size());
+            for(int row = 0; row < rows.size(); ++row) {
+                const QJsonArray channelRow = rows.at(row).toArray();
+                for(const QJsonValue& channelValue : channelRow) {
+                    const QString channelName = channelValue.toString().trimmed();
+                    if(!channelName.isEmpty()) {
+                        channelNames[row].append(channelName);
+                    }
+                }
+            }
+        } else if(directoryEntry->kind == FIFF_FREE_LIST) {
+            const QJsonDocument document = QJsonDocument::fromJson(tag->toString().toUtf8());
+            const QJsonArray rows = document.array();
+            extras.resize(rows.size());
+            for(int row = 0; row < rows.size(); ++row) {
+                extras[row] = rows.at(row).toObject().toVariantMap();
+            }
+        }
+    }
+
+    qFile.close();
+
+    const int count = onsetSeconds.size();
+    if(count == 0 || endSeconds.size() != count || descriptions.size() != count) {
+        qWarning() << "AnnotationModel: incomplete annotation fif content in" << qFile.fileName();
+        return false;
+    }
+
+    if(channelNames.size() < count) {
+        channelNames.resize(count);
+    }
+    if(extras.size() < count) {
+        extras.resize(count);
+    }
+
+    QVector<AnnotationEntry> parsedEntries;
+    parsedEntries.reserve(count);
+
+    for(int index = 0; index < count; ++index) {
+        QVariantMap extraValues = extras.at(index);
+        const QString comment = extraValues.value(QStringLiteral("comment")).toString().trimmed();
+        extraValues.remove(QStringLiteral("comment"));
+
+        const int startSample = onsetSecondsToSample(onsetSeconds.at(index));
+        const int endSample = startSample + durationSecondsToSamples(endSeconds.at(index) - onsetSeconds.at(index)) - 1;
+        parsedEntries.append(normalizeEntry(startSample,
+                                            endSample,
+                                            descriptions.at(index),
+                                            channelNames.at(index),
+                                            comment,
+                                            extraValues));
     }
 
     beginResetModel();
@@ -961,6 +1090,94 @@ bool AnnotationModel::saveAnnotationJson(QFile& qFile) const
     qFile.close();
 
     return bytesWritten >= 0;
+}
+
+//=============================================================================================================
+
+bool AnnotationModel::saveAnnotationFif(QFile& qFile) const
+{
+    FIFFLIB::FiffStream::SPtr stream = FIFFLIB::FiffStream::start_file(qFile);
+    if(!stream) {
+        qWarning() << "AnnotationModel: could not write annotation fif" << qFile.fileName();
+        return false;
+    }
+
+    QVector<float> onsetSeconds;
+    QVector<float> endSeconds;
+    onsetSeconds.reserve(m_annotations.size());
+    endSeconds.reserve(m_annotations.size());
+
+    QStringList descriptions;
+    descriptions.reserve(m_annotations.size());
+
+    QJsonArray channelNameRows;
+    bool haveChannelNames = false;
+
+    QJsonArray extrasRows;
+    bool haveExtras = false;
+
+    for(const AnnotationEntry& entry : m_annotations) {
+        const float onset = static_cast<float>(sampleToOnsetSeconds(entry.startSample));
+        const float duration = static_cast<float>((entry.endSample - entry.startSample + 1)
+                               / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0));
+
+        onsetSeconds.append(onset);
+        endSeconds.append(onset + duration);
+        descriptions.append(entry.description);
+
+        QJsonArray channelRow;
+        for(const QString& channelName : entry.channelNames) {
+            channelRow.append(channelName);
+        }
+        haveChannelNames = haveChannelNames || !entry.channelNames.isEmpty();
+        channelNameRows.append(channelRow);
+
+        QVariantMap extraValues = entry.extras;
+        if(!entry.comment.isEmpty()) {
+            extraValues.insert(QStringLiteral("comment"), entry.comment);
+        }
+
+        QJsonObject extraObject;
+        for(auto it = extraValues.constBegin(); it != extraValues.constEnd(); ++it) {
+            extraObject.insert(it.key(), QJsonValue::fromVariant(it.value()));
+        }
+
+        haveExtras = haveExtras || !extraObject.isEmpty();
+        extrasRows.append(extraObject);
+    }
+
+    stream->start_block(FiffBlockMneAnnotations);
+    if(!onsetSeconds.isEmpty()) {
+        stream->write_float(FiffMneBaselineMin, onsetSeconds.data(), onsetSeconds.size());
+        stream->write_float(FiffMneBaselineMax, endSeconds.data(), endSeconds.size());
+
+        const QString encodedDescriptions = encodeMneChannelNames(descriptions);
+        stream->write_string(FIFF_COMMENT, encodedDescriptions);
+    }
+
+    bool haveMeasurementStart = false;
+    const qint64 measurementStartUsecs = measurementStartUsecsSinceEpoch(&haveMeasurementStart);
+    if(haveMeasurementStart) {
+        const double measurementStamp[2] = {
+            static_cast<double>(measurementStartUsecs / 1000000LL),
+            static_cast<double>(measurementStartUsecs % 1000000LL)
+        };
+        stream->write_double(FIFF_MEAS_DATE, measurementStamp, 2);
+    }
+
+    if(haveChannelNames) {
+        const QString json = QString::fromUtf8(QJsonDocument(channelNameRows).toJson(QJsonDocument::Compact));
+        stream->write_string(FiffMneEpochsDropLog, json);
+    }
+
+    if(haveExtras) {
+        const QString json = QString::fromUtf8(QJsonDocument(extrasRows).toJson(QJsonDocument::Compact));
+        stream->write_string(FIFF_FREE_LIST, json);
+    }
+
+    stream->end_block(FiffBlockMneAnnotations);
+    stream->end_file();
+    return true;
 }
 
 //=============================================================================================================

@@ -95,9 +95,11 @@ private:
     };
 
     bool loadAnnotationJson(QFile& qFile);
+    bool loadAnnotationFif(QFile& qFile);
     bool loadAnnotationCsv(QFile& qFile);
     bool loadAnnotationTxt(QFile& qFile);
     bool saveAnnotationJson(QFile& qFile) const;
+    bool saveAnnotationFif(QFile& qFile) const;
     bool saveAnnotationCsv(QFile& qFile) const;
     bool saveAnnotationTxt(QFile& qFile) const;
 
