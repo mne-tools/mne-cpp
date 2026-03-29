@@ -1,27 +1,36 @@
 name: Coverity
 on:
   schedule:
-  - cron: '0 0 * * 1,3,5'
+    - cron: '0 0 * * 1,3,5'
+  workflow_dispatch:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+  COVERITY_SCAN_REF: staging
 
 jobs:
   ScanLinux:
     runs-on: ubuntu-24.04
     steps:
-      - name: Clone repository
+      - name: Clone staging branch
         uses: actions/checkout@v5
+        with:
+          ref: ${{ env.COVERITY_SCAN_REF }}
+          fetch-depth: 0
       - name: Install Python 3.10 version
         uses: actions/setup-python@v6
         with:
           python-version: '3.10'
           architecture: 'x64'
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: 6.11.0
-          modules: qtshadertools
+      - name: Download Qt toolchain
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          ./scripts/ci/download_toolchain.sh \
+            --kind qt \
+            --version "6.11.0" \
+            --linkage dynamic \
+            --output-dir "$RUNNER_TEMP/qt"
       - name: Coverity scripts
         run: |
           ./scripts/coverity_scan.sh "$COVTOKEN"

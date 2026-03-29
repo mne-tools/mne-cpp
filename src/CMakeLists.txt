@@ -24,6 +24,7 @@ endif()
 
 option(BUILD_EXAMPLES "Build examples" ON)
 option(BUILD_APPLICATIONS "Build applications" ON)
+option(BUILD_TOOLS "Build CLI tools (when BUILD_APPLICATIONS is ON)" ON)
 option(BUILD_TESTS "Build tests" OFF)
 
 option(BUILD_ALL "Build entire project" OFF)
@@ -51,6 +52,7 @@ if(BUILD_ALL)
   set(BUILD_EXAMPLES ON)
   set(BUILD_TESTS ON)
   set(BUILD_APPLICATIONS ON)
+  set(BUILD_TOOLS ON)
 endif()
 
 if(WASM)
@@ -220,6 +222,9 @@ add_subdirectory(external)
 
 if(BUILD_APPLICATIONS)
   add_subdirectory(applications)
+endif()
+
+if(BUILD_APPLICATIONS AND BUILD_TOOLS)
   add_subdirectory(tools)
 endif()
 

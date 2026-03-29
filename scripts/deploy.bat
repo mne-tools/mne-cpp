@@ -324,7 +324,7 @@ if [[ ${LinkOption} == "dynamic" ]]; then
 
     # ---------------------------------------------------------------
     # Locate macdeployqt — works with both Qt 5 ($Qt5_DIR) and Qt 6
-    # ($QT_ROOT_DIR or PATH set by jurplel/install-qt-action).
+    # ($QT_ROOT_DIR / Qt6_DIR / PATH exported by CI toolchain helpers or local setup).
     # ---------------------------------------------------------------
     MACDEPLOYQT=""
     if command -v macdeployqt &> /dev/null; then
@@ -699,7 +699,7 @@ if [[ ${LinkOption} == "dynamic" ]]; then
 
         # ---------------------------------------------------------------
         # Locate the Qt installation directory.
-        # jurplel/install-qt-action sets Qt6_DIR to either:
+        # CI helper scripts may set Qt6_DIR to either:
         #   - the Qt prefix     (e.g. <root>/Qt/6.x.y/gcc_64)      → has lib/
         #   - the CMake cfg dir (e.g. <prefix>/lib/cmake/Qt6)       → go up 3
         # QT_ROOT_DIR always takes precedence if set explicitly.
@@ -841,4 +841,3 @@ fi
 fi
 
 exit 0
-

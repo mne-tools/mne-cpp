@@ -40,12 +40,16 @@ jobs:
       with:
         python-version: '3.10'
         architecture: 'x64'
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v4
-      with:
-        version: 6.11.0
-        arch: win64_msvc2022_64
-        modules: qtshadertools
+    - name: Download Qt toolchain
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.ps1 `
+          -Kind qt `
+          -Version '6.11.0' `
+          -Linkage dynamic `
+          -OutputDir "$env:RUNNER_TEMP\qt"
     - name: Configure and compile MNE-CPP
       run: |
         cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
