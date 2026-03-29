@@ -548,19 +548,30 @@ void DataWindow::rebuildVirtualChannels()
     virtualDisplayInfo.reserve(m_virtualChannelDefinitions.size());
 
     for(const VirtualChannelDefinition& definition : std::as_const(m_virtualChannelDefinitions)) {
-        const int positiveChannel = channelIndexByName.value(definition.positiveChannel.trimmed(), -1);
-        const int negativeChannel = channelIndexByName.value(definition.negativeChannel.trimmed(), -1);
+        const int primaryChannel = channelIndexByName.value(definition.primaryChannel.trimmed(), -1);
+        QVector<int> referenceChannels;
+        referenceChannels.reserve(definition.referenceChannels.size());
+        for(const QString& referenceName : definition.referenceChannels) {
+            const int referenceChannel = channelIndexByName.value(referenceName.trimmed(), -1);
+            if(referenceChannel >= 0 && referenceChannel != primaryChannel && !referenceChannels.contains(referenceChannel)) {
+                referenceChannels.append(referenceChannel);
+            }
+        }
 
-        if(positiveChannel < 0 || negativeChannel < 0 || positiveChannel == negativeChannel) {
+        const bool invalidDefinition =
+            primaryChannel < 0
+            || referenceChannels.isEmpty()
+            || (definition.kind == VirtualChannelKind::Bipolar && referenceChannels.size() != 1);
+
+        if(invalidDefinition) {
             qWarning() << "DataWindow: could not resolve virtual channel"
                        << definition.name
-                       << definition.positiveChannel
-                       << definition.negativeChannel;
+                       << definition.primaryChannel
+                       << definition.referenceChannels;
             continue;
         }
 
-        const auto& positiveChannelInfo = fiffInfo->chs.at(positiveChannel);
-        const auto& negativeChannelInfo = fiffInfo->chs.at(negativeChannel);
+        const auto& primaryChannelInfo = fiffInfo->chs.at(primaryChannel);
 
         const auto amplitudeForChannel = [](const FIFFLIB::FiffChInfo& channelInfo) -> float {
             switch(channelInfo.kind) {
@@ -620,16 +631,22 @@ void DataWindow::rebuildVirtualChannels()
 
         ResolvedVirtualChannel resolvedChannel;
         resolvedChannel.name = definition.name;
-        resolvedChannel.positiveChannel = positiveChannel;
-        resolvedChannel.negativeChannel = negativeChannel;
+        resolvedChannel.kind = definition.kind;
+        resolvedChannel.primaryChannel = primaryChannel;
+        resolvedChannel.referenceChannels = referenceChannels;
         resolvedChannel.displayInfo.name = definition.name;
-        resolvedChannel.displayInfo.typeLabel =
-            (positiveChannelInfo.kind == negativeChannelInfo.kind)
-            ? typeLabelForKind(positiveChannelInfo.kind)
+        bool sameKind = true;
+        float amplitudeMax = amplitudeForChannel(primaryChannelInfo);
+        for(int referenceChannel : referenceChannels) {
+            const auto& referenceChannelInfo = fiffInfo->chs.at(referenceChannel);
+            sameKind = sameKind && (referenceChannelInfo.kind == primaryChannelInfo.kind);
+            amplitudeMax = qMax(amplitudeMax, amplitudeForChannel(referenceChannelInfo));
+        }
+        resolvedChannel.displayInfo.typeLabel = sameKind
+            ? typeLabelForKind(primaryChannelInfo.kind)
             : QStringLiteral("MISC");
-        resolvedChannel.displayInfo.color = colorForKind(positiveChannelInfo.kind).darker(115);
-        resolvedChannel.displayInfo.amplitudeMax =
-            qMax(amplitudeForChannel(positiveChannelInfo), amplitudeForChannel(negativeChannelInfo));
+        resolvedChannel.displayInfo.color = colorForKind(primaryChannelInfo.kind).darker(115);
+        resolvedChannel.displayInfo.amplitudeMax = amplitudeMax;
         if(resolvedChannel.displayInfo.amplitudeMax <= 0.f) {
             resolvedChannel.displayInfo.amplitudeMax = 1.f;
         }
@@ -656,15 +673,34 @@ Eigen::MatrixXd DataWindow::appendVirtualChannels(const Eigen::MatrixXd &data) c
 
     for(int row = 0; row < m_resolvedVirtualChannels.size(); ++row) {
         const ResolvedVirtualChannel& virtualChannel = m_resolvedVirtualChannels.at(row);
-        if(virtualChannel.positiveChannel < 0 || virtualChannel.negativeChannel < 0
-           || virtualChannel.positiveChannel >= data.rows()
-           || virtualChannel.negativeChannel >= data.rows()) {
+        if(virtualChannel.primaryChannel < 0
+           || virtualChannel.primaryChannel >= data.rows()
+           || virtualChannel.referenceChannels.isEmpty()) {
             displayData.row(data.rows() + row).setZero();
             continue;
         }
 
+        Eigen::RowVectorXd referenceSignal = Eigen::RowVectorXd::Zero(data.cols());
+        bool validReferences = true;
+        for(int referenceChannel : virtualChannel.referenceChannels) {
+            if(referenceChannel < 0 || referenceChannel >= data.rows()) {
+                validReferences = false;
+                break;
+            }
+            referenceSignal += data.row(referenceChannel);
+        }
+
+        if(!validReferences) {
+            displayData.row(data.rows() + row).setZero();
+            continue;
+        }
+
+        if(virtualChannel.kind == VirtualChannelKind::AverageReference) {
+            referenceSignal /= static_cast<double>(virtualChannel.referenceChannels.size());
+        }
+
         displayData.row(data.rows() + row) =
-            data.row(virtualChannel.positiveChannel) - data.row(virtualChannel.negativeChannel);
+            data.row(virtualChannel.primaryChannel) - referenceSignal;
     }
 
     return displayData;

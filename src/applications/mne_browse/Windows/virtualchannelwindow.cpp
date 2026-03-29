@@ -27,6 +27,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
+#include <QListWidget>
 #include <QMessageBox>
 #include <QTableView>
 #include <QToolBar>
@@ -35,6 +36,18 @@
 #include <algorithm>
 
 using namespace MNEBROWSE;
+
+namespace
+{
+
+QString kindToDisplayString(VirtualChannelKind kind)
+{
+    return kind == VirtualChannelKind::AverageReference
+        ? QStringLiteral("Average Reference")
+        : QStringLiteral("Bipolar");
+}
+
+} // namespace
 
 //=============================================================================================================
 
@@ -106,7 +119,7 @@ void VirtualChannelWindow::setupUi()
     m_pLayout->setContentsMargins(6, 6, 6, 6);
     m_pLayout->setSpacing(6);
 
-    m_pHintLabel = new QLabel(QStringLiteral("Create browser-level bipolar channels that are rendered live in the raw view."), m_pContents);
+    m_pHintLabel = new QLabel(QStringLiteral("Create live browser-level derived channels, including classic bipolar pairs and average-reference derivations."), m_pContents);
     m_pHintLabel->setWordWrap(true);
     m_pLayout->addWidget(m_pHintLabel);
 
@@ -144,7 +157,7 @@ void VirtualChannelWindow::initToolBar()
     m_pToolBar = new QToolBar(this);
     m_pToolBar->setMovable(false);
 
-    QAction* addAction = new QAction(tr("Add bipolar channel"), this);
+    QAction* addAction = new QAction(tr("Add virtual channel"), this);
     connect(addAction, &QAction::triggered,
             this, &VirtualChannelWindow::addVirtualChannel);
     m_pToolBar->addAction(addAction);
@@ -159,48 +172,112 @@ void VirtualChannelWindow::initToolBar()
 
 //=============================================================================================================
 
-bool VirtualChannelWindow::promptForVirtualChannel(QString& name,
-                                                   QString& positiveChannel,
-                                                   QString& negativeChannel) const
+bool VirtualChannelWindow::promptForVirtualChannel(VirtualChannelDefinition& definition) const
 {
     QDialog dialog(const_cast<VirtualChannelWindow*>(this));
-    dialog.setWindowTitle(QStringLiteral("Add Virtual Bipolar Channel"));
+    dialog.setWindowTitle(QStringLiteral("Add Virtual Channel"));
 
     QVBoxLayout* mainLayout = new QVBoxLayout(&dialog);
     QFormLayout* formLayout = new QFormLayout();
 
     QLineEdit* nameEdit = new QLineEdit(&dialog);
-    QComboBox* positiveComboBox = new QComboBox(&dialog);
-    QComboBox* negativeComboBox = new QComboBox(&dialog);
+    QComboBox* typeComboBox = new QComboBox(&dialog);
+    QComboBox* sourceComboBox = new QComboBox(&dialog);
+    QListWidget* referenceListWidget = new QListWidget(&dialog);
+    QLabel* hintLabel = new QLabel(&dialog);
 
-    positiveComboBox->addItems(m_availableChannelNames);
-    negativeComboBox->addItems(m_availableChannelNames);
+    typeComboBox->addItem(kindToDisplayString(VirtualChannelKind::Bipolar),
+                          static_cast<int>(VirtualChannelKind::Bipolar));
+    typeComboBox->addItem(kindToDisplayString(VirtualChannelKind::AverageReference),
+                          static_cast<int>(VirtualChannelKind::AverageReference));
 
-    if(m_availableChannelNames.size() > 1) {
-        negativeComboBox->setCurrentIndex(1);
-    }
+    sourceComboBox->addItems(m_availableChannelNames);
+    referenceListWidget->addItems(m_availableChannelNames);
+    referenceListWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    hintLabel->setWordWrap(true);
 
-    const auto updateName = [nameEdit, positiveComboBox, negativeComboBox]() {
-        if(nameEdit->isModified()) {
-            return;
+    const auto updateReferenceItems = [typeComboBox, sourceComboBox, referenceListWidget]() {
+        const QString sourceChannel = sourceComboBox->currentText().trimmed();
+        const VirtualChannelKind kind = static_cast<VirtualChannelKind>(
+            typeComboBox->currentData().toInt());
+
+        referenceListWidget->setSelectionMode(kind == VirtualChannelKind::AverageReference
+                                              ? QAbstractItemView::MultiSelection
+                                              : QAbstractItemView::SingleSelection);
+
+        bool firstReferenceSelected = false;
+        for(int row = 0; row < referenceListWidget->count(); ++row) {
+            QListWidgetItem* item = referenceListWidget->item(row);
+            const bool isSourceItem = item->text().trimmed() == sourceChannel;
+
+            Qt::ItemFlags flags = item->flags();
+            flags.setFlag(Qt::ItemIsSelectable, !isSourceItem);
+            item->setFlags(flags);
+            item->setSelected(false);
+
+            if(isSourceItem) {
+                continue;
+            }
+
+            if(kind == VirtualChannelKind::AverageReference) {
+                item->setSelected(true);
+            } else if(!firstReferenceSelected) {
+                item->setSelected(true);
+                firstReferenceSelected = true;
+            }
         }
-
-        nameEdit->setText(QStringLiteral("%1-%2")
-            .arg(positiveComboBox->currentText(), negativeComboBox->currentText()));
     };
 
-    QObject::connect(positiveComboBox, &QComboBox::currentTextChanged, &dialog, updateName);
-    QObject::connect(negativeComboBox, &QComboBox::currentTextChanged, &dialog, updateName);
-    updateName();
+    const auto updateNameAndHint = [nameEdit, typeComboBox, sourceComboBox, referenceListWidget, hintLabel]() {
+        const VirtualChannelKind kind = static_cast<VirtualChannelKind>(
+            typeComboBox->currentData().toInt());
+
+        QStringList selectedReferences;
+        for(int row = 0; row < referenceListWidget->count(); ++row) {
+            QListWidgetItem* item = referenceListWidget->item(row);
+            if(item->isSelected()) {
+                selectedReferences.append(item->text().trimmed());
+            }
+        }
+
+        if(!nameEdit->isModified()) {
+            if(kind == VirtualChannelKind::AverageReference) {
+                nameEdit->setText(QStringLiteral("%1-avgref").arg(sourceComboBox->currentText()));
+            } else {
+                nameEdit->setText(QStringLiteral("%1-%2")
+                    .arg(sourceComboBox->currentText(),
+                         selectedReferences.isEmpty() ? QStringLiteral("?") : selectedReferences.first()));
+            }
+        }
+
+        if(kind == VirtualChannelKind::AverageReference) {
+            hintLabel->setText(QStringLiteral("The virtual channel will be computed as Source - average(Reference(s))."));
+        } else {
+            hintLabel->setText(QStringLiteral("The virtual channel will be computed as Source - Reference."));
+        }
+    };
+
+    QObject::connect(typeComboBox,
+                     QOverload<int>::of(&QComboBox::currentIndexChanged),
+                     &dialog,
+                     updateReferenceItems);
+    QObject::connect(typeComboBox,
+                     QOverload<int>::of(&QComboBox::currentIndexChanged),
+                     &dialog,
+                     updateNameAndHint);
+    QObject::connect(sourceComboBox, &QComboBox::currentTextChanged, &dialog, updateReferenceItems);
+    QObject::connect(sourceComboBox, &QComboBox::currentTextChanged, &dialog, updateNameAndHint);
+    QObject::connect(referenceListWidget, &QListWidget::itemSelectionChanged, &dialog, updateNameAndHint);
+
+    updateReferenceItems();
+    updateNameAndHint();
 
     formLayout->addRow(QStringLiteral("Name"), nameEdit);
-    formLayout->addRow(QStringLiteral("Positive"), positiveComboBox);
-    formLayout->addRow(QStringLiteral("Negative"), negativeComboBox);
+    formLayout->addRow(QStringLiteral("Type"), typeComboBox);
+    formLayout->addRow(QStringLiteral("Source"), sourceComboBox);
+    formLayout->addRow(QStringLiteral("Reference(s)"), referenceListWidget);
     mainLayout->addLayout(formLayout);
-
-    QLabel* hint = new QLabel(QStringLiteral("The virtual channel will be computed as Positive - Negative."), &dialog);
-    hint->setWordWrap(true);
-    mainLayout->addWidget(hint);
+    mainLayout->addWidget(hintLabel);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                                                        Qt::Horizontal,
@@ -213,9 +290,18 @@ bool VirtualChannelWindow::promptForVirtualChannel(QString& name,
         return false;
     }
 
-    name = nameEdit->text().trimmed();
-    positiveChannel = positiveComboBox->currentText().trimmed();
-    negativeChannel = negativeComboBox->currentText().trimmed();
+    definition.name = nameEdit->text().trimmed();
+    definition.kind = static_cast<VirtualChannelKind>(typeComboBox->currentData().toInt());
+    definition.primaryChannel = sourceComboBox->currentText().trimmed();
+    definition.referenceChannels.clear();
+
+    for(int row = 0; row < referenceListWidget->count(); ++row) {
+        QListWidgetItem* item = referenceListWidget->item(row);
+        if(item->isSelected()) {
+            definition.referenceChannels.append(item->text().trimmed());
+        }
+    }
+
     return true;
 }
 
@@ -230,21 +316,31 @@ void VirtualChannelWindow::addVirtualChannel()
         return;
     }
 
-    QString name;
-    QString positiveChannel;
-    QString negativeChannel;
-    if(!promptForVirtualChannel(name, positiveChannel, negativeChannel)) {
+    VirtualChannelDefinition definition;
+    if(!promptForVirtualChannel(definition)) {
         return;
     }
 
-    if(positiveChannel == negativeChannel) {
+    definition.referenceChannels.removeAll(definition.primaryChannel);
+    definition.referenceChannels.removeDuplicates();
+
+    const bool invalidReferenceCount =
+        (definition.kind == VirtualChannelKind::Bipolar && definition.referenceChannels.size() != 1)
+        || (definition.kind == VirtualChannelKind::AverageReference && definition.referenceChannels.isEmpty());
+
+    if(definition.primaryChannel.isEmpty() || invalidReferenceCount) {
         QMessageBox::warning(this,
                              QStringLiteral("Add Virtual Channel"),
-                             QStringLiteral("Choose two different source channels for a bipolar virtual channel."));
+                             definition.kind == VirtualChannelKind::AverageReference
+                                 ? QStringLiteral("Choose one source channel and at least one reference channel.")
+                                 : QStringLiteral("Choose one source channel and exactly one reference channel."));
         return;
     }
 
-    const int row = m_pVirtualChannelModel->addVirtualChannel(name, positiveChannel, negativeChannel);
+    const int row = m_pVirtualChannelModel->addVirtualChannel(definition.name,
+                                                              definition.kind,
+                                                              definition.primaryChannel,
+                                                              definition.referenceChannels);
     if(row >= 0) {
         m_pTableView->selectRow(row);
         m_pTableView->scrollTo(m_pVirtualChannelModel->index(row, 0));

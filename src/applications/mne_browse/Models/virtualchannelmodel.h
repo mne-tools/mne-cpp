@@ -18,6 +18,7 @@
 
 #include <QAbstractTableModel>
 #include <QFile>
+#include <QStringList>
 #include <QVector>
 
 
@@ -29,10 +30,16 @@
 namespace MNEBROWSE
 {
 
+enum class VirtualChannelKind {
+    Bipolar = 0,
+    AverageReference
+};
+
 struct VirtualChannelDefinition {
-    QString name;
-    QString positiveChannel;
-    QString negativeChannel;
+    QString            name;
+    VirtualChannelKind kind = VirtualChannelKind::Bipolar;
+    QString            primaryChannel;
+    QStringList        referenceChannels;
 };
 
 class VirtualChannelModel : public QAbstractTableModel
@@ -52,8 +59,9 @@ public:
     bool removeRows(int position, int rows, const QModelIndex &parent = QModelIndex()) override;
 
     int addVirtualChannel(const QString& name,
-                          const QString& positiveChannel,
-                          const QString& negativeChannel);
+                          VirtualChannelKind kind,
+                          const QString& primaryChannel,
+                          const QStringList& referenceChannels);
 
     QVector<VirtualChannelDefinition> virtualChannels() const;
 
@@ -67,9 +75,11 @@ signals:
     void virtualChannelsChanged();
 
 private:
+    QString formulaForDefinition(const VirtualChannelDefinition& definition) const;
     VirtualChannelDefinition normalizeDefinition(const QString& name,
-                                                 const QString& positiveChannel,
-                                                 const QString& negativeChannel) const;
+                                                 VirtualChannelKind kind,
+                                                 const QString& primaryChannel,
+                                                 const QStringList& referenceChannels) const;
     void notifyVirtualChannelsChanged();
 
     QVector<VirtualChannelDefinition> m_virtualChannels;

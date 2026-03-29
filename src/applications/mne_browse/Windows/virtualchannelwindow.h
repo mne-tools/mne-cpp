@@ -51,9 +51,7 @@ private:
     void setupUi();
     void initTable();
     void initToolBar();
-    bool promptForVirtualChannel(QString& name,
-                                 QString& positiveChannel,
-                                 QString& negativeChannel) const;
+    bool promptForVirtualChannel(VirtualChannelDefinition& definition) const;
 
 private slots:
     void addVirtualChannel();
