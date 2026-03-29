@@ -202,10 +202,21 @@ jobs:
         git clone -b main --single-branch "https://${GIT_CREDENTIALS}@github.com/mne-cpp/mne-cpp.github.io.git"
         cd mne-cpp.github.io
 
+        # Only update the /dev subdirectory — preserve online installer repos.
+        if [ -d "dev/installer" ]; then
+          mkdir -p /tmp/website-dev-installer-backup
+          cp -r dev/installer /tmp/website-dev-installer-backup/
+        fi
+
         # Only update the /dev subdirectory — preserve stable root docs
         rm -rf dev
         mkdir -p dev
         cp -RT ../doc/website/build dev/
+
+        if [ -d "/tmp/website-dev-installer-backup/installer" ]; then
+          mkdir -p dev
+          cp -r /tmp/website-dev-installer-backup/installer dev/
+        fi
 
         git add .
         git commit -m 'Update dev website' --allow-empty

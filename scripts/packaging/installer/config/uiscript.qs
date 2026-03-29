@@ -26,6 +26,8 @@ Controller.prototype.IntroductionPageCallback = function()
             "<b>MNE-CPP @MNE_CPP_VERSION@</b>.<br><br>" +
             "MNE-CPP is a cross-platform, open-source C++ toolkit for " +
             "MEG and EEG data acquisition, processing, and visualization.<br><br>" +
+            "This installer uses the Qt Installer Framework online mode, so the " +
+            "selected components are downloaded from the MNE-CPP repository during installation.<br><br>" +
             "Click <b>Next</b> to continue.";
     }
 }
@@ -42,23 +44,6 @@ Controller.prototype.TargetDirectoryPageCallback = function()
             "The default location is <tt>~/MNE-CPP</tt>, similar to how " +
             "Qt installs under <tt>~/Qt</tt>. Applications, libraries, " +
             "headers, and data will be placed inside this directory.";
-    }
-}
-
-// ---------------------------------------------------------------------------
-//  Component selection page
-// ---------------------------------------------------------------------------
-Controller.prototype.ComponentSelectionPageCallback = function()
-{
-    var page = gui.currentPageWidget();
-    if (page) {
-        page.description =
-            "Choose which MNE-CPP components to install. " +
-            "Hover over a component to see its description.<br><br>" +
-            "<b>MNE-CPP Core Binaries</b> downloads the selected platform archive " +
-            "from GitHub Releases during installation. Optional components like the " +
-            "<b>Sample Dataset</b>, <b>MNE-Python</b>, and <b>Add to PATH</b> can " +
-            "be added or removed later using the Maintenance Tool.";
     }
 }
 
@@ -80,7 +65,7 @@ Controller.prototype.PerformInstallationPageCallback = function()
             kicker.objectName = "MneKicker";
             frameLayout.addWidget(kicker);
 
-            var title = new QLabel("Step 2 of 2: Extracting and configuring MNE-CPP", frame);
+            var title = new QLabel("Downloading and installing the selected MNE-CPP components", frame);
             title.objectName = "MneTitle";
             frameLayout.addWidget(title);
 
@@ -98,13 +83,17 @@ Controller.prototype.PerformInstallationPageCallback = function()
 
         var variant = installer.value("MNECPP_SELECTED_VARIANT");
         var releaseTag = installer.value("MNECPP_RELEASE_TAG");
+        var repositoryUrl = installer.value("MNECPP_REPOSITORY_URL");
         if (mneInstallSummaryLabel) {
-            var summary = "Installing the downloaded archive";
+            var summary = "Installing from the online repository";
             if (variant !== "") {
-                summary += " using the <b>" + variant + "</b> package";
+                summary += " using the <b>" + variant + "</b> payload";
             }
             if (releaseTag !== "") {
-                summary += " from release <b>" + releaseTag + "</b>.";
+                summary += " for release channel <b>" + releaseTag + "</b>";
+            }
+            if (repositoryUrl !== "") {
+                summary += ".<br><span style=\"font-size: 11px; color: #576574;\">" + repositoryUrl + "</span>";
             } else {
                 summary += ".";
             }

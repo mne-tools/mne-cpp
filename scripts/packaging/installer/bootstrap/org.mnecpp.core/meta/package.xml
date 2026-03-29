@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
     <DisplayName>MNE-CPP Core Binaries</DisplayName>
-    <Description>Downloads the selected MNE-CPP binary archive from GitHub Releases during installation. Choose between the dynamic and static builds on the next page.</Description>
+    <Description>Installs the selected MNE-CPP payload from the online repository. Choose between the dynamic and static builds and optional add-ons on the next page.</Description>
     <Version>@MNE_CPP_VERSION@</Version>
     <ReleaseDate>@MNE_CPP_RELEASE_DATE@</ReleaseDate>
     <Default>true</Default>

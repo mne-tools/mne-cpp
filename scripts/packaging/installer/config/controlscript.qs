@@ -1,11 +1,11 @@
 // controlscript.qs - MNE-CPP Installer control script
 //
 // This script customizes the installer wizard behaviour and enables
-// headless (non-interactive) bootstrap installs:
+// headless (non-interactive) online installs:
 //
 //   ./MNE-CPP-Installer --script controlscript.qs
 //
-// Or more commonly via the bootstrap shell script:
+// Or more commonly via the install shell script:
 //
 //   curl -fsSL https://mne-cpp.github.io/install.sh | sh
 //
@@ -46,11 +46,29 @@ Controller.prototype.BinaryVariantPageCallback = function()
 {
     var page = gui.currentPageWidget();
     var variant = installer.environmentVariable("MNE_CPP_VARIANT");
+    var cliOnly = installer.environmentVariable("MNE_CPP_CLI_ONLY");
 
     if (page && variant === "static") {
         var radioStatic = page.findChild("radioStatic");
         if (radioStatic) {
             radioStatic.checked = true;
+        }
+    }
+
+    if (page && cliOnly === "1") {
+        var sampleDataCheck = page.findChild("sampleDataCheck");
+        if (sampleDataCheck) {
+            sampleDataCheck.checked = false;
+        }
+
+        var mnePythonCheck = page.findChild("mnePythonCheck");
+        if (mnePythonCheck) {
+            mnePythonCheck.checked = false;
+        }
+
+        var pathConfigCheck = page.findChild("pathConfigCheck");
+        if (pathConfigCheck) {
+            pathConfigCheck.checked = true;
         }
     }
 
