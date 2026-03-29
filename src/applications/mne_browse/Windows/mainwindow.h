@@ -120,6 +120,7 @@
 
 #include <fiff/fiff.h>
 #include <mne/mne.h>
+#include <mne/mne_inverse_operator.h>
 
 
 //*************************************************************************************************************
@@ -298,9 +299,24 @@ private:
 
     //=========================================================================================================
     /**
+     * loadInverseOperator loads an inverse-operator FIF file without a dialog.
+     *
+     * @param [in] filename  Absolute path to the inverse-operator file.
+     * @return true on success.
+     */
+    bool loadInverseOperatorFile(const QString& filename);
+
+    //=========================================================================================================
+    /**
      * loadEvoked load the evoked data from file.
      */
     void loadEvoked();
+
+    //=========================================================================================================
+    /**
+     * Load a precomputed inverse operator from a FIF file.
+     */
+    void loadInverseOperator();
 
     //=========================================================================================================
     /**
@@ -340,6 +356,12 @@ private:
      * Load a covariance matrix from a FIF file.
      */
     void loadCovariance();
+
+    //=========================================================================================================
+    /**
+     * Compute source estimates from the currently selected evoked response(s).
+     */
+    void computeSourceEstimate();
 
     //=========================================================================================================
     /**
@@ -444,7 +466,9 @@ private:
     QFile                   m_qVirtualChannelFile;          /**< Browser virtual-channel sidecar file. */
     QFile                   m_qEvokedFile;                  /**< Fiff event data file to read (set for convenience). */
     QFile                   m_qCovFile;                     /**< Fiff covariance file to write (set for convenience). */
+    QFile                   m_qInverseOperatorFile;         /**< Inverse-operator fif file used for source-estimate export. */
     FIFFLIB::FiffCov        m_covariance;                   /**< Last computed covariance matrix. */
+    MNELIB::MNEInverseOperator m_inverseOperator;           /**< Last loaded inverse operator. */
 
     //Window widgets
     EventWindow*            m_pEventWindow;                 /**< Event widget which display the event view. */

@@ -43,20 +43,30 @@
 #include <QBuffer>
 #include <QApplication>
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDialog>
 #include <QDialogButtonBox>
+#include <QDir>
+#include <QDoubleSpinBox>
 #include <QFormLayout>
 #include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QInputDialog>
 #include <QListWidget>
 #include <QLineEdit>
+#include <QPushButton>
+#include <QSet>
 #include <QSignalBlocker>
 #include <QSpinBox>
 #include <QVBoxLayout>
 #include <QFileInfo>
 
 #include <cmath>
+#include <algorithm>
+
+#include <inv/minimum_norm/inv_minimum_norm.h>
+#include <inv/inv_source_estimate.h>
 
 
 //*************************************************************************************************************
@@ -93,6 +103,37 @@ QString defaultCovFilePath(const QString& rawFilePath)
     }
 
     return rawFilePath + "-cov.fif";
+}
+
+QString defaultSourceEstimateDirectory(const QSettings& settings,
+                                       const QString& rawFilePath,
+                                       const QString& evokedFilePath,
+                                       const QString& inverseOperatorPath)
+{
+    const QString savedDirectory =
+        settings.value("MainWindow/SourceEstimate/outputDirectory").toString().trimmed();
+    if(!savedDirectory.isEmpty() && QDir(savedDirectory).exists()) {
+        return savedDirectory;
+    }
+
+    const QStringList candidatePaths = {
+        evokedFilePath,
+        rawFilePath,
+        inverseOperatorPath
+    };
+
+    for(const QString& candidatePath : candidatePaths) {
+        if(candidatePath.isEmpty()) {
+            continue;
+        }
+
+        const QString absolutePath = QFileInfo(candidatePath).absolutePath();
+        if(QDir(absolutePath).exists()) {
+            return absolutePath;
+        }
+    }
+
+    return QDir::homePath();
 }
 
 QString defaultAnnotationFilePath(const QString& rawFilePath)
@@ -233,6 +274,193 @@ QList<int> evokedEventCodesFromSettings(const QSettings& settings)
     }
 
     return selectedEventCodes;
+}
+
+QString sanitizeFileToken(const QString& text, const QString& fallback = QStringLiteral("item"))
+{
+    QString sanitized;
+    sanitized.reserve(text.size());
+
+    bool lastWasSeparator = false;
+    for(const QChar& ch : text.trimmed()) {
+        if(ch.isLetterOrNumber()) {
+            sanitized.append(ch.toLower());
+            lastWasSeparator = false;
+        } else if((ch == QLatin1Char('_') || ch == QLatin1Char('-') || ch == QLatin1Char('.'))
+                  && !lastWasSeparator) {
+            sanitized.append(ch);
+            lastWasSeparator = true;
+        } else if(!lastWasSeparator) {
+            sanitized.append(QLatin1Char('_'));
+            lastWasSeparator = true;
+        }
+    }
+
+    while(sanitized.startsWith(QLatin1Char('_')) || sanitized.startsWith(QLatin1Char('-'))) {
+        sanitized.remove(0, 1);
+    }
+    while(sanitized.endsWith(QLatin1Char('_')) || sanitized.endsWith(QLatin1Char('-'))) {
+        sanitized.chop(1);
+    }
+
+    if(sanitized.isEmpty()) {
+        return fallback;
+    }
+
+    return sanitized;
+}
+
+QString defaultSourceEstimateStem(const QString& rawFilePath,
+                                  const QString& evokedFilePath,
+                                  const QString& inverseOperatorPath)
+{
+    QString stem;
+
+    if(!evokedFilePath.isEmpty()) {
+        stem = QFileInfo(evokedFilePath).completeBaseName();
+    } else if(!rawFilePath.isEmpty()) {
+        stem = QFileInfo(rawFilePath).completeBaseName();
+    } else if(!inverseOperatorPath.isEmpty()) {
+        stem = QFileInfo(inverseOperatorPath).completeBaseName();
+    }
+
+    const QStringList removableSuffixes = {
+        QStringLiteral("-ave"),
+        QStringLiteral("_ave"),
+        QStringLiteral("-raw"),
+        QStringLiteral("_raw"),
+        QStringLiteral("-inv"),
+        QStringLiteral("_inv")
+    };
+
+    for(const QString& suffix : removableSuffixes) {
+        if(stem.endsWith(suffix, Qt::CaseInsensitive)) {
+            stem.chop(suffix.size());
+            break;
+        }
+    }
+
+    return sanitizeFileToken(stem, QStringLiteral("source_estimate"));
+}
+
+QString uniqueStem(const QString& stem, QSet<QString>& usedStems)
+{
+    if(!usedStems.contains(stem)) {
+        usedStems.insert(stem);
+        return stem;
+    }
+
+    int suffix = 2;
+    QString candidateStem;
+    do {
+        candidateStem = QStringLiteral("%1_%2").arg(stem).arg(suffix);
+        ++suffix;
+    } while(usedStems.contains(candidateStem));
+
+    usedStems.insert(candidateStem);
+    return candidateStem;
+}
+
+INVLIB::InvEstimateMethod estimateMethodFromString(const QString& method)
+{
+    if(method.compare(QStringLiteral("MNE"), Qt::CaseInsensitive) == 0) {
+        return INVLIB::InvEstimateMethod::MNE;
+    }
+    if(method.compare(QStringLiteral("sLORETA"), Qt::CaseInsensitive) == 0) {
+        return INVLIB::InvEstimateMethod::sLORETA;
+    }
+    if(method.compare(QStringLiteral("eLORETA"), Qt::CaseInsensitive) == 0) {
+        return INVLIB::InvEstimateMethod::eLORETA;
+    }
+    return INVLIB::InvEstimateMethod::dSPM;
+}
+
+INVLIB::InvOrientationType orientationTypeFromInverse(const MNELIB::MNEInverseOperator& inverseOperator)
+{
+    if(inverseOperator.source_ori == FIFFV_MNE_FREE_ORI) {
+        return INVLIB::InvOrientationType::Free;
+    }
+    if(inverseOperator.source_ori == FIFFV_MNE_FIXED_ORI) {
+        return INVLIB::InvOrientationType::Fixed;
+    }
+    return INVLIB::InvOrientationType::Unknown;
+}
+
+QString summarizeSelectedEvokeds(const QStringList& comments)
+{
+    if(comments.isEmpty()) {
+        return QStringLiteral("No evoked sets selected.");
+    }
+
+    QStringList displayComments = comments;
+    for(QString& comment : displayComments) {
+        if(comment.trimmed().isEmpty()) {
+            comment = QStringLiteral("<unnamed>");
+        }
+    }
+
+    const int previewCount = std::min(3, static_cast<int>(displayComments.size()));
+    const QString preview = displayComments.mid(0, previewCount).join(QStringLiteral(", "));
+    if(displayComments.size() > previewCount) {
+        return QStringLiteral("%1 selected (%2, ...)")
+            .arg(displayComments.size())
+            .arg(preview);
+    }
+
+    return QStringLiteral("%1 selected (%2)")
+        .arg(displayComments.size())
+        .arg(preview);
+}
+
+int sourceEstimateSplitIndex(const INVLIB::InvSourceEstimate& sourceEstimate,
+                             const MNELIB::MNEInverseOperator& inverseOperator)
+{
+    if(inverseOperator.src.size() >= 2) {
+        int leftSourceCount = 0;
+        if(inverseOperator.src[0].vertno.size() > 0) {
+            leftSourceCount = inverseOperator.src[0].vertno.size();
+        } else if(inverseOperator.src[0].nuse > 0) {
+            leftSourceCount = inverseOperator.src[0].nuse;
+        }
+
+        if(leftSourceCount > 0
+           && leftSourceCount < sourceEstimate.data.rows()
+           && leftSourceCount < sourceEstimate.vertices.size()) {
+            return leftSourceCount;
+        }
+    }
+
+    for(int index = 1; index < sourceEstimate.vertices.size(); ++index) {
+        if(sourceEstimate.vertices(index) < sourceEstimate.vertices(index - 1)) {
+            return index;
+        }
+    }
+
+    return -1;
+}
+
+bool splitSourceEstimateByHemisphere(const INVLIB::InvSourceEstimate& sourceEstimate,
+                                     const MNELIB::MNEInverseOperator& inverseOperator,
+                                     INVLIB::InvSourceEstimate& leftHemisphere,
+                                     INVLIB::InvSourceEstimate& rightHemisphere)
+{
+    const int splitIndex = sourceEstimateSplitIndex(sourceEstimate, inverseOperator);
+    if(splitIndex <= 0
+       || splitIndex >= sourceEstimate.data.rows()
+       || splitIndex >= sourceEstimate.vertices.size()) {
+        return false;
+    }
+
+    leftHemisphere = sourceEstimate;
+    rightHemisphere = sourceEstimate;
+
+    leftHemisphere.data = sourceEstimate.data.topRows(splitIndex);
+    leftHemisphere.vertices = sourceEstimate.vertices.head(splitIndex);
+
+    rightHemisphere.data = sourceEstimate.data.bottomRows(sourceEstimate.data.rows() - splitIndex);
+    rightHemisphere.vertices = sourceEstimate.vertices.tail(sourceEstimate.vertices.size() - splitIndex);
+
+    return true;
 }
 
 WhiteningSettings whiteningSettingsFromSettings(const QSettings& settings)
@@ -570,6 +798,115 @@ bool showComputeCovarianceDialog(QWidget* parent,
     baselineFrom = static_cast<float>(baselineFromSpinBox->value()) / 1000.0f;
     baselineTo = static_cast<float>(baselineToSpinBox->value()) / 1000.0f;
     removeMean = removeMeanCheckBox->isChecked();
+
+    return true;
+}
+
+bool showComputeSourceEstimateDialog(QWidget* parent,
+                                     QSettings& settings,
+                                     const QString& inverseDescription,
+                                     const QStringList& selectedEvokedComments,
+                                     QString& method,
+                                     double& snr,
+                                     bool& pickNormal,
+                                     QString& outputDirectory)
+{
+    QDialog dialog(parent);
+    dialog.setWindowTitle(QStringLiteral("Compute Source Estimate"));
+
+    QVBoxLayout* mainLayout = new QVBoxLayout(&dialog);
+
+    QLabel* inverseLabel = new QLabel(inverseDescription, &dialog);
+    inverseLabel->setWordWrap(true);
+    mainLayout->addWidget(inverseLabel);
+
+    QLabel* evokedLabel = new QLabel(summarizeSelectedEvokeds(selectedEvokedComments), &dialog);
+    evokedLabel->setWordWrap(true);
+    mainLayout->addWidget(evokedLabel);
+
+    QGroupBox* settingsGroup = new QGroupBox(QStringLiteral("Inverse Settings"), &dialog);
+    QFormLayout* settingsLayout = new QFormLayout(settingsGroup);
+
+    QComboBox* methodComboBox = new QComboBox(settingsGroup);
+    methodComboBox->addItems({QStringLiteral("MNE"),
+                              QStringLiteral("dSPM"),
+                              QStringLiteral("sLORETA"),
+                              QStringLiteral("eLORETA")});
+    const QString savedMethod =
+        settings.value("MainWindow/SourceEstimate/method", QStringLiteral("dSPM")).toString();
+    const int methodIndex = methodComboBox->findText(savedMethod, Qt::MatchFixedString);
+    methodComboBox->setCurrentIndex(methodIndex >= 0 ? methodIndex : 1);
+
+    QDoubleSpinBox* snrSpinBox = new QDoubleSpinBox(settingsGroup);
+    snrSpinBox->setRange(0.1, 100.0);
+    snrSpinBox->setDecimals(2);
+    snrSpinBox->setSingleStep(0.1);
+    snrSpinBox->setValue(settings.value("MainWindow/SourceEstimate/snr", 3.0).toDouble());
+
+    QCheckBox* pickNormalCheckBox =
+        new QCheckBox(QStringLiteral("Pick normal component for free-orientation inverses"),
+                      settingsGroup);
+    pickNormalCheckBox->setChecked(settings.value("MainWindow/SourceEstimate/pickNormal", false).toBool());
+
+    settingsLayout->addRow(QStringLiteral("Method"), methodComboBox);
+    settingsLayout->addRow(QStringLiteral("SNR"), snrSpinBox);
+    settingsLayout->addRow(pickNormalCheckBox);
+    mainLayout->addWidget(settingsGroup);
+
+    QGroupBox* outputGroup = new QGroupBox(QStringLiteral("Output"), &dialog);
+    QVBoxLayout* outputLayout = new QVBoxLayout(outputGroup);
+
+    QLabel* outputHint = new QLabel(QStringLiteral("Each selected evoked set is exported beside the chosen directory "
+                                                   "using `<dataset>_<condition>_<method>-lh.stc` and `...-rh.stc` "
+                                                   "when hemisphere splitting is available."),
+                                    outputGroup);
+    outputHint->setWordWrap(true);
+    outputLayout->addWidget(outputHint);
+
+    QHBoxLayout* directoryLayout = new QHBoxLayout();
+    QLineEdit* outputDirectoryEdit = new QLineEdit(outputDirectory, outputGroup);
+    QPushButton* browseButton = new QPushButton(QStringLiteral("Browse..."), outputGroup);
+    directoryLayout->addWidget(outputDirectoryEdit, 1);
+    directoryLayout->addWidget(browseButton);
+    outputLayout->addLayout(directoryLayout);
+    mainLayout->addWidget(outputGroup);
+
+    QObject::connect(browseButton, &QPushButton::clicked, &dialog, [&dialog, outputDirectoryEdit]() {
+        const QString directory = QFileDialog::getExistingDirectory(&dialog,
+                                                                    QStringLiteral("Select output directory"),
+                                                                    outputDirectoryEdit->text());
+        if(!directory.isEmpty()) {
+            outputDirectoryEdit->setText(directory);
+        }
+    });
+
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                                                       Qt::Horizontal,
+                                                       &dialog);
+    QObject::connect(buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    QObject::connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    mainLayout->addWidget(buttonBox);
+
+    if(dialog.exec() != QDialog::Accepted) {
+        return false;
+    }
+
+    outputDirectory = outputDirectoryEdit->text().trimmed();
+    if(outputDirectory.isEmpty()) {
+        QMessageBox::warning(parent,
+                             QStringLiteral("Compute Source Estimate"),
+                             QStringLiteral("Choose an output directory for the exported source estimates."));
+        return false;
+    }
+
+    settings.setValue("MainWindow/SourceEstimate/method", methodComboBox->currentText());
+    settings.setValue("MainWindow/SourceEstimate/snr", snrSpinBox->value());
+    settings.setValue("MainWindow/SourceEstimate/pickNormal", pickNormalCheckBox->isChecked());
+    settings.setValue("MainWindow/SourceEstimate/outputDirectory", outputDirectory);
+
+    method = methodComboBox->currentText();
+    snr = snrSpinBox->value();
+    pickNormal = pickNormalCheckBox->isChecked();
 
     return true;
 }
@@ -996,6 +1333,9 @@ void MainWindow::createToolBar()
 
 void MainWindow::connectMenus()
 {
+    QAction* loadInverseOperatorAction = new QAction(tr("Load Inverse Operator..."), this);
+    ui->menuTest->insertAction(ui->m_loadEvokedAction, loadInverseOperatorAction);
+
     QAction* loadCovarianceAction = new QAction(tr("Load Covariance..."), this);
     ui->menuTest->insertAction(ui->m_loadEvokedAction, loadCovarianceAction);
 
@@ -1013,6 +1353,9 @@ void MainWindow::connectMenus()
 
     QAction* saveEvokedAction = new QAction(tr("Save Evoked (fif)..."), this);
     ui->menuTest->insertAction(ui->m_quitAction, saveEvokedAction);
+
+    QAction* computeSourceEstimateAction = new QAction(tr("Compute Source Estimate..."), this);
+    ui->menuTest->insertAction(ui->m_quitAction, computeSourceEstimateAction);
 
     QAction* loadAnnotationsAction = new QAction(tr("Load Annotations..."), this);
     ui->menuTest->insertAction(ui->m_loadEvokedAction, loadAnnotationsAction);
@@ -1052,6 +1395,7 @@ void MainWindow::connectMenus()
     connect(ui->m_writeAction, &QAction::triggered, this, &MainWindow::writeFile);
     connect(ui->m_loadEvents, &QAction::triggered, this, &MainWindow::loadEvents);
     connect(ui->m_saveEvents, &QAction::triggered, this, &MainWindow::saveEvents);
+    connect(loadInverseOperatorAction, &QAction::triggered, this, &MainWindow::loadInverseOperator);
     connect(loadAnnotationsAction, &QAction::triggered, this, &MainWindow::loadAnnotations);
     connect(saveAnnotationsAction, &QAction::triggered, this, &MainWindow::saveAnnotations);
     connect(loadVirtualChannelsAction, &QAction::triggered, this, &MainWindow::loadVirtualChannels);
@@ -1063,6 +1407,7 @@ void MainWindow::connectMenus()
     connect(recomputeEvokedAction, &QAction::triggered, this, &MainWindow::recomputeEvoked);
     connect(ui->m_loadEvokedAction, &QAction::triggered, this, &MainWindow::loadEvoked);
     connect(saveEvokedAction, &QAction::triggered, this, &MainWindow::saveEvoked);
+    connect(computeSourceEstimateAction, &QAction::triggered, this, &MainWindow::computeSourceEstimate);
     connect(m_pWhitenButterflyAction, &QAction::toggled, this, [this](bool checked){
         if(checked && m_covariance.isEmpty()) {
             QMessageBox::warning(this,
@@ -1235,6 +1580,18 @@ void MainWindow::setWindowStatus()
         }
     } else {
         title.append("  -  No covariance");
+    }
+
+    if(m_inverseOperator.nsource > 0 && !m_inverseOperator.src.isEmpty()) {
+        if(m_qInverseOperatorFile.fileName().isEmpty()) {
+            title.append("  -  Inverse: loaded");
+        } else {
+            int idx = m_qInverseOperatorFile.fileName().lastIndexOf("/");
+            QString filename = m_qInverseOperatorFile.fileName().remove(0,idx+1);
+            title.append(QString("  -  Inverse file: %1").arg(filename));
+        }
+    } else {
+        title.append("  -  No inverse");
     }
 
     if(!m_pStatusLabel) {
@@ -1582,6 +1939,10 @@ bool MainWindow::loadRawFile(const QString& filename)
     if(m_qCovFile.isOpen())
         m_qCovFile.close();
     m_qCovFile.setFileName(QString());
+    if(m_qInverseOperatorFile.isOpen())
+        m_qInverseOperatorFile.close();
+    m_qInverseOperatorFile.setFileName(QString());
+    m_inverseOperator = MNELIB::MNEInverseOperator();
     if(m_qAnnotationFile.isOpen())
         m_qAnnotationFile.close();
     m_qAnnotationFile.setFileName(QString());
@@ -1739,6 +2100,58 @@ bool MainWindow::loadVirtualChannelsFile(const QString& filename, bool showWindo
     }
 
     return ok;
+}
+
+//*************************************************************************************************************
+
+bool MainWindow::loadInverseOperatorFile(const QString& filename)
+{
+    QFile inverseOperatorFile(filename);
+    MNELIB::MNEInverseOperator inverseOperator;
+
+    if(!MNELIB::MNEInverseOperator::read_inverse_operator(inverseOperatorFile, inverseOperator)
+       || inverseOperator.nsource <= 0
+       || inverseOperator.src.isEmpty()) {
+        QMessageBox::warning(this,
+                             QStringLiteral("Load Inverse Operator"),
+                             QStringLiteral("Could not load an inverse operator from %1.").arg(filename));
+        return false;
+    }
+
+    if(m_qInverseOperatorFile.isOpen()) {
+        m_qInverseOperatorFile.close();
+    }
+
+    m_qInverseOperatorFile.setFileName(filename);
+    m_inverseOperator = inverseOperator;
+
+    setWindowStatus();
+    statusBar()->showMessage(QStringLiteral("Loaded inverse operator from %1.")
+                                 .arg(QFileInfo(filename).fileName()),
+                             4000);
+    return true;
+}
+
+//*************************************************************************************************************
+
+void MainWindow::loadInverseOperator()
+{
+    const QString defaultDirectory = !m_qInverseOperatorFile.fileName().isEmpty()
+        ? QFileInfo(m_qInverseOperatorFile.fileName()).absolutePath()
+        : !m_qFileRaw.fileName().isEmpty()
+            ? QFileInfo(m_qFileRaw.fileName()).absolutePath()
+            : QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/");
+
+    const QString filename = QFileDialog::getOpenFileName(this,
+                                                          QStringLiteral("Open inverse-operator file"),
+                                                          defaultDirectory,
+                                                          tr("fif inverse-operator files (*-inv.fif);;fif data files (*.fif)"));
+
+    if(filename.isEmpty()) {
+        return;
+    }
+
+    loadInverseOperatorFile(filename);
 }
 
 //*************************************************************************************************************
@@ -2112,6 +2525,207 @@ void MainWindow::saveEvoked()
                              "Save Evoked",
                              QString("Could not save evoked data to %1.").arg(filename));
     }
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::computeSourceEstimate()
+{
+    AverageModel* averageModel = m_pAverageWindow->getAverageModel();
+    if(!averageModel || !averageModel->isFileLoaded()) {
+        QMessageBox::warning(this,
+                             QStringLiteral("Compute Source Estimate"),
+                             QStringLiteral("Load or compute an evoked response before exporting source estimates."));
+        return;
+    }
+
+    if(m_inverseOperator.nsource <= 0 || m_inverseOperator.src.isEmpty()) {
+        const QMessageBox::StandardButton answer =
+            QMessageBox::question(this,
+                                  QStringLiteral("Compute Source Estimate"),
+                                  QStringLiteral("No inverse operator is loaded yet. Do you want to load one now?"),
+                                  QMessageBox::Yes | QMessageBox::No,
+                                  QMessageBox::Yes);
+        if(answer != QMessageBox::Yes) {
+            return;
+        }
+
+        loadInverseOperator();
+        if(m_inverseOperator.nsource <= 0 || m_inverseOperator.src.isEmpty()) {
+            return;
+        }
+    }
+
+    QList<int> selectedRows = m_pAverageWindow->selectedSetRows();
+    if(selectedRows.isEmpty()) {
+        for(int row = 0; row < averageModel->rowCount(); ++row) {
+            selectedRows.append(row);
+        }
+    }
+
+    QStringList selectedComments;
+    for(int row : selectedRows) {
+        const FIFFLIB::FiffEvoked* evoked = averageModel->getEvoked(row);
+        if(!evoked) {
+            continue;
+        }
+
+        const QString comment = evoked->comment.trimmed().isEmpty()
+            ? QStringLiteral("set_%1").arg(row + 1)
+            : evoked->comment.trimmed();
+        selectedComments.append(comment);
+    }
+
+    if(selectedComments.isEmpty()) {
+        QMessageBox::warning(this,
+                             QStringLiteral("Compute Source Estimate"),
+                             QStringLiteral("Select at least one valid evoked set."));
+        return;
+    }
+
+    QString method = m_qSettings.value("MainWindow/SourceEstimate/method",
+                                       QStringLiteral("dSPM")).toString();
+    double snr = m_qSettings.value("MainWindow/SourceEstimate/snr", 3.0).toDouble();
+    bool pickNormal = m_qSettings.value("MainWindow/SourceEstimate/pickNormal", false).toBool();
+    QString outputDirectory = defaultSourceEstimateDirectory(m_qSettings,
+                                                             m_qFileRaw.fileName(),
+                                                             m_qEvokedFile.fileName(),
+                                                             m_qInverseOperatorFile.fileName());
+
+    const QString inverseDescription = QStringLiteral("Inverse operator: %1 (%2 sources, %3 channels).")
+        .arg(m_qInverseOperatorFile.fileName().isEmpty()
+                 ? QStringLiteral("loaded in memory")
+                 : QFileInfo(m_qInverseOperatorFile.fileName()).fileName())
+        .arg(m_inverseOperator.nsource)
+        .arg(m_inverseOperator.nchan);
+
+    if(!showComputeSourceEstimateDialog(this,
+                                        m_qSettings,
+                                        inverseDescription,
+                                        selectedComments,
+                                        method,
+                                        snr,
+                                        pickNormal,
+                                        outputDirectory)) {
+        return;
+    }
+
+    QDir outputDir(outputDirectory);
+    if(!outputDir.exists() && !QDir().mkpath(outputDirectory)) {
+        QMessageBox::warning(this,
+                             QStringLiteral("Compute Source Estimate"),
+                             QStringLiteral("Could not create the output directory %1.").arg(outputDirectory));
+        return;
+    }
+
+    const float lambda2 = static_cast<float>(1.0 / (snr * snr));
+    const QString datasetStem = defaultSourceEstimateStem(m_qFileRaw.fileName(),
+                                                          m_qEvokedFile.fileName(),
+                                                          m_qInverseOperatorFile.fileName());
+
+    QStringList writtenFiles;
+    QStringList failedSets;
+    QSet<QString> usedStems;
+
+    QApplication::setOverrideCursor(Qt::BusyCursor);
+    qApp->processEvents();
+
+    for(int row : selectedRows) {
+        const FIFFLIB::FiffEvoked* evoked = averageModel->getEvoked(row);
+        if(!evoked) {
+            continue;
+        }
+
+        const QString comment = evoked->comment.trimmed().isEmpty()
+            ? QStringLiteral("set_%1").arg(row + 1)
+            : evoked->comment.trimmed();
+
+        INVLIB::InvMinimumNorm minimumNorm(m_inverseOperator, lambda2, method);
+        INVLIB::InvSourceEstimate sourceEstimate = minimumNorm.calculateInverse(*evoked, pickNormal);
+
+        if(sourceEstimate.isEmpty()) {
+            failedSets.append(comment);
+            continue;
+        }
+
+        sourceEstimate.method = estimateMethodFromString(method);
+        sourceEstimate.orientationType = orientationTypeFromInverse(m_inverseOperator);
+
+        const QString commentToken = sanitizeFileToken(comment, QStringLiteral("set_%1").arg(row + 1));
+        const QString methodToken = sanitizeFileToken(method, QStringLiteral("dspm"));
+        const QString stem = uniqueStem(QStringLiteral("%1_%2_%3")
+                                            .arg(datasetStem)
+                                            .arg(commentToken)
+                                            .arg(methodToken),
+                                        usedStems);
+
+        INVLIB::InvSourceEstimate leftHemisphere;
+        INVLIB::InvSourceEstimate rightHemisphere;
+        if(splitSourceEstimateByHemisphere(sourceEstimate,
+                                           m_inverseOperator,
+                                           leftHemisphere,
+                                           rightHemisphere)) {
+            const QString leftPath = outputDir.filePath(stem + QStringLiteral("-lh.stc"));
+            const QString rightPath = outputDir.filePath(stem + QStringLiteral("-rh.stc"));
+
+            QFile leftFile(leftPath);
+            QFile rightFile(rightPath);
+
+            if(!leftHemisphere.write(leftFile) || !rightHemisphere.write(rightFile)) {
+                failedSets.append(comment);
+                continue;
+            }
+
+            writtenFiles << leftPath << rightPath;
+        } else {
+            const QString outputPath = outputDir.filePath(stem + QStringLiteral(".stc"));
+            QFile outputFile(outputPath);
+            if(!sourceEstimate.write(outputFile)) {
+                failedSets.append(comment);
+                continue;
+            }
+
+            writtenFiles << outputPath;
+        }
+    }
+
+    QApplication::restoreOverrideCursor();
+
+    if(writtenFiles.isEmpty()) {
+        QMessageBox::warning(this,
+                             QStringLiteral("Compute Source Estimate"),
+                             QStringLiteral("No source estimates could be exported. Check that the selected evoked sets match the inverse operator channels."));
+        return;
+    }
+
+    QStringList previewFiles;
+    const int previewCount = std::min(4, static_cast<int>(writtenFiles.size()));
+    for(int index = 0; index < previewCount; ++index) {
+        previewFiles.append(QFileInfo(writtenFiles.at(index)).fileName());
+    }
+
+    QString resultText = QStringLiteral("Exported %1 source-estimate file(s) to %2.")
+        .arg(writtenFiles.size())
+        .arg(outputDirectory);
+
+    if(!previewFiles.isEmpty()) {
+        resultText += QStringLiteral("\n\n%1").arg(previewFiles.join(QStringLiteral("\n")));
+        if(writtenFiles.size() > previewFiles.size()) {
+            resultText += QStringLiteral("\n...");
+        }
+    }
+
+    if(!failedSets.isEmpty()) {
+        resultText += QStringLiteral("\n\nFailed for: %1").arg(failedSets.join(QStringLiteral(", ")));
+    }
+
+    QMessageBox::information(this,
+                             QStringLiteral("Compute Source Estimate"),
+                             resultText);
+    statusBar()->showMessage(QStringLiteral("Exported %1 source-estimate file(s).")
+                                 .arg(writtenFiles.size()),
+                             4000);
 }
 
 
