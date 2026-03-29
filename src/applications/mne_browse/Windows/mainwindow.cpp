@@ -108,6 +108,23 @@ QString defaultAnnotationFilePath(const QString& rawFilePath)
     return rawFilePath + "-annot.json";
 }
 
+QStringList defaultAnnotationCandidatePaths(const QString& rawFilePath)
+{
+    const QString defaultJsonPath = defaultAnnotationFilePath(rawFilePath);
+    if(defaultJsonPath.isEmpty()) {
+        return {};
+    }
+
+    QString basePath = defaultJsonPath;
+    if(basePath.endsWith(QStringLiteral(".json"), Qt::CaseInsensitive)) {
+        basePath.chop(5);
+    }
+
+    return {defaultJsonPath,
+            basePath + QStringLiteral(".csv"),
+            basePath + QStringLiteral(".txt")};
+}
+
 QString defaultVirtualChannelFilePath(const QString& rawFilePath)
 {
     if(rawFilePath.isEmpty()) {
@@ -1436,7 +1453,7 @@ void MainWindow::loadAnnotations()
     QString filename = QFileDialog::getOpenFileName(this,
                                                     QString("Open annotation file"),
                                                     QFileInfo(defaultAnnotationFilePath(m_qFileRaw.fileName())).absolutePath(),
-                                                    tr("annotation files (*-annot.json *.json)"));
+                                                    tr("annotation files (*-annot.json *.json *.csv *.txt)"));
 
     if(filename.isEmpty()) {
         return;
@@ -1464,7 +1481,7 @@ void MainWindow::saveAnnotations()
     QString filename = QFileDialog::getSaveFileName(this,
                                                     QString("Save annotation file"),
                                                     defaultPath,
-                                                    tr("annotation files (*-annot.json *.json)"));
+                                                    tr("annotation files (*-annot.json *.json *.csv *.txt)"));
 
     if(filename.isEmpty()) {
         return;
@@ -1597,9 +1614,12 @@ bool MainWindow::loadRawFile(const QString& filename)
                                  m_pDataWindow->lastSample());
 
     if (ok) {
-        const QString defaultAnnotationPath = defaultAnnotationFilePath(filename);
-        if(QFileInfo::exists(defaultAnnotationPath)) {
-            loadAnnotationsFile(defaultAnnotationPath, false);
+        const QStringList annotationCandidates = defaultAnnotationCandidatePaths(filename);
+        for(const QString& annotationCandidate : annotationCandidates) {
+            if(QFileInfo::exists(annotationCandidate)) {
+                loadAnnotationsFile(annotationCandidate, false);
+                break;
+            }
         }
 
         const QString defaultVirtualChannelPath = defaultVirtualChannelFilePath(filename);
@@ -1732,7 +1752,7 @@ void MainWindow::handleAnnotationRangeSelected(int startSample, int endSample)
     bool accepted = false;
     QString label = QInputDialog::getText(this,
                                           QStringLiteral("Add Annotation"),
-                                          QStringLiteral("Annotation label"),
+                                          QStringLiteral("Annotation description"),
                                           QLineEdit::Normal,
                                           defaultLabel,
                                           &accepted).trimmed();

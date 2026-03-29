@@ -20,6 +20,8 @@
 #include <QColor>
 #include <QFile>
 #include <QPair>
+#include <QStringList>
+#include <QVariantMap>
 #include <QVector>
 
 #include <fiff/fiff.h>
@@ -38,6 +40,8 @@ struct AnnotationSpanData {
     int     endSample   = 0;
     QColor  color;
     QString label;
+    QString comment;
+    QStringList channelNames;
 };
 
 //=============================================================================================================
@@ -63,7 +67,11 @@ public:
     void setFiffInfo(const FIFFLIB::FiffInfo::SPtr& pFiffInfo);
     void setFirstLastSample(int firstSample, int lastSample);
 
-    int addAnnotation(int startSample, int endSample, const QString& label);
+    int addAnnotation(int startSample,
+                      int endSample,
+                      const QString& description,
+                      const QStringList& channelNames = QStringList(),
+                      const QString& comment = QString());
     QPair<int, int> getSampleRange(int row) const;
     QVector<AnnotationSpanData> getAnnotationSpans() const;
 
@@ -80,12 +88,31 @@ private:
     struct AnnotationEntry {
         int     startSample = 0;
         int     endSample   = 0;
-        QString label;
+        QString description;
+        QStringList channelNames;
+        QString comment;
+        QVariantMap extras;
     };
 
-    AnnotationEntry normalizeEntry(int startSample, int endSample, const QString& label) const;
+    bool loadAnnotationJson(QFile& qFile);
+    bool loadAnnotationCsv(QFile& qFile);
+    bool loadAnnotationTxt(QFile& qFile);
+    bool saveAnnotationJson(QFile& qFile) const;
+    bool saveAnnotationCsv(QFile& qFile) const;
+    bool saveAnnotationTxt(QFile& qFile) const;
+
+    AnnotationEntry normalizeEntry(int startSample,
+                                   int endSample,
+                                   const QString& description,
+                                   const QStringList& channelNames = QStringList(),
+                                   const QString& comment = QString(),
+                                   const QVariantMap& extras = QVariantMap()) const;
+    double sampleToOnsetSeconds(int sample) const;
+    int onsetSecondsToSample(double onsetSeconds) const;
+    int durationSecondsToSamples(double durationSeconds) const;
+    qint64 measurementStartUsecsSinceEpoch(bool *ok = nullptr) const;
     void sortEntries();
-    QColor colorForLabel(const QString& label) const;
+    QColor colorForLabel(const QString& description) const;
     void notifyAnnotationsChanged();
 
     QVector<AnnotationEntry>  m_annotations;
