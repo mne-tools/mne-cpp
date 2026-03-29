@@ -1,105 +1,165 @@
 /*
  * MNE-CPP Installer Stylesheet
  *
- * Matches the mne-cpp.github.io website design.
- * Only styles non-interactive visual elements to preserve
- * native macOS button and control appearance.
- *
- *   Primary:    #6c5ce7  (purple)
- *   Background: #f8f9fc
- *   Surface:    #ffffff
- *   Text:       #1a1a2e
- *   Muted:      #636e72
- *   Navbar:     #1a1a2e → #16213e
+ * The installer keeps native controls where possible, but adds a cohesive
+ * visual language around the custom variant, download, and installation
+ * status panels.
  */
 
-
-/* ── All labels: allow word wrap so disk-space info doesn't clip ── */
+QWidget {
+    color: #102a43;
+}
 
 QLabel {
     qproperty-wordWrap: true;
 }
 
+QFrame#MneHeroCard,
+QFrame#MneOptionPanel {
+    background: #ffffff;
+    border: 1px solid #d9e2ec;
+    border-radius: 18px;
+}
 
-/* ── Progress bar (branded purple gradient) ─────────────────────── */
+QFrame#MneHeroCard {
+    padding: 12px;
+}
+
+QFrame#MneOptionPanel {
+    padding: 10px;
+}
+
+QLabel#MneKicker {
+    color: #0f766e;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+QLabel#MneTitle {
+    color: #102a43;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+QLabel#MneBody {
+    color: #486581;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+QLabel#MneDetail {
+    color: #627d98;
+    font-size: 12px;
+}
+
+QLabel#MneMetric {
+    color: #0b7285;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+QLabel#MneStatusText {
+    color: #102a43;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+QLabel#MneStepItem {
+    color: #627d98;
+    font-size: 12px;
+    padding: 2px 0;
+}
+
+QLabel#MneStepItem[state="active"] {
+    color: #0f766e;
+    font-weight: 600;
+}
+
+QLabel#MneStepItem[state="done"] {
+    color: #0b7285;
+    font-weight: 600;
+}
+
+QLabel#MneStepItem[state="error"] {
+    color: #b42318;
+    font-weight: 600;
+}
 
 QProgressBar {
-    background-color: #eef0f6;
+    background-color: #e8f1f2;
     border: none;
-    border-radius: 5px;
-    height: 8px;
+    border-radius: 8px;
+    min-height: 12px;
     text-align: center;
     font-size: 11px;
-    color: #636e72;
+    color: #486581;
+}
+
+QProgressBar#MneDownloadProgress {
+    min-height: 14px;
 }
 
 QProgressBar::chunk {
     background: qlineargradient(
         x1: 0, y1: 0, x2: 1, y2: 0,
-        stop: 0 #6c5ce7,
-        stop: 1 #a49af5
+        stop: 0 #0f766e,
+        stop: 1 #2cb1bc
     );
-    border-radius: 5px;
+    border-radius: 8px;
 }
-
-
-/* ── Tree view (component selection) ────────────────────────────── */
 
 QTreeView, QTreeWidget {
     background-color: #ffffff;
-    alternate-background-color: #fafbfd;
+    alternate-background-color: #f8fbfc;
     outline: none;
+    border: 1px solid #d9e2ec;
+    border-radius: 12px;
 }
 
 QTreeView::item {
-    padding: 4px 2px;
+    padding: 5px 4px;
 }
 
 QTreeView::item:hover {
-    background-color: rgba(108, 92, 231, 0.06);
+    background-color: rgba(15, 118, 110, 0.08);
 }
 
 QTreeView::item:selected {
-    background-color: rgba(108, 92, 231, 0.12);
-    color: #1a1a2e;
+    background-color: rgba(15, 118, 110, 0.14);
+    color: #102a43;
 }
 
 QHeaderView::section {
-    background-color: #f0f2f7;
+    background-color: #f0f4f8;
     border: none;
-    border-bottom: 1px solid #e0e4ea;
-    padding: 5px 8px;
+    border-bottom: 1px solid #d9e2ec;
+    padding: 6px 8px;
     font-weight: 600;
     font-size: 12px;
-    color: #636e72;
+    color: #486581;
 }
-
-
-/* ── Text browser (license text, install log) ───────────────────── */
 
 QTextBrowser, QTextEdit {
     background-color: #ffffff;
     padding: 10px;
     font-size: 12px;
-    color: #2d3436;
-    selection-background-color: rgba(108, 92, 231, 0.2);
+    color: #243b53;
+    border: 1px solid #d9e2ec;
+    border-radius: 12px;
+    selection-background-color: rgba(15, 118, 110, 0.18);
 }
-
-
-/* ── Group box titles ───────────────────────────────────────────── */
 
 QGroupBox::title {
-    color: #6c5ce7;
+    color: #0f766e;
 }
 
-
-/* ── Tooltips ───────────────────────────────────────────────────── */
-
 QToolTip {
-    background-color: #1a1a2e;
+    background-color: #102a43;
     color: #ffffff;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 6px 10px;
     font-size: 12px;
 }

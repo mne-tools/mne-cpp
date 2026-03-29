@@ -1,7 +1,7 @@
-// controlscript.qs — MNE-CPP Installer control script
+// controlscript.qs - MNE-CPP Installer control script
 //
 // This script customizes the installer wizard behaviour and enables
-// headless (non-interactive) installation for CLI-only use:
+// headless (non-interactive) bootstrap installs:
 //
 //   ./MNE-CPP-Installer --script controlscript.qs
 //
@@ -11,10 +11,12 @@
 //
 // The installer supports these environment-variable overrides:
 //
-//   MNE_CPP_INSTALL_DIR   — Override the target directory
+//   MNE_CPP_INSTALL_DIR   - Override the target directory
 //                            (default: ~/MNE-CPP)
-//   MNE_CPP_CLI_ONLY      — Set to "1" to install only CLI tools
-//                            (skips GUI apps, SDK, sample data, MNE-Python)
+//   MNE_CPP_VARIANT       - Select "dynamic" or "static"
+//                            (default: dynamic)
+//   MNE_CPP_CLI_ONLY      - Set to "1" to skip desktop integration and
+//                            optional add-ons during headless installs
 
 function Controller()
 {
@@ -40,6 +42,21 @@ Controller.prototype.TargetDirectoryPageCallback = function()
     gui.clickButton(buttons.NextButton);
 }
 
+Controller.prototype.BinaryVariantPageCallback = function()
+{
+    var page = gui.currentPageWidget();
+    var variant = installer.environmentVariable("MNE_CPP_VARIANT");
+
+    if (page && variant === "static") {
+        var radioStatic = page.findChild("radioStatic");
+        if (radioStatic) {
+            radioStatic.checked = true;
+        }
+    }
+
+    gui.clickButton(buttons.NextButton);
+}
+
 Controller.prototype.ComponentSelectionPageCallback = function()
 {
     var page = gui.currentPageWidget();
@@ -49,9 +66,8 @@ Controller.prototype.ComponentSelectionPageCallback = function()
         // Deselect everything first
         page.deselectAll();
 
-        // Select only CLI tools and PATH configuration
-        page.selectComponent("org.mnecpp.cli");
-        page.selectComponent("org.mnecpp.runtime");
+        // Select only the core payload and PATH configuration.
+        page.selectComponent("org.mnecpp.core");
         page.selectComponent("org.mnecpp.pathconfig");
     }
 

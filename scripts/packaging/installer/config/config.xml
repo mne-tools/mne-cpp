@@ -8,7 +8,7 @@
 
   The directory layout mirrors Qt's own installation structure:
       ~/MNE-CPP/
-      ├── 2.0.0/
+      ├── @MNE_CPP_VERSION@/
       │   ├── bin/
       │   ├── lib/
       │   └── include/
@@ -18,7 +18,7 @@
 -->
 <Installer>
     <Name>MNE-CPP</Name>
-    <Version>2.0.0</Version>
+    <Version>@MNE_CPP_VERSION@</Version>
     <Title>MNE-CPP Installer</Title>
     <Publisher>MNE-CPP Developers</Publisher>
     <StartMenuDir>MNE-CPP</StartMenuDir>
@@ -48,7 +48,7 @@
     <ControlScript>uiscript.qs</ControlScript>
 
     <!--
-      For headless CLI-only installs, run the installer binary with
+      For headless bootstrap installs, run the installer binary with
       the controlscript.qs file passed via the script flag.
     -->
 </Installer>
