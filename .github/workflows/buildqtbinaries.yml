@@ -14,8 +14,9 @@ env:
   QT_BINARY_RELEASE_NOTES: Reusable Qt runtime, static, WASM and Installer Framework assets for CI.
   QT_MIN_VERSION: '6.10.0'
   QT_MAX_VERSION: '6.11.0'
-  QIF_VERSION: '4.7'
-  QIF_TOOL_ID: 'qt.tools.ifw.47'
+  QIF_VERSION: '4.11.0'
+  QIF_VERSION_TOKEN: '4110'
+  QIF_QT_VERSION: '6.9.1'
 
 jobs:
   GenerateLinuxDynamicBinaries:
@@ -179,30 +180,86 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v5
-    - name: Install Python 3.10 version
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.10'
-        architecture: 'x64'
-    - name: Download Qt Installer Framework
+    - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install aqtinstall
-        aqt install-tool linux desktop tools_ifw ${{ env.QIF_TOOL_ID }} --outputdir "$RUNNER_TOOL_CACHE/Qt"
+        sudo apt-get update -q
+        sudo apt-get install -q \
+          build-essential \
+          ninja-build \
+          zlib1g-dev \
+          liblzma-dev \
+          libbz2-dev
+    - name: Build Qt Installer Framework
+      run: |
+        WORK_ROOT="$(cd .. && pwd)"
+
+        cd "${WORK_ROOT}"
+        "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 git clone --depth 1 https://code.qt.io/qt/qt5.git -b v${{ env.QIF_QT_VERSION }}
+        cd qt5
+        "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 ./init-repository -f --module-subset=qt5compat,qtbase,qtdeclarative,qttools,qttranslations
+
+        cd "${WORK_ROOT}"
+        mkdir qtifw_qt_build
+        cd qtifw_qt_build
+        ../qt5/configure \
+          -prefix "${WORK_ROOT}/QtIfwQt" \
+          -release \
+          -static \
+          -accessibility \
+          -qt-zlib \
+          -qt-libpng \
+          -qt-libjpeg \
+          -qt-pcre \
+          -no-glib \
+          -no-cups \
+          -no-sql-sqlite \
+          -no-feature-gssapi \
+          -no-qml-debug \
+          -no-opengl \
+          -no-egl \
+          -no-sm \
+          -no-icu \
+          -nomake examples \
+          -nomake tests \
+          -no-libudev \
+          -bundled-xcb-xinput \
+          -qt-harfbuzz \
+          -qt-doubleconversion \
+          -no-openssl \
+          -opensource \
+          -confirm-license \
+          -- -DCMAKE_BUILD_TYPE=Release
+        cmake --build . --parallel "$(nproc)"
+        cmake --install .
+
+        cd "${WORK_ROOT}"
+        "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 curl -fsSLO "https://download.qt.io/official_releases/qt-installer-framework/${{ env.QIF_VERSION }}/installer-framework-everywhere-src-${{ env.QIF_VERSION }}.tar.xz"
+        tar xf "installer-framework-everywhere-src-${{ env.QIF_VERSION }}.tar.xz"
+
+        mkdir ifw_build
+        cd ifw_build
+        "${WORK_ROOT}/QtIfwQt/bin/qmake" "../installer-framework-everywhere-src-${{ env.QIF_VERSION }}/installerfw.pro"
+        make -j"$(nproc)"
     - name: Package binaries
       run: |
-        tar cfvz "qt_ifw_47_linux.tar.gz" -C "$RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/${{ env.QIF_VERSION }}" .
+        WORK_ROOT="$(cd .. && pwd)"
+        PACKAGE_ROOT="${WORK_ROOT}/ifw_package"
+        rm -rf "${PACKAGE_ROOT}"
+        mkdir -p "${PACKAGE_ROOT}"
+        cp -R "${WORK_ROOT}/ifw_build/bin" "${PACKAGE_ROOT}/bin"
+        cp -R "${WORK_ROOT}/ifw_build/lib" "${PACKAGE_ROOT}/lib"
+        tar cfvz "qt_ifw_${{ env.QIF_VERSION_TOKEN }}_linux.tar.gz" -C "${PACKAGE_ROOT}" .
     - uses: actions/upload-artifact@v7
       with:
-        name: qt_ifw_47_linux.tar.gz
-        path: qt_ifw_47_linux.tar.gz
+        name: qt_ifw_${{ env.QIF_VERSION_TOKEN }}_linux.tar.gz
+        path: qt_ifw_${{ env.QIF_VERSION_TOKEN }}_linux.tar.gz
     - name: Upload to toolchain release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
       run: |
         bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
-        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt_ifw_47_linux.tar.gz --clobber
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt_ifw_${{ env.QIF_VERSION_TOKEN }}_linux.tar.gz" --clobber
 
   GenerateMacOSInstallerFramework:
     runs-on: macos-26
@@ -210,30 +267,70 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v5
-    - name: Install Python 3.10 version
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.10'
-        architecture: 'arm64'
-    - name: Download Qt Installer Framework
+    - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install aqtinstall
-        aqt install-tool mac desktop tools_ifw ${{ env.QIF_TOOL_ID }} --outputdir "$RUNNER_TOOL_CACHE/Qt"
+        brew list ninja >/dev/null 2>&1 || brew install ninja
+        brew list xz >/dev/null 2>&1 || brew install xz
+    - name: Build Qt Installer Framework
+      run: |
+        WORK_ROOT="$(cd .. && pwd)"
+
+        cd "${WORK_ROOT}"
+        "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 git clone --depth 1 https://code.qt.io/qt/qt5.git -b v${{ env.QIF_QT_VERSION }}
+        cd qt5
+        "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 ./init-repository -f --module-subset=qt5compat,qtbase,qtdeclarative,qttools,qttranslations
+
+        cd "${WORK_ROOT}"
+        mkdir qtifw_qt_build
+        cd qtifw_qt_build
+        ../qt5/configure \
+          -prefix "${WORK_ROOT}/QtIfwQt" \
+          -release \
+          -static \
+          -accessibility \
+          -qt-zlib \
+          -qt-libpng \
+          -no-cups \
+          -no-sql-sqlite \
+          -no-qml-debug \
+          -nomake examples \
+          -nomake tests \
+          -no-freetype \
+          -no-openssl \
+          -opensource \
+          -confirm-license \
+          -- -DCMAKE_BUILD_TYPE=Release
+        cmake --build . --parallel "$(sysctl -n hw.ncpu)"
+        cmake --install .
+
+        cd "${WORK_ROOT}"
+        "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 curl -fsSLO "https://download.qt.io/official_releases/qt-installer-framework/${{ env.QIF_VERSION }}/installer-framework-everywhere-src-${{ env.QIF_VERSION }}.tar.xz"
+        tar xf "installer-framework-everywhere-src-${{ env.QIF_VERSION }}.tar.xz"
+
+        mkdir ifw_build
+        cd ifw_build
+        "${WORK_ROOT}/QtIfwQt/bin/qmake" "../installer-framework-everywhere-src-${{ env.QIF_VERSION }}/installerfw.pro"
+        make -j"$(sysctl -n hw.ncpu)"
     - name: Package binaries
       run: |
-        tar cfvz "qt_ifw_47_macos.tar.gz" -C "$RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/${{ env.QIF_VERSION }}" .
+        WORK_ROOT="$(cd .. && pwd)"
+        PACKAGE_ROOT="${WORK_ROOT}/ifw_package"
+        rm -rf "${PACKAGE_ROOT}"
+        mkdir -p "${PACKAGE_ROOT}"
+        cp -R "${WORK_ROOT}/ifw_build/bin" "${PACKAGE_ROOT}/bin"
+        cp -R "${WORK_ROOT}/ifw_build/lib" "${PACKAGE_ROOT}/lib"
+        tar cfvz "qt_ifw_${{ env.QIF_VERSION_TOKEN }}_macos.tar.gz" -C "${PACKAGE_ROOT}" .
     - uses: actions/upload-artifact@v7
       with:
-        name: qt_ifw_47_macos.tar.gz
-        path: qt_ifw_47_macos.tar.gz
+        name: qt_ifw_${{ env.QIF_VERSION_TOKEN }}_macos.tar.gz
+        path: qt_ifw_${{ env.QIF_VERSION_TOKEN }}_macos.tar.gz
     - name: Upload to toolchain release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
       run: |
         bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
-        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt_ifw_47_macos.tar.gz --clobber
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt_ifw_${{ env.QIF_VERSION_TOKEN }}_macos.tar.gz" --clobber
 
   GenerateWinInstallerFramework:
     runs-on: windows-2025
@@ -241,32 +338,100 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v5
-    - name: Install Python 3.10 version
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.10'
-        architecture: 'x64'
-    - name: Download Qt Installer Framework
+    - name: Install ninja
       run: |
-        python -m pip install --upgrade pip
-        pip install aqtinstall
-        aqt install-tool windows desktop tools_ifw ${{ env.QIF_TOOL_ID }} --outputdir "$env:RUNNER_TOOL_CACHE\Qt"
+        choco install ninja
+    - name: Install IFW build dependencies
+      shell: pwsh
+      run: |
+        $vcpkgRoot = Join-Path $env:RUNNER_TEMP 'vcpkg'
+        git clone --depth 1 https://github.com/microsoft/vcpkg.git $vcpkgRoot
+        & "$vcpkgRoot\bootstrap-vcpkg.bat"
+        & "$vcpkgRoot\vcpkg.exe" install zlib:x64-windows-static bzip2:x64-windows-static liblzma:x64-windows-static
+        "VCPKG_ROOT=$vcpkgRoot" | Add-Content -Path $env:GITHUB_ENV
+    - name: Build Qt Installer Framework
+      shell: pwsh
+      run: |
+        $workRoot = Resolve-Path (Join-Path $env:GITHUB_WORKSPACE '..')
+        git clone --depth 1 https://code.qt.io/qt/qt5.git -b v${{ env.QIF_QT_VERSION }} (Join-Path $workRoot 'qt5')
+        New-Item -ItemType Directory -Path (Join-Path $workRoot 'qtifw_qt_build') | Out-Null
+        Set-Location (Join-Path $workRoot 'qtifw_qt_build')
+
+        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object {
+          if ($_ -match "^(.*?)=(.*)$") {
+            Set-Content "env:\$($matches[1])" $matches[2]
+          }
+        }
+
+        & (Join-Path $workRoot 'qt5\configure.bat') `
+          -init-submodules `
+          -submodules qt5compat,qtbase,qtdeclarative,qttools,qttranslations `
+          -prefix (Join-Path $workRoot 'QtIfwQt') `
+          -release `
+          -static `
+          -static-runtime `
+          -accessibility `
+          -no-icu `
+          -no-openssl `
+          -no-sql-sqlite `
+          -no-qml-debug `
+          -nomake examples `
+          -nomake tests `
+          -opensource `
+          -confirm-license
+        cmake --build . --parallel $env:NUMBER_OF_PROCESSORS
+        cmake --install .
+
+        $ifwArchive = Join-Path $workRoot 'installer-framework-everywhere-src-${{ env.QIF_VERSION }}.zip'
+        Invoke-WebRequest `
+          -Uri 'https://download.qt.io/official_releases/qt-installer-framework/${{ env.QIF_VERSION }}/installer-framework-everywhere-src-${{ env.QIF_VERSION }}.zip' `
+          -OutFile $ifwArchive
+        Expand-Archive -Path $ifwArchive -DestinationPath $workRoot -Force
+
+        $libRoot = Join-Path $env:VCPKG_ROOT 'installed\x64-windows-static'
+        $env:INCLUDE = "$(Join-Path $libRoot 'include');$env:INCLUDE"
+        $env:LIB = "$(Join-Path $libRoot 'lib');$env:LIB"
+        $zlibLib = (Get-ChildItem -Path (Join-Path $libRoot 'lib') -Filter 'zlib*.lib' | Select-Object -First 1).FullName
+        $bzip2Lib = (Get-ChildItem -Path (Join-Path $libRoot 'lib') -Filter '*bz2*.lib' | Select-Object -First 1).FullName
+        $lzmaLib = (Get-ChildItem -Path (Join-Path $libRoot 'lib') -Filter '*lzma*.lib' | Select-Object -First 1).FullName
+        if (-not $zlibLib -or -not $bzip2Lib -or -not $lzmaLib) {
+          throw 'Failed to resolve one or more IFW compression libraries from vcpkg.'
+        }
+
+        New-Item -ItemType Directory -Path (Join-Path $workRoot 'ifw_build') | Out-Null
+        Set-Location (Join-Path $workRoot 'ifw_build')
+        & (Join-Path $workRoot 'QtIfwQt\bin\qmake.exe') `
+          (Join-Path $workRoot 'installer-framework-everywhere-src-${{ env.QIF_VERSION }}\installerfw.pro') `
+          "IFW_ZLIB_LIBRARY=$zlibLib" `
+          "IFW_BZIP2_LIBRARY=$bzip2Lib" `
+          "IFW_LZMA_LIBRARY=$lzmaLib"
+        nmake /NOLOGO
     - name: Package binaries
+      shell: pwsh
       run: |
-        Push-Location "$env:RUNNER_TOOL_CACHE\Qt\Tools\QtInstallerFramework\${{ env.QIF_VERSION }}"
-        7z a "$env:GITHUB_WORKSPACE\qt_ifw_47_win.zip" .
+        $workRoot = Resolve-Path (Join-Path $env:GITHUB_WORKSPACE '..')
+        $packageRoot = Join-Path $workRoot 'ifw_package'
+        if (Test-Path $packageRoot) {
+          Remove-Item -Path $packageRoot -Recurse -Force
+        }
+        New-Item -ItemType Directory -Path $packageRoot | Out-Null
+        Copy-Item -Path (Join-Path $workRoot 'ifw_build\bin') -Destination (Join-Path $packageRoot 'bin') -Recurse
+        Copy-Item -Path (Join-Path $workRoot 'ifw_build\lib') -Destination (Join-Path $packageRoot 'lib') -Recurse
+        Push-Location $packageRoot
+        7z a "$env:GITHUB_WORKSPACE\qt_ifw_${{ env.QIF_VERSION_TOKEN }}_win.zip" .
         Pop-Location
     - uses: actions/upload-artifact@v7
       with:
-        name: qt_ifw_47_win.zip
-        path: qt_ifw_47_win.zip
+        name: qt_ifw_${{ env.QIF_VERSION_TOKEN }}_win.zip
+        path: qt_ifw_${{ env.QIF_VERSION_TOKEN }}_win.zip
     - name: Upload to toolchain release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
       run: |
         bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
-        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt_ifw_47_win.zip --clobber
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt_ifw_${{ env.QIF_VERSION_TOKEN }}_win.zip" --clobber
 
   GenerateLinuxStaticBinaries:
     runs-on: ubuntu-24.04

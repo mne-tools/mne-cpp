@@ -99,6 +99,8 @@ if ! command -v binarycreator >/dev/null 2>&1; then
     echo "Or set 'QtInstallerFramework_DIR'."
 
     for candidate in \
+        "$HOME/Qt/Tools/QtInstallerFramework/4.11.0/bin" \
+        "/opt/Qt/Tools/QtInstallerFramework/4.11.0/bin" \
         "$HOME/Qt/Tools/QtInstallerFramework/4.7/bin" \
         "/opt/Qt/Tools/QtInstallerFramework/4.7/bin" \
         "${QtInstallerFramework_DIR:-}/bin"; do
