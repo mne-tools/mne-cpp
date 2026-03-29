@@ -276,3 +276,40 @@ jobs:
       run: |
         cp mne-cpp-wasm.tar.gz mne-cpp-dev-wasm.tar.gz
         gh release upload dev_build mne-cpp-dev-wasm.tar.gz --clobber
+
+    - name: Deploy dev WASM to mne-cpp/wasm repository
+      env:
+        GIT_CREDENTIALS: ${{ secrets.GIT_CREDENTIALS }}
+      run: |
+        git config --global user.email christoph.dinh@mne-cpp.org
+        git config --global user.name chdinh
+        git clone "https://${GIT_CREDENTIALS}@github.com/mne-cpp/wasm.git" wasm-repo
+        cd wasm-repo
+
+        deploy_branch_dev_subdir() {
+          local branch="$1"
+
+          if git rev-parse --verify "origin/${branch}" > /dev/null 2>&1; then
+            git checkout "${branch}"
+          else
+            git checkout --orphan "${branch}"
+            git rm -rf --ignore-unmatch .
+            git clean -f -d
+            touch .nojekyll
+          fi
+
+          rm -rf dev
+          mkdir -p dev
+          cp -RT ../out/wasm/bin dev
+          if [ -d "../out/wasm/examples" ]; then
+            mkdir -p dev/examples
+            cp -RT ../out/wasm/examples dev/examples
+          fi
+
+          git add .
+          git commit -m "Update dev wasm builds" --allow-empty
+          git push origin "${branch}"
+        }
+
+        deploy_branch_dev_subdir gh-pages
+        deploy_branch_dev_subdir main
