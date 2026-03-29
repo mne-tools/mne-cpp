@@ -102,17 +102,12 @@
     )
 
     IF NOT [%QtCustomPath]==[] (
-      FOR /D %%s in (!QtCustomPath!\lib\cmake\*) do (
+      SET "CMakeConfigFlags=!CMakeConfigFlags! -DCMAKE_PREFIX_PATH=!QtCustomPath!"
 
-        set LIB_NAME=%%~ns
-        set "CMakeConfigFlags=!CMakeConfigFlags! -D!LIB_NAME!_DIR=%%s"
-
-        IF "!LIB_NAME!"=="Qt5" (
-          set "CMakeConfigFlags=!CMakeConfigFlags! -DQT_DIR=%%s"
-        )
-        IF "!LIB_NAME!"=="Qt6" (
-          set "CMakeConfigFlags=!CMakeConfigFlags! -DQT_DIR=%%s"
-        )
+      IF EXIST "!QtCustomPath!\lib\cmake\Qt6\Qt6Config.cmake" (
+        SET "CMakeConfigFlags=!CMakeConfigFlags! -DQt6_DIR=!QtCustomPath!\lib\cmake\Qt6 -DQT_DIR=!QtCustomPath!\lib\cmake\Qt6"
+      ) ELSE IF EXIST "!QtCustomPath!\lib\cmake\Qt5\Qt5Config.cmake" (
+        SET "CMakeConfigFlags=!CMakeConfigFlags! -DQt5_DIR=!QtCustomPath!\lib\cmake\Qt5 -DQT_DIR=!QtCustomPath!\lib\cmake\Qt5"
       )
     )
 
@@ -400,6 +395,8 @@ doPrintHelp() {
   echo "[--]       - mark beginning of extra-arguments section. any argument"
   echo "             following the double dash will be passed on to cmake"
   echo "             directly without it being parsed."
+  echo "Environment overrides:"
+  echo "  MNE_CPP_BUILD_JOBS / CMAKE_BUILD_PARALLEL_LEVEL can cap parallel jobs."
   echo " "
 }
 
@@ -450,7 +447,11 @@ SourceFolder=${BaseFolder}/src
 BuildFolder=${BaseFolder}/build/${BuildName}
 OutFolder=${BaseFolder}/out/${BuildName}
 
-if [ "$(uname)" == "Darwin" ]; then
+if [ -n "${MNE_CPP_BUILD_JOBS}" ]; then
+  NumProcesses="${MNE_CPP_BUILD_JOBS}"
+elif [ -n "${CMAKE_BUILD_PARALLEL_LEVEL}" ]; then
+  NumProcesses="${CMAKE_BUILD_PARALLEL_LEVEL}"
+elif [ "$(uname)" == "Darwin" ]; then
   NumProcesses=$(sysctl -n hw.logicalcpu)
 else
   NumProcesses=$(expr $(nproc --all))
@@ -476,21 +477,13 @@ else
 fi
 
 if [ -n "${QtCustomPath}" ]; then
-  
-  for d in ${QtCustomPath}/lib/cmake/* ; do
-    d=$(basename ${d})
-    QT_CMAKE_FLAGS="${QT_CMAKE_FLAGS}
-      -D${d}_DIR=${QtCustomPath}/lib/cmake/${d}"
-    if [ "$d" == "Qt5" ]; then
-      QT_CMAKE_FLAGS="${QT_CMAKE_FLAGS}
-        -DQT_DIR=${QtCustomPath}/lib/cmake/${d}"
-    elif [ "$d" == "Qt6" ]; then
-      QT_CMAKE_FLAGS="${QT_CMAKE_FLAGS}
-        -DQT_DIR=${QtCustomPath}/lib/cmake/${d}"
-    fi
-  done
+  CMakeConfigFlags="${CMakeConfigFlags} -DCMAKE_PREFIX_PATH=${QtCustomPath}"
 
-  CMakeConfigFlags="${CMakeConfigFlags} ${QT_CMAKE_FLAGS}"
+  if [ -d "${QtCustomPath}/lib/cmake/Qt6" ]; then
+    CMakeConfigFlags="${CMakeConfigFlags} -DQt6_DIR=${QtCustomPath}/lib/cmake/Qt6 -DQT_DIR=${QtCustomPath}/lib/cmake/Qt6"
+  elif [ -d "${QtCustomPath}/lib/cmake/Qt5" ]; then
+    CMakeConfigFlags="${CMakeConfigFlags} -DQt5_DIR=${QtCustomPath}/lib/cmake/Qt5 -DQT_DIR=${QtCustomPath}/lib/cmake/Qt5"
+  fi
 fi
 
 doPrintConfiguration

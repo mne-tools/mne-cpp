@@ -252,27 +252,32 @@ int main(int argc, char *argv[])
     QList<DigPt> points;
     if (!fifIn.isEmpty()) {
         points = readFifDig(fifIn);
-        fprintf(stderr, "Read %d points from %s\n", points.size(), qPrintable(fifIn));
+        fprintf(stderr, "Read %lld points from %s\n",
+                static_cast<long long>(points.size()),
+                qPrintable(fifIn));
     } else {
         points = readHpts(hptsIn);
-        fprintf(stderr, "Read %d points from %s\n", points.size(), qPrintable(hptsIn));
+        fprintf(stderr, "Read %lld points from %s\n",
+                static_cast<long long>(points.size()),
+                qPrintable(hptsIn));
     }
 
     if (points.isEmpty()) {
         qCritical("No digitization points read.");
         return 1;
     }
+    const auto pointCount = static_cast<long long>(points.size());
 
     // Write output(s)
     if (!fifOut.isEmpty()) {
         if (!writeFifDig(fifOut, points))
             return 1;
-        fprintf(stderr, "Wrote %d points to %s\n", points.size(), qPrintable(fifOut));
+        fprintf(stderr, "Wrote %lld points to %s\n", pointCount, qPrintable(fifOut));
     }
     if (!hptsOut.isEmpty()) {
         if (!writeHpts(hptsOut, points))
             return 1;
-        fprintf(stderr, "Wrote %d points to %s\n", points.size(), qPrintable(hptsOut));
+        fprintf(stderr, "Wrote %lld points to %s\n", pointCount, qPrintable(hptsOut));
     }
 
     fprintf(stderr, "done.\n");

@@ -211,7 +211,7 @@ QString RayPicker::buildLabel(const PickResult &result,
         QString pointName;
         if (result.item && result.vertexIndex >= 0) {
             AbstractTreeItem *abs = dynamic_cast<AbstractTreeItem*>(result.item);
-            if (abs && abs->type() == AbstractTreeItem::DigitizerItem + QStandardItem::UserType) {
+            if (abs && abs->type() == AbstractTreeItem::itemTypeId(AbstractTreeItem::DigitizerItem)) {
                 auto *digItem = static_cast<DigitizerTreeItem*>(abs);
                 constexpr int vertsPerSphere = 42;
                 int ptIdx = result.vertexIndex / vertsPerSphere;

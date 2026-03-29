@@ -30,9 +30,9 @@ Qt 6 is the only external dependency. **Qt 5 is no longer supported.**
    - The compiler target for your platform (e.g., `MSVC 2022 64-bit`, `Desktop gcc 64-bit`, or `macOS`)
    - **Qt Shader Tools** (required)
 3. After installation, add the Qt `bin` folder to your `PATH`:
-   - **Windows:** e.g. `C:\Qt\6.10.2\msvc2022_64\bin`
-   - **Linux:** e.g. `$HOME/Qt/6.10.2/gcc_64/bin` — also add the `lib` folder to `LD_LIBRARY_PATH`
-   - **macOS:** e.g. `$HOME/Qt/6.10.2/macos/bin` — also add the `lib` folder to `DYLD_LIBRARY_PATH`
+   - **Windows:** e.g. `C:\Qt\6.11.0\msvc2022_64\bin`
+   - **Linux:** e.g. `$HOME/Qt/6.11.0/gcc_64/bin` — also add the `lib` folder to `LD_LIBRARY_PATH`
+   - **macOS:** e.g. `$HOME/Qt/6.11.0/macos/bin` — also add the `lib` folder to `DYLD_LIBRARY_PATH`
 
 ## Get the Source Code
 
@@ -115,7 +115,7 @@ cmake --build build --config Release --parallel %NUMBER_OF_PROCESSORS%
 ### Via Qt Creator
 
 1. Open Qt Creator and select **File > Open File or Project**. Navigate to the `mne-cpp` root folder and select the top-level `CMakeLists.txt`.
-2. When prompted, select a kit with your Qt 6 installation — e.g. `Desktop Qt 6.10.2 MSVC2022 64bit`.
+2. When prompted, select a kit with your Qt 6 installation — e.g. `Desktop Qt 6.11.0 MSVC2022 64bit`.
 3. Select **Release** mode in the lower-left corner.
 4. In the Projects pane, right-click the top-level `mne_cpp` target and select **Run CMake**.
 5. Right-click again and select **Build** (this may take some time).

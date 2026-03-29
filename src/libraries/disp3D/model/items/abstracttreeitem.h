@@ -72,6 +72,11 @@ public:
         NetworkItem
     };
 
+    static constexpr int itemTypeId(ItemType type)
+    {
+        return QStandardItem::UserType + static_cast<int>(type);
+    }
+
     explicit AbstractTreeItem(const QString &text = "", int type = AbstractItem);
     virtual ~AbstractTreeItem() = default;
 

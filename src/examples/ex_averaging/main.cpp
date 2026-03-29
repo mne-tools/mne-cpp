@@ -173,9 +173,9 @@ int main(int argc, char *argv[])
                                                         fTMin,
                                                         fTMax,
                                                         event,
-                                                        -1.0f,
-                                                        -1.0f,
-                                                        true,
+                                                        false,
+                                                        0.0f,
+                                                        0.0f,
                                                         mapReject,
                                                         QStringList(),
                                                         picks);

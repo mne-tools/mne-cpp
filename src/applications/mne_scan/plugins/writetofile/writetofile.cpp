@@ -488,7 +488,10 @@ void WriteToFile::clipRecording(bool bChecked)
 
     m_qFileOut.close();
     m_FileSharer.copyRealtimeFile(m_qFileOut.fileName());
-    m_qFileOut.open(QIODevice::ReadWrite);
+    if (!m_qFileOut.open(QIODevice::ReadWrite)) {
+        qWarning() << "Could not reopen realtime file:" << m_qFileOut.fileName();
+        return;
+    }
 
     m_pOutfid->skipRawData(m_qFileOut.bytesAvailable());
 }
@@ -630,4 +633,3 @@ int WriteToFile::popUpYesNo(const QString& sText,
     auto ret = msgBox.exec();
     return ret;
 }
-

@@ -380,7 +380,7 @@ int main(int argc, char *argv[])
     if (!hdr.markerFile.isEmpty()) {
         QString vmrkPath = baseDir.filePath(hdr.markerFile);
         parseBVMarkers(vmrkPath, hdr);
-        printf("Markers: %d events\n", hdr.markers.size());
+        printf("Markers: %lld events\n", static_cast<long long>(hdr.markers.size()));
     }
 
     // Read binary data

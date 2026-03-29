@@ -192,7 +192,9 @@ int main(int argc, char *argv[])
         qCritical("No aliases read.");
         return 1;
     }
-    fprintf(stderr, "%d aliases read from %s\n", aliases.size(), qPrintable(aliasName));
+    fprintf(stderr, "%lld aliases read from %s\n",
+            static_cast<long long>(aliases.size()),
+            qPrintable(aliasName));
 
     // Open FIFF file for in-place update
     QFile file(fifName);

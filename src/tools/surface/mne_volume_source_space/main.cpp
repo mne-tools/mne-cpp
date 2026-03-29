@@ -162,7 +162,11 @@ int main(int argc, char *argv[])
 
     // Write output
     QFile outF(outFile);
-    outF.open(QIODevice::WriteOnly);
+    if (!outF.open(QIODevice::WriteOnly)) {
+        qCritical("Cannot write output file: %s", qPrintable(outFile));
+        delete sp;
+        return 1;
+    }
     FiffStream::SPtr outStream = FiffStream::start_file(outF);
     if (!outStream) {
         qCritical("Cannot write output file: %s", qPrintable(outFile));

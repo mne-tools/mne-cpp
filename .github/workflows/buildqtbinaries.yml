@@ -7,6 +7,9 @@ on:
     # Change this to the branch name which you are developing on to trigger the workflow
     - generateqt
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 jobs:
   GenerateLinuxStaticBinaries:
     runs-on: ubuntu-24.04
@@ -22,7 +25,7 @@ jobs:
       run: |
         # Clone Qt6 repo
         cd ..
-        git clone https://code.qt.io/qt/qt5.git -b v6.10.2
+        git clone https://code.qt.io/qt/qt5.git -b v6.11.0
         cd qt5
         ./init-repository -f --module-subset=qtbase,qtsvg,qtshadertools
         # Create shadow build folder
@@ -35,17 +38,17 @@ jobs:
         cmake --install .
     - name: Package binaries
       run: |
-        tar cfvz qt6_6102_static_binaries_linux.tar.gz -C ../Qt6_binaries .
-    - uses: actions/upload-artifact@v5
+        tar cfvz qt6_6110_static_binaries_linux.tar.gz -C ../Qt6_binaries .
+    - uses: actions/upload-artifact@v7
       with:
-        name: qt6_6102_static_binaries_linux.tar.gz
-        path: qt6_6102_static_binaries_linux.tar.gz
+        name: qt6_6110_static_binaries_linux.tar.gz
+        path: qt6_6110_static_binaries_linux.tar.gz
     - name: Create qt_binaries release and upload
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        gh release create qt_binaries --title "Static Qt Binaries" --notes "Pre-built static Qt 6.10.2 binaries for CI" 2>/dev/null || true
-        gh release upload qt_binaries qt6_6102_static_binaries_linux.tar.gz --clobber
+        gh release create qt_binaries --title "Static Qt Binaries" --notes "Pre-built static Qt 6.11.0 binaries for CI" 2>/dev/null || true
+        gh release upload qt_binaries qt6_6110_static_binaries_linux.tar.gz --clobber
 
   GenerateMacOSStaticBinaries:
     runs-on: macos-26
@@ -55,12 +58,12 @@ jobs:
       uses: actions/checkout@v5
     - name: Install dependencies
       run: |
-        brew install ninja
+        brew list ninja >/dev/null 2>&1 || brew install ninja
     - name: Compile static Qt version
       run: |
         # Clone Qt6 repo
         cd ..
-        git clone https://code.qt.io/qt/qt5.git -b v6.10.2
+        git clone https://code.qt.io/qt/qt5.git -b v6.11.0
         cd qt5
         ./init-repository -f --module-subset=qtbase,qtsvg,qtshadertools
         # Create shadow build folder
@@ -73,17 +76,17 @@ jobs:
         cmake --install .
     - name: Package binaries
       run: |
-        tar cfvz qt6_6102_static_binaries_macos.tar.gz -C ../Qt6_binaries .
-    - uses: actions/upload-artifact@v5
+        tar cfvz qt6_6110_static_binaries_macos.tar.gz -C ../Qt6_binaries .
+    - uses: actions/upload-artifact@v7
       with:
-        name: qt6_6102_static_binaries_macos.tar.gz
-        path: qt6_6102_static_binaries_macos.tar.gz
+        name: qt6_6110_static_binaries_macos.tar.gz
+        path: qt6_6110_static_binaries_macos.tar.gz
     - name: Upload to qt_binaries release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        gh release create qt_binaries --title "Static Qt Binaries" --notes "Pre-built static Qt 6.10.2 binaries for CI" 2>/dev/null || true
-        gh release upload qt_binaries qt6_6102_static_binaries_macos.tar.gz --clobber
+        gh release create qt_binaries --title "Static Qt Binaries" --notes "Pre-built static Qt 6.11.0 binaries for CI" 2>/dev/null || true
+        gh release upload qt_binaries qt6_6110_static_binaries_macos.tar.gz --clobber
 
   GenerateWinStaticBinaries:
     runs-on: windows-2025
@@ -103,7 +106,7 @@ jobs:
       run: |
         # Clone Qt6 repo
         cd ..
-        git clone https://code.qt.io/qt/qt5.git -b v6.10.2
+        git clone https://code.qt.io/qt/qt5.git -b v6.11.0
         # Create shadow build folder
         mkdir qt6_shadow
         cd qt6_shadow
@@ -117,17 +120,17 @@ jobs:
     - name: Package binaries
       run: |
         cd ..\Qt6_binaries
-        7z a ..\mne-cpp\qt6_6102_static_binaries_win.zip .
-    - uses: actions/upload-artifact@v5
+        7z a ..\mne-cpp\qt6_6110_static_binaries_win.zip .
+    - uses: actions/upload-artifact@v7
       with:
-        name: qt6_6102_static_binaries_win.zip
-        path: qt6_6102_static_binaries_win.zip
+        name: qt6_6110_static_binaries_win.zip
+        path: qt6_6110_static_binaries_win.zip
     - name: Upload to qt_binaries release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        gh release create qt_binaries --title "Static Qt Binaries" --notes "Pre-built static Qt 6.10.2 binaries for CI" 2>$null
-        gh release upload qt_binaries qt6_6102_static_binaries_win.zip --clobber
+        gh release create qt_binaries --title "Static Qt Binaries" --notes "Pre-built static Qt 6.11.0 binaries for CI" 2>$null
+        gh release upload qt_binaries qt6_6110_static_binaries_win.zip --clobber
 
   GenerateWasmBinaries:
     runs-on: ubuntu-24.04
@@ -151,7 +154,7 @@ jobs:
       run: |
         cd ..
         # Clone Qt6 repo
-        git clone https://code.qt.io/qt/qt5.git -b v6.10.2
+        git clone https://code.qt.io/qt/qt5.git -b v6.11.0
         cd qt5
         ./init-repository -f --module-subset=qtbase,qtsvg,qtshadertools
         # Build minimal host Qt
@@ -174,14 +177,14 @@ jobs:
         cmake --install .
     - name: Package binaries
       run: |
-        tar cfvz qt6_6102_static_binaries_wasm.tar.gz -C ../Qt6_binaries .
-    - uses: actions/upload-artifact@v5
+        tar cfvz qt6_6110_static_binaries_wasm.tar.gz -C ../Qt6_binaries .
+    - uses: actions/upload-artifact@v7
       with:
-        name: qt6_6102_static_binaries_wasm.tar.gz
-        path: qt6_6102_static_binaries_wasm.tar.gz
+        name: qt6_6110_static_binaries_wasm.tar.gz
+        path: qt6_6110_static_binaries_wasm.tar.gz
     - name: Upload to qt_binaries release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        gh release create qt_binaries --title "Static Qt Binaries" --notes "Pre-built static Qt 6.10.2 binaries for CI" 2>/dev/null || true
-        gh release upload qt_binaries qt6_6102_static_binaries_wasm.tar.gz --clobber
+        gh release create qt_binaries --title "Static Qt Binaries" --notes "Pre-built static Qt 6.11.0 binaries for CI" 2>/dev/null || true
+        gh release upload qt_binaries qt6_6110_static_binaries_wasm.tar.gz --clobber

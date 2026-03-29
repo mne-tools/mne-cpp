@@ -28,6 +28,9 @@ if(NOT (Qt6_FOUND OR QT_VERSION_MAJOR EQUAL 6))
     message(FATAL_ERROR "mne_disp now requires Qt 6 for the QRhi-based raw browser renderer.")
 endif()
 
+# QRhi currently relies on Qt private headers here by design; suppress the
+# upstream reminder so real project warnings stay visible in configure output.
+set(QT_NO_PRIVATE_MODULE_WARNING ON)
 find_package(Qt6 REQUIRED COMPONENTS GuiPrivate ShaderTools)
 set(MNE_DISP_HAS_RHIWIDGET TRUE)
 message(STATUS "mne_disp: QRhi GPU rendering enabled as the only supported raw-browser renderer")

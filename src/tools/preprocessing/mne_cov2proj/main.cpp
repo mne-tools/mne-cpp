@@ -169,7 +169,10 @@ int main(int argc, char *argv[])
 
     // Write projectors to file
     QFile outF(outFile);
-    outF.open(QIODevice::WriteOnly);
+    if (!outF.open(QIODevice::WriteOnly)) {
+        qCritical("Cannot open output file: %s", qPrintable(outFile));
+        return 1;
+    }
     FiffStream::SPtr stream = FiffStream::start_file(outF);
     if (!stream) {
         qCritical("Cannot open output file: %s", qPrintable(outFile));

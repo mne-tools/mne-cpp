@@ -52,7 +52,7 @@ AbstractTreeItem::AbstractTreeItem(const QString &text, int type)
 
 int AbstractTreeItem::type() const
 {
-    return QStandardItem::UserType + m_type;
+    return itemTypeId(static_cast<ItemType>(m_type));
 }
 
 void AbstractTreeItem::setVisible(bool visible)

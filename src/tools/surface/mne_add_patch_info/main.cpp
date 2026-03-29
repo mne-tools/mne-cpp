@@ -188,7 +188,10 @@ int main(int argc, char *argv[])
 
     // Read source space
     QFile file(srcFile);
-    file.open(QIODevice::ReadOnly);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qCritical("Cannot open source space file: %s", qPrintable(srcFile));
+        return 1;
+    }
     FiffStream::SPtr stream(new FiffStream(&file));
     MNESourceSpaces src;
     if (!MNESourceSpaces::readFromStream(stream, true, src) || src.size() == 0) {
@@ -258,7 +261,10 @@ int main(int argc, char *argv[])
     printf("\nWriting source space with patch info to: %s\n", qPrintable(outFile));
 
     QFile outF(outFile);
-    outF.open(QIODevice::WriteOnly);
+    if (!outF.open(QIODevice::WriteOnly)) {
+        qCritical("Cannot open output file: %s", qPrintable(outFile));
+        return 1;
+    }
     FiffStream::SPtr outStream(new FiffStream(&outF));
     src.writeToStream(outStream.data());
     outF.close();
