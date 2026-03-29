@@ -32,7 +32,13 @@ namespace MNEBROWSE
 
 enum class VirtualChannelKind {
     Bipolar = 0,
-    AverageReference
+    AverageReference,
+    WeightedReference
+};
+
+struct VirtualReferenceSetDefinition {
+    QString     name;
+    QStringList channels;
 };
 
 struct VirtualChannelDefinition {
@@ -40,6 +46,8 @@ struct VirtualChannelDefinition {
     VirtualChannelKind kind = VirtualChannelKind::Bipolar;
     QString            primaryChannel;
     QStringList        referenceChannels;
+    QVector<double>    referenceWeights;
+    QString            referenceSetName;
 };
 
 class VirtualChannelModel : public QAbstractTableModel
@@ -61,9 +69,17 @@ public:
     int addVirtualChannel(const QString& name,
                           VirtualChannelKind kind,
                           const QString& primaryChannel,
-                          const QStringList& referenceChannels);
+                          const QStringList& referenceChannels,
+                          const QVector<double>& referenceWeights = {},
+                          const QString& referenceSetName = QString());
+
+    int addReferenceSet(const QString& name, const QStringList& channels);
+    bool removeReferenceSet(const QString& name);
 
     QVector<VirtualChannelDefinition> virtualChannels() const;
+    QVector<VirtualReferenceSetDefinition> referenceSets() const;
+    QStringList referenceSetNames() const;
+    VirtualReferenceSetDefinition referenceSet(const QString& name) const;
 
     bool loadVirtualChannels(QFile& qFile);
     bool saveVirtualChannels(QFile& qFile) const;
@@ -75,15 +91,24 @@ signals:
     void virtualChannelsChanged();
 
 private:
+    QString referenceSummaryForDefinition(const VirtualChannelDefinition& definition) const;
     QString formulaForDefinition(const VirtualChannelDefinition& definition) const;
+    QStringList resolvedReferenceChannels(const VirtualChannelDefinition& definition) const;
+    QVector<double> resolvedReferenceWeights(const VirtualChannelDefinition& definition,
+                                             int resolvedChannelCount) const;
+    VirtualReferenceSetDefinition normalizeReferenceSet(const QString& name,
+                                                        const QStringList& channels) const;
     VirtualChannelDefinition normalizeDefinition(const QString& name,
                                                  VirtualChannelKind kind,
                                                  const QString& primaryChannel,
-                                                 const QStringList& referenceChannels) const;
+                                                 const QStringList& referenceChannels,
+                                                 const QVector<double>& referenceWeights = {},
+                                                 const QString& referenceSetName = QString()) const;
     void notifyVirtualChannelsChanged();
 
-    QVector<VirtualChannelDefinition> m_virtualChannels;
-    bool                              m_bFileLoaded = false;
+    QVector<VirtualChannelDefinition>      m_virtualChannels;
+    QVector<VirtualReferenceSetDefinition> m_referenceSets;
+    bool                                   m_bFileLoaded = false;
 };
 
 } // namespace MNEBROWSE
