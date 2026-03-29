@@ -40,7 +40,6 @@
 
 #include "filterwindow.h"
 
-#include <math/numerics.h>
 #include <QSignalBlocker>
 
 
@@ -74,9 +73,6 @@ FilterWindow::FilterWindow(MainWindow *mainWindow, QWidget *parent)
     initComboBoxes();
     initFilterPlot();
     initTableViews();
-
-    m_iWindowSize = MODEL_WINDOW_SIZE;
-    m_iFilterTaps = MODEL_NUM_FILTER_TAPS;
 }
 
 
@@ -159,7 +155,7 @@ void FilterWindow::initComboBoxes()
     connect(ui->m_comboBox_filterType,static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
                 this,&FilterWindow::changeStateSpinBoxes);
 
-    //Initial selection is a lowpass and Cosine design method
+    //Initial selection is a lowpass FIR design method.
     ui->m_doubleSpinBox_lowpass->setVisible(true);
     ui->m_label_lowpass->setVisible(true);
     ui->m_label_lowpass->setText("Cut-Off (Hz):");
@@ -168,12 +164,17 @@ void FilterWindow::initComboBoxes()
     ui->m_label_highpass->setVisible(false);
     ui->m_doubleSpinBox_highpass->setEnabled(false);
 
-    ui->m_spinBox_filterTaps->setVisible(false);
-    ui->m_label_filterTaps->setVisible(false);
+    ui->m_spinBox_filterTaps->setVisible(true);
+    ui->m_label_filterTaps->setVisible(true);
+    ui->m_label_filterTaps->setText("Filter order:");
 
     //If add filter to channel type combo box changes -> also change combo box for undo filtering
     connect(ui->m_comboBox_filterApplyTo, &QComboBox::currentTextChanged,
             ui->m_comboBox_filterUndoTo, &QComboBox::setCurrentText);
+
+    // Normalize the initial widget state right away so the dock opens with the
+    // correct labels, ranges, and FIR/IIR controls before the user changes anything.
+    changeStateSpinBoxes(ui->m_comboBox_designMethod->currentIndex());
 }
 
 
@@ -238,16 +239,17 @@ void FilterWindow::setFrequencies(double highpass, double lowpass)
 void FilterWindow::updateFilterPlot()
 {
     const auto fiffInfo = m_pMainWindow->dataWindow()->fiffInfo();
-    if(!fiffInfo || m_pUserDefinedFilter.isNull()) {
+    if(!fiffInfo) {
         return;
     }
 
-    m_pFilterPlotScene->updateFilter(m_pUserDefinedFilter.staticCast<MNEOperator>(),
-                                     fiffInfo->sfreq,
-                                     ui->m_doubleSpinBox_lowpass->value(),
-                                     ui->m_doubleSpinBox_highpass->value());
+    m_pFilterPlotScene->updateFilter(m_pUserDefinedFilter,
+                                     static_cast<int>(fiffInfo->sfreq));
 
-    ui->m_graphicsView_filterPlot->fitInView(m_pFilterPlotScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    const QRectF plotRect = m_pFilterPlotScene->itemsBoundingRect();
+    if(!plotRect.isEmpty()) {
+        ui->m_graphicsView_filterPlot->fitInView(plotRect, Qt::KeepAspectRatio);
+    }
 }
 
 
@@ -303,16 +305,28 @@ void FilterWindow::changeStateSpinBoxes(int currentIndex)
     Q_UNUSED(currentIndex);
 
     //Change visibility offilter tap spin boxes depending on filter design method
-    switch(ui->m_comboBox_designMethod->currentIndex()) {
-        case 0: //Cosine
-            ui->m_spinBox_filterTaps->setVisible(false);
-            ui->m_label_filterTaps->setVisible(false);
-            break;
+    const bool useIir = ui->m_comboBox_designMethod->currentText() == QLatin1String("Butterworth");
+    ui->m_spinBox_filterTaps->setVisible(true);
+    ui->m_label_filterTaps->setVisible(true);
+    ui->m_label_filterTaps->setText(useIir ? QStringLiteral("Filter order:")
+                                           : QStringLiteral("Filter order:"));
+    ui->m_label_transitionBand->setVisible(!useIir);
+    ui->m_doubleSpinBox_transitionband->setVisible(!useIir);
 
-        case 1: //Tschebyscheff
-            ui->m_spinBox_filterTaps->setVisible(true);
-            ui->m_label_filterTaps->setVisible(true);
-            break;
+    if(useIir) {
+        ui->m_spinBox_filterTaps->setMinimum(1);
+        ui->m_spinBox_filterTaps->setMaximum(16);
+        if(ui->m_spinBox_filterTaps->value() > 16) {
+            ui->m_spinBox_filterTaps->setValue(4);
+        }
+        ui->label_2->setText(QStringLiteral("SOS sections:"));
+    } else {
+        ui->m_spinBox_filterTaps->setMinimum(9);
+        ui->m_spinBox_filterTaps->setMaximum(2048);
+        if(ui->m_spinBox_filterTaps->value() < 9) {
+            ui->m_spinBox_filterTaps->setValue(256);
+        }
+        ui->label_2->setText(QStringLiteral("Response size:"));
     }
 
     //Change visibility of spin boxes depending on filter type
@@ -348,6 +362,17 @@ void FilterWindow::changeStateSpinBoxes(int currentIndex)
             ui->m_doubleSpinBox_highpass->setEnabled(true);
             ui->m_label_highpass->setText("Cut-Off High (Hz):");
             break;
+        case 3: //Bandstop
+            ui->m_doubleSpinBox_highpass->setVisible(true);
+            ui->m_label_highpass->setVisible(true);
+            ui->m_doubleSpinBox_lowpass->setVisible(true);
+            ui->m_label_lowpass->setText("Stop Low (Hz):");
+
+            ui->m_label_lowpass->setVisible(true);
+            ui->m_doubleSpinBox_lowpass->setEnabled(true);
+            ui->m_doubleSpinBox_highpass->setEnabled(true);
+            ui->m_label_highpass->setText("Stop High (Hz):");
+            break;
     }
 
     filterParametersChanged();
@@ -365,7 +390,8 @@ void FilterWindow::filterParametersChanged()
 
     const double nyquistFrequency = fiffInfo->sfreq / 2.0;
 
-    if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
+    if(ui->m_comboBox_filterType->currentText() == "Bandpass"
+       || ui->m_comboBox_filterType->currentText() == "Bandstop") {
         ui->m_doubleSpinBox_highpass->setMinimum(ui->m_doubleSpinBox_lowpass->value());
         ui->m_doubleSpinBox_lowpass->setMaximum(ui->m_doubleSpinBox_highpass->value());
     } else {
@@ -374,6 +400,14 @@ void FilterWindow::filterParametersChanged()
     }
 
     m_pUserDefinedFilter = buildUserDefinedFilter();
+    if(!m_pUserDefinedFilter.isNull()) {
+        ui->m_label_fftLength->setText(QString::number(m_pUserDefinedFilter->responseSizeHint()));
+        if(!m_pMainWindow->dataWindow()->activeSessionFilter().isNull()) {
+            m_pMainWindow->dataWindow()->setUserDefinedFilter(m_pUserDefinedFilter);
+        }
+    } else {
+        ui->m_label_fftLength->setText(QStringLiteral("-"));
+    }
     updateFilterPlot();
 }
 
@@ -394,8 +428,7 @@ void FilterWindow::applyFilter()
         return;
     }
 
-    m_pMainWindow->dataWindow()->setUserDefinedFilter(m_pUserDefinedFilter,
-                                                      ui->m_comboBox_filterApplyTo->currentText());
+    m_pMainWindow->dataWindow()->setUserDefinedFilter(m_pUserDefinedFilter);
     m_pMainWindow->dataWindow()->updateDataTableViews();
 }
 
@@ -476,9 +509,7 @@ void FilterWindow::exportFilterCoefficients()
             return;
 
         QTextStream out(&file);
-        for(int i = 0 ; i<m_pUserDefinedFilter->m_dCoeffA.cols() ;i++) {
-            out << m_pUserDefinedFilter->m_dCoeffA(i) << "\n";
-        }
+        out << m_pUserDefinedFilter->coefficientExportText();
 
         file.close();
     }
@@ -486,7 +517,7 @@ void FilterWindow::exportFilterCoefficients()
 
 //*************************************************************************************************************
 
-QSharedPointer<FilterOperator> FilterWindow::buildUserDefinedFilter() const
+QSharedPointer<SessionFilter> FilterWindow::buildUserDefinedFilter() const
 {
     const auto fiffInfo = m_pMainWindow->dataWindow()->fiffInfo();
     if(!fiffInfo) {
@@ -497,51 +528,54 @@ QSharedPointer<FilterOperator> FilterWindow::buildUserDefinedFilter() const
     const double highpassHz = ui->m_doubleSpinBox_highpass->value();
     const double transWidth = ui->m_doubleSpinBox_transitionband->value();
     const double samplingFrequency = fiffInfo->sfreq;
-    const double nyquistFrequency = samplingFrequency / 2.0;
     const int filterTaps = ui->m_spinBox_filterTaps->value();
 
-    int fftLength = m_iWindowSize;
-    const int exp = ceil(Numerics::log2(fftLength));
-    fftLength = pow(2, exp + 1);
-    ui->m_label_fftLength->setText(QString::number(fftLength));
-
-    FilterOperator::DesignMethod designMethod = ui->m_comboBox_designMethod->currentText() == "Tschebyscheff"
-        ? FilterOperator::Tschebyscheff
-        : FilterOperator::Cosine;
-
-    if(ui->m_comboBox_filterType->currentText() == "Lowpass") {
-        return QSharedPointer<FilterOperator>::create(QStringLiteral("User defined (Filter Window)"),
-                                                      FilterOperator::LPF,
-                                                      filterTaps,
-                                                      lowpassHz / nyquistFrequency,
-                                                      FILTER_DEFAULT_TRANS_BW_RATIO,
-                                                      transWidth / nyquistFrequency,
-                                                      samplingFrequency,
-                                                      fftLength,
-                                                      designMethod);
+    SessionFilter::DesignMethod designMethod = SessionFilter::DesignMethod::Cosine;
+    if(ui->m_comboBox_designMethod->currentText() == QLatin1String("Tschebyscheff")) {
+        designMethod = SessionFilter::DesignMethod::Tschebyscheff;
+    } else if(ui->m_comboBox_designMethod->currentText() == QLatin1String("Butterworth")) {
+        designMethod = SessionFilter::DesignMethod::Butterworth;
     }
 
-    if(ui->m_comboBox_filterType->currentText() == "Highpass") {
-        return QSharedPointer<FilterOperator>::create(QStringLiteral("User defined (Filter Window)"),
-                                                      FilterOperator::HPF,
-                                                      filterTaps,
-                                                      highpassHz / nyquistFrequency,
-                                                      FILTER_DEFAULT_TRANS_BW_RATIO,
-                                                      transWidth / nyquistFrequency,
-                                                      samplingFrequency,
-                                                      fftLength,
-                                                      designMethod);
+    SessionFilter::FilterType filterType = SessionFilter::FilterType::LowPass;
+    if(ui->m_comboBox_filterType->currentText() == QLatin1String("Highpass")) {
+        filterType = SessionFilter::FilterType::HighPass;
+    } else if(ui->m_comboBox_filterType->currentText() == QLatin1String("Bandpass")) {
+        filterType = SessionFilter::FilterType::BandPass;
+    } else if(ui->m_comboBox_filterType->currentText() == QLatin1String("Bandstop")) {
+        filterType = SessionFilter::FilterType::BandStop;
     }
 
-    const double bandwidth = highpassHz - lowpassHz;
-    const double center = lowpassHz + bandwidth / 2.0;
-    return QSharedPointer<FilterOperator>::create(QStringLiteral("User defined (Filter Window)"),
-                                                  FilterOperator::BPF,
-                                                  filterTaps,
-                                                  center / nyquistFrequency,
-                                                  bandwidth / nyquistFrequency,
-                                                  transWidth / nyquistFrequency,
-                                                  samplingFrequency,
-                                                  fftLength,
-                                                  designMethod);
+    double cutoffLowHz = lowpassHz;
+    double cutoffHighHz = highpassHz;
+    switch(filterType) {
+        case SessionFilter::FilterType::LowPass:
+            cutoffLowHz = lowpassHz;
+            cutoffHighHz = lowpassHz;
+            break;
+        case SessionFilter::FilterType::HighPass:
+            cutoffLowHz = highpassHz;
+            cutoffHighHz = highpassHz;
+            break;
+        case SessionFilter::FilterType::BandPass:
+        case SessionFilter::FilterType::BandStop:
+            cutoffLowHz = lowpassHz;
+            cutoffHighHz = highpassHz;
+            break;
+    }
+
+    QSharedPointer<SessionFilter> filter = QSharedPointer<SessionFilter>::create(QStringLiteral("User defined (Filter Window)"),
+                                                                                 designMethod,
+                                                                                 filterType,
+                                                                                 filterTaps,
+                                                                                 cutoffLowHz,
+                                                                                 cutoffHighHz,
+                                                                                 std::max(0.1, transWidth),
+                                                                                 samplingFrequency,
+                                                                                 ui->m_comboBox_filterApplyTo->currentText());
+    if(!filter->isValid()) {
+        return {};
+    }
+
+    return filter;
 }

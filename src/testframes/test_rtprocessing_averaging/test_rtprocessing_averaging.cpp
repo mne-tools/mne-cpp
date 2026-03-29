@@ -1,5 +1,6 @@
 #include <QtTest/QtTest>
 #include <Eigen/Dense>
+#include <algorithm>
 #include <cmath>
 
 #include <utils/generics/mne_logger.h>
@@ -20,10 +21,14 @@
 #include <mne/mne_forward_solution.h>
 #include <mne/mne_epoch_data_list.h>
 
+#include "../../applications/mne_browse/Utils/filteroperator.h"
+#include "../../applications/mne_browse/Utils/sessionfilter.h"
+
 using namespace RTPROCESSINGLIB;
 using namespace UTILSLIB;
 using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace MNEBROWSE;
 using namespace UTILSLIB;
 using namespace Eigen;
 
@@ -123,6 +128,22 @@ static QList<int> uniqueEventCodes(const MatrixXi& events, int maxCodes = -1)
     }
 
     return codes;
+}
+
+static double responseMagnitudeAt(const VectorXd& response,
+                                  double samplingFrequency,
+                                  double frequencyHz)
+{
+    if(response.size() == 0 || samplingFrequency <= 0.0) {
+        return 0.0;
+    }
+
+    const double nyquist = samplingFrequency / 2.0;
+    const double clampedFrequency = std::clamp(frequencyHz, 0.0, nyquist);
+    const int index = qBound(0,
+                             qRound((clampedFrequency / nyquist) * (response.size() - 1)),
+                             static_cast<int>(response.size() - 1));
+    return response(index);
 }
 
 class TestRtProcessingAveraging : public QObject
@@ -374,6 +395,211 @@ private slots:
     }
 
     //=========================================================================
+    // DATA-DRIVEN: Browser filter operators must handle long QRHI blocks
+    //=========================================================================
+    void data_browserFilterOperator_handlesLongBlocks()
+    {
+        if (!hasData()) QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        if (!file.exists()) QSKIP("Raw file not found");
+
+        FiffRawData raw(file);
+
+        MatrixXd data, times;
+        const fiff_int_t from = raw.first_samp;
+        const fiff_int_t to = qMin(raw.first_samp + static_cast<fiff_int_t>(raw.info.sfreq * 60.0f),
+                                   raw.last_samp);
+        if (!raw.read_raw_segment(data, times, from, to)) QSKIP("Segment read failed");
+
+        QVERIFY(data.rows() > 0);
+        QVERIFY(data.cols() > 4000);
+
+        const RowVectorXd inputRow = data.row(0);
+        const double nyquist = raw.info.sfreq / 2.0;
+        const int fftLength = 8192;
+
+        const QList<FilterOperator::DesignMethod> methods = {
+            FilterOperator::Cosine,
+            FilterOperator::Tschebyscheff
+        };
+
+        for (FilterOperator::DesignMethod method : methods) {
+            FilterOperator filter(QStringLiteral("browser_filter"),
+                                  FilterOperator::BPF,
+                                  128,
+                                  20.0 / nyquist,
+                                  18.0 / nyquist,
+                                  2.0 / nyquist,
+                                  raw.info.sfreq,
+                                  fftLength,
+                                  method);
+
+            const RowVectorXd filtered = filter.applyFFTFilter(inputRow);
+            QCOMPARE(filtered.cols(), inputRow.cols());
+            QVERIFY(filtered.allFinite());
+        }
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Shared session filter supports FIR/IIR and leaves STI rows untouched
+    //=========================================================================
+    void data_sessionFilter_handlesLongBlocks()
+    {
+        if (!hasData()) QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        if (!file.exists()) QSKIP("Raw file not found");
+
+        FiffRawData raw(file);
+
+        MatrixXd data, times;
+        const fiff_int_t from = raw.first_samp;
+        const fiff_int_t to = qMin(raw.first_samp + static_cast<fiff_int_t>(raw.info.sfreq * 60.0f),
+                                   raw.last_samp);
+        if (!raw.read_raw_segment(data, times, from, to)) QSKIP("Segment read failed");
+
+        QVERIFY(data.rows() > 0);
+        QVERIFY(data.cols() > 4000);
+
+        int stimIndex = -1;
+        int megIndex = -1;
+        for (int channelIndex = 0; channelIndex < raw.info.nchan; ++channelIndex) {
+            if (stimIndex < 0 && raw.info.chs[channelIndex].kind == FIFFV_STIM_CH) {
+                stimIndex = channelIndex;
+            }
+            if (megIndex < 0 && raw.info.chs[channelIndex].kind == FIFFV_MEG_CH) {
+                megIndex = channelIndex;
+            }
+        }
+
+        QVERIFY(megIndex >= 0);
+
+        struct FilterCase {
+            SessionFilter::DesignMethod designMethod;
+            SessionFilter::FilterType filterType;
+            int order;
+            double cutoffLow;
+            double cutoffHigh;
+            double transition;
+        };
+
+        const QList<FilterCase> filterCases = {
+            {SessionFilter::DesignMethod::Cosine,        SessionFilter::FilterType::LowPass,  256, 40.0, 40.0, 5.0},
+            {SessionFilter::DesignMethod::Cosine,        SessionFilter::FilterType::HighPass, 256, 10.0, 10.0, 5.0},
+            {SessionFilter::DesignMethod::Tschebyscheff, SessionFilter::FilterType::BandPass, 256,  1.0, 40.0, 5.0},
+            {SessionFilter::DesignMethod::Tschebyscheff, SessionFilter::FilterType::BandStop, 256, 48.0, 52.0, 2.0},
+            {SessionFilter::DesignMethod::Butterworth,   SessionFilter::FilterType::BandPass,   4,  1.0, 40.0, 5.0},
+            {SessionFilter::DesignMethod::Butterworth,   SessionFilter::FilterType::BandStop,   4, 48.0, 52.0, 2.0}
+        };
+
+        for (const FilterCase& filterCase : filterCases) {
+            SessionFilter filter(QStringLiteral("session_filter"),
+                                 filterCase.designMethod,
+                                 filterCase.filterType,
+                                 filterCase.order,
+                                 filterCase.cutoffLow,
+                                 filterCase.cutoffHigh,
+                                 filterCase.transition,
+                                 raw.info.sfreq,
+                                 QStringLiteral("All"));
+
+            QVERIFY(filter.isValid());
+            const MatrixXd filtered = filter.applyToMatrix(data, raw.info);
+            QCOMPARE(filtered.rows(), data.rows());
+            QCOMPARE(filtered.cols(), data.cols());
+            QVERIFY(filtered.allFinite());
+            const double maxMegDifference = (filtered.row(megIndex) - data.row(megIndex)).cwiseAbs().maxCoeff();
+            QVERIFY2(maxMegDifference > 1e-18,
+                     qPrintable(QStringLiteral("Expected filtered MEG row to change for %1, max diff was %2")
+                                    .arg(filter.displayName())
+                                    .arg(maxMegDifference, 0, 'g', 6)));
+            if (stimIndex >= 0) {
+                QVERIFY(filtered.row(stimIndex).isApprox(data.row(stimIndex), 1e-12));
+            }
+        }
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Shared session filter response preserves passbands for FIR designs
+    //=========================================================================
+    void sessionFilter_defaultIsInvalid()
+    {
+        const SessionFilter filter;
+
+        QVERIFY(!filter.isValid());
+        QVERIFY(filter.magnitudeResponse(32).isZero(0.0));
+        QVERIFY(filter.phaseResponse(32).isZero(0.0));
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Shared session filter response preserves passbands for FIR designs
+    //=========================================================================
+    void data_sessionFilter_responseSelectivity()
+    {
+        const double samplingFrequency = 1000.0;
+
+        struct ResponseCase {
+            SessionFilter::DesignMethod designMethod;
+            SessionFilter::FilterType filterType;
+            int order;
+            double cutoffLow;
+            double cutoffHigh;
+            double transition;
+            double passbandProbe;
+            double stopbandProbe;
+            double minPassbandMagnitude;
+            double maxStopbandMagnitude;
+        };
+
+        const QList<ResponseCase> responseCases = {
+            {SessionFilter::DesignMethod::Cosine,        SessionFilter::FilterType::LowPass,  80, 40.0, 40.0, 5.0,  5.0, 200.0, 0.70, 0.20},
+            {SessionFilter::DesignMethod::Cosine,        SessionFilter::FilterType::HighPass, 80, 10.0, 10.0, 5.0, 120.0,  2.0, 0.70, 0.20},
+            {SessionFilter::DesignMethod::Tschebyscheff, SessionFilter::FilterType::LowPass, 128, 40.0, 40.0, 5.0,  5.0, 200.0, 0.70, 0.20},
+            {SessionFilter::DesignMethod::Tschebyscheff, SessionFilter::FilterType::BandPass, 128, 10.0, 40.0, 5.0, 20.0, 120.0, 0.50, 0.30}
+        };
+
+        for(const ResponseCase& responseCase : responseCases) {
+            SessionFilter filter(QStringLiteral("response_filter"),
+                                 responseCase.designMethod,
+                                 responseCase.filterType,
+                                 responseCase.order,
+                                 responseCase.cutoffLow,
+                                 responseCase.cutoffHigh,
+                                 responseCase.transition,
+                                 samplingFrequency,
+                                 QStringLiteral("All"));
+
+            QVERIFY(filter.isValid());
+
+            const VectorXd response = filter.magnitudeResponse(4096);
+            QVERIFY(response.size() == 4096);
+
+            const double passbandMagnitude = responseMagnitudeAt(response,
+                                                                 samplingFrequency,
+                                                                 responseCase.passbandProbe);
+            const double stopbandMagnitude = responseMagnitudeAt(response,
+                                                                 samplingFrequency,
+                                                                 responseCase.stopbandProbe);
+
+            QVERIFY2(response.maxCoeff() > 0.5,
+                     qPrintable(QStringLiteral("Unexpectedly weak max response for %1")
+                                    .arg(filter.displayName())));
+            QVERIFY2(passbandMagnitude >= responseCase.minPassbandMagnitude,
+                     qPrintable(QStringLiteral("Passband magnitude too small for %1: %2")
+                                    .arg(filter.displayName())
+                                    .arg(passbandMagnitude, 0, 'g', 6)));
+            QVERIFY2(stopbandMagnitude <= responseCase.maxStopbandMagnitude,
+                     qPrintable(QStringLiteral("Stopband magnitude too large for %1: %2")
+                                    .arg(filter.displayName())
+                                    .arg(stopbandMagnitude, 0, 'g', 6)));
+            QVERIFY2(passbandMagnitude > stopbandMagnitude * 2.0,
+                     qPrintable(QStringLiteral("Passband/stopband separation too small for %1: %2 vs %3")
+                                    .arg(filter.displayName())
+                                    .arg(passbandMagnitude, 0, 'g', 6)
+                                    .arg(stopbandMagnitude, 0, 'g', 6)));
+        }
+    }
+
+    //=========================================================================
     // DATA-DRIVEN: Compute an evoked response from raw-trigger events
     //=========================================================================
     void data_computeAverageFromRawEvents()
@@ -404,6 +630,81 @@ private slots:
         QVERIFY(evoked.nave > 0);
         QVERIFY(qAbs(evoked.baseline.first + 0.1f) < 1e-6f);
         QVERIFY(qAbs(evoked.baseline.second - 0.0f) < 1e-6f);
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Session filtering changes epoch-derived averages and covariance estimates
+    //=========================================================================
+    void data_sessionFilter_changesOfflineResults()
+    {
+        if (!hasData()) QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        if (!file.exists()) QSKIP("Raw file not found");
+
+        FiffRawData raw(file);
+        const MatrixXi events = deriveStimEvents(raw);
+        QVERIFY(events.rows() > 0);
+
+        const QList<int> codes = uniqueEventCodes(events, 1);
+        QVERIFY(!codes.isEmpty());
+
+        MNEEpochDataList unfilteredEpochs = MNEEpochDataList::readEpochs(raw,
+                                                                         events,
+                                                                         -0.1f,
+                                                                         0.3f,
+                                                                         codes.first(),
+                                                                         {});
+        QVERIFY(!unfilteredEpochs.isEmpty());
+
+        MNEEpochDataList filteredEpochs = MNEEpochDataList::readEpochs(raw,
+                                                                       events,
+                                                                       -0.1f,
+                                                                       0.3f,
+                                                                       codes.first(),
+                                                                       {});
+        QVERIFY(!filteredEpochs.isEmpty());
+
+        SessionFilter filter(QStringLiteral("analysis_filter"),
+                             SessionFilter::DesignMethod::Butterworth,
+                             SessionFilter::FilterType::HighPass,
+                             4,
+                             20.0,
+                             20.0,
+                             5.0,
+                             raw.info.sfreq,
+                             QStringLiteral("MEG"));
+        QVERIFY(filter.isValid());
+
+        for (const auto& epoch : filteredEpochs) {
+            QVERIFY(!epoch.isNull());
+            epoch->epoch = filter.applyToMatrix(epoch->epoch, raw.info);
+        }
+
+        const MatrixXd originalEpoch = unfilteredEpochs.first()->epoch;
+        const MatrixXd filteredEpoch = filteredEpochs.first()->epoch;
+        QVERIFY((filteredEpoch - originalEpoch).cwiseAbs().maxCoeff() > 1e-15);
+
+        const FiffEvoked evokedOriginal = unfilteredEpochs.average(raw.info,
+                                                                   0,
+                                                                   unfilteredEpochs.first()->epoch.cols());
+        const FiffEvoked evokedFiltered = filteredEpochs.average(raw.info,
+                                                                 0,
+                                                                 filteredEpochs.first()->epoch.cols());
+        QVERIFY((evokedFiltered.data - evokedOriginal.data).cwiseAbs().maxCoeff() > 1e-15);
+
+        MatrixXd covOriginal = MatrixXd::Zero(raw.info.nchan, raw.info.nchan);
+        MatrixXd covFiltered = MatrixXd::Zero(raw.info.nchan, raw.info.nchan);
+        int sampleCount = 0;
+        for (int i = 0; i < unfilteredEpochs.size(); ++i) {
+            covOriginal += unfilteredEpochs.at(i)->epoch * unfilteredEpochs.at(i)->epoch.transpose();
+            covFiltered += filteredEpochs.at(i)->epoch * filteredEpochs.at(i)->epoch.transpose();
+            sampleCount += static_cast<int>(unfilteredEpochs.at(i)->epoch.cols());
+        }
+
+        QVERIFY(sampleCount > 1);
+        covOriginal /= static_cast<double>(sampleCount - 1);
+        covFiltered /= static_cast<double>(sampleCount - 1);
+        QVERIFY((covFiltered - covOriginal).cwiseAbs().maxCoeff() > 1e-15);
     }
 
     //=========================================================================

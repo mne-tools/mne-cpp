@@ -44,6 +44,7 @@
 #include "ui_filterwindowdock.h"
 #include "mainwindow.h"
 #include "../Utils/filterplotscene.h"
+#include "../Utils/sessionfilter.h"
 
 
 //*************************************************************************************************************
@@ -124,6 +125,14 @@ public:
      */
     void applyFilter();
 
+    //=========================================================================================================
+    /**
+     * Return the currently configured preview filter shown in the dock.
+     *
+     * @return Shared session-filter definition, or null if the current UI state is invalid.
+     */
+    QSharedPointer<SessionFilter> currentPreviewFilter() const { return m_pUserDefinedFilter; }
+
 private:
     //=========================================================================================================
     /**
@@ -181,23 +190,20 @@ private:
 
     //=========================================================================================================
     /**
-     * Rebuild the currently configured user-defined FIR filter from the UI state.
+     * Rebuild the currently configured session filter from the UI state.
      *
      * @return Shared filter operator or null when no raw metadata is available yet.
      */
-    QSharedPointer<FilterOperator> buildUserDefinedFilter() const;
+    QSharedPointer<SessionFilter> buildUserDefinedFilter() const;
 
     std::unique_ptr<Ui::FilterWindowDockWidget> ui;         /**< Pointer to the qt designer generated ui class.*/
 
     MainWindow*         m_pMainWindow;          /**< Pointer to the parent, the MainWindow class.*/
 
-    int                 m_iWindowSize;          /**< The current window size of the loaded fiff data in the DataWindow class.*/
-    int                 m_iFilterTaps;          /**< The current number of filter taps.*/
-
     QSettings           m_qSettings;            /**< QSettings variable used to write or read from independent application sessions.*/
 
     std::unique_ptr<FilterPlotScene> m_pFilterPlotScene;    /**< Owns the QGraphicsScene which holds the filter plotting.*/
-    QSharedPointer<FilterOperator>   m_pUserDefinedFilter;  /**< Current browser-side FIR filter definition. */
+    QSharedPointer<SessionFilter>    m_pUserDefinedFilter;  /**< Current shared session-filter definition. */
 
 protected slots:
     //=========================================================================================================

@@ -103,51 +103,18 @@ QColor markerColorForIndex(int index)
     return kMarkerColors.at(index % kMarkerColors.size());
 }
 
-bool channelMatchesFilterScope(const FIFFLIB::FiffInfo& info, int channelIndex, const QString& applyTo)
-{
-    const QString normalizedScope = applyTo.trimmed().toUpper();
-    if (normalizedScope.isEmpty() || normalizedScope == QLatin1String("ALL")) {
-        return true;
-    }
-
-    if (channelIndex < 0 || channelIndex >= info.ch_names.size() || channelIndex >= info.chs.size()) {
-        return false;
-    }
-
-    const QString channelName = info.ch_names.at(channelIndex).trimmed().toUpper();
-    const int kind = info.chs.at(channelIndex).kind;
-
-    if (normalizedScope == QLatin1String("MEG")) {
-        return kind == FIFFV_MEG_CH;
-    }
-    if (normalizedScope == QLatin1String("EEG")) {
-        return kind == FIFFV_EEG_CH;
-    }
-    if (normalizedScope == QLatin1String("ECG")) {
-        return kind == FIFFV_ECG_CH || channelName.contains(QLatin1String("ECG"));
-    }
-    if (normalizedScope == QLatin1String("EOG")) {
-        return kind == FIFFV_EOG_CH || channelName.contains(QLatin1String("EOG"));
-    }
-    if (normalizedScope == QLatin1String("EMG")) {
-        return kind == FIFFV_EMG_CH || channelName.contains(QLatin1String("EMG"));
-    }
-
-    return channelName.contains(normalizedScope);
-}
-
 QMultiMap<int, QSharedPointer<MNEOperator> > browserAssignedOperators(const QSharedPointer<FIFFLIB::FiffInfo>& info,
-                                                                      const QSharedPointer<FilterOperator>& filterOperator,
-                                                                      const QString& applyTo)
+                                                                      const QSharedPointer<SessionFilter>& filterDefinition)
 {
     QMultiMap<int, QSharedPointer<MNEOperator> > assignedOperators;
-    if (!info || filterOperator.isNull()) {
+    if (!info || filterDefinition.isNull()) {
         return assignedOperators;
     }
 
-    const QSharedPointer<MNEOperator> operatorBase = filterOperator.staticCast<MNEOperator>();
+    const QSharedPointer<MNEOperator> operatorBase = QSharedPointer<MNEOperator>::create(MNEOperator::FILTER);
+    operatorBase->m_sName = filterDefinition->displayName();
     for (int channelIndex = 0; channelIndex < info->nchan; ++channelIndex) {
-        if (channelMatchesFilterScope(*info, channelIndex, applyTo)) {
+        if (filterDefinition->appliesToChannel(*info, channelIndex)) {
             assignedOperators.insert(channelIndex, operatorBase);
         }
     }
@@ -591,15 +558,13 @@ void DataWindow::setVirtualChannels(const QVector<VirtualChannelDefinition> &vir
 
 //*************************************************************************************************************
 
-void DataWindow::setUserDefinedFilter(const QSharedPointer<FilterOperator>& filterOperator,
-                                      const QString& applyTo)
+void DataWindow::setUserDefinedFilter(const QSharedPointer<SessionFilter>& filterDefinition)
 {
-    m_pUserDefinedFilter = filterOperator;
-    m_sUserDefinedFilterApplyTo = applyTo;
+    m_pUserDefinedFilter = filterDefinition;
 
     if (m_pMainWindow && m_pMainWindow->chInfoWindow() && m_pMainWindow->chInfoWindow()->getDataModel()) {
         m_pMainWindow->chInfoWindow()->getDataModel()->assignedOperatorsChanged(
-            browserAssignedOperators(fiffInfo(), m_pUserDefinedFilter, m_sUserDefinedFilterApplyTo));
+            browserAssignedOperators(fiffInfo(), m_pUserDefinedFilter));
     }
 
     if (m_pFiffReader && m_pFiffReader->isOpen()) {
@@ -612,7 +577,6 @@ void DataWindow::setUserDefinedFilter(const QSharedPointer<FilterOperator>& filt
 void DataWindow::clearUserDefinedFilter()
 {
     m_pUserDefinedFilter.clear();
-    m_sUserDefinedFilterApplyTo.clear();
 
     if (m_pMainWindow && m_pMainWindow->chInfoWindow() && m_pMainWindow->chInfoWindow()->getDataModel()) {
         m_pMainWindow->chInfoWindow()->getDataModel()->assignedOperatorsChanged({});
@@ -1087,22 +1051,8 @@ Eigen::MatrixXd DataWindow::applyUserDefinedFilter(const Eigen::MatrixXd &data) 
         return data;
     }
 
-    Eigen::MatrixXd filteredData = data;
     const auto info = m_pFiffReader->fiffInfo();
-
-    for (int channelIndex = 0; channelIndex < filteredData.rows(); ++channelIndex) {
-        if (!channelMatchesFilterScope(*info, channelIndex, m_sUserDefinedFilterApplyTo)) {
-            continue;
-        }
-
-        if (channelIndex < info->chs.size() && info->chs.at(channelIndex).kind == FIFFV_STIM_CH) {
-            continue;
-        }
-
-        filteredData.row(channelIndex) = m_pUserDefinedFilter->applyFFTFilter(filteredData.row(channelIndex));
-    }
-
-    return filteredData;
+    return m_pUserDefinedFilter->applyToMatrix(data, *info);
 }
 
 //=============================================================================================================

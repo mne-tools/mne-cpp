@@ -46,6 +46,7 @@
 #include "../Delegates/rawdelegate.h"
 #include "../Models/rawmodel.h"
 #include "../Models/fiffblockreader.h"
+#include "../Utils/sessionfilter.h"
 #include "../Views/rawview.h"
 
 #include <disp/viewers/channeldataview.h>
@@ -279,19 +280,23 @@ public:
 
     //=========================================================================================================
     /**
-     * Apply a browser-side FIR filter to newly loaded raw blocks.
+     * Apply a shared session filter to newly loaded raw blocks and offline workflows.
      *
-     * @param[in] filterOperator  Filter definition to apply. Pass a null pointer to clear filtering.
-     * @param[in] applyTo         Channel group label from the filter UI ("All", "MEG", "EEG", ...).
+     * @param[in] filterDefinition  Filter definition to apply. Pass a null pointer to clear filtering.
      */
-    void setUserDefinedFilter(const QSharedPointer<FilterOperator>& filterOperator,
-                              const QString& applyTo);
+    void setUserDefinedFilter(const QSharedPointer<SessionFilter>& filterDefinition);
 
     //=========================================================================================================
     /**
-     * Clear any browser-side FIR filter and reload the current view unfiltered.
+     * Clear any browser/session filter and reload the current view unfiltered.
      */
     void clearUserDefinedFilter();
+
+    //=========================================================================================================
+    /**
+     * Returns the currently active session filter used by preview and offline processing.
+     */
+    QSharedPointer<SessionFilter> activeSessionFilter() const { return m_pUserDefinedFilter; }
 
 private:
     struct PersistentMarker;
@@ -388,7 +393,7 @@ private:
 
     //=========================================================================================================
     /**
-     * Apply the currently active browser-side FIR filter to a loaded raw block.
+     * Apply the currently active session filter to a loaded raw block.
      */
     Eigen::MatrixXd applyUserDefinedFilter(const Eigen::MatrixXd &data) const;
 
@@ -488,8 +493,7 @@ private:
 
     QVector<VirtualChannelDefinition>             m_virtualChannelDefinitions; /**< Requested virtual-channel definitions. */
     QVector<ResolvedVirtualChannel>               m_resolvedVirtualChannels; /**< Definitions resolved against the current FIFF header. */
-    QSharedPointer<FilterOperator>                m_pUserDefinedFilter; /**< Optional FIR filter applied directly in the QRHI browser path. */
-    QString                                       m_sUserDefinedFilterApplyTo; /**< Channel group targeted by m_pUserDefinedFilter. */
+    QSharedPointer<SessionFilter>                 m_pUserDefinedFilter; /**< Optional session filter applied directly in the QRHI browser path. */
 
     // ── Buffer sizing ──────────────────────────────────────────────────
     // Each block is 60 s.  Buffer holds kMaxBlocks = 10 blocks = 10 min.

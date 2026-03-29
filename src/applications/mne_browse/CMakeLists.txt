@@ -27,6 +27,7 @@ set(SOURCES
     Views/rawview.cpp
     Utils/datamarker.cpp
     Utils/rawsettings.cpp
+    Utils/sessionfilter.cpp
     Utils/filteroperator.cpp
     Utils/filterplotscene.cpp
     Utils/butterflyscene.cpp
@@ -62,6 +63,7 @@ set(HEADERS
     Views/rawview.h
     Utils/datamarker.h
     Utils/rawsettings.h
+    Utils/sessionfilter.h
     Utils/filteroperator.h
     Utils/types.h
     Utils/info.h

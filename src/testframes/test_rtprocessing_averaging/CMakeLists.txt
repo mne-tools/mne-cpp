@@ -7,7 +7,11 @@ set(QT_REQUIRED_COMPONENTS Core Widgets Concurrent Network Test)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-set(SOURCES test_rtprocessing_averaging.cpp)
+set(SOURCES
+    test_rtprocessing_averaging.cpp
+    ../../applications/mne_browse/Utils/filteroperator.cpp
+    ../../applications/mne_browse/Utils/sessionfilter.cpp
+)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES})
