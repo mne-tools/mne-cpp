@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>MNE-CPP Core Binaries</DisplayName>
+    <Description>Downloads the selected MNE-CPP binary archive from GitHub Releases during installation. Choose between the dynamic and static builds on the next page.</Description>
+    <Version>@MNE_CPP_VERSION@</Version>
+    <ReleaseDate>@MNE_CPP_RELEASE_DATE@</ReleaseDate>
+    <Default>true</Default>
+    <ForcedInstallation>true</ForcedInstallation>
+    <SortingPriority>100</SortingPriority>
+    <Script>installscript.qs</Script>
+    <Licenses>
+        <License name="BSD 3-Clause License" file="license.txt" />
+    </Licenses>
+</Package>

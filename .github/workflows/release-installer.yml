@@ -1,23 +1,19 @@
 name: Release Installer
 
-# This workflow builds platform-specific installers using the Qt Installer
-# Framework (QIF).  It is called by release.yml AFTER the Linux, macOS, and
-# Windows release builds have completed successfully, and downloads the
-# already-uploaded release archives from GitHub Releases.
+# Build lightweight platform installers with the Qt Installer Framework.
+# These installers no longer bundle the full MNE-CPP binary payload. Instead
+# they embed GitHub release metadata and download the selected static or
+# dynamic archive during installation.
 
 on:
   workflow_call:
 
 env:
-  # Qt Installer Framework version
   QIF_VERSION: "4.7"
   QIF_TOOL_ID: "qt.tools.ifw.47"
   MNE_CPP_VERSION: "2.0.0"
 
 jobs:
-  # =========================================================================
-  # Linux Installer  (.run)
-  # =========================================================================
   LinuxInstaller:
     runs-on: ubuntu-24.04
 
@@ -50,158 +46,34 @@ jobs:
 
     - name: Determine release tag
       id: tag
+      shell: bash
       run: |
         if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          echo "asset_prefix=mne-cpp-${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          echo "asset_prefix=mne-cpp-${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
         elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
-          echo "tag=latest" >> $GITHUB_OUTPUT
-          echo "asset_prefix=mne-cpp-latest" >> $GITHUB_OUTPUT
+          echo "tag=latest" >> "$GITHUB_OUTPUT"
+          echo "asset_prefix=mne-cpp-latest" >> "$GITHUB_OUTPUT"
         else
-          echo "tag=dev_build" >> $GITHUB_OUTPUT
-          echo "asset_prefix=mne-cpp-dev" >> $GITHUB_OUTPUT
+          echo "tag=dev_build" >> "$GITHUB_OUTPUT"
+          echo "asset_prefix=mne-cpp-dev" >> "$GITHUB_OUTPUT"
         fi
 
-    - name: Download dynamic release from GitHub Releases
-      env:
-        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+    - name: Prepare bootstrap installer payload
+      shell: bash
       run: |
-        ASSET="${{ steps.tag.outputs.asset_prefix }}-linux-dynamic-x86_64.tar.gz"
-        echo "Downloading ${ASSET} from release ${{ steps.tag.outputs.tag }}..."
-        gh release download "${{ steps.tag.outputs.tag }}" -p "${ASSET}" -D /tmp
-        echo "RELEASE_ARCHIVE=/tmp/${ASSET}" >> $GITHUB_ENV
-
-    - name: Stage release into QIF package layout
-      run: |
-        STAGING="scripts/packaging/installer/packages"
-
-        # CLI tools (QCoreApplication-based, no GUI dependencies)
-        CLI_APPS="mne_anonymize mne_edf2fiff mne_show_fiff mne_compute_raw_inverse mne_compute_mne mne_inverse_operator mne_make_source_space mne_forward_solution mne_setup_mri mne_surf2bem mne_setup_forward_model mne_watershed_bem mne_flash_bem mne_rt_server mne_dipole_fit mne_process_raw"
-
-        # GUI applications (QApplication-based, require display)
-        GUI_APPS="mne_scan mne_analyze mne_browse mne_inspect"
-
-        # --- Extract full archive to temp ---
-        EXTRACT_DIR="$(mktemp -d)"
-        tar xf "$RELEASE_ARCHIVE" -C "$EXTRACT_DIR" 2>/dev/null || true
-        # Free disk: remove the compressed archive immediately
-        rm -f "$RELEASE_ARCHIVE"
-        # Find the actual content root
-        CONTENT_DIR="$EXTRACT_DIR"
-        if ls "$EXTRACT_DIR"/mne-cpp*/ 1>/dev/null 2>&1; then
-          CONTENT_DIR="$(ls -d "$EXTRACT_DIR"/mne-cpp*/ | head -1)"
-        fi
-
-        # Auto-detect application directory (deploy.bat produces apps/)
-        APPS_SRC="apps"
-        if [ ! -d "$CONTENT_DIR/apps" ] && [ -d "$CONTENT_DIR/bin" ]; then
-          APPS_SRC="bin"
-        fi
-
-        # --- CLI Tools → org.mnecpp.applications.cli ---
-        CLI_DATA="${STAGING}/org.mnecpp.applications.cli/data"
-        mkdir -p "${CLI_DATA}/bin"
-        for app in $CLI_APPS; do
-          if [ -f "$CONTENT_DIR/${APPS_SRC}/$app" ]; then
-            cp "$CONTENT_DIR/${APPS_SRC}/$app" "${CLI_DATA}/bin/"
-          fi
-        done
-        # Stage mne_rt_server plugins alongside the CLI executable
-        if [ -d "$CONTENT_DIR/${APPS_SRC}/mne_rt_server_plugins" ]; then
-          cp -r "$CONTENT_DIR/${APPS_SRC}/mne_rt_server_plugins" "${CLI_DATA}/bin/"
-        fi
-
-        # --- GUI Apps → org.mnecpp.applications.gui ---
-        GUI_DATA="${STAGING}/org.mnecpp.applications.gui/data"
-        mkdir -p "${GUI_DATA}/bin"
-        for app in $GUI_APPS; do
-          if [ -f "$CONTENT_DIR/${APPS_SRC}/$app" ]; then
-            cp "$CONTENT_DIR/${APPS_SRC}/$app" "${GUI_DATA}/bin/"
-          elif [ -d "$CONTENT_DIR/${APPS_SRC}/${app}.app" ]; then
-            cp -r "$CONTENT_DIR/${APPS_SRC}/${app}.app" "${GUI_DATA}/bin/"
-          fi
-        done
-        # Stage mne_scan and mne_analyze plugins alongside GUI apps
-        for plugdir in mne_scan_plugins mne_analyze_plugins; do
-          if [ -d "$CONTENT_DIR/${APPS_SRC}/${plugdir}" ]; then
-            cp -r "$CONTENT_DIR/${APPS_SRC}/${plugdir}" "${GUI_DATA}/bin/"
-          fi
-        done
-
-        # NOTE: The legacy org.mnecpp.applications component has been
-        # removed to avoid duplicating all binaries a third time.
-        # CLI and GUI components above are authoritative.
-
-        # Runtime — lib/ and plugins/ (contains Qt shared libs and Qt plugins)
-        RT_DATA="${STAGING}/org.mnecpp.runtime/data"
-        mkdir -p "${RT_DATA}/lib"
-        if [ -d "$CONTENT_DIR/lib" ]; then
-          cp -r "$CONTENT_DIR/lib/"* "${RT_DATA}/lib/" 2>/dev/null || true
-        fi
-        # Qt plugins (platforms, imageformats, etc.) — required at runtime
-        if [ -d "$CONTENT_DIR/plugins" ]; then
-          cp -r "$CONTENT_DIR/plugins" "${RT_DATA}/" 2>/dev/null || true
-        fi
-
-        # Verify Qt libraries are present in the archive
-        QT_LIB_COUNT=$(find "${RT_DATA}" -name "libQt6*.so*" -o -name "Qt6*.dll" -o -name "Qt*.framework" 2>/dev/null | wc -l)
-        echo "Qt libraries found in runtime staging: ${QT_LIB_COUNT}"
-        if [ "${QT_LIB_COUNT}" -eq 0 ]; then
-          echo "WARNING: No Qt libraries found in release archive!"
-          echo "The installer will not work without Qt libraries."
-          echo "Ensure deploy.bat was run with the dynamic option."
-        fi
-
-        # SDK — include/ + lib/cmake/
-        SDK_DATA="${STAGING}/org.mnecpp.sdk/data"
-        mkdir -p "${SDK_DATA}/include"
-        # Release archives don't ship headers; copy them from the source tree.
-        for lib_dir in src/libraries/*/; do
-          lib_name=$(basename "$lib_dir")
-          [ "$lib_name" = "CMakeLists.txt" ] && continue
-          find "$lib_dir" -name '*.h' | while read hdr; do
-            rel="${hdr#src/libraries/}"
-            dest_dir="${SDK_DATA}/include/$(dirname "$rel")"
-            mkdir -p "$dest_dir"
-            cp "$hdr" "$dest_dir/"
-          done
-        done
-        if [ -d "$CONTENT_DIR/include" ]; then
-          cp -r "$CONTENT_DIR/include/"* "${SDK_DATA}/include/" 2>/dev/null || true
-        fi
-        if [ -d "$CONTENT_DIR/lib/cmake" ]; then
-          mkdir -p "${SDK_DATA}/lib"
-          cp -r "$CONTENT_DIR/lib/cmake" "${SDK_DATA}/lib/" 2>/dev/null || true
-        fi
-
-        # Scripts (sample data / mne-python / path config)
-        for comp in org.mnecpp.sampledata org.mnecpp.mnepython org.mnecpp.pathconfig; do
-          mkdir -p "${STAGING}/${comp}/data/scripts"
-        done
-        cp scripts/packaging/scripts/download_sample_data.sh  "${STAGING}/org.mnecpp.sampledata/data/scripts/"
-        cp scripts/packaging/scripts/download_sample_data.bat  "${STAGING}/org.mnecpp.sampledata/data/scripts/"
-        cp scripts/packaging/scripts/install_mne_python.sh     "${STAGING}/org.mnecpp.mnepython/data/scripts/"
-        cp scripts/packaging/scripts/install_mne_python.bat    "${STAGING}/org.mnecpp.mnepython/data/scripts/"
-        cp scripts/packaging/scripts/configure_environment.sh  "${STAGING}/org.mnecpp.pathconfig/data/scripts/"
-        cp scripts/packaging/scripts/configure_environment.bat "${STAGING}/org.mnecpp.pathconfig/data/scripts/"
-
-        # Clean up temp
-        rm -rf "$EXTRACT_DIR"
-
-        echo "Staged package layout:"
-        find scripts/packaging/installer -type f | head -80
-        echo ""
-        echo "Runtime component size:"
-        du -sh "${RT_DATA}" 2>/dev/null || true
+        ./scripts/prepare_bootstrap_installer.sh \
+          --release-tag "${{ steps.tag.outputs.tag }}" \
+          --asset-prefix "${{ steps.tag.outputs.asset_prefix }}" \
+          --output-dir build_installer/staging
 
     - name: Build installer with binarycreator
       run: |
         binarycreator \
           --offline-only \
-          -c scripts/packaging/installer/config/config.xml \
-          -p scripts/packaging/installer/packages \
+          -c build_installer/staging/config/config.xml \
+          -p build_installer/staging/packages \
           MNE-CPP-${{ env.MNE_CPP_VERSION }}-Linux.run
-
         ls -lh MNE-CPP-*.run
 
     - name: Upload installer
@@ -211,9 +83,6 @@ jobs:
         cp MNE-CPP-*-Linux.run "${{ steps.tag.outputs.asset_prefix }}-linux-installer-x86_64.run"
         gh release upload "${{ steps.tag.outputs.tag }}" "${{ steps.tag.outputs.asset_prefix }}-linux-installer-x86_64.run" --clobber
 
-  # =========================================================================
-  # macOS Installer  (.dmg)
-  # =========================================================================
   MacOSInstaller:
     runs-on: macos-26
 
@@ -235,171 +104,36 @@ jobs:
 
     - name: Determine release tag
       id: tag
+      shell: bash
       run: |
         if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          echo "asset_prefix=mne-cpp-${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          echo "asset_prefix=mne-cpp-${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
         elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
-          echo "tag=latest" >> $GITHUB_OUTPUT
-          echo "asset_prefix=mne-cpp-latest" >> $GITHUB_OUTPUT
+          echo "tag=latest" >> "$GITHUB_OUTPUT"
+          echo "asset_prefix=mne-cpp-latest" >> "$GITHUB_OUTPUT"
         else
-          echo "tag=dev_build" >> $GITHUB_OUTPUT
-          echo "asset_prefix=mne-cpp-dev" >> $GITHUB_OUTPUT
+          echo "tag=dev_build" >> "$GITHUB_OUTPUT"
+          echo "asset_prefix=mne-cpp-dev" >> "$GITHUB_OUTPUT"
         fi
 
-    - name: Download dynamic release from GitHub Releases
-      env:
-        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+    - name: Prepare bootstrap installer payload
+      shell: bash
       run: |
-        ASSET="${{ steps.tag.outputs.asset_prefix }}-macos-dynamic-arm64.tar.gz"
-        echo "Downloading ${ASSET} from release ${{ steps.tag.outputs.tag }}..."
-        gh release download "${{ steps.tag.outputs.tag }}" -p "${ASSET}" -D /tmp
-        echo "RELEASE_ARCHIVE=/tmp/${ASSET}" >> $GITHUB_ENV
-
-    - name: Stage release into QIF package layout
-      run: |
-        STAGING="scripts/packaging/installer/packages"
-
-        # CLI tools (QCoreApplication-based, no GUI dependencies)
-        CLI_APPS="mne_anonymize mne_edf2fiff mne_show_fiff mne_compute_raw_inverse mne_forward_solution mne_setup_mri mne_surf2bem mne_setup_forward_model mne_watershed_bem mne_flash_bem mne_rt_server mne_dipole_fit mne_process_raw"
-
-        # GUI applications (QApplication-based, require display)
-        GUI_APPS="mne_scan mne_analyze mne_browse mne_inspect"
-
-        # --- Extract full archive to temp ---
-        EXTRACT_DIR="$(mktemp -d)"
-        tar xf "$RELEASE_ARCHIVE" -C "$EXTRACT_DIR" 2>/dev/null || true
-        CONTENT_DIR="$EXTRACT_DIR"
-        if ls "$EXTRACT_DIR"/mne-cpp*/ 1>/dev/null 2>&1; then
-          CONTENT_DIR="$(ls -d "$EXTRACT_DIR"/mne-cpp*/ | head -1)"
-        fi
-
-        # Auto-detect application directory (deploy.bat produces apps/)
-        APPS_SRC="apps"
-        if [ ! -d "$CONTENT_DIR/apps" ] && [ -d "$CONTENT_DIR/bin" ]; then
-          APPS_SRC="bin"
-        fi
-
-        # --- CLI Tools → org.mnecpp.applications.cli ---
-        CLI_DATA="${STAGING}/org.mnecpp.applications.cli/data"
-        mkdir -p "${CLI_DATA}/bin"
-        for app in $CLI_APPS; do
-          # macOS: plain binary or .app bundle
-          if [ -f "$CONTENT_DIR/${APPS_SRC}/$app" ]; then
-            cp "$CONTENT_DIR/${APPS_SRC}/$app" "${CLI_DATA}/bin/"
-          elif [ -d "$CONTENT_DIR/${APPS_SRC}/${app}.app" ]; then
-            cp -r "$CONTENT_DIR/${APPS_SRC}/${app}.app" "${CLI_DATA}/bin/"
-          fi
-        done
-        # Stage mne_rt_server plugins alongside the CLI executable
-        # (mne_rt_server is CLI — no .app bundle, so plugins stay standalone)
-        if [ -d "$CONTENT_DIR/${APPS_SRC}/mne_rt_server_plugins" ]; then
-          cp -r "$CONTENT_DIR/${APPS_SRC}/mne_rt_server_plugins" "${CLI_DATA}/bin/"
-        fi
-
-        # --- GUI Apps → org.mnecpp.applications.gui ---
-        GUI_DATA="${STAGING}/org.mnecpp.applications.gui/data"
-        mkdir -p "${GUI_DATA}/bin"
-        for app in $GUI_APPS; do
-          if [ -d "$CONTENT_DIR/${APPS_SRC}/${app}.app" ]; then
-            cp -r "$CONTENT_DIR/${APPS_SRC}/${app}.app" "${GUI_DATA}/bin/"
-          elif [ -f "$CONTENT_DIR/${APPS_SRC}/$app" ]; then
-            cp "$CONTENT_DIR/${APPS_SRC}/$app" "${GUI_DATA}/bin/"
-          fi
-        done
-        # On macOS, mne_scan_plugins and mne_analyze_plugins are already
-        # inside their .app bundles (Contents/MacOS/). If standalone dirs
-        # exist (e.g. on non-macOS), copy them alongside GUI apps.
-        for plugdir in mne_scan_plugins mne_analyze_plugins; do
-          if [ -d "$CONTENT_DIR/${APPS_SRC}/${plugdir}" ]; then
-            cp -r "$CONTENT_DIR/${APPS_SRC}/${plugdir}" "${GUI_DATA}/bin/"
-          fi
-        done
-
-        # NOTE: The legacy org.mnecpp.applications component has been
-        # removed to avoid duplicating all binaries a third time, which
-        # caused "No space left on device" on macOS CI runners.
-        # CLI and GUI components above are authoritative.
-
-        # Runtime — lib/ (MNE-CPP shared libs; Qt frameworks are inside .app bundles)
-        RT_DATA="${STAGING}/org.mnecpp.runtime/data"
-        mkdir -p "${RT_DATA}/lib"
-        if [ -d "$CONTENT_DIR/lib" ]; then
-          cp -r "$CONTENT_DIR/lib/"* "${RT_DATA}/lib/" 2>/dev/null || true
-        fi
-
-        # Verify Qt frameworks are embedded inside at least one GUI .app bundle
-        QT_FW_COUNT=$(find "${GUI_DATA}" -name "Qt*.framework" -type d 2>/dev/null | wc -l)
-        echo "Qt frameworks found inside .app bundles: ${QT_FW_COUNT}"
-        if [ "${QT_FW_COUNT}" -eq 0 ]; then
-          echo "WARNING: No Qt frameworks found inside .app bundles!"
-          echo "macdeployqt may not have run during the release build."
-          echo "The installer will not work without Qt frameworks."
-        fi
-
-        # SDK — include/ + lib/cmake/
-        SDK_DATA="${STAGING}/org.mnecpp.sdk/data"
-        mkdir -p "${SDK_DATA}/include"
-        # Release archives don't ship headers; copy from the source tree.
-        for lib_dir in src/libraries/*/; do
-          lib_name=$(basename "$lib_dir")
-          [ "$lib_name" = "CMakeLists.txt" ] && continue
-          find "$lib_dir" -name '*.h' | while read hdr; do
-            rel="${hdr#src/libraries/}"
-            dest_dir="${SDK_DATA}/include/$(dirname "$rel")"
-            mkdir -p "$dest_dir"
-            cp "$hdr" "$dest_dir/"
-          done
-        done
-        if [ -d "$CONTENT_DIR/include" ]; then
-          cp -r "$CONTENT_DIR/include/"* "${SDK_DATA}/include/" 2>/dev/null || true
-        fi
-        if [ -d "$CONTENT_DIR/lib/cmake" ]; then
-          mkdir -p "${SDK_DATA}/lib"
-          cp -r "$CONTENT_DIR/lib/cmake" "${SDK_DATA}/lib/" 2>/dev/null || true
-        fi
-
-        # Scripts
-        for comp in org.mnecpp.sampledata org.mnecpp.mnepython org.mnecpp.pathconfig; do
-          mkdir -p "${STAGING}/${comp}/data/scripts"
-        done
-        cp scripts/packaging/scripts/download_sample_data.sh  "${STAGING}/org.mnecpp.sampledata/data/scripts/"
-        cp scripts/packaging/scripts/download_sample_data.bat  "${STAGING}/org.mnecpp.sampledata/data/scripts/"
-        cp scripts/packaging/scripts/install_mne_python.sh     "${STAGING}/org.mnecpp.mnepython/data/scripts/"
-        cp scripts/packaging/scripts/install_mne_python.bat    "${STAGING}/org.mnecpp.mnepython/data/scripts/"
-        cp scripts/packaging/scripts/configure_environment.sh  "${STAGING}/org.mnecpp.pathconfig/data/scripts/"
-        cp scripts/packaging/scripts/configure_environment.bat "${STAGING}/org.mnecpp.pathconfig/data/scripts/"
-
-        # Clean up temp
-        rm -rf "$EXTRACT_DIR"
-
-        echo "Staged package layout:"
-        find scripts/packaging/installer -type f | head -80
-        echo ""
-        echo "Runtime component size:"
-        du -sh "${RT_DATA}" 2>/dev/null || true
-        echo "GUI component size:"
-        du -sh "${GUI_DATA}" 2>/dev/null || true
+        ./scripts/prepare_bootstrap_installer.sh \
+          --release-tag "${{ steps.tag.outputs.tag }}" \
+          --asset-prefix "${{ steps.tag.outputs.asset_prefix }}" \
+          --output-dir build_installer/staging
 
     # -----------------------------------------------------------------
     # Code Signing & Notarization
     # -----------------------------------------------------------------
-    # Required repository secrets:
-    #   APPLE_DEVELOPER_ID_P12       – Base64-encoded .p12 certificate
-    #                                  (Developer ID Application)
-    #   APPLE_DEVELOPER_ID_PASSWORD  – Password for the .p12 file
-    #   APPLE_TEAM_ID                – 10-char Apple Team ID
-    #   APPLE_ID                     – Apple ID email for notarytool
-    #   APPLE_APP_PASSWORD           – App-specific password for notarytool
-    # -----------------------------------------------------------------
-
     - name: Import Apple Developer ID certificate
       if: env.APPLE_DEVELOPER_ID_P12 != ''
       env:
         APPLE_DEVELOPER_ID_P12: ${{ secrets.APPLE_DEVELOPER_ID_P12 }}
         APPLE_DEVELOPER_ID_PASSWORD: ${{ secrets.APPLE_DEVELOPER_ID_PASSWORD }}
       run: |
-        # Create a temporary keychain
         KEYCHAIN_PATH="$RUNNER_TEMP/signing.keychain-db"
         KEYCHAIN_PASSWORD="$(openssl rand -hex 16)"
 
@@ -407,7 +141,6 @@ jobs:
         security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
         security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
 
-        # Import the certificate
         echo "$APPLE_DEVELOPER_ID_P12" | base64 --decode > "$RUNNER_TEMP/certificate.p12"
         security import "$RUNNER_TEMP/certificate.p12" \
           -k "$KEYCHAIN_PATH" \
@@ -418,56 +151,19 @@ jobs:
         security set-key-partition-list -S apple-tool:,apple:,codesign: \
           -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
 
-        # Add to search list
         security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | tr -d '"')
 
-        # Extract the signing identity
         IDENTITY=$(security find-identity -v -p codesigning "$KEYCHAIN_PATH" | head -1 | awk -F'"' '{print $2}')
         echo "CODESIGN_IDENTITY=$IDENTITY" >> $GITHUB_ENV
         echo "KEYCHAIN_PATH=$KEYCHAIN_PATH" >> $GITHUB_ENV
         echo "Signing identity: $IDENTITY"
 
-    - name: Codesign staged binaries
-      if: env.CODESIGN_IDENTITY != ''
-      run: |
-        STAGING="scripts/packaging/installer/packages"
-        OPTS="--force --options runtime --timestamp"
-
-        echo "=== Signing shared libraries ==="
-        find "$STAGING" -name "*.dylib" -exec \
-          codesign $OPTS --sign "$CODESIGN_IDENTITY" {} \;
-
-        echo "=== Signing frameworks ==="
-        find "$STAGING" -name "*.framework" -type d | while read fw; do
-          codesign $OPTS --deep --sign "$CODESIGN_IDENTITY" "$fw"
-        done
-
-        echo "=== Signing CLI binaries ==="
-        CLI_DATA="$STAGING/org.mnecpp.applications.cli/data/bin"
-        if [ -d "$CLI_DATA" ]; then
-          find "$CLI_DATA" -type f -perm +111 ! -name "*.dylib" -exec \
-            codesign $OPTS --sign "$CODESIGN_IDENTITY" {} \;
-        fi
-
-        echo "=== Signing GUI .app bundles ==="
-        GUI_DATA="$STAGING/org.mnecpp.applications.gui/data/bin"
-        if [ -d "$GUI_DATA" ]; then
-          find "$GUI_DATA" -name "*.app" -type d | while read app; do
-            codesign $OPTS --deep --sign "$CODESIGN_IDENTITY" "$app"
-          done
-        fi
-
-        echo "=== Verifying signatures ==="
-        find "$STAGING" \( -name "*.app" -o -name "*.dylib" \) | head -5 | while read f; do
-          codesign --verify --verbose "$f" && echo "  OK: $f" || echo "  FAIL: $f"
-        done
-
     - name: Build installer with binarycreator
       run: |
         binarycreator \
           --offline-only \
-          -c scripts/packaging/installer/config/config.xml \
-          -p scripts/packaging/installer/packages \
+          -c build_installer/staging/config/config.xml \
+          -p build_installer/staging/packages \
           MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin
 
     - name: Codesign installer app
@@ -482,7 +178,6 @@ jobs:
       run: |
         echo "=== Disk usage before cleanup ==="
         df -h
-        # Remove caches and toolchains not needed for packaging
         sudo rm -rf /usr/local/share/gtk-doc /usr/local/Cellar \
           /usr/local/lib/node_modules /usr/share/dotnet \
           /opt/hostedtoolcache /Users/runner/Library/Caches/* 2>/dev/null || true
@@ -513,7 +208,6 @@ jobs:
         APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       run: |
-        echo "Submitting DMG to Apple notary service..."
         xcrun notarytool submit \
           "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.dmg" \
           --apple-id "$APPLE_ID" \
@@ -522,10 +216,8 @@ jobs:
           --wait \
           --timeout 30m
 
-        echo "Stapling notarization ticket to DMG..."
         xcrun stapler staple "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.dmg"
 
-        echo "Verifying notarization..."
         spctl --assess --type open --context context:primary-signature \
           "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.dmg" \
           && echo "Notarization verified successfully" \
@@ -543,9 +235,6 @@ jobs:
         cp MNE-CPP-*-Darwin.dmg "${{ steps.tag.outputs.asset_prefix }}-macos-installer-arm64.dmg"
         gh release upload "${{ steps.tag.outputs.tag }}" "${{ steps.tag.outputs.asset_prefix }}-macos-installer-arm64.dmg" --clobber
 
-  # =========================================================================
-  # Windows Installer  (.exe)
-  # =========================================================================
   WindowsInstaller:
     runs-on: windows-2025
 
@@ -570,159 +259,30 @@ jobs:
       shell: bash
       run: |
         if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          echo "asset_prefix=mne-cpp-${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          echo "asset_prefix=mne-cpp-${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
         elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
-          echo "tag=latest" >> $GITHUB_OUTPUT
-          echo "asset_prefix=mne-cpp-latest" >> $GITHUB_OUTPUT
+          echo "tag=latest" >> "$GITHUB_OUTPUT"
+          echo "asset_prefix=mne-cpp-latest" >> "$GITHUB_OUTPUT"
         else
-          echo "tag=dev_build" >> $GITHUB_OUTPUT
-          echo "asset_prefix=mne-cpp-dev" >> $GITHUB_OUTPUT
+          echo "tag=dev_build" >> "$GITHUB_OUTPUT"
+          echo "asset_prefix=mne-cpp-dev" >> "$GITHUB_OUTPUT"
         fi
 
-    - name: Download dynamic release from GitHub Releases
-      env:
-        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+    - name: Prepare bootstrap installer payload
       shell: bash
       run: |
-        ASSET="${{ steps.tag.outputs.asset_prefix }}-windows-dynamic-x86_64.zip"
-        echo "Downloading ${ASSET} from release ${{ steps.tag.outputs.tag }}..."
-        gh release download "${{ steps.tag.outputs.tag }}" -p "${ASSET}" -D "$RUNNER_TEMP"
-        echo "RELEASE_ARCHIVE=${RUNNER_TEMP}/${ASSET}" >> $GITHUB_ENV
-
-    - name: Stage release into QIF package layout
-      shell: bash
-      run: |
-        STAGING="scripts/packaging/installer/packages"
-
-        # CLI tools (QCoreApplication-based, no GUI dependencies)
-        CLI_APPS="mne_anonymize mne_edf2fiff mne_show_fiff mne_compute_raw_inverse mne_compute_mne mne_inverse_operator mne_make_source_space mne_forward_solution mne_setup_mri mne_surf2bem mne_setup_forward_model mne_watershed_bem mne_flash_bem mne_rt_server mne_dipole_fit mne_process_raw"
-
-        # GUI applications (QApplication-based, require display)
-        GUI_APPS="mne_scan mne_analyze mne_browse mne_inspect"
-
-        # Extract the full archive to a temp location first
-        EXTRACT_DIR="$RUNNER_TEMP/mne-cpp-extracted"
-        mkdir -p "$EXTRACT_DIR"
-        7z x "$RELEASE_ARCHIVE" -o"$EXTRACT_DIR" -y
-        # Free disk: remove the compressed archive immediately
-        rm -f "$RELEASE_ARCHIVE"
-
-        # Find the actual root (may be inside a subfolder)
-        CONTENT_DIR="$EXTRACT_DIR"
-        if [ -d "$EXTRACT_DIR"/mne-cpp* ]; then
-          CONTENT_DIR=$(ls -d "$EXTRACT_DIR"/mne-cpp* | head -1)
-        fi
-
-        # Auto-detect application directory (deploy.bat produces apps/)
-        APPS_SRC="apps"
-        if [ ! -d "$CONTENT_DIR/apps" ] && [ -d "$CONTENT_DIR/bin" ]; then
-          APPS_SRC="bin"
-        fi
-
-        # --- CLI Tools → org.mnecpp.applications.cli ---
-        CLI_DATA="${STAGING}/org.mnecpp.applications.cli/data"
-        mkdir -p "${CLI_DATA}/bin"
-        for app in $CLI_APPS; do
-          if [ -f "$CONTENT_DIR/${APPS_SRC}/${app}.exe" ]; then
-            cp "$CONTENT_DIR/${APPS_SRC}/${app}.exe" "${CLI_DATA}/bin/"
-          elif [ -f "$CONTENT_DIR/${APPS_SRC}/$app" ]; then
-            cp "$CONTENT_DIR/${APPS_SRC}/$app" "${CLI_DATA}/bin/"
-          fi
-        done
-        # Stage mne_rt_server plugins alongside the CLI executable
-        if [ -d "$CONTENT_DIR/${APPS_SRC}/mne_rt_server_plugins" ]; then
-          cp -r "$CONTENT_DIR/${APPS_SRC}/mne_rt_server_plugins" "${CLI_DATA}/bin/"
-        fi
-
-        # --- GUI Apps → org.mnecpp.applications.gui ---
-        GUI_DATA="${STAGING}/org.mnecpp.applications.gui/data"
-        mkdir -p "${GUI_DATA}/bin"
-        for app in $GUI_APPS; do
-          if [ -f "$CONTENT_DIR/${APPS_SRC}/${app}.exe" ]; then
-            cp "$CONTENT_DIR/${APPS_SRC}/${app}.exe" "${GUI_DATA}/bin/"
-          elif [ -f "$CONTENT_DIR/${APPS_SRC}/$app" ]; then
-            cp "$CONTENT_DIR/${APPS_SRC}/$app" "${GUI_DATA}/bin/"
-          fi
-        done
-        # Stage mne_scan and mne_analyze plugins alongside GUI apps
-        for plugdir in mne_scan_plugins mne_analyze_plugins; do
-          if [ -d "$CONTENT_DIR/${APPS_SRC}/${plugdir}" ]; then
-            cp -r "$CONTENT_DIR/${APPS_SRC}/${plugdir}" "${GUI_DATA}/bin/"
-          fi
-        done
-
-        # NOTE: The legacy org.mnecpp.applications component has been
-        # removed to avoid duplicating all binaries a third time.
-        # CLI and GUI components above are authoritative.
-
-        # Runtime — lib/ and apps/*.dll (includes Qt DLLs deployed by windeployqt)
-        RT_DATA="${STAGING}/org.mnecpp.runtime/data"
-        mkdir -p "${RT_DATA}/lib" "${RT_DATA}/bin"
-        if [ -d "$CONTENT_DIR/lib" ]; then
-          cp -r "$CONTENT_DIR/lib/"* "${RT_DATA}/lib/" 2>/dev/null || true
-        fi
-        # Copy DLLs to runtime bin/ (Windows needs DLLs alongside exes or on PATH)
-        find "$CONTENT_DIR/${APPS_SRC}" -maxdepth 1 -name "*.dll" -exec cp {} "${RT_DATA}/bin/" \; 2>/dev/null || true
-
-        # Copy Qt plugins deployed by windeployqt (platforms/, imageformats/, etc.)
-        for plugdir in platforms imageformats styles tls networkinformation; do
-          if [ -d "$CONTENT_DIR/${APPS_SRC}/${plugdir}" ]; then
-            cp -r "$CONTENT_DIR/${APPS_SRC}/${plugdir}" "${RT_DATA}/bin/" 2>/dev/null || true
-          fi
-        done
-
-        # Verify Qt DLLs are present in the archive
-        QT_DLL_COUNT=$(find "${RT_DATA}" -name "Qt6*.dll" 2>/dev/null | wc -l)
-        echo "Qt DLLs found in runtime staging: ${QT_DLL_COUNT}"
-        if [ "${QT_DLL_COUNT}" -eq 0 ]; then
-          echo "WARNING: No Qt DLLs found in release archive!"
-          echo "The installer will not work without Qt libraries."
-          echo "Ensure deploy.bat was run with the dynamic option."
-        fi
-
-        # SDK — include/ + lib/cmake/
-        SDK_DATA="${STAGING}/org.mnecpp.sdk/data"
-        mkdir -p "${SDK_DATA}/include"
-        # Release archives don't ship headers; copy from the source tree.
-        for lib_dir in src/libraries/*/; do
-          lib_name=$(basename "$lib_dir")
-          [ "$lib_name" = "CMakeLists.txt" ] && continue
-          find "$lib_dir" -name '*.h' | while read hdr; do
-            rel="${hdr#src/libraries/}"
-            dest_dir="${SDK_DATA}/include/$(dirname "$rel")"
-            mkdir -p "$dest_dir"
-            cp "$hdr" "$dest_dir/"
-          done
-        done
-        if [ -d "$CONTENT_DIR/include" ]; then
-          cp -r "$CONTENT_DIR/include/"* "${SDK_DATA}/include/" 2>/dev/null || true
-        fi
-        if [ -d "$CONTENT_DIR/lib/cmake" ]; then
-          mkdir -p "${SDK_DATA}/lib"
-          cp -r "$CONTENT_DIR/lib/cmake" "${SDK_DATA}/lib/" 2>/dev/null || true
-        fi
-
-        # Scripts
-        for comp in org.mnecpp.sampledata org.mnecpp.mnepython org.mnecpp.pathconfig; do
-          mkdir -p "${STAGING}/${comp}/data/scripts"
-        done
-        cp scripts/packaging/scripts/download_sample_data.sh  "${STAGING}/org.mnecpp.sampledata/data/scripts/"
-        cp scripts/packaging/scripts/download_sample_data.bat  "${STAGING}/org.mnecpp.sampledata/data/scripts/"
-        cp scripts/packaging/scripts/install_mne_python.sh     "${STAGING}/org.mnecpp.mnepython/data/scripts/"
-        cp scripts/packaging/scripts/install_mne_python.bat    "${STAGING}/org.mnecpp.mnepython/data/scripts/"
-        cp scripts/packaging/scripts/configure_environment.sh  "${STAGING}/org.mnecpp.pathconfig/data/scripts/"
-        cp scripts/packaging/scripts/configure_environment.bat "${STAGING}/org.mnecpp.pathconfig/data/scripts/"
-
-        # Clean up temp to free disk before binarycreator
-        rm -rf "$EXTRACT_DIR"
+        ./scripts/prepare_bootstrap_installer.sh \
+          --release-tag "${{ steps.tag.outputs.tag }}" \
+          --asset-prefix "${{ steps.tag.outputs.asset_prefix }}" \
+          --output-dir build_installer/staging
 
     - name: Build installer with binarycreator
       run: |
         binarycreator `
           --offline-only `
-          -c scripts/packaging/installer/config/config.xml `
-          -p scripts/packaging/installer/packages `
+          -c build_installer/staging/config/config.xml `
+          -p build_installer/staging/packages `
           MNE-CPP-${{ env.MNE_CPP_VERSION }}-win64.exe
 
         Get-ChildItem MNE-CPP-*-win64.exe
