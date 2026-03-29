@@ -40,6 +40,8 @@
 
 #include "mainwindow.h"
 
+#include <fiff/fiff_stream.h>
+
 #include <QBuffer>
 #include <QApplication>
 #include <QCheckBox>
@@ -188,6 +190,142 @@ QString defaultVirtualChannelFilePath(const QString& rawFilePath)
     }
 
     return rawFilePath + "-virtchan.json";
+}
+
+void applySessionFilterToEpochList(MNELIB::MNEEpochDataList& epochList,
+                                   const MNEBROWSE::SessionFilter& filter,
+                                   const FIFFLIB::FiffInfo& info,
+                                   const QMap<QString,double>& rejectMap)
+{
+    for(const auto& epoch : epochList) {
+        if(epoch.isNull()) {
+            continue;
+        }
+
+        epoch->epoch = filter.applyToMatrix(epoch->epoch, info);
+        if(!rejectMap.isEmpty()) {
+            epoch->bReject = MNELIB::MNEEpochDataList::checkForArtifact(epoch->epoch,
+                                                                        info,
+                                                                        rejectMap);
+        }
+    }
+}
+
+FIFFLIB::FiffCov computeCovarianceFromEpochLists(const QList<MNELIB::MNEEpochDataList>& epochLists,
+                                                 const FIFFLIB::FiffInfo& info,
+                                                 bool removeMean)
+{
+    FIFFLIB::FiffCov covariance;
+    if(epochLists.isEmpty()) {
+        return covariance;
+    }
+
+    Eigen::MatrixXd covAccum = Eigen::MatrixXd::Zero(info.nchan, info.nchan);
+    Eigen::VectorXd meanAccum = Eigen::VectorXd::Zero(info.nchan);
+    int totalSamples = 0;
+    int acceptedEpochs = 0;
+
+    for(const MNELIB::MNEEpochDataList& epochList : epochLists) {
+        for(const auto& epoch : epochList) {
+            if(epoch.isNull() || epoch->epoch.size() == 0) {
+                continue;
+            }
+
+            covAccum += epoch->epoch * epoch->epoch.transpose();
+            if(removeMean) {
+                meanAccum += epoch->epoch.rowwise().mean() * static_cast<double>(epoch->epoch.cols());
+            }
+
+            totalSamples += static_cast<int>(epoch->epoch.cols());
+            ++acceptedEpochs;
+        }
+    }
+
+    if(totalSamples < 2) {
+        return covariance;
+    }
+
+    if(removeMean) {
+        const Eigen::VectorXd grandMean = meanAccum / static_cast<double>(totalSamples);
+        covariance.data = (covAccum / static_cast<double>(totalSamples - 1))
+                          - (grandMean * grandMean.transpose())
+                                * (static_cast<double>(totalSamples) / static_cast<double>(totalSamples - 1));
+    } else {
+        covariance.data = covAccum / static_cast<double>(totalSamples - 1);
+    }
+
+    covariance.kind = FIFFV_MNE_NOISE_COV;
+    covariance.dim = info.nchan;
+    covariance.names = info.ch_names;
+    covariance.nfree = totalSamples - 1;
+    covariance.bads = info.bads;
+    covariance.projs = info.projs;
+
+    qInfo() << "[MainWindow] Computed filtered covariance:" << info.nchan
+            << "channels," << acceptedEpochs << "epochs," << totalSamples << "total samples.";
+
+    return covariance;
+}
+
+bool writeFilteredRawFile(const QString& rawFilePath,
+                          QIODevice* pIODevice,
+                          const MNEBROWSE::SessionFilter& filter)
+{
+    QFile rawFile(rawFilePath);
+    FIFFLIB::FiffRawData raw(rawFile);
+    if(raw.isEmpty()) {
+        qWarning() << "[MainWindow] Could not reopen raw data for filtered write" << rawFilePath;
+        return false;
+    }
+
+    Eigen::RowVectorXd cals;
+    Eigen::SparseMatrix<double> mult;
+    Eigen::RowVectorXi sel;
+
+    FIFFLIB::FiffStream::SPtr outfid = FIFFLIB::FiffStream::start_writing_raw(*pIODevice, raw.info, cals);
+    if(!outfid) {
+        qWarning() << "[MainWindow] Could not open output stream for filtered write.";
+        return false;
+    }
+
+    const int padSamples = filter.recommendedPaddingSamples();
+    const FIFFLIB::fiff_int_t from = raw.first_samp;
+    const FIFFLIB::fiff_int_t to = raw.last_samp;
+    const FIFFLIB::fiff_int_t quantum = static_cast<FIFFLIB::fiff_int_t>(std::ceil(10.0 * raw.info.sfreq));
+
+    bool firstBuffer = true;
+    for(FIFFLIB::fiff_int_t first = from; first <= to; first += quantum) {
+        const FIFFLIB::fiff_int_t last = std::min(first + quantum - 1, to);
+        const FIFFLIB::fiff_int_t paddedFirst = std::max(from, first - padSamples);
+        const FIFFLIB::fiff_int_t paddedLast = std::min(to, last + padSamples);
+
+        Eigen::MatrixXd data;
+        Eigen::MatrixXd times;
+        if(!raw.read_raw_segment(data, times, mult, paddedFirst, paddedLast, sel)) {
+            qWarning() << "[MainWindow] Error during filtered read_raw_segment.";
+            return false;
+        }
+
+        const Eigen::MatrixXd filteredData = filter.applyToMatrix(data, raw.info);
+        const int cropStart = static_cast<int>(first - paddedFirst);
+        const int cropLength = static_cast<int>(last - first + 1);
+        const Eigen::MatrixXd croppedData = filteredData.block(0,
+                                                               cropStart,
+                                                               filteredData.rows(),
+                                                               cropLength);
+
+        if(firstBuffer) {
+            if(first > 0) {
+                outfid->write_int(FIFF_FIRST_SAMPLE, &first);
+            }
+            firstBuffer = false;
+        }
+
+        outfid->write_raw_buffer(croppedData, mult);
+    }
+
+    outfid->finish_writing_raw();
+    return true;
 }
 
 QMap<int, int> countEventsByType(const MatrixXi& events)
@@ -1850,6 +1988,9 @@ void MainWindow::writeFile()
 
     QFutureWatcher<bool> writeFileFutureWatcher;
     QProgressDialog progressDialog("Writing to fif file...", QString(), 0, 0, this, Qt::Dialog);
+    const QSharedPointer<SessionFilter> activeFilter = m_pDataWindow->activeSessionFilter();
+    const bool useFilteredWrite = activeFilter && activeFilter->isValid();
+    const SessionFilter filterCopy = useFilteredWrite ? *activeFilter : SessionFilter();
 
     //Connect future watcher and dialog
     connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::finished,
@@ -1858,14 +1999,20 @@ void MainWindow::writeFile()
     connect(&progressDialog, &QProgressDialog::canceled,
             &writeFileFutureWatcher, &QFutureWatcher<bool>::cancel);
 
-    connect(rawModel(), &RawModel::writeProgressRangeChanged,
-            &progressDialog, &QProgressDialog::setRange);
+    if(!useFilteredWrite) {
+        connect(rawModel(), &RawModel::writeProgressRangeChanged,
+                &progressDialog, &QProgressDialog::setRange);
 
-    connect(rawModel(), &RawModel::writeProgressChanged,
-            &progressDialog, &QProgressDialog::setValue);
+        connect(rawModel(), &RawModel::writeProgressChanged,
+                &progressDialog, &QProgressDialog::setValue);
+    }
 
     //Run the file writing in seperate thread
-    writeFileFutureWatcher.setFuture(QtConcurrent::run([this, &qFileOutput](){
+    writeFileFutureWatcher.setFuture(QtConcurrent::run([this, &qFileOutput, filterCopy, useFilteredWrite](){
+        if(useFilteredWrite) {
+            return writeFilteredRawFile(m_qFileRaw.fileName(), &qFileOutput, filterCopy);
+        }
+
         return rawModel()->writeFiffData(&qFileOutput);
     }));
 
@@ -2517,6 +2664,9 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
     QList<MNELIB::MNEEpochDataList> epochLists;
     QList<int> epochEventCodes;
     QStringList epochComments;
+    const QSharedPointer<SessionFilter> activeFilter = m_pDataWindow->activeSessionFilter();
+    const bool useSessionFilter = activeFilter && activeFilter->isValid();
+    const QMap<QString,double> epochRejectMap = useSessionFilter ? QMap<QString,double>() : rejectMap;
 
     for(int eventCode : selectedEventCodes) {
         MNELIB::MNEEpochDataList epochList = MNELIB::MNEEpochDataList::readEpochs(raw,
@@ -2524,10 +2674,17 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
                                                                                    tmin,
                                                                                    tmax,
                                                                                    eventCode,
-                                                                                   rejectMap);
+                                                                                   epochRejectMap);
 
         if(epochList.isEmpty()) {
             continue;
+        }
+
+        if(useSessionFilter) {
+            applySessionFilterToEpochList(epochList,
+                                          *activeFilter,
+                                          raw.info,
+                                          rejectMap);
         }
 
         if(applyBaseline) {
@@ -2892,15 +3049,48 @@ void MainWindow::computeCovariance()
     QApplication::setOverrideCursor(Qt::BusyCursor);
     qApp->processEvents();
 
-    const FIFFLIB::FiffCov covariance = FIFFLIB::FiffCov::compute_from_epochs(raw,
-                                                                               events,
-                                                                               selectedEventCodes,
-                                                                               tmin,
-                                                                               tmax,
-                                                                               baselineFrom,
-                                                                               baselineTo,
-                                                                               applyBaseline,
-                                                                               removeMean);
+    const QSharedPointer<SessionFilter> activeFilter = m_pDataWindow->activeSessionFilter();
+    const bool useSessionFilter = activeFilter && activeFilter->isValid();
+    FIFFLIB::FiffCov covariance;
+    if(useSessionFilter) {
+        QList<MNELIB::MNEEpochDataList> epochLists;
+        for(int eventCode : selectedEventCodes) {
+            MNELIB::MNEEpochDataList epochList = MNELIB::MNEEpochDataList::readEpochs(raw,
+                                                                                       events,
+                                                                                       tmin,
+                                                                                       tmax,
+                                                                                       eventCode,
+                                                                                       {});
+            if(epochList.isEmpty()) {
+                continue;
+            }
+
+            applySessionFilterToEpochList(epochList,
+                                          *activeFilter,
+                                          raw.info,
+                                          {});
+
+            if(applyBaseline) {
+                epochList.applyBaselineCorrection(QPair<float, float>(baselineFrom, baselineTo));
+            }
+
+            epochLists.append(epochList);
+        }
+
+        covariance = computeCovarianceFromEpochLists(epochLists,
+                                                     raw.info,
+                                                     removeMean);
+    } else {
+        covariance = FIFFLIB::FiffCov::compute_from_epochs(raw,
+                                                           events,
+                                                           selectedEventCodes,
+                                                           tmin,
+                                                           tmax,
+                                                           baselineFrom,
+                                                           baselineTo,
+                                                           applyBaseline,
+                                                           removeMean);
+    }
 
     QApplication::restoreOverrideCursor();
 

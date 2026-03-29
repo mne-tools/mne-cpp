@@ -38,11 +38,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include "../Utils/filterplotscene.h"
-#include "../Utils/filteroperator.h"
+#include "../Utils/sessionfilter.h"
 
 
 //*************************************************************************************************************
@@ -84,30 +83,51 @@ public:
     /**
      * Updates the current filter.
      *
-     * @param [in] operatorFilter pointer to the current filter operator which is to be plotted
-     * @param [in] samplingFreq holds the current sampling frequency
-     * @param [in] cutOffLow cut off frequqency lowpass or lower cut off when filter is a bandpass
-     * @param [in] cutOffHigh cut off frequqency highpass or higher cut off when filter is a bandpass
+     * @param [in] filter          Shared filter definition to be plotted.
+     * @param [in] samplingFreq    Current sampling frequency in Hz.
      */
-    void updateFilter(QSharedPointer<MNEOperator> operatorFilter, int samplingFreq, int cutOffLow, int cutOffHigh);
+    void updateFilter(const QSharedPointer<SessionFilter>& filter, int samplingFreq);
 
 protected:
     //=========================================================================================================
     /**
      * Draws the diagram to plot the magnitude.
      *
-     * @param [in] holds the current sampling frequency
+     * @param [in] samplingFreq  Current sampling frequency in Hz.
+     * @param [in] xOffset       Left edge of the magnitude panel.
+     * @param [in] diagramWidth  Width of the plotted response in samples/pixels.
      */
-    void plotMagnitudeDiagram(int samplingFreq);
+    void plotMagnitudeDiagram(int samplingFreq, int xOffset, int diagramWidth);
 
     //=========================================================================================================
     /**
-     * Draws the filter's frequency response.
+     * Draws the diagram to plot the phase.
      *
+     * @param [in] samplingFreq  Current sampling frequency in Hz.
+     * @param [in] xOffset       Left edge of the phase panel.
+     * @param [in] diagramWidth  Width of the plotted response in samples/pixels.
      */
-    void plotFilterFrequencyResponse();
+    void plotPhaseDiagram(int samplingFreq, int xOffset, int diagramWidth);
 
-    QSharedPointer<FilterOperator>      m_pCurrentFilter;       /**< Pointer to the filter operator */
+    //=========================================================================================================
+    /**
+     * Draws the filter's magnitude response.
+     *
+     * @param [in] xOffset       Left edge of the magnitude panel.
+     * @param [in] diagramWidth  Width of the plotted response in samples/pixels.
+     */
+    void plotFilterFrequencyResponse(int xOffset, int diagramWidth);
+
+    //=========================================================================================================
+    /**
+     * Draws the filter's phase response.
+     *
+     * @param [in] xOffset       Left edge of the phase panel.
+     * @param [in] diagramWidth  Width of the plotted response in samples/pixels.
+     */
+    void plotFilterPhaseResponse(int xOffset, int diagramWidth);
+
+    QSharedPointer<SessionFilter>       m_pCurrentFilter;       /**< Pointer to the current session filter. */
 
     QGraphicsPathItem*                  m_pGraphicsItemPath;    /**< Pointer to the graphics path item in the filterplotscene */
 
@@ -118,8 +138,7 @@ protected:
     int             m_iAxisTextSize;            /**< point size of the plotted text. */
     int             m_iDiagramMarginsHoriz;     /**< horizontal space between the filter and diagram plot.  */
     int             m_iDiagramMarginsVert;      /**< vertical space between the filter and diagram plot. */
-    int             m_iCutOffLow;               /**< cut off frequqency lowpass or lower cut off when filter is a bandpass. */
-    int             m_iCutOffHigh;              /**< cut off frequqency highpass or higher cut off when filter is a bandpass. */
+    int             m_iDiagramSpacing;          /**< Horizontal spacing between magnitude and phase panels. */
     int             m_iCutOffMarkerWidth;       /**< cut off marker width. */
 
 };

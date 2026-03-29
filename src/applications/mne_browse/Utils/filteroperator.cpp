@@ -40,6 +40,8 @@
 
 #include "filteroperator.h"
 
+#include <algorithm>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -92,8 +94,6 @@ FilterOperator::FilterOperator(QString unique_name, FilterType type, int order, 
         }
 
         case Cosine: {
-            m_iFilterOrder = 0;
-
             CosineFilter filtercos;
 
             switch(type) {
@@ -125,12 +125,14 @@ FilterOperator::FilterOperator(QString unique_name, FilterType type, int order, 
                                             parkswidth*(sFreq/2),
                                             sFreq,
                                             (CosineFilter::TPassType)type);
+                    break;
                 case FilterType::NOTCH:
                     break;
             }
 
             m_dCoeffA = filtercos.m_vecCoeff;
             m_dFFTCoeffA = filtercos.m_vecFftCoeff;
+            m_iFilterOrder = static_cast<int>(m_dCoeffA.cols());
 
             break;
         }
@@ -176,25 +178,56 @@ RowVectorXd FilterOperator::applyFFTFilter(const RowVectorXd& data) const
         fftw_make_planner_thread_safe();
     #endif
 
-    //Zero pad in front and back
-    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
-    t_dataZeroPad.segment(m_iFFTlength/4-m_iFilterOrder/2, data.cols()) = data;
+    if(data.size() == 0 || m_dCoeffA.size() == 0) {
+        return data;
+    }
+
+    const int coeffLength = static_cast<int>(m_dCoeffA.cols());
+    const int minFftLength = std::max(m_iFFTlength, static_cast<int>(data.cols()) + coeffLength);
+
+    int fftLength = 1;
+    while(fftLength < minFftLength) {
+        fftLength <<= 1;
+    }
 
     //generate fft object
     Eigen::FFT<double> fft;
     fft.SetFlag(fft.HalfSpectrum);
 
+    // Transform coefficients on demand when the browser block is longer than the
+    // legacy raw-model window size. This keeps the filter path safe for QRHI
+    // blocks without forcing the whole app back to the compatibility model.
+    RowVectorXcd fftCoefficients;
+    if(m_dFFTCoeffA.cols() == fftLength/2 + 1) {
+        fftCoefficients = m_dFFTCoeffA;
+    } else {
+        RowVectorXd coeffZeroPad = RowVectorXd::Zero(fftLength);
+        coeffZeroPad.head(coeffLength) = m_dCoeffA;
+        fft.fwd(fftCoefficients, coeffZeroPad, fftLength);
+    }
+
+    RowVectorXd paddedData = data;
+    if(paddedData.cols() < fftLength) {
+        const int residual = fftLength - static_cast<int>(paddedData.cols());
+        paddedData.conservativeResize(fftLength);
+        paddedData.tail(residual).setZero();
+    }
+
     //fft-transform data sequence
     RowVectorXcd t_freqData;
-    fft.fwd(t_freqData,t_dataZeroPad);
+    fft.fwd(t_freqData, paddedData, fftLength);
 
     //perform frequency-domain filtering
-    RowVectorXcd t_filteredFreq = m_dFFTCoeffA.array()*t_freqData.array();
+    RowVectorXcd t_filteredFreq = fftCoefficients.array() * t_freqData.array();
 
     //inverse-FFT
     RowVectorXd t_filteredTime;
-    fft.inv(t_filteredTime,t_filteredFreq);
+    fft.inv(t_filteredTime, t_filteredFreq);
 
-    //Return filtered data still with zeros at front and end
-    return t_filteredTime;
+    const int groupDelay = coeffLength / 2;
+    if(groupDelay + data.cols() <= t_filteredTime.cols()) {
+        return t_filteredTime.segment(groupDelay, data.cols()).eval();
+    }
+
+    return t_filteredTime.head(data.cols()).eval();
 }

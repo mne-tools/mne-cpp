@@ -45,6 +45,7 @@
 #include "parksmcclellan.h"
 #include "cosinefilter.h"
 
+#include <algorithm>
 #include <iostream>
 
 //=============================================================================================================
@@ -405,6 +406,34 @@ void FilterKernel::designFilter()
     int iFftLength = m_iFilterOrder;
     int exp = ceil(Numerics::log2(iFftLength));
     iFftLength = pow(2, exp);
+
+    if(m_iDesignMethod == 0) {
+        double dSmallestFeatureHz = m_dParksWidth * (m_sFreq / 2.0);
+        const double dLowEdgeHz = std::max(0.0, (m_dCenterFreq - m_dBandwidth / 2.0) * (m_sFreq / 2.0));
+        const double dHighEdgeHz = std::max(0.0, (m_dCenterFreq + m_dBandwidth / 2.0) * (m_sFreq / 2.0));
+        const double dSingleCutoffHz = std::max(0.0, m_dCenterFreq * (m_sFreq / 2.0));
+
+        if(m_iFilterType == 0 || m_iFilterType == 1) {
+            if(dSingleCutoffHz > 0.0) {
+                dSmallestFeatureHz = std::min(dSmallestFeatureHz, dSingleCutoffHz);
+            }
+        } else {
+            if(dLowEdgeHz > 0.0) {
+                dSmallestFeatureHz = std::min(dSmallestFeatureHz, dLowEdgeHz);
+            }
+            if(dHighEdgeHz > 0.0) {
+                dSmallestFeatureHz = std::min(dSmallestFeatureHz, dHighEdgeHz);
+            }
+        }
+
+        dSmallestFeatureHz = std::max(0.5, dSmallestFeatureHz);
+
+        const int iRecommendedFftLength = static_cast<int>(std::ceil((m_sFreq / dSmallestFeatureHz) * 8.0));
+        if(iRecommendedFftLength > iFftLength) {
+            int iRecommendedExp = ceil(Numerics::log2(iRecommendedFftLength));
+            iFftLength = pow(2, iRecommendedExp);
+        }
+    }
 
     switch(m_iDesignMethod) {
         case 1: {

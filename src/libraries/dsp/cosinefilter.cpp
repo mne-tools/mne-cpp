@@ -42,6 +42,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include <algorithm>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -124,6 +126,10 @@ CosineFilter::CosineFilter(int fftLength,
                     c = cos(pi4*(k*mult+add));
                     filterFreqResp(s) = filterFreqResp(s).real()*c*c;
                 }
+            }
+
+            for (k = std::max(0, highpasss + w); k < resp_size; ++k) {
+                filterFreqResp(k) = 1.0;
             }
         }
     }
