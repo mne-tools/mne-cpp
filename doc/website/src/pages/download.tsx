@@ -28,6 +28,8 @@ interface GitHubRelease {
  * ──────────────────────────────────────────────────────────────── */
 
 const GH_API = 'https://api.github.com/repos/mne-tools/mne-cpp/releases';
+const STABLE_WASM_BASE_URL = 'https://mne-cpp.github.io/wasm';
+const DEV_WASM_BASE_URL = 'https://mne-cpp.github.io/wasm/dev';
 
 function fmtSize(bytes: number): string {
     if (bytes >= 1e9) return (bytes / 1e9).toFixed(1) + ' GB';
@@ -44,6 +46,10 @@ function fmtDate(iso: string): string {
 
 function shortSha(sha: string): string {
     return sha.slice(0, 7);
+}
+
+function wasmAppUrl(baseUrl: string, appFile: string): string {
+    return `${baseUrl}/${appFile}`;
 }
 
 /** Returns true when the string looks like a full or abbreviated commit SHA. */
@@ -453,6 +459,12 @@ export default function Download(): JSX.Element {
                                 executed entirely inside your browser's sandboxed runtime.
                             </p>
 
+                            <p className="dl-card__desc">
+                                Stable builds are published from tagged releases. Nightly builds are
+                                published from the current <code>staging</code> branch to the
+                                <code>/dev/</code> subdirectory.
+                            </p>
+
                             <div className="dl-privacy">
                                 <strong>Privacy.</strong>{' '}
                                 No files are uploaded to any cloud service or remote server.
@@ -473,56 +485,96 @@ export default function Download(): JSX.Element {
                                         <td>MNE Analyze</td>
                                         <td>Visualization, filtering, averaging, source localization</td>
                                         <td className="dl-table__right">
-                                            <a
-                                                href="https://mne-cpp.github.io/wasm/mne_analyze.html"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="button button--sm button--outline button--primary"
-                                            >
-                                                Open
-                                            </a>
+                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                                                <a
+                                                    href={wasmAppUrl(STABLE_WASM_BASE_URL, 'mne_analyze.html')}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="button button--sm button--outline button--primary"
+                                                >
+                                                    Stable
+                                                </a>
+                                                <a
+                                                    href={wasmAppUrl(DEV_WASM_BASE_URL, 'mne_analyze.html')}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="button button--sm button--outline button--secondary"
+                                                >
+                                                    Nightly
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>MNE Anonymize</td>
                                         <td>Remove or replace personally identifiable information from FIFF files</td>
                                         <td className="dl-table__right">
-                                            <a
-                                                href="https://mne-cpp.github.io/wasm/mne_anonymize.html"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="button button--sm button--outline button--primary"
-                                            >
-                                                Open
-                                            </a>
+                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                                                <a
+                                                    href={wasmAppUrl(STABLE_WASM_BASE_URL, 'mne_anonymize.html')}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="button button--sm button--outline button--primary"
+                                                >
+                                                    Stable
+                                                </a>
+                                                <a
+                                                    href={wasmAppUrl(DEV_WASM_BASE_URL, 'mne_anonymize.html')}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="button button--sm button--outline button--secondary"
+                                                >
+                                                    Nightly
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>MNE Browse</td>
                                         <td>Browse and inspect raw MEG/EEG data files</td>
                                         <td className="dl-table__right">
-                                            <a
-                                                href="https://mne-cpp.github.io/wasm/mne_browse.html"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="button button--sm button--outline button--primary"
-                                            >
-                                                Open
-                                            </a>
+                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                                                <a
+                                                    href={wasmAppUrl(STABLE_WASM_BASE_URL, 'mne_browse.html')}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="button button--sm button--outline button--primary"
+                                                >
+                                                    Stable
+                                                </a>
+                                                <a
+                                                    href={wasmAppUrl(DEV_WASM_BASE_URL, 'mne_browse.html')}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="button button--sm button--outline button--secondary"
+                                                >
+                                                    Nightly
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>MNE Inspect</td>
                                         <td>Inspect and review MEG/EEG channel data quality</td>
                                         <td className="dl-table__right">
-                                            <a
-                                                href="https://mne-cpp.github.io/wasm/mne_inspect.html"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="button button--sm button--outline button--primary"
-                                            >
-                                                Open
-                                            </a>
+                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                                                <a
+                                                    href={wasmAppUrl(STABLE_WASM_BASE_URL, 'mne_inspect.html')}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="button button--sm button--outline button--primary"
+                                                >
+                                                    Stable
+                                                </a>
+                                                <a
+                                                    href={wasmAppUrl(DEV_WASM_BASE_URL, 'mne_inspect.html')}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="button button--sm button--outline button--secondary"
+                                                >
+                                                    Nightly
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>

@@ -340,6 +340,9 @@ jobs:
         else
           git checkout --orphan gh-pages
         fi
+        if [ -d "dev" ]; then
+          cp -r dev /tmp/wasm-gh-pages-dev-backup
+        fi
         git rm -rf --ignore-unmatch .
         git clean -f -d
         git commit --allow-empty -m 'Update wasm builds'
@@ -347,6 +350,9 @@ jobs:
         if [ -d "../out/wasm/examples" ]; then
           mkdir -p examples
           cp -RT ../out/wasm/examples examples
+        fi
+        if [ -d "/tmp/wasm-gh-pages-dev-backup" ]; then
+          cp -r /tmp/wasm-gh-pages-dev-backup dev
         fi
         git add .
         git commit --amend --reset-author -m 'Update wasm builds'
@@ -358,6 +364,9 @@ jobs:
         else
           git checkout --orphan main
         fi
+        if [ -d "dev" ]; then
+          cp -r dev /tmp/wasm-main-dev-backup
+        fi
         git rm -rf --ignore-unmatch .
         git clean -f -d
         git commit --allow-empty -m 'Update wasm builds'
@@ -365,6 +374,9 @@ jobs:
         if [ -d "../out/wasm/examples" ]; then
           mkdir -p examples
           cp -RT ../out/wasm/examples examples
+        fi
+        if [ -d "/tmp/wasm-main-dev-backup" ]; then
+          cp -r /tmp/wasm-main-dev-backup dev
         fi
         git add .
         git commit --amend --reset-author -m 'Update wasm builds'

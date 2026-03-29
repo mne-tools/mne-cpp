@@ -8,6 +8,8 @@ sidebar_position: 14
 
 MNE-CPP can be compiled to [WebAssembly (Wasm)](https://webassembly.org/), allowing several of its GUI applications to run inside a standard web browser without installation. Users open a URL, load local `.fif` files, and work with the data directly — no data are uploaded to any server.
 
+Stable WebAssembly builds are published at `https://mne-cpp.github.io/wasm/`. Nightly development builds from the `staging` branch are published alongside them at `https://mne-cpp.github.io/wasm/dev/`.
+
 :::caution Experimental builds
 All WebAssembly builds listed on this page are **experimental** and under active development. Functionality may be incomplete or differ from the corresponding desktop applications. Bug reports and feedback are welcome.
 :::
@@ -60,7 +62,7 @@ The following MNE-CPP applications are currently available as WebAssembly builds
 
 <div style={{display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem'}}>
   <img src="/img/icon_mne-analyze_256x256.png" alt="MNE Analyze" width="48" />
-  <span>[Full documentation](analyze) &nbsp;·&nbsp; **[Launch in browser](https://mne-cpp.github.io/wasm/mne_analyze.html)**</span>
+  <span>[Full documentation](analyze) &nbsp;·&nbsp; **[Stable](https://mne-cpp.github.io/wasm/mne_analyze.html)** &nbsp;·&nbsp; **[Nightly](https://mne-cpp.github.io/wasm/dev/mne_analyze.html)**</span>
 </div>
 
 MNE Analyze provides a plugin-based GUI for sensor- and source-level analysis of pre-recorded MEG/EEG data. The WebAssembly build supports:
@@ -78,7 +80,7 @@ MNE Analyze provides a plugin-based GUI for sensor- and source-level analysis of
 
 <div style={{display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem'}}>
   <img src="/img/icon_mne-browse_256x256.png" alt="MNE Browse" width="48" />
-  <span>[Full documentation](browse-raw) &nbsp;·&nbsp; **[Launch in browser](https://mne-cpp.github.io/wasm/mne_browse.html)**</span>
+  <span>[Full documentation](browse-raw) &nbsp;·&nbsp; **[Stable](https://mne-cpp.github.io/wasm/mne_browse.html)** &nbsp;·&nbsp; **[Nightly](https://mne-cpp.github.io/wasm/dev/mne_browse.html)**</span>
 </div>
 
 MNE Browse provides a lightweight interface for browsing raw MEG/EEG data in FIFF format. Supported features:
@@ -95,7 +97,7 @@ MNE Browse provides a lightweight interface for browsing raw MEG/EEG data in FIF
 
 <div style={{display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem'}}>
   <img src="/img/icon_mne_inspect_256x256.png" alt="MNE Inspect" width="48" />
-  <span>[Full documentation](inspect) &nbsp;·&nbsp; **[Launch in browser](https://mne-cpp.github.io/wasm/mne_inspect.html)**</span>
+  <span>[Full documentation](inspect) &nbsp;·&nbsp; **[Stable](https://mne-cpp.github.io/wasm/mne_inspect.html)** &nbsp;·&nbsp; **[Nightly](https://mne-cpp.github.io/wasm/dev/mne_inspect.html)**</span>
 </div>
 
 MNE Inspect is a 3D brain visualization and source analysis application. The WebAssembly build supports:
@@ -111,7 +113,7 @@ MNE Inspect is a 3D brain visualization and source analysis application. The Web
 ### MNE Anonymize {#anonymize}
 
 <div style={{display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem'}}>
-  <span>[Full documentation](tools-anonymize) &nbsp;·&nbsp; **[Launch in browser](https://mne-cpp.github.io/wasm/mne_anonymize.html)**</span>
+  <span>[Full documentation](tools-anonymize) &nbsp;·&nbsp; **[Stable](https://mne-cpp.github.io/wasm/mne_anonymize.html)** &nbsp;·&nbsp; **[Nightly](https://mne-cpp.github.io/wasm/dev/mne_anonymize.html)**</span>
 </div>
 
 MNE Anonymize removes or substitutes Protected Health Information (PHI) and Personally Identifiable Information (PII) from FIFF files, following the HIPAA Safe Harbor approach. Handled fields include measurement dates, subject demographics, experimenter name, HIS IDs, project metadata, and hardware MAC addresses. The output file is completely rewritten — hidden or unlinked FIFF tags are never carried over.
