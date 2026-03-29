@@ -550,11 +550,17 @@ void DataWindow::rebuildVirtualChannels()
     for(const VirtualChannelDefinition& definition : std::as_const(m_virtualChannelDefinitions)) {
         const int primaryChannel = channelIndexByName.value(definition.primaryChannel.trimmed(), -1);
         QVector<int> referenceChannels;
+        QVector<double> referenceWeights;
         referenceChannels.reserve(definition.referenceChannels.size());
-        for(const QString& referenceName : definition.referenceChannels) {
+        referenceWeights.reserve(definition.referenceChannels.size());
+        for(int referenceIndex = 0; referenceIndex < definition.referenceChannels.size(); ++referenceIndex) {
+            const QString& referenceName = definition.referenceChannels.at(referenceIndex);
             const int referenceChannel = channelIndexByName.value(referenceName.trimmed(), -1);
             if(referenceChannel >= 0 && referenceChannel != primaryChannel && !referenceChannels.contains(referenceChannel)) {
                 referenceChannels.append(referenceChannel);
+                referenceWeights.append(referenceIndex < definition.referenceWeights.size()
+                                        ? definition.referenceWeights.at(referenceIndex)
+                                        : 1.0);
             }
         }
 
@@ -634,6 +640,7 @@ void DataWindow::rebuildVirtualChannels()
         resolvedChannel.kind = definition.kind;
         resolvedChannel.primaryChannel = primaryChannel;
         resolvedChannel.referenceChannels = referenceChannels;
+        resolvedChannel.referenceWeights = referenceWeights;
         resolvedChannel.displayInfo.name = definition.name;
         bool sameKind = true;
         float amplitudeMax = amplitudeForChannel(primaryChannelInfo);
@@ -682,12 +689,17 @@ Eigen::MatrixXd DataWindow::appendVirtualChannels(const Eigen::MatrixXd &data) c
 
         Eigen::RowVectorXd referenceSignal = Eigen::RowVectorXd::Zero(data.cols());
         bool validReferences = true;
-        for(int referenceChannel : virtualChannel.referenceChannels) {
+        for(int index = 0; index < virtualChannel.referenceChannels.size(); ++index) {
+            const int referenceChannel = virtualChannel.referenceChannels.at(index);
             if(referenceChannel < 0 || referenceChannel >= data.rows()) {
                 validReferences = false;
                 break;
             }
-            referenceSignal += data.row(referenceChannel);
+
+            const double weight = virtualChannel.kind == VirtualChannelKind::WeightedReference
+                ? virtualChannel.referenceWeights.value(index, 1.0)
+                : 1.0;
+            referenceSignal += weight * data.row(referenceChannel);
         }
 
         if(!validReferences) {

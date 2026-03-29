@@ -363,6 +363,7 @@ private:
         VirtualChannelKind          kind = VirtualChannelKind::Bipolar;
         int                         primaryChannel = -1;
         QVector<int>                referenceChannels;
+        QVector<double>             referenceWeights;
         DISPLIB::ChannelDisplayInfo displayInfo;
     };
 

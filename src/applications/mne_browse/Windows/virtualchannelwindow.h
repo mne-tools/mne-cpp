@@ -51,10 +51,12 @@ private:
     void setupUi();
     void initTable();
     void initToolBar();
+    bool promptForReferenceSet(VirtualReferenceSetDefinition& definition) const;
     bool promptForVirtualChannel(VirtualChannelDefinition& definition) const;
 
 private slots:
     void addVirtualChannel();
+    void manageReferenceSets();
     void removeSelectedVirtualChannels();
 
 private:
