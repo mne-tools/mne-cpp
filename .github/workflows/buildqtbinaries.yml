@@ -36,15 +36,26 @@ jobs:
       with:
         python-version: '3.10'
         architecture: 'x64'
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v4
-      with:
-        version: ${{ matrix.qt_version }}
-        modules: qtshadertools qttools
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -q
+        sudo apt-get install -q build-essential libgl1-mesa-dev libvulkan-dev ninja-build
+    - name: Compile dynamic Qt version
+      run: |
+        cd ..
+        git clone https://code.qt.io/qt/qt5.git -b v${{ matrix.qt_version }}
+        cd qt5
+        ./init-repository -f --module-subset=qtbase,qtsvg,qtshadertools,qttools
+        cd ..
+        mkdir qt6_shadow
+        cd qt6_shadow
+        ../qt5/configure -release -prefix "../Qt6_binaries" -skip webengine -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -qt-libpng -qt-pcre -- -DCMAKE_BUILD_TYPE=Release
+        cmake --build . --parallel $(nproc)
+        cmake --install .
     - name: Package binaries
       shell: bash
       run: |
-        tar cfvz "qt6_${{ matrix.version_token }}_dynamic_binaries_linux.tar.gz" -C "$RUNNER_WORKSPACE/Qt/${{ matrix.qt_version }}/gcc_64" .
+        tar cfvz "qt6_${{ matrix.version_token }}_dynamic_binaries_linux.tar.gz" -C ../Qt6_binaries .
     - uses: actions/upload-artifact@v7
       with:
         name: qt6_${{ matrix.version_token }}_dynamic_binaries_linux.tar.gz
@@ -76,15 +87,25 @@ jobs:
       with:
         python-version: '3.10'
         architecture: 'arm64'
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v4
-      with:
-        version: ${{ matrix.qt_version }}
-        modules: qtshadertools qttools
+    - name: Install dependencies
+      run: |
+        brew list ninja >/dev/null 2>&1 || brew install ninja
+    - name: Compile dynamic Qt version
+      run: |
+        cd ..
+        git clone https://code.qt.io/qt/qt5.git -b v${{ matrix.qt_version }}
+        cd qt5
+        ./init-repository -f --module-subset=qtbase,qtsvg,qtshadertools,qttools
+        cd ..
+        mkdir qt6_shadow
+        cd qt6_shadow
+        ../qt5/configure -release -prefix "../Qt6_binaries" -skip webengine -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -- -DCMAKE_BUILD_TYPE=Release
+        cmake --build . --parallel $(sysctl -n hw.ncpu)
+        cmake --install .
     - name: Package binaries
       shell: bash
       run: |
-        tar cfvz "qt6_${{ matrix.version_token }}_dynamic_binaries_macos.tar.gz" -C "$RUNNER_WORKSPACE/Qt/${{ matrix.qt_version }}/macos" .
+        tar cfvz "qt6_${{ matrix.version_token }}_dynamic_binaries_macos.tar.gz" -C ../Qt6_binaries .
     - uses: actions/upload-artifact@v7
       with:
         name: qt6_${{ matrix.version_token }}_dynamic_binaries_macos.tar.gz
@@ -105,10 +126,8 @@ jobs:
         include:
           - qt_version: '6.10.0'
             version_token: '6100'
-            source_build: false
           - qt_version: '6.11.0'
             version_token: '6110'
-            source_build: true
 
     steps:
     - name: Clone repository
@@ -118,19 +137,10 @@ jobs:
       with:
         python-version: '3.10'
         architecture: 'x64'
-    - name: Install Qt (pre-built)
-      if: ${{ !matrix.source_build }}
-      uses: jurplel/install-qt-action@v4
-      with:
-        version: ${{ matrix.qt_version }}
-        arch: win64_msvc2022_64
-        modules: qtshadertools qttools
     - name: Install ninja
-      if: ${{ matrix.source_build }}
       run: |
         choco install ninja
     - name: Compile dynamic Qt version from source
-      if: ${{ matrix.source_build }}
       run: |
         cd ..
         git clone https://code.qt.io/qt/qt5.git -b v${{ matrix.qt_version }}
@@ -143,11 +153,7 @@ jobs:
         cmake --install .
     - name: Package binaries
       run: |
-        if ('${{ matrix.source_build }}' -eq 'true') {
-          $qtDir = (Resolve-Path "$env:GITHUB_WORKSPACE\..\Qt6_binaries").Path
-        } else {
-          $qtDir = "$env:RUNNER_WORKSPACE\Qt\${{ matrix.qt_version }}\msvc2022_64"
-        }
+        $qtDir = (Resolve-Path "$env:GITHUB_WORKSPACE\..\Qt6_binaries").Path
         Push-Location $qtDir
         7z a "$env:GITHUB_WORKSPACE\qt6_${{ matrix.version_token }}_dynamic_binaries_win.zip" .
         Pop-Location
