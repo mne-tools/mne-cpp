@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
  * @file     mainwindow.h
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @version  2.1.0
  * @date     January, 2014
  *
  * @section  LICENSE
@@ -248,6 +248,16 @@ public:
 
     //=========================================================================================================
     /**
+     * Ensure the legacy RawModel is loaded for workflows that still require it
+     * (for example write/filter/projection operations).
+     *
+     * @param [in] featureName  User-facing feature name used in warning dialogs.
+     * @return true when the legacy model is available.
+     */
+    bool ensureLegacyRawModelLoaded(const QString& featureName = QString());
+
+    //=========================================================================================================
+    /**
      * applyCommandLineOptions applies options parsed from the command line after the window is shown.
      *
      * @param [in] rawFile     Path to raw FIFF file to open, or empty.
@@ -453,8 +463,8 @@ private:
     //=========================================================================================================
     /**
      * Seed auxiliary windows from the currently available FIFF header information.
-     * This keeps selection/layout-driven UI responsive even before the legacy RawModel
-     * background load has finished.
+     * This keeps selection/layout-driven UI responsive directly from the fast
+     * FiffBlockReader session state.
      */
     void syncAuxWindowsToFiffInfo(FIFFLIB::FiffInfo::SPtr fiffInfo,
                                   int firstSample,
@@ -499,7 +509,6 @@ private:
     QAction*                m_pHideBadAction;               /**< The action which is used to control hide bad channel functionality. */
     QAction*                m_pWhitenButterflyAction;       /**< Toggle whitening in the average butterfly plot. */
     QAction*                m_pAnnotationModeAction;        /**< Toggle Shift-drag annotation selection in the raw browser. */
-    QFutureWatcher<bool>    m_legacyLoadWatcher;            /**< Watches async legacy RawModel load so the UI stays responsive. */
     QList<MNELIB::MNEEpochDataList> m_epochReviewLists;     /**< Reviewed epochs grouped by event code. */
     QList<int>              m_epochReviewEventCodes;        /**< Event codes for the current review session. */
     QStringList             m_epochReviewComments;          /**< Display comments for the current review session. */

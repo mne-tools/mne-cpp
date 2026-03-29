@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
  * @file     noisereductionwindow.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @version  2.1.0
  * @date     December, 2014
  *
  * @section  LICENSE
@@ -152,7 +152,6 @@ void NoiseReductionWindow::createProjectorGroup()
             connect(m_enableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
                 this, &NoiseReductionWindow::enableDisableAllProj);
 
-            emit projSelectionChanged();
         }
 
         delete ui->m_groupBox_projections->layout();

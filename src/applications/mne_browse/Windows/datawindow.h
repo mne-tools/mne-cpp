@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
  * @file     datawindow.h
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @version  2.1.0
  * @date     August, 2014
  *
  * @section  LICENSE
@@ -46,6 +46,7 @@
 #include "../Delegates/rawdelegate.h"
 #include "../Models/rawmodel.h"
 #include "../Models/fiffblockreader.h"
+#include "../Views/rawview.h"
 
 #include <disp/viewers/channeldataview.h>
 #include <disp/viewers/helpers/channelrhiview.h>
@@ -57,6 +58,7 @@
 //=============================================================================================================
 
 #include <QWidget>
+#include <QByteArray>
 #include <QResizeEvent>
 #include <QPainter>
 #include <QColor>
@@ -133,6 +135,17 @@ public:
      * @return true on success.
      */
     bool loadFiffFile(const QString &path);
+
+    //=========================================================================================================
+    /**
+     * Load raw FIFF content from memory.
+     * Used by the browser/WASM file-picker path where no persistent filesystem path exists.
+     *
+     * @param[in] data         Raw FIFF file contents.
+     * @param[in] displayName  Friendly file name shown in the UI.
+     * @return true on success.
+     */
+    bool loadFiffBuffer(const QByteArray &data, const QString &displayName);
 
     //=========================================================================================================
     /**
@@ -233,6 +246,12 @@ public:
      * Returns the GPU-accelerated ChannelDataView (may be nullptr before loadFiffFile).
      */
     DISPLIB::ChannelDataView* getChannelDataView() { return m_pChannelDataView; }
+
+    //=========================================================================================================
+    /**
+     * Returns the application-level raw browser wrapper.
+     */
+    RawView* getRawView() { return m_pChannelDataView; }
 
     //=========================================================================================================
     /**
@@ -343,12 +362,12 @@ private:
     bool            m_bHideBadChannels;             /**< hide bad channels flag. */
 
     // ── ChannelDataView (GPU-accelerated renderer) ─────────────────────
-    DISPLIB::ChannelDataView* m_pChannelDataView    = nullptr; /**< GPU-accelerated signal renderer. */
-    FiffBlockReader*          m_pFiffReader         = nullptr; /**< Demand-paging FIFF reader. */
-    int                       m_iNextLoadSample     = 0;       /**< First sample of the next forward block to load. */
-    int                       m_iCurrentScrollSample = 0;      /**< Last known scroll position (absolute sample). */
-    bool                      m_bLoadingBlock       = false;   /**< Async load in progress. */
-    QString                   m_sFiffFilePath;                 /**< Path of the currently open FIFF file. */
+    RawView*                 m_pChannelDataView     = nullptr; /**< Application-level raw browser view wrapper. */
+    FiffBlockReader*         m_pFiffReader          = nullptr; /**< Demand-paging FIFF reader. */
+    int                      m_iNextLoadSample      = 0;       /**< First sample of the next forward block to load. */
+    int                      m_iCurrentScrollSample = 0;       /**< Last known scroll position (absolute sample). */
+    bool                     m_bLoadingBlock        = false;   /**< Async load in progress. */
+    QString                  m_sFiffFilePath;                  /**< Path of the currently open FIFF file. */
 
     // ── STIM event cache ───────────────────────────────────────────────
     QVector<DISPLIB::ChannelRhiView::EventMarker> m_stimEvents; /**< Accumulated STIM-channel events across loaded blocks. */
@@ -440,6 +459,14 @@ protected slots:
 
     //=========================================================================================================
     /**
+     * Moves the marker to the requested absolute sample in the visible raw viewport.
+     *
+     * @param[in] sample  Absolute sample index to place the marker at.
+     */
+    void moveMarkerToSample(int sample);
+
+    //=========================================================================================================
+    /**
      * Updates the marker position
      */
     void updateMarkerPosition();
@@ -449,6 +476,13 @@ protected slots:
      * Highlights the current selected channels in the 2D plot of selection manager
      */
     void highlightChannelsInSelectionManager();
+
+private:
+    //=========================================================================================================
+    /**
+     * Returns the actual signal viewport of the QRHI browser mapped into DataWindow coordinates.
+     */
+    QRect markerViewportRect() const;
 };
 
 } // NAMESPACE MNEBROWSE

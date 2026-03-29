@@ -1,8 +1,8 @@
 //=============================================================================================================
 /**
  * @file     rawsettings.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @version  dev
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @version  2.1.0
  * @date     January, 2014
  *
  * @section  LICENSE

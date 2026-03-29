@@ -218,7 +218,7 @@ void MneBrowseRawDelegate::createPlotPath(const QModelIndex& index,
     double dcOffset = 0.0;
     if(m_removeDC && rawModel) {
         const QModelIndex meanIndex = rawModel->index(index.row(), 1);
-        const QVariant meanVariant = rawModel->data(meanIndex, RawModelRoles::GetChannelMean);
+        const QVariant meanVariant = rawModel->data(meanIndex, MNEBROWSE::RawModelRoles::GetChannelMean);
         if(meanVariant.isValid()) {
             dcOffset = meanVariant.toDouble();
         }

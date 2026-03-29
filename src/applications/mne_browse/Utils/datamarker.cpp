@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
  * @file     datamarker.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @version  2.1.0
  * @date     August, 2014
  *
  * @section  LICENSE
@@ -83,8 +83,8 @@ void DataMarker::setMovementBoundary(QRegion rect)
 
 void DataMarker::mousePressEvent(QMouseEvent *event)
 {
-    if(event->buttons() == Qt::LeftButton)
-        m_oldPos = event->globalPosition().toPoint();
+    if(event->button() == Qt::LeftButton)
+        m_oldPos = event->position().toPoint();
 }
 
 
@@ -92,23 +92,20 @@ void DataMarker::mousePressEvent(QMouseEvent *event)
 
 void DataMarker::mouseMoveEvent(QMouseEvent *event)
 {
-    if(event->buttons() == Qt::LeftButton) {
-        const QPoint delta = event->globalPosition().toPoint() - m_oldPos;
-
-        QRect newPosition(x()+delta.x(), y(),
-                          this->geometry().width(), this->geometry().height());
-
-        //Check if new position is inside the boundary
-        if(m_movableRegion.contains(newPosition.bottomLeft()) && m_movableRegion.contains(newPosition.bottomRight())) {
-            move(x()+delta.x(), y());
-            m_oldPos = event->globalPosition().toPoint();
+    if(event->buttons() & Qt::LeftButton) {
+        const QRect boundaryRect = m_movableRegion.boundingRect();
+        if(boundaryRect.isEmpty()) {
+            return;
         }
 
-        if(event->scenePosition().x() < m_movableRegion.boundingRect().left())
-            move(m_movableRegion.boundingRect().left(), y());
+        const QPoint parentCursorPos = mapToParent(event->position().toPoint());
+        const int minX = boundaryRect.left();
+        const int maxX = qMax(minX, boundaryRect.right() - width() + 1);
+        const int nextX = qBound(minX,
+                                 parentCursorPos.x() - m_oldPos.x(),
+                                 maxX);
 
-        if(event->scenePosition().x() > m_movableRegion.boundingRect().right())
-            move(m_movableRegion.boundingRect().right()-2, y());
+        move(nextX, boundaryRect.top());
     }
 }
 

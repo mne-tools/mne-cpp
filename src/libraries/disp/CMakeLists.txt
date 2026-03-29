@@ -24,23 +24,13 @@ if(NOT WASM)
     endif()
 endif()
 
-# ── Optional QRhi support for ChannelDataView / ChannelRhiView ──────────────
-# Requires Qt6 with GuiPrivate (for <rhi/qrhi.h>) and ShaderTools (for qt_add_shaders).
-# Falls back silently to the QPainter path when either is unavailable.
-set(MNE_DISP_HAS_RHIWIDGET FALSE)
-if(NOT WASM)
-    if(Qt6_FOUND OR QT_VERSION_MAJOR EQUAL 6)
-        find_package(Qt6 OPTIONAL_COMPONENTS GuiPrivate ShaderTools QUIET)
-        if(Qt6GuiPrivate_FOUND AND Qt6ShaderTools_FOUND)
-            set(MNE_DISP_HAS_RHIWIDGET TRUE)
-            message(STATUS "mne_disp: QRhi GPU rendering enabled (Qt6::GuiPrivate + ShaderTools found)")
-        else()
-            message(STATUS "mne_disp: QRhi disabled — Qt6::GuiPrivate or ShaderTools not found, using QPainter tile cache")
-        endif()
-    endif()
-else()
-    message(STATUS "mne_disp: QRhi disabled for WASM build — using QPainter tile cache")
+if(NOT (Qt6_FOUND OR QT_VERSION_MAJOR EQUAL 6))
+    message(FATAL_ERROR "mne_disp now requires Qt 6 for the QRhi-based raw browser renderer.")
 endif()
+
+find_package(Qt6 REQUIRED COMPONENTS GuiPrivate ShaderTools)
+set(MNE_DISP_HAS_RHIWIDGET TRUE)
+message(STATUS "mne_disp: QRhi GPU rendering enabled as the only supported raw-browser renderer")
 
 set(SOURCES
     disp_global.cpp
@@ -215,7 +205,6 @@ add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI})
 
 # ── QRhi / shader compilation ───────────────────────────────────────────────
 if(MNE_DISP_HAS_RHIWIDGET)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_DISP_RHIWIDGET)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::GuiPrivate)
 
     qt_add_shaders(${PROJECT_NAME} "channeldata_shaders"
@@ -290,4 +279,3 @@ foreach(_header ${HEADERS})
         COMPONENT sdk
     )
 endforeach()
-

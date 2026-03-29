@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
  * @file     eventmodel.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  dev
+ * @version  2.1.0
  * @date     July, 2014
  *
  * @section  LICENSE
@@ -413,7 +413,7 @@ bool EventModel::saveEventData(QFile& qFile)
 
 //*************************************************************************************************************
 
-void EventModel::setFiffInfo(FiffInfo::SPtr& pFiffInfo)
+void EventModel::setFiffInfo(const FiffInfo::SPtr& pFiffInfo)
 {
     m_pFiffInfo = pFiffInfo;
 }
