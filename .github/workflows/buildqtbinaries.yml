@@ -155,7 +155,8 @@ jobs:
           # Temporary Qt 6.11 Windows workaround:
           # qhelpenginecore.cpp uses QtConcurrent, but the Help target omits Qt::Concurrent.
           # Remove this block once the next Qt release no longer needs the patch.
-          git -C qt5 submodule update --init --depth 1 qtrepotools qtbase qtsvg qtshadertools qtimageformats qtlanguageserver qtdeclarative qtactiveqt qttools
+          # qttools/assistant also needs its nested qlitehtml submodule on 6.11.
+          git -C qt5 submodule update --init --recursive --depth 1 qtrepotools qtbase qtsvg qtshadertools qtimageformats qtlanguageserver qtdeclarative qtactiveqt qttools
           $helpCmake = Join-Path $workRoot 'qt5\qttools\src\assistant\help\CMakeLists.txt'
           $helpCmakeLines = [System.Collections.Generic.List[string]]::new()
           $helpCmakeLines.AddRange([string[]](Get-Content $helpCmake))
