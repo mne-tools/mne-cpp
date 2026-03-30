@@ -292,14 +292,11 @@ jobs:
       uses: actions/checkout@v5
 
     - name: Install Qt Installer Framework
-      shell: pwsh
+      shell: cmd
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        ./scripts/ci/download_toolchain.ps1 `
-          -Kind ifw `
-          -Version '${{ env.QIF_VERSION }}' `
-          -OutputDir "$env:RUNNER_TEMP\ifw"
+        call scripts\ci\download_toolchain.bat --kind ifw --version "${{ env.QIF_VERSION }}" --output-dir "%RUNNER_TEMP%\ifw"
 
     - name: Determine release tag
       id: tag

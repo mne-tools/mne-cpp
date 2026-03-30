@@ -44,6 +44,15 @@ jobs:
           --linkage dynamic \
           --output-dir "$RUNNER_TEMP/qt"
 
+    - name: Download Eigen package
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind eigen \
+          --version "5.0.1" \
+          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+
     # Initialize CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v4

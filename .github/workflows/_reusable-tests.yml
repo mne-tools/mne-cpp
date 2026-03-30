@@ -68,17 +68,31 @@ jobs:
           --linkage dynamic \
           --output-dir "$RUNNER_TEMP/qt"
 
-    - name: Download Qt toolchain (Windows)
-      if: matrix.os == 'windows-2025'
-      shell: pwsh
+    - name: Download Eigen package (Linux|MacOS)
+      if: matrix.os == 'ubuntu-24.04' || matrix.os == 'macos-26'
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        ./scripts/ci/download_toolchain.ps1 `
-          -Kind qt `
-          -Version '6.11.0' `
-          -Linkage dynamic `
-          -OutputDir "$env:RUNNER_TEMP\qt"
+        ./scripts/ci/download_toolchain.sh \
+          --kind eigen \
+          --version "5.0.1" \
+          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+
+    - name: Download Qt toolchain (Windows)
+      if: matrix.os == 'windows-2025'
+      shell: cmd
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        call scripts\ci\download_toolchain.bat --kind qt --version "6.11.0" --linkage dynamic --output-dir "%RUNNER_TEMP%\qt"
+
+    - name: Download Eigen package (Windows)
+      if: matrix.os == 'windows-2025'
+      shell: cmd
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        call scripts\ci\download_toolchain.bat --kind eigen --version "5.0.1" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
 
     - name: Install MNE-Python
       run: |

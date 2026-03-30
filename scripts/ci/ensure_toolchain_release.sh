@@ -8,8 +8,8 @@ if [[ $# -ne 1 ]]; then
 fi
 
 release_tag="$1"
-release_title="${QT_BINARY_RELEASE_TITLE:-Qt Toolchain Artifacts}"
-release_notes="${QT_BINARY_RELEASE_NOTES:-Reusable Qt runtime, static, WASM and Installer Framework assets for CI.}"
+release_title="${TOOLCHAIN_RELEASE_TITLE:-${QT_BINARY_RELEASE_TITLE:-Toolchain Artifacts}}"
+release_notes="${TOOLCHAIN_RELEASE_NOTES:-${QT_BINARY_RELEASE_NOTES:-Reusable dependency assets for CI and local development.}}"
 repo="${GITHUB_REPOSITORY:?GITHUB_REPOSITORY is required}"
 
 if gh release view "${release_tag}" -R "${repo}" >/dev/null 2>&1; then

@@ -34,6 +34,7 @@
     SET "ExtraArgs="
     SET "ExtraSection=False"
     SET "QtCustomPath="
+    SET "QtLinkage=dynamic"
 
 
     :loop
@@ -73,6 +74,7 @@
       )
       IF "%ExtraSection%"=="False" IF "%1"=="static" (
         SET "CMakeConfigFlags=!CMakeConfigFlags! -DBUILD_SHARED_LIBS=OFF"
+        SET "QtLinkage=static"
       )
       IF "%ExtraSection%"=="False" IF "%1"=="tmsi" (
         SET "CMakeConfigFlags=!CMakeConfigFlags! -DWITH_TMSI=ON"
@@ -93,6 +95,13 @@
     SET SourceFolder=%BaseFolder%\src
     SET BuildFolder=%BaseFolder%\build\%BuildName%
     SET OutFolder=%BaseFolder%\out\%BuildName%
+
+    IF [%QtCustomPath%]==[] (
+      SET "QtDefaultPath=%BaseFolder%\src\external\qt\%QtLinkage%"
+      IF EXIST "!QtDefaultPath!\bin" (
+        SET "QtCustomPath=!QtDefaultPath!"
+      )
+    )
 
     IF "%MockBuild%"=="True" (
         ECHO.
@@ -207,6 +216,8 @@
       ECHO [qt=\path\]- Use specified qt installation to build the project. This \path
       ECHO              must point to the directory containing the bin and lib folders
       ECHO              for the desired Qt version. ex. \some\path\to\Qt\5.15.2\msvc2019_64\
+      ECHO              If omitted, the script auto-detects src\external\qt\dynamic or
+      ECHO              src\external\qt\static prepared by init.bat.
       ECHO [--]       - Mark beginning of extra-arguments section. Any argument
       ECHO              following the double dash will be passed on to cmake 
       ECHO              directly without it being parsed.      
@@ -300,6 +311,7 @@ CMakeConfigFlags=""
 ExtraArgs=""
 ExtraSection=False
 QtCustomPath=""
+QtLinkage="dynamic"
 EchoFlag=""
 
 doShowLogo() {
@@ -392,6 +404,8 @@ doPrintHelp() {
   echo "[qt=<path>]- Use specified qt installation to build the project. This path"
   echo "             must point to the directory containing the bin and lib folders"
   echo "             for the desired Qt version. ex. /some/path/to/Qt/5.15.2/gcc_64/"
+  echo "             If omitted, the script auto-detects src/external/qt/dynamic or"
+  echo "             src/external/qt/static prepared by ./init.sh."
   echo "[--]       - mark beginning of extra-arguments section. any argument"
   echo "             following the double dash will be passed on to cmake"
   echo "             directly without it being parsed."
@@ -415,6 +429,7 @@ for (( j=0; j<argc; j++)); do
     PrintHelp="true"
   elif [ "${argv[j]}" == "static" ]; then
     CMakeConfigFlags="${CMakeConfigFlags} -DBUILD_SHARED_LIBS=OFF"
+    QtLinkage="static"
   fi
   IFS='=' read -r -a inkarg <<< "${argv[j]}"
   if [ "${inkarg[0]}" == "qt" ]; then
@@ -446,6 +461,13 @@ fi
 SourceFolder=${BaseFolder}/src
 BuildFolder=${BaseFolder}/build/${BuildName}
 OutFolder=${BaseFolder}/out/${BuildName}
+
+if [ -z "${QtCustomPath}" ]; then
+  QtDefaultPath="${BaseFolder}/src/external/qt/${QtLinkage}"
+  if [ -d "${QtDefaultPath}/bin" ]; then
+    QtCustomPath="${QtDefaultPath}"
+  fi
+fi
 
 if [ -n "${MNE_CPP_BUILD_JOBS}" ]; then
   NumProcesses="${MNE_CPP_BUILD_JOBS}"
