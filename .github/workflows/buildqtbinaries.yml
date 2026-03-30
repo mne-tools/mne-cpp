@@ -150,17 +150,23 @@ jobs:
         cd ..
         $workRoot = (Get-Location).Path
         git clone https://code.qt.io/qt/qt5.git -b v${{ matrix.qt_version }}
-        git -C qt5 submodule update --init --depth 1 qttools
-        $helpCmake = Join-Path $workRoot 'qt5\qttools\src\assistant\help\CMakeLists.txt'
-        $helpCmakeLines = [System.Collections.Generic.List[string]]::new()
-        $helpCmakeLines.AddRange([string[]](Get-Content $helpCmake))
-        if (-not ($helpCmakeLines -contains '        Qt::Concurrent')) {
-          $coreLineIndex = $helpCmakeLines.IndexOf('        Qt::Core')
-          if ($coreLineIndex -lt 0) {
-            throw 'Could not locate Qt::Core entry in qttools/src/assistant/help/CMakeLists.txt.'
+        $applyQt611QtToolsPatch = '${{ matrix.qt_version }}' -eq '6.11.0'
+        if ($applyQt611QtToolsPatch) {
+          # Temporary Qt 6.11 Windows workaround:
+          # qhelpenginecore.cpp uses QtConcurrent, but the Help target omits Qt::Concurrent.
+          # Remove this block once the next Qt release no longer needs the patch.
+          git -C qt5 submodule update --init --depth 1 qtrepotools qtbase qtsvg qtshadertools qtimageformats qtlanguageserver qtdeclarative qtactiveqt qttools
+          $helpCmake = Join-Path $workRoot 'qt5\qttools\src\assistant\help\CMakeLists.txt'
+          $helpCmakeLines = [System.Collections.Generic.List[string]]::new()
+          $helpCmakeLines.AddRange([string[]](Get-Content $helpCmake))
+          if (-not ($helpCmakeLines -contains '        Qt::Concurrent')) {
+            $coreLineIndex = $helpCmakeLines.IndexOf('        Qt::Core')
+            if ($coreLineIndex -lt 0) {
+              throw 'Could not locate Qt::Core entry in qttools/src/assistant/help/CMakeLists.txt.'
+            }
+            $helpCmakeLines.Insert($coreLineIndex + 1, '        Qt::Concurrent')
+            Set-Content -Path $helpCmake -Value $helpCmakeLines
           }
-          $helpCmakeLines.Insert($coreLineIndex + 1, '        Qt::Concurrent')
-          Set-Content -Path $helpCmake -Value $helpCmakeLines
         }
         mkdir qt6_shadow
         cd qt6_shadow
@@ -171,7 +177,25 @@ jobs:
         $vcvarsPath = Join-Path $vsInstallPath 'VC\Auxiliary\Build\vcvars64.bat'
         cmd.exe /c "call `"$vcvarsPath`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        ..\qt5\configure.bat -init-submodules -submodules qtbase,qtsvg,qtshadertools,qttools -release -no-openssl -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "..\Qt6_binaries" -skip webengine -nomake tests -nomake examples -opensource -confirm-license
+        $configureArgs = @(
+          '-submodules', 'qtbase,qtsvg,qtshadertools,qttools',
+          '-release',
+          '-no-openssl',
+          '-no-pch',
+          '-optimize-size',
+          '-opengl', 'desktop',
+          '-platform', 'win32-msvc',
+          '-prefix', '..\Qt6_binaries',
+          '-skip', 'webengine',
+          '-nomake', 'tests',
+          '-nomake', 'examples',
+          '-opensource',
+          '-confirm-license'
+        )
+        if (-not $applyQt611QtToolsPatch) {
+          $configureArgs = @('-init-submodules') + $configureArgs
+        }
+        & ..\qt5\configure.bat @configureArgs
         cmake --build . --parallel $env:NUMBER_OF_PROCESSORS
         cmake --install .
     - name: Package binaries
