@@ -31,6 +31,14 @@ jobs:
             --version "6.11.0" \
             --linkage dynamic \
             --output-dir "$RUNNER_TEMP/qt"
+      - name: Download Eigen package
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          ./scripts/ci/download_toolchain.sh \
+            --kind eigen \
+            --version "5.0.1" \
+            --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
       - name: Coverity scripts
         run: |
           ./scripts/coverity_scan.sh "$COVTOKEN"

@@ -9,6 +9,29 @@ MNE-CPP uses **CMake** as its build system and requires **C++20** and **Qt 6**. 
 
 ## Prerequisites
 
+### Recommended Bootstrap
+
+The quickest way to get a reproducible developer setup is to use the repository init scripts:
+
+```bash
+./init.sh
+cmake --build build/developer-dynamic --parallel
+```
+
+On Windows use:
+
+```bat
+.\init.bat
+cmake --build build\developer-dynamic --parallel
+```
+
+These scripts download the MNE-CPP-maintained prerelease dependency bundles into `src/external/`:
+
+- Qt 6 desktop binaries matching your platform and requested linkage
+- Eigen 5.0.1 as a clean CMake package bundle
+
+That keeps local development aligned with the dependency artifacts used in CI and release workflows. Qt currently downloads from the public `qt_binaries` prerelease tag. Eigen is set up to use the public `eigen_artifacts` prerelease tag once it exists; until then the init scripts transparently fall back to the bundled `src/external/eigen-5.0.1` tree.
+
 ### CMake
 
 [CMake](https://cmake.org/download/) **3.15 or higher** is required.
@@ -23,7 +46,7 @@ MNE-CPP requires a compiler with **C++20 support**. The following compilers are 
 
 ### Qt 6
 
-Qt 6 is the only external dependency. **Qt 5 is no longer supported.**
+Qt 6 is the only dependency you need to install manually if you choose not to use the init scripts above. **Qt 5 is no longer supported.**
 
 1. Download and run the [Qt Online Installer](https://www.qt.io/download-qt-installer).
 2. Install **Qt 6.10 or higher** to a path without spaces. During installation, select:
@@ -66,6 +89,8 @@ Navigate to the `mne-cpp` root folder. We provide a cross-platform build script 
 ```bash
 ./scripts/build_project.bat
 ```
+
+If you ran `./init.sh` or `.\init.bat` first, `./scripts/build_project.bat` will also auto-detect the downloaded Qt bundle from `src/external/qt/`.
 
 Common options:
 

@@ -29,7 +29,11 @@ MNE-CPP is an open-source, cross-platform C++ framework for real-time and offlin
 Build from source
 -----------------
 
-`tools/build_project.bat` builds the project for Windows, Linux, and macOS.
+`./init.sh` bootstraps a developer build by downloading the MNE-CPP-maintained Qt and Eigen prerelease artifacts into `src/external/` and configuring a root-level build directory. On Windows use `.\init.bat`.
+
+It uses the public `qt_binaries` prerelease assets from the MNE-CPP releases page. Eigen is wired to the public `eigen_artifacts` prerelease as well, and until that first artifact is published the init flow falls back to the bundled `src/external/eigen-5.0.1` copy already in the repository.
+
+`./scripts/build_project.bat` builds the project for Windows, Linux, and macOS.
 
 For IDE discovery and manual builds, configure from the repository root:
 
@@ -43,6 +47,10 @@ For more in-depth information on how to compile the project, please follow the [
     * macOS - [Apple Clang (Xcode)](https://developer.apple.com/xcode/)
   * External dependencies
     * [Qt 6.10](https://www.qt.io/) or later
+
+Recommended quick start:
+
+`./init.sh && cmake --build build/developer-dynamic --parallel`
 
 Releases
 --------
