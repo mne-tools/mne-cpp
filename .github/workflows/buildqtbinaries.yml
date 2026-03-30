@@ -150,6 +150,7 @@ jobs:
         cd ..
         $workRoot = (Get-Location).Path
         git clone https://code.qt.io/qt/qt5.git -b v${{ matrix.qt_version }}
+        git -C qt5 submodule update --init --depth 1 qttools
         $helpCmake = Join-Path $workRoot 'qt5\qttools\src\assistant\help\CMakeLists.txt'
         $helpCmakeLines = [System.Collections.Generic.List[string]]::new()
         $helpCmakeLines.AddRange([string[]](Get-Content $helpCmake))
