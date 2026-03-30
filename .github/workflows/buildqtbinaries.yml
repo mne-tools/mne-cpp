@@ -148,10 +148,27 @@ jobs:
     - name: Compile dynamic Qt version from source
       run: |
         cd ..
+        $workRoot = (Get-Location).Path
         git clone https://code.qt.io/qt/qt5.git -b v${{ matrix.qt_version }}
+        $helpCmake = Join-Path $workRoot 'qt5\qttools\src\assistant\help\CMakeLists.txt'
+        $helpCmakeLines = [System.Collections.Generic.List[string]]::new()
+        $helpCmakeLines.AddRange([string[]](Get-Content $helpCmake))
+        if (-not ($helpCmakeLines -contains '        Qt::Concurrent')) {
+          $coreLineIndex = $helpCmakeLines.IndexOf('        Qt::Core')
+          if ($coreLineIndex -lt 0) {
+            throw 'Could not locate Qt::Core entry in qttools/src/assistant/help/CMakeLists.txt.'
+          }
+          $helpCmakeLines.Insert($coreLineIndex + 1, '        Qt::Concurrent')
+          Set-Content -Path $helpCmake -Value $helpCmakeLines
+        }
         mkdir qt6_shadow
         cd qt6_shadow
-        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        $vsInstallPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+        if (-not $vsInstallPath) {
+          throw 'Could not locate a Visual Studio installation with VC tools.'
+        }
+        $vcvarsPath = Join-Path $vsInstallPath 'VC\Auxiliary\Build\vcvars64.bat'
+        cmd.exe /c "call `"$vcvarsPath`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         ..\qt5\configure.bat -init-submodules -submodules qtbase,qtsvg,qtshadertools,qttools -release -no-openssl -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "..\Qt6_binaries" -skip webengine -nomake tests -nomake examples -opensource -confirm-license
         cmake --build . --parallel $env:NUMBER_OF_PROCESSORS
@@ -235,10 +252,15 @@ jobs:
         cd "${WORK_ROOT}"
         "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 curl -fsSLO "https://download.qt.io/official_releases/qt-installer-framework/${{ env.QIF_VERSION }}/installer-framework-everywhere-src-${{ env.QIF_VERSION }}.tar.xz"
         tar xf "installer-framework-everywhere-src-${{ env.QIF_VERSION }}.tar.xz"
+        IFW_SRC_DIR="$(find "${WORK_ROOT}" -maxdepth 1 -type d -name 'installer-framework-everywhere-src*' | head -n 1)"
+        if [ -z "${IFW_SRC_DIR}" ]; then
+          echo "Unable to locate extracted IFW source directory." >&2
+          exit 1
+        fi
 
         mkdir ifw_build
         cd ifw_build
-        "${WORK_ROOT}/QtIfwQt/bin/qmake" "../installer-framework-everywhere-src-${{ env.QIF_VERSION }}/installerfw.pro"
+        "${WORK_ROOT}/QtIfwQt/bin/qmake" "${IFW_SRC_DIR}/installerfw.pro"
         make -j"$(nproc)"
     - name: Package binaries
       run: |
@@ -307,10 +329,15 @@ jobs:
         cd "${WORK_ROOT}"
         "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 curl -fsSLO "https://download.qt.io/official_releases/qt-installer-framework/${{ env.QIF_VERSION }}/installer-framework-everywhere-src-${{ env.QIF_VERSION }}.tar.xz"
         tar xf "installer-framework-everywhere-src-${{ env.QIF_VERSION }}.tar.xz"
+        IFW_SRC_DIR="$(find "${WORK_ROOT}" -maxdepth 1 -type d -name 'installer-framework-everywhere-src*' | head -n 1)"
+        if [ -z "${IFW_SRC_DIR}" ]; then
+          echo "Unable to locate extracted IFW source directory." >&2
+          exit 1
+        fi
 
         mkdir ifw_build
         cd ifw_build
-        "${WORK_ROOT}/QtIfwQt/bin/qmake" "../installer-framework-everywhere-src-${{ env.QIF_VERSION }}/installerfw.pro"
+        "${WORK_ROOT}/QtIfwQt/bin/qmake" "${IFW_SRC_DIR}/installerfw.pro"
         make -j"$(sysctl -n hw.ncpu)"
     - name: Package binaries
       run: |
@@ -358,12 +385,19 @@ jobs:
         New-Item -ItemType Directory -Path (Join-Path $workRoot 'qtifw_qt_build') | Out-Null
         Set-Location (Join-Path $workRoot 'qtifw_qt_build')
 
-        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        $customVcpkgRoot = $env:VCPKG_ROOT
+        $vsInstallPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+        if (-not $vsInstallPath) {
+          throw 'Could not locate a Visual Studio installation with VC tools.'
+        }
+        $vcvarsPath = Join-Path $vsInstallPath 'VC\Auxiliary\Build\vcvars64.bat'
+        cmd.exe /c "call `"$vcvarsPath`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object {
           if ($_ -match "^(.*?)=(.*)$") {
             Set-Content "env:\$($matches[1])" $matches[2]
           }
         }
+        $env:VCPKG_ROOT = $customVcpkgRoot
 
         & (Join-Path $workRoot 'qt5\configure.bat') `
           -init-submodules `
@@ -389,6 +423,10 @@ jobs:
           -Uri 'https://download.qt.io/official_releases/qt-installer-framework/${{ env.QIF_VERSION }}/installer-framework-everywhere-src-${{ env.QIF_VERSION }}.zip' `
           -OutFile $ifwArchive
         Expand-Archive -Path $ifwArchive -DestinationPath $workRoot -Force
+        $ifwSourceDir = Get-ChildItem -Path $workRoot -Directory -Filter 'installer-framework-everywhere-src*' | Sort-Object FullName | Select-Object -First 1
+        if (-not $ifwSourceDir) {
+          throw 'Unable to locate extracted IFW source directory.'
+        }
 
         $libRoot = Join-Path $env:VCPKG_ROOT 'installed\x64-windows-static'
         $env:INCLUDE = "$(Join-Path $libRoot 'include');$env:INCLUDE"
@@ -403,7 +441,7 @@ jobs:
         New-Item -ItemType Directory -Path (Join-Path $workRoot 'ifw_build') | Out-Null
         Set-Location (Join-Path $workRoot 'ifw_build')
         & (Join-Path $workRoot 'QtIfwQt\bin\qmake.exe') `
-          (Join-Path $workRoot 'installer-framework-everywhere-src-${{ env.QIF_VERSION }}\installerfw.pro') `
+          (Join-Path $ifwSourceDir.FullName 'installerfw.pro') `
           "IFW_ZLIB_LIBRARY=$zlibLib" `
           "IFW_BZIP2_LIBRARY=$bzip2Lib" `
           "IFW_LZMA_LIBRARY=$lzmaLib"
