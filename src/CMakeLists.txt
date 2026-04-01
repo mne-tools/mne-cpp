@@ -1,5 +1,17 @@
+
 cmake_minimum_required(VERSION 3.15)
 project(mne_cpp LANGUAGES CXX)
+
+# Workaround: Inject dummy WrapOpenGL if missing (for custom Qt6 builds)
+set(_wrapopengl_dummy_dir "${CMAKE_BINARY_DIR}/cmake-dummy/WrapOpenGL")
+if(NOT TARGET WrapOpenGL::WrapOpenGL)
+  find_package(WrapOpenGL QUIET)
+  if(NOT TARGET WrapOpenGL::WrapOpenGL)
+    file(MAKE_DIRECTORY "${_wrapopengl_dummy_dir}")
+    file(WRITE "${_wrapopengl_dummy_dir}/WrapOpenGLConfig.cmake" "\nadd_library(WrapOpenGL::WrapOpenGL INTERFACE IMPORTED)\n")
+    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/cmake-dummy")
+  endif()
+endif()
 
 set(MNE_CPP_VERSION_MAJOR 2)
 set(MNE_CPP_VERSION_MINOR 0)
