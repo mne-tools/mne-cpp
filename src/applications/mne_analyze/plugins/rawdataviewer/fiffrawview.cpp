@@ -64,10 +64,9 @@
 #include <QEvent>
 #include <QKeyEvent>
 #include <QLabel>
+#include <QRhiWidget>
 
-#if !defined(NO_QOPENGLWIDGET)
-    #include <QOpenGLWidget>
-#endif
+
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -163,9 +162,17 @@ void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
 
     m_pTableView->setModel(m_pModel.data());
 
-    #if !defined(NO_QOPENGLWIDGET)
-    m_pTableView->setViewport(new QOpenGLWidget);
-    #endif
+    auto *rhiViewport = new QRhiWidget;
+#if defined(WASMBUILD) || defined(__EMSCRIPTEN__)
+    rhiViewport->setApi(QRhiWidget::Api::OpenGL);
+#elif defined(Q_OS_MACOS) || defined(Q_OS_IOS)
+    rhiViewport->setApi(QRhiWidget::Api::Metal);
+#elif defined(Q_OS_WIN)
+    rhiViewport->setApi(QRhiWidget::Api::Direct3D11);
+#else
+    rhiViewport->setApi(QRhiWidget::Api::OpenGL);
+#endif
+    m_pTableView->setViewport(rhiViewport);
 
     m_pTableView->setObjectName(QString::fromUtf8("m_pTableView"));
     QSizePolicy sizePolicy3(QSizePolicy::Expanding, QSizePolicy::Expanding);

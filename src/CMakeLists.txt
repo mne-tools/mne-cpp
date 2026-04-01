@@ -35,8 +35,6 @@ option(NO_IPC "Build project with no interprocess communication features (shared
 
 option(WASM "Setup build for wasm" OFF)
 
-option(NO_OPENGL "Build without QOpenGLWidget support" OFF)
-
 option(USE_FFTW "Use fftw backend for eigen" OFF)
 
 set(MNE_LOG_LEVEL "INFO" CACHE STRING "Minimum log level: DEBUG, INFO, WARN, CRIT, FATAL")
@@ -57,15 +55,10 @@ endif()
 
 if(WASM)
   add_compile_definitions(WASMBUILD)
-  add_compile_definitions(NO_QOPENGLWIDGET)
   set(BUILD_SHARED_LIBS OFF)
   set(NO_TESTS ON)
   set(NO_EXAMPLES ON)
   set(NO_IPC ON)
-endif()
-
-if(NO_OPENGL)
-    add_compile_definitions(NO_QOPENGLWIDGET)
 endif()
 
 if(NO_IPC)
@@ -169,20 +162,17 @@ message("QT_DIR - ${QT_DIR}")
 #   "Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR)"
 # would be printed dozens of times.  Finding all required components here
 # makes the subdirectory calls no-ops and prints the warning at most once.
+
+# Define required Qt components for MNE-CPP (Qt6 only, no OpenGL, require GuiPrivate for QRhi)
 set(_MNE_QT_COMPONENTS Core Concurrent Gui Network Widgets Svg Xml)
 if(NOT WASM)
-    list(APPEND _MNE_QT_COMPONENTS PrintSupport)
+  list(APPEND _MNE_QT_COMPONENTS PrintSupport)
 endif()
 if(QT_VERSION_MAJOR EQUAL 6)
-    list(APPEND _MNE_QT_COMPONENTS ShaderTools GuiPrivate)
-    if(NOT WASM AND NOT NO_OPENGL)
-        list(APPEND _MNE_QT_COMPONENTS OpenGL OpenGLWidgets)
-    endif()
-elseif(NOT WASM AND NOT NO_OPENGL)
-    list(APPEND _MNE_QT_COMPONENTS OpenGL)
+  list(APPEND _MNE_QT_COMPONENTS ShaderTools GuiPrivate)
 endif()
 if(BUILD_TESTS)
-    list(APPEND _MNE_QT_COMPONENTS Test)
+  list(APPEND _MNE_QT_COMPONENTS Test)
 endif()
 list(REMOVE_DUPLICATES _MNE_QT_COMPONENTS)
 set(QT_NO_PRIVATE_MODULE_WARNING ON)

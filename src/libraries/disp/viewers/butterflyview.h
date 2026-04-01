@@ -47,15 +47,9 @@
 //=============================================================================================================
 
 #include <QMap>
-#include <QWidget>
+#include <QRhiWidget>
 #include <QtGlobal>
-#if !defined(NO_QOPENGLWIDGET)
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-#include <QOpenGLWidget>
-#else
-#include <QtOpenGLWidgets/QOpenGLWidget>
-#endif
-#endif
+
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -84,11 +78,7 @@ class ChannelInfoModel;
  *
  * @brief Butterfly plot widget overlaying multiple channel waveforms in a single time-series view.
  */
-#if !defined(NO_QOPENGLWIDGET)
-class DISPSHARED_EXPORT ButterflyView : public QOpenGLWidget
-#else
-class DISPSHARED_EXPORT ButterflyView : public QWidget
-#endif
+class DISPSHARED_EXPORT ButterflyView : public QRhiWidget
 {
     Q_OBJECT
 
@@ -112,10 +102,10 @@ public:
 
     //=========================================================================================================
     /**
-     * Update the OpenGL viewport. This, e.g., necessary if this widget was set to a QDockWidget which changes
+     * Update the viewport. This, e.g., necessary if this widget was set to a QDockWidget which changes
      * its floating state.
      */
-    void updateOpenGLViewport();
+    void updateViewport();
 
     //=========================================================================================================
     /**
@@ -297,11 +287,7 @@ protected:
      *
      * @param[in] event pointer to PaintEvent -> not used.
      */
-    #if !defined(NO_QOPENGLWIDGET)
-    virtual void paintGL();
-    #else
     virtual void paintEvent(QPaintEvent *event);
-    #endif
 
     //=========================================================================================================
     /**

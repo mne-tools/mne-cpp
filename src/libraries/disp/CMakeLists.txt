@@ -8,21 +8,8 @@ set(CMAKE_AUTORCC ON)
 
 set(QT_REQUIRED_COMPONENTS Core Concurrent Widgets Svg)
 
-if(NOT WASM AND NOT NO_OPENGL)
-  list(APPEND QT_REQUIRED_COMPONENTS OpenGL)
-  if(Qt6_FOUND OR QT_VERSION_MAJOR EQUAL 6)
-    list(APPEND QT_REQUIRED_COMPONENTS OpenGLWidgets)
-  endif()
-endif()
-
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-
-if(NOT WASM AND NOT NO_OPENGL)
-    if (Qt6_FOUND)
-        find_package(Qt6 REQUIRED COMPONENTS OpenGLWidgets)
-    endif()
-endif()
 
 if(NOT (Qt6_FOUND OR QT_VERSION_MAJOR EQUAL 6))
     message(FATAL_ERROR "mne_disp now requires Qt 6 for the QRhi-based raw browser renderer.")

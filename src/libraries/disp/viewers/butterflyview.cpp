@@ -70,11 +70,7 @@ ButterflyView::ButterflyView(const QString& sSettingsPath,
                              QWidget *parent,
                              Qt::WindowFlags f)
 :
-#if !defined(NO_QOPENGLWIDGET)
-  QOpenGLWidget(parent, f)
-#else
-  QWidget(parent, f)
-#endif
+  QRhiWidget(parent)
 , m_sSettingsPath(sSettingsPath)
 , m_pEvokedSetModel(NULL)
 , m_bIsInit(false)
@@ -88,10 +84,19 @@ ButterflyView::ButterflyView(const QString& sSettingsPath,
 , m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
 {
     m_sSettingsPath = sSettingsPath;
-//    // Activate anti aliasing
-//    QSurfaceFormat fmt;
-//    fmt.setSamples(4);
-//    this->setFormat(fmt);
+
+#if defined(WASMBUILD) || defined(__EMSCRIPTEN__)
+    setApi(QRhiWidget::Api::OpenGL);
+#elif defined(Q_OS_MACOS) || defined(Q_OS_IOS)
+    setApi(QRhiWidget::Api::Metal);
+#elif defined(Q_OS_WIN)
+    setApi(QRhiWidget::Api::Direct3D11);
+#else
+    setApi(QRhiWidget::Api::OpenGL);
+#endif
+    setSampleCount(1);
+    setAttribute(Qt::WA_NativeWindow);
+
     loadSettings();
 }
 
@@ -104,12 +109,9 @@ ButterflyView::~ButterflyView()
 
 //=============================================================================================================
 
-void ButterflyView::updateOpenGLViewport()
+void ButterflyView::updateViewport()
 {
-#if !defined(NO_QOPENGLWIDGET)
-    // Activate anti aliasing
-    initializeGL();
-#endif
+    // No-op: ButterflyView now derives from QRhiWidget directly.
 }
 
 //=============================================================================================================
@@ -199,7 +201,7 @@ void ButterflyView::takeScreenshot(const QString& fileName)
         svgGen.setSize(this->size());
         svgGen.setViewBox(this->rect());
 
-        this->render(&svgGen);
+        QWidget::render(&svgGen);
     }
 
     if(fileName.contains(".png", Qt::CaseInsensitive)) {
@@ -207,7 +209,7 @@ void ButterflyView::takeScreenshot(const QString& fileName)
         image.fill(Qt::transparent);
 
         QPainter painter(&image);
-        this->render(&painter);
+        QWidget::render(&painter);
         image.save(fileName);
     }
 }
@@ -320,11 +322,7 @@ void ButterflyView::loadSettings()
 
 //=============================================================================================================
 
-#if !defined(NO_QOPENGLWIDGET)
-    void ButterflyView::paintGL()
-#else
-    void ButterflyView::paintEvent(QPaintEvent *event)
-#endif
+void ButterflyView::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
 
@@ -492,11 +490,7 @@ void ButterflyView::loadSettings()
         }
     }
 
-#if !defined(NO_QOPENGLWIDGET)
-    return QOpenGLWidget::paintGL();
-#else
-    return QWidget::paintEvent(event);
-#endif
+    return QRhiWidget::paintEvent(event);
 }
 
 //=============================================================================================================
