@@ -32,23 +32,38 @@ download_release_asset()
 {
     local asset_name="$1"
     local destination_dir="$2"
+    local max_retries=4
+    local delay=10
 
-    if command -v gh >/dev/null 2>&1; then
-        if [[ -n "${GH_TOKEN:-}" || -n "${GITHUB_TOKEN:-}" ]]; then
-            gh release download "${RELEASE_TAG}" -R "${REPOSITORY}" -p "${asset_name}" -D "${destination_dir}" >/dev/null 2>&1
+    for attempt in $(seq 1 "${max_retries}"); do
+        if command -v gh >/dev/null 2>&1; then
+            if [[ -n "${GH_TOKEN:-}" || -n "${GITHUB_TOKEN:-}" ]]; then
+                if gh release download "${RELEASE_TAG}" -R "${REPOSITORY}" -p "${asset_name}" -D "${destination_dir}" >/dev/null 2>&1; then
+                    return 0
+                fi
+            elif gh auth status >/dev/null 2>&1; then
+                if gh release download "${RELEASE_TAG}" -R "${REPOSITORY}" -p "${asset_name}" -D "${destination_dir}" >/dev/null 2>&1; then
+                    return 0
+                fi
+            fi
+        fi
+
+        local asset_url="https://github.com/${REPOSITORY}/releases/download/${RELEASE_TAG}/${asset_name}"
+        if curl --fail --location --silent --show-error \
+            --output "${destination_dir}/${asset_name}" \
+            "${asset_url}"; then
             return 0
         fi
 
-        if gh auth status >/dev/null 2>&1; then
-            gh release download "${RELEASE_TAG}" -R "${REPOSITORY}" -p "${asset_name}" -D "${destination_dir}" >/dev/null 2>&1
-            return 0
+        if [[ "${attempt}" -lt "${max_retries}" ]]; then
+            echo "Download attempt ${attempt}/${max_retries} failed, retrying in ${delay}s..."
+            sleep "${delay}"
+            delay=$((delay * 2))
         fi
-    fi
+    done
 
-    local asset_url="https://github.com/${REPOSITORY}/releases/download/${RELEASE_TAG}/${asset_name}"
-    curl --fail --location --silent --show-error \
-        --output "${destination_dir}/${asset_name}" \
-        "${asset_url}"
+    echo "ERROR: Failed to download ${asset_name} after ${max_retries} attempts."
+    return 1
 }
 
 KIND=""

@@ -202,8 +202,7 @@ execute_process(
 set(PROJECT_RESOURCES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources)
 
 ##==============================================================================
-## SDK export set — disabled for WASM (bundled Eigen target + Qt resource
-## targets cannot be exported).
+## SDK export set — disabled for WASM (Qt resource targets cannot be exported).
 if(NOT WASM)
     set(MNE_CPP_EXPORT_SET EXPORT MNECPPTargets)
 endif()
@@ -215,42 +214,29 @@ set(MNE_CPP_EIGEN_VERSION "5.0.1" CACHE STRING "Preferred Eigen package version 
 set(MNE_CPP_PREBUILT_EIGEN_DIR "${PROJECT_SOURCE_DIR}/external/eigen"
     CACHE PATH "Location of a prebuilt Eigen package prepared by the init scripts or CI helpers.")
 
-if(NOT WASM)
-    find_package(Eigen3 ${MNE_CPP_EIGEN_VERSION} QUIET NO_MODULE NO_DEFAULT_PATH
-        HINTS
-            "${MNE_CPP_PREBUILT_EIGEN_DIR}"
-            "${PROJECT_SOURCE_DIR}/external/eigen-${MNE_CPP_EIGEN_VERSION}-install")
+find_package(Eigen3 ${MNE_CPP_EIGEN_VERSION} QUIET NO_MODULE
+    HINTS
+        "${MNE_CPP_PREBUILT_EIGEN_DIR}"
+        "${PROJECT_SOURCE_DIR}/external/eigen-${MNE_CPP_EIGEN_VERSION}-install")
 
-    if(TARGET Eigen3::Eigen)
-        set(MNE_CPP_EIGEN_MODE "prebuilt")
-        if(NOT TARGET eigen)
-            add_library(eigen INTERFACE)
-            target_link_libraries(eigen INTERFACE Eigen3::Eigen)
-        endif()
+if(TARGET Eigen3::Eigen)
+    if(NOT TARGET eigen)
+        add_library(eigen INTERFACE)
+        target_link_libraries(eigen INTERFACE Eigen3::Eigen)
+    endif()
 
-        if(DEFINED Eigen3_DIR AND NOT Eigen3_DIR STREQUAL "")
-            get_filename_component(MNE_CPP_EIGEN_PACKAGE_ROOT "${Eigen3_DIR}/../../.." ABSOLUTE)
-            message(STATUS "[MNE-CPP] Using prebuilt Eigen package from ${MNE_CPP_EIGEN_PACKAGE_ROOT}")
-        else()
-            message(STATUS "[MNE-CPP] Using prebuilt Eigen package found via CMake package discovery.")
-        endif()
+    if(DEFINED Eigen3_DIR AND NOT Eigen3_DIR STREQUAL "")
+        get_filename_component(MNE_CPP_EIGEN_PACKAGE_ROOT "${Eigen3_DIR}/../../.." ABSOLUTE)
+        message(STATUS "[MNE-CPP] Using Eigen package from ${MNE_CPP_EIGEN_PACKAGE_ROOT}")
     else()
-        set(MNE_CPP_EIGEN_MODE "bundled")
-        if(EXISTS "${PROJECT_SOURCE_DIR}/external/eigen-${MNE_CPP_EIGEN_VERSION}/CMakeLists.txt")
-            message(STATUS "[MNE-CPP] Prebuilt Eigen package not found. Falling back to bundled Eigen source.")
-            add_subdirectory(external)
-        else()
-            message(FATAL_ERROR
-                "Could not find Eigen3 ${MNE_CPP_EIGEN_VERSION}.\n"
-                "Expected a prebuilt package under ${MNE_CPP_PREBUILT_EIGEN_DIR}\n"
-                "or a bundled fallback under ${PROJECT_SOURCE_DIR}/external/eigen-${MNE_CPP_EIGEN_VERSION}.\n"
-                "Run ./init.sh (or .\\init.bat on Windows) to fetch the MNE-CPP-maintained dependency artifacts."
-            )
-        endif()
+        message(STATUS "[MNE-CPP] Using Eigen package found via CMake package discovery.")
     endif()
 else()
-    set(MNE_CPP_EIGEN_MODE "bundled")
-    add_subdirectory(external)
+    message(FATAL_ERROR
+        "Could not find Eigen3 ${MNE_CPP_EIGEN_VERSION}.\n"
+        "Run ./init.sh (or .\\init.bat on Windows) to fetch the MNE-CPP-maintained dependency artifacts,\n"
+        "or install Eigen ${MNE_CPP_EIGEN_VERSION} on your system and set CMAKE_PREFIX_PATH accordingly."
+    )
 endif()
 
 ##==============================================================================
