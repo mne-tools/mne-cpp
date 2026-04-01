@@ -58,7 +58,7 @@ jobs:
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
     - name: Configure and compile MNE-CPP
       run: |
-        ./scripts/build_project.bat
+        ./scripts/build_project.sh
     - name: Free up disk space before packaging
       run: |
         echo "Disk usage before cleanup:" && df -h
@@ -174,7 +174,7 @@ jobs:
     - name: Configure and compile MNE-CPP (static)
       run: |
         export CMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/Qt6_static
-        ./scripts/build_project.bat static
+        ./scripts/build_project.sh static
     - name: Deploy binaries (MacOS)
       run: |
         ./scripts/deploy.bat static pack
