@@ -261,6 +261,15 @@ jobs:
         mkdir -p ${{ runner.tool_cache }}/Qt/6.11.0/gcc_64
         tar xf /tmp/qt6_6110_static_binaries_linux.tar.gz -C ${{ runner.tool_cache }}/Qt/6.11.0/gcc_64
 
+    - name: Download Eigen package
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind eigen \
+          --version "5.0.1" \
+          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+
     - name: Build WASM
       run: |
         source ../emsdk/emsdk_env.sh
