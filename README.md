@@ -26,36 +26,41 @@
 
 MNE-CPP is an open-source, cross-platform C++ framework for real-time and offline processing of MEG, EEG, and related neurophysiological data. It provides modular libraries for building standalone acquisition and analysis applications. For more information and documentation please visit https://mne-cpp.github.io/.
 
-Build from source
------------------
+Quick start
+-----------
 
-`./init.sh` bootstraps a developer build by downloading the MNE-CPP-maintained Qt and Eigen prerelease artifacts into `src/external/` and configuring a root-level build directory. On Windows use `.\init.bat`.
+```bash
+# Clone and build (Linux / macOS)
+git clone --recursive https://github.com/mne-tools/mne-cpp.git && cd mne-cpp
+./init.sh && cmake --build build/developer-dynamic --parallel
+```
 
-It uses the public `qt_binaries` prerelease assets from the MNE-CPP releases page. Eigen is downloaded from the public `eigen_artifacts` prerelease tag.
+```bat
+REM Windows
+git clone --recursive https://github.com/mne-tools/mne-cpp.git && cd mne-cpp
+.\init.bat
+cmake --build build\developer-dynamic --parallel
+```
 
-`./scripts/build_project.sh` builds the project on Linux and macOS; `.\scripts\build_project.bat` on Windows.
+`init` downloads Qt and Eigen into `src/external/`, then runs CMake configure. Run `./init.sh --help` to see all options (linkage, build type, custom Qt path, etc.).
 
-For IDE discovery and manual builds, configure from the repository root:
+Requirements
+------------
 
-`cmake -S . -B build`
+| Platform | Compiler | Min version |
+|----------|----------|-------------|
+| Windows  | [MSVC](https://visualstudio.microsoft.com/vs/) | 2022 |
+| Linux    | [GCC](https://gcc.gnu.org/releases.html) | 13 |
+| macOS    | [Xcode (Apple Clang)](https://developer.apple.com/xcode/) | latest |
 
-For more in-depth information on how to compile the project, please follow the [build guide](https://mne-cpp.github.io/docs/development/buildguide-cmake). The minimum requirements to build MNE-CPP are:
+[Qt](https://www.qt.io/) 6.10 or later is required. The `init` script downloads a compatible version automatically.
 
-  * Compiler
-    * Windows - [MSVC 2022](https://visualstudio.microsoft.com/vs/) or later
-    * Linux - [GCC 13](https://gcc.gnu.org/releases.html) or later
-    * macOS - [Apple Clang (Xcode)](https://developer.apple.com/xcode/)
-  * External dependencies
-    * [Qt 6.10](https://www.qt.io/) or later
-
-Recommended quick start:
-
-`./init.sh && cmake --build build/developer-dynamic --parallel`
+For the full build guide see the [documentation](https://mne-cpp.github.io/docs/development/buildguide-cmake).
 
 Releases
 --------
 
-Release binaries for Windows, macOS, and Linux are available [here](https://mne-cpp.github.io/download).
+Pre-built binaries for Windows, macOS, and Linux are available on the [download page](https://mne-cpp.github.io/download).
 
 Get involved
 ------------
