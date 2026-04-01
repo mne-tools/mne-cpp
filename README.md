@@ -31,9 +31,9 @@ Build from source
 
 `./init.sh` bootstraps a developer build by downloading the MNE-CPP-maintained Qt and Eigen prerelease artifacts into `src/external/` and configuring a root-level build directory. On Windows use `.\init.bat`.
 
-It uses the public `qt_binaries` prerelease assets from the MNE-CPP releases page. Eigen is downloaded from the public `eigen_artifacts` prerelease tag. No bundled Eigen copy is shipped in the repository.
+It uses the public `qt_binaries` prerelease assets from the MNE-CPP releases page. Eigen is downloaded from the public `eigen_artifacts` prerelease tag.
 
-`./scripts/build_project.bat` builds the project for Windows, Linux, and macOS.
+`./scripts/build_project.sh` builds the project on Linux and macOS; `.\scripts\build_project.bat` on Windows.
 
 For IDE discovery and manual builds, configure from the repository root:
 
