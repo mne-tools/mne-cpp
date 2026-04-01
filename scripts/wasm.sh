@@ -127,13 +127,21 @@ else
     exit 1
 fi
 
+# Locate Eigen package for cross-compilation
+EIGEN_DIR="${PROJECT_BASE_PATH}/src/external/eigen"
+EIGEN_CMAKE_ARGS=""
+if [ -f "${EIGEN_DIR}/share/eigen3/cmake/Eigen3Config.cmake" ]; then
+    EIGEN_CMAKE_ARGS="-DEigen3_DIR=${EIGEN_DIR}/share/eigen3/cmake"
+fi
+
 ${Qt6_DIR}/wasm_multithread/bin/qt-cmake \
         -DQT_HOST_PATH=${QT_HOST_PATH} \
 	-DCMAKE_BUILD_TYPE=Release \
 	-DBINARY_OUTPUT_DIRECTORY=${OUTPUT_DIRECTORY} \
 	-S ${SOURCE_DIRECTORY} \
 	-B ${BUILD_DIRECTORY} \
-	-DWASM=ON
+	-DWASM=ON \
+	${EIGEN_CMAKE_ARGS}
 
 cmake \
 	--build ${BUILD_DIRECTORY} \
