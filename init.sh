@@ -144,7 +144,7 @@ if [[ -z "${BUILD_DIR}" ]]; then
     BUILD_DIR="${REPO_ROOT}/build/developer-${LINKAGE}"
 fi
 
-for arg in "${EXTRA_CMAKE_ARGS[@]}"; do
+for arg in "${EXTRA_CMAKE_ARGS[@]+${EXTRA_CMAKE_ARGS[@]}}"; do
     case "${arg}" in
         -DNO_OPENGL=ON|-DNO_OPENGL:BOOL=ON)
             NO_OPENGL_VALUE="ON"
@@ -180,7 +180,7 @@ add_qt_candidate() {
 
     candidate="$(cd "${candidate}" && pwd)"
 
-    for existing in "${QT_CANDIDATES[@]}"; do
+    for existing in "${QT_CANDIDATES[@]+${QT_CANDIDATES[@]}}"; do
         if [[ "${existing}" == "${candidate}" ]]; then
             return
         fi
@@ -311,7 +311,7 @@ resolve_qt_dir() {
 
     if [[ "${QT_MODE}" != "artifact" ]]; then
         collect_qt_candidates
-        for candidate in "${QT_CANDIDATES[@]}"; do
+        for candidate in "${QT_CANDIDATES[@]+${QT_CANDIDATES[@]}}"; do
             if probe_qt_candidate "${candidate}" >/dev/null 2>&1; then
                 QT_DIR="${PROBED_QT_ROOT_DIR}"
                 QT_SOURCE="local"
@@ -385,7 +385,7 @@ if [[ "${LINKAGE}" == "static" ]]; then
 fi
 
 if (( ${#EXTRA_CMAKE_ARGS[@]} > 0 )); then
-    cmake_args+=("${EXTRA_CMAKE_ARGS[@]}")
+    cmake_args+=("${EXTRA_CMAKE_ARGS[@]+${EXTRA_CMAKE_ARGS[@]}}")
 fi
 
 cmake "${cmake_args[@]}"
