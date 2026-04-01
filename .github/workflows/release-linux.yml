@@ -34,6 +34,10 @@ jobs:
           echo "prefix=mne-cpp-local" >> "$GITHUB_OUTPUT"
           echo "should_upload=false" >> "$GITHUB_OUTPUT"
         fi
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update -q
+        sudo apt-get install -q libgl1-mesa-dev
     - name: Install Python 3.10 version
       uses: actions/setup-python@v6
       with:
