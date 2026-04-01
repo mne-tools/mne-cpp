@@ -837,21 +837,21 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::AbstractP
 
 void MainWindow::onDockLocationChanged(QWidget* pWidget)
 {
-    // Everytime a dock widget in the MultiView changes its floating state we need to update its OpenGL viewport
+    // Everytime a dock widget in the MultiView changes its floating state we need to update its viewport
     if(QVBoxLayout* vBoxLayout = qobject_cast<QVBoxLayout*>(pWidget->layout())) {
         for(int i = 0; i < vBoxLayout->count(); ++i) {
             if(QWidget *widget = pWidget->layout()->itemAt(i)->widget()) {
                 if(RealTimeMultiSampleArrayWidget* pView = qobject_cast<RealTimeMultiSampleArrayWidget*>(widget)) {
-                    pView->updateOpenGLViewport();
+                    pView->updateViewport();
                 } else if(RealTimeEvokedSetWidget* pView = qobject_cast<RealTimeEvokedSetWidget*>(widget)) {
-                    pView->updateOpenGLViewport();
+                    pView->updateViewport();
                 }
             }
         }
     } else if(RealTimeMultiSampleArrayWidget* pView = qobject_cast<RealTimeMultiSampleArrayWidget*>(pWidget)) {
-        pView->updateOpenGLViewport();
+        pView->updateViewport();
     } else if(RealTimeEvokedSetWidget* pView = qobject_cast<RealTimeEvokedSetWidget*>(pWidget)) {
-        pView->updateOpenGLViewport();
+        pView->updateViewport();
     }
 }
 

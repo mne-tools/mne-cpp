@@ -58,9 +58,8 @@
 #include <QDebug>
 #include <QGraphicsItem>
 #include <QSettings>
-#if !defined(NO_QOPENGLWIDGET)
-    #include <QOpenGLWidget>
-#endif
+#include <QRhiWidget>
+
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -85,9 +84,17 @@ AverageLayoutView::AverageLayoutView(const QString& sSettingsPath,
 
     m_pAverageLayoutView = new QGraphicsView();
 
-#if !defined(NO_QOPENGLWIDGET)
-    m_pAverageLayoutView->setViewport(new QOpenGLWidget);
+    auto *rhiViewport = new QRhiWidget;
+#if defined(WASMBUILD) || defined(__EMSCRIPTEN__)
+    rhiViewport->setApi(QRhiWidget::Api::OpenGL);
+#elif defined(Q_OS_MACOS) || defined(Q_OS_IOS)
+    rhiViewport->setApi(QRhiWidget::Api::Metal);
+#elif defined(Q_OS_WIN)
+    rhiViewport->setApi(QRhiWidget::Api::Direct3D11);
+#else
+    rhiViewport->setApi(QRhiWidget::Api::OpenGL);
 #endif
+    m_pAverageLayoutView->setViewport(rhiViewport);
 
     m_pAverageLayoutView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_pAverageLayoutView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -114,13 +121,21 @@ AverageLayoutView::~AverageLayoutView()
 
 //=============================================================================================================
 
-void AverageLayoutView::updateOpenGLViewport()
+void AverageLayoutView::updateViewport()
 {
-#if !defined(NO_QOPENGLWIDGET)
     if(m_pAverageLayoutView) {
-        m_pAverageLayoutView->setViewport(new QOpenGLWidget);
-    }
+        auto *rhiViewport = new QRhiWidget;
+#if defined(WASMBUILD) || defined(__EMSCRIPTEN__)
+        rhiViewport->setApi(QRhiWidget::Api::OpenGL);
+#elif defined(Q_OS_MACOS) || defined(Q_OS_IOS)
+        rhiViewport->setApi(QRhiWidget::Api::Metal);
+#elif defined(Q_OS_WIN)
+        rhiViewport->setApi(QRhiWidget::Api::Direct3D11);
+#else
+        rhiViewport->setApi(QRhiWidget::Api::OpenGL);
 #endif
+        m_pAverageLayoutView->setViewport(rhiViewport);
+    }
 }
 
 //=============================================================================================================

@@ -58,10 +58,9 @@
 #include <QSettings>
 #include <QScrollBar>
 #include <QMouseEvent>
+#include <QRhiWidget>
 
-#if !defined(NO_QOPENGLWIDGET)
-    #include <QOpenGLWidget>
-#endif
+
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -91,9 +90,17 @@ RtFiffRawView::RtFiffRawView(const QString& sSettingsPath,
     m_sSettingsPath = sSettingsPath;
     m_pTableView = new QTableView;
 
-#if !defined(NO_QOPENGLWIDGET)
-    m_pTableView->setViewport(new QOpenGLWidget);
+    auto *rhiViewport = new QRhiWidget;
+#if defined(WASMBUILD) || defined(__EMSCRIPTEN__)
+    rhiViewport->setApi(QRhiWidget::Api::OpenGL);
+#elif defined(Q_OS_MACOS) || defined(Q_OS_IOS)
+    rhiViewport->setApi(QRhiWidget::Api::Metal);
+#elif defined(Q_OS_WIN)
+    rhiViewport->setApi(QRhiWidget::Api::Direct3D11);
+#else
+    rhiViewport->setApi(QRhiWidget::Api::OpenGL);
 #endif
+    m_pTableView->setViewport(rhiViewport);
 
     // Install event filter for tracking mouse movements
     m_pTableView->viewport()->installEventFilter(this);
@@ -117,13 +124,21 @@ RtFiffRawView::~RtFiffRawView()
 
 //=============================================================================================================
 
-void RtFiffRawView::updateOpenGLViewport()
+void RtFiffRawView::updateViewport()
 {
-#if !defined(NO_QOPENGLWIDGET)
     if(m_pTableView) {
-        m_pTableView->setViewport(new QOpenGLWidget);
-    }
+        auto *rhiViewport = new QRhiWidget;
+#if defined(WASMBUILD) || defined(__EMSCRIPTEN__)
+        rhiViewport->setApi(QRhiWidget::Api::OpenGL);
+#elif defined(Q_OS_MACOS) || defined(Q_OS_IOS)
+        rhiViewport->setApi(QRhiWidget::Api::Metal);
+#elif defined(Q_OS_WIN)
+        rhiViewport->setApi(QRhiWidget::Api::Direct3D11);
+#else
+        rhiViewport->setApi(QRhiWidget::Api::OpenGL);
 #endif
+        m_pTableView->setViewport(rhiViewport);
+    }
 }
 
 //=============================================================================================================

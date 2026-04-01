@@ -402,13 +402,13 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
 
 //=============================================================================================================
 
-void RealTimeEvokedSetWidget::updateOpenGLViewport()
+void RealTimeEvokedSetWidget::updateViewport()
 {
     if(m_pAverageLayoutView) {
-        m_pAverageLayoutView->updateOpenGLViewport();
+        m_pAverageLayoutView->updateViewport();
     }
     if(m_pButterflyView) {
-        m_pButterflyView->updateOpenGLViewport();
+        m_pButterflyView->updateViewport();
     }
 }
 

@@ -97,7 +97,48 @@ if [[ "${LINKAGE}" != "dynamic" && "${LINKAGE}" != "static" ]]; then
     exit 1
 fi
 
-if [[ -z "${QT_DIR}" ]]; then
+
+# Candidate Qt roots: --qt-dir, env vars, common locations
+QT_CANDIDATES=()
+if [[ -n "${QT_DIR}" ]]; then
+    QT_CANDIDATES+=("${QT_DIR}")
+fi
+if [[ -n "${QT_ROOT_DIR:-}" ]]; then
+    QT_CANDIDATES+=("${QT_ROOT_DIR}")
+fi
+if [[ -n "${Qt6_DIR:-}" ]]; then
+    QT_CANDIDATES+=("${Qt6_DIR}")
+fi
+if [[ -n "${CMAKE_PREFIX_PATH:-}" ]]; then
+    IFS=":" read -ra CPATHS <<< "${CMAKE_PREFIX_PATH}"
+    for p in "${CPATHS[@]}"; do
+        QT_CANDIDATES+=("$p")
+    done
+fi
+# Add common install locations
+QT_CANDIDATES+=("/usr/local/opt/qt6" "/usr/local/Qt-6" "/opt/Qt6" "/usr/local/Qt6" "/usr/lib/qt6" "/usr/local/Cellar/qt@6" "/usr/local/qt6")
+
+# Probe for compatible Qt using a minimal CMake project
+QT_PROBE_SUCCESS=0
+QT_PROBE_DIR="$(mktemp -d)"
+trap 'rm -rf "${QT_PROBE_DIR}"' EXIT
+cp "${SCRIPT_DIR}/qt_probe.cmake" "${QT_PROBE_DIR}/CMakeLists.txt"
+
+for candidate in "${QT_CANDIDATES[@]}"; do
+    if [[ -d "$candidate/lib/cmake/Qt6" ]]; then
+        if cmake -S "${QT_PROBE_DIR}" -B "${QT_PROBE_DIR}/_build" \
+                 -DCMAKE_PREFIX_PATH="$candidate" \
+                 -DQt6_DIR="$candidate/lib/cmake/Qt6" >/dev/null 2>&1; then
+            QT_PROBE_SUCCESS=1
+            QT_DIR="$candidate"
+            break
+        fi
+        rm -rf "${QT_PROBE_DIR}/_build"
+    fi
+done
+rm -rf "${QT_PROBE_DIR}"
+
+if [[ $QT_PROBE_SUCCESS -eq 0 ]]; then
     QT_DIR="${SCRIPT_DIR}/qt/${LINKAGE}"
 fi
 
@@ -109,17 +150,23 @@ BUNDLED_EIGEN_DIR="${SCRIPT_DIR}/eigen-${EIGEN_VERSION}"
 
 mkdir -p "${SCRIPT_DIR}/qt"
 
+
+# Only download if not using a compatible system Qt
 download_qt=1
 if [[ ${SKIP_QT} -eq 1 ]]; then
     download_qt=0
 elif [[ ${FORCE} -eq 0 && -f "${QT_DIR}/lib/cmake/Qt6/Qt6Config.cmake" ]]; then
-    download_qt=0
+    # If we just probed a system Qt, don't download
+    if [[ $QT_PROBE_SUCCESS -eq 1 ]]; then
+        download_qt=0
+    fi
 fi
 
 download_eigen=1
 if [[ ${FORCE} -eq 0 && -f "${EIGEN_DIR}/share/eigen3/cmake/Eigen3Config.cmake" ]]; then
     download_eigen=0
 fi
+
 
 if [[ ${download_qt} -eq 1 ]]; then
     qt_args=(
@@ -133,6 +180,8 @@ if [[ ${download_qt} -eq 1 ]]; then
         qt_args+=(--release-tag "${QT_RELEASE_TAG}")
     fi
     "${REPO_ROOT}/scripts/ci/download_toolchain.sh" "${qt_args[@]}"
+elif [[ $QT_PROBE_SUCCESS -eq 1 ]]; then
+    echo "Using compatible system Qt at ${QT_DIR} (no artifact download needed)"
 elif [[ ${SKIP_QT} -eq 1 ]]; then
     if [[ -n "${QT_DIR}" ]]; then
         echo "Skipping Qt artifact download. Using caller-provided/local Qt at ${QT_DIR}"
