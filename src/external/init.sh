@@ -35,7 +35,6 @@ REPOSITORY="mne-tools/mne-cpp"
 QT_RELEASE_TAG=""
 EIGEN_RELEASE_TAG=""
 FORCE=0
-BUNDLED_EIGEN_DIR=""
 SKIP_QT=0
 
 while [[ $# -gt 0 ]]; do
@@ -146,8 +145,6 @@ if [[ -z "${EIGEN_DIR}" ]]; then
     EIGEN_DIR="${SCRIPT_DIR}/eigen"
 fi
 
-BUNDLED_EIGEN_DIR="${SCRIPT_DIR}/eigen-${EIGEN_VERSION}"
-
 mkdir -p "${SCRIPT_DIR}/qt"
 
 
@@ -202,14 +199,7 @@ if [[ ${download_eigen} -eq 1 ]]; then
     if [[ -n "${EIGEN_RELEASE_TAG}" ]]; then
         eigen_args+=(--release-tag "${EIGEN_RELEASE_TAG}")
     fi
-    if "${REPO_ROOT}/scripts/ci/download_toolchain.sh" "${eigen_args[@]}"; then
-        :
-    elif [[ -f "${BUNDLED_EIGEN_DIR}/CMakeLists.txt" ]]; then
-        echo "Eigen artifact is not available in the public prerelease yet. Continuing with bundled fallback at ${BUNDLED_EIGEN_DIR}."
-    else
-        echo "Failed to prepare Eigen and no bundled fallback was found at ${BUNDLED_EIGEN_DIR}." >&2
-        exit 1
-    fi
+    "${REPO_ROOT}/scripts/ci/download_toolchain.sh" "${eigen_args[@]}"
 else
     echo "Eigen bundle already present at ${EIGEN_DIR}"
 fi
@@ -221,10 +211,5 @@ if [[ ${SKIP_QT} -eq 1 ]]; then
 else
     echo "  Qt:    ${QT_DIR}"
 fi
-if [[ -f "${EIGEN_DIR}/share/eigen3/cmake/Eigen3Config.cmake" ]]; then
-    echo "  Eigen: ${EIGEN_DIR}"
-    echo "  CMake prefix hint: ${QT_DIR};${EIGEN_DIR}"
-else
-    echo "  Eigen: bundled fallback at ${BUNDLED_EIGEN_DIR}"
-    echo "  CMake prefix hint: ${QT_DIR}"
-fi
+echo "  Eigen: ${EIGEN_DIR}"
+echo "  CMake prefix hint: ${QT_DIR};${EIGEN_DIR}"

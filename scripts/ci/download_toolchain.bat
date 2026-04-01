@@ -154,6 +154,12 @@ if exist "%DOWNLOAD_DIR%" rmdir /s /q "%DOWNLOAD_DIR%"
 exit /b 0
 
 :download_asset
+set "DL_ATTEMPT=0"
+set "DL_DELAY=10"
+
+:download_retry
+set /a DL_ATTEMPT+=1
+
 where gh >nul 2>&1
 if not errorlevel 1 (
     gh release download "%RELEASE_TAG%" -R "%REPOSITORY%" -p "%ASSET_NAME%" -D "%DOWNLOAD_DIR%" >nul 2>nul
@@ -163,8 +169,16 @@ if not errorlevel 1 (
 curl --fail --location --silent --show-error ^
     --output "%DOWNLOAD_DIR%\%ASSET_NAME%" ^
     "https://github.com/%REPOSITORY%/releases/download/%RELEASE_TAG%/%ASSET_NAME%"
-if errorlevel 1 exit /b 1
-exit /b 0
+if not errorlevel 1 exit /b 0
+
+if %DL_ATTEMPT% lss 4 (
+    echo Download attempt %DL_ATTEMPT%/4 failed, retrying in %DL_DELAY%s...
+    timeout /t %DL_DELAY% /nobreak >nul
+    set /a DL_DELAY*=2
+    goto download_retry
+)
+echo ERROR: Failed to download %ASSET_NAME% after 4 attempts.
+exit /b 1
 
 :persist_env
 if defined GITHUB_ENV (

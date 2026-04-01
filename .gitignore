@@ -69,6 +69,7 @@ compile_commands.json
 /src/external/fftw
 /src/external/qt/
 /src/external/eigen/
+/src/external/eigen-*/
 /src/external/eigen-*-install/
 
 # Generated docu Docker files
