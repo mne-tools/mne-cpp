@@ -35,7 +35,7 @@ jobs:
           "https://gitlab.com/libeigen/eigen/-/archive/${{ env.EIGEN_VERSION }}/eigen-${{ env.EIGEN_VERSION }}.tar.gz"
         tar xzf eigen-${{ env.EIGEN_VERSION }}.tar.gz
 
-    - name: Configure and install Eigen package
+    - name: Configure, build and install Eigen package
       run: |
         cmake -S "eigen-${{ env.EIGEN_VERSION }}" -B eigen-build \
           -DCMAKE_BUILD_TYPE=Release \
@@ -46,7 +46,10 @@ jobs:
           -DEIGEN_BUILD_BTL=OFF \
           -DEIGEN_BUILD_DEMOS=OFF \
           -DEIGEN_BUILD_SPBENCH=OFF \
+          -DEIGEN_BUILD_BLAS=OFF \
+          -DEIGEN_BUILD_LAPACK=OFF \
           -DEIGEN_BUILD_CMAKE_PACKAGE=ON
+        cmake --build eigen-build
         cmake --install eigen-build
 
     - name: Package Eigen bundles
