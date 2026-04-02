@@ -140,6 +140,7 @@ signals:
      * @param[in] targetFirst  The desired new first-visible-channel index.
      */
     void channelScrollRequested(int targetFirst);
+    void channelBadToggled(int channelIndex, bool bad);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -162,6 +163,7 @@ private:
     int   m_visSampleLast   = 0;
 
     bool  m_dragging       = false;
+    bool  m_dragActivated  = false;
     int   m_dragStartY     = 0;
     int   m_dragStartFirst = 0;
 };

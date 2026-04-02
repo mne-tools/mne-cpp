@@ -868,6 +868,7 @@ void ChannelDataView::keyPressEvent(QKeyEvent *event)
         break;
     case Qt::Key_B:
         setButterflyMode(!butterflyMode());
+        emit butterflyToggled(butterflyMode());
         break;
     case Qt::Key_D:
         if (m_pModel)
@@ -875,9 +876,11 @@ void ChannelDataView::keyPressEvent(QKeyEvent *event)
         break;
     case Qt::Key_S:
         setScalebarsVisible(!scalebarsVisible());
+        emit scalebarsToggled(scalebarsVisible());
         break;
     case Qt::Key_X:
         setCrosshairEnabled(!crosshairEnabled());
+        emit crosshairToggled(crosshairEnabled());
         break;
     case Qt::Key_T:
         toggleTimeFormat();

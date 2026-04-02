@@ -426,6 +426,10 @@ signals:
      */
     void referenceMarkersClearRequested();
 
+    void crosshairToggled(bool on);
+    void butterflyToggled(bool on);
+    void scalebarsToggled(bool on);
+
     //=========================================================================================================
     /**
      * Forwarded from the underlying ChannelRhiView when the crosshair is active.
