@@ -1537,14 +1537,14 @@ void MainWindow::createToolBar()
 
     //Helper to create a simple painted icon
     auto makeIcon = [](const std::function<void(QPainter&, int)>& paintFn) -> QIcon {
-        const int sz = 64;
-        QPixmap pm(sz, sz);
-        pm.fill(Qt::transparent);
-        QPainter p(&pm);
+        const int sz = 128;
+        QImage img(sz, sz, QImage::Format_ARGB32_Premultiplied);
+        img.fill(Qt::transparent);
+        QPainter p(&img);
         p.setRenderHint(QPainter::Antialiasing);
         paintFn(p, sz);
         p.end();
-        return QIcon(pm);
+        return QIcon(QPixmap::fromImage(img));
     };
 
     //Toggle crosshair (X)

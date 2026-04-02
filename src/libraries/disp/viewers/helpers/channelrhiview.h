@@ -541,12 +541,16 @@ private:
     int   m_vboWindowLast   = 0;
 
     // ── Ruler / measurement overlay ───────────────────────────────────
-    // Active while Shift+Left-button is held.
-    bool  m_rulerActive   = false;
+    // Active while right-button is held.
+    enum class RulerSnap { Free, Horizontal, Vertical };
+    bool       m_rulerActive = false;
+    RulerSnap  m_rulerSnap   = RulerSnap::Free;
     int   m_rulerX0       = 0;   // press position (screen px)
     int   m_rulerY0       = 0;
-    int   m_rulerX1       = 0;   // current cursor position
+    int   m_rulerX1       = 0;   // current cursor position (may be snapped)
     int   m_rulerY1       = 0;
+    int   m_rulerRawX1    = 0;   // raw cursor position (unsnapped)
+    int   m_rulerRawY1    = 0;
 
     // ── Crosshair cursor ──────────────────────────────────────────────
     bool  m_crosshairEnabled = false;
