@@ -40,6 +40,9 @@
 
 #include "butterflyscene.h"
 
+#include <QPainter>
+#include <QGraphicsView>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -91,4 +94,102 @@ void ButterflyScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelI
 
         this->addItem(ButterflySceneItemTemp);
     }
+}
+
+
+//*************************************************************************************************************
+
+void ButterflyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    m_crosshairPos = event->scenePos();
+    m_crosshairVisible = true;
+    invalidate(sceneRect(), QGraphicsScene::ForegroundLayer);
+    LayoutScene::mouseMoveEvent(event);
+}
+
+
+//*************************************************************************************************************
+
+void ButterflyScene::drawForeground(QPainter *painter, const QRectF &rect)
+{
+    Q_UNUSED(rect);
+
+    if(!m_crosshairVisible || items().isEmpty())
+        return;
+
+    // Find the first ButterflySceneItem to get time/amplitude info
+    ButterflySceneItem* item = nullptr;
+    for(auto* gi : items()) {
+        item = dynamic_cast<ButterflySceneItem*>(gi);
+        if(item && item->m_pFiffInfo)
+            break;
+    }
+    if(!item || !item->m_pFiffInfo)
+        return;
+
+    // Map scene pos to item coords
+    QPointF localPos = item->mapFromScene(m_crosshairPos);
+    QRectF pa = item->plotArea();
+
+    // Only draw if inside the plot area
+    if(!pa.contains(localPos))
+        return;
+
+    QPointF sceneTopLeft = item->mapToScene(pa.topLeft());
+    QPointF sceneBottomRight = item->mapToScene(pa.bottomRight());
+    QRectF scenePlotArea(sceneTopLeft, sceneBottomRight);
+
+    // Crosshair lines
+    QPen crossPen(QColor(0, 0, 0, 150));
+    crossPen.setWidthF(0.5);
+    crossPen.setStyle(Qt::DashLine);
+    painter->setPen(crossPen);
+
+    // Vertical line
+    painter->drawLine(QPointF(m_crosshairPos.x(), scenePlotArea.top()),
+                      QPointF(m_crosshairPos.x(), scenePlotArea.bottom()));
+    // Horizontal line
+    painter->drawLine(QPointF(scenePlotArea.left(), m_crosshairPos.y()),
+                      QPointF(scenePlotArea.right(), m_crosshairPos.y()));
+
+    // Time/amplitude label
+    double timeMs = item->xToTime(localPos.x()) * 1000.0;
+    double amplitude = item->yToAmplitude(localPos.y());
+
+    // Format amplitude with unit
+    QString ampStr;
+    if(item->m_iSetKind == FIFFV_MEG_CH && item->m_iSetUnit == FIFF_UNIT_T_M) {
+        ampStr = QString::number(amplitude * 1e13, 'f', 1) + " fT/cm";
+    } else if(item->m_iSetKind == FIFFV_MEG_CH) {
+        ampStr = QString::number(amplitude * 1e15, 'f', 1) + " fT";
+    } else {
+        ampStr = QString::number(amplitude * 1e6, 'f', 2) + QStringLiteral(" \u00B5V");
+    }
+
+    QString label = QString("%1 ms, %2").arg(timeMs, 0, 'f', 1).arg(ampStr);
+
+    // Draw label background
+    QFont labelFont = painter->font();
+    labelFont.setPointSizeF(8);
+    painter->setFont(labelFont);
+    QFontMetricsF fm(labelFont);
+    QRectF textRect = fm.boundingRect(label);
+    textRect.adjust(-4, -2, 4, 2);
+
+    // Position: offset from crosshair to avoid overlap
+    double labelX = m_crosshairPos.x() + 10;
+    double labelY = m_crosshairPos.y() - 20;
+    // Keep label in scene
+    if(labelX + textRect.width() > scenePlotArea.right())
+        labelX = m_crosshairPos.x() - textRect.width() - 10;
+    if(labelY < scenePlotArea.top())
+        labelY = m_crosshairPos.y() + 5;
+
+    textRect.moveTo(labelX, labelY);
+    painter->setBrush(QColor(255, 255, 255, 200));
+    painter->setPen(Qt::NoPen);
+    painter->drawRect(textRect);
+
+    painter->setPen(Qt::black);
+    painter->drawText(textRect, Qt::AlignCenter, label);
 }

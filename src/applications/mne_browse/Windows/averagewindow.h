@@ -304,6 +304,11 @@ private:
      */
     void resizeEvent(QResizeEvent * event);
 
+    /**
+     * Resize butterfly scene items to fill the viewport at 1:1 pixel scale.
+     */
+    void updateButterflySize();
+
     std::unique_ptr<Ui::AverageWindow> ui;                  /**< Pointer to the qt designer generated ui class.*/
 
     QList<QColor>           m_lButterflyColors;     /**< List which holds 500 randomly generated colors.*/

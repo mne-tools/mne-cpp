@@ -52,6 +52,7 @@
 #include <QDate>
 #include <QMenu>
 #include <QRandomGenerator>
+#include <QTimer>
 
 
 //*************************************************************************************************************
@@ -388,6 +389,20 @@ void AverageWindow::init()
     initTableViewWidgets();
     initButtons();
     initComboBoxes();
+
+    // Allow the dock widget to be resized freely when docked
+    setMinimumHeight(100);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    // Re-fit views when switching tabs
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, [this](int) {
+        QTimer::singleShot(0, this, [this]() {
+            updateButterflySize();
+            if(m_pAverageScene && !m_pAverageScene->items().isEmpty()) {
+                ui->m_graphicsView_layout->fitInView(m_pAverageScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+            }
+        });
+    });
 }
 
 
@@ -460,6 +475,9 @@ void AverageWindow::initAverageSceneView()
     //Create butterfly average scene and set view
     m_pButterflyScene = new ButterflyScene(ui->m_graphicsView_butterflyPlot, this);
     ui->m_graphicsView_butterflyPlot->setScene(m_pButterflyScene);
+    ui->m_graphicsView_butterflyPlot->setMouseTracking(true);
+    ui->m_graphicsView_butterflyPlot->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->m_graphicsView_butterflyPlot->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     //Generate random colors for plotting
     for(int i = 0; i<500; i++)
@@ -550,6 +568,36 @@ void AverageWindow::refreshPlots()
         m_layoutDisplayEvokeds.append(displayEvoked);
     }
 
+    // Auto-populate layout scene if empty but evoked data is available
+    if(m_pAverageScene->items().isEmpty() && !selectedRows.isEmpty()) {
+        // Find the first valid evoked to extract channel info
+        const FIFFLIB::FiffEvoked* firstEvoked = nullptr;
+        for(int i = 0; i < selectedRows.size(); ++i) {
+            firstEvoked = m_pAverageModel->getEvoked(selectedRows.at(i).row());
+            if(firstEvoked && !firstEvoked->isEmpty())
+                break;
+        }
+        if(firstEvoked) {
+            SelectionItem selItem;
+            const FIFFLIB::FiffInfo& info = firstEvoked->info;
+            for(int ch = 0; ch < info.chs.size(); ++ch) {
+                const FIFFLIB::FiffChInfo& chInfo = info.chs[ch];
+                // Only include MEG and EEG channels
+                if(chInfo.kind != FIFFV_MEG_CH && chInfo.kind != FIFFV_EEG_CH)
+                    continue;
+                selItem.m_sChannelName.append(chInfo.ch_name);
+                selItem.m_iChannelNumber.append(ch);
+                selItem.m_iChannelKind.append(chInfo.kind);
+                selItem.m_iChannelUnit.append(chInfo.unit);
+                // Project 3D coil/electrode position to 2D
+                selItem.m_qpChannelPosition.append(QPointF(chInfo.chpos.r0(0), chInfo.chpos.r0(1)));
+            }
+            selItem.m_bShowAll = true;
+            m_pAverageScene->repaintSelectionItems(selItem);
+            ui->m_graphicsView_layout->fitInView(m_pAverageScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+        }
+    }
+
     //Get current items from the average scene
     QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
 
@@ -595,6 +643,11 @@ void AverageWindow::refreshPlots()
     }
 
     m_pAverageScene->update();
+
+    // Ensure 2D layout view is fitted after data update
+    if(!m_pAverageScene->items().isEmpty()) {
+        ui->m_graphicsView_layout->fitInView(m_pAverageScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    }
 
     //Draw butterfly plot
     m_pButterflyScene->clear();
@@ -647,10 +700,8 @@ void AverageWindow::refreshPlots()
 
     m_pButterflyScene->update();
 
-    //Fit butterfly plot in view
-    if(!m_pButterflyScene->items().isEmpty()) {
-        ui->m_graphicsView_butterflyPlot->fitInView(m_pButterflyScene->itemsBoundingRect(), Qt::KeepAspectRatio);
-    }
+    //Size butterfly items to fill the view at 1:1 scale
+    updateButterflySize();
 }
 
 
@@ -763,9 +814,31 @@ void AverageWindow::resizeEvent(QResizeEvent *event)
     Q_UNUSED(event);
 
     if(m_pAverageScene && !m_pAverageScene->items().isEmpty()) {
-        ui->m_graphicsView_layout->fitInView(m_pAverageScene->sceneRect(), Qt::KeepAspectRatio);
+        ui->m_graphicsView_layout->fitInView(m_pAverageScene->itemsBoundingRect(), Qt::KeepAspectRatio);
     }
-    if(m_pButterflyScene && !m_pButterflyScene->items().isEmpty()) {
-        ui->m_graphicsView_butterflyPlot->fitInView(m_pButterflyScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    updateButterflySize();
+}
+
+
+//*************************************************************************************************************
+
+void AverageWindow::updateButterflySize()
+{
+    if(!m_pButterflyScene || m_pButterflyScene->items().isEmpty())
+        return;
+
+    // Calculate plot dimensions to fill the viewport exactly
+    QSize vp = ui->m_graphicsView_butterflyPlot->viewport()->size();
+    int plotW = vp.width()  - ButterflySceneItem::kMarginLeft - ButterflySceneItem::kMarginRight;
+    int plotH = vp.height() - ButterflySceneItem::kMarginTop  - ButterflySceneItem::kMarginBottom;
+
+    for(auto* gi : m_pButterflyScene->items()) {
+        if(auto* bsi = dynamic_cast<ButterflySceneItem*>(gi))
+            bsi->setPlotSize(plotW, plotH);
     }
+
+    // Set scene rect to match viewport so items render at 1:1 pixel mapping
+    m_pButterflyScene->setSceneRect(0, 0, vp.width(), vp.height());
+    ui->m_graphicsView_butterflyPlot->resetTransform();
+    m_pButterflyScene->update();
 }
