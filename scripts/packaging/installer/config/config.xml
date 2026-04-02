@@ -43,19 +43,12 @@
 
     <!-- URLs -->
     <ProductUrl>https://mne-cpp.github.io/</ProductUrl>
-    <RemoteRepositories>
-        <Repository>
-            <Url>@MNE_CPP_REPOSITORY_URL@</Url>
-            <Enabled>1</Enabled>
-            <DisplayName>MNE-CPP Online Repository</DisplayName>
-        </Repository>
-    </RemoteRepositories>
 
     <!-- Interactive UI enhancements (does NOT auto-click) -->
     <ControlScript>uiscript.qs</ControlScript>
 
     <!--
-      For headless online installs, run the installer binary with the
+      For headless installs, run the installer binary with the
       controlscript.qs file passed via the script flag.
     -->
 </Installer>

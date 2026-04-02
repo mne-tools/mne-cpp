@@ -1,8 +1,8 @@
 name: Release Installer
 
-# Build lightweight platform online installers with the Qt Installer Framework.
-# The installer binaries remain small and install from per-platform IFW
-# repositories generated from the existing MNE-CPP release archives.
+# Build platform installers with the Qt Installer Framework.
+# Each installer is self-contained (offline) and bundles the MNE-CPP
+# dynamic & static release archives directly.
 
 on:
   workflow_call:
@@ -55,19 +55,7 @@ jobs:
           echo "asset_prefix=mne-cpp-dev" >> "$GITHUB_OUTPUT"
         fi
 
-    - name: Determine online repository URL
-      id: repository
-      shell: bash
-      run: |
-        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-          echo "url=https://mne-cpp.github.io/installer/${GITHUB_REF#refs/tags/}/linux" >> "$GITHUB_OUTPUT"
-        elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
-          echo "url=https://mne-cpp.github.io/installer/latest/linux" >> "$GITHUB_OUTPUT"
-        else
-          echo "url=https://mne-cpp.github.io/dev/installer/linux" >> "$GITHUB_OUTPUT"
-        fi
-
-    - name: Prepare online installer payload
+    - name: Prepare installer payload
       shell: bash
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
@@ -76,25 +64,11 @@ jobs:
           --release-tag "${{ steps.tag.outputs.tag }}" \
           --asset-prefix "${{ steps.tag.outputs.asset_prefix }}" \
           --platform linux \
-          --repository-url "${{ steps.repository.outputs.url }}" \
           --output-dir build_installer/staging
-
-    - name: Generate online repository
-      run: |
-        repogen \
-          --archive-format zip \
-          -p build_installer/staging/packages \
-          build_installer/repository
-
-    - uses: actions/upload-artifact@v7
-      with:
-        name: installer_repository_linux
-        path: build_installer/repository
 
     - name: Build installer with binarycreator
       run: |
         binarycreator \
-          --online-only \
           -c build_installer/staging/config/config.xml \
           -p build_installer/staging/packages \
           MNE-CPP-${{ env.MNE_CPP_VERSION }}-Linux.run
@@ -138,19 +112,7 @@ jobs:
           echo "asset_prefix=mne-cpp-dev" >> "$GITHUB_OUTPUT"
         fi
 
-    - name: Determine online repository URL
-      id: repository
-      shell: bash
-      run: |
-        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-          echo "url=https://mne-cpp.github.io/installer/${GITHUB_REF#refs/tags/}/macos" >> "$GITHUB_OUTPUT"
-        elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
-          echo "url=https://mne-cpp.github.io/installer/latest/macos" >> "$GITHUB_OUTPUT"
-        else
-          echo "url=https://mne-cpp.github.io/dev/installer/macos" >> "$GITHUB_OUTPUT"
-        fi
-
-    - name: Prepare online installer payload
+    - name: Prepare installer payload
       shell: bash
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
@@ -159,20 +121,7 @@ jobs:
           --release-tag "${{ steps.tag.outputs.tag }}" \
           --asset-prefix "${{ steps.tag.outputs.asset_prefix }}" \
           --platform macos \
-          --repository-url "${{ steps.repository.outputs.url }}" \
           --output-dir build_installer/staging
-
-    - name: Generate online repository
-      run: |
-        repogen \
-          --archive-format zip \
-          -p build_installer/staging/packages \
-          build_installer/repository
-
-    - uses: actions/upload-artifact@v7
-      with:
-        name: installer_repository_macos
-        path: build_installer/repository
 
     # -----------------------------------------------------------------
     # Code Signing & Notarization
@@ -210,7 +159,6 @@ jobs:
     - name: Build installer with binarycreator
       run: |
         binarycreator \
-          --online-only \
           -c build_installer/staging/config/config.xml \
           -p build_installer/staging/packages \
           MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin
@@ -313,19 +261,7 @@ jobs:
           echo "asset_prefix=mne-cpp-dev" >> "$GITHUB_OUTPUT"
         fi
 
-    - name: Determine online repository URL
-      id: repository
-      shell: bash
-      run: |
-        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-          echo "url=https://mne-cpp.github.io/installer/${GITHUB_REF#refs/tags/}/windows" >> "$GITHUB_OUTPUT"
-        elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
-          echo "url=https://mne-cpp.github.io/installer/latest/windows" >> "$GITHUB_OUTPUT"
-        else
-          echo "url=https://mne-cpp.github.io/dev/installer/windows" >> "$GITHUB_OUTPUT"
-        fi
-
-    - name: Prepare online installer payload
+    - name: Prepare installer payload
       shell: bash
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
@@ -334,26 +270,11 @@ jobs:
           --release-tag "${{ steps.tag.outputs.tag }}" \
           --asset-prefix "${{ steps.tag.outputs.asset_prefix }}" \
           --platform windows \
-          --repository-url "${{ steps.repository.outputs.url }}" \
           --output-dir build_installer/staging
-
-    - name: Generate online repository
-      shell: pwsh
-      run: |
-        repogen `
-          --archive-format zip `
-          -p build_installer/staging/packages `
-          build_installer/repository
-
-    - uses: actions/upload-artifact@v7
-      with:
-        name: installer_repository_windows
-        path: build_installer/repository
 
     - name: Build installer with binarycreator
       run: |
         binarycreator `
-          --online-only `
           -c build_installer/staging/config/config.xml `
           -p build_installer/staging/packages `
           MNE-CPP-${{ env.MNE_CPP_VERSION }}-win64.exe
@@ -367,66 +288,3 @@ jobs:
       run: |
         cp MNE-CPP-*-win64.exe "${{ steps.tag.outputs.asset_prefix }}-windows-installer-x86_64.exe"
         gh release upload "${{ steps.tag.outputs.tag }}" "${{ steps.tag.outputs.asset_prefix }}-windows-installer-x86_64.exe" --clobber
-
-  DeployOnlineRepositories:
-    runs-on: ubuntu-24.04
-    needs: [LinuxInstaller, MacOSInstaller, WindowsInstaller]
-
-    steps:
-    - uses: actions/download-artifact@v5
-      with:
-        name: installer_repository_linux
-        path: build_installer/repositories/linux
-
-    - uses: actions/download-artifact@v5
-      with:
-        name: installer_repository_macos
-        path: build_installer/repositories/macos
-
-    - uses: actions/download-artifact@v5
-      with:
-        name: installer_repository_windows
-        path: build_installer/repositories/windows
-
-    - name: Deploy repositories to mne-cpp.github.io
-      env:
-        GIT_CREDENTIALS: ${{ secrets.GIT_CREDENTIALS }}
-      run: |
-        git config --global user.email christoph.dinh@mne-cpp.org
-        git config --global user.name chdinh
-        git config --global http.postBuffer 524288000
-
-        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-          WEBSITE_BASE="installer/${GITHUB_REF#refs/tags/}"
-        elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
-          WEBSITE_BASE="installer/latest"
-        else
-          WEBSITE_BASE="dev/installer"
-        fi
-
-        git clone -b main --single-branch "https://${GIT_CREDENTIALS}@github.com/mne-cpp/mne-cpp.github.io.git" website
-        cd website
-
-        rm -rf "${WEBSITE_BASE}/linux" "${WEBSITE_BASE}/macos" "${WEBSITE_BASE}/windows"
-        mkdir -p "${WEBSITE_BASE}/linux" "${WEBSITE_BASE}/macos" "${WEBSITE_BASE}/windows"
-
-        cp -RT ../build_installer/repositories/linux "${WEBSITE_BASE}/linux"
-        cp -RT ../build_installer/repositories/macos "${WEBSITE_BASE}/macos"
-        cp -RT ../build_installer/repositories/windows "${WEBSITE_BASE}/windows"
-
-        git add .
-        git commit -m "Update IFW online repositories" --allow-empty
-
-        # Retry push with increasing delays to handle transient GitHub errors
-        for attempt in 1 2 3; do
-          if git push origin main; then
-            echo "Push succeeded on attempt ${attempt}"
-            break
-          fi
-          if [[ ${attempt} -eq 3 ]]; then
-            echo "Push failed after 3 attempts"
-            exit 1
-          fi
-          echo "Push failed on attempt ${attempt}, retrying in $((attempt * 15))s..."
-          sleep $((attempt * 15))
-        done

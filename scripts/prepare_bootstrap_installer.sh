@@ -1,9 +1,8 @@
 #!/bin/bash
 #
-# Prepare a Qt Installer Framework online-installer payload by hydrating the
+# Prepare a Qt Installer Framework offline-installer payload by hydrating the
 # platform-specific dynamic and static MNE-CPP release archives into IFW
-# packages. The installer binary itself stays small and fetches these packages
-# from a remote repository generated with repogen.
+# packages. The installer binary is self-contained and includes all components.
 
 set -euo pipefail
 
@@ -18,7 +17,6 @@ ASSET_PREFIX=""
 OUTPUT_DIR=""
 RELEASE_DATE="$(date +%F)"
 PLATFORM=""
-REPOSITORY_URL=""
 DYNAMIC_ARCHIVE=""
 STATIC_ARCHIVE=""
 GITHUB_REPOSITORY_NAME="${GITHUB_REPOSITORY:-mne-tools/mne-cpp}"
@@ -32,7 +30,6 @@ Options:
   --release-tag <tag>       GitHub release tag to embed into the installer
   --asset-prefix <name>     Release asset prefix (defaults from the tag)
   --platform <name>         linux | macos | windows
-  --repository-url <url>    Online repository URL embedded into config.xml
   --output-dir <dir>        Output staging directory for config/ and packages/
   --release-date <date>     Metadata release date (default: today, YYYY-MM-DD)
   --dynamic-archive <path>  Optional pre-downloaded dynamic release archive
@@ -155,10 +152,6 @@ while [[ $# -gt 0 ]]; do
             PLATFORM="$2"
             shift 2
             ;;
-        --repository-url)
-            REPOSITORY_URL="$2"
-            shift 2
-            ;;
         --output-dir)
             OUTPUT_DIR="$2"
             shift 2
@@ -197,11 +190,6 @@ if [[ -z "${PLATFORM}" ]]; then
     exit 1
 fi
 
-if [[ -z "${REPOSITORY_URL}" ]]; then
-    echo "ERROR: --repository-url is required."
-    exit 1
-fi
-
 if [[ -z "${OUTPUT_DIR}" ]]; then
     echo "ERROR: --output-dir is required."
     exit 1
@@ -216,7 +204,7 @@ VERSION_MINOR="$(sed -n 's/^set(MNE_CPP_VERSION_MINOR \([0-9][0-9]*\)).*/\1/p' "
 VERSION_PATCH="$(sed -n 's/^set(MNE_CPP_VERSION_PATCH \([0-9][0-9]*\)).*/\1/p' "${REPO_ROOT}/src/CMakeLists.txt")"
 VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
 
-TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/mne-cpp-online-installer.XXXXXX")"
+TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/mne-cpp-installer.XXXXXX")"
 trap 'rm -rf "${TMP_DIR}"' EXIT
 
 DYNAMIC_ASSET_NAME="$(release_asset_name dynamic)"
@@ -279,7 +267,6 @@ render_file()
         -e "s|@MNE_CPP_RELEASE_DATE@|${RELEASE_DATE}|g" \
         -e "s|@MNE_CPP_RELEASE_TAG@|${RELEASE_TAG}|g" \
         -e "s|@MNE_CPP_ASSET_PREFIX@|${ASSET_PREFIX}|g" \
-        -e "s|@MNE_CPP_REPOSITORY_URL@|${REPOSITORY_URL}|g" \
         "${file}" > "${tmp_file}"
 
     mv "${tmp_file}" "${file}"
@@ -289,10 +276,9 @@ while IFS= read -r -d '' file; do
     render_file "${file}"
 done < <(find "${OUTPUT_DIR}/config" "${OUTPUT_DIR}/packages" -type f \( -name '*.xml' -o -name '*.qs' \) -print0)
 
-echo "Prepared online installer staging:"
+echo "Prepared installer staging:"
 echo "  Release tag    : ${RELEASE_TAG}"
 echo "  Asset prefix   : ${ASSET_PREFIX}"
 echo "  Platform       : ${PLATFORM}"
-echo "  Repository URL : ${REPOSITORY_URL}"
 echo "  Version        : ${VERSION}"
 echo "  Output dir     : ${OUTPUT_DIR}"
