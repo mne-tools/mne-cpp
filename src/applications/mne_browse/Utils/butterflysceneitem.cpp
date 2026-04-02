@@ -41,6 +41,7 @@
 #include "butterflysceneitem.h"
 #include "rawsettings.h"
 
+#include <cmath>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -79,9 +80,58 @@ ButterflySceneItem::ButterflySceneItem(QString setName, int setKind, int setUnit
 
 QRectF ButterflySceneItem::boundingRect() const
 {
-    int height = 100;
-    int width = 500;
-    return QRectF(-width/2, -height/2, width, height);
+    const int totalW = kMarginLeft + m_plotWidth + kMarginRight;
+    const int totalH = kMarginTop + m_plotHeight + kMarginBottom;
+    return QRectF(0, 0, totalW, totalH);
+}
+
+
+//*************************************************************************************************************
+
+QRectF ButterflySceneItem::plotArea() const
+{
+    return QRectF(kMarginLeft, kMarginTop, m_plotWidth, m_plotHeight);
+}
+
+
+//*************************************************************************************************************
+
+void ButterflySceneItem::setPlotSize(int plotW, int plotH)
+{
+    prepareGeometryChange();
+    m_plotWidth  = qMax(100, plotW);
+    m_plotHeight = qMax(60, plotH);
+}
+
+
+//*************************************************************************************************************
+
+double ButterflySceneItem::xToTime(double sceneX) const
+{
+    if(!m_pFiffInfo || m_lAverageData.second <= 0)
+        return 0.0;
+    const QRectF pa = plotArea();
+    const double frac = (sceneX - pa.x()) / pa.width();
+    const double tMin = m_firstLastSample.first / m_pFiffInfo->sfreq;
+    const double tMax = m_firstLastSample.second / m_pFiffInfo->sfreq;
+    return tMin + frac * (tMax - tMin);
+}
+
+
+//*************************************************************************************************************
+
+double ButterflySceneItem::yToAmplitude(double sceneY) const
+{
+    const QRectF pa = plotArea();
+    double dMaxValue = 1e-09;
+    if(m_iSetKind == FIFFV_MEG_CH) {
+        dMaxValue = (m_iSetUnit == FIFF_UNIT_T_M) ? m_scaleMap.value("MEG_grad", DELEGATE_SCALE_MEG_GRAD)
+                                                   : m_scaleMap.value("MEG_mag", DELEGATE_SCALE_MEG_MAG);
+    } else if(m_iSetKind == FIFFV_EEG_CH) {
+        dMaxValue = m_scaleMap.value("MEG_EEG", DELEGATE_SCALE_EEG);
+    }
+    const double centerY = pa.y() + pa.height() / 2.0;
+    return -(sceneY - centerY) / (pa.height() / (2.0 * dMaxValue));
 }
 
 
@@ -92,14 +142,34 @@ void ButterflySceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    //Plot bounding rect / drawing region of this item
-    //painter->drawRect(this->boundingRect());
-
     painter->setRenderHint(QPainter::Antialiasing, true);
 
-    //Plot average data
+    // Background
+    painter->save();
+    painter->setBrush(QColor(250, 250, 250));
+    painter->setPen(Qt::NoPen);
+    painter->drawRect(plotArea());
+    painter->restore();
+
+    // Axes and labels
+    painter->save();
+    paintAxes(painter);
+    painter->restore();
+
+    // Average data paths
     painter->save();
     paintAveragePaths(painter);
+    painter->restore();
+
+    // Title
+    painter->save();
+    QFont titleFont = painter->font();
+    titleFont.setPointSizeF(10);
+    titleFont.setBold(true);
+    painter->setFont(titleFont);
+    painter->setPen(Qt::black);
+    painter->drawText(QRectF(kMarginLeft, 2, m_plotWidth, kMarginTop - 4),
+                      Qt::AlignHCenter | Qt::AlignTop, m_sSetName);
     painter->restore();
 }
 
@@ -119,11 +189,180 @@ void ButterflySceneItem::setEvokedData(const FiffEvoked& evoked)
 
 //*************************************************************************************************************
 
+void ButterflySceneItem::paintAxes(QPainter *painter)
+{
+    if(!m_pFiffInfo || m_lAverageData.second <= 0)
+        return;
+
+    const QRectF pa = plotArea();
+    const double sfreq = m_pFiffInfo->sfreq;
+    const double tMin = m_firstLastSample.first / sfreq;
+    const double tMax = m_firstLastSample.second / sfreq;
+    const double tRange = tMax - tMin;
+    if(tRange <= 0.0)
+        return;
+
+    // --- Determine max value for Y axis ---
+    double dMaxValue = 1e-09;
+    QString yUnitLabel;
+    if(m_iSetKind == FIFFV_MEG_CH) {
+        if(m_iSetUnit == FIFF_UNIT_T_M) {
+            dMaxValue = m_scaleMap.value("MEG_grad", DELEGATE_SCALE_MEG_GRAD);
+            yUnitLabel = "fT/cm";
+        } else {
+            dMaxValue = m_scaleMap.value("MEG_mag", DELEGATE_SCALE_MEG_MAG);
+            yUnitLabel = "fT";
+        }
+    } else if(m_iSetKind == FIFFV_EEG_CH) {
+        dMaxValue = m_scaleMap.value("MEG_EEG", DELEGATE_SCALE_EEG);
+        yUnitLabel = QStringLiteral("\u00B5V");  // µV
+    }
+
+    // --- Axis pens ---
+    QPen axisPen(QColor(80, 80, 80));
+    axisPen.setWidthF(1.0);
+    QPen gridPen(QColor(200, 200, 200));
+    gridPen.setWidthF(0.5);
+    gridPen.setStyle(Qt::DotLine);
+    QPen stimPen(QColor(200, 0, 0));
+    stimPen.setWidthF(1.5);
+
+    QFont labelFont = painter->font();
+    labelFont.setPointSizeF(7);
+    painter->setFont(labelFont);
+
+    // --- Draw frame ---
+    painter->setPen(axisPen);
+    painter->drawRect(pa);
+
+    // --- Zero line ---
+    double centerY = pa.y() + pa.height() / 2.0;
+    painter->setPen(gridPen);
+    QPainterPath zeroPath;
+    zeroPath.moveTo(pa.x(), centerY);
+    zeroPath.lineTo(pa.x() + pa.width(), centerY);
+    painter->drawPath(zeroPath);
+
+    // --- Time axis ticks ---
+    // Determine nice tick spacing: aim for ~8-12 ticks
+    double rawStep = tRange / 10.0;
+    double mag = std::pow(10.0, std::floor(std::log10(rawStep)));
+    double residual = rawStep / mag;
+    double tickStep;
+    if(residual < 1.5) tickStep = 1.0 * mag;
+    else if(residual < 3.5) tickStep = 2.0 * mag;
+    else if(residual < 7.5) tickStep = 5.0 * mag;
+    else tickStep = 10.0 * mag;
+
+    double tStart = std::ceil(tMin / tickStep) * tickStep;
+    painter->setPen(axisPen);
+    for(double t = tStart; t <= tMax + tickStep * 0.01; t += tickStep) {
+        double xFrac = (t - tMin) / tRange;
+        double xPos = pa.x() + xFrac * pa.width();
+
+        // Grid line
+        painter->setPen(gridPen);
+        painter->drawLine(QPointF(xPos, pa.y()), QPointF(xPos, pa.y() + pa.height()));
+
+        // Tick + label
+        painter->setPen(axisPen);
+        painter->drawLine(QPointF(xPos, pa.y() + pa.height()), QPointF(xPos, pa.y() + pa.height() + 4));
+        QString timeLabel = QString::number(t * 1000.0, 'f', 0); // ms
+        QRectF labelRect(xPos - 25, pa.y() + pa.height() + 5, 50, 15);
+        painter->drawText(labelRect, Qt::AlignHCenter | Qt::AlignTop, timeLabel);
+    }
+
+    // Time axis label
+    QFont axisLabelFont = labelFont;
+    axisLabelFont.setPointSizeF(8);
+    painter->setFont(axisLabelFont);
+    painter->setPen(axisPen);
+    painter->drawText(QRectF(pa.x(), pa.y() + pa.height() + 20, pa.width(), 18),
+                      Qt::AlignHCenter | Qt::AlignTop, "Time (ms)");
+
+    // --- Amplitude axis ticks ---
+    painter->setFont(labelFont);
+    // Y ticks: ~5 ticks above + 5 below
+    double yTickStep;
+    double yRawStep = dMaxValue / 4.0;
+
+    // Determine Y display scale factor and unit
+    double yDisplayFactor = 1.0;
+    if(m_iSetKind == FIFFV_MEG_CH && m_iSetUnit == FIFF_UNIT_T_M) {
+        yDisplayFactor = 1e13;  // T/m → fT/cm
+    } else if(m_iSetKind == FIFFV_MEG_CH && m_iSetUnit == FIFF_UNIT_T) {
+        yDisplayFactor = 1e15;  // T → fT
+    } else if(m_iSetKind == FIFFV_EEG_CH) {
+        yDisplayFactor = 1e6;   // V → µV
+    }
+
+    double yMag = std::pow(10.0, std::floor(std::log10(yRawStep * yDisplayFactor)));
+    double yRes = (yRawStep * yDisplayFactor) / yMag;
+    double yTickDisplayStep;
+    if(yRes < 1.5) yTickDisplayStep = 1.0 * yMag;
+    else if(yRes < 3.5) yTickDisplayStep = 2.0 * yMag;
+    else if(yRes < 7.5) yTickDisplayStep = 5.0 * yMag;
+    else yTickDisplayStep = 10.0 * yMag;
+    yTickStep = yTickDisplayStep / yDisplayFactor;
+
+    double scaleY = pa.height() / (2.0 * dMaxValue);
+    for(double v = -dMaxValue; v <= dMaxValue + yTickStep * 0.01; v += yTickStep) {
+        double yPos = centerY - v * scaleY;
+        if(yPos < pa.y() - 1 || yPos > pa.y() + pa.height() + 1)
+            continue;
+
+        // Grid line
+        if(std::abs(v) > yTickStep * 0.01) {
+            painter->setPen(gridPen);
+            painter->drawLine(QPointF(pa.x(), yPos), QPointF(pa.x() + pa.width(), yPos));
+        }
+
+        // Tick + label
+        painter->setPen(axisPen);
+        painter->drawLine(QPointF(pa.x() - 4, yPos), QPointF(pa.x(), yPos));
+        double displayVal = v * yDisplayFactor;
+        QString valLabel = QString::number(displayVal, 'g', 3);
+        QRectF yLabelRect(0, yPos - 8, kMarginLeft - 8, 16);
+        painter->drawText(yLabelRect, Qt::AlignRight | Qt::AlignVCenter, valLabel);
+    }
+
+    // Y axis label
+    painter->save();
+    painter->setFont(axisLabelFont);
+    painter->setPen(axisPen);
+    painter->translate(12, pa.y() + pa.height() / 2.0);
+    painter->rotate(-90);
+    painter->drawText(QRectF(-pa.height()/2, -8, pa.height(), 16),
+                      Qt::AlignHCenter | Qt::AlignVCenter, yUnitLabel);
+    painter->restore();
+
+    // --- Stimulus line at t=0 ---
+    if(tMin < 0 && tMax > 0) {
+        double x0 = pa.x() + (-tMin / tRange) * pa.width();
+        painter->setPen(stimPen);
+        painter->drawLine(QPointF(x0, pa.y()), QPointF(x0, pa.y() + pa.height()));
+
+        painter->setFont(labelFont);
+        painter->setPen(stimPen);
+        painter->drawText(QRectF(x0 - 20, pa.y() - 14, 40, 14),
+                          Qt::AlignHCenter | Qt::AlignBottom, "0 ms");
+    }
+}
+
+
+//*************************************************************************************************************
+
 void ButterflySceneItem::paintAveragePaths(QPainter *painter)
 {
     if(!m_pFiffInfo) {
         return;
     }
+
+    const QRectF pa = plotArea();
+    const double sfreq = m_pFiffInfo->sfreq;
+    const double tMin = m_firstLastSample.first / sfreq;
+    const double tMax = m_firstLastSample.second / sfreq;
+    const double tRange = tMax - tMin;
 
     //Create path for all channels
     for(int i = 0; i < m_pFiffInfo->chs.size() ;i++) {
@@ -158,22 +397,21 @@ void ButterflySceneItem::paintAveragePaths(QPainter *painter)
                 if(totalCols <= 0)
                     continue;
 
-                //Calculate X step to fill the full bounding rect width
-                QRectF boundingRect = this->boundingRect();
-                double xStep = boundingRect.width() / static_cast<double>(totalCols);
+                //Calculate step sizes using the plot area
+                double xStep = pa.width() / static_cast<double>(totalCols);
 
                 //Calculate scaling value
-                double dScaleY = (boundingRect.height())/(2*dMaxValue);
+                double dScaleY = (pa.height())/(2*dMaxValue);
 
                 //Setup the painter
-                double centerY = boundingRect.y() + boundingRect.height() / 2.0;
-                QPainterPath path = QPainterPath(QPointF(boundingRect.x(), centerY - (*(averageData+(0*m_pFiffInfo->chs.size())+i)) * dScaleY));
+                double centerY = pa.y() + pa.height() / 2.0;
+                double startVal = (*(averageData+(0*m_pFiffInfo->chs.size())+i)) * dScaleY;
+                QPainterPath path = QPainterPath(QPointF(pa.x(), centerY - startVal));
                 QPen pen;
                 pen.setStyle(Qt::SolidLine);
                 if(!m_cAverageColors.isEmpty() && i<m_cAverageColors.size())
                     pen.setColor(m_cAverageColors.at(i));
-                pen.setWidthF(0);
-                pen.setCosmetic(true);
+                pen.setWidthF(0.5);
                 painter->setPen(pen);
 
                 //Generate plot path
@@ -181,7 +419,12 @@ void ButterflySceneItem::paintAveragePaths(QPainter *painter)
                     //evoked matrix is stored in column major
                     double val = (*(averageData+(u*m_pFiffInfo->chs.size())+i)) * dScaleY;
 
-                    double xPos = boundingRect.x() + u * xStep;
+                    //Clamp to plot area
+                    double halfH = pa.height() / 2.0;
+                    if(val > halfH) val = halfH;
+                    else if(val < -halfH) val = -halfH;
+
+                    double xPos = pa.x() + u * xStep;
                     path.lineTo(QPointF(xPos, centerY - val));
                 }
 

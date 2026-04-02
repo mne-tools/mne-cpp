@@ -179,7 +179,8 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
     for(int dataIndex = 0; dataIndex < m_lAverageData.size(); ++dataIndex) {
         QString sAvrComment = m_lAverageData.at(dataIndex).first;
 
-        if(m_qMapAverageActivation[sAvrComment]) {
+        // Default to active when no activation map has been configured
+        if(!m_qMapAverageActivation.contains(sAvrComment) || m_qMapAverageActivation[sAvrComment]) {
             const double* averageData = m_lAverageData.at(dataIndex).second.first;
             int totalCols =  m_lAverageData.at(dataIndex).second.second;
             if(totalCols <= 0)

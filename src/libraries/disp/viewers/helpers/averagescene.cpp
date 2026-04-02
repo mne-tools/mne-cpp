@@ -62,7 +62,7 @@ using namespace DISPLIB;
 
 AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
 : LayoutScene(view, parent)
-, m_colGlobalItemSignalColor(Qt::yellow)
+, m_colGlobalItemSignalColor(QColor(0, 80, 180))
 {
 }
 

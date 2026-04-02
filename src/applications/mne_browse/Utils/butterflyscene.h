@@ -53,6 +53,8 @@
 //=============================================================================================================
 
 #include <QGraphicsScene>
+#include <QGraphicsSceneMouseEvent>
+#include <QGraphicsLineItem>
 
 
 //*************************************************************************************************************
@@ -105,6 +107,13 @@ public:
      */
     void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
 
+protected:
+    void drawForeground(QPainter *painter, const QRectF &rect) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+
+private:
+    QPointF m_crosshairPos;
+    bool    m_crosshairVisible = false;
 };
 
 } // NAMESPACE
