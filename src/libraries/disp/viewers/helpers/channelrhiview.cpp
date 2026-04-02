@@ -1918,6 +1918,24 @@ void ChannelRhiView::drawRulerOverlay(QPainter &p)
     const QColor dimColor(130, 160, 200, 120);
     int tickLen = 5;
 
+    // ── Semi-transparent "frozen" overlay over the measured area ──
+    {
+        QRect measured;
+        if (snapH)
+            measured = QRect(QPoint(qMin(x0, x1), 0),
+                             QPoint(qMax(x0, x1), height()));
+        else if (snapV)
+            measured = QRect(QPoint(0, qMin(y0, y1)),
+                             QPoint(width(), qMax(y0, y1)));
+        else
+            measured = QRect(QPoint(qMin(x0, x1), qMin(y0, y1)),
+                             QPoint(qMax(x0, x1), qMax(y0, y1)));
+        p.fillRect(measured, QColor(255, 255, 255, 60));
+        // Subtle border around the measured region
+        p.setPen(QPen(QColor(40, 120, 200, 80), 1));
+        p.drawRect(measured);
+    }
+
     // Vertical guide lines at the two X positions
     QPen vLinePen(snapV ? dimColor : activeColor, 1, Qt::DashLine);
     p.setPen(vLinePen);
