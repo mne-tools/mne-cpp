@@ -1417,6 +1417,14 @@ void MainWindow::setupWindowWidgets()
                         .arg(channelName, timeStr, fmtAmp(amplitude, unitLabel));
                     statusBar()->showMessage(msg);
                 });
+
+        // Sync toolbar action checked states when toggled via keyboard shortcuts
+        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::crosshairToggled,
+                m_pCrosshairAction, &QAction::setChecked);
+        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::butterflyToggled,
+                m_pButterflyAction, &QAction::setChecked);
+        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::scalebarsToggled,
+                m_pScalebarsAction, &QAction::setChecked);
     }
 
     // Connect time format toggle requested from DataWindow (via 'T' key)
@@ -1486,6 +1494,13 @@ void MainWindow::createToolBar()
     QToolBar *toolBar = new QToolBar(this);
     toolBar->setOrientation(Qt::Vertical);
     toolBar->setMovable(true);
+    // Suppress macOS default white-rectangle rendering for pressed/checked buttons
+    toolBar->setStyleSheet(QStringLiteral(
+        "QToolButton { background: transparent; border: none; padding: 4px; }"
+        "QToolButton:checked { background: rgba(60,140,220,40); border: 1px solid rgba(60,140,220,120); border-radius: 4px; }"
+        "QToolButton:pressed { background: rgba(60,140,220,70); border: 1px solid rgba(60,140,220,160); border-radius: 4px; }"
+        "QToolButton:hover { background: rgba(0,0,0,15); border-radius: 4px; }"
+    ));
 
     //Add DC removal action
     m_pRemoveDCAction = new QAction(QIcon(":/Resources/Images/removeDC.png"),tr("Remove DC component"), this);
@@ -1535,16 +1550,38 @@ void MainWindow::createToolBar()
 
     // --- Interactive inspection tools ---
 
-    //Helper to create a simple painted icon
+    // Helper – creates a QIcon with Off (normal) and On (highlighted) states
     auto makeIcon = [](const std::function<void(QPainter&, int)>& paintFn) -> QIcon {
         const int sz = 128;
-        QImage img(sz, sz, QImage::Format_ARGB32_Premultiplied);
-        img.fill(Qt::transparent);
-        QPainter p(&img);
-        p.setRenderHint(QPainter::Antialiasing);
-        paintFn(p, sz);
-        p.end();
-        return QIcon(QPixmap::fromImage(img));
+        QIcon icon;
+        // --- Off state ---
+        {
+            QImage img(sz, sz, QImage::Format_ARGB32_Premultiplied);
+            img.fill(Qt::transparent);
+            QPainter p(&img);
+            p.setRenderHint(QPainter::Antialiasing);
+            paintFn(p, sz);
+            p.end();
+            icon.addPixmap(QPixmap::fromImage(img), QIcon::Normal, QIcon::Off);
+        }
+        // --- On (checked) state – tinted background ---
+        {
+            QImage img(sz, sz, QImage::Format_ARGB32_Premultiplied);
+            img.fill(Qt::transparent);
+            QPainter p(&img);
+            p.setRenderHint(QPainter::Antialiasing);
+            p.setPen(Qt::NoPen);
+            p.setBrush(QColor(60, 140, 220, 50));
+            p.drawRoundedRect(4, 4, sz-8, sz-8, 12, 12);
+            paintFn(p, sz);
+            // Thin highlight border
+            p.setPen(QPen(QColor(60, 140, 220, 160), 4));
+            p.setBrush(Qt::NoBrush);
+            p.drawRoundedRect(4, 4, sz-8, sz-8, 12, 12);
+            p.end();
+            icon.addPixmap(QPixmap::fromImage(img), QIcon::Normal, QIcon::On);
+        }
+        return icon;
     };
 
     //Toggle crosshair (X)
@@ -1555,12 +1592,11 @@ void MainWindow::createToolBar()
         p.drawLine(4, sz/2, sz-4, sz/2);
     });
     m_pCrosshairAction = new QAction(crosshairIcon, tr("Toggle crosshair (X)"), this);
+    m_pCrosshairAction->setCheckable(true);
     m_pCrosshairAction->setStatusTip(tr("Toggle crosshair cursor overlay"));
-    connect(m_pCrosshairAction, &QAction::triggered, [this](){
-        if(m_pDataWindow && m_pDataWindow->getChannelDataView()) {
-            bool on = !m_pDataWindow->getChannelDataView()->crosshairEnabled();
-            m_pDataWindow->getChannelDataView()->setCrosshairEnabled(on);
-        }
+    connect(m_pCrosshairAction, &QAction::triggered, [this](bool checked){
+        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+            m_pDataWindow->getChannelDataView()->setCrosshairEnabled(checked);
     });
     toolBar->addAction(m_pCrosshairAction);
 
@@ -1582,12 +1618,11 @@ void MainWindow::createToolBar()
         }
     });
     m_pButterflyAction = new QAction(butterflyIcon, tr("Toggle butterfly mode (B)"), this);
+    m_pButterflyAction->setCheckable(true);
     m_pButterflyAction->setStatusTip(tr("Overlay all channels of the same type"));
-    connect(m_pButterflyAction, &QAction::triggered, [this](){
-        if(m_pDataWindow && m_pDataWindow->getChannelDataView()) {
-            bool on = !m_pDataWindow->getChannelDataView()->butterflyMode();
-            m_pDataWindow->getChannelDataView()->setButterflyMode(on);
-        }
+    connect(m_pButterflyAction, &QAction::triggered, [this](bool checked){
+        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+            m_pDataWindow->getChannelDataView()->setButterflyMode(checked);
     });
     toolBar->addAction(m_pButterflyAction);
 
@@ -1603,12 +1638,11 @@ void MainWindow::createToolBar()
         p.drawLine(cx-6, sz/2, cx+6, sz/2);
     });
     m_pScalebarsAction = new QAction(scalebarsIcon, tr("Toggle scalebars (S)"), this);
+    m_pScalebarsAction->setCheckable(true);
     m_pScalebarsAction->setStatusTip(tr("Show amplitude scalebars on the signal view"));
-    connect(m_pScalebarsAction, &QAction::triggered, [this](){
-        if(m_pDataWindow && m_pDataWindow->getChannelDataView()) {
-            bool on = !m_pDataWindow->getChannelDataView()->scalebarsVisible();
-            m_pDataWindow->getChannelDataView()->setScalebarsVisible(on);
-        }
+    connect(m_pScalebarsAction, &QAction::triggered, [this](bool checked){
+        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+            m_pDataWindow->getChannelDataView()->setScalebarsVisible(checked);
     });
     toolBar->addAction(m_pScalebarsAction);
 
@@ -1622,8 +1656,10 @@ void MainWindow::createToolBar()
         p.drawText(QRect(0,0,sz,sz), Qt::AlignCenter, "T");
     });
     QAction* timeFormatAction = new QAction(timeIcon, tr("Toggle time format (T)"), this);
+    timeFormatAction->setCheckable(true);
     timeFormatAction->setStatusTip(tr("Switch between seconds and clock time display"));
-    connect(timeFormatAction, &QAction::triggered, [this](){
+    connect(timeFormatAction, &QAction::triggered, [this](bool checked){
+        Q_UNUSED(checked);
         if(m_pDataWindow && m_pDataWindow->getChannelDataView())
             m_pDataWindow->getChannelDataView()->toggleTimeFormat();
     });

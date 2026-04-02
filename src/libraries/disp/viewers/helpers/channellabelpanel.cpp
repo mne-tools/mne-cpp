@@ -78,7 +78,7 @@ ChannelLabelPanel::ChannelLabelPanel(QWidget *parent)
 {
     setFixedWidth(kPanelWidth);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-    setCursor(Qt::SizeVerCursor);
+    setCursor(Qt::PointingHandCursor);
     setMouseTracking(true);
 }
 
@@ -368,6 +368,7 @@ void ChannelLabelPanel::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         m_dragging       = true;
+        m_dragActivated  = false;
         m_dragStartY     = event->position().toPoint().y();
         m_dragStartFirst = m_firstVisibleChannel;
         event->accept();
@@ -383,13 +384,21 @@ void ChannelLabelPanel::mouseMoveEvent(QMouseEvent *event)
         return;
     }
 
+    int dy = event->position().toPoint().y() - m_dragStartY;
+    if (!m_dragActivated && qAbs(dy) > 4)
+        m_dragActivated = true;
+
+    if (!m_dragActivated) {
+        event->accept();
+        return;
+    }
+
     const int totalCh    = effectiveChannelIndices().size();
     const int maxFirst   = qMax(0, totalCh - m_visibleChannelCount);
     const float laneH    = (m_visibleChannelCount > 0 && height() > 0)
                            ? static_cast<float>(height()) / m_visibleChannelCount
                            : 30.f;
 
-    int dy = event->position().toPoint().y() - m_dragStartY;
     // Dragging DOWN means earlier channels (positive dy → lower first index)
     int targetFirst = qBound(0,
                              m_dragStartFirst - static_cast<int>(dy / laneH),
@@ -404,7 +413,25 @@ void ChannelLabelPanel::mouseMoveEvent(QMouseEvent *event)
 void ChannelLabelPanel::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
+        const bool wasClick = m_dragging && !m_dragActivated;
         m_dragging = false;
+        m_dragActivated = false;
+
+        if (wasClick && m_model && m_visibleChannelCount > 0) {
+            const float laneH = static_cast<float>(height()) / m_visibleChannelCount;
+            const int row = static_cast<int>(event->position().y() / laneH);
+            const QVector<int> vis = effectiveChannelIndices();
+            const int idx = m_firstVisibleChannel + row;
+            if (idx >= 0 && idx < vis.size()) {
+                int ch = vis[idx];
+                auto info = m_model->channelInfo(ch);
+                bool newBad = !info.bad;
+                m_model->setChannelBad(ch, newBad);
+                emit channelBadToggled(ch, newBad);
+                update();
+            }
+        }
+
         event->accept();
     }
 }
