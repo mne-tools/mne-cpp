@@ -1911,26 +1911,51 @@ void ChannelRhiView::drawRulerOverlay(QPainter &p)
     int x0 = m_rulerX0, y0 = m_rulerY0;
     int x1 = m_rulerX1, y1 = m_rulerY1;
 
+    const bool snapH = (m_rulerSnap == RulerSnap::Horizontal);
+    const bool snapV = (m_rulerSnap == RulerSnap::Vertical);
+
+    const QColor activeColor(40, 120, 200, 220);
+    const QColor dimColor(130, 160, 200, 120);
+    int tickLen = 5;
+
     // Vertical guide lines at the two X positions
-    QPen vLinePen(QColor(40, 120, 200, 200), 1, Qt::DashLine);
+    QPen vLinePen(snapV ? dimColor : activeColor, 1, Qt::DashLine);
     p.setPen(vLinePen);
     p.drawLine(x0, 0, x0, height());
-    p.drawLine(x1, 0, x1, height());
+    if (!snapV)
+        p.drawLine(x1, 0, x1, height());
+
+    // Horizontal guide lines at the two Y positions (only when vertical snap)
+    if (snapV) {
+        QPen hGuidePen(activeColor, 1, Qt::DashLine);
+        p.setPen(hGuidePen);
+        p.drawLine(0, y0, width(), y0);
+        p.drawLine(0, y1, width(), y1);
+    }
 
     // Horizontal span line at y0
-    QPen hLinePen(QColor(40, 120, 200, 200), 1);
+    QPen hLinePen(snapV ? dimColor : activeColor, snapH ? 2 : 1);
     p.setPen(hLinePen);
-    p.drawLine(qMin(x0, x1), y0, qMax(x0, x1), y0);
+    if (!snapV)
+        p.drawLine(qMin(x0, x1), y0, qMax(x0, x1), y0);
 
     // Vertical span line at x0
-    p.drawLine(x0, qMin(y0, y1), x0, qMax(y0, y1));
+    QPen vSpanPen(snapH ? dimColor : activeColor, snapV ? 2 : 1);
+    p.setPen(vSpanPen);
+    if (!snapH)
+        p.drawLine(x0, qMin(y0, y1), x0, qMax(y0, y1));
 
     // End tick marks
-    int tickLen = 5;
-    p.drawLine(x0 - tickLen, y0, x0 + tickLen, y0);
-    p.drawLine(x1 - tickLen, y0, x1 + tickLen, y0);
-    p.drawLine(x0, y0 - tickLen, x0, y0 + tickLen);
-    p.drawLine(x0, y1 - tickLen, x0, y1 + tickLen);
+    if (!snapV) {
+        p.setPen(QPen(activeColor, 1));
+        p.drawLine(x0 - tickLen, y0, x0 + tickLen, y0);
+        p.drawLine(x1 - tickLen, y0, x1 + tickLen, y0);
+    }
+    if (!snapH) {
+        p.setPen(QPen(activeColor, 1));
+        p.drawLine(x0, y0 - tickLen, x0, y0 + tickLen);
+        p.drawLine(x0, y1 - tickLen, x0, y1 + tickLen);
+    }
 
     // ── Measurement labels ────────────────────────────────────────────
     float deltaSamples = static_cast<float>(x1 - x0) * m_samplesPerPixel;
@@ -1989,28 +2014,34 @@ void ChannelRhiView::drawRulerOverlay(QPainter &p)
     f.setPointSizeF(9.0);
     f.setBold(true);
     p.setFont(f);
-
-    int labelX = (x0 + x1) / 2;
-    int labelY = y0 - 6;
-    if (labelY < 14)
-        labelY = y0 + 16;
-
     QFontMetrics fm(f);
-    QRect tRect = fm.boundingRect(timeLabel);
-    tRect.moveCenter(QPoint(labelX, labelY));
-    tRect.adjust(-4, -2, 4, 2);
-    p.fillRect(tRect, QColor(255, 255, 255, 210));
-    p.setPen(QColor(20, 80, 160));
-    p.drawText(tRect, Qt::AlignCenter, timeLabel);
 
-    int aLabelX = x0 + 8;
-    int aLabelY = (y0 + y1) / 2;
-    QRect aRect = fm.boundingRect(ampLabel);
-    aRect.moveCenter(QPoint(aLabelX + aRect.width() / 2, aLabelY));
-    aRect.adjust(-4, -2, 4, 2);
-    p.fillRect(aRect, QColor(255, 255, 255, 210));
-    p.setPen(QColor(20, 80, 160));
-    p.drawText(aRect, Qt::AlignCenter, ampLabel);
+    // Time label (shown unless vertical snap)
+    if (!snapV) {
+        int labelX = (x0 + x1) / 2;
+        int labelY = y0 - 6;
+        if (labelY < 14)
+            labelY = y0 + 16;
+
+        QRect tRect = fm.boundingRect(timeLabel);
+        tRect.moveCenter(QPoint(labelX, labelY));
+        tRect.adjust(-4, -2, 4, 2);
+        p.fillRect(tRect, QColor(255, 255, 255, 210));
+        p.setPen(QColor(20, 80, 160));
+        p.drawText(tRect, Qt::AlignCenter, timeLabel);
+    }
+
+    // Amplitude label (shown unless horizontal snap)
+    if (!snapH) {
+        int aLabelX = x0 + 8;
+        int aLabelY = (y0 + y1) / 2;
+        QRect aRect = fm.boundingRect(ampLabel);
+        aRect.moveCenter(QPoint(aLabelX + aRect.width() / 2, aLabelY));
+        aRect.adjust(-4, -2, 4, 2);
+        p.fillRect(aRect, QColor(255, 255, 255, 210));
+        p.setPen(QColor(20, 80, 160));
+        p.drawText(aRect, Qt::AlignCenter, ampLabel);
+    }
 }
 
 //=============================================================================================================
@@ -2068,17 +2099,18 @@ void ChannelRhiView::wheelEvent(QWheelEvent *event)
 
 void ChannelRhiView::mousePressEvent(QMouseEvent *event)
 {
-    // Shift + left-click → start ruler measurement (takes priority over pan/drag)
-    if (event->button() == Qt::LeftButton && (event->modifiers() & Qt::ShiftModifier)) {
+    // Right-click → start ruler measurement
+    if (event->button() == Qt::RightButton) {
         // Stop any running inertial scroll before measuring
         if (m_pInertialAnim) {
             m_pInertialAnim->stop();
             m_pInertialAnim = nullptr;
         }
         m_rulerActive = true;
-        m_rulerX0 = m_rulerX1 = event->position().toPoint().x();
-        m_rulerY0 = m_rulerY1 = event->position().toPoint().y();
-        update();
+        m_rulerSnap   = RulerSnap::Free;
+        m_rulerX0 = m_rulerX1 = m_rulerRawX1 = event->position().toPoint().x();
+        m_rulerY0 = m_rulerY1 = m_rulerRawY1 = event->position().toPoint().y();
+        if (m_overlay) m_overlay->repaint();
         event->accept();
         return;
     }
@@ -2125,8 +2157,40 @@ void ChannelRhiView::mousePressEvent(QMouseEvent *event)
 void ChannelRhiView::mouseMoveEvent(QMouseEvent *event)
 {
     if (m_rulerActive) {
-        m_rulerX1 = event->position().toPoint().x();
-        m_rulerY1 = event->position().toPoint().y();
+        m_rulerRawX1 = event->position().toPoint().x();
+        m_rulerRawY1 = event->position().toPoint().y();
+
+        // Snap logic: if displacement is dominantly horizontal → lock to horizontal,
+        // if dominantly vertical → lock to vertical, otherwise free
+        int dx = qAbs(m_rulerRawX1 - m_rulerX0);
+        int dy = qAbs(m_rulerRawY1 - m_rulerY0);
+        const int kSnapThresh = 8;  // minimum movement before snapping
+        if (dx < kSnapThresh && dy < kSnapThresh) {
+            m_rulerSnap = RulerSnap::Free;
+        } else if (dx > dy * 2) {
+            m_rulerSnap = RulerSnap::Horizontal;
+        } else if (dy > dx * 2) {
+            m_rulerSnap = RulerSnap::Vertical;
+        } else {
+            m_rulerSnap = RulerSnap::Free;
+        }
+
+        // Apply snap
+        switch (m_rulerSnap) {
+        case RulerSnap::Horizontal:
+            m_rulerX1 = m_rulerRawX1;
+            m_rulerY1 = m_rulerY0;  // lock Y
+            break;
+        case RulerSnap::Vertical:
+            m_rulerX1 = m_rulerX0;  // lock X
+            m_rulerY1 = m_rulerRawY1;
+            break;
+        default:
+            m_rulerX1 = m_rulerRawX1;
+            m_rulerY1 = m_rulerRawY1;
+            break;
+        }
+
         if (m_overlay) m_overlay->repaint();
         event->accept();
         return;
@@ -2174,14 +2238,23 @@ void ChannelRhiView::mouseMoveEvent(QMouseEvent *event)
 
 void ChannelRhiView::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (m_rulerActive && event->button() == Qt::LeftButton) {
-        m_rulerX1 = event->position().toPoint().x();
-        m_rulerY1 = event->position().toPoint().y();
+    if (m_rulerActive && event->button() == Qt::RightButton) {
+        m_rulerRawX1 = event->position().toPoint().x();
+        m_rulerRawY1 = event->position().toPoint().y();
+        // Apply final snap
+        switch (m_rulerSnap) {
+        case RulerSnap::Horizontal:
+            m_rulerX1 = m_rulerRawX1; m_rulerY1 = m_rulerY0; break;
+        case RulerSnap::Vertical:
+            m_rulerX1 = m_rulerX0; m_rulerY1 = m_rulerRawY1; break;
+        default:
+            m_rulerX1 = m_rulerRawX1; m_rulerY1 = m_rulerRawY1; break;
+        }
+        m_rulerActive = false;
+        if (m_overlay) m_overlay->repaint();
+
         const int x0 = qMin(m_rulerX0, m_rulerX1);
         const int x1 = qMax(m_rulerX0, m_rulerX1);
-        m_rulerActive = false;
-        update();
-
         if (m_annotationSelectionEnabled && qAbs(x1 - x0) > 3) {
             int startSample = static_cast<int>(m_scrollSample + static_cast<float>(x0) * m_samplesPerPixel);
             int endSample = static_cast<int>(m_scrollSample + static_cast<float>(x1) * m_samplesPerPixel);
