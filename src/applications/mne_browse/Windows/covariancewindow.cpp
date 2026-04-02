@@ -17,15 +17,21 @@
 
 #include <QAction>
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QFormLayout>
 #include <QGroupBox>
+#include <QImage>
 #include <QLabel>
+#include <QPixmap>
 #include <QSignalBlocker>
 #include <QTextEdit>
 #include <QToolBar>
 #include <QVBoxLayout>
 #include <QWidget>
+
+#include <cmath>
+#include <limits>
 
 using namespace MNEBROWSE;
 
@@ -210,6 +216,23 @@ void CovarianceWindow::setupUi()
     m_pSummaryTextEdit->setMinimumHeight(160);
     m_pLayout->addWidget(m_pSummaryTextEdit);
 
+    // Heatmap visualization
+    QGroupBox* heatmapGroup = new QGroupBox(QStringLiteral("Covariance Matrix"), m_pContents);
+    QVBoxLayout* heatmapLayout = new QVBoxLayout(heatmapGroup);
+
+    m_pHeatmapChannelType = new QComboBox(heatmapGroup);
+    m_pHeatmapChannelType->addItems({QStringLiteral("All"), QStringLiteral("MEG_grad"),
+                                     QStringLiteral("MEG_mag"), QStringLiteral("EEG")});
+    heatmapLayout->addWidget(m_pHeatmapChannelType);
+
+    m_pHeatmapLabel = new QLabel(heatmapGroup);
+    m_pHeatmapLabel->setAlignment(Qt::AlignCenter);
+    m_pHeatmapLabel->setMinimumHeight(200);
+    m_pHeatmapLabel->setText(QStringLiteral("No covariance loaded."));
+    heatmapLayout->addWidget(m_pHeatmapLabel);
+
+    m_pLayout->addWidget(heatmapGroup);
+
     QGroupBox* whiteningGroup = new QGroupBox(QStringLiteral("Whitening"), m_pContents);
     QFormLayout* whiteningLayout = new QFormLayout(whiteningGroup);
 
@@ -274,6 +297,9 @@ void CovarianceWindow::initControls()
             this, [this]() { emitSettingsChanged(); });
     connect(m_pRegEegSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
             this, [this]() { emitSettingsChanged(); });
+
+    connect(m_pHeatmapChannelType, &QComboBox::currentTextChanged,
+            this, [this]() { updateHeatmap(); });
 }
 
 //=============================================================================================================
@@ -287,6 +313,132 @@ void CovarianceWindow::updateSummary()
     m_pSummaryTextEdit->setPlainText(covarianceSummary(m_covariance,
                                                        m_sSourceDescription,
                                                        m_pFiffInfo));
+    updateHeatmap();
+}
+
+//=============================================================================================================
+
+void CovarianceWindow::updateHeatmap()
+{
+    if(!m_pHeatmapLabel)
+        return;
+
+    if(m_covariance.isEmpty() || m_covariance.dim <= 0) {
+        m_pHeatmapLabel->setPixmap(QPixmap());
+        m_pHeatmapLabel->setText(QStringLiteral("No covariance loaded."));
+        return;
+    }
+
+    // Determine which channel indices to include based on the filter
+    QList<int> indices;
+    const QString filter = m_pHeatmapChannelType ? m_pHeatmapChannelType->currentText()
+                                                 : QStringLiteral("All");
+
+    for(int i = 0; i < m_covariance.names.size(); ++i) {
+        if(filter == QStringLiteral("All")) {
+            indices.append(i);
+            continue;
+        }
+
+        if(m_pFiffInfo) {
+            const int chIdx = m_pFiffInfo->ch_names.indexOf(m_covariance.names[i]);
+            if(chIdx < 0 || chIdx >= m_pFiffInfo->chs.size())
+                continue;
+
+            const auto& chInfo = m_pFiffInfo->chs.at(chIdx);
+            if(filter == QStringLiteral("MEG_grad")
+               && chInfo.kind == FIFFV_MEG_CH && chInfo.unit == FIFF_UNIT_T_M) {
+                indices.append(i);
+            } else if(filter == QStringLiteral("MEG_mag")
+                      && chInfo.kind == FIFFV_MEG_CH && chInfo.unit == FIFF_UNIT_T) {
+                indices.append(i);
+            } else if(filter == QStringLiteral("EEG") && chInfo.kind == FIFFV_EEG_CH) {
+                indices.append(i);
+            }
+        } else {
+            // Without FiffInfo, include all
+            indices.append(i);
+        }
+    }
+
+    if(indices.isEmpty()) {
+        m_pHeatmapLabel->setPixmap(QPixmap());
+        m_pHeatmapLabel->setText(QStringLiteral("No channels of this type in covariance."));
+        return;
+    }
+
+    const int n = indices.size();
+
+    // Extract the sub-matrix (or diagonal) and find min/max for color mapping
+    double vMin = std::numeric_limits<double>::max();
+    double vMax = std::numeric_limits<double>::lowest();
+
+    // Build the values to display
+    Eigen::MatrixXd subMatrix(n, n);
+
+    if(m_covariance.diag) {
+        subMatrix.setZero();
+        for(int i = 0; i < n; ++i) {
+            double val = m_covariance.data(indices[i], 0);
+            subMatrix(i, i) = val;
+            if(val < vMin) vMin = val;
+            if(val > vMax) vMax = val;
+        }
+    } else {
+        for(int i = 0; i < n; ++i) {
+            for(int j = 0; j < n; ++j) {
+                double val = m_covariance.data(indices[i], indices[j]);
+                subMatrix(i, j) = val;
+                if(val < vMin) vMin = val;
+                if(val > vMax) vMax = val;
+            }
+        }
+    }
+
+    // Use symmetric color range around zero
+    const double absMax = qMax(qAbs(vMin), qAbs(vMax));
+    if(absMax < 1e-30) {
+        m_pHeatmapLabel->setPixmap(QPixmap());
+        m_pHeatmapLabel->setText(QStringLiteral("Covariance matrix is effectively zero."));
+        return;
+    }
+
+    // Create the heatmap image
+    const int imgSize = qMin(n, 512); // cap image size
+    QImage img(imgSize, imgSize, QImage::Format_RGB32);
+
+    for(int py = 0; py < imgSize; ++py) {
+        const int row = py * n / imgSize;
+        QRgb* scanLine = reinterpret_cast<QRgb*>(img.scanLine(py));
+        for(int px = 0; px < imgSize; ++px) {
+            const int col = px * n / imgSize;
+            const double val = subMatrix(row, col);
+
+            // Blue-white-red diverging colormap
+            const double t = val / absMax; // in [-1, 1]
+            int r, g, b;
+            if(t >= 0) {
+                // White to red
+                r = 255;
+                g = static_cast<int>(255.0 * (1.0 - t));
+                b = static_cast<int>(255.0 * (1.0 - t));
+            } else {
+                // White to blue
+                r = static_cast<int>(255.0 * (1.0 + t));
+                g = static_cast<int>(255.0 * (1.0 + t));
+                b = 255;
+            }
+            scanLine[px] = qRgb(qBound(0, r, 255), qBound(0, g, 255), qBound(0, b, 255));
+        }
+    }
+
+    // Scale to fit the label width
+    const int displaySize = qMin(m_pHeatmapLabel->width() - 10, 400);
+    QPixmap pixmap = QPixmap::fromImage(img).scaled(displaySize, displaySize,
+                                                     Qt::KeepAspectRatio,
+                                                     Qt::FastTransformation);
+    m_pHeatmapLabel->setPixmap(pixmap);
+    m_pHeatmapLabel->setText(QString());
 }
 
 //=============================================================================================================
