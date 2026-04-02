@@ -79,7 +79,7 @@ namespace DISPLIB
  */
 struct ChannelDisplayInfo {
     QString name;           /**< Channel name for the label. */
-    QString typeLabel;      /**< Short type string: "MEG", "EEG", "EOG", "ECG", "EMG", "STIM", "MISC". */
+    QString typeLabel;      /**< Short type string: "MEG grad", "MEG mag", "EEG", "EOG", "ECG", "EMG", "STIM", "MISC". */
     QColor  color;          /**< Line colour to use in the GPU renderer. */
     float   amplitudeMax;   /**< Amplitude value (physical units) that maps to full row height. */
     bool    bad;            /**< Whether the channel is currently marked bad. */

@@ -409,6 +409,7 @@ protected:
     void drawCrosshair(QPainter &p);
     void drawScalebars(QPainter &p);
     void drawRulerOverlay(QPainter &p);
+    void emitCursorData();
     bool rulerActive() const { return m_rulerActive; }
 
     void resizeEvent(QResizeEvent *event) override;

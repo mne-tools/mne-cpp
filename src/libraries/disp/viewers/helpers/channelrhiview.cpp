@@ -1694,10 +1694,13 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
 
 void ChannelRhiView::drawOverlays()
 {
-    // Repaint the lightweight overlay widget so crosshair/scalebars/ruler
-    // stay in sync after GPU-driven scroll/zoom repaints.
+    // Schedule an overlay repaint so crosshair/scalebars/ruler stay in sync
+    // after GPU-driven scroll/zoom repaints.  Use update() (asynchronous)
+    // instead of repaint() because this is called from within paintEvent;
+    // synchronous repaint() from inside a paint handler can starve sibling
+    // widgets (e.g. the overview bar) of paint cycles.
     if (m_overlay && (m_crosshairEnabled || m_scalebarsVisible || m_rulerActive))
-        m_overlay->repaint();
+        m_overlay->update();
 }
 
 //=============================================================================================================
@@ -1720,7 +1723,9 @@ static QString formatAmplitude(float amp, const QString &unit)
 
 static QString unitForType(const QString &typeLabel)
 {
-    if (typeLabel == QStringLiteral("MEG"))
+    if (typeLabel == QStringLiteral("MEG grad"))
+        return QStringLiteral("T/m");
+    if (typeLabel == QStringLiteral("MEG mag") || typeLabel == QStringLiteral("MEG"))
         return QStringLiteral("T");
     if (typeLabel == QStringLiteral("EEG") ||
         typeLabel == QStringLiteral("EOG") ||
@@ -1764,8 +1769,6 @@ void ChannelRhiView::drawCrosshair(QPainter &p)
         int lane = qBound(0, static_cast<int>(m_crosshairY / laneH), nLanes - 1);
         channelLabel = groups[lane].typeLabel;
         unitStr = unitForType(groups[lane].typeLabel);
-        // No single-channel amplitude readout in butterfly; show type name only
-        emit cursorDataChanged(timeSec, 0.f, channelLabel, unitStr);
     } else {
         // Normal mode: determine the channel and sample under the cursor
         int totalCh = totalLogicalChannels();
@@ -1783,8 +1786,6 @@ void ChannelRhiView::drawCrosshair(QPainter &p)
         value = m_model->sampleValueAt(ch, sample);
         channelLabel = info.name;
         unitStr = unitForType(info.typeLabel);
-
-        emit cursorDataChanged(timeSec, value, channelLabel, unitStr);
     }
 
     // Draw info label near cursor
@@ -1822,6 +1823,42 @@ void ChannelRhiView::drawCrosshair(QPainter &p)
     p.fillRect(labelRect, QColor(255, 255, 255, 220));
     p.setPen(QColor(30, 30, 30));
     p.drawText(labelRect, Qt::AlignCenter, label);
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::emitCursorData()
+{
+    if (m_crosshairX < 0 || m_crosshairY < 0)
+        return;
+    if (!m_model || totalLogicalChannels() == 0)
+        return;
+
+    const int h = height();
+    int sample = static_cast<int>(m_scrollSample + static_cast<float>(m_crosshairX) * m_samplesPerPixel);
+    float timeSec = (m_sfreq > 0.f) ? static_cast<float>(sample - m_firstFileSample) / m_sfreq : 0.f;
+
+    if (m_butterflyMode) {
+        const auto groups = butterflyTypeGroups();
+        int nLanes = groups.size();
+        if (nLanes <= 0) return;
+        float laneH = static_cast<float>(h) / nLanes;
+        int lane = qBound(0, static_cast<int>(m_crosshairY / laneH), nLanes - 1);
+        emit cursorDataChanged(timeSec, 0.f,
+                               groups[lane].typeLabel,
+                               unitForType(groups[lane].typeLabel));
+    } else {
+        int totalCh = totalLogicalChannels();
+        int visCnt  = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
+        if (visCnt <= 0) return;
+        float laneH = static_cast<float>(h) / visCnt;
+        int   row   = qBound(0, static_cast<int>(m_crosshairY / laneH), visCnt - 1);
+        int   ch    = actualChannelAt(m_firstVisibleChannel + row);
+        if (ch < 0) return;
+        auto info = m_model->channelInfo(ch);
+        float value = m_model->sampleValueAt(ch, sample);
+        emit cursorDataChanged(timeSec, value, info.name, unitForType(info.typeLabel));
+    }
 }
 
 //=============================================================================================================
@@ -1995,15 +2032,7 @@ void ChannelRhiView::drawRulerOverlay(QPainter &p)
                 float yScale = info.amplitudeMax / (laneH * 0.45f);
                 deltaAmp = -dyPx * yScale;
 
-                if (info.typeLabel == QStringLiteral("MEG"))
-                    ampUnit = QStringLiteral("T");
-                else if (info.typeLabel == QStringLiteral("EEG") ||
-                         info.typeLabel == QStringLiteral("EOG") ||
-                         info.typeLabel == QStringLiteral("ECG") ||
-                         info.typeLabel == QStringLiteral("EMG"))
-                    ampUnit = QStringLiteral("V");
-                else
-                    ampUnit = QStringLiteral("AU");
+                ampUnit = unitForType(info.typeLabel);
             }
         }
     }
@@ -2247,6 +2276,10 @@ void ChannelRhiView::mouseMoveEvent(QMouseEvent *event)
         m_crosshairX = event->position().toPoint().x();
         m_crosshairY = event->position().toPoint().y();
         if (m_overlay) m_overlay->repaint();
+
+        // Emit cursor data signal here (not from drawCrosshair) to keep
+        // signal emission out of the paint path and avoid repaint cascades.
+        emitCursorData();
     }
 
     QRhiWidget::mouseMoveEvent(event);
