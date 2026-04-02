@@ -190,6 +190,22 @@ void DataWindow::scaleData(const QMap<QString,double> &scaleMap)
 {
     m_pRawDelegate->setScaleMap(scaleMap);
     updateDataTableViews();
+
+    // Forward to the GPU-based channel data view
+    if (m_pChannelDataView && m_pChannelDataView->model())
+        m_pChannelDataView->model()->setScaleMapFromStrings(scaleMap);
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::updateProjections()
+{
+    if (m_pFiffReader)
+        m_pFiffReader->updateProjections();
+
+    // Reload all visible data with the updated projection
+    restartChannelView(m_iCurrentScrollSample, false);
 }
 
 

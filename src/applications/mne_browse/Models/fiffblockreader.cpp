@@ -272,3 +272,19 @@ MatrixXd FiffBlockReader::doRead(int from, int to)
     }
     return data;
 }
+
+//=============================================================================================================
+
+void FiffBlockReader::updateProjections()
+{
+    if (m_raw.isNull() || !m_fiffInfo)
+        return;
+
+    // Recompute the projector matrix from active flags in FiffInfo::projs
+    Eigen::MatrixXd matProj;
+    qint32 nproj = m_fiffInfo->make_projector(matProj);
+    if (nproj > 0)
+        m_raw->proj = matProj;
+    else
+        m_raw->proj.resize(0, 0);   // Clear — no active projectors
+}

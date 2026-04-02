@@ -101,6 +101,9 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
         connect(averageSceneItemTemp, &AverageSceneItem::sceneUpdateRequested,
                     this, &AverageScene::updateScene);
 
+        averageSceneItemTemp->setPos(75 * selectionSceneItemTemp->m_qpChannelPosition.x(),
+                                     -75 * selectionSceneItemTemp->m_qpChannelPosition.y());
+
         this->addItem(averageSceneItemTemp);
     }
 }
@@ -121,6 +124,10 @@ void AverageScene::repaintSelectionItems(const DISPLIB::SelectionItem &selectedC
 
         connect(averageSceneItemTemp, &AverageSceneItem::sceneUpdateRequested,
                 this, &AverageScene::updateScene);
+
+        averageSceneItemTemp->setPos(75 * selectedChannelItems.m_qpChannelPosition[i].x(),
+                                     -75 * selectedChannelItems.m_qpChannelPosition[i].y());
+
         this->addItem(averageSceneItemTemp);
     }
 }

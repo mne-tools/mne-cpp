@@ -646,6 +646,11 @@ void AverageWindow::refreshPlots()
     }
 
     m_pButterflyScene->update();
+
+    //Fit butterfly plot in view
+    if(!m_pButterflyScene->items().isEmpty()) {
+        ui->m_graphicsView_butterflyPlot->fitInView(m_pButterflyScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    }
 }
 
 
@@ -756,4 +761,11 @@ void AverageWindow::exportAverageButterflyPlot()
 void AverageWindow::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
+
+    if(m_pAverageScene && !m_pAverageScene->items().isEmpty()) {
+        ui->m_graphicsView_layout->fitInView(m_pAverageScene->sceneRect(), Qt::KeepAspectRatio);
+    }
+    if(m_pButterflyScene && !m_pButterflyScene->items().isEmpty()) {
+        ui->m_graphicsView_butterflyPlot->fitInView(m_pButterflyScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    }
 }

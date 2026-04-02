@@ -148,6 +148,7 @@ public:
     void clearData();
 
     void setScaleMap(const QMap<qint32, float> &scaleMap);
+    void setScaleMapFromStrings(const QMap<QString, double> &scaleMap);
 
     //=========================================================================================================
     /**

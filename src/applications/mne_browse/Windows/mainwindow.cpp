@@ -1461,9 +1461,12 @@ void MainWindow::setupWindowWidgets()
 
     connect(m_pNoiseReductionWindow, &NoiseReductionWindow::projSelectionChanged,
             this, [this]() {
-                if (ensureLegacyRawModelLoaded(QStringLiteral("Noise Reduction"))) {
+                // Update projections in the demand-paged GPU path
+                m_pDataWindow->updateProjections();
+
+                // Also update legacy model if it is already loaded
+                if (rawModel() && rawModel()->isFileLoaded())
                     rawModel()->updateProjections();
-                }
             });
 
     connect(m_pNoiseReductionWindow, &NoiseReductionWindow::compSelectionChanged,
