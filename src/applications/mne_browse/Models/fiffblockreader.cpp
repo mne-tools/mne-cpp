@@ -280,11 +280,36 @@ void FiffBlockReader::updateProjections()
     if (m_raw.isNull() || !m_fiffInfo)
         return;
 
+    qWarning() << "[FiffBlockReader] updateProjections called. FiffInfo ptr="
+               << (void*)m_fiffInfo.data();
+
+    // Count active projectors for diagnostics
+    int nActive = 0;
+    for (int i = 0; i < m_fiffInfo->projs.size(); ++i) {
+        qWarning() << "[FiffBlockReader] proj" << i
+                   << "desc=" << m_fiffInfo->projs[i].desc
+                   << "active=" << m_fiffInfo->projs[i].active;
+        if (m_fiffInfo->projs[i].active)
+            ++nActive;
+    }
+
     // Recompute the projector matrix from active flags in FiffInfo::projs
     Eigen::MatrixXd matProj;
     qint32 nproj = m_fiffInfo->make_projector(matProj);
-    if (nproj > 0)
+    if (nproj > 0) {
         m_raw->proj = matProj;
-    else
+        // Verify it's not identity
+        double offDiagNorm = 0.0;
+        if (matProj.rows() > 0 && matProj.cols() > 0) {
+            Eigen::MatrixXd diff = matProj - Eigen::MatrixXd::Identity(matProj.rows(), matProj.cols());
+            offDiagNorm = diff.norm();
+        }
+        qWarning() << "[FiffBlockReader] Projections updated:" << nActive
+                   << "active projectors," << nproj << "applied. Matrix:"
+                   << matProj.rows() << "x" << matProj.cols()
+                   << "off-identity norm:" << offDiagNorm;
+    } else {
         m_raw->proj.resize(0, 0);   // Clear — no active projectors
+        qWarning() << "[FiffBlockReader] Projections cleared (0 active).";
+    }
 }

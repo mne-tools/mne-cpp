@@ -411,6 +411,13 @@ private:
 
     //=========================================================================================================
     /**
+     * Compute auto-scale values from the first loaded data window and apply to the GPU model.
+     * Call once right after file open, before restartChannelView.
+     */
+    void computeAutoScale();
+
+    //=========================================================================================================
+    /**
      * Setup the marker of the data window
      */
     void initMarker();

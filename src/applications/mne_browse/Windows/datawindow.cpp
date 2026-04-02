@@ -44,6 +44,7 @@
 #include <fiff/fiff_constants.h>
 
 #include <algorithm>
+#include <cmath>
 #include <QHash>
 #include <QSignalBlocker>
 #include <utility>
@@ -201,11 +202,88 @@ void DataWindow::scaleData(const QMap<QString,double> &scaleMap)
 
 void DataWindow::updateProjections()
 {
+    qWarning() << "[DataWindow] updateProjections called.";
     if (m_pFiffReader)
         m_pFiffReader->updateProjections();
 
     // Reload all visible data with the updated projection
     restartChannelView(m_iCurrentScrollSample, false);
+    qWarning() << "[DataWindow] updateProjections: restartChannelView done.";
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::computeAutoScale()
+{
+    if (!m_pFiffReader || !m_pFiffReader->isOpen())
+        return;
+    auto fiffInfo = m_pFiffReader->fiffInfo();
+    if (!fiffInfo)
+        return;
+
+    // Read a short sample (up to 2 seconds) synchronously from the file start
+    const int first = m_pFiffReader->firstSample();
+    const int last  = m_pFiffReader->lastSample();
+    const int sampleCount = qMin(static_cast<int>(2.0 * fiffInfo->sfreq),
+                                 last - first + 1);
+    if (sampleCount <= 0)
+        return;
+
+    Eigen::MatrixXd block = m_pFiffReader->readBlockSync(first, first + sampleCount - 1);
+    if (block.rows() == 0 || block.cols() == 0)
+        return;
+
+    // Accumulate per-channel-type RMS
+    // Channel types: MEG_grad, MEG_mag, EEG, EOG, EMG, ECG, STIM, MISC
+    struct TypeStats {
+        double sumSq = 0.0;
+        int    count = 0;         // number of (channel × sample) values
+    };
+
+    QMap<qint32, TypeStats> typeStats;
+
+    for (int ch = 0; ch < fiffInfo->nchan && ch < block.rows(); ++ch) {
+        if (fiffInfo->bads.contains(fiffInfo->ch_names[ch]))
+            continue;
+
+        const auto &chInfo = fiffInfo->chs[ch];
+        qint32 typeKey;
+        if (chInfo.kind == FIFFV_MEG_CH) {
+            typeKey = (chInfo.unit == FIFF_UNIT_T_M) ? -1 : -2; // grad vs mag
+        } else if (chInfo.kind == FIFFV_STIM_CH) {
+            continue; // skip stim channels for auto-scale
+        } else {
+            typeKey = chInfo.kind;
+        }
+
+        double rowSumSq = 0.0;
+        for (int s = 0; s < block.cols(); ++s) {
+            double v = block(ch, s);
+            rowSumSq += v * v;
+        }
+        typeStats[typeKey].sumSq += rowSumSq;
+        typeStats[typeKey].count += static_cast<int>(block.cols());
+    }
+
+    // Compute auto-scale: use 3× RMS as the half-range so ~99% of signal fits
+    QMap<qint32, float> autoScaleMap;
+    for (auto it = typeStats.constBegin(); it != typeStats.constEnd(); ++it) {
+        if (it.value().count > 0) {
+            double rms = std::sqrt(it.value().sumSq / it.value().count);
+            float halfRange = static_cast<float>(3.0 * rms);
+            if (halfRange > 0.0f)
+                autoScaleMap[it.key()] = halfRange;
+        }
+    }
+
+    // Apply to the GPU model (and cache in the view for restartChannelView)
+    if (m_pChannelDataView && !autoScaleMap.isEmpty()) {
+        m_pChannelDataView->setScalingMap(autoScaleMap);
+        qWarning() << "[DataWindow] Auto-scale applied:" << autoScaleMap.size() << "channel types.";
+        for (auto it = autoScaleMap.constBegin(); it != autoScaleMap.constEnd(); ++it)
+            qWarning() << "  typeKey=" << it.key() << "scale=" << it.value();
+    }
 }
 
 
@@ -726,6 +804,7 @@ bool DataWindow::loadFiffFile(const QString &path)
     auto fiffInfo = m_pFiffReader->fiffInfo();
     m_iStimChannel = fiffInfo ? resolveStimChannelIndex(*fiffInfo) : -1;
     rebuildVirtualChannels();
+    computeAutoScale();
     restartChannelView(m_pFiffReader->firstSample(), true);
 
     return true;
@@ -744,6 +823,7 @@ bool DataWindow::loadFiffBuffer(const QByteArray &data, const QString &displayNa
     auto fiffInfo = m_pFiffReader->fiffInfo();
     m_iStimChannel = fiffInfo ? resolveStimChannelIndex(*fiffInfo) : -1;
     rebuildVirtualChannels();
+    computeAutoScale();
     restartChannelView(m_pFiffReader->firstSample(), true);
 
     return true;
