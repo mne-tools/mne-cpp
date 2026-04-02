@@ -542,7 +542,10 @@ QString ChannelDataModel::typeLabelForChannel(int ch) const
     if (!m_pFiffInfo || ch >= m_pFiffInfo->nchan)
         return QStringLiteral("MISC");
     switch (m_pFiffInfo->chs[ch].kind) {
-    case FIFFV_MEG_CH:  return QStringLiteral("MEG");
+    case FIFFV_MEG_CH:
+        if (m_pFiffInfo->chs[ch].unit == FIFF_UNIT_T_M)
+            return QStringLiteral("MEG grad");
+        return QStringLiteral("MEG mag");
     case FIFFV_EEG_CH:  return QStringLiteral("EEG");
     case FIFFV_EOG_CH:  return QStringLiteral("EOG");
     case FIFFV_ECG_CH:  return QStringLiteral("ECG");
