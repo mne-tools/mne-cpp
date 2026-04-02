@@ -394,6 +394,7 @@ jobs:
       run: |
         git config --global user.email christoph.dinh@mne-cpp.org
         git config --global user.name chdinh
+        git config --global http.postBuffer 524288000
 
         if [[ "$GITHUB_REF" == refs/tags/* ]]; then
           WEBSITE_BASE="installer/${GITHUB_REF#refs/tags/}"
@@ -415,4 +416,17 @@ jobs:
 
         git add .
         git commit -m "Update IFW online repositories" --allow-empty
-        git push origin main
+
+        # Retry push with increasing delays to handle transient GitHub errors
+        for attempt in 1 2 3; do
+          if git push origin main; then
+            echo "Push succeeded on attempt ${attempt}"
+            break
+          fi
+          if [[ ${attempt} -eq 3 ]]; then
+            echo "Push failed after 3 attempts"
+            exit 1
+          fi
+          echo "Push failed on attempt ${attempt}, retrying in $((attempt * 15))s..."
+          sleep $((attempt * 15))
+        done
