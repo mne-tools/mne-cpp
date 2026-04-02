@@ -113,6 +113,15 @@ public:
 
     //=========================================================================================================
     /**
+     * Enable or disable butterfly mode. When active, lanes show type group labels
+     * (e.g. "MEG", "EEG") instead of individual channel names.
+     *
+     * @param[in] enabled  true = butterfly mode, false = normal per-channel mode.
+     */
+    void setButterflyMode(bool enabled);
+
+    //=========================================================================================================
+    /**
      * Update the visible sample window used for the per-channel RMS level bar.
      * Call this whenever the horizontal scroll position changes.
      *
@@ -148,6 +157,7 @@ private:
 
     QVector<int> m_channelIndices; // empty = identity (all channels)
     bool  m_hideBadChannels = false;
+    bool  m_butterflyMode   = false;
     int   m_visSampleFirst  = 0;
     int   m_visSampleLast   = 0;
 

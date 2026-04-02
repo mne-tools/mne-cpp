@@ -53,6 +53,7 @@
 #include <QVector>
 
 #include "helpers/channelrhiview.h"
+#include "helpers/overviewbarwidget.h"
 #include "helpers/timerulerwidget.h"
 
 //=============================================================================================================
@@ -305,6 +306,42 @@ public:
      */
     void setAnnotationSelectionEnabled(bool enabled);
 
+    // ── Interactive inspection features ───────────────────────────────
+
+    //=========================================================================================================
+    /**
+     * Enable or disable the crosshair cursor with coordinate readout.
+     */
+    void setCrosshairEnabled(bool enabled);
+    bool crosshairEnabled() const;
+
+    //=========================================================================================================
+    /**
+     * Show or hide per-channel-type amplitude scalebars.
+     */
+    void setScalebarsVisible(bool visible);
+    bool scalebarsVisible() const;
+
+    //=========================================================================================================
+    /**
+     * Toggle butterfly mode (overlay all same-type channels).
+     */
+    void setButterflyMode(bool enabled);
+    bool butterflyMode() const;
+
+    //=========================================================================================================
+    /**
+     * Toggle time format between float seconds and HH:MM:SS clock time.
+     */
+    void toggleTimeFormat();
+
+    //=========================================================================================================
+    /**
+     * Set clock time format on the ruler.
+     */
+    void setClockTimeFormat(bool useClock);
+    bool clockTimeFormat() const;
+
     // ── AbstractView overrides ────────────────────────────────────────
     void saveSettings() override;
     void loadSettings() override;
@@ -389,6 +426,13 @@ signals:
      */
     void referenceMarkersClearRequested();
 
+    //=========================================================================================================
+    /**
+     * Forwarded from the underlying ChannelRhiView when the crosshair is active.
+     */
+    void cursorDataChanged(float timeSec, float amplitude,
+                           const QString &channelName, const QString &unitLabel);
+
 protected:
     void updateGuiMode(GuiMode mode) override;
     void updateProcessingMode(ProcessingMode mode) override;
@@ -412,6 +456,8 @@ private:
     ChannelLabelPanel*               m_pLabelPanel          = nullptr;
     ChannelRhiView*                  m_pRhiView             = nullptr;
     TimeRulerWidget*                 m_pTimeRuler           = nullptr;
+    OverviewBarWidget*               m_pOverviewBar         = nullptr;
+    QWidget*                         m_pRulerHeader         = nullptr;
     QScrollBar*                      m_pScrollBar           = nullptr;
     QScrollBar*                      m_pChannelScrollBar    = nullptr;
     QToolButton*                     m_pScrollModeButton    = nullptr;

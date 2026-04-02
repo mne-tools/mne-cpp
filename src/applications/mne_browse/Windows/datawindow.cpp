@@ -1211,16 +1211,84 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
     if (m_pChannelDataView) {
         switch(event->key()) {
         case Qt::Key_Left:
-            m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() - RAWVIEW_KEYBOARD_SCROLL_STEP, false);
+            if (event->modifiers() & Qt::ShiftModifier)
+                m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() - m_pChannelDataView->visibleSampleCount(), false);
+            else
+                m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() - RAWVIEW_KEYBOARD_SCROLL_STEP, false);
             break;
         case Qt::Key_Right:
-            m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() + RAWVIEW_KEYBOARD_SCROLL_STEP, false);
+            if (event->modifiers() & Qt::ShiftModifier)
+                m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() + m_pChannelDataView->visibleSampleCount(), false);
+            else
+                m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() + RAWVIEW_KEYBOARD_SCROLL_STEP, false);
+            break;
+        case Qt::Key_Plus:
+        case Qt::Key_Equal:
+            // Increase amplitude scale (zoom in vertically)
+            m_pChannelDataView->setZoom(m_pChannelDataView->zoom() * 1.25);
+            break;
+        case Qt::Key_Minus:
+            // Decrease amplitude scale (zoom out vertically)
+            m_pChannelDataView->setZoom(m_pChannelDataView->zoom() / 1.25);
+            break;
+        case Qt::Key_Home:
+            // Decrease visible time window (show less time = zoom in)
+            m_pChannelDataView->setWindowSize(m_pChannelDataView->windowSize() / 1.25f);
+            break;
+        case Qt::Key_End:
+            // Increase visible time window (show more time = zoom out)
+            m_pChannelDataView->setWindowSize(m_pChannelDataView->windowSize() * 1.25f);
+            break;
+        case Qt::Key_B:
+            // Toggle butterfly mode
+            m_pChannelDataView->setButterflyMode(!m_pChannelDataView->butterflyMode());
+            break;
+        case Qt::Key_D:
+            if (event->modifiers() & Qt::ControlModifier) {
+                ui->m_tableView_rawTableView->clearSelection();
+            } else {
+                // Toggle DC removal
+                m_pChannelDataView->setRemoveDC(!m_pChannelDataView->model()->removeDC());
+            }
+            break;
+        case Qt::Key_S:
+            // Toggle scalebars
+            m_pChannelDataView->setScalebarsVisible(!m_pChannelDataView->scalebarsVisible());
+            break;
+        case Qt::Key_X:
+            // Toggle crosshair cursor
+            m_pChannelDataView->setCrosshairEnabled(!m_pChannelDataView->crosshairEnabled());
+            break;
+        case Qt::Key_T:
+            // Toggle time format
+            if (m_pChannelDataView) {
+                emit timeFormatToggleRequested();
+            }
+            break;
+        case Qt::Key_Question:
+            // Show keyboard shortcut help
+            {
+                QMessageBox::information(this, tr("Keyboard Shortcuts"),
+                    tr("<b>Navigation:</b><br>"
+                       "← / → — Scroll left/right (¼ page)<br>"
+                       "Shift+← / → — Scroll left/right (full page)<br>"
+                       "Home / End — Decrease/increase time window<br>"
+                       "+/= — Increase amplitude scale<br>"
+                       "- — Decrease amplitude scale<br>"
+                       "<br>"
+                       "<b>Display:</b><br>"
+                       "B — Toggle butterfly mode<br>"
+                       "D — Toggle DC removal<br>"
+                       "S — Toggle scalebars<br>"
+                       "T — Toggle time format (seconds / clock)<br>"
+                       "X — Toggle crosshair cursor<br>"
+                       "? — Show this help"));
+            }
+            break;
+        default:
             break;
         }
     }
-
-    if((event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_D))
-        ui->m_tableView_rawTableView->clearSelection();
 
     return QWidget::keyPressEvent(event);
 }

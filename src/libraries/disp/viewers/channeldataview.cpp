@@ -83,6 +83,12 @@ public:
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     }
 
+    void setClockTimeFormat(bool useClock) {
+        if (m_useClock == useClock) return;
+        m_useClock = useClock;
+        update();
+    }
+
 protected:
     void paintEvent(QPaintEvent *) override
     {
@@ -115,13 +121,15 @@ protected:
         p.setPen(QColor(60, 60, 70));
         p.drawText(QRect(0, 0, W, kTimeH / 2 + 2), Qt::AlignCenter, QStringLiteral("Time"));
 
-        // "mm:ss·ms" sub-label in lower half of the time zone
+        // Format sub-label in lower half of the time zone
         QFont subf = font();
         subf.setPointSizeF(6.5);
         p.setFont(subf);
         p.setPen(QColor(130, 130, 145));
+        QString fmtLabel = m_useClock ? QStringLiteral("mm:ss\u00B7ms")
+                                      : QStringLiteral("seconds");
         p.drawText(QRect(0, kTimeH / 2, W, kTimeH / 2),
-                   Qt::AlignCenter, QStringLiteral("mm:ss\u00B7ms"));
+                   Qt::AlignCenter, fmtLabel);
 
         // "Stim" label in the stim zone (bottom)
         QFont sf = font();
@@ -131,6 +139,9 @@ protected:
         p.setPen(QColor(80, 80, 100));
         p.drawText(QRect(0, kTimeH, W, kStimH), Qt::AlignCenter, QStringLiteral("Stim"));
     }
+
+private:
+    bool m_useClock = false;
 };
 
 //=============================================================================================================
@@ -180,8 +191,8 @@ void ChannelDataView::setupLayout()
     leftCol->setSpacing(0);
 
     // Combined header spanning the full ruler height (stim + time zones)
-    auto *rulerHdr = new RulerHeaderWidget(this);
-    leftCol->addWidget(rulerHdr, 0);
+    m_pRulerHeader = new RulerHeaderWidget(this);
+    leftCol->addWidget(m_pRulerHeader, 0);
 
     m_pLabelPanel = new ChannelLabelPanel(this);
     leftCol->addWidget(m_pLabelPanel, 1);
@@ -200,7 +211,7 @@ void ChannelDataView::setupLayout()
     m_pRhiView->setModel(m_pModel.data());
     m_pRhiView->setBackgroundColor(m_bgColor);
     m_pRhiView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    m_pRhiView->setFocusPolicy(Qt::NoFocus);
+    m_pRhiView->setFocusPolicy(Qt::ClickFocus);
     traceColumn->addWidget(m_pRhiView, 1);
 
     renderRow->addLayout(traceColumn, 1);
@@ -229,6 +240,11 @@ void ChannelDataView::setupLayout()
     renderRow->addLayout(rightCol, 0);
 
     outerLayout->addLayout(renderRow, 1);
+
+    // ── Overview bar (minimap) ───────────────────────────────────────────
+    m_pOverviewBar = new OverviewBarWidget(this);
+    m_pOverviewBar->setModel(m_pModel.data());
+    outerLayout->addWidget(m_pOverviewBar, 0);
 
     // ── Bottom row: horizontal scroll bar + scroll-mode toggle ───────────
     // The scroll-mode button lives at the bottom-right corner, between the
@@ -290,6 +306,10 @@ void ChannelDataView::setupLayout()
     connect(m_pRhiView, &ChannelRhiView::sampleRangeSelected,
             this, &ChannelDataView::sampleRangeSelected);
 
+    // Forward crosshair cursor data to ChannelDataView consumers
+    connect(m_pRhiView, &ChannelRhiView::cursorDataChanged,
+            this, &ChannelDataView::cursorDataChanged);
+
     connect(m_pRhiView, &ChannelRhiView::scrollSampleChanged,
             m_pTimeRuler, &TimeRulerWidget::setScrollSample);
 
@@ -330,6 +350,38 @@ void ChannelDataView::setupLayout()
                 }
             });
 
+    // ── Overview bar connections ─────────────────────────────────────────
+    // Keep viewport indicator in sync with scroll/zoom changes.
+    connect(m_pRhiView, &ChannelRhiView::scrollSampleChanged,
+            this, [this](float sample) {
+                if (m_pOverviewBar && m_pRhiView) {
+                    m_pOverviewBar->setViewport(
+                        sample,
+                        static_cast<float>(m_pRhiView->visibleSampleCount()));
+                }
+            });
+    connect(m_pRhiView, &ChannelRhiView::samplesPerPixelChanged,
+            this, [this](float) {
+                if (m_pOverviewBar && m_pRhiView) {
+                    m_pOverviewBar->setViewport(
+                        m_pRhiView->scrollSample(),
+                        static_cast<float>(m_pRhiView->visibleSampleCount()));
+                }
+            });
+    // Rebuild envelope when data changes.
+    connect(m_pModel.data(), &ChannelDataModel::dataChanged,
+            this, [this]() {
+                if (m_pOverviewBar) {
+                    m_pOverviewBar->setModel(m_pModel.data());
+                }
+            });
+    // Click/drag on overview bar → navigate.
+    connect(m_pOverviewBar, &OverviewBarWidget::scrollRequested,
+            this, [this](float targetSample) {
+                if (m_pRhiView)
+                    m_pRhiView->scrollTo(targetSample, 150);
+            });
+
     setFocusProxy(m_pRhiView);
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -351,6 +403,8 @@ void ChannelDataView::init(QSharedPointer<FiffInfo> pInfo)
             m_pTimeRuler->setSfreq(pInfo->sfreq);
         if (m_pRhiView)
             m_pRhiView->setSfreq(static_cast<float>(pInfo->sfreq));
+        if (m_pOverviewBar)
+            m_pOverviewBar->setSfreq(static_cast<float>(pInfo->sfreq));
     }
 
     if (m_pLabelPanel) {
@@ -375,6 +429,10 @@ void ChannelDataView::setFileBounds(int first, int last)
     }
     if (m_pTimeRuler)
         m_pTimeRuler->setFirstFileSample(first);
+    if (m_pOverviewBar) {
+        m_pOverviewBar->setFirstFileSample(first);
+        m_pOverviewBar->setLastFileSample(last);
+    }
     updateScrollBarRange();
 }
 
@@ -537,6 +595,9 @@ void ChannelDataView::setEvents(const QVector<ChannelRhiView::EventMarker> &even
     if (m_pRhiView)
         m_pRhiView->setEvents(events);
 
+    if (m_pOverviewBar)
+        m_pOverviewBar->setEvents(events);
+
     if (m_pTimeRuler) {
         QVector<TimeRulerEventMark> rulerMarks;
         rulerMarks.reserve(events.size());
@@ -560,6 +621,8 @@ void ChannelDataView::setAnnotations(const QVector<ChannelRhiView::AnnotationSpa
 {
     if (m_pRhiView)
         m_pRhiView->setAnnotations(annotations);
+    if (m_pOverviewBar)
+        m_pOverviewBar->setAnnotations(annotations);
 }
 
 //=============================================================================================================
@@ -568,6 +631,75 @@ void ChannelDataView::setAnnotationSelectionEnabled(bool enabled)
 {
     if (m_pRhiView)
         m_pRhiView->setAnnotationSelectionEnabled(enabled);
+}
+
+//=============================================================================================================
+
+void ChannelDataView::setCrosshairEnabled(bool enabled)
+{
+    if (m_pRhiView)
+        m_pRhiView->setCrosshairEnabled(enabled);
+}
+
+bool ChannelDataView::crosshairEnabled() const
+{
+    return m_pRhiView ? m_pRhiView->crosshairEnabled() : false;
+}
+
+//=============================================================================================================
+
+void ChannelDataView::setScalebarsVisible(bool visible)
+{
+    if (m_pRhiView)
+        m_pRhiView->setScalebarsVisible(visible);
+}
+
+bool ChannelDataView::scalebarsVisible() const
+{
+    return m_pRhiView ? m_pRhiView->scalebarsVisible() : false;
+}
+
+//=============================================================================================================
+
+void ChannelDataView::setButterflyMode(bool enabled)
+{
+    if (m_pRhiView)
+        m_pRhiView->setButterflyMode(enabled);
+    if (m_pLabelPanel)
+        m_pLabelPanel->setButterflyMode(enabled);
+}
+
+bool ChannelDataView::butterflyMode() const
+{
+    return m_pRhiView ? m_pRhiView->butterflyMode() : false;
+}
+
+//=============================================================================================================
+
+void ChannelDataView::toggleTimeFormat()
+{
+    if (m_pTimeRuler)
+        m_pTimeRuler->toggleTimeFormat();
+    bool useClock = m_pTimeRuler ? m_pTimeRuler->clockTimeFormat() : false;
+    if (m_pRhiView)
+        m_pRhiView->setClockTimeFormat(useClock);
+    if (m_pRulerHeader)
+        static_cast<RulerHeaderWidget*>(m_pRulerHeader)->setClockTimeFormat(useClock);
+}
+
+void ChannelDataView::setClockTimeFormat(bool useClock)
+{
+    if (m_pTimeRuler)
+        m_pTimeRuler->setClockTimeFormat(useClock);
+    if (m_pRhiView)
+        m_pRhiView->setClockTimeFormat(useClock);
+    if (m_pRulerHeader)
+        static_cast<RulerHeaderWidget*>(m_pRulerHeader)->setClockTimeFormat(useClock);
+}
+
+bool ChannelDataView::clockTimeFormat() const
+{
+    return m_pTimeRuler ? m_pTimeRuler->clockTimeFormat() : false;
 }
 
 //=============================================================================================================
@@ -733,6 +865,22 @@ void ChannelDataView::keyPressEvent(QKeyEvent *event)
         break;
     case Qt::Key_Minus:
         m_pRhiView->zoomTo(m_pRhiView->samplesPerPixel() * 1.33f, 200);
+        break;
+    case Qt::Key_B:
+        setButterflyMode(!butterflyMode());
+        break;
+    case Qt::Key_D:
+        if (m_pModel)
+            m_pModel->setRemoveDC(!m_pModel->removeDC());
+        break;
+    case Qt::Key_S:
+        setScalebarsVisible(!scalebarsVisible());
+        break;
+    case Qt::Key_X:
+        setCrosshairEnabled(!crosshairEnabled());
+        break;
+    case Qt::Key_T:
+        toggleTimeFormat();
         break;
     default:
         QWidget::keyPressEvent(event);

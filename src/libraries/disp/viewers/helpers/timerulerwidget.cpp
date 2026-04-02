@@ -167,6 +167,24 @@ QString TimeRulerWidget::formatTime(double seconds)
 
 //=============================================================================================================
 
+void TimeRulerWidget::toggleTimeFormat()
+{
+    m_useClockTime = !m_useClockTime;
+    update();
+}
+
+//=============================================================================================================
+
+void TimeRulerWidget::setClockTimeFormat(bool useClock)
+{
+    if (m_useClockTime == useClock)
+        return;
+    m_useClockTime = useClock;
+    update();
+}
+
+//=============================================================================================================
+
 int TimeRulerWidget::sampleAtX(int x) const
 {
     const int clampedX = qBound(0, x, qMax(0, width() - 1));
@@ -369,7 +387,19 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
 
             double elapsedSec = (s - origin) / m_sfreq;
             if (elapsedSec >= -tickIntervalS * 0.5) {
-                QString label = formatTime(elapsedSec);
+                QString label;
+                if (m_useClockTime && elapsedSec >= 0.0) {
+                    int totalMs = static_cast<int>(elapsedSec * 1000.0 + 0.5);
+                    int m   = totalMs / 60000;
+                    int sec = (totalMs % 60000) / 1000;
+                    int ms  = totalMs % 1000;
+                    label = QString("%1:%2.%3")
+                        .arg(m, 2, 10, QChar('0'))
+                        .arg(sec, 2, 10, QChar('0'))
+                        .arg(ms, 3, 10, QChar('0'));
+                } else {
+                    label = formatTime(elapsedSec);
+                }
                 const int lw  = fm.horizontalAdvance(label);
 
                 int lx = xi - lw / 2;

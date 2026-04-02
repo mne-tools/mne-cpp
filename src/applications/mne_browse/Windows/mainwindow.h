@@ -507,6 +507,9 @@ private:
     QLabel*                 m_pStatusLabel;                 /**< Persistent status bar label, updated in place to avoid repeated allocation. */
     QAction*                m_pRemoveDCAction;              /**< The action which is used to control DC removal. */
     QAction*                m_pHideBadAction;               /**< The action which is used to control hide bad channel functionality. */
+    QAction*                m_pCrosshairAction;             /**< Toggle crosshair cursor overlay. */
+    QAction*                m_pButterflyAction;             /**< Toggle butterfly mode. */
+    QAction*                m_pScalebarsAction;             /**< Toggle scalebars. */
     QAction*                m_pWhitenButterflyAction;       /**< Toggle whitening in the average butterfly plot. */
     QAction*                m_pAnnotationModeAction;        /**< Toggle Shift-drag annotation selection in the raw browser. */
     QList<MNELIB::MNEEpochDataList> m_epochReviewLists;     /**< Reviewed epochs grouped by event code. */

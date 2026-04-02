@@ -144,6 +144,16 @@ void ChannelLabelPanel::setHideBadChannels(bool hide)
 
 //=============================================================================================================
 
+void ChannelLabelPanel::setButterflyMode(bool enabled)
+{
+    if (m_butterflyMode == enabled)
+        return;
+    m_butterflyMode = enabled;
+    update();
+}
+
+//=============================================================================================================
+
 void ChannelLabelPanel::setVisibleSampleRange(int firstSample, int lastSample)
 {
     m_visSampleFirst = firstSample;
@@ -163,6 +173,80 @@ void ChannelLabelPanel::paintEvent(QPaintEvent *)
 
     if (!m_model)
         return;
+
+    // ── Butterfly mode: show type group labels ──────────────────────
+    if (m_butterflyMode) {
+        // Collect unique types in order
+        struct TypeGroup {
+            QString typeLabel;
+            QColor  color;
+            int     count = 0;
+        };
+        QVector<TypeGroup> groups;
+        QMap<QString, int> typeToGroup;
+
+        const QVector<int> allCh = effectiveChannelIndices();
+        for (int ch : allCh) {
+            auto info = m_model->channelInfo(ch);
+            if (typeToGroup.contains(info.typeLabel)) {
+                groups[typeToGroup[info.typeLabel]].count++;
+            } else {
+                int idx = groups.size();
+                typeToGroup[info.typeLabel] = idx;
+                TypeGroup g;
+                g.typeLabel = info.typeLabel;
+                g.color = info.color;
+                g.count = 1;
+                groups.append(g);
+            }
+        }
+
+        int nLanes = groups.size();
+        if (nLanes <= 0)
+            return;
+
+        const int pw = width();
+        const float laneH = static_cast<float>(height()) / nLanes;
+
+        QFont nameFont = font();
+        nameFont.setPointSizeF(qBound(8.0, static_cast<double>(laneH) * 0.25, 13.0));
+        nameFont.setBold(true);
+
+        QFont countFont = nameFont;
+        countFont.setPointSizeF(qBound(6.5, static_cast<double>(laneH) * 0.16, 9.0));
+        countFont.setBold(false);
+
+        for (int i = 0; i < nLanes; ++i) {
+            float yTop = i * laneH;
+
+            // Lane separator
+            if (i > 0) {
+                p.setPen(QPen(QColor(200, 200, 200), 1));
+                p.drawLine(QPointF(0, yTop), QPointF(pw, yTop));
+            }
+
+            // Type-colour strip
+            p.fillRect(QRectF(0, yTop, kStripWidth, laneH), groups[i].color);
+
+            // Type name
+            p.setFont(nameFont);
+            p.setPen(QColor(25, 25, 25));
+            QRectF nameRect(kStripWidth + 4, yTop + 1,
+                            pw - kStripWidth - 8, laneH * 0.50f);
+            p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, groups[i].typeLabel);
+
+            // Channel count
+            p.setFont(countFont);
+            p.setPen(QColor(110, 110, 120));
+            QString countStr = QString::number(groups[i].count) + QStringLiteral(" ch");
+            QRectF countRect(kStripWidth + 4, yTop + laneH * 0.52f,
+                             pw - kStripWidth - 8, laneH * 0.30f);
+            p.drawText(countRect, Qt::AlignLeft | Qt::AlignVCenter, countStr);
+        }
+        return;
+    }
+
+    // ── Normal mode: per-channel labels ─────────────────────────────
 
     const QVector<int> displayChannels = effectiveChannelIndices();
     const int totalCh = displayChannels.size();

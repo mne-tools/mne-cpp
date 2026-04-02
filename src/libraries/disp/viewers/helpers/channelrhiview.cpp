@@ -115,11 +115,54 @@ static void writeFloats(quint8 *base, int byteOffset, const float *data, int cou
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
+//=============================================================================================================
+// CrosshairOverlay — lightweight transparent child widget for crosshair/scalebar
+// painting.  Sits on top of the QRhiWidget and repaints independently so that
+// mouse-tracking updates do NOT trigger the expensive GPU render pipeline.
+//=============================================================================================================
+
+class CrosshairOverlay : public QWidget
+{
+public:
+    explicit CrosshairOverlay(ChannelRhiView *parent)
+        : QWidget(parent), m_view(parent)
+    {
+        setAttribute(Qt::WA_TransparentForMouseEvents);
+        setAttribute(Qt::WA_NoSystemBackground);
+        setAttribute(Qt::WA_TranslucentBackground);
+        setMouseTracking(false);
+    }
+
+    void syncSize() { setGeometry(0, 0, parentWidget()->width(), parentWidget()->height()); }
+
+protected:
+    void paintEvent(QPaintEvent *) override
+    {
+        if (!m_view) return;
+        QPainter p(this);
+        p.setRenderHint(QPainter::Antialiasing, false);
+
+        if (m_view->crosshairEnabled())
+            m_view->drawCrosshair(p);
+        if (m_view->scalebarsVisible())
+            m_view->drawScalebars(p);
+        if (m_view->rulerActive())
+            m_view->drawRulerOverlay(p);
+    }
+
+private:
+    ChannelRhiView *m_view;
+};
+
 ChannelRhiView::ChannelRhiView(QWidget *parent)
     : QRhiWidget(parent)
 {
     setFocusPolicy(Qt::StrongFocus);
     setMouseTracking(true);
+
+    m_overlay = new CrosshairOverlay(this);
+    m_overlay->raise();
+    m_overlay->show();
 
     // ── Async tile rebuild: swap in finished tile without blocking paintEvent ──
     connect(&m_tileWatcher, &QFutureWatcher<TileResult>::finished, this, [this]() {
@@ -446,6 +489,95 @@ void ChannelRhiView::setWheelScrollsChannels(bool channelsMode)
 
 //=============================================================================================================
 
+void ChannelRhiView::setCrosshairEnabled(bool enabled)
+{
+    if (m_crosshairEnabled == enabled)
+        return;
+    m_crosshairEnabled = enabled;
+    if (enabled) {
+        setMouseTracking(true);
+    } else {
+        setMouseTracking(false);
+        m_crosshairX = m_crosshairY = -1;
+    }
+    update();
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::setScalebarsVisible(bool visible)
+{
+    if (m_scalebarsVisible == visible)
+        return;
+    m_scalebarsVisible = visible;
+    update();
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::setButterflyMode(bool enabled)
+{
+    if (m_butterflyMode == enabled)
+        return;
+    m_butterflyMode = enabled;
+    m_vboDirty = true;
+    m_pipelineDirty = true;
+    m_tileDirty = true;
+    m_overlayDirty = true;
+    update();
+}
+
+//=============================================================================================================
+
+QVector<ChannelRhiView::ButterflyTypeGroup> ChannelRhiView::butterflyTypeGroups() const
+{
+    QVector<ButterflyTypeGroup> groups;
+    if (!m_model)
+        return groups;
+
+    const QVector<int> allCh = effectiveChannelIndices();
+    QMap<QString, int> typeToGroup; // typeLabel → index in groups
+
+    for (int ch : allCh) {
+        auto info = m_model->channelInfo(ch);
+        if (m_hideBadChannels && info.bad)
+            continue;
+        int gIdx;
+        if (typeToGroup.contains(info.typeLabel)) {
+            gIdx = typeToGroup[info.typeLabel];
+        } else {
+            gIdx = groups.size();
+            typeToGroup[info.typeLabel] = gIdx;
+            ButterflyTypeGroup g;
+            g.typeLabel = info.typeLabel;
+            g.color = info.color;
+            g.amplitudeMax = info.amplitudeMax;
+            groups.append(g);
+        }
+        groups[gIdx].channelIndices.append(ch);
+    }
+    return groups;
+}
+
+//=============================================================================================================
+
+int ChannelRhiView::butterflyLaneCount() const
+{
+    if (!m_model)
+        return 0;
+    const QVector<int> allCh = effectiveChannelIndices();
+    QSet<QString> types;
+    for (int ch : allCh) {
+        auto info = m_model->channelInfo(ch);
+        if (m_hideBadChannels && info.bad)
+            continue;
+        types.insert(info.typeLabel);
+    }
+    return types.size();
+}
+
+//=============================================================================================================
+
 void ChannelRhiView::setChannelIndices(const QVector<int> &indices)
 {
     const int previousFirstVisibleChannel = m_firstVisibleChannel;
@@ -587,8 +719,14 @@ void ChannelRhiView::ensurePipeline()
         (48 + rhi->ubufAlignment() - 1) & ~(rhi->ubufAlignment() - 1));
 
     // UBO has one slot per *visible* channel row, not all channels
+    // In butterfly mode, we need a slot for EVERY channel (all overlaid)
     int totalCh = totalLogicalChannels();
-    int nCh = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
+    int nCh;
+    if (m_butterflyMode) {
+        nCh = qMin(totalCh, kMaxChannels);
+    } else {
+        nCh = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
+    }
     nCh = qMax(nCh, 1);
     nCh = qMin(nCh, kMaxChannels);
 
@@ -769,6 +907,74 @@ void ChannelRhiView::updateUBO(QRhiResourceUpdateBatch *batch)
         return;
 
     int totalCh = totalLogicalChannels();
+
+    // ── Butterfly mode: one UBO slot per channel, type-based lane positions ──
+    if (m_butterflyMode) {
+        const auto groups = butterflyTypeGroups();
+        int nLanes = groups.size();
+        if (nLanes <= 0)
+            return;
+
+        // Build channel→lane map
+        QHash<int, int> chToLane;  // model channel idx → lane index
+        for (int g = 0; g < groups.size(); ++g)
+            for (int ch : groups[g].channelIndices)
+                chToLane[ch] = g;
+
+        float vw = static_cast<float>(width());
+        float vh = static_cast<float>(height());
+        float laneRange = 2.f / nLanes; // NDC height per lane
+
+        QVarLengthArray<quint8> buf(m_uboStride, 0);
+        int nToUpload = qMin(totalCh, kMaxChannels);
+
+        for (int logCh = 0; logCh < nToUpload; ++logCh) {
+            int ch = actualChannelAt(logCh);
+            memset(buf.data(), 0, m_uboStride);
+
+            auto info = (ch >= 0) ? m_model->channelInfo(ch) : ChannelDisplayInfo{};
+            bool hideThis = (ch < 0) || (m_hideBadChannels && info.bad);
+
+            int lane = chToLane.value(ch, -1);
+            if (lane < 0)
+                hideThis = true;
+
+            QColor col = hideThis ? m_bgColor
+                                  : (info.bad ? QColor(200, 60, 60, 180) : info.color);
+            float yRng = hideThis ? 0.f : laneRange;
+
+            float yCenter = (lane >= 0)
+                ? (1.f - laneRange * (lane + 0.5f))
+                : 0.f;
+
+            float rgba[4] = {
+                static_cast<float>(col.redF()),
+                static_cast<float>(col.greenF()),
+                static_cast<float>(col.blueF()),
+                static_cast<float>(col.alphaF())
+            };
+
+            auto *d = buf.data();
+            writeFloats(d, kUboOffsetColor,          rgba, 4);
+            writeFloat (d, kUboOffsetFirstSample,    static_cast<float>(logCh < static_cast<int>(m_gpuChannels.size())
+                                                                          ? m_gpuChannels[logCh].vboFirstSample : 0));
+            writeFloat (d, kUboOffsetScrollSample,   m_scrollSample);
+            writeFloat (d, kUboOffsetSampPerPixel,   m_samplesPerPixel);
+            writeFloat (d, kUboOffsetViewWidth,      vw);
+            writeFloat (d, kUboOffsetViewHeight,     vh);
+            writeFloat (d, kUboOffsetChannelYCenter, yCenter);
+            writeFloat (d, kUboOffsetChannelYRange,  yRng);
+            writeFloat (d, kUboOffsetAmplitudeMax,   info.amplitudeMax);
+
+            batch->updateDynamicBuffer(m_ubo.get(),
+                                       logCh * m_uboStride,
+                                       m_uboStride,
+                                       buf.constData());
+        }
+        return;
+    }
+
+    // ── Normal mode: one UBO slot per visible row ──
     int firstCh = qBound(0, m_firstVisibleChannel, totalCh);
     int visCnt  = qMin(m_visibleChannelCount, totalCh - firstCh);
     int nCh     = qMin(visCnt, kMaxChannels);
@@ -1119,26 +1325,48 @@ void ChannelRhiView::render(QRhiCommandBuffer *cb)
     cb->setGraphicsPipeline(m_pipeline.get());
 
     int totalCh = totalLogicalChannels();
-    int firstCh = qBound(0, m_firstVisibleChannel, totalCh);
-    int visCnt  = qMin(m_visibleChannelCount, totalCh - firstCh);
-    int nToRender = qMin(visCnt, kMaxChannels);
 
-    for (int i = 0; i < nToRender; ++i) {
-        int logCh = firstCh + i;
-        if (logCh >= static_cast<int>(m_gpuChannels.size()))
-            break;
-        auto &gd = m_gpuChannels[logCh];
-        if (!gd.vbo || gd.vertexCount < 2)
-            continue;
+    if (m_butterflyMode) {
+        // Butterfly: render ALL channels; UBO slots indexed by logical channel
+        int nToRender = qMin(totalCh, kMaxChannels);
+        for (int logCh = 0; logCh < nToRender; ++logCh) {
+            if (logCh >= static_cast<int>(m_gpuChannels.size()))
+                break;
+            auto &gd = m_gpuChannels[logCh];
+            if (!gd.vbo || gd.vertexCount < 2)
+                continue;
 
-        quint32 dynOffset = static_cast<quint32>(i * m_uboStride);
-        QRhiCommandBuffer::DynamicOffset dynOff{0, dynOffset};
-        cb->setShaderResources(m_srb.get(), 1, &dynOff);
+            quint32 dynOffset = static_cast<quint32>(logCh * m_uboStride);
+            QRhiCommandBuffer::DynamicOffset dynOff{0, dynOffset};
+            cb->setShaderResources(m_srb.get(), 1, &dynOff);
 
-        QRhiCommandBuffer::VertexInput vi(gd.vbo.get(), 0);
-        cb->setVertexInput(0, 1, &vi);
-        cb->draw(static_cast<quint32>(gd.vertexCount));
-    }
+            QRhiCommandBuffer::VertexInput vi(gd.vbo.get(), 0);
+            cb->setVertexInput(0, 1, &vi);
+            cb->draw(static_cast<quint32>(gd.vertexCount));
+        }
+    } else {
+        // Normal: render only the visible channel window
+        int firstCh = qBound(0, m_firstVisibleChannel, totalCh);
+        int visCnt  = qMin(m_visibleChannelCount, totalCh - firstCh);
+        int nToRender = qMin(visCnt, kMaxChannels);
+
+        for (int i = 0; i < nToRender; ++i) {
+            int logCh = firstCh + i;
+            if (logCh >= static_cast<int>(m_gpuChannels.size()))
+                break;
+            auto &gd = m_gpuChannels[logCh];
+            if (!gd.vbo || gd.vertexCount < 2)
+                continue;
+
+            quint32 dynOffset = static_cast<quint32>(i * m_uboStride);
+            QRhiCommandBuffer::DynamicOffset dynOff{0, dynOffset};
+            cb->setShaderResources(m_srb.get(), 1, &dynOff);
+
+            QRhiCommandBuffer::VertexInput vi(gd.vbo.get(), 0);
+            cb->setVertexInput(0, 1, &vi);
+            cb->draw(static_cast<quint32>(gd.vertexCount));
+        }
+    } // end butterfly/normal branch
 
     // ── Overlay blit (bands + event lines) — drawn after waveforms ───────
     if (overlayReady) {
@@ -1466,13 +1694,220 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
 
 void ChannelRhiView::drawOverlays()
 {
-    // ── Ruler / measurement overlay ──────────────────────────────────
-    if (!m_rulerActive)
+    // Repaint the lightweight overlay widget so crosshair/scalebars/ruler
+    // stay in sync after GPU-driven scroll/zoom repaints.
+    if (m_overlay && (m_crosshairEnabled || m_scalebarsVisible || m_rulerActive))
+        m_overlay->repaint();
+}
+
+//=============================================================================================================
+
+static QString formatAmplitude(float amp, const QString &unit)
+{
+    float absAmp = qAbs(amp);
+    if (absAmp == 0.f)
+        return QStringLiteral("0 ") + unit;
+    if (absAmp < 1e-9f)
+        return QString::number(amp * 1e12f, 'f', 1) + QStringLiteral(" p") + unit;
+    if (absAmp < 1e-6f)
+        return QString::number(amp * 1e9f, 'f', 1) + QStringLiteral(" n") + unit;
+    if (absAmp < 1e-3f)
+        return QString::number(amp * 1e6f, 'f', 1) + QStringLiteral(" µ") + unit;
+    if (absAmp < 1.f)
+        return QString::number(amp * 1e3f, 'f', 1) + QStringLiteral(" m") + unit;
+    return QString::number(amp, 'f', 3) + QStringLiteral(" ") + unit;
+}
+
+static QString unitForType(const QString &typeLabel)
+{
+    if (typeLabel == QStringLiteral("MEG"))
+        return QStringLiteral("T");
+    if (typeLabel == QStringLiteral("EEG") ||
+        typeLabel == QStringLiteral("EOG") ||
+        typeLabel == QStringLiteral("ECG") ||
+        typeLabel == QStringLiteral("EMG"))
+        return QStringLiteral("V");
+    return QStringLiteral("AU");
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::drawCrosshair(QPainter &p)
+{
+    if (m_crosshairX < 0 || m_crosshairY < 0)
+        return;
+    if (!m_model || totalLogicalChannels() == 0)
         return;
 
-    QPainter p(this);
-    p.setRenderHint(QPainter::Antialiasing, false);
+    const int w = width();
+    const int h = height();
 
+    // Draw crosshair lines
+    QPen crossPen(QColor(80, 80, 80, 160), 1, Qt::DashLine);
+    p.setPen(crossPen);
+    p.drawLine(m_crosshairX, 0, m_crosshairX, h);
+    p.drawLine(0, m_crosshairY, w, m_crosshairY);
+
+    int sample = static_cast<int>(m_scrollSample + static_cast<float>(m_crosshairX) * m_samplesPerPixel);
+    float timeSec = (m_sfreq > 0.f) ? static_cast<float>(sample - m_firstFileSample) / m_sfreq : 0.f;
+    QString channelLabel;
+    QString unitStr;
+    float value = 0.f;
+
+    if (m_butterflyMode) {
+        // In butterfly mode, lanes correspond to type groups
+        const auto groups = butterflyTypeGroups();
+        int nLanes = groups.size();
+        if (nLanes <= 0)
+            return;
+        float laneH = static_cast<float>(h) / nLanes;
+        int lane = qBound(0, static_cast<int>(m_crosshairY / laneH), nLanes - 1);
+        channelLabel = groups[lane].typeLabel;
+        unitStr = unitForType(groups[lane].typeLabel);
+        // No single-channel amplitude readout in butterfly; show type name only
+        emit cursorDataChanged(timeSec, 0.f, channelLabel, unitStr);
+    } else {
+        // Normal mode: determine the channel and sample under the cursor
+        int totalCh = totalLogicalChannels();
+        int visCnt  = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
+        if (visCnt <= 0)
+            return;
+
+        float laneH = static_cast<float>(h) / visCnt;
+        int   row   = qBound(0, static_cast<int>(m_crosshairY / laneH), visCnt - 1);
+        int   ch    = actualChannelAt(m_firstVisibleChannel + row);
+        if (ch < 0)
+            return;
+
+        auto info = m_model->channelInfo(ch);
+        value = m_model->sampleValueAt(ch, sample);
+        channelLabel = info.name;
+        unitStr = unitForType(info.typeLabel);
+
+        emit cursorDataChanged(timeSec, value, channelLabel, unitStr);
+    }
+
+    // Draw info label near cursor
+    QString timeStr;
+    if (m_useClockTime && timeSec >= 0.f) {
+        int totalMs = static_cast<int>(timeSec * 1000.f + 0.5f);
+        int m   = totalMs / 60000;
+        int sec = (totalMs % 60000) / 1000;
+        int ms  = totalMs % 1000;
+        timeStr = QString("%1:%2.%3")
+            .arg(m, 2, 10, QChar('0'))
+            .arg(sec, 2, 10, QChar('0'))
+            .arg(ms, 3, 10, QChar('0'));
+    } else {
+        timeStr = QString::number(static_cast<double>(timeSec), 'f', 3) + QStringLiteral(" s");
+    }
+    QString label = QString("%1  %2  %3")
+                    .arg(channelLabel,
+                         timeStr,
+                         formatAmplitude(value, unitStr));
+
+    QFont f = font();
+    f.setPointSizeF(8.5);
+    p.setFont(f);
+    QFontMetrics fm(f);
+    QRect labelRect = fm.boundingRect(label);
+    int lx = m_crosshairX + 10;
+    int ly = m_crosshairY - 10;
+    if (lx + labelRect.width() + 8 > w)
+        lx = m_crosshairX - labelRect.width() - 18;
+    if (ly - labelRect.height() < 4)
+        ly = m_crosshairY + labelRect.height() + 6;
+    labelRect.moveTopLeft(QPoint(lx, ly - labelRect.height()));
+    labelRect.adjust(-4, -2, 4, 2);
+    p.fillRect(labelRect, QColor(255, 255, 255, 220));
+    p.setPen(QColor(30, 30, 30));
+    p.drawText(labelRect, Qt::AlignCenter, label);
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::drawScalebars(QPainter &p)
+{
+    if (!m_model || totalLogicalChannels() == 0)
+        return;
+
+    int visCnt;
+    if (m_butterflyMode) {
+        visCnt = butterflyLaneCount();
+    } else {
+        int totalCh = totalLogicalChannels();
+        visCnt = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
+    }
+    if (visCnt <= 0)
+        return;
+
+    float laneH = static_cast<float>(height()) / visCnt;
+
+    // Collect unique channel types and their amplitude scales
+    QMap<QString, float> typeScales;
+    if (m_butterflyMode) {
+        const auto groups = butterflyTypeGroups();
+        for (const auto &g : groups)
+            if (g.amplitudeMax > 0.f)
+                typeScales[g.typeLabel] = g.amplitudeMax;
+    } else {
+        for (int i = 0; i < visCnt; ++i) {
+            int ch = actualChannelAt(m_firstVisibleChannel + i);
+            if (ch < 0) continue;
+            auto info = m_model->channelInfo(ch);
+            if (!typeScales.contains(info.typeLabel) && info.amplitudeMax > 0.f)
+                typeScales[info.typeLabel] = info.amplitudeMax;
+        }
+    }
+
+    if (typeScales.isEmpty())
+        return;
+
+    QFont f = font();
+    f.setPointSizeF(8.0);
+    p.setFont(f);
+    QFontMetrics fm(f);
+
+    // Draw scalebars in the bottom-right corner
+    const int margin = 12;
+    const int barHeight = qBound(20, static_cast<int>(laneH * 0.35f), 60);
+    int x = width() - margin;
+    int y = height() - margin;
+
+    for (auto it = typeScales.constEnd(); it != typeScales.constBegin(); ) {
+        --it;
+        QString unit = unitForType(it.key());
+        float ampValue = it.value();
+        QString label = it.key() + QStringLiteral(": ") + formatAmplitude(ampValue, unit);
+
+        int textW = fm.horizontalAdvance(label);
+        int barX = x - textW - 14;
+
+        // Background pill
+        QRect bgRect(barX - 4, y - barHeight - fm.height() - 4, textW + 22, barHeight + fm.height() + 8);
+        p.fillRect(bgRect, QColor(255, 255, 255, 200));
+
+        // Draw bar
+        QPen barPen(QColor(40, 40, 40), 2);
+        p.setPen(barPen);
+        int barTop = y - barHeight;
+        p.drawLine(barX + 4, barTop, barX + 4, y);
+        // Tick marks
+        p.drawLine(barX, barTop, barX + 8, barTop);
+        p.drawLine(barX, y, barX + 8, y);
+
+        // Label
+        p.setPen(QColor(30, 30, 30));
+        p.drawText(barX + 14, y - barHeight / 2 + fm.ascent() / 2, label);
+
+        y -= barHeight + fm.height() + 16;
+    }
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::drawRulerOverlay(QPainter &p)
+{
     int x0 = m_rulerX0, y0 = m_rulerY0;
     int x1 = m_rulerX1, y1 = m_rulerY1;
 
@@ -1498,11 +1933,9 @@ void ChannelRhiView::drawOverlays()
     p.drawLine(x0, y1 - tickLen, x0, y1 + tickLen);
 
     // ── Measurement labels ────────────────────────────────────────────
-    // Time difference (horizontal)
     float deltaSamples = static_cast<float>(x1 - x0) * m_samplesPerPixel;
     float deltaSec     = (m_sfreq > 0.f) ? deltaSamples / m_sfreq : 0.f;
 
-    // Amplitude difference (vertical, relative to the channel under x0/y0)
     float deltaAmp  = 0.f;
     QString ampUnit = QStringLiteral("AU");
     if (m_model && totalLogicalChannels() > 0) {
@@ -1515,13 +1948,10 @@ void ChannelRhiView::drawOverlays()
             if (ch < 0) ch = 0;
             auto  info  = m_model->channelInfo(ch);
             if (info.amplitudeMax > 0.f) {
-                float yCenter = (row + 0.5f) * laneH;
-                // positive y on screen → downward → negative amplitude
-                float dyPx      = static_cast<float>(y1 - y0);
-                float yScale    = info.amplitudeMax / (laneH * 0.45f);
+                float dyPx   = static_cast<float>(y1 - y0);
+                float yScale = info.amplitudeMax / (laneH * 0.45f);
                 deltaAmp = -dyPx * yScale;
 
-                // Choose a sensible unit suffix
                 if (info.typeLabel == QStringLiteral("MEG"))
                     ampUnit = QStringLiteral("T");
                 else if (info.typeLabel == QStringLiteral("EEG") ||
@@ -1531,12 +1961,10 @@ void ChannelRhiView::drawOverlays()
                     ampUnit = QStringLiteral("V");
                 else
                     ampUnit = QStringLiteral("AU");
-                Q_UNUSED(yCenter)
             }
         }
     }
 
-    // Format labels
     auto fmtTime = [](float sec) -> QString {
         float absSec = qAbs(sec);
         if (absSec < 1.f)
@@ -1554,21 +1982,19 @@ void ChannelRhiView::drawOverlays()
         return QString::number(amp, 'f', 3) + QStringLiteral(" ") + unit;
     };
 
-    QString timeLabel = QStringLiteral("ΔT = ") + fmtTime(deltaSec);
-    QString ampLabel  = QStringLiteral("ΔA = ") + fmtAmp(deltaAmp, ampUnit);
+    QString timeLabel = QStringLiteral("\u0394T = ") + fmtTime(deltaSec);
+    QString ampLabel  = QStringLiteral("\u0394A = ") + fmtAmp(deltaAmp, ampUnit);
 
     QFont f = font();
     f.setPointSizeF(9.0);
     f.setBold(true);
     p.setFont(f);
 
-    // Position label near the midpoint of the horizontal span
     int labelX = (x0 + x1) / 2;
     int labelY = y0 - 6;
     if (labelY < 14)
         labelY = y0 + 16;
 
-    // Draw white background pill behind time label
     QFontMetrics fm(f);
     QRect tRect = fm.boundingRect(timeLabel);
     tRect.moveCenter(QPoint(labelX, labelY));
@@ -1577,7 +2003,6 @@ void ChannelRhiView::drawOverlays()
     p.setPen(QColor(20, 80, 160));
     p.drawText(tRect, Qt::AlignCenter, timeLabel);
 
-    // Amplitude label below the vertical span
     int aLabelX = x0 + 8;
     int aLabelY = (y0 + y1) / 2;
     QRect aRect = fm.boundingRect(ampLabel);
@@ -1598,6 +2023,7 @@ void ChannelRhiView::resizeEvent(QResizeEvent *event)
     m_vboDirty = true;
     m_overlayDirty = true;
     m_tileDirty = true;
+    if (m_overlay) m_overlay->syncSize();
     emit viewResized(width(), height());
     update();
 }
@@ -1701,7 +2127,7 @@ void ChannelRhiView::mouseMoveEvent(QMouseEvent *event)
     if (m_rulerActive) {
         m_rulerX1 = event->position().toPoint().x();
         m_rulerY1 = event->position().toPoint().y();
-        update();
+        if (m_overlay) m_overlay->repaint();
         event->accept();
         return;
     }
@@ -1733,6 +2159,14 @@ void ChannelRhiView::mouseMoveEvent(QMouseEvent *event)
             return;
         }
     }
+
+    // ── Crosshair tracking (passive mouse tracking without buttons) ──
+    if (m_crosshairEnabled) {
+        m_crosshairX = event->position().toPoint().x();
+        m_crosshairY = event->position().toPoint().y();
+        if (m_overlay) m_overlay->repaint();
+    }
+
     QRhiWidget::mouseMoveEvent(event);
 }
 

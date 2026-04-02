@@ -247,6 +247,17 @@ public:
                                      int   pixelWidth,
                                      int  &vboFirstSample) const;
 
+    //=========================================================================================================
+    /**
+     * Return the raw sample value at a specific absolute sample index for the given channel.
+     * Returns 0 if the sample is outside the buffer or channel index is out of range.
+     *
+     * @param[in] channelIdx  Zero-based channel index.
+     * @param[in] sample      Absolute sample index.
+     * @return Sample value in physical units, or 0 if unavailable.
+     */
+    float sampleValueAt(int channelIdx, int sample) const;
+
 signals:
     //=========================================================================================================
     /**
