@@ -2017,11 +2017,11 @@ void ChannelRhiView::drawRulerOverlay(QPainter &p)
     auto fmtAmp = [](float amp, const QString &unit) -> QString {
         float absAmp = qAbs(amp);
         if (absAmp < 1e-6f)
-            return QString::number(amp * 1e9f, 'f', 1) + QStringLiteral(" n") + unit;
+            return QString::number(amp * 1e9f, 'f', 3) + QStringLiteral(" n") + unit;
         if (absAmp < 1e-3f)
-            return QString::number(amp * 1e6f, 'f', 1) + QStringLiteral(" µ") + unit;
+            return QString::number(amp * 1e6f, 'f', 3) + QStringLiteral(" µ") + unit;
         if (absAmp < 1.f)
-            return QString::number(amp * 1e3f, 'f', 1) + QStringLiteral(" m") + unit;
+            return QString::number(amp * 1e3f, 'f', 3) + QStringLiteral(" m") + unit;
         return QString::number(amp, 'f', 3) + QStringLiteral(" ") + unit;
     };
 
