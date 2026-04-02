@@ -63,7 +63,8 @@ jobs:
       run: |
         echo "Disk usage before cleanup:" && df -h
         # Remove large unused toolchains BUT preserve Qt (/opt/hostedtoolcache/Qt)
-        sudo rm -rf /usr/local/share/gtk-doc /usr/local/Cellar /usr/local/lib/node_modules /usr/share/dotnet /Users/runner/Library/Caches/*
+        sudo rm -rf /usr/local/share/gtk-doc /usr/local/Cellar /usr/local/lib/node_modules /usr/share/dotnet || true
+        sudo rm -rf /Users/runner/Library/Caches/* 2>/dev/null || true
         # Selectively clean hostedtoolcache without deleting Qt
         find /opt/hostedtoolcache -mindepth 1 -maxdepth 1 ! -name 'Qt' -exec sudo rm -rf {} + 2>/dev/null || true
         echo "Disk usage after cleanup:" && df -h
