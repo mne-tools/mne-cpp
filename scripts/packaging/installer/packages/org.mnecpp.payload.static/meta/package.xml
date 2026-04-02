@@ -4,7 +4,6 @@
     <Description>Internal online component containing the static MNE-CPP binaries for this platform.</Description>
     <Version>@MNE_CPP_VERSION@</Version>
     <ReleaseDate>@MNE_CPP_RELEASE_DATE@</ReleaseDate>
-    <Default>false</Default>
     <Checkable>false</Checkable>
     <SortingPriority>119</SortingPriority>
 </Package>

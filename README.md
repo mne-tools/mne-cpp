@@ -35,8 +35,8 @@ git clone --recursive https://github.com/mne-tools/mne-cpp.git && cd mne-cpp
 ./init.sh && cmake --build build/developer-dynamic --parallel
 ```
 
-```bat
-REM Windows
+```bash
+# Clone and build (Windows)
 git clone --recursive https://github.com/mne-tools/mne-cpp.git && cd mne-cpp
 .\init.bat
 cmake --build build\developer-dynamic --parallel
