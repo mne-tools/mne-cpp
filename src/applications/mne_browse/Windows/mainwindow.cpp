@@ -57,6 +57,7 @@
 #include <QInputDialog>
 #include <QListWidget>
 #include <QLineEdit>
+#include <QPainter>
 #include <QPushButton>
 #include <QSet>
 #include <QSignalBlocker>
@@ -66,6 +67,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <functional>
 
 #include <inv/minimum_norm/inv_minimum_norm.h>
 #include <inv/inv_source_estimate.h>
@@ -1093,6 +1095,9 @@ MainWindow::MainWindow(QWidget *parent)
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
 , m_pStatusLabel(nullptr)
+, m_pCrosshairAction(nullptr)
+, m_pButterflyAction(nullptr)
+, m_pScalebarsAction(nullptr)
 , m_pWhitenButterflyAction(nullptr)
 , m_pAnnotationModeAction(nullptr)
 {
@@ -1380,6 +1385,52 @@ void MainWindow::setupWindowWidgets()
     connect(m_pDataWindow, &DataWindow::annotationRangeSelected,
             this, &MainWindow::handleAnnotationRangeSelected);
 
+    // Connect crosshair cursor data to status bar
+    // The signal is forwarded: ChannelRhiView → ChannelDataView → here
+    if (m_pDataWindow->getChannelDataView()) {
+        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::cursorDataChanged,
+                this, [this](float timeSec, float amplitude, const QString &channelName, const QString &unitLabel) {
+                    auto fmtAmp = [](float amp, const QString &unit) -> QString {
+                        float absAmp = qAbs(amp);
+                        if (absAmp == 0.f) return QStringLiteral("0 ") + unit;
+                        if (absAmp < 1e-9f) return QString::number(amp * 1e12f, 'f', 1) + QStringLiteral(" p") + unit;
+                        if (absAmp < 1e-6f) return QString::number(amp * 1e9f, 'f', 1) + QStringLiteral(" n") + unit;
+                        if (absAmp < 1e-3f) return QString::number(amp * 1e6f, 'f', 1) + QStringLiteral(" µ") + unit;
+                        if (absAmp < 1.f) return QString::number(amp * 1e3f, 'f', 1) + QStringLiteral(" m") + unit;
+                        return QString::number(amp, 'f', 3) + QStringLiteral(" ") + unit;
+                    };
+                    QString timeStr;
+                    bool isClock = m_pDataWindow->getChannelDataView()->clockTimeFormat();
+                    if (isClock && timeSec >= 0.f) {
+                        int totalMs = static_cast<int>(timeSec * 1000.f + 0.5f);
+                        int m   = totalMs / 60000;
+                        int sec = (totalMs % 60000) / 1000;
+                        int ms  = totalMs % 1000;
+                        timeStr = QString("%1:%2.%3")
+                            .arg(m, 2, 10, QChar('0'))
+                            .arg(sec, 2, 10, QChar('0'))
+                            .arg(ms, 3, 10, QChar('0'));
+                    } else {
+                        timeStr = QString::number(timeSec, 'f', 3) + QStringLiteral(" s");
+                    }
+                    QString msg = QString("  %1  |  t = %2  |  %3")
+                        .arg(channelName, timeStr, fmtAmp(amplitude, unitLabel));
+                    statusBar()->showMessage(msg);
+                });
+    }
+
+    // Connect time format toggle requested from DataWindow (via 'T' key)
+    connect(m_pDataWindow, &DataWindow::timeFormatToggleRequested,
+            this, [this]() {
+                if (m_pDataWindow->getChannelDataView()) {
+                    m_pDataWindow->getChannelDataView()->toggleTimeFormat();
+                    bool isClock = m_pDataWindow->getChannelDataView()->clockTimeFormat();
+                    statusBar()->showMessage(isClock
+                        ? QStringLiteral("Time format: mm:ss.ms")
+                        : QStringLiteral("Time format: seconds"), 3000);
+                }
+            });
+
     connect(m_pVirtualChannelWindow->getVirtualChannelModel(), &VirtualChannelModel::virtualChannelsChanged,
             this, [this]() {
                 m_pDataWindow->setVirtualChannels(
@@ -1479,6 +1530,104 @@ void MainWindow::createToolBar()
         }
     });
     toolBar->addAction(m_pHideBadAction);
+
+    toolBar->addSeparator();
+
+    // --- Interactive inspection tools ---
+
+    //Helper to create a simple painted icon
+    auto makeIcon = [](const std::function<void(QPainter&, int)>& paintFn) -> QIcon {
+        const int sz = 64;
+        QPixmap pm(sz, sz);
+        pm.fill(Qt::transparent);
+        QPainter p(&pm);
+        p.setRenderHint(QPainter::Antialiasing);
+        paintFn(p, sz);
+        p.end();
+        return QIcon(pm);
+    };
+
+    //Toggle crosshair (X)
+    QIcon crosshairIcon = makeIcon([](QPainter& p, int sz){
+        QPen pen(QColor(0xd0, 0x40, 0x40), 3);
+        p.setPen(pen);
+        p.drawLine(sz/2, 4, sz/2, sz-4);
+        p.drawLine(4, sz/2, sz-4, sz/2);
+    });
+    m_pCrosshairAction = new QAction(crosshairIcon, tr("Toggle crosshair (X)"), this);
+    m_pCrosshairAction->setStatusTip(tr("Toggle crosshair cursor overlay"));
+    connect(m_pCrosshairAction, &QAction::triggered, [this](){
+        if(m_pDataWindow && m_pDataWindow->getChannelDataView()) {
+            bool on = !m_pDataWindow->getChannelDataView()->crosshairEnabled();
+            m_pDataWindow->getChannelDataView()->setCrosshairEnabled(on);
+        }
+    });
+    toolBar->addAction(m_pCrosshairAction);
+
+    //Toggle butterfly mode (B)
+    QIcon butterflyIcon = makeIcon([](QPainter& p, int sz){
+        QPen pen(QColor(0x40, 0x80, 0xd0), 2);
+        p.setPen(pen);
+        // Simple butterfly-like overlapping sine curves
+        for(int k = 0; k < 3; ++k) {
+            QPainterPath path;
+            double phase = k * 1.0;
+            path.moveTo(4, sz/2);
+            for(int x = 4; x <= sz-4; ++x) {
+                double t = double(x-4)/(sz-8) * 2.0 * M_PI;
+                double y = sz/2 + (sz/4) * std::sin(t + phase) * (1.0 - 0.2*k);
+                path.lineTo(x, y);
+            }
+            p.drawPath(path);
+        }
+    });
+    m_pButterflyAction = new QAction(butterflyIcon, tr("Toggle butterfly mode (B)"), this);
+    m_pButterflyAction->setStatusTip(tr("Overlay all channels of the same type"));
+    connect(m_pButterflyAction, &QAction::triggered, [this](){
+        if(m_pDataWindow && m_pDataWindow->getChannelDataView()) {
+            bool on = !m_pDataWindow->getChannelDataView()->butterflyMode();
+            m_pDataWindow->getChannelDataView()->setButterflyMode(on);
+        }
+    });
+    toolBar->addAction(m_pButterflyAction);
+
+    //Toggle scalebars (S)
+    QIcon scalebarsIcon = makeIcon([](QPainter& p, int sz){
+        QPen pen(QColor(0x40, 0xa0, 0x40), 3);
+        p.setPen(pen);
+        // Vertical bar with horizontal ticks
+        int cx = sz/2, top = 8, bot = sz-8;
+        p.drawLine(cx, top, cx, bot);
+        p.drawLine(cx-8, top, cx+8, top);
+        p.drawLine(cx-8, bot, cx+8, bot);
+        p.drawLine(cx-6, sz/2, cx+6, sz/2);
+    });
+    m_pScalebarsAction = new QAction(scalebarsIcon, tr("Toggle scalebars (S)"), this);
+    m_pScalebarsAction->setStatusTip(tr("Show amplitude scalebars on the signal view"));
+    connect(m_pScalebarsAction, &QAction::triggered, [this](){
+        if(m_pDataWindow && m_pDataWindow->getChannelDataView()) {
+            bool on = !m_pDataWindow->getChannelDataView()->scalebarsVisible();
+            m_pDataWindow->getChannelDataView()->setScalebarsVisible(on);
+        }
+    });
+    toolBar->addAction(m_pScalebarsAction);
+
+    //Toggle time format (T)
+    QIcon timeIcon = makeIcon([](QPainter& p, int sz){
+        QFont f = p.font();
+        f.setPixelSize(sz * 0.45);
+        f.setBold(true);
+        p.setFont(f);
+        p.setPen(QColor(0x60, 0x60, 0xc0));
+        p.drawText(QRect(0,0,sz,sz), Qt::AlignCenter, "T");
+    });
+    QAction* timeFormatAction = new QAction(timeIcon, tr("Toggle time format (T)"), this);
+    timeFormatAction->setStatusTip(tr("Switch between seconds and clock time display"));
+    connect(timeFormatAction, &QAction::triggered, [this](){
+        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+            m_pDataWindow->getChannelDataView()->toggleTimeFormat();
+    });
+    toolBar->addAction(timeFormatAction);
 
     toolBar->addSeparator();
 

@@ -140,6 +140,21 @@ public:
      */
     void setReferenceMarkers(const QVector<TimeRulerReferenceMark> &markers);
 
+    //=========================================================================================================
+    /**
+     * Toggle the time format between float seconds and HH:MM:SS clock time.
+     */
+    void toggleTimeFormat();
+
+    //=========================================================================================================
+    /**
+     * Set whether to use clock time (HH:MM:SS) or float seconds for labels.
+     *
+     * @param[in] useClock  true = HH:MM:SS, false = float seconds.
+     */
+    void setClockTimeFormat(bool useClock);
+    bool clockTimeFormat() const { return m_useClockTime; }
+
 public slots:
     //=========================================================================================================
     /**
@@ -223,6 +238,7 @@ private:
     int    m_firstFileSample = 0;
     float  m_scrollSample    = 0.f;
     float  m_spp             = 1.f;     // samples per pixel
+    bool   m_useClockTime    = false;   // false = float seconds, true = HH:MM:SS
 
     QVector<TimeRulerEventMark> m_events;
     QVector<TimeRulerReferenceMark> m_referenceMarkers;

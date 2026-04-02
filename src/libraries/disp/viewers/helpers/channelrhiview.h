@@ -75,6 +75,8 @@ class QRhiSampler;
 class QRhiShaderResourceBindings;
 class QRhiTexture;
 
+class CrosshairOverlay;  // defined in .cpp
+
 namespace DISPLIB
 {
 
@@ -326,6 +328,41 @@ public:
     void setHideBadChannels(bool hide);
     bool hideBadChannels() const { return m_hideBadChannels; }
 
+    // ── Crosshair ─────────────────────────────────────────────────────
+
+    //=========================================================================================================
+    /**
+     * Enable or disable the crosshair cursor overlay.
+     * When enabled, a vertical + horizontal cross follows the mouse and the view
+     * continuously emits cursorDataChanged() with the time/amplitude under the cursor.
+     */
+    void setCrosshairEnabled(bool enabled);
+    bool crosshairEnabled() const { return m_crosshairEnabled; }
+
+    /**
+     * Set whether the crosshair label uses clock time (mm:ss.ms) or seconds.
+     */
+    void setClockTimeFormat(bool useClock) { m_useClockTime = useClock; update(); }
+    bool clockTimeFormat() const { return m_useClockTime; }
+
+    // ── Scalebars ─────────────────────────────────────────────────────
+
+    //=========================================================================================================
+    /**
+     * Show or hide per-channel-type scalebars in the bottom-right corner.
+     */
+    void setScalebarsVisible(bool visible);
+    bool scalebarsVisible() const { return m_scalebarsVisible; }
+
+    // ── Butterfly mode ────────────────────────────────────────────────
+
+    //=========================================================================================================
+    /**
+     * Toggle butterfly mode: all channels of the same type are overlaid in a single lane.
+     */
+    void setButterflyMode(bool enabled);
+    bool butterflyMode() const { return m_butterflyMode; }
+
 signals:
     void scrollSampleChanged(float sample);
     void samplesPerPixelChanged(float spp);
@@ -349,11 +386,30 @@ signals:
      */
     void sampleRangeSelected(int startSample, int endSample);
 
+    //=========================================================================================================
+    /**
+     * Emitted continuously when the crosshair is active and the mouse moves.
+     *
+     * @param[in] timeSec     Time at cursor in seconds relative to file start.
+     * @param[in] amplitude   Raw amplitude value under the cursor in physical units.
+     * @param[in] channelName Name of the channel under the cursor.
+     * @param[in] unitLabel   Short unit label ("T", "V", "AU", …).
+     */
+    void cursorDataChanged(float timeSec, float amplitude,
+                           const QString &channelName, const QString &unitLabel);
+
 protected:
     void initialize(QRhiCommandBuffer *cb) override;
     void render(QRhiCommandBuffer *cb) override;
     void releaseResources() override;
     void paintEvent(QPaintEvent *event) override;
+
+    // Overlay access — called by CrosshairOverlay::paintEvent
+    friend class ::CrosshairOverlay;
+    void drawCrosshair(QPainter &p);
+    void drawScalebars(QPainter &p);
+    void drawRulerOverlay(QPainter &p);
+    bool rulerActive() const { return m_rulerActive; }
 
     void resizeEvent(QResizeEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
@@ -491,6 +547,29 @@ private:
     int   m_rulerY0       = 0;
     int   m_rulerX1       = 0;   // current cursor position
     int   m_rulerY1       = 0;
+
+    // ── Crosshair cursor ──────────────────────────────────────────────
+    bool  m_crosshairEnabled = false;
+    int   m_crosshairX       = -1;  // screen px, -1 = not tracking
+    int   m_crosshairY       = -1;
+    bool  m_useClockTime     = false;  // mirror of TimeRulerWidget time format
+    CrosshairOverlay* m_overlay = nullptr;  // lightweight overlay for crosshair/scalebars
+
+    // ── Scalebars ─────────────────────────────────────────────────────
+    bool  m_scalebarsVisible = false;
+
+    // ── Butterfly mode ────────────────────────────────────────────────
+    bool  m_butterflyMode = false;
+
+    struct ButterflyTypeGroup {
+        QString typeLabel;         // e.g. "MEG", "EEG"
+        QColor  color;             // representative type colour
+        float   amplitudeMax;      // per-type amplitude scale
+        QVector<int> channelIndices; // model channel indices in this group
+    };
+
+    QVector<ButterflyTypeGroup> butterflyTypeGroups() const;
+    int butterflyLaneCount() const;
 
     void drawOverlays();   // QPainter-based overlays on top of the QRHI-rendered traces
 };

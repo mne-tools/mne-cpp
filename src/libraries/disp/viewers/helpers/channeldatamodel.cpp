@@ -320,6 +320,20 @@ float ChannelDataModel::channelRms(int channelIdx, int first, int last) const
 
 //=============================================================================================================
 
+float ChannelDataModel::sampleValueAt(int channelIdx, int sample) const
+{
+    QReadLocker lk(&m_lock);
+    if (channelIdx < 0 || channelIdx >= m_channelData.size())
+        return 0.f;
+    const QVector<float> &src = m_channelData[channelIdx];
+    int bufIdx = sample - m_firstSample;
+    if (bufIdx < 0 || bufIdx >= src.size())
+        return 0.f;
+    return src[bufIdx];
+}
+
+//=============================================================================================================
+
 QVector<float> ChannelDataModel::decimatedVertices(int   channelIdx,
                                                     int   firstSample,
                                                     int   lastSample,

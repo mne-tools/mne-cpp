@@ -517,6 +517,12 @@ signals:
      */
     void annotationRangeSelected(int startSample, int endSample);
 
+    //=========================================================================================================
+    /**
+     * Emitted when the user presses T to toggle the time display format.
+     */
+    void timeFormatToggleRequested();
+
 protected slots:
     //=========================================================================================================
     /**
