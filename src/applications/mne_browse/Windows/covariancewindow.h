@@ -25,6 +25,7 @@
 #include <QDockWidget>
 
 class QCheckBox;
+class QComboBox;
 class QDoubleSpinBox;
 class QLabel;
 class QTextEdit;
@@ -57,6 +58,7 @@ private:
     void setupUi();
     void initControls();
     void updateSummary();
+    void updateHeatmap();
     void updateToggleState();
     void emitSettingsChanged();
 
@@ -71,6 +73,8 @@ private:
     QVBoxLayout*     m_pLayout = nullptr;
     QLabel*          m_pHintLabel = nullptr;
     QTextEdit*       m_pSummaryTextEdit = nullptr;
+    QLabel*          m_pHeatmapLabel = nullptr;
+    QComboBox*       m_pHeatmapChannelType = nullptr;
     QToolBar*        m_pToolBar = nullptr;
     QCheckBox*       m_pWhitenButterflyCheckBox = nullptr;
     QCheckBox*       m_pWhitenLayoutCheckBox = nullptr;
