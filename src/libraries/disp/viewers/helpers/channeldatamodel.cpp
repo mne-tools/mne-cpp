@@ -71,6 +71,10 @@ namespace {
     constexpr float kScaleSTIM     = 5.0f;       // AU
     constexpr float kScaleMISC     = 1.0f;       // AU
     constexpr float kScaleFallback = 1.0f;
+
+    // Internal pseudo-kind keys for separate MEG grad/mag scales
+    constexpr qint32 kMEGGradKind = -1;
+    constexpr qint32 kMEGMagKind  = -2;
 }
 
 //=============================================================================================================
@@ -186,6 +190,30 @@ void ChannelDataModel::setScaleMap(const QMap<qint32, float> &scaleMap)
     }
     rebuildDisplayInfo();
     emit metaChanged();
+}
+
+//=============================================================================================================
+
+void ChannelDataModel::setScaleMapFromStrings(const QMap<QString, double> &scaleMap)
+{
+    QMap<qint32, float> intMap;
+    if (scaleMap.contains(QStringLiteral("MEG_grad")))
+        intMap[kMEGGradKind] = static_cast<float>(scaleMap.value(QStringLiteral("MEG_grad")));
+    if (scaleMap.contains(QStringLiteral("MEG_mag")))
+        intMap[kMEGMagKind]  = static_cast<float>(scaleMap.value(QStringLiteral("MEG_mag")));
+    if (scaleMap.contains(QStringLiteral("MEG_EEG")))
+        intMap[FIFFV_EEG_CH] = static_cast<float>(scaleMap.value(QStringLiteral("MEG_EEG")));
+    if (scaleMap.contains(QStringLiteral("MEG_EOG")))
+        intMap[FIFFV_EOG_CH] = static_cast<float>(scaleMap.value(QStringLiteral("MEG_EOG")));
+    if (scaleMap.contains(QStringLiteral("MEG_EMG")))
+        intMap[FIFFV_EMG_CH] = static_cast<float>(scaleMap.value(QStringLiteral("MEG_EMG")));
+    if (scaleMap.contains(QStringLiteral("MEG_ECG")))
+        intMap[FIFFV_ECG_CH] = static_cast<float>(scaleMap.value(QStringLiteral("MEG_ECG")));
+    if (scaleMap.contains(QStringLiteral("MEG_MISC")))
+        intMap[FIFFV_MISC_CH] = static_cast<float>(scaleMap.value(QStringLiteral("MEG_MISC")));
+    if (scaleMap.contains(QStringLiteral("MEG_STIM")))
+        intMap[FIFFV_STIM_CH] = static_cast<float>(scaleMap.value(QStringLiteral("MEG_STIM")));
+    setScaleMap(intMap);
 }
 
 //=============================================================================================================
@@ -477,9 +505,11 @@ float ChannelDataModel::amplitudeMaxForChannel(int ch) const
     // MEG: distinguish gradiometer vs. magnetometer by unit
     if (kind == FIFFV_MEG_CH) {
         if (info.unit == FIFF_UNIT_T_M)
-            return m_scaleMap.value(FIFFV_MEG_CH, kScaleMEGGrad);
+            return m_scaleMap.value(kMEGGradKind,
+                   m_scaleMap.value(FIFFV_MEG_CH, kScaleMEGGrad));
         else
-            return m_scaleMap.value(FIFFV_MEG_CH, kScaleMEGMag);
+            return m_scaleMap.value(kMEGMagKind,
+                   m_scaleMap.value(FIFFV_MEG_CH, kScaleMEGMag));
     }
     if (m_scaleMap.contains(kind))
         return m_scaleMap.value(kind);

@@ -196,6 +196,13 @@ public:
      */
     Eigen::MatrixXd readBlockSync(int from, int to);
 
+    //=========================================================================================================
+    /**
+     * Recompute the SSP projector matrix from the active flags in FiffInfo::projs.
+     * After calling this, subsequent reads will apply the updated projections.
+     */
+    void updateProjections();
+
 signals:
     //=========================================================================================================
     /**

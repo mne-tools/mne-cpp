@@ -220,6 +220,12 @@ public:
 
     //=========================================================================================================
     /**
+     * Recompute SSP projectors from FiffInfo::projs and reload visible data.
+     */
+    void updateProjections();
+
+    //=========================================================================================================
+    /**
      * Updates the data table views
      */
     void updateDataTableViews();

@@ -155,35 +155,34 @@ void ButterflySceneItem::paintAveragePaths(QPainter *painter)
                 //Get data pointer for the current channel
                 const double* averageData = m_lAverageData.first;
                 int totalCols =  m_lAverageData.second; //equals to the number of samples stored in the data matrix
+                if(totalCols <= 0)
+                    continue;
 
-                //Calculate downsampling factor of averaged data in respect to the items width
-                int dsFactor;
+                //Calculate X step to fill the full bounding rect width
                 QRectF boundingRect = this->boundingRect();
-                totalCols / boundingRect.width()<1 ? dsFactor = 1 : dsFactor = totalCols / boundingRect.width();
+                double xStep = boundingRect.width() / static_cast<double>(totalCols);
 
                 //Calculate scaling value
                 double dScaleY = (boundingRect.height())/(2*dMaxValue);
 
                 //Setup the painter
-                QPainterPath path = QPainterPath(QPointF(boundingRect.x(), *(averageData+(0*m_pFiffInfo->chs.size())+i) * -dScaleY));
+                double centerY = boundingRect.y() + boundingRect.height() / 2.0;
+                QPainterPath path = QPainterPath(QPointF(boundingRect.x(), centerY - (*(averageData+(0*m_pFiffInfo->chs.size())+i)) * dScaleY));
                 QPen pen;
                 pen.setStyle(Qt::SolidLine);
                 if(!m_cAverageColors.isEmpty() && i<m_cAverageColors.size())
                     pen.setColor(m_cAverageColors.at(i));
-                pen.setWidthF(0.25);
+                pen.setWidthF(0);
+                pen.setCosmetic(true);
                 painter->setPen(pen);
 
                 //Generate plot path
-                QPointF qSamplePosition;
-
-                for(int u = 0; u < totalCols && path.elementCount() <= boundingRect.width(); u += dsFactor) {
+                for(int u = 0; u < totalCols; ++u) {
                     //evoked matrix is stored in column major
-                    double val = (*(averageData+(u*m_pFiffInfo->chs.size())+i) * dScaleY);
+                    double val = (*(averageData+(u*m_pFiffInfo->chs.size())+i)) * dScaleY;
 
-                    qSamplePosition.setY(-val);
-                    qSamplePosition.setX(path.currentPosition().x()+1);
-
-                    path.lineTo(qSamplePosition);
+                    double xPos = boundingRect.x() + u * xStep;
+                    path.lineTo(QPointF(xPos, centerY - val));
                 }
 
                 //Paint the path
