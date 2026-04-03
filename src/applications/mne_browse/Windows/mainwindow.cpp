@@ -1349,24 +1349,30 @@ void MainWindow::setupWindowWidgets()
     connect(m_pAverageWindow, &AverageWindow::recomputeAverageRequested,
             this, &MainWindow::recomputeEvoked);
 
-    connect(m_pAnnotationWindow->getAnnotationModel(), &AnnotationModel::annotationsChanged,
-            this, [this]() {
-                QVector<DISPLIB::ChannelRhiView::AnnotationSpan> spans;
-                const QVector<AnnotationSpanData> modelSpans =
-                    m_pAnnotationWindow->getAnnotationModel()->getAnnotationSpans();
-                spans.reserve(modelSpans.size());
-                for(const AnnotationSpanData& modelSpan : modelSpans) {
-                    DISPLIB::ChannelRhiView::AnnotationSpan span;
-                    span.startSample = modelSpan.startSample;
-                    span.endSample = modelSpan.endSample;
-                    span.color = modelSpan.color;
-                    span.label = modelSpan.label;
-                    spans.append(span);
-                }
+    auto refreshAnnotationOverlay = [this]() {
+        QVector<DISPLIB::ChannelRhiView::AnnotationSpan> spans;
+        const QVector<AnnotationSpanData> modelSpans =
+            m_pAnnotationWindow->getAnnotationModel()->getAnnotationSpans();
+        spans.reserve(modelSpans.size());
+        for(const AnnotationSpanData& modelSpan : modelSpans) {
+            if (!m_pAnnotationWindow->isDescriptionVisible(modelSpan.label))
+                continue;
+            DISPLIB::ChannelRhiView::AnnotationSpan span;
+            span.startSample = modelSpan.startSample;
+            span.endSample = modelSpan.endSample;
+            span.color = modelSpan.color;
+            span.label = modelSpan.label;
+            spans.append(span);
+        }
+        m_pDataWindow->setAnnotations(spans);
+        setWindowStatus();
+    };
 
-                m_pDataWindow->setAnnotations(spans);
-                setWindowStatus();
-            });
+    connect(m_pAnnotationWindow->getAnnotationModel(), &AnnotationModel::annotationsChanged,
+            this, refreshAnnotationOverlay);
+
+    connect(m_pAnnotationWindow, &AnnotationWindow::visibilityFilterChanged,
+            this, refreshAnnotationOverlay);
 
     connect(m_pEpochWindow->getEpochModel(), &EpochModel::epochsChanged,
             this, [this]() {
@@ -1432,6 +1438,10 @@ void MainWindow::setupWindowWidgets()
                 m_pButterflyAction, &QAction::setChecked);
         connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::scalebarsToggled,
                 m_pScalebarsAction, &QAction::setChecked);
+        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::eventsVisibleToggled,
+                m_pEventsVisibleAction, &QAction::setChecked);
+        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::annotationsVisibleToggled,
+                m_pAnnotationsVisibleAction, &QAction::setChecked);
     }
 
     // Connect time format toggle requested from DataWindow (via 'T' key)
@@ -1655,6 +1665,49 @@ void MainWindow::createToolBar()
             m_pDataWindow->getChannelDataView()->setScalebarsVisible(checked);
     });
     toolBar->addAction(m_pScalebarsAction);
+
+    //Toggle event visibility (E)
+    QIcon eventsIcon = makeIcon([](QPainter& p, int sz){
+        QFont f = p.font();
+        f.setPixelSize(sz * 0.45);
+        f.setBold(true);
+        p.setFont(f);
+        p.setPen(QColor(0xd0, 0x60, 0x20));
+        p.drawText(QRect(0,0,sz,sz), Qt::AlignCenter, "E");
+    });
+    m_pEventsVisibleAction = new QAction(eventsIcon, tr("Toggle event markers (E)"), this);
+    m_pEventsVisibleAction->setCheckable(true);
+    m_pEventsVisibleAction->setChecked(true);
+    m_pEventsVisibleAction->setStatusTip(tr("Show or hide event marker lines on the raw data"));
+    connect(m_pEventsVisibleAction, &QAction::triggered, [this](bool checked){
+        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+            m_pDataWindow->getChannelDataView()->setEventsVisible(checked);
+    });
+    toolBar->addAction(m_pEventsVisibleAction);
+
+    //Toggle annotation visibility (Shift+A)
+    QIcon annotIcon = makeIcon([](QPainter& p, int sz){
+        // Filled translucent rectangle with "A" label
+        p.fillRect(6, 6, sz-12, sz-12, QColor(0x40, 0xa0, 0xd0, 80));
+        QPen borderPen(QColor(0x40, 0xa0, 0xd0), 2);
+        p.setPen(borderPen);
+        p.drawRect(6, 6, sz-12, sz-12);
+        QFont f = p.font();
+        f.setPixelSize(sz * 0.35);
+        f.setBold(true);
+        p.setFont(f);
+        p.setPen(QColor(0x20, 0x60, 0x90));
+        p.drawText(QRect(0,0,sz,sz), Qt::AlignCenter, "A");
+    });
+    m_pAnnotationsVisibleAction = new QAction(annotIcon, tr("Toggle annotation spans (Shift+A)"), this);
+    m_pAnnotationsVisibleAction->setCheckable(true);
+    m_pAnnotationsVisibleAction->setChecked(true);
+    m_pAnnotationsVisibleAction->setStatusTip(tr("Show or hide annotation span overlays on the raw data"));
+    connect(m_pAnnotationsVisibleAction, &QAction::triggered, [this](bool checked){
+        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+            m_pDataWindow->getChannelDataView()->setAnnotationsVisible(checked);
+    });
+    toolBar->addAction(m_pAnnotationsVisibleAction);
 
     //Toggle time format (T)
     QIcon timeIcon = makeIcon([](QPainter& p, int sz){
@@ -1909,9 +1962,11 @@ void MainWindow::connectMenus()
                "<b>Display:</b><br>"
                "B — Toggle butterfly mode<br>"
                "D — Toggle DC removal<br>"
+               "E — Toggle event markers<br>"
                "S — Toggle scalebars<br>"
                "T — Toggle time format (seconds / clock)<br>"
                "X — Toggle crosshair cursor<br>"
+               "Shift+A — Toggle annotation spans<br>"
                "Ctrl+D — Clear channel selection<br>"
                "? — Show this help<br>"
                "<br>"
@@ -1958,6 +2013,10 @@ void MainWindow::setupMainWindow()
         m_pButterflyAction->setChecked(m_qSettings.value("MainWindow/View/butterfly").toBool());
     if (m_pScalebarsAction && m_qSettings.contains("MainWindow/View/scalebars"))
         m_pScalebarsAction->setChecked(m_qSettings.value("MainWindow/View/scalebars").toBool());
+    if (m_pEventsVisibleAction && m_qSettings.contains("MainWindow/View/eventsVisible"))
+        m_pEventsVisibleAction->setChecked(m_qSettings.value("MainWindow/View/eventsVisible").toBool());
+    if (m_pAnnotationsVisibleAction && m_qSettings.contains("MainWindow/View/annotationsVisible"))
+        m_pAnnotationsVisibleAction->setChecked(m_qSettings.value("MainWindow/View/annotationsVisible").toBool());
 
     //Set data window as central widget - This is needed because we are using QDockWidgets
     setCentralWidget(m_pDataWindow);
@@ -3564,6 +3623,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
         m_qSettings.setValue("MainWindow/View/butterfly", m_pButterflyAction->isChecked());
     if (m_pScalebarsAction)
         m_qSettings.setValue("MainWindow/View/scalebars", m_pScalebarsAction->isChecked());
+    if (m_pEventsVisibleAction)
+        m_qSettings.setValue("MainWindow/View/eventsVisible", m_pEventsVisibleAction->isChecked());
+    if (m_pAnnotationsVisibleAction)
+        m_qSettings.setValue("MainWindow/View/annotationsVisible", m_pAnnotationsVisibleAction->isChecked());
 
     QMainWindow::closeEvent(event);
 }

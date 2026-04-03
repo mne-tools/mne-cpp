@@ -638,6 +638,32 @@ void ChannelDataView::setAnnotationSelectionEnabled(bool enabled)
 
 //=============================================================================================================
 
+void ChannelDataView::setEventsVisible(bool visible)
+{
+    if (m_pRhiView)
+        m_pRhiView->setEventsVisible(visible);
+}
+
+bool ChannelDataView::eventsVisible() const
+{
+    return m_pRhiView ? m_pRhiView->eventsVisible() : true;
+}
+
+//=============================================================================================================
+
+void ChannelDataView::setAnnotationsVisible(bool visible)
+{
+    if (m_pRhiView)
+        m_pRhiView->setAnnotationsVisible(visible);
+}
+
+bool ChannelDataView::annotationsVisible() const
+{
+    return m_pRhiView ? m_pRhiView->annotationsVisible() : true;
+}
+
+//=============================================================================================================
+
 void ChannelDataView::setCrosshairEnabled(bool enabled)
 {
     if (m_pRhiView)
@@ -884,6 +910,19 @@ void ChannelDataView::keyPressEvent(QKeyEvent *event)
     case Qt::Key_X:
         setCrosshairEnabled(!crosshairEnabled());
         emit crosshairToggled(crosshairEnabled());
+        break;
+    case Qt::Key_E:
+        setEventsVisible(!eventsVisible());
+        emit eventsVisibleToggled(eventsVisible());
+        break;
+    case Qt::Key_A:
+        if (event->modifiers() & Qt::ShiftModifier) {
+            setAnnotationsVisible(!annotationsVisible());
+            emit annotationsVisibleToggled(annotationsVisible());
+        } else {
+            QWidget::keyPressEvent(event);
+            return;
+        }
         break;
     case Qt::Key_T:
         toggleTimeFormat();

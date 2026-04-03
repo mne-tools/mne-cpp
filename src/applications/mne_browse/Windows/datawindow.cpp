@@ -1357,6 +1357,16 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
             // Toggle crosshair cursor
             m_pChannelDataView->setCrosshairEnabled(!m_pChannelDataView->crosshairEnabled());
             break;
+        case Qt::Key_E:
+            // Toggle event marker visibility
+            m_pChannelDataView->setEventsVisible(!m_pChannelDataView->eventsVisible());
+            break;
+        case Qt::Key_A:
+            if (event->modifiers() & Qt::ShiftModifier) {
+                // Toggle annotation span visibility
+                m_pChannelDataView->setAnnotationsVisible(!m_pChannelDataView->annotationsVisible());
+            }
+            break;
         case Qt::Key_T:
             // Toggle time format
             if (m_pChannelDataView) {
@@ -1377,9 +1387,11 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
                        "<b>Display:</b><br>"
                        "B — Toggle butterfly mode<br>"
                        "D — Toggle DC removal<br>"
+                       "E — Toggle event markers<br>"
                        "S — Toggle scalebars<br>"
                        "T — Toggle time format (seconds / clock)<br>"
                        "X — Toggle crosshair cursor<br>"
+                       "Shift+A — Toggle annotation spans<br>"
                        "Ctrl+D — Clear channel selection<br>"
                        "? — Show this help<br>"
                        "<br>"

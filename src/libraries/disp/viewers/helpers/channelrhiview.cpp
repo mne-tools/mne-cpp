@@ -679,6 +679,32 @@ void ChannelRhiView::setAnnotationSelectionEnabled(bool enabled)
 
 //=============================================================================================================
 
+void ChannelRhiView::setEventsVisible(bool visible)
+{
+    if (m_bShowEvents == visible) return;
+    m_bShowEvents = visible;
+    m_tileDirty = true;
+    m_overlayDirty = true;
+    update();
+}
+
+bool ChannelRhiView::eventsVisible() const { return m_bShowEvents; }
+
+//=============================================================================================================
+
+void ChannelRhiView::setAnnotationsVisible(bool visible)
+{
+    if (m_bShowAnnotations == visible) return;
+    m_bShowAnnotations = visible;
+    m_tileDirty = true;
+    m_overlayDirty = true;
+    update();
+}
+
+bool ChannelRhiView::annotationsVisible() const { return m_bShowAnnotations; }
+
+//=============================================================================================================
+
 int ChannelRhiView::hitTestAnnotationBoundary(int px, bool &isStart) const
 {
     for (int i = 0; i < m_annotations.size(); ++i) {
@@ -1102,7 +1128,7 @@ void ChannelRhiView::rebuildOverlayImage(int logicalWidth, int logicalHeight, qr
     }
 
     // ── Annotation spans ────────────────────────────────────────────
-    if (!m_annotations.isEmpty()) {
+    if (m_bShowAnnotations && !m_annotations.isEmpty()) {
         QFont font = p.font();
         font.setPointSizeF(8.0);
         font.setBold(true);
@@ -1151,7 +1177,7 @@ void ChannelRhiView::rebuildOverlayImage(int logicalWidth, int logicalHeight, qr
     }
 
     // ── Event / stimulus marker lines ───────────────────────────────
-    if (!m_events.isEmpty()) {
+    if (m_bShowEvents && !m_events.isEmpty()) {
         for (const EventMarker &ev : m_events) {
             float xF = (static_cast<float>(ev.sample) - m_scrollSample) / m_samplesPerPixel;
             if (xF < -2.f || xF > logicalWidth + 2.f)
@@ -1470,8 +1496,8 @@ void ChannelRhiView::scheduleTileRebuild()
     int               firstFileSample = m_firstFileSample;
     bool              hideBad         = m_hideBadChannels;
     QVector<int>      chIndices       = m_filteredChannels; // snapshot for worker
-    QVector<EventMarker> eventsSnap   = m_events;           // snapshot for worker
-    QVector<AnnotationSpan> annotationsSnap = m_annotations;
+    QVector<EventMarker> eventsSnap   = m_bShowEvents ? m_events : QVector<EventMarker>();
+    QVector<AnnotationSpan> annotationsSnap = m_bShowAnnotations ? m_annotations : QVector<AnnotationSpan>();
 
     m_tileDirty          = false; // cleared now — any new event will set it true again
     m_tileRebuildPending = true;

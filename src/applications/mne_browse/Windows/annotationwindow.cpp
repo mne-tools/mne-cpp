@@ -18,6 +18,9 @@
 #include "mainwindow.h"
 
 #include <QAction>
+#include <QCheckBox>
+#include <QDialog>
+#include <QDialogButtonBox>
 #include <QEvent>
 #include <QHeaderView>
 #include <QKeyEvent>
@@ -75,6 +78,13 @@ void AnnotationWindow::addAnnotation(int startSample, int endSample, const QStri
         m_pTableView->selectRow(row);
         m_pTableView->scrollTo(m_pAnnotationModel->index(row, 0));
     }
+}
+
+//=============================================================================================================
+
+bool AnnotationWindow::isDescriptionVisible(const QString& description) const
+{
+    return !m_hiddenDescriptions.contains(description);
 }
 
 //=============================================================================================================
@@ -150,6 +160,12 @@ void AnnotationWindow::initToolBar()
             this, &AnnotationWindow::removeSelectedAnnotations);
     m_pToolBar->addAction(removeAnnotationAction);
 
+    QAction* selectVisibleAction = new QAction(tr("Select visible"), this);
+    selectVisibleAction->setToolTip(tr("Choose which annotation descriptions are visible on the raw data"));
+    connect(selectVisibleAction, &QAction::triggered,
+            this, &AnnotationWindow::selectVisibleDescriptions);
+    m_pToolBar->addAction(selectVisibleAction);
+
     m_pLayout->insertWidget(1, m_pToolBar);
 }
 
@@ -185,4 +201,47 @@ void AnnotationWindow::jumpToAnnotation(const QModelIndex &current, const QModel
 
     const QPair<int, int> range = m_pAnnotationModel->getSampleRange(current.row());
     m_pMainWindow->dataWindow()->getChannelDataView()->scrollToSample(range.first, true);
+}
+
+//=============================================================================================================
+
+void AnnotationWindow::selectVisibleDescriptions()
+{
+    // Collect unique descriptions from model
+    const QVector<AnnotationSpanData> spans = m_pAnnotationModel->getAnnotationSpans();
+    QSet<QString> descriptions;
+    for (const auto& span : spans)
+        descriptions.insert(span.label);
+
+    if (descriptions.isEmpty())
+        return;
+
+    QDialog dlg(this);
+    dlg.setWindowTitle(tr("Select Visible Descriptions"));
+    QVBoxLayout* layout = new QVBoxLayout(&dlg);
+
+    QList<QCheckBox*> checkboxes;
+    QStringList sorted = descriptions.values();
+    sorted.sort();
+    for (const QString& desc : sorted) {
+        QCheckBox* cb = new QCheckBox(desc, &dlg);
+        cb->setChecked(!m_hiddenDescriptions.contains(desc));
+        layout->addWidget(cb);
+        checkboxes.append(cb);
+    }
+
+    QDialogButtonBox* buttons = new QDialogButtonBox(
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dlg);
+    connect(buttons, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+    connect(buttons, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+    layout->addWidget(buttons);
+
+    if (dlg.exec() == QDialog::Accepted) {
+        m_hiddenDescriptions.clear();
+        for (int i = 0; i < checkboxes.size(); ++i) {
+            if (!checkboxes[i]->isChecked())
+                m_hiddenDescriptions.insert(sorted[i]);
+        }
+        emit visibilityFilterChanged();
+    }
 }

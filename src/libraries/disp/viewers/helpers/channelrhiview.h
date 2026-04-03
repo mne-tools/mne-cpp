@@ -156,6 +156,12 @@ public:
      */
     void setAnnotationSelectionEnabled(bool enabled);
 
+    void setEventsVisible(bool visible);
+    bool eventsVisible() const;
+
+    void setAnnotationsVisible(bool visible);
+    bool annotationsVisible() const;
+
     // ── Scroll / zoom ─────────────────────────────────────────────────
 
     float scrollSample()    const { return m_scrollSample; }
@@ -542,6 +548,8 @@ private:
     QVector<EventMarker> m_events;
     QVector<AnnotationSpan> m_annotations;
     bool m_annotationSelectionEnabled = false;
+    bool m_bShowEvents      = true;
+    bool m_bShowAnnotations = true;
 
     // ── Annotation boundary drag-resize ───────────────────────────────
     bool m_annDragging         = false;   ///< True while dragging an annotation boundary.

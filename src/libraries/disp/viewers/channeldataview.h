@@ -306,6 +306,12 @@ public:
      */
     void setAnnotationSelectionEnabled(bool enabled);
 
+    void setEventsVisible(bool visible);
+    bool eventsVisible() const;
+
+    void setAnnotationsVisible(bool visible);
+    bool annotationsVisible() const;
+
     // ── Interactive inspection features ───────────────────────────────
 
     //=========================================================================================================
@@ -435,6 +441,8 @@ signals:
     void crosshairToggled(bool on);
     void butterflyToggled(bool on);
     void scalebarsToggled(bool on);
+    void eventsVisibleToggled(bool on);
+    void annotationsVisibleToggled(bool on);
 
     //=========================================================================================================
     /**

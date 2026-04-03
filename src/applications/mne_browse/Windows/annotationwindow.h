@@ -20,6 +20,7 @@
 #include "../Models/annotationmodel.h"
 
 #include <QDockWidget>
+#include <QSet>
 
 class QLabel;
 class QTableView;
@@ -44,6 +45,10 @@ public:
     AnnotationModel* getAnnotationModel() const;
     QTableView* getAnnotationTableView() const;
     void addAnnotation(int startSample, int endSample, const QString& label);
+    bool isDescriptionVisible(const QString& description) const;
+
+signals:
+    void visibilityFilterChanged();
 
 protected:
     bool event(QEvent *event) override;
@@ -56,6 +61,7 @@ private:
 private slots:
     void removeSelectedAnnotations();
     void jumpToAnnotation(const QModelIndex &current, const QModelIndex &previous);
+    void selectVisibleDescriptions();
 
 private:
     MainWindow*      m_pMainWindow = nullptr;
@@ -65,6 +71,7 @@ private:
     QToolBar*        m_pToolBar = nullptr;
     QTableView*      m_pTableView = nullptr;
     AnnotationModel* m_pAnnotationModel = nullptr;
+    QSet<QString>    m_hiddenDescriptions;
 };
 
 } // namespace MNEBROWSE
