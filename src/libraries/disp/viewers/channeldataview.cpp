@@ -631,6 +631,28 @@ bool ChannelDataView::epochMarkersVisible() const
     return m_pRhiView ? m_pRhiView->epochMarkersVisible() : false;
 }
 
+void ChannelDataView::setClippingVisible(bool visible)
+{
+    if (m_pRhiView)
+        m_pRhiView->setClippingVisible(visible);
+}
+
+bool ChannelDataView::clippingVisible() const
+{
+    return m_pRhiView ? m_pRhiView->clippingVisible() : false;
+}
+
+void ChannelDataView::setZScoreMode(bool enabled)
+{
+    if (m_pRhiView)
+        m_pRhiView->setZScoreMode(enabled);
+}
+
+bool ChannelDataView::zScoreMode() const
+{
+    return m_pRhiView ? m_pRhiView->zScoreMode() : false;
+}
+
 //=============================================================================================================
 
 void ChannelDataView::setReferenceMarkers(const QVector<TimeRulerReferenceMark> &markers)
@@ -1005,6 +1027,14 @@ void ChannelDataView::keyPressEvent(QKeyEvent *event)
     case Qt::Key_G:
         setEpochMarkersVisible(!epochMarkersVisible());
         emit epochMarkersToggled(epochMarkersVisible());
+        break;
+    case Qt::Key_C:
+        setClippingVisible(!clippingVisible());
+        emit clippingToggled(clippingVisible());
+        break;
+    case Qt::Key_Z:
+        setZScoreMode(!zScoreMode());
+        emit zScoreModeToggled(zScoreMode());
         break;
     case Qt::Key_A:
         if (event->modifiers() & Qt::ShiftModifier) {

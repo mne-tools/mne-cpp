@@ -288,6 +288,12 @@ public:
     void setEpochMarkersVisible(bool visible);
     bool epochMarkersVisible() const;
 
+    void setClippingVisible(bool visible);
+    bool clippingVisible() const;
+
+    void setZScoreMode(bool enabled);
+    bool zScoreMode() const;
+
     //=========================================================================================================
     /**
      * Set the list of persistent sample/reference markers shown in the time ruler.
@@ -459,6 +465,8 @@ signals:
     void overviewBarToggled(bool on);
     void scrollSpeedChanged(float factor);
     void epochMarkersToggled(bool on);
+    void clippingToggled(bool on);
+    void zScoreModeToggled(bool on);
 
     //=========================================================================================================
     /**

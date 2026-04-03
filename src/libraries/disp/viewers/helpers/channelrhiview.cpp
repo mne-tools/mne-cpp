@@ -691,6 +691,28 @@ void ChannelRhiView::setEpochMarkersVisible(bool visible)
 
 //=============================================================================================================
 
+void ChannelRhiView::setClippingVisible(bool visible)
+{
+    if (m_bShowClipping == visible)
+        return;
+    m_bShowClipping = visible;
+    m_tileDirty = true;
+    update();
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::setZScoreMode(bool enabled)
+{
+    if (m_bZScoreMode == enabled)
+        return;
+    m_bZScoreMode = enabled;
+    m_tileDirty = true;
+    update();
+}
+
+//=============================================================================================================
+
 void ChannelRhiView::setAnnotations(const QVector<AnnotationSpan> &annotations)
 {
     m_annotations = annotations;
@@ -1540,13 +1562,16 @@ void ChannelRhiView::scheduleTileRebuild()
     QVector<EventMarker> eventsSnap   = m_bShowEvents ? m_events : QVector<EventMarker>();
     QVector<AnnotationSpan> annotationsSnap = m_bShowAnnotations ? m_annotations : QVector<AnnotationSpan>();
     QVector<int> epochSnap = m_bShowEpochMarkers ? m_epochTriggerSamples : QVector<int>();
+    bool clipSnap = m_bShowClipping;
+    bool zscoreSnap = m_bZScoreMode;
 
     m_tileDirty          = false; // cleared now — any new event will set it true again
     m_tileRebuildPending = true;
     m_tileWatcher.setFuture(QtConcurrent::run([=]() {
         return ChannelRhiView::buildTile(model, scrollSample, spp, firstCh, visCnt,
                                          pw, ph, bg, gridVis, sfreq, firstFileSample,
-                                         hideBad, chIndices, eventsSnap, annotationsSnap, epochSnap);
+                                         hideBad, chIndices, eventsSnap, annotationsSnap, epochSnap,
+                                         clipSnap, zscoreSnap);
     }));
 }
 
@@ -1563,7 +1588,9 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
     const QVector<int> &channelIndices,
     const QVector<EventMarker> &events,
     const QVector<AnnotationSpan> &annotations,
-    const QVector<int> &epochMarkers)
+    const QVector<int> &epochMarkers,
+    bool showClipping,
+    bool zScoreMode)
 {
     TileResult out;
     out.samplesPerPixel = spp;
@@ -1741,21 +1768,80 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
             continue;
 
         QColor col = info.bad ? QColor(190, 40, 40) : info.color;
-        p.setPen(QPen(col, 1.2));
+        QPen normalPen(col, 1.2);
+        QPen clipPen(QColor(255, 0, 0), 1.6);
 
         float yMid   = (i + 0.5f) * laneH;
-        float yScale = (laneH * 0.45f) / (info.amplitudeMax > 0.f ? info.amplitudeMax : 1.f);
-
         int nVerts = verts.size() / 2;
-        QPolygonF poly;
-        poly.reserve(nVerts);
-        for (int v = 0; v < nVerts; ++v) {
-            float samplePos = vboFirst + verts[v * 2];
-            float xPx = (samplePos - tileStart) / spp;
-            float yPx = yMid - verts[v * 2 + 1] * yScale;
-            poly.append(QPointF(xPx, yPx));
+        float yScale;
+
+        // Z-score normalization: compute mean and std of visible amplitudes
+        float zMean = 0.f, zStd = 1.f;
+        if (zScoreMode && nVerts > 1) {
+            double sum = 0.0, sumSq = 0.0;
+            for (int v = 0; v < nVerts; ++v) {
+                double a = static_cast<double>(verts[v * 2 + 1]);
+                sum   += a;
+                sumSq += a * a;
+            }
+            zMean = static_cast<float>(sum / nVerts);
+            double var = sumSq / nVerts - static_cast<double>(zMean) * zMean;
+            zStd  = var > 0.0 ? static_cast<float>(qSqrt(var)) : 1.f;
+            // Map ±4 std devs to fill the lane
+            yScale = (laneH * 0.45f) / 4.f;
+        } else {
+            yScale = (laneH * 0.45f) / (info.amplitudeMax > 0.f ? info.amplitudeMax : 1.f);
         }
-        p.drawPolyline(poly);
+
+        // Threshold for clipping: 95% of max amplitude (disabled in z-score mode)
+        float clipThresh = 0.95f * info.amplitudeMax;
+        bool doClip = showClipping && !info.bad && !zScoreMode && clipThresh > 0.f;
+
+        if (!doClip) {
+            // Fast path: single polyline, no clipping check
+            p.setPen(normalPen);
+            QPolygonF poly;
+            poly.reserve(nVerts);
+            for (int v = 0; v < nVerts; ++v) {
+                float samplePos = vboFirst + verts[v * 2];
+                float xPx = (samplePos - tileStart) / spp;
+                float amp = verts[v * 2 + 1];
+                if (zScoreMode) amp = (amp - zMean) / zStd;
+                float yPx = yMid - amp * yScale;
+                poly.append(QPointF(xPx, yPx));
+            }
+            p.drawPolyline(poly);
+        } else {
+            // Clipping-aware path: split polyline into normal/clipped segments
+            QPolygonF seg;
+            seg.reserve(nVerts);
+            bool prevClipped = false;
+
+            for (int v = 0; v < nVerts; ++v) {
+                float amp = verts[v * 2 + 1];
+                float samplePos = vboFirst + verts[v * 2];
+                float xPx = (samplePos - tileStart) / spp;
+                float yPx = yMid - amp * yScale;
+                bool clipped = qAbs(amp) >= clipThresh;
+
+                if (v > 0 && clipped != prevClipped) {
+                    // State change — flush current segment, start new one
+                    // Include current point in the end of old segment for continuity
+                    seg.append(QPointF(xPx, yPx));
+                    p.setPen(prevClipped ? clipPen : normalPen);
+                    p.drawPolyline(seg);
+                    // Start new segment from current point
+                    seg.clear();
+                }
+                seg.append(QPointF(xPx, yPx));
+                prevClipped = clipped;
+            }
+            // Draw remaining segment
+            if (seg.size() > 1) {
+                p.setPen(prevClipped ? clipPen : normalPen);
+                p.drawPolyline(seg);
+            }
+        }
     }
 
     // ── Event / stimulus marker pass ─────────────────────────────────

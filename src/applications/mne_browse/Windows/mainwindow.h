@@ -454,6 +454,8 @@ private:
      */
     void setupMainWindow();
 
+    void applyViewSettingsToDataView();
+
 protected:
     //=========================================================================================================
     /**
@@ -521,6 +523,8 @@ protected:
     QAction*                m_pAnnotationsVisibleAction;    /**< Toggle annotation span visibility (Shift+A). */
     QAction*                m_pOverviewBarAction;           /**< Toggle overview bar visibility (O). */
     QAction*                m_pEpochMarkersAction;          /**< Toggle epoch grid lines (G). */
+    QAction*                m_pClippingAction;              /**< Toggle clipping detection (C). */
+    QAction*                m_pZScoreAction;                /**< Toggle z-score normalization (Z). */
     QAction*                m_pWhitenButterflyAction;       /**< Toggle whitening in the average butterfly plot. */
     QAction*                m_pAnnotationModeAction;        /**< Toggle Shift-drag annotation selection in the raw browser. */
     QList<MNELIB::MNEEpochDataList> m_epochReviewLists;     /**< Reviewed epochs grouped by event code. */

@@ -145,6 +145,12 @@ public:
     void setEpochMarkersVisible(bool visible);
     bool epochMarkersVisible() const { return m_bShowEpochMarkers; }
 
+    void setClippingVisible(bool visible);
+    bool clippingVisible() const { return m_bShowClipping; }
+
+    void setZScoreMode(bool enabled);
+    bool zScoreMode() const { return m_bZScoreMode; }
+
     //=========================================================================================================
     /**
      * Set the list of time-span annotations to overlay on the traces.
@@ -492,7 +498,9 @@ private:
                                 const QVector<int> &channelIndices,
                                 const QVector<EventMarker> &events,
                                 const QVector<AnnotationSpan> &annotations,
-                                const QVector<int> &epochMarkers);
+                                const QVector<int> &epochMarkers,
+                                bool  showClipping,
+                                bool  zScoreMode);
     bool isTileFresh() const;
 
     QImage m_tileImage;
@@ -561,6 +569,8 @@ private:
     bool m_bShowEvents      = true;
     bool m_bShowAnnotations = true;
     bool m_bShowEpochMarkers = true;
+    bool m_bShowClipping     = true;
+    bool m_bZScoreMode       = false;
 
     // ── Annotation boundary drag-resize ───────────────────────────────
     bool m_annDragging         = false;   ///< True while dragging an annotation boundary.

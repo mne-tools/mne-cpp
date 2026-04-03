@@ -1365,6 +1365,14 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
             // Toggle epoch grid lines
             m_pChannelDataView->setEpochMarkersVisible(!m_pChannelDataView->epochMarkersVisible());
             break;
+        case Qt::Key_C:
+            // Toggle clipping detection
+            m_pChannelDataView->setClippingVisible(!m_pChannelDataView->clippingVisible());
+            break;
+        case Qt::Key_Z:
+            // Toggle z-score normalization
+            m_pChannelDataView->setZScoreMode(!m_pChannelDataView->zScoreMode());
+            break;
         case Qt::Key_A:
             if (event->modifiers() & Qt::ShiftModifier) {
                 // Toggle annotation span visibility
@@ -1402,6 +1410,7 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
                        "<br>"
                        "<b>Display:</b><br>"
                        "B — Toggle butterfly mode<br>"
+                       "C — Toggle clipping detection<br>"
                        "D — Toggle DC removal<br>"
                        "E — Toggle event markers<br>"
                        "G — Toggle epoch grid lines<br>"
@@ -1409,6 +1418,7 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
                        "S — Toggle scalebars<br>"
                        "T — Toggle time format (seconds / clock)<br>"
                        "X — Toggle crosshair cursor<br>"
+                       "Z — Toggle z-score normalization<br>"
                        "Shift+A — Toggle annotation spans<br>"
                        "[ / ] — Decrease/increase scroll speed<br>"
                        "Ctrl+D — Clear channel selection<br>"

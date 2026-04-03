@@ -1456,6 +1456,10 @@ void MainWindow::setupWindowWidgets()
                 m_pOverviewBarAction, &QAction::setChecked);
         connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::epochMarkersToggled,
                 m_pEpochMarkersAction, &QAction::setChecked);
+        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::clippingToggled,
+                m_pClippingAction, &QAction::setChecked);
+        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::zScoreModeToggled,
+                m_pZScoreAction, &QAction::setChecked);
         connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::scrollSpeedChanged,
                 this, [this](float factor){
                     statusBar()->showMessage(QString("Scroll speed: %1x").arg(factor, 0, 'f', 2), 2000);
@@ -1745,6 +1749,44 @@ void MainWindow::createToolBar()
             m_pDataWindow->getChannelDataView()->setEpochMarkersVisible(checked);
     });
     toolBar->addAction(m_pEpochMarkersAction);
+
+    //Toggle clipping detection (C)
+    QIcon clipIcon = makeIcon([](QPainter& p, int sz){
+        QFont f = p.font();
+        f.setPixelSize(sz * 0.45);
+        f.setBold(true);
+        p.setFont(f);
+        p.setPen(QColor(0xCC, 0x00, 0x00));
+        p.drawText(QRect(0,0,sz,sz), Qt::AlignCenter, "C");
+    });
+    m_pClippingAction = new QAction(clipIcon, tr("Toggle clipping detection (C)"), this);
+    m_pClippingAction->setCheckable(true);
+    m_pClippingAction->setChecked(true);
+    m_pClippingAction->setStatusTip(tr("Highlight clipped / saturated signal segments in red"));
+    connect(m_pClippingAction, &QAction::triggered, [this](bool checked){
+        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+            m_pDataWindow->getChannelDataView()->setClippingVisible(checked);
+    });
+    toolBar->addAction(m_pClippingAction);
+
+    //Toggle z-score normalization (Z)
+    QIcon zscoreIcon = makeIcon([](QPainter& p, int sz){
+        QFont f = p.font();
+        f.setPixelSize(sz * 0.45);
+        f.setBold(true);
+        p.setFont(f);
+        p.setPen(QColor(0x20, 0x60, 0xB0));
+        p.drawText(QRect(0,0,sz,sz), Qt::AlignCenter, "Z");
+    });
+    m_pZScoreAction = new QAction(zscoreIcon, tr("Toggle z-score normalization (Z)"), this);
+    m_pZScoreAction->setCheckable(true);
+    m_pZScoreAction->setChecked(false);
+    m_pZScoreAction->setStatusTip(tr("Normalize each channel by its z-score (mean/std) for uniform scaling"));
+    connect(m_pZScoreAction, &QAction::triggered, [this](bool checked){
+        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+            m_pDataWindow->getChannelDataView()->setZScoreMode(checked);
+    });
+    toolBar->addAction(m_pZScoreAction);
 
     //Toggle overview bar (O)
     QIcon overviewIcon = makeIcon([](QPainter& p, int sz){
@@ -2115,9 +2157,47 @@ void MainWindow::setupMainWindow()
         m_pOverviewBarAction->setChecked(m_qSettings.value("MainWindow/View/overviewBar").toBool());
     if (m_pEpochMarkersAction && m_qSettings.contains("MainWindow/View/epochMarkers"))
         m_pEpochMarkersAction->setChecked(m_qSettings.value("MainWindow/View/epochMarkers").toBool());
+    if (m_pClippingAction && m_qSettings.contains("MainWindow/View/clipping"))
+        m_pClippingAction->setChecked(m_qSettings.value("MainWindow/View/clipping").toBool());
+    if (m_pZScoreAction && m_qSettings.contains("MainWindow/View/zScore"))
+        m_pZScoreAction->setChecked(m_qSettings.value("MainWindow/View/zScore").toBool());
 
     //Set data window as central widget - This is needed because we are using QDockWidgets
     setCentralWidget(m_pDataWindow);
+
+    // Apply saved view states to the actual ChannelDataView
+    applyViewSettingsToDataView();
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::applyViewSettingsToDataView()
+{
+    auto view = m_pDataWindow ? m_pDataWindow->getChannelDataView() : nullptr;
+    if (!view)
+        return;
+
+    if (m_pCrosshairAction)
+        view->setCrosshairEnabled(m_pCrosshairAction->isChecked());
+    if (m_pButterflyAction)
+        view->setButterflyMode(m_pButterflyAction->isChecked());
+    if (m_pScalebarsAction)
+        view->setScalebarsVisible(m_pScalebarsAction->isChecked());
+    if (m_pEventsVisibleAction)
+        view->setEventsVisible(m_pEventsVisibleAction->isChecked());
+    if (m_pAnnotationsVisibleAction)
+        view->setAnnotationsVisible(m_pAnnotationsVisibleAction->isChecked());
+    if (m_pOverviewBarAction)
+        view->setOverviewBarVisible(m_pOverviewBarAction->isChecked());
+    if (m_pEpochMarkersAction)
+        view->setEpochMarkersVisible(m_pEpochMarkersAction->isChecked());
+    if (m_pClippingAction)
+        view->setClippingVisible(m_pClippingAction->isChecked());
+    if (m_pZScoreAction)
+        view->setZScoreMode(m_pZScoreAction->isChecked());
+    if (m_pRemoveDCAction && m_pRemoveDCAction->toolTip().contains("Add"))
+        view->setRemoveDC(true);
 }
 
 
@@ -2344,6 +2424,8 @@ void MainWindow::openFile()
             }
 
             setWindowStatus();
+            if (ok)
+                applyViewSettingsToDataView();
             m_qFileRaw.close();
         }
     };
@@ -2670,6 +2752,10 @@ bool MainWindow::loadRawFile(const QString& filename)
     }
 
     setWindowStatus();
+
+    if (ok)
+        applyViewSettingsToDataView();
+
     return ok;
 }
 
@@ -3739,6 +3825,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
         m_qSettings.setValue("MainWindow/View/overviewBar", m_pOverviewBarAction->isChecked());
     if (m_pEpochMarkersAction)
         m_qSettings.setValue("MainWindow/View/epochMarkers", m_pEpochMarkersAction->isChecked());
+    if (m_pClippingAction)
+        m_qSettings.setValue("MainWindow/View/clipping", m_pClippingAction->isChecked());
+    if (m_pZScoreAction)
+        m_qSettings.setValue("MainWindow/View/zScore", m_pZScoreAction->isChecked());
 
     QMainWindow::closeEvent(event);
 }
