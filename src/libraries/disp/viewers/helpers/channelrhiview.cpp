@@ -669,6 +669,28 @@ void ChannelRhiView::setEvents(const QVector<EventMarker> &events)
 
 //=============================================================================================================
 
+void ChannelRhiView::setEpochMarkers(const QVector<int> &triggerSamples)
+{
+    m_epochTriggerSamples = triggerSamples;
+    m_tileDirty = true;
+    m_overlayDirty = true;
+    update();
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::setEpochMarkersVisible(bool visible)
+{
+    if (m_bShowEpochMarkers == visible)
+        return;
+    m_bShowEpochMarkers = visible;
+    m_tileDirty = true;
+    m_overlayDirty = true;
+    update();
+}
+
+//=============================================================================================================
+
 void ChannelRhiView::setAnnotations(const QVector<AnnotationSpan> &annotations)
 {
     m_annotations = annotations;
@@ -1196,6 +1218,18 @@ void ChannelRhiView::rebuildOverlayImage(int logicalWidth, int logicalHeight, qr
         }
     }
 
+    // ── Epoch trigger marker lines ──────────────────────────────────
+    if (m_bShowEpochMarkers && !m_epochTriggerSamples.isEmpty()) {
+        QPen epochPen(QColor(100, 100, 100, 140), 1, Qt::DashLine);
+        p.setPen(epochPen);
+        for (int trigSample : m_epochTriggerSamples) {
+            float xF = (static_cast<float>(trigSample) - m_scrollSample) / m_samplesPerPixel;
+            if (xF < -2.f || xF > logicalWidth + 2.f)
+                continue;
+            p.drawLine(QPointF(xF, 0.f), QPointF(xF, static_cast<float>(logicalHeight)));
+        }
+    }
+
     m_overlayDirty = false;
 }
 
@@ -1505,13 +1539,14 @@ void ChannelRhiView::scheduleTileRebuild()
     QVector<int>      chIndices       = m_filteredChannels; // snapshot for worker
     QVector<EventMarker> eventsSnap   = m_bShowEvents ? m_events : QVector<EventMarker>();
     QVector<AnnotationSpan> annotationsSnap = m_bShowAnnotations ? m_annotations : QVector<AnnotationSpan>();
+    QVector<int> epochSnap = m_bShowEpochMarkers ? m_epochTriggerSamples : QVector<int>();
 
     m_tileDirty          = false; // cleared now — any new event will set it true again
     m_tileRebuildPending = true;
     m_tileWatcher.setFuture(QtConcurrent::run([=]() {
         return ChannelRhiView::buildTile(model, scrollSample, spp, firstCh, visCnt,
                                          pw, ph, bg, gridVis, sfreq, firstFileSample,
-                                         hideBad, chIndices, eventsSnap, annotationsSnap);
+                                         hideBad, chIndices, eventsSnap, annotationsSnap, epochSnap);
     }));
 }
 
@@ -1527,7 +1562,8 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
     bool hideBadChannels,
     const QVector<int> &channelIndices,
     const QVector<EventMarker> &events,
-    const QVector<AnnotationSpan> &annotations)
+    const QVector<AnnotationSpan> &annotations,
+    const QVector<int> &epochMarkers)
 {
     TileResult out;
     out.samplesPerPixel = spp;
@@ -1735,6 +1771,20 @@ ChannelRhiView::TileResult ChannelRhiView::buildTile(
             QColor lineColor = ev.color;
             lineColor.setAlpha(180);
             p.setPen(QPen(lineColor, 1));
+            p.drawLine(ix, 0, ix, ph);
+        }
+    }
+
+    // ── Epoch trigger marker pass ────────────────────────────────────
+    // Draw dashed grey vertical lines at epoch trigger positions.
+    if (!epochMarkers.isEmpty() && spp > 0.f) {
+        QPen epochPen(QColor(100, 100, 100, 140), 1, Qt::DashLine);
+        p.setPen(epochPen);
+        for (int trigSample : epochMarkers) {
+            float xF = (static_cast<float>(trigSample) - tileStart) / spp;
+            if (xF < -2.f || xF > tilePixWidth + 2.f)
+                continue;
+            int ix = static_cast<int>(xF);
             p.drawLine(ix, 0, ix, ph);
         }
     }

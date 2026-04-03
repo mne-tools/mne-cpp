@@ -1377,6 +1377,16 @@ void MainWindow::setupWindowWidgets()
     connect(m_pEpochWindow->getEpochModel(), &EpochModel::epochsChanged,
             this, [this]() {
                 refreshReviewedEvokedSet(QStringLiteral("Evoked responses updated from the reviewed epochs."));
+
+                // Push epoch trigger positions to the signal view as dashed grid lines
+                if (m_pDataWindow && m_pDataWindow->getChannelDataView()) {
+                    EpochModel* em = m_pEpochWindow->getEpochModel();
+                    QVector<int> triggers;
+                    triggers.reserve(em->rowCount());
+                    for (int r = 0; r < em->rowCount(); ++r)
+                        triggers.append(em->sampleAt(r));
+                    m_pDataWindow->getChannelDataView()->setEpochMarkers(triggers);
+                }
             });
 
     connect(m_pCovarianceWindow, &CovarianceWindow::whiteningSettingsChanged,
@@ -1444,6 +1454,8 @@ void MainWindow::setupWindowWidgets()
                 m_pAnnotationsVisibleAction, &QAction::setChecked);
         connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::overviewBarToggled,
                 m_pOverviewBarAction, &QAction::setChecked);
+        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::epochMarkersToggled,
+                m_pEpochMarkersAction, &QAction::setChecked);
         connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::scrollSpeedChanged,
                 this, [this](float factor){
                     statusBar()->showMessage(QString("Scroll speed: %1x").arg(factor, 0, 'f', 2), 2000);
@@ -1715,6 +1727,25 @@ void MainWindow::createToolBar()
     });
     toolBar->addAction(m_pAnnotationsVisibleAction);
 
+    //Toggle epoch grid lines (G)
+    QIcon epochIcon = makeIcon([](QPainter& p, int sz){
+        QFont f = p.font();
+        f.setPixelSize(sz * 0.45);
+        f.setBold(true);
+        p.setFont(f);
+        p.setPen(QColor(0x60, 0x60, 0x60));
+        p.drawText(QRect(0,0,sz,sz), Qt::AlignCenter, "G");
+    });
+    m_pEpochMarkersAction = new QAction(epochIcon, tr("Toggle epoch grid lines (G)"), this);
+    m_pEpochMarkersAction->setCheckable(true);
+    m_pEpochMarkersAction->setChecked(true);
+    m_pEpochMarkersAction->setStatusTip(tr("Show or hide dashed epoch trigger lines"));
+    connect(m_pEpochMarkersAction, &QAction::triggered, [this](bool checked){
+        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+            m_pDataWindow->getChannelDataView()->setEpochMarkersVisible(checked);
+    });
+    toolBar->addAction(m_pEpochMarkersAction);
+
     //Toggle overview bar (O)
     QIcon overviewIcon = makeIcon([](QPainter& p, int sz){
         QFont f = p.font();
@@ -1752,6 +1783,41 @@ void MainWindow::createToolBar()
             m_pDataWindow->getChannelDataView()->toggleTimeFormat();
     });
     toolBar->addAction(timeFormatAction);
+
+    //Sort channels by type
+    QIcon sortIcon = makeIcon([](QPainter& p, int sz){
+        QFont f = p.font();
+        f.setPixelSize(sz * 0.30);
+        f.setBold(true);
+        p.setFont(f);
+        p.setPen(QColor(0x50, 0x50, 0xa0));
+        p.drawText(QRect(0, 0, sz, sz/2), Qt::AlignCenter, "A↓");
+        p.drawText(QRect(0, sz/2, sz, sz/2), Qt::AlignCenter, "Z");
+    });
+    QAction* sortByTypeAction = new QAction(sortIcon, tr("Sort channels by type"), this);
+    sortByTypeAction->setStatusTip(tr("Group channels by type: MEG grad, MEG mag, EEG, EOG, ECG, ..."));
+    connect(sortByTypeAction, &QAction::triggered, [this](){
+        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+            m_pDataWindow->getChannelDataView()->sortChannelsByType();
+    });
+    toolBar->addAction(sortByTypeAction);
+
+    //Reset channel order
+    QIcon resetOrderIcon = makeIcon([](QPainter& p, int sz){
+        QFont f = p.font();
+        f.setPixelSize(sz * 0.30);
+        f.setBold(true);
+        p.setFont(f);
+        p.setPen(QColor(0xa0, 0x50, 0x50));
+        p.drawText(QRect(0, 0, sz, sz), Qt::AlignCenter, "#↓");
+    });
+    QAction* resetOrderAction = new QAction(resetOrderIcon, tr("Reset channel order"), this);
+    resetOrderAction->setStatusTip(tr("Restore original channel order from file"));
+    connect(resetOrderAction, &QAction::triggered, [this](){
+        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+            m_pDataWindow->getChannelDataView()->resetChannelOrder();
+    });
+    toolBar->addAction(resetOrderAction);
 
     toolBar->addSeparator();
 
@@ -1988,6 +2054,7 @@ void MainWindow::connectMenus()
                "B — Toggle butterfly mode<br>"
                "D — Toggle DC removal<br>"
                "E — Toggle event markers<br>"
+               "G — Toggle epoch grid lines<br>"
                "O — Toggle overview bar<br>"
                "S — Toggle scalebars<br>"
                "T — Toggle time format (seconds / clock)<br>"
@@ -2046,6 +2113,8 @@ void MainWindow::setupMainWindow()
         m_pAnnotationsVisibleAction->setChecked(m_qSettings.value("MainWindow/View/annotationsVisible").toBool());
     if (m_pOverviewBarAction && m_qSettings.contains("MainWindow/View/overviewBar"))
         m_pOverviewBarAction->setChecked(m_qSettings.value("MainWindow/View/overviewBar").toBool());
+    if (m_pEpochMarkersAction && m_qSettings.contains("MainWindow/View/epochMarkers"))
+        m_pEpochMarkersAction->setChecked(m_qSettings.value("MainWindow/View/epochMarkers").toBool());
 
     //Set data window as central widget - This is needed because we are using QDockWidgets
     setCentralWidget(m_pDataWindow);
@@ -3056,6 +3125,16 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
     }
     m_pEpochWindow->refreshFromModel();
 
+    // Push epoch grid lines to the signal view (signal was blocked above)
+    if (m_pDataWindow && m_pDataWindow->getChannelDataView()) {
+        EpochModel* em = m_pEpochWindow->getEpochModel();
+        QVector<int> triggers;
+        triggers.reserve(em->rowCount());
+        for (int r = 0; r < em->rowCount(); ++r)
+            triggers.append(em->sampleAt(r));
+        m_pDataWindow->getChannelDataView()->setEpochMarkers(triggers);
+    }
+
     if(!m_pEpochWindow->isVisible()) {
         m_pEpochWindow->show();
     }
@@ -3658,6 +3737,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
         m_qSettings.setValue("MainWindow/View/annotationsVisible", m_pAnnotationsVisibleAction->isChecked());
     if (m_pOverviewBarAction)
         m_qSettings.setValue("MainWindow/View/overviewBar", m_pOverviewBarAction->isChecked());
+    if (m_pEpochMarkersAction)
+        m_qSettings.setValue("MainWindow/View/epochMarkers", m_pEpochMarkersAction->isChecked());
 
     QMainWindow::closeEvent(event);
 }

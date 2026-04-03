@@ -53,6 +53,8 @@
 #include <QScrollBar>
 #include <QToolButton>
 #include <QKeyEvent>
+#include <algorithm>
+#include <numeric>
 #include <QResizeEvent>
 #include <QSettings>
 #include <QLabel>
@@ -612,6 +614,25 @@ void ChannelDataView::setEvents(const QVector<ChannelRhiView::EventMarker> &even
 
 //=============================================================================================================
 
+void ChannelDataView::setEpochMarkers(const QVector<int> &triggerSamples)
+{
+    if (m_pRhiView)
+        m_pRhiView->setEpochMarkers(triggerSamples);
+}
+
+void ChannelDataView::setEpochMarkersVisible(bool visible)
+{
+    if (m_pRhiView)
+        m_pRhiView->setEpochMarkersVisible(visible);
+}
+
+bool ChannelDataView::epochMarkersVisible() const
+{
+    return m_pRhiView ? m_pRhiView->epochMarkersVisible() : false;
+}
+
+//=============================================================================================================
+
 void ChannelDataView::setReferenceMarkers(const QVector<TimeRulerReferenceMark> &markers)
 {
     if (m_pTimeRuler)
@@ -686,6 +707,46 @@ void ChannelDataView::setScrollSpeedFactor(float factor)
 float ChannelDataView::scrollSpeedFactor() const
 {
     return m_pRhiView ? m_pRhiView->scrollSpeedFactor() : 1.0f;
+}
+
+//=============================================================================================================
+
+void ChannelDataView::sortChannelsByType()
+{
+    if (!m_pModel)
+        return;
+
+    // Define a canonical type ordering
+    static const QStringList typeOrder = {
+        "MEG grad", "MEG mag", "EEG", "EOG", "ECG", "EMG", "STIM", "MISC"
+    };
+
+    const int n = m_pModel->channelCount();
+    QVector<int> indices(n);
+    std::iota(indices.begin(), indices.end(), 0);
+
+    std::stable_sort(indices.begin(), indices.end(), [&](int a, int b) {
+        int ia = typeOrder.indexOf(m_pModel->channelInfo(a).typeLabel);
+        int ib = typeOrder.indexOf(m_pModel->channelInfo(b).typeLabel);
+        if (ia < 0) ia = typeOrder.size();
+        if (ib < 0) ib = typeOrder.size();
+        return ia < ib;
+    });
+
+    if (m_pRhiView)
+        m_pRhiView->setChannelIndices(indices);
+    if (m_pLabelPanel)
+        m_pLabelPanel->setChannelIndices(indices);
+    updateChannelScrollBarRange();
+}
+
+void ChannelDataView::resetChannelOrder()
+{
+    if (m_pRhiView)
+        m_pRhiView->setChannelIndices({});
+    if (m_pLabelPanel)
+        m_pLabelPanel->setChannelIndices({});
+    updateChannelScrollBarRange();
 }
 
 //=============================================================================================================
@@ -940,6 +1001,10 @@ void ChannelDataView::keyPressEvent(QKeyEvent *event)
     case Qt::Key_E:
         setEventsVisible(!eventsVisible());
         emit eventsVisibleToggled(eventsVisible());
+        break;
+    case Qt::Key_G:
+        setEpochMarkersVisible(!epochMarkersVisible());
+        emit epochMarkersToggled(epochMarkersVisible());
         break;
     case Qt::Key_A:
         if (event->modifiers() & Qt::ShiftModifier) {

@@ -1361,6 +1361,10 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
             // Toggle event marker visibility
             m_pChannelDataView->setEventsVisible(!m_pChannelDataView->eventsVisible());
             break;
+        case Qt::Key_G:
+            // Toggle epoch grid lines
+            m_pChannelDataView->setEpochMarkersVisible(!m_pChannelDataView->epochMarkersVisible());
+            break;
         case Qt::Key_A:
             if (event->modifiers() & Qt::ShiftModifier) {
                 // Toggle annotation span visibility
@@ -1400,6 +1404,7 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
                        "B — Toggle butterfly mode<br>"
                        "D — Toggle DC removal<br>"
                        "E — Toggle event markers<br>"
+                       "G — Toggle epoch grid lines<br>"
                        "O — Toggle overview bar<br>"
                        "S — Toggle scalebars<br>"
                        "T — Toggle time format (seconds / clock)<br>"

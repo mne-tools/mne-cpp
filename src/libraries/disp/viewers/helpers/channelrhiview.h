@@ -141,6 +141,10 @@ public:
      */
     void setEvents(const QVector<EventMarker> &events);
 
+    void setEpochMarkers(const QVector<int> &triggerSamples);
+    void setEpochMarkersVisible(bool visible);
+    bool epochMarkersVisible() const { return m_bShowEpochMarkers; }
+
     //=========================================================================================================
     /**
      * Set the list of time-span annotations to overlay on the traces.
@@ -487,7 +491,8 @@ private:
                                 bool  hideBadChannels,
                                 const QVector<int> &channelIndices,
                                 const QVector<EventMarker> &events,
-                                const QVector<AnnotationSpan> &annotations);
+                                const QVector<AnnotationSpan> &annotations,
+                                const QVector<int> &epochMarkers);
     bool isTileFresh() const;
 
     QImage m_tileImage;
@@ -550,10 +555,12 @@ private:
 
     // ── Event / stimulus markers ──────────────────────────────────────
     QVector<EventMarker> m_events;
+    QVector<int>          m_epochTriggerSamples;
     QVector<AnnotationSpan> m_annotations;
     bool m_annotationSelectionEnabled = false;
     bool m_bShowEvents      = true;
     bool m_bShowAnnotations = true;
+    bool m_bShowEpochMarkers = true;
 
     // ── Annotation boundary drag-resize ───────────────────────────────
     bool m_annDragging         = false;   ///< True while dragging an annotation boundary.

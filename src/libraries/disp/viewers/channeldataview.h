@@ -284,6 +284,10 @@ public:
      */
     void setEvents(const QVector<ChannelRhiView::EventMarker> &events);
 
+    void setEpochMarkers(const QVector<int> &triggerSamples);
+    void setEpochMarkersVisible(bool visible);
+    bool epochMarkersVisible() const;
+
     //=========================================================================================================
     /**
      * Set the list of persistent sample/reference markers shown in the time ruler.
@@ -317,6 +321,9 @@ public:
 
     void setScrollSpeedFactor(float factor);
     float scrollSpeedFactor() const;
+
+    void sortChannelsByType();
+    void resetChannelOrder();
 
     // ── Interactive inspection features ───────────────────────────────
 
@@ -451,6 +458,7 @@ signals:
     void annotationsVisibleToggled(bool on);
     void overviewBarToggled(bool on);
     void scrollSpeedChanged(float factor);
+    void epochMarkersToggled(bool on);
 
     //=========================================================================================================
     /**
