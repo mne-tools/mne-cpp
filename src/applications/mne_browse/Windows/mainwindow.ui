@@ -60,6 +60,7 @@
      <string>Help</string>
     </property>
     <addaction name="m_aboutAction"/>
+    <addaction name="m_keyboardShortcutsAction"/>
    </widget>
    <addaction name="menuTest"/>
    <addaction name="menuAdjust"/>
@@ -119,6 +120,14 @@
   <action name="m_aboutAction">
    <property name="text">
     <string>About...</string>
+   </property>
+  </action>
+  <action name="m_keyboardShortcutsAction">
+   <property name="text">
+    <string>Keyboard Shortcuts...</string>
+   </property>
+   <property name="shortcut">
+    <string>?</string>
    </property>
   </action>
   <action name="m_channelSelectionManagerAction">

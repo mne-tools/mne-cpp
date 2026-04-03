@@ -410,6 +410,12 @@ signals:
 
     //=========================================================================================================
     /**
+     * Emitted when the user drags an annotation boundary to a new position.
+     */
+    void annotationBoundaryMoved(int annotationIndex, bool isStartBoundary, int newSample);
+
+    //=========================================================================================================
+    /**
      * Emitted when the ruler context menu requests a new sample marker.
      */
     void referenceMarkerAddRequested(int sample);

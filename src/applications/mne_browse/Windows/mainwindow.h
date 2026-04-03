@@ -454,6 +454,13 @@ private:
      */
     void setupMainWindow();
 
+protected:
+    //=========================================================================================================
+    /**
+     * Saves persistent settings (window geometry, view toggles) on close.
+     */
+    void closeEvent(QCloseEvent *event) override;
+
     //=========================================================================================================
     /**
      * setWindowStatus sets the window status depending on the loaded file state

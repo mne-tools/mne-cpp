@@ -45,6 +45,7 @@
 #include <QBuffer>
 #include <QApplication>
 #include <QCheckBox>
+#include <QCloseEvent>
 #include <QComboBox>
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -1385,6 +1386,12 @@ void MainWindow::setupWindowWidgets()
     connect(m_pDataWindow, &DataWindow::annotationRangeSelected,
             this, &MainWindow::handleAnnotationRangeSelected);
 
+    connect(m_pDataWindow, &DataWindow::annotationBoundaryMoved,
+            this, [this](int annotationIndex, bool isStartBoundary, int newSample) {
+                m_pAnnotationWindow->getAnnotationModel()->updateAnnotationBoundary(
+                    annotationIndex, isStartBoundary, newSample);
+            });
+
     // Connect crosshair cursor data to status bar
     // The signal is forwarded: ChannelRhiView → ChannelDataView → here
     if (m_pDataWindow->getChannelDataView()) {
@@ -1889,6 +1896,41 @@ void MainWindow::connectMenus()
     connect(ui->m_aboutAction, &QAction::triggered, this, [this](){
         showWindow(m_pAboutWindow);
     });
+
+    connect(ui->m_keyboardShortcutsAction, &QAction::triggered, this, [this](){
+        QMessageBox::information(this, tr("Keyboard Shortcuts"),
+            tr("<b>Navigation:</b><br>"
+               "← / → — Scroll left/right (¼ page)<br>"
+               "Shift+← / → — Scroll left/right (full page)<br>"
+               "Home / End — Decrease/increase time window<br>"
+               "+/= — Increase amplitude scale<br>"
+               "- — Decrease amplitude scale<br>"
+               "<br>"
+               "<b>Display:</b><br>"
+               "B — Toggle butterfly mode<br>"
+               "D — Toggle DC removal<br>"
+               "S — Toggle scalebars<br>"
+               "T — Toggle time format (seconds / clock)<br>"
+               "X — Toggle crosshair cursor<br>"
+               "Ctrl+D — Clear channel selection<br>"
+               "? — Show this help<br>"
+               "<br>"
+               "<b>Mouse (Data View):</b><br>"
+               "Left-drag — Pan through time<br>"
+               "Right-drag — Ruler measurement<br>"
+               "Alt+Left-drag — Pan (alternative)<br>"
+               "Double-click — Toggle channel bad/good<br>"
+               "Scroll wheel — Scroll through channels<br>"
+               "<br>"
+               "<b>Annotations:</b><br>"
+               "Enable Annotation Mode from toolbar<br>"
+               "Right-drag — Select time range for annotation<br>"
+               "Drag boundary — Resize annotation span<br>"
+               "<br>"
+               "<b>File:</b><br>"
+               "Ctrl+O — Open file<br>"
+               "Ctrl+S — Save file"));
+    });
 }
 
 
@@ -1899,6 +1941,23 @@ void MainWindow::setupMainWindow()
     //set Window functions
     resize(m_qSettings.value("MainWindow/size", QSize(MAINWINDOW_WINDOW_SIZE_W, MAINWINDOW_WINDOW_SIZE_H)).toSize()); //Resize to predefined default size
     move(m_qSettings.value("MainWindow/position", QPoint(MAINWINDOW_WINDOW_POSITION_X, MAINWINDOW_WINDOW_POSITION_Y)).toPoint()); // Move this main window to position 50/50 on the screen
+
+    // Restore dock widget layout (positions, sizes, docking areas)
+    if (m_qSettings.contains("MainWindow/state")) {
+        restoreState(m_qSettings.value("MainWindow/state").toByteArray());
+    }
+
+    // Restore view toggle states
+    if (m_pRemoveDCAction && m_qSettings.contains("MainWindow/View/removeDC"))
+        m_pRemoveDCAction->setChecked(m_qSettings.value("MainWindow/View/removeDC").toBool());
+    if (m_pHideBadAction && m_qSettings.contains("MainWindow/View/hideBad"))
+        m_pHideBadAction->setChecked(m_qSettings.value("MainWindow/View/hideBad").toBool());
+    if (m_pCrosshairAction && m_qSettings.contains("MainWindow/View/crosshair"))
+        m_pCrosshairAction->setChecked(m_qSettings.value("MainWindow/View/crosshair").toBool());
+    if (m_pButterflyAction && m_qSettings.contains("MainWindow/View/butterfly"))
+        m_pButterflyAction->setChecked(m_qSettings.value("MainWindow/View/butterfly").toBool());
+    if (m_pScalebarsAction && m_qSettings.contains("MainWindow/View/scalebars"))
+        m_pScalebarsAction->setChecked(m_qSettings.value("MainWindow/View/scalebars").toBool());
 
     //Set data window as central widget - This is needed because we are using QDockWidgets
     setCentralWidget(m_pDataWindow);
@@ -3471,4 +3530,40 @@ void MainWindow::showWindow(QWidget *window)
     }
     else // if visible raise the widget to be sure that it is not obscured by other windows
         window->hide();
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    // Save window geometry
+    m_qSettings.setValue("MainWindow/size", size());
+    m_qSettings.setValue("MainWindow/position", pos());
+    m_qSettings.setValue("MainWindow/state", saveState());
+
+    // Save dock widget visibility
+    m_qSettings.setValue("MainWindow/Docks/eventVisible", m_pEventWindow && m_pEventWindow->isVisible());
+    m_qSettings.setValue("MainWindow/Docks/annotationVisible", m_pAnnotationWindow && m_pAnnotationWindow->isVisible());
+    m_qSettings.setValue("MainWindow/Docks/filterVisible", m_pFilterWindow && m_pFilterWindow->isVisible());
+    m_qSettings.setValue("MainWindow/Docks/averageVisible", m_pAverageWindow && m_pAverageWindow->isVisible());
+    m_qSettings.setValue("MainWindow/Docks/scaleVisible", m_pScaleWindow && m_pScaleWindow->isVisible());
+    m_qSettings.setValue("MainWindow/Docks/chInfoVisible", m_pChInfoWindow && m_pChInfoWindow->isVisible());
+    m_qSettings.setValue("MainWindow/Docks/noiseReductionVisible", m_pNoiseReductionWindow && m_pNoiseReductionWindow->isVisible());
+    m_qSettings.setValue("MainWindow/Docks/epochVisible", m_pEpochWindow && m_pEpochWindow->isVisible());
+    m_qSettings.setValue("MainWindow/Docks/covarianceVisible", m_pCovarianceWindow && m_pCovarianceWindow->isVisible());
+
+    // Save view toggle states
+    if (m_pRemoveDCAction)
+        m_qSettings.setValue("MainWindow/View/removeDC", m_pRemoveDCAction->isChecked());
+    if (m_pHideBadAction)
+        m_qSettings.setValue("MainWindow/View/hideBad", m_pHideBadAction->isChecked());
+    if (m_pCrosshairAction)
+        m_qSettings.setValue("MainWindow/View/crosshair", m_pCrosshairAction->isChecked());
+    if (m_pButterflyAction)
+        m_qSettings.setValue("MainWindow/View/butterfly", m_pButterflyAction->isChecked());
+    if (m_pScalebarsAction)
+        m_qSettings.setValue("MainWindow/View/scalebars", m_pScalebarsAction->isChecked());
+
+    QMainWindow::closeEvent(event);
 }

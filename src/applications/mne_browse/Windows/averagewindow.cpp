@@ -592,6 +592,39 @@ void AverageWindow::refreshPlots()
                 // Project 3D coil/electrode position to 2D
                 selItem.m_qpChannelPosition.append(QPointF(chInfo.chpos.r0(0), chInfo.chpos.r0(1)));
             }
+
+            // Normalize positions so that items (60x30) don't overlap when
+            // repaintSelectionItems multiplies by 75.  Raw r0 values are in
+            // metres (range ~±0.12 for MEG), giving scene coords of only ~±9,
+            // far smaller than the 60-pixel item width.
+            if(!selItem.m_qpChannelPosition.isEmpty()) {
+                double xMin = 1e10, xMax = -1e10, yMin = 1e10, yMax = -1e10;
+                for(const auto& p : selItem.m_qpChannelPosition) {
+                    if(p.x() < xMin) xMin = p.x();
+                    if(p.x() > xMax) xMax = p.x();
+                    if(p.y() < yMin) yMin = p.y();
+                    if(p.y() > yMax) yMax = p.y();
+                }
+                double xRange = xMax - xMin;
+                double yRange = yMax - yMin;
+                double maxRange = qMax(xRange, yRange);
+                if(maxRange > 1e-10) {
+                    // Target: nSide * 1.5 position units so that 75 * pos
+                    // gives ~112 pixel spacing between neighbours
+                    double nSide = std::ceil(std::sqrt(
+                        static_cast<double>(selItem.m_qpChannelPosition.size())));
+                    double targetRange = nSide * 1.5;
+                    double scale = targetRange / maxRange;
+                    double xCenter = (xMin + xMax) / 2.0;
+                    double yCenter = (yMin + yMax) / 2.0;
+                    for(int p = 0; p < selItem.m_qpChannelPosition.size(); ++p) {
+                        QPointF& pt = selItem.m_qpChannelPosition[p];
+                        pt = QPointF((pt.x() - xCenter) * scale,
+                                     (pt.y() - yCenter) * scale);
+                    }
+                }
+            }
+
             selItem.m_bShowAll = true;
             m_pAverageScene->repaintSelectionItems(selItem);
             ui->m_graphicsView_layout->fitInView(m_pAverageScene->itemsBoundingRect(), Qt::KeepAspectRatio);

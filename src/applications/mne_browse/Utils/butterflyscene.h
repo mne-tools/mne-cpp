@@ -110,6 +110,7 @@ public:
 protected:
     void drawForeground(QPainter *painter, const QRectF &rect) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 
 private:
     QPointF m_crosshairPos;

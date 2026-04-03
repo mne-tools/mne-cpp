@@ -306,6 +306,9 @@ void ChannelDataView::setupLayout()
     connect(m_pRhiView, &ChannelRhiView::sampleRangeSelected,
             this, &ChannelDataView::sampleRangeSelected);
 
+    connect(m_pRhiView, &ChannelRhiView::annotationBoundaryMoved,
+            this, &ChannelDataView::annotationBoundaryMoved);
+
     // Forward crosshair cursor data to ChannelDataView consumers
     connect(m_pRhiView, &ChannelRhiView::cursorDataChanged,
             this, &ChannelDataView::cursorDataChanged);

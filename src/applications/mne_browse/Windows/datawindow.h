@@ -532,6 +532,12 @@ signals:
 
     //=========================================================================================================
     /**
+     * Forwarded when the user drags an annotation boundary to a new position.
+     */
+    void annotationBoundaryMoved(int annotationIndex, bool isStartBoundary, int newSample);
+
+    //=========================================================================================================
+    /**
      * Emitted when the user presses T to toggle the time display format.
      */
     void timeFormatToggleRequested();

@@ -388,6 +388,16 @@ signals:
 
     //=========================================================================================================
     /**
+     * Emitted when the user finishes dragging an annotation boundary.
+     *
+     * @param[in] annotationIndex  Index in the annotation span list.
+     * @param[in] isStartBoundary  True if the start boundary was dragged.
+     * @param[in] newSample        New absolute sample position of the boundary.
+     */
+    void annotationBoundaryMoved(int annotationIndex, bool isStartBoundary, int newSample);
+
+    //=========================================================================================================
+    /**
      * Emitted continuously when the crosshair is active and the mouse moves.
      *
      * @param[in] timeSec     Time at cursor in seconds relative to file start.
@@ -532,6 +542,16 @@ private:
     QVector<EventMarker> m_events;
     QVector<AnnotationSpan> m_annotations;
     bool m_annotationSelectionEnabled = false;
+
+    // ── Annotation boundary drag-resize ───────────────────────────────
+    bool m_annDragging         = false;   ///< True while dragging an annotation boundary.
+    int  m_annDragIndex        = -1;      ///< Index of the annotation being resized.
+    bool m_annDragIsStart      = true;    ///< True if dragging the start boundary.
+    int  m_annHoverIndex       = -1;      ///< Index of annotation whose boundary is under cursor.
+    bool m_annHoverIsStart     = true;    ///< True if cursor is near the start boundary.
+    static constexpr int kAnnBoundaryHitPx = 5; ///< Hit-test tolerance in pixels.
+
+    int hitTestAnnotationBoundary(int px, bool &isStart) const;
 
     // Helper — use instead of firstCh+i for actual model channel index
     int actualChannelAt(int logicalIdx) const; // maps logical → model channel index

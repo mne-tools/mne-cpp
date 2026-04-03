@@ -42,6 +42,7 @@
 
 #include <QPainter>
 #include <QGraphicsView>
+#include <QGraphicsSceneWheelEvent>
 
 
 //*************************************************************************************************************
@@ -192,4 +193,13 @@ void ButterflyScene::drawForeground(QPainter *painter, const QRectF &rect)
 
     painter->setPen(Qt::black);
     painter->drawText(textRect, Qt::AlignCenter, label);
+}
+
+
+//*************************************************************************************************************
+
+void ButterflyScene::wheelEvent(QGraphicsSceneWheelEvent *event)
+{
+    // Ignore wheel events to prevent zoom in butterfly view
+    event->accept();
 }

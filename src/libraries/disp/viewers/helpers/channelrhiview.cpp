@@ -678,6 +678,26 @@ void ChannelRhiView::setAnnotationSelectionEnabled(bool enabled)
 }
 
 //=============================================================================================================
+
+int ChannelRhiView::hitTestAnnotationBoundary(int px, bool &isStart) const
+{
+    for (int i = 0; i < m_annotations.size(); ++i) {
+        const float xStart = (static_cast<float>(m_annotations[i].startSample) - m_scrollSample) / m_samplesPerPixel;
+        const float xEnd   = (static_cast<float>(m_annotations[i].endSample + 1) - m_scrollSample) / m_samplesPerPixel;
+
+        if (qAbs(px - static_cast<int>(xStart)) <= kAnnBoundaryHitPx) {
+            isStart = true;
+            return i;
+        }
+        if (qAbs(px - static_cast<int>(xEnd)) <= kAnnBoundaryHitPx) {
+            isStart = false;
+            return i;
+        }
+    }
+    return -1;
+}
+
+//=============================================================================================================
 void ChannelRhiView::initialize(QRhiCommandBuffer *cb)
 {
     Q_UNUSED(cb);
@@ -2177,6 +2197,20 @@ void ChannelRhiView::mousePressEvent(QMouseEvent *event)
             m_pInertialAnim->stop();
             m_pInertialAnim = nullptr;
         }
+
+        // Check if clicking on an annotation boundary for drag-resize
+        if (m_annotationSelectionEnabled && !m_annotations.isEmpty()) {
+            bool isStart = false;
+            int hitIdx = hitTestAnnotationBoundary(event->position().toPoint().x(), isStart);
+            if (hitIdx >= 0) {
+                m_annDragging    = true;
+                m_annDragIndex   = hitIdx;
+                m_annDragIsStart = isStart;
+                event->accept();
+                return;
+            }
+        }
+
         if (m_frozen) {
             // Frozen: clicks still emit sampleClicked but no drag
             float samplePos = m_scrollSample
@@ -2203,6 +2237,28 @@ void ChannelRhiView::mousePressEvent(QMouseEvent *event)
 
 void ChannelRhiView::mouseMoveEvent(QMouseEvent *event)
 {
+    // ── Annotation boundary drag-resize ──────────────────────────────
+    if (m_annDragging) {
+        // Visually update the annotation boundary while dragging
+        int newSample = static_cast<int>(m_scrollSample
+            + static_cast<float>(event->position().toPoint().x()) * m_samplesPerPixel);
+        newSample = qMax(newSample, m_firstFileSample);
+        if (m_lastFileSample >= 0)
+            newSample = qMin(newSample, m_lastFileSample);
+
+        if (m_annDragIndex >= 0 && m_annDragIndex < m_annotations.size()) {
+            if (m_annDragIsStart)
+                m_annotations[m_annDragIndex].startSample = newSample;
+            else
+                m_annotations[m_annDragIndex].endSample = newSample;
+            m_overlayDirty = true;
+            m_tileDirty = true;
+            update();
+        }
+        event->accept();
+        return;
+    }
+
     if (m_rulerActive) {
         m_rulerRawX1 = event->position().toPoint().x();
         m_rulerRawY1 = event->position().toPoint().y();
@@ -2282,6 +2338,22 @@ void ChannelRhiView::mouseMoveEvent(QMouseEvent *event)
         emitCursorData();
     }
 
+    // ── Annotation boundary hover cursor ─────────────────────────────
+    if (m_annotationSelectionEnabled && !m_annotations.isEmpty()) {
+        bool isStart = false;
+        int hitIdx = hitTestAnnotationBoundary(event->position().toPoint().x(), isStart);
+        if (hitIdx >= 0) {
+            if (m_annHoverIndex != hitIdx || m_annHoverIsStart != isStart) {
+                m_annHoverIndex   = hitIdx;
+                m_annHoverIsStart = isStart;
+                setCursor(Qt::SizeHorCursor);
+            }
+        } else if (m_annHoverIndex >= 0) {
+            m_annHoverIndex = -1;
+            unsetCursor();
+        }
+    }
+
     QRhiWidget::mouseMoveEvent(event);
 }
 
@@ -2289,6 +2361,21 @@ void ChannelRhiView::mouseMoveEvent(QMouseEvent *event)
 
 void ChannelRhiView::mouseReleaseEvent(QMouseEvent *event)
 {
+    // ── Annotation boundary drag-resize completion ───────────────────
+    if (m_annDragging && event->button() == Qt::LeftButton) {
+        int newSample = static_cast<int>(m_scrollSample
+            + static_cast<float>(event->position().toPoint().x()) * m_samplesPerPixel);
+        newSample = qMax(newSample, m_firstFileSample);
+        if (m_lastFileSample >= 0)
+            newSample = qMin(newSample, m_lastFileSample);
+
+        emit annotationBoundaryMoved(m_annDragIndex, m_annDragIsStart, newSample);
+        m_annDragging  = false;
+        m_annDragIndex = -1;
+        event->accept();
+        return;
+    }
+
     if (m_rulerActive && event->button() == Qt::RightButton) {
         m_rulerRawX1 = event->position().toPoint().x();
         m_rulerRawY1 = event->position().toPoint().y();

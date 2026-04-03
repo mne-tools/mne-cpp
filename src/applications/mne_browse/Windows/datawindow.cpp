@@ -707,6 +707,8 @@ void DataWindow::initMVCSettings()
             this, &DataWindow::onChannelViewScrollChanged);
     connect(m_pChannelDataView, &DISPLIB::ChannelDataView::sampleRangeSelected,
             this, &DataWindow::annotationRangeSelected);
+    connect(m_pChannelDataView, &DISPLIB::ChannelDataView::annotationBoundaryMoved,
+            this, &DataWindow::annotationBoundaryMoved);
     connect(m_pChannelDataView, &DISPLIB::ChannelDataView::referenceMarkerAddRequested,
             this, &DataWindow::addMarkerAtSample);
     connect(m_pChannelDataView, &DISPLIB::ChannelDataView::referenceMarkerRemoveRequested,
@@ -1378,7 +1380,24 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
                        "S — Toggle scalebars<br>"
                        "T — Toggle time format (seconds / clock)<br>"
                        "X — Toggle crosshair cursor<br>"
-                       "? — Show this help"));
+                       "Ctrl+D — Clear channel selection<br>"
+                       "? — Show this help<br>"
+                       "<br>"
+                       "<b>Mouse (Data View):</b><br>"
+                       "Left-drag — Pan through time<br>"
+                       "Right-drag — Ruler measurement<br>"
+                       "Alt+Left-drag — Pan (alternative)<br>"
+                       "Double-click — Toggle channel bad/good<br>"
+                       "Scroll wheel — Scroll through channels<br>"
+                       "<br>"
+                       "<b>Annotations:</b><br>"
+                       "Enable Annotation Mode from toolbar<br>"
+                       "Right-drag — Select time range for annotation<br>"
+                       "Drag boundary — Resize annotation span<br>"
+                       "<br>"
+                       "<b>File:</b><br>"
+                       "Ctrl+O — Open file<br>"
+                       "Ctrl+S — Save file"));
             }
             break;
         default:

@@ -200,6 +200,17 @@ public:
 
     //=========================================================================================================
     /**
+     * Updates the start or end boundary of an annotation by absolute sample index.
+     *
+     * @param[in] row           Annotation row index.
+     * @param[in] isStart       True to update startSample, false for endSample.
+     * @param[in] absoluteSample New absolute sample value.
+     * @return True on success.
+     */
+    bool updateAnnotationBoundary(int row, bool isStart, int absoluteSample);
+
+    //=========================================================================================================
+    /**
      * Returns the sample range of one annotation row.
      *
      * @param[in] row   Annotation row index.

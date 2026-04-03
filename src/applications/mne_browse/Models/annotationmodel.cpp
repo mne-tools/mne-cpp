@@ -571,6 +571,35 @@ QPair<int, int> AnnotationModel::getSampleRange(int row) const
 
 //=============================================================================================================
 
+bool AnnotationModel::updateAnnotationBoundary(int row, bool isStart, int absoluteSample)
+{
+    if(row < 0 || row >= m_annotations.size()) {
+        return false;
+    }
+
+    AnnotationEntry& entry = m_annotations[row];
+
+    if(isStart) {
+        entry.startSample = absoluteSample;
+    } else {
+        entry.endSample = absoluteSample;
+    }
+
+    // Ensure start <= end
+    if(entry.startSample > entry.endSample) {
+        std::swap(entry.startSample, entry.endSample);
+    }
+
+    beginResetModel();
+    sortEntries();
+    endResetModel();
+
+    notifyAnnotationsChanged();
+    return true;
+}
+
+//=============================================================================================================
+
 QVector<AnnotationSpanData> AnnotationModel::getAnnotationSpans() const
 {
     QVector<AnnotationSpanData> spans;
