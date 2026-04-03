@@ -2,7 +2,7 @@
 
 //=============================================================================================================
 // Fragment shader for ChannelDataView GPU signal rendering.
-// Simply outputs the per-channel solid colour from the uniform block.
+// Outputs per-channel solid colour, or red for clipped segments when enabled.
 //=============================================================================================================
 
 layout(std140, binding = 0) uniform ChannelBlock {
@@ -15,11 +15,18 @@ layout(std140, binding = 0) uniform ChannelBlock {
     float u_channelYCenter;
     float u_channelYRange;
     float u_amplitudeMax;
+    float u_showClipping;
 };
+
+layout(location = 0) in float v_norm;    // interpolated normalised amplitude
 
 layout(location = 0) out vec4 fragColor;
 
 void main()
 {
-    fragColor = u_color;
+    // Clipping detection: highlight in red where |norm| >= 0.95
+    if (u_showClipping > 0.5 && abs(v_norm) >= 0.95)
+        fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    else
+        fragColor = u_color;
 }

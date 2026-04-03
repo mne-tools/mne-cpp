@@ -23,7 +23,10 @@ layout(std140, binding = 0) uniform ChannelBlock {
     float u_channelYCenter;      // NDC y of the channel row centre
     float u_channelYRange;       // NDC height of the full channel row
     float u_amplitudeMax;        // amplitude that maps to ±45 % of the row height
+    float u_showClipping;        // > 0.5 to highlight clipped segments in red
 };
+
+layout(location = 0) out float v_norm;   // normalised amplitude for clipping detection
 
 void main()
 {
@@ -40,5 +43,6 @@ void main()
     // 45 % of the half-row height per unit norm — leaves 10 % dead-band at edges
     float yNDC  = u_channelYCenter + norm * (u_channelYRange * 0.45);
 
+    v_norm = norm;
     gl_Position = vec4(xNDC, yNDC, 0.0, 1.0);
 }

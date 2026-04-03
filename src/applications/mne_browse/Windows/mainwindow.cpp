@@ -2203,6 +2203,31 @@ void MainWindow::applyViewSettingsToDataView()
 
 //*************************************************************************************************************
 
+void MainWindow::toggleFullscreen()
+{
+    if (isFullScreen())
+        showNormal();
+    else
+        showFullScreen();
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::toggleZenMode()
+{
+    // Toggle visibility of toolbar, status bar, and menu bar
+    bool visible = statusBar()->isVisible();
+    statusBar()->setVisible(!visible);
+    menuBar()->setVisible(!visible);
+    const auto toolBars = findChildren<QToolBar *>();
+    for (QToolBar *tb : toolBars)
+        tb->setVisible(!visible);
+}
+
+
+//*************************************************************************************************************
+
 void MainWindow::setWindowStatus()
 {
     //Set window title

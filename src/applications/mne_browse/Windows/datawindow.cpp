@@ -1397,6 +1397,16 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
                 emit timeFormatToggleRequested();
             }
             break;
+        case Qt::Key_F11:
+            // Toggle fullscreen
+            if (m_pMainWindow)
+                m_pMainWindow->toggleFullscreen();
+            break;
+        case Qt::Key_F:
+            // Toggle zen mode (hide toolbar, statusbar, menubar)
+            if (m_pMainWindow)
+                m_pMainWindow->toggleZenMode();
+            break;
         case Qt::Key_Question:
             // Show keyboard shortcut help
             {
@@ -1413,6 +1423,8 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
                        "C — Toggle clipping detection<br>"
                        "D — Toggle DC removal<br>"
                        "E — Toggle event markers<br>"
+                       "F — Toggle zen mode (hide UI chrome)<br>"
+                       "F11 — Toggle fullscreen<br>"
                        "G — Toggle epoch grid lines<br>"
                        "O — Toggle overview bar<br>"
                        "S — Toggle scalebars<br>"

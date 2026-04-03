@@ -78,7 +78,8 @@ constexpr int kUboOffsetViewHeight     = 32; // float
 constexpr int kUboOffsetChannelYCenter = 36; // float
 constexpr int kUboOffsetChannelYRange  = 40; // float
 constexpr int kUboOffsetAmplitudeMax   = 44; // float
-// Total used: 48 bytes  — padded to m_uboStride (≥ 256) per dynamic offset rules.
+constexpr int kUboOffsetShowClipping   = 48; // float
+// Total used: 52 bytes  — padded to m_uboStride (≥ 256) per dynamic offset rules.
 
 constexpr int kMaxChannels = 1024;  // Upper hard limit for UBO pre-allocation
 
@@ -707,6 +708,7 @@ void ChannelRhiView::setZScoreMode(bool enabled)
     if (m_bZScoreMode == enabled)
         return;
     m_bZScoreMode = enabled;
+    m_vboDirty = true;   // VBO data changes (z-score normalization)
     m_tileDirty = true;
     update();
 }
@@ -813,7 +815,7 @@ void ChannelRhiView::ensurePipeline()
         return;
 
     m_uboStride = static_cast<int>(
-        (48 + rhi->ubufAlignment() - 1) & ~(rhi->ubufAlignment() - 1));
+        (52 + rhi->ubufAlignment() - 1) & ~(rhi->ubufAlignment() - 1));
 
     // UBO has one slot per *visible* channel row, not all channels
     // In butterfly mode, we need a slot for EVERY channel (all overlaid)
@@ -847,7 +849,7 @@ void ChannelRhiView::ensurePipeline()
                 QRhiShaderResourceBinding::VertexStage |
                 QRhiShaderResourceBinding::FragmentStage,
                 m_ubo.get(),
-                48 // visible block size for the shader
+                52 // visible block size for the shader
             )
         });
         m_srb->create();
@@ -970,6 +972,24 @@ void ChannelRhiView::rebuildVBOs(QRhiResourceUpdateBatch *batch)
             continue;
         }
 
+        // Z-score normalization: replace raw amplitudes with (y - mean) / std
+        if (m_bZScoreMode) {
+            int nv = verts.size() / 2;
+            if (nv > 1) {
+                double sum = 0.0, sumSq = 0.0;
+                for (int v = 0; v < nv; ++v) {
+                    double a = static_cast<double>(verts[v * 2 + 1]);
+                    sum   += a;
+                    sumSq += a * a;
+                }
+                float mean = static_cast<float>(sum / nv);
+                double var = sumSq / nv - static_cast<double>(mean) * mean;
+                float sd   = var > 0.0 ? static_cast<float>(qSqrt(var)) : 1.f;
+                for (int v = 0; v < nv; ++v)
+                    verts[v * 2 + 1] = (verts[v * 2 + 1] - mean) / sd;
+            }
+        }
+
         int vertexCount = verts.size() / 2; // each vertex is (x, y) = 2 floats
         quint32 byteSize = static_cast<quint32>(verts.size() * sizeof(float));
 
@@ -1061,7 +1081,8 @@ void ChannelRhiView::updateUBO(QRhiResourceUpdateBatch *batch)
             writeFloat (d, kUboOffsetViewHeight,     vh);
             writeFloat (d, kUboOffsetChannelYCenter, yCenter);
             writeFloat (d, kUboOffsetChannelYRange,  yRng);
-            writeFloat (d, kUboOffsetAmplitudeMax,   info.amplitudeMax);
+            writeFloat (d, kUboOffsetAmplitudeMax,   m_bZScoreMode ? 4.f : info.amplitudeMax);
+            writeFloat (d, kUboOffsetShowClipping,   (m_bShowClipping && !info.bad && !m_bZScoreMode) ? 1.f : 0.f);
 
             batch->updateDynamicBuffer(m_ubo.get(),
                                        logCh * m_uboStride,
@@ -1118,7 +1139,8 @@ void ChannelRhiView::updateUBO(QRhiResourceUpdateBatch *batch)
         writeFloat (d, kUboOffsetViewHeight,     vh);
         writeFloat (d, kUboOffsetChannelYCenter, yCenter);
         writeFloat (d, kUboOffsetChannelYRange,  yRng);
-        writeFloat (d, kUboOffsetAmplitudeMax,   info.amplitudeMax);
+        writeFloat (d, kUboOffsetAmplitudeMax,   m_bZScoreMode ? 4.f : info.amplitudeMax);
+        writeFloat (d, kUboOffsetShowClipping,   (m_bShowClipping && !info.bad && !m_bZScoreMode) ? 1.f : 0.f);
 
         // UBO slot i corresponds to visible row i
         batch->updateDynamicBuffer(m_ubo.get(),

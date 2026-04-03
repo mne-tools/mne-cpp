@@ -236,6 +236,8 @@ public:
      * Sub-window and file accessors — used by FilterWindow, EventWindow, DataWindow.
      * These replace the former friend class declarations.
      */
+    void toggleFullscreen();
+    void toggleZenMode();
     DataWindow*             dataWindow()            const { return m_pDataWindow; }
     EventWindow*            eventWindow()           const { return m_pEventWindow; }
     ChannelSelectionView*   channelSelectionView()  const { return m_pChannelSelectionView; }
