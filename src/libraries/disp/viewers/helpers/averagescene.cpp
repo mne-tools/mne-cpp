@@ -70,6 +70,8 @@ AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
 
 void AverageScene::setScaleMap(const QMap<qint32,float> &scaleMap)
 {
+    m_qMapChScaling = scaleMap;
+
     QList<QGraphicsItem*> itemList = this->items();
 
     QListIterator<QGraphicsItem*> i(itemList);
@@ -101,9 +103,10 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
         connect(averageSceneItemTemp, &AverageSceneItem::sceneUpdateRequested,
                     this, &AverageScene::updateScene);
 
-        averageSceneItemTemp->setPos(75 * selectionSceneItemTemp->m_qpChannelPosition.x(),
-                                     -75 * selectionSceneItemTemp->m_qpChannelPosition.y());
+        averageSceneItemTemp->setPos(160 * selectionSceneItemTemp->m_qpChannelPosition.x(),
+                                     -160 * selectionSceneItemTemp->m_qpChannelPosition.y());
 
+        averageSceneItemTemp->m_scaleMap = m_qMapChScaling;
         this->addItem(averageSceneItemTemp);
     }
 }
@@ -125,9 +128,10 @@ void AverageScene::repaintSelectionItems(const DISPLIB::SelectionItem &selectedC
         connect(averageSceneItemTemp, &AverageSceneItem::sceneUpdateRequested,
                 this, &AverageScene::updateScene);
 
-        averageSceneItemTemp->setPos(75 * selectedChannelItems.m_qpChannelPosition[i].x(),
-                                     -75 * selectedChannelItems.m_qpChannelPosition[i].y());
+        averageSceneItemTemp->setPos(160 * selectedChannelItems.m_qpChannelPosition[i].x(),
+                                     -160 * selectedChannelItems.m_qpChannelPosition[i].y());
 
+        averageSceneItemTemp->m_scaleMap = m_qMapChScaling;
         this->addItem(averageSceneItemTemp);
     }
 }
@@ -193,5 +197,5 @@ void AverageScene::setSignalItemColor(const QColor &signalColor)
     }
 
     repaintItems(items);
-    update();
+    this->update();
 }

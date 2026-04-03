@@ -280,6 +280,15 @@ private:
      */
     void refreshPlots();
 
+    /**
+     * Populate the 2D layout scene from evoked channel info.
+     * Creates AverageSceneItems at positions derived from channel coordinates.
+     *
+     * @param[in] selectedRows  The currently selected evoked-set model indices.
+     * @return true if items were created, false otherwise.
+     */
+    bool populateLayoutFromEvoked(const QModelIndexList& selectedRows);
+
     //=========================================================================================================
     /**
      * saves the current layout average plot as png or svg to file

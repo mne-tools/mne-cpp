@@ -50,8 +50,11 @@
 //=============================================================================================================
 
 #include <QDate>
+#include <QImage>
 #include <QMenu>
+#include <QPainter>
 #include <QRandomGenerator>
+#include <QStandardPaths>
 #include <QTimer>
 
 
@@ -452,7 +455,9 @@ void AverageWindow::initTableViewWidgets()
             this, [this](bool loaded) {
         if(loaded) {
             ui->m_tableView_loadedSets->resizeColumnsToContents();
+            m_pAverageScene->clear();
             selectLoadedSets();
+            refreshPlots();
         } else {
             m_pAverageScene->update();
             m_pButterflyScene->clear();
@@ -471,6 +476,17 @@ void AverageWindow::initAverageSceneView()
     //Create average scene and set view
     m_pAverageScene = new AverageScene(ui->m_graphicsView_layout, this);
     ui->m_graphicsView_layout->setScene(m_pAverageScene);
+
+    // Set sensible default scale map so traces are visible before the user
+    // opens the Scale window.  The raw defaults in getDefaultScalingValue
+    // (MAG=1e-12, GRAD=1e-15) are the unit amplitude, producing extreme
+    // dScaleY values.  Here we use the same multiples that ScalingView
+    // applies to its default slider positions.
+    QMap<qint32,float> defaultScaleMap;
+    defaultScaleMap[FIFF_UNIT_T]   = 1e-11f;   // MAG
+    defaultScaleMap[FIFF_UNIT_T_M] = 1e-10f;   // GRAD
+    defaultScaleMap[FIFFV_EEG_CH]  = 1e-4f;    // EEG
+    m_pAverageScene->setScaleMap(defaultScaleMap);
 
     //Create butterfly average scene and set view
     m_pButterflyScene = new ButterflyScene(ui->m_graphicsView_butterflyPlot, this);
@@ -521,8 +537,16 @@ void AverageWindow::initButtons()
 
 void AverageWindow::initComboBoxes()
 {
+    // Butterfly tab combo
     connect(ui->m_comboBox_channelKind, &QComboBox::currentTextChanged,
             this, [this](){
+        refreshPlots();
+    });
+
+    // 2D Layout tab combo — clear scene so it re-populates with the new channel type
+    connect(ui->m_comboBox_layoutChannelKind, &QComboBox::currentTextChanged,
+            this, [this](){
+        m_pAverageScene->clear();
         refreshPlots();
     });
 }
@@ -570,65 +594,7 @@ void AverageWindow::refreshPlots()
 
     // Auto-populate layout scene if empty but evoked data is available
     if(m_pAverageScene->items().isEmpty() && !selectedRows.isEmpty()) {
-        // Find the first valid evoked to extract channel info
-        const FIFFLIB::FiffEvoked* firstEvoked = nullptr;
-        for(int i = 0; i < selectedRows.size(); ++i) {
-            firstEvoked = m_pAverageModel->getEvoked(selectedRows.at(i).row());
-            if(firstEvoked && !firstEvoked->isEmpty())
-                break;
-        }
-        if(firstEvoked) {
-            SelectionItem selItem;
-            const FIFFLIB::FiffInfo& info = firstEvoked->info;
-            for(int ch = 0; ch < info.chs.size(); ++ch) {
-                const FIFFLIB::FiffChInfo& chInfo = info.chs[ch];
-                // Only include MEG and EEG channels
-                if(chInfo.kind != FIFFV_MEG_CH && chInfo.kind != FIFFV_EEG_CH)
-                    continue;
-                selItem.m_sChannelName.append(chInfo.ch_name);
-                selItem.m_iChannelNumber.append(ch);
-                selItem.m_iChannelKind.append(chInfo.kind);
-                selItem.m_iChannelUnit.append(chInfo.unit);
-                // Project 3D coil/electrode position to 2D
-                selItem.m_qpChannelPosition.append(QPointF(chInfo.chpos.r0(0), chInfo.chpos.r0(1)));
-            }
-
-            // Normalize positions so that items (60x30) don't overlap when
-            // repaintSelectionItems multiplies by 75.  Raw r0 values are in
-            // metres (range ~±0.12 for MEG), giving scene coords of only ~±9,
-            // far smaller than the 60-pixel item width.
-            if(!selItem.m_qpChannelPosition.isEmpty()) {
-                double xMin = 1e10, xMax = -1e10, yMin = 1e10, yMax = -1e10;
-                for(const auto& p : selItem.m_qpChannelPosition) {
-                    if(p.x() < xMin) xMin = p.x();
-                    if(p.x() > xMax) xMax = p.x();
-                    if(p.y() < yMin) yMin = p.y();
-                    if(p.y() > yMax) yMax = p.y();
-                }
-                double xRange = xMax - xMin;
-                double yRange = yMax - yMin;
-                double maxRange = qMax(xRange, yRange);
-                if(maxRange > 1e-10) {
-                    // Target: nSide * 1.5 position units so that 75 * pos
-                    // gives ~112 pixel spacing between neighbours
-                    double nSide = std::ceil(std::sqrt(
-                        static_cast<double>(selItem.m_qpChannelPosition.size())));
-                    double targetRange = nSide * 1.5;
-                    double scale = targetRange / maxRange;
-                    double xCenter = (xMin + xMax) / 2.0;
-                    double yCenter = (yMin + yMax) / 2.0;
-                    for(int p = 0; p < selItem.m_qpChannelPosition.size(); ++p) {
-                        QPointF& pt = selItem.m_qpChannelPosition[p];
-                        pt = QPointF((pt.x() - xCenter) * scale,
-                                     (pt.y() - yCenter) * scale);
-                    }
-                }
-            }
-
-            selItem.m_bShowAll = true;
-            m_pAverageScene->repaintSelectionItems(selItem);
-            ui->m_graphicsView_layout->fitInView(m_pAverageScene->itemsBoundingRect(), Qt::KeepAspectRatio);
-        }
+        populateLayoutFromEvoked(selectedRows);
     }
 
     //Get current items from the average scene
@@ -677,7 +643,6 @@ void AverageWindow::refreshPlots()
 
     m_pAverageScene->update();
 
-    // Ensure 2D layout view is fitted after data update
     if(!m_pAverageScene->items().isEmpty()) {
         ui->m_graphicsView_layout->fitInView(m_pAverageScene->itemsBoundingRect(), Qt::KeepAspectRatio);
     }
@@ -755,6 +720,85 @@ void AverageWindow::selectLoadedSets()
                                                          QItemSelectionModel::Select | QItemSelectionModel::Rows);
     ui->m_tableView_loadedSets->selectionModel()->setCurrentIndex(first,
                                                                   QItemSelectionModel::Current | QItemSelectionModel::Rows);
+}
+
+
+//*************************************************************************************************************
+
+bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows)
+{
+    const FIFFLIB::FiffEvoked* firstEvoked = nullptr;
+    for(int i = 0; i < selectedRows.size(); ++i) {
+        firstEvoked = m_pAverageModel->getEvoked(selectedRows.at(i).row());
+        if(firstEvoked && !firstEvoked->isEmpty())
+            break;
+    }
+    if(!firstEvoked)
+        return false;
+
+    // Determine which channel type to show based on the layout combo box
+    const QString selectionText = ui->m_comboBox_layoutChannelKind->currentText();
+    fiff_int_t filterKind = FIFFV_MEG_CH;
+    fiff_int_t filterUnit = FIFF_UNIT_T_M; // gradiometers by default
+    if(selectionText == QLatin1String("MEG_mag")) {
+        filterKind = FIFFV_MEG_CH;
+        filterUnit = FIFF_UNIT_T;
+    } else if(selectionText == QLatin1String("EEG")) {
+        filterKind = FIFFV_EEG_CH;
+        filterUnit = 0; // not used for EEG
+    }
+
+    SelectionItem selItem;
+    const FIFFLIB::FiffInfo& info = firstEvoked->info;
+    for(int ch = 0; ch < info.chs.size(); ++ch) {
+        const FIFFLIB::FiffChInfo& chInfo = info.chs[ch];
+        if(chInfo.kind != filterKind)
+            continue;
+        // For MEG, also filter by unit (magnetometer vs gradiometer)
+        if(filterKind == FIFFV_MEG_CH && chInfo.unit != filterUnit)
+            continue;
+        selItem.m_sChannelName.append(chInfo.ch_name);
+        selItem.m_iChannelNumber.append(ch);
+        selItem.m_iChannelKind.append(chInfo.kind);
+        selItem.m_iChannelUnit.append(chInfo.unit);
+        // Project 3D coil/electrode position to 2D
+        selItem.m_qpChannelPosition.append(QPointF(chInfo.chpos.r0(0), chInfo.chpos.r0(1)));
+    }
+
+    if(selItem.m_qpChannelPosition.isEmpty())
+        return false;
+
+    // Normalize positions so that items don't overlap when
+    // repaintSelectionItems multiplies by 160.  Raw r0 values are in
+    // metres (range ~±0.12 for MEG), giving scene coords far smaller
+    // than the 120-pixel item width.
+    double xMin = 1e10, xMax = -1e10, yMin = 1e10, yMax = -1e10;
+    for(const auto& p : selItem.m_qpChannelPosition) {
+        if(p.x() < xMin) xMin = p.x();
+        if(p.x() > xMax) xMax = p.x();
+        if(p.y() < yMin) yMin = p.y();
+        if(p.y() > yMax) yMax = p.y();
+    }
+    double xRange = xMax - xMin;
+    double yRange = yMax - yMin;
+    double maxRange = qMax(xRange, yRange);
+    if(maxRange > 1e-10) {
+        double nSide = std::ceil(std::sqrt(
+            static_cast<double>(selItem.m_qpChannelPosition.size())));
+        double targetRange = nSide * 1.5;
+        double scale = targetRange / maxRange;
+        double xCenter = (xMin + xMax) / 2.0;
+        double yCenter = (yMin + yMax) / 2.0;
+        for(int p = 0; p < selItem.m_qpChannelPosition.size(); ++p) {
+            QPointF& pt = selItem.m_qpChannelPosition[p];
+            pt = QPointF((pt.x() - xCenter) * scale,
+                         (pt.y() - yCenter) * scale);
+        }
+    }
+
+    selItem.m_bShowAll = true;
+    m_pAverageScene->repaintSelectionItems(selItem);
+    return true;
 }
 
 

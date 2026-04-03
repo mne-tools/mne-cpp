@@ -48,6 +48,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QMap>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -150,6 +152,7 @@ public:
 
 private:
     QColor                          m_colGlobalItemSignalColor;     /**< The color used in all items to draw the signals.*/
+    QMap<qint32, float>             m_qMapChScaling;                /**< Stored scale map applied to newly created items.*/
 
     QList<SelectionSceneItem*>      m_lSelectedChannelItems;        /**< Holds the selected channels from the selection manager.*/
 };
