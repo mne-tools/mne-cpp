@@ -664,6 +664,32 @@ bool ChannelDataView::annotationsVisible() const
 
 //=============================================================================================================
 
+void ChannelDataView::setOverviewBarVisible(bool visible)
+{
+    if (m_pOverviewBar)
+        m_pOverviewBar->setVisible(visible);
+}
+
+bool ChannelDataView::overviewBarVisible() const
+{
+    return m_pOverviewBar ? m_pOverviewBar->isVisible() : true;
+}
+
+//=============================================================================================================
+
+void ChannelDataView::setScrollSpeedFactor(float factor)
+{
+    if (m_pRhiView)
+        m_pRhiView->setScrollSpeedFactor(factor);
+}
+
+float ChannelDataView::scrollSpeedFactor() const
+{
+    return m_pRhiView ? m_pRhiView->scrollSpeedFactor() : 1.0f;
+}
+
+//=============================================================================================================
+
 void ChannelDataView::setCrosshairEnabled(bool enabled)
 {
     if (m_pRhiView)
@@ -923,6 +949,18 @@ void ChannelDataView::keyPressEvent(QKeyEvent *event)
             QWidget::keyPressEvent(event);
             return;
         }
+        break;
+    case Qt::Key_O:
+        setOverviewBarVisible(!overviewBarVisible());
+        emit overviewBarToggled(overviewBarVisible());
+        break;
+    case Qt::Key_BracketRight:
+        setScrollSpeedFactor(scrollSpeedFactor() * 1.5f);
+        emit scrollSpeedChanged(scrollSpeedFactor());
+        break;
+    case Qt::Key_BracketLeft:
+        setScrollSpeedFactor(scrollSpeedFactor() / 1.5f);
+        emit scrollSpeedChanged(scrollSpeedFactor());
         break;
     case Qt::Key_T:
         toggleTimeFormat();

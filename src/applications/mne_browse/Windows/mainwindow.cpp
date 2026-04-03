@@ -1442,6 +1442,12 @@ void MainWindow::setupWindowWidgets()
                 m_pEventsVisibleAction, &QAction::setChecked);
         connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::annotationsVisibleToggled,
                 m_pAnnotationsVisibleAction, &QAction::setChecked);
+        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::overviewBarToggled,
+                m_pOverviewBarAction, &QAction::setChecked);
+        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::scrollSpeedChanged,
+                this, [this](float factor){
+                    statusBar()->showMessage(QString("Scroll speed: %1x").arg(factor, 0, 'f', 2), 2000);
+                });
     }
 
     // Connect time format toggle requested from DataWindow (via 'T' key)
@@ -1709,6 +1715,25 @@ void MainWindow::createToolBar()
     });
     toolBar->addAction(m_pAnnotationsVisibleAction);
 
+    //Toggle overview bar (O)
+    QIcon overviewIcon = makeIcon([](QPainter& p, int sz){
+        QFont f = p.font();
+        f.setPixelSize(sz * 0.45);
+        f.setBold(true);
+        p.setFont(f);
+        p.setPen(QColor(0x40, 0x80, 0x40));
+        p.drawText(QRect(0,0,sz,sz), Qt::AlignCenter, "O");
+    });
+    m_pOverviewBarAction = new QAction(overviewIcon, tr("Toggle overview bar (O)"), this);
+    m_pOverviewBarAction->setCheckable(true);
+    m_pOverviewBarAction->setChecked(true);
+    m_pOverviewBarAction->setStatusTip(tr("Show or hide the overview navigation bar"));
+    connect(m_pOverviewBarAction, &QAction::triggered, [this](bool checked){
+        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+            m_pDataWindow->getChannelDataView()->setOverviewBarVisible(checked);
+    });
+    toolBar->addAction(m_pOverviewBarAction);
+
     //Toggle time format (T)
     QIcon timeIcon = makeIcon([](QPainter& p, int sz){
         QFont f = p.font();
@@ -1963,10 +1988,12 @@ void MainWindow::connectMenus()
                "B — Toggle butterfly mode<br>"
                "D — Toggle DC removal<br>"
                "E — Toggle event markers<br>"
+               "O — Toggle overview bar<br>"
                "S — Toggle scalebars<br>"
                "T — Toggle time format (seconds / clock)<br>"
                "X — Toggle crosshair cursor<br>"
                "Shift+A — Toggle annotation spans<br>"
+               "[ / ] — Decrease/increase scroll speed<br>"
                "Ctrl+D — Clear channel selection<br>"
                "? — Show this help<br>"
                "<br>"
@@ -2017,6 +2044,8 @@ void MainWindow::setupMainWindow()
         m_pEventsVisibleAction->setChecked(m_qSettings.value("MainWindow/View/eventsVisible").toBool());
     if (m_pAnnotationsVisibleAction && m_qSettings.contains("MainWindow/View/annotationsVisible"))
         m_pAnnotationsVisibleAction->setChecked(m_qSettings.value("MainWindow/View/annotationsVisible").toBool());
+    if (m_pOverviewBarAction && m_qSettings.contains("MainWindow/View/overviewBar"))
+        m_pOverviewBarAction->setChecked(m_qSettings.value("MainWindow/View/overviewBar").toBool());
 
     //Set data window as central widget - This is needed because we are using QDockWidgets
     setCentralWidget(m_pDataWindow);
@@ -3627,6 +3656,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
         m_qSettings.setValue("MainWindow/View/eventsVisible", m_pEventsVisibleAction->isChecked());
     if (m_pAnnotationsVisibleAction)
         m_qSettings.setValue("MainWindow/View/annotationsVisible", m_pAnnotationsVisibleAction->isChecked());
+    if (m_pOverviewBarAction)
+        m_qSettings.setValue("MainWindow/View/overviewBar", m_pOverviewBarAction->isChecked());
 
     QMainWindow::closeEvent(event);
 }

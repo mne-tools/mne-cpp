@@ -519,6 +519,7 @@ protected:
     QAction*                m_pScalebarsAction;             /**< Toggle scalebars. */
     QAction*                m_pEventsVisibleAction;         /**< Toggle event marker visibility (E). */
     QAction*                m_pAnnotationsVisibleAction;    /**< Toggle annotation span visibility (Shift+A). */
+    QAction*                m_pOverviewBarAction;           /**< Toggle overview bar visibility (O). */
     QAction*                m_pWhitenButterflyAction;       /**< Toggle whitening in the average butterfly plot. */
     QAction*                m_pAnnotationModeAction;        /**< Toggle Shift-drag annotation selection in the raw browser. */
     QList<MNELIB::MNEEpochDataList> m_epochReviewLists;     /**< Reviewed epochs grouped by event code. */

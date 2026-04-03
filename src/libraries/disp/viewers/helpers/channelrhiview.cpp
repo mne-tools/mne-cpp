@@ -489,6 +489,13 @@ void ChannelRhiView::setWheelScrollsChannels(bool channelsMode)
 
 //=============================================================================================================
 
+void ChannelRhiView::setScrollSpeedFactor(float factor)
+{
+    m_scrollSpeedFactor = qBound(0.25f, factor, 4.0f);
+}
+
+//=============================================================================================================
+
 void ChannelRhiView::setCrosshairEnabled(bool enabled)
 {
     if (m_crosshairEnabled == enabled)
@@ -2166,7 +2173,7 @@ void ChannelRhiView::wheelEvent(QWheelEvent *event)
     } else if (qAbs(delta.x()) > qAbs(delta.y())) {
         // Predominantly horizontal gesture (trackpad swipe left/right) → scroll time
         if (!m_frozen) {
-            float step = width() * m_samplesPerPixel * 0.1f
+            float step = width() * m_samplesPerPixel * 0.1f * m_scrollSpeedFactor
                          * (delta.x() > 0 ? -1.f : 1.f);
             scrollTo(m_scrollSample + step, 100);
         }
@@ -2179,7 +2186,7 @@ void ChannelRhiView::wheelEvent(QWheelEvent *event)
     } else {
         // Vertical wheel → scroll time
         if (!m_frozen) {
-            float step = width() * m_samplesPerPixel * 0.15f
+            float step = width() * m_samplesPerPixel * 0.15f * m_scrollSpeedFactor
                          * (delta.y() > 0 ? -1.f : 1.f);
             scrollTo(m_scrollSample + step, 100);
         }

@@ -322,6 +322,9 @@ public:
     void setWheelScrollsChannels(bool channelsMode);
     bool wheelScrollsChannels() const { return m_wheelScrollsChannels; }
 
+    void setScrollSpeedFactor(float factor);
+    float scrollSpeedFactor() const { return m_scrollSpeedFactor; }
+
     //=========================================================================================================
     /**
      * Show or hide waveform traces of channels marked bad.
@@ -518,6 +521,7 @@ private:
     int    m_firstFileSample      = 0;
     int    m_lastFileSample       = -1;   // -1 = no limit (file not yet known)
     bool   m_wheelScrollsChannels = true; // default: vertical wheel → channels
+    float  m_scrollSpeedFactor    = 1.0f;  // multiplier for wheel/keyboard scroll
     bool   m_hideBadChannels      = false;
 
     // ── Vertical channel windowing ────────────────────────────────────

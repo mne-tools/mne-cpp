@@ -534,9 +534,28 @@ int AnnotationModel::addAnnotation(int startSample,
                                    const QStringList& channelNames,
                                    const QString& comment)
 {
-    const AnnotationEntry entry = normalizeEntry(startSample, endSample, description, channelNames, comment);
+    AnnotationEntry entry = normalizeEntry(startSample, endSample, description, channelNames, comment);
+
+    // Auto-merge: absorb any existing same-description annotations that overlap or are adjacent
+    QVector<int> mergeIndices;
+    for (int i = 0; i < m_annotations.size(); ++i) {
+        const AnnotationEntry& existing = m_annotations.at(i);
+        if (existing.description != entry.description)
+            continue;
+        // Overlapping or adjacent (within 1 sample)?
+        if (existing.startSample <= entry.endSample + 1
+            && existing.endSample >= entry.startSample - 1) {
+            entry.startSample = qMin(entry.startSample, existing.startSample);
+            entry.endSample   = qMax(entry.endSample, existing.endSample);
+            mergeIndices.append(i);
+        }
+    }
 
     beginResetModel();
+    // Remove merged entries in reverse order
+    std::sort(mergeIndices.begin(), mergeIndices.end(), std::greater<int>());
+    for (int idx : mergeIndices)
+        m_annotations.removeAt(idx);
     m_annotations.append(entry);
     sortEntries();
     endResetModel();

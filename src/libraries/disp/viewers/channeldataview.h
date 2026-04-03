@@ -312,6 +312,12 @@ public:
     void setAnnotationsVisible(bool visible);
     bool annotationsVisible() const;
 
+    void setOverviewBarVisible(bool visible);
+    bool overviewBarVisible() const;
+
+    void setScrollSpeedFactor(float factor);
+    float scrollSpeedFactor() const;
+
     // ── Interactive inspection features ───────────────────────────────
 
     //=========================================================================================================
@@ -443,6 +449,8 @@ signals:
     void scalebarsToggled(bool on);
     void eventsVisibleToggled(bool on);
     void annotationsVisibleToggled(bool on);
+    void overviewBarToggled(bool on);
+    void scrollSpeedChanged(float factor);
 
     //=========================================================================================================
     /**

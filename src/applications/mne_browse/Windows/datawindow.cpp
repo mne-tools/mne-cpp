@@ -1312,13 +1312,13 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
             if (event->modifiers() & Qt::ShiftModifier)
                 m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() - m_pChannelDataView->visibleSampleCount(), false);
             else
-                m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() - RAWVIEW_KEYBOARD_SCROLL_STEP, false);
+                m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() - static_cast<int>(RAWVIEW_KEYBOARD_SCROLL_STEP * m_pChannelDataView->scrollSpeedFactor()), false);
             break;
         case Qt::Key_Right:
             if (event->modifiers() & Qt::ShiftModifier)
                 m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() + m_pChannelDataView->visibleSampleCount(), false);
             else
-                m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() + RAWVIEW_KEYBOARD_SCROLL_STEP, false);
+                m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() + static_cast<int>(RAWVIEW_KEYBOARD_SCROLL_STEP * m_pChannelDataView->scrollSpeedFactor()), false);
             break;
         case Qt::Key_Plus:
         case Qt::Key_Equal:
@@ -1367,6 +1367,18 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
                 m_pChannelDataView->setAnnotationsVisible(!m_pChannelDataView->annotationsVisible());
             }
             break;
+        case Qt::Key_O:
+            // Toggle overview bar visibility
+            m_pChannelDataView->setOverviewBarVisible(!m_pChannelDataView->overviewBarVisible());
+            break;
+        case Qt::Key_BracketRight:
+            // Increase scroll speed
+            m_pChannelDataView->setScrollSpeedFactor(m_pChannelDataView->scrollSpeedFactor() * 1.5f);
+            break;
+        case Qt::Key_BracketLeft:
+            // Decrease scroll speed
+            m_pChannelDataView->setScrollSpeedFactor(m_pChannelDataView->scrollSpeedFactor() / 1.5f);
+            break;
         case Qt::Key_T:
             // Toggle time format
             if (m_pChannelDataView) {
@@ -1388,10 +1400,12 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
                        "B — Toggle butterfly mode<br>"
                        "D — Toggle DC removal<br>"
                        "E — Toggle event markers<br>"
+                       "O — Toggle overview bar<br>"
                        "S — Toggle scalebars<br>"
                        "T — Toggle time format (seconds / clock)<br>"
                        "X — Toggle crosshair cursor<br>"
                        "Shift+A — Toggle annotation spans<br>"
+                       "[ / ] — Decrease/increase scroll speed<br>"
                        "Ctrl+D — Clear channel selection<br>"
                        "? — Show this help<br>"
                        "<br>"
