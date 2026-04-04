@@ -97,7 +97,6 @@ private slots:
 
     void testCalculateCosine()
     {
-        QSKIP("Cosine distance normalization not yet implemented in KMeans");
         KMeans kmeans("cosine", "sample", 1, "error", true, 50);
         // For cosine distance, use non-zero data
         MatrixXd X(30, 3);
@@ -118,7 +117,6 @@ private slots:
 
     void testCalculateCorrelation()
     {
-        QSKIP("Correlation distance normalization not yet implemented in KMeans");
         KMeans kmeans("correlation", "sample", 1, "error", true, 50);
         // Need enough dimensions for correlation (>1)
         MatrixXd X = MatrixXd::Random(20, 5);

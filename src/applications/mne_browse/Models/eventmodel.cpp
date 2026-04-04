@@ -399,14 +399,33 @@ bool EventModel::loadEventData(QFile& qFile)
 
 bool EventModel::saveEventData(QFile& qFile)
 {
-    Q_UNUSED(qFile);
+    if(m_dataSamples.isEmpty()) {
+        qWarning() << "No events to save.";
+        return false;
+    }
 
-    beginResetModel();
-    clearModel();
+    // Build MNE-style event matrix (nEvents x 3): [sample, prev_type, type]
+    MatrixXi events(m_dataSamples.size(), 3);
+    for(int i = 0; i < m_dataSamples.size(); ++i) {
+        events(i, 0) = m_dataSamples[i];
+        events(i, 1) = 0;
+        events(i, 2) = m_dataTypes[i];
+    }
 
-    //TODO: Save events to file
+    QFileInfo fileInfo(qFile);
+    bool writeSuccess = false;
+    if(fileInfo.suffix() == "eve") {
+        writeSuccess = MNE::write_events_to_ascii(qFile, events);
+    } else {
+        writeSuccess = MNE::write_events_to_fif(qFile, events);
+    }
 
-    endResetModel();
+    if(!writeSuccess) {
+        qWarning() << "Error while writing events.";
+        return false;
+    }
+
+    qInfo() << QString("Events saved to %1").arg(qFile.fileName());
     return true;
 }
 

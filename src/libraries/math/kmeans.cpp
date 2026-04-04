@@ -154,11 +154,26 @@ bool KMeans::calculate(const MatrixXd& X_in,
     n = X.rows();
     p = X.cols();
 
-    if (m_distance == KMeansDistance::Correlation)
+    if (m_distance == KMeansDistance::Cosine)
     {
+        // Normalize each row to unit length for cosine distance
+        VectorXd Xnorm = X.array().pow(2).rowwise().sum().sqrt();
+        for (qint32 i = 0; i < n; ++i)
+        {
+            if (Xnorm(i) > 0)
+                X.row(i) /= Xnorm(i);
+        }
+    }
+    else if (m_distance == KMeansDistance::Correlation)
+    {
+        // Mean-center each row, then normalize to unit length
         X.array() -= (X.rowwise().sum().array() / static_cast<double>(p)).replicate(1, p);
-        MatrixXd Xnorm = X.array().pow(2).rowwise().sum().sqrt();
-        X.array() /= Xnorm.replicate(1, p).array();
+        VectorXd Xnorm = X.array().pow(2).rowwise().sum().sqrt();
+        for (qint32 i = 0; i < n; ++i)
+        {
+            if (Xnorm(i) > 0)
+                X.row(i) /= Xnorm(i);
+        }
     }
 
     // Set up uniform initialization bounds if needed

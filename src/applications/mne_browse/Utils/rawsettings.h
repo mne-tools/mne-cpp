@@ -30,8 +30,8 @@
  *
  * @brief    In this RawSettings class all mne_browse settings are managed. In order to store settings
  *           from the last mne_browse session, the class uses the QtSettings class of Qt. [1]
- *           Using QSettings, the entries are stored locally in a OS-specific place from where they shall
- *           be loaded at each start of mne_browse if they were already set (this is not yet implemented -> ToDo)
+ *           Using QSettings, the entries are stored locally in a OS-specific place from where they are
+ *           loaded at each start of mne_browse if they were already set.
  *
  *
  *           [1] http://qt-project.org/doc/qt-5/QSettings.html

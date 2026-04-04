@@ -72,10 +72,6 @@ RawSettings::~RawSettings()
 
 void RawSettings::write()
 {
-    //MainWindow
-    //ToDo: ask for already stored setting in OS environment before setting them
-    //e.g. if(!m_qSettings.contains("RawModel/window_size")) m_qSettings.setValue("window_size",MODEL_WINDOW_SIZE);
-
     //Window settings
     m_qSettings.beginGroup("MainWindow");
 
@@ -133,20 +129,31 @@ void RawSettings::write()
 
 void RawSettings::init()
 {
-    m_mainwindow_size_w = MAINWINDOW_WINDOW_SIZE_W;
-    m_mainwindow_size_h = MAINWINDOW_WINDOW_SIZE_H;
-    m_mainwindow_position_x = MAINWINDOW_WINDOW_POSITION_X;
-    m_mainwindow_position_y = MAINWINDOW_WINDOW_POSITION_Y;
+    //Window settings - load from QSettings if previously stored, otherwise use defaults
+    m_qSettings.beginGroup("MainWindow");
+    QSize storedSize = m_qSettings.value("size", QSize(MAINWINDOW_WINDOW_SIZE_W, MAINWINDOW_WINDOW_SIZE_H)).toSize();
+    m_mainwindow_size_w = storedSize.width();
+    m_mainwindow_size_h = storedSize.height();
+    QPoint storedPos = m_qSettings.value("position", QPoint(MAINWINDOW_WINDOW_POSITION_X, MAINWINDOW_WINDOW_POSITION_Y)).toPoint();
+    m_mainwindow_position_x = storedPos.x();
+    m_mainwindow_position_y = storedPos.y();
+    m_qSettings.endGroup();
 
-    m_event_color_default = Qt::black;
-    m_event_color_1 = Qt::black;
-    m_event_color_2 = Qt::magenta;
-    m_event_color_3 = Qt::green;
-    m_event_color_4 = Qt::red;
-    m_event_color_5 = Qt::cyan;
-    m_event_color_32 = Qt::yellow;
-    m_event_color_998 = Qt::darkBlue;
-    m_event_color_999 = Qt::darkCyan;
-    m_data_marker_color = QColor (93,177,47); //green
-    //m_data_marker_color = QColor (227,6,19); //red
+    //Event colors - load from QSettings if previously stored, otherwise use defaults
+    m_qSettings.beginGroup("EventDesignParameters");
+    m_event_color_default = m_qSettings.value("event_color_default", QColor(Qt::black)).value<QColor>();
+    m_event_color_1 = m_qSettings.value("event_color_1", QColor(Qt::black)).value<QColor>();
+    m_event_color_2 = m_qSettings.value("event_color_2", QColor(Qt::magenta)).value<QColor>();
+    m_event_color_3 = m_qSettings.value("event_color_3", QColor(Qt::green)).value<QColor>();
+    m_event_color_4 = m_qSettings.value("event_color_4", QColor(Qt::red)).value<QColor>();
+    m_event_color_5 = m_qSettings.value("event_color_5", QColor(Qt::cyan)).value<QColor>();
+    m_event_color_32 = m_qSettings.value("event_color_32", QColor(Qt::yellow)).value<QColor>();
+    m_event_color_998 = m_qSettings.value("event_color_998", QColor(Qt::darkBlue)).value<QColor>();
+    m_event_color_999 = m_qSettings.value("event_color_999", QColor(Qt::darkCyan)).value<QColor>();
+    m_qSettings.endGroup();
+
+    //Data marker color
+    m_qSettings.beginGroup("DataMarker");
+    m_data_marker_color = m_qSettings.value("data_marker_color", QColor(93,177,47)).value<QColor>();
+    m_qSettings.endGroup();
 }

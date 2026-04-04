@@ -132,6 +132,9 @@ protected:
     QList<Eigen::MatrixXd>  m_lData;                    /**< The stored data blocks. */
 
     FIFFLIB::FiffInfo       m_fiffInfo;                 /**< Holds the fiff measurement information. */
+
+    QVector<int>            m_picks;                    /**< Indices of MEG/EEG channels to include. */
+    bool                    m_bPicksReady;              /**< Whether picks have been computed. */
 };
 
 //=============================================================================================================

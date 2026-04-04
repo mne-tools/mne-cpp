@@ -2,6 +2,85 @@
 
 All notable changes to MNE-CPP will be documented in this file.
 
+## [2.1.0] - 2026-04-10
+
+### New Features
+
+- **MNE Browse overhaul**
+  - QRhi-based 2D channel rendering for Metal/Vulkan/D3D12 performance
+  - ICA browser with component visualization, rejection, and original-data reset
+  - Epoch review workflow with evoked computation and histogram view
+  - Annotation workflow with FIF interoperability and auto-merge
+  - Virtual channel derivations with weighted reference workflows
+  - Covariance matrix heatmap visualization and whitening controls (W key)
+  - Projector dialog (J/Shift+J) and SSP toggle
+  - 2D layout view with mouse-wheel zoom, auto-scale, and channel scaling spinboxes
+  - Dark mode, drag-and-drop file open, recent files list
+  - GPU clipping/z-score shaders, fullscreen (F11), zen mode (F)
+  - Linear detrending (D key cycles None/DC/Linear)
+  - GFP overlay on butterfly view
+  - Interactive ruler tool with amplitude snap and semi-transparent overlay
+  - Double-click bad-channel marking, click-to-toggle bad channels
+  - Stimulus lane above time ruler with event markers
+  - Per-description event/annotation filtering and visibility toggles
+  - Channel sort by type, epoch grid lines (G), overview bar toggle (O), scroll speed control
+  - Source-estimate export workflow
+  - Session filtering workflow
+  - Settings persistence across sessions via QSettings
+  - Event file saving to FIF and ASCII formats
+  - WASM loading screen and optimized WebAssembly build
+
+- **MNE Analyze Studio**
+  - Agent-based workflow engine with grounded LLM safety
+  - Multi-provider planner profiles (OpenAI Responses API)
+  - Reusable inspect 3D surface views
+  - Extension-based view architecture with hosted view tooling
+  - VS Code chat UX integration and `.mna` project format
+
+- **BIDS library** (`mne_bids`): New library for reading and writing BIDS-formatted datasets with testframe
+
+- **Beamformers**: Added beamformer classes to the `inv` library with testframes
+
+- **DSP library enhancements**
+  - `WelchPsd`: Welch power spectral density estimation
+  - `MorletTfr`: Morlet wavelet time-frequency representation
+  - `xDAWN`: xDAWN spatial filtering for ERP denoising
+  - KMeans: Cosine and correlation distance normalization implemented
+  - Real-time covariance: Channel picks applied (MEG/EEG only)
+
+- **Logging**: Renamed `ApplicationLogger` to `MNELogger` with `MNE_LOG_LEVEL` and `MNE_LOG_MODE` environment variables
+
+### CI/CD
+
+- Qt 6.11 support with auto-detection in `init.sh`
+- Build Qt Installer Framework 4.11.0 toolchains from source
+- Offline self-contained installers (.run, .dmg, .exe)
+- Nightly WASM builds deployed alongside stable releases
+- Reusable Qt toolchain assets consumed by CI workflows
+- Eigen downloaded at configure time (no longer bundled)
+
+### Bug Fixes
+
+- Fixed Metal/QRhi rendering on macOS: native window, infinite repaint loop
+- Fixed butterfly whitening scale and circular channel arrangement
+- Fixed 2D layout channel filtering, scale persistence, and item sizing
+- Fixed crosshair repaint cascade, split MEG grad/mag scale labels
+- Fixed DSP SSS and bad-channel regressions
+- Fixed DSP pi constants on Windows, params defaults on Clang/GCC
+- Fixed Windows linker error for nested `Params` struct exports
+- Fixed macOS test flakiness and WASM build errors
+- Fixed `mne_anonymize` unique_ptr usage
+- Fixed ruler amplitude precision (1 → 3 decimal places)
+- Fixed stim chip overlap, event line z-order, and resize resampling
+- Fixed scroll pan boundary and smooth inertial scroll
+
+### Documentation
+
+- Updated website to reflect renamed/split libraries
+- Updated build guide paths (`tools/` → `scripts/`)
+- Fixed release download page for installers and WebAssembly
+- Updated Zenodo DOI to 19139238
+
 ## [2.0.0] - 2026-03-20
 
 ### Versioning
