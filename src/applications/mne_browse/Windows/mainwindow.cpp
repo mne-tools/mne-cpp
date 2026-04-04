@@ -1228,6 +1228,11 @@ void MainWindow::setCovarianceWhiteningSettings(const WhiteningSettings& setting
         QSignalBlocker blocker(m_pWhitenButterflyAction);
         m_pWhitenButterflyAction->setChecked(settings.enableButterfly);
     }
+
+    // Recompute raw whitener when regularisation parameters change
+    if(m_pDataWindow && !m_covariance.isEmpty()) {
+        m_pDataWindow->updateRawWhitener(m_covariance, settings);
+    }
 }
 
 
@@ -2253,6 +2258,16 @@ void MainWindow::toggleWhitening()
 {
     if(m_pAverageWindow)
         m_pAverageWindow->setButterflyWhiteningEnabled(!m_pAverageWindow->isButterflyWhiteningEnabled());
+
+    // Also toggle raw-trace whitening
+    if(m_pDataWindow) {
+        const bool newState = !m_pDataWindow->isRawWhiteningEnabled();
+        if(newState && !m_covariance.isEmpty()) {
+            // Build whitener on first toggle if covariance is available
+            m_pDataWindow->updateRawWhitener(m_covariance, covarianceWhiteningSettings());
+        }
+        m_pDataWindow->setRawWhiteningEnabled(newState);
+    }
 }
 
 
@@ -3781,6 +3796,11 @@ void MainWindow::computeCovariance()
                                        QStringLiteral("Computed from %1").arg(QFileInfo(m_qFileRaw.fileName()).fileName()),
                                        FIFFLIB::FiffInfo::SPtr(new FIFFLIB::FiffInfo(raw.info)));
 
+    // Update raw-trace whitener
+    if(m_pDataWindow) {
+        m_pDataWindow->updateRawWhitener(m_covariance, covarianceWhiteningSettings());
+    }
+
     setWindowStatus();
 
     QMessageBox::information(this,
@@ -3829,6 +3849,11 @@ void MainWindow::loadCovariance()
     m_pCovarianceWindow->setCovariance(m_covariance,
                                        QStringLiteral("Loaded from %1").arg(QFileInfo(filename).fileName()),
                                        m_pDataWindow->fiffInfo());
+
+    // Update raw-trace whitener
+    if(m_pDataWindow) {
+        m_pDataWindow->updateRawWhitener(m_covariance, covarianceWhiteningSettings());
+    }
 
     setWindowStatus();
 

@@ -85,6 +85,7 @@ struct WhiteningSettings
     bool useProj = true;
     bool enableButterfly = false;
     bool enableLayout = false;
+    bool enableRaw = false;
 };
 
 namespace RawModelRoles

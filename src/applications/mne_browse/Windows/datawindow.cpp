@@ -684,6 +684,118 @@ void DataWindow::clearUserDefinedFilter()
 
 //*************************************************************************************************************
 
+void DataWindow::setRawWhiteningEnabled(bool enabled)
+{
+    if (enabled && m_rawWhitener.rows() == 0) {
+        return;   // no whitener available — silently ignore
+    }
+
+    if (m_bRawWhiteningEnabled == enabled) {
+        return;
+    }
+
+    m_bRawWhiteningEnabled = enabled;
+
+    // Reload visible data so the display reflects the new state
+    if (m_pFiffReader && m_pFiffReader->isOpen()) {
+        restartChannelView(m_iCurrentScrollSample, false);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::updateRawWhitener(const FIFFLIB::FiffCov& cov, const WhiteningSettings& settings)
+{
+    m_rawWhitener = Eigen::MatrixXd();   // clear old
+
+    auto info = m_pFiffReader ? m_pFiffReader->fiffInfo() : nullptr;
+    if (!info || cov.isEmpty()) {
+        return;
+    }
+
+    // Regularize and prepare (eigen-decompose) restricted to the raw ch_names
+    const FIFFLIB::FiffCov regularizedCov =
+        cov.regularize(*info,
+                       settings.regMag,
+                       settings.regGrad,
+                       settings.regEeg,
+                       settings.useProj);
+
+    const FIFFLIB::FiffCov preparedCov =
+        regularizedCov.prepare_noise_cov(*info, info->ch_names);
+
+    if (preparedCov.isEmpty() || preparedCov.dim <= 0) {
+        return;
+    }
+
+    // Build the core whitener from eigendecomposition
+    Eigen::MatrixXd coreWhitener;
+    if (preparedCov.diag) {
+        coreWhitener = Eigen::MatrixXd::Zero(preparedCov.dim, preparedCov.dim);
+        for (int i = 0; i < preparedCov.dim; ++i) {
+            const double variance = preparedCov.data(i, 0);
+            if (variance > 1e-30)
+                coreWhitener(i, i) = 1.0 / std::sqrt(variance);
+        }
+    } else {
+        if (preparedCov.eig.size() == 0 || preparedCov.eigvec.size() == 0) {
+            return;
+        }
+        coreWhitener = Eigen::MatrixXd::Zero(preparedCov.dim, preparedCov.dim);
+        for (int i = 0; i < preparedCov.eig.size(); ++i) {
+            if (preparedCov.eig(i) > 1e-30)
+                coreWhitener(i, i) = 1.0 / std::sqrt(preparedCov.eig(i));
+        }
+        coreWhitener *= preparedCov.eigvec;
+    }
+
+    // Embed into full-channel identity matrix.
+    // prepare_noise_cov aligns to info->ch_names, so coreWhitener rows/cols
+    // correspond 1:1 to the info channels when dims match.
+    const int nCh = info->chs.size();
+    if (preparedCov.dim == nCh) {
+        // Simple case: covariance covers all channels
+        m_rawWhitener = coreWhitener;
+    } else {
+        // Covariance covers a subset — build index mapping from
+        // preparedCov.names into info->ch_names
+        m_rawWhitener = Eigen::MatrixXd::Identity(nCh, nCh);
+
+        QMap<QString, int> infoNameToIdx;
+        for (int i = 0; i < nCh; ++i) {
+            infoNameToIdx[info->ch_names[i]] = i;
+        }
+
+        // Build pick list: for each row in preparedCov, find its index in info
+        QVector<int> picks;
+        picks.reserve(preparedCov.dim);
+        for (int i = 0; i < preparedCov.names.size(); ++i) {
+            auto it = infoNameToIdx.constFind(preparedCov.names[i]);
+            if (it != infoNameToIdx.constEnd()) {
+                picks.append(it.value());
+            }
+        }
+
+        if (picks.size() == preparedCov.dim) {
+            // Insert the core whitener block into the identity
+            for (int r = 0; r < preparedCov.dim; ++r) {
+                for (int c = 0; c < preparedCov.dim; ++c) {
+                    m_rawWhitener(picks[r], picks[c]) = coreWhitener(r, c);
+                }
+            }
+        }
+    }
+
+    // If whitening is currently on, reload to apply the new whitener
+    if (m_bRawWhiteningEnabled && m_pFiffReader && m_pFiffReader->isOpen()) {
+        restartChannelView(m_iCurrentScrollSample, false);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void DataWindow::initMVCSettings()
 {
     //-----------------------------------
@@ -841,7 +953,14 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
         return;
 
     const Eigen::MatrixXd filteredData = applyUserDefinedFilter(data);
-    const Eigen::MatrixXd displayData = appendVirtualChannels(filteredData);
+
+    // Apply raw-trace whitening if enabled and whitener is available
+    const Eigen::MatrixXd whitenedData =
+        (m_bRawWhiteningEnabled && m_rawWhitener.rows() == filteredData.rows())
+            ? (m_rawWhitener * filteredData).eval()
+            : filteredData;
+
+    const Eigen::MatrixXd displayData = appendVirtualChannels(whitenedData);
     auto *model = m_pChannelDataView->model();
 
     // Determine whether this block is contiguous with existing model data.
@@ -1452,7 +1571,7 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
                        "O — Toggle overview bar<br>"
                        "S — Toggle scalebars<br>"
                        "T — Toggle time format (seconds / clock)<br>"
-                       "W — Toggle whitening (butterfly averages)<br>"
+                       "W — Toggle whitening (raw traces + butterfly)<br>"
                        "X — Toggle crosshair cursor<br>"
                        "Z — Toggle z-score normalization<br>"
                        "Shift+A — Toggle annotation spans<br>"

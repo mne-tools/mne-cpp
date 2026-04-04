@@ -52,6 +52,8 @@
 #include <disp/viewers/channeldataview.h>
 #include <disp/viewers/helpers/channelrhiview.h>
 
+#include <fiff/fiff_cov.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -304,6 +306,32 @@ public:
      */
     QSharedPointer<SessionFilter> activeSessionFilter() const { return m_pUserDefinedFilter; }
 
+    //=========================================================================================================
+    /**
+     * Enable or disable raw-trace whitening.  When enabled, the precomputed
+     * whitener matrix is applied to every loaded data block before display.
+     *
+     * @param[in] enabled  True to whiten raw traces.
+     */
+    void setRawWhiteningEnabled(bool enabled);
+
+    //=========================================================================================================
+    /**
+     * Returns whether raw-trace whitening is currently active.
+     */
+    bool isRawWhiteningEnabled() const { return m_bRawWhiteningEnabled; }
+
+    //=========================================================================================================
+    /**
+     * Recompute the internal whitener matrix from a noise covariance and
+     * the current FiffInfo.  Call this whenever the covariance, projection,
+     * or regularisation settings change.
+     *
+     * @param[in] cov       Noise covariance.
+     * @param[in] settings  Regularisation parameters.
+     */
+    void updateRawWhitener(const FIFFLIB::FiffCov& cov, const WhiteningSettings& settings);
+
 private:
     struct PersistentMarker;
 
@@ -507,6 +535,10 @@ private:
     QVector<VirtualChannelDefinition>             m_virtualChannelDefinitions; /**< Requested virtual-channel definitions. */
     QVector<ResolvedVirtualChannel>               m_resolvedVirtualChannels; /**< Definitions resolved against the current FIFF header. */
     QSharedPointer<SessionFilter>                 m_pUserDefinedFilter; /**< Optional session filter applied directly in the QRHI browser path. */
+
+    // ── Raw-trace whitening ────────────────────────────────────────────
+    bool                     m_bRawWhiteningEnabled = false; /**< True when raw traces should be whitened. */
+    Eigen::MatrixXd          m_rawWhitener;                  /**< Precomputed whitener (nch × nch) or empty. */
 
     // ── Buffer sizing ──────────────────────────────────────────────────
     // Each block is 60 s.  Buffer holds kMaxBlocks = 10 blocks = 10 min.
