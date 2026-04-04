@@ -1943,6 +1943,22 @@ void MainWindow::createToolBar()
     });
     toolBar->addAction(showNoiseReductionManager);
 
+    //Toggle visibility of the ICA browser
+    QIcon icaIcon = makeIcon([](QPainter& p, int sz){
+        QFont f = p.font();
+        f.setPixelSize(sz * 28 / 100);
+        f.setBold(true);
+        p.setFont(f);
+        p.setPen(QColor(0, 100, 180));
+        p.drawText(QRect(0, 0, sz, sz), Qt::AlignCenter, QStringLiteral("ICA"));
+    });
+    QAction* showIcaBrowser = new QAction(icaIcon, tr("ICA browser (I)"), this);
+    showIcaBrowser->setStatusTip(tr("Open ICA browser to compute and exclude components"));
+    connect(showIcaBrowser, &QAction::triggered, this, [this](){
+        computeIca();
+    });
+    toolBar->addAction(showIcaBrowser);
+
     toolBar->addSeparator();
 
     //Toggle visibility of the channel information window manager
