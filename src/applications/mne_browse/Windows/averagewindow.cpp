@@ -650,6 +650,10 @@ void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QIt
     Q_UNUSED(deselected);
     Q_UNUSED(selected);
 
+    // Re-compute auto-scale for the newly selected evoked set(s)
+    m_bAutoScaled = false;
+    m_bButterflyAutoScaled = false;
+
     refreshPlots();
 }
 

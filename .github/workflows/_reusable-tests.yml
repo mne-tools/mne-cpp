@@ -195,9 +195,9 @@ jobs:
         echo "gcda files: $(find build -name '*.gcda' 2>/dev/null | wc -l)"
         # Collect coverage data with fastcov (10-100x faster than lcov)
         fastcov -d build -o coverage.json
-        # Filtered report: only MNE-CPP libraries (no apps, tests, examples, external, Qt, Eigen)
+        # Filtered report: MNE-CPP libraries, applications, and tools
         fastcov -C coverage.json --lcov -o coverage_filtered.info \
-             --include src/libraries/ \
+             --include src/libraries/ src/applications/ src/tools/ \
              --exclude /usr Qt eigen
         # Extract total line coverage percentage from lcov format
         TOTAL_LINES=$(grep -c "^DA:" coverage_filtered.info 2>/dev/null || echo "0")

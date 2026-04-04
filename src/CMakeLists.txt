@@ -96,9 +96,9 @@ if(USE_FFTW)
   set(EIGEN_FFTW_DEFAULT)
 endif()
 
-# NOTE: WITH_CODE_COV coverage flags are applied only to library targets
-# (in src/libraries/CMakeLists.txt) so that gcov data is generated
-# exclusively for libraries, keeping Codecov reports focused.
+# NOTE: WITH_CODE_COV coverage flags are applied in src/libraries/,
+# src/applications/, and src/tools/ CMakeLists.txt so that gcov data
+# is generated for libraries, applications, and CLI tools.
 
 if(MSVC)
   add_compile_options(/EHsc /MP)

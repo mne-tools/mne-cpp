@@ -26,6 +26,8 @@
 
 MNE-CPP is an open-source, cross-platform C++ framework for real-time and offline processing of MEG, EEG, and related neurophysiological data. It provides modular libraries for building standalone acquisition and analysis applications. For more information and documentation please visit https://mne-cpp.github.io/.
 
+**Try it now** — [mne_browse](https://mne-cpp.github.io/wasm/mne_browse.html) runs entirely in the browser via WebAssembly (no install required).
+
 Quick start
 -----------
 

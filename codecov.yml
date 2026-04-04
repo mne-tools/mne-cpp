@@ -33,8 +33,11 @@ comment:
   behavior: default
   require_changes: no
 
-# Only track coverage for the MNE-CPP libraries.
-# gcov data is generated exclusively for libraries (see src/libraries/CMakeLists.txt),
-# and this paths directive tells Codecov to include only library source files.
+# Track coverage for MNE-CPP libraries, applications, and tools.
+# gcov instrumentation is enabled by WITH_CODE_COV in each subdirectory's
+# CMakeLists.txt; this paths directive tells Codecov which source files to
+# include in the coverage report.
 paths:
   - "src/libraries/**"
+  - "src/applications/**"
+  - "src/tools/**"

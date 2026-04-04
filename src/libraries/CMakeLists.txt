@@ -43,10 +43,10 @@ endif()
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-# ── Code-coverage instrumentation (libraries only) ──────────────────────
+# ── Code-coverage instrumentation ──────────────────────────────────────
 # When WITH_CODE_COV is ON the --coverage flag is applied here so that
-# only library code produces .gcno/.gcda files.  Applications, examples,
-# tests, and external code are never instrumented.
+# library code produces .gcno/.gcda files.  The same flag is also applied
+# in src/applications/ and src/tools/ CMakeLists.txt.
 if(WITH_CODE_COV)
   add_compile_options("--coverage" "-O1" "-g")
   add_link_options("--coverage")

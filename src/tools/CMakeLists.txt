@@ -15,6 +15,12 @@ endif()
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
+# ── Code-coverage instrumentation ───────────────────────────────────────
+if(WITH_CODE_COV)
+  add_compile_options("--coverage" "-O1" "-g")
+  add_link_options("--coverage")
+endif()
+
 ##==============================================================================
 ## Build options for individual CLI tools
 
