@@ -1422,6 +1422,15 @@ void MainWindow::setupWindowWidgets()
                 }
             });
 
+    connect(m_pIcaWindow, &IcaWindow::icaReset,
+            this, [this](const Eigen::MatrixXd &originalData) {
+                if(m_pDataWindow && m_pDataWindow->getChannelDataView()) {
+                    m_pDataWindow->getChannelDataView()->setData(originalData,
+                        m_pDataWindow->firstSample());
+                    statusBar()->showMessage(tr("ICA reset — original data restored."), 5000);
+                }
+            });
+
     connect(m_pDataWindow, &DataWindow::annotationRangeSelected,
             this, &MainWindow::handleAnnotationRangeSelected);
 

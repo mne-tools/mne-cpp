@@ -123,17 +123,24 @@ void IcaWindow::setupUi()
     m_pScrollArea->setWidget(m_pComponentListWidget);
     m_pMainLayout->addWidget(m_pScrollArea, 1);
 
-    // ── Apply button ────────────────────────────────────────────────
+    // ── Apply / Reset buttons ───────────────────────────────────────
+    auto *buttonLayout = new QHBoxLayout();
     m_pApplyButton = new QPushButton(tr("Apply Exclusion"), m_pCentralWidget);
     m_pApplyButton->setToolTip(tr("Remove the checked components from the raw data"));
     m_pApplyButton->setEnabled(false);
-    m_pMainLayout->addWidget(m_pApplyButton);
+    m_pResetButton = new QPushButton(tr("Reset"), m_pCentralWidget);
+    m_pResetButton->setToolTip(tr("Restore the original (unmodified) raw data"));
+    m_pResetButton->setEnabled(false);
+    buttonLayout->addWidget(m_pApplyButton);
+    buttonLayout->addWidget(m_pResetButton);
+    m_pMainLayout->addLayout(buttonLayout);
 
     setWidget(m_pCentralWidget);
 
     // Connections
     connect(m_pComputeButton, &QPushButton::clicked, this, &IcaWindow::onCompute);
     connect(m_pApplyButton,   &QPushButton::clicked, this, &IcaWindow::onApply);
+    connect(m_pResetButton,   &QPushButton::clicked, this, &IcaWindow::onReset);
 }
 
 //=============================================================================================================
@@ -241,7 +248,26 @@ void IcaWindow::onApply()
     m_pStatusLabel->setText(tr("Applied: excluded %1 component(s). Data cleaned.")
                                 .arg(excluded.size()));
 
+    m_pResetButton->setEnabled(true);
+
     emit icaCleaned(cleaned);
+}
+
+//=============================================================================================================
+
+void IcaWindow::onReset()
+{
+    if (m_rawData.rows() == 0)
+        return;
+
+    // Uncheck all component checkboxes
+    for (auto *cb : m_componentCheckboxes)
+        cb->setChecked(false);
+
+    m_pStatusLabel->setText(tr("Reset: original data restored."));
+    m_pResetButton->setEnabled(false);
+
+    emit icaReset(m_rawData);
 }
 
 //=============================================================================================================

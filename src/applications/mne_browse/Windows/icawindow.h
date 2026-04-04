@@ -100,6 +100,7 @@ signals:
      * @param[in] cleanedData  Channels × samples matrix after removing excluded components.
      */
     void icaCleaned(const Eigen::MatrixXd &cleanedData);
+    void icaReset(const Eigen::MatrixXd &originalData);
 
 public slots:
     /**
@@ -118,6 +119,7 @@ public slots:
 private slots:
     void onCompute();
     void onApply();
+    void onReset();
 
 private:
     void setupUi();
@@ -130,6 +132,7 @@ private:
     QSpinBox     *m_pNComponentsSpin = nullptr;
     QPushButton  *m_pComputeButton = nullptr;
     QPushButton  *m_pApplyButton   = nullptr;
+    QPushButton  *m_pResetButton   = nullptr;
     QScrollArea  *m_pScrollArea    = nullptr;
     QWidget      *m_pComponentListWidget = nullptr;
     QVBoxLayout  *m_pComponentListLayout = nullptr;
