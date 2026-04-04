@@ -121,6 +121,11 @@
               </property>
               <item>
                <property name="text">
+                <string>All</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
                 <string>MEG_grad</string>
                </property>
               </item>

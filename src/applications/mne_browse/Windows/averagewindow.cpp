@@ -329,7 +329,16 @@ void AverageWindow::clearNoiseCovariance()
 
 void AverageWindow::setWhiteningSettings(const WhiteningSettings& settings)
 {
+    const bool layoutChanged = (settings.enableLayout != m_whiteningSettings.enableLayout);
+    const bool butterflyChanged = (settings.enableButterfly != m_whiteningSettings.enableButterfly);
+    const bool regChanged = (settings.regMag != m_whiteningSettings.regMag ||
+                             settings.regGrad != m_whiteningSettings.regGrad ||
+                             settings.regEeg != m_whiteningSettings.regEeg ||
+                             settings.useProj != m_whiteningSettings.useProj);
     m_whiteningSettings = settings;
+    if(layoutChanged || butterflyChanged || regChanged) {
+        m_bAutoScaled = false;  // re-compute scale with new whitened amplitudes
+    }
     refreshPlots();
 }
 
@@ -351,6 +360,7 @@ void AverageWindow::setButterflyWhiteningEnabled(bool enabled)
     }
 
     m_whiteningSettings.enableButterfly = enabled;
+    m_bAutoScaled = false;  // re-compute scale with whitened amplitudes
     refreshPlots();
 }
 
@@ -847,6 +857,8 @@ bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows
 
     // Determine which channel type to show based on the layout combo box
     const QString selectionText = ui->m_comboBox_layoutChannelKind->currentText();
+    const bool showAll = (selectionText == QLatin1String("All"));
+
     fiff_int_t filterKind = FIFFV_MEG_CH;
     fiff_int_t filterUnit = FIFF_UNIT_T_M; // gradiometers by default
     if(selectionText == QLatin1String("MEG_mag")) {
@@ -861,11 +873,19 @@ bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows
     const FIFFLIB::FiffInfo& info = firstEvoked->info;
     for(int ch = 0; ch < info.chs.size(); ++ch) {
         const FIFFLIB::FiffChInfo& chInfo = info.chs[ch];
-        if(chInfo.kind != filterKind)
-            continue;
-        // For MEG, also filter by unit (magnetometer vs gradiometer)
-        if(filterKind == FIFFV_MEG_CH && chInfo.unit != filterUnit)
-            continue;
+
+        if(!showAll) {
+            if(chInfo.kind != filterKind)
+                continue;
+            // For MEG, also filter by unit (magnetometer vs gradiometer)
+            if(filterKind == FIFFV_MEG_CH && chInfo.unit != filterUnit)
+                continue;
+        } else {
+            // In "All" mode, accept MEG and EEG data channels
+            if(chInfo.kind != FIFFV_MEG_CH && chInfo.kind != FIFFV_EEG_CH)
+                continue;
+        }
+
         selItem.m_sChannelName.append(chInfo.ch_name);
         selItem.m_iChannelNumber.append(ch);
         selItem.m_iChannelKind.append(chInfo.kind);
@@ -876,6 +896,42 @@ bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows
 
     if(selItem.m_qpChannelPosition.isEmpty())
         return false;
+
+    // ── Separate co-located channels (e.g. planar grad pairs, or
+    //    mag+grad triplets in "All" mode) by applying small offsets ──
+    // Group channels that share the same position (within 1mm tolerance)
+    // The offset is applied AFTER normalization so it works in item-grid units.
+    const double posTol = 1e-3;  // 1mm in metres
+    struct ColocGroup { QVector<int> indices; };
+    QVector<ColocGroup> colocGroups;
+    QVector<bool> handled(selItem.m_qpChannelPosition.size(), false);
+    for(int i = 0; i < selItem.m_qpChannelPosition.size(); ++i) {
+        if(handled[i]) continue;
+
+        ColocGroup group;
+        group.indices.append(i);
+        for(int j = i + 1; j < selItem.m_qpChannelPosition.size(); ++j) {
+            if(handled[j]) continue;
+            double dx = selItem.m_qpChannelPosition[j].x() - selItem.m_qpChannelPosition[i].x();
+            double dy = selItem.m_qpChannelPosition[j].y() - selItem.m_qpChannelPosition[i].y();
+            if(std::sqrt(dx*dx + dy*dy) < posTol) {
+                group.indices.append(j);
+                handled[j] = true;
+            }
+        }
+        handled[i] = true;
+
+        if(group.indices.size() > 1) {
+            // Sort within group: magnetometer first, then grads by name
+            std::sort(group.indices.begin(), group.indices.end(), [&](int a, int b) {
+                int unitA = selItem.m_iChannelUnit[a];
+                int unitB = selItem.m_iChannelUnit[b];
+                if(unitA != unitB) return unitA < unitB;
+                return selItem.m_sChannelName[a] < selItem.m_sChannelName[b];
+            });
+            colocGroups.append(group);
+        }
+    }
 
     // Normalize positions so that items don't overlap when
     // repaintSelectionItems multiplies by 160.  Raw r0 values are in
@@ -902,6 +958,17 @@ bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows
             QPointF& pt = selItem.m_qpChannelPosition[p];
             pt = QPointF((pt.x() - xCenter) * scale,
                          (pt.y() - yCenter) * scale);
+        }
+    }
+
+    // Apply co-location offsets in normalized coordinates
+    // Offset of 0.5 units → 80px in scene (items are 120px wide, spaced ~160px)
+    for(const auto& group : colocGroups) {
+        const double spacing = 0.5;
+        int n = group.indices.size();
+        for(int k = 0; k < n; ++k) {
+            double offset = (k - (n - 1) / 2.0) * spacing;
+            selItem.m_qpChannelPosition[group.indices[k]].rx() += offset;
         }
     }
 
