@@ -465,6 +465,7 @@ void AverageWindow::initTableViewWidgets()
         if(loaded) {
             ui->m_tableView_loadedSets->resizeColumnsToContents();
             m_pAverageScene->clear();
+            m_bAutoScaled = false;
             selectLoadedSets();
             refreshPlots();
         } else {
@@ -709,6 +710,42 @@ void AverageWindow::refreshPlots()
                                                                                            averageData));
             }
         }
+    }
+
+    // Auto-scale: compute optimal scale from data on first load
+    if(!m_bAutoScaled && !m_layoutDisplayEvokeds.isEmpty()) {
+        double maxGrad = 0, maxMag = 0, maxEEG = 0;
+
+        for(const auto& evoked : m_layoutDisplayEvokeds) {
+            if(evoked.isEmpty() || evoked.data.rows() == 0)
+                continue;
+            const auto& info = evoked.info;
+            for(int ch = 0; ch < info.chs.size() && ch < evoked.data.rows(); ++ch) {
+                double maxVal = evoked.data.row(ch).cwiseAbs().maxCoeff();
+                if(info.chs[ch].kind == FIFFV_MEG_CH) {
+                    if(info.chs[ch].unit == FIFF_UNIT_T_M)
+                        maxGrad = qMax(maxGrad, maxVal);
+                    else
+                        maxMag = qMax(maxMag, maxVal);
+                } else if(info.chs[ch].kind == FIFFV_EEG_CH) {
+                    maxEEG = qMax(maxEEG, maxVal);
+                }
+            }
+        }
+
+        // Set scale to ~1.4× the max to fill ~70% of item height
+        QMap<qint32,float> autoScale;
+        autoScale[FIFF_UNIT_T_M] = maxGrad > 0 ? static_cast<float>(maxGrad * 1.4) : 1e-10f;
+        autoScale[FIFF_UNIT_T]   = maxMag  > 0 ? static_cast<float>(maxMag  * 1.4) : 1e-11f;
+        autoScale[FIFFV_EEG_CH]  = maxEEG  > 0 ? static_cast<float>(maxEEG  * 1.4) : 1e-4f;
+        m_pAverageScene->setScaleMap(autoScale);
+
+        // Update spinboxes to reflect auto-scaled values
+        if(m_pSpinGrad) m_pSpinGrad->setValue(autoScale[FIFF_UNIT_T_M] / 1e-10);
+        if(m_pSpinMag)  m_pSpinMag->setValue(autoScale[FIFF_UNIT_T] / 1e-11);
+        if(m_pSpinEEG)  m_pSpinEEG->setValue(autoScale[FIFFV_EEG_CH] / 1e-4);
+
+        m_bAutoScaled = true;
     }
 
     m_pAverageScene->update();

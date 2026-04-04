@@ -355,6 +355,7 @@ private:
     QDoubleSpinBox*         m_pSpinGrad = nullptr;
     QDoubleSpinBox*         m_pSpinMag  = nullptr;
     QDoubleSpinBox*         m_pSpinEEG  = nullptr;
+    bool                    m_bAutoScaled = false;
 };
 
 } // NAMESPACE MNEBROWSE
