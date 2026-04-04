@@ -338,6 +338,7 @@ void AverageWindow::setWhiteningSettings(const WhiteningSettings& settings)
     m_whiteningSettings = settings;
     if(layoutChanged || butterflyChanged || regChanged) {
         m_bAutoScaled = false;  // re-compute scale with new whitened amplitudes
+        m_bButterflyAutoScaled = false;
     }
     refreshPlots();
 }
@@ -361,6 +362,7 @@ void AverageWindow::setButterflyWhiteningEnabled(bool enabled)
 
     m_whiteningSettings.enableButterfly = enabled;
     m_bAutoScaled = false;  // re-compute scale with whitened amplitudes
+    m_bButterflyAutoScaled = false;
     refreshPlots();
 }
 
@@ -476,6 +478,7 @@ void AverageWindow::initTableViewWidgets()
             ui->m_tableView_loadedSets->resizeColumnsToContents();
             m_pAverageScene->clear();
             m_bAutoScaled = false;
+            m_bButterflyAutoScaled = false;
             selectLoadedSets();
             refreshPlots();
         } else {
@@ -559,6 +562,13 @@ void AverageWindow::initAverageSceneView()
             scaleMap[FIFF_UNIT_T_M] = static_cast<float>(m_pSpinGrad->value() * 1e-10);
             scaleMap[FIFFV_EEG_CH]  = static_cast<float>(m_pSpinEEG->value()  * 1e-4);
             m_pAverageScene->setScaleMap(scaleMap);
+
+            // Also propagate to butterfly scene (uses STRING keys)
+            QMap<QString,double> butterflyScale;
+            butterflyScale["MEG_grad"] = m_pSpinGrad->value() * 1e-10;
+            butterflyScale["MEG_mag"]  = m_pSpinMag->value()  * 1e-11;
+            butterflyScale["MEG_EEG"]  = m_pSpinEEG->value()  * 1e-4;
+            m_pButterflyScene->setScaleMap(butterflyScale);
         };
 
         connect(m_pSpinGrad, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
@@ -752,6 +762,13 @@ void AverageWindow::refreshPlots()
         autoScale[FIFFV_EEG_CH]  = maxEEG  > 0 ? static_cast<float>(maxEEG  * 1.4) : 1e-4f;
         m_pAverageScene->setScaleMap(autoScale);
 
+        // Also update butterfly scene (STRING keys)
+        QMap<QString,double> bfAutoScale;
+        bfAutoScale["MEG_grad"] = autoScale[FIFF_UNIT_T_M];
+        bfAutoScale["MEG_mag"]  = autoScale[FIFF_UNIT_T];
+        bfAutoScale["MEG_EEG"]  = autoScale[FIFFV_EEG_CH];
+        m_pButterflyScene->setScaleMap(bfAutoScale);
+
         // Update spinboxes to reflect auto-scaled values
         if(m_pSpinGrad) m_pSpinGrad->setValue(autoScale[FIFF_UNIT_T_M] / 1e-10);
         if(m_pSpinMag)  m_pSpinMag->setValue(autoScale[FIFF_UNIT_T] / 1e-11);
@@ -768,6 +785,8 @@ void AverageWindow::refreshPlots()
 
     //Draw butterfly plot
     m_pButterflyScene->clear();
+
+    double bfMaxGrad = 0, bfMaxMag = 0, bfMaxEEG = 0;
 
     for(int i = 0; i < selectedRows.size(); ++i) {
         QModelIndex index = selectedRows.at(i);
@@ -801,6 +820,24 @@ void AverageWindow::refreshPlots()
             continue;
         }
 
+        // Collect max amplitudes for butterfly auto-scale
+        if(!m_bButterflyAutoScaled) {
+            const auto& info = displayEvoked.info;
+            for(int ch = 0; ch < info.chs.size() && ch < displayEvoked.data.rows(); ++ch) {
+                if(info.bads.contains(info.chs[ch].ch_name))
+                    continue;
+                double maxVal = displayEvoked.data.row(ch).cwiseAbs().maxCoeff();
+                if(info.chs[ch].kind == FIFFV_MEG_CH) {
+                    if(info.chs[ch].unit == FIFF_UNIT_T_M)
+                        bfMaxGrad = qMax(bfMaxGrad, maxVal);
+                    else
+                        bfMaxMag = qMax(bfMaxMag, maxVal);
+                } else if(info.chs[ch].kind == FIFFV_EEG_CH) {
+                    bfMaxEEG = qMax(bfMaxEEG, maxVal);
+                }
+            }
+        }
+
         if(whiteningApplied) {
             setName.append(" [whitened]");
         }
@@ -813,6 +850,23 @@ void AverageWindow::refreshPlots()
         butterflySceneItemTemp->setEvokedData(displayEvoked);
 
         m_pButterflyScene->addItem(butterflySceneItemTemp);
+    }
+
+    // Apply butterfly-specific auto-scale from the (possibly whitened) display data
+    if(!m_bButterflyAutoScaled && (bfMaxGrad > 0 || bfMaxMag > 0 || bfMaxEEG > 0)) {
+        QMap<QString,double> bfAutoScale;
+        bfAutoScale["MEG_grad"] = bfMaxGrad > 0 ? bfMaxGrad * 1.4 : 4e-11;
+        bfAutoScale["MEG_mag"]  = bfMaxMag  > 0 ? bfMaxMag  * 1.4 : 1.2e-12;
+        bfAutoScale["MEG_EEG"]  = bfMaxEEG  > 0 ? bfMaxEEG  * 1.4 : 30e-6;
+        m_pButterflyScene->setScaleMap(bfAutoScale);
+        m_bButterflyAutoScaled = true;
+    } else if(m_pSpinGrad && m_pSpinMag && m_pSpinEEG) {
+        // Re-apply current layout scale to newly created butterfly items
+        QMap<QString,double> bfScale;
+        bfScale["MEG_grad"] = m_pSpinGrad->value() * 1e-10;
+        bfScale["MEG_mag"]  = m_pSpinMag->value()  * 1e-11;
+        bfScale["MEG_EEG"]  = m_pSpinEEG->value()  * 1e-4;
+        m_pButterflyScene->setScaleMap(bfScale);
     }
 
     m_pButterflyScene->update();
@@ -962,13 +1016,23 @@ bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows
     }
 
     // Apply co-location offsets in normalized coordinates
-    // Offset of 0.5 units → 80px in scene (items are 120px wide, spaced ~160px)
+    // Distribute co-located channels on a small circle around their center
     for(const auto& group : colocGroups) {
-        const double spacing = 0.5;
+        const double radius = 0.35;  // ~56px in scene, enough to separate 120px items
         int n = group.indices.size();
+        // Compute group center
+        double cx = 0, cy = 0;
         for(int k = 0; k < n; ++k) {
-            double offset = (k - (n - 1) / 2.0) * spacing;
-            selItem.m_qpChannelPosition[group.indices[k]].rx() += offset;
+            cx += selItem.m_qpChannelPosition[group.indices[k]].x();
+            cy += selItem.m_qpChannelPosition[group.indices[k]].y();
+        }
+        cx /= n;
+        cy /= n;
+        for(int k = 0; k < n; ++k) {
+            double angle = 2.0 * M_PI * k / n - M_PI / 2.0;  // Start from top
+            selItem.m_qpChannelPosition[group.indices[k]] =
+                QPointF(cx + radius * std::cos(angle),
+                        cy + radius * std::sin(angle));
         }
     }
 
