@@ -258,9 +258,16 @@ void ChannelDataModel::setMaxStoredSamples(int n)
 
 void ChannelDataModel::setRemoveDC(bool remove)
 {
+    setDetrendMode(remove ? DetrendMode::Mean : DetrendMode::None);
+}
+
+//=============================================================================================================
+
+void ChannelDataModel::setDetrendMode(DetrendMode mode)
+{
     {
         QWriteLocker lk(&m_lock);
-        m_removeDC = remove;
+        m_detrendMode = mode;
     }
     emit dataChanged();
 }
@@ -397,13 +404,34 @@ QVector<float> ChannelDataModel::decimatedVertices(int   channelIdx,
 
     int nSamples = bufLast - bufFirst;
 
-    // ── DC removal: compute mean over the window ────────────────────────
+    // ── Detrending: compute offset / trend over the window ────────────
     float dcOffset = 0.f;
-    if (m_removeDC) {
+    float linearSlope = 0.f;
+    float linearIntercept = 0.f;
+    const bool useLinear = (m_detrendMode == DetrendMode::Linear);
+    const bool useMean   = (m_detrendMode == DetrendMode::Mean);
+
+    if (useMean) {
         double sum = 0.0;
         for (int i = bufFirst; i < bufLast; ++i)
             sum += src[i];
         dcOffset = static_cast<float>(sum / nSamples);
+    } else if (useLinear) {
+        // Least-squares fit: y = slope * t + intercept, where t = 0..nSamples-1
+        double sumX = 0.0, sumY = 0.0, sumXX = 0.0, sumXY = 0.0;
+        for (int i = 0; i < nSamples; ++i) {
+            double x = static_cast<double>(i);
+            double y = static_cast<double>(src[bufFirst + i]);
+            sumX  += x;
+            sumY  += y;
+            sumXX += x * x;
+            sumXY += x * y;
+        }
+        double denom = nSamples * sumXX - sumX * sumX;
+        if (qAbs(denom) > 1e-30) {
+            linearSlope     = static_cast<float>((nSamples * sumXY - sumX * sumY) / denom);
+            linearIntercept = static_cast<float>((sumY - linearSlope * sumX) / nSamples);
+        }
     }
 
     if (nSamples <= pixelWidth * 2) {
@@ -411,8 +439,11 @@ QVector<float> ChannelDataModel::decimatedVertices(int   channelIdx,
         QVector<float> result;
         result.reserve(nSamples * 2);
         for (int i = 0; i < nSamples; ++i) {
+            float trend = useMean ? dcOffset
+                        : useLinear ? (linearSlope * i + linearIntercept)
+                        : 0.f;
             result.append(static_cast<float>(i));
-            result.append(src[bufFirst + i] - dcOffset);
+            result.append(src[bufFirst + i] - trend);
         }
         return result;
     }
@@ -439,8 +470,14 @@ QVector<float> ChannelDataModel::decimatedVertices(int   channelIdx,
             if (src[s] < minV) minV = src[s];
             if (src[s] > maxV) maxV = src[s];
         }
-        minV -= dcOffset;
-        maxV -= dcOffset;
+
+        // Subtract trend at the center of this pixel bin
+        float tCenter = static_cast<float>(sBegin - bufFirst) + (sEnd - sBegin) * 0.5f;
+        float trend = useMean ? dcOffset
+                    : useLinear ? (linearSlope * tCenter + linearIntercept)
+                    : 0.f;
+        minV -= trend;
+        maxV -= trend;
 
         float xOffset = px * spp;
 

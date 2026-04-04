@@ -77,6 +77,16 @@ namespace DISPLIB
 /**
  * @brief Channel display metadata (read-only from the renderer's perspective).
  */
+enum class DetrendMode {
+    None   = 0,  /**< No detrending. */
+    Mean   = 1,  /**< Remove DC offset (mean subtraction). */
+    Linear = 2   /**< Remove linear trend (least-squares line). */
+};
+
+//=============================================================================================================
+/**
+ * @brief Channel display metadata (read-only from the renderer's perspective).
+ */
 struct ChannelDisplayInfo {
     QString name;           /**< Channel name for the label. */
     QString typeLabel;      /**< Short type string: "MEG grad", "MEG mag", "EEG", "EOG", "ECG", "EMG", "STIM", "MISC". */
@@ -194,7 +204,10 @@ public:
      * @param[in] remove  true = subtract mean, false = raw data.
      */
     void setRemoveDC(bool remove);
-    bool removeDC() const { return m_removeDC; }
+    bool removeDC() const { return m_detrendMode != DetrendMode::None; }
+
+    void setDetrendMode(DetrendMode mode);
+    DetrendMode detrendMode() const { return m_detrendMode; }
 
     // ── Accessors (all thread-safe read) ──────────────────────────────
 
@@ -290,7 +303,7 @@ private:
 
     QVector<ChannelDisplayInfo>               m_virtualDisplayInfo;
     QVector<ChannelDisplayInfo>               m_displayInfo;  // pre-computed, rebuild on meta change
-    bool                                      m_removeDC = false;
+    DetrendMode                                m_detrendMode = DetrendMode::None;
 };
 
 } // namespace DISPLIB

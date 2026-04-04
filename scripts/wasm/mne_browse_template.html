@@ -1,12 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MNE-CPP | mne_browse</title>
     <style>
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; }
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(175deg, #f8f9fc 0%, #eef0f6 50%, #f4f5fa 100%);
@@ -14,395 +27,472 @@
 
         /* ── Loading overlay ─────────────────────────────────── */
         #loading-overlay {
-            position: fixed; inset: 0;
-            display: flex; align-items: center; justify-content: center;
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             z-index: 100;
             transition: opacity 0.6s ease, visibility 0.6s ease;
         }
-        #loading-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+        #loading-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
 
         /* ── Particle canvas ─────────────────────────────────── */
         #particles-canvas {
-            position: fixed; inset: 0;
-            width: 100%; height: 100%;
-            z-index: 0; pointer-events: none;
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
         }
 
         /* ── Glass card ──────────────────────────────────────── */
         .loading-card {
-            position: relative; z-index: 10;
+            position: relative;
+            z-index: 10;
             background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(255, 255, 255, 0.6);
             border-radius: 28px;
             padding: 52px 64px 44px;
             text-align: center;
             box-shadow:
-                0  2px  4px rgba(108, 92, 231, 0.03),
-                0  8px 16px rgba(108, 92, 231, 0.06),
+                0 2px 4px rgba(108, 92, 231, 0.03),
+                0 8px 16px rgba(108, 92, 231, 0.06),
                 0 20px 40px rgba(0, 0, 0, 0.07),
-                0  0  0  1px rgba(255, 255, 255, 0.5) inset;
-            max-width: 460px; width: 90%;
+                0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+            max-width: 460px;
+            width: 90%;
             will-change: transform;
             transition: transform 0.15s ease-out;
         }
 
         /* ── Logo ────────────────────────────────────────────── */
-        .logo-container { margin-bottom: 28px; }
+        .logo-container {
+            margin-bottom: 28px;
+        }
+
         .logo-container svg {
-            width: 220px; height: auto;
-            filter: drop-shadow(0 3px 12px rgba(0,0,0,0.08));
+            width: 220px;
+            height: auto;
+            filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.08));
         }
 
         /* ── Typography ──────────────────────────────────────── */
         .app-name {
-            font-size: 1.35rem; font-weight: 700;
-            color: #2d3436; letter-spacing: -0.025em;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #2d3436;
+            letter-spacing: -0.025em;
             margin-bottom: 6px;
         }
+
         .app-subtitle {
-            font-size: 0.82rem; color: #636e72;
+            font-size: 0.82rem;
+            color: #636e72;
             margin-bottom: 32px;
         }
 
         /* ── Progress bar ────────────────────────────────────── */
         .progress-container {
-            width: 100%; height: 4px;
+            width: 100%;
+            height: 4px;
             background: rgba(108, 92, 231, 0.1);
-            border-radius: 2px; overflow: hidden;
+            border-radius: 2px;
+            overflow: hidden;
             margin-bottom: 14px;
         }
+
         .progress-bar {
-            height: 100%; width: 0%;
+            height: 100%;
+            width: 0%;
             background: linear-gradient(90deg, #6c5ce7, #a29bfe, #6c5ce7);
             background-size: 200% 100%;
             border-radius: 2px;
             animation: shimmer 1.8s ease-in-out infinite;
             transition: width 0.4s ease;
         }
+
         @keyframes shimmer {
-            0%   { background-position:  200% 0; }
-            100% { background-position: -200% 0; }
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
         }
 
         /* ── Status ──────────────────────────────────────────── */
         .status-text {
-            font-size: 0.78rem; color: #b2bec3;
+            font-size: 0.78rem;
+            color: #b2bec3;
             min-height: 1.3em;
             transition: color 0.3s;
         }
 
         /* ── Qt canvas ───────────────────────────────────────── */
-        #screen { width: 100vw; height: 100vh; display: none; }
-        #screen.visible { display: block; }
-        #qtspinner, #qtstatus { display: none !important; }
+        #screen {
+            width: 100vw;
+            height: 100vh;
+            display: none;
+        }
+
+        #screen.visible {
+            display: block;
+        }
+
+        #qtspinner,
+        #qtstatus {
+            display: none !important;
+        }
     </style>
 </head>
+
 <body onload="init()">
 
-<!-- Floating polygon particles -->
-<canvas id="particles-canvas"></canvas>
+    <!-- Floating polygon particles -->
+    <canvas id="particles-canvas"></canvas>
 
-<!-- Loading screen -->
-<div id="loading-overlay">
-  <div class="loading-card" id="loading-card">
-    <div class="logo-container">
-      <!-- MNE-CPP logo (inline) -->
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576.5 301">
-        <polygon fill="#0C9A49" points="169.953,204.255 190.209,167.592 240.572,176.673"/>
-        <polygon fill="#986036" points="266.572,162.673 247.591,133.582 304.102,125.462"/>
-        <polygon fill="#DAAB28" points="176.34,6.882 163.176,42.18 130.617,11.339"/>
-        <polygon fill="#FAE250" points="183.34,9.882 226.399,55.263 170.176,45.18"/>
-        <path fill="#F8EA0A" d="M179.34,0l57.07,15.458L222.399,45.38Z"/>
-        <polygon fill="#2465B0" points="19.186,163.162 12.462,124.981 42.562,101.219"/>
-        <polygon fill="#DAAB28" points="229.399,44.263 243.41,14.341 274.816,34.175"/>
-        <polygon fill="#A17E2D" points="299.064,176.771 258.572,177.673 296.102,140.462"/>
-        <polygon fill="#D81E3A" points="62.204,40.686 90.102,28.65 78.058,63.241"/>
-        <polygon fill="#0B5840" points="168.953,198.255 148.264,192.523 189.209,161.592"/>
-        <polygon fill="#9A6C59" points="163.953,199.255 137.694,217.826 143.264,193.523"/>
-        <polygon fill="#C3A593" points="90.54,240.721 72.378,211.133 110.3,222.277"/>
-        <polygon fill="#D51C5C" points="78.058,63.241 59.795,89.175 42.067,63.409"/>
-        <polygon fill="#199EDA" points="42.562,101.219 12.462,124.981 33.229,83.075"/>
-        <polygon fill="#1CACE3" points="42.332,176.864 19.186,163.162 47.734,145.746"/>
-        <polygon fill="#FBDA20" points="134.608,236.354 120.522,270.775 106.058,270.775"/>
-        <polygon fill="#E76DAA" points="78.058,63.241 42.067,63.409 62.204,40.686"/>
-        <polygon fill="#E76DAA" points="42.067,63.409 59.795,89.175 33.229,83.075"/>
-        <polygon fill="#9A6C59" points="53.516,219.382 59.188,177.059 72.378,211.133"/>
-        <polygon fill="#59BA48" points="170.953,207.255 241.572,179.673 217.686,210.029"/>
-        <polygon fill="#A17E2D" points="106.058,270.775 107.767,241.688 137.694,217.826"/>
-        <polygon fill="#D9C3B7" points="107.767,241.688 110.326,222.309 137.694,217.826"/>
-        <polygon fill="#5D3429" points="53.516,219.382 72.378,211.133 76.22,236.783"/>
-        <polygon fill="#DAAB28" points="137.694,217.826 134.608,236.354 106.058,270.775"/>
-        <polygon fill="#986036" points="72.378,211.133 90.54,240.721 76.22,236.783"/>
-        <polygon fill="#C3A593" points="33.81,196.715 42.332,176.864 53.516,219.382"/>
-        <polygon fill="#AA1E53" points="126.617,18.339 116.213,40.475 90.102,28.65"/>
-        <polygon fill="#9A6C59" points="33.81,196.715 30.85,186.788 42.332,176.864"/>
-        <polygon fill="#9A6C59" points="107.767,241.688 90.54,240.721 110.3,222.277"/>
-        <polygon fill="#96C93F" points="234.591,145.582 253.572,174.673 203.209,165.592"/>
-        <path fill="#F8EA0A" d="M237.591,146.582l-43.22-58.888l74.267-3.346Z"/>
-        <path fill="#E76DAA" d="M159.176,49.18l-26.152,33.976l-16.81-42.682Z"/>
-        <polygon fill="#DF1284" points="163.176,47.18 120.213,38.475 130.617,16.339"/>
-        <path fill="#FBDA20" d="M172.176,49.18l56.223,10.083l-43.027,24.432Z"/>
-        <polygon fill="#FAE250" points="237.399,59.263 268.638,80.348 194.371,83.694"/>
-        <polygon fill="#FBDA20" points="233.399,50.263 278.816,40.175 264.626,71.365"/>
-        <polygon fill="#FBDA20" points="327.102,125.462 301.639,71.348 327.182,74.196"/>
-        <polygon fill="#2465B0" points="47.734,145.746 58.266,124.981 73.688,170.891"/>
-        <polygon fill="#6BC7E9" points="47.734,145.746 19.186,163.162 42.562,101.219"/>
-        <polygon fill="#DAAB28" points="304.182,60.196 278.626,57.365 292.816,26.175"/>
-        <polygon fill="#986036" points="340.251,125.643 309.064,170.771 306.102,134.462"/>
-        <path fill="#DF1284" d="M116.213,40.475l-8.192,44.029L78.058,63.241Z"/>
-        <polygon fill="#AA1E53" points="108.021,84.504 59.795,89.175 78.058,63.241"/>
-        <polygon fill="#E76DAA" points="116.213,40.475 78.058,63.241 90.102,28.65"/>
-        <path fill="#7BC24E" d="M184.209,162.592l-40.945,30.932l-27.298-25.096Z"/>
-        <polygon fill="#986036" points="143.264,193.523 110.3,222.277 113.307,187.823"/>
-        <polygon fill="#C3A593" points="110.326,222.309 143.264,193.523 137.694,217.826"/>
-        <path fill="#986036" d="M113.307,187.823l-40.929,23.311l-13.19-34.075Z"/>
-        <polygon fill="#5D3429" points="72.378,211.133 113.307,187.823 110.3,222.277"/>
-        <polygon fill="#DF1284" points="33.229,83.075 59.795,89.175 42.562,101.219"/>
-        <polygon fill="#199EDA" points="59.188,177.059 47.734,145.746 73.688,170.891"/>
-        <polygon fill="#2FB7E4" points="59.188,177.059 42.332,176.864 47.734,145.746"/>
-        <polygon fill="#5D3429" points="59.188,177.059 53.516,219.382 42.332,176.864"/>
-        <polygon fill="#BCDB95" points="224.591,146.582 193.211,166.587 179.166,126.641"/>
-        <polygon fill="#DAAB28" points="313.102,118.462 256.591,126.582 287.639,64.348"/>
-        <path fill="#A17E2D" d="M183.166,123.641l2.205-38.947l43.22,58.888Z"/>
-        <polygon fill="#6F1D47" points="108.021,84.504 116.213,40.475 133.023,83.156"/>
-        <polygon fill="#DF1284" points="179.371,79.694 140.023,79.156 166.176,45.18"/>
-        <polygon fill="#DF1284" points="133.023,83.156 124.386,106.568 108.021,84.504"/>
-        <polygon fill="#033045" points="42.562,101.219 58.266,124.981 47.734,145.746"/>
-        <polygon fill="#E76DAA" points="42.562,101.219 59.795,89.175 58.266,124.981"/>
-        <polygon fill="#DD4177" points="58.266,124.981 108.021,84.504 124.386,106.568"/>
-        <path fill="#BCDB95" d="M171.166,122.641l-54.2,45.787l8.42-61.86Z"/>
-        <polygon fill="#7BC24E" points="124.386,106.568 115.965,168.428 73.688,170.891"/>
-        <polygon fill="#0B5840" points="73.688,170.891 115.965,168.428 113.307,187.823"/>
-        <polygon fill="#0C9A49" points="113.307,187.823 115.965,168.428 143.264,193.523"/>
-        <polygon fill="#59BA48" points="120.965,167.428 175.166,121.641 189.211,161.587"/>
-        <polygon fill="#5D3429" points="113.307,187.823 59.188,177.059 73.688,170.891"/>
-        <polygon fill="#6F1D47" points="58.266,124.981 59.795,89.175 108.021,84.504"/>
-        <path fill="#AA1E53" d="M141.023,83.156l39.348,0.538l-2.205,38.947c0,0-30.521-32.834-37.162-39.474Z"/>
-        <path fill="#E76DAA" d="M173.166,120.641l-45.78-16.073l8.638-23.412Z"/>
-        <path fill="#96C93F" d="M73.688,170.891l-15.422-45.91l66.12-18.413Z"/>
-        <g>
-          <path fill="#033045" d="M267.267,298.125h-12.771v-34.354c0-3.711,0.159-7.81,0.479-12.293h-0.32c-0.667,3.522-1.268,6.061-1.802,7.606L239.4,298.124H228.83l-13.693-38.638c-0.374-1.041-0.975-3.711-1.802-8.008h-0.36c0.347,5.657,0.521,10.623,0.521,14.895v31.751h-11.651v-57.416h18.938l11.73,34.033c0.934,2.723,1.615,5.459,2.042,8.208h0.24c0.721-3.176,1.48-5.939,2.282-8.288l11.73-33.953h18.458V298.125z"/>
-          <path fill="#033045" d="M331.97,298.125h-13.054l-23.662-36.075c-1.39-2.108-2.351-3.696-2.883-4.765h-0.16c0.213,2.029,0.319,5.125,0.319,9.289v31.551h-12.212v-57.416h13.935l22.781,34.954c1.041,1.575,2.002,3.137,2.884,4.685h0.159c-0.214-1.334-0.319-3.964-0.319-7.888v-31.751h12.212V298.125z"/>
-          <path fill="#033045" d="M379.535,298.125h-34.435v-57.416h33.112v10.53h-20.181v12.771h18.778v10.49h-18.778v13.133h21.501L379.535,298.125z"/>
-          <path fill="#033045" d="M409.807,280.668h-21.901v-8.85h21.901V280.668z"/>
-          <path fill="#033045" d="M463.058,296.083c-4.19,2.028-9.662,3.043-16.416,3.043c-8.809,0-15.734-2.589-20.779-7.769c-5.046-5.179-7.566-12.078-7.566-20.699c0-9.182,2.836-16.629,8.508-22.342c5.673-5.713,13.033-8.568,22.082-8.568c5.604,0,10.33,0.708,14.175,2.122v12.452c-3.845-2.295-8.223-3.443-13.134-3.443c-5.394,0-9.743,1.695-13.054,5.085c-3.312,3.39-4.965,7.981-4.965,13.772c0,5.553,1.563,9.978,4.686,13.272c3.123,3.298,7.327,4.945,12.611,4.945c5.046,0,9.662-1.229,13.854-3.685v11.813z"/>
-          <path fill="#033045" d="M486,278.346v19.779h-12.934v-57.416h20.26c14.468,0,21.701,6.1,21.701,18.298c0,5.767-2.076,10.431-6.228,13.994c-4.15,3.563-9.696,5.345-16.637,5.345H486zM486,250.639v17.897h5.085c6.887,0,10.329-3.017,10.329-9.05c0-5.898-3.442-8.848-10.329-8.848H486z"/>
-          <path fill="#033045" d="M536.368,278.346v19.779h-12.933v-57.416h20.26c14.467,0,21.701,6.1,21.701,18.298c0,5.767-2.076,10.431-6.228,13.994c-4.152,3.563-9.696,5.345-16.637,5.345H536.368zM536.368,250.639v17.897h5.085c6.888,0,10.33-3.017,10.33-9.05c0-5.898-3.442-8.848-10.33-8.848H536.368z"/>
-        </g>
-        <g><path fill="#5D3429" d="M384.753,116.919h-8.965v8.965h-4.702v-8.965h-9.012v-4.726h9.012v-9.011h4.702v9.011h8.965V116.919z"/></g>
-        <g><path fill="#FBDA20" d="M460.946,57.98h-8.954v8.955h-4.696V57.98h-9.002v-4.721h9.002v-9.001h4.696v9.001h8.954V57.98z"/></g>
-        <g><path fill="#F8EA0A" d="M426.066,77.903h-11.194v11.193H409V77.903h-11.252V72H409V60.749h5.871V72h11.194V77.903z"/></g>
-        <g><path fill="#FBDA20" d="M330.073,37.312H320v10.074h-5.284V37.312h-10.127V32h10.127V21.874H320V32h10.072V37.312z"/></g>
-        <g><path fill="#FAE250" d="M388,54h-7.835v7.835h-4.108V54h-7.877v-4.131h7.877v-7.876h4.108v7.876H388V54z"/></g>
-        <g><path fill="#DAAB28" d="M442.114,110.265h-7.835v7.835h-4.108v-7.835h-7.877v-4.131h7.877v-7.876h4.108v7.876h7.835V110.265z"/></g>
-        <g><path fill="#FAE250" d="M359.313,77.487h-8.955v8.955h-4.697v-8.955h-9.001v-4.722h9.001v-9.001h4.697v9.001h8.955V77.487z"/></g>
-        <g><path fill="#B7967F" d="M400.835,154H393v7.835h-4.109V154h-7.877v-4.131h7.877v-7.876H393v7.876h7.835V154z"/></g>
-      </svg>
+    <!-- Loading screen -->
+    <div id="loading-overlay">
+        <div class="loading-card" id="loading-card">
+            <div class="logo-container">
+                <!-- MNE-CPP logo (inline) -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576.5 301">
+                    <polygon fill="#0C9A49" points="169.953,204.255 190.209,167.592 240.572,176.673" />
+                    <polygon fill="#986036" points="266.572,162.673 247.591,133.582 304.102,125.462" />
+                    <polygon fill="#DAAB28" points="176.34,6.882 163.176,42.18 130.617,11.339" />
+                    <polygon fill="#FAE250" points="183.34,9.882 226.399,55.263 170.176,45.18" />
+                    <path fill="#F8EA0A" d="M179.34,0l57.07,15.458L222.399,45.38Z" />
+                    <polygon fill="#2465B0" points="19.186,163.162 12.462,124.981 42.562,101.219" />
+                    <polygon fill="#DAAB28" points="229.399,44.263 243.41,14.341 274.816,34.175" />
+                    <polygon fill="#A17E2D" points="299.064,176.771 258.572,177.673 296.102,140.462" />
+                    <polygon fill="#D81E3A" points="62.204,40.686 90.102,28.65 78.058,63.241" />
+                    <polygon fill="#0B5840" points="168.953,198.255 148.264,192.523 189.209,161.592" />
+                    <polygon fill="#9A6C59" points="163.953,199.255 137.694,217.826 143.264,193.523" />
+                    <polygon fill="#C3A593" points="90.54,240.721 72.378,211.133 110.3,222.277" />
+                    <polygon fill="#D51C5C" points="78.058,63.241 59.795,89.175 42.067,63.409" />
+                    <polygon fill="#199EDA" points="42.562,101.219 12.462,124.981 33.229,83.075" />
+                    <polygon fill="#1CACE3" points="42.332,176.864 19.186,163.162 47.734,145.746" />
+                    <polygon fill="#FBDA20" points="134.608,236.354 120.522,270.775 106.058,270.775" />
+                    <polygon fill="#E76DAA" points="78.058,63.241 42.067,63.409 62.204,40.686" />
+                    <polygon fill="#E76DAA" points="42.067,63.409 59.795,89.175 33.229,83.075" />
+                    <polygon fill="#9A6C59" points="53.516,219.382 59.188,177.059 72.378,211.133" />
+                    <polygon fill="#59BA48" points="170.953,207.255 241.572,179.673 217.686,210.029" />
+                    <polygon fill="#A17E2D" points="106.058,270.775 107.767,241.688 137.694,217.826" />
+                    <polygon fill="#D9C3B7" points="107.767,241.688 110.326,222.309 137.694,217.826" />
+                    <polygon fill="#5D3429" points="53.516,219.382 72.378,211.133 76.22,236.783" />
+                    <polygon fill="#DAAB28" points="137.694,217.826 134.608,236.354 106.058,270.775" />
+                    <polygon fill="#986036" points="72.378,211.133 90.54,240.721 76.22,236.783" />
+                    <polygon fill="#C3A593" points="33.81,196.715 42.332,176.864 53.516,219.382" />
+                    <polygon fill="#AA1E53" points="126.617,18.339 116.213,40.475 90.102,28.65" />
+                    <polygon fill="#9A6C59" points="33.81,196.715 30.85,186.788 42.332,176.864" />
+                    <polygon fill="#9A6C59" points="107.767,241.688 90.54,240.721 110.3,222.277" />
+                    <polygon fill="#96C93F" points="234.591,145.582 253.572,174.673 203.209,165.592" />
+                    <path fill="#F8EA0A" d="M237.591,146.582l-43.22-58.888l74.267-3.346Z" />
+                    <path fill="#E76DAA" d="M159.176,49.18l-26.152,33.976l-16.81-42.682Z" />
+                    <polygon fill="#DF1284" points="163.176,47.18 120.213,38.475 130.617,16.339" />
+                    <path fill="#FBDA20" d="M172.176,49.18l56.223,10.083l-43.027,24.432Z" />
+                    <polygon fill="#FAE250" points="237.399,59.263 268.638,80.348 194.371,83.694" />
+                    <polygon fill="#FBDA20" points="233.399,50.263 278.816,40.175 264.626,71.365" />
+                    <polygon fill="#FBDA20" points="327.102,125.462 301.639,71.348 327.182,74.196" />
+                    <polygon fill="#2465B0" points="47.734,145.746 58.266,124.981 73.688,170.891" />
+                    <polygon fill="#6BC7E9" points="47.734,145.746 19.186,163.162 42.562,101.219" />
+                    <polygon fill="#DAAB28" points="304.182,60.196 278.626,57.365 292.816,26.175" />
+                    <polygon fill="#986036" points="340.251,125.643 309.064,170.771 306.102,134.462" />
+                    <path fill="#DF1284" d="M116.213,40.475l-8.192,44.029L78.058,63.241Z" />
+                    <polygon fill="#AA1E53" points="108.021,84.504 59.795,89.175 78.058,63.241" />
+                    <polygon fill="#E76DAA" points="116.213,40.475 78.058,63.241 90.102,28.65" />
+                    <path fill="#7BC24E" d="M184.209,162.592l-40.945,30.932l-27.298-25.096Z" />
+                    <polygon fill="#986036" points="143.264,193.523 110.3,222.277 113.307,187.823" />
+                    <polygon fill="#C3A593" points="110.326,222.309 143.264,193.523 137.694,217.826" />
+                    <path fill="#986036" d="M113.307,187.823l-40.929,23.311l-13.19-34.075Z" />
+                    <polygon fill="#5D3429" points="72.378,211.133 113.307,187.823 110.3,222.277" />
+                    <polygon fill="#DF1284" points="33.229,83.075 59.795,89.175 42.562,101.219" />
+                    <polygon fill="#199EDA" points="59.188,177.059 47.734,145.746 73.688,170.891" />
+                    <polygon fill="#2FB7E4" points="59.188,177.059 42.332,176.864 47.734,145.746" />
+                    <polygon fill="#5D3429" points="59.188,177.059 53.516,219.382 42.332,176.864" />
+                    <polygon fill="#BCDB95" points="224.591,146.582 193.211,166.587 179.166,126.641" />
+                    <polygon fill="#DAAB28" points="313.102,118.462 256.591,126.582 287.639,64.348" />
+                    <path fill="#A17E2D" d="M183.166,123.641l2.205-38.947l43.22,58.888Z" />
+                    <polygon fill="#6F1D47" points="108.021,84.504 116.213,40.475 133.023,83.156" />
+                    <polygon fill="#DF1284" points="179.371,79.694 140.023,79.156 166.176,45.18" />
+                    <polygon fill="#DF1284" points="133.023,83.156 124.386,106.568 108.021,84.504" />
+                    <polygon fill="#033045" points="42.562,101.219 58.266,124.981 47.734,145.746" />
+                    <polygon fill="#E76DAA" points="42.562,101.219 59.795,89.175 58.266,124.981" />
+                    <polygon fill="#DD4177" points="58.266,124.981 108.021,84.504 124.386,106.568" />
+                    <path fill="#BCDB95" d="M171.166,122.641l-54.2,45.787l8.42-61.86Z" />
+                    <polygon fill="#7BC24E" points="124.386,106.568 115.965,168.428 73.688,170.891" />
+                    <polygon fill="#0B5840" points="73.688,170.891 115.965,168.428 113.307,187.823" />
+                    <polygon fill="#0C9A49" points="113.307,187.823 115.965,168.428 143.264,193.523" />
+                    <polygon fill="#59BA48" points="120.965,167.428 175.166,121.641 189.211,161.587" />
+                    <polygon fill="#5D3429" points="113.307,187.823 59.188,177.059 73.688,170.891" />
+                    <polygon fill="#6F1D47" points="58.266,124.981 59.795,89.175 108.021,84.504" />
+                    <path fill="#AA1E53"
+                        d="M141.023,83.156l39.348,0.538l-2.205,38.947c0,0-30.521-32.834-37.162-39.474Z" />
+                    <path fill="#E76DAA" d="M173.166,120.641l-45.78-16.073l8.638-23.412Z" />
+                    <path fill="#96C93F" d="M73.688,170.891l-15.422-45.91l66.12-18.413Z" />
+                    <g>
+                        <path fill="#033045"
+                            d="M267.267,298.125h-12.771v-34.354c0-3.711,0.159-7.81,0.479-12.293h-0.32c-0.667,3.522-1.268,6.061-1.802,7.606L239.4,298.124H228.83l-13.693-38.638c-0.374-1.041-0.975-3.711-1.802-8.008h-0.36c0.347,5.657,0.521,10.623,0.521,14.895v31.751h-11.651v-57.416h18.938l11.73,34.033c0.934,2.723,1.615,5.459,2.042,8.208h0.24c0.721-3.176,1.48-5.939,2.282-8.288l11.73-33.953h18.458V298.125z" />
+                        <path fill="#033045"
+                            d="M331.97,298.125h-13.054l-23.662-36.075c-1.39-2.108-2.351-3.696-2.883-4.765h-0.16c0.213,2.029,0.319,5.125,0.319,9.289v31.551h-12.212v-57.416h13.935l22.781,34.954c1.041,1.575,2.002,3.137,2.884,4.685h0.159c-0.214-1.334-0.319-3.964-0.319-7.888v-31.751h12.212V298.125z" />
+                        <path fill="#033045"
+                            d="M379.535,298.125h-34.435v-57.416h33.112v10.53h-20.181v12.771h18.778v10.49h-18.778v13.133h21.501L379.535,298.125z" />
+                        <path fill="#033045" d="M409.807,280.668h-21.901v-8.85h21.901V280.668z" />
+                        <path fill="#033045"
+                            d="M463.058,296.083c-4.19,2.028-9.662,3.043-16.416,3.043c-8.809,0-15.734-2.589-20.779-7.769c-5.046-5.179-7.566-12.078-7.566-20.699c0-9.182,2.836-16.629,8.508-22.342c5.673-5.713,13.033-8.568,22.082-8.568c5.604,0,10.33,0.708,14.175,2.122v12.452c-3.845-2.295-8.223-3.443-13.134-3.443c-5.394,0-9.743,1.695-13.054,5.085c-3.312,3.39-4.965,7.981-4.965,13.772c0,5.553,1.563,9.978,4.686,13.272c3.123,3.298,7.327,4.945,12.611,4.945c5.046,0,9.662-1.229,13.854-3.685v11.813z" />
+                        <path fill="#033045"
+                            d="M486,278.346v19.779h-12.934v-57.416h20.26c14.468,0,21.701,6.1,21.701,18.298c0,5.767-2.076,10.431-6.228,13.994c-4.15,3.563-9.696,5.345-16.637,5.345H486zM486,250.639v17.897h5.085c6.887,0,10.329-3.017,10.329-9.05c0-5.898-3.442-8.848-10.329-8.848H486z" />
+                        <path fill="#033045"
+                            d="M536.368,278.346v19.779h-12.933v-57.416h20.26c14.467,0,21.701,6.1,21.701,18.298c0,5.767-2.076,10.431-6.228,13.994c-4.152,3.563-9.696,5.345-16.637,5.345H536.368zM536.368,250.639v17.897h5.085c6.888,0,10.33-3.017,10.33-9.05c0-5.898-3.442-8.848-10.33-8.848H536.368z" />
+                    </g>
+                    <g>
+                        <path fill="#5D3429"
+                            d="M384.753,116.919h-8.965v8.965h-4.702v-8.965h-9.012v-4.726h9.012v-9.011h4.702v9.011h8.965V116.919z" />
+                    </g>
+                    <g>
+                        <path fill="#FBDA20"
+                            d="M460.946,57.98h-8.954v8.955h-4.696V57.98h-9.002v-4.721h9.002v-9.001h4.696v9.001h8.954V57.98z" />
+                    </g>
+                    <g>
+                        <path fill="#F8EA0A"
+                            d="M426.066,77.903h-11.194v11.193H409V77.903h-11.252V72H409V60.749h5.871V72h11.194V77.903z" />
+                    </g>
+                    <g>
+                        <path fill="#FBDA20"
+                            d="M330.073,37.312H320v10.074h-5.284V37.312h-10.127V32h10.127V21.874H320V32h10.072V37.312z" />
+                    </g>
+                    <g>
+                        <path fill="#FAE250"
+                            d="M388,54h-7.835v7.835h-4.108V54h-7.877v-4.131h7.877v-7.876h4.108v7.876H388V54z" />
+                    </g>
+                    <g>
+                        <path fill="#DAAB28"
+                            d="M442.114,110.265h-7.835v7.835h-4.108v-7.835h-7.877v-4.131h7.877v-7.876h4.108v7.876h7.835V110.265z" />
+                    </g>
+                    <g>
+                        <path fill="#FAE250"
+                            d="M359.313,77.487h-8.955v8.955h-4.697v-8.955h-9.001v-4.722h9.001v-9.001h4.697v9.001h8.955V77.487z" />
+                    </g>
+                    <g>
+                        <path fill="#B7967F"
+                            d="M400.835,154H393v7.835h-4.109V154h-7.877v-4.131h7.877v-7.876H393v7.876h7.835V154z" />
+                    </g>
+                </svg>
+            </div>
+            <div class="app-name">mne_browse</div>
+            <div class="app-subtitle">Loading neuroimaging viewer&hellip;</div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="status-text" id="status-text">Initializing&hellip;</div>
+        </div>
     </div>
-    <div class="app-name">mne_browse</div>
-    <div class="app-subtitle">Loading neuroimaging viewer&hellip;</div>
-    <div class="progress-container">
-      <div class="progress-bar" id="progress-bar"></div>
-    </div>
-    <div class="status-text" id="status-text">Initializing&hellip;</div>
-  </div>
-</div>
 
-<!-- Qt application canvas -->
-<canvas id="screen"></canvas>
-<div id="qtspinner"></div>
-<div id="qtstatus"></div>
+    <!-- Qt application canvas -->
+    <canvas id="screen"></canvas>
+    <div id="qtspinner"></div>
+    <div id="qtstatus"></div>
 
-<script src="mne_browse.js"></script>
-<script>
-/* ================================================================
-   Floating-polygon particle system — mouse-reactive parallax
-   ================================================================ */
-(function () {
-    var canvas = document.getElementById('particles-canvas');
-    var ctx    = canvas.getContext('2d');
-    var W, H;
-    var mouseX, mouseY, targetX, targetY;
-    var particles = [];
-    var running   = true;
+    <script src="mne_browse.js"></script>
+    <script>
+        /* ================================================================
+           Floating-polygon particle system — mouse-reactive parallax
+           ================================================================ */
+        (function () {
+            var canvas = document.getElementById('particles-canvas');
+            var ctx = canvas.getContext('2d');
+            var W, H;
+            var mouseX, mouseY, targetX, targetY;
+            var particles = [];
+            var running = true;
 
-    var PALETTE = [
-        '#6c5ce7','#a29bfe','#0c9a49','#7bc24e','#96c93f',
-        '#199eda','#2fb7e4','#e76daa','#df1284','#aa1e53',
-        '#fbda20','#fae250','#daab28','#d81e3a','#2465b0',
-        '#033045','#986036','#c3a593'
-    ];
+            var PALETTE = [
+                '#6c5ce7', '#a29bfe', '#0c9a49', '#7bc24e', '#96c93f',
+                '#199eda', '#2fb7e4', '#e76daa', '#df1284', '#aa1e53',
+                '#fbda20', '#fae250', '#daab28', '#d81e3a', '#2465b0',
+                '#033045', '#986036', '#c3a593'
+            ];
 
-    function resize() {
-        W = canvas.width  = window.innerWidth;
-        H = canvas.height = window.innerHeight;
-        mouseX = targetX = W / 2;
-        mouseY = targetY = H / 2;
-    }
-
-    /* — Particle class — */
-    function Particle() {
-        this.x     = Math.random() * W;
-        this.y     = Math.random() * H;
-        this.r     = Math.random() * 7 + 2;
-        this.baseR = this.r;
-        this.vx    = (Math.random() - 0.5) * 0.35;
-        this.vy    = (Math.random() - 0.5) * 0.35;
-        this.color = PALETTE[Math.floor(Math.random() * PALETTE.length)];
-        this.alpha  = Math.random() * 0.25 + 0.08;
-        this.baseA  = this.alpha;
-        this.rot    = Math.random() * Math.PI * 2;
-        this.rotV   = (Math.random() - 0.5) * 0.015;
-        this.depth  = Math.random() * 0.7 + 0.3;
-        this.sides  = Math.floor(Math.random() * 3) + 3;
-    }
-
-    Particle.prototype.update = function () {
-        /* parallax drift from mouse */
-        var dx = (mouseX - W / 2) * this.depth * 0.00015;
-        var dy = (mouseY - H / 2) * this.depth * 0.00015;
-        this.x += this.vx + dx;
-        this.y += this.vy + dy;
-        this.rot += this.rotV;
-
-        /* proximity glow */
-        var mx = mouseX - this.x, my = mouseY - this.y;
-        var dist = Math.sqrt(mx * mx + my * my);
-        if (dist < 220) {
-            var t = 1 - dist / 220;
-            this.alpha = Math.min(0.55, this.baseA + t * 0.4);
-            this.r     = Math.min(this.baseR + t * 6, 16);
-        } else {
-            this.alpha += (this.baseA - this.alpha) * 0.04;
-            this.r     += (this.baseR - this.r) * 0.04;
-        }
-
-        /* wrap */
-        if (this.x < -30)     this.x = W + 30;
-        if (this.x > W + 30)  this.x = -30;
-        if (this.y < -30)     this.y = H + 30;
-        if (this.y > H + 30)  this.y = -30;
-    };
-
-    Particle.prototype.draw = function () {
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.rotate(this.rot);
-        ctx.globalAlpha = this.alpha;
-        ctx.fillStyle   = this.color;
-        ctx.beginPath();
-        for (var i = 0; i < this.sides; i++) {
-            var a  = (i / this.sides) * Math.PI * 2 - Math.PI / 2;
-            var px = Math.cos(a) * this.r;
-            var py = Math.sin(a) * this.r;
-            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-        }
-        ctx.closePath();
-        ctx.fill();
-        ctx.restore();
-    };
-
-    /* — Init — */
-    resize();
-    var count = Math.min(90, Math.floor(W * H / 12000));
-    for (var i = 0; i < count; i++) particles.push(new Particle());
-
-    /* smooth mouse */
-    document.addEventListener('mousemove', function (e) { targetX = e.clientX; targetY = e.clientY; });
-    document.addEventListener('touchmove', function (e) { targetX = e.touches[0].clientX; targetY = e.touches[0].clientY; }, { passive: true });
-    window.addEventListener('resize', resize);
-
-    /* — Card tilt — */
-    var card = document.getElementById('loading-card');
-    document.addEventListener('mousemove', function (e) {
-        if (!card || !running) return;
-        var r = card.getBoundingClientRect();
-        var cx = e.clientX - r.left - r.width  / 2;
-        var cy = e.clientY - r.top  - r.height / 2;
-        var tiltX = (cy / r.height) * 4;
-        var tiltY = -(cx / r.width) * 4;
-        card.style.transform = 'perspective(800px) rotateX(' + tiltX + 'deg) rotateY(' + tiltY + 'deg)';
-    });
-    document.addEventListener('mouseleave', function () {
-        if (card) card.style.transform = '';
-    });
-
-    /* — Render loop — */
-    function frame() {
-        if (!running) return;
-        mouseX += (targetX - mouseX) * 0.07;
-        mouseY += (targetY - mouseY) * 0.07;
-        ctx.clearRect(0, 0, W, H);
-        for (var i = 0; i < particles.length; i++) {
-            particles[i].update();
-            particles[i].draw();
-        }
-        requestAnimationFrame(frame);
-    }
-    frame();
-
-    /* expose stop for cleanup */
-    window._stopParticles = function () { running = false; };
-})();
-
-/* ================================================================
-   Progress bar — simulated advance until Qt takes over
-   ================================================================ */
-var progressBar = document.getElementById('progress-bar');
-var statusText  = document.getElementById('status-text');
-var simProg     = 0;
-
-function setProgress(v, msg) {
-    simProg = Math.min(v, 100);
-    progressBar.style.width = simProg + '%';
-    if (msg) statusText.textContent = msg;
-}
-
-var simTimer = setInterval(function () {
-    if      (simProg < 25) { simProg += Math.random() * 3;   setProgress(simProg, 'Downloading application\u2026');    }
-    else if (simProg < 55) { simProg += Math.random() * 1.5; setProgress(simProg, 'Compiling WebAssembly\u2026');      }
-    else if (simProg < 80) { simProg += Math.random() * 0.6; setProgress(simProg, 'Initializing Qt framework\u2026'); }
-}, 250);
-
-/* ================================================================
-   Qt WASM bootstrap
-   ================================================================ */
-async function init() {
-    var screen = document.getElementById('screen');
-
-    function showApp() {
-        clearInterval(simTimer);
-        setProgress(100, 'Ready!');
-        setTimeout(function () {
-            document.getElementById('loading-overlay').classList.add('hidden');
-            document.getElementById('particles-canvas').style.display = 'none';
-            screen.classList.add('visible');
-            if (window._stopParticles) window._stopParticles();
-        }, 500);
-    }
-
-    try {
-        await qtLoad({
-            qt: {
-                onLoaded: function () { showApp(); },
-                onExit: function (exitData) {
-                    if (exitData.code !== undefined) {
-                        clearInterval(simTimer);
-                        statusText.textContent = exitData.text || 'Application exited (code ' + exitData.code + ')';
-                        statusText.style.color = '#d63031';
-                    }
-                },
-                entryFunction: window.mne_browse_entry,
-                containerElements: [screen],
+            function resize() {
+                W = canvas.width = window.innerWidth;
+                H = canvas.height = window.innerHeight;
+                mouseX = targetX = W / 2;
+                mouseY = targetY = H / 2;
             }
-        });
-    } catch (e) {
-        clearInterval(simTimer);
-        setProgress(simProg, 'Failed to load: ' + e.message);
-        statusText.style.color = '#d63031';
-    }
-}
-</script>
+
+            /* — Particle class — */
+            function Particle() {
+                this.x = Math.random() * W;
+                this.y = Math.random() * H;
+                this.r = Math.random() * 7 + 2;
+                this.baseR = this.r;
+                this.vx = (Math.random() - 0.5) * 0.35;
+                this.vy = (Math.random() - 0.5) * 0.35;
+                this.color = PALETTE[Math.floor(Math.random() * PALETTE.length)];
+                this.alpha = Math.random() * 0.25 + 0.08;
+                this.baseA = this.alpha;
+                this.rot = Math.random() * Math.PI * 2;
+                this.rotV = (Math.random() - 0.5) * 0.015;
+                this.depth = Math.random() * 0.7 + 0.3;
+                this.sides = Math.floor(Math.random() * 3) + 3;
+            }
+
+            Particle.prototype.update = function () {
+                /* parallax drift from mouse */
+                var dx = (mouseX - W / 2) * this.depth * 0.00015;
+                var dy = (mouseY - H / 2) * this.depth * 0.00015;
+                this.x += this.vx + dx;
+                this.y += this.vy + dy;
+                this.rot += this.rotV;
+
+                /* proximity glow */
+                var mx = mouseX - this.x, my = mouseY - this.y;
+                var dist = Math.sqrt(mx * mx + my * my);
+                if (dist < 220) {
+                    var t = 1 - dist / 220;
+                    this.alpha = Math.min(0.55, this.baseA + t * 0.4);
+                    this.r = Math.min(this.baseR + t * 6, 16);
+                } else {
+                    this.alpha += (this.baseA - this.alpha) * 0.04;
+                    this.r += (this.baseR - this.r) * 0.04;
+                }
+
+                /* wrap */
+                if (this.x < -30) this.x = W + 30;
+                if (this.x > W + 30) this.x = -30;
+                if (this.y < -30) this.y = H + 30;
+                if (this.y > H + 30) this.y = -30;
+            };
+
+            Particle.prototype.draw = function () {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rot);
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                for (var i = 0; i < this.sides; i++) {
+                    var a = (i / this.sides) * Math.PI * 2 - Math.PI / 2;
+                    var px = Math.cos(a) * this.r;
+                    var py = Math.sin(a) * this.r;
+                    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            };
+
+            /* — Init — */
+            resize();
+            var count = Math.min(90, Math.floor(W * H / 12000));
+            for (var i = 0; i < count; i++) particles.push(new Particle());
+
+            /* smooth mouse */
+            document.addEventListener('mousemove', function (e) { targetX = e.clientX; targetY = e.clientY; });
+            document.addEventListener('touchmove', function (e) { targetX = e.touches[0].clientX; targetY = e.touches[0].clientY; }, { passive: true });
+            window.addEventListener('resize', resize);
+
+            /* — Card tilt — */
+            var card = document.getElementById('loading-card');
+            document.addEventListener('mousemove', function (e) {
+                if (!card || !running) return;
+                var r = card.getBoundingClientRect();
+                var cx = e.clientX - r.left - r.width / 2;
+                var cy = e.clientY - r.top - r.height / 2;
+                var tiltX = (cy / r.height) * 4;
+                var tiltY = -(cx / r.width) * 4;
+                card.style.transform = 'perspective(800px) rotateX(' + tiltX + 'deg) rotateY(' + tiltY + 'deg)';
+            });
+            document.addEventListener('mouseleave', function () {
+                if (card) card.style.transform = '';
+            });
+
+            /* — Render loop — */
+            function frame() {
+                if (!running) return;
+                mouseX += (targetX - mouseX) * 0.07;
+                mouseY += (targetY - mouseY) * 0.07;
+                ctx.clearRect(0, 0, W, H);
+                for (var i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+                requestAnimationFrame(frame);
+            }
+            frame();
+
+            /* expose stop for cleanup */
+            window._stopParticles = function () { running = false; };
+        })();
+
+        /* ================================================================
+           Progress bar — simulated advance until Qt takes over
+           ================================================================ */
+        var progressBar = document.getElementById('progress-bar');
+        var statusText = document.getElementById('status-text');
+        var simProg = 0;
+
+        function setProgress(v, msg) {
+            simProg = Math.min(v, 100);
+            progressBar.style.width = simProg + '%';
+            if (msg) statusText.textContent = msg;
+        }
+
+        var simTimer = setInterval(function () {
+            if (simProg < 25) { simProg += Math.random() * 3; setProgress(simProg, 'Downloading application\u2026'); }
+            else if (simProg < 55) { simProg += Math.random() * 1.5; setProgress(simProg, 'Compiling WebAssembly\u2026'); }
+            else if (simProg < 80) { simProg += Math.random() * 0.6; setProgress(simProg, 'Initializing Qt framework\u2026'); }
+        }, 250);
+
+        /* ================================================================
+           Qt WASM bootstrap
+           ================================================================ */
+        async function init() {
+            var screen = document.getElementById('screen');
+
+            function showApp() {
+                clearInterval(simTimer);
+                setProgress(100, 'Ready!');
+                setTimeout(function () {
+                    document.getElementById('loading-overlay').classList.add('hidden');
+                    document.getElementById('particles-canvas').style.display = 'none';
+                    screen.classList.add('visible');
+                    if (window._stopParticles) window._stopParticles();
+                }, 500);
+            }
+
+            try {
+                await qtLoad({
+                    qt: {
+                        onLoaded: function () { showApp(); },
+                        onExit: function (exitData) {
+                            if (exitData.code !== undefined) {
+                                clearInterval(simTimer);
+                                statusText.textContent = exitData.text || 'Application exited (code ' + exitData.code + ')';
+                                statusText.style.color = '#d63031';
+                            }
+                        },
+                        entryFunction: window.mne_browse_entry,
+                        containerElements: [screen],
+                    }
+                });
+            } catch (e) {
+                clearInterval(simTimer);
+                setProgress(simProg, 'Failed to load: ' + e.message);
+                statusText.style.color = '#d63031';
+            }
+        }
+    </script>
 </body>
+
 </html>

@@ -595,6 +595,20 @@ void ChannelDataView::setRemoveDC(bool dc)
 
 //=============================================================================================================
 
+void ChannelDataView::setDetrendMode(DetrendMode mode)
+{
+    m_pModel->setDetrendMode(mode);
+}
+
+//=============================================================================================================
+
+DetrendMode ChannelDataView::detrendMode() const
+{
+    return m_pModel->detrendMode();
+}
+
+//=============================================================================================================
+
 void ChannelDataView::setEvents(const QVector<ChannelRhiView::EventMarker> &events)
 {
     if (m_pRhiView)
@@ -1009,8 +1023,14 @@ void ChannelDataView::keyPressEvent(QKeyEvent *event)
         emit butterflyToggled(butterflyMode());
         break;
     case Qt::Key_D:
-        if (m_pModel)
-            m_pModel->setRemoveDC(!m_pModel->removeDC());
+        if (m_pModel) {
+            // Cycle: None → Mean → Linear → None
+            switch (m_pModel->detrendMode()) {
+            case DetrendMode::None:   m_pModel->setDetrendMode(DetrendMode::Mean);   break;
+            case DetrendMode::Mean:   m_pModel->setDetrendMode(DetrendMode::Linear); break;
+            case DetrendMode::Linear: m_pModel->setDetrendMode(DetrendMode::None);   break;
+            }
+        }
         break;
     case Qt::Key_S:
         setScalebarsVisible(!scalebarsVisible());

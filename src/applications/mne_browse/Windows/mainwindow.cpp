@@ -1261,6 +1261,11 @@ void MainWindow::setupWindowWidgets()
     addDockWidget(Qt::LeftDockWidgetArea, m_pCovarianceWindow);
     m_pCovarianceWindow->hide();
 
+    //Create dockable ICA browser window
+    m_pIcaWindow = new IcaWindow(this);
+    addDockWidget(Qt::RightDockWidgetArea, m_pIcaWindow);
+    m_pIcaWindow->hide();
+
     //Create dockable epoch-review window
     m_pEpochWindow = new EpochWindow(this);
     addDockWidget(Qt::LeftDockWidgetArea, m_pEpochWindow);
@@ -1320,6 +1325,7 @@ void MainWindow::setupWindowWidgets()
     m_pEventWindow->init();
     m_pAnnotationWindow->init();
     m_pCovarianceWindow->init();
+    m_pIcaWindow->init();
     m_pEpochWindow->init();
     m_pVirtualChannelWindow->init();
     m_pScaleWindow->init();
@@ -1404,6 +1410,15 @@ void MainWindow::setupWindowWidgets()
                    && !m_covariance.isEmpty()
                    && !m_pAverageWindow->isVisible()) {
                     showWindow(m_pAverageWindow);
+                }
+            });
+
+    connect(m_pIcaWindow, &IcaWindow::icaCleaned,
+            this, [this](const Eigen::MatrixXd &cleanedData) {
+                if(m_pDataWindow && m_pDataWindow->getChannelDataView()) {
+                    m_pDataWindow->getChannelDataView()->setData(cleanedData,
+                        m_pDataWindow->firstSample());
+                    statusBar()->showMessage(tr("ICA cleaning applied — data updated."), 5000);
                 }
             });
 
@@ -1957,6 +1972,9 @@ void MainWindow::connectMenus()
     QAction* saveCovarianceAction = new QAction(tr("Save Covariance (fif)..."), this);
     ui->menuTest->insertAction(ui->m_loadEvokedAction, saveCovarianceAction);
 
+    QAction* computeIcaAction = new QAction(tr("Compute ICA..."), this);
+    ui->menuTest->insertAction(ui->m_loadEvokedAction, computeIcaAction);
+
     QAction* computeEvokedAction = new QAction(tr("Compute Evoked..."), this);
     ui->menuTest->insertAction(ui->m_loadEvokedAction, computeEvokedAction);
 
@@ -1991,6 +2009,9 @@ void MainWindow::connectMenus()
     QAction* covarianceManagerAction = new QAction(tr("Covariance manager..."), this);
     ui->menuWindows->insertAction(ui->m_informationAction, covarianceManagerAction);
 
+    QAction* icaBrowserAction = new QAction(tr("ICA browser..."), this);
+    ui->menuWindows->insertAction(ui->m_informationAction, icaBrowserAction);
+
     QAction* epochManagerAction = new QAction(tr("Epoch manager..."), this);
     ui->menuWindows->insertAction(ui->m_informationAction, epochManagerAction);
 
@@ -2020,6 +2041,7 @@ void MainWindow::connectMenus()
     connect(saveVirtualChannelsAction, &QAction::triggered, this, &MainWindow::saveVirtualChannels);
     connect(loadCovarianceAction, &QAction::triggered, this, &MainWindow::loadCovariance);
     connect(computeCovarianceAction, &QAction::triggered, this, &MainWindow::computeCovariance);
+    connect(computeIcaAction, &QAction::triggered, this, &MainWindow::computeIca);
     connect(saveCovarianceAction, &QAction::triggered, this, &MainWindow::saveCovariance);
     connect(computeEvokedAction, &QAction::triggered, this, &MainWindow::computeEvoked);
     connect(recomputeEvokedAction, &QAction::triggered, this, &MainWindow::recomputeEvoked);
@@ -2066,6 +2088,9 @@ void MainWindow::connectMenus()
     });
     connect(covarianceManagerAction, &QAction::triggered, this, [this](){
         showWindow(m_pCovarianceWindow);
+    });
+    connect(icaBrowserAction, &QAction::triggered, this, [this](){
+        showWindow(m_pIcaWindow);
     });
     connect(epochManagerAction, &QAction::triggered, this, [this](){
         showWindow(m_pEpochWindow);
@@ -3904,6 +3929,51 @@ void MainWindow::computeCovariance()
         m_pCovarianceWindow->show();
     }
     m_pCovarianceWindow->raise();
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::computeIca()
+{
+    if(m_qFileRaw.fileName().isEmpty() || !QFile::exists(m_qFileRaw.fileName())) {
+        QMessageBox::warning(this,
+                             tr("Compute ICA"),
+                             tr("Load a raw FIF file before computing ICA."));
+        return;
+    }
+
+    QFile rawFile(m_qFileRaw.fileName());
+    FIFFLIB::FiffRawData raw(rawFile);
+
+    if(raw.isEmpty()) {
+        QMessageBox::warning(this,
+                             tr("Compute ICA"),
+                             tr("Could not open raw data from %1.").arg(m_qFileRaw.fileName()));
+        return;
+    }
+
+    // Read all data
+    Eigen::MatrixXd data, times;
+    Eigen::RowVectorXd cals;
+    Eigen::SparseMatrix<double> mult;
+    Eigen::RowVectorXi sel;
+    raw.read_raw_segment(data, times, mult, raw.first_samp, raw.last_samp, sel);
+
+    if(data.rows() == 0 || data.cols() == 0) {
+        QMessageBox::warning(this,
+                             tr("Compute ICA"),
+                             tr("No data could be read from the raw file."));
+        return;
+    }
+
+    QSharedPointer<FIFFLIB::FiffInfo> pInfo(new FIFFLIB::FiffInfo(raw.info));
+    m_pIcaWindow->setRawData(data, pInfo, raw.first_samp);
+
+    if(!m_pIcaWindow->isVisible()) {
+        m_pIcaWindow->show();
+    }
+    m_pIcaWindow->raise();
 }
 
 

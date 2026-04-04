@@ -1468,8 +1468,13 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
                 if (m_pMainWindow)
                     m_pMainWindow->toggleDarkMode();
             } else {
-                // Toggle DC removal
-                m_pChannelDataView->setRemoveDC(!m_pChannelDataView->model()->removeDC());
+                // Cycle detrending: None → Mean → Linear → None
+                auto mode = m_pChannelDataView->detrendMode();
+                switch (mode) {
+                case DISPLIB::DetrendMode::None:   m_pChannelDataView->setDetrendMode(DISPLIB::DetrendMode::Mean);   break;
+                case DISPLIB::DetrendMode::Mean:   m_pChannelDataView->setDetrendMode(DISPLIB::DetrendMode::Linear); break;
+                case DISPLIB::DetrendMode::Linear: m_pChannelDataView->setDetrendMode(DISPLIB::DetrendMode::None);   break;
+                }
             }
             break;
         case Qt::Key_S:
@@ -1546,6 +1551,11 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
                     m_pMainWindow->toggleNoiseReductionWindow();
             }
             break;
+        case Qt::Key_I:
+            // Open ICA browser
+            if (m_pMainWindow)
+                m_pMainWindow->computeIca();
+            break;
         case Qt::Key_W:
             // Toggle whitening on butterfly averages
             if (m_pMainWindow)
@@ -1570,12 +1580,13 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
                        "<b>Display:</b><br>"
                        "B — Toggle butterfly mode<br>"
                        "C — Toggle clipping detection<br>"
-                       "D — Toggle DC removal<br>"
+                       "D — Cycle detrending (None → DC → Linear)<br>"
                        "E — Toggle event markers<br>"
                        "F — Toggle zen mode (hide UI chrome)<br>"
                        "F11 — Toggle fullscreen<br>"
                        "G — Toggle epoch grid lines<br>"
                        "H — Show epoch PTP histogram<br>"
+                       "I — Open ICA browser<br>"
                        "J — Show/hide projector window<br>"
                        "O — Toggle overview bar<br>"
                        "P — Toggle GFP overlay (butterfly)<br>"

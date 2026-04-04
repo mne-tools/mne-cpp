@@ -40,6 +40,7 @@ set(SOURCES
     Windows/eventwindow.cpp
     Windows/annotationwindow.cpp
     Windows/covariancewindow.cpp
+    Windows/icawindow.cpp
     Windows/epochwindow.cpp
     Windows/virtualchannelwindow.cpp
     Windows/datawindow.cpp
@@ -78,6 +79,7 @@ set(HEADERS
     Windows/eventwindow.h
     Windows/annotationwindow.h
     Windows/covariancewindow.h
+    Windows/icawindow.h
     Windows/epochwindow.h
     Windows/virtualchannelwindow.h
     Windows/datawindow.h

@@ -85,6 +85,7 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
+enum class DetrendMode;
 class ChannelDataModel;
 class ChannelLabelPanel;
 class TimeRulerWidget;
@@ -263,6 +264,16 @@ public:
      * @param[in] dc  true = subtract per-channel mean from each rendered window.
      */
     void setRemoveDC(bool dc);
+
+    //=========================================================================================================
+    /**
+     * Set the detrending mode for on-the-fly trend removal during rendering.
+     * None = raw, Mean = DC offset, Linear = least-squares linear fit.
+     *
+     * @param[in] mode  The DetrendMode to use.
+     */
+    void setDetrendMode(DetrendMode mode);
+    DetrendMode detrendMode() const;
 
     //=========================================================================================================
     /**

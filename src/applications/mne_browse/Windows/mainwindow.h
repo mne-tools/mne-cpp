@@ -77,6 +77,7 @@
 #include "eventwindow.h"
 #include "annotationwindow.h"
 #include "covariancewindow.h"
+#include "icawindow.h"
 #include "epochwindow.h"
 #include "virtualchannelwindow.h"
 #include "datawindow.h"
@@ -244,6 +245,7 @@ public:
     void toggleGFP();
     void toggleDarkMode();
     void showEpochHistogram();
+    void computeIca();
     DataWindow*             dataWindow()            const { return m_pDataWindow; }
     EventWindow*            eventWindow()           const { return m_pEventWindow; }
     ChannelSelectionView*   channelSelectionView()  const { return m_pChannelSelectionView; }
@@ -506,6 +508,7 @@ protected:
     EventWindow*            m_pEventWindow;                 /**< Event widget which display the event view. */
     AnnotationWindow*       m_pAnnotationWindow;            /**< Annotation widget which displays browser annotations. */
     CovarianceWindow*       m_pCovarianceWindow;            /**< Dock widget which inspects covariance data and drives whitening. */
+    IcaWindow*              m_pIcaWindow;                   /**< Dock widget for ICA component browsing and rejection. */
     EpochWindow*            m_pEpochWindow;                 /**< Dock widget which reviews epochs before averaging. */
     VirtualChannelWindow*   m_pVirtualChannelWindow;        /**< Dock widget which manages browser-level derived channels. */
     FilterWindow*           m_pFilterWindow;                /**< Filter widget which display the filter options for the user. */
