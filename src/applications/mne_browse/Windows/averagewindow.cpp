@@ -721,6 +721,8 @@ void AverageWindow::refreshPlots()
                 continue;
             const auto& info = evoked.info;
             for(int ch = 0; ch < info.chs.size() && ch < evoked.data.rows(); ++ch) {
+                if(info.bads.contains(info.chs[ch].ch_name))
+                    continue;
                 double maxVal = evoked.data.row(ch).cwiseAbs().maxCoeff();
                 if(info.chs[ch].kind == FIFFV_MEG_CH) {
                     if(info.chs[ch].unit == FIFF_UNIT_T_M)
