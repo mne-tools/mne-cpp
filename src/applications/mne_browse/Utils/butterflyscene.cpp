@@ -83,6 +83,22 @@ void ButterflyScene::setScaleMap(const QMap<QString,double> &scaleMap)
 
 //*************************************************************************************************************
 
+void ButterflyScene::setShowGFP(bool show)
+{
+    QList<QGraphicsItem*> itemList = this->items();
+
+    QListIterator<QGraphicsItem*> i(itemList);
+    while (i.hasNext()) {
+        ButterflySceneItem* item = static_cast<ButterflySceneItem*>(i.next());
+        item->m_bShowGFP = show;
+    }
+
+    this->update();
+}
+
+
+//*************************************************************************************************************
+
 void ButterflyScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
 {
     this->clear();

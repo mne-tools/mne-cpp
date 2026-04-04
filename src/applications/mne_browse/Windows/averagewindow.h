@@ -210,6 +210,20 @@ public:
 
     //=========================================================================================================
     /**
+     * Toggle GFP (Global Field Power) overlay in the butterfly plot.
+     *
+     * @param show true to show GFP.
+     */
+    void setShowGFP(bool show);
+
+    //=========================================================================================================
+    /**
+     * Returns whether GFP overlay is currently enabled.
+     */
+    bool isShowGFP() const;
+
+    //=========================================================================================================
+    /**
      * Returns the currently selected evoked-set rows.
      *
      * @return Selected row indices in the loaded-set table.
@@ -357,6 +371,7 @@ private:
     QDoubleSpinBox*         m_pSpinEEG  = nullptr;
     bool                    m_bAutoScaled = false;
     bool                    m_bButterflyAutoScaled = false;
+    bool                    m_bShowGFP = false;
 };
 
 } // NAMESPACE MNEBROWSE

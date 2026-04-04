@@ -29,14 +29,21 @@ fi
 echo "[wasm_postbuild] Copying coi-serviceworker.js → $OUTPUT_DIR/"
 cp "$SCRIPT_DIR/coi-serviceworker.js" "$OUTPUT_DIR/coi-serviceworker.js"
 
-# --- 2. Patch every .html file ---------------------------------------------
+# --- 2. Replace mne_browse.html with custom template -----------------------
 #
-# Qt generates HTML like:
-#   <body onload="init()">
+# Qt generates a bare-bones HTML file.  We replace it with our branded
+# loading screen that includes the MNE-CPP logo, floating polygon particles,
+# mouse-reactive parallax, and a progress bar — while keeping the same
+# Qt bootstrap JS (`mne_browse.js`, `qtLoad`, `window.mne_browse_entry`).
 #
-# We inject the service-worker loader right after <head> so it runs before
-# any WASM code is fetched.
-#
+TEMPLATE="$SCRIPT_DIR/mne_browse_template.html"
+
+if [ -f "$OUTPUT_DIR/mne_browse.html" ] && [ -f "$TEMPLATE" ]; then
+    echo "[wasm_postbuild] Replacing mne_browse.html with custom template"
+    cp "$TEMPLATE" "$OUTPUT_DIR/mne_browse.html"
+fi
+
+# --- 3. Inject service-worker <script> into every .html -------------------
 SW_TAG='<script src="coi-serviceworker.js"></script>'
 
 for html in "$OUTPUT_DIR"/*.html; do
@@ -47,7 +54,6 @@ for html in "$OUTPUT_DIR"/*.html; do
         continue
     fi
 
-    # Insert the service-worker script right after <head> ... opening tags
     if [[ "$(uname)" == "Darwin" ]]; then
         sed -i '' "s|<head>|<head>\\
     ${SW_TAG}|" "$html"

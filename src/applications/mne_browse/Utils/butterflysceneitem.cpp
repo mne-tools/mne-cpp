@@ -161,6 +161,13 @@ void ButterflySceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     paintAveragePaths(painter);
     painter->restore();
 
+    // GFP overlay
+    if(m_bShowGFP) {
+        painter->save();
+        paintGFP(painter);
+        painter->restore();
+    }
+
     // Title
     painter->save();
     QFont titleFont = painter->font();
@@ -433,6 +440,129 @@ void ButterflySceneItem::paintAveragePaths(QPainter *painter)
             }
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void ButterflySceneItem::paintGFP(QPainter *painter)
+{
+    if(!m_pFiffInfo)
+        return;
+
+    const QRectF pa = plotArea();
+    const double* averageData = m_lAverageData.first;
+    int totalCols = m_lAverageData.second;
+    if(totalCols <= 0)
+        return;
+
+    // Determine scale for this channel type
+    double dMaxValue = 1e-09;
+    if(m_iSetKind == FIFFV_MEG_CH) {
+        if(m_iSetUnit == FIFF_UNIT_T_M)
+            dMaxValue = m_scaleMap.value("MEG_grad", 4e-11);
+        else
+            dMaxValue = m_scaleMap.value("MEG_mag", 1.2e-12);
+    } else if(m_iSetKind == FIFFV_EEG_CH) {
+        dMaxValue = m_scaleMap.value("MEG_EEG", 30e-6);
+    }
+
+    double dScaleY = pa.height() / (2.0 * dMaxValue);
+    double xStep = pa.width() / static_cast<double>(totalCols);
+    double centerY = pa.y() + pa.height() / 2.0;
+
+    // Collect channel indices matching this kind/unit
+    QVector<int> chIndices;
+    int nChs = m_pFiffInfo->chs.size();
+    for(int i = 0; i < nChs; ++i) {
+        const FiffChInfo& ch = m_pFiffInfo->chs[i];
+        if(m_pFiffInfo->bads.contains(ch.ch_name))
+            continue;
+        if(ch.kind == FIFFV_MEG_CH && m_iSetKind == FIFFV_MEG_CH &&
+           ch.unit == m_iSetUnit) {
+            chIndices.append(i);
+        } else if(ch.kind == FIFFV_EEG_CH && m_iSetKind == FIFFV_EEG_CH) {
+            chIndices.append(i);
+        }
+    }
+    if(chIndices.isEmpty())
+        return;
+
+    int nMatch = chIndices.size();
+
+    // Build GFP path: RMS across matching channels at each time point
+    // GFP is always positive, drawn symmetrically around the center line as filled area
+    QPainterPath pathTop(QPointF(pa.x(), centerY));
+    QPainterPath pathBot(QPointF(pa.x(), centerY));
+
+    for(int u = 0; u < totalCols; ++u) {
+        double sumSq = 0.0;
+        for(int c = 0; c < nMatch; ++c) {
+            double v = *(averageData + (u * nChs) + chIndices[c]);
+            sumSq += v * v;
+        }
+        double gfp = std::sqrt(sumSq / nMatch);
+        double yVal = gfp * dScaleY;
+        double halfH = pa.height() / 2.0;
+        if(yVal > halfH) yVal = halfH;
+
+        double xPos = pa.x() + u * xStep;
+        pathTop.lineTo(QPointF(xPos, centerY - yVal));
+        pathBot.lineTo(QPointF(xPos, centerY + yVal));
+    }
+
+    // Close top path back along center
+    pathTop.lineTo(QPointF(pa.x() + (totalCols - 1) * xStep, centerY));
+    pathTop.closeSubpath();
+
+    // Draw filled GFP area (semi-transparent)
+    QColor gfpFill(108, 92, 231, 35);   // purple, very transparent
+    QColor gfpLine(108, 92, 231, 180);  // purple, mostly opaque
+    painter->setBrush(gfpFill);
+    painter->setPen(Qt::NoPen);
+    painter->drawPath(pathTop);
+
+    // Bottom mirror
+    pathBot.lineTo(QPointF(pa.x() + (totalCols - 1) * xStep, centerY));
+    pathBot.closeSubpath();
+    painter->drawPath(pathBot);
+
+    // Draw GFP outline
+    QPainterPath outline(QPointF(pa.x(), centerY));
+    for(int u = 0; u < totalCols; ++u) {
+        double sumSq = 0.0;
+        for(int c = 0; c < nMatch; ++c) {
+            double v = *(averageData + (u * nChs) + chIndices[c]);
+            sumSq += v * v;
+        }
+        double gfp = std::sqrt(sumSq / nMatch);
+        double yVal = gfp * dScaleY;
+        double halfH = pa.height() / 2.0;
+        if(yVal > halfH) yVal = halfH;
+        outline.lineTo(QPointF(pa.x() + u * xStep, centerY - yVal));
+    }
+
+    QPen gfpPen(gfpLine);
+    gfpPen.setWidthF(1.5);
+    painter->setBrush(Qt::NoBrush);
+    painter->setPen(gfpPen);
+    painter->drawPath(outline);
+
+    // Mirror outline
+    QPainterPath outlineMirror(QPointF(pa.x(), centerY));
+    for(int u = 0; u < totalCols; ++u) {
+        double sumSq = 0.0;
+        for(int c = 0; c < nMatch; ++c) {
+            double v = *(averageData + (u * nChs) + chIndices[c]);
+            sumSq += v * v;
+        }
+        double gfp = std::sqrt(sumSq / nMatch);
+        double yVal = gfp * dScaleY;
+        double halfH = pa.height() / 2.0;
+        if(yVal > halfH) yVal = halfH;
+        outlineMirror.lineTo(QPointF(pa.x() + u * xStep, centerY + yVal));
+    }
+    painter->drawPath(outlineMirror);
 }
 
 

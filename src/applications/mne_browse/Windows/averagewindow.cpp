@@ -376,6 +376,22 @@ bool AverageWindow::isButterflyWhiteningEnabled() const
 
 //*************************************************************************************************************
 
+void AverageWindow::setShowGFP(bool show)
+{
+    m_bShowGFP = show;
+    if(m_pButterflyScene)
+        m_pButterflyScene->setShowGFP(show);
+}
+
+//*************************************************************************************************************
+
+bool AverageWindow::isShowGFP() const
+{
+    return m_bShowGFP;
+}
+
+//*************************************************************************************************************
+
 QList<int> AverageWindow::selectedSetRows() const
 {
     QList<int> rows;
@@ -852,6 +868,7 @@ void AverageWindow::refreshPlots()
                                                                             m_lButterflyColors);
 
         butterflySceneItemTemp->setEvokedData(displayEvoked);
+        butterflySceneItemTemp->m_bShowGFP = m_bShowGFP;
 
         m_pButterflyScene->addItem(butterflySceneItemTemp);
     }

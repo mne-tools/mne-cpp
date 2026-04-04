@@ -148,6 +148,7 @@ public:
     RowVectorPair           m_lAverageData;             /**< The channels average data which is to be plotted.*/
     QPair<int,int>          m_firstLastSample;          /**< The first and last sample.*/
     QMap<QString,double>    m_scaleMap;                 /**< Map with all channel types and their current scaling value.*/
+    bool                    m_bShowGFP = false;         /**< Whether to paint the GFP (Global Field Power) trace. */
 
     //=========================================================================================================
     /**
@@ -170,6 +171,12 @@ protected:
      * @param [in] painter The painter used to plot in this item.
      */
     void paintAveragePaths(QPainter *painter);
+
+    //=========================================================================================================
+    /**
+     * Paint the GFP (Global Field Power) trace as a filled area.
+     */
+    void paintGFP(QPainter *painter);
 
     //=========================================================================================================
     /**

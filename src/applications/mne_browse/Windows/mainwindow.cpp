@@ -51,6 +51,8 @@
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QDoubleSpinBox>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -58,6 +60,7 @@
 #include <QInputDialog>
 #include <QListWidget>
 #include <QLineEdit>
+#include <QMimeData>
 #include <QPainter>
 #include <QPushButton>
 #include <QSet>
@@ -1999,6 +2002,12 @@ void MainWindow::connectMenus()
     m_pAnnotationModeAction->setStatusTip(tr("When enabled, Shift-drag in the raw browser creates annotation spans."));
     ui->menuAdjust->addAction(m_pAnnotationModeAction);
 
+    // Recent files submenu
+    m_pRecentFilesMenu = new QMenu(tr("Open Recent"), this);
+    ui->menuTest->insertMenu(ui->m_writeAction, m_pRecentFilesMenu);
+    m_recentFiles = m_qSettings.value("recentFiles").toStringList();
+    updateRecentFilesMenu();
+
     //File
     connect(ui->m_openAction, &QAction::triggered, this, &MainWindow::openFile);
     connect(ui->m_writeAction, &QAction::triggered, this, &MainWindow::writeFile);
@@ -2169,6 +2178,7 @@ void MainWindow::setupMainWindow()
 
     //Set data window as central widget - This is needed because we are using QDockWidgets
     setCentralWidget(m_pDataWindow);
+    setAcceptDrops(true);
 
     // Apply saved view states to the actual ChannelDataView
     applyViewSettingsToDataView();
@@ -2268,6 +2278,85 @@ void MainWindow::toggleWhitening()
         }
         m_pDataWindow->setRawWhiteningEnabled(newState);
     }
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::toggleGFP()
+{
+    if(m_pAverageWindow) {
+        m_pAverageWindow->setShowGFP(!m_pAverageWindow->isShowGFP());
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::toggleDarkMode()
+{
+    static bool dark = false;
+    dark = !dark;
+
+    QPalette pal;
+    if(dark) {
+        pal.setColor(QPalette::Window,          QColor(42, 42, 42));
+        pal.setColor(QPalette::WindowText,      QColor(220, 220, 220));
+        pal.setColor(QPalette::Base,            QColor(30, 30, 30));
+        pal.setColor(QPalette::AlternateBase,   QColor(50, 50, 50));
+        pal.setColor(QPalette::ToolTipBase,     QColor(60, 60, 60));
+        pal.setColor(QPalette::ToolTipText,     QColor(220, 220, 220));
+        pal.setColor(QPalette::Text,            QColor(220, 220, 220));
+        pal.setColor(QPalette::Button,          QColor(53, 53, 53));
+        pal.setColor(QPalette::ButtonText,      QColor(220, 220, 220));
+        pal.setColor(QPalette::BrightText,      Qt::red);
+        pal.setColor(QPalette::Link,            QColor(108, 92, 231));
+        pal.setColor(QPalette::Highlight,       QColor(108, 92, 231));
+        pal.setColor(QPalette::HighlightedText, Qt::white);
+        pal.setColor(QPalette::Disabled, QPalette::Text,       QColor(128, 128, 128));
+        pal.setColor(QPalette::Disabled, QPalette::ButtonText, QColor(128, 128, 128));
+    } else {
+        pal = QApplication::style()->standardPalette();
+    }
+
+    QApplication::setPalette(pal);
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::addToRecentFiles(const QString& filename)
+{
+    m_recentFiles.removeAll(filename);
+    m_recentFiles.prepend(filename);
+    while(m_recentFiles.size() > 10)
+        m_recentFiles.removeLast();
+    m_qSettings.setValue("recentFiles", m_recentFiles);
+    updateRecentFilesMenu();
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::updateRecentFilesMenu()
+{
+    if(!m_pRecentFilesMenu)
+        return;
+
+    m_pRecentFilesMenu->clear();
+
+    for(const QString& path : m_recentFiles) {
+        if(!QFileInfo::exists(path))
+            continue;
+        QAction* action = m_pRecentFilesMenu->addAction(QFileInfo(path).fileName());
+        action->setData(path);
+        action->setToolTip(path);
+        connect(action, &QAction::triggered, this, [this, path]() {
+            loadRawFile(path);
+        });
+    }
+
+    m_pRecentFilesMenu->setEnabled(!m_pRecentFilesMenu->isEmpty());
 }
 
 
@@ -2938,8 +3027,10 @@ bool MainWindow::loadRawFile(const QString& filename)
 
     setWindowStatus();
 
-    if (ok)
+    if (ok) {
         applyViewSettingsToDataView();
+        addToRecentFiles(filename);
+    }
 
     return ok;
 }
@@ -4026,4 +4117,39 @@ void MainWindow::closeEvent(QCloseEvent *event)
         m_qSettings.setValue("MainWindow/View/zScore", m_pZScoreAction->isChecked());
 
     QMainWindow::closeEvent(event);
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+    if(event->mimeData()->hasUrls()) {
+        for(const QUrl& url : event->mimeData()->urls()) {
+            const QString path = url.toLocalFile();
+            if(path.endsWith(".fif", Qt::CaseInsensitive) ||
+               path.endsWith(".fiff", Qt::CaseInsensitive)) {
+                event->acceptProposedAction();
+                return;
+            }
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::dropEvent(QDropEvent *event)
+{
+    if(!event->mimeData()->hasUrls())
+        return;
+
+    for(const QUrl& url : event->mimeData()->urls()) {
+        const QString path = url.toLocalFile();
+        if(path.endsWith(".fif", Qt::CaseInsensitive) ||
+           path.endsWith(".fiff", Qt::CaseInsensitive)) {
+            loadRawFile(path);
+            return;
+        }
+    }
 }

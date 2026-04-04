@@ -101,6 +101,12 @@ public:
 
     //=========================================================================================================
     /**
+     * Enable or disable the GFP (Global Field Power) overlay on all items.
+     */
+    void setShowGFP(bool show);
+
+    //=========================================================================================================
+    /**
      * Repaints all items from the layout data in the scene.
      *
      *  @param [in] selectedChannelItems items which are to painted to the average scene

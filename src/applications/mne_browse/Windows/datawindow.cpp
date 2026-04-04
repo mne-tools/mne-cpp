@@ -1463,6 +1463,10 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
         case Qt::Key_D:
             if (event->modifiers() & Qt::ControlModifier) {
                 ui->m_tableView_rawTableView->clearSelection();
+            } else if (event->modifiers() & Qt::ShiftModifier) {
+                // Toggle dark mode
+                if (m_pMainWindow)
+                    m_pMainWindow->toggleDarkMode();
             } else {
                 // Toggle DC removal
                 m_pChannelDataView->setRemoveDC(!m_pChannelDataView->model()->removeDC());
@@ -1547,6 +1551,11 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
             if (m_pMainWindow)
                 m_pMainWindow->toggleWhitening();
             break;
+        case Qt::Key_P:
+            // Toggle GFP (Global Field Power) on butterfly plot
+            if (m_pMainWindow)
+                m_pMainWindow->toggleGFP();
+            break;
         case Qt::Key_Question:
             // Show keyboard shortcut help
             {
@@ -1569,12 +1578,14 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
                        "H — Show epoch PTP histogram<br>"
                        "J — Show/hide projector window<br>"
                        "O — Toggle overview bar<br>"
+                       "P — Toggle GFP overlay (butterfly)<br>"
                        "S — Toggle scalebars<br>"
                        "T — Toggle time format (seconds / clock)<br>"
                        "W — Toggle whitening (raw traces + butterfly)<br>"
                        "X — Toggle crosshair cursor<br>"
                        "Z — Toggle z-score normalization<br>"
                        "Shift+A — Toggle annotation spans<br>"
+                       "Shift+D — Toggle dark mode<br>"
                        "Shift+J — Toggle all projectors on/off<br>"
                        "[ / ] — Decrease/increase scroll speed<br>"
                        "Ctrl+D — Clear channel selection<br>"

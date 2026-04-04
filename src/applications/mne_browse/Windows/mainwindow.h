@@ -241,6 +241,8 @@ public:
     void toggleNoiseReductionWindow();
     void toggleAllProjectors();
     void toggleWhitening();
+    void toggleGFP();
+    void toggleDarkMode();
     void showEpochHistogram();
     DataWindow*             dataWindow()            const { return m_pDataWindow; }
     EventWindow*            eventWindow()           const { return m_pEventWindow; }
@@ -462,12 +464,17 @@ private:
 
     void applyViewSettingsToDataView();
 
+    void addToRecentFiles(const QString& filename);
+    void updateRecentFilesMenu();
+
 protected:
     //=========================================================================================================
     /**
      * Saves persistent settings (window geometry, view toggles) on close.
      */
     void closeEvent(QCloseEvent *event) override;
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dropEvent(QDropEvent *event) override;
 
     //=========================================================================================================
     /**
@@ -532,7 +539,11 @@ protected:
     QAction*                m_pClippingAction;              /**< Toggle clipping detection (C). */
     QAction*                m_pZScoreAction;                /**< Toggle z-score normalization (Z). */
     QAction*                m_pWhitenButterflyAction;       /**< Toggle whitening in the average butterfly plot. */
+    QAction*                m_pGFPAction;                   /**< Toggle GFP overlay in the butterfly plot. */
+    QAction*                m_pDarkModeAction;              /**< Toggle dark mode palette. */
     QAction*                m_pAnnotationModeAction;        /**< Toggle Shift-drag annotation selection in the raw browser. */
+    QMenu*                  m_pRecentFilesMenu = nullptr;   /**< "Open Recent" submenu. */
+    QStringList             m_recentFiles;                  /**< Most-recently-used file paths (newest first). */
     QList<MNELIB::MNEEpochDataList> m_epochReviewLists;     /**< Reviewed epochs grouped by event code. */
     QList<int>              m_epochReviewEventCodes;        /**< Event codes for the current review session. */
     QStringList             m_epochReviewComments;          /**< Display comments for the current review session. */
