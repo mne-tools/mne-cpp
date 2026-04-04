@@ -65,6 +65,8 @@
 
 #include <memory>
 
+class QDoubleSpinBox;
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -349,6 +351,10 @@ signals:
 private:
     QAction*                m_pComputeAverageAction = nullptr; /**< Default evoked-compute action shown by the add button. */
     QAction*                m_pRecomputeAverageAction = nullptr; /**< Quick recompute action using the last saved settings. */
+
+    QDoubleSpinBox*         m_pSpinGrad = nullptr;
+    QDoubleSpinBox*         m_pSpinMag  = nullptr;
+    QDoubleSpinBox*         m_pSpinEEG  = nullptr;
 };
 
 } // NAMESPACE MNEBROWSE

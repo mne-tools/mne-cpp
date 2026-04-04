@@ -76,7 +76,7 @@ LayoutScene::LayoutScene(QGraphicsView* view,
 //=============================================================================================================
 
 void LayoutScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
-    m_qvView->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
+    m_qvView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 
     // Scale the view / do the zoom
     double scaleFactor = 1.15;

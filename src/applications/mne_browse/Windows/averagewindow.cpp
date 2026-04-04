@@ -56,6 +56,10 @@
 #include <QRandomGenerator>
 #include <QStandardPaths>
 #include <QTimer>
+#include <QDoubleSpinBox>
+#include <QLabel>
+#include <QGridLayout>
+#include <QHBoxLayout>
 
 
 //*************************************************************************************************************
@@ -285,6 +289,11 @@ void AverageWindow::scaleAveragedData(const QMap<QString,double> &scaleMap)
 
     m_pAverageScene->setScaleMap(newScaleMapIdx);
     m_pButterflyScene->setScaleMap(scaleMap);
+
+    // Sync spinboxes with external scale changes
+    if(m_pSpinGrad) m_pSpinGrad->setValue(scaleMap.value("MEG_grad", 1e-10) / 1e-10);
+    if(m_pSpinMag)  m_pSpinMag->setValue(scaleMap.value("MEG_mag", 1e-11) / 1e-11);
+    if(m_pSpinEEG)  m_pSpinEEG->setValue(scaleMap.value("MEG_EEG", 1e-4) / 1e-4);
 }
 
 
@@ -487,6 +496,67 @@ void AverageWindow::initAverageSceneView()
     defaultScaleMap[FIFF_UNIT_T_M] = 1e-10f;   // GRAD
     defaultScaleMap[FIFFV_EEG_CH]  = 1e-4f;    // EEG
     m_pAverageScene->setScaleMap(defaultScaleMap);
+
+    // --- Scale controls for the 2D Layout tab ---
+    // The graphics view sits in gridLayout (inside gridLayout_2 on the tab page).
+    // We add scale spinboxes to gridLayout row 2.
+    QGridLayout* layoutGrid = nullptr;
+    if(auto* item = ui->m_graphicsView_layout->parentWidget()->layout()) {
+        // gridLayout_2 wraps gridLayout; find the inner one containing the view
+        for(int i = 0; i < item->count(); ++i) {
+            if(auto* nested = qobject_cast<QGridLayout*>(item->itemAt(i)->layout())) {
+                // Check if this grid contains our graphics view
+                for(int j = 0; j < nested->count(); ++j) {
+                    if(nested->itemAt(j)->widget() == ui->m_graphicsView_layout) {
+                        layoutGrid = nested;
+                        break;
+                    }
+                }
+                if(layoutGrid) break;
+            }
+        }
+    }
+    if(layoutGrid) {
+        QWidget* tabPage = ui->m_graphicsView_layout->parentWidget();
+
+        auto makeSpinBox = [&](const QString& labelText, double defaultVal) -> QDoubleSpinBox* {
+            QDoubleSpinBox* spin = new QDoubleSpinBox(tabPage);
+            spin->setDecimals(2);
+            spin->setRange(0.01, 100.0);
+            spin->setSingleStep(0.1);
+            spin->setValue(defaultVal);
+            spin->setPrefix(labelText + " ×");
+            spin->setFixedWidth(120);
+            return spin;
+        };
+
+        m_pSpinGrad = makeSpinBox("Grad", 1.0);
+        m_pSpinMag  = makeSpinBox("Mag", 1.0);
+        m_pSpinEEG  = makeSpinBox("EEG", 1.0);
+
+        QHBoxLayout* scaleLayout = new QHBoxLayout;
+        scaleLayout->addStretch();
+        scaleLayout->addWidget(m_pSpinGrad);
+        scaleLayout->addWidget(m_pSpinMag);
+        scaleLayout->addWidget(m_pSpinEEG);
+
+        layoutGrid->addLayout(scaleLayout, 2, 0, 1, 3);
+
+        auto updateScales = [this]() {
+            QMap<qint32,float> scaleMap;
+            scaleMap[FIFF_UNIT_T]   = static_cast<float>(m_pSpinMag->value()  * 1e-11);
+            scaleMap[FIFF_UNIT_T_M] = static_cast<float>(m_pSpinGrad->value() * 1e-10);
+            scaleMap[FIFFV_EEG_CH]  = static_cast<float>(m_pSpinEEG->value()  * 1e-4);
+            m_pAverageScene->setScaleMap(scaleMap);
+        };
+
+        connect(m_pSpinGrad, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+                this, updateScales);
+        connect(m_pSpinMag, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+                this, updateScales);
+        connect(m_pSpinEEG, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+                this, updateScales);
+    }
 
     //Create butterfly average scene and set view
     m_pButterflyScene = new ButterflyScene(ui->m_graphicsView_butterflyPlot, this);
