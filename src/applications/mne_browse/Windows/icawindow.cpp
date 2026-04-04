@@ -248,9 +248,15 @@ void IcaWindow::onApply()
 
 void IcaWindow::rebuildComponentList()
 {
-    clearIca();
-    m_bHasResult = true; // restore after clearIca resets it
-    m_pApplyButton->setEnabled(true);
+    // Clear only the UI widgets, not the ICA result
+    for (auto *cb : m_componentCheckboxes)
+        cb->deleteLater();
+    m_componentCheckboxes.clear();
+    while (QLayoutItem *item = m_pComponentListLayout->takeAt(0)) {
+        if (item->widget())
+            item->widget()->deleteLater();
+        delete item;
+    }
 
     const int nComp = static_cast<int>(m_icaResult.matSources.rows());
     const int waveWidth  = 260;
