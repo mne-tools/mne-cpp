@@ -99,6 +99,25 @@ void NoiseReductionWindow::setFiffInfo(FiffInfo::SPtr& pFiffInfo)
 
 //*************************************************************************************************************
 
+void NoiseReductionWindow::toggleAllProjectors()
+{
+    if(!m_pFiffInfo || m_qListProjCheckBox.isEmpty())
+        return;
+
+    // Determine new state: if all are on, turn all off; otherwise turn all on
+    bool allOn = true;
+    for(int i = 0; i < m_qListProjCheckBox.size(); ++i) {
+        if(!m_qListProjCheckBox[i]->isChecked()) {
+            allOn = false;
+            break;
+        }
+    }
+    enableDisableAllProj(!allOn);
+}
+
+
+//*************************************************************************************************************
+
 void NoiseReductionWindow::createProjectorGroup()
 {
     if(m_pFiffInfo)

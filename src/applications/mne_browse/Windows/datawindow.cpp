@@ -1407,6 +1407,27 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
             if (m_pMainWindow)
                 m_pMainWindow->toggleZenMode();
             break;
+        case Qt::Key_H:
+            // Show epoch PTP histogram
+            if (m_pMainWindow)
+                m_pMainWindow->showEpochHistogram();
+            break;
+        case Qt::Key_J:
+            if (event->modifiers() & Qt::ShiftModifier) {
+                // Toggle all projectors
+                if (m_pMainWindow)
+                    m_pMainWindow->toggleAllProjectors();
+            } else {
+                // Show/hide noise reduction (projector) window
+                if (m_pMainWindow)
+                    m_pMainWindow->toggleNoiseReductionWindow();
+            }
+            break;
+        case Qt::Key_W:
+            // Toggle whitening on butterfly averages
+            if (m_pMainWindow)
+                m_pMainWindow->toggleWhitening();
+            break;
         case Qt::Key_Question:
             // Show keyboard shortcut help
             {
@@ -1426,12 +1447,16 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
                        "F — Toggle zen mode (hide UI chrome)<br>"
                        "F11 — Toggle fullscreen<br>"
                        "G — Toggle epoch grid lines<br>"
+                       "H — Show epoch PTP histogram<br>"
+                       "J — Show/hide projector window<br>"
                        "O — Toggle overview bar<br>"
                        "S — Toggle scalebars<br>"
                        "T — Toggle time format (seconds / clock)<br>"
+                       "W — Toggle whitening (butterfly averages)<br>"
                        "X — Toggle crosshair cursor<br>"
                        "Z — Toggle z-score normalization<br>"
                        "Shift+A — Toggle annotation spans<br>"
+                       "Shift+J — Toggle all projectors on/off<br>"
                        "[ / ] — Decrease/increase scroll speed<br>"
                        "Ctrl+D — Clear channel selection<br>"
                        "? — Show this help<br>"

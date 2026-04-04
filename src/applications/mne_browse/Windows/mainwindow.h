@@ -238,6 +238,10 @@ public:
      */
     void toggleFullscreen();
     void toggleZenMode();
+    void toggleNoiseReductionWindow();
+    void toggleAllProjectors();
+    void toggleWhitening();
+    void showEpochHistogram();
     DataWindow*             dataWindow()            const { return m_pDataWindow; }
     EventWindow*            eventWindow()           const { return m_pEventWindow; }
     ChannelSelectionView*   channelSelectionView()  const { return m_pChannelSelectionView; }

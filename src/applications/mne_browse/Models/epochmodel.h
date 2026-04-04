@@ -187,6 +187,14 @@ public:
      */
     QString summaryText() const;
 
+    //=========================================================================================================
+    /**
+     * Returns peak-to-peak amplitudes (max across channels) for each included epoch.
+     *
+     * @return Vector of PTP values for included epochs.
+     */
+    QVector<double> ptpAmplitudes() const;
+
 signals:
     //=========================================================================================================
     /**

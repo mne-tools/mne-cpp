@@ -368,3 +368,23 @@ QString EpochModel::epochStatusText(const EpochEntry& entry) const
 
     return QStringLiteral("kept");
 }
+
+//=============================================================================================================
+
+QVector<double> EpochModel::ptpAmplitudes() const
+{
+    QVector<double> result;
+    result.reserve(m_entries.size());
+
+    for(const EpochEntry& entry : m_entries) {
+        if(!epochIsIncluded(entry) || !entry.epoch || entry.epoch->epoch.cols() == 0)
+            continue;
+
+        const Eigen::MatrixXd& data = entry.epoch->epoch;
+        // PTP per channel, then take max across channels
+        Eigen::VectorXd ptp = data.rowwise().maxCoeff() - data.rowwise().minCoeff();
+        result.append(ptp.maxCoeff());
+    }
+
+    return result;
+}

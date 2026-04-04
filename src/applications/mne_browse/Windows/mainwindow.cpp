@@ -2228,6 +2228,151 @@ void MainWindow::toggleZenMode()
 
 //*************************************************************************************************************
 
+void MainWindow::toggleNoiseReductionWindow()
+{
+    if(m_pNoiseReductionWindow->isVisible())
+        m_pNoiseReductionWindow->hide();
+    else {
+        m_pNoiseReductionWindow->show();
+        m_pNoiseReductionWindow->raise();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::toggleAllProjectors()
+{
+    m_pNoiseReductionWindow->toggleAllProjectors();
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::toggleWhitening()
+{
+    if(m_pAverageWindow)
+        m_pAverageWindow->setButterflyWhiteningEnabled(!m_pAverageWindow->isButterflyWhiteningEnabled());
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::showEpochHistogram()
+{
+    if(!m_pEpochWindow)
+        return;
+
+    EpochModel* em = m_pEpochWindow->getEpochModel();
+    if(!em || em->rowCount() == 0)
+        return;
+
+    QVector<double> ptpValues = em->ptpAmplitudes();
+    if(ptpValues.isEmpty())
+        return;
+
+    // --- compute histogram ---
+    const int nBins = 30;
+    double minVal = *std::min_element(ptpValues.begin(), ptpValues.end());
+    double maxVal = *std::max_element(ptpValues.begin(), ptpValues.end());
+
+    if(qFuzzyCompare(minVal, maxVal)) {
+        maxVal = minVal + 1.0;
+    }
+
+    const double binWidth = (maxVal - minVal) / nBins;
+    QVector<int> bins(nBins, 0);
+
+    for(double v : ptpValues) {
+        int idx = static_cast<int>((v - minVal) / binWidth);
+        if(idx >= nBins) idx = nBins - 1;
+        bins[idx]++;
+    }
+
+    int maxCount = *std::max_element(bins.begin(), bins.end());
+    if(maxCount == 0) maxCount = 1;
+
+    // --- build dialog ---
+    QDialog dlg(this);
+    dlg.setWindowTitle(tr("Epoch PTP Histogram (%1 epochs)").arg(ptpValues.size()));
+    dlg.resize(500, 350);
+
+    // Create a pixmap for the histogram
+    const int margin = 50;
+    const int w = 500;
+    const int h = 300;
+    QPixmap pixmap(w, h);
+    pixmap.fill(Qt::white);
+
+    {
+        QPainter p(&pixmap);
+        p.setRenderHint(QPainter::Antialiasing);
+
+        const int plotLeft = margin;
+        const int plotRight = w - 20;
+        const int plotTop = 20;
+        const int plotBottom = h - margin;
+        const int plotW = plotRight - plotLeft;
+        const int plotH = plotBottom - plotTop;
+
+        // Draw bars
+        const double barW = static_cast<double>(plotW) / nBins;
+        p.setPen(Qt::NoPen);
+        p.setBrush(QColor(70, 130, 180));  // steel blue
+
+        for(int i = 0; i < nBins; ++i) {
+            double barH = (static_cast<double>(bins[i]) / maxCount) * plotH;
+            double x = plotLeft + i * barW;
+            double y = plotBottom - barH;
+            p.drawRect(QRectF(x, y, barW - 1, barH));
+        }
+
+        // Draw axes
+        p.setPen(QPen(Qt::black, 1));
+        p.drawLine(plotLeft, plotBottom, plotRight, plotBottom);
+        p.drawLine(plotLeft, plotTop, plotLeft, plotBottom);
+
+        // X-axis labels
+        QFont font = p.font();
+        font.setPointSize(8);
+        p.setFont(font);
+
+        for(int i = 0; i <= 4; ++i) {
+            double val = minVal + (maxVal - minVal) * i / 4.0;
+            int x = plotLeft + plotW * i / 4;
+            p.drawText(QRect(x - 30, plotBottom + 5, 60, 20), Qt::AlignHCenter, QString::number(val, 'e', 1));
+        }
+
+        // Y-axis labels
+        for(int i = 0; i <= 4; ++i) {
+            int val = maxCount * i / 4;
+            int y = plotBottom - plotH * i / 4;
+            p.drawText(QRect(plotLeft - 45, y - 8, 40, 16), Qt::AlignRight | Qt::AlignVCenter, QString::number(val));
+        }
+
+        // Labels
+        font.setPointSize(9);
+        p.setFont(font);
+        p.drawText(QRect(plotLeft, h - 15, plotW, 15), Qt::AlignHCenter, tr("Peak-to-Peak Amplitude"));
+        p.save();
+        p.translate(12, plotTop + plotH / 2);
+        p.rotate(-90);
+        p.drawText(QRect(-40, 0, 80, 15), Qt::AlignHCenter, tr("Count"));
+        p.restore();
+    }
+
+    QLabel* label = new QLabel(&dlg);
+    label->setPixmap(pixmap);
+
+    QVBoxLayout* layout = new QVBoxLayout(&dlg);
+    layout->addWidget(label);
+    dlg.setLayout(layout);
+    dlg.exec();
+}
+
+
+//*************************************************************************************************************
+
 void MainWindow::setWindowStatus()
 {
     //Set window title
