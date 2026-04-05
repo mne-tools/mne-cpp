@@ -79,13 +79,6 @@
             margin-bottom: 28px;
         }
 
-        .app-icon {
-            width: 64px;
-            height: 64px;
-            margin-bottom: 16px;
-            filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.08));
-        }
-
         .logo-container svg {
             width: 220px;
             height: auto;
@@ -172,7 +165,6 @@
     <div id="loading-overlay">
         <div class="loading-card" id="loading-card">
             <div class="logo-container">
-                <img class="app-icon" src="data:image/png;base64,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" alt="MNE Browse">
                 <!-- MNE-CPP logo (inline) -->
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576.5 301">
                     <polygon fill="#0C9A49" points="169.953,204.255 190.209,167.592 240.572,176.673" />
@@ -311,6 +303,7 @@
     <div id="qtspinner"></div>
     <div id="qtstatus"></div>
 
+    <script src="qtloader.js"></script>
     <script src="mne_browse.js"></script>
     <script>
         /* ================================================================
@@ -354,6 +347,16 @@
                 this.depth = Math.random() * 0.7 + 0.3;
                 /* Only pluses and triangles (MNE-CPP logo shapes) */
                 this.shape = Math.random() < 0.5 ? 'plus' : 'triangle';
+                /* Pre-compute irregular triangle verts (like logo facets) */
+                if (this.shape === 'triangle') {
+                    this.tri = [];
+                    var angle0 = -Math.PI / 2 + (Math.random() - 0.5) * 0.6;
+                    for (var j = 0; j < 3; j++) {
+                        var a = angle0 + (j / 3) * Math.PI * 2;
+                        var stretch = 0.6 + Math.random() * 0.8;
+                        this.tri.push({ dx: Math.cos(a) * stretch, dy: Math.sin(a) * stretch });
+                    }
+                }
             }
 
             Particle.prototype.update = function () {
@@ -390,9 +393,10 @@
                 ctx.globalAlpha = this.alpha;
                 ctx.fillStyle = this.color;
                 if (this.shape === 'plus') {
-                    /* Plus / cross shape */
+                    /* Rectangular cross matching MNE-CPP logo proportions:
+                       arm thickness ≈ 26% of arm length (from logo SVG paths) */
                     var arm = this.r;
-                    var t = arm * 0.35;
+                    var t = arm * 0.26;
                     ctx.beginPath();
                     ctx.moveTo(-t, -arm); ctx.lineTo(t, -arm);
                     ctx.lineTo(t, -t);    ctx.lineTo(arm, -t);
@@ -403,14 +407,12 @@
                     ctx.closePath();
                     ctx.fill();
                 } else {
-                    /* Triangle */
+                    /* Irregular scalene triangle — like the logo's faceted polygons */
+                    var tri = this.tri;
                     ctx.beginPath();
-                    for (var i = 0; i < 3; i++) {
-                        var a = (i / 3) * Math.PI * 2 - Math.PI / 2;
-                        var px = Math.cos(a) * this.r;
-                        var py = Math.sin(a) * this.r;
-                        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-                    }
+                    ctx.moveTo(tri[0].dx * this.r, tri[0].dy * this.r);
+                    ctx.lineTo(tri[1].dx * this.r, tri[1].dy * this.r);
+                    ctx.lineTo(tri[2].dx * this.r, tri[2].dy * this.r);
                     ctx.closePath();
                     ctx.fill();
                 }
