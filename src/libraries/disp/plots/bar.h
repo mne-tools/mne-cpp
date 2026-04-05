@@ -187,7 +187,9 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
 {
     Eigen::VectorXd resultDisplayValues;
     Eigen::VectorXi resultExponentValues;
-    int iClassAmount = matClassFrequencyData.rows();
+    int iClassAmount = std::min(static_cast<int>(matClassFrequencyData.rows()),
+                                static_cast<int>(matClassLimitData.rows()) - 1);
+    if(iClassAmount < 1) return;
     this->splitCoefficientAndExponent(matClassLimitData, iClassAmount, resultDisplayValues, resultExponentValues);
 
     // Setup legend text

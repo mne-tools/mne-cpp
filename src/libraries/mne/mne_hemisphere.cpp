@@ -207,8 +207,8 @@ bool MNEHemisphere::complete_source_space_info()
         tri_cent.row(i) /= 3.0f;
 
         //cross product {cross((r2-r1),(r3-r1))}
-        a = r.row(1) - r.row(0 );
-        b = r.row(2) - r.row(0);
+        a = (r.row(1) - r.row(0 )).transpose();
+        b = (r.row(2) - r.row(0)).transpose();
         tri_nn(i,0) = a(1)*b(2)-a(2)*b(1);
         tri_nn(i,1) = a(2)*b(0)-a(0)*b(2);
         tri_nn(i,2) = a(0)*b(1)-a(1)*b(0);

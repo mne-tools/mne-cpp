@@ -200,6 +200,9 @@ int stride(int total, int max)
 
 } // anonymous namespace
 
+namespace INVLIB
+{
+
 //=============================================================================================================
 // TOKENIZE
 //=============================================================================================================
@@ -629,3 +632,5 @@ InvSourceEstimate fromTokens(const std::vector<InvToken> &tokens)
 
     return est;
 }
+
+} // namespace INVLIB

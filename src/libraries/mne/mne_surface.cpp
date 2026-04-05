@@ -505,7 +505,8 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, int add
     s->sigma       = sigma;
     s->coord_frame = coord_frame;
     s->rr          = tmp_nodes;
-    s->nn          = tmp_node_normals;
+    if (tmp_node_normals.rows() > 0)
+        s->nn          = tmp_node_normals;
     s->ntri        = ntri_count;
     s->np          = nnode;
     s->type        = FIFFV_MNE_SPACE_SURFACE;

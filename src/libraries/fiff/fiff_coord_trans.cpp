@@ -261,7 +261,7 @@ FiffCoordTrans::FiffCoordTrans(int from, int to, const Matrix4f& matTrans, bool 
 
     if(bStandard) {
         // make sure that it is a standard transform if requested
-        this->trans.row(3) = Vector4f(0,0,0,1);
+        this->trans.row(3) = Vector4f(0,0,0,1).transpose();
     }
 
     FiffCoordTrans::addInverse(*this);

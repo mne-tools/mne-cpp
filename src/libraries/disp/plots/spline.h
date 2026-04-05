@@ -283,7 +283,9 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
                         const Eigen::VectorXi& matClassFrequencyData)
 {
     Eigen::VectorXd resultDisplayValues;
-    int iClassAmount = matClassFrequencyData.rows();
+    int iClassAmount = std::min(static_cast<int>(matClassFrequencyData.rows()),
+                                static_cast<int>(matClassLimitData.rows()) - 1);
+    if(iClassAmount < 1) return;
     this->splitCoefficientAndExponent(matClassLimitData, iClassAmount, resultDisplayValues, m_vecResultExponentValues);
 
     m_dMinAxisX = resultDisplayValues(0);

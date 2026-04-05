@@ -931,7 +931,7 @@ InvDipoleForward* dipole_forward(InvDipoleFitData* d,
     }
 
     for (k = 0; k < ndip; k++) {
-        res->rd.row(k) = Eigen::Map<const Eigen::Vector3f>(rd[k]);
+        res->rd.row(k) = Eigen::Map<const Eigen::Vector3f>(rd[k]).transpose();
         /*
      * Calculate the field of three orthogonal dipoles
      */

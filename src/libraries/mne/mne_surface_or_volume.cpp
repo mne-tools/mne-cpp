@@ -422,9 +422,9 @@ void MNESurfaceOrVolume::add_triangle_data()
         tot_area = 0.0;
         for (k = 0, tri = tris.data(); k < ntri; k++, tri++) {
             tri->vert = &itris(k,0);
-            tri->r1   = rr.row(tri->vert[0]);
-            tri->r2   = rr.row(tri->vert[1]);
-            tri->r3   = rr.row(tri->vert[2]);
+            tri->r1   = rr.row(tri->vert[0]).transpose();
+            tri->r2   = rr.row(tri->vert[1]).transpose();
+            tri->r3   = rr.row(tri->vert[2]).transpose();
             tri->compute_data();
             tot_area += tri->area;
         }
@@ -445,9 +445,9 @@ void MNESurfaceOrVolume::add_triangle_data()
         use_tris.resize(nuse_tri);
         for (k = 0, tri = use_tris.data(); k < nuse_tri; k++, tri++) {
             tri->vert = &use_itris(k,0);
-            tri->r1   = rr.row(tri->vert[0]);
-            tri->r2   = rr.row(tri->vert[1]);
-            tri->r3   = rr.row(tri->vert[2]);
+            tri->r1   = rr.row(tri->vert[0]).transpose();
+            tri->r2   = rr.row(tri->vert[1]).transpose();
+            tri->r3   = rr.row(tri->vert[2]).transpose();
             tri->compute_data();
         }
     }

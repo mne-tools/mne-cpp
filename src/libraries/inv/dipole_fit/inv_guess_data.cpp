@@ -256,7 +256,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
         f->funcs = f->sphere_funcs.get();
 
     for (k = 0; k < this->nguess; k++) {
-        this->guess_fwd[k].reset(InvDipoleFitData::dipole_forward_one(f,Eigen::Vector3f(this->rr.row(k)),nullptr));
+        this->guess_fwd[k].reset(InvDipoleFitData::dipole_forward_one(f,Eigen::Vector3f(this->rr.row(k).transpose()),nullptr));
         if (!this->guess_fwd[k])
             goto bad;
 #ifdef DEBUG
@@ -396,7 +396,7 @@ bool InvGuessData::compute_guess_fields(InvDipoleFitData* f)
     else
         f->funcs = f->sphere_funcs.get();
     for (int k = 0; k < this->nguess; k++) {
-        this->guess_fwd[k].reset(InvDipoleFitData::dipole_forward_one(f,Eigen::Vector3f(this->rr.row(k)),this->guess_fwd[k].release()));
+        this->guess_fwd[k].reset(InvDipoleFitData::dipole_forward_one(f,Eigen::Vector3f(this->rr.row(k).transpose()),this->guess_fwd[k].release()));
         if (!this->guess_fwd[k]) {
             if (orig)
                 f->funcs = orig;

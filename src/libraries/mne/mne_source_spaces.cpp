@@ -477,8 +477,7 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
     }
     else
     {
-        MatrixXi p_defaultMatrix(0, 0);
-        p_Hemisphere.itris = p_defaultMatrix;
+        p_Hemisphere.itris.resize(0, 3);
     }
 //        qDebug() << "Triangles; type:" << t_pTag->getType() << "rows:" << p_Hemisphere.itris.rows() << "cols:" << p_Hemisphere.itris.cols();
 
@@ -552,7 +551,7 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
     {
        //res.nearest = tag1.data + 1;
        VectorXi nearestIdx = VectorXi(Map<VectorXi>(t_pTag1->toInt(), t_pTag1->size()/4, 1));
-       VectorXd nearestDist = VectorXd((Map<VectorXf>(t_pTag2->toFloat(), t_pTag1->size()/4, 1)).cast<double>());
+       VectorXd nearestDist = VectorXd((Map<VectorXf>(t_pTag2->toFloat(), t_pTag2->size()/4, 1)).cast<double>());
        p_Hemisphere.setNearestData(nearestIdx, nearestDist);
     }
 

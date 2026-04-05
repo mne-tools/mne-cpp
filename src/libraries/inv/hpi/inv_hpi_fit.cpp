@@ -243,7 +243,7 @@ Eigen::MatrixXd InvHpiFit::computeSeedPoints(const Eigen::MatrixXd& matAmplitude
             if(vecChIdcs(j) < m_sensors.ncoils()) {
                 Vector3d r0 = m_sensors.r0(vecChIdcs(j));
                 Vector3d ez = m_sensors.ez(vecChIdcs(j));
-                matCoilsSeed.row(j) = (-1 * ez * 0.03 + r0);
+                matCoilsSeed.row(j) = (-1 * ez * 0.03 + r0).transpose();
             }
         }
     }

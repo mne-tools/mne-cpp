@@ -348,8 +348,7 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
     }
     else
     {
-        MatrixXi p_defaultMatrix(0, 0);
-        p_BemSurface.itris = p_defaultMatrix;
+        p_BemSurface.itris.resize(0, 3);
     }
 
     return true;

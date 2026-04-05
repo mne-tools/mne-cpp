@@ -214,7 +214,7 @@ MatrixXd InvLCMV::applyFilter(const MatrixXd &data, const InvBeamformer &filters
     }
 
     // Whiten
-    if(filters.whitener.size() > 0 && filters.whitener.rows() == processed.rows()) {
+    if(filters.whitener.size() > 0 && filters.whitener.cols() == processed.rows()) {
         processed = filters.whitener * processed;
     }
 
@@ -231,7 +231,28 @@ InvSourceEstimate InvLCMV::applyLCMV(const FiffEvoked &evoked, const InvBeamform
         return InvSourceEstimate();
     }
 
-    MatrixXd sol = applyFilter(evoked.data, filters);
+    // Pick channels from evoked to match filter channel order
+    MatrixXd data;
+    if(filters.chNames.size() > 0 &&
+       static_cast<int>(filters.chNames.size()) != evoked.data.rows()) {
+        // Need to select and reorder channels
+        const int nFilterCh = static_cast<int>(filters.chNames.size());
+        const int nTimes = static_cast<int>(evoked.data.cols());
+        data.resize(nFilterCh, nTimes);
+        for(int i = 0; i < nFilterCh; ++i) {
+            int idx = evoked.info.ch_names.indexOf(filters.chNames[i]);
+            if(idx < 0) {
+                qWarning("InvLCMV::applyLCMV - Channel %s not found in evoked!",
+                         qPrintable(filters.chNames[i]));
+                return InvSourceEstimate();
+            }
+            data.row(i) = evoked.data.row(idx);
+        }
+    } else {
+        data = evoked.data;
+    }
+
+    MatrixXd sol = applyFilter(data, filters);
 
     // Combine XYZ for free orientation if needed
     const int nOrient = filters.nOrient();

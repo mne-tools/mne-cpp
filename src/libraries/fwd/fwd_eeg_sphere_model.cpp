@@ -1122,7 +1122,7 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Nu
 
     simplex = get_initial_simplex(mu,simplex_size);
     for (k = 0; k < nfit+1; k++)
-        func_val[k] = one_step(static_cast<VectorXd>(simplex.row(k)),u);
+        func_val[k] = one_step(VectorXd(simplex.row(k).transpose()),u);
 
     /*
    * (5) Do the nonlinear minimization

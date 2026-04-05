@@ -304,6 +304,6 @@ bool MNEProjectToSurface::nearest_triangle_point(const Vector3f &r, const int tr
 
 bool MNEProjectToSurface::project_to_triangle(Vector3f &rTri, const float p, const float q, const int tri)
 {
-    rTri = this->r1.row(tri) + p*this->r12.row(tri) + q*this->r13.row(tri);
+    rTri = (this->r1.row(tri) + p*this->r12.row(tri) + q*this->r13.row(tri)).transpose();
     return true;
 }

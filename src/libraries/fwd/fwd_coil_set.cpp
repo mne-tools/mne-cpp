@@ -199,8 +199,8 @@ FwdCoil::UPtr FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int acc, const F
 
     for (int p = 0; p < res->np; p++) {
         res->w[p] = def->w[p];
-        res->rmag.row(p)   = res->r0 + def->rmag(p, 0)*res->ex + def->rmag(p, 1)*res->ey + def->rmag(p, 2)*res->ez;
-        res->cosmag.row(p) = def->cosmag(p, 0)*res->ex + def->cosmag(p, 1)*res->ey + def->cosmag(p, 2)*res->ez;
+        res->rmag.row(p)   = (res->r0 + def->rmag(p, 0)*res->ex + def->rmag(p, 1)*res->ey + def->rmag(p, 2)*res->ez).transpose();
+        res->cosmag.row(p) = (def->cosmag(p, 0)*res->ex + def->cosmag(p, 1)*res->ey + def->cosmag(p, 2)*res->ez).transpose();
     }
     return res;
 }
