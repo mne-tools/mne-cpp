@@ -97,4 +97,5 @@ codecov
 
 # Coverage artifacts
 *.gcov
+*.info
 coverage_*.info
