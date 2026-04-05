@@ -34,6 +34,11 @@ jobs:
       with:
         python-version: '3.10'
 
+    - name: Install OpenGL development libraries
+      run: |
+        sudo apt-get update -q
+        sudo apt-get install -q libgl1-mesa-dev
+
     - name: Download Qt toolchain
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
