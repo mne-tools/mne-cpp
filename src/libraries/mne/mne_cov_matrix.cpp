@@ -666,7 +666,7 @@ int MNECovMatrix::whiten_vector(Eigen::Ref<Eigen::VectorXf> data, Eigen::Ref<Eig
             whitened_data[k] = data[k]*inv[k];
     }
     else {
-        std::vector<float> tmp(nchan);
+        Eigen::VectorXf tmp(nchan);
         for (int k = nzero; k < nchan; k++)
             tmp[k] = eigen.row(k).dot(data.cast<float>());
         for (int k = 0; k < nzero; k++)
@@ -746,11 +746,9 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::pick_chs_omit(const QStringList& new
                                                            const QList<FiffChInfo>& chs) const
 {
     int j,k;
-    int *pick = nullptr;
     Eigen::VectorXd cov_local;
     Eigen::VectorXd cov_diag_local;
     QStringList picked_names;
-    int   *is_meg = nullptr;
     int   from,to;
     std::unique_ptr<MNECovMatrix> res;
 
@@ -762,64 +760,62 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::pick_chs_omit(const QStringList& new
         qCritical("No names in covariance matrix. Cannot do picking.");
         return nullptr;
     }
-    std::vector<int> pickVec(new_ncov, -1);
-    pick = pickVec.data();
+    Eigen::VectorXi pickVec = Eigen::VectorXi::Constant(new_ncov, -1);
     for (j = 0; j < new_ncov; j++)
         for (k = 0; k < ncov; k++)
             if (QString::compare(names[k],new_names[j]) == 0) {
-                pick[j] = k;
+                pickVec[j] = k;
                 break;
             }
     for (j = 0; j < new_ncov; j++) {
-        if (pick[j] < 0) {
+        if (pickVec[j] < 0) {
             qWarning("All desired channels not found in the covariance matrix (at least missing %s).", new_names[j].toUtf8().constData());
             return nullptr;
         }
     }
-    std::vector<int> isMegVec;
+    Eigen::VectorXi isMegVec;
     if (omit_meg_eeg) {
         isMegVec.resize(new_ncov);
-        is_meg = isMegVec.data();
         if (!chs.isEmpty()) {
             for (j = 0; j < new_ncov; j++)
                 if (chs[j].kind == FIFFV_MEG_CH)
-                    is_meg[j] = true;
+                    isMegVec[j] = true;
                 else
-                    is_meg[j] = false;
+                    isMegVec[j] = false;
         }
         else {
             for (j = 0; j < new_ncov; j++)
                 if (new_names[j].startsWith("MEG"))
-                    is_meg[j] = true;
+                    isMegVec[j] = true;
                 else
-                    is_meg[j] = false;
+                    isMegVec[j] = false;
         }
     }
     if (cov_diag.size() > 0) {
         cov_diag_local.resize(new_ncov);
         for (j = 0; j < new_ncov; j++) {
-            cov_diag_local[j] = cov_diag[pick[j]];
-            picked_names.append(names[pick[j]]);
+            cov_diag_local[j] = cov_diag[pickVec[j]];
+            picked_names.append(names[pickVec[j]]);
         }
     }
     else {
         cov_local.resize(new_ncov*(new_ncov+1)/2);
         for (j = 0; j < new_ncov; j++) {
-            picked_names.append(names[pick[j]]);
+            picked_names.append(names[pickVec[j]]);
             for (k = 0; k <= j; k++) {
-                from = lt_packed_index(pick[j],pick[k]);
+                from = lt_packed_index(pickVec[j],pickVec[k]);
                 to   = lt_packed_index(j,k);
                 if (to < 0 || to > new_ncov*(new_ncov+1)/2-1) {
                     qCritical("Wrong destination index in pick_chs_omit : %d %d %d",j,k,to);
                     return nullptr;
                 }
                 if (from < 0 || from > ncov*(ncov+1)/2-1) {
-                    qCritical("Wrong source index in pick_chs_omit : %d %d %d",pick[j],pick[k],from);
+                    qCritical("Wrong source index in pick_chs_omit : %d %d %d",pickVec[j],pickVec[k],from);
                     return nullptr;
                 }
                 cov_local[to] = cov[from];
                 if (omit_meg_eeg)
-                    if (is_meg[j] != is_meg[k])
+                    if (isMegVec[j] != isMegVec[k])
                         cov_local[to] = 0.0;
             }
         }
@@ -835,7 +831,7 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::pick_chs_omit(const QStringList& new
     if (ch_class.size() > 0) {
         res->ch_class.resize(res->ncov);
         for (k = 0; k < res->ncov; k++)
-            res->ch_class[k] = ch_class[pick[k]];
+            res->ch_class[k] = ch_class[pickVec[k]];
     }
     return res;
 }

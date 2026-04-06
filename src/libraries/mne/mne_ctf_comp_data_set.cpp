@@ -408,7 +408,7 @@ MNECTFCompDataSet::MNECTFCompDataSet(const MNECTFCompDataSet &set)
     if (set.ncomp > 0) {
         for (int k = 0; k < set.ncomp; k++)
             if(set.comps[k])
-                this->comps.append(std::make_unique<MNECTFCompData>(*set.comps[k]));
+                this->comps.push_back(std::make_unique<MNECTFCompData>(*set.comps[k]));
         this->ncomp = this->comps.size();
     }
 
@@ -522,7 +522,7 @@ std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
             printf("Warning: Compensation data for '%s' omitted\n", explain_comp(one->kind).toUtf8().constData());
         }
         else {
-            set->comps.append(std::move(one));
+            set->comps.push_back(std::move(one));
             set->ncomp++;
         }
     }

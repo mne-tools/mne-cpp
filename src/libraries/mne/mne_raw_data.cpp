@@ -382,24 +382,20 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
 
     int s,c;
     int do_all;
-    float *mult;
 
 //    tag.data = NULL;
 
-    std::vector<int> pickno_storage;
+    Eigen::VectorXi pickno_vec;
     if (npick == 0) {
-        pickno_storage.resize(nchan);
-        for (c = 0; c < nchan; c++)
-            pickno_storage[c] = c;
-        pickno = pickno_storage.data();
+        pickno_vec = Eigen::VectorXi::LinSpaced(nchan, 0, nchan - 1);
+        pickno = pickno_vec.data();
         do_all = TRUE;
         npick = nchan;
     }
     else
         do_all = FALSE;
 
-    std::vector<float> mult_storage(npick);
-    mult = mult_storage.data();
+    Eigen::VectorXf mult(npick);
     for (c = 0; c < npick; c++)
         mult[c] = chs[pickno[c]].cal*chs[pickno[c]].range;
 
@@ -936,9 +932,7 @@ int MNERawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
     int          k,s,p,start,c,fills;
     MNERawBufDef* this_buf;
     RowMajorMatrixXf *values;
-    float        *pvalues = nullptr;
-    float        *deriv_pvalues = nullptr;
-    std::vector<float> deriv_pvalues_storage;
+    Eigen::VectorXf deriv_pvalues_vec;
 
     if (!proj || (sel && !proj->affect(sel->chspick,sel->nchan) && !proj->affect(sel->chspick_nospace,sel->nchan)))
         return pick_data(sel,firsts,ns,picked);
@@ -957,8 +951,7 @@ int MNERawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
     }
     else
         s = 0;
-    std::vector<float> pvalues_storage(info->nchan);
-    pvalues = pvalues_storage.data();
+    Eigen::VectorXf pvalues(info->nchan);
     for (k = 0, this_buf = bufs.data(); k < (int)bufs.size(); k++, this_buf++) {
         if (this_buf->lasts >= firsts) {
             start = firsts - this_buf->firsts;
@@ -993,17 +986,16 @@ int MNERawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
              */
                 values = &this_buf->vals;
                 if (sel && sel->nderiv > 0 && deriv_matched) {
-                    deriv_pvalues_storage.resize(deriv_matched->deriv_data->nrow);
-                    deriv_pvalues = deriv_pvalues_storage.data();
+                    deriv_pvalues_vec.resize(deriv_matched->deriv_data->nrow);
                 }
                 for (p = start; p < this_buf->ns && ns > 0; p++, ns--, s++) {
                     for (c = 0; c < info->nchan; c++)
                         pvalues[c] = (*values)(c,p);
-                    if (proj->project_vector(pvalues,info->nchan,TRUE) != OK)
+                    if (proj->project_vector(pvalues.data(),info->nchan,TRUE) != OK)
                         qWarning()<<"Error";
                     if (sel) {
                         if (sel->nderiv > 0 && deriv_matched) {
-                            if (mne_sparse_vec_mult2(deriv_matched->deriv_data->data.get(),pvalues,deriv_pvalues) == FAIL)
+                            if (mne_sparse_vec_mult2(deriv_matched->deriv_data->data.get(),pvalues.data(),deriv_pvalues_vec.data()) == FAIL)
                                 return FAIL;
                         }
                         for (c = 0; c < sel->nchan; c++) {
@@ -1016,7 +1008,7 @@ int MNERawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
                    * ...then the derived ones
                    */
                             else if (sel->pick_deriv[c] >= 0 && deriv_matched)
-                                picked[c][s] = deriv_pvalues[sel->pick_deriv[c]];
+                                picked[c][s] = deriv_pvalues_vec[sel->pick_deriv[c]];
                         }
                     }
                     else {

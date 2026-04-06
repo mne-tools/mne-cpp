@@ -51,6 +51,7 @@
 //=============================================================================================================
 
 #include <memory>
+#include <vector>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -250,7 +251,7 @@ public:
                          int ncomp_chan);
 
 public:
-    QList<std::unique_ptr<MNECTFCompData>> comps;   /**< All available compensation data sets. */
+    std::vector<std::unique_ptr<MNECTFCompData>> comps;   /**< All available compensation data sets. */
     int            ncomp;           /**< Number of compensation data sets. */
     QList<FIFFLIB::FiffChInfo>     chs;    /**< Channel information associated with compensation. */
     int            nch;             /**< Number of channels. */

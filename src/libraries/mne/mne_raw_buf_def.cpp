@@ -63,15 +63,3 @@ MNERawBufDef::MNERawBufDef()
 MNERawBufDef::~MNERawBufDef()
 {
 }
-
-//=============================================================================================================
-
-void MNERawBufDef::free_bufs(MNERawBufDef *bufs, int nbuf)
-{
-    /*
-     * vals and ch_filtered are now Eigen types that clean up automatically.
-     * We use delete[] to properly invoke destructors.
-     */
-    Q_UNUSED(nbuf)
-    delete[] bufs;
-}

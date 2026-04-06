@@ -147,30 +147,7 @@ using namespace MNELIB;
 #define TAG_USEREALRAS              4
 
 
-//===
-void fromFloatEigenMatrix_17(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
-{
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            to_mat[i][j] = from_mat(i,j);
-}
 
-void fromFloatEigenMatrix_17(const Eigen::MatrixXf& from_mat, float **& to_mat)
-{
-    fromFloatEigenMatrix_17(from_mat, to_mat, from_mat.rows(), from_mat.cols());
-}
-
-void fromIntEigenMatrix_17(const Eigen::MatrixXi& from_mat, int **&to_mat, const int m, const int n)
-{
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            to_mat[i][j] = from_mat(i,j);
-}
-
-void fromIntEigenMatrix_17(const Eigen::MatrixXi& from_mat, int **&to_mat)
-{
-    fromIntEigenMatrix_17(from_mat, to_mat, from_mat.rows(), from_mat.cols());
-}
 
 //============================= make_volume_source_space.c =============================
 

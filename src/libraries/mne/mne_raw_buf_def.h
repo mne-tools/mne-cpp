@@ -97,16 +97,7 @@ public:
      */
     ~MNERawBufDef();
 
-    /**
-     * @brief Free an array of raw data buffer definitions.
-     *
-     * The vals and ch_filtered members are Eigen types that clean up
-     * automatically. This function frees the C-allocated buffer array itself.
-     *
-     * @param[in] bufs   Pointer to the array of MNERawBufDef structures to free.
-     * @param[in] nbuf   Number of buffer definitions in the array.
-     */
-    static void free_bufs(MNERawBufDef* bufs, int nbuf);
+
 
 public:
     FIFFLIB::FiffDirEntry::SPtr ent;    /**< Directory entry locating this buffer in the FIFF file (file buffers only). */

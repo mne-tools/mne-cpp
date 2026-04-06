@@ -236,26 +236,25 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
                                         const Eigen::Matrix<float, 3, 3, Eigen::RowMajor>& mri_fid,
                                         Eigen::Vector3f& scales)
 {
-    float **dig_rr  = nullptr;
-    float **head_rr = nullptr;
     int   k,ndig,nhead;
     float simplex_size = 2e-2;
-    float r0[3],Rdig,Rscalp;
+    Eigen::VectorXf r0(3);
+    float Rdig,Rscalp;
     float LR[3],LN[3],len,norm[3],diff[3];
 
     scales[0] = scales[1] = scales[2] = 1.0;
 
-    dig_rr  = new float*[dig.npoint];
-    head_rr = new float*[np];
+    Eigen::MatrixXf dig_rr(dig.npoint, 3);
+    Eigen::MatrixXf head_rr(np, 3);
 
     // Pick only the points with positive z
     for (k = 0, ndig = 0; k < dig.npoint; k++) {
         if (dig.points[k].r[Z_17] > 0) {
-            dig_rr[ndig++] = dig.points[k].r;
+            dig_rr.row(ndig++) = Eigen::Map<const Eigen::RowVector3f>(dig.points[k].r);
         }
     }
 
-    if (!UTILSLIB::Sphere::fit_sphere_to_points(dig_rr,ndig,simplex_size,r0,&Rdig)){
+    if (!UTILSLIB::Sphere::fit_sphere_to_points(dig_rr.topRows(ndig),simplex_size,r0,Rdig)){
         goto out;
     }
 
@@ -273,11 +272,11 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
     for (k = 0, nhead = 0; k < np; k++) {
         VEC_DIFF_17(mri_fid.row(0).data(),&rr(k,0),diff);
         if (VEC_DOT_17(diff,norm) > 0) {
-            head_rr[nhead++] = &rr(k,0);
+            head_rr.row(nhead++) = rr.row(k);
         }
     }
 
-    if (!UTILSLIB::Sphere::fit_sphere_to_points(head_rr,nhead,simplex_size,r0,&Rscalp)) {
+    if (!UTILSLIB::Sphere::fit_sphere_to_points(head_rr.topRows(nhead),simplex_size,r0,Rscalp)) {
         goto out;
     }
 
@@ -286,8 +285,6 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
     scales[0] = scales[1] = scales[2] = Rdig/Rscalp;
 
 out : {
-        delete[] dig_rr;
-        delete[] head_rr;
         return;
     }
 }

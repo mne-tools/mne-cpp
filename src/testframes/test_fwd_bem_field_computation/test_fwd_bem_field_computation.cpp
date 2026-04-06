@@ -336,7 +336,7 @@ private slots:
         // Test gradient of BEM MEG field with respect to dipole position
 
         auto model = FwdBemModel::fwd_bem_load_homog_surface(bemPath());
-        model->fwd_bem_load_recompute_solution(bemSolPath(), FWD_BEM_LINEAR_COLL, 0);
+        model->fwd_bem_load_recompute_solution(bemSolPath(), FWD_BEM_CONSTANT_COLL, 0);
 
         auto coilDefs = FwdCoilSet::read_coil_defs(coilDefPath());
         QFile rawFile(rawPath());
@@ -371,7 +371,7 @@ private slots:
         // Test gradient of BEM EEG potential
 
         auto model = FwdBemModel::fwd_bem_load_homog_surface(bemPath());
-        model->fwd_bem_load_recompute_solution(bemSolPath(), FWD_BEM_LINEAR_COLL, 0);
+        model->fwd_bem_load_recompute_solution(bemSolPath(), FWD_BEM_CONSTANT_COLL, 0);
 
         QFile rawFile(rawPath());
         FiffRawData raw(rawFile);
