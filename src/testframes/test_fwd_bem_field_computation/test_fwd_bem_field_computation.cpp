@@ -211,11 +211,11 @@ private slots:
 
     void testBemFieldCalc()
     {
-        // Test BEM field calculation for a single dipole at a set of coils
+        // Test constant-collocation BEM field calculation for a single dipole
 
         auto model = FwdBemModel::fwd_bem_load_homog_surface(bemPath());
         QVERIFY(model != nullptr);
-        model->fwd_bem_load_recompute_solution(bemSolPath(), FWD_BEM_LINEAR_COLL, 0);
+        model->fwd_bem_load_recompute_solution(bemSolPath(), FWD_BEM_CONSTANT_COLL, 0);
 
         auto coilDefs = FwdCoilSet::read_coil_defs(coilDefPath());
         QFile rawFile(rawPath());
@@ -273,11 +273,11 @@ private slots:
 
     void testBemPotCalc()
     {
-        // Test BEM potential calculation for EEG electrodes
+        // Test constant-collocation BEM potential calculation for EEG electrodes
 
         auto model = FwdBemModel::fwd_bem_load_homog_surface(bemPath());
         QVERIFY(model != nullptr);
-        model->fwd_bem_load_recompute_solution(bemSolPath(), FWD_BEM_LINEAR_COLL, 0);
+        model->fwd_bem_load_recompute_solution(bemSolPath(), FWD_BEM_CONSTANT_COLL, 0);
 
         QFile rawFile(rawPath());
         FiffRawData raw(rawFile);
