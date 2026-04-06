@@ -113,15 +113,16 @@ public:
 
 public:
     FIFFLIB::FiffDirEntry::SPtr ent;    /**< Directory entry locating this buffer in the FIFF file (file buffers only). */
-    int   firsts,lasts;     /**< First and last sample indices. */
-    int   ntaper;           /**< Taper length for filtered buffers. */
-    int   ns;               /**< Number of samples (lasts - firsts + 1). */
-    int   nchan;            /**< Number of channels. */
-    int   is_skip;          /**< Non-zero if this buffer represents a data skip. */
+    int   firsts = 0;       /**< First sample index. */
+    int   lasts = 0;        /**< Last sample index. */
+    int   ntaper = 0;       /**< Taper length for filtered buffers. */
+    int   ns = 0;           /**< Number of samples (lasts - firsts + 1). */
+    int   nchan = 0;        /**< Number of channels. */
+    int   is_skip = 0;      /**< Non-zero if this buffer represents a data skip. */
     RowMajorMatrixXf vals;  /**< Sample values matrix [nchan x ns], row-major (empty if not loaded into memory). */
-    int   valid;            /**< Non-zero if the data in this buffer are meaningful. */
+    int   valid = 0;        /**< Non-zero if the data in this buffer are meaningful. */
     Eigen::VectorXi ch_filtered; /**< Per-channel flag: has this channel been filtered already (filtered buffers only). */
-    int   comp_status;      /**< Compensation status for raw buffers. */
+    int   comp_status = 0;  /**< Compensation status for raw buffers. */
 };
 
 } // NAMESPACE MNELIB
