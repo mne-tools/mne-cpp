@@ -26,18 +26,14 @@
 
 MNE-CPP is an open-source, cross-platform C++ framework for real-time and offline processing of MEG, EEG, and related neurophysiological data. It provides modular libraries for building standalone acquisition and analysis applications. For more information and documentation please visit https://mne-cpp.github.io/.
 
-MNE Browse
-----------
+Applications
+------------
 
-<p align="center">
-  <a href="https://mne-cpp.github.io/wasm/mne_browse.html"><img src="/src/applications/mne_browse/Resources/Images/ApplicationIcons/icon_browse_256x256.png" width="128" height="128" alt="MNE Browse"></a>
-</p>
+Run in the browser via WebAssembly — no install required.
 
-<p align="center">
-  <a href="https://mne-cpp.github.io/wasm/mne_browse.html"><strong>Launch MNE Browse in your browser</strong></a> — no install required (WebAssembly)
-</p>
-
-MNE Browse is a desktop and web application for visualizing and analyzing MEG/EEG raw data, including real-time filtering, event detection, averaging, and channel selection.
+| | Application | Description | |
+|---|---|---|---|
+| <a href="https://mne-cpp.github.io/wasm/mne_browse.html"><img src="/src/applications/mne_browse/Resources/Images/ApplicationIcons/icon_browse_64x64.png" width="32" height="32" alt="MNE Browse"></a> | **MNE Browse** | Browse and inspect raw MEG/EEG data with real-time filtering, event detection, and averaging | [**Open**](https://mne-cpp.github.io/wasm/mne_browse.html) |
 
 Quick start
 -----------
