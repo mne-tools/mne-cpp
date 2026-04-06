@@ -621,22 +621,12 @@ FiffCoordTrans FiffCoordTrans::readTransformFromNode(FiffStream::SPtr& stream,
 
 FiffCoordTrans FiffCoordTrans::procrustesAlign(int   from_frame,
                                                 int   to_frame,
-                                                float **fromp,
-                                                float **top,
-                                                float *w,
-                                                int   np,
+                                                const Eigen::MatrixXf& fromPts,
+                                                const Eigen::MatrixXf& toPts,
+                                                const Eigen::VectorXf& w,
                                                 float max_diff)
 {
-    /*
-     * Map the raw C arrays into Eigen matrices for the computation.
-     * fromp and top are np×3 C matrices (float**)
-     */
-    Eigen::MatrixXf fromPts(np, 3), toPts(np, 3);
-    for (int j = 0; j < np; ++j)
-        for (int c = 0; c < 3; ++c) {
-            fromPts(j, c) = fromp[j][c];
-            toPts(j, c)   = top[j][c];
-        }
+    int np = fromPts.rows();
 
     /* Calculate centroids and subtract */
     Eigen::Vector3f from0 = fromPts.colwise().mean();
@@ -647,9 +637,8 @@ FiffCoordTrans FiffCoordTrans::procrustesAlign(int   from_frame,
 
     /* Compute the cross-covariance matrix S */
     Eigen::Matrix3f S;
-    if (w) {
-        Eigen::VectorXf wVec = Eigen::Map<Eigen::VectorXf>(w, np);
-        S = fromC.transpose() * wVec.asDiagonal() * toC;
+    if (w.size() > 0) {
+        S = fromC.transpose() * w.asDiagonal() * toC;
     } else {
         S = fromC.transpose() * toC;
     }

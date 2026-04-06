@@ -50,6 +50,8 @@
 
 #include <QVector>
 
+#include <vector>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -254,7 +256,7 @@ protected:
      */
     void calcPairCombinations(  const int p_iNumPoints,
                                 const int p_iNumCombinations,
-                                Pair** p_ppPairIdxCombinations) const;
+                                std::vector<Pair>& p_pairIdxCombinations) const;
 
     //=========================================================================================================
     /**
@@ -313,7 +315,7 @@ protected:
     int m_iNumChannels;                 /**< Number of channels. */
     int m_iNumLeadFieldCombinations;    /**< Number of Lead Filed combinations (grid points + 1 over 2)*/
 
-    Pair** m_ppPairIdxCombinations; /**< Index combination vector with grid pair indices. */
+    std::vector<Pair> m_ppPairIdxCombinations; /**< Index combination vector with grid pair indices. */
 
     int m_iMaxNumThreads;   /**< Number of available CPU threads. */
 

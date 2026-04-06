@@ -70,7 +70,6 @@ InvRapMusic::InvRapMusic()
 , m_iNumGridPoints(0)
 , m_iNumChannels(0)
 , m_iNumLeadFieldCombinations(0)
-, m_ppPairIdxCombinations(nullptr)
 , m_iMaxNumThreads(1)
 , m_bIsInit(false)
 , m_iSamplesStcWindow(-1)
@@ -86,7 +85,6 @@ InvRapMusic::InvRapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, 
 , m_iNumGridPoints(0)
 , m_iNumChannels(0)
 , m_iNumLeadFieldCombinations(0)
-, m_ppPairIdxCombinations(nullptr)
 , m_iMaxNumThreads(1)
 , m_bIsInit(false)
 , m_iSamplesStcWindow(-1)
@@ -100,8 +98,6 @@ InvRapMusic::InvRapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, 
 
 InvRapMusic::~InvRapMusic()
 {
-    if(m_ppPairIdxCombinations != nullptr)
-        free(m_ppPairIdxCombinations);
 }
 
 //=============================================================================================================
@@ -160,7 +156,7 @@ bool InvRapMusic::init(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, do
 
     m_iNumLeadFieldCombinations = Numerics::nchoose2(m_iNumGridPoints+1);
 
-    m_ppPairIdxCombinations = (Pair **)malloc(m_iNumLeadFieldCombinations * sizeof(Pair *));
+    m_ppPairIdxCombinations.resize(m_iNumLeadFieldCombinations);
 
     calcPairCombinations(m_iNumGridPoints, m_iNumLeadFieldCombinations, m_ppPairIdxCombinations);
 
@@ -488,8 +484,8 @@ InvSourceEstimate InvRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
                 //Create Lead Field combinations -> It would be better to use a pointer construction, to increase performance
                 MatrixX6T t_matProj_G(t_matProj_LeadField.rows(),6);
 
-                int idx1 = m_ppPairIdxCombinations[i]->x1;
-                int idx2 = m_ppPairIdxCombinations[i]->x2;
+                int idx1 = m_ppPairIdxCombinations[i].x1;
+                int idx2 = m_ppPairIdxCombinations[i].x2;
 
                 InvRapMusic::getGainMatrixPair(t_matProj_LeadField, t_matProj_G, idx1, idx2);
 
@@ -527,8 +523,8 @@ InvSourceEstimate InvRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
         t_val_roh_k = t_vecRoh.maxCoeff(&t_iMaxIdx);//p_vecCor = ^roh_k
 
         //get positions in sparsed leadfield from index combinations;
-        int t_iIdx1 = m_ppPairIdxCombinations[t_iMaxIdx]->x1;
-        int t_iIdx2 = m_ppPairIdxCombinations[t_iMaxIdx]->x2;
+        int t_iIdx1 = m_ppPairIdxCombinations[t_iMaxIdx].x1;
+        int t_iIdx2 = m_ppPairIdxCombinations[t_iMaxIdx].x2;
 
         // (Idx+1) because of MATLAB positions -> starting with 1 not with 0
         std::cout << "Iteration: " << r+1 << " of " << t_iMaxSearch
@@ -798,7 +794,7 @@ void InvRapMusic::calcOrthProj(const MatrixXT& p_matA_k_1, MatrixXT& p_matOrthPr
 
 void InvRapMusic::calcPairCombinations(    const int p_iNumPoints,
                                         const int p_iNumCombinations,
-                                        Pair** p_ppPairIdxCombinations) const
+                                        std::vector<Pair>& p_pairIdxCombinations) const
 {
     int idx1 = 0;
     int idx2 = 0;
@@ -815,11 +811,11 @@ void InvRapMusic::calcPairCombinations(    const int p_iNumPoints,
         {
             InvRapMusic::getPointPair(p_iNumPoints, i, idx1, idx2);
 
-            Pair* t_pairCombination = new Pair();
-            t_pairCombination->x1 = idx1;
-            t_pairCombination->x2 = idx2;
+            Pair t_pairCombination;
+            t_pairCombination.x1 = idx1;
+            t_pairCombination.x2 = idx2;
 
-            p_ppPairIdxCombinations[i] = t_pairCombination;
+            p_pairIdxCombinations[i] = t_pairCombination;
         }
     }
 }

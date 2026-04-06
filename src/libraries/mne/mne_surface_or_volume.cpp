@@ -132,78 +132,6 @@ using namespace MNELIB;
     (xy)[Z_17] =   (x)[X_17]*(y)[Y_17]-(y)[X_17]*(x)[Y_17];\
     }
 
-#define MALLOC_17(x,t) (t *)malloc((x)*sizeof(t))
-
-#define REALLOC_17(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
-
-#define ALLOC_INT_17(x) MALLOC_17(x,int)
-
-#define ALLOC_CMATRIX_17(x,y) mne_cmatrix_17((x),(y))
-
-static void matrix_error_17(int kind, int nr, int nc)
-
-{
-    if (kind == 1)
-        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
-    else if (kind == 2)
-        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
-    else
-        printf("Allocation error for a %d x %d matrix\n",nr,nc);
-    if (sizeof(void *) == 4) {
-        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
-        printf("Please consider moving to a 64-bit platform.");
-    }
-    printf("Cannot continue. Sorry.\n");
-    exit(1);
-}
-
-float** mne_cmatrix_17(int numPoints,int numDim)
-{
-    float** m;
-    float*  whole;
-
-    m = MALLOC_17(numPoints, float *);
-    if (!m)
-    {
-        matrix_error_17( 1, numPoints, numDim);
-    }
-
-    whole = MALLOC_17( numPoints * numDim, float);
-    if (!whole)
-    {
-        matrix_error_17(2, numPoints, numDim);
-    }
-
-    for(int i = 0; i < numPoints; ++i)
-    {
-        m[i] = &whole[ i * numDim ];
-    }
-
-    return m;
-}
-
-#define FREE_17(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#define FREE_CMATRIX_17(m) mne_free_cmatrix_17((m))
-
-#define FREE_ICMATRIX_17(m) mne_free_icmatrix_17((m))
-
-void mne_free_cmatrix_17 (float **m)
-{
-    if (m) {
-        FREE_17(*m);
-        FREE_17(m);
-    }
-}
-
-void mne_free_icmatrix_17 (int **m)
-
-{
-    if (m) {
-        FREE_17(*m);
-        FREE_17(m);
-    }
-}
 
 #define NNEIGHBORS 26
 
@@ -218,35 +146,8 @@ void mne_free_icmatrix_17 (int **m)
 
 #define TAG_USEREALRAS              4
 
-#define ALLOC_ICMATRIX_17(x,y) mne_imatrix_17((x),(y))
 
-int **mne_imatrix_17(int nr,int nc)
-
-{
-    int i,**m;
-    int *whole;
-
-    m = MALLOC_17(nr,int *);
-    if (!m) matrix_error_17(1,nr,nc);
-    whole = MALLOC_17(nr*nc,int);
-    if (!whole) matrix_error_17(2,nr,nc);
-    for(i=0;i<nr;i++)
-        m[i] = whole + i*nc;
-    return m;
-}
-
-//float
-Eigen::MatrixXf toFloatEigenMatrix_17(float **mat, const int m, const int n)
-{
-    Eigen::MatrixXf eigen_mat(m,n);
-
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            eigen_mat(i,j) = mat[i][j];
-
-    return eigen_mat;
-}
-
+//===
 void fromFloatEigenMatrix_17(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
 {
     for ( int i = 0; i < m; ++i)

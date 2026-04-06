@@ -72,63 +72,12 @@ using namespace MNELIB;
 #define OK 0
 #endif
 
-#define MALLOC_36(x,t) (t *)malloc((x)*sizeof(t))
-#define REALLOC_36(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
-
-#define ALLOC_CMATRIX_36(x,y) mne_cmatrix_36((x),(y))
-
 #if defined(_WIN32) || defined(_WIN64)
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
 #endif
-
-static void matrix_error(int kind, int nr, int nc)
-
-{
-    if (kind == 1)
-        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
-    else if (kind == 2)
-        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
-    else
-        printf("Allocation error for a %d x %d matrix\n",nr,nc);
-    if (sizeof(void *) == 4) {
-        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
-        printf("Please consider moving to a 64-bit platform.");
-    }
-    printf("Cannot continue. Sorry.\n");
-    exit(1);
-}
-
-float **mne_cmatrix_36(int nr,int nc)
-
-{
-    int i;
-    float **m;
-    float *whole;
-
-    m = MALLOC_36(nr,float *);
-    if (!m) matrix_error(1,nr,nc);
-    whole = MALLOC_36(nr*nc,float);
-    if (!whole) matrix_error(2,nr,nc);
-
-    for(i=0;i<nr;i++)
-        m[i] = whole + i*nc;
-    return m;
-}
-
-#define FREE_36(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#define FREE_CMATRIX_36(m) mne_free_cmatrix_36((m))
-
-void mne_free_cmatrix_36 (float **m)
-{
-    if (m) {
-        FREE_36(*m);
-        FREE_36(m);
-    }
-}
 
 namespace MNELIB
 {
@@ -181,9 +130,9 @@ void mne_free_name_list_36(char **list, int nlist)
 #ifdef FOO
         printf("%d %s\n",k,list[k]);
 #endif
-        FREE_36(list[k]);
+        delete[] list[k];
     }
-    FREE_36(list);
+    delete[] list;
     return;
 }
 
@@ -514,7 +463,7 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
 //    tag.data = NULL;
 
     if (npick == 0) {
-        pickno = MALLOC_36(nchan, int);
+        pickno = new int[nchan];
         for (c = 0; c < nchan; c++)
             pickno[c] = c;
         do_all = TRUE;
@@ -523,7 +472,7 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
     else
         do_all = FALSE;
 
-    mult = MALLOC_36(npick,float);
+    mult = new float[npick];
     for (c = 0; c < npick; c++)
         mult[c] = chs[pickno[c]].cal*chs[pickno[c]].range;
 
@@ -573,14 +522,14 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
         goto bad;
     }
     if (do_all)
-        FREE_36(pickno);
-    FREE_36(mult);
+        delete[] pickno;
+    delete[] mult;
 //    FREE_36(tag.data);
     return OK;
 
 bad : {
         if (do_all)
-            FREE_36(pickno);
+            delete[] pickno;
 //        FREE_36(tag.data);
         return FAIL;
     }
@@ -670,7 +619,7 @@ int  mne_sparse_vec_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
 int  mne_sparse_mat_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
                           const MNERawBufDef::RowMajorMatrixXf& mult,  /* Matrix to be multiplied */
                           int             ncol,	   /* How many columns in the above */
-                          float           **res)   /* Result of the multiplication */
+                          MNERawBufDef::RowMajorMatrixXf& res)   /* Result of the multiplication */
 /*
       * Multiply a dense matrix by a sparse matrix.
       */
@@ -684,17 +633,17 @@ int  mne_sparse_mat_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
                 val = 0.0;
                 for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
                     val += mat->data[j]*mult(mat->inds[j],k);
-                res[i][k] = val;
+                res(i,k) = val;
             }
         }
     }
     else if (mat->coding == FIFFTS_MC_CCS) {
         for (k = 0; k < ncol; k++) {
             for (i = 0; i < mat->m; i++)
-                res[i][k] = 0.0;
+                res(i,k) = 0.0;
             for (i = 0; i < mat->n; i++)
                 for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
-                    res[mat->inds[j]][k] += mat->data[j]*mult(i,k);
+                    res(mat->inds[j],k) += mat->data[j]*mult(i,k);
         }
     }
     else {
@@ -922,7 +871,7 @@ int MNERawData::pick_data(mneChSelection sel, int firsts, int ns, float **picked
     float        *values;
     int          need_some;
 
-    float        **deriv_vals = NULL;
+    MNERawBufDef::RowMajorMatrixXf deriv_vals;
     int          deriv_ns     = 0;
     int          nderiv       = 0;
 
@@ -992,13 +941,11 @@ int MNERawData::pick_data(mneChSelection sel, int firsts, int ns, float **picked
                */
                     if (sel->nderiv > 0 && deriv_matched) {
                         if (deriv_ns < this_buf->ns || nderiv != deriv_matched->deriv_data->nrow) {
-                            FREE_CMATRIX_36(deriv_vals);
-                            deriv_vals  = ALLOC_CMATRIX_36(deriv_matched->deriv_data->nrow,this_buf->ns);
+                            deriv_vals.resize(deriv_matched->deriv_data->nrow, this_buf->ns);
                             nderiv      = deriv_matched->deriv_data->nrow;
                             deriv_ns    = this_buf->ns;
                         }
                         if (mne_sparse_mat_mult2(deriv_matched->deriv_data->data.get(),this_buf->vals,this_buf->ns,deriv_vals) == FAIL) {
-                            FREE_CMATRIX_36(deriv_vals);
                             return FAIL;
                         }
                     }
@@ -1014,9 +961,8 @@ int MNERawData::pick_data(mneChSelection sel, int firsts, int ns, float **picked
                  * ...then the derived ones
                  */
                         else if (sel->pick_deriv[c] >= 0 && deriv_matched) {
-                            values = deriv_vals[sel->pick_deriv[c]];
                             for (p = start, s2 = s, ns2 = ns; p < this_buf->ns && ns2 > 0; p++, ns2--, s2++)
-                                picked[c][s2] = values[p];
+                                picked[c][s2] = deriv_vals(sel->pick_deriv[c], p);
                         }
                     }
                 }
@@ -1056,7 +1002,6 @@ int MNERawData::pick_data(mneChSelection sel, int firsts, int ns, float **picked
                     picked[c][s] = 0;
         }
     }
-    FREE_CMATRIX_36(deriv_vals);
     return OK;
 }
 
@@ -1090,7 +1035,7 @@ int MNERawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
     }
     else
         s = 0;
-    pvalues = MALLOC_36(info->nchan,float);
+    pvalues = new float[info->nchan];
     for (k = 0, this_buf = bufs.data(); k < (int)bufs.size(); k++, this_buf++) {
         if (this_buf->lasts >= firsts) {
             start = firsts - this_buf->firsts;
@@ -1125,7 +1070,7 @@ int MNERawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
              */
                 values = &this_buf->vals;
                 if (sel && sel->nderiv > 0 && deriv_matched)
-                    deriv_pvalues = MALLOC_36(deriv_matched->deriv_data->nrow,float);
+                    deriv_pvalues = new float[deriv_matched->deriv_data->nrow];
                 for (p = start; p < this_buf->ns && ns > 0; p++, ns--, s++) {
                     for (c = 0; c < info->nchan; c++)
                         pvalues[c] = (*values)(c,p);
@@ -1160,8 +1105,8 @@ int MNERawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
                 break;
         }
     }
-    FREE_36(deriv_pvalues);
-    FREE_36(pvalues);
+    delete[] deriv_pvalues;
+    delete[] pvalues;
     /*
        * Extend with the last available sample or zero if the request is beyond the data
        */
@@ -1208,7 +1153,7 @@ int MNERawData::load_one_filt_buf(MNERawBufDef *buf)
     if (buf->valid)
         return OK;
 
-    vals = MALLOC_36(buf->nchan,float *);
+    vals = new float*[buf->nchan];
     for (k = 0; k < buf->nchan; k++) {
         buf->ch_filtered[k] = FALSE;
         vals[k] = buf->vals.row(k).data() + filter->taper_size;
@@ -1216,7 +1161,7 @@ int MNERawData::load_one_filt_buf(MNERawBufDef *buf)
 
     res = pick_data_proj(NULL,buf->firsts + filter->taper_size,buf->ns - 2*filter->taper_size,vals);
 
-    FREE_36(vals);
+    delete[] vals;
 
 #ifdef DEBUG
     if (res == OK)
@@ -1238,7 +1183,7 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
     int          bs1,bs2,s1,s2,lasts;
     MNERawBufDef* this_buf;
     float        *values;
-    float        **deriv_vals = NULL;
+    MNERawBufDef::RowMajorMatrixXf deriv_vals;
     Eigen::VectorXf dc;
     float        dc_offset;
     int          deriv_ns     = 0;
@@ -1399,8 +1344,7 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
              * Compute derived data if we need it
              */
                 if (deriv_ns < this_buf->ns || nderiv != deriv_matched->deriv_data->nrow) {
-                    FREE_CMATRIX_36(deriv_vals);
-                    deriv_vals  = ALLOC_CMATRIX_36(deriv_matched->deriv_data->nrow,this_buf->ns);
+                    deriv_vals.resize(deriv_matched->deriv_data->nrow, this_buf->ns);
                     nderiv      = deriv_matched->deriv_data->nrow;
                     deriv_ns    = this_buf->ns;
                 }
@@ -1417,9 +1361,8 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
                         picked[c][s] += values[bs];
                 }
                 else if (sel->pick_deriv[c] >= 0 && deriv_matched) {
-                    values = deriv_vals[sel->pick_deriv[c]];
                     for (s = s1, bs = bs1; s < s2; s++, bs++)
-                        picked[c][s] += values[bs];
+                        picked[c][s] += deriv_vals(sel->pick_deriv[c], bs);
                 }
             }
         }
@@ -1432,11 +1375,9 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
         }
     }
     (void)bs2; // squash compiler warning, this is unused
-    FREE_CMATRIX_36(deriv_vals);
     return OK;
 
 bad : {
-        FREE_CMATRIX_36(deriv_vals);
         return FAIL;
     }
 }
@@ -1693,14 +1634,17 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
     data->setup_filter_bufs();
 
     {
-        float **vals = ALLOC_CMATRIX_36(data->info->nchan,1);
+        std::vector<float> vals_storage(data->info->nchan, 0.0f);
+        std::vector<float*> vals_rows(data->info->nchan);
+        for (int i = 0; i < data->info->nchan; i++)
+            vals_rows[i] = &vals_storage[i];
+        float **vals = vals_rows.data();
 
         if (data->pick_data(NULL,data->first_samp,1,vals) == FAIL)
             goto bad;
         data->first_sample_val.resize(data->info->nchan);
         for (k = 0; k < data->info->nchan; k++)
             data->first_sample_val[k] = vals[k][0];
-        FREE_CMATRIX_36(vals);
         printf("Initial dc offsets determined\n");
     }
     printf("Raw data file %s:\n",name.toUtf8().constData());

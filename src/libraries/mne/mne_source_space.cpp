@@ -66,12 +66,6 @@ using FIFFLIB::FiffCoordTrans;
 #define Y_51 1
 #define Z_51 2
 
-#define ALLOC_INT_51(x) MALLOC_51(x,int)
-
-#define MALLOC_51(x,t) (t *)malloc((x)*sizeof(t))
-
-#define ALLOC_CMATRIX_51(x,y) mne_cmatrix_51((x),(y))
-
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -108,18 +102,6 @@ using FIFFLIB::FiffCoordTrans;
     (to)[Z_17] = (from)[Z_17];\
 }
 
-#define FREE_17(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#define MALLOC_17(x,t) (t *)malloc((x)*sizeof(t))
-
-#define ALLOC_CMATRIX_17(x,y) mne_cmatrix_17((x),(y))
-
-#define ALLOC_ICMATRIX_17(x,y) mne_imatrix_17((x),(y))
-
-#define FREE_CMATRIX_17(m) mne_free_cmatrix_17((m))
-
-#define FREE_ICMATRIX_17(m) mne_free_icmatrix_17((m))
-
 #define NNEIGHBORS 26
 
 #define CURVATURE_FILE_MAGIC_NUMBER  (16777215)
@@ -128,103 +110,6 @@ using FIFFLIB::FiffCoordTrans;
 #define TAG_OLD_COLORTABLE          1
 #define TAG_OLD_USEREALRAS          2
 #define TAG_USEREALRAS              4
-
-static void matrix_error_17(int kind, int nr, int nc)
-
-{
-    if (kind == 1)
-        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
-    else if (kind == 2)
-        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
-    else
-        printf("Allocation error for a %d x %d matrix\n",nr,nc);
-    if (sizeof(void *) == 4) {
-        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
-        printf("Please consider moving to a 64-bit platform.");
-    }
-    printf("Cannot continue. Sorry.\n");
-    exit(1);
-}
-
-static float** mne_cmatrix_17(int nr, int nc)
-{
-    int i;
-    float **m;
-    float *whole;
-
-    m = MALLOC_17(nr,float *);
-    if (!m) matrix_error_17(1,nr,nc);
-    whole = MALLOC_17(nr*nc,float);
-    if (!whole) matrix_error_17(2,nr,nc);
-
-    for(i=0;i<nr;i++)
-        m[i] = whole + i*nc;
-    return m;
-}
-
-static int **mne_imatrix_17(int nr, int nc)
-{
-    int i,**m;
-    int *whole;
-
-    m = MALLOC_17(nr,int *);
-    if (!m) matrix_error_17(1,nr,nc);
-    whole = MALLOC_17(nr*nc,int);
-    if (!whole) matrix_error_17(2,nr,nc);
-    for(i=0;i<nr;i++)
-        m[i] = whole + i*nc;
-    return m;
-}
-
-static void mne_free_cmatrix_17(float **m)
-{
-    if (m) {
-        FREE_17(*m);
-        FREE_17(m);
-    }
-}
-
-static void mne_free_icmatrix_17(int **m)
-{
-    if (m) {
-        FREE_17(*m);
-        FREE_17(m);
-    }
-}
-
-static void matrix_error_51(int kind, int nr, int nc)
-
-{
-    if (kind == 1)
-        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
-    else if (kind == 2)
-        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
-    else
-        printf("Allocation error for a %d x %d matrix\n",nr,nc);
-    if (sizeof(void *) == 4) {
-        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
-        printf("Please consider moving to a 64-bit platform.");
-    }
-    printf("Cannot continue. Sorry.\n");
-    exit(1);
-}
-
-float **mne_cmatrix_51(int nr,int nc)
-
-{
-    int i;
-    float **m;
-    float *whole;
-
-    m = MALLOC_51(nr,float *);
-    if (!m) matrix_error_51(1,nr,nc);
-    whole = MALLOC_51(nr*nc,float);
-    if (!whole) matrix_error_51(2,nr,nc);
-
-    for(i=0;i<nr;i++)
-        m[i] = whole + i*nc;
-    return m;
-}
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -445,10 +330,10 @@ int read_tag_data(QFile &fp, int tag, long long nbytes, unsigned char *&val, lon
 
      val = NULL;
     if (nbytes > 0) {
-        dum = MALLOC_17(nbytes+1,unsigned char);
+        dum = new unsigned char[nbytes+1]();
         if (fp.read(reinterpret_cast<char*>(dum), nbytes) != static_cast<qint64>(snbytes)) {
             printf("Failed to read %d bytes of tag data",static_cast<int>(nbytes));
-            FREE_17(dum);
+            delete[] dum;
             return FAIL;
         }
         dum[nbytes] = '\0'; /* Ensure null termination */
@@ -464,7 +349,7 @@ int read_tag_data(QFile &fp, int tag, long long nbytes, unsigned char *&val, lon
             nbytesp = sizeof(MNEVolGeom);
         }
         else if (tag == TAG_OLD_USEREALRAS || tag == TAG_USEREALRAS) {
-            int *vi = MALLOC_17(1,int);
+            int *vi = new int[1]();
             if (read_int(fp,*vi) == FAIL)
                 vi = 0;
             val = (unsigned char *)vi;
@@ -491,7 +376,7 @@ void add_mgh_tag_to_group(std::optional<MNEMghTagGroup>& g, int tag, long long l
     new_tag->tag  = tag;
     new_tag->len  = len;
     new_tag->data = QByteArray(reinterpret_cast<const char*>(data), static_cast<int>(len));
-    free(data);
+    delete[] data;
     g->tags.push_back(std::move(new_tag));
 }
 
@@ -672,12 +557,11 @@ int read_triangle_file(const QString& fname,
     char c;
 
     qint32  nvert,ntri,nquad;
-    float **vert = NULL;
-    int   **tri  = NULL;
+    PointsT    vert;
+    TrianglesT tri;
     int   k,p;
     int   quad[4];
     int   val;
-    float *rr[5];
     int   which;
 
     if (!fp.open(QIODevice::ReadOnly)) {
@@ -715,34 +599,34 @@ int read_triangle_file(const QString& fname,
         if (read_int(fp,ntri) != 0)
             goto bad;
         printf(" nvert = %d ntri = %d\n",nvert,ntri);
-        vert = ALLOC_CMATRIX_17(nvert,3);
-        tri  = ALLOC_ICMATRIX_17(ntri,3);
+        vert.resize(nvert, 3);
+        tri.resize(ntri, 3);
         /*
      * Read the vertices
      */
         for (k = 0; k < nvert; k++) {
-            if (read_float(fp,vert[k][X_17]) != 0)
+            if (read_float(fp,vert(k,X_17)) != 0)
                 goto bad;
-            if (read_float(fp,vert[k][Y_17]) != 0)
+            if (read_float(fp,vert(k,Y_17)) != 0)
                 goto bad;
-            if (read_float(fp,vert[k][Z_17]) != 0)
+            if (read_float(fp,vert(k,Z_17)) != 0)
                 goto bad;
         }
         /*
      * Read the triangles
      */
         for (k = 0; k < ntri; k++) {
-            if (read_int(fp,tri[k][X_17]) != 0)
+            if (read_int(fp,tri(k,X_17)) != 0)
                 goto bad;
-            if (check_vertex(tri[k][X_17],nvert) != OK)
+            if (check_vertex(tri(k,X_17),nvert) != OK)
                 goto bad;
-            if (read_int(fp,tri[k][Y_17]) != 0)
+            if (read_int(fp,tri(k,Y_17)) != 0)
                 goto bad;
-            if (check_vertex(tri[k][Y_17],nvert) != OK)
+            if (check_vertex(tri(k,Y_17),nvert) != OK)
                 goto bad;
-            if (read_int(fp,tri[k][Z_17]) != 0)
+            if (read_int(fp,tri(k,Z_17)) != 0)
                 goto bad;
-            if (check_vertex(tri[k][Z_17],nvert) != OK)
+            if (check_vertex(tri(k,Z_17),nvert) != OK)
                 goto bad;
         }
     }
@@ -755,39 +639,37 @@ int read_triangle_file(const QString& fname,
         printf("%s file : nvert = %d nquad = %d\n",
                 magic == QUAD_FILE_MAGIC_NUMBER ? "Quad" : "New quad",
                 nvert,nquad);
-        vert = ALLOC_CMATRIX_17(nvert,3);
+        vert.resize(nvert, 3);
         if (magic == QUAD_FILE_MAGIC_NUMBER) {
             for (k = 0; k < nvert; k++) {
                 if (read_int2(fp,val) != 0)
                     goto bad;
-                vert[k][X_17] = val/100.0;
+                vert(k,X_17) = val/100.0;
                 if (read_int2(fp,val) != 0)
                     goto bad;
-                vert[k][Y_17] = val/100.0;
+                vert(k,Y_17) = val/100.0;
                 if (read_int2(fp,val) != 0)
                     goto bad;
-                vert[k][Z_17] = val/100.0;
+                vert(k,Z_17) = val/100.0;
             }
         }
         else {			/* NEW_QUAD_FILE_MAGIC_NUMBER */
             for (k = 0; k < nvert; k++) {
-                if (read_float(fp,vert[k][X_17]) != 0)
+                if (read_float(fp,vert(k,X_17)) != 0)
                     goto bad;
-                if (read_float(fp,vert[k][Y_17]) != 0)
+                if (read_float(fp,vert(k,Y_17)) != 0)
                     goto bad;
-                if (read_float(fp,vert[k][Z_17]) != 0)
+                if (read_float(fp,vert(k,Z_17)) != 0)
                     goto bad;
             }
         }
         ntri = 2*nquad;
-        tri  = ALLOC_ICMATRIX_17(ntri,3);
+        tri.resize(ntri, 3);
         for (k = 0, ntri = 0; k < nquad; k++) {
             for (p = 0; p < 4; p++) {
                 if (read_int3(fp,quad[p]) != 0)
                     goto bad;
-                rr[p] = vert[quad[p]];
             }
-            rr[4] = vert[quad[0]];
 
             /*
      * The randomization is borrowed from FreeSurfer code
@@ -806,25 +688,25 @@ int read_triangle_file(const QString& fname,
      */
 
             if (EVEN(which)) {
-                tri[ntri][X_17] = quad[0];
-                tri[ntri][Y_17] = quad[1];
-                tri[ntri][Z_17] = quad[3];
+                tri(ntri,X_17) = quad[0];
+                tri(ntri,Y_17) = quad[1];
+                tri(ntri,Z_17) = quad[3];
                 ntri++;
 
-                tri[ntri][X_17] = quad[2];
-                tri[ntri][Y_17] = quad[3];
-                tri[ntri][Z_17] = quad[1];
+                tri(ntri,X_17) = quad[2];
+                tri(ntri,Y_17) = quad[3];
+                tri(ntri,Z_17) = quad[1];
                 ntri++;
             }
             else {
-                tri[ntri][X_17] = quad[0];
-                tri[ntri][Y_17] = quad[1];
-                tri[ntri][Z_17] = quad[2];
+                tri(ntri,X_17) = quad[0];
+                tri(ntri,Y_17) = quad[1];
+                tri(ntri,Z_17) = quad[2];
                 ntri++;
 
-                tri[ntri][X_17] = quad[0];
-                tri[ntri][Y_17] = quad[2];
-                tri[ntri][Z_17] = quad[3];
+                tri(ntri,X_17) = quad[0];
+                tri(ntri,Y_17) = quad[2];
+                tri(ntri,Z_17) = quad[3];
                 ntri++;
             }
         }
@@ -842,20 +724,12 @@ int read_triangle_file(const QString& fname,
     /*
      * Convert mm to m and store as Eigen matrices
      */
-    for (k = 0; k < nvert; k++) {
-        vert[k][X_17] = vert[k][X_17]/1000.0;
-        vert[k][Y_17] = vert[k][Y_17]/1000.0;
-        vert[k][Z_17] = vert[k][Z_17]/1000.0;
-    }
-    vertices = Eigen::Map<PointsT>(vert[0], nvert, 3);
-    FREE_CMATRIX_17(vert);
-    triangles = Eigen::Map<TrianglesT>(tri[0], ntri, 3);
-    FREE_ICMATRIX_17(tri);
+    vert /= 1000.0f;
+    vertices = std::move(vert);
+    triangles = std::move(tri);
     return OK;
 
 bad : {
-        FREE_CMATRIX_17(vert);
-        FREE_ICMATRIX_17(tri);
         return FAIL;
     }
 }
@@ -2062,8 +1936,8 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
                         new_space->neighbor_vert[k][p] = neighbors[q];
                 }
             }
-            FREE_17(neighbors);
-            FREE_17(nneighbors);
+            delete[] neighbors;
+            delete[] nneighbors;
             nneighbors = neighbors = NULL;
             /*
                 * There might be a coordinate transformation and dimensions
@@ -2122,11 +1996,11 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
 bad : {
         stream->close();
         // new_space and local_spaces auto-cleanup via unique_ptr
-        FREE_17(nearest);
-        FREE_17(nearest_dist);
-        FREE_17(neighbors);
-        FREE_17(nneighbors);
-        FREE_17(vol_dims);
+        delete[] nearest;
+        delete[] nearest_dist;
+        delete[] neighbors;
+        delete[] nneighbors;
+        delete[] vol_dims;
 
         return FIFF_FAIL;
     }

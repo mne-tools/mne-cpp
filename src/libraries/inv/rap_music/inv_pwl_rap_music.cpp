@@ -236,8 +236,8 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
                     //Create Lead Field combinations -> It would be better to use a pointer construction, to increase performance
                     MatrixX6T t_matProj_G(t_matProj_LeadField.rows(),6);
 
-                    int idx1 = m_ppPairIdxCombinations[k]->x1;
-                    int idx2 = m_ppPairIdxCombinations[k]->x2;
+                    int idx1 = m_ppPairIdxCombinations[k].x1;
+                    int idx2 = m_ppPairIdxCombinations[k].x2;
 
                     InvRapMusic::getGainMatrixPair(t_matProj_LeadField, t_matProj_G, idx1, idx2);
 
@@ -276,8 +276,8 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
             {
                 t_iMaxIdx_old = t_iMaxIdx;
                 //get positions in sparsed leadfield from index combinations;
-                t_iIdx1 = m_ppPairIdxCombinations[t_iMaxIdx]->x1;
-                t_iIdx2 = m_ppPairIdxCombinations[t_iMaxIdx]->x2;
+                t_iIdx1 = m_ppPairIdxCombinations[t_iMaxIdx].x1;
+                t_iIdx2 = m_ppPairIdxCombinations[t_iMaxIdx].x2;
             }
 
             //set new index

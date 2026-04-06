@@ -456,17 +456,17 @@ public:
      *
      * @param[in] from_frame   Source coordinate frame ID.
      * @param[in] to_frame     Destination coordinate frame ID.
-     * @param[in] fromp        Point locations in the source frame (np×3 C matrix).
-     * @param[in] top          Point locations in the destination frame (np×3 C matrix).
-     * @param[in] w            Optional weights (np elements), or nullptr for equal weight.
-     * @param[in] np           Number of points.
+     * @param[in] fromp        Point locations in the source frame (np×3 matrix).
+     * @param[in] top          Point locations in the destination frame (np×3 matrix).
+     * @param[in] w            Weights (np elements), or empty vector for equal weight.
      * @param[in] max_diff     Maximum allowed difference between transformed and target.
      *
      * @return The alignment transform, or an empty transform on failure.
      */
     static FiffCoordTrans procrustesAlign(int from_frame, int to_frame,
-                                          float **fromp, float **top,
-                                          float *w, int np,
+                                          const Eigen::MatrixXf& fromp,
+                                          const Eigen::MatrixXf& top,
+                                          const Eigen::VectorXf& w,
                                           float max_diff);
 
 public:

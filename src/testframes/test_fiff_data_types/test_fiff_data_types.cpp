@@ -409,17 +409,16 @@ private slots:
 
     void coordTrans_procrustesAlign()
     {
-        // Test Procrustes alignment — covers lines 634-676
-        const int np = 4;
-        float pts_from[4][3] = {{0,0,0},{1,0,0},{0,1,0},{0,0,1}};
-        float pts_to[4][3]   = {{0.1f,0,0},{1.1f,0,0},{0.1f,1,0},{0.1f,0,1}};
-        float* fromp[4] = {pts_from[0], pts_from[1], pts_from[2], pts_from[3]};
-        float* top[4]   = {pts_to[0], pts_to[1], pts_to[2], pts_to[3]};
-        float w[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+        // Test Procrustes alignment
+        Eigen::MatrixXf fromPts(4, 3), toPts(4, 3);
+        fromPts << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+        toPts   << 0.1f,0,0, 1.1f,0,0, 0.1f,1,0, 0.1f,0,1;
+        Eigen::VectorXf w(4);
+        w << 1.0f, 1.0f, 1.0f, 1.0f;
 
         FiffCoordTrans t = FiffCoordTrans::procrustesAlign(
             FIFFV_COORD_HEAD, FIFFV_COORD_DEVICE,
-            fromp, top, w, np, 0.01f);
+            fromPts, toPts, w, 0.01f);
         QVERIFY(!t.isEmpty());
         QCOMPARE(t.from, (int)FIFFV_COORD_HEAD);
         QCOMPARE(t.to, (int)FIFFV_COORD_DEVICE);
@@ -429,16 +428,14 @@ private slots:
 
     void coordTrans_procrustesNoWeights()
     {
-        // Test Procrustes without weights — covers the w==nullptr branch
-        const int np = 3;
-        float pts_from[3][3] = {{0,0,0},{1,0,0},{0,1,0}};
-        float pts_to[3][3]   = {{0,0,0},{1,0,0},{0,1,0}};
-        float* fromp[3] = {pts_from[0], pts_from[1], pts_from[2]};
-        float* top[3]   = {pts_to[0], pts_to[1], pts_to[2]};
+        // Test Procrustes without weights — empty weight vector
+        Eigen::MatrixXf fromPts(3, 3), toPts(3, 3);
+        fromPts << 0,0,0, 1,0,0, 0,1,0;
+        toPts   << 0,0,0, 1,0,0, 0,1,0;
 
         FiffCoordTrans t = FiffCoordTrans::procrustesAlign(
             FIFFV_COORD_HEAD, FIFFV_COORD_MRI,
-            fromp, top, nullptr, np, 0.01f);
+            fromPts, toPts, Eigen::VectorXf(), 0.01f);
         QVERIFY(!t.isEmpty());
         // Identity-like — rotation should be close to identity
         QVERIFY(qAbs(t.trans(0,0) - 1.0f) < 0.01f);

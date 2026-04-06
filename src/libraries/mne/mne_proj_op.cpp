@@ -71,58 +71,6 @@
 #define OK 0
 #endif
 
-#define MALLOC_23(x,t) (t *)malloc((x)*sizeof(t))
-
-#define REALLOC_23(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
-
-#define FREE_23(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#define FREE_CMATRIX_23(m) mne_free_cmatrix_23((m))
-
-void mne_free_cmatrix_23 (float **m)
-{
-    if (m) {
-        FREE_23(*m);
-        FREE_23(m);
-    }
-}
-
-#define ALLOC_CMATRIX_23(x,y) mne_cmatrix_23((x),(y))
-
-static void matrix_error_23(int kind, int nr, int nc)
-
-{
-    if (kind == 1)
-        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
-    else if (kind == 2)
-        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
-    else
-        printf("Allocation error for a %d x %d matrix\n",nr,nc);
-    if (sizeof(void *) == 4) {
-        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
-        printf("Please consider moving to a 64-bit platform.");
-    }
-    printf("Cannot continue. Sorry.\n");
-    exit(1);
-}
-
-float **mne_cmatrix_23(int nr,int nc)
-
-{
-    int i;
-    float **m;
-    float *whole;
-
-    m = MALLOC_23(nr,float *);
-    if (!m) matrix_error_23(1,nr,nc);
-    whole = MALLOC_23(nr*nc,float);
-    if (!whole) matrix_error_23(2,nr,nc);
-
-    for(i=0;i<nr;i++)
-        m[i] = whole + i*nc;
-    return m;
-}
-
 float mne_dot_vectors_23 (float *v1,
                        float *v2,
                        int   nn)
@@ -158,18 +106,6 @@ void mne_string_to_name_list_23(const QString& s, QStringList& listp,int &nlistp
     listp  = list;
     nlistp = list.size();
     return;
-}
-
-void fromFloatEigenMatrix_23(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
-{
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            to_mat[i][j] = from_mat(i,j);
-}
-
-void fromFloatEigenMatrix_23(const Eigen::MatrixXf& from_mat, float **& to_mat)
-{
-    fromFloatEigenMatrix_23(from_mat, to_mat, from_mat.rows(), from_mat.cols());
 }
 
 QString mne_name_list_to_string_23(const QStringList& list)

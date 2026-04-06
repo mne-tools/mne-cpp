@@ -87,57 +87,6 @@ using namespace INVLIB;
     (to)[Z_16] = (from)[Z_16];\
     }
 
-#define MALLOC_16(x,t) (t *)malloc((x)*sizeof(t))
-
-#define REALLOC_16(x,y,t) (t *)((x == nullptr) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
-
-#define ALLOC_CMATRIX_16(x,y) mne_cmatrix_16((x),(y))
-
-static void matrix_error_16(int kind, int nr, int nc)
-
-{
-    if (kind == 1)
-        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
-    else if (kind == 2)
-        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
-    else
-        printf("Allocation error for a %d x %d matrix\n",nr,nc);
-    if (sizeof(void *) == 4) {
-        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
-        printf("Please consider moving to a 64-bit platform.");
-    }
-    printf("Cannot continue. Sorry.\n");
-    exit(1);
-}
-
-float **mne_cmatrix_16(int nr,int nc)
-
-{
-    int i;
-    float **m;
-    float *whole;
-
-    m = MALLOC_16(nr,float *);
-    if (!m) matrix_error_16(1,nr,nc);
-    whole = MALLOC_16(nr*nc,float);
-    if (!whole) matrix_error_16(2,nr,nc);
-
-    for(i=0;i<nr;i++)
-        m[i] = whole + i*nc;
-    return m;
-}
-
-#define FREE_16(x) if ((char *)(x) != nullptr) free((char *)(x))
-#define FREE_CMATRIX_16(m) mne_free_cmatrix_16((m))
-
-void mne_free_cmatrix_16 (float **m)
-{
-    if (m) {
-        FREE_16(*m);
-        FREE_16(m);
-    }
-}
-
 void fromFloatEigenMatrix_16(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
 {
     for ( int i = 0; i < m; ++i)

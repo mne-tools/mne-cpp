@@ -113,55 +113,6 @@ constexpr float EVEN_CURV_COLOR = 0.375f;
     (xy)[Z_17] =   (x)[X_17]*(y)[Y_17]-(y)[X_17]*(x)[Y_17];\
     }
 
-#define MALLOC_17(x,t) (t *)malloc((x)*sizeof(t))
-
-#define ALLOC_CMATRIX_17(x,y) mne_cmatrix_ds_17((x),(y))
-
-static void matrix_error_ds_17(int kind, int nr, int nc)
-{
-    if (kind == 1)
-        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
-    else if (kind == 2)
-        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
-    else
-        printf("Allocation error for a %d x %d matrix\n",nr,nc);
-    if (sizeof(void *) == 4) {
-        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
-        printf("Please consider moving to a 64-bit platform.");
-    }
-    printf("Cannot continue. Sorry.\n");
-    exit(1);
-}
-
-static float** mne_cmatrix_ds_17(int numPoints,int numDim)
-{
-    float** m;
-    float*  whole;
-
-    m = MALLOC_17(numPoints, float *);
-    if (!m) matrix_error_ds_17(1, numPoints, numDim);
-
-    whole = MALLOC_17(numPoints * numDim, float);
-    if (!whole) matrix_error_ds_17(2, numPoints, numDim);
-
-    for(int i = 0; i < numPoints; ++i)
-        m[i] = &whole[ i * numDim ];
-
-    return m;
-}
-
-#define FREE_17(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#define FREE_CMATRIX_17(m) mne_free_cmatrix_ds_17((m))
-
-static void mne_free_cmatrix_ds_17(float **m)
-{
-    if (m) {
-        FREE_17(*m);
-        FREE_17(m);
-    }
-}
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -294,8 +245,8 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
 
     scales[0] = scales[1] = scales[2] = 1.0;
 
-    dig_rr  = MALLOC_17(dig.npoint,float *);
-    head_rr = MALLOC_17(np,float *);
+    dig_rr  = new float*[dig.npoint];
+    head_rr = new float*[np];
 
     // Pick only the points with positive z
     for (k = 0, ndig = 0; k < dig.npoint; k++) {
@@ -335,8 +286,8 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
     scales[0] = scales[1] = scales[2] = Rdig/Rscalp;
 
 out : {
-        FREE_17(dig_rr);
-        FREE_17(head_rr);
+        delete[] dig_rr;
+        delete[] head_rr;
         return;
     }
 }
@@ -467,9 +418,9 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
  */
 {
     int   res       = FAIL;
-    float **rr_head = NULL;
-    float **rr_mri  = NULL;
-    float *w        = NULL;
+    Eigen::MatrixXf rr_head(dig.npoint, 3);
+    Eigen::MatrixXf rr_mri(dig.npoint, 3);
+    Eigen::VectorXf w = Eigen::VectorXf::Zero(dig.npoint);
     int             k,nactive;
     FiffDigPoint    point;
     FiffCoordTrans t;
@@ -484,18 +435,11 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
      */
     calculate_digitizer_distances(dig,FALSE,TRUE);
 
-    /*
-     * Set up the alignment
-     */
-    rr_head = ALLOC_CMATRIX_17(dig.npoint,3);
-    rr_mri  = ALLOC_CMATRIX_17(dig.npoint,3);
-    w       = MALLOC_17(dig.npoint,float);
-
     for (k = 0, nactive = 0; k < dig.npoint; k++) {
         if (dig.active[k] && !dig.discard[k]) {
             point = dig.points.at(k);
-            VEC_COPY_17(rr_head[nactive],point.r);
-            VEC_COPY_17(rr_mri[nactive],dig.closest_point.row(k).data());
+            rr_head.row(nactive) = Eigen::Map<const Eigen::RowVector3f>(point.r);
+            rr_mri.row(nactive) = dig.closest_point.row(k);
             /*
             * Special handling for the nasion
             */
@@ -503,10 +447,10 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
                     point.ident == FIFFV_POINT_NASION) {
                 w[nactive] = nasion_weight;
                 if (nasion_mri) {
-                    VEC_COPY_17(rr_mri[nactive],nasion_mri->data());
-                    VEC_COPY_17(rr_head[nactive],nasion_mri->data());
+                    rr_mri.row(nactive) = nasion_mri->transpose();
+                    rr_head.row(nactive) = nasion_mri->transpose();
                     Q_ASSERT(dig.head_mri_t || dig.head_mri_t_adj);
-                    FiffCoordTrans::apply_inverse_trans(rr_head[nactive],
+                    FiffCoordTrans::apply_inverse_trans(rr_head.row(nactive).data(),
                                                             dig.head_mri_t_adj ? *dig.head_mri_t_adj : *dig.head_mri_t,
                                                             FIFFV_MOVE);
                 }
@@ -521,7 +465,10 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
         goto out;
     }
     if ((t = FiffCoordTrans::procrustesAlign(FIFFV_COORD_HEAD, FIFFV_COORD_MRI,
-                                                 rr_head, rr_mri, w, nactive, max_diff)).isEmpty())
+                                                 rr_head.topRows(nactive),
+                                                 rr_mri.topRows(nactive),
+                                                 w.head(nactive),
+                                                 max_diff)).isEmpty())
         goto out;
 
     if (dig.head_mri_t_adj)
@@ -532,12 +479,8 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
     dig.dist_valid = false;
     calculate_digitizer_distances(dig,FALSE,!last_step);
     res = OK;
-    goto out;
 
 out : {
-        FREE_CMATRIX_17(rr_head);
-        FREE_CMATRIX_17(rr_mri);
-        FREE_17(w);
         return res;
     }
 }
