@@ -304,12 +304,12 @@ signals:
     void executed(Command p_command);
 
 public:
-    QString             m_sCommand;
-    QString             m_sDescription;
-    QStringList         m_qListParamNames;
-    QList<QVariant>     m_qListParamValues;
-    QStringList         m_qListParamDescriptions;
-    bool                m_bIsJson;
+    QString             m_sCommand;                 /**< The command keyword. */
+    QString             m_sDescription;             /**< Human-readable description of the command. */
+    QStringList         m_qListParamNames;          /**< Parameter names (positional order). */
+    QList<QVariant>     m_qListParamValues;         /**< Current parameter values (same order as names). */
+    QStringList         m_qListParamDescriptions;   /**< Per-parameter description strings. */
+    bool                m_bIsJson;                  /**< True when the command was parsed from JSON. */
 };
 
 //=============================================================================================================

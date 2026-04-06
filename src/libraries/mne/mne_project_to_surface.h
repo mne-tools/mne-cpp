@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     project_to_surface.h
+ * @file     mne_project_to_surface.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0

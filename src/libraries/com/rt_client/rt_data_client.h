@@ -75,8 +75,8 @@ struct MetaData{
             :m_pInfo(pInfo)
             ,m_pDigitizerData(pDigitizerData){};
 
-    FIFFLIB::FiffInfo::SPtr m_pInfo;
-    FIFFLIB::FiffDigitizerData::SPtr m_pDigitizerData;
+    FIFFLIB::FiffInfo::SPtr m_pInfo;                   /**< Measurement information (channel layout, sampling rate, etc.). */
+    FIFFLIB::FiffDigitizerData::SPtr m_pDigitizerData;  /**< Head-shape digitizer point set. */
 };
 
 //=============================================================================================================

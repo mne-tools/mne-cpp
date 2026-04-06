@@ -751,7 +751,7 @@ int MNEProjOp::make_proj_bad(char **bad, int nbad)
     for (p = 0; p < nvec_eeg; p++, nvec++)
         if (sing_eeg_vec[p]/sing_eeg_vec[0] < USE_LIMIT)
             break;
-    proj_data = RowMajorMatrixXf::Zero(nvec,nch);
+    proj_data = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>::Zero(nvec,nch);
     for (p = 0, nvec = 0; p < nvec_meg; p++, nvec++) {
         if (sing_meg_vec[p]/sing_meg_vec[0] < USE_LIMIT)
             break;

@@ -85,9 +85,6 @@ public:
     typedef QSharedPointer<MNERawBufDef> SPtr;              /**< Shared pointer type for MNERawBufDef. */
     typedef QSharedPointer<const MNERawBufDef> ConstSPtr;   /**< Const shared pointer type for MNERawBufDef. */
 
-    /** Row-major float matrix matching the legacy float** memory layout. */
-    using RowMajorMatrixXf = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
-
     //=========================================================================================================
     /**
      * @brief Default constructor.
@@ -119,7 +116,7 @@ public:
     int   ns = 0;           /**< Number of samples (lasts - firsts + 1). */
     int   nchan = 0;        /**< Number of channels. */
     int   is_skip = 0;      /**< Non-zero if this buffer represents a data skip. */
-    RowMajorMatrixXf vals;  /**< Sample values matrix [nchan x ns], row-major (empty if not loaded into memory). */
+    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> vals;  /**< Sample values matrix [nchan x ns], row-major (empty if not loaded). */
     int   valid = 0;        /**< Non-zero if the data in this buffer are meaningful. */
     Eigen::VectorXi ch_filtered; /**< Per-channel flag: has this channel been filtered already (filtered buffers only). */
     int   comp_status = 0;  /**< Compensation status for raw buffers. */

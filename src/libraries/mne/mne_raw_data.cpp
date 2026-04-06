@@ -82,6 +82,9 @@ using namespace MNELIB;
 namespace MNELIB
 {
 
+/** Row-major float matrix (file-local convenience alias). */
+using RowMajorMatrixXf = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+
 /**
  * @brief Circular ring buffer for managing raw-data matrix allocations.
  *
@@ -92,7 +95,7 @@ namespace MNELIB
 struct RingBuffer
 {
     struct Entry {
-        MNERawBufDef::RowMajorMatrixXf *user = nullptr;
+        RowMajorMatrixXf *user = nullptr;
     };
 
     std::vector<Entry> entries;
@@ -104,7 +107,7 @@ struct RingBuffer
     {}
 
     /** Allocate (or reclaim) an entry for @p res with dimensions @p nrow x @p ncol. */
-    void allocate(int nrow, int ncol, MNERawBufDef::RowMajorMatrixXf *res)
+    void allocate(int nrow, int ncol, RowMajorMatrixXf *res)
     {
         if (next >= static_cast<int>(entries.size()))
             next = 0;
@@ -442,7 +445,7 @@ std::unique_ptr<FilterData> mne_create_filter_response(const MNEFilterDef&   fil
 int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
                           FiffStream::SPtr& stream,
                           const FiffDirEntry::SPtr& ent,         /* The directory entry to read */
-                          MNERawBufDef::RowMajorMatrixXf& data,  /* Matrix [npick x nsamp] to fill */
+                          RowMajorMatrixXf& data,  /* Matrix [npick x nsamp] to fill */
                           int          nchan,       /* Number of channels in the data */
                           int          nsamp,       /* Expected number of samples */
                           const QList<FIFFLIB::FiffChInfo>&   chs,         /* Channel info for ALL channels */
@@ -617,9 +620,9 @@ int  mne_sparse_vec_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
 }
 
 int  mne_sparse_mat_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
-                          const MNERawBufDef::RowMajorMatrixXf& mult,  /* Matrix to be multiplied */
+                          const RowMajorMatrixXf& mult,  /* Matrix to be multiplied */
                           int             ncol,	   /* How many columns in the above */
-                          MNERawBufDef::RowMajorMatrixXf& res)   /* Result of the multiplication */
+                          RowMajorMatrixXf& res)   /* Result of the multiplication */
 /*
       * Multiply a dense matrix by a sparse matrix.
       */
@@ -871,7 +874,7 @@ int MNERawData::pick_data(mneChSelection sel, int firsts, int ns, float **picked
     float        *values;
     int          need_some;
 
-    MNERawBufDef::RowMajorMatrixXf deriv_vals;
+    RowMajorMatrixXf deriv_vals;
     int          deriv_ns     = 0;
     int          nderiv       = 0;
 
@@ -1014,7 +1017,7 @@ int MNERawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
 {
     int          k,s,p,start,c,fills;
     MNERawBufDef* this_buf;
-    MNERawBufDef::RowMajorMatrixXf *values;
+    RowMajorMatrixXf *values;
     float        *pvalues;
     float        *deriv_pvalues = NULL;
 
@@ -1183,7 +1186,7 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
     int          bs1,bs2,s1,s2,lasts;
     MNERawBufDef* this_buf;
     float        *values;
-    MNERawBufDef::RowMajorMatrixXf deriv_vals;
+    RowMajorMatrixXf deriv_vals;
     Eigen::VectorXf dc;
     float        dc_offset;
     int          deriv_ns     = 0;
