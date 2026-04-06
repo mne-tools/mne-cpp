@@ -39,6 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "inv_global.h"
+
 #include <vector>
 
 //=============================================================================================================
@@ -62,7 +64,7 @@ namespace INVLIB
  *
  * @brief N-tuple of correlated grid sources with orientations and correlation matrix.
  */
-struct InvSourceCoupling
+struct INVSHARED_EXPORT InvSourceCoupling
 {
     std::vector<int>        gridIndices;    /**< Grid indices of the coupled sources (size N). */
     std::vector<Eigen::Vector3d> moments;   /**< Dipole moment / orientation for each coupled source (size N). */

@@ -381,7 +381,7 @@ void TestMneRawProjComp::ctfCompDataSet_defaultConstruction()
 {
     MNECTFCompDataSet compSet;
     QCOMPARE(compSet.ncomp, 0);
-    QVERIFY(compSet.comps.isEmpty());
+    QVERIFY(compSet.comps.empty());
     QVERIFY(compSet.current == nullptr);
 }
 
