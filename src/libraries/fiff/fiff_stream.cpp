@@ -3232,7 +3232,29 @@ fiff_long_t FiffStream::write_evoked_set(const FiffEvokedSet& p_FiffEvokedSet)
     if (p_FiffEvokedSet.info.meas_id.version != -1)
         this->write_id(FIFF_PARENT_BLOCK_ID, p_FiffEvokedSet.info.meas_id);
 
-    this->write_info_base(p_FiffEvokedSet.info);
+    //
+    //  Write measurement info so that the file can be read back
+    //
+    this->start_block(FIFFB_MEAS_INFO);
+
+    this->write_int(FIFF_NCHAN, &p_FiffEvokedSet.info.nchan);
+
+    float sfreq = p_FiffEvokedSet.info.sfreq;
+    this->write_float(FIFF_SFREQ, &sfreq);
+
+    for (int k = 0; k < p_FiffEvokedSet.info.nchan; ++k) {
+        FiffChInfo ch = p_FiffEvokedSet.info.chs[k];
+        ch.scanNo = k + 1;
+        this->write_ch_info(ch);
+    }
+
+    if (!p_FiffEvokedSet.info.dev_head_t.isEmpty())
+        this->write_coord_trans(p_FiffEvokedSet.info.dev_head_t);
+
+    if (!p_FiffEvokedSet.info.projs.isEmpty())
+        this->write_proj(p_FiffEvokedSet.info.projs);
+
+    this->end_block(FIFFB_MEAS_INFO);
 
     for (int j = 0; j < p_FiffEvokedSet.evoked.size(); ++j) {
         const FiffEvoked &evoked = p_FiffEvokedSet.evoked[j];
@@ -3242,6 +3264,12 @@ fiff_long_t FiffStream::write_evoked_set(const FiffEvokedSet& p_FiffEvokedSet)
 
         this->write_string(FIFF_COMMENT, evoked.comment);
 
+        int first = evoked.first;
+        this->write_int(FIFF_FIRST_SAMPLE, &first);
+
+        int last = evoked.last;
+        this->write_int(FIFF_LAST_SAMPLE, &last);
+
         this->start_block(FIFFB_ASPECT);
 
         int aspectKind = FIFFV_ASPECT_AVERAGE;
@@ -3250,17 +3278,8 @@ fiff_long_t FiffStream::write_evoked_set(const FiffEvokedSet& p_FiffEvokedSet)
         int nave = evoked.nave;
         this->write_int(FIFF_NAVE, &nave);
 
-        int first = evoked.first;
-        this->write_int(FIFF_FIRST_SAMPLE, &first);
-
-        int last = evoked.last;
-        this->write_int(FIFF_LAST_SAMPLE, &last);
-
         Eigen::MatrixXf floatData = evoked.data.cast<float>();
-        for (int ch = 0; ch < floatData.rows(); ++ch) {
-            this->write_float(FIFF_EPOCH, floatData.row(ch).data(),
-                              static_cast<int>(floatData.cols()));
-        }
+        this->write_float_matrix(FIFF_EPOCH, floatData);
 
         this->end_block(FIFFB_ASPECT);
         this->end_block(FIFFB_EVOKED);

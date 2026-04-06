@@ -125,7 +125,8 @@ QString TestMneSurf2Bem::findApplication()
                << appDir + "/mne_surf2bem.exe";
 #elif defined(Q_OS_MAC)
     candidates << appDir + "/../apps/mne_surf2bem"
-               << appDir + "/mne_surf2bem";
+               << appDir + "/mne_surf2bem"
+               << appDir + "/../bin/mne_surf2bem";
 #else
     candidates << appDir + "/../apps/mne_surf2bem"
                << appDir + "/mne_surf2bem"

@@ -12,6 +12,7 @@
 #include <QBuffer>
 #include <QTemporaryDir>
 #include <QCoreApplication>
+#include <QDir>
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 
@@ -681,7 +682,14 @@ void TestMneLibrary::inverseOp_readFullFile()
     QString invPath = m_sDataPath + "/Result/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif";
     if (!QFile::exists(invPath)) {
         invPath = m_sDataPath + "/MEG/sample/sample_audvis-meg-oct-6-meg-inv.fif";
-        if (!QFile::exists(invPath)) QSKIP("Inverse operator file not found");
+    }
+    if (!QFile::exists(invPath)) {
+        // Try MNE sample data
+        QString mneData = QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif";
+        if (QFile::exists(mneData))
+            invPath = mneData;
+        else
+            QSKIP("Inverse operator file not found");
     }
 
     QFile invFile(invPath);
@@ -1402,17 +1410,76 @@ void TestMneLibrary::forwardSolution_readVerify()
 
 void TestMneLibrary::inverseOp_makeSmallChannelSet()
 {
-    QSKIP("make_inverse_operator triggers Eigen empty-matrix assertion in debug builds");
+    // Read forward solution
+    QString mneBase = QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/";
+    QString fwdPath = mneBase + "sample_audvis-meg-eeg-oct-6-fwd.fif";
+    QString covPath = mneBase + "sample_audvis-cov.fif";
+    QString rawPath = m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif";
+
+    if (!QFile::exists(fwdPath) || !QFile::exists(covPath) || !QFile::exists(rawPath))
+        QSKIP("Required MNE sample data files not found");
+
+    // Read raw info
+    QFile rawFile(rawPath);
+    FiffRawData raw(rawFile);
+    FiffInfo info = raw.info;
+
+    // Read forward solution
+    QFile fwdFile(fwdPath);
+    MNEForwardSolution fwd;
+    bool ok = MNEForwardSolution::read(fwdFile, fwd);
+    QVERIFY(ok);
+    QVERIFY(!fwd.isEmpty());
+
+    // Read noise covariance
+    QFile covFile(covPath);
+    FiffCov noiseCov(covFile);
+
+    // Make inverse operator
+    MNEInverseOperator inv = MNEInverseOperator::make_inverse_operator(info, fwd, noiseCov, 0.2f, 0.8f);
+    QVERIFY(inv.eigen_fields->data.rows() > 0);
 }
 
 void TestMneLibrary::inverseOp_writeReadRoundTrip()
 {
-    QSKIP("make_inverse_operator triggers Eigen empty-matrix assertion in debug builds");
+    // Read an existing inverse op and write/read it
+    QString invPath = QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif";
+    if (!QFile::exists(invPath))
+        QSKIP("Inverse operator file not found");
+
+    QFile invFile(invPath);
+    MNEInverseOperator inv;
+    QVERIFY(MNEInverseOperator::read_inverse_operator(invFile, inv));
+    QVERIFY(inv.eigen_fields->data.rows() > 0);
+
+    // Write to temp file
+    QString tmpPath = QDir::tempPath() + "/test_inv_round_trip.fif";
+    QFile outFile(tmpPath);
+    inv.write(outFile);
+
+    // Read back
+    QFile inFile(tmpPath);
+    MNEInverseOperator inv2;
+    QVERIFY(MNEInverseOperator::read_inverse_operator(inFile, inv2));
+    QCOMPARE(inv2.eigen_fields->data.rows(), inv.eigen_fields->data.rows());
+    QCOMPARE(inv2.source_cov->data.rows(), inv.source_cov->data.rows());
+
+    QFile::remove(tmpPath);
 }
 
 void TestMneLibrary::inverseOp_checkChNames()
 {
-    QSKIP("make_inverse_operator triggers Eigen empty-matrix assertion in debug builds");
+    QString invPath = QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif";
+    if (!QFile::exists(invPath))
+        QSKIP("Inverse operator file not found");
+
+    QFile invFile(invPath);
+    MNEInverseOperator inv;
+    QVERIFY(MNEInverseOperator::read_inverse_operator(invFile, inv));
+
+    // Inverse operator should have channel names
+    QVERIFY(inv.eigen_fields->data.rows() > 0);
+    QVERIFY(inv.noise_cov->names.size() > 0);
 }
 
 //=============================================================================================================

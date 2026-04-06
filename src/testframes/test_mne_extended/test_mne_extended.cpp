@@ -504,7 +504,7 @@ private slots:
 
     void forwardSolution_readFromFile()
     {
-        QString fwdFile = dataPath() + "MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
+        QString fwdFile = dataPath() + "Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         if (!QFile::exists(fwdFile)) {
             QSKIP("Forward solution file not available");
         }

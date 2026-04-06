@@ -26,7 +26,18 @@
 
 MNE-CPP is an open-source, cross-platform C++ framework for real-time and offline processing of MEG, EEG, and related neurophysiological data. It provides modular libraries for building standalone acquisition and analysis applications. For more information and documentation please visit https://mne-cpp.github.io/.
 
-**Try it now** — [mne_browse](https://mne-cpp.github.io/wasm/mne_browse.html) runs entirely in the browser via WebAssembly (no install required).
+MNE Browse
+----------
+
+<p align="center">
+  <a href="https://mne-cpp.github.io/wasm/mne_browse.html"><img src="/src/applications/mne_browse/Resources/Images/ApplicationIcons/icon_browse_256x256.png" width="128" height="128" alt="MNE Browse"></a>
+</p>
+
+<p align="center">
+  <a href="https://mne-cpp.github.io/wasm/mne_browse.html"><strong>Launch MNE Browse in your browser</strong></a> — no install required (WebAssembly)
+</p>
+
+MNE Browse is a desktop and web application for visualizing and analyzing MEG/EEG raw data, including real-time filtering, event detection, averaging, and channel selection.
 
 Quick start
 -----------
@@ -49,13 +60,18 @@ cmake --build build\developer-dynamic --parallel
 Requirements
 ------------
 
+| Dependency | Min version | Notes |
+|------------|-------------|-------|
+| [CMake](https://cmake.org/download/) | 3.21 | Build system generator |
+| [Qt](https://www.qt.io/) | 6.10 | `init` downloads automatically |
+
 | Platform | Compiler | Min version |
 |----------|----------|-------------|
 | Windows  | [MSVC](https://visualstudio.microsoft.com/vs/) | 2022 |
 | Linux    | [GCC](https://gcc.gnu.org/releases.html) | 13 |
 | macOS    | [Xcode (Apple Clang)](https://developer.apple.com/xcode/) | latest |
 
-[Qt](https://www.qt.io/) 6.10 or later is required. The `init` script downloads a compatible version automatically.
+The `init` script downloads Qt and Eigen automatically. CMake must be installed separately.
 
 For the full build guide see the [documentation](https://mne-cpp.github.io/docs/development/buildguide-cmake).
 

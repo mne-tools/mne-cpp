@@ -95,6 +95,11 @@ private slots:
     void testMakeLayoutWithFit();
     void testMakeLayoutMirrorX();
     void testMakeLayoutMirrorY();
+    // std::vector overload
+    void testMakeLayoutStdVectorNoFit();
+    void testMakeLayoutStdVectorWithFit();
+    void testMakeLayoutStdVectorMirrorX();
+    void testMakeLayoutStdVectorWriteFile();
 
     // ── SelectionIO ───────────────────────────────────────────────────
     void testWriteReadMNESelFileQString();
@@ -344,6 +349,109 @@ void TestUtilsLayoutSelection::testMakeLayoutMirrorY()
 }
 
 //=============================================================================================================
+// LayoutMaker — std::vector overload
+//=============================================================================================================
+
+void TestUtilsLayoutSelection::testMakeLayoutStdVectorNoFit()
+{
+    std::vector<std::vector<float>> inputPoints = {
+        {0.1f, 0.0f, 0.0f},
+        {0.0f, 0.1f, 0.0f},
+        {-0.1f, 0.0f, 0.0f},
+        {0.0f, -0.1f, 0.0f}
+    };
+
+    std::vector<std::vector<float>> outputPoints;
+    std::vector<std::string> names = {"Ch1", "Ch2", "Ch3", "Ch4"};
+
+    std::string outPath = (m_tempDir.path() + "/layout_stdvec_nofit.lout").toStdString();
+
+    bool ok = LayoutMaker::makeLayout(inputPoints, outputPoints, names, outPath,
+                                      false, 0.2f, 0.5f, 0.5f, false);
+    QVERIFY(ok);
+    QCOMPARE(static_cast<int>(outputPoints.size()), 4);
+    for (const auto& pt : outputPoints) {
+        QVERIFY(pt.size() >= 2);
+    }
+}
+
+//=============================================================================================================
+
+void TestUtilsLayoutSelection::testMakeLayoutStdVectorWithFit()
+{
+    std::vector<std::vector<float>> inputPoints = {
+        {0.1f, 0.0f, 0.05f},
+        {0.0f, 0.1f, 0.05f},
+        {-0.1f, 0.0f, 0.05f},
+        {0.0f, -0.1f, 0.05f},
+        {0.05f, 0.05f, 0.07f}
+    };
+
+    std::vector<std::vector<float>> outputPoints;
+    std::vector<std::string> names = {"Ch1", "Ch2", "Ch3", "Ch4", "Ch5"};
+
+    std::string outPath = (m_tempDir.path() + "/layout_stdvec_fit.lout").toStdString();
+
+    bool ok = LayoutMaker::makeLayout(inputPoints, outputPoints, names, outPath,
+                                      true, 0.3f, 0.5f, 0.5f, false);
+    QVERIFY(ok);
+    QCOMPARE(static_cast<int>(outputPoints.size()), 5);
+}
+
+//=============================================================================================================
+
+void TestUtilsLayoutSelection::testMakeLayoutStdVectorMirrorX()
+{
+    std::vector<std::vector<float>> inputPoints = {
+        {0.1f, 0.0f, 0.0f},
+        {0.0f, 0.1f, 0.0f},
+        {-0.1f, 0.0f, 0.0f}
+    };
+
+    std::vector<std::vector<float>> outputNormal, outputMirrored;
+    std::vector<std::string> names = {"Ch1", "Ch2", "Ch3"};
+
+    std::string out1 = (m_tempDir.path() + "/layout_stdvec_normal.lout").toStdString();
+    std::string out2 = (m_tempDir.path() + "/layout_stdvec_mirrorx.lout").toStdString();
+
+    LayoutMaker::makeLayout(inputPoints, outputNormal, names, out1,
+                            false, 0.2f, 0.5f, 0.5f, false, false, false);
+    LayoutMaker::makeLayout(inputPoints, outputMirrored, names, out2,
+                            false, 0.2f, 0.5f, 0.5f, false, true, false);
+
+    QCOMPARE(outputMirrored.size(), outputNormal.size());
+    for (size_t i = 0; i < outputNormal.size(); ++i) {
+        QVERIFY(std::abs(outputMirrored[i][0] + outputNormal[i][0]) < 1e-5f);
+    }
+}
+
+//=============================================================================================================
+
+void TestUtilsLayoutSelection::testMakeLayoutStdVectorWriteFile()
+{
+    std::vector<std::vector<float>> inputPoints = {
+        {0.1f, 0.0f, 0.0f},
+        {0.0f, 0.1f, 0.0f},
+        {-0.1f, 0.0f, 0.0f}
+    };
+
+    std::vector<std::vector<float>> outputPoints;
+    std::vector<std::string> names = {"Ch1", "Ch2", "Ch3"};
+
+    std::string outPath = (m_tempDir.path() + "/layout_stdvec_written.lout").toStdString();
+
+    bool ok = LayoutMaker::makeLayout(inputPoints, outputPoints, names, outPath,
+                                      false, 0.2f, 0.5f, 0.5f, true);
+    QVERIFY(ok);
+    QCOMPARE(static_cast<int>(outputPoints.size()), 3);
+
+    // Verify file was written
+    QFile written(QString::fromStdString(outPath));
+    QVERIFY(written.exists());
+    QVERIFY(written.size() > 0);
+}
+
+//=============================================================================================================
 // SelectionIO
 //=============================================================================================================
 
@@ -395,7 +503,7 @@ void TestUtilsLayoutSelection::testReadMNESelFileNonExistent()
 
 void TestUtilsLayoutSelection::testWriteReadBrainstormMonQString()
 {
-    // Write two groups, each to its own .mon file, then read one back
+    // Write a group to its own .mon file, then read it back
     QString basePath = m_tempDir.path() + "/brainstorm";
 
     QMultiMap<QString, QStringList> selMap;
@@ -403,14 +511,14 @@ void TestUtilsLayoutSelection::testWriteReadBrainstormMonQString()
 
     QVERIFY(SelectionIO::writeBrainstormMonFiles(basePath, selMap));
 
-    // The file should be written as basePath_TestGroup.mon or similar
-    // Try to read back using the correct path pattern
+    // writeBrainstormMonFiles uses QFileInfo(path).absolutePath() + "/" + key + ".mon"
+    QFileInfo fi(basePath);
+    QString monPath = fi.absolutePath() + "/TestGroup.mon";
+    QVERIFY2(QFile::exists(monPath), qPrintable("Mon file not found at: " + monPath));
+
     QMultiMap<QString, QStringList> readMap;
-    QString monPath = basePath + "_TestGroup.mon";
-    if (QFile::exists(monPath)) {
-        QVERIFY(SelectionIO::readBrainstormMonFile(monPath, readMap));
-        QVERIFY(!readMap.isEmpty());
-    }
+    QVERIFY(SelectionIO::readBrainstormMonFile(monPath, readMap));
+    QVERIFY(!readMap.isEmpty());
 }
 
 //=============================================================================================================
@@ -420,9 +528,15 @@ void TestUtilsLayoutSelection::testWriteReadBrainstormMonStdString()
     std::string basePath = m_tempDir.path().toStdString() + "/brainstorm_std";
 
     std::map<std::string, std::vector<std::string>> selMap;
-    selMap["TestGroup"] = {"Chan1", "Chan2"};
+    selMap["StdTestGroup"] = {"Chan1", "Chan2"};
 
     QVERIFY(SelectionIO::writeBrainstormMonFiles(basePath, selMap));
+
+    // Read back using std::string overload
+    std::string monPath = basePath.substr(0, basePath.find_last_of("/") + 1) + "StdTestGroup.mon";
+    std::multimap<std::string, std::vector<std::string>> readMap;
+    QVERIFY(SelectionIO::readBrainstormMonFile(monPath, readMap));
+    QVERIFY(!readMap.empty());
 }
 
 

@@ -71,8 +71,12 @@ private slots:
 
     void testFiffIOReadEvoked()
     {
-        // FiffIO constructor may crash on evoked-only files; skip
-        QSKIP("Evoked-only files not supported by FiffIO constructor");
+        if(!QFile::exists(m_sEvokedFile)) QSKIP("Evoked file not found");
+
+        QFile file(m_sEvokedFile);
+        FiffIO io(file);
+
+        QVERIFY(io.m_qlistEvoked.size() > 0);
     }
 
     void testFiffIOSetupRead()

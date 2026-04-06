@@ -43,6 +43,7 @@
 #include <bids/bids_coordinate_system.h>
 #include <bids/bids_dataset_description.h>
 #include <bids/bids_raw_data.h>
+#include <bids/bids_global.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -113,6 +114,12 @@ private slots:
 
     // BidsRawData::write round-trip
     void testWriteRoundTrip();
+
+    // BIDSPath setter/getter coverage
+    void testPathSettersGetters();
+    void testPathValidation();
+    void testPathEquality();
+    void testBidsGlobalBuildInfo();
 
     void cleanupTestCase();
 };
@@ -514,6 +521,83 @@ void TestBids::testWriteRoundTrip()
 
 void TestBids::cleanupTestCase()
 {
+}
+
+//=============================================================================================================
+
+void TestBids::testPathSettersGetters()
+{
+    BIDSPath path;
+    path.setRoot("/tmp/bids");
+    path.setSubject("02");
+    path.setSession("03");
+    path.setTask("motor");
+    path.setAcquisition("acq01");
+    path.setRun("01");
+    path.setProcessing("sss");
+    path.setSpace("MNI");
+    path.setRecording("ecog");
+    path.setSplit("01");
+    path.setDescription("filtered");
+    path.setDatatype("meg");
+    path.setSuffix("meg");
+    path.setExtension(".fif");
+
+    QCOMPARE(path.root(), QStringLiteral("/tmp/bids"));
+    QCOMPARE(path.subject(), QStringLiteral("02"));
+    QCOMPARE(path.session(), QStringLiteral("03"));
+    QCOMPARE(path.task(), QStringLiteral("motor"));
+    QCOMPARE(path.acquisition(), QStringLiteral("acq01"));
+    QCOMPARE(path.run(), QStringLiteral("01"));
+    QCOMPARE(path.processing(), QStringLiteral("sss"));
+    QCOMPARE(path.space(), QStringLiteral("MNI"));
+    QCOMPARE(path.recording(), QStringLiteral("ecog"));
+    QCOMPARE(path.split(), QStringLiteral("01"));
+    QCOMPARE(path.description(), QStringLiteral("filtered"));
+    QCOMPARE(path.datatype(), QStringLiteral("meg"));
+    QCOMPARE(path.suffix(), QStringLiteral("meg"));
+    QCOMPARE(path.extension(), QStringLiteral(".fif"));
+}
+
+//=============================================================================================================
+
+void TestBids::testPathValidation()
+{
+    QVERIFY(BIDSPath::isValidEntityValue("abc"));
+    QVERIFY(BIDSPath::isValidEntityValue("abc123"));
+    QVERIFY(BIDSPath::isValidEntityValue(""));   // empty is valid per implementation
+    QVERIFY(!BIDSPath::isValidEntityValue("abc-def"));
+    QVERIFY(!BIDSPath::isValidEntityValue("abc_def"));
+    QVERIFY(!BIDSPath::isValidEntityValue("abc/def"));
+}
+
+//=============================================================================================================
+
+void TestBids::testPathEquality()
+{
+    BIDSPath a(bidsRoot(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr");
+    BIDSPath b(a);  // copy constructor
+
+    QCOMPARE(b.root(), a.root());
+    QCOMPARE(b.subject(), a.subject());
+    QCOMPARE(b.session(), a.session());
+    QCOMPARE(b.task(), a.task());
+    QCOMPARE(b.datatype(), a.datatype());
+    QCOMPARE(b.suffix(), a.suffix());
+    QCOMPARE(b.extension(), a.extension());
+    QCOMPARE(b.basename(), a.basename());
+}
+
+//=============================================================================================================
+
+void TestBids::testBidsGlobalBuildInfo()
+{
+    const char* dt = BIDSLIB::buildDateTime();
+    QVERIFY(dt != nullptr);
+    const char* h = BIDSLIB::buildHash();
+    QVERIFY(h != nullptr);
+    const char* hl = BIDSLIB::buildHashLong();
+    QVERIFY(hl != nullptr);
 }
 
 //=============================================================================================================

@@ -717,7 +717,9 @@ MNERawData::MNERawData()
 ,nbad(0)
 ,first_samp(0)
 ,omit_samp(0)
+,first_samp_old(0)
 ,omit_samp_old(0)
+,nsamp(0)
 ,proj(nullptr)
 ,sss(nullptr)
 ,comp(nullptr)
@@ -735,7 +737,8 @@ MNERawData::MNERawData()
 MNERawData::~MNERawData()
 {
 //    fiff_close(this->file);
-    this->stream->close();
+    if (this->stream)
+        this->stream->close();
     this->filename.clear();
     this->ch_names.clear();
 
@@ -786,7 +789,7 @@ void MNERawData::setup_filter_bufs()
     this->filt_bufs.clear();
     this->filt_ring.reset();
 
-    if (!this->filter)
+    if (!this->filter || filter->size <= 0)
         return;
 
     for (nfilt_buf = 0, firstsamp = this->first_samp-filter->taper_size;
@@ -1452,8 +1455,8 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
     std::unique_ptr<MNERawInfo> info;
     std::unique_ptr<MNERawData> data;
 
-    QFile file(name);
-    FiffStream::SPtr stream(new FiffStream(&file));
+    auto filePtr = std::make_unique<QFile>(name);
+    FiffStream::SPtr stream(new FiffStream(filePtr.get()));
     //    fiffFile           in    = NULL;
 
     FiffDirEntry::SPtr dir;
@@ -1493,6 +1496,7 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
 
     data           = std::make_unique<MNERawData>();
     data->filename = name;
+    data->file     = std::move(filePtr);
     data->stream   = stream;
     data->info = std::move(info);
     /*

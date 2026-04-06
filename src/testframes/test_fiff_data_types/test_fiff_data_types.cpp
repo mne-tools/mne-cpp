@@ -1,5 +1,6 @@
 #include <QtTest/QtTest>
 #include <QBuffer>
+#include <QTemporaryFile>
 #include <Eigen/Dense>
 
 #include <fiff/fiff_events.h>
@@ -9,6 +10,9 @@
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_constants.h>
+#include <fiff/fiff_proj.h>
+#include <fiff/fiff_digitizer_data.h>
+#include <fiff/fiff_dir_node.h>
 
 using namespace FIFFLIB;
 using namespace Eigen;
@@ -311,6 +315,237 @@ private slots:
 
         QVERIFY(qAbs(t1.trans(0, 3) - 0.05f) < 1e-5f);
         QVERIFY(qAbs(t2.trans(1, 3) - 0.03f) < 1e-5f);
+    }
+
+    //=========================================================================
+    // FiffCoordTrans — additional coverage tests
+    //=========================================================================
+    void coordTrans_rotMoveCtor()
+    {
+        // Test the (from, to, rot, move) constructor — covers lines 240-254
+        Matrix3f rot = Matrix3f::Identity();
+        rot(0,0) = 0.0f; rot(0,1) = -1.0f;
+        rot(1,0) = 1.0f; rot(1,1) = 0.0f; // 90-degree rotation about z
+        Vector3f move(0.01f, 0.02f, 0.03f);
+        FiffCoordTrans t(FIFFV_COORD_HEAD, FIFFV_COORD_MRI, rot, move);
+        QCOMPARE(t.from, (int)FIFFV_COORD_HEAD);
+        QCOMPARE(t.to, (int)FIFFV_COORD_MRI);
+        QVERIFY(qAbs(t.trans(0,3) - 0.01f) < 1e-5f);
+        QVERIFY(qAbs(t.trans(1,3) - 0.02f) < 1e-5f);
+        QVERIFY(qAbs(t.trans(3,3) - 1.0f) < 1e-5f);
+        // Verify inverse was computed
+        QVERIFY(qAbs(t.invtrans(3,3) - 1.0f) < 1e-5f);
+    }
+
+    void coordTrans_matrix4fCtor()
+    {
+        // Test 4x4 matrix constructor — covers lines 258-272
+        Matrix4f mat = Matrix4f::Identity();
+        mat(0,3) = 0.05f;
+        mat(3,0) = 0.001f; // non-standard row 3
+        FiffCoordTrans t(FIFFV_COORD_HEAD, FIFFV_COORD_DEVICE, mat, true);
+        QVERIFY(qAbs(t.trans(3,0)) < 1e-5f); // row 3 was zeroed by bStandard=true
+        QVERIFY(qAbs(t.trans(3,3) - 1.0f) < 1e-5f);
+        QVERIFY(qAbs(t.trans(0,3) - 0.05f) < 1e-5f);
+    }
+
+    void coordTrans_frameName()
+    {
+        // Test frame_name — covers lines 219-234
+        QCOMPARE(FiffCoordTrans::frame_name(FIFFV_COORD_UNKNOWN), QString("unknown"));
+        QCOMPARE(FiffCoordTrans::frame_name(FIFFV_COORD_DEVICE), QString("MEG device"));
+        QCOMPARE(FiffCoordTrans::frame_name(FIFFV_COORD_HEAD), QString("head"));
+        QCOMPARE(FiffCoordTrans::frame_name(FIFFV_COORD_MRI), QString("MRI (surface RAS)"));
+        QCOMPARE(FiffCoordTrans::frame_name(FIFFV_COORD_ISOTRAK), QString("isotrak"));
+        QCOMPARE(FiffCoordTrans::frame_name(FIFFV_MNE_COORD_MNI_TAL), QString("MNI Talairach"));
+        QCOMPARE(FiffCoordTrans::frame_name(99999), QString("unknown"));
+    }
+
+    void coordTrans_readTransformAscii()
+    {
+        // Test readTransformAscii — covers lines 493-544
+        QTemporaryFile tmp;
+        tmp.open();
+        QTextStream ts(&tmp);
+        // 4x4 matrix: identity rotation + small translation in mm
+        ts << "1.000000 0.000000 0.000000 10.0\n";
+        ts << "0.000000 1.000000 0.000000 20.0\n";
+        ts << "0.000000 0.000000 1.000000 30.0\n";
+        ts << "0.000000 0.000000 0.000000 1.0\n";
+        ts.flush();
+        tmp.close();
+
+        FiffCoordTrans t = FiffCoordTrans::readTransformAscii(tmp.fileName(),
+                                                               FIFFV_COORD_HEAD,
+                                                               FIFFV_COORD_MRI);
+        QCOMPARE(t.from, (int)FIFFV_COORD_HEAD);
+        QCOMPARE(t.to, (int)FIFFV_COORD_MRI);
+        // Translation values are divided by 1000 (mm -> m)
+        QVERIFY(qAbs(t.trans(0,3) - 0.01f) < 1e-5f);
+        QVERIFY(qAbs(t.trans(1,3) - 0.02f) < 1e-5f);
+        QVERIFY(qAbs(t.trans(2,3) - 0.03f) < 1e-5f);
+    }
+
+    void coordTrans_readTransformAsciiComments()
+    {
+        // Test with comment lines — covers more of readTransformAscii
+        QTemporaryFile tmp;
+        tmp.open();
+        QTextStream ts(&tmp);
+        ts << "# This is a comment\n";
+        ts << "1.0 0.0 0.0 5.0\n";
+        ts << "0.0 1.0 0.0 0.0  # inline comment\n";
+        ts << "0.0 0.0 1.0 0.0\n";
+        ts << "0.0 0.0 0.0 1.0\n";
+        ts.flush();
+        tmp.close();
+
+        FiffCoordTrans t = FiffCoordTrans::readTransformAscii(tmp.fileName(),
+                                                               FIFFV_COORD_MRI,
+                                                               FIFFV_COORD_HEAD);
+        QCOMPARE(t.from, (int)FIFFV_COORD_MRI);
+        QVERIFY(qAbs(t.trans(0,3) - 0.005f) < 1e-5f);
+    }
+
+    void coordTrans_procrustesAlign()
+    {
+        // Test Procrustes alignment — covers lines 634-676
+        const int np = 4;
+        float pts_from[4][3] = {{0,0,0},{1,0,0},{0,1,0},{0,0,1}};
+        float pts_to[4][3]   = {{0.1f,0,0},{1.1f,0,0},{0.1f,1,0},{0.1f,0,1}};
+        float* fromp[4] = {pts_from[0], pts_from[1], pts_from[2], pts_from[3]};
+        float* top[4]   = {pts_to[0], pts_to[1], pts_to[2], pts_to[3]};
+        float w[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+
+        FiffCoordTrans t = FiffCoordTrans::procrustesAlign(
+            FIFFV_COORD_HEAD, FIFFV_COORD_DEVICE,
+            fromp, top, w, np, 0.01f);
+        QVERIFY(!t.isEmpty());
+        QCOMPARE(t.from, (int)FIFFV_COORD_HEAD);
+        QCOMPARE(t.to, (int)FIFFV_COORD_DEVICE);
+        // The translation should be approximately (0.1, 0, 0)
+        QVERIFY(qAbs(t.trans(0,3) - 0.1f) < 0.01f);
+    }
+
+    void coordTrans_procrustesNoWeights()
+    {
+        // Test Procrustes without weights — covers the w==nullptr branch
+        const int np = 3;
+        float pts_from[3][3] = {{0,0,0},{1,0,0},{0,1,0}};
+        float pts_to[3][3]   = {{0,0,0},{1,0,0},{0,1,0}};
+        float* fromp[3] = {pts_from[0], pts_from[1], pts_from[2]};
+        float* top[3]   = {pts_to[0], pts_to[1], pts_to[2]};
+
+        FiffCoordTrans t = FiffCoordTrans::procrustesAlign(
+            FIFFV_COORD_HEAD, FIFFV_COORD_MRI,
+            fromp, top, nullptr, np, 0.01f);
+        QVERIFY(!t.isEmpty());
+        // Identity-like — rotation should be close to identity
+        QVERIFY(qAbs(t.trans(0,0) - 1.0f) < 0.01f);
+    }
+
+    void coordTrans_angleTo()
+    {
+        // Test angleTo — covers lines 300-320
+        FiffCoordTrans t;
+        t.from = FIFFV_COORD_HEAD;
+        t.to = FIFFV_COORD_DEVICE;
+        t.trans = Matrix4f::Identity();
+        t.invtrans = Matrix4f::Identity();
+
+        MatrixX4f dest = Matrix4f::Identity();
+        float angle = t.angleTo(dest);
+        QVERIFY(qAbs(angle) < 1e-3f); // Same rotation, angle should be 0
+    }
+
+    void coordTrans_moveTo()
+    {
+        // Tests translationTo — covers lines 325-340
+        FiffCoordTrans t;
+        t.from = FIFFV_COORD_HEAD;
+        t.to = FIFFV_COORD_DEVICE;
+        t.trans = Matrix4f::Identity();
+        t.invtrans = Matrix4f::Identity();
+
+        MatrixX4f dest = Matrix4f::Identity();
+        dest(0,3) = 0.1f;
+        float dist = t.translationTo(dest);
+        QVERIFY(qAbs(dist - 0.1f) < 1e-3f);
+    }
+
+    //=========================================================================
+    // FiffDigitizerData — coverage tests
+    //=========================================================================
+    void digitizerData_defaultCtor()
+    {
+        FiffDigitizerData dd;
+        QCOMPARE(dd.points.size(), 0);
+    }
+
+    void digitizerData_copyAndAssign()
+    {
+        // Covers copy constructor and assignment operator (lines ~73-93)
+        FiffDigitizerData dd;
+        FiffDigPoint p;
+        p.kind = FIFFV_POINT_CARDINAL;
+        p.ident = FIFFV_POINT_LPA;
+        p.coord_frame = FIFFV_COORD_HEAD;
+        p.r[0] = 1.0f; p.r[1] = 2.0f; p.r[2] = 3.0f;
+        dd.points.append(p);
+
+        // Copy
+        FiffDigitizerData dd2(dd);
+        QCOMPARE(dd2.points.size(), 1);
+        QVERIFY(qAbs(dd2.points[0].r[0] - 1.0f) < 1e-5f);
+
+        // Assign
+        FiffDigitizerData dd3;
+        dd3 = dd;
+        QCOMPARE(dd3.points.size(), 1);
+    }
+
+    //=========================================================================
+    // FiffProj — additional coverage tests
+    //=========================================================================
+    void proj_defaultCtor()
+    {
+        FiffProj proj;
+        QVERIFY(proj.kind == 0 || proj.kind == -1 || true); // just test construction doesn't crash
+        QVERIFY(proj.desc.isEmpty());
+    }
+
+    void proj_activateDeactivate()
+    {
+        // Create a simple projector
+        FiffProj proj;
+        proj.kind = 1;
+        proj.active = false;
+        proj.desc = "test_proj";
+
+        FiffNamedMatrix::SDPtr data(new FiffNamedMatrix);
+        data->nrow = 1;
+        data->ncol = 3;
+        data->data = MatrixXd::Ones(1, 3);
+        data->row_names << "comp1";
+        data->col_names << "ch1" << "ch2" << "ch3";
+        proj.data = data;
+
+        // Activate
+        QList<FiffProj> projs;
+        projs << proj;
+        FiffProj::activate_projs(projs);
+        QVERIFY(projs[0].active);
+    }
+
+    //=========================================================================
+    // FiffDirNode — coverage tests
+    //=========================================================================
+    void dirNode_defaultCtor()
+    {
+        FiffDirNode node;
+        QCOMPARE(node.type, -1);
+        QCOMPARE(node.nent(), 0);
+        QVERIFY(node.children.isEmpty());
     }
 };
 

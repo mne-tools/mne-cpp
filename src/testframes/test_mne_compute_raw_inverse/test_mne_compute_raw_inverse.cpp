@@ -206,6 +206,7 @@ QString TestMneComputeRawInverse::findExecutable()
 
     // Relative to test binary
     candidates << appDir + "/../apps/" + exeName;
+    candidates << appDir + "/../bin/" + exeName;
     candidates << appDir + "/" + exeName;    // Windows: tests and apps share same dir
 
     // Absolute fallbacks

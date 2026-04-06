@@ -148,13 +148,41 @@ private slots:
 
     void bemSurface_addTriangleData()
     {
-        // addTriangleData may segfault on small synthetic geometry
-        QSKIP("addTriangleData segfaults on synthetic geometry");
+        // Build a tetrahedron (4 vertices, 4 triangles)
+        MNEBemSurface bs;
+        bs.id = FIFFV_BEM_SURF_ID_BRAIN;
+        bs.np = 4;
+        bs.ntri = 4;
+        bs.rr.resize(4, 3);
+        bs.rr << 1,0,0, -1,0,0, 0,1,0, 0,0,1;
+        bs.itris.resize(4, 3);
+        bs.itris << 0,1,2, 0,1,3, 0,2,3, 1,2,3;
+
+        bool ok = bs.addTriangleData();
+        QVERIFY(ok);
+        QCOMPARE(bs.tri_cent.rows(), 4);
+        QCOMPARE(bs.tri_nn.rows(), 4);
+        QCOMPARE(bs.tri_area.size(), 4);
+        for (int i = 0; i < 4; i++) {
+            QVERIFY(bs.tri_area(i) > 0);
+        }
     }
 
     void bemSurface_addGeometryInfo()
     {
-        QSKIP("Depends on addTriangleData which segfaults");
+        // Build a tetrahedron and run addTriangleData (which calls add_geometry_info)
+        MNEBemSurface bs;
+        bs.id = FIFFV_BEM_SURF_ID_BRAIN;
+        bs.np = 4;
+        bs.ntri = 4;
+        bs.rr.resize(4, 3);
+        bs.rr << 1,0,0, -1,0,0, 0,1,0, 0,0,1;
+        bs.itris.resize(4, 3);
+        bs.itris << 0,1,2, 0,1,3, 0,2,3, 1,2,3;
+
+        bs.addTriangleData();
+        // add_geometry_info creates neighbor_tri and neighbor_vert
+        QVERIFY(bs.neighbor_tri.size() > 0);
     }
 
     void bemSurface_idName()
@@ -497,8 +525,19 @@ private slots:
 
     void ctfCompData_copyCtor()
     {
-        // MNECTFCompData copy constructor has raw pointer issues — skip
-        QSKIP("Copy ctor segfaults due to shallow pointer copy");
+        MNECTFCompData cd;
+        cd.kind = 1;
+        cd.calibrated = true;
+        cd.data = std::make_unique<MNENamedMatrix>();
+        cd.data->nrow = 2;
+        cd.data->ncol = 3;
+
+        MNECTFCompData cd2(cd);
+        QCOMPARE(cd2.kind, 1);
+        QVERIFY(cd2.calibrated);
+        QVERIFY(cd2.data != nullptr);
+        QCOMPARE(cd2.data->nrow, 2);
+        QCOMPARE(cd2.data->ncol, 3);
     }
 
     //=========================================================================

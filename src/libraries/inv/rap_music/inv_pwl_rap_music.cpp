@@ -365,6 +365,9 @@ void InvPwlRapMusic::PowellIdxVec(int p_iRow, int p_iNumPoints, Eigen::VectorXi&
     //
     //     p_pVecElements = new int(p_iNumPoints);
 
+    if (p_pVecElements.size() != p_iNumPoints)
+        p_pVecElements.resize(p_iNumPoints);
+
     //col combination index
     for(int i = 0; i <= p_iRow; ++i)//=p_iNumPoints-1
         p_pVecElements(i) = InvPwlRapMusic::PowellOffset(i+1,p_iNumPoints)-(p_iNumPoints-p_iRow);

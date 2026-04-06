@@ -638,21 +638,22 @@ void TestComputeRawInverse::testLabelRestrictedInverse()
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test FsLabel-Restricted Inverse >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     // Check if label files are available
-    QString labelDir = m_sDataPath + "/subjects/sample/label";
-    QString labelFile = labelDir + "/lh.auditory.label";
+    QStringList labelCandidates;
+    labelCandidates << m_sDataPath + "/subjects/sample/label/lh.auditory.label"
+                    << m_sDataPath + "/MEG/sample/labels/Aud-lh.label"
+                    << m_sDataPath + "/subjects/sample/label/lh.BA1.label"
+                    << QDir::homePath() + "/mne_data/MNE-sample-data/subjects/sample/label/lh.BA1.label"
+                    << QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/labels/Aud-lh.label";
 
-    // Try alternate path for older data layouts
-    if (!QFile::exists(labelFile)) {
-        labelDir = m_sDataPath + "/../subjects/sample/label";
-        labelFile = labelDir + "/lh.auditory.label";
+    QString labelFile;
+    for (const QString &c : labelCandidates) {
+        if (QFile::exists(c)) {
+            labelFile = c;
+            break;
+        }
     }
 
-    if (!QFile::exists(labelFile)) {
-        printf("  FsLabel file not found, trying aparc labels...\n");
-        labelFile = labelDir + "/lh.aparc.annot";
-    }
-
-    if (!QFile::exists(labelFile)) {
+    if (labelFile.isEmpty()) {
         QSKIP("No label files available for label-restricted inverse test");
         return;
     }

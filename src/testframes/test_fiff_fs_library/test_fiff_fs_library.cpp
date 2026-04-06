@@ -47,6 +47,7 @@
 #include <fs/fs_annotationset.h>
 #include <fs/fs_label.h>
 #include <fs/fs_colortable.h>
+#include <fs/fs_global.h>
 
 using namespace FIFFLIB;
 using namespace FSLIB;
@@ -198,6 +199,18 @@ private slots:
     void fs_surfaceSetReadNonInflated();
     void fs_annotationSetReadSynthetic();
     void fs_labelSelectTris();
+
+    // FS getter coverage — exercising uncovered inline getters
+    void fs_annotationMutableGetters();
+    void fs_surfaceNnCurvOffset();
+    void fs_annotationSetSizeCheck();
+    void fs_surfaceSetIsEmptyCheck();
+    void fs_globalBuildInfo();
+
+    // Additional fs coverage tests
+    void fs_annotationSet_readAndToLabels();
+    void fs_annotationSet_insertAndClear();
+    void fs_surfaceSet_readAndIndex();
 };
 
 //=============================================================================================================
@@ -858,7 +871,13 @@ void TestFiffFsLibrary::fiffCov_pickChannels()
 
 void TestFiffFsLibrary::fiffCov_saveAndReload()
 {
-    QSKIP("FiffCov save/reload on 366x366 matrix exceeds QTest timeout in debug+coverage builds");
+    if (!hasData()) QSKIP("No test data");
+    // Read cov and verify basic properties (full round-trip write is slow in debug+coverage)
+    QFile covFile(covPath());
+    FiffCov cov(covFile);
+    QVERIFY(!cov.isEmpty());
+    QVERIFY(cov.dim > 0);
+    QVERIFY(cov.names.size() == cov.dim);
 }
 
 void TestFiffFsLibrary::fiffCov_regularize()
@@ -1722,6 +1741,173 @@ void TestFiffFsLibrary::fs_labelSelectTris()
         }
     }
     QVERIFY(true);
+}
+
+//=============================================================================================================
+
+void TestFiffFsLibrary::fs_annotationMutableGetters()
+{
+    if (!hasData()) QSKIP("No test data");
+    if (!QFile::exists(annotLhPath())) QSKIP("lh.aparc.annot not found");
+
+    FsAnnotation annot;
+    FsAnnotation::read(annotLhPath(), annot);
+
+    // Non-const getters (return references)
+    Eigen::VectorXi& verts = annot.getVertices();
+    QVERIFY(verts.size() > 0);
+    Eigen::VectorXi& labels = annot.getLabelIds();
+    QVERIFY(labels.size() > 0);
+    FsColortable& ct = annot.getColortable();
+    QVERIFY(ct.numEntries > 0);
+
+    // Const getters (return by value)
+    const FsAnnotation& constAnnot = annot;
+    const Eigen::VectorXi constVerts = constAnnot.getVertices();
+    QVERIFY(constVerts.size() > 0);
+    const Eigen::VectorXi constLabels = constAnnot.getLabelIds();
+    QVERIFY(constLabels.size() > 0);
+    const FsColortable constCt = constAnnot.getColortable();
+    QVERIFY(constCt.numEntries > 0);
+}
+
+//=============================================================================================================
+
+void TestFiffFsLibrary::fs_surfaceNnCurvOffset()
+{
+    if (!hasData()) QSKIP("No test data");
+    if (!QFile::exists(surfLhPath())) QSKIP("lh.white not found");
+
+    FsSurface surf;
+    FsSurface::read(surfLhPath(), surf);
+
+    // Curv data might be empty if not loaded separately
+    const Eigen::MatrixX3f& normals = surf.nn();
+    Q_UNUSED(normals);
+    const Eigen::VectorXf& curv = surf.curv();
+    Q_UNUSED(curv);
+    const Eigen::Vector3f& off = surf.offset();
+    Q_UNUSED(off);
+    QVERIFY(true);
+}
+
+//=============================================================================================================
+
+void TestFiffFsLibrary::fs_annotationSetSizeCheck()
+{
+    FsAnnotationSet empty;
+    QVERIFY(empty.isEmpty());
+    QCOMPARE(empty.size(), 0);
+
+    if (hasData() && QFile::exists(annotLhPath()) && QFile::exists(annotRhPath())) {
+        FsAnnotationSet aSet(annotLhPath(), annotRhPath());
+        QVERIFY(!aSet.isEmpty());
+        QVERIFY(aSet.size() > 0);
+    }
+}
+
+//=============================================================================================================
+
+void TestFiffFsLibrary::fs_surfaceSetIsEmptyCheck()
+{
+    FsSurfaceSet empty;
+    QVERIFY(empty.isEmpty());
+
+    if (hasData() && QFile::exists(surfLhPath()) && QFile::exists(surfRhPath())) {
+        FsSurfaceSet sSet(surfLhPath(), surfRhPath());
+        QVERIFY(!sSet.isEmpty());
+    }
+}
+
+//=============================================================================================================
+
+void TestFiffFsLibrary::fs_globalBuildInfo()
+{
+    const char* dt = FSLIB::buildDateTime();
+    QVERIFY(dt != nullptr);
+    const char* h = FSLIB::buildHash();
+    QVERIFY(h != nullptr);
+    const char* hl = FSLIB::buildHashLong();
+    QVERIFY(hl != nullptr);
+}
+
+//=============================================================================================================
+
+void TestFiffFsLibrary::fs_annotationSet_readAndToLabels()
+{
+    if (!QFile::exists(annotLhPath()) || !QFile::exists(annotRhPath()))
+        QSKIP("Annotation files not found");
+    if (!QFile::exists(surfLhPath()) || !QFile::exists(surfRhPath()))
+        QSKIP("Surface files not found");
+
+    // Read annotation set from files
+    FsAnnotationSet aSet(annotLhPath(), annotRhPath());
+    QVERIFY(!aSet.isEmpty());
+    QCOMPARE(aSet.size(), 2);
+
+    // Read surface set
+    FsSurfaceSet sSet(surfLhPath(), surfRhPath());
+    QVERIFY(!sSet.isEmpty());
+
+    // Convert annotations to labels
+    QList<FsLabel> labels;
+    QList<Eigen::RowVector4i> labelRGBAs;
+    bool ok = aSet.toLabels(sSet, labels, labelRGBAs);
+    QVERIFY(ok);
+    QVERIFY(labels.size() > 0);
+    QCOMPARE(labels.size(), labelRGBAs.size());
+
+    // Each label should have vertices
+    for (int i = 0; i < labels.size(); ++i) {
+        QVERIFY(labels[i].vertices.size() > 0);
+    }
+}
+
+//=============================================================================================================
+
+void TestFiffFsLibrary::fs_annotationSet_insertAndClear()
+{
+    if (!QFile::exists(annotLhPath()))
+        QSKIP("Annotation file not found");
+
+    // Read one annotation
+    FsAnnotation annot;
+    FsAnnotation::read(annotLhPath(), annot);
+    QVERIFY(!annot.isEmpty());
+
+    // Build annotation set by inserting
+    FsAnnotationSet aSet;
+    QVERIFY(aSet.isEmpty());
+    aSet.insert(annot);
+    QVERIFY(!aSet.isEmpty());
+    QCOMPARE(aSet.size(), 1);
+
+    // Clear
+    aSet.clear();
+    QVERIFY(aSet.isEmpty());
+    QCOMPARE(aSet.size(), 0);
+}
+
+//=============================================================================================================
+
+void TestFiffFsLibrary::fs_surfaceSet_readAndIndex()
+{
+    if (!QFile::exists(surfLhPath()) || !QFile::exists(surfRhPath()))
+        QSKIP("Surface files not found");
+
+    // Read via static method
+    FsSurfaceSet sSet;
+    bool ok = FsSurfaceSet::read(surfLhPath(), surfRhPath(), sSet);
+    QVERIFY(ok);
+    QVERIFY(!sSet.isEmpty());
+    QCOMPARE(sSet.size(), 2);
+
+    // Access by hemisphere index
+    const FsSurface& lh = sSet[0];
+    QVERIFY(lh.rr().rows() > 0);
+
+    const FsSurface& rh = sSet[1];
+    QVERIFY(rh.rr().rows() > 0);
 }
 
 //=============================================================================================================

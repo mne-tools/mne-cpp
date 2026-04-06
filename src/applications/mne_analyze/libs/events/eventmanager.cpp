@@ -87,7 +87,10 @@ Event EventManager::getEvent(idNum eventId) const
 
 std::multimap<int, EVENTSINTERNAL::EventINT>::const_iterator EventManager::findEventINT(idNum eventId) const
 {
-    int sample = m_MapIdToSample.at(eventId);
+    auto it = m_MapIdToSample.find(eventId);
+    if (it == m_MapIdToSample.end())
+        return m_EventsListBySample.end();
+    int sample = it->second;
     auto eventsRange = m_EventsListBySample.equal_range(sample);
     for(auto e = eventsRange.first; e != eventsRange.second; ++e)
     {
@@ -311,14 +314,23 @@ bool EventManager::moveEvent(idNum eventId, int newSample)
 
 bool EventManager::deleteEvent(idNum eventId) noexcept
 {
-    bool eventFound(false);
-    eventFound = eraseEvent(eventId);
+#ifndef NO_IPC
+    // Capture the sample before eraseEvent removes it from the map
+    int sample = 0;
+    bool haveSample = false;
+    auto it = m_MapIdToSample.find(eventId);
+    if (it != m_MapIdToSample.end()) {
+        sample = it->second;
+        haveSample = true;
+    }
+#endif
 
+    bool eventFound = eraseEvent(eventId);
 
 #ifndef NO_IPC
-    if(eventFound && m_pSharedMemManager->isInit())
+    if(eventFound && haveSample && m_pSharedMemManager->isInit())
     {
-        m_pSharedMemManager->deleteEvent(m_MapIdToSample.at(eventId));
+        m_pSharedMemManager->deleteEvent(sample);
     }
 #endif
     return eventFound;

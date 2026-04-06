@@ -167,6 +167,13 @@ NetworkNode::SPtr Network::getNodeAt(int i)
 
 //=============================================================================================================
 
+NetworkEdge::SPtr Network::getEdgeAt(int i)
+{
+    return m_lFullEdges.at(i);
+}
+
+//=============================================================================================================
+
 qint16 Network::getFullDistribution() const
 {
     qint16 distribution = 0;

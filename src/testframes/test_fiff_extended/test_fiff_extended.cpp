@@ -436,9 +436,9 @@ private slots:
         epoch.array() += 5.0;
         QPair<float, float> baseline(0, 50);
 
-        FiffEvokedSet::subtractBaseline(epoch, 0, 50);
+        FiffEvokedSet::subtractBaseline(epoch, 0, 49);
 
-        // Mean of first 50 samples per channel should be ~0
+        // Mean of baseline region (samples 0..49) per channel should be ~0
         for (int ch = 0; ch < nCh; ++ch) {
             double mean = epoch.row(ch).head(50).mean();
             QVERIFY(std::abs(mean) < 1e-10);

@@ -59,6 +59,14 @@ using namespace MNELIB;
 //=============================================================================================================
 
 MNERawInfo::MNERawInfo()
+: nchan(0)
+, coord_frame(0)
+, sfreq(0.0f)
+, lowpass(0.0f)
+, highpass(0.0f)
+, buf_size(0)
+, maxshield_data(0)
+, ndir(0)
 {
 }
 
@@ -153,6 +161,7 @@ int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
     int to_find = 4;
     QList<FiffDirNode::SPtr> hpi;
     FiffDirNode::SPtr meas;
+    FiffDirNode::SPtr meas_info;
     fiff_int_t kind, pos;
 
      trans      = FiffCoordTrans();
@@ -166,7 +175,7 @@ int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
         goto bad;
     }
 
-    if (!(node = find_meas_info(node))) {
+    if (!(meas_info = find_meas_info(node))) {
         printf ("Meas. info not found!");
         goto bad;
     }
@@ -185,9 +194,9 @@ int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
        */
      *lowpass  = -1;
      *highpass = -1;
-    for (k = 0; k < node->nent(); k++) {
-        kind = node->dir[k]->kind;
-        pos  = node->dir[k]->pos;
+    for (k = 0; k < meas_info->nent(); k++) {
+        kind = meas_info->dir[k]->kind;
+        pos  = meas_info->dir[k]->pos;
         switch (kind) {
 
         case FIFF_NCHAN :
@@ -240,7 +249,10 @@ int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
         case FIFF_MEAS_DATE :
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
-            *start_time = (FiffTime*)t_pTag->data();
+            {
+                FiffTime* pTime = (FiffTime*)t_pTag->data();
+                *start_time = new FiffTime(pTime->secs, pTime->usecs);
+            }
             break;
 
         case FIFF_COORD_TRANS :
@@ -260,8 +272,7 @@ int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
         * Search for the coordinate transformation from
         * HPI_RESULT block if it was not previously found
         */
-    hpi = node->dir_tree_find(FIFFB_HPI_RESULT);
-    node = hpi[0];
+    hpi = meas_info->dir_tree_find(FIFFB_HPI_RESULT);
 
     if (hpi.size() > 0 && trans.isEmpty())
         for (k = 0; k < hpi[0]->nent(); k++)
@@ -292,6 +303,8 @@ int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
     return (0);
 
 bad : {
+        delete *start_time;
+        *start_time = nullptr;
         return (-1);
     }
 }
@@ -384,6 +397,8 @@ int MNERawInfo::load(const QString& name, int allow_maxshield, std::unique_ptr<M
             info->start_time.usecs = 0;
         }
     }
+    delete start_time;
+    start_time = nullptr;
     info->buf_size   = 0;
     for (k = 0; k < raw->nent(); k++) {
         if (raw->dir[k]->kind == FIFF_DATA_BUFFER) {

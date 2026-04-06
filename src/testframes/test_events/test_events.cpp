@@ -523,19 +523,21 @@ void TestEvents::testDeleteEventsInGroup()
 
 void TestEvents::testDeleteNonExistentEvent()
 {
-    // Note: EventManager::deleteEvent throws std::out_of_range (abort) for non-existent IDs.
-    // This is a known limitation. A graceful API would return false instead.
-    // Skipping the actual call to avoid crashing the test suite.
-    QSKIP("deleteEvent(nonexistent) triggers abort — skipping to avoid crash");
+    EventManager mgr;
+    // Deleting a non-existent event should return false gracefully
+    bool result = mgr.deleteEvent(999999);
+    QVERIFY(!result);
 }
 
 //=============================================================================================================
 
 void TestEvents::testGetNonExistentEvent()
 {
-    // Note: EventManager::getEvent may throw std::out_of_range (abort) for non-existent IDs.
-    // Skipping to avoid crash.
-    QSKIP("getEvent(nonexistent) may trigger abort — skipping to avoid crash");
+    EventManager mgr;
+    // Getting a non-existent event should return an empty/invalid result
+    auto events = mgr.getEvents({999999});
+    QVERIFY(events);
+    QCOMPARE((int)events->size(), 0);
 }
 
 //=============================================================================================================

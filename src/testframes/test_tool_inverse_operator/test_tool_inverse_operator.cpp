@@ -112,9 +112,8 @@ private slots:
 
         QString fwdFile = m_sResourcePath + "Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         QString covFile = m_sResourcePath + "MEG/sample/sample_audvis-cov.fif";
-        QString rawFile = m_sResourcePath + "MEG/sample/sample_audvis_trunc_raw.fif";
 
-        if (!QFile::exists(fwdFile) || !QFile::exists(covFile) || !QFile::exists(rawFile)) {
+        if (!QFile::exists(fwdFile) || !QFile::exists(covFile)) {
             QSKIP("Required test data not available");
         }
 
@@ -124,7 +123,7 @@ private slots:
         QString output = runTool("mne_inverse_operator", {
             "--fwd", fwdFile,
             "--noisecov", covFile,
-            "--meas", rawFile,
+            "--meg",
             "--inv", outPath
         }, 60000);
 

@@ -332,8 +332,25 @@ private slots:
 
     void pwlRapMusic_powellIdxVec()
     {
-        // PowellIdxVec triggers Eigen assertion internally — skip
-        QSKIP("PowellIdxVec has internal Eigen out-of-bounds issue");
+        // Test PowellIdxVec with valid parameters (p_iRow < p_iNumPoints)
+        Eigen::VectorXi vec;
+
+        // Row 0, 5 points
+        InvPwlRapMusic::PowellIdxVec(0, 5, vec);
+        QCOMPARE(vec.size(), 5);
+
+        // Row 2, 5 points
+        InvPwlRapMusic::PowellIdxVec(2, 5, vec);
+        QCOMPARE(vec.size(), 5);
+
+        // Row 4, 5 points (last valid row)
+        InvPwlRapMusic::PowellIdxVec(4, 5, vec);
+        QCOMPARE(vec.size(), 5);
+
+        // Verify all entries are non-negative
+        for (int i = 0; i < vec.size(); ++i) {
+            QVERIFY2(vec(i) >= 0, qPrintable(QString("vec(%1) = %2").arg(i).arg(vec(i))));
+        }
     }
 
     //=========================================================================

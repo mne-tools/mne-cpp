@@ -100,10 +100,12 @@ MNECTFCompData::MNECTFCompData(const MNECTFCompData& comp)
     kind       = comp.kind;
     mne_kind   = comp.mne_kind;
     calibrated = comp.calibrated;
-    data       = std::make_unique<MNENamedMatrix>(*comp.data);
-
-    presel     = std::make_unique<FiffSparseMatrix>(*comp.presel);
-    postsel    = std::make_unique<FiffSparseMatrix>(*comp.postsel);
+    if (comp.data)
+        data       = std::make_unique<MNENamedMatrix>(*comp.data);
+    if (comp.presel)
+        presel     = std::make_unique<FiffSparseMatrix>(*comp.presel);
+    if (comp.postsel)
+        postsel    = std::make_unique<FiffSparseMatrix>(*comp.postsel);
 }
 
 //=============================================================================================================

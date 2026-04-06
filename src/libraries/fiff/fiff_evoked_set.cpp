@@ -310,7 +310,7 @@ void FiffEvokedSet::subtractBaseline(Eigen::MatrixXd &epoch, int bminSamp, int b
     if (bmaxSamp >= epoch.cols()) bmaxSamp = static_cast<int>(epoch.cols()) - 1;
     if (bminSamp >= bmaxSamp) return;
 
-    int nBase = bmaxSamp - bminSamp;
+    int nBase = bmaxSamp - bminSamp + 1;
     for (int c = 0; c < epoch.rows(); ++c) {
         double baseVal = epoch.row(c).segment(bminSamp, nBase).mean();
         epoch.row(c).array() -= baseVal;

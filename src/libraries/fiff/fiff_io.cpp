@@ -163,7 +163,7 @@ bool FiffIO::read(QIODevice& pIODevice)
 
         //append to corresponding member qlist
         for(qint32 i=0; i < p_fiffEvokedSet.evoked.size(); ++i) {
-            m_qlistEvoked.append(QSharedPointer<FiffEvoked>(&p_fiffEvokedSet.evoked[i]));
+            m_qlistEvoked.append(QSharedPointer<FiffEvoked>(new FiffEvoked(p_fiffEvokedSet.evoked[i])));
         }
     }
 

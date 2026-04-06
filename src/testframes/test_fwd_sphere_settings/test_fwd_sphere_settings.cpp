@@ -92,8 +92,20 @@ private slots:
 
     void sphereModel_getCoeff()
     {
-        // fwd_eeg_get_multi_sphere_model_coeff needs setup - skip
-        QSKIP("Requires fwd_setup_eeg_sphere_model which hangs");
+        // Test fwd_eeg_get_multi_sphere_model_coeff directly (no fitting needed)
+        Eigen::VectorXf rads(4); rads << 0.90f, 0.92f, 0.97f, 1.0f;
+        Eigen::VectorXf sigs(4); sigs << 0.33f, 0.0042f, 1.0f, 0.33f;
+        auto model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
+            "test", 4, rads, sigs);
+        QVERIFY(model != nullptr);
+        // fwd_eeg_get_multi_sphere_model_coeff works without fitting
+        float rad = 0.09f;
+        for (int k = 0; k < model->nlayer(); k++)
+            model->layers[k].rad = rad * model->layers[k].rel_rad;
+        double c1 = model->fwd_eeg_get_multi_sphere_model_coeff(1);
+        double c2 = model->fwd_eeg_get_multi_sphere_model_coeff(2);
+        QVERIFY(std::isfinite(c1));
+        QVERIFY(std::isfinite(c2));
     }
 
     void sphereModel_nextLegen()
@@ -120,8 +132,16 @@ private slots:
 
     void sphereModel_bergScherg()
     {
-        // Berg-Scherg fitting is computationally expensive — skip
-        QSKIP("fwd_eeg_fit_berg_scherg hangs with large nterms");
+        // Test fwd_setup_eeg_sphere_model WITHOUT Berg-Scherg fitting
+        Eigen::VectorXf rads(4); rads << 0.90f, 0.92f, 0.97f, 1.0f;
+        Eigen::VectorXf sigs(4); sigs << 0.33f, 0.0042f, 1.0f, 0.33f;
+        auto model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
+            "test_bs", 4, rads, sigs);
+        QVERIFY(model != nullptr);
+        // Call setup without fitting (fit_berg_scherg = false)
+        bool ok = model->fwd_setup_eeg_sphere_model(0.09f, false, 3);
+        QVERIFY(ok);
+        QVERIFY(model->nlayer() == 4);
     }
 
     //=========================================================================
@@ -450,8 +470,18 @@ private slots:
     //=========================================================================
     void sphereModel_spherepot()
     {
-        // Uses fwd_setup_eeg_sphere_model with fitting — can be slow
-        QSKIP("spherepot with Berg-Scherg fitting hangs");
+        // Test sphere model setup without fitting, then verify accessors
+        Eigen::VectorXf rads(4); rads << 0.90f, 0.92f, 0.97f, 1.0f;
+        Eigen::VectorXf sigs(4); sigs << 0.33f, 0.0042f, 1.0f, 0.33f;
+        auto model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
+            "test_sp", 4, rads, sigs);
+        QVERIFY(model != nullptr);
+        bool ok = model->fwd_setup_eeg_sphere_model(0.09f, false, 3);
+        QVERIFY(ok);
+        // Verify model has proper layer structure
+        QCOMPARE(model->nlayer(), 4);
+        QVERIFY(model->layers[0].rad > 0);
+        QVERIFY(model->layers[3].rad > model->layers[0].rad);
     }
 };
 

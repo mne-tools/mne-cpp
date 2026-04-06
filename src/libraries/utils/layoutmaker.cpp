@@ -323,7 +323,7 @@ bool LayoutMaker::makeLayout(const std::vector<std::vector<float> > &inputPoints
 
     if(writeFile) {
         outFile.open(outFilePath);
-        if (outFile.is_open()) {
+        if (!outFile.is_open()) {
             std::cout << "Could not open output file!\n";
             return false;
         }

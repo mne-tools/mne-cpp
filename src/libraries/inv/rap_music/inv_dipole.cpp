@@ -60,6 +60,17 @@ template <class T>
 InvDipole<T>::~InvDipole()
 {
 }
+
+//=============================================================================================================
+
+template <class T>
+void InvDipole<T>::clean()
+{
+    m_vecPosition.setZero();
+    m_vecDirection.setZero();
+    m_dLength = 1;
+    m_dFrequency = 0;
+}
 }//Namespace
 
 #endif //DIPOLE_SOURCES
