@@ -56,18 +56,13 @@ cmake --build build\developer-dynamic --parallel
 Requirements
 ------------
 
-| Dependency | Min version | Notes |
-|------------|-------------|-------|
-| [CMake](https://cmake.org/download/) | 3.21 | Build system generator |
-| [Qt](https://www.qt.io/) | 6.10 | `init` downloads automatically |
+| Platform | Requirement |
+|----------|-------------|
+| Windows  | [CMake](https://cmake.org/download/) ≥ 3.21, [MSVC](https://visualstudio.microsoft.com/vs/) 2022 or later |
+| Linux    | [CMake](https://cmake.org/download/) ≥ 3.21, [GCC](https://gcc.gnu.org/releases.html) ≥ 13 |
+| macOS    | [CMake](https://cmake.org/download/) ≥ 3.21, [Xcode](https://developer.apple.com/xcode/) ≥ 16 |
 
-| Platform | Compiler | Min version |
-|----------|----------|-------------|
-| Windows  | [MSVC](https://visualstudio.microsoft.com/vs/) | 2022 |
-| Linux    | [GCC](https://gcc.gnu.org/releases.html) | 13 |
-| macOS    | [Xcode (Apple Clang)](https://developer.apple.com/xcode/) | latest |
-
-The `init` script downloads Qt and Eigen automatically. CMake must be installed separately.
+Qt and Eigen are downloaded automatically by the `init` script.
 
 For the full build guide see the [documentation](https://mne-cpp.github.io/docs/development/buildguide-cmake).
 
