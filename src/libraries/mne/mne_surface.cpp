@@ -426,7 +426,7 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, int add
 
     int     id = -1;
     int     nnode, ntri_count;
-    MNESurface* s = NULL;
+    MNESurface* s = nullptr;
     int k;
     MatrixXf tmp_node_normals;
     int coord_frame = FIFFV_COORD_MRI;
@@ -546,6 +546,6 @@ bad : {
         stream->close();
         if (s)
             delete s;
-        return NULL;
+        return nullptr;
     }
 }

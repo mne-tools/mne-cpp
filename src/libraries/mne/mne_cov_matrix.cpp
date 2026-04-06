@@ -505,7 +505,7 @@ int MNECovMatrix::condition(float rank_threshold, int use_rank)
         data1.resize(ncov,ncov);
         for (j = 0; j < ncov; j++) {
 #ifdef DEBUG
-            mne_print_vector(stdout,NULL,local_eigen.row(j).data(),ncov);
+            mne_print_vector(stdout,nullptr,local_eigen.row(j).data(),ncov);
 #endif
             for (k = 0; k < ncov; k++)
                 data1(j,k) = sqrt(lambda_local[j])*local_eigen(j,k);
@@ -514,7 +514,7 @@ int MNECovMatrix::condition(float rank_threshold, int use_rank)
 #ifdef DEBUG
         printf(">>>\n");
         for (j = 0; j < ncov; j++)
-            mne_print_dvector(stdout,NULL,data2.row(j).data(),ncov);
+            mne_print_dvector(stdout,nullptr,data2.row(j).data(),ncov);
         printf(">>>\n");
 #endif
         /*

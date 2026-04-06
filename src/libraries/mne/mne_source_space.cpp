@@ -325,10 +325,10 @@ int read_tag_data(QFile &fp, int tag, long long nbytes, unsigned char *&val, lon
  * Read the data of one tag
  */
 {
-    unsigned char *dum = NULL;
+    unsigned char *dum = nullptr;
     size_t snbytes = nbytes;
 
-     val = NULL;
+     val = nullptr;
     if (nbytes > 0) {
         dum = new unsigned char[nbytes+1]();
         if (fp.read(reinterpret_cast<char*>(dum), nbytes) != static_cast<qint64>(snbytes)) {
@@ -357,7 +357,7 @@ int read_tag_data(QFile &fp, int tag, long long nbytes, unsigned char *&val, lon
         }
         else {
             printf("Encountered an unknown tag with no length specification : %d\n",tag);
-            val     = NULL;
+            val     = nullptr;
             nbytesp = 0;
         }
     }
@@ -740,7 +740,7 @@ bad : {
 
 std::optional<MNEVolGeom> get_volume_geom_from_tag(const MNEMghTagGroup *tagsp)
 {
-    MNEMghTag*      tag  = NULL;
+    MNEMghTag*      tag  = nullptr;
 
     if (tagsp) {
         for (const auto &t : tagsp->tags)
@@ -1386,7 +1386,7 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
     {
         std::vector<std::unique_ptr<MNESourceSpace>> sp_vec;
         sp_vec.push_back(std::move(sp));
-        if (filter_source_spaces(surf,mindist,FiffCoordTrans(),sp_vec,NULL) != OK) {
+        if (filter_source_spaces(surf,mindist,FiffCoordTrans(),sp_vec,nullptr) != OK) {
             sp = std::move(sp_vec[0]);
             goto bad;
         }
@@ -1450,7 +1450,7 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
     return sp.release();
 
 bad : {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -1638,7 +1638,7 @@ int MNESourceSpace::filter_source_spaces(float limit, const QString& bemfile, co
         return OK;
 
     {
-        MNESurface* rawSurf = MNESurface::read_bem_surface(bemfile,FIFFV_BEM_SURF_ID_BRAIN,FALSE,NULL);
+        MNESurface* rawSurf = MNESurface::read_bem_surface(bemfile,FIFFV_BEM_SURF_ID_BRAIN,FALSE,nullptr);
         if (!rawSurf) {
             qCritical("BEM model does not have the inner skull triangulation!");
             return FAIL;
@@ -1724,11 +1724,11 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
     FiffTag::UPtr t_pTag;
     int             j,k,p,q;
     int             ntri;
-    int             *nearest = NULL;
-    float           *nearest_dist = NULL;
-    int             *nneighbors = NULL;
-    int             *neighbors  = NULL;
-    int             *vol_dims = NULL;
+    int             *nearest = nullptr;
+    float           *nearest_dist = nullptr;
+    int             *nneighbors = nullptr;
+    int             *neighbors  = nullptr;
+    int             *vol_dims = nullptr;
 
     if(!stream->open())
         goto bad;
@@ -1904,7 +1904,7 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
             int ntot,nvert,ntot_count,nneigh;
             int *neigh;
 
-            nneighbors = neighbors = NULL;
+            nneighbors = neighbors = nullptr;
             ntot = nvert = 0;
             if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEIGHBORS, t_pTag)) {
                 qDebug() << "ToDo: Check whether neighbors contains the right stuff!!! - use VectorXi instead";
@@ -1938,7 +1938,7 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
             }
             delete[] neighbors;
             delete[] nneighbors;
-            nneighbors = neighbors = NULL;
+            nneighbors = neighbors = nullptr;
             /*
                 * There might be a coordinate transformation and dimensions
                 */
@@ -2055,8 +2055,8 @@ int MNESourceSpace::restrict_sources_to_labels(std::vector<std::unique_ptr<MNESo
  * Pick only sources within a label
  */
 {
-    MNESourceSpace* lh = NULL;
-    MNESourceSpace* rh = NULL;
+    MNESourceSpace* lh = nullptr;
+    MNESourceSpace* rh = nullptr;
     MNESourceSpace* sp;
     Eigen::VectorXi lh_inuse;
     Eigen::VectorXi rh_inuse;

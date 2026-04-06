@@ -121,86 +121,7 @@ struct RingBuffer
 
 }
 
-void mne_free_name_list_36(char **list, int nlist)
-/*
- * Free a name list array
- */
-{
-    int k;
-    if (list == NULL || nlist == 0)
-        return;
-    for (k = 0; k < nlist; k++) {
-#ifdef FOO
-        printf("%d %s\n",k,list[k]);
-#endif
-        delete[] list[k];
-    }
-    delete[] list;
-    return;
-}
-
 //============================= misc_util.c =============================
-
-void mne_string_to_name_list(const QString& s, QStringList& listp,int &nlistp)
-/*
- * Convert a colon-separated list into a string array
- */
-{
-    QStringList list;
-
-    if (!s.isEmpty() && s.size() > 0) {
-        list = FIFFLIB::FiffStream::split_name_list(s);
-        //list = s.split(":");
-    }
-    listp  = list;
-    nlistp = list.size();
-    return;
-}
-
-QString mne_name_list_to_string(const QStringList& list)
-/*
- * Convert a string array to a colon-separated string
- */
-{
-    int nlist = list.size();
-    QString res;
-    if (nlist == 0 || list.isEmpty())
-        return res;
-//    res[0] = '\0';
-    for (int k = 0; k < nlist-1; k++) {
-        res += list[k];
-        res += ":";
-    }
-    res += list[nlist-1];
-    return res;
-}
-
-QString mne_channel_names_to_string(const QList<FIFFLIB::FiffChInfo>& chs,
-                                    int nch)
-/*
- * Make a colon-separated string out of channel names
- */
-{
-    QStringList names;
-    QString res;
-    if (nch <= 0)
-        return res;
-    for (int k = 0; k < nch; k++)
-        names.append(chs[k].ch_name);
-    res = mne_name_list_to_string(names);
-    return res;
-}
-
-void mne_channel_names_to_name_list(const QList<FIFFLIB::FiffChInfo>& chs,
-                                    int nch,
-                                    QStringList& listp,
-                                    int &nlistp)
-
-{
-    QString s = mne_channel_names_to_string(chs,nch);
-    mne_string_to_name_list(s,listp,nlistp);
-    return;
-}
 
 //============================= mne_apply_filter.c =============================
 
@@ -465,17 +386,20 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
 
 //    tag.data = NULL;
 
+    std::vector<int> pickno_storage;
     if (npick == 0) {
-        pickno = new int[nchan];
+        pickno_storage.resize(nchan);
         for (c = 0; c < nchan; c++)
-            pickno[c] = c;
+            pickno_storage[c] = c;
+        pickno = pickno_storage.data();
         do_all = TRUE;
         npick = nchan;
     }
     else
         do_all = FALSE;
 
-    mult = new float[npick];
+    std::vector<float> mult_storage(npick);
+    mult = mult_storage.data();
     for (c = 0; c < npick; c++)
         mult[c] = chs[pickno[c]].cal*chs[pickno[c]].range;
 
@@ -524,16 +448,9 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
         printf("We are not prepared to handle raw data type: %d",ent->type);
         goto bad;
     }
-    if (do_all)
-        delete[] pickno;
-    delete[] mult;
-//    FREE_36(tag.data);
     return OK;
 
 bad : {
-        if (do_all)
-            delete[] pickno;
-//        FREE_36(tag.data);
         return FAIL;
     }
 }
@@ -562,7 +479,8 @@ int mne_read_bad_channel_list_from_node(FiffStream::SPtr& stream,
         bad->find_tag(stream, FIFF_MNE_CH_NAME_LIST, t_pTag);
         if (t_pTag) {
             names = t_pTag->toString();
-            mne_string_to_name_list(names,list,nlist);
+            list = FiffStream::split_name_list(names);
+            nlist = list.size();
         }
     }
     listp = list;
@@ -800,7 +718,7 @@ int MNERawData::load_one_buffer(MNERawBufDef *buf)
                               buf->nchan,
                               buf->ns,
                               info->chInfo,
-                              NULL,0) != OK) {
+                              nullptr,0) != OK) {
         buf->valid = FALSE;
         return FAIL;
     }
@@ -1018,8 +936,9 @@ int MNERawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
     int          k,s,p,start,c,fills;
     MNERawBufDef* this_buf;
     RowMajorMatrixXf *values;
-    float        *pvalues;
-    float        *deriv_pvalues = NULL;
+    float        *pvalues = nullptr;
+    float        *deriv_pvalues = nullptr;
+    std::vector<float> deriv_pvalues_storage;
 
     if (!proj || (sel && !proj->affect(sel->chspick,sel->nchan) && !proj->affect(sel->chspick_nospace,sel->nchan)))
         return pick_data(sel,firsts,ns,picked);
@@ -1038,7 +957,8 @@ int MNERawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
     }
     else
         s = 0;
-    pvalues = new float[info->nchan];
+    std::vector<float> pvalues_storage(info->nchan);
+    pvalues = pvalues_storage.data();
     for (k = 0, this_buf = bufs.data(); k < (int)bufs.size(); k++, this_buf++) {
         if (this_buf->lasts >= firsts) {
             start = firsts - this_buf->firsts;
@@ -1072,8 +992,10 @@ int MNERawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
              * Apply projection
              */
                 values = &this_buf->vals;
-                if (sel && sel->nderiv > 0 && deriv_matched)
-                    deriv_pvalues = new float[deriv_matched->deriv_data->nrow];
+                if (sel && sel->nderiv > 0 && deriv_matched) {
+                    deriv_pvalues_storage.resize(deriv_matched->deriv_data->nrow);
+                    deriv_pvalues = deriv_pvalues_storage.data();
+                }
                 for (p = start; p < this_buf->ns && ns > 0; p++, ns--, s++) {
                     for (c = 0; c < info->nchan; c++)
                         pvalues[c] = (*values)(c,p);
@@ -1108,8 +1030,7 @@ int MNERawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
                 break;
         }
     }
-    delete[] deriv_pvalues;
-    delete[] pvalues;
+
     /*
        * Extend with the last available sample or zero if the request is beyond the data
        */
@@ -1147,8 +1068,6 @@ int MNERawData::load_one_filt_buf(MNERawBufDef *buf)
     int k;
     int res;
 
-    float **vals;
-
     if (buf->vals.size() == 0) {
         buf->valid = FALSE;
         filt_ring->allocate(buf->nchan, buf->ns,&buf->vals);
@@ -1156,15 +1075,14 @@ int MNERawData::load_one_filt_buf(MNERawBufDef *buf)
     if (buf->valid)
         return OK;
 
-    vals = new float*[buf->nchan];
+    std::vector<float*> vals_storage(buf->nchan);
+    float **vals = vals_storage.data();
     for (k = 0; k < buf->nchan; k++) {
         buf->ch_filtered[k] = FALSE;
         vals[k] = buf->vals.row(k).data() + filter->taper_size;
     }
 
-    res = pick_data_proj(NULL,buf->firsts + filter->taper_size,buf->ns - 2*filter->taper_size,vals);
-
-    delete[] vals;
+    res = pick_data_proj(nullptr,buf->firsts + filter->taper_size,buf->ns - 2*filter->taper_size,vals);
 
 #ifdef DEBUG
     if (res == OK)
@@ -1408,7 +1326,7 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
     //    fiffTagRec   tag;
     FiffTag::UPtr t_pTag;
     FiffChInfo   ch;
-    int k, b, nbuf, ndir, nnames;
+    int k, b, nbuf, ndir;
     int current_dir0 = 0;
 
     //    tag.data = NULL;
@@ -1446,11 +1364,10 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
     /*
        * Add the channel name list
        */
-    mne_channel_names_to_name_list(data->info->chInfo,
-                                   data->info->nchan,
-                                   data->ch_names,
-                                   nnames);
-    if (nnames != data->info->nchan) {
+    data->ch_names.clear();
+    for (int i = 0; i < data->info->nchan; i++)
+        data->ch_names.append(data->info->chInfo[i].ch_name);
+    if (data->ch_names.size() != data->info->nchan) {
         printf("Channel names were not translated correctly into a name list");
         goto bad;
     }
@@ -1643,7 +1560,7 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
             vals_rows[i] = &vals_storage[i];
         float **vals = vals_rows.data();
 
-        if (data->pick_data(NULL,data->first_samp,1,vals) == FAIL)
+        if (data->pick_data(nullptr,data->first_samp,1,vals) == FAIL)
             goto bad;
         data->first_sample_val.resize(data->info->nchan);
         for (k = 0; k < data->info->nchan; k++)

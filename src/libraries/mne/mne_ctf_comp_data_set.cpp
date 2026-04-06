@@ -181,7 +181,7 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
         qCritical("Some of the channel information was missing.");
         goto bad;
     }
-    if (t.isEmpty() && meg_head_t != NULL) {
+    if (t.isEmpty() && meg_head_t != nullptr) {
         /*
      * Try again in a more general fashion
      */
@@ -224,12 +224,12 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
         *neegp = neeg;
     }
 
-    if (idp == NULL) {
+    if (idp == nullptr) {
         /* id is auto-deleted by unique_ptr */
     }
     else
         *idp   = id.release();
-    if (meg_head_t == NULL) {
+    if (meg_head_t == nullptr) {
     }
     else
         *meg_head_t = t;
@@ -271,7 +271,7 @@ int mne_unmap_ctf_comp_kind(int ctf_comp)
     return ctf_comp;
 }
 
-FiffSparseMatrix* mne_convert_to_sparse(const Eigen::MatrixXf& dense,   /* The dense matrix to be converted */
+std::unique_ptr<FiffSparseMatrix> mne_convert_to_sparse(const Eigen::MatrixXf& dense,   /* The dense matrix to be converted */
                                       int   stor_type,      /* Either FIFFTS_MC_CCS or FIFFTS_MC_RCS */
                                       float small)          /* How small elements should be ignored? */
 /*
@@ -285,7 +285,6 @@ FiffSparseMatrix* mne_convert_to_sparse(const Eigen::MatrixXf& dense,   /* The d
     int ptr;
     int nrow = static_cast<int>(dense.rows());
     int ncol = static_cast<int>(dense.cols());
-    FiffSparseMatrix* sparse = NULL;
 
     if (small < 0) {		/* Automatic scaling */
         float maxval = dense.cwiseAbs().maxCoeff();
@@ -302,13 +301,13 @@ FiffSparseMatrix* mne_convert_to_sparse(const Eigen::MatrixXf& dense,   /* The d
 
     if (nz <= 0) {
         qWarning("No nonzero elements found.");
-        return NULL;
+        return nullptr;
     }
     if (stor_type != FIFFTS_MC_CCS && stor_type != FIFFTS_MC_RCS) {
         qWarning("Unknown sparse matrix storage type: %d",stor_type);
-        return NULL;
+        return nullptr;
     }
-    sparse = new FiffSparseMatrix;
+    auto sparse = std::make_unique<FiffSparseMatrix>();
     sparse->coding = stor_type;
     sparse->m      = nrow;
     sparse->n      = ncol;
@@ -386,39 +385,6 @@ int  mne_sparse_vec_mult2_32(FiffSparseMatrix* mat,     /* The sparse matrix */
     }
 }
 
-float mne_dot_vectors_32 (float *v1,
-                       float *v2,
-                       int   nn)
-
-{
-#ifdef BLAS
-    int one = 1;
-    float res = sdot(&nn,v1,&one,v2,&one);
-    return res;
-#else
-    float res = 0.0;
-    int   k;
-
-    for (k = 0; k < nn; k++)
-        res = res + v1[k]*v2[k];
-    return res;
-#endif
-}
-
-void mne_mat_vec_mult2_32 (float **m,float *v,float *result, int d1,int d2)
-/*
-      * Matrix multiplication
-      * result(d1) = m(d1 x d2) * v(d2)
-      */
-
-{
-    int j;
-
-    for (j = 0; j < d1; j++)
-        result[j] = mne_dot_vectors_32 (m[j],v,d2);
-    return;
-}
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -442,7 +408,7 @@ MNECTFCompDataSet::MNECTFCompDataSet(const MNECTFCompDataSet &set)
     if (set.ncomp > 0) {
         for (int k = 0; k < set.ncomp; k++)
             if(set.comps[k])
-                this->comps.append(new MNECTFCompData(*set.comps[k]));
+                this->comps.append(std::make_unique<MNECTFCompData>(*set.comps[k]));
         this->ncomp = this->comps.size();
     }
 
@@ -459,10 +425,6 @@ MNECTFCompDataSet::MNECTFCompDataSet(const MNECTFCompDataSet &set)
 
 MNECTFCompDataSet::~MNECTFCompDataSet()
 {
-
-    for (int k = 0; k < comps.size(); k++)
-        if(comps[k])
-            delete comps[k];
 }
 
 //=============================================================================================================
@@ -476,7 +438,6 @@ std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
     FiffStream::SPtr stream(new FiffStream(&file));
 
     std::unique_ptr<MNECTFCompDataSet> set;
-    MNECTFCompData* one;
     QList<FiffDirNode::SPtr> nodes;
     QList<FiffDirNode::SPtr> comps;
     int ncomp;
@@ -498,9 +459,9 @@ std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
                                              comp_chs,
                                              &ncompch,
                                              temp,
-                                             NULL,
-                                             NULL,
-                                             NULL) == FAIL)
+                                             nullptr,
+                                             nullptr,
+                                             nullptr) == FAIL)
             goto bad;
         if (ncompch > 0) {
             for (k = 0; k < ncompch; k++)
@@ -551,19 +512,17 @@ std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
         /*
             * Add these data to the set
             */
-        one = new MNECTFCompData;
+        auto one = std::make_unique<MNECTFCompData>();
         one->data = std::move(mat);
         one->kind                = kind;
         one->mne_kind            = mne_unmap_ctf_comp_kind(one->kind);
         one->calibrated          = calibrated;
 
         if (one->calibrate(set->chs,set->nch,TRUE) == FAIL) {
-            printf("Warning: Compensation data for '%s' omitted\n", explain_comp(one->kind).toUtf8().constData());//,err_get_error(),explain_comp(one->kind));
-            if(one)
-                delete one;
+            printf("Warning: Compensation data for '%s' omitted\n", explain_comp(one->kind).toUtf8().constData());
         }
         else {
-            set->comps.append(one);
+            set->comps.append(std::move(one));
             set->ncomp++;
         }
     }
@@ -643,9 +602,9 @@ int MNECTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
     /*
         * Find the desired compensation data matrix
         */
-    for (k = 0, this_comp = NULL; k < this->ncomp; k++) {
+    for (k = 0, this_comp = nullptr; k < this->ncomp; k++) {
         if (this->comps[k]->mne_kind == first_comp) {
-            this_comp = this->comps[k];
+            this_comp = this->comps[k].get();
             break;
         }
     }
@@ -680,10 +639,9 @@ int MNECTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
         Eigen::MatrixXf sel = Eigen::MatrixXf::Zero(this_comp->data->ncol, ncomp);
         for (j = 0; j < this_comp->data->ncol; j++)
             sel(j, comp_sel[j]) = 1.0f;
-        FiffSparseMatrix* ps = mne_convert_to_sparse(sel, FIFFTS_MC_RCS, 1e-30f);
-        if (!ps)
+        presel = mne_convert_to_sparse(sel, FIFFTS_MC_RCS, 1e-30f);
+        if (!presel)
             return FAIL;
-        presel.reset(ps);
         printf("\tPreselector created.\n");
     }
     /*
@@ -710,10 +668,9 @@ int MNECTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
             if (comps[j] != MNE_CTFV_COMP_NONE)
                 sel(j, p++) = 1.0f;
         }
-        FiffSparseMatrix* ps = mne_convert_to_sparse(sel, FIFFTS_MC_RCS, 1e-30f);
-        if (!ps)
+        postsel = mne_convert_to_sparse(sel, FIFFTS_MC_RCS, 1e-30f);
+        if (!postsel)
             return FAIL;
-        postsel.reset(ps);
         printf("\tPostselector created.\n");
     }
     current           = std::make_unique<MNECTFCompData>();

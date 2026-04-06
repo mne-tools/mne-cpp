@@ -261,11 +261,10 @@ public:
      *
      * @param[in, out] out        The text stream to write to.
      * @param[in]      tag        Prefix string printed before each line.
-     * @param[in]      list_data  If non-zero, print full vector data.
-     * @param[in]      exclude    Array of channel names to exclude from the display.
-     * @param[in]      nexclude   Number of excluded channels.
+     * @param[in]      list_data  If true, print full vector data.
+     * @param[in]      exclude    Channel names to exclude from the display.
      */
-    void report_data(QTextStream &out,const char *tag, int list_data, char **exclude, int nexclude);
+    void report_data(QTextStream &out, const QString &tag, bool list_data, const QStringList &exclude);
 
     /**
      * Write a one-line-per-item summary of all projection items to a text
@@ -274,7 +273,7 @@ public:
      * @param[in, out] out   The text stream to write to.
      * @param[in]      tag   Prefix string printed before each line.
      */
-    void report(QTextStream &out,const char *tag);
+    void report(QTextStream &out, const QString &tag);
 
     //=========================================================================================================
     /**
@@ -295,12 +294,11 @@ public:
      * bad channels are zeroed, and SVD is performed to produce an orthogonal
      * projector matrix stored in proj_data.
      *
-     * @param[in] bad    Array of bad channel names (may be nullptr).
-     * @param[in] nbad   Number of bad channels.
+     * @param[in] bad    List of bad channel names.
      *
      * @return OK on success, FAIL on error.
      */
-    int make_proj_bad(char **bad, int nbad);
+    int make_proj_bad(const QStringList& bad);
 
     //=========================================================================================================
     /**

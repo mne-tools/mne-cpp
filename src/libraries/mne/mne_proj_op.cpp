@@ -71,75 +71,7 @@
 #define OK 0
 #endif
 
-float mne_dot_vectors_23 (float *v1,
-                       float *v2,
-                       int   nn)
 
-{
-#ifdef BLAS
-    int one = 1;
-    float res = sdot(&nn,v1,&one,v2,&one);
-    return res;
-#else
-    float res = 0.0;
-    int   k;
-
-    for (k = 0; k < nn; k++)
-        res = res + v1[k]*v2[k];
-    return res;
-#endif
-}
-
-//============================= mne_named_matrix.c =============================
-
-void mne_string_to_name_list_23(const QString& s, QStringList& listp,int &nlistp)
-/*
-      * Convert a colon-separated list into a string array
-      */
-{
-    QStringList list;
-
-    if (!s.isEmpty() && s.size() > 0) {
-        list = FIFFLIB::FiffStream::split_name_list(s);
-        //list = s.split(":");
-    }
-    listp  = list;
-    nlistp = list.size();
-    return;
-}
-
-QString mne_name_list_to_string_23(const QStringList& list)
-/*
- * Convert a string array to a colon-separated string
- */
-{
-    int nlist = list.size();
-    QString res;
-    if (nlist == 0 || list.isEmpty())
-        return res;
-//    res[0] = '\0';
-    for (int k = 0; k < nlist-1; k++) {
-        res += list[k];
-        res += ":";
-    }
-    res += list[nlist-1];
-    return res;
-}
-
-QString mne_channel_names_to_string_23(const QList<FIFFLIB::FiffChInfo>& chs, int nch)
-/*
- * Make a colon-separated string out of channel names
- */
-{
-    QStringList names;
-    QString res;
-    if (nch <= 0)
-        return res;
-    for (int k = 0; k < nch; k++)
-        names.append(chs.at(k).ch_name);
-    res = mne_name_list_to_string_23(names);
-    return res;
-}
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -281,7 +213,7 @@ MNEProjOp *MNEProjOp::create_average_eeg_ref(const QList<FiffChInfo>& chs, int n
             eegcount++;
     if (eegcount == 0) {
         qCritical("No EEG channels specified for average reference.");
-        return NULL;
+        return nullptr;
     }
 
     for (k = 0; k < nch; k++)
@@ -317,18 +249,13 @@ int MNEProjOp::affect(const QStringList& list, int nlist)
 
 int MNEProjOp::affect_chs(const QList<FiffChInfo>& chs, int nch)
 {
-    QString ch_string;
-    int  res;
-    QStringList list;
-    int  nlist;
-
     if (nch == 0)
         return FALSE;
-    ch_string = mne_channel_names_to_string_23(chs,nch);
-    mne_string_to_name_list_23(ch_string,list,nlist);
-    res = affect(list,nlist);
-    list.clear();
-    return res;
+    QStringList list;
+    list.reserve(nch);
+    for (int k = 0; k < nch; k++)
+        list.append(chs.at(k).ch_name);
+    return affect(list, nch);
 }
 
 //=============================================================================================================
@@ -339,11 +266,6 @@ int MNEProjOp::project_vector(float *vec, int nvec, int do_complement)
      * Assume that all dimension checking etc. has been done before
      */
 {
-    thread_local std::vector<float> res;
-    float *pvec;
-    float  w;
-    int k,p;
-
     if (nitems <= 0 || this->nvec <= 0)
         return OK;
 
@@ -352,27 +274,20 @@ int MNEProjOp::project_vector(float *vec, int nvec, int do_complement)
         return FAIL;
     }
 
-    if (nch > static_cast<int>(res.size())) {
-        res.resize(nch);
+    Eigen::Map<Eigen::VectorXf> v(vec, nch);
+    Eigen::VectorXf proj = Eigen::VectorXf::Zero(nch);
+
+    for (int p = 0; p < this->nvec; p++) {
+        auto row = proj_data.row(p);
+        float w = row.dot(v);
+        proj += w * row.transpose();
     }
 
-    for (k = 0; k < nch; k++)
-        res[k] = 0.0;
+    if (do_complement)
+        v -= proj;
+    else
+        v = proj;
 
-    for (p = 0; p < this->nvec; p++) {
-        pvec = proj_data.row(p).data();
-        w = mne_dot_vectors_23(pvec,vec,nch);
-        for (k = 0; k < nch; k++)
-            res[k] = res[k] + w*pvec[k];
-    }
-    if (do_complement) {
-        for (k = 0; k < nch; k++)
-            vec[k] = vec[k] - res[k];
-    }
-    else {
-        for (k = 0; k < nch; k++)
-            vec[k] = res[k];
-    }
     return OK;
 }
 
@@ -383,7 +298,7 @@ MNEProjOp *MNEProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode
      * Load all the linear projection data
      */
 {
-    MNEProjOp*   op     = NULL;
+    MNEProjOp*   op     = nullptr;
     QList<FiffDirNode::SPtr> proj;
     FiffDirNode::SPtr start_node;
     QList<FiffDirNode::SPtr> items;
@@ -522,7 +437,7 @@ out :
 bad : {
         if(op)
             delete op;
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -534,9 +449,9 @@ MNEProjOp *MNEProjOp::read(const QString &name)
     FiffStream::SPtr stream(new FiffStream(&file));
 
     if(!stream->open())
-        return NULL;
+        return nullptr;
 
-    MNEProjOp*  res = NULL;
+    MNEProjOp*  res = nullptr;
 
     FiffDirNode::SPtr t_default;
     res = read_from_node(stream,t_default);
@@ -548,14 +463,14 @@ MNEProjOp *MNEProjOp::read(const QString &name)
 
 //=============================================================================================================
 
-void MNEProjOp::report_data(QTextStream &out, const char *tag, int list_data, char **exclude, int nexclude)
+void MNEProjOp::report_data(QTextStream &out, const QString &tag, bool list_data, const QStringList &exclude)
 /*
      * Output info about the projection operator
      */
 {
     int j,p,q;
     MNENamedMatrix* vecs;
-    int found;
+    bool found;
 
     if (nitems <= 0) {
         out << "Empty operator\n";
@@ -564,14 +479,14 @@ void MNEProjOp::report_data(QTextStream &out, const char *tag, int list_data, ch
 
     for (int k = 0; k < nitems; k++) {
         const auto& it = items[k];
-        if (list_data && tag)
+        if (list_data && !tag.isEmpty())
             out << tag << "\n";
-        if (tag)
+        if (!tag.isEmpty())
             out << tag;
         out << "# " << (k+1) << " : " << it.desc << " : " << it.nvec << " vecs : " << it.vecs->ncol << " chs "
             << (it.has_meg ? "MEG" : "EEG") << " "
             << (it.active ? "active" : "idle") << "\n";
-        if (list_data && tag)
+        if (list_data && !tag.isEmpty())
             out << tag << "\n";
         if (list_data) {
             vecs = items[k].vecs.get();
@@ -582,17 +497,12 @@ void MNEProjOp::report_data(QTextStream &out, const char *tag, int list_data, ch
             }
             for (p = 0; p < vecs->nrow; p++)
                 for (q = 0; q < vecs->ncol; q++) {
-                    for (j = 0, found  = 0; j < nexclude; j++) {
-                        if (QString::compare(exclude[j],vecs->collist[q]) == 0) {
-                            found = 1;
-                            break;
-                        }
-                    }
+                    found = exclude.contains(vecs->collist[q]);
                     out << qSetFieldWidth(10) << qSetRealNumberPrecision(5) << Qt::forcepoint
                         << (found ? 0.0 : vecs->data(p, q)) << qSetFieldWidth(0) << " ";
                     out << (q < vecs->ncol-1 ? " " : "\n");
                 }
-            if (list_data && tag)
+            if (list_data && !tag.isEmpty())
                 out << tag << "\n";
         }
     }
@@ -601,9 +511,9 @@ void MNEProjOp::report_data(QTextStream &out, const char *tag, int list_data, ch
 
 //=============================================================================================================
 
-void MNEProjOp::report(QTextStream &out, const char *tag)
+void MNEProjOp::report(QTextStream &out, const QString &tag)
 {
-    report_data(out,tag, FALSE, NULL, 0);
+    report_data(out, tag, false, QStringList());
 }
 
 //=============================================================================================================
@@ -637,7 +547,7 @@ constexpr float SMALL_VALUE = 1e-4f;
 
 } // anonymous namespace
 
-int MNEProjOp::make_proj_bad(char **bad, int nbad)
+int MNEProjOp::make_proj_bad(const QStringList& bad)
 {
     using RowMatrixXf = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 
@@ -692,9 +602,9 @@ int MNEProjOp::make_proj_bad(char **bad, int nbad)
     /*
      * Replace bad channel entries with zeroes
      */
-    for (q = 0; q < nbad; q++)
+    for (q = 0; q < bad.size(); q++)
         for (r = 0; r < nch; r++)
-            if (QString::compare(names[r],bad[q]) == 0) {
+            if (names[r] == bad[q]) {
                 for (p = 0; p < nvec_meg; p++)
                     mat_meg_mat(p,r) = 0.0;
                 for (p = 0; p < nvec_eeg; p++)
@@ -790,7 +700,7 @@ int MNEProjOp::make_proj_bad(char **bad, int nbad)
 
 int MNEProjOp::make_proj()
 {
-    return make_proj_bad(nullptr,0);
+    return make_proj_bad(QStringList());
 }
 
 //=============================================================================================================
@@ -850,7 +760,7 @@ bool MNEProjOp::makeProjection(const QList<QString>& projnames,
         }
         else {
             qInfo("Loaded projection from %s:", projnames[k].toUtf8().data());
-            { QTextStream errStream(stderr); one->report(errStream, "\t"); }
+            { QTextStream errStream(stderr); one->report(errStream, QStringLiteral("\t")); }
             if (!all)
                 all = std::make_unique<MNEProjOp>();
             all->combine(one.get());
@@ -870,7 +780,7 @@ bool MNEProjOp::makeProjection(const QList<QString>& projnames,
             std::unique_ptr<MNEProjOp> one(MNEProjOp::create_average_eeg_ref(chs, nch));
             if (one) {
                 qInfo("Average EEG reference projection added:");
-                { QTextStream errStream(stderr); one->report(errStream, "\t"); }
+                { QTextStream errStream(stderr); one->report(errStream, QStringLiteral("\t")); }
                 if (!all)
                     all = std::make_unique<MNEProjOp>();
                 all->combine(one.get());

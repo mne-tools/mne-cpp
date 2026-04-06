@@ -1153,7 +1153,7 @@ private slots:
         // Report to a string via QTextStream
         QString output;
         QTextStream stream(&output);
-        projOp.report(stream, "test_proj");
+        projOp.report(stream, QStringLiteral("test_proj"));
         QVERIFY(!output.isEmpty());
     }
 

@@ -748,7 +748,7 @@ InvDipoleFitData *InvDipoleFitData::setup_dipole_fit_data(const QString &mriname
         return nullptr;
     if (res->proj && res->proj->nitems > 0) {
         qInfo("Final projection operator is:");
-        { QTextStream errStream(stderr); res->proj->report(errStream,"\t"); }
+        { QTextStream errStream(stderr); res->proj->report(errStream, QStringLiteral("\t")); }
 
         if (res->proj->assign_channels(res->ch_names,res->nmeg+res->neeg) == FAIL)
             return nullptr;

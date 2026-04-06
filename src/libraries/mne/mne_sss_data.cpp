@@ -117,7 +117,7 @@ MNESssData *MNESssData::read(const QString &name)
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
 
-    MNESssData* s  = NULL;
+    MNESssData* s  = nullptr;
 
     if(stream->open())
         s = read_from_node(stream,stream->dirtree());
@@ -206,7 +206,7 @@ bad : {
             */
         if (s)
             delete s;
-        return NULL;
+        return nullptr;
     }
 }
 

@@ -555,7 +555,7 @@ void TestMneRawProjComp::projOp_report()
 
     QString output;
     QTextStream stream(&output);
-    proj->report(stream, "Test");
+    proj->report(stream, QStringLiteral("Test"));
     QVERIFY(!output.isEmpty());
 }
 

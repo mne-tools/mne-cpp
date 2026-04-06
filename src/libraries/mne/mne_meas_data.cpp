@@ -337,7 +337,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
             if (new_data->proj && new_data->proj->nitems > 0) {
                 printf("\tLoaded projection from %s:\n",name.toUtf8().data());
                 QTextStream errStream(stderr);
-                new_data->proj->report(errStream,"\t\t");
+                new_data->proj->report(errStream, QStringLiteral("\t\t"));
             }
         }
         else {
@@ -345,7 +345,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
             if (new_data->proj && new_data->proj->nitems > 0) {
                 printf("\tLoaded projection from %s:\n",name.toUtf8().data());
                 QTextStream errStream(stderr);
-                new_data->proj->report(errStream,"\t\t");
+                new_data->proj->report(errStream, QStringLiteral("\t\t"));
             }
             new_data->comp = MNECTFCompDataSet::read(name);
             if (!new_data->comp)

@@ -327,7 +327,7 @@ int MNERawInfo::load(const QString& name, int allow_maxshield, std::unique_ptr<M
     float          highpass;		/* Highpass filter frequency */
     float          lowpass;		/* Lowpass filter frequency */
     FiffDirNode::SPtr    raw;
-    FiffTime*      start_time = NULL;
+    FiffTime*      start_time = nullptr;
     int            k;
     int            maxshield_data = false;
     /*

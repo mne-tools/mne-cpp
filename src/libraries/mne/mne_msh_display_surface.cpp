@@ -236,8 +236,8 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
                                         const Eigen::Matrix<float, 3, 3, Eigen::RowMajor>& mri_fid,
                                         Eigen::Vector3f& scales)
 {
-    float **dig_rr  = NULL;
-    float **head_rr = NULL;
+    float **dig_rr  = nullptr;
+    float **head_rr = nullptr;
     int   k,ndig,nhead;
     float simplex_size = 2e-2;
     float r0[3],Rdig,Rscalp;

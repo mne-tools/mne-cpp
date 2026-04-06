@@ -250,7 +250,7 @@ public:
                          int ncomp_chan);
 
 public:
-    QList<MNECTFCompData*> comps;   /**< All available compensation data sets. */
+    QList<std::unique_ptr<MNECTFCompData>> comps;   /**< All available compensation data sets. */
     int            ncomp;           /**< Number of compensation data sets. */
     QList<FIFFLIB::FiffChInfo>     chs;    /**< Channel information associated with compensation. */
     int            nch;             /**< Number of channels. */

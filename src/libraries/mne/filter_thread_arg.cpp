@@ -62,9 +62,9 @@ using namespace MNELIB;
 //=============================================================================================================
 
 FilterThreadArg::FilterThreadArg()
-:s          (NULL)
+:s          (nullptr)
 ,limit      (-1)
-,filtered   (NULL)
+,filtered   (nullptr)
 ,stat       (FAIL)
 {
 }
