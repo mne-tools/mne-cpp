@@ -539,7 +539,7 @@ void TestMneRawProjComp::projOp_projectVector()
     // Apply projection to a test vector [3, 6, 9] -> removes mean
     VectorXd testVec(3);
     testVec << 3.0, 6.0, 9.0;
-    int result = proj.project_dvector(testVec, 3, 1);
+    int result = proj.project_dvector(testVec, true);
     QVERIFY(result >= 0);
 
     // After average reference projection the mean should be ~0

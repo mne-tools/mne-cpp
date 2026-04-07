@@ -68,8 +68,8 @@ public:
     unsigned int from = 0;          /**< Source transition value. */
     unsigned int to = 0;            /**< Destination transition value. */
     int          sample = 0;        /**< Sample number. */
-    int          show = 0;          /**< Display flag (application-defined). */
-    int          created_here = 0;  /**< Non-zero if this event was created in the program. */
+    bool         show = false;          /**< Display flag (application-defined). */
+    bool         created_here = false;  /**< Non-zero if this event was created in the program. */
     QString      comment;           /**< Free-text event comment. */
 };
 

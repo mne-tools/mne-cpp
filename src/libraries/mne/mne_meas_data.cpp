@@ -77,7 +77,7 @@ MNEMeasData::MNEMeasData()
 , fwd(nullptr)
 , chsel(nullptr)
 , nbad(0)
-, ch_major(0)
+, ch_major(false)
 , nset(0)
 , current(nullptr)
 {

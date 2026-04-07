@@ -199,7 +199,7 @@ public:
     int                     nbad;       /**< Number of bad channels. */
     Eigen::VectorXi          bad;       /**< Per-channel bad flag array (0 = good, 1 = bad). */
 
-    int                     ch_major;   /**< If non-zero, data rows are channels (not times). */
+    bool                    ch_major;   /**< If true, data rows are channels (not times). */
     QList<MNEMeasDataSet*>  sets;       /**< All loaded data-set epochs. */
     int                     nset;       /**< Number of loaded data sets. */
     MNEMeasDataSet*         current;    /**< Pointer to the currently active data set. */

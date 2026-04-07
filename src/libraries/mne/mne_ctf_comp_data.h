@@ -110,18 +110,18 @@ public:
      *
      * @param[in] chs    Channel information used for calibration factors.
      * @param[in] nch    Number of channels.
-     * @param[in] do_it  If TRUE, apply calibration; if FALSE, remove it.
+     * @param[in] do_it  If true, apply calibration; if false, remove it.
      *
      * @return OK on success, FAIL if a channel is not found.
      */
     int calibrate(const QList<FIFFLIB::FiffChInfo> &chs,
                   int            nch,
-                  int            do_it);
+                  bool           do_it);
 
 public:
     int             kind;                   /**< The CTF compensation kind constant. */
     int             mne_kind;               /**< MNE-internal compensation kind. */
-    int             calibrated;             /**< Whether the coefficients are already calibrated. */
+    bool            calibrated;             /**< Whether the coefficients are already calibrated. */
     std::unique_ptr<MNENamedMatrix>            data;      /**< The compensation matrix. */
     std::unique_ptr<FIFFLIB::FiffSparseMatrix>   presel;    /**< Sparse selector applied before compensation. */
     std::unique_ptr<FIFFLIB::FiffSparseMatrix>   postsel;   /**< Sparse selector applied after compensation. */

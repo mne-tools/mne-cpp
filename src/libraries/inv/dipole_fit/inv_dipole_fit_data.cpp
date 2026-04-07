@@ -1198,7 +1198,7 @@ bool InvDipoleFitData::fit_one(InvDipoleFitData* fit,
     nchan = fit->nmeg+fit->neeg;
     user.fwd = nullptr;
 
-    if (fit->proj && fit->proj->project_vector(B.data(),nchan,true) == FAIL)
+    if (fit->proj && fit->proj->project_vector(B,true) == FAIL)
         return false;
 
     if (fit->noise->whiten_vector(B,B,nchan) == FAIL)
@@ -1360,7 +1360,7 @@ int InvDipoleFitData::compute_dipole_field(InvDipoleFitData& d, const Eigen::Vec
    * Apply projection
    */
     for (k = 0; k < 3; k++)
-        if (d.proj && d.proj->project_vector(fwd.col(k).data(),nch,true) == FAIL)
+        if (d.proj && d.proj->project_vector(fwd.col(k),true) == FAIL)
             return FAIL;
 
     /*

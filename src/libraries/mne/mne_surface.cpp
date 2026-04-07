@@ -387,21 +387,30 @@ void MNESurface::activate_neighbors(int start, Eigen::VectorXi &act, int nstep) 
 // Static factory methods
 //=============================================================================================================
 
-MNESurface* MNESurface::read_bem_surface(const QString& name, int which, int add_geometry, float *sigmap)
+MNESurface* MNESurface::read_bem_surface(const QString& name, int which, bool add_geometry)
 {
-    return read_bem_surface(name, which, add_geometry, sigmap, true);
+    float sigma;
+    return read_bem_surface(name, which, add_geometry, sigma, true);
 }
 
 //=============================================================================================================
 
-MNESurface* MNESurface::read_bem_surface2(const QString& name, int which, int add_geometry, float *sigmap)
+MNESurface* MNESurface::read_bem_surface(const QString& name, int which, bool add_geometry, float& sigma)
 {
-    return read_bem_surface(name, which, add_geometry, sigmap, false);
+    return read_bem_surface(name, which, add_geometry, sigma, true);
 }
 
 //=============================================================================================================
 
-MNESurface* MNESurface::read_bem_surface(const QString& name, int which, int add_geometry, float *sigmap, bool check_too_many_neighbors)
+MNESurface* MNESurface::read_bem_surface2(const QString& name, int which, bool add_geometry)
+{
+    float sigma;
+    return read_bem_surface(name, which, add_geometry, sigma, false);
+}
+
+//=============================================================================================================
+
+MNESurface* MNESurface::read_bem_surface(const QString& name, int which, bool add_geometry, float& sigma, bool check_too_many_neighbors)
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
@@ -417,7 +426,7 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, int add
     int k;
     MatrixXf tmp_node_normals;
     int coord_frame = FIFFV_COORD_MRI;
-    float sigma = -1.0;
+    float sigmaLocal = -1.0;
     MatrixXf tmp_nodes;
     MatrixXi tmp_triangles;
 
@@ -480,7 +489,7 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, int add
         coord_frame = *t_pTag->toInt();
     }
     if (node->find_tag(stream, FIFF_BEM_SIGMA, t_pTag)) {
-        sigma = *t_pTag->toFloat();
+        sigmaLocal = *t_pTag->toFloat();
     }
 
     stream->close();
@@ -489,7 +498,7 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, int add
     tmp_triangles.array() -= 1;
     s->itris       = tmp_triangles;
     s->id          = which;
-    s->sigma       = sigma;
+    s->sigma       = sigmaLocal;
     s->coord_frame = coord_frame;
     s->rr          = tmp_nodes;
     if (tmp_node_normals.rows() > 0)
@@ -524,8 +533,7 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, int add
     s->nuse   = s->np;
     s->inuse  = Eigen::VectorXi::Ones(s->np);
     s->vertno = Eigen::VectorXi::LinSpaced(s->np, 0, s->np - 1);
-    if (sigmap)
-        *sigmap = sigma;
+    sigma = sigmaLocal;
 
     return s;
 

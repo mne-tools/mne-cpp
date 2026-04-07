@@ -165,7 +165,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
         }
         else if (!guess_surfname.isEmpty()) {
             printf("Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
-            if ((inner_skull = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,nullptr)) == nullptr)
+            if ((inner_skull = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,true)) == nullptr)
                 goto bad;
             free_inner_skull = TRUE;
         }
@@ -262,7 +262,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
         }
         else if (!guess_surfname.isEmpty()) {
             printf("Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
-            if ((inner_skull = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,nullptr)) == nullptr)
+            if ((inner_skull = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,true)) == nullptr)
                 goto bad;
             free_inner_skull = TRUE;
         }

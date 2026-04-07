@@ -197,7 +197,7 @@ public:
     std::vector<std::unique_ptr<MNESurfacePatch>>  patches;    /**< Optional flat patches for display (owned). */
     std::vector<float>            patch_rot;            /**< Rotation angles for the (flat) patches. */
     int               nsurf;	       /**< Number of surfaces. */
-    int               use_patches;       /**< Whether to use patches for display. */
+    bool              use_patches;       /**< Whether to use patches for display. */
     Eigen::VectorXi   active;	       /**< Boolean array indicating which surfaces are currently active. */
     Eigen::VectorXi   drawable;	       /**< Boolean array indicating which surfaces could be drawn. */
     std::unique_ptr<MNEMshLightSet> lights;  /**< Current active lighting configuration. */

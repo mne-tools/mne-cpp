@@ -694,14 +694,14 @@ int MNECTFCompDataSet::set_comp(QList<FIFFLIB::FiffChInfo>& chs,
 
 //=============================================================================================================
 
-int MNECTFCompDataSet::apply(int do_it, Eigen::Ref<Eigen::VectorXf> data)
+int MNECTFCompDataSet::apply(bool do_it, Eigen::Ref<Eigen::VectorXf> data)
 {
     return apply(do_it, data, data);
 }
 
 //=============================================================================================================
 
-int MNECTFCompDataSet::apply(int do_it, Eigen::Ref<Eigen::VectorXf> data, Eigen::Ref<const Eigen::VectorXf> compdata)
+int MNECTFCompDataSet::apply(bool do_it, Eigen::Ref<Eigen::VectorXf> data, Eigen::Ref<const Eigen::VectorXf> compdata)
 /*
      * Apply compensation or revert to uncompensated data
      */
@@ -789,7 +789,7 @@ int MNECTFCompDataSet::apply(int do_it, Eigen::Ref<Eigen::VectorXf> data, Eigen:
 
 //=============================================================================================================
 
-int MNECTFCompDataSet::apply_transpose(int do_it, Eigen::MatrixXf& data)
+int MNECTFCompDataSet::apply_transpose(bool do_it, Eigen::MatrixXf& data)
 /*
      * Apply compensation or revert to uncompensated data
      */

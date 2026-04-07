@@ -89,7 +89,7 @@ public:
 
 public:
     int   vert;			/* Vertex # */
-    int   sparse;			/* Is this a isolated point? */
+    bool  sparse;			/* Is this a isolated point? */
 
 // ### OLD STRUCT ###
 //    typedef struct {

@@ -117,7 +117,7 @@ MNEProjOp *MNEProjOp::combine(MNEProjOp *from)
 
 //=============================================================================================================
 
-void MNEProjOp::add_item_active(const MNENamedMatrix *vecs, int kind, const QString& desc, int is_active)
+void MNEProjOp::add_item_active(const MNENamedMatrix *vecs, int kind, const QString& desc, bool is_active)
 /*
  * Add a new item to an existing projection operator
  */
@@ -247,7 +247,7 @@ int MNEProjOp::affect_chs(const QList<FiffChInfo>& chs, int nch)
 
 //=============================================================================================================
 
-int MNEProjOp::project_vector(float *vec, int nvec, int do_complement)
+int MNEProjOp::project_vector(Eigen::Ref<Eigen::VectorXf> vec, bool do_complement)
 /*
      * Apply projection operator to a vector (floats)
      * Assume that all dimension checking etc. has been done before
@@ -256,24 +256,23 @@ int MNEProjOp::project_vector(float *vec, int nvec, int do_complement)
     if (nitems <= 0 || this->nvec <= 0)
         return OK;
 
-    if (nch != nvec) {
+    if (nch != static_cast<int>(vec.size())) {
         printf("Data vector size does not match projection operator");
         return FAIL;
     }
 
-    Eigen::Map<Eigen::VectorXf> v(vec, nch);
     Eigen::VectorXf proj = Eigen::VectorXf::Zero(nch);
 
     for (int p = 0; p < this->nvec; p++) {
         auto row = proj_data.row(p);
-        float w = row.dot(v);
+        float w = row.dot(vec);
         proj += w * row.transpose();
     }
 
     if (do_complement)
-        v -= proj;
+        vec -= proj;
     else
-        v = proj;
+        vec = proj;
 
     return OK;
 }
@@ -692,17 +691,17 @@ int MNEProjOp::make_proj()
 
 //=============================================================================================================
 
-int MNEProjOp::project_dvector(Eigen::Ref<Eigen::VectorXd> vec, int vec_nch, int do_complement)
+int MNEProjOp::project_dvector(Eigen::Ref<Eigen::VectorXd> vec, bool do_complement)
 {
     if (nvec <= 0)
         return OK;
 
-    if (nch != vec_nch) {
+    if (nch != static_cast<int>(vec.size())) {
         qCritical("Data vector size does not match projection operator");
         return FAIL;
     }
 
-    Eigen::VectorXd proj = Eigen::VectorXd::Zero(vec_nch);
+    Eigen::VectorXd proj = Eigen::VectorXd::Zero(vec.size());
 
     for (int p = 0; p < nvec; p++) {
         double w = vec.dot(proj_data.row(p).cast<double>());
@@ -789,7 +788,7 @@ int MNEProjOp::apply_cov(MNECovMatrix* c)
     using RowMatrixXd = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 
     int j,k,p;
-    int do_complement = true;
+    bool do_complement = true;
 
     if (nitems == 0)
         return OK;
@@ -817,7 +816,7 @@ int MNEProjOp::apply_cov(MNECovMatrix* c)
 
     for (k = 0; k < c->ncov; k++) {
         Eigen::Map<Eigen::VectorXd> row_k(dcovMat.row(k).data(), c->ncov);
-        if (project_dvector(row_k,c->ncov,do_complement) != OK)
+        if (project_dvector(row_k,do_complement) != OK)
             return FAIL;
     }
 
@@ -825,7 +824,7 @@ int MNEProjOp::apply_cov(MNECovMatrix* c)
 
     for (k = 0; k < c->ncov; k++) {
         Eigen::Map<Eigen::VectorXd> row_k(dcovMat.row(k).data(), c->ncov);
-        if (project_dvector(row_k,c->ncov,do_complement) != OK)
+        if (project_dvector(row_k,do_complement) != OK)
             return FAIL;
     }
 

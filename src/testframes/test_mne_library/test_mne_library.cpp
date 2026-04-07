@@ -753,7 +753,7 @@ void TestMneLibrary::surfOrVol_addUniformCurv()
 void TestMneLibrary::surfOrVol_realBemMethods()
 {
     if (!hasData()) QSKIP("No test data");
-    std::unique_ptr<MNESurface> surf(MNESurface::read_bem_surface2(bemPath(), -1, 1, nullptr));
+    std::unique_ptr<MNESurface> surf(MNESurface::read_bem_surface2(bemPath(), -1, 1));
     QVERIFY(surf != nullptr);
 
     float cm[3];
@@ -813,7 +813,7 @@ void TestMneLibrary::displaySurf_setupCurvatureColors()
 void TestMneLibrary::displaySurf_alignment()
 {
     if (!hasData()) QSKIP("No test data");
-    std::unique_ptr<MNESurface> surf(MNESurface::read_bem_surface2(bemPath(), -1, 1, nullptr));
+    std::unique_ptr<MNESurface> surf(MNESurface::read_bem_surface2(bemPath(), -1, 1));
     QVERIFY(surf != nullptr);
 
     auto dispSurf = std::make_unique<MNEMshDisplaySurface>();
@@ -1195,7 +1195,7 @@ void TestMneLibrary::epochData_readEpochs()
 void TestMneLibrary::volumeSourceSpace_create()
 {
     if (!hasData()) QSKIP("No test data");
-    std::unique_ptr<MNESurface> surf(MNESurface::read_bem_surface2(bemPath(), -1, 1, nullptr));
+    std::unique_ptr<MNESurface> surf(MNESurface::read_bem_surface2(bemPath(), -1, 1));
     QVERIFY(surf != nullptr);
 
     MNESourceSpace* vol = MNESourceSpace::make_volume_source_space(*surf, 0.020f, 0.0f, 0.005f);
@@ -1268,7 +1268,7 @@ void TestMneLibrary::bemSurface_readSingleLayer()
 {
     if (!hasData()) QSKIP("No test data");
     float sigma = 0.0f;
-    MNESurface* surf = MNESurface::read_bem_surface(bemPath(), -1, 1, &sigma);
+    MNESurface* surf = MNESurface::read_bem_surface(bemPath(), -1, true, sigma);
     QVERIFY(surf != nullptr);
     QVERIFY(surf->np > 0);
     QVERIFY(surf->ntri > 0);
@@ -1284,7 +1284,7 @@ void TestMneLibrary::bemSurface_readThreeLayer()
     QString bem3File = m_sDataPath + "/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
     if (!QFile::exists(bem3File)) { QSKIP("Three-layer BEM file not available"); }
     float sigma = 0.0f;
-    MNESurface* surf = MNESurface::read_bem_surface(bem3File, 1, 1, &sigma);
+    MNESurface* surf = MNESurface::read_bem_surface(bem3File, 1, true, sigma);
     QVERIFY(surf != nullptr);
     QVERIFY(surf->np > 0);
     qDebug() << "Three-layer BEM brain:" << surf->np << "verts";
@@ -1294,8 +1294,7 @@ void TestMneLibrary::bemSurface_readThreeLayer()
 void TestMneLibrary::bemSurface_sumSolids()
 {
     if (!hasData()) QSKIP("No test data");
-    float sigma = 0.0f;
-    MNESurface* surf = MNESurface::read_bem_surface(bemPath(), -1, 1, &sigma);
+    MNESurface* surf = MNESurface::read_bem_surface(bemPath(), -1, true);
     QVERIFY(surf != nullptr);
     Vector3f inside(surf->cm[0], surf->cm[1], surf->cm[2]);
     double total = surf->sum_solids(inside);
@@ -1307,8 +1306,7 @@ void TestMneLibrary::bemSurface_sumSolids()
 void TestMneLibrary::bemSurface_triangleCoords()
 {
     if (!hasData()) QSKIP("No test data");
-    float sigma = 0.0f;
-    MNESurface* surf = MNESurface::read_bem_surface(bemPath(), -1, 1, &sigma);
+    MNESurface* surf = MNESurface::read_bem_surface(bemPath(), -1, true);
     QVERIFY(surf != nullptr && surf->ntri > 0);
     int v0 = surf->itris(0, 0);
     Vector3f r(surf->rr(v0, 0), surf->rr(v0, 1), surf->rr(v0, 2));
@@ -1321,8 +1319,7 @@ void TestMneLibrary::bemSurface_triangleCoords()
 void TestMneLibrary::bemSurface_nearestTrianglePoint()
 {
     if (!hasData()) QSKIP("No test data");
-    float sigma = 0.0f;
-    MNESurface* surf = MNESurface::read_bem_surface(bemPath(), -1, 1, &sigma);
+    MNESurface* surf = MNESurface::read_bem_surface(bemPath(), -1, true);
     QVERIFY(surf != nullptr);
     int v0 = surf->itris(0, 0);
     Vector3f r(surf->rr(v0, 0) + 0.001f, surf->rr(v0, 1), surf->rr(v0, 2));
@@ -1336,8 +1333,7 @@ void TestMneLibrary::bemSurface_nearestTrianglePoint()
 void TestMneLibrary::bemSurface_projectToTriangle()
 {
     if (!hasData()) QSKIP("No test data");
-    float sigma = 0.0f;
-    MNESurface* surf = MNESurface::read_bem_surface(bemPath(), -1, 1, &sigma);
+    MNESurface* surf = MNESurface::read_bem_surface(bemPath(), -1, true);
     QVERIFY(surf != nullptr);
     Vector3f projected = surf->project_to_triangle(0, 0.3f, 0.3f);
     QVERIFY(std::isfinite(projected(0)));
@@ -1347,8 +1343,7 @@ void TestMneLibrary::bemSurface_projectToTriangle()
 void TestMneLibrary::bemSurface_projectToSurface()
 {
     if (!hasData()) QSKIP("No test data");
-    float sigma = 0.0f;
-    MNESurface* surf = MNESurface::read_bem_surface(bemPath(), -1, 1, &sigma);
+    MNESurface* surf = MNESurface::read_bem_surface(bemPath(), -1, true);
     QVERIFY(surf != nullptr);
     Vector3f r(surf->cm[0] + 0.01f, surf->cm[1], surf->cm[2]);
     float dist = 0.0f;
@@ -1361,8 +1356,7 @@ void TestMneLibrary::bemSurface_projectToSurface()
 void TestMneLibrary::bemSurface_geometryInfo()
 {
     if (!hasData()) QSKIP("No test data");
-    float sigma = 0.0f;
-    MNESurface* surf = MNESurface::read_bem_surface(bemPath(), -1, 1, &sigma);
+    MNESurface* surf = MNESurface::read_bem_surface(bemPath(), -1, true);
     QVERIFY(surf != nullptr);
     QVERIFY(surf->ntri > 0 && surf->np > 0);
     QVERIFY(surf->tris.size() == static_cast<size_t>(surf->ntri));

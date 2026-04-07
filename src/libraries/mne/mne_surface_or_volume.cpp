@@ -429,7 +429,7 @@ int MNESurfaceOrVolume::add_vertex_normals()
 
 //=============================================================================================================
 
-int MNESurfaceOrVolume::add_geometry_info(int do_normals, int check_too_many_neighbors)
+int MNESurfaceOrVolume::add_geometry_info(bool do_normals, bool check_too_many_neighbors)
 /*
           * Add vertex normals and neighbourhood information
           */
@@ -615,14 +615,14 @@ int MNESurfaceOrVolume::add_geometry_info(int do_normals, int check_too_many_nei
 
 //=============================================================================================================
 
-int MNESurfaceOrVolume::add_geometry_info(int do_normals)
+int MNESurfaceOrVolume::add_geometry_info(bool do_normals)
 {
     return add_geometry_info(do_normals,true);
 }
 
 //=============================================================================================================
 
-int MNESurfaceOrVolume::add_geometry_info2(int do_normals)
+int MNESurfaceOrVolume::add_geometry_info2(bool do_normals)
 
 {
     return add_geometry_info(do_normals,false);

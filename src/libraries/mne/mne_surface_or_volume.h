@@ -221,7 +221,7 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    int add_geometry_info(int do_normals, int check_too_many_neighbors);
+    int add_geometry_info(bool do_normals, bool check_too_many_neighbors);
 
     /**
      * Convenience overload that adds geometry information with border detection
@@ -232,7 +232,7 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    int add_geometry_info(int do_normals);
+    int add_geometry_info(bool do_normals);
 
     /**
      * Add geometry information with excess-neighbor checking disabled
@@ -243,7 +243,7 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    int add_geometry_info2(int do_normals);
+    int add_geometry_info2(bool do_normals);
 
 
     /**

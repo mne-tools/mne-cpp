@@ -978,7 +978,7 @@ int MNERawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
                 for (p = start; p < this_buf->ns && ns > 0; p++, ns--, s++) {
                     for (c = 0; c < info->nchan; c++)
                         pvalues[c] = (*values)(c,p);
-                    if (proj->project_vector(pvalues.data(),info->nchan,true) != OK)
+                    if (proj->project_vector(pvalues,true) != OK)
                         qWarning()<<"Error";
                     if (sel) {
                         if (sel->nderiv > 0 && deriv_matched) {
@@ -1116,7 +1116,7 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
             if (comp->apply(true,dc) != OK)
                 goto bad;
         if (proj)
-            if (proj->project_vector(dc.data(),info->nchan,true) != OK)
+            if (proj->project_vector(dc,true) != OK)
                 goto bad;
     }
     filter_was = filter->filter_on;

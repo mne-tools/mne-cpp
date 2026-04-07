@@ -309,7 +309,7 @@ int MNEMshDisplaySurface::discard_outlier_digitizer_points(FIFFLIB::FiffDigitize
 //=============================================================================================================
 
 void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerData& dig,
-                                                       int do_all, int do_approx) const
+                                                       bool do_all, bool do_approx) const
 /*
  * Calculate the distances from the scalp surface
  */

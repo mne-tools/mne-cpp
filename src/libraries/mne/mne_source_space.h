@@ -111,9 +111,9 @@ public:
      * Determine whether this source space is on the left hemisphere
      * based on the average x-coordinate of all vertices.
      *
-     * @return TRUE if left hemisphere, FALSE otherwise.
+     * @return true if left hemisphere, false otherwise.
      */
-    int is_left_hemi() const;
+    bool is_left_hemi() const;
 
     //=========================================================================================================
     /**
@@ -189,8 +189,8 @@ public:
      */
     static std::unique_ptr<MNESourceSpace> load_surface_geom(const QString& surf_file,
                                                              const QString& curv_file,
-                                                             int  add_geometry,
-                                                             int  check_too_many_neighbors);
+                                                             bool add_geometry,
+                                                             bool check_too_many_neighbors);
 
     //=========================================================================================================
     /**

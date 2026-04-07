@@ -163,13 +163,13 @@ public:
      * Apply or revert CTF compensation on a single-sample data vector
      * using the current compensation operator.
      *
-     * @param[in]      do_it      If TRUE, subtract compensated component; if FALSE, add it back.
+     * @param[in]      do_it      If true, subtract compensated component; if false, add it back.
      * @param[in, out] data       Data vector to process.
      * @param[in]      compdata   Compensation channel data (may equal data when omitted).
      *
      * @return OK on success, FAIL on error.
      */
-    int apply(int                  do_it,
+    int apply(bool                 do_it,
               Eigen::Ref<Eigen::VectorXf>     data,
               Eigen::Ref<const Eigen::VectorXf> compdata);
 
@@ -177,12 +177,12 @@ public:
     /**
      * Overload: apply compensation using the data vector itself as compensation input.
      *
-     * @param[in]      do_it   If TRUE, subtract compensated component; if FALSE, add it back.
+     * @param[in]      do_it   If true, subtract compensated component; if false, add it back.
      * @param[in, out] data    Data vector to process (also used as compensation input).
      *
      * @return OK on success, FAIL on error.
      */
-    int apply(int                  do_it,
+    int apply(bool                 do_it,
               Eigen::Ref<Eigen::VectorXf>     data);
 
     //=========================================================================================================
@@ -190,12 +190,12 @@ public:
      * Apply or revert CTF compensation across multiple time samples
      * (channels x samples matrix), the transposed equivalent of apply().
      *
-     * @param[in]      do_it   If TRUE, apply compensation; if FALSE, revert.
+     * @param[in]      do_it   If true, apply compensation; if false, revert.
      * @param[in, out] data    Channel-by-sample data matrix (rows = channels, cols = samples).
      *
      * @return OK on success, FAIL on error.
      */
-    int apply_transpose(int               do_it,
+    int apply_transpose(bool              do_it,
                         Eigen::MatrixXf&  data);
 
     //=========================================================================================================

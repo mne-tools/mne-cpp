@@ -73,7 +73,7 @@ using namespace MNELIB;
 MNECTFCompData::MNECTFCompData()
 :kind(MNE_CTFV_COMP_UNKNOWN)
 ,mne_kind(MNE_CTFV_COMP_UNKNOWN)
-,calibrated(0)
+,calibrated(false)
 {
 }
 
@@ -82,7 +82,7 @@ MNECTFCompData::MNECTFCompData()
 MNECTFCompData::MNECTFCompData(const MNECTFCompData& comp)
 :kind(MNE_CTFV_COMP_UNKNOWN)
 ,mne_kind(MNE_CTFV_COMP_UNKNOWN)
-,calibrated(0)
+,calibrated(false)
 {
     kind       = comp.kind;
     mne_kind   = comp.mne_kind;
@@ -103,7 +103,7 @@ MNECTFCompData::~MNECTFCompData()
 
 //=============================================================================================================
 
-int MNECTFCompData::calibrate(const QList<FIFFLIB::FiffChInfo>& chs, int nch, int do_it)
+int MNECTFCompData::calibrate(const QList<FIFFLIB::FiffChInfo>& chs, int nch, bool do_it)
 {
     Eigen::VectorXf col_cals(this->data->ncol);
     Eigen::VectorXf row_cals(this->data->nrow);

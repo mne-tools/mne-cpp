@@ -302,7 +302,7 @@ FwdBemModel::UPtr FwdBemModel::fwd_bem_load_surfaces(const QString &name, const 
 
     for (k = 0; k < nkind; k++) {
         float cond = -1.0f;
-        MNESurface* s = MNESurface::read_bem_surface(name,kinds[k],true,&cond);
+        MNESurface* s = MNESurface::read_bem_surface(name,kinds[k],true,cond);
         if (s == nullptr)
             return nullptr;
         if (cond < 0.0) {
@@ -509,7 +509,7 @@ MNESurface::UPtr FwdBemModel::make_guesses(MNESurface* guess_surf, float guessra
 
         bemname = bemFile.fileName();
 
-        MNESurface* sphere = MNESurface::read_bem_surface(bemname,9003,false,nullptr);
+        MNESurface* sphere = MNESurface::read_bem_surface(bemname,9003,false);
         if (!sphere)
             return res;
         sphere_owner.reset(sphere);

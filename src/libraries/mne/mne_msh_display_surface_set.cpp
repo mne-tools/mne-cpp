@@ -211,7 +211,7 @@ int MNEMshDisplaySurfaceSet::add_bem_surface(const QString&       filepath,
     printf("Loading BEM surface %s (id = %d) from %s ...\n",
            bemname.toUtf8().constData(), kind, filepath.toUtf8().constData());
 
-    std::unique_ptr<MNESurface> surf(MNESurface::read_bem_surface2(filepath,kind,full_geom,nullptr));
+    std::unique_ptr<MNESurface> surf(MNESurface::read_bem_surface2(filepath,kind,full_geom));
     if (!surf)
         return -1;
 

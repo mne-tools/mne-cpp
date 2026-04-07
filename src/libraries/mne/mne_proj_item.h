@@ -151,10 +151,10 @@ public:
     int             nvec;           /**< Number of projection vectors (== vecs->nrow when vecs is set). */
     QString         desc;           /**< Human-readable description (e.g. "PCA-v1"). */
     int             kind;           /**< FIFF projection item kind (FIFFV_PROJ_ITEM_*). */
-    int             active;         /**< Whether this item is currently active. */
-    int             active_file;    /**< Whether this item was active when loaded from file. */
-    int             has_meg;        /**< Whether the projection covers MEG channels. */
-    int             has_eeg;        /**< Whether the projection covers EEG channels. */
+    bool            active;         /**< Whether this item is currently active. */
+    bool            active_file;    /**< Whether this item was active when loaded from file. */
+    bool            has_meg;        /**< Whether the projection covers MEG channels. */
+    bool            has_eeg;        /**< Whether the projection covers EEG channels. */
 };
 
 } // NAMESPACE MNELIB

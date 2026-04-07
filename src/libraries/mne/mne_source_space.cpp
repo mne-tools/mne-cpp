@@ -841,7 +841,7 @@ void MNESourceSpace::enable_all_sources()
 
 //=============================================================================================================
 
-int MNESourceSpace::is_left_hemi() const
+bool MNESourceSpace::is_left_hemi() const
 /*
  * Left or right hemisphere?
  */
@@ -1083,8 +1083,8 @@ std::unique_ptr<MNESourceSpace> MNESourceSpace::load_surface(const QString& surf
 
 std::unique_ptr<MNESourceSpace> MNESourceSpace::load_surface_geom(const QString& surf_file,
                                                                    const QString& curv_file,
-                                                                   int  add_geometry,
-                                                                   int  check_too_many_neighbors)
+                                                                   bool add_geometry,
+                                                                   bool check_too_many_neighbors)
     /*
      * Load the surface and add the geometry information
      */
@@ -1625,7 +1625,7 @@ int MNESourceSpace::filter_source_spaces(float limit, const QString& bemfile, co
         return OK;
 
     {
-        MNESurface* rawSurf = MNESurface::read_bem_surface(bemfile,FIFFV_BEM_SURF_ID_BRAIN,false,nullptr);
+        MNESurface* rawSurf = MNESurface::read_bem_surface(bemfile,FIFFV_BEM_SURF_ID_BRAIN,false);
         if (!rawSurf) {
             qCritical("BEM model does not have the inner skull triangulation!");
             return FAIL;

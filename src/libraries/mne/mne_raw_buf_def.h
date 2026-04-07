@@ -106,9 +106,9 @@ public:
     int   ntaper = 0;       /**< Taper length for filtered buffers. */
     int   ns = 0;           /**< Number of samples (lasts - firsts + 1). */
     int   nchan = 0;        /**< Number of channels. */
-    int   is_skip = 0;      /**< Non-zero if this buffer represents a data skip. */
+    bool  is_skip = false;     /**< True if this buffer represents a data skip. */
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> vals;  /**< Sample values matrix [nchan x ns], row-major (empty if not loaded). */
-    int   valid = 0;        /**< Non-zero if the data in this buffer are meaningful. */
+    bool  valid = false;        /**< True if the data in this buffer are meaningful. */
     Eigen::VectorXi ch_filtered; /**< Per-channel flag: has this channel been filtered already (filtered buffers only). */
     int   comp_status = 0;  /**< Compensation status for raw buffers. */
 };

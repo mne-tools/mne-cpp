@@ -125,7 +125,7 @@ public:
     Eigen::Vector3f minv = Eigen::Vector3f::Constant(-1.0f);	/**< Minimum values along the three coordinate axes. */
     Eigen::Vector3f maxv = Eigen::Vector3f::Constant(1.0f);	/**< Maximum values along the three coordinate axes. */
     Eigen::Matrix4f trans = Eigen::Matrix4f::Identity();	/**< Extra 4x4 transformation matrix for this surface. */
-    int            sketch = 0;	/**< Non-zero to use sketch mode with decimated triangulation. */
+    bool           sketch = false;	/**< Non-zero to use sketch mode with decimated triangulation. */
 
     std::vector<std::unique_ptr<MNELIB::MNEMorphMap>> maps;		/**< Morphing maps from other surfaces to this one. */
 
@@ -149,9 +149,9 @@ public:
     int   curvature_color_mode = 0;	/**< How curvature is visualized. */
 
     int   overlay_color_mode = 0;	/**< How overlay data affects coloring. */
-    int   transparent = 0;		/**< Non-zero if this surface is rendered transparently. */
+    bool  transparent = false;		/**< Non-zero if this surface is rendered transparently. */
 
-    int   show_aux_data = 0;		/**< Non-zero to show auxiliary data related to this surface. */
+    bool  show_aux_data = false;		/**< Non-zero to show auxiliary data related to this surface. */
 
     std::vector<MNELIB::MNEMshPicked> picked;		/**< Picked locations in world coordinates. */
 
@@ -199,7 +199,7 @@ public:
      * Compute the distance from each active digitizer point to the head surface.
      */
     void calculate_digitizer_distances(FIFFLIB::FiffDigitizerData& dig,
-                                     int do_all, int do_approx) const;
+                                     bool do_all, bool do_approx) const;
 
     /**
      * Perform one iteration of ICP-like alignment.

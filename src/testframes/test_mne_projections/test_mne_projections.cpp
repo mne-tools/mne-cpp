@@ -270,12 +270,13 @@ private slots:
         op.make_proj();
 
         // Project a vector
-        float vec[3] = {1.0f, 2.0f, 3.0f};
-        float origNorm2 = vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2];
-        int rc = op.project_vector(vec, 3, 0);
+        Eigen::VectorXf vec(3);
+        vec << 1.0f, 2.0f, 3.0f;
+        float origNorm2 = vec.squaredNorm();
+        int rc = op.project_vector(vec, false);
         QVERIFY(rc >= 0);
         // Verify projection modified the vector
-        float newNorm2 = vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2];
+        float newNorm2 = vec.squaredNorm();
         QVERIFY(newNorm2 <= origNorm2 + 1e-5f);
     }
 
@@ -300,7 +301,7 @@ private slots:
         Eigen::VectorXd dvec(2);
         dvec << 1.0, 2.0;
         double origNorm = dvec.norm();
-        int rc = op.project_dvector(dvec, 2, 0);
+        int rc = op.project_dvector(dvec, false);
         QVERIFY(rc >= 0);
         QVERIFY(dvec.norm() <= origNorm + 1e-5);
     }

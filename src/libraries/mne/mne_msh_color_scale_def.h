@@ -94,7 +94,7 @@ public:
     float fmid;                     /* This is in the middle */
     float fslope;                   /* We still use the slope internally (sigh) */
     float tc_mult;                  /* Multiply the scales by this value for timecourses */
-    int   relative;                 /* Are fthresh and fmid relative to the maximum value over the surface? */
+    bool  relative;                 /* Are fthresh and fmid relative to the maximum value over the surface? */
 };
 
 //=============================================================================================================

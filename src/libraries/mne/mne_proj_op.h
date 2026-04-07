@@ -133,7 +133,7 @@ public:
      * @param[in] desc       Human-readable description of the projection.
      * @param[in] is_active  Whether the item is active on load.
      */
-    void add_item_active(const MNENamedMatrix* vecs, int kind, const  QString& desc, int is_active);
+    void add_item_active(const MNENamedMatrix* vecs, int kind, const  QString& desc, bool is_active);
 
     /**
      * @brief Add a projection item that is active by default.
@@ -201,12 +201,11 @@ public:
      * projection itself.
      *
      * @param[in, out] vec            Data vector of length nch.
-     * @param[in]      nvec          Expected number of channels (must match nch).
-     * @param[in]      do_complement If non-zero, compute the complement (I - P) * vec.
+     * @param[in]      do_complement If true, compute the complement (I - P) * vec.
      *
      * @return OK on success, FAIL on dimension mismatch.
      */
-    int project_vector(float *vec, int nvec, int do_complement);
+    int project_vector(Eigen::Ref<Eigen::VectorXf> vec, bool do_complement);
 
     /**
      * @brief Read all linear projection items from a FIFF tree node.
@@ -314,12 +313,11 @@ public:
      * Apply the compiled projection operator to a double-precision data vector.
      *
      * @param[in,out] vec             Data vector.
-     * @param[in]     nch             Expected length (must match operator dimension).
-     * @param[in]     do_complement   If non-zero, compute (I - P) * vec.
+     * @param[in]     do_complement   If true, compute (I - P) * vec.
      *
      * @return OK on success, FAIL on dimension mismatch.
      */
-    int project_dvector(Eigen::Ref<Eigen::VectorXd> vec, int nch, int do_complement);
+    int project_dvector(Eigen::Ref<Eigen::VectorXd> vec, bool do_complement);
 
     //=========================================================================================================
     /**

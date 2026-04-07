@@ -230,37 +230,47 @@ public:
      *
      * @param[in]  name           Path to the BEM FIFF file.
      * @param[in]  which          FsSurface ID to load (-1 loads the first found).
-     * @param[in]  add_geometry   If non-zero, compute full geometry info.
-     * @param[out] sigmap         If non-null, receives the surface conductivity.
-     * @return The loaded surface, or NULL on failure. Caller takes ownership.
+     * @param[in]  add_geometry   If true, compute full geometry info.
+     * @return The loaded surface, or nullptr on failure. Caller takes ownership.
      */
     static MNESurface* read_bem_surface(const QString& name, int which,
-                                        int add_geometry, float *sigmap);
+                                        bool add_geometry);
+
+    /**
+     * Read a BEM surface from a FIFF file (excess-neighbor checking enabled).
+     *
+     * @param[in]  name           Path to the BEM FIFF file.
+     * @param[in]  which          FsSurface ID to load (-1 loads the first found).
+     * @param[in]  add_geometry   If true, compute full geometry info.
+     * @param[out] sigma          Receives the surface conductivity.
+     * @return The loaded surface, or nullptr on failure. Caller takes ownership.
+     */
+    static MNESurface* read_bem_surface(const QString& name, int which,
+                                        bool add_geometry, float& sigma);
 
     /**
      * Read a BEM surface from a FIFF file (excess-neighbor checking disabled).
      *
      * @param[in]  name           Path to the BEM FIFF file.
      * @param[in]  which          FsSurface ID to load (-1 loads the first found).
-     * @param[in]  add_geometry   If non-zero, compute full geometry info.
-     * @param[out] sigmap         If non-null, receives the surface conductivity.
-     * @return The loaded surface, or NULL on failure. Caller takes ownership.
+     * @param[in]  add_geometry   If true, compute full geometry info.
+     * @return The loaded surface, or nullptr on failure. Caller takes ownership.
      */
     static MNESurface* read_bem_surface2(const QString& name, int which,
-                                         int add_geometry, float *sigmap);
+                                         bool add_geometry);
 
     /**
      * Read a BEM surface from a FIFF file.
      *
      * @param[in]  name                      Path to the BEM FIFF file.
      * @param[in]  which                     FsSurface ID to load (-1 loads the first found).
-     * @param[in]  add_geometry              If non-zero, compute full geometry info.
-     * @param[out] sigmap                    If non-null, receives the surface conductivity.
+     * @param[in]  add_geometry              If true, compute full geometry info.
+     * @param[out] sigma                     Receives the surface conductivity.
      * @param[in]  check_too_many_neighbors  Fail on excess neighbor count.
-     * @return The loaded surface, or NULL on failure. Caller takes ownership.
+     * @return The loaded surface, or nullptr on failure. Caller takes ownership.
      */
     static MNESurface* read_bem_surface(const QString& name, int which,
-                                        int add_geometry, float *sigmap,
+                                        bool add_geometry, float& sigma,
                                         bool check_too_many_neighbors);
 };
 

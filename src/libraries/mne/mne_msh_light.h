@@ -104,7 +104,7 @@ public:
     ~MNEMshLight();
 
 public:
-    int   state;			/* On or off? */
+    bool  state;			/* On or off? */
     float pos[3];			/* Where is the light? */
     float diff[3];		/* Diffuse intensity */
 
