@@ -73,7 +73,6 @@ public:
      */
     static int run(const ProcessingSettings &settings);
 
-private:
     /**
      * Compose output file names based on the raw file name and a tag.
      *
