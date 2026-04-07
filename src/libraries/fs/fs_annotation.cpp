@@ -188,6 +188,9 @@ bool FsAnnotation::read(const QString& p_sFileName, FsAnnotation &p_Annotation)
             QByteArray tmp;
             tmp.resize(len);
             t_Stream.readRawData(tmp.data(),len);
+            // FreeSurfer includes null terminator in stored length – strip it
+            if (tmp.endsWith('\0'))
+                tmp.chop(1);
             p_Annotation.m_Colortable.orig_tab = tmp;
 
             for(qint32 i = 0; i < numEntries; ++i)
@@ -200,6 +203,8 @@ bool FsAnnotation::read(const QString& p_sFileName, FsAnnotation &p_Annotation)
                 t_Stream >> len;
                 tmp.resize(len);
                 t_Stream.readRawData(tmp.data(),len);
+                if (tmp.endsWith('\0'))
+                    tmp.chop(1);
 
                 p_Annotation.m_Colortable.struct_names[i]= tmp;
 
@@ -227,6 +232,9 @@ bool FsAnnotation::read(const QString& p_sFileName, FsAnnotation &p_Annotation)
             QByteArray tmp;
             tmp.resize(len);
             t_Stream.readRawData(tmp.data(),len);
+            // FreeSurfer includes null terminator in stored length – strip it
+            if (tmp.endsWith('\0'))
+                tmp.chop(1);
             p_Annotation.m_Colortable.orig_tab = tmp;
 
             for(qint32 i = 0; i < numEntries; ++i)
@@ -251,6 +259,8 @@ bool FsAnnotation::read(const QString& p_sFileName, FsAnnotation &p_Annotation)
                 t_Stream >> len;
                 tmp.resize(len);
                 t_Stream.readRawData(tmp.data(),len);
+                if (tmp.endsWith('\0'))
+                    tmp.chop(1);
 
                 p_Annotation.m_Colortable.struct_names[structure]= tmp;
 
