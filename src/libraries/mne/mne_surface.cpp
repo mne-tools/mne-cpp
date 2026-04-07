@@ -63,21 +63,8 @@ using namespace MNELIB;
 
 //=============================================================================================================
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
+constexpr int FAIL = -1;
+constexpr int OK   =  0;
 
 #define X_17 0
 #define Y_17 1
@@ -168,7 +155,7 @@ int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjDa
 
     if (pd) {
         if (!pd->act[tri])
-            return FALSE;
+            return false;
         a = pd->a[tri];
         b = pd->b[tri];
         c = pd->c[tri];
@@ -193,7 +180,7 @@ int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjDa
         x = p;
         y = q;
         z = dist;
-        return TRUE;
+        return true;
     }
     /*
      * Side 1 -> 2
@@ -245,7 +232,7 @@ int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjDa
         y = q0;
         z = dist0;
     }
-    return TRUE;
+    return true;
 }
 
 //=============================================================================================================
@@ -340,7 +327,7 @@ void MNESurface::decide_search_restriction(MNEProjData& p,
     int minvert;
 
     for (k = 0; k < ntri; k++)
-        p.act[k] = FALSE;
+        p.act[k] = 0;
 
     if (approx_best < 0) {
         mindist = 1000.0;
@@ -391,7 +378,7 @@ void MNESurface::activate_neighbors(int start, Eigen::VectorXi &act, int nstep) 
         return;
 
     for (k = 0; k < nneighbor_tri[start]; k++)
-        act[neighbor_tri[start][k]] = TRUE;
+        act[neighbor_tri[start][k]] = 1;
     for (k = 0; k < nneighbor_vert[start]; k++)
         activate_neighbors(neighbor_vert[start][k], act, nstep - 1);
 }
@@ -409,7 +396,7 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, int add
 
 MNESurface* MNESurface::read_bem_surface2(const QString& name, int which, int add_geometry, float *sigmap)
 {
-    return read_bem_surface(name, which, add_geometry, sigmap, FALSE);
+    return read_bem_surface(name, which, add_geometry, sigmap, false);
 }
 
 //=============================================================================================================

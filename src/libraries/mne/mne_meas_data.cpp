@@ -63,13 +63,6 @@ using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace MNELIB;
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -84,7 +77,7 @@ MNEMeasData::MNEMeasData()
 , fwd(nullptr)
 , chsel(nullptr)
 , nbad(0)
-, ch_major(FALSE)
+, ch_major(0)
 , nset(0)
 , current(nullptr)
 {
@@ -213,7 +206,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
     MNEMeasData*    new_data = add_to;
     MNEMeasDataSet* dataset = nullptr;
 
-    stim14_name = getenv(MNE_ENV_TRIGGER_CH);
+    stim14_name = qEnvironmentVariable(MNE_ENV_TRIGGER_CH);
     if (stim14_name.isEmpty() || stim14_name.size() == 0)
         stim14_name = MNE_DEFAULT_TRIGGER_CH;
 
@@ -365,7 +358,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
             for (int b = 0; b < new_data->nbad; b++) {
                 for (k = 0; k < new_data->nchan; k++) {
                     if (QString::compare(new_data->chs[k].ch_name,new_data->badlist[b],Qt::CaseInsensitive) == 0) {
-                        new_data->bad[k] = TRUE;
+                        new_data->bad[k] = 1;
                         break;
                     }
                 }

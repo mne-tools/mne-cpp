@@ -41,10 +41,6 @@
 #include "mne_surface.h"
 #include "mne_triangle.h"
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-
 #define X_46 0
 #define Y_46 1
 #define Z_46 2
@@ -74,7 +70,7 @@ MNEProjData::MNEProjData(const MNELIB::MNESurface* s)
       b[k] =  VEC_DOT_46(tri->r13,tri->r13);
       c[k] =  VEC_DOT_46(tri->r12,tri->r13);
 
-      act[k] = TRUE;
+      act[k] = 1;
     }
     nactive = s->ntri;
 }

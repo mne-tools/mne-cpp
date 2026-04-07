@@ -45,13 +45,8 @@
 using namespace Eigen;
 using namespace MNELIB;
 
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
+constexpr int FAIL = -1;
+constexpr int OK   =  0;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

@@ -55,21 +55,8 @@
 
 #include <vector>
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
+constexpr int FAIL = -1;
+constexpr int OK   =  0;
 
 
 
@@ -142,23 +129,23 @@ void MNEProjOp::add_item_active(const MNENamedMatrix *vecs, int kind, const QStr
     new_item.vecs        = std::make_unique<MNENamedMatrix>(*vecs);
 
     if (kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
-        new_item.has_meg = FALSE;
-        new_item.has_eeg = TRUE;
+        new_item.has_meg = false;
+        new_item.has_eeg = true;
     }
     else {
         for (int k = 0; k < vecs->ncol; k++) {
             if (vecs->collist[k].contains("EEG"))//strstr(vecs->collist[k],"EEG") == vecs->collist[k])
-                new_item.has_eeg = TRUE;
+                new_item.has_eeg = true;
             if (vecs->collist[k].contains("MEG"))//strstr(vecs->collist[k],"MEG") == vecs->collist[k])
-                new_item.has_meg = TRUE;
+                new_item.has_meg = true;
         }
         if (!new_item.has_meg && !new_item.has_eeg) {
-            new_item.has_meg = TRUE;
-            new_item.has_eeg = FALSE;
+            new_item.has_meg = true;
+            new_item.has_eeg = false;
         }
         else if (new_item.has_meg && new_item.has_eeg) {
-            new_item.has_meg = TRUE;
-            new_item.has_eeg = FALSE;
+            new_item.has_meg = true;
+            new_item.has_eeg = false;
         }
     }
     if (!desc.isEmpty())
@@ -176,7 +163,7 @@ void MNEProjOp::add_item_active(const MNENamedMatrix *vecs, int kind, const QStr
 
 void MNEProjOp::add_item(const MNENamedMatrix *vecs, int kind, const QString& desc)
 {
-    add_item_active(vecs, kind, desc, TRUE);
+    add_item_active(vecs, kind, desc, true);
 }
 
 //=============================================================================================================
@@ -250,7 +237,7 @@ int MNEProjOp::affect(const QStringList& list, int nlist)
 int MNEProjOp::affect_chs(const QList<FiffChInfo>& chs, int nch)
 {
     if (nch == 0)
-        return FALSE;
+        return false;
     QStringList list;
     list.reserve(nch);
     for (int k = 0; k < nch; k++)
@@ -421,7 +408,7 @@ MNEProjOp *MNEProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode
             item_active = *t_pTag->toInt();
         }
         else
-            item_active = FALSE;
+            item_active = false;
         /*
         * Ready to add
         */

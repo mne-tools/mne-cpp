@@ -63,21 +63,8 @@ using namespace MNELIB;
 
 //============================= local macros =================================
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
+constexpr int FAIL = -1;
+constexpr int OK   =  0;
 
 constexpr int  SHOW_CURVATURE_NONE    = 0;
 constexpr int  SHOW_CURVATURE_OVERLAY = 1;
@@ -301,7 +288,7 @@ int MNEMshDisplaySurface::discard_outlier_digitizer_points(FIFFLIB::FiffDigitize
     int k;
 
     d.dist_valid = false;
-    calculate_digitizer_distances(d,TRUE,TRUE);
+    calculate_digitizer_distances(d,true,true);
     for (k = 0; k < d.npoint; k++) {
         d.discard[k] = 0;
         /*
@@ -358,7 +345,7 @@ void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerD
             if (do_approx) {
                 closest[nactive] = dig.closest(k);
                 if (closest[nactive] < 0)
-                    do_approx = FALSE;
+                    do_approx = false;
             }
             else
                 closest[nactive] = -1;
@@ -430,7 +417,7 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
     /*
      * Calculate initial distances
      */
-    calculate_digitizer_distances(dig,FALSE,TRUE);
+    calculate_digitizer_distances(dig,false,true);
 
     for (k = 0, nactive = 0; k < dig.npoint; k++) {
         if (dig.active[k] && !dig.discard[k]) {
@@ -474,7 +461,7 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
      * Calculate final distances
      */
     dig.dist_valid = false;
-    calculate_digitizer_distances(dig,FALSE,!last_step);
+    calculate_digitizer_distances(dig,false,!last_step);
     res = OK;
 
 out : {
@@ -489,7 +476,7 @@ float MNEMshDisplaySurface::rms_digitizer_distance(FIFFLIB::FiffDigitizerData& d
     float rms;
     int   k,nactive;
 
-    calculate_digitizer_distances(dig,FALSE,TRUE);
+    calculate_digitizer_distances(dig,false,true);
 
     for (k = 0, rms = 0.0, nactive = 0; k < dig.npoint; k++)
         if (dig.active[k] && !dig.discard[k]) {

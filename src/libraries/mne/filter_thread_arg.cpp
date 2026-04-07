@@ -42,13 +42,8 @@
 
 #include <fiff/fiff_coord_trans.h>
 
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
+constexpr int FAIL = -1;
+constexpr int OK   =  0;
 
 //=============================================================================================================
 // USED NAMESPACES

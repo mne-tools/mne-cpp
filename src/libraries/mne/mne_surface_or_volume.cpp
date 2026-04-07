@@ -90,21 +90,8 @@ using namespace MNELIB;
 
 //============================= dot.h =============================
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
+constexpr int FAIL = -1;
+constexpr int OK   =  0;
 
 #define X_17 0
 #define Y_17 1
@@ -570,9 +557,9 @@ int MNESurfaceOrVolume::add_geometry_info(int do_normals, int check_too_many_nei
             for (c = 0; c < 3; c++) {
                 vert = tris[neighbor_tri[k][p]].vert[c];
                 if (vert != k) {
-                    for (q = 0, found = FALSE; q < nneighbors; q++) {
+                    for (q = 0, found = false; q < nneighbors; q++) {
                         if (neighbors[q] == vert) {
-                            found = TRUE;
+                            found = true;
                             break;
                         }
                     }
@@ -630,7 +617,7 @@ int MNESurfaceOrVolume::add_geometry_info(int do_normals, int check_too_many_nei
 
 int MNESurfaceOrVolume::add_geometry_info(int do_normals)
 {
-    return add_geometry_info(do_normals,TRUE);
+    return add_geometry_info(do_normals,true);
 }
 
 //=============================================================================================================
@@ -638,7 +625,7 @@ int MNESurfaceOrVolume::add_geometry_info(int do_normals)
 int MNESurfaceOrVolume::add_geometry_info2(int do_normals)
 
 {
-    return add_geometry_info(do_normals,FALSE);
+    return add_geometry_info(do_normals,false);
 }
 
 //=============================================================================================================

@@ -56,21 +56,8 @@ using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
+constexpr int FAIL = -1;
+constexpr int OK   =  0;
 
 #if defined(_WIN32) || defined(_WIN64)
 #define snprintf _snprintf
@@ -281,7 +268,7 @@ std::unique_ptr<FilterData> mne_create_filter_response(const MNEFilterDef&   fil
     resp_size = (filter.size + 2*filter.taper_size)/2 + 1;
 
     auto filter_data = std::make_unique<FilterData>(resp_size);
-     *highpass_effective = FALSE;
+     *highpass_effective = false;
 
     for (f = 0; f < 2; f++) {
         highpass       = f == 0 ? filter.highpass  : filter.eog_highpass;
@@ -327,7 +314,7 @@ std::unique_ptr<FilterData> mne_create_filter_response(const MNEFilterDef&   fil
                     freq_resp[s] = freq_resp[s]*c*c;
                 }
             }
-            *highpass_effective = TRUE;
+            *highpass_effective = true;
         }
         else
             *highpass_effective = *highpass_effective || (filter.highpass == 0.0);
@@ -389,11 +376,11 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
     if (npick == 0) {
         pickno_vec = Eigen::VectorXi::LinSpaced(nchan, 0, nchan - 1);
         pickno = pickno_vec.data();
-        do_all = TRUE;
+        do_all = true;
         npick = nchan;
     }
     else
-        do_all = FALSE;
+        do_all = false;
 
     Eigen::VectorXf mult(npick);
     for (c = 0; c < npick; c++)
@@ -673,8 +660,8 @@ void MNERawData::setup_filter_bufs()
         filt_bufs[k].lasts       = firstsamp + filt_bufs[k].ns - 1;
         //        bufs[k].ent         = NULL;
         filt_bufs[k].nchan       = this->info->nchan;
-        filt_bufs[k].is_skip     = FALSE;
-        filt_bufs[k].valid       = FALSE;
+        filt_bufs[k].is_skip     = false;
+        filt_bufs[k].valid       = false;
         filt_bufs[k].ch_filtered = Eigen::VectorXi::Zero(this->info->nchan);
         filt_bufs[k].comp_status = MNE_CTFV_NOGRAD;
     }
@@ -698,7 +685,7 @@ int MNERawData::load_one_buffer(MNERawBufDef *buf)
         return FAIL;
     }
     if (buf->vals.size() == 0) {	/* The data space may have been reused */
-        buf->valid = FALSE;
+        buf->valid = false;
         ring->allocate(buf->nchan,buf->ns,&buf->vals);
     }
     if (buf->valid)
@@ -715,10 +702,10 @@ int MNERawData::load_one_buffer(MNERawBufDef *buf)
                               buf->ns,
                               info->chInfo,
                               nullptr,0) != OK) {
-        buf->valid = FALSE;
+        buf->valid = false;
         return FAIL;
     }
-    buf->valid       = TRUE;
+    buf->valid       = true;
     buf->comp_status = comp_file;
     return OK;
 }
@@ -750,7 +737,7 @@ int MNERawData::compensate_buffer(MNERawBufDef *buf)
             /*
              * Undo the previous compensation
              */
-            if (comp->apply_transpose(FALSE, dataMat) != OK) {
+            if (comp->apply_transpose(false, dataMat) != OK) {
                 std::swap(comp->current, comp->undo);
                 goto bad;
             }
@@ -760,7 +747,7 @@ int MNERawData::compensate_buffer(MNERawBufDef *buf)
             /*
              * Apply new compensation
              */
-            if (comp->apply_transpose(TRUE, dataMat) != OK)
+            if (comp->apply_transpose(true, dataMat) != OK)
                 goto bad;
         }
         /*
@@ -810,9 +797,9 @@ int MNERawData::pick_data(mneChSelection sel, int firsts, int ns, float **picked
        * There is possibly nothing to do
        */
     if (sel) {
-        for (c = 0, need_some = FALSE; c < sel->nchan; c++) {
+        for (c = 0, need_some = false; c < sel->nchan; c++) {
             if (sel->pick[c] >= 0 || sel->pick_deriv[c] >= 0) {
-                need_some = TRUE;
+                need_some = true;
                 break;
             }
         }
@@ -991,7 +978,7 @@ int MNERawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
                 for (p = start; p < this_buf->ns && ns > 0; p++, ns--, s++) {
                     for (c = 0; c < info->nchan; c++)
                         pvalues[c] = (*values)(c,p);
-                    if (proj->project_vector(pvalues.data(),info->nchan,TRUE) != OK)
+                    if (proj->project_vector(pvalues.data(),info->nchan,true) != OK)
                         qWarning()<<"Error";
                     if (sel) {
                         if (sel->nderiv > 0 && deriv_matched) {
@@ -1061,7 +1048,7 @@ int MNERawData::load_one_filt_buf(MNERawBufDef *buf)
     int res;
 
     if (buf->vals.size() == 0) {
-        buf->valid = FALSE;
+        buf->valid = false;
         filt_ring->allocate(buf->nchan, buf->ns,&buf->vals);
     }
     if (buf->valid)
@@ -1070,7 +1057,7 @@ int MNERawData::load_one_filt_buf(MNERawBufDef *buf)
     std::vector<float*> vals_storage(buf->nchan);
     float **vals = vals_storage.data();
     for (k = 0; k < buf->nchan; k++) {
-        buf->ch_filtered[k] = FALSE;
+        buf->ch_filtered[k] = false;
         vals[k] = buf->vals.row(k).data() + filter->taper_size;
     }
 
@@ -1126,10 +1113,10 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
          * Is this correct??
          */
         if (comp && comp->current)
-            if (comp->apply(TRUE,dc) != OK)
+            if (comp->apply(true,dc) != OK)
                 goto bad;
         if (proj)
-            if (proj->project_vector(dc.data(),info->nchan,TRUE) != OK)
+            if (proj->project_vector(dc.data(),info->nchan,true) != OK)
                 goto bad;
     }
     filter_was = filter->filter_on;
@@ -1161,15 +1148,15 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
                  */
                         dc_offset = 0.0;
                         if (info->chInfo[sel->pick[c]].kind == FIFFV_STIM_CH)
-                            filter->filter_on = FALSE;
+                            filter->filter_on = false;
                         else if (dc.size() > 0)
                             dc_offset = dc[sel->pick[c]];
-                        if (mne_apply_filter(*filter,filter_data.get(),this_buf->vals.row(sel->pick[c]).data(),this_buf->ns,TRUE,
+                        if (mne_apply_filter(*filter,filter_data.get(),this_buf->vals.row(sel->pick[c]).data(),this_buf->ns,true,
                                              dc_offset,info->chInfo[sel->pick[c]].kind) != OK) {
                             filter->filter_on = filter_was;
                             goto bad;
                         }
-                        this_buf->ch_filtered[sel->pick[c]] = TRUE;
+                        this_buf->ch_filtered[sel->pick[c]] = true;
                         filter->filter_on = filter_was;
                     }
                 }
@@ -1187,15 +1174,15 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
                  */
                         dc_offset = 0.0;
                         if (info->chInfo[c].kind == FIFFV_STIM_CH)
-                            filter->filter_on = FALSE;
+                            filter->filter_on = false;
                         else if (dc.size() > 0)
                             dc_offset = dc[c];
-                        if (mne_apply_filter(*filter,filter_data.get(),this_buf->vals.row(c).data(),this_buf->ns,TRUE,
+                        if (mne_apply_filter(*filter,filter_data.get(),this_buf->vals.row(c).data(),this_buf->ns,true,
                                              dc_offset,info->chInfo[c].kind) != OK) {
                             filter->filter_on = filter_was;
                             goto bad;
                         }
-                        this_buf->ch_filtered[c] = TRUE;
+                        this_buf->ch_filtered[c] = true;
                         filter->filter_on = filter_was;
                     }
                 }
@@ -1212,15 +1199,15 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
                */
                     dc_offset = 0.0;
                     if (info->chInfo[c].kind == FIFFV_STIM_CH)
-                        filter->filter_on = FALSE;
+                        filter->filter_on = false;
                     else if (dc.size() > 0)
                         dc_offset = dc[c];
-                    if (mne_apply_filter(*filter,filter_data.get(),this_buf->vals.row(c).data(),this_buf->ns,TRUE,
+                    if (mne_apply_filter(*filter,filter_data.get(),this_buf->vals.row(c).data(),this_buf->ns,true,
                                          dc_offset,info->chInfo[c].kind) != OK) {
                         filter->filter_on = filter_was;
                         goto bad;
                     }
-                    this_buf->ch_filtered[c] = TRUE;
+                    this_buf->ch_filtered[c] = true;
                     filter->filter_on = filter_was;
                 }
             }
@@ -1477,7 +1464,7 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
             data->bufs[nbuf].ent         = dir0[k];
             data->bufs[nbuf].nchan       = data->info->nchan;
             data->bufs[nbuf].is_skip     = dir0[k]->kind == FIFF_DATA_SKIP;
-            data->bufs[nbuf].valid       = FALSE;
+            data->bufs[nbuf].valid       = false;
             data->bufs[nbuf].comp_status = data->comp_file;
             nbuf++;
         }
@@ -1521,7 +1508,7 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
             for (b = 0; b < data->nbad; b++) {
                 for (k = 0; k < data->info->nchan; k++) {
                     if (QString::compare(data->info->chInfo[k].ch_name,data->badlist[b],Qt::CaseInsensitive) == 0) {
-                        data->bad[k] = TRUE;
+                        data->bad[k] = 1;
                         break;
                     }
                 }

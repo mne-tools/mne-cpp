@@ -55,22 +55,8 @@
 
 #include <QFile>
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
-
+constexpr int FAIL = -1;
+constexpr int OK   =  0;
 
 
 //=============================================================================================================
@@ -508,7 +494,7 @@ std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
             calibrated = *t_pTag->toInt();
         }
         else
-            calibrated = FALSE;
+            calibrated = 0;
         /*
             * Add these data to the set
             */
@@ -518,7 +504,7 @@ std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
         one->mne_kind            = mne_unmap_ctf_comp_kind(one->kind);
         one->calibrated          = calibrated;
 
-        if (one->calibrate(set->chs,set->nch,TRUE) == FAIL) {
+        if (one->calibrate(set->chs,set->nch,true) == FAIL) {
             printf("Warning: Compensation data for '%s' omitted\n", explain_comp(one->kind).toUtf8().constData());
         }
         else {

@@ -47,21 +47,8 @@
 
 #include <Eigen/Core>
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
+constexpr int FAIL = -1;
+constexpr int OK   =  0;
 
 #define MNE_CTFV_COMP_UNKNOWN -1
 #define MNE_CTFV_COMP_NONE    0
@@ -86,7 +73,7 @@ using namespace MNELIB;
 MNECTFCompData::MNECTFCompData()
 :kind(MNE_CTFV_COMP_UNKNOWN)
 ,mne_kind(MNE_CTFV_COMP_UNKNOWN)
-,calibrated(FALSE)
+,calibrated(0)
 {
 }
 
@@ -95,7 +82,7 @@ MNECTFCompData::MNECTFCompData()
 MNECTFCompData::MNECTFCompData(const MNECTFCompData& comp)
 :kind(MNE_CTFV_COMP_UNKNOWN)
 ,mne_kind(MNE_CTFV_COMP_UNKNOWN)
-,calibrated(FALSE)
+,calibrated(0)
 {
     kind       = comp.kind;
     mne_kind   = comp.mne_kind;
@@ -128,11 +115,11 @@ int MNECTFCompData::calibrate(const QList<FIFFLIB::FiffChInfo>& chs, int nch, in
 
     for (j = 0; j < this->data->nrow; j++) {
         name = this->data->rowlist[j];
-        found = FALSE;
+        found = false;
         for (p = 0; p < nch; p++)
             if (QString::compare(name,chs[p].ch_name) == 0) {
                 row_cals[j] = chs[p].range*chs[p].cal;
-                found = TRUE;
+                found = true;
                 break;
             }
         if (!found) {
@@ -142,11 +129,11 @@ int MNECTFCompData::calibrate(const QList<FIFFLIB::FiffChInfo>& chs, int nch, in
     }
     for (k = 0; k < this->data->ncol; k++) {
         name = this->data->collist[k];
-        found = FALSE;
+        found = false;
         for (p = 0; p < nch; p++)
             if (QString::compare(name,chs[p].ch_name) == 0) {
                 col_cals[k] = chs[p].range*chs[p].cal;
-                found = TRUE;
+                found = true;
                 break;
             }
         if (!found) {

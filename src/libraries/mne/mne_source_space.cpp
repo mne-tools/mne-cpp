@@ -66,21 +66,8 @@ using FIFFLIB::FiffCoordTrans;
 #define Y_51 1
 #define Z_51 2
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
+constexpr int FAIL = -1;
+constexpr int OK   =  0;
 
 #define X_17 0
 #define Y_17 1
@@ -345,14 +332,14 @@ int read_tag_data(QFile &fp, int tag, long long nbytes, unsigned char *&val, lon
             MNEVolGeom* g = read_vol_geom(fp);
             if (!g)
                 return FAIL;
-            val     = (unsigned char *)g;
+            val     = reinterpret_cast<unsigned char *>(g);
             nbytesp = sizeof(MNEVolGeom);
         }
         else if (tag == TAG_OLD_USEREALRAS || tag == TAG_USEREALRAS) {
             int *vi = new int[1]();
             if (read_int(fp,*vi) == FAIL)
                 vi = 0;
-            val = (unsigned char *)vi;
+            val = reinterpret_cast<unsigned char *>(vi);
             nbytesp = sizeof(int);
         }
         else {
@@ -847,7 +834,7 @@ void MNESourceSpace::enable_all_sources()
 {
     int k;
     for (k = 0; k < np; k++)
-        inuse[k] = TRUE;
+        inuse[k] = 1;
     nuse = np;
     return;
 }
@@ -865,9 +852,9 @@ int MNESourceSpace::is_left_hemi() const
     for (k = 0, xave = 0.0; k < np; k++)
         xave += rr(k,0);
     if (xave < 0.0)
-        return TRUE;
+        return true;
     else
-        return FALSE;
+        return false;
 }
 
 //=============================================================================================================
@@ -946,7 +933,7 @@ int MNESourceSpace::add_patch_stats()
 
     printf("Computing patch statistics...\n");
     if (neighbor_tri.empty())
-        if (add_geometry_info(FALSE) != OK)
+        if (add_geometry_info(false) != OK)
             return FAIL;
 
     if (nearest.empty()) {
@@ -1089,7 +1076,7 @@ std::unique_ptr<MNESourceSpace> MNESourceSpace::create_source_space(int np)
 std::unique_ptr<MNESourceSpace> MNESourceSpace::load_surface(const QString& surf_file,
                                                              const QString& curv_file)
 {
-    return load_surface_geom(surf_file,curv_file,TRUE,TRUE);
+    return load_surface_geom(surf_file,curv_file,true,true);
 }
 
 //=============================================================================================================
@@ -1135,11 +1122,11 @@ std::unique_ptr<MNESourceSpace> MNESourceSpace::load_surface_geom(const QString&
     s->val = Eigen::VectorXf::Zero(s->np);
     if (add_geometry) {
         if (check_too_many_neighbors) {
-            if (s->add_geometry_info(TRUE) != OK)
+            if (s->add_geometry_info(true) != OK)
                 goto bad;
         }
         else {
-            if (s->add_geometry_info2(TRUE) != OK)
+            if (s->add_geometry_info2(true) != OK)
                 goto bad;
         }
     }
@@ -1275,7 +1262,7 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
     sp->nneighbor_vert = Eigen::VectorXi::Constant(sp->np, NNEIGHBORS);
     sp->neighbor_vert.resize(sp->np);
     for (k = 0; k < sp->np; k++) {
-        sp->inuse[k]  = TRUE;
+        sp->inuse[k]  = 1;
         sp->vertno[k] = k;
         sp->nn(k,X_17) = sp->nn(k,Y_17) = 0.0; /* Source orientation is immaterial */
         sp->nn(k,Z_17) = 1.0;
@@ -1378,7 +1365,7 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
         VEC_DIFF_17(cm,&sp->rr(k,0),diff);
         dist = VEC_LEN_17(diff);
         if (dist < exclude || dist > maxdist) {
-            sp->inuse[k] = FALSE;
+            sp->inuse[k] = 0;
             sp->nuse--;
         }
     }
@@ -1503,7 +1490,7 @@ int MNESourceSpace::filter_source_spaces(const MNESurface& surf, float limit, co
                 tot_angle = surf.sum_solids(Eigen::Map<const Eigen::Vector3f>(r1))/(4*M_PI);
                 if (std::fabs(tot_angle-1.0) > 1e-5) {
                     omit_outside++;
-                    s->inuse[p1] = FALSE;
+                    s->inuse[p1] = 0;
                     s->nuse--;
                     if (filtered)
                         *filtered << qSetFieldWidth(10) << qSetRealNumberPrecision(3) << Qt::fixed
@@ -1525,7 +1512,7 @@ int MNESourceSpace::filter_source_spaces(const MNESurface& surf, float limit, co
                     }
                     if (mindist < limit) {
                         omit++;
-                        s->inuse[p1] = FALSE;
+                        s->inuse[p1] = 0;
                         s->nuse--;
                         if (filtered)
                             *filtered << qSetFieldWidth(10) << qSetRealNumberPrecision(3) << Qt::fixed
@@ -1579,7 +1566,7 @@ void MNESourceSpace::filter_source_space(FilterThreadArg *arg)
             tot_angle = surf->sum_solids(Eigen::Map<const Eigen::Vector3f>(r1))/(4*M_PI);
             if (std::fabs(tot_angle-1.0) > 1e-5) {
                 omit_outside++;
-                a->s->inuse[p1] = FALSE;
+                a->s->inuse[p1] = 0;
                 a->s->nuse--;
                 if (a->filtered)
                     *a->filtered << qSetFieldWidth(10) << qSetRealNumberPrecision(3) << Qt::fixed
@@ -1601,7 +1588,7 @@ void MNESourceSpace::filter_source_space(FilterThreadArg *arg)
                 }
                 if (mindist < a->limit) {
                     omit++;
-                    a->s->inuse[p1] = FALSE;
+                    a->s->inuse[p1] = 0;
                     a->s->nuse--;
                     if (a->filtered)
                         *a->filtered << qSetFieldWidth(10) << qSetRealNumberPrecision(3) << Qt::fixed
@@ -1638,7 +1625,7 @@ int MNESourceSpace::filter_source_spaces(float limit, const QString& bemfile, co
         return OK;
 
     {
-        MNESurface* rawSurf = MNESurface::read_bem_surface(bemfile,FIFFV_BEM_SURF_ID_BRAIN,FALSE,nullptr);
+        MNESurface* rawSurf = MNESurface::read_bem_surface(bemfile,FIFFV_BEM_SURF_ID_BRAIN,false,nullptr);
         if (!rawSurf) {
             qCritical("BEM model does not have the inner skull triangulation!");
             return FAIL;
