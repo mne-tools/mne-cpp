@@ -33,11 +33,9 @@ comment:
   behavior: default
   require_changes: no
 
-# Track coverage for MNE-CPP libraries, applications, and tools.
-# gcov instrumentation is enabled by WITH_CODE_COV in each subdirectory's
-# CMakeLists.txt; this paths directive tells Codecov which source files to
-# include in the coverage report.
-paths:
-  - "src/libraries/**"
-  - "src/applications/**"
-  - "src/tools/**"
+# Coverage is filtered to src/libraries, src/applications, src/tools by
+# fastcov before upload.  Files outside those directories are excluded from
+# the coverage_filtered.info report uploaded by the CI workflow.
+ignore:
+  - "src/testframes/**"
+  - "src/external/**"

@@ -173,22 +173,14 @@ jobs:
       run: |
         ./scripts/test_all.bat Release verbose
 
-    # ── Coverage: Codecov upload ──────────────────────────────────────────
-    - name: Upload coverage to Codecov
-      if: matrix.os == 'ubuntu-24.04' && inputs.upload_codecov
-      uses: codecov/codecov-action@v5
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        fail_ci_if_error: true
-
-    # ── Coverage: generate libraries-only report for threshold checks ─────
+    # ── Coverage: generate filtered report (fastcov) ─────────────────────
     - name: Install fastcov
-      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && inputs.coverage_threshold > 0
+      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage
       run: pip install fastcov
 
     - name: Generate coverage report (fastcov)
       id: lcov
-      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && inputs.coverage_threshold > 0
+      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage
       run: |
         echo "=== Coverage diagnostics ==="
         echo "gcno files: $(find build -name '*.gcno' 2>/dev/null | wc -l)"
@@ -209,6 +201,16 @@ jobs:
         fi
         echo "Total line coverage: ${COVERAGE}%"
         echo "coverage=${COVERAGE}" >> "$GITHUB_OUTPUT"
+
+    # ── Coverage: Codecov upload ──────────────────────────────────────────
+    - name: Upload coverage to Codecov
+      if: matrix.os == 'ubuntu-24.04' && inputs.upload_codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: coverage_filtered.info
+        disable_search: true
+        fail_ci_if_error: true
 
     # ── Coverage: threshold & regression check ─────────────────────────────
     - name: Restore previous coverage baseline
