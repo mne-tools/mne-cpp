@@ -65,6 +65,7 @@ class TestInvDipoleRapMne : public QObject
 private:
     QString m_sTestDataPath;
     QString m_sMneSamplePath;
+    bool m_bMneSampleAvailable = false;
 
     MNEForwardSolution m_fwd;
     FiffCov m_noiseCov;
@@ -168,10 +169,18 @@ void TestInvDipoleRapMne::initTestCase()
              qPrintable(QString("Test data not found: %1").arg(rawPath())));
 
     m_sMneSamplePath = QDir::homePath() + "/mne_data/MNE-sample-data";
-    QVERIFY2(QFile::exists(m_sMneSamplePath + "/MEG/sample/sample_audvis_raw.fif"),
-             qPrintable(QString("MNE sample data not found at %1").arg(m_sMneSamplePath)));
+    QString invPath = m_sMneSamplePath + "/MEG/sample/sample_audvis-meg-oct-6-meg-inv.fif";
+    if (QFile::exists(invPath)) {
+        m_bMneSampleAvailable = true;
+        QFile invFile(invPath);
+        m_invOp = MNEInverseOperator(invFile);
+        QVERIFY2(m_invOp.nsource > 0, "Failed to load inverse operator");
+    } else {
+        qDebug() << "MNE sample data not found at" << m_sMneSamplePath
+                 << "— inverse operator tests will be skipped";
+    }
 
-    // Load forward solution
+    // Load forward solution from submodule test data
     QVERIFY2(QFile::exists(fwdPath()),
              qPrintable(QString("Forward solution not found: %1").arg(fwdPath())));
     QFile fwdFile(fwdPath());
@@ -190,14 +199,6 @@ void TestInvDipoleRapMne::initTestCase()
     FiffRawData raw(rawFile);
     m_info = raw.info;
     QVERIFY2(m_info.nchan > 0, "Failed to load measurement info");
-
-    // Load inverse operator from MNE sample data
-    QString invPath = m_sMneSamplePath + "/MEG/sample/sample_audvis-meg-oct-6-meg-inv.fif";
-    QVERIFY2(QFile::exists(invPath),
-             qPrintable(QString("Inverse operator not found: %1").arg(invPath)));
-    QFile invFile(invPath);
-    m_invOp = MNEInverseOperator(invFile);
-    QVERIFY2(m_invOp.nsource > 0, "Failed to load inverse operator");
 }
 
 void TestInvDipoleRapMne::cleanupTestCase() {}
@@ -788,6 +789,9 @@ void TestInvDipoleRapMne::pwlRapMusic_powellIdxVec()
 
 void TestInvDipoleRapMne::minimumNorm_methodSetting()
 {
+    if (!m_bMneSampleAvailable)
+        QFAIL("MNE sample data not available");
+
     InvMinimumNorm mn(m_invOp, 1.0f / 9.0f, QString("MNE"));
     QCOMPARE(QString(mn.getName()), QString("Minimum Norm Estimate"));
 
@@ -801,6 +805,9 @@ void TestInvDipoleRapMne::minimumNorm_methodSetting()
 
 void TestInvDipoleRapMne::minimumNorm_calculateInverse()
 {
+    if (!m_bMneSampleAvailable)
+        QFAIL("MNE sample data not available");
+
     // Read evoked data
     QString avePath = m_sMneSamplePath + "/MEG/sample/sample_audvis-ave.fif";
     QVERIFY2(QFile::exists(avePath),
@@ -823,6 +830,9 @@ void TestInvDipoleRapMne::minimumNorm_calculateInverse()
 
 void TestInvDipoleRapMne::minimumNorm_dSPM()
 {
+    if (!m_bMneSampleAvailable)
+        QFAIL("MNE sample data not available");
+
     QString avePath = m_sMneSamplePath + "/MEG/sample/sample_audvis-ave.fif";
     QVERIFY2(QFile::exists(avePath),
              qPrintable(QString("Evoked data not found: %1").arg(avePath)));
@@ -841,6 +851,9 @@ void TestInvDipoleRapMne::minimumNorm_dSPM()
 
 void TestInvDipoleRapMne::minimumNorm_sLORETA()
 {
+    if (!m_bMneSampleAvailable)
+        QFAIL("MNE sample data not available");
+
     QString avePath = m_sMneSamplePath + "/MEG/sample/sample_audvis-ave.fif";
     QVERIFY2(QFile::exists(avePath),
              qPrintable(QString("Evoked data not found: %1").arg(avePath)));

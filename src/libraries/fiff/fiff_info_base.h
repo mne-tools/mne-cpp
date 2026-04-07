@@ -268,8 +268,7 @@ inline bool FiffInfoBase::isEmpty() const
 
 inline bool operator== (const FiffInfoBase &a, const FiffInfoBase &b)
 {
-    return (a.filename == b.filename &&
-            a.bads == b.bads &&
+    return (a.bads == b.bads &&
             //a.meas_id == b.meas_id &&
             a.nchan == b.nchan &&
             a.chs == b.chs &&

@@ -92,6 +92,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
     MNESurf2BemSettings settings(&argc, argv);
+    if (settings.shouldExit())
+        return settings.exitCode();
+
     Surf2Bem surf2bem(settings);
 
     return surf2bem.run();

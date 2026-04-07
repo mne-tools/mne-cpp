@@ -108,17 +108,17 @@ MNESurf2BemSettings::MNESurf2BemSettings(int *argc, char **argv)
             printf("  --version         Print version info.\n\n");
             printf("Note: --id, --swap, --meters, --shift, --ico, --sigma apply to the\n");
             printf("most recently specified --surf or --tri.\n\n");
-            exit(0);
+            m_bShouldExit = true; m_iExitCode = 0; return;
         }
         else if (arg == "--version") {
             printf("mne_surf2bem version 2.0 (mne-cpp port)\n");
             printf("Based on MNE C version 1.8 by Matti Hamalainen\n");
-            exit(0);
+            m_bShouldExit = true; m_iExitCode = 0; return;
         }
         else if (arg == "--surf" || arg == "--tri") {
             if (i + 1 >= args.size()) {
                 qCritical() << arg << ": argument required.";
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             SurfaceInput si;
             si.fileName = args[++i];
@@ -128,106 +128,106 @@ MNESurf2BemSettings::MNESurf2BemSettings(int *argc, char **argv)
         else if (arg == "--fif") {
             if (i + 1 >= args.size()) {
                 qCritical() << "--fif: argument required.";
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             m_sOutputFile = args[++i];
         }
         else if (arg == "--id") {
             if (i + 1 >= args.size()) {
                 qCritical() << "--id: argument required.";
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             bool ok;
             int val = args[++i].toInt(&ok);
             if (!ok) {
                 qCritical() << "Illegal number:" << args[i];
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             if (m_surfaces.isEmpty()) {
                 qCritical() << "Specify surface before its id.";
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             m_surfaces.last().id = val;
         }
         else if (arg == "--swap") {
             if (m_surfaces.isEmpty()) {
                 qCritical() << "Specify surface before --swap.";
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             m_surfaces.last().swap = true;
         }
         else if (arg == "--meters") {
             if (m_surfaces.isEmpty()) {
                 qCritical() << "Specify surface before --meters.";
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             m_surfaces.last().mm = false;
         }
         else if (arg == "--coordf") {
             if (i + 1 >= args.size()) {
                 qCritical() << "--coordf: argument required.";
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             bool ok;
             int val = args[++i].toInt(&ok);
             if (!ok) {
                 qCritical() << "Illegal number:" << args[i];
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             m_iCoordFrame = val;
         }
         else if (arg == "--ico") {
             if (i + 1 >= args.size()) {
                 qCritical() << "--ico: argument required.";
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             bool ok;
             int val = args[++i].toInt(&ok);
             if (!ok) {
                 qCritical() << "Illegal number:" << args[i];
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             if (m_surfaces.isEmpty()) {
                 qCritical() << "Specify surface before --ico.";
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             if (val < 0 || val > 6) {
                 qCritical() << "--ico value should be between 0 and 6.";
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             m_surfaces.last().ico = val;
         }
         else if (arg == "--sigma") {
             if (i + 1 >= args.size()) {
                 qCritical() << "--sigma: argument required.";
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             bool ok;
             float val = args[++i].toFloat(&ok);
             if (!ok) {
                 qCritical() << "Illegal number:" << args[i];
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             if (m_surfaces.isEmpty()) {
                 qCritical() << "Specify surface before its conductivity.";
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             m_surfaces.last().sigma = val;
         }
         else if (arg == "--shift") {
             if (i + 1 >= args.size()) {
                 qCritical() << "--shift: argument required.";
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             bool ok;
             float val = args[++i].toFloat(&ok);
             if (!ok) {
                 qCritical() << "Incomprehensible value:" << args[i];
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             if (m_surfaces.isEmpty()) {
                 qCritical() << "Specify the surface before the vertex shift.";
-                exit(1);
+                m_bShouldExit = true; m_iExitCode = 1; return;
             }
             // Convert mm to meters (matching original C code)
             m_surfaces.last().shift = val / 1000.0f;
@@ -244,7 +244,7 @@ MNESurf2BemSettings::MNESurf2BemSettings(int *argc, char **argv)
         }
         else {
             qCritical() << "Unrecognized argument:" << arg;
-            exit(1);
+            m_bShouldExit = true; m_iExitCode = 1; return;
         }
     }
 }
@@ -289,4 +289,18 @@ bool MNESurf2BemSettings::checkMore() const
 bool MNESurf2BemSettings::force() const
 {
     return m_bForce;
+}
+
+//=============================================================================================================
+
+bool MNESurf2BemSettings::shouldExit() const
+{
+    return m_bShouldExit;
+}
+
+//=============================================================================================================
+
+int MNESurf2BemSettings::exitCode() const
+{
+    return m_iExitCode;
 }

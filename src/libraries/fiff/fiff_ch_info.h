@@ -177,7 +177,6 @@ inline bool operator== (const FiffChInfo &a, const FiffChInfo &b)
     return (a.scanNo == b.scanNo &&
             a.logNo == b.logNo &&
             a.kind == b.kind &&
-            a.range == b.range &&
             a.cal == b.cal &&
             a.chpos == b.chpos &&
             a.unit == b.unit &&

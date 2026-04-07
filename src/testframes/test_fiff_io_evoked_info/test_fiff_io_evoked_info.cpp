@@ -43,7 +43,6 @@ class TestFiffIoEvokedInfo : public QObject
 
 private:
     QString m_sTestDataPath;
-    QString m_sMneSamplePath;
 
     QString rawPath() const { return m_sTestDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif"; }
     QString avePath() const { return m_sTestDataPath + "/MEG/sample/sample_audvis-ave.fif"; }
@@ -105,10 +104,6 @@ void TestFiffIoEvokedInfo::initTestCase()
                       + "/../resources/data/mne-cpp-test-data";
     QVERIFY2(QFile::exists(rawPath()),
              qPrintable(QString("Test data not found: %1").arg(rawPath())));
-
-    m_sMneSamplePath = QDir::homePath() + "/mne_data/MNE-sample-data";
-    QVERIFY2(QFile::exists(m_sMneSamplePath + "/MEG/sample/sample_audvis_raw.fif"),
-             qPrintable(QString("MNE sample data not found at %1").arg(m_sMneSamplePath)));
 }
 
 void TestFiffIoEvokedInfo::cleanupTestCase() {}

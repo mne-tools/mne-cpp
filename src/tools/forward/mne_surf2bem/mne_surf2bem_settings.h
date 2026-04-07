@@ -157,6 +157,22 @@ public:
      */
     bool force() const;
 
+    //=========================================================================================================
+    /**
+     * Returns whether the process should exit immediately (e.g., --help or --version).
+     *
+     * @return True if the constructor encountered --help, --version, or an error.
+     */
+    bool shouldExit() const;
+
+    //=========================================================================================================
+    /**
+     * Returns the exit code to use when shouldExit() is true.
+     *
+     * @return 0 for --help/--version, 1 for errors.
+     */
+    int exitCode() const;
+
 private:
     QVector<SurfaceInput> m_surfaces;   /**< Input surface specifications. */
     QString     m_sOutputFile;          /**< Output FIF file path. */
@@ -164,6 +180,8 @@ private:
     bool        m_bCheck;               /**< Perform topology checks. */
     bool        m_bCheckMore;           /**< Perform thickness checks. */
     bool        m_bForce;               /**< Force-load despite defects. */
+    bool        m_bShouldExit = false;  /**< True when the app should exit immediately. */
+    int         m_iExitCode = 0;        /**< Exit code when m_bShouldExit is true. */
 };
 
 } // namespace MNESURF2BEM

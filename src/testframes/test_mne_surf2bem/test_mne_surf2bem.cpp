@@ -97,6 +97,7 @@ private:
     QString findApplication();
     QString findSubjectsDir();
     QString findSurfaceFile(const QString& name);
+    void setupProcess(QProcess& proc);
 
     QString m_sAppPath;         /**< Path to the mne_surf2bem executable. */
     bool m_bAppAvailable;       /**< Whether the app is found. */
@@ -121,15 +122,15 @@ QString TestMneSurf2Bem::findApplication()
 
     QStringList candidates;
 #ifdef Q_OS_WIN
-    candidates << appDir + "/../apps/mne_surf2bem.exe"
-               << appDir + "/mne_surf2bem.exe";
+    candidates << appDir + "/mne_surf2bem.exe"
+               << appDir + "/../apps/mne_surf2bem.exe";
 #elif defined(Q_OS_MAC)
-    candidates << appDir + "/../apps/mne_surf2bem"
-               << appDir + "/mne_surf2bem"
+    candidates << appDir + "/mne_surf2bem"
+               << appDir + "/../apps/mne_surf2bem"
                << appDir + "/../bin/mne_surf2bem";
 #else
-    candidates << appDir + "/../apps/mne_surf2bem"
-               << appDir + "/mne_surf2bem"
+    candidates << appDir + "/mne_surf2bem"
+               << appDir + "/../apps/mne_surf2bem"
                << appDir + "/../bin/mne_surf2bem";
 #endif
 
@@ -190,6 +191,22 @@ QString TestMneSurf2Bem::findSurfaceFile(const QString& name)
 
 //=============================================================================================================
 
+void TestMneSurf2Bem::setupProcess(QProcess& proc)
+{
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    // Ensure the child process can find Qt and mne-cpp DLLs.
+    // Use QDir::cleanPath to produce absolute paths — the Windows DLL loader
+    // does not resolve ".." in PATH entries.
+    QString appDir = QFileInfo(m_sAppPath).absolutePath();
+    QString qtBinDir = QDir::cleanPath(
+        QCoreApplication::applicationDirPath() + "/../../../src/external/qt/dynamic/bin");
+    QString path = appDir + ";" + qtBinDir + ";" + env.value("PATH");
+    env.insert("PATH", path);
+    proc.setProcessEnvironment(env);
+}
+
+//=============================================================================================================
+
 void TestMneSurf2Bem::initTestCase()
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
@@ -218,10 +235,11 @@ void TestMneSurf2Bem::initTestCase()
 void TestMneSurf2Bem::testHelp()
 {
     if (!m_bAppAvailable) {
-        QSKIP("mne_surf2bem executable not found");
+        QFAIL("mne_surf2bem executable not found");
     }
 
     QProcess proc;
+    setupProcess(proc);
     proc.start(m_sAppPath, QStringList() << "--help");
     QVERIFY2(proc.waitForFinished(10000), "Process did not finish in time");
 
@@ -247,10 +265,11 @@ void TestMneSurf2Bem::testHelp()
 void TestMneSurf2Bem::testVersion()
 {
     if (!m_bAppAvailable) {
-        QSKIP("mne_surf2bem executable not found");
+        QFAIL("mne_surf2bem executable not found");
     }
 
     QProcess proc;
+    setupProcess(proc);
     proc.start(m_sAppPath, QStringList() << "--version");
     QVERIFY2(proc.waitForFinished(10000), "Process did not finish in time");
 
@@ -266,10 +285,11 @@ void TestMneSurf2Bem::testVersion()
 void TestMneSurf2Bem::testNoArgs()
 {
     if (!m_bAppAvailable) {
-        QSKIP("mne_surf2bem executable not found");
+        QFAIL("mne_surf2bem executable not found");
     }
 
     QProcess proc;
+    setupProcess(proc);
     proc.start(m_sAppPath, QStringList());
     QVERIFY2(proc.waitForFinished(10000), "Process did not finish in time");
 
@@ -286,11 +306,12 @@ void TestMneSurf2Bem::testNoArgs()
 void TestMneSurf2Bem::testMissingInputFile()
 {
     if (!m_bAppAvailable) {
-        QSKIP("mne_surf2bem executable not found");
+        QFAIL("mne_surf2bem executable not found");
     }
 
     // Try to convert a non-existent surface file
     QProcess proc;
+    setupProcess(proc);
     QStringList args;
     args << "--surf" << "/tmp/nonexistent_surface_file_xyz.surf"
          << "--fif" << m_tempDir.path() + "/missing_input.fif";
@@ -307,10 +328,10 @@ void TestMneSurf2Bem::testMissingInputFile()
 void TestMneSurf2Bem::testSingleSurfConversion()
 {
     if (!m_bAppAvailable) {
-        QSKIP("mne_surf2bem executable not found");
+        QFAIL("mne_surf2bem executable not found");
     }
     if (!m_bDataAvailable) {
-        QSKIP("Sample data not available");
+        QFAIL("Sample data not available");
     }
 
     //
@@ -318,12 +339,13 @@ void TestMneSurf2Bem::testSingleSurfConversion()
     //
     QString inputSurf = findSurfaceFile("inner_skull.surf");
     if (inputSurf.isEmpty()) {
-        QSKIP("inner_skull.surf not found in sample data");
+        QFAIL("inner_skull.surf not found in sample data");
     }
 
     QString outputFif = m_tempDir.path() + "/single_surf_test.fif";
 
     QProcess proc;
+    setupProcess(proc);
     QStringList args;
     args << "--surf" << inputSurf
          << "--id" << "1"
@@ -373,10 +395,10 @@ void TestMneSurf2Bem::testSingleSurfConversion()
 void TestMneSurf2Bem::testMultiSurfConversion()
 {
     if (!m_bAppAvailable) {
-        QSKIP("mne_surf2bem executable not found");
+        QFAIL("mne_surf2bem executable not found");
     }
     if (!m_bDataAvailable) {
-        QSKIP("Sample data not available");
+        QFAIL("Sample data not available");
     }
 
     //
@@ -387,12 +409,13 @@ void TestMneSurf2Bem::testMultiSurfConversion()
     QString outerSkin  = findSurfaceFile("outer_skin.surf");
 
     if (innerSkull.isEmpty() || outerSkull.isEmpty() || outerSkin.isEmpty()) {
-        QSKIP("Not all three BEM surfaces found in sample data");
+        QFAIL("Not all three BEM surfaces found in sample data");
     }
 
     QString outputFif = m_tempDir.path() + "/multi_surf_test.fif";
 
     QProcess proc;
+    setupProcess(proc);
     QStringList args;
     args << "--surf" << innerSkull << "--id" << "1"
          << "--surf" << outerSkull << "--id" << "3"
@@ -443,10 +466,10 @@ void TestMneSurf2Bem::testMultiSurfConversion()
 void TestMneSurf2Bem::testSurfConversionWithCheck()
 {
     if (!m_bAppAvailable) {
-        QSKIP("mne_surf2bem executable not found");
+        QFAIL("mne_surf2bem executable not found");
     }
     if (!m_bDataAvailable) {
-        QSKIP("Sample data not available");
+        QFAIL("Sample data not available");
     }
 
     //
@@ -457,12 +480,13 @@ void TestMneSurf2Bem::testSurfConversionWithCheck()
     QString outerSkin  = findSurfaceFile("outer_skin.surf");
 
     if (innerSkull.isEmpty() || outerSkull.isEmpty() || outerSkin.isEmpty()) {
-        QSKIP("Not all three BEM surfaces found in sample data");
+        QFAIL("Not all three BEM surfaces found in sample data");
     }
 
     QString outputFif = m_tempDir.path() + "/checked_surf_test.fif";
 
     QProcess proc;
+    setupProcess(proc);
     QStringList args;
     args << "--surf" << innerSkull << "--id" << "1"
          << "--surf" << outerSkull << "--id" << "3"
@@ -501,15 +525,15 @@ void TestMneSurf2Bem::testSurfConversionWithCheck()
 void TestMneSurf2Bem::testOverwriteOutput()
 {
     if (!m_bAppAvailable) {
-        QSKIP("mne_surf2bem executable not found");
+        QFAIL("mne_surf2bem executable not found");
     }
     if (!m_bDataAvailable) {
-        QSKIP("Sample data not available");
+        QFAIL("Sample data not available");
     }
 
     QString inputSurf = findSurfaceFile("inner_skull.surf");
     if (inputSurf.isEmpty()) {
-        QSKIP("inner_skull.surf not found in sample data");
+        QFAIL("inner_skull.surf not found in sample data");
     }
 
     QString outputFif = m_tempDir.path() + "/overwrite_test.fif";
@@ -517,6 +541,7 @@ void TestMneSurf2Bem::testOverwriteOutput()
     // First run — create the file
     {
         QProcess proc;
+        setupProcess(proc);
         QStringList args;
         args << "--surf" << inputSurf << "--id" << "1"
              << "--fif" << outputFif;
@@ -530,6 +555,7 @@ void TestMneSurf2Bem::testOverwriteOutput()
     // Second run — overwrite the file
     {
         QProcess proc;
+        setupProcess(proc);
         QStringList args;
         args << "--surf" << inputSurf << "--id" << "1"
              << "--fif" << outputFif;
