@@ -190,9 +190,9 @@ bool MNEHemisphere::complete_source_space_info()
     Vector3d a, b;
     int k = 0;
     float size = 0;
-    for (qint32 i = 0; i < ntri; ++i)
+    for (int i = 0; i < ntri; ++i)
     {
-        for ( qint32 j = 0; j < 3; ++j)
+        for ( int j = 0; j < 3; ++j)
         {
             k = itris(i, j);
 
@@ -233,9 +233,9 @@ bool MNEHemisphere::complete_source_space_info()
         use_tri_nn = MatrixX3d::Zero(nuse_tri,3);
         use_tri_area = VectorXd::Zero(nuse_tri);
 
-        for (qint32 i = 0; i < nuse_tri; ++i)
+        for (int i = 0; i < nuse_tri; ++i)
         {
-            for ( qint32 j = 0; j < 3; ++j)
+            for ( int j = 0; j < 3; ++j)
             {
                 k = use_itris(i, j);
 
@@ -297,12 +297,12 @@ bool MNEHemisphere::compute_patch_info()
 
     VectorXi nearest_sorted(t_vIndn.size());
 
-    qint32 current = 0;
-    std::vector<qint32> t_vfirsti;
+    int current = 0;
+    std::vector<int> t_vfirsti;
     t_vfirsti.push_back(current);
-    std::vector<qint32> t_vlasti;
+    std::vector<int> t_vlasti;
 
-    for(quint32 i = 0; i < t_vIndn.size(); ++i)
+    for(int i = 0; i < static_cast<int>(t_vIndn.size()); ++i)
     {
         nearest_sorted[i] = t_vIndn[i].second;
         if (t_vIndn[current].second != t_vIndn[i].second)
@@ -314,33 +314,28 @@ bool MNEHemisphere::compute_patch_info()
     }
     t_vlasti.push_back(static_cast<int>(t_vIndn.size()-1));
 
-    for(quint32 k = 0; k < t_vfirsti.size(); ++k)
+    for(int k = 0; k < static_cast<int>(t_vfirsti.size()); ++k)
     {
-        std::vector<int> t_vIndex;
+        Eigen::VectorXi t_vIndex(t_vlasti[k] - t_vfirsti[k] + 1);
 
         for(int l = t_vfirsti[k]; l <= t_vlasti[k]; ++l)
-            t_vIndex.push_back(t_vIndn[l].first);
+            t_vIndex[l - t_vfirsti[k]] = t_vIndn[l].first;
 
-        std::sort(t_vIndex.begin(),t_vIndex.end());
+        std::sort(t_vIndex.data(), t_vIndex.data() + t_vIndex.size());
 
-        int* t_pV = &t_vIndex[0];
-        Eigen::Map<Eigen::VectorXi> t_vPInfo(t_pV, t_vIndex.size());
-
-        pinfo.append(t_vPInfo);
+        pinfo.append(t_vIndex);
     }
 
     // compute patch indices of the in-use source space vertices
-    std::vector<qint32> patch_verts;
-    patch_verts.reserve(t_vlasti.size());
-    for(quint32 i = 0; i < t_vlasti.size(); ++i)
-        patch_verts.push_back(nearest_sorted[t_vlasti[i]]);
+    Eigen::VectorXi patch_verts(t_vlasti.size());
+    for(int i = 0; i < static_cast<int>(t_vlasti.size()); ++i)
+        patch_verts[i] = nearest_sorted[t_vlasti[i]];
 
     patch_inds.resize(vertno.size());
-    std::vector<qint32>::iterator it;
-    for(qint32 i = 0; i < vertno.size(); ++i)
+    for(int i = 0; i < vertno.size(); ++i)
     {
-        it = std::find(patch_verts.begin(), patch_verts.end(), vertno[i]);
-        patch_inds[i] = it-patch_verts.begin();
+        const int* ptr = std::find(patch_verts.data(), patch_verts.data() + patch_verts.size(), vertno[i]);
+        patch_inds[i] = static_cast<int>(ptr - patch_verts.data());
     }
 
     return true;
@@ -450,7 +445,7 @@ MatrixXf& MNEHemisphere::getTriCoords(float p_fScaling)
     if(m_TriCoords.size() == 0)
     {
         m_TriCoords = MatrixXf(3,3*itris.rows());
-        for(qint32 i = 0; i < itris.rows(); ++i)
+        for(int i = 0; i < itris.rows(); ++i)
         {
             m_TriCoords.col(i*3) = rr.row( itris(i,0) ).transpose().cast<float>();
             m_TriCoords.col(i*3+1) = rr.row( itris(i,1) ).transpose().cast<float>();

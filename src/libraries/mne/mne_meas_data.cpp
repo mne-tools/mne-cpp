@@ -202,7 +202,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
     /*
        * Selected channels
        */
-    std::vector<int> sel;
+    Eigen::VectorXi sel;
     int         stim14 = -1;
     /*
        * Other stuff
@@ -246,7 +246,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
        * Pick out the necessary channels
        */
     if (nchan > 0) {
-        sel.assign(nchan, -1);
+        sel = Eigen::VectorXi::Constant(nchan, -1);
         for (c = 0; c < nchan_file; c++) {
             for (k = 0; k < nchan; k++) {
                 if (sel[k] == -1 && QString::compare(chs[c].ch_name,names[k]) == 0) {
@@ -267,6 +267,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
     }
     else {  /* Load all channels */
         sel.resize(nchan_file);
+        sel.setZero();
         for (c = 0, nchan = 0; c < nchan_file; c++) {
             if (chs[c].kind == FIFFV_MEG_CH || chs[c].kind == FIFFV_EEG_CH) {
                 sel[nchan] = c;
@@ -359,7 +360,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
         {
             new_data->badlist = evoked.info.bads;
             new_data->nbad    = new_data->badlist.size();
-            new_data->bad.assign(new_data->nchan, FALSE);
+            new_data->bad = Eigen::VectorXi::Zero(new_data->nchan);
 
             for (int b = 0; b < new_data->nbad; b++) {
                 for (k = 0; k < new_data->nchan; k++) {

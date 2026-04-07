@@ -1724,11 +1724,6 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
     FiffTag::UPtr t_pTag;
     int             j,k,p,q;
     int             ntri;
-    int             *nearest = nullptr;
-    float           *nearest_dist = nullptr;
-    int             *nneighbors = nullptr;
-    int             *neighbors  = nullptr;
-    int             *vol_dims = nullptr;
 
     if(!stream->open())
         goto bad;
@@ -1772,7 +1767,7 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
             new_space->id = *t_pTag->toInt();
         }
         if (node->find_tag(stream, FIFF_SUBJ_HIS_ID, t_pTag)) {
-            new_space->subject = (char *)t_pTag->data();
+            new_space->subject = t_pTag->toString();
         }
         if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_TYPE, t_pTag)) {
             new_space->type = *t_pTag->toInt();
@@ -1822,12 +1817,13 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
                 goto bad;
             }
 
-            qDebug() << "ToDo: Check whether new_space->inuse contains the right stuff!!! - use VectorXi instead";
-            new_space->inuse = Eigen::VectorXi::Zero(new_space->np);
+            {
+                Eigen::Map<Eigen::VectorXi> inuseMap(t_pTag->toInt(), new_space->np);
+                new_space->inuse = inuseMap;
+            }
             if (new_space->nuse > 0) {
                 new_space->vertno = Eigen::VectorXi::Zero(new_space->nuse);
                 for (k = 0, p = 0; k < new_space->np; k++) {
-                    new_space->inuse[k] = t_pTag->toInt()[k]; //DEBUG
                     if (new_space->inuse[k])
                         new_space->vertno[p++] = k;
                 }
@@ -1857,24 +1853,21 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
                 * The patch information becomes relevant here
                 */
             if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEAREST, t_pTag)) {
-                nearest  = t_pTag->toInt();
+                Eigen::Map<Eigen::VectorXi> nearestMap(t_pTag->toInt(), new_space->np);
                 new_space->nearest.resize(new_space->np);
                 for (k = 0; k < new_space->np; k++) {
                     new_space->nearest[k].vert = k;
-                    new_space->nearest[k].nearest = nearest[k];
+                    new_space->nearest[k].nearest = nearestMap[k];
                     new_space->nearest[k].patch = nullptr;
                 }
 
                 if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEAREST_DIST, t_pTag)) {
                     goto bad;
                 }
-                qDebug() << "ToDo: Check whether nearest_dist contains the right stuff!!! - use VectorXf instead";
-                nearest_dist = t_pTag->toFloat();
+                Eigen::Map<Eigen::VectorXf> nearestDistMap(t_pTag->toFloat(), new_space->np);
                 for (k = 0; k < new_space->np; k++) {
-                    new_space->nearest[k].dist = nearest_dist[k];
+                    new_space->nearest[k].dist = nearestDistMap[k];
                 }
-                //                FREE_17(nearest); nearest = NULL;
-                //                FREE_17(nearest_dist); nearest_dist = NULL;
             }
             /*
             * We may have the distance matrix
@@ -1902,27 +1895,25 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
             */
         if (new_space->type == FIFFV_MNE_SPACE_VOLUME) {
             int ntot,nvert,ntot_count,nneigh;
-            int *neigh;
 
-            nneighbors = neighbors = nullptr;
+            Eigen::VectorXi neighborsVec;
+            Eigen::VectorXi nneighborsVec;
             ntot = nvert = 0;
             if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEIGHBORS, t_pTag)) {
-                qDebug() << "ToDo: Check whether neighbors contains the right stuff!!! - use VectorXi instead";
-                neighbors = t_pTag->toInt();
-                ntot      = t_pTag->size()/sizeof(fiff_int_t);
+                ntot = t_pTag->size()/sizeof(fiff_int_t);
+                neighborsVec = Eigen::Map<Eigen::VectorXi>(t_pTag->toInt(), ntot);
             }
             if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NNEIGHBORS, t_pTag)) {
-                qDebug() << "ToDo: Check whether nneighbors contains the right stuff!!! - use VectorXi instead";
-                nneighbors = t_pTag->toInt();
-                nvert      = t_pTag->size()/sizeof(fiff_int_t);
+                nvert = t_pTag->size()/sizeof(fiff_int_t);
+                nneighborsVec = Eigen::Map<Eigen::VectorXi>(t_pTag->toInt(), nvert);
             }
-            if (neighbors && nneighbors) {
+            if (neighborsVec.size() > 0 && nneighborsVec.size() > 0) {
                 if (nvert != new_space->np) {
                     printf("Inconsistent neighborhood data in file.");
                     goto bad;
                 }
                 for (k = 0, ntot_count = 0; k < nvert; k++)
-                    ntot_count += nneighbors[k];
+                    ntot_count += nneighborsVec[k];
                 if (ntot_count != ntot) {
                     printf("Inconsistent neighborhood data in file.");
                     goto bad;
@@ -1930,33 +1921,27 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
                 new_space->nneighbor_vert = Eigen::VectorXi::Zero(nvert);
                 new_space->neighbor_vert.resize(nvert);
                 for (k = 0, q = 0; k < nvert; k++) {
-                    new_space->nneighbor_vert[k] = nneigh = nneighbors[k];
+                    new_space->nneighbor_vert[k] = nneigh = nneighborsVec[k];
                     new_space->neighbor_vert[k] = Eigen::VectorXi(nneigh);
                     for (p = 0; p < nneigh; p++,q++)
-                        new_space->neighbor_vert[k][p] = neighbors[q];
+                        new_space->neighbor_vert[k][p] = neighborsVec[q];
                 }
             }
-            delete[] neighbors;
-            delete[] nneighbors;
-            nneighbors = neighbors = nullptr;
             /*
                 * There might be a coordinate transformation and dimensions
                 */
             new_space->voxel_surf_RAS_t   = FiffCoordTrans(FiffCoordTrans::readTransformFromNode(stream, node, FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS));
-            if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS, t_pTag)) {
-                qDebug() << "ToDo: Check whether vol_dims contains the right stuff!!! - use VectorXi instead";
-                vol_dims = t_pTag->toInt();
+            if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS, t_pTag)) {
+                Eigen::Map<Eigen::Vector3i> volDimsMap(t_pTag->toInt());
+                VEC_COPY_17(new_space->vol_dims, volDimsMap.data());
             }
-            if (vol_dims)
-                VEC_COPY_17(new_space->vol_dims,vol_dims);
             {
                 QList<FiffDirNode::SPtr>  mris = node->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
 
                 if (mris.size() == 0) { /* The old way */
                     new_space->MRI_surf_RAS_RAS_t = FiffCoordTrans(FiffCoordTrans::readTransformFromNode(stream, node, FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS));
                     if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_MRI_FILE, t_pTag)) {
-                        qDebug() << "ToDo: Check whether new_space->MRI_volume  contains the right stuff!!! - use QString instead";
-                        new_space->MRI_volume = (char *)t_pTag->data();
+                        new_space->MRI_volume = t_pTag->toString();
                     }
                     if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, t_pTag)) {
                         new_space->interpolator = std::move(*FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag));
@@ -1964,7 +1949,7 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
                 }
                 else {
                     if (node->find_tag(stream, FIFF_MNE_FILE_NAME, t_pTag)) {
-                        new_space->MRI_volume = (char *)t_pTag->data();
+                        new_space->MRI_volume = t_pTag->toString();
                     }
                     new_space->MRI_surf_RAS_RAS_t = FiffCoordTrans(FiffCoordTrans::readTransformFromNode(stream, mris[0], FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS));
                     new_space->MRI_voxel_surf_RAS_t   = FiffCoordTrans(FiffCoordTrans::readTransformFromNode(stream, mris[0], FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS));
@@ -1996,11 +1981,6 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
 bad : {
         stream->close();
         // new_space and local_spaces auto-cleanup via unique_ptr
-        delete[] nearest;
-        delete[] nearest_dist;
-        delete[] neighbors;
-        delete[] nneighbors;
-        delete[] vol_dims;
 
         return FIFF_FAIL;
     }

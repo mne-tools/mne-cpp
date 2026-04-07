@@ -131,7 +131,7 @@ std::unique_ptr<MNENamedMatrix> MNENamedMatrix::pick(const QStringList& pickrowl
     /*
      * Build row index mapping: for each picked row find its index in the original.
      */
-    std::vector<int> pick_row(picknrow);
+    Eigen::VectorXi pick_row = Eigen::VectorXi::Zero(picknrow);
     QStringList my_pickrowlist;
 
     if (!pickrowlist.isEmpty()) {
@@ -160,7 +160,7 @@ std::unique_ptr<MNENamedMatrix> MNENamedMatrix::pick(const QStringList& pickrowl
     /*
      * Build column index mapping analogously.
      */
-    std::vector<int> pick_col(pickncol);
+    Eigen::VectorXi pick_col = Eigen::VectorXi::Zero(pickncol);
     QStringList my_pickcollist;
 
     if (!pickcollist.isEmpty()) {

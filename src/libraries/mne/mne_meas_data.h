@@ -197,7 +197,7 @@ public:
     mneChSelection          chsel; /**< Channel selection for raw-data access. */
     QStringList             badlist;    /**< List of bad channel names. */
     int                     nbad;       /**< Number of bad channels. */
-    std::vector<int>         bad;       /**< Per-channel bad flag array (0 = good, 1 = bad). */
+    Eigen::VectorXi          bad;       /**< Per-channel bad flag array (0 = good, 1 = bad). */
 
     int                     ch_major;   /**< If non-zero, data rows are channels (not times). */
     QList<MNEMeasDataSet*>  sets;       /**< All loaded data-set epochs. */
