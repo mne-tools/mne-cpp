@@ -181,3 +181,7 @@ add_subdirectory(test_tool_inverse_computation)
 add_subdirectory(test_tool_forward_generation)
 add_subdirectory(test_tool_preproc_helpers)
 add_subdirectory(test_tool_info_helpers)
+
+# Library coverage enhancement tests (targeting 80-90%)
+add_subdirectory(test_fiff_coverage)
+add_subdirectory(test_mne_inv_coverage)

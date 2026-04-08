@@ -186,7 +186,7 @@ jobs:
         echo "gcno files: $(find build -name '*.gcno' 2>/dev/null | wc -l)"
         echo "gcda files: $(find build -name '*.gcda' 2>/dev/null | wc -l)"
 
-        LCOV_OPTS="--ignore-errors mismatch,inconsistent,gcov,negative"
+        LCOV_OPTS="--ignore-errors mismatch,inconsistent,gcov,negative,unused"
 
         # 1. Baseline: capture all instrumented lines as 0-hit (from .gcno)
         #    This ensures EVERY compiled source file appears in the report,
