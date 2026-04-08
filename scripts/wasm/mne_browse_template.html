@@ -138,15 +138,17 @@
             transition: color 0.3s;
         }
 
-        /* ── Qt canvas ───────────────────────────────────────── */
+        /* ── Qt screen container ────────────────────────── */
         #screen {
-            width: 100vw;
-            height: 100vh;
-            display: none;
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
         }
 
         #screen.visible {
-            display: block;
+            z-index: 200;
         }
 
         #qtspinner,
@@ -298,18 +300,15 @@
         </div>
     </div>
 
-    <!-- Qt application canvas -->
-    <canvas id="screen"></canvas>
-    <div id="qtspinner"></div>
-    <div id="qtstatus"></div>
-
-    <script src="qtloader.js"></script>
-    <script src="mne_browse.js"></script>
+    <!-- Qt application container (must be a div; Qt creates its own canvas inside) -->
+    <div id="screen"></div>
+    <div id="qtspinner" style="display:none"></div>
+    <div id="qtstatus" style="display:none"></div>
     <script>
         /* ================================================================
            Floating-polygon particle system — mouse-reactive parallax
            ================================================================ */
-        (function () {
+        try { (function () {
             var canvas = document.getElementById('particles-canvas');
             var ctx = canvas.getContext('2d');
             var W, H;
@@ -460,8 +459,9 @@
 
             /* expose stop for cleanup */
             window._stopParticles = function () { running = false; };
-        })();
-
+        })(); } catch(e) { console.warn('Particle system error:', e); }
+    </script>
+    <script>
         /* ================================================================
            Progress bar — simulated advance until Qt takes over
            ================================================================ */
@@ -531,6 +531,8 @@
             }
         }
     </script>
+    <script src="mne_browse.js"></script>
+    <script type="text/javascript" src="qtloader.js"></script>
 </body>
 
 </html>
