@@ -34,6 +34,7 @@ Run in the browser via WebAssembly — no install required.
 | | Application | Description | |
 |---|---|---|---|
 | <a href="https://mne-cpp.github.io/wasm/mne_browse.html"><img src="/src/applications/mne_browse/Resources/Images/ApplicationIcons/icon_browse_64x64.png" width="32" height="32" alt="MNE Browse"></a> | **MNE Browse** | Browse and inspect raw MEG/EEG data with real-time filtering, event detection, and averaging | [**Open**](https://mne-cpp.github.io/wasm/mne_browse.html) |
+| <a href="https://mne-cpp.github.io/wasm/mne_inspect.html"><img src="/src/applications/mne_inspect/resources/images/appIcons/icon_mne_inspect_64x64.png" width="32" height="32" alt="MNE Inspect"></a> | **MNE Inspect** | Interactive 3D visualization of brain surfaces, source estimates, and forward models | [**Open**](https://mne-cpp.github.io/wasm/mne_inspect.html) |
 
 Quick start
 -----------
@@ -82,6 +83,26 @@ Contact
 -------
 
 A list of contact persons can be found [here](https://mne-cpp.github.io/docs/overview#contact).
+
+Citation
+--------
+
+If you use MNE-CPP in your work, please cite:
+
+> Dinh, C., Esch, L., Mäki-Marttunen, V., Bott, F.-S., Lim, R., Yang, D., Drechsler, R., & Haueisen, J. (2021). **MNE-CPP: A cross-platform open-source C++ framework for real-time neurophysiology.** *Frontiers in Neuroscience*, 15, 663795. https://doi.org/10.3389/fnins.2021.663795
+
+```bibtex
+@article{dinh2021mnecpp,
+  title     = {MNE-CPP: A cross-platform open-source C++ framework for real-time neurophysiology},
+  author    = {Dinh, Christoph and Esch, Lorenz and M{\"a}ki-Marttunen, Vera and Bott, Faris-Sven and Lim, Robert and Yang, Daniel and Drechsler, Rolf and Haueisen, Jens},
+  journal   = {Frontiers in Neuroscience},
+  volume    = {15},
+  pages     = {663795},
+  year      = {2021},
+  publisher = {Frontiers},
+  doi       = {10.3389/fnins.2021.663795}
+}
+```
 
 License
 -------

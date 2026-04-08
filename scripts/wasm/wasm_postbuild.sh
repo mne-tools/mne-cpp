@@ -25,9 +25,12 @@ if [ ! -d "$OUTPUT_DIR" ]; then
     exit 1
 fi
 
-# --- 1. Copy coi-serviceworker.js -------------------------------------------
+# --- 1. Copy support scripts ------------------------------------------------
 echo "[wasm_postbuild] Copying coi-serviceworker.js → $OUTPUT_DIR/"
 cp "$SCRIPT_DIR/coi-serviceworker.js" "$OUTPUT_DIR/coi-serviceworker.js"
+
+echo "[wasm_postbuild] Copying wasm_pixelcheck.js → $OUTPUT_DIR/"
+cp "$SCRIPT_DIR/wasm_pixelcheck.js" "$OUTPUT_DIR/wasm_pixelcheck.js"
 
 # --- 2. Replace mne_browse.html with custom template -----------------------
 #
@@ -43,24 +46,42 @@ if [ -f "$OUTPUT_DIR/mne_browse.html" ] && [ -f "$TEMPLATE" ]; then
     cp "$TEMPLATE" "$OUTPUT_DIR/mne_browse.html"
 fi
 
-# --- 3. Inject service-worker <script> into every .html -------------------
+# --- 2b. Replace mne_inspect.html with custom template --------------------
+INSPECT_TEMPLATE="$SCRIPT_DIR/mne_inspect_template.html"
+
+if [ -f "$OUTPUT_DIR/mne_inspect.html" ] && [ -f "$INSPECT_TEMPLATE" ]; then
+    echo "[wasm_postbuild] Replacing mne_inspect.html with custom template"
+    cp "$INSPECT_TEMPLATE" "$OUTPUT_DIR/mne_inspect.html"
+fi
+
+# --- 3. Inject service-worker & pixel-check <script> into every .html ------
 SW_TAG='<script src="coi-serviceworker.js"></script>'
+PX_TAG='<script src="wasm_pixelcheck.js"></script>'
 
 for html in "$OUTPUT_DIR"/*.html; do
     [ -f "$html" ] || continue
 
     if grep -q 'coi-serviceworker' "$html"; then
         echo "[wasm_postbuild] Already patched: $(basename "$html")"
-        continue
+    else
+        if [[ "$(uname)" == "Darwin" ]]; then
+            sed -i '' "s|<head>|<head>\\
+    ${SW_TAG}|" "$html"
+        else
+            sed -i "s|<head>|<head>\n    ${SW_TAG}|" "$html"
+        fi
+        echo "[wasm_postbuild] Patched SW: $(basename "$html")"
     fi
 
-    if [[ "$(uname)" == "Darwin" ]]; then
-        sed -i '' "s|<head>|<head>\\
-    ${SW_TAG}|" "$html"
-    else
-        sed -i "s|<head>|<head>\n    ${SW_TAG}|" "$html"
+    if ! grep -q 'wasm_pixelcheck' "$html"; then
+        if [[ "$(uname)" == "Darwin" ]]; then
+            sed -i '' "s|</head>|    ${PX_TAG}\\
+</head>|" "$html"
+        else
+            sed -i "s|</head>|    ${PX_TAG}\n</head>|" "$html"
+        fi
+        echo "[wasm_postbuild] Patched pixelcheck: $(basename "$html")"
     fi
-    echo "[wasm_postbuild] Patched: $(basename "$html")"
 done
 
 echo "[wasm_postbuild] Done."
