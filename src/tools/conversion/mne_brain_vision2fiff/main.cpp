@@ -286,6 +286,7 @@ static bool readBVData(const QString &dataPath, const BVHeader &hdr, MatrixXd &d
     data.resize(nChan, nSamples);
     QDataStream ds(&file);
     ds.setByteOrder(QDataStream::LittleEndian);
+    ds.setFloatingPointPrecision(QDataStream::SinglePrecision);
 
     if (hdr.dataOrientation == 0) {
         // Multiplexed
