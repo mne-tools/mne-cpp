@@ -22,7 +22,7 @@ Applications
 
 ### Try in the browser (WebAssembly)
 
-No install required — runs entirely in your browser:
+No install required — runs entirely in your browser. **Your data never leaves your machine**: the browser is used purely as a runtime environment and all processing happens locally via WebAssembly. Nothing is uploaded to any server.
 
 | | Application | Description | |
 |---|---|---|---|

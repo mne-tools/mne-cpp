@@ -214,6 +214,9 @@ const sidebars: SidebarsConfig = {
             label: 'Library API',
             link: { type: 'doc', id: 'development/api' },
             items: [
+                'development/api-fiff',
+                'development/api-mne',
+                'development/api-fwd',
                 'development/api-dsp',
                 'development/api-inverse',
                 'development/api-connectivity',

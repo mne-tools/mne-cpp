@@ -85,3 +85,66 @@ Source-level connectivity works identically — pass source-localized signals in
 | Weighted Phase Lag Index | `wpli` | Phase |
 | Unbiased Squared Phase Lag Index | `uspli` | Phase |
 | Debiased Squared Weighted Phase Lag Index | `dswpli` | Phase |
+
+## Class Inventory
+
+### Metric Classes
+
+Every metric inherits from `AbstractMetric` and implements the same computation interface, so new metrics can be added by subclassing.
+
+| Class | Description | MNE-Python (`mne-connectivity`) |
+|---|---|---|
+| `AbstractMetric` | Base class providing common FFT, windowing, and trial-accumulation logic | `mne_connectivity.base` |
+| `Coherence` | Frequency-domain magnitude-squared coherence | `spectral_connectivity_epochs(method='coh')` |
+| `Coherency` | Complex-valued coherency (preserves phase information) | `spectral_connectivity_epochs(method='cohy')` |
+| `ImagCoherence` | Imaginary part of coherency — robust to volume-conduction artefacts | `spectral_connectivity_epochs(method='imcoh')` |
+| `Correlation` | Pearson correlation coefficient between signal pairs | `scipy.stats.pearsonr` |
+| `CrossCorrelation` | Cross-correlation with lag analysis | `scipy.signal.correlate` |
+| `PhaseLockingValue` | Phase-locking value — consistency of phase difference across trials | `spectral_connectivity_epochs(method='plv')` |
+| `PhaseLagIndex` | Phase Lag Index — antisymmetric; insensitive to zero-lag conduction | `spectral_connectivity_epochs(method='pli')` |
+| `WeightedPhaseLagIndex` | Weighted PLI — weights by magnitude of imaginary part | `spectral_connectivity_epochs(method='wpli')` |
+| `UnbiasedSquaredPhaseLagIndex` | Variance-corrected squared PLI (uPLI²) | `spectral_connectivity_epochs(method='dpli')` |
+| `DebiasedSquaredWeightedPhaseLagIndex` | Bias-corrected squared WPLI (dWPLI²) | `spectral_connectivity_epochs(method='wpli2_debiased')` |
+
+### Network Containers
+
+| Class | Description | MNE-Python |
+|---|---|---|
+| `Network` | Graph container with nodes, edges, connectivity matrix, and graph metrics (degree, distribution, thresholding) | `mne_connectivity.Connectivity` |
+| `NetworkNode` | Single network node with 3D position and incident edge list | — |
+| `NetworkEdge` | Weighted connection between two nodes with per-frequency-bin weights and threshold support | — |
+
+### Settings & Data
+
+| Class / Struct | Description |
+|---|---|
+| `ConnectivitySettings` | Complete computation configuration: input trial data, metric selection, sampling frequency, FFT size, window type, node positions |
+| `ConnectivitySettings::IntermediateTrialData` | Per-trial frequency-domain data: raw spectra, cross-spectral matrices, tapered spectra |
+| `ConnectivitySettings::IntermediateSumData` | Accumulated spectral data across all trials for final normalisation |
+| `VisualizationInfo` | Colourmap, node/edge RGBA colours, and visualisation method settings |
+
+### Static Entry Points
+
+| Function | Description |
+|---|---|
+| `Connectivity::calculate(settings)` | Dispatches computation: returns one `Network` per requested metric |
+
+## Algorithms Not Yet in MNE-CPP
+
+| Algorithm | MNE-Python (`mne-connectivity`) | Description |
+|---|---|---|
+| Directed Transfer Function (DTF) | `spectral_connectivity_epochs(method='dtf')` | Granger-causality-based directed connectivity in frequency domain |
+| Partial Directed Coherence (PDC) | `spectral_connectivity_epochs(method='pdc')` | Normalised directed coherence based on MVAR models |
+| Granger Causality (GC) | `spectral_connectivity_epochs(method='gc')` | Time-domain Granger causality |
+| Amplitude Envelope Correlation (AEC) | `mne_connectivity.envelope_correlation()` | Power envelope correlation with optional orthogonalisation |
+| Coherence (time-resolved) | `spectral_connectivity_time()` | Sliding-window or Hilbert-based time-resolved connectivity |
+| Power Envelope Correlation | `mne_connectivity.envelope_correlation()` | Broadband power envelope correlation for resting-state analysis |
+| Multivariate Connectivity (MIC/MIM) | `spectral_connectivity_epochs(method='mic')` | Multivariate interaction measure for multi-channel connectivity |
+
+## See Also
+
+- [Library API Overview](api) — All MNE-CPP libraries
+- [DSP Library](api-dsp) — Signal processing (filtering, spectral analysis) used as input to connectivity
+- [Inverse Library](api-inverse) — Source estimation for source-level connectivity
+- [Disp3D Library](api-disp3d) — 3D network visualisation
+- [mne-connectivity](https://mne.tools/mne-connectivity/stable/) — Python connectivity package for comparison

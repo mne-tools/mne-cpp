@@ -248,3 +248,87 @@ The renderer supports multiple shader pipelines (`ShaderMode`) and surface overl
 | `ModeAnnotation` | Atlas / parcellation region colors |
 | `ModeScientific` | Scientific colormap |
 | `ModeSourceEstimate` | STC amplitude overlay |
+
+## Complete Class Reference
+
+### View Layer
+
+| Class | MNE-Python Equivalent |
+|---|---|
+| `BrainView` | `mne.viz.Brain` |
+| `MultiViewLayout` | — (MNE-Python is single-view) |
+
+### Render Engine
+
+| Class | MNE-Python Equivalent |
+|---|---|
+| `BrainRenderer` | `Brain._renderer` |
+| `CameraController` | `Brain._view.camera` |
+| `RayPicker` | `Brain._on_pick()` |
+
+### Renderable Objects
+
+| Class | MNE-Python Equivalent |
+|---|---|
+| `BrainSurface` | `Brain._surface` |
+| `DipoleObject` | `mne.viz.plot_dipole_locations()` |
+| `NetworkObject` | — |
+| `SourceEstimateOverlay` | `Brain.set_data_time_index()` |
+| `MeshFactory` | — |
+
+### Data Model (Tree Items)
+
+| Class | MNE-Python Equivalent |
+|---|---|
+| `BrainTreeModel` | — |
+| `AbstractTreeItem` | — |
+| `SurfaceTreeItem` | FreeSurfer surface via `Brain.add_surface()` |
+| `BemTreeItem` | BEM forward reference |
+| `SensorTreeItem` | `Brain.get_sensors()` |
+| `DipoleTreeItem` | — |
+| `SourceSpaceTreeItem` | `Brain._source_space` |
+| `NetworkTreeItem` | — |
+| `DigitizerTreeItem` / `DigitizerSetTreeItem` | `mne.Digitization` |
+
+### Data Loaders & Managers
+
+| Class | MNE-Python Equivalent |
+|---|---|
+| `DataLoader` | `mne.io.read_raw_fif()`, `mne.read_source_spaces()` |
+| `SourceEstimateManager` | — |
+| `SensorFieldMapper` | `mne.viz.plot_evoked_field()` |
+| `RtSensorStreamManager` | — (no real-time in Python) |
+
+### Background Workers (Real-Time)
+
+| Class | Description |
+|---|---|
+| `RtSensorDataWorker` | Apply interpolation matrix to incoming sensor samples |
+| `RtSensorInterpolationMatWorker` | Build sparse sensor → surface mapping matrix |
+| `RtSourceDataWorker` | Apply STC interpolation to incoming source estimates |
+| `RtSourceInterpolationMatWorker` | Build sparse source → vertex mapping matrix |
+| `StcLoadingWorker` | Asynchronous STC file I/O |
+
+### Helpers
+
+| Class | Description |
+|---|---|
+| `GeometryInfo` | Sensor-to-mesh mapping, surface-constrained distance computation |
+| `Interpolation` | Distance-based weight matrices and signal interpolation |
+
+## Features Not Yet in MNE-CPP
+
+| Feature | MNE-Python | Description |
+|---|---|---|
+| Volume Rendering | `mne.viz.plot_volume_source_estimates()` | Ray-marched or sliced volumetric source estimate display |
+| Streamlines / Tractography | — | DTI tractography overlay (available in other tools like MRIcroGL) |
+| Glass Brain | `nilearn.plotting.plot_glass_brain()` | Semi-transparent maximum-intensity projection |
+| Time-Series Overlay | `mne.viz.plot_source_estimates('time_viewer')` | Integrated time-series and 3D surface in single view |
+| Movie Export | `Brain.save_movie()` | Automated animation export to video file |
+
+## See Also
+
+- [Library API Overview](api) — All MNE-CPP libraries
+- [Connectivity Library](api-connectivity) — Connectivity metrics that produce `Network` objects for 3D visualisation
+- [Inverse Library](api-inverse) — Source estimation that produces `SourceEstimate` for STC overlay
+- [MNE-Python Brain API](https://mne.tools/stable/generated/mne.viz.Brain.html)

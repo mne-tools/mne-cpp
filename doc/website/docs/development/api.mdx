@@ -18,8 +18,8 @@ The libraries are organized in layers: low-level I/O and math utilities at the b
 | **Utils** | `UTILSLIB` | Shared utilities: I/O helpers, spectral analysis, layout management, and warp algorithms |
 | **Math** | `MATHLIB` | Mathematical algorithms and geometry: linear algebra, optimization, spectral estimation, K-Means, sphere fitting |
 | **Fs** | `FSLIB` | FreeSurfer surface and annotation I/O |
-| **Fiff** | `FIFFLIB` | FIFF file I/O and data structures (raw, epochs, evoked, covariance, forward) |
-| **Mne** | `MNELIB` | Core MNE data structures: source spaces, source estimates, hemispheres |
+| [**Fiff**](api-fiff) | `FIFFLIB` | FIFF file I/O and data structures (raw, epochs, evoked, covariance, forward) |
+| [**Mne**](api-mne) | `MNELIB` | Core MNE data structures: source spaces, source estimates, hemispheres |
 | **Mri** | `MRILIB` | MRI volume and coordinate-system I/O (volumes, voxel geometry, transforms) |
 | **Bids** | `BIDSLIB` | BIDS dataset reading, writing, path construction, and sidecar metadata handling for iEEG/EEG/MEG |
 
@@ -27,10 +27,10 @@ The libraries are organized in layers: low-level I/O and math utilities at the b
 
 | Library | Namespace | Purpose |
 |---------|-----------|---------|
-| **Fwd** | `FWDLIB` | Forward modelling: BEM and MEG/EEG lead field computation |
-| **Inv** | `INVLIB` | Inverse source estimation: MNE, dSPM, sLORETA, beamforming, dipole fitting, HPI fitting, RAP-MUSIC |
-| **Dsp** | `DSPLIB` | Digital signal processing: filtering, spectrograms, real-time averaging, trigger detection, SPHARA, HPI, noise reduction |
-| **Conn** | `CONNLIB` | Functional connectivity metrics: Coherence, Cross-Correlation, PLV, PLI, WPLI, and variants |
+| [**Fwd**](api-fwd) | `FWDLIB` | Forward modelling: BEM and MEG/EEG lead field computation |
+| [**Inv**](api-inverse) | `INVLIB` | Inverse source estimation: MNE, dSPM, sLORETA, beamforming, dipole fitting, HPI fitting, RAP-MUSIC |
+| [**Dsp**](api-dsp) | `DSPLIB` | Digital signal processing: filtering, spectrograms, real-time averaging, trigger detection, SPHARA, HPI, noise reduction |
+| [**Conn**](api-connectivity) | `CONNLIB` | Functional connectivity metrics: Coherence, Cross-Correlation, PLV, PLI, WPLI, and variants |
 | **Lsl** | `LSLLIB` | Lab Streaming Layer (LSL) integration for real-time data exchange |
 | **Com** | `COMLIB` | Real-time client/server communication (commands, raw data streaming) with `mne_rt_server` |
 
@@ -39,9 +39,9 @@ The libraries are organized in layers: low-level I/O and math utilities at the b
 | Library | Namespace | Purpose |
 |---------|-----------|---------|
 | **Disp** | `DISPLIB` | 2D display widgets and visualization helpers: charts, topography, colour maps, `QWidget`-based viewers |
-| **Disp3D** | `DISP3DLIB` | 3D brain visualization using the Qt RHI rendering backend: cortical surfaces, connectivity networks, BEM models, source estimates, digitizers — supports Metal, Vulkan, D3D, and OpenGL backends |
+| [**Disp3D**](api-disp3d) | `DISP3DLIB` | 3D brain visualization using the Qt RHI rendering backend: cortical surfaces, connectivity networks, BEM models, source estimates, digitizers — supports Metal, Vulkan, D3D, and OpenGL backends |
 
-For in-depth guides on specific libraries, see the [Conn](api-connectivity.mdx) and [Disp3D](api-disp3d.mdx) pages.
+Detailed documentation is available for every library with a link above — covering class inventories, MNE-Python and MNE-C cross-references, code examples, and gap analysis.
 
 ## API Reference (Doxygen)
 
