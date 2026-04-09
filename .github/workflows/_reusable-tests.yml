@@ -173,47 +173,25 @@ jobs:
       run: |
         ./scripts/test_all.bat Release verbose
 
-    # ── Coverage: generate filtered report (lcov) ──────────────────────
-    - name: Install lcov
+    # ── Coverage: generate filtered report (fastcov) ─────────────────────
+    - name: Install fastcov
       if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage
-      run: sudo apt-get install -y lcov
+      run: pip install fastcov
 
-    - name: Generate coverage report (lcov)
+    - name: Generate coverage report (fastcov)
       id: lcov
       if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage
       run: |
         echo "=== Coverage diagnostics ==="
         echo "gcno files: $(find build -name '*.gcno' 2>/dev/null | wc -l)"
         echo "gcda files: $(find build -name '*.gcda' 2>/dev/null | wc -l)"
-
-        LCOV_OPTS="--ignore-errors mismatch,inconsistent,gcov,negative,unused"
-
-        # 1. Baseline: capture all instrumented lines as 0-hit (from .gcno)
-        #    This ensures EVERY compiled source file appears in the report,
-        #    even if no test executed it.
-        lcov --initial --capture --directory build \
-             --output-file coverage_base.info --no-external $LCOV_OPTS
-
-        # 2. Test coverage: capture execution hits (from .gcda)
-        lcov --capture --directory build \
-             --output-file coverage_test.info --no-external $LCOV_OPTS
-
-        # 3. Combine: baseline guarantees full line counts; test data adds hits
-        lcov --add-tracefile coverage_base.info \
-             --add-tracefile coverage_test.info \
-             --output-file coverage_combined.info $LCOV_OPTS
-
-        # 4. Extract only MNE-CPP source directories
-        lcov --extract coverage_combined.info \
-             '*/src/libraries/*' '*/src/applications/*' '*/src/tools/*' \
-             --output-file coverage_filtered.info $LCOV_OPTS
-
-        # 5. Remove third-party / generated paths that may have slipped in
-        lcov --remove coverage_filtered.info \
-             '*/Qt/*' '*/eigen/*' '/usr/*' '*mocs_compilation*' \
-             --output-file coverage_filtered.info $LCOV_OPTS
-
-        # Report statistics
+        # Collect coverage data with fastcov (10-100x faster than lcov)
+        fastcov -d build -o coverage.json
+        # Filtered report: MNE-CPP libraries, applications, and tools
+        fastcov -C coverage.json --lcov -o coverage_filtered.info \
+             --include src/libraries/ src/applications/ src/tools/ \
+             --exclude /usr Qt eigen
+        # Extract total line coverage percentage from lcov format
         TOTAL_LINES=$(grep -c "^DA:" coverage_filtered.info 2>/dev/null || echo "0")
         HIT_LINES=$(grep "^DA:" coverage_filtered.info | awk -F, '$2 > 0' | wc -l 2>/dev/null || echo "0")
         if [ "$TOTAL_LINES" -gt 0 ]; then
