@@ -29,9 +29,6 @@ fi
 echo "[wasm_postbuild] Copying coi-serviceworker.js → $OUTPUT_DIR/"
 cp "$SCRIPT_DIR/coi-serviceworker.js" "$OUTPUT_DIR/coi-serviceworker.js"
 
-echo "[wasm_postbuild] Copying wasm_pixelcheck.js → $OUTPUT_DIR/"
-cp "$SCRIPT_DIR/wasm_pixelcheck.js" "$OUTPUT_DIR/wasm_pixelcheck.js"
-
 # --- 2. Replace mne_browse.html with custom template -----------------------
 #
 # Qt generates a bare-bones HTML file.  We replace it with our branded
@@ -54,9 +51,8 @@ if [ -f "$OUTPUT_DIR/mne_inspect.html" ] && [ -f "$INSPECT_TEMPLATE" ]; then
     cp "$INSPECT_TEMPLATE" "$OUTPUT_DIR/mne_inspect.html"
 fi
 
-# --- 3. Inject service-worker & pixel-check <script> into every .html ------
+# --- 3. Inject service-worker <script> into every .html --------------------
 SW_TAG='<script src="coi-serviceworker.js"></script>'
-PX_TAG='<script src="wasm_pixelcheck.js"></script>'
 
 for html in "$OUTPUT_DIR"/*.html; do
     [ -f "$html" ] || continue
@@ -71,16 +67,6 @@ for html in "$OUTPUT_DIR"/*.html; do
             sed -i "s|<head>|<head>\n    ${SW_TAG}|" "$html"
         fi
         echo "[wasm_postbuild] Patched SW: $(basename "$html")"
-    fi
-
-    if ! grep -q 'wasm_pixelcheck' "$html"; then
-        if [[ "$(uname)" == "Darwin" ]]; then
-            sed -i '' "s|</head>|    ${PX_TAG}\\
-</head>|" "$html"
-        else
-            sed -i "s|</head>|    ${PX_TAG}\n</head>|" "$html"
-        fi
-        echo "[wasm_postbuild] Patched pixelcheck: $(basename "$html")"
     fi
 done
 
