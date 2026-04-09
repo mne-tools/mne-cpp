@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 title: "MNE-CPP"
-message: "If you use this software, please cite it using the metadata from this file."
+message: "If you use this software, please cite it as shown below."
 version: 2.1.0
 date-released: "2026-04-10"
 doi: 10.5281/zenodo.593102
