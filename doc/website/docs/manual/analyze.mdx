@@ -4,10 +4,6 @@ sidebar_label: MNE Analyze
 ---
 # MNE Analyze
 
-:::caution Under Development
-MNE Analyze is currently being ported to MNE-CPP and is not yet feature-complete compared to the original MNE-C `mne_analyze` application.
-:::
-
 MNE Analyze is a GUI application for comprehensive sensor- and source-level analysis of pre-recorded MEG/EEG data. It provides tools for data visualization, preprocessing, source localization, and interactive exploration of results. It currently supports the `.fif` (FIFF) file format.
 
 ![MNE Analyze – main window](/img/analyze/mne_an_1.png)
@@ -36,16 +32,19 @@ MNE Analyze uses a plugin-based architecture. The following plugins are currentl
 | **Dipole Fit** | Interactive dipole fitting |
 | **Real-time** | Connection to real-time data streams |
 
-## Planned Features
+## Roadmap
 
-The original MNE-C `mne_analyze` provided extensive functionality that is planned for future MNE-CPP releases:
+The following features are planned for future MNE-CPP releases:
 
-- Full 3D visualization of source estimates on cortical surfaces
-- Interactive ROI (Region of Interest) definition
 - Time-frequency analysis displays
+- Interactive ROI (Region of Interest) definition
 - Connectivity visualization
 - Movie generation of source activity
 - Surface morphing and group analysis visualization
+
+:::tip
+For an agent-oriented workflow with LLM-driven automation, see [MNE Analyze Studio](analyze-studio).
+:::
 
 ## Plugin Guides
 

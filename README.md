@@ -1,28 +1,16 @@
 <p align="center">
   <a href="/resources/design/logos/MNE-CPP_Logo.svg"><img src="/resources/design/logos/MNE-CPP_Logo.svg" width="400" height="200" alt="MNE-CPP"></a>
 </p>
+
 <p align="center">
-<a href="https://github.com/mne-tools/mne-cpp/releases/latest" target="_blank">
-    <img src="https://img.shields.io/badge/version-2.1.0-blue.svg" alt="Version 2.1.0">
-</a>
-<a href="https://github.com/mne-tools/mne-cpp/actions/workflows/main.yml" target="_blank">
-    <img src="https://github.com/mne-tools/mne-cpp/actions/workflows/main.yml/badge.svg?branch=main" alt="Release">
-</a>
-<a href="https://github.com/mne-tools/mne-cpp/actions/workflows/staging.yml" target="_blank">
-    <img src="https://github.com/mne-tools/mne-cpp/actions/workflows/staging.yml/badge.svg?branch=staging" alt="Staging">
-</a>
-<a href="https://codecov.io/gh/mne-tools/mne-cpp/tree/staging" target="_blank">
-    <img src="https://codecov.io/gh/mne-tools/mne-cpp/branch/staging/graph/badge.svg" alt="CodeCov">
-</a>
-<a href="https://github.com/mne-tools/mne-cpp/actions/workflows/codeql.yml" target="_blank">
-    <img src="https://github.com/mne-tools/mne-cpp/actions/workflows/codeql.yml/badge.svg" alt="CodeQL">
-</a>
-<a href="https://scan.coverity.com/projects/mne-tools-mne-cpp" target="_blank">
-    <img src="https://scan.coverity.com/projects/8955/badge.svg" alt="Coverity">
-</a>
-<a href="https://gitter.im/mne-tools/mne-cpp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge" target="_blank">
-    <img src="https://badges.gitter.im/mne-tools/mne-cpp.svg" alt="Gitter">
-</a>
+  <a href="https://github.com/mne-tools/mne-cpp/releases/latest"><img src="https://img.shields.io/badge/version-2.1.0-blue.svg" alt="Version 2.1.0"></a>&nbsp;
+  <a href="https://github.com/mne-tools/mne-cpp/actions/workflows/main.yml"><img src="https://github.com/mne-tools/mne-cpp/actions/workflows/main.yml/badge.svg?branch=main" alt="Release"></a>&nbsp;
+  <a href="https://github.com/mne-tools/mne-cpp/actions/workflows/staging.yml"><img src="https://github.com/mne-tools/mne-cpp/actions/workflows/staging.yml/badge.svg?branch=staging" alt="Staging"></a>&nbsp;
+  <a href="https://codecov.io/gh/mne-tools/mne-cpp/tree/staging"><img src="https://codecov.io/gh/mne-tools/mne-cpp/branch/staging/graph/badge.svg" alt="CodeCov"></a>
+  <br>
+  <a href="https://github.com/mne-tools/mne-cpp/actions/workflows/codeql.yml"><img src="https://github.com/mne-tools/mne-cpp/actions/workflows/codeql.yml/badge.svg" alt="CodeQL"></a>&nbsp;
+  <a href="https://scan.coverity.com/projects/mne-tools-mne-cpp"><img src="https://scan.coverity.com/projects/8955/badge.svg" alt="Coverity"></a>&nbsp;
+  <a href="https://gitter.im/mne-tools/mne-cpp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img src="https://badges.gitter.im/mne-tools/mne-cpp.svg" alt="Gitter"></a>
 </p>
 
 -----------------
@@ -32,12 +20,42 @@ MNE-CPP is an open-source, cross-platform C++ framework for real-time and offlin
 Applications
 ------------
 
-Run in the browser via WebAssembly — no install required.
+### Try in the browser (WebAssembly)
+
+No install required — runs entirely in your browser:
 
 | | Application | Description | |
 |---|---|---|---|
 | <a href="https://mne-cpp.github.io/wasm/mne_browse.html"><img src="/src/applications/mne_browse/Resources/Images/ApplicationIcons/icon_browse_64x64.png" width="32" height="32" alt="MNE Browse"></a> | **MNE Browse** | Browse and inspect raw MEG/EEG data with real-time filtering, event detection, and averaging | [**Open**](https://mne-cpp.github.io/wasm/mne_browse.html) |
 | <a href="https://mne-cpp.github.io/wasm/mne_inspect.html"><img src="/src/applications/mne_inspect/resources/images/appIcons/icon_mne_inspect_64x64.png" width="32" height="32" alt="MNE Inspect"></a> | **MNE Inspect** | Interactive 3D visualization of brain surfaces, source estimates, and forward models | [**Open**](https://mne-cpp.github.io/wasm/mne_inspect.html) |
+
+### Desktop applications
+
+| Application | Description |
+|---|---|
+| **MNE Scan** | Real-time acquisition and processing of MEG/EEG data with a plugin pipeline. Supports MEGIN, BabyMEG, BrainAmp, eegosports, gUSBAmp, TMSI, Natus, LSL, and FieldTrip Buffer. |
+| **MNE Analyze** | Sensor- and source-level analysis GUI: raw data browsing, filtering, averaging, co-registration, dipole fitting, and source localization. |
+| **MNE Analyze Studio** | Agent-oriented analysis workbench with an LLM-driven skill host, neuro kernel, and extension SDK for building composable analysis workflows. |
+| **MNE Dipole Fit** | Sequential equivalent current dipole fitting for localising focal brain activity. |
+
+### Command-line tools
+
+60+ CLI tools for BEM model creation, forward/inverse computation, data conversion, anonymization, and real-time streaming — all C++ ports of the original [MNE-C](http://www.nmr.mgh.harvard.edu/martinos/userInfo/data/MNE_register/index.php) utilities. See the [tools reference](https://mne-cpp.github.io/docs/manual/tools-overview).
+
+Libraries
+---------
+
+| Library | Description |
+|---|---|
+| **Fiff** | FIFF file I/O and data structures (raw, epochs, evoked, covariance, projections) |
+| **Mne** | Core MNE data structures — source spaces, source estimates, hemispheres |
+| **Fwd** | Forward modelling — BEM and MEG/EEG lead-field computation |
+| **Inv** | Inverse source estimation — MNE, dSPM, sLORETA, eLORETA, LCMV/DICS beamformers, RAP MUSIC, dipole fit, HPI |
+| **Dsp** | Digital signal processing — FIR/IIR filtering, ICA, xDAWN, SSS/tSSS, Welch PSD, Morlet TFR, spectrogram, resampling, bad-channel detection, SPHARA |
+| **Conn** | Functional connectivity — coherence, PLV, PLI, WPLI, cross-correlation, and network analysis |
+| **Disp3D** | 3D brain visualization (Metal/Vulkan/D3D/OpenGL via Qt RHI) |
+
+All libraries depend only on [Qt](https://www.qt.io/) and [Eigen](http://eigen.tuxfamily.org/). See the [Library API documentation](https://mne-cpp.github.io/docs/development/api).
 
 Quick start
 -----------

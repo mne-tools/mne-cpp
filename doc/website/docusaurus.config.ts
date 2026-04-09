@@ -7,7 +7,7 @@ import rehypeKatex from 'rehype-katex';
 // Determine if this is a dev or stable build (set via CI env var)
 const siteEnv = process.env.MNECPP_SITE_ENV || 'stable';
 const isDev = siteEnv === 'dev';
-const versionLabel = isDev ? 'dev (latest)' : 'v2.0.0';
+const versionLabel = isDev ? 'dev (latest)' : 'v2.1.0';
 
 const config: Config = {
     title: 'MNE-CPP',
@@ -25,7 +25,7 @@ const config: Config = {
     onBrokenMarkdownLinks: 'warn',
 
     customFields: {
-        version: '2.0.0',
+        version: '2.1.0',
     },
 
     i18n: {
@@ -120,7 +120,7 @@ const config: Config = {
                     className: 'navbar-version-dropdown',
                     items: [
                         {
-                            label: 'v2.0.0 (Stable)',
+                            label: 'v2.1.0 (Stable)',
                             href: 'https://mne-cpp.github.io/',
                         },
                         {

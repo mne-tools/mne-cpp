@@ -1,12 +1,16 @@
 ---
-title: The Minimum-Norm Estimates
+title: Inverse Methods
 sidebar_label: Inverse Estimation
 sidebar_position: 4
 ---
 
-# The Minimum-Norm Estimates
+# Inverse Methods
 
-This section describes the mathematical details of the calculation of minimum-norm estimates. In the Bayesian sense, the ensuing current distribution is the maximum a posteriori (MAP) estimate under the following assumptions:
+This section describes the mathematical details of all inverse source estimation methods available in MNE-CPP: **minimum-norm estimates** (MNE, dSPM, sLORETA, eLORETA), **beamformers** (LCMV, DICS), **RAP MUSIC**, and **dipole fitting**.
+
+# Minimum-Norm Estimates
+
+In the Bayesian sense, the ensuing current distribution is the maximum a posteriori (MAP) estimate under the following assumptions:
 
 - The viable locations of the currents are constrained to the cortex. Optionally, the current orientations can be fixed to be normal to the cortical mantle.
 - The amplitudes of the currents have a Gaussian prior distribution with a known source covariance matrix.
@@ -275,3 +279,310 @@ Generalizing, for any combination of sums and differences where $w_i = \pm 1$:
 $$
 1 / L_{\text{eff}} = \sum_{i=1}^{n} 1/L_i
 $$
+
+---
+
+# Beamformer Methods
+
+Beamformers are a family of adaptive spatial filters that estimate the source activity at a given brain location while suppressing contributions from other locations and noise. Unlike minimum-norm methods, beamformers do not require an explicit regularized inverse operator — instead, they construct a spatial filter from the data covariance and the forward model at each source point.
+
+## LCMV Beamformer
+
+The **Linearly Constrained Minimum Variance** (LCMV) beamformer (Van Veen et al., 1997) operates in the time domain. It finds a spatial filter $W$ that passes the signal from a target source location with unit gain while minimizing the total output power (i.e., suppressing all other sources and noise).
+
+### Spatial Filter
+
+The optimization problem is:
+
+$$
+\min_{W} \; \operatorname{tr}(W C_m W^\top) \quad \text{subject to} \quad W G = I
+$$
+
+where $G$ is the lead-field matrix (gain matrix) at the source location ($N \times n_{\text{orient}}$, with $n_{\text{orient}} = 1$ for fixed orientation or $3$ for free orientation) and $C_m$ is the $N \times N$ data covariance matrix.
+
+The closed-form solution is the **unit-gain filter**:
+
+$$
+W_{\text{ug}} = (G^\top C_m^{-1} G)^{-1} \, G^\top C_m^{-1}
+$$
+
+### Regularization
+
+Since the data covariance matrix may be rank-deficient (e.g., after SSP or MaxFilter), Tikhonov regularization is applied (Gross & Ioannides, 1999):
+
+$$
+C_{m,\text{reg}} = C_m + \alpha \cdot \frac{\operatorname{tr}(C_m)}{\operatorname{rank}(C_m)} \cdot I
+$$
+
+where $\alpha$ is the regularization parameter (typically 0.05). In practice this is implemented via eigendecomposition:
+
+$$
+C_m^{-1} = V \operatorname{diag}\!\left(\frac{1}{\lambda_i + \alpha_{\text{load}}}\right) V^\top
+$$
+
+### Weight Normalization
+
+The raw unit-gain filter can produce estimates with non-uniform sensitivity across the source space. Several normalization schemes address this:
+
+**Unit-noise-gain** (Sekihara & Nagarajan, 2008):
+
+$$
+W_{\text{ung}} = \frac{W_{\text{ug}}}{\sqrt{\operatorname{diag}(W_{\text{ug}} W_{\text{ug}}^\top)}}
+$$
+
+**Unit-noise-gain-invariant** (rotation-invariant form):
+
+$$
+W = (A A^\top)^{-1/2} A, \quad A = G^\top C_m^{-1}
+$$
+
+**Neural Activity Index** (NAI):
+
+$$
+W_{\text{NAI}} = \frac{W_{\text{ung}}}{\sqrt{\sigma_{\text{noise}}^2}}
+$$
+
+where $\sigma_{\text{noise}}^2$ is the estimated noise level.
+
+### Optimal Orientation
+
+When the source orientation is free, the orientation that maximizes the beamformer output power can be found by solving the generalized eigenvalue problem (Sekihara & Nagarajan, 2008, eq. 4.47):
+
+$$
+\hat{e} = \arg\max_{e} \frac{e^\top (G^\top C_m^{-1} G) \, e}{e^\top (G^\top C_m^{-2} G) \, e}
+$$
+
+The eigenvector with the largest eigenvalue gives the optimal source orientation.
+
+### Source Estimates
+
+The estimated source time course at location $i$ is:
+
+$$
+s_i(t) = W_i \, \tilde{x}(t)
+$$
+
+and the source power is:
+
+$$
+P_i = \operatorname{tr}(W_i \, C_m \, W_i^\top)
+$$
+
+where $\tilde{x}(t) = C_n^{-1/2} P_\perp \, x(t)$ is the whitened, projected data vector.
+
+### References
+
+- Van Veen, B.D. et al. (1997). Localization of brain electrical activity via linearly constrained minimum variance spatial filtering. *IEEE Trans. Biomed. Eng.*, 44(9), 867–880.
+- Sekihara, K. & Nagarajan, S.S. (2008). *Adaptive Spatial Filters for Electromagnetic Brain Imaging*. Springer.
+- Gross, J. & Ioannides, A.A. (1999). Linear transformations of data space in MEG. *Phys. Med. Biol.*, 44, 2081–2097.
+
+---
+
+## DICS Beamformer
+
+The **Dynamic Imaging of Coherent Sources** (DICS) beamformer (Gross et al., 2001) is the frequency-domain analogue of LCMV. It replaces the time-domain data covariance $C_m$ with the **cross-spectral density** (CSD) matrix $C(f)$ at a frequency of interest:
+
+$$
+W(f) = (G^\top C(f)^{-1} G)^{-1} \, G^\top C(f)^{-1}
+$$
+
+The CSD matrix $C(f)$ can be estimated using Fourier, multitaper, or Morlet wavelet methods.
+
+### Real Filter Option
+
+The CSD matrix is generally complex-valued. When computing spatial filter weights for source power estimation, it is common to use only the real part (Hipp et al., 2011):
+
+$$
+C_{\text{real}}(f) = \Re[C(f)]
+$$
+
+This ensures real-valued spatial filter weights and avoids phase-related artifacts in the power estimates.
+
+### Source Power
+
+The source power at location $i$ and frequency $f$ is:
+
+$$
+P_i(f) = \operatorname{tr}(W_i(f) \, C(f) \, W_i(f)^H)
+$$
+
+All regularization and weight-normalization options from LCMV apply identically.
+
+### References
+
+- Gross, J. et al. (2001). Dynamic imaging of coherent sources: studying neural interactions in the human brain. *PNAS*, 98(2), 694–699.
+- van Vliet, M. et al. (2018). Analysis of functional connectivity and oscillatory power using DICS. *J. Neurosci. Methods*, 309, 199–212.
+
+---
+
+# RAP MUSIC
+
+**Recursively Applied and Projected MUltiple SIgnal Classification** (RAP-MUSIC; Mosher & Leahy, 1999) is a scanning method that localizes multiple correlated or uncorrelated dipolar sources by iteratively identifying them and projecting them out of the data.
+
+## Signal Subspace Estimation
+
+Given the measured data matrix $F$ ($N$ channels × $T$ time samples), the signal subspace is estimated from the eigendecomposition of the data covariance:
+
+$$
+F F^\top = U \Lambda U^\top
+$$
+
+The signal subspace $\Phi_s = [u_{N-n+1}, \ldots, u_N]$ is formed from the $n$ eigenvectors corresponding to the $n$ largest eigenvalues, where $n$ is the number of dipoles to search for.
+
+## Subspace Correlation Scan
+
+For each candidate source location $i$ with lead-field $G_i$ ($N \times n_{\text{orient}}$):
+
+1. Compute the SVD of the lead-field: $G_i = U_G \Sigma_G V_G^\top$
+2. Compute the correlation matrix: $\mathcal{C} = U_G^\top \Phi_s$
+3. Compute the SVD of the correlation: $\mathcal{C} = U_\mathcal{C} \Sigma_\mathcal{C} V_\mathcal{C}^\top$
+4. The **subcorrelation metric** is the largest singular value: $\rho_i = \sigma_{\mathcal{C},1}$
+5. The **optimal orientation** is: $\hat{e}_i = V_G^\top \operatorname{diag}(1/\sigma_G) \, u_{\mathcal{C},1}$
+
+The source location with maximum $\rho_i$ is selected as the $k$-th identified source.
+
+## Recursive Projection
+
+After identifying source $k$ with lead-field column $a_k = G_{i^*} \hat{e}_{i^*}$, the source is projected out of both the lead-field and signal subspace. Let $A_k = [a_1, \ldots, a_k]$ be the matrix of all identified source fields so far, and let $U_A$ come from its SVD. The projector is:
+
+$$
+P_k = I - U_A U_A^\top
+$$
+
+The projected quantities for the next iteration are:
+
+$$
+G^{(k+1)} = P_k G, \qquad \Phi_s^{(k+1)} = P_k \Phi_s
+$$
+
+The algorithm terminates when the subcorrelation falls below a threshold (typically 0.5) or $n$ sources have been found.
+
+## TRAP-MUSIC Variant
+
+In **Truncated RAP-MUSIC** (Mäkelä et al., 2018), the signal subspace is additionally truncated at each iteration, keeping only $n - k$ columns after projection. This improves robustness when sources are highly correlated.
+
+## MNE-CPP Dipole-Pair Scanning
+
+The MNE-CPP implementation extends the standard algorithm by scanning over **pairs** of grid points simultaneously, which improves localization of correlated source pairs:
+
+1. All $\binom{N_{\text{grid}}+1}{2}$ pairs of grid points are enumerated
+2. For each pair $(i,j)$, the combined lead-field $G_{ij}$ ($N \times 6$) is formed
+3. The subspace correlation is computed for the combined lead-field
+4. The pair with maximum correlation is selected
+5. The identified sources are projected out and the process repeats
+
+The pair search is parallelized with OpenMP for performance.
+
+### References
+
+- Mosher, J.C. & Leahy, R.M. (1999). Source localization using recursively applied and projected (RAP) MUSIC. *IEEE Trans. Signal Process.*, 47(2), 332–340.
+- Mäkelä, N. et al. (2018). Truncated RAP-MUSIC (TRAP-MUSIC) for MEG and EEG source localization. *NeuroImage*, 167, 73–83.
+
+---
+
+# Dipole Fitting
+
+**Sequential equivalent current dipole (ECD) fitting** localizes focal brain activity by fitting one or more current dipoles to the measured field pattern at each time point. Unlike distributed methods (MNE, beamformers) that estimate activity at many locations simultaneously, dipole fitting finds the single position, orientation, and amplitude that best explain the data.
+
+## Forward Model
+
+For a current dipole at position $r_d$ with moment $Q = (Q_x, Q_y, Q_z)^\top$, the predicted field at sensor $k$ is:
+
+$$
+b_k = \sum_{j=1}^{3} G_{kj}(r_d) \, Q_j
+$$
+
+or in matrix form: $b = G(r_d) \, Q$, where $G(r_d)$ is the $N \times 3$ forward matrix computed at the candidate position using the BEM or sphere model.
+
+## Cost Function
+
+The fitting proceeds in whitened data space. Let $\tilde{B} = C_n^{-1/2} P_\perp B$ be the whitened, projected measurement vector and let $\tilde{G}(r_d) = C_n^{-1/2} P_\perp G(r_d)$ be the corresponding whitened forward matrix. The SVD of the whitened forward at the candidate position is:
+
+$$
+\tilde{G}(r_d) = U \Sigma V^\top
+$$
+
+The cost function to minimize over the dipole position $r_d$ is:
+
+$$
+f(r_d) = \|\tilde{B}\|^2 - \sum_{c=1}^{n_{\text{comp}}} (u_c^\top \tilde{B})^2
+$$
+
+where $n_{\text{comp}}$ is the effective number of components (typically 3 for a free dipole, reduced to 2 if the smallest singular value is less than 20% of the largest).
+
+## Goodness of Fit
+
+The relative quality of a dipole fit is measured by the **goodness-of-fit** (GOF):
+
+$$
+\text{GOF} = \frac{\sum_{c=1}^{n_{\text{comp}}} (u_c^\top \tilde{B})^2}{\|\tilde{B}\|^2} \times 100\%
+$$
+
+A GOF of 100% means the dipole model explains the data perfectly; lower values indicate contributions from other sources, distributed activity, or noise.
+
+## Dipole Moment Estimation
+
+Once the optimal position $r_d^*$ is found, the dipole moment is computed from the SVD of the whitened forward:
+
+$$
+Q = \sum_{c=1}^{n_{\text{comp}}} \frac{u_c^\top \tilde{B}}{\sigma_c} \, s_c \, v_c
+$$
+
+where $s_c$ are column normalization scale factors and $\sigma_c$ are the singular values.
+
+## Optimization Algorithm
+
+### Initial Grid Search
+
+To avoid local minima, the optimization begins with a grid search over precomputed **guess points** — a set of candidate dipole positions distributed within the conductor model (typically on concentric spheres at 1–2 cm spacing inside the inner skull). The forward fields for all guess points are precomputed, and the best-fitting initial positions are identified by evaluating the projection of the data onto each guess point's forward field.
+
+### Non-Linear Optimization
+
+Starting from the best guess point(s), the position is refined by non-linear optimization:
+
+- **MNE-CPP** uses a **Nelder-Mead simplex** algorithm (ported from MNE-C): the initial simplex is a regular tetrahedron of ~1 cm edge length centered on the guess point, with convergence tolerance of 0.2 mm.
+- **MNE-Python** uses **COBYLA** (Constrained Optimization BY Linear Approximation) with the constraint that the dipole must remain at least `min_dist` (default 5 mm) inside the inner skull surface.
+
+### Two-Pass Strategy (MNE-CPP)
+
+The MNE-CPP implementation optionally uses a two-pass approach: the first pass uses a sphere model for speed, and the second pass refines the position using the full BEM model starting from the sphere-model result.
+
+## Confidence Regions
+
+Confidence limits on the fitted dipole position can be estimated from the Hessian of the cost function at the solution. The Jacobian matrix $J$ contains the partial derivatives of the predicted field with respect to all six dipole parameters ($r_x, r_y, r_z, Q_x, Q_y, Q_z$). The parameter covariance matrix is:
+
+$$
+\mathcal{C} = (J^\top J)^{-1}
+$$
+
+The 95% confidence volume is:
+
+$$
+V_{95\%} = \frac{4\pi}{3} \sqrt{c^3 \, \lambda_1 \lambda_2 \lambda_3}
+$$
+
+where $\lambda_1, \lambda_2, \lambda_3$ are the eigenvalues of the $3 \times 3$ position submatrix of $\mathcal{C}$ and $c = 7.81$ is the critical value from the $\chi^2$ distribution with 3 degrees of freedom at the 95% confidence level.
+
+### References
+
+- Sarvas, J. (1987). Basic mathematical and electromagnetic concepts of the biomagnetic inverse problem. *Phys. Med. Biol.*, 32(1), 11–22.
+- Hämäläinen, M. et al. (1993). Magnetoencephalography — theory, instrumentation, and applications to noninvasive studies of the working human brain. *Rev. Mod. Phys.*, 65(2), 413–497.
+
+---
+
+## Summary of Inverse Methods
+
+The following table summarizes all inverse methods available in MNE-CPP:
+
+| Method | Type | Domain | Sources | Key Strength |
+|---|---|---|---|---|
+| **MNE** | Distributed | Time | All cortical | Mathematically well-defined, full current distribution |
+| **dSPM** | Distributed | Time | All cortical | Noise normalization removes depth bias |
+| **sLORETA** | Distributed | Time | All cortical | Zero localization error for point sources |
+| **eLORETA** | Distributed | Time | All cortical | Exact zero localization bias, iterative weights |
+| **LCMV** | Beamformer | Time | Scanning | Adaptive filter, good for focal sources |
+| **DICS** | Beamformer | Frequency | Scanning | Frequency-specific source localization |
+| **RAP MUSIC** | Subspace scanning | Time | Multiple focal | Localizes multiple correlated sources |
+| **Dipole Fit** | Parametric | Time | 1 dipole/timepoint | Precise localization for truly focal activity |
+
+All methods share common preprocessing: data whitening with the noise covariance matrix $C_n$, application of SSP projectors, and (for MEG) software gradient compensation. The choice of method depends on the expected source configuration and the scientific question.

@@ -1,0 +1,140 @@
+---
+title: DSP Library
+sidebar_label: DSP Library
+---
+
+# DSP Library (`DSPLIB`)
+
+The DSP library provides digital signal processing algorithms for MEG/EEG data, covering both offline batch processing and real-time streaming scenarios. All classes reside in the `DSPLIB` namespace and depend only on Qt and Eigen.
+
+## Algorithm Inventory
+
+The tables below list every algorithm implemented in MNE-CPP's DSP library, with references to the corresponding MNE-Python and MNE-C (v2.7) implementations where applicable.
+
+### Filtering
+
+| Class | Description | MNE-Python | MNE-C |
+|---|---|---|---|
+| `FilterKernel` | FIR filter kernel design (Parks-McClellan or cosine window) | `mne.filter.create_filter` | `mne_process_raw --filtersize` |
+| `FirFilter` | Discoverable FIR filter engine — lowpass, highpass, bandpass, bandstop | `mne.filter.filter_data` | `mne_process_raw --highpass/--lowpass` |
+| `IirFilter` | Butterworth IIR filter via second-order sections (biquads) | `mne.filter.construct_iir_filter` | — |
+| `CosineFilter` | Frequency-domain cosine filter response | `mne.filter.design_mne_c_filter` | `libmne` cosine filter |
+| `ParksMcClellan` | Parks-McClellan equiripple FIR design (Remez exchange) | `scipy.signal.remez` (via `create_filter`) | — |
+| `FilterIO` | Read/write filter coefficients to text files | — | — |
+| `Resample` | Polyphase anti-aliased rational resampling | `mne.filter.resample` | — |
+
+### Time-Frequency Analysis
+
+| Class | Description | MNE-Python | MNE-C |
+|---|---|---|---|
+| `WelchPsd` | Welch's averaged-periodogram PSD estimator | `mne.time_frequency.psd_array_welch` | — |
+| `Spectrogram` | Short-time Fourier transform spectrogram | `mne.time_frequency.stft` | — |
+| `MorletTfr` | Complex Morlet wavelet time-frequency representation | `mne.time_frequency.tfr_array_morlet` | — |
+
+### Spatial Filtering & Decomposition
+
+| Class | Description | MNE-Python | MNE-C |
+|---|---|---|---|
+| `ICA` | Independent Component Analysis (FastICA, deflationary, logcosh) | `mne.preprocessing.ICA` (FastICA, Infomax, Picard) | — |
+| `Xdawn` | xDAWN spatial filter for event-related response enhancement | `mne.preprocessing.Xdawn` | — |
+| `SSS` | Signal Space Separation (SSS) and temporal SSS (tSSS) | `mne.preprocessing.maxwell_filter` | — |
+| `makeSpharaProjector()` | SPHARA (Surface Partial Harmonic Analysis) spatial projector | — | — |
+
+### Artifact & Bad-Channel Detection
+
+| Class | Description | MNE-Python | MNE-C |
+|---|---|---|---|
+| `BadChannelDetect` | Automated bad channel detection (flat, variance, correlation) | `mne.preprocessing.find_bad_channels_maxwell` | — |
+| `ArtifactDetect` | ECG R-peak and EOG blink/saccade event detection | `mne.preprocessing.find_ecg_events`, `find_eog_events` | — |
+
+### Epoch & Event Processing
+
+| Class | Description | MNE-Python | MNE-C |
+|---|---|---|---|
+| `EpochExtractor` | Segment continuous data into fixed-length event-locked epochs | `mne.Epochs` | `mne_process_raw` (averaging mode) |
+| `detectTriggerFlanksMax()` | Detect trigger flanks using max-coefficient method | `mne.find_events` | `mne_process_raw --trigger` |
+| `detectTriggerFlanksGrad()` | Detect trigger flanks using gradient method | `mne.find_events` | `mne_process_raw --trigger` |
+
+### Real-Time Processing
+
+These classes are designed for streaming data and run in background threads:
+
+| Class | Description | MNE-Python | MNE-C |
+|---|---|---|---|
+| `RtFilter` | Real-time FIR filtering via FFT overlap-add convolution | `mne.io.Raw.filter` (batch) | `mne_process_raw` |
+| `RtAveraging` | Real-time epoch averaging with baseline correction | `mne.Evoked` (offline) | `mne_process_raw --ave` |
+| `RtCov` | Background covariance matrix estimation | `mne.compute_raw_covariance` | `mne_process_raw --cov` |
+| `RtNoise` | Real-time noise PSD estimation | `mne.time_frequency.psd_array_welch` | — |
+| `RtInvOp` | Background inverse operator recomputation on covariance updates | `mne.minimum_norm.make_inverse_operator` | `mne_inverse_operator` |
+| `RtConnectivity` | Real-time functional connectivity computation | `mne_connectivity` (offline) | — |
+| `RtHpi` | Continuous HPI coil localization and head tracking | `mne.chpi.compute_head_pos` | — |
+
+## Algorithms Not Yet in MNE-CPP
+
+The following algorithms exist in MNE-Python but have not yet been ported to C++. They represent opportunities for future work:
+
+### High Priority
+
+| Algorithm | MNE-Python Module | Description |
+|---|---|---|
+| Multitaper PSD | `mne.time_frequency.psd_array_multitaper` | Thomson's multitaper spectral estimation — higher spectral resolution than Welch |
+| Multitaper TFR | `mne.time_frequency.tfr_array_multitaper` | DPSS-windowed time-frequency representation |
+| Stockwell TFR | `mne.time_frequency._stockwell` | S-transform for adaptive time-frequency analysis |
+| Extended Infomax ICA | `mne.preprocessing.infomax_` | Extended Infomax — handles super- and sub-Gaussian sources |
+| Picard ICA | `mne.preprocessing.ICA` (method='picard') | Faster, more robust ICA via preconditioned gradient descent |
+| eLORETA (standalone) | `mne.minimum_norm._eloreta` | Already available via `InvMinimumNorm`; standalone function wrapper pending |
+| Mixed-Norm (MxNE) | `mne.inverse_sparse.mxne_inverse` | L1/L2 sparse inverse for focal source estimation |
+| Gamma-MAP | `mne.inverse_sparse._gamma_map` | Hierarchical Bayesian sparse inverse |
+
+### Medium Priority
+
+| Algorithm | MNE-Python Module | Description |
+|---|---|---|
+| Cross-Spectral Density | `mne.time_frequency.csd` | CSD via Fourier, multitaper, or Morlet — prerequisite for DICS beamformer improvements |
+| Current Source Density | `mne.preprocessing._csd` | Surface Laplacian for EEG — improves spatial resolution |
+| CSP (Common Spatial Patterns) | `mne.decoding.csp` | Spatial filter maximizing class-discriminative variance for BCI |
+| Cluster Permutation Statistics | `mne.stats.cluster_level` | Non-parametric cluster-level tests for spatio-temporal data |
+| OTP (Oversampled Temporal Projection) | `mne.preprocessing.otp` | MEG denoising via oversampled temporal projection |
+
+### From MNE-C (Not in MNE-Python)
+
+Some original MNE-C tools have unique functionality not replicated elsewhere:
+
+| Tool | MNE-C | Description |
+|---|---|---|
+| `mne_label_ssp` | `mne_label_ssp` | Create SSP projectors that suppress activity from a specific brain region |
+| `mne_map_data` | `mne_map_data` | Map data between arbitrary surface meshes |
+| `mne_average_estimates` | `mne_average_estimates` | Weighted averaging of source estimate (.stc) files |
+| `mne_process_stc` | `mne_process_stc` | Manipulate and post-process .stc files |
+| `mne_make_uniform_stc` | `mne_make_uniform_stc` | Create uniform source estimates for testing |
+
+## Usage Example
+
+```cpp
+#include <dsp/firfilter.h>
+#include <dsp/welch_psd.h>
+#include <dsp/ica.h>
+
+using namespace DSPLIB;
+
+// Design and apply a 1–40 Hz band-pass FIR filter
+FirFilter filter;
+Eigen::MatrixXd filtered = filter.apply(data, sFreq, 1.0, 40.0,
+                                         FirFilter::BPF, "hamming");
+
+// Compute Welch PSD
+auto [psd, freqs] = WelchPsd::compute(filtered, sFreq,
+                                       /*nfft=*/1024, /*noverlap=*/512);
+
+// Run ICA decomposition
+ICA ica;
+ica.fit(filtered, /*nComponents=*/20);
+Eigen::MatrixXd cleaned = ica.apply(filtered, /*exclude=*/{0, 3});
+```
+
+## See Also
+
+- [Library API Overview](api) — All MNE-CPP libraries
+- [Connectivity Library](api-connectivity) — Functional connectivity metrics
+- [Disp3D Library](api-disp3d) — 3D visualization
+- [MNE-Python API](https://mne.tools/stable/python_reference.html) — Full Python API reference for comparison

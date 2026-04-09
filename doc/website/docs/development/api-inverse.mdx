@@ -1,0 +1,92 @@
+---
+title: Inverse Library
+sidebar_label: Inverse Library
+---
+
+# Inverse Library (`INVLIB`)
+
+The Inverse library provides source localization algorithms for MEG/EEG data. All classes reside in the `INVLIB` namespace.
+
+## Algorithm Inventory
+
+### Minimum Norm Estimation
+
+| Class | Description | MNE-Python | MNE-C |
+|---|---|---|---|
+| `InvMinimumNorm` | MNE, dSPM, sLORETA, and eLORETA inverse methods | `mne.minimum_norm.apply_inverse` | `mne_inverse_operator` + `mne_compute_mne` |
+
+Supports all four noise-normalization strategies:
+
+| Method | Description |
+|---|---|
+| **MNE** | L2-regularized minimum-norm estimate |
+| **dSPM** | Dynamic Statistical Parametric Mapping — noise-normalized MNE |
+| **sLORETA** | Standardized Low-Resolution Electromagnetic Tomography |
+| **eLORETA** | Exact LORETA — iterative weight-normalized MNE for zero localization bias |
+
+### Beamformers
+
+| Class | Description | MNE-Python | MNE-C |
+|---|---|---|---|
+| `InvLCMV` | Linearly Constrained Minimum Variance beamformer (time domain) | `mne.beamformer.make_lcmv` / `apply_lcmv` | — |
+| `InvDICS` | Dynamic Imaging of Coherent Sources (frequency domain) | `mne.beamformer.make_dics` / `apply_dics` | — |
+| `InvBeamformer` | Computed spatial filter container | — | — |
+| `InvBeamformerCompute` | Shared computation routines (data covariance → spatial filter) | — | — |
+
+### RAP MUSIC
+
+| Class | Description | MNE-Python | MNE-C |
+|---|---|---|---|
+| `InvRapMusic` | Recursively Applied and Projected Multiple Signal Classification | `mne.beamformer.rap_music` | — |
+| `InvPwlRapMusic` | Powell-accelerated RAP MUSIC with gradient-free dipole optimization | — | — |
+| `InvDipole` | Single dipole result (position, orientation, correlation) | — | — |
+
+### Dipole Fitting
+
+| Class | Description | MNE-Python | MNE-C |
+|---|---|---|---|
+| `InvDipoleFit` | High-level driver for sequential ECD fitting | `mne.fit_dipole` | `mne_dipole_fit` |
+| `InvDipoleFitData` | Workspace: sensor geometry, forward model, noise covariance, fit routines | — | `libmne` internals |
+| `InvDipoleFitSettings` | Command-line and programmatic settings | — | `mne_dipole_fit` options |
+| `InvDipoleForward` | Forward field matrices and SVD for magnetic dipole fitting | — | `libfwd` |
+| `InvGuessData` | Precomputed guess-point grid with forward fields | — | `libmne` |
+| `InvEcd` | Single equivalent current dipole (position, orientation, amplitude, GOF) | `mne.Dipole` | — |
+| `InvEcdSet` | Collection of fitted dipoles | `mne.DipoleFixed` | — |
+
+### HPI Fitting
+
+| Class | Description | MNE-Python | MNE-C |
+|---|---|---|---|
+| `InvHpiFit` | HPI coil dipole fitting for head position tracking | `mne.chpi.compute_head_pos` | — |
+| `InvHpiDataUpdater` | Preprocesses raw HPI data (SSP, compensation, model fitting) | `mne.chpi.compute_chpi_amplitudes` | — |
+| `InvHpiModelParameters` | Configuration for HPI signal model (line freq, coil freqs, sample rate) | — | — |
+| `InvSignalModel` | Forward sinusoidal model matrix for HPI coil signals | — | — |
+| `InvSensorSet` | MEG sensor geometry container for HPI | — | — |
+
+### Result Types
+
+| Class / Enum | Description |
+|---|---|
+| `InvSourceEstimate` | Source estimate container (vertices × time, with time metadata) |
+| `InvSourceEstimateToken` | Tokenization / de-tokenization for foundation-model interfacing |
+| `InvFocalDipole` | Focal dipole with free 3D position, moment, and fit-quality metrics |
+| `InvSourceCoupling` | Correlated grid sources with orientations and correlation matrix |
+| `InvConnectivity` | Pairwise source connectivity matrix |
+| `InvEstimateMethod` | Enum: MNE, dSPM, sLORETA, eLORETA, LCMV, DICS, SAM, MxNE, GammaMAP, DipoleFit, RapMusic, PwlRapMusic |
+
+## Algorithms Not Yet in MNE-CPP
+
+| Algorithm | MNE-Python | Description |
+|---|---|---|
+| Mixed-Norm (MxNE) | `mne.inverse_sparse.mxne_inverse` | L1/L2 sparse inverse for focal sources |
+| TF-MxNE | `mne.inverse_sparse.mxne_inverse` | Time-frequency mixed-norm sparse inverse |
+| Gamma-MAP | `mne.inverse_sparse._gamma_map` | Hierarchical Bayesian sparse inverse |
+| SAM (Synthetic Aperture Magnetometry) | — | Beamformer variant for MEG (enum defined, implementation pending) |
+| TRAP MUSIC | `mne.beamformer._rap_music` | Truncated RAP-MUSIC variant |
+
+## See Also
+
+- [DSP Library](api-dsp) — Signal processing algorithms
+- [Connectivity Library](api-connectivity) — Functional connectivity metrics
+- [MNE Dipole Fit](../manual/dipole-fit) — Application GUI for dipole fitting
+- [mne_inverse_operator](../manual/tools-inverse-operator) — CLI tool for inverse operator computation

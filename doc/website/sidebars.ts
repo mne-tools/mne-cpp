@@ -65,6 +65,8 @@ const sidebars: SidebarsConfig = {
                         },
                         'manual/inspect',
                         'manual/browse-raw',
+                        'manual/dipole-fit',
+                        'manual/analyze-studio',
                         'manual/online',
                     ],
                 },
@@ -212,8 +214,10 @@ const sidebars: SidebarsConfig = {
             label: 'Library API',
             link: { type: 'doc', id: 'development/api' },
             items: [
-                'development/api-disp3d',
+                'development/api-dsp',
+                'development/api-inverse',
                 'development/api-connectivity',
+                'development/api-disp3d',
             ],
         },
         {

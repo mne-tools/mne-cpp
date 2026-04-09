@@ -1,0 +1,80 @@
+---
+title: MNE Dipole Fit
+sidebar_label: MNE Dipole Fit
+sidebar_position: 11
+---
+
+# MNE Dipole Fit
+
+MNE Dipole Fit is a GUI/CLI application for **sequential equivalent current dipole (ECD) fitting**. It localizes focal brain activity by fitting one or more dipoles to MEG/EEG evoked data at each time point, finding the source position, orientation, and amplitude that best explain the measured field pattern.
+
+This application is a C++ port of the original MNE-C `mne_dipole_fit` tool, enhanced with a 3D visualization of fitted dipoles on the cortical surface.
+
+## How It Works
+
+1. **Load data** — evoked FIFF file, noise covariance, BEM model (or sphere model), and optional MRI transformation.
+2. **Fit dipoles** — at each time point in the specified range, the algorithm performs a non-linear least-squares fit to find the dipole position, orientation, and amplitude that minimize the residual field. An initial grid search over precomputed guess points provides starting estimates.
+3. **Visualize** — fitted dipoles are displayed on the FreeSurfer cortical surface in a 3D viewer, colour-coded by goodness-of-fit.
+
+## Command-Line Options
+
+MNE Dipole Fit accepts the same command-line options as the original MNE-C tool:
+
+| Option | Description |
+|---|---|
+| `--meas <file>` | Evoked data file (FIFF) |
+| `--set <n>` | Data set number in the evoked file (default: 1) |
+| `--bad <file>` | File listing bad channel names |
+| `--noise <file>` | Noise covariance file |
+| `--gradnoise <val>` | Gradiometer noise override (fT/cm) |
+| `--magnoise <val>` | Magnetometer noise override (fT) |
+| `--eegnoise <val>` | EEG noise override (µV) |
+| `--reg <val>` | Regularization factor for noise covariance (default: 0.1 for MEG, 0.1 for EEG) |
+| `--gradreg <val>` | Gradiometer regularization override |
+| `--magreg <val>` | Magnetometer regularization override |
+| `--eegreg <val>` | EEG regularization override |
+| `--tmin <ms>` | Start of fitting interval (ms) |
+| `--tmax <ms>` | End of fitting interval (ms) |
+| `--tstep <ms>` | Time step between fitted dipoles (ms) |
+| `--integ <ms>` | Integration time over response (ms) |
+| `--bmin <ms>` | Baseline start (ms) |
+| `--bmax <ms>` | Baseline end (ms) |
+| `--bem <file>` | BEM model file (FIFF) |
+| `--origin <x:y:z>` | Sphere model origin (mm, MEG head frame) |
+| `--eegorigin <x:y:z>` | EEG sphere model origin |
+| `--eegscalp` | Scale EEG electrode positions to the scalp |
+| `--mri <file>` | Head-to-MRI transformation file |
+| `--accurate` | Use the accurate (slower) BEM formulation |
+| `--guess <file>` | Custom guess point file |
+| `--guessrad <mm>` | Radius of the guess point sphere (mm) |
+| `--guessrr <mm>` | Minimum distance between guess points (mm) |
+| `--dip <file>` | Output dipole file |
+| `--bdip <file>` | Output binary dipole file (FIFF) |
+
+### Example
+
+```bash
+mne_dipole_fit \
+  --meas audvis-ave.fif \
+  --set 1 \
+  --noise audvis-cov.fif \
+  --bem sample-5120-5120-5120-bem-sol.fif \
+  --mri sample-head_mri-trans.fif \
+  --tmin 40 --tmax 150 --tstep 5 \
+  --dip audvis-dip.txt --bdip audvis-dip.fif
+```
+
+## Correspondence to MNE-Python
+
+The equivalent function in MNE-Python is [`mne.fit_dipole()`](https://mne.tools/stable/generated/mne.fit_dipole.html), which provides identical sequential dipole fitting with additional options for parallel processing and confidence intervals.
+
+## Correspondence to MNE-C
+
+This application replaces the original `mne_dipole_fit` from MNE-C v2.7. All command-line options are preserved for backward compatibility. The underlying fitting algorithm (grid-search initialization + simplex optimization) is mathematically identical.
+
+## See Also
+
+- [MNE Analyze — Dipole Fit Plugin](analyze-dipolefit) — Interactive dipole fitting within MNE Analyze
+- [mne_inverse_operator](tools-inverse-operator) — Compute the distributed inverse operator
+- [mne_compute_mne](tools-compute-mne) — Compute distributed MNE/dSPM/sLORETA estimates
+- [Inverse Library API](../development/api) — `InvDipoleFit`, `InvDipoleFitData`, and related classes

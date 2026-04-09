@@ -25,11 +25,28 @@ MNE-CPP is an open-source, cross-platform C++ framework for real-time and offlin
 | ![MNE Browse](/img/icon_mne-browse_256x256.png) | [**MNE Browse**](manual/browse-raw) — Interactive viewer for raw MEG/EEG data in FIFF format with multi-channel navigation, scaling, filtering, and channel selection. |
 | ![MNE Inspect](/img/icon_mne_inspect_256x256.png) | [**MNE Inspect**](manual/inspect) — Interactive 3D brain viewer for FreeSurfer surfaces, BEM models, source estimates, atlases, sensors, and functional connectivity networks. |
 
+### Specialist Applications
+
+| Application | Description |
+|---|---|
+| [**MNE Analyze Studio**](manual/analyze-studio) | Agent-oriented analysis workbench with an LLM-driven skill host, neuro kernel, and extension SDK for building composable analysis workflows. *(Preview — staging branch)* |
+| [**MNE Dipole Fit**](manual/dipole-fit) | Sequential equivalent current dipole fitting for localising focal brain activity. C++ port of the original MNE-C `mne_dipole_fit` with 3D dipole visualization. |
+
 In addition, MNE-CPP ships a set of [command-line tools](manual/tools-overview) for BEM model creation, forward/inverse computation, data conversion, anonymization, and real-time streaming — all C++ ports of the original MNE-C utilities.
 
 ## Libraries
 
 All applications are built on MNE-CPP's modular C++ libraries, which depend only on [Qt](https://www.qt.io/) and [Eigen](http://eigen.tuxfamily.org/). The libraries can be used independently to build custom neuroscience applications. See the [Library API documentation](development/api) for details.
+
+| Library | Description |
+|---|---|
+| **Fiff** | FIFF file I/O — raw data, epochs, evoked, covariance, projections, events |
+| **Mne** | Core MNE data structures — source spaces, source estimates, hemispheres, forward solutions |
+| **Fwd** | Forward modelling — BEM and MEG/EEG lead-field computation |
+| [**Inv**](development/api-inverse) | Inverse source estimation — MNE, dSPM, sLORETA, eLORETA, LCMV/DICS beamformers, RAP MUSIC, dipole fit, HPI |
+| [**Dsp**](development/api-dsp) | Digital signal processing — FIR/IIR filtering, ICA, xDAWN, SSS/tSSS, Welch PSD, Morlet TFR, spectrogram, resampling, bad-channel detection, SPHARA, real-time averaging/filtering |
+| [**Conn**](development/api-connectivity) | Functional connectivity — coherence, coherency, PLV, PLI, WPLI, cross-correlation, and network analysis |
+| **Disp3D** | 3D brain visualization (Metal/Vulkan/D3D/OpenGL via Qt RHI) |
 
 **License:** BSD 3-Clause. **Versioning:** [Semantic Versioning](https://semver.org/).
 
