@@ -48,6 +48,7 @@
 //=============================================================================================================
 
 #include <iostream>
+#include <stdexcept>
 #include <QDebug>
 
 //=============================================================================================================
@@ -147,23 +148,33 @@ bool FiffIO::read(QIODevice& pIODevice)
     //Read all sort of types
     //raw data
     if(hasRaw) {
-        QSharedPointer<FiffRawData> p_fiffRawData(new FiffRawData(pIODevice));
-        pIODevice.close();
+        try {
+            QSharedPointer<FiffRawData> p_fiffRawData(new FiffRawData(pIODevice));
+            pIODevice.close();
 
-        //append to corresponding member qlist
-        m_qlistRaw.append(p_fiffRawData);
+            //append to corresponding member qlist
+            m_qlistRaw.append(p_fiffRawData);
 
-        qInfo( "Finished reading raw data!\n");
+            qInfo( "Finished reading raw data!\n");
+        } catch (const std::exception& e) {
+            qWarning() << "[FiffIO::read] Could not read raw data:" << e.what();
+            pIODevice.close();
+        }
     }
 
     //evoked data + projections
     if(hasEvoked) {
-        FiffEvokedSet p_fiffEvokedSet(pIODevice);
-        pIODevice.close();
+        try {
+            FiffEvokedSet p_fiffEvokedSet(pIODevice);
+            pIODevice.close();
 
-        //append to corresponding member qlist
-        for(qint32 i=0; i < p_fiffEvokedSet.evoked.size(); ++i) {
-            m_qlistEvoked.append(QSharedPointer<FiffEvoked>(new FiffEvoked(p_fiffEvokedSet.evoked[i])));
+            //append to corresponding member qlist
+            for(qint32 i=0; i < p_fiffEvokedSet.evoked.size(); ++i) {
+                m_qlistEvoked.append(QSharedPointer<FiffEvoked>(new FiffEvoked(p_fiffEvokedSet.evoked[i])));
+            }
+        } catch (const std::exception& e) {
+            qWarning() << "[FiffIO::read] Could not read evoked data:" << e.what();
+            pIODevice.close();
         }
     }
 

@@ -310,8 +310,8 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
 
     if (C_meg_idx.size() + C_eeg_idx.size() != n_chan)
     {
-        throw std::runtime_error("Error in FiffCov::prepare_noise_cov: channel sizes do no match!");
-        return FiffCov();
+        qWarning("FiffCov::prepare_noise_cov: %lld MEG + %lld EEG channels != %d total (unclassified channels present)",
+                 (long long)C_meg_idx.size(), (long long)C_eeg_idx.size(), n_chan);
     }
 
     p_NoiseCov.data = C;
@@ -377,9 +377,10 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
 
     MatrixXd C(cov_good.data);
 
-    //Subtract number of found stim channels because they are still in C but not the idx_eeg, idx_mag or idx_grad
-    if((unsigned) C.rows() - iNoStimCh != idx_eeg.size() + idx_mag.size() + idx_grad.size()) {
-        throw std::runtime_error("FiffCov::regularize: Channel dimensions do not fit");
+    //Check dimension consistency (channels not classified as EEG/MAG/GRAD, e.g. EOG/MISC, are expected)
+    if((unsigned) C.rows() != idx_eeg.size() + idx_mag.size() + idx_grad.size()) {
+        qWarning("FiffCov::regularize: %lld channels in cov but only %zu classified as EEG/MAG/GRAD (others will not be regularized)",
+                 (long long)C.rows(), idx_eeg.size() + idx_mag.size() + idx_grad.size());
     }
 
     QList<FiffProj> t_listProjs;
