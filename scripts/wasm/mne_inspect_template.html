@@ -22,7 +22,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(175deg, #0a0a14 0%, #0d1117 50%, #0a0e16 100%);
+            background: linear-gradient(175deg, #f8f9fc 0%, #eef0f6 50%, #f4f5fa 100%);
         }
 
         /* ── Loading overlay ─────────────────────────────────── */
@@ -56,58 +56,47 @@
         .loading-card {
             position: relative;
             z-index: 10;
-            background: rgba(18, 22, 30, 0.85);
+            background: rgba(255, 255, 255, 0.88);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(200, 170, 80, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.6);
             border-radius: 28px;
             padding: 52px 64px 44px;
             text-align: center;
             box-shadow:
-                0 2px 4px rgba(200, 170, 80, 0.03),
-                0 8px 16px rgba(200, 170, 80, 0.06),
-                0 20px 40px rgba(0, 0, 0, 0.3),
-                0 0 0 1px rgba(200, 170, 80, 0.1) inset;
+                0 2px 4px rgba(108, 92, 231, 0.03),
+                0 8px 16px rgba(108, 92, 231, 0.06),
+                0 20px 40px rgba(0, 0, 0, 0.07),
+                0 0 0 1px rgba(255, 255, 255, 0.5) inset;
             max-width: 460px;
             width: 90%;
             will-change: transform;
             transition: transform 0.15s ease-out;
         }
 
-        /* ── App icon ────────────────────────────────────────── */
-        .icon-container {
+        /* ── Logo ────────────────────────────────────────────── */
+        .logo-container {
             margin-bottom: 28px;
         }
 
-        .icon-container svg {
-            width: 96px;
-            height: 96px;
-            filter: drop-shadow(0 3px 12px rgba(200, 170, 80, 0.25));
-        }
-
-        /* ── Logo ────────────────────────────────────────────── */
-        .logo-container {
-            margin-bottom: 20px;
-        }
-
         .logo-container svg {
-            width: 200px;
+            width: 220px;
             height: auto;
-            filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.2));
+            filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.08));
         }
 
         /* ── Typography ──────────────────────────────────────── */
         .app-name {
             font-size: 1.35rem;
             font-weight: 700;
-            color: #e8d8a8;
+            color: #2d3436;
             letter-spacing: -0.025em;
             margin-bottom: 6px;
         }
 
         .app-subtitle {
             font-size: 0.82rem;
-            color: #8090a0;
+            color: #636e72;
             margin-bottom: 32px;
         }
 
@@ -115,7 +104,7 @@
         .progress-container {
             width: 100%;
             height: 4px;
-            background: rgba(200, 170, 80, 0.1);
+            background: rgba(108, 92, 231, 0.1);
             border-radius: 2px;
             overflow: hidden;
             margin-bottom: 14px;
@@ -124,7 +113,7 @@
         .progress-bar {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, #c8a850, #e8d080, #c8a850);
+            background: linear-gradient(90deg, #6c5ce7, #a29bfe, #6c5ce7);
             background-size: 200% 100%;
             border-radius: 2px;
             animation: shimmer 1.8s ease-in-out infinite;
@@ -144,7 +133,7 @@
         /* ── Status ──────────────────────────────────────────── */
         .status-text {
             font-size: 0.78rem;
-            color: #607080;
+            color: #b2bec3;
             min-height: 1.3em;
             transition: color 0.3s;
         }
@@ -177,16 +166,6 @@
     <!-- Loading screen -->
     <div id="loading-overlay">
         <div class="loading-card" id="loading-card">
-            <div class="icon-container">
-                <!-- MNE Inspect app icon (inline SVG matching the gold/brain-wave design) -->
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-                    <rect x="4" y="4" width="120" height="120" rx="16" ry="16" fill="#1a1a24" stroke="#c8a850" stroke-width="3"/>
-                    <text x="14" y="48" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="40" font-weight="700" fill="#c8a850">In</text>
-                    <path d="M12,80 Q32,60 52,78 Q72,96 92,68 Q107,50 118,62" fill="none" stroke="#c8a850" stroke-width="2.5" opacity="0.7"/>
-                    <path d="M12,90 Q32,72 52,88 Q72,104 92,78 Q107,62 118,72" fill="none" stroke="#c8a850" stroke-width="2" opacity="0.5"/>
-                    <path d="M12,100 Q32,84 52,98 Q72,112 92,88 Q107,74 118,82" fill="none" stroke="#c8a850" stroke-width="1.5" opacity="0.3"/>
-                </svg>
-            </div>
             <div class="logo-container">
                 <!-- MNE-CPP logo (inline) -->
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576.5 301">
@@ -264,18 +243,18 @@
                     <path fill="#E76DAA" d="M173.166,120.641l-45.78-16.073l8.638-23.412Z" />
                     <path fill="#96C93F" d="M73.688,170.891l-15.422-45.91l66.12-18.413Z" />
                     <g>
-                        <path fill="#e8d8a8"
+                        <path fill="#033045"
                             d="M267.267,298.125h-12.771v-34.354c0-3.711,0.159-7.81,0.479-12.293h-0.32c-0.667,3.522-1.268,6.061-1.802,7.606L239.4,298.124H228.83l-13.693-38.638c-0.374-1.041-0.975-3.711-1.802-8.008h-0.36c0.347,5.657,0.521,10.623,0.521,14.895v31.751h-11.651v-57.416h18.938l11.73,34.033c0.934,2.723,1.615,5.459,2.042,8.208h0.24c0.721-3.176,1.48-5.939,2.282-8.288l11.73-33.953h18.458V298.125z" />
-                        <path fill="#e8d8a8"
+                        <path fill="#033045"
                             d="M331.97,298.125h-13.054l-23.662-36.075c-1.39-2.108-2.351-3.696-2.883-4.765h-0.16c0.213,2.029,0.319,5.125,0.319,9.289v31.551h-12.212v-57.416h13.935l22.781,34.954c1.041,1.575,2.002,3.137,2.884,4.685h0.159c-0.214-1.334-0.319-3.964-0.319-7.888v-31.751h12.212V298.125z" />
-                        <path fill="#e8d8a8"
+                        <path fill="#033045"
                             d="M379.535,298.125h-34.435v-57.416h33.112v10.53h-20.181v12.771h18.778v10.49h-18.778v13.133h21.501L379.535,298.125z" />
-                        <path fill="#e8d8a8" d="M409.807,280.668h-21.901v-8.85h21.901V280.668z" />
-                        <path fill="#e8d8a8"
+                        <path fill="#033045" d="M409.807,280.668h-21.901v-8.85h21.901V280.668z" />
+                        <path fill="#033045"
                             d="M463.058,296.083c-4.19,2.028-9.662,3.043-16.416,3.043c-8.809,0-15.734-2.589-20.779-7.769c-5.046-5.179-7.566-12.078-7.566-20.699c0-9.182,2.836-16.629,8.508-22.342c5.673-5.713,13.033-8.568,22.082-8.568c5.604,0,10.33,0.708,14.175,2.122v12.452c-3.845-2.295-8.223-3.443-13.134-3.443c-5.394,0-9.743,1.695-13.054,5.085c-3.312,3.39-4.965,7.981-4.965,13.772c0,5.553,1.563,9.978,4.686,13.272c3.123,3.298,7.327,4.945,12.611,4.945c5.046,0,9.662-1.229,13.854-3.685v11.813z" />
-                        <path fill="#e8d8a8"
+                        <path fill="#033045"
                             d="M486,278.346v19.779h-12.934v-57.416h20.26c14.468,0,21.701,6.1,21.701,18.298c0,5.767-2.076,10.431-6.228,13.994c-4.15,3.563-9.696,5.345-16.637,5.345H486zM486,250.639v17.897h5.085c6.887,0,10.329-3.017,10.329-9.05c0-5.898-3.442-8.848-10.329-8.848H486z" />
-                        <path fill="#e8d8a8"
+                        <path fill="#033045"
                             d="M536.368,278.346v19.779h-12.933v-57.416h20.26c14.467,0,21.701,6.1,21.701,18.298c0,5.767-2.076,10.431-6.228,13.994c-4.152,3.563-9.696,5.345-16.637,5.345H536.368zM536.368,250.639v17.897h5.085c6.888,0,10.33-3.017,10.33-9.05c0-5.898-3.442-8.848-10.33-8.848H536.368z" />
                     </g>
                     <g>
@@ -313,7 +292,7 @@
                 </svg>
             </div>
             <div class="app-name">MNE Inspect</div>
-            <div class="app-subtitle">Loading 3D brain visualization&hellip;</div>
+            <div class="app-subtitle">Loading application&hellip;</div>
             <div class="progress-container">
                 <div class="progress-bar" id="progress-bar"></div>
             </div>
@@ -327,7 +306,7 @@
     <div id="qtstatus" style="display:none"></div>
     <script>
         /* ================================================================
-           Floating-polygon particle system — dark brain-themed
+           Floating-polygon particle system — mouse-reactive parallax
            ================================================================ */
         try { (function () {
             var canvas = document.getElementById('particles-canvas');
@@ -338,9 +317,10 @@
             var running = true;
 
             var PALETTE = [
-                '#c8a850', '#e8d080', '#a08030', '#d4b860', '#f0e0a0',
-                '#0c9a49', '#7bc24e', '#96c93f', '#199eda', '#2fb7e4',
-                '#e76daa', '#df1284', '#986036', '#c3a593', '#2465b0'
+                '#6c5ce7', '#a29bfe', '#0c9a49', '#7bc24e', '#96c93f',
+                '#199eda', '#2fb7e4', '#e76daa', '#df1284', '#aa1e53',
+                '#fbda20', '#fae250', '#daab28', '#d81e3a', '#2465b0',
+                '#033045', '#986036', '#c3a593'
             ];
 
             function resize() {
@@ -356,13 +336,13 @@
                 this.y = Math.random() * H;
                 this.r = Math.random() * 7 + 2;
                 this.baseR = this.r;
-                this.vx = (Math.random() - 0.5) * 0.25;
-                this.vy = (Math.random() - 0.5) * 0.25;
+                this.vx = (Math.random() - 0.5) * 0.35;
+                this.vy = (Math.random() - 0.5) * 0.35;
                 this.color = PALETTE[Math.floor(Math.random() * PALETTE.length)];
-                this.alpha = Math.random() * 0.2 + 0.05;
+                this.alpha = Math.random() * 0.25 + 0.08;
                 this.baseA = this.alpha;
                 this.rot = Math.random() * Math.PI * 2;
-                this.rotV = (Math.random() - 0.5) * 0.012;
+                this.rotV = (Math.random() - 0.5) * 0.015;
                 this.depth = Math.random() * 0.7 + 0.3;
                 /* Only pluses and triangles (MNE-CPP logo shapes) */
                 this.shape = Math.random() < 0.5 ? 'plus' : 'triangle';
@@ -391,7 +371,7 @@
                 var dist = Math.sqrt(mx * mx + my * my);
                 if (dist < 220) {
                     var t = 1 - dist / 220;
-                    this.alpha = Math.min(0.45, this.baseA + t * 0.35);
+                    this.alpha = Math.min(0.55, this.baseA + t * 0.4);
                     this.r = Math.min(this.baseR + t * 6, 16);
                 } else {
                     this.alpha += (this.baseA - this.alpha) * 0.04;
@@ -412,6 +392,8 @@
                 ctx.globalAlpha = this.alpha;
                 ctx.fillStyle = this.color;
                 if (this.shape === 'plus') {
+                    /* Rectangular cross matching MNE-CPP logo proportions:
+                       arm thickness ≈ 26% of arm length (from logo SVG paths) */
                     var arm = this.r;
                     var t = arm * 0.26;
                     ctx.beginPath();
@@ -424,6 +406,7 @@
                     ctx.closePath();
                     ctx.fill();
                 } else {
+                    /* Irregular scalene triangle — like the logo's faceted polygons */
                     var tri = this.tri;
                     ctx.beginPath();
                     ctx.moveTo(tri[0].dx * this.r, tri[0].dy * this.r);
@@ -437,7 +420,7 @@
 
             /* — Init — */
             resize();
-            var count = Math.min(80, Math.floor(W * H / 14000));
+            var count = Math.min(90, Math.floor(W * H / 12000));
             for (var i = 0; i < count; i++) particles.push(new Particle());
 
             /* smooth mouse */
@@ -495,7 +478,7 @@
         var simTimer = setInterval(function () {
             if (simProg < 25) { simProg += Math.random() * 3; setProgress(simProg, 'Downloading application\u2026'); }
             else if (simProg < 55) { simProg += Math.random() * 1.5; setProgress(simProg, 'Compiling WebAssembly\u2026'); }
-            else if (simProg < 80) { simProg += Math.random() * 0.6; setProgress(simProg, 'Initializing 3D renderer\u2026'); }
+            else if (simProg < 80) { simProg += Math.random() * 0.6; setProgress(simProg, 'Initializing Qt framework\u2026'); }
         }, 250);
 
         /* ================================================================
