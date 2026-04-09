@@ -41,6 +41,7 @@ jobs:
         architecture: 'x64'
     - name: Install dependencies
       run: |
+        sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
         sudo apt-get update -q
         sudo apt-get install -q build-essential libgl1-mesa-dev libvulkan-dev ninja-build
     - name: Compile dynamic Qt version
@@ -226,6 +227,7 @@ jobs:
       uses: actions/checkout@v5
     - name: Install dependencies
       run: |
+        sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
         sudo apt-get update -q
         sudo apt-get install -q \
           build-essential \
@@ -518,6 +520,7 @@ jobs:
       uses: actions/checkout@v5
     - name: Install dependencies
       run: |
+        sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
         sudo apt-get update -q
         sudo apt-get install -q build-essential libgl1-mesa-dev libvulkan-dev ninja-build
     - name: Compile static Qt version
@@ -650,6 +653,7 @@ jobs:
         ./emsdk activate 4.0.7
     - name: Install dependencies
       run: |
+        sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
         sudo apt-get update -q
         sudo apt-get install -q build-essential libgl1-mesa-dev libvulkan-dev ninja-build
     - name: Build host Qt (needed for cross-compilation)

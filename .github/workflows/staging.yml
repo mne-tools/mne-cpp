@@ -130,6 +130,7 @@ jobs:
 
     - name: Install Doxygen 1.16.1 and Graphviz
       run: |
+        sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
         sudo apt-get update -qq
         sudo apt-get install -qq qttools5-dev-tools graphviz
         wget -q https://github.com/doxygen/doxygen/releases/download/Release_1_16_1/doxygen-1.16.1.linux.bin.tar.gz
@@ -233,6 +234,7 @@ jobs:
 
     - name: Install dependencies
       run: |
+        sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
         sudo apt-get update -qq
         sudo apt-get install -qq build-essential libgl1-mesa-dev ninja-build
 

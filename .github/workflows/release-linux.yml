@@ -36,6 +36,8 @@ jobs:
         fi
     - name: Install system dependencies
       run: |
+        # Remove third-party repos that can cause transient 403/signing errors
+        sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
         sudo apt-get update -q
         sudo apt-get install -q libgl1-mesa-dev
     - name: Install Python 3.10 version
@@ -118,6 +120,8 @@ jobs:
         architecture: 'x64'
     - name: Install dependencies
       run: |
+        # Remove third-party repos that can cause transient 403/signing errors
+        sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
         sudo apt-get update -q
         sudo apt-get install -q build-essential libgl1-mesa-dev libvulkan-dev ninja-build
     - name: Download Eigen package

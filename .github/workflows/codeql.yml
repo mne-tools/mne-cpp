@@ -36,6 +36,7 @@ jobs:
 
     - name: Install OpenGL development libraries
       run: |
+        sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
         sudo apt-get update -q
         sudo apt-get install -q libgl1-mesa-dev
 
