@@ -46,6 +46,7 @@
 #include <math/numerics.h>
 #include <QDebug>
 
+#include <stdexcept>
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -80,8 +81,7 @@ FiffEvoked::FiffEvoked(QIODevice& p_IODevice,
     {
         baseline = t_baseline;
 
-        qWarning("\tFiff evoked data not found.\n");//ToDo Throw here
-        return;
+        throw std::runtime_error("Fiff evoked data not found");
     }
 }
 

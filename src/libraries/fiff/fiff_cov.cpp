@@ -61,6 +61,7 @@
 #include <Eigen/SVD>
 #include <QDebug>
 
+#include <stdexcept>
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -95,12 +96,11 @@ FiffCov::FiffCov(QIODevice &p_IODevice)
 
     if(!t_pStream->open())
     {
-        qWarning("\tNot able to open IODevice.\n");//ToDo Throw here
-        return;
+        throw std::runtime_error("Not able to open IODevice");
     }
 
     if(!t_pStream->read_cov(t_pStream->dirtree(), FIFFV_MNE_NOISE_COV, *this))
-        qWarning("\tFiff covariance not found.\n");//ToDo Throw here
+        throw std::runtime_error("Fiff covariance not found");
 
     qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov> >("QSharedPointer<FIFFLIB::FiffCov>");
     qRegisterMetaType<FIFFLIB::FiffCov>("FIFFLIB::FiffCov");
@@ -310,7 +310,7 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
 
     if (C_meg_idx.size() + C_eeg_idx.size() != n_chan)
     {
-        qWarning("Error in FiffCov::prepare_noise_cov: channel sizes do no match!\n");//ToDo Throw here
+        throw std::runtime_error("Error in FiffCov::prepare_noise_cov: channel sizes do no match!");
         return FiffCov();
     }
 
@@ -379,7 +379,7 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
 
     //Subtract number of found stim channels because they are still in C but not the idx_eeg, idx_mag or idx_grad
     if((unsigned) C.rows() - iNoStimCh != idx_eeg.size() + idx_mag.size() + idx_grad.size()) {
-        qWarning("Error in FiffCov::regularize: Channel dimensions do not fit.\n");//ToDo Throw
+        throw std::runtime_error("FiffCov::regularize: Channel dimensions do not fit");
     }
 
     QList<FiffProj> t_listProjs;

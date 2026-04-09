@@ -66,6 +66,7 @@
 #include <QFuture>
 #include <QRegularExpression>
 
+#include <stdexcept>
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -1734,8 +1735,7 @@ void MNEForwardSolution::to_fixed_ori()
 {
     if(!this->surf_ori || this->isFixedOrient())
     {
-        qWarning("Warning: Only surface-oriented, free-orientation forward solutions can be converted to fixed orientaton.\n");//ToDo: Throw here//qCritical//qFatal
-        return;
+        throw std::logic_error("Only surface-oriented, free-orientation forward solutions can be converted to fixed orientation");
     }
     qint32 count = 0;
     for(qint32 i = 2; i < this->sol->data.cols(); i += 3)

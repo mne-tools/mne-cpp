@@ -168,7 +168,6 @@ void RtCmdClient::sendCommandJSON(const Command &p_command)
     }
 
     m_qMutex.lock();
-//    m_sAvailableData.append(t_sReply); //ToDo check this
     m_sAvailableData = t_sReply;
     m_qMutex.unlock();
 

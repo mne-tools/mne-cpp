@@ -44,6 +44,7 @@
 #include "fiff_stream.h"
 #include "cstdlib"
 
+#include <stdexcept>
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -70,9 +71,7 @@ FiffRawData::FiffRawData(QIODevice &p_IODevice)
     //setup FiffRawData object
     if(!FiffStream::setup_read_raw(p_IODevice, *this))
     {
-        qWarning("\tError during fiff setup raw read.\n");
-        //exit(EXIT_FAILURE); //ToDo Throw here, e.g.: throw std::runtime_error("IO Error! File not found");
-        return;
+        throw std::runtime_error("Error during fiff setup raw read");
     }
 }
 
@@ -85,9 +84,7 @@ FiffRawData::FiffRawData(QIODevice &p_IODevice, bool b_littleEndian)
     //setup FiffRawData object
     if(!FiffStream::setup_read_raw(p_IODevice, *this, false, b_littleEndian))
     {
-        qWarning("\tError during fiff setup raw read.\n");
-        //exit(EXIT_FAILURE); //ToDo Throw here, e.g.: throw std::runtime_error("IO Error! File not found");
-        return;
+        throw std::runtime_error("Error during fiff setup raw read");
     }
 }
 

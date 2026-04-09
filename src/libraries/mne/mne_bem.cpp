@@ -44,14 +44,13 @@
 #include <math/warp.h>
 #include <fs/fs_label.h>
 
-#include <iostream>
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QFile>
 
+#include <stdexcept>
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -87,7 +86,7 @@ MNEBem::MNEBem(QIODevice &p_IODevice)   //const MNEBem &p_MNEBem
     if(!MNEBem::readFromStream(t_pStream, true, *this))
     {
         t_pStream->close();
-        std::cout << "Could not read the bem surfaces\n"; // ToDo throw error
+        throw std::runtime_error("Could not read the bem surfaces\n");
         //ToDo error(me,'Could not read the bem surfaces (%s)',mne_omit_first_line(lasterr));
 //        return false;
     }
@@ -220,7 +219,7 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
     if(!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NNODE, t_pTag))
     {
         p_pStream->close();
-        std::cout << "np not found!";
+        qWarning() << "np not found!";
         return false;
     }
     else
@@ -234,7 +233,7 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
     if(!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NTRI, t_pTag))
     {
         p_pStream->close();
-        std::cout << "ntri not found!";
+        qWarning() << "ntri not found!";
         return false;
     }
     else
@@ -251,8 +250,7 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
         if(!p_Tree->find_tag(p_pStream, FIFF_BEM_COORD_FRAME, t_pTag))
         {
             p_pStream->close();
-            std::cout << "Coordinate frame information not found."; //ToDo: throw error.
-            return false;
+            throw std::runtime_error("Coordinate frame information not found.");
         }
         else
         {
@@ -274,8 +272,7 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
     if(!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NODES, t_pTag))
     {
         p_pStream->close();
-        std::cout << "Vertex data not found."; //ToDo: throw error.
-        return false;
+        throw std::runtime_error("Vertex data not found.");
     }
 
     p_BemSurface.rr = t_pTag->toFloatMatrix().transpose();
@@ -284,8 +281,7 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
     if (rows_rr != p_BemSurface.np)
     {
         p_pStream->close();
-        std::cout << "Vertex information is incorrect."; //ToDo: throw error.
-        return false;
+        throw std::runtime_error("Vertex information is incorrect.");
     }
 
 //    qDebug() << "Surf Nodes; type:" << t_pTag->getType();
@@ -296,8 +292,7 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
         if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag))
         {
             p_pStream->close();
-            std::cout << "Vertex normals not found."; //ToDo: throw error.
-            return false;
+            throw std::runtime_error("Vertex normals not found.");
         }
 
         p_BemSurface.nn = t_pTag->toFloatMatrix().transpose();
@@ -310,8 +305,7 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
     if (p_BemSurface.nn.rows() != p_BemSurface.np)
     {
         p_pStream->close();
-        std::cout << "Vertex normal information is incorrect."; //ToDo: throw error.
-        return false;
+        throw std::runtime_error("Vertex normal information is incorrect.");
     }
 
 //    qDebug() << "Bem Vertex Normals; type:" << t_pTag->getType();
@@ -324,8 +318,7 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
             if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_TRIANGLES, t_pTag))
             {
                 p_pStream->close();
-                std::cout << "Triangulation not found."; //ToDo: throw error.
-                return false;
+                throw std::runtime_error("Triangulation not found.");
             }
             else
             {
@@ -342,8 +335,7 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
         if (p_BemSurface.itris.rows() != p_BemSurface.ntri)
         {
             p_pStream->close();
-            std::cout << "Triangulation information is incorrect."; //ToDo: throw error.
-            return false;
+            throw std::runtime_error("Triangulation information is incorrect.");
         }
     }
     else

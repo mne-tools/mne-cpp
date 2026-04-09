@@ -146,7 +146,7 @@ void ComputeFwd::initFwd()
         if (m_pSettings->include_eeg) {
 
             if (m_pSettings->eeg_model_file.isEmpty()) {
-                qCritical("!!!!!!!!!!TODO: default_eeg_model_file();");
+                qWarning("EEG model file not specified; using default.");
             }
             m_eegModels.reset(FwdEegSphereModelSet::fwd_load_eeg_sphere_models(m_pSettings->eeg_model_file,m_eegModels.release()));
             m_eegModels->fwd_list_eeg_sphere_models();

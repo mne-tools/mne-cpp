@@ -44,14 +44,13 @@
 #include <math/linalg.h>
 #include <fs/fs_label.h>
 
-#include <iostream>
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QFile>
 
+#include <stdexcept>
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -303,7 +302,7 @@ bool MNESourceSpaces::readFromStream(FiffStream::SPtr& p_pStream,
     {
         if(open_here)
             p_pStream->close();
-        std::cout << "No source spaces found";
+        qWarning() << "No source spaces found";
         return false;
     }
 
@@ -374,8 +373,7 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
     if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag))
     {
         p_pStream->close();
-        std::cout << "error: Number of vertices not found."; //ToDo: throw error.
-        return false;
+        throw std::runtime_error("error: Number of vertices not found.");
     }
 //        qDebug() << "Number of vertice; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
     p_Hemisphere.np = *t_pTag->toInt();
@@ -398,8 +396,7 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
     if(!p_Tree->find_tag(p_pStream, FIFF_MNE_COORD_FRAME, t_pTag))
     {
         p_pStream->close();
-        std::cout << "Coordinate frame information not found."; //ToDo: throw error.
-        return false;
+        throw std::runtime_error("Coordinate frame information not found.");
     }
     p_Hemisphere.coord_frame = *t_pTag->toInt();
 //        qDebug() << "Coord Frame; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
@@ -411,8 +408,7 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
     if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_POINTS, t_pTag))
     {
         p_pStream->close();
-        std::cout << "Vertex data not found."; //ToDo: throw error.
-        return false;
+        throw std::runtime_error("Vertex data not found.");
     }
 
     p_Hemisphere.rr = t_pTag->toFloatMatrix().transpose();
@@ -422,8 +418,7 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
     if (rows_rr != p_Hemisphere.np)
     {
         p_pStream->close();
-        std::cout << "Vertex information is incorrect."; //ToDo: throw error.
-        return false;
+        throw std::runtime_error("Vertex information is incorrect.");
     }
 //        qDebug() << "Source Space Points; type:" << t_pTag->getType();
 
@@ -431,8 +426,7 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
     if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag))
     {
         p_pStream->close();
-        std::cout << "Vertex normals not found."; //ToDo: throw error.
-        return false;
+        throw std::runtime_error("Vertex normals not found.");
     }
 
     p_Hemisphere.nn = t_pTag->toFloatMatrix().transpose();
@@ -441,8 +435,7 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
     if (rows_nn != p_Hemisphere.np)
     {
         p_pStream->close();
-        std::cout << "Vertex normal information is incorrect."; //ToDo: throw error.
-        return false;
+        throw std::runtime_error("Vertex normal information is incorrect.");
     }
 //        qDebug() << "Source Space Normals; type:" << t_pTag->getType();
 
@@ -454,8 +447,7 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
             if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_TRIANGLES, t_pTag))
             {
                 p_pStream->close();
-                std::cout << "Triangulation not found."; //ToDo: throw error.
-                return false;
+                throw std::runtime_error("Triangulation not found.");
             }
             else
             {
@@ -471,8 +463,7 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
         if (p_Hemisphere.itris.rows() != p_Hemisphere.ntri)
         {
             p_pStream->close();
-            std::cout << "Triangulation information is incorrect."; //ToDo: throw error.
-            return false;
+            throw std::runtime_error("Triangulation information is incorrect.");
         }
     }
     else
@@ -497,8 +488,7 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
         if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_SELECTION, t_pTag))
         {
             p_pStream->close();
-            std::cout << "Source selection information missing."; //ToDo: throw error.
-            return false;
+            throw std::runtime_error("Source selection information missing.");
         }
         p_Hemisphere.inuse = VectorXi(Map<VectorXi>(t_pTag->toInt(), t_pTag->size()/4, 1));//use copy constructor, for the sake of easy memory management
 
@@ -506,8 +496,7 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
         if (p_Hemisphere.inuse.rows() != p_Hemisphere.np)
         {
             p_pStream->close();
-            std::cout << "Incorrect number of entries in source space selection."; //ToDo: throw error.
-            return false;
+            throw std::runtime_error("Incorrect number of entries in source space selection.");
         }
         int pp = 0;
         for (int p = 0; p < p_Hemisphere.np; ++p)

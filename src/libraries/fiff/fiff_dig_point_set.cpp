@@ -57,6 +57,7 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
+#include <stdexcept>
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -102,7 +103,7 @@ FiffDigPointSet::FiffDigPointSet(QIODevice &p_IODevice)   //const FiffDigPointSe
 
     if(!FiffDigPointSet::readFromStream(t_pStream, *this)) {
         t_pStream->close();
-        qInfo() << "[FiffDigPointSet::FiffDigPointSet] Could not read the FiffDigPointSet"; // ToDo throw error
+        throw std::runtime_error("Could not read the FiffDigPointSet");
     }
 
     qInfo("[FiffDigPointSet::FiffDigPointSet] %i digitizer Points read from file.", this->size());

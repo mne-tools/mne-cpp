@@ -654,10 +654,6 @@ bool ChannelSelectionView::loadSelectionGroups(QString path)
     //Set group all as slected item
     m_pUi->m_listWidget_selectionGroups->setCurrentItem(getItemForChName(m_pUi->m_listWidget_selectionGroups, "All"), QItemSelectionModel::Select);
 
-    //Delete all MEG channels from the selection groups which are not in the loaded layout
-    //TODO: Is this needed anymore? Causes some trouble after a new selection file has been loaded
-    //cleanUpMEGChannels();
-
     m_pUi->m_lineEdit_loadedFile->setText(QFileInfo(path).fileName());
 
     if(m_bSetup){

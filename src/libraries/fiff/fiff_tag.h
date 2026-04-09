@@ -638,38 +638,6 @@ inline qint16* FiffTag::toDauPack16() const
 }
 
 //=============================================================================================================
-
-//inline std::complex<float>* FiffTag::toComplexFloat()
-//{
-//    if(this->isMatrix() || this->getType() != FIFFT_COMPLEX_FLOAT)
-//        return nullptr;
-//    else if(this->m_pComplexFloatData == nullptr)
-//    {
-//        float* t_pFloat = (float*)this->data();
-//        qDebug() << "ToDo toComplexFloat";
-//        //ToDo check this for arrays which contains more than one value
-//        this->m_pComplexFloatData = new std::complex<float>(t_pFloat[0],t_pFloat[1]);
-//    }
-//    return m_pComplexFloatData;
-//}
-
-//=============================================================================================================
-
-//inline std::complex<double>* FiffTag::toComplexDouble()
-//{
-//    if(this->isMatrix() || this->getType() != FIFFT_COMPLEX_DOUBLE)
-//        return nullptr;
-//    else if(this->m_pComplexDoubleData == nullptr)
-//    {
-//        double* t_pDouble = (double*)this->data();
-//        qDebug() << "ToDo toComplexDouble";
-//        //ToDo check this for arrays which contains more than one value
-//        this->m_pComplexDoubleData = new std::complex<double>(t_pDouble[0],t_pDouble[1]);
-//    }
-//    return m_pComplexDoubleData;
-//}
-
-//=============================================================================================================
 // Structures
 //=============================================================================================================
 

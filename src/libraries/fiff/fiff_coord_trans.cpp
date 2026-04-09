@@ -59,6 +59,7 @@
 #include <Eigen/Dense>
 #include <QDebug>
 
+#include <stdexcept>
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -88,8 +89,7 @@ FiffCoordTrans::FiffCoordTrans(QIODevice &p_IODevice)
 {
     if(!read(p_IODevice, *this))
     {
-        qWarning("\tCoordindate transform not found.\n");//ToDo Throw here
-        return;
+        throw std::runtime_error("Coordinate transform not found");
     }
 }
 

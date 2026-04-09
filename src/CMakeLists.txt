@@ -306,7 +306,7 @@ configure_package_config_file(
     INSTALL_DESTINATION lib/cmake/MNE-CPP
 )
 
-# Generate version file for find_package(MNE-CPP 2.0.0)
+# Generate version file for find_package(MNE-CPP 2.1.0)
 write_basic_package_version_file(
     "${CMAKE_CURRENT_BINARY_DIR}/MNE-CPPConfigVersion.cmake"
     VERSION ${MNE_CPP_VERSION}

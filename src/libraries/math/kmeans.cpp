@@ -366,7 +366,7 @@ bool KMeans::batchUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
             {
                 return converged;
             }
-            // Drop and Singleton actions: TODO — not yet implemented (kept as no-op)
+            // Drop and Singleton actions: not yet implemented (kept as no-op)
         }
 
         // Total sum of distances for the current configuration

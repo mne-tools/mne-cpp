@@ -53,6 +53,7 @@
 #include <Eigen/SVD>
 #include <QDebug>
 
+#include <stdexcept>
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -122,8 +123,7 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     fiff_int_t nchan = ch_names.size();
     if (nchan == 0)
     {
-        qWarning("No channel names specified\n");//ToDo throw here
-        return 0;
+        throw std::invalid_argument("No channel names specified");
     }
 
 //    if(proj)

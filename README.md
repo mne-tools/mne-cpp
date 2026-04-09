@@ -2,6 +2,9 @@
   <a href="/resources/design/logos/MNE-CPP_Logo.svg"><img src="/resources/design/logos/MNE-CPP_Logo.svg" width="400" height="200" alt="MNE-CPP"></a>
 </p>
 <p align="center">
+<a href="https://github.com/mne-tools/mne-cpp/releases/latest" target="_blank">
+    <img src="https://img.shields.io/badge/version-2.1.0-blue.svg" alt="Version 2.1.0">
+</a>
 <a href="https://github.com/mne-tools/mne-cpp/actions/workflows/main.yml" target="_blank">
     <img src="https://github.com/mne-tools/mne-cpp/actions/workflows/main.yml/badge.svg?branch=main" alt="Release">
 </a>

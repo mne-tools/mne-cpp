@@ -62,6 +62,7 @@
 #include <QFile>
 #include <QDebug>
 
+#include <stdexcept>
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -88,8 +89,7 @@ FiffEvokedSet::FiffEvokedSet(QIODevice& p_IODevice)
 
     if(!FiffEvokedSet::read(p_IODevice, *this))
     {
-        qWarning("\tFiff evoked data set not found.\n");//ToDo Throw here
-        return;
+        throw std::runtime_error("Fiff evoked data set not found");
     }
 }
 

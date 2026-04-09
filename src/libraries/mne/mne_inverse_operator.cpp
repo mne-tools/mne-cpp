@@ -643,7 +643,13 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
     bool is_fixed_ori = forward.isFixedOrient();
     MNEInverseOperator inv;
 
-    // TODO: add surface-orientation sanity check
+    //
+    // Surface-orientation sanity check
+    //
+    if(fixed && !forward.surf_ori)
+    {
+        qWarning("Warning: Forward solution is not surface-oriented. A surface-oriented solution is recommended for fixed-orientation inverse operators.");
+    }
 
     //Check parameters
     if(fixed && loose > 0)

@@ -45,6 +45,7 @@
 #include <iostream>
 #include <QDebug>
 
+#include <stdexcept>
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -128,8 +129,7 @@ FiffDigitizerData::FiffDigitizerData(QIODevice &p_IODevice)
     //Open if the device and stream have not been openend already
     if (!t_pStream->device()->isOpen()) {
         if(!t_pStream->open()) {
-            qWarning() << "Warning in FiffDigitizerData::FiffDigitizerData - Could not open the didigitzer data file"; // ToDo throw error
-            return;
+            throw std::runtime_error("Could not open the digitizer data file");
         }
 
         open_here = true;
@@ -137,7 +137,7 @@ FiffDigitizerData::FiffDigitizerData(QIODevice &p_IODevice)
 
     // If device is open read the data
     if(!t_pStream->read_digitizer_data(t_pStream->dirtree(), *this)) {
-        qWarning() << "Warning in FiffDigitizerData::FiffDigitizerData - Could not read the FiffDigitizerData"; // ToDo throw error
+        throw std::runtime_error("Could not read the FiffDigitizerData");
     }
 
     // If stream has been opened in this function also close here again

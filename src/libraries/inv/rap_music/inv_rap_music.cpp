@@ -41,16 +41,13 @@
 
 #include <math/numerics.h>
 
+#include <QDebug>
+
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <iostream>
-
+#include <stdexcept>
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -106,16 +103,16 @@ bool InvRapMusic::init(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, do
 {
     //Get available thread number
     #ifdef _OPENMP
-        std::cout << "OpenMP enabled" << std::endl;
+        qDebug() << "OpenMP enabled";
         m_iMaxNumThreads = omp_get_max_threads();
     #else
-        std::cout << "OpenMP disabled (to enable it: VS2010->Project Properties->C/C++->Language, then modify OpenMP Support)" << std::endl;
+        qDebug() << "OpenMP disabled (to enable it: VS2010->Project Properties->C/C++->Language, then modify OpenMP Support)";
         m_iMaxNumThreads = 1;
     #endif
-        std::cout << "Available Threats: " << m_iMaxNumThreads << std::endl << std::endl;
+        qDebug() << "Available Threats: " << m_iMaxNumThreads;
 
     //Initialize RAP MUSIC
-    std::cout << "##### Initialization RAP MUSIC started ######\n\n";
+    qDebug() << "##### Initialization RAP MUSIC started ######\n\n";
 
     m_iN = p_iN;
     m_dThreshold = p_dThr;
@@ -125,7 +122,7 @@ bool InvRapMusic::init(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, do
 //    {
 //        if ( p_pMatGrid->rows() != p_pMatLeadField->cols() / 3 )
 //        {
-//            std::cout << "Grid does not fit to given Lead Field!\n";
+//            qDebug() << "Grid does not fit to given Lead Field!\n";
 //            return false;
 //        }
 //    }
@@ -135,7 +132,7 @@ bool InvRapMusic::init(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, do
     //Lead Field check
     if ( p_pFwd.sol->data.cols() % 3 != 0 )
     {
-        std::cout << "Gain matrix is not associated with a 3D grid!\n";
+        qDebug() << "Gain matrix is not associated with a 3D grid!\n";
         return false;
     }
 
@@ -152,7 +149,7 @@ bool InvRapMusic::init(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, do
 
     //##### Calc lead field combination #####
 
-    std::cout << "Calculate gain matrix combinations. \n";
+    qDebug() << "Calculate gain matrix combinations. \n";
 
     m_iNumLeadFieldCombinations = Numerics::nchoose2(m_iNumGridPoints+1);
 
@@ -160,21 +157,21 @@ bool InvRapMusic::init(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, do
 
     calcPairCombinations(m_iNumGridPoints, m_iNumLeadFieldCombinations, m_ppPairIdxCombinations);
 
-    std::cout << "Gain matrix combinations calculated. \n\n";
+    qDebug() << "Gain matrix combinations calculated. \n\n";
 
     //##### Calc lead field combination end #####
 
-    std::cout << "Number of grid points: " << m_iNumGridPoints << "\n\n";
+    qDebug() << "Number of grid points: " << m_iNumGridPoints << "\n\n";
 
-    std::cout << "Number of combinated points: " << m_iNumLeadFieldCombinations << "\n\n";
+    qDebug() << "Number of combinated points: " << m_iNumLeadFieldCombinations << "\n\n";
 
-    std::cout << "Number of sources to find: " << m_iN << "\n\n";
+    qDebug() << "Number of sources to find: " << m_iN << "\n\n";
 
-    std::cout << "Threshold: " << m_dThreshold << "\n\n";
+    qDebug() << "Threshold: " << m_dThreshold << "\n\n";
 
     //Init end
 
-    std::cout << "##### Initialization RAP MUSIC completed ######\n\n\n";
+    qDebug() << "##### Initialization RAP MUSIC completed ######\n\n\n";
 
     Q_UNUSED(p_bSparsed);
 
@@ -207,11 +204,11 @@ InvSourceEstimate InvRapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, 
 
     if(p_fiffEvoked.data.rows() != m_iNumChannels)
     {
-        std::cout << "Number of FiffEvoked channels (" << p_fiffEvoked.data.rows() << ") doesn't match the number of channels (" << m_iNumChannels << ") of the forward solution." << std::endl;
+        qDebug() << "Number of FiffEvoked channels (" << p_fiffEvoked.data.rows() << ") doesn't match the number of channels (" << m_iNumChannels << ") of the forward solution.";
         return p_sourceEstimate;
     }
 //    else
-//        std::cout << "Number of FiffEvoked channels (" << p_fiffEvoked.data.rows() << ") matchs the number of channels (" << m_iNumChannels << ") of the forward solution." << std::endl;
+//        qDebug() << "Number of FiffEvoked channels (" << p_fiffEvoked.data.rows() << ") matchs the number of channels (" << m_iNumChannels << ") of the forward solution.";
 
     //
     // Rap MUSIC Source estimate
@@ -327,11 +324,11 @@ InvSourceEstimate InvRapMusic::calculateInverse(const MatrixXd &data, float tmin
 
     if(data.rows() != m_iNumChannels)
     {
-        std::cout << "Number of FiffEvoked channels (" << data.rows() << ") doesn't match the number of channels (" << m_iNumChannels << ") of the forward solution." << std::endl;
+        qDebug() << "Number of FiffEvoked channels (" << data.rows() << ") doesn't match the number of channels (" << m_iNumChannels << ") of the forward solution.";
         return p_sourceEstimate;
     }
 //    else
-//        std::cout << "Number of FiffEvoked channels (" << data.rows() << ") matchs the number of channels (" << m_iNumChannels << ") of the forward solution." << std::endl;
+//        qDebug() << "Number of FiffEvoked channels (" << data.rows() << ") matchs the number of channels (" << m_iNumChannels << ") of the forward solution.";
 
     //
     // Rap MUSIC Source estimate
@@ -381,15 +378,13 @@ InvSourceEstimate InvRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
     //if not initialized -> break
     if(!m_bIsInit)
     {
-        std::cout << "RAP MUSIC wasn't initialized!"; //ToDo: catch this earlier
-        return p_SourceEstimate; //false
+        throw std::logic_error("RAP MUSIC was not initialized");
     }
 
     //Test if data are correct
     if(p_matMeasurement.rows() != m_iNumChannels)
     {
-        std::cout << "Lead Field channels do not fit to number of measurement channels!"; //ToDo: catch this earlier
-        return p_SourceEstimate;
+        throw std::invalid_argument("Lead field channels do not match number of measurement channels");
     }
 
     //Inits
@@ -411,10 +406,10 @@ InvSourceEstimate InvRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
 
     if (t_r < m_iN)
     {
-        std::cout << "Warning: Rank " << t_r << " of the measurement data is smaller than the " << m_iN;
-        std::cout << " sources to find." << std::endl;
-        std::cout << "         Searching now for " << t_iMaxSearch << " correlated sources.";
-        std::cout << std::endl << std::endl;
+        qDebug() << "Warning: Rank " << t_r << " of the measurement data is smaller than the " << m_iN;
+        qDebug() << " sources to find.";
+        qDebug() << "         Searching now for " << t_iMaxSearch << " correlated sources.";
+        qDebug();
     }
 
     //Create Orthogonal Projector
@@ -442,7 +437,7 @@ InvSourceEstimate InvRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
 //    }
     p_RapDipoles.clear();
 
-    std::cout << "##### Calculation of RAP MUSIC started ######\n\n";
+    qDebug() << "##### Calculation of RAP MUSIC started ######\n\n";
 
     MatrixXT t_matProj_Phi_s(t_matOrthProj.rows(), t_pMatPhi_s->cols());
     //new Version: Calculate projection before
@@ -513,7 +508,7 @@ InvSourceEstimate InvRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
         end_subcorr = clock();
 
         float t_fSubcorrElapsedTime = ( (float)(end_subcorr-start_subcorr) / (float)CLOCKS_PER_SEC ) * 1000.0f;
-        std::cout << "Time Elapsed: " << t_fSubcorrElapsedTime << " ms" << std::endl;
+        qDebug() << "Time Elapsed: " << t_fSubcorrElapsedTime << " ms";
 
         //Find the maximum of correlation - can't put this in the for loop because it's running in different threads.
         double t_val_roh_k;
@@ -527,7 +522,7 @@ InvSourceEstimate InvRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
         int t_iIdx2 = m_ppPairIdxCombinations[t_iMaxIdx].x2;
 
         // (Idx+1) because of MATLAB positions -> starting with 1 not with 0
-        std::cout << "Iteration: " << r+1 << " of " << t_iMaxSearch
+        qDebug() << "Iteration: " << r+1 << " of " << t_iMaxSearch
             << "; Correlation: " << t_val_roh_k<< "; Position (Idx+1): " << t_iIdx1+1 << " - " << t_iIdx2+1 <<"\n\n";
 
         //Calculations with the max correlated dipole pair G_k_1 -> ToDo Obsolet when taking direkt Projected Lead Field
@@ -550,8 +545,8 @@ InvSourceEstimate InvRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
         //Stop Searching when Correlation is smaller then the Threshold
         if (t_val_roh_k < m_dThreshold)
         {
-            std::cout << "Searching stopped, last correlation " << t_val_roh_k;
-            std::cout << " is smaller then the given threshold " << m_dThreshold << std::endl << std::endl;
+            qDebug() << "Searching stopped, last correlation " << t_val_roh_k;
+            qDebug() << " is smaller then the given threshold " << m_dThreshold;
             break;
         }
 
@@ -565,12 +560,12 @@ InvSourceEstimate InvRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
         //ToDo
     }
 
-    std::cout << "##### Calculation of RAP MUSIC completed ######"<< std::endl << std::endl << std::endl;
+    qDebug() << "##### Calculation of RAP MUSIC completed ######";
 
     end = clock();
 
     float t_fElapsedTime = ( (float)(end-start) / (float)CLOCKS_PER_SEC ) * 1000.0f;
-    std::cout << "Total Time Elapsed: " << t_fElapsedTime << " ms" << std::endl << std::endl;
+    qDebug() << "Total Time Elapsed: " << t_fElapsedTime << " ms";
 
     //garbage collecting
     delete t_pMatPhi_s;
@@ -637,9 +632,7 @@ double InvRapMusic::subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_matU_B)
 
     if (t_matCor.cols() > t_matCor.rows())
     {
-        MatrixXT t_matCor_H(t_matCor.cols(), t_matCor.rows());
-        t_matCor_H = t_matCor.adjoint(); //for complex it has to be adjunct
-        //ToDo -> use instead adjointInPlace
+        MatrixXT t_matCor_H = t_matCor.adjoint(); //for complex it has to be adjoint
 
         Eigen::JacobiSVD<MatrixXT> t_svdCor_H(t_matCor_H);
 

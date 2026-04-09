@@ -243,15 +243,6 @@ public:
      */
     QList<FiffDigPoint> getList();
 
-//    ToDo:
-//    //=========================================================================================================
-//    /**
-//    * Write the FiffDigPointSet to a FIF file
-//    *
-//    * @param[in] p_IODevice   IO device to write the FiffDigPointSet to.
-//    */
-//    void write(QIODevice &p_IODevice);
-
 protected:
 
 private:

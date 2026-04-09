@@ -41,12 +41,7 @@
 #include "inv_ecd_set.h"
 #include <fiff/fiff_types.h>
 
-//ToDo don't use access and unlink -> use QT stuff instead -> QFile
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-#include <io.h>
-#else
-#include <unistd.h>
-#endif
+
 
 //=============================================================================================================
 // QT INCLUDES
@@ -80,7 +75,6 @@ using namespace FIFFLIB;
 // DEFINE STATIC METHODS
 //=============================================================================================================
 
-//TODO OBSOLETE - USE ALREADY DEFINED ONE
 static fiff_int_t swap_int (fiff_int_t source)
 {
     unsigned char *csource =  (unsigned char *)(&source);
@@ -95,7 +89,7 @@ static fiff_int_t swap_int (fiff_int_t source)
 }
 
 //=============================================================================================================
-//TODO OBSOLETE - USE ALREADY DEFINED ONE
+
 static float swap_float (float source)
 {
     unsigned char *csource =  (unsigned char *)(&source);
@@ -259,7 +253,7 @@ bool InvEcdSet::save_dipoles_bdip(const QString& fileName)
 bad : {
         if (out) {
             fclose(out);
-            unlink(fileName.toUtf8().data());
+            QFile::remove(fileName);
         }
         return false;
     }
@@ -304,7 +298,7 @@ bool InvEcdSet::save_dipoles_dip(const QString& fileName) const
 bad : {
         if (out) {
             fclose(out);
-            unlink(fileName.toUtf8().data());
+            QFile::remove(fileName);
         }
         return false;
     }

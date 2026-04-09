@@ -39,16 +39,13 @@
 
 #include "inv_pwl_rap_music.h"
 
+#include <QDebug>
+
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <iostream>
-
+#include <stdexcept>
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -111,15 +108,13 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
     //if not initialized -> break
     if(!m_bIsInit)
     {
-        std::cout << "RAP MUSIC wasn't initialized!"; //ToDo: catch this earlier
-        return p_SourceEstimate; //false
+        throw std::logic_error("RAP MUSIC was not initialized");
     }
 
     //Test if data are correct
     if(p_matMeasurement.rows() != m_iNumChannels)
     {
-        std::cout << "Lead Field channels do not fit to number of measurement channels!"; //ToDo: catch this earlier
-        return p_SourceEstimate;
+        throw std::invalid_argument("Lead field channels do not match number of measurement channels");
     }
 
     //Inits
@@ -141,10 +136,10 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
 
     if (t_r < m_iN)
     {
-        std::cout << "Warning: Rank " << t_r << " of the measurement data is smaller than the " << m_iN;
-        std::cout << " sources to find." << std::endl;
-        std::cout << "         Searching now for " << t_iMaxSearch << " correlated sources.";
-        std::cout << std::endl << std::endl;
+        qDebug() << "Warning: Rank " << t_r << " of the measurement data is smaller than the " << m_iN;
+        qDebug() << " sources to find.";
+        qDebug() << "         Searching now for " << t_iMaxSearch << " correlated sources.";
+        qDebug();
     }
 
     //Create Orthogonal Projector
@@ -172,7 +167,7 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
 //    }
     p_RapDipoles.clear();
 
-    std::cout << "##### Calculation of PWL RAP MUSIC started ######\n\n";
+    qDebug() << "##### Calculation of PWL RAP MUSIC started ######\n\n";
 
     MatrixXT t_matProj_Phi_s(t_matOrthProj.rows(), t_pMatPhi_s->cols());
     //new Version: Calculate projection before
@@ -293,10 +288,10 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
         end_subcorr = clock();
 
         float t_fSubcorrElapsedTime = ( (float)(end_subcorr-start_subcorr) / (float)CLOCKS_PER_SEC ) * 1000.0f;
-        std::cout << "Time Elapsed: " << t_fSubcorrElapsedTime << " ms" << std::endl;
+        qDebug() << "Time Elapsed: " << t_fSubcorrElapsedTime << " ms";
 
         // (Idx+1) because of MATLAB positions -> starting with 1 not with 0
-        std::cout << "Iteration: " << r+1 << " of " << t_iMaxSearch
+        qDebug() << "Iteration: " << r+1 << " of " << t_iMaxSearch
             << "; Correlation: " << t_val_roh_k<< "; Position (Idx+1): " << t_iIdx1+1 << " - " << t_iIdx2+1 <<"\n\n";
 
         //Calculations with the max correlated dipole pair G_k_1
@@ -319,8 +314,8 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
         //Stop Searching when Correlation is smaller then the Threshold
         if (t_val_roh_k < m_dThreshold)
         {
-            std::cout << "Searching stopped, last correlation " << t_val_roh_k;
-            std::cout << " is smaller then the given threshold " << m_dThreshold << std::endl << std::endl;
+            qDebug() << "Searching stopped, last correlation " << t_val_roh_k;
+            qDebug() << " is smaller then the given threshold " << m_dThreshold;
             break;
         }
 
@@ -334,12 +329,12 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
         //ToDo
     }
 
-    std::cout << "##### Calculation of PWL RAP MUSIC completed ######"<< std::endl << std::endl << std::endl;
+    qDebug() << "##### Calculation of PWL RAP MUSIC completed ######";
 
     end = clock();
 
     float t_fElapsedTime = ( (float)(end-start) / (float)CLOCKS_PER_SEC ) * 1000.0f;
-    std::cout << "Total Time Elapsed: " << t_fElapsedTime << " ms" << std::endl << std::endl;
+    qDebug() << "Total Time Elapsed: " << t_fElapsedTime << " ms";
 
     //garbage collecting
     delete t_pMatPhi_s;

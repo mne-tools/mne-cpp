@@ -98,14 +98,6 @@ public:
      */
     void connectCommands();
 
-//    virtual bool parseCommand(QStringList& p_sListCommand, QByteArray& p_blockOutputInfo);
-
-//    //=========================================================================================================
-//    /**
-//    * ToDo...
-//    */
-//    void clearClients();
-
 //public slots: --> in Qt 5 not anymore declared as slot
     void forwardMeasInfo(qint32 ID, const FIFFLIB::FiffInfo& p_fiffInfo);
     void forwardRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData);

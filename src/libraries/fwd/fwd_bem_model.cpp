@@ -2638,7 +2638,6 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
         /*
         * Field computation matrices...
         */
-        qDebug() << "!!!TODO Speed the following with Eigen up!";
         qInfo("Composing the field computation matrix...");
         if (fwd_bem_specify_coils(coils) == FAIL)
             return cleanup_fail();

@@ -60,22 +60,8 @@ using namespace MNELIB;
 using namespace FWDLIB;
 using namespace INVLIB;
 
-//ToDo remove later on
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
+constexpr int FAIL = -1;
+constexpr int OK   =  0;
 
 #define X_16 0
 #define Y_16 1
@@ -153,11 +139,11 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
     }
     else {
         MNESurface*    inner_skull = nullptr;
-        int            free_inner_skull = FALSE;
+        int            free_inner_skull = false;
         Eigen::Vector3f r0 = f->r0;
 
         Q_ASSERT(f->mri_head_t);
-        FiffCoordTrans::apply_inverse_trans(r0.data(),*f->mri_head_t,TRUE);
+        FiffCoordTrans::apply_inverse_trans(r0.data(),*f->mri_head_t,true);
         if (f->bem_model) {
             printf("Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
             if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == nullptr)
@@ -167,7 +153,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
             printf("Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
             if ((inner_skull = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,true)) == nullptr)
                 goto bad;
-            free_inner_skull = TRUE;
+            free_inner_skull = true;
         }
         guesses.reset((MNESourceSpace*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist).release());
         if (!guesses)
@@ -250,11 +236,11 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
     }
     else {
         MNESurface*     inner_skull = nullptr;
-        int            free_inner_skull = FALSE;
+        int            free_inner_skull = false;
         Eigen::Vector3f r0 = f->r0;
 
         Q_ASSERT(f->mri_head_t);
-        FiffCoordTrans::apply_inverse_trans(r0.data(),*f->mri_head_t,TRUE);
+        FiffCoordTrans::apply_inverse_trans(r0.data(),*f->mri_head_t,true);
         if (f->bem_model) {
             printf("Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
             if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == nullptr)
@@ -264,7 +250,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
             printf("Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
             if ((inner_skull = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,true)) == nullptr)
                 goto bad;
-            free_inner_skull = TRUE;
+            free_inner_skull = true;
         }
         guesses.reset((MNESourceSpace*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist).release());
         if (!guesses)
@@ -281,7 +267,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
     }
     if (guess_save_name) {
         printf("###################DEBUG writing source spaces not yet implemented.");
-        //    if (mne_write_source_spaces(guess_save_name,&guesses,1,FALSE) != OK)
+        //    if (mne_write_source_spaces(guess_save_name,&guesses,1,false) != OK)
         //      goto bad;
         //    printf("Wrote guess locations to %s\n",guess_save_name);
     }

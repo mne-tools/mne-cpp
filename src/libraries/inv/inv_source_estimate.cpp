@@ -49,6 +49,7 @@
 #include <QSharedPointer>
 #include <QDebug>
 
+#include <stdexcept>
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -113,8 +114,7 @@ InvSourceEstimate::InvSourceEstimate(QIODevice &p_IODevice)
 {
     if(!read(p_IODevice, *this))
     {
-        qWarning("Source estimation not found.");//ToDo Throw here
-        return;
+        throw std::runtime_error("Source estimation not found");
     }
 }
 

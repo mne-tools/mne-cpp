@@ -70,8 +70,6 @@ namespace MNELIB {
 
 class MNEBemSurface;
 
-//TODO this needs to be removed - this has to be a function not a class!!!
-
 //=============================================================================================================
 /**
  * Description of what this class is intended to do (in detail).

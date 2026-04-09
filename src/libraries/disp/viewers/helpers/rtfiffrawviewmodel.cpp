@@ -275,7 +275,11 @@ void RtFiffRawViewModel::initSphara()
             m_vecIndicesFirstBabyMEG(m_vecIndicesFirstBabyMEG.rows()-1) = r;
         }
 
-        //TODO: Find outer layer
+        //Find outer layer (FIFFV_COIL_BABY_REF_MAG)
+        if(m_pFiffInfo->chs.at(r).chpos.coil_type == 7003) {
+            m_vecIndicesSecondBabyMEG.conservativeResize(m_vecIndicesSecondBabyMEG.rows()+1);
+            m_vecIndicesSecondBabyMEG(m_vecIndicesSecondBabyMEG.rows()-1) = r;
+        }
     }
 
     //Generate indices used to create the SPHARA operators for EEG layouts
