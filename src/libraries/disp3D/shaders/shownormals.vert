@@ -4,6 +4,7 @@ layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
 layout(location = 2) in vec4 color;
 layout(location = 3) in vec4 annotColor;
+layout(location = 4) in float surfaceId;
 
 layout(location = 0) out vec3 v_normal;
 
@@ -15,7 +16,7 @@ layout(std140, binding = 0) uniform UniformBlock {
     float tissueType;
     float lightingEnabled;
     float overlayMode;
-    float _pad1;
+    float selectedSurfaceId;
     float _pad2;
 };
 

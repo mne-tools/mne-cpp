@@ -41,7 +41,9 @@
 #include "fiff_id.h"
 #include "fiff_file.h"
 
+#ifndef __EMSCRIPTEN__
 #include <QNetworkInterface>
+#endif
 #include <QDateTime>
 
 #include <ctime>
@@ -130,7 +132,7 @@ bool FiffId::get_machid(int *fixed_id)
 {
     QList<QString> possibleHardwareAdresses;
 
-    #ifndef WASMBUILD
+    #ifndef __EMSCRIPTEN__
     QList<QNetworkInterface> ifaces = QNetworkInterface::allInterfaces();
 
     fixed_id[0] = 0;

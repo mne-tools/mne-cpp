@@ -374,59 +374,36 @@ void BrainSurface::updateVertexColors()
         }
     }
 
-    // ── 3. Selection highlight (gold tint) — applied to BOTH channels
-    if (m_selected || m_selectedRegionId != -1) {
-        const uint32_t goldR = 255, goldG = 200, goldB = 80;
-        const float blendFactor = 0.4f;
-        
-        auto blendToGold = [&](uint32_t &c) {
-            uint32_t a = (c >> 24) & 0xFF;
-            uint32_t bv = (c >> 16) & 0xFF;
-            uint32_t gv = (c >> 8) & 0xFF;
-            uint32_t rv = c & 0xFF;
-            rv = static_cast<uint32_t>(rv * (1.0f - blendFactor) + goldR * blendFactor);
-            gv = static_cast<uint32_t>(gv * (1.0f - blendFactor) + goldG * blendFactor);
-            bv = static_cast<uint32_t>(bv * (1.0f - blendFactor) + goldB * blendFactor);
-            c = packABGR(rv, gv, bv, a);
-        };
-        
-        if (m_hasAnnotation && m_selectedRegionId != -1) {
+    // ── 3. Selection highlighting.
+    //       Tint the selected region / vertex range gold in the vertex
+    //       buffer so the user gets precise per-region feedback.
+    //       On WASM the merged-draw path re-reads vertexDataRef() every
+    //       frame, so this is safe without separate buffer re-uploads.
+    if (m_selected) {
+        const uint32_t gold = packABGR(255, 200, 60);
+        if (m_selectedRegionId != -1 && m_hasAnnotation) {
+            // Highlight a specific annotation region
             const Eigen::VectorXi &vertices = m_annotation.getVertices();
             const Eigen::VectorXi &labelIds = m_annotation.getLabelIds();
             for (int i = 0; i < labelIds.rows(); ++i) {
                 if (labelIds(i) == m_selectedRegionId) {
-                    int vertexIdx = vertices(i);
-                    if (vertexIdx >= 0 && vertexIdx < m_vertexData.size()) {
-                        blendToGold(m_vertexData[vertexIdx].color);
-                        blendToGold(m_vertexData[vertexIdx].colorAnnotation);
+                    int idx = vertices(i);
+                    if (idx >= 0 && idx < m_vertexData.size()) {
+                        m_vertexData[idx].color = gold;
+                        m_vertexData[idx].colorAnnotation = gold;
                     }
                 }
             }
-        } else if (m_selected) {
-            for (auto &v : m_vertexData) {
-                blendToGold(v.color);
-                blendToGold(v.colorAnnotation);
+        } else if (m_selectedVertexStart >= 0 && m_selectedVertexCount > 0) {
+            // Highlight a vertex range (e.g. single digitizer sphere)
+            const int end = qMin(m_selectedVertexStart + m_selectedVertexCount,
+                                 m_vertexData.size());
+            for (int i = m_selectedVertexStart; i < end; ++i) {
+                m_vertexData[i].color = gold;
             }
         }
-    }
-
-    // ── 4. Vertex-range highlight (for batched sphere meshes)
-    if (m_selectedVertexStart >= 0 && m_selectedVertexCount > 0) {
-        const uint32_t hlR = 255, hlG = 255, hlB = 180;
-        const float blendFactor = 0.85f;
-        int end = qMin(m_selectedVertexStart + m_selectedVertexCount, (int)m_vertexData.size());
-        for (int i = m_selectedVertexStart; i < end; ++i) {
-            for (uint32_t *c : { &m_vertexData[i].color, &m_vertexData[i].colorAnnotation }) {
-                uint32_t a = (*c >> 24) & 0xFF;
-                uint32_t bv = (*c >> 16) & 0xFF;
-                uint32_t gv = (*c >> 8) & 0xFF;
-                uint32_t rv = *c & 0xFF;
-                rv = static_cast<uint32_t>(rv * (1.0f - blendFactor) + hlR * blendFactor);
-                gv = static_cast<uint32_t>(gv * (1.0f - blendFactor) + hlG * blendFactor);
-                bv = static_cast<uint32_t>(bv * (1.0f - blendFactor) + hlB * blendFactor);
-                *c = packABGR(rv, gv, bv, a);
-            }
-        }
+        // Whole-surface selection (no region / vertex range) is handled
+        // by the shader gold glow via the isSelected uniform.
     }
 
     m_gpu->dirty = true;
@@ -509,7 +486,23 @@ void BrainSurface::applyTransform(const QMatrix4x4 &m)
 
 void BrainSurface::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
 {
-    if (!m_gpu->dirty && m_gpu->vertexBuffer && m_gpu->indexBuffer) return;
+    const bool needsCreate = !m_gpu->vertexBuffer || !m_gpu->indexBuffer;
+
+#ifdef __EMSCRIPTEN__
+    // On WebGL/WASM, always re-upload vertex and index data.
+    // The QRhi GLES2 backend's VAO cache can lose its element-buffer
+    // binding between frames, causing draws to produce no output.
+    // Re-uploading via uploadStaticBuffer triggers the necessary
+    // glBindBuffer calls that refresh the GL state.
+    if (!needsCreate && !m_gpu->dirty) {
+        // Buffers exist and data hasn't changed — still re-upload
+        u->uploadStaticBuffer(m_gpu->vertexBuffer.get(), m_vertexData.constData());
+        u->uploadStaticBuffer(m_gpu->indexBuffer.get(), m_indexData.constData());
+        return;
+    }
+#else
+    if (!m_gpu->dirty && !needsCreate) return;
+#endif
 
     const quint32 vbufSize = m_vertexData.size() * sizeof(VertexData);
     const quint32 ibufSize = m_indexData.size() * sizeof(uint32_t);
@@ -789,28 +782,19 @@ int BrainSurface::getAnnotationLabelId(int vertexIdx) const
 
 void BrainSurface::setSelectedRegion(int regionId)
 {
-    if (m_selectedRegionId != regionId) {
-        m_selectedRegionId = regionId;
-        updateVertexColors();
-        m_gpu->dirty = true;
-    }
+    m_selectedRegionId = regionId;
+    updateVertexColors();
 }
 
 void BrainSurface::setSelected(bool selected)
 {
-    if (m_selected != selected) {
-        m_selected = selected;
-        updateVertexColors();
-        m_gpu->dirty = true;
-    }
+    m_selected = selected;
+    updateVertexColors();
 }
 
 void BrainSurface::setSelectedVertexRange(int start, int count)
 {
-    if (m_selectedVertexStart != start || m_selectedVertexCount != count) {
-        m_selectedVertexStart = start;
-        m_selectedVertexCount = count;
-        updateVertexColors();
-        m_gpu->dirty = true;
-    }
+    m_selectedVertexStart = start;
+    m_selectedVertexCount = count;
+    updateVertexColors();
 }

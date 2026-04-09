@@ -71,6 +71,9 @@ struct VertexData {
     QVector3D norm;
     uint32_t color;           // curvature / base / STC color  (ABGR packed)
     uint32_t colorAnnotation; // annotation region color       (ABGR packed)
+    float surfaceId = 0.0f;  // WORKAROUND(QRhi-GLES2): surface ID for merged
+                             // single-drawIndexed on WASM.  Always 0 for
+                             // individual surfaces; set by merged path.
 };
 
 //=============================================================================================================
@@ -260,6 +263,11 @@ public:
      * Get the triangle index buffer.
      */
     QVector<uint32_t> triangleIndices() const { return m_indexData; }
+
+    /** @brief Const-ref access to CPU-side vertex data (used by merged rendering). */
+    const QVector<VertexData>& vertexDataRef() const { return m_vertexData; }
+    /** @brief Const-ref access to CPU-side index data (used by merged rendering). */
+    const QVector<uint32_t>& indexDataRef() const { return m_indexData; }
     
     //=========================================================================================================
     /**
@@ -366,6 +374,8 @@ public:
     
     void setSelected(bool selected);
     bool isSelected() const { return m_selected; }
+    int selectedRegionId() const { return m_selectedRegionId; }
+    int selectedVertexStart() const { return m_selectedVertexStart; }
 
     /**
      * Highlight a contiguous range of vertices (e.g. a single sphere in a batched mesh).

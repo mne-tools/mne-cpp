@@ -1402,11 +1402,12 @@ void BrainView::render(QRhiCommandBuffer *cb)
     int numEnabled = enabledViewports.size();
 
     // ── Pre-render phase ────────────────────────────────────────────────
-    // Apply per-pane overlay modes and pre-upload ALL Immutable GPU buffers
-    // BEFORE the render pass starts.  On Metal, uploading an Immutable
-    // buffer during an active render pass forces a pass restart which
-    // resets the viewport state, causing subsequent draws to cover the
-    // full framebuffer instead of the intended pane.
+    // Pre-upload ALL Immutable GPU buffers BEFORE the render pass starts.
+    // On Metal, uploading an Immutable buffer during an active render pass
+    // forces an encoder restart which resets the viewport state.  On
+    // WebGL/GLES2, buffer create()/upload calls invoke glBindBuffer() which
+    // silently modifies the currently-bound VAO's element-buffer binding,
+    // corrupting previously drawn surfaces.
     //
     // By doing all static uploads here (outside any render pass), we
     // guarantee that the draw loop below only records Dynamic uniform
@@ -1420,8 +1421,23 @@ void BrainView::render(QRhiCommandBuffer *cb)
     {
         QRhiResourceUpdateBatch *preUpload = rhi()->nextResourceUpdateBatch();
         for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+#ifdef __EMSCRIPTEN__
+            // WORKAROUND(QRhi-GLES2): Brain surfaces are drawn via the
+            // merged single-drawIndexed path.  Skip per-surface GPU buffer
+            // re-uploads — their GPU buffers are unused and the
+            // uploadStaticBuffer calls can pollute GLES2 element-buffer
+            // bindings.  Non-brain surfaces (srcsp_, dig_, bem_, sens_)
+            // still need their buffers for possible later draws.
+            {
+                const QString &key = it.key();
+                if (!key.startsWith("srcsp_") && !key.startsWith("dig_") &&
+                    !key.startsWith("bem_") && !key.startsWith("sens_"))
+                    continue;
+            }
+#endif
             it.value()->updateBuffers(rhi(), preUpload);
         }
+#ifndef __EMSCRIPTEN__
         if (m_debugPointerSurface) {
             m_debugPointerSurface->updateBuffers(rhi(), preUpload);
         }
@@ -1431,6 +1447,28 @@ void BrainView::render(QRhiCommandBuffer *cb)
         if (m_dipoles) {
             m_dipoles->updateBuffers(rhi(), preUpload);
         }
+#endif
+
+#ifdef __EMSCRIPTEN__
+        // WORKAROUND(QRhi-GLES2): Merge all visible brain surfaces into a
+        // single VBO/IBO for single-drawIndexed rendering.  The QRhi GLES2
+        // backend has a bug where only the first drawIndexed() per render
+        // pass produces visible output.  Remove when Qt fixes this upstream.
+        {
+            QVector<BrainSurface*> brainSurfaces;
+            for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+                const QString &key = it.key();
+                // Exclude non-brain surface keys
+                if (key.startsWith("srcsp_") || key.startsWith("dig_") ||
+                    key.startsWith("bem_") || key.startsWith("sens_"))
+                    continue;
+                if (!it.value()->isVisible()) continue;
+                brainSurfaces.append(it.value().get());
+            }
+            m_renderer->prepareMergedSurfaces(rhi(), preUpload, brainSurfaces);
+        }
+#endif
+
         // Network buffers are updated inside renderNetwork() via updateNodeBuffers/updateEdgeBuffers
         cb->resourceUpdate(preUpload);
     }
@@ -1558,8 +1596,29 @@ void BrainView::render(QRhiCommandBuffer *cb)
         if (!sv.matchesSurfaceType(it.key())) continue;
         if (!sv.shouldRenderSurface(it.key())) continue;
 
+#ifdef __EMSCRIPTEN__
+        // WORKAROUND(QRhi-GLES2): Brain surfaces are drawn via the merged
+        // single-drawIndexed path below.  Skip per-surface draws on WASM.
+        // Non-brain surfaces (srcsp_, dig_, bem_, sens_) still use the
+        // per-surface path in their respective passes.
+        continue;
+#endif
         m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), currentShader);
     }
+
+#ifdef __EMSCRIPTEN__
+    // WORKAROUND(QRhi-GLES2): Draw all merged brain surfaces in one call.
+    m_renderer->drawMergedSurfaces(cb, rhi(), sceneData, currentShader);
+
+    // WORKAROUND(QRhi-GLES2): Skip all subsequent per-surface draws.
+    // The QRhi GLES2 backend only renders the first drawIndexed() per
+    // render pass correctly.  Any additional drawIndexed (srcsp_, dig_,
+    // bem_, sens_, dipoles, network, debug pointer) would either fail
+    // silently or — more critically — corrupt the GL buffer state for
+    // the *next* frame, causing the merged brain surfaces to vanish.
+    // When Qt fixes the upstream bug, remove this #else and the
+    // corresponding #endif below to re-enable the per-surface draw path.
+#else
 
     // Pass 1b: Source Space Points (use same shader as brain for consistent depth/blend)
     // These use their own vertex colour, so force overlayMode to pass-through (Scientific)
@@ -1668,6 +1727,8 @@ void BrainView::render(QRhiCommandBuffer *cb)
 
         m_renderer->renderSurface(cb, rhi(), debugSceneData, m_debugPointerSurface.get(), BrainRenderer::Holographic);
     }
+
+#endif // !__EMSCRIPTEN__ — end of per-surface draw path
 
     } // End of viewport loop
 
@@ -2488,7 +2549,10 @@ void BrainView::castRay(const QPoint &pos)
                          sphereIdx * vertsPerSphere, vertsPerSphere);
                  } else if (currentRegionId != -1) {
                      m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(currentRegionId);
-                     m_itemSurfaceMap[m_hoveredItem]->setSelected(false);
+                     // Keep the surface selected so the shader gold glow
+                     // activates.  The old CPU vertex-color region highlight
+                     // was removed to avoid buffer re-uploads on WASM.
+                     m_itemSurfaceMap[m_hoveredItem]->setSelected(true);
                  } else {
                      m_itemSurfaceMap[m_hoveredItem]->setSelected(true);
                      m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(-1);
@@ -2512,7 +2576,7 @@ void BrainView::castRay(const QPoint &pos)
                 sphereIdx * vertsPerSphere, vertsPerSphere);
         } else if (currentRegionId != -1) {
             m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(currentRegionId);
-            m_itemSurfaceMap[m_hoveredItem]->setSelected(false);
+            m_itemSurfaceMap[m_hoveredItem]->setSelected(true);
         } else {
             m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(-1);
             m_itemSurfaceMap[m_hoveredItem]->setSelected(true);

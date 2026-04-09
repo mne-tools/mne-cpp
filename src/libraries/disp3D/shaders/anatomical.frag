@@ -6,6 +6,7 @@ layout(location = 2) in vec3 v_color;
 layout(location = 3) in vec3 v_viewDir;
 layout(location = 4) in float v_curvature;
 layout(location = 5) in vec3 v_annotColor;
+layout(location = 6) in float v_surfaceId;
 
 layout(location = 0) out vec4 fragColor;
 
@@ -17,7 +18,7 @@ layout(std140, binding = 0) uniform UniformBlock {
     float tissueType;  // 0=Unknown, 1=Brain, 2=Skin, 3=OuterSkull, 4=InnerSkull
     float lightingEnabled;
     float overlayMode; // 0=Surface, 1=Annotation, 2=Scientific, 3=SourceEstimate
-    float _pad1;
+    float selectedSurfaceId; // WORKAROUND(QRhi-GLES2): merged-draw surface selection
     float _pad2;
 };
 
@@ -82,7 +83,10 @@ void main() {
     }
     
     // Combine with uniform selection (whole surface selected)
-    float effectiveSelection = max(isSelected, vertexSelected);
+    // WORKAROUND(QRhi-GLES2): On WASM merged-draw path, isSelected is 0;
+    // instead selectedSurfaceId >= 0 and v_surfaceId identifies the surface.
+    bool surfaceMatch = (selectedSurfaceId >= 0.0 && abs(v_surfaceId - selectedSurfaceId) < 0.5);
+    float effectiveSelection = max(isSelected, surfaceMatch ? 1.0 : max(isSelected, vertexSelected));
     
     // Determine base color based on tissue type
     vec3 baseColor;
@@ -123,7 +127,10 @@ void main() {
     
     // ── Override with overlay colour when applicable ──
     if (overlayMode > 0.5 && overlayMode < 1.5) {
-        baseColor = v_annotColor;   // Annotation
+        // Annotation: fall back to tissue color when no annotation loaded (black)
+        if (dot(v_annotColor, v_annotColor) > 0.001) {
+            baseColor = v_annotColor;
+        }
     } else if (overlayMode > 2.5) {
         baseColor = v_color;        // Source Estimate
     }

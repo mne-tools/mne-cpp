@@ -6,6 +6,7 @@ layout(location = 2) in vec3 v_color;
 layout(location = 3) in vec3 v_viewDir;
 layout(location = 4) in float v_curvature;
 layout(location = 5) in vec3 v_annotColor;
+layout(location = 6) in float v_surfaceId;
 
 layout(location = 0) out vec4 fragColor;
 
@@ -17,7 +18,7 @@ layout(std140, binding = 0) uniform UniformBlock {
     float tissueType;  // 0=Unknown, 1=Brain, 2=Skin, 3=OuterSkull, 4=InnerSkull
     float lightingEnabled;
     float overlayMode; // 0=Surface, 1=Annotation, 2=Scientific, 3=SourceEstimate
-    float _pad1;
+    float selectedSurfaceId; // WORKAROUND(QRhi-GLES2): merged-draw surface selection
     float _pad2;
 };
 
@@ -30,8 +31,15 @@ void main() {
     vec3 effectiveColor;
     if (overlayMode < 0.5) {
         effectiveColor = vec3(1.0); // Surface: white
+        // Show gold selection tint from vertex colors
+        if (v_color.r - v_color.b > 0.15) {
+            effectiveColor = v_color;
+        }
     } else if (overlayMode < 1.5) {
-        effectiveColor = v_annotColor; // Annotation
+        // Annotation: fall back to white when no annotation loaded (black)
+        effectiveColor = (dot(v_annotColor, v_annotColor) > 0.001)
+                       ? v_annotColor
+                       : vec3(1.0);
     } else {
         effectiveColor = v_color; // Scientific / STC
     }
@@ -72,7 +80,11 @@ void main() {
     float final_alpha = mix(alpha_shell, alpha_data, is_data);
     
     // --- Selection Highlight (Silver Rim) ---
-    if (isSelected > 0.5) {
+    // WORKAROUND(QRhi-GLES2): On WASM merged-draw path, isSelected is 0;
+    // instead selectedSurfaceId >= 0 and v_surfaceId identifies the surface.
+    bool highlighted = (isSelected > 0.5)
+                    || (selectedSurfaceId >= 0.0 && abs(v_surfaceId - selectedSurfaceId) < 0.5);
+    if (highlighted) {
         float selectionRim = pow(1.0 - N_dot_V, 3.0);
         vec3 whiteColor = vec3(1.0, 1.1, 1.2); // Cool White
         base_rgb += whiteColor * 0.2; // Constant boost

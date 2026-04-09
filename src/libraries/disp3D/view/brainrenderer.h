@@ -155,6 +155,37 @@ public:
     void renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, BrainSurface *surface, ShaderMode mode);
 
     //=========================================================================================================
+    // ── WORKAROUND(QRhi-GLES2) ──────────────────────────────────────────
+    // The Qt QRhi GLES2/WebGL backend has a bug where only the first
+    // drawIndexed() per render pass produces visible output.  On WASM we
+    // work around this by merging all brain surfaces into a single VBO/IBO
+    // and issuing one drawIndexed().  When the upstream bug is fixed these
+    // two methods (and the merged buffers in Impl) can be removed.
+    //
+    /**
+     * Prepare merged brain surface geometry for single-drawIndexed rendering.
+     * Call BEFORE beginFrame() with a pre-upload resource batch.
+     *
+     * @param[in] rhi        QRhi pointer.
+     * @param[in] u          Resource update batch (pre-render uploads).
+     * @param[in] surfaces   Brain surfaces to merge.
+     */
+    void prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch *u,
+                               const QVector<BrainSurface*> &surfaces);
+
+    /**
+     * Draw previously prepared merged surfaces in a single drawIndexed.
+     * Call between beginFrame() and endFrame().
+     *
+     * @param[in] cb         Command buffer.
+     * @param[in] rhi        QRhi pointer.
+     * @param[in] data       Scene uniforms.
+     * @param[in] mode       Shader mode.
+     */
+    void drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
+                            const SceneData &data, ShaderMode mode);
+
+    //=========================================================================================================
     /**
      * Render dipoles using instanced rendering.
      *

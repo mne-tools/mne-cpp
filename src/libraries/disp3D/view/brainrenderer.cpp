@@ -68,6 +68,18 @@ struct BrainRenderer::Impl
     int currentUniformOffset = 0;
 
     bool resourcesDirty = true;
+
+    // ── WORKAROUND(QRhi-GLES2): merged single-drawIndexed buffers ────
+    // Used on WASM to avoid the multi-drawIndexed bug in QRhi's GLES2
+    // backend.  Remove when upstream Qt fixes the issue.
+    QVector<BrainSurface*> mergedSurfaces;
+    std::unique_ptr<QRhiBuffer> mergedVertexBuffer;
+    std::unique_ptr<QRhiBuffer> mergedIndexBuffer;
+    int mergedIndexCount = 0;
+    // Cached CPU-side merged data — re-uploaded every draw to refresh
+    // GLES2 element-buffer bindings that go stale between frames.
+    QByteArray mergedVertexRaw;
+    QByteArray mergedIndexRaw;
 };
 
 //=============================================================================================================
@@ -101,6 +113,7 @@ namespace {
     constexpr int kOffsetTissueType   = 92;     // float
     constexpr int kOffsetLighting     = 96;     // float
     constexpr int kOffsetOverlayMode  = 100;    // float
+    constexpr int kOffsetSelectedSurfaceId = 104; // float — WORKAROUND(QRhi-GLES2)
 }
 
 //=============================================================================================================
@@ -226,11 +239,12 @@ void BrainRenderer::Impl::createResources(QRhi *rhi, QRhiRenderPassDescriptor *r
                     { 1, 7, QRhiVertexInputAttribute::Float, 20 * sizeof(float) }
                 });
             } else {
-                il.setBindings({{ 32 }});
+                il.setBindings({{ 36 }});  // sizeof(VertexData) = 36 with surfaceId
                 il.setAttributes({{ 0, 0, QRhiVertexInputAttribute::Float3, 0 }, 
                                   { 0, 1, QRhiVertexInputAttribute::Float3, 12 }, 
                                   { 0, 2, QRhiVertexInputAttribute::UNormByte4, 24 },
-                                  { 0, 3, QRhiVertexInputAttribute::UNormByte4, 28 }});
+                                  { 0, 3, QRhiVertexInputAttribute::UNormByte4, 28 },
+                                  { 0, 4, QRhiVertexInputAttribute::Float, 32 }});  // surfaceId
             }
             
             p->setVertexInputLayout(il);
@@ -327,7 +341,17 @@ void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
     u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetMVP, 64, data.mvp.constData());
     u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetCameraPos, 12, &data.cameraPos);
     
+    // On desktop, when a specific annotation region or vertex range is
+    // selected the CPU vertex-color gold tint (in updateVertexColors)
+    // provides per-region feedback.  Suppress the shader's whole-surface
+    // gold glow so it doesn't drown out the region highlight.
     float selected = surface->isSelected() ? 1.0f : 0.0f;
+#ifndef __EMSCRIPTEN__
+    if (surface->isSelected()
+        && (surface->selectedRegionId() != -1 || surface->selectedVertexStart() >= 0)) {
+        selected = 0.0f;
+    }
+#endif
     u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetSelected, 4, &selected);
     
     u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLightDir, 12, &data.lightDir);
@@ -341,6 +365,10 @@ void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
 
     float overlayMode = data.overlayMode;
     u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetOverlayMode, 4, &overlayMode);
+
+    // Per-surface path: disable surfaceId-based selection (handled by isSelected).
+    float noSurfaceSelection = -1.0f;
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetSelectedSurfaceId, 4, &noSurfaceSelection);
 
     cb->resourceUpdate(u);
 
@@ -495,4 +523,157 @@ void BrainRenderer::renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
         cb->setVertexInput(0, 2, edgeBindings, network->edgeIndexBuffer(), 0, QRhiCommandBuffer::IndexUInt32);
         cb->drawIndexed(network->edgeIndexCount(), network->edgeInstanceCount());
     }
+}
+
+//=============================================================================================================
+// WORKAROUND(QRhi-GLES2): Merged single-drawIndexed rendering.
+// The Qt QRhi GLES2/WebGL backend has a bug where only the first
+// drawIndexed() per render pass produces visible output.  These two
+// methods merge multiple brain surfaces into a single VBO/IBO so that
+// all geometry is drawn in one call.
+//
+// Remove when upstream Qt fixes the issue.
+//=============================================================================================================
+
+void BrainRenderer::prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch * /*u*/,
+                                           const QVector<BrainSurface*> &surfaces)
+{
+    d->mergedSurfaces = surfaces;
+    d->mergedIndexCount = 0;
+
+    // Build merged vertex + index arrays
+    QVector<VertexData> mergedVerts;
+    QVector<uint32_t> mergedIndices;
+
+    float surfaceId = 0.0f;
+    for (BrainSurface *surf : surfaces) {
+        if (!surf) continue;
+
+        const uint32_t vertexOffset = mergedVerts.size();
+        const auto &srcVerts = surf->vertexDataRef();
+        const auto &srcIdx   = surf->indexDataRef();
+
+        // Copy vertices with surfaceId stamp
+        mergedVerts.reserve(mergedVerts.size() + srcVerts.size());
+        for (const VertexData &v : srcVerts) {
+            VertexData mv = v;
+            mv.surfaceId = surfaceId;
+            mergedVerts.append(mv);
+        }
+
+        // Copy indices with global vertex offset
+        mergedIndices.reserve(mergedIndices.size() + srcIdx.size());
+        for (uint32_t idx : srcIdx) {
+            mergedIndices.append(idx + vertexOffset);
+        }
+
+        surfaceId += 1.0f;
+    }
+
+    d->mergedIndexCount = mergedIndices.size();
+    if (d->mergedIndexCount == 0) return;
+
+    const quint32 vbufSize = mergedVerts.size()   * sizeof(VertexData);
+    const quint32 ibufSize = mergedIndices.size()  * sizeof(uint32_t);
+
+    // (Re-)create Dynamic buffers when they don't exist or are too small
+    if (!d->mergedVertexBuffer || d->mergedVertexBuffer->size() < vbufSize) {
+        d->mergedVertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
+                                                    QRhiBuffer::VertexBuffer, vbufSize));
+        d->mergedVertexBuffer->create();
+    }
+    if (!d->mergedIndexBuffer || d->mergedIndexBuffer->size() < ibufSize) {
+        d->mergedIndexBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
+                                                   QRhiBuffer::IndexBuffer, ibufSize));
+        d->mergedIndexBuffer->create();
+    }
+
+    // Cache raw data — uploaded in drawMergedSurfaces() inside the render
+    // pass so that GL element-buffer bindings are refreshed right before draw.
+    d->mergedVertexRaw = QByteArray(reinterpret_cast<const char*>(mergedVerts.constData()), vbufSize);
+    d->mergedIndexRaw  = QByteArray(reinterpret_cast<const char*>(mergedIndices.constData()), ibufSize);
+}
+
+//=============================================================================================================
+
+void BrainRenderer::drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
+                                        const SceneData &data, ShaderMode mode)
+{
+    if (d->mergedIndexCount == 0) return;
+    if (d->pipelines.find(mode) == d->pipelines.end()) return;
+
+    auto *pipeline = d->pipelines[mode].get();
+    if (!pipeline) return;
+
+    // Determine which merged surface (if any) is selected.
+    // When a specific annotation region or vertex range is highlighted,
+    // the gold tint lives in the vertex colours (updated by
+    // updateVertexColors).  Suppress the shader whole-surface glow so
+    // it doesn't drown out the per-region highlight.
+    float selectedSurfaceId = -1.0f;
+    for (int i = 0; i < d->mergedSurfaces.size(); ++i) {
+        if (d->mergedSurfaces[i] && d->mergedSurfaces[i]->isSelected()) {
+            if (d->mergedSurfaces[i]->selectedRegionId() == -1
+                && d->mergedSurfaces[i]->selectedVertexStart() < 0) {
+                selectedSurfaceId = static_cast<float>(i);
+            }
+            break;
+        }
+    }
+
+    // Uniform slot + buffer uploads.
+    // WORKAROUND(QRhi-GLES2): Upload merged VBO/IBO here (inside the
+    // render pass) rather than in the pre-upload phase.  The GLES2
+    // backend's glBufferSubData calls refresh GL_ARRAY_BUFFER /
+    // GL_ELEMENT_ARRAY_BUFFER bindings that can go stale between frames.
+    QRhiResourceUpdateBatch *u = rhi->nextResourceUpdateBatch();
+
+    // Re-upload merged geometry — ensures GL buffer bindings are fresh
+    u->updateDynamicBuffer(d->mergedVertexBuffer.get(), 0, d->mergedVertexRaw.size(), d->mergedVertexRaw.constData());
+    u->updateDynamicBuffer(d->mergedIndexBuffer.get(),  0, d->mergedIndexRaw.size(),  d->mergedIndexRaw.constData());
+
+    int offset = d->currentUniformOffset;
+    d->currentUniformOffset += d->uniformBufferOffsetAlignment;
+    if (d->currentUniformOffset >= d->uniformBuffer->size()) {
+        qWarning("BrainRenderer: uniform buffer overflow in drawMergedSurfaces");
+        return;
+    }
+
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetMVP, 64, data.mvp.constData());
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetCameraPos, 12, &data.cameraPos);
+
+    float selected = 0.0f;  // Per-surface isSelected disabled for merged path
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetSelected, 4, &selected);
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLightDir, 12, &data.lightDir);
+
+    float tissueType = 1.0f;  // Brain
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetTissueType, 4, &tissueType);
+
+    float lighting = data.lightingEnabled ? 1.0f : 0.0f;
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLighting, 4, &lighting);
+
+    float overlayMode = data.overlayMode;
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetOverlayMode, 4, &overlayMode);
+
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetSelectedSurfaceId, 4, &selectedSurfaceId);
+
+    cb->resourceUpdate(u);
+
+    cb->setViewport(toViewport(data));
+    cb->setScissor(toScissor(data));
+
+    auto draw = [&](QRhiGraphicsPipeline *p) {
+        cb->setGraphicsPipeline(p);
+        const QRhiCommandBuffer::DynamicOffset srbOffset = { 0, uint32_t(offset) };
+        cb->setShaderResources(d->srb.get(), 1, &srbOffset);
+        const QRhiCommandBuffer::VertexInput vbuf(d->mergedVertexBuffer.get(), 0);
+        cb->setVertexInput(0, 1, &vbuf, d->mergedIndexBuffer.get(), 0, QRhiCommandBuffer::IndexUInt32);
+        cb->drawIndexed(d->mergedIndexCount);
+    };
+
+    if (mode == Holographic && d->pipelinesBackColor.count(Holographic) > 0) {
+        draw(d->pipelinesBackColor[Holographic].get());
+    }
+
+    draw(pipeline);
 }
