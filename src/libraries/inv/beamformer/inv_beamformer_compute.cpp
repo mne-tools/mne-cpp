@@ -2,7 +2,7 @@
 /**
  * @file     inv_beamformer_compute.cpp
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    2.0.0
+ * @since    2.1.0
  * @date     March, 2026
  *
  * @section  LICENSE

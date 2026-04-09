@@ -4,7 +4,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Simon Heinke <simon.heinke@tu-ilmenau.de>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
- * @since    2.0.0
+ * @since    2.1.0
  * @date     March, 2019
  *
  * @section  LICENSE

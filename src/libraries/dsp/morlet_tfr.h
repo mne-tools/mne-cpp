@@ -2,7 +2,7 @@
 /**
  * @file     morlet_tfr.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
+ * @since    2.1.0
  * @date     March, 2026
  *
  * @section  LICENSE

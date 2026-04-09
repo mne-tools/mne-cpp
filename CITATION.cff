@@ -1,0 +1,151 @@
+cff-version: 1.2.0
+title: "MNE-CPP"
+message: "If you use this software, please cite both the software itself, and the paper listed in the preferred-citation field."
+version: 2.1.0
+date-released: "2026-04-10"
+doi: 10.5281/zenodo.19139238
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.593102
+    description: "Concept DOI for all versions of MNE-CPP"
+license: BSD-3-Clause
+repository-code: "https://github.com/mne-tools/mne-cpp"
+url: "https://mne-cpp.github.io"
+keywords:
+  - MNE-CPP
+  - MEG
+  - magnetoencephalography
+  - EEG
+  - electroencephalography
+  - electrophysiology
+  - neuroimaging
+  - "source imaging"
+  - "real-time processing"
+  - "brain imaging"
+  - C++
+  - "open source"
+  - "signal processing"
+  - "neuroscience software"
+authors:
+  - family-names: Esch
+    given-names: Lorenz
+  - family-names: Dinh
+    given-names: Christoph
+    affiliation: "Carl Zeiss (Germany)"
+  - family-names: Motta
+    given-names: Gabriel
+  - family-names: Garcia-Prieto
+    given-names: Juan
+  - family-names: Dörfel
+    given-names: Ruben
+  - family-names: Debor
+    given-names: Lars
+  - family-names: Knobl
+    given-names: Daniel
+  - family-names: Klüber
+    given-names: Viktor
+  - family-names: Henfling
+    given-names: Martin
+  - family-names: Tjen
+    given-names: Ricky
+  - family-names: Kiesel
+    given-names: Jana
+  - family-names: Sun
+    given-names: Limin
+  - family-names: Schlembach
+    given-names: Florian
+  - family-names: Strohmeier
+    given-names: Daniel
+  - family-names: Heinke
+    given-names: Simon
+  - family-names: Parfenov
+    given-names: Andrey
+  - family-names: Kunze
+    given-names: Tim
+  - family-names: Arndt
+    given-names: Felix
+  - family-names: Mead
+    given-names: Wayne
+  - family-names: Eichhorst
+    given-names: Louis
+  - family-names: Griesau
+    given-names: Felix
+  - family-names: Vorwerk
+    given-names: Johannes
+  - family-names: Doshi
+    given-names: Chiran
+  - family-names: Behrens
+    given-names: Johannes
+  - family-names: Pieloth
+    given-names: Christof
+  - family-names: Rockhill
+    given-names: Alex
+  - family-names: Dicamillo
+    given-names: Robert
+  - family-names: Sachdeva
+    given-names: Sugandha
+  - family-names: Hornberger
+    given-names: Erik
+  - family-names: Yahya
+    given-names: Faris
+  - name: ag-fieldline
+  - family-names: Polo
+    given-names: Franco
+  - family-names: Klamke
+    given-names: Marco
+  - name: betaha
+  - family-names: Lerm
+    given-names: Julius
+  - family-names: Kay
+    given-names: Benjamin
+  - family-names: Jas
+    given-names: Mainak
+  - family-names: Simidyan
+    given-names: Petros
+  - family-names: Larson
+    given-names: Eric
+  - family-names: Baumgarten
+    given-names: Daniel
+    affiliation: "University Innsbruck"
+  - family-names: Haueisen
+    given-names: Jens
+    affiliation: "TU Ilmenau"
+  - family-names: Okada
+    given-names: Yoshio
+    affiliation: "Harvard Medical School"
+  - family-names: Mosher
+    given-names: John C.
+    affiliation: "University of Texas Houston"
+  - family-names: Hämäläinen
+    given-names: Matti S.
+    affiliation: "Aalto University"
+preferred-citation:
+  type: article
+  title: "MNE Scan: Software for real-time processing of electrophysiological data"
+  authors:
+    - family-names: Esch
+      given-names: Lorenz
+    - family-names: Sun
+      given-names: Limin
+    - family-names: Klüber
+      given-names: Viktor
+    - family-names: Lew
+      given-names: Seok
+    - family-names: Baumgarten
+      given-names: Daniel
+    - family-names: Grant
+      given-names: P. Ellen
+    - family-names: Okada
+      given-names: Yoshio
+    - family-names: Haueisen
+      given-names: Jens
+    - family-names: Hämäläinen
+      given-names: Matti S.
+    - family-names: Dinh
+      given-names: Christoph
+  journal: "Journal of Neuroscience Methods"
+  volume: 303
+  start: 55
+  end: 67
+  year: 2018
+  doi: 10.1016/j.jneumeth.2018.03.020
