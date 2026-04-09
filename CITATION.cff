@@ -3,11 +3,14 @@ title: "MNE-CPP"
 message: "If you use this software, please cite both the software itself, and the paper listed in the preferred-citation field."
 version: 2.1.0
 date-released: "2026-04-10"
-doi: 10.5281/zenodo.19139238
+doi: 10.5281/zenodo.593102
 identifiers:
   - type: doi
     value: 10.5281/zenodo.593102
-    description: "Concept DOI for all versions of MNE-CPP"
+    description: "Concept DOI for all versions of MNE-CPP (always resolves to the latest version)"
+  - type: doi
+    value: 10.5281/zenodo.19139238
+    description: "Version-specific DOI for MNE-CPP 2.0.0"
 license: BSD-3-Clause
 repository-code: "https://github.com/mne-tools/mne-cpp"
 url: "https://mne-cpp.github.io"
