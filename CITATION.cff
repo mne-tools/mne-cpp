@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 title: "MNE-CPP"
-message: "If you use this software, please cite both the software itself, and the paper listed in the preferred-citation field."
+message: "If you use this software, please cite it using the metadata from this file."
 version: 2.1.0
 date-released: "2026-04-10"
 doi: 10.5281/zenodo.593102
@@ -122,33 +122,3 @@ authors:
   - family-names: Hämäläinen
     given-names: Matti S.
     affiliation: "Aalto University"
-preferred-citation:
-  type: article
-  title: "MNE Scan: Software for real-time processing of electrophysiological data"
-  authors:
-    - family-names: Esch
-      given-names: Lorenz
-    - family-names: Sun
-      given-names: Limin
-    - family-names: Klüber
-      given-names: Viktor
-    - family-names: Lew
-      given-names: Seok
-    - family-names: Baumgarten
-      given-names: Daniel
-    - family-names: Grant
-      given-names: P. Ellen
-    - family-names: Okada
-      given-names: Yoshio
-    - family-names: Haueisen
-      given-names: Jens
-    - family-names: Hämäläinen
-      given-names: Matti S.
-    - family-names: Dinh
-      given-names: Christoph
-  journal: "Journal of Neuroscience Methods"
-  volume: 303
-  start: 55
-  end: 67
-  year: 2018
-  doi: 10.1016/j.jneumeth.2018.03.020
