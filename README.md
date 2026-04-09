@@ -40,7 +40,7 @@ No install required — runs entirely in your browser. **Your data never leaves 
 
 ### Command-line tools
 
-60+ CLI tools for BEM model creation, forward/inverse computation, data conversion, anonymization, and real-time streaming — all C++ ports of the original [MNE-C](http://www.nmr.mgh.harvard.edu/martinos/userInfo/data/MNE_register/index.php) utilities. See the [tools reference](https://mne-cpp.github.io/docs/manual/tools-overview).
+50+ CLI tools for BEM model creation, forward/inverse computation, data conversion, anonymization, and real-time streaming — all C++ ports of the original [MNE-C](http://www.nmr.mgh.harvard.edu/martinos/userInfo/data/MNE_register/index.php) utilities. See the [tools reference](https://mne-cpp.github.io/docs/manual/tools-overview).
 
 Libraries
 ---------
@@ -108,22 +108,24 @@ A list of contact persons can be found [here](https://mne-cpp.github.io/docs/ove
 Citation
 --------
 
-If you use MNE-CPP in your work, please cite:
+If you use MNE-CPP in your work, please cite the software and the paper:
 
-> Dinh, C., Esch, L., Mäki-Marttunen, V., Bott, F.-S., Lim, R., Yang, D., Drechsler, R., & Haueisen, J. (2021). **MNE-CPP: A cross-platform open-source C++ framework for real-time neurophysiology.** *Frontiers in Neuroscience*, 15, 663795. https://doi.org/10.3389/fnins.2021.663795
+> Esch, L., Sun, L., Klüber, V., Lew, S., Baumgarten, D., Grant, P. E., Okada, Y., Haueisen, J., Hämäläinen, M. S., & Dinh, C. (2018). **MNE Scan: Software for real-time processing of electrophysiological data.** *Journal of Neuroscience Methods*, 303, 55–67. https://doi.org/10.1016/j.jneumeth.2018.03.020
 
 ```bibtex
-@article{dinh2021mnecpp,
-  title     = {MNE-CPP: A cross-platform open-source C++ framework for real-time neurophysiology},
-  author    = {Dinh, Christoph and Esch, Lorenz and M{\"a}ki-Marttunen, Vera and Bott, Faris-Sven and Lim, Robert and Yang, Daniel and Drechsler, Rolf and Haueisen, Jens},
-  journal   = {Frontiers in Neuroscience},
-  volume    = {15},
-  pages     = {663795},
-  year      = {2021},
-  publisher = {Frontiers},
-  doi       = {10.3389/fnins.2021.663795}
+@article{esch2018mnescan,
+  title     = {{MNE Scan}: Software for real-time processing of electrophysiological data},
+  author    = {Esch, Lorenz and Sun, Limin and Kl{\"u}ber, Viktor and Lew, Seok and Baumgarten, Daniel and Grant, P Ellen and Okada, Yoshio and Haueisen, Jens and H{\"a}m{\"a}l{\"a}inen, Matti S and Dinh, Christoph},
+  journal   = {Journal of Neuroscience Methods},
+  volume    = {303},
+  pages     = {55--67},
+  year      = {2018},
+  publisher = {Elsevier},
+  doi       = {10.1016/j.jneumeth.2018.03.020}
 }
 ```
+
+To cite a specific version of the software, use the [Zenodo record](https://doi.org/10.5281/zenodo.593102) (concept DOI: `10.5281/zenodo.593102`).
 
 License
 -------
