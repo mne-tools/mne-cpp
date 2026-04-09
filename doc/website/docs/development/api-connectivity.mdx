@@ -129,18 +129,6 @@ Every metric inherits from `AbstractMetric` and implements the same computation 
 |---|---|
 | `Connectivity::calculate(settings)` | Dispatches computation: returns one `Network` per requested metric |
 
-## Algorithms Not Yet in MNE-CPP
-
-| Algorithm | MNE-Python (`mne-connectivity`) | Description |
-|---|---|---|
-| Directed Transfer Function (DTF) | `spectral_connectivity_epochs(method='dtf')` | Granger-causality-based directed connectivity in frequency domain |
-| Partial Directed Coherence (PDC) | `spectral_connectivity_epochs(method='pdc')` | Normalised directed coherence based on MVAR models |
-| Granger Causality (GC) | `spectral_connectivity_epochs(method='gc')` | Time-domain Granger causality |
-| Amplitude Envelope Correlation (AEC) | `mne_connectivity.envelope_correlation()` | Power envelope correlation with optional orthogonalisation |
-| Coherence (time-resolved) | `spectral_connectivity_time()` | Sliding-window or Hilbert-based time-resolved connectivity |
-| Power Envelope Correlation | `mne_connectivity.envelope_correlation()` | Broadband power envelope correlation for resting-state analysis |
-| Multivariate Connectivity (MIC/MIM) | `spectral_connectivity_epochs(method='mic')` | Multivariate interaction measure for multi-channel connectivity |
-
 ## Doxygen Reference
 
 For method signatures, inheritance diagrams, and source-level documentation see the auto-generated [**CONNLIB namespace**](https://mne-cpp.github.io/doxygen-api/namespaceCONNLIB.html) in the Doxygen API reference.

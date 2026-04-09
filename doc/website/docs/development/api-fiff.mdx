@@ -144,20 +144,6 @@ QList<FiffEvoked> evokeds = FiffEvoked::read("sample_audvis-ave.fif");
 FiffCov cov = FiffCov::read("sample_audvis-cov.fif");
 ```
 
-## Algorithms Not Yet in MNE-CPP
-
-| Feature | MNE-Python | Description |
-|---|---|---|
-| Annotations | `mne.Annotations` | Time-stamped labels for raw data segments (e.g., BAD, EDGE) |
-| BDF/EDF reader | `mne.io.read_raw_edf()` | Native FIFF wrapping of BDF/EDF+ format |
-| BrainVision reader | `mne.io.read_raw_brainvision()` | BrainVision .vhdr/.vmrk/.eeg reader |
-| Fieldtrip reader | `mne.io.read_raw_fieldtrip()` | FieldTrip .mat file reader |
-| Montage | `mne.channels.DigMontage` | Standard montage and custom electrode placement |
-
-:::note
-MNE-CPP handles non-FIFF formats via the dedicated command-line converter tools (e.g., `mne_edf2fiff`, `mne_brain_vision2fiff`, `mne_ctf2fiff`). See the [Conversion tools](../manual/tools-edf2fiff).
-:::
-
 ## Doxygen Reference
 
 For method signatures, inheritance diagrams, and source-level documentation see the auto-generated [**FIFFLIB namespace**](https://mne-cpp.github.io/doxygen-api/namespaceFIFFLIB.html) in the Doxygen API reference.

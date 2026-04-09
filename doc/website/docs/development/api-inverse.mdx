@@ -74,16 +74,6 @@ Supports all four noise-normalization strategies:
 | `InvConnectivity` | Pairwise source connectivity matrix |
 | `InvEstimateMethod` | Enum: MNE, dSPM, sLORETA, eLORETA, LCMV, DICS, SAM, MxNE, GammaMAP, DipoleFit, RapMusic, PwlRapMusic |
 
-## Algorithms Not Yet in MNE-CPP
-
-| Algorithm | MNE-Python | Description |
-|---|---|---|
-| Mixed-Norm (MxNE) | `mne.inverse_sparse.mxne_inverse` | L1/L2 sparse inverse for focal sources |
-| TF-MxNE | `mne.inverse_sparse.mxne_inverse` | Time-frequency mixed-norm sparse inverse |
-| Gamma-MAP | `mne.inverse_sparse._gamma_map` | Hierarchical Bayesian sparse inverse |
-| SAM (Synthetic Aperture Magnetometry) | — | Beamformer variant for MEG (enum defined, implementation pending) |
-| TRAP MUSIC | `mne.beamformer._rap_music` | Truncated RAP-MUSIC variant |
-
 ## Doxygen Reference
 
 For method signatures, inheritance diagrams, and source-level documentation see the auto-generated [**INVLIB namespace**](https://mne-cpp.github.io/doxygen-api/namespaceINVLIB.html) in the Doxygen API reference.

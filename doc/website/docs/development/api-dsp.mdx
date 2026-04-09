@@ -69,45 +69,6 @@ These classes are designed for streaming data and run in background threads:
 | `RtConnectivity` | Real-time functional connectivity computation | `mne_connectivity` (offline) | — |
 | `RtHpi` | Continuous HPI coil localization and head tracking | `mne.chpi.compute_head_pos` | — |
 
-## Algorithms Not Yet in MNE-CPP
-
-The following algorithms exist in MNE-Python but have not yet been ported to C++. They represent opportunities for future work:
-
-### High Priority
-
-| Algorithm | MNE-Python Module | Description |
-|---|---|---|
-| Multitaper PSD | `mne.time_frequency.psd_array_multitaper` | Thomson's multitaper spectral estimation — higher spectral resolution than Welch |
-| Multitaper TFR | `mne.time_frequency.tfr_array_multitaper` | DPSS-windowed time-frequency representation |
-| Stockwell TFR | `mne.time_frequency._stockwell` | S-transform for adaptive time-frequency analysis |
-| Extended Infomax ICA | `mne.preprocessing.infomax_` | Extended Infomax — handles super- and sub-Gaussian sources |
-| Picard ICA | `mne.preprocessing.ICA` (method='picard') | Faster, more robust ICA via preconditioned gradient descent |
-| eLORETA (standalone) | `mne.minimum_norm._eloreta` | Already available via `InvMinimumNorm`; standalone function wrapper pending |
-| Mixed-Norm (MxNE) | `mne.inverse_sparse.mxne_inverse` | L1/L2 sparse inverse for focal source estimation |
-| Gamma-MAP | `mne.inverse_sparse._gamma_map` | Hierarchical Bayesian sparse inverse |
-
-### Medium Priority
-
-| Algorithm | MNE-Python Module | Description |
-|---|---|---|
-| Cross-Spectral Density | `mne.time_frequency.csd` | CSD via Fourier, multitaper, or Morlet — prerequisite for DICS beamformer improvements |
-| Current Source Density | `mne.preprocessing._csd` | Surface Laplacian for EEG — improves spatial resolution |
-| CSP (Common Spatial Patterns) | `mne.decoding.csp` | Spatial filter maximizing class-discriminative variance for BCI |
-| Cluster Permutation Statistics | `mne.stats.cluster_level` | Non-parametric cluster-level tests for spatio-temporal data |
-| OTP (Oversampled Temporal Projection) | `mne.preprocessing.otp` | MEG denoising via oversampled temporal projection |
-
-### From MNE-C (Not in MNE-Python)
-
-Some original MNE-C tools have unique functionality not replicated elsewhere:
-
-| Tool | MNE-C | Description |
-|---|---|---|
-| `mne_label_ssp` | `mne_label_ssp` | Create SSP projectors that suppress activity from a specific brain region |
-| `mne_map_data` | `mne_map_data` | Map data between arbitrary surface meshes |
-| `mne_average_estimates` | `mne_average_estimates` | Weighted averaging of source estimate (.stc) files |
-| `mne_process_stc` | `mne_process_stc` | Manipulate and post-process .stc files |
-| `mne_make_uniform_stc` | `mne_make_uniform_stc` | Create uniform source estimates for testing |
-
 ## Usage Example
 
 ```cpp

@@ -161,15 +161,6 @@ Eigen::MatrixXd megMapping =
     FwdFieldMap::computeMegMapping(info, trans, surface, sphereModel);
 ```
 
-## Algorithms Not Yet in MNE-CPP
-
-| Feature | MNE-Python | Description |
-|---|---|---|
-| OpenMEEG BEM | `mne.make_forward_solution(solver='openmeeg')` | BEM via OpenMEEG library — more accurate for complex geometries |
-| Finite Element Forward | External (SimNIBS) | FEM-based forward modelling for realistic tissue boundaries |
-| Dipole Patch Statistics | `mne.forward.compute_depth_prior()` | Depth-weighting priors for regularisation of deep sources |
-| Sensitivity Map (full) | `mne.sensitivity_map()` | Column-norm map of lead-field matrix for source-space coverage analysis |
-
 ## Doxygen Reference
 
 For method signatures, inheritance diagrams, and source-level documentation see the auto-generated [**FWDLIB namespace**](https://mne-cpp.github.io/doxygen-api/namespaceFWDLIB.html) in the Doxygen API reference.
