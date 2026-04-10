@@ -68,6 +68,10 @@ add_subdirectory(com)
 add_subdirectory(conn)
 add_subdirectory(dsp)
 
+add_subdirectory(mna)
+add_subdirectory(ml)
+add_subdirectory(sts)
+
 add_subdirectory(disp)
 
 add_subdirectory(disp3D)

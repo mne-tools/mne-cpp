@@ -1,0 +1,122 @@
+//=============================================================================================================
+/**
+ * @file     mna_types.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April, 2026
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    MNA type definitions.
+ *
+ */
+
+#ifndef MNA_TYPES_H
+#define MNA_TYPES_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <QString>
+
+//=============================================================================================================
+// DEFINE NAMESPACE MNALIB
+//=============================================================================================================
+
+namespace MNALIB{
+
+//=============================================================================================================
+// ENUMS
+//=============================================================================================================
+
+/**
+ * Describes the role a file plays within an MNA project.
+ */
+enum class MnaFileRole {
+    Raw,
+    Forward,
+    Inverse,
+    Covariance,
+    SourceEstimate,
+    Bem,
+    Surface,
+    Annotation,
+    Custom
+};
+
+//=============================================================================================================
+
+/**
+ * Supported container formats.
+ */
+enum class MnaContainerFormat {
+    Json,
+    Cbor
+};
+
+//=============================================================================================================
+// HELPER FUNCTIONS
+//=============================================================================================================
+
+/**
+ * Convert MnaFileRole to its string representation.
+ */
+inline QString mnaFileRoleToString(MnaFileRole role)
+{
+    switch(role) {
+    case MnaFileRole::Raw:            return QStringLiteral("raw");
+    case MnaFileRole::Forward:        return QStringLiteral("forward");
+    case MnaFileRole::Inverse:        return QStringLiteral("inverse");
+    case MnaFileRole::Covariance:     return QStringLiteral("covariance");
+    case MnaFileRole::SourceEstimate: return QStringLiteral("source_estimate");
+    case MnaFileRole::Bem:            return QStringLiteral("bem");
+    case MnaFileRole::Surface:        return QStringLiteral("surface");
+    case MnaFileRole::Annotation:     return QStringLiteral("annotation");
+    case MnaFileRole::Custom:         return QStringLiteral("custom");
+    }
+    return QStringLiteral("custom");
+}
+
+//=============================================================================================================
+
+/**
+ * Convert a string to MnaFileRole.
+ */
+inline MnaFileRole mnaFileRoleFromString(const QString& str)
+{
+    if(str == QLatin1String("raw"))              return MnaFileRole::Raw;
+    if(str == QLatin1String("forward"))          return MnaFileRole::Forward;
+    if(str == QLatin1String("inverse"))          return MnaFileRole::Inverse;
+    if(str == QLatin1String("covariance"))       return MnaFileRole::Covariance;
+    if(str == QLatin1String("source_estimate"))  return MnaFileRole::SourceEstimate;
+    if(str == QLatin1String("bem"))              return MnaFileRole::Bem;
+    if(str == QLatin1String("surface"))          return MnaFileRole::Surface;
+    if(str == QLatin1String("annotation"))       return MnaFileRole::Annotation;
+    return MnaFileRole::Custom;
+}
+
+} // namespace MNALIB
+
+#endif // MNA_TYPES_H
