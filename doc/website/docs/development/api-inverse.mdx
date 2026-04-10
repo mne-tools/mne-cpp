@@ -41,6 +41,17 @@ Supports all four noise-normalization strategies:
 | `InvPwlRapMusic` | Powell-accelerated RAP MUSIC with gradient-free dipole optimization | — | — |
 | `InvDipole` | Single dipole result (position, orientation, correlation) | — | — |
 
+### Contextual Minimum Norm Estimates (CMNE)
+
+| Class | Description | MNE-Python | MNE-C |
+|---|---|---|---|
+| `InvCmne` | CMNE inverse: dSPM base estimate refined by LSTM network (ONNX Runtime) | — | — |
+| `InvCmneSettings` | Configuration for CMNE: ONNX model path, sequence length, LSTM parameters | — | — |
+
+Combines classical dSPM with a trained LSTM neural network to incorporate temporal context. At inference time, `InvCmne::compute()` runs dSPM to obtain a base source estimate, then applies the ONNX-exported LSTM model sample-by-sample to produce a spatiotemporally refined CMNE result. Falls back to moving-average smoothing if no ONNX model is available.
+
+Reference: Dinh et al. (2021). *Contextual Minimum-Norm Estimates (CMNE): A Deep Learning Method for Source Estimation in Neuronal Networks.* Frontiers in Neuroscience, 15, 552666. [DOI: 10.3389/fnins.2021.552666](https://doi.org/10.3389/fnins.2021.552666)
+
 ### Dipole Fitting
 
 | Class | Description | MNE-Python | MNE-C |
@@ -72,7 +83,7 @@ Supports all four noise-normalization strategies:
 | `InvFocalDipole` | Focal dipole with free 3D position, moment, and fit-quality metrics |
 | `InvSourceCoupling` | Correlated grid sources with orientations and correlation matrix |
 | `InvConnectivity` | Pairwise source connectivity matrix |
-| `InvEstimateMethod` | Enum: MNE, dSPM, sLORETA, eLORETA, LCMV, DICS, SAM, MxNE, GammaMAP, DipoleFit, RapMusic, PwlRapMusic |
+| `InvEstimateMethod` | Enum: MNE, dSPM, sLORETA, eLORETA, CMNE, LCMV, DICS, SAM, MxNE, GammaMAP, DipoleFit, RapMusic, PwlRapMusic |
 
 ## Doxygen Reference
 

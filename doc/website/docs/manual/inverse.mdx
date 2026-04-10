@@ -6,7 +6,7 @@ sidebar_position: 4
 
 # Inverse Methods
 
-This section describes the mathematical details of all inverse source estimation methods available in MNE-CPP: **minimum-norm estimates** (MNE, dSPM, sLORETA, eLORETA), **beamformers** (LCMV, DICS), **RAP MUSIC**, and **dipole fitting**.
+This section describes the mathematical details of all inverse source estimation methods available in MNE-CPP: **minimum-norm estimates** (MNE, dSPM, sLORETA, eLORETA), **contextual minimum-norm estimates** (CMNE), **beamformers** (LCMV, DICS), **RAP MUSIC**, and **dipole fitting**.
 
 # Minimum-Norm Estimates
 
@@ -570,6 +570,175 @@ where $\lambda_1, \lambda_2, \lambda_3$ are the eigenvalues of the $3 \times 3$ 
 
 ---
 
+# Contextual Minimum-Norm Estimates (CMNE)
+
+Standard minimum-norm methods such as MNE, dSPM, sLORETA, and eLORETA compute source estimates **independently at each time point**: the estimate $\hat{j}(t)$ depends only on the measurement $x(t)$ and not on the temporal context in which $x(t)$ occurs. While this makes the methods robust and computationally straightforward, it ignores the rich temporal structure of neural signals. Brain activity unfolds over time with characteristic dynamics — somatosensory responses follow reproducible sequences across cortical areas, auditory processing propagates from primary to associative cortices, and so forth.
+
+**Contextual Minimum-Norm Estimates (CMNE)** address this limitation by augmenting dSPM with a **spatiotemporal LSTM network** that learns to exploit temporal context (Dinh et al., 2021). Rather than replacing the physics-based inverse model, CMNE uses data-driven temporal learning as a post-processing correction that improves spatial fidelity while preserving the well-understood regularization properties of dSPM.
+
+> Dinh, C.; Samuelsson, J.G.; Hunold, A.; Hämäläinen, M.S.; Khan, S.:
+> **Contextual MEG and EEG Source Estimates Using Spatiotemporal LSTM Networks.**
+> *Frontiers in Neuroscience* 15:552666 (2021).
+> [DOI: 10.3389/fnins.2021.552666](https://doi.org/10.3389/fnins.2021.552666)
+
+## Overview
+
+The CMNE pipeline proceeds in four stages:
+
+1. **dSPM kernel computation** — a standard noise-normalized inverse kernel $K_\text{dSPM}$ is built from the forward model, noise covariance, and regularization parameter (as described above).
+2. **dSPM source projection** — the kernel is applied to the evoked/epoch data to obtain a noise-normalized source time course at every cortical location.
+3. **Z-score rectification** — the source amplitudes are rectified (absolute value) and z-scored across time at each vertex, producing a unit-variance representation that is suitable as LSTM input.
+4. **LSTM temporal correction** — a trained LSTM network predicts the expected source pattern from the preceding $k$ time steps and applies it as a multiplicative correction to the current dSPM estimate, forming a recursive Markov chain.
+
+## Mathematical Formulation
+
+### Stage 1–3: dSPM and Preprocessing
+
+Let $y_t \in \mathbb{R}^N$ denote the measurement at time $t$ across $N$ channels. The whitened data and whitened gain matrix are:
+
+$$
+\tilde{y}_t = C^{-1/2} y_t, \qquad \tilde{G} = C^{-1/2} G
+$$
+
+The MNE kernel and dSPM noise normalization yield:
+
+$$
+K = R \tilde{G}^\top (\tilde{G} R \tilde{G}^\top + \lambda^2 I)^{-1}
+$$
+
+$$
+K_\text{dSPM} = W_\text{dSPM} K, \qquad W_\text{dSPM}(i,i) = \frac{1}{\sqrt{[K C K^\top]_{ii}}}
+$$
+
+The dSPM source estimate is $\hat{x}_t = K_\text{dSPM} \tilde{y}_t$. This is then rectified and z-scored:
+
+$$
+\hat{q}_t(i) = \frac{|\hat{x}_t(i)| - \mu_i}{\sigma_i}
+$$
+
+where $\mu_i$ and $\sigma_i$ are the mean and standard deviation of $|\hat{x}_t(i)|$ over time.
+
+### Stage 4: LSTM Temporal Correction
+
+The temporal correction operates as a recursive Markov chain. Let $b_t \in \mathbb{R}^{Q}$ denote the CMNE-corrected source estimate at time $t$ and let $k$ be the **look-back** window. For the first $k$ time steps, no correction is possible:
+
+$$
+b_t = \hat{q}_t, \qquad t < k
+$$
+
+For $t \geq k$, the preceding $k$ corrected estimates form the LSTM input sequence:
+
+$$
+\mathbf{B}_{t} = [b_{t-k}, \; b_{t-k+1}, \; \ldots, \; b_{t-1}] \in \mathbb{R}^{k \times Q}
+$$
+
+The LSTM network $f_\theta$ (trained offline) maps this sequence to a prediction vector:
+
+$$
+p_t = f_\theta(\mathbf{B}_{t}) \in \mathbb{R}^{Q}
+$$
+
+This prediction is normalized to form a diagonal weighting matrix:
+
+$$
+W_t^\text{CMNE}(i,i) = \frac{|p_t(i)|}{\max_j |p_t(j)|}
+$$
+
+The CMNE estimate is then the element-wise product of the LSTM-derived weights and the dSPM estimate:
+
+$$
+b_t = W_t^\text{CMNE} \hat{q}_t
+$$
+
+Crucially, $b_t$ replaces $\hat{q}_t$ in the sliding window for subsequent predictions. This recursive structure allows the network to build an evolving "context" of the source dynamics, progressively refining its predictions as more data becomes available.
+
+### LSTM Architecture
+
+The default architecture follows the paper's cross-validated design:
+
+| Parameter | Default | Description |
+|---|---|---|
+| **Look-back** $k$ | 80 | Number of past time steps fed to the LSTM |
+| **Hidden units** | 1280 | LSTM hidden state dimension |
+| **Layers** | 1 | Number of stacked LSTM layers |
+| **Output** | $Q$ (= n_sources) | Dense layer mapping hidden state to source space |
+| **Loss** | MSE | Mean squared error between prediction and ground truth |
+| **Optimizer** | Adam | Default learning rate $10^{-3}$ |
+
+- **Input shape**: $(B, k, Q)$ — batch of look-back windows across all sources
+- **Output shape**: $(B, Q)$ — predicted source pattern for the next time step
+
+The model is trained offline (in Python using PyTorch) and exported to ONNX format for C++ inference via ONNX Runtime.
+
+## Training
+
+The LSTM is trained on epoched data — individual trials from the same experimental paradigm. For each epoch:
+
+1. The dSPM source estimate is computed using the same forward model, noise covariance, and regularization as will be used at inference time.
+2. The source amplitudes are z-score rectified.
+3. Sliding windows of length $k$ are extracted, each producing one training pair: the input window $\mathbf{B}_t$ and the target $\hat{q}_t$.
+
+When ground-truth source activity is available (e.g., from simulations), the target is the true source pattern. When ground truth is unavailable, the dSPM estimate itself serves as a pseudo ground truth — the LSTM then learns to predict the next dSPM pattern from the preceding ones, effectively performing temporal denoising (referred to as "test mode" in the implementation).
+
+:::note
+Training on the MNE sample dataset (289 epochs, 7498 sources, look-back 40) produces approximately 110,000 training samples. The first run computes dSPM for all epochs, which takes several minutes on CPU. Subsequent runs load cached source estimates from disk automatically.
+:::
+
+## Fallback: Moving-Average Approximation
+
+When no trained ONNX model is available, MNE-CPP provides a **moving-average fallback** that replaces the LSTM prediction with a simple temporal average:
+
+$$
+W_t^\text{MA}(i,i) = \frac{1}{k} \sum_{s=t-k}^{t-1} b_s(i)
+$$
+
+This produces a smoothed version of the CMNE correction without requiring any trained model. While it does not achieve the spatial improvement of the LSTM approach, it serves as a baseline and allows the pipeline to run end-to-end for testing.
+
+## Performance
+
+The paper demonstrates the following improvements over standard dSPM on simulated somatosensory data (Dinh et al., 2021, Table 1):
+
+| Metric | dSPM | CMNE |
+|---|---|---|
+| **Peak localization error** (PE) | higher | reduced |
+| **Spatial dispersion** (SD) | broader | reduced |
+| **Source-space SNR** | lower | improved |
+
+The LSTM's contextual predictions effectively "focus" the dSPM estimate by suppressing source locations inconsistent with the learned temporal dynamics, leading to sharper and more focal source images while maintaining the noise normalization properties of dSPM.
+
+## CLI Tool
+
+The `mne_compute_cmne` tool provides three modes of operation:
+
+```bash
+# Compute CMNE source estimates
+mne_compute_cmne --mode compute \
+    --fwd sample_audvis-meg-eeg-oct-6-fwd.fif \
+    --cov sample_audvis-cov.fif \
+    --evoked sample_audvis-ave.fif \
+    --onnx cmne_lstm.onnx \
+    --out sample_audvis
+
+# Train the LSTM model
+mne_compute_cmne --mode train \
+    --fwd sample_audvis-meg-eeg-oct-6-fwd.fif \
+    --cov sample_audvis-cov.fif \
+    --epochs sample_audvis-epo.fif \
+    --onnx-out cmne_lstm.onnx
+
+# Fine-tune an existing model
+mne_compute_cmne --mode finetune \
+    --fwd sample_audvis-meg-eeg-oct-6-fwd.fif \
+    --cov sample_audvis-cov.fif \
+    --epochs sample_audvis-epo.fif \
+    --finetune cmne_lstm.onnx \
+    --onnx-out cmne_lstm_v2.onnx
+```
+
+Convenience scripts `run_compute.sh` and `run_train.sh` are provided for quick experiments using MNE sample data.
+
+---
+
 ## Summary of Inverse Methods
 
 The following table summarizes all inverse methods available in MNE-CPP:
@@ -580,6 +749,7 @@ The following table summarizes all inverse methods available in MNE-CPP:
 | **dSPM** | Distributed | Time | All cortical | Noise normalization removes depth bias |
 | **sLORETA** | Distributed | Time | All cortical | Zero localization error for point sources |
 | **eLORETA** | Distributed | Time | All cortical | Exact zero localization bias, iterative weights |
+| **CMNE** | Distributed + LSTM | Time | All cortical | Spatiotemporal context improves spatial fidelity |
 | **LCMV** | Beamformer | Time | Scanning | Adaptive filter, good for focal sources |
 | **DICS** | Beamformer | Frequency | Scanning | Frequency-specific source localization |
 | **RAP MUSIC** | Subspace scanning | Time | Multiple focal | Localizes multiple correlated sources |
