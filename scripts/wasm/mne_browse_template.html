@@ -310,7 +310,9 @@
            ================================================================ */
         try { (function () {
             var canvas = document.getElementById('particles-canvas');
+            if (!canvas) return;
             var ctx = canvas.getContext('2d');
+            if (!ctx) return;
             var W, H;
             var mouseX, mouseY, targetX, targetY;
             var particles = [];
@@ -420,19 +422,31 @@
 
             /* — Init — */
             resize();
-            var count = Math.min(90, Math.floor(W * H / 12000));
+            var count = Math.max(30, Math.min(90, Math.floor(W * H / 12000)));
             for (var i = 0; i < count; i++) particles.push(new Particle());
+
+            /* If canvas had zero size at init, re-seed on first real resize */
+            var seeded = (W > 0 && H > 0);
+            function reseedIfNeeded() {
+                if (!seeded && W > 0 && H > 0) {
+                    seeded = true;
+                    particles = [];
+                    var n = Math.max(30, Math.min(90, Math.floor(W * H / 12000)));
+                    for (var i = 0; i < n; i++) particles.push(new Particle());
+                }
+            }
 
             /* smooth mouse */
             document.addEventListener('mousemove', function (e) { targetX = e.clientX; targetY = e.clientY; });
             document.addEventListener('touchmove', function (e) { targetX = e.touches[0].clientX; targetY = e.touches[0].clientY; }, { passive: true });
-            window.addEventListener('resize', resize);
+            window.addEventListener('resize', function () { resize(); reseedIfNeeded(); });
 
             /* — Card tilt — */
             var card = document.getElementById('loading-card');
             document.addEventListener('mousemove', function (e) {
                 if (!card || !running) return;
                 var r = card.getBoundingClientRect();
+                if (r.width === 0 || r.height === 0) return;
                 var cx = e.clientX - r.left - r.width / 2;
                 var cy = e.clientY - r.top - r.height / 2;
                 var tiltX = (cy / r.height) * 4;
@@ -446,6 +460,7 @@
             /* — Render loop — */
             function frame() {
                 if (!running) return;
+                reseedIfNeeded();
                 mouseX += (targetX - mouseX) * 0.07;
                 mouseY += (targetY - mouseY) * 0.07;
                 ctx.clearRect(0, 0, W, H);

@@ -24,15 +24,17 @@ Applications
 
 No install required — runs entirely in your browser. **Your data never leaves your machine**: the browser is used purely as a runtime environment and all processing happens locally via WebAssembly. Nothing is uploaded to any server.
 
-| | Application | Description | |
-|---|---|---|---|
-| <a href="https://mne-cpp.github.io/wasm/mne_browse.html"><img src="/src/applications/mne_browse/Resources/Images/ApplicationIcons/icon_browse_64x64.png" width="32" height="32" alt="MNE Browse"></a> | **MNE Browse** | Browse and inspect raw MEG/EEG data with real-time filtering, event detection, and averaging | [**Open**](https://mne-cpp.github.io/wasm/mne_browse.html) |
-| <a href="https://mne-cpp.github.io/wasm/mne_inspect.html"><img src="/src/applications/mne_inspect/resources/images/appIcons/icon_mne_inspect_64x64.png" width="32" height="32" alt="MNE Inspect"></a> | **MNE Inspect** | Interactive 3D visualization of brain surfaces, source estimates, and forward models | [**Open**](https://mne-cpp.github.io/wasm/mne_inspect.html) |
+| | Application | Description | Release | Nightly |
+|---|---|---|---|---|
+| <a href="https://mne-cpp.github.io/wasm/mne_browse.html"><img src="/src/applications/mne_browse/Resources/Images/ApplicationIcons/icon_browse_64x64.png" width="32" height="32" alt="MNE Browse"></a> | **MNE Browse** | Browse and inspect raw MEG/EEG data with real-time filtering, event detection, and averaging | [**Open**](https://mne-cpp.github.io/wasm/mne_browse.html) | [**Open**](https://mne-cpp.github.io/wasm/dev/mne_browse.html) |
+| <a href="https://mne-cpp.github.io/wasm/mne_inspect.html"><img src="/src/applications/mne_inspect/resources/images/appIcons/icon_mne_inspect_64x64.png" width="32" height="32" alt="MNE Inspect"></a> | **MNE Inspect** | Interactive 3D visualization of brain surfaces, source estimates, and forward models | [**Open**](https://mne-cpp.github.io/wasm/mne_inspect.html) | [**Open**](https://mne-cpp.github.io/wasm/dev/mne_inspect.html) |
 
 ### Desktop applications
 
 | Application | Description |
 |---|---|
+| **MNE Browse** | Browse and inspect raw MEG/EEG data with real-time filtering, event detection, averaging, ICA, and covariance computation. |
+| **MNE Inspect** | Interactive 3D visualization of brain surfaces, source estimates, and forward models. |
 | **MNE Scan** | Real-time acquisition and processing of MEG/EEG data with a plugin pipeline. Supports MEGIN, BabyMEG, BrainAmp, eegosports, gUSBAmp, TMSI, Natus, LSL, and FieldTrip Buffer. |
 | **MNE Analyze** | Sensor- and source-level analysis GUI: raw data browsing, filtering, averaging, co-registration, dipole fitting, and source localization. |
 | **MNE Analyze Studio** | Agent-oriented analysis workbench with an LLM-driven skill host, neuro kernel, and extension SDK for building composable analysis workflows. |
