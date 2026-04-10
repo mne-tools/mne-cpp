@@ -49,6 +49,14 @@
 //=============================================================================================================
 
 #include <QDebug>
+#include <QCoreApplication>
+#include <QDir>
+
+//=============================================================================================================
+// MNE-CPP INCLUDES
+//=============================================================================================================
+
+#include <ml/ml_trainer.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -228,4 +236,86 @@ MatrixXd InvCmne::applyLstmCorrection(
     }
 
     return result;
+}
+
+//=============================================================================================================
+
+UTILSLIB::PythonRunnerResult InvCmne::trainLstm(
+    const QString& fwdPath,
+    const QString& covPath,
+    const QString& epochsPath,
+    const QString& outOnnxPath,
+    const InvCmneSettings& settings,
+    const QString& gtStcPrefix,
+    int hiddenSize,
+    int numLayers,
+    int trainEpochs,
+    double learningRate,
+    int batchSize,
+    const QString& pythonExe)
+{
+    // Resolve training package directory (contains pyproject.toml + script)
+    // Expected layout: <app_dir>/../scripts/ml/training/cmne/
+    QString appDir = QCoreApplication::applicationDirPath();
+    QString cmneDir = QDir(appDir).absoluteFilePath(
+        QStringLiteral("../scripts/ml/training/cmne"));
+
+    // Fallback: source tree relative to working directory
+    if (!QFile::exists(QDir(cmneDir).absoluteFilePath(QStringLiteral("pyproject.toml")))) {
+        cmneDir = QStringLiteral("scripts/ml/training/cmne");
+    }
+
+    QString scriptPath = QDir(cmneDir).absoluteFilePath(QStringLiteral("train_cmne_lstm.py"));
+
+    if (!QFile::exists(scriptPath)) {
+        UTILSLIB::PythonRunnerResult result;
+        result.stdErr = QStringLiteral("Training script not found: ") + scriptPath;
+        qWarning() << "[InvCmne::trainLstm]" << result.stdErr;
+        return result;
+    }
+
+    qDebug() << "[InvCmne::trainLstm] Script:" << scriptPath;
+    qDebug() << "[InvCmne::trainLstm] Package dir:" << cmneDir;
+
+    // Map method integer to string
+    QString methodStr;
+    switch (settings.method) {
+        case 0: methodStr = QStringLiteral("MNE");     break;
+        case 1: methodStr = QStringLiteral("dSPM");    break;
+        case 2: methodStr = QStringLiteral("sLORETA"); break;
+        case 3: methodStr = QStringLiteral("eLORETA"); break;
+        default: methodStr = QStringLiteral("dSPM");   break;
+    }
+
+    double snr = 1.0 / std::sqrt(settings.lambda2);
+
+    // Build argument list matching train_cmne_lstm.py CLI
+    QStringList args;
+    args << QStringLiteral("--fwd")          << fwdPath
+         << QStringLiteral("--cov")          << covPath
+         << QStringLiteral("--epochs")       << epochsPath
+         << QStringLiteral("--out")          << outOnnxPath
+         << QStringLiteral("--look-back")    << QString::number(settings.lookBack)
+         << QStringLiteral("--method")       << methodStr
+         << QStringLiteral("--snr")          << QString::number(snr, 'g', 6)
+         << QStringLiteral("--hidden")       << QString::number(hiddenSize)
+         << QStringLiteral("--layers")       << QString::number(numLayers)
+         << QStringLiteral("--train-epochs") << QString::number(trainEpochs)
+         << QStringLiteral("--lr")           << QString::number(learningRate, 'g', 6)
+         << QStringLiteral("--batch")        << QString::number(batchSize);
+
+    if (!gtStcPrefix.isEmpty()) {
+        args << QStringLiteral("--gt-stc") << gtStcPrefix;
+    }
+
+    // Configure PythonRunner with venv + pyproject.toml
+    // Venv lives inside the cmne package directory as .venv/
+    UTILSLIB::PythonRunnerConfig config;
+    config.pythonExe  = pythonExe;
+    config.venvDir    = QDir(cmneDir).absoluteFilePath(QStringLiteral(".venv"));
+    config.packageDir = cmneDir;
+
+    MLLIB::MlTrainer trainer(config);
+
+    return trainer.run(scriptPath, args);
 }

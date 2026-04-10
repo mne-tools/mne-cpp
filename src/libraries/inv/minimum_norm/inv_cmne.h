@@ -51,6 +51,12 @@
 #include <Eigen/Dense>
 
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace UTILSLIB { struct PythonRunnerResult; }
+
+//=============================================================================================================
 // DEFINE NAMESPACE INVLIB
 //=============================================================================================================
 
@@ -117,6 +123,44 @@ public:
         const Eigen::MatrixXd& matDspmData,
         const QString& onnxModelPath,
         int lookBack);
+
+    //=========================================================================================================
+    /**
+     * Train the CMNE LSTM model by invoking the Python training script.
+     *
+     * This is a convenience wrapper that calls
+     * ``scripts/ml/training/train_cmne_lstm.py`` via UTILSLIB::PythonRunner.
+     * The heavy lifting (PyTorch LSTM training + ONNX export) happens in
+     * Python; C++ only launches the process and streams its output.
+     *
+     * @param[in] fwdPath        Path to forward solution FIFF file.
+     * @param[in] covPath        Path to noise covariance FIFF file.
+     * @param[in] epochsPath     Path to epochs FIFF file.
+     * @param[in] outOnnxPath    Desired output path for the ONNX model.
+     * @param[in] settings       CMNE settings (look-back, method, SNR are forwarded).
+     * @param[in] gtStcPrefix    Ground-truth STC prefix (optional; empty = simulation mode).
+     * @param[in] hiddenSize     LSTM hidden dimension (default 256).
+     * @param[in] numLayers      LSTM layers (default 1).
+     * @param[in] trainEpochs    Number of training epochs (default 50).
+     * @param[in] learningRate   Learning rate (default 1e-3).
+     * @param[in] batchSize      Batch size (default 64).
+     * @param[in] pythonExe      Python interpreter (default "python3").
+     *
+     * @return PythonRunnerResult with exit code, captured output and progress.
+     */
+    static UTILSLIB::PythonRunnerResult trainLstm(
+        const QString& fwdPath,
+        const QString& covPath,
+        const QString& epochsPath,
+        const QString& outOnnxPath,
+        const InvCmneSettings& settings,
+        const QString& gtStcPrefix = {},
+        int hiddenSize = 256,
+        int numLayers = 1,
+        int trainEpochs = 50,
+        double learningRate = 1e-3,
+        int batchSize = 64,
+        const QString& pythonExe = QStringLiteral("python3"));
 
 private:
     //=========================================================================================================

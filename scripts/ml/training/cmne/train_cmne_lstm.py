@@ -223,8 +223,9 @@ def train(
             total_loss += loss.item() * X_batch.size(0)
 
         avg = total_loss / len(loader.dataset)
+        pct = 100.0 * epoch / epochs
         if epoch == 1 or epoch % max(1, epochs // 10) == 0:
-            print(f"  epoch {epoch:4d}/{epochs}  loss = {avg:.6f}")
+            print(f"[progress] {pct:.1f}% Training epoch {epoch}/{epochs}  loss = {avg:.6f}")
 
 
 # ── ONNX export ─────────────────────────────────────────────────────────────

@@ -100,3 +100,8 @@ codecov
 *.gcov
 *.info
 coverage_*.info
+
+# Python virtual environments
+.venv/
+__pycache__/
+*.egg-info/

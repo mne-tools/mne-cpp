@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "mne-cpp-cmne-training"
+version = "2.2.0"
+description = "CMNE LSTM training pipeline for MNE-CPP"
+readme = "README.md"
+license = "BSD-3-Clause"
+requires-python = ">=3.10"
+authors = [
+    { name = "Christoph Dinh", email = "christoph.dinh@mne-cpp.org" },
+]
+
+dependencies = [
+    "torch>=2.0",
+    "numpy>=1.24",
+    "mne>=1.6",
+    "onnx>=1.14",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7",
+    "ruff>=0.4",
+]
+
+[project.scripts]
+train-cmne-lstm = "train_cmne_lstm:main"
