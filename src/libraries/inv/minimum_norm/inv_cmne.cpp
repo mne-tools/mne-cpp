@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    InvCmne class definition (Contextual MNE, Dinh et al. 2021).
+ * @brief    InvCMNE class definition (Contextual MNE, Dinh et al. 2021).
  *
  */
 
@@ -69,66 +69,66 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InvCmneResult InvCmne::compute(
+InvCMNEResult InvCMNE::compute(
     const MatrixXd& matEvoked,
     const MatrixXd& matGain,
     const MatrixXd& matNoiseCov,
     const MatrixXd& matSrcCov,
-    const InvCmneSettings& settings)
+    const InvCMNESettings& settings)
 {
-    InvCmneResult result;
+    InvCMNEResult result;
 
     int nChannels = matGain.rows();
     int nSources  = matGain.cols();
     int nTimes    = matEvoked.cols();
 
     // Step 1: Compute dSPM kernel
-    qInfo() << "[InvCmne] Step 1/4: Computing dSPM kernel"
+    qInfo() << "[InvCMNE] Step 1/4: Computing dSPM kernel"
             << "(" << nChannels << "ch x" << nSources << "src, lambda2="
             << settings.lambda2 << ") …";
     MatrixXd matKernelDspm = computeDspmKernel(matGain, matNoiseCov, matSrcCov, settings.lambda2);
     result.matKernelDspm = matKernelDspm;
-    qInfo() << "[InvCmne] Step 1/4: dSPM kernel done"
+    qInfo() << "[InvCMNE] Step 1/4: dSPM kernel done"
             << "(" << matKernelDspm.rows() << "x" << matKernelDspm.cols() << ").";
 
     // Step 2: Apply kernel to evoked data -> dSPM source estimate
-    qInfo() << "[InvCmne] Step 2/4: Projecting evoked data to source space"
+    qInfo() << "[InvCMNE] Step 2/4: Projecting evoked data to source space"
             << "(" << nTimes << "time points) …";
     MatrixXd matDspmData = matKernelDspm * matEvoked;  // n_sources x n_times
 
     // Build dSPM source estimate
     VectorXi vertices = VectorXi::LinSpaced(matDspmData.rows(), 0, matDspmData.rows() - 1);
     result.stcDspm = InvSourceEstimate(matDspmData, vertices, 0.0f, 1.0f);
-    qInfo() << "[InvCmne] Step 2/4: dSPM source estimate done"
+    qInfo() << "[InvCMNE] Step 2/4: dSPM source estimate done"
             << "(" << matDspmData.rows() << "sources x" << matDspmData.cols() << "samples).";
 
     // Step 3: Z-score rectify
-    qInfo() << "[InvCmne] Step 3/4: Z-score rectifying source data …";
+    qInfo() << "[InvCMNE] Step 3/4: Z-score rectifying source data …";
     MatrixXd matZScored = zScoreRectify(matDspmData);
-    qInfo() << "[InvCmne] Step 3/4: Z-score rectification done.";
+    qInfo() << "[InvCMNE] Step 3/4: Z-score rectification done.";
 
     // Step 4: Apply LSTM correction if model available and enough time points
     MatrixXd matCmneData;
 
     if (!settings.onnxModelPath.isEmpty() && nTimes >= settings.lookBack) {
-        qInfo() << "[InvCmne] Step 4/4: Applying LSTM temporal correction"
+        qInfo() << "[InvCMNE] Step 4/4: Applying LSTM temporal correction"
                << "(look-back=" << settings.lookBack << ","
                << (nTimes - settings.lookBack) << "correctable time points) …";
         matCmneData = applyLstmCorrection(matZScored, settings.onnxModelPath, settings.lookBack);
 
         // Store raw LSTM prediction for diagnostics
         result.stcLstmPredict = InvSourceEstimate(matCmneData, vertices, 0.0f, 1.0f);
-        qInfo() << "[InvCmne] Step 4/4: LSTM correction done.";
+        qInfo() << "[InvCMNE] Step 4/4: LSTM correction done.";
     } else {
         // No correction possible — CMNE falls back to dSPM
         matCmneData = matDspmData;
 
         if (settings.onnxModelPath.isEmpty()) {
-            qInfo() << "[InvCmne] Step 4/4: No ONNX model — using moving-average correction.";
+            qInfo() << "[InvCMNE] Step 4/4: No ONNX model — using moving-average correction.";
             matCmneData = applyLstmCorrection(matZScored, QString(), settings.lookBack);
-            qInfo() << "[InvCmne] Step 4/4: Moving-average correction done.";
+            qInfo() << "[InvCMNE] Step 4/4: Moving-average correction done.";
         } else {
-            qInfo() << "[InvCmne] Step 4/4: Not enough time points for lookBack window"
+            qInfo() << "[InvCMNE] Step 4/4: Not enough time points for lookBack window"
                     << "(need" << settings.lookBack << ", have" << nTimes << ").";
         }
     }
@@ -141,7 +141,7 @@ InvCmneResult InvCmne::compute(
 
 //=============================================================================================================
 
-MatrixXd InvCmne::computeDspmKernel(
+MatrixXd InvCMNE::computeDspmKernel(
     const MatrixXd& matGain,
     const MatrixXd& matNoiseCov,
     const MatrixXd& matSrcCov,
@@ -200,7 +200,7 @@ MatrixXd InvCmne::computeDspmKernel(
 
 //=============================================================================================================
 
-MatrixXd InvCmne::zScoreRectify(const MatrixXd& matStcData)
+MatrixXd InvCMNE::zScoreRectify(const MatrixXd& matStcData)
 {
     int nSources = matStcData.rows();
     int nTimes = matStcData.cols();
@@ -226,7 +226,7 @@ MatrixXd InvCmne::zScoreRectify(const MatrixXd& matStcData)
 
 //=============================================================================================================
 
-MatrixXd InvCmne::applyLstmCorrection(
+MatrixXd InvCMNE::applyLstmCorrection(
     const MatrixXd& matDspmData,
     const QString& onnxModelPath,
     int lookBack)
@@ -271,12 +271,12 @@ MatrixXd InvCmne::applyLstmCorrection(
 
 //=============================================================================================================
 
-UTILSLIB::PythonRunnerResult InvCmne::trainLstm(
+UTILSLIB::PythonRunnerResult InvCMNE::trainLstm(
     const QString& fwdPath,
     const QString& covPath,
     const QString& epochsPath,
     const QString& outOnnxPath,
-    const InvCmneSettings& settings,
+    const InvCMNESettings& settings,
     const QString& gtStcPrefix,
     int hiddenSize,
     int numLayers,
@@ -302,12 +302,12 @@ UTILSLIB::PythonRunnerResult InvCmne::trainLstm(
     if (!QFile::exists(scriptPath)) {
         UTILSLIB::PythonRunnerResult result;
         result.stdErr = QStringLiteral("Training script not found: ") + scriptPath;
-        qWarning() << "[InvCmne::trainLstm]" << result.stdErr;
+        qWarning() << "[InvCMNE::trainLstm]" << result.stdErr;
         return result;
     }
 
-    qDebug() << "[InvCmne::trainLstm] Script:" << scriptPath;
-    qDebug() << "[InvCmne::trainLstm] Package dir:" << cmneDir;
+    qDebug() << "[InvCMNE::trainLstm] Script:" << scriptPath;
+    qDebug() << "[InvCMNE::trainLstm] Package dir:" << cmneDir;
 
     // Map method integer to string
     QString methodStr;
@@ -351,7 +351,7 @@ UTILSLIB::PythonRunnerResult InvCmne::trainLstm(
     config.venvDir    = QDir(cmneDir).absoluteFilePath(QStringLiteral(".venv"));
     config.packageDir = cmneDir;
 
-    MLLIB::MlTrainer trainer(config);
+    MLLIB::MLTrainer trainer(config);
 
     return trainer.run(scriptPath, args);
 }

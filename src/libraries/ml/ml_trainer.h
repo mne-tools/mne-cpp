@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MlTrainer class declaration — ML-specific convenience wrapper over PythonRunner.
+ * @brief    MLTrainer class declaration — ML-specific convenience wrapper over PythonRunner.
  *
  */
 
@@ -71,22 +71,22 @@ namespace MLLIB
  *
  * @brief ML training script launcher.
  */
-class MLSHARED_EXPORT MlTrainer
+class MLSHARED_EXPORT MLTrainer
 {
 public:
     //=========================================================================================================
     /**
-     * Construct an MlTrainer with default PythonRunner configuration.
+     * Construct an MLTrainer with default PythonRunner configuration.
      */
-    MlTrainer();
+    MLTrainer();
 
     //=========================================================================================================
     /**
-     * Construct an MlTrainer with explicit PythonRunner configuration.
+     * Construct an MLTrainer with explicit PythonRunner configuration.
      *
      * @param[in] config     PythonRunner configuration to use.
      */
-    explicit MlTrainer(const UTILSLIB::PythonRunnerConfig& config);
+    explicit MLTrainer(const UTILSLIB::PythonRunnerConfig& config);
 
     //=========================================================================================================
     /**

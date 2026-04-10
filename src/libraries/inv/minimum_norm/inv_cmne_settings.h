@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    InvCmneSettings struct declaration.
+ * @brief    InvCMNESettings struct declaration.
  *
  */
 
@@ -60,7 +60,7 @@ namespace INVLIB
  *
  * @brief CMNE settings
  */
-struct INVSHARED_EXPORT InvCmneSettings
+struct INVSHARED_EXPORT InvCMNESettings
 {
     QString onnxModelPath;          /**< Path to trained LSTM model (.onnx). */
     int lookBack = 80;              /**< k: number of past time steps. */

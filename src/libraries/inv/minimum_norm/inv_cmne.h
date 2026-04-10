@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    InvCmne class declaration (Contextual MNE, Dinh et al. 2021).
+ * @brief    InvCMNE class declaration (Contextual MNE, Dinh et al. 2021).
  *
  */
 
@@ -69,7 +69,7 @@ namespace INVLIB
  *
  * @brief CMNE result
  */
-struct INVSHARED_EXPORT InvCmneResult
+struct INVSHARED_EXPORT InvCMNEResult
 {
     InvSourceEstimate stcDspm;       /**< Uncorrected dSPM estimate. */
     InvSourceEstimate stcCmne;       /**< CMNE-corrected estimate. */
@@ -87,7 +87,7 @@ struct INVSHARED_EXPORT InvCmneResult
  *
  * @brief CMNE inverse solver
  */
-class INVSHARED_EXPORT InvCmne
+class INVSHARED_EXPORT InvCMNE
 {
 public:
     //=========================================================================================================
@@ -100,14 +100,14 @@ public:
      * @param[in] matSrcCov      Source covariance (n_sources x n_sources, diagonal).
      * @param[in] settings       CMNE settings.
      *
-     * @return InvCmneResult containing dSPM and CMNE source estimates.
+     * @return InvCMNEResult containing dSPM and CMNE source estimates.
      */
-    static InvCmneResult compute(
+    static InvCMNEResult compute(
         const Eigen::MatrixXd& matEvoked,
         const Eigen::MatrixXd& matGain,
         const Eigen::MatrixXd& matNoiseCov,
         const Eigen::MatrixXd& matSrcCov,
-        const InvCmneSettings& settings);
+        const InvCMNESettings& settings);
 
     //=========================================================================================================
     /**
@@ -154,7 +154,7 @@ public:
         const QString& covPath,
         const QString& epochsPath,
         const QString& outOnnxPath,
-        const InvCmneSettings& settings,
+        const InvCMNESettings& settings,
         const QString& gtStcPrefix = {},
         int hiddenSize = 256,
         int numLayers = 1,

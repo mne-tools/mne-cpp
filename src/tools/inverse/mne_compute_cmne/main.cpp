@@ -218,7 +218,7 @@ static int doCompute(const QCommandLineParser& parser)
     const int lookBack = parser.value(QStringLiteral("look-back")).toInt();
     const QString onnxPath = parser.value(QStringLiteral("onnx"));
 
-    InvCmneSettings settings;
+    InvCMNESettings settings;
     settings.lambda2     = 1.0 / (snr * snr);
     settings.method      = methodStringToInt(methodStr);
     settings.lookBack    = lookBack;
@@ -256,7 +256,7 @@ static int doCompute(const QCommandLineParser& parser)
     out << "Computing CMNE inverse solution …\n";
     out.flush();
 
-    InvCmneResult result = InvCmne::compute(
+    InvCMNEResult result = InvCMNE::compute(
         matEvoked, matGain, matNoiseCovPicked, matSrcCov, settings);
 
     // Propagate timing from evoked data
@@ -387,7 +387,7 @@ static int doTrain(const QCommandLineParser& parser, bool finetune)
     config.venvDir    = QDir(cmneDir).absoluteFilePath(QStringLiteral(".venv"));
     config.packageDir = cmneDir;
 
-    MlTrainer trainer(config);
+    MLTrainer trainer(config);
 
     // ── Set up live progress reporting ─────────────────────────────────
     trainer.runner().setLineCallback([&out, &err](int channel, const QString& line) {

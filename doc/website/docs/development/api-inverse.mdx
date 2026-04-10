@@ -45,10 +45,10 @@ Supports all four noise-normalization strategies:
 
 | Class | Description | MNE-Python | MNE-C |
 |---|---|---|---|
-| `InvCmne` | CMNE inverse: dSPM base estimate refined by LSTM network (ONNX Runtime) | — | — |
-| `InvCmneSettings` | Configuration for CMNE: ONNX model path, sequence length, LSTM parameters | — | — |
+| `InvCMNE` | CMNE inverse: dSPM base estimate refined by LSTM network (ONNX Runtime) | — | — |
+| `InvCMNESettings` | Configuration for CMNE: ONNX model path, sequence length, LSTM parameters | — | — |
 
-Combines classical dSPM with a trained LSTM neural network to incorporate temporal context. At inference time, `InvCmne::compute()` runs dSPM to obtain a base source estimate, then applies the ONNX-exported LSTM model sample-by-sample to produce a spatiotemporally refined CMNE result. Falls back to moving-average smoothing if no ONNX model is available.
+Combines classical dSPM with a trained LSTM neural network to incorporate temporal context. At inference time, `InvCMNE::compute()` runs dSPM to obtain a base source estimate, then applies the ONNX-exported LSTM model sample-by-sample to produce a spatiotemporally refined CMNE result. Falls back to moving-average smoothing if no ONNX model is available.
 
 Reference: Dinh et al. (2021). *Contextual Minimum-Norm Estimates (CMNE): A Deep Learning Method for Source Estimation in Neuronal Networks.* Frontiers in Neuroscience, 15, 552666. [DOI: 10.3389/fnins.2021.552666](https://doi.org/10.3389/fnins.2021.552666)
 

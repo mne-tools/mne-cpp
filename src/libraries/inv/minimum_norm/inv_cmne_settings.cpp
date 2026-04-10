@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    InvCmneSettings struct definition.
+ * @brief    InvCMNESettings struct definition.
  *
  */
 

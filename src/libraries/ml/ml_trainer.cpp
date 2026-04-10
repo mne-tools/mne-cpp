@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MlTrainer class definition.
+ * @brief    MLTrainer class definition.
  *
  */
 
@@ -55,38 +55,38 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MlTrainer::MlTrainer()
+MLTrainer::MLTrainer()
     : m_runner()
 {
 }
 
 //=============================================================================================================
 
-MlTrainer::MlTrainer(const PythonRunnerConfig& config)
+MLTrainer::MLTrainer(const PythonRunnerConfig& config)
     : m_runner(config)
 {
 }
 
 //=============================================================================================================
 
-PythonRunner& MlTrainer::runner()
+PythonRunner& MLTrainer::runner()
 {
     return m_runner;
 }
 
 //=============================================================================================================
 
-PythonRunnerResult MlTrainer::run(const QString& scriptPath,
+PythonRunnerResult MLTrainer::run(const QString& scriptPath,
                                    const QStringList& args)
 {
     if (!m_runner.isPythonAvailable()) {
         PythonRunnerResult result;
         result.stdErr = QStringLiteral("Python interpreter not found: ") + m_runner.config().pythonExe;
-        qWarning() << "[MlTrainer]" << result.stdErr;
+        qWarning() << "[MLTrainer]" << result.stdErr;
         return result;
     }
 
-    qDebug() << "[MlTrainer] Running training script:" << scriptPath;
+    qDebug() << "[MLTrainer] Running training script:" << scriptPath;
 
     // If a venv is configured, use runInVenv (creates venv + installs deps automatically)
     if (!m_runner.config().venvDir.isEmpty()) {
@@ -98,7 +98,7 @@ PythonRunnerResult MlTrainer::run(const QString& scriptPath,
 
 //=============================================================================================================
 
-QStringList MlTrainer::checkPrerequisites(const QStringList& packages) const
+QStringList MLTrainer::checkPrerequisites(const QStringList& packages) const
 {
     QStringList missing;
     for (const QString& pkg : packages) {
@@ -107,7 +107,7 @@ QStringList MlTrainer::checkPrerequisites(const QStringList& packages) const
         }
     }
     if (!missing.isEmpty()) {
-        qWarning() << "[MlTrainer] Missing Python packages:" << missing.join(QStringLiteral(", "));
+        qWarning() << "[MLTrainer] Missing Python packages:" << missing.join(QStringLiteral(", "));
     }
     return missing;
 }
