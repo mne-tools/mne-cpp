@@ -89,4 +89,4 @@ jobs:
 
     - name: Deploy binaries
       run: |
-        ./scripts/deploy.bat dynamic pack
+        ./scripts/deploy/deploy.bat dynamic pack

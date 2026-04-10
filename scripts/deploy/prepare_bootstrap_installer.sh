@@ -24,7 +24,7 @@ GITHUB_REPOSITORY_NAME="${GITHUB_REPOSITORY:-mne-tools/mne-cpp}"
 print_help()
 {
     cat <<'EOF'
-Usage: ./scripts/prepare_bootstrap_installer.sh [options]
+Usage: ./scripts/deploy/prepare_bootstrap_installer.sh [options]
 
 Options:
   --release-tag <tag>       GitHub release tag to embed into the installer

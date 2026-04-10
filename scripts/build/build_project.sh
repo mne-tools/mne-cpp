@@ -109,7 +109,7 @@ doPrintConfiguration() {
 
 doPrintHelp() {
   echo " "
-  echo "Usage: ./scripts/build_project.sh [Options]"
+  echo "Usage: ./scripts/build/build_project.sh [Options]"
   echo " "
   echo "All builds will be parallel."
   echo "All options can be used in undefined order, except for the extra args,"

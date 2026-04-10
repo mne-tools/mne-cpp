@@ -64,7 +64,7 @@ jobs:
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
     - name: Configure and compile MNE-CPP
       run: |
-        ./scripts/build_project.sh
+        ./scripts/build/build_project.sh
     - name: Deploy binaries
       run: |
         echo "Qt environment:"
@@ -76,7 +76,7 @@ jobs:
           QT_PREFIX="$(cd "${Qt6_DIR}/../../.." 2>/dev/null && pwd)"
         fi
         ls "$QT_PREFIX/lib"/libQt6*.so* 2>/dev/null | head -5 || echo "  No Qt .so files found at $QT_PREFIX/lib"
-        ./scripts/deploy.bat dynamic pack
+        ./scripts/deploy/deploy.bat dynamic pack
     - name: Upload release binaries
       if: steps.release-info.outputs.should_upload == 'true'
       env:
@@ -164,10 +164,10 @@ jobs:
     - name: Configure and compile MNE-CPP (static)
       run: |
         export CMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/Qt6_static
-        ./scripts/build_project.sh static
+        ./scripts/build/build_project.sh static
     - name: Deploy binaries
       run: |
-        ./scripts/deploy.bat static pack
+        ./scripts/deploy/deploy.bat static pack
     - name: Upload release binaries
       if: steps.release-info.outputs.should_upload == 'true'
       env:

@@ -58,7 +58,7 @@ jobs:
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
     - name: Configure and compile MNE-CPP
       run: |
-        ./scripts/build_project.sh
+        ./scripts/build/build_project.sh
     - name: Free up disk space before packaging
       run: |
         echo "Disk usage before cleanup:" && df -h
@@ -74,7 +74,7 @@ jobs:
         echo "  QT_ROOT_DIR=${QT_ROOT_DIR:-<not set>}"
         echo "  Qt6_DIR=${Qt6_DIR:-<not set>}"
         which macdeployqt || echo "WARNING: macdeployqt not on PATH"
-        ./scripts/deploy.bat dynamic pack
+        ./scripts/deploy/deploy.bat dynamic pack
         # Verify archive contains Qt frameworks
         echo ""
         echo "=== Archive verification ==="
@@ -175,10 +175,10 @@ jobs:
     - name: Configure and compile MNE-CPP (static)
       run: |
         export CMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/Qt6_static
-        ./scripts/build_project.sh static
+        ./scripts/build/build_project.sh static
     - name: Deploy binaries (MacOS)
       run: |
-        ./scripts/deploy.bat static pack
+        ./scripts/deploy/deploy.bat static pack
     - name: Upload release binaries
       if: steps.release-info.outputs.should_upload == 'true'
       env:

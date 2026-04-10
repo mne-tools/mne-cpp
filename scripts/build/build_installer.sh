@@ -6,9 +6,9 @@
 # Qt IFW repository instead of embedding the full MNE-CPP payload.
 #
 # Usage:
-#   ./scripts/build_installer.sh
-#   ./scripts/build_installer.sh --tag v2.0.0
-#   ./scripts/build_installer.sh --tag latest --asset-prefix mne-cpp-latest
+#   ./scripts/build/build_installer.sh
+#   ./scripts/build/build_installer.sh --tag v2.0.0
+#   ./scripts/build/build_installer.sh --tag latest --asset-prefix mne-cpp-latest
 
 set -euo pipefail
 

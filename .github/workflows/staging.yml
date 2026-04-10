@@ -282,7 +282,7 @@ jobs:
     - name: Build WASM
       run: |
         source ../emsdk/emsdk_env.sh
-        ./scripts/wasm.sh --emsdk 4.0.7
+        ./scripts/wasm/wasm.sh --emsdk 4.0.7
 
     - name: Prepare WASM artifacts
       run: |

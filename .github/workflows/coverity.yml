@@ -41,6 +41,6 @@ jobs:
             --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
       - name: Coverity scripts
         run: |
-          ./scripts/coverity_scan.sh "$COVTOKEN"
+          ./scripts/test/coverity_scan.sh "$COVTOKEN"
         env:
           COVTOKEN: ${{ secrets.COVERITY_TOKEN }}

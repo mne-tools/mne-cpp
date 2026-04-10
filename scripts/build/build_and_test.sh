@@ -3,11 +3,11 @@
 #  MNE-CPP  —  Configure ▸ Clean Build ▸ Test ▸ (optional) Coverage
 #
 #  Usage:
-#    ./scripts/build_and_test.sh                # Release build, run tests
-#    ./scripts/build_and_test.sh coverage       # Same but with gcov coverage
-#    ./scripts/build_and_test.sh Debug          # Debug build, run tests
-#    ./scripts/build_and_test.sh Debug coverage # Debug + coverage
-#    ./scripts/build_and_test.sh help           # Show help
+#    ./scripts/build/build_and_test.sh                # Release build, run tests
+#    ./scripts/build/build_and_test.sh coverage       # Same but with gcov coverage
+#    ./scripts/build/build_and_test.sh Debug          # Debug build, run tests
+#    ./scripts/build/build_and_test.sh Debug coverage # Debug + coverage
+#    ./scripts/build/build_and_test.sh help           # Show help
 #
 #  The script:
 #    1. Ensures mne-cpp-test-data is cloned
@@ -15,7 +15,7 @@
 #    3. Deletes previous build/out dirs (clean build)
 #    4. Configures CMake with BUILD_TESTS=ON (and WITH_CODE_COV if requested)
 #    5. Builds with all available cores
-#    6. Runs all tests via scripts/test_all.bat
+#    6. Runs all tests via scripts/test/test_all.bat
 #    7. If coverage: generates lcov/fastcov report
 # ==========================================================================
 set -euo pipefail
@@ -59,7 +59,7 @@ show_help() {
 
   MNE-CPP Build & Test convenience script
 
-  Usage: ./scripts/build_and_test.sh [options]
+  Usage: ./scripts/build/build_and_test.sh [options]
 
   Options:
     help        Show this help and exit
@@ -69,9 +69,9 @@ show_help() {
     --          Everything after this is forwarded to cmake
 
   Examples:
-    ./scripts/build_and_test.sh                  # Quick Release build + tests
-    ./scripts/build_and_test.sh coverage         # Release + coverage analysis
-    ./scripts/build_and_test.sh Debug coverage   # Debug + coverage analysis
+    ./scripts/build/build_and_test.sh                  # Quick Release build + tests
+    ./scripts/build/build_and_test.sh coverage         # Release + coverage analysis
+    ./scripts/build/build_and_test.sh Debug coverage   # Debug + coverage analysis
 
 EOF
 }

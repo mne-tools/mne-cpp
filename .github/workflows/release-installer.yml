@@ -61,7 +61,7 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        ./scripts/prepare_bootstrap_installer.sh \
+        ./scripts/deploy/prepare_bootstrap_installer.sh \
           --release-tag "${{ steps.tag.outputs.tag }}" \
           --asset-prefix "${{ steps.tag.outputs.asset_prefix }}" \
           --platform linux \
@@ -118,7 +118,7 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        ./scripts/prepare_bootstrap_installer.sh \
+        ./scripts/deploy/prepare_bootstrap_installer.sh \
           --release-tag "${{ steps.tag.outputs.tag }}" \
           --asset-prefix "${{ steps.tag.outputs.asset_prefix }}" \
           --platform macos \
@@ -267,7 +267,7 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        ./scripts/prepare_bootstrap_installer.sh \
+        ./scripts/deploy/prepare_bootstrap_installer.sh \
           --release-tag "${{ steps.tag.outputs.tag }}" \
           --asset-prefix "${{ steps.tag.outputs.asset_prefix }}" \
           --platform windows \
