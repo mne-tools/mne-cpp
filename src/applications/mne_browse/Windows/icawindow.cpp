@@ -49,7 +49,6 @@
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QMessageBox>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QSpinBox>
@@ -192,8 +191,7 @@ void IcaWindow::clearIca()
 void IcaWindow::onCompute()
 {
     if (m_rawData.rows() == 0 || m_rawData.cols() == 0) {
-        QMessageBox::warning(this, tr("ICA"),
-                             tr("No raw data available."));
+        m_pStatusLabel->setText(tr("No raw data available."));
         return;
     }
 
@@ -236,8 +234,7 @@ void IcaWindow::onApply()
     }
 
     if (excluded.isEmpty()) {
-        QMessageBox::information(this, tr("ICA"),
-                                 tr("No components selected for exclusion."));
+        m_pStatusLabel->setText(tr("No components selected for exclusion."));
         return;
     }
 

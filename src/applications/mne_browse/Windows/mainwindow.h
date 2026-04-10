@@ -268,6 +268,17 @@ public:
 
     //=========================================================================================================
     /**
+     * Open the currently loaded raw FIFF data as a FiffRawData object.
+     * Transparently handles WASM (in-memory buffer) and desktop (filesystem) paths.
+     *
+     * @param [out] raw         The FiffRawData object to populate.
+     * @param [in]  featureName User-facing feature name shown on failure (status bar).
+     * @return true when the raw data was opened successfully.
+     */
+    bool openFiffRawData(FIFFLIB::FiffRawData& raw, const QString& featureName = QString());
+
+    //=========================================================================================================
+    /**
      * applyCommandLineOptions applies options parsed from the command line after the window is shown.
      *
      * @param [in] rawFile     Path to raw FIFF file to open, or empty.

@@ -1204,6 +1204,36 @@ bool MainWindow::ensureLegacyRawModelLoaded(const QString& featureName)
 
 //*************************************************************************************************************
 
+bool MainWindow::openFiffRawData(FIFFLIB::FiffRawData& raw, const QString& featureName)
+{
+    const QString label = featureName.isEmpty() ? QStringLiteral("mne_browse") : featureName;
+
+#ifdef WASMBUILD
+    if (s_wasmByteArray.isEmpty()) {
+        statusBar()->showMessage(tr("Load a raw FIF file before using %1.").arg(label), 5000);
+        return false;
+    }
+    QBuffer rawBuffer(&s_wasmByteArray);
+    raw = FIFFLIB::FiffRawData(rawBuffer);
+#else
+    if (m_qFileRaw.fileName().isEmpty() || !QFile::exists(m_qFileRaw.fileName())) {
+        statusBar()->showMessage(tr("Load a raw FIF file before using %1.").arg(label), 5000);
+        return false;
+    }
+    QFile rawFile(m_qFileRaw.fileName());
+    raw = FIFFLIB::FiffRawData(rawFile);
+#endif
+
+    if (raw.isEmpty()) {
+        statusBar()->showMessage(tr("Could not open raw data for %1.").arg(label), 5000);
+        return false;
+    }
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 WhiteningSettings MainWindow::covarianceWhiteningSettings() const
 {
     return m_pAverageWindow ? m_pAverageWindow->whiteningSettings()
@@ -1283,6 +1313,7 @@ void MainWindow::setupWindowWidgets()
 
     //Create about window - QTDesigner used - see / FormFiles
     m_pAboutWindow = new AboutWindow(this);
+    addDockWidget(Qt::BottomDockWidgetArea, m_pAboutWindow);
     m_pAboutWindow->hide();
 
     //Create channel info window - QTDesigner used - see / FormFiles
@@ -3367,22 +3398,9 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
         ? QStringLiteral("Compute Evoked")
         : QStringLiteral("Recompute Evoked");
 
-    if(m_qFileRaw.fileName().isEmpty() || !QFile::exists(m_qFileRaw.fileName())) {
-        QMessageBox::warning(this,
-                             title,
-                             "Load a raw FIF file before computing evoked responses.");
+    FIFFLIB::FiffRawData raw;
+    if (!openFiffRawData(raw, title))
         return false;
-    }
-
-    QFile rawFile(m_qFileRaw.fileName());
-    FIFFLIB::FiffRawData raw(rawFile);
-
-    if(raw.isEmpty()) {
-        QMessageBox::warning(this,
-                             title,
-                             QString("Could not open raw data from %1.").arg(m_qFileRaw.fileName()));
-        return false;
-    }
 
     MatrixXi events = m_pEventWindow->getEventModel()->getEventMatrix();
     QString eventSourceDescription;
@@ -3812,22 +3830,9 @@ void MainWindow::computeSourceEstimate()
 
 void MainWindow::computeCovariance()
 {
-    if(m_qFileRaw.fileName().isEmpty() || !QFile::exists(m_qFileRaw.fileName())) {
-        QMessageBox::warning(this,
-                             "Compute Covariance",
-                             "Load a raw FIF file before computing a covariance matrix.");
+    FIFFLIB::FiffRawData raw;
+    if (!openFiffRawData(raw, tr("Compute Covariance")))
         return;
-    }
-
-    QFile rawFile(m_qFileRaw.fileName());
-    FIFFLIB::FiffRawData raw(rawFile);
-
-    if(raw.isEmpty()) {
-        QMessageBox::warning(this,
-                             "Compute Covariance",
-                             QString("Could not open raw data from %1.").arg(m_qFileRaw.fileName()));
-        return;
-    }
 
     MatrixXi events = m_pEventWindow->getEventModel()->getEventMatrix();
     QString eventSourceDescription;
@@ -3961,22 +3966,9 @@ void MainWindow::computeCovariance()
 
 void MainWindow::computeIca()
 {
-    if(m_qFileRaw.fileName().isEmpty() || !QFile::exists(m_qFileRaw.fileName())) {
-        QMessageBox::warning(this,
-                             tr("Compute ICA"),
-                             tr("Load a raw FIF file before computing ICA."));
+    FIFFLIB::FiffRawData raw;
+    if (!openFiffRawData(raw, tr("Compute ICA")))
         return;
-    }
-
-    QFile rawFile(m_qFileRaw.fileName());
-    FIFFLIB::FiffRawData raw(rawFile);
-
-    if(raw.isEmpty()) {
-        QMessageBox::warning(this,
-                             tr("Compute ICA"),
-                             tr("Could not open raw data from %1.").arg(m_qFileRaw.fileName()));
-        return;
-    }
 
     // Read all data
     Eigen::MatrixXd data, times;
@@ -3986,9 +3978,7 @@ void MainWindow::computeIca()
     raw.read_raw_segment(data, times, mult, raw.first_samp, raw.last_samp, sel);
 
     if(data.rows() == 0 || data.cols() == 0) {
-        QMessageBox::warning(this,
-                             tr("Compute ICA"),
-                             tr("No data could be read from the raw file."));
+        statusBar()->showMessage(tr("No data could be read from the raw file for ICA."), 5000);
         return;
     }
 

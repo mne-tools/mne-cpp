@@ -55,10 +55,12 @@ using namespace MNEBROWSE;
 //=============================================================================================================
 
 AboutWindow::AboutWindow(QWidget *parent) :
-    QWidget(parent, Qt::Window),
+    QDockWidget(tr("About"), parent),
     ui(new Ui::AboutWindow)
 {
-    ui->setupUi(this);
+    QWidget *content = new QWidget(this);
+    ui->setupUi(content);
+    setWidget(content);
 
     ui->m_label_splashcreen->setPixmap(QPixmap(":/Resources/Images/splashscreen_mne_browse.png"));
 }

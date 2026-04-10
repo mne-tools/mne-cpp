@@ -49,7 +49,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
+#include <QDockWidget>
 
 #include <memory>
 
@@ -67,7 +67,7 @@ namespace MNEBROWSE
  *
  * @brief The AboutWindow class provides the about window.
  */
-class AboutWindow : public QWidget
+class AboutWindow : public QDockWidget
 {
     Q_OBJECT
 
