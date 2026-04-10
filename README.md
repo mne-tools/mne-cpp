@@ -105,28 +105,6 @@ Contact
 
 A list of contact persons can be found [here](https://mne-cpp.github.io/docs/overview#contact).
 
-Citation
---------
-
-If you use MNE-CPP in your work, please cite the software and the paper:
-
-> Esch, L., Sun, L., Klüber, V., Lew, S., Baumgarten, D., Grant, P. E., Okada, Y., Haueisen, J., Hämäläinen, M. S., & Dinh, C. (2018). **MNE Scan: Software for real-time processing of electrophysiological data.** *Journal of Neuroscience Methods*, 303, 55–67. https://doi.org/10.1016/j.jneumeth.2018.03.020
-
-```bibtex
-@article{esch2018mnescan,
-  title     = {{MNE Scan}: Software for real-time processing of electrophysiological data},
-  author    = {Esch, Lorenz and Sun, Limin and Kl{\"u}ber, Viktor and Lew, Seok and Baumgarten, Daniel and Grant, P Ellen and Okada, Yoshio and Haueisen, Jens and H{\"a}m{\"a}l{\"a}inen, Matti S and Dinh, Christoph},
-  journal   = {Journal of Neuroscience Methods},
-  volume    = {303},
-  pages     = {55--67},
-  year      = {2018},
-  publisher = {Elsevier},
-  doi       = {10.1016/j.jneumeth.2018.03.020}
-}
-```
-
-To cite a specific version of the software, use the [Zenodo record](https://doi.org/10.5281/zenodo.593102) (concept DOI: `10.5281/zenodo.593102`).
-
 License
 -------
 

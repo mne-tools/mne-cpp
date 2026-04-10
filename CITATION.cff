@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 title: "MNE-CPP"
-message: "If you use this software, please cite it as shown below."
+message: "If you use this software, please cite both the software itself, and the paper listed in the preferred-citation field."
 version: 2.1.0
 date-released: "2026-04-10"
 doi: 10.5281/zenodo.593102
@@ -122,3 +122,35 @@ authors:
   - family-names: Hämäläinen
     given-names: Matti S.
     affiliation: "Aalto University"
+preferred-citation:
+  title: "MNE: Software for Acquiring, Processing, and Visualizing MEG/EEG Data"
+  type: generic
+  year: 2019
+  doi: 10.1007/978-3-030-00087-5_59
+  collection-title: "Magnetoencephalography: From Signals to Dynamic Cortical Networks"
+  publisher:
+    name: Springer
+  start: 355
+  end: 371
+  editors:
+    - family-names: Supek
+      given-names: Selma
+    - family-names: Aine
+      given-names: Cheryl J.
+  authors:
+    - family-names: Esch
+      given-names: Lorenz
+    - family-names: Dinh
+      given-names: Christoph
+    - family-names: Larson
+      given-names: Eric
+    - family-names: Engemann
+      given-names: Denis A.
+    - family-names: Jas
+      given-names: Mainak
+    - family-names: Khan
+      given-names: Sheraz
+    - family-names: Gramfort
+      given-names: Alexandre
+    - family-names: Hämäläinen
+      given-names: Matti S.
