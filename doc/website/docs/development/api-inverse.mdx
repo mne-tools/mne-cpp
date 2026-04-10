@@ -52,6 +52,17 @@ Combines classical dSPM with a trained LSTM neural network to incorporate tempor
 
 Reference: Dinh et al. (2021). *Contextual Minimum-Norm Estimates (CMNE): A Deep Learning Method for Source Estimation in Neuronal Networks.* Frontiers in Neuroscience, 15, 552666. [DOI: 10.3389/fnins.2021.552666](https://doi.org/10.3389/fnins.2021.552666)
 
+### Sparse Methods
+
+| Class | Description | MNE-Python | MNE-C |
+|---|---|---|---|
+| `InvMxne` | Mixed-Norm Estimate (MxNE) — L21-norm sparse inverse via IRLS | `mne.inverse_sparse.mixed_norm` | — |
+| `InvMxneResult` | Result container: sparse source estimate, active vertices, iteration count, residual | — | — |
+| `InvGammaMap` | Gamma-MAP sparse Bayesian learning inverse via EM | `mne.inverse_sparse.gamma_map` | — |
+| `InvGammaMapResult` | Result container: sparse source estimate, active vertices, gamma hyperparameters | — | — |
+
+**MxNE** minimizes a group-lasso ($\ell_{2,1}$-norm) cost function using iteratively reweighted least squares with active-set pruning. **Gamma-MAP** uses an EM algorithm to estimate per-source variance hyperparameters, pruning sources below a configurable threshold.
+
 ### Dipole Fitting
 
 | Class | Description | MNE-Python | MNE-C |
