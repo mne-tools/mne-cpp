@@ -58,28 +58,20 @@ jobs:
         git config --global user.name chdinh
         git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}
 
-        # Move dev_build tag to current commit
+        # Delete existing dev_build release (if any)
+        if gh release view dev_build > /dev/null 2>&1; then
+          gh release delete dev_build --yes --cleanup-tag
+        fi
+        git push origin :refs/tags/dev_build 2>/dev/null || true
+
+        # Create new tag + pre-release
         git tag dev_build -f -a -m "Development Builds"
         git push origin dev_build -f
-
-        # Create or update the pre-release (avoids delete+create race condition)
-        if gh release view dev_build > /dev/null 2>&1; then
-          # Delete stale assets from previous build
-          gh release view dev_build --json assets --jq '.assets[].name' | while read -r asset; do
-            gh release delete-asset dev_build "$asset" --yes || true
-          done
-          gh release edit dev_build \
-            --prerelease \
-            --draft=false \
-            --title "Development Builds" \
-            --notes "Latest development builds from the staging branch. These are pre-release builds for testing."
-        else
-          gh release create dev_build \
-            --prerelease \
-            --title "Development Builds" \
-            --notes "Latest development builds from the staging branch. These are pre-release builds for testing." \
-            --target ${{ github.sha }}
-        fi
+        gh release create dev_build \
+          --prerelease \
+          --title "Development Builds" \
+          --notes "Latest development builds from the staging branch. These are pre-release builds for testing." \
+          --target ${{ github.sha }}
 
   # ── Platform release builds (parallel) ───────────────────────────────────
   Linux:
