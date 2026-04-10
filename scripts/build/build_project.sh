@@ -19,7 +19,7 @@ EXIT_FAIL=1
 EXIT_SUCCESS=0
 
 ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
-BaseFolder="$(cleanAbsPath "$ScriptPath/..")"
+BaseFolder="$(cleanAbsPath "$ScriptPath/../..")"
 SourceFolder=""
 BuildFolder=""
 OutFolder=""

@@ -15,7 +15,7 @@ function cleanAbsPath()
 echo -e "\033[33;1mSetting Parameters...\033[0m"
 
 ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
-BaseFolder="$(cleanAbsPath "$ScriptPath/..")"
+BaseFolder="$(cleanAbsPath "$ScriptPath/../..")"
 
 COV_WORKING_PATH="${BaseFolder}/cov_scan"
 COVERITY_SCAN_BUILD_PATH="${COV_WORKING_PATH}/build"

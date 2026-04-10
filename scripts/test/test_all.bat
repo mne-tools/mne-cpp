@@ -16,7 +16,7 @@
 @REM Setup default values
 setlocal EnableDelayedExpansion
 set scriptPath=%~dp0
-set basePath=%scriptPath%..
+set basePath=%scriptPath%..\..
 
 set verboseMode=False
 set buildName=Release

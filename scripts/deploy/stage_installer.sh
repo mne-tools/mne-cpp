@@ -7,7 +7,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 OUTPUT_DIR="${REPO_ROOT}/build_installer/staging"
 RELEASE_TAG="${1:-dev_build}"
 PLATFORM="${2:-linux}"

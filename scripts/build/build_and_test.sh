@@ -22,7 +22,7 @@ set -euo pipefail
 
 # ── Resolve paths ─────────────────────────────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd -P)"
-BASE_DIR="$(cd "$SCRIPT_DIR/.." && pwd -P)"
+BASE_DIR="$(cd "$SCRIPT_DIR/../.." && pwd -P)"
 
 # ── Defaults ──────────────────────────────────────────────────────────────
 BUILD_TYPE="Release"

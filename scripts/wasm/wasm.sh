@@ -20,7 +20,7 @@ SAVE_LOG="true"
 SHOW_HELP="false"
 
 SCRIPT_PATH="$(cleanAbsPath "$(dirname "$0")")"
-PROJECT_BASE_PATH="$(cleanAbsPath "$SCRIPT_PATH/..")"
+PROJECT_BASE_PATH="$(cleanAbsPath "$SCRIPT_PATH/../..")"
 
 NUM_PARALLEL_PROC=1
 

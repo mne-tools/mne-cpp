@@ -2,7 +2,7 @@
 setlocal EnableDelayedExpansion
 
 SET ScriptPath=%~dp0
-SET BaseFolder=%ScriptPath%..
+SET BaseFolder=%ScriptPath%..\..
 
 SET "EXIT_FAIL=1"
 SET "EXIT_SUCCESS=0"
