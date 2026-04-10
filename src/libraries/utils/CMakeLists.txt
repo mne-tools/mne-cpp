@@ -17,6 +17,7 @@ set(SOURCES
   layoutloader.cpp
   layoutmaker.cpp
   selectionio.cpp
+  python_runner.cpp
   generics/observerpattern.cpp
   generics/mne_logger.cpp
   utils_global.cpp
@@ -29,6 +30,7 @@ set(HEADERS
   layoutloader.h
   layoutmaker.h
   selectionio.h
+  python_runner.h
   generics/circularbuffer.h
   generics/commandpattern.h
   generics/observerpattern.h
