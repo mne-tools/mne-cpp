@@ -1,0 +1,144 @@
+name: BuildOnnxRuntimeArtifacts
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    # Change this to the branch name which you are developing on to trigger the workflow
+    - generateonnxruntime
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+  ONNXRUNTIME_VERSION: '1.21.0'
+  ONNXRUNTIME_VERSION_TOKEN: '1210'
+  ONNXRUNTIME_ARTIFACT_RELEASE_TAG: onnxruntime_artifacts
+  TOOLCHAIN_RELEASE_TITLE: ONNX Runtime Artifacts
+  TOOLCHAIN_RELEASE_NOTES: Reusable ONNX Runtime shared library packages for CI and local development.
+
+jobs:
+  RepackageLinux:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+
+    - name: Download official ONNX Runtime release (linux-x64)
+      run: |
+        curl --fail --location --silent --show-error \
+          --output onnxruntime-linux-x64.tgz \
+          "https://github.com/microsoft/onnxruntime/releases/download/v${{ env.ONNXRUNTIME_VERSION }}/onnxruntime-linux-x64-${{ env.ONNXRUNTIME_VERSION }}.tgz"
+
+    - name: Verify checksum and extract
+      run: |
+        mkdir onnxruntime-extracted
+        tar xzf onnxruntime-linux-x64.tgz -C onnxruntime-extracted --strip-components=1
+        # Verify the expected files are present
+        test -f onnxruntime-extracted/include/onnxruntime_cxx_api.h
+        test -f onnxruntime-extracted/lib/libonnxruntime.so
+
+    - name: Repackage in MNE-CPP naming convention
+      run: |
+        tar cfvz "onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_linux.tar.gz" -C onnxruntime-extracted .
+
+    - uses: actions/upload-artifact@v7
+      with:
+        name: onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_linux.tar.gz
+        path: onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_linux.tar.gz
+
+    - name: Create dependency release and upload
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
+      run: |
+        bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.ONNXRUNTIME_ARTIFACT_RELEASE_TAG }}"
+        gh release upload "${{ env.ONNXRUNTIME_ARTIFACT_RELEASE_TAG }}" "onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_linux.tar.gz" --clobber
+
+  RepackageMacOS:
+    runs-on: macos-26
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            ort_arch: arm64
+          - arch: x86_64
+            ort_arch: x86_64
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+
+    - name: Download official ONNX Runtime release (macos-${{ matrix.arch }})
+      run: |
+        curl --fail --location --silent --show-error \
+          --output onnxruntime-osx.tgz \
+          "https://github.com/microsoft/onnxruntime/releases/download/v${{ env.ONNXRUNTIME_VERSION }}/onnxruntime-osx-${{ matrix.ort_arch }}-${{ env.ONNXRUNTIME_VERSION }}.tgz"
+
+    - name: Verify and extract
+      run: |
+        mkdir onnxruntime-extracted
+        tar xzf onnxruntime-osx.tgz -C onnxruntime-extracted --strip-components=1
+        test -f onnxruntime-extracted/include/onnxruntime_cxx_api.h
+        test -f onnxruntime-extracted/lib/libonnxruntime.dylib
+
+    - name: Repackage in MNE-CPP naming convention
+      run: |
+        tar cfvz "onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_macos_${{ matrix.arch }}.tar.gz" -C onnxruntime-extracted .
+
+    - uses: actions/upload-artifact@v7
+      with:
+        name: onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_macos_${{ matrix.arch }}.tar.gz
+        path: onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_macos_${{ matrix.arch }}.tar.gz
+
+    - name: Create dependency release and upload
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
+      run: |
+        bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.ONNXRUNTIME_ARTIFACT_RELEASE_TAG }}"
+        gh release upload "${{ env.ONNXRUNTIME_ARTIFACT_RELEASE_TAG }}" "onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_macos_${{ matrix.arch }}.tar.gz" --clobber
+
+  RepackageWindows:
+    runs-on: windows-2025
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+
+    - name: Download official ONNX Runtime release (win-x64)
+      shell: bash
+      run: |
+        curl --fail --location --silent --show-error \
+          --output onnxruntime-win-x64.zip \
+          "https://github.com/microsoft/onnxruntime/releases/download/v${{ env.ONNXRUNTIME_VERSION }}/onnxruntime-win-x64-${{ env.ONNXRUNTIME_VERSION }}.zip"
+
+    - name: Verify and extract
+      shell: bash
+      run: |
+        mkdir onnxruntime-extracted
+        # Windows zip has a top-level directory; use a temp dir + move contents.
+        unzip -q onnxruntime-win-x64.zip -d onnxruntime-temp
+        mv onnxruntime-temp/onnxruntime-win-x64-${{ env.ONNXRUNTIME_VERSION }}/* onnxruntime-extracted/
+        test -f onnxruntime-extracted/include/onnxruntime_cxx_api.h
+        test -f onnxruntime-extracted/lib/onnxruntime.lib
+
+    - name: Repackage in MNE-CPP naming convention
+      shell: bash
+      run: |
+        cd onnxruntime-extracted
+        zip -rq "../onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_windows.zip" .
+
+    - uses: actions/upload-artifact@v7
+      with:
+        name: onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_windows.zip
+        path: onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_windows.zip
+
+    - name: Create dependency release and upload
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
+      run: |
+        bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.ONNXRUNTIME_ARTIFACT_RELEASE_TAG }}"
+        gh release upload "${{ env.ONNXRUNTIME_ARTIFACT_RELEASE_TAG }}" "onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_windows.zip" --clobber
