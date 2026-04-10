@@ -101,7 +101,11 @@ codecov
 *.info
 coverage_*.info
 
-# Python virtual environments
+# Python virtual environments and build artifacts
 .venv/
 __pycache__/
 *.egg-info/
+scripts/ml/training/cmne/build/
+
+# Tool runtime output
+src/tools/inverse/mne_compute_cmne/output/
