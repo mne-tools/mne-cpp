@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     bids_coordinate_system.h
+ * @file     multitaper_psd.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April, 2026
@@ -28,20 +28,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    BidsCoordinateSystem struct — iEEG coordinate system from *_coordsystem.json.
+ * @brief    MultitaperPsd class declaration — multitaper power spectral density estimator.
  *
  */
 
-#ifndef BIDS_COORDINATE_SYSTEM_H
-#define BIDS_COORDINATE_SYSTEM_H
+#ifndef MULTITAPER_PSD_H
+#define MULTITAPER_PSD_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "bids_global.h"
-
-#include <fiff/fiff_coord_trans.h>
+#include "dsp_global.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -50,59 +48,59 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// QT INCLUDES
+// DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
-#include <QString>
-
-//=============================================================================================================
-// DEFINE NAMESPACE BIDSLIB
-//=============================================================================================================
-
-namespace BIDSLIB
+namespace UTILSLIB
 {
 
 //=============================================================================================================
 /**
- * @brief Coordinate system metadata from *_coordsystem.json.
- *
- * Describes the spatial reference frame used for electrode positions.
+ * @brief Result of a multitaper PSD computation.
  */
-struct BIDSSHARED_EXPORT BidsCoordinateSystem
+struct DSPSHARED_EXPORT MultitaperPsdResult
 {
-    QString system;                     /**< e.g. "ACPC", "MNI305", "Other" (REQUIRED for iEEG). */
-    QString units;                      /**< "m", "mm", or "cm" (REQUIRED for iEEG). */
-    QString description;                /**< Description of the coordinate system (RECOMMENDED). */
-    QString processingDescription;      /**< How coordinates were obtained (RECOMMENDED). */
-    QString associatedImagePath;        /**< Relative path to associated T1w image (OPTIONAL). */
-    Eigen::Matrix4d transform;          /**< 4x4 affine transform (identity if not provided). */
-
-    /**
-     * @brief Read a BIDS *_coordsystem.json file.
-     * @param[in] sFilePath  Path to the coordsystem.json file.
-     * @return Populated coordinate system, or default if file cannot be read.
-     */
-    static BidsCoordinateSystem readJson(const QString& sFilePath);
-
-    /**
-     * @brief Write a BIDS *_coordsystem.json file.
-     * @param[in] sFilePath  Output path.
-     * @param[in] cs         Coordinate system metadata.
-     * @return true on success.
-     */
-    static bool writeJson(const QString& sFilePath,
-                          const BidsCoordinateSystem& cs);
-
-    /**
-     * @brief Convert parsed transform to a FiffCoordTrans.
-     * @param[in] fromFrame  Source coordinate frame (default FIFFV_COORD_MRI = 5).
-     * @param[in] toFrame    Destination coordinate frame (default FIFFV_COORD_HEAD = 4).
-     * @return FiffCoordTrans populated with the parsed 4x4 matrix.
-     */
-    FIFFLIB::FiffCoordTrans toFiffCoordTrans(int fromFrame = FIFFV_COORD_MRI,
-                                              int toFrame = FIFFV_COORD_HEAD) const;
+    Eigen::MatrixXd    matPsd;    ///< n_channels × n_freqs; one-sided PSD in unit²/Hz
+    Eigen::RowVectorXd vecFreqs;  ///< Frequency axis in Hz, length nFft/2+1
 };
 
-} // namespace BIDSLIB
+//=============================================================================================================
+/**
+ * @brief Multitaper power spectral density estimator using DPSS (Slepian) tapers.
+ *
+ * Applies multiple orthogonal DPSS tapers to the data, computes the FFT of each
+ * tapered segment, and averages the resulting periodograms weighted by the taper
+ * eigenvalues. This provides a PSD estimate with reduced variance compared to
+ * a single-taper (periodogram) approach.
+ *
+ * @code
+ *   // 600 Hz data, half-bandwidth 4, default tapers
+ *   MultitaperPsdResult r = MultitaperPsd::compute(matData, 600.0);
+ *   // r.matPsd   → n_channels × (n_times/2+1)
+ *   // r.vecFreqs → frequency axis in Hz
+ * @endcode
+ */
+class DSPSHARED_EXPORT MultitaperPsd
+{
+public:
+    //=========================================================================================================
+    /**
+     * Compute multitaper PSD for every channel of a data matrix.
+     *
+     * @param[in] matData         Data matrix (n_channels × n_times).
+     * @param[in] sfreq           Sampling frequency in Hz.
+     * @param[in] halfBandwidth   Half-bandwidth parameter (NW); default 4.0.
+     * @param[in] nTapers         Number of DPSS tapers; -1 → floor(2*halfBandwidth - 1).
+     * @param[in] nFft            FFT length; -1 → n_times.
+     * @return                    MultitaperPsdResult with matPsd and vecFreqs.
+     */
+    static MultitaperPsdResult compute(const Eigen::MatrixXd& matData,
+                                        double                 sfreq,
+                                        double                 halfBandwidth = 4.0,
+                                        int                    nTapers = -1,
+                                        int                    nFft = -1);
+};
 
-#endif // BIDS_COORDINATE_SYSTEM_H
+} // namespace UTILSLIB
+
+#endif // MULTITAPER_PSD_H

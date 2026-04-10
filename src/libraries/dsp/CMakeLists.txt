@@ -39,6 +39,12 @@ set(SOURCES
   bad_channel_detect.cpp
   welch_psd.cpp
   morlet_tfr.cpp
+  dpss.cpp
+  multitaper_psd.cpp
+  multitaper_tfr.cpp
+  channel_derivation.cpp
+  csd.cpp
+  extended_infomax.cpp
 )
 
 set(HEADERS
@@ -68,6 +74,12 @@ set(HEADERS
   bad_channel_detect.h
   welch_psd.h
   morlet_tfr.h
+  dpss.h
+  multitaper_psd.h
+  multitaper_tfr.h
+  channel_derivation.h
+  csd.h
+  extended_infomax.h
 )
 
 set(FILE_TO_UPDATE dsp_global.cpp)

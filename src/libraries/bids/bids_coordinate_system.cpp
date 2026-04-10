@@ -2,8 +2,8 @@
 /**
  * @file     bids_coordinate_system.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.1.0
- * @date     March, 2026
+ * @since    2.2.0
+ * @date     April, 2026
  *
  * @section  LICENSE
  *
@@ -45,6 +45,7 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QDebug>
 
 //=============================================================================================================
@@ -60,6 +61,7 @@ using namespace BIDSLIB;
 BidsCoordinateSystem BidsCoordinateSystem::readJson(const QString& sFilePath)
 {
     BidsCoordinateSystem cs;
+    cs.transform = Eigen::Matrix4d::Identity();
 
     QFile file(sFilePath);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -78,11 +80,45 @@ BidsCoordinateSystem BidsCoordinateSystem::readJson(const QString& sFilePath)
     }
 
     QJsonObject json = doc.object();
-    cs.system                = json.value(QStringLiteral("iEEGCoordinateSystem")).toString();
-    cs.units                 = json.value(QStringLiteral("iEEGCoordinateUnits")).toString();
-    cs.description           = json.value(QStringLiteral("iEEGCoordinateSystemDescription")).toString();
+
+    // Try iEEG fields first, fall back to EEG fields
+    cs.system = json.value(QStringLiteral("iEEGCoordinateSystem")).toString();
+    if(cs.system.isEmpty())
+        cs.system = json.value(QStringLiteral("EEGCoordinateSystem")).toString();
+
+    cs.units = json.value(QStringLiteral("iEEGCoordinateUnits")).toString();
+    if(cs.units.isEmpty())
+        cs.units = json.value(QStringLiteral("EEGCoordinateUnits")).toString();
+
+    cs.description = json.value(QStringLiteral("iEEGCoordinateSystemDescription")).toString();
+    if(cs.description.isEmpty())
+        cs.description = json.value(QStringLiteral("EEGCoordinateSystemDescription")).toString();
+
     cs.processingDescription = json.value(QStringLiteral("iEEGCoordinateProcessingDescription")).toString();
-    cs.associatedImagePath   = json.value(QStringLiteral("IntendedFor")).toString();
+    if(cs.processingDescription.isEmpty())
+        cs.processingDescription = json.value(QStringLiteral("EEGCoordinateProcessingDescription")).toString();
+
+    cs.associatedImagePath = json.value(QStringLiteral("IntendedFor")).toString();
+
+    // Parse 4x4 transform if provided as "iEEGCoordinateProcessingTransform" or "Transform"
+    QString transformKey;
+    if(json.contains(QStringLiteral("iEEGCoordinateProcessingTransform")))
+        transformKey = QStringLiteral("iEEGCoordinateProcessingTransform");
+    else if(json.contains(QStringLiteral("Transform")))
+        transformKey = QStringLiteral("Transform");
+
+    if(!transformKey.isEmpty()) {
+        QJsonArray rows = json.value(transformKey).toArray();
+        if(rows.size() == 4) {
+            for(int r = 0; r < 4; ++r) {
+                QJsonArray cols = rows[r].toArray();
+                if(cols.size() == 4) {
+                    for(int c = 0; c < 4; ++c)
+                        cs.transform(r, c) = cols[c].toDouble();
+                }
+            }
+        }
+    }
 
     return cs;
 }
@@ -113,4 +149,12 @@ bool BidsCoordinateSystem::writeJson(const QString& sFilePath,
     file.write(QJsonDocument(json).toJson(QJsonDocument::Indented));
     file.close();
     return true;
+}
+
+//=============================================================================================================
+
+FIFFLIB::FiffCoordTrans BidsCoordinateSystem::toFiffCoordTrans(int fromFrame, int toFrame) const
+{
+    Eigen::Matrix4f matTrans = transform.cast<float>();
+    return FIFFLIB::FiffCoordTrans(fromFrame, toFrame, matTrans);
 }

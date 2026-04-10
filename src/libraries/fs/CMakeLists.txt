@@ -12,6 +12,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 
 set(SOURCES
     fs_annotation.cpp
+    fs_atlas_lookup.cpp
     fs_colortable.cpp
     fs_global.cpp
     fs_label.cpp
@@ -22,6 +23,7 @@ set(SOURCES
 
 set(HEADERS
     fs_annotation.h
+    fs_atlas_lookup.h
     fs_global.h
     fs_colortable.h
     fs_label.h

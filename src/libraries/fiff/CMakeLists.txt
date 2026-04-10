@@ -39,6 +39,7 @@ set(SOURCES
     fiff_digitizer_data.cpp
     fiff_coord_trans_set.cpp
     fiff_file_sharer.cpp
+    fiff_annotations.cpp
 )
 
 set(HEADERS
@@ -76,6 +77,7 @@ set(HEADERS
     fiff_digitizer_data.h
     fiff_coord_trans_set.h
     fiff_file_sharer.h
+    fiff_annotations.h
     fiff_byte_swap.h
 )
 

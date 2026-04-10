@@ -32,6 +32,7 @@ set(SOURCES
     mri_mgh_io.cpp
     mri_cor_io.cpp
     mri_cor_fif_io.cpp
+    mri_slicer.cpp
 )
 
 set(HEADERS
@@ -41,6 +42,7 @@ set(HEADERS
     mri_mgh_io.h
     mri_cor_io.h
     mri_cor_fif_io.h
+    mri_slicer.h
 )
 
 set(FILE_TO_UPDATE mri_global.cpp)

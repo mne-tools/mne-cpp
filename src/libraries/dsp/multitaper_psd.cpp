@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     bids_coordinate_system.h
+ * @file     multitaper_psd.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April, 2026
@@ -28,81 +28,110 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    BidsCoordinateSystem struct — iEEG coordinate system from *_coordsystem.json.
- *
+ * @brief    Implementation of MultitaperPsd.
  */
-
-#ifndef BIDS_COORDINATE_SYSTEM_H
-#define BIDS_COORDINATE_SYSTEM_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "bids_global.h"
-
-#include <fiff/fiff_coord_trans.h>
+#include "multitaper_psd.h"
+#include "dpss.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+//#ifndef EIGEN_FFTW_DEFAULT
+//#define EIGEN_FFTW_DEFAULT
+//#endif
+#include <unsupported/Eigen/FFT>
 
 //=============================================================================================================
-// QT INCLUDES
+// STD INCLUDES
 //=============================================================================================================
 
-#include <QString>
+#include <cmath>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BIDSLIB
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace BIDSLIB
+using namespace UTILSLIB;
+using namespace Eigen;
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+MultitaperPsdResult MultitaperPsd::compute(const MatrixXd& matData,
+                                            double          sfreq,
+                                            double          halfBandwidth,
+                                            int             nTapers,
+                                            int             nFft)
 {
+    const int nChannels = static_cast<int>(matData.rows());
+    const int nTimes    = static_cast<int>(matData.cols());
 
-//=============================================================================================================
-/**
- * @brief Coordinate system metadata from *_coordsystem.json.
- *
- * Describes the spatial reference frame used for electrode positions.
- */
-struct BIDSSHARED_EXPORT BidsCoordinateSystem
-{
-    QString system;                     /**< e.g. "ACPC", "MNI305", "Other" (REQUIRED for iEEG). */
-    QString units;                      /**< "m", "mm", or "cm" (REQUIRED for iEEG). */
-    QString description;                /**< Description of the coordinate system (RECOMMENDED). */
-    QString processingDescription;      /**< How coordinates were obtained (RECOMMENDED). */
-    QString associatedImagePath;        /**< Relative path to associated T1w image (OPTIONAL). */
-    Eigen::Matrix4d transform;          /**< 4x4 affine transform (identity if not provided). */
+    if (nFft < 0)
+        nFft = nTimes;
 
-    /**
-     * @brief Read a BIDS *_coordsystem.json file.
-     * @param[in] sFilePath  Path to the coordsystem.json file.
-     * @return Populated coordinate system, or default if file cannot be read.
-     */
-    static BidsCoordinateSystem readJson(const QString& sFilePath);
+    const int nFreqs = nFft / 2 + 1;
 
-    /**
-     * @brief Write a BIDS *_coordsystem.json file.
-     * @param[in] sFilePath  Output path.
-     * @param[in] cs         Coordinate system metadata.
-     * @return true on success.
-     */
-    static bool writeJson(const QString& sFilePath,
-                          const BidsCoordinateSystem& cs);
+    // 1. Compute DPSS tapers
+    DpssResult dpss = Dpss::compute(nTimes, halfBandwidth, nTapers);
+    const int nTap = static_cast<int>(dpss.matTapers.rows());
 
-    /**
-     * @brief Convert parsed transform to a FiffCoordTrans.
-     * @param[in] fromFrame  Source coordinate frame (default FIFFV_COORD_MRI = 5).
-     * @param[in] toFrame    Destination coordinate frame (default FIFFV_COORD_HEAD = 4).
-     * @return FiffCoordTrans populated with the parsed 4x4 matrix.
-     */
-    FIFFLIB::FiffCoordTrans toFiffCoordTrans(int fromFrame = FIFFV_COORD_MRI,
-                                              int toFrame = FIFFV_COORD_HEAD) const;
-};
+    // Compute eigenvalue weights for weighted averaging
+    double weightSum = 0.0;
+    for (int t = 0; t < nTap; ++t)
+        weightSum += dpss.vecEigenvalues[t];
 
-} // namespace BIDSLIB
+    MultitaperPsdResult result;
+    result.matPsd = MatrixXd::Zero(nChannels, nFreqs);
 
-#endif // BIDS_COORDINATE_SYSTEM_H
+    // Build frequency axis
+    result.vecFreqs.resize(nFreqs);
+    for (int k = 0; k < nFreqs; ++k)
+        result.vecFreqs[k] = static_cast<double>(k) * sfreq / static_cast<double>(nFft);
+
+    Eigen::FFT<double> fft;
+
+    // 2. For each channel, apply each taper, FFT, accumulate weighted |X|^2
+    for (int ch = 0; ch < nChannels; ++ch) {
+        RowVectorXd psd = RowVectorXd::Zero(nFreqs);
+
+        for (int t = 0; t < nTap; ++t) {
+            // Apply taper element-wise
+            VectorXd tapered = matData.row(ch).transpose().array()
+                             * dpss.matTapers.row(t).transpose().array();
+
+            // Zero-pad to nFft if needed
+            VectorXd padded = VectorXd::Zero(nFft);
+            const int copyLen = std::min(nTimes, nFft);
+            padded.head(copyLen) = tapered.head(copyLen);
+
+            // Forward FFT
+            VectorXcd spec;
+            fft.fwd(spec, padded);
+
+            // Accumulate weighted |X[k]|^2
+            const double w = dpss.vecEigenvalues[t];
+            for (int k = 0; k < nFreqs; ++k)
+                psd[k] += w * std::norm(spec[k]);
+        }
+
+        // Normalise: divide by (weightSum × sfreq)
+        const double dNorm = 1.0 / (weightSum * sfreq);
+        psd *= dNorm;
+
+        // One-sided: double all non-DC, non-Nyquist bins
+        for (int k = 1; k < nFreqs - 1; ++k)
+            psd[k] *= 2.0;
+
+        result.matPsd.row(ch) = psd;
+    }
+
+    return result;
+}

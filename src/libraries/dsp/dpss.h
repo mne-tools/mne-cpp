@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     bids_coordinate_system.h
+ * @file     dpss.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April, 2026
@@ -28,20 +28,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    BidsCoordinateSystem struct — iEEG coordinate system from *_coordsystem.json.
+ * @brief    Dpss class declaration — Discrete Prolate Spheroidal Sequences (Slepian tapers).
  *
  */
 
-#ifndef BIDS_COORDINATE_SYSTEM_H
-#define BIDS_COORDINATE_SYSTEM_H
+#ifndef DPSS_H
+#define DPSS_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "bids_global.h"
-
-#include <fiff/fiff_coord_trans.h>
+#include "dsp_global.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -50,59 +48,52 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// QT INCLUDES
+// DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
-#include <QString>
-
-//=============================================================================================================
-// DEFINE NAMESPACE BIDSLIB
-//=============================================================================================================
-
-namespace BIDSLIB
+namespace UTILSLIB
 {
 
 //=============================================================================================================
 /**
- * @brief Coordinate system metadata from *_coordsystem.json.
- *
- * Describes the spatial reference frame used for electrode positions.
+ * @brief Result of a DPSS taper computation.
  */
-struct BIDSSHARED_EXPORT BidsCoordinateSystem
+struct DSPSHARED_EXPORT DpssResult
 {
-    QString system;                     /**< e.g. "ACPC", "MNI305", "Other" (REQUIRED for iEEG). */
-    QString units;                      /**< "m", "mm", or "cm" (REQUIRED for iEEG). */
-    QString description;                /**< Description of the coordinate system (RECOMMENDED). */
-    QString processingDescription;      /**< How coordinates were obtained (RECOMMENDED). */
-    QString associatedImagePath;        /**< Relative path to associated T1w image (OPTIONAL). */
-    Eigen::Matrix4d transform;          /**< 4x4 affine transform (identity if not provided). */
-
-    /**
-     * @brief Read a BIDS *_coordsystem.json file.
-     * @param[in] sFilePath  Path to the coordsystem.json file.
-     * @return Populated coordinate system, or default if file cannot be read.
-     */
-    static BidsCoordinateSystem readJson(const QString& sFilePath);
-
-    /**
-     * @brief Write a BIDS *_coordsystem.json file.
-     * @param[in] sFilePath  Output path.
-     * @param[in] cs         Coordinate system metadata.
-     * @return true on success.
-     */
-    static bool writeJson(const QString& sFilePath,
-                          const BidsCoordinateSystem& cs);
-
-    /**
-     * @brief Convert parsed transform to a FiffCoordTrans.
-     * @param[in] fromFrame  Source coordinate frame (default FIFFV_COORD_MRI = 5).
-     * @param[in] toFrame    Destination coordinate frame (default FIFFV_COORD_HEAD = 4).
-     * @return FiffCoordTrans populated with the parsed 4x4 matrix.
-     */
-    FIFFLIB::FiffCoordTrans toFiffCoordTrans(int fromFrame = FIFFV_COORD_MRI,
-                                              int toFrame = FIFFV_COORD_HEAD) const;
+    Eigen::MatrixXd matTapers;      ///< nTapers × N, each row is a unit-norm taper
+    Eigen::VectorXd vecEigenvalues; ///< Concentration ratios, length nTapers
 };
 
-} // namespace BIDSLIB
+//=============================================================================================================
+/**
+ * @brief Discrete Prolate Spheroidal Sequences (Slepian tapers).
+ *
+ * Computes DPSS tapers via the tridiagonal eigenvalue formulation. These tapers
+ * are used by the multitaper spectral estimator to achieve optimal spectral
+ * concentration within a given half-bandwidth.
+ *
+ * @code
+ *   // 256-sample window, half-bandwidth 4, default number of tapers (7)
+ *   DpssResult r = Dpss::compute(256, 4.0);
+ *   // r.matTapers   → 7 × 256
+ *   // r.vecEigenvalues → 7 concentration ratios ≈ 1.0
+ * @endcode
+ */
+class DSPSHARED_EXPORT Dpss
+{
+public:
+    //=========================================================================================================
+    /**
+     * Compute DPSS tapers for a given window length and half-bandwidth.
+     *
+     * @param[in] N               Window length in samples.
+     * @param[in] halfBandwidth   Half-bandwidth parameter (NW); typical values: 2, 3, 4.
+     * @param[in] nTapers         Number of tapers to return; -1 → floor(2*halfBandwidth - 1).
+     * @return                    DpssResult with matTapers (nTapers × N) and vecEigenvalues.
+     */
+    static DpssResult compute(int N, double halfBandwidth, int nTapers = -1);
+};
 
-#endif // BIDS_COORDINATE_SYSTEM_H
+} // namespace UTILSLIB
+
+#endif // DPSS_H

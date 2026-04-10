@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     bids_coordinate_system.h
+ * @file     multitaper_tfr.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April, 2026
@@ -28,20 +28,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    BidsCoordinateSystem struct — iEEG coordinate system from *_coordsystem.json.
+ * @brief    MultitaperTfr class declaration — sliding-window multitaper time-frequency representation.
  *
  */
 
-#ifndef BIDS_COORDINATE_SYSTEM_H
-#define BIDS_COORDINATE_SYSTEM_H
+#ifndef MULTITAPER_TFR_H
+#define MULTITAPER_TFR_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "bids_global.h"
-
-#include <fiff/fiff_coord_trans.h>
+#include "dsp_global.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -53,56 +51,62 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QString>
+#include <QVector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BIDSLIB
+// DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
-namespace BIDSLIB
+namespace UTILSLIB
 {
 
 //=============================================================================================================
 /**
- * @brief Coordinate system metadata from *_coordsystem.json.
- *
- * Describes the spatial reference frame used for electrode positions.
+ * @brief Result of a multitaper TFR computation.
  */
-struct BIDSSHARED_EXPORT BidsCoordinateSystem
+struct DSPSHARED_EXPORT MultitaperTfrResult
 {
-    QString system;                     /**< e.g. "ACPC", "MNI305", "Other" (REQUIRED for iEEG). */
-    QString units;                      /**< "m", "mm", or "cm" (REQUIRED for iEEG). */
-    QString description;                /**< Description of the coordinate system (RECOMMENDED). */
-    QString processingDescription;      /**< How coordinates were obtained (RECOMMENDED). */
-    QString associatedImagePath;        /**< Relative path to associated T1w image (OPTIONAL). */
-    Eigen::Matrix4d transform;          /**< 4x4 affine transform (identity if not provided). */
-
-    /**
-     * @brief Read a BIDS *_coordsystem.json file.
-     * @param[in] sFilePath  Path to the coordsystem.json file.
-     * @return Populated coordinate system, or default if file cannot be read.
-     */
-    static BidsCoordinateSystem readJson(const QString& sFilePath);
-
-    /**
-     * @brief Write a BIDS *_coordsystem.json file.
-     * @param[in] sFilePath  Output path.
-     * @param[in] cs         Coordinate system metadata.
-     * @return true on success.
-     */
-    static bool writeJson(const QString& sFilePath,
-                          const BidsCoordinateSystem& cs);
-
-    /**
-     * @brief Convert parsed transform to a FiffCoordTrans.
-     * @param[in] fromFrame  Source coordinate frame (default FIFFV_COORD_MRI = 5).
-     * @param[in] toFrame    Destination coordinate frame (default FIFFV_COORD_HEAD = 4).
-     * @return FiffCoordTrans populated with the parsed 4x4 matrix.
-     */
-    FIFFLIB::FiffCoordTrans toFiffCoordTrans(int fromFrame = FIFFV_COORD_MRI,
-                                              int toFrame = FIFFV_COORD_HEAD) const;
+    QVector<Eigen::MatrixXd> tfrData;   ///< One matrix per channel, each: n_freqs × n_times
+    Eigen::RowVectorXd       vecFreqs;  ///< Frequency axis in Hz
+    Eigen::RowVectorXd       vecTimes;  ///< Time axis in seconds (window centres)
 };
 
-} // namespace BIDSLIB
+//=============================================================================================================
+/**
+ * @brief Sliding-window multitaper time-frequency representation.
+ *
+ * Slides a fixed-length analysis window across the data and computes a multitaper
+ * PSD at each position, yielding a time-frequency power map per channel.
+ *
+ * @code
+ *   // 600 Hz data, 256-sample windows, 128-sample step, half-bandwidth 4
+ *   MultitaperTfrResult r = MultitaperTfr::compute(matData, 600.0);
+ *   // r.tfrData[ch] → n_freqs × n_time_steps
+ * @endcode
+ */
+class DSPSHARED_EXPORT MultitaperTfr
+{
+public:
+    //=========================================================================================================
+    /**
+     * Compute sliding-window multitaper TFR for every channel of a data matrix.
+     *
+     * @param[in] matData         Data matrix (n_channels × n_times).
+     * @param[in] sfreq           Sampling frequency in Hz.
+     * @param[in] windowSize      Analysis window length in samples (default 256).
+     * @param[in] stepSize        Step size in samples; -1 → windowSize / 2.
+     * @param[in] halfBandwidth   Half-bandwidth parameter (NW); default 4.0.
+     * @param[in] nTapers         Number of DPSS tapers; -1 → floor(2*halfBandwidth - 1).
+     * @return                    MultitaperTfrResult with tfrData, vecFreqs, vecTimes.
+     */
+    static MultitaperTfrResult compute(const Eigen::MatrixXd& matData,
+                                        double                 sfreq,
+                                        int                    windowSize = 256,
+                                        int                    stepSize = -1,
+                                        double                 halfBandwidth = 4.0,
+                                        int                    nTapers = -1);
+};
 
-#endif // BIDS_COORDINATE_SYSTEM_H
+} // namespace UTILSLIB
+
+#endif // MULTITAPER_TFR_H

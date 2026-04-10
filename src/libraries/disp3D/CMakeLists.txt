@@ -40,6 +40,7 @@ set(SOURCES
     renderable/brainsurface.cpp
     renderable/sourceestimateoverlay.cpp
     renderable/dipoleobject.cpp
+    renderable/electrodeobject.cpp
     renderable/networkobject.cpp
     scene/sensorfieldmapper.cpp
     scene/rtsensorstreammanager.cpp
@@ -80,6 +81,7 @@ set(HEADERS
     renderable/brainsurface.h
     renderable/sourceestimateoverlay.h
     renderable/dipoleobject.h
+    renderable/electrodeobject.h
     renderable/networkobject.h
     scene/sensorfieldmapper.h
     scene/rtsensorstreammanager.h
