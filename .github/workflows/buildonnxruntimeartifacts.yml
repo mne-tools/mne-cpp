@@ -125,10 +125,9 @@ jobs:
         test -f onnxruntime-extracted/lib/onnxruntime.lib
 
     - name: Repackage in MNE-CPP naming convention
-      shell: bash
+      shell: pwsh
       run: |
-        cd onnxruntime-extracted
-        zip -rq "../onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_windows.zip" .
+        Compress-Archive -Path "onnxruntime-extracted\*" -DestinationPath "onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_windows.zip"
 
     - uses: actions/upload-artifact@v7
       with:
@@ -172,14 +171,25 @@ jobs:
       run: |
         source ../emsdk/emsdk_env.sh
         cd ../onnxruntime
-        ./build.sh \
-          --build_wasm_static_lib \
-          --skip_tests \
-          --disable_wasm_exception_catching \
-          --disable_rtti \
-          --parallel \
-          --config Release \
-          --cmake_extra_defines onnxruntime_BUILD_UNIT_TESTS=OFF
+        # Retry up to 3 times to handle transient FetchContent download failures
+        for attempt in 1 2 3; do
+          echo "Build attempt ${attempt}/3..."
+          if ./build.sh \
+            --build_wasm_static_lib \
+            --skip_tests \
+            --disable_wasm_exception_catching \
+            --disable_rtti \
+            --parallel \
+            --config Release \
+            --cmake_extra_defines onnxruntime_BUILD_UNIT_TESTS=OFF; then
+            echo "Build succeeded on attempt ${attempt}"
+            exit 0
+          fi
+          echo "Build attempt ${attempt} failed, retrying..."
+          sleep 10
+        done
+        echo "All build attempts failed"
+        exit 1
 
     - name: Package WASM static library
       run: |
