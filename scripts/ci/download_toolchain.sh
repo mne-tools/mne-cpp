@@ -5,7 +5,7 @@ set -euo pipefail
 usage()
 {
     cat <<'EOF'
-Usage: ./scripts/ci/download_toolchain.sh --kind <qt|ifw|eigen> --version <version> --output-dir <dir> [--linkage <dynamic|static>] [--release-tag <tag>] [--repository <owner/repo>]
+Usage: ./scripts/ci/download_toolchain.sh --kind <qt|ifw|eigen|onnxruntime> --version <version> --output-dir <dir> [--linkage <dynamic|static>] [--release-tag <tag>] [--repository <owner/repo>]
 EOF
 }
 
@@ -158,6 +158,27 @@ case "${KIND}" in
         fi
         ASSET_NAME="eigen_${VERSION_TOKEN}_any.${ARCHIVE_EXTENSION}"
         ;;
+    onnxruntime)
+        # Re-hosted on mne-tools/mne-cpp releases (same as Qt/Eigen).
+        # The buildonnxruntimeartifacts.yml workflow fetches the official
+        # Microsoft binaries, verifies them and re-packages under our
+        # naming convention: onnxruntime_<ver>_<platform>[_<arch>].<ext>
+        if [[ -z "${RELEASE_TAG}" ]]; then
+            RELEASE_TAG="${ONNXRUNTIME_TOOLCHAIN_RELEASE_TAG:-onnxruntime_artifacts}"
+        fi
+        case "${PLATFORM}" in
+            linux)
+                ASSET_NAME="onnxruntime_${VERSION_TOKEN}_linux.${ARCHIVE_EXTENSION}"
+                ;;
+            macos)
+                if [[ "$(uname -m)" == "arm64" ]]; then
+                    ASSET_NAME="onnxruntime_${VERSION_TOKEN}_macos_arm64.${ARCHIVE_EXTENSION}"
+                else
+                    ASSET_NAME="onnxruntime_${VERSION_TOKEN}_macos_x86_64.${ARCHIVE_EXTENSION}"
+                fi
+                ;;
+        esac
+        ;;
     *)
         echo "Unsupported toolchain kind: ${KIND}" >&2
         exit 1
@@ -196,6 +217,9 @@ elif [[ "${KIND}" == "ifw" ]]; then
     persist_env "CPACK_IFW_ROOT" "${OUTPUT_DIR}"
     append_path "${OUTPUT_DIR}/bin"
     echo "Qt Installer Framework ready at ${OUTPUT_DIR}"
+elif [[ "${KIND}" == "onnxruntime" ]]; then
+    persist_env "ONNXRUNTIME_ROOT_DIR" "${OUTPUT_DIR}"
+    echo "ONNX Runtime ready at ${OUTPUT_DIR}"
 else
     EIGEN_ROOT_DIR="${OUTPUT_DIR}"
     EIGEN3_CONFIG_DIR="${EIGEN_ROOT_DIR}/share/eigen3/cmake"

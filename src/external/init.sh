@@ -14,6 +14,9 @@ Options:
   --linkage <dynamic|static>    Qt linkage to prepare (default: dynamic)
   --qt-dir <path>               Target directory for the Qt bundle
   --eigen-dir <path>            Target directory for the Eigen bundle
+  --onnxruntime-version <ver>   ONNX Runtime version to download (default: none; set to enable)
+  --onnxruntime-dir <path>      Target directory for the ONNX Runtime package
+  --onnxruntime-release-tag <t> Override the ONNX Runtime prerelease tag
   --skip-qt                     Skip Qt download and keep using the provided/local Qt prefix
   --repository <owner/repo>     Repository hosting the prerelease assets (default: mne-tools/mne-cpp)
   --qt-release-tag <tag>        Override the Qt prerelease tag
@@ -31,9 +34,12 @@ EIGEN_VERSION="5.0.1"
 LINKAGE="dynamic"
 QT_DIR=""
 EIGEN_DIR=""
+ONNXRUNTIME_VERSION=""
+ONNXRUNTIME_DIR=""
 REPOSITORY="mne-tools/mne-cpp"
 QT_RELEASE_TAG=""
 EIGEN_RELEASE_TAG=""
+ONNXRUNTIME_RELEASE_TAG=""
 FORCE=0
 SKIP_QT=0
 
@@ -57,6 +63,18 @@ while [[ $# -gt 0 ]]; do
             ;;
         --eigen-dir)
             EIGEN_DIR="$2"
+            shift 2
+            ;;
+        --onnxruntime-version)
+            ONNXRUNTIME_VERSION="$2"
+            shift 2
+            ;;
+        --onnxruntime-dir)
+            ONNXRUNTIME_DIR="$2"
+            shift 2
+            ;;
+        --onnxruntime-release-tag)
+            ONNXRUNTIME_RELEASE_TAG="$2"
             shift 2
             ;;
         --skip-qt)
@@ -145,6 +163,10 @@ if [[ -z "${EIGEN_DIR}" ]]; then
     EIGEN_DIR="${SCRIPT_DIR}/eigen"
 fi
 
+if [[ -n "${ONNXRUNTIME_VERSION}" && -z "${ONNXRUNTIME_DIR}" ]]; then
+    ONNXRUNTIME_DIR="${SCRIPT_DIR}/onnxruntime"
+fi
+
 mkdir -p "${SCRIPT_DIR}/qt"
 
 
@@ -204,6 +226,27 @@ else
     echo "Eigen bundle already present at ${EIGEN_DIR}"
 fi
 
+if [[ -n "${ONNXRUNTIME_VERSION}" ]]; then
+    download_onnx=1
+    if [[ ${FORCE} -eq 0 && -f "${ONNXRUNTIME_DIR}/include/onnxruntime_cxx_api.h" ]]; then
+        download_onnx=0
+    fi
+    if [[ ${download_onnx} -eq 1 ]]; then
+        ort_args=(
+            --kind onnxruntime
+            --version "${ONNXRUNTIME_VERSION}"
+            --output-dir "${ONNXRUNTIME_DIR}"
+            --repository "${REPOSITORY}"
+        )
+        if [[ -n "${ONNXRUNTIME_RELEASE_TAG}" ]]; then
+            ort_args+=(--release-tag "${ONNXRUNTIME_RELEASE_TAG}")
+        fi
+        "${REPO_ROOT}/scripts/ci/download_toolchain.sh" "${ort_args[@]}"
+    else
+        echo "ONNX Runtime already present at ${ONNXRUNTIME_DIR}"
+    fi
+fi
+
 echo ""
 echo "Dependency setup complete."
 if [[ ${SKIP_QT} -eq 1 ]]; then
@@ -212,4 +255,7 @@ else
     echo "  Qt:    ${QT_DIR}"
 fi
 echo "  Eigen: ${EIGEN_DIR}"
+if [[ -n "${ONNXRUNTIME_VERSION}" ]]; then
+    echo "  ONNX Runtime: ${ONNXRUNTIME_DIR}"
+fi
 echo "  CMake prefix hint: ${QT_DIR};${EIGEN_DIR}"

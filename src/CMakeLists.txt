@@ -38,6 +38,8 @@ option(WASM "Setup build for wasm" OFF)
 
 option(USE_FFTW "Use fftw backend for eigen" OFF)
 
+option(USE_ONNXRUNTIME "Enable ONNX Runtime backend for the ml library" OFF)
+
 set(MNE_LOG_LEVEL "INFO" CACHE STRING "Minimum log level: DEBUG, INFO, WARN, CRIT, FATAL")
 set_property(CACHE MNE_LOG_LEVEL PROPERTY STRINGS DEBUG INFO WARN CRIT FATAL)
 
@@ -238,6 +240,54 @@ else()
         "Run ./init.sh (or .\\init.bat on Windows) to fetch the MNE-CPP-maintained dependency artifacts,\n"
         "or install Eigen ${MNE_CPP_EIGEN_VERSION} on your system and set CMAKE_PREFIX_PATH accordingly."
     )
+endif()
+
+##==============================================================================
+## ONNX Runtime dependency (optional)
+
+if(USE_ONNXRUNTIME)
+    set(MNE_CPP_ONNXRUNTIME_VERSION "1.21.0" CACHE STRING "Preferred ONNX Runtime version for MNE-CPP.")
+    set(MNE_CPP_PREBUILT_ONNXRUNTIME_DIR "${PROJECT_SOURCE_DIR}/external/onnxruntime"
+        CACHE PATH "Location of the extracted ONNX Runtime package.")
+
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
+
+    # Try the native onnxruntime CMake config first, then our FindOnnxRuntime module.
+    find_package(onnxruntime ${MNE_CPP_ONNXRUNTIME_VERSION} QUIET CONFIG
+        HINTS "${MNE_CPP_PREBUILT_ONNXRUNTIME_DIR}")
+
+    if(NOT onnxruntime_FOUND)
+        find_package(OnnxRuntime QUIET
+            HINTS "${MNE_CPP_PREBUILT_ONNXRUNTIME_DIR}")
+    endif()
+
+    if(TARGET onnxruntime::onnxruntime)
+        # The native ONNX Runtime config sets INTERFACE_INCLUDE_DIRECTORIES to
+        # include/onnxruntime, but the actual headers live in include/.
+        # Correct the path so #include <onnxruntime_cxx_api.h> works.
+        get_target_property(_ort_inc onnxruntime::onnxruntime INTERFACE_INCLUDE_DIRECTORIES)
+        if(_ort_inc AND NOT EXISTS "${_ort_inc}/onnxruntime_cxx_api.h")
+            get_filename_component(_ort_inc_parent "${_ort_inc}" DIRECTORY)
+            if(EXISTS "${_ort_inc_parent}/onnxruntime_cxx_api.h")
+                set_target_properties(onnxruntime::onnxruntime PROPERTIES
+                    INTERFACE_INCLUDE_DIRECTORIES "${_ort_inc_parent}")
+            endif()
+        endif()
+        message(STATUS "[MNE-CPP] ONNX Runtime found (target onnxruntime::onnxruntime)")
+    elseif(TARGET OnnxRuntime::OnnxRuntime)
+        # Our FindOnnxRuntime module found it; create the canonical alias.
+        if(NOT TARGET onnxruntime::onnxruntime)
+            add_library(onnxruntime::onnxruntime ALIAS OnnxRuntime::OnnxRuntime)
+        endif()
+        message(STATUS "[MNE-CPP] ONNX Runtime found via FindOnnxRuntime module")
+    else()
+        message(WARNING
+            "[MNE-CPP] USE_ONNXRUNTIME=ON but ONNX Runtime was not found.\n"
+            "Run ./src/external/init.sh --onnxruntime-version ${MNE_CPP_ONNXRUNTIME_VERSION}\n"
+            "or download the ONNX Runtime release into ${MNE_CPP_PREBUILT_ONNXRUNTIME_DIR}.\n"
+            "The ml library will be built without ONNX Runtime support."
+        )
+    endif()
 endif()
 
 ##==============================================================================

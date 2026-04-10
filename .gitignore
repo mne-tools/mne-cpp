@@ -71,6 +71,7 @@ compile_commands.json
 /src/external/eigen/
 /src/external/eigen-*/
 /src/external/eigen-*-install/
+/src/external/onnxruntime/
 
 # Generated docu Docker files
 /_site

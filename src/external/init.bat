@@ -16,6 +16,9 @@ set "EIGEN_RELEASE_TAG="
 set "FORCE=0"
 set "BUNDLED_EIGEN_DIR="
 set "SKIP_QT=0"
+set "ONNXRUNTIME_VERSION="
+set "ONNXRUNTIME_DIR="
+set "ONNXRUNTIME_RELEASE_TAG="
 
 :parse_args
 if "%~1"=="" goto after_parse
@@ -45,6 +48,24 @@ if /I "%~1"=="--qt-dir" (
 )
 if /I "%~1"=="--eigen-dir" (
     set "EIGEN_DIR=%~2"
+    shift
+    shift
+    goto parse_args
+)
+if /I "%~1"=="--onnxruntime-version" (
+    set "ONNXRUNTIME_VERSION=%~2"
+    shift
+    shift
+    goto parse_args
+)
+if /I "%~1"=="--onnxruntime-dir" (
+    set "ONNXRUNTIME_DIR=%~2"
+    shift
+    shift
+    goto parse_args
+)
+if /I "%~1"=="--onnxruntime-release-tag" (
+    set "ONNXRUNTIME_RELEASE_TAG=%~2"
     shift
     shift
     goto parse_args
@@ -91,6 +112,7 @@ if /I not "%LINKAGE%"=="dynamic" if /I not "%LINKAGE%"=="static" (
 
 if not defined QT_DIR set "QT_DIR=%SCRIPT_DIR%\qt\%LINKAGE%"
 if not defined EIGEN_DIR set "EIGEN_DIR=%SCRIPT_DIR%\eigen"
+if defined ONNXRUNTIME_VERSION if not defined ONNXRUNTIME_DIR set "ONNXRUNTIME_DIR=%SCRIPT_DIR%\onnxruntime"
 set "BUNDLED_EIGEN_DIR=%SCRIPT_DIR%\eigen-%EIGEN_VERSION%"
 
 if not exist "%SCRIPT_DIR%\qt" mkdir "%SCRIPT_DIR%\qt"
@@ -136,6 +158,20 @@ if errorlevel 1 (
 )
 
 :after_eigen
+if not defined ONNXRUNTIME_VERSION goto after_onnxruntime
+if "%FORCE%"=="1" goto download_onnxruntime
+if exist "%ONNXRUNTIME_DIR%\include\onnxruntime_cxx_api.h" (
+    echo ONNX Runtime already present at %ONNXRUNTIME_DIR%
+    goto after_onnxruntime
+)
+
+:download_onnxruntime
+call "%REPO_ROOT%\scripts\ci\download_toolchain.bat" --kind onnxruntime --version "%ONNXRUNTIME_VERSION%" --output-dir "%ONNXRUNTIME_DIR%" --repository "%REPOSITORY%" --release-tag "%ONNXRUNTIME_RELEASE_TAG%"
+if errorlevel 1 (
+    echo Failed to download ONNX Runtime %ONNXRUNTIME_VERSION%. The ml library will build without ONNX support.
+)
+
+:after_onnxruntime
 echo.
 echo Dependency setup complete.
 if "%SKIP_QT%"=="1" (
@@ -149,6 +185,9 @@ if exist "%EIGEN_DIR%\share\eigen3\cmake\Eigen3Config.cmake" (
 ) else (
     echo   Eigen: bundled fallback at %BUNDLED_EIGEN_DIR%
     echo   CMake prefix hint: %QT_DIR%
+)
+if defined ONNXRUNTIME_VERSION (
+    echo   ONNX Runtime: %ONNXRUNTIME_DIR%
 )
 exit /b 0
 
@@ -171,6 +210,9 @@ echo   --eigen-version ^<version^>     Eigen version to download ^(default: 5.0.
 echo   --linkage ^<dynamic^|static^>   Qt linkage to prepare ^(default: dynamic^)
 echo   --qt-dir ^<path^>               Target directory for the Qt bundle
 echo   --eigen-dir ^<path^>            Target directory for the Eigen bundle
+echo   --onnxruntime-version ^<ver^>   ONNX Runtime version to download ^(default: none^)
+echo   --onnxruntime-dir ^<path^>      Target directory for the ONNX Runtime package
+echo   --onnxruntime-release-tag ^<t^> Override the ONNX Runtime prerelease tag
 echo   --skip-qt                       Skip Qt download and keep using the provided/local Qt prefix
 echo   --repository ^<owner/repo^>     Repository hosting the prerelease assets ^(default: mne-tools/mne-cpp^)
 echo   --qt-release-tag ^<tag^>        Override the Qt prerelease tag
