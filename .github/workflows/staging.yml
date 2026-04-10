@@ -33,6 +33,9 @@ concurrency:
   group: staging-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 env:
   # Minimum acceptable line coverage percentage (libraries only).
   # The pipeline will FAIL if coverage drops below this.
@@ -72,6 +75,10 @@ jobs:
           --title "Development Builds" \
           --notes "Latest development builds from the staging branch. These are pre-release builds for testing." \
           --target ${{ github.sha }}
+
+        # Ensure the release is published (not draft) — guards against
+        # token-permission or API quirks that silently create drafts.
+        gh release edit dev_build --draft=false --prerelease
 
   # ── Platform release builds (parallel) ───────────────────────────────────
   Linux:
