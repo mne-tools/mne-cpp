@@ -473,7 +473,7 @@ Mosher & Leahy (1999) already proposed that the subspace correlation scan can be
 
 ### Powell-Accelerated Pair Scanning
 
-To make dipole-pair scanning computationally tractable, MNE-CPP employs a **Powell coordinate-descent strategy** (Dinh et al., 2012): instead of evaluating all $\binom{N_{\text{grid}}}{2}$ pairs exhaustively, the algorithm alternates between fixing one dipole index and scanning the other along all grid points. This reduces the search from $O(N^2)$ to iterative $O(N)$ sweeps that converge rapidly to the global maximum. The pair search is parallelized with OpenMP.
+To make dipole-pair scanning computationally tractable, MNE-CPP employs a **Powell coordinate-descent strategy** (Dinh et al., 2012): instead of evaluating all $\binom{N_{\text{grid}}}{2}$ pairs exhaustively, the algorithm alternates between fixing one dipole index and scanning the other along all grid points. This reduces the search from $O(N^2)$ to iterative $O(N)$ sweeps that converge rapidly, though not necessarily to the global maximum. The pair search is parallelized with OpenMP.
 
 The procedure is:
 
