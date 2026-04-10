@@ -36,6 +36,10 @@ set(SOURCES
     beamformer/inv_beamformer_compute.cpp
     beamformer/inv_lcmv.cpp
     beamformer/inv_dics.cpp
+    sparse/inv_mxne.cpp
+    sparse/inv_gamma_map.cpp
+    minimum_norm/inv_cmne.cpp
+    minimum_norm/inv_cmne_settings.cpp
 )
 
 set(HEADERS
@@ -69,6 +73,10 @@ set(HEADERS
     beamformer/inv_beamformer_settings.h
     beamformer/inv_lcmv.h
     beamformer/inv_dics.h
+    sparse/inv_mxne.h
+    sparse/inv_gamma_map.h
+    minimum_norm/inv_cmne.h
+    minimum_norm/inv_cmne_settings.h
 )
 
 set(FILE_TO_UPDATE inv_global.cpp)
