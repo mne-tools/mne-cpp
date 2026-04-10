@@ -78,38 +78,58 @@ InvCmneResult InvCmne::compute(
 {
     InvCmneResult result;
 
+    int nChannels = matGain.rows();
+    int nSources  = matGain.cols();
+    int nTimes    = matEvoked.cols();
+
     // Step 1: Compute dSPM kernel
+    qInfo() << "[InvCmne] Step 1/4: Computing dSPM kernel"
+            << "(" << nChannels << "ch x" << nSources << "src, lambda2="
+            << settings.lambda2 << ") …";
     MatrixXd matKernelDspm = computeDspmKernel(matGain, matNoiseCov, matSrcCov, settings.lambda2);
     result.matKernelDspm = matKernelDspm;
+    qInfo() << "[InvCmne] Step 1/4: dSPM kernel done"
+            << "(" << matKernelDspm.rows() << "x" << matKernelDspm.cols() << ").";
 
     // Step 2: Apply kernel to evoked data -> dSPM source estimate
+    qInfo() << "[InvCmne] Step 2/4: Projecting evoked data to source space"
+            << "(" << nTimes << "time points) …";
     MatrixXd matDspmData = matKernelDspm * matEvoked;  // n_sources x n_times
 
     // Build dSPM source estimate
     VectorXi vertices = VectorXi::LinSpaced(matDspmData.rows(), 0, matDspmData.rows() - 1);
     result.stcDspm = InvSourceEstimate(matDspmData, vertices, 0.0f, 1.0f);
+    qInfo() << "[InvCmne] Step 2/4: dSPM source estimate done"
+            << "(" << matDspmData.rows() << "sources x" << matDspmData.cols() << "samples).";
 
     // Step 3: Z-score rectify
+    qInfo() << "[InvCmne] Step 3/4: Z-score rectifying source data …";
     MatrixXd matZScored = zScoreRectify(matDspmData);
+    qInfo() << "[InvCmne] Step 3/4: Z-score rectification done.";
 
     // Step 4: Apply LSTM correction if model available and enough time points
-    int nTimes = matDspmData.cols();
     MatrixXd matCmneData;
 
     if (!settings.onnxModelPath.isEmpty() && nTimes >= settings.lookBack) {
+        qInfo() << "[InvCmne] Step 4/4: Applying LSTM temporal correction"
+               << "(look-back=" << settings.lookBack << ","
+               << (nTimes - settings.lookBack) << "correctable time points) …";
         matCmneData = applyLstmCorrection(matZScored, settings.onnxModelPath, settings.lookBack);
 
         // Store raw LSTM prediction for diagnostics
         result.stcLstmPredict = InvSourceEstimate(matCmneData, vertices, 0.0f, 1.0f);
+        qInfo() << "[InvCmne] Step 4/4: LSTM correction done.";
     } else {
         // No correction possible — CMNE falls back to dSPM
         matCmneData = matDspmData;
 
         if (settings.onnxModelPath.isEmpty()) {
-            qDebug() << "[InvCmne::compute] No ONNX model path provided, returning uncorrected dSPM.";
+            qInfo() << "[InvCmne] Step 4/4: No ONNX model — using moving-average correction.";
+            matCmneData = applyLstmCorrection(matZScored, QString(), settings.lookBack);
+            qInfo() << "[InvCmne] Step 4/4: Moving-average correction done.";
         } else {
-            qDebug() << "[InvCmne::compute] Not enough time points for lookBack window"
-                     << "(need" << settings.lookBack << ", have" << nTimes << ").";
+            qInfo() << "[InvCmne] Step 4/4: Not enough time points for lookBack window"
+                    << "(need" << settings.lookBack << ", have" << nTimes << ").";
         }
     }
 
@@ -132,6 +152,8 @@ MatrixXd InvCmne::computeDspmKernel(
 
     // Step 1: Whiten noise covariance via eigendecomposition
     // C_n = V * D * V^T  ->  C_n^{-1/2} = V * D^{-1/2} * V^T
+    qInfo() << "  [dSPM kernel] Eigendecomposition of noise covariance"
+            << "(" << nChannels << "x" << nChannels << ") …";
     SelfAdjointEigenSolver<MatrixXd> eigSolver(matNoiseCov);
     VectorXd eigVals = eigSolver.eigenvalues();
     MatrixXd eigVecs = eigSolver.eigenvectors();
@@ -147,24 +169,24 @@ MatrixXd InvCmne::computeDspmKernel(
     MatrixXd matWhitener = eigVecs * eigValsInvSqrt.asDiagonal() * eigVecs.transpose();
 
     // Step 2: Whiten gain matrix
+    qInfo() << "  [dSPM kernel] Whitening gain matrix …";
     MatrixXd matGainWhitened = matWhitener * matGain;  // n_channels x n_sources
 
     // Step 3: MNE kernel
+    qInfo() << "  [dSPM kernel] Computing MNE kernel (LDLT solve," << nChannels << "x" << nChannels << ") …";
     // K = C_R * G_tilde^T * (G_tilde * C_R * G_tilde^T + lambda2 * I)^{-1}
     MatrixXd matGCR = matGainWhitened * matSrcCov;                         // n_channels x n_sources
     MatrixXd matA = matGCR * matGainWhitened.transpose();                  // n_channels x n_channels
     matA.diagonal().array() += lambda2;
 
-    // Solve: K = C_R * G_tilde^T * A^{-1}
-    // Equivalent to: K^T = A^{-1} * G_tilde * C_R, then transpose
-    MatrixXd matKT = matA.ldlt().solve(matGCR);                            // n_channels x n_sources
-    MatrixXd matK = matSrcCov * matGainWhitened.transpose() * matA.ldlt().solve(MatrixXd::Identity(nChannels, nChannels));
-    // Simplification: K = (C_R * G_tilde^T) * A^{-1}
-    matK = (matSrcCov * matGainWhitened.transpose()) * matA.ldlt().solve(MatrixXd::Identity(nChannels, nChannels));
+    // Solve once: A^{-1} via LDLT, then K = (C_R * G_tilde^T) * A^{-1}
+    auto ldlt = matA.ldlt();
+    MatrixXd matK = (matSrcCov * matGainWhitened.transpose()) * ldlt.solve(MatrixXd::Identity(nChannels, nChannels));
 
     // Step 4: dSPM normalization
     // noise_norm_i = sqrt((K * C_n * K^T)(i,i))
     // K_dSPM(i,:) = K(i,:) / noise_norm_i
+    qInfo() << "  [dSPM kernel] Normalizing" << nSources << "source rows …";
     MatrixXd matKCn = matK * matNoiseCov;  // n_sources x n_channels
     for (int i = 0; i < nSources; ++i) {
         double noiseNorm = std::sqrt(matKCn.row(i).dot(matK.row(i)));
@@ -216,8 +238,17 @@ MatrixXd InvCmne::applyLstmCorrection(
 
     MatrixXd result = matDspmData;  // copy — for t < lookBack: identity (no correction)
 
+    int nCorrectableSteps = nTimes - lookBack;
+    int reportInterval = qMax(1, nCorrectableSteps / 10);  // report ~10 times
+
     // For t >= lookBack: apply temporal correction
     for (int t = lookBack; t < nTimes; ++t) {
+        int step = t - lookBack;
+        if (step % reportInterval == 0 || t == nTimes - 1) {
+            double pct = 100.0 * (step + 1) / nCorrectableSteps;
+            qInfo().noquote() << QString("  [LSTM correction] %1% (%2/%3 time steps)")
+                .arg(pct, 0, 'f', 0).arg(step + 1).arg(nCorrectableSteps);
+        }
         // Extract window: last lookBack columns before t
         MatrixXd window = result.middleCols(t - lookBack, lookBack);
 
@@ -252,6 +283,7 @@ UTILSLIB::PythonRunnerResult InvCmne::trainLstm(
     int trainEpochs,
     double learningRate,
     int batchSize,
+    const QString& finetuneOnnxPath,
     const QString& pythonExe)
 {
     // Resolve training package directory (contains pyproject.toml + script)
@@ -306,6 +338,10 @@ UTILSLIB::PythonRunnerResult InvCmne::trainLstm(
 
     if (!gtStcPrefix.isEmpty()) {
         args << QStringLiteral("--gt-stc") << gtStcPrefix;
+    }
+
+    if (!finetuneOnnxPath.isEmpty()) {
+        args << QStringLiteral("--finetune") << finetuneOnnxPath;
     }
 
     // Configure PythonRunner with venv + pyproject.toml

@@ -144,6 +144,7 @@ public:
      * @param[in] trainEpochs    Number of training epochs (default 50).
      * @param[in] learningRate   Learning rate (default 1e-3).
      * @param[in] batchSize      Batch size (default 64).
+     * @param[in] finetuneOnnxPath  Existing ONNX model to fine-tune from (optional).
      * @param[in] pythonExe      Python interpreter (default "python3").
      *
      * @return PythonRunnerResult with exit code, captured output and progress.
@@ -160,6 +161,7 @@ public:
         int trainEpochs = 50,
         double learningRate = 1e-3,
         int batchSize = 64,
+        const QString& finetuneOnnxPath = {},
         const QString& pythonExe = QStringLiteral("python3"));
 
 private:
