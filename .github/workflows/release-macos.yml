@@ -56,9 +56,17 @@ jobs:
           --kind eigen \
           --version "5.0.1" \
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+    - name: Download ONNX Runtime
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind onnxruntime \
+          --version "1.21.0" \
+          --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
     - name: Configure and compile MNE-CPP
       run: |
-        ./scripts/build/build_project.sh
+        ./scripts/build/build_project.sh -- -DUSE_ONNXRUNTIME=ON
     - name: Free up disk space before packaging
       run: |
         echo "Disk usage before cleanup:" && df -h
@@ -143,6 +151,14 @@ jobs:
           --kind eigen \
           --version "5.0.1" \
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+    - name: Download ONNX Runtime
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind onnxruntime \
+          --version "1.21.0" \
+          --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
     - name: Cache static Qt binaries
       id: cache-qt-static
       uses: actions/cache@v5
@@ -175,7 +191,7 @@ jobs:
     - name: Configure and compile MNE-CPP (static)
       run: |
         export CMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/Qt6_static
-        ./scripts/build/build_project.sh static
+        ./scripts/build/build_project.sh static -- -DUSE_ONNXRUNTIME=ON
     - name: Deploy binaries (MacOS)
       run: |
         ./scripts/deploy/deploy.bat static pack

@@ -57,6 +57,16 @@ jobs:
           --version "5.0.1" \
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
 
+    - name: Download ONNX Runtime (Linux|MacOS)
+      if: matrix.os == 'ubuntu-24.04' || matrix.os == 'macos-26'
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind onnxruntime \
+          --version "1.21.0" \
+          --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
+
     - name: Download Qt toolchain (Windows)
       if: matrix.os == 'windows-2025'
       shell: cmd
@@ -73,10 +83,18 @@ jobs:
       run: |
         call scripts\ci\download_toolchain.bat --kind eigen --version "5.0.1" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
 
+    - name: Download ONNX Runtime (Windows)
+      if: matrix.os == 'windows-2025'
+      shell: cmd
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        call scripts\ci\download_toolchain.bat --kind onnxruntime --version "1.21.0" --output-dir "%GITHUB_WORKSPACE%\src\external\onnxruntime"
+
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: matrix.os == 'ubuntu-24.04' || matrix.os == 'macos-26'
       run: |
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DUSE_ONNXRUNTIME=ON
         cmake --build build
 
     - name: Configure and compile MNE-CPP (Windows)
@@ -84,7 +102,7 @@ jobs:
       run: |
         cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DUSE_ONNXRUNTIME=ON
         cmake --build build --config Release
 
     - name: Deploy binaries

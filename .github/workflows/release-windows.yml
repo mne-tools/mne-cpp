@@ -52,11 +52,17 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
         call scripts\ci\download_toolchain.bat --kind eigen --version "5.0.1" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
+    - name: Download ONNX Runtime
+      shell: cmd
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        call scripts\ci\download_toolchain.bat --kind onnxruntime --version "1.21.0" --output-dir "%GITHUB_WORKSPACE%\src\external\onnxruntime"
     - name: Configure and compile MNE-CPP
       run: |
         cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        ./scripts/build/build_project.bat
+        ./scripts/build/build_project.bat -- -DUSE_ONNXRUNTIME=ON
     - name: Deploy binaries (Windows)
       run: |
         echo "Qt environment:"
@@ -131,6 +137,12 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
         call scripts\ci\download_toolchain.bat --kind eigen --version "5.0.1" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
+    - name: Download ONNX Runtime
+      shell: cmd
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        call scripts\ci\download_toolchain.bat --kind onnxruntime --version "1.21.0" --output-dir "%GITHUB_WORKSPACE%\src\external\onnxruntime"
     - name: Cache static Qt binaries
       id: cache-qt-static
       uses: actions/cache@v5
@@ -164,7 +176,7 @@ jobs:
         cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         $env:CMAKE_PREFIX_PATH = "$env:GITHUB_WORKSPACE\Qt6_static"
-        ./scripts/build/build_project.bat static
+        ./scripts/build/build_project.bat static -- -DUSE_ONNXRUNTIME=ON
     - name: Deploy binaries (Windows)
       run: |
         ./scripts/deploy/deploy.bat static pack

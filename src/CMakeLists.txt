@@ -38,7 +38,7 @@ option(WASM "Setup build for wasm" OFF)
 
 option(USE_FFTW "Use fftw backend for eigen" OFF)
 
-option(USE_ONNXRUNTIME "Enable ONNX Runtime backend for the ml library" OFF)
+option(USE_ONNXRUNTIME "Enable ONNX Runtime backend for the ml library" ON)
 
 set(MNE_LOG_LEVEL "INFO" CACHE STRING "Minimum log level: DEBUG, INFO, WARN, CRIT, FATAL")
 set_property(CACHE MNE_LOG_LEVEL PROPERTY STRINGS DEBUG INFO WARN CRIT FATAL)

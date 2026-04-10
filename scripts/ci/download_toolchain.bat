@@ -94,6 +94,15 @@ if /I "%KIND%"=="qt" (
         )
     )
     set "ASSET_NAME=eigen_%VERSION_TOKEN%_any.zip"
+) else if /I "%KIND%"=="onnxruntime" (
+    if not defined RELEASE_TAG (
+        if defined ONNXRUNTIME_TOOLCHAIN_RELEASE_TAG (
+            set "RELEASE_TAG=%ONNXRUNTIME_TOOLCHAIN_RELEASE_TAG%"
+        ) else (
+            set "RELEASE_TAG=onnxruntime_artifacts"
+        )
+    )
+    set "ASSET_NAME=onnxruntime_%VERSION_TOKEN%_windows.zip"
 ) else (
     echo Unsupported toolchain kind: %KIND% 1>&2
     exit /b 1
@@ -133,6 +142,9 @@ if /I "%KIND%"=="qt" (
     call :persist_env CPACK_IFW_ROOT "%OUTPUT_DIR%"
     call :append_path "%OUTPUT_DIR%\bin"
     echo Qt Installer Framework ready at %OUTPUT_DIR%
+) else if /I "%KIND%"=="onnxruntime" (
+    call :persist_env ONNXRUNTIME_ROOT_DIR "%OUTPUT_DIR%"
+    echo ONNX Runtime ready at %OUTPUT_DIR%
 ) else (
     set "EIGEN_CONFIG_DIR=%OUTPUT_DIR%\share\eigen3\cmake"
     if defined CMAKE_PREFIX_PATH (

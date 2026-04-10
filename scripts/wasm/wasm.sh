@@ -134,6 +134,13 @@ if [ -f "${EIGEN_DIR}/share/eigen3/cmake/Eigen3Config.cmake" ]; then
     EIGEN_CMAKE_ARGS="-DEigen3_DIR=${EIGEN_DIR}/share/eigen3/cmake"
 fi
 
+# Locate ONNX Runtime for cross-compilation
+ONNXRUNTIME_DIR="${PROJECT_BASE_PATH}/src/external/onnxruntime"
+ONNXRUNTIME_CMAKE_ARGS=""
+if [ -d "${ONNXRUNTIME_DIR}" ]; then
+    ONNXRUNTIME_CMAKE_ARGS="-DUSE_ONNXRUNTIME=ON -DONNXRUNTIME_ROOT_DIR=${ONNXRUNTIME_DIR}"
+fi
+
 ${Qt6_DIR}/wasm_multithread/bin/qt-cmake \
         -DQT_HOST_PATH=${QT_HOST_PATH} \
 	-DCMAKE_BUILD_TYPE=Release \
@@ -141,7 +148,8 @@ ${Qt6_DIR}/wasm_multithread/bin/qt-cmake \
 	-S ${SOURCE_DIRECTORY} \
 	-B ${BUILD_DIRECTORY} \
 	-DWASM=ON \
-	${EIGEN_CMAKE_ARGS}
+	${EIGEN_CMAKE_ARGS} \
+	${ONNXRUNTIME_CMAKE_ARGS}
 
 cmake \
 	--build ${BUILD_DIRECTORY} \

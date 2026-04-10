@@ -5,7 +5,7 @@ set -euo pipefail
 usage()
 {
     cat <<'EOF'
-Usage: ./scripts/ci/download_toolchain.sh --kind <qt|ifw|eigen|onnxruntime> --version <version> --output-dir <dir> [--linkage <dynamic|static>] [--release-tag <tag>] [--repository <owner/repo>]
+Usage: ./scripts/ci/download_toolchain.sh --kind <qt|ifw|eigen|onnxruntime> --version <version> --output-dir <dir> [--linkage <dynamic|static>] [--platform <platform>] [--release-tag <tag>] [--repository <owner/repo>]
 EOF
 }
 
@@ -71,6 +71,7 @@ VERSION=""
 LINKAGE=""
 OUTPUT_DIR=""
 RELEASE_TAG=""
+PLATFORM_OVERRIDE=""
 REPOSITORY="${GITHUB_REPOSITORY:-mne-tools/mne-cpp}"
 
 while [[ $# -gt 0 ]]; do
@@ -93,6 +94,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --release-tag)
             RELEASE_TAG="$2"
+            shift 2
+            ;;
+        --platform)
+            PLATFORM_OVERRIDE="$2"
             shift 2
             ;;
         --repository)
@@ -132,6 +137,10 @@ case "$(uname -s)" in
         exit 1
         ;;
 esac
+
+if [[ -n "${PLATFORM_OVERRIDE}" ]]; then
+    PLATFORM="${PLATFORM_OVERRIDE}"
+fi
 
 VERSION_TOKEN="${VERSION//./}"
 
@@ -176,6 +185,12 @@ case "${KIND}" in
                 else
                     ASSET_NAME="onnxruntime_${VERSION_TOKEN}_macos_x86_64.${ARCHIVE_EXTENSION}"
                 fi
+                ;;
+            windows)
+                ASSET_NAME="onnxruntime_${VERSION_TOKEN}_windows.${ARCHIVE_EXTENSION}"
+                ;;
+            wasm)
+                ASSET_NAME="onnxruntime_${VERSION_TOKEN}_wasm.${ARCHIVE_EXTENSION}"
                 ;;
         esac
         ;;

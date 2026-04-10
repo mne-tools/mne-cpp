@@ -279,6 +279,16 @@ jobs:
           --version "5.0.1" \
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
 
+    - name: Download ONNX Runtime (WASM)
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind onnxruntime \
+          --version "1.21.0" \
+          --platform wasm \
+          --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
+
     - name: Build WASM
       run: |
         source ../emsdk/emsdk_env.sh

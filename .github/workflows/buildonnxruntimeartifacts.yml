@@ -142,3 +142,69 @@ jobs:
       run: |
         bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.ONNXRUNTIME_ARTIFACT_RELEASE_TAG }}"
         gh release upload "${{ env.ONNXRUNTIME_ARTIFACT_RELEASE_TAG }}" "onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_windows.zip" --clobber
+
+  BuildWasm:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qq build-essential ninja-build
+
+    - name: Setup Emscripten SDK
+      run: |
+        git clone https://github.com/emscripten-core/emsdk.git ../emsdk
+        cd ../emsdk
+        ./emsdk install 4.0.7
+        ./emsdk activate 4.0.7
+
+    - name: Clone ONNX Runtime source
+      run: |
+        git clone --depth 1 --branch v${{ env.ONNXRUNTIME_VERSION }} \
+          --recurse-submodules --shallow-submodules \
+          https://github.com/microsoft/onnxruntime.git ../onnxruntime
+
+    - name: Build ONNX Runtime static library for WASM
+      run: |
+        source ../emsdk/emsdk_env.sh
+        cd ../onnxruntime
+        ./build.sh \
+          --build_wasm_static_lib \
+          --skip_tests \
+          --disable_wasm_exception_catching \
+          --disable_rtti \
+          --parallel \
+          --config Release \
+          --cmake_extra_defines onnxruntime_BUILD_UNIT_TESTS=OFF
+
+    - name: Package WASM static library
+      run: |
+        mkdir -p onnxruntime-wasm/include onnxruntime-wasm/lib
+        # Copy headers from source
+        cp ../onnxruntime/include/onnxruntime/core/session/*.h onnxruntime-wasm/include/
+        # Copy the static library from the build output
+        find ../onnxruntime/build -name 'libonnxruntime.a' -o -name 'onnxruntime.a' | head -1 | xargs -I{} cp {} onnxruntime-wasm/lib/
+        # Also copy any additional static libs that may be needed
+        find ../onnxruntime/build -name 'libonnxruntime_common.a' | head -1 | xargs -I{} cp {} onnxruntime-wasm/lib/ 2>/dev/null || true
+        find ../onnxruntime/build -name 'libonnxruntime_session.a' | head -1 | xargs -I{} cp {} onnxruntime-wasm/lib/ 2>/dev/null || true
+        # Verify
+        test -f onnxruntime-wasm/include/onnxruntime_cxx_api.h
+        ls -la onnxruntime-wasm/lib/
+        tar cfvz "onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_wasm.tar.gz" -C onnxruntime-wasm .
+
+    - uses: actions/upload-artifact@v7
+      with:
+        name: onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_wasm.tar.gz
+        path: onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_wasm.tar.gz
+
+    - name: Create dependency release and upload
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
+      run: |
+        bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.ONNXRUNTIME_ARTIFACT_RELEASE_TAG }}"
+        gh release upload "${{ env.ONNXRUNTIME_ARTIFACT_RELEASE_TAG }}" "onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_wasm.tar.gz" --clobber
