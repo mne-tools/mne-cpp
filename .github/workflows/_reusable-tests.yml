@@ -85,6 +85,16 @@ jobs:
           --version "5.0.1" \
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
 
+    - name: Download ONNX Runtime (Linux|MacOS)
+      if: matrix.os == 'ubuntu-24.04' || matrix.os == 'macos-26'
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind onnxruntime \
+          --version "1.21.0" \
+          --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
+
     - name: Download Qt toolchain (Windows)
       if: matrix.os == 'windows-2025'
       shell: cmd
@@ -100,6 +110,14 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
         call scripts\ci\download_toolchain.bat --kind eigen --version "5.0.1" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
+
+    - name: Download ONNX Runtime (Windows)
+      if: matrix.os == 'windows-2025'
+      shell: cmd
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        call scripts\ci\download_toolchain.bat --kind onnxruntime --version "1.21.0" --output-dir "%GITHUB_WORKSPACE%\src\external\onnxruntime"
 
     - name: Install MNE-Python
       run: |
