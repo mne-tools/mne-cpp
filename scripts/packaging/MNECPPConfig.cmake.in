@@ -10,7 +10,8 @@
 #    MNE-CPP::mne_fs          MNE-CPP::mne_mne        MNE-CPP::mne_fwd
 #    MNE-CPP::mne_inv         MNE-CPP::mne_com        MNE-CPP::mne_conn
 #    MNE-CPP::mne_dsp         MNE-CPP::mne_lsl        MNE-CPP::mne_mri
-#    MNE-CPP::mne_disp        MNE-CPP::mne_disp3D
+#    MNE-CPP::mne_bids        MNE-CPP::mne_mna        MNE-CPP::mne_ml
+#    MNE-CPP::mne_sts         MNE-CPP::mne_disp       MNE-CPP::mne_disp3D
 #
 #  Usage:
 #    find_package(MNE-CPP 2.0.0 REQUIRED)
@@ -43,7 +44,8 @@ include("${CMAKE_CURRENT_LIST_DIR}/MNECPPTargets.cmake")
 # so ensure Qt::Core and Eigen3::Eigen propagate to consuming targets.
 set(_mnecpp_all_targets
     mne_utils mne_math mne_fiff mne_fs mne_mne mne_fwd mne_inv
-    mne_com mne_conn mne_dsp mne_lsl mne_mri mne_disp mne_disp3D
+    mne_com mne_conn mne_dsp mne_lsl mne_mri mne_bids
+    mne_mna mne_ml mne_sts mne_disp mne_disp3D
 )
 foreach(_t IN LISTS _mnecpp_all_targets)
     if(TARGET MNE-CPP::${_t})
@@ -73,6 +75,10 @@ set(MNE_CPP_LIBRARIES
     mne_dsp
     mne_lsl
     mne_mri
+    mne_bids
+    mne_mna
+    mne_ml
+    mne_sts
     mne_disp
     mne_disp3D
 )

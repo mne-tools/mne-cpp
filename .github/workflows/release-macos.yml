@@ -18,8 +18,9 @@ jobs:
       id: release-info
       run: |
         if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-          echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
-          echo "prefix=mne-cpp-${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          TAG="${GITHUB_REF#refs/tags/}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "prefix=mne-cpp-${TAG#v}" >> "$GITHUB_OUTPUT"
           echo "should_upload=true" >> "$GITHUB_OUTPUT"
         elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
           echo "tag=latest" >> "$GITHUB_OUTPUT"
@@ -119,8 +120,9 @@ jobs:
       id: release-info
       run: |
         if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-          echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
-          echo "prefix=mne-cpp-${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          TAG="${GITHUB_REF#refs/tags/}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "prefix=mne-cpp-${TAG#v}" >> "$GITHUB_OUTPUT"
           echo "should_upload=true" >> "$GITHUB_OUTPUT"
         elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
           echo "tag=latest" >> "$GITHUB_OUTPUT"

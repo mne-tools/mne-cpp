@@ -1213,8 +1213,12 @@ bool MainWindow::openFiffRawData(FIFFLIB::FiffRawData& raw, const QString& featu
         statusBar()->showMessage(tr("Load a raw FIF file before using %1.").arg(label), 5000);
         return false;
     }
-    QBuffer rawBuffer(&s_wasmByteArray);
-    raw = FIFFLIB::FiffRawData(rawBuffer);
+    // Use the persistent member buffer so FiffRawData's internal FiffStream
+    // keeps a valid QIODevice* after this function returns.
+    if (m_wasmRawBuffer.isOpen())
+        m_wasmRawBuffer.close();
+    m_wasmRawBuffer.setBuffer(&s_wasmByteArray);
+    raw = FIFFLIB::FiffRawData(m_wasmRawBuffer);
 #else
     if (m_qFileRaw.fileName().isEmpty() || !QFile::exists(m_qFileRaw.fileName())) {
         statusBar()->showMessage(tr("Load a raw FIF file before using %1.").arg(label), 5000);

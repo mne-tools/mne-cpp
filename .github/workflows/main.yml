@@ -340,8 +340,10 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        cp mne-cpp-wasm.tar.gz "mne-cpp-${{ github.ref_name }}-wasm.tar.gz"
-        gh release upload "${{ github.ref_name }}" "mne-cpp-${{ github.ref_name }}-wasm.tar.gz" --clobber
+        VERSION="${{ github.ref_name }}"
+        VERSION="${VERSION#v}"
+        cp mne-cpp-wasm.tar.gz "mne-cpp-${VERSION}-wasm.tar.gz"
+        gh release upload "${{ github.ref_name }}" "mne-cpp-${VERSION}-wasm.tar.gz" --clobber
 
     - name: Deploy WASM to mne-cpp/wasm repository
       env:

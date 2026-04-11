@@ -98,6 +98,7 @@
 
 #include "ui_mainwindow.h"
 
+#include <QBuffer>
 #include <QFileDialog>
 #include <QScrollBar>
 #include <QToolBar>
@@ -514,6 +515,10 @@ protected:
     QFile                   m_qInverseOperatorFile;         /**< Inverse-operator fif file used for source-estimate export. */
     FIFFLIB::FiffCov        m_covariance;                   /**< Last computed covariance matrix. */
     MNELIB::MNEInverseOperator m_inverseOperator;           /**< Last loaded inverse operator. */
+
+#ifdef WASMBUILD
+    QBuffer                 m_wasmRawBuffer;                /**< Persistent QBuffer wrapping s_wasmByteArray so FiffRawData\n                                                                 keeps a valid QIODevice after openFiffRawData returns. */
+#endif
 
     //Window widgets
     EventWindow*            m_pEventWindow;                 /**< Event widget which display the event view. */

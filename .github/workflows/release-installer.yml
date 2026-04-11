@@ -46,8 +46,9 @@ jobs:
       shell: bash
       run: |
         if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-          echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
-          echo "asset_prefix=mne-cpp-${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          TAG="${GITHUB_REF#refs/tags/}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "asset_prefix=mne-cpp-${TAG#v}" >> "$GITHUB_OUTPUT"
         elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
           echo "tag=latest" >> "$GITHUB_OUTPUT"
           echo "asset_prefix=mne-cpp-latest" >> "$GITHUB_OUTPUT"
@@ -103,8 +104,9 @@ jobs:
       shell: bash
       run: |
         if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-          echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
-          echo "asset_prefix=mne-cpp-${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          TAG="${GITHUB_REF#refs/tags/}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "asset_prefix=mne-cpp-${TAG#v}" >> "$GITHUB_OUTPUT"
         elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
           echo "tag=latest" >> "$GITHUB_OUTPUT"
           echo "asset_prefix=mne-cpp-latest" >> "$GITHUB_OUTPUT"
@@ -252,8 +254,9 @@ jobs:
       shell: bash
       run: |
         if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-          echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
-          echo "asset_prefix=mne-cpp-${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          TAG="${GITHUB_REF#refs/tags/}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "asset_prefix=mne-cpp-${TAG#v}" >> "$GITHUB_OUTPUT"
         elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
           echo "tag=latest" >> "$GITHUB_OUTPUT"
           echo "asset_prefix=mne-cpp-latest" >> "$GITHUB_OUTPUT"
