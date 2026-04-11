@@ -77,6 +77,50 @@ enum class MnaContainerFormat {
 };
 
 //=============================================================================================================
+
+/**
+ * Describes the kind of data flowing through a graph port.
+ */
+enum class MnaDataKind {
+    FiffRaw,            ///< Raw MEG/EEG data (FIFF format)
+    Forward,            ///< Forward solution
+    Inverse,            ///< Inverse operator
+    Covariance,         ///< Noise or data covariance matrix
+    SourceEstimate,     ///< Source-level time series
+    Epochs,             ///< Epoched data
+    Evoked,             ///< Averaged evoked response
+    Matrix,             ///< Generic Eigen matrix (for intermediate results)
+    Volume,             ///< MRI volume data
+    Surface,            ///< Surface mesh (FreeSurfer)
+    Bem,                ///< BEM model
+    Annotation,         ///< FreeSurfer annotation / parcellation
+    Label,              ///< ROI label
+    RealTimeStream,     ///< Live data channel (MNE Scan / LSL / FIFF-RT)
+    Custom              ///< User-defined data kind
+};
+
+//=============================================================================================================
+
+/**
+ * Direction of a port on a graph node.
+ */
+enum class MnaPortDir {
+    Input,
+    Output
+};
+
+//=============================================================================================================
+
+/**
+ * Execution mode for a graph node.
+ */
+enum class MnaNodeExecMode {
+    Batch,   ///< Runs once on static file-based inputs (default)
+    Stream,  ///< Runs continuously on real-time data (MNE Scan mode)
+    Ipc      ///< Delegates to an external process via inter-process communication
+};
+
+//=============================================================================================================
 // HELPER FUNCTIONS
 //=============================================================================================================
 

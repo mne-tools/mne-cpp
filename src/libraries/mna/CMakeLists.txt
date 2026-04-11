@@ -21,6 +21,14 @@ set(SOURCES
   mna_subject.cpp
   mna_project.cpp
   mna_io.cpp
+  mna_port.cpp
+  mna_node.cpp
+  mna_op_schema.cpp
+  mna_op_registry.cpp
+  mna_param_binding.cpp
+  mna_param_tree.cpp
+  mna_graph.cpp
+  mna_graph_executor.cpp
 )
 
 set(HEADERS
@@ -33,6 +41,14 @@ set(HEADERS
   mna_subject.h
   mna_project.h
   mna_io.h
+  mna_port.h
+  mna_node.h
+  mna_op_schema.h
+  mna_op_registry.h
+  mna_param_binding.h
+  mna_param_tree.h
+  mna_graph.h
+  mna_graph_executor.h
 )
 
 set(FILE_TO_UPDATE mna_global.cpp)
