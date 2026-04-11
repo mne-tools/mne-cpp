@@ -56,9 +56,12 @@
 // MNE-CPP INCLUDES
 //=============================================================================================================
 
-#include <ml/ml_trainer.h>
 #include <ml/ml_onnx_model.h>
 #include <ml/ml_tensor.h>
+
+#ifndef WASMBUILD
+#include <ml/ml_trainer.h>
+#endif
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -321,6 +324,8 @@ MatrixXd InvCMNE::applyLstmCorrection(
 
 //=============================================================================================================
 
+#ifndef WASMBUILD
+
 UTILSLIB::PythonRunnerResult InvCMNE::trainLstm(
     const QString& fwdPath,
     const QString& covPath,
@@ -405,3 +410,5 @@ UTILSLIB::PythonRunnerResult InvCMNE::trainLstm(
 
     return trainer.run(scriptPath, args);
 }
+
+#endif // !WASMBUILD

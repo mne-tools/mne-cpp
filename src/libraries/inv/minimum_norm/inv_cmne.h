@@ -54,7 +54,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+#ifndef WASMBUILD
 namespace UTILSLIB { struct PythonRunnerResult; }
+#endif
 
 //=============================================================================================================
 // DEFINE NAMESPACE INVLIB
@@ -125,6 +127,7 @@ public:
         int lookBack);
 
     //=========================================================================================================
+#ifndef WASMBUILD
     /**
      * Train the CMNE LSTM model by invoking the Python training script.
      *
@@ -163,6 +166,7 @@ public:
         int batchSize = 64,
         const QString& finetuneOnnxPath = {},
         const QString& pythonExe = QStringLiteral("python3"));
+#endif
 
 private:
     //=========================================================================================================
