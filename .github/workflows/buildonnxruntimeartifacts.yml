@@ -171,7 +171,25 @@ jobs:
       run: |
         source ../emsdk/emsdk_env.sh
         cd ../onnxruntime
-        # Retry up to 3 times to handle transient FetchContent download failures
+
+        # Pre-download Eigen to avoid FetchContent failures (GitLab
+        # blocks downloads from GitHub Actions runners).
+        # ORT 1.21.0 needs Eigen commit 1d8b82b0740839c0de7f1242a3585e3390ff5f33
+        EIGEN_COMMIT="1d8b82b0740839c0de7f1242a3585e3390ff5f33"
+        EIGEN_DIR="$(pwd)/build/_deps/eigen-src"
+        mkdir -p "${EIGEN_DIR}"
+        for url in \
+          "https://github.com/eigenteam/eigen-git-mirror/archive/${EIGEN_COMMIT}.tar.gz" \
+          "https://gitlab.com/libeigen/eigen/-/archive/${EIGEN_COMMIT}/eigen-${EIGEN_COMMIT}.tar.gz"; do
+          if curl --fail --location --silent --show-error --retry 3 --retry-delay 5 \
+               -o /tmp/eigen.tar.gz "${url}"; then
+            echo "Downloaded Eigen from ${url}"
+            break
+          fi
+        done
+        tar xzf /tmp/eigen.tar.gz -C "${EIGEN_DIR}" --strip-components=1
+
+        # Retry up to 3 times to handle other transient failures
         for attempt in 1 2 3; do
           echo "Build attempt ${attempt}/3..."
           if ./build.sh \
@@ -181,11 +199,13 @@ jobs:
             --disable_rtti \
             --parallel \
             --config Release \
-            --cmake_extra_defines onnxruntime_BUILD_UNIT_TESTS=OFF; then
+            --cmake_extra_defines onnxruntime_BUILD_UNIT_TESTS=OFF \
+              FETCHCONTENT_SOURCE_DIR_EIGEN="${EIGEN_DIR}"; then
             echo "Build succeeded on attempt ${attempt}"
             exit 0
           fi
           echo "Build attempt ${attempt} failed, retrying..."
+          rm -rf build/Linux
           sleep 10
         done
         echo "All build attempts failed"

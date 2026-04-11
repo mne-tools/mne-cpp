@@ -57,7 +57,6 @@ jobs:
           --version "5.0.1" \
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
     - name: Download ONNX Runtime
-      continue-on-error: true
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
@@ -153,7 +152,6 @@ jobs:
           --version "5.0.1" \
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
     - name: Download ONNX Runtime
-      continue-on-error: true
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |

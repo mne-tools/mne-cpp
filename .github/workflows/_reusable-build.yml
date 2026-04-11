@@ -59,7 +59,6 @@ jobs:
 
     - name: Download ONNX Runtime (Linux|MacOS)
       if: matrix.os == 'ubuntu-24.04' || matrix.os == 'macos-26'
-      continue-on-error: true
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
@@ -86,7 +85,6 @@ jobs:
 
     - name: Download ONNX Runtime (Windows)
       if: matrix.os == 'windows-2025'
-      continue-on-error: true
       shell: cmd
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
