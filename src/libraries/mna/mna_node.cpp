@@ -57,6 +57,7 @@ static QString execModeToString(MnaNodeExecMode mode)
     case MnaNodeExecMode::Batch:  return QStringLiteral("batch");
     case MnaNodeExecMode::Stream: return QStringLiteral("stream");
     case MnaNodeExecMode::Ipc:    return QStringLiteral("ipc");
+    case MnaNodeExecMode::Script: return QStringLiteral("script");
     }
     return QStringLiteral("batch");
 }
@@ -67,6 +68,7 @@ static MnaNodeExecMode execModeFromString(const QString& str)
 {
     if (str == QLatin1String("stream")) return MnaNodeExecMode::Stream;
     if (str == QLatin1String("ipc"))    return MnaNodeExecMode::Ipc;
+    if (str == QLatin1String("script")) return MnaNodeExecMode::Script;
     return MnaNodeExecMode::Batch;
 }
 
@@ -106,6 +108,17 @@ QJsonObject MnaNode::toJson() const
         json[QLatin1String("ipc_transport")] = ipcTransport;
     }
 
+    // Script config
+    if (execMode == MnaNodeExecMode::Script) {
+        json[QLatin1String("script")] = script.toJson();
+    }
+
+    // Verification & provenance
+    QJsonObject verObj = verification.toJson();
+    if (!verObj.isEmpty()) {
+        json[QLatin1String("verification")] = verObj;
+    }
+
     // Metadata
     if (!toolVersion.isEmpty())
         json[QLatin1String("tool_version")] = toolVersion;
@@ -143,6 +156,16 @@ MnaNode MnaNode::fromJson(const QJsonObject& json)
         node.ipcArgs.append(v.toString());
     node.ipcWorkDir   = json[QLatin1String("ipc_work_dir")].toString();
     node.ipcTransport = json[QLatin1String("ipc_transport")].toString();
+
+    // Script
+    if (json.contains(QLatin1String("script"))) {
+        node.script = MnaScript::fromJson(json[QLatin1String("script")].toObject());
+    }
+
+    // Verification
+    if (json.contains(QLatin1String("verification"))) {
+        node.verification = MnaVerification::fromJson(json[QLatin1String("verification")].toObject());
+    }
 
     // Metadata
     node.toolVersion = json[QLatin1String("tool_version")].toString();
@@ -185,6 +208,15 @@ QCborMap MnaNode::toCbor() const
         cbor[QLatin1String("ipc_transport")] = ipcTransport;
     }
 
+    if (execMode == MnaNodeExecMode::Script) {
+        cbor[QLatin1String("script")] = script.toCbor();
+    }
+
+    QCborMap verCbor = verification.toCbor();
+    if (!verCbor.isEmpty()) {
+        cbor[QLatin1String("verification")] = verCbor;
+    }
+
     if (!toolVersion.isEmpty())
         cbor[QLatin1String("tool_version")] = toolVersion;
     if (executedAt.isValid())
@@ -220,6 +252,13 @@ MnaNode MnaNode::fromCbor(const QCborMap& cbor)
         node.ipcArgs.append(v.toString());
     node.ipcWorkDir   = cbor[QLatin1String("ipc_work_dir")].toString();
     node.ipcTransport = cbor[QLatin1String("ipc_transport")].toString();
+
+    if (cbor.contains(QLatin1String("script"))) {
+        node.script = MnaScript::fromCbor(cbor[QLatin1String("script")].toMap());
+    }
+    if (cbor.contains(QLatin1String("verification"))) {
+        node.verification = MnaVerification::fromCbor(cbor[QLatin1String("verification")].toMap());
+    }
 
     node.toolVersion = cbor[QLatin1String("tool_version")].toString();
     QString execStr  = cbor[QLatin1String("executed_at")].toString();

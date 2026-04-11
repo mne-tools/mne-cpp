@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     mna_node.h
+ * @file     mna_script.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April, 2026
@@ -28,22 +28,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MnaNode struct declaration — one operation in the computational graph.
+ * @brief    MnaScript struct declaration — inline code embedded in a graph node.
  *
  */
 
-#ifndef MNA_NODE_H
-#define MNA_NODE_H
+#ifndef MNA_SCRIPT_H
+#define MNA_SCRIPT_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "mna_global.h"
-#include "mna_types.h"
-#include "mna_port.h"
-#include "mna_script.h"
-#include "mna_verification.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -51,11 +47,8 @@
 
 #include <QString>
 #include <QStringList>
-#include <QVariantMap>
-#include <QDateTime>
 #include <QJsonObject>
 #include <QCborMap>
-#include <QList>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNALIB
@@ -66,44 +59,27 @@ namespace MNALIB
 
 //=============================================================================================================
 /**
- * One operation in the computational graph.
+ * Inline script definition embedded in an MnaNode. When the node's execMode is
+ * Script, the executor writes the code to a temporary file, invokes the
+ * interpreter, and captures the results.
  *
- * @brief Graph node representing a processing step.
+ * @brief Inline code for script-type graph nodes.
  */
-struct MNASHARED_EXPORT MnaNode
+struct MNASHARED_EXPORT MnaScript
 {
-    QString     id;                     ///< Unique node identifier
-    QString     opType;                 ///< Operation type (looked up in MnaOpRegistry)
-    QVariantMap attributes;             ///< Operation parameters
-
-    QList<MnaPort> inputs;              ///< Input ports
-    QList<MnaPort> outputs;             ///< Output ports
-
-    MnaNodeExecMode execMode = MnaNodeExecMode::Batch; ///< Execution mode
-
-    // IPC configuration (used when execMode == Ipc)
-    QString     ipcCommand;             ///< External executable command
-    QStringList ipcArgs;                ///< Command-line arguments (supports {{placeholder}} tokens)
-    QString     ipcWorkDir;             ///< Working directory for external process
-    QString     ipcTransport;           ///< "stdio", "tcp", "shm", "file"
-
-    // Script configuration (used when execMode == Script)
-    MnaScript   script;                 ///< Inline source code, interpreter, language
-
-    // Verification & provenance
-    MnaVerification verification;       ///< Explanation, checks, results, and provenance snapshot
-
-    // Execution metadata
-    QString     toolVersion;            ///< Version of tool that last executed this node
-    QDateTime   executedAt;             ///< Timestamp of last execution
-    bool        dirty = true;           ///< Whether node needs re-execution
+    QString     language;           ///< "python", "shell", "r", "matlab", "octave", "julia"
+    QString     interpreter;        ///< Interpreter command (e.g. "python3", "/bin/bash", "Rscript")
+                                    ///< Empty → auto-detect from language
+    QStringList interpreterArgs;    ///< Extra args before the script file (e.g. ["-u"] for unbuffered Python)
+    QString     code;               ///< The inline source code
+    bool        keepTempFile = false; ///< true → preserve temp script file after execution (debug aid)
 
     QJsonObject toJson() const;
-    static MnaNode fromJson(const QJsonObject& json);
+    static MnaScript fromJson(const QJsonObject& json);
     QCborMap toCbor() const;
-    static MnaNode fromCbor(const QCborMap& cbor);
+    static MnaScript fromCbor(const QCborMap& cbor);
 };
 
 } // namespace MNALIB
 
-#endif // MNA_NODE_H
+#endif // MNA_SCRIPT_H

@@ -117,7 +117,8 @@ enum class MnaPortDir {
 enum class MnaNodeExecMode {
     Batch,   ///< Runs once on static file-based inputs (default)
     Stream,  ///< Runs continuously on real-time data (MNE Scan mode)
-    Ipc      ///< Delegates to an external process via inter-process communication
+    Ipc,     ///< Delegates to an external process via inter-process communication
+    Script   ///< Inline code executed via interpreter (Python, shell, R, …)
 };
 
 //=============================================================================================================

@@ -29,6 +29,8 @@ set(SOURCES
   mna_param_tree.cpp
   mna_graph.cpp
   mna_graph_executor.cpp
+  mna_script.cpp
+  mna_verification.cpp
 )
 
 set(HEADERS
@@ -49,6 +51,8 @@ set(HEADERS
   mna_param_tree.h
   mna_graph.h
   mna_graph_executor.h
+  mna_script.h
+  mna_verification.h
 )
 
 set(FILE_TO_UPDATE mna_global.cpp)

@@ -23,6 +23,7 @@
 
 #include <QProcess>
 #include <QDir>
+#include <QTemporaryFile>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -172,6 +173,68 @@ MnaGraphExecutor::Context MnaGraphExecutor::executeIncremental(MnaGraph& graph,
 QVariantMap MnaGraphExecutor::executeNode(const MnaNode& node,
                                             const QVariantMap& inputs)
 {
+    // Script execution — inline code via interpreter
+    if (node.execMode == MnaNodeExecMode::Script) {
+        const MnaScript& script = node.script;
+
+        // Determine file extension from language
+        QString ext = QStringLiteral(".txt");
+        if (script.language == QLatin1String("python"))      ext = QStringLiteral(".py");
+        else if (script.language == QLatin1String("shell"))  ext = QStringLiteral(".sh");
+        else if (script.language == QLatin1String("r"))      ext = QStringLiteral(".R");
+        else if (script.language == QLatin1String("matlab")) ext = QStringLiteral(".m");
+        else if (script.language == QLatin1String("octave")) ext = QStringLiteral(".m");
+        else if (script.language == QLatin1String("julia"))  ext = QStringLiteral(".jl");
+
+        // Substitute {{placeholder}} tokens in the code
+        QString code = script.code;
+        for (auto it = inputs.constBegin(); it != inputs.constEnd(); ++it) {
+            code.replace(QStringLiteral("{{") + it.key() + QStringLiteral("}}"),
+                         it.value().toString());
+        }
+        for (auto it = node.attributes.constBegin(); it != node.attributes.constEnd(); ++it) {
+            code.replace(QStringLiteral("{{") + it.key() + QStringLiteral("}}"),
+                         it.value().toString());
+        }
+
+        // Write code to temporary file
+        QTemporaryFile tempFile(QDir::tempPath() + QStringLiteral("/mna_script_XXXXXX") + ext);
+        tempFile.setAutoRemove(!script.keepTempFile);
+        if (!tempFile.open()) {
+            QVariantMap outputs;
+            outputs.insert(QStringLiteral("stderr"), QStringLiteral("Failed to create temporary script file"));
+            outputs.insert(QStringLiteral("exit_code"), -1);
+            return outputs;
+        }
+        tempFile.write(code.toUtf8());
+        tempFile.close();
+
+        // Determine interpreter
+        QString interpreter = script.interpreter;
+        if (interpreter.isEmpty()) {
+            if (script.language == QLatin1String("python"))      interpreter = QStringLiteral("python3");
+            else if (script.language == QLatin1String("shell"))  interpreter = QStringLiteral("/bin/bash");
+            else if (script.language == QLatin1String("r"))      interpreter = QStringLiteral("Rscript");
+            else if (script.language == QLatin1String("matlab")) interpreter = QStringLiteral("matlab");
+            else if (script.language == QLatin1String("octave")) interpreter = QStringLiteral("octave");
+            else if (script.language == QLatin1String("julia"))  interpreter = QStringLiteral("julia");
+        }
+
+        QStringList args = script.interpreterArgs;
+        args.append(tempFile.fileName());
+
+        QProcess process;
+        process.start(interpreter, args);
+        process.waitForFinished(-1);
+
+        QVariantMap outputs;
+        outputs.insert(QStringLiteral("stdout"), QString::fromUtf8(process.readAllStandardOutput()));
+        outputs.insert(QStringLiteral("stderr"), QString::fromUtf8(process.readAllStandardError()));
+        outputs.insert(QStringLiteral("exit_code"), process.exitCode());
+
+        return outputs;
+    }
+
     // IPC execution
     if (node.execMode == MnaNodeExecMode::Ipc) {
         QProcess process;
