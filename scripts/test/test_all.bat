@@ -235,7 +235,7 @@ fi
 doPrintConfiguration
 
 ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
-BasePath="$(cleanAbsPath "$ScriptPath/..")"
+BasePath="$(cleanAbsPath "$ScriptPath/../..")"
 
 if [[ $(uname) == "Linux" ]]; then
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BasePath/lib

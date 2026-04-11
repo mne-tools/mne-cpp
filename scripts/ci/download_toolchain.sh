@@ -233,6 +233,12 @@ elif [[ "${KIND}" == "ifw" ]]; then
     append_path "${OUTPUT_DIR}/bin"
     echo "Qt Installer Framework ready at ${OUTPUT_DIR}"
 elif [[ "${KIND}" == "onnxruntime" ]]; then
+    # On Linux the Microsoft pre-built tarball ships libraries under lib/
+    # but the bundled CMake config (onnxruntimeTargets.cmake) references
+    # lib64/.  Create a compatibility symlink so both paths resolve.
+    if [[ "$(uname)" == "Linux" && -d "${OUTPUT_DIR}/lib" && ! -d "${OUTPUT_DIR}/lib64" ]]; then
+        ln -sf lib "${OUTPUT_DIR}/lib64"
+    fi
     persist_env "ONNXRUNTIME_ROOT_DIR" "${OUTPUT_DIR}"
     echo "ONNX Runtime ready at ${OUTPUT_DIR}"
 else

@@ -280,6 +280,7 @@ jobs:
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
 
     - name: Download ONNX Runtime (WASM)
+      continue-on-error: true
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |

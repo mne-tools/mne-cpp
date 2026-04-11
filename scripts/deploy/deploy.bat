@@ -15,7 +15,7 @@
     REM setlocal EnableDelayedExpansion
 
     SET SCRIPT_PATH=%~dp0
-    SET BASE_PATH=%SCRIPT_PATH%..
+    SET BASE_PATH=%SCRIPT_PATH%..\..
     SET CURRENT_PATH=%cd%
     
     REM SETX VCINSTALLDIR "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\"
@@ -241,7 +241,7 @@ function cleanAbsPath()
 EXIT_SUCCESS=0
 EXIT_FAIL=1
 ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
-BasePath="$(cleanAbsPath "$ScriptPath/..")"
+BasePath="$(cleanAbsPath "$ScriptPath/../..")"
 OutDirName=""
 LinkOption="dynamic"
 PackOption=""
@@ -302,7 +302,7 @@ for (( j=0; j<argc; j++ )); do
     fi
 done
 
-OutFolder=${BASE_PATH}/out/${BuildName}
+OutFolder=${BasePath}/out/${BuildName}
 
 if [ "${MockBuild}" == "true" ]; then
   MockText="echo "
@@ -595,7 +595,7 @@ function cleanAbsPath()
 EXIT_FAIL=1
 EXIT_SUCCESS=0
 ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
-BasePath="$(cleanAbsPath "$ScriptPath/..")"
+BasePath="$(cleanAbsPath "$ScriptPath/../..")"
 OutDirName=""
 LinkOption="dynamic"
 PackOption=""

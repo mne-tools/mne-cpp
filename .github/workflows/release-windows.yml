@@ -53,6 +53,7 @@ jobs:
       run: |
         call scripts\ci\download_toolchain.bat --kind eigen --version "5.0.1" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
     - name: Download ONNX Runtime
+      continue-on-error: true
       shell: cmd
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
@@ -138,6 +139,7 @@ jobs:
       run: |
         call scripts\ci\download_toolchain.bat --kind eigen --version "5.0.1" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
     - name: Download ONNX Runtime
+      continue-on-error: true
       shell: cmd
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
