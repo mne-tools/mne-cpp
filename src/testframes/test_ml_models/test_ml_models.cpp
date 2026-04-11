@@ -131,7 +131,8 @@ void TestMlModels::testLinearModelPredict()
     MlLinearModel model(MlTaskType::Regression, 0.1);
 
     // Create a simple input tensor
-    MlTensor input(MatrixXf::Random(5, 3));
+    MatrixXf mat = MatrixXf::Random(5, 3);
+    MlTensor input(mat);
 
     MlTensor output = model.predict(input);
 
@@ -146,7 +147,8 @@ void TestMlModels::testLinearModelSaveLoad()
     MlLinearModel original(MlTaskType::Regression, 0.5);
 
     // Run a predict to initialize weights (if lazy-init)
-    MlTensor input(MatrixXf::Random(10, 4));
+    MatrixXf mat = MatrixXf::Random(10, 4);
+    MlTensor input(mat);
     original.predict(input);
 
     QString path = m_tempDir.filePath("linear_model.json");
@@ -191,7 +193,8 @@ void TestMlModels::testOnnxModelNotLoaded()
     QVERIFY(!model.isLoaded());
 
     // Predict on unloaded model should return empty or handle gracefully
-    MlTensor input(MatrixXf::Random(1, 10));
+    MatrixXf mat = MatrixXf::Random(1, 10);
+    MlTensor input(mat);
     MlTensor output = model.predict(input);
     // Should not crash
     QVERIFY(true);
@@ -216,7 +219,8 @@ void TestMlModels::testModelPolymorphism()
     QVERIFY(!model->modelType().isEmpty());
     QCOMPARE(model->taskType(), MlTaskType::Regression);
 
-    MlTensor input(MatrixXf::Random(3, 5));
+    MatrixXf mat = MatrixXf::Random(3, 5);
+    MlTensor input(mat);
     MlTensor output = model->predict(input);
     QVERIFY(true); // Didn't crash
 }
