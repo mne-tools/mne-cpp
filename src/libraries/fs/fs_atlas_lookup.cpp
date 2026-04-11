@@ -51,7 +51,9 @@
 #include <QFile>
 #include <QDataStream>
 #include <QDebug>
+#ifndef WASMBUILD
 #include <QProcess>
+#endif
 #include <QtEndian>
 
 //=============================================================================================================
@@ -85,6 +87,10 @@ bool FsAtlasLookup::load(const QString& sParcellationPath)
     QByteArray data;
 
     if(sParcellationPath.endsWith(QStringLiteral(".mgz"), Qt::CaseInsensitive)) {
+#ifdef WASMBUILD
+        qWarning() << "[FsAtlasLookup::load] .mgz files not supported in WebAssembly build (QProcess unavailable):" << sParcellationPath;
+        return false;
+#else
         // Decompress mgz via gzip
         QProcess gzipProc;
         gzipProc.start(QStringLiteral("gzip"), QStringList() << QStringLiteral("-dc") << sParcellationPath);
@@ -97,6 +103,7 @@ bool FsAtlasLookup::load(const QString& sParcellationPath)
             return false;
         }
         data = gzipProc.readAllStandardOutput();
+#endif
     } else {
         QFile file(sParcellationPath);
         if(!file.open(QIODevice::ReadOnly)) {

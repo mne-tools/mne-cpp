@@ -136,11 +136,11 @@ void TestPythonRunner::testRunCodeHelloWorld()
         QSKIP("Python not available");
     }
 
-    PythonRunner runner;
     PythonRunnerConfig config;
-    config.timeoutMs = 10000;
+    config.timeoutMsec = 10000;
+    PythonRunner runner(config);
 
-    PythonRunnerResult result = runner.runCode("print('Hello World')", config);
+    PythonRunnerResult result = runner.runCode("print('Hello World')");
     QVERIFY(result.success);
     QCOMPARE(result.exitCode, 0);
     QCOMPARE(result.stdOut.trimmed(), QString("Hello World"));
@@ -154,12 +154,12 @@ void TestPythonRunner::testRunCodeStdErr()
         QSKIP("Python not available");
     }
 
-    PythonRunner runner;
     PythonRunnerConfig config;
-    config.timeoutMs = 10000;
+    config.timeoutMsec = 10000;
+    PythonRunner runner(config);
 
     PythonRunnerResult result = runner.runCode(
-        "import sys; sys.stderr.write('error msg\\n')", config);
+        "import sys; sys.stderr.write('error msg\\n')");
     QVERIFY(result.success);
     QVERIFY(result.stdErr.contains("error msg"));
 }
@@ -172,12 +172,12 @@ void TestPythonRunner::testRunCodeExitCode()
         QSKIP("Python not available");
     }
 
-    PythonRunner runner;
     PythonRunnerConfig config;
-    config.timeoutMs = 10000;
+    config.timeoutMsec = 10000;
+    PythonRunner runner(config);
 
     // Exit with non-zero code
-    PythonRunnerResult result = runner.runCode("import sys; sys.exit(42)", config);
+    PythonRunnerResult result = runner.runCode("import sys; sys.exit(42)");
     QVERIFY(!result.success);
     QCOMPARE(result.exitCode, 42);
 }
@@ -190,13 +190,13 @@ void TestPythonRunner::testRunCodeTimeout()
         QSKIP("Python not available");
     }
 
-    PythonRunner runner;
     PythonRunnerConfig config;
-    config.timeoutMs = 500; // Very short timeout
+    config.timeoutMsec = 500; // Very short timeout
+    PythonRunner runner(config);
 
     // This should time out
     PythonRunnerResult result = runner.runCode(
-        "import time; time.sleep(30)", config);
+        "import time; time.sleep(30)");
     QVERIFY(!result.success);
     QVERIFY(result.timedOut);
 }
@@ -209,16 +209,16 @@ void TestPythonRunner::testRunCodeMultiline()
         QSKIP("Python not available");
     }
 
-    PythonRunner runner;
     PythonRunnerConfig config;
-    config.timeoutMs = 10000;
+    config.timeoutMsec = 10000;
+    PythonRunner runner(config);
 
     QString code =
         "x = 2\n"
         "y = 3\n"
         "print(x * y)";
 
-    PythonRunnerResult result = runner.runCode(code, config);
+    PythonRunnerResult result = runner.runCode(code);
     QVERIFY(result.success);
     QCOMPARE(result.stdOut.trimmed(), QString("6"));
 }
@@ -231,13 +231,13 @@ void TestPythonRunner::testRunCodeEnvironmentVars()
         QSKIP("Python not available");
     }
 
-    PythonRunner runner;
     PythonRunnerConfig config;
-    config.timeoutMs = 10000;
-    config.environment.insert("MNE_CPP_TEST_VAR", "test_value_42");
+    config.timeoutMsec = 10000;
+    config.extraEnv << QStringLiteral("MNE_CPP_TEST_VAR=test_value_42");
+    PythonRunner runner(config);
 
     PythonRunnerResult result = runner.runCode(
-        "import os; print(os.environ.get('MNE_CPP_TEST_VAR', 'missing'))", config);
+        "import os; print(os.environ.get('MNE_CPP_TEST_VAR', 'missing'))");
     QVERIFY(result.success);
     QCOMPARE(result.stdOut.trimmed(), QString("test_value_42"));
 }
@@ -267,24 +267,23 @@ void TestPythonRunner::testProgressParsing()
         QSKIP("Python not available");
     }
 
-    PythonRunner runner;
     PythonRunnerConfig config;
-    config.timeoutMs = 10000;
+    config.timeoutMsec = 10000;
+    PythonRunner runner(config);
 
     QList<double> progressValues;
-    config.lineCallback = [&progressValues](const QString& line, bool /*isStdErr*/) {
+    runner.setLineCallback([](int /*channel*/, const QString& /*line*/) {
         // The runner should parse progress lines like "[progress] 50.0%"
-        Q_UNUSED(line);
-    };
-    config.progressCallback = [&progressValues](double pct) {
-        progressValues.append(pct);
-    };
+    });
+    runner.setProgressCallback([&progressValues](float pct, const QString& /*msg*/) {
+        progressValues.append(static_cast<double>(pct));
+    });
 
     PythonRunnerResult result = runner.runCode(
         "print('[progress] 25.0%')\n"
         "print('[progress] 50.0%')\n"
         "print('[progress] 100.0%')\n"
-        "print('done')", config);
+        "print('done')");
     QVERIFY(result.success);
 
     // Verify progress values were parsed

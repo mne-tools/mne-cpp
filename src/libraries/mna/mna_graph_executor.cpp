@@ -40,9 +40,11 @@
 #include "mna_graph.h"
 #include "mna_op_registry.h"
 
-#include <QProcess>
 #include <QDir>
 #include <QTemporaryFile>
+#ifndef WASMBUILD
+#include <QProcess>
+#endif
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -194,6 +196,12 @@ QVariantMap MnaGraphExecutor::executeNode(const MnaNode& node,
 {
     // Script execution — inline code via interpreter
     if (node.execMode == MnaNodeExecMode::Script) {
+#ifdef WASMBUILD
+        QVariantMap outputs;
+        outputs.insert(QStringLiteral("stderr"), QStringLiteral("Script execution not supported in WebAssembly build (QProcess unavailable)"));
+        outputs.insert(QStringLiteral("exit_code"), -1);
+        return outputs;
+#else
         const MnaScript& script = node.script;
 
         // Determine file extension from language
@@ -252,10 +260,17 @@ QVariantMap MnaGraphExecutor::executeNode(const MnaNode& node,
         outputs.insert(QStringLiteral("exit_code"), process.exitCode());
 
         return outputs;
+#endif
     }
 
     // IPC execution
     if (node.execMode == MnaNodeExecMode::Ipc) {
+#ifdef WASMBUILD
+        QVariantMap outputs;
+        outputs.insert(QStringLiteral("stderr"), QStringLiteral("IPC execution not supported in WebAssembly build (QProcess unavailable)"));
+        outputs.insert(QStringLiteral("exit_code"), -1);
+        return outputs;
+#else
         QProcess process;
         if (!node.ipcWorkDir.isEmpty()) {
             process.setWorkingDirectory(node.ipcWorkDir);
@@ -293,6 +308,7 @@ QVariantMap MnaGraphExecutor::executeNode(const MnaNode& node,
         }
 
         return outputs;
+#endif
     }
 
     // Look up registered op function
