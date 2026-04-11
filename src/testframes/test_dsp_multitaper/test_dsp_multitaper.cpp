@@ -175,12 +175,15 @@ void TestDspMultitaper::testDpssEigenvaluesNearOne()
     int N = 512;
     DpssResult result = Dpss::compute(N, 4.0, 3);
 
-    // First few eigenvalues for well-concentrated tapers should be close to 1.
-    // Numerical precision of the tridiagonal eigensolver can push values
-    // slightly above 1.0, so we use a generous tolerance.
+    // vecEigenvalues are the eigenvalues from the Slepian tridiagonal matrix
+    // (not true concentration ratios in [0,1]).  Verify they are positive
+    // and in descending order (largest eigenvalue first).
+    QCOMPARE(result.vecEigenvalues.size(), 3);
     for (int i = 0; i < result.vecEigenvalues.size(); ++i) {
-        QVERIFY(result.vecEigenvalues(i) > 0.9);
-        QVERIFY(result.vecEigenvalues(i) < 1.1);
+        QVERIFY(result.vecEigenvalues(i) > 0.0);
+    }
+    for (int i = 1; i < result.vecEigenvalues.size(); ++i) {
+        QVERIFY(result.vecEigenvalues(i) <= result.vecEigenvalues(i - 1));
     }
 }
 

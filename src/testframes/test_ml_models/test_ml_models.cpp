@@ -240,12 +240,10 @@ void TestMlModels::testOnnxModelNotLoaded()
     MlOnnxModel model;
     QVERIFY(!model.isLoaded());
 
-    // Predict on unloaded model should return empty or handle gracefully
+    // Predict on unloaded model should throw (ONNX Runtime may not be available)
     MatrixXf mat = MatrixXf::Random(1, 10);
     MlTensor input(mat);
-    MlTensor output = model.predict(input);
-    // Should not crash
-    QVERIFY(true);
+    QVERIFY_EXCEPTION_THROWN(model.predict(input), std::runtime_error);
 }
 
 //=============================================================================================================
