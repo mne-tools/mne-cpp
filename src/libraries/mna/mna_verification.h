@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include "mna_global.h"
+#include "mna_script.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -74,7 +75,11 @@ struct MNASHARED_EXPORT MnaVerificationCheck
     QString     id;             ///< Unique check identifier within the node (e.g. "cov_posdef")
     QString     description;    ///< Human-readable: "Covariance matrix must be positive-definite"
     QString     phase;          ///< "pre" (before execution) or "post" (after execution)
-    QString     expression;     ///< Evaluable expression: "rank(covariance) > 0"
+    QString     expression;     ///< Simple evaluable expression: "rank(covariance) > 0"
+    MnaScript   script;         ///< Optional script for complex checks (exit code 0 = pass).
+                                ///< When script.code is non-empty, the executor runs the script
+                                ///< instead of evaluating `expression`. Supports {{placeholder}}
+                                ///< substitution for node inputs and attributes.
     QString     severity;       ///< "error" (abort), "warning" (log + continue), "info" (always continue)
     QString     onFail;         ///< Optional remediation hint
 

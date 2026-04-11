@@ -40,6 +40,9 @@ QJsonObject MnaVerificationCheck::toJson() const
     json[QStringLiteral("description")] = description;
     json[QStringLiteral("phase")]       = phase;
     json[QStringLiteral("expression")]  = expression;
+    if (!script.code.isEmpty()) {
+        json[QStringLiteral("script")] = script.toJson();
+    }
     json[QStringLiteral("severity")]    = severity;
     if (!onFail.isEmpty()) {
         json[QStringLiteral("on_fail")] = onFail;
@@ -56,6 +59,9 @@ MnaVerificationCheck MnaVerificationCheck::fromJson(const QJsonObject& json)
     c.description = json.value(QStringLiteral("description")).toString();
     c.phase       = json.value(QStringLiteral("phase")).toString();
     c.expression  = json.value(QStringLiteral("expression")).toString();
+    if (json.contains(QStringLiteral("script"))) {
+        c.script = MnaScript::fromJson(json.value(QStringLiteral("script")).toObject());
+    }
     c.severity    = json.value(QStringLiteral("severity")).toString();
     c.onFail      = json.value(QStringLiteral("on_fail")).toString();
     return c;
@@ -70,6 +76,9 @@ QCborMap MnaVerificationCheck::toCbor() const
     cbor.insert(QStringLiteral("description"), description);
     cbor.insert(QStringLiteral("phase"),       phase);
     cbor.insert(QStringLiteral("expression"),  expression);
+    if (!script.code.isEmpty()) {
+        cbor.insert(QStringLiteral("script"), script.toCbor());
+    }
     cbor.insert(QStringLiteral("severity"),    severity);
     if (!onFail.isEmpty()) {
         cbor.insert(QStringLiteral("on_fail"), onFail);
@@ -86,6 +95,9 @@ MnaVerificationCheck MnaVerificationCheck::fromCbor(const QCborMap& cbor)
     c.description = cbor.value(QStringLiteral("description")).toString();
     c.phase       = cbor.value(QStringLiteral("phase")).toString();
     c.expression  = cbor.value(QStringLiteral("expression")).toString();
+    if (cbor.contains(QStringLiteral("script"))) {
+        c.script = MnaScript::fromCbor(cbor.value(QStringLiteral("script")).toMap());
+    }
     c.severity    = cbor.value(QStringLiteral("severity")).toString();
     c.onFail      = cbor.value(QStringLiteral("on_fail")).toString();
     return c;

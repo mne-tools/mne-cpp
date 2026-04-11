@@ -51,6 +51,14 @@ QJsonObject MnaScript::toJson() const
 
     json[QStringLiteral("code")] = code;
 
+    if (!sourceUri.isEmpty()) {
+        json[QStringLiteral("source_uri")] = sourceUri;
+    }
+
+    if (!codeSha256.isEmpty()) {
+        json[QStringLiteral("code_sha256")] = codeSha256;
+    }
+
     if (keepTempFile) {
         json[QStringLiteral("keep_temp_file")] = true;
     }
@@ -66,6 +74,8 @@ MnaScript MnaScript::fromJson(const QJsonObject& json)
     s.language     = json.value(QStringLiteral("language")).toString();
     s.interpreter  = json.value(QStringLiteral("interpreter")).toString();
     s.code         = json.value(QStringLiteral("code")).toString();
+    s.sourceUri    = json.value(QStringLiteral("source_uri")).toString();
+    s.codeSha256   = json.value(QStringLiteral("code_sha256")).toString();
     s.keepTempFile = json.value(QStringLiteral("keep_temp_file")).toBool(false);
 
     const QJsonArray arr = json.value(QStringLiteral("interpreter_args")).toArray();
@@ -97,6 +107,14 @@ QCborMap MnaScript::toCbor() const
 
     cbor.insert(QStringLiteral("code"), code);
 
+    if (!sourceUri.isEmpty()) {
+        cbor.insert(QStringLiteral("source_uri"), sourceUri);
+    }
+
+    if (!codeSha256.isEmpty()) {
+        cbor.insert(QStringLiteral("code_sha256"), codeSha256);
+    }
+
     if (keepTempFile) {
         cbor.insert(QStringLiteral("keep_temp_file"), true);
     }
@@ -112,6 +130,8 @@ MnaScript MnaScript::fromCbor(const QCborMap& cbor)
     s.language     = cbor.value(QStringLiteral("language")).toString();
     s.interpreter  = cbor.value(QStringLiteral("interpreter")).toString();
     s.code         = cbor.value(QStringLiteral("code")).toString();
+    s.sourceUri    = cbor.value(QStringLiteral("source_uri")).toString();
+    s.codeSha256   = cbor.value(QStringLiteral("code_sha256")).toString();
     s.keepTempFile = cbor.value(QStringLiteral("keep_temp_file")).toBool();
 
     const QCborArray arr = cbor.value(QStringLiteral("interpreter_args")).toArray();
