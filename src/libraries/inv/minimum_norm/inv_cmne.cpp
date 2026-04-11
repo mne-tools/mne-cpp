@@ -57,6 +57,8 @@
 //=============================================================================================================
 
 #include <ml/ml_trainer.h>
+#include <ml/ml_onnx_model.h>
+#include <ml/ml_tensor.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -231,8 +233,6 @@ MatrixXd InvCMNE::applyLstmCorrection(
     const QString& onnxModelPath,
     int lookBack)
 {
-    Q_UNUSED(onnxModelPath)
-
     int nSources = matDspmData.rows();
     int nTimes = matDspmData.cols();
 
@@ -240,6 +240,28 @@ MatrixXd InvCMNE::applyLstmCorrection(
 
     int nCorrectableSteps = nTimes - lookBack;
     int reportInterval = qMax(1, nCorrectableSteps / 10);  // report ~10 times
+
+    // Try to load ONNX model for LSTM inference
+    MLLIB::MlOnnxModel lstmModel;
+    bool useOrt = false;
+
+    if (!onnxModelPath.isEmpty()) {
+        if (lstmModel.load(onnxModelPath)) {
+            useOrt = true;
+            qInfo() << "  [LSTM correction] ONNX model loaded — using LSTM inference.";
+        } else {
+            qWarning() << "  [LSTM correction] Failed to load ONNX model — falling back to moving average.";
+        }
+    } else {
+        qInfo() << "  [LSTM correction] No ONNX model path — using moving average.";
+    }
+
+    // Pre-allocate input buffer for ORT: shape [1, lookBack, nSources] (batch, seq, features)
+    // Row-major layout: [seq][features]
+    std::vector<float> inputBuf;
+    if (useOrt) {
+        inputBuf.resize(static_cast<size_t>(lookBack) * static_cast<size_t>(nSources));
+    }
 
     // For t >= lookBack: apply temporal correction
     for (int t = lookBack; t < nTimes; ++t) {
@@ -249,12 +271,40 @@ MatrixXd InvCMNE::applyLstmCorrection(
             qInfo().noquote() << QString("  [LSTM correction] %1% (%2/%3 time steps)")
                 .arg(pct, 0, 'f', 0).arg(step + 1).arg(nCorrectableSteps);
         }
-        // Extract window: last lookBack columns before t
-        MatrixXd window = result.middleCols(t - lookBack, lookBack);
 
-        // TODO: Replace with actual ONNX inference when ml library is ready
-        // For now, use moving average as control estimate (from paper)
-        VectorXd prediction = window.rowwise().mean();
+        VectorXd prediction;
+
+        if (useOrt) {
+            // Fill input buffer: double→float, column-major→row-major
+            // Layout: inputBuf[k * nSources + s] = matDspmData(s, t - lookBack + k)
+            for (int k = 0; k < lookBack; ++k) {
+                int col = t - lookBack + k;
+                for (int s = 0; s < nSources; ++s) {
+                    inputBuf[static_cast<size_t>(k) * static_cast<size_t>(nSources)
+                             + static_cast<size_t>(s)] = static_cast<float>(result(s, col));
+                }
+            }
+
+            // Create MlTensor view over the pre-allocated buffer — zero-copy
+            std::vector<int64_t> inputShape = {1, static_cast<int64_t>(lookBack),
+                                               static_cast<int64_t>(nSources)};
+            MLLIB::MlTensor inputTensor = MLLIB::MlTensor::view(inputBuf.data(), inputShape);
+
+            // Run LSTM inference
+            MLLIB::MlTensor outputTensor = lstmModel.predict(inputTensor);
+
+            // Convert output to Eigen VectorXd
+            // Expected output shape: [1, nSources] or [nSources]
+            prediction.resize(nSources);
+            const float* outPtr = outputTensor.data();
+            for (int s = 0; s < nSources; ++s) {
+                prediction(s) = static_cast<double>(outPtr[s]);
+            }
+        } else {
+            // Moving average fallback (control estimate from paper)
+            MatrixXd window = result.middleCols(t - lookBack, lookBack);
+            prediction = window.rowwise().mean();
+        }
 
         // Normalize prediction (Eq. 12)
         double maxVal = prediction.cwiseAbs().maxCoeff();

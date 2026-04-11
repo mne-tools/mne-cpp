@@ -49,6 +49,22 @@
 #include <QString>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <string>
+#include <vector>
+
+//=============================================================================================================
+// FORWARD DECLARE ORT TYPES
+//=============================================================================================================
+
+#ifdef MNE_USE_ONNXRUNTIME
+namespace Ort { class Env; class Session; class MemoryInfo; class RunOptions; }
+#endif
+
+//=============================================================================================================
 // DEFINE NAMESPACE MLLIB
 //=============================================================================================================
 
@@ -82,11 +98,27 @@ public:
     QString modelType() const override;
     MlTaskType taskType() const override;
 
+    //=========================================================================================================
+    /**
+     * @return True if an ONNX Runtime session has been loaded and is ready for inference.
+     */
+    bool isLoaded() const;
+
 private:
+#ifdef MNE_USE_ONNXRUNTIME
+    static Ort::Env& ortEnv();
+#endif
+
     QString     m_modelPath;                                /**< Path to ONNX model file. */
     MlTaskType  m_taskType = MlTaskType::Classification;    /**< Task type.               */
 
-    // When MNE_USE_ONNXRUNTIME is defined the ONNX Runtime session members would be added here.
+#ifdef MNE_USE_ONNXRUNTIME
+    std::unique_ptr<Ort::Session>    m_session;              /**< ORT inference session.              */
+    std::unique_ptr<Ort::MemoryInfo> m_memoryInfo;           /**< CPU memory info (reused).            */
+    std::vector<std::string>         m_inputNames;           /**< Cached input node names.             */
+    std::vector<std::string>         m_outputNames;          /**< Cached output node names.            */
+    std::vector<std::vector<int64_t>> m_inputShapes;         /**< Cached input node shapes.            */
+#endif
 };
 
 } // namespace MLLIB
