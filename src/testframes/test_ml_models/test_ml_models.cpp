@@ -47,6 +47,10 @@
 #include <QtTest>
 #include <QObject>
 #include <QTemporaryDir>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QFile>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -130,13 +134,38 @@ void TestMlModels::testLinearModelPredict()
 {
     MlLinearModel model(MlTaskType::Regression, 0.1);
 
-    // Create a simple input tensor
+    // Predicting on an untrained model should throw
     MatrixXf mat = MatrixXf::Random(5, 3);
     MlTensor input(mat);
+    QVERIFY_EXCEPTION_THROWN(model.predict(input), std::runtime_error);
 
-    MlTensor output = model.predict(input);
+    // Create a trained model via save/load round-trip with known weights
+    QTemporaryDir tmpDir;
+    QVERIFY(tmpDir.isValid());
+    QString modelPath = tmpDir.filePath("test_model.json");
 
-    // Output should have same number of rows (samples)
+    // Write a minimal model JSON: 3 features, 1 output, identity-like weights
+    QJsonObject root;
+    root[QStringLiteral("task_type")] = QStringLiteral("regression");
+    root[QStringLiteral("regularization")] = 0.1;
+    root[QStringLiteral("n_features")] = 3;
+    root[QStringLiteral("n_outputs")] = 1;
+    QJsonArray weights;
+    weights.append(QJsonArray{1.0});
+    weights.append(QJsonArray{1.0});
+    weights.append(QJsonArray{1.0});
+    root[QStringLiteral("weights")] = weights;
+    root[QStringLiteral("bias")] = QJsonArray{0.0};
+
+    QFile file(modelPath);
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.write(QJsonDocument(root).toJson());
+    file.close();
+
+    MlLinearModel trainedModel;
+    QVERIFY(trainedModel.load(modelPath));
+
+    MlTensor output = trainedModel.predict(input);
     QCOMPARE(output.rows(), 5);
 }
 

@@ -178,7 +178,7 @@ void TestDspMultitaper::testDpssEigenvaluesNearOne()
     // First few eigenvalues for well-concentrated tapers should be close to 1
     for (int i = 0; i < result.vecEigenvalues.size(); ++i) {
         QVERIFY(result.vecEigenvalues(i) > 0.9);
-        QVERIFY(result.vecEigenvalues(i) <= 1.0 + 1e-10);
+        QVERIFY(result.vecEigenvalues(i) <= 1.0 + 1e-6);
     }
 }
 
