@@ -36,7 +36,15 @@ SET "QtLinkage=dynamic"
 :loop
 IF NOT "%1"=="" (
   IF "%ExtraSection%"=="True" (
-    SET "ExtraArgs=!ExtraArgs! %~1"
+    REM cmd.exe splits on '=' so "-DVAR=VAL" arrives as two tokens.
+    REM Reconstruct by peeking at the next arg when current starts with -D.
+    SET "_ea=%~1"
+    IF "!_ea:~0,2!"=="-D" (
+      SET "ExtraArgs=!ExtraArgs! !_ea!=%~2"
+      SHIFT
+    ) ELSE (
+      SET "ExtraArgs=!ExtraArgs! !_ea!"
+    )
   )
   IF "%ExtraSection%"=="False" IF "%1"=="help" (
     call:showLogo

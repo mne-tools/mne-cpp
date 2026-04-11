@@ -38,6 +38,8 @@
 
 #include "ml_trainer.h"
 
+#ifndef WASMBUILD // QProcess (used by PythonRunner) is not available in Qt WASM
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -111,3 +113,5 @@ QStringList MLTrainer::checkPrerequisites(const QStringList& packages) const
     }
     return missing;
 }
+
+#endif // WASMBUILD

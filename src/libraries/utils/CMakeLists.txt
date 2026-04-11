@@ -17,8 +17,6 @@ set(SOURCES
   layoutloader.cpp
   layoutmaker.cpp
   selectionio.cpp
-  python_runner.cpp
-  python_test_helper.cpp
   generics/observerpattern.cpp
   generics/mne_logger.cpp
   utils_global.cpp
@@ -31,13 +29,18 @@ set(HEADERS
   layoutloader.h
   layoutmaker.h
   selectionio.h
-  python_runner.h
-  python_test_helper.h
   generics/circularbuffer.h
   generics/commandpattern.h
   generics/observerpattern.h
   generics/mne_logger.h
 )
+
+# QProcess is not available in Qt for WebAssembly, so exclude
+# PythonRunner / PythonTestHelper from WASM builds.
+if(NOT WASM)
+  list(APPEND SOURCES python_runner.cpp python_test_helper.cpp)
+  list(APPEND HEADERS python_runner.h python_test_helper.h)
+endif()
 
 set(FILE_TO_UPDATE utils_global.cpp)
 

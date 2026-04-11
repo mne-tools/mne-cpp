@@ -35,6 +35,8 @@
 #ifndef ML_TRAINER_H
 #define ML_TRAINER_H
 
+#ifndef WASMBUILD // QProcess (used by PythonRunner) is not available in Qt WASM
+
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -126,5 +128,7 @@ private:
 };
 
 } // namespace MLLIB
+
+#endif // WASMBUILD
 
 #endif // ML_TRAINER_H
