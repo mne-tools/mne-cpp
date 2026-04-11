@@ -173,13 +173,32 @@ void TestMlModels::testLinearModelPredict()
 
 void TestMlModels::testLinearModelSaveLoad()
 {
-    MlLinearModel original(MlTaskType::Regression, 0.5);
+    // Create a trained model via JSON with known weights (4 features, 1 output)
+    QString seedPath = m_tempDir.filePath("seed_model.json");
+    {
+        QJsonObject root;
+        root[QStringLiteral("task_type")] = QStringLiteral("regression");
+        root[QStringLiteral("regularization")] = 0.5;
+        root[QStringLiteral("n_features")] = 4;
+        root[QStringLiteral("n_outputs")] = 1;
+        QJsonArray weights;
+        weights.append(QJsonArray{1.0});
+        weights.append(QJsonArray{2.0});
+        weights.append(QJsonArray{3.0});
+        weights.append(QJsonArray{4.0});
+        root[QStringLiteral("weights")] = weights;
+        root[QStringLiteral("bias")] = QJsonArray{0.5};
 
-    // Run a predict to initialize weights (if lazy-init)
-    MatrixXf mat = MatrixXf::Random(10, 4);
-    MlTensor input(mat);
-    original.predict(input);
+        QFile f(seedPath);
+        QVERIFY(f.open(QIODevice::WriteOnly));
+        f.write(QJsonDocument(root).toJson());
+        f.close();
+    }
 
+    MlLinearModel original;
+    QVERIFY(original.load(seedPath));
+
+    // Save and reload
     QString path = m_tempDir.filePath("linear_model.json");
     QVERIFY(original.save(path));
 
