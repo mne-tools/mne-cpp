@@ -228,19 +228,35 @@ MatrixXd ICA::excludeComponents(const MatrixXd& matData,
         return matData;
     }
 
-    // Project to source space
-    MatrixXd matSources = applyUnmixing(matData, result);
+    // Subtract only the contribution of excluded components from the original data:
+    //   artifact = A[:, excluded] * W[excluded, :] * (data - mean)
+    //   cleaned  = data - artifact
+    //
+    // This preserves the full-rank original signal and removes only the estimated
+    // artifact, matching the approach used by MNE-Python's ica.apply().
 
-    // Zero the excluded components
-    for (int idx : excludedComponents) {
-        if (idx >= 0 && idx < static_cast<int>(matSources.rows())) {
-            matSources.row(idx).setZero();
+    MatrixXd matCentered = matData.colwise() - result.vecMean;
+
+    // Build partial mixing and partial sources for only the excluded components
+    const int nExcl  = excludedComponents.size();
+    const int nCh    = static_cast<int>(result.matMixing.rows());
+    const int nSamps = static_cast<int>(matCentered.cols());
+
+    MatrixXd partialMixing(nCh, nExcl);
+    MatrixXd partialSources(nExcl, nSamps);
+
+    for (int i = 0; i < nExcl; ++i) {
+        int idx = excludedComponents[i];
+        if (idx >= 0 && idx < static_cast<int>(result.matUnmixing.rows())) {
+            partialMixing.col(i)  = result.matMixing.col(idx);
+            partialSources.row(i) = result.matUnmixing.row(idx) * matCentered;
+        } else {
+            partialMixing.col(i).setZero();
+            partialSources.row(i).setZero();
         }
     }
 
-    // Back-project and add mean
-    MatrixXd matRecon = result.matMixing * matSources;
-    return matRecon.colwise() + result.vecMean;
+    return matData - partialMixing * partialSources;
 }
 
 //=============================================================================================================
