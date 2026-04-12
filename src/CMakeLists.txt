@@ -250,6 +250,15 @@ if(USE_ONNXRUNTIME)
     set(MNE_CPP_PREBUILT_ONNXRUNTIME_DIR "${PROJECT_SOURCE_DIR}/external/onnxruntime"
         CACHE PATH "Location of the extracted ONNX Runtime package.")
 
+    # Propagate as CMake variable so FindOnnxRuntime.cmake can pick it up
+    if(NOT DEFINED ONNXRUNTIME_ROOT_DIR)
+        if(DEFINED ENV{ONNXRUNTIME_ROOT_DIR})
+            set(ONNXRUNTIME_ROOT_DIR "$ENV{ONNXRUNTIME_ROOT_DIR}")
+        else()
+            set(ONNXRUNTIME_ROOT_DIR "${MNE_CPP_PREBUILT_ONNXRUNTIME_DIR}")
+        endif()
+    endif()
+
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 
     # Try the native onnxruntime CMake config first, then our FindOnnxRuntime module.
