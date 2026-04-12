@@ -1,0 +1,96 @@
+# Auto-fix build failures using Copilot agent
+#
+# Triggers when the staging CI workflow completes with a failure.
+# Extracts error logs and opens an issue with structured error context
+# that can be picked up by Copilot Workspace or a custom agent.
+#
+# To enable full agentic auto-fix (create PRs automatically), set the
+# COPILOT_API_KEY secret and uncomment the auto-fix step.
+
+name: Auto-Fix Build Failures
+
+on:
+  workflow_run:
+    workflows: ["Staging"]
+    types: [completed]
+
+permissions:
+  contents: read
+  issues: write
+  actions: read
+
+jobs:
+  detect-and-report:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Collect failed job logs
+      id: logs
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        RUN_ID=${{ github.event.workflow_run.id }}
+        echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+
+        # Get failed jobs
+        FAILED_JOBS=$(gh api "repos/${{ github.repository }}/actions/runs/$RUN_ID/jobs" \
+          --jq '.jobs[] | select(.conclusion == "failure") | .id')
+
+        ERROR_LOG=""
+        for JOB_ID in $FAILED_JOBS; do
+          JOB_NAME=$(gh api "repos/${{ github.repository }}/actions/jobs/$JOB_ID" --jq '.name')
+          echo "Fetching logs for: $JOB_NAME (job $JOB_ID)"
+
+          # Download and extract error lines
+          JOB_ERRORS=$(gh api "repos/${{ github.repository }}/actions/jobs/$JOB_ID/logs" 2>/dev/null \
+            | grep -i "error:" | head -20 || echo "(no error lines found)")
+
+          ERROR_LOG="${ERROR_LOG}
+        ### ${JOB_NAME}
+        \`\`\`
+        ${JOB_ERRORS}
+        \`\`\`
+        "
+        done
+
+        # Write to file (avoid GITHUB_OUTPUT multiline issues)
+        echo "$ERROR_LOG" > /tmp/error_log.md
+
+    - name: Check for existing auto-fix issue
+      id: existing
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        COUNT=$(gh issue list -R "${{ github.repository }}" \
+          --label "auto-fix" --state open --json number --jq 'length')
+        echo "open_count=$COUNT" >> "$GITHUB_OUTPUT"
+
+    - name: Create or update issue
+      if: steps.existing.outputs.open_count == '0'
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ steps.logs.outputs.run_id }}"
+        COMMIT_SHA="${{ github.event.workflow_run.head_sha }}"
+        SHORT_SHA="${COMMIT_SHA:0:7}"
+
+        BODY="## Build Failure Auto-Detected
+
+        **Run:** [#${{ steps.logs.outputs.run_id }}](${RUN_URL})
+        **Commit:** [\`${SHORT_SHA}\`](https://github.com/${{ github.repository }}/commit/${COMMIT_SHA})
+        **Branch:** \`${{ github.event.workflow_run.head_branch }}\`
+
+        ## Error Summary
+
+        $(cat /tmp/error_log.md)
+
+        ---
+        _This issue was automatically created by the auto-fix workflow.
+        Use Copilot Workspace or \`@github-copilot\` to suggest a fix._
+        "
+
+        gh issue create -R "${{ github.repository }}" \
+          --title "CI Build Failure on ${SHORT_SHA}" \
+          --body "$BODY" \
+          --label "auto-fix,bug"
