@@ -331,6 +331,11 @@ jobs:
         if [ -d "out/wasm/examples" ]; then
           cp resources/design/logos/qtlogo.svg out/wasm/examples/qtlogo.svg
         fi
+        # Replace bare Qt HTML with branded loading screens & inject COOP/COEP SW
+        ./scripts/wasm/wasm_postbuild.sh out/wasm/bin
+        if [ -d "out/wasm/examples" ]; then
+          ./scripts/wasm/wasm_postbuild.sh out/wasm/examples
+        fi
 
     - name: Package WASM
       run: |
