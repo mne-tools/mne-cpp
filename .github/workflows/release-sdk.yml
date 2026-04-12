@@ -139,65 +139,6 @@ jobs:
         name: mne-cpp-sdk-macos-arm64
         path: ${{ runner.temp }}/mne-cpp-sdk-${{ env.MNE_CPP_VERSION }}-macos-arm64.tar.gz
 
-  macOSSDKIntel:
-    runs-on: macos-13
-    steps:
-    - name: Clone repository
-      uses: actions/checkout@v5
-
-    - name: Install Python 3.10
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.10'
-
-    - name: Download Qt toolchain
-      env:
-        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-      run: |
-        ./scripts/ci/download_toolchain.sh \
-          --kind qt \
-          --version "6.11.0" \
-          --linkage dynamic \
-          --output-dir "$RUNNER_TEMP/qt"
-
-    - name: Download Eigen package
-      env:
-        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-      run: |
-        ./scripts/ci/download_toolchain.sh \
-          --kind eigen \
-          --output-dir "$RUNNER_TEMP/eigen"
-
-    - name: Configure
-      run: |
-        cmake -S . -B build \
-          -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/qt" \
-          -DCMAKE_INSTALL_PREFIX="$RUNNER_TEMP/sdk" \
-          -DEIGEN3_DIR="$RUNNER_TEMP/eigen" \
-          -DCMAKE_BUILD_TYPE=Release
-
-    - name: Build
-      run: cmake --build build --parallel $(sysctl -n hw.ncpu)
-
-    - name: Install SDK
-      run: cmake --install build --component sdk
-
-    - name: Copy examples
-      run: |
-        mkdir -p "$RUNNER_TEMP/sdk/share/mne-cpp/examples"
-        cp -r resources/examples/*.mna "$RUNNER_TEMP/sdk/share/mne-cpp/examples/" 2>/dev/null || true
-
-    - name: Package
-      run: |
-        cd "$RUNNER_TEMP"
-        tar czf "mne-cpp-sdk-${MNE_CPP_VERSION}-macos-x86_64.tar.gz" sdk/
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: mne-cpp-sdk-macos-x86_64
-        path: ${{ runner.temp }}/mne-cpp-sdk-${{ env.MNE_CPP_VERSION }}-macos-x86_64.tar.gz
-
   WindowsSDK:
     runs-on: windows-2025
     steps:

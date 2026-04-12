@@ -41,8 +41,8 @@
 //=============================================================================================================
 
 #include <mna/mna_io.h>
-#include <mna/mna_graph.h>
-#include <mna/mna_node.h>
+#include <mna/mna_project.h>
+#include <mna/mna_step.h>
 #include <mna/mna_op_registry.h>
 
 #include <utils/generics/mne_logger.h>
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName(QStringLiteral("mne_inverse_pipeline"));
     QCoreApplication::setApplicationVersion(QStringLiteral(PROGRAM_VERSION));
 
-    MNELogger::setupFromEnvironment();
+    qInstallMessageHandler(MNELogger::customLogWriter);
 
     //
     // Command-line parsing
@@ -146,65 +146,63 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    MnaGraph& graph = project.graph;
-
-    //
-    // Validate the graph
-    //
-    QStringList errors;
-    if (!graph.validate(&errors)) {
-        qCritical() << "Graph validation failed:";
-        for (const auto& err : errors)
-            qCritical() << "  " << err;
+    const QList<MnaStep>& pipeline = project.pipeline;
+    if (pipeline.isEmpty()) {
+        qCritical() << "Error: project pipeline is empty.";
         return 1;
     }
-    qInfo() << "Graph validated successfully.";
+
+    qInfo() << "Project:" << project.name
+            << "—" << pipeline.size() << "pipeline steps.";
 
     //
-    // Topological sort
+    // Print execution order
     //
-    const QStringList order = graph.topologicalSort();
-    qInfo() << "Execution order:" << order.join(QStringLiteral(" -> "));
+    QStringList stepIds;
+    for (const auto& step : pipeline)
+        stepIds.append(step.id.isEmpty() ? step.tool : step.id);
+    qInfo() << "Execution order:" << stepIds.join(QStringLiteral(" -> "));
 
     //
     // Dry run — stop here
     //
     if (parser.isSet(dryRunOpt)) {
-        out << "Dry run complete. " << order.size() << " nodes validated.\n";
+        out << "Dry run complete. " << pipeline.size() << " steps validated.\n";
         return 0;
     }
 
     //
-    // Execute nodes in topological order
+    // Execute pipeline steps in order
     //
     qInfo() << "Executing pipeline...";
     const auto& registry = MnaOpRegistry::instance();
 
-    for (const auto& nodeId : order) {
-        const MnaNode& n = graph.node(nodeId);
-        qInfo() << "  [" << nodeId << "] op:" << n.opType;
+    QVariantMap stepResults;  // accumulate outputs keyed by step id
 
-        auto func = registry.opFunc(n.opType);
+    for (int i = 0; i < pipeline.size(); ++i) {
+        const MnaStep& step = pipeline[i];
+        const QString stepLabel = step.id.isEmpty() ? step.tool : step.id;
+        qInfo() << "  [" << stepLabel << "] tool:" << step.tool;
+
+        auto func = registry.opFunc(step.tool);
         if (!func) {
-            qWarning() << "    No execution function registered for" << n.opType << "— skipping.";
+            qWarning() << "    No execution function registered for" << step.tool << "— skipping.";
             continue;
         }
 
-        // Gather input variants from upstream nodes
+        // Build input map from upstream step results
         QVariantMap inputs;
-        for (const auto& port : n.inputPorts) {
-            if (!port.sourceNodeId.isEmpty()) {
-                inputs.insert(port.name, n.runtimeOutputs.value(port.sourceNodeId));
+        for (const QString& inputRef : step.inputs) {
+            if (stepResults.contains(inputRef)) {
+                inputs.insert(inputRef, stepResults.value(inputRef));
             }
         }
 
-        // Gather attributes as params
-        QVariantMap params;
-        for (const auto& attr : n.attributes) {
-            params.insert(attr.key, attr.value);
-        }
+        QVariantMap result = func(inputs, step.parameters);
 
-        QVariant result = func(params, inputs);
+        // Store results keyed by step id for downstream steps
+        stepResults.insert(stepLabel, QVariant::fromValue(result));
+
         qInfo() << "    Done.";
     }
 

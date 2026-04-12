@@ -1333,7 +1333,6 @@ bool AnnotationModel::saveAnnotationCsv(QFile& qFile) const
     const qint64 measurementStartUsecs = measurementStartUsecsSinceEpoch(&haveMeasurementStart);
     const qint64 csvBaseUsecs = haveMeasurementStart ? measurementStartUsecs : 0;
 
-    const QVector<AnnotationEntry> entries = exportEntries();
     for(const AnnotationEntry& entry : entries) {
         const qint64 onsetUsecs = csvBaseUsecs + qRound64(sampleToOnsetSeconds(entry.startSample) * 1000000.0);
         QStringList values;
@@ -1416,7 +1415,6 @@ bool AnnotationModel::saveAnnotationTxt(QFile& qFile) const
 
     stream << "# " << columns.join(QStringLiteral(", ")) << '\n';
 
-    const QVector<AnnotationEntry> entries = exportEntries();
     for(const AnnotationEntry& entry : entries) {
         QStringList values;
         values.reserve(columns.size());
