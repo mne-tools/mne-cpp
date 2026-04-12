@@ -38,7 +38,6 @@
 //=============================================================================================================
 
 #include <mri/mri_slicer.h>
-#include <mri/mri_vol_data.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -82,63 +81,54 @@ private slots:
     void cleanupTestCase();
 
 private:
-    MriVolData m_vol;
-    bool m_hasTestData = false;
+    QVector<float> m_volData;
+    QVector<int>   m_dims;
+    Matrix4f       m_vox2ras;
 };
 
 //=============================================================================================================
 
 void TestMriSlicer::initTestCase()
 {
-    // Try to find a T1 volume from test data
-    QStringList candidates;
-    candidates << QDir::currentPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/mri/T1.mgz"
-               << QDir::currentPath() + "/resources/data/mne-cpp-test-data/subjects/sample/mri/T1.mgz";
+    // Create a small synthetic 16×16×16 volume with identity vox2ras
+    m_dims = {16, 16, 16};
+    int nVoxels = m_dims[0] * m_dims[1] * m_dims[2];
+    m_volData.resize(nVoxels);
 
-    QString mneData = qEnvironmentVariable("MNE_DATA");
-    if (!mneData.isEmpty()) {
-        candidates << mneData + "/MNE-sample-data/subjects/sample/mri/T1.mgz";
-    }
+    // Fill with a gradient so slices are non-uniform
+    for (int z = 0; z < m_dims[2]; ++z)
+        for (int y = 0; y < m_dims[1]; ++y)
+            for (int x = 0; x < m_dims[0]; ++x)
+                m_volData[x + y * m_dims[0] + z * m_dims[0] * m_dims[1]] =
+                    static_cast<float>(x + y + z);
 
-    for (const auto& path : candidates) {
-        if (QFile::exists(path)) {
-            m_hasTestData = m_vol.read(path);
-            if (m_hasTestData) {
-                qDebug() << "Loaded T1 volume from:" << path;
-                break;
-            }
-        }
-    }
-
-    if (!m_hasTestData) {
-        qWarning("No T1.mgz found — some MriSlicer tests will be limited. "
-                 "Set MNE_DATA or provide mne-cpp-test-data.");
-    }
+    // Identity vox2ras (1mm voxels, origin at corner)
+    m_vox2ras = Matrix4f::Identity();
 }
 
 //=============================================================================================================
 
 void TestMriSlicer::testSliceOrientations()
 {
-    if (!m_hasTestData)
-        return;
-
     // Extract one slice of each orientation at the middle index
-    int midAxial = m_vol.dimZ() / 2;
-    MriSliceImage axial = MriSlicer::extractSlice(m_vol, SliceOrientation::Axial, midAxial);
+    int midAxial = m_dims[2] / 2;
+    MriSliceImage axial = MriSlicer::extractSlice(m_volData, m_dims, m_vox2ras,
+                                                   SliceOrientation::Axial, midAxial);
     QCOMPARE(axial.orientation, SliceOrientation::Axial);
     QVERIFY(axial.width > 0);
     QVERIFY(axial.height > 0);
     QCOMPARE(axial.sliceIndex, midAxial);
 
-    int midCoronal = m_vol.dimY() / 2;
-    MriSliceImage coronal = MriSlicer::extractSlice(m_vol, SliceOrientation::Coronal, midCoronal);
+    int midCoronal = m_dims[1] / 2;
+    MriSliceImage coronal = MriSlicer::extractSlice(m_volData, m_dims, m_vox2ras,
+                                                     SliceOrientation::Coronal, midCoronal);
     QCOMPARE(coronal.orientation, SliceOrientation::Coronal);
     QVERIFY(coronal.width > 0);
     QVERIFY(coronal.height > 0);
 
-    int midSagittal = m_vol.dimX() / 2;
-    MriSliceImage sagittal = MriSlicer::extractSlice(m_vol, SliceOrientation::Sagittal, midSagittal);
+    int midSagittal = m_dims[0] / 2;
+    MriSliceImage sagittal = MriSlicer::extractSlice(m_volData, m_dims, m_vox2ras,
+                                                      SliceOrientation::Sagittal, midSagittal);
     QCOMPARE(sagittal.orientation, SliceOrientation::Sagittal);
     QVERIFY(sagittal.width > 0);
     QVERIFY(sagittal.height > 0);
@@ -148,19 +138,16 @@ void TestMriSlicer::testSliceOrientations()
 
 void TestMriSlicer::testRasVoxelRoundTrip()
 {
-    if (!m_hasTestData)
-        return;
-
-    // For random RAS points within the volume, round-trip should be consistent
+    // For RAS points within the volume, round-trip should be consistent
     // voxelToRas(rasToVoxel(ras)) ≈ ras (within half voxel)
     QVector<Vector3f> testPoints;
-    testPoints << Vector3f(0.0f, 0.0f, 0.0f)
-               << Vector3f(10.0f, -20.0f, 30.0f)
-               << Vector3f(-5.0f, 15.0f, -10.0f);
+    testPoints << Vector3f(5.0f, 5.0f, 5.0f)
+               << Vector3f(10.0f, 3.0f, 8.0f)
+               << Vector3f(1.0f, 12.0f, 7.0f);
 
     for (const auto& ras : testPoints) {
-        Vector3i vox = MriSlicer::rasToVoxel(m_vol, ras);
-        Vector3f roundTrip = MriSlicer::voxelToRas(m_vol, vox);
+        Vector3i vox = MriSlicer::rasToVoxel(m_vox2ras, ras);
+        Vector3f roundTrip = MriSlicer::voxelToRas(m_vox2ras, vox);
 
         // The round-trip error should be at most 1 voxel width in each dimension
         // (due to integer rounding of voxel indices)
@@ -175,12 +162,10 @@ void TestMriSlicer::testRasVoxelRoundTrip()
 
 void TestMriSlicer::testOrthogonalExtraction()
 {
-    if (!m_hasTestData)
-        return;
-
     // Extract three orthogonal slices at a point
-    Vector3f centerRas(0.0f, 0.0f, 0.0f);
-    QVector<MriSliceImage> slices = MriSlicer::extractOrthogonal(m_vol, centerRas);
+    Vector3f centerRas(8.0f, 8.0f, 8.0f);
+    QVector<MriSliceImage> slices = MriSlicer::extractOrthogonal(m_volData, m_dims,
+                                                                  m_vox2ras, centerRas);
 
     QCOMPARE(slices.size(), 3);
 
@@ -200,11 +185,9 @@ void TestMriSlicer::testOrthogonalExtraction()
 
 void TestMriSlicer::testSliceNormalization()
 {
-    if (!m_hasTestData)
-        return;
-
     // Slice pixels should be normalized to [0, 1]
-    MriSliceImage slice = MriSlicer::extractSlice(m_vol, SliceOrientation::Axial, m_vol.dimZ() / 2);
+    MriSliceImage slice = MriSlicer::extractSlice(m_volData, m_dims, m_vox2ras,
+                                                   SliceOrientation::Axial, m_dims[2] / 2);
 
     float minVal = slice.pixels.minCoeff();
     float maxVal = slice.pixels.maxCoeff();

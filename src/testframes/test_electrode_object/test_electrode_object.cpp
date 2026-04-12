@@ -260,14 +260,17 @@ void TestElectrodeObject::testGeometryGeneration()
     obj.setShafts(shafts);
 
     // Generate shaft geometry (cylinder mesh)
-    auto shaftGeo = obj.generateShaftGeometry(16);  // 16 segments
+    QVector<float> shaftVerts;
+    QVector<unsigned int> shaftIdx;
+    obj.generateShaftGeometry(shaftVerts, shaftIdx, 16);  // 16 segments
     // Should have geometry data for 3 shafts
-    QVERIFY(!shaftGeo.isEmpty());
+    QVERIFY(!shaftVerts.isEmpty());
 
     // Generate contact instances (instanced spheres)
-    auto contactInstances = obj.generateContactInstances();
-    // 3 shafts × 6 contacts = 18 instances
-    QCOMPARE(contactInstances.size(), 18);
+    QVector<float> contactInstData;
+    obj.generateContactInstances(contactInstData);
+    // 3 shafts × 6 contacts = 18 instances, each 9 floats (pos3 + radius1 + rgba4 + selected1)
+    QCOMPARE(contactInstData.size(), 18 * 9);
 }
 
 //=============================================================================================================

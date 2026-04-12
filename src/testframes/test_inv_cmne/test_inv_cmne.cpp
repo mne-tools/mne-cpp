@@ -179,8 +179,8 @@ void TestInvCmne::testDspmKernelDimensions()
     InvCMNEResult result = InvCMNE::compute(evoked, gain, noiseCov, srcCov, settings);
 
     // dSPM output dimensions
-    QCOMPARE(result.stcDspm.data().rows(), nSrc);
-    QCOMPARE(result.stcDspm.data().cols(), nTimes);
+    QCOMPARE(result.stcDspm.data.rows(), nSrc);
+    QCOMPARE(result.stcDspm.data.cols(), nTimes);
 
     // Kernel dimensions
     QCOMPARE(result.matKernelDspm.rows(), nSrc);
@@ -215,11 +215,11 @@ void TestInvCmne::testDspmOutputRange()
     InvCMNEResult result = InvCMNE::compute(evoked, gain, noiseCov, srcCov, settings);
 
     // dSPM values should not be all zeros
-    QVERIFY2(result.stcDspm.data().norm() > 0.0, "dSPM output should not be all zeros");
+    QVERIFY2(result.stcDspm.data.norm() > 0.0, "dSPM output should not be all zeros");
 
     // dSPM values should not contain NaN or Inf
-    bool hasNan = result.stcDspm.data().array().isNaN().any();
-    bool hasInf = result.stcDspm.data().array().isInf().any();
+    bool hasNan = result.stcDspm.data.array().isNaN().any();
+    bool hasInf = result.stcDspm.data.array().isInf().any();
     QVERIFY2(!hasNan, "dSPM output contains NaN");
     QVERIFY2(!hasInf, "dSPM output contains Inf");
 }
@@ -253,8 +253,8 @@ void TestInvCmne::testZScoreRectifyProperties()
     InvCMNEResult result = InvCMNE::compute(evoked, gain, noiseCov, srcCov, settings);
 
     // Verify dSPM data is finite
-    QVERIFY(!result.stcDspm.data().array().isNaN().any());
-    QVERIFY(!result.stcDspm.data().array().isInf().any());
+    QVERIFY(!result.stcDspm.data.array().isNaN().any());
+    QVERIFY(!result.stcDspm.data.array().isInf().any());
 }
 
 //=============================================================================================================
@@ -290,10 +290,10 @@ void TestInvCmne::testCmneIdentityForEarlyTimesteps()
 
     // First lookBack columns of CMNE should equal dSPM (when no model is available,
     // the entire output may equal dSPM)
-    if (result.stcCmne.data().cols() > 0 && result.stcDspm.data().cols() > 0) {
-        int checkCols = qMin(lookBack, (int)result.stcCmne.data().cols());
-        MatrixXd cmneEarly = result.stcCmne.data().leftCols(checkCols);
-        MatrixXd dspmEarly = result.stcDspm.data().leftCols(checkCols);
+    if (result.stcCmne.data.cols() > 0 && result.stcDspm.data.cols() > 0) {
+        int checkCols = qMin(lookBack, (int)result.stcCmne.data.cols());
+        MatrixXd cmneEarly = result.stcCmne.data.leftCols(checkCols);
+        MatrixXd dspmEarly = result.stcDspm.data.leftCols(checkCols);
         double maxDiff = (cmneEarly - dspmEarly).cwiseAbs().maxCoeff();
         QVERIFY2(maxDiff < 1e-10,
                  qPrintable(QString("Early timesteps: CMNE != dSPM, maxDiff=%1").arg(maxDiff)));
@@ -325,12 +325,12 @@ void TestInvCmne::testCmneOutputDimensions()
     InvCMNEResult result = InvCMNE::compute(evoked, gain, noiseCov, srcCov, settings);
 
     // Both dSPM and CMNE outputs should have same dimensions
-    QCOMPARE(result.stcDspm.data().rows(), nSrc);
-    QCOMPARE(result.stcDspm.data().cols(), nTimes);
+    QCOMPARE(result.stcDspm.data.rows(), nSrc);
+    QCOMPARE(result.stcDspm.data.cols(), nTimes);
 
-    if (result.stcCmne.data().rows() > 0) {
-        QCOMPARE(result.stcCmne.data().rows(), nSrc);
-        QCOMPARE(result.stcCmne.data().cols(), nTimes);
+    if (result.stcCmne.data.rows() > 0) {
+        QCOMPARE(result.stcCmne.data.rows(), nSrc);
+        QCOMPARE(result.stcCmne.data.cols(), nTimes);
     }
 }
 
@@ -362,8 +362,8 @@ void TestInvCmne::testFewTimeSamples()
     // Should not crash
     InvCMNEResult result = InvCMNE::compute(evoked, gain, noiseCov, srcCov, settings);
 
-    QCOMPARE(result.stcDspm.data().rows(), nSrc);
-    QCOMPARE(result.stcDspm.data().cols(), nTimes);
+    QCOMPARE(result.stcDspm.data.rows(), nSrc);
+    QCOMPARE(result.stcDspm.data.cols(), nTimes);
 }
 
 //=============================================================================================================

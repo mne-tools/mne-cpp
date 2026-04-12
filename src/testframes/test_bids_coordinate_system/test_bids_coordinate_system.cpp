@@ -119,10 +119,10 @@ void TestBidsCoordinateSystem::testWriteJsonRoundTrip()
     cs.system = "MNI152NLin2009aSym";
     cs.units = "mm";
     cs.description = "Test coordinate system";
-    cs.transform = Matrix4f::Identity();
-    cs.transform(0, 3) = 10.0f;
-    cs.transform(1, 3) = 20.0f;
-    cs.transform(2, 3) = 30.0f;
+    cs.transform = Matrix4d::Identity();
+    cs.transform(0, 3) = 10.0;
+    cs.transform(1, 3) = 20.0;
+    cs.transform(2, 3) = 30.0;
 
     QString outPath = m_tempDir.filePath("test_coordsystem.json");
     QVERIFY(BidsCoordinateSystem::writeJson(outPath, cs));
@@ -133,8 +133,8 @@ void TestBidsCoordinateSystem::testWriteJsonRoundTrip()
     QCOMPARE(csRead.description, cs.description);
 
     // The 4x4 transform should round-trip
-    float maxDiff = (csRead.transform - cs.transform).cwiseAbs().maxCoeff();
-    QVERIFY2(maxDiff < 1e-5f,
+    double maxDiff = (csRead.transform - cs.transform).cwiseAbs().maxCoeff();
+    QVERIFY2(maxDiff < 1e-5,
              qPrintable(QString("Transform round-trip maxDiff=%1").arg(maxDiff)));
 }
 
@@ -145,10 +145,10 @@ void TestBidsCoordinateSystem::testToFiffCoordTrans()
     BidsCoordinateSystem cs;
     cs.system = "Other";
     cs.units = "mm";
-    cs.transform = Matrix4f::Identity();
-    cs.transform(0, 3) = 5.0f;
-    cs.transform(1, 3) = 10.0f;
-    cs.transform(2, 3) = 15.0f;
+    cs.transform = Matrix4d::Identity();
+    cs.transform(0, 3) = 5.0;
+    cs.transform(1, 3) = 10.0;
+    cs.transform(2, 3) = 15.0;
 
     FiffCoordTrans trans = cs.toFiffCoordTrans(FIFFV_COORD_MRI, FIFFV_COORD_HEAD);
 
@@ -164,14 +164,14 @@ void TestBidsCoordinateSystem::testTransformValues()
     BidsCoordinateSystem cs;
     cs.system = "Other";
     cs.units = "mm";
-    cs.transform = Matrix4f::Identity();
+    cs.transform = Matrix4d::Identity();
     // Set a rotation + translation
-    cs.transform(0, 0) = 0.0f;   cs.transform(0, 1) = -1.0f;  cs.transform(0, 2) = 0.0f;
-    cs.transform(1, 0) = 1.0f;   cs.transform(1, 1) = 0.0f;   cs.transform(1, 2) = 0.0f;
-    cs.transform(2, 0) = 0.0f;   cs.transform(2, 1) = 0.0f;   cs.transform(2, 2) = 1.0f;
-    cs.transform(0, 3) = 100.0f;
-    cs.transform(1, 3) = 200.0f;
-    cs.transform(2, 3) = 300.0f;
+    cs.transform(0, 0) = 0.0;   cs.transform(0, 1) = -1.0;  cs.transform(0, 2) = 0.0;
+    cs.transform(1, 0) = 1.0;   cs.transform(1, 1) = 0.0;   cs.transform(1, 2) = 0.0;
+    cs.transform(2, 0) = 0.0;   cs.transform(2, 1) = 0.0;   cs.transform(2, 2) = 1.0;
+    cs.transform(0, 3) = 100.0;
+    cs.transform(1, 3) = 200.0;
+    cs.transform(2, 3) = 300.0;
 
     FiffCoordTrans trans = cs.toFiffCoordTrans(FIFFV_COORD_MRI, FIFFV_COORD_HEAD);
 
@@ -188,7 +188,7 @@ void TestBidsCoordinateSystem::testIdentityTransform()
     BidsCoordinateSystem cs;
     cs.system = "Other";
     cs.units = "m";
-    cs.transform = Matrix4f::Identity();
+    cs.transform = Matrix4d::Identity();
 
     FiffCoordTrans trans = cs.toFiffCoordTrans(FIFFV_COORD_HEAD, FIFFV_COORD_HEAD);
     QCOMPARE(trans.from, (int)FIFFV_COORD_HEAD);
