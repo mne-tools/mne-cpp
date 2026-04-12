@@ -53,7 +53,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 # ONNX Runtime (optional — enabled when USE_ONNXRUNTIME=ON and the package was found)
 if(TARGET onnxruntime::onnxruntime)
     target_link_libraries(${PROJECT_NAME} PRIVATE onnxruntime::onnxruntime)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_USE_ONNXRUNTIME)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC MNE_USE_ONNXRUNTIME)
     message(STATUS "[mne_ml] ONNX Runtime enabled")
 
     # Copy the ONNX Runtime shared library next to mne_ml so the runtime linker
