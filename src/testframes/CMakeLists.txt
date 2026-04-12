@@ -196,3 +196,17 @@ add_subdirectory(test_dsp_channel_derivation)
 add_subdirectory(test_sts_cluster)
 add_subdirectory(test_ml_models)
 add_subdirectory(test_inv_sparse)
+
+# v2.2.0 gap-closing tests
+add_subdirectory(test_sts_cov_estimators)
+add_subdirectory(test_inv_cmne)
+add_subdirectory(test_dsp_infomax)
+add_subdirectory(test_bids_coordinate_system)
+add_subdirectory(test_fs_atlas_lookup)
+add_subdirectory(test_mri_slicer)
+add_subdirectory(test_electrode_object)
+add_subdirectory(test_ml_trainer)
+add_subdirectory(test_mna_graph_execution)
+
+# v2.2.0 cross-validation tests (MNE-CPP vs MNE-Python)
+add_subdirectory(test_crossval_covariance)

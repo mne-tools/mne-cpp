@@ -86,10 +86,45 @@ namespace UTILSLIB
  *   QVERIFY(qAbs(cppValue - pyValue) < 1e-6);
  * @endcode
  *
- * When MNE-Python is not installed, tests should QSKIP gracefully.
+ * When MNE-Python is not installed, tests should QSKIP gracefully — but
+ * never silently.  Use the GUARD_PYTHON / GUARD_PYTHON_PACKAGE macros to
+ * ensure skips are intentional and visible.  When the environment variable
+ * MNE_REQUIRE_PYTHON=true is set (e.g. in CI), those macros QFAIL instead
+ * of QSKIP, so a missing Python installation is treated as a hard error.
  *
  * @brief Test helper for MNE-Python cross-validation.
  */
+
+//=============================================================================================================
+/**
+ * @brief Skip (or fail) the current test if Python is not available.
+ *
+ * Use this macro at the top of any test slot that requires Python.
+ * - If MNE_REQUIRE_PYTHON is **not** set: QSKIP with a clear message.
+ * - If MNE_REQUIRE_PYTHON=true: QFAIL so the skip is never silent in CI.
+ *
+ * @param helper   A PythonTestHelper (or bool) — must support operator bool / isAvailable().
+ * @param reason   Human-readable reason string.
+ */
+#define GUARD_PYTHON(available, reason) \
+    do { \
+        if (!(available)) { \
+            if (UTILSLIB::PythonTestHelper::isPythonRequired()) \
+                QFAIL(qPrintable(QString("HARD FAIL (MNE_REQUIRE_PYTHON=true): %1").arg(reason))); \
+            QSKIP(qPrintable(QString("SKIP: %1").arg(reason))); \
+        } \
+    } while (0)
+
+/**
+ * @brief Skip (or fail) the current test if a Python package is missing.
+ *
+ * @param helper       A PythonTestHelper instance.
+ * @param packageName  Package name string (e.g. "sklearn").
+ */
+#define GUARD_PYTHON_PACKAGE(helper, packageName) \
+    GUARD_PYTHON((helper).hasPackage(packageName), \
+                 QString("Python package '%1' not available").arg(packageName))
+
 class UTILSSHARED_EXPORT PythonTestHelper
 {
 public:
@@ -195,6 +230,73 @@ public:
      * @return Absolute path to the test data directory.
      */
     static QString testDataPath();
+
+    //=========================================================================================================
+    /**
+     * Check whether the environment demands Python availability.
+     *
+     * When MNE_REQUIRE_PYTHON=true is set, test guards should QFAIL instead
+     * of QSKIP, ensuring skips are never silent in CI.
+     *
+     * @return True if MNE_REQUIRE_PYTHON environment variable is "true" (or "1").
+     */
+    static bool isPythonRequired();
+
+    //=========================================================================================================
+    /**
+     * Write an Eigen matrix to a text file with full double precision.
+     * The format is one row per line, space-separated values, using %.17e
+     * notation — compatible with Python's numpy.loadtxt().
+     *
+     * @param[in] filePath   Output file path.
+     * @param[in] mat        Matrix to write.
+     *
+     * @return True on success.
+     */
+    static bool writeMatrix(const QString& filePath, const Eigen::MatrixXd& mat);
+
+    //=========================================================================================================
+    /**
+     * Read an Eigen matrix from a text file (space-separated values,
+     * one row per line). Compatible with numpy.savetxt() output.
+     *
+     * @param[in] filePath   Input file path.
+     * @param[out] ok        Set to true on success, false on failure.
+     *
+     * @return Parsed MatrixXd, or empty matrix on failure.
+     */
+    static Eigen::MatrixXd readMatrix(const QString& filePath, bool* ok = nullptr);
+
+    //=========================================================================================================
+    /**
+     * Run Python code that writes a matrix to outputFilePath
+     * (e.g. via numpy.savetxt), then read the result back as an Eigen MatrixXd.
+     *
+     * This is preferred over evalMatrix() for large matrices or when full
+     * double precision is required, because it avoids stdout parsing.
+     *
+     * Example:
+     * @code
+     *   QString code = QString(
+     *       "import numpy as np\n"
+     *       "cov = np.eye(3)\n"
+     *       "np.savetxt('%1', cov, fmt='%%.17e')\n"
+     *   ).arg(outPath);
+     *   bool ok;
+     *   auto mat = helper.evalMatrixViaFile(code, outPath, &ok);
+     * @endcode
+     *
+     * @param[in] code             Python code to execute.
+     * @param[in] outputFilePath   Path where Python writes the matrix.
+     * @param[out] ok              Set to true on success.
+     * @param[in] timeoutMs        Timeout in milliseconds.
+     *
+     * @return Parsed MatrixXd, or empty matrix on failure.
+     */
+    Eigen::MatrixXd evalMatrixViaFile(const QString& code,
+                                       const QString& outputFilePath,
+                                       bool* ok = nullptr,
+                                       int timeoutMs = 120000) const;
 
 private:
     mutable PythonRunner m_runner;  /**< Internal PythonRunner instance. */

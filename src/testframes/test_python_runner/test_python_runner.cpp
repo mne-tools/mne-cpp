@@ -97,9 +97,8 @@ void TestPythonRunner::initTestCase()
 {
     PythonRunner runner;
     m_bPythonAvailable = runner.isPythonAvailable();
-    if (!m_bPythonAvailable) {
-        qWarning() << "Python not available - some tests will be skipped";
-    }
+    qDebug() << "Python detection: available=" << m_bPythonAvailable
+             << " MNE_REQUIRE_PYTHON=" << PythonTestHelper::isPythonRequired();
 }
 
 //=============================================================================================================
@@ -117,9 +116,7 @@ void TestPythonRunner::testIsPythonAvailable()
 
 void TestPythonRunner::testPythonVersion()
 {
-    if (!m_bPythonAvailable) {
-        QSKIP("Python not available");
-    }
+    GUARD_PYTHON(m_bPythonAvailable, "Python not available");
 
     PythonRunner runner;
     QString version = runner.pythonVersion();
@@ -132,9 +129,7 @@ void TestPythonRunner::testPythonVersion()
 
 void TestPythonRunner::testRunCodeHelloWorld()
 {
-    if (!m_bPythonAvailable) {
-        QSKIP("Python not available");
-    }
+    GUARD_PYTHON(m_bPythonAvailable, "Python not available");
 
     PythonRunnerConfig config;
     config.timeoutMsec = 10000;
@@ -150,9 +145,7 @@ void TestPythonRunner::testRunCodeHelloWorld()
 
 void TestPythonRunner::testRunCodeStdErr()
 {
-    if (!m_bPythonAvailable) {
-        QSKIP("Python not available");
-    }
+    GUARD_PYTHON(m_bPythonAvailable, "Python not available");
 
     PythonRunnerConfig config;
     config.timeoutMsec = 10000;
@@ -168,9 +161,7 @@ void TestPythonRunner::testRunCodeStdErr()
 
 void TestPythonRunner::testRunCodeExitCode()
 {
-    if (!m_bPythonAvailable) {
-        QSKIP("Python not available");
-    }
+    GUARD_PYTHON(m_bPythonAvailable, "Python not available");
 
     PythonRunnerConfig config;
     config.timeoutMsec = 10000;
@@ -186,9 +177,7 @@ void TestPythonRunner::testRunCodeExitCode()
 
 void TestPythonRunner::testRunCodeTimeout()
 {
-    if (!m_bPythonAvailable) {
-        QSKIP("Python not available");
-    }
+    GUARD_PYTHON(m_bPythonAvailable, "Python not available");
 
     PythonRunnerConfig config;
     config.timeoutMsec = 500; // Very short timeout
@@ -205,9 +194,7 @@ void TestPythonRunner::testRunCodeTimeout()
 
 void TestPythonRunner::testRunCodeMultiline()
 {
-    if (!m_bPythonAvailable) {
-        QSKIP("Python not available");
-    }
+    GUARD_PYTHON(m_bPythonAvailable, "Python not available");
 
     PythonRunnerConfig config;
     config.timeoutMsec = 10000;
@@ -227,9 +214,7 @@ void TestPythonRunner::testRunCodeMultiline()
 
 void TestPythonRunner::testRunCodeEnvironmentVars()
 {
-    if (!m_bPythonAvailable) {
-        QSKIP("Python not available");
-    }
+    GUARD_PYTHON(m_bPythonAvailable, "Python not available");
 
     PythonRunnerConfig config;
     config.timeoutMsec = 10000;
@@ -246,9 +231,7 @@ void TestPythonRunner::testRunCodeEnvironmentVars()
 
 void TestPythonRunner::testIsPackageAvailable()
 {
-    if (!m_bPythonAvailable) {
-        QSKIP("Python not available");
-    }
+    GUARD_PYTHON(m_bPythonAvailable, "Python not available");
 
     PythonRunner runner;
 
@@ -263,9 +246,7 @@ void TestPythonRunner::testIsPackageAvailable()
 
 void TestPythonRunner::testProgressParsing()
 {
-    if (!m_bPythonAvailable) {
-        QSKIP("Python not available");
-    }
+    GUARD_PYTHON(m_bPythonAvailable, "Python not available");
 
     PythonRunnerConfig config;
     config.timeoutMsec = 10000;
@@ -309,9 +290,7 @@ void TestPythonRunner::testHelperIsAvailable()
 void TestPythonRunner::testHelperEval()
 {
     PythonTestHelper helper;
-    if (!helper.isPythonAvailable()) {
-        QSKIP("Python not available");
-    }
+    GUARD_PYTHON(helper.isPythonAvailable(), "Python not available");
 
     PythonRunnerResult result = helper.eval("print(2 + 3)");
     QVERIFY(result.success);
@@ -323,9 +302,7 @@ void TestPythonRunner::testHelperEval()
 void TestPythonRunner::testHelperEvalDouble()
 {
     PythonTestHelper helper;
-    if (!helper.isPythonAvailable()) {
-        QSKIP("Python not available");
-    }
+    GUARD_PYTHON(helper.isPythonAvailable(), "Python not available");
 
     bool ok = false;
     double value = helper.evalDouble("import math; print(math.pi)", &ok);
@@ -338,9 +315,7 @@ void TestPythonRunner::testHelperEvalDouble()
 void TestPythonRunner::testHelperEvalVector()
 {
     PythonTestHelper helper;
-    if (!helper.isPythonAvailable()) {
-        QSKIP("Python not available");
-    }
+    GUARD_PYTHON(helper.isPythonAvailable(), "Python not available");
 
     bool ok = false;
     Eigen::VectorXd vec = helper.evalVector(
@@ -356,9 +331,7 @@ void TestPythonRunner::testHelperEvalVector()
 void TestPythonRunner::testHelperEvalMatrix()
 {
     PythonTestHelper helper;
-    if (!helper.isPythonAvailable()) {
-        QSKIP("Python not available");
-    }
+    GUARD_PYTHON(helper.isPythonAvailable(), "Python not available");
 
     bool ok = false;
     Eigen::MatrixXd mat = helper.evalMatrix(

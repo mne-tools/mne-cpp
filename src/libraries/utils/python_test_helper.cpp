@@ -40,6 +40,8 @@
 
 #include <QCoreApplication>
 #include <QDir>
+#include <QFile>
+#include <QProcessEnvironment>
 #include <QTextStream>
 #include <QRegularExpression>
 
@@ -220,4 +222,110 @@ PythonRunnerResult PythonTestHelper::runScript(const QString& scriptPath,
 QString PythonTestHelper::testDataPath()
 {
     return QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/";
+}
+
+//=============================================================================================================
+
+bool PythonTestHelper::isPythonRequired()
+{
+    const QString val = QProcessEnvironment::systemEnvironment().value("MNE_REQUIRE_PYTHON").toLower();
+    return val == "true" || val == "1";
+}
+
+//=============================================================================================================
+
+bool PythonTestHelper::writeMatrix(const QString& filePath, const MatrixXd& mat)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        return false;
+    }
+
+    QTextStream out(&file);
+    out.setRealNumberNotation(QTextStream::ScientificNotation);
+    out.setRealNumberPrecision(17);
+
+    for (int r = 0; r < mat.rows(); ++r) {
+        for (int c = 0; c < mat.cols(); ++c) {
+            if (c > 0) out << ' ';
+            out << mat(r, c);
+        }
+        out << '\n';
+    }
+
+    file.close();
+    return true;
+}
+
+//=============================================================================================================
+
+MatrixXd PythonTestHelper::readMatrix(const QString& filePath, bool* ok)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        if (ok) *ok = false;
+        return MatrixXd();
+    }
+
+    QTextStream in(&file);
+    QList<QList<double>> rowData;
+    int nCols = -1;
+
+    while (!in.atEnd()) {
+        QString line = in.readLine().trimmed();
+        if (line.isEmpty()) continue;
+
+        QStringList tokens = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+        if (nCols < 0) {
+            nCols = tokens.size();
+        } else if (tokens.size() != nCols) {
+            if (ok) *ok = false;
+            return MatrixXd();
+        }
+
+        QList<double> row;
+        for (const QString& token : tokens) {
+            bool parseOk = false;
+            double val = token.toDouble(&parseOk);
+            if (!parseOk) {
+                if (ok) *ok = false;
+                return MatrixXd();
+            }
+            row.append(val);
+        }
+        rowData.append(row);
+    }
+
+    file.close();
+
+    if (rowData.isEmpty() || nCols <= 0) {
+        if (ok) *ok = false;
+        return MatrixXd();
+    }
+
+    MatrixXd mat(rowData.size(), nCols);
+    for (int r = 0; r < rowData.size(); ++r) {
+        for (int c = 0; c < nCols; ++c) {
+            mat(r, c) = rowData[r][c];
+        }
+    }
+
+    if (ok) *ok = true;
+    return mat;
+}
+
+//=============================================================================================================
+
+MatrixXd PythonTestHelper::evalMatrixViaFile(const QString& code,
+                                              const QString& outputFilePath,
+                                              bool* ok,
+                                              int timeoutMs) const
+{
+    PythonRunnerResult result = eval(code, timeoutMs);
+    if (!result.success) {
+        if (ok) *ok = false;
+        return MatrixXd();
+    }
+
+    return readMatrix(outputFilePath, ok);
 }
