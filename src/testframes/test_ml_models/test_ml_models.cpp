@@ -265,10 +265,10 @@ void TestMlModels::testModelPolymorphism()
     QVERIFY(!model->modelType().isEmpty());
     QCOMPARE(model->taskType(), MlTaskType::Regression);
 
+    // Predicting on an untrained model must throw
     MatrixXf mat = MatrixXf::Random(3, 5);
     MlTensor input(mat);
-    MlTensor output = model->predict(input);
-    QVERIFY(true); // Didn't crash
+    QVERIFY_EXCEPTION_THROWN(model->predict(input), std::runtime_error);
 }
 
 //=============================================================================================================
