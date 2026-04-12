@@ -38,6 +38,8 @@
 
 #include "electrodeobject.h"
 
+#include <rhi/qrhi.h>
+
 #include <QtMath>
 
 #include <limits>
@@ -47,6 +49,20 @@
 //=============================================================================================================
 
 using namespace DISP3DLIB;
+
+//=============================================================================================================
+// PIMPL
+//=============================================================================================================
+
+struct ElectrodeObject::GpuBuffers
+{
+    std::unique_ptr<QRhiBuffer> vertexBuffer;   // shaft geometry (pos+normal)
+    std::unique_ptr<QRhiBuffer> indexBuffer;     // shaft triangle indices
+    std::unique_ptr<QRhiBuffer> instanceBuffer;  // per-contact instance data
+    uint32_t shaftIndexCount = 0;
+    uint32_t instanceCount = 0;
+    bool dirty = true;
+};
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -59,8 +75,13 @@ ElectrodeObject::ElectrodeObject()
     , m_bbMax(std::numeric_limits<float>::lowest(),
               std::numeric_limits<float>::lowest(),
               std::numeric_limits<float>::lowest())
+    , m_gpu(std::make_unique<GpuBuffers>())
 {
 }
+
+//=============================================================================================================
+
+ElectrodeObject::~ElectrodeObject() = default;
 
 //=============================================================================================================
 
@@ -69,6 +90,7 @@ void ElectrodeObject::setShafts(const QVector<ElectrodeShaft>& shafts)
     m_shafts = shafts;
     m_selectedContact.clear();
     computeBoundingBox();
+    m_gpu->dirty = true;
 }
 
 //=============================================================================================================
@@ -116,6 +138,7 @@ void ElectrodeObject::setContactValues(const QMap<QString, float>& values,
             }
         }
     }
+    m_gpu->dirty = true;
 }
 
 //=============================================================================================================
@@ -131,6 +154,7 @@ void ElectrodeObject::selectContact(const QString& name)
         for (auto& contact : shaft.contacts) {
             if (contact.name == name) {
                 contact.selected = true;
+                m_gpu->dirty = true;
                 return;
             }
         }
@@ -149,6 +173,7 @@ void ElectrodeObject::clearSelection()
         for (auto& contact : shaft.contacts)
             contact.selected = false;
     }
+    m_gpu->dirty = true;
 }
 
 //=============================================================================================================
@@ -358,4 +383,110 @@ QColor ElectrodeObject::interpolateColor(float value, float minVal, float maxVal
     result.setBlueF(static_cast<qreal>(b));
     result.setAlphaF(static_cast<qreal>(a));
     return result;
+}
+
+//=============================================================================================================
+
+void ElectrodeObject::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
+{
+    const bool needsCreate = !m_gpu->vertexBuffer || !m_gpu->indexBuffer || !m_gpu->instanceBuffer;
+
+#ifdef __EMSCRIPTEN__
+    if (!needsCreate && !m_gpu->dirty) {
+        // WASM: always re-upload to avoid VAO cache staleness
+        if (m_gpu->shaftIndexCount > 0) {
+            QVector<float> verts;
+            QVector<unsigned int> idx;
+            generateShaftGeometry(verts, idx);
+            u->uploadStaticBuffer(m_gpu->vertexBuffer.get(), verts.constData());
+            u->uploadStaticBuffer(m_gpu->indexBuffer.get(), idx.constData());
+        }
+        if (m_gpu->instanceCount > 0) {
+            QVector<float> inst;
+            generateContactInstances(inst);
+            u->uploadStaticBuffer(m_gpu->instanceBuffer.get(), inst.constData());
+        }
+        return;
+    }
+#else
+    if (!m_gpu->dirty && !needsCreate) return;
+#endif
+
+    // Generate CPU-side data
+    QVector<float> shaftVerts;
+    QVector<unsigned int> shaftIdx;
+    generateShaftGeometry(shaftVerts, shaftIdx);
+
+    QVector<float> instData;
+    generateContactInstances(instData);
+
+    m_gpu->shaftIndexCount = static_cast<uint32_t>(shaftIdx.size());
+    m_gpu->instanceCount   = static_cast<uint32_t>(instData.size() / 9);
+
+    // Shaft vertex buffer
+    const quint32 vbufSize = static_cast<quint32>(shaftVerts.size() * sizeof(float));
+    if (vbufSize > 0) {
+        if (!m_gpu->vertexBuffer) {
+            m_gpu->vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, vbufSize));
+            m_gpu->vertexBuffer->create();
+        }
+        u->uploadStaticBuffer(m_gpu->vertexBuffer.get(), shaftVerts.constData());
+    }
+
+    // Shaft index buffer
+    const quint32 ibufSize = static_cast<quint32>(shaftIdx.size() * sizeof(unsigned int));
+    if (ibufSize > 0) {
+        if (!m_gpu->indexBuffer) {
+            m_gpu->indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, ibufSize));
+            m_gpu->indexBuffer->create();
+        }
+        u->uploadStaticBuffer(m_gpu->indexBuffer.get(), shaftIdx.constData());
+    }
+
+    // Contact instance buffer
+    const quint32 instBufSize = static_cast<quint32>(instData.size() * sizeof(float));
+    if (instBufSize > 0) {
+        if (!m_gpu->instanceBuffer) {
+            m_gpu->instanceBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, instBufSize));
+            m_gpu->instanceBuffer->create();
+        }
+        u->uploadStaticBuffer(m_gpu->instanceBuffer.get(), instData.constData());
+    }
+
+    m_gpu->dirty = false;
+}
+
+//=============================================================================================================
+
+QRhiBuffer* ElectrodeObject::vertexBuffer() const
+{
+    return m_gpu->vertexBuffer.get();
+}
+
+//=============================================================================================================
+
+QRhiBuffer* ElectrodeObject::indexBuffer() const
+{
+    return m_gpu->indexBuffer.get();
+}
+
+//=============================================================================================================
+
+QRhiBuffer* ElectrodeObject::instanceBuffer() const
+{
+    return m_gpu->instanceBuffer.get();
+}
+
+//=============================================================================================================
+
+uint32_t ElectrodeObject::shaftIndexCount() const
+{
+    return m_gpu->shaftIndexCount;
+}
+
+//=============================================================================================================
+
+uint32_t ElectrodeObject::contactInstanceCount() const
+{
+    return m_gpu->instanceCount;
 }

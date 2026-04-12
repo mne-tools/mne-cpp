@@ -51,6 +51,13 @@
 #include <QVector>
 #include <QVector3D>
 
+#include <memory>
+
+// Forward-declare QRhi types so that this header stays QRhi-free
+class QRhi;
+class QRhiBuffer;
+class QRhiResourceUpdateBatch;
+
 //=============================================================================================================
 // DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
@@ -95,6 +102,7 @@ class DISP3DSHARED_EXPORT ElectrodeObject
 {
 public:
     ElectrodeObject();
+    ~ElectrodeObject();
 
     //=========================================================================================================
     /**
@@ -182,6 +190,45 @@ public:
      */
     QVector3D boundingBoxMax() const;
 
+    //=========================================================================================================
+    /**
+     * Update GPU buffers (shaft vertex/index, contact instance) via QRhi.
+     *
+     * @param[in] rhi        Pointer to QRhi instance.
+     * @param[in] u          Resource update batch.
+     */
+    void updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u);
+
+    //=========================================================================================================
+    /**
+     * @return Shaft vertex buffer (position + normal interleaved, 6 floats/vertex).
+     */
+    QRhiBuffer* vertexBuffer() const;
+
+    //=========================================================================================================
+    /**
+     * @return Shaft index buffer.
+     */
+    QRhiBuffer* indexBuffer() const;
+
+    //=========================================================================================================
+    /**
+     * @return Contact instance buffer (9 floats/instance).
+     */
+    QRhiBuffer* instanceBuffer() const;
+
+    //=========================================================================================================
+    /**
+     * @return Number of shaft indices for drawIndexed.
+     */
+    uint32_t shaftIndexCount() const;
+
+    //=========================================================================================================
+    /**
+     * @return Number of contact instances for instanced draw.
+     */
+    uint32_t contactInstanceCount() const;
+
 private:
     QVector<ElectrodeShaft> m_shafts;           /**< All electrode shafts. */
     QString                 m_selectedContact;   /**< Currently selected contact name. */
@@ -207,6 +254,10 @@ private:
      */
     static QColor interpolateColor(float value, float minVal, float maxVal,
                                    const QColor& minColor, const QColor& maxColor);
+
+    /** @brief QRhi vertex, index, and instance buffers for electrode GPU rendering. */
+    struct GpuBuffers;
+    std::unique_ptr<GpuBuffers> m_gpu;
 };
 
 } // namespace DISP3DLIB

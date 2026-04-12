@@ -60,6 +60,7 @@ option(BUILD_MNE_SENSITIVITY_MAP "Build MNE Sensitivity Map" ON)
 option(BUILD_MNE_COMPUTE_CMNE "Build MNE Compute CMNE" ON)
 option(BUILD_MNE_SMOOTH "Build MNE Smooth" ON)
 option(BUILD_MNE_VOLUME_DATA2MRI "Build MNE Volume Data to MRI" ON)
+option(BUILD_MNE_INVERSE_PIPELINE "Build MNE Inverse Pipeline" ON)
 
 # Preprocessing tools
 option(BUILD_MNE_PROCESS_RAW "Build MNE Process Raw" ON)
@@ -201,6 +202,9 @@ if(NOT WASM)
   endif()
   if(BUILD_MNE_VOLUME_DATA2MRI)
     add_subdirectory(inverse/mne_volume_data2mri)
+  endif()
+  if(BUILD_MNE_INVERSE_PIPELINE AND TARGET mne_mna)
+    add_subdirectory(inverse/mne_inverse_pipeline)
   endif()
 
   # Preprocessing

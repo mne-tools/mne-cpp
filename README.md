@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/mne-tools/mne-cpp/releases/latest"><img src="https://img.shields.io/badge/version-2.1.0-blue.svg" alt="Version 2.1.0"></a>&nbsp;
+  <a href="https://github.com/mne-tools/mne-cpp/releases/latest"><img src="https://img.shields.io/badge/version-2.2.0-blue.svg" alt="Version 2.2.0"></a>&nbsp;
   <a href="https://github.com/mne-tools/mne-cpp/actions/workflows/main.yml"><img src="https://github.com/mne-tools/mne-cpp/actions/workflows/main.yml/badge.svg?branch=main" alt="Release"></a>&nbsp;
   <a href="https://github.com/mne-tools/mne-cpp/actions/workflows/staging.yml"><img src="https://github.com/mne-tools/mne-cpp/actions/workflows/staging.yml/badge.svg?branch=staging" alt="Staging"></a>&nbsp;
   <a href="https://codecov.io/gh/mne-tools/mne-cpp/tree/staging"><img src="https://codecov.io/gh/mne-tools/mne-cpp/branch/staging/graph/badge.svg" alt="CodeCov"></a>

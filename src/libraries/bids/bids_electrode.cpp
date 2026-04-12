@@ -39,6 +39,8 @@
 #include "bids_electrode.h"
 #include "bids_tsv.h"
 
+#include <Eigen/Core>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -120,4 +122,51 @@ bool BidsElectrode::writeTsv(const QString& sFilePath,
     }
 
     return BidsTsv::writeTsv(sFilePath, headers, rows);
+}
+
+//=============================================================================================================
+
+FIFFLIB::FiffDigPointSet BidsElectrode::toFiffDigPoints(
+    const QList<BidsElectrode>& electrodes,
+    const FIFFLIB::FiffCoordTrans& trans)
+{
+    using namespace FIFFLIB;
+
+    FiffDigPointSet digSet;
+    int ident = 1;
+
+    const bool hasTransform = (trans.from != 0 || trans.to != 0);
+
+    for (const BidsElectrode& elec : electrodes) {
+        // Skip electrodes with "n/a" coordinates
+        bool xOk = false, yOk = false, zOk = false;
+        float xVal = elec.x.toFloat(&xOk);
+        float yVal = elec.y.toFloat(&yOk);
+        float zVal = elec.z.toFloat(&zOk);
+
+        if (!xOk || !yOk || !zOk) {
+            continue;
+        }
+
+        FiffDigPoint point;
+        point.kind  = FIFFV_POINT_EEG;
+        point.ident = ident++;
+        point.r[0]  = xVal;
+        point.r[1]  = yVal;
+        point.r[2]  = zVal;
+
+        // Apply coordinate transform if provided
+        if (hasTransform) {
+            Eigen::Vector3f pos(point.r[0], point.r[1], point.r[2]);
+            Eigen::Vector3f transformed = (trans.trans.block<3,3>(0,0).cast<float>() * pos
+                                           + trans.trans.block<3,1>(0,3).cast<float>());
+            point.r[0] = transformed(0);
+            point.r[1] = transformed(1);
+            point.r[2] = transformed(2);
+        }
+
+        digSet << point;
+    }
+
+    return digSet;
 }

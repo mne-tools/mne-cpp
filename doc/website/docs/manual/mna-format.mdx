@@ -1,0 +1,73 @@
+# MNA Graph Format
+
+The **MNA** (MNE Node-graph for Analysis) format is a YAML-based project file
+that describes an analysis pipeline as a directed acyclic graph (DAG) of
+operators.
+
+## File Structure
+
+An `.mna` file contains three top-level sections:
+
+```yaml
+format: mna/1.0
+meta:
+  author: Jane Doe
+  description: "Minimum-norm source localization pipeline"
+  created: 2026-04-25T10:00:00Z
+
+nodes:
+  - id: load_raw
+    op: io.read_raw_fif
+    params:
+      path: "${DATA_DIR}/sample_audvis_raw.fif"
+
+  - id: filter
+    op: dsp.band_pass_filter
+    inputs: [load_raw]
+    params:
+      low_freq: 1.0
+      high_freq: 40.0
+
+  - id: inverse
+    op: inv.compute_mne
+    inputs: [filter]
+    params:
+      method: dSPM
+      snr: 3.0
+```
+
+### `format`
+
+Version string of the MNA schema (`mna/1.0`).
+
+### `meta`
+
+Optional metadata: author, description, timestamps.
+
+### `nodes`
+
+Ordered list of operator nodes. Each node has:
+
+| Field    | Required | Description                                               |
+|----------|----------|-----------------------------------------------------------|
+| `id`     | yes      | Unique string identifier for the node.                    |
+| `op`     | yes      | Registered operator name (namespace-qualified).           |
+| `inputs` | no       | List of upstream node IDs whose outputs feed this node.   |
+| `params` | no       | Key-value parameters passed to the operator at execution. |
+
+## Execution Model
+
+The MNA runtime (`MnaGraph`) resolves the DAG in topological order and executes
+each operator sequentially. Outputs of predecessor nodes are passed as inputs to
+downstream nodes via a shared context map keyed by node ID.
+
+### Operator Registry
+
+Operators are registered in `MnaOpRegistry`. Built-in operators cover common I/O,
+DSP, forward, and inverse workflows. Custom operators can be registered at runtime
+via `MnaOpRegistry::registerOp()`.
+
+## Example
+
+See `resources/examples/mna_inverse_dspm.mna` for a complete inverse-pipeline
+example.

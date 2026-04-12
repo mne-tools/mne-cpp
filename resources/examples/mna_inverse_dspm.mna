@@ -1,0 +1,74 @@
+{
+    "mna_version": "1.0",
+    "name": "dSPM Inverse Pipeline",
+    "description": "dSPM inverse source estimation pipeline using the MNE sample dataset",
+    "created": "2026-04-25T10:00:00Z",
+    "modified": "2026-04-25T10:00:00Z",
+    "subjects": [],
+    "pipeline": [
+        {
+            "id": "load_raw",
+            "tool": "load_fiff_raw",
+            "toolVersion": "2.2.0",
+            "parameters": {
+                "raw_path": "${TEST_DATA}/MEG/sample/sample_audvis_trunc_raw.fif"
+            },
+            "inputs": [],
+            "outputs": ["raw_data", "info"]
+        },
+        {
+            "id": "load_evoked",
+            "tool": "load_fiff_evoked",
+            "toolVersion": "2.2.0",
+            "parameters": {
+                "evoked_path": "${TEST_DATA}/MEG/sample/sample_audvis-ave.fif",
+                "setno": 0
+            },
+            "inputs": [],
+            "outputs": ["evoked"]
+        },
+        {
+            "id": "load_cov",
+            "tool": "load_fiff_cov",
+            "toolVersion": "2.2.0",
+            "parameters": {
+                "cov_path": "${TEST_DATA}/MEG/sample/sample_audvis-cov.fif"
+            },
+            "inputs": [],
+            "outputs": ["noise_cov"]
+        },
+        {
+            "id": "load_fwd",
+            "tool": "load_forward",
+            "toolVersion": "2.2.0",
+            "parameters": {
+                "fwd_path": "${TEST_DATA}/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif"
+            },
+            "inputs": [],
+            "outputs": ["forward"]
+        },
+        {
+            "id": "make_inv",
+            "tool": "make_inverse_operator",
+            "toolVersion": "2.2.0",
+            "parameters": {
+                "loose": 0.2,
+                "depth": 0.8
+            },
+            "inputs": ["load_raw::info", "load_fwd::forward", "load_cov::noise_cov"],
+            "outputs": ["inverse_operator"]
+        },
+        {
+            "id": "apply_dspm",
+            "tool": "apply_inverse",
+            "toolVersion": "2.2.0",
+            "parameters": {
+                "method": "dSPM",
+                "snr": 3.0,
+                "pick_normal": false
+            },
+            "inputs": ["make_inv::inverse_operator", "load_evoked::evoked"],
+            "outputs": ["source_estimate"]
+        }
+    ]
+}

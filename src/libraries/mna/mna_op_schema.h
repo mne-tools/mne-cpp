@@ -100,8 +100,13 @@ class MNASHARED_EXPORT MnaOpSchema
 {
 public:
     QString     opType;         ///< Operation type string
+    QString     version;        ///< Version of the operation (e.g. "2.2.0")
+    QString     binding;        ///< Binding type: "internal", "cli", or "script"
+    QString     category;       ///< Category: "io", "preprocessing", "source_estimation", etc.
     QString     description;    ///< What the operation does
     QString     library;        ///< Which library provides the implementation
+    QString     executable;     ///< For CLI ops: executable name (e.g. "recon-all")
+    QString     cliTemplate;    ///< For CLI ops: command template with {{placeholder}} tokens
 
     QList<MnaOpSchemaPort> inputPorts;   ///< Expected input ports
     QList<MnaOpSchemaPort> outputPorts;  ///< Expected output ports

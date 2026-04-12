@@ -1,0 +1,63 @@
+# MNA Library API
+
+The `mne_mna` library implements the MNA graph-execution engine.
+
+## Core Classes
+
+### `MnaGraph`
+
+Parses an `.mna` file, resolves the DAG, and executes operators in topological order.
+
+```cpp
+#include <mna/mna_graph.h>
+
+MNALIB::MnaGraph graph;
+graph.loadFromFile("pipeline.mna");
+graph.execute();
+```
+
+| Method              | Description                                       |
+|---------------------|---------------------------------------------------|
+| `loadFromFile(path)`| Parse a YAML `.mna` file and build the DAG.       |
+| `execute()`         | Run all nodes in topological order.                |
+| `nodeResult(id)`    | Retrieve the output `QVariant` of a completed node.|
+
+### `MnaOpRegistry`
+
+Singleton registry mapping operator names to callable functors.
+
+```cpp
+#include <mna/mna_op_registry.h>
+
+auto& reg = MNALIB::MnaOpRegistry::instance();
+reg.registerOp("custom.my_filter", [](const QVariantMap& params,
+                                       const QVariantMap& inputs) -> QVariant {
+    // implementation
+    return result;
+});
+```
+
+| Method                         | Description                                |
+|--------------------------------|--------------------------------------------|
+| `instance()`                   | Access the singleton registry.             |
+| `registerOp(name, functor)`    | Register an operator under `name`.         |
+| `hasOp(name)`                  | Check if an operator is registered.        |
+| `invoke(name, params, inputs)` | Execute the named operator.                |
+
+## Built-in Operators
+
+| Namespace   | Operator                  | Description                          |
+|-------------|---------------------------|--------------------------------------|
+| `io`        | `io.read_raw_fif`         | Load a raw FIF file.                 |
+| `io`        | `io.write_raw_fif`        | Save a raw FIF file.                 |
+| `dsp`       | `dsp.band_pass_filter`    | Apply a band-pass FIR filter.        |
+| `inv`       | `inv.compute_mne`         | Compute MNE/dSPM/sLORETA inverse.   |
+| `fwd`       | `fwd.make_forward`        | Compute forward solution.            |
+
+## Link Dependencies
+
+```cmake
+target_link_libraries(my_app PRIVATE mne_mna)
+```
+
+The library depends on `mne_utils`, `mne_fiff`, and Qt6::Core.

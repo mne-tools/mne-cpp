@@ -25,6 +25,7 @@ set(SOURCES
   mna_node.cpp
   mna_op_schema.cpp
   mna_op_registry.cpp
+  mna_registry_loader.cpp
   mna_param_binding.cpp
   mna_param_tree.cpp
   mna_graph.cpp
@@ -47,6 +48,7 @@ set(HEADERS
   mna_node.h
   mna_op_schema.h
   mna_op_registry.h
+  mna_registry_loader.h
   mna_param_binding.h
   mna_param_tree.h
   mna_graph.h

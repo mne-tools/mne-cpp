@@ -2,8 +2,8 @@
 /**
  * @file     annotationmodel.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @version  2.1.0
- * @date     March, 2026
+ * @version  2.2.0
+ * @date     April, 2026
  *
  * @section  LICENSE
  *
@@ -56,6 +56,7 @@
 #include <algorithm>
 
 using namespace MNEBROWSE;
+using namespace FIFFLIB;
 
 namespace
 {
@@ -329,7 +330,7 @@ AnnotationModel::~AnnotationModel() = default;
 int AnnotationModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
-    return m_annotations.size();
+    return m_fiffAnnotations.size();
 }
 
 //=============================================================================================================
@@ -382,11 +383,11 @@ QVariant AnnotationModel::headerData(int section, Qt::Orientation orientation, i
 
 QVariant AnnotationModel::data(const QModelIndex &index, int role) const
 {
-    if(!index.isValid() || index.row() < 0 || index.row() >= m_annotations.size()) {
+    if(!index.isValid() || index.row() < 0 || index.row() >= m_fiffAnnotations.size()) {
         return QVariant();
     }
 
-    const AnnotationEntry& entry = m_annotations.at(index.row());
+    const FiffAnnotation& annot = m_fiffAnnotations[index.row()];
 
     if(role == Qt::TextAlignmentRole) {
         return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
@@ -395,7 +396,7 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
     if(role == Qt::BackgroundRole) {
         QBrush brush;
         brush.setStyle(Qt::SolidPattern);
-        QColor color = colorForLabel(entry.description);
+        QColor color = colorForLabel(annot.description);
         color.setAlpha(40);
         brush.setColor(color);
         return QVariant(brush);
@@ -405,8 +406,11 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
-    const int relativeStart = entry.startSample - m_iFirstSample;
-    const int relativeEnd = entry.endSample - m_iFirstSample;
+    const double sfreq = (m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0;
+    const int startSample = m_iFirstSample + static_cast<int>(qRound(annot.onset * sfreq));
+    const int endSample = startSample + static_cast<int>(qRound(annot.duration * sfreq));
+    const int relativeStart = startSample - m_iFirstSample;
+    const int relativeEnd = endSample - m_iFirstSample;
 
     switch(index.column()) {
         case StartSampleColumn:
@@ -414,16 +418,15 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
         case EndSampleColumn:
             return QVariant(relativeEnd);
         case OnsetSecondsColumn:
-            return QVariant(sampleToOnsetSeconds(entry.startSample));
+            return QVariant(annot.onset);
         case DurationSecondsColumn:
-            return QVariant(static_cast<double>(entry.endSample - entry.startSample + 1)
-                            / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0));
+            return QVariant(annot.duration);
         case DescriptionColumn:
-            return QVariant(entry.description);
+            return QVariant(annot.description);
         case ChannelsColumn:
-            return QVariant(displayChannelNames(entry.channelNames));
+            return QVariant(displayChannelNames(annot.channelNames));
         case CommentColumn:
-            return QVariant(entry.comment);
+            return QVariant(annot.comment);
         default:
             return QVariant();
     }
@@ -444,44 +447,45 @@ Qt::ItemFlags AnnotationModel::flags(const QModelIndex &index) const
 
 bool AnnotationModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if(role != Qt::EditRole || !index.isValid() || index.row() < 0 || index.row() >= m_annotations.size()) {
+    if(role != Qt::EditRole || !index.isValid() || index.row() < 0 || index.row() >= m_fiffAnnotations.size()) {
         return false;
     }
 
-    AnnotationEntry& entry = m_annotations[index.row()];
+    FiffAnnotation& annot = m_fiffAnnotations[index.row()];
+    const double sfreq = (m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0;
 
     switch(index.column()) {
         case StartSampleColumn:
-            entry.startSample = value.toInt() + m_iFirstSample;
+            annot.onset = static_cast<double>(value.toInt()) / sfreq;
             break;
-        case EndSampleColumn:
-            entry.endSample = value.toInt() + m_iFirstSample;
+        case EndSampleColumn: {
+            double startSec = annot.onset;
+            double endSec = static_cast<double>(value.toInt()) / sfreq;
+            annot.duration = qMax(0.0, endSec - startSec);
             break;
+        }
         case OnsetSecondsColumn:
-            entry.startSample = onsetSecondsToSample(value.toDouble());
+            annot.onset = value.toDouble();
             break;
         case DurationSecondsColumn:
-            entry.endSample = entry.startSample + durationSecondsToSamples(value.toDouble()) - 1;
+            annot.duration = qMax(0.0, value.toDouble());
             break;
         case DescriptionColumn:
-            entry.description = value.toString().trimmed();
+            annot.description = value.toString().trimmed();
             break;
         case ChannelsColumn:
-            entry.channelNames = parseDisplayChannelNames(value.toString());
+            annot.channelNames = parseDisplayChannelNames(value.toString());
             break;
         case CommentColumn:
-            entry.comment = value.toString().trimmed();
+            annot.comment = value.toString().trimmed();
             break;
         default:
             return false;
     }
 
-    entry = normalizeEntry(entry.startSample,
-                           entry.endSample,
-                           entry.description,
-                           entry.channelNames,
-                           entry.comment,
-                           entry.extras);
+    // Ensure non-negative onset and duration
+    if(annot.onset < 0.0) annot.onset = 0.0;
+    if(annot.duration < 0.0) annot.duration = 0.0;
 
     beginResetModel();
     sortEntries();
@@ -497,13 +501,13 @@ bool AnnotationModel::removeRows(int position, int rows, const QModelIndex &pare
 {
     Q_UNUSED(parent)
 
-    if(position < 0 || rows <= 0 || position + rows > m_annotations.size()) {
+    if(position < 0 || rows <= 0 || position + rows > m_fiffAnnotations.size()) {
         return false;
     }
 
     beginRemoveRows(QModelIndex(), position, position + rows - 1);
     for(int index = 0; index < rows; ++index) {
-        m_annotations.removeAt(position);
+        m_fiffAnnotations.remove(position);
     }
     endRemoveRows();
 
@@ -536,39 +540,53 @@ int AnnotationModel::addAnnotation(int startSample,
 {
     AnnotationEntry entry = normalizeEntry(startSample, endSample, description, channelNames, comment);
 
+    // Convert to time-based FiffAnnotation
+    const double sfreq = (m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0;
+    double onset = static_cast<double>(entry.startSample - m_iFirstSample) / sfreq;
+    double duration = static_cast<double>(entry.endSample - entry.startSample + 1) / sfreq;
+    if(onset < 0.0) onset = 0.0;
+    if(duration < 0.0) duration = 0.0;
+
     // Auto-merge: absorb any existing same-description annotations that overlap or are adjacent
     QVector<int> mergeIndices;
-    for (int i = 0; i < m_annotations.size(); ++i) {
-        const AnnotationEntry& existing = m_annotations.at(i);
+    for (int i = 0; i < m_fiffAnnotations.size(); ++i) {
+        const FiffAnnotation& existing = m_fiffAnnotations[i];
         if (existing.description != entry.description)
             continue;
+        // Convert existing to samples for overlap check
+        int existStart = m_iFirstSample + static_cast<int>(qRound(existing.onset * sfreq));
+        int existEnd = existStart + static_cast<int>(qRound(existing.duration * sfreq));
         // Overlapping or adjacent (within 1 sample)?
-        if (existing.startSample <= entry.endSample + 1
-            && existing.endSample >= entry.startSample - 1) {
-            entry.startSample = qMin(entry.startSample, existing.startSample);
-            entry.endSample   = qMax(entry.endSample, existing.endSample);
+        if (existStart <= entry.endSample + 1
+            && existEnd >= entry.startSample - 1) {
+            entry.startSample = qMin(entry.startSample, existStart);
+            entry.endSample   = qMax(entry.endSample, existEnd);
             mergeIndices.append(i);
         }
     }
+
+    // Recompute onset/duration after merge
+    onset = static_cast<double>(entry.startSample - m_iFirstSample) / sfreq;
+    duration = static_cast<double>(entry.endSample - entry.startSample + 1) / sfreq;
 
     beginResetModel();
     // Remove merged entries in reverse order
     std::sort(mergeIndices.begin(), mergeIndices.end(), std::greater<int>());
     for (int idx : mergeIndices)
-        m_annotations.removeAt(idx);
-    m_annotations.append(entry);
+        m_fiffAnnotations.remove(idx);
+
+    m_fiffAnnotations.append(onset, duration, entry.description, entry.channelNames, entry.comment);
     sortEntries();
     endResetModel();
 
     notifyAnnotationsChanged();
 
-    for(int row = 0; row < m_annotations.size(); ++row) {
-        const AnnotationEntry& candidate = m_annotations.at(row);
-        if(candidate.startSample == entry.startSample
-           && candidate.endSample == entry.endSample
-           && candidate.description == entry.description
-           && candidate.channelNames == entry.channelNames
-           && candidate.comment == entry.comment) {
+    // Find the row of the newly inserted annotation
+    for(int row = 0; row < m_fiffAnnotations.size(); ++row) {
+        const FiffAnnotation& candidate = m_fiffAnnotations[row];
+        if(qAbs(candidate.onset - onset) < 1e-9
+           && qAbs(candidate.duration - duration) < 1e-9
+           && candidate.description == entry.description) {
             return row;
         }
     }
@@ -580,34 +598,46 @@ int AnnotationModel::addAnnotation(int startSample,
 
 QPair<int, int> AnnotationModel::getSampleRange(int row) const
 {
-    if(row < 0 || row >= m_annotations.size()) {
+    if(row < 0 || row >= m_fiffAnnotations.size()) {
         return QPair<int, int>(0, 0);
     }
 
-    const AnnotationEntry& entry = m_annotations.at(row);
-    return QPair<int, int>(entry.startSample, entry.endSample);
+    const FiffAnnotation& annot = m_fiffAnnotations[row];
+    const double sfreq = (m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0;
+    int startSample = m_iFirstSample + static_cast<int>(qRound(annot.onset * sfreq));
+    int endSample = startSample + static_cast<int>(qRound(annot.duration * sfreq));
+    return QPair<int, int>(startSample, endSample);
 }
 
 //=============================================================================================================
 
 bool AnnotationModel::updateAnnotationBoundary(int row, bool isStart, int absoluteSample)
 {
-    if(row < 0 || row >= m_annotations.size()) {
+    if(row < 0 || row >= m_fiffAnnotations.size()) {
         return false;
     }
 
-    AnnotationEntry& entry = m_annotations[row];
+    FiffAnnotation& annot = m_fiffAnnotations[row];
+    const double sfreq = (m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0;
+
+    int startSample = m_iFirstSample + static_cast<int>(qRound(annot.onset * sfreq));
+    int endSample = startSample + static_cast<int>(qRound(annot.duration * sfreq));
 
     if(isStart) {
-        entry.startSample = absoluteSample;
+        startSample = absoluteSample;
     } else {
-        entry.endSample = absoluteSample;
+        endSample = absoluteSample;
     }
 
     // Ensure start <= end
-    if(entry.startSample > entry.endSample) {
-        std::swap(entry.startSample, entry.endSample);
+    if(startSample > endSample) {
+        std::swap(startSample, endSample);
     }
+
+    annot.onset = static_cast<double>(startSample - m_iFirstSample) / sfreq;
+    annot.duration = static_cast<double>(endSample - startSample) / sfreq;
+    if(annot.onset < 0.0) annot.onset = 0.0;
+    if(annot.duration < 0.0) annot.duration = 0.0;
 
     beginResetModel();
     sortEntries();
@@ -622,16 +652,19 @@ bool AnnotationModel::updateAnnotationBoundary(int row, bool isStart, int absolu
 QVector<AnnotationSpanData> AnnotationModel::getAnnotationSpans() const
 {
     QVector<AnnotationSpanData> spans;
-    spans.reserve(m_annotations.size());
+    spans.reserve(m_fiffAnnotations.size());
 
-    for(const AnnotationEntry& entry : m_annotations) {
+    const double sfreq = (m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0;
+
+    for(int i = 0; i < m_fiffAnnotations.size(); ++i) {
+        const FiffAnnotation& annot = m_fiffAnnotations[i];
         AnnotationSpanData span;
-        span.startSample = entry.startSample;
-        span.endSample = entry.endSample;
-        span.color = colorForLabel(entry.description);
-        span.label = entry.description;
-        span.comment = entry.comment;
-        span.channelNames = entry.channelNames;
+        span.startSample = m_iFirstSample + static_cast<int>(qRound(annot.onset * sfreq));
+        span.endSample = span.startSample + static_cast<int>(qRound(annot.duration * sfreq));
+        span.color = colorForLabel(annot.description);
+        span.label = annot.description;
+        span.comment = annot.comment;
+        span.channelNames = annot.channelNames;
         spans.append(span);
     }
 
@@ -745,7 +778,7 @@ bool AnnotationModel::loadAnnotationJson(QFile& qFile)
     }
 
     beginResetModel();
-    m_annotations = parsedEntries;
+    importEntries(parsedEntries);
     sortEntries();
     m_bFileLoaded = true;
     endResetModel();
@@ -861,7 +894,7 @@ bool AnnotationModel::loadAnnotationFif(QFile& qFile)
     }
 
     beginResetModel();
-    m_annotations = parsedEntries;
+    importEntries(parsedEntries);
     sortEntries();
     m_bFileLoaded = true;
     endResetModel();
@@ -987,7 +1020,7 @@ bool AnnotationModel::loadAnnotationCsv(QFile& qFile)
     qFile.close();
 
     beginResetModel();
-    m_annotations = parsedEntries;
+    importEntries(parsedEntries);
     sortEntries();
     m_bFileLoaded = true;
     endResetModel();
@@ -1094,7 +1127,7 @@ bool AnnotationModel::loadAnnotationTxt(QFile& qFile)
     qFile.close();
 
     beginResetModel();
-    m_annotations = parsedEntries;
+    importEntries(parsedEntries);
     sortEntries();
     m_bFileLoaded = true;
     endResetModel();
@@ -1113,7 +1146,8 @@ bool AnnotationModel::saveAnnotationJson(QFile& qFile) const
     }
 
     QJsonArray annotationArray;
-    for(const AnnotationEntry& entry : m_annotations) {
+    const QVector<AnnotationEntry> entries = exportEntries();
+    for(const AnnotationEntry& entry : entries) {
         QJsonObject object;
         object.insert(QStringLiteral("start_sample"), entry.startSample);
         object.insert(QStringLiteral("end_sample"), entry.endSample);
@@ -1175,11 +1209,11 @@ bool AnnotationModel::saveAnnotationFif(QFile& qFile) const
 
     QVector<float> onsetSeconds;
     QVector<float> endSeconds;
-    onsetSeconds.reserve(m_annotations.size());
-    endSeconds.reserve(m_annotations.size());
+    onsetSeconds.reserve(m_fiffAnnotations.size());
+    endSeconds.reserve(m_fiffAnnotations.size());
 
     QStringList descriptions;
-    descriptions.reserve(m_annotations.size());
+    descriptions.reserve(m_fiffAnnotations.size());
 
     QJsonArray channelNameRows;
     bool haveChannelNames = false;
@@ -1187,7 +1221,8 @@ bool AnnotationModel::saveAnnotationFif(QFile& qFile) const
     QJsonArray extrasRows;
     bool haveExtras = false;
 
-    for(const AnnotationEntry& entry : m_annotations) {
+    const QVector<AnnotationEntry> entries = exportEntries();
+    for(const AnnotationEntry& entry : entries) {
         const float onset = static_cast<float>(sampleToOnsetSeconds(entry.startSample));
         const float duration = static_cast<float>((entry.endSample - entry.startSample + 1)
                                / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0));
@@ -1263,7 +1298,8 @@ bool AnnotationModel::saveAnnotationCsv(QFile& qFile) const
     bool haveChannels = false;
     bool haveComments = false;
     QSet<QString> extraKeys;
-    for(const AnnotationEntry& entry : m_annotations) {
+    const QVector<AnnotationEntry> entries = exportEntries();
+    for(const AnnotationEntry& entry : entries) {
         haveChannels = haveChannels || !entry.channelNames.isEmpty();
         haveComments = haveComments || !entry.comment.isEmpty();
         for(auto it = entry.extras.constBegin(); it != entry.extras.constEnd(); ++it) {
@@ -1297,7 +1333,8 @@ bool AnnotationModel::saveAnnotationCsv(QFile& qFile) const
     const qint64 measurementStartUsecs = measurementStartUsecsSinceEpoch(&haveMeasurementStart);
     const qint64 csvBaseUsecs = haveMeasurementStart ? measurementStartUsecs : 0;
 
-    for(const AnnotationEntry& entry : m_annotations) {
+    const QVector<AnnotationEntry> entries = exportEntries();
+    for(const AnnotationEntry& entry : entries) {
         const qint64 onsetUsecs = csvBaseUsecs + qRound64(sampleToOnsetSeconds(entry.startSample) * 1000000.0);
         QStringList values;
         values.reserve(columns.size());
@@ -1345,7 +1382,8 @@ bool AnnotationModel::saveAnnotationTxt(QFile& qFile) const
     bool haveChannels = false;
     bool haveComments = false;
     QSet<QString> extraKeys;
-    for(const AnnotationEntry& entry : m_annotations) {
+    const QVector<AnnotationEntry> entries = exportEntries();
+    for(const AnnotationEntry& entry : entries) {
         haveChannels = haveChannels || !entry.channelNames.isEmpty();
         haveComments = haveComments || !entry.comment.isEmpty();
         for(auto it = entry.extras.constBegin(); it != entry.extras.constEnd(); ++it) {
@@ -1378,7 +1416,8 @@ bool AnnotationModel::saveAnnotationTxt(QFile& qFile) const
 
     stream << "# " << columns.join(QStringLiteral(", ")) << '\n';
 
-    for(const AnnotationEntry& entry : m_annotations) {
+    const QVector<AnnotationEntry> entries = exportEntries();
+    for(const AnnotationEntry& entry : entries) {
         QStringList values;
         values.reserve(columns.size());
         values.append(QString::number(sampleToOnsetSeconds(entry.startSample), 'g', 15));
@@ -1412,7 +1451,7 @@ bool AnnotationModel::saveAnnotationTxt(QFile& qFile) const
 void AnnotationModel::clearModel()
 {
     beginResetModel();
-    m_annotations.clear();
+    m_fiffAnnotations.clear();
     m_bFileLoaded = false;
     endResetModel();
 
@@ -1424,6 +1463,25 @@ void AnnotationModel::clearModel()
 bool AnnotationModel::isFileLoaded() const
 {
     return m_bFileLoaded;
+}
+
+//=============================================================================================================
+
+const FiffAnnotations& AnnotationModel::fiffAnnotations() const
+{
+    return m_fiffAnnotations;
+}
+
+//=============================================================================================================
+
+void AnnotationModel::setFiffAnnotations(const FiffAnnotations& annotations)
+{
+    beginResetModel();
+    m_fiffAnnotations = annotations;
+    m_bFileLoaded = false;
+    endResetModel();
+
+    notifyAnnotationsChanged();
 }
 
 //=============================================================================================================
@@ -1520,19 +1578,67 @@ qint64 AnnotationModel::measurementStartUsecsSinceEpoch(bool *ok) const
 
 //=============================================================================================================
 
+void AnnotationModel::importEntries(const QVector<AnnotationEntry>& entries)
+{
+    const double sfreq = (m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0;
+
+    m_fiffAnnotations.clear();
+    for (const AnnotationEntry& e : entries) {
+        double onset = static_cast<double>(e.startSample - m_iFirstSample) / sfreq;
+        double duration = static_cast<double>(e.endSample - e.startSample + 1) / sfreq;
+        if (onset < 0.0) onset = 0.0;
+        if (duration < 0.0) duration = 0.0;
+
+        FiffAnnotation annot;
+        annot.onset        = onset;
+        annot.duration     = duration;
+        annot.description  = e.description;
+        annot.channelNames = e.channelNames;
+        annot.comment      = e.comment;
+        annot.extras       = e.extras;
+        m_fiffAnnotations.append(annot);
+    }
+}
+
+//=============================================================================================================
+
+QVector<AnnotationModel::AnnotationEntry> AnnotationModel::exportEntries() const
+{
+    const double sfreq = (m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0;
+
+    QVector<AnnotationEntry> entries;
+    entries.reserve(m_fiffAnnotations.size());
+
+    for (int i = 0; i < m_fiffAnnotations.size(); ++i) {
+        const FiffAnnotation& annot = m_fiffAnnotations[i];
+        AnnotationEntry e;
+        e.startSample  = m_iFirstSample + static_cast<int>(qRound(annot.onset * sfreq));
+        e.endSample    = e.startSample + static_cast<int>(qRound(annot.duration * sfreq));
+        e.description  = annot.description;
+        e.channelNames = annot.channelNames;
+        e.comment      = annot.comment;
+        e.extras       = annot.extras;
+        entries.append(e);
+    }
+
+    return entries;
+}
+
+//=============================================================================================================
+
 void AnnotationModel::sortEntries()
 {
-    std::sort(m_annotations.begin(),
-              m_annotations.end(),
-              [](const AnnotationEntry& left, const AnnotationEntry& right) {
-                  if(left.startSample != right.startSample) {
-                      return left.startSample < right.startSample;
+    // Sort the underlying QVector directly via toVector() — FiffAnnotations
+    // exposes its internal vector for in-place sorting.
+    QVector<FiffAnnotation>& vec = const_cast<QVector<FiffAnnotation>&>(m_fiffAnnotations.toVector());
+    std::sort(vec.begin(), vec.end(),
+              [](const FiffAnnotation& left, const FiffAnnotation& right) {
+                  if(qAbs(left.onset - right.onset) > 1e-12) {
+                      return left.onset < right.onset;
                   }
-
-                  if(left.endSample != right.endSample) {
-                      return left.endSample < right.endSample;
+                  if(qAbs(left.duration - right.duration) > 1e-12) {
+                      return left.duration < right.duration;
                   }
-
                   return left.description < right.description;
               });
 }

@@ -1,0 +1,163 @@
+{
+    "mna_registry_version": "1.0",
+    "provider": "mne-cpp",
+    "description": "Core MNE-CPP operations for the MNA graph execution engine",
+    "ops": [
+        {
+            "type": "load_fiff_raw",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "io",
+            "description": "Load raw MEG/EEG data from a FIFF file",
+            "library": "mne_fiff",
+            "inputs": [],
+            "outputs": [
+                { "name": "raw_data", "kind": "FiffRaw",  "description": "Loaded raw data" },
+                { "name": "info",     "kind": "FiffInfo", "description": "Measurement info" }
+            ],
+            "parameters": [
+                { "name": "raw_path", "type": "string", "required": true, "description": "Path to the FIFF raw file" }
+            ]
+        },
+        {
+            "type": "load_fiff_evoked",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "io",
+            "description": "Load averaged evoked response from a FIFF file",
+            "library": "mne_fiff",
+            "inputs": [],
+            "outputs": [
+                { "name": "evoked", "kind": "Evoked", "description": "Evoked response" }
+            ],
+            "parameters": [
+                { "name": "evoked_path", "type": "string", "required": true, "description": "Path to the FIFF evoked file" },
+                { "name": "setno",       "type": "int",    "required": false, "default": 0, "description": "Evoked data set index" }
+            ]
+        },
+        {
+            "type": "load_fiff_cov",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "io",
+            "description": "Load noise covariance matrix from a FIFF file",
+            "library": "mne_fiff",
+            "inputs": [],
+            "outputs": [
+                { "name": "noise_cov", "kind": "Covariance", "description": "Noise covariance matrix" }
+            ],
+            "parameters": [
+                { "name": "cov_path", "type": "string", "required": true, "description": "Path to the FIFF covariance file" }
+            ]
+        },
+        {
+            "type": "load_forward",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "io",
+            "description": "Load a pre-computed forward solution from a FIFF file",
+            "library": "mne_fwd",
+            "inputs": [],
+            "outputs": [
+                { "name": "forward", "kind": "Forward", "description": "Forward solution" }
+            ],
+            "parameters": [
+                { "name": "fwd_path", "type": "string", "required": true, "description": "Path to the FIFF forward solution file" }
+            ]
+        },
+        {
+            "type": "make_inverse_operator",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "source_estimation",
+            "description": "Build an MNE inverse operator from FiffInfo, forward solution, and noise covariance",
+            "library": "mne_inv",
+            "inputs": [
+                { "name": "info",      "kind": "FiffInfo",   "description": "Measurement info (channel layout, projections)" },
+                { "name": "forward",   "kind": "Forward",    "description": "Forward solution" },
+                { "name": "noise_cov", "kind": "Covariance", "description": "Noise covariance matrix" }
+            ],
+            "outputs": [
+                { "name": "inverse_operator", "kind": "Inverse", "description": "Inverse operator" }
+            ],
+            "parameters": [
+                { "name": "loose", "type": "double", "required": false, "default": 0.2, "description": "Loose orientation constraint (0=fixed, 1=free)" },
+                { "name": "depth", "type": "double", "required": false, "default": 0.8, "description": "Depth weighting exponent" }
+            ]
+        },
+        {
+            "type": "apply_inverse",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "source_estimation",
+            "description": "Apply inverse operator to produce source estimates (MNE, dSPM, sLORETA)",
+            "library": "mne_inv",
+            "inputs": [
+                { "name": "inverse_operator", "kind": "Inverse", "description": "Inverse operator" },
+                { "name": "evoked",           "kind": "Evoked",  "description": "Evoked data to invert" }
+            ],
+            "outputs": [
+                { "name": "source_estimate", "kind": "SourceEstimate", "description": "Source estimate (STC)" }
+            ],
+            "parameters": [
+                { "name": "method",      "type": "string", "required": false, "default": "dSPM",  "description": "Inverse method: MNE, dSPM, sLORETA" },
+                { "name": "snr",         "type": "double", "required": false, "default": 3.0,     "description": "Signal-to-noise ratio (lambda2 = 1/snr^2)" },
+                { "name": "pick_normal", "type": "bool",   "required": false, "default": false,   "description": "Pick normal component only" }
+            ]
+        },
+        {
+            "type": "filter_bandpass",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "preprocessing",
+            "description": "Apply bandpass filter to raw data",
+            "library": "mne_dsp",
+            "inputs": [
+                { "name": "raw_data", "kind": "FiffRaw", "description": "Raw data to filter" }
+            ],
+            "outputs": [
+                { "name": "filtered", "kind": "FiffRaw", "description": "Filtered data" }
+            ],
+            "parameters": [
+                { "name": "l_freq", "type": "double", "required": false, "description": "Low cutoff frequency (Hz)" },
+                { "name": "h_freq", "type": "double", "required": false, "description": "High cutoff frequency (Hz)" }
+            ]
+        },
+        {
+            "type": "compute_covariance",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "source_estimation",
+            "description": "Compute noise covariance from raw or epoched data",
+            "library": "mne_mne",
+            "inputs": [
+                { "name": "raw_data", "kind": "FiffRaw", "description": "Raw data input" }
+            ],
+            "outputs": [
+                { "name": "covariance", "kind": "Covariance", "description": "Computed noise covariance" }
+            ],
+            "parameters": [
+                { "name": "method", "type": "string", "required": false, "default": "empirical", "description": "Estimation method: empirical, ledoit-wolf, shrunk" },
+                { "name": "tmin",   "type": "double", "required": false, "description": "Start time for covariance window (seconds)" },
+                { "name": "tmax",   "type": "double", "required": false, "description": "End time for covariance window (seconds)" }
+            ]
+        },
+        {
+            "type": "ipc_command",
+            "version": "2.2.0",
+            "binding": "cli",
+            "category": "external",
+            "description": "Execute an external command via inter-process communication",
+            "library": "mne_mna",
+            "inputs": [],
+            "outputs": [
+                { "name": "stdout",    "kind": "Custom", "description": "Standard output of the process" },
+                { "name": "stderr",    "kind": "Custom", "description": "Standard error of the process" },
+                { "name": "exit_code", "kind": "Custom", "description": "Process exit code" }
+            ],
+            "parameters": [
+                { "name": "command", "type": "string", "required": true, "description": "Command to execute" }
+            ]
+        }
+    ]
+}

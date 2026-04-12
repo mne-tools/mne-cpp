@@ -80,6 +80,9 @@ compile_commands.json
 doc/doxygen/html/
 doc/doxygen/qt-creator_doc/
 
+# Paper drafts (not part of source distribution)
+doc/papers/
+
 /build*
 /out*
 /resources/data*

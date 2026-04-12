@@ -41,6 +41,7 @@ set(SOURCES
     renderable/sourceestimateoverlay.cpp
     renderable/dipoleobject.cpp
     renderable/electrodeobject.cpp
+    renderable/sliceobject.cpp
     renderable/networkobject.cpp
     scene/sensorfieldmapper.cpp
     scene/rtsensorstreammanager.cpp
@@ -82,6 +83,7 @@ set(HEADERS
     renderable/sourceestimateoverlay.h
     renderable/dipoleobject.h
     renderable/electrodeobject.h
+    renderable/sliceobject.h
     renderable/networkobject.h
     scene/sensorfieldmapper.h
     scene/rtsensorstreammanager.h
@@ -123,6 +125,10 @@ qt_add_shaders(${PROJECT_NAME} "disp3d_shaders"
         "shaders/dipole.frag"
         "shaders/shownormals.vert"
         "shaders/shownormals.frag"
+        "shaders/electrode.vert"
+        "shaders/electrode.frag"
+        "shaders/slice.vert"
+        "shaders/slice.frag"
 )
 
 target_include_directories(${PROJECT_NAME}

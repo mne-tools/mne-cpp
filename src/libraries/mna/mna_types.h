@@ -162,6 +162,59 @@ inline MnaFileRole mnaFileRoleFromString(const QString& str)
     return MnaFileRole::Custom;
 }
 
+//=============================================================================================================
+
+/**
+ * Convert MnaDataKind to its string representation.
+ */
+inline QString mnaDataKindToString(MnaDataKind kind)
+{
+    switch (kind) {
+    case MnaDataKind::FiffRaw:          return QStringLiteral("FiffRaw");
+    case MnaDataKind::Forward:          return QStringLiteral("Forward");
+    case MnaDataKind::Inverse:          return QStringLiteral("Inverse");
+    case MnaDataKind::Covariance:       return QStringLiteral("Covariance");
+    case MnaDataKind::SourceEstimate:   return QStringLiteral("SourceEstimate");
+    case MnaDataKind::Epochs:           return QStringLiteral("Epochs");
+    case MnaDataKind::Evoked:           return QStringLiteral("Evoked");
+    case MnaDataKind::Matrix:           return QStringLiteral("Matrix");
+    case MnaDataKind::Volume:           return QStringLiteral("Volume");
+    case MnaDataKind::Surface:          return QStringLiteral("Surface");
+    case MnaDataKind::Bem:              return QStringLiteral("Bem");
+    case MnaDataKind::Annotation:       return QStringLiteral("Annotation");
+    case MnaDataKind::Label:            return QStringLiteral("Label");
+    case MnaDataKind::RealTimeStream:   return QStringLiteral("RealTimeStream");
+    case MnaDataKind::Custom:           return QStringLiteral("Custom");
+    }
+    return QStringLiteral("Custom");
+}
+
+//=============================================================================================================
+
+/**
+ * Convert a string to MnaDataKind.
+ */
+inline MnaDataKind mnaDataKindFromString(const QString& str)
+{
+    if (str == QLatin1String("FiffRaw")         || str == QLatin1String("fiff_raw"))           return MnaDataKind::FiffRaw;
+    if (str == QLatin1String("FiffInfo"))         return MnaDataKind::Custom; // FiffInfo is a sub-kind of FiffRaw context
+    if (str == QLatin1String("Forward")         || str == QLatin1String("forward"))            return MnaDataKind::Forward;
+    if (str == QLatin1String("Inverse")         || str == QLatin1String("inverse"))            return MnaDataKind::Inverse;
+    if (str == QLatin1String("Covariance")      || str == QLatin1String("covariance"))         return MnaDataKind::Covariance;
+    if (str == QLatin1String("SourceEstimate")  || str == QLatin1String("source_estimate"))    return MnaDataKind::SourceEstimate;
+    if (str == QLatin1String("Epochs")          || str == QLatin1String("epochs"))             return MnaDataKind::Epochs;
+    if (str == QLatin1String("Evoked")          || str == QLatin1String("evoked"))             return MnaDataKind::Evoked;
+    if (str == QLatin1String("Matrix")          || str == QLatin1String("matrix"))             return MnaDataKind::Matrix;
+    if (str == QLatin1String("Volume")          || str == QLatin1String("volume"))             return MnaDataKind::Volume;
+    if (str == QLatin1String("Surface")         || str == QLatin1String("surface"))            return MnaDataKind::Surface;
+    if (str == QLatin1String("Bem")             || str == QLatin1String("bem"))                return MnaDataKind::Bem;
+    if (str == QLatin1String("Annotation")      || str == QLatin1String("annotation"))         return MnaDataKind::Annotation;
+    if (str == QLatin1String("Label")           || str == QLatin1String("label"))              return MnaDataKind::Label;
+    if (str == QLatin1String("RealTimeStream")  || str == QLatin1String("real_time_stream"))   return MnaDataKind::RealTimeStream;
+    if (str == QLatin1String("FilePath")        || str == QLatin1String("DirectoryPath"))      return MnaDataKind::Custom;
+    return MnaDataKind::Custom;
+}
+
 } // namespace MNALIB
 
 #endif // MNA_TYPES_H

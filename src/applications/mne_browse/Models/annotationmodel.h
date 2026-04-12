@@ -2,8 +2,8 @@
 /**
  * @file     annotationmodel.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @version  2.1.0
- * @date     March, 2026
+ * @version  2.2.0
+ * @date     April, 2026
  *
  * @section  LICENSE
  *
@@ -48,6 +48,7 @@
 #include <QVector>
 
 #include <fiff/fiff.h>
+#include <fiff/fiff_annotations.h>
 
 
 //*************************************************************************************************************
@@ -246,6 +247,22 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns the underlying FiffAnnotations container for direct library-level access.
+     *
+     * @return Const reference to the FiffAnnotations storage.
+     */
+    const FIFFLIB::FiffAnnotations& fiffAnnotations() const;
+
+    //=========================================================================================================
+    /**
+     * Replaces the internal annotation data from a FiffAnnotations container.
+     *
+     * @param[in] annotations   Annotation data to load.
+     */
+    void setFiffAnnotations(const FIFFLIB::FiffAnnotations& annotations);
+
+    //=========================================================================================================
+    /**
      * Clears all annotations and resets file-backed state.
      */
     void clearModel();
@@ -427,7 +444,24 @@ private:
      */
     void notifyAnnotationsChanged();
 
-    QVector<AnnotationEntry>  m_annotations;   /**< Editable annotation list. */
+    //=========================================================================================================
+    /**
+     * Converts AnnotationEntry vector to FiffAnnotations and assigns to internal storage.
+     *
+     * @param[in] entries   Parsed annotation entries (sample-based).
+     */
+    void importEntries(const QVector<AnnotationEntry>& entries);
+
+    //=========================================================================================================
+    /**
+     * Converts internal FiffAnnotations back to a vector of AnnotationEntry for
+     * use in legacy save methods.
+     *
+     * @return Vector of sample-based annotation entries.
+     */
+    QVector<AnnotationEntry> exportEntries() const;
+
+    FIFFLIB::FiffAnnotations       m_fiffAnnotations; /**< Canonical annotation storage (time-based). */
     FIFFLIB::FiffInfo::SPtr   m_pFiffInfo;     /**< Measurement info used for sample/time conversion. */
     int                       m_iFirstSample = 0; /**< First sample of the loaded raw file. */
     int                       m_iLastSample  = 0; /**< Last sample of the loaded raw file. */

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     mna_op_registry.h
+ * @file     mna_registry_loader.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April, 2026
@@ -28,29 +28,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MnaOpRegistry class declaration — singleton catalog of operation schemas.
+ * @brief    MnaRegistryLoader class declaration — loads MNA op schemas from JSON manifests.
  *
  */
 
-#ifndef MNA_OP_REGISTRY_H
-#define MNA_OP_REGISTRY_H
+#ifndef MNA_REGISTRY_LOADER_H
+#define MNA_REGISTRY_LOADER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "mna_global.h"
-#include "mna_op_schema.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QString>
-#include <QStringList>
-#include <QMap>
-#include <QVariantMap>
-#include <functional>
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace MNALIB { class MnaOpRegistry; }
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNALIB
@@ -61,77 +62,52 @@ namespace MNALIB
 
 //=============================================================================================================
 /**
- * Singleton catalog of all registered operation schemas.
+ * Loads MNA operation schemas from declarative JSON registry manifest files.
  *
- * @brief Operation registry for the MNA graph model.
+ * Registry files follow the mna-registry.json format with "mna_registry_version",
+ * "provider", and "ops" array.  The loader supports a master manifest plus
+ * drop-in files from a mna-registry.d/ directory.
+ *
+ * @brief Declarative MNA registry file loader.
  */
-class MNASHARED_EXPORT MnaOpRegistry
+class MNASHARED_EXPORT MnaRegistryLoader
 {
 public:
-    /// Operation implementation callback type.
-    using OpFunc = std::function<QVariantMap(const QVariantMap& inputs,
-                                             const QVariantMap& attributes)>;
-
     /**
-     * Access the singleton instance.
-     */
-    static MnaOpRegistry& instance();
-
-    /**
-     * Register an operation schema.
-     */
-    void registerOp(const MnaOpSchema& schema);
-
-    /**
-     * Check if an operation type is registered.
-     */
-    bool hasOp(const QString& opType) const;
-
-    /**
-     * Get the schema for an operation type.
-     */
-    MnaOpSchema schema(const QString& opType) const;
-
-    /**
-     * List all registered operation types.
-     */
-    QStringList registeredOps() const;
-
-    /**
-     * Register an implementation function for an operation type.
-     */
-    void registerOpFunc(const QString& opType, OpFunc func);
-
-    /**
-     * Get the implementation function for an operation type.
-     */
-    OpFunc opFunc(const QString& opType) const;
-
-    /**
-     * Load registry files from the standard resources/mna/ directory.
+     * Load a single registry manifest file and register all ops.
      *
-     * Searches upward from the application directory to find resources/mna/,
-     * then loads mna-registry.json and all drop-in files from mna-registry.d/.
-     *
-     * @return Number of ops loaded, or 0 if no registry directory was found.
+     * @param[in] path          Path to the JSON manifest file.
+     * @param[in,out] registry  Registry to populate.
+     * @return Number of ops successfully loaded, or -1 on file error.
      */
-    int loadRegistryFiles();
+    static int loadFile(const QString& path, MnaOpRegistry& registry);
 
     /**
-     * Return op types referenced in a project that have no registered schema.
+     * Load the master manifest plus all drop-in files from a directory.
      *
-     * @param[in] project  The MNA project to check.
-     * @return List of op type strings with no registered schema.
+     * Loads mna-registry.json first, then all *.json files from
+     * mna-registry.d/ in alphabetical order.  Later files override
+     * earlier entries for the same op type.
+     *
+     * @param[in] registryDir   Directory containing mna-registry.json.
+     * @param[in,out] registry  Registry to populate.
+     * @return Total number of ops loaded across all files.
      */
-    QStringList missingOps(const QStringList& pipelineTools) const;
+    static int loadDirectory(const QString& registryDir, MnaOpRegistry& registry);
 
-private:
-    MnaOpRegistry();
-
-    QMap<QString, MnaOpSchema> m_schemas;
-    QMap<QString, OpFunc> m_funcs;
+    /**
+     * Serialize current registry schemas to a JSON manifest file.
+     *
+     * @param[in] path      Output file path.
+     * @param[in] provider  Provider name for the manifest header.
+     * @param[in] registry  Registry to serialize.
+     * @return True if writing succeeded.
+     */
+    static bool saveFile(const QString& path,
+                         const QString& provider,
+                         const MnaOpRegistry& registry);
 };
 
 } // namespace MNALIB
 
-#endif // MNA_OP_REGISTRY_H
+#endif // MNA_REGISTRY_LOADER_H

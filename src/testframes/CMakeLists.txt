@@ -207,6 +207,7 @@ add_subdirectory(test_mri_slicer)
 add_subdirectory(test_electrode_object)
 add_subdirectory(test_ml_trainer)
 add_subdirectory(test_mna_graph_execution)
+add_subdirectory(test_mna_inverse_pipeline)
 
 # v2.2.0 cross-validation tests (MNE-CPP vs MNE-Python)
 add_subdirectory(test_crossval_covariance)

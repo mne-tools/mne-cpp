@@ -522,12 +522,19 @@ if [[ ${LinkOption} == "dynamic" ]]; then
         echo "CMake config files:"
         ls ${BasePath}/out/${BuildName}/lib/cmake/MNE-CPP/ 2>/dev/null
 
+        # Determine macOS architecture label
+        if [[ "$(uname -m)" == "arm64" ]]; then
+            MACOS_ARCH="arm64"
+        else
+            MACOS_ARCH="x86_64"
+        fi
+
         # Creating archive of all macos deployed applications.
         # Include bin/ (with Qt frameworks inside .app bundles), lib/
         # (MNE-CPP shared libraries + Qt frameworks for CLI tools),
         # include/ (public headers for SDK users), share/ (Eigen cmake config),
         # and resources/ (config files needed by CLI tools like mne_rt_server).
-        ${MockText}tar cfvz mne-cpp-macos-dynamic-arm64.tar.gz -C ${BasePath}/out/${BuildName} bin lib include share resources
+        ${MockText}tar cfvz mne-cpp-macos-dynamic-${MACOS_ARCH}.tar.gz -C ${BasePath}/out/${BuildName} bin lib include share resources
     fi
 
 elif [[ ${LinkOption} == "static" ]]; then
@@ -559,8 +566,15 @@ elif [[ ${LinkOption} == "static" ]]; then
         ${MockText}rm -r mne-cpp/bin/mne_analyze_plugins
         ${MockText}rm -r mne-cpp/bin/mne_rt_server_plugins
 
+        # Determine macOS architecture label
+        if [[ "$(uname -m)" == "arm64" ]]; then
+            MACOS_ARCH="arm64"
+        else
+            MACOS_ARCH="x86_64"
+        fi
+
         # Creating archive of all macos deployed applications
-        ${MockText}tar cfvz mne-cpp-macos-static-arm64.tar.gz mne-cpp
+        ${MockText}tar cfvz mne-cpp-macos-static-${MACOS_ARCH}.tar.gz mne-cpp
     fi
 
 else 

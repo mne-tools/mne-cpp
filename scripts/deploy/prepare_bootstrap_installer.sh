@@ -17,6 +17,7 @@ ASSET_PREFIX=""
 OUTPUT_DIR=""
 RELEASE_DATE="$(date +%F)"
 PLATFORM=""
+ARCH=""
 DYNAMIC_ARCHIVE=""
 STATIC_ARCHIVE=""
 GITHUB_REPOSITORY_NAME="${GITHUB_REPOSITORY:-mne-tools/mne-cpp}"
@@ -30,6 +31,7 @@ Options:
   --release-tag <tag>       GitHub release tag to embed into the installer
   --asset-prefix <name>     Release asset prefix (defaults from the tag)
   --platform <name>         linux | macos | windows
+  --arch <arch>             Architecture override (e.g. arm64, x86_64)
   --output-dir <dir>        Output staging directory for config/ and packages/
   --release-date <date>     Metadata release date (default: today, YYYY-MM-DD)
   --dynamic-archive <path>  Optional pre-downloaded dynamic release archive
@@ -61,13 +63,13 @@ release_asset_name()
 
     case "${PLATFORM}" in
         linux)
-            printf '%s-linux-%s-x86_64.tar.gz\n' "${ASSET_PREFIX}" "${variant}"
+            printf '%s-linux-%s-%s.tar.gz\n' "${ASSET_PREFIX}" "${variant}" "${ARCH}"
             ;;
         macos)
-            printf '%s-macos-%s-arm64.tar.gz\n' "${ASSET_PREFIX}" "${variant}"
+            printf '%s-macos-%s-%s.tar.gz\n' "${ASSET_PREFIX}" "${variant}" "${ARCH}"
             ;;
         windows)
-            printf '%s-windows-%s-x86_64.zip\n' "${ASSET_PREFIX}" "${variant}"
+            printf '%s-windows-%s-%s.zip\n' "${ASSET_PREFIX}" "${variant}" "${ARCH}"
             ;;
         *)
             echo "ERROR: Unsupported platform '${PLATFORM}'." >&2
@@ -152,6 +154,10 @@ while [[ $# -gt 0 ]]; do
             PLATFORM="$2"
             shift 2
             ;;
+        --arch)
+            ARCH="$2"
+            shift 2
+            ;;
         --output-dir)
             OUTPUT_DIR="$2"
             shift 2
@@ -197,6 +203,15 @@ fi
 
 if [[ -z "${ASSET_PREFIX}" ]]; then
     ASSET_PREFIX="$(derive_asset_prefix "${RELEASE_TAG}")"
+fi
+
+# Default architecture per platform when --arch is not given
+if [[ -z "${ARCH}" ]]; then
+    case "${PLATFORM}" in
+        linux)   ARCH="x86_64" ;;
+        macos)   ARCH="arm64"  ;;
+        windows) ARCH="x86_64" ;;
+    esac
 fi
 
 VERSION_MAJOR="$(sed -n 's/^set(MNE_CPP_VERSION_MAJOR \([0-9][0-9]*\)).*/\1/p' "${REPO_ROOT}/src/CMakeLists.txt")"

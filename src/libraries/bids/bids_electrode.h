@@ -42,6 +42,14 @@
 #include "bids_global.h"
 
 //=============================================================================================================
+// FIFF INCLUDES
+//=============================================================================================================
+
+#include <fiff/fiff_dig_point.h>
+#include <fiff/fiff_dig_point_set.h>
+#include <fiff/fiff_coord_trans.h>
+
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -85,6 +93,25 @@ struct BIDSSHARED_EXPORT BidsElectrode
      */
     static bool writeTsv(const QString& sFilePath,
                          const QList<BidsElectrode>& electrodes);
+
+    /**
+     * @brief Convert a list of BIDS electrodes to a FIFF digitizer point set.
+     *
+     * Each electrode with valid numeric x/y/z coordinates is converted to a
+     * FiffDigPoint with kind FIFFV_POINT_EEG. Electrodes with "n/a" coordinates
+     * are skipped.
+     *
+     * If a coordinate transform is supplied, the positions are transformed from
+     * the BIDS coordinate frame into the FIFF head frame before insertion.
+     *
+     * @param[in] electrodes    List of BIDS electrode records.
+     * @param[in] trans         Optional coordinate transform (BIDS frame → head).
+     *                          Pass a default-constructed FiffCoordTrans to skip.
+     * @return FiffDigPointSet with one point per valid electrode.
+     */
+    static FIFFLIB::FiffDigPointSet toFiffDigPoints(
+        const QList<BidsElectrode>& electrodes,
+        const FIFFLIB::FiffCoordTrans& trans = FIFFLIB::FiffCoordTrans());
 };
 
 } // namespace BIDSLIB

@@ -2,6 +2,40 @@
 
 All notable changes to MNE-CPP will be documented in this file.
 
+## [2.2.0] - 2026-04-25
+
+### New Features
+
+- **MNA graph-execution library** (`mne_mna`): New library for the `.mna` analysis node-graph format with YAML-based operator definitions, topological execution, and `MnaOpRegistry` for built-in and user-registered operators
+- **Machine-learning library** (`mne_ml`): New library with `MlTrainer` for sklearn-compatible model training via embedded Python, supporting SVM, Random Forest, Logistic Regression, and custom estimators
+- **STS covariance estimators**: Added Ledoit-Wolf and Oracle Approximating Shrinkage (OAS) estimators to the `sts` library with cross-validation support against scikit-learn
+- **CMNE sparse inverse**: Added Cascaded MNE (`InvCMNE`) solver to the inverse library for spatially sparse source estimation
+- **DSP Infomax ICA**: Extended the `dsp` library with an Infomax-based ICA decomposition algorithm
+- **BIDS coordinate system**: Added `BidsCoordinateSystem` class for round-trip parsing and writing of `coordinatesystem.json`, and `BidsElectrode::toFiffDigPoints()` for converting BIDS electrodes to FIFF digitizer point sets
+- **FreeSurfer atlas lookup**: Added `FsAtlasLookup` for Desikan-Killiany / Destrieux atlas region querying
+- **MRI slicer**: Added `MriSlicer` class for extracting orthogonal slices (Axial/Sagittal/Coronal) from NIfTI volumes
+- **3D electrode visualization**: `ElectrodeObject` now includes QRhi GPU buffer management (`updateBuffers`, `vertexBuffer`, `indexBuffer`, `instanceBuffer`) following the BrainSurface pattern; new `electrode.vert` / `electrode.frag` shaders with instanced contact spheres and Blinn-Phong lighting
+- **3D MRI slice visualization**: New `SliceObject` renderable for textured MRI volume slices with voxel-to-world transforms and intensity windowing; new `slice.vert` / `slice.frag` shaders
+- **FiffAnnotations integration**: `AnnotationModel` refactored to use `FiffAnnotations` as backing store instead of internal `QVector<AnnotationEntry>`, with `fiffAnnotations()` / `setFiffAnnotations()` public accessors
+- **Python cross-validation tests**: Added `GUARD_PYTHON` / `GUARD_PYTHON_PACKAGE` macros ensuring Python-dependent tests fail in CI (`MNE_REQUIRE_PYTHON=true`) instead of silently skipping
+- **PythonTestHelper extensions**: Added `writeMatrix()`, `readMatrix()`, and `evalMatrixViaFile()` convenience methods for Eigen↔NumPy round-trip validation
+
+### CI/CD
+
+- Upgraded `codecov/codecov-action` from v5 to v6 to resolve Node.js 20 deprecation warnings
+- Added `MNE_REQUIRE_PYTHON: 'true'` environment variable to all platform test steps
+- Added `scikit-learn` to Python test dependencies
+- Updated lodash from 4.17.23 to 4.18.1 (Dependabot security fix)
+
+### Bug Fixes
+
+- Fixed potential silent test skips — Python-dependent tests now respect `MNE_REQUIRE_PYTHON` enforcement
+
+### Documentation
+
+- Added MNA format manual page (`mna-format.mdx`)
+- Added MNA API reference page (`api-mna.mdx`)
+
 ## [2.1.0] - 2026-04-10
 
 ### New Features
