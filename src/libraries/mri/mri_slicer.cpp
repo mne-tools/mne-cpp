@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include "mri_slicer.h"
+#include "mri_vol_data.h"
 
 #include <Eigen/LU>
 
@@ -202,4 +203,41 @@ Vector3f MriSlicer::voxelToRas(const Matrix4f& vox2ras,
     Vector4f rasH = vox2ras * voxH;
 
     return rasH.head<3>();
+}
+
+//=============================================================================================================
+// MriVolData convenience overloads
+//=============================================================================================================
+
+MriSliceImage MriSlicer::extractSlice(const MriVolData& vol,
+                                       SliceOrientation orientation,
+                                       int sliceIndex)
+{
+    return extractSlice(vol.voxelDataAsFloat(), vol.dims(),
+                        vol.computeVox2Ras(), orientation, sliceIndex);
+}
+
+//=============================================================================================================
+
+QVector<MriSliceImage> MriSlicer::extractOrthogonal(const MriVolData& vol,
+                                                     const Vector3f& rasPoint)
+{
+    return extractOrthogonal(vol.voxelDataAsFloat(), vol.dims(),
+                             vol.computeVox2Ras(), rasPoint);
+}
+
+//=============================================================================================================
+
+Vector3i MriSlicer::rasToVoxel(const MriVolData& vol,
+                                const Vector3f& rasPoint)
+{
+    return rasToVoxel(vol.computeVox2Ras(), rasPoint);
+}
+
+//=============================================================================================================
+
+Vector3f MriSlicer::voxelToRas(const MriVolData& vol,
+                                const Vector3i& voxel)
+{
+    return voxelToRas(vol.computeVox2Ras(), voxel);
 }

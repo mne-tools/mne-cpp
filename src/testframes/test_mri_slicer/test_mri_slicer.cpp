@@ -38,6 +38,8 @@
 //=============================================================================================================
 
 #include <mri/mri_slicer.h>
+#include <mri/mri_vol_data.h>
+#include <fiff/fiff_file.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -78,12 +80,23 @@ private slots:
     void testOrthogonalExtraction();
     void testSliceNormalization();
 
+    // MriVolData convenience-API tests
+    void testVolDataDimAccessors();
+    void testVolDataVoxelDataAsFloat();
+    void testVolDataSliceOverload();
+    void testVolDataOrthogonalOverload();
+    void testVolDataRasRoundTrip();
+
     void cleanupTestCase();
 
 private:
+    // Flat-array path
     QVector<float> m_volData;
     QVector<int>   m_dims;
     Matrix4f       m_vox2ras;
+
+    // MriVolData path — populated with same synthetic data
+    MriVolData     m_vol;
 };
 
 //=============================================================================================================
@@ -104,6 +117,36 @@ void TestMriSlicer::initTestCase()
 
     // Identity vox2ras (1mm voxels, origin at corner)
     m_vox2ras = Matrix4f::Identity();
+
+    // Populate m_vol with equivalent data via MriVolData fields
+    m_vol.width  = m_dims[0];
+    m_vol.height = m_dims[1];
+    m_vol.depth  = m_dims[2];
+    m_vol.nframes = 1;
+    m_vol.rasGood = true;
+    m_vol.xsize = 1.0f;
+    m_vol.ysize = 1.0f;
+    m_vol.zsize = 1.0f;
+    // Identity direction cosines → identity vox2ras
+    m_vol.x_ras = Vector3f(1.0f, 0.0f, 0.0f);
+    m_vol.y_ras = Vector3f(0.0f, 1.0f, 0.0f);
+    m_vol.z_ras = Vector3f(0.0f, 0.0f, 1.0f);
+    // c_ras at centre of volume so that P0 = 0 (origin at corner)
+    m_vol.c_ras = Vector3f(m_dims[0] / 2.0f, m_dims[1] / 2.0f, m_dims[2] / 2.0f);
+
+    // Build per-slice data (z slices, each width x height, float pixel format)
+    m_vol.slices.resize(m_dims[2]);
+    for (int z = 0; z < m_dims[2]; ++z) {
+        MriSlice& s = m_vol.slices[z];
+        s.pixelFormat = FIFFV_MRI_PIXEL_FLOAT;
+        s.width  = m_dims[0];
+        s.height = m_dims[1];
+        int sliceSize = m_dims[0] * m_dims[1];
+        s.pixelsFloat.resize(sliceSize);
+        for (int y = 0; y < m_dims[1]; ++y)
+            for (int x = 0; x < m_dims[0]; ++x)
+                s.pixelsFloat[x + y * m_dims[0]] = static_cast<float>(x + y + z);
+    }
 }
 
 //=============================================================================================================
@@ -199,6 +242,118 @@ void TestMriSlicer::testSliceNormalization()
 
     // Slice should not be all zero (contains brain anatomy)
     QVERIFY2(maxVal > 0.0f, "Slice should contain non-zero pixels (brain anatomy)");
+}
+
+//=============================================================================================================
+// MriVolData convenience-API tests
+//=============================================================================================================
+
+void TestMriSlicer::testVolDataDimAccessors()
+{
+    QCOMPARE(m_vol.dimX(), m_dims[0]);
+    QCOMPARE(m_vol.dimY(), m_dims[1]);
+    QCOMPARE(m_vol.dimZ(), m_dims[2]);
+
+    QVector<int> dims = m_vol.dims();
+    QCOMPARE(dims.size(), 3);
+    QCOMPARE(dims[0], m_dims[0]);
+    QCOMPARE(dims[1], m_dims[1]);
+    QCOMPARE(dims[2], m_dims[2]);
+}
+
+//=============================================================================================================
+
+void TestMriSlicer::testVolDataVoxelDataAsFloat()
+{
+    QVector<float> flat = m_vol.voxelDataAsFloat();
+    QCOMPARE(flat.size(), m_volData.size());
+
+    // Verify content matches the flat-array data
+    for (int i = 0; i < flat.size(); ++i) {
+        QCOMPARE(flat[i], m_volData[i]);
+    }
+}
+
+//=============================================================================================================
+
+void TestMriSlicer::testVolDataSliceOverload()
+{
+    int midAxial = m_dims[2] / 2;
+
+    // Extract via flat-array API using the MriVolData's own vox2ras
+    Matrix4f volVox2ras = m_vol.computeVox2Ras();
+    QVector<float> flat = m_vol.voxelDataAsFloat();
+    QVector<int>   dims = m_vol.dims();
+
+    MriSliceImage refSlice = MriSlicer::extractSlice(flat, dims, volVox2ras,
+                                                      SliceOrientation::Axial, midAxial);
+    // Extract via MriVolData overload
+    MriSliceImage volSlice = MriSlicer::extractSlice(m_vol, SliceOrientation::Axial, midAxial);
+
+    QCOMPARE(volSlice.orientation, refSlice.orientation);
+    QCOMPARE(volSlice.sliceIndex, refSlice.sliceIndex);
+    QCOMPARE(volSlice.width, refSlice.width);
+    QCOMPARE(volSlice.height, refSlice.height);
+
+    // Pixel data must match
+    QCOMPARE(volSlice.pixels.rows(), refSlice.pixels.rows());
+    QCOMPARE(volSlice.pixels.cols(), refSlice.pixels.cols());
+    QVERIFY(volSlice.pixels.isApprox(refSlice.pixels, 1e-6f));
+}
+
+//=============================================================================================================
+
+void TestMriSlicer::testVolDataOrthogonalOverload()
+{
+    // Use a RAS point in meters (computeVox2Ras returns meters)
+    Matrix4f volVox2ras = m_vol.computeVox2Ras();
+    QVector<float> flat = m_vol.voxelDataAsFloat();
+    QVector<int>   dims = m_vol.dims();
+
+    // Centre voxel in RAS (meters)
+    Vector3i centerVox(m_dims[0] / 2, m_dims[1] / 2, m_dims[2] / 2);
+    Vector3f centerRas = MriSlicer::voxelToRas(volVox2ras, centerVox);
+
+    QVector<MriSliceImage> refSlices = MriSlicer::extractOrthogonal(flat, dims,
+                                                                     volVox2ras, centerRas);
+    QVector<MriSliceImage> volSlices = MriSlicer::extractOrthogonal(m_vol, centerRas);
+
+    QCOMPARE(volSlices.size(), 3);
+    QCOMPARE(volSlices.size(), refSlices.size());
+
+    for (int i = 0; i < 3; ++i) {
+        QCOMPARE(volSlices[i].orientation, refSlices[i].orientation);
+        QCOMPARE(volSlices[i].sliceIndex, refSlices[i].sliceIndex);
+        QVERIFY(volSlices[i].pixels.isApprox(refSlices[i].pixels, 1e-6f));
+    }
+}
+
+//=============================================================================================================
+
+void TestMriSlicer::testVolDataRasRoundTrip()
+{
+    // Convert a few voxel indices to RAS and back using MriVolData overloads
+    QVector<Vector3i> testVoxels;
+    testVoxels << Vector3i(5, 5, 5)
+               << Vector3i(10, 3, 8)
+               << Vector3i(1, 12, 7);
+
+    Matrix4f volVox2ras = m_vol.computeVox2Ras();
+
+    for (const auto& vox : testVoxels) {
+        // Via flat-array API
+        Vector3f refRas = MriSlicer::voxelToRas(volVox2ras, vox);
+        Vector3i refVox = MriSlicer::rasToVoxel(volVox2ras, refRas);
+
+        // Via MriVolData overloads
+        Vector3f volRas = MriSlicer::voxelToRas(m_vol, vox);
+        Vector3i volVox = MriSlicer::rasToVoxel(m_vol, volRas);
+
+        QCOMPARE(volVox, refVox);
+        float maxErr = (volRas - refRas).cwiseAbs().maxCoeff();
+        QVERIFY2(maxErr < 1e-6f,
+                 qPrintable(QString("MriVolData RAS mismatch=%1").arg(maxErr)));
+    }
 }
 
 //=============================================================================================================

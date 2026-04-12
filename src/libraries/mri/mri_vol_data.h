@@ -156,11 +156,61 @@ public:
 
     //=========================================================================================================
     /**
+     * Convenience loader: reads an MGH/MGZ file and populates this volume.
+     *
+     * Wraps MriMghIO::read() so callers don't need to manage a separate
+     * additionalTrans vector.  Mirrors MNE-Python's
+     * ``nib.load(path)`` one-liner.
+     *
+     * @param[in] path  Path to the .mgh or .mgz file.
+     *
+     * @return True on success, false on error.
+     */
+    bool read(const QString& path);
+
+    //=========================================================================================================
+    /**
      * Returns whether this volume contains valid data.
      *
      * @return True if the volume has been loaded successfully.
      */
     bool isValid() const;
+
+    //=========================================================================================================
+    /**
+     * @return First (x) dimension — fastest-varying axis.
+     */
+    int dimX() const { return width; }
+
+    //=========================================================================================================
+    /**
+     * @return Second (y) dimension.
+     */
+    int dimY() const { return height; }
+
+    //=========================================================================================================
+    /**
+     * @return Third (z) dimension — slowest-varying axis.
+     */
+    int dimZ() const { return depth; }
+
+    //=========================================================================================================
+    /**
+     * @return Volume dimensions as {dimX, dimY, dimZ}.
+     */
+    QVector<int> dims() const { return {width, height, depth}; }
+
+    //=========================================================================================================
+    /**
+     * Returns all voxel data as a contiguous float array in x-fastest order.
+     *
+     * Mirrors MNE-Python's ``img.get_fdata().ravel(order='F')``.  Regardless
+     * of the on-disk type (UCHAR, SHORT, INT, FLOAT) the output is always
+     * float.  The array length is ``width * height * depth``.
+     *
+     * @return Flat voxel data; empty vector if the volume has no slices.
+     */
+    QVector<float> voxelDataAsFloat() const;
 
     //=========================================================================================================
     /**

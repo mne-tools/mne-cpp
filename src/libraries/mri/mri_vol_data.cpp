@@ -37,6 +37,9 @@
 //=============================================================================================================
 
 #include "mri_vol_data.h"
+#include "mri_mgh_io.h"
+
+#include <fiff/fiff_file.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -78,6 +81,47 @@ MriVolData::MriVolData()
 bool MriVolData::isValid() const
 {
     return (version == MRI_MGH_VERSION && width > 0 && height > 0 && depth > 0);
+}
+
+//=============================================================================================================
+
+bool MriVolData::read(const QString& path)
+{
+    QVector<FIFFLIB::FiffCoordTrans> additionalTrans;
+    return MriMghIO::read(path, *this, additionalTrans);
+}
+
+//=============================================================================================================
+
+QVector<float> MriVolData::voxelDataAsFloat() const
+{
+    if (slices.isEmpty() || width <= 0 || height <= 0 || depth <= 0)
+        return {};
+
+    const int nPixels = width * height;
+    QVector<float> result(width * height * depth, 0.0f);
+
+    for (int k = 0; k < depth && k < slices.size(); ++k) {
+        const MriSlice& slice = slices[k];
+        int offset = k * nPixels;
+
+        switch (slice.pixelFormat) {
+            case FIFFV_MRI_PIXEL_BYTE:
+                for (int p = 0; p < qMin(nPixels, slice.pixels.size()); ++p)
+                    result[offset + p] = static_cast<float>(slice.pixels[p]);
+                break;
+            case FIFFV_MRI_PIXEL_WORD:
+                for (int p = 0; p < qMin(nPixels, slice.pixelsWord.size()); ++p)
+                    result[offset + p] = static_cast<float>(slice.pixelsWord[p]);
+                break;
+            case FIFFV_MRI_PIXEL_FLOAT:
+                for (int p = 0; p < qMin(nPixels, slice.pixelsFloat.size()); ++p)
+                    result[offset + p] = slice.pixelsFloat[p];
+                break;
+        }
+    }
+
+    return result;
 }
 
 //=============================================================================================================
