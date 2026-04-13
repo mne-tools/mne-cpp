@@ -207,8 +207,12 @@ jobs:
         echo "=== Coverage diagnostics ==="
         echo "gcno files: $(find build -name '*.gcno' 2>/dev/null | wc -l)"
         echo "gcda files: $(find build -name '*.gcda' 2>/dev/null | wc -l)"
-        # Collect coverage data with fastcov (10-100x faster than lcov)
-        fastcov -d build -o coverage.json
+        # Collect coverage data with fastcov (10-100x faster than lcov).
+        # --process-gcno includes .gcno files without .gcda counterparts
+        # so that untested source files appear in the report at 0% instead
+        # of being silently omitted.  This tracks ALL instrumented lines
+        # across libraries, applications, and tools.
+        fastcov --process-gcno -d build -o coverage.json
         # Filtered report: MNE-CPP libraries, applications, and tools
         fastcov -C coverage.json --lcov -o coverage_filtered.info \
              --include src/libraries/ src/applications/ src/tools/ \
