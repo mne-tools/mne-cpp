@@ -19,7 +19,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_inv
     mne_utils
     mne_math
-    eigen
+    Eigen3::Eigen
 )
 
 if(WITH_CODE_COV)

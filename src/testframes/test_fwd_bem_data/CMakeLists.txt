@@ -31,5 +31,5 @@ target_link_libraries(test_fwd_bem_data PRIVATE
     mne_events
     mne_disp
     mne_disp3D
-    eigen
+    Eigen3::Eigen
 )

@@ -36,5 +36,5 @@ target_link_libraries(mne_analyze_studio_dummy_3d_extension_widgets PUBLIC
     mne_fiff
     mne_fs
     mne_mne
-    eigen
+    Eigen3::Eigen
 )

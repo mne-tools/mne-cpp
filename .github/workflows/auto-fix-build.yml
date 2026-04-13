@@ -9,10 +9,13 @@
 
 name: Auto-Fix Build Failures
 
+# NOTE: Disabled until CI is stable. Uncomment the 'on:' trigger to re-enable.
+# on:
+#   workflow_run:
+#     workflows: ["Staging"]
+#     types: [completed]
 on:
-  workflow_run:
-    workflows: ["Staging"]
-    types: [completed]
+  workflow_dispatch:  # manual-only for now
 
 permissions:
   contents: read

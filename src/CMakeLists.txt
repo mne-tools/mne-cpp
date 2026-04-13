@@ -36,7 +36,7 @@ option(NO_IPC "Build project with no interprocess communication features (shared
 
 option(WASM "Setup build for wasm" OFF)
 
-option(USE_FFTW "Use fftw backend for eigen" OFF)
+option(USE_FFTW "Use fftw backend for Eigen3::Eigen" OFF)
 
 option(USE_ONNXRUNTIME "Enable ONNX Runtime backend for the ml library" ON)
 
@@ -214,20 +214,15 @@ endif()
 ## Eigen dependency
 
 set(MNE_CPP_EIGEN_VERSION "5.0.1" CACHE STRING "Preferred Eigen package version for MNE-CPP.")
-set(MNE_CPP_PREBUILT_EIGEN_DIR "${PROJECT_SOURCE_DIR}/external/eigen"
+set(MNE_CPP_PREBUILT_EIGEN_DIR "${PROJECT_SOURCE_DIR}/external/Eigen3::Eigen"
     CACHE PATH "Location of a prebuilt Eigen package prepared by the init scripts or CI helpers.")
 
 find_package(Eigen3 ${MNE_CPP_EIGEN_VERSION} QUIET NO_MODULE
     HINTS
         "${MNE_CPP_PREBUILT_EIGEN_DIR}"
-        "${PROJECT_SOURCE_DIR}/external/eigen-${MNE_CPP_EIGEN_VERSION}-install")
+        "${PROJECT_SOURCE_DIR}/external/Eigen3::Eigen-${MNE_CPP_EIGEN_VERSION}-install")
 
 if(TARGET Eigen3::Eigen)
-    if(NOT TARGET eigen)
-        add_library(eigen INTERFACE)
-        target_link_libraries(eigen INTERFACE Eigen3::Eigen)
-    endif()
-
     if(DEFINED Eigen3_DIR AND NOT Eigen3_DIR STREQUAL "")
         get_filename_component(MNE_CPP_EIGEN_PACKAGE_ROOT "${Eigen3_DIR}/../../.." ABSOLUTE)
         message(STATUS "[MNE-CPP] Using Eigen package from ${MNE_CPP_EIGEN_PACKAGE_ROOT}")

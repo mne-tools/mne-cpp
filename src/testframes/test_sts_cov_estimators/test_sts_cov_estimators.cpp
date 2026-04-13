@@ -45,6 +45,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/Cholesky>
 #include <Eigen/Eigenvalues>
 
 //=============================================================================================================
@@ -132,19 +133,40 @@ void TestStsCovEstimators::testLedoitWolfPositiveDefinite()
 
 void TestStsCovEstimators::testLedoitWolfFullRankData()
 {
-    // With n_samples >> n_channels and i.i.d. data, alpha should be small
-    // (sample covariance is already well-conditioned)
-    MatrixXd data = generateGaussianData(10, 5000);
+    // With n_samples >> n_channels and well-structured Toeplitz covariance,
+    // alpha should be small (sample covariance is already well-conditioned)
+    int p = 10;
+    int n = 5000;
+
+    // Generate Toeplitz-correlated data: Sigma(i,j) = 0.8^|i-j|
+    std::mt19937 gen(42);
+    std::normal_distribution<> dist(0.0, 1.0);
+
+    MatrixXd trueCov = MatrixXd::Identity(p, p);
+    for (int i = 0; i < p; ++i)
+        for (int j = 0; j < p; ++j)
+            trueCov(i, j) = std::pow(0.8, std::abs(i - j));
+
+    Eigen::LLT<MatrixXd> llt(trueCov);
+    MatrixXd L = llt.matrixL();
+
+    MatrixXd whitenoise(p, n);
+    for (int i = 0; i < p; ++i)
+        for (int j = 0; j < n; ++j)
+            whitenoise(i, j) = dist(gen);
+
+    MatrixXd data = L * whitenoise;
+    data.colwise() -= data.rowwise().mean();
+
     auto [cov, alpha] = StsCovEstimators::ledoitWolf(data);
 
     QVERIFY2(alpha < 0.3,
-             qPrintable(QString("For well-conditioned data, alpha=%1 should be small").arg(alpha)));
+             qPrintable(QString("For Toeplitz-structured data, alpha=%1 should be small").arg(alpha)));
 
-    // Output should be close to identity (data is i.i.d. standard normal)
-    MatrixXd identity = MatrixXd::Identity(10, 10);
-    double maxDiff = (cov - identity).cwiseAbs().maxCoeff();
-    QVERIFY2(maxDiff < 0.3,
-             qPrintable(QString("Cov should be near identity, maxDiff=%1").arg(maxDiff)));
+    // Output covariance should closely match the true structure
+    double maxDiff = (cov - trueCov).cwiseAbs().maxCoeff();
+    QVERIFY2(maxDiff < 0.5,
+             qPrintable(QString("Estimated cov should match Toeplitz, maxDiff=%1").arg(maxDiff)));
 }
 
 //=============================================================================================================

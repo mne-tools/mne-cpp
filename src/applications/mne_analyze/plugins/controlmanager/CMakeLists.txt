@@ -69,7 +69,7 @@ endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     ${MNE_LIBS_REQUIRED}
-    eigen
+    Eigen3::Eigen
     anShared
     ${FFTW_LIBS})
 

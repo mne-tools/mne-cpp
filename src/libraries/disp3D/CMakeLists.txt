@@ -172,7 +172,7 @@ endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     ${MNE_LIBS_REQUIRED}
-    eigen
+    Eigen3::Eigen
     ${FFTW_LIBS})
 
 # Qt6::GuiPrivate is PRIVATE — QRhi details are fully encapsulated in .cpp files.

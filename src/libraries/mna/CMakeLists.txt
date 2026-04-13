@@ -15,7 +15,6 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 set(SOURCES
   mna_global.cpp
   mna_file_ref.cpp
-  mna_step.cpp
   mna_recording.cpp
   mna_session.cpp
   mna_subject.cpp
@@ -38,7 +37,6 @@ set(HEADERS
   mna_global.h
   mna_types.h
   mna_file_ref.h
-  mna_step.h
   mna_recording.h
   mna_session.h
   mna_subject.h
@@ -75,7 +73,7 @@ set(MNE_LIBS_REQUIRED mne_utils)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     ${MNE_LIBS_REQUIRED}
-    eigen)
+    Eigen3::Eigen)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_MNA_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
 

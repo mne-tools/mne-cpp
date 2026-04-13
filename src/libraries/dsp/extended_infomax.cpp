@@ -149,8 +149,8 @@ InfomaxResult ExtendedInfomax::compute(
         MatrixXd matY(nComponents, nTimes);
         for (int i = 0; i < nComponents; ++i) {
             if (vecSigns(i) > 0) {
-                // Super-Gaussian: g(u) = -2 * tanh(u)
-                matY.row(i) = -2.0 * matSources.row(i).array().tanh();
+                // Super-Gaussian: g(u) = -tanh(u)
+                matY.row(i) = -matSources.row(i).array().tanh();
             } else {
                 // Sub-Gaussian: g(u) = tanh(u) - u
                 matY.row(i) = matSources.row(i).array().tanh() - matSources.row(i).array();

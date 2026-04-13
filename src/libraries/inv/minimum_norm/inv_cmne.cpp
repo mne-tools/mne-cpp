@@ -130,7 +130,7 @@ InvCMNEResult InvCMNE::compute(
 
         if (settings.onnxModelPath.isEmpty()) {
             qInfo() << "[InvCMNE] Step 4/4: No ONNX model — using moving-average correction.";
-            matCmneData = applyLstmCorrection(matZScored, QString(), settings.lookBack);
+            matCmneData = applyLstmCorrection(matDspmData, QString(), settings.lookBack);
             qInfo() << "[InvCMNE] Step 4/4: Moving-average correction done.";
         } else {
             qInfo() << "[InvCMNE] Step 4/4: Not enough time points for lookBack window"

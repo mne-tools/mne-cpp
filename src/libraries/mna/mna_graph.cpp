@@ -251,6 +251,43 @@ bool MnaGraph::validate(QStringList* errors) const
                 addError(QStringLiteral("Node '%1': %2").arg(n.id, e));
             }
         }
+
+        // Check that required input ports are connected
+        for (const MnaOpSchemaPort& sp : schema.inputPorts) {
+            if (!sp.required)
+                continue;
+            for (const MnaPort& np : n.inputs) {
+                if (np.name == sp.name && np.sourceNodeId.isEmpty()) {
+                    addError(QStringLiteral("Node '%1': required input port '%2' is not connected")
+                             .arg(n.id, sp.name));
+                }
+            }
+        }
+    }
+
+    // Check cross-edge dataKind compatibility
+    for (const MnaNode& n : m_nodes) {
+        for (const MnaPort& inp : n.inputs) {
+            if (inp.sourceNodeId.isEmpty() || inp.sourcePortName.isEmpty())
+                continue;
+            // Find source node and output port
+            for (const MnaNode& srcNode : m_nodes) {
+                if (srcNode.id != inp.sourceNodeId)
+                    continue;
+                for (const MnaPort& srcOut : srcNode.outputs) {
+                    if (srcOut.name == inp.sourcePortName) {
+                        if (inp.dataKind != MnaDataKind::Custom &&
+                            srcOut.dataKind != MnaDataKind::Custom &&
+                            inp.dataKind != srcOut.dataKind) {
+                            addError(QStringLiteral("Edge %1.%2 -> %3.%4: data kind mismatch (%5 != %6)")
+                                     .arg(srcNode.id, srcOut.name, n.id, inp.name)
+                                     .arg(static_cast<int>(srcOut.dataKind))
+                                     .arg(static_cast<int>(inp.dataKind)));
+                        }
+                    }
+                }
+            }
+        }
     }
 
     return valid;

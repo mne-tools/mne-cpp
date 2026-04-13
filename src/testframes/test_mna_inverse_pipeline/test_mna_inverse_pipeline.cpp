@@ -54,8 +54,6 @@
 #include <mna/mna_types.h>
 #include <mna/mna_io.h>
 #include <mna/mna_project.h>
-
-#include <fiff/fiff.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_cov.h>
@@ -107,66 +105,6 @@ using namespace Eigen;
 // FiffInfo, FiffEvoked, MNEForwardSolution, InvSourceEstimate shared pointers
 // are registered at runtime below if not already known to QMetaType.
 #endif
-
-//=============================================================================================================
-// HELPERS — build MnaGraph from MnaProject pipeline steps
-//=============================================================================================================
-
-namespace {
-
-struct InputRef {
-    QString nodeId;
-    QString portName;
-};
-
-InputRef parseInputRef(const QString& ref)
-{
-    InputRef r;
-    int sep = ref.indexOf(QLatin1String("::"));
-    if (sep >= 0) {
-        r.nodeId   = ref.left(sep);
-        r.portName = ref.mid(sep + 2);
-    }
-    return r;
-}
-
-MnaGraph graphFromPipeline(const QList<MnaStep>& steps)
-{
-    MnaGraph graph;
-
-    for (const auto& step : steps) {
-        MnaNode node;
-        node.id         = step.id;
-        node.opType     = step.tool;
-        node.attributes = step.parameters;
-        node.dirty      = true;
-
-        for (const auto& inputRef : step.inputs) {
-            InputRef ref = parseInputRef(inputRef);
-            MnaPort in;
-            in.name           = ref.portName;
-            in.dataKind       = MnaDataKind::Matrix;
-            in.direction      = MnaPortDir::Input;
-            in.sourceNodeId   = ref.nodeId;
-            in.sourcePortName = ref.portName;
-            node.inputs.append(in);
-        }
-
-        for (const auto& outName : step.outputs) {
-            MnaPort out;
-            out.name      = outName;
-            out.dataKind  = MnaDataKind::Matrix;
-            out.direction = MnaPortDir::Output;
-            node.outputs.append(out);
-        }
-
-        graph.addNode(node);
-    }
-
-    return graph;
-}
-
-} // namespace
 
 //=============================================================================================================
 /**
@@ -371,29 +309,30 @@ void TestMnaInversePipeline::testLoadMnaFile()
     QVERIFY(!m_project.description.isEmpty());
     QCOMPARE(m_project.pipeline.size(), 6);
 
-    QStringList stepIds;
-    for (const auto& step : m_project.pipeline)
-        stepIds.append(step.id);
+    QStringList nodeIds;
+    for (const auto& node : m_project.pipeline)
+        nodeIds.append(node.id);
 
-    QVERIFY(stepIds.contains(QStringLiteral("load_raw")));
-    QVERIFY(stepIds.contains(QStringLiteral("load_evoked")));
-    QVERIFY(stepIds.contains(QStringLiteral("load_cov")));
-    QVERIFY(stepIds.contains(QStringLiteral("load_fwd")));
-    QVERIFY(stepIds.contains(QStringLiteral("make_inv")));
-    QVERIFY(stepIds.contains(QStringLiteral("apply_dspm")));
+    QVERIFY(nodeIds.contains(QStringLiteral("load_raw")));
+    QVERIFY(nodeIds.contains(QStringLiteral("load_evoked")));
+    QVERIFY(nodeIds.contains(QStringLiteral("load_cov")));
+    QVERIFY(nodeIds.contains(QStringLiteral("load_fwd")));
+    QVERIFY(nodeIds.contains(QStringLiteral("make_inv")));
+    QVERIFY(nodeIds.contains(QStringLiteral("apply_dspm")));
 
     // Verify inverse parameters from the file
-    MnaStep applyStep;
-    for (const auto& step : m_project.pipeline) {
-        if (step.id == QLatin1String("apply_dspm"))
-            applyStep = step;
+    MnaNode applyNode;
+    for (const auto& node : m_project.pipeline) {
+        if (node.id == QLatin1String("apply_dspm"))
+            applyNode = node;
     }
-    QCOMPARE(applyStep.tool, QStringLiteral("apply_inverse"));
-    QCOMPARE(applyStep.parameters.value(QStringLiteral("method")).toString(), QStringLiteral("dSPM"));
-    QCOMPARE(applyStep.parameters.value(QStringLiteral("snr")).toDouble(), 3.0);
+    QCOMPARE(applyNode.opType, QStringLiteral("apply_inverse"));
+    QCOMPARE(applyNode.attributes.value(QStringLiteral("method")).toString(), QStringLiteral("dSPM"));
+    QCOMPARE(applyNode.attributes.value(QStringLiteral("snr")).toDouble(), 3.0);
 
-    // Build the execution graph
-    m_graph = graphFromPipeline(m_project.pipeline);
+    // Build the execution graph directly from pipeline nodes
+    for (const MnaNode& node : m_project.pipeline)
+        m_graph.addNode(node);
     QCOMPARE(m_graph.nodes().size(), 6);
 }
 
@@ -577,8 +516,8 @@ void TestMnaInversePipeline::testMnaFileRoundTrip()
     QCOMPARE(loaded.pipeline.size(), m_project.pipeline.size());
 
     for (int i = 0; i < m_project.pipeline.size(); ++i) {
-        QCOMPARE(loaded.pipeline[i].id,   m_project.pipeline[i].id);
-        QCOMPARE(loaded.pipeline[i].tool, m_project.pipeline[i].tool);
+        QCOMPARE(loaded.pipeline[i].id,     m_project.pipeline[i].id);
+        QCOMPARE(loaded.pipeline[i].opType, m_project.pipeline[i].opType);
         QCOMPARE(loaded.pipeline[i].inputs.size(),  m_project.pipeline[i].inputs.size());
         QCOMPARE(loaded.pipeline[i].outputs.size(), m_project.pipeline[i].outputs.size());
     }

@@ -248,13 +248,21 @@ set(MNE_LIBS_REQUIRED
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     ${MNE_LIBS_REQUIRED}
-    eigen
+    Eigen3::Eigen
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_DISP_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
 
 if(NOT BUILD_SHARED_LIBS)
   target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
+
+  # Qt resource targets (e.g. from qt_add_shaders) must be exported for static builds
+  foreach(_idx RANGE 1 10)
+      if(TARGET ${PROJECT_NAME}_resources_${_idx})
+          install(TARGETS ${PROJECT_NAME}_resources_${_idx} ${MNE_CPP_EXPORT_SET}
+              ARCHIVE DESTINATION lib COMPONENT sdk)
+      endif()
+  endforeach()
 endif()
 
 install(TARGETS ${PROJECT_NAME} ${MNE_CPP_EXPORT_SET}

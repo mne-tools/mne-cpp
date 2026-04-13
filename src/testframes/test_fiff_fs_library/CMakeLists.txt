@@ -30,7 +30,7 @@ target_link_libraries(test_fiff_fs_library PRIVATE
     mne_utils
     mne_math
     mne_events
-    eigen
+    Eigen3::Eigen
     Qt6::Core
     Qt6::Widgets
     Qt6::Concurrent

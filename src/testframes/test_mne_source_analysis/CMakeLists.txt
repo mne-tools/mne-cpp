@@ -14,7 +14,7 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Test
-    eigen
+    Eigen3::Eigen
     mne_fiff
     mne_mne
     mne_fs

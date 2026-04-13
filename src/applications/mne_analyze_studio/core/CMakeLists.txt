@@ -67,7 +67,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     mne_fiff
     mne_bids
     mne_fs
-    eigen
+    Eigen3::Eigen
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_ANALYZE_STUDIO_CORE_LIBRARY)

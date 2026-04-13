@@ -77,8 +77,8 @@ QJsonObject MnaProject::toJson() const
     json[QLatin1String("subjects")] = subjArr;
 
     QJsonArray pipeArr;
-    for(const MnaStep& st : pipeline) {
-        pipeArr.append(st.toJson());
+    for(const MnaNode& nd : pipeline) {
+        pipeArr.append(nd.toJson());
     }
     json[QLatin1String("pipeline")] = pipeArr;
 
@@ -103,7 +103,7 @@ MnaProject MnaProject::fromJson(const QJsonObject& json)
 
     const QJsonArray pipeArr = json[QLatin1String("pipeline")].toArray();
     for(const QJsonValue& v : pipeArr) {
-        proj.pipeline.append(MnaStep::fromJson(v.toObject()));
+        proj.pipeline.append(MnaNode::fromJson(v.toObject()));
     }
 
     return proj;
@@ -127,8 +127,8 @@ QCborMap MnaProject::toCbor() const
     cbor[QLatin1String("subjects")] = subjArr;
 
     QCborArray pipeArr;
-    for(const MnaStep& st : pipeline) {
-        pipeArr.append(st.toCbor());
+    for(const MnaNode& nd : pipeline) {
+        pipeArr.append(nd.toCbor());
     }
     cbor[QLatin1String("pipeline")] = pipeArr;
 
@@ -153,7 +153,7 @@ MnaProject MnaProject::fromCbor(const QCborMap& cbor)
 
     const QCborArray pipeArr = cbor[QLatin1String("pipeline")].toArray();
     for(const QCborValue& v : pipeArr) {
-        proj.pipeline.append(MnaStep::fromCbor(v.toMap()));
+        proj.pipeline.append(MnaNode::fromCbor(v.toMap()));
     }
 
     return proj;

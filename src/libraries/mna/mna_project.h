@@ -41,7 +41,7 @@
 
 #include "mna_global.h"
 #include "mna_subject.h"
-#include "mna_step.h"
+#include "mna_node.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -86,7 +86,7 @@ public:
     QDateTime          created;       /**< Creation timestamp. */
     QDateTime          modified;      /**< Last modification timestamp. */
     QList<MnaSubject>  subjects;      /**< Subjects in the project. */
-    QList<MnaStep>     pipeline;      /**< Processing pipeline steps. */
+    QList<MnaNode>     pipeline;      /**< Processing pipeline nodes. */
 
     //=========================================================================================================
     /**

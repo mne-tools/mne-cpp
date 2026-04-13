@@ -38,6 +38,8 @@
 
 #include <mna/mna_io.h>
 #include <mna/mna_project.h>
+#include <mna/mna_node.h>
+#include <mna/mna_port.h>
 #include <mna/mna_types.h>
 
 //=============================================================================================================
@@ -79,8 +81,8 @@ private slots:
     void testFileRefConstruction();
     void testFileRoleEnumRoundTrip();
 
-    // MnaStep
-    void testStepConstruction();
+    // MnaNode (pipeline node)
+    void testNodeConstruction();
 
     // JSON serialization
     void testProjectJsonRoundTrip();
@@ -88,7 +90,7 @@ private slots:
     void testSessionJsonRoundTrip();
     void testRecordingJsonRoundTrip();
     void testFileRefJsonRoundTrip();
-    void testStepJsonRoundTrip();
+    void testNodeJsonRoundTrip();
 
     // CBOR serialization
     void testProjectCborRoundTrip();
@@ -151,18 +153,29 @@ MnaProject TestMnaIo::createSampleProject()
 
     project.subjects.append(subject);
 
-    // Add a pipeline step
-    MnaStep step;
-    step.id = "step-01";
-    step.tool = "mne_compute_raw_inverse";
-    step.toolVersion = "2.2.0";
-    step.parameters.insert("method", "dSPM");
-    step.parameters.insert("snr", 3.0);
-    step.inputs.append("raw.fif");
-    step.outputs.append("stc-lh.stc");
-    step.timestamp = QDateTime::currentDateTimeUtc();
+    // Add a pipeline node
+    MnaNode node;
+    node.id = "step-01";
+    node.opType = "mne_compute_raw_inverse";
+    node.toolVersion = "2.2.0";
+    node.attributes.insert("method", "dSPM");
+    node.attributes.insert("snr", 3.0);
 
-    project.pipeline.append(step);
+    MnaPort inPort;
+    inPort.name = "raw";
+    inPort.dataKind = MnaDataKind::Matrix;
+    inPort.direction = MnaPortDir::Input;
+    node.inputs.append(inPort);
+
+    MnaPort outPort;
+    outPort.name = "stc";
+    outPort.dataKind = MnaDataKind::Matrix;
+    outPort.direction = MnaPortDir::Output;
+    node.outputs.append(outPort);
+
+    node.executedAt = QDateTime::currentDateTimeUtc();
+
+    project.pipeline.append(node);
 
     return project;
 }
@@ -258,20 +271,30 @@ void TestMnaIo::testFileRoleEnumRoundTrip()
 
 //=============================================================================================================
 
-void TestMnaIo::testStepConstruction()
+void TestMnaIo::testNodeConstruction()
 {
-    MnaStep step;
-    step.id = "step-01";
-    step.tool = "filter";
-    step.toolVersion = "1.0";
-    step.parameters.insert("lowpass", 40.0);
-    step.inputs.append("raw.fif");
-    step.outputs.append("filtered.fif");
+    MnaNode node;
+    node.id = "step-01";
+    node.opType = "filter";
+    node.toolVersion = "1.0";
+    node.attributes.insert("lowpass", 40.0);
 
-    QCOMPARE(step.id, QString("step-01"));
-    QCOMPARE(step.parameters.value("lowpass").toDouble(), 40.0);
-    QCOMPARE(step.inputs.size(), 1);
-    QCOMPARE(step.outputs.size(), 1);
+    MnaPort inPort;
+    inPort.name = "raw";
+    inPort.dataKind = MnaDataKind::Matrix;
+    inPort.direction = MnaPortDir::Input;
+    node.inputs.append(inPort);
+
+    MnaPort outPort;
+    outPort.name = "filtered";
+    outPort.dataKind = MnaDataKind::Matrix;
+    outPort.direction = MnaPortDir::Output;
+    node.outputs.append(outPort);
+
+    QCOMPARE(node.id, QString("step-01"));
+    QCOMPARE(node.attributes.value("lowpass").toDouble(), 40.0);
+    QCOMPARE(node.inputs.size(), 1);
+    QCOMPARE(node.outputs.size(), 1);
 }
 
 //=============================================================================================================
@@ -291,7 +314,7 @@ void TestMnaIo::testProjectJsonRoundTrip()
     // Verify nested data survived
     QCOMPARE(restored.subjects[0].id, original.subjects[0].id);
     QCOMPARE(restored.subjects[0].sessions[0].id, original.subjects[0].sessions[0].id);
-    QCOMPARE(restored.pipeline[0].tool, original.pipeline[0].tool);
+    QCOMPARE(restored.pipeline[0].opType, original.pipeline[0].opType);
 }
 
 //=============================================================================================================
@@ -370,26 +393,43 @@ void TestMnaIo::testFileRefJsonRoundTrip()
 
 //=============================================================================================================
 
-void TestMnaIo::testStepJsonRoundTrip()
+void TestMnaIo::testNodeJsonRoundTrip()
 {
-    MnaStep original;
+    MnaNode original;
     original.id = "step-02";
-    original.tool = "csd_compute";
+    original.opType = "csd_compute";
     original.toolVersion = "2.2.0";
-    original.parameters.insert("fmin", 7.0);
-    original.parameters.insert("fmax", 30.0);
-    original.inputs << "epochs.fif" << "noise_cov.fif";
-    original.outputs << "csd.json";
-    original.timestamp = QDateTime::currentDateTimeUtc();
+    original.attributes.insert("fmin", 7.0);
+    original.attributes.insert("fmax", 30.0);
+
+    MnaPort in1;
+    in1.name = "epochs";
+    in1.dataKind = MnaDataKind::Epochs;
+    in1.direction = MnaPortDir::Input;
+    original.inputs.append(in1);
+
+    MnaPort in2;
+    in2.name = "noise_cov";
+    in2.dataKind = MnaDataKind::Matrix;
+    in2.direction = MnaPortDir::Input;
+    original.inputs.append(in2);
+
+    MnaPort out;
+    out.name = "csd";
+    out.dataKind = MnaDataKind::Custom;
+    out.direction = MnaPortDir::Output;
+    original.outputs.append(out);
+
+    original.executedAt = QDateTime::currentDateTimeUtc();
 
     QJsonObject json = original.toJson();
-    MnaStep restored = MnaStep::fromJson(json);
+    MnaNode restored = MnaNode::fromJson(json);
 
     QCOMPARE(restored.id, original.id);
-    QCOMPARE(restored.tool, original.tool);
+    QCOMPARE(restored.opType, original.opType);
     QCOMPARE(restored.inputs.size(), 2);
     QCOMPARE(restored.outputs.size(), 1);
-    QCOMPARE(restored.parameters.value("fmin").toDouble(), 7.0);
+    QCOMPARE(restored.attributes.value("fmin").toDouble(), 7.0);
 }
 
 //=============================================================================================================

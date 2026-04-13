@@ -66,7 +66,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_math
     mne_mne
     mne_utils
-    eigen
+    Eigen3::Eigen
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)

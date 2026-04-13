@@ -543,7 +543,7 @@ int AnnotationModel::addAnnotation(int startSample,
     // Convert to time-based FiffAnnotation
     const double sfreq = (m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0;
     double onset = static_cast<double>(entry.startSample - m_iFirstSample) / sfreq;
-    double duration = static_cast<double>(entry.endSample - entry.startSample + 1) / sfreq;
+    double duration = static_cast<double>(entry.endSample - entry.startSample) / sfreq;
     if(onset < 0.0) onset = 0.0;
     if(duration < 0.0) duration = 0.0;
 
@@ -567,7 +567,7 @@ int AnnotationModel::addAnnotation(int startSample,
 
     // Recompute onset/duration after merge
     onset = static_cast<double>(entry.startSample - m_iFirstSample) / sfreq;
-    duration = static_cast<double>(entry.endSample - entry.startSample + 1) / sfreq;
+    duration = static_cast<double>(entry.endSample - entry.startSample) / sfreq;
 
     beginResetModel();
     // Remove merged entries in reverse order

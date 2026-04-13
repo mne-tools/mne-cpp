@@ -30,7 +30,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_fwd
     mne_utils
     mne_math
-    eigen
+    Eigen3::Eigen
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

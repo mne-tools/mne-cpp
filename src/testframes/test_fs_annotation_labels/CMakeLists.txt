@@ -22,7 +22,7 @@ set(MNE_LIBS_REQUIRED mne_fs mne_fiff mne_utils
     mne_math)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-  ${QT_REQUIRED_COMPONENT_LIBS} ${MNE_LIBS_REQUIRED} eigen)
+  ${QT_REQUIRED_COMPONENT_LIBS} ${MNE_LIBS_REQUIRED} Eigen3::Eigen)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
   WIN32_EXECUTABLE FALSE

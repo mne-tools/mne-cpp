@@ -8,67 +8,87 @@
     "pipeline": [
         {
             "id": "load_raw",
-            "tool": "load_fiff_raw",
-            "toolVersion": "2.2.0",
-            "parameters": {
+            "op_type": "load_fiff_raw",
+            "tool_version": "2.2.0",
+            "attributes": {
                 "raw_path": "${TEST_DATA}/MEG/sample/sample_audvis_trunc_raw.fif"
             },
             "inputs": [],
-            "outputs": ["raw_data", "info"]
+            "outputs": [
+                {"name": "raw_data", "data_kind": "matrix", "direction": "output"},
+                {"name": "info",     "data_kind": "matrix", "direction": "output"}
+            ]
         },
         {
             "id": "load_evoked",
-            "tool": "load_fiff_evoked",
-            "toolVersion": "2.2.0",
-            "parameters": {
+            "op_type": "load_fiff_evoked",
+            "tool_version": "2.2.0",
+            "attributes": {
                 "evoked_path": "${TEST_DATA}/MEG/sample/sample_audvis-ave.fif",
                 "setno": 0
             },
             "inputs": [],
-            "outputs": ["evoked"]
+            "outputs": [
+                {"name": "evoked", "data_kind": "matrix", "direction": "output"}
+            ]
         },
         {
             "id": "load_cov",
-            "tool": "load_fiff_cov",
-            "toolVersion": "2.2.0",
-            "parameters": {
+            "op_type": "load_fiff_cov",
+            "tool_version": "2.2.0",
+            "attributes": {
                 "cov_path": "${TEST_DATA}/MEG/sample/sample_audvis-cov.fif"
             },
             "inputs": [],
-            "outputs": ["noise_cov"]
+            "outputs": [
+                {"name": "noise_cov", "data_kind": "matrix", "direction": "output"}
+            ]
         },
         {
             "id": "load_fwd",
-            "tool": "load_forward",
-            "toolVersion": "2.2.0",
-            "parameters": {
+            "op_type": "load_forward",
+            "tool_version": "2.2.0",
+            "attributes": {
                 "fwd_path": "${TEST_DATA}/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif"
             },
             "inputs": [],
-            "outputs": ["forward"]
+            "outputs": [
+                {"name": "forward", "data_kind": "matrix", "direction": "output"}
+            ]
         },
         {
             "id": "make_inv",
-            "tool": "make_inverse_operator",
-            "toolVersion": "2.2.0",
-            "parameters": {
+            "op_type": "make_inverse_operator",
+            "tool_version": "2.2.0",
+            "attributes": {
                 "loose": 0.2,
                 "depth": 0.8
             },
-            "inputs": ["load_raw::info", "load_fwd::forward", "load_cov::noise_cov"],
-            "outputs": ["inverse_operator"]
+            "inputs": [
+                {"name": "info",      "data_kind": "matrix", "direction": "input", "source_node": "load_raw",  "source_port": "info"},
+                {"name": "forward",   "data_kind": "matrix", "direction": "input", "source_node": "load_fwd",  "source_port": "forward"},
+                {"name": "noise_cov", "data_kind": "matrix", "direction": "input", "source_node": "load_cov",  "source_port": "noise_cov"}
+            ],
+            "outputs": [
+                {"name": "inverse_operator", "data_kind": "matrix", "direction": "output"}
+            ]
         },
         {
             "id": "apply_dspm",
-            "tool": "apply_inverse",
-            "toolVersion": "2.2.0",
-            "parameters": {
+            "op_type": "apply_inverse",
+            "tool_version": "2.2.0",
+            "attributes": {
                 "method": "dSPM",
                 "snr": 3.0,
                 "pick_normal": false
             },
-            "inputs": ["make_inv::inverse_operator", "load_evoked::evoked"],
-            "outputs": ["source_estimate"]
+            "inputs": [
+                {"name": "inverse_operator", "data_kind": "matrix", "direction": "input", "source_node": "make_inv",     "source_port": "inverse_operator"},
+                {"name": "evoked",           "data_kind": "matrix", "direction": "input", "source_node": "load_evoked",  "source_port": "evoked"}
+            ],
+            "outputs": [
+                {"name": "source_estimate", "data_kind": "matrix", "direction": "output"}
+            ]
         }
     ]
 }

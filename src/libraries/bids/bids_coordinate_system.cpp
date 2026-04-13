@@ -140,6 +140,18 @@ bool BidsCoordinateSystem::writeJson(const QString& sFilePath,
     if(!cs.associatedImagePath.isEmpty())
         json[QStringLiteral("IntendedFor")] = cs.associatedImagePath;
 
+    // Serialize the 4x4 transform matrix
+    if(!cs.transform.isIdentity(1e-15)) {
+        QJsonArray rows;
+        for(int r = 0; r < 4; ++r) {
+            QJsonArray cols;
+            for(int c = 0; c < 4; ++c)
+                cols.append(cs.transform(r, c));
+            rows.append(cols);
+        }
+        json[QStringLiteral("iEEGCoordinateProcessingTransform")] = rows;
+    }
+
     QFile file(sFilePath);
     if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qWarning() << "[BidsCoordinateSystem::writeJson] Cannot open" << sFilePath << "for writing";
