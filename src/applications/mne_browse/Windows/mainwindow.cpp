@@ -1224,8 +1224,11 @@ bool MainWindow::openFiffRawData(FIFFLIB::FiffRawData& raw, const QString& featu
         statusBar()->showMessage(tr("Load a raw FIF file before using %1.").arg(label), 5000);
         return false;
     }
-    QFile rawFile(m_qFileRaw.fileName());
-    raw = FIFFLIB::FiffRawData(rawFile);
+    // Re-open the member QFile so FiffRawData's internal FiffStream holds a
+    // valid QIODevice* that outlives this function call.
+    if (m_qFileRaw.isOpen())
+        m_qFileRaw.close();
+    raw = FIFFLIB::FiffRawData(m_qFileRaw);
 #endif
 
     if (raw.isEmpty()) {
