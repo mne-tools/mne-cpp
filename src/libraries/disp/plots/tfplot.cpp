@@ -306,7 +306,7 @@ void TFplot::resizeEvent(QResizeEvent *event)
     Q_UNUSED(event);   
 
     QWidget *widget = this->layout()->itemAt(0)-> widget();
-    if (widget != NULL ) {
+    if (widget != nullptr ) {
         QGraphicsView* view = (QGraphicsView*)widget;
         view->fitInView(view->sceneRect(),Qt::KeepAspectRatio);
     }

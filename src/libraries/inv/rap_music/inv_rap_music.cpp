@@ -253,7 +253,7 @@ InvSourceEstimate InvRapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, 
         qint32 t_iNumSensors = p_fiffEvoked.data.rows();
         qint32 t_iNumSteps = p_fiffEvoked.data.cols();
 
-        qint32 t_iSamplesOverlap = (qint32)floor(((float)m_iSamplesStcWindow)*m_fStcOverlap);
+        qint32 t_iSamplesOverlap = static_cast<qint32>(floor(static_cast<float>(m_iSamplesStcWindow)*m_fStcOverlap));
         qint32 t_iSamplesDiscard = t_iSamplesOverlap/2;
 
         MatrixXd data = MatrixXd::Zero(t_iNumSensors, m_iSamplesStcWindow);
@@ -507,7 +507,7 @@ InvSourceEstimate InvRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
         //subcorr benchmark
         end_subcorr = clock();
 
-        float t_fSubcorrElapsedTime = ( (float)(end_subcorr-start_subcorr) / (float)CLOCKS_PER_SEC ) * 1000.0f;
+        float t_fSubcorrElapsedTime = ( static_cast<float>(end_subcorr-start_subcorr) / static_cast<float>(CLOCKS_PER_SEC) ) * 1000.0f;
         qDebug() << "Time Elapsed: " << t_fSubcorrElapsedTime << " ms";
 
         //Find the maximum of correlation - can't put this in the for loop because it's running in different threads.
@@ -564,7 +564,7 @@ InvSourceEstimate InvRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
 
     end = clock();
 
-    float t_fElapsedTime = ( (float)(end-start) / (float)CLOCKS_PER_SEC ) * 1000.0f;
+    float t_fElapsedTime = ( static_cast<float>(end-start) / static_cast<float>(CLOCKS_PER_SEC) ) * 1000.0f;
     qDebug() << "Total Time Elapsed: " << t_fElapsedTime << " ms";
 
     //garbage collecting
@@ -818,7 +818,7 @@ void InvRapMusic::calcPairCombinations(    const int p_iNumPoints,
 void InvRapMusic::getPointPair(const int p_iPoints, const int p_iCurIdx, int &p_iIdx1, int &p_iIdx2)
 {
     int ii = p_iPoints*(p_iPoints+1)/2-1-p_iCurIdx;
-    int K = (int)floor((sqrt((double)(8*ii+1))-1)/2);
+    int K = static_cast<int>(floor((sqrt(static_cast<double>(8*ii+1))-1)/2));
 
     p_iIdx1 = p_iPoints-1-K;
 

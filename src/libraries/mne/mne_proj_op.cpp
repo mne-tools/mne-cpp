@@ -208,7 +208,7 @@ MNEProjOp *MNEProjOp::create_average_eeg_ref(const QList<FiffChInfo>& chs, int n
         if (chs.at(k).kind == FIFFV_EEG_CH)
             names.append(chs.at(k).ch_name);
 
-    Eigen::MatrixXf vec_data = Eigen::MatrixXf::Constant(1, eegcount, 1.0f/sqrt((double)eegcount));
+    Eigen::MatrixXf vec_data = Eigen::MatrixXf::Constant(1, eegcount, 1.0f/sqrt(static_cast<double>(eegcount)));
 
     QStringList emptyList;
     auto vecs = MNENamedMatrix::build(1,eegcount,emptyList,names,vec_data);

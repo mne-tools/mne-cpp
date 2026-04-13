@@ -397,7 +397,7 @@ void DataWindow::addMarkerAtSample(int sample)
     marker.color = markerColorForIndex(m_dataMarkers.size());
     marker.line = new DataMarker(this);
     marker.line->setMarkerColor(marker.color);
-    marker.line->resize(DATA_MARKER_WIDTH, viewportRect.height());
+    marker.line->resize(RawSettingsConstants::kDataMarkerWidth, viewportRect.height());
     marker.line->raise();
 
     marker.label = new QLabel(this);
@@ -418,7 +418,7 @@ void DataWindow::addMarkerAtSample(int sample)
             return;
         }
 
-        const int markerCenterX = m->line->geometry().left() + (DATA_MARKER_WIDTH / 2);
+        const int markerCenterX = m->line->geometry().left() + (RawSettingsConstants::kDataMarkerWidth / 2);
         const int localMarkerX = m_pChannelDataView->mapFrom(this, QPoint(markerCenterX, viewportRect.center().y())).x();
         m->sample = m_pChannelDataView->viewportXToSample(localMarkerX);
         if (m_pFiffReader && m_pFiffReader->isOpen()) {
@@ -549,19 +549,19 @@ void DataWindow::syncMarkersToViewport()
         int markerX = viewportRect.left();
         if (m_pChannelDataView) {
             const int localViewportX = m_pChannelDataView->sampleToViewportX(marker.sample);
-            markerX = m_pChannelDataView->mapTo(this, QPoint(localViewportX, 0)).x() - (DATA_MARKER_WIDTH / 2);
+            markerX = m_pChannelDataView->mapTo(this, QPoint(localViewportX, 0)).x() - (RawSettingsConstants::kDataMarkerWidth / 2);
             visible = marker.sample >= m_pChannelDataView->firstVisibleSample()
                    && marker.sample <= (m_pChannelDataView->firstVisibleSample() + m_pChannelDataView->visibleSampleCount());
         }
 
-        const int maxMarkerX = qMax(viewportRect.left(), viewportRect.right() - DATA_MARKER_WIDTH + 1);
+        const int maxMarkerX = qMax(viewportRect.left(), viewportRect.right() - RawSettingsConstants::kDataMarkerWidth + 1);
         markerX = qBound(viewportRect.left(), markerX, maxMarkerX);
 
         {
             QSignalBlocker blocker(marker.line);
             marker.line->setGeometry(markerX,
                                      viewportRect.y(),
-                                     DATA_MARKER_WIDTH,
+                                     RawSettingsConstants::kDataMarkerWidth,
                                      viewportRect.height());
         }
 
@@ -1431,13 +1431,13 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
             if (event->modifiers() & Qt::ShiftModifier)
                 m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() - m_pChannelDataView->visibleSampleCount(), false);
             else
-                m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() - static_cast<int>(RAWVIEW_KEYBOARD_SCROLL_STEP * m_pChannelDataView->scrollSpeedFactor()), false);
+                m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() - static_cast<int>(RawSettingsConstants::kRawViewKeyScrollStep * m_pChannelDataView->scrollSpeedFactor()), false);
             break;
         case Qt::Key_Right:
             if (event->modifiers() & Qt::ShiftModifier)
                 m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() + m_pChannelDataView->visibleSampleCount(), false);
             else
-                m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() + static_cast<int>(RAWVIEW_KEYBOARD_SCROLL_STEP * m_pChannelDataView->scrollSpeedFactor()), false);
+                m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() + static_cast<int>(RawSettingsConstants::kRawViewKeyScrollStep * m_pChannelDataView->scrollSpeedFactor()), false);
             break;
         case Qt::Key_Plus:
         case Qt::Key_Equal:
@@ -1802,7 +1802,7 @@ void DataWindow::setMarkerSampleLabel()
             continue;
         }
 
-        const int markerCenterX = marker.line->geometry().left() + (DATA_MARKER_WIDTH / 2);
+        const int markerCenterX = marker.line->geometry().left() + (RawSettingsConstants::kDataMarkerWidth / 2);
         const int currentMilliseconds = static_cast<int>((static_cast<double>(marker.sample) / fiffInfo->sfreq) * 1000.0);
         QString markerText = QString("%1 / %2 sec")
                                  .arg(QString::number(marker.sample))

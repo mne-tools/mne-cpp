@@ -564,7 +564,7 @@ bool MNEFiffExpSet::show_fiff_contents(FILE *out, const QString &name, bool verb
                         case FIFFT_DIG_STRING_STRUCT :
                             if (stream->read_tag(tag,this_ent->pos)) {
 #ifdef FOO
-                                if ((ds = decode_fiff_dig_string(&tag)) != NULL)
+                                if ((ds = decode_fiff_dig_string(&tag)) != nullptr)
                                     print_dig_string (ds);
                                 free_fiff_dig_string(ds);
 #endif

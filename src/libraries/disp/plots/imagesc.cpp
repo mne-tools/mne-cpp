@@ -174,12 +174,12 @@ void ImageSc::updateMaps()
     if(m_pPixmapData)
     {
         delete m_pPixmapData;
-        m_pPixmapData = NULL;
+        m_pPixmapData = nullptr;
     }
     if(m_pPixmapColorbar)
     {
         delete m_pPixmapColorbar;
-        m_pPixmapColorbar = NULL;
+        m_pPixmapColorbar = nullptr;
     }
 
     if(m_matCentNormData.rows() > 0 && m_matCentNormData.cols() > 0)

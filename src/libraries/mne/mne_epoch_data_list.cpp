@@ -140,7 +140,7 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
             if (p == 0) {
                 times.resize(1, to-from+1);
                 for (qint32 i = 0; i < times.cols(); ++i)
-                    times(0, i) = ((float)(from-event_samp+i)) / raw.info.sfreq;
+                    times(0, i) = static_cast<float>(from-event_samp+i) / raw.info.sfreq;
             }
 
             epoch->event = event;

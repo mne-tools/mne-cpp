@@ -235,7 +235,7 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
                     brush.setColor(m_eventTypeColor.value(m_dataTypes_Filtered.at(index.row()), Qt::black));
 
                     QColor colorTemp = brush.color();
-                    colorTemp.setAlpha(EVENT_MARKER_OPACITY);
+                    colorTemp.setAlpha(RawSettingsConstants::kEventMarkerOpacity);
                     brush.setColor(colorTemp);
                     return QVariant(brush);
                 }

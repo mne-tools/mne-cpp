@@ -378,9 +378,9 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
     MatrixXd C(cov_good.data);
 
     //Check dimension consistency (channels not classified as EEG/MAG/GRAD, e.g. EOG/MISC, are expected)
-    if((unsigned) C.rows() != idx_eeg.size() + idx_mag.size() + idx_grad.size()) {
+    if(static_cast<unsigned>(C.rows()) != idx_eeg.size() + idx_mag.size() + idx_grad.size()) {
         qWarning("FiffCov::regularize: %lld channels in cov but only %zu classified as EEG/MAG/GRAD (others will not be regularized)",
-                 (long long)C.rows(), idx_eeg.size() + idx_mag.size() + idx_grad.size());
+                 static_cast<long long>(C.rows()), idx_eeg.size() + idx_mag.size() + idx_grad.size());
     }
 
     QList<FiffProj> t_listProjs;

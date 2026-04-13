@@ -72,7 +72,7 @@ ButterflyView::ButterflyView(const QString& sSettingsPath,
 :
   QRhiWidget(parent)
 , m_sSettingsPath(sSettingsPath)
-, m_pEvokedSetModel(NULL)
+, m_pEvokedSetModel(nullptr)
 , m_bIsInit(false)
 , m_bShowMAG(true)
 , m_bShowGRAD(true)

@@ -509,7 +509,7 @@ int read_curvature_file(const QString& fname,
         for (k = 0; k < ncurv; k++) {
             if (read_int2(fp,val) != 0)
                 goto bad;
-            curv[k] = (float)val/100.0;
+            curv[k] = static_cast<float>(val)/100.0;
             if (curv[k] > curvmax)
                 curvmax = curv[k];
             if (curv[k] < curvmin)

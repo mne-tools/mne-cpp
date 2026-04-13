@@ -296,7 +296,7 @@ static _fiffExp _fiff_unit_explanations[] = {
    * Others we need
    */
   { FIFF_UNIT_T_M,"T/m" }, /* T/m */ 
-  { -1, NULL }};
+  { -1, nullptr }};
 
 static _fiffExp _fiff_unit_mul_explanations[] = {
   { FIFF_UNITM_E, "E" },
@@ -315,7 +315,7 @@ static _fiffExp _fiff_unit_mul_explanations[] = {
   { FIFF_UNITM_P, "p" },
   { FIFF_UNITM_F, "f" },
   { FIFF_UNITM_A, "a" },
-  {-1, NULL }};
+  {-1, nullptr }};
 } // NAMESPACE
 
 #endif // FIFF_EXPLAIN_H

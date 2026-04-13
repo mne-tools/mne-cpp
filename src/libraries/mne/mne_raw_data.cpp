@@ -393,7 +393,7 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
         goto bad;
 
     if (ent->type == FIFFT_FLOAT) {
-        if ((int)(t_pTag->size()/(sizeof(fiff_float_t)*nchan)) != nsamp) {
+        if (static_cast<int>(t_pTag->size()/(sizeof(fiff_float_t)*nchan)) != nsamp) {
             qCritical("Incorrect number of samples in buffer.");
             goto bad;
         }
@@ -405,7 +405,7 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
         }
     }
     else if (ent->type == FIFFT_SHORT || ent->type == FIFFT_DAU_PACK16) {
-        if ((int)(t_pTag->size()/(sizeof(fiff_short_t)*nchan)) != nsamp) {
+        if (static_cast<int>(t_pTag->size()/(sizeof(fiff_short_t)*nchan)) != nsamp) {
             qCritical("Incorrect number of samples in buffer.");
             goto bad;
         }
@@ -417,7 +417,7 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
         }
     }
     else if (ent->type == FIFFT_INT) {
-        if ((int)(t_pTag->size()/(sizeof(fiff_int_t)*nchan)) != nsamp) {
+        if (static_cast<int>(t_pTag->size()/(sizeof(fiff_int_t)*nchan)) != nsamp) {
             qCritical("Incorrect number of samples in buffer.");
             goto bad;
         }
@@ -810,7 +810,7 @@ int MNERawData::pick_data(mneChSelection sel, int firsts, int ns, float **picked
     /*
        * Have to to the hard work
        */
-    for (k = 0, this_buf = bufs.data(), s = 0; k < (int)bufs.size(); k++, this_buf++) {
+    for (k = 0, this_buf = bufs.data(), s = 0; k < static_cast<int>(bufs.size()); k++, this_buf++) {
         if (this_buf->lasts >= firsts) {
             start = firsts - this_buf->firsts;
             if (start < 0)
@@ -940,7 +940,7 @@ int MNERawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
     else
         s = 0;
     Eigen::VectorXf pvalues(info->nchan);
-    for (k = 0, this_buf = bufs.data(); k < (int)bufs.size(); k++, this_buf++) {
+    for (k = 0, this_buf = bufs.data(); k < static_cast<int>(bufs.size()); k++, this_buf++) {
         if (this_buf->lasts >= firsts) {
             start = firsts - this_buf->firsts;
             if (start < 0)
@@ -1124,11 +1124,11 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
     /*
        * Find the first buffer to consider
        */
-    for (k = 0, this_buf = filt_bufs.data(); k < (int)filt_bufs.size(); k++, this_buf++) {
+    for (k = 0, this_buf = filt_bufs.data(); k < static_cast<int>(filt_bufs.size()); k++, this_buf++) {
         if (this_buf->lasts >= firsts)
             break;
     }
-    for (; k < (int)filt_bufs.size() && this_buf->firsts <= lasts; k++, this_buf++) {
+    for (; k < static_cast<int>(filt_bufs.size()) && this_buf->firsts <= lasts; k++, this_buf++) {
 #ifdef DEBUG
         qDebug("this_buf (%d): %d..%d\n",k,this_buf->firsts,this_buf->lasts);
 #endif
@@ -1326,7 +1326,7 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
          * Take care of the nonzero unit multiplier
          */
         if (ch.unit_mul != 0) {
-            ch.cal = pow(10.0,(double)(ch.unit_mul))*ch.cal;
+            ch.cal = pow(10.0,static_cast<double>(ch.unit_mul))*ch.cal;
             qInfo("Ch %s unit multiplier %d -> 0\n",ch.ch_name.toLatin1().data(),ch.unit_mul);
             ch.unit_mul = 0;
         }

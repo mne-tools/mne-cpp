@@ -262,7 +262,7 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
 
             t_val_roh_k = t_vecRoh.maxCoeff(&t_iMaxIdx);//p_vecCor = ^roh_k
 
-            if((int)t_iMaxIdx == t_iMaxIdx_old)
+            if(static_cast<int>(t_iMaxIdx) == t_iMaxIdx_old)
             {
                 t_iMaxFound = 1;
                 break;
@@ -287,7 +287,7 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
         //subcorr benchmark
         end_subcorr = clock();
 
-        float t_fSubcorrElapsedTime = ( (float)(end_subcorr-start_subcorr) / (float)CLOCKS_PER_SEC ) * 1000.0f;
+        float t_fSubcorrElapsedTime = ( static_cast<float>(end_subcorr-start_subcorr) / static_cast<float>(CLOCKS_PER_SEC) ) * 1000.0f;
         qDebug() << "Time Elapsed: " << t_fSubcorrElapsedTime << " ms";
 
         // (Idx+1) because of MATLAB positions -> starting with 1 not with 0
@@ -333,7 +333,7 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
 
     end = clock();
 
-    float t_fElapsedTime = ( (float)(end-start) / (float)CLOCKS_PER_SEC ) * 1000.0f;
+    float t_fElapsedTime = ( static_cast<float>(end-start) / static_cast<float>(CLOCKS_PER_SEC) ) * 1000.0f;
     qDebug() << "Total Time Elapsed: " << t_fElapsedTime << " ms";
 
     //garbage collecting

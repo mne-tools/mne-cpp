@@ -91,7 +91,7 @@ FiffSimulator::FiffSimulator()
 , m_uiBufferSampleSize(200)//(4)
 , m_AccelerationFactor(1.0)
 , m_TrueSamplingRate(0.0)
-, m_pRawMatrixBuffer(NULL)
+, m_pRawMatrixBuffer(nullptr)
 , m_bIsRunning(false)
 {
     this->init();
@@ -323,7 +323,7 @@ void FiffSimulator::init()
 
     if(m_pRawMatrixBuffer)
         delete m_pRawMatrixBuffer;
-    m_pRawMatrixBuffer = NULL;
+    m_pRawMatrixBuffer = nullptr;
 
     if(!m_RawInfo.isEmpty())
         m_pRawMatrixBuffer = new CircularBuffer_Matrix_float(RAW_BUFFFER_SIZE);

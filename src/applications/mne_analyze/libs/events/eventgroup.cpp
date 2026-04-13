@@ -40,8 +40,7 @@
 #include "eventgroup.h"
 #include "event.h"
 
-#include <stdlib.h>
-#include <ctime>
+#include <random>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -125,8 +124,6 @@ EVENTSINTERNAL::EventGroupINT::EventGroupINT(std::string&& name)
 , m_Id(0)
 , m_order(0)
 {
-    std::srand(std::time(NULL));
-
     setRandomColor();
 }
 
@@ -137,8 +134,6 @@ EVENTSINTERNAL::EventGroupINT::EventGroupINT(idNum id, const std::string& name)
 , m_Id(id)
 , m_order(0)
 {
-    std::srand(std::time(NULL));
-
     setRandomColor();
 }
 
@@ -150,8 +145,6 @@ EVENTSINTERNAL::EventGroupINT::EventGroupINT(idNum id, const std::string& name,
 , m_Id(id)
 , m_order(0)
 {
-    std::srand(std::time(NULL));
-
     setColor(color);
 }
 
@@ -173,9 +166,11 @@ RgbColor EVENTSINTERNAL::EventGroupINT::getColor() const
 
 void EVENTSINTERNAL::EventGroupINT::setRandomColor()
 {
-    m_Color.r = rand() % 256;
-    m_Color.g = rand() % 256;
-    m_Color.b = rand() % 256;
+    static std::mt19937 rng{std::random_device{}()};
+    std::uniform_int_distribution<int> dist(0, 255);
+    m_Color.r = dist(rng);
+    m_Color.g = dist(rng);
+    m_Color.b = dist(rng);
 }
 
 //=============================================================================================================

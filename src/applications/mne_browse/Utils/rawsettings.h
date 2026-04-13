@@ -67,64 +67,64 @@
 // CONSTANTS
 //=============================================================================================================
 
+namespace RawSettingsConstants {
+
 //MainWindow
-#define MAINWINDOW_WINDOW_SIZE_W 1200 //width of MainWindow
-#define MAINWINDOW_WINDOW_SIZE_H 800 //width of MainWindow
-#define MAINWINDOW_WINDOW_POSITION_X 50 //initial window position x
-#define MAINWINDOW_WINDOW_POSITION_Y 50 //initial window position y
+inline constexpr int kMainWindowSizeW = 1200;            ///< Width of MainWindow
+inline constexpr int kMainWindowSizeH = 800;             ///< Height of MainWindow
+inline constexpr int kMainWindowPositionX = 50;          ///< Initial window position x
+inline constexpr int kMainWindowPositionY = 50;          ///< Initial window position y
 
 //RawModel
-#define MODEL_WINDOW_SIZE 4016 //this value+MODEL_NUM_FILTER_TAPS must be a multiple integer of 2^x (e.g. 4016 or 8112 for 80 filter taps), length of data window to preload [in samples]
-#define MODEL_RELOAD_POS 2000 //Distance that the current window needs to be off the ends of m_data[i] [in samples]
-#define MODEL_MAX_WINDOWS 3 //number of windows that are at maximum remained in m_data
-#define MODEL_NUM_FILTER_TAPS 80 //number of filter taps, required to take into account because of FFT convolution (zero padding)
-#define MODEL_MAX_NUM_FILTER_TAPS 0 //number of maximal filter taps
+inline constexpr int kModelWindowSize = 4016;            ///< Length of data window to preload [samples]. Must satisfy (value + kModelNumFilterTaps) = 2^n
+inline constexpr int kModelReloadPos = 2000;             ///< Distance from window edge triggering reload [samples]
+inline constexpr int kModelMaxWindows = 3;               ///< Maximum number of preloaded windows
+inline constexpr int kModelNumFilterTaps = 80;           ///< Filter tap count for FFT zero-padding
+inline constexpr int kModelMaxNumFilterTaps = 0;         ///< Maximum filter tap count
 
-//RawDelegate
-//Look
-#define DELEGATE_PLOT_HEIGHT 40 //height of a single plot (row)
-#define DELEGATE_DX 1 //each DX pixel a sample is plot -> plot resolution
-#define DELEGATE_NHLINES 6 //number of horizontal lines within a single plot (row)
+//RawDelegate — Layout
+inline constexpr int kDelegatePlotHeight = 40;           ///< Height of a single channel row [pixels]
+inline constexpr int kDelegateDx = 1;                    ///< Pixels per sample → plot resolution
+inline constexpr int kDelegateNHLines = 6;               ///< Horizontal grid lines per row
 
-//maximum values for different channels types according to FiffChInfo
-#define DELEGATE_MAX_MEG_GRAD 1e-10 // kind=FIFFV_MEG_CH && unit=FIFF_UNIT_T_M
-#define DELEGATE_MAX_MEG_MAG 1e-11 // kind=FIFFV_MEG_CH && unit=FIFF_UNIT_T
-#define DELEGATE_MAX_EEG 1e-4 // kind=FIFFV_EEG_CH
-#define DELEGATE_MAX_EOG 1e-3 // kind=FIFFV_EOG_CH
-#define DELEGATE_MAX_STIM 5 // kind=FIFFV_STIM_CH
+//RawDelegate — Maximum channel amplitudes (by FiffChInfo type)
+inline constexpr double kDelegateMaxMegGrad = 1e-10;    ///< kind=FIFFV_MEG_CH, unit=FIFF_UNIT_T_M
+inline constexpr double kDelegateMaxMegMag = 1e-11;     ///< kind=FIFFV_MEG_CH, unit=FIFF_UNIT_T
+inline constexpr double kDelegateMaxEeg = 1e-4;         ///< kind=FIFFV_EEG_CH
+inline constexpr double kDelegateMaxEog = 1e-3;         ///< kind=FIFFV_EOG_CH
+inline constexpr double kDelegateMaxStim = 5.0;         ///< kind=FIFFV_STIM_CH
 
-//Define Event design parameters
-//Event marker width
-#define EVENT_MARKER_WIDTH 3 // in pixels
+//Event markers
+inline constexpr int kEventMarkerWidth = 3;              ///< Event marker width [pixels]
+inline constexpr int kEventMarkerOpacity = 110;          ///< Event marker opacity [0..255]
 
-//Event marker opacity
-#define EVENT_MARKER_OPACITY 110 // opacity of the markers and backgorunds in the table columns. Range: 0...255
+//Data markers
+inline constexpr int kDataMarkerWidth = 3;               ///< Data marker width [pixels]
+inline constexpr int kDataMarkerOpacity = 200;           ///< Data marker opacity [0..255]
+inline constexpr int kDataMarkerInitialX = 74;           ///< Initial x position after file load [pixels]
+inline constexpr int kDataMarkerLabelVOffset = 20;       ///< Label offset above marker line [pixels]
 
-//Data marker
-#define DATA_MARKER_WIDTH 3 // in pixels
-#define DATA_MARKER_OPACITY 200 // opacity of the data marker and backgorunds in the table columns. Range: 0...255
-#define DATA_MARKER_INITIAL_X 74 // initial x-pixel of the data marker after a file is loaded
-#define DATA_MARKER_LABEL_V_OFFSET 20 // vertical pixel offset of the marker sample label above the marker line
+//RawDelegate — Initial/fallback scaling
+inline constexpr double kDelegateInitialMaxValue = 65530.0; ///< Placeholder max before file load
+inline constexpr double kDelegateFallbackScale = 1e-9;      ///< Fallback for unknown channel types
 
-//RawDelegate: initial/fallback scaling
-#define DELEGATE_INITIAL_MAX_VALUE 65530.0 // placeholder max-value before a file is loaded
-#define DELEGATE_FALLBACK_SCALE 1e-9 // fallback amplitude scale for unknown/unhandled channel types
-
-//Raw view keyboard navigation
-#define RAWVIEW_KEYBOARD_SCROLL_STEP 25 // pixels per Left/Right key press
+//Keyboard navigation
+inline constexpr int kRawViewKeyScrollStep = 25;         ///< Pixels per Left/Right key press
 
 //Filter design
-#define FILTER_DEFAULT_TRANS_BW_RATIO 0.2 // default transition-band width as fraction of Nyquist
+inline constexpr double kFilterDefaultTransBWRatio = 0.2; ///< Transition-band width as fraction of Nyquist
 
-//Default channel amplitude scales (used to initialize the scale map)
-#define DELEGATE_SCALE_MEG_GRAD  (400e-15 * 100)  // fT/m (*100 because fiff stores fT/cm)
-#define DELEGATE_SCALE_MEG_MAG   1.2e-12
-#define DELEGATE_SCALE_EEG       30e-6
-#define DELEGATE_SCALE_EOG       150e-6
-#define DELEGATE_SCALE_EMG       1e-3
-#define DELEGATE_SCALE_ECG       1e-3
-#define DELEGATE_SCALE_MISC      1.0
-#define DELEGATE_SCALE_STIM      5.0
+//Default channel amplitude scales (for scale map initialization)
+inline constexpr double kDelegateScaleMegGrad = 400e-15 * 100; ///< fT/m (×100 because FIFF stores fT/cm)
+inline constexpr double kDelegateScaleMegMag = 1.2e-12;
+inline constexpr double kDelegateScaleEeg = 30e-6;
+inline constexpr double kDelegateScaleEog = 150e-6;
+inline constexpr double kDelegateScaleEmg = 1e-3;
+inline constexpr double kDelegateScaleEcg = 1e-3;
+inline constexpr double kDelegateScaleMisc = 1.0;
+inline constexpr double kDelegateScaleStim = 5.0;
+
+} // namespace RawSettingsConstants
 
 //*************************************************************************************************************
 //=============================================================================================================
