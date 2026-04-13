@@ -47,6 +47,7 @@
 #include <fiff/fiff_coord_trans.h>
 
 #include <QFile>
+#include <QDebug>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -297,7 +298,7 @@ void MNESurface::find_closest_on_surface_approx(const PointsT& r, int np_points,
     MNEProjData* p = new MNEProjData(this);
     int k, was;
 
-    printf("%s for %d points %d steps...", nearest_tri[0] < 0 ? "Closest" : "Approx closest", np_points, nstep);
+    qInfo("%s for %d points %d steps...", nearest_tri[0] < 0 ? "Closest" : "Approx closest", np_points, nstep);
 
     for (k = 0; k < np_points; k++) {
         was = nearest_tri[k];
@@ -311,7 +312,7 @@ void MNESurface::find_closest_on_surface_approx(const PointsT& r, int np_points,
     }
     (void)was;
 
-    printf("[done]\n");
+    qInfo("[done]\n");
     delete p;
 }
 
@@ -442,7 +443,7 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, bool ad
     }
     surfs = stream->dirtree()->dir_tree_find(FIFFB_BEM_SURF);
     if (surfs.size() == 0) {
-        printf("No BEM surfaces found in %s", name.toUtf8().constData());
+        qCritical("No BEM surfaces found in %s", name.toUtf8().constData());
         goto bad;
     }
     if (which >= 0) {
@@ -455,7 +456,7 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, bool ad
             }
         }
         if (id != which) {
-            printf("Desired surface not found in %s", name.toUtf8().constData());
+            qCritical("Desired surface not found in %s", name.toUtf8().constData());
             goto bad;
         }
     }

@@ -820,7 +820,7 @@ bool AnnotationModel::loadAnnotationFif(QFile& qFile)
         }
 
         if(directoryEntry->kind == FiffMneBaselineMin) {
-            if(float* values = tag->toFloat()) {
+            if(const float* values = tag->toFloat()) {
                 const int count = tag->size() / static_cast<int>(sizeof(float));
                 onsetSeconds.resize(count);
                 for(int index = 0; index < count; ++index) {
@@ -828,7 +828,7 @@ bool AnnotationModel::loadAnnotationFif(QFile& qFile)
                 }
             }
         } else if(directoryEntry->kind == FiffMneBaselineMax) {
-            if(float* values = tag->toFloat()) {
+            if(const float* values = tag->toFloat()) {
                 const int count = tag->size() / static_cast<int>(sizeof(float));
                 endSeconds.resize(count);
                 for(int index = 0; index < count; ++index) {

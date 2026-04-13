@@ -71,22 +71,22 @@ void MNE::setup_compensators(FiffRawData& raw,
 {
     // Set up projection
     if (raw.info.projs.size() == 0) {
-        printf("No projector specified for these data\n");
+        qInfo("No projector specified for these data\n");
     } else {
         // Activate the projection items
         for (qint32 k = 0; k < raw.info.projs.size(); ++k) {
             raw.info.projs[k].active = true;
         }
 
-        printf("%lld projection items activated\n",raw.info.projs.size());
+        qInfo("%lld projection items activated\n",raw.info.projs.size());
         // Create the projector
 //        fiff_int_t nproj = MNE::make_projector_info(raw.info, raw.proj); Using the member function instead
         fiff_int_t nproj = raw.info.make_projector(raw.proj);
 
         if (nproj == 0)  {
-            printf("The projection vectors do not apply to these channels\n");
+            qInfo("The projection vectors do not apply to these channels\n");
         } else {
-            printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
+            qInfo("Created an SSP operator (subspace dimension = %d)\n",nproj);
         }
     }
 
@@ -94,7 +94,7 @@ void MNE::setup_compensators(FiffRawData& raw,
 //    qint32 current_comp = MNE::get_current_comp(raw.info);
     qint32 current_comp = raw.info.get_current_comp();
     if (current_comp > 0)
-        printf("Current compensation grade : %d\n",current_comp);
+        qInfo("Current compensation grade : %d\n",current_comp);
 
     if (keep_comp)
         dest_comp = current_comp;
@@ -106,11 +106,11 @@ void MNE::setup_compensators(FiffRawData& raw,
         {
 //            raw.info.chs = MNE::set_current_comp(raw.info.chs,dest_comp);
             raw.info.set_current_comp(dest_comp);
-            printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
+            qInfo("Appropriate compensator added to change to grade %d.\n",dest_comp);
         }
         else
         {
-            printf("Could not make the compensator\n");
+            qCritical("Could not make the compensator\n");
             return;
         }
     }

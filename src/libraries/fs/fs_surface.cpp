@@ -271,13 +271,13 @@ bool FsSurface::read(const QString &p_sFile, FsSurface &p_Surface, bool p_bLoadC
                 {
                     t_DataStream >> iVal;
                     FIFFLIB::swap_short(iVal);
-                    verts(i,j) = ((float)iVal) / 100;
+                    verts(i,j) = static_cast<float>(iVal) / 100;
                 }
             }
         }
         else
         {
-            t_DataStream.readRawData((char *)verts.data(), nvert*3*sizeof(float));
+            t_DataStream.readRawData(reinterpret_cast<char *>(verts.data()), nvert*3*sizeof(float));
             for(qint32 i = 0; i < nvert; ++i)
                 for(qint32 j = 0; j < 3; ++j)
                     FIFFLIB::swap_floatp(&verts(i,j));
@@ -343,7 +343,7 @@ bool FsSurface::read(const QString &p_sFile, FsSurface &p_Surface, bool p_bLoadC
 
         //vertices
         verts.resize(3, nvert);
-        t_DataStream.readRawData((char *)verts.data(), nvert*3*sizeof(float));
+        t_DataStream.readRawData(reinterpret_cast<char *>(verts.data()), nvert*3*sizeof(float));
         for(qint32 i = 0; i < 3; ++i)
             for(qint32 j = 0; j < nvert; ++j)
                 FIFFLIB::swap_floatp(&verts(i,j));
@@ -434,7 +434,7 @@ VectorXf FsSurface::read_curv(const QString &p_sFileName)
         t_DataStream >> vals_per_vertex;
 
         curv.resize(vnum, 1);
-        t_DataStream.readRawData((char *)curv.data(), vnum*sizeof(float));
+        t_DataStream.readRawData(reinterpret_cast<char *>(curv.data()), vnum*sizeof(float));
         for(qint32 i = 0; i < vnum; ++i)
            FIFFLIB::swap_floatp(&curv(i));
     }
@@ -448,7 +448,7 @@ VectorXf FsSurface::read_curv(const QString &p_sFileName)
         {
             t_DataStream >> iVal;
             FIFFLIB::swap_short(iVal);
-            curv(i) = ((float)iVal) / 100;
+            curv(i) = static_cast<float>(iVal) / 100;
         }
     }
     t_File.close();
@@ -464,7 +464,7 @@ qint32 FsSurface::fread3(QDataStream &stream)
 {
     char bytes[3];
     stream.readRawData(bytes, 3);
-    return (((unsigned char)bytes[0]) << 16) + (((unsigned char)bytes[1]) << 8) + ((unsigned char)bytes[2]);
+    return (static_cast<unsigned char>(bytes[0]) << 16) + (static_cast<unsigned char>(bytes[1]) << 8) + static_cast<unsigned char>(bytes[2]);
 }
 
 //=============================================================================================================
@@ -473,7 +473,7 @@ qint32 FsSurface::fread3(std::iostream &stream)
 {
     char bytes[3];
     stream.read(bytes, 3);
-    return (((unsigned char)bytes[0]) << 16) + (((unsigned char)bytes[1]) << 8) + ((unsigned char)bytes[2]);
+    return (static_cast<unsigned char>(bytes[0]) << 16) + (static_cast<unsigned char>(bytes[1]) << 8) + static_cast<unsigned char>(bytes[2]);
 }
 
 //=============================================================================================================

@@ -531,7 +531,7 @@ bool MNEFiffExpSet::show_fiff_contents(FILE *out, const QString &name, bool verb
                             break;
                         case FIFFT_COMPLEX_FLOAT :
                             if (stream->read_tag(tag,this_ent->pos)) {
-                                float *fdata = tag->toFloat();
+                                const float *fdata = tag->toFloat();
                                 if (tag->size() == 2*sizeof(fiff_float_t))
                                     fprintf(out,"\t(%g %g)",fdata[0],fdata[1]);
                                 else
@@ -541,7 +541,7 @@ bool MNEFiffExpSet::show_fiff_contents(FILE *out, const QString &name, bool verb
                             break;
                         case FIFFT_COMPLEX_DOUBLE :
                             if (stream->read_tag(tag,this_ent->pos)) {
-                                double *ddata = tag->toDouble();
+                                const double *ddata = tag->toDouble();
                                 if (tag->size() == 2*sizeof(fiff_double_t))
                                     fprintf(out,"\t(%g %g)",ddata[0],ddata[1]);
                                 else

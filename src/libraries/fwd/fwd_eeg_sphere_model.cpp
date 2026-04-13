@@ -1124,6 +1124,9 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Nu
     for (k = 0; k < nfit+1; k++)
         func_val[k] = one_step(VectorXd(simplex.row(k).transpose()),u);
 
+    // Capture user data in type-safe lambda — no void* needed
+    auto cost = [u](const VectorXd& x) -> double { return one_step(x, u); };
+
     /*
    * (5) Do the nonlinear minimization
    */
@@ -1131,8 +1134,7 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Nu
                                                       func_val,
                                                       ftol,
                                                       0.0,
-                                                      one_step,
-                                                      u,
+                                                      cost,
                                                       max_eval,
                                                       neval,
                                                       report,

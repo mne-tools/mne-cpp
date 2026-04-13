@@ -175,7 +175,9 @@ void RtClient::run()
         if(kind == FIFF_DATA_BUFFER)
         {
             to += matData.cols();
-            printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/m_pFiffInfo->sfreq, ((float)to)/m_pFiffInfo->sfreq);
+            qInfo("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to,
+                  static_cast<float>(from)/m_pFiffInfo->sfreq,
+                  static_cast<float>(to)/m_pFiffInfo->sfreq);
             from += matData.cols();
 
             emit rawBufferReceived(matData);
@@ -183,7 +185,7 @@ void RtClient::run()
         else if(FIFF_DATA_BUFFER == FIFF_BLOCK_END)
             m_bIsRunning = false;
 
-        printf("[done]\n");
+        qInfo("[done]");
     }
 
     //

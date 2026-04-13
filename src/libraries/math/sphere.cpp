@@ -186,13 +186,15 @@ bool Sphere::fit_sphere_to_points(const MatrixXf &rr, float simplex_size, Vector
 
     user.report = false;
 
+    // Capture user data in type-safe lambda — no void* needed
+    auto cost = [&user](const VectorXf& x) -> float { return fit_eval(x, &user); };
+
     //Start the minimization
     if(!SimplexAlgorithm::simplex_minimize<float>(  init_simplex,   /* The initial simplex */
                                                     init_vals,      /* Function values at the vertices */
                                                     ftol,           /* Relative convergence tolerance */
                                                     0.0f,           /* No spatial convergence tolerance */
-                                                    fit_eval,       /* The function to be evaluated */
-                                                    &user,          /* Data to be passed to the above function in each evaluation */
+                                                    cost,           /* The cost function (captures user data) */
                                                     max_eval,       /* Maximum number of function evaluations */
                                                     neval,          /* Number of function evaluations */
                                                     report_interval,/* How often to report (-1 = no_reporting) */

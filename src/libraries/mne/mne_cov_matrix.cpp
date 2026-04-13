@@ -52,6 +52,7 @@
 #include <fiff/fiff_tag.h>
 
 #include <QFile>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -169,8 +170,8 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::read(const QString& name, int kind)
     std::unique_ptr<MNECovMatrix> res;
 
     int            k,p,nn;
-    float          *f;
-    double         *d;
+    const float    *f;
+    const double   *d;
     std::unique_ptr<MNEProjOp> op;
     std::unique_ptr<MNESssData> sss;
 
@@ -487,10 +488,10 @@ int MNECovMatrix::condition(float rank_threshold, int use_rank)
             else
                 break;
         }
-        printf("\n\tEstimated covariance matrix rank = %d (%g)\n",nok,lambda_local[ncov-nok]/lambda_local[ncov-1]);
+        qInfo("\n\tEstimated covariance matrix rank = %d (%g)\n",nok,lambda_local[ncov-nok]/lambda_local[ncov-1]);
         if (use_rank > 0 && use_rank < nok) {
             nok = use_rank;
-            printf("\tUser-selected covariance matrix rank = %d (%g)\n",nok,lambda_local[ncov-nok]/lambda_local[ncov-1]);
+            qInfo("\tUser-selected covariance matrix rank = %d (%g)\n",nok,lambda_local[ncov-nok]/lambda_local[ncov-1]);
         }
         /*
          * Put it back together
@@ -507,10 +508,10 @@ int MNECovMatrix::condition(float rank_threshold, int use_rank)
         }
         MatrixXd data2 = data1.transpose() * data1;
 #ifdef DEBUG
-        printf(">>>\n");
+        qInfo(">>>\n");
         for (j = 0; j < ncov; j++)
             mne_print_dvector(stdout,nullptr,data2.row(j).data(),ncov);
-        printf(">>>\n");
+        qInfo(">>>\n");
 #endif
         /*
          * Scale back
@@ -543,7 +544,7 @@ int MNECovMatrix::decompose_eigen_small(float p_small, int use_rank)
     if (cov_diag.size() > 0)
         return add_inv();
     if (lambda.size() > 0 && eigen.size() > 0) {
-        printf("\n\tEigenvalue decomposition had been precomputed.\n");
+        qInfo("\n\tEigenvalue decomposition had been precomputed.\n");
         nzero = 0;
         for (k = 0; k < ncov; k++, nzero++)
             if (lambda[k] > 0)
@@ -584,7 +585,7 @@ int MNECovMatrix::decompose_eigen_small(float p_small, int use_rank)
                 else
                     neeg++;
             }
-            printf("\t%d MEG and %d EEG-like channels remain in the whitened data\n",nmeg,neeg);
+            qInfo("\t%d MEG and %d EEG-like channels remain in the whitened data\n",nmeg,neeg);
         }
     }
     return add_inv();

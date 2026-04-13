@@ -305,7 +305,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                         else if(t_pTag->type == FIFFT_INT)
                             one = cal*(Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<double>();
                         else if(t_pTag->type == FIFFT_FLOAT)
-                            one = cal*(Map< MatrixXf >( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
+                            one = cal*(Map<const MatrixXf>(t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
                         else if(t_pTag->type == FIFFT_SHORT)
                             one = cal*(Map< MatrixShort >( t_pTag->toShort(),nchan, thisRawDir.nsamp)).cast<double>();
                         else
@@ -332,7 +332,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                         }
                         else if(t_pTag->type == FIFFT_FLOAT)
                         {
-                            tmp_data = (Map< MatrixXf > ( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
+                            tmp_data = (Map<const MatrixXf>(t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
 
                             for(r = 0; r < sel.size(); ++r)
                                 newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel[r],0,1,thisRawDir.nsamp);
@@ -359,7 +359,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                     else if(t_pTag->type == FIFFT_INT)
                         one = mult*(Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<double>();
                     else if(t_pTag->type == FIFFT_FLOAT)
-                        one = mult*(Map< MatrixXf >( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
+                        one = mult*(Map<const MatrixXf>(t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
                     else
                         qWarning("Data Storage Format not known yet [3]!! Type: %d\n", t_pTag->type);
                 }
@@ -639,7 +639,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                         else if(t_pTag->type == FIFFT_INT)
                             one = cal*(Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<double>();
                         else if(t_pTag->type == FIFFT_FLOAT)
-                            one = cal*(Map< MatrixXf >( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
+                            one = cal*(Map<const MatrixXf>(t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
                         else if(t_pTag->type == FIFFT_SHORT)
                             one = cal*(Map< MatrixShort >( t_pTag->toShort(),nchan, thisRawDir.nsamp)).cast<double>();
                         else
@@ -667,7 +667,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                         }
                         else if(t_pTag->type == FIFFT_FLOAT)
                         {
-                            MatrixXd tmp_data = (Map< MatrixXf > ( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
+                            MatrixXd tmp_data = (Map<const MatrixXf>(t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
 
                             for(r = 0; r < sel.size(); ++r)
                                 newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel[r],0,1,thisRawDir.nsamp);
@@ -694,7 +694,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                     else if(t_pTag->type == FIFFT_INT)
                         one = mult*(Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<double>();
                     else if(t_pTag->type == FIFFT_FLOAT)
-                        one = mult*(Map< MatrixXf >( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
+                        one = mult*(Map<const MatrixXf>(t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
                     else
                         qWarning("Data Storage Format not known yet [3]!! Type: %d\n", t_pTag->type);
                 }

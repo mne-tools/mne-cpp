@@ -56,6 +56,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QtConcurrent>
+#include <QDebug>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -198,7 +199,7 @@ int read_long(QFile &in, long long &lval)
 int check_vertex(int no, int maxno)
 {
     if (no < 0 || no > maxno-1) {
-        printf("Illegal vertex number %d (max %d).",no,maxno);
+        qCritical("Illegal vertex number %d (max %d).",no,maxno);
         return FAIL;
     }
     return OK;
@@ -319,7 +320,7 @@ int read_tag_data(QFile &fp, int tag, long long nbytes, unsigned char *&val, lon
     if (nbytes > 0) {
         dum = new unsigned char[nbytes+1]();
         if (fp.read(reinterpret_cast<char*>(dum), nbytes) != static_cast<qint64>(snbytes)) {
-            printf("Failed to read %d bytes of tag data",static_cast<int>(nbytes));
+            qCritical("Failed to read %d bytes of tag data",static_cast<int>(nbytes));
             delete[] dum;
             return FAIL;
         }
@@ -343,7 +344,7 @@ int read_tag_data(QFile &fp, int tag, long long nbytes, unsigned char *&val, lon
             nbytesp = sizeof(int);
         }
         else {
-            printf("Encountered an unknown tag with no length specification : %d\n",tag);
+            qWarning("Encountered an unknown tag with no length specification : %d\n",tag);
             val     = nullptr;
             nbytesp = 0;
         }
@@ -467,7 +468,7 @@ int read_curvature_file(const QString& fname,
         if (read_int(fp,nface) != 0)
             goto bad;
 #ifdef DEBUG
-        printf("nvert = %d nface = %d\n",ncurv,nface);
+        qInfo("nvert = %d nface = %d\n",ncurv,nface);
 #endif
         if (read_int(fp,val_pervert) != 0)
             goto bad;
@@ -498,7 +499,7 @@ int read_curvature_file(const QString& fname,
         if (read_int3(fp,nface) != 0)
             goto bad;
 #ifdef DEBUG
-        printf("nvert = %d nface = %d\n",ncurv,nface);
+        qInfo("nvert = %d nface = %d\n",ncurv,nface);
 #endif
         /*
  * Read the curvature values
@@ -517,7 +518,7 @@ int read_curvature_file(const QString& fname,
         }
     }
 #ifdef DEBUG
-    printf("Curvature range: %f...%f\n",curvmin,curvmax);
+    qInfo("Curvature range: %f...%f\n",curvmin,curvmax);
 #endif
     return OK;
 
@@ -569,7 +570,7 @@ int read_triangle_file(const QString& fname,
         /*
      * Get the comment
      */
-        printf("Triangle file : ");
+        qInfo("Triangle file : ");
         for (fp.getChar(&c); c != '\n'; fp.getChar(&c)) {
             if (fp.atEnd()) {
                 qCritical()<<"Bad triangle file.";
@@ -585,7 +586,7 @@ int read_triangle_file(const QString& fname,
             goto bad;
         if (read_int(fp,ntri) != 0)
             goto bad;
-        printf(" nvert = %d ntri = %d\n",nvert,ntri);
+        qInfo(" nvert = %d ntri = %d\n",nvert,ntri);
         vert.resize(nvert, 3);
         tri.resize(ntri, 3);
         /*
@@ -623,7 +624,7 @@ int read_triangle_file(const QString& fname,
             goto bad;
         if (read_int3(fp,nquad) != 0)
             goto bad;
-        printf("%s file : nvert = %d nquad = %d\n",
+        qInfo("%s file : nvert = %d nquad = %d\n",
                 magic == QUAD_FILE_MAGIC_NUMBER ? "Quad" : "New quad",
                 nvert,nquad);
         vert.resize(nvert, 3);
@@ -671,7 +672,7 @@ int read_triangle_file(const QString& fname,
 #endif
             which = quad[0];
             /*
-    printf("%f ",sqrt(1.9*quad[0]) + sqrt(3.5*quad[1]));
+    qInfo("%f ",sqrt(1.9*quad[0]) + sqrt(3.5*quad[1]));
      */
 
             if (EVEN(which)) {
@@ -907,7 +908,7 @@ int MNESourceSpace::transform_source_space(const FiffCoordTrans& t)
     if (coord_frame == t.to)
         return OK;
     if (coord_frame != t.from) {
-        printf("Coordinate transformation does not match with the source space coordinate system.");
+        qCritical("Coordinate transformation does not match with the source space coordinate system.");
         return FAIL;
     }
     for (k = 0; k < np; k++) {
@@ -931,7 +932,7 @@ int MNESourceSpace::add_patch_stats()
     std::vector<std::optional<MNEPatchInfo>> pinfo(nuse);
     int        nave,p,q,k;
 
-    printf("Computing patch statistics...\n");
+    qInfo("Computing patch statistics...\n");
     if (neighbor_tri.empty())
         if (add_geometry_info(false) != OK)
             return FAIL;
@@ -947,7 +948,7 @@ int MNESourceSpace::add_patch_stats()
     /*
        * Calculate the average normals and the patch areas
        */
-    printf("\tareas, average normals, and mean deviations...");
+    qInfo("\tareas, average normals, and mean deviations...");
     std::sort(nearest.begin(), nearest.end(),
               [](const MNENearest& a, const MNENearest& b) { return a.nearest < b.nearest; });
     nearest_data = nearest.data();  // refresh after sort
@@ -993,7 +994,7 @@ int MNESourceSpace::add_patch_stats()
         pinfo[q]->calculate_normal_stats(this);
         q++;
     }
-    printf(" %d/%d [done]\n",q,nuse);
+    qInfo(" %d/%d [done]\n",q,nuse);
 
     patches = std::move(pinfo);
 
@@ -1222,10 +1223,10 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
         if (dist > maxdist)
             maxdist = dist;
     }
-    printf("FsSurface CM = (%6.1f %6.1f %6.1f) mm\n",
+    qInfo("FsSurface CM = (%6.1f %6.1f %6.1f) mm\n",
            1000*cm[X_17], 1000*cm[Y_17], 1000*cm[Z_17]);
-    printf("FsSurface fits inside a sphere with radius %6.1f mm\n",1000*maxdist);
-    printf("FsSurface extent:\n"
+    qInfo("FsSurface fits inside a sphere with radius %6.1f mm\n",1000*maxdist);
+    qInfo("FsSurface extent:\n"
            "\tx = %6.1f ... %6.1f mm\n"
            "\ty = %6.1f ... %6.1f mm\n"
            "\tz = %6.1f ... %6.1f mm\n",
@@ -1242,7 +1243,7 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
         else
             minn[c] = -floor(std::fabs(min[c])/grid)-1;
     }
-    printf("Grid extent:\n"
+    qInfo("Grid extent:\n"
            "\tx = %6.1f ... %6.1f mm\n"
            "\ty = %6.1f ... %6.1f mm\n"
            "\tz = %6.1f ... %6.1f mm\n",
@@ -1357,7 +1358,7 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
             }
         }
     }
-    printf("%d sources before omitting any.\n",sp->nuse);
+    qInfo("%d sources before omitting any.\n",sp->nuse);
     /*
        * Exclude infeasible points
        */
@@ -1369,7 +1370,7 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
             sp->nuse--;
         }
     }
-    printf("%d sources after omitting infeasible sources.\n",sp->nuse);
+    qInfo("%d sources after omitting infeasible sources.\n",sp->nuse);
     {
         std::vector<std::unique_ptr<MNESourceSpace>> sp_vec;
         sp_vec.push_back(std::move(sp));
@@ -1379,11 +1380,11 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
         }
         sp = std::move(sp_vec[0]);
     }
-    printf("%d sources remaining after excluding the sources outside the surface and less than %6.1f mm inside.\n",sp->nuse,1000*mindist);
+    qInfo("%d sources remaining after excluding the sources outside the surface and less than %6.1f mm inside.\n",sp->nuse,1000*mindist);
     /*
        * Omit unused vertices from the neighborhoods
        */
-    printf("Adjusting the neighborhood info...");
+    qInfo("Adjusting the neighborhood info...");
     for (k = 0; k < sp->np; k++) {
         Eigen::VectorXi& neigh = sp->neighbor_vert[k];
         nneigh = sp->nneighbor_vert[k];
@@ -1397,7 +1398,7 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
                 neigh[c] = -1;
         }
     }
-    printf("[done]\n");
+    qInfo("[done]\n");
     /*
      * Set up the volume data (needed for creating the interpolation matrix)
      */
@@ -1458,23 +1459,23 @@ int MNESourceSpace::filter_source_spaces(const MNESurface& surf, float limit, co
     int nspace = static_cast<int>(spaces.size());
 
     if (spaces[0]->coord_frame == FIFFV_COORD_HEAD && mri_head_t.isEmpty()) {
-        printf("Source spaces are in head coordinates and no coordinate transform was provided!");
+        qCritical("Source spaces are in head coordinates and no coordinate transform was provided!");
         return FAIL;
     }
     /*
         * How close are the source points to the surface?
         */
-    printf("Source spaces are in ");
+    qInfo("Source spaces are in ");
     if (spaces[0]->coord_frame == FIFFV_COORD_HEAD)
-        printf("head coordinates.\n");
+        qInfo("head coordinates.\n");
     else if (spaces[0]->coord_frame == FIFFV_COORD_MRI)
-        printf("MRI coordinates.\n");
+        qInfo("MRI coordinates.\n");
     else
-        printf("unknown (%d) coordinates.\n",spaces[0]->coord_frame);
-    printf("Checking that the sources are inside the bounding surface ");
+        qWarning("unknown (%d) coordinates.\n",spaces[0]->coord_frame);
+    qInfo("Checking that the sources are inside the bounding surface ");
     if (limit > 0.0)
-        printf("and at least %6.1f mm away",1000*limit);
-    printf(" (will take a few...)\n");
+        qInfo("and at least %6.1f mm away",1000*limit);
+    qInfo(" (will take a few...)\n");
     omit         = 0;
     omit_outside = 0;
     for (k = 0; k < nspace; k++) {
@@ -1523,12 +1524,12 @@ int MNESourceSpace::filter_source_spaces(const MNESurface& surf, float limit, co
     }
     (void)minnode; // squash compiler warning, this is unused
     if (omit_outside > 0)
-        printf("%d source space points omitted because they are outside the inner skull surface.\n",
+        qInfo("%d source space points omitted because they are outside the inner skull surface.\n",
                omit_outside);
     if (omit > 0)
-        printf("%d source space points omitted because of the %6.1f-mm distance limit.\n",
+        qInfo("%d source space points omitted because of the %6.1f-mm distance limit.\n",
                omit,1000*limit);
-    printf("Thank you for waiting.\n");
+    qInfo("Thank you for waiting.\n");
     return OK;
 }
 
@@ -1599,10 +1600,10 @@ void MNESourceSpace::filter_source_space(FilterThreadArg *arg)
     }
     (void)minnode; // squash compiler warning, set but unused
     if (omit_outside > 0)
-        printf("%d source space points omitted because they are outside the inner skull surface.\n",
+        qInfo("%d source space points omitted because they are outside the inner skull surface.\n",
                 omit_outside);
     if (omit > 0)
-        printf("%d source space points omitted because of the %6.1f-mm distance limit.\n",
+        qInfo("%d source space points omitted because of the %6.1f-mm distance limit.\n",
                 omit,1000*a->limit);
     a->stat = OK;
     return;
@@ -1635,17 +1636,17 @@ int MNESourceSpace::filter_source_spaces(float limit, const QString& bemfile, co
     /*
      * How close are the source points to the surface?
      */
-    printf("Source spaces are in ");
+    qInfo("Source spaces are in ");
     if (spaces[0]->coord_frame == FIFFV_COORD_HEAD)
-        printf("head coordinates.\n");
+        qInfo("head coordinates.\n");
     else if (spaces[0]->coord_frame == FIFFV_COORD_MRI)
-        printf("MRI coordinates.\n");
+        qInfo("MRI coordinates.\n");
     else
-        printf("unknown (%d) coordinates.\n",spaces[0]->coord_frame);
-    printf("Checking that the sources are inside the inner skull ");
+        qWarning("unknown (%d) coordinates.\n",spaces[0]->coord_frame);
+    qInfo("Checking that the sources are inside the inner skull ");
     if (limit > 0.0)
-        printf("and at least %6.1f mm away",1000*limit);
-    printf(" (will take a few...)\n");
+        qInfo("and at least %6.1f mm away",1000*limit);
+    qInfo(" (will take a few...)\n");
     if (nproc < 2 || nspace == 1 || !use_threads) {
         /*
         * This is the conventional calculation
@@ -1689,7 +1690,7 @@ int MNESourceSpace::filter_source_spaces(float limit, const QString& bemfile, co
                 delete args[k];
         }
     }
-    printf("Thank you for waiting.\n\n");
+    qInfo("Thank you for waiting.\n\n");
 
     return OK;
 }
@@ -1717,7 +1718,7 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
 
     sources = stream->dirtree()->dir_tree_find(FIFFB_MNE_SOURCE_SPACE);
     if (sources.size() == 0) {
-        printf("No source spaces available here");
+        qCritical("No source spaces available here");
         goto bad;
     }
     for (j = 0; j < sources.size(); j++) {
@@ -1731,7 +1732,7 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
         }
         new_space->np = *t_pTag->toInt();
         if (new_space->np == 0) {
-            printf("No points in this source space");
+            qCritical("No points in this source space");
             goto bad;
         }
         if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_POINTS, t_pTag)) {
@@ -1851,7 +1852,7 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
                 if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEAREST_DIST, t_pTag)) {
                     goto bad;
                 }
-                Eigen::Map<Eigen::VectorXf> nearestDistMap(t_pTag->toFloat(), new_space->np);
+                Eigen::Map<const Eigen::VectorXf> nearestDistMap(t_pTag->toFloat(), new_space->np);
                 for (k = 0; k < new_space->np; k++) {
                     new_space->nearest[k].dist = nearestDistMap[k];
                 }
@@ -1896,13 +1897,13 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
             }
             if (neighborsVec.size() > 0 && nneighborsVec.size() > 0) {
                 if (nvert != new_space->np) {
-                    printf("Inconsistent neighborhood data in file.");
+                    qCritical("Inconsistent neighborhood data in file.");
                     goto bad;
                 }
                 for (k = 0, ntot_count = 0; k < nvert; k++)
                     ntot_count += nneighborsVec[k];
                 if (ntot_count != ntot) {
-                    printf("Inconsistent neighborhood data in file.");
+                    qCritical("Inconsistent neighborhood data in file.");
                     goto bad;
                 }
                 new_space->nneighbor_vert = Eigen::VectorXi::Zero(nvert);
@@ -1999,12 +2000,12 @@ int MNESourceSpace::transform_source_spaces_to(int coord_frame, const FiffCoordT
                     }
                 }
                 else {
-                    printf("Could not transform a source space because of transformation incompatibility.");
+                    qCritical("Could not transform a source space because of transformation incompatibility.");
                     return FAIL;
                 }
             }
             else {
-                printf("Could not transform a source space because of missing coordinate transformation.");
+                qCritical("Could not transform a source space because of missing coordinate transformation.");
                 return FAIL;
             }
         }
@@ -2061,7 +2062,7 @@ int MNESourceSpace::restrict_sources_to_labels(std::vector<std::unique_ptr<MNESo
             inuse = &rh_inuse;
         }
         else {
-            printf("\tWarning: cannot assign label file %s to a hemisphere.\n",labels[k].toUtf8().constData());
+            qWarning("\tWarning: cannot assign label file %s to a hemisphere.\n",labels[k].toUtf8().constData());
             continue;
         }
         if (sp) {
@@ -2071,10 +2072,10 @@ int MNESourceSpace::restrict_sources_to_labels(std::vector<std::unique_ptr<MNESo
                 if (sel[p] >= 0 && sel[p] < sp->np)
                     (*inuse)[sel[p]] = sp->inuse[sel[p]];
                 else
-                    printf("vertex number out of range in %s (%d vs %d)\n",
+                    qWarning("vertex number out of range in %s (%d vs %d)\n",
                            labels[k].toUtf8().constData(),sel[p],sp->np);
             }
-            printf("Processed label file %s\n",labels[k].toUtf8().constData());
+            qInfo("Processed label file %s\n",labels[k].toUtf8().constData());
         }
     }
     if (lh) lh->update_inuse(std::move(lh_inuse));

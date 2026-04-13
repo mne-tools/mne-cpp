@@ -58,6 +58,7 @@
 //=============================================================================================================
 
 #include <qmath.h>
+#include <QDebug>
 
 //=============================================================================================================
 // CONSTANTS
@@ -144,7 +145,7 @@ std::unique_ptr<MNEMshDisplaySurfaceSet> MNEMshDisplaySurfaceSet::load(const QSt
     QString pathRh     = QString("%1/%2/surf/%3.%4").arg(subjects_dir).arg(subject_id).arg("rh").arg(surf);
     QString pathRhCurv = QString("%1/%2/surf/%3.%4").arg(subjects_dir).arg(subject_id).arg("rh").arg("curv");
 
-    printf("Loading surface %s ...\n", pathLh.toUtf8().constData());
+    qInfo("Loading surface %s ...\n", pathLh.toUtf8().constData());
     auto left = MNESourceSpace::load_surface(pathLh, pathLhCurv);
     if (!left) {
         left = MNESourceSpace::load_surface(pathLh, QString());
@@ -153,7 +154,7 @@ std::unique_ptr<MNEMshDisplaySurfaceSet> MNEMshDisplaySurfaceSet::load(const QSt
         left->add_uniform_curv();
     }
 
-    printf("Loading surface %s ...\n", pathRh.toUtf8().constData());
+    qInfo("Loading surface %s ...\n", pathRh.toUtf8().constData());
     auto right = MNESourceSpace::load_surface(pathRh, pathRhCurv);
     if (!right) {
         right = MNESourceSpace::load_surface(pathRh, QString());
@@ -208,7 +209,7 @@ int MNEMshDisplaySurfaceSet::add_bem_surface(const QString&       filepath,
                                                 int                  full_geom,
                                                 int                  check)
 {
-    printf("Loading BEM surface %s (id = %d) from %s ...\n",
+    qInfo("Loading BEM surface %s (id = %d) from %s ...\n",
            bemname.toUtf8().constData(), kind, filepath.toUtf8().constData());
 
     std::unique_ptr<MNESurface> surf(MNESurface::read_bem_surface2(filepath,kind,full_geom));
@@ -219,7 +220,7 @@ int MNEMshDisplaySurfaceSet::add_bem_surface(const QString&       filepath,
         surf->compute_surface_cm();
         double sum = surf->sum_solids(Eigen::Map<const Eigen::Vector3f>(surf->cm)) / (4*M_PI);
         if (std::fabs(sum - 1.0) > 1e-4) {
-            printf( "%s surface is not closed "
+            qCritical( "%s surface is not closed "
                                  "(sum of solid angles = %g * 4*PI).",
                    bemname.toUtf8().constData(), sum);
             return -1;

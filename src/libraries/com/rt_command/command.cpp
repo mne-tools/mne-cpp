@@ -137,7 +137,7 @@ Command::Command(   const QString &p_sCommand, const QString &p_sDescription,
     }
     else
     {
-        printf("error: description vector hasn't the same size like parameter map.\n");
+        qCritical("error: description vector hasn't the same size like parameter map.\n");
         return;
     }
 }

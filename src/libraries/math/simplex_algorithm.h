@@ -60,6 +60,8 @@ namespace UTILSLIB
  * Simplex algorithm is an optimization method to solve linear optimization problems.
  *
  * @brief Simplex algorithm.
+ * @note  Implements the Strategy pattern — the cost function and report function
+ *        are injected as callable template parameters (zero-overhead type erasure).
  */
 class MATHSHARED_EXPORT SimplexAlgorithm
 {
@@ -77,47 +79,57 @@ public:
      * mne_simplex_fit.c
      * Refactored: mne_simplex_minimize
      *
-     * Minimization with the simplex algorithm. Float implementation
+     * Minimization with the simplex algorithm.
      * Modified from Numerical Recipes. Supports an optional absolute spatial
      * tolerance (stol) to detect simplex collapse.
      *
-     * @param[in] p              The initial simplex.
-     * @param[in] y              Function values at the vertices.
-     * @param[in] ftol           Relative convergence tolerance.
-     * @param[in] stol           Absolute spatial convergence tolerance (0 to disable).
-     * @param[in] func           The function to be evaluated.
-     * @param[in] user_data      Data to be passed to the above function in each evaluation.
-     * @param[in] max_eval       Maximum number of function evaluations.
-     * @param[in] neval          Number of function evaluations.
-     * @param[in] report         How often to report (-1 = no_reporting).
-     * @param[in] report_func    The function to be called when reporting.
+     * @tparam T              Scalar type (float or double).
+     * @tparam CostFunc       Callable with signature T(const VectorX<T>&). Evaluates the cost at a simplex vertex.
+     * @tparam ReportFunc     Callable with signature bool(int loop, const VectorX<T>& fitpar, double fval_lo, double fval_hi, double par_diff).
+     *
+     * @param[in,out] p       The initial simplex (npar+1 x npar). On return, row 0 is the best vertex.
+     * @param[in,out] y       Function values at the vertices.
+     * @param[in] ftol        Relative convergence tolerance.
+     * @param[in] stol        Absolute spatial convergence tolerance (0 to disable).
+     * @param[in] func        The cost function to be evaluated.
+     * @param[in] max_eval    Maximum number of function evaluations.
+     * @param[out] neval      Number of function evaluations performed.
+     * @param[in] report      How often to report (-1 = no reporting).
+     * @param[in] report_func The function to be called when reporting (may be nullptr).
      *
      * @return True when minimization succeeded, false otherwise.
      */
-    template <typename T>
+    template <typename T, typename CostFunc, typename ReportFunc>
     static bool simplex_minimize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& p,
                                  Eigen::Matrix<T,Eigen::Dynamic, 1>& y,
                                  T ftol,
                                  T stol,
-                                 T (*func)(const Eigen::Matrix<T,Eigen::Dynamic, 1>& x, const void *user_data),
-                                 const void *user_data,
+                                 CostFunc&& func,
                                  int max_eval,
                                  int &neval,
                                  int report,
-                                 bool (*report_func)(int loop,
-                                                     const Eigen::Matrix<T,Eigen::Dynamic, 1>& fitpar,
-                                                     double fval_lo,
-                                                     double fval_hi,
-                                                     double par_diff));
+                                 ReportFunc&& report_func);
+
+    //=========================================================================================================
+    /**
+     * Overload without report function (no reporting).
+     */
+    template <typename T, typename CostFunc>
+    static bool simplex_minimize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& p,
+                                 Eigen::Matrix<T,Eigen::Dynamic, 1>& y,
+                                 T ftol,
+                                 T stol,
+                                 CostFunc&& func,
+                                 int max_eval,
+                                 int &neval);
 
 private:
 
-    template <typename T>
+    template <typename T, typename CostFunc>
     static T tryit(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> &p,
                    Eigen::Matrix<T,Eigen::Dynamic, 1> &y,
                    Eigen::Matrix<T,Eigen::Dynamic, 1> &psum,
-                   T (*func)(  const Eigen::Matrix<T,Eigen::Dynamic, 1> &x,const void *user_data),                     /* The function to be evaluated */
-                   const void *user_data,                                      /* Data to be passed to the above function in each evaluation */
+                   CostFunc&& func,
                    int   ihi,
                    int &neval,
                    T fac);
@@ -127,12 +139,11 @@ private:
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-template <typename T>
+template <typename T, typename CostFunc>
 T SimplexAlgorithm::tryit(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> &p,
                           Eigen::Matrix<T,Eigen::Dynamic, 1> &y,
                           Eigen::Matrix<T,Eigen::Dynamic, 1> &psum,
-                          T (*func)(  const Eigen::Matrix<T,Eigen::Dynamic, 1> &x,const void *user_data),                     /* The function to be evaluated */
-                          const void *user_data,                                      /* Data to be passed to the above function in each evaluation */
+                          CostFunc&& func,
                           int   ihi,
                           int &neval,
                           T fac)
@@ -147,7 +158,7 @@ T SimplexAlgorithm::tryit(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> &p,
 
     ptry = psum * fac1 - p.row(ihi).transpose() * fac2;
 
-    ytry = (*func)(ptry,user_data);
+    ytry = func(ptry);
     ++neval;
 
     if (ytry < y[ihi]) {
@@ -162,21 +173,31 @@ T SimplexAlgorithm::tryit(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> &p,
 
 //=============================================================================================================
 
-template <typename T>
+template <typename T, typename CostFunc>
 bool SimplexAlgorithm::simplex_minimize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& p,
                                         Eigen::Matrix<T,Eigen::Dynamic, 1>& y,
                                         T ftol,
                                         T stol,
-                                        T (*func)(const Eigen::Matrix<T,Eigen::Dynamic, 1>& x, const void *user_data),
-                                        const void *user_data,
+                                        CostFunc&& func,
+                                        int max_eval,
+                                        int &neval)
+{
+    auto no_report = [](int, const Eigen::Matrix<T,Eigen::Dynamic,1>&, double, double, double) { return true; };
+    return simplex_minimize<T>(p, y, ftol, stol, std::forward<CostFunc>(func), max_eval, neval, -1, no_report);
+}
+
+//=============================================================================================================
+
+template <typename T, typename CostFunc, typename ReportFunc>
+bool SimplexAlgorithm::simplex_minimize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& p,
+                                        Eigen::Matrix<T,Eigen::Dynamic, 1>& y,
+                                        T ftol,
+                                        T stol,
+                                        CostFunc&& func,
                                         int max_eval,
                                         int &neval,
                                         int report,
-                                        bool (*report_func)(int loop,
-                                                            const Eigen::Matrix<T,Eigen::Dynamic, 1>& fitpar,
-                                                            double fval_lo,
-                                                            double fval_hi,
-                                                            double par_diff))
+                                        ReportFunc&& report_func)
 {
     constexpr int MIN_STOL_LOOP = 5;
     int   ndim = p.cols();
@@ -196,7 +217,7 @@ bool SimplexAlgorithm::simplex_minimize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dy
     constexpr T kBeta  = static_cast<T>(0.5);
     constexpr T kGamma = static_cast<T>(2.0);
 
-    if (report_func != nullptr && report > 0)
+    if (report > 0)
         report_func(0, static_cast<Eigen::Matrix<T,Eigen::Dynamic, 1>>(p.row(0)), -1.0, -1.0, 0.0);
 
     dsum = 0.0;
@@ -215,7 +236,7 @@ bool SimplexAlgorithm::simplex_minimize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dy
         /*
          * Report that we are proceeding...
          */
-        if (count == report && report_func != nullptr) {
+        if (count == report) {
             if (!report_func(loop, static_cast<Eigen::Matrix<T,Eigen::Dynamic, 1>>(p.row(ilo)),
                              y[ilo], y[ihi], std::sqrt(dsum))) {
                 qWarning("Iteration interrupted.");
@@ -235,18 +256,18 @@ bool SimplexAlgorithm::simplex_minimize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dy
             if (loop > MIN_STOL_LOOP && std::sqrt(dsum) < stol)
                 break;
         }
-        ytry = tryit<T>(p,y,psum,func,user_data,ihi,neval,-kAlpha);
+        ytry = tryit<T>(p,y,psum,func,ihi,neval,-kAlpha);
         if (ytry <= y[ilo])
-            tryit<T>(p,y,psum,func,user_data,ihi,neval,kGamma);
+            tryit<T>(p,y,psum,func,ihi,neval,kGamma);
         else if (ytry >= y[inhi]) {
             ysave = y[ihi];
-            ytry = tryit<T>(p,y,psum,func,user_data,ihi,neval,kBeta);
+            ytry = tryit<T>(p,y,psum,func,ihi,neval,kBeta);
             if (ytry >= ysave) {
                 for (i = 0; i < mpts; i++) {
                     if (i !=  ilo) {
                         psum = static_cast<T>(0.5) * (p.row(i) + p.row(ilo));
                         p.row(i) = psum;
-                        y[i] = (*func)(psum,user_data);
+                        y[i] = func(psum);
                     }
                 }
                 neval +=  ndim;

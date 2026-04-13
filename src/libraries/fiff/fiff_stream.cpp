@@ -624,11 +624,11 @@ bool FiffStream::read_cov(const FiffDirNode::SPtr& p_Node, fiff_int_t cov_kind, 
                     //
                     if (tag->type == FIFFT_DOUBLE)
                     {
-                        cov_diag = Map<VectorXd>(tag->toDouble(),dim);
+                        cov_diag = Map<const VectorXd>(tag->toDouble(),dim);
                     }
                     else if (tag->type == FIFFT_FLOAT)
                     {
-                        cov_diag = Map<VectorXf>(tag->toFloat(),dim).cast<double>();
+                        cov_diag = Map<const VectorXf>(tag->toFloat(),dim).cast<double>();
                     }
                     else {
                         qCritical("Illegal data type for covariance matrix\n");
@@ -645,11 +645,11 @@ bool FiffStream::read_cov(const FiffDirNode::SPtr& p_Node, fiff_int_t cov_kind, 
                 nn = dim*(dim+1)/2;
                 if (tag->type == FIFFT_DOUBLE)
                 {
-                    vals =  Map<VectorXd>(tag->toDouble(),nn);
+                    vals =  Map<const VectorXd>(tag->toDouble(),nn);
                 }
                 else if (tag->type == FIFFT_FLOAT)
                 {
-                    vals = Map<VectorXf>(tag->toFloat(),nn).cast<double>();
+                    vals = Map<const VectorXf>(tag->toFloat(),nn).cast<double>();
                 }
                 else
                 {
@@ -726,7 +726,7 @@ bool FiffStream::read_cov(const FiffDirNode::SPtr& p_Node, fiff_int_t cov_kind, 
             FiffTag::UPtr tag2;
             if (current->find_tag(this, FIFF_MNE_COV_EIGENVALUES, tag1) && current->find_tag(this, FIFF_MNE_COV_EIGENVECTORS, tag2))
             {
-                eig = VectorXd(Map<VectorXd>(tag1->toDouble(),dim));
+                eig = VectorXd(Map<const VectorXd>(tag1->toDouble(),dim));
                 eigvec = tag2->toFloatMatrix().cast<double>();
                 eigvec.transposeInPlace();
             }

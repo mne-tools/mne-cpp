@@ -64,6 +64,7 @@
 #include <QTextStream>
 #include <QCoreApplication>
 #include <QtConcurrent>
+#include <QDebug>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -291,12 +292,12 @@ void MNESurfaceOrVolume::add_triangle_data()
 #ifdef TRIANGLE_SIZE_WARNING
         for (k = 0, tri = tris.data(); k < ntri; k++, tri++)
             if (tri->area < 1e-5*tot_area/ntri)
-                printf("Warning: Triangle area is only %g um^2 (%.5f %% of expected average)\n",
+                qWarning("Warning: Triangle area is only %g um^2 (%.5f %% of expected average)\n",
                        1e12*tri->area,100*ntri*tri->area/tot_area);
 #endif
     }
 #ifdef DEBUG
-    printf("\ttotal area = %-.1f cm^2\n",1e4*tot_area);
+    qInfo("\ttotal area = %-.1f cm^2\n",1e4*tot_area);
 #endif
     /*
        * Add information for the selected subset if applicable
@@ -360,7 +361,7 @@ void MNESurfaceOrVolume::calculate_vertex_distances()
 
     vert_dist.clear();
     vert_dist.resize(np);
-    printf("\tDistances between neighboring vertices...");
+    qInfo("\tDistances between neighboring vertices...");
     for (k = 0, ndist = 0; k < np; k++) {
         nneigh = nneighbor_vert[k];
         vert_dist[k] = Eigen::VectorXf(nneigh);
@@ -375,7 +376,7 @@ void MNESurfaceOrVolume::calculate_vertex_distances()
             ndist++;
         }
     }
-    printf("[%d distances done]\n",ndist);
+    qInfo("[%d distances done]\n",ndist);
     return;
 }
 
@@ -464,11 +465,11 @@ int MNESurfaceOrVolume::add_geometry_info(bool do_normals, bool check_too_many_n
     add_triangle_data();
     for (p = 0, tri = tris.data(); p < ntri; p++, tri++)
         if (tri->area == 0)
-            printf("\tWarning : zero size triangle # %d\n",p);
-    printf("\tTriangle ");
+            qWarning("\tWarning : zero size triangle # %d\n",p);
+    qInfo("\tTriangle ");
     if (do_normals)
-        printf("and vertex ");
-    printf("normals and neighboring triangles...");
+        qInfo("and vertex ");
+    qInfo("normals and neighboring triangles...");
     for (p = 0, tri = tris.data(); p < ntri; p++, tri++) {
         ii = tri->vert;
         w = 1.0;			/* This should be related to the triangle size */
@@ -496,14 +497,14 @@ int MNESurfaceOrVolume::add_geometry_info(bool do_normals, bool check_too_many_n
             return FAIL;
 #else
 #ifdef REPORT_WARNINGS
-            printf("Warning: Vertex %d does not have any neighboring triangles!\n",k);
+            qWarning("Warning: Vertex %d does not have any neighboring triangles!\n",k);
 #endif
 #endif
             nfix_no_neighbors++;
         }
         else if (nneighbor_tri[k] < 3) {
 #ifdef REPORT_WARNINGS
-            printf("\n\tTopological defect: Vertex %d has only %d neighboring triangle%s Vertex omitted.\n\t",
+            qWarning("\n\tTopological defect: Vertex %d has only %d neighboring triangle%s Vertex omitted.\n\t",
                    k,nneighbor_tri[k],nneighbor_tri[k] > 1 ? "s." : ".");
 #endif
             nfix_defect++;
@@ -521,11 +522,11 @@ int MNESurfaceOrVolume::add_geometry_info(bool do_normals, bool check_too_many_n
                 for (c = 0; c < 3; c++)
                     nn(k,c) = nn(k,c)/size;
         }
-    printf("[done]\n");
+    qInfo("[done]\n");
     /*
        * Determine the neighboring vertices
        */
-    printf("\tVertex neighbors...");
+    qInfo("\tVertex neighbors...");
     neighbor_vert.clear();
     neighbor_vert.resize(np);
     nneighbor_vert = VectorXi::Zero(np);
@@ -563,11 +564,11 @@ int MNESurfaceOrVolume::add_geometry_info(bool do_normals, bool check_too_many_n
                             neighbors[nneighbors++] = vert;
                         else {
                             if (check_too_many_neighbors) {
-                                printf("Too many neighbors for vertex %d.",k);
+                                qCritical("Too many neighbors for vertex %d.",k);
                                 return FAIL;
                             }
                             else
-                                printf("\tWarning: Too many neighbors for vertex %d\n",k);
+                                qWarning("\tWarning: Too many neighbors for vertex %d\n",k);
                         }
                     }
                 }
@@ -575,14 +576,14 @@ int MNESurfaceOrVolume::add_geometry_info(bool do_normals, bool check_too_many_n
         }
         if (nneighbors != nneighbor_vert[k]) {
 #ifdef REPORT_WARNINGS
-            printf("\n\tIncorrect number of distinct neighbors for vertex %d (%d instead of %d) [fixed].",
+            qWarning("\n\tIncorrect number of distinct neighbors for vertex %d (%d instead of %d) [fixed].",
                    k,nneighbors,nneighbor_vert[k]);
 #endif
             nfix_distinct++;
             nneighbor_vert[k] = nneighbors;
         }
     }
-    printf("[done]\n");
+    qInfo("[done]\n");
     /*
        * Distance calculation follows
        */
@@ -592,17 +593,17 @@ int MNESurfaceOrVolume::add_geometry_info(bool do_normals, bool check_too_many_n
        * Summarize the defects
        */
     if (nfix_defect > 0)
-        printf("\tWarning: %d topological defects were fixed.\n",nfix_defect);
+        qWarning("\tWarning: %d topological defects were fixed.\n",nfix_defect);
     if (nfix_distinct > 0)
-        printf("\tWarning: %d vertices had incorrect number of distinct neighbors (fixed).\n",nfix_distinct);
+        qWarning("\tWarning: %d vertices had incorrect number of distinct neighbors (fixed).\n",nfix_distinct);
     if (nfix_no_neighbors > 0)
-        printf("\tWarning: %d vertices did not have any neighboring triangles (fixed)\n",nfix_no_neighbors);
+        qWarning("\tWarning: %d vertices did not have any neighboring triangles (fixed)\n",nfix_no_neighbors);
 #ifdef DEBUG
     for (k = 0; k < np; k++) {
         if (nneighbor_vert[k] <= 0)
-            printf("No neighbors for vertex %d\n",k);
+            qCritical("No neighbors for vertex %d\n",k);
         if (nneighbor_tri[k] <= 0)
-            printf("No neighbor tris for vertex %d\n",k);
+            qCritical("No neighbor tris for vertex %d\n",k);
     }
 #endif
     return OK;

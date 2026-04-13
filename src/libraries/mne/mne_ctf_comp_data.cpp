@@ -44,6 +44,7 @@
 #include <fiff/fiff_tag.h>
 
 #include <QFile>
+#include <QDebug>
 
 #include <Eigen/Core>
 
@@ -123,7 +124,7 @@ int MNECTFCompData::calibrate(const QList<FIFFLIB::FiffChInfo>& chs, int nch, bo
                 break;
             }
         if (!found) {
-            printf("Channel %s not found. Cannot calibrate the compensation matrix.",name.toUtf8().constData());
+            qCritical("Channel %s not found. Cannot calibrate the compensation matrix.",name.toUtf8().constData());
             return FAIL;
         }
     }
@@ -137,7 +138,7 @@ int MNECTFCompData::calibrate(const QList<FIFFLIB::FiffChInfo>& chs, int nch, bo
                 break;
             }
         if (!found) {
-            printf("Channel %s not found. Cannot calibrate the compensation matrix.",name.toUtf8().constData());
+            qCritical("Channel %s not found. Cannot calibrate the compensation matrix.",name.toUtf8().constData());
             return FAIL;
         }
     }

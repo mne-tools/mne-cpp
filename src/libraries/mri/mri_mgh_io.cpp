@@ -54,6 +54,7 @@
 #include <QDataStream>
 #include <QDebug>
 #include <QRegularExpression>
+#include <QDebug>
 
 #include <zlib.h>
 
@@ -119,9 +120,9 @@ bool MriMghIO::read(const QString& mgzFile,
         FIFFV_COORD_MRI_SLICE, FIFFV_COORD_MRI, vox2ras, true);
 
     if (verbose) {
-        printf("Voxel -> FsSurface RAS transform:\n");
+        qInfo("Voxel -> FsSurface RAS transform:\n");
         for (int r = 0; r < 4; ++r) {
-            printf("  %10.6f %10.6f %10.6f %10.6f\n",
+            qInfo("  %10.6f %10.6f %10.6f %10.6f\n",
                    vox2ras(r, 0), vox2ras(r, 1), vox2ras(r, 2), vox2ras(r, 3));
         }
     }
@@ -135,7 +136,7 @@ bool MriMghIO::read(const QString& mgzFile,
     parseFooter(fileData, volData, additionalTrans, subjectMriDir, verbose);
 
     if (verbose) {
-        printf("Read %d slices from %s (%dx%d pixels)\n",
+        qInfo("Read %d slices from %s (%dx%d pixels)\n",
                static_cast<int>(volData.slices.size()), qPrintable(mgzFile),
                volData.width, volData.height);
     }
@@ -238,7 +239,7 @@ bool MriMghIO::parseHeader(const QByteArray& data, MriVolData& volData, bool ver
     volData.dof     = dof;
 
     if (verbose) {
-        printf("MGH file: %dx%dx%d, %d frame(s), type=%d\n",
+        qInfo("MGH file: %dx%dx%d, %d frame(s), type=%d\n",
                width, height, depth, nframes, type);
     }
 
@@ -265,10 +266,10 @@ bool MriMghIO::parseHeader(const QByteArray& data, MriVolData& volData, bool ver
     // Else: default values from MriVolData constructor are used
 
     if (verbose) {
-        printf("Voxel sizes: %.4f x %.4f x %.4f mm\n",
+        qInfo("Voxel sizes: %.4f x %.4f x %.4f mm\n",
                volData.xsize, volData.ysize, volData.zsize);
-        printf("goodRAS: %d\n", goodRASflag);
-        printf("c_ras: %.4f %.4f %.4f\n",
+        qInfo("goodRAS: %d\n", goodRASflag);
+        qInfo("c_ras: %.4f %.4f %.4f\n",
                volData.c_ras[0], volData.c_ras[1], volData.c_ras[2]);
     }
 
@@ -462,7 +463,7 @@ bool MriMghIO::parseFooter(const QByteArray& data,
             volData.talairachXfmPath = xfmPath;
 
             if (verbose) {
-                printf("Found Talairach transform reference: %s\n", qPrintable(xfmPath));
+                qInfo("Found Talairach transform reference: %s\n", qPrintable(xfmPath));
             }
 
             // Resolve relative paths using subject MRI directory
@@ -516,7 +517,7 @@ bool MriMghIO::parseFooter(const QByteArray& data,
                                 additionalTrans.append(talTrans);
 
                                 if (verbose) {
-                                    printf("Read Talairach transform from %s\n", qPrintable(xfmPath));
+                                    qInfo("Read Talairach transform from %s\n", qPrintable(xfmPath));
                                 }
                             }
                         }
@@ -524,7 +525,7 @@ bool MriMghIO::parseFooter(const QByteArray& data,
                 }
             } else {
                 if (verbose) {
-                    printf("Talairach transform file not found: %s\n", qPrintable(xfmPath));
+                    qWarning("Talairach transform file not found: %s\n", qPrintable(xfmPath));
                 }
             }
         }

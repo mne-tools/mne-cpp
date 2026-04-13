@@ -52,6 +52,7 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -172,7 +173,7 @@ int MNEMshDisplaySurface::align_fiducials(FiffDigitizerData& head_dig,
 
     if (scale_head) {
         get_head_scale(head_dig,mri_fid,scales);
-        printf("xscale = %.3f yscale = %.3f zscale = %.3f\n",scales[0],scales[1],scales[2]);
+        qInfo("xscale = %.3f yscale = %.3f zscale = %.3f\n",scales[0],scales[1],scales[2]);
 
         for (j = 0; j < 3; j++)
             for (k = 0; k < 3; k++)
@@ -192,7 +193,7 @@ int MNEMshDisplaySurface::align_fiducials(FiffDigitizerData& head_dig,
     for (k = 0; k < head_dig.nfids(); k++)
         VEC_COPY_17(head_dig.mri_fids[k].r,mri_fid.row(k).data());
     head_dig.head_mri_t_adj->print();
-    printf("After simple alignment : \n");
+    qInfo("After simple alignment : \n");
 
     if (omit_dist > 0)
         discard_outlier_digitizer_points(head_dig,omit_dist);
@@ -204,9 +205,9 @@ int MNEMshDisplaySurface::align_fiducials(FiffDigitizerData& head_dig,
                 goto bad;
         }
 
-        printf("%d / %d iterations done. RMS dist = %7.1f mm\n",k,niter,
+        qInfo("%d / %d iterations done. RMS dist = %7.1f mm\n",k,niter,
                 1000.0*rms_digitizer_distance(head_dig));
-        printf("After refinement :\n");
+        qInfo("After refinement :\n");
         head_dig.head_mri_t_adj->print();
     }
 
@@ -245,7 +246,7 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
         goto out;
     }
 
-    printf("Polhemus : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[X_17],1000*r0[Y_17],1000*r0[Z_17],1000*Rdig);
+    qInfo("Polhemus : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[X_17],1000*r0[Y_17],1000*r0[Z_17],1000*Rdig);
 
     // Pick only the points above the fiducial plane
     VEC_DIFF_17(mri_fid.row(0).data(),mri_fid.row(2).data(),LR);
@@ -267,7 +268,7 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
         goto out;
     }
 
-    printf("Scalp : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[X_17],1000*r0[Y_17],1000*r0[Z_17],1000*Rscalp);
+    qInfo("Scalp : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[X_17],1000*r0[Y_17],1000*r0[Z_17],1000*Rscalp);
 
     scales[0] = scales[1] = scales[2] = Rdig/Rscalp;
 
@@ -301,7 +302,7 @@ int MNEMshDisplaySurface::discard_outlier_digitizer_points(FIFFLIB::FiffDigitize
             d.discard[k] = 1;
         }
     }
-    printf("%d points discarded (maxdist = %6.1f mm).\n",discarded,1000*maxdist);
+    qInfo("%d points discarded (maxdist = %6.1f mm).\n",discarded,1000*maxdist);
 
     return discarded;
 }
@@ -358,7 +359,7 @@ void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerD
      * Project the points on the triangles
      */
     if (!do_approx)
-        printf("Inside or outside for %d points...",nactive);
+        qInfo("Inside or outside for %d points...",nactive);
     for (k = 0, nactive = 0; k < dig.npoint; k++) {
         if ((dig.active[k] && !dig.discard[k]) || do_all) {
             dig.dist(k)    = dists[nactive];
@@ -384,7 +385,7 @@ void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerD
     }
 
     if (!do_approx)
-        printf("[done]\n");
+        qInfo("[done]\n");
 
     dig.dist_valid = true;
 
@@ -521,10 +522,10 @@ void MNEMshDisplaySurface::decide_surface_extent(const QString& tag)
     }
 
 #ifdef DEBUG
-    printf("%s:\n",tag.toUtf8().constData());
-    printf("\tx = %f ... %f mm\n",1000*mn[0],1000*mx[0]);
-    printf("\ty = %f ... %f mm\n",1000*mn[1],1000*mx[1]);
-    printf("\tz = %f ... %f mm\n",1000*mn[2],1000*mx[2]);
+    qInfo("%s:\n",tag.toUtf8().constData());
+    qInfo("\tx = %f ... %f mm\n",1000*mn[0],1000*mx[0]);
+    qInfo("\ty = %f ... %f mm\n",1000*mn[1],1000*mx[1]);
+    qInfo("\tz = %f ... %f mm\n",1000*mn[2],1000*mx[2]);
 #endif
 
     fov = std::max(mn.cwiseAbs().maxCoeff(), mx.cwiseAbs().maxCoeff());
@@ -581,7 +582,7 @@ void MNEMshDisplaySurface::setup_curvature_colors()
         }
     }
 #ifdef DEBUG
-    printf("Average curvature : %f\n",curv_sum/np);
+    qInfo("Average curvature : %f\n",curv_sum/np);
 #endif
 }
 

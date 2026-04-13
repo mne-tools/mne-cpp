@@ -126,12 +126,12 @@ void Linalg::get_whitener(MatrixXd &A,
     for(qint32 i = 0; i < eig.size()-rnk; ++i)
         eig(i) = 0;
 
-    printf("Setting small %s eigenvalues to zero.\n", ch_type.toUtf8().constData());
+    qInfo("Setting small %s eigenvalues to zero.", ch_type.toUtf8().constData());
     if (!pca)
-        printf("Not doing PCA for %s\n", ch_type.toUtf8().constData());
+        qInfo("Not doing PCA for %s", ch_type.toUtf8().constData());
     else
     {
-        printf("Doing PCA for %s.",ch_type.toUtf8().constData());
+        qInfo("Doing PCA for %s.", ch_type.toUtf8().constData());
         eigvec = eigvec.block(eigvec.rows()-rnk, 0, rnk, eigvec.cols());
     }
 }
@@ -155,12 +155,12 @@ void Linalg::get_whitener(MatrixXd &A,
     for(qint32 i = 0; i < eig.size()-rnk; ++i)
         eig(i) = 0;
 
-    printf("Setting small %s eigenvalues to zero.\n", ch_type.c_str());
+    qInfo("Setting small %s eigenvalues to zero.", ch_type.c_str());
     if (!pca)
-        printf("Not doing PCA for %s\n", ch_type.c_str());
+        qInfo("Not doing PCA for %s", ch_type.c_str());
     else
     {
-        printf("Doing PCA for %s.",ch_type.c_str());
+        qInfo("Doing PCA for %s.", ch_type.c_str());
         eigvec = eigvec.block(eigvec.rows()-rnk, 0, rnk, eigvec.cols());
     }
 }

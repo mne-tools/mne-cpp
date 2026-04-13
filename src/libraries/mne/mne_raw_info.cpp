@@ -45,6 +45,7 @@
 #include <Eigen/Core>
 
 #include <QFile>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -171,12 +172,12 @@ int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
         * Find desired parents
         */
     if (!(meas = find_meas(node))) {
-        printf ("Meas. block not found!");
+        qCritical ("Meas. block not found!");
         goto bad;
     }
 
     if (!(meas_info = find_meas_info(node))) {
-        printf ("Meas. info not found!");
+        qCritical ("Meas. info not found!");
         goto bad;
     }
     /*
@@ -296,7 +297,7 @@ int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
         }
     }
     if (to_find != 0) {
-        printf ("Not all essential tags were found!");
+        qCritical ("Not all essential tags were found!");
         goto bad;
     }
     chp = ch;
@@ -340,13 +341,13 @@ int MNERawInfo::load(const QString& name, int allow_maxshield, std::unique_ptr<M
         if (allow_maxshield) {
             raw = find_maxshield(stream->dirtree());
             if (raw->isEmpty()) {
-                printf("No raw data in this file.");
+                qCritical("No raw data in this file.");
                 goto out;
             }
             maxshield_data = true;
         }
         else {
-            printf("No raw data in this file.");
+            qCritical("No raw data in this file.");
             goto out;
         }
     }
@@ -409,14 +410,14 @@ int MNERawInfo::load(const QString& name, int allow_maxshield, std::unique_ptr<M
             else if (raw->dir[k]->type == FIFFT_INT)
                 info->buf_size = raw->dir[k]->size/(nchan*sizeof(fiff_int_t));
             else {
-                printf("We are not prepared to handle raw data type: %d",raw->dir[k]->type);
+                qCritical("We are not prepared to handle raw data type: %d",raw->dir[k]->type);
                 goto out;
             }
             break;
         }
     }
     if (info->buf_size <= 0) {
-        printf("No raw data buffers available.");
+        qCritical("No raw data buffers available.");
         goto out;
     }
     info->rawDir     = rawDir;

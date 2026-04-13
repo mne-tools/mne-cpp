@@ -1233,13 +1233,16 @@ bool InvDipoleFitData::fit_one(InvDipoleFitData* fit,
         MatrixXf simplexMat = make_initial_dipole_simplex(rd_guess,size);
         for (int p = 0; p < 4; p++)
             vals[p] = fit_eval(simplexMat.row(p),fit);
+
+        // Capture fit pointer in type-safe lambda — no void* needed
+        auto cost = [fit](const VectorXf& x) -> float { return fit_eval(x, fit); };
+
         if (!UTILSLIB::SimplexAlgorithm::simplex_minimize<float>(
                              simplexMat,        /* The initial simplex */
                              vals,              /* Function values at the vertices */
                              ftol[k],           /* Relative convergence tolerance for the target function */
                              atol[k],           /* Absolute tolerance for the change in the parameters */
-                             fit_eval,          /* The function to be evaluated */
-                             fit,               /* Data to be passed to the above function in each evaluation */
+                             cost,              /* The cost function (captures fit data) */
                              max_eval,          /* Maximum number of function evaluations */
                              neval,             /* Number of function evaluations */
                              report_interval,   /* How often to report (-1 = no_reporting) */

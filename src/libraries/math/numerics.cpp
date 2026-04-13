@@ -91,7 +91,7 @@ bool Numerics::issparse(VectorXd &v)
 
 int Numerics::nchoose2(int n)
 {
-    int t_iNumOfCombination = (int)(n*(n-1)*0.5);
+    int t_iNumOfCombination = static_cast<int>(n*(n-1)*0.5);
 
     return t_iNumOfCombination;
 }
@@ -161,7 +161,7 @@ MatrixXd Numerics::rescale(const MatrixXd &data,
         std_mat = std_mat.cwiseProduct(std_mat);
         VectorXd std_v = std_mat.rowwise().mean();
         for(qint32 i = 0; i < std_v.size(); ++i)
-            std_v[i] = sqrt(std_v[i] / (float)(imax-imin));
+            std_v[i] = sqrt(std_v[i] / static_cast<float>(imax-imin));
 
         data_out -= mean.rowwise().replicate(data_out.cols());
         data_out = data_out.cwiseQuotient(std_v.rowwise().replicate(data_out.cols()));
@@ -241,7 +241,7 @@ MatrixXd Numerics::rescale(const MatrixXd& data,
         std_mat = std_mat.cwiseProduct(std_mat);
         VectorXd std_v = std_mat.rowwise().mean();
         for(qint32 i = 0; i < std_v.size(); ++i)
-            std_v[i] = sqrt(std_v[i] / (float)(imax-imin));
+            std_v[i] = sqrt(std_v[i] / static_cast<float>(imax-imin));
 
         data_out -= mean.rowwise().replicate(data_out.cols());
         data_out = data_out.cwiseQuotient(std_v.rowwise().replicate(data_out.cols()));

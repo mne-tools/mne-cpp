@@ -110,7 +110,7 @@ FiffInfo::SPtr RtDataClient::readInfo()
         t_fiffStream.read_rt_tag(t_pTag);
         if(t_pTag->kind == FIFF_BLOCK_START && *(t_pTag->toInt()) == FIFFB_MEAS_INFO)
         {
-            printf("FIFF_BLOCK_START FIFFB_MEAS_INFO\n");
+            qInfo("FIFF_BLOCK_START FIFFB_MEAS_INFO");
             t_bReadMeasBlockStart = true;
         }
     }
@@ -349,7 +349,7 @@ FiffInfo::SPtr RtDataClient::readInfo()
         // END MEAS
         if(t_pTag->kind == FIFF_BLOCK_END && *t_pTag->toInt() == FIFFB_MEAS_INFO)
         {
-            printf("FIFF_BLOCK_END FIFFB_MEAS_INFO\n");
+            qInfo("FIFF_BLOCK_END FIFFB_MEAS_INFO");
             t_bReadMeasBlockEnd = true;
         }
     }
@@ -385,7 +385,7 @@ MetaData RtDataClient::readMetadata()
         t_fiffStream.read_rt_tag(t_pTag);
         if(t_pTag->kind == FIFF_BLOCK_START && *(t_pTag->toInt()) == FIFFB_MEAS_INFO)
         {
-            printf("FIFF_BLOCK_START FIFFB_MEAS_INFO\n");
+            qInfo("FIFF_BLOCK_START FIFFB_MEAS_INFO");
             t_bReadMeasBlockStart = true;
         }
     }
@@ -629,7 +629,7 @@ MetaData RtDataClient::readMetadata()
         // END MEAS
         if(t_pTag->kind == FIFF_BLOCK_END && *t_pTag->toInt() == FIFFB_MEAS_INFO)
         {
-            printf("FIFF_BLOCK_END FIFFB_MEAS_INFO\n");
+            qInfo("FIFF_BLOCK_END FIFFB_MEAS_INFO");
             t_bReadMeasBlockEnd = true;
         }
     }
@@ -670,7 +670,7 @@ void RtDataClient::readRawBuffer(qint32 p_nChannels,
     if(kind == FIFF_DATA_BUFFER)
     {
         qint32 nSamples = (t_pTag->size()/4)/p_nChannels;
-        data = MatrixXf(Map< MatrixXf >(t_pTag->toFloat(), p_nChannels, nSamples));
+        data = MatrixXf(Map<const MatrixXf>(t_pTag->toFloat(), p_nChannels, nSamples));
     }
 //        else
 //            data = tag.data;

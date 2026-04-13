@@ -62,6 +62,7 @@
 
 #include <QFile>
 #include <QTextStream>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -134,7 +135,7 @@ MNESssData *MNESssData::read_from_node(QSharedPointer<FiffStream> &stream, const
     QList<FiffDirNode::SPtr> sss;
     FiffDirNode::SPtr node;
     FiffTag::UPtr t_pTag;
-    float       *r0;
+    const float *r0;
     int j,p,q,n;
     /*
         * Locate the SSS information
@@ -178,7 +179,7 @@ MNESssData *MNESssData::read_from_node(QSharedPointer<FiffStream> &stream, const
             s->comp_info = Eigen::VectorXi::Map(raw, ncomp);
 
             if (ncomp != (s->in_order*(2+s->in_order) + s->out_order*(2+s->out_order))) {
-                printf("Number of SSS components does not match the expansion orders listed in the file");
+                qCritical("Number of SSS components does not match the expansion orders listed in the file");
                 goto bad;
             }
         }

@@ -304,7 +304,7 @@ public:
     *
     * @return type cast of the tag data pointer.
     */
-    inline float* toFloat() const;
+    inline const float* toFloat() const;
 
     //=========================================================================================================
     /**
@@ -313,7 +313,7 @@ public:
      *
      * @return type cast of the tag data pointer.
      */
-    inline double* toDouble() const;
+    inline const double* toDouble() const;
 
     //=========================================================================================================
     /**
@@ -578,7 +578,7 @@ inline quint32* FiffTag::toUnsignedInt() const
 inline qint32* FiffTag::toInt() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_INT) {
-        printf("Expected an integer tag : %d (found data type %d instead)\n",this->kind,this->getType());
+        qWarning("Expected an integer tag : %d (found data type %d instead)\n",this->kind,this->getType());
         return nullptr;
     }
     else
@@ -590,7 +590,7 @@ inline qint32* FiffTag::toInt() const
 inline qint32* FiffTag::toJulian() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_JULIAN) {
-        printf("Expected a julian tag : %d (found data type %d instead)\n",this->kind,this->getType());
+        qWarning("Expected a julian tag : %d (found data type %d instead)\n",this->kind,this->getType());
         return nullptr;
     }
     else
@@ -599,22 +599,22 @@ inline qint32* FiffTag::toJulian() const
 
 //=============================================================================================================
 
-inline float* FiffTag::toFloat() const
+inline const float* FiffTag::toFloat() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_FLOAT)
         return nullptr;
     else
-        return (float*)this->data();
+        return reinterpret_cast<const float*>(this->data());
 }
 
 //=============================================================================================================
 
-inline double* FiffTag::toDouble() const
+inline const double* FiffTag::toDouble() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_DOUBLE)
         return nullptr;
     else
-        return (double*)this->data();
+        return reinterpret_cast<const double*>(this->data());
 }
 
 //=============================================================================================================
@@ -670,13 +670,12 @@ inline FiffDigPoint FiffTag::toDigPoint() const
         return t_fiffDigPoint;
     else
     {
-        qint32* t_pInt32 = (qint32*)this->data();
-//            memcpy (&t_fiffDigPoint,this->data,this->size);
+        auto *t_pInt32 = reinterpret_cast<const qint32*>(this->data());
 
         t_fiffDigPoint.kind = t_pInt32[0];
         t_fiffDigPoint.ident = t_pInt32[1];
 
-        float* t_pFloat = (float*)this->data();
+        auto *t_pFloat = reinterpret_cast<const float*>(this->data());
         t_fiffDigPoint.r[0] = t_pFloat[2];
         t_fiffDigPoint.r[1] = t_pFloat[3];
         t_fiffDigPoint.r[2] = t_pFloat[4];
@@ -696,12 +695,12 @@ inline FiffCoordTrans FiffTag::toCoordTrans() const
         return p_FiffCoordTrans;
     else
     {
-        qint32* t_pInt32 = (qint32*)this->data();
+        auto *t_pInt32 = reinterpret_cast<const qint32*>(this->data());
         p_FiffCoordTrans.from = t_pInt32[0];
         p_FiffCoordTrans.to = t_pInt32[1];
 
         p_FiffCoordTrans.trans.setIdentity(4,4);
-        float* t_pFloat = (float*)this->data();
+        auto *t_pFloat = reinterpret_cast<const float*>(this->data());
         int count = 0;
         int r, c;
         for (r = 0; r < 3; ++r) {
@@ -738,11 +737,11 @@ inline FiffChInfo FiffTag::toChInfo() const
         return p_FiffChInfo;
     else
     {
-        qint32* t_pInt32 = (qint32*)this->data();
+        auto *t_pInt32 = reinterpret_cast<const qint32*>(this->data());
         p_FiffChInfo.scanNo = t_pInt32[0];
         p_FiffChInfo.logNo = t_pInt32[1];
         p_FiffChInfo.kind = t_pInt32[2];
-        float* t_pFloat = (float*)this->data();
+        auto *t_pFloat = reinterpret_cast<const float*>(this->data());
         p_FiffChInfo.range = t_pFloat[3];
         p_FiffChInfo.cal = t_pFloat[4];
 
@@ -866,13 +865,12 @@ inline Eigen::MatrixXi FiffTag::toIntMatrix() const
 
     if (ndim != 2)
     {
-        printf("Only two-dimensional matrices are supported at this time");
+        qWarning("Only two-dimensional matrices are supported at this time");
         return Eigen::MatrixXi();
     }
 
-    //MatrixXd p_Matrix = Map<MatrixXd>( (float*)this->data,p_dims[0], p_dims[1]);
-    // --> Use copy constructor instead --> slower performance but higher memory management reliability
-    Eigen::MatrixXi p_Matrix(Eigen::Map<Eigen::MatrixXi>( (int*)this->data(),dims[0], dims[1]));
+    // Use copy constructor instead --> slower performance but higher memory management reliability
+    Eigen::MatrixXi p_Matrix(Eigen::Map<const Eigen::MatrixXi>(reinterpret_cast<const int*>(this->data()), dims[0], dims[1]));
 
     return p_Matrix;
 }
@@ -886,8 +884,8 @@ inline Eigen::MatrixXf FiffTag::toFloatMatrix() const
 
     if (fiff_type_matrix_coding(this->type) != FIFFTS_MC_DENSE)
     {
-        printf("Error in FiffTag::toFloatMatrix(): Matrix is not dense!\n");
-        return Eigen::MatrixXf();//NULL;
+        qWarning("Error in FiffTag::toFloatMatrix(): Matrix is not dense!");
+        return Eigen::MatrixXf();
     }
 
     qint32 ndim;
@@ -896,12 +894,12 @@ inline Eigen::MatrixXf FiffTag::toFloatMatrix() const
 
     if (ndim != 2)
     {
-        printf("Only two-dimensional matrices are supported at this time");
-        return Eigen::MatrixXf();//NULL;
+        qWarning("Only two-dimensional matrices are supported at this time");
+        return Eigen::MatrixXf();
     }
 
-    // --> Use copy constructor instead --> slower performance but higher memory management reliability
-    Eigen::MatrixXf p_Matrix((Eigen::Map<Eigen::MatrixXf>( (float*)this->data(),dims[0], dims[1])));
+    // Use copy constructor instead --> slower performance but higher memory management reliability
+    Eigen::MatrixXf p_Matrix(Eigen::Map<const Eigen::MatrixXf>(reinterpret_cast<const float*>(this->data()), dims[0], dims[1]));
 
     return p_Matrix;
 }
@@ -915,7 +913,7 @@ inline Eigen::SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
 
     if (fiff_type_matrix_coding(this->type) != FIFFTS_MC_CCS && fiff_type_matrix_coding(this->type) != FIFFTS_MC_RCS)
     {
-        printf("Error in FiffTag::toSparseFloatMatrix(): Matrix is not sparse!\n");
+        qCritical("Error in FiffTag::toSparseFloatMatrix(): Matrix is not sparse!\n");
         return Eigen::SparseMatrix<double>();//NULL;
     }
 
@@ -925,8 +923,8 @@ inline Eigen::SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
 
     if (ndim != 2)
     {
-        printf("Only two-dimensional matrices are supported at this time");
-        return Eigen::SparseMatrix<double>();//NULL;
+        qWarning("Only two-dimensional matrices are supported at this time");
+        return Eigen::SparseMatrix<double>();
     }
 
     qint32 nnz = dims[0];
@@ -937,8 +935,8 @@ inline Eigen::SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
     std::vector<T> tripletList;
     tripletList.reserve(nnz);
 
-    float *t_pFloat = (float*)this->data();
-    int *t_pInt = (int*)this->data();
+    auto *t_pFloat = reinterpret_cast<const float*>(this->data());
+    auto *t_pInt = reinterpret_cast<const int*>(this->data());
     qint32 offset1 = nnz;
     qint32 offset2 = 2*nnz;
     if (fiff_type_matrix_coding(this->type) == FIFFTS_MC_CCS)

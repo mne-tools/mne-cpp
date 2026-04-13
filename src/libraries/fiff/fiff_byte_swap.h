@@ -54,9 +54,9 @@ namespace FIFFLIB
  */
 inline qint16 swap_short(qint16 source)
 {
-    unsigned char *csource = (unsigned char *)(&source);
+    auto *csource = reinterpret_cast<unsigned char *>(&source);
     qint16 result;
-    unsigned char *cresult = (unsigned char *)(&result);
+    auto *cresult = reinterpret_cast<unsigned char *>(&result);
     cresult[0] = csource[1];
     cresult[1] = csource[0];
     return result;
@@ -68,9 +68,9 @@ inline qint16 swap_short(qint16 source)
  */
 inline qint32 swap_int(qint32 source)
 {
-    unsigned char *csource = (unsigned char *)(&source);
+    auto *csource = reinterpret_cast<unsigned char *>(&source);
     qint32 result;
-    unsigned char *cresult = (unsigned char *)(&result);
+    auto *cresult = reinterpret_cast<unsigned char *>(&result);
     cresult[0] = csource[3];
     cresult[1] = csource[2];
     cresult[2] = csource[1];
@@ -84,7 +84,7 @@ inline qint32 swap_int(qint32 source)
  */
 inline void swap_intp(qint32 *source)
 {
-    unsigned char *csource = (unsigned char *)(source);
+    auto *csource = reinterpret_cast<unsigned char *>(source);
     unsigned char c;
     c = csource[3]; csource[3] = csource[0]; csource[0] = c;
     c = csource[2]; csource[2] = csource[1]; csource[1] = c;
@@ -96,9 +96,9 @@ inline void swap_intp(qint32 *source)
  */
 inline qint64 swap_long(qint64 source)
 {
-    unsigned char *csource = (unsigned char *)(&source);
+    auto *csource = reinterpret_cast<unsigned char *>(&source);
     qint64 result;
-    unsigned char *cresult = (unsigned char *)(&result);
+    auto *cresult = reinterpret_cast<unsigned char *>(&result);
     cresult[0] = csource[7];
     cresult[1] = csource[6];
     cresult[2] = csource[5];
@@ -116,7 +116,7 @@ inline qint64 swap_long(qint64 source)
  */
 inline void swap_longp(qint64 *source)
 {
-    unsigned char *csource = (unsigned char *)(source);
+    auto *csource = reinterpret_cast<unsigned char *>(source);
     unsigned char c;
     c = csource[0]; csource[0] = csource[7]; csource[7] = c;
     c = csource[1]; csource[1] = csource[6]; csource[6] = c;
@@ -130,9 +130,9 @@ inline void swap_longp(qint64 *source)
  */
 inline float swap_float(float source)
 {
-    unsigned char *csource = (unsigned char *)(&source);
+    auto *csource = reinterpret_cast<unsigned char *>(&source);
     float result;
-    unsigned char *cresult = (unsigned char *)(&result);
+    auto *cresult = reinterpret_cast<unsigned char *>(&result);
     cresult[0] = csource[3];
     cresult[1] = csource[2];
     cresult[2] = csource[1];
@@ -146,7 +146,7 @@ inline float swap_float(float source)
  */
 inline void swap_floatp(float *source)
 {
-    unsigned char *csource = (unsigned char *)(source);
+    auto *csource = reinterpret_cast<unsigned char *>(source);
     unsigned char c;
     c = csource[3]; csource[3] = csource[0]; csource[0] = c;
     c = csource[2]; csource[2] = csource[1]; csource[1] = c;
@@ -158,7 +158,7 @@ inline void swap_floatp(float *source)
  */
 inline void swap_doublep(double *source)
 {
-    unsigned char *csource = (unsigned char *)(source);
+    auto *csource = reinterpret_cast<unsigned char *>(source);
     unsigned char c;
     c = csource[7]; csource[7] = csource[0]; csource[0] = c;
     c = csource[6]; csource[6] = csource[1]; csource[1] = c;

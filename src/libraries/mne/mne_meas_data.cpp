@@ -53,6 +53,7 @@
 
 #include <QFile>
 #include <QTextStream>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -137,7 +138,7 @@ void MNEMeasData::adjust_baselines(float bmin, float bmax)
             for (int s = 0; s < current->np; s++)
                 bdata(s, c) -= ave;
         }
-        printf("\t%s : using baseline %7.1f ... %7.1f ms\n",
+        qInfo("\t%s : using baseline %7.1f ... %7.1f ms\n",
                 current->comment.toUtf8().constData() ? current->comment.toUtf8().constData() : "unknown",
                 1000 * (tmin + b1 / sfreq),
                 1000 * (tmin + b2 / sfreq));
@@ -166,7 +167,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
     if (!FiffEvoked::read(file, evoked, set - 1,
                           QPair<float,float>(-1.0f, -1.0f), false))
     {
-        printf("Failed to read evoked data from %s\n", name.toUtf8().constData());
+        qCritical("Failed to read evoked data from %s\n", name.toUtf8().constData());
         return nullptr;
     }
 
@@ -233,7 +234,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
     }
 
     if (!id.isEmpty())
-        printf("\tMeasurement file id: %s\n", id.toString().toUtf8().constData());
+        qInfo("\tMeasurement file id: %s\n", id.toString().toUtf8().constData());
 
     /*
        * Pick out the necessary channels
@@ -253,7 +254,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
         }
         for (k = 0; k < nchan; k++)
             if (sel[k] == -1) {
-                printf("All channels needed were not in the MEG/EEG data file "
+                qCritical("All channels needed were not in the MEG/EEG data file "
                        "(first missing: %s).",names[k].toUtf8().constData());
                 goto out;
             }
@@ -279,7 +280,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
     np    = n2 - n1;
     tmin  = dtmin;
     tmax  = dtmin + (np-1)/sfreq;
-    printf("\tData time range: %8.1f ... %8.1f ms\n",1000*tmin,1000*tmax);
+    qInfo("\tData time range: %8.1f ... %8.1f ms\n",1000*tmin,1000*tmax);
     /*
        * Just put it together
        */
@@ -310,11 +311,11 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
 
         if (!devHeadT.isEmpty()) {
             new_data->meg_head_t = std::make_unique<FiffCoordTrans>(devHeadT);
-            printf("\tUsing MEG <-> head transform from the present data set\n");
+            qInfo("\tUsing MEG <-> head transform from the present data set\n");
         }
         if (op != nullptr && !op->mri_head_t.isEmpty()) { /* Copy if available */
             new_data->mri_head_t = std::make_unique<FiffCoordTrans>(op->mri_head_t);
-            printf("\tPicked MRI <-> head transform from the inverse operator\n");
+            qInfo("\tPicked MRI <-> head transform from the inverse operator\n");
         }
         /*
          * Channel list
@@ -329,7 +330,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
         if (op) {			/* Attach the projection operator and CTF compensation info to the data, too */
             new_data->proj.reset(MNEProjOp::read(name));
             if (new_data->proj && new_data->proj->nitems > 0) {
-                printf("\tLoaded projection from %s:\n",name.toUtf8().data());
+                qInfo("\tLoaded projection from %s:\n",name.toUtf8().data());
                 QTextStream errStream(stderr);
                 new_data->proj->report(errStream, QStringLiteral("\t\t"));
             }
@@ -337,7 +338,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
         else {
             new_data->proj.reset(MNEProjOp::read(name));
             if (new_data->proj && new_data->proj->nitems > 0) {
-                printf("\tLoaded projection from %s:\n",name.toUtf8().data());
+                qInfo("\tLoaded projection from %s:\n",name.toUtf8().data());
                 QTextStream errStream(stderr);
                 new_data->proj->report(errStream, QStringLiteral("\t\t"));
             }
@@ -345,7 +346,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
             if (!new_data->comp)
                 goto out;
             if (new_data->comp->ncomp > 0)
-                printf("\tRead %d compensation data sets from %s\n",new_data->comp->ncomp,name.toUtf8().data());
+                qInfo("\tRead %d compensation data sets from %s\n",new_data->comp->ncomp,name.toUtf8().data());
         }
         /*
          * Bad channels — already read by FiffEvoked via FiffStream::read_meas_info()
@@ -363,11 +364,11 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
                     }
                 }
             }
-            printf("\t%d bad channels read from %s%s",new_data->nbad,name.toUtf8().data(),new_data->nbad > 0 ? ":\n" : "\n");
+            qInfo("\t%d bad channels read from %s%s",new_data->nbad,name.toUtf8().data(),new_data->nbad > 0 ? ":\n" : "\n");
             if (new_data->nbad > 0) {
-                printf("\t\t");
+                qInfo("\t\t");
                 for (k = 0; k < new_data->nbad; k++)
-                    printf("%s%c",new_data->badlist[k].toUtf8().constData(),k < new_data->nbad-1 ? ' ' : '\n');
+                    qInfo("%s%c",new_data->badlist[k].toUtf8().constData(),k < new_data->nbad-1 ? ' ' : '\n');
             }
         }
     }
@@ -407,7 +408,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
     if (!add_to)
         new_data->current = new_data->sets[0];
     res = new_data;
-    printf("\t%s dataset %s from %s\n",
+    qInfo("\t%s dataset %s from %s\n",
             add_to ? "Added" : "Loaded",
             new_data->sets[new_data->nset-1]->comment.toUtf8().constData() ? new_data->sets[new_data->nset-1]->comment.toUtf8().constData() : "unknown",name.toUtf8().data());
 

@@ -49,6 +49,7 @@
 
 #include <memory>
 #include <QFile>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -131,10 +132,10 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
         if (MNESourceSpace::read_source_spaces(guessname,sp) == FAIL)
             goto bad;
         if (static_cast<int>(sp.size()) != 1) {
-            printf("Incorrect number of source spaces in guess file");
+            qCritical("Incorrect number of source spaces in guess file");
             goto bad;
         }
-        printf("Read guesses from %s\n",guessname.toUtf8().constData());
+        qInfo("Read guesses from %s\n",guessname.toUtf8().constData());
         guesses = std::move(sp[0]);
     }
     else {
@@ -145,12 +146,12 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
         Q_ASSERT(f->mri_head_t);
         FiffCoordTrans::apply_inverse_trans(r0.data(),*f->mri_head_t,true);
         if (f->bem_model) {
-            printf("Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
+            qInfo("Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
             if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == nullptr)
                 goto bad;
         }
         else if (!guess_surfname.isEmpty()) {
-            printf("Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
+            qInfo("Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
             if ((inner_skull = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,true)) == nullptr)
                 goto bad;
             free_inner_skull = true;
@@ -168,7 +169,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
             goto bad;
         guesses = std::move(guesses_vec[0]);
     }
-    printf("Guess locations are now in %s coordinates.\n",FiffCoordTrans::frame_name(f->coord_frame).toUtf8().constData());
+    qInfo("Guess locations are now in %s coordinates.\n",FiffCoordTrans::frame_name(f->coord_frame).toUtf8().constData());
 
     this->nguess  = guesses->nuse;
     this->rr.resize(guesses->nuse, 3);
@@ -179,7 +180,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
         }
     guesses.reset();
 
-    printf("Go through all guess source locations...");
+    qInfo("Go through all guess source locations...");
     this->guess_fwd.resize(this->nguess);
     /*
         * Compute the guesses using the sphere model for speed
@@ -196,12 +197,12 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
             goto bad;
 #ifdef DEBUG
         sing = this->guess_fwd[k]->sing;
-        printf("%f %f %f\n",sing[0],sing[1],sing[2]);
+        qInfo("%f %f %f\n",sing[0],sing[1],sing[2]);
 #endif
     }
     f->funcs = orig;
 
-    printf("[done %d sources]\n",p);
+    qInfo("[done %d sources]\n",p);
 
     return;
 //    return res;
@@ -231,7 +232,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
             qCritical("Incorrect number of source spaces in guess file");
             goto bad;
         }
-        printf("Read guesses from %s\n",guessname.toUtf8().constData());
+        qInfo("Read guesses from %s\n",guessname.toUtf8().constData());
         guesses = std::move(sp[0]);
     }
     else {
@@ -242,12 +243,12 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
         Q_ASSERT(f->mri_head_t);
         FiffCoordTrans::apply_inverse_trans(r0.data(),*f->mri_head_t,true);
         if (f->bem_model) {
-            printf("Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
+            qInfo("Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
             if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == nullptr)
                 goto bad;
         }
         else if (!guess_surfname.isEmpty()) {
-            printf("Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
+            qInfo("Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
             if ((inner_skull = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,true)) == nullptr)
                 goto bad;
             free_inner_skull = true;
@@ -266,10 +267,10 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
         goto bad;
     }
     if (guess_save_name) {
-        printf("###################DEBUG writing source spaces not yet implemented.");
+        qCritical("###################DEBUG writing source spaces not yet implemented.");
         //    if (mne_write_source_spaces(guess_save_name,&guesses,1,false) != OK)
         //      goto bad;
-        //    printf("Wrote guess locations to %s\n",guess_save_name);
+        //    qInfo("Wrote guess locations to %s\n",guess_save_name);
     }
     /*
      * Transform the guess locations to the appropriate coordinate frame
@@ -281,7 +282,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
             goto bad;
         guesses = std::move(guesses_vec[0]);
     }
-    printf("Guess locations are now in %s coordinates.\n",FiffCoordTrans::frame_name(f->coord_frame).toUtf8().constData());
+    qInfo("Guess locations are now in %s coordinates.\n",FiffCoordTrans::frame_name(f->coord_frame).toUtf8().constData());
 
     this->nguess  = guesses->nuse;
     this->rr.resize(guesses->nuse, 3);
@@ -324,7 +325,7 @@ bool InvGuessData::compute_guess_fields(InvDipoleFitData* f)
         qCritical("Noise covariance missing in compute_guess_fields");
         return false;
     }
-    printf("Go through all guess source locations...");
+    qInfo("Go through all guess source locations...");
     orig = f->funcs;
     if (f->fit_mag_dipoles)
         f->funcs = f->mag_dipole_funcs.get();
@@ -339,11 +340,11 @@ bool InvGuessData::compute_guess_fields(InvDipoleFitData* f)
         }
 #ifdef DEBUG
         sing = this->guess_fwd[k]->sing;
-        printf("%f %f %f\n",sing[0],sing[1],sing[2]);
+        qInfo("%f %f %f\n",sing[0],sing[1],sing[2]);
 #endif
     }
     f->funcs = orig;
-    printf("[done %d sources]\n",this->nguess);
+    qInfo("[done %d sources]\n",this->nguess);
 
     return true;
 }

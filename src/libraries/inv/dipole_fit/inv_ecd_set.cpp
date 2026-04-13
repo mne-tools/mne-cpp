@@ -51,6 +51,7 @@
 #include <QFile>
 #include <QString>
 #include <QRegularExpression>
+#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -192,10 +193,10 @@ InvEcdSet InvEcdSet::read_dipoles_dip(const QString& fileName)
         }
         inputFile.close();
 
-        printf("Read %d dipoles in dip format from %s\n",set.size(),fileName.toUtf8().data());
+        qInfo("Read %d dipoles in dip format from %s\n",set.size(),fileName.toUtf8().data());
     }
     else {
-        printf("Not able to read from: %s\n", fileName.toUtf8().data());
+        qCritical("Not able to read from: %s\n", fileName.toUtf8().data());
     }
 
     return set;
@@ -218,7 +219,7 @@ bool InvEcdSet::save_dipoles_bdip(const QString& fileName)
         return true;
 
     if ((out = fopen(fileName.toUtf8().data(),"w")) == nullptr) {
-        printf("%s", fileName.toUtf8().constData());
+        qInfo("%s", fileName.toUtf8().constData());
         return false;
     }
 
@@ -236,7 +237,7 @@ bool InvEcdSet::save_dipoles_bdip(const QString& fileName)
             one_out.errors_computed = swap_int(0);
             one_out.khi2            = swap_float(one.khi2);
             if (fwrite(&one_out,sizeof(bdipEcdRec),1,out) != 1) {
-                printf("Failed to write a dipole");
+                qCritical("Failed to write a dipole");
                 goto bad;
             }
             nsave++;
@@ -244,10 +245,10 @@ bool InvEcdSet::save_dipoles_bdip(const QString& fileName)
     }
     if (fclose(out) != 0) {
         out = nullptr;
-        printf("%s", fileName.toUtf8().constData());
+        qInfo("%s", fileName.toUtf8().constData());
         return false;
     }
-    printf("Save %d dipoles in bdip format to %s\n",nsave,fileName.toUtf8().data());
+    qInfo("Save %d dipoles in bdip format to %s\n",nsave,fileName.toUtf8().data());
     return true;
 
 bad : {
@@ -270,7 +271,7 @@ bool InvEcdSet::save_dipoles_dip(const QString& fileName) const
     if (fileName.isEmpty() || this->size() == 0)
         return true;
     if ((out = fopen(fileName.toUtf8().data(),"w")) == nullptr) {
-        printf("%s", fileName.toUtf8().constData());
+        qInfo("%s", fileName.toUtf8().constData());
         return false;
     }
     fprintf(out,"# CoordinateSystem \"Head\"\n");
@@ -289,10 +290,10 @@ bool InvEcdSet::save_dipoles_dip(const QString& fileName) const
     fprintf(out,"## Name \"%s dipoles\" Style \"Dipoles\"\n","ALL");
     if (fclose(out) != 0) {
         out = nullptr;
-        printf("%s", fileName.toUtf8().constData());
+        qInfo("%s", fileName.toUtf8().constData());
         goto bad;
     }
-    printf("Save %d dipoles in dip format to %s\n",nsave,fileName.toUtf8().data());
+    qInfo("Save %d dipoles in dip format to %s\n",nsave,fileName.toUtf8().data());
     return true;
 
 bad : {

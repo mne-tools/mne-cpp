@@ -49,6 +49,7 @@
 
 #include <QFile>
 #include <QTextStream>
+#include <QDebug>
 
 #include <Eigen/Core>
 #include <Eigen/SVD>
@@ -257,7 +258,7 @@ int MNEProjOp::project_vector(Eigen::Ref<Eigen::VectorXf> vec, bool do_complemen
         return OK;
 
     if (nch != static_cast<int>(vec.size())) {
-        printf("Data vector size does not match projection operator");
+        qCritical("Data vector size does not match projection operator");
         return FAIL;
     }
 
@@ -376,7 +377,7 @@ MNEProjOp *MNEProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode
         item_names = FiffStream::split_name_list(t_pTag->toString());
 
         if (item_names.size() != item_nchan) {
-            printf("Channel name list incorrectly specified for proj item # %d",k+1);
+            qCritical("Channel name list incorrectly specified for proj item # %d",k+1);
             item_names.clear();
             goto bad;
         }
