@@ -711,6 +711,34 @@ private slots:
     }
 
     //=========================================================================
+    // Regression: FiffRawData borrows a non-owning QIODevice* via
+    // FiffStream.  The caller MUST keep the QFile alive for the entire
+    // lifetime of FiffRawData.  This test verifies that doing so (the
+    // correct pattern used by mainwindow.cpp after the fix) allows
+    // read_raw_segment to succeed.  See commit 2e2d941ac.
+    //=========================================================================
+    void fiffRawData_persistentFileHandleWorks()
+    {
+        if (!hasData()) QSKIP("No test data");
+
+        // Persistent QFile — mirrors the fixed application code
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        FiffRawData raw(file);
+        QVERIFY(!raw.isEmpty());
+
+        // Read a 1-second segment
+        MatrixXd data, times;
+        fiff_int_t from = raw.first_samp;
+        fiff_int_t to = qMin(raw.first_samp + (fiff_int_t)(raw.info.sfreq),
+                             raw.last_samp);
+        bool ok = raw.read_raw_segment(data, times, from, to);
+
+        QVERIFY2(ok, "read_raw_segment failed with persistent QFile");
+        QVERIFY(data.rows() > 0);
+        QVERIFY(data.cols() > 0);
+    }
+
+    //=========================================================================
     void cleanupTestCase() {}
 };
 
