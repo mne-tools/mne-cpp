@@ -114,43 +114,43 @@ void InitParksMcClellan2(void)
  InitDone2 = true;
 
  ExchangeIndex  = new(std::nothrow) int[SMALL];
- if(ExchangeIndex == NULL)InitDone2 = false;
+ if(ExchangeIndex == nullptr) InitDone2 = false;
 
  LeGrangeD  = new(std::nothrow) double[SMALL];
- if(LeGrangeD == NULL)InitDone2 = false;
+ if(LeGrangeD == nullptr) InitDone2 = false;
 
  Alpha    = new(std::nothrow) double[SMALL];
- if(Alpha == NULL)InitDone2 = false;
+ if(Alpha == nullptr) InitDone2 = false;
 
  CosOfGrid  = new(std::nothrow) double[SMALL];
- if(CosOfGrid == NULL)InitDone2 = false;
+ if(CosOfGrid == nullptr) InitDone2 = false;
 
  DesPlus  = new(std::nothrow) double[SMALL];
- if(DesPlus == NULL)InitDone2 = false;
+ if(DesPlus == nullptr) InitDone2 = false;
 
  Coeff  = new(std::nothrow) double[SMALL];
- if(Coeff == NULL)InitDone2 = false;
+ if(Coeff == nullptr) InitDone2 = false;
 
  Edge  = new(std::nothrow) double[SMALL];
- if(Edge == NULL)InitDone2 = false;
+ if(Edge == nullptr) InitDone2 = false;
 
  BandMag    = new(std::nothrow) double[SMALL];
- if(BandMag == NULL)InitDone2 = false;
+ if(BandMag == nullptr) InitDone2 = false;
 
  InitWeight  = new(std::nothrow) double[SMALL];
- if(InitWeight == NULL)InitDone2 = false;
+ if(InitWeight == nullptr) InitDone2 = false;
 
  DesiredMag    = new(std::nothrow) double[BIG];
- if(DesiredMag == NULL)InitDone2 = false;
+ if(DesiredMag == nullptr) InitDone2 = false;
 
  Grid  = new(std::nothrow) double[BIG];
- if(Grid == NULL)InitDone2 = false;
+ if(Grid == nullptr) InitDone2 = false;
 
  Weight  = new(std::nothrow) double[BIG];
- if(Weight == NULL)InitDone2 = false;
+ if(Weight == nullptr) InitDone2 = false;
 
  FirCoeff = new(std::nothrow) double[BIG];
- if(FirCoeff == NULL)InitDone2 = false;
+ if(FirCoeff == nullptr) InitDone2 = false;
 
  //if(!InitDone2)MessageBox(NULL, L"Memory Error", L"Memory not Allocated in InitParksMcClellan", MB_OK);
 

@@ -74,11 +74,12 @@ namespace UTILSLIB
 //=============================================================================================================
 
 /** @brief Workspace for sphere-fitting used by the layout maker, holding 3-D point coordinates and fit parameters. */
-typedef struct {
+struct fitUserRec {
   Eigen::MatrixXf rr;
   int   np;
   int   report;
-} *fitUser,fitUserRec;
+};
+using fitUser = fitUserRec*;
 
 //=============================================================================================================
 /**

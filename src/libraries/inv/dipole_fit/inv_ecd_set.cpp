@@ -68,9 +68,9 @@ using namespace FIFFLIB;
 // DEFINES
 //=============================================================================================================
 
-#define X 0
-#define Y 1
-#define Z 2
+constexpr int X = 0;
+constexpr int Y = 1;
+constexpr int Z = 2;
 
 //=============================================================================================================
 // DEFINE STATIC METHODS
@@ -126,7 +126,8 @@ typedef struct {
     float khi2;                 /* The khi^2 value */
     float prob;                 /* Probability to exceed khi^2 by chance */
     float noise_est;            /* Total noise estimate */
-} *bdipEcd,bdipEcdRec;
+} bdipEcdRec;
+using bdipEcd = bdipEcdRec*;
 
 } // Namespace
 

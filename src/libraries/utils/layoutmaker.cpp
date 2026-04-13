@@ -64,9 +64,7 @@ using namespace Eigen;
 // DEFINES
 //=============================================================================================================
 
-#ifndef EPS
-#define EPS 1e-6
-#endif
+constexpr double kEps = 1e-6;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -372,7 +370,7 @@ void LayoutMaker::sphere_coord (float x,
 {
   /* Rectangular to spherical coordinates */
   float rxy = sqrt(x*x+y*y);
-  if (rxy < EPS) {		/* Let's hope this is reasonable */
+  if (rxy < kEps) {		/* Let's hope this is reasonable */
      *r = z;
      *theta = 0.0;
      *phi   = 0.0;

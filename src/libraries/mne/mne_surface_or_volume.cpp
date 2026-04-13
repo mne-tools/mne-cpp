@@ -116,18 +116,7 @@ constexpr int OK   =  0;
     }
 
 
-#define NNEIGHBORS 26
-
-#define CURVATURE_FILE_MAGIC_NUMBER  (16777215)
-
-#define TAG_MGH_XFORM               31
-#define TAG_SURF_GEOM               21
-#define TAG_OLD_USEREALRAS          2
-#define TAG_COLORTABLE              5
-#define TAG_OLD_MGH_XFORM           30
-#define TAG_OLD_COLORTABLE          1
-
-#define TAG_USEREALRAS              4
+constexpr int kNNeighbors = 26;
 
 
 

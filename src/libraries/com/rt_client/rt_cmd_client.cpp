@@ -49,7 +49,7 @@
 
 #include <iostream>
 
-#define USENEW 1
+constexpr bool kUseNew = true;
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -104,63 +104,66 @@ void RtCmdClient::sendCommandJSON(const Command &p_command)
     if (this->state() == QAbstractSocket::ConnectedState)
     {
         // Send request
-#ifdef USENEW
-        QByteArray block;
-        QDataStream out(&block, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_5_1);
-
-        out << static_cast<quint16>(0);
-        out << t_sCommand;
-        out.device()->seek(0);
-        out << static_cast<quint16>(static_cast<unsigned long>(block.size()) - sizeof(quint16));
-
-        this->write(block);
-        this->waitForBytesWritten();
-
-        // Receive response
-        QDataStream in(this);
-        in.setVersion(QDataStream::Qt_5_1);
-
-        quint16 blockSize = 0;
-
-        bool respComplete = false;
-
-        do
+        if constexpr (kUseNew)
         {
-            this->waitForReadyRead(100);
+            QByteArray block;
+            QDataStream out(&block, QIODevice::WriteOnly);
+            out.setVersion(QDataStream::Qt_5_1);
 
-            if (blockSize == 0)
-            {
-                if (this->bytesAvailable() >= (int)sizeof(quint16))
-                    in >> blockSize;
-            }
-            else if(this->bytesAvailable() >= blockSize)
-            {
-                in >> t_sReply;
-                respComplete = true;
-            }
-        } while (!respComplete && blockSize < 65000);//Sanity Check -> allowed maximal blocksize is 65.000
-#else
-        this->write(t_sCommand.toUtf8().constData(), t_sCommand.size());
-        this->waitForBytesWritten();
+            out << static_cast<quint16>(0);
+            out << t_sCommand;
+            out.device()->seek(0);
+            out << static_cast<quint16>(static_cast<unsigned long>(block.size()) - sizeof(quint16));
 
-        // Receive response
-        bool respComplete = false;
-        QByteArray t_qByteArrayRaw;
-        do
+            this->write(block);
+            this->waitForBytesWritten();
+
+            // Receive response
+            QDataStream in(this);
+            in.setVersion(QDataStream::Qt_5_1);
+
+            quint16 blockSize = 0;
+
+            bool respComplete = false;
+
+            do
+            {
+                this->waitForReadyRead(100);
+
+                if (blockSize == 0)
+                {
+                    if (this->bytesAvailable() >= static_cast<int>(sizeof(quint16)))
+                        in >> blockSize;
+                }
+                else if(this->bytesAvailable() >= blockSize)
+                {
+                    in >> t_sReply;
+                    respComplete = true;
+                }
+            } while (!respComplete && blockSize < 65000);//Sanity Check -> allowed maximal blocksize is 65.000
+        }
+        else
         {
-            if (this->waitForReadyRead(100))
+            this->write(t_sCommand.toUtf8().constData(), t_sCommand.size());
+            this->waitForBytesWritten();
+
+            // Receive response
+            bool respComplete = false;
+            QByteArray t_qByteArrayRaw;
+            do
             {
-                t_qByteArrayRaw += this->readAll();
-                // We need a break condition,
-                // because we do not have a stop character and do not know how many bytes to receive.
-                respComplete = t_qByteArrayRaw.count('{')
-                        == t_qByteArrayRaw.count('}');
-            }
-            qDebug() << "Response: " << t_qByteArrayRaw.size() << " bytes";
-        } while (!respComplete);
-        t_sReply = QString(t_qByteArrayRaw);
-#endif
+                if (this->waitForReadyRead(100))
+                {
+                    t_qByteArrayRaw += this->readAll();
+                    // We need a break condition,
+                    // because we do not have a stop character and do not know how many bytes to receive.
+                    respComplete = t_qByteArrayRaw.count('{')
+                            == t_qByteArrayRaw.count('}');
+                }
+                qDebug() << "Response: " << t_qByteArrayRaw.size() << " bytes";
+            } while (!respComplete);
+            t_sReply = QString(t_qByteArrayRaw);
+        }
     }
     else
     {

@@ -58,16 +58,16 @@ namespace FIFFLIB
 /**
  * @brief FIFF tag explanation record mapping a FIFF tag kind to its human-readable description text.
  */
-typedef struct {
+struct FiffExplainEntry {
   int kind;         /* What is this explanation good for? */
   const char *text;
-} _fiffExp;
+};
 
 //=============================================================================================================
 // DEFINE STATIC METHODS
 //=============================================================================================================
 
-static _fiffExp _fiff_explanations[] = {
+static FiffExplainEntry _fiff_explanations[] = {
   { FIFF_FILE_ID,         "file ID        " },
   { FIFF_DIR_POINTER,     "dir pointer    " },
   { FIFF_DIR,             "directory      " },
@@ -223,7 +223,7 @@ static _fiffExp _fiff_explanations[] = {
 
 //=============================================================================================================
 
-static _fiffExp _fiff_block_explanations[] = {
+static FiffExplainEntry _fiff_block_explanations[] = {
   { FIFFB_ROOT,           "root          " },
   { FIFFB_MEAS,           "measurement   " },
   { FIFFB_MEAS_INFO,      "meas. info    " },
@@ -258,7 +258,7 @@ static _fiffExp _fiff_block_explanations[] = {
 
 //=============================================================================================================
 
-static _fiffExp _fiff_unit_explanations[] = {
+static FiffExplainEntry _fiff_unit_explanations[] = {
   /*
    * SI base units
    */
@@ -298,7 +298,7 @@ static _fiffExp _fiff_unit_explanations[] = {
   { FIFF_UNIT_T_M,"T/m" }, /* T/m */ 
   { -1, nullptr }};
 
-static _fiffExp _fiff_unit_mul_explanations[] = {
+static FiffExplainEntry _fiff_unit_mul_explanations[] = {
   { FIFF_UNITM_E, "E" },
   { FIFF_UNITM_PET,  "P" },
   { FIFF_UNITM_T, "T" },

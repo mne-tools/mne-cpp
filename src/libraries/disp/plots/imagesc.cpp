@@ -59,8 +59,8 @@ using namespace Eigen;
 
 ImageSc::ImageSc(QWidget *parent)
 : Graph(parent)
-, m_pPixmapData(NULL)
-, m_pPixmapColorbar(NULL)
+, m_pPixmapData(nullptr)
+, m_pPixmapColorbar(nullptr)
 {
     init();
 }
@@ -69,8 +69,8 @@ ImageSc::ImageSc(QWidget *parent)
 
 ImageSc::ImageSc(MatrixXd &p_dMat, QWidget *parent)
 : Graph(parent)
-, m_pPixmapData(NULL)
-, m_pPixmapColorbar(NULL)
+, m_pPixmapData(nullptr)
+, m_pPixmapColorbar(nullptr)
 {
     init();
     updateData(p_dMat);
@@ -80,8 +80,8 @@ ImageSc::ImageSc(MatrixXd &p_dMat, QWidget *parent)
 
 ImageSc::ImageSc(MatrixXf &p_fMat, QWidget *parent)
 : Graph(parent)
-, m_pPixmapData(NULL)
-, m_pPixmapColorbar(NULL)
+, m_pPixmapData(nullptr)
+, m_pPixmapColorbar(nullptr)
 {
     init();
     updateData(p_fMat);
@@ -91,8 +91,8 @@ ImageSc::ImageSc(MatrixXf &p_fMat, QWidget *parent)
 
 ImageSc::ImageSc(MatrixXi &p_iMat, QWidget *parent)
 : Graph(parent)
-, m_pPixmapData(NULL)
-, m_pPixmapColorbar(NULL)
+, m_pPixmapData(nullptr)
+, m_pPixmapColorbar(nullptr)
 {
     init();
     updateData(p_iMat);

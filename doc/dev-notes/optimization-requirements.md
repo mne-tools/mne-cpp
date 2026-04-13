@@ -4,7 +4,7 @@
 performance bottlenecks, and test quality issues. Revisit periodically to
 measure progress and re-prioritize.
 
-Last updated: 13 April 2026
+Last updated: 14 April 2026
 
 ---
 
@@ -506,7 +506,7 @@ These tests demonstrate best practices — use them as templates:
 - [x] Replace `printf` in `com/rt_data_client.cpp` → `qInfo` (4 calls) ✅ 2026-04-13
 - [x] Const-correctness cascade: 10 files updated for `toFloat()`/`toDouble()` const return ✅ 2026-04-13
 - [x] **All printf eliminated from libraries**: 20 files, ~380 calls → `qInfo`/`qCritical`/`qWarning` ✅ 2026-04-13
-- [ ] Replace remaining C-style casts in `fiff/fiff_cov.cpp`
+- [x] Replace remaining C-style casts in library code (fiff_cov, inv_rap_music, inv_pwl_rap_music, mne_raw_data, mne_source_space, mne_epoch_data_list, mne_proj_op) ✅ 2026-04-14
 - [ ] Replace all remaining `printf` in tools and applications
 - [ ] Convert functions returning raw `T*` to smart pointers
 - [ ] Add `::create()` factory methods to `FiffStream`, `FiffRawData`
@@ -516,12 +516,13 @@ These tests demonstrate best practices — use them as templates:
 ### P2 — Performance & Polish (Ongoing)
 
 - [ ] Add `.noalias()` to identified matrix multiplications
-- [ ] Convert `#define` constants to `constexpr`
+- [x] Convert `#define` constants to `constexpr` in `rawsettings.h` + 8 caller files ✅ 2026-04-14
+- [ ] Convert remaining `#define` constants to `constexpr` (rt_cmd_client, mne_make_cor_set, mne_ctf2fiff)
 - [ ] Replace `typedef struct` with modern struct declarations
-- [ ] Replace `NULL` with `nullptr` everywhere
+- [x] Replace `NULL` with `nullptr` in library and tool code (6 files, 15 usages) ✅ 2026-04-14
 - [ ] Add `reserve()` to container loops with known sizes
 - [ ] Convert eligible `std::vector<double>` to Eigen types
-- [ ] Replace `std::srand`/`std::rand` with `<random>`
+- [x] Replace `std::srand`/`std::rand` with `<random>` (eventgroup.cpp) ✅ 2026-04-14
 - [ ] Profile and optimize hot paths (SCDC computation, BEM solver)
 
 ### P3 — Architecture (Plan & Execute Carefully)
@@ -672,10 +673,10 @@ Patterns are not decoration; they must serve clarity **and** performance.
 | Metric | Current (2026-04-13) | Target |
 |--------|---------------------|--------|
 | Raw `new` outside Qt widgets | 120+ | 0 |
-| C-style casts | 40+ | 0 |
+| C-style casts | ~~40+~~ ~5 remaining in libraries | 0 |
 | `printf` calls (non-external) | ~~15+~~ 0 in libraries | 0 |
-| `#define` numeric constants | 25+ | 0 |
-| `NULL` usage | 5+ | 0 |
+| `#define` numeric constants | ~~25+~~ ~10 remaining | 0 |
+| `NULL` usage | ~~5+~~ ~2 remaining (apps only) | 0 |
 | `void*` parameters (non-external) | 12+ | 0 |
 | `typedef struct` | 5 active | 0 |
 | Weak tests (smoke-only) | ~40% | <5% |
@@ -725,6 +726,12 @@ Patterns are not decoration; they must serve clarity **and** performance.
 | | `com/rt_command/command.cpp` — 1 printf → qCritical | — |
 | | `fiff/fiff_tag.h` — 3 printf → qWarning/qCritical | — |
 | | **Result: 0 printf remaining in all libraries** | — |
+| | Full build: **0 errors** | — |
+| 2026-04-14 | **Iteration 3 — Next Priority Fixes (23 files):** | — |
+| | NULL → nullptr in library/tool code: `butterflyview.cpp`, `imagesc.cpp` (8), `tfplot.cpp`, `fiff_explain.h` (2), `fiffsimulator.cpp` (2), `mne_fiff_exp_set.cpp` | — |
+| | C-style casts → `static_cast` in 7 library files: `fiff_cov.cpp`, `inv_pwl_rap_music.cpp` (3), `inv_rap_music.cpp` (5), `mne_raw_data.cpp` (7), `mne_source_space.cpp`, `mne_epoch_data_list.cpp`, `mne_proj_op.cpp` | — |
+| | `std::srand`/`std::rand` → `std::mt19937` + `std::uniform_int_distribution` in `eventgroup.cpp` | — |
+| | `#define` macros → `inline constexpr` in `RawSettingsConstants` namespace (`rawsettings.h` + 8 caller files, 54 references) | — |
 | | Full build: **0 errors** | — |
 
 ---

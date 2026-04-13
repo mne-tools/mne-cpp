@@ -80,11 +80,11 @@ namespace INVLIB
  *
  * @brief Index pair representing two grid points evaluated together in the RAP MUSIC subspace scan
  */
-typedef struct Pair
+struct Pair
 {
     int x1; /**< Index one of the pair. */
     int x2; /**< Index two of the pair. */
-} Pair;
+};
 
 //=============================================================================================================
 /**

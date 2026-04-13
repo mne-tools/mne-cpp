@@ -269,7 +269,7 @@ IConnector* ConnectorManager::getActiveConnector()
             return *it;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 //=============================================================================================================

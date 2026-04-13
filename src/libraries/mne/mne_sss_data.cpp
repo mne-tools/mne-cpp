@@ -46,9 +46,9 @@
 
 //============================= dot.h =============================
 
-#define X 0
-#define Y 1
-#define Z 2
+constexpr int X = 0;
+constexpr int Y = 1;
+constexpr int Z = 2;
 
 #define VEC_COPY(to,from) {\
     (to)[X] = (from)[X];\
@@ -216,10 +216,10 @@ namespace MNELIB
 {
 
 /** @brief Lookup record mapping a FIFF coordinate frame integer code to its human-readable name. */
-typedef struct {
+struct frameNameRec_1 {
     int frame;
     const char *name;
-} frameNameRec_1;
+};
 
 }
 
