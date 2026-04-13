@@ -64,6 +64,10 @@ if(WASM)
   set(NO_IPC ON)
 endif()
 
+if(NOT BUILD_SHARED_LIBS)
+  add_compile_definitions(STATICBUILD)
+endif()
+
 if(NO_IPC)
     add_compile_definitions(NO_IPC)
 endif()

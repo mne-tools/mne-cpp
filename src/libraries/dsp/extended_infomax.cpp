@@ -135,6 +135,13 @@ InfomaxResult ExtendedInfomax::compute(
     const double dInvN = 1.0 / static_cast<double>(nTimes);
     MatrixXd matIdentity = MatrixXd::Identity(nComponents, nComponents);
 
+    // Learning rate annealing: the natural gradient has a nonzero steady-state
+    // when the assumed nonlinearity does not perfectly match the true source
+    // distribution.  Geometric decay lets the step shrink toward zero so the
+    // convergence criterion can fire.
+    double dCurrentLR = learningRate;
+    constexpr double dAnnealFactor = 0.998;
+
     for (int iter = 0; iter < maxIterations; ++iter) {
         // Compute sources
         MatrixXd matSources = matW * matWhite;
@@ -157,21 +164,23 @@ InfomaxResult ExtendedInfomax::compute(
             }
         }
 
-        // Natural gradient: dW = learningRate * (I + Y * S^T / n_times) * W
+        // Natural gradient: dW = lr * (I + Y * S^T / n_times) * W
         MatrixXd matGrad = matIdentity + (matY * matSources.transpose()) * dInvN;
-        MatrixXd matDW = learningRate * matGrad * matW;
-
-        // Check convergence
-        double dMaxDW = matDW.array().abs().maxCoeff();
-        double dMaxW = matW.array().abs().maxCoeff();
+        MatrixXd matDW = dCurrentLR * matGrad * matW;
 
         matW += matDW;
         result.nIterations = iter + 1;
 
-        if (dMaxW > 0.0 && (dMaxDW / dMaxW) < tolerance) {
+        // Convergence: squared Frobenius norm of the weight update
+        // (matches MNE-Python's criterion).  With learning rate annealing
+        // the update shrinks each iteration.
+        double dChange = matDW.squaredNorm();
+        if (dChange < tolerance) {
             result.converged = true;
             break;
         }
+
+        dCurrentLR *= dAnnealFactor;
     }
 
     //=========================================================================================================
