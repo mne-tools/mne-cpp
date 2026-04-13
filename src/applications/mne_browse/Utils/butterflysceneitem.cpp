@@ -65,14 +65,14 @@ ButterflySceneItem::ButterflySceneItem(QString setName, int setKind, int setUnit
 , m_pFiffInfo(Q_NULLPTR)
 {
     //Init m_scaleMap
-    m_scaleMap["MEG_grad"] = RawSettingsConstants::kDelegateScaleMegGrad;
-    m_scaleMap["MEG_mag"]  = RawSettingsConstants::kDelegateScaleMegMag;
-    m_scaleMap["MEG_EEG"]  = RawSettingsConstants::kDelegateScaleEeg;
-    m_scaleMap["MEG_EOG"]  = RawSettingsConstants::kDelegateScaleEog;
-    m_scaleMap["MEG_EMG"]  = RawSettingsConstants::kDelegateScaleEmg;
-    m_scaleMap["MEG_ECG"]  = RawSettingsConstants::kDelegateScaleEcg;
-    m_scaleMap["MEG_MISC"] = RawSettingsConstants::kDelegateScaleMisc;
-    m_scaleMap["MEG_STIM"] = RawSettingsConstants::kDelegateScaleStim;
+    m_scaleMap["MEG_grad"] = RawSettingsConstants::DELEGATE_SCALE_MEG_GRAD;
+    m_scaleMap["MEG_mag"]  = RawSettingsConstants::DELEGATE_SCALE_MEG_MAG;
+    m_scaleMap["MEG_EEG"]  = RawSettingsConstants::DELEGATE_SCALE_EEG;
+    m_scaleMap["MEG_EOG"]  = RawSettingsConstants::DELEGATE_SCALE_EOG;
+    m_scaleMap["MEG_EMG"]  = RawSettingsConstants::DELEGATE_SCALE_EMG;
+    m_scaleMap["MEG_ECG"]  = RawSettingsConstants::DELEGATE_SCALE_ECG;
+    m_scaleMap["MEG_MISC"] = RawSettingsConstants::DELEGATE_SCALE_MISC;
+    m_scaleMap["MEG_STIM"] = RawSettingsConstants::DELEGATE_SCALE_STIM;
 }
 
 
@@ -125,10 +125,10 @@ double ButterflySceneItem::yToAmplitude(double sceneY) const
     const QRectF pa = plotArea();
     double dMaxValue = 1e-09;
     if(m_iSetKind == FIFFV_MEG_CH) {
-        dMaxValue = (m_iSetUnit == FIFF_UNIT_T_M) ? m_scaleMap.value("MEG_grad", RawSettingsConstants::kDelegateScaleMegGrad)
-                                                   : m_scaleMap.value("MEG_mag", RawSettingsConstants::kDelegateScaleMegMag);
+        dMaxValue = (m_iSetUnit == FIFF_UNIT_T_M) ? m_scaleMap.value("MEG_grad", RawSettingsConstants::DELEGATE_SCALE_MEG_GRAD)
+                                                   : m_scaleMap.value("MEG_mag", RawSettingsConstants::DELEGATE_SCALE_MEG_MAG);
     } else if(m_iSetKind == FIFFV_EEG_CH) {
-        dMaxValue = m_scaleMap.value("MEG_EEG", RawSettingsConstants::kDelegateScaleEeg);
+        dMaxValue = m_scaleMap.value("MEG_EEG", RawSettingsConstants::DELEGATE_SCALE_EEG);
     }
     const double centerY = pa.y() + pa.height() / 2.0;
     return -(sceneY - centerY) / (pa.height() / (2.0 * dMaxValue));
@@ -214,14 +214,14 @@ void ButterflySceneItem::paintAxes(QPainter *painter)
     QString yUnitLabel;
     if(m_iSetKind == FIFFV_MEG_CH) {
         if(m_iSetUnit == FIFF_UNIT_T_M) {
-            dMaxValue = m_scaleMap.value("MEG_grad", RawSettingsConstants::kDelegateScaleMegGrad);
+            dMaxValue = m_scaleMap.value("MEG_grad", RawSettingsConstants::DELEGATE_SCALE_MEG_GRAD);
             yUnitLabel = "fT/cm";
         } else {
-            dMaxValue = m_scaleMap.value("MEG_mag", RawSettingsConstants::kDelegateScaleMegMag);
+            dMaxValue = m_scaleMap.value("MEG_mag", RawSettingsConstants::DELEGATE_SCALE_MEG_MAG);
             yUnitLabel = "fT";
         }
     } else if(m_iSetKind == FIFFV_EEG_CH) {
-        dMaxValue = m_scaleMap.value("MEG_EEG", RawSettingsConstants::kDelegateScaleEeg);
+        dMaxValue = m_scaleMap.value("MEG_EEG", RawSettingsConstants::DELEGATE_SCALE_EEG);
         yUnitLabel = QStringLiteral("\u00B5V");  // µV
     }
 

@@ -90,10 +90,10 @@ RawModel::RawModel(QObject *parent)
 , m_iAbsFiffCursor(0)
 , m_iCurAbsScrollPos(0)
 {
-    m_iWindowSize = RawSettingsConstants::kModelWindowSize;
-    m_reloadPos = RawSettingsConstants::kModelReloadPos;
-    m_maxWindows = RawSettingsConstants::kModelMaxWindows;
-    m_iFilterTaps = RawSettingsConstants::kModelNumFilterTaps;
+    m_iWindowSize = RawSettingsConstants::MODEL_WINDOW_SIZE;
+    m_reloadPos = RawSettingsConstants::MODEL_RELOAD_POS;
+    m_maxWindows = RawSettingsConstants::MODEL_MAX_WINDOWS;
+    m_iFilterTaps = RawSettingsConstants::MODEL_NUM_FILTER_TAPS;
 
     //Set default sampling freq to 1024
     m_pFiffInfo->sfreq = 1024;
@@ -131,10 +131,10 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
 , m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
 , m_filterChType("All")
 {
-    m_iWindowSize = RawSettingsConstants::kModelWindowSize;
-    m_reloadPos = RawSettingsConstants::kModelReloadPos;
-    m_maxWindows = RawSettingsConstants::kModelMaxWindows;
-    m_iFilterTaps = RawSettingsConstants::kModelNumFilterTaps;
+    m_iWindowSize = RawSettingsConstants::MODEL_WINDOW_SIZE;
+    m_reloadPos = RawSettingsConstants::MODEL_RELOAD_POS;
+    m_maxWindows = RawSettingsConstants::MODEL_MAX_WINDOWS;
+    m_iFilterTaps = RawSettingsConstants::MODEL_NUM_FILTER_TAPS;
 
     //read fiff data
     loadFiffData(&qFile);

@@ -77,7 +77,7 @@ void DataMarker::setMarkerColor(const QColor &color)
 {
     QPalette pal(palette());
     QColor alphaColor = color;
-    alphaColor.setAlpha(RawSettingsConstants::kDataMarkerOpacity);
+    alphaColor.setAlpha(RawSettingsConstants::DATA_MARKER_OPACITY);
     pal.setColor(QPalette::Window, alphaColor);
     setAutoFillBackground(true);
     setPalette(pal);

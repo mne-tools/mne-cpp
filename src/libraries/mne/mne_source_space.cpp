@@ -90,14 +90,14 @@ constexpr int OK   =  0;
     (to)[Z_17] = (from)[Z_17];\
 }
 
-constexpr int kNNeighbors = 26;
+constexpr int NNEIGHBORS = 26;
 
-constexpr int kCurvatureFileMagicNumber = 16777215;
+constexpr int CURVATURE_FILE_MAGIC_NUMBER = 16777215;
 
-constexpr int kTagOldMghXform     = 30;
-constexpr int kTagOldColortable   = 1;
-constexpr int kTagOldUserealras   = 2;
-constexpr int kTagUserealras      = 4;
+constexpr int TAG_OLD_MGH_XFORM     = 30;
+constexpr int TAG_OLD_COLORTABLE   = 1;
+constexpr int TAG_OLD_USEREALRAS   = 2;
+constexpr int TAG_USEREALRAS      = 4;
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -336,7 +336,7 @@ int read_tag_data(QFile &fp, int tag, long long nbytes, unsigned char *&val, lon
             val     = reinterpret_cast<unsigned char *>(g);
             nbytesp = sizeof(MNEVolGeom);
         }
-        else if (tag == kTagOldUserealras || tag == kTagUserealras) {
+        else if (tag == TAG_OLD_USEREALRAS || tag == TAG_USEREALRAS) {
             int *vi = new int[1]();
             if (read_int(fp,*vi) == FAIL)
                 vi = 0;
@@ -389,14 +389,14 @@ int read_next_tag(QFile &fp, int &tagp, long long &lenp, unsigned char *&datap)
         return OK;
     }
     switch (tag) {
-    case kTagOldMghXform: /* This is obviously a burden of the past */
+    case TAG_OLD_MGH_XFORM: /* This is obviously a burden of the past */
         if (read_int(fp,ilen) == FAIL)
             return FAIL;
         len = ilen - 1;
         break ;
     case TAG_OLD_SURF_GEOM:
-    case kTagOldUserealras:
-    case kTagOldColortable:
+    case TAG_OLD_USEREALRAS:
+    case TAG_OLD_COLORTABLE:
         len = 0 ;
         break ;
     default:
@@ -459,7 +459,7 @@ int read_curvature_file(const QString& fname,
         qCritical() << "Bad magic in" << fname;
         goto bad;
     }
-    if (magic == kCurvatureFileMagicNumber) {	    /* A new-style curvature file */
+    if (magic == CURVATURE_FILE_MAGIC_NUMBER) {	    /* A new-style curvature file */
         /*
  * How many and faces
  */
@@ -1260,14 +1260,14 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
     nrow   = (maxn[X_17]-minn[X_17]+1);
     sp = MNESourceSpace::create_source_space(np);
     sp->type = MNE_SOURCE_SPACE_VOLUME;
-    sp->nneighbor_vert = Eigen::VectorXi::Constant(sp->np, kNNeighbors);
+    sp->nneighbor_vert = Eigen::VectorXi::Constant(sp->np, NNEIGHBORS);
     sp->neighbor_vert.resize(sp->np);
     for (k = 0; k < sp->np; k++) {
         sp->inuse[k]  = 1;
         sp->vertno[k] = k;
         sp->nn(k,X_17) = sp->nn(k,Y_17) = 0.0; /* Source orientation is immaterial */
         sp->nn(k,Z_17) = 1.0;
-        sp->neighbor_vert[k] = Eigen::VectorXi::Constant(kNNeighbors, -1);
+        sp->neighbor_vert[k] = Eigen::VectorXi::Constant(NNEIGHBORS, -1);
         sp->nuse++;
     }
     for (k = 0, z = minn[Z_17]; z <= maxn[Z_17]; z++) {

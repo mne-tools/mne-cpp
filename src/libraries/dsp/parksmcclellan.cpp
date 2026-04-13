@@ -42,7 +42,7 @@
  * if(GRID[1] < 0.01 && GRID[NGRID] > 0.49) KKK = 1;
  * This may be due to the 0.01 minimum width limit we set for the bands.
  *
- * Note our use of kMinTestVal. The original code wasn't guarding against division by zero.
+ * Note our use of MIN_TEST_VAL. The original code wasn't guarding against division by zero.
  * Limiting the return values as we have also helped the algorithm's convergence behavior.
  *
  * In an effort to improve readability, we made a large number of variable name changes and also
@@ -82,11 +82,11 @@ using namespace Eigen;
 // DEFINES
 //=============================================================================================================
 
-constexpr int kBig = 4096;        // Used to define array sizes. Must be somewhat larger than 8 * MaxNumTaps
-constexpr int kSmall = 256;
-constexpr double kTwoPi = 6.28318530717958647692;
-constexpr int kMaxIterations = 50;          // Max Number of Iterations. Some filters require as many as 45 iterations.
-constexpr double kMinTestVal = 1.0E-6;      // Min value used in LeGrangeInterp and GEE
+constexpr int BIG = 4096;        // Used to define array sizes. Must be somewhat larger than 8 * MaxNumTaps
+constexpr int SMALL = 256;
+constexpr double M_2PI = 6.28318530717958647692;
+constexpr int ITRMAX = 50;          // Max Number of Iterations. Some filters require as many as 45 iterations.
+constexpr double MIN_TEST_VAL = 1.0E-6;      // Min value used in LeGrangeInterp and GEE
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -94,18 +94,18 @@ constexpr double kMinTestVal = 1.0E-6;      // Min value used in LeGrangeInterp 
 
 ParksMcClellan::ParksMcClellan()
 : HalfTapCount(0)
-, ExchangeIndex(kSmall)
-, LeGrangeD(kSmall)
-, Alpha(kSmall)
-, CosOfGrid(kSmall)
-, DesPlus(kSmall)
-, Coeff(kSmall)
-, Edge(kSmall)
-, BandMag(kSmall)
-, InitWeight(kSmall)
-, DesiredMag(kBig)
-, Grid(kBig)
-, Weight(kBig)
+, ExchangeIndex(SMALL)
+, LeGrangeD(SMALL)
+, Alpha(SMALL)
+, CosOfGrid(SMALL)
+, DesPlus(SMALL)
+, Coeff(SMALL)
+, Edge(SMALL)
+, BandMag(SMALL)
+, InitWeight(SMALL)
+, DesiredMag(BIG)
+, Grid(BIG)
+, Weight(BIG)
 , InitDone2(false)
 {
 }
@@ -114,18 +114,18 @@ ParksMcClellan::ParksMcClellan()
 
 ParksMcClellan::ParksMcClellan(int NumTaps, double OmegaC, double BW, double ParksWidth, TPassType PassType)
 : HalfTapCount(0)
-, ExchangeIndex(kSmall)
-, LeGrangeD(kSmall)
-, Alpha(kSmall)
-, CosOfGrid(kSmall)
-, DesPlus(kSmall)
-, Coeff(kSmall)
-, Edge(kSmall)
-, BandMag(kSmall)
-, InitWeight(kSmall)
-, DesiredMag(kBig)
-, Grid(kBig)
-, Weight(kBig)
+, ExchangeIndex(SMALL)
+, LeGrangeD(SMALL)
+, Alpha(SMALL)
+, CosOfGrid(SMALL)
+, DesPlus(SMALL)
+, Coeff(SMALL)
+, Edge(SMALL)
+, BandMag(SMALL)
+, InitWeight(SMALL)
+, DesiredMag(BIG)
+, Grid(BIG)
+, Weight(BIG)
 , InitDone2(false)
 {
     FirCoeff = RowVectorXd::Zero(NumTaps);
@@ -360,7 +360,7 @@ int ParksMcClellan::Remez2(int GridIndex)
     for(j=1; j<=HalfTapCount+1; j++)
     {
         TempVar = Grid[ ExchangeIndex[j] ];
-        CosOfGrid[j] = cos(TempVar * kTwoPi);
+        CosOfGrid[j] = cos(TempVar * M_2PI);
     }
 
     JET = (HalfTapCount-1)/15 + 1;
@@ -530,7 +530,7 @@ int ParksMcClellan::Remez2(int GridIndex)
 
         if(LUCK == 2)
         {
-            if(JCHNGE > 0 && NITER++ < kMaxIterations) goto TOP_LINE;
+            if(JCHNGE > 0 && NITER++ < ITRMAX) goto TOP_LINE;
             else return(NITER);
         }
 
@@ -539,7 +539,7 @@ int ParksMcClellan::Remez2(int GridIndex)
             ExchangeIndex[HalfTapCount+2 - j] = ExchangeIndex[HalfTapCount+1 - j];
         }
         ExchangeIndex[1] = K1;
-        if(NITER++ < kMaxIterations) goto TOP_LINE;
+        if(NITER++ < ITRMAX) goto TOP_LINE;
     }  // end if(LUCK == 1 || LUCK == 2)
 
     KN = ExchangeIndex[HalfTapCount+2];
@@ -548,7 +548,7 @@ int ParksMcClellan::Remez2(int GridIndex)
         ExchangeIndex[j] = ExchangeIndex[j+1];
     }
     ExchangeIndex[HalfTapCount+1] = KN;
-    if(NITER++ < kMaxIterations) goto TOP_LINE;
+    if(NITER++ < ITRMAX) goto TOP_LINE;
 
     return(NITER);
 }
@@ -566,10 +566,10 @@ double ParksMcClellan::LeGrangeInterp2(int K, int N, int M) // D
   {
    if(j != K)Dee = 2.0 * Dee * (Q - CosOfGrid[j]);
   }
- if(std::fabs(Dee) < kMinTestVal )
+ if(std::fabs(Dee) < MIN_TEST_VAL )
   {
-   if(Dee < 0.0)Dee = -kMinTestVal;
-   else         Dee =  kMinTestVal;
+   if(Dee < 0.0)Dee = -MIN_TEST_VAL;
+   else         Dee =  MIN_TEST_VAL;
   }
  return(1.0/Dee);
 }
@@ -582,24 +582,24 @@ double ParksMcClellan::GEE2(int K, int N)
  double P,C,Dee,XF;
  P = 0.0;
  XF = Grid[K];
- XF = cos(kTwoPi * XF);
+ XF = cos(M_2PI * XF);
  Dee = 0.0;
  for(j=1; j<=N; j++)
   {
    C = XF - CosOfGrid[j];
-   if(std::fabs(C) < kMinTestVal )
+   if(std::fabs(C) < MIN_TEST_VAL )
     {
-     if(C < 0.0)C = -kMinTestVal;
-     else       C =  kMinTestVal;
+     if(C < 0.0)C = -MIN_TEST_VAL;
+     else       C =  MIN_TEST_VAL;
     }
    C = LeGrangeD[j] / C;
    Dee = Dee + C;
    P = P + C*DesPlus[j];
   }
- if(std::fabs(Dee) < kMinTestVal )
+ if(std::fabs(Dee) < MIN_TEST_VAL )
   {
-   if(Dee < 0.0)Dee = -kMinTestVal;
-   else         Dee =  kMinTestVal;
+   if(Dee < 0.0)Dee = -MIN_TEST_VAL;
+   else         Dee =  MIN_TEST_VAL;
   }
  return(P/Dee);
 }
@@ -621,7 +621,7 @@ void ParksMcClellan::CalcCoefficients()
  int j, k, n;
  double GTempVar, OneOverNumTaps;
  double Omega, TempVar, FreqN, TempX,  GridCos;
- double GeeArray[kSmall];
+ double GeeArray[SMALL];
 
  GTempVar = Grid[1];
  CosOfGrid[HalfTapCount+2] = -2.0;
@@ -631,18 +631,18 @@ void ParksMcClellan::CalcCoefficients()
  for(j=1; j<=HalfTapCount; j++)
   {
    FreqN = (double)(j-1) * OneOverNumTaps;
-   TempX = cos(kTwoPi * FreqN);
+   TempX = cos(M_2PI * FreqN);
 
    GridCos = CosOfGrid[k];
    if(TempX <= GridCos)
     {
-     while(TempX <= GridCos && (GridCos-TempX) >= kMinTestVal) // kMinTestVal = 1.0E-6
+     while(TempX <= GridCos && (GridCos-TempX) >= MIN_TEST_VAL) // MIN_TEST_VAL = 1.0E-6
       {
        k++;;
        GridCos = CosOfGrid[k];
       }
     }
-   if(TempX <= GridCos || (TempX-GridCos) < kMinTestVal)
+   if(TempX <= GridCos || (TempX-GridCos) < MIN_TEST_VAL)
     {
      GeeArray[j] = DesPlus[k]; // Desired Response
     }
@@ -658,7 +658,7 @@ void ParksMcClellan::CalcCoefficients()
  for(j=1; j<=HalfTapCount; j++)
   {
    TempVar = 0.0;
-   Omega = (double)(j-1) * kTwoPi * OneOverNumTaps;
+   Omega = (double)(j-1) * M_2PI * OneOverNumTaps;
    for(n=1; n<=HalfTapCount-1; n++)
     {
      TempVar += GeeArray[n+1] * cos(Omega * (double)n);

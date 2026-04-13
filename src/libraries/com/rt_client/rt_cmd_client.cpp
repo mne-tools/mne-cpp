@@ -49,7 +49,7 @@
 
 #include <iostream>
 
-constexpr bool kUseNew = true;
+constexpr bool USENEW = true;
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -104,7 +104,7 @@ void RtCmdClient::sendCommandJSON(const Command &p_command)
     if (this->state() == QAbstractSocket::ConnectedState)
     {
         // Send request
-        if constexpr (kUseNew)
+        if constexpr (USENEW)
         {
             QByteArray block;
             QDataStream out(&block, QIODevice::WriteOnly);

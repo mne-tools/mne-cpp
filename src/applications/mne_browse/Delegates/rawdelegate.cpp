@@ -68,26 +68,26 @@ RawDelegate::RawDelegate(QObject *parent)
 , m_bShowSelectedEventsOnly(false)
 , m_bActivateEvents(true)
 , m_bRemoveDC(false)
-, m_dMaxValue(RawSettingsConstants::kDelegateInitialMaxValue)
+, m_dMaxValue(RawSettingsConstants::DELEGATE_INITIAL_MAX_VALUE)
 , m_dScaleY(1)
 {
-    m_iDefaultPlotHeight = RawSettingsConstants::kDelegatePlotHeight;
-    m_dDx = RawSettingsConstants::kDelegateDx;
-    m_nhlines = RawSettingsConstants::kDelegateNHLines;
+    m_iDefaultPlotHeight = RawSettingsConstants::DELEGATE_PLOT_HEIGHT;
+    m_dDx = RawSettingsConstants::DELEGATE_DX;
+    m_nhlines = RawSettingsConstants::DELEGATE_NHLINES;
 
     m_pEventModel = nullptr;
     m_pEventView = nullptr;
     m_pRawView = nullptr;
 
     //Init m_scaleMap
-    m_scaleMap["MEG_grad"] = RawSettingsConstants::kDelegateScaleMegGrad;
-    m_scaleMap["MEG_mag"]  = RawSettingsConstants::kDelegateScaleMegMag;
-    m_scaleMap["MEG_EEG"]  = RawSettingsConstants::kDelegateScaleEeg;
-    m_scaleMap["MEG_EOG"]  = RawSettingsConstants::kDelegateScaleEog;
-    m_scaleMap["MEG_EMG"]  = RawSettingsConstants::kDelegateScaleEmg;
-    m_scaleMap["MEG_ECG"]  = RawSettingsConstants::kDelegateScaleEcg;
-    m_scaleMap["MEG_MISC"] = RawSettingsConstants::kDelegateScaleMisc;
-    m_scaleMap["MEG_STIM"] = RawSettingsConstants::kDelegateScaleStim;
+    m_scaleMap["MEG_grad"] = RawSettingsConstants::DELEGATE_SCALE_MEG_GRAD;
+    m_scaleMap["MEG_mag"]  = RawSettingsConstants::DELEGATE_SCALE_MEG_MAG;
+    m_scaleMap["MEG_EEG"]  = RawSettingsConstants::DELEGATE_SCALE_EEG;
+    m_scaleMap["MEG_EOG"]  = RawSettingsConstants::DELEGATE_SCALE_EOG;
+    m_scaleMap["MEG_EMG"]  = RawSettingsConstants::DELEGATE_SCALE_EMG;
+    m_scaleMap["MEG_ECG"]  = RawSettingsConstants::DELEGATE_SCALE_ECG;
+    m_scaleMap["MEG_MISC"] = RawSettingsConstants::DELEGATE_SCALE_MISC;
+    m_scaleMap["MEG_STIM"] = RawSettingsConstants::DELEGATE_SCALE_STIM;
 }
 
 
@@ -222,7 +222,7 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     const RawModel* t_model = static_cast<const RawModel*>(index.model());
     qint32 kind = t_model->channelInfoList()[index.row()].kind;
-    double dMaxValue = RawSettingsConstants::kDelegateFallbackScale;
+    double dMaxValue = RawSettingsConstants::DELEGATE_FALLBACK_SCALE;
 
     switch(kind) {
     case FIFFV_MEG_CH: {
@@ -315,7 +315,7 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
     qint32 sampleRangeHigh = sampleRangeLow + rawModel->sizeOfPreloadedData();
 
     QPen pen;
-    pen.setWidth(RawSettingsConstants::kEventMarkerWidth);
+    pen.setWidth(RawSettingsConstants::EVENT_MARKER_WIDTH);
 
     QColor colorTemp;
 
@@ -331,12 +331,12 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
                 pen.setColor(eventTypeColor.value(type, Qt::black));
 
                 colorTemp = pen.color();
-                colorTemp.setAlpha(RawSettingsConstants::kEventMarkerOpacity);
+                colorTemp.setAlpha(RawSettingsConstants::EVENT_MARKER_OPACITY);
                 pen.setColor(colorTemp);
                 painter->setPen(pen);
 
                 //Draw line from sample position (x) and highest to lowest y position of the column widget - Add -m_qSettings.value("EventDesignParameters/event_marker_width").toInt() to avoid painting ovre the edge of the column widget
-                painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() + option.rect.height() - RawSettingsConstants::kEventMarkerWidth);
+                painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() + option.rect.height() - RawSettingsConstants::EVENT_MARKER_WIDTH);
             } // END for statement
         } // END if statement event in data range
     } // END if statement plot all
@@ -354,12 +354,12 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
                 pen.setColor(eventTypeColor.value(type, Qt::black));
 
                 colorTemp = pen.color();
-                colorTemp.setAlpha(RawSettingsConstants::kEventMarkerOpacity);
+                colorTemp.setAlpha(RawSettingsConstants::EVENT_MARKER_OPACITY);
                 pen.setColor(colorTemp);
                 painter->setPen(pen);
 
                 //Draw line from sample position (x) and highest to lowest y position of the column widget - Add +m_qSettings.value("EventDesignParameters/event_marker_width").toInt() to avoid painting ovre the edge of the column widget
-                painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() - option.rect.height() + RawSettingsConstants::kEventMarkerWidth);
+                painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() - option.rect.height() + RawSettingsConstants::EVENT_MARKER_WIDTH);
             } // END for statement
         } // END if statement
     } // END else statement

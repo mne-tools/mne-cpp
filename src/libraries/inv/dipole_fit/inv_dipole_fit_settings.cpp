@@ -109,12 +109,12 @@ void InvDipoleFitSettings::initMembers()
     is_raw       = false;         
     include_meg  = false;         
     include_eeg  = false;        
-    tmin         = -2*kBigTime;   
-    tmax         = 2*kBigTime;
+    tmin         = -2*BIG_TIME;   
+    tmax         = 2*BIG_TIME;
     tstep        = -1.0;          
     integ        = 0.0;
-    bmin         = kBigTime;      
-    bmax         = kBigTime;
+    bmin         = BIG_TIME;      
+    bmax         = BIG_TIME;
     do_baseline  = false;         
     setno        = 1;             
     verbose      = false;
@@ -136,7 +136,7 @@ void InvDipoleFitSettings::initMembers()
 
 void InvDipoleFitSettings::checkIntegrity()
 {
-    do_baseline = (bmin < kBigTime && bmax < kBigTime);
+    do_baseline = (bmin < BIG_TIME && bmax < BIG_TIME);
 
     if (measname.isEmpty()) {
         qCritical ("Data file name missing. Please specify one using the --meas option.");

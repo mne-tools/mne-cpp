@@ -116,7 +116,7 @@ constexpr int OK   =  0;
     }
 
 
-constexpr int kNNeighbors = 26;
+constexpr int NNEIGHBORS = 26;
 
 
 

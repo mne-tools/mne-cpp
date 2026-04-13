@@ -131,10 +131,10 @@ void RawSettings::init()
 {
     //Window settings - load from QSettings if previously stored, otherwise use defaults
     m_qSettings.beginGroup("MainWindow");
-    QSize storedSize = m_qSettings.value("size", QSize(RawSettingsConstants::kMainWindowSizeW, RawSettingsConstants::kMainWindowSizeH)).toSize();
+    QSize storedSize = m_qSettings.value("size", QSize(RawSettingsConstants::MAINWINDOW_WINDOW_SIZE_W, RawSettingsConstants::MAINWINDOW_WINDOW_SIZE_H)).toSize();
     m_mainwindow_size_w = storedSize.width();
     m_mainwindow_size_h = storedSize.height();
-    QPoint storedPos = m_qSettings.value("position", QPoint(RawSettingsConstants::kMainWindowPositionX, RawSettingsConstants::kMainWindowPositionY)).toPoint();
+    QPoint storedPos = m_qSettings.value("position", QPoint(RawSettingsConstants::MAINWINDOW_WINDOW_POSITION_X, RawSettingsConstants::MAINWINDOW_WINDOW_POSITION_Y)).toPoint();
     m_mainwindow_position_x = storedPos.x();
     m_mainwindow_position_y = storedPos.y();
     m_qSettings.endGroup();
