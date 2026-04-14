@@ -453,28 +453,31 @@ int read_curvature_file(const QString& fname,
 
     if (!fp.open(QIODevice::ReadOnly)) {
         qCritical() << fname;
-        goto bad;
+        curv.resize(0); return FAIL;
     }
     if (read_int3(fp,magic) != 0) {
         qCritical() << "Bad magic in" << fname;
-        goto bad;
+        curv.resize(0); return FAIL;
     }
     if (magic == CURVATURE_FILE_MAGIC_NUMBER) {	    /* A new-style curvature file */
         /*
  * How many and faces
  */
-        if (read_int(fp,ncurv) != 0)
-            goto bad;
-        if (read_int(fp,nface) != 0)
-            goto bad;
+        if (read_int(fp,ncurv) != 0) {
+            curv.resize(0); return FAIL;
+        }
+        if (read_int(fp,nface) != 0) {
+            curv.resize(0); return FAIL;
+        }
 #ifdef DEBUG
         qInfo("nvert = %d nface = %d\n",ncurv,nface);
 #endif
-        if (read_int(fp,val_pervert) != 0)
-            goto bad;
+        if (read_int(fp,val_pervert) != 0) {
+            curv.resize(0); return FAIL;
+        }
         if (val_pervert != 1) {
             qCritical("Values per vertex not equal to one.");
-            goto bad;
+            curv.resize(0); return FAIL;
         }
         /*
  * Read the curvature values
@@ -482,8 +485,9 @@ int read_curvature_file(const QString& fname,
         curv.resize(ncurv);
         curvmin = curvmax = 0.0;
         for (k = 0; k < ncurv; k++) {
-            if (read_float(fp,fval) != 0)
-                goto bad;
+            if (read_float(fp,fval) != 0) {
+                curv.resize(0); return FAIL;
+            }
             curv[k] = fval;
             if (curv[k] > curvmax)
                 curvmax = curv[k];
@@ -496,8 +500,9 @@ int read_curvature_file(const QString& fname,
         /*
  * How many vertices
  */
-        if (read_int3(fp,nface) != 0)
-            goto bad;
+        if (read_int3(fp,nface) != 0) {
+            curv.resize(0); return FAIL;
+        }
 #ifdef DEBUG
         qInfo("nvert = %d nface = %d\n",ncurv,nface);
 #endif
@@ -507,8 +512,9 @@ int read_curvature_file(const QString& fname,
         curv.resize(ncurv);
         curvmin = curvmax = 0.0;
         for (k = 0; k < ncurv; k++) {
-            if (read_int2(fp,val) != 0)
-                goto bad;
+            if (read_int2(fp,val) != 0) {
+                curv.resize(0); return FAIL;
+            }
             curv[k] = static_cast<float>(val)/100.0;
             if (curv[k] > curvmax)
                 curvmax = curv[k];
@@ -521,11 +527,6 @@ int read_curvature_file(const QString& fname,
     qInfo("Curvature range: %f...%f\n",curvmin,curvmax);
 #endif
     return OK;
-
-bad : {
-        curv.resize(0);
-        return FAIL;
-    }
 }
 
 //=========================================================================
@@ -554,17 +555,17 @@ int read_triangle_file(const QString& fname,
 
     if (!fp.open(QIODevice::ReadOnly)) {
         qCritical() << fname;
-        goto bad;
+        return FAIL;
     }
     if (read_int3(fp,magic) != 0) {
         qCritical() << "Bad magic in" << fname;
-        goto bad;
+        return FAIL;
     }
     if (magic != TRIANGLE_FILE_MAGIC_NUMBER &&
             magic != QUAD_FILE_MAGIC_NUMBER &&
             magic != NEW_QUAD_FILE_MAGIC_NUMBER) {
         qCritical() << "Bad magic in" << fname;
-        goto bad;
+        return FAIL;
     }
     if (magic == TRIANGLE_FILE_MAGIC_NUMBER) {
         /*
@@ -574,7 +575,7 @@ int read_triangle_file(const QString& fname,
         for (fp.getChar(&c); c != '\n'; fp.getChar(&c)) {
             if (fp.atEnd()) {
                 qCritical()<<"Bad triangle file.";
-                goto bad;
+                return FAIL;
             }
             putc(c,stderr);
         }
@@ -583,9 +584,9 @@ int read_triangle_file(const QString& fname,
      * How many vertices and triangles?
      */
         if (read_int(fp,nvert) != 0)
-            goto bad;
+            return FAIL;
         if (read_int(fp,ntri) != 0)
-            goto bad;
+            return FAIL;
         qInfo(" nvert = %d ntri = %d\n",nvert,ntri);
         vert.resize(nvert, 3);
         tri.resize(ntri, 3);
@@ -594,36 +595,36 @@ int read_triangle_file(const QString& fname,
      */
         for (k = 0; k < nvert; k++) {
             if (read_float(fp,vert(k,X_17)) != 0)
-                goto bad;
+                return FAIL;
             if (read_float(fp,vert(k,Y_17)) != 0)
-                goto bad;
+                return FAIL;
             if (read_float(fp,vert(k,Z_17)) != 0)
-                goto bad;
+                return FAIL;
         }
         /*
      * Read the triangles
      */
         for (k = 0; k < ntri; k++) {
             if (read_int(fp,tri(k,X_17)) != 0)
-                goto bad;
+                return FAIL;
             if (check_vertex(tri(k,X_17),nvert) != OK)
-                goto bad;
+                return FAIL;
             if (read_int(fp,tri(k,Y_17)) != 0)
-                goto bad;
+                return FAIL;
             if (check_vertex(tri(k,Y_17),nvert) != OK)
-                goto bad;
+                return FAIL;
             if (read_int(fp,tri(k,Z_17)) != 0)
-                goto bad;
+                return FAIL;
             if (check_vertex(tri(k,Z_17),nvert) != OK)
-                goto bad;
+                return FAIL;
         }
     }
     else if (magic == QUAD_FILE_MAGIC_NUMBER ||
              magic == NEW_QUAD_FILE_MAGIC_NUMBER) {
         if (read_int3(fp,nvert) != 0)
-            goto bad;
+            return FAIL;
         if (read_int3(fp,nquad) != 0)
-            goto bad;
+            return FAIL;
         qInfo("%s file : nvert = %d nquad = %d\n",
                 magic == QUAD_FILE_MAGIC_NUMBER ? "Quad" : "New quad",
                 nvert,nquad);
@@ -631,24 +632,24 @@ int read_triangle_file(const QString& fname,
         if (magic == QUAD_FILE_MAGIC_NUMBER) {
             for (k = 0; k < nvert; k++) {
                 if (read_int2(fp,val) != 0)
-                    goto bad;
+                    return FAIL;
                 vert(k,X_17) = val/100.0;
                 if (read_int2(fp,val) != 0)
-                    goto bad;
+                    return FAIL;
                 vert(k,Y_17) = val/100.0;
                 if (read_int2(fp,val) != 0)
-                    goto bad;
+                    return FAIL;
                 vert(k,Z_17) = val/100.0;
             }
         }
         else {			/* NEW_QUAD_FILE_MAGIC_NUMBER */
             for (k = 0; k < nvert; k++) {
                 if (read_float(fp,vert(k,X_17)) != 0)
-                    goto bad;
+                    return FAIL;
                 if (read_float(fp,vert(k,Y_17)) != 0)
-                    goto bad;
+                    return FAIL;
                 if (read_float(fp,vert(k,Z_17)) != 0)
-                    goto bad;
+                    return FAIL;
             }
         }
         ntri = 2*nquad;
@@ -656,7 +657,7 @@ int read_triangle_file(const QString& fname,
         for (k = 0, ntri = 0; k < nquad; k++) {
             for (p = 0; p < 4; p++) {
                 if (read_int3(fp,quad[p]) != 0)
-                    goto bad;
+                    return FAIL;
             }
 
             /*
@@ -705,7 +706,7 @@ int read_triangle_file(const QString& fname,
     if (tagsp) {
         std::optional<MNEMghTagGroup> tags;
         if (read_mgh_tags(fp, tags) == FAIL) {
-            goto bad;
+            return FAIL;
         }
         *tagsp = std::move(tags);
     }
@@ -716,10 +717,6 @@ int read_triangle_file(const QString& fname,
     vertices = std::move(vert);
     triangles = std::move(tri);
     return OK;
-
-bad : {
-        return FAIL;
-    }
 }
 
 //=========================================================================
@@ -1101,14 +1098,14 @@ std::unique_ptr<MNESourceSpace> MNESourceSpace::load_surface_geom(const QString&
                                verts,
                                tris,
                                &tags) == -1)
-        goto bad;
+        return nullptr;
 
     if (!curv_file.isEmpty()) {
         if (read_curvature_file(curv_file, curvs) == -1)
-            goto bad;
+            return nullptr;
         if (curvs.size() != verts.rows()) {
             qCritical()<<"Incorrect number of vertices in the curvature file.";
-            goto bad;
+            return nullptr;
         }
     }
 
@@ -1124,16 +1121,16 @@ std::unique_ptr<MNESourceSpace> MNESourceSpace::load_surface_geom(const QString&
     if (add_geometry) {
         if (check_too_many_neighbors) {
             if (s->add_geometry_info(true) != OK)
-                goto bad;
+                return nullptr;
         }
         else {
             if (s->add_geometry_info2(true) != OK)
-                goto bad;
+                return nullptr;
         }
     }
     else if (s->nn.rows() == 0) {			/* Normals only */
         if (s->add_vertex_normals() != OK)
-            goto bad;
+            return nullptr;
     }
     else
         s->add_triangle_data();
@@ -1144,10 +1141,6 @@ std::unique_ptr<MNESourceSpace> MNESourceSpace::load_surface_geom(const QString&
     s->vol_geom = get_volume_geom_from_tag(s->mgh_tags ? &(*s->mgh_tags) : nullptr);
 
     return s;
-
-bad : {
-        return nullptr;
-    }
 }
 
 //=============================================================================================================
@@ -1375,8 +1368,7 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
         std::vector<std::unique_ptr<MNESourceSpace>> sp_vec;
         sp_vec.push_back(std::move(sp));
         if (filter_source_spaces(surf,mindist,FiffCoordTrans(),sp_vec,nullptr) != OK) {
-            sp = std::move(sp_vec[0]);
-            goto bad;
+            return nullptr;
         }
         sp = std::move(sp_vec[0]);
     }
@@ -1427,7 +1419,7 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
 
         sp->voxel_surf_RAS_t = make_voxel_ras_trans(r0,x_ras,y_ras,z_ras,voxel_size);
         if (!sp->voxel_surf_RAS_t || sp->voxel_surf_RAS_t->isEmpty())
-            goto bad;
+            return nullptr;
 
         sp->vol_dims[0] = width;
         sp->vol_dims[1] = height;
@@ -1436,10 +1428,6 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
     }
 
     return sp.release();
-
-bad : {
-        return nullptr;
-    }
 }
 
 //=============================================================================================================
@@ -1713,13 +1701,16 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
     int             j,k,p,q;
     int             ntri;
 
-    if(!stream->open())
-        goto bad;
+    if(!stream->open()) {
+        stream->close();
+        return FIFF_FAIL;
+    }
 
     sources = stream->dirtree()->dir_tree_find(FIFFB_MNE_SOURCE_SPACE);
     if (sources.size() == 0) {
         qCritical("No source spaces available here");
-        goto bad;
+        stream->close();
+        return FIFF_FAIL;
     }
     for (j = 0; j < sources.size(); j++) {
         new_space = MNESourceSpace::create_source_space(0);
@@ -1728,20 +1719,24 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
             * Get the mandatory data first
             */
         if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag)) {
-            goto bad;
+            stream->close();
+            return FIFF_FAIL;
         }
         new_space->np = *t_pTag->toInt();
         if (new_space->np == 0) {
             qCritical("No points in this source space");
-            goto bad;
+            stream->close();
+            return FIFF_FAIL;
         }
         if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_POINTS, t_pTag)) {
-            goto bad;
+            stream->close();
+            return FIFF_FAIL;
         }
         MatrixXf tmp_rr = t_pTag->toFloatMatrix().transpose();
         new_space->rr = tmp_rr;
         if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag)) {
-            goto bad;
+            stream->close();
+            return FIFF_FAIL;
         }
         MatrixXf tmp_nn = t_pTag->toFloatMatrix().transpose();
         new_space->nn = tmp_nn;
@@ -1771,7 +1766,8 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
 
             if (!node->find_tag(stream, FIFF_BEM_SURF_TRIANGLES, t_pTag)) {
                 if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_TRIANGLES, t_pTag)) {
-                    goto bad;
+                    stream->close();
+                    return FIFF_FAIL;
                 }
             }
 
@@ -1802,7 +1798,8 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
         else {
             new_space->nuse = *t_pTag->toInt();
             if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_SELECTION, t_pTag)) {
-                goto bad;
+                stream->close();
+                return FIFF_FAIL;
             }
 
             {
@@ -1829,7 +1826,8 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
             if (ntri > 0) {
 
                 if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, t_pTag)) {
-                    goto bad;
+                    stream->close();
+                    return FIFF_FAIL;
                 }
 
                 MatrixXi tmp_itris = t_pTag->toIntMatrix().transpose();
@@ -1850,7 +1848,8 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
                 }
 
                 if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEAREST_DIST, t_pTag)) {
-                    goto bad;
+                    stream->close();
+                    return FIFF_FAIL;
                 }
                 Eigen::Map<const Eigen::VectorXf> nearestDistMap(t_pTag->toFloat(), new_space->np);
                 for (k = 0; k < new_space->np; k++) {
@@ -1866,11 +1865,13 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
                     //                    SparseMatrix<double> tmpSparse = t_pTag->toSparseFloatMatrix();
                     auto dist_lower = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
                     if (!dist_lower) {
-                        goto bad;
+                        stream->close();
+                        return FIFF_FAIL;
                     }
                     auto dist_full = dist_lower->mne_add_upper_triangle_rcs();
                     if (!dist_full) {
-                        goto bad;
+                        stream->close();
+                        return FIFF_FAIL;
                     }
                     new_space->dist = std::move(*dist_full);
                 }
@@ -1898,13 +1899,15 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
             if (neighborsVec.size() > 0 && nneighborsVec.size() > 0) {
                 if (nvert != new_space->np) {
                     qCritical("Inconsistent neighborhood data in file.");
-                    goto bad;
+                    stream->close();
+                    return FIFF_FAIL;
                 }
                 for (k = 0, ntot_count = 0; k < nvert; k++)
                     ntot_count += nneighborsVec[k];
                 if (ntot_count != ntot) {
                     qCritical("Inconsistent neighborhood data in file.");
-                    goto bad;
+                    stream->close();
+                    return FIFF_FAIL;
                 }
                 new_space->nneighbor_vert = Eigen::VectorXi::Zero(nvert);
                 new_space->neighbor_vert.resize(nvert);
@@ -1965,13 +1968,6 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
      spaces = std::move(local_spaces);
 
     return FIFF_OK;
-
-bad : {
-        stream->close();
-        // new_space and local_spaces auto-cleanup via unique_ptr
-
-        return FIFF_FAIL;
-    }
 }
 
 //=============================================================================================================
@@ -2067,7 +2063,7 @@ int MNESourceSpace::restrict_sources_to_labels(std::vector<std::unique_ptr<MNESo
         }
         if (sp) {
             if (read_label(labels[k],sel) == FAIL)
-                goto bad;
+                return FAIL;
             for (p = 0; p < sel.size(); p++) {
                 if (sel[p] >= 0 && sel[p] < sp->np)
                     (*inuse)[sel[p]] = sp->inuse[sel[p]];
@@ -2081,10 +2077,6 @@ int MNESourceSpace::restrict_sources_to_labels(std::vector<std::unique_ptr<MNESo
     if (lh) lh->update_inuse(std::move(lh_inuse));
     if (rh) rh->update_inuse(std::move(rh_inuse));
     return OK;
-
-bad : {
-        return FAIL;
-    }
 }
 
 //=============================================================================================================
@@ -2094,8 +2086,6 @@ int MNESourceSpace::read_label(const QString& label, Eigen::VectorXi& sel)
           * Find the source points within a label
           */
 {
-    int  res = FAIL;
-
     int k,p,nlabel;
     char c;
     float fdum;
@@ -2105,12 +2095,14 @@ int MNESourceSpace::read_label(const QString& label, Eigen::VectorXi& sel)
     QFile inFile(label);
     if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qCritical() << label;//err_set_sys_error(label);
-        goto out;
+        sel.resize(0);
+        return FAIL;
     }
     inFile.getChar(&c);
     if (c !='#') {
         qCritical("FsLabel file does not start correctly.");
-        goto out;
+        sel.resize(0);
+        return FAIL;
     }
     /*
        * Skip the comment line
@@ -2122,26 +2114,22 @@ int MNESourceSpace::read_label(const QString& label, Eigen::VectorXi& sel)
     in >> nlabel;
     if (in.status() != QTextStream::Ok) {
         qCritical("Could not read the number of labelled points.");
-        goto out;
+        sel.resize(0);
+        return FAIL;
     }
     sel.resize(nlabel);
     for (k = 0; k < nlabel; k++) {
         in >> p >> fdum >> fdum >> fdum >> fdum;
         if (in.status() != QTextStream::Ok) {
             qCritical("Could not read label point # %d",k+1);
-            goto out;
+            sel.resize(0);
+            return FAIL;
         }
         sel[k] = p;
     }
-    res = OK;
     }
 
-out : {
-        if (res != OK) {
-            sel.resize(0);
-        }
-        return res;
-    }
+    return OK;
 }
 
 //=============================================================================================================

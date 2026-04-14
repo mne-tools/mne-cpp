@@ -20,9 +20,10 @@ Last updated: 14 April 2026
 8. [Thread Safety](#8-thread-safety)
 9. [Documentation Quality](#9-documentation-quality)
 10. [Test Quality & Independent Verification](#10-test-quality--independent-verification)
-11. [Priority Matrix](#11-priority-matrix)
-12. [Audit Process — How We Scan & What Matters](#12-audit-process--how-we-scan--what-matters)
-13. [Progress Tracker](#13-progress-tracker)
+11. [C++17 Adoption & Modernization](#11-c17-adoption--modernization)
+12. [Priority Matrix](#12-priority-matrix)
+13. [Audit Process — How We Scan & What Matters](#13-audit-process--how-we-scan--what-matters)
+14. [Progress Tracker](#14-progress-tracker)
 
 ---
 
@@ -32,13 +33,18 @@ The MNE-CPP codebase contains a mix of legacy C-style code (ported from the
 original MNE-C/Fortran) and modern C++17. Key systemic issues:
 
 - **120+ raw pointer instances** across libraries, tools, and examples
+- **~236 `goto` statements** in 19 C-port files (cleanup anti-pattern)
+- **~376 virtual methods** missing `override` keyword
+- **~51 `using namespace` directives** in header files (namespace pollution)
+- **18 files** with duplicated `FAIL`/`OK` constant definitions
+- **~984 signed/unsigned loop mismatches** (`int i < container.size()`)
 - **40+ C-style casts** in core numerical code (fiff, fs, math)
 - **25+ `#define` constants** that should be `constexpr`
-- **15+ `printf` calls** in libraries and tools instead of Qt/stream logging
 - **`void*` callback pattern** in performance-critical forward/math code
 - **Inconsistent smart pointer types** (`QSharedPointer` vs `std::shared_ptr`)
 - **~40% of tests are weak** (smoke-only, no numerical assertions, no cross-validation)
 - **Zero MNE-Python cross-validation** for critical algorithms
+- **Low C++17 feature adoption** (`[[nodiscard]]`: 17, `std::optional`: 18, `enum class`: 30 vs plain `enum`: 24)
 
 ---
 
@@ -138,14 +144,129 @@ Each call categorized as `qInfo` (progress), `qCritical` (errors), `qWarning` (r
 | `tools/server/.../fiffsimulator.cpp:94,326` | `= nullptr` |
 | `tools/server/.../connectormanager.cpp:272` | `return nullptr` |
 
-### 3.6 `memcpy`/`memset` → Safe Alternatives
+### 3.6 `goto` Statements → RAII / Early Returns
+
+**~236 `goto` statements across 19 files** — the single largest remaining C-legacy
+pattern. All follow the C-port `goto bad;`/`goto done;` cleanup idiom, which is
+non-idiomatic in C++ and should be replaced with RAII, early returns, or exceptions.
+
+| Priority | Location | Count | Pattern | Recommended Fix |
+|----------|----------|-------|---------|-----------------|
+| P1 | `mne/mne_source_space.cpp` | 61 | `goto bad;` / `goto done;` cleanup | RAII + early return, split into smaller functions |
+| P1 | `mne/mne_raw_data.cpp` | 32 | `goto bad;` cleanup after I/O | RAII wrappers, `std::optional` returns |
+| P1 | `inv/dipole_fit/inv_guess_data.cpp` | 16 | `goto bad;` after allocation | Smart pointers, scope guards |
+| P1 | `inv/dipole_fit/inv_dipole_fit_data.cpp` | 14 | `goto bad;` | RAII + early return |
+| P1 | `mne/mne_surface_or_volume.cpp` | 12 | `goto bad;` | RAII |
+| P1 | `mne/mne_meas_data.cpp` | 11 | `goto bad;` | RAII |
+| P2 | `fwd/fwd_bem_model.cpp` | 10+ | `goto bad;` | RAII (large function — split first) |
+| P2 | `fwd/compute_fwd.cpp` | 10+ | `goto bad;` / `goto out;` | RAII |
+| P2 | Other files (11) | ~80 | Various | RAII + early return |
+
+**Elimination strategy:**
+1. Replace `goto bad; ... bad: cleanup; return FAIL;` with direct `return std::nullopt;` or `return false;`
+2. Move resource allocation to RAII types (smart pointers, `QFile` auto-close)
+3. For deeply nested goto patterns, extract inner logic into helper functions
+4. Use C++ scope exit or custom scope guards where cleanup is non-trivial
+
+### 3.7 Missing `override` Keyword
+
+**~376 virtual method declarations** without `override`. This allows silent
+broken overrides when base class signatures change.
+
+| Priority | Location | Count | Fix |
+|----------|----------|-------|-----|
+| P1 | `tools/server/.../fiffsimulator.h` | 8 | Add `override`, remove redundant `virtual` |
+| P1 | `mne_analyze_studio/.../rawmodel.h` | 5+ | Add `override` |
+| P1 | `mne_scan/libs/scDisp/*.h` | 20+ | Add `override` |
+| P2 | All library/app virtual methods | ~340 | Systematic `override` audit |
+
+**Rule:** Every overriding method must use `override`. The `virtual` keyword on
+overrides is redundant and should be removed. Use `final` on classes/methods
+that must not be further overridden.
+
+### 3.8 `using namespace` in Headers
+
+**~51 instances** of `using namespace` in `.h` files. This pollutes the
+namespace of every file that includes the header.
+
+| Priority | Location | Directives | Fix |
+|----------|----------|------------|-----|
+| P1 | `mne_browse/Delegates/rawdelegate.h` | `using namespace Eigen;` + `using namespace MNELIB;` | Fully qualify: `Eigen::MatrixXd` |
+| P1 | `mne_browse/Windows/mainwindow.h` | `using namespace Eigen;` | Fully qualify |
+| P1 | `mne_analyze_studio/.../filteroperator.h` | 4 `using namespace` directives | Fully qualify |
+| P2 | Other app/tool headers (~45) | Various | Fully qualify |
+
+**Rule:** Never use `using namespace` in a header file. Use fully-qualified
+names or scoped `using` declarations inside function bodies only.
+
+### 3.9 Duplicated `FAIL`/`OK` Constants
+
+**18 files** independently define identical constants:
+```cpp
+constexpr int FAIL = -1;
+constexpr int OK   =  0;
+```
+
+**Files:** `fwd_bem_model.cpp`, `fwd_eeg_sphere_model.cpp`, `compute_fwd.cpp`,
+`fwd_comp_data.cpp`, `inv_guess_data.cpp`, `inv_dipole_fit_data.cpp`,
+`mne_named_vector.cpp`, `mne_ctf_comp_data_set.cpp`, `mne_forward_solution.cpp`,
+`mne_raw_data.cpp`, `mne_surface_or_volume.cpp`, `mne_ctf_comp_data.cpp`,
+`mne_proj_op.cpp`, `mne_cov_matrix.cpp`, `filter_thread_arg.cpp`,
+`mne_surface.cpp`, `mne_source_space.cpp`, `mne_msh_display_surface.cpp`
+
+**Fix:** Create a shared header `utils/mne_status.h`:
+```cpp
+namespace MNELIB {
+    constexpr int FAIL = -1;
+    constexpr int OK   =  0;
+}
+```
+Or better: `enum class Status { Ok = 0, Fail = -1 };` with conversion operators.
+
+### 3.10 Plain `enum` → `enum class`
+
+**24 plain `enum` declarations** in library headers vs 30 `enum class`. Plain
+enums leak their enumerators into the enclosing scope and allow implicit
+conversion to `int`.
+
+**Fix:** Convert remaining plain `enum` to `enum class` with explicit underlying
+type where needed.
+
+### 3.11 Signed/Unsigned Loop Mismatches
+
+**~984 instances** of `for (int i = 0; i < container.size(); ...)` where
+`.size()` returns `size_t` or `qsizetype`. This is the single most common
+pattern issue in the codebase.
+
+**Fix:** Use `qsizetype` (Qt 6) or `int` with explicit cast at comparison.
+For Eigen: `.rows()` and `.cols()` return `Eigen::Index` (typically `long`).
+
+### 3.12 Magic Numbers
+
+Unnamed numeric literals scattered in code reduce readability:
+
+| Priority | Location | Example | Fix |
+|----------|----------|---------|-----|
+| P2 | `disp/viewers/helpers/rtfiffrawviewmodel.cpp` | `coil_type == 3012`, `== 3024` | Named constants from FIFF spec |
+| P2 | `fiff/fiff_stream.cpp` | `ctfkind == 1194479433` | Named constant with comment |
+| P2 | `mne_scan/plugins/tmsi/tmsi.cpp` | `if(i==136)`, `if(i==137)` | Named channel index constants |
+
+### 3.13 Unused Parameters (`Q_UNUSED`)
+
+**~314 `Q_UNUSED()` macros** — each indicates a function accepting parameters
+it doesn't use. High count suggests overly broad interfaces.
+
+**Fix:** Where possible, remove the parameter from the signature. For virtual
+methods where the signature is fixed, use unnamed parameters: `void foo(int /*unused*/)`. 
+
+### 3.14 `memcpy`/`memset` → Safe Alternatives
 
 | Location | Fix |
 |----------|-----|
 | `mne_analyze/libs/events/eventsharedmemmanager.cpp:315-316` | `std::copy_n` or `std::memcpy` with `static_assert` on triviality |
 | `fs/fs_atlas_lookup.cpp:186,264` | `std::bit_cast<float>(bits)` (C++20) or keep `memcpy` with comment |
 
-### 3.7 `std::srand`/`std::rand` → `<random>`
+### 3.15 `std::srand`/`std::rand` → `<random>`
 
 | Location | Fix |
 |----------|-----|
@@ -180,11 +301,21 @@ C-style callback with type-erased user data. Replace with templates or `std::fun
 
 | Pattern | Occurrences | Locations | Fix |
 |---------|-------------|-----------|-----|
+| `FAIL`/`OK` constants | 18 files | All C-port `.cpp` files | Shared `utils/mne_status.h` header (see §3.9) |
 | `BrainView* + BrainTreeModel*` init | 10+ | 8 examples + 2 apps | Factory: `Disp3DFactory::createBrainView()` |
 | `FiffStream::SPtr(new FiffStream(&file))` | 15+ | All tools | `FiffStream::create(QIODevice*)` static factory |
 | Epoch collection loop | 5+ | Multiple inverse examples | Utility: `MNEEpochData::collectEpochs(raw, events, ...)` |
 
-### 4.4 Inconsistent Error Handling
+### 4.4 Global / Static Mutable State
+
+| Priority | Location | Issue | Fix |
+|----------|----------|-------|-----|
+| P1 | `mne_scan/plugins/babymeg/FormFiles/globalobj.h` | 15+ extern globals (`g_queue`, `g_maxlen`, `g_mutex`, etc.) | Encapsulate in a `BabyMegState` class |
+| P2 | `mne/mne_raw_data.cpp:563` | `static int approx_ring_buf_size` | Pass as parameter or member |
+| P2 | `mne_browse/main.cpp` | Global `MainWindow*` in signal handler | `std::atomic<MainWindow*>` or redesign |
+| P2 | `mne_analyze_studio/workbench/main.cpp` | `int g_signalPipe[2]` | Encapsulate in signal handler class |
+
+### 4.5 Inconsistent Error Handling
 
 | Area | Pattern | Recommendation |
 |------|---------|----------------|
@@ -484,7 +615,58 @@ These tests demonstrate best practices — use them as templates:
 
 ---
 
-## 11. Priority Matrix
+## 11. C++17 Adoption & Modernization
+
+The project targets C++17 but underutilizes many features. Adopting these
+improves safety, readability, and performance.
+
+### 11.1 Feature Adoption Status
+
+| Feature | Current Usage | Target | Impact |
+|---------|--------------|--------|--------|
+| `[[nodiscard]]` | 17 uses | All factory/computation functions | Prevents ignoring error-indicating returns |
+| `std::optional` | 18 uses | Replace `T* or nullptr` return patterns | Explicit optionality without heap allocation |
+| `std::string_view` | 1 use | For `const char*` parameters in C-port code | Zero-copy string references |
+| `if constexpr` | 11 uses | Template dispatch, conditional compilation | Compile-time branch elimination |
+| Structured bindings | 20 uses | Range-for over maps, pair returns | Cleaner destructuring |
+| `enum class` | 30 vs 24 plain | All enums should be `enum class` | Scoped enumerators, no implicit int conversion |
+| `constexpr` functions | 8 | Math utilities, constant computation | Compile-time evaluation |
+| `[[maybe_unused]]` | ~0 | Replace `Q_UNUSED()` macros | Standard attribute vs Qt macro |
+| Fold expressions | 0 | Variadic template utilities | Cleaner parameter packs |
+| Class template argument deduction | ~0 | `std::pair`, `std::tuple`, `std::optional` | Less verbose template instantiation |
+
+### 11.2 `[[nodiscard]]` Policy
+
+All functions where ignoring the return value is a bug should be marked
+`[[nodiscard]]`:
+- Factory methods returning smart pointers
+- Functions returning error codes or `bool` success indicators
+- Computation functions returning results (Eigen matrices, scalars)
+- `std::optional` returns
+
+### 11.3 `std::optional` Adoption
+
+Replace the C-port pattern:
+```cpp
+// Before: raw pointer return, caller must check NULL
+MNESurface* MNESurface::read(const QString& path);
+
+// After: explicit optionality
+std::optional<MNESurface> MNESurface::read(const QString& path);
+```
+
+Also replace `FAIL`/`OK` return codes where the function produces a value:
+```cpp
+// Before: out-parameter + error code
+int readData(const QString& path, MatrixXd& result);
+
+// After: optional return
+std::optional<MatrixXd> readData(const QString& path);
+```
+
+---
+
+## 12. Priority Matrix
 
 ### P0 — Safety & Correctness (Do First)
 
@@ -493,6 +675,8 @@ These tests demonstrate best practices — use them as templates:
 - [ ] Add MNE-Python cross-validation for forward solution, inverse operators
 - [ ] Fix thread safety in LSL stream inlet buffer operations
 - [ ] Make test data paths robust (environment variable fallback)
+- [ ] Eliminate `goto` statements in library code (~236 in 19 files) ← **NEW**
+- [ ] Encapsulate global mutable state in `babymeg/globalobj.h` (15+ globals) ← **NEW**
 
 ### P1 — Code Quality & Maintainability (Next Sprint)
 
@@ -510,13 +694,15 @@ These tests demonstrate best practices — use them as templates:
 - [ ] Replace all remaining `printf` in tools and applications
 - [ ] Convert functions returning raw `T*` to smart pointers
 - [ ] Add `::create()` factory methods to `FiffStream`, `FiffRawData`
+- [ ] Add `override` to all virtual method overrides (~376 methods) ← **NEW**
+- [ ] Remove `using namespace` from all header files (~51 instances) ← **NEW**
+- [ ] Consolidate duplicated `FAIL`/`OK` into shared header (18 files) ← **NEW**
 - [ ] Strengthen weak tests (add numerical assertions to smoke tests)
 - [ ] Add edge case tests for DSP, interpolation, math utilities
 
 ### P2 — Performance & Polish (Ongoing)
 
 - [ ] Add `.noalias()` to identified matrix multiplications
-- [x] Convert `#define` constants to `constexpr` in `rawsettings.h` + 8 caller files ✅ 2026-04-14
 - [ ] Convert remaining `#define` constants to `constexpr` (rt_cmd_client, mne_make_cor_set, mne_ctf2fiff)
 - [ ] Replace `typedef struct` with modern struct declarations
 - [x] Replace `NULL` with `nullptr` in library and tool code (6 files, 15 usages) ✅ 2026-04-14
@@ -524,6 +710,11 @@ These tests demonstrate best practices — use them as templates:
 - [ ] Convert eligible `std::vector<double>` to Eigen types
 - [x] Replace `std::srand`/`std::rand` with `<random>` (eventgroup.cpp) ✅ 2026-04-14
 - [ ] Profile and optimize hot paths (SCDC computation, BEM solver)
+- [ ] Convert plain `enum` to `enum class` (24 remaining) ← **NEW**
+- [ ] Fix signed/unsigned loop mismatches (~984 instances) ← **NEW**
+- [ ] Add `[[nodiscard]]` to factory/computation functions ← **NEW**
+- [ ] Replace magic numbers with named constants ← **NEW**
+- [ ] Reduce `Q_UNUSED` count by narrowing interfaces (~314) ← **NEW**
 
 ### P3 — Architecture (Plan & Execute Carefully)
 
@@ -534,12 +725,12 @@ These tests demonstrate best practices — use them as templates:
 
 ---
 
-## 12. Audit Process — How We Scan & What Matters
+## 13. Audit Process — How We Scan & What Matters
 
 To ensure nothing slips through and the codebase converges toward a single,
 beautiful, idiomatic standard, every audit cycle must follow this checklist.
 
-### 12.1 Automated Scans (Run Every Cycle)
+### 13.1 Automated Scans (Run Every Cycle)
 
 | Scan | Command / Method | What It Catches |
 |------|-----------------|-----------------|
@@ -554,8 +745,15 @@ beautiful, idiomatic standard, every audit cycle must follow this checklist.
 | **Missing reserve** | Look for `append\|push_back` inside `for`/`while` loops without prior `reserve()` | Container reallocation churn |
 | **Compiler warnings** | `cmake --build build/ 2>&1 \| grep -i 'warning'` | Implicit conversions, unused variables, sign compare |
 | **clang-tidy** | `clang-tidy -p build/ src/libraries/**/*.cpp -checks='modernize-*,performance-*,bugprone-*,cppcoreguidelines-*'` | Comprehensive modern C++ conformance |
+| **goto statements** | `grep -rn '\bgoto\b' src/libraries/ src/tools/ --include='*.cpp' \| grep -v external/` | C-style cleanup anti-pattern |
+| **Missing override** | `grep -rn 'virtual.*(.*)' src/ --include='*.h' \| grep -v override \| grep -v '= 0'` | Silent broken overrides |
+| **using namespace in headers** | `grep -rn 'using namespace' src/ --include='*.h' \| grep -v external/` | Namespace pollution |
+| **Duplicated FAIL/OK** | `grep -rn 'constexpr int FAIL' src/libraries/ --include='*.cpp'` | Copy-pasted constants |
+| **dynamic_cast** | `grep -rn 'dynamic_cast' src/ --include='*.cpp' \| grep -v external/` | Potential design smell |
+| **Q_UNUSED** | `grep -rn 'Q_UNUSED' src/ --include='*.cpp' \| wc -l` | Overly broad interfaces |
+| **Plain enum** | `grep -rn '^\s*enum\b' src/libraries/ --include='*.h' \| grep -v 'enum class'` | Unscoped enumerators |
 
-### 12.2 Manual Review Checklist (Per Library / Module)
+### 13.2 Manual Review Checklist (Per Library / Module)
 
 For each directory in `src/libraries/`, `src/applications/`, `src/tools/`,
 `src/examples/`, and `src/testframes/`:
@@ -578,7 +776,7 @@ For each directory in `src/libraries/`, `src/applications/`, `src/tools/`,
 - [ ] **Thread safety documented**: Classes that may be used from multiple
       threads state their guarantees explicitly
 
-### 12.3 Test Quality Criteria (Per Test File)
+### 13.3 Test Quality Criteria (Per Test File)
 
 Every test must satisfy **all** of these to pass review:
 
@@ -593,7 +791,7 @@ Every test must satisfy **all** of these to pass review:
 | **Deterministic** | Tests produce same result every run (seed RNGs, control floating-point env) | Random failures |
 | **Performance baseline** | Hot-path tests log execution time; regressions caught by CI | No timing measurement |
 
-### 12.4 Beauty Standards — What "Beautiful Code" Means for MNE-CPP
+### 13.4 Beauty Standards — What "Beautiful Code" Means for MNE-CPP
 
 The goal is code that a new contributor can read top-to-bottom and understand
 without referring to external documentation. Concretely:
@@ -620,7 +818,7 @@ without referring to external documentation. Concretely:
    Code should read like a reference implementation, not like an ad-hoc
    solution. See §12.4.1 for the pattern catalogue.
 
-#### 12.4.1 Architectural & Design Pattern Catalogue
+#### 13.4.1 Architectural & Design Pattern Catalogue
 
 We emphasize the use of well-known design patterns so that every structural
 choice is immediately recognizable and understandable — textbook-style.
@@ -658,7 +856,7 @@ Patterns are not decoration; they must serve clarity **and** performance.
    strategy produces the expected behavior change. If a class uses Builder,
    test that invalid build sequences are rejected.
 
-### 12.5 Periodic Audit Schedule
+### 13.5 Periodic Audit Schedule
 
 | Frequency | Scope | Method |
 |-----------|-------|--------|
@@ -668,9 +866,9 @@ Patterns are not decoration; they must serve clarity **and** performance.
 | **Quarterly** | Test quality deep-dive | Score every test against §12.3 criteria, identify weakest 10 |
 | **Annually** | Architecture review | Evaluate god classes, dependency graph, API surface stability |
 
-### 12.6 Metrics to Track
+### 13.6 Metrics to Track
 
-| Metric | Current (2026-04-13) | Target |
+| Metric | Current (2026-04-14) | Target |
 |--------|---------------------|--------|
 | Raw `new` outside Qt widgets | 120+ | 0 |
 | C-style casts | ~~40+~~ ~5 remaining in libraries | 0 |
@@ -679,6 +877,15 @@ Patterns are not decoration; they must serve clarity **and** performance.
 | `NULL` usage | ~~5+~~ ~2 remaining (apps only) | 0 |
 | `void*` parameters (non-external) | 12+ | 0 |
 | `typedef struct` | 5 active | 0 |
+| **`goto` statements** | **~236 in 19 files** | **0** |
+| **Missing `override`** | **~376** | **0** |
+| **`using namespace` in headers** | **~51** | **0** |
+| **Duplicated `FAIL`/`OK`** | **18 files** | **1 shared header** |
+| **Signed/unsigned mismatches** | **~984** | **0** |
+| **`Q_UNUSED` macros** | **~314** | **<50** |
+| **Plain `enum` (not `enum class`)** | **24** | **0** |
+| **`dynamic_cast`** | **~35** | **<10 (justified only)** |
+| **`[[nodiscard]]` adoption** | **17** | **200+** |
 | Weak tests (smoke-only) | ~40% | <5% |
 | Tests with Python cross-validation | 0 | 11 (see §10.4) |
 | Compiler warnings (non-external) | TBD | 0 |
@@ -686,7 +893,7 @@ Patterns are not decoration; they must serve clarity **and** performance.
 
 ---
 
-## 13. Progress Tracker
+## 14. Progress Tracker
 
 | Date | Changes | Author |
 |------|---------|--------|

@@ -170,7 +170,9 @@ public:
      * @param[out] lowpass     Lowpass filter cutoff frequency in Hz.
      * @param[out] chp         List of channel information structures, one per channel.
      * @param[out] trans       Device-to-head coordinate transformation.
-     * @param[out] start_time  Measurement start time (NULL if absent).
+     * @param[out] start_time  Measurement start time.  Populated from FIFF_MEAS_DATE
+     *                           if present; otherwise from the measurement ID time;
+     *                           otherwise zeroed.
      *
      * @return 0 on success, -1 on failure.
      */
@@ -183,7 +185,21 @@ public:
                               float *lowpass,
                               QList<FIFFLIB::FiffChInfo>& chp,
                               FIFFLIB::FiffCoordTrans& trans,
-                              FIFFLIB::FiffTime* *start_time);
+                              FIFFLIB::FiffTime& start_time);
+
+    /**
+     * @overload
+     * Overload that does not return the measurement start time.
+     */
+    static int get_meas_info (FIFFLIB::FiffStream::SPtr& stream,
+                              FIFFLIB::FiffDirNode::SPtr& node,
+                              std::unique_ptr<FIFFLIB::FiffId>& id,
+                              int *nchan,
+                              float *sfreq,
+                              float *highpass,
+                              float *lowpass,
+                              QList<FIFFLIB::FiffChInfo>& chp,
+                              FIFFLIB::FiffCoordTrans& trans);
 
     /**
      * Loads raw data information from a FIFF file.

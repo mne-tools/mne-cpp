@@ -175,17 +175,13 @@ private slots:
             float sfreq = 0, highpass = 0, lowpass = 0;
             QList<FiffChInfo> chInfo;
             FiffCoordTrans trans;
-            FiffTime* startTime = nullptr;
+            FiffTime startTime;
 
             int rc = MNERawInfo::get_meas_info(stream, meas, id, &nchan, &sfreq,
-                                               &highpass, &lowpass, chInfo, trans, &startTime);
+                                               &highpass, &lowpass, chInfo, trans, startTime);
             if(rc == 0) {
                 QVERIFY(nchan > 0);
                 QVERIFY(sfreq > 0);
-            }
-
-            if(startTime) {
-                delete startTime;
             }
         }
 

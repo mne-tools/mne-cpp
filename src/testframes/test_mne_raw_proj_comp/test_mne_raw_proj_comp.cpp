@@ -642,18 +642,15 @@ void TestMneRawProjComp::rawInfo_getMeasInfo()
     float sfreq = 0, highpass = 0, lowpass = 0;
     QList<FiffChInfo> chp;
     FiffCoordTrans trans;
-    FiffTime* start_time = nullptr;
+    FiffTime start_time;
 
     int result = MNERawInfo::get_meas_info(stream, rawNode, id, &nchan,
                                            &sfreq, &highpass, &lowpass,
-                                           chp, trans, &start_time);
+                                           chp, trans, start_time);
     QCOMPARE(result, 0);
     QVERIFY(nchan > 0);
     QVERIFY(sfreq > 0);
     QCOMPARE(chp.size(), nchan);
-    if (start_time) {
-        delete start_time;
-    }
 }
 
 //=============================================================================================================

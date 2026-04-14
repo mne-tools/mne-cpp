@@ -104,8 +104,9 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
     fiff_int_t kind, pos;
     int j,k,to_find;
 
-    if(!stream->open())
-        goto bad;
+    if(!stream->open()) {
+        stream->close(); return FIFF_FAIL;
+    }
 
     nodes = stream->dirtree()->dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
 
@@ -113,7 +114,7 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
         nodes = stream->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
         if (nodes.size() == 0) {
             qCritical ("Could not find the channel information.");
-            goto bad;
+            stream->close(); return FIFF_FAIL;
         }
     }
     info = nodes[0];
@@ -123,8 +124,9 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
         pos  = info->dir[k]->pos;
         switch (kind) {
         case FIFF_NCHAN :
-            if (!stream->read_tag(t_pTag,pos))
-                goto bad;
+            if (!stream->read_tag(t_pTag,pos)) {
+                stream->close(); return FIFF_FAIL;
+            }
             nchan = *t_pTag->toInt();
 
             for (j = 0; j < nchan; j++) {
@@ -135,14 +137,16 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
             break;
 
         case FIFF_PARENT_BLOCK_ID :
-            if(!stream->read_tag(t_pTag, pos))
-                goto bad;
+            if(!stream->read_tag(t_pTag, pos)) {
+                stream->close(); return FIFF_FAIL;
+            }
             id = std::make_unique<FiffId>(*(FiffId*)t_pTag->data());
             break;
 
         case FIFF_COORD_TRANS :
-            if(!stream->read_tag(t_pTag, pos))
-                goto bad;
+            if(!stream->read_tag(t_pTag, pos)) {
+                stream->close(); return FIFF_FAIL;
+            }
 //            t = t_pTag->toCoordTrans();
             t = FiffCoordTrans::readFromTag( t_pTag );
             if (t.from != FIFFV_COORD_DEVICE || t.to   != FIFFV_COORD_HEAD)
@@ -150,13 +154,14 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
             break;
 
         case FIFF_CH_INFO : /* Information about one channel */
-            if(!stream->read_tag(t_pTag, pos))
-                goto bad;
+            if(!stream->read_tag(t_pTag, pos)) {
+                stream->close(); return FIFF_FAIL;
+            }
 
             this_ch = t_pTag->toChInfo();
             if (this_ch.scanNo <= 0 || this_ch.scanNo > nchan) {
                 qCritical ("FIFF_CH_INFO : scan # out of range %d (%d)!",this_ch.scanNo,nchan);
-                goto bad;
+                stream->close(); return FIFF_FAIL;
             }
             else
                 chs[this_ch.scanNo-1] = this_ch;
@@ -166,7 +171,7 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
     }
     if (to_find != 0) {
         qCritical("Some of the channel information was missing.");
-        goto bad;
+        stream->close(); return FIFF_FAIL;
     }
     if (t.isEmpty() && meg_head_t != nullptr) {
         /*
@@ -175,7 +180,7 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
         t = FiffCoordTrans::readMeasTransform(name);
         if (t.isEmpty()) {
             qCritical("MEG -> head coordinate transformation not found.");
-            goto bad;
+            stream->close(); return FIFF_FAIL;
         }
     }
     /*
@@ -222,11 +227,6 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
         *meg_head_t = t;
 
     return FIFF_OK;
-
-bad : {
-        stream->close();
-        return FIFF_FAIL;
-    }
 }
 
 #define MNE_CTFV_COMP_UNKNOWN -1
@@ -449,7 +449,7 @@ std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
                                              nullptr,
                                              nullptr,
                                              nullptr) == FAIL)
-            goto bad;
+            return nullptr;
         if (ncompch > 0) {
             for (k = 0; k < ncompch; k++)
                 chs.append(comp_chs[k]);
@@ -459,18 +459,21 @@ std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
     /*
         * Read the rest of the stuff
         */
-    if(!stream->open())
-        goto bad;
+    if(!stream->open()) {
+        stream->close(); return nullptr;
+    }
     set = std::make_unique<MNECTFCompDataSet>();
     /*
         * Locate the compensation data sets
         */
     nodes = stream->dirtree()->dir_tree_find(FIFFB_MNE_CTF_COMP);
-    if (nodes.size() == 0)
-        goto good;      /* Nothing more to do */
+    if (nodes.size() == 0) {
+        stream->close(); return set;
+    }
     comps = nodes[0]->dir_tree_find(FIFFB_MNE_CTF_COMP_DATA);
-    if (comps.size() == 0)
-        goto good;
+    if (comps.size() == 0) {
+        stream->close(); return set;
+    }
     ncomp = comps.size();
     /*
         * Set the channel info
@@ -482,14 +485,16 @@ std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
         */
     for (k = 0; k < ncomp; k++) {
         auto mat = MNENamedMatrix::read(stream,comps[k],FIFF_MNE_CTF_COMP_DATA);
-        if (!mat)
-            goto bad;
+        if (!mat) {
+            stream->close(); return nullptr;
+        }
         comps[k]->find_tag(stream, FIFF_MNE_CTF_COMP_KIND, t_pTag);
         if (t_pTag) {
             kind = *t_pTag->toInt();
         }
-        else
-            goto bad;
+        else {
+            stream->close(); return nullptr;
+        }
         comps[k]->find_tag(stream, FIFF_MNE_CTF_COMP_CALIBRATED, t_pTag);
         if (t_pTag) {
             calibrated = *t_pTag->toInt();
@@ -516,17 +521,8 @@ std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
 #ifdef DEBUG
     qInfo("%d CTF compensation data sets read from %s\n",set->ncomp,name);
 #endif
-    goto good;
-
-bad : {
-        stream->close();
-        return nullptr;
-    }
-
-good : {
-        stream->close();
-        return set;
-    }
+    stream->close();
+    return set;
 }
 
 //=============================================================================================================
@@ -994,7 +990,7 @@ int MNECTFCompDataSet::set_compensation(int compensate_to,
         * Update the 'current' field to reflect the compensation possibly present in the data now
         */
     if (make_comp(chs,nchan,comp_chs,ncomp_chan) == FAIL)
-        goto bad;
+        return FAIL;
     /*
         * Are we there already?
         */
@@ -1014,17 +1010,14 @@ int MNECTFCompDataSet::set_compensation(int compensate_to,
             comp_was = undo->mne_kind;
         else
             comp_was = MNE_CTFV_NOGRAD;
-        if (make_comp(chs,nchan,comp_chs,ncomp_chan) == FAIL)
-            goto bad;
+        if (make_comp(chs,nchan,comp_chs,ncomp_chan) == FAIL) {
+            if (comp_was != MNE_CTFV_COMP_UNKNOWN)
+                set_comp(chs,nchan,comp_was);
+            return FAIL;
+        }
         qInfo("Compensation set up as requested (%s -> %s).\n",
                 explain_comp(map_comp_kind(comp_was)).toUtf8().constData(),
                 explain_comp(current->kind).toUtf8().constData());
     }
     return OK;
-
-bad : {
-        if (comp_was != MNE_CTFV_COMP_UNKNOWN)
-            set_comp(chs,nchan,comp_was);
-        return FAIL;
-    }
 }

@@ -256,7 +256,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
             if (sel[k] == -1) {
                 qCritical("All channels needed were not in the MEG/EEG data file "
                        "(first missing: %s).",names[k].toUtf8().constData());
-                goto out;
+                return nullptr;
             }
     }
     else {  /* Load all channels */
@@ -343,8 +343,10 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
                 new_data->proj->report(errStream, QStringLiteral("\t\t"));
             }
             new_data->comp = MNECTFCompDataSet::read(name);
-            if (!new_data->comp)
-                goto out;
+            if (!new_data->comp) {
+                delete new_data;
+                return nullptr;
+            }
             if (new_data->comp->ncomp > 0)
                 qInfo("\tRead %d compensation data sets from %s\n",new_data->comp->ncomp,name.toUtf8().data());
         }
@@ -412,11 +414,9 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
             add_to ? "Added" : "Loaded",
             new_data->sets[new_data->nset-1]->comment.toUtf8().constData() ? new_data->sets[new_data->nset-1]->comment.toUtf8().constData() : "unknown",name.toUtf8().data());
 
-out : {
-        if (res == nullptr && !add_to)
-            delete new_data;
-        return res;
-    }
+    if (res == nullptr && !add_to)
+        delete new_data;
+    return res;
 }
 
 //=============================================================================================================

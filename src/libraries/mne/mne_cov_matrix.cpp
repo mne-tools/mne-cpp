@@ -559,8 +559,11 @@ int MNECovMatrix::decompose_eigen_small(float p_small, int use_rank)
 
         lambda.resize(ncov);
         eigen.resize(ncov,ncov);
-        if (mne_decompose_eigen (cov,lambda,eigen,ncov) != 0)
-            goto bad;
+        if (mne_decompose_eigen (cov,lambda,eigen,ncov) != 0) {
+            lambda.resize(0);
+            eigen.resize(0,0);
+            return FAIL;
+        }
         nzero = ncov - rank;
         for (k = 0; k < nzero; k++)
             lambda[k] = 0.0;
@@ -589,12 +592,6 @@ int MNECovMatrix::decompose_eigen_small(float p_small, int use_rank)
         }
     }
     return add_inv();
-
-bad : {
-        lambda.resize(0);
-        eigen.resize(0,0);
-        return FAIL;
-    }
 }
 
 //=============================================================================================================

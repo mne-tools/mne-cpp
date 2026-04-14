@@ -130,10 +130,10 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
             */
         std::vector<std::unique_ptr<MNESourceSpace>> sp;
         if (MNESourceSpace::read_source_spaces(guessname,sp) == FAIL)
-            goto bad;
+            return;
         if (static_cast<int>(sp.size()) != 1) {
             qCritical("Incorrect number of source spaces in guess file");
-            goto bad;
+            return;
         }
         qInfo("Read guesses from %s\n",guessname.toUtf8().constData());
         guesses = std::move(sp[0]);
@@ -148,17 +148,17 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
         if (f->bem_model) {
             qInfo("Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
             if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == nullptr)
-                goto bad;
+                return;
         }
         else if (!guess_surfname.isEmpty()) {
             qInfo("Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
             if ((inner_skull = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,true)) == nullptr)
-                goto bad;
+                return;
             free_inner_skull = true;
         }
         guesses.reset((MNESourceSpace*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist).release());
         if (!guesses)
-            goto bad;
+            return;
         if (free_inner_skull)
             delete inner_skull;
     }
@@ -166,7 +166,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
         std::vector<std::unique_ptr<MNESourceSpace>> guesses_vec;
         guesses_vec.push_back(std::move(guesses));
         if (MNESourceSpace::transform_source_spaces_to(f->coord_frame,*f->mri_head_t,guesses_vec) != OK)
-            goto bad;
+            return;
         guesses = std::move(guesses_vec[0]);
     }
     qInfo("Guess locations are now in %s coordinates.\n",FiffCoordTrans::frame_name(f->coord_frame).toUtf8().constData());
@@ -194,7 +194,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
     for (k = 0; k < this->nguess; k++) {
         this->guess_fwd[k].reset(InvDipoleFitData::dipole_forward_one(f,Eigen::Vector3f(this->rr.row(k).transpose()),nullptr));
         if (!this->guess_fwd[k])
-            goto bad;
+            return;
 #ifdef DEBUG
         sing = this->guess_fwd[k]->sing;
         qInfo("%f %f %f\n",sing[0],sing[1],sing[2]);
@@ -206,11 +206,6 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
 
     return;
 //    return res;
-
-bad : {
-        return;
-//        return nullptr;
-    }
 }
 
 //=============================================================================================================
@@ -227,10 +222,10 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
          */
         std::vector<std::unique_ptr<MNESourceSpace>> sp;
         if (MNESourceSpace::read_source_spaces(guessname,sp) == FIFF_FAIL)
-            goto bad;
+            return;
         if (static_cast<int>(sp.size()) != 1) {
             qCritical("Incorrect number of source spaces in guess file");
-            goto bad;
+            return;
         }
         qInfo("Read guesses from %s\n",guessname.toUtf8().constData());
         guesses = std::move(sp[0]);
@@ -245,17 +240,17 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
         if (f->bem_model) {
             qInfo("Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
             if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == nullptr)
-                goto bad;
+                return;
         }
         else if (!guess_surfname.isEmpty()) {
             qInfo("Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
             if ((inner_skull = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,true)) == nullptr)
-                goto bad;
+                return;
             free_inner_skull = true;
         }
         guesses.reset((MNESourceSpace*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist).release());
         if (!guesses)
-            goto bad;
+            return;
         if (free_inner_skull)
             delete inner_skull;
     }
@@ -264,7 +259,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
        */
     if (guesses->nuse == 0) {
         qCritical("No active guess locations remaining.");
-        goto bad;
+        return;
     }
     if (guess_save_name) {
         qCritical("###################DEBUG writing source spaces not yet implemented.");
@@ -279,7 +274,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
         std::vector<std::unique_ptr<MNESourceSpace>> guesses_vec;
         guesses_vec.push_back(std::move(guesses));
         if (MNESourceSpace::transform_source_spaces_to(f->coord_frame,*f->mri_head_t,guesses_vec) != OK)
-            goto bad;
+            return;
         guesses = std::move(guesses_vec[0]);
     }
     qInfo("Guess locations are now in %s coordinates.\n",FiffCoordTrans::frame_name(f->coord_frame).toUtf8().constData());
@@ -298,13 +293,9 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
         * Compute the guesses using the sphere model for speed
         */
     if (!this->compute_guess_fields(f))
-        goto bad;
+        return;
 
     return;
-
-bad : {
-        return;
-    }
 }
 
 //=============================================================================================================

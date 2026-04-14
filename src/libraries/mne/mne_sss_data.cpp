@@ -146,33 +146,40 @@ MNESssData *MNESssData::read_from_node(QSharedPointer<FiffStream> &stream, const
         /*
             * Read the SSS information, require all tags to be present
             */
-        if (!node->find_tag(stream, FIFF_SSS_JOB, t_pTag))
-            goto bad;
+        if (!node->find_tag(stream, FIFF_SSS_JOB, t_pTag)) {
+            delete s; return nullptr;
+        }
         s->job = *t_pTag->toInt();
 
-        if (!node->find_tag(stream, FIFF_SSS_FRAME, t_pTag))
-            goto bad;
+        if (!node->find_tag(stream, FIFF_SSS_FRAME, t_pTag)) {
+            delete s; return nullptr;
+        }
         s->coord_frame = *t_pTag->toInt();
 
-        if (!node->find_tag(stream, FIFF_SSS_ORIGIN, t_pTag))
-            goto bad;
+        if (!node->find_tag(stream, FIFF_SSS_ORIGIN, t_pTag)) {
+            delete s; return nullptr;
+        }
         r0 = t_pTag->toFloat();
         VEC_COPY(s->origin,r0);
 
-        if (!node->find_tag(stream, FIFF_SSS_ORD_IN, t_pTag))
-            goto bad;
+        if (!node->find_tag(stream, FIFF_SSS_ORD_IN, t_pTag)) {
+            delete s; return nullptr;
+        }
         s->in_order = *t_pTag->toInt();
 
-        if (!node->find_tag(stream, FIFF_SSS_ORD_OUT, t_pTag))
-            goto bad;
+        if (!node->find_tag(stream, FIFF_SSS_ORD_OUT, t_pTag)) {
+            delete s; return nullptr;
+        }
         s->out_order = *t_pTag->toInt();
 
-        if (!node->find_tag(stream, FIFF_SSS_NMAG, t_pTag))
-            goto bad;
+        if (!node->find_tag(stream, FIFF_SSS_NMAG, t_pTag)) {
+            delete s; return nullptr;
+        }
         s->nchan = *t_pTag->toInt();
 
-        if (!node->find_tag(stream, FIFF_SSS_COMPONENTS, t_pTag))
-            goto bad;
+        if (!node->find_tag(stream, FIFF_SSS_COMPONENTS, t_pTag)) {
+            delete s; return nullptr;
+        }
         {
             int ncomp = t_pTag->size()/sizeof(fiff_int_t);
             int *raw  = t_pTag->toInt();
@@ -180,7 +187,7 @@ MNESssData *MNESssData::read_from_node(QSharedPointer<FiffStream> &stream, const
 
             if (ncomp != (s->in_order*(2+s->in_order) + s->out_order*(2+s->out_order))) {
                 qCritical("Number of SSS components does not match the expansion orders listed in the file");
-                goto bad;
+                delete s; return nullptr;
             }
         }
         /*
@@ -200,15 +207,6 @@ MNESssData *MNESssData::read_from_node(QSharedPointer<FiffStream> &stream, const
         * There it is!
         */
     return s;
-
-bad : {
-        /*
-            * Not entirely happy
-            */
-        if (s)
-            delete s;
-        return nullptr;
-    }
 }
 
 //=============================================================================================================

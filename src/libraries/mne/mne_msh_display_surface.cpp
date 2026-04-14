@@ -162,12 +162,12 @@ int MNEMshDisplaySurface::align_fiducials(FiffDigitizerData& head_dig,
     for (k = 0; k < 3; k++) {
         if (!head_fid_found[k]) {
             qCritical("Some of the MEG fiducials were missing");
-            goto bad;
+            return FAIL;
         }
 
         if (!mri_fid_found[k]) {
             qCritical("Some of the MRI fiducials were missing");
-            goto bad;
+            return FAIL;
         }
     }
 
@@ -202,7 +202,7 @@ int MNEMshDisplaySurface::align_fiducials(FiffDigitizerData& head_dig,
     if (niter > 0) {
         for (k = 0; k < niter; k++) {
             if (iterate_alignment_once(head_dig,nasion_weight,Eigen::Vector3f(mri_fid.row(1).transpose()),k == niter-1 && niter > 1) == FAIL)
-                goto bad;
+                return FAIL;
         }
 
         qInfo("%d / %d iterations done. RMS dist = %7.1f mm\n",k,niter,
@@ -212,9 +212,6 @@ int MNEMshDisplaySurface::align_fiducials(FiffDigitizerData& head_dig,
     }
 
     return OK;
-
-bad :
-    return FAIL;
 }
 
 //=============================================================================================================
@@ -243,7 +240,7 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
     }
 
     if (!UTILSLIB::Sphere::fit_sphere_to_points(dig_rr.topRows(ndig),simplex_size,r0,Rdig)){
-        goto out;
+        return;
     }
 
     qInfo("Polhemus : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[X_17],1000*r0[Y_17],1000*r0[Z_17],1000*Rdig);
@@ -265,16 +262,12 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
     }
 
     if (!UTILSLIB::Sphere::fit_sphere_to_points(head_rr.topRows(nhead),simplex_size,r0,Rscalp)) {
-        goto out;
+        return;
     }
 
     qInfo("Scalp : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[X_17],1000*r0[Y_17],1000*r0[Z_17],1000*Rscalp);
 
     scales[0] = scales[1] = scales[2] = Rdig/Rscalp;
-
-out : {
-        return;
-    }
 }
 
 //=============================================================================================================
@@ -402,7 +395,6 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
  * Find the best alignment of the coordinate frames
  */
 {
-    int   res       = FAIL;
     Eigen::MatrixXf rr_head(dig.npoint, 3);
     Eigen::MatrixXf rr_mri(dig.npoint, 3);
     Eigen::VectorXf w = Eigen::VectorXf::Zero(dig.npoint);
@@ -413,7 +405,7 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
 
     if (!dig.head_mri_t_adj) {
         qCritical()<<"Not adjusting the transformation";
-        goto out;
+        return FAIL;
     }
     /*
      * Calculate initial distances
@@ -447,14 +439,14 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
     }
     if (nactive < 3) {
         qCritical() << "Not enough points to do the alignment";
-        goto out;
+        return FAIL;
     }
     if ((t = FiffCoordTrans::procrustesAlign(FIFFV_COORD_HEAD, FIFFV_COORD_MRI,
                                                  rr_head.topRows(nactive),
                                                  rr_mri.topRows(nactive),
                                                  w.head(nactive),
                                                  max_diff)).isEmpty())
-        goto out;
+        return FAIL;
 
     if (dig.head_mri_t_adj)
         dig.head_mri_t_adj = std::make_unique<FiffCoordTrans>(t);
@@ -463,11 +455,7 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
      */
     dig.dist_valid = false;
     calculate_digitizer_distances(dig,false,!last_step);
-    res = OK;
-
-out : {
-        return res;
-    }
+    return OK;
 }
 
 //=============================================================================================================

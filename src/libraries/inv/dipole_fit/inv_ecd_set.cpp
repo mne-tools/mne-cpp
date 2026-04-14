@@ -239,7 +239,9 @@ bool InvEcdSet::save_dipoles_bdip(const QString& fileName)
             one_out.khi2            = swap_float(one.khi2);
             if (fwrite(&one_out,sizeof(bdipEcdRec),1,out) != 1) {
                 qCritical("Failed to write a dipole");
-                goto bad;
+                fclose(out);
+                QFile::remove(fileName);
+                return false;
             }
             nsave++;
         }
@@ -251,14 +253,6 @@ bool InvEcdSet::save_dipoles_bdip(const QString& fileName)
     }
     qInfo("Save %d dipoles in bdip format to %s\n",nsave,fileName.toUtf8().data());
     return true;
-
-bad : {
-        if (out) {
-            fclose(out);
-            QFile::remove(fileName);
-        }
-        return false;
-    }
 }
 
 //=============================================================================================================
@@ -292,18 +286,10 @@ bool InvEcdSet::save_dipoles_dip(const QString& fileName) const
     if (fclose(out) != 0) {
         out = nullptr;
         qInfo("%s", fileName.toUtf8().constData());
-        goto bad;
+        return false;
     }
     qInfo("Save %d dipoles in dip format to %s\n",nsave,fileName.toUtf8().data());
     return true;
-
-bad : {
-        if (out) {
-            fclose(out);
-            QFile::remove(fileName);
-        }
-        return false;
-    }
 }
 
 //=============================================================================================================

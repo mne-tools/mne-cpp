@@ -432,7 +432,7 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, bool ad
     MatrixXi tmp_triangles;
 
     if (!stream->open())
-        goto bad;
+        return nullptr;
 
     bems = stream->dirtree()->dir_tree_find(FIFFB_BEM);
     if (bems.size() > 0) {
@@ -444,7 +444,7 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, bool ad
     surfs = stream->dirtree()->dir_tree_find(FIFFB_BEM_SURF);
     if (surfs.size() == 0) {
         qCritical("No BEM surfaces found in %s", name.toUtf8().constData());
-        goto bad;
+        stream->close(); return nullptr;
     }
     if (which >= 0) {
         for (k = 0; k < surfs.size(); ++k) {
@@ -457,30 +457,34 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, bool ad
         }
         if (id != which) {
             qCritical("Desired surface not found in %s", name.toUtf8().constData());
-            goto bad;
+            stream->close(); return nullptr;
         }
     }
     else
         node = surfs[0];
 
-    if (!node->find_tag(stream, FIFF_BEM_SURF_NNODE, t_pTag))
-        goto bad;
+    if (!node->find_tag(stream, FIFF_BEM_SURF_NNODE, t_pTag)) {
+        stream->close(); return nullptr;
+    }
     nnode = *t_pTag->toInt();
 
-    if (!node->find_tag(stream, FIFF_BEM_SURF_NTRI, t_pTag))
-        goto bad;
+    if (!node->find_tag(stream, FIFF_BEM_SURF_NTRI, t_pTag)) {
+        stream->close(); return nullptr;
+    }
     ntri_count = *t_pTag->toInt();
 
-    if (!node->find_tag(stream, FIFF_BEM_SURF_NODES, t_pTag))
-        goto bad;
+    if (!node->find_tag(stream, FIFF_BEM_SURF_NODES, t_pTag)) {
+        stream->close(); return nullptr;
+    }
     tmp_nodes = t_pTag->toFloatMatrix().transpose();
 
     if (node->find_tag(stream, FIFF_BEM_SURF_NORMALS, t_pTag)) {
         tmp_node_normals = t_pTag->toFloatMatrix().transpose();
     }
 
-    if (!node->find_tag(stream, FIFF_BEM_SURF_TRIANGLES, t_pTag))
-        goto bad;
+    if (!node->find_tag(stream, FIFF_BEM_SURF_TRIANGLES, t_pTag)) {
+        stream->close(); return nullptr;
+    }
     tmp_triangles = t_pTag->toIntMatrix().transpose();
 
     if (node->find_tag(stream, FIFF_MNE_COORD_FRAME, t_pTag)) {
@@ -516,17 +520,20 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, bool ad
 
     if (add_geometry) {
         if (check_too_many_neighbors) {
-            if (s->add_geometry_info(s->nn.rows() == 0) != OK)
-                goto bad;
+            if (s->add_geometry_info(s->nn.rows() == 0) != OK) {
+                delete s; return nullptr;
+            }
         }
         else {
-            if (s->add_geometry_info2(s->nn.rows() == 0) != OK)
-                goto bad;
+            if (s->add_geometry_info2(s->nn.rows() == 0) != OK) {
+                delete s; return nullptr;
+            }
         }
     }
     else if (s->nn.rows() == 0) {
-        if (s->add_vertex_normals() != OK)
-            goto bad;
+        if (s->add_vertex_normals() != OK) {
+            delete s; return nullptr;
+        }
     }
     else
         s->add_triangle_data();
@@ -537,11 +544,4 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, bool ad
     sigma = sigmaLocal;
 
     return s;
-
-bad : {
-        stream->close();
-        if (s)
-            delete s;
-        return nullptr;
-    }
 }

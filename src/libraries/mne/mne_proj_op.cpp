@@ -301,7 +301,7 @@ MNEProjOp *MNEProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode
 
     if (!stream) {
         qCritical("File not open read_from_node");
-        goto bad;
+        return nullptr;
     }
 
     if (!start || start->isEmpty())
@@ -312,13 +312,13 @@ MNEProjOp *MNEProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode
     op = new MNEProjOp();
     proj = start_node->dir_tree_find(FIFFB_PROJ);
     if (proj.size() == 0 || proj[0]->isEmpty())   /* The caller must recognize an empty projection */
-        goto out;
+        return op;
     /*
         * Only the first projection block is recognized
         */
     items = proj[0]->dir_tree_find(FIFFB_PROJ_ITEM);
     if (items.size() == 0 || items[0]->isEmpty())   /* The caller must recognize an empty projection */
-        goto out;
+        return op;
     /*
         * Get a common number of channels
         */
@@ -366,38 +366,42 @@ MNEProjOp *MNEProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode
         }
         if (item_nchan <= 0) {
             qCritical("Number of channels incorrectly specified for one of the projection items.");
-            goto bad;
+            delete op; return nullptr;
         }
         /*
             * Take care of the channel names
             */
-        if (!node->find_tag(stream, FIFF_PROJ_ITEM_CH_NAME_LIST, t_pTag))
-            goto bad;
+        if (!node->find_tag(stream, FIFF_PROJ_ITEM_CH_NAME_LIST, t_pTag)) {
+            delete op; return nullptr;
+        }
 
         item_names = FiffStream::split_name_list(t_pTag->toString());
 
         if (item_names.size() != item_nchan) {
             qCritical("Channel name list incorrectly specified for proj item # %d",k+1);
             item_names.clear();
-            goto bad;
+            delete op; return nullptr;
         }
         /*
             * Kind of item
             */
-        if (!node->find_tag(stream, FIFF_PROJ_ITEM_KIND, t_pTag))
-            goto bad;
+        if (!node->find_tag(stream, FIFF_PROJ_ITEM_KIND, t_pTag)) {
+            delete op; return nullptr;
+        }
         item_kind = *t_pTag->toInt();
         /*
             * How many vectors
             */
-        if (!node->find_tag(stream,FIFF_PROJ_ITEM_NVEC, t_pTag))
-            goto bad;
+        if (!node->find_tag(stream,FIFF_PROJ_ITEM_NVEC, t_pTag)) {
+            delete op; return nullptr;
+        }
         item_nvec = *t_pTag->toInt();
         /*
             * The projection data
             */
-        if (!node->find_tag(stream,FIFF_PROJ_ITEM_VECTORS, t_pTag))
-            goto bad;
+        if (!node->find_tag(stream,FIFF_PROJ_ITEM_VECTORS, t_pTag)) {
+            delete op; return nullptr;
+        }
 
         MatrixXf item_vectors = t_pTag->toFloatMatrix().transpose();
 
@@ -418,14 +422,7 @@ MNEProjOp *MNEProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode
         op->items[op->nitems-1].active_file = item_active;
     }
 
-out :
     return op;
-
-bad : {
-        if(op)
-            delete op;
-        return nullptr;
-    }
 }
 
 //=============================================================================================================

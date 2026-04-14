@@ -390,12 +390,12 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
 //    if (fiff_read_this_tag(in->fd,ent->pos,&tag) ==  FIFF_FAIL)
 //        goto bad;
     if (!stream->read_tag(t_pTag,ent->pos))
-        goto bad;
+        return FAIL;
 
     if (ent->type == FIFFT_FLOAT) {
         if (static_cast<int>(t_pTag->size()/(sizeof(fiff_float_t)*nchan)) != nsamp) {
             qCritical("Incorrect number of samples in buffer.");
-            goto bad;
+            return FAIL;
         }
         qDebug() << "ToDo: Check whether this_samplef contains the right stuff!!! - use VectorXf instead";
         this_samplef = t_pTag->toFloat();
@@ -407,7 +407,7 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
     else if (ent->type == FIFFT_SHORT || ent->type == FIFFT_DAU_PACK16) {
         if (static_cast<int>(t_pTag->size()/(sizeof(fiff_short_t)*nchan)) != nsamp) {
             qCritical("Incorrect number of samples in buffer.");
-            goto bad;
+            return FAIL;
         }
         qDebug() << "ToDo: Check whether this_samples contains the right stuff!!! - use VectorXi instead";
         this_samples = (fiff_short_t *)t_pTag->data();
@@ -419,7 +419,7 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
     else if (ent->type == FIFFT_INT) {
         if (static_cast<int>(t_pTag->size()/(sizeof(fiff_int_t)*nchan)) != nsamp) {
             qCritical("Incorrect number of samples in buffer.");
-            goto bad;
+            return FAIL;
         }
         qDebug() << "ToDo: Check whether this_sample contains the right stuff!!! - use VectorXi instead";
         this_sample = t_pTag->toInt();
@@ -430,13 +430,9 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
     }
     else {
         qCritical("We are not prepared to handle raw data type: %d",ent->type);
-        goto bad;
-    }
-    return OK;
-
-bad : {
         return FAIL;
     }
+    return OK;
 }
 
 //============================= mne_process_bads.c =============================
@@ -740,7 +736,7 @@ int MNERawData::compensate_buffer(MNERawBufDef *buf)
              */
             if (comp->apply_transpose(false, dataMat) != OK) {
                 std::swap(comp->current, comp->undo);
-                goto bad;
+                return FAIL;
             }
             std::swap(comp->current, comp->undo);
         }
@@ -749,7 +745,7 @@ int MNERawData::compensate_buffer(MNERawBufDef *buf)
              * Apply new compensation
              */
             if (comp->apply_transpose(true, dataMat) != OK)
-                goto bad;
+                return FAIL;
         }
         /*
          * Copy result back to buf->vals
@@ -758,9 +754,6 @@ int MNERawData::compensate_buffer(MNERawBufDef *buf)
     }
     buf->comp_status = comp_now;
     return OK;
-
-bad :
-    return FAIL;
 }
 
 //=============================================================================================================
@@ -1115,10 +1108,10 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
          */
         if (comp && comp->current)
             if (comp->apply(true,dc) != OK)
-                goto bad;
+                return FAIL;
         if (proj)
             if (proj->project_vector(dc,true) != OK)
-                goto bad;
+                return FAIL;
     }
     filter_was = filter->filter_on;
     /*
@@ -1136,7 +1129,7 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
          * Load the buffer first and apply projection
          */
         if (load_one_filt_buf(this_buf) != OK)
-            goto bad;
+            return FAIL;
         /*
          * Then filter all relevant channels (not stimuli)
          */
@@ -1155,7 +1148,7 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
                         if (mne_apply_filter(*filter,filter_data.get(),this_buf->vals.row(sel->pick[c]).data(),this_buf->ns,true,
                                              dc_offset,info->chInfo[sel->pick[c]].kind) != OK) {
                             filter->filter_on = filter_was;
-                            goto bad;
+                            return FAIL;
                         }
                         this_buf->ch_filtered[sel->pick[c]] = true;
                         filter->filter_on = filter_was;
@@ -1181,7 +1174,7 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
                         if (mne_apply_filter(*filter,filter_data.get(),this_buf->vals.row(c).data(),this_buf->ns,true,
                                              dc_offset,info->chInfo[c].kind) != OK) {
                             filter->filter_on = filter_was;
-                            goto bad;
+                            return FAIL;
                         }
                         this_buf->ch_filtered[c] = true;
                         filter->filter_on = filter_was;
@@ -1206,7 +1199,7 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
                     if (mne_apply_filter(*filter,filter_data.get(),this_buf->vals.row(c).data(),this_buf->ns,true,
                                          dc_offset,info->chInfo[c].kind) != OK) {
                         filter->filter_on = filter_was;
-                        goto bad;
+                        return FAIL;
                     }
                     this_buf->ch_filtered[c] = true;
                     filter->filter_on = filter_was;
@@ -1250,7 +1243,7 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
                     deriv_ns    = this_buf->ns;
                 }
                 if (mne_sparse_mat_mult2(deriv_matched->deriv_data->data.get(),this_buf->vals,this_buf->ns,deriv_vals) == FAIL)
-                    goto bad;
+                    return FAIL;
             }
             for (c = 0; c < sel->nchan; c++) {
                 /*
@@ -1277,10 +1270,6 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
     }
     (void)bs2; // squash compiler warning, this is unused
     return OK;
-
-bad : {
-        return FAIL;
-    }
 }
 
 //=============================================================================================================
@@ -1312,7 +1301,7 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
     //    tag.data = NULL;
 
     if (MNERawInfo::load(name,allow_maxshield,info) == FAIL)
-        goto bad;
+        return nullptr;
 
     for (k = 0; k < info->nchan; k++) {
         ch = info->chInfo.at(k);
@@ -1334,7 +1323,7 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
     //    if ((in = fiff_open(name)) == NULL)
     //        goto bad;
     if(!stream->open())
-        goto bad;
+        return nullptr;
 
     data           = std::make_unique<MNERawData>();
     data->filename = name;
@@ -1349,7 +1338,7 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
         data->ch_names.append(data->info->chInfo[i].ch_name);
     if (data->ch_names.size() != data->info->nchan) {
         qCritical("Channel names were not translated correctly into a name list");
-        goto bad;
+        return nullptr;
     }
     /*
        * Compensation data
@@ -1364,7 +1353,7 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
     else
         qWarning() << "err_print_error()";
     if ((data->comp_file = MNECTFCompDataSet::get_comp(data->info->chInfo,data->info->nchan)) == FAIL)
-        goto bad;
+        return nullptr;
     qInfo("Compensation in file : %s\n",MNECTFCompDataSet::explain_comp(MNECTFCompDataSet::map_comp_kind(data->comp_file)).toUtf8().constData());
     if (comp_set < 0)
         data->comp_now = data->comp_file;
@@ -1374,14 +1363,14 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
     if (!data->comp) {
         if (data->comp_now != MNE_CTFV_NOGRAD) {
             qCritical("Cannot do compensation because compensation data are missing");
-            goto bad;
+            return nullptr;
         }
     } else if (data->comp->set_compensation(data->comp_now,
                                     data->info->chInfo,
                                     data->info->nchan,
                                     QList<FIFFLIB::FiffChInfo>(),
                                     0) == FAIL)
-        goto bad;
+        return nullptr;
     /*
        * SSS data
        */
@@ -1407,7 +1396,7 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
         //        if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
         //            goto bad;
         if (!stream->read_tag(t_pTag,dir0[current_dir0]->pos))
-            goto bad;
+            return nullptr;
         data->first_samp = *t_pTag->toInt();
         current_dir0++;
         ndir--;
@@ -1417,7 +1406,7 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
         //        if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
         //            goto bad;
         if (!stream->read_tag(t_pTag,dir0[current_dir0]->pos))
-            goto bad;
+            return nullptr;
         nsamp_skip = data->info->buf_size*(*t_pTag->toInt());
         qInfo("Data skip of %d samples in the beginning\n",nsamp_skip);
         current_dir0++;
@@ -1426,7 +1415,7 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
             //            if (fiff_read_this_tag(in->fd,dir0->pos,&tag) == FIFF_FAIL)
             //                goto bad;
             if (!stream->read_tag(t_pTag,dir0[current_dir0]->pos))
-                goto bad;
+                return nullptr;
             data->first_samp += *t_pTag->toInt();
             current_dir0++;
             ndir--;
@@ -1481,14 +1470,14 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
                 data->bufs[k].ns = dir->size/(data->info->nchan*sizeof(fiff_int_t));
             else {
                 qCritical("We are not prepared to handle raw data type: %d",dir->type);
-                goto bad;
+                return nullptr;
             }
         }
         else if (dir->kind == FIFF_DATA_SKIP) {
             //            if (fiff_read_this_tag(in->fd,dir->pos,&tag) == FIFF_FAIL)
             //                goto bad;
             if (!stream->read_tag(t_pTag,dir->pos))
-                goto bad;
+                return nullptr;
             data->bufs[k].ns = data->info->buf_size*(*t_pTag->toInt());
         }
         data->bufs[k].firsts = k == 0 ? data->first_samp : data->bufs[k-1].lasts + 1;
@@ -1541,7 +1530,7 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
         float **vals = vals_rows.data();
 
         if (data->pick_data(nullptr,data->first_samp,1,vals) == FAIL)
-            goto bad;
+            return nullptr;
         data->first_sample_val.resize(data->info->nchan);
         for (k = 0; k < data->info->nchan; k++)
             data->first_sample_val[k] = vals[k][0];
@@ -1554,10 +1543,6 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
     qInfo("\tlength = %-8.3f sec\n",data->nsamp/data->info->sfreq);
 
     return data.release();
-
-bad : {
-        return nullptr;
-    }
 }
 
 //=============================================================================================================
