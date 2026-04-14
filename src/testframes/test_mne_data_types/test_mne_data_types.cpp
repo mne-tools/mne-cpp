@@ -1066,10 +1066,9 @@ private slots:
         QCOMPARE(projOp.nitems, 1);
 
         // dup creates a deep copy
-        MNEProjOp* dup = projOp.dup();
+        auto dup = projOp.dup();
         QVERIFY(dup != nullptr);
         QCOMPARE(dup->nitems, 1);
-        delete dup;
     }
 
     void projOp_addItemActive()

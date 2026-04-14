@@ -140,7 +140,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
     }
     else {
         MNESurface*    inner_skull = nullptr;
-        int            free_inner_skull = false;
+        std::unique_ptr<MNESurface> inner_skull_owned;
         Eigen::Vector3f r0 = f->r0;
 
         Q_ASSERT(f->mri_head_t);
@@ -152,15 +152,14 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
         }
         else if (!guess_surfname.isEmpty()) {
             qInfo("Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
-            if ((inner_skull = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,true)) == nullptr)
+            inner_skull_owned = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,true);
+            if (!inner_skull_owned)
                 return;
-            free_inner_skull = true;
+            inner_skull = inner_skull_owned.get();
         }
-        guesses.reset((MNESourceSpace*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist).release());
+        guesses.reset(reinterpret_cast<MNESourceSpace*>(FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist).release()));
         if (!guesses)
             return;
-        if (free_inner_skull)
-            delete inner_skull;
     }
     {
         std::vector<std::unique_ptr<MNESourceSpace>> guesses_vec;
@@ -232,7 +231,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
     }
     else {
         MNESurface*     inner_skull = nullptr;
-        int            free_inner_skull = false;
+        std::unique_ptr<MNESurface> inner_skull_owned;
         Eigen::Vector3f r0 = f->r0;
 
         Q_ASSERT(f->mri_head_t);
@@ -244,15 +243,14 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
         }
         else if (!guess_surfname.isEmpty()) {
             qInfo("Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
-            if ((inner_skull = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,true)) == nullptr)
+            inner_skull_owned = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,true);
+            if (!inner_skull_owned)
                 return;
-            free_inner_skull = true;
+            inner_skull = inner_skull_owned.get();
         }
-        guesses.reset((MNESourceSpace*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist).release());
+        guesses.reset(reinterpret_cast<MNESourceSpace*>(FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist).release()));
         if (!guesses)
             return;
-        if (free_inner_skull)
-            delete inner_skull;
     }
     /*
        * Save the guesses for future use

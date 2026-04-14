@@ -159,7 +159,7 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::read(const QString& name, int kind)
     int             nnames     = 0;
     Eigen::VectorXd cov;
     Eigen::VectorXd cov_diag;
-    FiffSparseMatrix* cov_sparse = nullptr;
+    std::unique_ptr<FiffSparseMatrix> cov_sparse_owner;
     Eigen::VectorXd lambda;
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> eigen;
     MatrixXf        tmp_eigen;
@@ -270,12 +270,11 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::read(const QString& name, int kind)
             for (p = 0; p < nn; p++)
                 cov[p] = f[p];
         } else {
-            auto cov_sparse_uptr = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
-            if (!cov_sparse_uptr) {
+            cov_sparse_owner = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
+            if (!cov_sparse_owner) {
                 stream->close();
                 return nullptr;
             }
-            cov_sparse = cov_sparse_uptr.release();
         }
 
         if (nodes[k]->find_tag(stream, FIFF_MNE_COV_EIGENVALUES, t_pTag)) {
@@ -283,7 +282,6 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::read(const QString& name, int kind)
             lambda = Eigen::Map<const Eigen::VectorXd>(lambda_data, ncov);
             if (nodes[k]->find_tag(stream, FIFF_MNE_COV_EIGENVECTORS, t_pTag)) {
                 stream->close();
-                delete cov_sparse;
                 return nullptr;
             }
 
@@ -296,19 +294,17 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::read(const QString& name, int kind)
         /*
          * Read the optional projection operator
          */
-        op.reset(MNEProjOp::read_from_node(stream, nodes[k]));
+        op = MNEProjOp::read_from_node(stream, nodes[k]);
         if (!op) {
             stream->close();
-            delete cov_sparse;
             return nullptr;
         }
         /*
          * Read the optional SSS data
          */
-        sss.reset(MNESssData::read_from_node(stream, nodes[k]));
+        sss = MNESssData::read_from_node(stream, nodes[k]);
         if (!sss) {
             stream->close();
-            delete cov_sparse;
             return nullptr;
         }
         /*
@@ -317,8 +313,8 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::read(const QString& name, int kind)
         bads = stream->read_bad_channels(nodes[k]);
         nbad = bads.size();
     }
-    if (cov_sparse)
-        res = create_sparse(kind, ncov, names, cov_sparse);
+    if (cov_sparse_owner)
+        res = create_sparse(kind, ncov, names, cov_sparse_owner.release());
     else if (cov.size() > 0)
         res = create_dense(kind, ncov, names, cov);
     else if (cov_diag.size() > 0)
@@ -328,7 +324,6 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::read(const QString& name, int kind)
         stream->close();
         return nullptr;
     }
-    cov_sparse = nullptr;
     res->eigen  = std::move(eigen);
     res->lambda = std::move(lambda);
     res->nfree  = nfree;
@@ -370,7 +365,7 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::dup() const
     }
     res->bads = bads;
     res->nbad = nbad;
-    res->proj.reset(proj ? proj->dup() : nullptr);
+    res->proj = proj ? proj->dup() : nullptr;
     if (sss)
         res->sss = std::make_unique<MNESssData>(*sss);
 
@@ -818,8 +813,8 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::pick_chs_omit(const QStringList& new
 
     res->bads = bads;
     res->nbad = nbad;
-    res->proj.reset(proj ? proj->dup() : nullptr);
-    res->sss.reset(sss ? new MNESssData(*sss) : nullptr);
+    res->proj = proj ? proj->dup() : nullptr;
+    res->sss = sss ? std::make_unique<MNESssData>(*sss) : nullptr;
 
     if (ch_class.size() > 0) {
         res->ch_class.resize(res->ncov);

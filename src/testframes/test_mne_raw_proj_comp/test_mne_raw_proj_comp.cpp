@@ -312,7 +312,7 @@ void TestMneRawProjComp::sssData_readFromRawFile()
 {
 
     // SSS data may or may not be present in the test file
-    std::unique_ptr<MNESssData> sss(MNESssData::read(rawPath()));
+    auto sss = MNESssData::read(rawPath());
     // The test file is from Elekta Neuromag, should have SSS info
     // If NULL, that's also a valid result (no SSS data)
     if (sss) {
@@ -448,7 +448,7 @@ void TestMneRawProjComp::projOp_addItemAndDuplicate()
     QCOMPARE(proj.nitems, 1);
 
     // Duplicate
-    std::unique_ptr<MNEProjOp> dup(proj.dup());
+    auto dup = proj.dup();
     QVERIFY(dup != nullptr);
     QCOMPARE(dup->nitems, 1);
 }
@@ -456,7 +456,7 @@ void TestMneRawProjComp::projOp_addItemAndDuplicate()
 void TestMneRawProjComp::projOp_readFromFile()
 {
 
-    std::unique_ptr<MNEProjOp> proj(MNEProjOp::read(rawPath()));
+    auto proj = MNEProjOp::read(rawPath());
     QVERIFY(proj != nullptr);
     QVERIFY(proj->nitems > 0);  // Neuromag data should have SSP projectors
 }
@@ -464,7 +464,7 @@ void TestMneRawProjComp::projOp_readFromFile()
 void TestMneRawProjComp::projOp_assignChannelsAndMake()
 {
 
-    std::unique_ptr<MNEProjOp> proj(MNEProjOp::read(rawPath()));
+    auto proj = MNEProjOp::read(rawPath());
     QVERIFY(proj != nullptr);
 
     // Read channel names from the raw file
@@ -486,7 +486,7 @@ void TestMneRawProjComp::projOp_assignChannelsAndMake()
 void TestMneRawProjComp::projOp_affectChannels()
 {
 
-    std::unique_ptr<MNEProjOp> proj(MNEProjOp::read(rawPath()));
+    auto proj = MNEProjOp::read(rawPath());
     QVERIFY(proj != nullptr);
 
     QFile file(rawPath());
@@ -502,8 +502,8 @@ void TestMneRawProjComp::projOp_createAvgEegRef()
     QFile file(rawPath());
     FiffRawData rawData(file);
 
-    std::unique_ptr<MNEProjOp> eegRef(
-        MNEProjOp::create_average_eeg_ref(rawData.info.chs, rawData.info.nchan));
+    auto eegRef =
+        MNEProjOp::create_average_eeg_ref(rawData.info.chs, rawData.info.nchan);
     QVERIFY(eegRef != nullptr);
     QVERIFY(eegRef->nitems > 0);
 }
@@ -543,7 +543,7 @@ void TestMneRawProjComp::projOp_projectVector()
 void TestMneRawProjComp::projOp_report()
 {
 
-    std::unique_ptr<MNEProjOp> proj(MNEProjOp::read(rawPath()));
+    auto proj = MNEProjOp::read(rawPath());
     QVERIFY(proj != nullptr);
 
     QString output;

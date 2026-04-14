@@ -1607,19 +1607,18 @@ int MNESourceSpace::filter_source_spaces(float limit, const QString& bemfile, co
     QSharedPointer<MNESurface> surf;
     int             k;
     int             nproc = QThread::idealThreadCount();
-    FilterThreadArg* a;
     int nspace = static_cast<int>(spaces.size());
 
     if (bemfile.isEmpty())
         return OK;
 
     {
-        MNESurface* rawSurf = MNESurface::read_bem_surface(bemfile,FIFFV_BEM_SURF_ID_BRAIN,false);
+        auto rawSurf = MNESurface::read_bem_surface(bemfile,FIFFV_BEM_SURF_ID_BRAIN,false);
         if (!rawSurf) {
             qCritical("BEM model does not have the inner skull triangulation!");
             return FAIL;
         }
-        surf.reset(rawSurf);
+        surf.reset(rawSurf.release());
     }
     /*
      * How close are the source points to the surface?
@@ -1640,15 +1639,13 @@ int MNESourceSpace::filter_source_spaces(float limit, const QString& bemfile, co
         * This is the conventional calculation
         */
         for (k = 0; k < nspace; k++) {
-            a = new FilterThreadArg();
-            a->s = spaces[k].get();
-            a->mri_head_t = std::make_unique<FiffCoordTrans>(mri_head_t);
-            a->surf = surf;
-            a->limit = limit;
-            a->filtered = filtered;
-            filter_source_space(a);
-            if(a)
-                delete a;
+            auto a_ptr = std::make_unique<FilterThreadArg>();
+            a_ptr->s = spaces[k].get();
+            a_ptr->mri_head_t = std::make_unique<FiffCoordTrans>(mri_head_t);
+            a_ptr->surf = surf;
+            a_ptr->limit = limit;
+            a_ptr->filtered = filtered;
+            filter_source_space(a_ptr.get());
             spaces[k]->rearrange_source_space();
         }
     }
@@ -1656,16 +1653,18 @@ int MNESourceSpace::filter_source_spaces(float limit, const QString& bemfile, co
         /*
         * Calculate all (both) source spaces simultaneously
         */
-        QList<FilterThreadArg*> args;//filterThreadArg *args = MALLOC_17(nspace,filterThreadArg);
+        QList<FilterThreadArg*> args;
 
+        std::vector<std::unique_ptr<FilterThreadArg>> arg_owners;
         for (k = 0; k < nspace; k++) {
-            a = new FilterThreadArg();
-            a->s = spaces[k].get();
-            a->mri_head_t = std::make_unique<FiffCoordTrans>(mri_head_t);
-            a->surf = surf;
-            a->limit = limit;
-            a->filtered = filtered;
-            args.append(a);
+            auto a_ptr = std::make_unique<FilterThreadArg>();
+            a_ptr->s = spaces[k].get();
+            a_ptr->mri_head_t = std::make_unique<FiffCoordTrans>(mri_head_t);
+            a_ptr->surf = surf;
+            a_ptr->limit = limit;
+            a_ptr->filtered = filtered;
+            args.append(a_ptr.get());
+            arg_owners.push_back(std::move(a_ptr));
         }
         /*
         * Ready to start the threads & Wait for them to complete
@@ -1674,8 +1673,6 @@ int MNESourceSpace::filter_source_spaces(float limit, const QString& bemfile, co
 
         for (k = 0; k < nspace; k++) {
             spaces[k]->rearrange_source_space();
-            if(args[k])
-                delete args[k];
         }
     }
     qInfo("Thank you for waiting.\n\n");

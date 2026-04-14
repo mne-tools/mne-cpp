@@ -113,12 +113,12 @@ MNESssData::~MNESssData() = default;
 
 //=============================================================================================================
 
-MNESssData *MNESssData::read(const QString &name)
+std::unique_ptr<MNESssData> MNESssData::read(const QString &name)
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
 
-    MNESssData* s  = nullptr;
+    std::unique_ptr<MNESssData> s;
 
     if(stream->open())
         s = read_from_node(stream,stream->dirtree());
@@ -129,9 +129,9 @@ MNESssData *MNESssData::read(const QString &name)
 
 //=============================================================================================================
 
-MNESssData *MNESssData::read_from_node(QSharedPointer<FiffStream> &stream, const QSharedPointer<FiffDirNode> &start)
+std::unique_ptr<MNESssData> MNESssData::read_from_node(QSharedPointer<FiffStream> &stream, const QSharedPointer<FiffDirNode> &start)
 {
-    MNESssData* s  = new MNESssData();
+    auto s = std::make_unique<MNESssData>();
     QList<FiffDirNode::SPtr> sss;
     FiffDirNode::SPtr node;
     FiffTag::UPtr t_pTag;
@@ -147,38 +147,38 @@ MNESssData *MNESssData::read_from_node(QSharedPointer<FiffStream> &stream, const
             * Read the SSS information, require all tags to be present
             */
         if (!node->find_tag(stream, FIFF_SSS_JOB, t_pTag)) {
-            delete s; return nullptr;
+            return nullptr;
         }
         s->job = *t_pTag->toInt();
 
         if (!node->find_tag(stream, FIFF_SSS_FRAME, t_pTag)) {
-            delete s; return nullptr;
+            return nullptr;
         }
         s->coord_frame = *t_pTag->toInt();
 
         if (!node->find_tag(stream, FIFF_SSS_ORIGIN, t_pTag)) {
-            delete s; return nullptr;
+            return nullptr;
         }
         r0 = t_pTag->toFloat();
         VEC_COPY(s->origin,r0);
 
         if (!node->find_tag(stream, FIFF_SSS_ORD_IN, t_pTag)) {
-            delete s; return nullptr;
+            return nullptr;
         }
         s->in_order = *t_pTag->toInt();
 
         if (!node->find_tag(stream, FIFF_SSS_ORD_OUT, t_pTag)) {
-            delete s; return nullptr;
+            return nullptr;
         }
         s->out_order = *t_pTag->toInt();
 
         if (!node->find_tag(stream, FIFF_SSS_NMAG, t_pTag)) {
-            delete s; return nullptr;
+            return nullptr;
         }
         s->nchan = *t_pTag->toInt();
 
         if (!node->find_tag(stream, FIFF_SSS_COMPONENTS, t_pTag)) {
-            delete s; return nullptr;
+            return nullptr;
         }
         {
             int ncomp = t_pTag->size()/sizeof(fiff_int_t);
@@ -187,7 +187,7 @@ MNESssData *MNESssData::read_from_node(QSharedPointer<FiffStream> &stream, const
 
             if (ncomp != (s->in_order*(2+s->in_order) + s->out_order*(2+s->out_order))) {
                 qCritical("Number of SSS components does not match the expansion orders listed in the file");
-                delete s; return nullptr;
+                return nullptr;
             }
         }
         /*

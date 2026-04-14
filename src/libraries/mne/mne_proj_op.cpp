@@ -169,12 +169,12 @@ void MNEProjOp::add_item(const MNENamedMatrix *vecs, int kind, const QString& de
 
 //=============================================================================================================
 
-MNEProjOp *MNEProjOp::dup() const
+std::unique_ptr<MNEProjOp> MNEProjOp::dup() const
 /*
  * Provide a duplicate (item data only)
  */
 {
-    MNEProjOp* res = new MNEProjOp();
+    auto res = std::make_unique<MNEProjOp>();
 
     for (int k = 0; k < nitems; k++) {
         const auto& it = items[k];
@@ -186,7 +186,7 @@ MNEProjOp *MNEProjOp::dup() const
 
 //=============================================================================================================
 
-MNEProjOp *MNEProjOp::create_average_eeg_ref(const QList<FiffChInfo>& chs, int nch)
+std::unique_ptr<MNEProjOp> MNEProjOp::create_average_eeg_ref(const QList<FiffChInfo>& chs, int nch)
 /*
      * Make the projection operator for average electrode reference
      */
@@ -194,7 +194,6 @@ MNEProjOp *MNEProjOp::create_average_eeg_ref(const QList<FiffChInfo>& chs, int n
     int eegcount = 0;
     int k;
     QStringList     names;
-    MNEProjOp*      op;
 
     for (k = 0; k < nch; k++)
         if (chs.at(k).kind == FIFFV_EEG_CH)
@@ -213,7 +212,7 @@ MNEProjOp *MNEProjOp::create_average_eeg_ref(const QList<FiffChInfo>& chs, int n
     QStringList emptyList;
     auto vecs = MNENamedMatrix::build(1,eegcount,emptyList,names,vec_data);
 
-    op = new MNEProjOp();
+    auto op = std::make_unique<MNEProjOp>();
     op->add_item(vecs.get(),FIFFV_MNE_PROJ_ITEM_EEG_AVREF,"Average EEG reference");
 
     return op;
@@ -280,12 +279,11 @@ int MNEProjOp::project_vector(Eigen::Ref<Eigen::VectorXf> vec, bool do_complemen
 
 //=============================================================================================================
 
-MNEProjOp *MNEProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode::SPtr &start)
+std::unique_ptr<MNEProjOp> MNEProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode::SPtr &start)
 /*
      * Load all the linear projection data
      */
 {
-    MNEProjOp*   op     = nullptr;
     QList<FiffDirNode::SPtr> proj;
     FiffDirNode::SPtr start_node;
     QList<FiffDirNode::SPtr> items;
@@ -309,7 +307,7 @@ MNEProjOp *MNEProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode
     else
         start_node = start;
 
-    op = new MNEProjOp();
+    auto op = std::make_unique<MNEProjOp>();
     proj = start_node->dir_tree_find(FIFFB_PROJ);
     if (proj.size() == 0 || proj[0]->isEmpty())   /* The caller must recognize an empty projection */
         return op;
@@ -366,13 +364,13 @@ MNEProjOp *MNEProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode
         }
         if (item_nchan <= 0) {
             qCritical("Number of channels incorrectly specified for one of the projection items.");
-            delete op; return nullptr;
+            return nullptr;
         }
         /*
             * Take care of the channel names
             */
         if (!node->find_tag(stream, FIFF_PROJ_ITEM_CH_NAME_LIST, t_pTag)) {
-            delete op; return nullptr;
+            return nullptr;
         }
 
         item_names = FiffStream::split_name_list(t_pTag->toString());
@@ -380,27 +378,27 @@ MNEProjOp *MNEProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode
         if (item_names.size() != item_nchan) {
             qCritical("Channel name list incorrectly specified for proj item # %d",k+1);
             item_names.clear();
-            delete op; return nullptr;
+            return nullptr;
         }
         /*
             * Kind of item
             */
         if (!node->find_tag(stream, FIFF_PROJ_ITEM_KIND, t_pTag)) {
-            delete op; return nullptr;
+            return nullptr;
         }
         item_kind = *t_pTag->toInt();
         /*
             * How many vectors
             */
         if (!node->find_tag(stream,FIFF_PROJ_ITEM_NVEC, t_pTag)) {
-            delete op; return nullptr;
+            return nullptr;
         }
         item_nvec = *t_pTag->toInt();
         /*
             * The projection data
             */
         if (!node->find_tag(stream,FIFF_PROJ_ITEM_VECTORS, t_pTag)) {
-            delete op; return nullptr;
+            return nullptr;
         }
 
         MatrixXf item_vectors = t_pTag->toFloatMatrix().transpose();
@@ -427,7 +425,7 @@ MNEProjOp *MNEProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode
 
 //=============================================================================================================
 
-MNEProjOp *MNEProjOp::read(const QString &name)
+std::unique_ptr<MNEProjOp> MNEProjOp::read(const QString &name)
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
@@ -435,10 +433,8 @@ MNEProjOp *MNEProjOp::read(const QString &name)
     if(!stream->open())
         return nullptr;
 
-    MNEProjOp*  res = nullptr;
-
     FiffDirNode::SPtr t_default;
-    res = read_from_node(stream,t_default);
+    auto res = read_from_node(stream,t_default);
 
     stream->close();
 

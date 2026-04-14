@@ -44,6 +44,12 @@
 #include "mne_global.h"
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
@@ -116,7 +122,7 @@ public:
      *
      * @return   The read SSS data.
      */
-    static MNESssData *read(const QString& name);
+    static std::unique_ptr<MNESssData> read(const QString& name);
 
     //=========================================================================================================
     /**
@@ -128,7 +134,7 @@ public:
      *
      * @return   The read SSS data.
      */
-    static MNESssData* read_from_node( QSharedPointer<FIFFLIB::FiffStream>& stream, const QSharedPointer<FIFFLIB::FiffDirNode>& start );
+    static std::unique_ptr<MNESssData> read_from_node( QSharedPointer<FIFFLIB::FiffStream>& stream, const QSharedPointer<FIFFLIB::FiffDirNode>& start );
 
     //=========================================================================================================
     /**

@@ -328,7 +328,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
         new_data->op  = op;		/* Attach inverse operator */
         new_data->fwd = fwd;		/* ...or a fwd operator */
         if (op) {			/* Attach the projection operator and CTF compensation info to the data, too */
-            new_data->proj.reset(MNEProjOp::read(name));
+            new_data->proj = MNEProjOp::read(name);
             if (new_data->proj && new_data->proj->nitems > 0) {
                 qInfo("\tLoaded projection from %s:\n",name.toUtf8().data());
                 QTextStream errStream(stderr);
@@ -336,7 +336,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
             }
         }
         else {
-            new_data->proj.reset(MNEProjOp::read(name));
+            new_data->proj = MNEProjOp::read(name);
             if (new_data->proj && new_data->proj->nitems > 0) {
                 qInfo("\tLoaded projection from %s:\n",name.toUtf8().data());
                 QTextStream errStream(stderr);

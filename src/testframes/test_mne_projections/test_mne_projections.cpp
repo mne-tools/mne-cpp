@@ -166,7 +166,7 @@ private slots:
         MNENamedMatrix nm(*nm_ptr);
         op.add_item(&nm, 1, "Vec set");
 
-        std::unique_ptr<MNEProjOp> dup(op.dup());
+        auto dup = op.dup();
         QVERIFY(dup != nullptr);
         QCOMPARE(dup->nitems, 1);
         QCOMPARE(dup->items[0].desc, QString("Vec set"));
@@ -339,7 +339,7 @@ private slots:
             chs.append(ch);
         }
 
-        std::unique_ptr<MNEProjOp> projOp(MNEProjOp::create_average_eeg_ref(chs, chs.size()));
+        auto projOp = MNEProjOp::create_average_eeg_ref(chs, chs.size());
         QVERIFY(projOp != nullptr);
         QVERIFY(projOp->nitems > 0);
     }

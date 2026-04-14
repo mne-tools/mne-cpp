@@ -302,21 +302,19 @@ FwdBemModel::UPtr FwdBemModel::fwd_bem_load_surfaces(const QString &name, const 
 
     for (k = 0; k < nkind; k++) {
         float cond = -1.0f;
-        MNESurface* s = MNESurface::read_bem_surface(name,kinds[k],true,cond);
-        if (s == nullptr)
+        auto s = MNESurface::read_bem_surface(name,kinds[k],true,cond);
+        if (!s)
             return nullptr;
         if (cond < 0.0) {
             qCritical("No conductivity available for surface %s",fwd_bem_explain_surface(kinds[k]).toUtf8().constData());
-            delete s;
             return nullptr;
         }
         if (s->coord_frame != FIFFV_COORD_MRI) {
             qCritical("FsSurface %s not specified in MRI coordinates.",fwd_bem_explain_surface(kinds[k]).toUtf8().constData());
-            delete s;
             return nullptr;
         }
         sigma_tmp[k] = cond;
-        surfs.push_back(std::shared_ptr<MNESurface>(s));
+        surfs.push_back(std::move(s));
     }
     auto m = std::make_unique<FwdBemModel>();
 
@@ -509,18 +507,17 @@ MNESurface::UPtr FwdBemModel::make_guesses(MNESurface* guess_surf, float guessra
 
         bemname = bemFile.fileName();
 
-        MNESurface* sphere = MNESurface::read_bem_surface(bemname,9003,false);
-        if (!sphere)
+        sphere_owner = MNESurface::read_bem_surface(bemname,9003,false);
+        if (!sphere_owner)
             return res;
-        sphere_owner.reset(sphere);
 
-        for (k = 0; k < sphere->np; k++) {
-            dist = sphere->point(k).norm();
-            sphere->rr.row(k) = (guessrad * sphere->rr.row(k) / dist) + guess_r0.transpose();
+        for (k = 0; k < sphere_owner->np; k++) {
+            dist = sphere_owner->point(k).norm();
+            sphere_owner->rr.row(k) = (guessrad * sphere_owner->rr.row(k) / dist) + guess_r0.transpose();
         }
-        if (sphere->add_geometry_info(true) == FAIL)
+        if (sphere_owner->add_geometry_info(true) == FAIL)
             return res;
-        guess_surf = sphere;
+        guess_surf = sphere_owner.get();
     }
     else {
         qInfo("Guess surface (%d = %s) is in %s coordinates",

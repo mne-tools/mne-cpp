@@ -233,7 +233,7 @@ public:
      * @param[in]  add_geometry   If true, compute full geometry info.
      * @return The loaded surface, or nullptr on failure. Caller takes ownership.
      */
-    static MNESurface* read_bem_surface(const QString& name, int which,
+    static std::unique_ptr<MNESurface> read_bem_surface(const QString& name, int which,
                                         bool add_geometry);
 
     /**
@@ -245,7 +245,7 @@ public:
      * @param[out] sigma          Receives the surface conductivity.
      * @return The loaded surface, or nullptr on failure. Caller takes ownership.
      */
-    static MNESurface* read_bem_surface(const QString& name, int which,
+    static std::unique_ptr<MNESurface> read_bem_surface(const QString& name, int which,
                                         bool add_geometry, float& sigma);
 
     /**
@@ -256,7 +256,7 @@ public:
      * @param[in]  add_geometry   If true, compute full geometry info.
      * @return The loaded surface, or nullptr on failure. Caller takes ownership.
      */
-    static MNESurface* read_bem_surface2(const QString& name, int which,
+    static std::unique_ptr<MNESurface> read_bem_surface2(const QString& name, int which,
                                          bool add_geometry);
 
     /**
@@ -269,7 +269,7 @@ public:
      * @param[in]  check_too_many_neighbors  Fail on excess neighbor count.
      * @return The loaded surface, or nullptr on failure. Caller takes ownership.
      */
-    static MNESurface* read_bem_surface(const QString& name, int which,
+    static std::unique_ptr<MNESurface> read_bem_surface(const QString& name, int which,
                                         bool add_geometry, float& sigma,
                                         bool check_too_many_neighbors);
 };

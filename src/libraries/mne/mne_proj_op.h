@@ -153,7 +153,7 @@ public:
      *
      * @return A newly allocated copy. Caller takes ownership.
      */
-    MNEProjOp* dup() const;
+    std::unique_ptr<MNEProjOp> dup() const;
 
     /**
      * @brief Create an average EEG reference projector.
@@ -167,7 +167,7 @@ public:
      * @return A new projection operator, or NULL if no EEG channels are found.
      *         Caller takes ownership.
      */
-    static MNEProjOp* create_average_eeg_ref(const QList<FIFFLIB::FiffChInfo>& chs, int nch);
+    static std::unique_ptr<MNEProjOp> create_average_eeg_ref(const QList<FIFFLIB::FiffChInfo>& chs, int nch);
 
     /**
      * Count how many active projection vectors affect a given list of
@@ -216,7 +216,7 @@ public:
      * @return A populated projection operator (possibly with zero items),
      *         or NULL on error. Caller takes ownership.
      */
-    static MNEProjOp* read_from_node(FIFFLIB::FiffStream::SPtr& stream,
+    static std::unique_ptr<MNEProjOp> read_from_node(FIFFLIB::FiffStream::SPtr& stream,
                                      const FIFFLIB::FiffDirNode::SPtr& start);
 
     /**
@@ -228,7 +228,7 @@ public:
      * @return The loaded projection operator, or NULL on error.
      *         Caller takes ownership.
      */
-    static MNEProjOp* read(const QString& name);
+    static std::unique_ptr<MNEProjOp> read(const QString& name);
 
     /**
      * @brief Load and combine SSP projection operators from files for the selected channels.

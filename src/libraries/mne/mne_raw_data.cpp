@@ -1374,7 +1374,7 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
     /*
        * SSS data
        */
-    data->sss.reset(MNESssData::read(data->filename));
+    data->sss = MNESssData::read(data->filename);
     if (data->sss && data->sss->job != FIFFV_SSS_JOB_NOTHING && data->sss->comp_info.size() > 0) {
         qInfo("SSS data read from %s :\n",data->filename.toUtf8().constData());
         QTextStream errStream(stderr);

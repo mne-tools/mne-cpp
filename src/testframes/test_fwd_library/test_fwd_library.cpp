@@ -369,7 +369,7 @@ void TestFwdLibrary::bemModel_solidAngles()
     if (!QFile::exists(icosPath))
         QSKIP("icos.fif not found");
 
-    MNESurface* sphere = MNESurface::read_bem_surface(icosPath, 9003, false);
+    auto sphere = MNESurface::read_bem_surface(icosPath, 9003, false);
     QVERIFY(sphere != nullptr);
     QVERIFY(sphere->ntri > 0);
 
@@ -384,14 +384,12 @@ void TestFwdLibrary::bemModel_solidAngles()
 
     // Build a small surface list for solid angles
     std::vector<MNESurface*> surfs;
-    surfs.push_back(sphere);
+    surfs.push_back(sphere.get());
 
     Eigen::MatrixXf solids = FwdBemModel::fwd_bem_solid_angles(surfs);
     QCOMPARE(solids.rows(), sphere->ntri);
     QCOMPARE(solids.cols(), sphere->ntri);
     QVERIFY(solids.allFinite());
-
-    delete sphere;
 }
 
 void TestFwdLibrary::bemModel_linPotCoeff()
@@ -419,12 +417,10 @@ void TestFwdLibrary::bemModel_freeSolution()
     if (!QFile::exists(icosPath))
         QSKIP("icos.fif not found");
 
-    MNESurface* sphere = MNESurface::read_bem_surface(icosPath, 9003, false);
+    auto sphere = MNESurface::read_bem_surface(icosPath, 9003, false);
     QVERIFY(sphere != nullptr);
     QVERIFY(sphere->ntri > 0);
     QVERIFY(sphere->np > 0);
-
-    delete sphere;
 }
 
 void TestFwdLibrary::bemModel_makeGuesses()

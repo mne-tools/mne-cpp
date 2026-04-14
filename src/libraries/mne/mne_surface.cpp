@@ -295,7 +295,7 @@ void MNESurface::find_closest_on_surface_approx(const PointsT& r, int np_points,
                                                  Eigen::VectorXi& nearest_tri,
                                                  Eigen::VectorXf& dist, int nstep) const
 {
-    MNEProjData* p = new MNEProjData(this);
+    auto p = std::make_unique<MNEProjData>(this);
     int k, was;
 
     qInfo("%s for %d points %d steps...", nearest_tri[0] < 0 ? "Closest" : "Approx closest", np_points, nstep);
@@ -304,16 +304,15 @@ void MNESurface::find_closest_on_surface_approx(const PointsT& r, int np_points,
         was = nearest_tri[k];
         Eigen::Vector3f pt = Eigen::Map<const Eigen::Vector3f>(r.row(k).data());
         decide_search_restriction(*p, nearest_tri[k], nstep, pt);
-        nearest_tri[k] = project_to_surface(p, pt, dist[k]);
+        nearest_tri[k] = project_to_surface(p.get(), pt, dist[k]);
         if (nearest_tri[k] < 0) {
             decide_search_restriction(*p, -1, nstep, pt);
-            nearest_tri[k] = project_to_surface(p, pt, dist[k]);
+            nearest_tri[k] = project_to_surface(p.get(), pt, dist[k]);
         }
     }
     (void)was;
 
     qInfo("[done]\n");
-    delete p;
 }
 
 //=============================================================================================================
@@ -388,7 +387,7 @@ void MNESurface::activate_neighbors(int start, Eigen::VectorXi &act, int nstep) 
 // Static factory methods
 //=============================================================================================================
 
-MNESurface* MNESurface::read_bem_surface(const QString& name, int which, bool add_geometry)
+std::unique_ptr<MNESurface> MNESurface::read_bem_surface(const QString& name, int which, bool add_geometry)
 {
     float sigma;
     return read_bem_surface(name, which, add_geometry, sigma, true);
@@ -396,14 +395,14 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, bool ad
 
 //=============================================================================================================
 
-MNESurface* MNESurface::read_bem_surface(const QString& name, int which, bool add_geometry, float& sigma)
+std::unique_ptr<MNESurface> MNESurface::read_bem_surface(const QString& name, int which, bool add_geometry, float& sigma)
 {
     return read_bem_surface(name, which, add_geometry, sigma, true);
 }
 
 //=============================================================================================================
 
-MNESurface* MNESurface::read_bem_surface2(const QString& name, int which, bool add_geometry)
+std::unique_ptr<MNESurface> MNESurface::read_bem_surface2(const QString& name, int which, bool add_geometry)
 {
     float sigma;
     return read_bem_surface(name, which, add_geometry, sigma, false);
@@ -411,7 +410,7 @@ MNESurface* MNESurface::read_bem_surface2(const QString& name, int which, bool a
 
 //=============================================================================================================
 
-MNESurface* MNESurface::read_bem_surface(const QString& name, int which, bool add_geometry, float& sigma, bool check_too_many_neighbors)
+std::unique_ptr<MNESurface> MNESurface::read_bem_surface(const QString& name, int which, bool add_geometry, float& sigma, bool check_too_many_neighbors)
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
@@ -424,6 +423,7 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, bool ad
     int     id = -1;
     int     nnode, ntri_count;
     MNESurface* s = nullptr;
+    std::unique_ptr<MNESurface> s_ptr;
     int k;
     MatrixXf tmp_node_normals;
     int coord_frame = FIFFV_COORD_MRI;
@@ -499,7 +499,8 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, bool ad
 
     stream->close();
 
-    s = new MNESurface();
+    s_ptr = std::make_unique<MNESurface>();
+    s = s_ptr.get();
     tmp_triangles.array() -= 1;
     s->itris       = tmp_triangles;
     s->id          = which;
@@ -521,18 +522,18 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, bool ad
     if (add_geometry) {
         if (check_too_many_neighbors) {
             if (s->add_geometry_info(s->nn.rows() == 0) != OK) {
-                delete s; return nullptr;
+                return nullptr;
             }
         }
         else {
             if (s->add_geometry_info2(s->nn.rows() == 0) != OK) {
-                delete s; return nullptr;
+                return nullptr;
             }
         }
     }
     else if (s->nn.rows() == 0) {
         if (s->add_vertex_normals() != OK) {
-            delete s; return nullptr;
+            return nullptr;
         }
     }
     else
@@ -543,5 +544,5 @@ MNESurface* MNESurface::read_bem_surface(const QString& name, int which, bool ad
     s->vertno = Eigen::VectorXi::LinSpaced(s->np, 0, s->np - 1);
     sigma = sigmaLocal;
 
-    return s;
+    return s_ptr;
 }

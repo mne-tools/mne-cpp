@@ -501,10 +501,9 @@ private slots:
         auto nm = MNENamedMatrix::build(1, 2, rows, cols, data);
         op.add_item(nm.get(), 1, "test");
 
-        MNEProjOp* dup = op.dup();
+        auto dup = op.dup();
         QVERIFY(dup != nullptr);
         QCOMPARE(dup->nitems, 1);
-        delete dup;
     }
 
     void projOp_freeProj()
