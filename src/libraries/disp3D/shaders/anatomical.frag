@@ -7,7 +7,6 @@ layout(location = 3) in vec3 v_viewDir;
 layout(location = 4) in float v_curvature;
 layout(location = 5) in vec3 v_annotColor;
 layout(location = 6) in float v_surfaceId;
-layout(location = 7) in float v_tissueType;
 
 layout(location = 0) out vec4 fragColor;
 
@@ -75,11 +74,6 @@ void main() {
     vec3 H = normalize(L + V);  // Half-vector for specular
     
     int tissue = int(tissueType + 0.5);  // Round to nearest int
-    // WORKAROUND(QRhi-GLES2): Per-vertex tissueType overrides uniform when
-    // non-zero (set by merged single-drawIndexed path on WASM).
-    if (v_tissueType > 0.5) {
-        tissue = int(v_tissueType + 0.5);
-    }
     
     // Detect per-vertex selection ONLY for brain tissue
     // (Skin/skull have inherent warm colors that would false-positive)
@@ -193,15 +187,6 @@ void main() {
         finalColor += vec3(0.95, 0.90, 0.90) * wetSpec;
     }
     
-    // WORKAROUND(QRhi-GLES2): On WASM merged-draw path, non-brain surfaces
-    // need transparency so they blend over the opaque brain geometry.
-    float alpha = 1.0;
-    if (tissue > 1) {
-        float NdotV_alpha = clamp(dot(N, V), 0.0, 1.0);
-        float fresnel_alpha = pow(1.0 - NdotV_alpha, 2.5);
-        alpha = 0.15 + 0.7 * fresnel_alpha;
-    }
-
     // Clamp and output
-    fragColor = vec4(clamp(finalColor, 0.0, 1.0), alpha);
+    fragColor = vec4(clamp(finalColor, 0.0, 1.0), 1.0);
 }

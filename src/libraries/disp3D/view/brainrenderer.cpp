@@ -71,15 +71,18 @@ struct BrainRenderer::Impl
 
     // ── WORKAROUND(QRhi-GLES2): merged single-drawIndexed buffers ────
     // Used on WASM to avoid the multi-drawIndexed bug in QRhi's GLES2
-    // backend.  Remove when upstream Qt fixes the issue.
-    QVector<BrainSurface*> mergedSurfaces;
-    std::unique_ptr<QRhiBuffer> mergedVertexBuffer;
-    std::unique_ptr<QRhiBuffer> mergedIndexBuffer;
-    int mergedIndexCount = 0;
-    // Cached CPU-side merged data — re-uploaded every draw to refresh
-    // GLES2 element-buffer bindings that go stale between frames.
-    QByteArray mergedVertexRaw;
-    QByteArray mergedIndexRaw;
+    // backend.  Each surface category (brain, BEM, sensors, etc.) gets
+    // its own merged buffer set, drawn in separate render passes.
+    // Remove when upstream Qt fixes the issue.
+    struct MergedGroup {
+        QVector<BrainSurface*> surfaces;
+        std::unique_ptr<QRhiBuffer> vertexBuffer;
+        std::unique_ptr<QRhiBuffer> indexBuffer;
+        int indexCount = 0;
+        QByteArray vertexRaw;
+        QByteArray indexRaw;
+    };
+    std::map<QString, MergedGroup> mergedGroups;  // keyed by category name
 };
 
 //=============================================================================================================
@@ -239,13 +242,12 @@ void BrainRenderer::Impl::createResources(QRhi *rhi, QRhiRenderPassDescriptor *r
                     { 1, 7, QRhiVertexInputAttribute::Float, 20 * sizeof(float) }
                 });
             } else {
-                il.setBindings({{ 40 }});  // sizeof(VertexData) = 40 with surfaceId + tissueType
+                il.setBindings({{ 36 }});  // sizeof(VertexData) = 36 with surfaceId
                 il.setAttributes({{ 0, 0, QRhiVertexInputAttribute::Float3, 0 }, 
                                   { 0, 1, QRhiVertexInputAttribute::Float3, 12 }, 
                                   { 0, 2, QRhiVertexInputAttribute::UNormByte4, 24 },
                                   { 0, 3, QRhiVertexInputAttribute::UNormByte4, 28 },
-                                  { 0, 4, QRhiVertexInputAttribute::Float, 32 },    // surfaceId
-                                  { 0, 5, QRhiVertexInputAttribute::Float, 36 }});  // tissueType
+                                  { 0, 4, QRhiVertexInputAttribute::Float, 32 }});   // surfaceId
             }
             
             p->setVertexInputLayout(il);
@@ -267,23 +269,8 @@ void BrainRenderer::Impl::createResources(QRhi *rhi, QRhiRenderPassDescriptor *r
                 p->setDepthTest(true);
                 p->setDepthWrite(false);
             } else {
-#ifdef __EMSCRIPTEN__
-                // WORKAROUND(QRhi-GLES2): On WASM the merged single-drawIndexed
-                // path combines opaque brain + transparent BEM surfaces.  Enable
-                // alpha blending; brain vertices output alpha=1.0 (fully opaque)
-                // while BEM vertices use fresnel-based transparency.
-                blend.enable = true;
-                blend.srcColor = QRhiGraphicsPipeline::SrcAlpha;
-                blend.dstColor = QRhiGraphicsPipeline::OneMinusSrcAlpha;
-                blend.srcAlpha = QRhiGraphicsPipeline::One;
-                blend.dstAlpha = QRhiGraphicsPipeline::OneMinusSrcAlpha;
-                p->setTargetBlends({blend});
                 p->setDepthTest(true);
                 p->setDepthWrite(true);
-#else
-                p->setDepthTest(true);
-                p->setDepthWrite(true);
-#endif
             }
             p->setFlags(QRhiGraphicsPipeline::UsesScissor);
             p->create();
@@ -328,6 +315,48 @@ void BrainRenderer::updateSceneUniforms(QRhi *rhi, const SceneData &data)
 void BrainRenderer::endFrame(QRhiCommandBuffer *cb)
 {
     cb->endPass();
+}
+
+//=============================================================================================================
+// ── WORKAROUND(QRhi-GLES2): Multi-pass rendering ───────────────────────
+// The Qt QRhi GLES2/WebGL backend only renders the first drawIndexed()
+// per render pass.  To render multiple surface types (brain, BEM,
+// sensors, dipoles, etc.) we use separate render passes — one per
+// surface category — with PreserveColorContents so each pass composites
+// over the previous one.  Remove when upstream Qt fixes the bug.
+//=============================================================================================================
+
+void BrainRenderer::beginAdditionalPass(QRhiCommandBuffer *cb, QRhiRenderTarget *rt)
+{
+    // Set PreserveColorContents so this pass does NOT clear the previous
+    // pass's output.  The flag is checked by beginPass() to select
+    // GL_LOAD instead of GL_CLEAR.
+    auto *texRt = dynamic_cast<QRhiTextureRenderTarget*>(rt);
+    if (texRt) {
+        texRt->setFlags(texRt->flags()
+            | QRhiTextureRenderTarget::PreserveColorContents
+            | QRhiTextureRenderTarget::PreserveDepthStencilContents);
+    }
+
+    cb->beginPass(rt, QColor(0, 0, 0), { 1.0f, 0 });
+    const int w = rt->pixelSize().width();
+    const int h = rt->pixelSize().height();
+    cb->setViewport(QRhiViewport(0, 0, w, h));
+    cb->setScissor(QRhiScissor(0, 0, w, h));
+}
+
+void BrainRenderer::endAdditionalPass(QRhiCommandBuffer *cb, QRhiRenderTarget *rt)
+{
+    cb->endPass();
+
+    // Restore flags so the NEXT frame's first pass clears normally.
+    auto *texRt = dynamic_cast<QRhiTextureRenderTarget*>(rt);
+    if (texRt) {
+        texRt->setFlags(texRt->flags()
+            & ~QRhiTextureRenderTarget::Flags(
+                QRhiTextureRenderTarget::PreserveColorContents
+                | QRhiTextureRenderTarget::PreserveDepthStencilContents));
+    }
 }
 
 //=============================================================================================================
@@ -553,10 +582,12 @@ void BrainRenderer::renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
 //=============================================================================================================
 
 void BrainRenderer::prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch * /*u*/,
-                                           const QVector<BrainSurface*> &surfaces)
+                                           const QVector<BrainSurface*> &surfaces,
+                                           const QString &groupName)
 {
-    d->mergedSurfaces = surfaces;
-    d->mergedIndexCount = 0;
+    auto &group = d->mergedGroups[groupName];
+    group.surfaces = surfaces;
+    group.indexCount = 0;
 
     // Build merged vertex + index arrays
     QVector<VertexData> mergedVerts;
@@ -570,13 +601,11 @@ void BrainRenderer::prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch * /
         const auto &srcVerts = surf->vertexDataRef();
         const auto &srcIdx   = surf->indexDataRef();
 
-        // Copy vertices with surfaceId and tissueType stamp
+        // Copy vertices with surfaceId stamp
         mergedVerts.reserve(mergedVerts.size() + srcVerts.size());
-        float perVertexTissue = static_cast<float>(surf->tissueType());
         for (const VertexData &v : srcVerts) {
             VertexData mv = v;
             mv.surfaceId = surfaceId;
-            mv.tissueType = perVertexTissue;
             mergedVerts.append(mv);
         }
 
@@ -589,67 +618,63 @@ void BrainRenderer::prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch * /
         surfaceId += 1.0f;
     }
 
-    d->mergedIndexCount = mergedIndices.size();
-    if (d->mergedIndexCount == 0) return;
+    group.indexCount = mergedIndices.size();
+    if (group.indexCount == 0) return;
 
     const quint32 vbufSize = mergedVerts.size()   * sizeof(VertexData);
     const quint32 ibufSize = mergedIndices.size()  * sizeof(uint32_t);
 
     // (Re-)create Dynamic buffers when they don't exist or are too small
-    if (!d->mergedVertexBuffer || d->mergedVertexBuffer->size() < vbufSize) {
-        d->mergedVertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
+    if (!group.vertexBuffer || group.vertexBuffer->size() < vbufSize) {
+        group.vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
                                                     QRhiBuffer::VertexBuffer, vbufSize));
-        d->mergedVertexBuffer->create();
+        group.vertexBuffer->create();
     }
-    if (!d->mergedIndexBuffer || d->mergedIndexBuffer->size() < ibufSize) {
-        d->mergedIndexBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
+    if (!group.indexBuffer || group.indexBuffer->size() < ibufSize) {
+        group.indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
                                                    QRhiBuffer::IndexBuffer, ibufSize));
-        d->mergedIndexBuffer->create();
+        group.indexBuffer->create();
     }
 
     // Cache raw data — uploaded in drawMergedSurfaces() inside the render
     // pass so that GL element-buffer bindings are refreshed right before draw.
-    d->mergedVertexRaw = QByteArray(reinterpret_cast<const char*>(mergedVerts.constData()), vbufSize);
-    d->mergedIndexRaw  = QByteArray(reinterpret_cast<const char*>(mergedIndices.constData()), ibufSize);
+    group.vertexRaw = QByteArray(reinterpret_cast<const char*>(mergedVerts.constData()), vbufSize);
+    group.indexRaw  = QByteArray(reinterpret_cast<const char*>(mergedIndices.constData()), ibufSize);
 }
 
 //=============================================================================================================
 
 void BrainRenderer::drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
-                                        const SceneData &data, ShaderMode mode)
+                                        const SceneData &data, ShaderMode mode,
+                                        const QString &groupName)
 {
-    if (d->mergedIndexCount == 0) return;
+    auto it = d->mergedGroups.find(groupName);
+    if (it == d->mergedGroups.end()) return;
+    auto &group = it->second;
+
+    if (group.indexCount == 0) return;
     if (d->pipelines.find(mode) == d->pipelines.end()) return;
 
     auto *pipeline = d->pipelines[mode].get();
     if (!pipeline) return;
 
     // Determine which merged surface (if any) is selected.
-    // When a specific annotation region or vertex range is highlighted,
-    // the gold tint lives in the vertex colours (updated by
-    // updateVertexColors).  Suppress the shader whole-surface glow so
-    // it doesn't drown out the per-region highlight.
     float selectedSurfaceId = -1.0f;
-    for (int i = 0; i < d->mergedSurfaces.size(); ++i) {
-        if (d->mergedSurfaces[i] && d->mergedSurfaces[i]->isSelected()) {
-            if (d->mergedSurfaces[i]->selectedRegionId() == -1
-                && d->mergedSurfaces[i]->selectedVertexStart() < 0) {
+    for (int i = 0; i < group.surfaces.size(); ++i) {
+        if (group.surfaces[i] && group.surfaces[i]->isSelected()) {
+            if (group.surfaces[i]->selectedRegionId() == -1
+                && group.surfaces[i]->selectedVertexStart() < 0) {
                 selectedSurfaceId = static_cast<float>(i);
             }
             break;
         }
     }
 
-    // Uniform slot + buffer uploads.
-    // WORKAROUND(QRhi-GLES2): Upload merged VBO/IBO here (inside the
-    // render pass) rather than in the pre-upload phase.  The GLES2
-    // backend's glBufferSubData calls refresh GL_ARRAY_BUFFER /
-    // GL_ELEMENT_ARRAY_BUFFER bindings that can go stale between frames.
     QRhiResourceUpdateBatch *u = rhi->nextResourceUpdateBatch();
 
     // Re-upload merged geometry — ensures GL buffer bindings are fresh
-    u->updateDynamicBuffer(d->mergedVertexBuffer.get(), 0, d->mergedVertexRaw.size(), d->mergedVertexRaw.constData());
-    u->updateDynamicBuffer(d->mergedIndexBuffer.get(),  0, d->mergedIndexRaw.size(),  d->mergedIndexRaw.constData());
+    u->updateDynamicBuffer(group.vertexBuffer.get(), 0, group.vertexRaw.size(), group.vertexRaw.constData());
+    u->updateDynamicBuffer(group.indexBuffer.get(),  0, group.indexRaw.size(),  group.indexRaw.constData());
 
     int offset = d->currentUniformOffset;
     d->currentUniformOffset += d->uniformBufferOffsetAlignment;
@@ -665,7 +690,10 @@ void BrainRenderer::drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
     u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetSelected, 4, &selected);
     u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLightDir, 12, &data.lightDir);
 
-    float tissueType = 0.0f;  // Per-vertex tissueType used for merged path
+    float tissueType = 0.0f;  // Derived from first surface in the group
+    if (!group.surfaces.isEmpty() && group.surfaces.first()) {
+        tissueType = static_cast<float>(group.surfaces.first()->tissueType());
+    }
     u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetTissueType, 4, &tissueType);
 
     float lighting = data.lightingEnabled ? 1.0f : 0.0f;
@@ -685,9 +713,9 @@ void BrainRenderer::drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
         cb->setGraphicsPipeline(p);
         const QRhiCommandBuffer::DynamicOffset srbOffset = { 0, uint32_t(offset) };
         cb->setShaderResources(d->srb.get(), 1, &srbOffset);
-        const QRhiCommandBuffer::VertexInput vbuf(d->mergedVertexBuffer.get(), 0);
-        cb->setVertexInput(0, 1, &vbuf, d->mergedIndexBuffer.get(), 0, QRhiCommandBuffer::IndexUInt32);
-        cb->drawIndexed(d->mergedIndexCount);
+        const QRhiCommandBuffer::VertexInput vbuf(group.vertexBuffer.get(), 0);
+        cb->setVertexInput(0, 1, &vbuf, group.indexBuffer.get(), 0, QRhiCommandBuffer::IndexUInt32);
+        cb->drawIndexed(group.indexCount);
     };
 
     if (mode == Holographic && d->pipelinesBackColor.count(Holographic) > 0) {

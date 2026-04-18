@@ -5,7 +5,6 @@ layout(location = 1) in vec3 normal;
 layout(location = 2) in vec4 color;
 layout(location = 3) in vec4 annotColor;
 layout(location = 4) in float surfaceId;
-layout(location = 5) in float a_tissueType;
 
 layout(location = 0) out vec3 v_worldPos;
 layout(location = 1) out vec3 v_normal;
@@ -14,7 +13,6 @@ layout(location = 3) out vec3 v_viewDir;
 layout(location = 4) out float v_curvature;
 layout(location = 5) out vec3 v_annotColor;
 layout(location = 6) out float v_surfaceId;
-layout(location = 7) out float v_tissueType;
 
 layout(std140, binding = 0) uniform UniformBlock {
     mat4 mvp;
@@ -36,6 +34,5 @@ void main() {
     v_annotColor = annotColor.rgb;
     v_viewDir = normalize(cameraPos - position);
     v_surfaceId = surfaceId;
-    v_tissueType = a_tissueType;
     gl_Position = mvp * vec4(position, 1.0);
 }

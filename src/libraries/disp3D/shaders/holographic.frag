@@ -7,7 +7,6 @@ layout(location = 3) in vec3 v_viewDir;
 layout(location = 4) in float v_curvature;
 layout(location = 5) in vec3 v_annotColor;
 layout(location = 6) in float v_surfaceId;
-layout(location = 7) in float v_tissueType;
 
 layout(location = 0) out vec4 fragColor;
 

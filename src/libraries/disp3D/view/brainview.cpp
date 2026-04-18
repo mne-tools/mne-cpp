@@ -1422,12 +1422,10 @@ void BrainView::render(QRhiCommandBuffer *cb)
         QRhiResourceUpdateBatch *preUpload = rhi()->nextResourceUpdateBatch();
         for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
 #ifdef __EMSCRIPTEN__
-            // WORKAROUND(QRhi-GLES2): All surfaces (brain, BEM, sensors,
-            // digitizers, source-space) are drawn via the merged single-
-            // drawIndexed path.  Skip per-surface GPU buffer re-uploads —
-            // their individual GPU buffers are unused and the
-            // uploadStaticBuffer calls can pollute GLES2 element-buffer
-            // bindings.
+            // WORKAROUND(QRhi-GLES2): Per-surface GPU buffers are unused on
+            // WASM — all geometry is drawn via merged per-category buffers.
+            // Skip individual uploads to avoid polluting GLES2
+            // element-buffer bindings.
             continue;
 #endif
             it.value()->updateBuffers(rhi(), preUpload);
@@ -1445,28 +1443,39 @@ void BrainView::render(QRhiCommandBuffer *cb)
 #endif
 
 #ifdef __EMSCRIPTEN__
-        // WORKAROUND(QRhi-GLES2): Merge ALL visible surfaces into a single
-        // VBO/IBO for single-drawIndexed rendering.  The QRhi GLES2 backend
-        // has a bug where only the first drawIndexed() per render pass
-        // produces visible output.  Opaque surfaces (brain, source-space,
-        // digitizers) are added first; transparent surfaces (BEM, sensors)
-        // are appended after so they blend correctly over the opaque geometry.
-        // Remove when Qt fixes this upstream.
+        // WORKAROUND(QRhi-GLES2): The QRhi GLES2/WebGL backend only renders
+        // the first drawIndexed() per render pass.  Surfaces of each category
+        // are merged into a single VBO/IBO and drawn in separate render passes
+        // (one drawIndexed per pass) using PreserveColorContents to composite.
         {
-            QVector<BrainSurface*> opaqueSurfaces;
-            QVector<BrainSurface*> transparentSurfaces;
+            // Collect surfaces by category
+            QVector<BrainSurface*> brainSurfaces;
+            QVector<BrainSurface*> bemSurfaces;
+            QVector<BrainSurface*> sensorSurfaces;
+            QVector<BrainSurface*> srcspSurfaces;
+            QVector<BrainSurface*> digSurfaces;
+
             for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
                 if (!it.value()->isVisible()) continue;
                 const QString &key = it.key();
-                if (key.startsWith("bem_") || key.startsWith("sens_")) {
-                    transparentSurfaces.append(it.value().get());
-                } else {
-                    opaqueSurfaces.append(it.value().get());
-                }
+                if (key.startsWith("bem_"))       bemSurfaces.append(it.value().get());
+                else if (key.startsWith("sens_")) sensorSurfaces.append(it.value().get());
+                else if (key.startsWith("srcsp_")) srcspSurfaces.append(it.value().get());
+                else if (key.startsWith("dig_"))  digSurfaces.append(it.value().get());
+                else                               brainSurfaces.append(it.value().get());
             }
-            QVector<BrainSurface*> allMergedSurfaces = opaqueSurfaces;
-            allMergedSurfaces.append(transparentSurfaces);
-            m_renderer->prepareMergedSurfaces(rhi(), preUpload, allMergedSurfaces);
+
+            // Prepare merged buffers per category (only non-empty groups)
+            if (!brainSurfaces.isEmpty())
+                m_renderer->prepareMergedSurfaces(rhi(), preUpload, brainSurfaces, QStringLiteral("brain"));
+            if (!bemSurfaces.isEmpty())
+                m_renderer->prepareMergedSurfaces(rhi(), preUpload, bemSurfaces, QStringLiteral("bem"));
+            if (!sensorSurfaces.isEmpty())
+                m_renderer->prepareMergedSurfaces(rhi(), preUpload, sensorSurfaces, QStringLiteral("sensor"));
+            if (!srcspSurfaces.isEmpty())
+                m_renderer->prepareMergedSurfaces(rhi(), preUpload, srcspSurfaces, QStringLiteral("srcsp"));
+            if (!digSurfaces.isEmpty())
+                m_renderer->prepareMergedSurfaces(rhi(), preUpload, digSurfaces, QStringLiteral("dig"));
         }
 #endif
 
@@ -1598,23 +1607,89 @@ void BrainView::render(QRhiCommandBuffer *cb)
         if (!sv.shouldRenderSurface(it.key())) continue;
 
 #ifdef __EMSCRIPTEN__
-        // WORKAROUND(QRhi-GLES2): All surfaces are drawn via the merged
-        // single-drawIndexed path below.  Skip per-surface draws on WASM.
+        // WORKAROUND(QRhi-GLES2): Brain surfaces drawn via merged
+        // per-category buffer (one drawIndexed per render pass).
         continue;
 #endif
         m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), currentShader);
     }
 
 #ifdef __EMSCRIPTEN__
-    // WORKAROUND(QRhi-GLES2): Draw all merged surfaces in one call.
-    m_renderer->drawMergedSurfaces(cb, rhi(), sceneData, currentShader);
+    // ══════════════════════════════════════════════════════════════════════
+    // WORKAROUND(QRhi-GLES2): Multi-pass rendering.
+    // The Qt QRhi GLES2/WebGL backend only renders the first drawIndexed()
+    // per render pass.  Each surface category is drawn in its own pass
+    // with PreserveColorContents to composite over the previous pass.
+    //
+    // Compromises due to this backend bug:
+    //   1. Surfaces of the same category (e.g. left/right hemisphere,
+    //      multiple BEM layers) are merged into a single VBO/IBO — they
+    //      cannot be drawn with separate drawIndexed calls.
+    //   2. Per-surface shader/uniform customization within a category
+    //      is not possible (all surfaces in a group share one draw call).
+    //   3. Transparent surface sorting (back-to-front) within a merged
+    //      group is unavailable — only inter-pass ordering is controlled.
+    //   4. Debug pointer / intersection indicator is not rendered.
+    //
+    // Remove when upstream Qt fixes the QRhi GLES2 drawIndexed bug.
+    // ══════════════════════════════════════════════════════════════════════
 
-    // WORKAROUND(QRhi-GLES2): Skip all subsequent per-surface draws.
-    // The QRhi GLES2 backend only renders the first drawIndexed() per
-    // render pass correctly.  Dipoles, network, and debug pointer use
-    // different vertex layouts or instanced rendering and cannot be
-    // merged — they are not rendered on WASM until the upstream Qt bug
-    // is fixed or a multi-pass workaround is validated.
+    // Pass 1 (first pass — already in beginFrame): Brain surfaces
+    m_renderer->drawMergedSurfaces(cb, rhi(), sceneData, currentShader, QStringLiteral("brain"));
+
+    // Shared scene data for non-brain surfaces (pass-through overlay)
+    BrainRenderer::SceneData nonBrainSceneData = sceneData;
+    nonBrainSceneData.overlayMode = static_cast<float>(BrainSurface::ModeScientific);
+
+    // Pass 2: Source space points
+    m_renderer->endFrame(cb);
+    m_renderer->beginAdditionalPass(cb, renderTarget());
+    m_renderer->drawMergedSurfaces(cb, rhi(), nonBrainSceneData, currentShader, QStringLiteral("srcsp"));
+
+    // Pass 3: Digitizer points
+    m_renderer->endAdditionalPass(cb, renderTarget());
+    m_renderer->beginAdditionalPass(cb, renderTarget());
+    m_renderer->drawMergedSurfaces(cb, rhi(), nonBrainSceneData, currentShader, QStringLiteral("dig"));
+
+    // Pass 4: BEM surfaces (transparent, use BEM shader)
+    m_renderer->endAdditionalPass(cb, renderTarget());
+    m_renderer->beginAdditionalPass(cb, renderTarget());
+    {
+        BrainRenderer::SceneData bemSceneData = sceneData;
+        bemSceneData.overlayMode = static_cast<float>(BrainSurface::ModeScientific);
+        m_renderer->drawMergedSurfaces(cb, rhi(), bemSceneData, currentBemShader, QStringLiteral("bem"));
+    }
+
+    // Pass 5: Sensor surfaces (transparent, holographic)
+    m_renderer->endAdditionalPass(cb, renderTarget());
+    m_renderer->beginAdditionalPass(cb, renderTarget());
+    {
+        BrainRenderer::SceneData sensorSceneData = sceneData;
+        sensorSceneData.overlayMode = static_cast<float>(BrainSurface::ModeScientific);
+        m_renderer->drawMergedSurfaces(cb, rhi(), sensorSceneData, BrainRenderer::Holographic, QStringLiteral("sensor"));
+    }
+
+    // Pass 6: Dipoles (instanced rendering — each drawIndexed is in its own pass)
+    for (auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
+        if (it.value()->isVisible() && sv.visibility.dipoles) {
+            m_renderer->endAdditionalPass(cb, renderTarget());
+            m_renderer->beginAdditionalPass(cb, renderTarget());
+            m_renderer->renderDipoles(cb, rhi(), sceneData, it.value().get());
+        }
+    }
+    if (sv.visibility.dipoles && m_dipoles) {
+        m_renderer->endAdditionalPass(cb, renderTarget());
+        m_renderer->beginAdditionalPass(cb, renderTarget());
+        m_renderer->renderDipoles(cb, rhi(), sceneData, m_dipoles.get());
+    }
+
+    // End the last additional pass — the viewport loop continues and
+    // beginFrame's pass has already been ended above.
+    // We need to re-enter a pass for the next viewport slot (if any)
+    // or for endFrame() at the bottom.
+    m_renderer->endAdditionalPass(cb, renderTarget());
+    m_renderer->beginAdditionalPass(cb, renderTarget());
+
 #else
 
     // Pass 1b: Source Space Points (use same shader as brain for consistent depth/blend)

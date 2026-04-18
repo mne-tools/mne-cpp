@@ -135,6 +135,30 @@ public:
     void beginFrame(QRhiCommandBuffer *cb, QRhiRenderTarget *rt);
 
     //=========================================================================================================
+    // ── WORKAROUND(QRhi-GLES2): Multi-pass rendering ───────────────────
+    // Begin/end an additional render pass that preserves the previous
+    // pass's colour+depth contents.  Used on WASM where each surface
+    // category needs its own pass (one drawIndexed per pass limit).
+    //
+    /**
+     * Begin an additional render pass that preserves previous output.
+     * Sets PreserveColorContents + PreserveDepthStencilContents on the
+     * texture render target so the new pass composites over the old one.
+     *
+     * @param[in] cb         Command buffer.
+     * @param[in] rt         Render target.
+     */
+    void beginAdditionalPass(QRhiCommandBuffer *cb, QRhiRenderTarget *rt);
+
+    /**
+     * End an additional render pass and restore render target flags.
+     *
+     * @param[in] cb         Command buffer.
+     * @param[in] rt         Render target.
+     */
+    void endAdditionalPass(QRhiCommandBuffer *cb, QRhiRenderTarget *rt);
+
+    //=========================================================================================================
     /**
      * Set uniforms that are shared for the entire frame.
      * 
@@ -171,7 +195,8 @@ public:
      * @param[in] surfaces   Brain surfaces to merge.
      */
     void prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch *u,
-                               const QVector<BrainSurface*> &surfaces);
+                               const QVector<BrainSurface*> &surfaces,
+                               const QString &groupName = QStringLiteral("default"));
 
     /**
      * Draw previously prepared merged surfaces in a single drawIndexed.
@@ -183,7 +208,8 @@ public:
      * @param[in] mode       Shader mode.
      */
     void drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
-                            const SceneData &data, ShaderMode mode);
+                            const SceneData &data, ShaderMode mode,
+                            const QString &groupName = QStringLiteral("default"));
 
     //=========================================================================================================
     /**
