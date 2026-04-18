@@ -89,32 +89,9 @@ using namespace MNELIB;
 constexpr int FAIL = -1;
 constexpr int OK   =  0;
 
-#define X_17 0
-#define Y_17 1
-#define Z_17 2
-
-#define VEC_DOT_17(x,y) ((x)[X_17]*(y)[X_17] + (x)[Y_17]*(y)[Y_17] + (x)[Z_17]*(y)[Z_17])
-
-#define VEC_LEN_17(x) sqrt(VEC_DOT_17(x,x))
-
-#define VEC_DIFF_17(from,to,diff) {\
-    (diff)[X_17] = (to)[X_17] - (from)[X_17];\
-    (diff)[Y_17] = (to)[Y_17] - (from)[Y_17];\
-    (diff)[Z_17] = (to)[Z_17] - (from)[Z_17];\
-    }
-
-#define VEC_COPY_17(to,from) {\
-    (to)[X_17] = (from)[X_17];\
-    (to)[Y_17] = (from)[Y_17];\
-    (to)[Z_17] = (from)[Z_17];\
-    }
-
-#define CROSS_PRODUCT_17(x,y,xy) {\
-    (xy)[X_17] =   (x)[Y_17]*(y)[Z_17]-(y)[Y_17]*(x)[Z_17];\
-    (xy)[Y_17] = -((x)[X_17]*(y)[Z_17]-(y)[X_17]*(x)[Z_17]);\
-    (xy)[Z_17] =   (x)[X_17]*(y)[Y_17]-(y)[X_17]*(x)[Y_17];\
-    }
-
+constexpr int X = 0;
+constexpr int Y = 1;
+constexpr int Z = 2;
 
 constexpr int NNEIGHBORS = 26;
 
@@ -123,31 +100,18 @@ constexpr int NNEIGHBORS = 26;
 
 //============================= make_volume_source_space.c =============================
 
-static std::optional<FiffCoordTrans> make_voxel_ras_trans(float *r0,
-                                                  float *x_ras,
-                                                  float *y_ras,
-                                                  float *z_ras,
-                                                  float *voxel_size)
-
+static std::optional<FiffCoordTrans> make_voxel_ras_trans(const Eigen::Vector3f& r0,
+                                                  const Eigen::Vector3f& x_ras,
+                                                  const Eigen::Vector3f& y_ras,
+                                                  const Eigen::Vector3f& z_ras,
+                                                  const Eigen::Vector3f& voxel_size)
 {
-    float rot[3][3],move[3];
-    int   j,k;
+    Eigen::Matrix3f rot;
+    rot.row(0) = x_ras.transpose() * voxel_size[0];
+    rot.row(1) = y_ras.transpose() * voxel_size[1];
+    rot.row(2) = z_ras.transpose() * voxel_size[2];
 
-    VEC_COPY_17(move,r0);
-
-    for (j = 0; j < 3; j++) {
-        rot[j][0] = x_ras[j];
-        rot[j][1] = y_ras[j];
-        rot[j][2] = z_ras[j];
-    }
-
-    for (j = 0; j < 3; j++)
-        for (k = 0; k < 3; k++)
-            rot[j][k]    = voxel_size[k]*rot[j][k];
-
-    return FiffCoordTrans(FIFFV_MNE_COORD_MRI_VOXEL,FIFFV_COORD_MRI,
-                                            Eigen::Map<Eigen::Matrix3f>(&rot[0][0]),
-                                            Eigen::Map<Eigen::Vector3f>(move));
+    return FiffCoordTrans(FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_COORD_MRI, rot, r0);
 }
 
 //=============================================================================================================
@@ -230,21 +194,16 @@ double MNESurfaceOrVolume::solid_angle(const Eigen::Vector3f& from, const MNETri
      * formula
      */
 {
-    double v1[3],v2[3],v3[3];
-    double l1,l2,l3,s,triple;
-    double cross[3];
+    Eigen::Vector3d v1 = (tri.r1 - from).cast<double>();
+    Eigen::Vector3d v2 = (tri.r2 - from).cast<double>();
+    Eigen::Vector3d v3 = (tri.r3 - from).cast<double>();
 
-    VEC_DIFF_17 (from,tri.r1,v1);
-    VEC_DIFF_17 (from,tri.r2,v2);
-    VEC_DIFF_17 (from,tri.r3,v3);
+    double triple = v1.cross(v2).dot(v3);
 
-    CROSS_PRODUCT_17(v1,v2,cross);
-    triple = VEC_DOT_17(cross,v3);
-
-    l1 = VEC_LEN_17(v1);
-    l2 = VEC_LEN_17(v2);
-    l3 = VEC_LEN_17(v3);
-    s = (l1*l2*l3+VEC_DOT_17(v1,v2)*l3+VEC_DOT_17(v1,v3)*l2+VEC_DOT_17(v2,v3)*l1);
+    double l1 = v1.norm();
+    double l2 = v2.norm();
+    double l3 = v3.norm();
+    double s = (l1*l2*l3+v1.dot(v2)*l3+v1.dot(v3)*l2+v2.dot(v3)*l1);
 
     return (2.0*atan2(triple,s));
 }
@@ -342,7 +301,6 @@ void MNESurfaceOrVolume::compute_surface_cm()
 void MNESurfaceOrVolume::calculate_vertex_distances()
 {
     int   k,p,ndist;
-    float diff[3];
     int   nneigh;
 
     if (neighbor_vert.empty() || nneighbor_vert.size() == 0)
@@ -357,8 +315,7 @@ void MNESurfaceOrVolume::calculate_vertex_distances()
         const Eigen::VectorXi& neigh = neighbor_vert[k];
         for (p = 0; p < nneigh; p++) {
             if (neigh[p] >= 0) {
-                VEC_DIFF_17(&rr(k,0),&rr(neigh[p],0),diff);
-                vert_dist[k][p] = VEC_LEN_17(diff);
+                vert_dist[k][p] = (rr.row(neigh[p]) - rr.row(k)).norm();
             }
             else
                 vert_dist[k][p] = -1.0;
@@ -384,10 +341,6 @@ int MNESurfaceOrVolume::add_vertex_normals()
        * Reallocate the stuff and initialize
        */
     nn = MNESurfaceOrVolume::NormalsT::Zero(np,3);
-
-    for (k = 0; k < np; k++) {
-        nn(k,X_17) = nn(k,Y_17) = nn(k,Z_17) = 0.0;
-    }
     /*
        * One pass through the triangles will do it
        */
@@ -403,10 +356,9 @@ int MNESurfaceOrVolume::add_vertex_normals()
                 nn(ii[k],c) += w*tri->nn[c];
     }
     for (k = 0; k < np; k++) {
-        size = VEC_LEN_17(&nn(k,0));
+        size = nn.row(k).norm();
         if (size > 0.0)
-            for (c = 0; c < 3; c++)
-                nn(k,c) = nn(k,c)/size;
+            nn.row(k) /= size;
     }
     compute_surface_cm();
     return OK;
@@ -444,10 +396,7 @@ int MNESurfaceOrVolume::add_geometry_info(bool do_normals, bool check_too_many_n
     neighbor_tri.resize(np);
     nneighbor_tri = Eigen::VectorXi::Zero(np);
 
-    for (k = 0; k < np; k++) {
-        if (do_normals)
-            nn(k,X_17) = nn(k,Y_17) = nn(k,Z_17) = 0.0;
-    }
+    /* nn is already zero-initialized above */
     /*
        * One pass through the triangles will do it
        */
@@ -506,10 +455,9 @@ int MNESurfaceOrVolume::add_geometry_info(bool do_normals, bool check_too_many_n
        */
     for (k = 0; k < np; k++)
         if (nneighbor_tri[k] > 0) {
-            size = VEC_LEN_17(&nn(k,0));
+            size = nn.row(k).norm();
             if (size > 0.0)
-                for (c = 0; c < 3; c++)
-                    nn(k,c) = nn(k,c)/size;
+                nn.row(k) /= size;
         }
     qInfo("[done]\n");
     /*

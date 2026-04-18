@@ -44,17 +44,7 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
 
-//============================= dot.h =============================
-
-constexpr int X = 0;
-constexpr int Y = 1;
-constexpr int Z = 2;
-
-#define VEC_COPY(to,from) {\
-    (to)[X] = (from)[X];\
-    (to)[Y] = (from)[Y];\
-    (to)[Z] = (from)[Z];\
-    }
+#include <Eigen/Core>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -160,7 +150,7 @@ std::unique_ptr<MNESssData> MNESssData::read_from_node(QSharedPointer<FiffStream
             return nullptr;
         }
         r0 = t_pTag->toFloat();
-        VEC_COPY(s->origin,r0);
+        Eigen::Map<Eigen::Vector3f>(s->origin) = Eigen::Map<const Eigen::Vector3f>(r0);
 
         if (!node->find_tag(stream, FIFF_SSS_ORD_IN, t_pTag)) {
             return nullptr;

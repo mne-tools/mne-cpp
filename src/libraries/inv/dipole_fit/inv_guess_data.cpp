@@ -64,41 +64,6 @@ using namespace INVLIB;
 constexpr int FAIL = -1;
 constexpr int OK   =  0;
 
-#define X_16 0
-#define Y_16 1
-#define Z_16 2
-
-#define VEC_COPY_16(to,from) {\
-    (to)[X_16] = (from)[X_16];\
-    (to)[Y_16] = (from)[Y_16];\
-    (to)[Z_16] = (from)[Z_16];\
-    }
-
-void fromFloatEigenMatrix_16(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
-{
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            to_mat[i][j] = from_mat(i,j);
-}
-
-void fromFloatEigenMatrix_16(const Eigen::MatrixXf& from_mat, float **& to_mat)
-{
-    fromFloatEigenMatrix_16(from_mat, to_mat, from_mat.rows(), from_mat.cols());
-}
-
-//int
-void fromIntEigenMatrix_16(const Eigen::MatrixXi& from_mat, int **&to_mat, const int m, const int n)
-{
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            to_mat[i][j] = from_mat(i,j);
-}
-
-void fromIntEigenMatrix_16(const Eigen::MatrixXi& from_mat, int **&to_mat)
-{
-    fromIntEigenMatrix_16(from_mat, to_mat, from_mat.rows(), from_mat.cols());
-}
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================

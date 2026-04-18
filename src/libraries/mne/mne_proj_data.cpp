@@ -41,12 +41,6 @@
 #include "mne_surface.h"
 #include "mne_triangle.h"
 
-#define X_46 0
-#define Y_46 1
-#define Z_46 2
-
-#define VEC_DOT_46(x,y) ((x)[X_46]*(y)[X_46] + (x)[Y_46]*(y)[Y_46] + (x)[Z_46]*(y)[Z_46])
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -66,9 +60,9 @@ MNEProjData::MNEProjData(const MNELIB::MNESurface* s)
 
     const MNETriangle* tri = s->tris.data();
     for (int k = 0; k < s->ntri; k++, tri++) {
-      a[k] =  VEC_DOT_46(tri->r12,tri->r12);
-      b[k] =  VEC_DOT_46(tri->r13,tri->r13);
-      c[k] =  VEC_DOT_46(tri->r12,tri->r13);
+      a[k] =  tri->r12.dot(tri->r12);
+      b[k] =  tri->r13.dot(tri->r13);
+      c[k] =  tri->r12.dot(tri->r13);
 
       act[k] = 1;
     }

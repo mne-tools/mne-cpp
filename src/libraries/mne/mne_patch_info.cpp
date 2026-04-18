@@ -42,18 +42,16 @@
 #include "mne_source_space.h"
 #include <mne/mne_triangle.h>
 
-#define X_43 0
-#define Y_43 1
-#define Z_43 2
-
-#define VEC_DOT_43(x,y) ((x)[X_43]*(y)[X_43] + (x)[Y_43]*(y)[Y_43] + (x)[Z_43]*(y)[Z_43])
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace Eigen;
 using namespace MNELIB;
+
+constexpr int X = 0;
+constexpr int Y = 1;
+constexpr int Z = 2;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -96,23 +94,18 @@ void MNEPatchInfo::calculate_normal_stats(MNESourceSpace *s)
     int k;
     float cos_theta,size;
 
-    ave_nn[X_43] = 0.0;
-    ave_nn[Y_43] = 0.0;
-    ave_nn[Z_43] = 0.0;
+    Eigen::Map<Eigen::Vector3f> ave(ave_nn);
+    ave.setZero();
 
     for (k = 0; k < memb_vert.size(); k++) {
-        ave_nn[X_43] += s->nn(memb_vert[k],X_43);
-        ave_nn[Y_43] += s->nn(memb_vert[k],Y_43);
-        ave_nn[Z_43] += s->nn(memb_vert[k],Z_43);
+        ave += s->nn.row(memb_vert[k]).transpose();
     }
-    size = sqrt(VEC_DOT_43(ave_nn,ave_nn));
-    ave_nn[X_43] = ave_nn[X_43]/size;
-    ave_nn[Y_43] = ave_nn[Y_43]/size;
-    ave_nn[Z_43] = ave_nn[Z_43]/size;
+    size = ave.norm();
+    ave /= size;
 
     dev_nn = 0.0;
     for (k = 0; k < memb_vert.size(); k++) {
-        cos_theta = VEC_DOT_43(&s->nn(memb_vert[k],0),ave_nn);
+        cos_theta = s->nn.row(memb_vert[k]).dot(ave);
         if (cos_theta < -1.0)
             cos_theta = -1.0;
         else if (cos_theta > 1.0)

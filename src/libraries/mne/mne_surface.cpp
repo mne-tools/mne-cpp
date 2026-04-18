@@ -67,22 +67,9 @@ using namespace MNELIB;
 constexpr int FAIL = -1;
 constexpr int OK   =  0;
 
-#define X_17 0
-#define Y_17 1
-#define Z_17 2
-
-#define VEC_DOT_17(x,y) ((x)[X_17]*(y)[X_17] + (x)[Y_17]*(y)[Y_17] + (x)[Z_17]*(y)[Z_17])
-#define VEC_LEN_17(x) sqrt(VEC_DOT_17(x,x))
-#define VEC_DIFF_17(from,to,diff) {\
-    (diff)[X_17] = (to)[X_17] - (from)[X_17];\
-    (diff)[Y_17] = (to)[Y_17] - (from)[Y_17];\
-    (diff)[Z_17] = (to)[Z_17] - (from)[Z_17];\
-    }
-#define VEC_COPY_17(to,from) {\
-    (to)[X_17] = (from)[X_17];\
-    (to)[Y_17] = (from)[Y_17];\
-    (to)[Z_17] = (from)[Z_17];\
-    }
+constexpr int X = 0;
+constexpr int Y = 1;
+constexpr int Z = 2;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -117,21 +104,20 @@ double MNESurface::sum_solids(const Eigen::Vector3f& from) const
 
 void MNESurface::triangle_coords(const Eigen::Vector3f& r, int tri, float &x, float &y, float &z) const
 {
-    double rr[3];
     double a, b, c, v1, v2, det;
     const MNETriangle* this_tri;
 
     this_tri = &tris[tri];
 
-    VEC_DIFF_17(this_tri->r1, r, rr);
-    z = VEC_DOT_17(rr, this_tri->nn);
+    Eigen::Vector3d rr = (r - this_tri->r1).cast<double>();
+    z = rr.dot(this_tri->nn.cast<double>());
 
-    a = VEC_DOT_17(this_tri->r12, this_tri->r12);
-    b = VEC_DOT_17(this_tri->r13, this_tri->r13);
-    c = VEC_DOT_17(this_tri->r12, this_tri->r13);
+    a = this_tri->r12.cast<double>().squaredNorm();
+    b = this_tri->r13.cast<double>().squaredNorm();
+    c = this_tri->r12.cast<double>().dot(this_tri->r13.cast<double>());
 
-    v1 = VEC_DOT_17(rr, this_tri->r12);
-    v2 = VEC_DOT_17(rr, this_tri->r13);
+    v1 = rr.dot(this_tri->r12.cast<double>());
+    v2 = rr.dot(this_tri->r13.cast<double>());
 
     det = a * b - c * c;
 
@@ -144,15 +130,14 @@ void MNESurface::triangle_coords(const Eigen::Vector3f& r, int tri, float &x, fl
 int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjData *user, int tri, float &x, float &y, float &z) const
 {
     double p, q, p0, q0, t0;
-    double rr[3];
     double a, b, c, v1, v2, det;
     double best, dist, dist0;
     const MNEProjData* pd = user;
     const MNETriangle* this_tri;
 
     this_tri = &tris[tri];
-    VEC_DIFF_17(this_tri->r1, r, rr);
-    dist = VEC_DOT_17(rr, this_tri->nn);
+    Eigen::Vector3d rr = (r - this_tri->r1).cast<double>();
+    dist = rr.dot(this_tri->nn.cast<double>());
 
     if (pd) {
         if (!pd->act[tri])
@@ -162,13 +147,13 @@ int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjDa
         c = pd->c[tri];
     }
     else {
-        a = VEC_DOT_17(this_tri->r12, this_tri->r12);
-        b = VEC_DOT_17(this_tri->r13, this_tri->r13);
-        c = VEC_DOT_17(this_tri->r12, this_tri->r13);
+        a = this_tri->r12.cast<double>().squaredNorm();
+        b = this_tri->r13.cast<double>().squaredNorm();
+        c = this_tri->r12.cast<double>().dot(this_tri->r13.cast<double>());
     }
 
-    v1 = VEC_DOT_17(rr, this_tri->r12);
-    v2 = VEC_DOT_17(rr, this_tri->r13);
+    v1 = rr.dot(this_tri->r12.cast<double>());
+    v2 = rr.dot(this_tri->r13.cast<double>());
 
     det = a * b - c * c;
 
@@ -323,7 +308,8 @@ void MNESurface::decide_search_restriction(MNEProjData& p,
                                            const Eigen::Vector3f& r) const
 {
     int k;
-    float diff[3], dist_val, mindist;
+    Eigen::Vector3f diff_vec;
+    float dist_val, mindist;
     int minvert;
 
     for (k = 0; k < ntri; k++)
@@ -333,8 +319,8 @@ void MNESurface::decide_search_restriction(MNEProjData& p,
         mindist = 1000.0;
         minvert = 0;
         for (k = 0; k < np; k++) {
-            VEC_DIFF_17(r, &rr(k, 0), diff);
-            dist_val = VEC_LEN_17(diff);
+            diff_vec = rr.row(k).transpose() - r;
+            dist_val = diff_vec.norm();
             if (dist_val < mindist && nneighbor_tri[k] > 0) {
                 mindist = dist_val;
                 minvert = k;
@@ -343,18 +329,18 @@ void MNESurface::decide_search_restriction(MNEProjData& p,
     }
     else {
         const MNETriangle* this_tri = &tris[approx_best];
-        VEC_DIFF_17(r, this_tri->r1, diff);
-        mindist = VEC_LEN_17(diff);
+        diff_vec = this_tri->r1 - r;
+        mindist = diff_vec.norm();
         minvert = this_tri->vert[0];
 
-        VEC_DIFF_17(r, this_tri->r2, diff);
-        dist_val = VEC_LEN_17(diff);
+        diff_vec = this_tri->r2 - r;
+        dist_val = diff_vec.norm();
         if (dist_val < mindist) {
             mindist = dist_val;
             minvert = this_tri->vert[1];
         }
-        VEC_DIFF_17(r, this_tri->r3, diff);
-        dist_val = VEC_LEN_17(diff);
+        diff_vec = this_tri->r3 - r;
+        dist_val = diff_vec.norm();
         if (dist_val < mindist) {
             mindist = dist_val;
             minvert = this_tri->vert[2];

@@ -58,37 +58,20 @@
 #include <QtConcurrent>
 #include <QDebug>
 
+#include <cstring>
+#include <memory>
+
 #define _USE_MATH_DEFINES
 #include <math.h>
 
 using FIFFLIB::FiffCoordTrans;
 
-#define X_51 0
-#define Y_51 1
-#define Z_51 2
+constexpr int X = 0;
+constexpr int Y = 1;
+constexpr int Z = 2;
 
 constexpr int FAIL = -1;
 constexpr int OK   =  0;
-
-#define X_17 0
-#define Y_17 1
-#define Z_17 2
-
-#define VEC_DOT_17(x,y) ((x)[X_17]*(y)[X_17] + (x)[Y_17]*(y)[Y_17] + (x)[Z_17]*(y)[Z_17])
-
-#define VEC_LEN_17(x) sqrt(VEC_DOT_17(x,x))
-
-#define VEC_DIFF_17(from,to,diff) {\
-    (diff)[X_17] = (to)[X_17] - (from)[X_17];\
-    (diff)[Y_17] = (to)[Y_17] - (from)[Y_17];\
-    (diff)[Z_17] = (to)[Z_17] - (from)[Z_17];\
-}
-
-#define VEC_COPY_17(to,from) {\
-    (to)[X_17] = (from)[X_17];\
-    (to)[Y_17] = (from)[Y_17];\
-    (to)[Z_17] = (from)[Z_17];\
-}
 
 constexpr int NNEIGHBORS = 26;
 
@@ -217,7 +200,7 @@ MNEVolGeom dup_vol_geom(const MNEVolGeom& g)
 // read_vol_geom
 //=========================================================================
 
-MNEVolGeom* read_vol_geom(QFile &fp)
+std::unique_ptr<MNEVolGeom> read_vol_geom(QFile &fp)
 /*
  * This the volume geometry reading code from FreeSurfer
  */
@@ -229,7 +212,7 @@ MNEVolGeom* read_vol_geom(QFile &fp)
     int counter = 0;
     qint64 pos = 0;
 
-    MNEVolGeom* vg = new MNEVolGeom();
+    auto vg = std::make_unique<MNEVolGeom>();
 
     while (!fp.atEnd() && counter < 8)
     {
@@ -247,7 +230,7 @@ MNEVolGeom* read_vol_geom(QFile &fp)
         }
         else if (!strcmp(param, "filename")) {
             if (sscanf(line, "%s %s %s", param, eq, buf) >= 3)
-                vg->filename = strdup(buf);
+                vg->filename = QString::fromUtf8(buf);
             counter++;
         }
         else if (!strcmp(param, "volume")) {
@@ -298,8 +281,7 @@ MNEVolGeom* read_vol_geom(QFile &fp)
         /* note that this won't allow compression using pipe */
     }
     if (!vgRead) {
-        delete vg;
-        vg = new MNEVolGeom();
+        vg = std::make_unique<MNEVolGeom>();
     }
     return vg;
 }
@@ -313,34 +295,39 @@ int read_tag_data(QFile &fp, int tag, long long nbytes, unsigned char *&val, lon
  * Read the data of one tag
  */
 {
-    unsigned char *dum = nullptr;
     size_t snbytes = nbytes;
 
      val = nullptr;
     if (nbytes > 0) {
-        dum = new unsigned char[nbytes+1]();
-        if (fp.read(reinterpret_cast<char*>(dum), nbytes) != static_cast<qint64>(snbytes)) {
+        auto dum = std::make_unique<unsigned char[]>(nbytes+1);
+        if (fp.read(reinterpret_cast<char*>(dum.get()), nbytes) != static_cast<qint64>(snbytes)) {
             qCritical("Failed to read %d bytes of tag data",static_cast<int>(nbytes));
-            delete[] dum;
             return FAIL;
         }
         dum[nbytes] = '\0'; /* Ensure null termination */
-        val     = dum;
+        val     = dum.release();
         nbytesp = nbytes;
     }
     else {			/* Need to handle special cases */
         if (tag == TAG_OLD_SURF_GEOM) {
-            MNEVolGeom* g = read_vol_geom(fp);
+            auto g = read_vol_geom(fp);
             if (!g)
                 return FAIL;
-            val     = reinterpret_cast<unsigned char *>(g);
+            /*
+             * Serialize the MNEVolGeom into a byte array so that
+             * add_mgh_tag_to_group can safely delete[] the buffer.
+             * get_volume_geom_from_tag later reinterprets these bytes.
+             */
+            auto buf = std::make_unique<unsigned char[]>(sizeof(MNEVolGeom));
+            std::memcpy(buf.get(), g.get(), sizeof(MNEVolGeom));
+            val     = buf.release();
             nbytesp = sizeof(MNEVolGeom);
         }
         else if (tag == TAG_OLD_USEREALRAS || tag == TAG_USEREALRAS) {
-            int *vi = new int[1]();
-            if (read_int(fp,*vi) == FAIL)
-                vi = 0;
-            val = reinterpret_cast<unsigned char *>(vi);
+            auto vi = std::make_unique<int[]>(1);
+            if (read_int(fp, vi[0]) == FAIL)
+                return FAIL;
+            val = reinterpret_cast<unsigned char *>(vi.release());
             nbytesp = sizeof(int);
         }
         else {
@@ -594,28 +581,28 @@ int read_triangle_file(const QString& fname,
      * Read the vertices
      */
         for (k = 0; k < nvert; k++) {
-            if (read_float(fp,vert(k,X_17)) != 0)
+            if (read_float(fp,vert(k,0)) != 0)
                 return FAIL;
-            if (read_float(fp,vert(k,Y_17)) != 0)
+            if (read_float(fp,vert(k,1)) != 0)
                 return FAIL;
-            if (read_float(fp,vert(k,Z_17)) != 0)
+            if (read_float(fp,vert(k,2)) != 0)
                 return FAIL;
         }
         /*
      * Read the triangles
      */
         for (k = 0; k < ntri; k++) {
-            if (read_int(fp,tri(k,X_17)) != 0)
+            if (read_int(fp,tri(k,0)) != 0)
                 return FAIL;
-            if (check_vertex(tri(k,X_17),nvert) != OK)
+            if (check_vertex(tri(k,0),nvert) != OK)
                 return FAIL;
-            if (read_int(fp,tri(k,Y_17)) != 0)
+            if (read_int(fp,tri(k,1)) != 0)
                 return FAIL;
-            if (check_vertex(tri(k,Y_17),nvert) != OK)
+            if (check_vertex(tri(k,1),nvert) != OK)
                 return FAIL;
-            if (read_int(fp,tri(k,Z_17)) != 0)
+            if (read_int(fp,tri(k,2)) != 0)
                 return FAIL;
-            if (check_vertex(tri(k,Z_17),nvert) != OK)
+            if (check_vertex(tri(k,2),nvert) != OK)
                 return FAIL;
         }
     }
@@ -633,22 +620,22 @@ int read_triangle_file(const QString& fname,
             for (k = 0; k < nvert; k++) {
                 if (read_int2(fp,val) != 0)
                     return FAIL;
-                vert(k,X_17) = val/100.0;
+                vert(k,0) = val/100.0;
                 if (read_int2(fp,val) != 0)
                     return FAIL;
-                vert(k,Y_17) = val/100.0;
+                vert(k,1) = val/100.0;
                 if (read_int2(fp,val) != 0)
                     return FAIL;
-                vert(k,Z_17) = val/100.0;
+                vert(k,2) = val/100.0;
             }
         }
         else {			/* NEW_QUAD_FILE_MAGIC_NUMBER */
             for (k = 0; k < nvert; k++) {
-                if (read_float(fp,vert(k,X_17)) != 0)
+                if (read_float(fp,vert(k,0)) != 0)
                     return FAIL;
-                if (read_float(fp,vert(k,Y_17)) != 0)
+                if (read_float(fp,vert(k,1)) != 0)
                     return FAIL;
-                if (read_float(fp,vert(k,Z_17)) != 0)
+                if (read_float(fp,vert(k,2)) != 0)
                     return FAIL;
             }
         }
@@ -677,25 +664,25 @@ int read_triangle_file(const QString& fname,
      */
 
             if (EVEN(which)) {
-                tri(ntri,X_17) = quad[0];
-                tri(ntri,Y_17) = quad[1];
-                tri(ntri,Z_17) = quad[3];
+                tri(ntri,0) = quad[0];
+                tri(ntri,1) = quad[1];
+                tri(ntri,2) = quad[3];
                 ntri++;
 
-                tri(ntri,X_17) = quad[2];
-                tri(ntri,Y_17) = quad[3];
-                tri(ntri,Z_17) = quad[1];
+                tri(ntri,0) = quad[2];
+                tri(ntri,1) = quad[3];
+                tri(ntri,2) = quad[1];
                 ntri++;
             }
             else {
-                tri(ntri,X_17) = quad[0];
-                tri(ntri,Y_17) = quad[1];
-                tri(ntri,Z_17) = quad[2];
+                tri(ntri,0) = quad[0];
+                tri(ntri,1) = quad[1];
+                tri(ntri,2) = quad[2];
                 ntri++;
 
-                tri(ntri,X_17) = quad[0];
-                tri(ntri,Y_17) = quad[2];
-                tri(ntri,Z_17) = quad[3];
+                tri(ntri,0) = quad[0];
+                tri(ntri,1) = quad[2];
+                tri(ntri,2) = quad[3];
                 ntri++;
             }
         }
@@ -789,7 +776,7 @@ MNESourceSpace::MNESourceSpace(int np)
     vol_geom.reset();
     mgh_tags.reset();
 
-    cm[X_51] = cm[Y_51] = cm[Z_51] = 0.0;
+    cm[0] = cm[1] = cm[2] = 0.0;
 }
 
 //=============================================================================================================
@@ -1145,31 +1132,18 @@ std::unique_ptr<MNESourceSpace> MNESourceSpace::load_surface_geom(const QString&
 
 //=============================================================================================================
 
-static std::optional<FiffCoordTrans> make_voxel_ras_trans(float *r0,
-                                                  float *x_ras,
-                                                  float *y_ras,
-                                                  float *z_ras,
-                                                  float *voxel_size)
-
+static std::optional<FiffCoordTrans> make_voxel_ras_trans(const Eigen::Vector3f& r0,
+                                                  const Eigen::Vector3f& x_ras,
+                                                  const Eigen::Vector3f& y_ras,
+                                                  const Eigen::Vector3f& z_ras,
+                                                  const Eigen::Vector3f& voxel_size)
 {
-    float rot[3][3],move[3];
-    int   j,k;
+    Eigen::Matrix3f rot;
+    rot.row(0) = x_ras.transpose() * voxel_size[0];
+    rot.row(1) = y_ras.transpose() * voxel_size[1];
+    rot.row(2) = z_ras.transpose() * voxel_size[2];
 
-    VEC_COPY_17(move,r0);
-
-    for (j = 0; j < 3; j++) {
-        rot[j][0] = x_ras[j];
-        rot[j][1] = y_ras[j];
-        rot[j][2] = z_ras[j];
-    }
-
-    for (j = 0; j < 3; j++)
-        for (k = 0; k < 3; k++)
-            rot[j][k]    = voxel_size[k]*rot[j][k];
-
-    return FiffCoordTrans(FIFFV_MNE_COORD_MRI_VOXEL,FIFFV_COORD_MRI,
-                                            Eigen::Map<Eigen::Matrix3f>(&rot[0][0]),
-                                            Eigen::Map<Eigen::Vector3f>(move));
+    return FiffCoordTrans(FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_COORD_MRI, rot, r0);
 }
 
 MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf, float grid, float exclude, float mindist)
@@ -1177,10 +1151,9 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
      * Make a source space which covers the volume bounded by surf
      */
 {
-    float min[3],max[3],cm[3];
+    Eigen::Vector3f minV, maxV, cm;
     int   minn[3],maxn[3];
-    const float *node;
-    float maxdist,dist,diff[3];
+    float maxdist,dist;
     int   k,c;
     std::unique_ptr<MNESourceSpace> sp;
     int np,nplane,nrow;
@@ -1189,68 +1162,60 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
     /*
         * Figure out the grid size
         */
-    cm[X_17] = cm[Y_17] = cm[Z_17] = 0.0;
-    node = &surf.rr(0,0);
-    for (c = 0; c < 3; c++)
-        min[c] = max[c] = node[c];
+    cm.setZero();
+    minV = maxV = surf.rr.row(0).transpose();
 
     for (k = 0; k < surf.np; k++) {
-        node = &surf.rr(k,0);
-        for (c = 0; c < 3; c++) {
-            cm[c] += node[c];
-            if (node[c] < min[c])
-                min[c] = node[c];
-            if (node[c] > max[c])
-                max[c] = node[c];
-        }
+        Eigen::Vector3f node = surf.rr.row(k).transpose();
+        cm += node;
+        minV = minV.cwiseMin(node);
+        maxV = maxV.cwiseMax(node);
     }
-    for (c = 0; c < 3; c++)
-        cm[c] = cm[c]/surf.np;
+    cm /= static_cast<float>(surf.np);
     /*
        * Define the sphere which fits the surface
        */
     maxdist = 0.0;
     for (k = 0; k < surf.np; k++) {
-        VEC_DIFF_17(cm,&surf.rr(k,0),diff);
-        dist = VEC_LEN_17(diff);
+        dist = (surf.rr.row(k).transpose() - cm).norm();
         if (dist > maxdist)
             maxdist = dist;
     }
     qInfo("FsSurface CM = (%6.1f %6.1f %6.1f) mm\n",
-           1000*cm[X_17], 1000*cm[Y_17], 1000*cm[Z_17]);
+           1000*cm[X], 1000*cm[Y], 1000*cm[Z]);
     qInfo("FsSurface fits inside a sphere with radius %6.1f mm\n",1000*maxdist);
     qInfo("FsSurface extent:\n"
            "\tx = %6.1f ... %6.1f mm\n"
            "\ty = %6.1f ... %6.1f mm\n"
            "\tz = %6.1f ... %6.1f mm\n",
-           1000*min[X_17],1000*max[X_17],
-           1000*min[Y_17],1000*max[Y_17],
-           1000*min[Z_17],1000*max[Z_17]);
+           1000*minV[X],1000*maxV[X],
+           1000*minV[Y],1000*maxV[Y],
+           1000*minV[Z],1000*maxV[Z]);
     for (c = 0; c < 3; c++) {
-        if (max[c] > 0)
-            maxn[c] = floor(std::fabs(max[c])/grid)+1;
+        if (maxV[c] > 0)
+            maxn[c] = floor(std::fabs(maxV[c])/grid)+1;
         else
-            maxn[c] = -floor(std::fabs(max[c])/grid)-1;
-        if (min[c] > 0)
-            minn[c] = floor(std::fabs(min[c])/grid)+1;
+            maxn[c] = -floor(std::fabs(maxV[c])/grid)-1;
+        if (minV[c] > 0)
+            minn[c] = floor(std::fabs(minV[c])/grid)+1;
         else
-            minn[c] = -floor(std::fabs(min[c])/grid)-1;
+            minn[c] = -floor(std::fabs(minV[c])/grid)-1;
     }
     qInfo("Grid extent:\n"
            "\tx = %6.1f ... %6.1f mm\n"
            "\ty = %6.1f ... %6.1f mm\n"
            "\tz = %6.1f ... %6.1f mm\n",
-           1000*(minn[X_17]*grid),1000*(maxn[X_17]*grid),
-           1000*(minn[Y_17]*grid),1000*(maxn[Y_17]*grid),
-           1000*(minn[Z_17]*grid),1000*(maxn[Z_17]*grid));
+           1000*(minn[0]*grid),1000*(maxn[0]*grid),
+           1000*(minn[1]*grid),1000*(maxn[1]*grid),
+           1000*(minn[2]*grid),1000*(maxn[2]*grid));
     /*
        * Now make the initial grid
        */
     np = 1;
     for (c = 0; c < 3; c++)
         np = np*(maxn[c]-minn[c]+1);
-    nplane = (maxn[X_17]-minn[X_17]+1)*(maxn[Y_17]-minn[Y_17]+1);
-    nrow   = (maxn[X_17]-minn[X_17]+1);
+    nplane = (maxn[0]-minn[0]+1)*(maxn[1]-minn[1]+1);
+    nrow   = (maxn[0]-minn[0]+1);
     sp = MNESourceSpace::create_source_space(np);
     sp->type = MNE_SOURCE_SPACE_VOLUME;
     sp->nneighbor_vert = Eigen::VectorXi::Constant(sp->np, NNEIGHBORS);
@@ -1258,93 +1223,93 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
     for (k = 0; k < sp->np; k++) {
         sp->inuse[k]  = 1;
         sp->vertno[k] = k;
-        sp->nn(k,X_17) = sp->nn(k,Y_17) = 0.0; /* Source orientation is immaterial */
-        sp->nn(k,Z_17) = 1.0;
+        sp->nn(k,0) = sp->nn(k,1) = 0.0; /* Source orientation is immaterial */
+        sp->nn(k,2) = 1.0;
         sp->neighbor_vert[k] = Eigen::VectorXi::Constant(NNEIGHBORS, -1);
         sp->nuse++;
     }
-    for (k = 0, z = minn[Z_17]; z <= maxn[Z_17]; z++) {
-        for (y = minn[Y_17]; y <= maxn[Y_17]; y++) {
-            for (x = minn[X_17]; x <= maxn[X_17]; x++, k++) {
-                sp->rr(k,X_17) = x*grid;
-                sp->rr(k,Y_17) = y*grid;
-                sp->rr(k,Z_17) = z*grid;
+    for (k = 0, z = minn[2]; z <= maxn[2]; z++) {
+        for (y = minn[1]; y <= maxn[1]; y++) {
+            for (x = minn[0]; x <= maxn[0]; x++, k++) {
+                sp->rr(k,0) = x*grid;
+                sp->rr(k,1) = y*grid;
+                sp->rr(k,2) = z*grid;
                 /*
              * Figure out the neighborhood:
              * 6-neighborhood first
              */
                 Eigen::VectorXi& neigh = sp->neighbor_vert[k];
-                if (z > minn[Z_17])
+                if (z > minn[2])
                     neigh[0]  = k - nplane;
-                if (x < maxn[X_17])
+                if (x < maxn[0])
                     neigh[1] = k + 1;
-                if (y < maxn[Y_17])
+                if (y < maxn[1])
                     neigh[2] = k + nrow;
-                if (x > minn[X_17])
+                if (x > minn[0])
                     neigh[3] = k - 1;
-                if (y > minn[Y_17])
+                if (y > minn[1])
                     neigh[4] = k - nrow;
-                if (z < maxn[Z_17])
+                if (z < maxn[2])
                     neigh[5] = k + nplane;
                 /*
              * Then the rest to complete the 26-neighborhood
              * First the plane below
              */
-                if (z > minn[Z_17]) {
-                    if (x < maxn[X_17]) {
+                if (z > minn[2]) {
+                    if (x < maxn[0]) {
                         neigh[6] = k + 1 - nplane;
-                        if (y < maxn[Y_17])
+                        if (y < maxn[1])
                             neigh[7] = k + 1 + nrow - nplane;
                     }
-                    if (y < maxn[Y_17])
+                    if (y < maxn[1])
                         neigh[8] = k + nrow - nplane;
-                    if (x > minn[X_17]) {
-                        if (y < maxn[Y_17])
+                    if (x > minn[0]) {
+                        if (y < maxn[1])
                             neigh[9] = k - 1 + nrow - nplane;
                         neigh[10] = k - 1 - nplane;
-                        if (y > minn[Y_17])
+                        if (y > minn[1])
                             neigh[11] = k - 1 - nrow - nplane;
                     }
-                    if (y > minn[Y_17]) {
+                    if (y > minn[1]) {
                         neigh[12] = k - nrow - nplane;
-                        if (x < maxn[X_17])
+                        if (x < maxn[0])
                             neigh[13] = k + 1 - nrow - nplane;
                     }
                 }
                 /*
              * Then the same plane
              */
-                if (x < maxn[X_17] && y < maxn[Y_17])
+                if (x < maxn[0] && y < maxn[1])
                     neigh[14] = k + 1 + nrow;
-                if (x > minn[X_17]) {
-                    if (y < maxn[Y_17])
+                if (x > minn[0]) {
+                    if (y < maxn[1])
                         neigh[15] = k - 1 + nrow;
-                    if (y > minn[Y_17])
+                    if (y > minn[1])
                         neigh[16] = k - 1 - nrow;
                 }
-                if (y > minn[Y_17] && x < maxn[X_17])
+                if (y > minn[1] && x < maxn[0])
                     neigh[17] = k + 1 - nrow - nplane;
                 /*
              * Finally one plane above
              */
-                if (z < maxn[Z_17]) {
-                    if (x < maxn[X_17]) {
+                if (z < maxn[2]) {
+                    if (x < maxn[0]) {
                         neigh[18] = k + 1 + nplane;
-                        if (y < maxn[Y_17])
+                        if (y < maxn[1])
                             neigh[19] = k + 1 + nrow + nplane;
                     }
-                    if (y < maxn[Y_17])
+                    if (y < maxn[1])
                         neigh[20] = k + nrow + nplane;
-                    if (x > minn[X_17]) {
-                        if (y < maxn[Y_17])
+                    if (x > minn[0]) {
+                        if (y < maxn[1])
                             neigh[21] = k - 1 + nrow + nplane;
                         neigh[22] = k - 1 + nplane;
-                        if (y > minn[Y_17])
+                        if (y > minn[1])
                             neigh[23] = k - 1 - nrow + nplane;
                     }
-                    if (y > minn[Y_17]) {
+                    if (y > minn[1]) {
                         neigh[24] = k - nrow + nplane;
-                        if (x < maxn[X_17])
+                        if (x < maxn[0])
                             neigh[25] = k + 1 - nrow + nplane;
                     }
                 }
@@ -1356,8 +1321,7 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
        * Exclude infeasible points
        */
     for (k = 0; k < sp->np; k++) {
-        VEC_DIFF_17(cm,&sp->rr(k,0),diff);
-        dist = VEC_LEN_17(diff);
+        dist = (sp->rr.row(k).transpose() - cm).norm();
         if (dist < exclude || dist > maxdist) {
             sp->inuse[k] = 0;
             sp->nuse--;
@@ -1395,27 +1359,14 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
      * Set up the volume data (needed for creating the interpolation matrix)
      */
     {
-        float r0[3],voxel_size[3],x_ras[3],y_ras[3],z_ras[3];
-        int   width,height,depth;
-
-        r0[X_17] = minn[X_17]*grid;
-        r0[Y_17] = minn[Y_17]*grid;
-        r0[Z_17] = minn[Z_17]*grid;
-
-        voxel_size[0] = grid;
-        voxel_size[1] = grid;
-        voxel_size[2] = grid;
-
-        width  = (maxn[X_17]-minn[X_17]+1);
-        height = (maxn[Y_17]-minn[Y_17]+1);
-        depth  = (maxn[Z_17]-minn[Z_17]+1);
-
-        for (k = 0; k < 3; k++)
-            x_ras[k] = y_ras[k] = z_ras[k] = 0.0;
-
-        x_ras[0] = 1.0;
-        y_ras[1] = 1.0;
-        z_ras[2] = 1.0;
+        Eigen::Vector3f r0(minn[0]*grid, minn[1]*grid, minn[2]*grid);
+        Eigen::Vector3f voxel_size(grid, grid, grid);
+        Eigen::Vector3f x_ras = Eigen::Vector3f::UnitX();
+        Eigen::Vector3f y_ras = Eigen::Vector3f::UnitY();
+        Eigen::Vector3f z_ras = Eigen::Vector3f::UnitZ();
+        int width  = (maxn[0]-minn[0]+1);
+        int height = (maxn[1]-minn[1]+1);
+        int depth  = (maxn[2]-minn[2]+1);
 
         sp->voxel_surf_RAS_t = make_voxel_ras_trans(r0,x_ras,y_ras,z_ras,voxel_size);
         if (!sp->voxel_surf_RAS_t || sp->voxel_surf_RAS_t->isEmpty())
@@ -1424,7 +1375,7 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
         sp->vol_dims[0] = width;
         sp->vol_dims[1] = height;
         sp->vol_dims[2] = depth;
-        VEC_COPY_17(sp->voxel_size,voxel_size);
+        Eigen::Map<Eigen::Vector3f>(sp->voxel_size) = voxel_size;
     }
 
     return sp.release();
@@ -1439,8 +1390,8 @@ int MNESourceSpace::filter_source_spaces(const MNESurface& surf, float limit, co
 {
     MNESourceSpace* s;
     int k,p1,p2;
-    float r1[3];
-    float mindist,dist,diff[3];
+    Eigen::Vector3f r1;
+    float mindist,dist;
     int   minnode;
     int   omit,omit_outside;
     double tot_angle;
@@ -1470,20 +1421,20 @@ int MNESourceSpace::filter_source_spaces(const MNESurface& surf, float limit, co
         s = spaces[k].get();
         for (p1 = 0; p1 < s->np; p1++)
             if (s->inuse[p1]) {
-                VEC_COPY_17(r1,&s->rr(p1,0));	/* Transform the point to MRI coordinates */
+                r1 = s->rr.row(p1).transpose();	/* Transform the point to MRI coordinates */
                 if (s->coord_frame == FIFFV_COORD_HEAD)
-                    FiffCoordTrans::apply_inverse_trans(r1,mri_head_t,FIFFV_MOVE);
+                    FiffCoordTrans::apply_inverse_trans(r1.data(),mri_head_t,FIFFV_MOVE);
                 /*
                 * Check that the source is inside the inner skull surface
                 */
-                tot_angle = surf.sum_solids(Eigen::Map<const Eigen::Vector3f>(r1))/(4*M_PI);
+                tot_angle = surf.sum_solids(r1)/(4*M_PI);
                 if (std::fabs(tot_angle-1.0) > 1e-5) {
                     omit_outside++;
                     s->inuse[p1] = 0;
                     s->nuse--;
                     if (filtered)
                         *filtered << qSetFieldWidth(10) << qSetRealNumberPrecision(3) << Qt::fixed
-                                  << 1000*r1[X_17] << " " << 1000*r1[Y_17] << " " << 1000*r1[Z_17] << "\n" << qSetFieldWidth(0);
+                                  << 1000*r1[X] << " " << 1000*r1[Y] << " " << 1000*r1[Z] << "\n" << qSetFieldWidth(0);
                 }
                 else if (limit > 0.0) {
                     /*
@@ -1492,8 +1443,7 @@ int MNESourceSpace::filter_source_spaces(const MNESurface& surf, float limit, co
                     mindist = 1.0;
                     minnode = 0;
                     for (p2 = 0; p2 < surf.np; p2++) {
-                        VEC_DIFF_17(r1,&surf.rr(p2,0),diff);
-                        dist = VEC_LEN_17(diff);
+                        dist = (surf.rr.row(p2).transpose() - r1).norm();
                         if (dist < mindist) {
                             mindist = dist;
                             minnode = p2;
@@ -1505,7 +1455,7 @@ int MNESourceSpace::filter_source_spaces(const MNESurface& surf, float limit, co
                         s->nuse--;
                         if (filtered)
                             *filtered << qSetFieldWidth(10) << qSetRealNumberPrecision(3) << Qt::fixed
-                                      << 1000*r1[X_17] << " " << 1000*r1[Y_17] << " " << 1000*r1[Z_17] << "\n" << qSetFieldWidth(0);
+                                      << 1000*r1[X] << " " << 1000*r1[Y] << " " << 1000*r1[Z] << "\n" << qSetFieldWidth(0);
                     }
                 }
             }
@@ -1529,8 +1479,8 @@ void MNESourceSpace::filter_source_space(FilterThreadArg *arg)
     int    p1,p2;
     double tot_angle;
     int    omit,omit_outside;
-    float  r1[3];
-    float  mindist,dist,diff[3];
+    Eigen::Vector3f r1;
+    float  mindist,dist;
     int    minnode;
 
     QSharedPointer<MNESurface> surf = a->surf.toStrongRef();
@@ -1544,22 +1494,22 @@ void MNESourceSpace::filter_source_space(FilterThreadArg *arg)
 
     for (p1 = 0; p1 < a->s->np; p1++) {
         if (a->s->inuse[p1]) {
-            VEC_COPY_17(r1,&a->s->rr(p1,0));	/* Transform the point to MRI coordinates */
+            r1 = a->s->rr.row(p1).transpose();	/* Transform the point to MRI coordinates */
             if (a->s->coord_frame == FIFFV_COORD_HEAD) {
                 Q_ASSERT(a->mri_head_t);
-                FiffCoordTrans::apply_inverse_trans(r1,*a->mri_head_t,FIFFV_MOVE);
+                FiffCoordTrans::apply_inverse_trans(r1.data(),*a->mri_head_t,FIFFV_MOVE);
             }
             /*
            * Check that the source is inside the inner skull surface
            */
-            tot_angle = surf->sum_solids(Eigen::Map<const Eigen::Vector3f>(r1))/(4*M_PI);
+            tot_angle = surf->sum_solids(r1)/(4*M_PI);
             if (std::fabs(tot_angle-1.0) > 1e-5) {
                 omit_outside++;
                 a->s->inuse[p1] = 0;
                 a->s->nuse--;
                 if (a->filtered)
                     *a->filtered << qSetFieldWidth(10) << qSetRealNumberPrecision(3) << Qt::fixed
-                                 << 1000*r1[X_17] << " " << 1000*r1[Y_17] << " " << 1000*r1[Z_17] << "\n" << qSetFieldWidth(0);
+                                 << 1000*r1[X] << " " << 1000*r1[Y] << " " << 1000*r1[Z] << "\n" << qSetFieldWidth(0);
             }
             else if (a->limit > 0.0) {
                 /*
@@ -1568,8 +1518,7 @@ void MNESourceSpace::filter_source_space(FilterThreadArg *arg)
                 mindist = 1.0;
                 minnode = 0;
                 for (p2 = 0; p2 < surf->np; p2++) {
-                    VEC_DIFF_17(r1,&surf->rr(p2,0),diff);
-                    dist = VEC_LEN_17(diff);
+                    dist = (surf->rr.row(p2).transpose() - r1).norm();
                     if (dist < mindist) {
                         mindist = dist;
                         minnode = p2;
@@ -1581,7 +1530,7 @@ void MNESourceSpace::filter_source_space(FilterThreadArg *arg)
                     a->s->nuse--;
                     if (a->filtered)
                         *a->filtered << qSetFieldWidth(10) << qSetRealNumberPrecision(3) << Qt::fixed
-                                     << 1000*r1[X_17] << " " << 1000*r1[Y_17] << " " << 1000*r1[Z_17] << "\n" << qSetFieldWidth(0);
+                                     << 1000*r1[X] << " " << 1000*r1[Y] << " " << 1000*r1[Z] << "\n" << qSetFieldWidth(0);
                 }
             }
         }
@@ -1921,7 +1870,7 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
             new_space->voxel_surf_RAS_t   = FiffCoordTrans(FiffCoordTrans::readTransformFromNode(stream, node, FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS));
             if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS, t_pTag)) {
                 Eigen::Map<Eigen::Vector3i> volDimsMap(t_pTag->toInt());
-                VEC_COPY_17(new_space->vol_dims, volDimsMap.data());
+                Eigen::Map<Eigen::Vector3i>(new_space->vol_dims) = volDimsMap;
             }
             {
                 QList<FiffDirNode::SPtr>  mris = node->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);

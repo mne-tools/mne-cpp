@@ -50,6 +50,8 @@
 
 #include <math/sphere.h>
 
+#include <Eigen/Geometry>
+
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <QDebug>
@@ -67,6 +69,10 @@ using namespace MNELIB;
 constexpr int FAIL = -1;
 constexpr int OK   =  0;
 
+constexpr int X = 0;
+constexpr int Y = 1;
+constexpr int Z = 2;
+
 constexpr int  SHOW_CURVATURE_NONE    = 0;
 constexpr int  SHOW_CURVATURE_OVERLAY = 1;
 constexpr int  SHOW_OVERLAY_HEAT      = 1;
@@ -74,32 +80,6 @@ constexpr int  SHOW_OVERLAY_HEAT      = 1;
 constexpr float POS_CURV_COLOR  = 0.25f;
 constexpr float NEG_CURV_COLOR  = 0.375f;
 constexpr float EVEN_CURV_COLOR = 0.375f;
-
-#define X_17 0
-#define Y_17 1
-#define Z_17 2
-
-#define VEC_DOT_17(x,y) ((x)[X_17]*(y)[X_17] + (x)[Y_17]*(y)[Y_17] + (x)[Z_17]*(y)[Z_17])
-
-#define VEC_LEN_17(x) sqrt(VEC_DOT_17(x,x))
-
-#define VEC_DIFF_17(from,to,diff) {\
-    (diff)[X_17] = (to)[X_17] - (from)[X_17];\
-    (diff)[Y_17] = (to)[Y_17] - (from)[Y_17];\
-    (diff)[Z_17] = (to)[Z_17] - (from)[Z_17];\
-    }
-
-#define VEC_COPY_17(to,from) {\
-    (to)[X_17] = (from)[X_17];\
-    (to)[Y_17] = (from)[Y_17];\
-    (to)[Z_17] = (from)[Z_17];\
-    }
-
-#define CROSS_PRODUCT_17(x,y,xy) {\
-    (xy)[X_17] =   (x)[Y_17]*(y)[Z_17]-(y)[Y_17]*(x)[Z_17];\
-    (xy)[Y_17] = -((x)[X_17]*(y)[Z_17]-(y)[X_17]*(x)[Z_17]);\
-    (xy)[Z_17] =   (x)[X_17]*(y)[Y_17]-(y)[X_17]*(x)[Y_17];\
-    }
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -191,7 +171,7 @@ int MNEMshDisplaySurface::align_fiducials(FiffDigitizerData& head_dig,
 
     // Overwrite the fiducial locations with the ones from the MRI digitizer data
     for (k = 0; k < head_dig.nfids(); k++)
-        VEC_COPY_17(head_dig.mri_fids[k].r,mri_fid.row(k).data());
+        Eigen::Map<Eigen::Vector3f>(head_dig.mri_fids[k].r) = mri_fid.row(k).transpose();
     head_dig.head_mri_t_adj->print();
     qInfo("After simple alignment : \n");
 
@@ -225,7 +205,6 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
     float simplex_size = 2e-2;
     Eigen::VectorXf r0(3);
     float Rdig,Rscalp;
-    float LR[3],LN[3],len,norm[3],diff[3];
 
     scales[0] = scales[1] = scales[2] = 1.0;
 
@@ -234,7 +213,7 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
 
     // Pick only the points with positive z
     for (k = 0, ndig = 0; k < dig.npoint; k++) {
-        if (dig.points[k].r[Z_17] > 0) {
+        if (dig.points[k].r[2] > 0) {
             dig_rr.row(ndig++) = Eigen::Map<const Eigen::RowVector3f>(dig.points[k].r);
         }
     }
@@ -243,20 +222,17 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
         return;
     }
 
-    qInfo("Polhemus : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[X_17],1000*r0[Y_17],1000*r0[Z_17],1000*Rdig);
+    qInfo("Polhemus : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[0],1000*r0[1],1000*r0[2],1000*Rdig);
 
     // Pick only the points above the fiducial plane
-    VEC_DIFF_17(mri_fid.row(0).data(),mri_fid.row(2).data(),LR);
-    VEC_DIFF_17(mri_fid.row(0).data(),mri_fid.row(1).data(),LN);
-    CROSS_PRODUCT_17(LR,LN,norm);
-    len = VEC_LEN_17(norm);
-    norm[0] = norm[0]/len;
-    norm[1] = norm[1]/len;
-    norm[2] = norm[2]/len;
+    Eigen::Vector3f LR = mri_fid.row(2).transpose() - mri_fid.row(0).transpose();
+    Eigen::Vector3f LN = mri_fid.row(1).transpose() - mri_fid.row(0).transpose();
+    Eigen::Vector3f norm = LR.cross(LN);
+    norm.normalize();
 
     for (k = 0, nhead = 0; k < np; k++) {
-        VEC_DIFF_17(mri_fid.row(0).data(),&rr(k,0),diff);
-        if (VEC_DOT_17(diff,norm) > 0) {
+        Eigen::Vector3f diff_vec = rr.row(k).transpose() - mri_fid.row(0).transpose();
+        if (diff_vec.dot(norm) > 0) {
             head_rr.row(nhead++) = rr.row(k);
         }
     }
@@ -265,7 +241,7 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
         return;
     }
 
-    qInfo("Scalp : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[X_17],1000*r0[Y_17],1000*r0[Z_17],1000*Rscalp);
+    qInfo("Scalp : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[0],1000*r0[1],1000*r0[2],1000*Rscalp);
 
     scales[0] = scales[1] = scales[2] = Rdig/Rscalp;
 }
