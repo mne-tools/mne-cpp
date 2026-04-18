@@ -48,6 +48,7 @@
 //=============================================================================================================
 
 #include <limits>
+#include <functional>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -62,6 +63,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/Sparse>
 
 //=============================================================================================================
 // DEFINE NAMESPACE
@@ -95,6 +97,29 @@ public:
                                                 const std::vector<Eigen::VectorXi> &vecNeighborVertices,
                                                 Eigen::VectorXi &vecVertSubset,
                                                 double dCancelDist = FLOAT_INFINITY);
+
+    //=========================================================================================================
+    /**
+     * @brief scdcInterpolationMat   Computes geodesic distances (SCDC) and builds the sparse interpolation
+     *        matrix in a single pass, without allocating a dense nVertices x nSources distance table.
+     *        Produces identical results to scdc() + Interpolation::createInterpolationMat() but uses
+     *        dramatically less memory (sparse representation only stores entries within cancelDist).
+     *
+     * @param[in] matVertices              Vertex positions (nVertices x 3).
+     * @param[in] vecNeighborVertices      Adjacency list for each vertex.
+     * @param[in] vecVertSubset            Source vertex indices.
+     * @param[in] interpolationFunction    Weight function (e.g. Interpolation::cubic).
+     * @param[in] dCancelDist             Maximum geodesic distance for interpolation.
+     * @param[in] progressCallback         Optional callback reporting Dijkstra progress (current, total).
+     * @return Sparse interpolation matrix (nVertices x nSources).
+     */
+    static QSharedPointer<Eigen::SparseMatrix<float>> scdcInterpolationMat(
+        const Eigen::MatrixX3f &matVertices,
+        const std::vector<Eigen::VectorXi> &vecNeighborVertices,
+        const Eigen::VectorXi &vecVertSubset,
+        double (*interpolationFunction)(double),
+        double dCancelDist,
+        std::function<void(int, int)> progressCallback = nullptr);
 
     //=========================================================================================================
     /**

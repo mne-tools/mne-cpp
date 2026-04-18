@@ -94,6 +94,13 @@ install(
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)
+    # WASM: increase pthread pool to avoid deadlocks when QtConcurrent or
+    # QThread spawn additional threads (e.g. SCDC geodesic distance computation).
+    # Qt default is 4, which is too small for our background loading pipeline.
+    # Must be set BEFORE qt_finalize_executable() which reads this property.
+    if(EMSCRIPTEN)
+        set_target_properties(${PROJECT_NAME} PROPERTIES QT_WASM_PTHREAD_POOL_SIZE 8)
+    endif()
     qt_finalize_executable(${PROJECT_NAME})
 endif()
 

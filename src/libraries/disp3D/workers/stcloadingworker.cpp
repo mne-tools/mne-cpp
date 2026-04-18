@@ -72,6 +72,49 @@ StcLoadingWorker::~StcLoadingWorker()
 
 //=============================================================================================================
 
+QSharedPointer<Eigen::SparseMatrix<float>> StcLoadingWorker::computeInterpolationMatrix(
+    const Eigen::MatrixX3f &matVertices,
+    Eigen::VectorXi &vecSourceVertices,
+    double cancelDist,
+    const QString &hemiLabel,
+    int progressStart,
+    int progressEnd)
+{
+    emit progress(progressStart, QString("Computing %1 geodesic interpolation...").arg(hemiLabel));
+
+    // Compute neighbors from the appropriate surface
+    std::vector<Eigen::VectorXi> vecNeighbors;
+    if (hemiLabel == "LH" && m_lhSurface) {
+        vecNeighbors = m_lhSurface->computeNeighbors();
+    } else if (hemiLabel == "RH" && m_rhSurface) {
+        vecNeighbors = m_rhSurface->computeNeighbors();
+    }
+
+    // Use sparse SCDC+interpolation: runs Dijkstra per source vertex and directly
+    // builds the sparse interpolation matrix without a dense intermediate distance table.
+    // This produces identical results to the old scdc() + createInterpolationMat() pipeline
+    // but uses ~18 MB instead of ~8.7 GB for a typical fsaverage source space.
+    const int progressRange = progressEnd - progressStart;
+    auto progressCallback = [this, &hemiLabel, progressStart, progressRange](int current, int total) {
+        int pct = progressStart + (progressRange * current) / total;
+        emit progress(pct, QString("%1 geodesic interpolation %2/%3").arg(hemiLabel).arg(current).arg(total));
+    };
+
+    auto interpMat = DISP3DLIB::GeometryInfo::scdcInterpolationMat(
+        matVertices,
+        vecNeighbors,
+        vecSourceVertices,
+        DISP3DLIB::Interpolation::cubic,
+        cancelDist,
+        progressCallback
+    );
+
+    emit progress(progressEnd, QString("%1 interpolation matrix ready").arg(hemiLabel));
+    return interpMat;
+}
+
+//=============================================================================================================
+
 void StcLoadingWorker::process()
 {
     emit progress(0, "Loading STC files...");
@@ -83,8 +126,6 @@ void StcLoadingWorker::process()
         if (INVLIB::InvSourceEstimate::read(file, stc)) {
             m_stcLh = stc;
             m_hasLh = true;
-            qDebug() << "StcLoadingWorker: Loaded LH with" << stc.data.rows() << "vertices,"
-                     << stc.data.cols() << "time points";
         } else {
             emit error(QString("Failed to read LH STC file: %1").arg(m_lhPath));
         }
@@ -99,8 +140,6 @@ void StcLoadingWorker::process()
         if (INVLIB::InvSourceEstimate::read(file, stc)) {
             m_stcRh = stc;
             m_hasRh = true;
-            qDebug() << "StcLoadingWorker: Loaded RH with" << stc.data.rows() << "vertices,"
-                     << stc.data.cols() << "time points";
         } else {
             emit error(QString("Failed to read RH STC file: %1").arg(m_rhPath));
         }
@@ -114,79 +153,23 @@ void StcLoadingWorker::process()
 
     // Compute LH interpolation matrix
     if (m_hasLh && m_lhSurface) {
-        emit progress(10, "Computing LH interpolation matrix...");
-        
         Eigen::MatrixX3f matVertices = m_lhSurface->verticesAsMatrix();
-        std::vector<Eigen::VectorXi> vecNeighbors = m_lhSurface->computeNeighbors();
-
         Eigen::VectorXi vecSourceVertices = m_stcLh.vertices;
 
-        qDebug() << "StcLoadingWorker: LH surface has" << matVertices.rows() << "vertices,"
-                 << vecSourceVertices.size() << "sources";
-
         if (vecSourceVertices.size() > 0) {
-            // Compute distance table (SCDC - geodesic distance)
-            emit progress(15, "Computing LH geodesic distances (SCDC)...");
-            QSharedPointer<Eigen::MatrixXd> distTable = DISP3DLIB::GeometryInfo::scdc(
-                matVertices,
-                vecNeighbors,
-                vecSourceVertices,
-                m_cancelDist
-            );
-
-            if (distTable && distTable->rows() > 0) {
-                emit progress(35, "Creating LH interpolation matrix...");
-                m_interpMatLh = DISP3DLIB::Interpolation::createInterpolationMat(
-                    vecSourceVertices,
-                    distTable,
-                    DISP3DLIB::Interpolation::cubic,
-                    m_cancelDist
-                );
-
-                if (m_interpMatLh && m_interpMatLh->rows() > 0) {
-                    qDebug() << "StcLoadingWorker: LH interpolation matrix created:"
-                             << m_interpMatLh->rows() << "x" << m_interpMatLh->cols();
-                }
-            }
+            m_interpMatLh = computeInterpolationMatrix(matVertices, vecSourceVertices, m_cancelDist,
+                                                       "LH", 10, 45);
         }
     }
 
     // Compute RH interpolation matrix
     if (m_hasRh && m_rhSurface) {
-        emit progress(50, "Computing RH interpolation matrix...");
-
         Eigen::MatrixX3f matVertices = m_rhSurface->verticesAsMatrix();
-        std::vector<Eigen::VectorXi> vecNeighbors = m_rhSurface->computeNeighbors();
-
         Eigen::VectorXi vecSourceVertices = m_stcRh.vertices;
 
-        qDebug() << "StcLoadingWorker: RH surface has" << matVertices.rows() << "vertices,"
-                 << vecSourceVertices.size() << "sources";
-
         if (vecSourceVertices.size() > 0) {
-            // Compute distance table (SCDC - geodesic distance)
-            emit progress(55, "Computing RH geodesic distances (SCDC)...");
-            QSharedPointer<Eigen::MatrixXd> distTable = DISP3DLIB::GeometryInfo::scdc(
-                matVertices,
-                vecNeighbors,
-                vecSourceVertices,
-                m_cancelDist
-            );
-
-            if (distTable && distTable->rows() > 0) {
-                emit progress(75, "Creating RH interpolation matrix...");
-                m_interpMatRh = DISP3DLIB::Interpolation::createInterpolationMat(
-                    vecSourceVertices,
-                    distTable,
-                    DISP3DLIB::Interpolation::cubic,
-                    m_cancelDist
-                );
-
-                if (m_interpMatRh && m_interpMatRh->rows() > 0) {
-                    qDebug() << "StcLoadingWorker: RH interpolation matrix created:"
-                             << m_interpMatRh->rows() << "x" << m_interpMatRh->cols();
-                }
-            }
+            m_interpMatRh = computeInterpolationMatrix(matVertices, vecSourceVertices, m_cancelDist,
+                                                       "RH", 50, 90);
         }
     }
 

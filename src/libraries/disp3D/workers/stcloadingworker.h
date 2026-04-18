@@ -172,6 +172,14 @@ signals:
     void error(const QString &message);
 
 private:
+    QSharedPointer<Eigen::SparseMatrix<float>> computeInterpolationMatrix(
+        const Eigen::MatrixX3f &matVertices,
+        Eigen::VectorXi &vecSourceVertices,
+        double cancelDist,
+        const QString &hemiLabel,
+        int progressStart,
+        int progressEnd);
+
     QString m_lhPath;                                          /**< Path to LH STC file. */
     QString m_rhPath;                                          /**< Path to RH STC file. */
     BrainSurface *m_lhSurface;                                 /**< Pointer to LH surface. */

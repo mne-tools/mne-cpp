@@ -87,6 +87,10 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MatrixX3f &matVertices,
     if (iCores <= 0) {
         iCores = 2;
     }
+#ifdef __EMSCRIPTEN__
+    // Cap parallel threads to avoid exhausting the Emscripten pthread pool.
+    iCores = qMin(iCores, 2);
+#endif
 
     qint32 iSubArraySize = int(double(vecVertSubset.size()) / double(iCores));
     QVector<QFuture<void> > vecThreads(iCores);
@@ -130,6 +134,130 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MatrixX3f &matVertices,
 
 //=============================================================================================================
 
+QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
+    const MatrixX3f &matVertices,
+    const std::vector<VectorXi> &vecNeighborVertices,
+    const VectorXi &vecVertSubset,
+    double (*interpolationFunction)(double),
+    double dCancelDist,
+    std::function<void(int, int)> progressCallback)
+{
+    const qint32 nVerts = static_cast<qint32>(matVertices.rows());
+    const qint32 nSources = static_cast<qint32>(vecVertSubset.size());
+    const qint32 nAdj = static_cast<qint32>(vecNeighborVertices.size());
+
+    // Build a set of source vertex indices for O(1) lookup
+    // (vertices that ARE source vertices get weight=1 on themselves)
+    QSet<qint32> sourceVertexSet;
+    QHash<qint32, qint32> vertexToSourceIdx;
+    for (qint32 s = 0; s < nSources; ++s) {
+        sourceVertexSet.insert(vecVertSubset[s]);
+        vertexToSourceIdx.insert(vecVertSubset[s], s);
+    }
+
+    // For each source vertex, run Dijkstra from that source.
+    // Collect distances to all reachable mesh vertices within cancelDist.
+    // Store as: perVertex[meshVertexIdx] -> list of (sourceIdx, geodesicDist)
+    // We process source-by-source since each Dijkstra only touches a small neighborhood.
+
+    // Thread-local storage: each chunk produces triplets
+    struct VertexWeight {
+        qint32 sourceIdx;
+        float dist;
+    };
+
+    // We'll collect per-vertex sparse distance info
+    // Using a vector of vectors: for each mesh vertex, store (sourceIdx, dist) pairs
+    std::vector<std::vector<VertexWeight>> perVertexWeights(nVerts);
+
+    // Process sources sequentially (each Dijkstra is already fast with cancelDist)
+    QVector<double> vecMinDists(nAdj);
+    std::set<std::pair<double, qint32>> vertexQ;
+    const double INF = FLOAT_INFINITY;
+
+    for (qint32 s = 0; s < nSources; ++s) {
+        if (progressCallback && s > 0 && s % 100 == 0) {
+            progressCallback(s, nSources);
+        }
+
+        qint32 iRoot = vecVertSubset[s];
+        vertexQ.clear();
+        vecMinDists.fill(INF);
+        vecMinDists[iRoot] = 0.0;
+        vertexQ.insert(std::make_pair(0.0, iRoot));
+
+        while (!vertexQ.empty()) {
+            const double dDist = vertexQ.begin()->first;
+            const qint32 u = vertexQ.begin()->second;
+            vertexQ.erase(vertexQ.begin());
+
+            if (dDist <= dCancelDist) {
+                const VectorXi& vecNeighbours = vecNeighborVertices[u];
+
+                for (Eigen::Index ne = 0; ne < vecNeighbours.size(); ++ne) {
+                    qint32 v = vecNeighbours[ne];
+
+                    const double dDistX = matVertices(u, 0) - matVertices(v, 0);
+                    const double dDistY = matVertices(u, 1) - matVertices(v, 1);
+                    const double dDistZ = matVertices(u, 2) - matVertices(v, 2);
+                    const double dDistWithU = dDist + sqrt(dDistX * dDistX + dDistY * dDistY + dDistZ * dDistZ);
+
+                    if (dDistWithU < vecMinDists[v]) {
+                        vertexQ.erase(std::make_pair(vecMinDists[v], v));
+                        vecMinDists[v] = dDistWithU;
+                        vertexQ.insert(std::make_pair(vecMinDists[v], v));
+                    }
+                }
+            }
+        }
+
+        // Collect all vertices reachable from this source within cancelDist
+        for (qint32 m = 0; m < nAdj; ++m) {
+            if (vecMinDists[m] < dCancelDist) {
+                perVertexWeights[m].push_back({s, static_cast<float>(vecMinDists[m])});
+            }
+        }
+    }
+
+    // Build the sparse interpolation matrix from the collected distances
+
+    QVector<Eigen::Triplet<float>> vecTriplets;
+    // Estimate ~10-20 sources per vertex on average
+    vecTriplets.reserve(nVerts * 10);
+
+    for (qint32 r = 0; r < nVerts; ++r) {
+        if (sourceVertexSet.contains(r)) {
+            // Source vertex: identity mapping (weight = 1)
+            vecTriplets.push_back(Eigen::Triplet<float>(r, vertexToSourceIdx[r], 1.0f));
+        } else {
+            const auto& weights = perVertexWeights[r];
+            if (weights.empty()) continue;
+
+            // Apply interpolation function and normalize weights
+            float dWeightsSum = 0.0f;
+            QVector<QPair<qint32, float>> vecBelowThresh;
+            vecBelowThresh.reserve(static_cast<int>(weights.size()));
+
+            for (const auto& w : weights) {
+                const float dValueWeight = std::fabs(1.0f / static_cast<float>(interpolationFunction(w.dist)));
+                dWeightsSum += dValueWeight;
+                vecBelowThresh.push_back(qMakePair(w.sourceIdx, dValueWeight));
+            }
+
+            for (const auto& qp : vecBelowThresh) {
+                vecTriplets.push_back(Eigen::Triplet<float>(r, qp.first, qp.second / dWeightsSum));
+            }
+        }
+    }
+
+    auto interpMat = QSharedPointer<SparseMatrix<float>>::create(nVerts, nSources);
+    interpMat->setFromTriplets(vecTriplets.begin(), vecTriplets.end());
+
+    return interpMat;
+}
+
+//=============================================================================================================
+
 VectorXi GeometryInfo::projectSensors(const MatrixX3f &matVertices,
                                       const MatrixX3f &matSensorPositions)
 {
@@ -140,6 +268,9 @@ VectorXi GeometryInfo::projectSensors(const MatrixX3f &matVertices,
     {
         iCores = 2;
     }
+#ifdef __EMSCRIPTEN__
+    iCores = qMin(iCores, (qint32)2);
+#endif
 
     const qint32 iSubArraySize = int(double(iNumSensors) / double(iCores));
 
