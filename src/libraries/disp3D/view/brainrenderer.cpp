@@ -239,12 +239,13 @@ void BrainRenderer::Impl::createResources(QRhi *rhi, QRhiRenderPassDescriptor *r
                     { 1, 7, QRhiVertexInputAttribute::Float, 20 * sizeof(float) }
                 });
             } else {
-                il.setBindings({{ 36 }});  // sizeof(VertexData) = 36 with surfaceId
+                il.setBindings({{ 40 }});  // sizeof(VertexData) = 40 with surfaceId + tissueType
                 il.setAttributes({{ 0, 0, QRhiVertexInputAttribute::Float3, 0 }, 
                                   { 0, 1, QRhiVertexInputAttribute::Float3, 12 }, 
                                   { 0, 2, QRhiVertexInputAttribute::UNormByte4, 24 },
                                   { 0, 3, QRhiVertexInputAttribute::UNormByte4, 28 },
-                                  { 0, 4, QRhiVertexInputAttribute::Float, 32 }});  // surfaceId
+                                  { 0, 4, QRhiVertexInputAttribute::Float, 32 },    // surfaceId
+                                  { 0, 5, QRhiVertexInputAttribute::Float, 36 }});  // tissueType
             }
             
             p->setVertexInputLayout(il);
@@ -266,8 +267,23 @@ void BrainRenderer::Impl::createResources(QRhi *rhi, QRhiRenderPassDescriptor *r
                 p->setDepthTest(true);
                 p->setDepthWrite(false);
             } else {
+#ifdef __EMSCRIPTEN__
+                // WORKAROUND(QRhi-GLES2): On WASM the merged single-drawIndexed
+                // path combines opaque brain + transparent BEM surfaces.  Enable
+                // alpha blending; brain vertices output alpha=1.0 (fully opaque)
+                // while BEM vertices use fresnel-based transparency.
+                blend.enable = true;
+                blend.srcColor = QRhiGraphicsPipeline::SrcAlpha;
+                blend.dstColor = QRhiGraphicsPipeline::OneMinusSrcAlpha;
+                blend.srcAlpha = QRhiGraphicsPipeline::One;
+                blend.dstAlpha = QRhiGraphicsPipeline::OneMinusSrcAlpha;
+                p->setTargetBlends({blend});
                 p->setDepthTest(true);
                 p->setDepthWrite(true);
+#else
+                p->setDepthTest(true);
+                p->setDepthWrite(true);
+#endif
             }
             p->setFlags(QRhiGraphicsPipeline::UsesScissor);
             p->create();
@@ -529,8 +545,9 @@ void BrainRenderer::renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
 // WORKAROUND(QRhi-GLES2): Merged single-drawIndexed rendering.
 // The Qt QRhi GLES2/WebGL backend has a bug where only the first
 // drawIndexed() per render pass produces visible output.  These two
-// methods merge multiple brain surfaces into a single VBO/IBO so that
-// all geometry is drawn in one call.
+// methods merge all surfaces (brain, BEM, sensors, digitizers,
+// source-space) into a single VBO/IBO so that all geometry is drawn
+// in one call.
 //
 // Remove when upstream Qt fixes the issue.
 //=============================================================================================================
@@ -553,11 +570,13 @@ void BrainRenderer::prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch * /
         const auto &srcVerts = surf->vertexDataRef();
         const auto &srcIdx   = surf->indexDataRef();
 
-        // Copy vertices with surfaceId stamp
+        // Copy vertices with surfaceId and tissueType stamp
         mergedVerts.reserve(mergedVerts.size() + srcVerts.size());
+        float perVertexTissue = static_cast<float>(surf->tissueType());
         for (const VertexData &v : srcVerts) {
             VertexData mv = v;
             mv.surfaceId = surfaceId;
+            mv.tissueType = perVertexTissue;
             mergedVerts.append(mv);
         }
 
@@ -646,7 +665,7 @@ void BrainRenderer::drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
     u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetSelected, 4, &selected);
     u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLightDir, 12, &data.lightDir);
 
-    float tissueType = 1.0f;  // Brain
+    float tissueType = 0.0f;  // Per-vertex tissueType used for merged path
     u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetTissueType, 4, &tissueType);
 
     float lighting = data.lightingEnabled ? 1.0f : 0.0f;

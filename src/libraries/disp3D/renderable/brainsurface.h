@@ -74,6 +74,11 @@ struct VertexData {
     float surfaceId = 0.0f;  // WORKAROUND(QRhi-GLES2): surface ID for merged
                              // single-drawIndexed on WASM.  Always 0 for
                              // individual surfaces; set by merged path.
+    float tissueType = 0.0f; // WORKAROUND(QRhi-GLES2): per-vertex tissue type
+                             // for merged single-drawIndexed on WASM.
+                             // 0=Unknown, 1=Brain, 2=Skin, 3=OuterSkull, 4=InnerSkull.
+                             // On desktop the uniform is used; on WASM the
+                             // vertex attribute takes precedence when non-zero.
 };
 
 //=============================================================================================================

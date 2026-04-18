@@ -5,6 +5,7 @@ layout(location = 1) in vec3 v_color;
 layout(location = 2) in vec3 v_worldPos;
 layout(location = 3) in vec3 v_annotColor;
 layout(location = 4) in float v_surfaceId;
+layout(location = 5) in float v_tissueType;
 
 layout(location = 0) out vec4 fragColor;
 
@@ -83,5 +84,17 @@ void main() {
         finalColor += glowColor * fresnel * 0.6;
     }
     
-    fragColor = vec4(finalColor, 1.0);
+    // WORKAROUND(QRhi-GLES2): On WASM merged-draw path, BEM surfaces
+    // (tissueType > 1) need transparency.  Per-vertex tissueType overrides
+    // the uniform when non-zero; brain vertices output alpha=1.0 (opaque).
+    float effectiveTissue = (v_tissueType > 0.5) ? v_tissueType : tissueType;
+    float alpha = 1.0;
+    if (effectiveTissue > 1.5) {
+        // Non-brain tissue: fresnel-based transparency (holographic shell)
+        float N_dot_V = abs(dot(N, V));
+        float fresnel = pow(1.0 - N_dot_V, 2.5);
+        alpha = 0.15 + 0.7 * fresnel;
+    }
+
+    fragColor = vec4(finalColor, alpha);
 }

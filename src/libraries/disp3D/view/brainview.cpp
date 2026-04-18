@@ -1422,18 +1422,13 @@ void BrainView::render(QRhiCommandBuffer *cb)
         QRhiResourceUpdateBatch *preUpload = rhi()->nextResourceUpdateBatch();
         for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
 #ifdef __EMSCRIPTEN__
-            // WORKAROUND(QRhi-GLES2): Brain surfaces are drawn via the
-            // merged single-drawIndexed path.  Skip per-surface GPU buffer
-            // re-uploads — their GPU buffers are unused and the
+            // WORKAROUND(QRhi-GLES2): All surfaces (brain, BEM, sensors,
+            // digitizers, source-space) are drawn via the merged single-
+            // drawIndexed path.  Skip per-surface GPU buffer re-uploads —
+            // their individual GPU buffers are unused and the
             // uploadStaticBuffer calls can pollute GLES2 element-buffer
-            // bindings.  Non-brain surfaces (srcsp_, dig_, bem_, sens_)
-            // still need their buffers for possible later draws.
-            {
-                const QString &key = it.key();
-                if (!key.startsWith("srcsp_") && !key.startsWith("dig_") &&
-                    !key.startsWith("bem_") && !key.startsWith("sens_"))
-                    continue;
-            }
+            // bindings.
+            continue;
 #endif
             it.value()->updateBuffers(rhi(), preUpload);
         }
@@ -1450,22 +1445,28 @@ void BrainView::render(QRhiCommandBuffer *cb)
 #endif
 
 #ifdef __EMSCRIPTEN__
-        // WORKAROUND(QRhi-GLES2): Merge all visible brain surfaces into a
-        // single VBO/IBO for single-drawIndexed rendering.  The QRhi GLES2
-        // backend has a bug where only the first drawIndexed() per render
-        // pass produces visible output.  Remove when Qt fixes this upstream.
+        // WORKAROUND(QRhi-GLES2): Merge ALL visible surfaces into a single
+        // VBO/IBO for single-drawIndexed rendering.  The QRhi GLES2 backend
+        // has a bug where only the first drawIndexed() per render pass
+        // produces visible output.  Opaque surfaces (brain, source-space,
+        // digitizers) are added first; transparent surfaces (BEM, sensors)
+        // are appended after so they blend correctly over the opaque geometry.
+        // Remove when Qt fixes this upstream.
         {
-            QVector<BrainSurface*> brainSurfaces;
+            QVector<BrainSurface*> opaqueSurfaces;
+            QVector<BrainSurface*> transparentSurfaces;
             for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-                const QString &key = it.key();
-                // Exclude non-brain surface keys
-                if (key.startsWith("srcsp_") || key.startsWith("dig_") ||
-                    key.startsWith("bem_") || key.startsWith("sens_"))
-                    continue;
                 if (!it.value()->isVisible()) continue;
-                brainSurfaces.append(it.value().get());
+                const QString &key = it.key();
+                if (key.startsWith("bem_") || key.startsWith("sens_")) {
+                    transparentSurfaces.append(it.value().get());
+                } else {
+                    opaqueSurfaces.append(it.value().get());
+                }
             }
-            m_renderer->prepareMergedSurfaces(rhi(), preUpload, brainSurfaces);
+            QVector<BrainSurface*> allMergedSurfaces = opaqueSurfaces;
+            allMergedSurfaces.append(transparentSurfaces);
+            m_renderer->prepareMergedSurfaces(rhi(), preUpload, allMergedSurfaces);
         }
 #endif
 
@@ -1597,27 +1598,23 @@ void BrainView::render(QRhiCommandBuffer *cb)
         if (!sv.shouldRenderSurface(it.key())) continue;
 
 #ifdef __EMSCRIPTEN__
-        // WORKAROUND(QRhi-GLES2): Brain surfaces are drawn via the merged
+        // WORKAROUND(QRhi-GLES2): All surfaces are drawn via the merged
         // single-drawIndexed path below.  Skip per-surface draws on WASM.
-        // Non-brain surfaces (srcsp_, dig_, bem_, sens_) still use the
-        // per-surface path in their respective passes.
         continue;
 #endif
         m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), currentShader);
     }
 
 #ifdef __EMSCRIPTEN__
-    // WORKAROUND(QRhi-GLES2): Draw all merged brain surfaces in one call.
+    // WORKAROUND(QRhi-GLES2): Draw all merged surfaces in one call.
     m_renderer->drawMergedSurfaces(cb, rhi(), sceneData, currentShader);
 
     // WORKAROUND(QRhi-GLES2): Skip all subsequent per-surface draws.
     // The QRhi GLES2 backend only renders the first drawIndexed() per
-    // render pass correctly.  Any additional drawIndexed (srcsp_, dig_,
-    // bem_, sens_, dipoles, network, debug pointer) would either fail
-    // silently or — more critically — corrupt the GL buffer state for
-    // the *next* frame, causing the merged brain surfaces to vanish.
-    // When Qt fixes the upstream bug, remove this #else and the
-    // corresponding #endif below to re-enable the per-surface draw path.
+    // render pass correctly.  Dipoles, network, and debug pointer use
+    // different vertex layouts or instanced rendering and cannot be
+    // merged — they are not rendered on WASM until the upstream Qt bug
+    // is fixed or a multi-pass workaround is validated.
 #else
 
     // Pass 1b: Source Space Points (use same shader as brain for consistent depth/blend)
