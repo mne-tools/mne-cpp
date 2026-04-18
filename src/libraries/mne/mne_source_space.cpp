@@ -314,14 +314,34 @@ int read_tag_data(QFile &fp, int tag, long long nbytes, unsigned char *&val, lon
             if (!g)
                 return FAIL;
             /*
-             * Serialize the MNEVolGeom into a byte array so that
-             * add_mgh_tag_to_group can safely delete[] the buffer.
-             * get_volume_geom_from_tag later reinterprets these bytes.
+             * Serialize MNEVolGeom as POD fields followed by a
+             * null-terminated UTF-8 filename.  We must NOT memcpy the
+             * entire MNEVolGeom because it contains a QString member
+             * whose internal pointers become dangling when *g is
+             * destroyed at the end of this block.
              */
-            auto buf = std::make_unique<unsigned char[]>(sizeof(MNEVolGeom));
-            std::memcpy(buf.get(), g.get(), sizeof(MNEVolGeom));
+            struct VolGeomPOD {
+                int   valid;
+                int   width, height, depth;
+                float xsize, ysize, zsize;
+                float x_ras[3], y_ras[3], z_ras[3];
+                float c_ras[3];
+            };
+            QByteArray fn = g->filename.toUtf8();
+            size_t totalSize = sizeof(VolGeomPOD) + fn.size() + 1;
+            auto buf = std::make_unique<unsigned char[]>(totalSize);
+            VolGeomPOD pod;
+            pod.valid  = g->valid;
+            pod.width  = g->width;  pod.height = g->height; pod.depth = g->depth;
+            pod.xsize  = g->xsize;  pod.ysize  = g->ysize;  pod.zsize = g->zsize;
+            std::memcpy(pod.x_ras, g->x_ras, 3 * sizeof(float));
+            std::memcpy(pod.y_ras, g->y_ras, 3 * sizeof(float));
+            std::memcpy(pod.z_ras, g->z_ras, 3 * sizeof(float));
+            std::memcpy(pod.c_ras, g->c_ras, 3 * sizeof(float));
+            std::memcpy(buf.get(), &pod, sizeof(VolGeomPOD));
+            std::memcpy(buf.get() + sizeof(VolGeomPOD), fn.constData(), fn.size() + 1);
             val     = buf.release();
-            nbytesp = sizeof(MNEVolGeom);
+            nbytesp = static_cast<long long>(totalSize);
         }
         else if (tag == TAG_OLD_USEREALRAS || tag == TAG_USEREALRAS) {
             auto vi = std::make_unique<int[]>(1);
@@ -712,16 +732,41 @@ int read_triangle_file(const QString& fname,
 
 std::optional<MNEVolGeom> get_volume_geom_from_tag(const MNEMghTagGroup *tagsp)
 {
-    MNEMghTag*      tag  = nullptr;
+    if (!tagsp)
+        return std::nullopt;
 
-    if (tagsp) {
-        for (const auto &t : tagsp->tags)
-            if (t->tag == TAG_OLD_SURF_GEOM) {
-                tag = t.get();
-                break;
-            }
-        if (tag)
-            return dup_vol_geom(*reinterpret_cast<MNEVolGeom*>(tag->data.data()));
+    struct VolGeomPOD {
+        int   valid;
+        int   width, height, depth;
+        float xsize, ysize, zsize;
+        float x_ras[3], y_ras[3], z_ras[3];
+        float c_ras[3];
+    };
+
+    for (const auto &t : tagsp->tags) {
+        if (t->tag == TAG_OLD_SURF_GEOM) {
+            if (t->len < static_cast<long long>(sizeof(VolGeomPOD)))
+                return std::nullopt;
+
+            const unsigned char *d = reinterpret_cast<const unsigned char *>(t->data.constData());
+            VolGeomPOD pod;
+            std::memcpy(&pod, d, sizeof(VolGeomPOD));
+
+            MNEVolGeom result;
+            result.valid  = pod.valid;
+            result.width  = pod.width;  result.height = pod.height; result.depth = pod.depth;
+            result.xsize  = pod.xsize;  result.ysize  = pod.ysize;  result.zsize = pod.zsize;
+            std::memcpy(result.x_ras, pod.x_ras, 3 * sizeof(float));
+            std::memcpy(result.y_ras, pod.y_ras, 3 * sizeof(float));
+            std::memcpy(result.z_ras, pod.z_ras, 3 * sizeof(float));
+            std::memcpy(result.c_ras, pod.c_ras, 3 * sizeof(float));
+
+            if (t->len > static_cast<long long>(sizeof(VolGeomPOD)))
+                result.filename = QString::fromUtf8(
+                    reinterpret_cast<const char *>(d + sizeof(VolGeomPOD)));
+
+            return result;
+        }
     }
     return std::nullopt;
 }
@@ -943,7 +988,7 @@ int MNESourceSpace::add_patch_stats()
                 qCritical("No vertices belong to the patch of vertex %d",nearest_data[p-1].nearest);
                 return FAIL;
             }
-            if (vertno[q] == nearest_data[p-1].nearest) { /* Some source space points may have been omitted since
+            if (q < nuse && vertno[q] == nearest_data[p-1].nearest) { /* Some source space points may have been omitted since
                                * the patch information was computed */
                 pinfo[q] = MNEPatchInfo();
                 pinfo[q]->vert = nearest_data[p-1].nearest;
@@ -965,7 +1010,7 @@ int MNESourceSpace::add_patch_stats()
         qCritical("No vertices belong to the patch of vertex %d",nearest_data[p-1].nearest);
         return FAIL;
     }
-    if (vertno[q] == nearest_data[p-1].nearest) {
+    if (q < nuse && vertno[q] == nearest_data[p-1].nearest) {
         pinfo[q]       = MNEPatchInfo();
         pinfo[q]->vert = nearest_data[p-1].nearest;
         this_patch = nearest_data+p-nave;
