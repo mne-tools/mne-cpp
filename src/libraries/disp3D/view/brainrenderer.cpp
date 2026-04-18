@@ -296,6 +296,21 @@ void BrainRenderer::Impl::createResources(QRhi *rhi, QRhiRenderPassDescriptor *r
 void BrainRenderer::beginFrame(QRhiCommandBuffer *cb, QRhiRenderTarget *rt)
 {
     d->currentUniformOffset = 0;
+
+    // WORKAROUND(QRhi-GLES2): Ensure PreserveColorContents is cleared so
+    // the first pass of each frame clears the framebuffer.  The multi-pass
+    // WASM path sets this flag via beginAdditionalPass(); if the last
+    // additional pass is still open when endFrame() runs, the flag leaks
+    // into the next frame and the clear never happens — producing ghost
+    // images of previous frames.
+    auto *texRt = dynamic_cast<QRhiTextureRenderTarget*>(rt);
+    if (texRt) {
+        texRt->setFlags(texRt->flags()
+            & ~QRhiTextureRenderTarget::Flags(
+                QRhiTextureRenderTarget::PreserveColorContents
+                | QRhiTextureRenderTarget::PreserveDepthStencilContents));
+    }
+
     cb->beginPass(rt, QColor(0, 0, 0), { 1.0f, 0 });
     const int w = rt->pixelSize().width();
     const int h = rt->pixelSize().height();
