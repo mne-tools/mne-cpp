@@ -394,10 +394,10 @@ void TestToolInverseComputation::testFindLabelsInDirSorted()
     QDir().mkpath(labelDir);
 
     // Create label files out of order
-    QFile(labelDir + "/rh.V1.label").open(QIODevice::WriteOnly);
-    QFile(labelDir + "/lh.V1.label").open(QIODevice::WriteOnly);
-    QFile(labelDir + "/lh.MT.label").open(QIODevice::WriteOnly);
-    QFile(labelDir + "/not_a_label.txt").open(QIODevice::WriteOnly);
+    (void)QFile(labelDir + "/rh.V1.label").open(QIODevice::WriteOnly);
+    (void)QFile(labelDir + "/lh.V1.label").open(QIODevice::WriteOnly);
+    (void)QFile(labelDir + "/lh.MT.label").open(QIODevice::WriteOnly);
+    (void)QFile(labelDir + "/not_a_label.txt").open(QIODevice::WriteOnly);
 
     QStringList labels = findLabelsInDir(labelDir);
     QCOMPARE(labels.size(), 3);  // Only .label files

@@ -295,3 +295,158 @@ QString MNEBemSurface::id_name(int id)
         default: return "Unknown";
     }
 }
+
+//=============================================================================================================
+
+/**
+ * Helper: compute edge length squared between two vertices
+ */
+static double edgeLenSq(const Eigen::MatrixX3d& rr, int v0, int v1)
+{
+    return (rr.row(v0) - rr.row(v1)).squaredNorm();
+}
+
+//=============================================================================================================
+
+QList<MNEBemSurface> MNEBemSurface::makeScalpSurfaces(
+    const MNEBemSurface& outerSkin,
+    const QList<int>& targetVertices)
+{
+    QList<MNEBemSurface> results;
+
+    if (outerSkin.np <= 0 || outerSkin.ntri <= 0) {
+        qWarning("MNEBemSurface::makeScalpSurfaces - Input surface is empty.");
+        return results;
+    }
+
+    for (int target : targetVertices) {
+        if (target >= outerSkin.np) {
+            // No decimation needed, just copy
+            results.append(MNEBemSurface(outerSkin));
+            continue;
+        }
+
+        // Work on a copy
+        MNEBemSurface surf(outerSkin);
+
+        // Build vertex-referenced rr as doubles, triangles as ints
+        // Use iterative edge collapse: find shortest edge, collapse to midpoint
+        Eigen::MatrixX3d rr = surf.rr.cast<double>();
+        Eigen::MatrixX3d nn = surf.nn.cast<double>();
+
+        // Build triangle list as std::vector for easy manipulation
+        int nTri = surf.ntri;
+        std::vector<std::array<int,3>> tris(nTri);
+        for (int i = 0; i < nTri; ++i) {
+            tris[i] = {surf.itris(i, 0), surf.itris(i, 1), surf.itris(i, 2)};
+        }
+
+        // Track which vertices are alive
+        int currentNp = surf.np;
+        std::vector<bool> vertAlive(currentNp, true);
+        // Redirect map: when a vertex is collapsed, redirect to its replacement
+        std::vector<int> redirect(currentNp);
+        for (int i = 0; i < currentNp; ++i)
+            redirect[i] = i;
+
+        auto resolve = [&](int v) -> int {
+            while (redirect[v] != v)
+                v = redirect[v];
+            return v;
+        };
+
+        while (currentNp > target) {
+            // Find shortest edge in the mesh
+            double bestLen = std::numeric_limits<double>::max();
+            int bestTri = -1;
+            int bestEdge = -1;
+
+            for (int t = 0; t < static_cast<int>(tris.size()); ++t) {
+                int v0 = resolve(tris[t][0]);
+                int v1 = resolve(tris[t][1]);
+                int v2 = resolve(tris[t][2]);
+                // Skip degenerate triangles
+                if (v0 == v1 || v1 == v2 || v0 == v2)
+                    continue;
+
+                double d01 = edgeLenSq(rr, v0, v1);
+                double d12 = edgeLenSq(rr, v1, v2);
+                double d20 = edgeLenSq(rr, v2, v0);
+
+                if (d01 < bestLen) { bestLen = d01; bestTri = t; bestEdge = 0; }
+                if (d12 < bestLen) { bestLen = d12; bestTri = t; bestEdge = 1; }
+                if (d20 < bestLen) { bestLen = d20; bestTri = t; bestEdge = 2; }
+            }
+
+            if (bestTri < 0)
+                break;
+
+            // Collapse edge: merge the two vertices into the midpoint
+            int va = resolve(tris[bestTri][bestEdge]);
+            int vb = resolve(tris[bestTri][(bestEdge + 1) % 3]);
+
+            // Place midpoint at va
+            rr.row(va) = (rr.row(va) + rr.row(vb)) * 0.5;
+            nn.row(va) = (nn.row(va) + nn.row(vb)).normalized();
+
+            // Redirect vb -> va
+            redirect[vb] = va;
+            vertAlive[vb] = false;
+            currentNp--;
+        }
+
+        // Rebuild compact vertex array and triangle array
+        std::vector<int> oldToNew(surf.np, -1);
+        int newNp = 0;
+        for (int i = 0; i < surf.np; ++i) {
+            if (vertAlive[i] && resolve(i) == i) {
+                oldToNew[i] = newNp++;
+            }
+        }
+
+        MNEBemSurface decimated;
+        decimated.id = surf.id;
+        decimated.coord_frame = surf.coord_frame;
+        decimated.sigma = surf.sigma;
+        decimated.np = newNp;
+
+        // Use Eigen types matching MNESurfaceOrVolume
+        MNESurfaceOrVolume::PointsT newRr(newNp, 3);
+        Eigen::MatrixX3f newNn(newNp, 3);
+        for (int i = 0; i < surf.np; ++i) {
+            if (oldToNew[i] >= 0) {
+                newRr.row(oldToNew[i]) = rr.row(i).cast<float>();
+                newNn.row(oldToNew[i]) = nn.row(i).cast<float>();
+            }
+        }
+        decimated.rr = newRr;
+        decimated.nn = newNn;
+
+        // Rebuild triangles
+        std::vector<std::array<int,3>> newTris;
+        for (const auto& tri : tris) {
+            int a = oldToNew[resolve(tri[0])];
+            int b = oldToNew[resolve(tri[1])];
+            int c = oldToNew[resolve(tri[2])];
+            if (a >= 0 && b >= 0 && c >= 0 && a != b && b != c && a != c) {
+                newTris.push_back({a, b, c});
+            }
+        }
+
+        decimated.ntri = static_cast<int>(newTris.size());
+        MNESurfaceOrVolume::TrianglesT newItris(decimated.ntri, 3);
+        for (int i = 0; i < decimated.ntri; ++i) {
+            newItris(i, 0) = newTris[i][0];
+            newItris(i, 1) = newTris[i][1];
+            newItris(i, 2) = newTris[i][2];
+        }
+        decimated.itris = newItris;
+
+        // Recompute triangle data
+        decimated.addTriangleData();
+
+        results.append(decimated);
+    }
+
+    return results;
+}

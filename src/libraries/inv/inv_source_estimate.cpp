@@ -50,6 +50,7 @@
 #include <QDebug>
 
 #include <stdexcept>
+#include <QtEndian>
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -264,6 +265,94 @@ bool InvSourceEstimate::write(QIODevice &p_IODevice)
 
     qInfo("[done]");
     return true;
+}
+
+//=============================================================================================================
+
+InvSourceEstimate InvSourceEstimate::read_w(const QString& path)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning("InvSourceEstimate::read_w - Cannot open file %s", path.toUtf8().constData());
+        return InvSourceEstimate();
+    }
+
+    QDataStream stream(&file);
+    stream.setByteOrder(QDataStream::BigEndian);
+    stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+
+    // Skip 2-byte magic
+    quint16 magic;
+    stream >> magic;
+
+    // Read number of vertices (3-byte big-endian integer)
+    quint8 b0, b1, b2;
+    stream >> b0 >> b1 >> b2;
+    qint32 nVertices = (static_cast<qint32>(b0) << 16)
+                     | (static_cast<qint32>(b1) << 8)
+                     |  static_cast<qint32>(b2);
+
+    VectorXi vertices(nVertices);
+    MatrixXd data(nVertices, 1);
+
+    for (qint32 i = 0; i < nVertices; ++i) {
+        // Read 3-byte vertex index
+        stream >> b0 >> b1 >> b2;
+        vertices[i] = (static_cast<qint32>(b0) << 16)
+                     | (static_cast<qint32>(b1) << 8)
+                     |  static_cast<qint32>(b2);
+
+        // Read 4-byte big-endian float
+        float val;
+        stream >> val;
+        data(i, 0) = static_cast<double>(val);
+    }
+
+    file.close();
+
+    InvSourceEstimate stc(data, vertices, 0.0f, 0.0f);
+    return stc;
+}
+
+//=============================================================================================================
+
+void InvSourceEstimate::write_w(const QString& path) const
+{
+    if (isEmpty()) {
+        qWarning("InvSourceEstimate::write_w - Source estimate is empty");
+        return;
+    }
+
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly)) {
+        qWarning("InvSourceEstimate::write_w - Cannot open file %s for writing", path.toUtf8().constData());
+        return;
+    }
+
+    QDataStream stream(&file);
+    stream.setByteOrder(QDataStream::BigEndian);
+    stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+
+    // Write 2-byte magic (zeros)
+    stream << static_cast<quint8>(0) << static_cast<quint8>(0);
+
+    // Write number of vertices as 3-byte big-endian integer
+    qint32 nVertices = static_cast<qint32>(vertices.size());
+    stream << static_cast<quint8>((nVertices >> 16) & 0xFF)
+           << static_cast<quint8>((nVertices >> 8) & 0xFF)
+           << static_cast<quint8>(nVertices & 0xFF);
+
+    // Write each vertex index (3 bytes) and value (4-byte float)
+    for (qint32 i = 0; i < nVertices; ++i) {
+        qint32 idx = vertices[i];
+        stream << static_cast<quint8>((idx >> 16) & 0xFF)
+               << static_cast<quint8>((idx >> 8) & 0xFF)
+               << static_cast<quint8>(idx & 0xFF);
+
+        stream << static_cast<float>(data(i, 0));
+    }
+
+    file.close();
 }
 
 //=============================================================================================================

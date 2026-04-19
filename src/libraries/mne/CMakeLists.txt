@@ -59,6 +59,7 @@ set(SOURCES
     mne_description_parser.cpp
     mne_forward_solution.cpp
     mne_inverse_operator.cpp
+    mne_cortical_map.cpp
     mne_meas_data.cpp
     mne_meas_data_set.cpp
 )
@@ -121,6 +122,7 @@ set(HEADERS
     mne_description_parser.h
     mne_forward_solution.h
     mne_inverse_operator.h
+    mne_cortical_map.h
     mne_meas_data.h
     mne_meas_data_set.h
 )

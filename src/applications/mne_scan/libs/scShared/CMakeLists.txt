@@ -21,6 +21,7 @@ set(SOURCES
     Management/pluginconnectorconnectionwidget.cpp 
     Management/pluginscenemanager.cpp 
     Management/displaymanager.cpp
+    Management/mna_scan_types.cpp
 )
 
 set(HEADERS
@@ -38,6 +39,7 @@ set(HEADERS
     Management/pluginconnectorconnectionwidget.h 
     Management/pluginscenemanager.h 
     Management/displaymanager.h
+    Management/mna_scan_types.h
 )
 
 # set(FILE_TO_UPDATE scShared_global.cpp)
@@ -80,6 +82,7 @@ set(MNE_LIBS_REQUIRED
     mne_inv
     mne_dsp
     mne_events
+    mne_mna
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

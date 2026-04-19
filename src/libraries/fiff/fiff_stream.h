@@ -833,6 +833,22 @@ public:
      */
     void write_rt_command(fiff_int_t command, const QString& data);
 
+    //=========================================================================================================
+    /**
+     * Copy the FIFF processing history block from one file to another.
+     *
+     * Opens the source file, locates the FIFFB_PROCESSING_HISTORY block,
+     * reads all tags within it, then appends them to the destination file.
+     *
+     * @param[in] fromPath   Path to the source FIFF file.
+     * @param[in] toPath     Path to the destination FIFF file.
+     *
+     * @return true on success, false on error.
+     *
+     * @since 2.2.0
+     */
+    static bool copyProcessingHistory(const QString& fromPath, const QString& toPath);
+
 private:
     //=========================================================================================================
     /**

@@ -67,6 +67,8 @@ namespace MNELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class MNEHemisphere;
+
 //=============================================================================================================
 /**
  * Implements the MNE Source Space (Replaces typedef mneSurfaceOrVolume mneSourceSpace; struct of MNE-C mne_types.h).
@@ -254,6 +256,23 @@ public:
      * @return FIFF_OK on success, FIFF_FAIL on error.
      */
     int writeToStream(FIFFLIB::FiffStream::SPtr& stream, bool selected_only) const;
+
+    //=========================================================================================================
+    /**
+     * Downsample a hemisphere source space to an icosahedral subdivision
+     * of the given grade.
+     *
+     * For each vertex of the icosahedron at the requested grade, the
+     * nearest vertex in the hemisphere is found and marked as in-use.
+     *
+     * @param[in] hemi      The hemisphere to downsample.
+     * @param[in] icoGrade  Icosahedral subdivision grade (0-7).
+     *
+     * @return A new MNEHemisphere with the downsampled vertex selection.
+     *
+     * @since 2.2.0
+     */
+    static MNEHemisphere icoDownsample(const MNEHemisphere& hemi, int icoGrade);
 
 private:
     /**

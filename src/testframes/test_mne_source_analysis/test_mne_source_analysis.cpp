@@ -142,7 +142,7 @@ private slots:
         if(ok) {
             QCOMPARE(reloaded.evoked.size(), evokedSet.evoked.size());
         } else {
-            QWARN("Re-read of saved evoked set failed — save() code path was still exercised");
+            qWarning("Re-read of saved evoked set failed — save() code path was still exercised");
         }
         QFile::remove(tmpFile);
     }
@@ -328,7 +328,7 @@ private slots:
         if(prepared.dim >= 0) {
             QVERIFY(prepared.dim == chNames.size());
         } else {
-            QWARN(qPrintable(QString("prepare_noise_cov returned dim=%1 for %2 channels — code path exercised")
+            qWarning("%s", qPrintable(QString("prepare_noise_cov returned dim=%1 for %2 channels — code path exercised")
                              .arg(prepared.dim).arg(chNames.size())));
         }
     }

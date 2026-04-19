@@ -171,6 +171,31 @@ public:
 
     //=========================================================================================================
     /**
+     * Read a .w file (single time-point source estimate).
+     *
+     * The .w format stores vertex indices (3-byte big-endian) and float
+     * values (4-byte big-endian) for a single time point.
+     *
+     * @param[in] path   Path to the .w file.
+     *
+     * @return The source estimate with single-column data.
+     *
+     * @since 2.2.0
+     */
+    static InvSourceEstimate read_w(const QString& path);
+
+    //=========================================================================================================
+    /**
+     * Write the first time point of this source estimate to a .w file.
+     *
+     * @param[in] path   Path to the .w file to write.
+     *
+     * @since 2.2.0
+     */
+    void write_w(const QString& path) const;
+
+    //=========================================================================================================
+    /**
      * Returns whether SourceEstimate is empty.
      *
      * @return true if is empty, false otherwise.

@@ -160,6 +160,22 @@ public:
      */
     static QString id_name(int id);
 
+    //=========================================================================================================
+    /**
+     * Decimate the outer skin surface to the target vertex counts
+     * using iterative edge collapse simplification.
+     *
+     * @param[in] outerSkin       The outer skin BEM surface to decimate.
+     * @param[in] targetVertices  List of target vertex counts (default: {2562, 10242, 40962}).
+     *
+     * @return A list of decimated BEM surfaces, one per target resolution.
+     *
+     * @since 2.2.0
+     */
+    static QList<MNEBemSurface> makeScalpSurfaces(
+        const MNEBemSurface& outerSkin,
+        const QList<int>& targetVertices = {2562, 10242, 40962});
+
 public:
     Eigen::MatrixX3d tri_cent;         /**< Triangle centers. */
     Eigen::MatrixX3d tri_nn;           /**< Triangle normals. */

@@ -3436,6 +3436,66 @@ QList<FiffDirEntry::SPtr> FiffStream::make_dir(bool *ok)
 
 //=============================================================================================================
 
+bool FiffStream::copyProcessingHistory(const QString& fromPath, const QString& toPath)
+{
+    // Open source file
+    QFile srcFile(fromPath);
+    if (!srcFile.open(QIODevice::ReadOnly)) {
+        qWarning("FiffStream::copyProcessingHistory - Cannot open source file %s",
+                 fromPath.toUtf8().constData());
+        return false;
+    }
+
+    FiffStream srcStream(&srcFile);
+    if (!srcStream.open()) {
+        qWarning("FiffStream::copyProcessingHistory - Cannot parse source FIFF file %s",
+                 fromPath.toUtf8().constData());
+        srcFile.close();
+        return false;
+    }
+
+    // Find the FIFFB_PROCESSING_HISTORY block in the directory tree
+    QList<FiffDirNode::SPtr> histNodes = srcStream.dirtree()->dir_tree_find(FIFFB_PROCESSING_HISTORY);
+    if (histNodes.isEmpty()) {
+        qWarning("FiffStream::copyProcessingHistory - No processing history block found in %s",
+                 fromPath.toUtf8().constData());
+        srcStream.close();
+        return false;
+    }
+
+    // Read all tags from the processing history block
+    const FiffDirNode::SPtr& histNode = histNodes[0];
+    std::vector<FiffTag::UPtr> histTags;
+    for (int i = 0; i < histNode->nent(); ++i) {
+        FiffTag::UPtr tag;
+        if (srcStream.read_tag(tag, histNode->dir[i]->pos)) {
+            histTags.push_back(std::move(tag));
+        }
+    }
+    srcStream.close();
+
+    // Open destination file for update
+    QFile dstFile(toPath);
+    FiffStream::SPtr dstStream = FiffStream::open_update(dstFile);
+    if (!dstStream) {
+        qWarning("FiffStream::copyProcessingHistory - Cannot open destination file %s for update",
+                 toPath.toUtf8().constData());
+        return false;
+    }
+
+    // Write the processing history block
+    dstStream->start_block(FIFFB_PROCESSING_HISTORY);
+    for (const auto& tag : histTags) {
+        dstStream->write_tag(tag);
+    }
+    dstStream->end_block(FIFFB_PROCESSING_HISTORY);
+
+    dstStream->close();
+    return true;
+}
+
+//=============================================================================================================
+
 bool FiffStream::check_beginning(FiffTag::UPtr &p_pTag)
 {
     this->read_tag(p_pTag);

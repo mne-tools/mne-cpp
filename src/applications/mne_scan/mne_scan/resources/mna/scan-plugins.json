@@ -1,0 +1,201 @@
+{
+    "mna_registry_version": "1.0",
+    "provider": "mne-scan",
+    "description": "MNE Scan plugin operation schemas for real-time acquisition and processing",
+    "ops": [
+        {
+            "type": "FiffSimulator",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "acquisition",
+            "description": "Simulate real-time MEG/EEG acquisition by streaming a FIFF raw file",
+            "library": "scan_sensor",
+            "inputs": [],
+            "outputs": [
+                { "name": "raw_out", "kind": "FiffRaw", "description": "Simulated real-time raw data stream" }
+            ],
+            "parameters": [
+                { "name": "raw_path",    "type": "string", "required": true,  "description": "Path to the FIFF raw file to replay" },
+                { "name": "buffer_size", "type": "int",    "required": false, "default": 400, "description": "Number of samples per buffer block" }
+            ]
+        },
+        {
+            "type": "BabyMEG",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "acquisition",
+            "description": "Acquire real-time data from a BabyMEG device",
+            "library": "scan_sensor",
+            "inputs": [],
+            "outputs": [
+                { "name": "raw_out", "kind": "FiffRaw", "description": "Real-time raw data from BabyMEG" }
+            ],
+            "parameters": [
+                { "name": "ip",   "type": "string", "required": false, "default": "127.0.0.1", "description": "IP address of the BabyMEG server" },
+                { "name": "port", "type": "int",    "required": false, "default": 1101,        "description": "Port of the BabyMEG server" }
+            ]
+        },
+        {
+            "type": "LslAdapter",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "acquisition",
+            "description": "Acquire real-time data via Lab Streaming Layer (LSL)",
+            "library": "scan_sensor",
+            "inputs": [],
+            "outputs": [
+                { "name": "raw_out", "kind": "FiffRaw", "description": "Real-time raw data from an LSL stream" }
+            ],
+            "parameters": [
+                { "name": "stream_name", "type": "string", "required": true, "description": "Name of the LSL stream to connect to" }
+            ]
+        },
+        {
+            "type": "Averaging",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "preprocessing",
+            "description": "Compute real-time running averages (evoked responses) from raw data",
+            "library": "scan_algorithm",
+            "inputs": [
+                { "name": "raw_in", "kind": "FiffRaw", "description": "Incoming real-time raw data" }
+            ],
+            "outputs": [
+                { "name": "evoked_out", "kind": "Evoked", "description": "Real-time averaged evoked response" }
+            ],
+            "parameters": [
+                { "name": "numAverages",  "type": "int",    "required": false, "default": 100,    "description": "Number of epochs to average" },
+                { "name": "baselineFrom", "type": "double", "required": false, "default": -0.2,   "description": "Baseline start time in seconds" },
+                { "name": "baselineTo",   "type": "double", "required": false, "default": 0.0,    "description": "Baseline end time in seconds" },
+                { "name": "stim_channel", "type": "string", "required": false, "default": "STI 014", "description": "Stimulus channel name for event detection" }
+            ]
+        },
+        {
+            "type": "Covariance",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "preprocessing",
+            "description": "Compute real-time noise covariance from raw data",
+            "library": "scan_algorithm",
+            "inputs": [
+                { "name": "raw_in", "kind": "FiffRaw", "description": "Incoming real-time raw data" }
+            ],
+            "outputs": [
+                { "name": "cov_out", "kind": "Covariance", "description": "Real-time noise covariance estimate" }
+            ],
+            "parameters": [
+                { "name": "num_samples", "type": "int", "required": false, "default": 5000, "description": "Number of samples used for covariance estimation" }
+            ]
+        },
+        {
+            "type": "NoiseReduction",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "preprocessing",
+            "description": "Apply real-time noise reduction (SSP, compensation) to raw data",
+            "library": "scan_algorithm",
+            "inputs": [
+                { "name": "raw_in", "kind": "FiffRaw", "description": "Incoming real-time raw data" }
+            ],
+            "outputs": [
+                { "name": "raw_out", "kind": "FiffRaw", "description": "Noise-reduced raw data" }
+            ],
+            "parameters": [
+                { "name": "ssp_active",  "type": "bool", "required": false, "default": true,  "description": "Apply SSP projectors" },
+                { "name": "comp_active", "type": "bool", "required": false, "default": false, "description": "Apply compensation (e.g., 3rd-order gradiometer)" }
+            ]
+        },
+        {
+            "type": "Hpi",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "preprocessing",
+            "description": "Estimate real-time head position using HPI coils",
+            "library": "scan_algorithm",
+            "inputs": [
+                { "name": "raw_in", "kind": "FiffRaw", "description": "Incoming real-time raw data with HPI signals" }
+            ],
+            "outputs": [
+                { "name": "hpi_out", "kind": "Custom", "tag": "hpi", "description": "Real-time HPI fitting result (head position)" }
+            ],
+            "parameters": [
+                { "name": "fitting_window_size",  "type": "int",    "required": false, "default": 200,  "description": "Number of samples for HPI fitting window" },
+                { "name": "max_allowed_movement", "type": "double", "required": false, "default": 0.01, "description": "Maximum allowed head movement in meters" }
+            ]
+        },
+        {
+            "type": "RtFwd",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "source_estimation",
+            "description": "Compute real-time forward solution based on updated head position",
+            "library": "scan_algorithm",
+            "inputs": [
+                { "name": "hpi_in", "kind": "Custom", "tag": "hpi", "description": "Real-time HPI result for head-to-device transform" }
+            ],
+            "outputs": [
+                { "name": "fwd_out", "kind": "Forward", "description": "Updated real-time forward solution" }
+            ],
+            "parameters": [
+                { "name": "do_eeg",           "type": "bool", "required": false, "default": false, "description": "Compute EEG forward solution" },
+                { "name": "do_meg",           "type": "bool", "required": false, "default": true,  "description": "Compute MEG forward solution" },
+                { "name": "include_eeg_dist", "type": "bool", "required": false, "default": false, "description": "Include EEG electrode distance corrections" }
+            ]
+        },
+        {
+            "type": "RtcMne",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "source_estimation",
+            "description": "Compute real-time source estimates using MNE/dSPM/sLORETA inverse methods",
+            "library": "scan_algorithm",
+            "inputs": [
+                { "name": "raw_in", "kind": "FiffRaw",    "description": "Incoming real-time raw data" },
+                { "name": "cov_in", "kind": "Covariance", "description": "Noise covariance matrix" },
+                { "name": "fwd_in", "kind": "Forward",    "description": "Forward solution" }
+            ],
+            "outputs": [
+                { "name": "stc_out", "kind": "SourceEstimate", "description": "Real-time source estimate" }
+            ],
+            "parameters": [
+                { "name": "method",       "type": "string", "required": false, "default": "dSPM", "description": "Inverse method: MNE, dSPM, sLORETA" },
+                { "name": "snr",          "type": "double", "required": false, "default": 3.0,    "description": "Signal-to-noise ratio (lambda2 = 1/snr^2)" },
+                { "name": "trigger_type", "type": "int",    "required": false, "default": 0,      "description": "Trigger type for event-based source estimation (0 = continuous)" }
+            ]
+        },
+        {
+            "type": "NeuronalConnectivity",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "connectivity",
+            "description": "Compute real-time neuronal connectivity metrics from source estimates",
+            "library": "scan_algorithm",
+            "inputs": [
+                { "name": "stc_in", "kind": "SourceEstimate", "description": "Source estimate input" }
+            ],
+            "outputs": [
+                { "name": "conn_out", "kind": "Custom", "tag": "connectivity", "description": "Connectivity matrix" }
+            ],
+            "parameters": [
+                { "name": "method",      "type": "string", "required": false, "default": "COR", "description": "Connectivity method: COR (correlation), COH (coherence), etc." },
+                { "name": "window_size", "type": "int",    "required": false, "default": 50,    "description": "Number of time samples for connectivity window" }
+            ]
+        },
+        {
+            "type": "WriteToFile",
+            "version": "2.2.0",
+            "binding": "internal",
+            "category": "io",
+            "description": "Write real-time raw data stream to a FIFF file on disk",
+            "library": "scan_io",
+            "inputs": [
+                { "name": "raw_in", "kind": "FiffRaw", "description": "Incoming real-time raw data to record" }
+            ],
+            "outputs": [],
+            "parameters": [
+                { "name": "file_path", "type": "string", "required": true,             "description": "Output file path for the recorded data" },
+                { "name": "format",    "type": "string", "required": false, "default": "fiff", "description": "Output file format (fiff)" }
+            ]
+        }
+    ]
+}

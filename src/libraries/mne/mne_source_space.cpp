@@ -43,6 +43,7 @@
 #include "mne_patch_info.h"
 #include "mne_mgh_tag_group.h"
 #include "mne_surface.h"
+#include "mne_hemisphere.h"
 #include "filter_thread_arg.h"
 
 #include <fiff/fiff_coord_trans.h>
@@ -2310,5 +2311,123 @@ int MNESourceSpace::writeToStream(FiffStream::SPtr& stream, bool selected_only) 
 
     stream->end_block(FIFFB_MNE_SOURCE_SPACE);
     return FIFF_OK;
+}
+
+//=============================================================================================================
+
+/**
+ * Helper: generate vertices of a unit icosahedron subdivided to the given grade.
+ * Grade 0 = 12 vertices (icosahedron), grade N = 10 * 4^N + 2 vertices.
+ */
+static Eigen::MatrixX3f generateIcoVertices(int grade)
+{
+    // Base icosahedron vertices
+    const float t = (1.0f + std::sqrt(5.0f)) / 2.0f;
+    std::vector<Eigen::Vector3f> verts = {
+        {-1,  t,  0}, { 1,  t,  0}, {-1, -t,  0}, { 1, -t,  0},
+        { 0, -1,  t}, { 0,  1,  t}, { 0, -1, -t}, { 0,  1, -t},
+        { t,  0, -1}, { t,  0,  1}, {-t,  0, -1}, {-t,  0,  1}
+    };
+    // Normalize to unit sphere
+    for (auto& v : verts)
+        v.normalize();
+
+    // Base icosahedron faces
+    std::vector<std::array<int,3>> faces = {
+        {0,11,5}, {0,5,1}, {0,1,7}, {0,7,10}, {0,10,11},
+        {1,5,9}, {5,11,4}, {11,10,2}, {10,7,6}, {7,1,8},
+        {3,9,4}, {3,4,2}, {3,2,6}, {3,6,8}, {3,8,9},
+        {4,9,5}, {2,4,11}, {6,2,10}, {8,6,7}, {9,8,1}
+    };
+
+    // Subdivide
+    for (int g = 0; g < grade; ++g) {
+        std::map<std::pair<int,int>, int> midpointCache;
+        std::vector<std::array<int,3>> newFaces;
+
+        auto getMidpoint = [&](int i1, int i2) -> int {
+            auto key = std::make_pair(std::min(i1, i2), std::max(i1, i2));
+            auto it = midpointCache.find(key);
+            if (it != midpointCache.end())
+                return it->second;
+            Eigen::Vector3f mid = (verts[i1] + verts[i2]).normalized();
+            int idx = static_cast<int>(verts.size());
+            verts.push_back(mid);
+            midpointCache[key] = idx;
+            return idx;
+        };
+
+        for (const auto& f : faces) {
+            int a = getMidpoint(f[0], f[1]);
+            int b = getMidpoint(f[1], f[2]);
+            int c = getMidpoint(f[2], f[0]);
+            newFaces.push_back({f[0], a, c});
+            newFaces.push_back({f[1], b, a});
+            newFaces.push_back({f[2], c, b});
+            newFaces.push_back({a, b, c});
+        }
+        faces = newFaces;
+    }
+
+    Eigen::MatrixX3f result(static_cast<int>(verts.size()), 3);
+    for (int i = 0; i < static_cast<int>(verts.size()); ++i)
+        result.row(i) = verts[i];
+    return result;
+}
+
+//=============================================================================================================
+
+MNEHemisphere MNESourceSpace::icoDownsample(const MNEHemisphere& hemi, int icoGrade)
+{
+    MNEHemisphere result(hemi);
+
+    if (hemi.np <= 0 || hemi.rr.rows() == 0) {
+        qWarning("MNESourceSpace::icoDownsample - Hemisphere has no vertices.");
+        return result;
+    }
+
+    // Generate icosahedral surface at the requested grade
+    Eigen::MatrixX3f icoVerts = generateIcoVertices(icoGrade);
+
+    // Project hemisphere vertices to unit sphere for matching
+    Eigen::MatrixX3f hemiNorm(hemi.np, 3);
+    for (int i = 0; i < hemi.np; ++i) {
+        Eigen::Vector3f v = hemi.rr.row(i);
+        float len = v.norm();
+        if (len > 0.0f)
+            hemiNorm.row(i) = (v / len).transpose();
+        else
+            hemiNorm.row(i) = v.transpose();
+    }
+
+    // Clear inuse
+    result.inuse = Eigen::VectorXi::Zero(result.np);
+
+    // For each icosahedral vertex, find the nearest hemisphere vertex
+    for (int i = 0; i < icoVerts.rows(); ++i) {
+        Eigen::Vector3f icoV = icoVerts.row(i);
+        float bestDist = std::numeric_limits<float>::max();
+        int bestIdx = -1;
+        for (int j = 0; j < hemi.np; ++j) {
+            float d = (hemiNorm.row(j).transpose() - icoV).squaredNorm();
+            if (d < bestDist) {
+                bestDist = d;
+                bestIdx = j;
+            }
+        }
+        if (bestIdx >= 0)
+            result.inuse[bestIdx] = 1;
+    }
+
+    // Recount nuse and rebuild vertno
+    result.nuse = result.inuse.sum();
+    result.vertno.resize(result.nuse);
+    int k = 0;
+    for (int i = 0; i < result.np; ++i) {
+        if (result.inuse[i])
+            result.vertno[k++] = i;
+    }
+
+    return result;
 }
 
