@@ -84,10 +84,14 @@ option(BUILD_MNE_MAKE_EEG_LAYOUT "Build MNE Make EEG Layout" ON)
 
 # Info/inspection tools
 option(BUILD_MNE_SHOW_FIFF "Build MNE Show Fiff" ON)
+option(BUILD_MNE_SHOW_MNA "Build MNE Show MNA" ON)
 option(BUILD_MNE_COMPARE_FIF_FILES "Build MNE Compare Fif Files" ON)
 option(BUILD_MNE_LIST_BEM "Build MNE List BEM" ON)
 option(BUILD_MNE_LIST_SOURCE_SPACE "Build MNE List Source Space" ON)
 option(BUILD_MNE_COLLECT_TRANSFORMS "Build MNE Collect Transforms" ON)
+
+# MNA/BIDS conversion
+option(BUILD_MNE_MNA_BIDS_CONVERTER "Build MNE MNA BIDS Converter" ON)
 
 # Server
 option(BUILD_MNE_RT_SERVER "Build MNE Rt Server" ON)
@@ -144,6 +148,9 @@ if(NOT WASM)
   endif()
   if(BUILD_MNE_MAKE_COR_SET)
     add_subdirectory(conversion/mne_make_cor_set)
+  endif()
+  if(BUILD_MNE_MNA_BIDS_CONVERTER AND TARGET mne_mna)
+    add_subdirectory(conversion/mne_mna_bids_converter)
   endif()
 
   # Forward modeling
@@ -262,6 +269,9 @@ if(NOT WASM)
   # Info/inspection
   if(BUILD_MNE_SHOW_FIFF)
     add_subdirectory(info/mne_show_fiff)
+  endif()
+  if(BUILD_MNE_SHOW_MNA AND TARGET mne_mna)
+    add_subdirectory(info/mne_show_mna)
   endif()
   if(BUILD_MNE_COMPARE_FIF_FILES)
     add_subdirectory(info/mne_compare_fif_files)

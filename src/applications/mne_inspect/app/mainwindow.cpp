@@ -45,6 +45,13 @@
 #include <fs/fs_surfaceset.h>
 #include <fs/fs_annotation.h>
 #include <mne/mne_bem.h>
+#include <mna/mna_io.h>
+#include <mna/mna_project.h>
+#include <mna/mna_file_ref.h>
+#include <mna/mna_subject.h>
+#include <mna/mna_session.h>
+#include <mna/mna_recording.h>
+#include <mna/mna_types.h>
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -60,6 +67,7 @@
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
+#include <QRegularExpression>
 #include <QScrollArea>
 #include <QProgressBar>
 #include <QGridLayout>
@@ -70,6 +78,8 @@
 
 #ifdef WASMBUILD
 #include <QBuffer>
+#include <QCborValue>
+#include <QCborMap>
 #endif
 
 //=============================================================================================================
@@ -78,6 +88,44 @@
 
 using namespace FSLIB;
 using namespace MNELIB;
+using namespace MNALIB;
+
+//=============================================================================================================
+// BIDS HELPERS
+//=============================================================================================================
+
+/**
+ * Map an MnaFileRole to a BIDS-like subdirectory.
+ */
+static QString bidsSubdirForRole(MnaFileRole role)
+{
+    switch (role) {
+    case MnaFileRole::Surface:
+    case MnaFileRole::Annotation:
+        return QStringLiteral("anat");
+    case MnaFileRole::Bem:
+    case MnaFileRole::SourceSpace:
+        return QStringLiteral("bem");
+    case MnaFileRole::Digitizer:
+    case MnaFileRole::Transform:
+    case MnaFileRole::Evoked:
+        return QStringLiteral("meg");
+    case MnaFileRole::SourceEstimate:
+        return QStringLiteral("source");
+    default:
+        return QStringLiteral("other");
+    }
+}
+
+/**
+ * Build a BIDS-like relative path: sub-<subj>/ses-<sess>/<modality>/<filename>
+ */
+static QString bidsBuildRelPath(const QString &subjId, const QString &sessId,
+                                MnaFileRole role, const QString &fileName)
+{
+    return QStringLiteral("sub-%1/ses-%2/%3/%4")
+        .arg(subjId, sessId, bidsSubdirForRole(role), QFileInfo(fileName).fileName());
+}
 
 //=============================================================================================================
 // WASM HELPERS
@@ -142,6 +190,23 @@ void MainWindow::setupUI()
     scrollArea->setWidget(sidePanel);
 
     // (Old controls moved to surfGroup/viewGroup)
+
+    // ===== Project Group =====
+    QGroupBox *projectGroup = new QGroupBox("Project");
+    QVBoxLayout *projectLayout = new QVBoxLayout(projectGroup);
+    projectLayout->setContentsMargins(6, 12, 6, 6);
+    projectLayout->setSpacing(8);
+
+#ifdef WASMBUILD
+    m_openProjectBtn = new QPushButton("Import Project (.mnx)...");
+    m_exportProjectBtn = new QPushButton("Export Project (.mnx)...");
+#else
+    m_openProjectBtn = new QPushButton("Open Project...");
+    m_exportProjectBtn = new QPushButton("Export Project...");
+#endif
+
+    projectLayout->addWidget(m_openProjectBtn);
+    projectLayout->addWidget(m_exportProjectBtn);
 
     // ===== Brain Surface Group =====
     QGroupBox *surfGroup = new QGroupBox("Brain Surface");
@@ -586,6 +651,7 @@ void MainWindow::setupUI()
     viewLayout->addLayout(presetRow);
 
     // Assemble side panel
+    sideLayout->addWidget(projectGroup);
     sideLayout->addWidget(surfGroup);
     sideLayout->addWidget(bemGroup);
     sideLayout->addWidget(stcGroup);
@@ -611,6 +677,75 @@ void MainWindow::setupUI()
 
 void MainWindow::setupConnections()
 {
+    // ── Project ────────────────────────────────────────────────────────
+
+    connect(m_openProjectBtn, &QPushButton::clicked, [this]() {
+#ifdef WASMBUILD
+        QFileDialog::getOpenFileContent("MNA Project (*.mnx)", [this](const QString &fileName, const QByteArray &fileContent) {
+            if (fileName.isEmpty()) return;
+            QString path = wasmSaveToTemp(fileName, fileContent);
+            if (path.isEmpty()) return;
+            importMnaProject(path);
+        });
+#else
+        QString path = QFileDialog::getOpenFileName(this, "Open MNA Project", "",
+            "MNA Project Files (*.mna *.mnx);;All Files (*)");
+        if (path.isEmpty()) return;
+        importMnaProject(path);
+#endif
+    });
+
+    connect(m_exportProjectBtn, &QPushButton::clicked, [this]() {
+#ifdef WASMBUILD
+        // WASM always exports as .mnx with embedded data
+        MnaProject proj;
+        proj.name = QStringLiteral("MNE Inspect Export");
+        proj.description = QStringLiteral("Exported from MNE Inspect (WASM)");
+        proj.modified = QDateTime::currentDateTimeUtc();
+
+        MnaSubject subj;
+        subj.id = QStringLiteral("User");
+        MnaSession session;
+        session.id = QStringLiteral("session-01");
+        MnaRecording rec;
+        rec.id = QStringLiteral("recording-01");
+
+        for (const auto &entry : m_loadedFiles) {
+            MnaFileRef ref;
+            ref.role = static_cast<MnaFileRole>(entry.second);
+            ref.path = bidsBuildRelPath(subj.id, session.id, ref.role, entry.first);
+            ref.format = QFileInfo(entry.first).suffix();
+            ref.embedded = true;
+
+            QFile f(entry.first);
+            if (f.open(QIODevice::ReadOnly)) {
+                ref.data = f.readAll();
+                ref.sizeBytes = ref.data.size();
+                f.close();
+            }
+            rec.files.append(ref);
+        }
+
+        session.recordings.append(rec);
+        subj.sessions.append(session);
+        proj.subjects.append(subj);
+
+        // Serialize to CBOR in memory
+        const QByteArray magic = QByteArrayLiteral("MNX1");
+        QCborValue cborVal(proj.toCbor());
+        QByteArray cborData = cborVal.toCbor();
+        QByteArray out = magic + cborData;
+
+        QFileDialog::saveFileContent(out, "project.mnx");
+#else
+        QString path = QFileDialog::getSaveFileName(this, "Export MNA Project", "project.mnx",
+            "MNX Binary (*.mnx);;MNA JSON (*.mna);;All Files (*)");
+        if (path.isEmpty()) return;
+        bool embed = path.endsWith(QLatin1String(".mnx"), Qt::CaseInsensitive);
+        exportMnaProject(path, embed);
+#endif
+    });
+
     // Surface type
     connect(m_surfCombo, &QComboBox::currentTextChanged, m_brainView, &BrainView::setActiveSurface);
 
@@ -756,6 +891,7 @@ void MainWindow::setupConnections()
             FsSurface surf(path);
             if (!surf.isEmpty()) {
                 m_model->addSurface("User", hemi, type, surf);
+                trackLoadedFile(path, static_cast<int>(MnaFileRole::Surface));
             }
         });
 #else
@@ -773,6 +909,7 @@ void MainWindow::setupConnections()
         FsSurface surf(path);
         if (!surf.isEmpty()) {
             m_model->addSurface("User", hemi, type, surf);
+            trackLoadedFile(path, static_cast<int>(MnaFileRole::Surface));
         }
 #endif
     });
@@ -790,6 +927,7 @@ void MainWindow::setupConnections()
             FsAnnotation annot(path);
             if (!annot.isEmpty()) {
                 m_model->addAnnotation("User", hemi, annot);
+                trackLoadedFile(path, static_cast<int>(MnaFileRole::Annotation));
             }
         });
 #else
@@ -803,6 +941,7 @@ void MainWindow::setupConnections()
         FsAnnotation annot(path);
         if (!annot.isEmpty()) {
             m_model->addAnnotation("User", hemi, annot);
+            trackLoadedFile(path, static_cast<int>(MnaFileRole::Annotation));
         }
 #endif
     });
@@ -814,11 +953,13 @@ void MainWindow::setupConnections()
             if (fileName.isEmpty()) return;
             QString path = wasmSaveToTemp(fileName, fileContent);
             if (path.isEmpty()) return;
+            trackLoadedFile(path, static_cast<int>(MnaFileRole::SourceEstimate));
             addStcEntry(path, true);
         });
 #else
         QString path = QFileDialog::getOpenFileName(this, "Select Source Estimate", "", "STC Files (*-lh.stc *-rh.stc *.stc)");
         if (path.isEmpty()) return;
+        trackLoadedFile(path, static_cast<int>(MnaFileRole::SourceEstimate));
         addStcEntry(path, true);
 #endif
     });
@@ -1017,6 +1158,7 @@ void MainWindow::setupConnections()
             if (path.isEmpty()) return;
 
             if (m_brainView->loadSensors(path)) {
+                trackLoadedFile(path, static_cast<int>(MnaFileRole::Digitizer));
                 m_showMegCheck->setEnabled(true);
                 m_showEegCheck->setEnabled(true);
                 m_showDigCheck->setEnabled(true);
@@ -1029,6 +1171,7 @@ void MainWindow::setupConnections()
         if (path.isEmpty()) return;
 
         if (m_brainView->loadSensors(path)) {
+            trackLoadedFile(path, static_cast<int>(MnaFileRole::Digitizer));
             m_showMegCheck->setEnabled(true);
             m_showEegCheck->setEnabled(true);
             m_showDigCheck->setEnabled(true);
@@ -1046,11 +1189,13 @@ void MainWindow::setupConnections()
             QString path = wasmSaveToTemp(fileName, fileContent);
             if (path.isEmpty()) return;
             m_brainView->loadTransformation(path);
+            trackLoadedFile(path, static_cast<int>(MnaFileRole::Transform));
         });
 #else
         QString path = QFileDialog::getOpenFileName(this, "Select Transformation", "", "FIF Files (*.fif)");
         if (path.isEmpty()) return;
         m_brainView->loadTransformation(path);
+        trackLoadedFile(path, static_cast<int>(MnaFileRole::Transform));
 #endif
     });
 
@@ -1130,6 +1275,7 @@ void MainWindow::setupConnections()
             QString path = wasmSaveToTemp(fileName, fileContent);
             if (path.isEmpty()) return;
             if (m_brainView->loadSourceSpace(path)) {
+                trackLoadedFile(path, static_cast<int>(MnaFileRole::SourceSpace));
                 m_showSrcSpaceCheck->setEnabled(true);
                 m_showSrcSpaceCheck->setChecked(false);
                 m_brainView->setSourceSpaceVisible(false);
@@ -1140,6 +1286,7 @@ void MainWindow::setupConnections()
             "Source Space Files (*-src.fif *-fwd.fif);;All FIF Files (*.fif)");
         if (path.isEmpty()) return;
         if (m_brainView->loadSourceSpace(path)) {
+            trackLoadedFile(path, static_cast<int>(MnaFileRole::SourceSpace));
             m_showSrcSpaceCheck->setEnabled(true);
             m_showSrcSpaceCheck->setChecked(false);
             m_brainView->setSourceSpaceVisible(false);
@@ -1183,6 +1330,7 @@ void MainWindow::setupConnections()
             m_evokedSetCombo->blockSignals(false);
 
             m_evokedSetCombo->setProperty("evokedPath", path);
+            trackLoadedFile(path, static_cast<int>(MnaFileRole::Evoked));
             m_brainView->loadSensorField(path, 0);
         });
 #else
@@ -1208,6 +1356,7 @@ void MainWindow::setupConnections()
 
         // Store the path for re-loading when the combo changes
         m_evokedSetCombo->setProperty("evokedPath", path);
+        trackLoadedFile(path, static_cast<int>(MnaFileRole::Evoked));
 
         // Load the first evoked set
         m_brainView->loadSensorField(path, 0);
@@ -1501,6 +1650,7 @@ void MainWindow::loadInitialData(const QString &subjectPath,
     // Auto-load digitizer
     if (!digitizerPath.isEmpty() && QFile::exists(digitizerPath)) {
         qInfo() << "Auto-loading digitizer from:" << digitizerPath;
+        trackLoadedFile(digitizerPath, static_cast<int>(MnaFileRole::Digitizer));
         if (m_brainView->loadSensors(digitizerPath)) {
             m_showMegCheck->setEnabled(true);
             m_showEegCheck->setEnabled(true);
@@ -1532,12 +1682,14 @@ void MainWindow::loadInitialData(const QString &subjectPath,
     // Auto-load transformation
     if (!transPath.isEmpty() && QFile::exists(transPath)) {
         qInfo() << "Auto-loading transformation from:" << transPath;
+        trackLoadedFile(transPath, static_cast<int>(MnaFileRole::Transform));
         m_brainView->loadTransformation(transPath);
     }
 
     // Auto-load source space
     if (!srcSpacePath.isEmpty() && QFile::exists(srcSpacePath)) {
         qInfo() << "Auto-loading source space from:" << srcSpacePath;
+        trackLoadedFile(srcSpacePath, static_cast<int>(MnaFileRole::SourceSpace));
         if (m_brainView->loadSourceSpace(srcSpacePath)) {
             m_showSrcSpaceCheck->setEnabled(true);
             m_showSrcSpaceCheck->setChecked(false);
@@ -1550,6 +1702,7 @@ void MainWindow::loadInitialData(const QString &subjectPath,
         const QString &stcPath = stcPaths[i];
         if (!stcPath.isEmpty() && QFile::exists(stcPath)) {
             qInfo() << "Auto-loading source estimate from:" << stcPath;
+            trackLoadedFile(stcPath, static_cast<int>(MnaFileRole::SourceEstimate));
             addStcEntry(stcPath, /*activate=*/ (i == 0));
         }
     }
@@ -1557,6 +1710,7 @@ void MainWindow::loadInitialData(const QString &subjectPath,
     // Auto-load evoked
     if (!evokedPath.isEmpty() && QFile::exists(evokedPath)) {
         qInfo() << "Auto-loading evoked from:" << evokedPath;
+        trackLoadedFile(evokedPath, static_cast<int>(MnaFileRole::Evoked));
 
         QStringList sets = BrainView::probeEvokedSets(evokedPath);
         m_evokedSetCombo->blockSignals(true);
@@ -1641,6 +1795,7 @@ void MainWindow::loadHemisphere(const QString &subjectPath, const QString &subje
         FsSurface surf(surfPath);
         if (!surf.isEmpty()) {
             m_model->addSurface(subjectName, hemi, type, surf);
+            trackLoadedFile(surfPath, static_cast<int>(MnaFileRole::Surface));
             qInfo() << "Added" << hemi << type;
         }
     }
@@ -1651,6 +1806,7 @@ void MainWindow::loadHemisphere(const QString &subjectPath, const QString &subje
         FsAnnotation annot(annotPath);
         if (!annot.isEmpty()) {
             m_model->addAnnotation(subjectName, hemi, annot);
+            trackLoadedFile(annotPath, static_cast<int>(MnaFileRole::Annotation));
             qInfo() << "Added annotation for" << hemi;
         }
     }
@@ -1662,6 +1818,7 @@ void MainWindow::loadBem(const QString &subjectName, const QString &bemPath)
 {
     QFile bemFile(bemPath);
     if (bemFile.exists()) {
+        trackLoadedFile(bemPath, static_cast<int>(MnaFileRole::Bem));
         MNEBem bem(bemFile);
         for (int i = 0; i < bem.size(); ++i) {
             QString name;
@@ -1815,4 +1972,200 @@ void MainWindow::syncUIToEditTarget(int target)
 void MainWindow::updateViewportCheckboxes(int count)
 {
     Q_UNUSED(count);
+}
+
+//=============================================================================================================
+
+void MainWindow::trackLoadedFile(const QString &path, int role)
+{
+    if (path.isEmpty()) return;
+    // Avoid duplicates
+    for (const auto &entry : m_loadedFiles) {
+        if (entry.first == path) return;
+    }
+    m_loadedFiles.append(qMakePair(path, role));
+}
+
+//=============================================================================================================
+
+void MainWindow::importMnaProject(const QString &path)
+{
+    MnaProject proj = MnaIO::read(path);
+    if (proj.name.isEmpty() && proj.subjects.isEmpty()) {
+        qWarning() << "Failed to read MNA project from:" << path;
+        return;
+    }
+
+    qInfo() << "Importing MNA project:" << proj.name;
+    const QString projectDir = QFileInfo(path).absolutePath();
+
+    // Create a unique extraction root under /tmp using the project name
+    const QString extractRoot = QStringLiteral("/tmp/mna_") +
+        proj.name.toLower().replace(QRegularExpression(QStringLiteral("[^a-z0-9]+")), QStringLiteral("_"));
+
+    // Collect all file refs from all subjects/sessions/recordings
+    for (const MnaSubject &subj : proj.subjects) {
+        for (const MnaSession &sess : subj.sessions) {
+            for (const MnaRecording &rec : sess.recordings) {
+                for (const MnaFileRef &ref : rec.files) {
+                    // Resolve the file: embedded → extract to BIDS tree, external → resolve relative path
+                    QString filePath;
+                    if (ref.embedded && !ref.data.isEmpty()) {
+                        // Preserve BIDS directory structure: <extractRoot>/<ref.path>
+                        filePath = extractRoot + QStringLiteral("/") + ref.path;
+                        QDir().mkpath(QFileInfo(filePath).absolutePath());
+                        QFile f(filePath);
+                        if (f.open(QIODevice::WriteOnly)) {
+                            f.write(ref.data);
+                            f.close();
+                        } else {
+                            qWarning() << "Failed to extract embedded file:" << ref.path;
+                            continue;
+                        }
+                    } else {
+                        // Resolve relative path against the project file directory
+                        filePath = QDir(projectDir).filePath(ref.path);
+                        if (!QFile::exists(filePath)) {
+                            qWarning() << "Referenced file not found:" << filePath;
+                            continue;
+                        }
+                    }
+
+                    trackLoadedFile(filePath, static_cast<int>(ref.role));
+
+                    // Dispatch to the appropriate loader based on role
+                    switch (ref.role) {
+                    case MnaFileRole::Surface: {
+                        QString fn = QFileInfo(filePath).fileName();
+                        QString hemi = fn.contains("lh.") ? "lh" : (fn.contains("rh.") ? "rh" : "lh");
+                        QString type = "pial";
+                        if (fn.contains("inflated")) type = "inflated";
+                        else if (fn.contains("white")) type = "white";
+                        else if (fn.contains("orig")) type = "orig";
+                        FsSurface surf(filePath);
+                        if (!surf.isEmpty()) {
+                            m_model->addSurface(subj.id, hemi, type, surf);
+                            qInfo() << "Imported surface:" << fn;
+                        }
+                        break;
+                    }
+                    case MnaFileRole::Annotation: {
+                        QString fn = QFileInfo(filePath).fileName();
+                        QString hemi = fn.contains("lh.") ? "lh" : (fn.contains("rh.") ? "rh" : "lh");
+                        FsAnnotation annot(filePath);
+                        if (!annot.isEmpty()) {
+                            m_model->addAnnotation(subj.id, hemi, annot);
+                            qInfo() << "Imported annotation:" << fn;
+                        }
+                        break;
+                    }
+                    case MnaFileRole::Bem:
+                        loadBem(subj.id, filePath);
+                        qInfo() << "Imported BEM:" << ref.path;
+                        break;
+                    case MnaFileRole::Digitizer:
+                        if (m_brainView->loadSensors(filePath)) {
+                            m_showMegCheck->setEnabled(true);
+                            m_showEegCheck->setEnabled(true);
+                            m_showDigCheck->setEnabled(true);
+                            m_showHelmetCheck->setEnabled(true);
+                            m_helmetShapeCombo->setEnabled(true);
+                            qInfo() << "Imported digitizer:" << ref.path;
+                        }
+                        break;
+                    case MnaFileRole::Transform:
+                        m_brainView->loadTransformation(filePath);
+                        qInfo() << "Imported transformation:" << ref.path;
+                        break;
+                    case MnaFileRole::SourceSpace:
+                        if (m_brainView->loadSourceSpace(filePath)) {
+                            m_showSrcSpaceCheck->setEnabled(true);
+                            m_showSrcSpaceCheck->setChecked(false);
+                            m_brainView->setSourceSpaceVisible(false);
+                            qInfo() << "Imported source space:" << ref.path;
+                        }
+                        break;
+                    case MnaFileRole::SourceEstimate:
+                        addStcEntry(filePath, m_stcCombo->count() == 0);
+                        qInfo() << "Imported STC:" << ref.path;
+                        break;
+                    case MnaFileRole::Evoked: {
+                        QStringList sets = BrainView::probeEvokedSets(filePath);
+                        m_evokedSetCombo->blockSignals(true);
+                        m_evokedSetCombo->clear();
+                        if (!sets.isEmpty()) {
+                            m_evokedSetCombo->addItems(sets);
+                            m_evokedSetCombo->setEnabled(sets.size() > 1);
+                            m_evokedSetCombo->setCurrentIndex(0);
+                        }
+                        m_evokedSetCombo->blockSignals(false);
+                        m_evokedSetCombo->setProperty("evokedPath", filePath);
+                        m_brainView->loadSensorField(filePath, 0);
+                        qInfo() << "Imported evoked:" << ref.path;
+                        break;
+                    }
+                    default:
+                        qInfo() << "Skipping file with role:" << mnaFileRoleToString(ref.role) << ref.path;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    qInfo() << "MNA project import complete.";
+}
+
+//=============================================================================================================
+
+void MainWindow::exportMnaProject(const QString &path, bool embedData)
+{
+    MnaProject proj;
+    proj.name = QStringLiteral("MNE Inspect Export");
+    proj.description = QStringLiteral("Exported from MNE Inspect");
+    proj.modified = QDateTime::currentDateTimeUtc();
+
+    MnaSubject subj;
+    subj.id = QStringLiteral("User");
+    MnaSession session;
+    session.id = QStringLiteral("session-01");
+    MnaRecording rec;
+    rec.id = QStringLiteral("recording-01");
+
+    const QString projectDir = QFileInfo(path).absolutePath();
+
+    for (const auto &entry : m_loadedFiles) {
+        MnaFileRef ref;
+        ref.role = static_cast<MnaFileRole>(entry.second);
+        ref.format = QFileInfo(entry.first).suffix();
+
+        if (embedData) {
+            ref.path = bidsBuildRelPath(subj.id, session.id, ref.role, entry.first);
+            ref.embedded = true;
+            QFile f(entry.first);
+            if (f.open(QIODevice::ReadOnly)) {
+                ref.data = f.readAll();
+                ref.sizeBytes = ref.data.size();
+                f.close();
+            }
+        } else {
+            // Store as relative path from project file
+            ref.path = QDir(projectDir).relativeFilePath(entry.first);
+            ref.embedded = false;
+            QFileInfo fi(entry.first);
+            ref.sizeBytes = fi.size();
+        }
+
+        rec.files.append(ref);
+    }
+
+    session.recordings.append(rec);
+    subj.sessions.append(session);
+    proj.subjects.append(subj);
+
+    if (MnaIO::write(proj, path)) {
+        qInfo() << "Exported MNA project to:" << path;
+    } else {
+        qWarning() << "Failed to export MNA project to:" << path;
+    }
 }

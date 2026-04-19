@@ -65,6 +65,7 @@ set(MNE_LIBS_REQUIRED
     mne_fiff
     mne_fwd
     mne_mne
+    mne_mna
     mne_disp
     mne_inv
     mne_utils

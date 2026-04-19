@@ -41,6 +41,7 @@
 
 #include <QMainWindow>
 #include <QElapsedTimer>
+#include <QStringList>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -121,6 +122,22 @@ private:
      * triggering a load.
      */
     void addStcEntry(const QString &stcPath, bool activate = true);
+
+    /**
+     * Import an MNA/MNX project file — extract embedded files and load them.
+     */
+    void importMnaProject(const QString &path);
+
+    /**
+     * Export the currently loaded data as an MNA (JSON) or MNX (CBOR) project file.
+     * When embedData is true, all referenced files are embedded in the container.
+     */
+    void exportMnaProject(const QString &path, bool embedData);
+
+    /**
+     * Track a loaded file path and its role for later export.
+     */
+    void trackLoadedFile(const QString &path, int role);
 
 private:
     // Core components
@@ -227,6 +244,13 @@ private:
     // Playback stepping (for real-time accurate playback)
     QElapsedTimer m_playbackClock;          //!< Wall-clock for measuring actual elapsed time
     double m_stcStepAccum = 0.0;            //!< Fractional sample accumulator
+
+    // MNA Project
+    QPushButton *m_openProjectBtn = nullptr;
+    QPushButton *m_exportProjectBtn = nullptr;
+
+    // Loaded file tracking for MNA export (path → MnaFileRole int)
+    QList<QPair<QString, int>> m_loadedFiles;
 
     // Sync state
     bool m_isSyncing = false;
