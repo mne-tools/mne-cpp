@@ -144,9 +144,15 @@ std::vector<int> fiff_get_matrix_dims(const FiffTag::UPtr& tag)
 
 FiffSparseMatrix::FiffSparseMatrix()
 : coding(0)
-, m(0)
-, n(0)
-, nz(0)
+{
+}
+
+//=============================================================================================================
+
+FiffSparseMatrix::FiffSparseMatrix(Eigen::SparseMatrix<float>&& mat,
+                                   FIFFLIB::fiff_int_t coding)
+: coding(coding)
+, m_eigen(std::move(mat))
 {
 }
 
@@ -162,7 +168,7 @@ std::vector<int> FiffSparseMatrix::fiff_get_matrix_sparse_dims(const FiffTag::UP
 FiffSparseMatrix::UPtr FiffSparseMatrix::fiff_get_float_sparse_matrix(const FiffTag::UPtr& tag)
 {
     int   m,n,nz;
-    int   coding,correct_size;
+    int   cod,correct_size;
 
     if ( fiff_type_fundamental(tag->type)   != FIFFT_MATRIX ||
          fiff_type_base(tag->type)          != FIFFT_FLOAT ||
@@ -185,11 +191,11 @@ FiffSparseMatrix::UPtr FiffSparseMatrix::fiff_get_float_sparse_matrix(const Fiff
     n   = dims[2];
     nz  = dims[3];
 
-    coding = fiff_type_matrix_coding(tag->type);
-    if (coding == FIFFTS_MC_CCS)
+    cod = fiff_type_matrix_coding(tag->type);
+    if (cod == FIFFTS_MC_CCS)
         correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
                 (n+1+dims[0]+2)*(sizeof(fiff_int_t));
-    else if (coding == FIFFTS_MC_RCS)
+    else if (cod == FIFFTS_MC_RCS)
         correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
                 (m+1+dims[0]+2)*(sizeof(fiff_int_t));
     else {
@@ -201,23 +207,35 @@ FiffSparseMatrix::UPtr FiffSparseMatrix::fiff_get_float_sparse_matrix(const Fiff
         return nullptr;
     }
     /*
-     * Parse tag data into Eigen vectors via Map (zero-copy wrap + assignment copy)
+     * Parse tag data into triplets and build Eigen sparse matrix directly
      */
-    auto res = std::make_unique<FiffSparseMatrix>();
-    res->m      = m;
-    res->n      = n;
-    res->nz     = nz;
-    res->coding = coding;
-
     const float* src_data = reinterpret_cast<const float*>(tag->data());
     const int*   src_inds = reinterpret_cast<const int*>(src_data + nz);
     const int*   src_ptrs = src_inds + nz;
-    int ptrs_count = (coding == FIFFTS_MC_CCS) ? (n + 1) : (m + 1);
 
-    res->data = Eigen::Map<const Eigen::VectorXf>(src_data, nz);
-    res->inds = Eigen::Map<const Eigen::VectorXi>(src_inds, nz);
-    res->ptrs = Eigen::Map<const Eigen::VectorXi>(src_ptrs, ptrs_count);
+    using T = Eigen::Triplet<float>;
+    std::vector<T> triplets;
+    triplets.reserve(nz);
 
+    if (cod == FIFFTS_MC_RCS) {
+        for (int row = 0; row < m; ++row) {
+            for (int j = src_ptrs[row]; j < src_ptrs[row + 1]; ++j) {
+                triplets.push_back(T(row, src_inds[j], src_data[j]));
+            }
+        }
+    } else { // CCS
+        for (int col = 0; col < n; ++col) {
+            for (int j = src_ptrs[col]; j < src_ptrs[col + 1]; ++j) {
+                triplets.push_back(T(src_inds[j], col, src_data[j]));
+            }
+        }
+    }
+
+    Eigen::SparseMatrix<float> eigenMat(m, n);
+    eigenMat.setFromTriplets(triplets.begin(), triplets.end());
+    eigenMat.makeCompressed();
+
+    auto res = std::make_unique<FiffSparseMatrix>(std::move(eigenMat), cod);
     return res;
 }
 
@@ -225,48 +243,37 @@ FiffSparseMatrix::UPtr FiffSparseMatrix::fiff_get_float_sparse_matrix(const Fiff
 
 FiffSparseMatrix::UPtr FiffSparseMatrix::create_sparse_rcs(int nrow, int ncol, int *nnz, int **colindex, float **vals)
 {
-    int j,k,nz,ptr,ind;
+    int j,k,totalNz;
 
-    for (j = 0, nz = 0; j < nrow; j++)
-        nz = nz + nnz[j];
+    for (j = 0, totalNz = 0; j < nrow; j++)
+        totalNz = totalNz + nnz[j];
 
-    if (nz <= 0) {
+    if (totalNz <= 0) {
         qWarning("[FiffSparseMatrix::create_sparse_rcs] No nonzero elements specified.");
         return nullptr;
     }
 
-    auto sparse = std::make_unique<FiffSparseMatrix>();
-    sparse->coding = FIFFTS_MC_RCS;
-    sparse->m      = nrow;
-    sparse->n      = ncol;
-    sparse->nz     = nz;
-    sparse->data   = Eigen::VectorXf::Zero(nz);
-    sparse->inds   = Eigen::VectorXi::Zero(nz);
-    sparse->ptrs   = Eigen::VectorXi::Zero(nrow + 1);
+    using T = Eigen::Triplet<float>;
+    std::vector<T> triplets;
+    triplets.reserve(totalNz);
 
-    for (j = 0, nz = 0; j < nrow; j++) {
-        ptr = -1;
+    for (j = 0; j < nrow; j++) {
         for (k = 0; k < nnz[j]; k++) {
-            if (ptr < 0)
-                ptr = nz;
-            ind = sparse->inds[nz] = colindex[j][k];
-            if (ind < 0 || ind >= ncol) {
+            int col = colindex[j][k];
+            if (col < 0 || col >= ncol) {
                 qWarning("[FiffSparseMatrix::create_sparse_rcs] Column index out of range");
                 return nullptr;
             }
-            if (vals)
-                sparse->data[nz] = vals[j][k];
-            else
-                sparse->data[nz] = 0.0;
-            nz++;
+            float val = vals ? vals[j][k] : 0.0f;
+            triplets.push_back(T(j, col, val));
         }
-        sparse->ptrs[j] = ptr;
     }
-    sparse->ptrs[nrow] = nz;
-    for (j = nrow-1; j >= 0; j--) /* Take care of the empty rows */
-        if (sparse->ptrs[j] < 0)
-            sparse->ptrs[j] = sparse->ptrs[j+1];
-    return sparse;
+
+    Eigen::SparseMatrix<float> eigenMat(nrow, ncol);
+    eigenMat.setFromTriplets(triplets.begin(), triplets.end());
+    eigenMat.makeCompressed();
+
+    return std::make_unique<FiffSparseMatrix>(std::move(eigenMat), FIFFTS_MC_RCS);
 }
 
 //=============================================================================================================
@@ -276,93 +283,29 @@ FiffSparseMatrix::UPtr FiffSparseMatrix::mne_add_upper_triangle_rcs()
  * Fill in upper triangle with the lower triangle values
  */
 {
-    if (this->coding != FIFFTS_MC_RCS) {
-        qWarning("[FiffSparseMatrix::mne_add_upper_triangle_rcs] input must be in RCS format");
-        return nullptr;
-    }
-    if (this->m != this->n) {
+    int nRows = rows();
+    int nCols = cols();
+
+    if (nRows != nCols) {
         qWarning("[FiffSparseMatrix::mne_add_upper_triangle_rcs] input must be square");
         return nullptr;
     }
 
-    // Build per-row data from existing lower triangle
-    std::vector<int> nnz_vec(this->m);
-    std::vector<std::vector<int>>   colindex(this->m);
-    std::vector<std::vector<float>> vals(this->m);
+    // Build full (lower + upper) by adding transpose
+    Eigen::SparseMatrix<float> full = m_eigen + Eigen::SparseMatrix<float>(m_eigen.transpose());
 
-    for (int i = 0; i < this->m; i++) {
-        nnz_vec[i] = this->ptrs[i+1] - this->ptrs[i];
-        if (nnz_vec[i] > 0) {
-            colindex[i].resize(nnz_vec[i]);
-            vals[i].resize(nnz_vec[i]);
-            for (int j = this->ptrs[i], k = 0; j < this->ptrs[i+1]; j++, k++) {
-                vals[i][k]     = this->data[j];
-                colindex[i][k] = this->inds[j];
+    // The diagonal was counted twice — fix by subtracting the diagonal once
+    for (int k = 0; k < full.outerSize(); ++k) {
+        for (Eigen::SparseMatrix<float>::InnerIterator it(full, k); it; ++it) {
+            if (it.row() == it.col()) {
+                // Original diagonal value is in m_eigen; full has 2x, so set back to 1x
+                it.valueRef() = 0.5f * it.value();
             }
         }
     }
 
-    // Count additional upper-triangle entries per row
-    std::vector<int> nadd(this->m, 0);
-    for (int i = 0; i < this->m; i++)
-        for (int j = this->ptrs[i]; j < this->ptrs[i+1]; j++)
-            nadd[this->inds[j]]++;
-
-    // Expand per-row storage and add upper-triangle entries
-    for (int i = 0; i < this->m; i++) {
-        colindex[i].resize(nnz_vec[i] + nadd[i]);
-        vals[i].resize(nnz_vec[i] + nadd[i]);
-    }
-    for (int i = 0; i < this->m; i++)
-        for (int j = this->ptrs[i]; j < this->ptrs[i+1]; j++) {
-            int row = this->inds[j];
-            colindex[row][nnz_vec[row]] = i;
-            vals[row][nnz_vec[row]]     = this->data[j];
-            nnz_vec[row]++;
-        }
-
-    // Build raw pointer arrays for create_sparse_rcs
-    std::vector<int*>   ci_ptrs(this->m);
-    std::vector<float*> val_ptrs(this->m);
-    for (int i = 0; i < this->m; i++) {
-        ci_ptrs[i]  = colindex[i].data();
-        val_ptrs[i] = vals[i].data();
-    }
-
-    return create_sparse_rcs(this->m, this->n, nnz_vec.data(), ci_ptrs.data(), val_ptrs.data());
-}
-
-//=============================================================================================================
-
-Eigen::SparseMatrix<double> FiffSparseMatrix::toEigenSparse() const
-{
-    if (is_empty())
-        return Eigen::SparseMatrix<double>();
-
-    using T = Eigen::Triplet<double>;
-    std::vector<T> tripletList;
-    tripletList.reserve(nz);
-
-    if (coding == FIFFTS_MC_RCS) {
-        for (int row = 0; row < m; ++row) {
-            for (int j = ptrs[row]; j < ptrs[row + 1]; ++j) {
-                tripletList.push_back(T(row, inds[j], static_cast<double>(data[j])));
-            }
-        }
-    } else if (coding == FIFFTS_MC_CCS) {
-        for (int col = 0; col < n; ++col) {
-            for (int j = ptrs[col]; j < ptrs[col + 1]; ++j) {
-                tripletList.push_back(T(inds[j], col, static_cast<double>(data[j])));
-            }
-        }
-    } else {
-        qWarning("[FiffSparseMatrix::toEigenSparse] Unknown coding type: %d", coding);
-        return Eigen::SparseMatrix<double>();
-    }
-
-    Eigen::SparseMatrix<double> result(m, n);
-    result.setFromTriplets(tripletList.begin(), tripletList.end());
-    return result;
+    full.makeCompressed();
+    return std::make_unique<FiffSparseMatrix>(std::move(full), FIFFTS_MC_RCS);
 }
 
 //=============================================================================================================
@@ -370,49 +313,26 @@ Eigen::SparseMatrix<double> FiffSparseMatrix::toEigenSparse() const
 FiffSparseMatrix FiffSparseMatrix::fromEigenSparse(const Eigen::SparseMatrix<double>& mat)
 {
     FiffSparseMatrix result;
-    if (mat.nonZeros() == 0) {
+    if (mat.nonZeros() == 0)
         return result;
-    }
 
-    // Store in RCS (row-compressed) format
-    // Eigen's default SparseMatrix is column-major, so we iterate by row
     result.coding = FIFFTS_MC_RCS;
-    result.m = static_cast<fiff_int_t>(mat.rows());
-    result.n = static_cast<fiff_int_t>(mat.cols());
-    result.nz = static_cast<fiff_int_t>(mat.nonZeros());
-    result.data = Eigen::VectorXf::Zero(result.nz);
-    result.inds = Eigen::VectorXi::Zero(result.nz);
-    result.ptrs = Eigen::VectorXi::Zero(result.m + 1);
+    result.m_eigen = mat.cast<float>();
+    result.m_eigen.makeCompressed();
+    return result;
+}
 
-    // Collect triplets sorted by row
-    using T = Eigen::Triplet<double>;
-    std::vector<T> triplets;
-    triplets.reserve(mat.nonZeros());
-    for (int k = 0; k < mat.outerSize(); ++k) {
-        for (Eigen::SparseMatrix<double>::InnerIterator it(mat, k); it; ++it) {
-            triplets.push_back(T(it.row(), it.col(), it.value()));
-        }
-    }
-    std::sort(triplets.begin(), triplets.end(),
-              [](const T& a, const T& b) {
-                  return a.row() < b.row() || (a.row() == b.row() && a.col() < b.col());
-              });
+//=============================================================================================================
 
-    int idx = 0;
-    int row = 0;
-    result.ptrs[0] = 0;
-    for (const auto& t : triplets) {
-        while (row < t.row()) {
-            result.ptrs[++row] = idx;
-        }
-        result.data[idx] = static_cast<float>(t.value());
-        result.inds[idx] = static_cast<int>(t.col());
-        ++idx;
-    }
-    while (row < result.m) {
-        result.ptrs[++row] = idx;
-    }
+FiffSparseMatrix FiffSparseMatrix::fromEigenSparse(const Eigen::SparseMatrix<float>& mat)
+{
+    FiffSparseMatrix result;
+    if (mat.nonZeros() == 0)
+        return result;
 
+    result.coding = FIFFTS_MC_RCS;
+    result.m_eigen = mat;
+    result.m_eigen.makeCompressed();
     return result;
 }
 
@@ -420,44 +340,29 @@ FiffSparseMatrix FiffSparseMatrix::fromEigenSparse(const Eigen::SparseMatrix<dou
 
 FiffSparseMatrix::UPtr FiffSparseMatrix::pickLowerTriangleRcs() const
 {
-    if (coding != FIFFTS_MC_RCS) {
-        qWarning("[FiffSparseMatrix::pickLowerTriangleRcs] input must be in RCS format");
-        return nullptr;
-    }
-    if (m != n) {
+    int nRows = rows();
+    int nCols = cols();
+
+    if (nRows != nCols) {
         qWarning("[FiffSparseMatrix::pickLowerTriangleRcs] input must be square");
         return nullptr;
     }
 
-    std::vector<int>                nnz_vec(m);
-    std::vector<std::vector<int>>   colindex(m);
-    std::vector<std::vector<float>> vals(m);
+    using T = Eigen::Triplet<float>;
+    std::vector<T> triplets;
+    triplets.reserve(m_eigen.nonZeros());
 
-    for (int i = 0; i < m; i++) {
-        int count = ptrs[i+1] - ptrs[i];
-        if (count > 0) {
-            colindex[i].resize(count);
-            vals[i].resize(count);
-            int k = 0;
-            for (int j = ptrs[i]; j < ptrs[i+1]; j++) {
-                if (inds[j] <= i) {
-                    vals[i][k]     = data[j];
-                    colindex[i][k] = inds[j];
-                    k++;
-                }
+    for (int k = 0; k < m_eigen.outerSize(); ++k) {
+        for (Eigen::SparseMatrix<float>::InnerIterator it(m_eigen, k); it; ++it) {
+            if (it.row() >= it.col()) {  // lower triangle including diagonal
+                triplets.push_back(T(it.row(), it.col(), it.value()));
             }
-            nnz_vec[i] = k;
-        } else {
-            nnz_vec[i] = 0;
         }
     }
 
-    std::vector<int*>   ci_ptrs(m);
-    std::vector<float*> val_ptrs(m);
-    for (int i = 0; i < m; i++) {
-        ci_ptrs[i]  = colindex[i].empty() ? nullptr : colindex[i].data();
-        val_ptrs[i] = vals[i].empty() ? nullptr : vals[i].data();
-    }
+    Eigen::SparseMatrix<float> lower(nRows, nCols);
+    lower.setFromTriplets(triplets.begin(), triplets.end());
+    lower.makeCompressed();
 
-    return create_sparse_rcs(m, n, nnz_vec.data(), ci_ptrs.data(), val_ptrs.data());
+    return std::make_unique<FiffSparseMatrix>(std::move(lower), FIFFTS_MC_RCS);
 }

@@ -563,15 +563,15 @@ void MNEHemisphere::writeToStream(FiffStream* p_pStream)
     //   Distances
     if (!this->dist.is_empty())
     {
-        // Convert FiffSparseMatrix to Eigen and save only upper triangular portion
-        Eigen::SparseMatrix<double> eigenDist = this->dist.toEigenSparse();
+        // Extract upper triangular portion from the dist matrix
+        const Eigen::SparseMatrix<float>& eigenDist = this->dist.eigen();
         typedef Eigen::Triplet<float> T;
         std::vector<T> tripletList;
         tripletList.reserve(eigenDist.nonZeros());
         for (int k=0; k < eigenDist.outerSize(); ++k)
-            for (Eigen::SparseMatrix<double>::InnerIterator it(eigenDist,k); it; ++it)
+            for (Eigen::SparseMatrix<float>::InnerIterator it(eigenDist,k); it; ++it)
                 if(it.col() >= it.row())//only upper triangle -> todo iteration can be optimized
-                    tripletList.push_back(T(it.row(), it.col(), (float)it.value()));
+                    tripletList.push_back(T(it.row(), it.col(), it.value()));
         Eigen::SparseMatrix<float> dists(eigenDist.rows(), eigenDist.cols());
         dists.setFromTriplets(tripletList.begin(), tripletList.end());
 

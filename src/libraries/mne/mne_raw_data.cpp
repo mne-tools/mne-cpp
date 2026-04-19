@@ -490,31 +490,13 @@ int  mne_sparse_vec_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
                           float           *vector, /* Vector to be multiplied */
                           float           *res)    /* Result of the multiplication */
 /*
-      * Multiply a vector by a sparse matrix.
+      * Multiply a vector by a sparse matrix using Eigen.
       */
 {
-    int i,j;
-
-    if (mat->coding == FIFFTS_MC_RCS) {
-        for (i = 0; i < mat->m; i++) {
-            res[i] = 0.0;
-            for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
-                res[i] += mat->data[j]*vector[mat->inds[j]];
-        }
-        return 0;
-    }
-    else if (mat->coding == FIFFTS_MC_CCS) {
-        for (i = 0; i < mat->m; i++)
-            res[i] = 0.0;
-        for (i = 0; i < mat->n; i++)
-            for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
-                res[mat->inds[j]] += mat->data[j]*vector[i];
-        return 0;
-    }
-    else {
-        qWarning("mne_sparse_vec_mult2: unknown sparse matrix storage type: %d",mat->coding);
-        return -1;
-    }
+    Eigen::Map<const Eigen::VectorXf> vecIn(vector, mat->cols());
+    Eigen::Map<Eigen::VectorXf> vecOut(res, mat->rows());
+    vecOut = mat->eigen() * vecIn;
+    return 0;
 }
 
 int  mne_sparse_mat_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
@@ -522,35 +504,13 @@ int  mne_sparse_mat_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
                           int             ncol,	   /* How many columns in the above */
                           RowMajorMatrixXf& res)   /* Result of the multiplication */
 /*
-      * Multiply a dense matrix by a sparse matrix.
+      * Multiply a dense matrix by a sparse matrix using Eigen.
       */
 {
-    int i,j,k;
-    float val;
-
-    if (mat->coding == FIFFTS_MC_RCS) {
-        for (i = 0; i < mat->m; i++) {
-            for (k = 0; k < ncol; k++) {
-                val = 0.0;
-                for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
-                    val += mat->data[j]*mult(mat->inds[j],k);
-                res(i,k) = val;
-            }
-        }
-    }
-    else if (mat->coding == FIFFTS_MC_CCS) {
-        for (k = 0; k < ncol; k++) {
-            for (i = 0; i < mat->m; i++)
-                res(i,k) = 0.0;
-            for (i = 0; i < mat->n; i++)
-                for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
-                    res(mat->inds[j],k) += mat->data[j]*mult(i,k);
-        }
-    }
-    else {
-        qWarning("mne_sparse_mat_mult2: unknown sparse matrix storage type: %d",mat->coding);
-        return -1;
-    }
+    Q_UNUSED(ncol);
+    // mat->eigen() is column-major sparse, mult is row-major dense
+    // Result: res = sparse * mult  (rows: mat->rows(), cols: mult.cols())
+    res = mat->eigen() * mult;
     return 0;
 }
 

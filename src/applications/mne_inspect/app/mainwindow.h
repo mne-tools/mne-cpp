@@ -58,9 +58,9 @@ class QPushButton;
 class QAction;
 class QCloseEvent;
 class QDockWidget;
+class QGroupBox;
 class QMenu;
 class QProgressBar;
-class QToolBar;
 class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -161,11 +161,6 @@ private:
     void createMenus();
 
     /**
-     * Create the main toolbar with quick-access actions.
-     */
-    void createToolBar();
-
-    /**
      * Create the status bar.
      */
     void createStatusBar();
@@ -205,6 +200,17 @@ private:
     BrainView *m_brainView = nullptr;
     BrainTreeModel *m_model = nullptr;
 
+    // Group boxes (disabled until data is loaded)
+    QGroupBox *m_surfGroup = nullptr;
+    QGroupBox *m_bemGroup = nullptr;
+    QGroupBox *m_stcGroup = nullptr;
+    QGroupBox *m_dipoleGroup = nullptr;
+    QGroupBox *m_srcSpaceGroup = nullptr;
+    QGroupBox *m_networkGroup = nullptr;
+    QGroupBox *m_evokedGroup = nullptr;
+    QGroupBox *m_sensorStreamGroup = nullptr;
+    QGroupBox *m_sensorGroup = nullptr;
+
     // Control widgets - FsSurface
     QComboBox *m_surfCombo = nullptr;
     QComboBox *m_overlayCombo = nullptr;
@@ -218,7 +224,6 @@ private:
     QCheckBox *m_rhCheck = nullptr;
 
     // Control widgets - BEM
-    QPushButton *m_loadBemBtn = nullptr;
     QCheckBox *m_headCheck = nullptr;
     QCheckBox *m_outerCheck = nullptr;
     QCheckBox *m_innerCheck = nullptr;
@@ -231,11 +236,8 @@ private:
     QLabel *m_cameraPresetLabel = nullptr;
 
     // Control widgets - Brain FsSurface
-    QPushButton *m_loadSurfaceBtn = nullptr;
-    QPushButton *m_loadAtlasBtn = nullptr;
 
     // Control widgets - STC
-    QPushButton *m_loadStcBtn = nullptr;
     QComboBox *m_stcCombo = nullptr;
     QLabel *m_stcStatusLabel = nullptr;
     QProgressBar *m_stcProgressBar = nullptr;
@@ -250,8 +252,6 @@ private:
     QTimer *m_stcTimer = nullptr;
 
     // Control widgets - Sensors
-    QPushButton *m_loadDigBtn = nullptr;
-    QPushButton *m_loadTransBtn = nullptr;
     QCheckBox *m_showMegCheck = nullptr;
     QCheckBox *m_showEegCheck = nullptr;
     QCheckBox *m_showDigCheck = nullptr;
@@ -262,11 +262,9 @@ private:
     QCheckBox *m_applyTransCheck = nullptr;
 
     // Control widgets - Dipoles
-    QPushButton *m_loadDipoleBtn = nullptr;
     QCheckBox *m_showDipoleCheck = nullptr;
 
     // Control widgets - Source Space
-    QPushButton *m_loadSrcSpaceBtn = nullptr;
     QCheckBox *m_showSrcSpaceCheck = nullptr;
 
     // Control widgets - Network
@@ -275,7 +273,6 @@ private:
     QComboBox *m_networkColormapCombo = nullptr;
 
     // Control widgets - Evoked / Sensor Field
-    QPushButton *m_loadEvokedBtn = nullptr;
     QComboBox *m_evokedSetCombo = nullptr;
     QCheckBox *m_showMegFieldCheck = nullptr;
     QCheckBox *m_showEegFieldCheck = nullptr;
@@ -306,10 +303,6 @@ private:
     QElapsedTimer m_playbackClock;          //!< Wall-clock for measuring actual elapsed time
     double m_stcStepAccum = 0.0;            //!< Fractional sample accumulator
 
-    // MNA Project
-    QPushButton *m_openProjectBtn = nullptr;
-    QPushButton *m_exportProjectBtn = nullptr;
-
     // Loaded file tracking for MNA export (path → MnaFileRole int)
     QList<QPair<QString, int>> m_loadedFiles;
 
@@ -322,9 +315,6 @@ private:
 
     // Loaded files tree
     QTreeWidget *m_loadedFilesTree = nullptr;
-
-    // Toolbar
-    QToolBar *m_mainToolBar = nullptr;
 
     // Status bar labels
     QLabel *m_statusLabel = nullptr;

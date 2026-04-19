@@ -78,7 +78,6 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QMenuBar>
-#include <QToolBar>
 #include <QStatusBar>
 #include <QDockWidget>
 #include <QTreeWidget>
@@ -166,6 +165,53 @@ static QString wasmSaveToTemp(const QString &fileName, const QByteArray &fileCon
 #endif
 
 //=============================================================================================================
+// HELPERS
+//=============================================================================================================
+
+/**
+ * Create a flat, modern title bar widget for a QDockWidget.
+ * Thin bar with uppercase label on the left and a small close button on the right.
+ */
+static QWidget *createFlatDockTitleBar(QDockWidget *dock, const QString &title)
+{
+    QWidget *bar = new QWidget(dock);
+    bar->setObjectName("flatDockTitleBar");
+    bar->setMinimumHeight(40);
+    bar->setMaximumHeight(40);
+    bar->setStyleSheet(
+        "#flatDockTitleBar { background: palette(window); border-bottom: 1px solid palette(mid); padding: 0px; margin: 0px; }"
+    );
+
+    QHBoxLayout *lay = new QHBoxLayout(bar);
+    lay->setContentsMargins(10, 8, 10, 8);
+    lay->setSpacing(0);
+
+    QLabel *lbl = new QLabel(title.toUpper());
+    lbl->setStyleSheet(
+        "font-size: 11px;"
+        "font-weight: 600;"
+        "letter-spacing: 0.5px;"
+        "color: palette(text);"
+        "background: transparent;"
+        "border: none;"
+    );
+    lay->addWidget(lbl, 1, Qt::AlignVCenter);
+
+    QPushButton *closeBtn = new QPushButton("\u00D7");   // multiplication sign ×
+    closeBtn->setFixedSize(20, 20);
+    closeBtn->setFlat(true);
+    closeBtn->setCursor(Qt::ArrowCursor);
+    closeBtn->setStyleSheet(
+        "QPushButton { font-size: 14px; color: palette(text); background: transparent; border: none; border-radius: 3px; }"
+        "QPushButton:hover { background: palette(mid); }"
+    );
+    QObject::connect(closeBtn, &QPushButton::clicked, dock, &QDockWidget::close);
+    lay->addWidget(closeBtn, 0, Qt::AlignVCenter);
+
+    return bar;
+}
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -176,11 +222,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     setupUI();
     createMenus();
-    createToolBar();
     createStatusBar();
     setupConnections();
 
     restoreSettings();
+
+    // Sync view-count combo to the value BrainView restored from its own settings.
+    // This triggers currentIndexChanged which rebuilds edit-target combo, etc.
+    const int restoredCount = m_brainView->viewCount();
+    m_viewCountCombo->setCurrentIndex(restoredCount - 1);
 }
 
 //=============================================================================================================
@@ -203,35 +253,14 @@ void MainWindow::setupUI()
     sideLayout->setSpacing(5);
     scrollArea->setWidget(sidePanel);
 
-    // (Old controls moved to surfGroup/viewGroup)
-
-    // ===== Project Group =====
-    QGroupBox *projectGroup = new QGroupBox("Project");
-    QVBoxLayout *projectLayout = new QVBoxLayout(projectGroup);
-    projectLayout->setContentsMargins(6, 12, 6, 6);
-    projectLayout->setSpacing(8);
-
-#ifdef WASMBUILD
-    m_openProjectBtn = new QPushButton("Import Project (.mnx)...");
-    m_exportProjectBtn = new QPushButton("Export Project (.mnx)...");
-#else
-    m_openProjectBtn = new QPushButton("Open Project...");
-    m_exportProjectBtn = new QPushButton("Export Project...");
-#endif
-
-    projectLayout->addWidget(m_openProjectBtn);
-    projectLayout->addWidget(m_exportProjectBtn);
-
     // ===== Brain Surface Group =====
-    QGroupBox *surfGroup = new QGroupBox("Brain Surface");
-    QVBoxLayout *surfLayout = new QVBoxLayout(surfGroup);
+    m_surfGroup = new QGroupBox("Brain Surface");
+    m_surfGroup->setEnabled(false);
+    QVBoxLayout *surfLayout = new QVBoxLayout(m_surfGroup);
     surfLayout->setContentsMargins(6, 12, 6, 6);
     surfLayout->setSpacing(8);
 
     // Surface Selector
-    m_loadSurfaceBtn = new QPushButton("Load Surface...");
-    m_loadAtlasBtn = new QPushButton("Load Atlas...");
-
     QLabel *surfLabel = new QLabel("Surface Type:");
     m_surfCombo = new QComboBox;
     m_surfCombo->addItems({"pial", "inflated", "white"});
@@ -273,8 +302,6 @@ void MainWindow::setupUI()
     m_innerCheck = new QCheckBox("Inner Skull");
     m_innerCheck->setChecked(true);
 
-    surfLayout->addWidget(m_loadSurfaceBtn);
-    surfLayout->addWidget(m_loadAtlasBtn);
     surfLayout->addWidget(surfLabel);
     surfLayout->addWidget(m_surfCombo);
     surfLayout->addWidget(overlayLabel);
@@ -285,14 +312,12 @@ void MainWindow::setupUI()
     surfLayout->addWidget(m_rhCheck);
 
     // ===== BEM Surface Group =====
-    QGroupBox *bemGroup = new QGroupBox("BEM Surface");
-    QVBoxLayout *bemLayout = new QVBoxLayout(bemGroup);
+    m_bemGroup = new QGroupBox("BEM Surface");
+    m_bemGroup->setEnabled(false);
+    QVBoxLayout *bemLayout = new QVBoxLayout(m_bemGroup);
     bemLayout->setContentsMargins(6, 12, 6, 6);
     bemLayout->setSpacing(8);
 
-    m_loadBemBtn = new QPushButton("Load BEM...");
-
-    bemLayout->addWidget(m_loadBemBtn);
     bemLayout->addWidget(m_headCheck);
     bemLayout->addWidget(m_outerCheck);
     bemLayout->addWidget(m_innerCheck);
@@ -302,12 +327,11 @@ void MainWindow::setupUI()
     bemLayout->addWidget(m_linkShadersCheck);
 
     // ===== Source Estimate Group =====
-    QGroupBox *stcGroup = new QGroupBox("Source Estimate");
-    QVBoxLayout *stcLayout = new QVBoxLayout(stcGroup);
+    m_stcGroup = new QGroupBox("Source Estimate");
+    m_stcGroup->setEnabled(false);
+    QVBoxLayout *stcLayout = new QVBoxLayout(m_stcGroup);
     stcLayout->setContentsMargins(6, 12, 6, 6);
     stcLayout->setSpacing(8);
-
-    m_loadStcBtn = new QPushButton("Load STC...");
 
     QLabel *stcSelectLabel = new QLabel("Source Estimate:");
     m_stcCombo = new QComboBox;
@@ -382,7 +406,6 @@ void MainWindow::setupUI()
     m_stcProgressBar->setValue(0);
     m_stcProgressBar->hide();
 
-    stcLayout->addWidget(m_loadStcBtn);
     stcLayout->addWidget(stcSelectLabel);
     stcLayout->addWidget(m_stcCombo);
     stcLayout->addWidget(m_stcStatusLabel);
@@ -399,36 +422,35 @@ void MainWindow::setupUI()
     stcLayout->addStretch();
 
     // ===== Dipole Group =====
-    QGroupBox *dipoleGroup = new QGroupBox("Dipoles");
-    QVBoxLayout *dipoleLayout = new QVBoxLayout(dipoleGroup);
+    m_dipoleGroup = new QGroupBox("Dipoles");
+    m_dipoleGroup->setEnabled(false);
+    QVBoxLayout *dipoleLayout = new QVBoxLayout(m_dipoleGroup);
     dipoleLayout->setContentsMargins(6, 12, 6, 6);
     dipoleLayout->setSpacing(8);
 
-    m_loadDipoleBtn = new QPushButton("Load Dipoles...");
     m_showDipoleCheck = new QCheckBox("Show Dipoles");
     m_showDipoleCheck->setChecked(true);
     m_showDipoleCheck->setEnabled(false);
 
-    dipoleLayout->addWidget(m_loadDipoleBtn);
     dipoleLayout->addWidget(m_showDipoleCheck);
 
     // ===== Source Space Group =====
-    QGroupBox *srcSpaceGroup = new QGroupBox("Source Space");
-    QVBoxLayout *srcSpaceLayout = new QVBoxLayout(srcSpaceGroup);
+    m_srcSpaceGroup = new QGroupBox("Source Space");
+    m_srcSpaceGroup->setEnabled(false);
+    QVBoxLayout *srcSpaceLayout = new QVBoxLayout(m_srcSpaceGroup);
     srcSpaceLayout->setContentsMargins(6, 12, 6, 6);
     srcSpaceLayout->setSpacing(8);
 
-    m_loadSrcSpaceBtn = new QPushButton("Load Source Space...");
     m_showSrcSpaceCheck = new QCheckBox("Show Source Space");
     m_showSrcSpaceCheck->setChecked(false);
     m_showSrcSpaceCheck->setEnabled(false);
 
-    srcSpaceLayout->addWidget(m_loadSrcSpaceBtn);
     srcSpaceLayout->addWidget(m_showSrcSpaceCheck);
 
     // ===== Connectivity Network Group =====
-    QGroupBox *networkGroup = new QGroupBox("Connectivity Network");
-    QVBoxLayout *networkLayout = new QVBoxLayout(networkGroup);
+    m_networkGroup = new QGroupBox("Connectivity Network");
+    m_networkGroup->setEnabled(false);
+    QVBoxLayout *networkLayout = new QVBoxLayout(m_networkGroup);
     networkLayout->setContentsMargins(6, 12, 6, 6);
     networkLayout->setSpacing(8);
 
@@ -454,12 +476,11 @@ void MainWindow::setupUI()
     networkLayout->addWidget(m_networkColormapCombo);
 
     // ===== Evoked Group =====
-    QGroupBox *evokedGroup = new QGroupBox("Evoked");
-    QVBoxLayout *evokedLayout = new QVBoxLayout(evokedGroup);
+    m_evokedGroup = new QGroupBox("Evoked");
+    m_evokedGroup->setEnabled(false);
+    QVBoxLayout *evokedLayout = new QVBoxLayout(m_evokedGroup);
     evokedLayout->setContentsMargins(6, 12, 6, 6);
     evokedLayout->setSpacing(6);
-
-    m_loadEvokedBtn = new QPushButton("Load Evoked...");
 
     QLabel *evokedSetLabel = new QLabel("Evoked Set:");
     m_evokedSetCombo = new QComboBox;
@@ -500,7 +521,6 @@ void MainWindow::setupUI()
     m_syncTimesCheck->setToolTip("Synchronize STC and sensor field time points");
     m_syncTimesCheck->setEnabled(false);
 
-    evokedLayout->addWidget(m_loadEvokedBtn);
     evokedLayout->addWidget(evokedSetLabel);
     evokedLayout->addWidget(m_evokedSetCombo);
     evokedLayout->addWidget(m_showMegFieldCheck);
@@ -514,8 +534,9 @@ void MainWindow::setupUI()
     evokedLayout->addWidget(m_syncTimesCheck);
 
     // ===== Sensor Streaming Group =====
-    QGroupBox *sensorStreamGroup = new QGroupBox("Sensor Streaming");
-    QVBoxLayout *sensorStreamLayout = new QVBoxLayout(sensorStreamGroup);
+    m_sensorStreamGroup = new QGroupBox("Sensor Streaming");
+    m_sensorStreamGroup->setEnabled(false);
+    QVBoxLayout *sensorStreamLayout = new QVBoxLayout(m_sensorStreamGroup);
     sensorStreamLayout->setContentsMargins(6, 12, 6, 6);
     sensorStreamLayout->setSpacing(6);
 
@@ -552,13 +573,11 @@ void MainWindow::setupUI()
     sensorStreamLayout->addWidget(m_sensorStreamColormapCombo);
 
     // ===== Sensor Group =====
-    QGroupBox *sensorGroup = new QGroupBox("Sensors");
-    QVBoxLayout *sensorLayout = new QVBoxLayout(sensorGroup);
+    m_sensorGroup = new QGroupBox("Sensors");
+    m_sensorGroup->setEnabled(false);
+    QVBoxLayout *sensorLayout = new QVBoxLayout(m_sensorGroup);
     sensorLayout->setContentsMargins(6, 12, 6, 6);
     sensorLayout->setSpacing(8);
-
-    m_loadDigBtn = new QPushButton("Load Digitizer...");
-    m_loadTransBtn = new QPushButton("Load Transformation...");
 
     m_showMegCheck = new QCheckBox("Show MEG");
     m_showMegCheck->setChecked(false);
@@ -605,8 +624,6 @@ void MainWindow::setupUI()
     m_applyTransCheck->setChecked(true);
     m_applyTransCheck->setToolTip("Apply Head-to-MRI transformation to sensors if available.");
 
-    sensorLayout->addWidget(m_loadDigBtn);
-    sensorLayout->addWidget(m_loadTransBtn);
     sensorLayout->addWidget(m_showMegCheck);
     sensorLayout->addWidget(m_showEegCheck);
     sensorLayout->addWidget(m_showDigCheck);
@@ -665,16 +682,15 @@ void MainWindow::setupUI()
     viewLayout->addLayout(presetRow);
 
     // Assemble side panel
-    sideLayout->addWidget(projectGroup);
-    sideLayout->addWidget(surfGroup);
-    sideLayout->addWidget(bemGroup);
-    sideLayout->addWidget(stcGroup);
-    sideLayout->addWidget(dipoleGroup);
-    sideLayout->addWidget(srcSpaceGroup);
-    sideLayout->addWidget(networkGroup);
-    sideLayout->addWidget(evokedGroup);
-    sideLayout->addWidget(sensorStreamGroup);
-    sideLayout->addWidget(sensorGroup);
+    sideLayout->addWidget(m_surfGroup);
+    sideLayout->addWidget(m_bemGroup);
+    sideLayout->addWidget(m_stcGroup);
+    sideLayout->addWidget(m_dipoleGroup);
+    sideLayout->addWidget(m_srcSpaceGroup);
+    sideLayout->addWidget(m_networkGroup);
+    sideLayout->addWidget(m_evokedGroup);
+    sideLayout->addWidget(m_sensorStreamGroup);
+    sideLayout->addWidget(m_sensorGroup);
     sideLayout->addWidget(viewGroup);
     sideLayout->addStretch();
 
@@ -694,6 +710,7 @@ void MainWindow::setupUI()
     m_controlsDock = new QDockWidget("Controls", this);
     m_controlsDock->setObjectName("controlsDock");
     m_controlsDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
+    m_controlsDock->setTitleBarWidget(createFlatDockTitleBar(m_controlsDock, "Controls"));
     m_controlsDock->setWidget(scrollArea);
     addDockWidget(Qt::LeftDockWidgetArea, m_controlsDock);
 
@@ -709,7 +726,7 @@ void MainWindow::setupConnections()
 {
     // ── Project ────────────────────────────────────────────────────────
 
-    connect(m_openProjectBtn, &QPushButton::clicked, [this]() {
+    connect(m_actOpenProject, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
         QFileDialog::getOpenFileContent("MNA Project (*.mnx)", [this](const QString &fileName, const QByteArray &fileContent) {
             if (fileName.isEmpty()) return;
@@ -725,7 +742,7 @@ void MainWindow::setupConnections()
 #endif
     });
 
-    connect(m_exportProjectBtn, &QPushButton::clicked, [this]() {
+    connect(m_actExportProject, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
         // WASM always exports as .mnx with embedded data
         MnaProject proj;
@@ -821,7 +838,7 @@ void MainWindow::setupConnections()
     connect(m_rhCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setHemiVisible(1, checked); });
 
     // BEM loading
-    connect(m_loadBemBtn, &QPushButton::clicked, [this]() {
+    connect(m_actLoadBem, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
         QFileDialog::getOpenFileContent("BEM Files (*.fif)", [this](const QString &fileName, const QByteArray &fileContent) {
             if (fileName.isEmpty()) return;
@@ -904,7 +921,7 @@ void MainWindow::setupConnections()
     });
 
     // Brain Surface
-    connect(m_loadSurfaceBtn, &QPushButton::clicked, [this]() {
+    connect(m_actLoadSurface, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
         QFileDialog::getOpenFileContent("FreeSurfer Surface (*.*)", [this](const QString &fileName, const QByteArray &fileContent) {
             if (fileName.isEmpty()) return;
@@ -921,6 +938,7 @@ void MainWindow::setupConnections()
             FsSurface surf(path);
             if (!surf.isEmpty()) {
                 m_model->addSurface("User", hemi, type, surf);
+                m_surfGroup->setEnabled(true);
                 trackLoadedFile(path, static_cast<int>(MnaFileRole::Surface));
                 qInfo() << "Loaded surface:" << hemi << type
                          << "(load the opposite hemisphere separately in browser mode)";
@@ -941,6 +959,7 @@ void MainWindow::setupConnections()
         FsSurface surf(path);
         if (!surf.isEmpty()) {
             m_model->addSurface("User", hemi, type, surf);
+            m_surfGroup->setEnabled(true);
             trackLoadedFile(path, static_cast<int>(MnaFileRole::Surface));
             qInfo() << "Loaded surface:" << hemi << type;
         }
@@ -959,7 +978,7 @@ void MainWindow::setupConnections()
 #endif
     });
 
-    connect(m_loadAtlasBtn, &QPushButton::clicked, [this]() {
+    connect(m_actLoadAtlas, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
         QFileDialog::getOpenFileContent("FreeSurfer Annotation (*.annot)", [this](const QString &fileName, const QByteArray &fileContent) {
             if (fileName.isEmpty()) return;
@@ -1006,7 +1025,7 @@ void MainWindow::setupConnections()
     });
 
     // STC loading – add file to combo, which triggers the actual load
-    connect(m_loadStcBtn, &QPushButton::clicked, [this]() {
+    connect(m_actLoadStc, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
         QFileDialog::getOpenFileContent("STC Files (*.stc)", [this](const QString &fileName, const QByteArray &fileContent) {
             if (fileName.isEmpty()) return;
@@ -1032,7 +1051,7 @@ void MainWindow::setupConnections()
         QString lhPath = pair[0];
         QString rhPath = pair[1];
 
-        m_loadStcBtn->setEnabled(false);
+        m_actLoadStc->setEnabled(false);
         m_stcStatusLabel->setText("Starting...");
         m_stcStatusLabel->show();
         m_stcProgressBar->setValue(0);
@@ -1049,7 +1068,8 @@ void MainWindow::setupConnections()
     connect(m_brainView, &BrainView::sourceEstimateLoaded, [this](int numPoints) {
         m_stcStatusLabel->hide();
         m_stcProgressBar->hide();
-        m_loadStcBtn->setEnabled(true);
+        m_actLoadStc->setEnabled(true);
+        m_stcGroup->setEnabled(true);
 
         m_timeSlider->setEnabled(true);
         m_timeSlider->setRange(0, numPoints - 1);
@@ -1210,7 +1230,7 @@ void MainWindow::setupConnections()
     });
 
     // Sensors
-    connect(m_loadDigBtn, &QPushButton::clicked, [this]() {
+    connect(m_actLoadDigitizer, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
         QFileDialog::getOpenFileContent("FIF Files (*.fif)", [this](const QString &fileName, const QByteArray &fileContent) {
             if (fileName.isEmpty()) return;
@@ -1219,6 +1239,7 @@ void MainWindow::setupConnections()
 
             if (m_brainView->loadSensors(path)) {
                 trackLoadedFile(path, static_cast<int>(MnaFileRole::Digitizer));
+                m_sensorGroup->setEnabled(true);
                 m_showMegCheck->setEnabled(true);
                 m_showEegCheck->setEnabled(true);
                 m_showDigCheck->setEnabled(true);
@@ -1232,6 +1253,7 @@ void MainWindow::setupConnections()
 
         if (m_brainView->loadSensors(path)) {
             trackLoadedFile(path, static_cast<int>(MnaFileRole::Digitizer));
+            m_sensorGroup->setEnabled(true);
             m_showMegCheck->setEnabled(true);
             m_showEegCheck->setEnabled(true);
             m_showDigCheck->setEnabled(true);
@@ -1242,7 +1264,7 @@ void MainWindow::setupConnections()
 #endif
     });
 
-    connect(m_loadTransBtn, &QPushButton::clicked, [this]() {
+    connect(m_actLoadTransform, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
         QFileDialog::getOpenFileContent("FIF Files (*.fif)", [this](const QString &fileName, const QByteArray &fileContent) {
             if (fileName.isEmpty()) return;
@@ -1306,13 +1328,14 @@ void MainWindow::setupConnections()
     connect(m_applyTransCheck, &QCheckBox::toggled, m_brainView, &BrainView::setSensorTransEnabled);
 
     // Dipoles
-    connect(m_loadDipoleBtn, &QPushButton::clicked, [this]() {
+    connect(m_actLoadDipoles, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
         QFileDialog::getOpenFileContent("Dipole Files (*.dip *.bdip)", [this](const QString &fileName, const QByteArray &fileContent) {
             if (fileName.isEmpty()) return;
             QString path = wasmSaveToTemp(fileName, fileContent);
             if (path.isEmpty()) return;
             if (m_brainView->loadDipoles(path)) {
+                m_dipoleGroup->setEnabled(true);
                 m_showDipoleCheck->setEnabled(true);
             }
         });
@@ -1320,6 +1343,7 @@ void MainWindow::setupConnections()
         QString path = QFileDialog::getOpenFileName(this, "Select Dipoles", "", "Dipole Files (*.dip *.bdip)");
         if (path.isEmpty()) return;
         if (m_brainView->loadDipoles(path)) {
+            m_dipoleGroup->setEnabled(true);
             m_showDipoleCheck->setEnabled(true);
         }
 #endif
@@ -1328,7 +1352,7 @@ void MainWindow::setupConnections()
     connect(m_showDipoleCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setDipoleVisible(checked); });
 
     // Source Space
-    connect(m_loadSrcSpaceBtn, &QPushButton::clicked, [this]() {
+    connect(m_actLoadSrcSpace, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
         QFileDialog::getOpenFileContent("Source Space Files (*.fif)", [this](const QString &fileName, const QByteArray &fileContent) {
             if (fileName.isEmpty()) return;
@@ -1336,6 +1360,7 @@ void MainWindow::setupConnections()
             if (path.isEmpty()) return;
             if (m_brainView->loadSourceSpace(path)) {
                 trackLoadedFile(path, static_cast<int>(MnaFileRole::SourceSpace));
+                m_srcSpaceGroup->setEnabled(true);
                 m_showSrcSpaceCheck->setEnabled(true);
                 m_showSrcSpaceCheck->setChecked(false);
                 m_brainView->setSourceSpaceVisible(false);
@@ -1347,6 +1372,7 @@ void MainWindow::setupConnections()
         if (path.isEmpty()) return;
         if (m_brainView->loadSourceSpace(path)) {
             trackLoadedFile(path, static_cast<int>(MnaFileRole::SourceSpace));
+            m_srcSpaceGroup->setEnabled(true);
             m_showSrcSpaceCheck->setEnabled(true);
             m_showSrcSpaceCheck->setChecked(false);
             m_brainView->setSourceSpaceVisible(false);
@@ -1368,7 +1394,7 @@ void MainWindow::setupConnections()
     // ── Evoked ─────────────────────────────────────────────────────────
 
     // Load Evoked (average FIF) – probe for evoked sets first
-    connect(m_loadEvokedBtn, &QPushButton::clicked, [this]() {
+    connect(m_actLoadEvoked, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
         QFileDialog::getOpenFileContent("Average FIF Files (*.fif)", [this](const QString &fileName, const QByteArray &fileContent) {
             if (fileName.isEmpty()) return;
@@ -1433,6 +1459,8 @@ void MainWindow::setupConnections()
 
     connect(m_brainView, &BrainView::sensorFieldLoaded, [this](int numTimePoints, int initialTimePoint) {
         // Enable field-map controls
+        m_evokedGroup->setEnabled(true);
+        m_sensorStreamGroup->setEnabled(true);
         m_showMegFieldCheck->setEnabled(true);
         m_showEegFieldCheck->setEnabled(true);
         m_showMegContourCheck->setEnabled(true);
@@ -1646,17 +1674,6 @@ void MainWindow::setupConnections()
 
     // ── Menu Action Connections ────────────────────────────────────────
 
-    connect(m_actOpenProject, &QAction::triggered, m_openProjectBtn, &QPushButton::click);
-    connect(m_actExportProject, &QAction::triggered, m_exportProjectBtn, &QPushButton::click);
-    connect(m_actLoadSurface, &QAction::triggered, m_loadSurfaceBtn, &QPushButton::click);
-    connect(m_actLoadAtlas, &QAction::triggered, m_loadAtlasBtn, &QPushButton::click);
-    connect(m_actLoadBem, &QAction::triggered, m_loadBemBtn, &QPushButton::click);
-    connect(m_actLoadStc, &QAction::triggered, m_loadStcBtn, &QPushButton::click);
-    connect(m_actLoadDipoles, &QAction::triggered, m_loadDipoleBtn, &QPushButton::click);
-    connect(m_actLoadSrcSpace, &QAction::triggered, m_loadSrcSpaceBtn, &QPushButton::click);
-    connect(m_actLoadEvoked, &QAction::triggered, m_loadEvokedBtn, &QPushButton::click);
-    connect(m_actLoadDigitizer, &QAction::triggered, m_loadDigBtn, &QPushButton::click);
-    connect(m_actLoadTransform, &QAction::triggered, m_loadTransBtn, &QPushButton::click);
     connect(m_actPlayPause, &QAction::triggered, m_playButton, &QPushButton::click);
     connect(m_actStepFwd, &QAction::triggered, [this]() {
         if (m_timeSlider->isEnabled())
@@ -1749,6 +1766,7 @@ void MainWindow::loadInitialData(const QString &subjectPath,
         qInfo() << "Auto-loading digitizer from:" << digitizerPath;
         trackLoadedFile(digitizerPath, static_cast<int>(MnaFileRole::Digitizer));
         if (m_brainView->loadSensors(digitizerPath)) {
+            m_sensorGroup->setEnabled(true);
             m_showMegCheck->setEnabled(true);
             m_showEegCheck->setEnabled(true);
             m_showDigCheck->setEnabled(true);
@@ -1788,6 +1806,7 @@ void MainWindow::loadInitialData(const QString &subjectPath,
         qInfo() << "Auto-loading source space from:" << srcSpacePath;
         trackLoadedFile(srcSpacePath, static_cast<int>(MnaFileRole::SourceSpace));
         if (m_brainView->loadSourceSpace(srcSpacePath)) {
+            m_srcSpaceGroup->setEnabled(true);
             m_showSrcSpaceCheck->setEnabled(true);
             m_showSrcSpaceCheck->setChecked(false);
             m_brainView->setSourceSpaceVisible(false);
@@ -1892,6 +1911,7 @@ void MainWindow::loadHemisphere(const QString &subjectPath, const QString &subje
         FsSurface surf(surfPath);
         if (!surf.isEmpty()) {
             m_model->addSurface(subjectName, hemi, type, surf);
+            m_surfGroup->setEnabled(true);
             trackLoadedFile(surfPath, static_cast<int>(MnaFileRole::Surface));
             qInfo() << "Added" << hemi << type;
         }
@@ -1928,6 +1948,7 @@ void MainWindow::loadBem(const QString &subjectName, const QString &bemPath)
             m_model->addBemSurface(subjectName, name, bem[i]);
             qInfo() << "Added BEM:" << name;
         }
+        m_bemGroup->setEnabled(true);
     } else {
         qWarning() << "BEM path provided but file not found:" << bemPath;
     }
@@ -1937,6 +1958,7 @@ void MainWindow::loadBem(const QString &subjectName, const QString &bemPath)
 
 void MainWindow::enableNetworkControls()
 {
+    m_networkGroup->setEnabled(true);
     m_showNetworkCheck->setEnabled(true);
     m_showNetworkCheck->setChecked(true);
     m_networkThresholdSlider->setEnabled(true);
@@ -2143,6 +2165,7 @@ void MainWindow::importMnaProject(const QString &path)
                         FsSurface surf(filePath);
                         if (!surf.isEmpty()) {
                             m_model->addSurface(subj.id, hemi, type, surf);
+                            m_surfGroup->setEnabled(true);
                             qInfo() << "Imported surface:" << fn;
                         }
                         break;
@@ -2163,6 +2186,7 @@ void MainWindow::importMnaProject(const QString &path)
                         break;
                     case MnaFileRole::Digitizer:
                         if (m_brainView->loadSensors(filePath)) {
+                            m_sensorGroup->setEnabled(true);
                             m_showMegCheck->setEnabled(true);
                             m_showEegCheck->setEnabled(true);
                             m_showDigCheck->setEnabled(true);
@@ -2177,6 +2201,7 @@ void MainWindow::importMnaProject(const QString &path)
                         break;
                     case MnaFileRole::SourceSpace:
                         if (m_brainView->loadSourceSpace(filePath)) {
+                            m_srcSpaceGroup->setEnabled(true);
                             m_showSrcSpaceCheck->setEnabled(true);
                             m_showSrcSpaceCheck->setChecked(false);
                             m_brainView->setSourceSpaceVisible(false);
@@ -2353,6 +2378,11 @@ void MainWindow::createMenus()
     m_actStepFwd = m_playbackMenu->addAction("Step Forward");
     m_actStepBack = m_playbackMenu->addAction("Step Back");
 
+    m_playbackMenu->addSeparator();
+    m_actSyncLock = m_playbackMenu->addAction("Sync Lock");
+    m_actSyncLock->setCheckable(true);
+    m_actSyncLock->setChecked(true);
+
     m_actRealtimeToggle = m_toolsMenu->addAction("Realtime Streaming");
     m_actRealtimeToggle->setCheckable(true);
 
@@ -2375,28 +2405,6 @@ void MainWindow::createMenus()
 
 //=============================================================================================================
 
-void MainWindow::createToolBar()
-{
-    m_mainToolBar = addToolBar("Main");
-    m_mainToolBar->setObjectName("mainToolBar");
-    m_mainToolBar->setMovable(false);
-
-    m_mainToolBar->addAction(m_actOpenProject);
-    m_mainToolBar->addAction(m_actLoadSurface);
-    m_mainToolBar->addAction(m_actLoadStc);
-    m_mainToolBar->addSeparator();
-    m_mainToolBar->addAction(m_actPlayPause);
-    m_mainToolBar->addAction(m_actStepFwd);
-    m_mainToolBar->addAction(m_actStepBack);
-    m_mainToolBar->addSeparator();
-
-    m_actSyncLock = m_mainToolBar->addAction("Sync Lock");
-    m_actSyncLock->setCheckable(true);
-    m_actSyncLock->setChecked(true);
-}
-
-//=============================================================================================================
-
 void MainWindow::createStatusBar()
 {
     m_statusLabel = new QLabel("Ready");
@@ -2413,6 +2421,7 @@ void MainWindow::createLoadedFilesDock()
     m_loadedFilesDock = new QDockWidget("Loaded Files", this);
     m_loadedFilesDock->setObjectName("loadedFilesDock");
     m_loadedFilesDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
+    m_loadedFilesDock->setTitleBarWidget(createFlatDockTitleBar(m_loadedFilesDock, "Loaded Files"));
 
     m_loadedFilesTree = new QTreeWidget;
     m_loadedFilesTree->setHeaderLabels({"Name", "Type", "Path"});

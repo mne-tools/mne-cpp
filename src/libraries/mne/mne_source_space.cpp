@@ -2191,7 +2191,7 @@ int MNESourceSpace::writeVolumeInfo(FiffStream::SPtr& stream, bool selected_only
                 stream->write_coord_trans(*MRI_voxel_surf_RAS_t);
             stream->write_string(FIFF_MNE_FILE_NAME,MRI_volume);
             if (interpolator)
-                stream->write_float_sparse_rcs(FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, interpolator->toEigenSparse().cast<float>());
+                stream->write_float_sparse_rcs(FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, interpolator->eigen());
             if (MRI_vol_dims[0] > 0 && MRI_vol_dims[1] > 0 && MRI_vol_dims[2] > 0) {
                 stream->write_int(FIFF_MRI_WIDTH,&MRI_vol_dims[0]);
                 stream->write_int(FIFF_MRI_HEIGHT,&MRI_vol_dims[1]);
@@ -2301,7 +2301,7 @@ int MNESourceSpace::writeToStream(FiffStream::SPtr& stream, bool selected_only) 
             auto m = dist.pickLowerTriangleRcs();
             if (!m)
                 return FIFF_FAIL;
-            stream->write_float_sparse_rcs(FIFF_MNE_SOURCE_SPACE_DIST, m->toEigenSparse().cast<float>());
+            stream->write_float_sparse_rcs(FIFF_MNE_SOURCE_SPACE_DIST, m->eigen());
             stream->write_float(FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, &dist_limit);
         }
     }

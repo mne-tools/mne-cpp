@@ -262,16 +262,10 @@ std::unique_ptr<FiffSparseMatrix> mne_convert_to_sparse(const Eigen::MatrixXf& d
                                       int   stor_type,      /* Either FIFFTS_MC_CCS or FIFFTS_MC_RCS */
                                       float small)          /* How small elements should be ignored? */
 /*
- * Create the compressed row or column storage sparse matrix representation
- * including a vector containing the nonzero matrix element values,
- * the row or column pointer vector and the appropriate index vector(s).
+ * Convert a dense matrix to sparse using Eigen's sparseView.
  */
 {
-    int j,k;
-    int nz;
-    int ptr;
-    int nrow = static_cast<int>(dense.rows());
-    int ncol = static_cast<int>(dense.cols());
+    Q_UNUSED(stor_type);
 
     if (small < 0) {		/* Automatic scaling */
         float maxval = dense.cwiseAbs().maxCoeff();
@@ -280,96 +274,29 @@ std::unique_ptr<FiffSparseMatrix> mne_convert_to_sparse(const Eigen::MatrixXf& d
         else
             small = std::fabs(small);
     }
-    for (j = 0, nz = 0; j < nrow; j++)
-        for (k = 0; k < ncol; k++) {
-            if (std::fabs(dense(j,k)) > small)
-                nz++;
-        }
 
-    if (nz <= 0) {
+    Eigen::SparseMatrix<float> eigenSparse = dense.sparseView(small, 1.0f);
+    eigenSparse.makeCompressed();
+
+    if (eigenSparse.nonZeros() <= 0) {
         qWarning("No nonzero elements found.");
         return nullptr;
     }
-    if (stor_type != FIFFTS_MC_CCS && stor_type != FIFFTS_MC_RCS) {
-        qWarning("Unknown sparse matrix storage type: %d",stor_type);
-        return nullptr;
-    }
-    auto sparse = std::make_unique<FiffSparseMatrix>();
-    sparse->coding = stor_type;
-    sparse->m      = nrow;
-    sparse->n      = ncol;
-    sparse->nz     = nz;
-    sparse->data.resize(nz);
-    sparse->inds.resize(nz);
 
-    if (stor_type == FIFFTS_MC_RCS) {
-        sparse->ptrs.resize(nrow + 1);
-        for (j = 0, nz = 0; j < nrow; j++) {
-            ptr = -1;
-            for (k = 0; k < ncol; k++)
-                if (std::fabs(dense(j,k)) > small) {
-                    sparse->data[nz] = dense(j,k);
-                    if (ptr < 0)
-                        ptr = nz;
-                    sparse->inds[nz++] = k;
-                }
-            sparse->ptrs[j] = ptr;
-        }
-        sparse->ptrs[nrow] = nz;
-        for (j = nrow - 1; j >= 0; j--) /* Take care of the empty rows */
-            if (sparse->ptrs[j] < 0)
-                sparse->ptrs[j] = sparse->ptrs[j+1];
-    }
-    else if (stor_type == FIFFTS_MC_CCS) {
-        sparse->ptrs.resize(ncol + 1);
-        for (k = 0, nz = 0; k < ncol; k++) {
-            ptr = -1;
-            for (j = 0; j < nrow; j++)
-                if (std::fabs(dense(j,k)) > small) {
-                    sparse->data[nz] = dense(j,k);
-                    if (ptr < 0)
-                        ptr = nz;
-                    sparse->inds[nz++] = j;
-                }
-            sparse->ptrs[k] = ptr;
-        }
-        sparse->ptrs[ncol] = nz;
-        for (k = ncol-1; k >= 0; k--) /* Take care of the empty columns */
-            if (sparse->ptrs[k] < 0)
-                sparse->ptrs[k] = sparse->ptrs[k+1];
-    }
-    return sparse;
+    return std::make_unique<FiffSparseMatrix>(std::move(eigenSparse), FIFFTS_MC_RCS);
 }
 
 int  mne_sparse_vec_mult2_32(FiffSparseMatrix* mat,     /* The sparse matrix */
                           float           *vector, /* Vector to be multiplied */
                           float           *res)    /* Result of the multiplication */
 /*
-      * Multiply a vector by a sparse matrix.
+      * Multiply a vector by a sparse matrix using Eigen.
       */
 {
-    int i,j;
-
-    if (mat->coding == FIFFTS_MC_RCS) {
-        for (i = 0; i < mat->m; i++) {
-            res[i] = 0.0;
-            for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
-                res[i] += mat->data[j]*vector[mat->inds[j]];
-        }
-        return 0;
-    }
-    else if (mat->coding == FIFFTS_MC_CCS) {
-        for (i = 0; i < mat->m; i++)
-            res[i] = 0.0;
-        for (i = 0; i < mat->n; i++)
-            for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
-                res[mat->inds[j]] += mat->data[j]*vector[i];
-        return 0;
-    }
-    else {
-        qWarning("mne_sparse_vec_mult2: unknown sparse matrix storage type: %d",mat->coding);
-        return -1;
-    }
+    Eigen::Map<const Eigen::VectorXf> vecIn(vector, mat->cols());
+    Eigen::Map<Eigen::VectorXf> vecOut(res, mat->rows());
+    vecOut = mat->eigen() * vecIn;
+    return 0;
 }
 
 //=============================================================================================================
@@ -714,9 +641,9 @@ int MNECTFCompDataSet::apply(bool do_it, Eigen::Ref<Eigen::VectorXf> data, Eigen
        * Dimension checks
        */
     if (this_comp->presel) {
-        if (this_comp->presel->n != ncompdata) {
+        if (this_comp->presel->cols() != ncompdata) {
             qCritical("Compensation data dimension mismatch. Expected %d, got %d channels.",
-                   this_comp->presel->n,ncompdata);
+                   this_comp->presel->cols(),ncompdata);
             return FAIL;
         }
     }
@@ -726,9 +653,9 @@ int MNECTFCompDataSet::apply(bool do_it, Eigen::Ref<Eigen::VectorXf> data, Eigen
         return FAIL;
     }
     if (this_comp->postsel) {
-        if (this_comp->postsel->m != ndata) {
+        if (this_comp->postsel->rows() != ndata) {
             qCritical("Data dimension mismatch. Expected %d, got %d channels.",
-                   this_comp->postsel->m,ndata);
+                   this_comp->postsel->rows(),ndata);
             return FAIL;
         }
     }
@@ -743,7 +670,7 @@ int MNECTFCompDataSet::apply(bool do_it, Eigen::Ref<Eigen::VectorXf> data, Eigen
     const float *presel;
     if (this_comp->presel) {
         if (this_comp->presel_data.size() == 0)
-            this_comp->presel_data.resize(this_comp->presel->m);
+            this_comp->presel_data.resize(this_comp->presel->rows());
         if (mne_sparse_vec_mult2_32(this_comp->presel.get(),const_cast<float*>(compdata.data()),this_comp->presel_data.data()) != OK)
             return FAIL;
         presel = this_comp->presel_data.data();
@@ -768,7 +695,7 @@ int MNECTFCompDataSet::apply(bool do_it, Eigen::Ref<Eigen::VectorXf> data, Eigen
         comp = this_comp->comp_data.data();
     else {
         if (this_comp->postsel_data.size() == 0)
-            this_comp->postsel_data.resize(this_comp->postsel->m);
+            this_comp->postsel_data.resize(this_comp->postsel->rows());
         if (mne_sparse_vec_mult2_32(this_comp->postsel.get(),this_comp->comp_data.data(),this_comp->postsel_data.data()) != OK)
             return FAIL;
         comp = this_comp->postsel_data.data();
@@ -805,9 +732,9 @@ int MNECTFCompDataSet::apply_transpose(bool do_it, Eigen::MatrixXf& data)
         * Dimension checks
         */
     if (this_comp->presel) {
-        if (this_comp->presel->n != ncompdata) {
+        if (this_comp->presel->cols() != ncompdata) {
             qCritical("Compensation data dimension mismatch. Expected %d, got %d channels.",
-                   this_comp->presel->n,ncompdata);
+                   this_comp->presel->cols(),ncompdata);
             return FAIL;
         }
     }
@@ -817,9 +744,9 @@ int MNECTFCompDataSet::apply_transpose(bool do_it, Eigen::MatrixXf& data)
         return FAIL;
     }
     if (this_comp->postsel) {
-        if (this_comp->postsel->m != ndata) {
+        if (this_comp->postsel->rows() != ndata) {
             qCritical("Data dimension mismatch. Expected %d, got %d channels.",
-                   this_comp->postsel->m,ndata);
+                   this_comp->postsel->rows(),ndata);
             return FAIL;
         }
     }
@@ -833,26 +760,7 @@ int MNECTFCompDataSet::apply_transpose(bool do_it, Eigen::MatrixXf& data)
         */
     Eigen::MatrixXf preselMat;
     if (this_comp->presel) {
-        preselMat.resize(this_comp->presel->m, ns);
-        FiffSparseMatrix* sp = this_comp->presel.get();
-        if (sp->coding == FIFFTS_MC_RCS) {
-            for (int i = 0; i < sp->m; i++)
-                for (int c = 0; c < ns; c++) {
-                    float val = 0.0f;
-                    for (int j = sp->ptrs[i]; j < sp->ptrs[i+1]; j++)
-                        val += sp->data[j] * data(sp->inds[j], c);
-                    preselMat(i, c) = val;
-                }
-        } else if (sp->coding == FIFFTS_MC_CCS) {
-            preselMat.setZero();
-            for (int c = 0; c < ns; c++)
-                for (int i = 0; i < sp->n; i++)
-                    for (int j = sp->ptrs[i]; j < sp->ptrs[i+1]; j++)
-                        preselMat(sp->inds[j], c) += sp->data[j] * data(i, c);
-        } else {
-            qCritical("Unknown sparse matrix storage type: %d", sp->coding);
-            return FAIL;
-        }
+        preselMat = this_comp->presel->eigen() * data;
     }
     else {
         preselMat = data;
@@ -866,27 +774,7 @@ int MNECTFCompDataSet::apply_transpose(bool do_it, Eigen::MatrixXf& data)
         * Optional postselection — sparse matrix * comp
         */
     if (this_comp->postsel) {
-        Eigen::MatrixXf postselMat(this_comp->postsel->m, ns);
-        FiffSparseMatrix* sp = this_comp->postsel.get();
-        if (sp->coding == FIFFTS_MC_RCS) {
-            for (int i = 0; i < sp->m; i++)
-                for (int c = 0; c < ns; c++) {
-                    float val = 0.0f;
-                    for (int j = sp->ptrs[i]; j < sp->ptrs[i+1]; j++)
-                        val += sp->data[j] * comp(sp->inds[j], c);
-                    postselMat(i, c) = val;
-                }
-        } else if (sp->coding == FIFFTS_MC_CCS) {
-            postselMat.setZero();
-            for (int c = 0; c < ns; c++)
-                for (int i = 0; i < sp->n; i++)
-                    for (int j = sp->ptrs[i]; j < sp->ptrs[i+1]; j++)
-                        postselMat(sp->inds[j], c) += sp->data[j] * comp(i, c);
-        } else {
-            qCritical("Unknown sparse matrix storage type: %d", sp->coding);
-            return FAIL;
-        }
-        comp = std::move(postselMat);
+        comp = this_comp->postsel->eigen() * comp;
     }
     /*
         * Compensate or revert compensation?

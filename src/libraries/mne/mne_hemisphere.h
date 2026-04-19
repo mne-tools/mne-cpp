@@ -284,11 +284,11 @@ inline bool operator== (const MNEHemisphere &a, const MNEHemisphere &b)
             a.patch_inds.isApprox(b.patch_inds) &&
             //a.dist_limit == b.dist_limit && //TODO: We still not sure if dist_limit can also be a matrix. This needs to be debugged
             [&a, &b]() {
-                auto sa = a.dist.toEigenSparse();
-                auto sb = b.dist.toEigenSparse();
+                const auto& sa = a.dist.eigen();
+                const auto& sb = b.dist.eigen();
                 if (sa.rows() == 0 && sb.rows() == 0 && sa.cols() == 0 && sb.cols() == 0)
                     return true;
-                return sa.isApprox(sb, 0.0001);
+                return sa.toDense().isApprox(sb.toDense(), 0.0001f);
             }() &&
             a.tri_cent.isApprox(b.tri_cent, 0.0001) &&
             a.tri_nn.isApprox(b.tri_nn, 0.0001) &&

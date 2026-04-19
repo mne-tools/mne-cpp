@@ -74,9 +74,13 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * Implements a FIFF sparse matrix.
+ * FIFF sparse matrix — wraps Eigen::SparseMatrix<float>.
  *
- * @brief FIFF sparse matrix storage.
+ * Internally stores data in a single Eigen::SparseMatrix<float>.
+ * The @c coding member records whether the FIFF source was CCS or RCS
+ * (used only during serialization / deserialization).
+ *
+ * @brief FIFF sparse matrix storage backed by Eigen.
  */
 class FIFFSHARED_EXPORT FiffSparseMatrix
 {
@@ -88,13 +92,23 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs the FiffSparseMatrix
+     * Constructs an empty FiffSparseMatrix.
      */
     FiffSparseMatrix();
 
     //=========================================================================================================
     /**
-     * Copies a FiffSparseMatrix (default — Eigen vectors handle deep copy).
+     * Constructs a FiffSparseMatrix wrapping an existing Eigen sparse matrix.
+     *
+     * @param[in] mat     Eigen sparse matrix to wrap (moved in).
+     * @param[in] coding  FIFF storage coding (FIFFTS_MC_RCS or FIFFTS_MC_CCS).
+     */
+    explicit FiffSparseMatrix(Eigen::SparseMatrix<float>&& mat,
+                              FIFFLIB::fiff_int_t coding = FIFFTS_MC_RCS);
+
+    //=========================================================================================================
+    /**
+     * Default copy constructor.
      */
     FiffSparseMatrix(const FiffSparseMatrix& mat) = default;
 
@@ -118,9 +132,43 @@ public:
 
     //=========================================================================================================
     /**
-     * Destroys the FiffSparseMatrix (default — Eigen vectors clean up automatically).
+     * Default destructor.
      */
     ~FiffSparseMatrix() = default;
+
+    //============================= Eigen access =============================
+
+    /**
+     * Mutable access to the underlying Eigen sparse matrix.
+     * @return Reference to the internal Eigen::SparseMatrix<float>.
+     */
+    inline Eigen::SparseMatrix<float>& eigen() { return m_eigen; }
+
+    /**
+     * Const access to the underlying Eigen sparse matrix.
+     * @return Const reference to the internal Eigen::SparseMatrix<float>.
+     */
+    inline const Eigen::SparseMatrix<float>& eigen() const { return m_eigen; }
+
+    /**
+     * Implicit conversion to const Eigen::SparseMatrix<float>&.
+     */
+    inline operator const Eigen::SparseMatrix<float>&() const { return m_eigen; }
+
+    /**
+     * Number of rows.
+     */
+    inline int rows() const { return static_cast<int>(m_eigen.rows()); }
+
+    /**
+     * Number of columns.
+     */
+    inline int cols() const { return static_cast<int>(m_eigen.cols()); }
+
+    /**
+     * Number of stored non-zero elements.
+     */
+    inline int nonZeros() const { return static_cast<int>(m_eigen.nonZeros()); }
 
     //============================= fiff_sparse.c =============================
 
@@ -183,16 +231,15 @@ public:
     inline bool is_empty() const;
 
     /**
-     * Convert this FiffSparseMatrix to an Eigen::SparseMatrix<double>.
-     * Supports both RCS and CCS coding.
+     * Convert to Eigen::SparseMatrix<double> (cast from float).
      *
-     * @return The equivalent Eigen sparse matrix.
+     * @return A double-precision copy of the internal sparse matrix.
      */
-    Eigen::SparseMatrix<double> toEigenSparse() const;
+    inline Eigen::SparseMatrix<double> toEigenSparse() const;
 
     /**
-     * Create a FiffSparseMatrix from an Eigen::SparseMatrix.
-     * Stores in RCS (row-compressed) format.
+     * Create a FiffSparseMatrix from an Eigen::SparseMatrix<double>.
+     * The data is cast to float for internal storage.
      *
      * @param[in] mat  The Eigen sparse matrix to convert.
      *
@@ -200,15 +247,20 @@ public:
      */
     static FiffSparseMatrix fromEigenSparse(const Eigen::SparseMatrix<double>& mat);
 
-public:
-    FIFFLIB::fiff_int_t   coding;    /**< coding (storage) type of the sparse matrix. */
-    FIFFLIB::fiff_int_t   m;         /**< m rows. */
-    FIFFLIB::fiff_int_t   n;         /**< n columns. */
-    FIFFLIB::fiff_int_t   nz;        /**< nz nonzeros. */
-    Eigen::VectorXf       data;      /**< Non-zero values (nz elements). */
-    Eigen::VectorXi       inds;      /**< Index array (nz elements). */
-    Eigen::VectorXi       ptrs;      /**< Pointer array (m+1 for RCS, n+1 for CCS). */
+    /**
+     * Create a FiffSparseMatrix from an Eigen::SparseMatrix<float>.
+     *
+     * @param[in] mat  The Eigen sparse matrix to wrap.
+     *
+     * @return The equivalent FiffSparseMatrix.
+     */
+    static FiffSparseMatrix fromEigenSparse(const Eigen::SparseMatrix<float>& mat);
 
+public:
+    FIFFLIB::fiff_int_t   coding;    /**< FIFF coding type (FIFFTS_MC_RCS or FIFFTS_MC_CCS). Used for serialization only. */
+
+private:
+    Eigen::SparseMatrix<float> m_eigen;  /**< The sparse matrix data. */
 };
 
 //=============================================================================================================
@@ -217,7 +269,12 @@ public:
 
 inline bool FiffSparseMatrix::is_empty() const
 {
-    return nz <= 0 || data.size() == 0;
+    return m_eigen.nonZeros() <= 0;
+}
+
+inline Eigen::SparseMatrix<double> FiffSparseMatrix::toEigenSparse() const
+{
+    return m_eigen.cast<double>();
 }
 
 } // NAMESPACE FIFFLIB
