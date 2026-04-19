@@ -57,7 +57,6 @@
 //=============================================================================================================
 
 #include <QtWidgets>
-#include <QDomDocument>
 #include <QTextStream>
 #include <QStandardPaths>
 #include <QDir>
@@ -115,15 +114,9 @@ PluginGui::PluginGui(SCSHAREDLIB::PluginManager *pPluginManager,
     {
         settings.setValue(QString("MNEScan/loadingState"), false);
 
-        // Prefer .mna; fall back to legacy .xml (auto-migrate on first load)
         QString appData = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
         if (QFile::exists(appData + QStringLiteral("/default.mna"))) {
             loadConfig(appData, QStringLiteral("default.mna"));
-        } else if (QFile::exists(appData + QStringLiteral("/default.xml"))) {
-            // Auto-migrate: load XML, then save as MNA
-            loadConfig(appData, QStringLiteral("default.xml"));
-            saveConfig(appData, QStringLiteral("default.mna"));
-            qInfo() << "Migrated legacy default.xml → default.mna";
         }
     }
 
@@ -192,124 +185,7 @@ void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
 
     QString fullPath = sPath + QStringLiteral("/") + sFileName;
 
-    // Dispatch by file extension
-    if (sFileName.endsWith(QLatin1String(".mna")) || sFileName.endsWith(QLatin1String(".mnx"))) {
-        loadConfigMna(fullPath);
-    } else {
-        loadConfigXml(fullPath);
-    }
-}
-
-//=============================================================================================================
-
-void PluginGui::loadConfigXml(const QString& fullPath)
-{
-    QDomDocument doc("PluginConfig");
-    QFile file(fullPath);
-    if (!file.open(QIODevice::ReadOnly))
-        return;
-    if (!doc.setContent(&file)) {
-        file.close();
-        return;
-    }
-    file.close();
-
-    clearScene();
-
-    QDomElement docElem = doc.documentElement();
-    if(docElem.tagName() != "PluginTree")
-    {
-        qWarning() << fullPath << "not a valid PluginTree!";
-        return;
-    }
-
-    QDomNode nodePluginTree = docElem.firstChild();
-    while(!nodePluginTree.isNull()) {
-        QDomElement elementPluginTree = nodePluginTree.toElement();
-        //
-        // Create Plugins
-        //
-        if(elementPluginTree.tagName() == "Plugins") {
-            QDomNode nodePlugins = elementPluginTree.firstChild();
-            while(!nodePlugins.isNull())
-            {
-                QDomElement e = nodePlugins.toElement();
-                nodePlugins = nodePlugins.nextSibling();
-                if(!e.isNull()) {
-                    QPointF pos((qreal)e.attribute("pos_x").toInt(),(qreal)e.attribute("pos_y").toInt());
-                    QAction *pCurrentAction = Q_NULLPTR;
-
-                    for(qint32 i = 0; i < m_pActionGroupPlugins->actions().size(); ++i)
-                    {
-                        if(m_pActionGroupPlugins->actions()[i]->text() == e.attribute("name"))
-                        {
-                            pCurrentAction = m_pActionGroupPlugins->actions()[i];
-                            break;
-                        }
-                    }
-
-                    if(!pCurrentAction)
-                        continue;
-
-                    pCurrentAction->setChecked(true);
-                    m_pPluginScene->setActionPluginItem(pCurrentAction);
-                    m_pPluginScene->setMode(PluginScene::InsertPluginItem);
-                    m_pPluginScene->insertItem(pos);
-                }
-            }
-        }
-        //
-        // Create Connections
-        //
-        if(elementPluginTree.tagName() == "Connections") {
-            QDomNode nodeConections = elementPluginTree.firstChild();
-            while(!nodeConections.isNull())
-            {
-                QDomElement e = nodeConections.toElement();
-                nodeConections = nodeConections.nextSibling();
-                if(!e.isNull()) {
-                    qDebug() << qPrintable(e.tagName()) << e.attribute("receiver") << e.attribute("sender");
-
-                    QString sSender = e.attribute("sender");
-                    QString sReceiver = e.attribute("receiver");
-
-                    //
-                    // Start & End
-                    //
-                    PluginItem* startItem = Q_NULLPTR;
-                    PluginItem* endItem = Q_NULLPTR;
-                    for(qint32 i = 0; i < m_pPluginScene->items().size(); ++i)
-                    {
-                        if(PluginItem* item = qgraphicsitem_cast<PluginItem *>(m_pPluginScene->items()[i])) {
-                            if(item->plugin()->getName() == sSender)
-                                startItem = item;
-
-                            if(item->plugin()->getName() == sReceiver)
-                                endItem = item;
-                        }
-                    }
-
-                    if(!startItem || !endItem)
-                        continue;
-
-                    SCSHAREDLIB::PluginConnectorConnection::SPtr pConnection = SCSHAREDLIB::PluginConnectorConnection::create(startItem->plugin(), endItem->plugin());
-
-                    if(pConnection->isConnected())
-                    {
-                        Arrow *arrow = new Arrow(startItem, endItem, pConnection);
-                        arrow->setColor(QColor(65,113,156));
-                        startItem->addArrow(arrow);
-                        endItem->addArrow(arrow);
-                        arrow->setZValue(-1000.0);
-                        m_pPluginScene->addItem(arrow);
-                        arrow->updatePosition();
-                    }
-
-                }
-            }
-        }
-        nodePluginTree = nodePluginTree.nextSibling();
-    }
+    loadConfigMna(fullPath);
 }
 
 //=============================================================================================================
@@ -396,12 +272,7 @@ void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
 
     QString fullPath = sPath + QStringLiteral("/") + sFileName;
 
-    // Dispatch by file extension
-    if (sFileName.endsWith(QLatin1String(".mna")) || sFileName.endsWith(QLatin1String(".mnx"))) {
-        saveConfigMna(fullPath);
-    } else {
-        saveConfigXml(fullPath);
-    }
+    saveConfigMna(fullPath);
 }
 
 //=============================================================================================================
@@ -431,69 +302,6 @@ void PluginGui::saveConfigMna(const QString& fullPath)
             return;
 
     MNALIB::MnaIO::write(project, fullPath);
-}
-
-//=============================================================================================================
-
-void PluginGui::saveConfigXml(const QString& fullPath)
-{
-    QDomDocument doc("PluginConfig");
-    QDomElement root = doc.createElement("PluginTree");
-    doc.appendChild(root);
-
-    //
-    // Plugins
-    //
-    QDomElement plugins = doc.createElement("Plugins");
-    root.appendChild(plugins);
-    SCSHAREDLIB::AbstractPlugin::SPtr pPlugin;
-    foreach (QGraphicsItem *item, m_pPluginScene->items())
-    {
-        if(item->type() == PluginItem::Type)
-        {
-            pPlugin = qgraphicsitem_cast<PluginItem *>(item)->plugin();
-
-            QDomElement plugin = doc.createElement("Plugin");
-            plugin.setAttribute("name",pPlugin->getName());
-            plugin.setAttribute("pos_x",item->x());
-            plugin.setAttribute("pos_y",item->y());
-            plugins.appendChild(plugin);
-        }
-    }
-
-    //
-    // Connections
-    //
-    QDomElement connections = doc.createElement("Connections");
-    root.appendChild(connections);
-    SCSHAREDLIB::PluginConnectorConnection::SPtr pConnection;
-    foreach (QGraphicsItem *item, m_pPluginScene->items())
-    {
-        if(item->type() == Arrow::Type)
-        {
-            pConnection = qgraphicsitem_cast<Arrow *>(item)->connection();
-
-            QDomElement connection = doc.createElement("Connection");
-            connection.setAttribute("sender",pConnection->getSender()->getName());
-            connection.setAttribute("receiver",pConnection->getReceiver()->getName());
-            connections.appendChild(connection);
-        }
-    }
-
-    QString xml = doc.toString();
-
-    QFileInfo fi(fullPath);
-    QDir dir;
-    if (!dir.exists(fi.path()))
-        if (!dir.mkpath(fi.path()))
-            return;
-
-    QFile file(fullPath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-        return;
-
-    QTextStream out(&file);
-    out << xml;
 }
 
 //=============================================================================================================

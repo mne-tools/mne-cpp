@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
  * @file     directed_transfer_function.h
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April, 2026
  *
  * @section  LICENSE
  *
- * Copyright (C) 2026, Christoph Dinh, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2026, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:

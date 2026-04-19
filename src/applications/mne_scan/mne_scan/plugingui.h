@@ -148,21 +148,9 @@ private:
 
     //=========================================================================================================
     /**
-     * Load config from legacy XML file.
-     */
-    void loadConfigXml(const QString& fullPath);
-
-    //=========================================================================================================
-    /**
      * Save config to MNA/MNX file.
      */
     void saveConfigMna(const QString& fullPath);
-
-    //=========================================================================================================
-    /**
-     * Save config to legacy XML file.
-     */
-    void saveConfigXml(const QString& fullPath);
 
     SCSHAREDLIB::PluginManager*          m_pPluginManager;       /**< Corresponding plugin manager. */
     SCSHAREDLIB::PluginSceneManager*     m_pPluginSceneManager;  /**< Corresponding plugin scene manager. */

@@ -75,7 +75,6 @@ fi
 if [ -d "$SCRIPT_DIR/icons" ]; then
     echo "[wasm_postbuild] Copying icons/ → $OUTPUT_DIR/icons/"
     mkdir -p "$OUTPUT_DIR/icons"
-    cp "$SCRIPT_DIR/icons/"*.svg "$OUTPUT_DIR/icons/" 2>/dev/null || true
     cp "$SCRIPT_DIR/icons/"*.png "$OUTPUT_DIR/icons/" 2>/dev/null || true
 fi
 

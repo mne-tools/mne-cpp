@@ -1,28 +1,32 @@
 #!/usr/bin/env python3
-"""Generate PWA icon PNGs from the MNE-CPP brain logo SVGs.
+"""Generate PWA icon PNGs from the MNE Inspect application icon.
 
-The SVG icons (icon-192.svg, icon-512.svg) contain the colorful polygon
-brain from resources/design/logos/MNE-CPP_Logo.svg, centered on a dark
-rounded-rectangle background. This script converts them to PNG using
-rsvg-convert (librsvg) when available.
+Resizes the 256x256 app icon to the sizes required by the PWA manifest
+(192x192 and 512x512).  Uses ``sips`` on macOS or ``convert`` (ImageMagick)
+elsewhere.
 
 Usage:
     python3 generate_icons.py
 """
 import subprocess
 import os
+import sys
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.normpath(os.path.join(SCRIPT_DIR, '..', '..', '..'))
+SOURCE_ICON = os.path.join(
+    REPO_ROOT, 'src', 'applications', 'mne_inspect', 'resources',
+    'images', 'appIcons', 'icon_mne_inspect_256x256.png')
+
+if not os.path.exists(SOURCE_ICON):
+    sys.exit(f'Source icon not found: {SOURCE_ICON}')
 
 for size in [192, 512]:
-    svg_path = os.path.join(SCRIPT_DIR, f'icon-{size}.svg')
     png_path = os.path.join(SCRIPT_DIR, f'icon-{size}.png')
-    if not os.path.exists(svg_path):
-        print(f'SVG not found: {svg_path}')
-        continue
-    try:
-        subprocess.run(['rsvg-convert', '-w', str(size), '-h', str(size),
-                       svg_path, '-o', png_path], check=True)
-        print(f'Converted {svg_path} -> {png_path}')
-    except FileNotFoundError:
-        print(f'rsvg-convert not found; install librsvg or convert manually')
+    if sys.platform == 'darwin':
+        subprocess.run(['sips', '-z', str(size), str(size),
+                       SOURCE_ICON, '--out', png_path], check=True)
+    else:
+        subprocess.run(['convert', SOURCE_ICON, '-resize',
+                       f'{size}x{size}', png_path], check=True)
+    print(f'Generated {png_path} ({size}x{size})')
