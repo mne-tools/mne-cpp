@@ -511,22 +511,6 @@ public slots:
 
     //=========================================================================================================
     /**
-     * Set the STC time point for a specific viewport.
-     *
-     * @param[in] viewportIdx  Viewport index (0..N-1), or -1 for single view.
-     * @param[in] index        Time sample index.
-     */
-    void setTimePointForViewport(int viewportIdx, int index);
-
-    //=========================================================================================================
-    /**
-     * Configure a 2-viewport side-by-side layout for LH vs RH comparison.
-     * Left viewport shows LH only, right viewport shows RH only.
-     */
-    void setupCompareHemispheres();
-
-    //=========================================================================================================
-    /**
      * Cast rays from screen position to find intersected objects.
      *
      * @param[in] pos        2D mouse position.
@@ -773,16 +757,6 @@ signals:
      * @param[in] time       Time in seconds.
      */
     void timePointChanged(int index, float time);
-
-    //=========================================================================================================
-    /**
-     * Emitted when a viewport-specific time point changes.
-     *
-     * @param[in] viewportIdx  Viewport index (0..N-1), or -1 for single view.
-     * @param[in] index        Time sample index.
-     * @param[in] time         Time in seconds.
-     */
-    void viewportTimePointChanged(int viewportIdx, int index, float time);
 
     //=========================================================================================================
     /**

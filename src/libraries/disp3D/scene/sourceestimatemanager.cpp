@@ -216,37 +216,6 @@ void SourceEstimateManager::setTimePoint(int index,
 
 //=============================================================================================================
 
-void SourceEstimateManager::setTimePointForViewport(int index, int viewportIdx,
-                                                     const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces,
-                                                     const SubView &singleView,
-                                                     const QVector<SubView> &subViews)
-{
-    if (!m_overlay || !m_overlay->isLoaded()) return;
-
-    const int tp = qBound(0, index, m_overlay->numTimePoints() - 1);
-
-    // Determine which SubView this viewport refers to
-    const SubView &view = (viewportIdx < 0) ? singleView
-                        : (viewportIdx < subViews.size()) ? subViews[viewportIdx]
-                        : singleView;
-
-    // Apply source estimate only to surfaces matching this viewport's type and visibility
-    for (auto it = surfaces.begin(); it != surfaces.end(); ++it) {
-        if (it.key().endsWith(view.surfaceType)) {
-            // Only apply if this hemisphere is visible in the viewport
-            const bool isLh = it.key().startsWith("lh_");
-            const bool isRh = it.key().startsWith("rh_");
-            if ((isLh && view.visibility.lh) || (isRh && view.visibility.rh)) {
-                m_overlay->applyToSurface(it.value().get(), tp);
-            }
-        }
-    }
-
-    emit viewportTimePointChanged(viewportIdx, tp, m_overlay->timeAtIndex(tp));
-}
-
-//=============================================================================================================
-
 float SourceEstimateManager::tstep() const
 {
     return (m_overlay && m_overlay->isLoaded()) ? m_overlay->tstep() : 0.0f;

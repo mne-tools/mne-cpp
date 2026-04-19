@@ -66,7 +66,7 @@ class QTreeWidget;
 class QTreeWidgetItem;
 class BrainView;
 class BrainTreeModel;
-class ViewportTimeStrip;
+
 
 //=============================================================================================================
 /**
@@ -305,12 +305,6 @@ private:
     // Playback stepping (for real-time accurate playback)
     QElapsedTimer m_playbackClock;          //!< Wall-clock for measuring actual elapsed time
     double m_stcStepAccum = 0.0;            //!< Fractional sample accumulator
-
-    // Per-viewport timeline
-    bool m_timelineSynced = true;           //!< True when all viewports share the same time
-    QToolButton *m_syncLockBtn = nullptr;   //!< Toolbar button for sync lock toggle
-    QAction *m_compareHemiAction = nullptr; //!< Action for Compare Hemispheres preset
-    QVector<ViewportTimeStrip*> m_viewportTimeStrips; //!< Per-viewport control strips
 
     // MNA Project
     QPushButton *m_openProjectBtn = nullptr;

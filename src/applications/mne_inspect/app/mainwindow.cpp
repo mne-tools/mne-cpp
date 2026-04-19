@@ -37,7 +37,6 @@
 //=============================================================================================================
 
 #include "mainwindow.h"
-#include "viewporttimestrip.h"
 #include <disp3D/view/brainview.h>
 #include <disp3D/model/braintreemodel.h>
 #include <disp3D/core/viewstate.h>
@@ -665,25 +664,6 @@ void MainWindow::setupUI()
     presetRow->addWidget(m_cameraPresetCombo);
     viewLayout->addLayout(presetRow);
 
-    // Timeline Sync Lock
-    m_syncLockBtn = new QToolButton;
-    m_syncLockBtn->setText(QStringLiteral("\U0001F517"));  // chain-link emoji
-    m_syncLockBtn->setCheckable(true);
-    m_syncLockBtn->setChecked(true);
-    m_syncLockBtn->setToolTip("Timeline sync: locked — all viewports share the same time.\nClick to unlock for independent per-viewport timelines.");
-    QHBoxLayout *syncRow = new QHBoxLayout();
-    syncRow->addWidget(new QLabel("Timeline Sync:"));
-    syncRow->addWidget(m_syncLockBtn);
-    viewLayout->addLayout(syncRow);
-
-    // Compare Hemispheres
-    m_compareHemiAction = new QAction("Compare Hemispheres", this);
-    m_compareHemiAction->setToolTip("Create 2-viewport layout: LH left, RH right, timelines unlocked.");
-    QPushButton *compareHemiBtn = new QPushButton("Compare Hemispheres");
-    compareHemiBtn->setToolTip(m_compareHemiAction->toolTip());
-    viewLayout->addWidget(compareHemiBtn);
-    connect(compareHemiBtn, &QPushButton::clicked, m_compareHemiAction, &QAction::trigger);
-
     // Assemble side panel
     sideLayout->addWidget(projectGroup);
     sideLayout->addWidget(surfGroup);
@@ -709,14 +689,6 @@ void MainWindow::setupUI()
     viewContainerLayout->setContentsMargins(0, 0, 0, 0);
     viewContainerLayout->setSpacing(0);
     viewContainerLayout->addWidget(m_brainView, 1);
-
-    // Create initial per-viewport time strips (hidden by default — shown when sync is unlocked)
-    for (int i = 0; i < 4; ++i) {
-        auto *strip = new ViewportTimeStrip(i, viewContainer);
-        strip->hide();
-        viewContainerLayout->addWidget(strip);
-        m_viewportTimeStrips.append(strip);
-    }
 
     // ===== Controls Dock Widget =====
     m_controlsDock = new QDockWidget("Controls", this);
@@ -897,99 +869,6 @@ void MainWindow::setupConnections()
             syncUIToEditTarget(-1);
         }
         m_editTargetCombo->blockSignals(false);
-
-        // Update per-viewport time strip visibility
-        for (int i = 0; i < m_viewportTimeStrips.size(); ++i) {
-            m_viewportTimeStrips[i]->setVisible(!m_timelineSynced && i < count);
-        }
-    });
-
-    // Timeline sync lock toggle
-    connect(m_syncLockBtn, &QToolButton::toggled, [this](bool locked) {
-        m_timelineSynced = locked;
-        m_syncLockBtn->setToolTip(locked
-            ? "Timeline sync: locked — all viewports share the same time.\nClick to unlock for independent per-viewport timelines."
-            : "Timeline sync: unlocked — each viewport has its own timeline.\nClick to lock for synchronized timelines.");
-
-        const int count = m_brainView->viewCount();
-        for (int i = 0; i < m_viewportTimeStrips.size(); ++i) {
-            m_viewportTimeStrips[i]->setVisible(!locked && i < count && count > 1);
-            m_viewportTimeStrips[i]->setControlsEnabled(!locked);
-        }
-    });
-
-    // Compare Hemispheres preset
-    connect(m_compareHemiAction, &QAction::triggered, [this]() {
-        m_brainView->setupCompareHemispheres();
-
-        // Update view count combo to "2 Views" without re-triggering full handler
-        m_viewCountCombo->blockSignals(true);
-        m_viewCountCombo->setCurrentIndex(1);  // "2 Views"
-        m_viewCountCombo->blockSignals(false);
-        updateViewportCheckboxes(2);
-
-        m_editTargetCombo->setEnabled(true);
-        m_cameraPresetCombo->setEnabled(true);
-
-        // Rebuild edit target combo for 2 viewports
-        m_editTargetCombo->blockSignals(true);
-        m_editTargetCombo->clear();
-        m_editTargetCombo->addItem("LH (Left)", 0);
-        m_editTargetCombo->addItem("RH (Right)", 1);
-        m_editTargetCombo->setCurrentIndex(0);
-        m_brainView->setVisualizationEditTarget(0);
-        syncUIToEditTarget(0);
-        m_editTargetCombo->blockSignals(false);
-
-        // Unlock timeline sync
-        m_syncLockBtn->setChecked(false);  // triggers the toggled handler
-    });
-
-    // Per-viewport time strip connections
-    for (ViewportTimeStrip *strip : m_viewportTimeStrips) {
-        connect(strip, &ViewportTimeStrip::sliderValueChanged, [this](int viewportIdx, int value) {
-            m_brainView->setTimePointForViewport(viewportIdx, value);
-        });
-
-        connect(strip, &ViewportTimeStrip::playToggled, [this](int viewportIdx, bool playing) {
-            Q_UNUSED(viewportIdx)
-            if (playing && !m_stcTimer->isActive()) {
-                m_stcStepAccum = 0.0;
-                m_playbackClock.start();
-                m_stcTimer->start();
-            }
-            // Check if any strip is still playing; if not, timer will stop in timeout handler
-        });
-
-        connect(strip, &ViewportTimeStrip::stepBackward, [this](int viewportIdx) {
-            if (viewportIdx < m_viewportTimeStrips.size()) {
-                int cur = m_viewportTimeStrips[viewportIdx]->currentValue();
-                if (cur > 0) {
-                    m_viewportTimeStrips[viewportIdx]->setTimePoint(cur - 1,
-                        m_brainView->stcTmin() + (cur - 1) * m_brainView->stcStep());
-                    m_brainView->setTimePointForViewport(viewportIdx, cur - 1);
-                }
-            }
-        });
-
-        connect(strip, &ViewportTimeStrip::stepForward, [this](int viewportIdx) {
-            if (viewportIdx < m_viewportTimeStrips.size()) {
-                int cur = m_viewportTimeStrips[viewportIdx]->currentValue();
-                int maxVal = m_brainView->stcNumTimePoints() - 1;
-                if (cur < maxVal) {
-                    m_viewportTimeStrips[viewportIdx]->setTimePoint(cur + 1,
-                        m_brainView->stcTmin() + (cur + 1) * m_brainView->stcStep());
-                    m_brainView->setTimePointForViewport(viewportIdx, cur + 1);
-                }
-            }
-        });
-    }
-
-    // Per-viewport time point feedback from BrainView
-    connect(m_brainView, &BrainView::viewportTimePointChanged, [this](int viewportIdx, int index, float time) {
-        if (viewportIdx >= 0 && viewportIdx < m_viewportTimeStrips.size()) {
-            m_viewportTimeStrips[viewportIdx]->setTimePoint(index, time);
-        }
     });
 
     // Multi-view: edit target selection
@@ -1043,6 +922,8 @@ void MainWindow::setupConnections()
             if (!surf.isEmpty()) {
                 m_model->addSurface("User", hemi, type, surf);
                 trackLoadedFile(path, static_cast<int>(MnaFileRole::Surface));
+                qInfo() << "Loaded surface:" << hemi << type
+                         << "(load the opposite hemisphere separately in browser mode)";
             }
         });
 #else
@@ -1061,6 +942,19 @@ void MainWindow::setupConnections()
         if (!surf.isEmpty()) {
             m_model->addSurface("User", hemi, type, surf);
             trackLoadedFile(path, static_cast<int>(MnaFileRole::Surface));
+            qInfo() << "Loaded surface:" << hemi << type;
+        }
+
+        // Auto-load opposite hemisphere if available
+        QString otherHemi = (hemi == "lh") ? "rh" : "lh";
+        QString otherPath = QFileInfo(path).absolutePath() + "/" + otherHemi + "." + type;
+        if (QFile::exists(otherPath)) {
+            FsSurface otherSurf(otherPath);
+            if (!otherSurf.isEmpty()) {
+                m_model->addSurface("User", otherHemi, type, otherSurf);
+                trackLoadedFile(otherPath, static_cast<int>(MnaFileRole::Surface));
+                qInfo() << "Auto-loaded opposite hemisphere:" << otherHemi << type;
+            }
         }
 #endif
     });
@@ -1093,6 +987,20 @@ void MainWindow::setupConnections()
         if (!annot.isEmpty()) {
             m_model->addAnnotation("User", hemi, annot);
             trackLoadedFile(path, static_cast<int>(MnaFileRole::Annotation));
+            qInfo() << "Loaded annotation:" << hemi;
+        }
+
+        // Auto-load opposite hemisphere annotation if available
+        QString otherHemi = (hemi == "lh") ? "rh" : "lh";
+        QString otherPath = QFileInfo(path).absolutePath() + "/"
+            + fileName.replace(hemi + ".", otherHemi + ".");
+        if (QFile::exists(otherPath)) {
+            FsAnnotation otherAnnot(otherPath);
+            if (!otherAnnot.isEmpty()) {
+                m_model->addAnnotation("User", otherHemi, otherAnnot);
+                trackLoadedFile(otherPath, static_cast<int>(MnaFileRole::Annotation));
+                qInfo() << "Auto-loaded opposite hemisphere annotation:" << otherHemi;
+            }
         }
 #endif
     });
@@ -1160,13 +1068,6 @@ void MainWindow::setupConnections()
         // approach in the timeout handler dynamically computes the correct
         // number of frames to advance for any speed factor.
         m_stcTimer->setInterval(16);  // ~60 fps
-
-        // Update per-viewport time strips
-        for (ViewportTimeStrip *strip : m_viewportTimeStrips) {
-            strip->setRange(numPoints - 1);
-            strip->setTimePoint(0, m_brainView->stcTmin());
-            strip->stopPlayback();
-        }
     });
 
     connect(m_timeSlider, &QSlider::valueChanged, [this](int value) {
@@ -1269,17 +1170,9 @@ void MainWindow::setupConnections()
         if (checked && m_stcTimer->isActive()) {
             m_stcTimer->stop();
             m_playButton->setText("Play");
-            for (ViewportTimeStrip *strip : m_viewportTimeStrips)
-                strip->stopPlayback();
         } else if (!checked && m_brainView->isRealtimeStreaming()) {
             m_brainView->stopRealtimeStreaming();
             m_playButton->setText("Play");
-        }
-
-        // Disable per-viewport timeline controls in realtime mode
-        m_syncLockBtn->setEnabled(!checked);
-        for (ViewportTimeStrip *strip : m_viewportTimeStrips) {
-            strip->setControlsEnabled(!checked && !m_timelineSynced);
         }
     });
 
@@ -1295,58 +1188,25 @@ void MainWindow::setupConnections()
         // How many samples worth of data time elapsed
         double samplesElapsed = (elapsedMs * factor) / (tstep * 1000.0);
 
-        if (m_timelineSynced) {
-            // Synced mode: single accumulator, advance main slider
-            m_stcStepAccum += samplesElapsed;
-            int steps = static_cast<int>(m_stcStepAccum);
-            if (steps < 1) return;
-            m_stcStepAccum -= steps;
+        // Single accumulator, advance main slider
+        m_stcStepAccum += samplesElapsed;
+        int steps = static_cast<int>(m_stcStepAccum);
+        if (steps < 1) return;
+        m_stcStepAccum -= steps;
 
-            int cur = m_timeSlider->value();
-            int maxVal = m_timeSlider->maximum();
-            int next = cur + steps;
-            if (next > maxVal) {
-                if (m_loopCheck->isChecked()) {
-                    next = next % (maxVal + 1);
-                } else {
-                    next = maxVal;
-                    m_stcTimer->stop();
-                    m_playButton->setText("Play");
-                }
-            }
-            m_timeSlider->setValue(next);
-        } else {
-            // Unlocked mode: iterate per-viewport strips
-            int maxVal = m_brainView->stcNumTimePoints() - 1;
-            if (maxVal <= 0) return;
-
-            bool anyPlaying = false;
-            for (ViewportTimeStrip *strip : m_viewportTimeStrips) {
-                if (!strip->isVisible() || !strip->isPlaying())
-                    continue;
-                anyPlaying = true;
-
-                // Each strip has its own accumulator via the SubView
-                // For simplicity, use the shared elapsed time but advance independently
-                int cur = strip->currentValue();
-                int next = cur + qMax(1, static_cast<int>(samplesElapsed));
-                if (next > maxVal) {
-                    if (m_loopCheck->isChecked()) {
-                        next = next % (maxVal + 1);
-                    } else {
-                        next = maxVal;
-                        strip->stopPlayback();
-                    }
-                }
-                float time = m_brainView->stcTmin() + next * tstep;
-                strip->setTimePoint(next, time);
-                m_brainView->setTimePointForViewport(strip->viewportIndex(), next);
-            }
-
-            if (!anyPlaying) {
+        int cur = m_timeSlider->value();
+        int maxVal = m_timeSlider->maximum();
+        int next = cur + steps;
+        if (next > maxVal) {
+            if (m_loopCheck->isChecked()) {
+                next = next % (maxVal + 1);
+            } else {
+                next = maxVal;
                 m_stcTimer->stop();
+                m_playButton->setText("Play");
             }
         }
+        m_timeSlider->setValue(next);
     });
 
     // Sensors

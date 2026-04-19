@@ -14,12 +14,10 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 set(SOURCES
     main.cpp
     app/mainwindow.cpp
-    app/viewporttimestrip.cpp
 )
 
 set(HEADERS
     app/mainwindow.h
-    app/viewporttimestrip.h
 )
 
 set(RESOURCES
