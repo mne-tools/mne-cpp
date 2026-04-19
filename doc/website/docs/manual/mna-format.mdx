@@ -1,73 +1,476 @@
-# MNA Graph Format
+---
+title: "MNA Project Format"
+sidebar_label: "MNA Format"
+sidebar_position: 8
+---
 
-The **MNA** (MNE Node-graph for Analysis) format is a YAML-based project file
-that describes an analysis pipeline as a directed acyclic graph (DAG) of
-operators.
+# MNA Project Format
 
-## File Structure
+The **MNA** (MNE Node-graph for Analysis) format is a portable project file that bundles data references, processing parameters, and an executable computational graph into a single manifest. It solves a fundamental problem in neuroimaging workflows: the scattering of raw data files, intermediate results, parameter choices, and processing scripts across directories with no formal link between them.
 
-An `.mna` file contains three top-level sections:
+## Motivation
 
-```yaml
-format: mna/1.0
-meta:
-  author: Jane Doe
-  description: "Minimum-norm source localization pipeline"
-  created: 2026-04-25T10:00:00Z
+A typical MEG/EEG analysis involves dozens of files — raw recordings, forward solutions, inverse operators, covariance matrices, source estimates — plus parameter choices (filter cutoffs, regularization values, SNR assumptions) that are often buried in scripts or lost entirely. Reproducing a result means reconstructing the exact sequence of operations and parameters, which is error-prone and labour-intensive.
 
-nodes:
-  - id: load_raw
-    op: io.read_raw_fif
-    params:
-      path: "${DATA_DIR}/sample_audvis_raw.fif"
+MNA addresses this by capturing the **complete analysis state** in a single, machine-readable document:
 
-  - id: filter
-    op: dsp.band_pass_filter
-    inputs: [load_raw]
-    params:
-      low_freq: 1.0
-      high_freq: 40.0
+- **Data inventory** — every input and output file is referenced with a path, SHA-256 hash, and semantic role
+- **Parameter transparency** — all processing parameters are explicit, versioned, and optionally formula-driven
+- **Executable graph** — the processing pipeline is a directed acyclic graph (DAG) that can be re-executed to reproduce results
+- **Provenance** — each node records which tool version produced it, when it ran, and what verification checks it passed
 
-  - id: inverse
-    op: inv.compute_mne
-    inputs: [filter]
-    params:
-      method: dSPM
-      snr: 3.0
+## Project Hierarchy
+
+An MNA project follows a hierarchical data model that mirrors the structure of a neuroimaging study:
+
+```
+MnaProject
+ ├── name, description, mnaVersion, created, modified
+ ├── subjects[]
+ │    └── MnaSubject
+ │         ├── id, freeSurferDir
+ │         └── sessions[]
+ │              └── MnaSession
+ │                   ├── id
+ │                   └── recordings[]
+ │                        └── MnaRecording
+ │                             ├── id
+ │                             └── files[]
+ │                                  └── MnaFileRef
+ │                                       ├── role (Raw, Forward, Inverse, …)
+ │                                       ├── path (relative POSIX)
+ │                                       ├── sha256
+ │                                       ├── format ("fiff", "stc", "mgh", …)
+ │                                       ├── sizeBytes
+ │                                       └── embedded (bool + data)
+ └── pipeline[]  →  MnaNode[]  (the computational graph)
 ```
 
-### `format`
+### Class Reference
 
-Version string of the MNA schema (`mna/1.0`).
+| Class | Purpose |
+|---|---|
+| `MnaProject` | Top-level container. Holds subjects, the processing pipeline, and project metadata. Schema version is stored in `mnaVersion` (current: `"1.0"`). |
+| `MnaSubject` | Represents a participant. Links to a FreeSurfer `SUBJECTS_DIR` for anatomy. |
+| `MnaSession` | Groups recordings from one measurement session. |
+| `MnaRecording` | Groups files from one recording run (raw, events, head digitization, etc.). |
+| `MnaFileRef` | A single file reference with role, path, hash, format, and optional embedded data. |
 
-### `meta`
+### File Roles (`MnaFileRole`)
 
-Optional metadata: author, description, timestamps.
+| Role | Description |
+|---|---|
+| `Raw` | Raw MEG/EEG recording |
+| `Forward` | Forward solution |
+| `Inverse` | Inverse operator |
+| `Covariance` | Noise or data covariance matrix |
+| `SourceEstimate` | Source-level time series (`.stc`, `.w`) |
+| `Bem` | BEM model geometry |
+| `Surface` | FreeSurfer surface mesh |
+| `Annotation` | FreeSurfer cortical parcellation |
+| `Digitizer` | Head digitization points |
+| `Transform` | Coordinate transformation (head → MRI) |
+| `SourceSpace` | Source space definition |
+| `Evoked` | Averaged evoked response |
+| `Custom` | User-defined |
 
-### `nodes`
+## Computational Graph
 
-Ordered list of operator nodes. Each node has:
+The heart of MNA is the **computational graph**: a directed acyclic graph (DAG) of processing nodes that transforms raw data into results.
 
-| Field    | Required | Description                                               |
-|----------|----------|-----------------------------------------------------------|
-| `id`     | yes      | Unique string identifier for the node.                    |
-| `op`     | yes      | Registered operator name (namespace-qualified).           |
-| `inputs` | no       | List of upstream node IDs whose outputs feed this node.   |
-| `params` | no       | Key-value parameters passed to the operator at execution. |
+### MnaGraph
 
-## Execution Model
+`MnaGraph` is the top-level graph container. It holds:
 
-The MNA runtime (`MnaGraph`) resolves the DAG in topological order and executes
-each operator sequentially. Outputs of predecessor nodes are passed as inputs to
-downstream nodes via a shared context map keyed by node ID.
+- A list of `MnaNode` objects (the processing steps)
+- Graph-level input and output ports (`graphInputs`, `graphOutputs`)
+- A hierarchical parameter tree (`MnaParamTree`)
+- Connection and validation methods
 
-### Operator Registry
+```cpp
+MnaGraph graph;
+graph.addNode(filterNode);
+graph.addNode(inverseNode);
+graph.connect("filter_01", "filtered_raw",
+              "inverse_01", "raw_input");
 
-Operators are registered in `MnaOpRegistry`. Built-in operators cover common I/O,
-DSP, forward, and inverse workflows. Custom operators can be registered at runtime
-via `MnaOpRegistry::registerOp()`.
+QStringList errors;
+if (!graph.validate(&errors)) {
+    for (const auto& e : errors)
+        qWarning() << e;
+}
+```
 
-## Example
+### MnaNode
 
-See `resources/examples/mna_inverse_dspm.mna` for a complete inverse-pipeline
-example.
+Each node represents a single processing step:
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | `QString` | Unique identifier (e.g., `"filter_01"`) |
+| `opType` | `QString` | Operation type looked up in `MnaOpRegistry` (e.g., `"dsp.band_pass_filter"`) |
+| `attributes` | `QVariantMap` | Operation parameters (e.g., `{"low_freq": 1.0, "high_freq": 40.0}`) |
+| `inputs` | `QList<MnaPort>` | Input ports with upstream connections |
+| `outputs` | `QList<MnaPort>` | Output ports |
+| `execMode` | `MnaNodeExecMode` | Execution mode: `Batch`, `Stream`, `Ipc`, or `Script` |
+| `verification` | `MnaVerification` | Pre/post-condition checks and provenance |
+| `dirty` | `bool` | Whether the node needs re-execution |
+
+### MnaPort
+
+Typed input/output slot on a graph node:
+
+| Field | Type | Description |
+|---|---|---|
+| `name` | `QString` | Port name, unique within a node |
+| `dataKind` | `MnaDataKind` | Type of data flowing through (e.g., `FiffRaw`, `Forward`, `SourceEstimate`) |
+| `direction` | `MnaPortDir` | `Input` or `Output` |
+| `sourceNodeId` | `QString` | Upstream node (for input ports) |
+| `sourcePortName` | `QString` | Upstream output port name |
+| `streamProtocol` | `QString` | For real-time: `"fiff-rt"`, `"lsl"`, `"tcp"`, `"shm"` |
+| `streamEndpoint` | `QString` | Protocol-specific address |
+| `cachedResultPath` | `QString` | Path to cached result file |
+| `cachedResultHash` | `QString` | SHA-256 hash for cache invalidation |
+
+### Data Kinds (`MnaDataKind`)
+
+| Kind | Description |
+|---|---|
+| `FiffRaw` | Raw MEG/EEG data (FIFF format) |
+| `Forward` | Forward solution |
+| `Inverse` | Inverse operator |
+| `Covariance` | Noise or data covariance matrix |
+| `SourceEstimate` | Source-level time series |
+| `Epochs` | Epoched data |
+| `Evoked` | Averaged evoked response |
+| `Matrix` | Generic Eigen matrix (for intermediates) |
+| `Volume` | MRI volume data |
+| `Surface` | Surface mesh (FreeSurfer) |
+| `Bem` | BEM model |
+| `Annotation` | FreeSurfer annotation/parcellation |
+| `Label` | ROI label |
+| `RealTimeStream` | Live data channel (MNE Scan / LSL / FIFF-RT) |
+| `Custom` | User-defined data kind |
+
+### Node Execution Modes (`MnaNodeExecMode`)
+
+| Mode | Description |
+|---|---|
+| `Batch` | Runs once on static file-based inputs (default) |
+| `Stream` | Runs continuously on real-time data (MNE Scan integration) |
+| `Ipc` | Delegates to an external process via inter-process communication |
+| `Script` | Inline code executed via an interpreter (Python, shell, R, MATLAB, Julia) |
+
+## Operator Schemas
+
+Every operation type is described by an **operator schema** (`MnaOpSchema`) that declares the expected inputs, outputs, and attributes. Schemas enable validation before execution: the graph can verify that all required ports are connected, data kinds are compatible, and mandatory attributes are set.
+
+### MnaOpSchema
+
+| Field | Type | Description |
+|---|---|---|
+| `opType` | `QString` | Operation type identifier (e.g., `"inv.compute_mne"`) |
+| `version` | `QString` | Schema version (e.g., `"2.2.0"`) |
+| `binding` | `QString` | `"internal"`, `"cli"`, or `"script"` |
+| `category` | `QString` | `"io"`, `"preprocessing"`, `"source_estimation"`, etc. |
+| `description` | `QString` | Human-readable description |
+| `library` | `QString` | Which library provides the implementation |
+| `inputPorts` | `QList<MnaOpSchemaPort>` | Expected input port descriptors |
+| `outputPorts` | `QList<MnaOpSchemaPort>` | Expected output port descriptors |
+| `attributes` | `QList<MnaOpSchemaAttr>` | Expected attribute descriptors with types and defaults |
+
+### MnaOpRegistry
+
+The singleton `MnaOpRegistry` maps operation type strings to schemas and implementation functions:
+
+```cpp
+auto& reg = MnaOpRegistry::instance();
+
+// Register a schema
+reg.registerOp(mySchema);
+
+// Register an implementation
+reg.registerOpFunc("custom.my_filter", [](const QVariantMap& inputs,
+                                           const QVariantMap& attrs) -> QVariantMap {
+    // Process inputs using attrs
+    return {{"filtered", result}};
+});
+
+// Check and invoke
+if (reg.hasOp("dsp.band_pass_filter")) {
+    auto schema = reg.schema("dsp.band_pass_filter");
+    auto func   = reg.opFunc("dsp.band_pass_filter");
+}
+```
+
+### MnaRegistryLoader
+
+Loads operator schemas from declarative JSON registry manifest files:
+
+```cpp
+MnaRegistryLoader::loadDirectory("resources/mna/", MnaOpRegistry::instance());
+```
+
+The loader supports a master `mna-registry.json` file plus drop-in files from a `mna-registry.d/` subdirectory. Later files override earlier entries for the same operation type.
+
+## Parameters
+
+### MnaParamTree
+
+A hierarchical parameter store where each parameter has a path (`"nodeId/attrKey"`) and an optional dynamic binding:
+
+```cpp
+MnaParamTree tree;
+tree.setParam("filter_01/low_freq", 1.0);
+tree.setParam("filter_01/high_freq", 40.0);
+tree.setParam("inverse_01/snr", 3.0);
+
+QVariant val = tree.param("inverse_01/snr");  // → 3.0
+```
+
+### MnaParamBinding
+
+Dynamic bindings link a target parameter to a formula that is re-evaluated when a trigger condition is met:
+
+| Field | Type | Description |
+|---|---|---|
+| `targetPath` | `QString` | Parameter path to control (e.g., `"inverse_01/lambda"`) |
+| `expression` | `QString` | Formula string (e.g., `"clamp(ref('noise_est_01/snr') * 0.1, 0.01, 1.0)"`) |
+| `trigger` | `QString` | `"on_change"`, `"periodic"`, or `"manual"` |
+| `periodMs` | `int` | Evaluation period for periodic triggers |
+| `dependencies` | `QStringList` | Paths this binding reads from |
+
+```cpp
+MnaParamBinding binding;
+binding.targetPath  = "inverse_01/lambda";
+binding.expression  = "1.0 / pow(ref('inverse_01/snr'), 2)";
+binding.trigger     = "on_change";
+binding.dependencies = {"inverse_01/snr"};
+
+tree.addBinding(binding);
+```
+
+## Execution
+
+### MnaGraphExecutor
+
+The executor traverses the graph in topological order and invokes the registered operation function for each node:
+
+```cpp
+QVariantMap graphInputs;
+graphInputs["raw_file"] = "/data/sample_audvis_raw.fif";
+
+auto ctx = MnaGraphExecutor::execute(graph, graphInputs);
+
+// Access results
+QVariant stc = ctx.results["inverse_01::source_estimate"];
+```
+
+#### Execution Modes
+
+| Mode | Description |
+|---|---|
+| **Full execution** | `execute()` — runs all nodes in topological order |
+| **Incremental execution** | `executeIncremental()` — runs only dirty nodes and their downstream dependents |
+| **Single-node execution** | `executeNode()` — runs one node for testing/debugging |
+
+#### Progress Callback
+
+```cpp
+MnaGraphExecutor::setProgressCallback(
+    [](const QString& nodeId, int current, int total) {
+        qDebug() << QString("[%1/%2] %3").arg(current).arg(total).arg(nodeId);
+    });
+```
+
+#### Stream Mode
+
+When a node's `execMode` is `Stream`, the executor connects to the real-time data source specified by the input port's `streamProtocol` and `streamEndpoint`, then continuously processes incoming data buffers. This integrates MNA pipelines with MNE Scan for real-time acquisition and processing.
+
+## Verification and Provenance
+
+### MnaVerification
+
+Each node carries a `MnaVerification` block containing:
+
+- **Checks** (`MnaVerificationCheck`) — declarative pre- and post-conditions evaluated by the executor
+- **Results** (`MnaVerificationResult`) — the outcome of each check after execution
+- **Provenance** (`MnaProvenance`) — a snapshot of the execution environment
+
+### Verification Checks
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | `QString` | Unique check ID within the node (e.g., `"cov_posdef"`) |
+| `description` | `QString` | Human-readable description |
+| `phase` | `QString` | `"pre"` (before execution) or `"post"` (after execution) |
+| `expression` | `QString` | Simple evaluable expression (e.g., `"rank(covariance) > 0"`) |
+| `script` | `MnaScript` | Optional script for complex checks (exit code 0 = pass) |
+| `severity` | `QString` | `"error"` (abort), `"warning"` (log + continue), `"info"` (always continue) |
+| `onFail` | `QString` | Remediation hint shown on failure |
+
+### MnaScript
+
+Inline code that can be embedded in nodes (for `Script` exec mode) or verification checks:
+
+| Field | Type | Description |
+|---|---|---|
+| `language` | `QString` | `"python"`, `"shell"`, `"r"`, `"matlab"`, `"octave"`, `"julia"` |
+| `interpreter` | `QString` | Interpreter command (e.g., `"python3"`); empty = auto-detect |
+| `interpreterArgs` | `QStringList` | Extra args before the script file |
+| `code` | `QString` | The inline source code |
+| `sourceUri` | `QString` | Optional authoring-time reference |
+| `codeSha256` | `QString` | SHA-256 of `code` for integrity verification |
+
+## File Formats
+
+MNA supports two serialization formats with identical schemas:
+
+| Format | Extension | Encoding | Use Case |
+|---|---|---|---|
+| **MNA JSON** | `.mna` | UTF-8 JSON | Human-readable, diff-friendly, version control |
+| **MNA CBOR** | `.mnx` | CBOR with `"MNX1"` magic header | Compact binary, faster parsing, embedded file data |
+
+### Reading and Writing
+
+```cpp
+#include <mna/mna_io.h>
+
+// Read (dispatches by extension)
+MnaProject project = MnaIO::read("pipeline.mna");
+
+// Write JSON
+MnaIO::write(project, "pipeline.mna");
+
+// Write CBOR
+MnaIO::write(project, "pipeline.mnx");
+```
+
+Both formats support round-trip serialization via `toJson()`/`fromJson()` and `toCbor()`/`fromCbor()` methods on every MNA class.
+
+## Example: Minimum-Norm Pipeline
+
+```json
+{
+  "mnaVersion": "1.0",
+  "name": "audvis_dspm",
+  "description": "dSPM source localization of auditory/visual paradigm",
+  "created": "2026-04-19T10:00:00Z",
+  "subjects": [
+    {
+      "id": "sample",
+      "freeSurferDir": "subjects/sample",
+      "sessions": [
+        {
+          "id": "01",
+          "recordings": [
+            {
+              "id": "audvis",
+              "files": [
+                { "role": "Raw",        "path": "data/sample_audvis_raw.fif",  "format": "fiff" },
+                { "role": "Forward",    "path": "data/sample_audvis-fwd.fif",  "format": "fiff" },
+                { "role": "Covariance", "path": "data/sample_audvis-cov.fif",  "format": "fiff" }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "pipeline": [
+    {
+      "id": "read_raw_01",
+      "opType": "io.read_raw_fif",
+      "attributes": { "path": "data/sample_audvis_raw.fif" },
+      "inputs": [],
+      "outputs": [
+        { "name": "raw", "dataKind": "FiffRaw", "direction": "Output" }
+      ]
+    },
+    {
+      "id": "filter_01",
+      "opType": "dsp.band_pass_filter",
+      "attributes": { "low_freq": 1.0, "high_freq": 40.0 },
+      "inputs": [
+        { "name": "raw_input", "dataKind": "FiffRaw", "direction": "Input",
+          "sourceNodeId": "read_raw_01", "sourcePortName": "raw" }
+      ],
+      "outputs": [
+        { "name": "filtered_raw", "dataKind": "FiffRaw", "direction": "Output" }
+      ]
+    },
+    {
+      "id": "read_fwd_01",
+      "opType": "io.read_forward",
+      "attributes": { "path": "data/sample_audvis-fwd.fif" },
+      "inputs": [],
+      "outputs": [
+        { "name": "forward", "dataKind": "Forward", "direction": "Output" }
+      ]
+    },
+    {
+      "id": "read_cov_01",
+      "opType": "io.read_covariance",
+      "attributes": { "path": "data/sample_audvis-cov.fif" },
+      "inputs": [],
+      "outputs": [
+        { "name": "covariance", "dataKind": "Covariance", "direction": "Output" }
+      ]
+    },
+    {
+      "id": "inverse_01",
+      "opType": "inv.compute_mne",
+      "attributes": { "method": "dSPM", "snr": 3.0 },
+      "inputs": [
+        { "name": "raw_input", "dataKind": "FiffRaw", "direction": "Input",
+          "sourceNodeId": "filter_01", "sourcePortName": "filtered_raw" },
+        { "name": "forward", "dataKind": "Forward", "direction": "Input",
+          "sourceNodeId": "read_fwd_01", "sourcePortName": "forward" },
+        { "name": "covariance", "dataKind": "Covariance", "direction": "Input",
+          "sourceNodeId": "read_cov_01", "sourcePortName": "covariance" }
+      ],
+      "outputs": [
+        { "name": "source_estimate", "dataKind": "SourceEstimate", "direction": "Output" }
+      ],
+      "verification": {
+        "checks": [
+          {
+            "id": "cov_posdef",
+            "description": "Covariance matrix must be positive-definite",
+            "phase": "pre",
+            "expression": "rank(covariance) > 0",
+            "severity": "error"
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+## CLI Tools
+
+MNE-CPP ships several command-line tools for working with MNA files:
+
+| Tool | Description |
+|---|---|
+| [`mne_show_mna`](tools-overview#mne_show_mna) | Pretty-print an `.mna`/`.mnx` file: project metadata, file inventory, and pipeline graph summary. |
+| [`mne_inverse_pipeline`](tools-overview#mne_inverse_pipeline) | Build and execute a complete inverse pipeline from command-line arguments, saving the result as an `.mna` project. |
+| [`mne_mna_bids_converter`](tools-overview#mne_mna_bids_converter) | Scan a BIDS dataset directory and generate an `.mna` project with file references and subject/session structure. |
+
+## BIDS Integration
+
+The `mne_mna_bids_converter` tool scans a BIDS-compliant dataset and generates an MNA project that mirrors the BIDS hierarchy:
+
+```bash
+mne_mna_bids_converter --bids-root /data/ds000117 --output ds000117.mna
+```
+
+The generated project contains `MnaSubject` → `MnaSession` → `MnaRecording` → `MnaFileRef` entries for all raw data files, with roles inferred from BIDS suffixes (`_meg.fif` → `Raw`, `_T1w.nii.gz` → `Volume`, etc.).
+
+## See Also
+
+- [MNA Library API](../development/api-mna) — C++ class reference for the MNA library
+- [Library API](../development/api) — Overview of all MNE-CPP libraries
+- [Workflow](workflow) — The MEG/EEG processing workflow
+- [FIFF Format](fiff-format) — The FIFF file format reference

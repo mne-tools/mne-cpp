@@ -1,0 +1,51 @@
+---
+title: mne_sensor_locations
+sidebar_label: mne_sensor_locations
+---
+
+# mne_sensor_locations
+
+## Overview
+
+`mne_sensor_locations` exports sensor locations from a measurement FIFF file to a text file. It writes one line per MEG and EEG channel with the channel name and x, y, z coordinates. Positions can be reported in either the head or device coordinate frame.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_sensor_locations [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--meas <file>` | Measurement FIFF file |
+| `--out <file>` | Output text file |
+| `--frame <frame>` | Coordinate frame: `head` (default) or `device` |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Example
+
+```bash
+# Export sensor locations in head coordinates
+mne_sensor_locations --meas sam-raw.fif --out sensors_head.txt
+
+# Export in device coordinates
+mne_sensor_locations --meas sam-raw.fif --out sensors_dev.txt --frame device
+```
+
+Output format (one channel per line):
+
+```
+MEG 0113               0.061300     0.047200     0.089100
+MEG 0112               0.062100     0.048000     0.088500
+EEG 001                0.083400     0.012300     0.067800
+```
+
+## See Also
+
+- [mne_check_eeg_locations](tools-check-eeg-locations) — Validate EEG electrode positions
+- [mne_list_coil_def](tools-list-coil-def) — List coil definitions

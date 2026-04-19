@@ -1,0 +1,45 @@
+---
+title: mne_process_stc
+sidebar_label: mne_process_stc
+---
+
+# mne_process_stc
+
+## Overview
+
+`mne_process_stc` processes STC source estimate files: scale values, export to ASCII text, or copy to a new binary STC file.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_process_stc [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--in <file>` | Input STC file |
+| `--out <file>` | Output binary STC file |
+| `--outasc <file>` | Output ASCII file |
+| `--scaleby <factor>` | Multiply values by this factor |
+| `--scaleto <value>` | Scale data so that the maximum equals this value |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Example
+
+```bash
+# Scale STC values by a factor and write binary output
+mne_process_stc --in sam-lh.stc --out sam-scaled-lh.stc --scaleby 1e9
+
+# Export to ASCII with normalized maximum
+mne_process_stc --in sam-lh.stc --outasc sam-lh.txt --scaleto 1.0
+```
+
+## See Also
+
+- [mne_average_estimates](tools-average-estimates) — Weighted average of STC files
+- [mne_make_uniform_stc](tools-make-uniform-stc) — Create uniform STC for testing

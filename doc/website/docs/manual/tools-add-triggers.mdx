@@ -1,0 +1,50 @@
+---
+title: mne_add_triggers
+sidebar_label: mne_add_triggers
+---
+
+# mne_add_triggers
+
+## Overview
+
+`mne_add_triggers` adds trigger events to a raw data file's stimulus (STI) channel. It reads a trigger file with sample–value pairs and writes the events into the STI channel of the raw data. The tool prefers `STI 014` but falls back to the first available stimulus channel.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_add_triggers [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--raw <file>` | Input raw FIFF file |
+| `--trg <file>` | Trigger file (`sample event_value` per line) |
+| `--out <file>` | Output FIFF file |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Trigger File Format
+
+One trigger event per line with sample number and event value separated by whitespace. Lines starting with `#` are comments.
+
+```
+# sample  event_value
+1000      1
+2500      2
+4000      1
+```
+
+## Example
+
+```bash
+mne_add_triggers --raw sam-raw.fif --trg triggers.txt --out sam-triggers-raw.fif
+```
+
+## See Also
+
+- [mne_fix_stim14](tools-fix-stim14) — Fix STI 014 by combining STI 001-006
+- [mne_toggle_skips](tools-toggle-skips) — Toggle skip tags in raw data

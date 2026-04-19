@@ -1,0 +1,53 @@
+---
+title: mne_make_derivations
+sidebar_label: mne_make_derivations
+---
+
+# mne_make_derivations
+
+## Overview
+
+`mne_make_derivations` parses a text channel derivation file and writes it as a FIFF named matrix. Channel derivations define how derived (virtual) channels are computed as linear combinations of physical channels.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_make_derivations [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--in <file>` | Input text derivation file |
+| `--out <file>` | Output FIFF file |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Derivation File Format
+
+One derivation per line with the following format:
+
+```
+derived_name = coeff1 * ch_name1 + coeff2 * ch_name2 + ...
+```
+
+Example:
+
+```
+EOG_bipolar = 1.0 * EOG061 + -1.0 * EOG062
+ECG_bipolar = 1.0 * ECG063 + -1.0 * ECG064
+```
+
+## Example
+
+```bash
+mne_make_derivations --in derivations.txt --out derivations.fif
+```
+
+## See Also
+
+- [mne_change_baselines](tools-change-baselines) — Change baseline in evoked data
+- [mne_sensor_locations](tools-sensor-locations) — Export sensor locations to text

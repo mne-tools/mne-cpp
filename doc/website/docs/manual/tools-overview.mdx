@@ -33,9 +33,12 @@ The tools below are organized by their role in a typical MEG/EEG analysis workfl
 | [mne_tufts2fiff](tools-tufts2fiff) | Converts Tufts University EEG data to FIFF format |
 | [mne_eximia2fiff](tools-eximia2fiff) | Converts Nexstim eXimia EEG data (`.nxe`) to FIFF format |
 | [mne_raw2mat](tools-raw2mat) | Exports raw FIFF data to MATLAB `.mat` format |
+| [mne_epochs2mat](tools-epochs2mat) | Exports epoched data to MATLAB `.mat` format |
 | [mne_convert_surface](tools-convert-surface) | Converts surface meshes between FIFF, FreeSurfer, .tri, and .smf formats |
 | [mne_convert_dig_data](tools-convert-dig-data) | Converts digitization data between FIFF and hpts formats |
 | [mne_ctf_dig2fiff](tools-ctf-dig2fiff) | Converts CTF Polhemus digitization data to FIFF/hpts format |
+| [mne_convert_ctf_markers](tools-convert-ctf-markers) | Converts CTF marker files to FIFF event format |
+| [mne_mna_bids_converter](tools-mna-bids-converter) | Converts between MNA project format and BIDS directory layout |
 | [mne_show_fiff](tools-show-fiff) | Lists the contents of a FIFF file |
 | [mne_compare_fif_files](tools-compare-fif-files) | Compares two FIFF files tag by tag |
 
@@ -50,6 +53,13 @@ The tools below are organized by their role in a typical MEG/EEG analysis workfl
 | [mne_compensate_data](tools-compensate-data) | Applies or changes CTF software gradient compensation grade |
 | [mne_cov2proj](tools-cov2proj) | Derives SSP projection vectors from a noise covariance matrix |
 | [mne_anonymize](tools-anonymize) | Removes or modifies personal health information from FIFF files |
+| [mne_add_triggers](tools-add-triggers) | Adds trigger events to raw data from a text file |
+| [mne_change_baselines](tools-change-baselines) | Changes the baseline interval in evoked data files |
+| [mne_change_nave](tools-change-nave) | Modifies the number of averages (n_ave) field in evoked data |
+| [mne_copy_processing_history](tools-copy-processing-history) | Copies processing history tags between FIFF files |
+| [mne_fix_stim14](tools-fix-stim14) | Reconstructs STI 014 by combining STI 001–006 |
+| [mne_make_derivations](tools-make-derivations) | Parses a text derivation file into FIFF format |
+| [mne_toggle_skips](tools-toggle-skips) | Toggles skip tags in raw data files |
 
 ## BEM Model Creation and Validation
 
@@ -63,6 +73,9 @@ The tools below are organized by their role in a typical MEG/EEG analysis workfl
 | [mne_make_sphere_bem](tools-make-sphere-bem) | Creates a spherical BEM model from concentric shells |
 | [mne_check_surface](tools-check-surface) | Validates BEM and FreeSurfer surface meshes for topological correctness |
 | [mne_list_bem](tools-list-bem) | Exports BEM surface data from FIFF to ASCII text |
+| [mne_fit_sphere_to_surf](tools-fit-sphere-to-surf) | Fits a sphere to a set of surface points |
+| [mne_make_scalp_surfaces](tools-make-scalp-surfaces) | Generates decimated scalp surface meshes for visualization |
+| [mne_transform_points](tools-transform-points) | Transforms 3D points between coordinate frames |
 
 ## MRI Setup
 
@@ -93,6 +106,13 @@ The tools below are organized by their role in a typical MEG/EEG analysis workfl
 | [mne_compute_raw_inverse](tools-compute-raw-inverse) | Computes inverse solutions (MNE/dSPM/sLORETA) on continuous data |
 | [mne_dipole_fit](tools-dipole-fit) | Performs electric current dipole fitting |
 | [mne_volume_data2mri](tools-volume-data2mri) | Maps volume source estimates to MRI voxel space |
+| [mne_compute_cmne](tools-compute-cmne) | Computes CMNE source estimates using ONNX Runtime (compute/train/finetune) |
+| [mne_inverse_pipeline](tools-inverse-pipeline) | Executes an MNA graph-based inverse processing pipeline |
+| [mne_label_ssp](tools-label-ssp) | Creates SSP projectors from cortical ROI labels |
+| [mne_average_estimates](tools-average-estimates) | Computes weighted average of STC source estimate files |
+| [mne_process_stc](tools-process-stc) | Scales, exports, or copies STC source estimate files |
+| [mne_make_uniform_stc](tools-make-uniform-stc) | Creates uniform-value STC files for testing and validation |
+| [mne_map_data](tools-map-data) | Maps evoked data between different sensor arrays |
 
 ## Morphing and Group Analysis
 
@@ -117,6 +137,17 @@ The tools below are organized by their role in a typical MEG/EEG analysis workfl
 | Tool | Description |
 |---|---|
 | [mne_simu](tools-simu) | Generates simulated MEG/EEG data from a forward solution |
+
+## Inspection and Information
+
+| Tool | Description |
+|---|---|
+| [mne_check_eeg_locations](tools-check-eeg-locations) | Validates EEG electrode positions in a FIFF file |
+| [mne_evoked_data_summary](tools-evoked-data-summary) | Prints a summary of evoked data sets in a FIFF file |
+| [mne_list_coil_def](tools-list-coil-def) | Lists coil definitions from the coil definition file |
+| [mne_list_proj](tools-list-proj) | Lists SSP projection vectors in a FIFF file |
+| [mne_sensor_locations](tools-sensor-locations) | Exports sensor locations to a text file |
+| [mne_show_mna](tools-show-mna) | Displays the contents of an MNA project file |
 
 ## Real-Time Streaming
 

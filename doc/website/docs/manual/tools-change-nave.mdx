@@ -1,0 +1,44 @@
+---
+title: mne_change_nave
+sidebar_label: mne_change_nave
+---
+
+# mne_change_nave
+
+## Overview
+
+`mne_change_nave` modifies the `nave` (number of averages) field in evoked data. This is useful when the nave value needs to be corrected after data processing, or when simulating different averaging conditions.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_change_nave [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--meas <file>` | Input evoked FIFF file |
+| `--nave <value>` | New nave value |
+| `--set <index>` | Which evoked set index to modify (default: 0) |
+| `--out <file>` | Output FIFF file |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Example
+
+```bash
+# Set nave to 100 for the first evoked set
+mne_change_nave --meas sam-ave.fif --nave 100 --out sam-fixed-ave.fif
+
+# Modify the second evoked set (index 1)
+mne_change_nave --meas sam-ave.fif --nave 50 --set 1 --out sam-fixed-ave.fif
+```
+
+## See Also
+
+- [mne_change_baselines](tools-change-baselines) — Change baseline in evoked data
+- [mne_evoked_data_summary](tools-evoked-data-summary) — Print evoked data summary

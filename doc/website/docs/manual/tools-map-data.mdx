@@ -1,0 +1,49 @@
+---
+title: mne_map_data
+sidebar_label: mne_map_data
+---
+
+# mne_map_data
+
+## Overview
+
+`mne_map_data` maps evoked data between sensor arrays via forward/inverse operators. It source-localizes the input evoked data using the inverse operator, then projects the source estimate through the forward solution (with target sensor geometry) to produce mapped evoked data on a different sensor array.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_map_data [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--from <file>` | Source evoked FIFF file |
+| `--to <file>` | Target measurement info FIFF file (for target sensor layout) |
+| `--fwd <file>` | Forward solution FIFF file |
+| `--inv <file>` | Inverse operator FIFF file (optional; computed from fwd if omitted) |
+| `--out <file>` | Output evoked FIFF file |
+| `--snr <value>` | SNR for regularization (default: 3.0) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Example
+
+```bash
+# Map evoked data from one sensor array to another
+mne_map_data --from source-ave.fif --to target-raw.fif \
+    --fwd sam-meg-fwd.fif --out mapped-ave.fif
+
+# Map with explicit inverse operator and custom SNR
+mne_map_data --from source-ave.fif --to target-raw.fif \
+    --fwd sam-meg-fwd.fif --inv sam-meg-inv.fif \
+    --snr 2.0 --out mapped-ave.fif
+```
+
+## See Also
+
+- [mne_sensitivity_map](tools-sensitivity-map) — Compute sensitivity maps from forward solutions
+- [mne_compute_cmne](tools-compute-cmne) — Compute CMNE source estimates

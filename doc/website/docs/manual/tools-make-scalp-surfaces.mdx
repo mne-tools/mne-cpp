@@ -1,0 +1,43 @@
+---
+title: mne_make_scalp_surfaces
+sidebar_label: mne_make_scalp_surfaces
+---
+
+# mne_make_scalp_surfaces
+
+## Overview
+
+`mne_make_scalp_surfaces` generates decimated scalp surfaces from a BEM outer skin surface. It reads a BEM file, locates the outer skin surface, and creates decimated versions at the specified vertex counts. This is useful for creating lighter-weight surfaces for visualization and coregistration.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_make_scalp_surfaces [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--bem <file>` | BEM file with outer skin surface |
+| `--out <dir>` | Output directory for decimated surfaces |
+| `--grades <counts>` | Comma-separated target vertex counts (default: `2562,10242,40962`) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Example
+
+```bash
+# Generate scalp surfaces at default resolutions
+mne_make_scalp_surfaces --bem sam-head.fif --out scalp/
+
+# Generate at custom resolutions
+mne_make_scalp_surfaces --bem sam-head.fif --out scalp/ --grades 642,2562,10242
+```
+
+## See Also
+
+- [mne_fit_sphere_to_surf](tools-fit-sphere-to-surf) — Fit sphere to surface points
+- [mne_transform_points](tools-transform-points) — Transform 3D points between coordinate frames

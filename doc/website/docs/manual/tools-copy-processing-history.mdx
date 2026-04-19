@@ -1,0 +1,38 @@
+---
+title: mne_copy_processing_history
+sidebar_label: mne_copy_processing_history
+---
+
+# mne_copy_processing_history
+
+## Overview
+
+`mne_copy_processing_history` copies the processing history block from one FIFF file to another. Processing history records the sequence of operations applied to the data, and this tool allows transferring that provenance information between files.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_copy_processing_history [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--from <file>` | Source FIFF file containing processing history |
+| `--to <file>` | Destination FIFF file (will be modified) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Example
+
+```bash
+mne_copy_processing_history --from sam-ave.fif --to sam-new-ave.fif
+```
+
+## See Also
+
+- [mne_evoked_data_summary](tools-evoked-data-summary) — Print evoked data summary
+- [mne_change_baselines](tools-change-baselines) — Change baseline in evoked data

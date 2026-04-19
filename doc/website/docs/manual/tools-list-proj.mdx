@@ -1,0 +1,49 @@
+---
+title: mne_list_proj
+sidebar_label: mne_list_proj
+---
+
+# mne_list_proj
+
+## Overview
+
+`mne_list_proj` lists SSP (Signal Space Projection) projectors from a FIFF measurement file. It reads the measurement info and prints a table showing each projector's index, kind, number of vectors, active status, and description.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_list_proj [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--meas <name>` | Measurement FIFF file |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Example
+
+```bash
+mne_list_proj --meas sam-raw.fif
+```
+
+Example output:
+
+```
+Found 3 SSP projector(s):
+
+Index  Kind                 NVec     Active   Description
+------ -------------------- -------- -------- --------------------
+1      Field                1        Yes      PCA-v1
+2      Field                1        Yes      PCA-v2
+3      Field                1        Yes      PCA-v3
+```
+
+## See Also
+
+- [mne_label_ssp](tools-label-ssp) — Create SSP projectors from cortical ROIs
+- [mne_check_eeg_locations](tools-check-eeg-locations) — Validate EEG electrode positions

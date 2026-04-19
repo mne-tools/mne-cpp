@@ -1,0 +1,50 @@
+---
+title: mne_list_coil_def
+sidebar_label: mne_list_coil_def
+---
+
+# mne_list_coil_def
+
+## Overview
+
+`mne_list_coil_def` lists all available coil definitions from a coil definition file. It reads the file and prints a table showing each coil's type number, class (MAG, AXIAL_GRAD, PLANAR_GRAD, EEG), accuracy level, number of integration points, size, and description.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_list_coil_def [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--coildef <name>` | Custom coil definition file (optional; uses default `coil_def.dat` if omitted) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Example
+
+```bash
+# List coil definitions using the default file
+mne_list_coil_def
+
+# Use a custom coil definition file
+mne_list_coil_def --coildef my_coil_def.dat
+```
+
+Example output:
+
+```
+Type     Class          Accuracy   NP     Size(m)    Description
+-------- -------------- ---------- ------ ---------- --------------------
+3012     PLANAR_GRAD    normal     8      0.0264     Vectorview type 1 planar gradiometer
+3022     MAG            normal     4      0.0210     Vectorview type 1 magnetometer
+```
+
+## See Also
+
+- [mne_sensor_locations](tools-sensor-locations) — Export sensor locations to text
+- [mne_list_proj](tools-list-proj) — List SSP projectors

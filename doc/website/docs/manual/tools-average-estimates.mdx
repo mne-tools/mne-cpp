@@ -1,0 +1,49 @@
+---
+title: mne_average_estimates
+sidebar_label: mne_average_estimates
+---
+
+# mne_average_estimates
+
+## Overview
+
+`mne_average_estimates` computes a weighted average of STC source estimate files. It reads a description file listing weight–path pairs, loads each STC, and produces a normalized weighted average.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_average_estimates [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--desc <file>` | Description file listing `<weight> <stc-path>` pairs (one per line) |
+| `--out <file>` | Output STC file path |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description File Format
+
+The description file contains one entry per line with a weight and STC file path, separated by whitespace. Lines starting with `#` are comments.
+
+```
+# weight  stc-path
+0.5  subject1-lh.stc
+0.3  subject2-lh.stc
+0.2  subject3-lh.stc
+```
+
+## Example
+
+```bash
+mne_average_estimates --desc subjects.txt --out group-avg-lh.stc
+```
+
+## See Also
+
+- [mne_process_stc](tools-process-stc) — Scale, export, copy STC files
+- [mne_make_uniform_stc](tools-make-uniform-stc) — Create uniform STC for testing

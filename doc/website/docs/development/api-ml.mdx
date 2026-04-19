@@ -1,0 +1,331 @@
+---
+title: "ML Library API"
+sidebar_label: "ML"
+---
+
+# ML Library API
+
+The `mne_ml` library (`MLLIB` namespace) provides machine learning infrastructure for MNE-CPP: ONNX Runtime inference for pre-trained neural networks, built-in linear models, feature scaling, tensor data structures, and a processing pipeline. The primary use case is [CMNE](../manual/glossary#general-concepts) (Contextual Minimum-Norm Estimate) inference, where an LSTM network trained in Python is deployed via ONNX Runtime in C++.
+
+```cmake
+target_link_libraries(my_app PRIVATE mne_ml)
+```
+
+Dependencies: `mne_utils`, `mne_math`, Qt6::Core, Eigen3. Optional: ONNX Runtime (enabled via `USE_ONNXRUNTIME=ON`).
+
+## Class Inventory
+
+| Class / Struct | Header | Description |
+|---|---|---|
+| `MlModel` | `ml/ml_model.h` | Abstract base class for all ML models |
+| `MlOnnxModel` | `ml/ml_onnx_model.h` | ONNX Runtime backed model for neural network inference |
+| `MlLinearModel` | `ml/ml_linear_model.h` | Ridge regression / logistic regression built-in model |
+| `MlPipeline` | `ml/ml_pipeline.h` | Scaler → model processing pipeline |
+| `MlScaler` | `ml/ml_scaler.h` | Feature scaler (StandardScaler or MinMaxScaler) |
+| `MlTensor` | `ml/ml_tensor.h` | N-dimensional row-major float32 tensor with zero-copy semantics |
+| `MLTrainer` | `ml/ml_trainer.h` | Python training script launcher (not available in WASM builds) |
+
+### Enumerations (`ml/ml_types.h`)
+
+| Enum | Values | Description |
+|---|---|---|
+| `MlBackend` | `OnnxRuntime`, `BuiltIn` | ML back-end engine |
+| `MlDataType` | `Float32`, `Float64`, `Int64` | Tensor data types |
+| `MlTaskType` | `Classification`, `Regression`, `FeatureExtraction` | ML task categories |
+
+---
+
+## MlModel (Abstract Base)
+
+All ML models implement this interface:
+
+```cpp
+#include <ml/ml_model.h>
+
+class MlModel {
+public:
+    typedef QSharedPointer<MlModel> SPtr;
+
+    virtual MlTensor predict(const MlTensor& input) const = 0;
+    virtual bool save(const QString& path) const = 0;
+    virtual bool load(const QString& path) = 0;
+    virtual QString modelType() const = 0;
+    virtual MlTaskType taskType() const = 0;
+};
+```
+
+| Method | Description |
+|---|---|
+| `predict(input)` | Run inference on the input tensor |
+| `save(path)` | Save model to file |
+| `load(path)` | Load model from file |
+| `modelType()` | Return model type string (e.g., `"onnx"`, `"linear"`) |
+| `taskType()` | Return the task type (Classification, Regression, FeatureExtraction) |
+
+---
+
+## MlOnnxModel
+
+ONNX Runtime backed model for deploying pre-trained neural networks (e.g., CMNE LSTM):
+
+```cpp
+#include <ml/ml_onnx_model.h>
+
+MLLIB::MlOnnxModel model;
+if (model.load("cmne_lstm.onnx")) {
+    qDebug() << "Model loaded, type:" << model.modelType();
+
+    // Prepare input tensor: [batch, sequence_length, features]
+    std::vector<float> data(1 * 20 * 204, 0.0f);
+    MLLIB::MlTensor input(std::move(data), {1, 20, 204});
+
+    // Run inference
+    MLLIB::MlTensor output = model.predict(input);
+    qDebug() << "Output shape:" << output.shape();
+}
+```
+
+| Method | Description |
+|---|---|
+| `predict(input)` | Run ONNX Runtime inference on the input tensor |
+| `load(path)` | Load an `.onnx` model file and create an inference session |
+| `save(path)` | Copy the model file to a new path |
+| `isLoaded()` | Check if a session is loaded and ready |
+| `modelType()` | Returns `"onnx"` |
+| `taskType()` | Returns the configured task type |
+
+:::note
+When built without `USE_ONNXRUNTIME`, all methods throw `std::runtime_error`. The ONNX Runtime shared library is automatically copied alongside `mne_ml` during the build for runtime discovery.
+:::
+
+---
+
+## MlLinearModel
+
+Built-in ridge regression and logistic regression:
+
+```cpp
+#include <ml/ml_linear_model.h>
+
+// Ridge regression
+MLLIB::MlLinearModel regressor(MLLIB::MlTaskType::Regression, 1.0);
+
+// After training (weights/bias set externally or loaded)
+MLLIB::MlTensor prediction = regressor.predict(features);
+
+// Access weights
+const Eigen::MatrixXf& W = regressor.weights();  // n_features x n_outputs
+const Eigen::VectorXf& b = regressor.bias();      // n_outputs
+```
+
+| Method | Description |
+|---|---|
+| `predict(input)` | Compute `X * W + b` (regression) or sigmoid/softmax (classification) |
+| `load(path)` / `save(path)` | Serialize weights, bias, and configuration |
+| `weights()` | Access the weight matrix (n_features × n_outputs) |
+| `bias()` | Access the bias vector (n_outputs) |
+| `modelType()` | Returns `"linear"` |
+| `taskType()` | Returns the configured task type |
+
+Constructor parameters:
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `type` | `MlTaskType` | `Regression` | Task type |
+| `regularization` | `double` | `1.0` | L2 regularization strength (λ) |
+
+---
+
+## MlPipeline
+
+Simple scaler → model processing pipeline:
+
+```cpp
+#include <ml/ml_pipeline.h>
+
+MLLIB::MlPipeline pipeline;
+
+// Set up scaler
+MLLIB::MlScaler scaler(MLLIB::MlScaler::StandardScaler);
+pipeline.setScaler(scaler);
+
+// Set up model
+auto model = QSharedPointer<MLLIB::MlOnnxModel>::create();
+model->load("cmne_lstm.onnx");
+pipeline.setModel(model);
+
+// Fit scaler on training data
+pipeline.fitScaler(trainingFeatures);
+
+// Predict (scales input, then runs model)
+MLLIB::MlTensor result = pipeline.predict(testFeatures);
+```
+
+| Method | Description |
+|---|---|
+| `setScaler(scaler)` | Set the feature scaler |
+| `setModel(model)` | Set the model (as `MlModel::SPtr`) |
+| `fitScaler(X)` | Fit the scaler on the given feature matrix |
+| `predict(X)` | Scale (if scaler set) and run model prediction |
+
+---
+
+## MlScaler
+
+Feature scaling with two strategies:
+
+```cpp
+#include <ml/ml_scaler.h>
+
+// StandardScaler: (x - mean) / std
+MLLIB::MlScaler scaler(MLLIB::MlScaler::StandardScaler);
+
+// MinMaxScaler: (x - min) / (max - min)
+MLLIB::MlScaler minmax(MLLIB::MlScaler::MinMaxScaler);
+
+// Fit and transform
+MLLIB::MlTensor scaled = scaler.fitTransform(data);
+
+// Transform new data with learned statistics
+MLLIB::MlTensor newScaled = scaler.transform(newData);
+
+// Undo scaling
+MLLIB::MlTensor original = scaler.inverseTransform(scaled);
+```
+
+| Method | Description |
+|---|---|
+| `fit(data)` | Compute statistics from the data |
+| `transform(data)` | Apply the learned transform |
+| `fitTransform(data)` | Convenience: fit then transform |
+| `inverseTransform(data)` | Undo the scaling |
+
+| Scaler Type | Formula |
+|---|---|
+| `StandardScaler` | $(x - \mu) / \sigma$ |
+| `MinMaxScaler` | $(x - x_{\min}) / (x_{\max} - x_{\min})$ |
+
+---
+
+## MlTensor
+
+N-dimensional tensor with contiguous row-major (C-order) float32 storage. Data is held in a reference-counted buffer, making copy, reshape, and slice O(1). Storage layout is row-major to match ONNX Runtime, PyTorch, and NumPy conventions.
+
+```cpp
+#include <ml/ml_tensor.h>
+
+// From moved buffer
+std::vector<float> buf(1 * 20 * 204, 0.0f);
+MLLIB::MlTensor t1(std::move(buf), {1, 20, 204});
+
+// From Eigen matrix (copied + transposed to row-major)
+Eigen::MatrixXf mat(100, 50);
+MLLIB::MlTensor t2(mat);
+
+// From raw pointer
+float* ptr = ...;
+MLLIB::MlTensor t3(ptr, {10, 20});
+
+// Access shape
+std::vector<int64_t> shape = t1.shape();  // {1, 20, 204}
+
+// Eigen interop (zero-copy map)
+auto eigenMap = t2.matrix();  // RowMajorMatrixMap
+```
+
+### Type Aliases
+
+| Alias | Type |
+|---|---|
+| `RowMajorMatrixXf` | `Eigen::Matrix<float, Dynamic, Dynamic, RowMajor>` |
+| `RowMajorMatrixMap` | `Eigen::Map<RowMajorMatrixXf>` |
+| `ConstRowMajorMatrixMap` | `Eigen::Map<const RowMajorMatrixXf>` |
+
+### Constructors
+
+| Constructor | Description |
+|---|---|
+| `MlTensor()` | Empty 0-element tensor |
+| `MlTensor(data&&, shape)` | From moved `std::vector<float>` buffer and shape |
+| `MlTensor(ptr, shape)` | Copy from raw pointer and shape |
+| `MlTensor(MatrixXf)` | From Eigen column-major matrix (copied to row-major) |
+
+---
+
+## MLTrainer
+
+ML-specific convenience wrapper over `UTILSLIB::PythonRunner` for launching Python training scripts. Not available in WASM builds.
+
+```cpp
+#include <ml/ml_trainer.h>
+
+MLLIB::MLTrainer trainer;
+
+// Check prerequisites
+if (trainer.checkPackages({"torch", "mne", "numpy"})) {
+    // Run training script
+    auto result = trainer.run("scripts/ml/training/train_cmne.py",
+                               {"--epochs", "100", "--lr", "0.001"});
+    if (result.exitCode == 0) {
+        qDebug() << "Training complete";
+    }
+}
+```
+
+| Method | Description |
+|---|---|
+| `run(scriptPath, args)` | Run a Python training script |
+| `checkPackages(packages)` | Verify that required Python packages are importable |
+| `runner()` | Access the underlying `PythonRunner` for callback/config changes |
+
+---
+
+## CMNE Workflow Example
+
+A complete CMNE (Contextual Minimum-Norm Estimate) workflow:
+
+```cpp
+#include <ml/ml_onnx_model.h>
+#include <ml/ml_scaler.h>
+#include <ml/ml_pipeline.h>
+#include <ml/ml_tensor.h>
+
+// 1. Set up pipeline
+MLLIB::MlPipeline pipeline;
+
+MLLIB::MlScaler scaler(MLLIB::MlScaler::StandardScaler);
+pipeline.setScaler(scaler);
+
+auto model = QSharedPointer<MLLIB::MlOnnxModel>::create();
+model->load("models/cmne_lstm_audvis.onnx");
+pipeline.setModel(model);
+
+// 2. Prepare input: sensor data as tensor [batch, time_steps, channels]
+//    e.g., 20 preceding time samples × 204 gradiometer channels
+Eigen::MatrixXf sensorData(20, 204);
+// ... fill with MEG data ...
+
+MLLIB::MlTensor input(sensorData);
+pipeline.fitScaler(input);
+
+// 3. Predict source estimates
+MLLIB::MlTensor sourceEstimate = pipeline.predict(input);
+// Output shape: [1, n_sources] — source amplitudes at the current time point
+```
+
+## MNE-Python Cross-Reference
+
+| MNE-CPP (MLLIB) | Python Equivalent |
+|---|---|
+| `MlOnnxModel` | `onnxruntime.InferenceSession` |
+| `MlLinearModel` | `sklearn.linear_model.Ridge` / `LogisticRegression` |
+| `MlScaler` | `sklearn.preprocessing.StandardScaler` / `MinMaxScaler` |
+| `MlPipeline` | `sklearn.pipeline.Pipeline` |
+| `MlTensor` | `numpy.ndarray` / `torch.Tensor` |
+| `MLTrainer` | Direct Python execution (no equivalent needed) |
+
+## See Also
+
+- [Inverse Estimation API](api-inverse) — MNE, dSPM, sLORETA, CMNE inverse methods
+- [Library API](api) — Overview of all MNE-CPP libraries
+- [Glossary](../manual/glossary) — CMNE, ONNX, and related terms

@@ -1,0 +1,55 @@
+---
+title: mne_evoked_data_summary
+sidebar_label: mne_evoked_data_summary
+---
+
+# mne_evoked_data_summary
+
+## Overview
+
+`mne_evoked_data_summary` prints a human-readable summary of all evoked data sets from a FIFF file. For each evoked set, it displays the set number, comment, aspect kind, nave, time range, total channel count, and a breakdown by channel type (MEG gradiometers, magnetometers, EEG, STIM, EOG, ECG, etc.).
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_evoked_data_summary [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--meas <file>` | Evoked FIFF file |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Example
+
+```bash
+mne_evoked_data_summary --meas sam-ave.fif
+```
+
+Example output:
+
+```
+File: sam-ave.fif
+Number of evoked data sets: 2
+
+--- Set 1 ---
+  Comment    : Left Auditory
+  Type       : Average
+  Nave       : 55
+  Time range : -0.200 to 0.500 s
+  Channels   : 366
+  Channel types:
+    EEG          : 60
+    MEG_GRAD     : 204
+    MEG_MAG      : 102
+```
+
+## See Also
+
+- [mne_change_baselines](tools-change-baselines) — Change baseline in evoked data
+- [mne_change_nave](tools-change-nave) — Modify n_ave field in evoked data

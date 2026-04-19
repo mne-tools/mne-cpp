@@ -1,0 +1,57 @@
+---
+title: mne_transform_points
+sidebar_label: mne_transform_points
+---
+
+# mne_transform_points
+
+## Overview
+
+`mne_transform_points` transforms 3D points between coordinate frames using a FIFF coordinate transform. It reads a set of points from a text file, applies the specified transform (forward or inverse as needed), and writes the transformed points to an output file.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_transform_points [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--trans <name>` | FIFF coordinate transform file |
+| `--in <name>` | Input text file (one point per line: `x y z`) |
+| `--out <name>` | Output text file |
+| `--from <name>` | Source frame name (`head`, `mri`, `device`) |
+| `--to <name>` | Target frame name (`head`, `mri`, `device`) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Example
+
+```bash
+# Transform points from MRI to head coordinates
+mne_transform_points --trans sam-trans.fif --in points_mri.txt \
+    --out points_head.txt --from mri --to head
+
+# Transform from head to device coordinates
+mne_transform_points --trans sam-trans.fif --in points_head.txt \
+    --out points_dev.txt --from head --to device
+```
+
+## Input Format
+
+One point per line, with x, y, z coordinates separated by whitespace. Lines starting with `#` are comments.
+
+```
+# x        y        z
+0.065000   0.023000  0.089000
+0.072000  -0.015000  0.078000
+```
+
+## See Also
+
+- [mne_fit_sphere_to_surf](tools-fit-sphere-to-surf) — Fit sphere to surface points
+- [mne_sensor_locations](tools-sensor-locations) — Export sensor locations to text

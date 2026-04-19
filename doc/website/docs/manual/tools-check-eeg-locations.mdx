@@ -1,0 +1,43 @@
+---
+title: mne_check_eeg_locations
+sidebar_label: mne_check_eeg_locations
+---
+
+# mne_check_eeg_locations
+
+## Overview
+
+`mne_check_eeg_locations` validates EEG electrode positions in a FIFF measurement file. It checks for undefined (all-zero) locations, duplicate positions (within 1 mm tolerance), and electrodes at unexpected distances from the origin (outside the 50–150 mm range typical for head-surface electrodes).
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_check_eeg_locations [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--meas <name>` | Measurement FIFF file |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Checks Performed
+
+1. **Undefined locations** — electrodes with all-zero position coordinates
+2. **Duplicate positions** — pairs of electrodes closer than 1 mm
+3. **Distance from origin** — electrodes outside the expected 50–150 mm radius from the origin
+
+## Example
+
+```bash
+mne_check_eeg_locations --meas sam-raw.fif
+```
+
+## See Also
+
+- [mne_sensor_locations](tools-sensor-locations) — Export sensor locations to text
+- [mne_list_proj](tools-list-proj) — List SSP projectors

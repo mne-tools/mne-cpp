@@ -1,0 +1,52 @@
+---
+title: mne_fit_sphere_to_surf
+sidebar_label: mne_fit_sphere_to_surf
+---
+
+# mne_fit_sphere_to_surf
+
+## Overview
+
+`mne_fit_sphere_to_surf` fits a best-fit sphere to surface points. It reads a FreeSurfer surface or FIFF BEM surface file and uses the simplex method to find the sphere center and radius that best approximate the surface geometry.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_fit_sphere_to_surf [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--surf <name>` | Surface file (FreeSurfer format or FIFF BEM) |
+| `--out <name>` | Output text file with sphere parameters |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Output Format
+
+The output file contains a single line with four space-separated values:
+
+```
+center_x center_y center_z radius
+```
+
+All values are in meters.
+
+## Example
+
+```bash
+# Fit sphere to a FreeSurfer inner skull surface
+mne_fit_sphere_to_surf --surf lh.inner_skull --out sphere.txt
+
+# Fit sphere to a FIFF BEM surface
+mne_fit_sphere_to_surf --surf sam-inner_skull-bem.fif --out sphere.txt
+```
+
+## See Also
+
+- [mne_make_scalp_surfaces](tools-make-scalp-surfaces) — Generate decimated scalp surfaces
+- [mne_transform_points](tools-transform-points) — Transform 3D points between coordinate frames

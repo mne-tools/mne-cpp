@@ -1,0 +1,46 @@
+---
+title: mne_convert_ctf_markers
+sidebar_label: mne_convert_ctf_markers
+---
+
+# mne_convert_ctf_markers
+
+## Overview
+
+`mne_convert_ctf_markers` converts CTF marker files to MNE event format. It parses the CTF marker classification format and outputs events as a text file with one event per line in `sample 0 event_id` format.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_convert_ctf_markers [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--markers <file>` | CTF marker file |
+| `--out <file>` | Output event file (text format) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Output Format
+
+Each line contains three whitespace-separated values:
+
+```
+sample  0  event_id
+```
+
+## Example
+
+```bash
+mne_convert_ctf_markers --markers MarkerFile.mrk --out events.txt
+```
+
+## See Also
+
+- [mne_add_triggers](tools-add-triggers) — Add trigger events to raw data
+- [mne_epochs2mat](tools-epochs2mat) — Export epochs to MATLAB .mat format

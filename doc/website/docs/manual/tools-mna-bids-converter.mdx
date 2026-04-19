@@ -1,0 +1,55 @@
+---
+title: mne_mna_bids_converter
+sidebar_label: mne_mna_bids_converter
+---
+
+# mne_mna_bids_converter
+
+## Overview
+
+`mne_mna_bids_converter` converts between MNA/MNX project files and BIDS directory structures. It supports three commands: **extract** (unpack an MNX/MNA to a BIDS directory tree), **pack** (import a BIDS directory into an MNA/MNX project), and **convert** (convert between MNA JSON and MNX CBOR formats).
+
+## Usage
+
+```bash
+mne_mna_bids_converter <command> [options]
+```
+
+## Commands
+
+| Command | Syntax | Description |
+|---|---|---|
+| `extract` | `extract <input.mnx\|mna> <output_dir>` | Extract files to BIDS directory tree |
+| `pack` | `pack <bids_dir> <output.mnx\|mna>` | Import BIDS directory into MNA/MNX project |
+| `convert` | `convert <input.mna\|mnx> <output.mnx\|mna>` | Convert between MNA (JSON) and MNX (CBOR) |
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--embed` | (pack) Embed file data into the output (default for `.mnx`) |
+| `--no-embed` | (pack) Store file references only (default for `.mna`) |
+| `-h, --help` | Show help |
+| `--version` | Show version |
+
+## Example
+
+```bash
+# Extract embedded files from an MNX project to a BIDS tree
+mne_mna_bids_converter extract analysis.mnx bids_output/
+
+# Import a BIDS directory into an MNX project with embedded data
+mne_mna_bids_converter pack bids_input/ analysis.mnx --embed
+
+# Convert MNA (JSON) to MNX (CBOR)
+mne_mna_bids_converter convert analysis.mna analysis.mnx
+
+# Convert MNX (CBOR) back to MNA (JSON)
+mne_mna_bids_converter convert analysis.mnx analysis.mna
+```
+
+## See Also
+
+- [mne_show_mna](tools-show-mna) — Display MNA project file contents
+- [mne_inverse_pipeline](tools-inverse-pipeline) — Execute MNA graph-based inverse pipeline
+- [MNA Format](mna-format) — MNA project file format specification

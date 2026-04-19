@@ -1,0 +1,44 @@
+---
+title: mne_fix_stim14
+sidebar_label: mne_fix_stim14
+---
+
+# mne_fix_stim14
+
+## Overview
+
+`mne_fix_stim14` recomputes the `STI 014` stimulus channel by combining channels `STI 001` through `STI 006` using binary weighting. This is needed when the combined stimulus channel was not properly recorded or has become corrupted.
+
+The formula is:
+
+```
+STI014 = STI001 + 2×STI002 + 4×STI003 + 8×STI004 + 16×STI005 + 32×STI006
+```
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_fix_stim14 [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--raw <file>` | Input raw FIFF file |
+| `--out <file>` | Output FIFF file |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Example
+
+```bash
+mne_fix_stim14 --raw sam-raw.fif --out sam-fixed-raw.fif
+```
+
+## See Also
+
+- [mne_add_triggers](tools-add-triggers) — Add trigger events to raw data
+- [mne_toggle_skips](tools-toggle-skips) — Toggle skip tags in raw data

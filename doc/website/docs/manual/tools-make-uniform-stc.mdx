@@ -1,0 +1,41 @@
+---
+title: mne_make_uniform_stc
+sidebar_label: mne_make_uniform_stc
+---
+
+# mne_make_uniform_stc
+
+## Overview
+
+`mne_make_uniform_stc` creates a uniform STC source estimate where every vertex has the same value. This is useful for testing visualization pipelines, verifying source space coverage, or creating baseline reference files.
+
+## Usage
+
+```bash
+mne_make_uniform_stc [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--src <file>` | Source space FIFF file |
+| `--val <value>` | Uniform value for all vertices (default: 1.0) |
+| `--out <file>` | Output STC file path |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Example
+
+```bash
+# Create uniform STC with all vertices set to 1.0
+mne_make_uniform_stc --src sam-oct-6-src.fif --out uniform-lh.stc
+
+# Create uniform STC with custom value
+mne_make_uniform_stc --src sam-oct-6-src.fif --val 0.5 --out half-lh.stc
+```
+
+## See Also
+
+- [mne_process_stc](tools-process-stc) — Scale, export, copy STC files
+- [mne_average_estimates](tools-average-estimates) — Weighted average of STC files

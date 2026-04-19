@@ -1,0 +1,41 @@
+---
+title: mne_change_baselines
+sidebar_label: mne_change_baselines
+---
+
+# mne_change_baselines
+
+## Overview
+
+`mne_change_baselines` applies a new baseline correction to evoked data. It reads evoked data sets from a FIFF file without baseline correction, then applies the specified baseline window to all evoked sets in the file.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_change_baselines [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--meas <file>` | Input evoked FIFF file |
+| `--bmin <seconds>` | Baseline start in seconds |
+| `--bmax <seconds>` | Baseline end in seconds |
+| `--out <file>` | Output FIFF file |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Example
+
+```bash
+# Apply baseline correction from -200ms to 0ms
+mne_change_baselines --meas sam-ave.fif --bmin -0.2 --bmax 0.0 --out sam-bl-ave.fif
+```
+
+## See Also
+
+- [mne_change_nave](tools-change-nave) — Modify n_ave field in evoked data
+- [mne_evoked_data_summary](tools-evoked-data-summary) — Print evoked data summary

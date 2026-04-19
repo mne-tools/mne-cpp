@@ -1,0 +1,42 @@
+---
+title: mne_toggle_skips
+sidebar_label: mne_toggle_skips
+---
+
+# mne_toggle_skips
+
+## Overview
+
+`mne_toggle_skips` toggles skip tags in raw FIFF data. This modifies the file in-place, toggling `FIFF_DATA_SKIP` tags between active (skip) and inactive (unskip) states. Skip tags mark segments of raw data that should be excluded from processing.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_toggle_skips [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--raw <file>` | Input raw FIFF file (modified in-place) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+:::caution
+This tool modifies the file in-place. Make a backup before running.
+:::
+
+## Example
+
+```bash
+# Toggle all skip tags in a raw file
+mne_toggle_skips --raw sam-raw.fif
+```
+
+## See Also
+
+- [mne_fix_stim14](tools-fix-stim14) — Fix STI 014 by combining STI 001-006
+- [mne_add_triggers](tools-add-triggers) — Add trigger events to raw data

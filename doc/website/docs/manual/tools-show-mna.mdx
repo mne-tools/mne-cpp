@@ -1,0 +1,45 @@
+---
+title: mne_show_mna
+sidebar_label: mne_show_mna
+---
+
+# mne_show_mna
+
+## Overview
+
+`mne_show_mna` inspects MNA (`.mna`) and MNX (`.mnx`) project files. It displays the project structure including subjects, sessions, recordings, referenced/embedded files, pipeline nodes, and metadata. It can also output the project as formatted JSON.
+
+## Usage
+
+```bash
+mne_show_mna [options] <file>
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `<file>` | Path to a `.mna` or `.mnx` project file (positional argument) |
+| `-V, --verbose` | Show extended details (SHA-256, format, size) |
+| `--json` | Output the project as formatted JSON to stdout |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Example
+
+```bash
+# Display project summary
+mne_show_mna analysis.mna
+
+# Show verbose details including file sizes and checksums
+mne_show_mna --verbose analysis.mnx
+
+# Dump as JSON for scripting
+mne_show_mna --json analysis.mna > project.json
+```
+
+## See Also
+
+- [mne_inverse_pipeline](tools-inverse-pipeline) — Execute MNA graph-based inverse pipeline
+- [mne_mna_bids_converter](tools-mna-bids-converter) — Convert between MNA and BIDS formats
+- [MNA Format](mna-format) — MNA project file format specification

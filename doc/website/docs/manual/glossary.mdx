@@ -13,21 +13,32 @@ A reference of key terms, abbreviations, and concepts used throughout the MNE-CP
 | Term | Definition |
 |---|---|
 | **BEM** | Boundary-Element Model. A numerical method for computing the forward solution by discretizing the boundaries between tissue compartments of different electrical conductivity (scalp, skull, brain). |
+| **CMNE** | Contextual Minimum-Norm Estimate. A deep-learning-based inverse method that uses an LSTM network to incorporate temporal context from preceding time samples. Training in Python (PyTorch), inference via ONNX Runtime in C++. |
 | **Coregistration** | The process of aligning the MEG/EEG head coordinate system with the MRI coordinate system using fiducial landmarks. Stored in a `-trans.fif` file. |
+| **DICS** | Dynamic Imaging of Coherent Sources. A frequency-domain beamformer that estimates source power and coherence using the cross-spectral density matrix. |
 | **dSPM** | Dynamic Statistical Parametric Mapping. A noise-normalized variant of the minimum-norm estimate that produces statistical maps (F-statistic) rather than current amplitudes. |
 | **ECD** | Equivalent Current Dipole. A point-source model used in dipole fitting to localize focal brain activity. |
 | **eLORETA** | Exact Low-Resolution Electromagnetic Tomography. A distributed source localization method with exact zero localization error for single-dipole sources. |
 | **Evoked response** | The averaged brain response time-locked to a stimulus event. Also called event-related field (ERF) for MEG and event-related potential (ERP) for EEG. |
 | **Forward solution** | The theoretical prediction of the magnetic fields and electric potentials at the sensor locations given a set of source dipoles in the brain. |
+| **Gamma-MAP** | Gamma Maximum a Posteriori. A sparse Bayesian inverse method using an EM algorithm with a Gamma hyperprior on source variances to promote focal source distributions. |
 | **Inverse operator** | A matrix that maps measured sensor data to estimated source activity on the cortex or in a volume. Computed from the forward solution and noise-covariance matrix. |
+| **LCMV** | Linearly Constrained Minimum Variance beamformer. A spatial filter that passes signals from a target location while minimizing output power from other sources. |
+| **MNA** | MNE Node-graph for Analysis. A portable project file format (`.mna` JSON / `.mnx` CBOR) that bundles data references, processing parameters, and an executable computational graph into a single manifest. See [MNA Format](mna-format). |
 | **MNE** | Minimum-Norm Estimate. A distributed source localization method that finds the source distribution with minimum overall power that explains the measured data. |
 | **Morphing** | The process of mapping source estimates from one subject's cortical surface to another (e.g., `fsaverage`) for group analysis. |
+| **MxNE** | Mixed-Norm Estimate. A sparse inverse method using L1/L2 mixed norms (group lasso) to find focal sources via iteratively reweighted least squares (IRLS). |
 | **Noise-covariance matrix** | A matrix characterizing the spatial noise statistics of the sensor data. Used to weight channels appropriately in the inverse solution. |
+| **ONNX** | Open Neural Network Exchange. An open format for machine learning models. MNE-CPP uses ONNX Runtime for CMNE inference, loading pre-trained LSTM models for source estimation. |
+| **RAP MUSIC** | Recursively Applied and Projected Multiple Signal Classification. A subspace method for localizing multiple correlated sources by iteratively scanning, finding peaks, and projecting out found sources. |
 | **Regularization** | A mathematical technique to stabilize the ill-posed inverse problem by trading off data fit against solution smoothness. Controlled by the regularization parameter (related to assumed SNR). |
 | **sLORETA** | Standardized Low-Resolution Electromagnetic Tomography. A noise-normalized variant of the minimum-norm estimate with near-zero localization bias for point spread. |
 | **SNR** | Signal-to-Noise Ratio. In MNE, the assumed SNR controls the regularization parameter $\lambda^2 = 1 / \text{SNR}^2$. |
+| **SPHARA** | Spatial Harmonic Analysis. Spatial basis functions computed from the sensor geometry for noise reduction, similar to spatial frequency filtering. |
 | **Source space** | The set of candidate dipole locations (and orientations) on the cortical surface or in a volume where source currents are estimated. |
 | **SSP** | Signal-Space Projection. A method for removing environmental noise and artifacts by projecting data away from known noise subspaces. See [Signal-Space Projection](ssp). |
+| **SSS/tSSS** | Signal Space Separation / temporal SSS. Methods for removing external interference from MEG data by decomposing the measured field into internal and external multipole components. |
+| **xDAWN** | A supervised spatial filter designed to enhance event-related potentials by maximizing the signal-to-signal-plus-noise ratio. Used in BCI and ERP denoising. |
 
 ## MEG/EEG Systems and Sensors
 
@@ -90,6 +101,9 @@ For details on coordinate transformations ($T^-$, $T^+$, $T_1$–$T_4$), see [Fo
 | `.surf` | Surface | FreeSurfer binary surface file (vertices + triangles). |
 | `.mgh` / `.mgz` | MRI volume | FreeSurfer MRI volume format (uncompressed / compressed). |
 | `.hpts` | Head points | Text file with digitization point coordinates. See [Data Conversion — hpts format](data-conversion#the-hpts-format). |
+| `.mna` | MNA (JSON) | MNE analysis project file — data references, parameters, and executable graph. See [MNA Format](mna-format). |
+| `.mnx` | MNA (CBOR) | Binary MNA project file in CBOR encoding. Same schema as `.mna` but more compact. Can also serve as a container file that encapsulates linked data files (raw, evoked, forward solutions, etc.) into a single self-contained archive. |
+| `.onnx` | ONNX | Open Neural Network Exchange model file. Used for CMNE LSTM inference. |
 
 ## Environment Variables
 

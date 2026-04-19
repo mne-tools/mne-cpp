@@ -1,0 +1,66 @@
+---
+title: mne_compute_cmne
+sidebar_label: mne_compute_cmne
+---
+
+# mne_compute_cmne
+
+## Overview
+
+`mne_compute_cmne` computes Contextual Minimum-Norm Estimate (CMNE) source time courses from evoked data, or trains / fine-tunes the LSTM correction model. Three modes of operation are available: **compute** (apply dSPM + LSTM correction and write STC files), **train** (train CMNE LSTM from FIFF files and export ONNX), and **finetune** (continue training from an existing model).
+
+This is a C++ port of the original CMNE algorithm by Christoph Dinh.
+
+## Usage
+
+```bash
+mne_compute_cmne [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--mode <mode>` | Operation mode: `compute`, `train`, or `finetune` (default: `compute`) |
+| `--fwd <file>` | Forward solution FIFF file |
+| `--cov <file>` | Noise covariance FIFF file |
+| `--snr <value>` | Signal-to-noise ratio (default: 3.0) |
+| `--method <name>` | Inverse method: `MNE`, `dSPM`, `sLORETA`, `eLORETA` (default: `dSPM`) |
+| `--look-back <k>` | Number of past time steps k (default: 80) |
+| `--evoked <file>` | Evoked data FIFF file (compute mode) |
+| `--onnx <file>` | ONNX model for LSTM correction (compute mode) |
+| `--out <prefix>` | Output STC prefix; writes `<prefix>-dspm.stc` and `<prefix>-cmne.stc` |
+| `--setno <n>` | Evoked data set number (default: 0) |
+| `--epochs <file>` | MNE Epochs FIFF file (train/finetune mode) |
+| `--gt-stc <prefix>` | Ground-truth STC prefix (optional; omit for pseudo-GT mode) |
+| `--onnx-out <file>` | Output ONNX model path (train/finetune mode, default: `cmne_lstm.onnx`) |
+| `--hidden <n>` | LSTM hidden dimension (default: 256) |
+| `--layers <n>` | Number of LSTM layers (default: 1) |
+| `--train-epochs <n>` | Number of training epochs (default: 50) |
+| `--lr <value>` | Learning rate (default: 0.001) |
+| `--batch <n>` | Batch size (default: 64) |
+| `--finetune <file>` | Existing ONNX model to fine-tune from |
+| `--python <exe>` | Python interpreter (default: `python3`) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Example
+
+```bash
+# Compute CMNE source estimates from evoked data
+mne_compute_cmne --mode compute --fwd sam-meg-fwd.fif --cov sam-cov.fif \
+    --evoked sam-ave.fif --onnx cmne_lstm.onnx --out sam-result
+
+# Train CMNE LSTM model
+mne_compute_cmne --mode train --fwd sam-meg-fwd.fif --cov sam-cov.fif \
+    --epochs sam-epo.fif --onnx-out cmne_lstm.onnx
+
+# Fine-tune an existing model
+mne_compute_cmne --mode finetune --fwd sam-meg-fwd.fif --cov sam-cov.fif \
+    --epochs sam-epo.fif --finetune cmne_lstm.onnx --onnx-out cmne_v2.onnx
+```
+
+## See Also
+
+- [mne_inverse_pipeline](tools-inverse-pipeline) — Execute MNA graph-based inverse pipeline
+- [mne_sensitivity_map](tools-sensitivity-map) — Compute sensitivity maps from forward solutions

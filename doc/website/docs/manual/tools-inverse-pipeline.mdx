@@ -1,0 +1,45 @@
+---
+title: mne_inverse_pipeline
+sidebar_label: mne_inverse_pipeline
+---
+
+# mne_inverse_pipeline
+
+## Overview
+
+`mne_inverse_pipeline` executes an MNA graph-based pipeline for inverse source estimation. It reads a `.mna` project file describing a pipeline of processing nodes (load → filter → covariance → forward → inverse), validates the directed acyclic graph (DAG), and executes it in topological order.
+
+## Usage
+
+```bash
+mne_inverse_pipeline [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `-p, --project <file>` | Path to the `.mna` project file |
+| `-n, --dry-run` | Validate the graph without executing it |
+| `--list-ops` | List all registered operators and exit |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Example
+
+```bash
+# Execute an inverse pipeline
+mne_inverse_pipeline --project analysis.mna
+
+# Validate without executing
+mne_inverse_pipeline --project analysis.mna --dry-run
+
+# List available operators
+mne_inverse_pipeline --list-ops
+```
+
+## See Also
+
+- [mne_show_mna](tools-show-mna) — Display MNA project file contents
+- [mne_compute_cmne](tools-compute-cmne) — Compute CMNE source estimates
+- [MNA Format](mna-format) — MNA project file format specification

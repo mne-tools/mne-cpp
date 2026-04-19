@@ -1,0 +1,43 @@
+---
+title: mne_label_ssp
+sidebar_label: mne_label_ssp
+---
+
+# mne_label_ssp
+
+## Overview
+
+`mne_label_ssp` creates SSP (Signal Space Projection) projectors from cortical label ROIs. Given a forward solution and one or more FreeSurfer label files, it extracts the forward model columns corresponding to each label's vertices, computes the SVD, and creates projection vectors that suppress activity from those regions.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_label_ssp [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--fwd <file>` | Forward solution file |
+| `--label <file>` | Label file (can be specified multiple times) |
+| `--ncomp <n>` | Number of components per label (default: 1) |
+| `--out <file>` | Output projector file |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Example
+
+```bash
+# Create SSP projectors from two label ROIs
+mne_label_ssp --fwd sam-meg-fwd.fif \
+    --label lh.V1.label --label rh.V1.label \
+    --ncomp 2 --out v1-proj.fif
+```
+
+## See Also
+
+- [mne_list_proj](tools-list-proj) — List SSP projectors from a FIFF file
+- [mne_sensitivity_map](tools-sensitivity-map) — Compute sensitivity maps from forward solutions

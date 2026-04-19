@@ -1,0 +1,349 @@
+---
+title: "Statistics Library API"
+sidebar_label: "Statistics"
+---
+
+# Statistics Library API
+
+The `mne_sts` library (`STSLIB` namespace) provides statistical testing and evaluation tools for MEG/EEG analysis: parametric tests (t-tests, F-tests), non-parametric cluster permutation testing, multiple comparison correction, covariance estimation with shrinkage methods, spatial adjacency construction, and source-level evaluation metrics.
+
+```cmake
+target_link_libraries(my_app PRIVATE mne_sts)
+```
+
+Dependencies: `mne_utils`, `mne_fiff`, Qt6::Core, Eigen3.
+
+## Class Inventory
+
+| Class / Struct | Header | Description |
+|---|---|---|
+| `StatsTtest` | `sts/sts_ttest.h` | One-sample, paired, and independent t-tests |
+| `StatsTtestResult` | `sts/sts_ttest.h` | Result structure for t-tests (t-statistics, p-values, df) |
+| `StatsFtest` | `sts/sts_ftest.h` | One-way ANOVA F-test |
+| `StatsFtestResult` | `sts/sts_ftest.h` | Result structure for F-tests (F-statistics, p-values, df) |
+| `StatsCluster` | `sts/sts_cluster.h` | Cluster-based permutation testing |
+| `StatsClusterResult` | `sts/sts_cluster.h` | Result structure for cluster permutation tests |
+| `StsCovEstimators` | `sts/sts_cov_estimators.h` | Covariance estimators (Ledoit-Wolf shrinkage) |
+| `StatsAdjacency` | `sts/sts_adjacency.h` | Adjacency matrix construction from channel positions or source spaces |
+| `StatsMcCorrection` | `sts/sts_correction.h` | Multiple comparison correction (Bonferroni, Holm-Bonferroni, FDR) |
+| `StatsSourceMetrics` | `sts/sts_source_metrics.h` | Source-space evaluation metrics (localization error, spatial dispersion) |
+
+### Enumerations (`sts/sts_types.h`)
+
+| Enum | Values | Description |
+|---|---|---|
+| `StatsTailType` | `Left`, `Right`, `Both` | Tail type for statistical tests |
+| `StatsCorrection` | `None`, `Bonferroni`, `Fdr`, `ClusterPermutation` | Multiple comparison correction method |
+
+---
+
+## StatsTtest
+
+Parametric t-tests: one-sample, paired, and independent two-sample.
+
+```cpp
+#include <sts/sts_ttest.h>
+
+// One-sample t-test (each column tested against mu=0)
+Eigen::MatrixXd data(30, 100);  // 30 subjects × 100 time points
+auto result = STSLIB::StatsTtest::oneSample(data, 0.0, STSLIB::StatsTailType::Both);
+// result.matTstat: 1 × 100 t-statistics
+// result.matPval:  1 × 100 p-values
+// result.degreesOfFreedom: 29
+
+// Paired t-test
+Eigen::MatrixXd condA(30, 100), condB(30, 100);
+auto paired = STSLIB::StatsTtest::paired(condA, condB);
+```
+
+### Methods
+
+| Method | Description |
+|---|---|
+| `oneSample(data, mu, tail)` | One-sample t-test. Each column of `data` is tested against `mu`. |
+| `paired(dataA, dataB, tail)` | Paired t-test. Tests `dataA - dataB` against 0. |
+| `independent(dataA, dataB, tail)` | Independent two-sample t-test. |
+
+### StatsTtestResult
+
+| Member | Type | Description |
+|---|---|---|
+| `matTstat` | `Eigen::MatrixXd` | t-statistics (same shape as input columns) |
+| `matPval` | `Eigen::MatrixXd` | p-values |
+| `degreesOfFreedom` | `int` | Degrees of freedom |
+
+---
+
+## StatsFtest
+
+One-way ANOVA F-test for comparing multiple groups:
+
+```cpp
+#include <sts/sts_ftest.h>
+
+QVector<Eigen::MatrixXd> groups;
+groups.append(group1);  // n_obs × n_variables
+groups.append(group2);
+groups.append(group3);
+
+auto result = STSLIB::StatsFtest::oneWay(groups);
+// result.matFstat: F-statistics
+// result.matPval:  p-values
+// result.dfBetween, result.dfWithin: degrees of freedom
+```
+
+### Methods
+
+| Method | Description |
+|---|---|
+| `oneWay(groups)` | One-way ANOVA F-test |
+| `fCdf(f, df1, df2)` | CDF of the F-distribution (regularized incomplete beta function) |
+
+### StatsFtestResult
+
+| Member | Type | Description |
+|---|---|---|
+| `matFstat` | `Eigen::MatrixXd` | F-statistics |
+| `matPval` | `Eigen::MatrixXd` | p-values |
+| `dfBetween` | `int` | Between-groups degrees of freedom |
+| `dfWithin` | `int` | Within-groups degrees of freedom |
+
+---
+
+## StatsCluster
+
+Cluster-based permutation test for comparing two conditions while controlling for multiple comparisons through spatial-temporal clustering:
+
+```cpp
+#include <sts/sts_cluster.h>
+#include <sts/sts_adjacency.h>
+
+// Build adjacency matrix from channel positions
+auto adjacency = STSLIB::StatsAdjacency::fromChannelPositions(fiffInfo);
+
+// Per-subject data: each matrix is nChannels × nTimes
+QVector<Eigen::MatrixXd> condA, condB;
+for (int s = 0; s < nSubjects; ++s) {
+    condA.append(subjectDataA[s]);
+    condB.append(subjectDataB[s]);
+}
+
+// Run cluster permutation test
+auto result = STSLIB::StatsCluster::permutationTest(
+    condA, condB, adjacency,
+    1024,    // nPermutations
+    0.05,    // clusterAlpha (initial threshold)
+    0.05);   // pThreshold (significance)
+
+// Examine significant clusters
+for (int c = 0; c < result.vecClusterPvals.size(); ++c) {
+    if (result.vecClusterPvals[c] < 0.05) {
+        qDebug() << "Cluster" << c
+                 << "stat:" << result.vecClusterStats[c]
+                 << "p:" << result.vecClusterPvals[c];
+    }
+}
+```
+
+### Methods
+
+| Method | Description |
+|---|---|
+| `permutationTest(dataA, dataB, adjacency, nPermutations, clusterAlpha, pThreshold, tail)` | Cluster-based permutation test |
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `dataA` | `QVector<Eigen::MatrixXd>` | — | Per-subject data for condition A (nChannels × nTimes) |
+| `dataB` | `QVector<Eigen::MatrixXd>` | — | Per-subject data for condition B |
+| `adjacency` | `Eigen::SparseMatrix<int>` | — | Spatial adjacency matrix |
+| `nPermutations` | `int` | `1024` | Number of random permutations |
+| `clusterAlpha` | `double` | `0.05` | Alpha level for initial thresholding |
+| `pThreshold` | `double` | `0.05` | p-value threshold for reporting |
+| `tail` | `StatsTailType` | `Both` | Tail type |
+
+### StatsClusterResult
+
+| Member | Type | Description |
+|---|---|---|
+| `matTObs` | `Eigen::MatrixXd` | Observed t-statistic map (nChannels × nTimes) |
+| `vecClusterStats` | `QVector<double>` | Sum of t-values for each observed cluster |
+| `vecClusterPvals` | `QVector<double>` | p-value for each observed cluster |
+| `matClusterIds` | `Eigen::MatrixXi` | Cluster label at each (channel, time) point; 0 = not in cluster |
+| `clusterThreshold` | `double` | t-threshold used for clustering |
+
+---
+
+## StatsAdjacency
+
+Build spatial adjacency matrices for cluster permutation testing:
+
+```cpp
+#include <sts/sts_adjacency.h>
+
+// From channel positions (distance threshold = 3× median nearest-neighbor distance)
+auto chAdj = STSLIB::StatsAdjacency::fromChannelPositions(info);
+
+// From channel positions with channel selection
+auto chAdj2 = STSLIB::StatsAdjacency::fromChannelPositions(info, {"MEG 0111", "MEG 0121"});
+
+// From a triangulated source space
+auto srcAdj = STSLIB::StatsAdjacency::fromTriangulation(tris, nVertices);
+```
+
+### Methods
+
+| Method | Description |
+|---|---|
+| `fromChannelPositions(info, picks)` | Build adjacency from `FiffInfo` channel positions |
+| `fromTriangulation(tris, nVertices)` | Build adjacency from a triangulated surface mesh |
+
+---
+
+## StsCovEstimators
+
+Covariance matrix estimators with shrinkage methods:
+
+```cpp
+#include <sts/sts_cov_estimators.h>
+
+// Zero-mean data: n_channels × n_samples
+Eigen::MatrixXd data(306, 10000);
+
+// Ledoit-Wolf optimal shrinkage estimator
+auto [cov, alpha] = STSLIB::StsCovEstimators::ledoitWolf(data);
+qDebug() << "Shrinkage coefficient:" << alpha;
+// cov: 306 × 306 shrunk covariance matrix
+```
+
+### Methods
+
+| Method | Description |
+|---|---|
+| `ledoitWolf(data)` | Ledoit-Wolf optimal shrinkage covariance estimator. Returns `std::pair<Eigen::MatrixXd, double>` (covariance matrix, shrinkage coefficient $\alpha \in [0,1]$). |
+
+The Ledoit-Wolf estimator computes the optimal linear shrinkage coefficient analytically using the formula from Ledoit & Wolf (2004), producing a well-conditioned covariance matrix even when the number of variables exceeds the number of observations.
+
+---
+
+## StatsMcCorrection
+
+Multiple comparison correction methods:
+
+```cpp
+#include <sts/sts_correction.h>
+
+Eigen::MatrixXd pvals = result.matPval;
+
+// Bonferroni: corrected_p = min(p × n, 1.0)
+auto bonf = STSLIB::StatsMcCorrection::bonferroni(pvals);
+
+// Holm-Bonferroni step-down
+auto holm = STSLIB::StatsMcCorrection::holmBonferroni(pvals);
+
+// FDR (Benjamini-Hochberg)
+auto fdr = STSLIB::StatsMcCorrection::fdr(pvals, 0.05);
+```
+
+### Methods
+
+| Method | Description |
+|---|---|
+| `bonferroni(pValues)` | Bonferroni correction: $p_{\text{corr}} = \min(p \times n, 1)$ |
+| `holmBonferroni(pValues)` | Holm-Bonferroni step-down correction |
+| `fdr(pValues, alpha)` | False Discovery Rate (Benjamini-Hochberg) correction |
+
+---
+
+## StatsSourceMetrics
+
+Source-space evaluation metrics for inverse solutions, as used in CMNE evaluation (Dinh et al., 2021):
+
+```cpp
+#include <sts/sts_source_metrics.h>
+
+// Peak localization error
+Eigen::Vector3d truePos(0.03, -0.02, 0.06);
+Eigen::Vector3d estPos(0.032, -0.019, 0.058);
+double pe = STSLIB::StatsSourceMetrics::peakLocalizationError(truePos, estPos);
+qDebug() << "PE:" << pe << "m";
+
+// Spatial dispersion
+Eigen::VectorXd amplitudes(7498);
+Eigen::MatrixXd positions(7498, 3);
+int peakIdx = STSLIB::StatsSourceMetrics::findPeakIndex(amplitudes);
+double sd = STSLIB::StatsSourceMetrics::spatialDispersion(amplitudes, positions, peakIdx);
+qDebug() << "SD:" << sd << "m";
+```
+
+### Methods
+
+| Method | Description |
+|---|---|
+| `peakLocalizationError(truePos, estimatedPos)` | Euclidean distance between true and estimated peak position |
+| `spatialDispersion(amplitudes, positions, peakIndex)` | Amplitude-weighted mean distance from peak: $\text{SD} = \sum_k \|a_k\| \cdot d(k, \text{peak}) / \sum_k \|a_k\|$ |
+| `findPeakIndex(amplitudes)` | Find the index of the source with maximum absolute amplitude |
+
+---
+
+## Complete Example: Cluster Permutation Test
+
+```cpp
+#include <fiff/fiff_info.h>
+#include <sts/sts_ttest.h>
+#include <sts/sts_cluster.h>
+#include <sts/sts_adjacency.h>
+#include <sts/sts_correction.h>
+
+// Load measurement info for channel positions
+FIFFLIB::FiffInfo info = ...;
+
+// Build spatial adjacency
+auto adjacency = STSLIB::StatsAdjacency::fromChannelPositions(info);
+
+// Collect per-subject evoked data for two conditions
+QVector<Eigen::MatrixXd> auditory, visual;
+for (int s = 0; s < 20; ++s) {
+    auditory.append(loadEvoked(s, "auditory"));  // nChannels × nTimes
+    visual.append(loadEvoked(s, "visual"));
+}
+
+// Run cluster permutation test
+auto clusterResult = STSLIB::StatsCluster::permutationTest(
+    auditory, visual, adjacency, 2048, 0.05, 0.05);
+
+// Report significant clusters
+for (int c = 0; c < clusterResult.vecClusterPvals.size(); ++c) {
+    if (clusterResult.vecClusterPvals[c] < 0.05) {
+        qDebug() << QString("Significant cluster %1: stat=%2, p=%3")
+                        .arg(c)
+                        .arg(clusterResult.vecClusterStats[c])
+                        .arg(clusterResult.vecClusterPvals[c]);
+    }
+}
+```
+
+## MNE-Python Cross-Reference
+
+| MNE-CPP (STSLIB) | MNE-Python Equivalent |
+|---|---|
+| `StatsTtest::oneSample` | `scipy.stats.ttest_1samp` |
+| `StatsTtest::paired` | `scipy.stats.ttest_rel` |
+| `StatsTtest::independent` | `scipy.stats.ttest_ind` |
+| `StatsFtest::oneWay` | `scipy.stats.f_oneway` |
+| `StatsCluster::permutationTest` | `mne.stats.spatio_temporal_cluster_test` |
+| `StsCovEstimators::ledoitWolf` | `sklearn.covariance.LedoitWolf` / `mne.compute_covariance(method='ledoit_wolf')` |
+| `StatsAdjacency::fromChannelPositions` | `mne.channels.find_ch_adjacency` |
+| `StatsAdjacency::fromTriangulation` | `mne.spatial_src_adjacency` |
+| `StatsMcCorrection::bonferroni` | `mne.stats.bonferroni_correction` |
+| `StatsMcCorrection::fdr` | `mne.stats.fdr_correction` |
+| `StatsSourceMetrics::peakLocalizationError` | Custom (no built-in equivalent) |
+| `StatsSourceMetrics::spatialDispersion` | Custom (no built-in equivalent) |
+
+## See Also
+
+- [DSP Library API](api-dsp) — Filtering, spectral analysis, and preprocessing
+- [Inverse Library API](api-inverse) — Source estimation methods
+- [Library API](api) — Overview of all MNE-CPP libraries
+- [Glossary](../manual/glossary) — Statistical terms and definitions

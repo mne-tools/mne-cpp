@@ -1,0 +1,47 @@
+---
+title: mne_epochs2mat
+sidebar_label: mne_epochs2mat
+---
+
+# mne_epochs2mat
+
+## Overview
+
+`mne_epochs2mat` exports epochs from a raw FIFF file to MATLAB Level 5 MAT files. It reads events from a text file, extracts epochs around matching events with specified time bounds, and writes each epoch as a separate `.mat` file containing the data matrix, sampling frequency, and time vector.
+
+## Usage
+
+```bash
+mne_epochs2mat [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--raw <file>` | Raw FIFF file |
+| `--event <file>` | Event file (text: `sample prev event_id`) |
+| `--tmin <sec>` | Epoch start time in seconds (e.g., `-0.2`) |
+| `--tmax <sec>` | Epoch end time in seconds (e.g., `0.5`) |
+| `--event-id <id>` | Event ID to extract |
+| `--out <dir>` | Output directory for `.mat` files |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Example
+
+```bash
+# Export epochs for event ID 1, from -200ms to 500ms
+mne_epochs2mat --raw sam-raw.fif --event events.txt \
+    --tmin -0.2 --tmax 0.5 --event-id 1 --out epochs/
+```
+
+Output files are named `epoch_001.mat`, `epoch_002.mat`, etc. Each file contains:
+- `data` — channels × time points matrix
+- `sfreq` — sampling frequency
+- `times` — time vector in seconds
+
+## See Also
+
+- [mne_convert_ctf_markers](tools-convert-ctf-markers) — Convert CTF markers to MNE event format
+- [mne_mna_bids_converter](tools-mna-bids-converter) — Convert between MNA and BIDS formats
