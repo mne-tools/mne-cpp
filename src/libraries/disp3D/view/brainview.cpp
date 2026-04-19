@@ -1449,9 +1449,11 @@ void BrainView::render(QRhiCommandBuffer *cb)
         // This means all surfaces share the same shader — no per-category
         // shader differentiation (e.g. holographic sensors) on WASM.
         {
+            const SubView &sv = (m_viewMode == MultiView) ? m_subViews[0] : m_singleView;
             QVector<BrainSurface*> allSurfaces;
             for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
                 if (!it.value()->isVisible()) continue;
+                if (!sv.shouldRenderSurface(it.key())) continue;
                 allSurfaces.append(it.value().get());
             }
             if (!allSurfaces.isEmpty())
