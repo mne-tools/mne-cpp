@@ -748,6 +748,53 @@ public slots:
      */
     void setRealtimeSensorColormap(const QString &name);
 
+    // ── Data removal ───────────────────────────────────────────────────
+
+    /**
+     * Remove all brain surfaces (pial, white, inflated) and their annotations.
+     */
+    void clearSurfaces();
+
+    /**
+     * Remove all BEM surfaces from the scene.
+     */
+    void clearBem();
+
+    /**
+     * Remove source estimate data and restore surface colours.
+     */
+    void clearSourceEstimate();
+
+    /**
+     * Remove dipole objects from the scene.
+     */
+    void clearDipoles();
+
+    /**
+     * Remove source space points from the scene.
+     */
+    void clearSourceSpace();
+
+    /**
+     * Remove sensor geometry, digitizer points, and the MEG helmet surface.
+     */
+    void clearSensors();
+
+    /**
+     * Remove evoked / sensor field mapping data.
+     */
+    void clearEvoked();
+
+    /**
+     * Remove the head-to-MRI coordinate transformation.
+     */
+    void clearTransformation();
+
+    /**
+     * Remove the connectivity network from the scene.
+     */
+    void clearNetwork();
+
 signals:
     //=========================================================================================================
     /**
@@ -856,6 +903,7 @@ private:
     const ViewVisibilityProfile& visibilityProfileForTarget(int target) const;
 
     void refreshSensorTransforms();
+    void removeSurfacesByPrefix(const QString &prefix);
 
 protected:
     void initialize(QRhiCommandBuffer *cb) override;

@@ -42,6 +42,7 @@
 #include <QMainWindow>
 #include <QElapsedTimer>
 #include <QStringList>
+#include <mna/mna_types.h>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -147,6 +148,11 @@ private:
      * Track a loaded file path and its role for later export.
      */
     void trackLoadedFile(const QString &path, int role);
+
+    /**
+     * Unload data of the given role from the 3D scene.
+     */
+    void unloadFileFromScene(MNALIB::MnaFileRole role, const QString &path = QString());
 
     /**
      * Handle close event — save settings before closing.

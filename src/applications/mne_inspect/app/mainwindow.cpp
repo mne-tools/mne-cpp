@@ -88,6 +88,8 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QClipboard>
+#include <QDesktopServices>
+#include <QUrl>
 
 #ifdef WASMBUILD
 #include <QBuffer>
@@ -1337,6 +1339,7 @@ void MainWindow::setupConnections()
             if (m_brainView->loadDipoles(path)) {
                 m_dipoleGroup->setEnabled(true);
                 m_showDipoleCheck->setEnabled(true);
+                trackLoadedFile(path, static_cast<int>(MnaFileRole::Custom));
             }
         });
 #else
@@ -1345,6 +1348,7 @@ void MainWindow::setupConnections()
         if (m_brainView->loadDipoles(path)) {
             m_dipoleGroup->setEnabled(true);
             m_showDipoleCheck->setEnabled(true);
+            trackLoadedFile(path, static_cast<int>(MnaFileRole::Custom));
         }
 #endif
     });
@@ -2108,6 +2112,53 @@ void MainWindow::trackLoadedFile(const QString &path, int role)
 
 //=============================================================================================================
 
+void MainWindow::unloadFileFromScene(MnaFileRole role, const QString &path)
+{
+    if (!m_brainView) return;
+
+    switch (role) {
+    case MnaFileRole::Surface:
+    case MnaFileRole::Annotation:
+        m_brainView->clearSurfaces();
+        m_surfGroup->setEnabled(false);
+        break;
+    case MnaFileRole::Bem:
+        m_brainView->clearBem();
+        m_bemGroup->setEnabled(false);
+        break;
+    case MnaFileRole::SourceEstimate:
+        m_brainView->clearSourceEstimate();
+        m_stcGroup->setEnabled(false);
+        break;
+    case MnaFileRole::SourceSpace:
+        m_brainView->clearSourceSpace();
+        m_srcSpaceGroup->setEnabled(false);
+        break;
+    case MnaFileRole::Digitizer:
+        m_brainView->clearSensors();
+        m_sensorGroup->setEnabled(false);
+        break;
+    case MnaFileRole::Transform:
+        m_brainView->clearTransformation();
+        break;
+    case MnaFileRole::Evoked:
+        m_brainView->clearEvoked();
+        m_evokedGroup->setEnabled(false);
+        break;
+    case MnaFileRole::Custom:
+        // Dipole files use Custom role
+        if (path.endsWith(".dip") || path.endsWith(".bdip")) {
+            m_brainView->clearDipoles();
+            m_dipoleGroup->setEnabled(false);
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+//=============================================================================================================
+
 void MainWindow::importMnaProject(const QString &path)
 {
     MnaProject proj = MnaIO::read(path);
@@ -2434,12 +2485,19 @@ void MainWindow::createLoadedFilesDock()
 
         QMenu menu;
         QAction *removeAct = menu.addAction("Remove");
+#ifndef WASMBUILD
+        QAction *showInFinderAct = menu.addAction("Show in Finder");
+#endif
         QAction *copyPathAct = menu.addAction("Copy Path");
 
         QAction *chosen = menu.exec(m_loadedFilesTree->viewport()->mapToGlobal(pos));
 
         if (chosen == removeAct) {
             QString path = item->text(2);
+            int role = item->data(0, Qt::UserRole).toInt();
+            // Unload from 3D scene based on role
+            unloadFileFromScene(static_cast<MnaFileRole>(role), path);
+            // Remove from tracking list
             for (int i = m_loadedFiles.size() - 1; i >= 0; --i) {
                 if (m_loadedFiles[i].first == path) {
                     m_loadedFiles.removeAt(i);
@@ -2447,8 +2505,32 @@ void MainWindow::createLoadedFilesDock()
                 }
             }
             delete item;
+            if (m_statusLabel)
+                m_statusLabel->setText("Ready");
+#ifndef WASMBUILD
+        } else if (chosen == showInFinderAct) {
+            QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(item->text(2)).absolutePath()));
+#endif
         } else if (chosen == copyPathAct) {
             QApplication::clipboard()->setText(item->text(2));
+        }
+    });
+
+    // Double-click on STC entry activates it in the STC combo box
+    connect(m_loadedFilesTree, &QTreeWidget::itemDoubleClicked, [this](QTreeWidgetItem *item, int /*column*/) {
+        if (!item) return;
+        int role = item->data(0, Qt::UserRole).toInt();
+        if (static_cast<MnaFileRole>(role) == MnaFileRole::SourceEstimate) {
+            QString fileName = item->text(0);
+            // Match against STC combo entries
+            QString baseName = fileName;
+            baseName.replace("-lh.stc", "").replace("-rh.stc", "");
+            for (int i = 0; i < m_stcCombo->count(); ++i) {
+                if (m_stcCombo->itemText(i) == baseName) {
+                    m_stcCombo->setCurrentIndex(i);
+                    return;
+                }
+            }
         }
     });
 
@@ -2466,6 +2548,7 @@ void MainWindow::addLoadedFileEntry(const QString &path, int role)
     item->setText(0, QFileInfo(path).fileName());
     item->setText(1, mnaFileRoleToString(static_cast<MnaFileRole>(role)));
     item->setText(2, path);
+    item->setData(0, Qt::UserRole, role);
     m_loadedFilesTree->addTopLevelItem(item);
 
     // Update status bar

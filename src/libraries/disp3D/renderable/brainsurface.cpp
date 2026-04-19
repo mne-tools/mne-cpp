@@ -303,6 +303,16 @@ void BrainSurface::applySourceEstimateColors(const QVector<uint32_t> &colors)
 
 //=============================================================================================================
 
+void BrainSurface::clearSourceEstimateColors()
+{
+    m_stcColors.clear();
+    m_visMode = ModeSurface;
+    updateVertexColors();
+    m_gpu->dirty = true;
+}
+
+//=============================================================================================================
+
 void BrainSurface::setUseDefaultColor(bool useDefault)
 {
     m_baseColor = useDefault ? m_defaultColor : Qt::white;

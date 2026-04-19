@@ -231,6 +231,11 @@ public:
      * @param[in] colors     Vector of packed ABGR colors, one per vertex.
      */
     void applySourceEstimateColors(const QVector<uint32_t> &colors);
+
+    /**
+     * Clear source estimate overlay colors and restore curvature-based coloring.
+     */
+    void clearSourceEstimateColors();
     
     //=========================================================================================================
     /**
