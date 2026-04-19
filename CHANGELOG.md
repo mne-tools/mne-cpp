@@ -19,6 +19,19 @@ All notable changes to MNE-CPP will be documented in this file.
 - **FiffAnnotations integration**: `AnnotationModel` refactored to use `FiffAnnotations` as backing store instead of internal `QVector<AnnotationEntry>`, with `fiffAnnotations()` / `setFiffAnnotations()` public accessors
 - **Python cross-validation tests**: Added `GUARD_PYTHON` / `GUARD_PYTHON_PACKAGE` macros ensuring Python-dependent tests fail in CI (`MNE_REQUIRE_PYTHON=true`) instead of silently skipping
 - **PythonTestHelper extensions**: Added `writeMatrix()`, `readMatrix()`, and `evalMatrixViaFile()` convenience methods for Eigen↔NumPy round-trip validation
+- **MNA Scan plugin registry**: Added `scan-plugins.json` schema and `MnaScanTypes` class for declaring MNE Scan plugins as MNA operator schemas
+- **W-file I/O**: Added `read_w` and `write_w` methods to `FiffStream` for FreeSurfer `.w` format surface data
+- **Cortical surface mapping**: New `MNECorticalMap` class with `icoDownsample()` for icosahedral downsampling, `smoothOperator()` for nearest-neighbor surface smoothing, and `computeMorphMaps()` for cross-subject cortical morphing
+- **Scalp surface generation**: Added `makeScalpSurfaces()` to `MNEBemSurface` for creating decimated scalp meshes at multiple resolutions
+- **Processing history**: Added `copyProcessingHistory()` to `FiffStream` for transferring processing provenance between FIFF files
+
+### Command-Line Tools
+
+- **Inverse tools** (7 new): `mne_compute_cmne` (CMNE source estimation via ONNX Runtime), `mne_inverse_pipeline` (MNA graph-based inverse pipeline), `mne_label_ssp` (SSP projectors from cortical ROIs), `mne_average_estimates` (weighted STC averaging), `mne_process_stc` (STC scale/export/copy), `mne_make_uniform_stc` (uniform STC for testing), `mne_map_data` (evoked data remapping between sensor arrays)
+- **Preprocessing tools** (7 new): `mne_add_triggers` (insert trigger events), `mne_change_baselines` (modify evoked baselines), `mne_change_nave` (modify n_ave field), `mne_copy_processing_history` (copy processing provenance), `mne_fix_stim14` (reconstruct STI 014 from STI 001–006), `mne_make_derivations` (text derivation to FIFF), `mne_toggle_skips` (toggle raw skip tags)
+- **Info tools** (6 new): `mne_check_eeg_locations` (validate EEG positions), `mne_evoked_data_summary` (print evoked summaries), `mne_list_coil_def` (list coil definitions), `mne_list_proj` (list SSP projectors), `mne_sensor_locations` (export sensor locations to text), `mne_show_mna` (display MNA project contents)
+- **Forward tools** (3 new): `mne_fit_sphere_to_surf` (fit sphere to surface points), `mne_make_scalp_surfaces` (generate decimated scalp meshes), `mne_transform_points` (transform 3D points between coordinate frames)
+- **Conversion tools** (3 new): `mne_convert_ctf_markers` (CTF markers to FIFF events), `mne_epochs2mat` (epochs to MATLAB .mat), `mne_mna_bids_converter` (MNA ↔ BIDS conversion)
 
 ### CI/CD
 
@@ -30,11 +43,21 @@ All notable changes to MNE-CPP will be documented in this file.
 ### Bug Fixes
 
 - Fixed potential silent test skips — Python-dependent tests now respect `MNE_REQUIRE_PYTHON` enforcement
+- Fixed deprecated `qWarn` calls in `test_mne_source_analysis` (replaced with `qWarning()`)
+- Fixed unused `[[nodiscard]]` return values in `test_tool_inverse_computation`
 
 ### Documentation
 
-- Added MNA format manual page (`mna-format.mdx`)
-- Added MNA API reference page (`api-mna.mdx`)
+- Added 26 new command-line tool documentation pages
+- Rewrote MNA format manual page (`mna-format.mdx`) as comprehensive reference (73 → 476 lines)
+- Rewrote MNA API reference page (`api-mna.mdx`) with full class inventory (63 → 572 lines)
+- Added ML library API reference page (`api-ml.mdx`)
+- Added Statistics library API reference page (`api-sts.mdx`)
+- Updated tools overview with all 26 new tools and new "Inspection and Information" section
+- Updated overview and API pages with Mna, Ml, Sts library entries
+- Expanded glossary with 14 new terms (CMNE, DICS, LCMV, MNA, MxNE, ONNX, etc.) and 3 file format entries (`.mna`, `.mnx`, `.onnx`)
+- Fixed orphaned pages (`mna-format`, `api-mna`) by adding to sidebar navigation
+- Added zero-tolerance warning policy to development conventions
 
 ## [2.1.0] - 2026-04-10
 
