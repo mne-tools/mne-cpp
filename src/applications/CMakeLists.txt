@@ -5,7 +5,10 @@ if(WIN32)
 endif()
 
 if(APPLE)
-  set(CMAKE_INSTALL_RPATH "@executable_path/../lib")
+  set(CMAKE_INSTALL_RPATH
+    "@executable_path/../lib"            # flat binary:  bin/app        → bin/../lib
+    "@executable_path/../../../../lib"   # .app bundle:  bin/X.app/Contents/MacOS/X → bin/../lib
+  )
   if(NOT BUILD_MAC_APP_BUNDLE)
     set(CMAKE_MACOSX_RPATH TRUE)
   endif()
