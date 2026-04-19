@@ -102,6 +102,27 @@ public:
     static Eigen::SparseMatrix<int> fromSourceSpace(
         const Eigen::MatrixX3i& tris,
         int nVertices);
+
+    //=========================================================================================================
+    /**
+     * Build a spatio-temporal adjacency matrix from a triangulated source space.
+     *
+     * Constructs a (nVertices*nTimes) x (nVertices*nTimes) adjacency matrix where spatial
+     * neighbors come from the triangle mesh and temporal neighbors connect each vertex to
+     * itself at t-1 and t+1. The linear index is vertex * nTimes + time.
+     *
+     * @param[in] tris       Triangle definitions (nTris x 3, vertex indices).
+     * @param[in] nVertices  Total number of vertices.
+     * @param[in] nTimes     Number of time points.
+     *
+     * @return Sparse adjacency matrix (symmetric, nVertices*nTimes x nVertices*nTimes).
+     *
+     * @since 2.2.0
+     */
+    static Eigen::SparseMatrix<int> fromSourceSpaceTemporal(
+        const Eigen::MatrixX3i& tris,
+        int nVertices,
+        int nTimes);
 };
 
 } // namespace STSLIB

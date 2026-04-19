@@ -55,9 +55,18 @@ class QTimer;
 class QDoubleSpinBox;
 class QSpinBox;
 class QPushButton;
+class QAction;
+class QCloseEvent;
+class QDockWidget;
+class QMenu;
 class QProgressBar;
+class QToolBar;
+class QToolButton;
+class QTreeWidget;
+class QTreeWidgetItem;
 class BrainView;
 class BrainTreeModel;
+class ViewportTimeStrip;
 
 //=============================================================================================================
 /**
@@ -138,6 +147,58 @@ private:
      * Track a loaded file path and its role for later export.
      */
     void trackLoadedFile(const QString &path, int role);
+
+    /**
+     * Handle close event — save settings before closing.
+     *
+     * @param[in] event     Close event.
+     */
+    void closeEvent(QCloseEvent *event) override;
+
+    /**
+     * Create menu bar with File, View, Tools, Help menus.
+     */
+    void createMenus();
+
+    /**
+     * Create the main toolbar with quick-access actions.
+     */
+    void createToolBar();
+
+    /**
+     * Create the status bar.
+     */
+    void createStatusBar();
+
+    /**
+     * Create the Loaded Files dock widget with QTreeWidget.
+     */
+    void createLoadedFilesDock();
+
+    /**
+     * Add an entry to the Loaded Files tree widget.
+     */
+    void addLoadedFileEntry(const QString &path, int role);
+
+    /**
+     * Save window geometry, dock state, and recent files to QSettings.
+     */
+    void saveSettings();
+
+    /**
+     * Restore window geometry, dock state, and recent files from QSettings.
+     */
+    void restoreSettings();
+
+    /**
+     * Update the recent files submenu.
+     */
+    void updateRecentFilesMenu();
+
+    /**
+     * Add a path to the recent files list.
+     */
+    void addRecentFile(const QString &path);
 
 private:
     // Core components
@@ -245,6 +306,12 @@ private:
     QElapsedTimer m_playbackClock;          //!< Wall-clock for measuring actual elapsed time
     double m_stcStepAccum = 0.0;            //!< Fractional sample accumulator
 
+    // Per-viewport timeline
+    bool m_timelineSynced = true;           //!< True when all viewports share the same time
+    QToolButton *m_syncLockBtn = nullptr;   //!< Toolbar button for sync lock toggle
+    QAction *m_compareHemiAction = nullptr; //!< Action for Compare Hemispheres preset
+    QVector<ViewportTimeStrip*> m_viewportTimeStrips; //!< Per-viewport control strips
+
     // MNA Project
     QPushButton *m_openProjectBtn = nullptr;
     QPushButton *m_exportProjectBtn = nullptr;
@@ -254,6 +321,54 @@ private:
 
     // Sync state
     bool m_isSyncing = false;
+
+    // Dock widgets
+    QDockWidget *m_controlsDock = nullptr;
+    QDockWidget *m_loadedFilesDock = nullptr;
+
+    // Loaded files tree
+    QTreeWidget *m_loadedFilesTree = nullptr;
+
+    // Toolbar
+    QToolBar *m_mainToolBar = nullptr;
+
+    // Status bar labels
+    QLabel *m_statusLabel = nullptr;
+    QLabel *m_statusTimeLabel = nullptr;
+
+    // Menu bar menus
+    QMenu *m_fileMenu = nullptr;
+    QMenu *m_viewMenu = nullptr;
+    QMenu *m_toolsMenu = nullptr;
+    QMenu *m_helpMenu = nullptr;
+    QMenu *m_recentFilesMenu = nullptr;
+    QMenu *m_cameraPresetsMenu = nullptr;
+    QMenu *m_playbackMenu = nullptr;
+
+    // Actions
+    QAction *m_actOpenProject = nullptr;
+    QAction *m_actExportProject = nullptr;
+    QAction *m_actLoadSurface = nullptr;
+    QAction *m_actLoadAtlas = nullptr;
+    QAction *m_actLoadBem = nullptr;
+    QAction *m_actLoadStc = nullptr;
+    QAction *m_actLoadDipoles = nullptr;
+    QAction *m_actLoadSrcSpace = nullptr;
+    QAction *m_actLoadEvoked = nullptr;
+    QAction *m_actLoadDigitizer = nullptr;
+    QAction *m_actLoadTransform = nullptr;
+    QAction *m_actQuit = nullptr;
+    QAction *m_actShowControls = nullptr;
+    QAction *m_actShowLoadedFiles = nullptr;
+    QAction *m_actResetCamera = nullptr;
+    QAction *m_actPlayPause = nullptr;
+    QAction *m_actStepFwd = nullptr;
+    QAction *m_actStepBack = nullptr;
+    QAction *m_actRealtimeToggle = nullptr;
+    QAction *m_actSyncLock = nullptr;
+
+    // Recent files
+    QStringList m_recentFiles;
 };
 
 #endif // MAINWINDOW_H

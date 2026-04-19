@@ -128,6 +128,21 @@ public:
                       const SubView &singleView,
                       const QVector<SubView> &subViews);
 
+    /**
+     * Set the STC time-point for a single viewport and apply colours only to
+     * surfaces visible in that viewport.
+     *
+     * @param[in] index        Time-point index.
+     * @param[in] viewportIdx  Viewport index (0..N-1), or -1 for single view.
+     * @param[in] surfaces     FsSurface map.
+     * @param[in] singleView   Single-view state.
+     * @param[in] subViews     Multi-view states.
+     */
+    void setTimePointForViewport(int index, int viewportIdx,
+                                 const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces,
+                                 const SubView &singleView,
+                                 const QVector<SubView> &subViews);
+
     /** @return current time-point index. */
     int currentTimePoint() const { return m_currentTimePoint; }
 
@@ -205,6 +220,9 @@ signals:
 
     /** Emitted when the active time point changes. */
     void timePointChanged(int index, float time);
+
+    /** Emitted when a viewport-specific time point changes. */
+    void viewportTimePointChanged(int viewportIdx, int index, float time);
 
     /** Emitted during async loading to report progress. */
     void loadingProgress(int percent, const QString &message);

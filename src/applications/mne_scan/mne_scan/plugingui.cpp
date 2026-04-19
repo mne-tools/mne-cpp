@@ -47,6 +47,11 @@
 #include <scShared/Plugins/abstractsensor.h>
 #include <scShared/Plugins/abstractalgorithm.h>
 
+#include <mna/mna_project.h>
+#include <mna/mna_io.h>
+#include <mna/mna_graph.h>
+#include <mna/mna_node.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -57,6 +62,7 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QSettings>
+#include <QFileInfo>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -108,7 +114,17 @@ PluginGui::PluginGui(SCSHAREDLIB::PluginManager *pPluginManager,
     if(loadingState)
     {
         settings.setValue(QString("MNEScan/loadingState"), false);
-        loadConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation), "default.xml");
+
+        // Prefer .mna; fall back to legacy .xml (auto-migrate on first load)
+        QString appData = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        if (QFile::exists(appData + QStringLiteral("/default.mna"))) {
+            loadConfig(appData, QStringLiteral("default.mna"));
+        } else if (QFile::exists(appData + QStringLiteral("/default.xml"))) {
+            // Auto-migrate: load XML, then save as MNA
+            loadConfig(appData, QStringLiteral("default.xml"));
+            saveConfig(appData, QStringLiteral("default.mna"));
+            qInfo() << "Migrated legacy default.xml → default.mna";
+        }
     }
 
     settings.setValue(QString("MNEScan/loadingState"), true);
@@ -122,9 +138,9 @@ PluginGui::PluginGui(SCSHAREDLIB::PluginManager *pPluginManager,
 PluginGui::~PluginGui()
 {
     //
-    // Save current configuration
+    // Save current configuration (MNA format)
     //
-    saveConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),"default.xml");
+    saveConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),"default.mna");
 
     m_pCurrentPlugin.reset();
 
@@ -174,8 +190,22 @@ void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
 {
     qDebug() << "load" << sPath+"/"+sFileName;
 
+    QString fullPath = sPath + QStringLiteral("/") + sFileName;
+
+    // Dispatch by file extension
+    if (sFileName.endsWith(QLatin1String(".mna")) || sFileName.endsWith(QLatin1String(".mnx"))) {
+        loadConfigMna(fullPath);
+    } else {
+        loadConfigXml(fullPath);
+    }
+}
+
+//=============================================================================================================
+
+void PluginGui::loadConfigXml(const QString& fullPath)
+{
     QDomDocument doc("PluginConfig");
-    QFile file(sPath+"/"+sFileName);
+    QFile file(fullPath);
     if (!file.open(QIODevice::ReadOnly))
         return;
     if (!doc.setContent(&file)) {
@@ -189,7 +219,7 @@ void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
     QDomElement docElem = doc.documentElement();
     if(docElem.tagName() != "PluginTree")
     {
-        qWarning() << sFileName << "not found!";
+        qWarning() << fullPath << "not a valid PluginTree!";
         return;
     }
 
@@ -284,9 +314,129 @@ void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
 
 //=============================================================================================================
 
+void PluginGui::loadConfigMna(const QString& fullPath)
+{
+    MNALIB::MnaProject project = MNALIB::MnaIO::read(fullPath);
+    if (project.pipeline.isEmpty()) {
+        qWarning() << "Empty or invalid MNA pipeline in" << fullPath;
+        return;
+    }
+
+    clearScene();
+
+    // Phase 1: Create plugins from pipeline nodes
+    QMap<QString, PluginItem*> itemMap;
+    for (const MNALIB::MnaNode& node : project.pipeline) {
+        QAction* pCurrentAction = Q_NULLPTR;
+        for (int i = 0; i < m_pActionGroupPlugins->actions().size(); ++i) {
+            if (m_pActionGroupPlugins->actions()[i]->text() == node.opType) {
+                pCurrentAction = m_pActionGroupPlugins->actions()[i];
+                break;
+            }
+        }
+        if (!pCurrentAction)
+            continue;
+
+        qreal posX = node.attributes.value(QStringLiteral("gui_x"), 0).toReal();
+        qreal posY = node.attributes.value(QStringLiteral("gui_y"), 0).toReal();
+        QPointF pos(posX, posY);
+
+        SCSHAREDLIB::AbstractPlugin::SPtr pPlugin;
+        pCurrentAction->setChecked(true);
+        m_pPluginScene->setActionPluginItem(pCurrentAction);
+        m_pPluginScene->setMode(PluginScene::InsertPluginItem);
+        m_pPluginScene->insertItem(pos);
+
+        // Find the just-inserted PluginItem
+        for (QGraphicsItem* item : m_pPluginScene->items()) {
+            if (item->type() == PluginItem::Type) {
+                PluginItem* pi = qgraphicsitem_cast<PluginItem*>(item);
+                if (pi->plugin()->getName() == node.opType && !itemMap.contains(node.id)) {
+                    itemMap.insert(node.id, pi);
+                    break;
+                }
+            }
+        }
+    }
+
+    // Phase 2: Create connections from port links
+    for (const MNALIB::MnaNode& node : project.pipeline) {
+        for (const MNALIB::MnaPort& inPort : node.inputs) {
+            if (inPort.sourceNodeId.isEmpty())
+                continue;
+
+            PluginItem* startItem = itemMap.value(inPort.sourceNodeId);
+            PluginItem* endItem   = itemMap.value(node.id);
+            if (!startItem || !endItem)
+                continue;
+
+            SCSHAREDLIB::PluginConnectorConnection::SPtr pConnection =
+                SCSHAREDLIB::PluginConnectorConnection::create(startItem->plugin(), endItem->plugin());
+
+            if (pConnection->isConnected()) {
+                Arrow* arrow = new Arrow(startItem, endItem, pConnection);
+                arrow->setColor(QColor(65, 113, 156));
+                startItem->addArrow(arrow);
+                endItem->addArrow(arrow);
+                arrow->setZValue(-1000.0);
+                m_pPluginScene->addItem(arrow);
+                arrow->updatePosition();
+
+                m_pPluginSceneManager->connectGraphNodes(startItem->plugin(), endItem->plugin());
+            }
+        }
+    }
+}
+
+//=============================================================================================================
+
 void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
 {
     qDebug() << "Save Config" << sPath+"/"+sFileName;
+
+    QString fullPath = sPath + QStringLiteral("/") + sFileName;
+
+    // Dispatch by file extension
+    if (sFileName.endsWith(QLatin1String(".mna")) || sFileName.endsWith(QLatin1String(".mnx"))) {
+        saveConfigMna(fullPath);
+    } else {
+        saveConfigXml(fullPath);
+    }
+}
+
+//=============================================================================================================
+
+void PluginGui::saveConfigMna(const QString& fullPath)
+{
+    // Update GUI positions in the pipeline graph
+    for (QGraphicsItem* item : m_pPluginScene->items()) {
+        if (item->type() == PluginItem::Type) {
+            SCSHAREDLIB::AbstractPlugin::SPtr pPlugin = qgraphicsitem_cast<PluginItem*>(item)->plugin();
+            m_pPluginSceneManager->updateGraphNodePosition(pPlugin, item->x(), item->y());
+        }
+    }
+
+    // Build MnaProject from the current pipeline graph
+    MNALIB::MnaProject project;
+    project.name        = QStringLiteral("MNE Scan Pipeline");
+    project.description = QStringLiteral("Auto-saved MNE Scan plugin configuration");
+    project.pipeline    = m_pPluginSceneManager->pipelineGraph().nodes();
+    project.modified    = QDateTime::currentDateTimeUtc();
+
+    // Ensure directory exists
+    QFileInfo fi(fullPath);
+    QDir dir;
+    if (!dir.exists(fi.path()))
+        if (!dir.mkpath(fi.path()))
+            return;
+
+    MNALIB::MnaIO::write(project, fullPath);
+}
+
+//=============================================================================================================
+
+void PluginGui::saveConfigXml(const QString& fullPath)
+{
     QDomDocument doc("PluginConfig");
     QDomElement root = doc.createElement("PluginTree");
     doc.appendChild(root);
@@ -332,12 +482,13 @@ void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
 
     QString xml = doc.toString();
 
+    QFileInfo fi(fullPath);
     QDir dir;
-    if(!dir.exists(sPath))
-        if(!dir.mkpath(sPath))
+    if (!dir.exists(fi.path()))
+        if (!dir.mkpath(fi.path()))
             return;
 
-    QFile file(sPath+"/"+sFileName);
+    QFile file(fullPath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
         return;
 
@@ -395,7 +546,7 @@ bool PluginGui::removePlugin(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin)
         selectedPluginChanged(m_pCurrentPlugin);
     }
 
-    saveConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),"default.xml");
+    saveConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),"default.mna");
 
     return bRemoved;
 }
@@ -420,7 +571,7 @@ void PluginGui::itemInserted(PluginItem *item)
     m_pButtonGroupPointers->button(int(PluginScene::MovePluginItem))->setChecked(true);
     m_pPluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
 
-    saveConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),"default.xml");
+    saveConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),"default.mna");
 }
 
 //=============================================================================================================

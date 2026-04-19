@@ -51,6 +51,34 @@ if [ -f "$OUTPUT_DIR/mne_inspect.html" ] && [ -f "$INSPECT_TEMPLATE" ]; then
     cp "$INSPECT_TEMPLATE" "$OUTPUT_DIR/mne_inspect.html"
 fi
 
+# --- 2c. Copy PWA assets (manifest, service worker, icons) ----------------
+echo "[wasm_postbuild] Copying PWA manifest → $OUTPUT_DIR/"
+cp "$SCRIPT_DIR/manifest.json" "$OUTPUT_DIR/manifest.json"
+
+echo "[wasm_postbuild] Copying sw.js → $OUTPUT_DIR/"
+cp "$SCRIPT_DIR/sw.js" "$OUTPUT_DIR/sw.js"
+
+# Replace __CACHE_VERSION__ placeholder with version from CITATION.cff
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+if [ -f "$REPO_ROOT/CITATION.cff" ]; then
+    APP_VERSION=$(grep '^version:' "$REPO_ROOT/CITATION.cff" | head -1 | sed 's/version:[[:space:]]*//')
+    if [ -n "$APP_VERSION" ]; then
+        echo "[wasm_postbuild] Setting SW cache version to mne-inspect-v${APP_VERSION}"
+        if [[ "$(uname)" == "Darwin" ]]; then
+            sed -i '' "s|mne-inspect-v2.2.0|mne-inspect-v${APP_VERSION}|g" "$OUTPUT_DIR/sw.js"
+        else
+            sed -i "s|mne-inspect-v2.2.0|mne-inspect-v${APP_VERSION}|g" "$OUTPUT_DIR/sw.js"
+        fi
+    fi
+fi
+
+if [ -d "$SCRIPT_DIR/icons" ]; then
+    echo "[wasm_postbuild] Copying icons/ → $OUTPUT_DIR/icons/"
+    mkdir -p "$OUTPUT_DIR/icons"
+    cp "$SCRIPT_DIR/icons/"*.svg "$OUTPUT_DIR/icons/" 2>/dev/null || true
+    cp "$SCRIPT_DIR/icons/"*.png "$OUTPUT_DIR/icons/" 2>/dev/null || true
+fi
+
 # --- 3. Inject service-worker <script> into every .html --------------------
 SW_TAG='<script src="coi-serviceworker.js"></script>'
 

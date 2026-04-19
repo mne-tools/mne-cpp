@@ -329,3 +329,87 @@ void MnaGraphExecutor::setProgressCallback(ProgressCallback cb)
 {
     s_progressCallback = cb;
 }
+
+//=============================================================================================================
+// Stream-mode execution
+//=============================================================================================================
+
+MnaGraphExecutor::StreamContext MnaGraphExecutor::startStream(MnaGraph& graph,
+                                                               PluginFactory factory)
+{
+    StreamContext ctx;
+    ctx.graph = &graph;
+
+    // 1. Validate the graph
+    QStringList errors;
+    if (!graph.validate(&errors)) {
+        qWarning() << "MnaGraphExecutor::startStream - graph validation failed:" << errors;
+        return ctx;
+    }
+
+    // 2. Topological sort
+    ctx.executionOrder = graph.topologicalSort();
+
+    // 3. Apply current parameter tree values to node attributes
+    for (MnaNode& n : graph.nodes()) {
+        for (const QString& path : graph.paramTree.allPaths()) {
+            int sep = path.indexOf(QLatin1Char('/'));
+            if (sep > 0) {
+                QString nodeId  = path.left(sep);
+                QString attrKey = path.mid(sep + 1);
+                if (nodeId == n.id) {
+                    n.attributes.insert(attrKey, graph.paramTree.param(path));
+                }
+            }
+        }
+    }
+
+    // 4. Instantiate live plugins via factory
+    for (const QString& nodeId : ctx.executionOrder) {
+        const MnaNode& n = graph.node(nodeId);
+        QObject* plugin = factory(n.opType);
+        if (!plugin) {
+            qWarning() << "MnaGraphExecutor::startStream - factory returned nullptr for opType:" << n.opType;
+            // Clean up already-created plugins
+            for (QObject* p : ctx.livePlugins) {
+                delete p;
+            }
+            ctx.livePlugins.clear();
+            return ctx;
+        }
+        ctx.livePlugins.insert(nodeId, plugin);
+    }
+
+    // 5. Wiring: the host application is responsible for connecting
+    //    Qt signals/slots between the QObject* instances based on
+    //    the port connections encoded in each node's input ports.
+    //    The mna library provides the graph topology; the host app
+    //    knows the concrete signal/slot signatures.
+
+    ctx.running = true;
+    return ctx;
+}
+
+//=============================================================================================================
+
+void MnaGraphExecutor::stopStream(StreamContext& ctx)
+{
+    if (!ctx.running) {
+        return;
+    }
+
+    ctx.running = false;
+
+    // Stop in reverse topological order
+    for (int i = ctx.executionOrder.size() - 1; i >= 0; --i) {
+        const QString& nodeId = ctx.executionOrder[i];
+        QObject* plugin = ctx.livePlugins.value(nodeId);
+        if (plugin) {
+            delete plugin;
+        }
+    }
+
+    ctx.livePlugins.clear();
+    ctx.executionOrder.clear();
+    ctx.graph = nullptr;
+}

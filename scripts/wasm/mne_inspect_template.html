@@ -4,7 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3b82f6">
     <title>MNE-CPP | MNE Inspect</title>
+    <link rel="manifest" href="manifest.json">
     <style>
         *,
         *::before,
@@ -548,6 +550,13 @@
     </script>
     <script src="mne_inspect.js"></script>
     <script type="text/javascript" src="qtloader.js"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js', { scope: './' })
+          .then((reg) => console.log('SW registered:', reg.scope))
+          .catch((err) => console.warn('SW registration failed:', err));
+      }
+    </script>
 </body>
 
 </html>

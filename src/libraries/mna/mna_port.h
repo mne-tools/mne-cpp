@@ -74,8 +74,16 @@ struct MNASHARED_EXPORT MnaPort
     QString     sourcePortName;     ///< Which output port on that node?
 
     // Real-time stream binding (used when dataKind == RealTimeStream)
-    QString     streamProtocol;     ///< "fiff-rt", "lsl", "tcp", "shm", "" = not a stream
-    QString     streamEndpoint;     ///< Protocol-specific address
+    //
+    // Supported stream protocols:
+    //   "fiff-rt"   — FIFF real-time protocol (MNE Scan native, TCP-based)
+    //   "lsl"       — Lab Streaming Layer (multicast, cross-platform)
+    //   "ftbuffer"  — FieldTrip buffer protocol (TCP, language-agnostic)
+    //   "shm"       — Shared memory transport (single-machine, zero-copy)
+    //   ""          — Internal Qt signal/slot wiring (in-process, default)
+    //
+    QString     streamProtocol;     ///< "fiff-rt", "lsl", "ftbuffer", "shm", "" = internal signal/slot
+    QString     streamEndpoint;     ///< Protocol-specific address (e.g. "localhost:4218" for fiff-rt)
     int         streamBufferMs = 0; ///< Ring-buffer length in ms (0 = unbounded)
 
     // Cached result reference (for output ports)

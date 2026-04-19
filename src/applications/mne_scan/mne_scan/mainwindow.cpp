@@ -318,7 +318,10 @@ void MainWindow::openConfiguration()
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Open MNE Scan Configuration File",
                                                 QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),
-                                                 tr("Configuration file (*.xml)"));
+                                                 tr("MNA files (*.mna);;MNX binary files (*.mnx);;Legacy XML (*.xml);;All files (*)"));
+
+    if (path.isEmpty())
+        return;
 
     QFileInfo qFileInfo(path);
     m_pPluginGui->loadConfig(qFileInfo.path(), qFileInfo.fileName());
@@ -333,8 +336,11 @@ void MainWindow::saveConfiguration()
     QString path = QFileDialog::getSaveFileName(
                 this,
                 "Save MNE Scan Configuration File",
-                QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),
-                 tr("Configuration file (*.xml)"));
+                QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + QStringLiteral("/pipeline.mna"),
+                 tr("MNA files (*.mna);;MNX binary files (*.mnx);;Legacy XML (*.xml)"));
+
+    if (path.isEmpty())
+        return;
 
     QFileInfo qFileInfo(path);
     m_pPluginGui->saveConfig(qFileInfo.path(), qFileInfo.fileName());

@@ -194,6 +194,10 @@ void PluginScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 arrow->setZValue(-1000.0);
                 addItem(arrow);
                 arrow->updatePosition();
+
+                // Record connection in MNA pipeline graph
+                m_pPluginGui->m_pPluginSceneManager->connectGraphNodes(
+                    startItem->plugin(), endItem->plugin());
             }
 
         }

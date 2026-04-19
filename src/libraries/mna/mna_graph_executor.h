@@ -50,6 +50,7 @@
 #include <QMap>
 #include <QVariant>
 #include <QVariantMap>
+#include <QObject>
 #include <functional>
 
 //=============================================================================================================
@@ -90,6 +91,22 @@ public:
         QVariantMap graphInputs;
     };
 
+    //=========================================================================================================
+    /**
+     * Stream execution context — maps graph nodes to live plugin instances.
+     *
+     * Used by MNE Scan to wire an MnaGraph to running AbstractPlugin objects.
+     * The mna library uses QObject* to avoid depending on MNE Scan libraries;
+     * the host application is responsible for casting to the actual plugin type.
+     */
+    struct StreamContext
+    {
+        MnaGraph*                  graph = nullptr;         ///< The pipeline graph (owned externally)
+        QMap<QString, QObject*>    livePlugins;             ///< nodeId → live plugin instance (QObject* avoids scan dependency)
+        bool                       running = false;         ///< Whether the stream is active
+        QStringList                executionOrder;          ///< Topological order used for startup/shutdown
+    };
+
     /**
      * Execute the full graph (all nodes in topological order).
      * @param graph         The graph to execute.
@@ -123,6 +140,41 @@ public:
      * Set a progress callback invoked for each node execution.
      */
     static void setProgressCallback(ProgressCallback cb);
+
+    //=========================================================================================================
+    // Stream-mode execution
+    //=========================================================================================================
+
+    /// Factory callback: given a node's opType, create the corresponding live plugin.
+    /// Returns nullptr if the opType is unknown.  The host app provides this callback.
+    using PluginFactory = std::function<QObject*(const QString& opType)>;
+
+    /**
+     * Start stream-mode execution of a graph.
+     *
+     * 1. Validates the graph
+     * 2. Performs topological sort
+     * 3. For each node, calls @p factory to instantiate a live plugin
+     * 4. Applies MnaParamTree values to node attributes
+     * 5. Wires connections based on port dataKind matching
+     *
+     * The mna library does NOT depend on MNE Scan — the host app provides
+     * the factory and is responsible for wiring Qt signal/slot connections
+     * between the returned QObject* instances.
+     *
+     * @param[in,out] graph     The pipeline graph.
+     * @param[in]     factory   Callback that maps opType → live QObject* plugin.
+     * @return Stream context.  Check ctx.running to see if startup succeeded.
+     */
+    static StreamContext startStream(MnaGraph& graph, PluginFactory factory);
+
+    /**
+     * Stop a running stream.  Iterates nodes in reverse topological order
+     * and deletes the live plugin objects.
+     *
+     * @param[in,out] ctx   The stream context to stop.
+     */
+    static void stopStream(StreamContext& ctx);
 
 private:
     static ProgressCallback s_progressCallback;

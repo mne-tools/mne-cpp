@@ -1,0 +1,163 @@
+//=============================================================================================================
+/**
+ * @file     granger_causality.cpp
+ * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ *           Lorenz Esch <lesch@mgh.harvard.edu>
+ * @since    2.2.0
+ * @date     April, 2026
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2026, Christoph Dinh, Lorenz Esch. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    GrangerCausality class definition.
+ *
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "granger_causality.h"
+#include "mvar_model.h"
+#include "../network/networknode.h"
+#include "../network/networkedge.h"
+#include "../network/network.h"
+#include "../connectivitysettings.h"
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QDebug>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Dense>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace CONNLIB;
+using namespace Eigen;
+
+//=============================================================================================================
+// DEFINE GLOBAL METHODS
+//=============================================================================================================
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+GrangerCausality::GrangerCausality()
+{
+}
+
+//=============================================================================================================
+
+Network GrangerCausality::calculate(ConnectivitySettings& connectivitySettings)
+{
+    Network finalNetwork("GC");
+
+    if(connectivitySettings.isEmpty()) {
+        qDebug() << "GrangerCausality::calculate - Input data is empty";
+        return finalNetwork;
+    }
+
+    finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
+
+    // Average trial data for MVAR fitting
+    const int nTrials = connectivitySettings.size();
+    MatrixXd matDataAvg = connectivitySettings.at(0).matData;
+    for(int t = 1; t < nTrials; ++t) {
+        matDataAvg += connectivitySettings.at(t).matData;
+    }
+    matDataAvg /= static_cast<double>(nTrials);
+
+    const int nCh = static_cast<int>(matDataAvg.rows());
+    const int iNfft = connectivitySettings.getFFTSize();
+    const int iNFreqs = static_cast<int>(std::floor(iNfft / 2.0)) + 1;
+
+    finalNetwork.setFFTSize(iNFreqs);
+    finalNetwork.setUsedFreqBins(iNFreqs);
+
+    // Create nodes
+    RowVectorXf rowVert = RowVectorXf::Zero(3);
+    for(int i = 0; i < nCh; ++i) {
+        rowVert = RowVectorXf::Zero(3);
+        if(connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
+            rowVert(0) = connectivitySettings.getNodePositions().row(i)(0);
+            rowVert(1) = connectivitySettings.getNodePositions().row(i)(1);
+            rowVert(2) = connectivitySettings.getNodePositions().row(i)(2);
+        }
+        finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
+    }
+
+    // Fit MVAR model
+    MvarModel model;
+    model.fit(matDataAvg);
+
+    // Compute transfer function and spectral matrix at normalized frequencies
+    VectorXd vecFreqs = VectorXd::LinSpaced(iNFreqs, 0.0, 0.5);
+    QVector<MatrixXcd> vecH = model.transferFunction(vecFreqs);
+    QVector<MatrixXcd> vecS = model.spectralMatrix(vecFreqs);
+    MatrixXd matSigma = model.noiseCov();
+
+    // Compute spectral Granger causality for each directed pair
+    // GC_{j->i}(f) = ln( S_{ii}(f) / (S_{ii}(f) - gamma_{ij} * |H_{ij}(f)|^2) )
+    // where gamma_{ij} = Sigma_{jj} - Sigma_{ij}^2 / Sigma_{ii}
+    for(int i = 0; i < nCh; ++i) {
+        for(int j = 0; j < nCh; ++j) {
+            if(i == j) {
+                continue;
+            }
+
+            MatrixXd matWeight(iNFreqs, 1);
+
+            const double gammaIJ = matSigma(j, j) - (matSigma(i, j) * matSigma(i, j)) / matSigma(i, i);
+
+            for(int fi = 0; fi < iNFreqs; ++fi) {
+                const double sII = vecS[fi](i, i).real();
+                const double hIJ2 = std::norm(vecH[fi](i, j));
+                const double denom = sII - gammaIJ * hIJ2;
+
+                if(denom > 0.0 && sII > 0.0) {
+                    matWeight(fi, 0) = std::log(sII / denom);
+                } else {
+                    matWeight(fi, 0) = 0.0;
+                }
+            }
+
+            QSharedPointer<NetworkEdge> pEdge =
+                QSharedPointer<NetworkEdge>(new NetworkEdge(j, i, matWeight));
+
+            finalNetwork.getNodeAt(j)->append(pEdge);
+            finalNetwork.getNodeAt(i)->append(pEdge);
+            finalNetwork.append(pEdge);
+        }
+    }
+
+    return finalNetwork;
+}

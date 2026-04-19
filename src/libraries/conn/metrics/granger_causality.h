@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
- * @file     connectivity.cpp
- * @author   Daniel Strohmeier <Daniel.Strohmeier@tu-ilmenau.de>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Faris Yahya <mfarisyahya@gmail.com>
- * @since    0.1.0
- * @date     March, 2017
+ * @file     granger_causality.h
+ * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ *           Lorenz Esch <lesch@mgh.harvard.edu>
+ * @since    2.2.0
+ * @date     April, 2026
  *
  * @section  LICENSE
  *
- * Copyright (C) 2017, Daniel Strohmeier, Lorenz Esch, Faris Yahya. All rights reserved.
+ * Copyright (C) 2026, Christoph Dinh, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,120 +29,88 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Connectivity class definition.
+ * @brief     GrangerCausality class declaration.
  *
  */
+
+#ifndef GRANGERCAUSALITY_H
+#define GRANGERCAUSALITY_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity.h"
+#include "../conn_global.h"
 
-#include "connectivitysettings.h"
-#include "network/network.h"
-#include "metrics/correlation.h"
-#include "metrics/crosscorrelation.h"
-#include "metrics/coherence.h"
-#include "metrics/imagcoherence.h"
-#include "metrics/phaselagindex.h"
-#include "metrics/phaselockingvalue.h"
-#include "metrics/weightedphaselagindex.h"
-#include "metrics/unbiasedsquaredphaselagindex.h"
-#include "metrics/debiasedsquaredweightedphaselagindex.h"
-#include "metrics/granger_causality.h"
-#include "metrics/directed_transfer_function.h"
-#include "metrics/partial_directed_coherence.h"
+#include "abstractmetric.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
-#include <QFutureSynchronizer>
-#include <QtConcurrent>
+#include <QSharedPointer>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace CONNLIB;
+#include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE GLOBAL METHODS
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE CONNLIB
 //=============================================================================================================
 
-Connectivity::Connectivity()
+namespace CONNLIB {
+
+//=============================================================================================================
+// CONNLIB FORWARD DECLARATIONS
+//=============================================================================================================
+
+class Network;
+class ConnectivitySettings;
+
+//=============================================================================================================
+/**
+ * This class computes spectral Granger causality from an MVAR model.
+ *
+ * GC_{j->i}(f) = ln( S_{ii}(f) / (S_{ii}(f) - (Sigma_{jj} - Sigma_{ij}^2/Sigma_{ii}) * |H_{ij}(f)|^2) )
+ *
+ * @brief This class computes spectral Granger causality.
+ * @since 2.2.0
+ */
+class CONNSHARED_EXPORT GrangerCausality : public AbstractMetric
 {
-}
+
+public:
+    typedef QSharedPointer<GrangerCausality> SPtr;            /**< Shared pointer type for GrangerCausality. */
+    typedef QSharedPointer<const GrangerCausality> ConstSPtr; /**< Const shared pointer type for GrangerCausality. */
+
+    //=========================================================================================================
+    /**
+     * Constructs a GrangerCausality object.
+     */
+    explicit GrangerCausality();
+
+    //=========================================================================================================
+    /**
+     * Calculates spectral Granger causality between all channel pairs.
+     *
+     * @param[in] connectivitySettings   The input data and parameters.
+     *
+     * @return                   The connectivity information in form of a network structure.
+     *
+     * @since 2.2.0
+     */
+    static Network calculate(ConnectivitySettings &connectivitySettings);
+};
 
 //=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+} // namespace CONNLIB
 
-QList<Network> Connectivity::calculate(ConnectivitySettings& connectivitySettings)
-{
-    QStringList lMethods = connectivitySettings.getConnectivityMethods();
-    QList<Network> results;
-    QElapsedTimer timer;
-    timer.start();
-
-    if(lMethods.contains("WPLI")) {
-        results.append(WeightedPhaseLagIndex::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("USPLI")) {
-        results.append(UnbiasedSquaredPhaseLagIndex::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("COR")) {
-        results.append(Correlation::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("XCOR")) {
-        results.append(CrossCorrelation::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("PLI")) {
-        results.append(PhaseLagIndex::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("COH")) {
-        results.append(Coherence::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("IMAGCOH")) {
-        results.append(ImagCoherence::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("PLV")) {
-        results.append(PhaseLockingValue::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("DSWPLI")) {
-        results.append(DebiasedSquaredWeightedPhaseLagIndex::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("GC")) {
-        results.append(GrangerCausality::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("DTF")) {
-        results.append(DirectedTransferFunction::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("PDC")) {
-        results.append(PartialDirectedCoherence::calculate(connectivitySettings));
-    }
-
-    qWarning() << "Total" << timer.elapsed();
-    qDebug() << "Connectivity::calculateMultiMethods - Calculated"<< lMethods <<"for" << connectivitySettings.size() << "trials in"<< timer.elapsed() << "msecs.";
-
-    return results;
-}
+#endif // GRANGERCAUSALITY_H

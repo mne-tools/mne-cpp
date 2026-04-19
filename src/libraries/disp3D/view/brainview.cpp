@@ -196,6 +196,8 @@ BrainView::BrainView(QWidget *parent)
             this, &BrainView::sourceThresholdsUpdated);
     connect(&m_sourceManager, &SourceEstimateManager::timePointChanged,
             this, &BrainView::timePointChanged);
+    connect(&m_sourceManager, &SourceEstimateManager::viewportTimePointChanged,
+            this, &BrainView::viewportTimePointChanged);
     connect(&m_sourceManager, &SourceEstimateManager::loadingProgress,
             this, &BrainView::stcLoadingProgress);
     connect(&m_sourceManager, &SourceEstimateManager::realtimeColorsAvailable,
@@ -1917,6 +1919,39 @@ void BrainView::onSourceEstimateLoaded(int numTimePoints)
 void BrainView::setTimePoint(int index)
 {
     m_sourceManager.setTimePoint(index, m_surfaces, m_singleView, m_subViews);
+    update();
+}
+
+//=============================================================================================================
+
+void BrainView::setTimePointForViewport(int viewportIdx, int index)
+{
+    m_sourceManager.setTimePointForViewport(index, viewportIdx, m_surfaces, m_singleView, m_subViews);
+    update();
+}
+
+//=============================================================================================================
+
+void BrainView::setupCompareHemispheres()
+{
+    // Set to 2 viewports side-by-side
+    setViewCount(2);
+
+    // Left viewport (index 0): LH only
+    if (m_subViews.size() > 0) {
+        m_subViews[0].visibility.lh = true;
+        m_subViews[0].visibility.rh = false;
+        m_subViews[0].preset = 3;   // Left camera
+    }
+
+    // Right viewport (index 1): RH only
+    if (m_subViews.size() > 1) {
+        m_subViews[1].visibility.lh = false;
+        m_subViews[1].visibility.rh = true;
+        m_subViews[1].preset = 6;   // Right camera (mirrored)
+    }
+
+    saveMultiViewSettings();
     update();
 }
 

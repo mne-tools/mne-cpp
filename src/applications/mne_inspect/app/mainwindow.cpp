@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include "mainwindow.h"
+#include "viewporttimestrip.h"
 #include <disp3D/view/brainview.h>
 #include <disp3D/model/braintreemodel.h>
 #include <disp3D/core/viewstate.h>
@@ -60,6 +61,8 @@
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QPushButton>
+#include <QToolButton>
+#include <QAction>
 #include <QSlider>
 #include <QDoubleSpinBox>
 #include <QSpinBox>
@@ -75,6 +78,18 @@
 #include <QElapsedTimer>
 #include <QCoreApplication>
 #include <QDebug>
+#include <QMenuBar>
+#include <QToolBar>
+#include <QStatusBar>
+#include <QDockWidget>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
+#include <QAction>
+#include <QSettings>
+#include <QApplication>
+#include <QMessageBox>
+#include <QCloseEvent>
+#include <QClipboard>
 
 #ifdef WASMBUILD
 #include <QBuffer>
@@ -161,22 +176,22 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("MNE Inspect");
 
     setupUI();
+    createMenus();
+    createToolBar();
+    createStatusBar();
     setupConnections();
 
-    resize(1200, 800);
+    restoreSettings();
 }
 
 //=============================================================================================================
 
 void MainWindow::setupUI()
 {
-    QWidget *centralWidget = new QWidget;
-    QHBoxLayout *mainLayout = new QHBoxLayout(centralWidget);
-    setCentralWidget(centralWidget);
-
     // Side Panel (Controls) with Scroll Area
     QScrollArea *scrollArea = new QScrollArea;
-    scrollArea->setFixedWidth(290);
+    scrollArea->setMinimumWidth(280);
+    scrollArea->setMaximumWidth(320);
     scrollArea->setWidgetResizable(true);
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scrollArea->setFrameShape(QFrame::NoFrame);
@@ -650,6 +665,25 @@ void MainWindow::setupUI()
     presetRow->addWidget(m_cameraPresetCombo);
     viewLayout->addLayout(presetRow);
 
+    // Timeline Sync Lock
+    m_syncLockBtn = new QToolButton;
+    m_syncLockBtn->setText(QStringLiteral("\U0001F517"));  // chain-link emoji
+    m_syncLockBtn->setCheckable(true);
+    m_syncLockBtn->setChecked(true);
+    m_syncLockBtn->setToolTip("Timeline sync: locked — all viewports share the same time.\nClick to unlock for independent per-viewport timelines.");
+    QHBoxLayout *syncRow = new QHBoxLayout();
+    syncRow->addWidget(new QLabel("Timeline Sync:"));
+    syncRow->addWidget(m_syncLockBtn);
+    viewLayout->addLayout(syncRow);
+
+    // Compare Hemispheres
+    m_compareHemiAction = new QAction("Compare Hemispheres", this);
+    m_compareHemiAction->setToolTip("Create 2-viewport layout: LH left, RH right, timelines unlocked.");
+    QPushButton *compareHemiBtn = new QPushButton("Compare Hemispheres");
+    compareHemiBtn->setToolTip(m_compareHemiAction->toolTip());
+    viewLayout->addWidget(compareHemiBtn);
+    connect(compareHemiBtn, &QPushButton::clicked, m_compareHemiAction, &QAction::trigger);
+
     // Assemble side panel
     sideLayout->addWidget(projectGroup);
     sideLayout->addWidget(surfGroup);
@@ -669,8 +703,32 @@ void MainWindow::setupUI()
     m_model = new BrainTreeModel(m_brainView);
     m_brainView->setModel(m_model);
 
-    mainLayout->addWidget(scrollArea);
-    mainLayout->addWidget(m_brainView);
+    // Wrap BrainView + per-viewport time strips in a vertical layout
+    QWidget *viewContainer = new QWidget;
+    QVBoxLayout *viewContainerLayout = new QVBoxLayout(viewContainer);
+    viewContainerLayout->setContentsMargins(0, 0, 0, 0);
+    viewContainerLayout->setSpacing(0);
+    viewContainerLayout->addWidget(m_brainView, 1);
+
+    // Create initial per-viewport time strips (hidden by default — shown when sync is unlocked)
+    for (int i = 0; i < 4; ++i) {
+        auto *strip = new ViewportTimeStrip(i, viewContainer);
+        strip->hide();
+        viewContainerLayout->addWidget(strip);
+        m_viewportTimeStrips.append(strip);
+    }
+
+    // ===== Controls Dock Widget =====
+    m_controlsDock = new QDockWidget("Controls", this);
+    m_controlsDock->setObjectName("controlsDock");
+    m_controlsDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
+    m_controlsDock->setWidget(scrollArea);
+    addDockWidget(Qt::LeftDockWidgetArea, m_controlsDock);
+
+    setCentralWidget(viewContainer);
+
+    // ===== Loaded Files Dock Widget =====
+    createLoadedFilesDock();
 }
 
 //=============================================================================================================
@@ -839,6 +897,99 @@ void MainWindow::setupConnections()
             syncUIToEditTarget(-1);
         }
         m_editTargetCombo->blockSignals(false);
+
+        // Update per-viewport time strip visibility
+        for (int i = 0; i < m_viewportTimeStrips.size(); ++i) {
+            m_viewportTimeStrips[i]->setVisible(!m_timelineSynced && i < count);
+        }
+    });
+
+    // Timeline sync lock toggle
+    connect(m_syncLockBtn, &QToolButton::toggled, [this](bool locked) {
+        m_timelineSynced = locked;
+        m_syncLockBtn->setToolTip(locked
+            ? "Timeline sync: locked — all viewports share the same time.\nClick to unlock for independent per-viewport timelines."
+            : "Timeline sync: unlocked — each viewport has its own timeline.\nClick to lock for synchronized timelines.");
+
+        const int count = m_brainView->viewCount();
+        for (int i = 0; i < m_viewportTimeStrips.size(); ++i) {
+            m_viewportTimeStrips[i]->setVisible(!locked && i < count && count > 1);
+            m_viewportTimeStrips[i]->setControlsEnabled(!locked);
+        }
+    });
+
+    // Compare Hemispheres preset
+    connect(m_compareHemiAction, &QAction::triggered, [this]() {
+        m_brainView->setupCompareHemispheres();
+
+        // Update view count combo to "2 Views" without re-triggering full handler
+        m_viewCountCombo->blockSignals(true);
+        m_viewCountCombo->setCurrentIndex(1);  // "2 Views"
+        m_viewCountCombo->blockSignals(false);
+        updateViewportCheckboxes(2);
+
+        m_editTargetCombo->setEnabled(true);
+        m_cameraPresetCombo->setEnabled(true);
+
+        // Rebuild edit target combo for 2 viewports
+        m_editTargetCombo->blockSignals(true);
+        m_editTargetCombo->clear();
+        m_editTargetCombo->addItem("LH (Left)", 0);
+        m_editTargetCombo->addItem("RH (Right)", 1);
+        m_editTargetCombo->setCurrentIndex(0);
+        m_brainView->setVisualizationEditTarget(0);
+        syncUIToEditTarget(0);
+        m_editTargetCombo->blockSignals(false);
+
+        // Unlock timeline sync
+        m_syncLockBtn->setChecked(false);  // triggers the toggled handler
+    });
+
+    // Per-viewport time strip connections
+    for (ViewportTimeStrip *strip : m_viewportTimeStrips) {
+        connect(strip, &ViewportTimeStrip::sliderValueChanged, [this](int viewportIdx, int value) {
+            m_brainView->setTimePointForViewport(viewportIdx, value);
+        });
+
+        connect(strip, &ViewportTimeStrip::playToggled, [this](int viewportIdx, bool playing) {
+            Q_UNUSED(viewportIdx)
+            if (playing && !m_stcTimer->isActive()) {
+                m_stcStepAccum = 0.0;
+                m_playbackClock.start();
+                m_stcTimer->start();
+            }
+            // Check if any strip is still playing; if not, timer will stop in timeout handler
+        });
+
+        connect(strip, &ViewportTimeStrip::stepBackward, [this](int viewportIdx) {
+            if (viewportIdx < m_viewportTimeStrips.size()) {
+                int cur = m_viewportTimeStrips[viewportIdx]->currentValue();
+                if (cur > 0) {
+                    m_viewportTimeStrips[viewportIdx]->setTimePoint(cur - 1,
+                        m_brainView->stcTmin() + (cur - 1) * m_brainView->stcStep());
+                    m_brainView->setTimePointForViewport(viewportIdx, cur - 1);
+                }
+            }
+        });
+
+        connect(strip, &ViewportTimeStrip::stepForward, [this](int viewportIdx) {
+            if (viewportIdx < m_viewportTimeStrips.size()) {
+                int cur = m_viewportTimeStrips[viewportIdx]->currentValue();
+                int maxVal = m_brainView->stcNumTimePoints() - 1;
+                if (cur < maxVal) {
+                    m_viewportTimeStrips[viewportIdx]->setTimePoint(cur + 1,
+                        m_brainView->stcTmin() + (cur + 1) * m_brainView->stcStep());
+                    m_brainView->setTimePointForViewport(viewportIdx, cur + 1);
+                }
+            }
+        });
+    }
+
+    // Per-viewport time point feedback from BrainView
+    connect(m_brainView, &BrainView::viewportTimePointChanged, [this](int viewportIdx, int index, float time) {
+        if (viewportIdx >= 0 && viewportIdx < m_viewportTimeStrips.size()) {
+            m_viewportTimeStrips[viewportIdx]->setTimePoint(index, time);
+        }
     });
 
     // Multi-view: edit target selection
@@ -1009,6 +1160,13 @@ void MainWindow::setupConnections()
         // approach in the timeout handler dynamically computes the correct
         // number of frames to advance for any speed factor.
         m_stcTimer->setInterval(16);  // ~60 fps
+
+        // Update per-viewport time strips
+        for (ViewportTimeStrip *strip : m_viewportTimeStrips) {
+            strip->setRange(numPoints - 1);
+            strip->setTimePoint(0, m_brainView->stcTmin());
+            strip->stopPlayback();
+        }
     });
 
     connect(m_timeSlider, &QSlider::valueChanged, [this](int value) {
@@ -1111,9 +1269,17 @@ void MainWindow::setupConnections()
         if (checked && m_stcTimer->isActive()) {
             m_stcTimer->stop();
             m_playButton->setText("Play");
+            for (ViewportTimeStrip *strip : m_viewportTimeStrips)
+                strip->stopPlayback();
         } else if (!checked && m_brainView->isRealtimeStreaming()) {
             m_brainView->stopRealtimeStreaming();
             m_playButton->setText("Play");
+        }
+
+        // Disable per-viewport timeline controls in realtime mode
+        m_syncLockBtn->setEnabled(!checked);
+        for (ViewportTimeStrip *strip : m_viewportTimeStrips) {
+            strip->setControlsEnabled(!checked && !m_timelineSynced);
         }
     });
 
@@ -1128,25 +1294,59 @@ void MainWindow::setupConnections()
         double factor = m_speedCombo->currentData().toDouble();
         // How many samples worth of data time elapsed
         double samplesElapsed = (elapsedMs * factor) / (tstep * 1000.0);
-        m_stcStepAccum += samplesElapsed;
 
-        int steps = static_cast<int>(m_stcStepAccum);
-        if (steps < 1) return;
-        m_stcStepAccum -= steps;
+        if (m_timelineSynced) {
+            // Synced mode: single accumulator, advance main slider
+            m_stcStepAccum += samplesElapsed;
+            int steps = static_cast<int>(m_stcStepAccum);
+            if (steps < 1) return;
+            m_stcStepAccum -= steps;
 
-        int cur = m_timeSlider->value();
-        int maxVal = m_timeSlider->maximum();
-        int next = cur + steps;
-        if (next > maxVal) {
-            if (m_loopCheck->isChecked()) {
-                next = next % (maxVal + 1);
-            } else {
-                next = maxVal;
+            int cur = m_timeSlider->value();
+            int maxVal = m_timeSlider->maximum();
+            int next = cur + steps;
+            if (next > maxVal) {
+                if (m_loopCheck->isChecked()) {
+                    next = next % (maxVal + 1);
+                } else {
+                    next = maxVal;
+                    m_stcTimer->stop();
+                    m_playButton->setText("Play");
+                }
+            }
+            m_timeSlider->setValue(next);
+        } else {
+            // Unlocked mode: iterate per-viewport strips
+            int maxVal = m_brainView->stcNumTimePoints() - 1;
+            if (maxVal <= 0) return;
+
+            bool anyPlaying = false;
+            for (ViewportTimeStrip *strip : m_viewportTimeStrips) {
+                if (!strip->isVisible() || !strip->isPlaying())
+                    continue;
+                anyPlaying = true;
+
+                // Each strip has its own accumulator via the SubView
+                // For simplicity, use the shared elapsed time but advance independently
+                int cur = strip->currentValue();
+                int next = cur + qMax(1, static_cast<int>(samplesElapsed));
+                if (next > maxVal) {
+                    if (m_loopCheck->isChecked()) {
+                        next = next % (maxVal + 1);
+                    } else {
+                        next = maxVal;
+                        strip->stopPlayback();
+                    }
+                }
+                float time = m_brainView->stcTmin() + next * tstep;
+                strip->setTimePoint(next, time);
+                m_brainView->setTimePointForViewport(strip->viewportIndex(), next);
+            }
+
+            if (!anyPlaying) {
                 m_stcTimer->stop();
-                m_playButton->setText("Play");
             }
         }
-        m_timeSlider->setValue(next);
     });
 
     // Sensors
@@ -1583,6 +1783,43 @@ void MainWindow::setupConnections()
     m_showInfoCheck->blockSignals(true);
     m_showInfoCheck->setChecked(m_brainView->isInfoPanelVisible());
     m_showInfoCheck->blockSignals(false);
+
+    // ── Menu Action Connections ────────────────────────────────────────
+
+    connect(m_actOpenProject, &QAction::triggered, m_openProjectBtn, &QPushButton::click);
+    connect(m_actExportProject, &QAction::triggered, m_exportProjectBtn, &QPushButton::click);
+    connect(m_actLoadSurface, &QAction::triggered, m_loadSurfaceBtn, &QPushButton::click);
+    connect(m_actLoadAtlas, &QAction::triggered, m_loadAtlasBtn, &QPushButton::click);
+    connect(m_actLoadBem, &QAction::triggered, m_loadBemBtn, &QPushButton::click);
+    connect(m_actLoadStc, &QAction::triggered, m_loadStcBtn, &QPushButton::click);
+    connect(m_actLoadDipoles, &QAction::triggered, m_loadDipoleBtn, &QPushButton::click);
+    connect(m_actLoadSrcSpace, &QAction::triggered, m_loadSrcSpaceBtn, &QPushButton::click);
+    connect(m_actLoadEvoked, &QAction::triggered, m_loadEvokedBtn, &QPushButton::click);
+    connect(m_actLoadDigitizer, &QAction::triggered, m_loadDigBtn, &QPushButton::click);
+    connect(m_actLoadTransform, &QAction::triggered, m_loadTransBtn, &QPushButton::click);
+    connect(m_actPlayPause, &QAction::triggered, m_playButton, &QPushButton::click);
+    connect(m_actStepFwd, &QAction::triggered, [this]() {
+        if (m_timeSlider->isEnabled())
+            m_timeSlider->setValue(m_timeSlider->value() + 1);
+    });
+    connect(m_actStepBack, &QAction::triggered, [this]() {
+        if (m_timeSlider->isEnabled())
+            m_timeSlider->setValue(qMax(0, m_timeSlider->value() - 1));
+    });
+    connect(m_actRealtimeToggle, &QAction::toggled, m_realtimeCheck, &QCheckBox::setChecked);
+    connect(m_actSyncLock, &QAction::toggled, m_syncTimesCheck, &QCheckBox::setChecked);
+
+    // ── Status Bar Updates ────────────────────────────────────────────
+
+    connect(m_brainView, &BrainView::stcLoadingProgress, [this](int /*percent*/, const QString &message) {
+        m_statusLabel->setText(message);
+    });
+    connect(m_brainView, &BrainView::sourceEstimateLoaded, [this](int /*numPoints*/) {
+        m_statusLabel->setText("Ready");
+    });
+    connect(m_brainView, &BrainView::timePointChanged, [this](int /*index*/, float time) {
+        m_statusTimeLabel->setText(QString("Time: %1 s").arg(time, 0, 'f', 3));
+    });
 }
 
 //=============================================================================================================
@@ -1984,6 +2221,7 @@ void MainWindow::trackLoadedFile(const QString &path, int role)
         if (entry.first == path) return;
     }
     m_loadedFiles.append(qMakePair(path, role));
+    addLoadedFileEntry(path, role);
 }
 
 //=============================================================================================================
@@ -2114,6 +2352,7 @@ void MainWindow::importMnaProject(const QString &path)
     }
 
     qInfo() << "MNA project import complete.";
+    addRecentFile(path);
 }
 
 //=============================================================================================================
@@ -2168,4 +2407,275 @@ void MainWindow::exportMnaProject(const QString &path, bool embedData)
     } else {
         qWarning() << "Failed to export MNA project to:" << path;
     }
+}
+
+//=============================================================================================================
+
+void MainWindow::createMenus()
+{
+    // ── File Menu ──────────────────────────────────────────────────────
+
+    m_fileMenu = menuBar()->addMenu("&File");
+
+    m_actOpenProject = m_fileMenu->addAction("&Open Project...");
+    m_actOpenProject->setShortcut(QKeySequence("Ctrl+O"));
+
+    m_actExportProject = m_fileMenu->addAction("&Export Project...");
+    m_actExportProject->setShortcut(QKeySequence("Ctrl+Shift+E"));
+
+    m_fileMenu->addSeparator();
+
+    m_actLoadSurface = m_fileMenu->addAction("Load &Surface...");
+    m_actLoadSurface->setShortcut(QKeySequence("Ctrl+L"));
+
+    m_actLoadAtlas = m_fileMenu->addAction("Load &Atlas...");
+    m_actLoadBem = m_fileMenu->addAction("Load &BEM...");
+    m_actLoadStc = m_fileMenu->addAction("Load Source &Estimate...");
+    m_actLoadDipoles = m_fileMenu->addAction("Load &Dipoles...");
+    m_actLoadSrcSpace = m_fileMenu->addAction("Load Source S&pace...");
+    m_actLoadEvoked = m_fileMenu->addAction("Load E&voked...");
+    m_actLoadDigitizer = m_fileMenu->addAction("Load Digi&tizer...");
+    m_actLoadTransform = m_fileMenu->addAction("Load T&ransformation...");
+
+    m_fileMenu->addSeparator();
+
+#ifndef WASMBUILD
+    m_recentFilesMenu = m_fileMenu->addMenu("Recent Projects");
+    updateRecentFilesMenu();
+    m_fileMenu->addSeparator();
+#endif
+
+    m_actQuit = m_fileMenu->addAction("&Quit");
+    m_actQuit->setShortcut(QKeySequence("Ctrl+Q"));
+    connect(m_actQuit, &QAction::triggered, this, &QWidget::close);
+
+    // ── View Menu ──────────────────────────────────────────────────────
+
+    m_viewMenu = menuBar()->addMenu("&View");
+
+    m_actShowControls = m_controlsDock->toggleViewAction();
+    m_actShowControls->setShortcut(QKeySequence("Ctrl+1"));
+    m_actShowControls->setText("Show Controls Panel");
+    m_viewMenu->addAction(m_actShowControls);
+
+    m_actShowLoadedFiles = m_loadedFilesDock->toggleViewAction();
+    m_actShowLoadedFiles->setShortcut(QKeySequence("Ctrl+2"));
+    m_actShowLoadedFiles->setText("Show Loaded Files Panel");
+    m_viewMenu->addAction(m_actShowLoadedFiles);
+
+    m_viewMenu->addSeparator();
+
+    m_cameraPresetsMenu = m_viewMenu->addMenu("Camera Presets");
+    const QStringList presets = {"Left", "Right", "Top", "Bottom", "Front", "Back"};
+    for (const QString &preset : presets) {
+        QAction *act = m_cameraPresetsMenu->addAction(preset);
+        connect(act, &QAction::triggered, [this, preset]() {
+            int idx = m_cameraPresetCombo->findText(preset);
+            if (idx >= 0) m_cameraPresetCombo->setCurrentIndex(idx);
+        });
+    }
+
+    m_actResetCamera = m_viewMenu->addAction("&Reset Camera");
+    m_actResetCamera->setShortcut(QKeySequence("Ctrl+R"));
+    connect(m_actResetCamera, &QAction::triggered, [this]() {
+        m_cameraPresetCombo->setCurrentIndex(1);  // Perspective
+    });
+
+    // ── Tools Menu ─────────────────────────────────────────────────────
+
+    m_toolsMenu = menuBar()->addMenu("&Tools");
+
+    m_playbackMenu = m_toolsMenu->addMenu("Playback Controls");
+
+    m_actPlayPause = m_playbackMenu->addAction("Play / Pause");
+    m_actPlayPause->setShortcut(QKeySequence(Qt::Key_Space));
+
+    m_actStepFwd = m_playbackMenu->addAction("Step Forward");
+    m_actStepBack = m_playbackMenu->addAction("Step Back");
+
+    m_actRealtimeToggle = m_toolsMenu->addAction("Realtime Streaming");
+    m_actRealtimeToggle->setCheckable(true);
+
+    // ── Help Menu ──────────────────────────────────────────────────────
+
+    m_helpMenu = menuBar()->addMenu("&Help");
+
+    m_helpMenu->addAction("About MNE Inspect", [this]() {
+        QMessageBox::about(this, "About MNE Inspect",
+            "MNE Inspect\n\n"
+            "Brain visualization and analysis tool.\n\n"
+            "Part of the MNE-CPP project.\n"
+            "https://mne-cpp.github.io");
+    });
+
+    m_helpMenu->addAction("About Qt", [this]() {
+        QApplication::aboutQt();
+    });
+}
+
+//=============================================================================================================
+
+void MainWindow::createToolBar()
+{
+    m_mainToolBar = addToolBar("Main");
+    m_mainToolBar->setObjectName("mainToolBar");
+    m_mainToolBar->setMovable(false);
+
+    m_mainToolBar->addAction(m_actOpenProject);
+    m_mainToolBar->addAction(m_actLoadSurface);
+    m_mainToolBar->addAction(m_actLoadStc);
+    m_mainToolBar->addSeparator();
+    m_mainToolBar->addAction(m_actPlayPause);
+    m_mainToolBar->addAction(m_actStepFwd);
+    m_mainToolBar->addAction(m_actStepBack);
+    m_mainToolBar->addSeparator();
+
+    m_actSyncLock = m_mainToolBar->addAction("Sync Lock");
+    m_actSyncLock->setCheckable(true);
+    m_actSyncLock->setChecked(true);
+}
+
+//=============================================================================================================
+
+void MainWindow::createStatusBar()
+{
+    m_statusLabel = new QLabel("Ready");
+    m_statusTimeLabel = new QLabel("");
+
+    statusBar()->addWidget(m_statusLabel, 1);
+    statusBar()->addPermanentWidget(m_statusTimeLabel);
+}
+
+//=============================================================================================================
+
+void MainWindow::createLoadedFilesDock()
+{
+    m_loadedFilesDock = new QDockWidget("Loaded Files", this);
+    m_loadedFilesDock->setObjectName("loadedFilesDock");
+    m_loadedFilesDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
+
+    m_loadedFilesTree = new QTreeWidget;
+    m_loadedFilesTree->setHeaderLabels({"Name", "Type", "Path"});
+    m_loadedFilesTree->setColumnCount(3);
+    m_loadedFilesTree->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    connect(m_loadedFilesTree, &QTreeWidget::customContextMenuRequested, [this](const QPoint &pos) {
+        QTreeWidgetItem *item = m_loadedFilesTree->itemAt(pos);
+        if (!item) return;
+
+        QMenu menu;
+        QAction *removeAct = menu.addAction("Remove");
+        QAction *copyPathAct = menu.addAction("Copy Path");
+
+        QAction *chosen = menu.exec(m_loadedFilesTree->viewport()->mapToGlobal(pos));
+
+        if (chosen == removeAct) {
+            QString path = item->text(2);
+            for (int i = m_loadedFiles.size() - 1; i >= 0; --i) {
+                if (m_loadedFiles[i].first == path) {
+                    m_loadedFiles.removeAt(i);
+                    break;
+                }
+            }
+            delete item;
+        } else if (chosen == copyPathAct) {
+            QApplication::clipboard()->setText(item->text(2));
+        }
+    });
+
+    m_loadedFilesDock->setWidget(m_loadedFilesTree);
+    addDockWidget(Qt::RightDockWidgetArea, m_loadedFilesDock);
+}
+
+//=============================================================================================================
+
+void MainWindow::addLoadedFileEntry(const QString &path, int role)
+{
+    if (!m_loadedFilesTree) return;
+
+    QTreeWidgetItem *item = new QTreeWidgetItem;
+    item->setText(0, QFileInfo(path).fileName());
+    item->setText(1, mnaFileRoleToString(static_cast<MnaFileRole>(role)));
+    item->setText(2, path);
+    m_loadedFilesTree->addTopLevelItem(item);
+
+    // Update status bar
+    if (m_statusLabel) {
+        m_statusLabel->setText(QString("Loaded: %1").arg(QFileInfo(path).fileName()));
+    }
+}
+
+//=============================================================================================================
+
+void MainWindow::saveSettings()
+{
+#ifndef WASMBUILD
+    QSettings settings("mne-cpp", "mne_inspect");
+    settings.setValue("geometry", saveGeometry());
+    settings.setValue("windowState", saveState());
+    settings.setValue("recentFiles", m_recentFiles);
+#endif
+}
+
+//=============================================================================================================
+
+void MainWindow::restoreSettings()
+{
+#ifndef WASMBUILD
+    QSettings settings("mne-cpp", "mne_inspect");
+    if (settings.contains("geometry")) {
+        restoreGeometry(settings.value("geometry").toByteArray());
+        restoreState(settings.value("windowState").toByteArray());
+    } else {
+        resize(1200, 800);
+    }
+    m_recentFiles = settings.value("recentFiles").toStringList();
+    updateRecentFilesMenu();
+#else
+    resize(1200, 800);
+#endif
+}
+
+//=============================================================================================================
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    saveSettings();
+    QMainWindow::closeEvent(event);
+}
+
+//=============================================================================================================
+
+void MainWindow::updateRecentFilesMenu()
+{
+#ifndef WASMBUILD
+    if (!m_recentFilesMenu) return;
+    m_recentFilesMenu->clear();
+
+    const int maxRecent = qMin(m_recentFiles.size(), 10);
+    for (int i = 0; i < maxRecent; ++i) {
+        const QString &filePath = m_recentFiles[i];
+        QAction *act = m_recentFilesMenu->addAction(QFileInfo(filePath).fileName());
+        connect(act, &QAction::triggered, [this, filePath]() {
+            importMnaProject(filePath);
+        });
+    }
+    m_recentFilesMenu->setEnabled(!m_recentFiles.isEmpty());
+#endif
+}
+
+//=============================================================================================================
+
+void MainWindow::addRecentFile(const QString &path)
+{
+#ifndef WASMBUILD
+    m_recentFiles.removeAll(path);
+    m_recentFiles.prepend(path);
+    while (m_recentFiles.size() > 10) {
+        m_recentFiles.removeLast();
+    }
+    updateRecentFilesMenu();
+#else
+    Q_UNUSED(path);
+#endif
 }

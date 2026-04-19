@@ -152,3 +152,45 @@ SparseMatrix<int> StatsAdjacency::fromSourceSpace(const MatrixX3i& tris, int nVe
     adj.setFromTriplets(triplets.begin(), triplets.end());
     return adj;
 }
+
+//=============================================================================================================
+
+SparseMatrix<int> StatsAdjacency::fromSourceSpaceTemporal(
+    const MatrixX3i& tris, int nVertices, int nTimes)
+{
+    // Build spatial adjacency first
+    SparseMatrix<int> spatialAdj = fromSourceSpace(tris, nVertices);
+
+    const int nTotal = nVertices * nTimes;
+    std::vector<Triplet<int>> triplets;
+
+    // Reserve approximate capacity: spatial edges * nTimes + temporal edges
+    triplets.reserve(static_cast<size_t>(spatialAdj.nonZeros()) * nTimes
+                     + static_cast<size_t>(nVertices) * (nTimes - 1) * 2);
+
+    // Spatial neighbors repeated for each time point
+    // Linear index: v * nTimes + t
+    for (int t = 0; t < nTimes; ++t) {
+        for (int k = 0; k < spatialAdj.outerSize(); ++k) {
+            for (SparseMatrix<int>::InnerIterator it(spatialAdj, k); it; ++it) {
+                int row = static_cast<int>(it.row()) * nTimes + t;
+                int col = static_cast<int>(it.col()) * nTimes + t;
+                triplets.emplace_back(row, col, 1);
+            }
+        }
+    }
+
+    // Temporal neighbors: vertex v at time t adjacent to v at t-1 and t+1
+    for (int v = 0; v < nVertices; ++v) {
+        for (int t = 0; t < nTimes - 1; ++t) {
+            int idx0 = v * nTimes + t;
+            int idx1 = v * nTimes + t + 1;
+            triplets.emplace_back(idx0, idx1, 1);
+            triplets.emplace_back(idx1, idx0, 1);
+        }
+    }
+
+    SparseMatrix<int> adj(nTotal, nTotal);
+    adj.setFromTriplets(triplets.begin(), triplets.end());
+    return adj;
+}

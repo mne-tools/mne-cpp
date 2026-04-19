@@ -23,6 +23,10 @@ set(SOURCES
     metrics/weightedphaselagindex.cpp
     metrics/debiasedsquaredweightedphaselagindex.cpp
     metrics/phaselagindex.cpp
+    metrics/mvar_model.cpp
+    metrics/granger_causality.cpp
+    metrics/directed_transfer_function.cpp
+    metrics/partial_directed_coherence.cpp
     network/network.cpp
     network/networknode.cpp
     network/networkedge.cpp
@@ -43,6 +47,10 @@ set(HEADERS
     metrics/weightedphaselagindex.h
     metrics/debiasedsquaredweightedphaselagindex.h
     metrics/phaselagindex.h
+    metrics/mvar_model.h
+    metrics/granger_causality.h
+    metrics/directed_transfer_function.h
+    metrics/partial_directed_coherence.h
     network/network.h
     network/networknode.h
     network/networkedge.h

@@ -107,6 +107,76 @@ public:
         double pThreshold = 0.05,
         StatsTailType tail = StatsTailType::Both);
 
+    //=========================================================================================================
+    /**
+     * One-sample cluster-based permutation test.
+     *
+     * Tests whether the mean across subjects differs from zero at each vertex x time
+     * point using sign-flip permutations.
+     *
+     * @param[in] data            Per-subject data. Each matrix is nVertices x nTimes.
+     * @param[in] adjacency       Spatio-temporal adjacency matrix (nVertices*nTimes x nVertices*nTimes).
+     * @param[in] threshold       Cluster-forming t-threshold.
+     * @param[in] nPermutations   Number of sign-flip permutations.
+     * @param[in] tail            Tail type for the test.
+     *
+     * @return StatsClusterResult with observed t-map, cluster statistics, and p-values.
+     *
+     * @since 2.2.0
+     */
+    static StatsClusterResult oneSamplePermutationTest(
+        const QVector<Eigen::MatrixXd>& data,
+        const Eigen::SparseMatrix<int>& adjacency,
+        double threshold,
+        int nPermutations,
+        StatsTailType tail);
+
+    //=========================================================================================================
+    /**
+     * F-test cluster-based permutation test for one-way ANOVA.
+     *
+     * Tests for differences across conditions by randomly reassigning condition
+     * labels and computing max cluster F-statistics.
+     *
+     * @param[in] conditions      Vector of conditions, each containing per-subject matrices (nVertices x nTimes).
+     * @param[in] adjacency       Spatio-temporal adjacency matrix (nVertices*nTimes x nVertices*nTimes).
+     * @param[in] threshold       Cluster-forming F-threshold.
+     * @param[in] nPermutations   Number of permutations.
+     *
+     * @return StatsClusterResult with observed F-map (in matTObs), cluster statistics, and p-values.
+     *
+     * @since 2.2.0
+     */
+    static StatsClusterResult fTestPermutationTest(
+        const QVector<QVector<Eigen::MatrixXd>>& conditions,
+        const Eigen::SparseMatrix<int>& adjacency,
+        double threshold,
+        int nPermutations);
+
+    //=========================================================================================================
+    /**
+     * Threshold-Free Cluster Enhancement (TFCE).
+     *
+     * Enhances a statistic map by integrating cluster extent and height over a range
+     * of thresholds (Smith & Nichols 2009). Handles both positive and negative values.
+     *
+     * @param[in] statMap     Statistic map (nVertices x nTimes).
+     * @param[in] adjacency   Spatio-temporal adjacency matrix (nVertices*nTimes x nVertices*nTimes).
+     * @param[in] E           Extent exponent (default 0.5).
+     * @param[in] H           Height exponent (default 2.0).
+     * @param[in] nSteps      Number of threshold steps (default 100).
+     *
+     * @return TFCE-enhanced score map (nVertices x nTimes).
+     *
+     * @since 2.2.0
+     */
+    static Eigen::MatrixXd tfce(
+        const Eigen::MatrixXd& statMap,
+        const Eigen::SparseMatrix<int>& adjacency,
+        double E = 0.5,
+        double H = 2.0,
+        int nSteps = 100);
+
 private:
     //=========================================================================================================
     /**
@@ -144,6 +214,52 @@ private:
      * Approximate the inverse t CDF (quantile function) for thresholding.
      */
     static double inverseTCdf(double p, int df);
+
+    //=========================================================================================================
+    /**
+     * Compute a one-sample t-statistic map: t = mean / (std / sqrt(n)).
+     */
+    static Eigen::MatrixXd computeOneSampleTMap(
+        const QVector<Eigen::MatrixXd>& data);
+
+    //=========================================================================================================
+    /**
+     * Compute a one-way ANOVA F-statistic map across conditions.
+     */
+    static Eigen::MatrixXd computeFMap(
+        const QVector<QVector<Eigen::MatrixXd>>& conditions);
+
+    //=========================================================================================================
+    /**
+     * Find connected clusters on a flattened spatio-temporal adjacency matrix.
+     *
+     * @return Pair of (cluster ID matrix, vector of cluster statistic sums).
+     */
+    static QPair<Eigen::MatrixXi, QVector<double>> findClustersFlat(
+        const Eigen::MatrixXd& statMap,
+        double threshold,
+        const Eigen::SparseMatrix<int>& adjacency,
+        bool positiveOnly);
+
+    //=========================================================================================================
+    /**
+     * Perform one sign-flip permutation for one-sample test.
+     */
+    static double permuteOnceOneSample(
+        const QVector<Eigen::MatrixXd>& data,
+        const Eigen::SparseMatrix<int>& adjacency,
+        double threshold,
+        StatsTailType tail);
+
+    //=========================================================================================================
+    /**
+     * Perform one label-shuffle permutation for F-test.
+     */
+    static double permuteOnceFTest(
+        const QVector<Eigen::MatrixXd>& allData,
+        const QVector<int>& groupSizes,
+        const Eigen::SparseMatrix<int>& adjacency,
+        double threshold);
 };
 
 } // namespace STSLIB

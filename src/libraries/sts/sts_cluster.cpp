@@ -38,6 +38,7 @@
 
 #include "sts_cluster.h"
 #include "sts_ttest.h"
+#include "sts_ftest.h"
 
 #include <QtConcurrent>
 #include <QRandomGenerator>
@@ -314,4 +315,455 @@ double StatsCluster::inverseTCdf(double p, int df)
     }
 
     return (lo + hi) / 2.0;
+}
+
+//=============================================================================================================
+
+MatrixXd StatsCluster::computeOneSampleTMap(const QVector<MatrixXd>& data)
+{
+    const int nSubjects = data.size();
+    const int nVertices = static_cast<int>(data[0].rows());
+    const int nTimes = static_cast<int>(data[0].cols());
+
+    MatrixXd sum = MatrixXd::Zero(nVertices, nTimes);
+    MatrixXd sumSq = MatrixXd::Zero(nVertices, nTimes);
+
+    for (int s = 0; s < nSubjects; ++s) {
+        sum += data[s];
+        sumSq += data[s].cwiseProduct(data[s]);
+    }
+
+    double n = static_cast<double>(nSubjects);
+    MatrixXd mean = sum / n;
+    MatrixXd variance = (sumSq - sum.cwiseProduct(sum) / n) / (n - 1.0);
+    variance = variance.cwiseMax(1.0e-30);
+
+    MatrixXd tMap = mean.array() / (variance.array().sqrt() / std::sqrt(n));
+    return tMap;
+}
+
+//=============================================================================================================
+
+MatrixXd StatsCluster::computeFMap(const QVector<QVector<MatrixXd>>& conditions)
+{
+    const int nConditions = conditions.size();
+    const int nVertices = static_cast<int>(conditions[0][0].rows());
+    const int nTimes = static_cast<int>(conditions[0][0].cols());
+
+    // Count total subjects and build per-condition means
+    int nTotal = 0;
+    for (int c = 0; c < nConditions; ++c) {
+        nTotal += conditions[c].size();
+    }
+
+    // Grand mean
+    MatrixXd grandSum = MatrixXd::Zero(nVertices, nTimes);
+    for (int c = 0; c < nConditions; ++c) {
+        for (int s = 0; s < conditions[c].size(); ++s) {
+            grandSum += conditions[c][s];
+        }
+    }
+    MatrixXd grandMean = grandSum / static_cast<double>(nTotal);
+
+    // SS between and SS within
+    MatrixXd ssBetween = MatrixXd::Zero(nVertices, nTimes);
+    MatrixXd ssWithin = MatrixXd::Zero(nVertices, nTimes);
+
+    for (int c = 0; c < nConditions; ++c) {
+        int nc = conditions[c].size();
+        MatrixXd condSum = MatrixXd::Zero(nVertices, nTimes);
+        for (int s = 0; s < nc; ++s) {
+            condSum += conditions[c][s];
+        }
+        MatrixXd condMean = condSum / static_cast<double>(nc);
+
+        MatrixXd diff = condMean - grandMean;
+        ssBetween += static_cast<double>(nc) * diff.cwiseProduct(diff);
+
+        for (int s = 0; s < nc; ++s) {
+            MatrixXd residual = conditions[c][s] - condMean;
+            ssWithin += residual.cwiseProduct(residual);
+        }
+    }
+
+    int dfBetween = nConditions - 1;
+    int dfWithin = nTotal - nConditions;
+
+    MatrixXd msBetween = ssBetween / static_cast<double>(dfBetween);
+    MatrixXd msWithin = ssWithin / static_cast<double>(dfWithin);
+    msWithin = msWithin.cwiseMax(1.0e-30);
+
+    MatrixXd fMap = msBetween.array() / msWithin.array();
+    return fMap;
+}
+
+//=============================================================================================================
+
+QPair<MatrixXi, QVector<double>> StatsCluster::findClustersFlat(
+    const MatrixXd& statMap,
+    double threshold,
+    const SparseMatrix<int>& adjacency,
+    bool positiveOnly)
+{
+    const int nVertices = static_cast<int>(statMap.rows());
+    const int nTimes = static_cast<int>(statMap.cols());
+    const int nTotal = nVertices * nTimes;
+
+    MatrixXi clusterIds = MatrixXi::Zero(nVertices, nTimes);
+    QVector<double> clusterStats;
+    int currentClusterId = 0;
+
+    // BFS on the flat spatio-temporal adjacency
+    std::vector<bool> visited(nTotal, false);
+
+    for (int idx = 0; idx < nTotal; ++idx) {
+        int v = idx / nTimes;
+        int t = idx % nTimes;
+        double val = statMap(v, t);
+
+        bool suprathreshold = positiveOnly ? (val > threshold) : (val < -threshold);
+        if (!suprathreshold || visited[idx]) continue;
+
+        currentClusterId++;
+        double clusterSum = 0.0;
+        std::queue<int> queue;
+        queue.push(idx);
+        visited[idx] = true;
+
+        while (!queue.empty()) {
+            int curIdx = queue.front();
+            queue.pop();
+
+            int curV = curIdx / nTimes;
+            int curT = curIdx % nTimes;
+
+            clusterIds(curV, curT) = positiveOnly ? currentClusterId : -currentClusterId;
+            clusterSum += statMap(curV, curT);
+
+            // Iterate over adjacency neighbors
+            for (SparseMatrix<int>::InnerIterator it(adjacency, curIdx); it; ++it) {
+                int nIdx = static_cast<int>(it.row());
+                if (visited[nIdx]) continue;
+                int nV = nIdx / nTimes;
+                int nT = nIdx % nTimes;
+                double nval = statMap(nV, nT);
+                bool nSupra = positiveOnly ? (nval > threshold) : (nval < -threshold);
+                if (nSupra) {
+                    visited[nIdx] = true;
+                    queue.push(nIdx);
+                }
+            }
+        }
+
+        clusterStats.append(clusterSum);
+    }
+
+    return {clusterIds, clusterStats};
+}
+
+//=============================================================================================================
+
+double StatsCluster::permuteOnceOneSample(
+    const QVector<MatrixXd>& data,
+    const SparseMatrix<int>& adjacency,
+    double threshold,
+    StatsTailType tail)
+{
+    const int nSubjects = data.size();
+
+    // Generate random sign flips
+    QRandomGenerator rng(QRandomGenerator::global()->generate());
+    QVector<int> signs(nSubjects);
+    for (int s = 0; s < nSubjects; ++s) {
+        signs[s] = rng.bounded(2) == 0 ? 1 : -1;
+    }
+
+    // Apply sign flips
+    QVector<MatrixXd> flipped(nSubjects);
+    for (int s = 0; s < nSubjects; ++s) {
+        flipped[s] = data[s] * static_cast<double>(signs[s]);
+    }
+
+    // Compute t-map and find clusters
+    MatrixXd tMap = computeOneSampleTMap(flipped);
+
+    double maxStat = 0.0;
+
+    if (tail == StatsTailType::Both || tail == StatsTailType::Right) {
+        auto [ids, stats] = findClustersFlat(tMap, threshold, adjacency, true);
+        for (double s : stats) {
+            if (std::fabs(s) > maxStat) maxStat = std::fabs(s);
+        }
+    }
+    if (tail == StatsTailType::Both || tail == StatsTailType::Left) {
+        auto [ids, stats] = findClustersFlat(tMap, threshold, adjacency, false);
+        for (double s : stats) {
+            if (std::fabs(s) > maxStat) maxStat = std::fabs(s);
+        }
+    }
+
+    return maxStat;
+}
+
+//=============================================================================================================
+
+double StatsCluster::permuteOnceFTest(
+    const QVector<MatrixXd>& allData,
+    const QVector<int>& groupSizes,
+    const SparseMatrix<int>& adjacency,
+    double threshold)
+{
+    const int nTotal = allData.size();
+
+    // Random permutation of indices
+    std::vector<int> indices(nTotal);
+    std::iota(indices.begin(), indices.end(), 0);
+
+    QRandomGenerator rng(QRandomGenerator::global()->generate());
+    for (int i = nTotal - 1; i > 0; --i) {
+        int j = static_cast<int>(rng.bounded(i + 1));
+        std::swap(indices[i], indices[j]);
+    }
+
+    // Rebuild condition groups
+    QVector<QVector<MatrixXd>> permConditions;
+    int offset = 0;
+    for (int c = 0; c < groupSizes.size(); ++c) {
+        QVector<MatrixXd> group;
+        group.reserve(groupSizes[c]);
+        for (int s = 0; s < groupSizes[c]; ++s) {
+            group.append(allData[indices[offset + s]]);
+        }
+        permConditions.append(group);
+        offset += groupSizes[c];
+    }
+
+    // Compute F-map and find clusters (F is always positive)
+    MatrixXd fMap = computeFMap(permConditions);
+    auto [ids, stats] = findClustersFlat(fMap, threshold, adjacency, true);
+
+    double maxStat = 0.0;
+    for (double s : stats) {
+        if (s > maxStat) maxStat = s;
+    }
+    return maxStat;
+}
+
+//=============================================================================================================
+
+StatsClusterResult StatsCluster::oneSamplePermutationTest(
+    const QVector<MatrixXd>& data,
+    const SparseMatrix<int>& adjacency,
+    double threshold,
+    int nPermutations,
+    StatsTailType tail)
+{
+    // Step 1: Compute observed one-sample t-map
+    MatrixXd tObs = computeOneSampleTMap(data);
+
+    // Step 2: Find observed clusters
+    MatrixXi clusterIdsPos, clusterIdsNeg;
+    QVector<double> clusterStats;
+
+    if (tail == StatsTailType::Both || tail == StatsTailType::Right) {
+        auto [ids, stats] = findClustersFlat(tObs, threshold, adjacency, true);
+        clusterIdsPos = ids;
+        clusterStats.append(stats);
+    }
+    if (tail == StatsTailType::Both || tail == StatsTailType::Left) {
+        auto [ids, stats] = findClustersFlat(tObs, threshold, adjacency, false);
+        clusterIdsNeg = ids;
+        clusterStats.append(stats);
+    }
+
+    // Merge cluster ID maps
+    MatrixXi clusterIds = MatrixXi::Zero(tObs.rows(), tObs.cols());
+    if (clusterIdsPos.size() > 0) clusterIds += clusterIdsPos;
+    if (clusterIdsNeg.size() > 0) clusterIds += clusterIdsNeg;
+
+    // Step 3: Build null distribution via sign-flip permutations
+    QVector<int> permIndices(nPermutations);
+    std::iota(permIndices.begin(), permIndices.end(), 0);
+
+    std::function<double(int)> permuteFunc = [&](int) -> double {
+        return permuteOnceOneSample(data, adjacency, threshold, tail);
+    };
+
+    QFuture<double> future = QtConcurrent::mapped(permIndices, permuteFunc);
+    future.waitForFinished();
+
+    QVector<double> nullDist(nPermutations);
+    for (int i = 0; i < nPermutations; ++i) {
+        nullDist[i] = future.resultAt(i);
+    }
+    std::sort(nullDist.begin(), nullDist.end());
+
+    // Step 4: Compute cluster p-values
+    QVector<double> clusterPvals(clusterStats.size());
+    for (int c = 0; c < clusterStats.size(); ++c) {
+        double obsStat = std::fabs(clusterStats[c]);
+        int count = 0;
+        for (int p = 0; p < nPermutations; ++p) {
+            if (nullDist[p] >= obsStat) {
+                count++;
+            }
+        }
+        clusterPvals[c] = static_cast<double>(count) / static_cast<double>(nPermutations);
+    }
+
+    StatsClusterResult result;
+    result.matTObs = tObs;
+    result.vecClusterStats = clusterStats;
+    result.vecClusterPvals = clusterPvals;
+    result.matClusterIds = clusterIds;
+    result.clusterThreshold = threshold;
+    return result;
+}
+
+//=============================================================================================================
+
+StatsClusterResult StatsCluster::fTestPermutationTest(
+    const QVector<QVector<MatrixXd>>& conditions,
+    const SparseMatrix<int>& adjacency,
+    double threshold,
+    int nPermutations)
+{
+    // Step 1: Compute observed F-map
+    MatrixXd fObs = computeFMap(conditions);
+
+    // Step 2: Find observed clusters (F is always positive, one-tailed)
+    auto [clusterIds, clusterStats] = findClustersFlat(fObs, threshold, adjacency, true);
+
+    // Step 3: Flatten all data and record group sizes
+    QVector<MatrixXd> allData;
+    QVector<int> groupSizes;
+    for (int c = 0; c < conditions.size(); ++c) {
+        groupSizes.append(conditions[c].size());
+        for (int s = 0; s < conditions[c].size(); ++s) {
+            allData.append(conditions[c][s]);
+        }
+    }
+
+    // Step 4: Build null distribution via label-shuffle permutations
+    QVector<int> permIndices(nPermutations);
+    std::iota(permIndices.begin(), permIndices.end(), 0);
+
+    std::function<double(int)> permuteFunc = [&](int) -> double {
+        return permuteOnceFTest(allData, groupSizes, adjacency, threshold);
+    };
+
+    QFuture<double> future = QtConcurrent::mapped(permIndices, permuteFunc);
+    future.waitForFinished();
+
+    QVector<double> nullDist(nPermutations);
+    for (int i = 0; i < nPermutations; ++i) {
+        nullDist[i] = future.resultAt(i);
+    }
+    std::sort(nullDist.begin(), nullDist.end());
+
+    // Step 5: Compute cluster p-values
+    QVector<double> clusterPvals(clusterStats.size());
+    for (int c = 0; c < clusterStats.size(); ++c) {
+        double obsStat = clusterStats[c];
+        int count = 0;
+        for (int p = 0; p < nPermutations; ++p) {
+            if (nullDist[p] >= obsStat) {
+                count++;
+            }
+        }
+        clusterPvals[c] = static_cast<double>(count) / static_cast<double>(nPermutations);
+    }
+
+    StatsClusterResult result;
+    result.matTObs = fObs;
+    result.vecClusterStats = clusterStats;
+    result.vecClusterPvals = clusterPvals;
+    result.matClusterIds = clusterIds;
+    result.clusterThreshold = threshold;
+    return result;
+}
+
+//=============================================================================================================
+
+MatrixXd StatsCluster::tfce(
+    const MatrixXd& statMap,
+    const SparseMatrix<int>& adjacency,
+    double E,
+    double H,
+    int nSteps)
+{
+    const int nVertices = static_cast<int>(statMap.rows());
+    const int nTimes = static_cast<int>(statMap.cols());
+    const int nTotal = nVertices * nTimes;
+
+    MatrixXd tfceMap = MatrixXd::Zero(nVertices, nTimes);
+
+    // Helper: run TFCE on one polarity
+    auto runTfce = [&](const MatrixXd& absMap, bool isPositive) {
+        double maxVal = absMap.maxCoeff();
+        if (maxVal <= 0.0) return;
+
+        double dh = maxVal / static_cast<double>(nSteps);
+
+        for (int step = 1; step <= nSteps; ++step) {
+            double h = dh * static_cast<double>(step);
+
+            // Find connected components above threshold h
+            std::vector<bool> visited(nTotal, false);
+
+            for (int idx = 0; idx < nTotal; ++idx) {
+                int v = idx / nTimes;
+                int t = idx % nTimes;
+
+                if (absMap(v, t) < h || visited[idx]) continue;
+
+                // BFS to find cluster
+                std::vector<int> cluster;
+                std::queue<int> queue;
+                queue.push(idx);
+                visited[idx] = true;
+
+                while (!queue.empty()) {
+                    int curIdx = queue.front();
+                    queue.pop();
+                    cluster.push_back(curIdx);
+
+                    for (SparseMatrix<int>::InnerIterator it(adjacency, curIdx); it; ++it) {
+                        int nIdx = static_cast<int>(it.row());
+                        if (visited[nIdx]) continue;
+                        int nV = nIdx / nTimes;
+                        int nT = nIdx % nTimes;
+                        if (absMap(nV, nT) >= h) {
+                            visited[nIdx] = true;
+                            queue.push(nIdx);
+                        }
+                    }
+                }
+
+                // Compute contribution: e^E * h^H * dh
+                double extent = static_cast<double>(cluster.size());
+                double contribution = std::pow(extent, E) * std::pow(h, H) * dh;
+
+                for (int cIdx : cluster) {
+                    int cv = cIdx / nTimes;
+                    int ct = cIdx % nTimes;
+                    if (isPositive) {
+                        tfceMap(cv, ct) += contribution;
+                    } else {
+                        tfceMap(cv, ct) -= contribution;
+                    }
+                }
+            }
+        }
+    };
+
+    // Positive values
+    MatrixXd posMap = statMap.cwiseMax(0.0);
+    runTfce(posMap, true);
+
+    // Negative values (use absolute values, then negate contributions)
+    MatrixXd negMap = (-statMap).cwiseMax(0.0);
+    runTfce(negMap, false);
+
+    return tfceMap;
 }

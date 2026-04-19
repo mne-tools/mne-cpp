@@ -1,0 +1,96 @@
+{
+    "mna_version": "1.0",
+    "name": "Auditory Pipeline",
+    "description": "Example MNE Scan pipeline: FiffSimulator producing raw data, feeding into Averaging and Covariance estimation.",
+    "created": "2026-04-19T00:00:00Z",
+    "modified": "2026-04-19T00:00:00Z",
+    "subjects": [],
+    "pipeline": [
+        {
+            "id": "FiffSimulator",
+            "opType": "FiffSimulator",
+            "execMode": "stream",
+            "attributes": {
+                "gui_x": 50,
+                "gui_y": 100,
+                "sFreq": 1000.0,
+                "dataFile": "MNE-sample-data/MEG/sample/sample_audvis_raw.fif"
+            },
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "RealTimeSampleArray",
+                    "dataKind": "fiff_raw",
+                    "direction": "output",
+                    "streamProtocol": "",
+                    "streamEndpoint": "",
+                    "streamBufferMs": 0
+                }
+            ],
+            "dirty": true
+        },
+        {
+            "id": "Averaging",
+            "opType": "Averaging",
+            "execMode": "stream",
+            "attributes": {
+                "gui_x": 350,
+                "gui_y": 50,
+                "numAverages": 80,
+                "baselineFrom": -200,
+                "baselineTo": 0,
+                "stim_channel": "STI 014"
+            },
+            "inputs": [
+                {
+                    "name": "RealTimeSampleArray",
+                    "dataKind": "fiff_raw",
+                    "direction": "input",
+                    "sourceNodeId": "FiffSimulator",
+                    "sourcePortName": "RealTimeSampleArray"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "RealTimeEvokedSet",
+                    "dataKind": "evoked",
+                    "direction": "output",
+                    "streamProtocol": "",
+                    "streamEndpoint": "",
+                    "streamBufferMs": 0
+                }
+            ],
+            "dirty": true
+        },
+        {
+            "id": "Covariance",
+            "opType": "Covariance",
+            "execMode": "stream",
+            "attributes": {
+                "gui_x": 350,
+                "gui_y": 200,
+                "numSamples": 5000
+            },
+            "inputs": [
+                {
+                    "name": "RealTimeSampleArray",
+                    "dataKind": "fiff_raw",
+                    "direction": "input",
+                    "sourceNodeId": "FiffSimulator",
+                    "sourcePortName": "RealTimeSampleArray"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "RealTimeCovariance",
+                    "dataKind": "covariance",
+                    "direction": "output",
+                    "streamProtocol": "",
+                    "streamEndpoint": "",
+                    "streamBufferMs": 0
+                }
+            ],
+            "dirty": true
+        }
+    ]
+}

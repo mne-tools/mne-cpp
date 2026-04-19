@@ -44,6 +44,15 @@
 #include "pluginconnectorconnection.h"
 
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace MNALIB
+{
+class MnaGraph;
+}
+
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -146,6 +155,46 @@ public:
      */
     void clear();
 
+    //=========================================================================================================
+    /**
+     * Returns a reference to the pipeline MnaGraph.
+     * The graph mirrors the current plugin/connection state.
+     */
+    MNALIB::MnaGraph& pipelineGraph();
+
+    /**
+     * Returns a const reference to the pipeline MnaGraph.
+     */
+    const MNALIB::MnaGraph& pipelineGraph() const;
+
+    //=========================================================================================================
+    /**
+     * Add a graph node for the given plugin.
+     * Called automatically by addPlugin().
+     */
+    void addGraphNode(const AbstractPlugin::SPtr& pPlugin, qreal guiX = 0, qreal guiY = 0);
+
+    //=========================================================================================================
+    /**
+     * Remove the graph node for the given plugin.
+     * Called automatically by removePlugin().
+     */
+    void removeGraphNode(const AbstractPlugin::SPtr& pPlugin);
+
+    //=========================================================================================================
+    /**
+     * Record a connection in the pipeline graph.
+     */
+    void connectGraphNodes(const AbstractPlugin::SPtr& pSender,
+                           const AbstractPlugin::SPtr& pReceiver);
+
+    //=========================================================================================================
+    /**
+     * Update the GUI position attributes for a plugin's graph node.
+     */
+    void updateGraphNodePosition(const AbstractPlugin::SPtr& pPlugin,
+                                 qreal guiX, qreal guiY);
+
 signals:
 
 private:
@@ -163,6 +212,7 @@ private:
     void stopNonSensorPlugins();
 
     PluginList m_pluginList;    /**< List of plugins associated with this set. */
+    MNALIB::MnaGraph* m_pPipelineGraph;  /**< MNA graph mirroring the plugin scene. */
 };
 
 //=============================================================================================================

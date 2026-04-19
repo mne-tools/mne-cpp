@@ -160,6 +160,12 @@ struct DISP3DSHARED_EXPORT SubView
     int                             preset           = 1;   // 0=Top,1=Perspective,...,6=Right
     bool                            enabled          = true;
 
+    // ── Per-viewport timeline state ───────────────────────────────────
+    int                             currentTimePoint = 0;
+    double                          playbackSpeed    = 1.0;
+    double                          stcStepAccum     = 0.0;
+    bool                            isPlaying        = false;
+
     // ── FsSurface classification helpers ─────────────────────────────────
 
     /**
