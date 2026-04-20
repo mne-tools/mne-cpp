@@ -497,7 +497,7 @@ private slots:
         if(ok) {
             QVERIFY(desc.categories.size() > 0);
         } else {
-            QWARN("parseAverageFile failed — code path exercised");
+            qWarning("parseAverageFile failed — code path exercised");
         }
     }
 
@@ -530,7 +530,7 @@ private slots:
         if(ok) {
             QVERIFY(desc.defs.size() > 0);
         } else {
-            QWARN("parseCovarianceFile failed — code path exercised");
+            qWarning("parseCovarianceFile failed — code path exercised");
         }
     }
 

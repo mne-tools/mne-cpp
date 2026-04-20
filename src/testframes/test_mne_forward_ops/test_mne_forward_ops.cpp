@@ -217,7 +217,7 @@ private slots:
             QCOMPARE(reloaded.nchan, m_fwd.nchan);
             QFile::remove(tmpFile);
         } else {
-            QWARN("Forward solution write failed — code path exercised");
+            qWarning("Forward solution write failed — code path exercised");
         }
     }
 

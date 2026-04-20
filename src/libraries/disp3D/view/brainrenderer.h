@@ -58,6 +58,9 @@ class QRhiCommandBuffer;
 class QRhiRenderTarget;
 class QRhiRenderPassDescriptor;
 class QRhiResourceUpdateBatch;
+class QRhiTexture;
+class QRhiRenderBuffer;
+class QRhiTextureRenderTarget;
 class BrainSurface;
 class DipoleObject;
 class NetworkObject;
@@ -124,39 +127,53 @@ public:
      * @param[in] sampleCount  MSAA sample count.
      */
     void initialize(QRhi *rhi, QRhiRenderPassDescriptor *rp, int sampleCount);
-    
+
     //=========================================================================================================
     /**
-     * Begin a rendering frame/pass. Clears the target.
+     * Create the dual render-target pair for multi-pass rendering.
+     *
+     * Both render targets share the same color texture and depth-stencil
+     * buffer but differ in their load/store flags:
+     *   - m_rtClear:    clears color+depth on beginPass  (first pass)
+     *   - m_rtPreserve: preserves previous output        (passes 2+)
+     *
+     * Qt bakes these flags into native resources at create() time, so
+     * calling setFlags() dynamically does NOT work (especially on WebGL).
+     * This is the validated pattern from test_wasm_multi_pass.
+     *
+     * @param[in] rhi        QRhi instance.
+     * @param[in] colorTex   Color texture (owned by QRhiWidget or caller).
+     * @param[in] pixelSize  Render target dimensions.
+     */
+    void ensureRenderTargets(QRhi *rhi, QRhiTexture *colorTex, const QSize &pixelSize);
+
+    //=========================================================================================================
+    /**
+     * @return The clearing render target (pass 1).
+     */
+    QRhiRenderTarget *rtClear() const;
+
+    /**
+     * @return The preserving render target (passes 2+).
+     */
+    QRhiRenderTarget *rtPreserve() const;
+
+    //=========================================================================================================
+    /**
+     * Begin the first render pass of a frame. Clears color and depth.
      *
      * @param[in] cb         Command buffer to record to.
-     * @param[in] rt         Render target to draw into.
      */
-    void beginFrame(QRhiCommandBuffer *cb, QRhiRenderTarget *rt);
+    void beginFrame(QRhiCommandBuffer *cb);
 
     //=========================================================================================================
-    // ── WORKAROUND(QRhi-GLES2): Multi-pass rendering ───────────────────
-    // Begin/end an additional render pass that preserves the previous
-    // pass's colour+depth contents.  Used on WASM where each surface
-    // category needs its own pass (one drawIndexed per pass limit).
-    //
     /**
      * Begin an additional render pass that preserves previous output.
-     * Sets PreserveColorContents + PreserveDepthStencilContents on the
-     * texture render target so the new pass composites over the old one.
+     * Uses the internal preserving render target (m_rtPreserve).
      *
      * @param[in] cb         Command buffer.
-     * @param[in] rt         Render target.
      */
-    void beginAdditionalPass(QRhiCommandBuffer *cb, QRhiRenderTarget *rt);
-
-    /**
-     * End an additional render pass and restore render target flags.
-     *
-     * @param[in] cb         Command buffer.
-     * @param[in] rt         Render target.
-     */
-    void endAdditionalPass(QRhiCommandBuffer *cb, QRhiRenderTarget *rt);
+    void beginPreservingPass(QRhiCommandBuffer *cb);
 
     //=========================================================================================================
     /**
@@ -168,7 +185,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Render a single surface. Must be called between beginFrame and endFrame.
+     * Render a single surface. Must be called between beginFrame/beginPreservingPass and endPass.
      *
      * @param[in] cb         Command buffer.
      * @param[in] rhi        QRhi pointer.
@@ -190,17 +207,41 @@ public:
      * Prepare merged brain surface geometry for single-drawIndexed rendering.
      * Call BEFORE beginFrame() with a pre-upload resource batch.
      *
+     * Uses dirty-flag caching: geometry is only rebuilt when the surface
+     * list changes (add/remove/visibility toggle).  Per-vertex color
+     * updates (STC animation) only re-upload the color channel.
+     *
      * @param[in] rhi        QRhi pointer.
      * @param[in] u          Resource update batch (pre-render uploads).
      * @param[in] surfaces   Brain surfaces to merge.
+     * @param[in] groupName  Category name (e.g. "brain", "bem", "srcsp").
      */
     void prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch *u,
                                const QVector<BrainSurface*> &surfaces,
                                const QString &groupName = QStringLiteral("default"));
 
     /**
+     * Mark a merged group as dirty so it is rebuilt on the next
+     * prepareMergedSurfaces call.  Call when surfaces are added/removed
+     * or visibility changes.
+     *
+     * @param[in] groupName  Category name to invalidate.
+     */
+    void invalidateMergedGroup(const QString &groupName = QStringLiteral("default"));
+
+    /**
+     * Check if a merged group has drawable geometry (indexCount > 0).
+     * Use before beginPreservingPass() to avoid empty render passes
+     * which can clear the framebuffer on some WebGL implementations.
+     *
+     * @param[in] groupName  Category name to check.
+     * @return true if the group exists and has indices to draw.
+     */
+    bool hasMergedContent(const QString &groupName) const;
+
+    /**
      * Draw previously prepared merged surfaces in a single drawIndexed.
-     * Call between beginFrame() and endFrame().
+     * Call between beginFrame()/beginPreservingPass() and endPass().
      *
      * @param[in] cb         Command buffer.
      * @param[in] rhi        QRhi pointer.
@@ -236,11 +277,11 @@ public:
 
     //=========================================================================================================
     /**
-     * End the rendering frame/pass.
+     * End any render pass (clearing or preserving).
      *
      * @param[in] cb         Command buffer.
      */
-    void endFrame(QRhiCommandBuffer *cb);
+    void endPass(QRhiCommandBuffer *cb);
     
 private:
     /** @brief Private implementation holding QRhi pipelines, shader resources, and uniform buffers (PIMPL). */

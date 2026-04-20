@@ -207,7 +207,7 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        fprintf(stderr, "  Matched %d gain-matrix columns\n", colIndices.size());
+        fprintf(stderr, "  Matched %lld gain-matrix columns\n", static_cast<long long>(colIndices.size()));
 
         //
         // Extract restricted gain matrix columns
@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
     //
     // Write projectors to output file
     //
-    fprintf(stderr, "Writing %d projector(s) to %s...\n", projectors.size(), outFile.toUtf8().constData());
+    fprintf(stderr, "Writing %lld projector(s) to %s...\n", static_cast<long long>(projectors.size()), outFile.toUtf8().constData());
 
     QFile outIO(outFile);
     FiffStream::SPtr stream = FiffStream::start_file(outIO);

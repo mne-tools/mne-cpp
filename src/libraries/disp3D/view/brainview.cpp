@@ -93,6 +93,7 @@ BrainView::BrainView(QWidget *parent)
 {
     setMinimumSize(800, 600);
     setSampleCount(1);
+    setAutoRenderTarget(false);  // We manage our own dual render targets
 
 #if defined(WASMBUILD) || defined(__EMSCRIPTEN__)
     setApi(Api::OpenGL);  // WebGL 2 (OpenGL ES 3.0) on WASM
@@ -1314,6 +1315,11 @@ void BrainView::initialize(QRhiCommandBuffer *cb)
     Q_UNUSED(cb);
 
     m_renderer = std::make_unique<BrainRenderer>();
+
+    // Create dual render targets (clearing + preserving) sharing this
+    // widget's color texture.  Must be done here because colorTexture()
+    // is only valid inside initialize()/render().
+    m_renderer->ensureRenderTargets(rhi(), colorTexture(), colorTexture()->pixelSize());
 }
 
 //=============================================================================================================
@@ -1330,9 +1336,10 @@ void BrainView::render(QRhiCommandBuffer *cb)
         if (!m_renderer) {
             m_renderer = std::make_unique<BrainRenderer>();
         }
-        m_renderer->initialize(rhi(), renderTarget()->renderPassDescriptor(), sampleCount());
-        m_renderer->beginFrame(cb, renderTarget());
-        m_renderer->endFrame(cb);
+        m_renderer->ensureRenderTargets(rhi(), colorTexture(), colorTexture()->pixelSize());
+        m_renderer->initialize(rhi(), m_renderer->rtClear()->renderPassDescriptor(), sampleCount());
+        m_renderer->beginFrame(cb);
+        m_renderer->endPass(cb);
         return;
     }
 
@@ -1392,10 +1399,11 @@ void BrainView::render(QRhiCommandBuffer *cb)
     }
 
     // Initialize renderer
-    m_renderer->initialize(rhi(), renderTarget()->renderPassDescriptor(), sampleCount());
+    m_renderer->ensureRenderTargets(rhi(), colorTexture(), colorTexture()->pixelSize());
+    m_renderer->initialize(rhi(), m_renderer->rtClear()->renderPassDescriptor(), sampleCount());
 
     // Determine viewport configuration
-    QSize outputSize = renderTarget()->pixelSize();
+    QSize outputSize = m_renderer->rtClear()->pixelSize();
 
     // Build list of enabled viewports
     const auto enabledViewports = enabledViewportIndices();
@@ -1443,21 +1451,51 @@ void BrainView::render(QRhiCommandBuffer *cb)
 #endif
 
 #ifdef __EMSCRIPTEN__
-        // WORKAROUND(QRhi-GLES2): The QRhi GLES2/WebGL backend only renders
-        // the first drawIndexed() per render pass.  ALL visible surfaces are
-        // merged into a single VBO/IBO and drawn with one drawIndexed call.
-        // This means all surfaces share the same shader — no per-category
-        // shader differentiation (e.g. holographic sensors) on WASM.
+        // WORKAROUND(QRhi-GLES2): Single merged buffer for ALL surfaces.
+        // The Qt QRhi GLES2/WebGL backend only renders the first
+        // drawIndexed() per render pass.  Multi-pass compositing via
+        // PreserveColorContents is unreliable across WebGL implementations.
+        // Merge everything into one VBO/IBO and issue one drawIndexed().
         {
             const SubView &sv = (m_viewMode == MultiView) ? m_subViews[0] : m_singleView;
+
             QVector<BrainSurface*> allSurfaces;
+
+            // Brain surfaces (opaque, drawn first for depth)
             for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-                if (!it.value()->isVisible()) continue;
+                if (!SubView::isBrainSurfaceKey(it.key())) continue;
+                if (!sv.matchesSurfaceType(it.key())) continue;
                 if (!sv.shouldRenderSurface(it.key())) continue;
                 allSurfaces.append(it.value().get());
             }
-            if (!allSurfaces.isEmpty())
-                m_renderer->prepareMergedSurfaces(rhi(), preUpload, allSurfaces, QStringLiteral("default"));
+
+            // Source space points
+            for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+                if (!it.key().startsWith("srcsp_")) continue;
+                if (!sv.shouldRenderSurface(it.key())) continue;
+                if (!it.value()->isVisible()) continue;
+                allSurfaces.append(it.value().get());
+            }
+
+            // Digitizer points
+            for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+                if (!it.key().startsWith("dig_")) continue;
+                if (!sv.shouldRenderSurface(it.key())) continue;
+                if (!it.value()->isVisible()) continue;
+                allSurfaces.append(it.value().get());
+            }
+
+            // BEM + sensors (transparent — appended last for correct blending order)
+            for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+                bool isSensor = it.key().startsWith("sens_");
+                bool isBem = it.key().startsWith("bem_");
+                if (!isSensor && !isBem) continue;
+                if (!sv.shouldRenderSurface(it.key())) continue;
+                if (!it.value()->isVisible()) continue;
+                allSurfaces.append(it.value().get());
+            }
+
+            m_renderer->prepareMergedSurfaces(rhi(), preUpload, allSurfaces, QStringLiteral("default"));
         }
 #endif
 
@@ -1465,8 +1503,8 @@ void BrainView::render(QRhiCommandBuffer *cb)
         cb->resourceUpdate(preUpload);
     }
 
-    // ── Render pass ─────────────────────────────────────────────────────
-    m_renderer->beginFrame(cb, renderTarget());
+    // ── Render passes ───────────────────────────────────────────────────
+    m_renderer->beginFrame(cb);
 
     for (int slot = 0; slot < numEnabled; ++slot) {
         int vp = (m_viewMode == MultiView) ? enabledViewports[slot] : 0;
@@ -1598,23 +1636,15 @@ void BrainView::render(QRhiCommandBuffer *cb)
 
 #ifdef __EMSCRIPTEN__
     // ══════════════════════════════════════════════════════════════════════
-    // WORKAROUND(QRhi-GLES2): Multi-pass rendering.
+    // WORKAROUND(QRhi-GLES2): Single-pass merged rendering.
     // The Qt QRhi GLES2/WebGL backend only renders the first drawIndexed()
-    // per render pass.  ALL visible surfaces are merged into a single
-    // VBO/IBO and drawn with one drawIndexed call in the beginFrame pass.
-    //
-    // Compromises due to this backend constraint:
-    //   1. All surfaces share a single shader — no per-category shader
-    //      differentiation (e.g. holographic for sensors).
-    //   2. Per-surface uniforms are not possible (all surfaces share
-    //      one draw call).
-    //   3. Transparent surface sorting is unavailable.
-    //   4. Dipoles and debug pointer are not rendered.
+    // per render pass, AND multi-pass compositing via PreserveColorContents
+    // is unreliable.  All visible surfaces (brain, BEM, sensors, source
+    // space, digitizers) are merged into one VBO/IBO and drawn in a single
+    // drawIndexed() call in the clearing pass.
     //
     // Remove when upstream Qt fixes the QRhi GLES2 drawIndexed bug.
     // ══════════════════════════════════════════════════════════════════════
-
-    // Single pass — all visible surfaces in one merged draw call
     m_renderer->drawMergedSurfaces(cb, rhi(), sceneData, currentShader, QStringLiteral("default"));
 
 #else
@@ -1731,7 +1761,10 @@ void BrainView::render(QRhiCommandBuffer *cb)
 
     } // End of viewport loop
 
-    m_renderer->endFrame(cb);
+    m_renderer->endPass(cb);
+
+    // On WASM, all surfaces are drawn in the single clearing pass above
+    // via the merged "default" group.  No additional preserving passes needed.
 }
 
 //=============================================================================================================

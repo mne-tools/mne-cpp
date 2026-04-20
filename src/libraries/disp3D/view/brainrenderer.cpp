@@ -69,6 +69,20 @@ struct BrainRenderer::Impl
 
     bool resourcesDirty = true;
 
+    // ── Dual render targets for multi-pass rendering ─────────────────
+    // Qt bakes load/store flags at create() time, so we need two separate
+    // render targets sharing the same color texture + depth buffer:
+    //   - rtClear:    clears framebuffer    (first pass of each frame)
+    //   - rtPreserve: preserves contents    (subsequent passes)
+    // Validated in test_wasm_multi_pass on both Metal and WebGL.
+    std::unique_ptr<QRhiRenderBuffer> dsBuffer;
+    std::unique_ptr<QRhiTextureRenderTarget> rtClear;
+    std::unique_ptr<QRhiTextureRenderTarget> rtPreserve;
+    std::unique_ptr<QRhiRenderPassDescriptor> rpClear;
+    std::unique_ptr<QRhiRenderPassDescriptor> rpPreserve;
+    QSize rtSize;
+    QRhiTexture *rtColorTex = nullptr;  // Track texture pointer for rebuild
+
     // ── WORKAROUND(QRhi-GLES2): merged single-drawIndexed buffers ────
     // Used on WASM to avoid the multi-drawIndexed bug in QRhi's GLES2
     // backend.  Each surface category (brain, BEM, sensors, etc.) gets
@@ -79,6 +93,7 @@ struct BrainRenderer::Impl
         std::unique_ptr<QRhiBuffer> vertexBuffer;
         std::unique_ptr<QRhiBuffer> indexBuffer;
         int indexCount = 0;
+        bool dirty = true;  // Geometry needs rebuild (surface list changed)
         QByteArray vertexRaw;
         QByteArray indexRaw;
     };
@@ -293,24 +308,60 @@ void BrainRenderer::Impl::createResources(QRhi *rhi, QRhiRenderPassDescriptor *r
 
 //=============================================================================================================
 
-void BrainRenderer::beginFrame(QRhiCommandBuffer *cb, QRhiRenderTarget *rt)
+//=============================================================================================================
+
+void BrainRenderer::ensureRenderTargets(QRhi *rhi, QRhiTexture *colorTex, const QSize &pixelSize)
+{
+    // Rebuild when size changes OR when the backing texture changes
+    // (QRhiWidget may return a different colorTexture() each frame).
+    if (d->rtClear && d->rtSize == pixelSize && d->rtColorTex == colorTex)
+        return;
+
+    d->rtSize = pixelSize;
+    d->rtColorTex = colorTex;
+
+    // Shared depth-stencil buffer
+    d->dsBuffer.reset(rhi->newRenderBuffer(QRhiRenderBuffer::DepthStencil, pixelSize));
+    d->dsBuffer->create();
+
+    QRhiColorAttachment colorAtt(colorTex);
+    QRhiTextureRenderTargetDescription desc(colorAtt);
+    desc.setDepthStencilBuffer(d->dsBuffer.get());
+
+    // RT 1: Clearing (no preserve flags) — used for the first pass of each frame
+    d->rtClear.reset(rhi->newTextureRenderTarget(desc));
+    d->rpClear.reset(d->rtClear->newCompatibleRenderPassDescriptor());
+    d->rtClear->setRenderPassDescriptor(d->rpClear.get());
+    d->rtClear->create();
+
+    // RT 2: Preserving (load previous contents) — used for passes 2+
+    d->rtPreserve.reset(rhi->newTextureRenderTarget(desc,
+        QRhiTextureRenderTarget::PreserveColorContents
+        | QRhiTextureRenderTarget::PreserveDepthStencilContents));
+    d->rpPreserve.reset(d->rtPreserve->newCompatibleRenderPassDescriptor());
+    d->rtPreserve->setRenderPassDescriptor(d->rpPreserve.get());
+    d->rtPreserve->create();
+}
+
+//=============================================================================================================
+
+QRhiRenderTarget *BrainRenderer::rtClear() const
+{
+    return d->rtClear.get();
+}
+
+QRhiRenderTarget *BrainRenderer::rtPreserve() const
+{
+    return d->rtPreserve.get();
+}
+
+//=============================================================================================================
+
+void BrainRenderer::beginFrame(QRhiCommandBuffer *cb)
 {
     d->currentUniformOffset = 0;
 
-    // WORKAROUND(QRhi-GLES2): Ensure PreserveColorContents is cleared so
-    // the first pass of each frame clears the framebuffer.  The multi-pass
-    // WASM path sets this flag via beginAdditionalPass(); if the last
-    // additional pass is still open when endFrame() runs, the flag leaks
-    // into the next frame and the clear never happens — producing ghost
-    // images of previous frames.
-    auto *texRt = dynamic_cast<QRhiTextureRenderTarget*>(rt);
-    if (texRt) {
-        texRt->setFlags(texRt->flags()
-            & ~QRhiTextureRenderTarget::Flags(
-                QRhiTextureRenderTarget::PreserveColorContents
-                | QRhiTextureRenderTarget::PreserveDepthStencilContents));
-    }
-
+    auto *rt = d->rtClear.get();
     cb->beginPass(rt, QColor(0, 0, 0), { 1.0f, 0 });
     const int w = rt->pixelSize().width();
     const int h = rt->pixelSize().height();
@@ -327,32 +378,9 @@ void BrainRenderer::updateSceneUniforms(QRhi *rhi, const SceneData &data)
 
 //=============================================================================================================
 
-void BrainRenderer::endFrame(QRhiCommandBuffer *cb)
+void BrainRenderer::beginPreservingPass(QRhiCommandBuffer *cb)
 {
-    cb->endPass();
-}
-
-//=============================================================================================================
-// ── WORKAROUND(QRhi-GLES2): Multi-pass rendering ───────────────────────
-// The Qt QRhi GLES2/WebGL backend only renders the first drawIndexed()
-// per render pass.  To render multiple surface types (brain, BEM,
-// sensors, dipoles, etc.) we use separate render passes — one per
-// surface category — with PreserveColorContents so each pass composites
-// over the previous one.  Remove when upstream Qt fixes the bug.
-//=============================================================================================================
-
-void BrainRenderer::beginAdditionalPass(QRhiCommandBuffer *cb, QRhiRenderTarget *rt)
-{
-    // Set PreserveColorContents so this pass does NOT clear the previous
-    // pass's output.  The flag is checked by beginPass() to select
-    // GL_LOAD instead of GL_CLEAR.
-    auto *texRt = dynamic_cast<QRhiTextureRenderTarget*>(rt);
-    if (texRt) {
-        texRt->setFlags(texRt->flags()
-            | QRhiTextureRenderTarget::PreserveColorContents
-            | QRhiTextureRenderTarget::PreserveDepthStencilContents);
-    }
-
+    auto *rt = d->rtPreserve.get();
     cb->beginPass(rt, QColor(0, 0, 0), { 1.0f, 0 });
     const int w = rt->pixelSize().width();
     const int h = rt->pixelSize().height();
@@ -360,18 +388,11 @@ void BrainRenderer::beginAdditionalPass(QRhiCommandBuffer *cb, QRhiRenderTarget 
     cb->setScissor(QRhiScissor(0, 0, w, h));
 }
 
-void BrainRenderer::endAdditionalPass(QRhiCommandBuffer *cb, QRhiRenderTarget *rt)
+//=============================================================================================================
+
+void BrainRenderer::endPass(QRhiCommandBuffer *cb)
 {
     cb->endPass();
-
-    // Restore flags so the NEXT frame's first pass clears normally.
-    auto *texRt = dynamic_cast<QRhiTextureRenderTarget*>(rt);
-    if (texRt) {
-        texRt->setFlags(texRt->flags()
-            & ~QRhiTextureRenderTarget::Flags(
-                QRhiTextureRenderTarget::PreserveColorContents
-                | QRhiTextureRenderTarget::PreserveDepthStencilContents));
-    }
 }
 
 //=============================================================================================================
@@ -601,8 +622,46 @@ void BrainRenderer::prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch * /
                                            const QString &groupName)
 {
     auto &group = d->mergedGroups[groupName];
+
+    // Check if surface list changed (different count or different pointers)
+    if (!group.dirty) {
+        if (group.surfaces.size() != surfaces.size()) {
+            group.dirty = true;
+        } else {
+            for (int i = 0; i < surfaces.size(); ++i) {
+                if (group.surfaces[i] != surfaces[i]) {
+                    group.dirty = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    // If geometry hasn't changed, just re-upload vertex data for color updates
+    // (STC animation changes vertex colors but not topology)
+    if (!group.dirty && group.indexCount > 0) {
+        QVector<VertexData> mergedVerts;
+        float surfaceId = 0.0f;
+        for (BrainSurface *surf : surfaces) {
+            if (!surf) { surfaceId += 1.0f; continue; }
+            const auto &srcVerts = surf->vertexDataRef();
+            mergedVerts.reserve(mergedVerts.size() + srcVerts.size());
+            for (const VertexData &v : srcVerts) {
+                VertexData mv = v;
+                mv.surfaceId = surfaceId;
+                mergedVerts.append(mv);
+            }
+            surfaceId += 1.0f;
+        }
+        const quint32 vbufSize = mergedVerts.size() * sizeof(VertexData);
+        group.vertexRaw = QByteArray(reinterpret_cast<const char*>(mergedVerts.constData()), vbufSize);
+        return;
+    }
+
+    // Full rebuild: topology or surface list changed
     group.surfaces = surfaces;
     group.indexCount = 0;
+    group.dirty = false;
 
     // Build merged vertex + index arrays
     QVector<VertexData> mergedVerts;
@@ -655,6 +714,24 @@ void BrainRenderer::prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch * /
     // pass so that GL element-buffer bindings are refreshed right before draw.
     group.vertexRaw = QByteArray(reinterpret_cast<const char*>(mergedVerts.constData()), vbufSize);
     group.indexRaw  = QByteArray(reinterpret_cast<const char*>(mergedIndices.constData()), ibufSize);
+}
+
+//=============================================================================================================
+
+void BrainRenderer::invalidateMergedGroup(const QString &groupName)
+{
+    auto it = d->mergedGroups.find(groupName);
+    if (it != d->mergedGroups.end()) {
+        it->second.dirty = true;
+    }
+}
+
+//=============================================================================================================
+
+bool BrainRenderer::hasMergedContent(const QString &groupName) const
+{
+    auto it = d->mergedGroups.find(groupName);
+    return it != d->mergedGroups.end() && it->second.indexCount > 0;
 }
 
 //=============================================================================================================
@@ -733,9 +810,17 @@ void BrainRenderer::drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
         cb->drawIndexed(group.indexCount);
     };
 
+    // WORKAROUND(QRhi-GLES2): On WebGL, only one drawIndexed() per pass.
+    // For Holographic mode, the back-face pass must happen in a separate
+    // render pass.  The caller is responsible for wrapping each call in
+    // its own beginPreservingPass/endPass on WASM.
+#ifdef __EMSCRIPTEN__
+    draw(pipeline);
+#else
     if (mode == Holographic && d->pipelinesBackColor.count(Holographic) > 0) {
         draw(d->pipelinesBackColor[Holographic].get());
     }
 
     draw(pipeline);
+#endif
 }
