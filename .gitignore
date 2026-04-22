@@ -85,6 +85,8 @@ doc/papers/
 
 /build*
 /out*
+/CMakeCache.txt
+/CMakeFiles/
 /resources/data*
 /resources/resources
 .cache/*
