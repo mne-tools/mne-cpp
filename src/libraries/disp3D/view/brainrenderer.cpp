@@ -47,6 +47,7 @@
 
 #include <QFile>
 #include <QDebug>
+#include <array>
 #include <map>
 #include <cstring>
 
@@ -54,15 +55,17 @@
 // PIMPL
 //=============================================================================================================
 
+static constexpr int kNumShaderModes = 6; // Standard..ShowNormals
+
 struct BrainRenderer::Impl
 {
     void createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int sampleCount);
 
     std::unique_ptr<QRhiShaderResourceBindings> srb;
 
-    // Pipelines for each mode
-    std::map<ShaderMode, std::unique_ptr<QRhiGraphicsPipeline>> pipelines;
-    std::map<ShaderMode, std::unique_ptr<QRhiGraphicsPipeline>> pipelinesBackColor; // For Holographic back faces
+    // Pipelines for each mode — indexed by ShaderMode enum (O(1) lookup)
+    std::array<std::unique_ptr<QRhiGraphicsPipeline>, kNumShaderModes> pipelines{};
+    std::array<std::unique_ptr<QRhiGraphicsPipeline>, kNumShaderModes> pipelinesBackColor{};
 
     std::unique_ptr<QRhiBuffer> uniformBuffer;
     int uniformBufferOffsetAlignment = 0;
@@ -404,9 +407,6 @@ void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
 {
     if (!surface || !surface->isVisible()) return;
 
-    // Check if pipeline for this mode exists
-    if (d->pipelines.find(mode) == d->pipelines.end()) return;
-    
     auto *pipeline = d->pipelines[mode].get();
     if (!pipeline) return;
 
@@ -474,7 +474,7 @@ void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
         cb->drawIndexed(surface->indexCount());
     };
 
-    if (mode == Holographic && d->pipelinesBackColor.count(Holographic) > 0) {
+    if (mode == Holographic && d->pipelinesBackColor[Holographic]) {
         draw(d->pipelinesBackColor[Holographic].get());
     }
     
@@ -487,8 +487,6 @@ void BrainRenderer::renderDipoles(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
 {
     if (!dipoles || !dipoles->isVisible() || dipoles->instanceCount() == 0) return;
 
-    if (d->pipelines.find(Dipole) == d->pipelines.end()) return;
-    
     auto *pipeline = d->pipelines[Dipole].get();
     if (!pipeline) return;
 
@@ -498,24 +496,27 @@ void BrainRenderer::renderDipoles(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
     // Dynamic slot update
     int offset = d->currentUniformOffset;
     d->currentUniformOffset += d->uniformBufferOffsetAlignment;
-    if (d->currentUniformOffset >= d->uniformBuffer->size()) d->currentUniformOffset = 0;
+    if (d->currentUniformOffset >= d->uniformBuffer->size()) {
+        qWarning("BrainRenderer: uniform buffer overflow in renderDipoles");
+        return;
+    }
 
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetMVP, 64, data.mvp.constData());
-
-    // Pack post-MVP uniforms into a contiguous block (cameraPos..lighting)
+    // Pack all uniforms into a single contiguous upload
     struct {
+        float mvp[16];          // 0..63
         float cameraPos[3];     // 64..75
-        float _pad0;            // 76..79  (isSelected — unused for dipoles)
+        float _pad0;            // 76..79
         float lightDir[3];      // 80..91
-        float _pad1;            // 92..95  (tissueType — unused for dipoles)
+        float _pad1;            // 92..95
         float lightingEnabled;  // 96..99
     } dub;
+    memcpy(dub.mvp, data.mvp.constData(), 64);
     memcpy(dub.cameraPos, &data.cameraPos, 12);
     dub._pad0 = 0.0f;
     memcpy(dub.lightDir, &data.lightDir, 12);
     dub._pad1 = 0.0f;
     dub.lightingEnabled = data.lightingEnabled ? 1.0f : 0.0f;
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetCameraPos, sizeof(dub), &dub);
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset, sizeof(dub), &dub);
 
     cb->resourceUpdate(u);
 
@@ -544,8 +545,6 @@ void BrainRenderer::renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
 {
     if (!network || !network->isVisible() || !network->hasData()) return;
 
-    if (d->pipelines.find(Dipole) == d->pipelines.end()) return;
-
     auto *pipeline = d->pipelines[Dipole].get();
     if (!pipeline) return;
 
@@ -561,12 +560,12 @@ void BrainRenderer::renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
             return;
         }
 
-        uNodes->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetMVP, 64, data.mvp.constData());
-        struct { float cp[3]; float _p0; float ld[3]; float _p1; float le; } nub;
+        struct { float mvp[16]; float cp[3]; float _p0; float ld[3]; float _p1; float le; } nub;
+        memcpy(nub.mvp, data.mvp.constData(), 64);
         memcpy(nub.cp, &data.cameraPos, 12); nub._p0 = 0.0f;
         memcpy(nub.ld, &data.lightDir, 12);  nub._p1 = 0.0f;
         nub.le = data.lightingEnabled ? 1.0f : 0.0f;
-        uNodes->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetCameraPos, sizeof(nub), &nub);
+        uNodes->updateDynamicBuffer(d->uniformBuffer.get(), offset, sizeof(nub), &nub);
 
         cb->resourceUpdate(uNodes);
         cb->setViewport(toViewport(data));
@@ -598,12 +597,12 @@ void BrainRenderer::renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
             return;
         }
 
-        uEdges->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetMVP, 64, data.mvp.constData());
-        struct { float cp[3]; float _p0; float ld[3]; float _p1; float le; } eub;
+        struct { float mvp[16]; float cp[3]; float _p0; float ld[3]; float _p1; float le; } eub;
+        memcpy(eub.mvp, data.mvp.constData(), 64);
         memcpy(eub.cp, &data.cameraPos, 12); eub._p0 = 0.0f;
         memcpy(eub.ld, &data.lightDir, 12);  eub._p1 = 0.0f;
         eub.le = data.lightingEnabled ? 1.0f : 0.0f;
-        uEdges->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetCameraPos, sizeof(eub), &eub);
+        uEdges->updateDynamicBuffer(d->uniformBuffer.get(), offset, sizeof(eub), &eub);
 
         cb->resourceUpdate(uEdges);
         cb->setViewport(toViewport(data));
@@ -801,7 +800,6 @@ void BrainRenderer::drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
     auto &group = it->second;
 
     if (group.indexCount == 0) return;
-    if (d->pipelines.find(mode) == d->pipelines.end()) return;
 
     auto *pipeline = d->pipelines[mode].get();
     if (!pipeline) return;
@@ -879,7 +877,7 @@ void BrainRenderer::drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
 #ifdef __EMSCRIPTEN__
     draw(pipeline);
 #else
-    if (mode == Holographic && d->pipelinesBackColor.count(Holographic) > 0) {
+    if (mode == Holographic && d->pipelinesBackColor[Holographic]) {
         draw(d->pipelinesBackColor[Holographic].get());
     }
 

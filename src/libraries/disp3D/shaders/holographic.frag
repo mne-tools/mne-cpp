@@ -45,8 +45,9 @@ void main() {
 
     // === DATA DETECTION (Saturation) ===
     float gray_val = dot(effectiveColor, vec3(0.299, 0.587, 0.114));
-    float saturation = length(effectiveColor - vec3(gray_val));
-    float is_data = smoothstep(0.05, 0.2, saturation);
+    vec3 diff = effectiveColor - vec3(gray_val);
+    float satSq = dot(diff, diff);
+    float is_data = smoothstep(0.0025, 0.04, satSq);
     
     // === COLOR PALETTE ===
     vec3 shell_blue = vec3(0.0, 0.4, 0.8);
