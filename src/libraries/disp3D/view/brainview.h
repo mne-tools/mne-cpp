@@ -978,6 +978,7 @@ private:
     QLabel *m_fpsLabel = nullptr;                   /**< Overlay label showing FPS and vertex count. */
     QLabel *m_singleViewInfoLabel = nullptr;        /**< Overlay label for single-view shader/surface info. */
     QTimer *m_updateTimer = nullptr;                /**< Periodic repaint timer (~60 Hz). */
+    bool m_sceneDirty = true;                       /**< Set when scene needs redraw; cleared after render. */
     int m_snapshotCounter = 0;                      /**< Sequential counter for snapshot filenames. */
     bool m_infoPanelVisible = true;                 /**< Whether the info overlay panel is shown. */
 

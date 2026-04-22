@@ -273,6 +273,9 @@ public:
     const QVector<VertexData>& vertexDataRef() const { return m_vertexData; }
     /** @brief Const-ref access to CPU-side index data (used by merged rendering). */
     const QVector<uint32_t>& indexDataRef() const { return m_indexData; }
+
+    /** @brief Monotonically increasing counter bumped whenever vertex data changes. */
+    quint64 vertexGeneration() const { return m_vertexGeneration; }
     
     //=========================================================================================================
     /**
@@ -393,6 +396,7 @@ public:
     
 private:
     void updateVertexColors();
+    void markVertexDirty();
 
     QVector<VertexData> m_vertexData;
     QVector<VertexData> m_originalVertexData;
@@ -419,6 +423,8 @@ private:
     /** @brief QRhi vertex, index, and uniform buffers for brain surface GPU rendering. */
     struct GpuBuffers;
     std::unique_ptr<GpuBuffers> m_gpu;
+
+    quint64 m_vertexGeneration = 0;
 
     mutable QVector3D m_aabbMin;
     mutable QVector3D m_aabbMax;

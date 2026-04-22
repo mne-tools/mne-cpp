@@ -53,6 +53,14 @@ struct BrainSurface::GpuBuffers
     bool dirty = true;
 };
 
+//=============================================================================================================
+
+void BrainSurface::markVertexDirty()
+{
+    m_gpu->dirty = true;
+    ++m_vertexGeneration;
+}
+
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -109,7 +117,7 @@ void BrainSurface::fromSurface(const FSLIB::FsSurface &surf)
     }
     m_indexCount = m_indexData.size();
     
-    m_gpu->dirty = true;
+    markVertexDirty();
     m_bAABBDirty = true;
     
     // Initial coloring based on current visualization mode
@@ -160,7 +168,7 @@ void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface &surf, const QColo
     m_indexCount = m_indexData.size();
     
     m_originalVertexData = m_vertexData;
-    m_gpu->dirty = true;
+    markVertexDirty();
 }
 
 void BrainSurface::createFromData(const Eigen::MatrixX3f &vertices, const Eigen::MatrixX3i &triangles, const QColor &color)
@@ -210,7 +218,7 @@ void BrainSurface::createFromData(const Eigen::MatrixX3f &vertices, const Eigen:
     m_indexCount = m_indexData.size();
     
     m_originalVertexData = m_vertexData;
-    m_gpu->dirty = true;
+    markVertexDirty();
 }
 
 //=============================================================================================================
@@ -249,7 +257,7 @@ bool BrainSurface::loadAnnotation(const QString &path)
     }
     m_hasAnnotation = true;
     updateVertexColors();
-    m_gpu->dirty = true;
+    markVertexDirty();
     return true;
 }
 
@@ -258,7 +266,7 @@ void BrainSurface::addAnnotation(const FSLIB::FsAnnotation &annotation)
     m_annotation = annotation;
     m_hasAnnotation = true;
     updateVertexColors();
-    m_gpu->dirty = true;
+    markVertexDirty();
 }
 
 
@@ -283,7 +291,7 @@ void BrainSurface::setVisualizationMode(VisualizationMode mode)
     // must be refreshed so the channel holds curvature grays (Scientific)
     // or STC colours (SourceEstimate).
     updateVertexColors();
-    m_gpu->dirty = true;
+    markVertexDirty();
 }
 
 //=============================================================================================================
@@ -298,7 +306,7 @@ void BrainSurface::applySourceEstimateColors(const QVector<uint32_t> &colors)
         m_vertexData[i].color = colors[i];
     }
     
-    m_gpu->dirty = true;
+    markVertexDirty();
 }
 
 //=============================================================================================================
@@ -308,7 +316,7 @@ void BrainSurface::clearSourceEstimateColors()
     m_stcColors.clear();
     m_visMode = ModeSurface;
     updateVertexColors();
-    m_gpu->dirty = true;
+    markVertexDirty();
 }
 
 //=============================================================================================================
@@ -416,7 +424,7 @@ void BrainSurface::updateVertexColors()
         // by the shader gold glow via the isSelected uniform.
     }
 
-    m_gpu->dirty = true;
+    markVertexDirty();
 }
 
 float BrainSurface::minX() const
@@ -442,7 +450,7 @@ void BrainSurface::translateX(float offset)
     for (auto &v : m_vertexData) {
         v.pos.setX(v.pos.x() + offset);
     }
-    m_gpu->dirty = true;
+    markVertexDirty();
     m_bAABBDirty = true;
 }
 
@@ -475,7 +483,7 @@ void BrainSurface::transform(const QMatrix4x4 &m)
         float nz = d[2]*v.norm.x() + d[5]*v.norm.y() + d[8]*v.norm.z();
         v.norm = QVector3D(nx, ny, nz).normalized();
     }
-    m_gpu->dirty = true;
+    markVertexDirty();
     m_bAABBDirty = true;
 }
 
@@ -487,7 +495,7 @@ void BrainSurface::applyTransform(const QMatrix4x4 &m)
     if (!m.isIdentity()) {
         transform(m);
     } else {
-        m_gpu->dirty = true;
+        markVertexDirty();
         m_bAABBDirty = true;
     }
 }

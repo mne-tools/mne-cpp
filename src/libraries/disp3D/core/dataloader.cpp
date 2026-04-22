@@ -42,6 +42,7 @@
 #include "renderable/brainsurface.h"
 
 #include <QFile>
+#include <QFileInfo>
 #include <QDebug>
 #include <QCoreApplication>
 
@@ -176,6 +177,15 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
 
             if (helmetPath.isEmpty()) {
                 helmetPath = pickHelmetFile();
+#ifdef __EMSCRIPTEN__
+                // WASM: applicationDirPath()/../ may not resolve correctly.
+                // Try the preloaded virtual FS path directly.
+                if (!QFile::exists(helmetPath)) {
+                    QString fn = QFileInfo(helmetPath).fileName();
+                    if (fn.isEmpty()) fn = QStringLiteral("306m.fif");
+                    helmetPath = QStringLiteral("/resources/general/sensorSurfaces/") + fn;
+                }
+#endif
             }
 
             if (!QFile::exists(helmetPath)) {
@@ -185,6 +195,20 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
                     helmetPath = fallback;
                 }
             }
+
+#ifdef __EMSCRIPTEN__
+            // WASM fallback: sensor surfaces are preloaded into the
+            // Emscripten virtual FS at /resources/general/sensorSurfaces/.
+            // applicationDirPath() may not resolve the /../ correctly.
+            if (!QFile::exists(helmetPath)) {
+                QString wasmFallback = QStringLiteral("/resources/general/sensorSurfaces/")
+                    + QFileInfo(helmetPath).fileName();
+                if (wasmFallback.endsWith('/')) wasmFallback += "306m.fif";
+                if (QFile::exists(wasmFallback)) {
+                    helmetPath = wasmFallback;
+                }
+            }
+#endif
 
             if (!QFile::exists(helmetPath)) {
                 qWarning() << "MEG helmet surface file not found. Checked:" << helmetPath;

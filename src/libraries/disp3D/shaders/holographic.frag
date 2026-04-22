@@ -25,7 +25,6 @@ layout(std140, binding = 0) uniform UniformBlock {
 void main() {
     vec3 N = normalize(v_normal);
     vec3 V = normalize(v_viewDir);
-    vec3 L = normalize(lightDir);
     
     // Select effective vertex colour from overlayMode
     vec3 effectiveColor;
@@ -57,8 +56,7 @@ void main() {
     float N_dot_V = abs(dot(N, V)); // Use abs for double-sided visibility
     float fresnel = pow(1.0 - N_dot_V, 2.5);
     
-    // === LIGHTING (Subtle for Hologram) ===
-    float diff = max(dot(N, L), 0.0);
+    // === EDGE GLOW ===
     float rim = pow(1.0 - N_dot_V, 3.0);
     
     // === FINAL COLOR CALCULATION ===

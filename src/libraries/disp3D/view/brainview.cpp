@@ -108,7 +108,12 @@ BrainView::BrainView(QWidget *parent)
     setMouseTracking(true); // Enable hover events
 
     m_updateTimer = new QTimer(this);
-    connect(m_updateTimer, &QTimer::timeout, this, QOverload<>::of(&BrainView::update));
+    connect(m_updateTimer, &QTimer::timeout, this, [this]() {
+        if (m_sceneDirty) {
+            m_sceneDirty = false;
+            update();
+        }
+    });
     m_updateTimer->start(16); // ~60 FPS update
 
     m_fpsLabel = new QLabel(this);
@@ -232,7 +237,7 @@ void BrainView::setInitialCameraRotation(const QQuaternion &rotation)
 {
     m_cameraRotation = rotation;
     saveMultiViewSettings();
-    update();
+    m_sceneDirty = true; update();
 }
 
 void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
@@ -430,7 +435,7 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
     }
     updateInflatedSurfaceTransforms();
     updateSceneBounds();
-    update();
+    m_sceneDirty = true; update();
 }
 
 void BrainView::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
@@ -461,7 +466,7 @@ void BrainView::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bot
          }
     }
     updateSceneBounds();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -484,7 +489,7 @@ void BrainView::setActiveSurface(const QString &type)
     saveMultiViewSettings();
 
     updateSceneBounds();
-    update();
+    m_sceneDirty = true; update();
 }
 
 void BrainView::updateSceneBounds()
@@ -545,7 +550,7 @@ void BrainView::setShaderMode(const QString &modeName)
 
     m_brainShaderMode = mode;
     saveMultiViewSettings();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -719,7 +724,7 @@ void BrainView::setBemShaderMode(const QString &modeName)
 
     m_bemShaderMode = mode;
     saveMultiViewSettings();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -734,7 +739,7 @@ void BrainView::syncBemShadersToBrainShaders()
     m_bemShaderMode = subViewForTarget(m_visualizationEditTarget).bemShader;
 
     saveMultiViewSettings();
-    update();
+    m_sceneDirty = true; update();
 }
 
 void BrainView::setSensorVisible(const QString &type, bool visible)
@@ -761,7 +766,7 @@ void BrainView::setSensorVisible(const QString &type, bool visible)
     }
 
     saveMultiViewSettings();
-    update();
+    m_sceneDirty = true; update();
 }
 
 void BrainView::setSensorTransEnabled(bool enabled)
@@ -769,7 +774,7 @@ void BrainView::setSensorTransEnabled(bool enabled)
     if (m_applySensorTrans != enabled) {
         m_applySensorTrans = enabled;
         refreshSensorTransforms();
-        update();
+        m_sceneDirty = true; update();
     }
 }
 
@@ -786,7 +791,7 @@ void BrainView::setDipoleVisible(bool visible)
     profile.dipoles = visible;
     m_dipolesVisible = visible;
     saveMultiViewSettings();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -811,7 +816,7 @@ void BrainView::setVisualizationMode(const QString &modeName)
     }
 
     saveMultiViewSettings();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -825,7 +830,7 @@ void BrainView::setHemiVisible(int hemiIdx, bool visible)
         profile.rh = visible;
     }
     saveMultiViewSettings();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -835,7 +840,7 @@ void BrainView::setBemVisible(const QString &name, bool visible)
     auto &profile = visibilityProfileForTarget(m_visualizationEditTarget);
     profile.setObjectVisible("bem_" + name, visible);
     saveMultiViewSettings();
-    update();
+    m_sceneDirty = true; update();
 }
 
 void BrainView::setBemHighContrast(bool enabled)
@@ -845,7 +850,7 @@ void BrainView::setBemHighContrast(bool enabled)
             it.value()->setUseDefaultColor(enabled);
         }
     }
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -853,7 +858,7 @@ void BrainView::setBemHighContrast(bool enabled)
 void BrainView::setLightingEnabled(bool enabled)
 {
     m_lightingEnabled = enabled;
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -877,7 +882,7 @@ void BrainView::showSingleView()
     saveMultiViewSettings();
     updateViewportSeparators();
     updateOverlayLayout();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -888,7 +893,7 @@ void BrainView::showMultiView()
     saveMultiViewSettings();
     updateViewportSeparators();
     updateOverlayLayout();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -918,7 +923,7 @@ void BrainView::setViewCount(int count)
     saveMultiViewSettings();
     updateViewportSeparators();
     updateOverlayLayout();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -931,7 +936,7 @@ void BrainView::resetMultiViewLayout()
     saveMultiViewSettings();
     updateViewportSeparators();
     updateOverlayLayout();
-    update();
+    m_sceneDirty = true; update();
 }
 
 bool BrainView::isViewportEnabled(int index) const
@@ -1262,7 +1267,7 @@ void BrainView::setViewportEnabled(int index, bool enabled)
         saveMultiViewSettings();
         updateViewportSeparators();
         updateOverlayLayout();
-        update();
+        m_sceneDirty = true; update();
     }
 }
 
@@ -1278,7 +1283,7 @@ void BrainView::setViewportCameraPreset(int index, int preset)
     m_subViews[index].preset = preset;
     saveMultiViewSettings();
     updateOverlayLayout();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -1604,6 +1609,7 @@ void BrainView::render(QRhiCommandBuffer *cb)
     const QString overlayName = visualizationModeName(sv.overlayMode);
 
     // Collect matched brain surface keys for this pane's info panel
+#ifndef __EMSCRIPTEN__
     QStringList drawnKeys;
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
         if (!sv.matchesSurfaceType(it.key())) continue;
@@ -1611,6 +1617,9 @@ void BrainView::render(QRhiCommandBuffer *cb)
         drawnKeys << it.key();
     }
     const QString drawnInfo = drawnKeys.isEmpty() ? "none" : drawnKeys.join(", ");
+#else
+    const QString drawnInfo = QStringLiteral("merged");
+#endif
 
     if (m_viewMode == MultiView && m_viewportInfoLabels[vp]) {
         m_viewportInfoLabels[vp]->setText(
@@ -1819,7 +1828,7 @@ void BrainView::mouseMoveEvent(QMouseEvent *event)
 
         m_lastMousePos = event->pos();
         updateViewportSeparators();
-        update();
+        m_sceneDirty = true; update();
         return;
     }
 
@@ -1835,7 +1844,7 @@ void BrainView::mouseMoveEvent(QMouseEvent *event)
                 const QPoint diff = event->pos() - m_lastMousePos;
                 CameraController::applyMousePan(diff, m_subViews[activeVp].pan, m_sceneSize);
                 m_lastMousePos = event->pos();
-                update();
+                m_sceneDirty = true; update();
                 return;
             }
 
@@ -1846,7 +1855,7 @@ void BrainView::mouseMoveEvent(QMouseEvent *event)
 
                 m_perspectiveRotatedSincePress = true;
                 m_lastMousePos = event->pos();
-                update();
+                m_sceneDirty = true; update();
                 return;
             }
 
@@ -1859,7 +1868,7 @@ void BrainView::mouseMoveEvent(QMouseEvent *event)
         CameraController::applyMouseRotation(diff, m_cameraRotation);
 
         m_lastMousePos = event->pos();
-        update();
+        m_sceneDirty = true; update();
     } else {
         if (m_viewMode == MultiView) {
             updateSplitterCursor(event->pos());
@@ -1914,7 +1923,7 @@ void BrainView::wheelEvent(QWheelEvent *event)
     } else {
         m_zoom += delta;
     }
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -1927,7 +1936,7 @@ void BrainView::keyPressEvent(QKeyEvent *event)
         m_cameraRotation = QQuaternion();
         logPerspectiveRotation("reset-initial");
         saveMultiViewSettings();
-        update();
+        m_sceneDirty = true; update();
     }
 }
 
@@ -1952,7 +1961,7 @@ void BrainView::onSourceEstimateLoaded(int numTimePoints)
 void BrainView::setTimePoint(int index)
 {
     m_sourceManager.setTimePoint(index, m_surfaces, m_singleView, m_subViews);
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2042,7 +2051,7 @@ void BrainView::onRealtimeColorsAvailable(const QVector<uint32_t> &colorsLh,
         }
     }
 
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2102,7 +2111,7 @@ void BrainView::setSensorFieldTimePoint(int index)
     m_fieldMapper.setTimePoint(qBound(0, index, maxIdx));
     m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
     emit sensorFieldTimePointChanged(m_fieldMapper.timePoint(), m_fieldMapper.evoked().times(m_fieldMapper.timePoint()));
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2120,7 +2129,7 @@ void BrainView::setSensorFieldVisible(const QString &type, bool visible)
 
     saveMultiViewSettings();
     m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2138,7 +2147,7 @@ void BrainView::setSensorFieldContourVisible(const QString &type, bool visible)
 
     saveMultiViewSettings();
     m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2156,7 +2165,7 @@ void BrainView::setMegFieldMapOnHead(bool useHead)
     if (m_fieldMapper.isLoaded()) {
         m_fieldMapper.buildMapping(m_surfaces, m_headToMriTrans, m_applySensorTrans);
         m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
-        update();
+        m_sceneDirty = true; update();
     }
 }
 
@@ -2169,7 +2178,7 @@ void BrainView::setSensorFieldColormap(const QString &name)
     }
     m_fieldMapper.setColormap(name);
     m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2304,7 +2313,7 @@ void BrainView::onSensorStreamColorsAvailable(const QString &surfaceKey,
         surface->applySourceEstimateColors(colors);
     }
 
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2345,7 +2354,7 @@ bool BrainView::loadMegHelmetSurface(const QString &helmetFilePath) {
     m_surfaces["sens_surface_meg"] = surface;
     refreshSensorTransforms();
     updateSceneBounds();
-    update();
+    m_sceneDirty = true; update();
     return true;
 }
 
@@ -2372,7 +2381,7 @@ bool BrainView::loadNetwork(const CONNLIB::Network &network, const QString &name
     // Also register in the tree model
     m_model->addNetwork(network, name);
 
-    update();
+    m_sceneDirty = true; update();
     return true;
 }
 
@@ -2385,7 +2394,7 @@ void BrainView::setNetworkVisible(bool visible)
     m_networkVisible = visible;
     if (m_network) m_network->setVisible(visible);
     saveMultiViewSettings();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2394,7 +2403,7 @@ void BrainView::setNetworkThreshold(double threshold)
 {
     if (m_network) {
         m_network->setThreshold(threshold);
-        update();
+        m_sceneDirty = true; update();
     }
 }
 
@@ -2404,7 +2413,7 @@ void BrainView::setNetworkColormap(const QString &name)
 {
     if (m_network) {
         m_network->setColormap(name);
-        update();
+        m_sceneDirty = true; update();
     }
 }
 
@@ -2425,7 +2434,7 @@ void BrainView::setSourceSpaceVisible(bool visible)
     auto &profile = visibilityProfileForTarget(m_visualizationEditTarget);
     profile.sourceSpace = visible;
     saveMultiViewSettings();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2616,7 +2625,7 @@ void BrainView::castRay(const QPoint &pos)
     } else if (!m_hoveredSurfaceKey.isEmpty() && m_surfaces.contains(m_hoveredSurfaceKey)) {
         m_surfaces[m_hoveredSurfaceKey]->setSelected(true);
     }
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2683,7 +2692,7 @@ void BrainView::showViewportPresetMenu(int viewport, const QPoint &globalPos)
     m_subViews[viewport].preset = newPreset;
     saveMultiViewSettings();
     updateOverlayLayout();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2776,7 +2785,7 @@ void BrainView::clearSurfaces()
     m_activeSurface.reset();
     m_activeSurfaceType.clear();
     updateSceneBounds();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2815,7 +2824,7 @@ void BrainView::clearBem()
         m_surfaces.remove(key);
 
     updateSceneBounds();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2828,7 +2837,7 @@ void BrainView::clearSourceEstimate()
             it.value()->clearSourceEstimateColors();
         }
     }
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2848,7 +2857,7 @@ void BrainView::clearDipoles()
         }
         it = m_itemDipoleMap.erase(it);
     }
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2887,7 +2896,7 @@ void BrainView::clearSourceSpace()
         m_surfaces.remove(key);
 
     updateSceneBounds();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2928,7 +2937,7 @@ void BrainView::clearSensors()
     m_devHeadTrans = QMatrix4x4();
     m_hasDevHead = false;
     updateSceneBounds();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2937,7 +2946,7 @@ void BrainView::clearEvoked()
 {
     m_fieldMapper.setEvoked(FIFFLIB::FiffEvoked());
     m_sensorStreamManager.stopStreaming();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2946,7 +2955,7 @@ void BrainView::clearTransformation()
 {
     m_headToMriTrans = FIFFLIB::FiffCoordTrans();
     refreshSensorTransforms();
-    update();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================
@@ -2966,5 +2975,5 @@ void BrainView::clearNetwork()
             }
         }
     }
-    update();
+    m_sceneDirty = true; update();
 }

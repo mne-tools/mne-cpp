@@ -101,6 +101,14 @@ if(QT_VERSION_MAJOR EQUAL 6)
     # Must be set BEFORE qt_finalize_executable() which reads this property.
     if(EMSCRIPTEN)
         set_target_properties(${PROJECT_NAME} PROPERTIES QT_WASM_PTHREAD_POOL_SIZE 8)
+
+        # Embed sensor surface files into the Emscripten virtual filesystem.
+        # QCoreApplication::applicationDirPath() returns "/" on WASM, so
+        # the code resolves "/../resources/general/sensorSurfaces/306m.fif"
+        # to "/resources/general/sensorSurfaces/306m.fif".
+        target_link_options(${PROJECT_NAME} PRIVATE
+            "SHELL:--preload-file ${PROJECT_RESOURCES_DIR}/general/sensorSurfaces@/resources/general/sensorSurfaces"
+        )
     endif()
     qt_finalize_executable(${PROJECT_NAME})
 endif()

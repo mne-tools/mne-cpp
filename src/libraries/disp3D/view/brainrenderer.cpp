@@ -48,6 +48,7 @@
 #include <QFile>
 #include <QDebug>
 #include <map>
+#include <cstring>
 
 //=============================================================================================================
 // PIMPL
@@ -94,8 +95,10 @@ struct BrainRenderer::Impl
         std::unique_ptr<QRhiBuffer> indexBuffer;
         int indexCount = 0;
         bool dirty = true;  // Geometry needs rebuild (surface list changed)
+        bool gpuDirty = true; // Raw data changed, needs GPU re-upload
         QByteArray vertexRaw;
         QByteArray indexRaw;
+        QVector<quint64> surfaceGenerations; // per-surface vertex generation snapshot
     };
     std::map<QString, MergedGroup> mergedGroups;  // keyed by category name
 };
@@ -419,9 +422,6 @@ void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
         return;  // Skip this draw rather than silently corrupt earlier viewport data
     }
 
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetMVP, 64, data.mvp.constData());
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetCameraPos, 12, &data.cameraPos);
-    
     // On desktop, when a specific annotation region or vertex range is
     // selected the CPU vertex-color gold tint (in updateVertexColors)
     // provides per-region feedback.  Suppress the shader's whole-surface
@@ -433,23 +433,28 @@ void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
         selected = 0.0f;
     }
 #endif
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetSelected, 4, &selected);
-    
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLightDir, 12, &data.lightDir);
-    
-    // Pass tissue type for anatomical shader (offset 92, uses original _pad2 slot)
-    float tissueType = static_cast<float>(surface->tissueType());
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetTissueType, 4, &tissueType);
-    
-    float lighting = data.lightingEnabled ? 1.0f : 0.0f;
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLighting, 4, &lighting);
 
-    float overlayMode = data.overlayMode;
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetOverlayMode, 4, &overlayMode);
+    // Pack ALL uniforms into a contiguous block for a single upload
+    struct {
+        float mvp[16];          // 0..63
+        float cameraPos[3];     // 64..75
+        float isSelected;       // 76..79
+        float lightDir[3];      // 80..91
+        float tissueType;       // 92..95
+        float lightingEnabled;  // 96..99
+        float overlayMode;      // 100..103
+        float selectedSurfaceId;// 104..107
+    } ub;
+    memcpy(ub.mvp, data.mvp.constData(), 64);
+    memcpy(ub.cameraPos, &data.cameraPos, 12);
+    ub.isSelected = selected;
+    memcpy(ub.lightDir, &data.lightDir, 12);
+    ub.tissueType = static_cast<float>(surface->tissueType());
+    ub.lightingEnabled = data.lightingEnabled ? 1.0f : 0.0f;
+    ub.overlayMode = data.overlayMode;
+    ub.selectedSurfaceId = -1.0f;  // Per-surface path: surfaceId selection disabled
 
-    // Per-surface path: disable surfaceId-based selection (handled by isSelected).
-    float noSurfaceSelection = -1.0f;
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetSelectedSurfaceId, 4, &noSurfaceSelection);
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset, sizeof(ub), &ub);
 
     cb->resourceUpdate(u);
 
@@ -496,10 +501,21 @@ void BrainRenderer::renderDipoles(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
     if (d->currentUniformOffset >= d->uniformBuffer->size()) d->currentUniformOffset = 0;
 
     u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetMVP, 64, data.mvp.constData());
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetCameraPos, 12, &data.cameraPos);
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLightDir, 12, &data.lightDir);
-    float lighting = data.lightingEnabled ? 1.0f : 0.0f;
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLighting, 4, &lighting);
+
+    // Pack post-MVP uniforms into a contiguous block (cameraPos..lighting)
+    struct {
+        float cameraPos[3];     // 64..75
+        float _pad0;            // 76..79  (isSelected — unused for dipoles)
+        float lightDir[3];      // 80..91
+        float _pad1;            // 92..95  (tissueType — unused for dipoles)
+        float lightingEnabled;  // 96..99
+    } dub;
+    memcpy(dub.cameraPos, &data.cameraPos, 12);
+    dub._pad0 = 0.0f;
+    memcpy(dub.lightDir, &data.lightDir, 12);
+    dub._pad1 = 0.0f;
+    dub.lightingEnabled = data.lightingEnabled ? 1.0f : 0.0f;
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetCameraPos, sizeof(dub), &dub);
 
     cb->resourceUpdate(u);
 
@@ -546,10 +562,11 @@ void BrainRenderer::renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
         }
 
         uNodes->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetMVP, 64, data.mvp.constData());
-        uNodes->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetCameraPos, 12, &data.cameraPos);
-        uNodes->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLightDir, 12, &data.lightDir);
-        float lighting = data.lightingEnabled ? 1.0f : 0.0f;
-        uNodes->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLighting, 4, &lighting);
+        struct { float cp[3]; float _p0; float ld[3]; float _p1; float le; } nub;
+        memcpy(nub.cp, &data.cameraPos, 12); nub._p0 = 0.0f;
+        memcpy(nub.ld, &data.lightDir, 12);  nub._p1 = 0.0f;
+        nub.le = data.lightingEnabled ? 1.0f : 0.0f;
+        uNodes->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetCameraPos, sizeof(nub), &nub);
 
         cb->resourceUpdate(uNodes);
         cb->setViewport(toViewport(data));
@@ -582,10 +599,11 @@ void BrainRenderer::renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
         }
 
         uEdges->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetMVP, 64, data.mvp.constData());
-        uEdges->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetCameraPos, 12, &data.cameraPos);
-        uEdges->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLightDir, 12, &data.lightDir);
-        float lighting = data.lightingEnabled ? 1.0f : 0.0f;
-        uEdges->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLighting, 4, &lighting);
+        struct { float cp[3]; float _p0; float ld[3]; float _p1; float le; } eub;
+        memcpy(eub.cp, &data.cameraPos, 12); eub._p0 = 0.0f;
+        memcpy(eub.ld, &data.lightDir, 12);  eub._p1 = 0.0f;
+        eub.le = data.lightingEnabled ? 1.0f : 0.0f;
+        uEdges->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetCameraPos, sizeof(eub), &eub);
 
         cb->resourceUpdate(uEdges);
         cb->setViewport(toViewport(data));
@@ -637,24 +655,50 @@ void BrainRenderer::prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch * /
         }
     }
 
-    // If geometry hasn't changed, just re-upload vertex data for color updates
+    // If geometry hasn't changed, check if any surface vertex data actually changed
     // (STC animation changes vertex colors but not topology)
     if (!group.dirty && group.indexCount > 0) {
-        QVector<VertexData> mergedVerts;
+        // Compare per-surface vertex generation counters
+        bool anyChanged = false;
+        if (group.surfaceGenerations.size() != surfaces.size()) {
+            anyChanged = true;
+        } else {
+            for (int i = 0; i < surfaces.size(); ++i) {
+                if (surfaces[i] && surfaces[i]->vertexGeneration() != group.surfaceGenerations[i]) {
+                    anyChanged = true;
+                    break;
+                }
+            }
+        }
+
+        if (!anyChanged) {
+            // Nothing changed — skip vertex rebuild entirely
+            return;
+        }
+
+        // Re-merge vertex data directly into vertexRaw (no temp allocation)
         float surfaceId = 0.0f;
-        for (BrainSurface *surf : surfaces) {
+        group.surfaceGenerations.resize(surfaces.size());
+        int totalVerts = 0;
+        for (int si = 0; si < surfaces.size(); ++si)
+            if (surfaces[si]) totalVerts += surfaces[si]->vertexDataRef().size();
+        const quint32 vbufSize = totalVerts * sizeof(VertexData);
+        if (group.vertexRaw.size() != static_cast<int>(vbufSize))
+            group.vertexRaw.resize(vbufSize);
+        VertexData *dst = reinterpret_cast<VertexData*>(group.vertexRaw.data());
+        for (int si = 0; si < surfaces.size(); ++si) {
+            BrainSurface *surf = surfaces[si];
             if (!surf) { surfaceId += 1.0f; continue; }
             const auto &srcVerts = surf->vertexDataRef();
-            mergedVerts.reserve(mergedVerts.size() + srcVerts.size());
-            for (const VertexData &v : srcVerts) {
-                VertexData mv = v;
-                mv.surfaceId = surfaceId;
-                mergedVerts.append(mv);
-            }
+            const int n = srcVerts.size();
+            memcpy(dst, srcVerts.constData(), n * sizeof(VertexData));
+            for (int j = 0; j < n; ++j)
+                dst[j].surfaceId = surfaceId;
+            dst += n;
+            group.surfaceGenerations[si] = surf->vertexGeneration();
             surfaceId += 1.0f;
         }
-        const quint32 vbufSize = mergedVerts.size() * sizeof(VertexData);
-        group.vertexRaw = QByteArray(reinterpret_cast<const char*>(mergedVerts.constData()), vbufSize);
+        group.gpuDirty = true;
         return;
     }
 
@@ -664,39 +708,20 @@ void BrainRenderer::prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch * /
     group.dirty = false;
 
     // Build merged vertex + index arrays
-    QVector<VertexData> mergedVerts;
-    QVector<uint32_t> mergedIndices;
-
-    float surfaceId = 0.0f;
-    for (BrainSurface *surf : surfaces) {
-        if (!surf) continue;
-
-        const uint32_t vertexOffset = mergedVerts.size();
-        const auto &srcVerts = surf->vertexDataRef();
-        const auto &srcIdx   = surf->indexDataRef();
-
-        // Copy vertices with surfaceId stamp
-        mergedVerts.reserve(mergedVerts.size() + srcVerts.size());
-        for (const VertexData &v : srcVerts) {
-            VertexData mv = v;
-            mv.surfaceId = surfaceId;
-            mergedVerts.append(mv);
-        }
-
-        // Copy indices with global vertex offset
-        mergedIndices.reserve(mergedIndices.size() + srcIdx.size());
-        for (uint32_t idx : srcIdx) {
-            mergedIndices.append(idx + vertexOffset);
-        }
-
-        surfaceId += 1.0f;
+    // Pre-calculate total sizes for single allocation
+    int totalVerts = 0;
+    int totalIndices = 0;
+    for (int si = 0; si < surfaces.size(); ++si) {
+        if (!surfaces[si]) continue;
+        totalVerts += surfaces[si]->vertexDataRef().size();
+        totalIndices += surfaces[si]->indexDataRef().size();
     }
 
-    group.indexCount = mergedIndices.size();
+    group.indexCount = totalIndices;
     if (group.indexCount == 0) return;
 
-    const quint32 vbufSize = mergedVerts.size()   * sizeof(VertexData);
-    const quint32 ibufSize = mergedIndices.size()  * sizeof(uint32_t);
+    const quint32 vbufSize = totalVerts   * sizeof(VertexData);
+    const quint32 ibufSize = totalIndices * sizeof(uint32_t);
 
     // (Re-)create Dynamic buffers when they don't exist or are too small
     if (!group.vertexBuffer || group.vertexBuffer->size() < vbufSize) {
@@ -710,10 +735,41 @@ void BrainRenderer::prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch * /
         group.indexBuffer->create();
     }
 
-    // Cache raw data — uploaded in drawMergedSurfaces() inside the render
-    // pass so that GL element-buffer bindings are refreshed right before draw.
-    group.vertexRaw = QByteArray(reinterpret_cast<const char*>(mergedVerts.constData()), vbufSize);
-    group.indexRaw  = QByteArray(reinterpret_cast<const char*>(mergedIndices.constData()), ibufSize);
+    // Write directly into QByteArrays — no temp QVector intermediaries
+    group.vertexRaw.resize(vbufSize);
+    group.indexRaw.resize(ibufSize);
+    group.surfaceGenerations.resize(surfaces.size());
+
+    VertexData *vDst = reinterpret_cast<VertexData*>(group.vertexRaw.data());
+    uint32_t *iDst = reinterpret_cast<uint32_t*>(group.indexRaw.data());
+    float surfaceId = 0.0f;
+    uint32_t vertexOffset = 0;
+    for (int si = 0; si < surfaces.size(); ++si) {
+        BrainSurface *surf = surfaces[si];
+        if (!surf) { surfaceId += 1.0f; continue; }
+
+        const auto &srcVerts = surf->vertexDataRef();
+        const auto &srcIdx   = surf->indexDataRef();
+        const int nv = srcVerts.size();
+        const int ni = srcIdx.size();
+
+        // Bulk copy vertices + stamp surfaceId
+        memcpy(vDst, srcVerts.constData(), nv * sizeof(VertexData));
+        for (int j = 0; j < nv; ++j)
+            vDst[j].surfaceId = surfaceId;
+        vDst += nv;
+
+        // Copy indices with global vertex offset
+        const uint32_t *srcI = srcIdx.constData();
+        for (int j = 0; j < ni; ++j)
+            iDst[j] = srcI[j] + vertexOffset;
+        iDst += ni;
+
+        vertexOffset += nv;
+        group.surfaceGenerations[si] = surf->vertexGeneration();
+        surfaceId += 1.0f;
+    }
+    group.gpuDirty = true;
 }
 
 //=============================================================================================================
@@ -764,9 +820,12 @@ void BrainRenderer::drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
 
     QRhiResourceUpdateBatch *u = rhi->nextResourceUpdateBatch();
 
-    // Re-upload merged geometry — ensures GL buffer bindings are fresh
-    u->updateDynamicBuffer(group.vertexBuffer.get(), 0, group.vertexRaw.size(), group.vertexRaw.constData());
-    u->updateDynamicBuffer(group.indexBuffer.get(),  0, group.indexRaw.size(),  group.indexRaw.constData());
+    // Re-upload merged geometry only when data actually changed
+    if (group.gpuDirty) {
+        u->updateDynamicBuffer(group.vertexBuffer.get(), 0, group.vertexRaw.size(), group.vertexRaw.constData());
+        u->updateDynamicBuffer(group.indexBuffer.get(),  0, group.indexRaw.size(),  group.indexRaw.constData());
+        group.gpuDirty = false;
+    }
 
     int offset = d->currentUniformOffset;
     d->currentUniformOffset += d->uniformBufferOffsetAlignment;
@@ -775,26 +834,29 @@ void BrainRenderer::drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
         return;
     }
 
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetMVP, 64, data.mvp.constData());
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetCameraPos, 12, &data.cameraPos);
+    // Pack all uniforms into a contiguous block for a single upload
+    // Layout must match the shader's UniformBlock (std140).
+    struct {
+        float mvp[16];          // 0..63
+        float cameraPos[3];     // 64..75
+        float isSelected;       // 76..79
+        float lightDir[3];      // 80..91
+        float tissueType;       // 92..95
+        float lightingEnabled;  // 96..99
+        float overlayMode;      // 100..103
+        float selectedSurfaceId;// 104..107
+    } ub;
+    memcpy(ub.mvp, data.mvp.constData(), 64);
+    memcpy(ub.cameraPos, &data.cameraPos, 12);
+    ub.isSelected = 0.0f;
+    memcpy(ub.lightDir, &data.lightDir, 12);
+    ub.tissueType = (!group.surfaces.isEmpty() && group.surfaces.first())
+                  ? static_cast<float>(group.surfaces.first()->tissueType()) : 0.0f;
+    ub.lightingEnabled = data.lightingEnabled ? 1.0f : 0.0f;
+    ub.overlayMode = data.overlayMode;
+    ub.selectedSurfaceId = selectedSurfaceId;
 
-    float selected = 0.0f;  // Per-surface isSelected disabled for merged path
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetSelected, 4, &selected);
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLightDir, 12, &data.lightDir);
-
-    float tissueType = 0.0f;  // Derived from first surface in the group
-    if (!group.surfaces.isEmpty() && group.surfaces.first()) {
-        tissueType = static_cast<float>(group.surfaces.first()->tissueType());
-    }
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetTissueType, 4, &tissueType);
-
-    float lighting = data.lightingEnabled ? 1.0f : 0.0f;
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLighting, 4, &lighting);
-
-    float overlayMode = data.overlayMode;
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetOverlayMode, 4, &overlayMode);
-
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetSelectedSurfaceId, 4, &selectedSurfaceId);
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset, sizeof(ub), &ub);
 
     cb->resourceUpdate(u);
 
