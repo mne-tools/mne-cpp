@@ -97,8 +97,10 @@ struct BrainRenderer::Impl
         std::unique_ptr<QRhiBuffer> vertexBuffer;
         std::unique_ptr<QRhiBuffer> indexBuffer;
         int indexCount = 0;
+        int totalVertexCount = 0; // cached vertex count from last full rebuild
         bool dirty = true;  // Geometry needs rebuild (surface list changed)
-        bool gpuDirty = true; // Raw data changed, needs GPU re-upload
+        bool gpuVertexDirty = true; // Vertex data changed, needs GPU re-upload
+        bool gpuIndexDirty  = true; // Index data changed, needs GPU re-upload
         QByteArray vertexRaw;
         QByteArray indexRaw;
         QVector<quint64> surfaceGenerations; // per-surface vertex generation snapshot
@@ -676,34 +678,43 @@ void BrainRenderer::prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch * /
         }
 
         // Re-merge vertex data directly into vertexRaw (no temp allocation)
-        float surfaceId = 0.0f;
-        group.surfaceGenerations.resize(surfaces.size());
+        // Safety: verify vertex count hasn't changed since the full rebuild.
+        // If it has, fall through to the full rebuild path to update indices.
         int totalVerts = 0;
         for (int si = 0; si < surfaces.size(); ++si)
             if (surfaces[si]) totalVerts += surfaces[si]->vertexDataRef().size();
-        const quint32 vbufSize = totalVerts * sizeof(VertexData);
-        if (group.vertexRaw.size() != static_cast<int>(vbufSize))
-            group.vertexRaw.resize(vbufSize);
-        VertexData *dst = reinterpret_cast<VertexData*>(group.vertexRaw.data());
-        for (int si = 0; si < surfaces.size(); ++si) {
-            BrainSurface *surf = surfaces[si];
-            if (!surf) { surfaceId += 1.0f; continue; }
-            const auto &srcVerts = surf->vertexDataRef();
-            const int n = srcVerts.size();
-            memcpy(dst, srcVerts.constData(), n * sizeof(VertexData));
-            for (int j = 0; j < n; ++j)
-                dst[j].surfaceId = surfaceId;
-            dst += n;
-            group.surfaceGenerations[si] = surf->vertexGeneration();
-            surfaceId += 1.0f;
+        if (totalVerts != group.totalVertexCount) {
+            group.dirty = true;
+            // Fall through to full rebuild below
+        } else {
+            float brainId = 0.0f;
+            float nonBrainId = 100.0f; // offset so shaders can distinguish
+            group.surfaceGenerations.resize(surfaces.size());
+            VertexData *dst = reinterpret_cast<VertexData*>(group.vertexRaw.data());
+            for (int si = 0; si < surfaces.size(); ++si) {
+                BrainSurface *surf = surfaces[si];
+                if (!surf) { brainId += 1.0f; nonBrainId += 1.0f; continue; }
+                const bool isBrain = (surf->tissueType() == BrainSurface::TissueBrain);
+                const float id = isBrain ? brainId : nonBrainId;
+                const auto &srcVerts = surf->vertexDataRef();
+                const int n = srcVerts.size();
+                memcpy(dst, srcVerts.constData(), n * sizeof(VertexData));
+                for (int j = 0; j < n; ++j)
+                    dst[j].surfaceId = id;
+                dst += n;
+                group.surfaceGenerations[si] = surf->vertexGeneration();
+                brainId += 1.0f;
+                nonBrainId += 1.0f;
+            }
+            group.gpuVertexDirty = true;
+            return;
         }
-        group.gpuDirty = true;
-        return;
     }
 
     // Full rebuild: topology or surface list changed
     group.surfaces = surfaces;
     group.indexCount = 0;
+    group.totalVertexCount = 0;
     group.dirty = false;
 
     // Build merged vertex + index arrays
@@ -741,12 +752,15 @@ void BrainRenderer::prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch * /
 
     VertexData *vDst = reinterpret_cast<VertexData*>(group.vertexRaw.data());
     uint32_t *iDst = reinterpret_cast<uint32_t*>(group.indexRaw.data());
-    float surfaceId = 0.0f;
+    float brainId = 0.0f;
+    float nonBrainId = 100.0f; // offset so shaders can distinguish
     uint32_t vertexOffset = 0;
     for (int si = 0; si < surfaces.size(); ++si) {
         BrainSurface *surf = surfaces[si];
-        if (!surf) { surfaceId += 1.0f; continue; }
+        if (!surf) { brainId += 1.0f; nonBrainId += 1.0f; continue; }
 
+        const bool isBrain = (surf->tissueType() == BrainSurface::TissueBrain);
+        const float id = isBrain ? brainId : nonBrainId;
         const auto &srcVerts = surf->vertexDataRef();
         const auto &srcIdx   = surf->indexDataRef();
         const int nv = srcVerts.size();
@@ -755,7 +769,7 @@ void BrainRenderer::prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch * /
         // Bulk copy vertices + stamp surfaceId
         memcpy(vDst, srcVerts.constData(), nv * sizeof(VertexData));
         for (int j = 0; j < nv; ++j)
-            vDst[j].surfaceId = surfaceId;
+            vDst[j].surfaceId = id;
         vDst += nv;
 
         // Copy indices with global vertex offset
@@ -766,9 +780,12 @@ void BrainRenderer::prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch * /
 
         vertexOffset += nv;
         group.surfaceGenerations[si] = surf->vertexGeneration();
-        surfaceId += 1.0f;
+        brainId += 1.0f;
+        nonBrainId += 1.0f;
     }
-    group.gpuDirty = true;
+    group.totalVertexCount = totalVerts;
+    group.gpuVertexDirty = true;
+    group.gpuIndexDirty  = true;
 }
 
 //=============================================================================================================
@@ -805,12 +822,14 @@ void BrainRenderer::drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
     if (!pipeline) return;
 
     // Determine which merged surface (if any) is selected.
+    // surfaceId encoding: brain surfaces get ids 0,1,2...; non-brain get 100,101,102...
     float selectedSurfaceId = -1.0f;
     for (int i = 0; i < group.surfaces.size(); ++i) {
         if (group.surfaces[i] && group.surfaces[i]->isSelected()) {
             if (group.surfaces[i]->selectedRegionId() == -1
                 && group.surfaces[i]->selectedVertexStart() < 0) {
-                selectedSurfaceId = static_cast<float>(i);
+                const bool isBrain = (group.surfaces[i]->tissueType() == BrainSurface::TissueBrain);
+                selectedSurfaceId = static_cast<float>(isBrain ? i : 100 + i);
             }
             break;
         }
@@ -818,11 +837,17 @@ void BrainRenderer::drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
 
     QRhiResourceUpdateBatch *u = rhi->nextResourceUpdateBatch();
 
-    // Re-upload merged geometry only when data actually changed
-    if (group.gpuDirty) {
+    // Re-upload merged geometry only when data actually changed.
+    // Split VBO / IBO uploads: the fast-update path (STC color changes)
+    // only modifies vertices; re-uploading the IBO via glBufferSubData on
+    // WebGL can corrupt the VAO's element-buffer binding.
+    if (group.gpuVertexDirty) {
         u->updateDynamicBuffer(group.vertexBuffer.get(), 0, group.vertexRaw.size(), group.vertexRaw.constData());
+        group.gpuVertexDirty = false;
+    }
+    if (group.gpuIndexDirty) {
         u->updateDynamicBuffer(group.indexBuffer.get(),  0, group.indexRaw.size(),  group.indexRaw.constData());
-        group.gpuDirty = false;
+        group.gpuIndexDirty = false;
     }
 
     int offset = d->currentUniformOffset;

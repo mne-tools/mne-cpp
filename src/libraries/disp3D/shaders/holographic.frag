@@ -26,9 +26,14 @@ void main() {
     vec3 N = normalize(v_normal);
     vec3 V = normalize(v_viewDir);
     
-    // Select effective vertex colour from overlayMode
+    // Select effective vertex colour from overlayMode.
+    // WORKAROUND(QRhi-GLES2): In the merged-draw path, non-brain surfaces
+    // (BEM, sensors, field maps) get surfaceId >= 100.  Always use their
+    // vertex colour so field-map colours are visible.
     vec3 effectiveColor;
-    if (overlayMode < 0.5) {
+    if (v_surfaceId >= 99.5) {
+        effectiveColor = v_color;
+    } else if (overlayMode < 0.5) {
         effectiveColor = vec3(1.0); // Surface: white
         // Show gold selection tint from vertex colors
         if (v_color.r - v_color.b > 0.15) {

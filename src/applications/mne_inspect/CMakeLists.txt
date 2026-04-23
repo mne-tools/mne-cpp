@@ -108,6 +108,7 @@ if(QT_VERSION_MAJOR EQUAL 6)
         # to "/resources/general/sensorSurfaces/306m.fif".
         target_link_options(${PROJECT_NAME} PRIVATE
             "SHELL:--preload-file ${PROJECT_RESOURCES_DIR}/general/sensorSurfaces@/resources/general/sensorSurfaces"
+            "SHELL:--preload-file ${PROJECT_RESOURCES_DIR}/general/coilDefinitions@/resources/general/coilDefinitions"
         )
     endif()
     qt_finalize_executable(${PROJECT_NAME})

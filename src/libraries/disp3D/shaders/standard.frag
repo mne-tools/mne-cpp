@@ -32,9 +32,15 @@ void main() {
     float NdotH = max(dot(N, H), 0.0);
     float spec = pow(NdotH, 32.0) * 0.3;
     
-    // Select base color based on overlayMode uniform
+    // Select base color based on overlayMode uniform.
+    // WORKAROUND(QRhi-GLES2): In the merged-draw path, non-brain surfaces
+    // (BEM, sensors, field maps) get surfaceId >= 100.  These always use
+    // their vertex colour directly so the field-map colours are visible
+    // regardless of the brain's overlayMode.
     vec3 baseColor;
-    if (overlayMode < 0.5) {
+    if (v_surfaceId >= 99.5) {
+        baseColor = v_color;
+    } else if (overlayMode < 0.5) {
         // Surface mode: warm white (ignore vertex colour)
         baseColor = vec3(1.0, 0.97, 0.94);
         // Show gold selection tint from vertex colors.

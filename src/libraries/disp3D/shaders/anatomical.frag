@@ -126,7 +126,12 @@ void main() {
     }
     
     // ── Override with overlay colour when applicable ──
-    if (overlayMode > 0.5 && overlayMode < 1.5) {
+    // WORKAROUND(QRhi-GLES2): In the merged-draw path, non-brain surfaces
+    // (BEM, sensors, field maps) get surfaceId >= 100.  Always use vertex
+    // colour so field-map colours are visible.
+    if (v_surfaceId >= 99.5) {
+        baseColor = v_color;
+    } else if (overlayMode > 0.5 && overlayMode < 1.5) {
         // Annotation: fall back to tissue color when no annotation loaded (black)
         if (dot(v_annotColor, v_annotColor) > 0.001) {
             baseColor = v_annotColor;
