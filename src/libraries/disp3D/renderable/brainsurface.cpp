@@ -51,6 +51,7 @@ struct BrainSurface::GpuBuffers
     std::unique_ptr<QRhiBuffer> vertexBuffer;
     std::unique_ptr<QRhiBuffer> indexBuffer;
     bool dirty = true;
+    bool indexDirty = true;   // IBO needs (re-)upload (topology change)
 };
 
 //=============================================================================================================
@@ -526,16 +527,37 @@ void BrainSurface::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
     const quint32 ibufSize = m_indexData.size() * sizeof(uint32_t);
 
     if (!m_gpu->vertexBuffer) {
+        // Use Dynamic VBO on desktop: allows in-place updateDynamicBuffer()
+        // for STC animation colour updates without buffer destroy/recreate.
+        // WASM uses merged per-category buffers, so this path is only
+        // relevant for desktop (where it's Immutable as a fallback).
+#ifdef __EMSCRIPTEN__
         m_gpu->vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, vbufSize));
+#else
+        m_gpu->vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::VertexBuffer, vbufSize));
+#endif
         m_gpu->vertexBuffer->create();
+        m_gpu->indexDirty = true; // new VBO implies IBO also needs upload
     }
     if (!m_gpu->indexBuffer) {
         m_gpu->indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, ibufSize));
         m_gpu->indexBuffer->create();
+        m_gpu->indexDirty = true;
     }
 
+#ifdef __EMSCRIPTEN__
     u->uploadStaticBuffer(m_gpu->vertexBuffer.get(), m_vertexData.constData());
     u->uploadStaticBuffer(m_gpu->indexBuffer.get(), m_indexData.constData());
+#else
+    // Desktop: Dynamic VBO — in-place update, no buffer recreation.
+    // Only re-upload IBO when topology actually changed (initial load,
+    // geometry swap).  STC colour animation only touches the VBO.
+    u->updateDynamicBuffer(m_gpu->vertexBuffer.get(), 0, vbufSize, m_vertexData.constData());
+    if (m_gpu->indexDirty) {
+        u->uploadStaticBuffer(m_gpu->indexBuffer.get(), m_indexData.constData());
+        m_gpu->indexDirty = false;
+    }
+#endif
     m_gpu->dirty = false;
 }
 

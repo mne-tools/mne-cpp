@@ -61,7 +61,6 @@
 #include <Eigen/Dense>
 #include <QMatrix4x4>
 #include <QDebug>
-#include <QTimer>
 #include <QLabel>
 #include <QFrame>
 #include <QMouseEvent>
@@ -107,14 +106,9 @@ BrainView::BrainView(QWidget *parent)
 
     setMouseTracking(true); // Enable hover events
 
-    m_updateTimer = new QTimer(this);
-    connect(m_updateTimer, &QTimer::timeout, this, [this]() {
-        if (m_sceneDirty) {
-            m_sceneDirty = false;
-            update();
-        }
-    });
-    m_updateTimer->start(16); // ~60 FPS update
+    // No periodic update timer — redraws are demand-driven via update().
+    // Every setter that changes scene state calls m_sceneDirty = true
+    // followed by update(), which coalesces into one render() per frame.
 
     m_fpsLabel = new QLabel(this);
     m_fpsLabel->setStyleSheet("color: white; font-weight: bold; font-family: monospace; font-size: 13px; background: transparent; padding: 5px;");
@@ -435,6 +429,7 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
     }
     updateInflatedSurfaceTransforms();
     updateSceneBounds();
+    m_vertexCountDirty = true;
     m_sceneDirty = true; update();
 }
 
@@ -452,6 +447,7 @@ void BrainView::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bot
              if (absItem) {
                  if (roles.contains(AbstractTreeItem::VisibleRole)) {
                      surf->setVisible(absItem->isVisible());
+                     m_vertexCountDirty = true;
                  }
                  if (roles.contains(AbstractTreeItem::ColorRole)) {
                      // Update color (not fully impl in BrainSurface yet for uniform override, but prepared)
@@ -489,6 +485,7 @@ void BrainView::setActiveSurface(const QString &type)
     saveMultiViewSettings();
 
     updateSceneBounds();
+    m_vertexCountDirty = true;
     m_sceneDirty = true; update();
 }
 
@@ -1357,46 +1354,39 @@ void BrainView::render(QRhiCommandBuffer *cb)
     m_frameCount++;
     if (m_fpsTimer.elapsed() >= 500) {
         float fps = m_frameCount / (m_fpsTimer.elapsed() / 1000.0f);
-        auto countVerticesForSubView = [this](const SubView &sv) -> qint64 {
-            qint64 total = 0;
 
-            for (auto it = m_surfaces.cbegin(); it != m_surfaces.cend(); ++it) {
-                const QString &key = it.key();
-                auto surface = it.value();
-                if (!surface) {
-                    continue;
-                }
-
-                if (!sv.shouldRenderSurface(key)) {
-                    continue;
-                }
-
-                if (SubView::isBrainSurfaceKey(key)) {
-                    if (!sv.matchesSurfaceType(key)) {
-                        continue;
+        // Recount vertices only when surface list/visibility changed
+        if (m_vertexCountDirty) {
+            auto countVerticesForSubView = [this](const SubView &sv) -> qint64 {
+                qint64 total = 0;
+                for (auto it = m_surfaces.cbegin(); it != m_surfaces.cend(); ++it) {
+                    const QString &key = it.key();
+                    auto surface = it.value();
+                    if (!surface) continue;
+                    if (!sv.shouldRenderSurface(key)) continue;
+                    if (SubView::isBrainSurfaceKey(key)) {
+                        if (!sv.matchesSurfaceType(key)) continue;
+                    } else {
+                        if (!surface->isVisible()) continue;
                     }
-                } else {
-                    if (!surface->isVisible()) {
-                        continue;
-                    }
+                    total += surface->vertexCount();
                 }
+                return total;
+            };
 
-                total += surface->vertexCount();
+            qint64 vCount = 0;
+            if (m_viewMode == MultiView) {
+                for (int vp : enabledViewportIndices()) {
+                    vCount += countVerticesForSubView(m_subViews[vp]);
+                }
+            } else {
+                vCount = countVerticesForSubView(m_singleView);
             }
-
-            return total;
-        };
-
-        qint64 vCount = 0;
-        if (m_viewMode == MultiView) {
-            for (int vp : enabledViewportIndices()) {
-                vCount += countVerticesForSubView(m_subViews[vp]);
-            }
-        } else {
-            vCount = countVerticesForSubView(m_singleView);
+            m_cachedVertexCount = vCount;
+            m_vertexCountDirty = false;
         }
 
-        m_fpsLabel->setText(QString("FPS: %1\nVertices: %2").arg(fps, 0, 'f', 1).arg(vCount));
+        m_fpsLabel->setText(QString("FPS: %1\nVertices: %2").arg(fps, 0, 'f', 1).arg(m_cachedVertexCount));
         updateOverlayLayout();
         m_fpsLabel->raise();
         m_frameCount = 0;

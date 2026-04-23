@@ -412,8 +412,12 @@ void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
     auto *pipeline = d->pipelines[mode].get();
     if (!pipeline) return;
 
+    // NOTE: Buffer uploads are handled in the pre-render phase
+    // (BrainView::render pre-upload loop).  Do not call
+    // surface->updateBuffers() here — it would allocate a redundant
+    // QRhiResourceUpdateBatch per surface.
+
     QRhiResourceUpdateBatch *u = rhi->nextResourceUpdateBatch();
-    surface->updateBuffers(rhi, u);
 
     // Dynamic slot update
     int offset = d->currentUniformOffset;
