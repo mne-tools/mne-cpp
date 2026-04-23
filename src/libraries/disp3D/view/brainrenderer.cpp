@@ -485,6 +485,78 @@ void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
 
 //=============================================================================================================
 
+int BrainRenderer::prepareSurfaceDraw(QRhiResourceUpdateBatch *u,
+                                       const SceneData &data,
+                                       BrainSurface *surface)
+{
+    if (!surface || !surface->isVisible()) return -1;
+
+    int offset = d->currentUniformOffset;
+    d->currentUniformOffset += d->uniformBufferOffsetAlignment;
+    if (d->currentUniformOffset >= d->uniformBuffer->size()) {
+        qWarning("BrainRenderer: uniform buffer overflow in prepareSurfaceDraw");
+        return -1;
+    }
+
+    float selected = surface->isSelected() ? 1.0f : 0.0f;
+    if (surface->isSelected()
+        && (surface->selectedRegionId() != -1 || surface->selectedVertexStart() >= 0)) {
+        selected = 0.0f;
+    }
+
+    struct {
+        float mvp[16];
+        float cameraPos[3];
+        float isSelected;
+        float lightDir[3];
+        float tissueType;
+        float lightingEnabled;
+        float overlayMode;
+        float selectedSurfaceId;
+    } ub;
+    memcpy(ub.mvp, data.mvp.constData(), 64);
+    memcpy(ub.cameraPos, &data.cameraPos, 12);
+    ub.isSelected = selected;
+    memcpy(ub.lightDir, &data.lightDir, 12);
+    ub.tissueType = static_cast<float>(surface->tissueType());
+    ub.lightingEnabled = data.lightingEnabled ? 1.0f : 0.0f;
+    ub.overlayMode = data.overlayMode;
+    ub.selectedSurfaceId = -1.0f;
+
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset, sizeof(ub), &ub);
+    return offset;
+}
+
+//=============================================================================================================
+
+void BrainRenderer::issueSurfaceDraw(QRhiCommandBuffer *cb,
+                                      BrainSurface *surface,
+                                      ShaderMode mode,
+                                      int uniformOffset)
+{
+    if (!surface || uniformOffset < 0) return;
+
+    auto *pipeline = d->pipelines[mode].get();
+    if (!pipeline) return;
+
+    auto draw = [&](QRhiGraphicsPipeline *p) {
+        cb->setGraphicsPipeline(p);
+        const QRhiCommandBuffer::DynamicOffset srbOffset = { 0, uint32_t(uniformOffset) };
+        cb->setShaderResources(d->srb.get(), 1, &srbOffset);
+        const QRhiCommandBuffer::VertexInput vbuf(surface->vertexBuffer(), 0);
+        cb->setVertexInput(0, 1, &vbuf, surface->indexBuffer(), 0, QRhiCommandBuffer::IndexUInt32);
+        cb->drawIndexed(surface->indexCount());
+    };
+
+    if (mode == Holographic && d->pipelinesBackColor[Holographic]) {
+        draw(d->pipelinesBackColor[Holographic].get());
+    }
+
+    draw(pipeline);
+}
+
+//=============================================================================================================
+
 void BrainRenderer::renderDipoles(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, DipoleObject *dipoles)
 {
     if (!dipoles || !dipoles->isVisible() || dipoles->instanceCount() == 0) return;

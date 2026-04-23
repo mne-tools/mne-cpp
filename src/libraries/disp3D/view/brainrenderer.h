@@ -196,6 +196,35 @@ public:
     void renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, BrainSurface *surface, ShaderMode mode);
 
     //=========================================================================================================
+    /**
+     * Upload uniform data for a surface into a shared resource batch.
+     *
+     * This is the batched equivalent of the first half of renderSurface().
+     * Call once per surface, then submit the batch with cb->resourceUpdate(),
+     * and finally call issueSurfaceDraw() for each surface.
+     *
+     * @param[in] u          Shared resource update batch.
+     * @param[in] data       Scene uniforms (MVP, light, etc).
+     * @param[in] surface    Pointer to surface.
+     * @return Uniform buffer offset for this draw, or -1 on failure.
+     */
+    int prepareSurfaceDraw(QRhiResourceUpdateBatch *u, const SceneData &data, BrainSurface *surface);
+
+    /**
+     * Issue draw commands for a surface using a pre-computed uniform offset.
+     *
+     * Call after cb->resourceUpdate() has been submitted with the batch
+     * from prepareSurfaceDraw().  Does not create resource batches or
+     * modify viewport/scissor state.
+     *
+     * @param[in] cb             Command buffer.
+     * @param[in] surface        Pointer to surface to draw.
+     * @param[in] mode           Shader mode.
+     * @param[in] uniformOffset  Offset returned by prepareSurfaceDraw().
+     */
+    void issueSurfaceDraw(QRhiCommandBuffer *cb, BrainSurface *surface, ShaderMode mode, int uniformOffset);
+
+    //=========================================================================================================
     // ── WORKAROUND(QRhi-GLES2) ──────────────────────────────────────────
     // The Qt QRhi GLES2/WebGL backend has a bug where only the first
     // drawIndexed() per render pass produces visible output.  On WASM we

@@ -1611,24 +1611,18 @@ void BrainView::render(QRhiCommandBuffer *cb)
     // Collect matched brain surface keys for this pane's info panel
 #ifndef __EMSCRIPTEN__
     QStringList drawnKeys;
-    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-        if (!sv.matchesSurfaceType(it.key())) continue;
-        if (!sv.shouldRenderSurface(it.key())) continue;
-        drawnKeys << it.key();
-    }
-    const QString drawnInfo = drawnKeys.isEmpty() ? "none" : drawnKeys.join(", ");
 #else
     const QString drawnInfo = QStringLiteral("merged");
 #endif
 
     if (m_viewMode == MultiView && m_viewportInfoLabels[vp]) {
         m_viewportInfoLabels[vp]->setText(
-            QString("Shader: %1\nSurface: %2\nOverlay: %3\nDrawn: %4")
-                .arg(shaderModeName(currentShader), sv.surfaceType, overlayName, drawnInfo));
+            QString("Shader: %1\nSurface: %2\nOverlay: %3")
+                .arg(shaderModeName(currentShader), sv.surfaceType, overlayName));
     } else if (m_viewMode == SingleView && m_singleViewInfoLabel) {
         m_singleViewInfoLabel->setText(
-            QString("Shader: %1\nSurface: %2\nOverlay: %3\nDrawn: %4")
-                .arg(shaderModeName(currentShader), sv.surfaceType, overlayName, drawnInfo));
+            QString("Shader: %1\nSurface: %2\nOverlay: %3")
+                .arg(shaderModeName(currentShader), sv.surfaceType, overlayName));
     }
 
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
@@ -1640,8 +1634,25 @@ void BrainView::render(QRhiCommandBuffer *cb)
         // per-category buffer (one drawIndexed per render pass).
         continue;
 #endif
+#ifndef __EMSCRIPTEN__
+        drawnKeys << it.key();
+#endif
         m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), currentShader);
     }
+
+#ifndef __EMSCRIPTEN__
+    // Update info panel with drawn brain surface keys after rendering
+    {
+        const QString drawnInfo = drawnKeys.isEmpty() ? QStringLiteral("none") : drawnKeys.join(QStringLiteral(", "));
+        if (m_viewMode == MultiView && m_viewportInfoLabels[vp]) {
+            m_viewportInfoLabels[vp]->setText(m_viewportInfoLabels[vp]->text()
+                + QStringLiteral("\nDrawn: ") + drawnInfo);
+        } else if (m_viewMode == SingleView && m_singleViewInfoLabel) {
+            m_singleViewInfoLabel->setText(m_singleViewInfoLabel->text()
+                + QStringLiteral("\nDrawn: ") + drawnInfo);
+        }
+    }
+#endif
 
 #ifdef __EMSCRIPTEN__
     // ══════════════════════════════════════════════════════════════════════
@@ -1658,34 +1669,11 @@ void BrainView::render(QRhiCommandBuffer *cb)
 
 #else
 
-    // Pass 1b: Source Space Points (use same shader as brain for consistent depth/blend)
-    // These use their own vertex colour, so force overlayMode to pass-through (Scientific)
-    BrainRenderer::SceneData nonBrainSceneData = sceneData;
-    nonBrainSceneData.overlayMode = static_cast<float>(BrainSurface::ModeScientific);
-
-    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-        if (!it.key().startsWith("srcsp_")) continue;
-        if (!sv.shouldRenderSurface(it.key())) continue;
-        if (!it.value()->isVisible()) continue;
-        m_renderer->renderSurface(cb, rhi(), nonBrainSceneData, it.value().get(), currentShader);
-    }
-
-    // Pass 1c: Digitizer Points (opaque small spheres, render like source space)
-    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-        if (!it.key().startsWith("dig_")) continue;
-        if (!sv.shouldRenderSurface(it.key())) continue;
-        if (!it.value()->isVisible()) continue;
-        m_renderer->renderSurface(cb, rhi(), nonBrainSceneData, it.value().get(), currentShader);
-    }
-
-    // Pass 2: Transparent Surfaces sorted Back-to-Front
-    struct RenderItem {
-        BrainSurface* surf;
-        float dist;
-        BrainRenderer::ShaderMode mode;
-        float overlayMode;  // per-item overlay mode
-    };
-    QVector<RenderItem> transparentItems;
+    // ── Batched desktop rendering ───────────────────────────────────────
+    // Single pass over m_surfaces categorises non-brain items into opaque
+    // and transparent draw lists.  All uniform uploads are batched into
+    // one QRhiResourceUpdateBatch and submitted once, eliminating per-
+    // surface batch allocation and redundant viewport/scissor reassertion.
 
     // Determine per-viewport field-map visibility
     const bool megFieldVisible = sv.visibility.megFieldMap;
@@ -1693,49 +1681,81 @@ void BrainView::render(QRhiCommandBuffer *cb)
     const QString &megFieldKey = m_fieldMapper.megSurfaceKey();
     const QString &eegFieldKey = m_fieldMapper.eegSurfaceKey();
 
+    struct DrawItem {
+        BrainSurface *surface;
+        BrainRenderer::ShaderMode mode;
+        float overlayMode;
+        float distSq;        // for transparent back-to-front sort
+        int uniformOffset;    // filled by prepareSurfaceDraw
+    };
+
+    QVector<DrawItem> opaqueDraws;
+    QVector<DrawItem> transparentDraws;
+
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-        bool isSensor = it.key().startsWith("sens_");
-        bool isBem = it.key().startsWith("bem_");
+        const QString &key = it.key();
+        BrainSurface *surf = it.value().get();
 
-        if (!isSensor && !isBem) continue;
-        if (!sv.shouldRenderSurface(it.key())) continue;
-        if (!it.value()->isVisible()) continue;
+        if (SubView::isBrainSurfaceKey(key)) {
+            // Brain surfaces already rendered above
+            continue;
+        } else if (key.startsWith("srcsp_") || key.startsWith("dig_")) {
+            if (!sv.shouldRenderSurface(key)) continue;
+            if (!surf->isVisible()) continue;
+            opaqueDraws.append({surf, currentShader,
+                                static_cast<float>(BrainSurface::ModeScientific),
+                                0.0f, -1});
+        } else {
+            bool isSensor = key.startsWith("sens_");
+            bool isBem    = key.startsWith("bem_");
+            if (!isSensor && !isBem) continue;
+            if (!sv.shouldRenderSurface(key)) continue;
+            if (!surf->isVisible()) continue;
 
-        QVector3D min, max;
-        it.value()->boundingBox(min, max);
-        QVector3D center = (min + max) * 0.5f;
-        float d = (sceneData.cameraPos - center).lengthSquared();
+            QVector3D bmin, bmax;
+            surf->boundingBox(bmin, bmax);
+            QVector3D center = (bmin + bmax) * 0.5f;
+            float dist = (sceneData.cameraPos - center).lengthSquared();
 
-        BrainRenderer::ShaderMode mode = BrainRenderer::Holographic;
-        if (isBem) mode = currentBemShader;
+            auto mode = isBem ? currentBemShader : BrainRenderer::Holographic;
+            float itemOverlay = static_cast<float>(BrainSurface::ModeScientific);
+            if (key == megFieldKey && !megFieldVisible)
+                itemOverlay = static_cast<float>(BrainSurface::ModeSurface);
+            else if (key == eegFieldKey && !eegFieldVisible)
+                itemOverlay = static_cast<float>(BrainSurface::ModeSurface);
 
-        // For the field-map target surfaces, use ModeSurface (holographic
-        // shell) when the field map is not visible in this viewport.
-        // Otherwise use ModeScientific so the field-map vertex colours
-        // are passed through to the shader.
-        float itemOverlay = static_cast<float>(BrainSurface::ModeScientific);
-        if (it.key() == megFieldKey && !megFieldVisible) {
-            itemOverlay = static_cast<float>(BrainSurface::ModeSurface);
-        } else if (it.key() == eegFieldKey && !eegFieldVisible) {
-            itemOverlay = static_cast<float>(BrainSurface::ModeSurface);
+            transparentDraws.append({surf, mode, itemOverlay, dist, -1});
         }
-
-        transparentItems.append({it.value().get(), d, mode, itemOverlay});
     }
 
-    std::sort(transparentItems.begin(), transparentItems.end(), [](const RenderItem &a, const RenderItem &b) {
-        return a.dist > b.dist;
-    });
+    // Sort transparent items back-to-front for correct alpha blending
+    std::sort(transparentDraws.begin(), transparentDraws.end(),
+              [](const DrawItem &a, const DrawItem &b) { return a.distSq > b.distSq; });
 
-    // BEM / sensor surfaces: per-item overlayMode controls whether field
-    // map colours are shown (Scientific) or the surface falls back to
-    // its default holographic shell appearance (FsSurface).
-    BrainRenderer::SceneData bemSceneData = sceneData;
+    // Batch all uniform uploads into a single resource update
+    QRhiResourceUpdateBatch *surfBatch = rhi()->nextResourceUpdateBatch();
+    BrainRenderer::SceneData batchData = sceneData;
 
-    for (const auto &item : transparentItems) {
-        bemSceneData.overlayMode = item.overlayMode;
-        m_renderer->renderSurface(cb, rhi(), bemSceneData, item.surf, item.mode);
+    for (auto &item : opaqueDraws) {
+        batchData.overlayMode = item.overlayMode;
+        item.uniformOffset = m_renderer->prepareSurfaceDraw(surfBatch, batchData, item.surface);
     }
+    for (auto &item : transparentDraws) {
+        batchData.overlayMode = item.overlayMode;
+        item.uniformOffset = m_renderer->prepareSurfaceDraw(surfBatch, batchData, item.surface);
+    }
+
+    cb->resourceUpdate(surfBatch);
+
+    // Set viewport/scissor once for all batched draws
+    cb->setViewport(viewport);
+    cb->setScissor(scissor);
+
+    // Issue all draw calls — no resource updates or state resets between them
+    for (const auto &item : opaqueDraws)
+        m_renderer->issueSurfaceDraw(cb, item.surface, item.mode, item.uniformOffset);
+    for (const auto &item : transparentDraws)
+        m_renderer->issueSurfaceDraw(cb, item.surface, item.mode, item.uniformOffset);
 
     // Render Dipoles
     for(auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
