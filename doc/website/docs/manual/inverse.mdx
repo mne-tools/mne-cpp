@@ -370,6 +370,43 @@ $$
 
 Crucially, $b_t$ replaces $\hat{q}_t$ in the sliding window for subsequent predictions. This recursive structure allows the network to build an evolving "context" of the source dynamics, progressively refining its predictions as more data becomes available.
 
+### Markov Chain Interpretation
+
+The recursive feedback structure of CMNE is a defining feature that distinguishes it from both classical minimum-norm methods and conventional deep learning post-processing. Understanding it as a **Markov chain** provides key insights into the method's behaviour and stability.
+
+#### Why CMNE forms a Markov chain
+
+A **Markov chain** is a stochastic process in which the future state depends only on the current state (or, for higher-order chains, on a finite number of past states), not on the full history. In CMNE, the corrected source estimate $b_t$ depends on:
+
+1. The current dSPM estimate $\hat{q}_t$ (derived from the physics-based inverse model), and
+2. The **preceding $k$ corrected estimates** $b_{t-k}, \ldots, b_{t-1}$ (the look-back window).
+
+This constitutes a **$k$-th order Markov chain** on the source state space $\mathbb{R}^Q$:
+
+$$
+b_t = g(b_{t-k}, \ldots, b_{t-1}, \hat{q}_t; \theta)
+$$
+
+where $g(\cdot)$ encapsulates the LSTM prediction, normalization, and element-wise multiplication. The state at time $t$ is fully determined by the most recent $k$ states and the current measurement — no memory beyond the look-back window influences the estimate.
+
+#### Consequences of the Markov property
+
+**Context accumulation.** Because each $b_t$ feeds into the window for computing $b_{t+1}$, the network progressively accumulates temporal context. Even though the window is finite ($k$ steps), information from earlier time points propagates forward through the chain: $b_{t-k}$ was itself computed from a window that included $b_{t-2k}$, and so forth. This creates an effective receptive field that grows linearly with the number of elapsed time steps, while keeping the computational cost per step constant.
+
+**Causal processing.** The chain is strictly causal — $b_t$ depends only on past states, never on future ones. This is essential for real-time applications where future data is not yet available. In MNE Scan (real-time MEG), the CMNE correction can be applied sample-by-sample as new data arrives.
+
+**Warm-up phase.** For the first $k$ time steps, the chain has not yet accumulated enough history to make meaningful corrections. During this phase, $b_t = \hat{q}_t$ (uncorrected dSPM). The estimates improve once the window is fully populated.
+
+**Stability.** The normalization step $W_t^\text{CMNE}(i,i) = |p_t(i)| / \max_j |p_t(j)|$ bounds the correction weights to $[0, 1]$, preventing the recursive feedback from amplifying noise or diverging. This is a critical design choice: without it, the chain could exhibit positive feedback loops where artifacts in early estimates grow over time. The LSTM learns which sources to suppress (weight $\approx 0$) and which to preserve (weight $\approx 1$), effectively acting as a learned, time-varying spatial filter.
+
+#### Connection to the paper
+
+The Markov chain formulation is described in Dinh et al. (2021, Section 2.3). The paper demonstrates that the recursive structure is critical for CMNE's performance — a non-recursive variant (where the LSTM operates on uncorrected dSPM rather than on its own previous outputs) achieves significantly worse spatial resolution. The feedback loop allows the network to:
+
+- **Track propagating activity**: as neural activation moves from one cortical area to another, the Markov chain naturally follows this trajectory because each prediction is conditioned on the recent corrected pattern.
+- **Suppress spurious activations**: a source that was correctly suppressed in $b_{t-1}$ remains suppressed in the input to the LSTM at time $t$, reinforcing the correct spatial pattern.
+- **Adapt to individual subjects**: fine-tuning the LSTM on a subject's own data allows the Markov chain to learn subject-specific temporal dynamics.
+
 #### LSTM Architecture
 
 The default architecture follows the paper's cross-validated design:
