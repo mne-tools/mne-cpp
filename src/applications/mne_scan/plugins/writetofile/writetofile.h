@@ -126,6 +126,8 @@ public:
     virtual QString getName() const;
     virtual QWidget* setupWidget();
     virtual QString getBuildInfo();
+    virtual QVariantMap getAttributes() const override;
+    virtual void setAttributes(const QVariantMap& attributes) override;
 
     //=========================================================================================================
     /**

@@ -45,6 +45,8 @@
 #include <scShared/Management/pluginmanager.h>
 #include <scShared/Management/pluginscenemanager.h>
 
+#include <mna/mna_project.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -176,6 +178,8 @@ private:
     QAction*    deleteAction;
     QAction*    toFrontAction;
     QAction*    sendBackAction;
+
+    MNALIB::MnaProject m_loadedMnaProject;   /**< Loaded project preserved for enriching round-trip saves. */
 };
 
 //=============================================================================================================

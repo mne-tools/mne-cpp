@@ -229,6 +229,8 @@ void PluginGui::loadConfigMna(const QString& fullPath)
                 PluginItem* pi = qgraphicsitem_cast<PluginItem*>(item);
                 if (pi->plugin()->getName() == node.opType && !itemMap.contains(node.id)) {
                     itemMap.insert(node.id, pi);
+                    // Restore plugin-specific settings from node attributes
+                    pi->plugin()->setAttributes(node.attributes);
                     break;
                 }
             }
@@ -262,6 +264,8 @@ void PluginGui::loadConfigMna(const QString& fullPath)
             }
         }
     }
+
+    m_loadedMnaProject = project;
 }
 
 //=============================================================================================================
@@ -287,12 +291,21 @@ void PluginGui::saveConfigMna(const QString& fullPath)
         }
     }
 
-    // Build MnaProject from the current pipeline graph
+    // Refresh plugin-specific attributes (file paths, parameters)
+    m_pPluginSceneManager->refreshGraphNodeAttributes();
+
+    // ── Enriching mode: start from loaded project to preserve foreign data ──
     MNALIB::MnaProject project;
-    project.name        = QStringLiteral("MNE Scan Pipeline");
-    project.description = QStringLiteral("Auto-saved MNE Scan plugin configuration");
-    project.pipeline    = m_pPluginSceneManager->pipelineGraph().nodes();
-    project.modified    = QDateTime::currentDateTimeUtc();
+    if (!m_loadedMnaProject.subjects.isEmpty() || !m_loadedMnaProject.pipeline.isEmpty()) {
+        project = m_loadedMnaProject;
+    } else {
+        project.name        = QStringLiteral("MNE Scan Pipeline");
+        project.description = QStringLiteral("MNE Scan plugin configuration");
+        project.mnaVersion  = QString::fromLatin1(MNALIB::MnaProject::CURRENT_SCHEMA_VERSION);
+        project.created     = QDateTime::currentDateTimeUtc();
+    }
+    project.pipeline = m_pPluginSceneManager->pipelineGraph().nodes();
+    project.modified = QDateTime::currentDateTimeUtc();
 
     // Ensure directory exists
     QFileInfo fi(fullPath);
@@ -302,6 +315,7 @@ void PluginGui::saveConfigMna(const QString& fullPath)
             return;
 
     MNALIB::MnaIO::write(project, fullPath);
+    m_loadedMnaProject = project;
 }
 
 //=============================================================================================================

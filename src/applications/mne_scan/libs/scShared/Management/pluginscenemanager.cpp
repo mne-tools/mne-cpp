@@ -257,6 +257,11 @@ void PluginSceneManager::addGraphNode(const AbstractPlugin::SPtr& pPlugin, qreal
     node.attributes.insert(QStringLiteral("gui_x"), guiX);
     node.attributes.insert(QStringLiteral("gui_y"), guiY);
 
+    // Store plugin-specific settings
+    const QVariantMap pluginAttrs = pPlugin->getAttributes();
+    for (auto it = pluginAttrs.constBegin(); it != pluginAttrs.constEnd(); ++it)
+        node.attributes.insert(it.key(), it.value());
+
     // Build output ports from plugin output connectors
     for (int i = 0; i < pPlugin->getOutputConnectors().size(); ++i) {
         MNALIB::MnaPort outPort;
@@ -317,5 +322,19 @@ void PluginSceneManager::updateGraphNodePosition(const AbstractPlugin::SPtr& pPl
         MNALIB::MnaNode& n = m_pPipelineGraph->node(pPlugin->getName());
         n.attributes.insert(QStringLiteral("gui_x"), guiX);
         n.attributes.insert(QStringLiteral("gui_y"), guiY);
+    }
+}
+
+//=============================================================================================================
+
+void PluginSceneManager::refreshGraphNodeAttributes()
+{
+    for (const auto& pPlugin : m_pluginList) {
+        if (!m_pPipelineGraph->hasNode(pPlugin->getName()))
+            continue;
+        MNALIB::MnaNode& node = m_pPipelineGraph->node(pPlugin->getName());
+        const QVariantMap pluginAttrs = pPlugin->getAttributes();
+        for (auto it = pluginAttrs.constBegin(); it != pluginAttrs.constEnd(); ++it)
+            node.attributes.insert(it.key(), it.value());
     }
 }

@@ -195,6 +195,13 @@ public:
     void updateGraphNodePosition(const AbstractPlugin::SPtr& pPlugin,
                                  qreal guiX, qreal guiY);
 
+    //=========================================================================================================
+    /**
+     * Refresh all graph node attributes from plugin settings.
+     * Call this before saving to ensure node attributes are up to date.
+     */
+    void refreshGraphNodeAttributes();
+
 signals:
 
 private:

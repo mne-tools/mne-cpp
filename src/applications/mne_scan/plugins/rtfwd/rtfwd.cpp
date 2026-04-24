@@ -546,3 +546,62 @@ QString RtFwd::getBuildInfo()
 {
     return QString(RTFWDPLUGIN::buildDateTime()) + QString(" - ")  + QString(RTFWDPLUGIN::buildHash());
 }
+
+//=============================================================================================================
+
+QVariantMap RtFwd::getAttributes() const
+{
+    QVariantMap attrs;
+    attrs[QStringLiteral("solname")]        = m_pFwdSettings->solname;
+    attrs[QStringLiteral("mriname")]        = m_pFwdSettings->mriname;
+    attrs[QStringLiteral("bemname")]        = m_pFwdSettings->bemname;
+    attrs[QStringLiteral("srcname")]        = m_pFwdSettings->srcname;
+    attrs[QStringLiteral("measname")]       = m_pFwdSettings->measname;
+    attrs[QStringLiteral("transname")]      = m_pFwdSettings->transname;
+    attrs[QStringLiteral("eeg_model_name")] = m_pFwdSettings->eeg_model_name;
+    attrs[QStringLiteral("include_meg")]    = m_pFwdSettings->include_meg;
+    attrs[QStringLiteral("include_eeg")]    = m_pFwdSettings->include_eeg;
+    attrs[QStringLiteral("accurate")]       = m_pFwdSettings->accurate;
+    attrs[QStringLiteral("mindist")]        = static_cast<double>(m_pFwdSettings->mindist);
+    attrs[QStringLiteral("ncluster")]       = m_pFwdSettings->ncluster;
+    attrs[QStringLiteral("atlasDir")]       = m_sAtlasDir;
+    attrs[QStringLiteral("doClustering")]   = m_bDoClustering;
+    attrs[QStringLiteral("doRecomputation")] = m_bDoRecomputation;
+    return attrs;
+}
+
+//=============================================================================================================
+
+void RtFwd::setAttributes(const QVariantMap& attributes)
+{
+    if (attributes.contains(QStringLiteral("solname")))
+        m_pFwdSettings->solname = attributes[QStringLiteral("solname")].toString();
+    if (attributes.contains(QStringLiteral("mriname")))
+        m_pFwdSettings->mriname = attributes[QStringLiteral("mriname")].toString();
+    if (attributes.contains(QStringLiteral("bemname")))
+        m_pFwdSettings->bemname = attributes[QStringLiteral("bemname")].toString();
+    if (attributes.contains(QStringLiteral("srcname")))
+        m_pFwdSettings->srcname = attributes[QStringLiteral("srcname")].toString();
+    if (attributes.contains(QStringLiteral("measname")))
+        m_pFwdSettings->measname = attributes[QStringLiteral("measname")].toString();
+    if (attributes.contains(QStringLiteral("transname")))
+        m_pFwdSettings->transname = attributes[QStringLiteral("transname")].toString();
+    if (attributes.contains(QStringLiteral("eeg_model_name")))
+        m_pFwdSettings->eeg_model_name = attributes[QStringLiteral("eeg_model_name")].toString();
+    if (attributes.contains(QStringLiteral("include_meg")))
+        m_pFwdSettings->include_meg = attributes[QStringLiteral("include_meg")].toBool();
+    if (attributes.contains(QStringLiteral("include_eeg")))
+        m_pFwdSettings->include_eeg = attributes[QStringLiteral("include_eeg")].toBool();
+    if (attributes.contains(QStringLiteral("accurate")))
+        m_pFwdSettings->accurate = attributes[QStringLiteral("accurate")].toBool();
+    if (attributes.contains(QStringLiteral("mindist")))
+        m_pFwdSettings->mindist = static_cast<float>(attributes[QStringLiteral("mindist")].toDouble());
+    if (attributes.contains(QStringLiteral("ncluster")))
+        m_pFwdSettings->ncluster = attributes[QStringLiteral("ncluster")].toInt();
+    if (attributes.contains(QStringLiteral("atlasDir")))
+        m_sAtlasDir = attributes[QStringLiteral("atlasDir")].toString();
+    if (attributes.contains(QStringLiteral("doClustering")))
+        m_bDoClustering = attributes[QStringLiteral("doClustering")].toBool();
+    if (attributes.contains(QStringLiteral("doRecomputation")))
+        m_bDoRecomputation = attributes[QStringLiteral("doRecomputation")].toBool();
+}

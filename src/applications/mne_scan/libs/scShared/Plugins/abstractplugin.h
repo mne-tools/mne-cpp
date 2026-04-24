@@ -191,6 +191,24 @@ public:
      */
     virtual QString getBuildInfo() = 0;
 
+    //=========================================================================================================
+    /**
+     * Returns the plugin's current settings as key-value pairs.
+     * Subclasses override this to serialize file paths, thresholds, etc.
+     *
+     * @return a QVariantMap of attribute name → value.
+     */
+    virtual QVariantMap getAttributes() const { return {}; }
+
+    //=========================================================================================================
+    /**
+     * Applies previously saved attributes (from a project file) to this plugin.
+     * Subclasses override this to restore file paths, thresholds, etc.
+     *
+     * @param[in] attributes   The key-value pairs to apply.
+     */
+    virtual void setAttributes(const QVariantMap& attributes) { Q_UNUSED(attributes); }
+
     inline InputConnectorList& getInputConnectors(){return m_inputConnectors;}
     inline OutputConnectorList& getOutputConnectors(){return m_outputConnectors;}
 

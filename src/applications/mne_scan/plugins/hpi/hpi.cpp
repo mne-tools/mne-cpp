@@ -687,3 +687,35 @@ QString Hpi::getBuildInfo()
 {
     return QString(HPIPLUGIN::buildDateTime()) + QString(" - ")  + QString(HPIPLUGIN::buildHash());
 }
+
+//=============================================================================================================
+
+QVariantMap Hpi::getAttributes() const
+{
+    QVariantMap attrs;
+    attrs[QStringLiteral("filePathDigitizers")] = m_sFilePathDigitzers;
+    attrs[QStringLiteral("fittingWindowSize")]  = static_cast<int>(m_iFittingWindowSize);
+    attrs[QStringLiteral("doFreqOrder")]        = m_bDoFreqOrder;
+    attrs[QStringLiteral("doContinuousHpi")]    = m_bDoContinousHpi;
+    attrs[QStringLiteral("useSSP")]             = m_bUseSSP;
+    attrs[QStringLiteral("useComp")]            = m_bUseComp;
+    return attrs;
+}
+
+//=============================================================================================================
+
+void Hpi::setAttributes(const QVariantMap& attributes)
+{
+    if (attributes.contains(QStringLiteral("filePathDigitizers")))
+        m_sFilePathDigitzers = attributes[QStringLiteral("filePathDigitizers")].toString();
+    if (attributes.contains(QStringLiteral("fittingWindowSize")))
+        m_iFittingWindowSize = static_cast<qint16>(attributes[QStringLiteral("fittingWindowSize")].toInt());
+    if (attributes.contains(QStringLiteral("doFreqOrder")))
+        m_bDoFreqOrder = attributes[QStringLiteral("doFreqOrder")].toBool();
+    if (attributes.contains(QStringLiteral("doContinuousHpi")))
+        m_bDoContinousHpi = attributes[QStringLiteral("doContinuousHpi")].toBool();
+    if (attributes.contains(QStringLiteral("useSSP")))
+        m_bUseSSP = attributes[QStringLiteral("useSSP")].toBool();
+    if (attributes.contains(QStringLiteral("useComp")))
+        m_bUseComp = attributes[QStringLiteral("useComp")].toBool();
+}

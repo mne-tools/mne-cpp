@@ -281,3 +281,20 @@ QString Covariance::getBuildInfo()
 {
     return QString(COVARIANCEPLUGIN::buildDateTime()) + QString(" - ")  + QString(COVARIANCEPLUGIN::buildHash());
 }
+
+//=============================================================================================================
+
+QVariantMap Covariance::getAttributes() const
+{
+    QVariantMap attrs;
+    attrs[QStringLiteral("estimationSamples")] = m_iEstimationSamples;
+    return attrs;
+}
+
+//=============================================================================================================
+
+void Covariance::setAttributes(const QVariantMap& attributes)
+{
+    if (attributes.contains(QStringLiteral("estimationSamples")))
+        m_iEstimationSamples = attributes[QStringLiteral("estimationSamples")].toInt();
+}

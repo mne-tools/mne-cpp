@@ -675,3 +675,38 @@ QString RtcMne::getBuildInfo()
 {
     return QString(RTCMNEPLUGIN::buildDateTime()) + QString(" - ")  + QString(RTCMNEPLUGIN::buildHash());
 }
+
+//=============================================================================================================
+
+QVariantMap RtcMne::getAttributes() const
+{
+    QVariantMap attrs;
+    attrs[QStringLiteral("atlasDir")]       = m_sAtlasDir;
+    attrs[QStringLiteral("surfaceDir")]     = m_sSurfaceDir;
+    attrs[QStringLiteral("mriHeadTrans")]   = m_fMriHeadTrans.fileName();
+    attrs[QStringLiteral("method")]         = m_sMethod;
+    attrs[QStringLiteral("avrType")]        = m_sAvrType;
+    attrs[QStringLiteral("downSample")]     = m_iDownSample;
+    attrs[QStringLiteral("numAverages")]    = m_iNumAverages;
+    return attrs;
+}
+
+//=============================================================================================================
+
+void RtcMne::setAttributes(const QVariantMap& attributes)
+{
+    if (attributes.contains(QStringLiteral("atlasDir")))
+        m_sAtlasDir = attributes[QStringLiteral("atlasDir")].toString();
+    if (attributes.contains(QStringLiteral("surfaceDir")))
+        m_sSurfaceDir = attributes[QStringLiteral("surfaceDir")].toString();
+    if (attributes.contains(QStringLiteral("mriHeadTrans")))
+        m_fMriHeadTrans.setFileName(attributes[QStringLiteral("mriHeadTrans")].toString());
+    if (attributes.contains(QStringLiteral("method")))
+        m_sMethod = attributes[QStringLiteral("method")].toString();
+    if (attributes.contains(QStringLiteral("avrType")))
+        m_sAvrType = attributes[QStringLiteral("avrType")].toString();
+    if (attributes.contains(QStringLiteral("downSample")))
+        m_iDownSample = attributes[QStringLiteral("downSample")].toInt();
+    if (attributes.contains(QStringLiteral("numAverages")))
+        m_iNumAverages = attributes[QStringLiteral("numAverages")].toInt();
+}

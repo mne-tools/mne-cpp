@@ -633,3 +633,20 @@ int WriteToFile::popUpYesNo(const QString& sText,
     auto ret = msgBox.exec();
     return ret;
 }
+
+//=============================================================================================================
+
+QVariantMap WriteToFile::getAttributes() const
+{
+    QVariantMap attrs;
+    attrs[QStringLiteral("recordFileName")] = m_sRecordFileName;
+    return attrs;
+}
+
+//=============================================================================================================
+
+void WriteToFile::setAttributes(const QVariantMap& attributes)
+{
+    if (attributes.contains(QStringLiteral("recordFileName")))
+        m_sRecordFileName = attributes[QStringLiteral("recordFileName")].toString();
+}

@@ -149,6 +149,8 @@ public:
     void changeSamples(qint32 samples);
 
     virtual QString getBuildInfo();
+    virtual QVariantMap getAttributes() const override;
+    virtual void setAttributes(const QVariantMap& attributes) override;
 
 protected:
     virtual void run();
