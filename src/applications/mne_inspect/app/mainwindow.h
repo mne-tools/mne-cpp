@@ -43,6 +43,7 @@
 #include <QElapsedTimer>
 #include <QStringList>
 #include <mna/mna_types.h>
+#include <mna/mna_project.h>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -311,6 +312,9 @@ private:
 
     // Loaded file tracking for MNA export (path → MnaFileRole int)
     QList<QPair<QString, int>> m_loadedFiles;
+
+    // Loaded MNA project preserved for enriching round-trip saves
+    MNALIB::MnaProject m_loadedMnaProject;
 
     // Sync state
     bool m_isSyncing = false;

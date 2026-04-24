@@ -149,6 +149,8 @@ protected:
             m_view->drawScalebars(p);
         if (m_view->rulerActive())
             m_view->drawRulerOverlay(p);
+        if (m_view->annotationSelecting())
+            m_view->drawAnnotationSelectionOverlay(p);
     }
 
 private:
@@ -160,6 +162,7 @@ ChannelRhiView::ChannelRhiView(QWidget *parent)
 {
     setFocusPolicy(Qt::StrongFocus);
     setMouseTracking(true);
+    setContextMenuPolicy(Qt::PreventContextMenu);  // prevent right-click context menu
 
     m_overlay = new CrosshairOverlay(this);
     m_overlay->raise();
@@ -294,7 +297,15 @@ void ChannelRhiView::setScrollSample(float sample)
         sample + visible > m_vboWindowLast - margin) {
         m_vboDirty = true;
     }
-    m_overlayDirty = true;
+
+    // Overlay prefetch: only rebuild when scroll exceeds the cached sample range.
+    // The shader handles bands via uniforms, so we only need to rebuild when
+    // annotations/events would be outside the cached texture.
+    if (m_overlayTotalSamples <= 0.f ||
+        sample < m_overlayFirstSample ||
+        sample + visible > m_overlayFirstSample + m_overlayTotalSamples) {
+        m_overlayDirty = true;
+    }
 
     emit scrollSampleChanged(m_scrollSample);
     update();
@@ -1151,8 +1162,14 @@ void ChannelRhiView::updateUBO(QRhiResourceUpdateBatch *batch)
 }
 
 //=============================================================================================================
-// Overlay blit — bands + event lines baked into a QImage and uploaded as a QRhiTexture
-// so they are part of the Metal texture and remain visible even when the app loses focus.
+// Overlay texture — annotations, events, and epoch markers baked into a QImage.
+// Alternating per-second bands are now computed in the fragment shader, so this
+// image only needs rebuilding when annotations/events change or when the scroll
+// exceeds the prefetch window.
+//
+// The overlay covers a wider sample range than the viewport (controlled by
+// kOverlayPrefetchFactor).  The fragment shader maps screen UVs into this
+// wider texture via the OverlayParams UBO.
 //=============================================================================================================
 
 void ChannelRhiView::rebuildOverlayImage(int logicalWidth, int logicalHeight, qreal devicePixelRatio)
@@ -1170,35 +1187,19 @@ void ChannelRhiView::rebuildOverlayImage(int logicalWidth, int logicalHeight, qr
         return;
     }
 
+    // The overlay covers m_overlayFirstSample .. m_overlayFirstSample + m_overlayTotalSamples.
+    // Map sample positions to pixel X using the overlay's own coordinate system.
+    const float overlayFirst = m_overlayFirstSample;
+    const float overlayTotal = m_overlayTotalSamples;
+    const float overlayPixelsPerSample = (overlayTotal > 0.f)
+        ? static_cast<float>(logicalWidth) / overlayTotal
+        : 0.f;
+
     QPainter p(&m_overlayImage);
     p.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
-    // ── Alternating per-second bands ────────────────────────────────
-    if (m_gridVisible) {
-        const float samplesPerSec = m_sfreq;
-        const float origin        = static_cast<float>(m_firstFileSample);
-        float firstBound = std::floor((m_scrollSample - origin) / samplesPerSec)
-                           * samplesPerSec + origin;
-        long long bandIdx = static_cast<long long>((firstBound - origin) / samplesPerSec);
-        bool oddBand      = (bandIdx & 1) != 0;
-
-        QColor tint(0, 0, 0, 20); // 8 % opacity dark tint on odd seconds
-        const float vw = static_cast<float>(logicalWidth);
-        const float vh = static_cast<float>(logicalHeight);
-        const float sppF = m_samplesPerPixel;
-
-        for (float s = firstBound;
-             s < m_scrollSample + logicalWidth * sppF + samplesPerSec;
-             s += samplesPerSec, oddBand = !oddBand) {
-            if (!oddBand) continue;
-            float xStart = (s - m_scrollSample) / sppF;
-            float xEnd   = xStart + samplesPerSec / sppF;
-            xStart = qBound(0.f, xStart, vw);
-            xEnd   = qBound(0.f, xEnd,   vw);
-            if (xEnd > xStart)
-                p.fillRect(QRectF(xStart, 0, xEnd - xStart, vh), tint);
-        }
-    }
+    // Note: alternating per-second bands are now computed per-pixel in the
+    // fragment shader — no QPainter band rendering here.
 
     // ── Annotation spans ────────────────────────────────────────────
     if (m_bShowAnnotations && !m_annotations.isEmpty()) {
@@ -1208,8 +1209,8 @@ void ChannelRhiView::rebuildOverlayImage(int logicalWidth, int logicalHeight, qr
         p.setFont(font);
 
         for (const AnnotationSpan &annotation : m_annotations) {
-            const float xStart = (static_cast<float>(annotation.startSample) - m_scrollSample) / m_samplesPerPixel;
-            const float xEnd = (static_cast<float>(annotation.endSample + 1) - m_scrollSample) / m_samplesPerPixel;
+            const float xStart = (static_cast<float>(annotation.startSample) - overlayFirst) * overlayPixelsPerSample;
+            const float xEnd = (static_cast<float>(annotation.endSample + 1) - overlayFirst) * overlayPixelsPerSample;
             if (xEnd < -2.f || xStart > logicalWidth + 2.f) {
                 continue;
             }
@@ -1252,7 +1253,7 @@ void ChannelRhiView::rebuildOverlayImage(int logicalWidth, int logicalHeight, qr
     // ── Event / stimulus marker lines ───────────────────────────────
     if (m_bShowEvents && !m_events.isEmpty()) {
         for (const EventMarker &ev : m_events) {
-            float xF = (static_cast<float>(ev.sample) - m_scrollSample) / m_samplesPerPixel;
+            float xF = (static_cast<float>(ev.sample) - overlayFirst) * overlayPixelsPerSample;
             if (xF < -2.f || xF > logicalWidth + 2.f)
                 continue;
             QColor lineColor = ev.color;
@@ -1267,7 +1268,7 @@ void ChannelRhiView::rebuildOverlayImage(int logicalWidth, int logicalHeight, qr
         QPen epochPen(QColor(100, 100, 100, 140), 1, Qt::DashLine);
         p.setPen(epochPen);
         for (int trigSample : m_epochTriggerSamples) {
-            float xF = (static_cast<float>(trigSample) - m_scrollSample) / m_samplesPerPixel;
+            float xF = (static_cast<float>(trigSample) - overlayFirst) * overlayPixelsPerSample;
             if (xF < -2.f || xF > logicalWidth + 2.f)
                 continue;
             p.drawLine(QPointF(xF, 0.f), QPointF(xF, static_cast<float>(logicalHeight)));
@@ -1288,14 +1289,20 @@ void ChannelRhiView::ensureOverlayPipeline()
         return;
 
     // Full-screen quad VBO: (pos.x, pos.y, uv.x, uv.y) per vertex, TriangleStrip.
-    // Dynamic so it can be uploaded in render() via the existing batch.
+    // Static — the quad vertices never change (screen-space NDC coordinates).
     // NDC Y+ = top. Image UV Y=0 = top.
     //   NDC(-1,-1)=bottom-left → UV(0,1)
     //   NDC(-1, 1)=top-left    → UV(0,0)
     //   NDC( 1,-1)=bottom-right→ UV(1,1)
     //   NDC( 1, 1)=top-right   → UV(1,0)
-    static constexpr int kQuadBytes = 4 * 4 * sizeof(float);
-    m_overlayVbo.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
+    static constexpr float kQuadVerts[] = {
+        -1.f, -1.f,  0.f, 1.f,
+        -1.f,  1.f,  0.f, 0.f,
+         1.f, -1.f,  1.f, 1.f,
+         1.f,  1.f,  1.f, 0.f,
+    };
+    static constexpr int kQuadBytes = sizeof(kQuadVerts);
+    m_overlayVbo.reset(rhi->newBuffer(QRhiBuffer::Immutable,
                                       QRhiBuffer::VertexBuffer,
                                       kQuadBytes));
     if (!m_overlayVbo->create()) {
@@ -1313,12 +1320,27 @@ void ChannelRhiView::ensureOverlayPipeline()
         QRhiSampler::ClampToEdge, QRhiSampler::ClampToEdge));
     m_overlaySampler->create();
 
-    // SRB: binding 1 = combined image sampler
+    // UBO for per-frame overlay parameters (binding 2, 8 floats = 32 bytes,
+    // aligned to 256 for std140 on all backends).
+    static constexpr int kOverlayUboSize = 256;
+    m_overlayUbo.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
+                                      QRhiBuffer::UniformBuffer,
+                                      kOverlayUboSize));
+    if (!m_overlayUbo->create()) {
+        m_overlayVbo.reset();
+        m_overlayUbo.reset();
+        return;
+    }
+
+    // SRB: binding 1 = combined image sampler, binding 2 = overlay UBO
     m_overlaySrb.reset(rhi->newShaderResourceBindings());
     m_overlaySrb->setBindings({
         QRhiShaderResourceBinding::sampledTexture(
             1, QRhiShaderResourceBinding::FragmentStage,
-            m_overlayTex.get(), m_overlaySampler.get())
+            m_overlayTex.get(), m_overlaySampler.get()),
+        QRhiShaderResourceBinding::uniformBuffer(
+            2, QRhiShaderResourceBinding::FragmentStage,
+            m_overlayUbo.get())
     });
     m_overlaySrb->create();
 
@@ -1335,6 +1357,7 @@ void ChannelRhiView::ensureOverlayPipeline()
     QShader fs = loadShader(QStringLiteral(":/disp/shaders/viewers/helpers/shaders/overlay.frag.qsb"));
     if (!vs.isValid() || !fs.isValid()) {
         m_overlayVbo.reset();
+        m_overlayUbo.reset();
         m_overlaySrb.reset();
         m_overlaySampler.reset();
         m_overlayTex.reset();
@@ -1370,7 +1393,13 @@ void ChannelRhiView::ensureOverlayPipeline()
     if (!m_overlayPipeline->create()) {
         qWarning() << "ChannelRhiView: overlay pipeline create failed";
         m_overlayPipeline.reset();
+        return;
     }
+
+    // The static VBO needs an initial upload.  Since ensureOverlayPipeline()
+    // is called from render(), we set a flag and do the upload in the render
+    // batch instead.
+    m_overlayVboNeedsUpload = true;
 }
 
 //=============================================================================================================
@@ -1410,38 +1439,86 @@ void ChannelRhiView::render(QRhiCommandBuffer *cb)
 
     updateUBO(batch);
 
-    // ── Overlay image (bands + event lines) ──────────────────────────────
+    // ── Overlay image (annotations + events; bands computed in shader) ──
     ensureOverlayPipeline();
     bool overlayReady = false;
-    if (m_overlayPipeline && m_overlayVbo && pw > 0 && ph > 0 && logicalW > 0 && logicalH > 0) {
+    if (m_overlayPipeline && m_overlayVbo && m_overlayUbo && pw > 0 && ph > 0 && logicalW > 0 && logicalH > 0) {
+
+        // Upload the static quad VBO if it was just created
+        if (m_overlayVboNeedsUpload) {
+            static constexpr float kQuadVerts[] = {
+                -1.f, -1.f,  0.f, 1.f,
+                -1.f,  1.f,  0.f, 0.f,
+                 1.f, -1.f,  1.f, 1.f,
+                 1.f,  1.f,  1.f, 0.f,
+            };
+            batch->uploadStaticBuffer(m_overlayVbo.get(), 0,
+                                      static_cast<quint32>(sizeof(kQuadVerts)), kQuadVerts);
+            m_overlayVboNeedsUpload = false;
+        }
+
+        // Compute the overlay prefetch window (wider than the viewport)
+        const float visibleSamples = static_cast<float>(logicalW) * m_samplesPerPixel;
+        const float extraSamples   = kOverlayPrefetchFactor * visibleSamples;
+        const float overlayFirstSample = m_scrollSample - extraSamples;
+        const float overlayTotalSamples = visibleSamples + 2.0f * extraSamples;
+        // Width of overlay texture in logical pixels = 1 + 2*prefetch factor times viewport
+        const int overlayLogicalW = static_cast<int>(std::ceil(
+            (1.0f + 2.0f * kOverlayPrefetchFactor) * static_cast<float>(logicalW)));
+
         // Rebuild the overlay QImage if dirty or resized
-        if (m_overlayDirty || QSize(pw, ph) != m_overlayTexSize) {
-            rebuildOverlayImage(logicalW, logicalH, overlayDpr);
+        const QSize requiredTexSize(qRound(overlayLogicalW * overlayDpr),
+                                    qRound(logicalH * overlayDpr));
+        if (m_overlayDirty || requiredTexSize != m_overlayTexSize) {
+            // Store the sample range covered by this overlay build
+            m_overlayFirstSample  = overlayFirstSample;
+            m_overlayTotalSamples = overlayTotalSamples;
+
+            rebuildOverlayImage(overlayLogicalW, logicalH, overlayDpr);
+
             // (Re)create texture at the correct pixel size
-            if (QSize(pw, ph) != m_overlayTexSize) {
-                m_overlayTex.reset(rhi()->newTexture(QRhiTexture::RGBA8, QSize(pw, ph)));
+            if (requiredTexSize != m_overlayTexSize) {
+                m_overlayTex.reset(rhi()->newTexture(QRhiTexture::RGBA8, requiredTexSize));
                 m_overlayTex->create();
                 // Re-create SRB because it references the texture
                 m_overlaySrb->setBindings({
                     QRhiShaderResourceBinding::sampledTexture(
                         1, QRhiShaderResourceBinding::FragmentStage,
-                        m_overlayTex.get(), m_overlaySampler.get())
+                        m_overlayTex.get(), m_overlaySampler.get()),
+                    QRhiShaderResourceBinding::uniformBuffer(
+                        2, QRhiShaderResourceBinding::FragmentStage,
+                        m_overlayUbo.get())
                 });
                 m_overlaySrb->create();
-                m_overlayTexSize = QSize(pw, ph);
+                m_overlayTexSize = requiredTexSize;
             }
             QRhiTextureUploadEntry entry(0, 0, QRhiTextureSubresourceUploadDescription(m_overlayImage));
             batch->uploadTexture(m_overlayTex.get(), entry);
         }
 
-        // Upload quad VBO (dynamic, 4 vertices × 4 floats)
-        static const float kQuadVerts[] = {
-            -1.f, -1.f,  0.f, 1.f,
-            -1.f,  1.f,  0.f, 0.f,
-             1.f, -1.f,  1.f, 1.f,
-             1.f,  1.f,  1.f, 0.f,
+        // Upload per-frame overlay UBO (scroll params for shader-computed bands + UV mapping)
+        struct OverlayParams {
+            float scrollSample;
+            float samplesPerPixel;
+            float viewWidth;
+            float sfreq;
+            float firstFileSample;
+            float gridEnabled;
+            float overlayFirstSample;
+            float overlayTotalSamples;
         };
-        batch->updateDynamicBuffer(m_overlayVbo.get(), 0, sizeof(kQuadVerts), kQuadVerts);
+        OverlayParams params;
+        params.scrollSample       = m_scrollSample;
+        params.samplesPerPixel    = m_samplesPerPixel;
+        params.viewWidth          = static_cast<float>(logicalW);
+        params.sfreq              = m_sfreq;
+        params.firstFileSample    = static_cast<float>(m_firstFileSample);
+        params.gridEnabled        = m_gridVisible ? 1.0f : 0.0f;
+        params.overlayFirstSample = m_overlayFirstSample;
+        params.overlayTotalSamples = m_overlayTotalSamples;
+        batch->updateDynamicBuffer(m_overlayUbo.get(), 0,
+                                   static_cast<quint32>(sizeof(params)), &params);
+
         overlayReady = true;
     }
 
@@ -2303,6 +2380,47 @@ void ChannelRhiView::drawRulerOverlay(QPainter &p)
 }
 
 //=============================================================================================================
+
+void ChannelRhiView::drawAnnotationSelectionOverlay(QPainter &p)
+{
+    const int x0 = qMin(m_annSelX0, m_annSelX1);
+    const int x1 = qMax(m_annSelX0, m_annSelX1);
+    const int h  = height();
+
+    // Semi-transparent fill matching annotation overlay style
+    p.fillRect(QRect(x0, 0, x1 - x0, h), QColor(210, 60, 60, 50));
+
+    // Left and right borders
+    QPen borderPen(QColor(210, 60, 60, 180), 2);
+    p.setPen(borderPen);
+    p.drawLine(x0, 0, x0, h);
+    p.drawLine(x1, 0, x1, h);
+
+    // Duration label pill at the top
+    if (m_sfreq > 0.f && m_samplesPerPixel > 0.f) {
+        float deltaSamples = static_cast<float>(x1 - x0) * m_samplesPerPixel;
+        float deltaSec     = deltaSamples / m_sfreq;
+        QString label;
+        if (deltaSec < 1.f)
+            label = QString::number(deltaSec * 1000.f, 'f', 0) + QStringLiteral(" ms");
+        else
+            label = QString::number(deltaSec, 'f', 2) + QStringLiteral(" s");
+
+        QFont f = p.font();
+        f.setPointSizeF(8.0);
+        f.setBold(true);
+        p.setFont(f);
+        QFontMetrics fm(f);
+        QRect labelRect = fm.boundingRect(label);
+        labelRect.adjust(-6, -2, 6, 2);
+        labelRect.moveTopLeft(QPoint(x0 + 4, 4));
+        p.fillRect(labelRect, QColor(210, 60, 60, 215));
+        p.setPen(Qt::white);
+        p.drawText(labelRect, Qt::AlignCenter, label);
+    }
+}
+
+//=============================================================================================================
 // Shared event handlers
 //=============================================================================================================
 
@@ -2357,18 +2475,28 @@ void ChannelRhiView::wheelEvent(QWheelEvent *event)
 
 void ChannelRhiView::mousePressEvent(QMouseEvent *event)
 {
-    // Right-click → start ruler measurement
+    // Right-click → annotation range selection (when annotation mode is ON)
+    //            → ruler measurement         (when annotation mode is OFF)
     if (event->button() == Qt::RightButton) {
-        // Stop any running inertial scroll before measuring
+        // Stop any running inertial scroll
         if (m_pInertialAnim) {
             m_pInertialAnim->stop();
             m_pInertialAnim = nullptr;
         }
-        m_rulerActive = true;
-        m_rulerSnap   = RulerSnap::Free;
-        m_rulerX0 = m_rulerX1 = m_rulerRawX1 = event->position().toPoint().x();
-        m_rulerY0 = m_rulerY1 = m_rulerRawY1 = event->position().toPoint().y();
-        if (m_overlay) m_overlay->repaint();
+
+        if (m_annotationSelectionEnabled) {
+            // Annotation mode: right-drag creates a new annotation range
+            m_annSelecting = true;
+            m_annSelX0 = m_annSelX1 = event->position().toPoint().x();
+            if (m_overlay) m_overlay->repaint();
+        } else {
+            // Normal mode: right-drag starts ruler measurement
+            m_rulerActive = true;
+            m_rulerSnap   = RulerSnap::Free;
+            m_rulerX0 = m_rulerX1 = m_rulerRawX1 = event->position().toPoint().x();
+            m_rulerY0 = m_rulerY1 = m_rulerRawY1 = event->position().toPoint().y();
+            if (m_overlay) m_overlay->repaint();
+        }
         event->accept();
         return;
     }
@@ -2446,6 +2574,14 @@ void ChannelRhiView::mouseMoveEvent(QMouseEvent *event)
             m_tileDirty = true;
             update();
         }
+        event->accept();
+        return;
+    }
+
+    // ── Annotation range selection drag (right-button, annotation mode) ─
+    if (m_annSelecting) {
+        m_annSelX1 = event->position().toPoint().x();
+        if (m_overlay) m_overlay->repaint();
         event->accept();
         return;
     }
@@ -2567,6 +2703,29 @@ void ChannelRhiView::mouseReleaseEvent(QMouseEvent *event)
         return;
     }
 
+    // ── Annotation range selection completion (right-button, annotation mode) ─
+    if (m_annSelecting && event->button() == Qt::RightButton) {
+        m_annSelX1 = event->position().toPoint().x();
+        m_annSelecting = false;
+        if (m_overlay) m_overlay->repaint();
+
+        const int x0 = qMin(m_annSelX0, m_annSelX1);
+        const int x1 = qMax(m_annSelX0, m_annSelX1);
+        if (qAbs(x1 - x0) > 3) {
+            int startSample = static_cast<int>(m_scrollSample + static_cast<float>(x0) * m_samplesPerPixel);
+            int endSample   = static_cast<int>(m_scrollSample + static_cast<float>(x1) * m_samplesPerPixel);
+
+            startSample = qMax(startSample, m_firstFileSample);
+            if (m_lastFileSample >= 0)
+                endSample = qMin(endSample, m_lastFileSample);
+
+            if (endSample >= startSample)
+                emit sampleRangeSelected(startSample, endSample);
+        }
+        event->accept();
+        return;
+    }
+
     if (m_rulerActive && event->button() == Qt::RightButton) {
         m_rulerRawX1 = event->position().toPoint().x();
         m_rulerRawY1 = event->position().toPoint().y();
@@ -2581,22 +2740,6 @@ void ChannelRhiView::mouseReleaseEvent(QMouseEvent *event)
         }
         m_rulerActive = false;
         if (m_overlay) m_overlay->repaint();
-
-        const int x0 = qMin(m_rulerX0, m_rulerX1);
-        const int x1 = qMax(m_rulerX0, m_rulerX1);
-        if (m_annotationSelectionEnabled && qAbs(x1 - x0) > 3) {
-            int startSample = static_cast<int>(m_scrollSample + static_cast<float>(x0) * m_samplesPerPixel);
-            int endSample = static_cast<int>(m_scrollSample + static_cast<float>(x1) * m_samplesPerPixel);
-
-            startSample = qMax(startSample, m_firstFileSample);
-            if (m_lastFileSample >= 0) {
-                endSample = qMin(endSample, m_lastFileSample);
-            }
-
-            if (endSample >= startSample) {
-                emit sampleRangeSelected(startSample, endSample);
-            }
-        }
 
         event->accept();
         return;

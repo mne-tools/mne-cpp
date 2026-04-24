@@ -83,6 +83,7 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QAction>
+#include <QSet>
 #include <QSettings>
 #include <QApplication>
 #include <QMessageBox>
@@ -90,6 +91,8 @@
 #include <QClipboard>
 #include <QDesktopServices>
 #include <QUrl>
+
+#include <algorithm>
 
 #ifdef WASMBUILD
 #include <QBuffer>
@@ -2279,13 +2282,24 @@ void MainWindow::importMnaProject(const QString &path)
                         break;
                     }
                     default:
-                        qInfo() << "Skipping file with role:" << mnaFileRoleToString(ref.role) << ref.path;
+                        qInfo() << "Preserving foreign file with role:" << mnaFileRoleToString(ref.role) << ref.path;
                         break;
                     }
                 }
             }
         }
     }
+
+    // Resolve all non-embedded file ref paths to absolute before storing,
+    // so we can re-relativize correctly when saving to a different location.
+    for (auto &s : proj.subjects)
+        for (auto &se : s.sessions)
+            for (auto &r : se.recordings)
+                for (auto &f : r.files)
+                    if (!f.embedded)
+                        f.path = QDir(projectDir).absoluteFilePath(f.path);
+
+    m_loadedMnaProject = proj;
 
     qInfo() << "MNA project import complete.";
     addRecentFile(path);
@@ -2295,27 +2309,103 @@ void MainWindow::importMnaProject(const QString &path)
 
 void MainWindow::exportMnaProject(const QString &path, bool embedData)
 {
+    // ── Enriching mode: start from loaded project to preserve foreign data ──
+    // Roles that mne_inspect owns and will replace with current state
+    static const QSet<MnaFileRole> ownedRoles = {
+        MnaFileRole::Surface,
+        MnaFileRole::Annotation,
+        MnaFileRole::Bem,
+        MnaFileRole::Digitizer,
+        MnaFileRole::Transform,
+        MnaFileRole::SourceSpace,
+        MnaFileRole::SourceEstimate,
+        MnaFileRole::Evoked,
+        MnaFileRole::Custom
+    };
+
     MnaProject proj;
-    proj.name = QStringLiteral("MNE Inspect Export");
-    proj.description = QStringLiteral("Exported from MNE Inspect");
-    proj.modified = QDateTime::currentDateTimeUtc();
-
-    MnaSubject subj;
-    subj.id = QStringLiteral("User");
-    MnaSession session;
-    session.id = QStringLiteral("session-01");
-    MnaRecording rec;
-    rec.id = QStringLiteral("recording-01");
-
+    const bool hasBase = !m_loadedMnaProject.subjects.isEmpty();
     const QString projectDir = QFileInfo(path).absolutePath();
 
+    if (hasBase) {
+        // Preserve all metadata, pipeline, and subject structure from the loaded project
+        proj = m_loadedMnaProject;
+        proj.modified = QDateTime::currentDateTimeUtc();
+
+        // Strip only our owned roles from the first recording; keep everything else
+        if (!proj.subjects.isEmpty()
+            && !proj.subjects[0].sessions.isEmpty()
+            && !proj.subjects[0].sessions[0].recordings.isEmpty())
+        {
+            auto &files = proj.subjects[0].sessions[0].recordings[0].files;
+            files.erase(std::remove_if(files.begin(), files.end(),
+                [](const MnaFileRef &r){ return ownedRoles.contains(r.role); }),
+                files.end());
+
+            // Re-serialize foreign refs for the target format
+            for (auto &ref : files) {
+                if (embedData) {
+                    if (!ref.embedded && !ref.path.isEmpty()) {
+                        QFile f(ref.path);
+                        if (f.open(QIODevice::ReadOnly)) {
+                            ref.data = f.readAll();
+                            ref.sizeBytes = ref.data.size();
+                            f.close();
+                        }
+                        ref.path = proj.subjects[0].id + QStringLiteral("/")
+                                   + proj.subjects[0].sessions[0].id + QStringLiteral("/passthrough/")
+                                   + QFileInfo(ref.path).fileName();
+                        ref.embedded = true;
+                    }
+                } else {
+                    if (ref.embedded && !ref.data.isEmpty()) {
+                        const QString outPath = projectDir + QDir::separator() + QFileInfo(ref.path).fileName();
+                        QFile f(outPath);
+                        if (f.open(QIODevice::WriteOnly)) {
+                            f.write(ref.data);
+                            f.close();
+                        }
+                        ref.path = QDir(projectDir).relativeFilePath(outPath);
+                        ref.embedded = false;
+                        ref.data.clear();
+                    } else if (!ref.embedded) {
+                        ref.path = QDir(projectDir).relativeFilePath(ref.path);
+                    }
+                }
+            }
+        }
+    } else {
+        // Brand-new project — create minimal structure
+        proj.name = QStringLiteral("MNE Inspect Export");
+        proj.description = QStringLiteral("Exported from MNE Inspect");
+        proj.mnaVersion = QString::fromLatin1(MnaProject::CURRENT_SCHEMA_VERSION);
+        proj.created = QDateTime::currentDateTimeUtc();
+        proj.modified = QDateTime::currentDateTimeUtc();
+
+        MnaSubject subj;
+        subj.id = QStringLiteral("User");
+        MnaSession session;
+        session.id = QStringLiteral("session-01");
+        MnaRecording rec;
+        rec.id = QStringLiteral("recording-01");
+        session.recordings.append(rec);
+        subj.sessions.append(session);
+        proj.subjects.append(subj);
+    }
+
+    // Reference to the first recording where we add our files
+    auto &rec = proj.subjects[0].sessions[0].recordings[0];
+
+    // Add current owned file refs
     for (const auto &entry : m_loadedFiles) {
         MnaFileRef ref;
         ref.role = static_cast<MnaFileRole>(entry.second);
         ref.format = QFileInfo(entry.first).suffix();
 
         if (embedData) {
-            ref.path = bidsBuildRelPath(subj.id, session.id, ref.role, entry.first);
+            ref.path = bidsBuildRelPath(proj.subjects[0].id,
+                                        proj.subjects[0].sessions[0].id,
+                                        ref.role, entry.first);
             ref.embedded = true;
             QFile f(entry.first);
             if (f.open(QIODevice::ReadOnly)) {
@@ -2324,7 +2414,6 @@ void MainWindow::exportMnaProject(const QString &path, bool embedData)
                 f.close();
             }
         } else {
-            // Store as relative path from project file
             ref.path = QDir(projectDir).relativeFilePath(entry.first);
             ref.embedded = false;
             QFileInfo fi(entry.first);
@@ -2334,11 +2423,8 @@ void MainWindow::exportMnaProject(const QString &path, bool embedData)
         rec.files.append(ref);
     }
 
-    session.recordings.append(rec);
-    subj.sessions.append(session);
-    proj.subjects.append(subj);
-
     if (MnaIO::write(proj, path)) {
+        m_loadedMnaProject = proj;
         qInfo() << "Exported MNA project to:" << path;
     } else {
         qWarning() << "Failed to export MNA project to:" << path;

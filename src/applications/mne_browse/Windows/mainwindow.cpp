@@ -69,6 +69,7 @@
 #include <QVBoxLayout>
 #include <QFileInfo>
 
+#include <QJsonObject>
 #include <cmath>
 #include <algorithm>
 #include <functional>
@@ -2023,6 +2024,15 @@ void MainWindow::createToolBar()
 
 void MainWindow::connectMenus()
 {
+    // ── Project actions ──────────────────────────────────────────────
+    QAction* openProjectAction = new QAction(tr("Open Project (.mna/.mnx)..."), this);
+    ui->menuTest->insertAction(ui->m_writeAction, openProjectAction);
+
+    QAction* saveProjectAction = new QAction(tr("Save Project (.mna/.mnx)..."), this);
+    ui->menuTest->insertAction(ui->m_writeAction, saveProjectAction);
+
+    ui->menuTest->insertSeparator(ui->m_writeAction);
+
     QAction* loadInverseOperatorAction = new QAction(tr("Load Inverse Operator..."), this);
     ui->menuTest->insertAction(ui->m_loadEvokedAction, loadInverseOperatorAction);
 
@@ -2083,7 +2093,7 @@ void MainWindow::connectMenus()
 
     m_pAnnotationModeAction = new QAction(tr("Annotation Mode"), this);
     m_pAnnotationModeAction->setCheckable(true);
-    m_pAnnotationModeAction->setStatusTip(tr("When enabled, Shift-drag in the raw browser creates annotation spans."));
+    m_pAnnotationModeAction->setStatusTip(tr("When enabled, right-drag in the raw browser creates annotation spans."));
     ui->menuAdjust->addAction(m_pAnnotationModeAction);
 
     // Recent files submenu
@@ -2094,6 +2104,8 @@ void MainWindow::connectMenus()
 
     //File
     connect(ui->m_openAction, &QAction::triggered, this, &MainWindow::openFile);
+    connect(openProjectAction, &QAction::triggered, this, &MainWindow::openProject);
+    connect(saveProjectAction, &QAction::triggered, this, &MainWindow::saveProject);
     connect(ui->m_writeAction, &QAction::triggered, this, &MainWindow::writeFile);
     connect(ui->m_loadEvents, &QAction::triggered, this, &MainWindow::loadEvents);
     connect(ui->m_saveEvents, &QAction::triggered, this, &MainWindow::saveEvents);
@@ -2137,7 +2149,7 @@ void MainWindow::connectMenus()
     connect(m_pAnnotationModeAction, &QAction::toggled, this, [this](bool checked) {
         m_pDataWindow->setAnnotationSelectionEnabled(checked);
         statusBar()->showMessage(checked
-                                 ? QStringLiteral("Annotation mode enabled: Shift-drag in the raw browser to create spans.")
+                                 ? QStringLiteral("Annotation mode enabled: Right-drag in the raw browser to create spans.")
                                  : QStringLiteral("Annotation mode disabled."),
                                  4000);
     });
@@ -2808,6 +2820,316 @@ void MainWindow::openFile()
 
 //*************************************************************************************************************
 
+void MainWindow::openProject()
+{
+    const QString filename = QFileDialog::getOpenFileName(this,
+                                                          tr("Open MNA/MNX Project"),
+                                                          QString(),
+                                                          tr("MNX binary (*.mnx);;MNA JSON (*.mna);;All Files (*)"));
+    if (filename.isEmpty())
+        return;
+
+    // Read project via MNA library (handles both .mna JSON and .mnx CBOR)
+    MNALIB::MnaProject proj = MNALIB::MnaIO::read(filename);
+    if (proj.name.isEmpty() && proj.subjects.isEmpty()) {
+        QMessageBox::warning(this, tr("Open Project"), tr("Failed to open project:\n%1").arg(filename));
+        return;
+    }
+
+    // Extract embedded files to a temp directory;
+    // resolve external paths relative to the project file.
+    m_mnxTempDir = std::make_unique<QTemporaryDir>();
+    if (!m_mnxTempDir->isValid()) {
+        QMessageBox::warning(this, tr("Open Project"), tr("Failed to create temporary directory."));
+        m_mnxTempDir.reset();
+        return;
+    }
+
+    const QString projectDir = QFileInfo(filename).absolutePath();
+    const QString extractDir = m_mnxTempDir->path();
+
+    // Collect resolved paths by role
+    QString rawPath, eventPath, annotPath, virtChanPath, evokedPath, covPath, invPath;
+
+    for (const auto &subj : proj.subjects) {
+        for (const auto &sess : subj.sessions) {
+            for (const auto &rec : sess.recordings) {
+                for (const auto &ref : rec.files) {
+                    QString filePath;
+                    if (ref.embedded && !ref.data.isEmpty()) {
+                        // Write embedded data to temp dir preserving BIDS path
+                        filePath = extractDir + QDir::separator() + ref.path;
+                        QDir().mkpath(QFileInfo(filePath).absolutePath());
+                        QFile f(filePath);
+                        if (f.open(QIODevice::WriteOnly)) {
+                            f.write(ref.data);
+                            f.close();
+                        }
+                    } else {
+                        // Resolve relative path from project file location
+                        filePath = QDir(projectDir).absoluteFilePath(ref.path);
+                    }
+
+                    if (!QFileInfo::exists(filePath))
+                        continue;
+
+                    switch (ref.role) {
+                    case MNALIB::MnaFileRole::Raw:            rawPath = filePath; break;
+                    case MNALIB::MnaFileRole::Event:          eventPath = filePath; break;
+                    case MNALIB::MnaFileRole::Annotation:     annotPath = filePath; break;
+                    case MNALIB::MnaFileRole::VirtualChannel: virtChanPath = filePath; break;
+                    case MNALIB::MnaFileRole::Evoked:         evokedPath = filePath; break;
+                    case MNALIB::MnaFileRole::Covariance:     covPath = filePath; break;
+                    case MNALIB::MnaFileRole::Inverse:        invPath = filePath; break;
+                    default: break;
+                    }
+                }
+            }
+        }
+    }
+
+    if (rawPath.isEmpty()) {
+        QMessageBox::warning(this, tr("Open Project"), tr("Project does not contain a raw FIF file."));
+        m_mnxTempDir.reset();
+        return;
+    }
+
+    if (!loadRawFile(rawPath)) {
+        QMessageBox::warning(this, tr("Open Project"), tr("Failed to load raw file from project."));
+        m_mnxTempDir.reset();
+        return;
+    }
+
+    // Load additional files that auto-discovery might miss
+    if (!covPath.isEmpty() && QFileInfo::exists(covPath)) {
+        QFile covFile(covPath);
+        FIFFLIB::FiffCov cov(covFile);
+        if (!cov.isEmpty()) {
+            m_qCovFile.setFileName(covPath);
+            m_covariance = cov;
+            m_pAverageWindow->setNoiseCovariance(m_covariance);
+            m_pCovarianceWindow->setCovariance(m_covariance,
+                                               QStringLiteral("Loaded from project"),
+                                               m_pDataWindow->fiffInfo());
+            if (m_pDataWindow) {
+                m_pDataWindow->updateRawWhitener(m_covariance, covarianceWhiteningSettings());
+            }
+        }
+    }
+
+    if (!invPath.isEmpty() && QFileInfo::exists(invPath)) {
+        loadInverseOperatorFile(invPath);
+    }
+
+    if (!evokedPath.isEmpty() && QFileInfo::exists(evokedPath)) {
+        if (m_qEvokedFile.isOpen()) m_qEvokedFile.close();
+        m_qEvokedFile.setFileName(evokedPath);
+        m_pAverageWindow->getAverageModel()->loadEvokedData(m_qEvokedFile);
+    }
+
+    // Resolve all non-embedded file ref paths to absolute before storing,
+    // so we can re-relativize correctly when saving to a different location.
+    for (auto &s : proj.subjects)
+        for (auto &se : s.sessions)
+            for (auto &r : se.recordings)
+                for (auto &f : r.files)
+                    if (!f.embedded)
+                        f.path = QDir(projectDir).absoluteFilePath(f.path);
+
+    m_mnxProject = proj;
+    m_mnxFilePath = filename;
+    statusBar()->showMessage(tr("Project loaded: %1").arg(QFileInfo(filename).fileName()), 5000);
+    setWindowStatus();
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::saveProject()
+{
+    if (m_qFileRaw.fileName().isEmpty()) {
+        QMessageBox::warning(this, tr("Save Project"), tr("Load a raw FIF file before saving a project."));
+        return;
+    }
+
+    // Determine default save path
+    QString defaultPath;
+    if (!m_mnxFilePath.isEmpty()) {
+        defaultPath = m_mnxFilePath;
+    } else {
+        const QString rawName = QFileInfo(m_qFileRaw.fileName()).completeBaseName();
+        defaultPath = QFileInfo(m_qFileRaw.fileName()).absolutePath()
+                      + QDir::separator() + rawName + QStringLiteral(".mnx");
+    }
+
+    const QString filename = QFileDialog::getSaveFileName(this,
+                                                          tr("Save MNA/MNX Project"),
+                                                          defaultPath,
+                                                          tr("MNX binary (*.mnx);;MNA JSON (*.mna);;All Files (*)"));
+    if (filename.isEmpty())
+        return;
+
+    // Auto-save annotations, virtual channels, and events to sidecar files
+    if (m_pAnnotationWindow->getAnnotationModel()->rowCount() > 0) {
+        if (m_qAnnotationFile.fileName().isEmpty()) {
+            m_qAnnotationFile.setFileName(defaultAnnotationFilePath(m_qFileRaw.fileName()));
+        }
+        m_pAnnotationWindow->getAnnotationModel()->saveAnnotationData(m_qAnnotationFile);
+    }
+
+    if (m_pVirtualChannelWindow->getVirtualChannelModel()->rowCount() > 0) {
+        if (m_qVirtualChannelFile.fileName().isEmpty()) {
+            m_qVirtualChannelFile.setFileName(defaultVirtualChannelFilePath(m_qFileRaw.fileName()));
+        }
+        m_pVirtualChannelWindow->getVirtualChannelModel()->saveVirtualChannels(m_qVirtualChannelFile);
+    }
+
+    if (m_pEventWindow->getEventModel()->rowCount() > 0) {
+        if (m_qEventFile.fileName().isEmpty()) {
+            const QString rawBase = m_qFileRaw.fileName();
+            m_qEventFile.setFileName(rawBase.endsWith(QStringLiteral(".fif"), Qt::CaseInsensitive)
+                ? rawBase.left(rawBase.size() - 4) + QStringLiteral("-eve.fif")
+                : rawBase + QStringLiteral("-eve.fif"));
+        }
+        m_pEventWindow->getEventModel()->saveEventData(m_qEventFile);
+    }
+
+    // Determine if data should be embedded (binary .mnx) or referenced (.mna)
+    const bool embed = filename.endsWith(QStringLiteral(".mnx"), Qt::CaseInsensitive);
+    const QString projectDir = QFileInfo(filename).absolutePath();
+
+    // ── Enriching mode: start from loaded project to preserve foreign data ──
+    // Roles that mne_browse owns and will replace with current state
+    static const QSet<MNALIB::MnaFileRole> ownedRoles = {
+        MNALIB::MnaFileRole::Raw,
+        MNALIB::MnaFileRole::Event,
+        MNALIB::MnaFileRole::Annotation,
+        MNALIB::MnaFileRole::VirtualChannel,
+        MNALIB::MnaFileRole::Evoked,
+        MNALIB::MnaFileRole::Covariance,
+        MNALIB::MnaFileRole::Inverse
+    };
+
+    MNALIB::MnaProject proj;
+    const bool hasBase = !m_mnxProject.subjects.isEmpty();
+
+    if (hasBase) {
+        // Preserve all metadata, pipeline, and subject structure from the loaded project
+        proj = m_mnxProject;
+        proj.modified = QDateTime::currentDateTimeUtc();
+
+        // Strip only our owned roles from the first recording; keep everything else
+        if (!proj.subjects.isEmpty()
+            && !proj.subjects[0].sessions.isEmpty()
+            && !proj.subjects[0].sessions[0].recordings.isEmpty())
+        {
+            auto &files = proj.subjects[0].sessions[0].recordings[0].files;
+            files.erase(std::remove_if(files.begin(), files.end(),
+                [](const MNALIB::MnaFileRef &r){ return ownedRoles.contains(r.role); }),
+                files.end());
+
+            // Re-serialize foreign embedded/external refs for the target format
+            for (auto &ref : files) {
+                if (embed) {
+                    if (!ref.embedded && !ref.path.isEmpty()) {
+                        // External → embed: read file data
+                        QFile f(ref.path);
+                        if (f.open(QIODevice::ReadOnly)) {
+                            ref.data = f.readAll();
+                            ref.sizeBytes = ref.data.size();
+                            f.close();
+                        }
+                        ref.path = proj.subjects[0].id + QStringLiteral("/")
+                                   + proj.subjects[0].sessions[0].id + QStringLiteral("/passthrough/")
+                                   + QFileInfo(ref.path).fileName();
+                        ref.embedded = true;
+                    }
+                } else {
+                    if (ref.embedded && !ref.data.isEmpty()) {
+                        // Embed → external: write data out alongside the project file
+                        const QString outPath = projectDir + QDir::separator() + QFileInfo(ref.path).fileName();
+                        QFile f(outPath);
+                        if (f.open(QIODevice::WriteOnly)) {
+                            f.write(ref.data);
+                            f.close();
+                        }
+                        ref.path = QDir(projectDir).relativeFilePath(outPath);
+                        ref.embedded = false;
+                        ref.data.clear();
+                    } else if (!ref.embedded) {
+                        ref.path = QDir(projectDir).relativeFilePath(ref.path);
+                    }
+                }
+            }
+        }
+    } else {
+        // Brand-new project — create minimal structure
+        proj.name = QFileInfo(m_qFileRaw.fileName()).completeBaseName();
+        proj.description = QStringLiteral("MNE Browse project");
+        proj.mnaVersion = QString::fromLatin1(MNALIB::MnaProject::CURRENT_SCHEMA_VERSION);
+        proj.created = QDateTime::currentDateTimeUtc();
+        proj.modified = QDateTime::currentDateTimeUtc();
+
+        MNALIB::MnaSubject subj;
+        subj.id = QStringLiteral("sub-01");
+        MNALIB::MnaSession sess;
+        sess.id = QStringLiteral("ses-browse");
+        MNALIB::MnaRecording rec;
+        rec.id = QStringLiteral("rec-01");
+        sess.recordings.append(rec);
+        subj.sessions.append(sess);
+        proj.subjects.append(subj);
+    }
+
+    // Reference to the first recording where we add our files
+    auto &rec = proj.subjects[0].sessions[0].recordings[0];
+
+    // Helper: add a file ref for an owned role
+    auto addFileRef = [&](const QString& filePath, MNALIB::MnaFileRole role) {
+        if (filePath.isEmpty() || !QFileInfo::exists(filePath))
+            return;
+        MNALIB::MnaFileRef ref;
+        ref.role = role;
+        ref.format = QFileInfo(filePath).suffix();
+        ref.sizeBytes = QFileInfo(filePath).size();
+        if (embed) {
+            ref.path = proj.subjects[0].id + QStringLiteral("/")
+                       + proj.subjects[0].sessions[0].id + QStringLiteral("/meg/")
+                       + QFileInfo(filePath).fileName();
+            ref.embedded = true;
+            QFile f(filePath);
+            if (f.open(QIODevice::ReadOnly)) {
+                ref.data = f.readAll();
+                f.close();
+            }
+        } else {
+            ref.path = QDir(projectDir).relativeFilePath(filePath);
+            ref.embedded = false;
+        }
+        rec.files.append(ref);
+    };
+
+    addFileRef(m_qFileRaw.fileName(),            MNALIB::MnaFileRole::Raw);
+    addFileRef(m_qEventFile.fileName(),           MNALIB::MnaFileRole::Event);
+    addFileRef(m_qAnnotationFile.fileName(),      MNALIB::MnaFileRole::Annotation);
+    addFileRef(m_qVirtualChannelFile.fileName(),  MNALIB::MnaFileRole::VirtualChannel);
+    addFileRef(m_qEvokedFile.fileName(),          MNALIB::MnaFileRole::Evoked);
+    addFileRef(m_qCovFile.fileName(),             MNALIB::MnaFileRole::Covariance);
+    addFileRef(m_qInverseOperatorFile.fileName(), MNALIB::MnaFileRole::Inverse);
+
+    if (!MNALIB::MnaIO::write(proj, filename)) {
+        QMessageBox::warning(this, tr("Save Project"), tr("Failed to write project to:\n%1").arg(filename));
+        return;
+    }
+
+    m_mnxProject = proj;
+    m_mnxFilePath = filename;
+    statusBar()->showMessage(tr("Project saved: %1").arg(QFileInfo(filename).fileName()), 5000);
+}
+
+
+//*************************************************************************************************************
+
 void MainWindow::writeFile()
 {
     if(!ensureLegacyRawModelLoaded(QStringLiteral("Write FIFF File"))) {
@@ -3264,20 +3586,40 @@ void MainWindow::handleAnnotationRangeSelected(int startSample, int endSample)
     }
 
     const QString defaultLabel = m_qSettings.value("MainWindow/Annotations/defaultLabel",
-                                                   QStringLiteral("BAD_manual")).toString();
+                                                   QStringLiteral("BAD_SEGMENT")).toString();
 
-    bool accepted = false;
-    QString label = QInputDialog::getText(this,
-                                          QStringLiteral("Add Annotation"),
-                                          QStringLiteral("Annotation description"),
-                                          QLineEdit::Normal,
-                                          defaultLabel,
-                                          &accepted).trimmed();
+    // Preset labels — common annotation types
+    const QStringList presets = {
+        QStringLiteral("BAD_SEGMENT"),
+        QStringLiteral("GOOD_SEGMENT"),
+        QStringLiteral("BAD_manual"),
+        QStringLiteral("BAD_blink"),
+        QStringLiteral("BAD_muscle"),
+        QStringLiteral("BAD_jump"),
+        QStringLiteral("EDGE_artifact")
+    };
 
-    if(!accepted) {
+    // Build a dialog with an editable combo box
+    QDialog dlg(this);
+    dlg.setWindowTitle(QStringLiteral("Add Annotation"));
+    auto *layout = new QVBoxLayout(&dlg);
+    layout->addWidget(new QLabel(QStringLiteral("Annotation description:")));
+    auto *combo = new QComboBox;
+    combo->setEditable(true);
+    combo->addItems(presets);
+    // Set the last-used label as current text (even if it's custom)
+    combo->setCurrentText(defaultLabel);
+    layout->addWidget(combo);
+    auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    connect(buttons, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+    connect(buttons, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+    layout->addWidget(buttons);
+
+    if(dlg.exec() != QDialog::Accepted) {
         return;
     }
 
+    QString label = combo->currentText().trimmed();
     if(label.isEmpty()) {
         label = defaultLabel;
     }

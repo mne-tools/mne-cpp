@@ -73,6 +73,10 @@
 #include "../Utils/types.h"
 #include "../Utils/rawsettings.h"
 
+#include <mna/mna_project.h>
+#include <mna/mna_io.h>
+#include <mna/mna_types.h>
+
 #include "filterwindow.h"
 #include "eventwindow.h"
 #include "annotationwindow.h"
@@ -111,6 +115,8 @@
 #include <QProgressDialog>
 #include <QMessageBox>
 #include <QtConcurrent>
+
+#include <QTemporaryDir>
 
 #include <memory>
 
@@ -189,6 +195,18 @@ private:
      * openFile opens a file dialog that picks the fiff data file to analyze and invokes the setup methods.
      */
     void openFile();
+
+    //=========================================================================================================
+    /**
+     * Open an .mnx project archive — extracts to a temp dir and loads all contents.
+     */
+    void openProject();
+
+    //=========================================================================================================
+    /**
+     * Save the current session as an .mnx project archive.
+     */
+    void saveProject();
 
     //=========================================================================================================
     /**
@@ -560,7 +578,7 @@ protected:
     QAction*                m_pWhitenButterflyAction;       /**< Toggle whitening in the average butterfly plot. */
     QAction*                m_pGFPAction;                   /**< Toggle GFP overlay in the butterfly plot. */
     QAction*                m_pDarkModeAction;              /**< Toggle dark mode palette. */
-    QAction*                m_pAnnotationModeAction;        /**< Toggle Shift-drag annotation selection in the raw browser. */
+    QAction*                m_pAnnotationModeAction;        /**< Toggle right-drag annotation selection in the raw browser. */
     QMenu*                  m_pRecentFilesMenu = nullptr;   /**< "Open Recent" submenu. */
     QStringList             m_recentFiles;                  /**< Most-recently-used file paths (newest first). */
     QList<MNELIB::MNEEpochDataList> m_epochReviewLists;     /**< Reviewed epochs grouped by event code. */
@@ -568,6 +586,10 @@ protected:
     QStringList             m_epochReviewComments;          /**< Display comments for the current review session. */
     FIFFLIB::FiffInfo::SPtr m_pEpochReviewInfo;             /**< Raw info used to rebuild evoked responses from reviewed epochs. */
     QPair<float,float>      m_epochReviewBaseline;          /**< Baseline metadata of the current review session. */
+
+    MNALIB::MnaProject      m_mnxProject;                   /**< Currently open MNA/MNX project (empty if loading standalone files). */
+    std::unique_ptr<QTemporaryDir> m_mnxTempDir;              /**< Temp dir for extracted .mnx embedded files. */
+    QString                 m_mnxFilePath;                   /**< Path to the currently open .mnx/.mna file. */
 };
 
 } //NAMESPACE

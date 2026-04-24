@@ -67,6 +67,8 @@ enum class MnaFileRole {
     Transform,
     SourceSpace,
     Evoked,
+    Event,
+    VirtualChannel,
     Custom
 };
 
@@ -145,7 +147,10 @@ inline QString mnaFileRoleToString(MnaFileRole role)
     case MnaFileRole::Annotation:     return QStringLiteral("annotation");    case MnaFileRole::Digitizer:      return QStringLiteral("digitizer");
     case MnaFileRole::Transform:      return QStringLiteral("transform");
     case MnaFileRole::SourceSpace:    return QStringLiteral("source_space");
-    case MnaFileRole::Evoked:         return QStringLiteral("evoked");    case MnaFileRole::Custom:         return QStringLiteral("custom");
+    case MnaFileRole::Evoked:         return QStringLiteral("evoked");
+    case MnaFileRole::Event:          return QStringLiteral("event");
+    case MnaFileRole::VirtualChannel: return QStringLiteral("virtual_channel");
+    case MnaFileRole::Custom:         return QStringLiteral("custom");
     }
     return QStringLiteral("custom");
 }
@@ -169,6 +174,8 @@ inline MnaFileRole mnaFileRoleFromString(const QString& str)
     if(str == QLatin1String("transform"))        return MnaFileRole::Transform;
     if(str == QLatin1String("source_space"))     return MnaFileRole::SourceSpace;
     if(str == QLatin1String("evoked"))           return MnaFileRole::Evoked;
+    if(str == QLatin1String("event"))            return MnaFileRole::Event;
+    if(str == QLatin1String("virtual_channel")) return MnaFileRole::VirtualChannel;
     return MnaFileRole::Custom;
 }
 

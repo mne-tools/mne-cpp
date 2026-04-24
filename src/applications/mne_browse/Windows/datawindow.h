@@ -272,7 +272,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Enable or disable Shift-drag annotation creation in the raw browser.
+     * Enable or disable right-drag annotation creation in the raw browser.
      */
     void setAnnotationSelectionEnabled(bool enabled);
 

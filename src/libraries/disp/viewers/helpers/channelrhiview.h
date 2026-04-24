@@ -438,8 +438,10 @@ protected:
     void drawCrosshair(QPainter &p);
     void drawScalebars(QPainter &p);
     void drawRulerOverlay(QPainter &p);
+    void drawAnnotationSelectionOverlay(QPainter &p);
     void emitCursorData();
     bool rulerActive() const { return m_rulerActive; }
+    bool annotationSelecting() const { return m_annSelecting; }
 
     void resizeEvent(QResizeEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
@@ -461,18 +463,27 @@ private:
     void updateUBO(QRhiResourceUpdateBatch *batch);
     bool isVboDirty() const;
 
-    // ── Overlay blit (bands + event lines baked into Metal texture) ───
+    // ── Overlay blit (annotations/events baked into texture, bands in shader) ──
     void ensureOverlayPipeline();
     void rebuildOverlayImage(int logicalWidth, int logicalHeight, qreal devicePixelRatio);
 
-    std::unique_ptr<QRhiBuffer>                  m_overlayVbo;
+    std::unique_ptr<QRhiBuffer>                  m_overlayVbo;     // Static quad
     std::unique_ptr<QRhiTexture>                 m_overlayTex;
     std::unique_ptr<QRhiSampler>                 m_overlaySampler;
     std::unique_ptr<QRhiShaderResourceBindings>  m_overlaySrb;
     std::unique_ptr<QRhiGraphicsPipeline>        m_overlayPipeline;
+    std::unique_ptr<QRhiBuffer>                  m_overlayUbo;     // OverlayParams UBO
+    bool                                         m_overlayVboNeedsUpload = false;
     QImage                                       m_overlayImage;
     bool                                         m_overlayDirty = true;
     QSize                                        m_overlayTexSize;
+
+    // Overlay prefetch: the texture covers a wider sample range than the viewport.
+    // During scroll, the shader maps screen UVs into this wider texture via uniforms.
+    // Rebuild is only needed when scroll exceeds the prefetch window.
+    static constexpr float kOverlayPrefetchFactor = 1.0f; // extra viewport widths each side
+    float                  m_overlayFirstSample   = 0.f;  // first sample covered by overlay tex
+    float                  m_overlayTotalSamples  = 0.f;  // total sample span of overlay tex
 
     // ── Legacy async tile helpers retained for staging/reuse ──────────
     struct TileResult {
@@ -579,6 +590,11 @@ private:
     int  m_annHoverIndex       = -1;      ///< Index of annotation whose boundary is under cursor.
     bool m_annHoverIsStart     = true;    ///< True if cursor is near the start boundary.
     static constexpr int kAnnBoundaryHitPx = 5; ///< Hit-test tolerance in pixels.
+
+    // ── Annotation range selection (right-drag when annotation mode ON) ─
+    bool m_annSelecting        = false;   ///< True while right-dragging to select a new annotation range.
+    int  m_annSelX0            = 0;       ///< Press position (screen px).
+    int  m_annSelX1            = 0;       ///< Current cursor position (screen px).
 
     int hitTestAnnotationBoundary(int px, bool &isStart) const;
 
