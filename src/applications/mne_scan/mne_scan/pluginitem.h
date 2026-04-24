@@ -37,6 +37,7 @@
 
 #include <scShared/Plugins/abstractplugin.h>
 
+#include <QFont>
 #include <QGraphicsPixmapItem>
 #include <QLinearGradient>
 #include <QList>
@@ -78,13 +79,17 @@ public:
     void addArrow(Arrow *arrow);
     QPixmap image() const;
 
-    int type() const { return Type;}
+    QRectF boundingRect() const override;
+    QPointF outputPortLocalPos() const;
+    QPointF inputPortLocalPos() const;
 
-    void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
+    int type() const override { return Type;}
+
+    void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0) override;
 
 protected:
-    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     void resizeAsRectangle(int width, int height);
 
 private:
@@ -96,6 +101,17 @@ private:
 
     QLinearGradient m_qLinearGradientFace;
     QColor m_qColorContour;
+    QColor m_qColorFillTop;
+    QFont m_nameFont;
+    QFont m_typeFont;
+
+    static constexpr qreal PORT_RADIUS = 5.0;
+    static constexpr qreal CORNER_RADIUS = 8.0;
+    static constexpr int HORIZONTAL_PADDING = 16;
+    static constexpr int VERTICAL_PADDING = 8;
+    static constexpr int TYPE_LABEL_HEIGHT = 14;
+    static constexpr int MIN_WIDTH = 120;
+    static constexpr int MIN_HEIGHT = 48;
 
     QMenu *m_contextMenu;
     QList<Arrow *> arrows;

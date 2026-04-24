@@ -50,6 +50,7 @@
 #include <QList>
 #include <QJsonObject>
 #include <QCborMap>
+#include <QSet>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNALIB
@@ -66,6 +67,7 @@ struct MNASHARED_EXPORT MnaSubject
     QString            id;              /**< Subject identifier. */
     QString            freeSurferDir;   /**< Relative path to FreeSurfer SUBJECTS_DIR. */
     QList<MnaSession>  sessions;        /**< Sessions for this subject. */
+    QJsonObject        extras;          /**< Unknown keys preserved for lossless round-trip. */
 
     //=========================================================================================================
     /**

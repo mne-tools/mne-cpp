@@ -50,6 +50,7 @@
 #include <QList>
 #include <QJsonObject>
 #include <QCborMap>
+#include <QSet>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNALIB
@@ -65,6 +66,7 @@ struct MNASHARED_EXPORT MnaRecording
 {
     QString            id;     /**< Recording identifier. */
     QList<MnaFileRef>  files;  /**< Files belonging to this recording. */
+    QJsonObject        extras; /**< Unknown keys preserved for lossless round-trip. */
 
     //=========================================================================================================
     /**

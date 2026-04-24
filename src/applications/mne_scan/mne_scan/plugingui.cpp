@@ -253,7 +253,7 @@ void PluginGui::loadConfigMna(const QString& fullPath)
 
             if (pConnection->isConnected()) {
                 Arrow* arrow = new Arrow(startItem, endItem, pConnection);
-                arrow->setColor(QColor(65, 113, 156));
+                arrow->setColor(QColor(148, 163, 184)); // slate-400
                 startItem->addArrow(arrow);
                 endItem->addArrow(arrow);
                 arrow->setZValue(-1000.0);

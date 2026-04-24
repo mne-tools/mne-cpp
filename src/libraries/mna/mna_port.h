@@ -49,6 +49,7 @@
 #include <QString>
 #include <QJsonObject>
 #include <QCborMap>
+#include <QSet>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNALIB
@@ -89,6 +90,7 @@ struct MNASHARED_EXPORT MnaPort
     // Cached result reference (for output ports)
     QString     cachedResultPath;   ///< Relative path to cached result
     QString     cachedResultHash;   ///< SHA-256 for invalidation
+    QJsonObject extras;             ///< Unknown keys preserved for lossless round-trip
 
     QJsonObject toJson() const;
     static MnaPort fromJson(const QJsonObject& json);

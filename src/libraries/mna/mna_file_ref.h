@@ -50,6 +50,7 @@
 #include <QByteArray>
 #include <QJsonObject>
 #include <QCborMap>
+#include <QSet>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNALIB
@@ -70,6 +71,7 @@ struct MNASHARED_EXPORT MnaFileRef
     qint64      sizeBytes = 0;                /**< File size in bytes. */
     bool        embedded  = false;            /**< Whether data is embedded in the container. */
     QByteArray  data;                         /**< Embedded file data (only when embedded == true). */
+    QJsonObject extras;                       /**< Unknown keys preserved for lossless round-trip. */
 
     //=========================================================================================================
     /**

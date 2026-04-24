@@ -116,7 +116,7 @@ static MnaPortDir portDirFromString(const QString& str)
 
 QJsonObject MnaPort::toJson() const
 {
-    QJsonObject json;
+    QJsonObject json = extras;
     json[QLatin1String("name")]      = name;
     json[QLatin1String("data_kind")] = dataKindToString(dataKind);
     json[QLatin1String("direction")] = portDirToString(direction);
@@ -155,6 +155,19 @@ MnaPort MnaPort::fromJson(const QJsonObject& json)
     port.streamBufferMs = json[QLatin1String("stream_buffer_ms")].toInt(0);
     port.cachedResultPath = json[QLatin1String("cached_result")].toString();
     port.cachedResultHash = json[QLatin1String("cached_result_hash")].toString();
+
+    static const QSet<QString> knownKeys = {
+        QStringLiteral("name"), QStringLiteral("data_kind"),
+        QStringLiteral("direction"), QStringLiteral("source_node"),
+        QStringLiteral("source_port"), QStringLiteral("stream_protocol"),
+        QStringLiteral("stream_endpoint"), QStringLiteral("stream_buffer_ms"),
+        QStringLiteral("cached_result"), QStringLiteral("cached_result_hash")
+    };
+    for (auto it = json.constBegin(); it != json.constEnd(); ++it) {
+        if (!knownKeys.contains(it.key()))
+            port.extras.insert(it.key(), it.value());
+    }
+
     return port;
 }
 
@@ -162,7 +175,7 @@ MnaPort MnaPort::fromJson(const QJsonObject& json)
 
 QCborMap MnaPort::toCbor() const
 {
-    QCborMap cbor;
+    QCborMap cbor = QCborMap::fromJsonObject(extras);
     cbor[QLatin1String("name")]      = name;
     cbor[QLatin1String("data_kind")] = dataKindToString(dataKind);
     cbor[QLatin1String("direction")] = portDirToString(direction);
@@ -199,5 +212,19 @@ MnaPort MnaPort::fromCbor(const QCborMap& cbor)
     port.streamBufferMs = cbor[QLatin1String("stream_buffer_ms")].toInteger();
     port.cachedResultPath = cbor[QLatin1String("cached_result")].toString();
     port.cachedResultHash = cbor[QLatin1String("cached_result_hash")].toString();
+
+    static const QSet<QString> knownKeys = {
+        QStringLiteral("name"), QStringLiteral("data_kind"),
+        QStringLiteral("direction"), QStringLiteral("source_node"),
+        QStringLiteral("source_port"), QStringLiteral("stream_protocol"),
+        QStringLiteral("stream_endpoint"), QStringLiteral("stream_buffer_ms"),
+        QStringLiteral("cached_result"), QStringLiteral("cached_result_hash")
+    };
+    QJsonObject cborJson = cbor.toJsonObject();
+    for (auto it = cborJson.constBegin(); it != cborJson.constEnd(); ++it) {
+        if (!knownKeys.contains(it.key()))
+            port.extras.insert(it.key(), it.value());
+    }
+
     return port;
 }

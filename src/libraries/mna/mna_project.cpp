@@ -63,7 +63,8 @@ MnaProject::MnaProject()
 
 QJsonObject MnaProject::toJson() const
 {
-    QJsonObject json;
+    // Start from extras to preserve unknown keys
+    QJsonObject json = extras;
     json[QLatin1String("mna_version")] = mnaVersion;
     json[QLatin1String("name")]        = name;
     json[QLatin1String("description")] = description;
@@ -106,6 +107,18 @@ MnaProject MnaProject::fromJson(const QJsonObject& json)
         proj.pipeline.append(MnaNode::fromJson(v.toObject()));
     }
 
+    // Capture unknown keys for lossless round-trip
+    static const QSet<QString> knownKeys = {
+        QStringLiteral("mna_version"), QStringLiteral("name"),
+        QStringLiteral("description"), QStringLiteral("created"),
+        QStringLiteral("modified"), QStringLiteral("subjects"),
+        QStringLiteral("pipeline")
+    };
+    for (auto it = json.constBegin(); it != json.constEnd(); ++it) {
+        if (!knownKeys.contains(it.key()))
+            proj.extras.insert(it.key(), it.value());
+    }
+
     return proj;
 }
 
@@ -113,7 +126,8 @@ MnaProject MnaProject::fromJson(const QJsonObject& json)
 
 QCborMap MnaProject::toCbor() const
 {
-    QCborMap cbor;
+    // Start from extras to preserve unknown keys
+    QCborMap cbor = QCborMap::fromJsonObject(extras);
     cbor[QLatin1String("mna_version")] = mnaVersion;
     cbor[QLatin1String("name")]        = name;
     cbor[QLatin1String("description")] = description;
@@ -154,6 +168,19 @@ MnaProject MnaProject::fromCbor(const QCborMap& cbor)
     const QCborArray pipeArr = cbor[QLatin1String("pipeline")].toArray();
     for(const QCborValue& v : pipeArr) {
         proj.pipeline.append(MnaNode::fromCbor(v.toMap()));
+    }
+
+    // Capture unknown keys for lossless round-trip
+    static const QSet<QString> knownKeys = {
+        QStringLiteral("mna_version"), QStringLiteral("name"),
+        QStringLiteral("description"), QStringLiteral("created"),
+        QStringLiteral("modified"), QStringLiteral("subjects"),
+        QStringLiteral("pipeline")
+    };
+    QJsonObject cborJson = cbor.toJsonObject();
+    for (auto it = cborJson.constBegin(); it != cborJson.constEnd(); ++it) {
+        if (!knownKeys.contains(it.key()))
+            proj.extras.insert(it.key(), it.value());
     }
 
     return proj;

@@ -56,6 +56,7 @@
 #include <QJsonObject>
 #include <QCborMap>
 #include <QList>
+#include <QSet>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNALIB
@@ -97,6 +98,7 @@ struct MNASHARED_EXPORT MnaNode
     QString     toolVersion;            ///< Version of tool that last executed this node
     QDateTime   executedAt;             ///< Timestamp of last execution
     bool        dirty = true;           ///< Whether node needs re-execution
+    QJsonObject extras;                 ///< Unknown keys preserved for lossless round-trip
 
     QJsonObject toJson() const;
     static MnaNode fromJson(const QJsonObject& json);

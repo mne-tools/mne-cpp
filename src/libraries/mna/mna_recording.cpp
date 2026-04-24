@@ -53,7 +53,7 @@ using namespace MNALIB;
 
 QJsonObject MnaRecording::toJson() const
 {
-    QJsonObject json;
+    QJsonObject json = extras;
     json[QLatin1String("id")] = id;
 
     QJsonArray filesArr;
@@ -77,6 +77,14 @@ MnaRecording MnaRecording::fromJson(const QJsonObject& json)
         rec.files.append(MnaFileRef::fromJson(v.toObject()));
     }
 
+    static const QSet<QString> knownKeys = {
+        QStringLiteral("id"), QStringLiteral("files")
+    };
+    for (auto it = json.constBegin(); it != json.constEnd(); ++it) {
+        if (!knownKeys.contains(it.key()))
+            rec.extras.insert(it.key(), it.value());
+    }
+
     return rec;
 }
 
@@ -84,7 +92,7 @@ MnaRecording MnaRecording::fromJson(const QJsonObject& json)
 
 QCborMap MnaRecording::toCbor() const
 {
-    QCborMap cbor;
+    QCborMap cbor = QCborMap::fromJsonObject(extras);
     cbor[QLatin1String("id")] = id;
 
     QCborArray filesArr;
@@ -106,6 +114,15 @@ MnaRecording MnaRecording::fromCbor(const QCborMap& cbor)
     const QCborArray filesArr = cbor[QLatin1String("files")].toArray();
     for(const QCborValue& v : filesArr) {
         rec.files.append(MnaFileRef::fromCbor(v.toMap()));
+    }
+
+    static const QSet<QString> knownKeys = {
+        QStringLiteral("id"), QStringLiteral("files")
+    };
+    QJsonObject cborJson = cbor.toJsonObject();
+    for (auto it = cborJson.constBegin(); it != cborJson.constEnd(); ++it) {
+        if (!knownKeys.contains(it.key()))
+            rec.extras.insert(it.key(), it.value());
     }
 
     return rec;

@@ -78,7 +78,7 @@ static MnaNodeExecMode execModeFromString(const QString& str)
 
 QJsonObject MnaNode::toJson() const
 {
-    QJsonObject json;
+    QJsonObject json = extras;
     json[QLatin1String("id")]        = id;
     json[QLatin1String("op_type")]   = opType;
     json[QLatin1String("exec_mode")] = execModeToString(execMode);
@@ -174,6 +174,21 @@ MnaNode MnaNode::fromJson(const QJsonObject& json)
         node.executedAt = QDateTime::fromString(execStr, Qt::ISODate);
     node.dirty = json[QLatin1String("dirty")].toBool(true);
 
+    static const QSet<QString> knownKeys = {
+        QStringLiteral("id"), QStringLiteral("op_type"),
+        QStringLiteral("exec_mode"), QStringLiteral("attributes"),
+        QStringLiteral("inputs"), QStringLiteral("outputs"),
+        QStringLiteral("ipc_command"), QStringLiteral("ipc_args"),
+        QStringLiteral("ipc_work_dir"), QStringLiteral("ipc_transport"),
+        QStringLiteral("script"), QStringLiteral("verification"),
+        QStringLiteral("tool_version"), QStringLiteral("executed_at"),
+        QStringLiteral("dirty")
+    };
+    for (auto it = json.constBegin(); it != json.constEnd(); ++it) {
+        if (!knownKeys.contains(it.key()))
+            node.extras.insert(it.key(), it.value());
+    }
+
     return node;
 }
 
@@ -181,7 +196,7 @@ MnaNode MnaNode::fromJson(const QJsonObject& json)
 
 QCborMap MnaNode::toCbor() const
 {
-    QCborMap cbor;
+    QCborMap cbor = QCborMap::fromJsonObject(extras);
     cbor[QLatin1String("id")]        = id;
     cbor[QLatin1String("op_type")]   = opType;
     cbor[QLatin1String("exec_mode")] = execModeToString(execMode);
@@ -265,6 +280,22 @@ MnaNode MnaNode::fromCbor(const QCborMap& cbor)
     if (!execStr.isEmpty())
         node.executedAt = QDateTime::fromString(execStr, Qt::ISODate);
     node.dirty = cbor[QLatin1String("dirty")].toBool(true);
+
+    static const QSet<QString> knownKeys = {
+        QStringLiteral("id"), QStringLiteral("op_type"),
+        QStringLiteral("exec_mode"), QStringLiteral("attributes"),
+        QStringLiteral("inputs"), QStringLiteral("outputs"),
+        QStringLiteral("ipc_command"), QStringLiteral("ipc_args"),
+        QStringLiteral("ipc_work_dir"), QStringLiteral("ipc_transport"),
+        QStringLiteral("script"), QStringLiteral("verification"),
+        QStringLiteral("tool_version"), QStringLiteral("executed_at"),
+        QStringLiteral("dirty")
+    };
+    QJsonObject cborJson = cbor.toJsonObject();
+    for (auto it = cborJson.constBegin(); it != cborJson.constEnd(); ++it) {
+        if (!knownKeys.contains(it.key()))
+            node.extras.insert(it.key(), it.value());
+    }
 
     return node;
 }

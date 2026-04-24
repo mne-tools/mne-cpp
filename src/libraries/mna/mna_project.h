@@ -87,6 +87,7 @@ public:
     QDateTime          modified;      /**< Last modification timestamp. */
     QList<MnaSubject>  subjects;      /**< Subjects in the project. */
     QList<MnaNode>     pipeline;      /**< Processing pipeline nodes. */
+    QJsonObject        extras;        /**< Unknown keys preserved for lossless round-trip. */
 
     //=========================================================================================================
     /**

@@ -38,16 +38,11 @@
 
 #include "arrow.h"
 
-#include <math.h>
+#include <QtMath>
 
 #include <QPen>
 #include <QPainter>
-
-//=============================================================================================================
-// CONSTS
-//=============================================================================================================
-
-const qreal Pi = 3.14;
+#include <QPainterPath>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -65,17 +60,18 @@ Arrow::Arrow(PluginItem *startItem, PluginItem *endItem, SCSHAREDLIB::PluginConn
 , m_EndItem(endItem)
 , m_pConnection(connection)
 {
-    m_StartItem = startItem;
-    m_EndItem = endItem;
     setFlag(QGraphicsItem::ItemIsSelectable, true);
-    m_qColor = Qt::black;
-    setPen(QPen(m_qColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    m_qColor = QColor(148, 163, 184); // slate-400
+    setPen(QPen(m_qColor, 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 }
 
 //=============================================================================================================
 
 QRectF Arrow::boundingRect() const
 {
+    if (!m_bezierPath.isEmpty())
+        return m_bezierPath.boundingRect().adjusted(-15, -15, 15, 15);
+
     qreal extra = (pen().width() + 20) / 2.0;
 
     return QRectF(line().p1(), QSizeF(line().p2().x() - line().p1().x(),
@@ -88,6 +84,13 @@ QRectF Arrow::boundingRect() const
 
 QPainterPath Arrow::shape() const
 {
+    if (!m_bezierPath.isEmpty()) {
+        QPainterPathStroker stroker;
+        stroker.setWidth(15);
+        QPainterPath result = stroker.createStroke(m_bezierPath);
+        result.addPolygon(arrowHead);
+        return result;
+    }
     QPainterPath path = QGraphicsLineItem::shape();
     path.addPolygon(arrowHead);
     return path;
@@ -97,8 +100,20 @@ QPainterPath Arrow::shape() const
 
 void Arrow::updatePosition()
 {
-    QLineF line(mapFromItem(m_StartItem, 0, 0), mapFromItem(m_EndItem, 0, 0));
-    setLine(line);
+    QPointF startPt = mapFromItem(m_StartItem, m_StartItem->outputPortLocalPos());
+    QPointF endPt   = mapFromItem(m_EndItem,   m_EndItem->inputPortLocalPos());
+
+    setLine(QLineF(startPt, endPt));
+
+    // Build cubic bezier path
+    qreal dx = qAbs(endPt.x() - startPt.x());
+    qreal offset = qMax(50.0, dx * 0.4);
+    QPointF cp1(startPt.x() + offset, startPt.y());
+    QPointF cp2(endPt.x()   - offset, endPt.y());
+
+    m_bezierPath = QPainterPath();
+    m_bezierPath.moveTo(startPt);
+    m_bezierPath.cubicTo(cp1, cp2, endPt);
 }
 
 //=============================================================================================================
@@ -106,59 +121,35 @@ void Arrow::updatePosition()
 void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
           QWidget *)
 {
-    if (m_StartItem->collidesWithItem(m_EndItem))
+    if (m_StartItem->collidesWithItem(m_EndItem) || m_bezierPath.isEmpty())
         return;
-
-    QPen myPen = pen();
-    myPen.setColor(m_qColor);
-    qreal arrowSize = 10;
-    painter->setPen(myPen);
-    painter->setBrush(m_qColor);
 
     painter->setRenderHint(QPainter::Antialiasing);
 
-    QLineF centerLine(m_StartItem->pos(), m_EndItem->pos());
-    QPolygonF endPolygon = m_EndItem->polygon();
-    QPointF p1 = endPolygon.first() + m_EndItem->pos();
-    QPointF p2;
-    QPointF intersectPoint;
-    QLineF polyLine;
-    for (int i = 1; i < endPolygon.count(); ++i) {
-        p2 = endPolygon.at(i) + m_EndItem->pos();
-        polyLine = QLineF(p1, p2);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        QLineF::IntersectType intersectType = polyLine.intersect(centerLine, &intersectPoint);
-#else
-        QLineF::IntersectType intersectType = polyLine.intersects(centerLine, &intersectPoint);
-#endif
+    QPointF endPt = m_bezierPath.pointAtPercent(1.0);
 
-        if (intersectType == QLineF::BoundedIntersection) {
-            break;
-        }
-        p1 = p2;
-    }
+    // Draw bezier curve
+    QColor lineColor = isSelected() ? QColor(59, 130, 246) : m_qColor;
+    QPen curvePen(lineColor, isSelected() ? 2.5 : 1.5);
+    curvePen.setCapStyle(Qt::RoundCap);
+    curvePen.setJoinStyle(Qt::RoundJoin);
+    painter->setPen(curvePen);
+    painter->setBrush(Qt::NoBrush);
+    painter->drawPath(m_bezierPath);
 
-    setLine(QLineF(intersectPoint, m_StartItem->pos()));
+    // Arrowhead at end point — compute tangent angle near curve end
+    constexpr qreal arrowSize = 9.0;
+    QPointF nearEnd = m_bezierPath.pointAtPercent(0.97);
+    qreal angle = qAtan2(-(endPt.y() - nearEnd.y()), endPt.x() - nearEnd.x());
 
-    double angle = ::acos(line().dx() / line().length());
-    if (line().dy() >= 0)
-        angle = (Pi * 2) - angle;
-
-    QPointF arrowP1 = line().p1() + QPointF(sin(angle + Pi * 2 / 5) * arrowSize,
-                                    cos(angle + Pi * 2 / 5) * arrowSize);
-    QPointF arrowP2 = line().p1() + QPointF(sin(angle + Pi - Pi * 2 / 5) * arrowSize,
-                                    cos(angle + Pi - Pi * 2 / 5) * arrowSize);
+    QPointF arrowP1 = endPt + QPointF(qSin(angle + M_PI / 3.0) * arrowSize,
+                                       qCos(angle + M_PI / 3.0) * arrowSize);
+    QPointF arrowP2 = endPt + QPointF(qSin(angle + M_PI - M_PI / 3.0) * arrowSize,
+                                       qCos(angle + M_PI - M_PI / 3.0) * arrowSize);
 
     arrowHead.clear();
-    arrowHead << line().p1() << arrowP1 << arrowP2;
-    painter->drawLine(line());
+    arrowHead << endPt << arrowP1 << arrowP2;
+    painter->setPen(QPen(lineColor, 1));
+    painter->setBrush(lineColor);
     painter->drawPolygon(arrowHead);
-    if (isSelected()) {
-        painter->setPen(QPen(m_qColor, 1, Qt::DashLine));
-        QLineF qLine = line();
-        qLine.translate(0, 4.0);
-        painter->drawLine(qLine);
-        qLine.translate(0,-8.0);
-        painter->drawLine(qLine);
-    }
 }

@@ -41,9 +41,11 @@
 #include "plugingui.h"
 #include "arrow.h"
 
+#include <QPainter>
 #include <QTextCursor>
 #include <QGraphicsSceneMouseEvent>
 #include <QAction>
+#include <QtMath>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -65,7 +67,7 @@ PluginScene::PluginScene(QMenu *pMenuPluginItem, PluginGui *pPluginGui)
     m_mode = MovePluginItem;
 //    m_itemType = PluginItem::Sensor;
     line = 0;
-    m_qColorLine = QColor(65,113,156);
+    m_qColorLine = QColor(148, 163, 184); // slate-400
 }
 
 //=============================================================================================================
@@ -73,6 +75,28 @@ PluginScene::PluginScene(QMenu *pMenuPluginItem, PluginGui *pPluginGui)
 PluginScene::~PluginScene()
 {
     this->clear();
+}
+
+//=============================================================================================================
+
+void PluginScene::drawBackground(QPainter *painter, const QRectF &rect)
+{
+    // Solid background
+    painter->fillRect(rect, QColor(249, 250, 251)); // gray-50
+
+    // Dot grid
+    const qreal gridSize = 20.0;
+    painter->setPen(QPen(QColor(209, 213, 219), 1.5)); // gray-300
+
+    qreal left = qFloor(rect.left() / gridSize) * gridSize;
+    qreal top  = qFloor(rect.top()  / gridSize) * gridSize;
+
+    QVector<QPointF> points;
+    for (qreal x = left; x <= rect.right(); x += gridSize)
+        for (qreal y = top; y <= rect.bottom(); y += gridSize)
+            points.append(QPointF(x, y));
+
+    painter->drawPoints(points.data(), points.size());
 }
 
 //=============================================================================================================

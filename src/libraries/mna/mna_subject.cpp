@@ -53,7 +53,7 @@ using namespace MNALIB;
 
 QJsonObject MnaSubject::toJson() const
 {
-    QJsonObject json;
+    QJsonObject json = extras;
     json[QLatin1String("id")]             = id;
     json[QLatin1String("freesurfer_dir")] = freeSurferDir;
 
@@ -79,6 +79,15 @@ MnaSubject MnaSubject::fromJson(const QJsonObject& json)
         subj.sessions.append(MnaSession::fromJson(v.toObject()));
     }
 
+    static const QSet<QString> knownKeys = {
+        QStringLiteral("id"), QStringLiteral("freesurfer_dir"),
+        QStringLiteral("sessions")
+    };
+    for (auto it = json.constBegin(); it != json.constEnd(); ++it) {
+        if (!knownKeys.contains(it.key()))
+            subj.extras.insert(it.key(), it.value());
+    }
+
     return subj;
 }
 
@@ -86,7 +95,7 @@ MnaSubject MnaSubject::fromJson(const QJsonObject& json)
 
 QCborMap MnaSubject::toCbor() const
 {
-    QCborMap cbor;
+    QCborMap cbor = QCborMap::fromJsonObject(extras);
     cbor[QLatin1String("id")]             = id;
     cbor[QLatin1String("freesurfer_dir")] = freeSurferDir;
 
@@ -110,6 +119,16 @@ MnaSubject MnaSubject::fromCbor(const QCborMap& cbor)
     const QCborArray sessArr = cbor[QLatin1String("sessions")].toArray();
     for(const QCborValue& v : sessArr) {
         subj.sessions.append(MnaSession::fromCbor(v.toMap()));
+    }
+
+    static const QSet<QString> knownKeys = {
+        QStringLiteral("id"), QStringLiteral("freesurfer_dir"),
+        QStringLiteral("sessions")
+    };
+    QJsonObject cborJson = cbor.toJsonObject();
+    for (auto it = cborJson.constBegin(); it != cborJson.constEnd(); ++it) {
+        if (!knownKeys.contains(it.key()))
+            subj.extras.insert(it.key(), it.value());
     }
 
     return subj;

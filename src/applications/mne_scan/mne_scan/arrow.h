@@ -48,6 +48,7 @@
 
 #include <QSharedPointer>
 #include <QGraphicsLineItem>
+#include <QPainterPath>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -96,6 +97,7 @@ private:
 
     QColor m_qColor;
     QPolygonF arrowHead;
+    QPainterPath m_bezierPath;
 };
 } //NAMESPACE
 

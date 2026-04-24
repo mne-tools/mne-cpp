@@ -54,7 +54,7 @@ using namespace MNALIB;
 
 QJsonObject MnaFileRef::toJson() const
 {
-    QJsonObject json;
+    QJsonObject json = extras;
     json[QLatin1String("role")]       = mnaFileRoleToString(role);
     json[QLatin1String("path")]       = path;
     json[QLatin1String("sha256")]     = sha256;
@@ -81,6 +81,18 @@ MnaFileRef MnaFileRef::fromJson(const QJsonObject& json)
     if(ref.embedded) {
         ref.data = QByteArray::fromBase64(json[QLatin1String("data")].toString().toLatin1());
     }
+
+    static const QSet<QString> knownKeys = {
+        QStringLiteral("role"), QStringLiteral("path"),
+        QStringLiteral("sha256"), QStringLiteral("format"),
+        QStringLiteral("size_bytes"), QStringLiteral("embedded"),
+        QStringLiteral("data")
+    };
+    for (auto it = json.constBegin(); it != json.constEnd(); ++it) {
+        if (!knownKeys.contains(it.key()))
+            ref.extras.insert(it.key(), it.value());
+    }
+
     return ref;
 }
 
@@ -88,7 +100,7 @@ MnaFileRef MnaFileRef::fromJson(const QJsonObject& json)
 
 QCborMap MnaFileRef::toCbor() const
 {
-    QCborMap cbor;
+    QCborMap cbor = QCborMap::fromJsonObject(extras);
     cbor[QLatin1String("role")]       = mnaFileRoleToString(role);
     cbor[QLatin1String("path")]       = path;
     cbor[QLatin1String("sha256")]     = sha256;
@@ -115,5 +127,18 @@ MnaFileRef MnaFileRef::fromCbor(const QCborMap& cbor)
     if(ref.embedded) {
         ref.data = cbor[QLatin1String("data")].toByteArray();
     }
+
+    static const QSet<QString> knownKeys = {
+        QStringLiteral("role"), QStringLiteral("path"),
+        QStringLiteral("sha256"), QStringLiteral("format"),
+        QStringLiteral("size_bytes"), QStringLiteral("embedded"),
+        QStringLiteral("data")
+    };
+    QJsonObject cborJson = cbor.toJsonObject();
+    for (auto it = cborJson.constBegin(); it != cborJson.constEnd(); ++it) {
+        if (!knownKeys.contains(it.key()))
+            ref.extras.insert(it.key(), it.value());
+    }
+
     return ref;
 }

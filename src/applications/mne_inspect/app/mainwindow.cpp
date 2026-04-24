@@ -2319,8 +2319,7 @@ void MainWindow::exportMnaProject(const QString &path, bool embedData)
         MnaFileRole::Transform,
         MnaFileRole::SourceSpace,
         MnaFileRole::SourceEstimate,
-        MnaFileRole::Evoked,
-        MnaFileRole::Custom
+        MnaFileRole::Evoked
     };
 
     MnaProject proj;

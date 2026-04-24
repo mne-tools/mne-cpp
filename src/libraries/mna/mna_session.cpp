@@ -53,7 +53,7 @@ using namespace MNALIB;
 
 QJsonObject MnaSession::toJson() const
 {
-    QJsonObject json;
+    QJsonObject json = extras;
     json[QLatin1String("id")] = id;
 
     QJsonArray recsArr;
@@ -77,6 +77,14 @@ MnaSession MnaSession::fromJson(const QJsonObject& json)
         session.recordings.append(MnaRecording::fromJson(v.toObject()));
     }
 
+    static const QSet<QString> knownKeys = {
+        QStringLiteral("id"), QStringLiteral("recordings")
+    };
+    for (auto it = json.constBegin(); it != json.constEnd(); ++it) {
+        if (!knownKeys.contains(it.key()))
+            session.extras.insert(it.key(), it.value());
+    }
+
     return session;
 }
 
@@ -84,7 +92,7 @@ MnaSession MnaSession::fromJson(const QJsonObject& json)
 
 QCborMap MnaSession::toCbor() const
 {
-    QCborMap cbor;
+    QCborMap cbor = QCborMap::fromJsonObject(extras);
     cbor[QLatin1String("id")] = id;
 
     QCborArray recsArr;
@@ -106,6 +114,15 @@ MnaSession MnaSession::fromCbor(const QCborMap& cbor)
     const QCborArray recsArr = cbor[QLatin1String("recordings")].toArray();
     for(const QCborValue& v : recsArr) {
         session.recordings.append(MnaRecording::fromCbor(v.toMap()));
+    }
+
+    static const QSet<QString> knownKeys = {
+        QStringLiteral("id"), QStringLiteral("recordings")
+    };
+    QJsonObject cborJson = cbor.toJsonObject();
+    for (auto it = cborJson.constBegin(); it != cborJson.constEnd(); ++it) {
+        if (!knownKeys.contains(it.key()))
+            session.extras.insert(it.key(), it.value());
     }
 
     return session;

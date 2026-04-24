@@ -2452,6 +2452,7 @@ void MainWindow::updateRecentFilesMenu()
         action->setData(path);
         action->setToolTip(path);
         connect(action, &QAction::triggered, this, [this, path]() {
+            m_mnxProject = MNALIB::MnaProject();
             loadRawFile(path);
         });
     }
@@ -2734,6 +2735,9 @@ void MainWindow::openFile()
 #ifdef WASMBUILD
     auto fileContentReady = [&](const QString &fileName, const QByteArray &fileContent) {
         if (!fileName.isEmpty()) {
+            // Reset loaded project so standalone files don't contaminate next save
+            m_mnxProject = MNALIB::MnaProject();
+
             if(m_qFileRaw.isOpen())
                 m_qFileRaw.close();
 
@@ -2813,6 +2817,8 @@ void MainWindow::openFile()
     if(filename.isEmpty())
         return;
 
+    // Reset loaded project so standalone files don't contaminate next save
+    m_mnxProject = MNALIB::MnaProject();
     loadRawFile(filename);
 #endif
 }
@@ -4441,6 +4447,7 @@ void MainWindow::applyCommandLineOptions(const QString& rawFile,
         if(!QFile::exists(rawFile)) {
             qWarning() << "[mne_browse] --raw: file not found:" << rawFile;
         } else {
+            m_mnxProject = MNALIB::MnaProject();
             loadRawFile(rawFile);
         }
     }
@@ -4582,6 +4589,7 @@ void MainWindow::dropEvent(QDropEvent *event)
         const QString path = url.toLocalFile();
         if(path.endsWith(".fif", Qt::CaseInsensitive) ||
            path.endsWith(".fiff", Qt::CaseInsensitive)) {
+            m_mnxProject = MNALIB::MnaProject();
             loadRawFile(path);
             return;
         }
