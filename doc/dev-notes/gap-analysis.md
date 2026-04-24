@@ -3,7 +3,7 @@
 Internal developer reference. Compares mne-cpp against MNE-C (SVN) and MNE-Python
 to identify all features and algorithms not yet ported.
 
-Last updated: 24 April 2026
+Last updated: 25 April 2026
 
 ---
 
@@ -320,10 +320,6 @@ Nothing in this category. This is a complete gap relative to MNE-Python.
 | Feature | Source | Priority | Description |
 |---|---|---|---|
 | SourceMorph (full) | Py | High | Unified morphing with volume-to-volume, sparse smoothing, and fsaverage mapping |
-| STC processing (arithmetic) | C | Medium | `mne_process_stc` — manipulate, threshold, combine STC files |
-| STC uniform resampling | C | Low | `mne_make_uniform_stc` — uniform time grid |
-| STC averaging | C | Low | `mne_average_estimates` — weighted cross-subject averaging |
-| Surface data mapping | C | Low | `mne_map_data` — map between arbitrary surface meshes |
 
 Note: The following are already ported in `src/tools/`:
 - `mne_smooth` — geodesic surface smoothing
@@ -359,7 +355,7 @@ Note: The following are already ported in `src/tools/`:
 | Volume source estimate rendering | Py | Medium | Ray-marched or sliced volumetric display |
 | Glass brain projection | Py (nilearn) | Low | Semi-transparent maximum-intensity projection |
 | Time-series + 3D linked view | Py | Medium | Integrated time viewer with 3D surface |
-| Movie / animation export | Py | Low | `Brain.save_movie()` — automated video export |
+| Movie / animation export | — | — | `mne_make_movie` ported in `src/tools/inverse/` |
 | Topomap sequences | Py | Medium | Time-stepped topographic map arrays |
 | ICA component property plots | Py | Low | Source / topography / variance plots for ICA components |
 | Covariance matrix heatmap | Py | Low | Visualise noise/data covariance structure |
@@ -388,15 +384,17 @@ Note: The following are already ported in `src/tools/`:
 
 ## 12. MNE-C Command-Line Tools
 
-MNE-C has ~78 CLI tools. **mne-cpp has achieved full parity** with 78 CLI
-tools in `src/tools/`, plus 6 GUI applications and 3 new MNA-specific tools
-that have no MNE-C counterpart.
+MNE-C has ~78 CLI tools. **mne-cpp has achieved complete parity and beyond** with 82 CLI
+tools in `src/tools/`, plus 6 GUI applications. All remaining MNE-C legacy tools
+have been ported. The extra 4 tools are MNA-specific utilities that have no MNE-C
+counterpart.
 
-### Tools in `src/tools/` (78 total)
+### Tools in `src/tools/` (82 total)
 
-**Conversion** (`src/tools/conversion/`, 14 tools):
+**Conversion** (`src/tools/conversion/`, 16 tools):
 `mne_brain_vision2fiff`, `mne_convert_ctf_markers`, `mne_convert_dig_data`,
-`mne_convert_surface`, `mne_ctf2fiff`, `mne_ctf_dig2fiff`, `mne_edf2fiff`,
+`mne_convert_lspcov`, `mne_convert_ncov`, `mne_convert_surface`,
+`mne_ctf2fiff`, `mne_ctf_dig2fiff`, `mne_edf2fiff`,
 `mne_epochs2mat`, `mne_eximia2fiff`, `mne_kit2fiff`, `mne_make_cor_set`,
 `mne_mna_bids_converter`, `mne_raw2mat`, `mne_tufts2fiff`
 
@@ -407,22 +405,22 @@ that have no MNE-C counterpart.
 `mne_prepare_bem_model`, `mne_setup_forward_model`, `mne_setup_mri`,
 `mne_surf2bem`, `mne_transform_points`, `mne_watershed_bem`
 
-**Inverse** (`src/tools/inverse/`, 14 tools):
+**Inverse** (`src/tools/inverse/`, 15 tools):
 `mne_average_estimates`, `mne_compute_cmne`, `mne_compute_mne`,
 `mne_compute_raw_inverse`, `mne_dipole_fit`, `mne_inverse_operator`,
-`mne_inverse_pipeline`, `mne_label_ssp`, `mne_make_uniform_stc`,
-`mne_map_data`, `mne_process_stc`, `mne_sensitivity_map`, `mne_smooth`,
-`mne_volume_data2mri`
+`mne_inverse_pipeline`, `mne_label_ssp`, `mne_make_movie`,
+`mne_make_uniform_stc`, `mne_map_data`, `mne_process_stc`,
+`mne_sensitivity_map`, `mne_smooth`, `mne_volume_data2mri`
 
-**Preprocessing** (`src/tools/preprocessing/`, 18 tools):
+**Preprocessing** (`src/tools/preprocessing/`, 19 tools):
 `mne_add_to_meas_info`, `mne_add_triggers`, `mne_anonymize`,
 `mne_change_baselines`, `mne_change_nave`, `mne_compensate_data`,
 `mne_copy_processing_history`, `mne_cov2proj`, `mne_create_comp_data`,
-`mne_fix_mag_coil_types`, `mne_fix_stim14`, `mne_insert_4D_comp`,
-`mne_make_derivations`, `mne_mark_bad_channels`, `mne_process_raw`,
-`mne_rename_channels`, `mne_toggle_skips`
+`mne_dacq_annotator`, `mne_fix_mag_coil_types`, `mne_fix_stim14`,
+`mne_insert_4D_comp`, `mne_make_derivations`, `mne_mark_bad_channels`,
+`mne_process_raw`, `mne_rename_channels`, `mne_toggle_skips`
 
-**Info** (`src/tools/info/`, 10 tools):
+**Info** (`src/tools/info/`, 11 tools):
 `mne_check_eeg_locations`, `mne_collect_transforms`, `mne_compare_fif_files`,
 `mne_evoked_data_summary`, `mne_list_bem`, `mne_list_coil_def`,
 `mne_list_proj`, `mne_list_source_space`, `mne_sensor_locations`,
@@ -441,16 +439,9 @@ that have no MNE-C counterpart.
 `mne_analyze`, `mne_analyze_studio`, `mne_browse`, `mne_dipole_fit`,
 `mne_inspect`, `mne_scan`
 
-### MNE-C tools with no mne-cpp equivalent
+### MNE-C tools — all ported
 
-| MNE-C Tool | Priority | Description |
-|---|---|---|
-| `mne_make_movie` | Low | Generate movie from STC data (visualisation feature, not a data tool) |
-| `mne_convert_lspcov` | Low | Convert ASCII covariance to FIFF (niche format) |
-| `mne_convert_ncov` | Low | Convert noise covariance formats (niche format) |
-| `mne_dacq_annotator` | Low | Annotation editor for acquisition metadata (legacy Neuromag tool) |
-
-Only 4 low-priority MNE-C utilities remain unported — all are niche legacy tools.
+All MNE-C CLI tools have been ported to mne-cpp. No remaining gaps.
 
 ---
 
@@ -498,6 +489,10 @@ Neither reference codebase has these real-time capabilities.
 | Channel derivations | Implemented in `dsp/channel_derivation.h/.cpp` |
 | MNA/MNX project format | Full library in `src/libraries/mna/` with lossless round-trip |
 | CMNE (ML-based inverse) | ONNX Runtime inference + PyTorch training bridge |
+| `mne_make_movie` | Ported in `src/tools/inverse/mne_make_movie` — STC frame export |
+| `mne_convert_lspcov` | Ported in `src/tools/conversion/mne_convert_lspcov` — LISP cov to FIFF |
+| `mne_convert_ncov` | Ported in `src/tools/conversion/mne_convert_ncov` — ASCII ncov to FIFF |
+| `mne_dacq_annotator` | Ported in `src/tools/preprocessing/mne_dacq_annotator` — CLI event annotation |
 | 22 missing MNE-C CLI tools | All implemented in `src/tools/` (TASK 25): `mne_dipole_fit`, `mne_label_ssp`, `mne_average_estimates`, `mne_process_stc`, `mne_make_uniform_stc`, `mne_map_data`, `mne_epochs2mat`, `mne_sensor_locations`, `mne_evoked_data_summary`, `mne_transform_points`, `mne_check_eeg_locations`, `mne_fit_sphere_to_surf`, `mne_list_coil_def`, `mne_list_proj`, `mne_change_baselines`, `mne_change_nave`, `mne_add_triggers`, `mne_fix_stim14`, `mne_toggle_skips`, `mne_copy_processing_history`, `mne_make_derivations`, `mne_convert_ctf_markers` |
 
 ### CLI Tool Coverage

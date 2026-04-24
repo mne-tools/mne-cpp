@@ -38,6 +38,8 @@ option(BUILD_MNE_RAW2MAT "Build MNE Raw2Mat" ON)
 option(BUILD_MNE_EPOCHS2MAT "Build MNE Epochs2Mat" ON)
 option(BUILD_MNE_MAKE_COR_SET "Build MNE Make COR Set" ON)
 option(BUILD_MNE_CONVERT_CTF_MARKERS "Build MNE Convert CTF Markers" ON)
+option(BUILD_MNE_CONVERT_LSPCOV "Build MNE Convert LISP Covariance" ON)
+option(BUILD_MNE_CONVERT_NCOV "Build MNE Convert Ncov" ON)
 
 # Forward modeling tools
 option(BUILD_MNE_FORWARD_SOLUTION "Build MNE Forward Solution" ON)
@@ -72,6 +74,7 @@ option(BUILD_MNE_MAKE_UNIFORM_STC "Build MNE Make Uniform STC" ON)
 option(BUILD_MNE_MAP_DATA "Build MNE Map Data" ON)
 option(BUILD_MNE_DIPOLE_FIT "Build MNE Dipole Fit CLI" ON)
 option(BUILD_MNE_LABEL_SSP "Build MNE Label SSP" ON)
+option(BUILD_MNE_MAKE_MOVIE "Build MNE Make Movie" ON)
 
 # Preprocessing tools
 option(BUILD_MNE_PROCESS_RAW "Build MNE Process Raw" ON)
@@ -91,6 +94,7 @@ option(BUILD_MNE_FIX_STIM14 "Build MNE Fix Stim14" ON)
 option(BUILD_MNE_TOGGLE_SKIPS "Build MNE Toggle Skips" ON)
 option(BUILD_MNE_COPY_PROCESSING_HISTORY "Build MNE Copy Processing History" ON)
 option(BUILD_MNE_MAKE_DERIVATIONS "Build MNE Make Derivations" ON)
+option(BUILD_MNE_DACQ_ANNOTATOR "Build MNE DACQ Annotator" ON)
 
 # Surface & label tools
 option(BUILD_MNE_VOLUME_SOURCE_SPACE "Build MNE Volume Source Space" ON)
@@ -181,6 +185,12 @@ if(NOT WASM)
   if(BUILD_MNE_CONVERT_CTF_MARKERS)
     add_subdirectory(conversion/mne_convert_ctf_markers)
   endif()
+  if(BUILD_MNE_CONVERT_LSPCOV)
+    add_subdirectory(conversion/mne_convert_lspcov)
+  endif()
+  if(BUILD_MNE_CONVERT_NCOV)
+    add_subdirectory(conversion/mne_convert_ncov)
+  endif()
 
   # Forward modeling
   if(BUILD_MNE_FORWARD_SOLUTION)
@@ -269,6 +279,9 @@ if(NOT WASM)
   if(BUILD_MNE_LABEL_SSP)
     add_subdirectory(inverse/mne_label_ssp)
   endif()
+  if(BUILD_MNE_MAKE_MOVIE)
+    add_subdirectory(inverse/mne_make_movie)
+  endif()
 
   # Preprocessing
   if(BUILD_MNE_PROCESS_RAW)
@@ -321,6 +334,9 @@ if(NOT WASM)
   endif()
   if(BUILD_MNE_MAKE_DERIVATIONS)
     add_subdirectory(preprocessing/mne_make_derivations)
+  endif()
+  if(BUILD_MNE_DACQ_ANNOTATOR)
+    add_subdirectory(preprocessing/mne_dacq_annotator)
   endif()
 
   # Surface & label operations
