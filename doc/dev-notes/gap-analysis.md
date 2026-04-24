@@ -3,7 +3,7 @@
 Internal developer reference. Compares mne-cpp against MNE-C (SVN) and MNE-Python
 to identify all features and algorithms not yet ported.
 
-Last updated: 10 April 2026
+Last updated: 24 April 2026
 
 ---
 
@@ -35,14 +35,15 @@ Last updated: 10 April 2026
 | CLI source estimation | ✅ | `mne_compute_mne` in `src/tools/inverse/` |
 | CLI continuous inverse | ✅ | `mne_compute_raw_inverse` in `src/tools/inverse/` |
 | Sensitivity map | ✅ | `mne_sensitivity_map` in `src/tools/inverse/` |
+| Mixed-Norm (MxNE) | ✅ | L1/L2 sparse inverse for focal source estimation (added v2.2.0) |
+| Gamma-MAP | ✅ | Hierarchical Bayesian sparse inverse with ARD (added v2.2.0) |
+| CMNE (LSTM-based inverse) | ✅ | Context-based MNE via ONNX Runtime + PyTorch training (added v2.2.0) |
 
 ### Gaps
 
 | Algorithm | Source | Priority | Description |
 |---|---|---|---|
-| Mixed-Norm (MxNE) | Py | High | L1/L2 sparse inverse for focal source estimation |
 | TF-MxNE | Py | High | Time-frequency mixed-norm sparse inverse |
-| Gamma-MAP | Py | High | Hierarchical Bayesian sparse inverse (automatic relevance determination) |
 | TRAP-MUSIC | Py | Medium | Truncated RAP-MUSIC variant |
 | SAM (Synthetic Aperture Magnetometry) | — | Low | Beamformer variant for MEG (enum defined in mne-cpp, no implementation) |
 | Resolution metrics | Py | Medium | Point-spread function, cross-talk function analysis for inverse operators |
@@ -60,7 +61,10 @@ Last updated: 10 April 2026
 | Welch PSD | ✅ | Configurable windowing and overlap |
 | Morlet TFR | ✅ | Complex wavelet convolution |
 | Spectrogram (STFT) | ✅ | Gaussian windowing |
+| Multitaper PSD (DPSS) | ✅ | Thomson's multitaper with DPSS tapers (added v2.2.0) |
+| Cross-Spectral Density (CSD) | ✅ | CSD via Fourier, multitaper, or Morlet (added v2.2.0) |
 | FastICA | ✅ | Deflationary, logcosh nonlinearity |
+| Extended Infomax ICA | ✅ | Handles sub- and super-Gaussian sources (added v2.2.0) |
 | SSS / tSSS | ✅ | Spherical harmonic basis, temporal extension |
 | xDAWN | ✅ | Event-related response enhancement spatial filter |
 | ECG / EOG detection | ✅ | Bandpass + adaptive threshold |
@@ -74,12 +78,9 @@ Last updated: 10 April 2026
 
 | Algorithm | Source | Priority | Description |
 |---|---|---|---|
-| Multitaper PSD (DPSS) | Py | High | Thomson's multitaper — higher spectral resolution than Welch |
 | Multitaper TFR | Py | High | DPSS-windowed time-frequency representation |
 | Stockwell TFR (S-transform) | Py | Medium | Adaptive time-frequency analysis |
-| Extended Infomax ICA | Py | High | Handles super- and sub-Gaussian sources (default in many EEG labs) |
 | Picard ICA | Py | Medium | Faster, more robust ICA via preconditioned gradient descent |
-| Cross-Spectral Density (CSD) | Py | High | CSD via Fourier, multitaper, or Morlet — required for improved DICS |
 | Current Source Density (surface Laplacian) | Py | Medium | Spatial derivative for EEG — improves topographic resolution |
 | OTP (Oversampled Temporal Projection) | Py | Low | MEG denoising via oversampled temporal projection |
 | Maxwell filter CLI tool | C | Medium | Standalone Maxwell filtering command-line interface (library exists, no CLI) |
@@ -154,12 +155,14 @@ Last updated: 10 April 2026
 | Evoked data | ✅ | Read/write |
 | Digitiser points (FIFF + HPTS) | ✅ | Read/write |
 | LSL streaming | ✅ | Dedicated LSL library |
+| FiffAnnotations | ✅ | Time-stamped labels for raw data (BAD, EDGE, etc.) with FIFF I/O (added v2.2.0) |
+| MNA / MNX project format | ✅ | Portable project container: JSON (.mna) + CBOR binary (.mnx), lossless round-trip, extras preservation (added v2.2.0) |
+| Channel derivations | ✅ | Mathematical channel combinations / bipolar montages via `MNEDeriv` (added v2.2.0) |
 
 ### Gaps
 
 | Feature | Source | Priority | Description |
 |---|---|---|---|
-| Annotations class | Py | High | Time-stamped labels for raw data (BAD, EDGE, etc.) — mne-cpp has event matrices but no `Annotations` equivalent |
 | Standard montages (10-20, 10-10, 10-05) | Py | High | Built-in electrode position databases for standard EEG systems |
 | FieldTrip reader | Py | Low | `.mat` file reading for FieldTrip data |
 | EEGLAB reader | Py | Low | `.set` / `.fdt` file reading |
@@ -171,7 +174,7 @@ Last updated: 10 April 2026
 | Epochs MATLAB export | C | Low | `mne_epochs2mat` — epoch export to MATLAB |
 | DICOM reader | C | Low | MRI DICOM import (libmshDicom in MNE-C) |
 | W-data format | C | Low | `.w` file I/O for weight matrices |
-| Channel derivations | C | Medium | Mathematical channel combinations (bipolar montages, `mne_make_derivations`) |
+
 
 ---
 
@@ -236,7 +239,7 @@ Last updated: 10 April 2026
 
 | Feature | Source | Priority | Description |
 |---|---|---|---|
-| ICA: Extended Infomax | Py | High | Handles sub-Gaussian sources; default in many EEG labs |
+
 | ICA: Picard | Py | Medium | Faster, more robust ICA |
 | ICA: automatic component classification | Py | Medium | Auto-detect ECG/EOG/muscle components by correlation |
 | SSP: label-constrained | C | Low | `mne_label_ssp` — suppress activity from specific brain region |
@@ -482,11 +485,25 @@ Neither reference codebase has these real-time capabilities.
 
 | Priority | Count | Key items |
 |---|---|---|
-| **High** | 8 | MxNE/Gamma-MAP/TF-MxNE sparse inverse, Annotations class, standard montages, Ledoit-Wolf covariance, Extended Infomax ICA, Maxwell movement compensation |
-| **Medium** | 20 | Multitaper PSD/TFR, CSD, directed connectivity, Picard ICA, auto ICA classification, cluster permutation stats, SourceMorph, depth priors, resolution metrics, volume rendering, simulation, surface Laplacian, topomap sequences |
+| **High** | 3 | TF-MxNE sparse inverse, standard montages, Ledoit-Wolf covariance, Maxwell movement compensation |
+| **Medium** | 17 | Multitaper TFR, directed connectivity, Picard ICA, auto ICA classification, cluster permutation stats, SourceMorph, depth priors, resolution metrics, volume rendering, simulation, surface Laplacian, topomap sequences |
 | **Low** | 20 | Niche I/O formats (EEGLAB, EGI, SNIRF, etc.), Stockwell TFR, movie export, FEM forward, OTP, AR PSD, decoding/ML wrappers, remaining MNE-C utilities |
+
+### Closed since v2.1.0 (now in staging)
+
+| Former Gap | Resolution |
+|---|---|
+| MxNE / Gamma-MAP sparse inverse | Implemented in `inv/sparse_source_estimators/` |
+| Multitaper PSD (DPSS) | Implemented in `dsp/dpss_multitaper.h/.cpp` |
+| Cross-Spectral Density (CSD) | Implemented in `dsp/cross_spectral_density.h/.cpp` |
+| Extended Infomax ICA | Implemented in `dsp/extended_infomax.h/.cpp` |
+| FiffAnnotations class | Implemented in `fiff/fiff_annotations.h/.cpp` |
+| Channel derivations | Implemented in `dsp/channel_derivation.h/.cpp` |
+| MNA/MNX project format | Full library in `src/libraries/mna/` with lossless round-trip |
+| CMNE (ML-based inverse) | ONNX Runtime inference + PyTorch training bridge |
 
 ### CLI Tool Coverage
 
-mne-cpp has ported **52 of ~78** MNE-C command-line tools (67%), plus 5 GUI applications
-and a real-time server. Only ~20 low-priority MNE-C utilities remain unported.
+mne-cpp has ported **52 of ~78** MNE-C command-line tools (67%), plus 6 GUI applications,
+a real-time server, and 3 new MNA tools (`mne_show_mna`, `mne_inverse_pipeline`,
+`mne_mna_bids_converter`). Only ~20 low-priority MNE-C utilities remain unported.

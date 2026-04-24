@@ -1,12 +1,24 @@
 ---
-title: "MNA Project Format"
-sidebar_label: "MNA Format"
+title: "MNA / MNX Project Format"
+sidebar_label: "MNA / MNX Format"
 sidebar_position: 8
 ---
 
-# MNA Project Format
+# MNA / MNX Project Format
 
-The **MNA** (MNE Node-graph for Analysis) format is a portable project file that bundles data references, processing parameters, and an executable computational graph into a single manifest. It solves a fundamental problem in neuroimaging workflows: the scattering of raw data files, intermediate results, parameter choices, and processing scripts across directories with no formal link between them.
+The **MNA** (MNE Node-graph for Analysis) format is a portable project file that bundles data references, processing parameters, and an executable computational graph into a single manifest. It comes in two serialization variants:
+
+| | MNA (JSON) | MNX (Binary) |
+|---|---|---|
+| **Extension** | `.mna` | `.mnx` |
+| **Encoding** | UTF-8 JSON | CBOR with `MNX1` magic header |
+| **Best for** | Human reading, diffs, version control | Distribution, speed, embedded data |
+| **Embedded data** | Base64-encoded in `"data"` field | Raw bytes (zero-copy CBOR) |
+| **Schema** | Identical | Identical |
+
+Both formats represent the exact same data model. You can convert freely between them — `MnaIO::read()` and `MnaIO::write()` dispatch by file extension.
+
+MNA/MNX solves a fundamental problem in neuroimaging workflows: the scattering of raw data files, intermediate results, parameter choices, and processing scripts across directories with no formal link between them.
 
 ## Motivation
 
@@ -322,31 +334,235 @@ Inline code that can be embedded in nodes (for `Script` exec mode) or verificati
 | `sourceUri` | `QString` | Optional authoring-time reference |
 | `codeSha256` | `QString` | SHA-256 of `code` for integrity verification |
 
-## File Formats
+## Serialization Formats
 
-MNA supports two serialization formats with identical schemas:
+### MNA — JSON Text Format
 
-| Format | Extension | Encoding | Use Case |
+The `.mna` format serializes the project as indented UTF-8 JSON. Every MNA class implements `toJson()` / `fromJson()`:
+
+```cpp
+QJsonObject json = project.toJson();
+MnaProject  proj = MnaProject::fromJson(json);
+```
+
+**Advantages:**
+- Human-readable — open in any text editor
+- Diff-friendly — track changes in Git line-by-line
+- Debuggable — inspect parameters and file references at a glance
+
+**Embedded data** is Base64-encoded in the `"data"` field of an `MnaFileRef`:
+
+```json
+{
+  "role": "Event",
+  "path": "events.fif",
+  "embedded": true,
+  "data": "AAAB..."
+}
+```
+
+### MNX — CBOR Binary Format
+
+The `.mnx` format is the compact binary counterpart, using [CBOR (RFC 8949)](https://cbor.io/) with a 4-byte magic header. It is the recommended format for distributing self-contained projects because embedded file data is stored as raw bytes (no Base64 overhead).
+
+#### Wire format
+
+```
+Offset  Size  Content
+──────  ────  ───────────────────────────────────
+0       4     Magic bytes: 0x4D 0x4E 0x58 0x31  ("MNX1")
+4       n     CBOR-encoded QCborMap (the MnaProject)
+```
+
+The magic header allows quick file-type detection without parsing the CBOR payload:
+
+```cpp
+// Quick check
+QFile f("pipeline.mnx");
+f.open(QIODevice::ReadOnly);
+QByteArray magic = f.read(4);
+bool isMnx = (magic == QByteArrayLiteral("MNX1"));
+```
+
+Every MNA class implements `toCbor()` / `fromCbor()`:
+
+```cpp
+QCborMap cbor = project.toCbor();
+MnaProject proj = MnaProject::fromCbor(cbor);
+```
+
+**Advantages:**
+- Compact — typically 30–60 % smaller than JSON
+- Fast parsing — CBOR is a binary format with no tokenization overhead
+- Native binary data — embedded files stored as CBOR byte strings (no Base64 expansion)
+- Self-contained — a single `.mnx` file can bundle all data files for a complete analysis
+
+**Embedded data** is stored as raw CBOR byte strings — no Base64 expansion:
+
+```cpp
+// JSON serialization (Base64)
+json["data"] = QString::fromLatin1(data.toBase64());
+
+// CBOR serialization (raw bytes, ~33 % smaller for binary payloads)
+cbor["data"] = QCborValue(data);   // native ByteArray
+```
+
+#### CBOR key reference
+
+All CBOR map keys are **identical to their JSON counterparts** — no abbreviation or integer tags are used. This simplifies debugging and cross-language implementations.
+
+**MnaProject**
+
+| Key | CBOR Type | Notes |
+|---|---|---|
+| `mna_version` | Text | Schema version, e.g. `"1.0"` |
+| `name` | Text | |
+| `description` | Text | |
+| `created` | Text | ISO 8601 with milliseconds |
+| `modified` | Text | ISO 8601 with milliseconds |
+| `subjects` | Array | Array of MnaSubject maps |
+| `pipeline` | Array | Array of MnaNode maps |
+
+**MnaSubject / MnaSession / MnaRecording**
+
+| Key | CBOR Type | Notes |
+|---|---|---|
+| `id` | Text | Unique identifier |
+| `freesurfer_dir` | Text | MnaSubject only |
+| `sessions` | Array | MnaSubject only — array of MnaSession |
+| `recordings` | Array | MnaSession only — array of MnaRecording |
+| `files` | Array | MnaRecording only — array of MnaFileRef |
+
+**MnaFileRef**
+
+| Key | CBOR Type | Notes |
+|---|---|---|
+| `role` | Text | File role as string (`"Raw"`, `"Forward"`, …) |
+| `path` | Text | Relative POSIX path |
+| `sha256` | Text | Hex-encoded SHA-256 |
+| `format` | Text | `"fiff"`, `"stc"`, `"mgh"`, … |
+| `size_bytes` | Integer | File size in bytes |
+| `embedded` | Boolean | Whether data is inline |
+| `data` | **ByteArray** | Raw bytes (only when `embedded == true`) |
+
+**MnaNode**
+
+| Key | CBOR Type | Notes |
+|---|---|---|
+| `id` | Text | Unique node identifier |
+| `op_type` | Text | Operation type, e.g. `"dsp.band_pass_filter"` |
+| `exec_mode` | Text | `"batch"`, `"stream"`, `"ipc"`, `"script"` |
+| `attributes` | Map | Nested CBOR map of operation parameters |
+| `inputs` | Array | Array of MnaPort maps |
+| `outputs` | Array | Array of MnaPort maps |
+| `ipc_command` | Text | External command (IPC mode) |
+| `ipc_args` | Array | Command-line arguments |
+| `ipc_work_dir` | Text | Working directory |
+| `ipc_transport` | Text | `"stdio"`, `"tcp"`, `"shm"`, `"file"` |
+| `script` | Map | MnaScript (Script mode) |
+| `verification` | Map | MnaVerification structure |
+| `tool_version` | Text | Version string |
+| `executed_at` | Text | ISO 8601 timestamp |
+| `dirty` | Boolean | Needs re-execution |
+
+**MnaPort**
+
+| Key | CBOR Type | Notes |
+|---|---|---|
+| `name` | Text | Port name (unique within node) |
+| `data_kind` | Text | `"fiff_raw"`, `"forward"`, `"inverse"`, … |
+| `direction` | Text | `"input"` or `"output"` |
+| `source_node` | Text | Upstream node ID |
+| `source_port` | Text | Upstream port name |
+| `stream_protocol` | Text | `"fiff-rt"`, `"lsl"`, `"ftbuffer"`, `"shm"` |
+| `stream_endpoint` | Text | Protocol-specific address |
+| `stream_buffer_ms` | Integer | Ring-buffer length in milliseconds |
+| `cached_result` | Text | Path to cached output |
+| `cached_result_hash` | Text | SHA-256 for cache validation |
+
+**MnaScript**
+
+| Key | CBOR Type | Notes |
+|---|---|---|
+| `language` | Text | `"python"`, `"shell"`, `"r"`, `"matlab"`, `"octave"`, `"julia"` |
+| `interpreter` | Text | Interpreter command (e.g. `"python3"`) |
+| `interpreter_args` | Array | Extra args before script file |
+| `code` | Text | Inline source code |
+| `source_uri` | Text | Authoring-time reference |
+| `code_sha256` | Text | SHA-256 of `code` |
+| `keep_temp_file` | Boolean | Preserve temp script after execution |
+
+#### Data type mapping
+
+| C++ / Qt Type | JSON Encoding | CBOR Encoding |
+|---|---|---|
+| `QString` | JSON string | CBOR text string |
+| `QDateTime` | ISO 8601 string (`Qt::ISODateWithMs`) | CBOR text string |
+| `QByteArray` (data) | Base64-encoded JSON string | CBOR byte string (major type 2) |
+| `int` / `qint64` | JSON number | CBOR integer |
+| `bool` | JSON `true`/`false` | CBOR `true`/`false` |
+| `QVariant` | `QJsonValue::fromVariant()` | `QCborValue::fromVariant()` |
+| `QVariantMap` | `QJsonObject` | `QCborMap` via `fromJsonObject()` |
+
+:::note
+`MnaParamTree` is serialized in the JSON format only. It is omitted from the CBOR representation; parameter bindings are handled at the application layer rather than persisted in `.mnx` files.
+:::
+
+#### Size comparison example
+
+| Content | `.mna` (JSON) | `.mnx` (CBOR) | Savings |
 |---|---|---|---|
-| **MNA JSON** | `.mna` | UTF-8 JSON | Human-readable, diff-friendly, version control |
-| **MNA CBOR** | `.mnx` | CBOR with `"MNX1"` magic header | Compact binary, faster parsing, embedded file data |
+| Metadata only (5 nodes, no data) | 4.2 KB | 1.8 KB | 57 % |
+| With 10 MB embedded raw file | 13.4 MB | 10.1 MB | 25 % |
 
 ### Reading and Writing
+
+`MnaIO` automatically selects the format based on the file extension:
 
 ```cpp
 #include <mna/mna_io.h>
 
-// Read (dispatches by extension)
-MnaProject project = MnaIO::read("pipeline.mna");
+// Read (dispatches by extension: .mna → JSON, .mnx → CBOR)
+MnaProject project = MnaIO::read("pipeline.mnx");
 
 // Write JSON
 MnaIO::write(project, "pipeline.mna");
 
-// Write CBOR
+// Write CBOR binary
 MnaIO::write(project, "pipeline.mnx");
 ```
 
-Both formats support round-trip serialization via `toJson()`/`fromJson()` and `toCbor()`/`fromCbor()` methods on every MNA class.
+### Round-Trip Fidelity
+
+Both formats guarantee **lossless round-trip serialization**. Every MNA struct carries an `extras` field (`QJsonObject`) that captures any JSON/CBOR keys not recognized by the current software version. On serialization, these unknown keys are written back. This means:
+
+- A project created by a **newer** MNA version (with additional fields) can be opened and re-saved by an **older** version without losing the new fields
+- **Cross-application round-trips** preserve foreign data: mne_browse, mne_inspect, and mne_scan each only modify the fields they own, leaving everything else intact (enriching mode)
+
+```
+Original file    →  fromJson()  →  MnaProject  →  toJson()  →  Saved file
+                                   (extras bag)
+All unknown keys ─────────────────────────────────────────────→ All unknown keys preserved
+```
+
+### Converting Between Formats
+
+```cpp
+// JSON → Binary
+MnaProject proj = MnaIO::read("pipeline.mna");
+MnaIO::write(proj, "pipeline.mnx");
+
+// Binary → JSON
+MnaProject proj = MnaIO::read("pipeline.mnx");
+MnaIO::write(proj, "pipeline.mna");
+```
+
+Or use the CLI:
+
+```bash
+mne_show_mna pipeline.mnx                 # inspect contents
+mne_show_mna pipeline.mna --convert mnx   # convert to binary (planned)
+```
 
 ## Example: Minimum-Norm Pipeline
 
@@ -454,9 +670,9 @@ MNE-CPP ships several command-line tools for working with MNA files:
 
 | Tool | Description |
 |---|---|
-| [`mne_show_mna`](tools-overview#mne_show_mna) | Pretty-print an `.mna`/`.mnx` file: project metadata, file inventory, and pipeline graph summary. |
-| [`mne_inverse_pipeline`](tools-overview#mne_inverse_pipeline) | Build and execute a complete inverse pipeline from command-line arguments, saving the result as an `.mna` project. |
-| [`mne_mna_bids_converter`](tools-overview#mne_mna_bids_converter) | Scan a BIDS dataset directory and generate an `.mna` project with file references and subject/session structure. |
+| [`mne_show_mna`](tools-show-mna) | Pretty-print an `.mna`/`.mnx` file: project metadata, file inventory, and pipeline graph summary. |
+| [`mne_inverse_pipeline`](tools-inverse-pipeline) | Build and execute a complete inverse pipeline from command-line arguments, saving the result as an `.mna` project. |
+| [`mne_mna_bids_converter`](tools-mna-bids-converter) | Scan a BIDS dataset directory and generate an `.mna` project with file references and subject/session structure. |
 
 ## BIDS Integration
 
