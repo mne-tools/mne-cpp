@@ -469,13 +469,168 @@ Neither reference codebase has these real-time capabilities.
 
 ---
 
+## 14. GUI Application: `mne_analyze` vs. MNE-C SVN `mne_analyze`
+
+MNE-C SVN `mne_analyze` (v2.55) is a comprehensive Motif/X11/OpenGL application
+with ~70 source files, ~40 menu items, and ~20 dialogs. The mne-cpp `mne_analyze`
+is a modern plugin-based Qt application with QRhi rendering and WebAssembly support.
+
+### What mne-cpp `mne_analyze` already has
+
+| Feature | Status | Notes |
+|---|---|---|
+| **Data loading** | | |
+| Raw FIFF file loading | ✅ | Via `DataLoader` plugin with file dialog |
+| Event file loading (`.eve`) | ✅ | `EventModel` integration |
+| BEM surface loading | ✅ | `BemDataModel` |
+| Average file loading (`*-ave.fif`) | ✅ | `AveragingDataModel` |
+| Covariance file loading (`*-cov.fif`) | ✅ | `CovarianceModel` |
+| MRI coordinate transform loading | ✅ | `MriCoordModel` |
+| Multiple data sets simultaneously | ✅ | BIDS-style tree view |
+| WebAssembly file loading | ✅ | Via `QFileDialog::getOpenFileContent` |
+| Command-line file input (`-f`/`--file`) | ✅ | `AnalyzeCore::parseCmdLineInputs` |
+| **Signal browsing** | | |
+| Raw time-series display | ✅ | `FiffRawView` with custom delegate |
+| Channel scaling (per type) | ✅ | `SCALING_MAP_CHANGED` events |
+| Signal/background color customisation | ✅ | Via settings plugin |
+| Zoom (vertical amplitude) | ✅ | Continuous zoom control |
+| Time window size adjustment | ✅ | Configurable window width |
+| Channel selection (show subset) | ✅ | Interactive 2D layout picker |
+| Event marker overlay | ✅ | Toggle event display on raw data |
+| Scroll to event | ✅ | Jump to event sample position |
+| Real-time streaming display | ✅ | MNE Scan session integration |
+| **Filtering** | | |
+| FIR/IIR filter design | ✅ | Full `FilterDesignView` |
+| Real-time filter application | ✅ | On-the-fly filtering of displayed data |
+| Per-channel-type filtering | ✅ | MEG grad/mag, EEG separate |
+| **Averaging** | | |
+| Epoch-based averaging | ✅ | `MNEEpochDataList::computeAverage` |
+| Filtered averaging | ✅ | With active filter kernel |
+| Butterfly view | ✅ | `ButterflyView` |
+| 2D layout view (topographic) | ✅ | `AverageLayoutView` |
+| Baseline correction | ✅ | Configurable window |
+| Artifact rejection (EOG) | ✅ | Threshold-based |
+| Modality selection | ✅ | `ModalitySelectionView` |
+| **Channel selection** | | |
+| 2D channel layout visualisation | ✅ | `ChannelSelectionView` with scene items |
+| Interactive channel picking | ✅ | Graphical selection on layout |
+| **Co-registration** | | |
+| Digitiser loading | ✅ | From FIFF measurement file |
+| MRI fiducial loading | ✅ | LPA/NAS/RPA from file |
+| Interactive fiducial picking in 3D | ✅ | Object picking in `View3D` |
+| Fiducial-based alignment | ✅ | Weighted matched-point fitting |
+| ICP refinement | ✅ | Iterative closest point with convergence control |
+| Point weighting (LPA/NAS/RPA/HPI/HSP/EEG) | ✅ | Separate weight controls per type |
+| Auto-scale option | ✅ | Uniform scaling during fit |
+| Outlier omission distance | ✅ | Configurable threshold |
+| Transform load/save | ✅ | `FiffCoordTrans` read/write |
+| Fiducial save | ✅ | `FiffDigPointSet::write()` |
+| **Dipole fitting** | | |
+| ECD single dipole fit | ✅ | Full `InvDipoleFit::calculateFit()` |
+| Sequential (moving) dipole fits | ✅ | Time range with step |
+| BEM model selection | ✅ | From loaded models |
+| Noise covariance selection | ✅ | From loaded `CovarianceModel` |
+| Modality selection (MEG/EEG) | ✅ | Per-type toggle |
+| Regularisation controls | ✅ | Per sensor type |
+| Sphere model fallback | ✅ | Configurable origin + radius |
+| Dipole display in 3D | ✅ | Via `BrainTreeModel::addDipoles()` |
+| **3D visualisation** | | |
+| BEM surface rendering | ✅ | `BrainTreeModel::addBemSurface()` |
+| Digitiser point cloud display | ✅ | In 3D view |
+| Dipole result display | ✅ | Arrow rendering |
+| Camera rotation | ✅ | Interactive mouse control |
+| Coordinate axis toggle | ✅ | Show/hide axes |
+| Fullscreen mode | ✅ | Toggle |
+| Light colour/intensity | ✅ | Adjustable |
+| 3D screenshot export | ✅ | `BrainView::saveSnapshot()` |
+| **Export** | | |
+| 2D screenshot (PNG/SVG) | ✅ | From raw view and butterfly |
+| 3D screenshot | ✅ | From 3D view |
+| Save raw data to FIFF | ✅ | Via `DataLoader` |
+| Save events to `.eve` | ✅ | Via `EventModel` |
+| **Architecture (mne-cpp advantages)** | | |
+| Plugin architecture | ✅ | Dynamic plugin loading |
+| WebAssembly deployment | ✅ | Browser-based operation |
+| Real-time MNE Scan integration | ✅ | Live data from acquisition |
+| BIDS tree view | ✅ | Native BIDS data management |
+| QRhi GPU rendering | ✅ | Modern GPU API (Metal/Vulkan/D3D12/OpenGL) |
+
+### Gaps: Features in MNE-C `mne_analyze` missing from mne-cpp
+
+| Feature | Priority | Description |
+|---|---|---|
+| **Source estimation** | | |
+| FreeSurfer cortical surface loading | High | Load `lh.inflated`, `rh.pial`, etc. from `SUBJECTS_DIR` |
+| STC/W-file overlay loading | High | Load source estimate overlays (`.stc`, `.w`) on brain surface |
+| Source estimate computation in GUI | High | MNE/dSPM/sLORETA from inverse operator + evoked data |
+| Source overlay colour scale controls | High | `fthresh`/`fmid`/`fmax`, heat/cool maps, sign retention |
+| Source overlay time animation | High | Step through STC time points interactively |
+| Source overlay smoothing | Medium | Configurable smoothing steps on cortical surface |
+| Source overlay transparency | Medium | Per-overlay alpha control |
+| Inverse operator management | Medium | Load, select, and apply inverse operators within GUI |
+| Normal component extraction | Medium | Extract cortical-normal component only |
+| Predicted data computation | Low | Forward prediction from current source estimate |
+| Regularisation methods (GCV, Pearson) | Low | Alternative regularisation beyond SNR-based |
+| Source data simulation (PSF) | Low | Simulate sensor data from picked surface points |
+| **Surface & label management** | | |
+| Label loading (single / batch / annotation) | High | FreeSurfer `.label` and `.annot` file loading |
+| Label list dialog | High | Browse, select, colour labels |
+| Label timecourse extraction | High | Average, max, L2, L1, time-L2 collapse methods |
+| Interactive vertex marking | Medium | Click to mark vertices, grow regions |
+| Create label from marked vertices | Medium | Save marked regions as `.label` files |
+| Surface patch display | Low | Toggle cortical patch visibility |
+| Morphed surface loading | Low | Cross-subject surface morphing display |
+| **Field mapping** | | |
+| MEG field interpolation on helmet | Medium | Sphere-model-based MEG field map |
+| MEG scalp field maps | Medium | MEG field mapped to head surface |
+| EEG potential maps | Medium | EEG scalp potential interpolation |
+| Contour maps on surfaces | Medium | Iso-contour overlays with configurable step |
+| **Interactive tools** | | |
+| Vertex picking with data readout | High | Click on surface → report source estimate value |
+| Timecourse at picked vertex | High | Display full time series at selected vertex |
+| Timecourse manager | Medium | Save, name, colour, export multiple timecourses |
+| Multi-dipole fitting | Medium | Multiple dipoles at single time point |
+| **2D plotting** | | |
+| SNR display | Medium | Signal-to-noise ratio plot |
+| MNE amplitude plot at vertex | Medium | Source estimate amplitude trace |
+| Plot hardcopy export (PS, AI, SVG) | Low | Vector format export from 2D plots |
+| **Visualisation extras** | | |
+| MEG sensor coil display | Medium | Draw coil geometries in 3D |
+| EEG electrode display | Medium | Show electrode locations on head |
+| Left/right/both hemisphere toggle | Medium | Quick hemisphere selection |
+| View presets (lateral, medial, dorsal, etc.) | Medium | Named camera positions |
+| Curvature colouring | Low | Sulci/gyri shading on cortical surface |
+| Overlay histogram | Low | Value distribution display |
+| Scale bar display | Low | Colour scale legend |
+| **MRI integration** | | |
+| MRI orthogonal viewer | Low | Axial/coronal/sagittal slice display |
+| Show location in MRI slices | Low | Picked vertex → MRI coordinates |
+| Surface data as MRI overlay | Low | Source estimates as `.mgh` overlay |
+| **HPI** | | |
+| Continuous HPI visualisation | Low | Head movement over time (QUAT channels) |
+| Angular velocity display | Low | Rotation rate analysis |
+| **Interoperability** | | |
+| Remote control / scripting | Low | Pipe-based command interface |
+| Movie / QuickTime export | Low | Automated frame capture to movie file |
+| Drag-and-drop to external tools | Low | Send dipoles to tkmedit/mrilab |
+
+### Priority summary for `mne_analyze` parity
+
+| Priority | Count | Key items |
+|---|---|---|
+| **High** | 9 | Cortical surface loading, STC overlay, source estimation in GUI, label management, vertex picking with readout, timecourse at vertex |
+| **Medium** | 14 | Field mapping, overlay smoothing/transparency, inverse operator management, MEG/EEG sensor display, timecourse manager, view presets, multi-dipole, SNR plot |
+| **Low** | 12 | MRI viewer, HPI visualisation, remote control, movie export, curvature, histogram, scale bar, morphed surfaces, PSF simulation |
+
+---
+
 ## Summary: Gap Counts by Priority
 
 | Priority | Count | Key items |
 |---|---|---|
-| **High** | 3 | TF-MxNE sparse inverse, standard montages, Ledoit-Wolf covariance, Maxwell movement compensation |
-| **Medium** | 17 | Multitaper TFR, directed connectivity, Picard ICA, auto ICA classification, cluster permutation stats, SourceMorph, depth priors, resolution metrics, volume rendering, simulation, surface Laplacian, topomap sequences |
-| **Low** | 20 | Niche I/O formats (EEGLAB, EGI, SNIRF, etc.), Stockwell TFR, movie export, FEM forward, OTP, AR PSD, decoding/ML wrappers, remaining MNE-C utilities |
+| **High** | 12 | TF-MxNE, standard montages, Ledoit-Wolf covariance, Maxwell movement compensation, **mne_analyze**: cortical surface loading, STC overlay, source estimation in GUI, label management, vertex picking |
+| **Medium** | 31 | Multitaper TFR, directed connectivity, Picard ICA, auto ICA classification, cluster permutation stats, SourceMorph, depth priors, resolution metrics, volume rendering, simulation, surface Laplacian, topomap sequences, **mne_analyze**: field mapping, overlay controls, sensor display, timecourse manager, view presets |
+| **Low** | 32 | Niche I/O formats (EEGLAB, EGI, SNIRF, etc.), Stockwell TFR, FEM forward, OTP, AR PSD, decoding/ML wrappers, **mne_analyze**: MRI viewer, HPI vis, remote control, movie export, curvature |
 
 ### Closed since v2.1.0 (now in staging)
 
@@ -497,8 +652,8 @@ Neither reference codebase has these real-time capabilities.
 
 ### CLI Tool Coverage
 
-mne-cpp has ported **78 CLI tools** in `src/tools/` — achieving full MNE-C feature
-parity. Plus 6 GUI applications, a real-time server, and 3 new MNA tools
-(`mne_show_mna`, `mne_inverse_pipeline`, `mne_mna_bids_converter`) that go beyond
-MNE-C. Only 4 niche legacy MNE-C utilities remain unported (`mne_make_movie`,
-`mne_convert_lspcov`, `mne_convert_ncov`, `mne_dacq_annotator`).
+mne-cpp has ported **82 CLI tools** in `src/tools/` — achieving complete MNE-C
+feature parity and beyond. Plus 6 GUI applications, a real-time server, and 4 new
+MNA-specific tools (`mne_show_mna`, `mne_inverse_pipeline`,
+`mne_mna_bids_converter`, `mne_compute_cmne`) that go beyond MNE-C.
+All MNE-C CLI tools have been ported — no remaining gaps.
