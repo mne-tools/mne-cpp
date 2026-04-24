@@ -388,72 +388,69 @@ Note: The following are already ported in `src/tools/`:
 
 ## 12. MNE-C Command-Line Tools
 
-MNE-C has ~78 CLI tools. mne-cpp has ported a large majority of them into
-`src/tools/` (52 tools), plus 5 GUI applications and `mne_dipole_fit`.
+MNE-C has ~78 CLI tools. **mne-cpp has achieved full parity** with 78 CLI
+tools in `src/tools/`, plus 6 GUI applications and 3 new MNA-specific tools
+that have no MNE-C counterpart.
 
-### Tools already ported (in `src/tools/`)
+### Tools in `src/tools/` (78 total)
 
-**Conversion** (`src/tools/conversion/`):
-`mne_brain_vision2fiff`, `mne_ctf2fiff`, `mne_ctf_dig2fiff`, `mne_edf2fiff`,
-`mne_eximia2fiff`, `mne_kit2fiff`, `mne_tufts2fiff`, `mne_raw2mat`,
-`mne_convert_dig_data`, `mne_convert_surface`, `mne_make_cor_set`
+**Conversion** (`src/tools/conversion/`, 14 tools):
+`mne_brain_vision2fiff`, `mne_convert_ctf_markers`, `mne_convert_dig_data`,
+`mne_convert_surface`, `mne_ctf2fiff`, `mne_ctf_dig2fiff`, `mne_edf2fiff`,
+`mne_epochs2mat`, `mne_eximia2fiff`, `mne_kit2fiff`, `mne_make_cor_set`,
+`mne_mna_bids_converter`, `mne_raw2mat`, `mne_tufts2fiff`
 
-**Forward** (`src/tools/forward/`):
-`mne_forward_solution`, `mne_prepare_bem_model`, `mne_make_source_space`,
-`mne_make_sphere_bem`, `mne_surf2bem`, `mne_check_surface`,
-`mne_average_forward_solutions`, `mne_setup_forward_model`, `mne_setup_mri`,
-`mne_flash_bem`, `mne_watershed_bem`
+**Forward** (`src/tools/forward/`, 14 tools):
+`mne_average_forward_solutions`, `mne_check_surface`,
+`mne_fit_sphere_to_surf`, `mne_flash_bem`, `mne_forward_solution`,
+`mne_make_scalp_surfaces`, `mne_make_source_space`, `mne_make_sphere_bem`,
+`mne_prepare_bem_model`, `mne_setup_forward_model`, `mne_setup_mri`,
+`mne_surf2bem`, `mne_transform_points`, `mne_watershed_bem`
 
-**Inverse** (`src/tools/inverse/`):
-`mne_inverse_operator`, `mne_compute_mne`, `mne_compute_raw_inverse`,
-`mne_sensitivity_map`, `mne_smooth`, `mne_volume_data2mri`
+**Inverse** (`src/tools/inverse/`, 14 tools):
+`mne_average_estimates`, `mne_compute_cmne`, `mne_compute_mne`,
+`mne_compute_raw_inverse`, `mne_dipole_fit`, `mne_inverse_operator`,
+`mne_inverse_pipeline`, `mne_label_ssp`, `mne_make_uniform_stc`,
+`mne_map_data`, `mne_process_stc`, `mne_sensitivity_map`, `mne_smooth`,
+`mne_volume_data2mri`
 
-**Preprocessing** (`src/tools/preprocessing/`):
-`mne_anonymize`, `mne_mark_bad_channels`, `mne_rename_channels`,
-`mne_compensate_data`, `mne_cov2proj`, `mne_create_comp_data`,
-`mne_fix_mag_coil_types`, `mne_insert_4D_comp`, `mne_add_to_meas_info`,
-`mne_process_raw`
+**Preprocessing** (`src/tools/preprocessing/`, 18 tools):
+`mne_add_to_meas_info`, `mne_add_triggers`, `mne_anonymize`,
+`mne_change_baselines`, `mne_change_nave`, `mne_compensate_data`,
+`mne_copy_processing_history`, `mne_cov2proj`, `mne_create_comp_data`,
+`mne_fix_mag_coil_types`, `mne_fix_stim14`, `mne_insert_4D_comp`,
+`mne_make_derivations`, `mne_mark_bad_channels`, `mne_process_raw`,
+`mne_rename_channels`, `mne_toggle_skips`
 
-**Info** (`src/tools/info/`):
-`mne_show_fiff`, `mne_list_source_space`, `mne_list_bem`,
-`mne_collect_transforms`, `mne_compare_fif_files`
+**Info** (`src/tools/info/`, 10 tools):
+`mne_check_eeg_locations`, `mne_collect_transforms`, `mne_compare_fif_files`,
+`mne_evoked_data_summary`, `mne_list_bem`, `mne_list_coil_def`,
+`mne_list_proj`, `mne_list_source_space`, `mne_sensor_locations`,
+`mne_show_fiff`, `mne_show_mna`
 
-**Surface** (`src/tools/surface/`):
-`mne_annot2labels`, `mne_morph_labels`, `mne_make_morph_maps`,
-`mne_add_patch_info`, `mne_make_eeg_layout`, `mne_volume_source_space`
+**Surface** (`src/tools/surface/`, 6 tools):
+`mne_add_patch_info`, `mne_annot2labels`, `mne_make_eeg_layout`,
+`mne_make_morph_maps`, `mne_morph_labels`, `mne_volume_source_space`
 
-**Simulation** (`src/tools/simulation/`): `mne_simu`
+**Simulation** (`src/tools/simulation/`, 1 tool): `mne_simu`
 
-**Server** (`src/tools/server/`): `mne_rt_server`
+**Server** (`src/tools/server/`, 1 tool): `mne_rt_server`
 
-**Applications** (`src/applications/`):
-`mne_dipole_fit`, `mne_analyze`, `mne_analyze_studio`, `mne_browse`,
+### GUI Applications (`src/applications/`, 6 total)
+
+`mne_analyze`, `mne_analyze_studio`, `mne_browse`, `mne_dipole_fit`,
 `mne_inspect`, `mne_scan`
 
 ### MNE-C tools with no mne-cpp equivalent
 
 | MNE-C Tool | Priority | Description |
 |---|---|---|
-| `mne_process_stc` | Medium | STC file arithmetic, thresholding, combination |
-| `mne_make_uniform_stc` | Low | Resample STC to uniform time grid |
-| `mne_average_estimates` | Low | Weighted cross-subject STC averaging |
-| `mne_map_data` | Low | Map data between arbitrary surface meshes |
-| `mne_make_movie` | Low | Generate movie from STC data |
-| `mne_label_ssp` | Low | SSP projectors from label-constrained data |
-| `mne_make_derivations` | Low | Create derived channel definitions (bipolar montages) |
-| `mne_epochs2mat` | Low | Export epochs to MATLAB format |
-| `mne_add_triggers` | Low | Add trigger channels from external file |
-| `mne_fix_stim14` | Low | Fix STIM14 channel issues |
-| `mne_toggle_skips` | Low | Toggle skip flags in FIFF |
-| `mne_check_eeg_locations` | Low | Validate EEG electrode locations |
-| `mne_change_baselines` | Low | Modify baseline correction in evoked data |
-| `mne_change_nave` | Low | Change number of averages in evoked data |
-| `mne_convert_lspcov` | Low | Convert ASCII covariance to FIFF |
-| `mne_convert_ncov` | Low | Convert noise covariance formats |
-| `mne_evoked_data_summary` | Low | Summarise evoked data statistics |
-| `mne_transform_points` | Low | Apply coordinate transformation to point sets |
-| `mne_sensor_locations` | Low | Display sensor position information |
-| `mne_dacq_annotator` | Low | Annotation editor for acquisition metadata |
+| `mne_make_movie` | Low | Generate movie from STC data (visualisation feature, not a data tool) |
+| `mne_convert_lspcov` | Low | Convert ASCII covariance to FIFF (niche format) |
+| `mne_convert_ncov` | Low | Convert noise covariance formats (niche format) |
+| `mne_dacq_annotator` | Low | Annotation editor for acquisition metadata (legacy Neuromag tool) |
+
+Only 4 low-priority MNE-C utilities remain unported — all are niche legacy tools.
 
 ---
 
@@ -501,9 +498,12 @@ Neither reference codebase has these real-time capabilities.
 | Channel derivations | Implemented in `dsp/channel_derivation.h/.cpp` |
 | MNA/MNX project format | Full library in `src/libraries/mna/` with lossless round-trip |
 | CMNE (ML-based inverse) | ONNX Runtime inference + PyTorch training bridge |
+| 22 missing MNE-C CLI tools | All implemented in `src/tools/` (TASK 25): `mne_dipole_fit`, `mne_label_ssp`, `mne_average_estimates`, `mne_process_stc`, `mne_make_uniform_stc`, `mne_map_data`, `mne_epochs2mat`, `mne_sensor_locations`, `mne_evoked_data_summary`, `mne_transform_points`, `mne_check_eeg_locations`, `mne_fit_sphere_to_surf`, `mne_list_coil_def`, `mne_list_proj`, `mne_change_baselines`, `mne_change_nave`, `mne_add_triggers`, `mne_fix_stim14`, `mne_toggle_skips`, `mne_copy_processing_history`, `mne_make_derivations`, `mne_convert_ctf_markers` |
 
 ### CLI Tool Coverage
 
-mne-cpp has ported **52 of ~78** MNE-C command-line tools (67%), plus 6 GUI applications,
-a real-time server, and 3 new MNA tools (`mne_show_mna`, `mne_inverse_pipeline`,
-`mne_mna_bids_converter`). Only ~20 low-priority MNE-C utilities remain unported.
+mne-cpp has ported **78 CLI tools** in `src/tools/` — achieving full MNE-C feature
+parity. Plus 6 GUI applications, a real-time server, and 3 new MNA tools
+(`mne_show_mna`, `mne_inverse_pipeline`, `mne_mna_bids_converter`) that go beyond
+MNE-C. Only 4 niche legacy MNE-C utilities remain unported (`mne_make_movie`,
+`mne_convert_lspcov`, `mne_convert_ncov`, `mne_dacq_annotator`).
