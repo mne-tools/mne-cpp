@@ -62,6 +62,8 @@ const QString BIDS_DATATYPE_EEG   = QStringLiteral("eeg");
 const QString BIDS_DATATYPE_IEEG  = QStringLiteral("ieeg");
 const QString BIDS_DATATYPE_ANAT  = QStringLiteral("anat");
 const QString BIDS_DATATYPE_FUNC  = QStringLiteral("func");
+const QString BIDS_DATATYPE_DWI   = QStringLiteral("dwi");
+const QString BIDS_DATATYPE_PERF  = QStringLiteral("perf");
 const QString BIDS_DATATYPE_BEH   = QStringLiteral("beh");
 
 /** All allowed BIDS electrophysiology datatypes. */
@@ -74,7 +76,8 @@ inline QStringList allowedElectrophysiologyDatatypes()
 inline QStringList allowedDatatypes()
 {
     return {BIDS_DATATYPE_MEG, BIDS_DATATYPE_EEG, BIDS_DATATYPE_IEEG,
-            BIDS_DATATYPE_ANAT, BIDS_DATATYPE_FUNC, BIDS_DATATYPE_BEH};
+            BIDS_DATATYPE_ANAT, BIDS_DATATYPE_FUNC, BIDS_DATATYPE_DWI,
+            BIDS_DATATYPE_PERF, BIDS_DATATYPE_BEH};
 }
 
 //=============================================================================================================
