@@ -2,13 +2,26 @@
 
 All notable changes to MNE-CPP will be documented in this file.
 
-## [2.2.0] - 2026-04-25
+## [2.2.0] - 2026-04-26
+
+### Highlights
+
+- **MNX as MNE Scan project storage** — Pipeline configurations now load and save as `.mna` (JSON) or `.mnx` (CBOR) files via `MnaIO`; legacy XML pipeline format removed. Default auto-save path is `default.mna`.
+- **Unified File-menu naming across applications** — `mne_scan`, `mne_inspect`, and `mne_browse` now use the same "Open Project… / Save Project… / Export Project as MNX…" pattern.
+- **MNE-C CLI parity (82 tools)** — every command-line tool from MNE-C has a mne-cpp counterpart; final 4 ports landed in this release (`mne_make_movie`, `mne_convert_lspcov`, `mne_convert_ncov`, `mne_dacq_annotator`).
+- **Lossless MNA / MNX round-trip** — every MNA struct preserves unknown JSON/CBOR keys via an `extras` field, so newer schema fields survive a round-trip through older software.
+- **Performance as a co-equal optimization goal** — periodic `code-optimization` prompt and matching `optimization-requirements.md` doc cover both idiomatic-code refactors and quantitative perf wins (≥ 5 % wall-clock).
 
 ### New Features
 
 - **MNA graph-execution library** (`mne_mna`): New library for the `.mna` analysis node-graph format with YAML-based operator definitions, topological execution, and `MnaOpRegistry` for built-in and user-registered operators
+- **MNX binary container** — CBOR-based binary equivalent of `.mna` (`MNX1` magic header), with embedded-data support and identical key structure for lossless format conversion
+- **MNA Scan integration** — `MnaGraph m_pPipelineGraph` mirrors the live plugin scene in `PluginSceneManager`; `MnaDataKind` ↔ `ConnectorDataType` mapping shipped in `mna_scan_types`; `PluginGui::loadConfig`/`saveConfig` route through `MnaIO::read`/`MnaIO::write`
+- **Stream-mode MnaGraphExecutor** — `MnaGraphExecutor::startStream()` / `stopStream()` with `StreamContext` for real-time acquisition pipelines
 - **Machine-learning library** (`mne_ml`): New library with `MlTrainer` for sklearn-compatible model training via embedded Python, supporting SVM, Random Forest, Logistic Regression, and custom estimators
 - **STS covariance estimators**: Added Ledoit-Wolf and Oracle Approximating Shrinkage (OAS) estimators to the `sts` library with cross-validation support against scikit-learn
+- **Source-space cluster permutation tests** — `StatsCluster::oneSamplePermutationTest()`, `fTestPermutationTest()`, `tfce()` (threshold-free cluster enhancement); `StatsAdjacency::fromSourceSpaceTemporal()` for spatio-temporal adjacency
+- **Spectral connectivity expansion** — `GrangerCausality` (`"GC"`), `DirectedTransferFunction` (`"DTF"`), `PartialDirectedCoherence` (`"PDC"`); shared MVAR fitting via `MvarModel`
 - **CMNE sparse inverse**: Added Cascaded MNE (`InvCMNE`) solver to the inverse library for spatially sparse source estimation
 - **DSP Infomax ICA**: Extended the `dsp` library with an Infomax-based ICA decomposition algorithm
 - **BIDS coordinate system**: Added `BidsCoordinateSystem` class for round-trip parsing and writing of `coordinatesystem.json`, and `BidsElectrode::toFiffDigPoints()` for converting BIDS electrodes to FIFF digitizer point sets
@@ -25,13 +38,38 @@ All notable changes to MNE-CPP will be documented in this file.
 - **Scalp surface generation**: Added `makeScalpSurfaces()` to `MNEBemSurface` for creating decimated scalp meshes at multiple resolutions
 - **Processing history**: Added `copyProcessingHistory()` to `FiffStream` for transferring processing provenance between FIFF files
 
+### MNE Inspect
+
+- **UI overhaul** — Native `QMenuBar` (File / View / Tools / Help) with macOS system-menu integration, Recent Projects submenu (max 10), Ctrl+O / Ctrl+Q / Space shortcuts; closable + movable Controls and Loaded Files dock widgets with custom flat title bars; status bar with progress; `saveState()` / `restoreState()` persistence
+- **Loaded Files panel** — live `QTreeWidget` with Name / Type / Path columns and context menu (Remove, Copy Path, Show in Finder); double-click STC entry activates it in the source-estimate combo
+- **Progressive-disclosure controls** — load buttons removed from sidebar; menu actions are the single entry point; control groups disabled until matching data loads; data unload via Loaded Files context menu
+- **WASM compatibility** — menu bar renders inline; `QFileDialog` guarded for WASM; recent-files menu disabled on WASM
+
+### MNE Scan
+
+- **File menu uses Project terminology** — `&New Project` (Ctrl+N), `&Open Project…` (Ctrl+O, accepts `*.mna *.mnx`), `&Save Project…` (Ctrl+S, defaults `.mna`), `&Export Project as MNX…` (Ctrl+Shift+E, always binary CBOR)
+- **Auto-save default path** — `default.xml` → `default.mna` (auto-loaded on startup if present)
+- **Foreign-data preservation** — round-trip saves preserve unknown fields via `m_loadedMnaProject`
+- **Modernised pipeline canvas** — rounded-rect nodes with gradient fills, drop shadows, type labels (`SENSOR` / `ALGORITHM`), centred name, hollow-input / filled-output ports, Bezier connections with tangent arrowheads, dot-grid background, Tailwind-inspired palette, selection glow
+
+### MNE Browse
+
+- **Project reset on standalone open** — opening a raw file without a project resets `m_mnxProject` to prevent stale-project contamination across all 5 file-open entry points (desktop menu, WASM picker, recent files, drag-drop, CLI)
+
+### WASM Progressive Web App
+
+- **PWA manifest + service worker** — `scripts/wasm/manifest.json`, `scripts/wasm/sw.js`, 192×192 / 512×512 icons; offline caching with versioned cache keys; combined COOP/COEP header injection
+- **No server required** — deploy bundle to any static host; service worker injects required headers for `SharedArrayBuffer`
+
 ### Command-Line Tools
 
-- **Inverse tools** (7 new): `mne_compute_cmne` (CMNE source estimation via ONNX Runtime), `mne_inverse_pipeline` (MNA graph-based inverse pipeline), `mne_label_ssp` (SSP projectors from cortical ROIs), `mne_average_estimates` (weighted STC averaging), `mne_process_stc` (STC scale/export/copy), `mne_make_uniform_stc` (uniform STC for testing), `mne_map_data` (evoked data remapping between sensor arrays)
-- **Preprocessing tools** (7 new): `mne_add_triggers` (insert trigger events), `mne_change_baselines` (modify evoked baselines), `mne_change_nave` (modify n_ave field), `mne_copy_processing_history` (copy processing provenance), `mne_fix_stim14` (reconstruct STI 014 from STI 001–006), `mne_make_derivations` (text derivation to FIFF), `mne_toggle_skips` (toggle raw skip tags)
-- **Info tools** (6 new): `mne_check_eeg_locations` (validate EEG positions), `mne_evoked_data_summary` (print evoked summaries), `mne_list_coil_def` (list coil definitions), `mne_list_proj` (list SSP projectors), `mne_sensor_locations` (export sensor locations to text), `mne_show_mna` (display MNA project contents)
-- **Forward tools** (3 new): `mne_fit_sphere_to_surf` (fit sphere to surface points), `mne_make_scalp_surfaces` (generate decimated scalp meshes), `mne_transform_points` (transform 3D points between coordinate frames)
-- **Conversion tools** (3 new): `mne_convert_ctf_markers` (CTF markers to FIFF events), `mne_epochs2mat` (epochs to MATLAB .mat), `mne_mna_bids_converter` (MNA ↔ BIDS conversion)
+- **Final MNE-C CLI parity** (4 new): `mne_make_movie` (STC frames → PNG via `FsSurface` orthographic projection), `mne_convert_lspcov` (LISP S-expression covariance → FIFF `FiffCov`), `mne_convert_ncov` (ASCII ncov → FIFF), `mne_dacq_annotator` (event annotation replacing legacy Motif GUI)
+- **Inverse tools** (7 new): `mne_compute_cmne`, `mne_inverse_pipeline`, `mne_label_ssp`, `mne_average_estimates`, `mne_process_stc`, `mne_make_uniform_stc`, `mne_map_data`
+- **Preprocessing tools** (7 new): `mne_add_triggers`, `mne_change_baselines`, `mne_change_nave`, `mne_copy_processing_history`, `mne_fix_stim14`, `mne_make_derivations`, `mne_toggle_skips`
+- **Info tools** (6 new): `mne_check_eeg_locations`, `mne_evoked_data_summary`, `mne_list_coil_def`, `mne_list_proj`, `mne_sensor_locations`, `mne_show_mna`
+- **Forward tools** (3 new): `mne_fit_sphere_to_surf`, `mne_make_scalp_surfaces`, `mne_transform_points`
+- **Conversion tools** (3 new): `mne_convert_ctf_markers`, `mne_epochs2mat`, `mne_mna_bids_converter`
+- **Total CLI inventory: 82 tools** — full MNE-C feature parity
 
 ### CI/CD
 
@@ -49,7 +87,7 @@ All notable changes to MNE-CPP will be documented in this file.
 ### Documentation
 
 - Added 26 new command-line tool documentation pages
-- Rewrote MNA format manual page (`mna-format.mdx`) as comprehensive reference (73 → 476 lines)
+- Comprehensive MNA / MNX format manual page (`mna-format.mdx`, ~692 lines) — file types, BIDS-like data hierarchy, computational graph, execution modes, parameter system, op registry, verification & provenance, MNX byte layout, schema versioning, complete annotated JSON example
 - Rewrote MNA API reference page (`api-mna.mdx`) with full class inventory (63 → 572 lines)
 - Added ML library API reference page (`api-ml.mdx`)
 - Added Statistics library API reference page (`api-sts.mdx`)
@@ -58,6 +96,8 @@ All notable changes to MNE-CPP will be documented in this file.
 - Expanded glossary with 14 new terms (CMNE, DICS, LCMV, MNA, MxNE, ONNX, etc.) and 3 file format entries (`.mna`, `.mnx`, `.onnx`)
 - Fixed orphaned pages (`mna-format`, `api-mna`) by adding to sidebar navigation
 - Added zero-tolerance warning policy to development conventions
+- Added `mne_analyze` feature-parity gap analysis (Section 14 of `gap-analysis.md`); concrete plugin-level tasks moved to `optimization-requirements.md` § 15
+- Added reusable `code-optimization` Copilot prompt (`.github/prompts/code-optimization.prompt.md`) and matching `optimization-requirements.md` backlog with explicit performance scope
 
 ## [2.1.0] - 2026-04-10
 

@@ -3,7 +3,7 @@
 Internal developer reference. Compares mne-cpp against MNE-C (SVN) and MNE-Python
 to identify all features and algorithms not yet ported.
 
-Last updated: 25 April 2026
+Last updated: 26 April 2026 (post-v2.2.0 sweep — connectivity directed measures + sts cluster permutation tests / TFCE marked done)
 
 ---
 
@@ -195,14 +195,15 @@ Last updated: 25 April 2026
 | Correlation (Pearson) | ✅ | Time domain |
 | Cross-correlation | ✅ | Lagged time domain |
 | Network graph (nodes + edges) | ✅ | Graph representation |
+| MVAR model fitting | ✅ | Levinson–Durbin recursion (`MvarModel`) |
+| Granger Causality (GC) | ✅ | Spectral GC via MVAR + spectral factorisation |
+| Directed Transfer Function (DTF) | ✅ | From MVAR transfer matrix |
+| Partial Directed Coherence (PDC) | ✅ | From MVAR coefficients |
 
 ### Gaps
 
 | Algorithm | Source | Priority | Description |
 |---|---|---|---|
-| Directed Transfer Function (DTF) | Py (mne-connectivity) | Medium | Granger-causality-based directed connectivity in frequency domain |
-| Partial Directed Coherence (PDC) | Py (mne-connectivity) | Medium | Normalised directed coherence based on MVAR models |
-| Granger Causality (GC) | Py (mne-connectivity) | Medium | Time-domain Granger causality |
 | Amplitude Envelope Correlation (AEC) | Py (mne-connectivity) | Medium | Power envelope correlation with optional orthogonalisation |
 | Power Envelope Correlation | Py (mne-connectivity) | Medium | Broadband power envelope correlation for resting-state |
 | Time-resolved coherence | Py (mne-connectivity) | Low | Sliding-window or Hilbert-based time-resolved connectivity |
@@ -281,19 +282,23 @@ Last updated: 25 April 2026
 
 ### What mne-cpp already has
 
-Nothing in this category. This is a complete gap relative to MNE-Python.
+| Feature | Status | Notes |
+|---|---|---|
+| Paired t-test permutation | ✅ | `StatsCluster::permutationTest()` (sts library) |
+| One-sample permutation | ✅ | `StatsCluster::oneSamplePermutationTest()` (sign-flip) |
+| F-test cluster permutation | ✅ | `StatsCluster::fTestPermutationTest()` |
+| Spatio-temporal clustering | ✅ | BFS over adjacency; `StatsAdjacency::fromSourceSpaceTemporal()` |
+| TFCE (Threshold-Free Cluster Enhancement) | ✅ | `StatsCluster::tfce()` (Smith & Nichols 2009) |
+| Ledoit–Wolf / OAS shrinkage | ✅ | sts library |
+| Cortical-mesh adjacency | ✅ | `StatsAdjacency::fromSourceSpace()` |
 
 ### Gaps
 
 | Feature | Source | Priority | Description |
 |---|---|---|---|
-| Permutation t-test | Py | Medium | Non-parametric univariate testing |
-| Cluster-level permutation tests | Py | High | Spatio-temporal cluster statistics (the most-used MNE-Python stats feature) |
-| F-tests (1-way, repeated measures) | Py | Medium | Parametric ANOVA |
 | FDR / Bonferroni correction | Py | Medium | Multiple comparison correction |
 | Bootstrap confidence intervals | Py | Low | Non-parametric confidence intervals |
 | Linear regression (channel-wise) | Py | Low | Regression on raw/epochs data |
-| Adjacency matrices | Py | Medium | Spatial/temporal neighbourhood graphs for cluster tests |
 | CSP (Common Spatial Patterns) | Py | Medium | Spatial filter for BCI classification |
 | SPoC (Source Power Comodulation) | Py | Low | Covariance-based feature extraction |
 | SSD (Spatio-Spectral Decomposition) | Py | Low | Frequency-selective spatial components |
