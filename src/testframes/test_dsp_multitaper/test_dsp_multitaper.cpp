@@ -192,7 +192,9 @@ void TestDspMultitaper::testDpssEigenvaluesNearOne()
 void TestDspMultitaper::testPsdSinusoidal()
 {
     double sfreq = 1000.0;
-    int nSamples = 2000;
+    // Keep N modest; DPSS solve is O(N^3) under coverage. 1024 samples
+    // gives ~1 Hz frequency resolution which is fine for the 10 Hz peak.
+    int nSamples = 1024;
     // Generate 10 Hz sinusoid
     MatrixXd data = generateSinusoidal(1, nSamples, sfreq, {10.0});
 
@@ -214,7 +216,7 @@ void TestDspMultitaper::testPsdSinusoidal()
 void TestDspMultitaper::testPsdOutputDimensions()
 {
     double sfreq = 500.0;
-    int nSamples = 1024;
+    int nSamples = 256;
     int nChannels = 3;
     MatrixXd data = MatrixXd::Random(nChannels, nSamples);
 
@@ -233,7 +235,7 @@ void TestDspMultitaper::testPsdOutputDimensions()
 void TestDspMultitaper::testPsdFrequencyRange()
 {
     double sfreq = 1000.0;
-    int nSamples = 2000;
+    int nSamples = 512;
     MatrixXd data = MatrixXd::Random(1, nSamples);
 
     MultitaperPsdResult result = MultitaperPsd::compute(data, sfreq);
@@ -248,7 +250,7 @@ void TestDspMultitaper::testPsdFrequencyRange()
 void TestDspMultitaper::testPsdMultiChannel()
 {
     double sfreq = 500.0;
-    int nSamples = 1000;
+    int nSamples = 256;
     // Channel 0: 20 Hz, Channel 1: 50 Hz
     MatrixXd data(2, nSamples);
     for (int s = 0; s < nSamples; ++s) {
@@ -273,10 +275,10 @@ void TestDspMultitaper::testPsdMultiChannel()
 void TestDspMultitaper::testTfrSinusoidal()
 {
     double sfreq = 500.0;
-    int nSamples = 2000;
+    int nSamples = 1024;
     MatrixXd data = generateSinusoidal(1, nSamples, sfreq, {15.0});
 
-    MultitaperTfrResult result = MultitaperTfr::compute(data, sfreq, 256, -1, 4.0);
+    MultitaperTfrResult result = MultitaperTfr::compute(data, sfreq, 128, -1, 4.0);
 
     QVERIFY(result.tfrData.size() > 0);
     QVERIFY(result.vecFreqs.size() > 0);
