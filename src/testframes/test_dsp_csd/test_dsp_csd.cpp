@@ -104,7 +104,8 @@ void TestDspCsd::initTestCase()
 void TestDspCsd::testMultitaperBasic()
 {
     int nChannels = 3;
-    int nSamples = 1024;
+    // DPSS solve is slow under coverage instrumentation; keep N modest
+    int nSamples = 256;
     double sfreq = 500.0;
     MatrixXd data = MatrixXd::Random(nChannels, nSamples);
 
@@ -120,7 +121,8 @@ void TestDspCsd::testMultitaperBasic()
 void TestDspCsd::testMultitaperDimensions()
 {
     int nChannels = 4;
-    int nSamples = 2048;
+    // DPSS computation is O(N^3); keep nSamples modest to keep tests fast
+    int nSamples = 512;
     double sfreq = 1000.0;
     MatrixXd data = MatrixXd::Random(nChannels, nSamples);
 
@@ -144,7 +146,7 @@ void TestDspCsd::testMultitaperHermitian()
 {
     // CSD matrix should be Hermitian: CSD(i,j) = conj(CSD(j,i))
     int nChannels = 3;
-    int nSamples = 1024;
+    int nSamples = 256;
     double sfreq = 500.0;
     MatrixXd data = MatrixXd::Random(nChannels, nSamples);
 
@@ -165,7 +167,7 @@ void TestDspCsd::testMultitaperDiagonalPositive()
 {
     // Auto-spectral density (diagonal) should be real and non-negative
     int nChannels = 3;
-    int nSamples = 1024;
+    int nSamples = 256;
     double sfreq = 500.0;
     MatrixXd data = MatrixXd::Random(nChannels, nSamples);
 
@@ -269,7 +271,8 @@ void TestDspCsd::testMorletDimensions()
 void TestDspCsd::testFreqRangeFiltering()
 {
     int nChannels = 2;
-    int nSamples = 2048;
+    // Keep nSamples small to avoid slow DPSS solve
+    int nSamples = 512;
     double sfreq = 1000.0;
     MatrixXd data = MatrixXd::Random(nChannels, nSamples);
 

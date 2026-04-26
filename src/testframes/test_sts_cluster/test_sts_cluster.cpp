@@ -333,14 +333,17 @@ void TestStsCluster::testCorrectionBounds()
 
 void TestStsCluster::testClusterPermutationBasic()
 {
-    // Two groups of 10 observations across 8 spatial points
+    // Two groups of 10 observations across 8 spatial points.
+    // StatsCluster::permutationTest expects each observation as a
+    // (nChannels x nTimes) matrix where nChannels matches the
+    // adjacency dimension. We use nTimes=1 here.
     int nObs = 10;
     int nSpace = 8;
 
     QVector<MatrixXd> dataA, dataB;
     for (int i = 0; i < nObs; ++i) {
-        dataA.append(MatrixXd::Random(1, nSpace));
-        dataB.append(MatrixXd::Random(1, nSpace) + MatrixXd::Constant(1, nSpace, 3.0));
+        dataA.append(MatrixXd::Random(nSpace, 1));
+        dataB.append(MatrixXd::Random(nSpace, 1) + MatrixXd::Constant(nSpace, 1, 3.0));
     }
 
     SparseMatrix<int> adj = createChainAdjacency(nSpace);
@@ -349,7 +352,7 @@ void TestStsCluster::testClusterPermutationBasic()
         dataA, dataB, adj, 100, 0.05, 0.05);
 
     // Result should have the right dimensions
-    QCOMPARE(static_cast<int>(result.matTObs.cols()), nSpace);
+    QCOMPARE(static_cast<int>(result.matTObs.rows()), nSpace);
     // Cluster threshold should be set
     QVERIFY(result.clusterThreshold > 0);
 }
@@ -364,8 +367,8 @@ void TestStsCluster::testClusterPermutationNullDistribution()
 
     QVector<MatrixXd> dataA, dataB;
     for (int i = 0; i < nObs; ++i) {
-        dataA.append(MatrixXd::Random(1, nSpace));
-        dataB.append(MatrixXd::Random(1, nSpace));
+        dataA.append(MatrixXd::Random(nSpace, 1));
+        dataB.append(MatrixXd::Random(nSpace, 1));
     }
 
     SparseMatrix<int> adj = createChainAdjacency(nSpace);
@@ -392,11 +395,11 @@ void TestStsCluster::testClusterPermutationStrongEffect()
 
     QVector<MatrixXd> dataA, dataB;
     for (int i = 0; i < nObs; ++i) {
-        MatrixXd a = MatrixXd::Random(1, nSpace) * 0.1;
-        MatrixXd b = MatrixXd::Random(1, nSpace) * 0.1;
-        // Add strong effect at positions 2-5
+        MatrixXd a = MatrixXd::Random(nSpace, 1) * 0.1;
+        MatrixXd b = MatrixXd::Random(nSpace, 1) * 0.1;
+        // Add strong effect at spatial positions 2-5
         for (int j = 2; j <= 5; ++j) {
-            b(0, j) += 10.0;
+            b(j, 0) += 10.0;
         }
         dataA.append(a);
         dataB.append(b);
