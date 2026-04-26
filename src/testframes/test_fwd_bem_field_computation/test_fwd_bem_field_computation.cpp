@@ -124,14 +124,6 @@ private slots:
     void testBemComputeSolution_constant()
     {
         // Test computing a constant collocation BEM solution.
-        // Inverting the 5120x5120 BEM coefficient matrix is O(N^3) and is
-        // prohibitively slow under coverage instrumentation (-O0 + gcov).
-        // Honour MNE_CPP_SKIP_SLOW_TESTS to keep coverage runs fast while
-        // preserving regression coverage on a normal release build.
-        if (!qEnvironmentVariableIsEmpty("MNE_CPP_SKIP_SLOW_TESTS")) {
-            QSKIP("Slow BEM constant collocation skipped (MNE_CPP_SKIP_SLOW_TESTS set)");
-        }
-
         auto model = FwdBemModel::fwd_bem_load_homog_surface(bemPath());
         QVERIFY(model != nullptr);
 
@@ -219,12 +211,6 @@ private slots:
     void testBemFieldCalc()
     {
         // Test constant-collocation BEM field calculation for a single dipole.
-        // Recomputing the constant-collocation solution from a linear-collocation
-        // solution file is O(N^3) and prohibitively slow under coverage builds.
-        if (!qEnvironmentVariableIsEmpty("MNE_CPP_SKIP_SLOW_TESTS")) {
-            QSKIP("Slow BEM constant collocation skipped (MNE_CPP_SKIP_SLOW_TESTS set)");
-        }
-
         auto model = FwdBemModel::fwd_bem_load_homog_surface(bemPath());
         QVERIFY(model != nullptr);
         model->fwd_bem_load_recompute_solution(bemSolPath(), FWD_BEM_CONSTANT_COLL, 0);
@@ -286,11 +272,6 @@ private slots:
     void testBemPotCalc()
     {
         // Test constant-collocation BEM potential calculation for EEG electrodes.
-        // See testBemFieldCalc for rationale on the slow-test guard.
-        if (!qEnvironmentVariableIsEmpty("MNE_CPP_SKIP_SLOW_TESTS")) {
-            QSKIP("Slow BEM constant collocation skipped (MNE_CPP_SKIP_SLOW_TESTS set)");
-        }
-
         auto model = FwdBemModel::fwd_bem_load_homog_surface(bemPath());
         QVERIFY(model != nullptr);
         model->fwd_bem_load_recompute_solution(bemSolPath(), FWD_BEM_CONSTANT_COLL, 0);
@@ -350,11 +331,6 @@ private slots:
     void testBemFieldGradCalc()
     {
         // Test gradient of BEM MEG field with respect to dipole position.
-        // See testBemFieldCalc for rationale on the slow-test guard.
-        if (!qEnvironmentVariableIsEmpty("MNE_CPP_SKIP_SLOW_TESTS")) {
-            QSKIP("Slow BEM constant collocation skipped (MNE_CPP_SKIP_SLOW_TESTS set)");
-        }
-
         auto model = FwdBemModel::fwd_bem_load_homog_surface(bemPath());
         model->fwd_bem_load_recompute_solution(bemSolPath(), FWD_BEM_CONSTANT_COLL, 0);
 
@@ -389,11 +365,6 @@ private slots:
     void testBemPotGradCalc()
     {
         // Test gradient of BEM EEG potential.
-        // See testBemFieldCalc for rationale on the slow-test guard.
-        if (!qEnvironmentVariableIsEmpty("MNE_CPP_SKIP_SLOW_TESTS")) {
-            QSKIP("Slow BEM constant collocation skipped (MNE_CPP_SKIP_SLOW_TESTS set)");
-        }
-
         auto model = FwdBemModel::fwd_bem_load_homog_surface(bemPath());
         model->fwd_bem_load_recompute_solution(bemSolPath(), FWD_BEM_CONSTANT_COLL, 0);
 
@@ -680,13 +651,6 @@ private slots:
         // Test the complete forward computation pipeline using ComputeFwd.
         // This exercises compute_fwd.cpp (initFwd, calculateFwd, populateMetadata)
         // which showed 0% coverage in existing reports.
-        // The pipeline runs the full BEM solve + lead-field computation and
-        // is too slow under coverage instrumentation; gate behind the same
-        // slow-test environment variable used for the constant-collocation tests.
-        if (!qEnvironmentVariableIsEmpty("MNE_CPP_SKIP_SLOW_TESTS")) {
-            QSKIP("Slow forward pipeline skipped (MNE_CPP_SKIP_SLOW_TESTS set)");
-        }
-
         auto pSettings = std::make_shared<ComputeFwdSettings>();
         pSettings->include_meg = true;
         pSettings->include_eeg = true;
