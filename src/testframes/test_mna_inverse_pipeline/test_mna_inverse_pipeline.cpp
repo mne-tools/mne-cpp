@@ -195,7 +195,7 @@ void TestMnaInversePipeline::registerRealOps()
 
             QFile rawFile(rawPath);
             FiffRawData raw(rawFile);
-            auto info = QSharedPointer<FiffInfo>(new FiffInfo(raw.info));
+            auto info = QSharedPointer<FiffInfo>::create(raw.info);
 
             return {
                 {QStringLiteral("raw_data"), QVariant()},
@@ -214,7 +214,7 @@ void TestMnaInversePipeline::registerRealOps()
 
             QFile evkFile(evkPath);
             QPair<float, float> noBaseline(-1.0f, -1.0f);
-            auto evoked = QSharedPointer<FiffEvoked>(new FiffEvoked(evkFile, setno, noBaseline));
+            auto evoked = QSharedPointer<FiffEvoked>::create(evkFile, setno, noBaseline);
 
             return {{QStringLiteral("evoked"), QVariant::fromValue(evoked)}};
         });
@@ -228,7 +228,7 @@ void TestMnaInversePipeline::registerRealOps()
             covPath.replace(QLatin1String("${TEST_DATA}"), dataPath);
 
             QFile covFile(covPath);
-            auto cov = QSharedPointer<FiffCov>(new FiffCov(covFile));
+            auto cov = QSharedPointer<FiffCov>::create(covFile);
 
             return {{QStringLiteral("noise_cov"), QVariant::fromValue(cov)}};
         });
@@ -242,7 +242,7 @@ void TestMnaInversePipeline::registerRealOps()
             fwdPath.replace(QLatin1String("${TEST_DATA}"), dataPath);
 
             QFile fwdFile(fwdPath);
-            auto fwd = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(fwdFile));
+            auto fwd = QSharedPointer<MNEForwardSolution>::create(fwdFile);
 
             return {{QStringLiteral("forward"), QVariant::fromValue(fwd)}};
         });
@@ -262,7 +262,7 @@ void TestMnaInversePipeline::registerRealOps()
             MNEInverseOperator invOpLocal = MNEInverseOperator::make_inverse_operator(
                 *info, *fwd, *cov, loose, depth, false, true);
 
-            auto invOp = QSharedPointer<MNEInverseOperator>(new MNEInverseOperator(invOpLocal));
+            auto invOp = QSharedPointer<MNEInverseOperator>::create(invOpLocal);
 
             return {{QStringLiteral("inverse_operator"), QVariant::fromValue(invOp)}};
         });
@@ -290,7 +290,7 @@ void TestMnaInversePipeline::registerRealOps()
             mn.doInverseSetup(evoked->nave, pickNormal);
 
             InvSourceEstimate stcLocal = mn.calculateInverse(picked.data, tmin, tstep, pickNormal);
-            auto stc = QSharedPointer<InvSourceEstimate>(new InvSourceEstimate(stcLocal));
+            auto stc = QSharedPointer<InvSourceEstimate>::create(stcLocal);
 
             return {{QStringLiteral("source_estimate"), QVariant::fromValue(stc)}};
         });

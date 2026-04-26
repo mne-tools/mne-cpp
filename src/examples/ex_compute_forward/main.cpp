@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
     // Init data loading and writing
     QFile t_fileIn(pSettings->measname);
     FiffRawData raw(t_fileIn);
-    QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(raw.info));
+    QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FiffInfo>::create(raw.info);
 
     FiffCoordTrans meg_head_t = pFiffInfo->dev_head_t;
 

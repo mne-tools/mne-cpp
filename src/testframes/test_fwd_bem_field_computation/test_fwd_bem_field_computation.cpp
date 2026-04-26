@@ -674,7 +674,7 @@ private slots:
 
         QFile rawFile(rawPath());
         FiffRawData raw(rawFile);
-        pSettings->pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(raw.info));
+        pSettings->pFiffInfo = QSharedPointer<FiffInfo>::create(raw.info);
         pSettings->checkIntegrity();
 
         auto pFwdComputer = std::make_shared<ComputeFwd>(pSettings);

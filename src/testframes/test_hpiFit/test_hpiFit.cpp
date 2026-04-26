@@ -140,7 +140,7 @@ void TestHpiFit::initTestCase()
 
     // Setup for reading the raw data
     m_raw = FiffRawData(t_fileIn);
-    m_pFiffInfo =  QSharedPointer<FiffInfo>(new FiffInfo(m_raw.info));
+    m_pFiffInfo =  QSharedPointer<FiffInfo>::create(m_raw.info);
 
     // read data segment (200 samples)
     int iBuffer = 200;
@@ -174,7 +174,7 @@ void TestHpiFit::initTestCase()
 void TestHpiFit::init()
 {
     // run at beginning of each test
-    m_pFiffInfo =  QSharedPointer<FiffInfo>(new FiffInfo(m_raw.info));
+    m_pFiffInfo =  QSharedPointer<FiffInfo>::create(m_raw.info);
 }
 
 //=============================================================================================================

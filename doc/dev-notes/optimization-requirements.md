@@ -1012,6 +1012,16 @@ Patterns are not decoration; they must serve clarity **and** performance.
 | | `std::srand`/`std::rand` → `std::mt19937` + `std::uniform_int_distribution` in `eventgroup.cpp` | — |
 | | `#define` macros → `inline constexpr` in `RawSettingsConstants` namespace (`rawsettings.h` + 8 caller files, 54 references) | — |
 | | Full build: **0 errors** | — |
+| 2026-04-26 | **Iteration 4 — `QSharedPointer<X>::create()` modernization (7 files, 14 sites):** | — |
+| | `src/testframes/test_mna_inverse_pipeline/test_mna_inverse_pipeline.cpp` — 6 sites (FiffInfo, FiffEvoked, FiffCov, MNEForwardSolution, MNEInverseOperator, InvSourceEstimate) | — |
+| | `src/testframes/test_hpiFit/test_hpiFit.cpp` — 2 FiffInfo sites | — |
+| | `src/testframes/test_hpiDataUpdater/test_hpiDataUpdater.cpp` — 2 FiffInfo sites | — |
+| | `src/testframes/test_fwd_bem_field_computation/test_fwd_bem_field_computation.cpp` — FiffInfo + MNEForwardSolution | — |
+| | `src/testframes/test_mne_forward_solution/test_mne_forward_solution.cpp` — FiffInfo + MNEForwardSolution | — |
+| | `src/examples/ex_hpiFit/main.cpp` — 1 FiffInfo site | — |
+| | `src/examples/ex_compute_forward/main.cpp` — 1 FiffInfo site | — |
+| | Pattern: `QSharedPointer<X>(new X(...))` → `QSharedPointer<X>::create(...)` (single allocation, idiomatic Qt 6) | — |
+| | Build (test_hpiFit, test_hpiDataUpdater, test_fwd_bem_field_computation, test_mne_forward_solution, test_mna_inverse_pipeline, ex_hpi_fit, ex_compute_forward): **0 errors, 0 new warnings** | — |
 
 ---
 
