@@ -17,6 +17,20 @@ codebase **measurably better in code quality, runtime performance, or both**.
 Idiomatic / beautiful C++ and raw runtime speed are co-equal goals here.
 Making a hot loop 20% faster is as valuable as eliminating 50 C-style casts.
 
+> **Important — scope of performance sweeps.** Performance optimization is
+> **not limited** to the items currently listed in
+> `doc/dev-notes/optimization-requirements.md` § 5. The whole `src/` tree is
+> always in scope: any hot path, any algorithm, any allocation pattern, any
+> Eigen expression, any I/O loop — in any library, tool, or application — is
+> a valid target if profiling proves it matters. The listed items are
+> _starting points_, not a closed backlog. Whenever you find a new hotspot,
+> fix it **and** add it to § 5 (with measured numbers) so the next pass
+> benefits.
+>
+> Code-quality sweeps may also operate on the full tree, but the listed
+> items in §§ 2–4, 6–11 capture the highest-impact known issues; prefer them
+> first.
+
 ## Source of truth
 
 All work items, priorities, and metrics live in
@@ -42,14 +56,17 @@ That document tracks:
 
 ## Workflow for one optimization pass
 
-1. **Pick a batch.** Open `optimization-requirements.md` and select **one** of:
-   - The next-highest-impact P0/P1 cluster from the priority matrix (§ 12)
-   - One concrete metric from § 13.6 to drive toward 0 (e.g. eliminate all
-     remaining C-style casts in one library)
-   - **One performance hotspot from § 5** (e.g. parallelize an epoch loop,
-     add `noalias()` to a matmul, replace an O(n²) algorithm with KD-tree)
-   - One `mne_analyze` task from § 15 (H1–H6, M1–M14, L1–L5)
-   - A single non-idiomatic file flagged in § 2–§ 4
+1. **Pick a batch.** Either:
+   - Choose one item from `optimization-requirements.md`:
+     - The next-highest-impact P0/P1 cluster from the priority matrix (§ 12)
+     - One concrete metric from § 13.6 to drive toward 0
+     - One performance hotspot from § 5 (parallelism, SIMD, allocations…)
+     - One `mne_analyze` task from § 15 (H1–H6, M1–M14, L1–L5)
+     - A single non-idiomatic file flagged in §§ 2–4
+   - **Or** discover a new target by profiling / scanning the full `src/`
+     tree (especially valid for performance work — see scope note above).
+     If you find one, fix it _and_ append it to § 5 of the requirements
+     doc with measured numbers so the backlog stays current.
    Keep the batch small enough to verify in one full build.
 
 2. **Scan the codebase** to confirm scope and find every occurrence

@@ -332,6 +332,12 @@ private:
 
     //=========================================================================================================
     /**
+     * Implements export-as-MNX (binary CBOR project) action.
+     */
+    void exportAsMnx();
+
+    //=========================================================================================================
+    /**
      * Implements help contents action.
      */
     void helpContents();
@@ -386,9 +392,10 @@ private:
     QPointer<QActionGroup>              m_pActionStyleGroup;            /**< group for styles. */
     QPointer<QActionGroup>              m_pActionModeGroup;             /**< group for gui modes. */
 
-    QPointer<QAction>                   m_pActionNewConfig;             /**< new configuration. */
-    QPointer<QAction>                   m_pActionOpenConfig;            /**< open configuration. */
-    QPointer<QAction>                   m_pActionSaveConfig;            /**< save configuration. */
+    QPointer<QAction>                   m_pActionNewConfig;             /**< new pipeline project. */
+    QPointer<QAction>                   m_pActionOpenConfig;            /**< open pipeline project. */
+    QPointer<QAction>                   m_pActionSaveConfig;            /**< save pipeline project. */
+    QPointer<QAction>                   m_pActionExportMnx;             /**< export pipeline project as binary MNX. */
     QPointer<QAction>                   m_pActionExit;                  /**< exit application. */
     QPointer<QAction>                   m_pActionMinLgLv;               /**< set minimal log level. */
     QPointer<QAction>                   m_pActionNormLgLv;              /**< set normal log level. */

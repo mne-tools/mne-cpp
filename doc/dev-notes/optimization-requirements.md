@@ -329,6 +329,14 @@ C-style callback with type-erased user data. Replace with templates or `std::fun
 
 ## 5. Performance Optimization Opportunities
 
+> **Scope:** Performance work is **never restricted to the items listed
+> below.** The whole `src/` tree is in scope at all times \u2014 any hot path,
+> algorithm, allocation pattern, Eigen expression, or I/O loop in any
+> library, tool, or application is a valid target if profiling proves it
+> matters. The items below are starting points and known wins, not a closed
+> backlog. When you find a new hotspot, fix it **and** append it here
+> (with measured numbers) so the next pass benefits.
+
 ### 5.1 Missing `reserve()` on Containers
 
 Many append/push_back loops lack pre-allocation. Grep for patterns:

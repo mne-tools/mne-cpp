@@ -305,7 +305,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::newConfiguration()
 {
-    writeToLog(tr("Invoked <b>File|NewConfiguration</b>"), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("Invoked <b>File|NewProject</b>"), _LogKndMessage, _LogLvMin);
     m_pPluginGui->clearScene();
 }
 
@@ -313,12 +313,12 @@ void MainWindow::newConfiguration()
 
 void MainWindow::openConfiguration()
 {
-    writeToLog(tr("Invoked <b>File|OpenConfiguration</b>"), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("Invoked <b>File|OpenProject</b>"), _LogKndMessage, _LogLvMin);
 
     QString path = QFileDialog::getOpenFileName(this,
-                                                "Open MNE Scan Configuration File",
+                                                tr("Open MNE Scan Project"),
                                                 QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),
-                                                 tr("MNA files (*.mna);;MNX binary files (*.mnx);;All files (*)"));
+                                                 tr("MNA Project Files (*.mna *.mnx);;MNA files (*.mna);;MNX binary files (*.mnx);;All files (*)"));
 
     if (path.isEmpty())
         return;
@@ -331,16 +331,39 @@ void MainWindow::openConfiguration()
 
 void MainWindow::saveConfiguration()
 {
-    writeToLog(tr("Invoked <b>File|SaveConfiguration</b>"), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("Invoked <b>File|SaveProject</b>"), _LogKndMessage, _LogLvMin);
 
     QString path = QFileDialog::getSaveFileName(
                 this,
-                "Save MNE Scan Configuration File",
+                tr("Save MNE Scan Project"),
                 QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + QStringLiteral("/pipeline.mna"),
-                 tr("MNA files (*.mna);;MNX binary files (*.mnx)"));
+                 tr("MNA Project Files (*.mna);;MNX binary files (*.mnx)"));
 
     if (path.isEmpty())
         return;
+
+    QFileInfo qFileInfo(path);
+    m_pPluginGui->saveConfig(qFileInfo.path(), qFileInfo.fileName());
+}
+
+//=============================================================================================================
+
+void MainWindow::exportAsMnx()
+{
+    writeToLog(tr("Invoked <b>File|ExportProjectAsMNX</b>"), _LogKndMessage, _LogLvMin);
+
+    QString path = QFileDialog::getSaveFileName(
+                this,
+                tr("Export MNE Scan Project as MNX (binary)"),
+                QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + QStringLiteral("/pipeline.mnx"),
+                 tr("MNX binary files (*.mnx)"));
+
+    if (path.isEmpty())
+        return;
+
+    // Force .mnx extension regardless of what the user typed.
+    if (!path.endsWith(QLatin1String(".mnx"), Qt::CaseInsensitive))
+        path += QStringLiteral(".mnx");
 
     QFileInfo qFileInfo(path);
     m_pPluginGui->saveConfig(qFileInfo.path(), qFileInfo.fileName());
@@ -458,23 +481,29 @@ void MainWindow::setMaxLogLevel()
 void MainWindow::createActions()
 {
     //File QMenu
-    m_pActionNewConfig = new QAction(QIcon(":/images/new.png"), tr("&New configuration"), this);
+    m_pActionNewConfig = new QAction(QIcon(":/images/new.png"), tr("&New Project"), this);
     m_pActionNewConfig->setShortcuts(QKeySequence::New);
-    m_pActionNewConfig->setStatusTip(tr("Create a new configuration"));
+    m_pActionNewConfig->setStatusTip(tr("Create a new pipeline project"));
     connect(m_pActionNewConfig.data(), &QAction::triggered,
             this, &MainWindow::newConfiguration);
 
-    m_pActionOpenConfig = new QAction(tr("&Open configuration..."), this);
+    m_pActionOpenConfig = new QAction(tr("&Open Project..."), this);
     m_pActionOpenConfig->setShortcuts(QKeySequence::Open);
-    m_pActionOpenConfig->setStatusTip(tr("Open an existing configuration"));
+    m_pActionOpenConfig->setStatusTip(tr("Open an existing MNA/MNX pipeline project"));
     connect(m_pActionOpenConfig.data(), &QAction::triggered,
             this, &MainWindow::openConfiguration);
 
-    m_pActionSaveConfig = new QAction(QIcon(":/images/save.png"), tr("&Save configuration..."), this);
+    m_pActionSaveConfig = new QAction(QIcon(":/images/save.png"), tr("&Save Project..."), this);
     m_pActionSaveConfig->setShortcuts(QKeySequence::Save);
-    m_pActionSaveConfig->setStatusTip(tr("Save the current configuration"));
+    m_pActionSaveConfig->setStatusTip(tr("Save the current pipeline project (MNA / MNX)"));
     connect(m_pActionSaveConfig.data(), &QAction::triggered,
             this, &MainWindow::saveConfiguration);
+
+    m_pActionExportMnx = new QAction(tr("&Export Project as MNX..."), this);
+    m_pActionExportMnx->setShortcut(QKeySequence("Ctrl+Shift+E"));
+    m_pActionExportMnx->setStatusTip(tr("Export the current pipeline project as a binary MNX file"));
+    connect(m_pActionExportMnx.data(), &QAction::triggered,
+            this, &MainWindow::exportAsMnx);
 
     m_pActionExit = new QAction(tr("E&xit"), this);
     m_pActionExit->setShortcuts(QKeySequence::Quit);
@@ -602,6 +631,7 @@ void MainWindow::createMenus()
         m_pMenuFile->addAction(m_pActionNewConfig);
         m_pMenuFile->addAction(m_pActionOpenConfig);
         m_pMenuFile->addAction(m_pActionSaveConfig);
+        m_pMenuFile->addAction(m_pActionExportMnx);
         m_pMenuFile->addSeparator();
         m_pMenuFile->addAction(m_pActionExit);
     }
@@ -919,7 +949,7 @@ void MainWindow::writeToLog(const QString& logMsg,
 void MainWindow::startMeasurement()
 {
     // Save pipeline before starting just in case a crash occurs
-    m_pPluginGui->saveConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),"default.xml");
+    m_pPluginGui->saveConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),"default.mna");
 
     writeToLog(tr("Starting real-time measurement..."), _LogKndMessage, _LogLvMin);
 
