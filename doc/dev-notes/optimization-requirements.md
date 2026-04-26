@@ -386,6 +386,69 @@ for (...) { result.append(...); }
 | `sts/sts_adjacency.cpp` — nearest-neighbor | O(n²) pairwise distance | KD-tree or spatial hashing |
 | `disp3D/helpers/geometryinfo.cpp` — SCDC | BFS per vertex (inefficient for dense meshes) | Dijkstra with priority queue |
 
+### 5.7 Parallelism & Concurrency
+
+| Pattern | Tooling | Notes |
+|---|---|---|
+| Independent per-channel / per-epoch loops | `QtConcurrent::map`, `QtConcurrent::blockingMappedReduced` | Most filtering, baseline correction, artifact rejection passes are embarrassingly parallel |
+| Per-vertex source-space loops | OpenMP `#pragma omp parallel for` (already enabled via Eigen) | Ensure inner Eigen ops use `Eigen::setNbThreads()` correctly; avoid nested parallelism |
+| Long-running GUI tasks | `QThreadPool` + `QFutureWatcher` | Never block the GUI thread; report progress via signals |
+| Real-time pipeline stages (mne_scan) | `CircularBuffer` + producer/consumer | Verify lock-free where contention matters |
+
+### 5.8 SIMD & Vectorization
+
+| Optimization | Notes |
+|---|---|
+| Eigen SIMD | Default backend already uses SSE/AVX; ensure release builds pass `-O3 -march=native` (or per-target `-mavx2`/`-mfma` where portable) |
+| Loop vectorization | Prefer Eigen array expressions (`(a.array() * b.array()).matrix()`) over hand-rolled loops |
+| Branch-free inner loops | Replace `if`-in-loop with `select(mask, a, b)` Eigen pattern when both branches are cheap |
+| Auto-vectorization friendliness | Avoid pointer aliasing in tight loops; use `__restrict` / `Eigen::Ref` |
+
+### 5.9 Memory & Allocations
+
+| Pattern | Fix |
+|---|---|
+| `new`/`delete` in hot loops | Pre-allocate with `reserve()` or reuse a thread-local buffer |
+| Frequent `QString` / `QByteArray` heap allocs | Hoist out of loops; prefer `QStringLiteral` for compile-time strings |
+| Repeated Eigen `MatrixXd` temporaries | Reuse a member `MatrixXd` cache; size with `conservativeResize` only when the size changes |
+| Implicit `QList`/`QVector` detach on write | Use `const` references on read paths; `std::as_const(container)` in range-fors |
+| Cache-line ping-pong in parallel writes | Pad per-thread accumulators to 64 bytes |
+
+### 5.10 Hot-Path Discovery & Measurement
+
+Before optimizing anything, **measure**. Optimization without a baseline is waste.
+
+| Tool | Use case |
+|---|---|
+| **macOS Instruments** (Time Profiler, Allocations, System Trace) | Primary profiler on dev machines |
+| **Linux `perf` + flamegraph** | CPU sampling on CI / Linux developers |
+| **Tracy** or **Qt's `QElapsedTimer`** | In-source spot timings for narrow regions |
+| **Eigen `EIGEN_DONT_VECTORIZE` toggle** | Prove a hot path is actually vectorized (compare timings) |
+| **Google Benchmark** (potential add) | Microbenchmarks for library-level hot functions |
+
+**Workflow for any perf change:**
+
+1. Pick a representative dataset (a fixed `.fif`, a fixed STC, or a synthetic generator with a fixed seed).
+2. Time the baseline 3× with `QElapsedTimer` or Instruments; record min / median / max.
+3. Apply the change.
+4. Re-time; require **≥5% wall-clock improvement** (or a justified architectural reason) before merging.
+5. Record before/after numbers in the commit message and in § 14 Progress Tracker.
+
+### 5.11 Build-Time Optimization Flags
+
+| Build config | Required flags | Verify |
+|---|---|---|
+| `Release` | `-O3 -DNDEBUG`, LTO when supported (`-flto=thin`) | `cmake -DCMAKE_BUILD_TYPE=Release` |
+| `RelWithDebInfo` | `-O2 -g -DNDEBUG` | Default for profiling |
+| Eigen | `-DEIGEN_NO_DEBUG` in Release; never in Debug | Check `defines` in `cmake/Findeigen3.cmake` |
+| WASM | `-O3 -msimd128` (Wasm SIMD); `-sASYNCIFY` only where required | `build_wasm/CMakeCache.txt` |
+
+### 5.12 Performance Regression Guardrails
+
+- Add a small benchmark to `src/testframes/` whenever a hot path is optimized.
+- Benchmarks should fail the build if wall-time regresses by **>10%** vs a stored baseline (CSV in `resources/benchmarks/`).
+- Profile-guided sanity check before each release tag: run a fixed end-to-end pipeline (load → filter → average → inverse → STC) and compare to the previous release.
+
 ---
 
 ## 6. Eigen Adoption & Numerical Types
