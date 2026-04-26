@@ -4,7 +4,7 @@
 performance bottlenecks, and test quality issues. Revisit periodically to
 measure progress and re-prioritize.
 
-Last updated: 14 April 2026
+Last updated: 26 April 2026
 
 ---
 
@@ -24,6 +24,7 @@ Last updated: 14 April 2026
 12. [Priority Matrix](#12-priority-matrix)
 13. [Audit Process — How We Scan & What Matters](#13-audit-process--how-we-scan--what-matters)
 14. [Progress Tracker](#14-progress-tracker)
+15. [`mne_analyze` Feature Parity Tasks](#15-mne_analyze-feature-parity-tasks)
 
 ---
 
@@ -940,6 +941,233 @@ Patterns are not decoration; they must serve clarity **and** performance.
 | | `std::srand`/`std::rand` → `std::mt19937` + `std::uniform_int_distribution` in `eventgroup.cpp` | — |
 | | `#define` macros → `inline constexpr` in `RawSettingsConstants` namespace (`rawsettings.h` + 8 caller files, 54 references) | — |
 | | Full build: **0 errors** | — |
+
+---
+
+## 15. `mne_analyze` Feature Parity Tasks
+
+These are concrete plugin-level tasks for closing the GUI feature gap against
+MNE-C SVN `mne_analyze` (v2.55). Source-of-truth catalogue is in
+[gap-analysis.md § 14](gap-analysis.md). Work them off opportunistically from
+the optimization passes; each is independently shippable.
+
+### Plugin architecture (reference)
+
+Every feature lives in its own plugin under
+`src/applications/mne_analyze/plugins/<name>/`. Copy an existing plugin as a
+starting point:
+
+| Example plugin | Teaches |
+|---|---|
+| `coregistration/` | 3D interaction, `FiffCoordTrans`, `View3D` integration |
+| `dipolefit/` | Inverse computation, BEM/cov selection, 3D display |
+| `rawdataviewer/` | FIFF browsing, `FiffRawView`, event overlay |
+| `averaging/` | Epoch-based evoked computation, butterfly/layout views |
+| `view3d/` | BEM surfaces, digitizers, 3D scene management |
+
+Plugin skeleton:
+```
+src/applications/mne_analyze/plugins/<name>/
+├── CMakeLists.txt          # target: <name>extension
+├── <name>extension.h
+├── <name>extension.cpp
+├── <name>view.h            # optional QWidget panel
+└── <name>view.cpp
+```
+
+Register the plugin in
+`src/applications/mne_analyze/extensions/extensionmanager.cpp`.
+
+### Coding conventions
+
+- Namespace: `MNEANLYZEEXTLIB`
+- License header: BSD-3-Clause, copyright Christoph Dinh, `@since 2.2.0`,
+  `@date April, 2026`
+- Qt 6.11+, C++17, zero warnings
+- 3D rendering: `DISP3DLIB::View3D`, `BrainTreeModel`, `BrainView`
+- Surface I/O: `FSLIB::FsSurface` (`rr()` → `MatrixX3f`, `tris()` → `MatrixX3i`)
+- Source estimates: `MNELIB::MNESourceEstimate`
+- Forward solution: `MNELIB::MNEForwardSolution`
+- Inverse operator: `MNELIB::MNEInverseOperator(file)`, check `nsource > 0`
+- Covariance: `FIFFLIB::FiffCov`, save via `cov.save(fileName)`
+
+### Acceptance criteria (per feature)
+
+1. Compiles with **zero warnings** under Qt 6.11, macOS/Linux/WASM.
+2. Each plugin is independently loadable — app starts without it if the shared
+   library is absent.
+3. All file I/O uses existing FIFF/FS library classes — no raw parsing.
+4. Plugin registers correctly in `ExtensionManager` and appears in the menu.
+5. WASM-incompatible code guarded with `#ifndef Q_OS_WASM`.
+6. New files carry the BSD-3-Clause header with `@since 2.2.0`.
+
+---
+
+### 15.1 HIGH priority
+
+#### H1 — Cortical surface loading
+
+**Goal:** "Load Surface" action that reads a FreeSurfer surface
+(`lh.pial`, `rh.inflated`, …) and displays it in `View3D`.
+
+- File dialog → `FsSurface::read(path)`
+- Build a `Qt3DCore::QEntity` mesh from `rr()` + `tris()`
+- Add mesh to `BrainTreeModel` (model: `surface`)
+- Hemisphere toggle (left / right / both)
+
+**Files:** `src/applications/mne_analyze/plugins/surfaceloader/` (new); register
+in `mne_analyze.pro`.
+
+#### H2 — STC overlay on cortical surface
+
+**Goal:** Map `MNESourceEstimate` (`.stc`) onto the loaded cortical surface
+with a colour map and animate across time.
+
+- `MNESourceEstimate::read(fileName)`
+- Vertex values → colour (hot / cool / RdBu)
+- Push updated vertex colours to `Qt3DRender` geometry per frame
+- Time slider + play/pause (reuse `FiffRawView` time logic)
+- Respect H1's hemisphere selection
+
+**Files:** `src/applications/mne_analyze/plugins/stcoverlay/` (new).
+
+#### H3 — Source estimation inside `mne_analyze`
+
+**Goal:** Complete the stub `SourceLocalization` plugin so users can compute
+dSPM/MNE/sLORETA from within the GUI.
+
+- Load forward: `MNEForwardSolution(forwardFile)`
+- Load inverse: `MNEInverseOperator invOp(invFile)`, check `invOp.nsource > 0`
+- Pick evoked / covariance from analysis context
+- `MNEInverse::prepareInverseOperator` + `MNEInverse::imagingKernel`
+- Feed result into the H2 STC overlay
+- Method selector: dSPM / MNE / sLORETA
+
+**Files:** `src/applications/mne_analyze/plugins/sourcelocalization/sourcelocalizationextension.{h,cpp}`.
+
+#### H4 — Label / ROI management
+
+**Goal:** Load FreeSurfer label files (`.label`, `aparc.annot`); display named
+ROIs on the cortical surface.
+
+- ASCII parser for `.label` (vertex index + RAS); use `FSLIB::Label::read` if
+  present, otherwise minimal parser
+- `.annot` binary parser
+- Highlight labelled vertices with configurable solid colour overlay
+- Dock listing loaded labels with per-label visibility toggle
+- "Create label from selection": save marked vertices to `.label`
+
+**Files:** `src/applications/mne_analyze/plugins/labelmanager/` (new).
+
+#### H5 — Vertex picking with data readout
+
+**Goal:** Click cortical surface → report source estimate value at vertex.
+
+- Wire `View3D::objectPicked(QVector3D)` to nearest-vertex search on `rr()`
+- Show vertex index, RAS coords, current STC amplitude, time point
+- Persistent crosshair / sphere marker at picked location
+- Emit signal so H6 can subscribe
+
+**Files:** extend `plugins/stcoverlay/` (H2) or add a hook in `plugins/view3d/`.
+
+#### H6 — Timecourse at picked vertex
+
+**Goal:** Display full source estimate time series for the H5-picked vertex.
+
+- Extract row from `MNESourceEstimate::data` at the vertex index
+- Plot in `QCustomPlot` (or `DISPLIB::AbstractView`) docked panel:
+  x = time (ms), y = amplitude
+- Vertical cursor tracking the main time slider
+- Pin multiple traces for comparison
+
+**Files:** extend `plugins/sourcelocalization/` or add `plugins/vertextimecourse/`.
+
+---
+
+### 15.2 MEDIUM priority
+
+#### M1 — MEG/EEG field mapping
+
+Map sensor signals onto helmet / head surface via sphere-model interpolation.
+- `FWDLIB::FwdBemModel::sphere_field_map()` or spherical-harmonics expansion
+- Render as colour overlay on `helmetsurface.fif` or generated sphere mesh
+- Toggle MEG field / EEG potential / iso-contours
+
+#### M2 — Overlay smoothing & transparency
+
+Extend the H2 STC overlay:
+- "Smoothing steps" spinner (0–5): iterative neighbour-averaging using surface
+  adjacency
+- Opacity slider (0–100%) controlling overlay material alpha
+
+#### M3 — Inverse operator management dock
+
+Dock listing loaded inverse operators with metadata (method, depth,
+noise-cov file). Switch active operator without re-opening files.
+
+#### M4 — MEG/EEG sensor coil display
+
+Draw MEG coil geometries and EEG electrode spheres in 3D from
+`FIFFLIB::FiffChInfo` + `MNECoilDef`.
+
+#### M5 — View presets
+
+Named camera positions (lateral, medial, dorsal, ventral, frontal, occipital)
+as toolbar buttons. Save/restore via `QSettings`.
+
+#### M6 — Timecourse manager
+
+Dock managing multiple saved vertex timecourses: name, colour, CSV export,
+overlay in a shared plot.
+
+#### M7 — Multi-dipole fitting
+
+Extend `DipoleFit` plugin: loop `InvDipoleFit::calculateFit()` over a time
+range; accumulate as a multi-dipole set.
+
+#### M8 — SNR display
+
+Compute SNR from baseline and active windows of evoked data; show
+`QCustomPlot` trace in the averaging panel.
+
+#### M9 — EEG potential maps
+
+Spherical-spline interpolation of EEG scalp potentials mapped to a head
+surface mesh. Reuse `ChannelInterpolation` if available.
+
+#### M10–M14 — lower urgency
+
+Hemisphere toggle (L/R/both); iso-contours on surface; MNE amplitude trace at
+vertex; overlay histogram; plot hardcopy export (SVG).
+
+---
+
+### 15.3 LOW priority
+
+#### L1 — MRI orthogonal viewer
+
+Load `.mgz` / `.nii` via `MriVolData::read()`; show axial / coronal / sagittal
+in three `MriSlicer`-backed `QLabel` canvases.
+
+#### L2 — Show picked vertex in MRI slices
+
+When H5 fires a pick, transform RAS → voxel indices; update MRI slice
+crosshair.
+
+#### L3 — Continuous HPI visualisation
+
+Plot head movement from QUAT HPI channels over time. Reuse `FiffRawView`
+channel access; plot quaternion magnitudes.
+
+#### L4 — Remote control / scripting
+
+Named-pipe or local TCP socket accepting simple commands
+(`load <file>`, `set-time <ms>`, `screenshot <path>`).
+
+#### L5 — Movie / frame export
+
+Animate STC overlay across all time points; capture each frame via
+`BrainView::saveSnapshot()`. Reuse `mne_make_movie` logic as reference.
 
 ---
 

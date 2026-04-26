@@ -555,11 +555,12 @@ is a modern plugin-based Qt application with QRhi rendering and WebAssembly supp
 | BIDS tree view | ✅ | Native BIDS data management |
 | QRhi GPU rendering | ✅ | Modern GPU API (Metal/Vulkan/D3D12/OpenGL) |
 
-> **Optimization prompt:** An actionable implementation guide for closing these
-> gaps lives at
-> [`.github/prompts/mne-analyze-optimization.prompt.md`](../../.github/prompts/mne-analyze-optimization.prompt.md).
-> Open it in the VS Code editor and use `/mne-analyze-optimization` to invoke
-> it as a Copilot agent prompt.
+> **Implementation roadmap:** Concrete plugin-level tasks (H1–H6, M1–M14,
+> L1–L5) live in
+> [`optimization-requirements.md` § 15](optimization-requirements.md#15-mne_analyze-feature-parity-tasks).
+> Use the
+> [`/code-optimization`](../../.github/prompts/code-optimization.prompt.md)
+> Copilot prompt to pick a task and run a focused optimization pass.
 
 ### Gaps: Features in MNE-C `mne_analyze` missing from mne-cpp
 
