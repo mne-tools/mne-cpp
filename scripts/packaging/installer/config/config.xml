@@ -39,6 +39,8 @@
 
     <!-- Branding -->
     <Logo>MNE-CPP_Logo.png</Logo>
+    <Banner>banner.png</Banner>
+    <Watermark>watermark.png</Watermark>
     <StyleSheet>style.qss</StyleSheet>
 
     <!-- URLs -->

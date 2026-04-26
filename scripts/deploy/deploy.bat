@@ -495,6 +495,42 @@ if [[ ${LinkOption} == "dynamic" ]]; then
         ${MockText}rm -rf ${BasePath}/out/${BuildName}/bin/mne_analyze_plugins
         # mne_rt_server_plugins stays — mne_rt_server is a CLI tool (no .app bundle)
 
+        # ---------------------------------------------------------------
+        # Strip developer-machine LC_RPATH entries.
+        # macdeployqt does not remove absolute Qt rpaths baked in by CMake
+        # at link time (e.g. /Users/<dev>/Qt/.../lib, /opt/homebrew/lib).
+        # On a clean target these paths obviously do not exist; even worse,
+        # if the target machine happens to have a different Qt at the same
+        # path it can shadow the bundled frameworks. Strip every absolute
+        # rpath that is NOT @executable_path / @loader_path / @rpath.
+        # ---------------------------------------------------------------
+        echo ""
+        echo "=== Stripping developer-machine rpaths ==="
+        strip_dev_rpaths() {
+            local bin="$1"
+            [ -f "$bin" ] || return 0
+            otool -l "$bin" 2>/dev/null \
+                | awk '/cmd LC_RPATH/{f=1; next} f && /path /{print $2; f=0}' \
+                | grep -E '^/' \
+                | while read -r rp; do
+                    echo "  strip $(basename "$bin"): $rp"
+                    ${MockText}install_name_tool -delete_rpath "$rp" "$bin" 2>/dev/null || true
+                done
+        }
+        # All .app bundle main executables
+        for app in ${BasePath}/out/${BuildName}/bin/*.app; do
+            [ -d "$app" ] || continue
+            strip_dev_rpaths "$app/Contents/MacOS/$(basename "$app" .app)"
+        done
+        # CLI tools in bin/
+        for bin in ${BasePath}/out/${BuildName}/bin/*; do
+            [ -f "$bin" ] && [ -x "$bin" ] && strip_dev_rpaths "$bin"
+        done
+        # MNE-CPP and Qt dylibs in lib/
+        for dl in ${BasePath}/out/${BuildName}/lib/*.dylib; do
+            strip_dev_rpaths "$dl"
+        done
+
         # Verify Qt frameworks before packing
         echo ""
         echo "=== Pre-pack verification ==="
@@ -507,6 +543,29 @@ if [[ ${LinkOption} == "dynamic" ]]; then
         fi
         if [ "${QT_FW_IN_LIB}" -lt 5 ]; then
             echo "WARNING: Very few Qt frameworks in lib/. CLI tools may not work."
+        fi
+
+        # Hard-fail if any developer-machine absolute rpath survived the strip step.
+        echo "Verifying no developer-machine rpaths leak into the package..."
+        LEAKED=$(
+            { for f in ${BasePath}/out/${BuildName}/bin/*.app/Contents/MacOS/*; do
+                  [ -f "$f" ] && otool -l "$f" 2>/dev/null
+              done
+              for f in ${BasePath}/out/${BuildName}/bin/*; do
+                  [ -f "$f" ] && [ -x "$f" ] && otool -l "$f" 2>/dev/null
+              done
+              for f in ${BasePath}/out/${BuildName}/lib/*.dylib; do
+                  [ -f "$f" ] && otool -l "$f" 2>/dev/null
+              done
+            } | awk '/cmd LC_RPATH/{f=1; next} f && /path /{print $2; f=0}' \
+              | grep -E '^/(Users|opt/homebrew|usr/local)/' | sort -u || true
+        )
+        if [ -n "${LEAKED}" ]; then
+            echo "ERROR: developer-machine rpaths still present in shipped binaries:"
+            printf '  %s\n' ${LEAKED}
+            [[ ${MockText} == "" ]] && exit 1
+        else
+            echo "  OK: no absolute developer rpaths remain."
         fi
         echo "Total output size:"
         du -sh ${BasePath}/out/${BuildName}/bin/ ${BasePath}/out/${BuildName}/lib/ 2>/dev/null
