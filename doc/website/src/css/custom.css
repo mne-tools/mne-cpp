@@ -527,11 +527,31 @@ html {
     }
 }
 
-/* Hide version badge and GitHub icon from the hamburger sidebar menu
-   (they are only relevant on the desktop top bar) */
-.navbar-sidebar .navbar-version-item,
-.navbar-sidebar .header-github-link {
+/* Hide version badge from the hamburger sidebar menu
+   (only relevant on the desktop top bar) */
+.navbar-sidebar .navbar-version-item {
     display: none !important;
+}
+
+/* GitHub link in the hamburger sidebar — show as a labeled icon link.
+   By default Docusaurus only renders an empty <a> for icon-only navbar
+   items, which disappears in the vertical mobile menu. Force a visible
+   "GitHub" label and align the icon with the other sidebar entries. */
+.navbar-sidebar .header-github-link {
+    display: flex !important;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.navbar-sidebar .header-github-link::after {
+    content: 'GitHub';
+    font-weight: 500;
+}
+
+.navbar-sidebar .header-github-link::before {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
 }
 
 /* Responsive */
