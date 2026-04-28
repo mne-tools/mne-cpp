@@ -70,62 +70,53 @@ RawSettings::~RawSettings()
 
 //*************************************************************************************************************
 
+void RawSettings::writeMainWindow()
+{
+    m_qSettings.beginGroup("MainWindow");
+    m_qSettings.setValue("size", QSize(m_mainwindow_size_w, m_mainwindow_size_h));
+    m_qSettings.setValue("position", QPoint(m_mainwindow_position_x, m_mainwindow_position_y));
+    m_qSettings.endGroup();
+}
+
+
+//*************************************************************************************************************
+
+void RawSettings::writeEventColors()
+{
+    m_qSettings.beginGroup("EventDesignParameters");
+    m_qSettings.setValue("event_color_default", QVariant(m_event_color_default));
+    m_qSettings.setValue("event_color_1",       QVariant(m_event_color_1));
+    m_qSettings.setValue("event_color_2",       QVariant(m_event_color_2));
+    m_qSettings.setValue("event_color_3",       QVariant(m_event_color_3));
+    m_qSettings.setValue("event_color_4",       QVariant(m_event_color_4));
+    m_qSettings.setValue("event_color_5",       QVariant(m_event_color_5));
+    m_qSettings.setValue("event_color_32",      QVariant(m_event_color_32));
+    m_qSettings.setValue("event_color_998",     QVariant(m_event_color_998));
+    m_qSettings.setValue("event_color_999",     QVariant(m_event_color_999));
+    m_qSettings.endGroup();
+}
+
+
+//*************************************************************************************************************
+
+void RawSettings::writeDataMarker()
+{
+    m_qSettings.beginGroup("DataMarker");
+    m_qSettings.setValue("data_marker_color", QVariant(m_data_marker_color));
+    m_qSettings.endGroup();
+}
+
+
+//*************************************************************************************************************
+
 void RawSettings::write()
 {
-    //MainWindow
-    //ToDo: ask for already stored setting in OS environment before setting them
-    //e.g. if(!m_qSettings.contains("RawModel/window_size")) m_qSettings.setValue("window_size",MODEL_WINDOW_SIZE);
-
-    //Window settings
-    m_qSettings.beginGroup("MainWindow");
-
-        m_qSettings.setValue("size",QSize(m_mainwindow_size_w, m_mainwindow_size_h));
-        m_qSettings.setValue("position",QPoint(m_mainwindow_position_x, m_mainwindow_position_y));
-
-    m_qSettings.endGroup();
-
-    //EventDesignParameters
-    m_qSettings.beginGroup("EventDesignParameters");
-
-        //Event colors
-        QVariant variant;
-        variant = m_event_color_default;
-        m_qSettings.setValue("event_color_default",variant);
-
-        variant = m_event_color_1;
-        m_qSettings.setValue("event_color_1",variant);
-
-        variant = m_event_color_2;
-        m_qSettings.setValue("event_color_2",variant);
-
-        variant = m_event_color_3;
-        m_qSettings.setValue("event_color_3",variant);
-
-        variant = m_event_color_4;
-        m_qSettings.setValue("event_color_4",variant);
-
-        variant = m_event_color_5;
-        m_qSettings.setValue("event_color_5",variant);
-
-        variant = m_event_color_32;
-        m_qSettings.setValue("event_color_32",variant);
-
-        variant = m_event_color_998;
-        m_qSettings.setValue("event_color_998",variant);
-
-        variant = m_event_color_999;
-        m_qSettings.setValue("event_color_999",variant);
-
-    m_qSettings.endGroup();
-
-    //Data window marker
-    m_qSettings.beginGroup("DataMarker");
-
-        //data marker color and width colors
-        variant = m_data_marker_color;
-        m_qSettings.setValue("data_marker_color",variant);
-
-    m_qSettings.endGroup();
+    // Split into per-group helpers — works around an Apple clang 17
+    // (clang-1700.6.3.2) frontend crash (Trace/BPT trap: 5) that triggers
+    // when the entire write() body is processed as one large function.
+    writeMainWindow();
+    writeEventColors();
+    writeDataMarker();
 }
 
 

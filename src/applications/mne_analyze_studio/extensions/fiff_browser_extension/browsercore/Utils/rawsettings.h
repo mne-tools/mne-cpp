@@ -159,6 +159,10 @@ public:
     void write();
 
 private:
+    void writeMainWindow();
+    void writeEventColors();
+    void writeDataMarker();
+
     QSettings m_qSettings;  /**< QSettings object that initializes all the RawSettings */
 
     //=========================================================================================================
