@@ -3,7 +3,13 @@
 Internal developer reference. Compares mne-cpp against MNE-C (SVN) and MNE-Python
 to identify all features and algorithms not yet ported.
 
-Last updated: 26 April 2026 (post-v2.2.0 sweep — connectivity directed measures + sts cluster permutation tests / TFCE marked done)
+Last updated: 28 April 2026 (v2.3.0 planning sweep — gaps prioritised against
+v2.3.0 release story; see [v2.3.0-requirements.md](v2.3.0-requirements.md) for
+the seven-pillar plan: Pillar 0 = MNE Inspect multimodal viz (sEEG/ECoG/MRI/
+source overlay) — **HIGHEST PRIORITY**, Pillar A = MNE Scan production
+hardening, Pillar B = mne_analyze cortical workflow, Pillar C = mne_analyze_studio,
+Pillar D = MNE-Python algorithm parity push, Pillar E = mne-mna Python pkg,
+Pillar F = NeuralSet interop)
 
 ---
 
