@@ -22,6 +22,22 @@ jobs:
         with:
           python-version: '3.10'
           architecture: 'x64'
+      - name: Install system dependencies
+        run: |
+          # Drop the Microsoft/Azure apt sources that occasionally 401 on
+          # ubuntu-24.04 runners; they are not needed here.
+          sudo rm -f /etc/apt/sources.list.d/microsoft-*.list \
+                     /etc/apt/sources.list.d/azure-*.list \
+                     /etc/apt/sources.list.d/microsoft-*.sources \
+                     /etc/apt/sources.list.d/azure-*.sources
+          sudo apt-get update -q
+          # libgl1-mesa-dev is required for Qt6's Gui module to be detected
+          # by find_package; libvulkan-dev mirrors the regular Linux build.
+          sudo apt-get install -q -y \
+            build-essential \
+            ninja-build \
+            libgl1-mesa-dev \
+            libvulkan-dev
       - name: Download Qt toolchain
         env:
           GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
@@ -39,8 +55,9 @@ jobs:
             --kind eigen \
             --version "5.0.1" \
             --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
-      - name: Coverity scripts
+      - name: Coverity scan
         run: |
           ./scripts/test/coverity_scan.sh "$COVTOKEN"
         env:
           COVTOKEN: ${{ secrets.COVERITY_TOKEN }}
+
