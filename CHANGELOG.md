@@ -2,6 +2,18 @@
 
 All notable changes to MNE-CPP will be documented in this file.
 
+## [2.2.1] - 2026-04-28
+
+### Bug Fixes
+
+- **mne_inspect — STC scrolling broken on desktop** (regression introduced in 2.2.0). Scrubbing the STC time-slider froze playback, produced flicker / "stretched-triangle" geometry artefacts, and could crash the application after a few seconds.
+  - Root cause: commit `b58c18a8c2` ("Energy/computational savings…") switched the per-surface vertex buffer from `QRhiBuffer::Immutable` to `QRhiBuffer::Dynamic` to enable in-place colour updates. `Dynamic` is documented for *small, frequently-updated* payloads (UBOs, a few hundred bytes); using it for a multi-MB brain-surface VBO triggers two failure modes on Metal/Vulkan:
+    1. Each in-flight frame slot keeps its own physical buffer. Skipping the per-frame `updateDynamicBuffer()` (because `m_gpu->dirty` was false) caused the GPU to sample the wrong slot — visible as stuck frames and wildly out-of-range vertex positions.
+    2. Allocating a 4-5 MB Dynamic buffer × in-flight slots × every visible surface multiplied GPU memory pressure by roughly 3×, leading to allocation failures during interactive scrubbing.
+  - The WebAssembly build was unaffected because the WASM merged-surface renderer uses `Immutable` buffers re-uploaded every frame.
+  - Fix: revert just the desktop VBO type to `QRhiBuffer::Immutable` (re-created when vertex data is dirty). All other improvements from `b58c18a8c2` (demand-driven render, cached vertex count, IBO upload gating, removal of redundant `updateBuffers` in `renderSurface`) are kept.
+  - Files: `src/libraries/disp3D/renderable/brainsurface.cpp`.
+
 ## [2.2.0] - 2026-04-26
 
 ### Highlights

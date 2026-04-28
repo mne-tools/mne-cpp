@@ -12,7 +12,7 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
-  MNE_CPP_VERSION: "2.2.0"
+  MNE_CPP_VERSION: "2.2.1"
 
 jobs:
   LinuxSDK:

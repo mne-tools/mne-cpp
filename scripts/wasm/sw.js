@@ -1,6 +1,6 @@
 // MNE Inspect Service Worker
 // Combines COOP/COEP header injection with offline caching
-const CACHE_VERSION = 'mne-inspect-v2.2.0';
+const CACHE_VERSION = 'mne-inspect-v2.2.1';
 
 const PRECACHE_ASSETS = [
   './',

@@ -4,7 +4,7 @@ project(mne_cpp LANGUAGES CXX)
 
 set(MNE_CPP_VERSION_MAJOR 2)
 set(MNE_CPP_VERSION_MINOR 2)
-set(MNE_CPP_VERSION_PATCH 0)
+set(MNE_CPP_VERSION_PATCH 1)
 set(MNE_CPP_VERSION "${MNE_CPP_VERSION_MAJOR}.${MNE_CPP_VERSION_MINOR}.${MNE_CPP_VERSION_PATCH}")
 
 # Make the project version available as a compile definition for CLI tools

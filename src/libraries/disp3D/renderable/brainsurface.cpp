@@ -520,44 +520,53 @@ void BrainSurface::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
         return;
     }
 #else
+    // Desktop: VBO is Immutable.  Nothing to do unless the data has
+    // actually changed (markVertexDirty()) or the buffer hasn't been
+    // created yet.  When dirty we recreate the VBO below to swap in the
+    // new vertex data — this is intentional: an Immutable buffer cannot
+    // be partially updated, and STC colour animation modifies the colour
+    // channel of every vertex anyway.
     if (!m_gpu->dirty && !needsCreate) return;
 #endif
 
     const quint32 vbufSize = m_vertexData.size() * sizeof(VertexData);
     const quint32 ibufSize = m_indexData.size() * sizeof(uint32_t);
 
-    if (!m_gpu->vertexBuffer) {
-        // Use Dynamic VBO on desktop: allows in-place updateDynamicBuffer()
-        // for STC animation colour updates without buffer destroy/recreate.
-        // WASM uses merged per-category buffers, so this path is only
-        // relevant for desktop (where it's Immutable as a fallback).
 #ifdef __EMSCRIPTEN__
+    if (!m_gpu->vertexBuffer) {
         m_gpu->vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, vbufSize));
-#else
-        m_gpu->vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::VertexBuffer, vbufSize));
-#endif
         m_gpu->vertexBuffer->create();
         m_gpu->indexDirty = true; // new VBO implies IBO also needs upload
     }
+#else
+    // Desktop: recreate the Immutable VBO whenever data is dirty so the
+    // new vertex contents take effect.  Using Immutable (re-created on
+    // change) instead of QRhiBuffer::Dynamic avoids two issues with
+    // Dynamic buffers on Metal/Vulkan for multi-MB vertex data:
+    //   1) Dynamic is documented as intended for small, frequently-updated
+    //      payloads (UBOs); large Dynamic buffers exhibit unstable
+    //      behaviour across in-flight slot rotation, including stale-slot
+    //      reads (frozen STC frames) and out-of-range geometry artefacts
+    //      ("stretched triangle" glitches).
+    //   2) Each in-flight frame slot allocates its own physical buffer,
+    //      multiplying memory pressure ~3x for every visible surface.
+    if (!m_gpu->vertexBuffer || m_gpu->dirty) {
+        m_gpu->vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, vbufSize));
+        m_gpu->vertexBuffer->create();
+        m_gpu->indexDirty = true; // new VBO implies IBO also needs upload
+    }
+#endif
     if (!m_gpu->indexBuffer) {
         m_gpu->indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, ibufSize));
         m_gpu->indexBuffer->create();
         m_gpu->indexDirty = true;
     }
 
-#ifdef __EMSCRIPTEN__
     u->uploadStaticBuffer(m_gpu->vertexBuffer.get(), m_vertexData.constData());
-    u->uploadStaticBuffer(m_gpu->indexBuffer.get(), m_indexData.constData());
-#else
-    // Desktop: Dynamic VBO — in-place update, no buffer recreation.
-    // Only re-upload IBO when topology actually changed (initial load,
-    // geometry swap).  STC colour animation only touches the VBO.
-    u->updateDynamicBuffer(m_gpu->vertexBuffer.get(), 0, vbufSize, m_vertexData.constData());
     if (m_gpu->indexDirty) {
         u->uploadStaticBuffer(m_gpu->indexBuffer.get(), m_indexData.constData());
         m_gpu->indexDirty = false;
     }
-#endif
     m_gpu->dirty = false;
 }
 
