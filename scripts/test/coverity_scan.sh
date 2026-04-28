@@ -20,13 +20,16 @@ BaseFolder="$(cleanAbsPath "$ScriptPath/../..")"
 COV_WORKING_PATH="${BaseFolder}/cov_scan"
 COVERITY_SCAN_BUILD_PATH="${COV_WORKING_PATH}/build"
 RESULTS_DIR="${COV_WORKING_PATH}/cov-int"
-# Limit the scan to MNE-CPP's own libraries. Including the GUI applications
-# (mne_scan / mne_analyze* / mne_inspect / mne_browse / mne_dipole_fit) and
-# their generated UI/MOC translation units roughly tripled the cov-int
-# tarball and pushed it past the Coverity Scan upload limit (HTTP 413).
-# Library coverage is the primary security-relevant surface anyway.
+# Scan everything we ship: libraries, the GUI applications, and the
+# command-line tools. third-party code under src/external is intentionally
+# excluded — it is upstream code we do not own and Coverity findings on it
+# would just generate noise. The pre-upload size guard below will catch the
+# day a large new application pushes us past the Coverity Scan 500 MiB
+# upload cap; if that happens we will need to drop a sub-tree again.
 COVERITY_SCAN_WHITELIST=(
     "${BaseFolder}/src/libraries"
+    "${BaseFolder}/src/applications"
+    "${BaseFolder}/src/tools"
 )
 
 echo -e "Coverity working path: ${COV_WORKING_PATH}"
@@ -48,8 +51,8 @@ declare -a COVERITY_SCAN_CONFIGURE_COMMAND=(
     -S "${BaseFolder}/src"
     -DCMAKE_BUILD_TYPE=Release
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-    -DBUILD_APPLICATIONS=OFF
-    -DBUILD_TOOLS=OFF
+    -DBUILD_APPLICATIONS=ON
+    -DBUILD_TOOLS=ON
     -DBUILD_EXAMPLES=OFF
     -DBUILD_TESTS=OFF
 )
@@ -167,7 +170,7 @@ response=$(curl \
   --form email=$COVERITY_SCAN_NOTIFICATION_EMAIL \
   --form file=@$RESULTS_ARCHIVE \
   --form version=$SHA \
-  --form description="GitHub Actions build (${COVERITY_SCAN_BRANCH_PATTERN}, whitelist: libraries)" \
+  --form description="GitHub Actions build (${COVERITY_SCAN_BRANCH_PATTERN}, whitelist: libraries + applications + tools)" \
   $UPLOAD_URL)
 echo "$response"
 status_code=$(echo "$response" | sed -n '$p')
