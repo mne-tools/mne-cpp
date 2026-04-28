@@ -1,0 +1,97 @@
+---
+title: mne_make_movie
+sidebar_label: mne_make_movie
+---
+
+# mne_make_movie
+
+## Overview
+
+`mne_make_movie` renders source-estimate activity overlaid on a FreeSurfer cortical surface and exports each time frame as a PNG image. The resulting frame sequence can then be assembled into a movie with external tools such as `ffmpeg`.
+
+The tool can either consume a precomputed STC file pair (`--stcin`) or compute the source estimate on the fly from an inverse operator and a measurement file (`--inv` + `--meas`). In addition to PNG rendering it can extract per-label time courses to a text file for downstream analysis.
+
+This is a C++ port of the original MNE-C `mne_make_movie` utility by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_make_movie [options]
+```
+
+## Options
+
+### Input
+
+| Option | Description |
+|---|---|
+| `--stcin <prefix>` | Input STC file prefix (left hemisphere assumed; `-rh.stc` auto-loaded) |
+| `--inv <file>` | Inverse operator file (alternative to `--stcin`: compute on the fly) |
+| `--meas <file>` | Measurement file (used with `--inv`) |
+| `--set <number>` | Data set number (default: `0`) |
+| `--snr <value>` | SNR for inverse regularization (default: `3.0`) |
+| `--method <name>` | Inverse method: `MNE`, `dSPM`, `sLORETA` (default: `dSPM`) |
+
+### Time range
+
+| Option | Description |
+|---|---|
+| `--tmin <seconds>` | Start time |
+| `--tmax <seconds>` | End time |
+| `--tstep <seconds>` | Time step between frames |
+
+### Surface and view
+
+| Option | Description |
+|---|---|
+| `--subject <name>` | FreeSurfer subject name |
+| `--subjects-dir <dir>` | FreeSurfer `SUBJECTS_DIR` (default: `$SUBJECTS_DIR`) |
+| `--surface <name>` | Surface to render on (default: `inflated`) |
+| `--lh` | Left hemisphere only |
+| `--rh` | Right hemisphere only |
+| `--view <name>` | View: `lat`, `med`, `dor`, `ven`, `ros`, `cau` (default: `lat`) |
+
+### Color scale
+
+| Option | Description |
+|---|---|
+| `--fthresh <value>` | Activation threshold (default: `3.0`) |
+| `--fmid <value>` | Mid-scale value (default: `6.0`) |
+| `--fmax <value>` | Maximum scale value (default: `10.0`) |
+| `--signed` | Show signed values (positive + negative) |
+
+### Output
+
+| Option | Description |
+|---|---|
+| `--png <prefix>` | Output PNG prefix |
+| `--width <pixels>` | Image width (default: `800`) |
+| `--height <pixels>` | Image height (default: `600`) |
+| `--label <file>` | Label file(s) for ROI extraction (may be repeated) |
+| `--labelout <file>` | Output text file for label time courses |
+
+## Example
+
+Render dSPM frames between 50 ms and 200 ms in 10 ms steps from an existing STC pair:
+
+```bash
+mne_make_movie \
+    --stcin sample-dSPM \
+    --subject sample --subjects-dir $SUBJECTS_DIR \
+    --tmin 0.050 --tmax 0.200 --tstep 0.010 \
+    --view lat --png frames/sample-dSPM-
+```
+
+Then assemble a movie with `ffmpeg`:
+
+```bash
+ffmpeg -framerate 10 -pattern_type glob \
+       -i 'frames/sample-dSPM-*.png' \
+       -c:v libx264 -pix_fmt yuv420p sample-dSPM.mp4
+```
+
+## See Also
+
+- [mne_compute_mne](tools-compute-mne) — Compute MNE/dSPM/sLORETA source estimates
+- [mne_process_stc](tools-process-stc) — Scale, export, or copy STC files
+- [mne_smooth](tools-smooth) — Spatial smoothing for cortical source estimates

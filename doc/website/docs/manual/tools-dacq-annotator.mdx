@@ -1,0 +1,68 @@
+---
+title: mne_dacq_annotator
+sidebar_label: mne_dacq_annotator
+---
+
+# mne_dacq_annotator
+
+## Overview
+
+`mne_dacq_annotator` is a command-line tool for creating, listing, and editing event annotations associated with FIFF MEG/EEG measurement files.
+
+Events are stored in the standard MNE event-file format — a three-column representation `(sample, before, after)` with optional comment fields. Events can be added explicitly by sample number or extracted automatically from a stimulus channel using a configurable threshold.
+
+The original MNE-C `mne_dacq_annotator` was a Motif/X11 GUI tool used for real-time annotation during MEG acquisition. This C++ port keeps the same annotation model but exposes it as a scriptable command-line utility.
+
+## Usage
+
+```bash
+mne_dacq_annotator [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--meas <file>` | Input FIFF measurement file |
+| `--events <file>` | Event file to read/edit (default: `<meas>-eve.fif`) |
+| `--add <spec>` | Add event; `spec` is `sample:before:after[:comment]` |
+| `--remove <sample>` | Remove the event at the given sample number |
+| `--list` | List all events in the file |
+| `--out <file>` | Output event file (default: overwrite `--events`) |
+| `--stim-ch <name>` | Extract events from the named stimulus channel |
+| `--thresh <value>` | Threshold for stimulus-channel extraction (default: `1.0`) |
+| `--help` | Print help |
+| `--version` | Print version |
+
+`--add` and `--remove` may be repeated to apply multiple edits in a single invocation.
+
+## Examples
+
+List all events stored next to a measurement file:
+
+```bash
+mne_dacq_annotator --meas sample_audvis_raw.fif --list
+```
+
+Add a manual annotation at sample 12345 with a 50-sample lead-in / 100-sample lead-out:
+
+```bash
+mne_dacq_annotator \
+    --meas sample_audvis_raw.fif \
+    --add 12345:50:100:button_press \
+    --out sample_audvis-eve.fif
+```
+
+Extract events from `STI 014` using a 0.5 V threshold:
+
+```bash
+mne_dacq_annotator \
+    --meas sample_audvis_raw.fif \
+    --stim-ch "STI 014" --thresh 0.5 \
+    --out sample_audvis-eve.fif
+```
+
+## See Also
+
+- [mne_add_triggers](tools-add-triggers) — Add trigger events from a text file
+- [mne_fix_stim14](tools-fix-stim14) — Recompute the combined STI 014 channel

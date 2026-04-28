@@ -1,0 +1,49 @@
+---
+title: mne_convert_ncov
+sidebar_label: mne_convert_ncov
+---
+
+# mne_convert_ncov
+
+## Overview
+
+`mne_convert_ncov` converts a noise covariance matrix stored in the legacy MNE ASCII `ncov` format into a standard FIFF covariance file.
+
+The `ncov` format starts with a `#!ascii` magic line, followed by a `nmeg neeg nfree` dimensions line, and the full symmetric covariance matrix in row-major order. Channel names are taken from a FIFF measurement file. The `--meg` and `--eeg` flags select which sensor groups to keep in the output.
+
+This is a C++ port of the original MNE-C `mne_convert_ncov` utility by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_convert_ncov [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--ncov <file>` | Input ncov ASCII covariance file |
+| `--meas <file>` | Measurement FIFF file used for channel names |
+| `--cov <file>` | Output FIFF covariance file (default: `<ncov-stem>.fif`) |
+| `--meg` | Include MEG channels |
+| `--eeg` | Include EEG channels |
+| `--help` | Print help |
+| `--version` | Print version |
+
+If neither `--meg` nor `--eeg` is given, both channel groups are included.
+
+## Example
+
+```bash
+mne_convert_ncov \
+    --ncov sample-noise.ncov \
+    --meas sample_audvis_raw.fif \
+    --cov sample-noise-cov.fif \
+    --meg --eeg
+```
+
+## See Also
+
+- [mne_convert_lspcov](tools-convert-lspcov) — Convert LISP-format covariance to FIFF
+- [mne_cov2proj](tools-cov2proj) — Derive SSP projectors from a noise covariance

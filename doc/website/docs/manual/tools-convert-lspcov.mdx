@@ -1,0 +1,47 @@
+---
+title: mne_convert_lspcov
+sidebar_label: mne_convert_lspcov
+---
+
+# mne_convert_lspcov
+
+## Overview
+
+`mne_convert_lspcov` converts a covariance matrix stored in the LISP S-expression format produced by external graph tools into a standard FIFF covariance file.
+
+The tool reads the symmetric matrix from the LISP file, matches its rows and columns against the channel information taken from a FIFF measurement file, and writes either a FIFF covariance file, a plain ASCII text file, or both.
+
+This is a C++ port of the original MNE-C `mne_convert_lspcov` utility by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_convert_lspcov [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--lspcov <file>` | Input LISP-format covariance file |
+| `--meas <file>` | Measurement FIFF file used for channel names |
+| `--out <file>` | Output FIFF covariance file |
+| `--outasc <file>` | Output text (ASCII) covariance file |
+| `--help` | Print help |
+| `--version` | Print version |
+
+At least one of `--out` or `--outasc` must be specified.
+
+## Example
+
+```bash
+mne_convert_lspcov \
+    --lspcov sample-cov.lisp \
+    --meas sample_audvis_raw.fif \
+    --out sample-cov.fif
+```
+
+## See Also
+
+- [mne_convert_ncov](tools-convert-ncov) — Convert legacy MNE ASCII noise covariance to FIFF
+- [mne_cov2proj](tools-cov2proj) — Derive SSP projectors from a noise covariance

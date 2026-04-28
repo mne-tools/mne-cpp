@@ -114,6 +114,7 @@ const sidebars: SidebarsConfig = {
                                 'manual/tools-process-stc',
                                 'manual/tools-make-uniform-stc',
                                 'manual/tools-map-data',
+                                'manual/tools-make-movie',
                             ],
                         },
                         {
@@ -137,6 +138,7 @@ const sidebars: SidebarsConfig = {
                                 'manual/tools-fix-stim14',
                                 'manual/tools-make-derivations',
                                 'manual/tools-toggle-skips',
+                                'manual/tools-dacq-annotator',
                             ],
                         },
                         {
@@ -157,6 +159,8 @@ const sidebars: SidebarsConfig = {
                                 'manual/tools-convert-ctf-markers',
                                 'manual/tools-epochs2mat',
                                 'manual/tools-mna-bids-converter',
+                                'manual/tools-convert-lspcov',
+                                'manual/tools-convert-ncov',
                             ],
                         },
                         {

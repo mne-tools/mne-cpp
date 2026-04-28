@@ -49,12 +49,16 @@ const funders = [
     { name: 'Azure', logo: 'img/funding_logos/azure.png', url: 'https://azure.microsoft.com/' },
 ];
 
+// Commit counts mirror the GitHub contributors graph
+// (https://github.com/mne-tools/mne-cpp/graphs/contributors), sorted by
+// commits descending. Bot/AI accounts (dependabot[bot], claude) are
+// intentionally excluded. Last refreshed: 2026-04-28.
 const contributors = [
-    { login: 'LorenzE', contributions: 3904 },
-    { login: 'chdinh', contributions: 3011 },
-    { login: 'gabrielbmotta', contributions: 1326 },
-    { login: 'juangpc', contributions: 1207 },
-    { login: 'RDoerfel', contributions: 626 },
+    { login: 'chdinh', contributions: 3910 },
+    { login: 'LorenzE', contributions: 3907 },
+    { login: 'gabrielbmotta', contributions: 1518 },
+    { login: 'juangpc', contributions: 1345 },
+    { login: 'RDoerfel', contributions: 691 },
     { login: '1DIce', contributions: 267 },
     { login: 'LostSign', contributions: 194 },
     { login: 'ViktorKL', contributions: 179 },
@@ -69,23 +73,23 @@ const contributors = [
     { login: 'farndt', contributions: 39 },
     { login: 'imsorryk', contributions: 35 },
     { login: 'louiseichhorst', contributions: 20 },
+    { login: 'johaenns', contributions: 20 },
     { login: 'femigr', contributions: 17 },
-    { login: 'johaenns', contributions: 14 },
     { login: 'jobehrens', contributions: 12 },
     { login: 'cdoshi', contributions: 12 },
     { login: 'cpieloth', contributions: 11 },
     { login: 'alexrockhill', contributions: 10 },
+    { login: 'ag-fieldline', contributions: 10 },
     { login: 'buildqa', contributions: 9 },
     { login: 'SachdevaS', contributions: 7 },
-    { login: 'er06645810', contributions: 6 },
     { login: 'mfarisyahya', contributions: 6 },
-    { login: 'ag-fieldline', contributions: 5 },
-    { login: 'betaha', contributions: 4 },
-    { login: 'Julius-L', contributions: 4 },
-    { login: 'MKlamke', contributions: 4 },
+    { login: 'er06645810', contributions: 6 },
     { login: 'fjpolo', contributions: 4 },
-    { login: 'benkay86', contributions: 3 },
+    { login: 'betaha', contributions: 4 },
+    { login: 'MKlamke', contributions: 4 },
+    { login: 'Julius-L', contributions: 4 },
     { login: 'jasmainak', contributions: 3 },
+    { login: 'benkay86', contributions: 3 },
     { login: 'PetrosSimidyan', contributions: 3 },
     { login: 'larsoner', contributions: 2 },
 ];
