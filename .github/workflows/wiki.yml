@@ -1,0 +1,88 @@
+name: Wiki
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Sync doc/wiki/  →  github.com/mne-tools/mne-cpp.wiki.git
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Triggered on:
+#   • push to main that touches doc/wiki/** or this workflow file
+#   • manual dispatch
+#
+# The job clones the wiki repo, mirrors doc/wiki/ into it, and pushes if
+# anything changed. Files in doc/wiki/ are the single source of truth — direct
+# edits via the GitHub Wiki UI are overwritten on the next push to main.
+# ═══════════════════════════════════════════════════════════════════════════
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'doc/wiki/**'
+      - '.github/workflows/wiki.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: wiki
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Sync doc/wiki/ to wiki repo
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          if [ ! -d doc/wiki ] || [ -z "$(ls -A doc/wiki 2>/dev/null)" ]; then
+            echo "::error::doc/wiki/ is empty or missing — refusing to wipe wiki"
+            exit 1
+          fi
+
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          WIKI_URL="https://x-access-token:${GH_TOKEN}@github.com/${REPO}.wiki.git"
+          WORK_DIR="$(mktemp -d)"
+
+          # The wiki repo may not exist yet (never initialised). Try to clone;
+          # if that fails, init an empty repo and push to create it.
+          if git clone --depth 1 "$WIKI_URL" "$WORK_DIR" 2>/dev/null; then
+            echo "Cloned existing wiki."
+          else
+            echo "Wiki repo not initialised — creating."
+            git -C "$WORK_DIR" init -b master
+            git -C "$WORK_DIR" remote add origin "$WIKI_URL"
+          fi
+
+          # Mirror doc/wiki/ → wiki working tree (delete files removed in source).
+          rsync -a --delete \
+            --exclude='.git' \
+            doc/wiki/ "$WORK_DIR/"
+
+          cd "$WORK_DIR"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No wiki changes to publish."
+            exit 0
+          fi
+
+          SHORT_SHA="$(echo "$SHA" | cut -c1-12)"
+          git commit -m "Sync wiki from ${REPO}@${SHORT_SHA}" \
+                     -m "Triggered by @${ACTOR}. Source: doc/wiki/ — edit there, not here."
+
+          # Push; if the remote rejects (e.g. fresh repo on default branch),
+          # fall back to the appropriate default branch name.
+          if ! git push origin HEAD:master 2>/dev/null; then
+            git push origin HEAD:main
+          fi
