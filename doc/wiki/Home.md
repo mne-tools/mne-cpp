@@ -1,26 +1,26 @@
-# Welcome to the MNE-CPP wiki
+# MNE-CPP wiki
 
 **MNE-CPP** is an open-source, cross-platform C++17 framework for the
-acquisition, processing, and visualization of MEG / EEG / sEEG / fNIRS data —
+acquisition, processing, and visualization of MEG / EEG / sEEG / fNIRS data,
 designed for real-time clinical and research workflows.
 
-> 📖 The **authoritative documentation lives on the project website**.
-> This wiki is a curated index of *where to find what*.
+The authoritative documentation lives on the [project website](https://mne-cpp.github.io).
+This wiki is a curated index of where to find what.
 
 ---
 
-## 🚀 Get started in 60 seconds
+## Get started
 
 | Step | Where to go |
 |------|-------------|
-| 1 — Install a binary | **[Downloads](https://mne-cpp.github.io/pages/install/binaries)** (Linux / macOS / Windows installers, plus a [WebAssembly demo](https://mne-cpp.github.io/wasm/))|
-| 2 — Open sample data  | **[Sample dataset](https://mne-cpp.github.io/docs/manual/sample-dataset)** |
-| 3 — First MNE Inspect session | **[Inspect quickstart](https://mne-cpp.github.io/docs/manual/inspect)** |
-| 4 — Build from source | **[Developer setup](https://mne-cpp.github.io/docs/development/setup)** |
+| Install a binary | [Downloads](https://mne-cpp.github.io/pages/install/binaries) — Linux, macOS, Windows installers, plus a [WebAssembly demo](https://mne-cpp.github.io/wasm/) |
+| Open sample data | [Sample dataset](https://mne-cpp.github.io/docs/manual/sample-dataset) |
+| First MNE Inspect session | [Inspect quickstart](https://mne-cpp.github.io/docs/manual/inspect) |
+| Build from source | [Developer setup](https://mne-cpp.github.io/docs/development/setup) |
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 | Resource | Link |
 |----------|------|
@@ -30,11 +30,11 @@ designed for real-time clinical and research workflows.
 | C++ API reference (Doxygen) | https://mne-cpp.github.io/api |
 | MNA / MNX format specification | https://mne-cpp.github.io/docs/manual/mna-format |
 | FIFF format reference | https://mne-cpp.github.io/docs/manual/fiff-format |
-| 82 CLI tools overview | https://mne-cpp.github.io/docs/manual/tools-overview |
+| Command-line tools overview | https://mne-cpp.github.io/docs/manual/tools-overview |
 
 ---
 
-## 💾 Downloads & releases
+## Downloads and releases
 
 | Channel | Link |
 |---------|------|
@@ -46,10 +46,10 @@ designed for real-time clinical and research workflows.
 
 ---
 
-## 🎓 Cite MNE-CPP
+## Citation
 
 If you use MNE-CPP in academic work, please cite the framework. The
-**concept DOI** always resolves to the latest version:
+concept DOI always resolves to the latest version:
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.593102.svg)](https://doi.org/10.5281/zenodo.593102)
 
@@ -64,13 +64,14 @@ If you use MNE-CPP in academic work, please cite the framework. The
 ```
 
 A machine-readable [`CITATION.cff`](https://github.com/mne-tools/mne-cpp/blob/main/CITATION.cff)
-ships in the repository root — GitHub's *Cite this repository* button uses it.
+ships in the repository root and is consumed by GitHub's *Cite this repository*
+button.
 
 Full publication list: https://mne-cpp.github.io/docs/cite
 
 ---
 
-## 🤝 Community & support
+## Community and support
 
 | Channel | Purpose |
 |---------|---------|
@@ -79,23 +80,23 @@ Full publication list: https://mne-cpp.github.io/docs/cite
 | [Pull requests](https://github.com/mne-tools/mne-cpp/pulls) | Code contributions |
 | [`CONTRIBUTING.md`](https://github.com/mne-tools/mne-cpp/blob/main/CONTRIBUTING.md) | How to contribute |
 | [`CODE_OF_CONDUCT.md`](https://github.com/mne-tools/mne-cpp/blob/main/CODE_OF_CONDUCT.md) | Community standards |
-| MNE-Python community | https://mne.tools (sister project — shared formats and concepts) |
+| MNE-Python community | https://mne.tools — sister project, shared formats and concepts |
 
 ---
 
-## 🛠️ For maintainers
+## For maintainers
 
-- **[Release process](Release-Process)** — how to cut a new MNE-CPP release.
-- **[Roadmap](Roadmap)** — current release plans (v2.2.0 → v2.3.0).
-- **CI dashboards:** [Staging](https://github.com/mne-tools/mne-cpp/actions/workflows/staging.yml)
+- [Release process](Release-Process) — how to cut a new MNE-CPP release.
+- [Roadmap](Roadmap) — current release plans (v2.2.0 to v2.3.0).
+- CI dashboards: [Staging](https://github.com/mne-tools/mne-cpp/actions/workflows/staging.yml)
   · [Release](https://github.com/mne-tools/mne-cpp/actions/workflows/main.yml)
   · [CodeQL](https://github.com/mne-tools/mne-cpp/actions/workflows/codeql.yml)
   · [Coverity](https://github.com/mne-tools/mne-cpp/actions/workflows/coverity.yml)
-- **Coverage:** [![codecov](https://codecov.io/gh/mne-tools/mne-cpp/branch/main/graph/badge.svg)](https://codecov.io/gh/mne-tools/mne-cpp)
+- Coverage: [![codecov](https://codecov.io/gh/mne-tools/mne-cpp/branch/main/graph/badge.svg)](https://codecov.io/gh/mne-tools/mne-cpp)
 
 ---
 
-## 🔗 Sister & upstream projects
+## Sister and upstream projects
 
 | Project | Relationship |
 |---------|--------------|
@@ -108,9 +109,9 @@ Full publication list: https://mne-cpp.github.io/docs/cite
 
 ---
 
-> 📝 *This wiki is generated from
-> [`doc/wiki/`](https://github.com/mne-tools/mne-cpp/tree/main/doc/wiki) in the
-> main repo and auto-deployed by the
-> [`wiki.yml`](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/wiki.yml)
-> workflow on every push to `main`. Edit those files via PR — direct edits to
-> the wiki UI will be overwritten.*
+*This wiki is generated from
+[`doc/wiki/`](https://github.com/mne-tools/mne-cpp/tree/main/doc/wiki) in the
+main repo and auto-deployed by the
+[`wiki.yml`](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/wiki.yml)
+workflow on every push to `main`. Edit those files via pull request; direct
+edits to the wiki UI will be overwritten.*

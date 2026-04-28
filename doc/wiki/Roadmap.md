@@ -4,7 +4,7 @@ The detailed task sheets live under
 [`doc/dev-notes/`](https://github.com/mne-tools/mne-cpp/tree/main/doc/dev-notes)
 in the main repo. This page is the high-level summary.
 
-## v2.2.0 — *Intracranial + Intelligence + Real-Time* — April 2026 ✅
+## v2.2.0 — *Intracranial + Intelligence + Real-Time* — April 2026 (released)
 
 - New libraries: **`mna`** (analysis container `.mna`/`.mnx`),
   **`ml`** (ONNX Runtime + Python training bridge), **`sts`**

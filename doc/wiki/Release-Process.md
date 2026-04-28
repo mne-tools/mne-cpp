@@ -8,7 +8,7 @@ GitHub Release.
 
 ## Pre-release checklist
 
-1. All tasks in `doc/dev-notes/vX.Y.Z-requirements.md` are ✅ DONE or
+1. All tasks in `doc/dev-notes/vX.Y.Z-requirements.md` are DONE or
    explicitly deferred.
 2. `staging.yml` is green on the latest `staging` commit (all 22 jobs).
 3. Versioned files are bumped to `X.Y.Z`:
