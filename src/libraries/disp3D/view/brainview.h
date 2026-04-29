@@ -59,6 +59,7 @@
 #include <QQuaternion>
 #include <Eigen/Core>
 #include <QRect>
+#include <QImage>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -72,6 +73,7 @@ class BrainRenderer;
 class BrainSurface;
 class DipoleObject;
 class NetworkObject;
+namespace DISP3DLIB { class VideoOverlay; }
 namespace CONNLIB { class Network; }
 
 //=============================================================================================================
@@ -794,6 +796,31 @@ public slots:
      */
     void clearNetwork();
 
+    //=========================================================================================================
+    // ── Video overlay ──────────────────────────────────────────────────
+    //=========================================================================================================
+
+    /**
+     * Enable or disable the generic live video overlay decal that is
+     * drawn on top of the head surface at the current focus position.
+     */
+    void setVideoOverlayEnabled(bool enabled);
+
+    /** @return Whether the video overlay is currently enabled. */
+    bool isVideoOverlayEnabled() const;
+
+    /** Set the world-space focus position (metres) of the overlay quad. */
+    void setVideoOverlayFocusPosition(const QVector3D &position);
+
+    /** Set the side length of the overlay quad (metres). Default ≈ 0.06 m. */
+    void setVideoOverlaySize(float meters);
+
+    /** Set the overall opacity of the overlay [0..1]. */
+    void setVideoOverlayOpacity(float opacity);
+
+    /** Push a new video frame to the overlay (e.g. from QVideoSink). */
+    void pushVideoOverlayFrame(const QImage &frame);
+
 signals:
     //=========================================================================================================
     /**
@@ -985,6 +1012,7 @@ private:
     // ── Scene objects ──────────────────────────────────────────────────
     std::unique_ptr<DipoleObject> m_dipoles;        /**< Standalone dipole set (loaded via file). */
     std::unique_ptr<NetworkObject> m_network;       /**< Connectivity network visualization. */
+    std::unique_ptr<DISP3DLIB::VideoOverlay> m_videoOverlay; /**< Live RGB video overlay decal. */
 
     /** Update the scene bounding box based on visible objects. */
     void updateSceneBounds();

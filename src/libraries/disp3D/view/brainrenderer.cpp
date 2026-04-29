@@ -44,10 +44,16 @@
 #include "renderable/brainsurface.h"
 #include "renderable/dipoleobject.h"
 #include "renderable/networkobject.h"
+#include "renderable/videooverlay.h"
+
+using DISP3DLIB::VideoOverlay;
 
 #include <QFile>
 #include <QDebug>
+#include <QImage>
+#include <QVector3D>
 #include <array>
+#include <limits>
 #include <map>
 #include <cstring>
 
@@ -106,6 +112,27 @@ struct BrainRenderer::Impl
         QVector<quint64> surfaceGenerations; // per-surface vertex generation snapshot
     };
     std::map<QString, MergedGroup> mergedGroups;  // keyed by category name
+
+    // ── Generic video overlay ───────────────────────────────────────
+    // Camera-facing textured quad rendered last (depth test off) at the
+    // current focus point. Resources are created lazily on first use.
+    struct VideoOverlayResources {
+        std::unique_ptr<QRhiGraphicsPipeline> pipeline;
+        std::unique_ptr<QRhiGraphicsPipeline> surfacePipeline;
+        std::unique_ptr<QRhiShaderResourceBindings> srb;
+        std::unique_ptr<QRhiBuffer> uniformBuffer;
+        std::unique_ptr<QRhiBuffer> vertexBuffer;
+        std::unique_ptr<QRhiBuffer> indexBuffer;
+        std::unique_ptr<QRhiTexture> texture;
+        std::unique_ptr<QRhiSampler> sampler;
+        QSize textureSize;
+        int uniformBufferOffsetAlignment = 0;
+        int currentUniformOffset = 0;
+        quint64 uploadedFrameGen = std::numeric_limits<quint64>::max();
+        bool indexUploaded = false;
+        bool initialized = false;
+    };
+    VideoOverlayResources videoOverlay;
 };
 
 //=============================================================================================================
@@ -120,6 +147,23 @@ static inline QRhiViewport toViewport(const BrainRenderer::SceneData &d)
 static inline QRhiScissor toScissor(const BrainRenderer::SceneData &d)
 {
     return QRhiScissor(d.scissorX, d.scissorY, d.scissorW, d.scissorH);
+}
+
+static QImage tightlyPackedRgba(const QImage &source)
+{
+    if (source.isNull())
+        return {};
+
+    QImage rgba = source.convertToFormat(QImage::Format_RGBA8888);
+    const qsizetype tightStride = qsizetype(rgba.width()) * 4;
+    if (rgba.bytesPerLine() == tightStride)
+        return rgba.copy();
+
+    QImage packed(rgba.size(), QImage::Format_RGBA8888);
+    for (int y = 0; y < rgba.height(); ++y) {
+        memcpy(packed.scanLine(y), rgba.constScanLine(y), size_t(tightStride));
+    }
+    return packed;
 }
 
 //=============================================================================================================
@@ -401,6 +445,350 @@ void BrainRenderer::beginPreservingPass(QRhiCommandBuffer *cb)
 void BrainRenderer::endPass(QRhiCommandBuffer *cb)
 {
     cb->endPass();
+}
+
+//=============================================================================================================
+// Video overlay rendering
+//=============================================================================================================
+
+void BrainRenderer::prepareVideoOverlay(QRhi *rhi,
+                                         QRhiResourceUpdateBatch *u,
+                                         VideoOverlay *overlay)
+{
+    if (!overlay || !overlay->isEnabled()) return;
+    if (!overlay->hasFrame()) return;
+    if (!rhi || !u) return;
+
+    QImage frame = tightlyPackedRgba(overlay->frame());
+    if (frame.isNull()) return;
+
+    auto &k = d->videoOverlay;
+    k.currentUniformOffset = 0;
+
+    // ── Lazy resource creation ──────────────────────────────────────
+    if (!k.initialized) {
+        // Shaders
+        QFile vFile(QStringLiteral(":/video_overlay.vert.qsb"));
+        QFile fFile(QStringLiteral(":/video_overlay.frag.qsb"));
+        if (!vFile.open(QIODevice::ReadOnly) || !fFile.open(QIODevice::ReadOnly)) {
+            qWarning() << "BrainRenderer: failed to open video overlay shaders";
+            return;
+        }
+        QShader vShader = QShader::fromSerialized(vFile.readAll());
+        QShader fShader = QShader::fromSerialized(fFile.readAll());
+        if (!vShader.isValid() || !fShader.isValid()) {
+            qWarning() << "BrainRenderer: invalid video overlay shaders";
+            return;
+        }
+
+        // Uniform buffer (mat4 + vec4 + 4 floats = 96 bytes, pad to 256)
+        constexpr int kUbSize = 256;
+        k.uniformBufferOffsetAlignment = rhi->ubufAlignment();
+        k.uniformBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
+                                             QRhiBuffer::UniformBuffer,
+                                             64 * k.uniformBufferOffsetAlignment));
+        k.uniformBuffer->create();
+
+        // Vertex buffer: 4 vertices × (3 pos + 2 uv) floats — refilled each frame
+        constexpr int kVbSize = 4 * 5 * sizeof(float);
+        k.vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
+                                            QRhiBuffer::VertexBuffer, kVbSize));
+        k.vertexBuffer->create();
+
+        // Index buffer: 2 triangles, 6 indices — uploaded once
+        constexpr int kIbSize = 6 * sizeof(quint32);
+        k.indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable,
+                                           QRhiBuffer::IndexBuffer, kIbSize));
+        k.indexBuffer->create();
+
+        // Sampler (linear, clamp)
+        k.sampler.reset(rhi->newSampler(QRhiSampler::Linear, QRhiSampler::Linear,
+                                        QRhiSampler::None,
+                                        QRhiSampler::ClampToEdge,
+                                        QRhiSampler::ClampToEdge));
+        k.sampler->create();
+
+        // Initial texture uses the first real frame size.
+        k.texture.reset(rhi->newTexture(QRhiTexture::RGBA8, frame.size()));
+        k.texture->create();
+        k.textureSize = frame.size();
+
+        // SRB binding: uniform @ 0, sampled image @ 1
+        k.srb.reset(rhi->newShaderResourceBindings());
+        k.srb->setBindings({
+            QRhiShaderResourceBinding::uniformBufferWithDynamicOffset(0,
+                QRhiShaderResourceBinding::VertexStage |
+                QRhiShaderResourceBinding::FragmentStage,
+                k.uniformBuffer.get(), kUniformBlockSize),
+            QRhiShaderResourceBinding::sampledTexture(1,
+                QRhiShaderResourceBinding::FragmentStage,
+                k.texture.get(), k.sampler.get())
+        });
+        k.srb->create();
+
+        // Pipeline (alpha-blended, depth-test off so it sits on top)
+        QRhiGraphicsPipeline::TargetBlend blend;
+        blend.enable = true;
+        blend.srcColor = QRhiGraphicsPipeline::SrcAlpha;
+        blend.dstColor = QRhiGraphicsPipeline::OneMinusSrcAlpha;
+        blend.srcAlpha = QRhiGraphicsPipeline::One;
+        blend.dstAlpha = QRhiGraphicsPipeline::OneMinusSrcAlpha;
+
+        k.pipeline.reset(rhi->newGraphicsPipeline());
+        k.pipeline->setShaderStages({
+            { QRhiShaderStage::Vertex, vShader },
+            { QRhiShaderStage::Fragment, fShader }
+        });
+        QRhiVertexInputLayout il;
+        il.setBindings({{ 5 * sizeof(float) }});
+        il.setAttributes({
+            { 0, 0, QRhiVertexInputAttribute::Float3, 0 },
+            { 0, 1, QRhiVertexInputAttribute::Float2, 3 * sizeof(float) }
+        });
+        k.pipeline->setVertexInputLayout(il);
+        k.pipeline->setShaderResourceBindings(k.srb.get());
+        k.pipeline->setRenderPassDescriptor(d->rtClear->renderPassDescriptor());
+        k.pipeline->setSampleCount(d->rtClear->sampleCount());
+        k.pipeline->setCullMode(QRhiGraphicsPipeline::None);
+        k.pipeline->setTargetBlends({blend});
+        k.pipeline->setDepthTest(false);
+        k.pipeline->setDepthWrite(false);
+        k.pipeline->setFlags(QRhiGraphicsPipeline::UsesScissor);
+        k.pipeline->create();
+
+        QFile dvFile(QStringLiteral(":/video_decal.vert.qsb"));
+        QFile dfFile(QStringLiteral(":/video_decal.frag.qsb"));
+        if (!dvFile.open(QIODevice::ReadOnly) || !dfFile.open(QIODevice::ReadOnly)) {
+            qWarning() << "BrainRenderer: failed to open video decal shaders";
+            return;
+        }
+        QShader dvShader = QShader::fromSerialized(dvFile.readAll());
+        QShader dfShader = QShader::fromSerialized(dfFile.readAll());
+        if (!dvShader.isValid() || !dfShader.isValid()) {
+            qWarning() << "BrainRenderer: invalid video decal shaders";
+            return;
+        }
+
+        QRhiGraphicsPipeline::TargetBlend decalBlend;
+        decalBlend.enable = true;
+        decalBlend.srcColor = QRhiGraphicsPipeline::SrcAlpha;
+        decalBlend.dstColor = QRhiGraphicsPipeline::OneMinusSrcAlpha;
+        decalBlend.srcAlpha = QRhiGraphicsPipeline::One;
+        decalBlend.dstAlpha = QRhiGraphicsPipeline::OneMinusSrcAlpha;
+
+        k.surfacePipeline.reset(rhi->newGraphicsPipeline());
+        k.surfacePipeline->setShaderStages({
+            { QRhiShaderStage::Vertex, dvShader },
+            { QRhiShaderStage::Fragment, dfShader }
+        });
+        QRhiVertexInputLayout dil;
+        dil.setBindings({{ 36 }});
+        dil.setAttributes({
+            { 0, 0, QRhiVertexInputAttribute::Float3, 0 },
+            { 0, 1, QRhiVertexInputAttribute::Float3, 12 },
+            { 0, 2, QRhiVertexInputAttribute::UNormByte4, 24 },
+            { 0, 3, QRhiVertexInputAttribute::UNormByte4, 28 },
+            { 0, 4, QRhiVertexInputAttribute::Float, 32 }
+        });
+        k.surfacePipeline->setVertexInputLayout(dil);
+        k.surfacePipeline->setShaderResourceBindings(k.srb.get());
+        k.surfacePipeline->setRenderPassDescriptor(d->rtClear->renderPassDescriptor());
+        k.surfacePipeline->setSampleCount(d->rtClear->sampleCount());
+        k.surfacePipeline->setCullMode(QRhiGraphicsPipeline::None);
+        k.surfacePipeline->setTargetBlends({decalBlend});
+        k.surfacePipeline->setDepthTest(true);
+        k.surfacePipeline->setDepthWrite(false);
+        k.surfacePipeline->setFlags(QRhiGraphicsPipeline::UsesScissor);
+        k.surfacePipeline->create();
+
+        k.initialized = true;
+    }
+
+    // ── Index buffer (one-shot upload) ──────────────────────────────
+    if (!k.indexUploaded) {
+        const quint32 idx[6] = { 0, 1, 2,  2, 1, 3 };
+        u->uploadStaticBuffer(k.indexBuffer.get(), idx);
+        k.indexUploaded = true;
+    }
+
+    // ── Texture (re-create on size change, re-upload on new frame) ──
+    if (frame.size() != k.textureSize) {
+        k.texture.reset(rhi->newTexture(QRhiTexture::RGBA8, frame.size()));
+        k.texture->create();
+        k.textureSize = frame.size();
+        // Rebuild SRB to point at the new texture
+        k.srb->setBindings({
+            QRhiShaderResourceBinding::uniformBufferWithDynamicOffset(0,
+                QRhiShaderResourceBinding::VertexStage |
+                QRhiShaderResourceBinding::FragmentStage,
+                k.uniformBuffer.get(), kUniformBlockSize),
+            QRhiShaderResourceBinding::sampledTexture(1,
+                QRhiShaderResourceBinding::FragmentStage,
+                k.texture.get(), k.sampler.get())
+        });
+        k.srb->create();
+        k.uploadedFrameGen = std::numeric_limits<quint64>::max();
+    }
+    if (overlay->frameGeneration() != k.uploadedFrameGen) {
+        QRhiTextureSubresourceUploadDescription sub(frame);
+        QRhiTextureUploadDescription desc({ 0, 0, sub });
+        u->uploadTexture(k.texture.get(), desc);
+        k.uploadedFrameGen = overlay->frameGeneration();
+    }
+}
+
+void BrainRenderer::renderVideoOverlay(QRhiCommandBuffer *cb, QRhi *rhi,
+                                        const SceneData &data,
+                                        VideoOverlay *overlay)
+{
+    if (!overlay || !overlay->isEnabled()) return;
+    if (!overlay->hasFrame()) return;
+
+    auto &k = d->videoOverlay;
+    if (!k.initialized) return;
+    if (k.uniformBufferOffsetAlignment <= 0) return;
+
+    QRhiResourceUpdateBatch *u = rhi->nextResourceUpdateBatch();
+    const int uniformOffset = k.currentUniformOffset;
+    k.currentUniformOffset += k.uniformBufferOffsetAlignment;
+    if (uniformOffset + kUniformBlockSize > k.uniformBuffer->size()) return;
+
+    // ── Billboard the quad to face the camera ──────────────────────
+    const QVector3D centre = overlay->focusPosition();
+    const float halfSize = 0.5f * overlay->sizeMeters();
+
+    QVector3D viewDir = centre - data.cameraPos;
+    if (viewDir.lengthSquared() < 1e-12f) viewDir = QVector3D(0, 0, -1);
+    viewDir.normalize();
+
+    QVector3D worldUp(0.0f, 0.0f, 1.0f);
+    if (std::abs(QVector3D::dotProduct(viewDir, worldUp)) > 0.95f) {
+        worldUp = QVector3D(0.0f, 1.0f, 0.0f);
+    }
+    QVector3D right = QVector3D::crossProduct(viewDir, worldUp).normalized();
+    QVector3D up = QVector3D::crossProduct(right, viewDir).normalized();
+
+    const QVector3D c00 = centre - right * halfSize - up * halfSize;
+    const QVector3D c10 = centre + right * halfSize - up * halfSize;
+    const QVector3D c01 = centre - right * halfSize + up * halfSize;
+    const QVector3D c11 = centre + right * halfSize + up * halfSize;
+
+    const float verts[4 * 5] = {
+        c00.x(), c00.y(), c00.z(),  0.0f, 1.0f,   // image y is flipped vs uv
+        c10.x(), c10.y(), c10.z(),  1.0f, 1.0f,
+        c01.x(), c01.y(), c01.z(),  0.0f, 0.0f,
+        c11.x(), c11.y(), c11.z(),  1.0f, 0.0f
+    };
+    u->updateDynamicBuffer(k.vertexBuffer.get(), 0, sizeof(verts), verts);
+
+    // ── Uniforms (mat4 mvp, vec4 borderColor, float opacity, 3 pad) ─
+    struct {
+        float mvp[16];
+        float borderColor[4];
+        float opacity;
+        float pad0, pad1, pad2;
+    } ub;
+    memcpy(ub.mvp, data.mvp.constData(), 64);
+    ub.borderColor[0] = 0.0f;
+    ub.borderColor[1] = 0.85f;
+    ub.borderColor[2] = 1.0f;
+    ub.borderColor[3] = 1.0f;
+    ub.opacity = overlay->opacity();
+    ub.pad0 = ub.pad1 = ub.pad2 = 0.0f;
+    u->updateDynamicBuffer(k.uniformBuffer.get(), uniformOffset, sizeof(ub), &ub);
+
+    cb->resourceUpdate(u);
+
+    // ── Draw ────────────────────────────────────────────────────────
+    cb->setViewport(toViewport(data));
+    cb->setScissor(toScissor(data));
+    cb->setGraphicsPipeline(k.pipeline.get());
+    const QRhiCommandBuffer::DynamicOffset srbOffset = { 0, uint32_t(uniformOffset) };
+    cb->setShaderResources(k.srb.get(), 1, &srbOffset);
+    const QRhiCommandBuffer::VertexInput vbuf(k.vertexBuffer.get(), 0);
+    cb->setVertexInput(0, 1, &vbuf, k.indexBuffer.get(), 0, QRhiCommandBuffer::IndexUInt32);
+    cb->drawIndexed(6);
+}
+
+void BrainRenderer::renderVideoOverlayOnSurface(QRhiCommandBuffer *cb, QRhi *rhi,
+                                                const SceneData &data,
+                                                VideoOverlay *overlay,
+                                                BrainSurface *surface)
+{
+    Q_UNUSED(rhi);
+    if (!overlay || !overlay->isEnabled() || !overlay->hasFrame()) return;
+    if (!surface || !surface->isVisible()) return;
+
+    auto &k = d->videoOverlay;
+    if (!k.initialized || !k.surfacePipeline) return;
+    if (k.uniformBufferOffsetAlignment <= 0) return;
+
+    QRhiResourceUpdateBatch *u = rhi->nextResourceUpdateBatch();
+    const int uniformOffset = k.currentUniformOffset;
+    k.currentUniformOffset += k.uniformBufferOffsetAlignment;
+    if (uniformOffset + kUniformBlockSize > k.uniformBuffer->size()) return;
+
+    // Keep the decal attached to the same head-space location and orientation
+    // in every viewport. Approximate the local scalp normal from the current
+    // focus vector; later this can be replaced by a microscope/fiducial normal.
+    QVector3D localNormal = overlay->focusPosition();
+    if (localNormal.lengthSquared() < 1e-12f) {
+        localNormal = QVector3D(0.0f, 0.0f, 1.0f);
+    }
+    localNormal.normalize();
+
+    QVector3D referenceUp(0.0f, 0.0f, 1.0f);
+    if (std::abs(QVector3D::dotProduct(localNormal, referenceUp)) > 0.95f) {
+        referenceUp = QVector3D(1.0f, 0.0f, 0.0f);
+    }
+    const QVector3D axisU = QVector3D::crossProduct(referenceUp, localNormal).normalized();
+    const QVector3D axisV = QVector3D::crossProduct(localNormal, axisU).normalized();
+
+    struct {
+        float mvp[16];
+        float focusAndSize[4];
+        float axisUAndOpacity[4];
+        float axisVAndOffset[4];
+        float axisNAndDepth[4];
+        float cameraPosAndFacing[4];
+        float borderColor[4];
+    } ub;
+    memcpy(ub.mvp, data.mvp.constData(), 64);
+    ub.focusAndSize[0] = overlay->focusPosition().x();
+    ub.focusAndSize[1] = overlay->focusPosition().y();
+    ub.focusAndSize[2] = overlay->focusPosition().z();
+    ub.focusAndSize[3] = overlay->sizeMeters();
+    ub.axisUAndOpacity[0] = axisU.x();
+    ub.axisUAndOpacity[1] = axisU.y();
+    ub.axisUAndOpacity[2] = axisU.z();
+    ub.axisUAndOpacity[3] = overlay->opacity();
+    ub.axisVAndOffset[0] = axisV.x();
+    ub.axisVAndOffset[1] = axisV.y();
+    ub.axisVAndOffset[2] = axisV.z();
+    ub.axisVAndOffset[3] = 0.0015f;
+    ub.axisNAndDepth[0] = localNormal.x();
+    ub.axisNAndDepth[1] = localNormal.y();
+    ub.axisNAndDepth[2] = localNormal.z();
+    ub.axisNAndDepth[3] = std::max(0.015f, overlay->sizeMeters() * 0.45f);
+    ub.cameraPosAndFacing[0] = data.cameraPos.x();
+    ub.cameraPosAndFacing[1] = data.cameraPos.y();
+    ub.cameraPosAndFacing[2] = data.cameraPos.z();
+    ub.cameraPosAndFacing[3] = 0.0f;
+    ub.borderColor[0] = 0.0f;
+    ub.borderColor[1] = 0.85f;
+    ub.borderColor[2] = 1.0f;
+    ub.borderColor[3] = 1.0f;
+    u->updateDynamicBuffer(k.uniformBuffer.get(), uniformOffset, sizeof(ub), &ub);
+    cb->resourceUpdate(u);
+
+    cb->setViewport(toViewport(data));
+    cb->setScissor(toScissor(data));
+    cb->setGraphicsPipeline(k.surfacePipeline.get());
+    const QRhiCommandBuffer::DynamicOffset srbOffset = { 0, uint32_t(uniformOffset) };
+    cb->setShaderResources(k.srb.get(), 1, &srbOffset);
+    const QRhiCommandBuffer::VertexInput vbuf(surface->vertexBuffer(), 0);
+    cb->setVertexInput(0, 1, &vbuf, surface->indexBuffer(), 0, QRhiCommandBuffer::IndexUInt32);
+    cb->drawIndexed(surface->indexCount());
 }
 
 //=============================================================================================================
