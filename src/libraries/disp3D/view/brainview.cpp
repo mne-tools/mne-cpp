@@ -44,6 +44,7 @@
 #include "renderable/brainsurface.h"
 #include "renderable/dipoleobject.h"
 #include "renderable/networkobject.h"
+#include "renderable/videooverlay.h"
 #include "core/surfacekeys.h"
 #include "core/dataloader.h"
 #include "input/raypicker.h"
@@ -204,6 +205,10 @@ BrainView::BrainView(QWidget *parent)
     // RtSensorStreamManager → BrainView
     connect(&m_sensorStreamManager, &RtSensorStreamManager::colorsAvailable,
             this, &BrainView::onSensorStreamColorsAvailable);
+
+    // Video overlay starts disabled with a default focus point near the
+    // top of a typical FreeSurfer head; the application toggles it on.
+    m_videoOverlay = std::make_unique<DISP3DLIB::VideoOverlay>();
 }
 
 //=============================================================================================================
@@ -1444,6 +1449,9 @@ void BrainView::render(QRhiCommandBuffer *cb)
             m_dipoles->updateBuffers(rhi(), preUpload);
         }
 #endif
+        if (m_videoOverlay && m_videoOverlay->isEnabled()) {
+            m_renderer->prepareVideoOverlay(rhi(), preUpload, m_videoOverlay.get());
+        }
 
 #ifdef __EMSCRIPTEN__
         // WORKAROUND(QRhi-GLES2): Single merged buffer for ALL surfaces.
@@ -1777,6 +1785,23 @@ void BrainView::render(QRhiCommandBuffer *cb)
     }
 
 #endif // !__EMSCRIPTEN__ — end of per-surface draw path
+
+    // Video overlay - projected onto the scalp/head mesh as a movable window.
+    if (m_videoOverlay && m_videoOverlay->isEnabled()) {
+        BrainSurface *targetSurface = nullptr;
+        if (m_surfaces.contains(QStringLiteral("bem_head"))) {
+            targetSurface = m_surfaces[QStringLiteral("bem_head")].get();
+        } else {
+            for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+                if (it.value() && it.value()->tissueType() == BrainSurface::TissueSkin) {
+                    targetSurface = it.value().get();
+                    break;
+                }
+            }
+        }
+        m_renderer->renderVideoOverlayOnSurface(cb, rhi(), sceneData,
+                                                m_videoOverlay.get(), targetSurface);
+    }
 
     } // End of viewport loop
 
@@ -2986,4 +3011,49 @@ void BrainView::clearNetwork()
         }
     }
     m_sceneDirty = true; update();
+}
+
+//=============================================================================================================
+// Video overlay public API
+//=============================================================================================================
+
+void BrainView::setVideoOverlayEnabled(bool enabled)
+{
+    if (!m_videoOverlay) return;
+    if (m_videoOverlay->isEnabled() == enabled) return;
+    m_videoOverlay->setEnabled(enabled);
+    m_sceneDirty = true; update();
+}
+
+bool BrainView::isVideoOverlayEnabled() const
+{
+    return m_videoOverlay && m_videoOverlay->isEnabled();
+}
+
+void BrainView::setVideoOverlayFocusPosition(const QVector3D &position)
+{
+    if (!m_videoOverlay) return;
+    m_videoOverlay->setFocusPosition(position);
+    if (m_videoOverlay->isEnabled()) { m_sceneDirty = true; update(); }
+}
+
+void BrainView::setVideoOverlaySize(float meters)
+{
+    if (!m_videoOverlay) return;
+    m_videoOverlay->setSizeMeters(std::max(0.001f, meters));
+    if (m_videoOverlay->isEnabled()) { m_sceneDirty = true; update(); }
+}
+
+void BrainView::setVideoOverlayOpacity(float opacity)
+{
+    if (!m_videoOverlay) return;
+    m_videoOverlay->setOpacity(std::clamp(opacity, 0.0f, 1.0f));
+    if (m_videoOverlay->isEnabled()) { m_sceneDirty = true; update(); }
+}
+
+void BrainView::pushVideoOverlayFrame(const QImage &frame)
+{
+    if (!m_videoOverlay) return;
+    m_videoOverlay->setFrame(frame);
+    if (m_videoOverlay->isEnabled()) { m_sceneDirty = true; update(); }
 }

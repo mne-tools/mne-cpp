@@ -64,6 +64,7 @@ class QRhiTextureRenderTarget;
 class BrainSurface;
 class DipoleObject;
 class NetworkObject;
+namespace DISP3DLIB { class VideoOverlay; }
 
 //=============================================================================================================
 /**
@@ -303,6 +304,51 @@ public:
      * @param[in] network    Pointer to NetworkObject.
      */
     void renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, NetworkObject *network);
+
+    //=========================================================================================================
+    /**
+     * Prepare live video overlay GPU resources and upload the latest frame.
+     *
+     * Must be called before a render pass starts. Texture uploads require a
+     * blit encoder on Metal and must not be recorded while a render encoder is
+     * active.
+     *
+     * @param[in] rhi        QRhi pointer.
+     * @param[in] u          Resource update batch owned by the caller.
+     * @param[in] overlay    Pointer to VideoOverlay; ignored when null/disabled.
+     */
+    void prepareVideoOverlay(QRhi *rhi,
+                             QRhiResourceUpdateBatch *u,
+                             DISP3DLIB::VideoOverlay *overlay);
+
+    //=========================================================================================================
+    /**
+     * Render a live video overlay as a camera-facing textured quad.
+     * Always drawn last (depth test disabled) so the cut-out sits on top of
+     * the head surface at the current focus position.
+     *
+     * @param[in] cb         Command buffer (must be inside a render pass).
+     * @param[in] rhi        QRhi pointer.
+     * @param[in] data       Scene uniforms (MVP, camera position).
+     * @param[in] overlay    Pointer to VideoOverlay; ignored when null/disabled.
+     */
+    void renderVideoOverlay(QRhiCommandBuffer *cb, QRhi *rhi,
+                             const SceneData &data,
+                             DISP3DLIB::VideoOverlay *overlay);
+
+    /**
+     * Render a live video overlay projected onto an existing surface mesh.
+     *
+     * @param[in] cb         Command buffer (must be inside a render pass).
+     * @param[in] rhi        QRhi pointer.
+     * @param[in] data       Scene uniforms (MVP, camera position).
+     * @param[in] overlay    Pointer to VideoOverlay; ignored when null/disabled.
+     * @param[in] surface    Target surface mesh (typically scalp/head).
+     */
+    void renderVideoOverlayOnSurface(QRhiCommandBuffer *cb, QRhi *rhi,
+                                     const SceneData &data,
+                                     DISP3DLIB::VideoOverlay *overlay,
+                                     BrainSurface *surface);
 
     //=========================================================================================================
     /**

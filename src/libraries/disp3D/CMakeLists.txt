@@ -85,6 +85,7 @@ set(HEADERS
     renderable/electrodeobject.h
     renderable/sliceobject.h
     renderable/networkobject.h
+    renderable/videooverlay.h
     scene/sensorfieldmapper.h
     scene/rtsensorstreammanager.h
     scene/sourceestimatemanager.h
@@ -129,6 +130,10 @@ qt_add_shaders(${PROJECT_NAME} "disp3d_shaders"
         "shaders/electrode.frag"
         "shaders/slice.vert"
         "shaders/slice.frag"
+        "shaders/video_overlay.vert"
+        "shaders/video_overlay.frag"
+        "shaders/video_decal.vert"
+        "shaders/video_decal.frag"
 )
 
 target_include_directories(${PROJECT_NAME}
