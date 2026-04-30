@@ -765,7 +765,7 @@ void BrainRenderer::renderVideoOverlayOnSurface(QRhiCommandBuffer *cb, QRhi *rhi
     ub.axisVAndOffset[0] = axisV.x();
     ub.axisVAndOffset[1] = axisV.y();
     ub.axisVAndOffset[2] = axisV.z();
-    ub.axisVAndOffset[3] = 0.0015f;
+    ub.axisVAndOffset[3] = 0.00045f;
     ub.axisNAndDepth[0] = localNormal.x();
     ub.axisNAndDepth[1] = localNormal.y();
     ub.axisNAndDepth[2] = localNormal.z();

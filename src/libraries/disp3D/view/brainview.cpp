@@ -1752,8 +1752,45 @@ void BrainView::render(QRhiCommandBuffer *cb)
     // Issue all draw calls — no resource updates or state resets between them
     for (const auto &item : opaqueDraws)
         m_renderer->issueSurfaceDraw(cb, item.surface, item.mode, item.uniformOffset);
-    for (const auto &item : transparentDraws)
+
+    BrainSurface *videoOverlayTargetSurface = nullptr;
+    const bool hasVideoOverlay = m_videoOverlay
+                                 && m_videoOverlay->isEnabled()
+                                 && m_videoOverlay->hasFrame();
+    if (hasVideoOverlay) {
+        if (m_surfaces.contains(QStringLiteral("bem_head"))) {
+            videoOverlayTargetSurface = m_surfaces[QStringLiteral("bem_head")].get();
+        } else {
+            for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+                if (it.value() && it.value()->tissueType() == BrainSurface::TissueSkin) {
+                    videoOverlayTargetSurface = it.value().get();
+                    break;
+                }
+            }
+        }
+    }
+
+    bool videoOverlayDrawn = false;
+    auto drawVideoOverlay = [&]() {
+        if (!videoOverlayDrawn && videoOverlayTargetSurface) {
+            m_renderer->renderVideoOverlayOnSurface(cb, rhi(), sceneData,
+                                                    m_videoOverlay.get(), videoOverlayTargetSurface);
+            videoOverlayDrawn = true;
+        }
+    };
+
+    for (const auto &item : transparentDraws) {
         m_renderer->issueSurfaceDraw(cb, item.surface, item.mode, item.uniformOffset);
+        if (item.surface == videoOverlayTargetSurface) {
+            // The decal belongs to the target anatomy, so draw it immediately
+            // after that surface. Drawing it before the transparent pass hides
+            // it behind the anatomical head; drawing it at frame end makes it
+            // float above the helmet. This placement keeps it attached to the
+            // head while preserving later transparent context.
+            drawVideoOverlay();
+        }
+    }
+    drawVideoOverlay();
 
     // Render Dipoles
     for(auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
@@ -1785,23 +1822,6 @@ void BrainView::render(QRhiCommandBuffer *cb)
     }
 
 #endif // !__EMSCRIPTEN__ — end of per-surface draw path
-
-    // Video overlay - projected onto the scalp/head mesh as a movable window.
-    if (m_videoOverlay && m_videoOverlay->isEnabled()) {
-        BrainSurface *targetSurface = nullptr;
-        if (m_surfaces.contains(QStringLiteral("bem_head"))) {
-            targetSurface = m_surfaces[QStringLiteral("bem_head")].get();
-        } else {
-            for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-                if (it.value() && it.value()->tissueType() == BrainSurface::TissueSkin) {
-                    targetSurface = it.value().get();
-                    break;
-                }
-            }
-        }
-        m_renderer->renderVideoOverlayOnSurface(cb, rhi(), sceneData,
-                                                m_videoOverlay.get(), targetSurface);
-    }
 
     } // End of viewport loop
 

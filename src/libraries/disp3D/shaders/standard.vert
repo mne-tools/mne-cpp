@@ -11,6 +11,7 @@ layout(location = 1) out vec3 v_color;
 layout(location = 2) out vec3 v_worldPos;
 layout(location = 3) out vec3 v_annotColor;
 layout(location = 4) out float v_surfaceId;
+layout(location = 5) out float v_curvatureGray;
 
 layout(std140, binding = 0) uniform UniformBlock {
     mat4 mvp;
@@ -30,5 +31,6 @@ void main() {
     v_color = color.rgb;
     v_annotColor = annotColor.rgb;
     v_surfaceId = surfaceId;
+    v_curvatureGray = color.a;
     gl_Position = mvp * vec4(position, 1.0);
 }

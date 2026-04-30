@@ -5,6 +5,7 @@ layout(location = 1) in vec3 v_color;
 layout(location = 2) in vec3 v_worldPos;
 layout(location = 3) in vec3 v_annotColor;
 layout(location = 4) in float v_surfaceId;
+layout(location = 5) in float v_curvatureGray;
 
 layout(location = 0) out vec4 fragColor;
 
@@ -41,13 +42,8 @@ void main() {
     if (v_surfaceId >= 99.5) {
         baseColor = v_color;
     } else if (overlayMode < 0.5) {
-        // Surface mode: warm white (ignore vertex colour)
-        baseColor = vec3(1.0, 0.97, 0.94);
-        // Show gold selection tint from vertex colors.
-        // Curvature grays have R ≈ B; gold (255,200,60) has R-B ≈ 0.76.
-        if (v_color.r - v_color.b > 0.15) {
-            baseColor = v_color;
-        }
+        // Surface mode: neutral curvature grey, independent from STC RGB.
+        baseColor = vec3(v_curvatureGray);
     } else if (overlayMode < 1.5) {
         // Annotation mode: use annotation colour channel
         // Fall back to warm white when no annotation is loaded (black)

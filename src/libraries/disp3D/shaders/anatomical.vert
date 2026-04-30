@@ -29,7 +29,7 @@ layout(std140, binding = 0) uniform UniformBlock {
 void main() {
     v_worldPos = position;
     v_normal = normalize(normal);
-    v_curvature = color.r;
+    v_curvature = color.a;
     v_color = color.rgb;
     v_annotColor = annotColor.rgb;
     v_viewDir = normalize(cameraPos - position);

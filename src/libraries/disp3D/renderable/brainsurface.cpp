@@ -42,6 +42,20 @@
 
 #include <set>
 
+namespace {
+uint32_t withAlpha(uint32_t color, uint32_t alpha)
+{
+    return (color & 0x00FFFFFFu) | ((alpha & 0xFFu) << 24);
+}
+
+uint32_t curvatureGray(const QVector<float> &curvature, int index)
+{
+    return (index >= 0 && index < curvature.size() && curvature[index] > 0.0f)
+        ? 0x40u
+        : 0xAAu;
+}
+} // namespace
+
 //=============================================================================================================
 // PIMPL
 //=============================================================================================================
@@ -302,9 +316,11 @@ void BrainSurface::applySourceEstimateColors(const QVector<uint32_t> &colors)
     m_visMode = ModeSourceEstimate;
     m_stcColors = colors;
     
-    // Write STC colours into the primary color channel
+    // Write STC colours into the primary color channel. Preserve neutral
+    // curvature grey in alpha so Surface mode can still render the classic
+    // light/dark cortex while RGB is occupied by source-estimate colours.
     for (int i = 0; i < qMin(colors.size(), m_vertexData.size()); ++i) {
-        m_vertexData[i].color = colors[i];
+        m_vertexData[i].color = withAlpha(colors[i], curvatureGray(m_curvature, i));
     }
     
     markVertexDirty();
@@ -337,8 +353,8 @@ void BrainSurface::updateVertexColors()
     //       in FsSurface mode the shader overrides with white for brain tissue.
     if (!m_curvature.isEmpty() && m_curvature.size() == m_vertexData.size()) {
         for (int i = 0; i < m_vertexData.size(); ++i) {
-            const uint32_t val = (m_curvature[i] > 0.0f) ? 0x40u : 0xAAu;
-            m_vertexData[i].color = packABGR(val, val, val);
+            const uint32_t val = curvatureGray(m_curvature, i);
+            m_vertexData[i].color = packABGR(val, val, val, val);
         }
     } else {
         // Use the base colour (set via setUseDefaultColor / fromBemSurface).
@@ -358,7 +374,7 @@ void BrainSurface::updateVertexColors()
     // (colorAnnotation) and is unaffected.
     if (!m_stcColors.isEmpty()) {
         for (int i = 0; i < qMin(m_stcColors.size(), m_vertexData.size()); ++i) {
-            m_vertexData[i].color = m_stcColors[i];
+            m_vertexData[i].color = withAlpha(m_stcColors[i], curvatureGray(m_curvature, i));
         }
     }
 

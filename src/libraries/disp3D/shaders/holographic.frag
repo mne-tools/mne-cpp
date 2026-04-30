@@ -34,11 +34,7 @@ void main() {
     if (v_surfaceId >= 99.5) {
         effectiveColor = v_color;
     } else if (overlayMode < 0.5) {
-        effectiveColor = vec3(1.0); // Surface: white
-        // Show gold selection tint from vertex colors
-        if (v_color.r - v_color.b > 0.15) {
-            effectiveColor = v_color;
-        }
+        effectiveColor = vec3(v_curvature); // Surface: neutral curvature grey
     } else if (overlayMode < 1.5) {
         // Annotation: fall back to white when no annotation loaded (black)
         effectiveColor = (dot(v_annotColor, v_annotColor) > 0.001)
