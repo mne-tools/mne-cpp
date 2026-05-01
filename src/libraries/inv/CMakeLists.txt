@@ -37,7 +37,9 @@ set(SOURCES
     beamformer/inv_lcmv.cpp
     beamformer/inv_dics.cpp
     sparse/inv_mxne.cpp
+    sparse/inv_tf_mxne.cpp
     sparse/inv_gamma_map.cpp
+    inv_source_estimate_io.cpp
     minimum_norm/inv_cmne.cpp
     minimum_norm/inv_cmne_settings.cpp
     inv_convenience.cpp
@@ -76,7 +78,9 @@ set(HEADERS
     beamformer/inv_lcmv.h
     beamformer/inv_dics.h
     sparse/inv_mxne.h
+    sparse/inv_tf_mxne.h
     sparse/inv_gamma_map.h
+    inv_source_estimate_io.h
     minimum_norm/inv_cmne.h
     minimum_norm/inv_cmne_settings.h
     inv_convenience.h

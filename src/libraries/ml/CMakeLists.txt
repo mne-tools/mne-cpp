@@ -17,6 +17,7 @@ set(SOURCES
   ml_scaler.cpp
   ml_pipeline.cpp
   ml_trainer.cpp
+  ml_csp.cpp
 )
 
 set(HEADERS
@@ -29,6 +30,7 @@ set(HEADERS
   ml_scaler.h
   ml_pipeline.h
   ml_trainer.h
+  ml_csp.h
 )
 
 set(FILE_TO_UPDATE ml_global.cpp)

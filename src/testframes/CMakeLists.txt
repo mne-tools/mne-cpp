@@ -241,3 +241,9 @@ add_subdirectory(test_source_morph)
 # v2.3.0 Fine calibration + Maxwell movement compensation tests
 add_subdirectory(test_fine_calibration)
 add_subdirectory(test_maxwell_movement_comp)
+
+# v2.3.0 TF-MxNE, CSP decoding, source estimate I/O, report tests
+add_subdirectory(test_tf_mxne)
+add_subdirectory(test_csp)
+add_subdirectory(test_source_estimate_io)
+add_subdirectory(test_report)
