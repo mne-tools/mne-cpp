@@ -20,6 +20,7 @@ set(SOURCES
   ml_csp.cpp
   ml_spoc.cpp
   ml_ssd.cpp
+  ml_ica_label.cpp
 )
 
 set(HEADERS
@@ -35,6 +36,7 @@ set(HEADERS
   ml_csp.h
   ml_spoc.h
   ml_ssd.h
+  ml_ica_label.h
 )
 
 set(FILE_TO_UPDATE ml_global.cpp)

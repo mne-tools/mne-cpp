@@ -143,7 +143,7 @@ void MlCsp::fit(const QList<MatrixXd>& epochsClass1,
 
     // Compute patterns: A = Cov_composite * W^T * (W * Cov_composite * W^T)^{-1}
     // Simplified: patterns = pinv(filters)^T
-    m_patterns = m_filters.bdcSvd(ComputeThinU | ComputeThinV).solve(
+    m_patterns = m_filters.bdcSvd<ComputeThinU | ComputeThinV>().solve(
         MatrixXd::Identity(nTotal, nTotal)).transpose();
 
     m_bFitted = true;

@@ -58,6 +58,8 @@ set(SOURCES
   fine_calibration.cpp
   maxwell_movement_comp.cpp
   surface_laplacian.cpp
+  picard_ica.cpp
+  connectivity_aec.cpp
 )
 
 set(HEADERS
@@ -106,6 +108,8 @@ set(HEADERS
   fine_calibration.h
   maxwell_movement_comp.h
   surface_laplacian.h
+  picard_ica.h
+  connectivity_aec.h
 )
 
 set(FILE_TO_UPDATE dsp_global.cpp)

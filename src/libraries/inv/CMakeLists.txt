@@ -47,6 +47,8 @@ set(SOURCES
     morph/source_morph.cpp
     inv_resolution_matrix.cpp
     inv_label_time_course.cpp
+    inv_vector_source_estimate.cpp
+    inv_volume_source_estimate.cpp
 )
 
 set(HEADERS
@@ -91,6 +93,8 @@ set(HEADERS
     morph/source_morph.h
     inv_resolution_matrix.h
     inv_label_time_course.h
+    inv_vector_source_estimate.h
+    inv_volume_source_estimate.h
 )
 
 set(FILE_TO_UPDATE inv_global.cpp)

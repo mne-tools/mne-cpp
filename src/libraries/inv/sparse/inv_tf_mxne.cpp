@@ -233,7 +233,7 @@ InvTfMxneResult InvTfMxne::compute(const MatrixXd& matGain,
             Gactive.col(i) = matGain.col(activeVertices[i]);
         }
         // Least-squares on active set: X_active = pinv(G_active) * M
-        finalX = Gactive.bdcSvd(ComputeThinU | ComputeThinV).solve(matData);
+        finalX = Gactive.bdcSvd<ComputeThinU | ComputeThinV>().solve(matData);
     } else if (!activeVertices.isEmpty()) {
         finalX = MatrixXd(activeVertices.size(), nTimes);
         for (int i = 0; i < activeVertices.size(); ++i) {

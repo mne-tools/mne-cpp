@@ -259,3 +259,9 @@ add_subdirectory(test_ssd)
 add_subdirectory(test_trap_music)
 add_subdirectory(test_epochs)
 add_subdirectory(test_label_utils)
+
+# v2.3.0 Batch 12: Picard ICA, ICA labeling, source estimate types, AEC connectivity
+add_subdirectory(test_picard_ica)
+add_subdirectory(test_ica_label)
+add_subdirectory(test_source_estimate_types)
+add_subdirectory(test_connectivity_aec)
