@@ -39,6 +39,7 @@ set(_mne_qt_components
     Core
     Concurrent
     Gui
+    Multimedia
     Network
     PrintSupport
     Svg

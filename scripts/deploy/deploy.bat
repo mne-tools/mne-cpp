@@ -476,7 +476,7 @@ if [[ ${LinkOption} == "dynamic" ]]; then
     fi
     if [ -n "${QT_PLUGINS_DIR}" ] && [ -d "${QT_PLUGINS_DIR}" ]; then
         mkdir -p "${BasePath}/out/${BuildName}/lib/plugins"
-        for plugdir in platforms imageformats iconengines networkinformation tls styles; do
+        for plugdir in platforms imageformats iconengines multimedia networkinformation tls styles; do
             if [ -d "${QT_PLUGINS_DIR}/${plugdir}" ]; then
                 echo "  Copying ${plugdir}/ ..."
                 ${MockText}cp -a "${QT_PLUGINS_DIR}/${plugdir}" "${BasePath}/out/${BuildName}/lib/plugins/"

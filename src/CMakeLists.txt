@@ -171,7 +171,7 @@ message("QT_DIR - ${QT_DIR}")
 # makes the subdirectory calls no-ops and prints the warning at most once.
 
 # Define required Qt components for MNE-CPP (Qt6 only, no OpenGL, require GuiPrivate for QRhi)
-set(_MNE_QT_COMPONENTS Core Concurrent Gui Network Widgets Svg Xml)
+set(_MNE_QT_COMPONENTS Core Concurrent Gui Multimedia Network Widgets Svg Xml)
 if(NOT WASM)
   list(APPEND _MNE_QT_COMPONENTS PrintSupport)
 endif()

@@ -6,7 +6,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Gui Widgets ShaderTools)
+set(QT_REQUIRED_COMPONENTS Core Gui Multimedia Widgets ShaderTools)
 
 # GuiPrivate is needed for QRhi headers — check availability (may be absent in some WASM builds)
 find_package(Qt6 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
