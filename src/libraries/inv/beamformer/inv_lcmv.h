@@ -49,6 +49,8 @@
 
 #include <fiff/fiff_cov.h>
 
+#include <QList>
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -155,6 +157,45 @@ public:
      */
     static InvSourceEstimate applyLCMVCov(const FIFFLIB::FiffCov &dataCov,
                                           const InvBeamformer &filters);
+
+    //=========================================================================================================
+    /**
+     * Apply LCMV beamformer to a list of epochs.
+     *
+     * @param[in] epochs    List of epoch data matrices (n_channels x n_times each).
+     * @param[in] tmin      Start time of each epoch (seconds).
+     * @param[in] tstep     Time step (1/sfreq).
+     * @param[in] filters   Pre-computed LCMV beamformer from makeLCMV().
+     *
+     * @return List of source estimates, one per epoch.
+     */
+    static QList<InvSourceEstimate> applyLCMVEpochs(const QList<Eigen::MatrixXd> &epochs,
+                                                     float tmin,
+                                                     float tstep,
+                                                     const InvBeamformer &filters);
+
+    //=========================================================================================================
+    /**
+     * Compute the LCMV resolution matrix: R = W @ G.
+     *
+     * The resolution matrix describes the point-spread function of the beamformer.
+     * Each row shows how a unit source at one location maps through the forward
+     * model and back through the beamformer. Ideally R = I (perfect resolution).
+     *
+     * @param[in] forward   Forward solution with leadfield.
+     * @param[in] info      Measurement info.
+     * @param[in] dataCov   Data covariance.
+     * @param[in] reg       Regularization (default 0.05).
+     * @param[in] noiseCov  Noise covariance for whitening (optional).
+     *
+     * @return Resolution matrix (n_sources x n_sources).
+     */
+    static Eigen::MatrixXd makeLCMVResolutionMatrix(
+        const MNELIB::MNEForwardSolution &forward,
+        const FIFFLIB::FiffInfo &info,
+        const FIFFLIB::FiffCov &dataCov,
+        double reg = 0.05,
+        const FIFFLIB::FiffCov &noiseCov = FIFFLIB::FiffCov());
 
 private:
     /**

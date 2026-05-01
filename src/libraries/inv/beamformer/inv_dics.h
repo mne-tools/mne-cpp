@@ -55,6 +55,8 @@
 
 #include <fiff/fiff_cov.h>
 
+#include <QList>
+
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
@@ -166,6 +168,24 @@ public:
                                        float tstep,
                                        const InvBeamformer &filters,
                                        int freqIdx = 0);
+
+    //=========================================================================================================
+    /**
+     * Apply DICS beamformer to each epoch in a list.
+     *
+     * @param[in] epochs    List of epoch data matrices (n_channels x n_times each).
+     * @param[in] tmin      Start time of each epoch (seconds).
+     * @param[in] tstep     Time step (1/sfreq).
+     * @param[in] filters   Pre-computed DICS beamformer from makeDICS().
+     * @param[in] freqIdx   Index of the frequency filter to use (default 0).
+     *
+     * @return List of source estimates, one per epoch.
+     */
+    static QList<InvSourceEstimate> applyDICSEpochs(const QList<Eigen::MatrixXd> &epochs,
+                                                     float tmin,
+                                                     float tstep,
+                                                     const InvBeamformer &filters,
+                                                     int freqIdx = 0);
 };
 
 } // NAMESPACE INVLIB

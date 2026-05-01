@@ -340,3 +340,70 @@ InvSourceEstimate InvLCMV::applyLCMVCov(const FiffCov &dataCov,
 
     return stc;
 }
+
+//=============================================================================================================
+
+QList<InvSourceEstimate> InvLCMV::applyLCMVEpochs(const QList<MatrixXd> &epochs,
+                                                    float tmin,
+                                                    float tstep,
+                                                    const InvBeamformer &filters)
+{
+    QList<InvSourceEstimate> results;
+
+    if (epochs.isEmpty()) {
+        qWarning("InvLCMV::applyLCMVEpochs - No epochs provided.");
+        return results;
+    }
+    if (!filters.isValid() || filters.kind != "LCMV") {
+        qWarning("InvLCMV::applyLCMVEpochs - Invalid or non-LCMV filters!");
+        return results;
+    }
+
+    for (int i = 0; i < epochs.size(); ++i) {
+        InvSourceEstimate stc = applyLCMVRaw(epochs[i], tmin, tstep, filters);
+        if (stc.isEmpty()) {
+            qWarning("InvLCMV::applyLCMVEpochs - Epoch %d produced empty source estimate.", i);
+        }
+        results.append(stc);
+    }
+
+    return results;
+}
+
+//=============================================================================================================
+
+MatrixXd InvLCMV::makeLCMVResolutionMatrix(
+    const MNEForwardSolution &forward,
+    const FiffInfo &info,
+    const FiffCov &dataCov,
+    double reg,
+    const FiffCov &noiseCov)
+{
+    // Build the LCMV filter
+    InvBeamformer filters = makeLCMV(info, forward, dataCov, reg, noiseCov);
+
+    if (!filters.isValid() || filters.weights.empty()) {
+        qWarning("InvLCMV::makeLCMVResolutionMatrix - Could not compute LCMV filter.");
+        return MatrixXd();
+    }
+
+    // Extract leadfield: G (n_channels x n_dipoles)
+    MatrixXd G = forward.sol->data;
+
+    // Apply whitening to leadfield
+    MatrixXd Gw = G;
+    if (filters.proj.size() > 0 && filters.proj.rows() == G.rows()) {
+        Gw = filters.proj * Gw;
+    }
+    if (filters.whitener.size() > 0 && filters.whitener.cols() == Gw.rows()) {
+        Gw = filters.whitener * Gw;
+    }
+
+    // Resolution matrix: R = W @ G_whitened
+    MatrixXd R = filters.weights[0] * Gw;
+
+    qInfo("InvLCMV::makeLCMVResolutionMatrix - Resolution matrix: %d x %d",
+          static_cast<int>(R.rows()), static_cast<int>(R.cols()));
+
+    return R;
+}

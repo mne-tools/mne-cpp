@@ -307,3 +307,33 @@ InvSourceEstimate InvDICS::applyDICS(const MatrixXd &data,
 
     return stc;
 }
+
+//=============================================================================================================
+
+QList<InvSourceEstimate> InvDICS::applyDICSEpochs(const QList<MatrixXd> &epochs,
+                                                    float tmin,
+                                                    float tstep,
+                                                    const InvBeamformer &filters,
+                                                    int freqIdx)
+{
+    QList<InvSourceEstimate> results;
+
+    if (epochs.isEmpty()) {
+        qWarning("InvDICS::applyDICSEpochs - No epochs provided.");
+        return results;
+    }
+    if (!filters.isValid() || filters.kind != "DICS") {
+        qWarning("InvDICS::applyDICSEpochs - Invalid or non-DICS filters!");
+        return results;
+    }
+
+    for (int i = 0; i < epochs.size(); ++i) {
+        InvSourceEstimate stc = applyDICS(epochs[i], tmin, tstep, filters, freqIdx);
+        if (stc.isEmpty()) {
+            qWarning("InvDICS::applyDICSEpochs - Epoch %d produced empty source estimate.", i);
+        }
+        results.append(stc);
+    }
+
+    return results;
+}

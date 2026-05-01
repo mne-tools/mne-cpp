@@ -40,6 +40,7 @@ set(SOURCES
     sparse/inv_gamma_map.cpp
     minimum_norm/inv_cmne.cpp
     minimum_norm/inv_cmne_settings.cpp
+    inv_convenience.cpp
 )
 
 set(HEADERS
@@ -77,6 +78,7 @@ set(HEADERS
     sparse/inv_gamma_map.h
     minimum_norm/inv_cmne.h
     minimum_norm/inv_cmne_settings.h
+    inv_convenience.h
 )
 
 set(FILE_TO_UPDATE inv_global.cpp)

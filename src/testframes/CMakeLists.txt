@@ -226,3 +226,6 @@ add_subdirectory(test_dsp_peak_finder)
 
 # v2.2.0 cross-validation tests (MNE-CPP vs MNE-Python)
 add_subdirectory(test_crossval_covariance)
+
+# v2.3.0 inverse/beamformer convenience tests
+add_subdirectory(test_inv_convenience)
