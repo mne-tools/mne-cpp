@@ -57,6 +57,7 @@ set(SOURCES
   simulate.cpp
   fine_calibration.cpp
   maxwell_movement_comp.cpp
+  surface_laplacian.cpp
 )
 
 set(HEADERS
@@ -104,6 +105,7 @@ set(HEADERS
   simulate.h
   fine_calibration.h
   maxwell_movement_comp.h
+  surface_laplacian.h
 )
 
 set(FILE_TO_UPDATE dsp_global.cpp)

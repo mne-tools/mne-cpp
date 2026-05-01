@@ -156,8 +156,8 @@ BadChannelsMaxwellResult UTILSLIB::findBadChannelsMaxwell(
         }
     }
 
-    qInfo("[findBadChannelsMaxwell] Detected %d bad channel(s) out of %d MEG channels.",
-          result.badChannels.size(), nMeg);
+qInfo("[findBadChannelsMaxwell] Detected %lld bad channel(s) out of %d MEG channels.",
+           static_cast<long long>(result.badChannels.size()), nMeg);
 
     return result;
 }

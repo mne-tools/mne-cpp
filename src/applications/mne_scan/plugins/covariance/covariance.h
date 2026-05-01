@@ -114,7 +114,7 @@ public:
     /**
      * Initialise input and output connectors.
      */
-    virtual void init();
+    virtual void init() override;
 
     //=========================================================================================================
     /**
@@ -126,21 +126,21 @@ public:
     /**
      * Is called when plugin is detached of the stage. Can be used to safe settings.
      */
-    virtual void unload();
+    virtual void unload() override;
 
     //=========================================================================================================
     /**
      * Clone the plugin
      */
-    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const override;
 
-    virtual bool start();
-    virtual bool stop();
+    virtual bool start() override;
+    virtual bool stop() override;
 
-    virtual SCSHAREDLIB::AbstractPlugin::PluginType getType() const;
-    virtual QString getName() const;
+    virtual SCSHAREDLIB::AbstractPlugin::PluginType getType() const override;
+    virtual QString getName() const override;
 
-    virtual QWidget* setupWidget();
+    virtual QWidget* setupWidget() override;
 
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
@@ -148,12 +148,12 @@ public:
 
     void changeSamples(qint32 samples);
 
-    virtual QString getBuildInfo();
+    virtual QString getBuildInfo() override;
     virtual QVariantMap getAttributes() const override;
     virtual void setAttributes(const QVariantMap& attributes) override;
 
 protected:
-    virtual void run();
+    virtual void run() override;
 
 private:
     QMutex      m_mutex;

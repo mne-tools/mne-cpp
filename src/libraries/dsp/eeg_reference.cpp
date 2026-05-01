@@ -223,7 +223,7 @@ void UTILSLIB::setBipolarReference(MatrixXd& data,
 {
     if (anodes.size() != cathodes.size()) {
         qWarning("setBipolarReference: anodes and cathodes must have the same length "
-                 "(%d vs %d).", anodes.size(), cathodes.size());
+                 "(%lld vs %lld).", static_cast<long long>(anodes.size()), static_cast<long long>(cathodes.size()));
         return;
     }
 

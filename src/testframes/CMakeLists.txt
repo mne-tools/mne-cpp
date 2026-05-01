@@ -247,3 +247,9 @@ add_subdirectory(test_tf_mxne)
 add_subdirectory(test_csp)
 add_subdirectory(test_source_estimate_io)
 add_subdirectory(test_report)
+
+# v2.3.0 Batch 10: Surface Laplacian, resolution matrix, label time course, SPoC
+add_subdirectory(test_surface_laplacian)
+add_subdirectory(test_resolution_matrix)
+add_subdirectory(test_label_time_course)
+add_subdirectory(test_spoc)

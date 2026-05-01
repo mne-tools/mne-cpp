@@ -44,6 +44,8 @@ set(SOURCES
     minimum_norm/inv_cmne_settings.cpp
     inv_convenience.cpp
     morph/source_morph.cpp
+    inv_resolution_matrix.cpp
+    inv_label_time_course.cpp
 )
 
 set(HEADERS
@@ -85,6 +87,8 @@ set(HEADERS
     minimum_norm/inv_cmne_settings.h
     inv_convenience.h
     morph/source_morph.h
+    inv_resolution_matrix.h
+    inv_label_time_course.h
 )
 
 set(FILE_TO_UPDATE inv_global.cpp)
