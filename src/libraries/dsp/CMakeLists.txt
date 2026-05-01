@@ -50,6 +50,9 @@ set(SOURCES
   eog_regression.cpp
   filter_chpi.cpp
   annotate_artifact.cpp
+  bridged_electrodes.cpp
+  bad_channels_lof.cpp
+  peak_finder.cpp
 )
 
 set(HEADERS
@@ -90,6 +93,9 @@ set(HEADERS
   eog_regression.h
   filter_chpi.h
   annotate_artifact.h
+  bridged_electrodes.h
+  bad_channels_lof.h
+  peak_finder.h
 )
 
 set(FILE_TO_UPDATE dsp_global.cpp)
