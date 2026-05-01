@@ -233,3 +233,7 @@ add_subdirectory(test_inv_convenience)
 # v2.3.0 Maxwell bad channels + simulation tests
 add_subdirectory(test_dsp_bad_channels_maxwell)
 add_subdirectory(test_dsp_simulate)
+
+# v2.3.0 Standard montages + source morph tests
+add_subdirectory(test_standard_montage)
+add_subdirectory(test_source_morph)

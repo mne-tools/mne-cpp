@@ -17,6 +17,7 @@ set(SOURCES
   layoutloader.cpp
   layoutmaker.cpp
   selectionio.cpp
+  montage/standard_montage.cpp
   generics/observerpattern.cpp
   generics/mne_logger.cpp
   utils_global.cpp
@@ -29,6 +30,7 @@ set(HEADERS
   layoutloader.h
   layoutmaker.h
   selectionio.h
+  montage/standard_montage.h
   generics/circularbuffer.h
   generics/commandpattern.h
   generics/observerpattern.h
