@@ -45,6 +45,8 @@ set(SOURCES
   channel_derivation.cpp
   csd.cpp
   extended_infomax.cpp
+  stim_artifact.cpp
+  eeg_reference.cpp
 )
 
 set(HEADERS
@@ -80,6 +82,8 @@ set(HEADERS
   channel_derivation.h
   csd.h
   extended_infomax.h
+  stim_artifact.h
+  eeg_reference.h
 )
 
 set(FILE_TO_UPDATE dsp_global.cpp)

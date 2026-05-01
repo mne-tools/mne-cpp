@@ -46,6 +46,8 @@ add_subdirectory(test_fs)
 add_subdirectory(test_sensorSet)
 add_subdirectory(test_signalModel)
 
+add_subdirectory(test_fiff_annotation_event_utils)
+
 add_subdirectory(test_interpolation)
 add_subdirectory(test_geometryinfo)
 add_subdirectory(test_rt_source_streaming)
@@ -193,6 +195,7 @@ add_subdirectory(test_fiff_annotations)
 add_subdirectory(test_dsp_multitaper)
 add_subdirectory(test_dsp_csd)
 add_subdirectory(test_dsp_channel_derivation)
+add_subdirectory(test_dsp_eeg_reference)
 add_subdirectory(test_sts_cluster)
 add_subdirectory(test_ml_models)
 add_subdirectory(test_inv_sparse)
@@ -211,6 +214,9 @@ add_subdirectory(test_mna_inverse_pipeline)
 add_subdirectory(test_mna_registry_loader)
 add_subdirectory(test_mna_serialization)
 add_subdirectory(test_mna_bids)
+
+# v2.3.0 DSP preprocessing tests
+add_subdirectory(test_dsp_stim_artifact)
 
 # v2.2.0 cross-validation tests (MNE-CPP vs MNE-Python)
 add_subdirectory(test_crossval_covariance)

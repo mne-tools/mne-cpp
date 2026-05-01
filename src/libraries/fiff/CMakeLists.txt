@@ -40,6 +40,7 @@ set(SOURCES
     fiff_coord_trans_set.cpp
     fiff_file_sharer.cpp
     fiff_annotations.cpp
+    fiff_annotation_event_utils.cpp
 )
 
 set(HEADERS
@@ -78,6 +79,7 @@ set(HEADERS
     fiff_coord_trans_set.h
     fiff_file_sharer.h
     fiff_annotations.h
+    fiff_annotation_event_utils.h
     fiff_byte_swap.h
 )
 
