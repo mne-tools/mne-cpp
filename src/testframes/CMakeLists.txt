@@ -237,3 +237,7 @@ add_subdirectory(test_dsp_simulate)
 # v2.3.0 Standard montages + source morph tests
 add_subdirectory(test_standard_montage)
 add_subdirectory(test_source_morph)
+
+# v2.3.0 Fine calibration + Maxwell movement compensation tests
+add_subdirectory(test_fine_calibration)
+add_subdirectory(test_maxwell_movement_comp)

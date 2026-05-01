@@ -55,6 +55,8 @@ set(SOURCES
   peak_finder.cpp
   bad_channels_maxwell.cpp
   simulate.cpp
+  fine_calibration.cpp
+  maxwell_movement_comp.cpp
 )
 
 set(HEADERS
@@ -100,6 +102,8 @@ set(HEADERS
   peak_finder.h
   bad_channels_maxwell.h
   simulate.h
+  fine_calibration.h
+  maxwell_movement_comp.h
 )
 
 set(FILE_TO_UPDATE dsp_global.cpp)
