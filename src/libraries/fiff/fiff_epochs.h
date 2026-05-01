@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include "fiff_global.h"
+#include "fiff_evoked.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -121,12 +122,17 @@ public:
      * @brief Compute the average (evoked response) across epochs.
      *
      * All epochs must have the same dimensions.
+     * Returns a FiffEvoked with data, nave, times, and aspect_kind populated.
      *
      * @param[in] epochs        List of epochs.
+     * @param[in] dSFreq        Sampling frequency in Hz (used to compute times vector).
+     * @param[in] comment       Comment string for the evoked (default "Average").
      *
-     * @return Averaged data (n_channels × n_times_per_epoch).
+     * @return FiffEvoked with averaged data and metadata.
      */
-    static Eigen::MatrixXd averageEpochs(const QList<FiffEpochData>& epochs);
+    static FiffEvoked averageEpochs(const QList<FiffEpochData>& epochs,
+                                    double dSFreq,
+                                    const QString& comment = "Average");
 
     //=========================================================================================================
     /**

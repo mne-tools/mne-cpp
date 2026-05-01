@@ -17,6 +17,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_epochs.h>
+#include <fiff/fiff_evoked.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -158,10 +159,19 @@ void TestEpochs::testAverage()
     // Create epochs with known values
     auto epochs = FiffEpochs::makeFixedLengthEpochs(m_data, m_sFreq, 2.0);
 
-    MatrixXd avg = FiffEpochs::averageEpochs(epochs);
-    QCOMPARE(static_cast<int>(avg.rows()), m_nCh);
-    QCOMPARE(static_cast<int>(avg.cols()), 200);
-    QVERIFY(avg.allFinite());
+    FiffEvoked evoked = FiffEpochs::averageEpochs(epochs, m_sFreq);
+    QCOMPARE(static_cast<int>(evoked.data.rows()), m_nCh);
+    QCOMPARE(static_cast<int>(evoked.data.cols()), 200);
+    QVERIFY(evoked.data.allFinite());
+
+    // Verify evoked metadata
+    QCOMPARE(evoked.nave, epochs.size());
+    QCOMPARE(evoked.aspect_kind, static_cast<fiff_int_t>(FIFFV_ASPECT_AVERAGE));
+    QCOMPARE(evoked.comment, QString("Average"));
+
+    // Verify times vector
+    QCOMPARE(static_cast<int>(evoked.times.size()), 200);
+    QVERIFY(std::abs(evoked.times(0) - static_cast<float>(epochs[0].tmin)) < 1e-5f);
 }
 
 //=============================================================================================================

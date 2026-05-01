@@ -412,11 +412,16 @@ jobs:
     - name: Install IFW build dependencies
       shell: pwsh
       run: |
+        $ErrorActionPreference = 'Stop'
         $vcpkgRoot = Join-Path $env:RUNNER_TEMP 'vcpkg'
         git clone --depth 1 https://github.com/microsoft/vcpkg.git $vcpkgRoot
         & "$vcpkgRoot\bootstrap-vcpkg.bat"
         & "$vcpkgRoot\vcpkg.exe" install zlib:x64-windows-static bzip2:x64-windows-static liblzma:x64-windows-static
-        "VCPKG_ROOT=$vcpkgRoot" | Add-Content -Path $env:GITHUB_ENV
+        if ($LASTEXITCODE -ne 0) { throw "vcpkg install failed with exit code $LASTEXITCODE" }
+        $libDir = Join-Path $vcpkgRoot 'installed\x64-windows-static\lib'
+        Write-Host "vcpkg lib directory contents:"
+        Get-ChildItem -Path $libDir -Filter '*.lib' | ForEach-Object { Write-Host "  $_" }
+        "IFW_VCPKG_ROOT=$vcpkgRoot" | Add-Content -Path $env:GITHUB_ENV
     - name: Build Qt Installer Framework
       shell: pwsh
       run: |
@@ -425,7 +430,6 @@ jobs:
         New-Item -ItemType Directory -Path (Join-Path $workRoot 'qtifw_qt_build') | Out-Null
         Set-Location (Join-Path $workRoot 'qtifw_qt_build')
 
-        $customVcpkgRoot = $env:VCPKG_ROOT
         $vsInstallPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
         if (-not $vsInstallPath) {
           throw 'Could not locate a Visual Studio installation with VC tools.'
@@ -437,7 +441,6 @@ jobs:
             Set-Content "env:\$($matches[1])" $matches[2]
           }
         }
-        $env:VCPKG_ROOT = $customVcpkgRoot
 
         & (Join-Path $workRoot 'qt5\configure.bat') `
           -init-submodules `
@@ -468,12 +471,28 @@ jobs:
           throw 'Unable to locate extracted IFW source directory.'
         }
 
-        $libRoot = Join-Path $env:VCPKG_ROOT 'installed\x64-windows-static'
+        $ifwVcpkgRoot = $env:IFW_VCPKG_ROOT
+        if (-not $ifwVcpkgRoot) {
+          throw 'IFW_VCPKG_ROOT is not set. The Install IFW build dependencies step may have failed.'
+        }
+        $libRoot = Join-Path $ifwVcpkgRoot 'installed\x64-windows-static'
+        $libDir = Join-Path $libRoot 'lib'
+        Write-Host "IFW_VCPKG_ROOT=$ifwVcpkgRoot"
+        Write-Host "Library directory: $libDir"
+        if (Test-Path $libDir) {
+          Write-Host "Library directory contents:"
+          Get-ChildItem -Path $libDir -Filter '*.lib' | ForEach-Object { Write-Host "  $_" }
+        } else {
+          throw "Library directory does not exist: $libDir"
+        }
         $env:INCLUDE = "$(Join-Path $libRoot 'include');$env:INCLUDE"
-        $env:LIB = "$(Join-Path $libRoot 'lib');$env:LIB"
-        $zlibLib = (Get-ChildItem -Path (Join-Path $libRoot 'lib') -Filter 'zlib*.lib' | Select-Object -First 1).FullName
-        $bzip2Lib = (Get-ChildItem -Path (Join-Path $libRoot 'lib') -Filter '*bz2*.lib' | Select-Object -First 1).FullName
-        $lzmaLib = (Get-ChildItem -Path (Join-Path $libRoot 'lib') -Filter '*lzma*.lib' | Select-Object -First 1).FullName
+        $env:LIB = "$libDir;$env:LIB"
+        $zlibLib = (Get-ChildItem -Path $libDir -Filter 'zlib*.lib' | Select-Object -First 1).FullName
+        if (-not $zlibLib) { $zlibLib = (Get-ChildItem -Path $libDir -Filter 'z.lib' | Select-Object -First 1).FullName }
+        $bzip2Lib = (Get-ChildItem -Path $libDir -Filter '*bz2*.lib' | Select-Object -First 1).FullName
+        if (-not $bzip2Lib) { $bzip2Lib = (Get-ChildItem -Path $libDir -Filter 'bzip2*.lib' | Select-Object -First 1).FullName }
+        $lzmaLib = (Get-ChildItem -Path $libDir -Filter '*lzma*.lib' | Select-Object -First 1).FullName
+        Write-Host "Resolved libraries: zlib=$zlibLib bzip2=$bzip2Lib lzma=$lzmaLib"
         if (-not $zlibLib -or -not $bzip2Lib -or -not $lzmaLib) {
           throw 'Failed to resolve one or more IFW compression libraries from vcpkg.'
         }

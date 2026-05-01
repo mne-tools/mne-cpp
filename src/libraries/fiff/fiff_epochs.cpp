@@ -36,6 +36,7 @@
 //=============================================================================================================
 
 #include "fiff_epochs.h"
+#include "fiff_evoked.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -123,11 +124,15 @@ QList<FiffEpochData> FiffEpochs::concatenateEpochs(const QList<QList<FiffEpochDa
 
 //=============================================================================================================
 
-MatrixXd FiffEpochs::averageEpochs(const QList<FiffEpochData>& epochs)
+FiffEvoked FiffEpochs::averageEpochs(const QList<FiffEpochData>& epochs,
+                                     double dSFreq,
+                                     const QString& comment)
 {
+    FiffEvoked evoked;
+
     if (epochs.isEmpty()) {
         qWarning() << "[FiffEpochs::averageEpochs] Empty epoch list.";
-        return MatrixXd();
+        return evoked;
     }
 
     const int nCh = static_cast<int>(epochs[0].data.rows());
@@ -145,7 +150,24 @@ MatrixXd FiffEpochs::averageEpochs(const QList<FiffEpochData>& epochs)
     }
 
     avg /= static_cast<double>(nEpochs);
-    return avg;
+
+    // Populate the evoked
+    evoked.data = avg;
+    evoked.nave = nEpochs;
+    evoked.aspect_kind = FIFFV_ASPECT_AVERAGE;
+    evoked.comment = comment;
+
+    // Compute times vector from the first epoch
+    const double tmin = epochs[0].tmin;
+    evoked.first = static_cast<fiff_int_t>(std::round(tmin * dSFreq));
+    evoked.last = evoked.first + nTimes - 1;
+
+    RowVectorXf times(nTimes);
+    for (int i = 0; i < nTimes; ++i)
+        times(i) = static_cast<float>(tmin + static_cast<double>(i) / dSFreq);
+    evoked.times = times;
+
+    return evoked;
 }
 
 //=============================================================================================================
