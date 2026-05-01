@@ -1,0 +1,182 @@
+//=============================================================================================================
+/**
+ * @file     filter_chpi.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.3.0
+ * @date     May, 2026
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    Implementation of filterChpi — cHPI signal removal by notch filtering.
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "filter_chpi.h"
+#include "iirfilter.h"
+
+#include <fiff/fiff_info.h>
+#include <fiff/fiff_constants.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QDebug>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace UTILSLIB;
+using namespace FIFFLIB;
+using namespace Eigen;
+
+//=============================================================================================================
+// STATIC HELPERS
+//=============================================================================================================
+
+/**
+ * @brief Collect indices of MEG channels from info.
+ */
+static QVector<int> megChannelIndices(const FiffInfo& info)
+{
+    QVector<int> indices;
+    for (int i = 0; i < info.chs.size(); ++i) {
+        if (info.chs[i].kind == FIFFV_MEG_CH) {
+            indices.append(i);
+        }
+    }
+    return indices;
+}
+
+//=============================================================================================================
+// DEFINITIONS
+//=============================================================================================================
+
+void UTILSLIB::filterChpi(MatrixXd& data,
+                           const FiffInfo& info,
+                           double sfreq,
+                           const QVector<double>& hpiFreqs,
+                           const FilterChpiParams& params)
+{
+    if (hpiFreqs.isEmpty()) {
+        return;
+    }
+
+    if (sfreq <= 0.0) {
+        qWarning() << "filterChpi: Invalid sampling frequency" << sfreq << "Hz. Skipping.";
+        return;
+    }
+
+    const double dNyquist = sfreq / 2.0;
+
+    // Collect valid frequencies
+    QVector<double> validFreqs;
+    for (const double freq : hpiFreqs) {
+        const double fLow = freq - params.dNotchWidth;
+        const double fHigh = freq + params.dNotchWidth;
+        if (freq <= 0.0 || fHigh >= dNyquist) {
+            qWarning() << "filterChpi: Skipping invalid cHPI frequency" << freq
+                        << "Hz (Nyquist =" << dNyquist << "Hz).";
+            continue;
+        }
+        if (fLow <= 0.0) {
+            qWarning() << "filterChpi: Skipping cHPI frequency" << freq
+                        << "Hz (notch lower edge <= 0 Hz).";
+            continue;
+        }
+        validFreqs.append(freq);
+    }
+
+    if (validFreqs.isEmpty()) {
+        return;
+    }
+
+    if (params.bMegOnly) {
+        // Filter only MEG channels
+        const QVector<int> megIdx = megChannelIndices(info);
+        if (megIdx.isEmpty()) {
+            qWarning() << "filterChpi: No MEG channels found in FiffInfo. Nothing to filter.";
+            return;
+        }
+
+        // Extract MEG submatrix
+        MatrixXd megData(megIdx.size(), data.cols());
+        for (int i = 0; i < megIdx.size(); ++i) {
+            megData.row(i) = data.row(megIdx[i]);
+        }
+
+        // Apply notch filters sequentially
+        for (const double freq : validFreqs) {
+            const double fLow = freq - params.dNotchWidth;
+            const double fHigh = freq + params.dNotchWidth;
+
+            QVector<IirBiquad> sos = IirFilter::designButterworth(
+                params.iFilterOrder, IirFilter::BandStop, fLow, fHigh, sfreq);
+
+            megData = IirFilter::applyZeroPhaseMatrix(megData, sos);
+        }
+
+        // Write back
+        for (int i = 0; i < megIdx.size(); ++i) {
+            data.row(megIdx[i]) = megData.row(i);
+        }
+    } else {
+        // Filter all channels
+        for (const double freq : validFreqs) {
+            const double fLow = freq - params.dNotchWidth;
+            const double fHigh = freq + params.dNotchWidth;
+
+            QVector<IirBiquad> sos = IirFilter::designButterworth(
+                params.iFilterOrder, IirFilter::BandStop, fLow, fHigh, sfreq);
+
+            data = IirFilter::applyZeroPhaseMatrix(data, sos);
+        }
+    }
+}
+
+//=============================================================================================================
+
+void UTILSLIB::filterChpi(MatrixXd& data,
+                           const FiffInfo& info,
+                           double sfreq,
+                           const FilterChpiParams& params)
+{
+    // Attempt to extract HPI coil frequencies from FiffInfo.
+    // The HPI frequency information may be stored in various FIFF blocks
+    // (FIFFB_HPI_MEAS, FIFFB_HPI_SUBSYSTEM), but the FiffInfo C++ struct
+    // does not currently expose a parsed list of HPI excitation frequencies.
+    // This overload is provided for API completeness; users should prefer
+    // passing frequencies explicitly.
+    Q_UNUSED(data)
+    Q_UNUSED(info)
+    Q_UNUSED(sfreq)
+    Q_UNUSED(params)
+
+    qWarning() << "filterChpi: Automatic cHPI frequency extraction from FiffInfo is not yet "
+                  "implemented. Please provide frequencies explicitly via the hpiFreqs parameter.";
+}

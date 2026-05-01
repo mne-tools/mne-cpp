@@ -47,6 +47,9 @@ set(SOURCES
   extended_infomax.cpp
   stim_artifact.cpp
   eeg_reference.cpp
+  eog_regression.cpp
+  filter_chpi.cpp
+  annotate_artifact.cpp
 )
 
 set(HEADERS
@@ -84,6 +87,9 @@ set(HEADERS
   extended_infomax.h
   stim_artifact.h
   eeg_reference.h
+  eog_regression.h
+  filter_chpi.h
+  annotate_artifact.h
 )
 
 set(FILE_TO_UPDATE dsp_global.cpp)

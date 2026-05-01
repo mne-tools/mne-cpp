@@ -217,6 +217,9 @@ add_subdirectory(test_mna_bids)
 
 # v2.3.0 DSP preprocessing tests
 add_subdirectory(test_dsp_stim_artifact)
+add_subdirectory(test_dsp_annotate_artifact)
+add_subdirectory(test_dsp_filter_chpi)
+add_subdirectory(test_dsp_eog_regression)
 
 # v2.2.0 cross-validation tests (MNE-CPP vs MNE-Python)
 add_subdirectory(test_crossval_covariance)
