@@ -141,8 +141,8 @@ public:
     /**
      * AbstractAlgorithm functions
      */
-    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const;
-    virtual void init();
+    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const override;
+    virtual void init() override;
 
     //=========================================================================================================
     /**
@@ -150,13 +150,13 @@ public:
      */
     void initPluginControlWidgets();
 
-    virtual void unload();
-    virtual bool start();
-    virtual bool stop();
-    virtual SCSHAREDLIB::AbstractPlugin::PluginType getType() const;
-    virtual QString getName() const;
-    virtual QWidget* setupWidget();
-    virtual QString getBuildInfo();
+    virtual void unload() override;
+    virtual bool start() override;
+    virtual bool stop() override;
+    virtual SCSHAREDLIB::AbstractPlugin::PluginType getType() const override;
+    virtual QString getName() const override;
+    virtual QWidget* setupWidget() override;
+    virtual QString getBuildInfo() override;
     virtual QVariantMap getAttributes() const override;
     virtual void setAttributes(const QVariantMap& attributes) override;
 
@@ -225,7 +225,7 @@ protected:
      */
     void onTimePointValueChanged(int iTimePointMs);
 
-    virtual void run();
+    virtual void run() override;
 
     QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeFwdSolution> >           m_pRTFSInput;               /**< The RealTimeFwdSolution input.*/
     QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray> >      m_pRTMSAInput;              /**< The RealTimeMultiSampleArray input.*/

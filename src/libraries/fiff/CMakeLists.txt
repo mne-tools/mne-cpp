@@ -30,6 +30,7 @@ set(SOURCES
     fiff_dir_entry.cpp
     fiff_info_base.cpp
     fiff_evoked.cpp
+    fiff_epochs.cpp
     fiff_evoked_set.cpp
     fiff_events.cpp
     fiff_io.cpp
@@ -69,6 +70,7 @@ set(HEADERS
     fiff_stream.h
     fiff_info_base.h
     fiff_evoked.h
+    fiff_epochs.h
     fiff_evoked_set.h
     fiff_events.h
     fiff_io.h

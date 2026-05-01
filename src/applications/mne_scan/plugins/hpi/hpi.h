@@ -122,15 +122,15 @@ public:
     /**
      * AbstractAlgorithm functions
      */
-    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const;
-    virtual void init();
-    virtual void unload();
-    virtual bool start();
-    virtual bool stop();
-    virtual AbstractPlugin::PluginType getType() const;
-    virtual QString getName() const;
-    virtual QWidget* setupWidget();
-    virtual QString getBuildInfo();
+    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const override;
+    virtual void init() override;
+    virtual void unload() override;
+    virtual bool start() override;
+    virtual bool stop() override;
+    virtual AbstractPlugin::PluginType getType() const override;
+    virtual QString getName() const override;
+    virtual QWidget* setupWidget() override;
+    virtual QString getBuildInfo() override;
     virtual QVariantMap getAttributes() const override;
     virtual void setAttributes(const QVariantMap& attributes) override;
 
@@ -259,7 +259,7 @@ private:
     /**
      * AbstractAlgorithm function
      */
-    virtual void run();
+    virtual void run() override;
 
     //=========================================================================================================
     /**

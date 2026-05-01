@@ -19,6 +19,7 @@ set(SOURCES
   ml_trainer.cpp
   ml_csp.cpp
   ml_spoc.cpp
+  ml_ssd.cpp
 )
 
 set(HEADERS
@@ -33,6 +34,7 @@ set(HEADERS
   ml_trainer.h
   ml_csp.h
   ml_spoc.h
+  ml_ssd.h
 )
 
 set(FILE_TO_UPDATE ml_global.cpp)

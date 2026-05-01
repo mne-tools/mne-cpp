@@ -16,6 +16,7 @@ set(SOURCES
     fs_colortable.cpp
     fs_global.cpp
     fs_label.cpp
+    fs_label_utils.cpp
     fs_surface.cpp
     fs_annotationset.cpp
     fs_surfaceset.cpp
@@ -27,6 +28,7 @@ set(HEADERS
     fs_global.h
     fs_colortable.h
     fs_label.h
+    fs_label_utils.h
     fs_surface.h
     fs_annotationset.h
     fs_surfaceset.h

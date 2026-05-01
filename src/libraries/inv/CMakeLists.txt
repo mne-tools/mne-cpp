@@ -16,6 +16,7 @@ set(SOURCES
     rap_music/inv_rap_music.cpp
     rap_music/inv_pwl_rap_music.cpp
     rap_music/inv_dipole.cpp
+    rap_music/inv_trap_music.cpp
     inv_source_coupling.cpp
     inv_source_estimate.cpp
     inv_source_estimate_token.cpp
@@ -54,6 +55,7 @@ set(HEADERS
     rap_music/inv_rap_music.h
     rap_music/inv_pwl_rap_music.h
     rap_music/inv_dipole.h
+    rap_music/inv_trap_music.h
     inv_source_estimate.h
     inv_source_estimate_token.h
     inv_types.h
