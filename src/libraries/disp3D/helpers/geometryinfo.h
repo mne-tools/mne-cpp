@@ -47,6 +47,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <atomic>
 #include <limits>
 #include <functional>
 
@@ -111,7 +112,8 @@ public:
      * @param[in] interpolationFunction    Weight function (e.g. Interpolation::cubic).
      * @param[in] dCancelDist             Maximum geodesic distance for interpolation.
      * @param[in] progressCallback         Optional callback reporting Dijkstra progress (current, total).
-     * @return Sparse interpolation matrix (nVertices x nSources).
+     * @param[in] cancelledFlag            Optional pointer to an atomic bool; when set to true the computation aborts early.
+     * @return Sparse interpolation matrix (nVertices x nSources), or empty matrix if cancelled.
      */
     static QSharedPointer<Eigen::SparseMatrix<float>> scdcInterpolationMat(
         const Eigen::MatrixX3f &matVertices,
@@ -119,7 +121,8 @@ public:
         const Eigen::VectorXi &vecVertSubset,
         double (*interpolationFunction)(double),
         double dCancelDist,
-        std::function<void(int, int)> progressCallback = nullptr);
+        std::function<void(int, int)> progressCallback = nullptr,
+        const std::atomic<bool> *cancelledFlag = nullptr);
 
     //=========================================================================================================
     /**

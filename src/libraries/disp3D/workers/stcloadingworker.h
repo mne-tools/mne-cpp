@@ -46,6 +46,7 @@
 #include <QString>
 #include <QSharedPointer>
 #include <Eigen/Sparse>
+#include <atomic>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -137,6 +138,16 @@ public:
      */
     bool hasRh() const { return m_hasRh; }
 
+    //=========================================================================================================
+    /**
+     * Request cancellation of the current loading/interpolation.
+     * Thread-safe; takes effect at the next progress check.
+     */
+    void requestCancel() { m_cancelled.store(true, std::memory_order_relaxed); }
+
+    /** @return true if cancellation has been requested. */
+    bool isCancelled() const { return m_cancelled.load(std::memory_order_relaxed); }
+
 public slots:
     //=========================================================================================================
     /**
@@ -193,6 +204,7 @@ private:
 
     QSharedPointer<Eigen::SparseMatrix<float>> m_interpMatLh;  /**< LH interpolation matrix. */
     QSharedPointer<Eigen::SparseMatrix<float>> m_interpMatRh;  /**< RH interpolation matrix. */
+    std::atomic<bool> m_cancelled{false};                       /**< Cancellation flag. */
 };
 
 #endif // STCLOADINGWORKER_H

@@ -140,7 +140,8 @@ QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
     const VectorXi &vecVertSubset,
     double (*interpolationFunction)(double),
     double dCancelDist,
-    std::function<void(int, int)> progressCallback)
+    std::function<void(int, int)> progressCallback,
+    const std::atomic<bool> *cancelledFlag)
 {
     const qint32 nVerts = static_cast<qint32>(matVertices.rows());
     const qint32 nSources = static_cast<qint32>(vecVertSubset.size());
@@ -176,6 +177,9 @@ QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
     const double INF = FLOAT_INFINITY;
 
     for (qint32 s = 0; s < nSources; ++s) {
+        if (cancelledFlag && cancelledFlag->load(std::memory_order_relaxed))
+            return QSharedPointer<SparseMatrix<float>>();
+
         if (progressCallback && s > 0 && s % 100 == 0) {
             progressCallback(s, nSources);
         }

@@ -3037,6 +3037,7 @@ void BrainView::clearNetwork()
 
 void BrainView::stopAllStreaming()
 {
+    m_sourceManager.cancelLoading();
     m_sourceManager.stopStreaming();
     m_sensorStreamManager.stopStreaming();
 }

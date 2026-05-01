@@ -61,6 +61,15 @@ SourceEstimateManager::SourceEstimateManager(QObject *parent)
 
 SourceEstimateManager::~SourceEstimateManager()
 {
+    cancelLoading();
+}
+
+//=============================================================================================================
+
+void SourceEstimateManager::cancelLoading()
+{
+    if (m_stcWorker)
+        m_stcWorker->requestCancel();
     if (m_loadingThread) {
         m_loadingThread->quit();
         m_loadingThread->wait();

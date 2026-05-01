@@ -96,6 +96,8 @@ QSharedPointer<Eigen::SparseMatrix<float>> StcLoadingWorker::computeInterpolatio
     // but uses ~18 MB instead of ~8.7 GB for a typical fsaverage source space.
     const int progressRange = progressEnd - progressStart;
     auto progressCallback = [this, &hemiLabel, progressStart, progressRange](int current, int total) {
+        if (m_cancelled.load(std::memory_order_relaxed))
+            return;
         int pct = progressStart + (progressRange * current) / total;
         emit progress(pct, QString("%1 geodesic interpolation %2/%3").arg(hemiLabel).arg(current).arg(total));
     };
@@ -106,8 +108,12 @@ QSharedPointer<Eigen::SparseMatrix<float>> StcLoadingWorker::computeInterpolatio
         vecSourceVertices,
         DISP3DLIB::Interpolation::cubic,
         cancelDist,
-        progressCallback
+        progressCallback,
+        &m_cancelled
     );
+
+    if (m_cancelled.load(std::memory_order_relaxed))
+        return QSharedPointer<Eigen::SparseMatrix<float>>();
 
     emit progress(progressEnd, QString("%1 interpolation matrix ready").arg(hemiLabel));
     return interpMat;
@@ -151,6 +157,8 @@ void StcLoadingWorker::process()
         return;
     }
 
+    if (m_cancelled.load(std::memory_order_relaxed)) { emit finished(false); return; }
+
     // Compute LH interpolation matrix
     if (m_hasLh && m_lhSurface) {
         Eigen::MatrixX3f matVertices = m_lhSurface->verticesAsMatrix();
@@ -159,6 +167,7 @@ void StcLoadingWorker::process()
         if (vecSourceVertices.size() > 0) {
             m_interpMatLh = computeInterpolationMatrix(matVertices, vecSourceVertices, m_cancelDist,
                                                        "LH", 10, 45);
+            if (m_cancelled.load(std::memory_order_relaxed)) { emit finished(false); return; }
         }
     }
 
@@ -170,6 +179,7 @@ void StcLoadingWorker::process()
         if (vecSourceVertices.size() > 0) {
             m_interpMatRh = computeInterpolationMatrix(matVertices, vecSourceVertices, m_cancelDist,
                                                        "RH", 50, 90);
+            if (m_cancelled.load(std::memory_order_relaxed)) { emit finished(false); return; }
         }
     }
 

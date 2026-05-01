@@ -104,6 +104,11 @@ public:
               const QString &activeSurfaceType);
 
     /**
+     * Cancel any in-progress STC loading / interpolation and wait for the thread to finish.
+     */
+    void cancelLoading();
+
+    /**
      * @return true while an async STC load is in progress.
      */
     bool isLoading() const { return m_isLoading; }
