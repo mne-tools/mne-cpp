@@ -796,6 +796,12 @@ public slots:
      */
     void clearNetwork();
 
+    /**
+     * Stop all active background streaming (source estimate + sensor).
+     * Call before destruction to avoid blocking thread joins in destructors.
+     */
+    void stopAllStreaming();
+
     //=========================================================================================================
     // ── Video overlay ──────────────────────────────────────────────────
     //=========================================================================================================
