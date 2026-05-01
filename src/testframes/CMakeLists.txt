@@ -229,3 +229,7 @@ add_subdirectory(test_crossval_covariance)
 
 # v2.3.0 inverse/beamformer convenience tests
 add_subdirectory(test_inv_convenience)
+
+# v2.3.0 Maxwell bad channels + simulation tests
+add_subdirectory(test_dsp_bad_channels_maxwell)
+add_subdirectory(test_dsp_simulate)

@@ -53,6 +53,8 @@ set(SOURCES
   bridged_electrodes.cpp
   bad_channels_lof.cpp
   peak_finder.cpp
+  bad_channels_maxwell.cpp
+  simulate.cpp
 )
 
 set(HEADERS
@@ -96,6 +98,8 @@ set(HEADERS
   bridged_electrodes.h
   bad_channels_lof.h
   peak_finder.h
+  bad_channels_maxwell.h
+  simulate.h
 )
 
 set(FILE_TO_UPDATE dsp_global.cpp)
