@@ -91,6 +91,33 @@ private slots:
     void testLedoitWolfDimensions();
     void testLedoitWolfIdentityLimit();
 
+    // OAS tests
+    void testOasShrinkageRange();
+    void testOasPositiveDefinite();
+    void testOasSymmetry();
+
+    // Diagonal fixed tests
+    void testDiagFixedPositiveDefinite();
+    void testDiagFixedIncreasedDiagonal();
+
+    // PCA tests
+    void testPcaDimensions();
+    void testPcaAutoRank();
+    void testPcaExplicitRank();
+    void testPcaSymmetry();
+
+    // Factor Analysis tests
+    void testFactorAnalysisDimensions();
+    void testFactorAnalysisSymmetry();
+    void testFactorAnalysisPositiveDefinite();
+
+    // Auto-select tests
+    void testAutoSelectReturnsValid();
+    void testAutoSelectMethodIndex();
+
+    // Log-likelihood tests
+    void testGaussianLogLikelihoodFinite();
+
     void cleanupTestCase();
 
 private:
@@ -251,6 +278,217 @@ void TestStsCovEstimators::testLedoitWolfIdentityLimit()
         QVERIFY2(std::abs(cov(i, i) - 1.0) < 0.1,
                  qPrintable(QString("Diagonal(%1)=%2, expected ~1.0").arg(i).arg(cov(i, i))));
     }
+}
+
+//=============================================================================================================
+// OAS tests
+//=============================================================================================================
+
+void TestStsCovEstimators::testOasShrinkageRange()
+{
+    MatrixXd data = generateGaussianData(20, 100);
+    auto [cov, rho] = StsCovEstimators::oas(data);
+    QVERIFY2(rho >= 0.0 && rho <= 1.0,
+             qPrintable(QString("OAS rho=%1, expected [0,1]").arg(rho)));
+}
+
+//=============================================================================================================
+
+void TestStsCovEstimators::testOasPositiveDefinite()
+{
+    MatrixXd data = generateGaussianData(30, 200);
+    auto [cov, rho] = StsCovEstimators::oas(data);
+
+    SelfAdjointEigenSolver<MatrixXd> solver(cov);
+    double minEig = solver.eigenvalues().minCoeff();
+    QVERIFY2(minEig > 0.0,
+             qPrintable(QString("OAS min eigenvalue=%1, expected > 0").arg(minEig)));
+}
+
+//=============================================================================================================
+
+void TestStsCovEstimators::testOasSymmetry()
+{
+    MatrixXd data = generateGaussianData(20, 100);
+    auto [cov, rho] = StsCovEstimators::oas(data);
+    double asymmetry = (cov - cov.transpose()).norm();
+    QVERIFY2(asymmetry < 1e-12,
+             qPrintable(QString("OAS asymmetry=%1").arg(asymmetry)));
+}
+
+//=============================================================================================================
+// Diagonal fixed tests
+//=============================================================================================================
+
+void TestStsCovEstimators::testDiagFixedPositiveDefinite()
+{
+    MatrixXd data = generateRankDeficientData(64, 40, 30);
+    auto [cov, reg] = StsCovEstimators::diagonalFixed(data, 0.1);
+
+    SelfAdjointEigenSolver<MatrixXd> solver(cov);
+    double minEig = solver.eigenvalues().minCoeff();
+    QVERIFY2(minEig > 0.0,
+             qPrintable(QString("DiagFixed min eigenvalue=%1").arg(minEig)));
+}
+
+//=============================================================================================================
+
+void TestStsCovEstimators::testDiagFixedIncreasedDiagonal()
+{
+    MatrixXd data = generateGaussianData(10, 200);
+    auto [covBase, reg0] = StsCovEstimators::diagonalFixed(data, 0.0);
+    auto [covReg, reg1] = StsCovEstimators::diagonalFixed(data, 0.2);
+
+    // Diagonal elements should be larger with regularisation
+    for (int i = 0; i < 10; ++i) {
+        QVERIFY2(covReg(i, i) >= covBase(i, i),
+                 qPrintable(QString("DiagFixed: reg diagonal(%1)=%2 < base=%3")
+                            .arg(i).arg(covReg(i, i)).arg(covBase(i, i))));
+    }
+}
+
+//=============================================================================================================
+// PCA tests
+//=============================================================================================================
+
+void TestStsCovEstimators::testPcaDimensions()
+{
+    int nCh = 20;
+    MatrixXd data = generateGaussianData(nCh, 200);
+    auto [cov, rank] = StsCovEstimators::pca(data);
+    QCOMPARE(cov.rows(), nCh);
+    QCOMPARE(cov.cols(), nCh);
+}
+
+//=============================================================================================================
+
+void TestStsCovEstimators::testPcaAutoRank()
+{
+    // Rank-deficient data → PCA auto-rank should detect the true rank
+    int nCh = 30;
+    int trueRank = 10;
+    MatrixXd data = generateRankDeficientData(nCh, 200, trueRank);
+    auto [cov, detectedRank] = StsCovEstimators::pca(data);
+
+    QVERIFY2(static_cast<int>(detectedRank) <= trueRank + 2,
+             qPrintable(QString("PCA auto rank=%1, true rank=%2")
+                        .arg(detectedRank).arg(trueRank)));
+}
+
+//=============================================================================================================
+
+void TestStsCovEstimators::testPcaExplicitRank()
+{
+    int nCh = 20;
+    int explicitRank = 5;
+    MatrixXd data = generateGaussianData(nCh, 200);
+    auto [cov, rank] = StsCovEstimators::pca(data, explicitRank);
+
+    QCOMPARE(static_cast<int>(rank), explicitRank);
+
+    // Check that the effective rank is <= explicitRank
+    SelfAdjointEigenSolver<MatrixXd> solver(cov);
+    int nonZero = 0;
+    double maxEig = solver.eigenvalues().maxCoeff();
+    for (int i = 0; i < nCh; ++i) {
+        if (solver.eigenvalues()(i) > maxEig * 1e-10)
+            ++nonZero;
+    }
+    QCOMPARE(nonZero, explicitRank);
+}
+
+//=============================================================================================================
+
+void TestStsCovEstimators::testPcaSymmetry()
+{
+    MatrixXd data = generateGaussianData(15, 100);
+    auto [cov, rank] = StsCovEstimators::pca(data);
+    double asymmetry = (cov - cov.transpose()).norm();
+    QVERIFY2(asymmetry < 1e-12,
+             qPrintable(QString("PCA asymmetry=%1").arg(asymmetry)));
+}
+
+//=============================================================================================================
+// Factor Analysis tests
+//=============================================================================================================
+
+void TestStsCovEstimators::testFactorAnalysisDimensions()
+{
+    int nCh = 15;
+    MatrixXd data = generateGaussianData(nCh, 300);
+    auto [cov, ll] = StsCovEstimators::factorAnalysis(data, 3);
+    QCOMPARE(cov.rows(), nCh);
+    QCOMPARE(cov.cols(), nCh);
+}
+
+//=============================================================================================================
+
+void TestStsCovEstimators::testFactorAnalysisSymmetry()
+{
+    MatrixXd data = generateGaussianData(10, 200);
+    auto [cov, ll] = StsCovEstimators::factorAnalysis(data, 3);
+    double asymmetry = (cov - cov.transpose()).norm();
+    QVERIFY2(asymmetry < 1e-12,
+             qPrintable(QString("FA asymmetry=%1").arg(asymmetry)));
+}
+
+//=============================================================================================================
+
+void TestStsCovEstimators::testFactorAnalysisPositiveDefinite()
+{
+    MatrixXd data = generateGaussianData(15, 300);
+    auto [cov, ll] = StsCovEstimators::factorAnalysis(data, 3);
+
+    SelfAdjointEigenSolver<MatrixXd> solver(cov);
+    double minEig = solver.eigenvalues().minCoeff();
+    QVERIFY2(minEig > 0.0,
+             qPrintable(QString("FA min eigenvalue=%1").arg(minEig)));
+}
+
+//=============================================================================================================
+// Auto-select tests
+//=============================================================================================================
+
+void TestStsCovEstimators::testAutoSelectReturnsValid()
+{
+    MatrixXd data = generateGaussianData(10, 200);
+    auto [cov, bestMethod] = StsCovEstimators::autoSelect(data, 3);
+
+    // Must be positive semi-definite and symmetric
+    QCOMPARE(cov.rows(), static_cast<Eigen::Index>(10));
+    QCOMPARE(cov.cols(), static_cast<Eigen::Index>(10));
+    double asymmetry = (cov - cov.transpose()).norm();
+    QVERIFY2(asymmetry < 1e-10,
+             qPrintable(QString("Auto-select asymmetry=%1").arg(asymmetry)));
+}
+
+//=============================================================================================================
+
+void TestStsCovEstimators::testAutoSelectMethodIndex()
+{
+    MatrixXd data = generateGaussianData(10, 200);
+    auto [cov, bestMethod] = StsCovEstimators::autoSelect(data, 3);
+
+    int method = static_cast<int>(bestMethod);
+    QVERIFY2(method >= 0 && method <= 5,
+             qPrintable(QString("Auto-select method=%1, expected [0,5]").arg(method)));
+}
+
+//=============================================================================================================
+// Log-likelihood tests
+//=============================================================================================================
+
+void TestStsCovEstimators::testGaussianLogLikelihoodFinite()
+{
+    MatrixXd data = generateGaussianData(10, 200);
+    MatrixXd cov = (data * data.transpose()) / 200.0;
+    cov.diagonal().array() += 1e-6;  // ensure invertible
+
+    double ll = StsCovEstimators::gaussianLogLikelihood(data, cov);
+    QVERIFY2(std::isfinite(ll),
+             qPrintable(QString("Log-likelihood=%1, expected finite").arg(ll)));
+    QVERIFY2(ll < 0.0,
+             qPrintable(QString("Log-likelihood=%1, expected negative").arg(ll)));
 }
 
 //=============================================================================================================

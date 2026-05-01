@@ -43,6 +43,16 @@
 //=============================================================================================================
 
 #include <algorithm>
+#include <cmath>
+#include <numeric>
+#include <random>
+#include <vector>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Eigenvalues>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -93,4 +103,341 @@ std::pair<MatrixXd, double> StsCovEstimators::ledoitWolf(const MatrixXd& matData
     covShrunk.diagonal().array() += alpha * mu;
 
     return {covShrunk, alpha};
+}
+
+//=============================================================================================================
+
+std::pair<MatrixXd, double> StsCovEstimators::oas(const MatrixXd& matData)
+{
+    const int p = static_cast<int>(matData.rows());
+    const int n = static_cast<int>(matData.cols());
+
+    // Sample covariance (1/n normalisation)
+    const MatrixXd S = (matData * matData.transpose()) / static_cast<double>(n);
+
+    const double trS = S.trace();
+    const double trS2 = S.squaredNorm();   // = trace(S * S) for symmetric S
+    const double mu = trS / static_cast<double>(p);
+
+    // OAS formula: rho = (1 - 2/p) * trS2 + trS^2
+    //                     ------------------------------------------------
+    //                     (n + 1 - 2/p) * (trS2 - trS^2 / p)
+    const double num = (1.0 - 2.0 / static_cast<double>(p)) * trS2 + trS * trS;
+    const double den = (static_cast<double>(n) + 1.0 - 2.0 / static_cast<double>(p))
+                       * (trS2 - trS * trS / static_cast<double>(p));
+
+    double rho = 0.0;
+    if (std::abs(den) > 1e-30) {
+        rho = std::clamp(num / den, 0.0, 1.0);
+    }
+
+    // Shrunk covariance: rho * mu * I + (1 - rho) * S
+    MatrixXd covShrunk = (1.0 - rho) * S;
+    covShrunk.diagonal().array() += rho * mu;
+
+    return {covShrunk, rho};
+}
+
+//=============================================================================================================
+
+std::pair<MatrixXd, double> StsCovEstimators::diagonalFixed(const MatrixXd& matData,
+                                                             double dReg)
+{
+    const int p = static_cast<int>(matData.rows());
+    const int n = static_cast<int>(matData.cols());
+
+    // Sample covariance (1/n)
+    MatrixXd cov = (matData * matData.transpose()) / static_cast<double>(n);
+
+    // Add dReg * mean_eigenvalue * I  (mean_eigenvalue = trace / p)
+    const double meanEig = cov.trace() / static_cast<double>(p);
+    cov.diagonal().array() += dReg * meanEig;
+
+    return {cov, dReg};
+}
+
+//=============================================================================================================
+
+std::pair<MatrixXd, double> StsCovEstimators::pca(const MatrixXd& matData,
+                                                   int iRank)
+{
+    const int p = static_cast<int>(matData.rows());
+    const int n = static_cast<int>(matData.cols());
+
+    // Sample covariance (1/n)
+    const MatrixXd S = (matData * matData.transpose()) / static_cast<double>(n);
+
+    // Eigen decomposition (self-adjoint → eigenvalues in ascending order)
+    SelfAdjointEigenSolver<MatrixXd> solver(S);
+    VectorXd evals = solver.eigenvalues();
+    MatrixXd evecs = solver.eigenvectors();
+
+    // Auto-detect rank: count eigenvalues > max_eval * 1e-10
+    if (iRank <= 0) {
+        const double maxEval = evals.maxCoeff();
+        const double threshold = maxEval * 1e-10;
+        iRank = 0;
+        for (int i = 0; i < p; ++i) {
+            if (evals(i) > threshold)
+                ++iRank;
+        }
+        if (iRank == 0) iRank = 1;  // at least 1
+    }
+    iRank = std::min(iRank, p);
+
+    // Zero out eigenvalues below rank (keep top-k)
+    // Eigenvalues are in ascending order, so zero out [0, p-iRank)
+    for (int i = 0; i < p - iRank; ++i) {
+        evals(i) = 0.0;
+    }
+
+    // Reconstruct: V * diag(evals) * V^T
+    MatrixXd covPca = evecs * evals.asDiagonal() * evecs.transpose();
+
+    return {covPca, static_cast<double>(iRank)};
+}
+
+//=============================================================================================================
+
+std::pair<MatrixXd, double> StsCovEstimators::factorAnalysis(const MatrixXd& matData,
+                                                              int iNFactors,
+                                                              int iMaxIter,
+                                                              double dTol)
+{
+    const int p = static_cast<int>(matData.rows());
+    const int n = static_cast<int>(matData.cols());
+
+    // Sample covariance (1/n)
+    const MatrixXd S = (matData * matData.transpose()) / static_cast<double>(n);
+
+    // Default number of factors
+    if (iNFactors <= 0) {
+        iNFactors = std::max(1, std::min(p, n) / 2);
+    }
+    iNFactors = std::min(iNFactors, p - 1);
+
+    // Initialise Psi (noise variances) from diagonal of S
+    VectorXd psi = S.diagonal();
+
+    double prevLL = -std::numeric_limits<double>::infinity();
+
+    MatrixXd W;  // Loading matrix p x k
+
+    for (int iter = 0; iter < iMaxIter; ++iter) {
+        // E-step: compute expected sufficient statistics
+        // Psi^{-1/2}
+        VectorXd psiInvSqrt = psi.array().max(1e-30).inverse().sqrt();
+
+        // Whitened covariance: Psi^{-1/2} S Psi^{-1/2}
+        MatrixXd Sw = psiInvSqrt.asDiagonal() * S * psiInvSqrt.asDiagonal();
+
+        // Eigen decomposition of whitened covariance
+        SelfAdjointEigenSolver<MatrixXd> solver(Sw);
+        VectorXd evals = solver.eigenvalues();
+        MatrixXd evecs = solver.eigenvectors();
+
+        // Take top-k eigenvalues/vectors (ascending order → take last k)
+        VectorXd topEvals = evals.tail(iNFactors);
+        MatrixXd topEvecs = evecs.rightCols(iNFactors);
+
+        // Loading matrix: W = Psi^{1/2} * V_k * (Lambda_k - I)^{1/2}
+        VectorXd loadScale(iNFactors);
+        for (int j = 0; j < iNFactors; ++j) {
+            loadScale(j) = std::sqrt(std::max(topEvals(j) - 1.0, 0.0));
+        }
+        W = psi.array().sqrt().matrix().asDiagonal() * topEvecs * loadScale.asDiagonal();
+
+        // M-step: update Psi
+        // Psi_new = diag(S - W * W^T)
+        MatrixXd WWT = W * W.transpose();
+        psi = (S - WWT).diagonal().array().max(1e-30);
+
+        // Log-likelihood for convergence check:
+        // Sigma = W*W^T + diag(psi)
+        // Use the eigenvalue-based formula for efficiency
+        double logDetSigma = 0.0;
+        double trInvS = 0.0;
+        for (int j = 0; j < iNFactors; ++j) {
+            logDetSigma += std::log(std::max(topEvals(j), 1e-30));
+        }
+        // Add contribution of unit eigenvalues (p - k of them)
+        // and psi scaling
+        logDetSigma += psi.array().log().sum();
+
+        // Simple convergence via trace-based LL approximation
+        MatrixXd Sigma = WWT;
+        Sigma.diagonal() += psi;
+        SelfAdjointEigenSolver<MatrixXd> sigSolver(Sigma);
+        VectorXd sigEvals = sigSolver.eigenvalues().array().max(1e-30);
+        logDetSigma = sigEvals.array().log().sum();
+
+        MatrixXd SigmaInv = sigSolver.eigenvectors()
+                           * sigEvals.array().inverse().matrix().asDiagonal()
+                           * sigSolver.eigenvectors().transpose();
+        trInvS = (SigmaInv * S).trace();
+
+        double ll = -0.5 * static_cast<double>(n) * (static_cast<double>(p) * std::log(2.0 * M_PI)
+                                                      + logDetSigma + trInvS);
+
+        if (std::abs(ll - prevLL) < dTol) {
+            break;
+        }
+        prevLL = ll;
+    }
+
+    // Final covariance: W * W^T + diag(psi)
+    MatrixXd covFA = W * W.transpose();
+    covFA.diagonal() += psi;
+
+    return {covFA, prevLL};
+}
+
+//=============================================================================================================
+
+double StsCovEstimators::gaussianLogLikelihood(const MatrixXd& matTestData,
+                                                const MatrixXd& matCov)
+{
+    const int p = static_cast<int>(matTestData.rows());
+    const int n = static_cast<int>(matTestData.cols());
+
+    // Eigen decomposition of covariance
+    SelfAdjointEigenSolver<MatrixXd> solver(matCov);
+    VectorXd evals = solver.eigenvalues().array().max(1e-30);
+    MatrixXd evecs = solver.eigenvectors();
+
+    // log|Σ|
+    double logDet = evals.array().log().sum();
+
+    // Σ^{-1}
+    MatrixXd covInv = evecs * evals.array().inverse().matrix().asDiagonal() * evecs.transpose();
+
+    // Test sample covariance (1/n)
+    MatrixXd Stest = (matTestData * matTestData.transpose()) / static_cast<double>(n);
+
+    // trace(Σ^{-1} * S_test)
+    double trInvS = (covInv * Stest).trace();
+
+    // Average log-likelihood per sample
+    return -0.5 * (static_cast<double>(p) * std::log(2.0 * M_PI) + logDet + trInvS);
+}
+
+//=============================================================================================================
+
+std::pair<MatrixXd, double> StsCovEstimators::autoSelect(const MatrixXd& matData,
+                                                          int iNFolds)
+{
+    const int n = static_cast<int>(matData.cols());
+
+    if (iNFolds < 2) iNFolds = 2;
+    if (iNFolds > n) iNFolds = n;
+
+    // Create fold indices (simple sequential split)
+    std::vector<int> indices(static_cast<size_t>(n));
+    std::iota(indices.begin(), indices.end(), 0);
+
+    // Shuffle for randomised folds
+    std::mt19937 gen(42);
+    std::shuffle(indices.begin(), indices.end(), gen);
+
+    // Method names for indexing: 0=empirical, 1=shrunk, 2=oas, 3=diag_fixed, 4=pca, 5=fa
+    const int nMethods = 6;
+    std::vector<double> avgLL(static_cast<size_t>(nMethods), 0.0);
+
+    const int foldSize = n / iNFolds;
+
+    for (int fold = 0; fold < iNFolds; ++fold) {
+        // Split into train and test
+        int testStart = fold * foldSize;
+        int testEnd = (fold == iNFolds - 1) ? n : (fold + 1) * foldSize;
+        int nTest = testEnd - testStart;
+        int nTrain = n - nTest;
+
+        MatrixXd trainData(matData.rows(), nTrain);
+        MatrixXd testData(matData.rows(), nTest);
+
+        int trainIdx = 0;
+        int testIdx = 0;
+        for (int i = 0; i < n; ++i) {
+            int col = indices[static_cast<size_t>(i)];
+            if (i >= testStart && i < testEnd) {
+                testData.col(testIdx++) = matData.col(col);
+            } else {
+                trainData.col(trainIdx++) = matData.col(col);
+            }
+        }
+
+        // Zero-mean train and test independently
+        trainData.colwise() -= trainData.rowwise().mean();
+        testData.colwise() -= testData.rowwise().mean();
+
+        // Fit each method on train, evaluate on test
+        // 0: empirical
+        {
+            MatrixXd cov = (trainData * trainData.transpose()) / static_cast<double>(nTrain);
+            // Small regularisation to avoid singular matrix
+            cov.diagonal().array() += 1e-10 * cov.trace() / static_cast<double>(cov.rows());
+            avgLL[0] += gaussianLogLikelihood(testData, cov);
+        }
+        // 1: shrunk (Ledoit-Wolf)
+        {
+            auto [cov, alpha] = ledoitWolf(trainData);
+            avgLL[1] += gaussianLogLikelihood(testData, cov);
+        }
+        // 2: OAS
+        {
+            auto [cov, rho] = oas(trainData);
+            avgLL[2] += gaussianLogLikelihood(testData, cov);
+        }
+        // 3: diagonal_fixed
+        {
+            auto [cov, reg] = diagonalFixed(trainData);
+            avgLL[3] += gaussianLogLikelihood(testData, cov);
+        }
+        // 4: PCA
+        {
+            auto [cov, rank] = pca(trainData);
+            // PCA can produce singular matrix — regularise for LL computation
+            cov.diagonal().array() += 1e-10 * cov.trace() / static_cast<double>(cov.rows());
+            avgLL[4] += gaussianLogLikelihood(testData, cov);
+        }
+        // 5: Factor Analysis
+        {
+            auto [cov, ll] = factorAnalysis(trainData);
+            avgLL[5] += gaussianLogLikelihood(testData, cov);
+        }
+    }
+
+    // Average across folds
+    for (int m = 0; m < nMethods; ++m) {
+        avgLL[static_cast<size_t>(m)] /= static_cast<double>(iNFolds);
+    }
+
+    // Find best method
+    int bestMethod = 0;
+    double bestLL = avgLL[0];
+    for (int m = 1; m < nMethods; ++m) {
+        if (avgLL[static_cast<size_t>(m)] > bestLL) {
+            bestLL = avgLL[static_cast<size_t>(m)];
+            bestMethod = m;
+        }
+    }
+
+    // Re-fit best method on full data
+    std::pair<MatrixXd, double> result;
+    switch (bestMethod) {
+    case 0: {
+        MatrixXd cov = (matData * matData.transpose()) / static_cast<double>(n);
+        cov.diagonal().array() += 1e-10 * cov.trace() / static_cast<double>(cov.rows());
+        result = {cov, static_cast<double>(bestMethod)};
+        break;
+    }
+    case 1: result = ledoitWolf(matData); result.second = static_cast<double>(bestMethod); break;
+    case 2: result = oas(matData); result.second = static_cast<double>(bestMethod); break;
+    case 3: result = diagonalFixed(matData); result.second = static_cast<double>(bestMethod); break;
+    case 4: result = pca(matData); result.second = static_cast<double>(bestMethod); break;
+    case 5: result = factorAnalysis(matData); result.second = static_cast<double>(bestMethod); break;
+    default: result = ledoitWolf(matData); result.second = 1.0; break;
+    }
+
+    return result;
 }
