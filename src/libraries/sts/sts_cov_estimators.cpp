@@ -39,6 +39,13 @@
 #include "sts_cov_estimators.h"
 
 //=============================================================================================================
+// SKIGEN INCLUDES
+//=============================================================================================================
+
+#include <Skigen/Covariance>
+#include <Skigen/Decomposition>
+
+//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
@@ -67,75 +74,20 @@ using namespace Eigen;
 
 std::pair<MatrixXd, double> StsCovEstimators::ledoitWolf(const MatrixXd& matData)
 {
-    const int p = static_cast<int>(matData.rows());
-    const int n = static_cast<int>(matData.cols());
-
-    // Sample covariance (using 1/n, matching Ledoit-Wolf and scikit-learn)
-    const MatrixXd S = (matData * matData.transpose()) / static_cast<double>(n);
-
-    // Shrinkage target: mu * I_p
-    const double mu = S.trace() / static_cast<double>(p);
-
-    // delta = ||S - mu * I||^2_F / p
-    MatrixXd centered = S - mu * MatrixXd::Identity(p, p);
-    const double delta = centered.squaredNorm() / static_cast<double>(p);
-
-    // If delta is essentially zero, S is already a scaled identity
-    if (delta < 1e-30) {
-        return {S, 0.0};
-    }
-
-    // Efficient computation of beta:
-    // sum_k ||x_k x_k^T - S||^2_F = sum_k (x_k^T x_k)^2 - n * ||S||^2_F
-    double sumSqNorms = 0.0;
-    for (int k = 0; k < n; ++k) {
-        const double nrm = matData.col(k).squaredNorm();
-        sumSqNorms += nrm * nrm;
-    }
-    const double betaSum = sumSqNorms - static_cast<double>(n) * S.squaredNorm();
-    const double beta = betaSum / (static_cast<double>(n) * static_cast<double>(n) * static_cast<double>(p));
-
-    // Optimal shrinkage coefficient, clipped to [0, 1]
-    const double alpha = std::clamp(beta / delta, 0.0, 1.0);
-
-    // Shrunk covariance: alpha * mu * I + (1 - alpha) * S
-    MatrixXd covShrunk = (1.0 - alpha) * S;
-    covShrunk.diagonal().array() += alpha * mu;
-
-    return {covShrunk, alpha};
+    // matData is (p × n), already zero-centred; skigen expects (n × p)
+    Skigen::LedoitWolf<double> lw(/*assume_centered=*/true);
+    lw.fit(matData.transpose());
+    return {lw.covariance(), lw.shrinkage()};
 }
 
 //=============================================================================================================
 
 std::pair<MatrixXd, double> StsCovEstimators::oas(const MatrixXd& matData)
 {
-    const int p = static_cast<int>(matData.rows());
-    const int n = static_cast<int>(matData.cols());
-
-    // Sample covariance (1/n normalisation)
-    const MatrixXd S = (matData * matData.transpose()) / static_cast<double>(n);
-
-    const double trS = S.trace();
-    const double trS2 = S.squaredNorm();   // = trace(S * S) for symmetric S
-    const double mu = trS / static_cast<double>(p);
-
-    // OAS formula: rho = (1 - 2/p) * trS2 + trS^2
-    //                     ------------------------------------------------
-    //                     (n + 1 - 2/p) * (trS2 - trS^2 / p)
-    const double num = (1.0 - 2.0 / static_cast<double>(p)) * trS2 + trS * trS;
-    const double den = (static_cast<double>(n) + 1.0 - 2.0 / static_cast<double>(p))
-                       * (trS2 - trS * trS / static_cast<double>(p));
-
-    double rho = 0.0;
-    if (std::abs(den) > 1e-30) {
-        rho = std::clamp(num / den, 0.0, 1.0);
-    }
-
-    // Shrunk covariance: rho * mu * I + (1 - rho) * S
-    MatrixXd covShrunk = (1.0 - rho) * S;
-    covShrunk.diagonal().array() += rho * mu;
-
-    return {covShrunk, rho};
+    // matData is (p × n), already zero-centred; skigen expects (n × p)
+    Skigen::OAS<double> oas_est(/*assume_centered=*/true);
+    oas_est.fit(matData.transpose());
+    return {oas_est.covariance(), oas_est.shrinkage()};
 }
 
 //=============================================================================================================
@@ -204,92 +156,10 @@ std::pair<MatrixXd, double> StsCovEstimators::factorAnalysis(const MatrixXd& mat
                                                               int iMaxIter,
                                                               double dTol)
 {
-    const int p = static_cast<int>(matData.rows());
-    const int n = static_cast<int>(matData.cols());
-
-    // Sample covariance (1/n)
-    const MatrixXd S = (matData * matData.transpose()) / static_cast<double>(n);
-
-    // Default number of factors
-    if (iNFactors <= 0) {
-        iNFactors = std::max(1, std::min(p, n) / 2);
-    }
-    iNFactors = std::min(iNFactors, p - 1);
-
-    // Initialise Psi (noise variances) from diagonal of S
-    VectorXd psi = S.diagonal();
-
-    double prevLL = -std::numeric_limits<double>::infinity();
-
-    MatrixXd W;  // Loading matrix p x k
-
-    for (int iter = 0; iter < iMaxIter; ++iter) {
-        // E-step: compute expected sufficient statistics
-        // Psi^{-1/2}
-        VectorXd psiInvSqrt = psi.array().max(1e-30).inverse().sqrt();
-
-        // Whitened covariance: Psi^{-1/2} S Psi^{-1/2}
-        MatrixXd Sw = psiInvSqrt.asDiagonal() * S * psiInvSqrt.asDiagonal();
-
-        // Eigen decomposition of whitened covariance
-        SelfAdjointEigenSolver<MatrixXd> solver(Sw);
-        VectorXd evals = solver.eigenvalues();
-        MatrixXd evecs = solver.eigenvectors();
-
-        // Take top-k eigenvalues/vectors (ascending order → take last k)
-        VectorXd topEvals = evals.tail(iNFactors);
-        MatrixXd topEvecs = evecs.rightCols(iNFactors);
-
-        // Loading matrix: W = Psi^{1/2} * V_k * (Lambda_k - I)^{1/2}
-        VectorXd loadScale(iNFactors);
-        for (int j = 0; j < iNFactors; ++j) {
-            loadScale(j) = std::sqrt(std::max(topEvals(j) - 1.0, 0.0));
-        }
-        W = psi.array().sqrt().matrix().asDiagonal() * topEvecs * loadScale.asDiagonal();
-
-        // M-step: update Psi
-        // Psi_new = diag(S - W * W^T)
-        MatrixXd WWT = W * W.transpose();
-        psi = (S - WWT).diagonal().array().max(1e-30);
-
-        // Log-likelihood for convergence check:
-        // Sigma = W*W^T + diag(psi)
-        // Use the eigenvalue-based formula for efficiency
-        double logDetSigma = 0.0;
-        double trInvS = 0.0;
-        for (int j = 0; j < iNFactors; ++j) {
-            logDetSigma += std::log(std::max(topEvals(j), 1e-30));
-        }
-        // Add contribution of unit eigenvalues (p - k of them)
-        // and psi scaling
-        logDetSigma += psi.array().log().sum();
-
-        // Simple convergence via trace-based LL approximation
-        MatrixXd Sigma = WWT;
-        Sigma.diagonal() += psi;
-        SelfAdjointEigenSolver<MatrixXd> sigSolver(Sigma);
-        VectorXd sigEvals = sigSolver.eigenvalues().array().max(1e-30);
-        logDetSigma = sigEvals.array().log().sum();
-
-        MatrixXd SigmaInv = sigSolver.eigenvectors()
-                           * sigEvals.array().inverse().matrix().asDiagonal()
-                           * sigSolver.eigenvectors().transpose();
-        trInvS = (SigmaInv * S).trace();
-
-        double ll = -0.5 * static_cast<double>(n) * (static_cast<double>(p) * std::log(2.0 * M_PI)
-                                                      + logDetSigma + trInvS);
-
-        if (std::abs(ll - prevLL) < dTol) {
-            break;
-        }
-        prevLL = ll;
-    }
-
-    // Final covariance: W * W^T + diag(psi)
-    MatrixXd covFA = W * W.transpose();
-    covFA.diagonal() += psi;
-
-    return {covFA, prevLL};
+    // matData is (p × n), already zero-centred; skigen expects (n × p)
+    Skigen::FactorAnalysis<double> fa(iNFactors, iMaxIter, dTol);
+    fa.fit(matData.transpose());
+    return {fa.covariance(), fa.log_likelihood()};
 }
 
 //=============================================================================================================

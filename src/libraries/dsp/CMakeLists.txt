@@ -155,6 +155,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     ${MNE_LIBS_REQUIRED}
     Eigen3::Eigen
+    Skigen::Skigen
     ${FFTW_LIBS})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_DSP_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")

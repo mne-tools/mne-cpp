@@ -42,6 +42,12 @@
 #include <fiff/fiff_constants.h>
 
 //=============================================================================================================
+// SKIGEN INCLUDES
+//=============================================================================================================
+
+#include <Skigen/Neighbors>
+
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -53,8 +59,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <numeric>
-#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -71,66 +75,15 @@ using namespace Eigen;
 VectorXd UTILSLIB::computeLofScores(const MatrixXd& features, int k)
 {
     const int n = static_cast<int>(features.rows());
-    const int d = static_cast<int>(features.cols());
 
     if (n <= k) {
         return VectorXd::Ones(n);
     }
 
-    // Compute pairwise distance matrix
-    MatrixXd dist = MatrixXd::Zero(n, n);
-    for (int i = 0; i < n; ++i) {
-        for (int j = i + 1; j < n; ++j) {
-            double d_ij = (features.row(i) - features.row(j)).norm();
-            dist(i, j) = d_ij;
-            dist(j, i) = d_ij;
-        }
-    }
-
-    // For each point, find k-nearest neighbours and k-distance
-    std::vector<std::vector<int>> neighbors(static_cast<size_t>(n));
-    VectorXd kDist(n);
-
-    for (int i = 0; i < n; ++i) {
-        // Sort indices by distance to point i
-        std::vector<int> indices(static_cast<size_t>(n));
-        std::iota(indices.begin(), indices.end(), 0);
-        std::sort(indices.begin(), indices.end(),
-                  [&dist, i](int a, int b) { return dist(i, a) < dist(i, b); });
-
-        // Skip self (index 0 after sorting), take next k
-        neighbors[static_cast<size_t>(i)].resize(static_cast<size_t>(k));
-        for (int j = 0; j < k; ++j) {
-            neighbors[static_cast<size_t>(i)][static_cast<size_t>(j)] = indices[static_cast<size_t>(j + 1)];
-        }
-        kDist(i) = dist(i, indices[static_cast<size_t>(k)]);
-    }
-
-    // Compute Local Reachability Density (LRD) for each point
-    VectorXd lrd(n);
-    for (int i = 0; i < n; ++i) {
-        double reachDistSum = 0.0;
-        for (int j = 0; j < k; ++j) {
-            int nb = neighbors[static_cast<size_t>(i)][static_cast<size_t>(j)];
-            // Reachability distance = max(k-distance(nb), dist(i, nb))
-            reachDistSum += std::max(kDist(nb), dist(i, nb));
-        }
-        lrd(i) = (reachDistSum > 1e-30) ? static_cast<double>(k) / reachDistSum : 1.0;
-    }
-
-    // Compute LOF scores
-    VectorXd lof(n);
-    for (int i = 0; i < n; ++i) {
-        double lrdSum = 0.0;
-        for (int j = 0; j < k; ++j) {
-            int nb = neighbors[static_cast<size_t>(i)][static_cast<size_t>(j)];
-            lrdSum += lrd(nb);
-        }
-        double avgLrd = lrdSum / static_cast<double>(k);
-        lof(i) = (lrd(i) > 1e-30) ? avgLrd / lrd(i) : 1.0;
-    }
-
-    return lof;
+    // features is (n_samples × n_features), matches skigen convention
+    Skigen::LocalOutlierFactor<double> lof(k);
+    lof.fit(features);
+    return lof.lof_scores();
 }
 
 //=============================================================================================================
