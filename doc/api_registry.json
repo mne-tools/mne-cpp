@@ -1365,17 +1365,17 @@
       "mne_cpp_class": "MlScaler",
       "mne_cpp_header": "ml/ml_scaler.h",
       "skigen_class": "Skigen::Preprocessing::StandardScaler / MinMaxScaler",
-      "skigen_status": "exists",
-      "migration_action": "Replace MlScaler internals with Skigen::Preprocessing calls; keep MlScaler as thin MNE-CPP wrapper",
+      "skigen_status": "done",
+      "migration_action": "Refactored: MlScaler::fit delegates to Skigen::StandardScaler/MinMaxScaler",
       "priority": "high"
     },
     {
       "mne_cpp_class": "MlLinearModel",
       "mne_cpp_header": "ml/ml_linear_model.h",
       "skigen_class": "Skigen::LinearModel::Ridge / LogisticRegression",
-      "skigen_status": "exists",
-      "migration_action": "Replace MlLinearModel internals with Skigen::LinearModel calls",
-      "priority": "high"
+      "skigen_status": "not applicable",
+      "migration_action": "MlLinearModel is a predict-only inference container (weights loaded from JSON, no fit). Delegation to skigen training models is not applicable.",
+      "priority": "low"
     },
     {
       "mne_cpp_class": "MlPipeline",
@@ -1397,24 +1397,24 @@
       "mne_cpp_class": "BadChannelsLof",
       "mne_cpp_header": "dsp/bad_channels_lof.h",
       "skigen_class": "Skigen::Neighbors::LocalOutlierFactor",
-      "skigen_status": "needs implementation",
-      "migration_action": "Implement LocalOutlierFactor in skigen::Neighbors; refactor BadChannelsLof to use it",
+      "skigen_status": "done",
+      "migration_action": "Refactored: BadChannelsLof delegates LOF to Skigen::LocalOutlierFactor",
       "priority": "high"
     },
     {
       "mne_cpp_class": "StsCovEstimators (ledoitWolf)",
       "mne_cpp_header": "sts/sts_cov_estimators.h",
       "skigen_class": "Skigen::Covariance::LedoitWolf",
-      "skigen_status": "needs implementation",
-      "migration_action": "Implement LedoitWolf in new skigen::Covariance module; refactor StsCovEstimators to call it",
+      "skigen_status": "done",
+      "migration_action": "Refactored: StsCovEstimators::ledoitWolf delegates to Skigen::LedoitWolf",
       "priority": "medium"
     },
     {
       "mne_cpp_class": "StsCovEstimators (oas)",
       "mne_cpp_header": "sts/sts_cov_estimators.h",
       "skigen_class": "Skigen::Covariance::OAS",
-      "skigen_status": "needs implementation",
-      "migration_action": "Implement OAS in skigen::Covariance; refactor StsCovEstimators",
+      "skigen_status": "done",
+      "migration_action": "Refactored: StsCovEstimators::oas delegates to Skigen::OAS",
       "priority": "medium"
     },
     {
@@ -1429,8 +1429,8 @@
       "mne_cpp_class": "StsCovEstimators (factorAnalysis)",
       "mne_cpp_header": "sts/sts_cov_estimators.h",
       "skigen_class": "Skigen::Decomposition::FactorAnalysis",
-      "skigen_status": "needs implementation",
-      "migration_action": "Implement FactorAnalysis in skigen::Decomposition; refactor StsCovEstimators",
+      "skigen_status": "done",
+      "migration_action": "Refactored: StsCovEstimators::factorAnalysis delegates to Skigen::FactorAnalysis",
       "priority": "medium"
     },
     {
@@ -1445,24 +1445,24 @@
       "mne_cpp_class": "MlCsp",
       "mne_cpp_header": "ml/ml_csp.h",
       "skigen_class": "Skigen::Decomposition::CSP",
-      "skigen_status": "needs implementation",
-      "migration_action": "Implement CSP in skigen::Decomposition; refactor MlCsp as thin wrapper",
+      "skigen_status": "done",
+      "migration_action": "Refactored: MlCsp delegates fit/transform to Skigen::CSP",
       "priority": "medium"
     },
     {
       "mne_cpp_class": "MlSpoc",
       "mne_cpp_header": "ml/ml_spoc.h",
       "skigen_class": "Skigen::Decomposition::SPoC",
-      "skigen_status": "needs implementation",
-      "migration_action": "Implement SPoC in skigen::Decomposition; refactor MlSpoc as thin wrapper",
+      "skigen_status": "done",
+      "migration_action": "Refactored: MlSpoc delegates fit/transform to Skigen::SPoC",
       "priority": "medium"
     },
     {
       "mne_cpp_class": "MlSsd",
       "mne_cpp_header": "ml/ml_ssd.h",
       "skigen_class": "Skigen::Decomposition::SSD",
-      "skigen_status": "needs implementation",
-      "migration_action": "Implement SSD in skigen::Decomposition; refactor MlSsd as thin wrapper",
+      "skigen_status": "done",
+      "migration_action": "Refactored: MlSsd delegates fit/transform to Skigen::SSD",
       "priority": "medium"
     }
   ],

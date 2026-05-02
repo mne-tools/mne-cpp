@@ -38,18 +38,10 @@
 #include "ml_spoc.h"
 
 //=============================================================================================================
-// EIGEN INCLUDES
+// SKIGEN INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
-#include <Eigen/Dense>
-#include <Eigen/Eigenvalues>
-
-//=============================================================================================================
-// STD INCLUDES
-//=============================================================================================================
-
-#include <cmath>
+#include <Skigen/Decomposition>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -86,91 +78,22 @@ void MlSpoc::fit(const QList<MatrixXd>& epochs,
         return;
     }
 
-    const int nEpochs = epochs.size();
-    if (target.size() != nEpochs) {
-        qWarning() << "[MlSpoc::fit] Epoch count" << nEpochs
+    if (target.size() != epochs.size()) {
+        qWarning() << "[MlSpoc::fit] Epoch count" << epochs.size()
                     << "!= target size" << target.size();
         return;
     }
 
-    const int nCh = static_cast<int>(epochs[0].rows());
+    // Convert QList → std::vector for skigen
+    std::vector<MatrixXd> e(epochs.cbegin(), epochs.cend());
 
-    // 1. Normalise target to zero mean, unit variance
-    double zMean = target.mean();
-    double zStd = std::sqrt((target.array() - zMean).square().sum()
-                            / static_cast<double>(nEpochs - 1));
-    VectorXd z = (target.array() - zMean);
-    if (zStd > 1e-15)
-        z /= zStd;
+    Skigen::SPoC<double> spoc(m_nComponents);
+    spoc.fit(e, target);
 
-    // 2. Compute per-epoch covariance and accumulate C and Cz
-    MatrixXd C = MatrixXd::Zero(nCh, nCh);
-    MatrixXd Cz = MatrixXd::Zero(nCh, nCh);
-
-    for (int e = 0; e < nEpochs; ++e) {
-        const MatrixXd& X = epochs[e];
-        if (X.rows() != nCh) {
-            qWarning() << "[MlSpoc::fit] Epoch" << e << "has" << X.rows()
-                        << "channels, expected" << nCh;
-            return;
-        }
-
-        // Demean across time
-        MatrixXd Xc = X.colwise() - X.rowwise().mean().col(0);
-
-        // Sample covariance (scaled by number of time points)
-        MatrixXd covE = (Xc * Xc.transpose()) / static_cast<double>(Xc.cols());
-
-        C += covE;
-        Cz += z[e] * covE;
-    }
-
-    C /= static_cast<double>(nEpochs);
-    Cz /= static_cast<double>(nEpochs);
-
-    // 3. Solve generalised eigenvalue problem: Cz · w = λ · C · w
-    GeneralizedSelfAdjointEigenSolver<MatrixXd> solver(Cz, C);
-
-    if (solver.info() != Success) {
-        qWarning() << "[MlSpoc::fit] Eigenvalue decomposition failed.";
-        return;
-    }
-
-    // Eigenvalues are sorted ascending; we want the largest magnitude
-    const VectorXd& allEvals = solver.eigenvalues();
-    const MatrixXd& allEvecs = solver.eigenvectors();
-
-    // Sort by absolute eigenvalue (descending)
-    std::vector<int> sortIdx(nCh);
-    std::iota(sortIdx.begin(), sortIdx.end(), 0);
-    std::sort(sortIdx.begin(), sortIdx.end(), [&](int a, int b) {
-        return std::abs(allEvals[a]) > std::abs(allEvals[b]);
-    });
-
-    int nComp = std::min(m_nComponents, nCh);
-    m_matFilters.resize(nComp, nCh);
-    m_vecEigenvalues.resize(nComp);
-
-    for (int i = 0; i < nComp; ++i) {
-        int idx = sortIdx[static_cast<size_t>(i)];
-        m_vecEigenvalues[i] = allEvals[idx];
-
-        VectorXd w = allEvecs.col(idx);
-        // Normalise filter to unit norm
-        double norm = w.norm();
-        if (norm > 0.0)
-            w /= norm;
-        m_matFilters.row(i) = w.transpose();
-    }
-
-    // 4. Compute patterns: A = C · W · inv(W^T · C · W)
-    MatrixXd W = m_matFilters.transpose();  // nCh × nComp
-    MatrixXd CW = C * W;
-    MatrixXd WtCW = W.transpose() * CW;
-    MatrixXd WtCW_inv = WtCW.inverse();
-    m_matPatterns = (CW * WtCW_inv).transpose();  // nComp × nCh
-
-    m_bFitted = true;
+    m_matFilters      = spoc.filters();
+    m_matPatterns     = spoc.patterns();
+    m_vecEigenvalues  = spoc.eigenvalues();
+    m_bFitted         = true;
 }
 
 //=============================================================================================================
@@ -182,18 +105,21 @@ MatrixXd MlSpoc::transform(const QList<MatrixXd>& epochs) const
         return MatrixXd();
     }
 
-    const int nEpochs = epochs.size();
+    // Apply stored filters to compute log-variance features
+    std::vector<MatrixXd> e(epochs.cbegin(), epochs.cend());
+
+    Skigen::SPoC<double> spoc(m_nComponents);
+    // Use the stored filters directly
+    const int nEpochs = static_cast<int>(e.size());
     const int nComp = static_cast<int>(m_matFilters.rows());
     MatrixXd features(nEpochs, nComp);
 
-    for (int e = 0; e < nEpochs; ++e) {
-        // Apply spatial filter: s = W * X  (nComp × nTimes)
-        MatrixXd s = m_matFilters * epochs[e];
-
-        // Log-variance feature
+    for (int ep = 0; ep < nEpochs; ++ep) {
+        MatrixXd s = m_matFilters * e[static_cast<size_t>(ep)];
         for (int c = 0; c < nComp; ++c) {
-            double var = s.row(c).squaredNorm() / static_cast<double>(s.cols());
-            features(e, c) = std::log(std::max(var, 1e-30));
+            double var = s.row(c).squaredNorm()
+                       / static_cast<double>(s.cols());
+            features(ep, c) = std::log(std::max(var, 1e-30));
         }
     }
 

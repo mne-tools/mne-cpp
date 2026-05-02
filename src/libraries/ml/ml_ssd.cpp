@@ -38,22 +38,16 @@
 #include "ml_ssd.h"
 
 //=============================================================================================================
-// EIGEN INCLUDES
+// SKIGEN INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Eigenvalues>
+#include <Skigen/Decomposition>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QDebug>
-
-//=============================================================================================================
-// STD INCLUDES
-//=============================================================================================================
-
-#include <cmath>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -90,43 +84,16 @@ void MlSsd::fit(const MatrixXd& matData,
     if (m_nComponents > nCh)
         m_nComponents = nCh;
 
-    // Mean-center the data
-    MatrixXd dataCentered = matData.colwise() - matData.rowwise().mean();
+    Skigen::SSD<double> ssd(m_nComponents);
+    ssd.fit(matData, dSFreq,
+            signalBand.first, signalBand.second,
+            noiseBand.first, noiseBand.second,
+            dRegParam);
 
-    // Bandpass filter for signal and noise bands
-    MatrixXd dataSignal = bandpassFilter(dataCentered, dSFreq, signalBand.first, signalBand.second);
-    MatrixXd dataNoise = bandpassFilter(dataCentered, dSFreq, noiseBand.first, noiseBand.second);
-
-    // Compute covariance matrices
-    MatrixXd covSignal = (dataSignal * dataSignal.transpose()) / static_cast<double>(nTimes - 1);
-    MatrixXd covNoise = (dataNoise * dataNoise.transpose()) / static_cast<double>(nTimes - 1);
-
-    // Regularise the noise covariance
-    covNoise += dRegParam * covNoise.trace() / static_cast<double>(nCh) * MatrixXd::Identity(nCh, nCh);
-
-    // Solve the generalised eigenvalue problem: C_signal * w = lambda * C_noise * w
-    // Equivalent to: inv(C_noise) * C_signal * w = lambda * w
-    GeneralizedSelfAdjointEigenSolver<MatrixXd> ges(covSignal, covNoise);
-
-    if (ges.info() != Success) {
-        qWarning() << "[MlSsd::fit] Eigenvalue decomposition failed.";
-        return;
-    }
-
-    // Eigenvalues are in ascending order; we want the largest first
-    VectorXd eigenvalues = ges.eigenvalues().reverse();
-    MatrixXd eigenvectors = ges.eigenvectors().rowwise().reverse();
-
-    // Select top n_components
-    m_eigenvalues = eigenvalues.head(m_nComponents);
-    m_filters = eigenvectors.leftCols(m_nComponents).transpose();  // (n_components × n_channels)
-
-    // Compute patterns: A = C * W * inv(W' * C * W)
-    MatrixXd covFull = (dataCentered * dataCentered.transpose()) / static_cast<double>(nTimes - 1);
-    MatrixXd WtCW = m_filters * covFull * m_filters.transpose();
-    m_patterns = (covFull * m_filters.transpose() * WtCW.inverse()).transpose();  // (n_components × n_channels)
-
-    m_bFitted = true;
+    m_filters     = ssd.filters();
+    m_patterns    = ssd.patterns();
+    m_eigenvalues = ssd.eigenvalues();
+    m_bFitted     = true;
 }
 
 //=============================================================================================================
@@ -151,83 +118,4 @@ MatrixXd MlSsd::fitTransform(const MatrixXd& matData,
 {
     fit(matData, dSFreq, signalBand, noiseBand, dRegParam);
     return transform(matData);
-}
-
-//=============================================================================================================
-
-MatrixXd MlSsd::bandpassFilter(const MatrixXd& matData,
-                                 double dSFreq,
-                                 double dLowFreq,
-                                 double dHighFreq)
-{
-    // Simple windowed-sinc FIR bandpass filter
-    const int nCh = static_cast<int>(matData.rows());
-    const int nTimes = static_cast<int>(matData.cols());
-
-    // Determine filter order (use a modest order for computational efficiency)
-    int filterOrder = std::min(static_cast<int>(std::round(3.0 * dSFreq / dLowFreq)), nTimes - 1);
-    if (filterOrder % 2 != 0)
-        filterOrder += 1;
-    filterOrder = std::min(filterOrder, 128);
-
-    const int halfOrder = filterOrder / 2;
-
-    // Build windowed-sinc coefficients for bandpass
-    VectorXd h(filterOrder + 1);
-    double wLow = 2.0 * M_PI * dLowFreq / dSFreq;
-    double wHigh = 2.0 * M_PI * dHighFreq / dSFreq;
-
-    for (int i = 0; i <= filterOrder; ++i) {
-        int n = i - halfOrder;
-        if (n == 0) {
-            h[i] = (wHigh - wLow) / M_PI;
-        } else {
-            h[i] = (std::sin(wHigh * n) - std::sin(wLow * n)) / (M_PI * n);
-        }
-        // Apply Hamming window
-        h[i] *= 0.54 - 0.46 * std::cos(2.0 * M_PI * i / filterOrder);
-    }
-
-    // Normalize to unit gain at center frequency
-    double centerFreq = (dLowFreq + dHighFreq) / 2.0;
-    double wCenter = 2.0 * M_PI * centerFreq / dSFreq;
-    double gainReal = 0.0;
-    for (int i = 0; i <= filterOrder; ++i) {
-        gainReal += h[i] * std::cos(wCenter * (i - halfOrder));
-    }
-    if (std::abs(gainReal) > 1e-12)
-        h /= std::abs(gainReal);
-
-    // Apply filter via convolution (zero-phase: forward + reverse)
-    MatrixXd result(nCh, nTimes);
-
-    for (int ch = 0; ch < nCh; ++ch) {
-        // Forward pass
-        VectorXd forward(nTimes);
-        for (int t = 0; t < nTimes; ++t) {
-            double sum = 0.0;
-            for (int k = 0; k <= filterOrder; ++k) {
-                int idx = t - k;
-                if (idx >= 0 && idx < nTimes)
-                    sum += h[k] * matData(ch, idx);
-            }
-            forward[t] = sum;
-        }
-
-        // Reverse pass (for zero-phase filtering)
-        VectorXd backward(nTimes);
-        for (int t = nTimes - 1; t >= 0; --t) {
-            double sum = 0.0;
-            for (int k = 0; k <= filterOrder; ++k) {
-                int idx = t + k;
-                if (idx >= 0 && idx < nTimes)
-                    sum += h[k] * forward[idx];
-            }
-            backward[t] = sum;
-        }
-
-        result.row(ch) = backward.transpose();
-    }
-
-    return result;
 }

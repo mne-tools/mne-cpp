@@ -39,11 +39,16 @@
 #include "ml_scaler.h"
 
 //=============================================================================================================
+// SKIGEN INCLUDES
+//=============================================================================================================
+
+#include <Skigen/Preprocessing>
+
+//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <stdexcept>
-#include <cmath>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -68,14 +73,15 @@ void MlScaler::fit(const MlTensor& data)
     auto X = data.matrix();
 
     if (m_type == StandardScaler) {
-        m_mean = X.colwise().mean();
-        VectorXf variance = ((X.rowwise() - m_mean.transpose()).array().square().colwise().sum() /
-                             static_cast<float>(X.rows())).matrix().transpose();
-        m_std = variance.array().sqrt().max(1e-10f).matrix();
+        Skigen::StandardScaler<float> scaler;
+        scaler.fit(X);
+        m_mean = scaler.mean().transpose();
+        m_std  = scaler.scale().transpose();
     } else {
-        m_min   = X.colwise().minCoeff();
-        VectorXf maxVals = X.colwise().maxCoeff();
-        m_range = (maxVals - m_min).array().max(1e-10f).matrix();
+        Skigen::MinMaxScaler<float> scaler;
+        scaler.fit(X);
+        m_min   = scaler.data_min().transpose();
+        m_range = scaler.data_range().transpose();
     }
 
     m_fitted = true;

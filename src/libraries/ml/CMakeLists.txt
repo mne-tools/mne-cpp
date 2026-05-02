@@ -56,7 +56,8 @@ set(MNE_LIBS_REQUIRED mne_utils mne_math)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     ${MNE_LIBS_REQUIRED}
-    Eigen3::Eigen)
+    Eigen3::Eigen
+    Skigen::Skigen)
 
 # ONNX Runtime (optional — enabled when USE_ONNXRUNTIME=ON and the package was found)
 if(TARGET onnxruntime::onnxruntime)

@@ -160,21 +160,6 @@ public:
     bool isFitted() const { return m_bFitted; }
 
 private:
-    /**
-     * @brief Simple FIR bandpass filter applied to each row of data.
-     *
-     * @param[in] matData    Data (n_channels × n_times).
-     * @param[in] dSFreq     Sampling frequency in Hz.
-     * @param[in] dLowFreq   Low cutoff in Hz.
-     * @param[in] dHighFreq  High cutoff in Hz.
-     *
-     * @return Filtered data (n_channels × n_times).
-     */
-    static Eigen::MatrixXd bandpassFilter(const Eigen::MatrixXd& matData,
-                                           double dSFreq,
-                                           double dLowFreq,
-                                           double dHighFreq);
-
     int             m_nComponents;
     bool            m_bFitted = false;
     Eigen::MatrixXd m_filters;       /**< Spatial filters (n_components × n_channels). */

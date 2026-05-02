@@ -38,16 +38,16 @@
 #include "ml_csp.h"
 
 //=============================================================================================================
+// SKIGEN INCLUDES
+//=============================================================================================================
+
+#include <Skigen/Decomposition>
+
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QDebug>
-
-//=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Eigenvalues>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -75,78 +75,17 @@ void MlCsp::fit(const QList<MatrixXd>& epochsClass1,
         return;
     }
 
-    const int nChannels = epochsClass1[0].rows();
+    // Convert QList → std::vector for skigen
+    std::vector<MatrixXd> e1(epochsClass1.cbegin(), epochsClass1.cend());
+    std::vector<MatrixXd> e2(epochsClass2.cbegin(), epochsClass2.cend());
 
-    // Compute average covariance for each class
-    MatrixXd cov1 = MatrixXd::Zero(nChannels, nChannels);
-    for (const auto& epoch : epochsClass1) {
-        MatrixXd centered = epoch.colwise() - epoch.rowwise().mean();
-        cov1 += centered * centered.transpose() / static_cast<double>(epoch.cols() - 1);
-    }
-    cov1 /= epochsClass1.size();
+    Skigen::CSP<double> csp(m_nComponents);
+    csp.fit(e1, e2);
 
-    MatrixXd cov2 = MatrixXd::Zero(nChannels, nChannels);
-    for (const auto& epoch : epochsClass2) {
-        MatrixXd centered = epoch.colwise() - epoch.rowwise().mean();
-        cov2 += centered * centered.transpose() / static_cast<double>(epoch.cols() - 1);
-    }
-    cov2 /= epochsClass2.size();
-
-    // Composite covariance
-    MatrixXd covComposite = cov1 + cov2;
-
-    // Whitening transform: W = D^(-1/2) * U^T from eigendecomp of composite
-    SelfAdjointEigenSolver<MatrixXd> eigComposite(covComposite);
-    VectorXd d = eigComposite.eigenvalues();
-    MatrixXd U = eigComposite.eigenvectors();
-
-    // Regularize: clamp small eigenvalues
-    double dMin = d.maxCoeff() * 1e-10;
-    for (int i = 0; i < d.size(); ++i) {
-        if (d(i) < dMin) d(i) = dMin;
-    }
-
-    VectorXd dInvSqrt = d.array().sqrt().inverse();
-    MatrixXd W = dInvSqrt.asDiagonal() * U.transpose();
-
-    // Whiten class covariances
-    MatrixXd S1 = W * cov1 * W.transpose();
-
-    // Eigendecompose whitened class-1 covariance
-    SelfAdjointEigenSolver<MatrixXd> eigS1(S1);
-    VectorXd lambdas = eigS1.eigenvalues();
-    MatrixXd B = eigS1.eigenvectors();
-
-    // CSP filters = selected columns of B^T * W
-    // Eigenvalues are sorted ascending — first columns maximize class 2,
-    // last columns maximize class 1
-    MatrixXd allFilters = B.transpose() * W;  // (nChannels × nChannels)
-
-    // Select top and bottom components
-    int nPerClass = m_nComponents / 2;
-    int nTotal = std::min(m_nComponents, nChannels);
-    nPerClass = std::min(nPerClass, nChannels / 2);
-
-    m_filters = MatrixXd(nTotal, nChannels);
-    m_eigenvalues = VectorXd(nTotal);
-
-    // Bottom nPerClass (maximize class 2 variance)
-    for (int i = 0; i < nPerClass; ++i) {
-        m_filters.row(i) = allFilters.row(i);
-        m_eigenvalues(i) = lambdas(i);
-    }
-    // Top nPerClass (maximize class 1 variance)
-    for (int i = 0; i < nTotal - nPerClass; ++i) {
-        m_filters.row(nPerClass + i) = allFilters.row(nChannels - 1 - i);
-        m_eigenvalues(nPerClass + i) = lambdas(nChannels - 1 - i);
-    }
-
-    // Compute patterns: A = Cov_composite * W^T * (W * Cov_composite * W^T)^{-1}
-    // Simplified: patterns = pinv(filters)^T
-    m_patterns = m_filters.bdcSvd<ComputeThinU | ComputeThinV>().solve(
-        MatrixXd::Identity(nTotal, nTotal)).transpose();
-
-    m_bFitted = true;
+    m_filters     = csp.filters();
+    m_patterns    = csp.patterns();
+    m_eigenvalues = csp.eigenvalues();
+    m_bFitted     = true;
 }
 
 //=============================================================================================================
@@ -158,23 +97,29 @@ MatrixXd MlCsp::transform(const QList<MatrixXd>& epochs) const
         return MatrixXd();
     }
 
-    MatrixXd features(epochs.size(), m_nComponents);
+    // Delegate to skigen CSP (reuse fitted filters stored in m_filters)
+    // We reconstruct a fitted CSP instance by directly computing features
+    // using the stored filters, matching the skigen transform logic.
+    std::vector<MatrixXd> e(epochs.cbegin(), epochs.cend());
 
-    for (int e = 0; e < epochs.size(); ++e) {
-        // Apply spatial filters
-        MatrixXd filtered = m_filters * epochs[e];  // (nComponents × nTimes)
+    Skigen::CSP<double> csp(m_nComponents);
+    // Use the stored filters directly rather than re-fitting
+    const int nEpochs = static_cast<int>(e.size());
+    const int nComp = static_cast<int>(m_filters.rows());
+    MatrixXd features(nEpochs, nComp);
 
-        // Compute log-variance for each component
-        for (int c = 0; c < m_nComponents; ++c) {
-            double variance = filtered.row(c).squaredNorm() / static_cast<double>(filtered.cols());
-            features(e, c) = std::log(variance);
+    for (int ep = 0; ep < nEpochs; ++ep) {
+        MatrixXd filtered = m_filters * e[static_cast<size_t>(ep)];
+        for (int c = 0; c < nComp; ++c) {
+            double var = filtered.row(c).squaredNorm()
+                       / static_cast<double>(filtered.cols());
+            features(ep, c) = std::log(var);
         }
     }
 
-    // Normalize features (subtract mean log-variance per epoch for scale invariance)
-    for (int e = 0; e < epochs.size(); ++e) {
-        double mean = features.row(e).mean();
-        features.row(e).array() -= mean;
+    // Normalize: subtract per-epoch mean for scale invariance
+    for (int ep = 0; ep < nEpochs; ++ep) {
+        features.row(ep).array() -= features.row(ep).mean();
     }
 
     return features;
