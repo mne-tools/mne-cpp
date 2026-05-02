@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     ml_types.h
+ * @file     ml_global.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April, 2026
@@ -28,37 +28,26 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    ML type enumerations.
+ * @brief    ml library global functions.
  *
  */
 
-#ifndef DECODING_TYPES_H
-#define DECODING_TYPES_H
-
 //=============================================================================================================
-// DEFINE NAMESPACE DECODINGLIB
+// INCLUDES
 //=============================================================================================================
 
-namespace DECODINGLIB{
+#include "ml_global.h"
 
 //=============================================================================================================
-/**
- * Available ML back-end engines.
- */
-enum class MlBackend { OnnxRuntime, BuiltIn };
+// DEFINE METHODS
+//=============================================================================================================
+
+const char* MLLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();}
 
 //=============================================================================================================
-/**
- * Supported data types for tensors.
- */
-enum class MlDataType { Float32, Float64, Int64 };
+
+const char* MLLIB::buildHash(){ return UTILSLIB::gitHash();}
 
 //=============================================================================================================
-/**
- * ML task categories.
- */
-enum class MlTaskType { Classification, Regression, FeatureExtraction };
 
-} // namespace DECODINGLIB
-
-#endif // DECODING_TYPES_H
+const char* MLLIB::buildHashLong(){ return UTILSLIB::gitHashLong();}

@@ -40,8 +40,13 @@
     },
     "decoding": {
       "dir": "src/libraries/decoding",
-      "sidebar_label": "DECODINGLIB — Decoding & ML Inference",
-      "origin": "mne-python + custom"
+      "sidebar_label": "DECODINGLIB — Signal Decoding",
+      "origin": "mne-python"
+    },
+    "ml": {
+      "dir": "src/libraries/ml",
+      "sidebar_label": "MLLIB — ML Infrastructure",
+      "origin": "custom"
     },
     "sts": {
       "dir": "src/libraries/sts",
@@ -1096,7 +1101,63 @@
       "example": null,
       "status": "done",
       "skigen_candidate": false,
-      "notes": "ICA label classification — neuroscience-specific, stays in mne-cpp"
+      "notes": "ICA label classification — neuroscience-specific, stays in decoding"
+    },
+    {
+      "name": "MlTensor",
+      "module": "ml",
+      "header": "ml/ml_tensor.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_ml_models",
+      "example": null,
+      "status": "done",
+      "skigen_candidate": false,
+      "notes": "N-dimensional tensor for ML inference (ONNX Runtime interop)"
+    },
+    {
+      "name": "MlModel",
+      "module": "ml",
+      "header": "ml/ml_model.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_ml_models",
+      "example": null,
+      "status": "done",
+      "skigen_candidate": false,
+      "notes": "Abstract base class for ML model inference"
+    },
+    {
+      "name": "MlOnnxModel",
+      "module": "ml",
+      "header": "ml/ml_onnx_model.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_ml_models",
+      "example": null,
+      "status": "done",
+      "skigen_candidate": false,
+      "notes": "ONNX Runtime model inference implementation"
+    },
+    {
+      "name": "MLTrainer",
+      "module": "ml",
+      "header": "ml/ml_trainer.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_ml_trainer",
+      "example": null,
+      "status": "done",
+      "skigen_candidate": false,
+      "notes": "Orchestrates ML training via Python subprocess"
     },
     {
       "name": "KMeans",

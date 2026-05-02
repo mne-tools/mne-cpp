@@ -28,7 +28,7 @@ set(MNE_LIBS_REQUIRED
     mne_fwd
     mne_mne
     mne_fiff
-    mne_decoding
+    mne_ml
     mne_utils
     mne_math
     mne_events

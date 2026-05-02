@@ -14,9 +14,6 @@ set(SOURCES
   decoding_csp.cpp
   decoding_spoc.cpp
   decoding_ssd.cpp
-  decoding_tensor.cpp
-  decoding_onnx_model.cpp
-  decoding_trainer.cpp
   decoding_ica_label.cpp
 )
 
@@ -25,11 +22,6 @@ set(HEADERS
   decoding_csp.h
   decoding_spoc.h
   decoding_ssd.h
-  decoding_types.h
-  decoding_tensor.h
-  decoding_model.h
-  decoding_onnx_model.h
-  decoding_trainer.h
   decoding_ica_label.h
 )
 
@@ -45,52 +37,13 @@ target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURR
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
-set(MNE_LIBS_REQUIRED mne_utils mne_math)
+set(MNE_LIBS_REQUIRED mne_utils)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     ${MNE_LIBS_REQUIRED}
     Eigen3::Eigen
     Skigen::Skigen)
-
-# ONNX Runtime (optional — enabled when USE_ONNXRUNTIME=ON and the package was found)
-if(TARGET onnxruntime::onnxruntime)
-    target_link_libraries(${PROJECT_NAME} PRIVATE onnxruntime::onnxruntime)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC MNE_USE_ONNXRUNTIME)
-    message(STATUS "[mne_decoding] ONNX Runtime enabled")
-
-    # Copy the ONNX Runtime shared library next to mne_decoding so the runtime linker
-    # can find it (via RPATH on macOS/Linux, or same-directory on Windows).
-    get_target_property(_ort_loc onnxruntime::onnxruntime IMPORTED_LOCATION)
-    if(NOT _ort_loc)
-        get_target_property(_ort_loc onnxruntime::onnxruntime IMPORTED_LOCATION_RELEASE)
-    endif()
-    if(_ort_loc)
-        get_filename_component(_ort_dir "${_ort_loc}" DIRECTORY)
-        if(WIN32)
-            file(GLOB _ort_dlls "${_ort_dir}/*.dll")
-            foreach(_dll ${_ort_dlls})
-                add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_dll}" "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
-                    COMMENT "Copying ORT DLL: ${_dll}")
-            endforeach()
-        elseif(APPLE)
-            file(GLOB _ort_dylibs "${_ort_dir}/libonnxruntime*.dylib")
-            foreach(_dylib ${_ort_dylibs})
-                add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_dylib}" "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
-                    COMMENT "Copying ORT dylib: ${_dylib}")
-            endforeach()
-        else()
-            file(GLOB _ort_sos "${_ort_dir}/libonnxruntime*.so*")
-            foreach(_so ${_ort_sos})
-                add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_so}" "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
-                    COMMENT "Copying ORT so: ${_so}")
-            endforeach()
-        endif()
-    endif()
-endif()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_DECODING_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
 

@@ -69,6 +69,7 @@ add_subdirectory(conn)
 add_subdirectory(dsp)
 
 add_subdirectory(mna)
+add_subdirectory(ml)
 add_subdirectory(decoding)
 add_subdirectory(sts)
 
