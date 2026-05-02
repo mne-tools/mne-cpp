@@ -13,13 +13,7 @@ set(SOURCES
   ml_global.cpp
   ml_tensor.cpp
   ml_onnx_model.cpp
-  ml_linear_model.cpp
-  ml_scaler.cpp
-  ml_pipeline.cpp
   ml_trainer.cpp
-  ml_csp.cpp
-  ml_spoc.cpp
-  ml_ssd.cpp
   ml_ica_label.cpp
 )
 
@@ -29,13 +23,7 @@ set(HEADERS
   ml_tensor.h
   ml_model.h
   ml_onnx_model.h
-  ml_linear_model.h
-  ml_scaler.h
-  ml_pipeline.h
   ml_trainer.h
-  ml_csp.h
-  ml_spoc.h
-  ml_ssd.h
   ml_ica_label.h
 )
 
@@ -56,8 +44,7 @@ set(MNE_LIBS_REQUIRED mne_utils mne_math)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     ${MNE_LIBS_REQUIRED}
-    Eigen3::Eigen
-    Skigen::Skigen)
+    Eigen3::Eigen)
 
 # ONNX Runtime (optional — enabled when USE_ONNXRUNTIME=ON and the package was found)
 if(TARGET onnxruntime::onnxruntime)
