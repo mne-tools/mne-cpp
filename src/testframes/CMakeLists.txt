@@ -262,3 +262,8 @@ add_subdirectory(test_picard_ica)
 add_subdirectory(test_ica_label)
 add_subdirectory(test_source_estimate_types)
 add_subdirectory(test_connectivity_aec)
+
+# v2.3.0 Batch 15: Decoding library tests (CSP, SPoC, SSD)
+add_subdirectory(test_decoding_csp)
+add_subdirectory(test_decoding_spoc)
+add_subdirectory(test_decoding_ssd)
