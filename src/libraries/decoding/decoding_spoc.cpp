@@ -38,13 +38,19 @@
 
 #include "decoding_spoc.h"
 
-#include <Skigen/Decomposition>
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Eigenvalues>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <cmath>
+#include <numeric>
 #include <stdexcept>
 
 //=============================================================================================================
@@ -78,12 +84,66 @@ void DecodingSpoc::fit(const std::vector<MatrixXd>& epochs,
             "DecodingSpoc::fit: epochs and y must have the same length");
     }
 
-    // Delegate core GED to Skigen
-    Skigen::SPoC<double> spoc(m_nComponents);
-    spoc.fit(epochs, y);
+    // Delegate core GED (SPoC algorithm)
+    const auto n_epochs = static_cast<Index>(epochs.size());
+    const auto n_ch = epochs[0].rows();
 
-    m_filters = spoc.filters();
-    m_patterns = spoc.patterns().transpose();  // Skigen: (n_comp × n_ch) → stored as (n_ch × n_comp)
+    // 1. Normalize target
+    double z_mean = y.mean();
+    double z_std = std::sqrt(
+        (y.array() - z_mean).square().sum()
+        / static_cast<double>(n_epochs - 1));
+    VectorXd z = (y.array() - z_mean).matrix();
+    if (z_std > 1e-15) z /= z_std;
+
+    // 2. Per-epoch covariance → C and Cz
+    MatrixXd C  = MatrixXd::Zero(n_ch, n_ch);
+    MatrixXd Cz = MatrixXd::Zero(n_ch, n_ch);
+
+    for (Index e = 0; e < n_epochs; ++e) {
+        const auto& X = epochs[static_cast<size_t>(e)];
+        MatrixXd Xc = X.colwise() - X.rowwise().mean();
+        MatrixXd cov_e = (Xc * Xc.transpose())
+                         / static_cast<double>(Xc.cols());
+        C  += cov_e;
+        Cz += z(e) * cov_e;
+    }
+    C  /= static_cast<double>(n_epochs);
+    Cz /= static_cast<double>(n_epochs);
+
+    // 3. Generalized eigenvalue problem: Cz w = λ C w
+    GeneralizedSelfAdjointEigenSolver<MatrixXd> solver(Cz, C);
+    if (solver.info() != Eigen::Success) {
+        throw std::runtime_error(
+            "DecodingSpoc::fit: eigenvalue decomposition failed");
+    }
+
+    const VectorXd& all_evals = solver.eigenvalues();
+    const MatrixXd& all_evecs = solver.eigenvectors();
+
+    // 4. Sort by |eigenvalue| descending
+    std::vector<int> idx(static_cast<size_t>(n_ch));
+    std::iota(idx.begin(), idx.end(), 0);
+    std::sort(idx.begin(), idx.end(), [&](int a, int b) {
+        return std::abs(all_evals(a)) > std::abs(all_evals(b));
+    });
+
+    int n_comp = std::min(m_nComponents, static_cast<int>(n_ch));
+    m_filters.resize(n_comp, n_ch);
+
+    for (int i = 0; i < n_comp; ++i) {
+        int j = idx[static_cast<size_t>(i)];
+        VectorXd w = all_evecs.col(j);
+        double norm = w.norm();
+        if (norm > 0.0) w /= norm;
+        m_filters.row(i) = w.transpose();
+    }
+
+    // 5. Patterns: A = C W inv(W^T C W)
+    MatrixXd Wt = m_filters.transpose();
+    MatrixXd CW = C * Wt;
+    MatrixXd WtCW = Wt.transpose() * CW;
+    m_patterns = (CW * WtCW.inverse());  // (n_ch × n_comp) — already correct shape
 
     // Compute mean band power for z-score normalisation
     MatrixXd powerFeatures = computePowerFeatures(epochs);

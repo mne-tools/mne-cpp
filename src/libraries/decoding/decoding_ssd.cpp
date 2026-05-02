@@ -38,12 +38,18 @@
 
 #include "decoding_ssd.h"
 
-#include <Skigen/Decomposition>
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Eigenvalues>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
+#include <cmath>
 #include <stdexcept>
 
 //=============================================================================================================
@@ -73,12 +79,55 @@ void DecodingSsd::fit(const Ref<const MatrixXd>& data,
             "DecodingSsd::fit: signal band must be within noise band");
     }
 
-    Skigen::SSD<double> ssd(m_nComponents);
-    ssd.fit(data, sfreq, signalLow, signalHigh, noiseLow, noiseHigh, m_regParam);
+    const auto n_ch = data.rows();
+    const auto n_times = data.cols();
 
-    m_filters = ssd.filters();
-    m_patterns = ssd.patterns().transpose();  // Skigen: (n_comp × n_ch) → stored as (n_ch × n_comp)
-    m_eigenvalues = ssd.eigenvalues();
+    if (n_ch < 2 || n_times < 2) {
+        throw std::invalid_argument(
+            "DecodingSsd::fit: data must have >= 2 channels and >= 2 time points");
+    }
+
+    int n_comp = std::min(m_nComponents, static_cast<int>(n_ch));
+
+    // Mean-center
+    MatrixXd centered = data.colwise() - data.rowwise().mean();
+
+    // Bandpass filter for signal and noise bands
+    MatrixXd data_signal = bandpassFilter(centered, sfreq, signalLow, signalHigh);
+    MatrixXd data_noise  = bandpassFilter(centered, sfreq, noiseLow, noiseHigh);
+
+    // Covariance matrices
+    MatrixXd cov_signal = (data_signal * data_signal.transpose())
+                          / static_cast<double>(n_times - 1);
+    MatrixXd cov_noise  = (data_noise * data_noise.transpose())
+                          / static_cast<double>(n_times - 1);
+
+    // Regularize noise covariance
+    cov_noise += m_regParam * cov_noise.trace()
+                 / static_cast<double>(n_ch)
+                 * MatrixXd::Identity(n_ch, n_ch);
+
+    // Generalized eigenvalue problem: C_signal w = λ C_noise w
+    GeneralizedSelfAdjointEigenSolver<MatrixXd> ges(cov_signal, cov_noise);
+    if (ges.info() != Eigen::Success) {
+        throw std::runtime_error(
+            "DecodingSsd::fit: eigenvalue decomposition failed");
+    }
+
+    // Eigenvalues ascending → reverse for descending
+    VectorXd evals = ges.eigenvalues().reverse();
+    MatrixXd evecs = ges.eigenvectors().rowwise().reverse();
+
+    m_eigenvalues = evals.head(n_comp);
+    m_filters = evecs.leftCols(n_comp).transpose();  // (n_comp × n_ch)
+
+    // Patterns: A = C W inv(W^T C W)
+    MatrixXd cov_full = (centered * centered.transpose())
+                        / static_cast<double>(n_times - 1);
+    MatrixXd WtCW = m_filters * cov_full * m_filters.transpose();
+    m_patterns = (cov_full * m_filters.transpose()
+                  * WtCW.inverse());  // (n_ch × n_comp)
+
     m_fitted = true;
 }
 
@@ -152,4 +201,86 @@ const VectorXd& DecodingSsd::eigenvalues() const
 bool DecodingSsd::isFitted() const
 {
     return m_fitted;
+}
+
+//=============================================================================================================
+
+MatrixXd DecodingSsd::bandpassFilter(const MatrixXd& data,
+                                     double sfreq,
+                                     double lowFreq,
+                                     double highFreq)
+{
+    const auto n_ch = data.rows();
+    const auto n_times = data.cols();
+
+    int filter_order = std::min(
+        static_cast<int>(std::round(3.0 * sfreq / lowFreq)),
+        static_cast<int>(n_times) - 1);
+    if (filter_order % 2 != 0) ++filter_order;
+    filter_order = std::min(filter_order, 128);
+
+    const int half = filter_order / 2;
+    const double pi = M_PI;
+
+    // Windowed-sinc coefficients
+    VectorXd h(filter_order + 1);
+    double w_low  = 2.0 * pi * lowFreq  / sfreq;
+    double w_high = 2.0 * pi * highFreq / sfreq;
+
+    for (int i = 0; i <= filter_order; ++i) {
+        int n = i - half;
+        if (n == 0) {
+            h(i) = (w_high - w_low) / pi;
+        } else {
+            h(i) = (std::sin(w_high * static_cast<double>(n))
+                   - std::sin(w_low * static_cast<double>(n)))
+                  / (pi * static_cast<double>(n));
+        }
+        // Hamming window
+        h(i) *= 0.54
+               - 0.46 * std::cos(
+                   2.0 * pi * static_cast<double>(i)
+                   / static_cast<double>(filter_order));
+    }
+
+    // Normalize to unit gain at center frequency
+    double center = (lowFreq + highFreq) / 2.0;
+    double w_center = 2.0 * pi * center / sfreq;
+    double gain = 0.0;
+    for (int i = 0; i <= filter_order; ++i) {
+        gain += h(i) * std::cos(
+            w_center * static_cast<double>(i - half));
+    }
+    if (std::abs(gain) > 1e-12) h /= std::abs(gain);
+
+    // Forward + reverse convolution (zero-phase)
+    MatrixXd result(n_ch, n_times);
+
+    for (Index ch = 0; ch < n_ch; ++ch) {
+        VectorXd forward(n_times);
+        for (Index t = 0; t < n_times; ++t) {
+            double sum = 0.0;
+            for (int k = 0; k <= filter_order; ++k) {
+                auto idx = t - k;
+                if (idx >= 0 && idx < n_times)
+                    sum += h(k) * data(ch, idx);
+            }
+            forward(t) = sum;
+        }
+
+        VectorXd backward(n_times);
+        for (Index t = n_times - 1; t >= 0; --t) {
+            double sum = 0.0;
+            for (int k = 0; k <= filter_order; ++k) {
+                auto idx = t + k;
+                if (idx >= 0 && idx < n_times)
+                    sum += h(k) * forward(idx);
+            }
+            backward(t) = sum;
+        }
+
+        result.row(ch) = backward.transpose();
+    }
+
+    return result;
 }

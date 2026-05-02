@@ -59,9 +59,9 @@ namespace DECODINGLIB{
  *
  * Mirrors mne.decoding.SSD from MNE-Python. SSD finds spatial filters that
  * maximise signal-band power relative to noise-band power. Delegates core
- * GED to Skigen::SSD.
+ * GED algorithm inline.
  *
- * MNE-specific additions over bare Skigen::SSD:
+ * MNE-specific additions:
  * - apply() for denoised low-rank factorisation
  * - Separate accessor for signal/noise frequency bands
  * - Sampling frequency stored for spectral analysis
@@ -161,6 +161,14 @@ private:
     Eigen::MatrixXd m_patterns;
     Eigen::VectorXd m_eigenvalues;
     bool m_fitted = false;
+
+    /**
+     * Windowed-sinc FIR bandpass filter (zero-phase, forward+reverse).
+     */
+    static Eigen::MatrixXd bandpassFilter(const Eigen::MatrixXd& data,
+                                          double sfreq,
+                                          double lowFreq,
+                                          double highFreq);
 };
 
 } // namespace DECODINGLIB

@@ -38,7 +38,12 @@
 
 #include "decoding_csp.h"
 
-#include <Skigen/Decomposition>
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Eigenvalues>
+#include <Eigen/SVD>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -101,12 +106,74 @@ void DecodingCsp::fit(const std::vector<MatrixXd>& epochs,
         }
     }
 
-    // Delegate core GED to Skigen
-    Skigen::CSP<double> csp(m_nComponents);
-    csp.fit(epochs1, epochs2);
+    const auto n_ch = epochs1[0].rows();
 
-    m_filters = csp.filters();
-    m_patterns = csp.patterns().transpose();  // Skigen: (n_comp × n_ch) → stored as (n_ch × n_comp)
+    // Average covariance for each class
+    MatrixXd cov1 = MatrixXd::Zero(n_ch, n_ch);
+    for (const auto& epoch : epochs1) {
+        MatrixXd centered = epoch.colwise() - epoch.rowwise().mean();
+        cov1 += centered * centered.transpose()
+                / static_cast<double>(epoch.cols() - 1);
+    }
+    cov1 /= static_cast<double>(epochs1.size());
+
+    MatrixXd cov2 = MatrixXd::Zero(n_ch, n_ch);
+    for (const auto& epoch : epochs2) {
+        MatrixXd centered = epoch.colwise() - epoch.rowwise().mean();
+        cov2 += centered * centered.transpose()
+                / static_cast<double>(epoch.cols() - 1);
+    }
+    cov2 /= static_cast<double>(epochs2.size());
+
+    // Composite covariance
+    MatrixXd cov_comp = cov1 + cov2;
+
+    // Whitening: W = D^{-1/2} U^T
+    SelfAdjointEigenSolver<MatrixXd> eig_comp(cov_comp);
+    VectorXd d = eig_comp.eigenvalues();
+    MatrixXd U = eig_comp.eigenvectors();
+
+    const double d_min = d.maxCoeff() * 1e-10;
+    for (Index i = 0; i < d.size(); ++i) {
+        if (d(i) < d_min) d(i) = d_min;
+    }
+
+    MatrixXd W = d.array().sqrt().inverse().matrix().asDiagonal()
+                 * U.transpose();
+
+    // Whiten class-1 covariance and eigendecompose
+    MatrixXd S1 = W * cov1 * W.transpose();
+    SelfAdjointEigenSolver<MatrixXd> eig_s1(S1);
+    VectorXd lambdas = eig_s1.eigenvalues();
+    MatrixXd B = eig_s1.eigenvectors();
+
+    // All filters in eigenvalue order (ascending)
+    MatrixXd all_filters = B.transpose() * W;
+
+    // Select first and last components
+    int n_per_class = m_nComponents / 2;
+    int n_total = std::min(m_nComponents, static_cast<int>(n_ch));
+    n_per_class = std::min(n_per_class, static_cast<int>(n_ch) / 2);
+
+    m_filters = MatrixXd(n_total, n_ch);
+    VectorXd eigenvalues(n_total);
+
+    // Bottom n_per_class (maximize class-2 variance)
+    for (int i = 0; i < n_per_class; ++i) {
+        m_filters.row(i) = all_filters.row(i);
+        eigenvalues(i) = lambdas(i);
+    }
+    // Top (n_total - n_per_class) (maximize class-1 variance)
+    for (int i = 0; i < n_total - n_per_class; ++i) {
+        m_filters.row(n_per_class + i) =
+            all_filters.row(static_cast<int>(n_ch) - 1 - i);
+        eigenvalues(n_per_class + i) =
+            lambdas(static_cast<int>(n_ch) - 1 - i);
+    }
+
+    // Patterns = pinv(filters) — shape (n_ch × n_comp)
+    auto svd = m_filters.bdcSvd(ComputeThinU | ComputeThinV);
+    m_patterns = svd.solve(MatrixXd::Identity(n_total, n_total));
 
     // Compute mean band power for z-score normalisation
     MatrixXd powerFeatures = computePowerFeatures(epochs);

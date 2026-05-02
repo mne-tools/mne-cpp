@@ -65,9 +65,9 @@
  * @brief     M/EEG signal decoding (CSP, SPoC, SSD, LinearModel).
  *
  * Mirrors the public API of mne.decoding from MNE-Python. Classes in this
- * library delegate the core numerics to Skigen while adding MNE-specific
- * features such as transform modes, feature standardisation, and inverse
- * transforms.
+ * library implement the core decomposition algorithms inline while
+ * adding MNE-specific features such as transform modes, feature
+ * standardisation, and inverse transforms.
  */
 namespace DECODINGLIB{
 

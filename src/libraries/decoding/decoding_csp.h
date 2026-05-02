@@ -64,7 +64,7 @@ namespace DECODINGLIB{
  * @brief Common Spatial Patterns (CSP) for M/EEG signal decomposition.
  *
  * Mirrors the public API of mne.decoding.CSP from MNE-Python. The core
- * GED computation is delegated to Skigen::CSP while this class adds
+ * The core GED computation is implemented inline. This class adds
  * MNE-specific features:
  *
  * - transform_into modes: AveragePower (default) or CspSpace

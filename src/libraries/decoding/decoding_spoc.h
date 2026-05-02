@@ -65,7 +65,7 @@ namespace DECODINGLIB{
  *
  * Mirrors mne.decoding.SPoC from MNE-Python. SPoC finds spatial filters
  * whose band-power envelope maximally covaries with a continuous target
- * variable. Delegates core GED to Skigen::SPoC.
+ * variable. The core GED is implemented inline.
  *
  * MNE-specific additions:
  * - transform_into modes: AveragePower (default) or CspSpace
