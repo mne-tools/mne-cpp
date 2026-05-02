@@ -31,14 +31,14 @@
  * @brief    MlIcaLabel class for automatic ICA component classification.
  */
 
-#ifndef ML_ICA_LABEL_H
-#define ML_ICA_LABEL_H
+#ifndef DECODING_ICA_LABEL_H
+#define DECODING_ICA_LABEL_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ml_global.h"
+#include "decoding_global.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -55,10 +55,10 @@
 #include <QPair>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MLLIB
+// DEFINE NAMESPACE DECODINGLIB
 //=============================================================================================================
 
-namespace MLLIB
+namespace DECODINGLIB
 {
 
 //=============================================================================================================
@@ -78,7 +78,7 @@ enum class IcaComponentLabel
 /**
  * @brief Result of labeling one ICA component.
  */
-struct MLSHARED_EXPORT IcaLabelResult
+struct DECODINGSHARED_EXPORT IcaLabelResult
 {
     int componentIndex;         /**< 0-based component index. */
     IcaComponentLabel label;    /**< Assigned label. */
@@ -101,7 +101,7 @@ struct MLSHARED_EXPORT IcaLabelResult
  *   QVector<int> artIdx = MlIcaLabel::findArtifactComponents(labels);
  * @endcode
  */
-class MLSHARED_EXPORT MlIcaLabel
+class DECODINGSHARED_EXPORT MlIcaLabel
 {
 public:
     //=========================================================================================================
@@ -162,6 +162,6 @@ private:
     MlIcaLabel() = delete;
 };
 
-} // namespace MLLIB
+} // namespace DECODINGLIB
 
-#endif // ML_ICA_LABEL_H
+#endif // DECODING_ICA_LABEL_H

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     ml_trainer.h
+ * @file     ml_model.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April, 2026
@@ -28,107 +28,89 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MLTrainer class declaration — ML-specific convenience wrapper over PythonRunner.
+ * @brief    MlModel pure-abstract base class declaration.
  *
  */
 
-#ifndef ML_TRAINER_H
-#define ML_TRAINER_H
-
-#ifndef WASMBUILD // QProcess (used by PythonRunner) is not available in Qt WASM
+#ifndef DECODING_MODEL_H
+#define DECODING_MODEL_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ml_global.h"
-
-#include <utils/python_runner.h>
+#include "decoding_global.h"
+#include "decoding_types.h"
+#include "decoding_tensor.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
 #include <QString>
-#include <QStringList>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MLLIB
+// DEFINE NAMESPACE DECODINGLIB
 //=============================================================================================================
 
-namespace MLLIB
-{
+namespace DECODINGLIB{
 
 //=============================================================================================================
 /**
- * ML-specific convenience wrapper over UTILSLIB::PythonRunner.
- *
- * Adds:
- * - Automatic prerequisite checking (Python + required packages).
- * - Default scripts directory resolution (scripts/ml/training/).
- * - Forwards line/progress callbacks to PythonRunner.
- *
- * Training logic lives entirely in Python (PyTorch, scikit-learn, …).
- * No Python embedding or linkage is required.
- *
- * @brief ML training script launcher.
+ * @brief Abstract interface for all ML models.
  */
-class MLSHARED_EXPORT MLTrainer
+class DECODINGSHARED_EXPORT MlModel
 {
 public:
-    //=========================================================================================================
-    /**
-     * Construct an MLTrainer with default PythonRunner configuration.
-     */
-    MLTrainer();
+    typedef QSharedPointer<MlModel> SPtr;   /**< Shared pointer type for MlModel. */
 
     //=========================================================================================================
     /**
-     * Construct an MLTrainer with explicit PythonRunner configuration.
-     *
-     * @param[in] config     PythonRunner configuration to use.
+     * Virtual destructor.
      */
-    explicit MLTrainer(const UTILSLIB::PythonRunnerConfig& config);
+    virtual ~MlModel() = default;
 
     //=========================================================================================================
     /**
-     * Access the underlying PythonRunner for callback/config changes.
+     * Run inference on the given input tensor.
      *
-     * @return Reference to the PythonRunner instance.
+     * @param[in] input   The input data.
+     * @return The prediction result.
      */
-    UTILSLIB::PythonRunner& runner();
+    virtual MlTensor predict(const MlTensor& input) const = 0;
 
     //=========================================================================================================
     /**
-     * Run a training script.
+     * Serialise the model to disk.
      *
-     * If the PythonRunner is configured with a venvDir and packageDir,
-     * the venv is created/updated automatically before the script runs.
-     *
-     * @param[in] scriptPath     Path to the .py training script.
-     * @param[in] args           Arguments forwarded to the script.
-     *
-     * @return PythonRunnerResult with exit code, output, and progress.
+     * @param[in] path   File path.
+     * @return True if successful.
      */
-    UTILSLIB::PythonRunnerResult run(const QString& scriptPath,
-                                     const QStringList& args = {});
+    virtual bool save(const QString& path) const = 0;
 
     //=========================================================================================================
     /**
-     * Check that the required Python packages are importable.
+     * Load a model from disk.
      *
-     * @param[in] packages   List of package names (e.g. {"torch", "mne"}).
-     *
-     * @return List of packages that could NOT be imported (empty = all OK).
+     * @param[in] path   File path.
+     * @return True if successful.
      */
-    QStringList checkPrerequisites(const QStringList& packages) const;
+    virtual bool load(const QString& path) = 0;
 
-private:
-    UTILSLIB::PythonRunner m_runner;    /**< Underlying Python process launcher. */
+    //=========================================================================================================
+    /**
+     * @return Human-readable model type name.
+     */
+    virtual QString modelType() const = 0;
+
+    //=========================================================================================================
+    /**
+     * @return The task type this model is configured for.
+     */
+    virtual MlTaskType taskType() const = 0;
 };
 
-} // namespace MLLIB
+} // namespace DECODINGLIB
 
-#endif // WASMBUILD
-
-#endif // ML_TRAINER_H
+#endif // DECODING_MODEL_H

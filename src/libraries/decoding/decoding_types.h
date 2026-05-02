@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     ml_global.cpp
+ * @file     ml_types.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April, 2026
@@ -28,26 +28,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    ml library global functions.
+ * @brief    ML type enumerations.
  *
  */
 
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "ml_global.h"
+#ifndef DECODING_TYPES_H
+#define DECODING_TYPES_H
 
 //=============================================================================================================
-// DEFINE METHODS
+// DEFINE NAMESPACE DECODINGLIB
 //=============================================================================================================
 
-const char* MLLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();}
+namespace DECODINGLIB{
 
 //=============================================================================================================
-
-const char* MLLIB::buildHash(){ return UTILSLIB::gitHash();}
+/**
+ * Available ML back-end engines.
+ */
+enum class MlBackend { OnnxRuntime, BuiltIn };
 
 //=============================================================================================================
+/**
+ * Supported data types for tensors.
+ */
+enum class MlDataType { Float32, Float64, Int64 };
 
-const char* MLLIB::buildHashLong(){ return UTILSLIB::gitHashLong();}
+//=============================================================================================================
+/**
+ * ML task categories.
+ */
+enum class MlTaskType { Classification, Regression, FeatureExtraction };
+
+} // namespace DECODINGLIB
+
+#endif // DECODING_TYPES_H

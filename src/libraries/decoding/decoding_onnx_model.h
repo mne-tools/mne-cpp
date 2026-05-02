@@ -32,15 +32,15 @@
  *
  */
 
-#ifndef ML_ONNX_MODEL_H
-#define ML_ONNX_MODEL_H
+#ifndef DECODING_ONNX_MODEL_H
+#define DECODING_ONNX_MODEL_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ml_global.h"
-#include "ml_model.h"
+#include "decoding_global.h"
+#include "decoding_model.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -65,10 +65,10 @@ namespace Ort { class Env; class Session; class MemoryInfo; class RunOptions; }
 #endif
 
 //=============================================================================================================
-// DEFINE NAMESPACE MLLIB
+// DEFINE NAMESPACE DECODINGLIB
 //=============================================================================================================
 
-namespace MLLIB{
+namespace DECODINGLIB{
 
 //=============================================================================================================
 /**
@@ -76,7 +76,7 @@ namespace MLLIB{
  *
  * When built without USE_ONNXRUNTIME all methods throw std::runtime_error.
  */
-class MLSHARED_EXPORT MlOnnxModel : public MlModel
+class DECODINGSHARED_EXPORT MlOnnxModel : public MlModel
 {
 public:
     //=========================================================================================================
@@ -121,6 +121,6 @@ private:
 #endif
 };
 
-} // namespace MLLIB
+} // namespace DECODINGLIB
 
-#endif // ML_ONNX_MODEL_H
+#endif // DECODING_ONNX_MODEL_H

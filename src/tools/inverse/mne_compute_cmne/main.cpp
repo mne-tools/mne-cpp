@@ -54,7 +54,7 @@
 #include <inv/minimum_norm/inv_cmne.h>
 #include <inv/minimum_norm/inv_cmne_settings.h>
 
-#include <ml/ml_trainer.h>
+#include <decoding/decoding_trainer.h>
 #include <utils/python_runner.h>
 #include <utils/generics/mne_logger.h>
 
@@ -86,7 +86,7 @@ using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace INVLIB;
 using namespace UTILSLIB;
-using namespace MLLIB;
+using namespace DECODINGLIB;
 
 //=============================================================================================================
 // HELPERS

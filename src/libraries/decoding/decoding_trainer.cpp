@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     ml_model.h
+ * @file     ml_trainer.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April, 2026
@@ -28,89 +28,90 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MlModel pure-abstract base class declaration.
+ * @brief    MLTrainer class definition.
  *
  */
-
-#ifndef ML_MODEL_H
-#define ML_MODEL_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ml_global.h"
-#include "ml_types.h"
-#include "ml_tensor.h"
+#include "decoding_trainer.h"
+
+#ifndef WASMBUILD // QProcess (used by PythonRunner) is not available in Qt WASM
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QString>
+#include <QDebug>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MLLIB
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace MLLIB{
+using namespace DECODINGLIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
-/**
- * @brief Abstract interface for all ML models.
- */
-class MLSHARED_EXPORT MlModel
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+MLTrainer::MLTrainer()
+    : m_runner()
 {
-public:
-    typedef QSharedPointer<MlModel> SPtr;   /**< Shared pointer type for MlModel. */
+}
 
-    //=========================================================================================================
-    /**
-     * Virtual destructor.
-     */
-    virtual ~MlModel() = default;
+//=============================================================================================================
 
-    //=========================================================================================================
-    /**
-     * Run inference on the given input tensor.
-     *
-     * @param[in] input   The input data.
-     * @return The prediction result.
-     */
-    virtual MlTensor predict(const MlTensor& input) const = 0;
+MLTrainer::MLTrainer(const PythonRunnerConfig& config)
+    : m_runner(config)
+{
+}
 
-    //=========================================================================================================
-    /**
-     * Serialise the model to disk.
-     *
-     * @param[in] path   File path.
-     * @return True if successful.
-     */
-    virtual bool save(const QString& path) const = 0;
+//=============================================================================================================
 
-    //=========================================================================================================
-    /**
-     * Load a model from disk.
-     *
-     * @param[in] path   File path.
-     * @return True if successful.
-     */
-    virtual bool load(const QString& path) = 0;
+PythonRunner& MLTrainer::runner()
+{
+    return m_runner;
+}
 
-    //=========================================================================================================
-    /**
-     * @return Human-readable model type name.
-     */
-    virtual QString modelType() const = 0;
+//=============================================================================================================
 
-    //=========================================================================================================
-    /**
-     * @return The task type this model is configured for.
-     */
-    virtual MlTaskType taskType() const = 0;
-};
+PythonRunnerResult MLTrainer::run(const QString& scriptPath,
+                                   const QStringList& args)
+{
+    if (!m_runner.isPythonAvailable()) {
+        PythonRunnerResult result;
+        result.stdErr = QStringLiteral("Python interpreter not found: ") + m_runner.config().pythonExe;
+        qWarning() << "[MLTrainer]" << result.stdErr;
+        return result;
+    }
 
-} // namespace MLLIB
+    qDebug() << "[MLTrainer] Running training script:" << scriptPath;
 
-#endif // ML_MODEL_H
+    // If a venv is configured, use runInVenv (creates venv + installs deps automatically)
+    if (!m_runner.config().venvDir.isEmpty()) {
+        return m_runner.runInVenv(scriptPath, args);
+    }
+
+    return m_runner.run(scriptPath, args);
+}
+
+//=============================================================================================================
+
+QStringList MLTrainer::checkPrerequisites(const QStringList& packages) const
+{
+    QStringList missing;
+    for (const QString& pkg : packages) {
+        if (!m_runner.isPackageAvailable(pkg)) {
+            missing << pkg;
+        }
+    }
+    if (!missing.isEmpty()) {
+        qWarning() << "[MLTrainer] Missing Python packages:" << missing.join(QStringLiteral(", "));
+    }
+    return missing;
+}
+
+#endif // WASMBUILD

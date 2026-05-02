@@ -32,14 +32,14 @@
  *
  */
 
-#ifndef ML_TENSOR_H
-#define ML_TENSOR_H
+#ifndef DECODING_TENSOR_H
+#define DECODING_TENSOR_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ml_global.h"
+#include "decoding_global.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -57,10 +57,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MLLIB
+// DEFINE NAMESPACE DECODINGLIB
 //=============================================================================================================
 
-namespace MLLIB{
+namespace DECODINGLIB{
 
 //=============================================================================================================
 /**
@@ -75,7 +75,7 @@ namespace MLLIB{
  * conventions.  Eigen interop is provided through Map accessors that
  * expose the data without copying.
  */
-class MLSHARED_EXPORT MlTensor
+class DECODINGSHARED_EXPORT MlTensor
 {
 public:
     //  --- type aliases used in the public API --------------------------------
@@ -275,6 +275,6 @@ private:
     int64_t             m_size  = 0;                 /**< Cached total element count. */
 };
 
-} // namespace MLLIB
+} // namespace DECODINGLIB
 
-#endif // ML_TENSOR_H
+#endif // DECODING_TENSOR_H

@@ -38,15 +38,10 @@
       "sidebar_label": "CONNLIB — Connectivity",
       "origin": "mne-python"
     },
-    "ml": {
-      "dir": "src/libraries/ml",
-      "sidebar_label": "MLLIB — Machine Learning",
-      "origin": "mne-python (sklearn)"
-    },
     "decoding": {
       "dir": "src/libraries/decoding",
-      "sidebar_label": "DECODINGLIB — Decoding (mne.decoding)",
-      "origin": "mne-python"
+      "sidebar_label": "DECODINGLIB — Decoding & ML Inference",
+      "origin": "mne-python + custom"
     },
     "sts": {
       "dir": "src/libraries/sts",
@@ -1048,96 +1043,6 @@
       "skigen_candidate": false
     },
     {
-      "name": "MlCsp",
-      "module": "ml",
-      "header": "ml/ml_csp.h",
-      "origin": "mne-python",
-      "mne_c_tool": null,
-      "mne_python": "mne.decoding.CSP",
-      "sklearn": "sklearn.base.BaseEstimator + TransformerMixin (interface)",
-      "test": null,
-      "example": null,
-      "status": "removed",
-      "skigen_candidate": true,
-      "skigen_target": "Skigen::Decomposition::CSP (new)",
-      "notes": "Removed in batch 15; replaced by DecodingCsp in decoding library"
-    },
-    {
-      "name": "MlSpoc",
-      "module": "ml",
-      "header": "ml/ml_spoc.h",
-      "origin": "mne-python",
-      "mne_c_tool": null,
-      "mne_python": "mne.decoding.SPoC",
-      "sklearn": "sklearn.base.BaseEstimator + TransformerMixin (interface)",
-      "test": null,
-      "example": null,
-      "status": "removed",
-      "skigen_candidate": true,
-      "skigen_target": "Skigen::Decomposition::SPoC (new)",
-      "notes": "Removed in batch 15; replaced by DecodingSpoc in decoding library"
-    },
-    {
-      "name": "MlSsd",
-      "module": "ml",
-      "header": "ml/ml_ssd.h",
-      "origin": "mne-python",
-      "mne_c_tool": null,
-      "mne_python": "mne.decoding.SSD",
-      "sklearn": "sklearn.base.BaseEstimator + TransformerMixin (interface)",
-      "test": null,
-      "example": null,
-      "status": "removed",
-      "skigen_candidate": true,
-      "skigen_target": "Skigen::Decomposition::SSD (new)",
-      "notes": "Removed in batch 15; replaced by DecodingSsd in decoding library"
-    },
-    {
-      "name": "MlScaler",
-      "module": "ml",
-      "header": "ml/ml_scaler.h",
-      "origin": "sklearn",
-      "mne_c_tool": null,
-      "mne_python": "mne.decoding.Scaler",
-      "sklearn": "sklearn.preprocessing.StandardScaler / MinMaxScaler",
-      "test": null,
-      "example": null,
-      "status": "removed",
-      "skigen_candidate": true,
-      "skigen_target": "Skigen::Preprocessing::StandardScaler (exists), Skigen::Preprocessing::MinMaxScaler (exists)",
-      "notes": "Removed in batch 15; direct sklearn equivalent now in skigen"
-    },
-    {
-      "name": "MlLinearModel",
-      "module": "ml",
-      "header": "ml/ml_linear_model.h",
-      "origin": "sklearn",
-      "mne_c_tool": null,
-      "mne_python": "mne.decoding (linear models)",
-      "sklearn": "sklearn.linear_model.Ridge / LogisticRegression",
-      "test": null,
-      "example": null,
-      "status": "removed",
-      "skigen_candidate": true,
-      "skigen_target": "Skigen::LinearModel::Ridge (exists), Skigen::LinearModel::LogisticRegression (exists)",
-      "notes": "Removed in batch 15; predict-only inference container"
-    },
-    {
-      "name": "MlPipeline",
-      "module": "ml",
-      "header": "ml/ml_pipeline.h",
-      "origin": "sklearn",
-      "mne_c_tool": null,
-      "mne_python": "sklearn.pipeline.Pipeline",
-      "sklearn": "sklearn.pipeline.Pipeline",
-      "test": null,
-      "example": null,
-      "status": "removed",
-      "skigen_candidate": true,
-      "skigen_target": "Skigen::Pipeline::Pipeline (exists)",
-      "notes": "Removed in batch 15; users import sklearn.pipeline directly or use Skigen::Pipeline"
-    },
-    {
       "name": "DecodingCsp",
       "module": "decoding",
       "header": "decoding/decoding_csp.h",
@@ -1181,8 +1086,8 @@
     },
     {
       "name": "MlIcaLabel",
-      "module": "ml",
-      "header": "ml/ml_ica_label.h",
+      "module": "decoding",
+      "header": "decoding/decoding_ica_label.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": "mne_icalabel",
@@ -1409,30 +1314,6 @@
   ],
   "skigen_migration_candidates": [
     {
-      "mne_cpp_class": "MlScaler",
-      "mne_cpp_header": "ml/ml_scaler.h",
-      "skigen_class": "Skigen::Preprocessing::StandardScaler / MinMaxScaler",
-      "skigen_status": "done",
-      "migration_action": "Removed: MlScaler deleted; direct sklearn equivalent in Skigen::StandardScaler/MinMaxScaler; mne.decoding.Scaler planned for decoding library",
-      "priority": "high"
-    },
-    {
-      "mne_cpp_class": "MlLinearModel",
-      "mne_cpp_header": "ml/ml_linear_model.h",
-      "skigen_class": "Skigen::LinearModel::Ridge / LogisticRegression",
-      "skigen_status": "not applicable",
-      "migration_action": "Removed: MlLinearModel deleted; predict-only container not applicable to skigen training models",
-      "priority": "low"
-    },
-    {
-      "mne_cpp_class": "MlPipeline",
-      "mne_cpp_header": "ml/ml_pipeline.h",
-      "skigen_class": "Skigen::Pipeline::Pipeline",
-      "skigen_status": "exists",
-      "migration_action": "Removed: MlPipeline deleted; users use Skigen::Pipeline directly",
-      "priority": "high"
-    },
-    {
       "mne_cpp_class": "KMeans",
       "mne_cpp_header": "math/kmeans.h",
       "skigen_class": "Skigen::Cluster::KMeans",
@@ -1487,30 +1368,6 @@
       "skigen_status": "exists",
       "migration_action": "StsCovEstimators::autoSelect can delegate CV loop to Skigen::ModelSelection",
       "priority": "low"
-    },
-    {
-      "mne_cpp_class": "MlCsp",
-      "mne_cpp_header": "ml/ml_csp.h",
-      "skigen_class": "Skigen::Decomposition::CSP",
-      "skigen_status": "done",
-      "migration_action": "Removed: MlCsp deleted; replaced by DecodingCsp in decoding library (delegates to Skigen::CSP)",
-      "priority": "medium"
-    },
-    {
-      "mne_cpp_class": "MlSpoc",
-      "mne_cpp_header": "ml/ml_spoc.h",
-      "skigen_class": "Skigen::Decomposition::SPoC",
-      "skigen_status": "done",
-      "migration_action": "Removed: MlSpoc deleted; replaced by DecodingSpoc in decoding library (delegates to Skigen::SPoC)",
-      "priority": "medium"
-    },
-    {
-      "mne_cpp_class": "MlSsd",
-      "mne_cpp_header": "ml/ml_ssd.h",
-      "skigen_class": "Skigen::Decomposition::SSD",
-      "skigen_status": "done",
-      "migration_action": "Removed: MlSsd deleted; replaced by DecodingSsd in decoding library (delegates to Skigen::SSD)",
-      "priority": "medium"
     }
   ],
   "skigen_new_modules_needed": [

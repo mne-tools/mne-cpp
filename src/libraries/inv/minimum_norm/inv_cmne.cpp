@@ -56,11 +56,11 @@
 // MNE-CPP INCLUDES
 //=============================================================================================================
 
-#include <ml/ml_onnx_model.h>
-#include <ml/ml_tensor.h>
+#include <decoding/decoding_onnx_model.h>
+#include <decoding/decoding_tensor.h>
 
 #ifndef WASMBUILD
-#include <ml/ml_trainer.h>
+#include <decoding/decoding_trainer.h>
 #endif
 
 //=============================================================================================================
@@ -245,7 +245,7 @@ MatrixXd InvCMNE::applyLstmCorrection(
     int reportInterval = qMax(1, nCorrectableSteps / 10);  // report ~10 times
 
     // Try to load ONNX model for LSTM inference
-    MLLIB::MlOnnxModel lstmModel;
+    DECODINGLIB::MlOnnxModel lstmModel;
     bool useOrt = false;
 
     if (!onnxModelPath.isEmpty()) {
@@ -291,10 +291,10 @@ MatrixXd InvCMNE::applyLstmCorrection(
             // Create MlTensor view over the pre-allocated buffer — zero-copy
             std::vector<int64_t> inputShape = {1, static_cast<int64_t>(lookBack),
                                                static_cast<int64_t>(nSources)};
-            MLLIB::MlTensor inputTensor = MLLIB::MlTensor::view(inputBuf.data(), inputShape);
+            DECODINGLIB::MlTensor inputTensor = DECODINGLIB::MlTensor::view(inputBuf.data(), inputShape);
 
             // Run LSTM inference
-            MLLIB::MlTensor outputTensor = lstmModel.predict(inputTensor);
+            DECODINGLIB::MlTensor outputTensor = lstmModel.predict(inputTensor);
 
             // Convert output to Eigen VectorXd
             // Expected output shape: [1, nSources] or [nSources]
@@ -406,7 +406,7 @@ UTILSLIB::PythonRunnerResult InvCMNE::trainLstm(
     config.venvDir    = QDir(cmneDir).absoluteFilePath(QStringLiteral(".venv"));
     config.packageDir = cmneDir;
 
-    MLLIB::MLTrainer trainer(config);
+    DECODINGLIB::MLTrainer trainer(config);
 
     return trainer.run(scriptPath, args);
 }

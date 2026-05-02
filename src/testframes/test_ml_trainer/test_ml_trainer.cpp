@@ -38,7 +38,7 @@
 //=============================================================================================================
 
 #ifndef WASMBUILD
-#include <ml/ml_trainer.h>
+#include <decoding/decoding_trainer.h>
 #include <utils/python_runner.h>
 #include <utils/python_test_helper.h>
 #endif
@@ -58,7 +58,7 @@
 //=============================================================================================================
 
 #ifndef WASMBUILD
-using namespace MLLIB;
+using namespace DECODINGLIB;
 using namespace UTILSLIB;
 #endif
 

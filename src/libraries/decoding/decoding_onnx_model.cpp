@@ -36,7 +36,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ml_onnx_model.h"
+#include "decoding_onnx_model.h"
 
 #ifdef MNE_USE_ONNXRUNTIME
 #include <onnxruntime_cxx_api.h>
@@ -59,7 +59,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MLLIB;
+using namespace DECODINGLIB;
 
 //=============================================================================================================
 // STATIC HELPERS
