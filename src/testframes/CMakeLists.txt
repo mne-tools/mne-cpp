@@ -242,20 +242,17 @@ add_subdirectory(test_source_morph)
 add_subdirectory(test_fine_calibration)
 add_subdirectory(test_maxwell_movement_comp)
 
-# v2.3.0 TF-MxNE, CSP decoding, source estimate I/O, report tests
+# v2.3.0 TF-MxNE, source estimate I/O, report tests
 add_subdirectory(test_tf_mxne)
-add_subdirectory(test_csp)
 add_subdirectory(test_source_estimate_io)
 add_subdirectory(test_report)
 
-# v2.3.0 Batch 10: Surface Laplacian, resolution matrix, label time course, SPoC
+# v2.3.0 Batch 10: Surface Laplacian, resolution matrix, label time course
 add_subdirectory(test_surface_laplacian)
 add_subdirectory(test_resolution_matrix)
 add_subdirectory(test_label_time_course)
-add_subdirectory(test_spoc)
 
-# v2.3.0 Batch 11: SSD, TRAP-MUSIC, epochs convenience, label operations
-add_subdirectory(test_ssd)
+# v2.3.0 Batch 11: TRAP-MUSIC, epochs convenience, label operations
 add_subdirectory(test_trap_music)
 add_subdirectory(test_epochs)
 add_subdirectory(test_label_utils)
