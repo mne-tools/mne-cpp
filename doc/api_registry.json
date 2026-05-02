@@ -43,6 +43,11 @@
       "sidebar_label": "MLLIB — Machine Learning",
       "origin": "mne-python (sklearn)"
     },
+    "decoding": {
+      "dir": "src/libraries/decoding",
+      "sidebar_label": "DECODINGLIB — Decoding (mne.decoding)",
+      "origin": "mne-python"
+    },
     "sts": {
       "dir": "src/libraries/sts",
       "sidebar_label": "STSLIB — Statistics",
@@ -1050,12 +1055,12 @@
       "mne_c_tool": null,
       "mne_python": "mne.decoding.CSP",
       "sklearn": "sklearn.base.BaseEstimator + TransformerMixin (interface)",
-      "test": "test_csp",
+      "test": null,
       "example": null,
-      "status": "done",
+      "status": "removed",
       "skigen_candidate": true,
       "skigen_target": "Skigen::Decomposition::CSP (new)",
-      "notes": "CSP is a spatial filter decomposition — fits sklearn Transformer pattern; consider migrating core algorithm to skigen"
+      "notes": "Removed in batch 15; replaced by DecodingCsp in decoding library"
     },
     {
       "name": "MlSpoc",
@@ -1065,12 +1070,12 @@
       "mne_c_tool": null,
       "mne_python": "mne.decoding.SPoC",
       "sklearn": "sklearn.base.BaseEstimator + TransformerMixin (interface)",
-      "test": "test_spoc",
+      "test": null,
       "example": null,
-      "status": "done",
+      "status": "removed",
       "skigen_candidate": true,
       "skigen_target": "Skigen::Decomposition::SPoC (new)",
-      "notes": "SPoC finds spatial filters whose power covaries with target; sklearn Transformer pattern"
+      "notes": "Removed in batch 15; replaced by DecodingSpoc in decoding library"
     },
     {
       "name": "MlSsd",
@@ -1080,12 +1085,12 @@
       "mne_c_tool": null,
       "mne_python": "mne.decoding.SSD",
       "sklearn": "sklearn.base.BaseEstimator + TransformerMixin (interface)",
-      "test": "test_ssd",
+      "test": null,
       "example": null,
-      "status": "done",
+      "status": "removed",
       "skigen_candidate": true,
       "skigen_target": "Skigen::Decomposition::SSD (new)",
-      "notes": "SSD maximizes signal-band vs. noise-band power ratio; sklearn Transformer pattern"
+      "notes": "Removed in batch 15; replaced by DecodingSsd in decoding library"
     },
     {
       "name": "MlScaler",
@@ -1095,12 +1100,12 @@
       "mne_c_tool": null,
       "mne_python": "mne.decoding.Scaler",
       "sklearn": "sklearn.preprocessing.StandardScaler / MinMaxScaler",
-      "test": "test_ml_models",
+      "test": null,
       "example": null,
-      "status": "done",
+      "status": "removed",
       "skigen_candidate": true,
       "skigen_target": "Skigen::Preprocessing::StandardScaler (exists), Skigen::Preprocessing::MinMaxScaler (exists)",
-      "notes": "Direct sklearn equivalent; should delegate to skigen"
+      "notes": "Removed in batch 15; direct sklearn equivalent now in skigen"
     },
     {
       "name": "MlLinearModel",
@@ -1110,12 +1115,12 @@
       "mne_c_tool": null,
       "mne_python": "mne.decoding (linear models)",
       "sklearn": "sklearn.linear_model.Ridge / LogisticRegression",
-      "test": "test_ml_models",
+      "test": null,
       "example": null,
-      "status": "done",
+      "status": "removed",
       "skigen_candidate": true,
       "skigen_target": "Skigen::LinearModel::Ridge (exists), Skigen::LinearModel::LogisticRegression (exists)",
-      "notes": "Direct sklearn equivalent; should delegate to skigen"
+      "notes": "Removed in batch 15; predict-only inference container"
     },
     {
       "name": "MlPipeline",
@@ -1125,12 +1130,54 @@
       "mne_c_tool": null,
       "mne_python": "sklearn.pipeline.Pipeline",
       "sklearn": "sklearn.pipeline.Pipeline",
-      "test": "test_ml_models",
+      "test": null,
       "example": null,
-      "status": "done",
+      "status": "removed",
       "skigen_candidate": true,
       "skigen_target": "Skigen::Pipeline::Pipeline (exists)",
-      "notes": "Direct sklearn equivalent; should delegate to skigen"
+      "notes": "Removed in batch 15; users import sklearn.pipeline directly or use Skigen::Pipeline"
+    },
+    {
+      "name": "DecodingCsp",
+      "module": "decoding",
+      "header": "decoding/decoding_csp.h",
+      "origin": "mne-python",
+      "mne_c_tool": null,
+      "mne_python": "mne.decoding.CSP",
+      "sklearn": null,
+      "test": "test_decoding_csp",
+      "example": null,
+      "status": "done",
+      "skigen_candidate": false,
+      "notes": "Delegates to Skigen::CSP; adds MNE-specific transform modes (AveragePower/CspSpace), log/z-score standardisation, inverse_transform"
+    },
+    {
+      "name": "DecodingSpoc",
+      "module": "decoding",
+      "header": "decoding/decoding_spoc.h",
+      "origin": "mne-python",
+      "mne_c_tool": null,
+      "mne_python": "mne.decoding.SPoC",
+      "sklearn": null,
+      "test": "test_decoding_spoc",
+      "example": null,
+      "status": "done",
+      "skigen_candidate": false,
+      "notes": "Delegates to Skigen::SPoC; adds MNE-specific power feature extraction and transform modes"
+    },
+    {
+      "name": "DecodingSsd",
+      "module": "decoding",
+      "header": "decoding/decoding_ssd.h",
+      "origin": "mne-python",
+      "mne_c_tool": null,
+      "mne_python": "mne.decoding.SSD",
+      "sklearn": null,
+      "test": "test_decoding_ssd",
+      "example": null,
+      "status": "done",
+      "skigen_candidate": false,
+      "notes": "Delegates to Skigen::SSD; adds apply() for denoised low-rank reconstruction"
     },
     {
       "name": "MlIcaLabel",
@@ -1366,7 +1413,7 @@
       "mne_cpp_header": "ml/ml_scaler.h",
       "skigen_class": "Skigen::Preprocessing::StandardScaler / MinMaxScaler",
       "skigen_status": "done",
-      "migration_action": "Refactored: MlScaler::fit delegates to Skigen::StandardScaler/MinMaxScaler",
+      "migration_action": "Removed: MlScaler deleted; direct sklearn equivalent in Skigen::StandardScaler/MinMaxScaler; mne.decoding.Scaler planned for decoding library",
       "priority": "high"
     },
     {
@@ -1374,7 +1421,7 @@
       "mne_cpp_header": "ml/ml_linear_model.h",
       "skigen_class": "Skigen::LinearModel::Ridge / LogisticRegression",
       "skigen_status": "not applicable",
-      "migration_action": "MlLinearModel is a predict-only inference container (weights loaded from JSON, no fit). Delegation to skigen training models is not applicable.",
+      "migration_action": "Removed: MlLinearModel deleted; predict-only container not applicable to skigen training models",
       "priority": "low"
     },
     {
@@ -1382,7 +1429,7 @@
       "mne_cpp_header": "ml/ml_pipeline.h",
       "skigen_class": "Skigen::Pipeline::Pipeline",
       "skigen_status": "exists",
-      "migration_action": "Replace MlPipeline with Skigen::Pipeline; keep MlPipeline as compatibility alias",
+      "migration_action": "Removed: MlPipeline deleted; users use Skigen::Pipeline directly",
       "priority": "high"
     },
     {
@@ -1446,7 +1493,7 @@
       "mne_cpp_header": "ml/ml_csp.h",
       "skigen_class": "Skigen::Decomposition::CSP",
       "skigen_status": "done",
-      "migration_action": "Refactored: MlCsp delegates fit/transform to Skigen::CSP",
+      "migration_action": "Removed: MlCsp deleted; replaced by DecodingCsp in decoding library (delegates to Skigen::CSP)",
       "priority": "medium"
     },
     {
@@ -1454,7 +1501,7 @@
       "mne_cpp_header": "ml/ml_spoc.h",
       "skigen_class": "Skigen::Decomposition::SPoC",
       "skigen_status": "done",
-      "migration_action": "Refactored: MlSpoc delegates fit/transform to Skigen::SPoC",
+      "migration_action": "Removed: MlSpoc deleted; replaced by DecodingSpoc in decoding library (delegates to Skigen::SPoC)",
       "priority": "medium"
     },
     {
@@ -1462,7 +1509,7 @@
       "mne_cpp_header": "ml/ml_ssd.h",
       "skigen_class": "Skigen::Decomposition::SSD",
       "skigen_status": "done",
-      "migration_action": "Refactored: MlSsd delegates fit/transform to Skigen::SSD",
+      "migration_action": "Removed: MlSsd deleted; replaced by DecodingSsd in decoding library (delegates to Skigen::SSD)",
       "priority": "medium"
     }
   ],
