@@ -72,6 +72,7 @@ compile_commands.json
 /src/external/eigen-*/
 /src/external/eigen-*-install/
 /src/external/onnxruntime/
+/src/external/skigen/
 
 # Generated docu Docker files
 /_site

@@ -258,4 +258,17 @@ echo "  Eigen: ${EIGEN_DIR}"
 if [[ -n "${ONNXRUNTIME_VERSION}" ]]; then
     echo "  ONNX Runtime: ${ONNXRUNTIME_DIR}"
 fi
+
+# ── Skigen — scikit-learn algorithms on Eigen (header-only) ──────────────
+SKIGEN_DIR="${SCRIPT_DIR}/skigen"
+if [[ ! -d "${SKIGEN_DIR}" ]]; then
+    echo "Cloning skigen (staging branch)..."
+    git clone --branch staging https://github.com/skigen-project/skigen.git \
+        "${SKIGEN_DIR}"
+else
+    echo "Updating skigen (staging HEAD)..."
+    git -C "${SKIGEN_DIR}" pull --ff-only origin staging || true
+fi
+echo "  Skigen: ${SKIGEN_DIR}"
+
 echo "  CMake prefix hint: ${QT_DIR};${EIGEN_DIR}"

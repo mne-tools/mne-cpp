@@ -189,6 +189,18 @@ if exist "%EIGEN_DIR%\share\eigen3\cmake\Eigen3Config.cmake" (
 if defined ONNXRUNTIME_VERSION (
     echo   ONNX Runtime: %ONNXRUNTIME_DIR%
 )
+
+rem ── Skigen — scikit-learn algorithms on Eigen (header-only) ──
+set "SKIGEN_DIR=%SCRIPT_DIR%\skigen"
+if not exist "%SKIGEN_DIR%" (
+    echo Cloning skigen ^(staging branch^)...
+    git clone --branch staging https://github.com/skigen-project/skigen.git "%SKIGEN_DIR%"
+) else (
+    echo Updating skigen ^(staging HEAD^)...
+    git -C "%SKIGEN_DIR%" pull --ff-only origin staging 2>nul
+)
+echo   Skigen: %SKIGEN_DIR%
+
 exit /b 0
 
 :usage_ok
