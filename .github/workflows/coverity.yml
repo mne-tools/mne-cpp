@@ -55,6 +55,8 @@ jobs:
             --kind eigen \
             --version "5.0.1" \
             --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+      - name: Clone Skigen
+        run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
       - name: Coverity scan
         run: |
           ./scripts/test/coverity_scan.sh "$COVTOKEN"

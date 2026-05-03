@@ -2,11 +2,15 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "staging" ]
   pull_request:
     branches: [ "main" ]
   schedule:
     - cron: '28 15 * * 1'
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
@@ -58,6 +62,9 @@ jobs:
           --kind eigen \
           --version "5.0.1" \
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+
+    - name: Clone Skigen
+      run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
 
     # Initialize CodeQL tools for scanning.
     - name: Initialize CodeQL

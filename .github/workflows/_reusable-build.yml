@@ -67,6 +67,10 @@ jobs:
           --version "1.21.0" \
           --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
 
+    - name: Clone Skigen (Linux|MacOS)
+      if: matrix.os == 'ubuntu-24.04' || matrix.os == 'macos-26'
+      run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
+
     - name: Download Qt toolchain (Windows)
       if: matrix.os == 'windows-2025'
       shell: cmd
@@ -90,6 +94,10 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
         call scripts\ci\download_toolchain.bat --kind onnxruntime --version "1.21.0" --output-dir "%GITHUB_WORKSPACE%\src\external\onnxruntime"
+
+    - name: Clone Skigen (Windows)
+      if: matrix.os == 'windows-2025'
+      run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
 
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: matrix.os == 'ubuntu-24.04' || matrix.os == 'macos-26'

@@ -50,6 +50,9 @@ jobs:
           --kind eigen \
           --output-dir "$RUNNER_TEMP/eigen"
 
+    - name: Clone Skigen
+      run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
+
     - name: Configure
       run: |
         cmake -S . -B build \
@@ -108,6 +111,9 @@ jobs:
         ./scripts/ci/download_toolchain.sh \
           --kind eigen \
           --output-dir "$RUNNER_TEMP/eigen"
+
+    - name: Clone Skigen
+      run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
 
     - name: Configure
       run: |
@@ -169,6 +175,9 @@ jobs:
         ./scripts/ci/download_toolchain.sh \
           --kind eigen \
           --output-dir "$RUNNER_TEMP/eigen"
+
+    - name: Clone Skigen
+      run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
 
     - name: Configure
       shell: bash

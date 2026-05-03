@@ -289,6 +289,9 @@ jobs:
           --platform wasm \
           --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
 
+    - name: Clone Skigen
+      run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
+
     - name: Build WASM
       run: |
         source ../emsdk/emsdk_env.sh

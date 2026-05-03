@@ -59,6 +59,8 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
         call scripts\ci\download_toolchain.bat --kind onnxruntime --version "1.21.0" --output-dir "%GITHUB_WORKSPACE%\src\external\onnxruntime"
+    - name: Clone Skigen
+      run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
     - name: Configure and compile MNE-CPP
       run: |
         cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
@@ -145,12 +147,14 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
         call scripts\ci\download_toolchain.bat --kind onnxruntime --version "1.21.0" --output-dir "%GITHUB_WORKSPACE%\src\external\onnxruntime"
+    - name: Clone Skigen
+      run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
     - name: Cache static Qt binaries
       id: cache-qt-static
       uses: actions/cache@v5
       with:
         path: Qt6_static
-        key: qt-6.11.0-static-windows-x86_64
+        key: qt-6.11.0-static-windows-x86_64-v2
     - name: Download pre-built static Qt
       id: download-qt-static
       if: steps.cache-qt-static.outputs.cache-hit != 'true'
