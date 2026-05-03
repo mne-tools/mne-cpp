@@ -2,7 +2,8 @@
 /**
  * @file     fiff_dig_point_set.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July, 2016
  *
@@ -48,6 +49,9 @@
 #include "fiff_tag.h"
 #include "fiff_types.h"
 #include <QDebug>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -208,6 +212,46 @@ void FiffDigPointSet::write(QIODevice &p_IODevice)
     qInfo("Write Digitizer Points in %s...\n", t_pStream->streamName().toUtf8().constData());
     this->writeToStream(t_pStream.data());
     t_pStream->end_file();
+}
+
+//=============================================================================================================
+
+bool FiffDigPointSet::write(const QString& filePath, QString* errorMessage)
+{
+    if (filePath.isEmpty()) {
+        if (errorMessage) *errorMessage = QStringLiteral("Output path is empty.");
+        return false;
+    }
+
+    const QFileInfo info(filePath);
+    if (!info.dir().exists()) {
+        if (errorMessage) {
+            *errorMessage = QStringLiteral("Destination directory '%1' does not exist.")
+                                .arg(info.dir().absolutePath());
+        }
+        return false;
+    }
+
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        if (errorMessage) {
+            *errorMessage = QStringLiteral("Cannot open '%1' for writing: %2")
+                                .arg(filePath, file.errorString());
+        }
+        return false;
+    }
+
+    write(file);
+    file.close();
+
+    if (!QFileInfo::exists(filePath)) {
+        if (errorMessage) {
+            *errorMessage = QStringLiteral("FiffDigPointSet::write produced no file at '%1'.")
+                                .arg(filePath);
+        }
+        return false;
+    }
+    return true;
 }
 
 //=============================================================================================================

@@ -2,7 +2,8 @@
 /**
  * @file     fiff_dig_point_set.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     Jul, 2016
  *
@@ -167,6 +168,20 @@ public:
      * @param[in] p_IODevice   IO device to write the digitizer point set to.
      */
     void write(QIODevice &p_IODevice);
+
+    //=========================================================================================================
+    /**
+     * Convenience overload: write the digitizer point set to a path on disk.
+     *
+     * Verifies that the destination directory exists and that the file was
+     * actually produced. The file is opened in WriteOnly|Truncate mode.
+     *
+     * @param[in]  filePath      Destination .fif file path.
+     * @param[out] errorMessage  Optional, populated on failure.
+     *
+     * @return true on success, false on error.
+     */
+    bool write(const QString& filePath, QString* errorMessage = nullptr);
 
     //=========================================================================================================
     /**

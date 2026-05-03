@@ -365,7 +365,7 @@ private slots:
     {
         // Test readTransformAscii — covers lines 493-544
         QTemporaryFile tmp;
-        tmp.open();
+        QVERIFY(tmp.open());
         QTextStream ts(&tmp);
         // 4x4 matrix: identity rotation + small translation in mm
         ts << "1.000000 0.000000 0.000000 10.0\n";
@@ -390,7 +390,7 @@ private slots:
     {
         // Test with comment lines — covers more of readTransformAscii
         QTemporaryFile tmp;
-        tmp.open();
+        QVERIFY(tmp.open());
         QTextStream ts(&tmp);
         ts << "# This is a comment\n";
         ts << "1.0 0.0 0.0 5.0\n";
