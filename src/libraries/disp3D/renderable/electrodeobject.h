@@ -81,14 +81,43 @@ struct DISP3DSHARED_EXPORT ElectrodeContact
 
 //=============================================================================================================
 /**
- * @brief One shaft of a stereotactic depth electrode (sEEG).
+ * @brief Geometry layout for an electrode array.
+ *
+ * Added in v2.3.0 (TASK 10) to extend the original sEEG-only ElectrodeObject
+ * with ECoG strip and grid topologies. The renderer interprets the layout
+ * field on @ref ElectrodeArray:
+ *
+ *   - Depth — render the cylindrical shaft + sphere instances per contact
+ *             (the only mode supported in v2.2.0).
+ *   - Strip — render sphere instances only, no shaft (a 1×N ECoG strip).
+ *   - Grid  — render sphere instances on a regular @ref gridRows × @ref
+ *             gridCols lattice, optionally with a translucent quad mesh
+ *             linking the contacts as a visual reference.
  */
-struct DISP3DSHARED_EXPORT ElectrodeShaft
+enum class ElectrodeLayout {
+    Depth = 0,  /**< Stereotactic depth electrode (cylinder + contacts). */
+    Strip,       /**< 1×N ECoG strip — spheres only. */
+    Grid         /**< gridRows × gridCols ECoG grid — spheres + optional mesh. */
+};
+
+//=============================================================================================================
+/**
+ * @brief One electrode array — sEEG depth shaft, ECoG strip, or ECoG grid.
+ *
+ * The Depth-only fields (@ref shaftRadius, @ref shaftColor) are ignored
+ * for Strip and Grid layouts. The Grid-only fields (@ref gridRows,
+ * @ref gridCols) default to 1 and so describe a degenerate single
+ * contact for the other layouts.
+ */
+struct DISP3DSHARED_EXPORT ElectrodeArray
 {
-    QString                     label;          /**< Shaft label: "LH", "RA", etc. */
-    QVector<ElectrodeContact>   contacts;       /**< Contacts ordered tip-to-tail. */
-    float                       shaftRadius = 0.4f; /**< Cylinder radius in mm. */
-    QColor                      shaftColor = Qt::gray;  /**< Shaft body color. */
+    QString                     label;                  /**< Array label: "LH", "GridA", etc. */
+    ElectrodeLayout             layout = ElectrodeLayout::Depth; /**< Geometry kind. */
+    int                         gridRows = 1;           /**< Grid only: number of rows. */
+    int                         gridCols = 1;           /**< Grid only: number of cols (Strip uses Cols = N, Rows = 1). */
+    QVector<ElectrodeContact>   contacts;               /**< Contacts in array-local order. */
+    float                       shaftRadius = 0.4f;     /**< Depth only: cylinder radius in mm. */
+    QColor                      shaftColor = Qt::gray;  /**< Depth only: shaft body color. */
 };
 
 //=============================================================================================================
@@ -106,17 +135,17 @@ public:
 
     //=========================================================================================================
     /**
-     * Set electrode data from shaft definitions.
+     * Set electrode data from array definitions.
      *
-     * @param[in] shafts    Vector of electrode shafts.
+     * @param[in] arrays  Vector of electrode arrays.
      */
-    void setShafts(const QVector<ElectrodeShaft>& shafts);
+    void setArrays(const QVector<ElectrodeArray>& arrays);
 
     //=========================================================================================================
     /**
-     * @return Const reference to the current shafts.
+     * @return Const reference to the current arrays.
      */
-    const QVector<ElectrodeShaft>& shafts() const;
+    const QVector<ElectrodeArray>& arrays() const;
 
     //=========================================================================================================
     /**
@@ -230,7 +259,7 @@ public:
     uint32_t contactInstanceCount() const;
 
 private:
-    QVector<ElectrodeShaft> m_shafts;           /**< All electrode shafts. */
+    QVector<ElectrodeArray> m_arrays;            /**< All electrode arrays. */
     QString                 m_selectedContact;   /**< Currently selected contact name. */
     QVector3D               m_bbMin;             /**< Cached bounding box min. */
     QVector3D               m_bbMax;             /**< Cached bounding box max. */

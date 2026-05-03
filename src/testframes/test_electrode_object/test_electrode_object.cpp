@@ -28,8 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Tests for ElectrodeObject — sEEG electrode geometry and data overlay.
- *           Tests shaft construction, contact selection, value overlay, and bounding box.
+ * @brief    Tests for ElectrodeObject — sEEG / ECoG electrode geometry and data overlay.
+ *           Tests array construction, contact selection, value overlay, and bounding box.
  */
 
 //=============================================================================================================
@@ -56,7 +56,7 @@ using namespace DISP3DLIB;
 /**
  * DECLARE CLASS TestElectrodeObject
  *
- * @brief Tests for ElectrodeObject sEEG electrode rendering data.
+ * @brief Tests for ElectrodeObject sEEG/ECoG electrode rendering data.
  */
 class TestElectrodeObject : public QObject
 {
@@ -66,7 +66,7 @@ private slots:
     void initTestCase();
 
     void testEmptyConstruction();
-    void testSetShafts();
+    void testSetArrays();
     void testTotalContactCount();
     void testContactSelection();
     void testClearSelection();
@@ -78,7 +78,7 @@ private slots:
     void cleanupTestCase();
 
 private:
-    QVector<ElectrodeShaft> createTestShafts(int nShafts, int contactsPerShaft) const;
+    QVector<ElectrodeArray> createTestArrays(int nArrays, int contactsPerArray) const;
 };
 
 //=============================================================================================================
@@ -93,22 +93,22 @@ void TestElectrodeObject::testEmptyConstruction()
 {
     ElectrodeObject obj;
     QCOMPARE(obj.totalContactCount(), 0);
-    QVERIFY(obj.shafts().isEmpty());
+    QVERIFY(obj.arrays().isEmpty());
     QVERIFY(obj.selectedContact().isEmpty());
 }
 
 //=============================================================================================================
 
-void TestElectrodeObject::testSetShafts()
+void TestElectrodeObject::testSetArrays()
 {
     ElectrodeObject obj;
-    QVector<ElectrodeShaft> shafts = createTestShafts(3, 8);
-    obj.setShafts(shafts);
+    QVector<ElectrodeArray> arrays = createTestArrays(3, 8);
+    obj.setArrays(arrays);
 
-    QCOMPARE(obj.shafts().size(), 3);
-    QCOMPARE(obj.shafts()[0].contacts.size(), 8);
-    QCOMPARE(obj.shafts()[1].contacts.size(), 8);
-    QCOMPARE(obj.shafts()[2].contacts.size(), 8);
+    QCOMPARE(obj.arrays().size(), 3);
+    QCOMPARE(obj.arrays()[0].contacts.size(), 8);
+    QCOMPARE(obj.arrays()[1].contacts.size(), 8);
+    QCOMPARE(obj.arrays()[2].contacts.size(), 8);
 }
 
 //=============================================================================================================
@@ -117,31 +117,31 @@ void TestElectrodeObject::testTotalContactCount()
 {
     ElectrodeObject obj;
 
-    // 10 shafts × 12 contacts = 120 total
-    QVector<ElectrodeShaft> shafts = createTestShafts(10, 12);
-    obj.setShafts(shafts);
+    // 10 arrays × 12 contacts = 120 total
+    QVector<ElectrodeArray> arrays = createTestArrays(10, 12);
+    obj.setArrays(arrays);
     QCOMPARE(obj.totalContactCount(), 120);
 
     // Different sizes
-    QVector<ElectrodeShaft> mixed;
-    ElectrodeShaft s1;
-    s1.label = "A";
+    QVector<ElectrodeArray> mixed;
+    ElectrodeArray a1;
+    a1.label = "A";
     for (int i = 0; i < 5; ++i) {
         ElectrodeContact c;
         c.name = QString("A%1").arg(i);
         c.position = QVector3D(0, 0, i);
-        s1.contacts.append(c);
+        a1.contacts.append(c);
     }
-    ElectrodeShaft s2;
-    s2.label = "B";
+    ElectrodeArray a2;
+    a2.label = "B";
     for (int i = 0; i < 3; ++i) {
         ElectrodeContact c;
         c.name = QString("B%1").arg(i);
         c.position = QVector3D(10, 0, i);
-        s2.contacts.append(c);
+        a2.contacts.append(c);
     }
-    mixed << s1 << s2;
-    obj.setShafts(mixed);
+    mixed << a1 << a2;
+    obj.setArrays(mixed);
     QCOMPARE(obj.totalContactCount(), 8);
 }
 
@@ -150,8 +150,8 @@ void TestElectrodeObject::testTotalContactCount()
 void TestElectrodeObject::testContactSelection()
 {
     ElectrodeObject obj;
-    QVector<ElectrodeShaft> shafts = createTestShafts(2, 4);
-    obj.setShafts(shafts);
+    QVector<ElectrodeArray> arrays = createTestArrays(2, 4);
+    obj.setArrays(arrays);
 
     obj.selectContact("S0_C2");
     QCOMPARE(obj.selectedContact(), QString("S0_C2"));
@@ -166,8 +166,8 @@ void TestElectrodeObject::testContactSelection()
 void TestElectrodeObject::testClearSelection()
 {
     ElectrodeObject obj;
-    QVector<ElectrodeShaft> shafts = createTestShafts(1, 4);
-    obj.setShafts(shafts);
+    QVector<ElectrodeArray> arrays = createTestArrays(1, 4);
+    obj.setArrays(arrays);
 
     obj.selectContact("S0_C1");
     QVERIFY(!obj.selectedContact().isEmpty());
@@ -181,8 +181,8 @@ void TestElectrodeObject::testClearSelection()
 void TestElectrodeObject::testContactValues()
 {
     ElectrodeObject obj;
-    QVector<ElectrodeShaft> shafts = createTestShafts(1, 4);
-    obj.setShafts(shafts);
+    QVector<ElectrodeArray> arrays = createTestArrays(1, 4);
+    obj.setArrays(arrays);
 
     QMap<QString, float> values;
     values["S0_C0"] = 0.0f;
@@ -193,8 +193,8 @@ void TestElectrodeObject::testContactValues()
     obj.setContactValues(values, Qt::blue, Qt::red);
 
     // After setting values, the contacts should have updated colors
-    // Verify the shafts still have correct contact count
-    QCOMPARE(obj.shafts()[0].contacts.size(), 4);
+    // Verify the array still has the correct contact count
+    QCOMPARE(obj.arrays()[0].contacts.size(), 4);
 }
 
 //=============================================================================================================
@@ -202,15 +202,15 @@ void TestElectrodeObject::testContactValues()
 void TestElectrodeObject::testBoundingBox()
 {
     ElectrodeObject obj;
-    QVector<ElectrodeShaft> shafts = createTestShafts(2, 5);
-    obj.setShafts(shafts);
+    QVector<ElectrodeArray> arrays = createTestArrays(2, 5);
+    obj.setArrays(arrays);
 
     QVector3D bbMin = obj.boundingBoxMin();
     QVector3D bbMax = obj.boundingBoxMax();
 
     // Bounding box should enclose all contact positions
-    for (const auto& shaft : shafts) {
-        for (const auto& contact : shaft.contacts) {
+    for (const auto& arr : arrays) {
+        for (const auto& contact : arr.contacts) {
             QVERIFY2(contact.position.x() >= bbMin.x() - 1.0f &&
                      contact.position.x() <= bbMax.x() + 1.0f,
                      "Contact X outside bounding box");
@@ -223,7 +223,6 @@ void TestElectrodeObject::testBoundingBox()
         }
     }
 
-    // BB max should be >= BB min in each dimension
     QVERIFY(bbMax.x() >= bbMin.x());
     QVERIFY(bbMax.y() >= bbMin.y());
     QVERIFY(bbMax.z() >= bbMin.z());
@@ -233,22 +232,22 @@ void TestElectrodeObject::testBoundingBox()
 
 void TestElectrodeObject::testSingleContact()
 {
-    // Edge case: a shaft with a single contact (no cylinder can be drawn)
+    // Edge case: a depth array with a single contact (no cylinder can be drawn)
     ElectrodeObject obj;
-    ElectrodeShaft shaft;
-    shaft.label = "X";
+    ElectrodeArray arr;
+    arr.label = "X";
     ElectrodeContact c;
     c.name = "X1";
     c.position = QVector3D(10.0f, 20.0f, 30.0f);
     c.radius = 0.5f;
-    shaft.contacts.append(c);
+    arr.contacts.append(c);
 
-    QVector<ElectrodeShaft> shafts;
-    shafts << shaft;
-    obj.setShafts(shafts);
+    QVector<ElectrodeArray> arrays;
+    arrays << arr;
+    obj.setArrays(arrays);
 
     QCOMPARE(obj.totalContactCount(), 1);
-    QCOMPARE(obj.shafts().size(), 1);
+    QCOMPARE(obj.arrays().size(), 1);
 }
 
 //=============================================================================================================
@@ -256,20 +255,19 @@ void TestElectrodeObject::testSingleContact()
 void TestElectrodeObject::testGeometryGeneration()
 {
     ElectrodeObject obj;
-    QVector<ElectrodeShaft> shafts = createTestShafts(3, 6);
-    obj.setShafts(shafts);
+    QVector<ElectrodeArray> arrays = createTestArrays(3, 6);
+    obj.setArrays(arrays);
 
     // Generate shaft geometry (cylinder mesh)
     QVector<float> shaftVerts;
     QVector<unsigned int> shaftIdx;
-    obj.generateShaftGeometry(shaftVerts, shaftIdx, 16);  // 16 segments
-    // Should have geometry data for 3 shafts
+    obj.generateShaftGeometry(shaftVerts, shaftIdx, 16);
     QVERIFY(!shaftVerts.isEmpty());
 
     // Generate contact instances (instanced spheres)
     QVector<float> contactInstData;
     obj.generateContactInstances(contactInstData);
-    // 3 shafts × 6 contacts = 18 instances, each 9 floats (pos3 + radius1 + rgba4 + selected1)
+    // 3 arrays × 6 contacts = 18 instances, each 9 floats
     QCOMPARE(contactInstData.size(), 18 * 9);
 }
 
@@ -281,29 +279,28 @@ void TestElectrodeObject::cleanupTestCase()
 
 //=============================================================================================================
 
-QVector<ElectrodeShaft> TestElectrodeObject::createTestShafts(int nShafts, int contactsPerShaft) const
+QVector<ElectrodeArray> TestElectrodeObject::createTestArrays(int nArrays, int contactsPerArray) const
 {
-    QVector<ElectrodeShaft> shafts;
-    for (int s = 0; s < nShafts; ++s) {
-        ElectrodeShaft shaft;
-        shaft.label = QString("S%1").arg(s);
-        shaft.shaftRadius = 0.4f;
-        shaft.shaftColor = Qt::gray;
+    QVector<ElectrodeArray> arrays;
+    for (int s = 0; s < nArrays; ++s) {
+        ElectrodeArray arr;
+        arr.label = QString("S%1").arg(s);
+        arr.shaftRadius = 0.4f;
+        arr.shaftColor = Qt::gray;
 
-        for (int c = 0; c < contactsPerShaft; ++c) {
+        for (int c = 0; c < contactsPerArray; ++c) {
             ElectrodeContact contact;
             contact.name = QString("S%1_C%2").arg(s).arg(c);
-            // Space contacts along Z axis, separated by shaft index in X
             contact.position = QVector3D(s * 20.0f, 0.0f, c * 3.5f);
             contact.radius = 0.5f;
             contact.color = Qt::white;
             contact.selected = false;
             contact.value = 0.0f;
-            shaft.contacts.append(contact);
+            arr.contacts.append(contact);
         }
-        shafts.append(shaft);
+        arrays.append(arr);
     }
-    return shafts;
+    return arrays;
 }
 
 //=============================================================================================================

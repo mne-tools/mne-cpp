@@ -43,6 +43,7 @@ set(SOURCES
     renderable/electrodeobject.cpp
     renderable/sliceobject.cpp
     renderable/networkobject.cpp
+    scene/multimodalscene.cpp
     scene/sensorfieldmapper.cpp
     scene/rtsensorstreammanager.cpp
     scene/sourceestimatemanager.cpp
@@ -86,6 +87,8 @@ set(HEADERS
     renderable/sliceobject.h
     renderable/networkobject.h
     renderable/videooverlay.h
+    scene/multimodalscene.h
+    scene/pickresult.h
     scene/sensorfieldmapper.h
     scene/rtsensorstreammanager.h
     scene/sourceestimatemanager.h

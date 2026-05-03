@@ -85,9 +85,9 @@ ElectrodeObject::~ElectrodeObject() = default;
 
 //=============================================================================================================
 
-void ElectrodeObject::setShafts(const QVector<ElectrodeShaft>& shafts)
+void ElectrodeObject::setArrays(const QVector<ElectrodeArray>& arrays)
 {
-    m_shafts = shafts;
+    m_arrays = arrays;
     m_selectedContact.clear();
     computeBoundingBox();
     m_gpu->dirty = true;
@@ -95,9 +95,9 @@ void ElectrodeObject::setShafts(const QVector<ElectrodeShaft>& shafts)
 
 //=============================================================================================================
 
-const QVector<ElectrodeShaft>& ElectrodeObject::shafts() const
+const QVector<ElectrodeArray>& ElectrodeObject::arrays() const
 {
-    return m_shafts;
+    return m_arrays;
 }
 
 //=============================================================================================================
@@ -105,7 +105,7 @@ const QVector<ElectrodeShaft>& ElectrodeObject::shafts() const
 int ElectrodeObject::totalContactCount() const
 {
     int count = 0;
-    for (const auto& shaft : m_shafts)
+    for (const auto& shaft : m_arrays)
         count += shaft.contacts.size();
     return count;
 }
@@ -128,7 +128,7 @@ void ElectrodeObject::setContactValues(const QMap<QString, float>& values,
     }
 
     // Apply to contacts
-    for (auto& shaft : m_shafts) {
+    for (auto& shaft : m_arrays) {
         for (auto& contact : shaft.contacts) {
             auto it = values.find(contact.name);
             if (it != values.end()) {
@@ -150,7 +150,7 @@ void ElectrodeObject::selectContact(const QString& name)
 
     // Set new selection
     m_selectedContact = name;
-    for (auto& shaft : m_shafts) {
+    for (auto& shaft : m_arrays) {
         for (auto& contact : shaft.contacts) {
             if (contact.name == name) {
                 contact.selected = true;
@@ -169,7 +169,7 @@ void ElectrodeObject::selectContact(const QString& name)
 void ElectrodeObject::clearSelection()
 {
     m_selectedContact.clear();
-    for (auto& shaft : m_shafts) {
+    for (auto& shaft : m_arrays) {
         for (auto& contact : shaft.contacts)
             contact.selected = false;
     }
@@ -195,7 +195,11 @@ void ElectrodeObject::generateShaftGeometry(QVector<float>& vertices,
     if (cylinderSides < 3)
         cylinderSides = 3;
 
-    for (const auto& shaft : m_shafts) {
+    for (const auto& shaft : m_arrays) {
+        // v2.3.0: Strip and Grid layouts render as instanced spheres only
+        // (no cylinder shaft). They are emitted via generateContactInstances.
+        if (shaft.layout != ElectrodeLayout::Depth)
+            continue;
         if (shaft.contacts.size() < 2)
             continue;
 
@@ -301,7 +305,7 @@ void ElectrodeObject::generateContactInstances(QVector<float>& instanceData) con
     const int floatsPerInstance = 9;
     instanceData.reserve(totalContactCount() * floatsPerInstance);
 
-    for (const auto& shaft : m_shafts) {
+    for (const auto& shaft : m_arrays) {
         for (const auto& contact : shaft.contacts) {
             // position (3)
             instanceData.append(contact.position.x());
@@ -345,7 +349,7 @@ void ElectrodeObject::computeBoundingBox()
                         std::numeric_limits<float>::lowest(),
                         std::numeric_limits<float>::lowest());
 
-    for (const auto& shaft : m_shafts) {
+    for (const auto& shaft : m_arrays) {
         for (const auto& contact : shaft.contacts) {
             const float pad = contact.radius;
             const QVector3D& p = contact.position;

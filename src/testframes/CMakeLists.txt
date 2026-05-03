@@ -267,3 +267,6 @@ add_subdirectory(test_connectivity_aec)
 add_subdirectory(test_decoding_csp)
 add_subdirectory(test_decoding_spoc)
 add_subdirectory(test_decoding_ssd)
+
+# v2.3.0 Batch 16: GUI integration foundation (TASK 4 / 10 / 11)
+add_subdirectory(test_multimodal_scene)
