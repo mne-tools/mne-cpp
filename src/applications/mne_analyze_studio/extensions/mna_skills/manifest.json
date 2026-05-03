@@ -1,0 +1,13 @@
+{
+  "id": "mna-skills",
+  "display_name": "MNA Project Skills",
+  "version": "0.1.0",
+  "entry_point": "mna_skills",
+  "contributes": {
+    "ui": {
+      "sidebar_items": [
+        "Workflow Skills"
+      ]
+    }
+  }
+}

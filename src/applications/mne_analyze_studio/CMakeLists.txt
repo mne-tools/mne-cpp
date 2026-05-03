@@ -46,6 +46,7 @@ add_subdirectory(extensions/analysis_results_extension)
 add_subdirectory(extensions/psd_analysis_extension)
 add_subdirectory(extensions/temporal_filter_skill)
 add_subdirectory(extensions/source_estimation_skill)
+add_subdirectory(extensions/mna_skills)
 add_subdirectory(neuro_kernel)
 add_subdirectory(skill_host)
 
