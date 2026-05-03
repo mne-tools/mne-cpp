@@ -205,15 +205,17 @@ void MneAlign::loadSettings()
             m_pSplitter->restoreState(ss);
     }
 
-    // Restore toolbar combos without triggering applyViewConfiguration().
-    const int viewCount    = qBound(1, s.value(QStringLiteral("viewCount"),    1).toInt(), 4);
+    // Sync toolbar combos from the 3D view's actual loaded state.
+    // viewCount and renderMode come from BrainView (which already loaded
+    // them from QSettings in its own ctor); cameraPreset is stored in the
+    // MneAlign group because BrainView keeps camera as a quaternion.
     const int cameraPreset = qBound(0, s.value(QStringLiteral("cameraPreset"), 1).toInt(), 6);
-    const QString renderMode = s.value(QStringLiteral("renderMode"),
-                                       QStringLiteral("Anatomical")).toString();
+    const QString bemPath  = s.value(QStringLiteral("lastBemPath")).toString();
+    s.endGroup();
 
-    if (m_pViewCountCombo) {
+    if (m_pViewCountCombo && m_pView3d) {
         m_pViewCountCombo->blockSignals(true);
-        m_pViewCountCombo->setCurrentIndex(viewCount - 1);
+        m_pViewCountCombo->setCurrentIndex(m_pView3d->viewCount() - 1);
         m_pViewCountCombo->blockSignals(false);
     }
     if (m_pCameraPresetCombo) {
@@ -221,16 +223,12 @@ void MneAlign::loadSettings()
         m_pCameraPresetCombo->setCurrentIndex(cameraPreset);
         m_pCameraPresetCombo->blockSignals(false);
     }
-    if (m_pRenderModeCombo) {
+    if (m_pRenderModeCombo && m_pView3d) {
         m_pRenderModeCombo->blockSignals(true);
-        const int idx = m_pRenderModeCombo->findText(renderMode);
+        const int idx = m_pRenderModeCombo->findText(m_pView3d->renderMode());
         m_pRenderModeCombo->setCurrentIndex(idx >= 0 ? idx : 0);
         m_pRenderModeCombo->blockSignals(false);
     }
-
-    // Reload last BEM if path is still accessible.
-    const QString bemPath = s.value(QStringLiteral("lastBemPath")).toString();
-    s.endGroup();
 
     if (!bemPath.isEmpty() && QFile::exists(bemPath)) {
         if (m_pWizard)

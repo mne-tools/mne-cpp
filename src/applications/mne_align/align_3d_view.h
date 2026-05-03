@@ -71,6 +71,13 @@ public:
     void setRenderMode(const QString& modeName);
     void setCameraPreset(int preset);
 
+    /** Number of enabled viewports as loaded/set in BrainView. */
+    int     viewCount() const;
+    /** Shader/render mode name as currently active in BrainView. */
+    QString renderMode() const;
+    /** Camera preset index last set via setCameraPreset(). */
+    int     cameraPreset() const { return m_cameraPreset; }
+
     /** Access the underlying scene (used by the QRhi renderer). */
     DISP3DLIB::MultimodalScene* scene() const;
 

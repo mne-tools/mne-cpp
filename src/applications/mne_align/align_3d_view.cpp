@@ -87,6 +87,23 @@ MultimodalScene* Align3DView::scene() const
     return m_pScene.get();
 }
 
+int Align3DView::viewCount() const
+{
+    if (m_pBrainView)
+        return qBound(1, m_pBrainView->viewCount(), 4);
+    return m_viewCount;
+}
+
+QString Align3DView::renderMode() const
+{
+    if (m_pBrainView) {
+        const QString mode = m_pBrainView->shaderModeForTarget(-1);
+        if (!mode.isEmpty())
+            return mode;
+    }
+    return m_renderMode;
+}
+
 void Align3DView::setViewCount(int count)
 {
     m_viewCount = qBound(1, count, 4);
