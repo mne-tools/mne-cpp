@@ -33,6 +33,7 @@ add_subdirectory(sourcelocalization)
 
 if(TARGET mne_disp3D)
   add_subdirectory(view3d)
+  add_subdirectory(cortical_surface)
 endif()
 
 # add_subdirectory(sampleplugin)
