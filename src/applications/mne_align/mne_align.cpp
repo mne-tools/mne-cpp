@@ -43,6 +43,7 @@
 #include <mne/mne_bem.h>
 
 #include <QAction>
+#include <QCloseEvent>
 #include <QComboBox>
 #include <QFile>
 #include <QFileDialog>
@@ -51,6 +52,7 @@
 #include <QLabel>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QSettings>
 #include <QSplitter>
 #include <QStatusBar>
 #include <QToolBar>
@@ -86,7 +88,9 @@ MneAlign::MneAlign(QWidget* parent)
             this, &MneAlign::onWizardStepChanged);
 
     onDigitizerConnectedChanged(false);
-        onWizardStepChanged(m_pWizard->currentStep());
+    onWizardStepChanged(m_pWizard->currentStep());
+
+    loadSettings();
 }
 
 MneAlign::~MneAlign() = default;
@@ -181,6 +185,80 @@ void MneAlign::buildMenus()
 
 //=============================================================================================================
 
+void MneAlign::closeEvent(QCloseEvent* event)
+{
+    saveSettings();
+    QMainWindow::closeEvent(event);
+}
+
+//=============================================================================================================
+
+void MneAlign::loadSettings()
+{
+    QSettings s;
+    s.beginGroup(QStringLiteral("MneAlign"));
+
+    restoreGeometry(s.value(QStringLiteral("geometry")).toByteArray());
+    if (m_pSplitter) {
+        const QByteArray ss = s.value(QStringLiteral("splitterState")).toByteArray();
+        if (!ss.isEmpty())
+            m_pSplitter->restoreState(ss);
+    }
+
+    // Restore toolbar combos without triggering applyViewConfiguration().
+    const int viewCount    = qBound(1, s.value(QStringLiteral("viewCount"),    1).toInt(), 4);
+    const int cameraPreset = qBound(0, s.value(QStringLiteral("cameraPreset"), 1).toInt(), 6);
+    const QString renderMode = s.value(QStringLiteral("renderMode"),
+                                       QStringLiteral("Anatomical")).toString();
+
+    if (m_pViewCountCombo) {
+        m_pViewCountCombo->blockSignals(true);
+        m_pViewCountCombo->setCurrentIndex(viewCount - 1);
+        m_pViewCountCombo->blockSignals(false);
+    }
+    if (m_pCameraPresetCombo) {
+        m_pCameraPresetCombo->blockSignals(true);
+        m_pCameraPresetCombo->setCurrentIndex(cameraPreset);
+        m_pCameraPresetCombo->blockSignals(false);
+    }
+    if (m_pRenderModeCombo) {
+        m_pRenderModeCombo->blockSignals(true);
+        const int idx = m_pRenderModeCombo->findText(renderMode);
+        m_pRenderModeCombo->setCurrentIndex(idx >= 0 ? idx : 0);
+        m_pRenderModeCombo->blockSignals(false);
+    }
+
+    // Reload last BEM if path is still accessible.
+    const QString bemPath = s.value(QStringLiteral("lastBemPath")).toString();
+    s.endGroup();
+
+    if (!bemPath.isEmpty() && QFile::exists(bemPath)) {
+        if (m_pWizard)
+            m_pWizard->setBemPath(bemPath);
+        onWizardBemPathChanged(bemPath);
+    }
+}
+
+//=============================================================================================================
+
+void MneAlign::saveSettings()
+{
+    QSettings s;
+    s.beginGroup(QStringLiteral("MneAlign"));
+    s.setValue(QStringLiteral("geometry"),      saveGeometry());
+    if (m_pSplitter)
+        s.setValue(QStringLiteral("splitterState"), m_pSplitter->saveState());
+    if (m_pViewCountCombo)
+        s.setValue(QStringLiteral("viewCount"),    m_pViewCountCombo->currentIndex() + 1);
+    if (m_pCameraPresetCombo)
+        s.setValue(QStringLiteral("cameraPreset"), m_pCameraPresetCombo->currentIndex());
+    if (m_pRenderModeCombo)
+        s.setValue(QStringLiteral("renderMode"),   m_pRenderModeCombo->currentText());
+    s.endGroup();
+}
+
+//=============================================================================================================
+
 void MneAlign::onOpenBem()
 {
     const QString path = QFileDialog::getOpenFileName(
@@ -210,6 +288,11 @@ void MneAlign::onWizardBemPathChanged(const QString& path)
         m_pStatusBem->setText(QStringLiteral("BEM: %1").arg(QFileInfo(path).fileName()));
     }
     statusBar()->showMessage(QStringLiteral("Loaded BEM: %1").arg(path), 4000);
+
+    QSettings s;
+    s.beginGroup(QStringLiteral("MneAlign"));
+    s.setValue(QStringLiteral("lastBemPath"), path);
+    s.endGroup();
 }
 
 //=============================================================================================================

@@ -63,6 +63,9 @@ public:
     explicit MneAlign(QWidget* parent = nullptr);
     ~MneAlign() override;
 
+protected:
+    void closeEvent(QCloseEvent* event) override;
+
 private slots:
     void onOpenBem();
     void onConnectDigitizer();
@@ -76,6 +79,8 @@ private slots:
 private:
     void buildUi();
     void buildMenus();
+    void loadSettings();
+    void saveSettings();
 
     AcquiredPoints*       m_pPoints     = nullptr;
     PolhemusConnection*   m_pDigitizer  = nullptr;

@@ -68,16 +68,9 @@ Align3DView::Align3DView(AcquiredPoints* acquired, QWidget* parent)
     m_pBrainView = new BrainView(this);
     lay->addWidget(m_pBrainView);
 
-    // Wipe any per-pane SubView state persisted by previous runs (or by
-    // other applications that share the BrainView QSettings group). Without
-    // this, a stale `visibility.bemHead = false` for one of the panes
-    // leaves that pane blank even though the camera/preset are correct.
-    m_pBrainView->resetAllSubViewState();
-
     m_pBrainModel = new BrainTreeModel(m_pBrainView);
     m_pBrainView->setModel(m_pBrainModel);
 
-    applyViewConfiguration();
     rebuildBemSurfaces();
     rebuildDigitizerLayer();
 
