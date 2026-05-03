@@ -489,6 +489,8 @@ jobs:
         $env:LIB = "$libDir;$env:LIB"
         $zlibLib = (Get-ChildItem -Path $libDir -Filter 'zlib*.lib' | Select-Object -First 1).FullName
         if (-not $zlibLib) { $zlibLib = (Get-ChildItem -Path $libDir -Filter 'z.lib' | Select-Object -First 1).FullName }
+        if (-not $zlibLib) { $zlibLib = (Get-ChildItem -Path $libDir -Filter 'zs.lib' | Select-Object -First 1).FullName }
+        if (-not $zlibLib) { $zlibLib = (Get-ChildItem -Path $libDir -Filter 'zlibstatic*.lib' | Select-Object -First 1).FullName }
         $bzip2Lib = (Get-ChildItem -Path $libDir -Filter '*bz2*.lib' | Select-Object -First 1).FullName
         if (-not $bzip2Lib) { $bzip2Lib = (Get-ChildItem -Path $libDir -Filter 'bzip2*.lib' | Select-Object -First 1).FullName }
         $lzmaLib = (Get-ChildItem -Path $libDir -Filter '*lzma*.lib' | Select-Object -First 1).FullName
