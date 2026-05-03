@@ -181,6 +181,28 @@ void MneAlign::buildMenus()
                     m_pView3d->setRenderMode(text);
                 }
             });
+
+    // Push-based UI sync: when BrainView changes its persisted state —
+    // either at startup (after loadMultiViewSettings) or on user action —
+    // it forwards through Align3DView and we update the combos here.
+    // blockSignals prevents the combo's currentIndexChanged from looping
+    // back into setViewCount/setRenderMode.
+    if (m_pView3d) {
+        connect(m_pView3d, &Align3DView::viewCountChanged,
+                this, [this](int count) {
+                    if (!m_pViewCountCombo) return;
+                    QSignalBlocker block(m_pViewCountCombo);
+                    m_pViewCountCombo->setCurrentIndex(qBound(1, count, 4) - 1);
+                });
+        connect(m_pView3d, &Align3DView::renderModeChanged,
+                this, [this](const QString& mode) {
+                    if (!m_pRenderModeCombo) return;
+                    const int idx = m_pRenderModeCombo->findText(mode);
+                    if (idx < 0) return;
+                    QSignalBlocker block(m_pRenderModeCombo);
+                    m_pRenderModeCombo->setCurrentIndex(idx);
+                });
+    }
 }
 
 //=============================================================================================================
@@ -205,29 +227,19 @@ void MneAlign::loadSettings()
             m_pSplitter->restoreState(ss);
     }
 
-    // Sync toolbar combos from the 3D view's actual loaded state.
-    // viewCount and renderMode come from BrainView (which already loaded
-    // them from QSettings in its own ctor); cameraPreset is stored in the
-    // MneAlign group because BrainView keeps camera as a quaternion.
+    // viewCount and renderMode are owned by BrainView and have already
+    // been restored in its constructor; the toolbar combos are kept in
+    // sync via the BrainView → Align3DView → MneAlign signal chain set up
+    // in buildMenus(). Here we only restore the cameraPreset (which has
+    // no BrainView equivalent — BrainView stores the resulting camera
+    // quaternion) and the last BEM path.
     const int cameraPreset = qBound(0, s.value(QStringLiteral("cameraPreset"), 1).toInt(), 6);
     const QString bemPath  = s.value(QStringLiteral("lastBemPath")).toString();
     s.endGroup();
 
-    if (m_pViewCountCombo && m_pView3d) {
-        m_pViewCountCombo->blockSignals(true);
-        m_pViewCountCombo->setCurrentIndex(m_pView3d->viewCount() - 1);
-        m_pViewCountCombo->blockSignals(false);
-    }
     if (m_pCameraPresetCombo) {
-        m_pCameraPresetCombo->blockSignals(true);
+        QSignalBlocker block(m_pCameraPresetCombo);
         m_pCameraPresetCombo->setCurrentIndex(cameraPreset);
-        m_pCameraPresetCombo->blockSignals(false);
-    }
-    if (m_pRenderModeCombo && m_pView3d) {
-        m_pRenderModeCombo->blockSignals(true);
-        const int idx = m_pRenderModeCombo->findText(m_pView3d->renderMode());
-        m_pRenderModeCombo->setCurrentIndex(idx >= 0 ? idx : 0);
-        m_pRenderModeCombo->blockSignals(false);
     }
 
     if (!bemPath.isEmpty() && QFile::exists(bemPath)) {
@@ -246,12 +258,8 @@ void MneAlign::saveSettings()
     s.setValue(QStringLiteral("geometry"),      saveGeometry());
     if (m_pSplitter)
         s.setValue(QStringLiteral("splitterState"), m_pSplitter->saveState());
-    if (m_pViewCountCombo)
-        s.setValue(QStringLiteral("viewCount"),    m_pViewCountCombo->currentIndex() + 1);
     if (m_pCameraPresetCombo)
         s.setValue(QStringLiteral("cameraPreset"), m_pCameraPresetCombo->currentIndex());
-    if (m_pRenderModeCombo)
-        s.setValue(QStringLiteral("renderMode"),   m_pRenderModeCombo->currentText());
     s.endGroup();
 }
 

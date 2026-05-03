@@ -71,15 +71,20 @@ public:
     void setRenderMode(const QString& modeName);
     void setCameraPreset(int preset);
 
-    /** Number of enabled viewports as loaded/set in BrainView. */
-    int     viewCount() const;
-    /** Shader/render mode name as currently active in BrainView. */
-    QString renderMode() const;
-    /** Camera preset index last set via setCameraPreset(). */
+    /** Camera preset index last set via setCameraPreset(). Camera state
+     *  itself is owned by BrainView (as a quaternion) so this is the
+     *  only piece the host application has to track for its toolbar. */
     int     cameraPreset() const { return m_cameraPreset; }
 
     /** Access the underlying scene (used by the QRhi renderer). */
     DISP3DLIB::MultimodalScene* scene() const;
+
+signals:
+    /** Forwarded from BrainView::viewCountChanged — fires both on user
+     *  changes and after persisted state is restored at startup. */
+    void viewCountChanged(int count);
+    /** Forwarded from BrainView::shaderModeChanged. */
+    void renderModeChanged(const QString& modeName);
 
 private slots:
     void onPointsChanged();
@@ -93,9 +98,7 @@ private:
     AcquiredPoints*                                m_pPoints = nullptr;
     std::unique_ptr<DISP3DLIB::MultimodalScene>    m_pScene;
     std::shared_ptr<MNELIB::MNEBem>                m_pBem;
-    int                                            m_viewCount = 1;
     int                                            m_cameraPreset = 1;
-    QString                                        m_renderMode = QStringLiteral("Anatomical");
 
     QPointer<BrainView>                            m_pBrainView;
     QPointer<BrainTreeModel>                       m_pBrainModel;

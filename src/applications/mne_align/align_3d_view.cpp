@@ -71,6 +71,15 @@ Align3DView::Align3DView(AcquiredPoints* acquired, QWidget* parent)
     m_pBrainModel = new BrainTreeModel(m_pBrainView);
     m_pBrainView->setModel(m_pBrainModel);
 
+    // Forward BrainView state-change signals so host UIs can keep their
+    // controls (toolbar combos, status bars, …) in sync without having
+    // to poll. These fire both on user-driven changes and after
+    // BrainView restores its persisted state on construction.
+    connect(m_pBrainView, &BrainView::viewCountChanged,
+            this, &Align3DView::viewCountChanged);
+    connect(m_pBrainView, &BrainView::shaderModeChanged,
+            this, &Align3DView::renderModeChanged);
+
     rebuildBemSurfaces();
     rebuildDigitizerLayer();
 
@@ -87,26 +96,10 @@ MultimodalScene* Align3DView::scene() const
     return m_pScene.get();
 }
 
-int Align3DView::viewCount() const
-{
-    if (m_pBrainView)
-        return qBound(1, m_pBrainView->viewCount(), 4);
-    return m_viewCount;
-}
-
-QString Align3DView::renderMode() const
-{
-    if (m_pBrainView) {
-        const QString mode = m_pBrainView->shaderModeForTarget(-1);
-        if (!mode.isEmpty())
-            return mode;
-    }
-    return m_renderMode;
-}
-
 void Align3DView::setViewCount(int count)
 {
-    m_viewCount = qBound(1, count, 4);
+    if (!m_pBrainView) return;
+    m_pBrainView->setViewCount(qBound(1, count, 4));
     applyViewConfiguration();
 }
 
@@ -115,8 +108,8 @@ void Align3DView::setRenderMode(const QString& modeName)
     if (modeName != QLatin1String("Anatomical") && modeName != QLatin1String("Holographic")) {
         return;
     }
-
-    m_renderMode = modeName;
+    if (!m_pBrainView) return;
+    m_pBrainView->setShaderMode(modeName);
     applyViewConfiguration();
 }
 
@@ -239,17 +232,21 @@ void Align3DView::applyViewConfiguration()
         return;
     }
 
+    // Read the authoritative state from BrainView itself — setters that
+    // call us have already pushed their values down.
+    const int viewCount       = qBound(1, m_pBrainView->viewCount(), 4);
+    const QString renderMode  = m_pBrainView->shaderModeForTarget(-1);
+
     // Default per-pane preset assignment for the 2x2 multi-view grid.
     // Slot 0 mirrors the user-selected camera; the remaining slots show
     // complementary orthographic angles useful for fiducial alignment.
     static constexpr int kFallbackMultiViewPresets[4] = {1, 2, 3, 0};
 
-    m_pBrainView->setViewCount(m_viewCount);
     m_pBrainView->resetSingleViewCameraState();
     m_pBrainView->setInitialCameraRotation(multiViewPresetOffset(m_cameraPreset));
 
-    if (m_viewCount > 1) {
-        for (int i = 0; i < m_viewCount; ++i) {
+    if (viewCount > 1) {
+        for (int i = 0; i < viewCount; ++i) {
             const int preset = (i == 0) ? m_cameraPreset : kFallbackMultiViewPresets[i];
             m_pBrainView->resetViewportCameraState(i);
             m_pBrainView->setViewportCameraPreset(i, preset);
@@ -258,17 +255,17 @@ void Align3DView::applyViewConfiguration()
     }
 
     // Apply alignment-specific shader/overlay to single-view + every pane.
-    auto applyShaders = [this](int target) {
+    auto applyShaders = [this, &renderMode](int target) {
         m_pBrainView->setVisualizationEditTarget(target);
-        m_pBrainView->setShaderMode(m_renderMode);
-        m_pBrainView->setBemShaderMode(m_renderMode);
+        m_pBrainView->setShaderMode(renderMode);
+        m_pBrainView->setBemShaderMode(renderMode);
         m_pBrainView->setVisualizationMode(QStringLiteral("Scientific"));
     };
 
     applyShaders(-1);
-    for (int i = 0; i < m_viewCount && i < 4; ++i) {
+    for (int i = 0; i < viewCount && i < 4; ++i) {
         applyShaders(i);
     }
 
-    m_pBrainView->setVisualizationEditTarget(m_viewCount > 1 ? 0 : -1);
+    m_pBrainView->setVisualizationEditTarget(viewCount > 1 ? 0 : -1);
 }

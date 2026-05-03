@@ -918,6 +918,27 @@ signals:
      */
     void visualizationEditTargetChanged(int target);
 
+    //=========================================================================================================
+    /**
+     * Emitted whenever the number of viewports changes — either via
+     * @ref setViewCount or after restoring persisted state in
+     * @ref loadMultiViewSettings. UI consumers (e.g. host toolbars)
+     * should connect to this to keep their controls in sync.
+     *
+     * @param[in] count  Number of viewports (1..kDefaultViewportCount).
+     */
+    void viewCountChanged(int count);
+
+    //=========================================================================================================
+    /**
+     * Emitted whenever the active brain shader mode changes — either
+     * via @ref setShaderMode or after restoring persisted state in
+     * @ref loadMultiViewSettings.
+     *
+     * @param[in] modeName  Shader name as accepted by @ref setShaderMode.
+     */
+    void shaderModeChanged(const QString &modeName);
+
 private slots:
     //=========================================================================================================
     /**

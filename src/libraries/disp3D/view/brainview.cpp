@@ -69,6 +69,7 @@
 #include <QWheelEvent>
 #include <QResizeEvent>
 #include <QSettings>
+#include <QTimer>
 #include <QMenu>
 #include <QStandardItem>
 #include <algorithm>
@@ -557,6 +558,7 @@ void BrainView::setShaderMode(const QString &modeName)
     m_brainShaderMode = mode;
     saveMultiViewSettings();
     m_sceneDirty = true; update();
+    emit shaderModeChanged(shaderModeName(mode));
 }
 
 //=============================================================================================================
@@ -930,6 +932,7 @@ void BrainView::setViewCount(int count)
     updateViewportSeparators();
     updateOverlayLayout();
     m_sceneDirty = true; update();
+    emit viewCountChanged(m_viewCount);
 }
 
 //=============================================================================================================
@@ -1235,6 +1238,16 @@ void BrainView::loadMultiViewSettings()
     m_layout.setSplitY(m_multiSplitY);
 
     setVisualizationEditTarget(m_visualizationEditTarget);
+
+    // Notify observers that persisted state has been restored. Defer to
+    // the next event-loop tick so that callers constructing BrainView
+    // and connecting to these signals immediately afterwards still
+    // receive the initial state — direct emits from inside the ctor
+    // chain would fire before any external connect() call.
+    QTimer::singleShot(0, this, [this]() {
+        emit viewCountChanged(m_viewCount);
+        emit shaderModeChanged(shaderModeName(m_brainShaderMode));
+    });
 }
 
 //=============================================================================================================
