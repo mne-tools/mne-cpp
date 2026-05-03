@@ -187,7 +187,7 @@ jobs:
         cd ..
         git clone https://code.qt.io/qt/qt5.git -b v6.11.0
         cd qt5
-        ./init-repository -f --module-subset=qtbase,qtmultimedia,qtsvg,qtshadertools
+        ./init-repository -f --module-subset=qtbase,qtmultimedia,qtsvg,qtshadertools,qtserialport
         cd ..
         mkdir qt6_shadow
         cd qt6_shadow

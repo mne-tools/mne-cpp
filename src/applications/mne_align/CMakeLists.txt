@@ -6,13 +6,10 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Gui Widgets)
+set(QT_REQUIRED_COMPONENTS Core Gui Widgets SerialPort)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-
-# Optional: real Polhemus FastTrak backend uses Qt::SerialPort if present.
-find_package(Qt${QT_VERSION_MAJOR} QUIET COMPONENTS SerialPort)
 
 set(SOURCES
     main.cpp
@@ -58,11 +55,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${MNE_LIBS_REQUIRED}
     Eigen3::Eigen
 )
-
-if(Qt${QT_VERSION_MAJOR}SerialPort_FOUND)
-    target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::SerialPort)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_ALIGN_HAS_SERIALPORT)
-endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER org.mne-cpp.mne_align

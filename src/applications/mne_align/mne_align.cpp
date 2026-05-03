@@ -216,15 +216,35 @@ void MneAlign::onWizardBemPathChanged(const QString& path)
 
 void MneAlign::onConnectDigitizer()
 {
-    bool ok = false;
-    const QString port = QInputDialog::getText(
-        this, QStringLiteral("Connect digitizer"),
-        QStringLiteral("Serial port (leave empty for mock backend):"),
-        QLineEdit::Normal, QString(), &ok);
-    if (!ok) return;
+    // Auto-scan first: pick a likely FastTrak/FastSCAN by USB vendor id so
+    // the user doesn't have to type a device path. If detection fails, fall
+    // back to a chooser populated with every visible serial port (plus a
+    // "Mock backend" entry that maps to an empty port name).
+    const QString detected = PolhemusConnection::autoDetectPortName();
+
+    QString port;
+    if (!detected.isEmpty()) {
+        port = detected;
+        statusBar()->showMessage(
+            QStringLiteral("Detected digitizer on '%1' \u2014 connecting\u2026").arg(port), 3000);
+    } else {
+        QStringList items;
+        items << QStringLiteral("Mock backend (no hardware)");
+        items += PolhemusConnection::availablePorts();
+
+        bool ok = false;
+        const QString choice = QInputDialog::getItem(
+            this, QStringLiteral("Connect digitizer"),
+            QStringLiteral("No FastTrak auto-detected. Pick a serial port:"),
+            items, /*current*/ 0, /*editable*/ false, &ok);
+        if (!ok) return;
+        port = (choice == items.first()) ? QString() : choice;
+    }
+
     if (!m_pDigitizer->open(port)) {
         QMessageBox::warning(this, windowTitle(),
-                              QStringLiteral("Failed to open digitizer on '%1'.").arg(port));
+                              QStringLiteral("Failed to open digitizer on '%1'.")
+                                  .arg(port.isEmpty() ? QStringLiteral("mock") : port));
     }
 }
 

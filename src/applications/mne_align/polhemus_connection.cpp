@@ -66,7 +66,6 @@ bool PolhemusConnection::open(const QString& portName, const PolhemusSerialConfi
         return true;
     }
 
-#ifdef MNE_ALIGN_HAS_SERIALPORT
     if (!portName.isEmpty()) {
         if (openSerial(portName, cfg)) {
             m_isConnected = true;
@@ -76,14 +75,6 @@ bool PolhemusConnection::open(const QString& portName, const PolhemusSerialConfi
         // Serial open failed; do NOT silently fall back — surface the error.
         return false;
     }
-#else
-    Q_UNUSED(cfg);
-    if (!portName.isEmpty()) {
-        emit errorOccurred(
-            QStringLiteral("Hardware backend unavailable (Qt::SerialPort not built in); "
-                           "starting mock instead."));
-    }
-#endif
 
     if (!openMock()) {
         return false;
@@ -101,12 +92,9 @@ void PolhemusConnection::close()
     if (!m_isConnected) {
         return;
     }
-#ifdef MNE_ALIGN_HAS_SERIALPORT
     if (m_pSerial) {
         closeSerial();
-    } else
-#endif
-    {
+    } else {
         closeMock();
     }
     m_isConnected = false;
@@ -124,6 +112,46 @@ bool PolhemusConnection::isConnected() const
 QString PolhemusConnection::backendName() const
 {
     return m_backendName;
+}
+
+//=============================================================================================================
+// Port discovery helpers
+//=============================================================================================================
+
+QStringList PolhemusConnection::availablePorts()
+{
+    QStringList names;
+    const auto ports = QSerialPortInfo::availablePorts();
+    names.reserve(ports.size());
+    for (const auto& info : ports) {
+        names << info.portName();
+    }
+    return names;
+}
+
+QString PolhemusConnection::autoDetectPortName()
+{
+    // Polhemus FastTrak/FastSCAN units use one of two USB-serial bridges:
+    //   * Polhemus-branded FTDI VID 0x0F44
+    //   * Generic FTDI VID 0x0403 (older / OEM units)
+    // We prefer the Polhemus VID, then fall back to any FTDI device.
+    constexpr quint16 kPolhemusVid = 0x0F44;
+    constexpr quint16 kFtdiVid     = 0x0403;
+
+    QString ftdiCandidate;
+    for (const auto& info : QSerialPortInfo::availablePorts()) {
+        if (!info.hasVendorIdentifier()) {
+            continue;
+        }
+        const quint16 vid = info.vendorIdentifier();
+        if (vid == kPolhemusVid) {
+            return info.portName();
+        }
+        if (vid == kFtdiVid && ftdiCandidate.isEmpty()) {
+            ftdiCandidate = info.portName();
+        }
+    }
+    return ftdiCandidate;
 }
 
 //=============================================================================================================
@@ -162,8 +190,6 @@ void PolhemusConnection::onMockTick()
 //=============================================================================================================
 // Serial / FastTrak backend
 //=============================================================================================================
-
-#ifdef MNE_ALIGN_HAS_SERIALPORT
 
 bool PolhemusConnection::openSerial(const QString& portName, const PolhemusSerialConfig& cfg)
 {
@@ -248,5 +274,3 @@ void PolhemusConnection::drainParser()
         emit pointReceived(s.station, s.position, s.orientation);
     }
 }
-
-#endif // MNE_ALIGN_HAS_SERIALPORT

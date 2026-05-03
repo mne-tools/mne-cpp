@@ -69,8 +69,6 @@
 #include <QWheelEvent>
 #include <QResizeEvent>
 #include <QSettings>
-#include <QCoreApplication>
-#include <QFileInfo>
 #include <QMenu>
 #include <QStandardItem>
 #include <algorithm>
@@ -83,21 +81,10 @@
 
 using namespace FIFFLIB;
 
-namespace {
-
-QSettings makeBrainViewSettings()
-{
-    const QString organization = QCoreApplication::organizationName().isEmpty()
-        ? QStringLiteral("MNE-CPP")
-        : QCoreApplication::organizationName();
-    const QString application = QCoreApplication::applicationName().isEmpty()
-        ? QFileInfo(QCoreApplication::applicationFilePath()).baseName()
-        : QCoreApplication::applicationName();
-
-    return QSettings(organization, application);
-}
-
-} // namespace
+// QSettings is constructed with its default ctor below; it picks up the
+// organisation and application names that each host (mne_align,
+// mne_inspect, ex_disp_3D, ...) sets on QCoreApplication in its main(),
+// so persisted view state is naturally scoped per-application.
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -1193,7 +1180,7 @@ void BrainView::logPerspectiveRotation(const QString& context) const
 
 void BrainView::loadMultiViewSettings()
 {
-    QSettings settings = makeBrainViewSettings();
+    QSettings settings;
     settings.beginGroup(QStringLiteral("BrainView"));
 
     m_multiSplitX = settings.value("multiSplitX", 0.5f).toFloat();
@@ -1254,7 +1241,7 @@ void BrainView::loadMultiViewSettings()
 
 void BrainView::saveMultiViewSettings() const
 {
-    QSettings settings = makeBrainViewSettings();
+    QSettings settings;
     settings.beginGroup(QStringLiteral("BrainView"));
     settings.setValue("multiSplitX", m_multiSplitX);
     settings.setValue("multiSplitY", m_multiSplitY);

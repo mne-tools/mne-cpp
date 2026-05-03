@@ -37,14 +37,17 @@
  *
  *           2. **FastTrak / FastSCAN** — opens a `QSerialPort`, sends
  *              the continuous-output command, and decodes the ASCII
- *              record stream via @ref FastTrakParser. Compiled in iff
- *              the `Qt::SerialPort` module is available (controlled by
- *              the `MNE_ALIGN_HAS_SERIALPORT` define).
+ *              record stream via @ref FastTrakParser. The serial backend
+ *              is always compiled in: Qt::SerialPort is a hard build
+ *              dependency of mne_align so the app is always ready to
+ *              talk to a real digitizer.
  *
  *           Backend selection is implicit: an empty @c portName picks
- *           mock; a non-empty name and SerialPort support pick the
- *           hardware backend (falling back to mock when SerialPort is
- *           not built in).
+ *           mock; a non-empty name picks the hardware backend.
+ *           @ref autoDetectPortName scans @ref availablePorts for a
+ *           likely FastTrak (FTDI USB-serial) and returns it, so the UI
+ *           can offer a one-click "connect" without asking the user to
+ *           type a device path.
  */
 
 #ifndef MNE_ALIGN_POLHEMUS_CONNECTION_H
@@ -54,13 +57,12 @@
 
 #include <QObject>
 #include <QQuaternion>
+#include <QSerialPort>
+#include <QSerialPortInfo>
 #include <QString>
+#include <QStringList>
 #include <QTimer>
 #include <QVector3D>
-
-#ifdef MNE_ALIGN_HAS_SERIALPORT
-#include <QSerialPort>
-#endif
 
 namespace MNEALIGN
 {
@@ -94,8 +96,7 @@ public:
     /**
      * Open the connection.
      *
-     * @param portName  Empty → mock backend. Non-empty → hardware
-     *                  backend (when compiled in).
+     * @param portName  Empty → mock backend. Non-empty → hardware backend.
      * @param cfg       Serial transport configuration; ignored by the
      *                  mock backend.
      */
@@ -107,6 +108,29 @@ public:
 
     bool    isConnected() const;
     QString backendName() const;
+
+    //=========================================================================================================
+    /**
+     * @brief Enumerate every serial port currently visible to the OS.
+     *
+     * Convenience wrapper around @c QSerialPortInfo::availablePorts that
+     * returns just the system port names (e.g. `/dev/cu.usbserial-AB0`,
+     * `COM3`) so callers can populate a combo box without pulling in
+     * `QSerialPortInfo` themselves.
+     */
+    static QStringList availablePorts();
+
+    //=========================================================================================================
+    /**
+     * @brief Best-effort auto-detection of an attached FastTrak/FastSCAN.
+     *
+     * Polhemus FastTrak/FastSCAN units ship with an FTDI USB-serial
+     * bridge (vendor id 0x0F44 for newer Polhemus-branded units, 0x0403
+     * for the generic FTDI chip used in older units). This scan returns
+     * the first matching port name, or an empty string if no candidate
+     * is found.
+     */
+    static QString  autoDetectPortName();
 
 signals:
     /**
@@ -124,20 +148,16 @@ signals:
 
 private slots:
     void onMockTick();
-#ifdef MNE_ALIGN_HAS_SERIALPORT
     void onSerialReadyRead();
     void onSerialError(QSerialPort::SerialPortError err);
-#endif
 
 private:
     bool openMock();
     void closeMock();
 
-#ifdef MNE_ALIGN_HAS_SERIALPORT
     bool openSerial(const QString& portName, const PolhemusSerialConfig& cfg);
     void closeSerial();
     void drainParser();
-#endif
 
     bool        m_isConnected = false;
     QString     m_backendName;
@@ -146,11 +166,9 @@ private:
     QTimer      m_mockTimer;
     int         m_mockSampleIdx = 0;
 
-#ifdef MNE_ALIGN_HAS_SERIALPORT
     // Serial backend ----------------------------------------------------------
     QSerialPort*    m_pSerial = nullptr;
     FastTrakParser  m_parser;
-#endif
 };
 
 } // namespace MNEALIGN
