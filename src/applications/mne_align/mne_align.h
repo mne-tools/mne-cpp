@@ -40,11 +40,15 @@
 
 class QSplitter;
 class QLabel;
+class QAction;
+class QComboBox;
 
 namespace MNELIB { class MNEBem; }
 
 namespace MNEALIGN
 {
+
+enum class AlignStep;
 
 class AlignWizard;
 class Align3DView;
@@ -66,6 +70,7 @@ private slots:
     void onAbout();
     void onWizardExportRequest(const QString& outPath);
     void onWizardBemPathChanged(const QString& path);
+    void onWizardStepChanged(MNEALIGN::AlignStep step);
     void onDigitizerConnectedChanged(bool connected);
 
 private:
@@ -78,6 +83,12 @@ private:
     QPointer<QSplitter>   m_pSplitter;
     QPointer<AlignWizard> m_pWizard;
     QPointer<Align3DView> m_pView3d;
+    QPointer<QAction>     m_pBackAction;
+    QPointer<QAction>     m_pNextAction;
+    QPointer<QLabel>      m_pStepLabel;
+    QPointer<QComboBox>   m_pViewCountCombo;
+    QPointer<QComboBox>   m_pRenderModeCombo;
+    QPointer<QComboBox>   m_pCameraPresetCombo;
     QPointer<QLabel>      m_pStatusDigitizer;
     QPointer<QLabel>      m_pStatusBem;
 };

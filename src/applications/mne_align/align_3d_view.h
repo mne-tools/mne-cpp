@@ -46,10 +46,11 @@
 
 #include <memory>
 
+class BrainTreeModel;
+class BrainView;
+
 namespace DISP3DLIB { class MultimodalScene; }
 namespace MNELIB    { class MNEBem; }
-
-class QLabel;
 
 namespace MNEALIGN
 {
@@ -66,6 +67,9 @@ public:
 
     /** Replace any previously registered head BEM. */
     void setBem(std::shared_ptr<MNELIB::MNEBem> bem);
+    void setViewCount(int count);
+    void setRenderMode(const QString& modeName);
+    void setCameraPreset(int preset);
 
     /** Access the underlying scene (used by the QRhi renderer). */
     DISP3DLIB::MultimodalScene* scene() const;
@@ -75,13 +79,19 @@ private slots:
 
 private:
     void rebuildAcquiredLayer();
-    void refreshStatus();
+    void rebuildBemSurfaces();
+    void rebuildDigitizerLayer();
+    void applyViewConfiguration();
 
     AcquiredPoints*                                m_pPoints = nullptr;
     std::unique_ptr<DISP3DLIB::MultimodalScene>    m_pScene;
     std::shared_ptr<MNELIB::MNEBem>                m_pBem;
+    int                                            m_viewCount = 1;
+    int                                            m_cameraPreset = 1;
+    QString                                        m_renderMode = QStringLiteral("Anatomical");
 
-    QPointer<QLabel>                               m_pStatusLabel;
+    QPointer<BrainView>                            m_pBrainView;
+    QPointer<BrainTreeModel>                       m_pBrainModel;
 };
 
 } // namespace MNEALIGN

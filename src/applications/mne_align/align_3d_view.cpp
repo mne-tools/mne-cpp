@@ -34,10 +34,15 @@
 
 #include "acquired_points.h"
 
+#include <disp3D/core/viewstate.h>
+#include <disp3D/model/braintreemodel.h>
 #include <disp3D/scene/multimodalscene.h>
+#include <disp3D/view/brainview.h>
+
+#include <fiff/fiff_constants.h>
+#include <fiff/fiff_dig_point.h>
 #include <mne/mne_bem.h>
 
-#include <QLabel>
 #include <QVBoxLayout>
 
 using namespace MNEALIGN;
@@ -60,19 +65,26 @@ Align3DView::Align3DView(AcquiredPoints* acquired, QWidget* parent)
     auto* lay = new QVBoxLayout(this);
     lay->setContentsMargins(0, 0, 0, 0);
 
-    m_pStatusLabel = new QLabel(this);
-    m_pStatusLabel->setAlignment(Qt::AlignCenter);
-    m_pStatusLabel->setTextFormat(Qt::RichText);
-    m_pStatusLabel->setMinimumSize(320, 240);
-    m_pStatusLabel->setStyleSheet(
-        QStringLiteral("background-color: #1a1a1a; color: #cfcfcf; padding: 8px;"));
-    lay->addWidget(m_pStatusLabel);
+    m_pBrainView = new BrainView(this);
+    lay->addWidget(m_pBrainView);
+
+    // Wipe any per-pane SubView state persisted by previous runs (or by
+    // other applications that share the BrainView QSettings group). Without
+    // this, a stale `visibility.bemHead = false` for one of the panes
+    // leaves that pane blank even though the camera/preset are correct.
+    m_pBrainView->resetAllSubViewState();
+
+    m_pBrainModel = new BrainTreeModel(m_pBrainView);
+    m_pBrainView->setModel(m_pBrainModel);
+
+    applyViewConfiguration();
+    rebuildBemSurfaces();
+    rebuildDigitizerLayer();
 
     if (m_pPoints) {
         connect(m_pPoints, &AcquiredPoints::pointsChanged,
                 this, &Align3DView::onPointsChanged);
     }
-    refreshStatus();
 }
 
 Align3DView::~Align3DView() = default;
@@ -80,6 +92,28 @@ Align3DView::~Align3DView() = default;
 MultimodalScene* Align3DView::scene() const
 {
     return m_pScene.get();
+}
+
+void Align3DView::setViewCount(int count)
+{
+    m_viewCount = qBound(1, count, 4);
+    applyViewConfiguration();
+}
+
+void Align3DView::setRenderMode(const QString& modeName)
+{
+    if (modeName != QLatin1String("Anatomical") && modeName != QLatin1String("Holographic")) {
+        return;
+    }
+
+    m_renderMode = modeName;
+    applyViewConfiguration();
+}
+
+void Align3DView::setCameraPreset(int preset)
+{
+    m_cameraPreset = qBound(0, preset, 6);
+    applyViewConfiguration();
 }
 
 //=============================================================================================================
@@ -97,7 +131,7 @@ void Align3DView::setBem(std::shared_ptr<MNELIB::MNEBem> bem)
         layer.payload     = std::shared_ptr<void>(m_pBem, m_pBem.get());
         m_pScene->addLayer(layer);
     }
-    refreshStatus();
+    rebuildBemSurfaces();
 }
 
 //=============================================================================================================
@@ -105,7 +139,7 @@ void Align3DView::setBem(std::shared_ptr<MNELIB::MNEBem> bem)
 void Align3DView::onPointsChanged()
 {
     rebuildAcquiredLayer();
-    refreshStatus();
+    rebuildDigitizerLayer();
 }
 
 void Align3DView::rebuildAcquiredLayer()
@@ -123,21 +157,108 @@ void Align3DView::rebuildAcquiredLayer()
     m_pScene->addLayer(layer);
 }
 
-void Align3DView::refreshStatus()
+void Align3DView::rebuildBemSurfaces()
 {
-    if (!m_pStatusLabel) return;
+    if (!m_pBrainView || !m_pBrainModel) {
+        return;
+    }
 
-    const int nLayers = static_cast<int>(m_pScene->layers().size());
-    const int nPoints = m_pPoints ? m_pPoints->points().size() : 0;
-    const QString bemTxt = m_pBem ? QStringLiteral("loaded") : QStringLiteral("(none)");
+    m_pBrainView->clearBem();
+    if (!m_pBem) {
+        return;
+    }
 
-    m_pStatusLabel->setText(QStringLiteral(
-        "<h3>MNE Align 3-D viewer</h3>"
-        "<p>BEM: <b>%1</b><br>"
-        "Acquired points: <b>%2</b><br>"
-        "Scene layers: <b>%3</b></p>"
-        "<p><i>Renderer not yet wired — placeholder view.</i></p>")
-        .arg(bemTxt)
-        .arg(nPoints)
-        .arg(nLayers));
+    for (int i = 0; i < m_pBem->size(); ++i) {
+        QString name;
+        switch ((*m_pBem)[i].id) {
+            case 4: name = QStringLiteral("head");        break;
+            case 3: name = QStringLiteral("outer_skull"); break;
+            case 1: name = QStringLiteral("inner_skull"); break;
+            default: name = QString::number(i);           break;
+        }
+        m_pBrainModel->addBemSurface(QStringLiteral("align"), name, (*m_pBem)[i]);
+    }
+}
+
+void Align3DView::rebuildDigitizerLayer()
+{
+    if (!m_pBrainView || !m_pBrainModel) {
+        return;
+    }
+
+    if (!m_pPoints || m_pPoints->points().isEmpty()) {
+        m_pBrainView->clearSensors();
+        return;
+    }
+
+    QList<FIFFLIB::FiffDigPoint> digitizerPoints;
+    digitizerPoints.reserve(m_pPoints->points().size());
+
+    for (const auto& point : m_pPoints->points()) {
+        FIFFLIB::FiffDigPoint dig;
+        dig.coord_frame = FIFFV_COORD_HEAD;
+        dig.r[0] = point.position.x();
+        dig.r[1] = point.position.y();
+        dig.r[2] = point.position.z();
+
+        switch (point.kind) {
+            case PointKind::Fiducial:
+                dig.kind = FIFFV_POINT_CARDINAL;
+                dig.ident = point.identNumber;
+                break;
+            case PointKind::Eeg:
+                dig.kind = FIFFV_POINT_EEG;
+                dig.ident = point.identNumber;
+                break;
+            case PointKind::HeadShape:
+                dig.kind = FIFFV_POINT_EXTRA;
+                dig.ident = point.identNumber;
+                break;
+        }
+
+        digitizerPoints.append(dig);
+    }
+
+    m_pBrainView->clearSensors();
+    m_pBrainModel->addDigitizerData(digitizerPoints);
+}
+
+void Align3DView::applyViewConfiguration()
+{
+    if (!m_pBrainView) {
+        return;
+    }
+
+    // Default per-pane preset assignment for the 2x2 multi-view grid.
+    // Slot 0 mirrors the user-selected camera; the remaining slots show
+    // complementary orthographic angles useful for fiducial alignment.
+    static constexpr int kFallbackMultiViewPresets[4] = {1, 2, 3, 0};
+
+    m_pBrainView->setViewCount(m_viewCount);
+    m_pBrainView->resetSingleViewCameraState();
+    m_pBrainView->setInitialCameraRotation(multiViewPresetOffset(m_cameraPreset));
+
+    if (m_viewCount > 1) {
+        for (int i = 0; i < m_viewCount; ++i) {
+            const int preset = (i == 0) ? m_cameraPreset : kFallbackMultiViewPresets[i];
+            m_pBrainView->resetViewportCameraState(i);
+            m_pBrainView->setViewportCameraPreset(i, preset);
+        }
+        m_pBrainView->resetMultiViewLayout();
+    }
+
+    // Apply alignment-specific shader/overlay to single-view + every pane.
+    auto applyShaders = [this](int target) {
+        m_pBrainView->setVisualizationEditTarget(target);
+        m_pBrainView->setShaderMode(m_renderMode);
+        m_pBrainView->setBemShaderMode(m_renderMode);
+        m_pBrainView->setVisualizationMode(QStringLiteral("Scientific"));
+    };
+
+    applyShaders(-1);
+    for (int i = 0; i < m_viewCount && i < 4; ++i) {
+        applyShaders(i);
+    }
+
+    m_pBrainView->setVisualizationEditTarget(m_viewCount > 1 ? 0 : -1);
 }

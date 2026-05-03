@@ -27,7 +27,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @brief    Polhemus digitizer connection — mock backend implementation.
+ * @brief    Polhemus digitizer connection implementation.
  */
 
 #include "polhemus_connection.h"
@@ -60,23 +60,35 @@ PolhemusConnection::~PolhemusConnection()
 
 //=============================================================================================================
 
-bool PolhemusConnection::open(const QString& portName)
+bool PolhemusConnection::open(const QString& portName, const PolhemusSerialConfig& cfg)
 {
     if (m_isConnected) {
         return true;
     }
 
-    if (!portName.isEmpty()) {
 #ifdef MNE_ALIGN_HAS_SERIALPORT
-        // Real serial backend not yet wired; fall through to mock so the
-        // app remains usable on machines without a Polhemus device.
-        Q_UNUSED(portName);
+    if (!portName.isEmpty()) {
+        if (openSerial(portName, cfg)) {
+            m_isConnected = true;
+            emit connectedChanged(true);
+            return true;
+        }
+        // Serial open failed; do NOT silently fall back — surface the error.
+        return false;
+    }
+#else
+    Q_UNUSED(cfg);
+    if (!portName.isEmpty()) {
+        emit errorOccurred(
+            QStringLiteral("Hardware backend unavailable (Qt::SerialPort not built in); "
+                           "starting mock instead."));
+    }
 #endif
+
+    if (!openMock()) {
+        return false;
     }
 
-    m_backendName = QStringLiteral("mock");
-    m_mockSampleIdx = 0;
-    m_mockTimer.start();
     m_isConnected = true;
     emit connectedChanged(true);
     return true;
@@ -89,7 +101,14 @@ void PolhemusConnection::close()
     if (!m_isConnected) {
         return;
     }
-    m_mockTimer.stop();
+#ifdef MNE_ALIGN_HAS_SERIALPORT
+    if (m_pSerial) {
+        closeSerial();
+    } else
+#endif
+    {
+        closeMock();
+    }
     m_isConnected = false;
     m_backendName.clear();
     emit connectedChanged(false);
@@ -102,20 +121,33 @@ bool PolhemusConnection::isConnected() const
     return m_isConnected;
 }
 
-//=============================================================================================================
-
 QString PolhemusConnection::backendName() const
 {
     return m_backendName;
 }
 
 //=============================================================================================================
+// Mock backend
+//=============================================================================================================
+
+bool PolhemusConnection::openMock()
+{
+    m_backendName   = QStringLiteral("mock");
+    m_mockSampleIdx = 0;
+    m_mockTimer.start();
+    return true;
+}
+
+void PolhemusConnection::closeMock()
+{
+    m_mockTimer.stop();
+}
 
 void PolhemusConnection::onMockTick()
 {
     // Sweep around the equator of a 10 cm sphere centred at the origin —
-    // good enough to drive the wizard's HSP step end-to-end for tests and
-    // visual smoke checks.
+    // good enough to drive the wizard's HSP step end-to-end for tests
+    // and visual smoke checks.
     const double phase = (2.0 * M_PI * (m_mockSampleIdx % kMockPointsPerLap))
                          / static_cast<double>(kMockPointsPerLap);
     const double elevation = 0.3 * std::sin(phase * 3.0);
@@ -126,3 +158,95 @@ void PolhemusConnection::onMockTick()
     ++m_mockSampleIdx;
     emit pointReceived(/*station*/ 1, pos, QQuaternion());
 }
+
+//=============================================================================================================
+// Serial / FastTrak backend
+//=============================================================================================================
+
+#ifdef MNE_ALIGN_HAS_SERIALPORT
+
+bool PolhemusConnection::openSerial(const QString& portName, const PolhemusSerialConfig& cfg)
+{
+    auto* port = new QSerialPort(this);
+    port->setPortName(portName);
+    port->setBaudRate(cfg.baudRate);
+    port->setDataBits(QSerialPort::Data8);
+    port->setParity(QSerialPort::NoParity);
+    port->setStopBits(QSerialPort::OneStop);
+    port->setFlowControl(QSerialPort::NoFlowControl);
+
+    if (!port->open(QIODevice::ReadWrite)) {
+        emit errorOccurred(QStringLiteral("Serial open failed (%1): %2")
+                               .arg(portName, port->errorString()));
+        port->deleteLater();
+        return false;
+    }
+
+    m_pSerial = port;
+    m_parser.reset();
+    m_parser.setUnits(cfg.units);
+
+    connect(m_pSerial, &QSerialPort::readyRead, this, &PolhemusConnection::onSerialReadyRead);
+    connect(m_pSerial, &QSerialPort::errorOccurred, this, &PolhemusConnection::onSerialError);
+
+    if (!cfg.streamCommand.isEmpty()) {
+        m_pSerial->write(cfg.streamCommand);
+    }
+
+    m_backendName = QStringLiteral("FastTrak (%1 @ %2 baud)")
+                        .arg(portName)
+                        .arg(cfg.baudRate);
+    return true;
+}
+
+void PolhemusConnection::closeSerial()
+{
+    if (!m_pSerial) {
+        return;
+    }
+    if (m_pSerial->isOpen()) {
+        // Stop continuous streaming politely before closing.
+        m_pSerial->write(QByteArrayLiteral("P\r"));
+        m_pSerial->flush();
+        m_pSerial->close();
+    }
+    m_pSerial->deleteLater();
+    m_pSerial = nullptr;
+    m_parser.reset();
+}
+
+void PolhemusConnection::onSerialReadyRead()
+{
+    if (!m_pSerial) {
+        return;
+    }
+    m_parser.append(m_pSerial->readAll());
+    drainParser();
+}
+
+void PolhemusConnection::onSerialError(QSerialPort::SerialPortError err)
+{
+    if (err == QSerialPort::NoError) {
+        return;
+    }
+    if (!m_pSerial) {
+        return;
+    }
+    const QString msg = QStringLiteral("Serial error: %1").arg(m_pSerial->errorString());
+    emit errorOccurred(msg);
+
+    if (err == QSerialPort::ResourceError || err == QSerialPort::DeviceNotFoundError) {
+        // Hardware has gone away — tear down so the UI reflects it.
+        close();
+    }
+}
+
+void PolhemusConnection::drainParser()
+{
+    FastTrakSample s;
+    while (m_parser.nextSample(s)) {
+        emit pointReceived(s.station, s.position, s.orientation);
+    }
+}
+
+#endif // MNE_ALIGN_HAS_SERIALPORT

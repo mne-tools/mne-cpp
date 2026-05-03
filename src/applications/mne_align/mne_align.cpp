@@ -43,6 +43,7 @@
 #include <mne/mne_bem.h>
 
 #include <QAction>
+#include <QComboBox>
 #include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -81,8 +82,11 @@ MneAlign::MneAlign(QWidget* parent)
             this, &MneAlign::onWizardExportRequest);
     connect(m_pWizard, &AlignWizard::bemPathChanged,
             this, &MneAlign::onWizardBemPathChanged);
+        connect(m_pWizard, &AlignWizard::stepChanged,
+            this, &MneAlign::onWizardStepChanged);
 
     onDigitizerConnectedChanged(false);
+        onWizardStepChanged(m_pWizard->currentStep());
 }
 
 MneAlign::~MneAlign() = default;
@@ -93,13 +97,15 @@ void MneAlign::buildUi()
 {
     m_pWizard = new AlignWizard(m_pPoints, m_pDigitizer, this);
     m_pView3d = new Align3DView(m_pPoints, this);
+    m_pWizard->setMinimumWidth(240);
 
     m_pSplitter = new QSplitter(Qt::Horizontal, this);
     m_pSplitter->addWidget(m_pWizard);
     m_pSplitter->addWidget(m_pView3d);
+    m_pSplitter->setChildrenCollapsible(false);
     m_pSplitter->setStretchFactor(0, 0);
-    m_pSplitter->setStretchFactor(1, 1);
-    m_pSplitter->setSizes({420, 680});
+    m_pSplitter->setStretchFactor(1, 4);
+    m_pSplitter->setSizes({280, 920});
     setCentralWidget(m_pSplitter);
 
     m_pStatusBem       = new QLabel(QStringLiteral("BEM: (none)"), this);
@@ -121,6 +127,56 @@ void MneAlign::buildMenus()
 
     auto* helpMenu = menuBar()->addMenu(QStringLiteral("&Help"));
     helpMenu->addAction(QStringLiteral("&About"), this, &MneAlign::onAbout);
+
+    auto* navToolBar = addToolBar(QStringLiteral("Workflow"));
+    navToolBar->setMovable(false);
+    m_pBackAction = navToolBar->addAction(QStringLiteral("Back"), m_pWizard, &AlignWizard::back);
+    m_pNextAction = navToolBar->addAction(QStringLiteral("Next"), m_pWizard, &AlignWizard::next);
+    navToolBar->addSeparator();
+    m_pStepLabel = new QLabel(this);
+    navToolBar->addWidget(m_pStepLabel);
+    navToolBar->addSeparator();
+    navToolBar->addWidget(new QLabel(QStringLiteral("Views:"), this));
+    m_pViewCountCombo = new QComboBox(this);
+    m_pViewCountCombo->addItems({QStringLiteral("1"), QStringLiteral("2"), QStringLiteral("3"), QStringLiteral("4")});
+    m_pViewCountCombo->setCurrentIndex(0);
+    navToolBar->addWidget(m_pViewCountCombo);
+    navToolBar->addWidget(new QLabel(QStringLiteral("Camera:"), this));
+    m_pCameraPresetCombo = new QComboBox(this);
+    m_pCameraPresetCombo->addItems({
+        QStringLiteral("Top"),
+        QStringLiteral("Perspective"),
+        QStringLiteral("Front"),
+        QStringLiteral("Left"),
+        QStringLiteral("Bottom"),
+        QStringLiteral("Back"),
+        QStringLiteral("Right")
+    });
+    m_pCameraPresetCombo->setCurrentIndex(1);
+    navToolBar->addWidget(m_pCameraPresetCombo);
+    navToolBar->addWidget(new QLabel(QStringLiteral("Render:"), this));
+    m_pRenderModeCombo = new QComboBox(this);
+    m_pRenderModeCombo->addItems({QStringLiteral("Anatomical"), QStringLiteral("Holographic")});
+    navToolBar->addWidget(m_pRenderModeCombo);
+
+    connect(m_pViewCountCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this](int index) {
+                if (m_pView3d) {
+                    m_pView3d->setViewCount(index + 1);
+                }
+            });
+    connect(m_pCameraPresetCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this](int index) {
+                if (m_pView3d) {
+                    m_pView3d->setCameraPreset(index);
+                }
+            });
+    connect(m_pRenderModeCombo, &QComboBox::currentTextChanged,
+            this, [this](const QString& text) {
+                if (m_pView3d) {
+                    m_pView3d->setRenderMode(text);
+                }
+            });
 }
 
 //=============================================================================================================
@@ -131,6 +187,9 @@ void MneAlign::onOpenBem()
         this, QStringLiteral("Open BEM surface"),
         QString(), QStringLiteral("FIFF BEM (*.fif *.fif.gz);;All files (*)"));
     if (path.isEmpty()) return;
+    if (m_pWizard) {
+        m_pWizard->setBemPath(path);
+    }
     onWizardBemPathChanged(path);
 }
 
@@ -180,6 +239,23 @@ void MneAlign::onDigitizerConnectedChanged(bool connected)
     m_pStatusDigitizer->setText(connected
         ? QStringLiteral("Digitizer: %1").arg(m_pDigitizer->backendName())
         : QStringLiteral("Digitizer: disconnected"));
+}
+
+void MneAlign::onWizardStepChanged(MNEALIGN::AlignStep step)
+{
+    if (m_pStepLabel) {
+        m_pStepLabel->setText(QStringLiteral("Step %1/%2 — %3")
+            .arg(static_cast<int>(step) + 1)
+            .arg(AlignWizard::stepCount())
+            .arg(AlignWizard::titleFor(step)));
+    }
+
+    if (m_pBackAction) {
+        m_pBackAction->setEnabled(step != AlignStep::Setup);
+    }
+    if (m_pNextAction) {
+        m_pNextAction->setEnabled(step != AlignStep::Export);
+    }
 }
 
 //=============================================================================================================

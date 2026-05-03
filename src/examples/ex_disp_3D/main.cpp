@@ -107,6 +107,9 @@ int main(int argc, char *argv[])
     
     qInstallMessageHandler(MNELogger::customLogWriter);
     QApplication a(argc, argv);
+    QCoreApplication::setOrganizationName(QStringLiteral("MNE-CPP"));
+    QCoreApplication::setOrganizationDomain(QStringLiteral("mne-cpp.org"));
+    QCoreApplication::setApplicationName(QStringLiteral("ex_disp_3D"));
 
     // Command Line Parser
     QCommandLineParser parser;

@@ -137,6 +137,17 @@ void AlignWizard::goToStep(AlignStep step)
     setCurrentIndex(static_cast<int>(step));
 }
 
+void AlignWizard::setBemPath(const QString& path)
+{
+    m_bemPath = path;
+    if (m_pSetupBemLabel) {
+        m_pSetupBemLabel->setText(path.isEmpty()
+            ? QStringLiteral("<i>(no BEM loaded)</i>")
+            : QFileInfo(path).fileName());
+    }
+    refreshExportUi();
+}
+
 void AlignWizard::next() { if (currentIndex() < count() - 1) setCurrentIndex(currentIndex() + 1); }
 void AlignWizard::back() { if (currentIndex() > 0)           setCurrentIndex(currentIndex() - 1); }
 
@@ -214,10 +225,7 @@ void AlignWizard::onPickBemFile()
         QString(), QStringLiteral("FIFF BEM (*.fif *.fif.gz);;All files (*)"));
     if (path.isEmpty()) return;
 
-    m_bemPath = path;
-    if (m_pSetupBemLabel) {
-        m_pSetupBemLabel->setText(QFileInfo(path).fileName());
-    }
+    setBemPath(path);
     emit bemPathChanged(path);
 }
 

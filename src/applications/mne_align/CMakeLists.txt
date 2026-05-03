@@ -20,6 +20,7 @@ set(SOURCES
     align_wizard.cpp
     align_3d_view.cpp
     polhemus_connection.cpp
+    fasttrak_parser.cpp
 )
 
 set(HEADERS
@@ -27,6 +28,7 @@ set(HEADERS
     align_wizard.h
     align_3d_view.h
     polhemus_connection.h
+    fasttrak_parser.h
     acquired_points.h
 )
 

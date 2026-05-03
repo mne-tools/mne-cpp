@@ -83,6 +83,7 @@ public:
 
     AlignStep currentStep() const;
     void      goToStep(AlignStep step);
+    void      setBemPath(const QString& path);
 
     QString                            bemPath() const { return m_bemPath; }
     UTILSLIB::StandardMontage::System  cap()     const { return m_capSystem; }

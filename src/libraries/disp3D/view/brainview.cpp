@@ -70,6 +70,7 @@
 #include <QResizeEvent>
 #include <QSettings>
 #include <QCoreApplication>
+#include <QFileInfo>
 #include <QMenu>
 #include <QStandardItem>
 #include <algorithm>
@@ -81,6 +82,22 @@
 #include <conn/network/network.h>
 
 using namespace FIFFLIB;
+
+namespace {
+
+QSettings makeBrainViewSettings()
+{
+    const QString organization = QCoreApplication::organizationName().isEmpty()
+        ? QStringLiteral("MNE-CPP")
+        : QCoreApplication::organizationName();
+    const QString application = QCoreApplication::applicationName().isEmpty()
+        ? QFileInfo(QCoreApplication::applicationFilePath()).baseName()
+        : QCoreApplication::applicationName();
+
+    return QSettings(organization, application);
+}
+
+} // namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -1176,8 +1193,8 @@ void BrainView::logPerspectiveRotation(const QString& context) const
 
 void BrainView::loadMultiViewSettings()
 {
-    QSettings settings("MNECPP");
-    settings.beginGroup("ex_brain_view/BrainView");
+    QSettings settings = makeBrainViewSettings();
+    settings.beginGroup(QStringLiteral("BrainView"));
 
     m_multiSplitX = settings.value("multiSplitX", 0.5f).toFloat();
     m_multiSplitY = settings.value("multiSplitY", 0.5f).toFloat();
@@ -1237,8 +1254,8 @@ void BrainView::loadMultiViewSettings()
 
 void BrainView::saveMultiViewSettings() const
 {
-    QSettings settings("MNECPP");
-    settings.beginGroup("ex_brain_view/BrainView");
+    QSettings settings = makeBrainViewSettings();
+    settings.beginGroup(QStringLiteral("BrainView"));
     settings.setValue("multiSplitX", m_multiSplitX);
     settings.setValue("multiSplitY", m_multiSplitY);
     settings.setValue("viewMode", static_cast<int>(m_viewMode));
@@ -1283,6 +1300,48 @@ void BrainView::setViewportCameraPreset(int index, int preset)
     if (m_subViews[index].preset == preset)
         return;
     m_subViews[index].preset = preset;
+    saveMultiViewSettings();
+    updateOverlayLayout();
+    m_sceneDirty = true; update();
+}
+
+//=============================================================================================================
+
+void BrainView::resetSingleViewCameraState()
+{
+    m_cameraRotation = QQuaternion();
+    m_zoom = 0.0f;
+    saveMultiViewSettings();
+    m_sceneDirty = true; update();
+}
+
+//=============================================================================================================
+
+void BrainView::resetViewportCameraState(int index)
+{
+    if (index < 0 || index >= static_cast<int>(m_subViews.size())) {
+        return;
+    }
+
+    m_subViews[index].zoom = 0.0f;
+    m_subViews[index].pan = QVector2D();
+    m_subViews[index].perspectiveRotation = QQuaternion();
+    saveMultiViewSettings();
+    m_sceneDirty = true; update();
+}
+
+//=============================================================================================================
+
+void BrainView::resetAllSubViewState()
+{
+    m_singleView = SubView{};
+    for (int i = 0; i < m_subViews.size(); ++i) {
+        const bool wasEnabled = m_subViews[i].enabled;
+        m_subViews[i] = SubView::defaultForIndex(i);
+        m_subViews[i].enabled = wasEnabled;
+    }
+    m_cameraRotation = QQuaternion();
+    m_zoom = 0.0f;
     saveMultiViewSettings();
     updateOverlayLayout();
     m_sceneDirty = true; update();

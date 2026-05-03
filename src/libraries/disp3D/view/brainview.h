@@ -331,6 +331,27 @@ public slots:
     void setViewportCameraPreset(int index, int preset);
 
     /**
+     * Reset single-view camera state (rotation and zoom) to defaults.
+     */
+    void resetSingleViewCameraState();
+
+    /**
+     * Reset one multi-view pane's camera state (zoom, pan, perspective rotation).
+     *
+     * @param[in] index      Viewport index (0–3).
+     */
+    void resetViewportCameraState(int index);
+
+    /**
+     * Reset all per-pane SubView state (camera, visibility, shaders, surface
+     * type, overlay) to its index-specific factory defaults and reset the
+     * single-view state too. Use this when an embedding application wants
+     * a clean slate that ignores any settings persisted by previous runs
+     * or other hosts of BrainView.
+     */
+    void resetAllSubViewState();
+
+    /**
      * Get the camera preset for a specific viewport.
      *
      * @param[in] index      Viewport index (0–3).
