@@ -41,7 +41,6 @@
 // STD INCLUDES
 //=============================================================================================================
 
-#define _USE_MATH_DEFINES
 #include <cmath>
 #include <complex>
 #include <vector>

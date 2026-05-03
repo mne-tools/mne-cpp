@@ -108,6 +108,7 @@ endif()
 
 if(MSVC)
   add_compile_options(/EHsc /MP)
+  add_compile_definitions(_USE_MATH_DEFINES)
 endif()
 
 ##==============================================================================
