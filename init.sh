@@ -368,17 +368,18 @@ if [[ ${DEPS_ONLY} -eq 1 ]]; then
     exit 0
 fi
 
+CMAKE_PREFIX_VALUE="${QT_DIR}"
+if [[ -f "${EIGEN_CONFIG_PATH}" ]]; then
+    CMAKE_PREFIX_VALUE="${QT_DIR};${EIGEN_DIR}"
+fi
+
 cmake_args=(
     -B "${BUILD_DIR}"
     -S "${REPO_ROOT}"
     -DCMAKE_BUILD_TYPE="${BUILD_TYPE}"
     -DNO_OPENGL="${NO_OPENGL_VALUE}"
-    "-DCMAKE_PREFIX_PATH=${QT_DIR}"
+    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_VALUE}"
 )
-
-if [[ -f "${EIGEN_CONFIG_PATH}" ]]; then
-    cmake_args[4]="-DCMAKE_PREFIX_PATH=${QT_DIR};${EIGEN_DIR}"
-fi
 
 if [[ "${LINKAGE}" == "static" ]]; then
     cmake_args+=(-DBUILD_SHARED_LIBS=OFF)
