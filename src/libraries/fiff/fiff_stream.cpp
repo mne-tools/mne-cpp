@@ -1186,7 +1186,12 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
                 break;
             case FIFF_GANTRY_ANGLE:
                 this->read_tag(t_pTag,pos);
-                gantry_angle = *t_pTag->toInt();
+                // MNE-Python writes this as float; older writers used int.
+                if (t_pTag->getType() == FIFFT_FLOAT) {
+                    gantry_angle = static_cast<fiff_int_t>(*t_pTag->toFloat());
+                } else if (t_pTag->getType() == FIFFT_INT) {
+                    gantry_angle = *t_pTag->toInt();
+                }
                 break;
             case FIFF_UTC_OFFSET:
                 this->read_tag(t_pTag,pos);
