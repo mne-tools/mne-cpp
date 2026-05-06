@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     fasttrak_parser.h
+ * @file     fastrak_parser.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.3.0
  * @date     May, 2026
@@ -27,7 +27,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @brief    Polhemus FastTrak / FastSCAN ASCII record parser.
+ * @brief    Polhemus Fastrak / FastSCAN ASCII record parser.
  *
  *           Format-0 ASCII record (default factory output):
  *
@@ -35,7 +35,7 @@
  *
  *           where each numeric field is fixed-width and signed
  *           (e.g. "+123.456"). Positions are in the units configured on
- *           the device (inches by default for FastTrak, centimetres for
+ *           the device (inches by default for Fastrak, centimetres for
  *           the FastSCAN family). Orientation is azimuth/elevation/roll
  *           in degrees, applied in that order around Z, Y, X.
  *
@@ -44,8 +44,8 @@
  *           pop completed samples via @ref nextSample.
  */
 
-#ifndef UTILS_FASTTRAK_PARSER_H
-#define UTILS_FASTTRAK_PARSER_H
+#ifndef UTILS_FASTRAK_PARSER_H
+#define UTILS_FASTRAK_PARSER_H
 
 //=============================================================================================================
 // INCLUDES
@@ -70,9 +70,9 @@ namespace UTILSLIB
 
 //=============================================================================================================
 /**
- * @brief One decoded sample from a FastTrak ASCII stream.
+ * @brief One decoded sample from a Fastrak ASCII stream.
  */
-struct UTILSSHARED_EXPORT FastTrakSample
+struct UTILSSHARED_EXPORT FastrakSample
 {
     int          station = 0;     ///< 1-based station id reported by the device.
     QVector3D    position;        ///< Position in metres (always normalised to SI).
@@ -82,20 +82,20 @@ struct UTILSSHARED_EXPORT FastTrakSample
 
 //=============================================================================================================
 /**
- * @brief Streaming parser for FastTrak / FastSCAN ASCII records.
+ * @brief Streaming parser for Fastrak / FastSCAN ASCII records.
  *
  * Thread-affine: the caller is responsible for serialising calls. No
  * heap allocations on the hot path other than the internal buffer.
  */
-class UTILSSHARED_EXPORT FastTrakParser
+class UTILSSHARED_EXPORT FastrakParser
 {
 public:
     enum class Units {
-        Inches,           ///< FastTrak factory default.
+        Inches,           ///< Fastrak factory default.
         Centimetres       ///< FastSCAN / G4 default.
     };
 
-    FastTrakParser() = default;
+    FastrakParser() = default;
 
     /** Configure the linear unit reported by the device. */
     void setUnits(Units units) { m_units = units; }
@@ -111,7 +111,7 @@ public:
      * @return true when @p out was populated; false when the buffer does
      *         not yet contain a complete record.
      */
-    bool nextSample(FastTrakSample& out);
+    bool nextSample(FastrakSample& out);
 
     /** Reset accumulated buffer state. */
     void reset() { m_buffer.clear(); }
@@ -122,7 +122,7 @@ public:
      *
      * @return true on success; false on malformed input.
      */
-    static bool parseRecord(const QByteArray& record, Units units, FastTrakSample& out);
+    static bool parseRecord(const QByteArray& record, Units units, FastrakSample& out);
 
 private:
     QByteArray m_buffer;
@@ -131,4 +131,4 @@ private:
 
 } // namespace UTILSLIB
 
-#endif // UTILS_FASTTRAK_PARSER_H
+#endif // UTILS_FASTRAK_PARSER_H

@@ -186,7 +186,7 @@ void PolhemusConnection::onMockTick()
 }
 
 //=============================================================================================================
-// Serial / FastTrak backend
+// Serial / Fastrak backend
 //=============================================================================================================
 
 bool PolhemusConnection::openSerial(const QString& portName, const PolhemusSerialConfig& cfg)
@@ -217,7 +217,7 @@ bool PolhemusConnection::openSerial(const QString& portName, const PolhemusSeria
         m_pSerial->write(cfg.streamCommand);
     }
 
-    m_backendName = QStringLiteral("FastTrak (%1 @ %2 baud)")
+    m_backendName = QStringLiteral("Fastrak (%1 @ %2 baud)")
                         .arg(portName)
                         .arg(cfg.baudRate);
     return true;
@@ -266,7 +266,7 @@ void PolhemusConnection::onSerialError(QSerialPort::SerialPortError err)
 
 void PolhemusConnection::drainParser()
 {
-    FastTrakSample s;
+    FastrakSample s;
     while (m_parser.nextSample(s)) {
         m_lastSamples[s.station] = {s.position, s.orientation};
         emit pointReceived(s.station, s.position, s.orientation);

@@ -348,7 +348,7 @@ void MneAlign::onWizardBemPathChanged(const QString& path)
 
 void MneAlign::onConnectDigitizer()
 {
-    // Auto-scan first: pick a likely FastTrak/FastSCAN by USB vendor id so
+    // Auto-scan first: pick a likely Fastrak/FastSCAN by USB vendor id so
     // the user doesn't have to type a device path. If detection fails, fall
     // back to a chooser populated with every visible serial port (plus a
     // "Mock backend" entry that maps to an empty port name).
@@ -367,7 +367,7 @@ void MneAlign::onConnectDigitizer()
         bool ok = false;
         const QString choice = QInputDialog::getItem(
             this, QStringLiteral("Connect digitizer"),
-            QStringLiteral("No FastTrak auto-detected. Pick a serial port:"),
+            QStringLiteral("No Fastrak auto-detected. Pick a serial port:"),
             items, /*current*/ 0, /*editable*/ false, &ok);
         if (!ok) return;
         port = (choice == items.first()) ? QString() : choice;
@@ -459,7 +459,7 @@ void MneAlign::onAbout()
     QMessageBox::about(this, windowTitle(),
         QStringLiteral(
             "<h3>MNE Align</h3>"
-            "<p>Stripped-down <b>mne_inspect</b> variant for Polhemus FastTrak "
+            "<p>Stripped-down <b>mne_inspect</b> variant for Polhemus Fastrak "
             "digitisation against a head BEM and an EEG cap.</p>"
             "<p>v2.3.0</p>"));
 }

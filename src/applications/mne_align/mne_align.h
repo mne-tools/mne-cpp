@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @brief    Top-level window for the MNE Align app — a stripped-down
- *           variant of `mne_inspect` focused on Polhemus FastTrak
+ *           variant of `mne_inspect` focused on Polhemus Fastrak
  *           digitisation against a head BEM and an EEG cap.
  */
 

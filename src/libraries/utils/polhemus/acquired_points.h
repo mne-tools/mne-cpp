@@ -32,7 +32,7 @@
  *           Plain Qt model object passed by reference between the wizard,
  *           the 3-D view, and the FIFF exporter. Points are stored in
  *           head/sensor frame metres exactly as received from the
- *           Polhemus FastTrak.
+ *           Polhemus Fastrak.
  */
 
 #ifndef UTILS_ACQUIRED_POINTS_H

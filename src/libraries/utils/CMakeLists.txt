@@ -18,7 +18,7 @@ set(SOURCES
   layoutmaker.cpp
   selectionio.cpp
   montage/standard_montage.cpp
-  polhemus/fasttrak_parser.cpp
+  polhemus/fastrak_parser.cpp
   polhemus/polhemus_connection.cpp
   polhemus/polhemus_coregistration.cpp
   report.cpp
@@ -36,7 +36,7 @@ set(HEADERS
   selectionio.h
   montage/standard_montage.h
   polhemus/acquired_points.h
-  polhemus/fasttrak_parser.h
+  polhemus/fastrak_parser.h
   polhemus/polhemus_connection.h
   polhemus/polhemus_coregistration.h
   report.h

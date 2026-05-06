@@ -35,14 +35,14 @@
  *              every @c kMockTickIntervalMs. Always available so apps
  *              and tests run on machines without a real digitizer.
  *
- *           2. **FastTrak / FastSCAN** — opens a `QSerialPort`, sends
+ *           2. **Fastrak / FastSCAN** — opens a `QSerialPort`, sends
  *              the continuous-output command, and decodes the ASCII
- *              record stream via @ref FastTrakParser.
+ *              record stream via @ref FastrakParser.
  *
  *           Backend selection is implicit: an empty @c portName picks
  *           mock; a non-empty name picks the hardware backend.
  *           @ref autoDetectPortName scans @ref availablePorts for a
- *           likely FastTrak (FTDI USB-serial) and returns it, so the UI
+ *           likely Fastrak (FTDI USB-serial) and returns it, so the UI
  *           can offer a one-click "connect" without asking the user to
  *           type a device path.
  */
@@ -55,7 +55,7 @@
 //=============================================================================================================
 
 #include "../utils_global.h"
-#include "fasttrak_parser.h"
+#include "fastrak_parser.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -84,9 +84,9 @@ namespace UTILSLIB
 struct UTILSSHARED_EXPORT PolhemusSerialConfig
 {
     int                       baudRate = 115200;
-    FastTrakParser::Units     units    = FastTrakParser::Units::Inches;
+    FastrakParser::Units     units    = FastrakParser::Units::Inches;
     /** Stream control command sent right after opening the port. The
-     *  factory default for FastTrak is `"C\r"` (continuous ASCII output);
+     *  factory default for Fastrak is `"C\r"` (continuous ASCII output);
      *  use `"P\r"` if the application drives polled mode itself. */
     QByteArray                streamCommand = QByteArrayLiteral("C\r");
 };
@@ -132,9 +132,9 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief Best-effort auto-detection of an attached FastTrak/FastSCAN.
+     * @brief Best-effort auto-detection of an attached Fastrak/FastSCAN.
      *
-     * Polhemus FastTrak/FastSCAN units ship with an FTDI USB-serial
+     * Polhemus Fastrak/FastSCAN units ship with an FTDI USB-serial
      * bridge (vendor id 0x0F44 for newer Polhemus-branded units, 0x0403
      * for the generic FTDI chip used in older units). This scan returns
      * the first matching port name, or an empty string if no candidate
@@ -189,7 +189,7 @@ private:
 
     // Serial backend ----------------------------------------------------------
     QSerialPort*    m_pSerial = nullptr;
-    FastTrakParser  m_parser;
+    FastrakParser  m_parser;
 
     // Pen-button detection (stream-pause timeout) -----------------------------
     QTimer      m_streamPauseTimer;

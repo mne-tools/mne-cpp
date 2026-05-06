@@ -27,7 +27,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @brief    Head–device coregistration using the Polhemus FastTrak.
+ * @brief    Head–device coregistration using the Polhemus Fastrak.
  *
  *           Two Polhemus stations work together:
  *
@@ -87,7 +87,7 @@ namespace UTILSLIB
 
 //=============================================================================================================
 /**
- * @brief Head–device coregistration engine driven by a Polhemus FastTrak.
+ * @brief Head–device coregistration engine driven by a Polhemus Fastrak.
  *
  * The class wires itself to a @ref PolhemusConnection and maintains:
  *   - A continuously updated device-to-world transform (from the tracker

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     fasttrak_parser.cpp
+ * @file     fastrak_parser.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.3.0
  * @date     May, 2026
@@ -27,10 +27,10 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @brief    Implementation of @ref UTILSLIB::FastTrakParser.
+ * @brief    Implementation of @ref UTILSLIB::FastrakParser.
  */
 
-#include "fasttrak_parser.h"
+#include "fastrak_parser.h"
 
 using namespace UTILSLIB;
 
@@ -39,9 +39,9 @@ namespace {
 constexpr float kInchToMetre       = 0.0254f;
 constexpr float kCentimetreToMetre = 0.01f;
 
-float linearScale(FastTrakParser::Units units)
+float linearScale(FastrakParser::Units units)
 {
-    return (units == FastTrakParser::Units::Inches) ? kInchToMetre
+    return (units == FastrakParser::Units::Inches) ? kInchToMetre
                                                     : kCentimetreToMetre;
 }
 
@@ -49,7 +49,7 @@ float linearScale(FastTrakParser::Units units)
 
 //=============================================================================================================
 
-bool FastTrakParser::parseRecord(const QByteArray& record, Units units, FastTrakSample& out)
+bool FastrakParser::parseRecord(const QByteArray& record, Units units, FastrakSample& out)
 {
     // Tokenise on whitespace; a record is "<station> <x> <y> <z> [<az> <el> <ro>]".
     const QList<QByteArray> tokens = record.simplified().split(' ');
@@ -104,7 +104,7 @@ bool FastTrakParser::parseRecord(const QByteArray& record, Units units, FastTrak
 
 //=============================================================================================================
 
-bool FastTrakParser::nextSample(FastTrakSample& out)
+bool FastrakParser::nextSample(FastrakSample& out)
 {
     while (true) {
         const int eol = m_buffer.indexOf('\n');
