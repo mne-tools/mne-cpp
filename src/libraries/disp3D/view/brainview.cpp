@@ -419,15 +419,21 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
 
             m_itemSurfaceMap[item] = brainSurf;
 
-            // Category name for legacy map key
+            // Category name for surface-map key.  A monotonic counter
+            // suffix guarantees uniqueness so that multiple items of the
+            // same PointKind each get their own entry in m_surfaces.
+            // shouldRenderSurface() matches by prefix ("dig_cardinal",
+            // "dig_hpi", …) so the suffix is transparent to visibility.
+            static int s_digKeyCounter = 0;
             QString catName;
             switch (digItem->pointKind()) {
                 case DigitizerTreeItem::Cardinal: catName = "cardinal"; break;
                 case DigitizerTreeItem::HPI:      catName = "hpi"; break;
                 case DigitizerTreeItem::EEG:      catName = "eeg"; break;
                 case DigitizerTreeItem::Extra:    catName = "extra"; break;
+                default:                          catName = digItem->text().toLower().replace(' ', '_'); break;
             }
-            QString key = "dig_" + catName;
+            QString key = QStringLiteral("dig_%1_%2").arg(catName).arg(s_digKeyCounter++);
             m_surfaces[key] = brainSurf;
         }
 
@@ -1628,8 +1634,10 @@ void BrainView::render(QRhiCommandBuffer *cb)
         cb->setScissor(scissor);
 
         // Calculate camera for this viewport
-        m_camera.setSceneCenter(m_sceneCenter);
-        m_camera.setSceneSize(m_sceneSize);
+        const QVector3D effectiveCenter = m_cameraFocusOverride ? m_cameraFocusCenter : m_sceneCenter;
+        const float     effectiveSize   = m_cameraFocusOverride ? m_cameraFocusSize   : m_sceneSize;
+        m_camera.setSceneCenter(effectiveCenter);
+        m_camera.setSceneSize(effectiveSize);
         m_camera.setRotation(m_cameraRotation);
         m_camera.setZoom(m_zoom);
         const CameraResult cam = (m_viewMode == MultiView)
@@ -1759,9 +1767,19 @@ void BrainView::render(QRhiCommandBuffer *cb)
         } else if (key.startsWith("srcsp_") || key.startsWith("dig_")) {
             if (!sv.shouldRenderSurface(key)) continue;
             if (!surf->isVisible()) continue;
-            opaqueDraws.append({surf, currentShader,
-                                static_cast<float>(BrainSurface::ModeScientific),
-                                0.0f, -1});
+            if (key.startsWith(QLatin1String("dig_live_t_"))) {
+                QVector3D bmin, bmax;
+                surf->boundingBox(bmin, bmax);
+                QVector3D ctr = (bmin + bmax) * 0.5f;
+                float dist = (sceneData.cameraPos - ctr).lengthSquared();
+                transparentDraws.append({surf, BrainRenderer::Holographic,
+                                         static_cast<float>(BrainSurface::ModeScientific),
+                                         dist, -1});
+            } else {
+                opaqueDraws.append({surf, currentShader,
+                                    static_cast<float>(BrainSurface::ModeScientific),
+                                    0.0f, -1});
+            }
         } else {
             bool isSensor = key.startsWith("sens_");
             bool isBem    = key.startsWith("bem_");
@@ -2015,11 +2033,33 @@ void BrainView::mouseReleaseEvent(QMouseEvent *event)
         saveMultiViewSettings();
     }
 
+    // Emit surface click if a clean left-click landed on geometry
+    if (event->button() == Qt::LeftButton && !m_isDraggingSplitter && !m_perspectiveRotatedSincePress) {
+        castRay(event->pos());
+        if (m_hasIntersection) {
+            emit surfacePointClicked(m_lastIntersectionPoint);
+        }
+    }
+
     if (m_viewMode == MultiView) {
         updateSplitterCursor(event->pos());
     } else {
         unsetCursor();
     }
+}
+
+//=============================================================================================================
+
+void BrainView::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        castRay(event->pos());
+        if (m_hasIntersection) {
+            emit surfacePointDoubleClicked(m_lastIntersectionPoint);
+            return;
+        }
+    }
+    QRhiWidget::mouseDoubleClickEvent(event);
 }
 
 //=============================================================================================================
@@ -2617,8 +2657,10 @@ void BrainView::castRay(const QPoint &pos)
     const int vp = (m_viewMode == MultiView) ? enabledViewports[activeSlot] : 0;
     const SubView &sv = (m_viewMode == MultiView) ? m_subViews[vp] : m_singleView;
 
-    m_camera.setSceneCenter(m_sceneCenter);
-    m_camera.setSceneSize(m_sceneSize);
+    const QVector3D effectiveCenter2 = m_cameraFocusOverride ? m_cameraFocusCenter : m_sceneCenter;
+    const float     effectiveSize2   = m_cameraFocusOverride ? m_cameraFocusSize   : m_sceneSize;
+    m_camera.setSceneCenter(effectiveCenter2);
+    m_camera.setSceneSize(effectiveSize2);
     m_camera.setRotation(m_cameraRotation);
     m_camera.setZoom(m_zoom);
     const float aspect = float(std::max(1, activePane.width())) / float(std::max(1, activePane.height()));
@@ -3014,6 +3056,103 @@ void BrainView::clearSourceSpace()
 }
 
 //=============================================================================================================
+
+void BrainView::setLiveMarkers(const QVector<LiveMarker>& markers)
+{
+    // Remove previous live surfaces (no scene-bounds update).
+    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ) {
+        if (it.key().startsWith(QLatin1String("dig_live_")))
+            it = m_surfaces.erase(it);
+        else
+            ++it;
+    }
+
+    for (int i = 0; i < markers.size(); ++i) {
+        auto surf = MeshFactory::createBatchedSpheres(
+            {markers[i].position}, markers[i].radius, markers[i].color);
+        surf->setVisible(true);
+        const QString prefix = markers[i].transparent
+            ? QStringLiteral("dig_live_t_%1") : QStringLiteral("dig_live_%1");
+        m_surfaces[prefix.arg(i)] = surf;
+    }
+
+    // Intentionally NO updateSceneBounds() — the camera stays locked.
+    m_sceneDirty = true;
+    update();
+}
+
+void BrainView::clearLiveMarkers()
+{
+    bool removed = false;
+    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ) {
+        if (it.key().startsWith(QLatin1String("dig_live_"))) {
+            it = m_surfaces.erase(it);
+            removed = true;
+        } else {
+            ++it;
+        }
+    }
+    if (removed) {
+        m_sceneDirty = true;
+        update();
+    }
+}
+
+void BrainView::setStaticMarkers(const QVector<LiveMarker>& markers)
+{
+    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ) {
+        if (it.key().startsWith(QLatin1String("dig_static_")))
+            it = m_surfaces.erase(it);
+        else
+            ++it;
+    }
+
+    for (int i = 0; i < markers.size(); ++i) {
+        auto surf = MeshFactory::createBatchedSpheres(
+            {markers[i].position}, markers[i].radius, markers[i].color);
+        surf->setVisible(true);
+        m_surfaces[QStringLiteral("dig_static_%1").arg(i)] = surf;
+    }
+
+    m_sceneDirty = true;
+    update();
+}
+
+void BrainView::clearStaticMarkers()
+{
+    bool removed = false;
+    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ) {
+        if (it.key().startsWith(QLatin1String("dig_static_"))) {
+            it = m_surfaces.erase(it);
+            removed = true;
+        } else {
+            ++it;
+        }
+    }
+    if (removed) {
+        m_sceneDirty = true;
+        update();
+    }
+}
+
+void BrainView::setCameraFocusOverride(const QVector3D& center, float size)
+{
+    m_cameraFocusOverride = true;
+    m_cameraFocusCenter   = center;
+    m_cameraFocusSize     = size;
+    m_sceneDirty = true;
+    update();
+}
+
+void BrainView::clearCameraFocusOverride()
+{
+    if (!m_cameraFocusOverride)
+        return;
+    m_cameraFocusOverride = false;
+    updateSceneBounds();
+    m_sceneDirty = true;
+    update();
+}
 
 void BrainView::clearSensors()
 {

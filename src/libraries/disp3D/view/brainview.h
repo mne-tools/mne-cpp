@@ -78,6 +78,21 @@ namespace CONNLIB { class Network; }
 
 //=============================================================================================================
 /**
+ * @brief Lightweight live overlay marker rendered as a single sphere.
+ *
+ * Used by @ref BrainView::setLiveMarkers to draw transient markers
+ * (e.g. digitizer tracker tip, orientation axes) without going through
+ * the model pipeline or recalculating scene bounds.
+ */
+struct DISP3DSHARED_EXPORT LiveMarker {
+    QVector3D position;
+    QColor    color;
+    float     radius = 0.003f;
+    bool      transparent = false; ///< If true, rendered with alpha blending.
+};
+
+//=============================================================================================================
+/**
  * BrainView is the main widget for the 3D brain visualization. It handles user interaction,
  * surface loading, and coordinates with the BrainRenderer.
  *
@@ -802,6 +817,37 @@ public slots:
      */
     void clearSensors();
 
+    // ── Live marker overlay (lightweight, no model, no scene-bounds) ───
+
+    /**
+     * Replace the set of live overlay markers.
+     *
+     * Renders each marker as a small sphere without touching the model
+     * or recalculating scene bounds, so the camera stays locked.
+     */
+    void setLiveMarkers(const QVector<LiveMarker>& markers);
+
+    /** Remove all live overlay markers. */
+    void clearLiveMarkers();
+
+    /**
+     * Replace the set of static overlay markers (fiducials, acquired points).
+     * These persist across frames and are always visible.
+     */
+    void setStaticMarkers(const QVector<LiveMarker>& markers);
+
+    /** Remove all static overlay markers. */
+    void clearStaticMarkers();
+
+    /**
+     * Override the auto-computed scene center and size.
+     * While active, updateSceneBounds() results are ignored for camera framing.
+     */
+    void setCameraFocusOverride(const QVector3D& center, float size);
+
+    /** Remove the camera focus override; revert to auto-computed bounds. */
+    void clearCameraFocusOverride();
+
     /**
      * Remove evoked / sensor field mapping data.
      */
@@ -939,6 +985,18 @@ signals:
      */
     void shaderModeChanged(const QString &modeName);
 
+    /**
+     * Emitted on left-click when the click hits a surface.
+     * @param[in] worldPos  Hit point in world (model) coordinates.
+     */
+    void surfacePointClicked(const QVector3D &worldPos);
+
+    /**
+     * Emitted on double-click when the click hits a surface.
+     * @param[in] worldPos  Hit point in world (model) coordinates.
+     */
+    void surfacePointDoubleClicked(const QVector3D &worldPos);
+
 private slots:
     //=========================================================================================================
     /**
@@ -986,6 +1044,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
@@ -1043,6 +1102,9 @@ private:
     QQuaternion m_cameraRotation;                   /**< Global camera orientation quaternion. */
     QVector3D m_sceneCenter = QVector3D(0, 0, 0);   /**< Bounding-box centre of the scene. */
     float m_sceneSize = 0.3f;                       /**< Bounding-box diagonal of the scene (metres). */
+    bool m_cameraFocusOverride = false;              /**< When true, m_sceneCenter/m_sceneSize are user-set. */
+    QVector3D m_cameraFocusCenter;                   /**< Override center (valid when m_cameraFocusOverride). */
+    float m_cameraFocusSize = 0.3f;                  /**< Override size   (valid when m_cameraFocusOverride). */
     float m_zoom = 0.0f;                            /**< Zoom level for single-view mode. */
     QPoint m_lastMousePos;                          /**< Previous mouse position for drag deltas. */
 
