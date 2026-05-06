@@ -35,8 +35,16 @@
 #ifndef MNE_ALIGN_MNE_ALIGN_H
 #define MNE_ALIGN_MNE_ALIGN_H
 
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include <QMainWindow>
 #include <QPointer>
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 class QSplitter;
 class QLabel;
@@ -44,6 +52,10 @@ class QAction;
 class QComboBox;
 
 namespace MNELIB { class MNEBem; }
+
+//=============================================================================================================
+// DEFINE NAMESPACE MNEALIGN
+//=============================================================================================================
 
 namespace MNEALIGN
 {
@@ -55,12 +67,31 @@ class Align3DView;
 class AcquiredPoints;
 class PolhemusConnection;
 
+//=============================================================================================================
+/**
+ * @brief Top-level window for the MNE Align digitisation application.
+ *
+ * Hosts an @ref AlignWizard and an @ref Align3DView side-by-side,
+ * coordinates the @ref PolhemusConnection, and provides menu/toolbar
+ * actions for BEM loading, digitizer connection, and ICP fitting.
+ */
 class MneAlign : public QMainWindow
 {
     Q_OBJECT
 
 public:
+    //=========================================================================================================
+    /**
+     * @brief Constructs the main window.
+     *
+     * @param[in] parent   Parent widget.
+     */
     explicit MneAlign(QWidget* parent = nullptr);
+
+    //=========================================================================================================
+    /**
+     * @brief Destroys the main window.
+     */
     ~MneAlign() override;
 
 protected:
@@ -75,6 +106,7 @@ private slots:
     void onWizardBemPathChanged(const QString& path);
     void onWizardStepChanged(MNEALIGN::AlignStep step);
     void onDigitizerConnectedChanged(bool connected);
+    void onIcpFit();
 
 private:
     void buildUi();
@@ -94,6 +126,8 @@ private:
     QPointer<QComboBox>   m_pViewCountCombo;
     QPointer<QComboBox>   m_pRenderModeCombo;
     QPointer<QComboBox>   m_pCameraPresetCombo;
+    QPointer<QComboBox>   m_pCameraFocusCombo;
+    QPointer<QComboBox>   m_pPenStationCombo;
     QPointer<QLabel>      m_pStatusDigitizer;
     QPointer<QLabel>      m_pStatusBem;
 };

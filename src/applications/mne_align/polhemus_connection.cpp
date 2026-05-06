@@ -40,6 +40,7 @@ namespace {
 constexpr int    kMockTickIntervalMs = 100;
 constexpr float  kMockSphereRadiusM  = 0.10f;   // 10 cm (typical adult head)
 constexpr int    kMockPointsPerLap   = 60;
+constexpr int    kStreamPauseMs      = 300;      // pen-button pause threshold
 }
 
 //=============================================================================================================
@@ -49,6 +50,10 @@ PolhemusConnection::PolhemusConnection(QObject* parent)
 {
     m_mockTimer.setInterval(kMockTickIntervalMs);
     connect(&m_mockTimer, &QTimer::timeout, this, &PolhemusConnection::onMockTick);
+
+    m_streamPauseTimer.setSingleShot(true);
+    m_streamPauseTimer.setInterval(kStreamPauseMs);
+    connect(&m_streamPauseTimer, &QTimer::timeout, this, &PolhemusConnection::onStreamPauseTimeout);
 }
 
 //=============================================================================================================
@@ -230,6 +235,7 @@ void PolhemusConnection::closeSerial()
     if (!m_pSerial) {
         return;
     }
+    m_streamPauseTimer.stop();
     if (m_pSerial->isOpen()) {
         // Stop continuous streaming politely before closing.
         m_pSerial->write(QByteArrayLiteral("P\r"));
@@ -271,6 +277,27 @@ void PolhemusConnection::drainParser()
 {
     FastTrakSample s;
     while (m_parser.nextSample(s)) {
+        m_lastSamples[s.station] = {s.position, s.orientation};
         emit pointReceived(s.station, s.position, s.orientation);
     }
+    // (Re-)start the pause timer on every batch of data.
+    // If the stream goes silent for kStreamPauseMs the pen button was pressed.
+    if (m_pSerial) {
+        m_streamPauseTimer.start();
+    }
+}
+
+void PolhemusConnection::onStreamPauseTimeout()
+{
+    if (!m_pSerial || !m_isConnected) return;
+
+    // The continuous stream has been silent — pen button was pressed.
+    // Emit for every station that has accumulated data; the wizard
+    // filters by pen-station so only the relevant one triggers capture.
+    for (auto it = m_lastSamples.constBegin(); it != m_lastSamples.constEnd(); ++it) {
+        emit penButtonPressed(it.key(), it.value().position, it.value().orientation);
+    }
+
+    // Restart continuous mode so the live feed resumes on release.
+    m_pSerial->write(QByteArrayLiteral("C\r"));
 }

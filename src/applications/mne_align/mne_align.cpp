@@ -41,6 +41,10 @@
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <mne/mne_bem.h>
+#include <mne/mne_bem_surface.h>
+#include <mne/mne_icp.h>
+#include <mne/mne_project_to_surface.h>
+#include <fiff/fiff_coord_trans.h>
 
 #include <QAction>
 #include <QCloseEvent>
@@ -82,6 +86,8 @@ MneAlign::MneAlign(QWidget* parent)
 
     connect(m_pWizard, &AlignWizard::requestExport,
             this, &MneAlign::onWizardExportRequest);
+    connect(m_pWizard, &AlignWizard::requestIcpFit,
+            this, &MneAlign::onIcpFit);
     connect(m_pWizard, &AlignWizard::bemPathChanged,
             this, &MneAlign::onWizardBemPathChanged);
         connect(m_pWizard, &AlignWizard::stepChanged,
@@ -116,6 +122,22 @@ void MneAlign::buildUi()
     m_pStatusDigitizer = new QLabel(QStringLiteral("Digitizer: disconnected"), this);
     statusBar()->addPermanentWidget(m_pStatusBem);
     statusBar()->addPermanentWidget(m_pStatusDigitizer);
+
+    if (m_pDigitizer && m_pView3d) {
+        connect(m_pDigitizer, &PolhemusConnection::pointReceived,
+                m_pView3d, &Align3DView::setLiveDigitizerPose);
+        connect(m_pDigitizer, &PolhemusConnection::connectedChanged,
+                m_pView3d, &Align3DView::setDigitizerConnected);
+    }
+    if (m_pView3d && m_pWizard) {
+        connect(m_pView3d, &Align3DView::surfacePointDoubleClicked,
+                m_pWizard, &AlignWizard::onSurfaceDoubleClicked);
+        // Push updated tracker→MRI transform to the wizard whenever points change
+        connect(m_pPoints, &AcquiredPoints::pointsChanged, this, [this]{
+            if (m_pWizard && m_pView3d)
+                m_pWizard->setTrackerTransform(m_pView3d->trackerToMri());
+        });
+    }
 }
 
 void MneAlign::buildMenus()
@@ -162,6 +184,14 @@ void MneAlign::buildMenus()
     m_pRenderModeCombo = new QComboBox(this);
     m_pRenderModeCombo->addItems({QStringLiteral("Anatomical"), QStringLiteral("Holographic")});
     navToolBar->addWidget(m_pRenderModeCombo);
+    navToolBar->addWidget(new QLabel(QStringLiteral("Focus:"), this));
+    m_pCameraFocusCombo = new QComboBox(this);
+    m_pCameraFocusCombo->addItems({QStringLiteral("Brain"), QStringLiteral("Pointer")});
+    navToolBar->addWidget(m_pCameraFocusCombo);
+    navToolBar->addWidget(new QLabel(QStringLiteral("Pen:"), this));
+    m_pPenStationCombo = new QComboBox(this);
+    m_pPenStationCombo->addItems({QStringLiteral("1"), QStringLiteral("2"), QStringLiteral("3"), QStringLiteral("4")});
+    navToolBar->addWidget(m_pPenStationCombo);
 
     connect(m_pViewCountCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, [this](int index) {
@@ -180,6 +210,19 @@ void MneAlign::buildMenus()
                 if (m_pView3d) {
                     m_pView3d->setRenderMode(text);
                 }
+            });
+    connect(m_pCameraFocusCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this](int index) {
+                if (m_pView3d) {
+                    m_pView3d->setCameraFocus(index == 0 ? CameraFocus::Brain
+                                                         : CameraFocus::Pointer);
+                }
+            });
+    connect(m_pPenStationCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this](int index) {
+                const int station = index + 1;
+                if (m_pView3d) m_pView3d->setPenStation(station);
+                if (m_pWizard) m_pWizard->setPenStation(station);
             });
 
     // Push-based UI sync: when BrainView changes its persisted state —
@@ -419,4 +462,75 @@ void MneAlign::onAbout()
             "<p>Stripped-down <b>mne_inspect</b> variant for Polhemus FastTrak "
             "digitisation against a head BEM and an EEG cap.</p>"
             "<p>v2.3.0</p>"));
+}
+
+void MneAlign::onIcpFit()
+{
+    using namespace MNELIB;
+    using namespace FIFFLIB;
+
+    if (!m_pPoints || !m_pView3d) return;
+    auto bem = m_pView3d->bem();
+    if (!bem || bem->isEmpty()) {
+        QMessageBox::warning(this, windowTitle(), QStringLiteral("No BEM surface loaded."));
+        return;
+    }
+
+    // Require all 3 twin fiducials and all 3 captured fiducials
+    if (!m_pPoints->hasAllTwinFiducials()) {
+        QMessageBox::warning(this, windowTitle(),
+            QStringLiteral("Twin fiducials incomplete. Click NAS, LPA, RPA on the BEM surface in Step 1."));
+        return;
+    }
+    if (!m_pPoints->hasFiducial(FiducialId::NAS)
+        || !m_pPoints->hasFiducial(FiducialId::LPA)
+        || !m_pPoints->hasFiducial(FiducialId::RPA)) {
+        QMessageBox::warning(this, windowTitle(),
+            QStringLiteral("Captured fiducials incomplete. Capture NAS, LPA, RPA with the pen in Step 2."));
+        return;
+    }
+
+    // Use the progressive alignment as initial transform
+    const QMatrix4x4 initQt = m_pView3d->trackerToMri();
+    Eigen::Matrix4f matInit;
+    for (int r = 0; r < 4; ++r)
+        for (int c = 0; c < 4; ++c)
+            matInit(r, c) = initQt(r, c);
+
+    // Build MNEProjectToSurface from the head BEM
+    MNEProjectToSurface::SPtr projSurface =
+        MNEProjectToSurface::SPtr::create((*bem)[0]);
+
+    // Build point cloud from all captured points (raw tracker space)
+    const auto& pts = m_pPoints->points();
+    if (pts.isEmpty()) return;
+
+    Eigen::MatrixXf cloud(pts.size(), 3);
+    for (int i = 0; i < pts.size(); ++i) {
+        cloud(i, 0) = pts[i].position.x();
+        cloud(i, 1) = pts[i].position.y();
+        cloud(i, 2) = pts[i].position.z();
+    }
+
+    // Run ICP refinement
+    FiffCoordTrans trans(FIFFV_COORD_HEAD, FIFFV_COORD_MRI, matInit);
+    FiffCoordTrans::addInverse(trans);
+    float rmse = 0.0f;
+    if (!performIcp(projSurface, cloud, trans, rmse, false, 20, 0.001f)) {
+        QMessageBox::warning(this, windowTitle(), QStringLiteral("ICP convergence failed."));
+        return;
+    }
+
+    // Store the refined transform back — points stay in raw tracker space,
+    // the view applies the transform for display.
+    QMatrix4x4 refined;
+    for (int r = 0; r < 4; ++r)
+        for (int c = 0; c < 4; ++c)
+            refined(r, c) = trans.trans(r, c);
+    // TODO: push refined transform to Align3DView and persist for export
+
+    m_pPoints->emitChanged();
+
+    statusBar()->showMessage(
+        QStringLiteral("ICP fit complete — RMSE: %1 mm").arg(rmse * 1000.0f, 0, 'f', 2), 10000);
 }

@@ -58,6 +58,9 @@ constexpr int kEegIdx       = 2;
 constexpr int kHspIdx       = 3;
 constexpr int kExportIdx    = 4;
 
+/** Canonical fiducial capture order. */
+constexpr FiducialId kFiducialOrder[] = {FiducialId::NAS, FiducialId::LPA, FiducialId::RPA};
+
 QString fiducialName(FiducialId id)
 {
     switch (id) {
@@ -100,6 +103,8 @@ AlignWizard::AlignWizard(AcquiredPoints* acquired,
     if (m_pDigitizer) {
         connect(m_pDigitizer, &PolhemusConnection::pointReceived,
                 this, &AlignWizard::onLivePoint);
+        connect(m_pDigitizer, &PolhemusConnection::penButtonPressed,
+                this, &AlignWizard::onPenButtonPressed);
     }
     connect(m_pPoints, &AcquiredPoints::pointsChanged,
             this, &AlignWizard::onAcquiredChanged);
@@ -151,26 +156,67 @@ void AlignWizard::setBemPath(const QString& path)
 void AlignWizard::next() { if (currentIndex() < count() - 1) setCurrentIndex(currentIndex() + 1); }
 void AlignWizard::back() { if (currentIndex() > 0)           setCurrentIndex(currentIndex() - 1); }
 
+void AlignWizard::setPenStation(int station)
+{
+    m_penStation = qBound(1, station, 4);
+}
+
 //=============================================================================================================
 // Live cursor
 //=============================================================================================================
 
-void AlignWizard::onLivePoint(int /*station*/, const QVector3D& pos, const QQuaternion& /*ori*/)
+void AlignWizard::onLivePoint(int station, const QVector3D& pos, const QQuaternion& /*ori*/)
 {
+    // Only track the pen station for capture
+    if (station != m_penStation) return;
+
     m_lastLivePos = pos;
+    const bool wasLive = m_haveLive;
     m_haveLive = true;
 
+    // First live sample: enable capture buttons
+    if (!wasLive) {
+        refreshFiducialUi();
+        refreshEegUi();
+        refreshHeadShapeUi();
+    }
+
+    const QVector3D mapped = m_trackerToMri.map(pos);
     const auto liveStr = QStringLiteral("live: (%1, %2, %3) m")
-                             .arg(pos.x(), 0, 'f', 4)
-                             .arg(pos.y(), 0, 'f', 4)
-                             .arg(pos.z(), 0, 'f', 4);
+                             .arg(mapped.x(), 0, 'f', 4)
+                             .arg(mapped.y(), 0, 'f', 4)
+                             .arg(mapped.z(), 0, 'f', 4);
     if (m_pFidLiveLabel) m_pFidLiveLabel->setText(liveStr);
     if (m_pEegLiveLabel) m_pEegLiveLabel->setText(liveStr);
     if (m_pHspLiveLabel) m_pHspLiveLabel->setText(liveStr);
 }
 
+void AlignWizard::onPenButtonPressed(int station, const QVector3D& pos, const QQuaternion& /*ori*/)
+{
+    if (station != m_penStation) return;
+
+    // Use the frozen position as the capture point
+    m_lastLivePos = pos;
+    m_haveLive    = true;
+
+    switch (currentStep()) {
+    case AlignStep::Fiducials:
+        onCaptureFiducial();
+        break;
+    case AlignStep::EegCap:
+        onCaptureEeg();
+        break;
+    case AlignStep::HeadShape:
+        onCaptureHsp();
+        break;
+    default:
+        break;
+    }
+}
+
 void AlignWizard::onAcquiredChanged()
 {
+    refreshSetupTwinUi();
     refreshFiducialUi();
     refreshEegUi();
     refreshHeadShapeUi();
@@ -210,6 +256,38 @@ QWidget* AlignWizard::buildSetupPage()
     capRow->addWidget(m_pSetupCapCombo, 1);
     lay->addLayout(capRow);
 
+    lay->addWidget(new QLabel(QStringLiteral(
+        "<b>Twin fiducials:</b> Select a fiducial below, then "
+        "<b>double-click</b> on the BEM surface to place it."), page));
+
+    // Fiducial selection buttons
+    auto* fidRow = new QHBoxLayout;
+    m_pTwinNasBtn = new QPushButton(QStringLiteral("NAS"), page);
+    m_pTwinLpaBtn = new QPushButton(QStringLiteral("LPA"), page);
+    m_pTwinRpaBtn = new QPushButton(QStringLiteral("RPA"), page);
+    m_pTwinNasBtn->setCheckable(true);
+    m_pTwinLpaBtn->setCheckable(true);
+    m_pTwinRpaBtn->setCheckable(true);
+    m_pTwinNasBtn->setChecked(true); // NAS selected by default
+    fidRow->addWidget(m_pTwinNasBtn);
+    fidRow->addWidget(m_pTwinLpaBtn);
+    fidRow->addWidget(m_pTwinRpaBtn);
+    lay->addLayout(fidRow);
+
+    auto selectFid = [this](FiducialId id) {
+        m_selectedTwinFid = id;
+        m_pTwinNasBtn->setChecked(id == FiducialId::NAS);
+        m_pTwinLpaBtn->setChecked(id == FiducialId::LPA);
+        m_pTwinRpaBtn->setChecked(id == FiducialId::RPA);
+    };
+    connect(m_pTwinNasBtn, &QPushButton::clicked, this, [selectFid]{ selectFid(FiducialId::NAS); });
+    connect(m_pTwinLpaBtn, &QPushButton::clicked, this, [selectFid]{ selectFid(FiducialId::LPA); });
+    connect(m_pTwinRpaBtn, &QPushButton::clicked, this, [selectFid]{ selectFid(FiducialId::RPA); });
+
+    m_pSetupTwinFidLabel = new QLabel(page);
+    m_pSetupTwinFidLabel->setTextFormat(Qt::RichText);
+    lay->addWidget(m_pSetupTwinFidLabel);
+
     lay->addStretch(1);
 
     connect(bemBtn, &QPushButton::clicked, this, &AlignWizard::onPickBemFile);
@@ -239,6 +317,52 @@ void AlignWizard::onCapComboChanged(int index)
     refreshEegUi();
 }
 
+void AlignWizard::onSurfaceDoubleClicked(const QVector3D& worldPos)
+{
+    // Only handle double-clicks in the Setup step
+    if (currentStep() != AlignStep::Setup) return;
+
+    // Place the currently selected twin fiducial
+    m_pPoints->setTwinFiducial(m_selectedTwinFid, worldPos);
+    refreshSetupTwinUi();
+
+    // Auto-advance to next unset fiducial
+    for (FiducialId id : kFiducialOrder) {
+        if (!m_pPoints->hasTwinFiducial(id)) {
+            m_selectedTwinFid = id;
+            if (m_pTwinNasBtn) m_pTwinNasBtn->setChecked(id == FiducialId::NAS);
+            if (m_pTwinLpaBtn) m_pTwinLpaBtn->setChecked(id == FiducialId::LPA);
+            if (m_pTwinRpaBtn) m_pTwinRpaBtn->setChecked(id == FiducialId::RPA);
+            break;
+        }
+    }
+}
+
+void AlignWizard::refreshSetupTwinUi()
+{
+    if (!m_pSetupTwinFidLabel) return;
+
+    QString html;
+    for (FiducialId id : kFiducialOrder) {
+        const bool have = m_pPoints->hasTwinFiducial(id);
+        const bool selected = (id == m_selectedTwinFid);
+        const QString mark = have ? QStringLiteral("✔") : QStringLiteral("○");
+        QString posStr;
+        if (have) {
+            const QVector3D p = m_pPoints->twinFiducial(id);
+            posStr = QStringLiteral(" (%1, %2, %3)")
+                         .arg(p.x(), 0, 'f', 4).arg(p.y(), 0, 'f', 4).arg(p.z(), 0, 'f', 4);
+        }
+        const QString style = selected ? QStringLiteral(" style='color:#FFD700;'") : QString();
+        html += QStringLiteral("<span%4>%1 <b>%2</b>%3</span><br>")
+                    .arg(mark, fiducialName(id), posStr, style);
+    }
+
+    html += QStringLiteral("Double-click on surface to place <b>%1</b>")
+                .arg(fiducialName(m_selectedTwinFid));
+    m_pSetupTwinFidLabel->setText(html);
+}
+
 //=============================================================================================================
 // Fiducials page
 //=============================================================================================================
@@ -250,12 +374,37 @@ QWidget* AlignWizard::buildFiducialsPage()
 
     lay->addWidget(new QLabel(QStringLiteral("<h2>Step 2 — Fiducials</h2>"
                                               "Capture <b>NAS</b>, <b>LPA</b>, <b>RPA</b> in turn. "
-                                              "Hold the stylus on the landmark and press "
-                                              "<b>Capture</b>."), page));
+                                              "Hold the stylus on the landmark and press the "
+                                              "<b>pen button</b> to capture, or use the button below."), page));
 
     m_pFidStatusLabel = new QLabel(page);
     m_pFidStatusLabel->setTextFormat(Qt::RichText);
     lay->addWidget(m_pFidStatusLabel);
+
+    // Fiducial selection buttons — click to (re)select target
+    auto* fidRow = new QHBoxLayout;
+    m_pFidNasBtn = new QPushButton(QStringLiteral("NAS"), page);
+    m_pFidLpaBtn = new QPushButton(QStringLiteral("LPA"), page);
+    m_pFidRpaBtn = new QPushButton(QStringLiteral("RPA"), page);
+    m_pFidNasBtn->setCheckable(true);
+    m_pFidLpaBtn->setCheckable(true);
+    m_pFidRpaBtn->setCheckable(true);
+    m_pFidNasBtn->setChecked(true);
+    fidRow->addWidget(m_pFidNasBtn);
+    fidRow->addWidget(m_pFidLpaBtn);
+    fidRow->addWidget(m_pFidRpaBtn);
+    lay->addLayout(fidRow);
+
+    auto selectFidTarget = [this](FiducialId id) {
+        m_selectedFiducial = id;
+        m_pFidNasBtn->setChecked(id == FiducialId::NAS);
+        m_pFidLpaBtn->setChecked(id == FiducialId::LPA);
+        m_pFidRpaBtn->setChecked(id == FiducialId::RPA);
+        refreshFiducialUi();
+    };
+    connect(m_pFidNasBtn, &QPushButton::clicked, this, [selectFidTarget]{ selectFidTarget(FiducialId::NAS); });
+    connect(m_pFidLpaBtn, &QPushButton::clicked, this, [selectFidTarget]{ selectFidTarget(FiducialId::LPA); });
+    connect(m_pFidRpaBtn, &QPushButton::clicked, this, [selectFidTarget]{ selectFidTarget(FiducialId::RPA); });
 
     m_pFidLiveLabel = new QLabel(QStringLiteral("live: —"), page);
     lay->addWidget(m_pFidLiveLabel);
@@ -277,8 +426,7 @@ QWidget* AlignWizard::buildFiducialsPage()
 
 FiducialId AlignWizard::nextFiducial(bool* allDone) const
 {
-    static constexpr FiducialId kOrder[] = {FiducialId::NAS, FiducialId::LPA, FiducialId::RPA};
-    for (FiducialId id : kOrder) {
+    for (FiducialId id : kFiducialOrder) {
         if (!m_pPoints->hasFiducial(id)) {
             if (allDone) *allDone = false;
             return id;
@@ -292,30 +440,23 @@ void AlignWizard::refreshFiducialUi()
 {
     if (!m_pFidStatusLabel) return;
 
-    QString html = QStringLiteral("<table>");
-    static constexpr FiducialId kOrder[] = {FiducialId::NAS, FiducialId::LPA, FiducialId::RPA};
-    for (FiducialId id : kOrder) {
+    QString html;
+    for (FiducialId id : kFiducialOrder) {
         const bool have = m_pPoints->hasFiducial(id);
+        const bool selected = (id == m_selectedFiducial);
         const QString mark = have ? QStringLiteral("✔") : QStringLiteral("○");
-        html += QStringLiteral("<tr><td>%1</td><td><b>%2</b></td></tr>")
-                    .arg(mark, fiducialName(id));
+        const QString style = selected ? QStringLiteral(" style='color:#FFD700;'") : QString();
+        html += QStringLiteral("<span%3>%1 <b>%2</b></span><br>")
+                    .arg(mark, fiducialName(id), style);
     }
-    html += QStringLiteral("</table>");
-
-    bool allDone = false;
-    const FiducialId next = nextFiducial(&allDone);
-    if (allDone) {
-        html += QStringLiteral("<p>All fiducials captured. Continue with EEG.</p>");
-    } else {
-        html += QStringLiteral("<p>Next: <b>%1</b></p>").arg(fiducialName(next));
-    }
+    html += QStringLiteral("Target: <b>%1</b> — press pen button or Capture")
+                .arg(fiducialName(m_selectedFiducial));
     m_pFidStatusLabel->setText(html);
 
     if (m_pFidCaptureBtn) {
-        m_pFidCaptureBtn->setEnabled(!allDone && m_haveLive);
-        m_pFidCaptureBtn->setText(allDone
-            ? QStringLiteral("Capture")
-            : QStringLiteral("Capture %1").arg(fiducialName(next)));
+        m_pFidCaptureBtn->setEnabled(m_haveLive);
+        m_pFidCaptureBtn->setText(
+            QStringLiteral("Capture %1").arg(fiducialName(m_selectedFiducial)));
     }
     if (m_pFidUndoBtn) {
         m_pFidUndoBtn->setEnabled(m_pPoints->countOf(PointKind::Fiducial) > 0);
@@ -325,16 +466,32 @@ void AlignWizard::refreshFiducialUi()
 void AlignWizard::onCaptureFiducial()
 {
     if (!m_haveLive) return;
-    bool allDone = false;
-    const FiducialId next = nextFiducial(&allDone);
-    if (allDone) return;
+
+    const FiducialId target = m_selectedFiducial;
+
+    // Remove existing capture of this fiducial if re-recording
+    if (m_pPoints->hasFiducial(target)) {
+        m_pPoints->removeFiducial(target);
+    }
 
     DigitizedPoint p;
     p.kind        = PointKind::Fiducial;
-    p.label       = fiducialName(next);
-    p.identNumber = static_cast<int>(next);
+    p.label       = fiducialName(target);
+    p.identNumber = static_cast<int>(target);
     p.position    = m_lastLivePos;
     m_pPoints->append(p);
+
+    // Auto-advance to next uncaptured fiducial
+    for (FiducialId id : kFiducialOrder) {
+        if (!m_pPoints->hasFiducial(id)) {
+            m_selectedFiducial = id;
+            if (m_pFidNasBtn) m_pFidNasBtn->setChecked(id == FiducialId::NAS);
+            if (m_pFidLpaBtn) m_pFidLpaBtn->setChecked(id == FiducialId::LPA);
+            if (m_pFidRpaBtn) m_pFidRpaBtn->setChecked(id == FiducialId::RPA);
+            break;
+        }
+    }
+    refreshFiducialUi();
 }
 
 void AlignWizard::onUndoFiducial()
@@ -353,8 +510,8 @@ QWidget* AlignWizard::buildEegCapPage()
 
     lay->addWidget(new QLabel(QStringLiteral("<h2>Step 3 — EEG electrodes</h2>"
                                               "Walk the cap and capture every electrode. "
-                                              "The list shows the configured montage; "
-                                              "captured electrodes are marked with ✔."), page));
+                                              "Press the <b>pen button</b> or the button below. "
+                                              "Captured electrodes are marked with ✔."), page));
 
     m_pEegList = new QListWidget(page);
     m_pEegList->setSelectionMode(QAbstractItemView::NoSelection);
@@ -457,9 +614,9 @@ QWidget* AlignWizard::buildHeadShapePage()
     auto* lay  = new QVBoxLayout(page);
 
     lay->addWidget(new QLabel(QStringLiteral("<h2>Step 4 — Head shape</h2>"
-                                              "Sweep the stylus over the scalp and press "
-                                              "<b>Capture</b> to add additional head-shape points. "
-                                              "These are written as FIFF <code>EXTRA</code> points."), page));
+                                              "Sweep the stylus over the scalp and press the "
+                                              "<b>pen button</b> or <b>Capture</b> below to add "
+                                              "head-shape points (FIFF <code>EXTRA</code>)."), page));
 
     m_pHspCountLabel = new QLabel(page);
     lay->addWidget(m_pHspCountLabel);
@@ -518,17 +675,25 @@ QWidget* AlignWizard::buildExportPage()
     auto* lay  = new QVBoxLayout(page);
 
     lay->addWidget(new QLabel(QStringLiteral("<h2>Step 5 — Export</h2>"
-                                              "Save the captured digitisation as a FIFF "
+                                              "Refine the coregistration with ICP, then save "
+                                              "the captured digitisation as a FIFF "
                                               "<code>FIFFB_ISOTRAK</code> point set."), page));
 
     m_pExportSummaryLabel = new QLabel(page);
     m_pExportSummaryLabel->setTextFormat(Qt::RichText);
     lay->addWidget(m_pExportSummaryLabel);
 
+    auto* icpBtn = new QPushButton(QStringLiteral("Run ICP Fit"), page);
+    lay->addWidget(icpBtn);
+    m_pIcpStatusLabel = new QLabel(page);
+    m_pIcpStatusLabel->setTextFormat(Qt::RichText);
+    lay->addWidget(m_pIcpStatusLabel);
+
     auto* btn = new QPushButton(QStringLiteral("Save digitization…"), page);
     lay->addWidget(btn);
     lay->addStretch(1);
 
+    connect(icpBtn, &QPushButton::clicked, this, [this]() { emit requestIcpFit(); });
     connect(btn, &QPushButton::clicked, this, &AlignWizard::onExportClicked);
     return page;
 }

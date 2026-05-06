@@ -37,11 +37,19 @@
 
 #ifndef MNE_ALIGN_ACQUIRED_POINTS_H
 #define MNE_ALIGN_ACQUIRED_POINTS_H
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
 
+#include <QMap>
 #include <QObject>
 #include <QString>
 #include <QVector>
 #include <QVector3D>
+
+//=============================================================================================================
+// DEFINE NAMESPACE MNEALIGN
+//=============================================================================================================
 
 namespace MNEALIGN
 {
@@ -144,10 +152,54 @@ public:
         return false;
     }
 
+    /** Remove a previously captured fiducial so it can be re-recorded. */
+    void removeFiducial(FiducialId id) {
+        for (int i = m_points.size() - 1; i >= 0; --i) {
+            if (m_points[i].kind == PointKind::Fiducial
+                && m_points[i].identNumber == static_cast<int>(id)) {
+                m_points.removeAt(i);
+            }
+        }
+        emit pointsChanged();
+    }
+
     int countOf(PointKind kind) const {
         int n = 0;
         for (const auto& p : m_points) if (p.kind == kind) ++n;
         return n;
+    }
+
+    void setPosition(int index, const QVector3D& pos) {
+        if (index >= 0 && index < m_points.size())
+            m_points[index].position = pos;
+    }
+
+    void emitChanged() { emit pointsChanged(); }
+
+    // ── Twin (BEM-space) fiducials — clicked on digital twin surface ──
+
+    void setTwinFiducial(FiducialId id, const QVector3D& pos) {
+        m_twinFiducials[static_cast<int>(id)] = pos;
+        emit pointsChanged();
+    }
+
+    void clearTwinFiducial(FiducialId id) {
+        m_twinFiducials.remove(static_cast<int>(id));
+        emit pointsChanged();
+    }
+
+    bool hasTwinFiducial(FiducialId id) const {
+        return m_twinFiducials.contains(static_cast<int>(id));
+    }
+
+    QVector3D twinFiducial(FiducialId id) const {
+        return m_twinFiducials.value(static_cast<int>(id));
+    }
+
+    bool hasAllTwinFiducials() const {
+        return hasTwinFiducial(FiducialId::NAS)
+            && hasTwinFiducial(FiducialId::LPA)
+            && hasTwinFiducial(FiducialId::RPA);
     }
 
 signals:
@@ -155,6 +207,7 @@ signals:
 
 private:
     QVector<DigitizedPoint> m_points;
+    QMap<int, QVector3D> m_twinFiducials; ///< BEM-space fiducials keyed by FiducialId
 };
 
 } // namespace MNEALIGN

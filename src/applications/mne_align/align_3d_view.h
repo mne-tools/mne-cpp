@@ -41,10 +41,22 @@
 #ifndef MNE_ALIGN_ALIGN_3D_VIEW_H
 #define MNE_ALIGN_ALIGN_3D_VIEW_H
 
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <QMap>
+#include <QMatrix4x4>
 #include <QPointer>
+#include <QQuaternion>
+#include <QTimer>
 #include <QWidget>
 
 #include <memory>
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 class BrainTreeModel;
 class BrainView;
@@ -52,53 +64,172 @@ class BrainView;
 namespace DISP3DLIB { class MultimodalScene; }
 namespace MNELIB    { class MNEBem; }
 
+//=============================================================================================================
+// DEFINE NAMESPACE MNEALIGN
+//=============================================================================================================
+
 namespace MNEALIGN
 {
 
 class AcquiredPoints;
 
+//=============================================================================================================
+/**
+ * @brief Camera focus mode for the 3-D viewer.
+ */
+enum class CameraFocus { Brain, Pointer };
+
+//=============================================================================================================
+/**
+ * @brief 3-D viewer widget for the MNE Align digitisation workflow.
+ *
+ * Hosts a @ref DISP3DLIB::MultimodalScene, renders the head BEM mesh,
+ * digitised points, and live Polhemus tracker markers. Manages the
+ * device→head and head→MRI transform chain.
+ */
 class Align3DView : public QWidget
 {
     Q_OBJECT
 
 public:
+    //=========================================================================================================
+    /**
+     * @brief Constructs the 3-D viewer.
+     *
+     * @param[in] acquired   Shared digitised-point store (not owned).
+     * @param[in] parent     Parent widget.
+     */
     explicit Align3DView(AcquiredPoints* acquired, QWidget* parent = nullptr);
+
+    //=========================================================================================================
+    /**
+     * @brief Destroys the 3-D viewer.
+     */
     ~Align3DView() override;
 
-    /** Replace any previously registered head BEM. */
+    //=========================================================================================================
+    /**
+     * @brief Replace any previously registered head BEM.
+     *
+     * @param[in] bem   BEM model to display.
+     */
     void setBem(std::shared_ptr<MNELIB::MNEBem> bem);
+
+    /**
+     * @brief Set the number of viewport panes (1–4).
+     *
+     * @param[in] count   Number of viewports.
+     */
     void setViewCount(int count);
+
+    /**
+     * @brief Set the render shader mode ("Anatomical" or "Holographic").
+     *
+     * @param[in] modeName   Shader mode name.
+     */
     void setRenderMode(const QString& modeName);
+
+    /**
+     * @brief Set the camera preset index (0–6).
+     *
+     * @param[in] preset   Camera preset index.
+     */
     void setCameraPreset(int preset);
 
-    /** Camera preset index last set via setCameraPreset(). Camera state
-     *  itself is owned by BrainView (as a quaternion) so this is the
-     *  only piece the host application has to track for its toolbar. */
-    int     cameraPreset() const { return m_cameraPreset; }
+    /**
+     * @brief Set the camera focus target.
+     *
+     * @param[in] focus   Camera focus mode.
+     */
+    void setCameraFocus(CameraFocus focus);
 
-    /** Access the underlying scene (used by the QRhi renderer). */
+    /**
+     * @brief Set the Polhemus pen station number (1–4).
+     *
+     * @param[in] station   Pen station id.
+     */
+    void setPenStation(int station);
+
+    /** @return Current camera preset index. */
+    int         cameraPreset() const { return m_cameraPreset; }
+
+    /** @return Current camera focus mode. */
+    CameraFocus cameraFocus()  const { return m_cameraFocus; }
+
+    /** @return The underlying multimodal scene. */
     DISP3DLIB::MultimodalScene* scene() const;
 
+    /** @return The loaded BEM data (may be null). */
+    std::shared_ptr<MNELIB::MNEBem> bem() const { return m_pBem; }
+
+    /** @return Combined device→MRI transform (device→head × head→MRI). */
+    QMatrix4x4 trackerToMri() const { return m_headToMri * m_deviceToHead; }
+
+    /** @return Device→Head transform (runtime, not stored in trans.fif). */
+    QMatrix4x4 deviceToHead() const { return m_deviceToHead; }
+
+    /** @return Head→MRI coregistration (stored in trans.fif). */
+    QMatrix4x4 headToMri() const { return m_headToMri; }
+
+    /**
+     * @brief Notify that the digitizer connection state changed.
+     *
+     * @param[in] connected   True if a digitizer is connected.
+     */
+    void setDigitizerConnected(bool connected);
+
+    /**
+     * @brief Push a live tracker pose from the digitizer.
+     *
+     * @param[in] station      Polhemus station id (1–4).
+     * @param[in] position     Position in metres, sensor frame.
+     * @param[in] orientation  Sensor orientation quaternion.
+     */
+    void setLiveDigitizerPose(int station, const QVector3D& position, const QQuaternion& orientation);
+
 signals:
-    /** Forwarded from BrainView::viewCountChanged — fires both on user
-     *  changes and after persisted state is restored at startup. */
+    /** @brief Emitted when the viewport count changes. */
     void viewCountChanged(int count);
-    /** Forwarded from BrainView::shaderModeChanged. */
+
+    /** @brief Emitted when the render shader mode changes. */
     void renderModeChanged(const QString& modeName);
+
+    /** @brief Emitted on single-click ray-pick against the BEM surface. */
+    void surfacePointClicked(const QVector3D& worldPos);
+
+    /** @brief Emitted on double-click ray-pick against the BEM surface. */
+    void surfacePointDoubleClicked(const QVector3D& worldPos);
 
 private slots:
     void onPointsChanged();
+    void onLiveUpdateTick();
 
 private:
     void rebuildAcquiredLayer();
     void rebuildBemSurfaces();
     void rebuildDigitizerLayer();
+    void rebuildStaticMarkers();
+    void recomputeAlignment();
     void applyViewConfiguration();
 
     AcquiredPoints*                                m_pPoints = nullptr;
     std::unique_ptr<DISP3DLIB::MultimodalScene>    m_pScene;
     std::shared_ptr<MNELIB::MNEBem>                m_pBem;
     int                                            m_cameraPreset = 1;
+    CameraFocus                                    m_cameraFocus = CameraFocus::Brain;
+    int                                            m_penStation = 1;
+
+    // Per-station live tracker state
+    struct StationPose {
+        QVector3D   position;
+        QQuaternion orientation;
+    };
+    bool                                           m_digitizerConnected = false;
+    bool                                           m_liveTrackerDirty = false;
+    QMap<int, StationPose>                         m_stationPoses;
+    QTimer                                         m_liveUpdateTimer;
+    QMatrix4x4                                     m_deviceToHead;  ///< runtime offset, not in trans.fif
+    QMatrix4x4                                     m_headToMri;     ///< coregistration for trans.fif
 
     QPointer<BrainView>                            m_pBrainView;
     QPointer<BrainTreeModel>                       m_pBrainModel;

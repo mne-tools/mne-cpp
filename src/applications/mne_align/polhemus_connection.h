@@ -74,7 +74,7 @@ namespace MNEALIGN
 struct PolhemusSerialConfig
 {
     int                       baudRate = 115200;
-    FastTrakParser::Units     units    = FastTrakParser::Units::Centimetres;
+    FastTrakParser::Units     units    = FastTrakParser::Units::Inches;
     /** Stream control command sent right after opening the port. The
      *  factory default for FastTrak is `"C\r"` (continuous ASCII output);
      *  use `"P\r"` if the application drives polled mode itself. */
@@ -146,10 +146,21 @@ signals:
     /** Non-fatal protocol/IO error (already logged by the backend). */
     void errorOccurred(const QString& message);
 
+    /**
+     * Emitted when the continuous stream pauses (pen button pressed).
+     * The last received position/orientation are provided so the caller
+     * can record the capture without a separate GUI button click.
+     *
+     * After emitting, the connection automatically restarts the
+     * continuous stream so the live feed resumes on button release.
+     */
+    void penButtonPressed(int station, const QVector3D& position, const QQuaternion& orientation);
+
 private slots:
     void onMockTick();
     void onSerialReadyRead();
     void onSerialError(QSerialPort::SerialPortError err);
+    void onStreamPauseTimeout();
 
 private:
     bool openMock();
@@ -169,6 +180,11 @@ private:
     // Serial backend ----------------------------------------------------------
     QSerialPort*    m_pSerial = nullptr;
     FastTrakParser  m_parser;
+
+    // Pen-button detection (stream-pause timeout) -----------------------------
+    QTimer      m_streamPauseTimer;
+    struct StationSample { QVector3D position; QQuaternion orientation; };
+    QMap<int, StationSample> m_lastSamples;
 };
 
 } // namespace MNEALIGN
