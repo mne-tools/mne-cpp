@@ -34,7 +34,7 @@
 
 #include <QtMath>
 
-using namespace MNEALIGN;
+using namespace UTILSLIB;
 
 namespace {
 constexpr int    kMockTickIntervalMs = 100;
@@ -136,10 +136,6 @@ QStringList PolhemusConnection::availablePorts()
 
 QString PolhemusConnection::autoDetectPortName()
 {
-    // Polhemus FastTrak/FastSCAN units use one of two USB-serial bridges:
-    //   * Polhemus-branded FTDI VID 0x0F44
-    //   * Generic FTDI VID 0x0403 (older / OEM units)
-    // We prefer the Polhemus VID, then fall back to any FTDI device.
     constexpr quint16 kPolhemusVid = 0x0F44;
     constexpr quint16 kFtdiVid     = 0x0403;
 
@@ -178,9 +174,6 @@ void PolhemusConnection::closeMock()
 
 void PolhemusConnection::onMockTick()
 {
-    // Sweep around the equator of a 10 cm sphere centred at the origin —
-    // good enough to drive the wizard's HSP step end-to-end for tests
-    // and visual smoke checks.
     const double phase = (2.0 * M_PI * (m_mockSampleIdx % kMockPointsPerLap))
                          / static_cast<double>(kMockPointsPerLap);
     const double elevation = 0.3 * std::sin(phase * 3.0);
@@ -237,7 +230,6 @@ void PolhemusConnection::closeSerial()
     }
     m_streamPauseTimer.stop();
     if (m_pSerial->isOpen()) {
-        // Stop continuous streaming politely before closing.
         m_pSerial->write(QByteArrayLiteral("P\r"));
         m_pSerial->flush();
         m_pSerial->close();
@@ -268,7 +260,6 @@ void PolhemusConnection::onSerialError(QSerialPort::SerialPortError err)
     emit errorOccurred(msg);
 
     if (err == QSerialPort::ResourceError || err == QSerialPort::DeviceNotFoundError) {
-        // Hardware has gone away — tear down so the UI reflects it.
         close();
     }
 }
@@ -280,8 +271,6 @@ void PolhemusConnection::drainParser()
         m_lastSamples[s.station] = {s.position, s.orientation};
         emit pointReceived(s.station, s.position, s.orientation);
     }
-    // (Re-)start the pause timer on every batch of data.
-    // If the stream goes silent for kStreamPauseMs the pen button was pressed.
     if (m_pSerial) {
         m_streamPauseTimer.start();
     }
@@ -291,13 +280,9 @@ void PolhemusConnection::onStreamPauseTimeout()
 {
     if (!m_pSerial || !m_isConnected) return;
 
-    // The continuous stream has been silent — pen button was pressed.
-    // Emit for every station that has accumulated data; the wizard
-    // filters by pen-station so only the relevant one triggers capture.
     for (auto it = m_lastSamples.constBegin(); it != m_lastSamples.constEnd(); ++it) {
         emit penButtonPressed(it.key(), it.value().position, it.value().orientation);
     }
 
-    // Restart continuous mode so the live feed resumes on release.
     m_pSerial->write(QByteArrayLiteral("C\r"));
 }

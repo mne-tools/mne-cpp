@@ -27,12 +27,12 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @brief    Implementation of @ref MNEALIGN::FastTrakParser.
+ * @brief    Implementation of @ref UTILSLIB::FastTrakParser.
  */
 
 #include "fasttrak_parser.h"
 
-using namespace MNEALIGN;
+using namespace UTILSLIB;
 
 namespace {
 
@@ -90,8 +90,7 @@ bool FastTrakParser::parseRecord(const QByteArray& record, Units units, FastTrak
         const float ro = parseFloat(tokens[6]);
         if (ok) {
             // Polhemus convention: yaw (azimuth, Z), pitch (elevation, Y), roll (X),
-            // intrinsic ZYX order. QQuaternion::fromEulerAngles uses (pitch, yaw, roll)
-            // around (X, Y, Z) intrinsic; pre-compose explicitly to avoid surprises.
+            // intrinsic ZYX order. Pre-compose explicitly to avoid surprises.
             const QQuaternion qZ = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, az);
             const QQuaternion qY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, el);
             const QQuaternion qX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, ro);

@@ -8,7 +8,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Gui)
+set(QT_REQUIRED_COMPONENTS Core Gui SerialPort)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
@@ -18,6 +18,8 @@ set(SOURCES
   layoutmaker.cpp
   selectionio.cpp
   montage/standard_montage.cpp
+  polhemus/fasttrak_parser.cpp
+  polhemus/polhemus_connection.cpp
   report.cpp
   generics/observerpattern.cpp
   generics/mne_logger.cpp
@@ -32,6 +34,9 @@ set(HEADERS
   layoutmaker.h
   selectionio.h
   montage/standard_montage.h
+  polhemus/acquired_points.h
+  polhemus/fasttrak_parser.h
+  polhemus/polhemus_connection.h
   report.h
   generics/circularbuffer.h
   generics/commandpattern.h

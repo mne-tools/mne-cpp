@@ -16,17 +16,12 @@ set(SOURCES
     mne_align.cpp
     align_wizard.cpp
     align_3d_view.cpp
-    polhemus_connection.cpp
-    fasttrak_parser.cpp
 )
 
 set(HEADERS
     mne_align.h
     align_wizard.h
     align_3d_view.h
-    polhemus_connection.h
-    fasttrak_parser.h
-    acquired_points.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
