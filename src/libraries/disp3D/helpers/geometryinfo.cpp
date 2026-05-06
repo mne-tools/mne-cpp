@@ -45,14 +45,19 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <atomic>
 #include <cmath>
 #include <fstream>
+#include <queue>
 #include <set>
+#include <utility>
+#include <vector>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QThread>
 #include <QtConcurrent/QtConcurrent>
 
 //=============================================================================================================
@@ -166,59 +171,151 @@ QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
         qint32 sourceIdx;
         float dist;
     };
+    struct WeightTriple {
+        qint32 vertex;
+        qint32 sourceIdx;
+        float  dist;
+    };
 
-    // We'll collect per-vertex sparse distance info
-    // Using a vector of vectors: for each mesh vertex, store (sourceIdx, dist) pairs
-    std::vector<std::vector<VertexWeight>> perVertexWeights(nVerts);
+    // Parallelize the per-source Dijkstra loop. Sources are independent;
+    // each worker keeps its own thread-local Dijkstra scratch buffers and
+    // emits a flat list of (vertex, source, dist) triples. A final
+    // single-threaded merge pass groups them per mesh vertex. This recovers
+    // the multi-core scaling that the legacy scdc() path used to provide.
+    int iCores = QThread::idealThreadCount();
+    if (iCores <= 0) {
+        iCores = 2;
+    }
+#ifdef __EMSCRIPTEN__
+    iCores = qMin(iCores, 2);
+#endif
+    iCores = qMin(iCores, qMax(1, static_cast<int>(nSources)));
 
-    // Process sources sequentially (each Dijkstra is already fast with cancelDist)
-    QVector<double> vecMinDists(nAdj);
-    std::set<std::pair<double, qint32>> vertexQ;
-    const double INF = FLOAT_INFINITY;
+    std::atomic<bool> internalCancel(false);
+    const std::atomic<bool> *cancelView = cancelledFlag ? cancelledFlag : &internalCancel;
 
-    for (qint32 s = 0; s < nSources; ++s) {
-        if (cancelledFlag && cancelledFlag->load(std::memory_order_relaxed))
-            return QSharedPointer<SparseMatrix<float>>();
+    std::atomic<qint32> progressCounter(0);
 
-        if (progressCallback && s > 0 && s % 100 == 0) {
-            progressCallback(s, nSources);
-        }
+    std::vector<std::vector<WeightTriple>> perThreadTriples(iCores);
 
-        qint32 iRoot = vecVertSubset[s];
-        vertexQ.clear();
-        vecMinDists.fill(INF);
-        vecMinDists[iRoot] = 0.0;
-        vertexQ.insert(std::make_pair(0.0, iRoot));
+    auto worker = [&](int threadIdx, qint32 sBegin, qint32 sEnd) {
+        std::vector<WeightTriple> &out = perThreadTriples[threadIdx];
+        // Heuristic reserve: average ~32 reachable vertices per source.
+        out.reserve(static_cast<size_t>(sEnd - sBegin) * 32);
 
-        while (!vertexQ.empty()) {
-            const double dDist = vertexQ.begin()->first;
-            const qint32 u = vertexQ.begin()->second;
-            vertexQ.erase(vertexQ.begin());
+        // Thread-local Dijkstra scratch.
+        std::vector<float> vecMinDists(nAdj, FLOAT_INFINITY);
+        // Track which entries we touched so we only have to reset those
+        // between sources (avoids O(nVerts) fill() per source).
+        std::vector<qint32> touched;
+        touched.reserve(1024);
 
-            if (dDist <= dCancelDist) {
-                const VectorXi& vecNeighbours = vecNeighborVertices[u];
+        // Lazy-deletion priority queue: push (dist, vertex); skip stale entries
+        // when popping. ~3-5x faster than std::set for Dijkstra.
+        using QueueEntry = std::pair<float, qint32>;
+        std::priority_queue<QueueEntry, std::vector<QueueEntry>, std::greater<QueueEntry>> vertexQ;
+
+        const float fCancelDist = static_cast<float>(dCancelDist);
+
+        for (qint32 s = sBegin; s < sEnd; ++s) {
+            // Cooperative cancellation; only check every 16 sources to keep
+            // the atomic load out of the hot inner loop.
+            if (((s - sBegin) & 0xF) == 0
+                && cancelView->load(std::memory_order_relaxed)) {
+                return;
+            }
+
+            const qint32 iRoot = vecVertSubset[s];
+
+            // Reset only previously-touched slots.
+            for (qint32 idx : touched) vecMinDists[idx] = FLOAT_INFINITY;
+            touched.clear();
+            while (!vertexQ.empty()) vertexQ.pop();
+
+            vecMinDists[iRoot] = 0.0f;
+            touched.push_back(iRoot);
+            vertexQ.emplace(0.0f, iRoot);
+
+            while (!vertexQ.empty()) {
+                const float fDist = vertexQ.top().first;
+                const qint32 u   = vertexQ.top().second;
+                vertexQ.pop();
+
+                // Stale entry from lazy deletion?
+                if (fDist > vecMinDists[u]) continue;
+                if (fDist > fCancelDist)    continue;
+
+                const VectorXi &vecNeighbours = vecNeighborVertices[u];
+                const float ux = matVertices(u, 0);
+                const float uy = matVertices(u, 1);
+                const float uz = matVertices(u, 2);
 
                 for (Eigen::Index ne = 0; ne < vecNeighbours.size(); ++ne) {
-                    qint32 v = vecNeighbours[ne];
+                    const qint32 v = vecNeighbours[ne];
+                    const float dx = ux - matVertices(v, 0);
+                    const float dy = uy - matVertices(v, 1);
+                    const float dz = uz - matVertices(v, 2);
+                    const float fDistWithU = fDist + std::sqrt(dx*dx + dy*dy + dz*dz);
 
-                    const double dDistX = matVertices(u, 0) - matVertices(v, 0);
-                    const double dDistY = matVertices(u, 1) - matVertices(v, 1);
-                    const double dDistZ = matVertices(u, 2) - matVertices(v, 2);
-                    const double dDistWithU = dDist + sqrt(dDistX * dDistX + dDistY * dDistY + dDistZ * dDistZ);
-
-                    if (dDistWithU < vecMinDists[v]) {
-                        vertexQ.erase(std::make_pair(vecMinDists[v], v));
-                        vecMinDists[v] = dDistWithU;
-                        vertexQ.insert(std::make_pair(vecMinDists[v], v));
+                    if (fDistWithU < vecMinDists[v]) {
+                        if (vecMinDists[v] == FLOAT_INFINITY)
+                            touched.push_back(v);
+                        vecMinDists[v] = fDistWithU;
+                        if (fDistWithU <= fCancelDist)
+                            vertexQ.emplace(fDistWithU, v);
                     }
                 }
             }
-        }
 
-        // Collect all vertices reachable from this source within cancelDist
-        for (qint32 m = 0; m < nAdj; ++m) {
-            if (vecMinDists[m] < dCancelDist) {
-                perVertexWeights[m].push_back({s, static_cast<float>(vecMinDists[m])});
+            // Collect reachable vertices for this source.
+            for (qint32 idx : touched) {
+                const float d = vecMinDists[idx];
+                if (d < fCancelDist) {
+                    out.push_back({idx, s, d});
+                }
+            }
+
+            if (progressCallback) {
+                const qint32 done = progressCounter.fetch_add(1, std::memory_order_relaxed) + 1;
+                if ((done % 100) == 0) {
+                    progressCallback(done, nSources);
+                }
+            }
+        }
+    };
+
+    if (iCores <= 1) {
+        worker(0, 0, nSources);
+    } else {
+        QVector<QFuture<void>> vecThreads;
+        vecThreads.reserve(iCores);
+        const qint32 chunk = nSources / iCores;
+        qint32 sBegin = 0;
+        for (int t = 0; t < iCores; ++t) {
+            const qint32 sEnd = (t == iCores - 1) ? nSources : (sBegin + chunk);
+            vecThreads.push_back(QtConcurrent::run(worker, t, sBegin, sEnd));
+            sBegin = sEnd;
+        }
+        for (QFuture<void> &f : vecThreads) f.waitForFinished();
+    }
+
+    if (cancelView->load(std::memory_order_relaxed))
+        return QSharedPointer<SparseMatrix<float>>();
+
+    // Merge thread-local triples into the per-vertex list.
+    std::vector<std::vector<VertexWeight>> perVertexWeights(nVerts);
+    {
+        // Pre-size each per-vertex bucket to avoid repeated reallocations.
+        std::vector<size_t> counts(nVerts, 0);
+        for (const auto &chunk : perThreadTriples) {
+            for (const auto &t : chunk) ++counts[t.vertex];
+        }
+        for (qint32 v = 0; v < nVerts; ++v) {
+            if (counts[v]) perVertexWeights[v].reserve(counts[v]);
+        }
+        for (const auto &chunk : perThreadTriples) {
+            for (const auto &t : chunk) {
+                perVertexWeights[t.vertex].push_back({t.sourceIdx, t.dist});
             }
         }
     }
