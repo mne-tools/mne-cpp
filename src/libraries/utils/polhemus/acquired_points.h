@@ -170,6 +170,13 @@ public:
         emit pointsChanged();
     }
 
+    /** True iff all three cardinal fiducials have been captured. */
+    bool hasAllFiducials() const {
+        return hasFiducial(FiducialId::NAS)
+            && hasFiducial(FiducialId::LPA)
+            && hasFiducial(FiducialId::RPA);
+    }
+
     int countOf(PointKind kind) const {
         int n = 0;
         for (const auto& p : m_points) if (p.kind == kind) ++n;

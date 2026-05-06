@@ -20,6 +20,7 @@ set(SOURCES
   montage/standard_montage.cpp
   polhemus/fasttrak_parser.cpp
   polhemus/polhemus_connection.cpp
+  polhemus/polhemus_coregistration.cpp
   report.cpp
   generics/observerpattern.cpp
   generics/mne_logger.cpp
@@ -37,6 +38,7 @@ set(HEADERS
   polhemus/acquired_points.h
   polhemus/fasttrak_parser.h
   polhemus/polhemus_connection.h
+  polhemus/polhemus_coregistration.h
   report.h
   generics/circularbuffer.h
   generics/commandpattern.h
