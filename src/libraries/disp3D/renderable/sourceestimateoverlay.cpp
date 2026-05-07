@@ -86,6 +86,7 @@ bool SourceEstimateOverlay::loadStc(const QString &path, int hemi)
         qDebug() << "SourceEstimateOverlay: Loaded RH with" << stc.data.rows() << "vertices," 
                  << stc.data.cols() << "time points";
     }
+    invalidateColorCache();
 
     // Auto-set thresholds based on data range
     if (m_hasLh || m_hasRh) {
@@ -131,12 +132,28 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface *surface, int timeIndex)
 
     // Clamp time index
     int tIdx = qBound(0, timeIndex, static_cast<int>(stc->data.cols()) - 1);
+    const uint32_t vertexCount = surface->vertexCount();
+
+    // ── Color cache fast-path ──────────────────────────────────────
+    // Hot loop while scrubbing or auto-looping: avoid the sparse
+    // interpolation matvec and per-vertex colormap evaluation by
+    // returning the pre-computed buffer for this (hemi, vertexCount,
+    // timeIndex). The cache is invalidated whenever colormap,
+    // thresholds or source data change.
+    const ColorCacheKey cacheKey(hemi, static_cast<int>(vertexCount));
+    auto bucketIt = m_colorCache.find(cacheKey);
+    if (bucketIt != m_colorCache.end()) {
+        auto frameIt = bucketIt.value().constFind(tIdx);
+        if (frameIt != bucketIt.value().constEnd()) {
+            surface->applySourceEstimateColors(frameIt.value());
+            return;
+        }
+    }
 
     // Get source data for this time point
     Eigen::VectorXf sourceData = stc->data.col(tIdx).cwiseAbs().cast<float>();
 
     // Create color array for all surface vertices
-    uint32_t vertexCount = surface->vertexCount();
     QVector<uint32_t> colors(vertexCount, 0xFF808080); // Default gray
 
     // Determine if we have an interpolation matrix
@@ -185,6 +202,10 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface *surface, int timeIndex)
         colors[i] = valueToColor(normalized, alpha);
     }
 
+    // Store in cache before handing off to the surface so back-scrubs
+    // and auto-loop iterations are free.
+    m_colorCache[cacheKey].insert(tIdx, colors);
+
     surface->applySourceEstimateColors(colors);
 }
 
@@ -192,16 +213,20 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface *surface, int timeIndex)
 
 void SourceEstimateOverlay::setColormap(const QString &name)
 {
+    if (m_colormap == name) return;
     m_colormap = name;
+    invalidateColorCache();
 }
 
 //=============================================================================================================
 
 void SourceEstimateOverlay::setThresholds(float min, float mid, float max)
 {
+    if (m_threshMin == min && m_threshMid == mid && m_threshMax == max) return;
     m_threshMin = min;
     m_threshMid = mid;
     m_threshMax = max;
+    invalidateColorCache();
 }
 
 //=============================================================================================================
@@ -368,6 +393,7 @@ void SourceEstimateOverlay::setStcData(const INVLIB::InvSourceEstimate &stc, int
         m_stcRh = stc;
         m_hasRh = true;
     }
+    invalidateColorCache();
 }
 
 //=============================================================================================================
@@ -379,6 +405,7 @@ void SourceEstimateOverlay::setInterpolationMatrix(QSharedPointer<Eigen::SparseM
     } else {
         m_interpolationMatRh = mat;
     }
+    invalidateColorCache();
 }
 
 //=============================================================================================================
@@ -391,6 +418,7 @@ void SourceEstimateOverlay::updateThresholdsFromData()
         m_threshMin = minVal;
         m_threshMax = maxVal;
         m_threshMid = (minVal + maxVal) / 2.0;
+        invalidateColorCache();
         qDebug() << "SourceEstimateOverlay: Auto thresholds set to" << m_threshMin << m_threshMid << m_threshMax;
     }
 }

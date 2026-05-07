@@ -45,6 +45,8 @@
 #include <QVector>
 #include <QString>
 #include <QSharedPointer>
+#include <QHash>
+#include <QPair>
 #include <Eigen/Sparse>
 
 //=============================================================================================================
@@ -263,6 +265,18 @@ private:
 
     QSharedPointer<Eigen::SparseMatrix<float>> m_interpolationMatLh;  /**< LH interpolation matrix. */
     QSharedPointer<Eigen::SparseMatrix<float>> m_interpolationMatRh;  /**< RH interpolation matrix. */
+
+    // ── Per-time-point color cache ─────────────────────────────────────
+    // Keyed by (hemi, vertexCount). The inner hash maps timeIndex →
+    // pre-computed packed-ABGR color buffer. Invalidated whenever the
+    // colormap, thresholds or source data change. This makes scrubbing
+    // and auto-loop playback effectively free after the first pass: only
+    // the per-vertex color blend + GPU upload happens, never the sparse
+    // interpolation matvec or the per-vertex colormap calculation.
+    using ColorCacheKey = QPair<int, int>;                                  /**< (hemi, vertexCount). */
+    using ColorCacheBucket = QHash<int, QVector<uint32_t>>;                 /**< timeIndex → ABGR colors. */
+    mutable QHash<ColorCacheKey, ColorCacheBucket> m_colorCache;            /**< Lazy color cache. */
+    void invalidateColorCache() { m_colorCache.clear(); }
 };
 
 #endif // SOURCEESTIMATEOVERLAY_H
