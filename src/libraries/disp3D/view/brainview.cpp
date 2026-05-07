@@ -72,8 +72,6 @@
 #include <QTimer>
 #include <QMenu>
 #include <QStandardItem>
-#include <QtConcurrent/QtConcurrent>
-#include <QFutureWatcher>
 #include <algorithm>
 #include <cmath>
 
@@ -2607,111 +2605,6 @@ bool BrainView::loadTransformation(const QString &transPath)
 }
 
 //==============================================================================
-
-void BrainView::loadSensorsAsync(const QString &fifPath)
-{
-    const QString overridePath = m_megHelmetOverridePath;
-    auto *watcher = new QFutureWatcher<DataLoader::SensorLoadResult>(this);
-    connect(watcher, &QFutureWatcher<DataLoader::SensorLoadResult>::finished,
-            this, [this, watcher]() {
-                watcher->deleteLater();
-                auto r = watcher->result();
-                if (!r.hasInfo && !r.hasDigitizer) {
-                    emit sensorsLoaded(false);
-                    return;
-                }
-                m_devHeadTrans = r.devHeadTrans;
-                m_hasDevHead   = r.hasDevHead;
-                if (!r.megGradItems.isEmpty()) m_model->addSensors("MEG/Grad", r.megGradItems);
-                if (!r.megMagItems.isEmpty())  m_model->addSensors("MEG/Mag",  r.megMagItems);
-                if (!r.eegItems.isEmpty())     m_model->addSensors("EEG",      r.eegItems);
-                if (r.helmetSurface)
-                    m_surfaces["sens_surface_meg"] = r.helmetSurface;
-                if (!r.digitizerPoints.isEmpty())
-                    m_model->addDigitizerData(r.digitizerPoints);
-                refreshSensorTransforms();
-                emit sensorsLoaded(true);
-            });
-    watcher->setFuture(QtConcurrent::run([fifPath, overridePath]() {
-        return DataLoader::loadSensors(fifPath, overridePath);
-    }));
-}
-
-//==============================================================================
-
-void BrainView::loadTransformationAsync(const QString &transPath)
-{
-    struct TransResult { bool ok = false; FiffCoordTrans trans; };
-    auto *watcher = new QFutureWatcher<TransResult>(this);
-    connect(watcher, &QFutureWatcher<TransResult>::finished,
-            this, [this, watcher]() {
-                watcher->deleteLater();
-                auto r = watcher->result();
-                if (!r.ok) { emit transformationLoaded(false); return; }
-                m_headToMriTrans = r.trans;
-                refreshSensorTransforms();
-                emit transformationLoaded(true);
-            });
-    watcher->setFuture(QtConcurrent::run([transPath]() {
-        TransResult r;
-        r.ok = DataLoader::loadHeadToMriTransform(transPath, r.trans);
-        return r;
-    }));
-}
-
-//==============================================================================
-
-void BrainView::loadSourceSpaceAsync(const QString &fwdPath)
-{
-    auto *watcher = new QFutureWatcher<MNELIB::MNESourceSpaces>(this);
-    connect(watcher, &QFutureWatcher<MNELIB::MNESourceSpaces>::finished,
-            this, [this, watcher]() {
-                watcher->deleteLater();
-                auto srcSpace = watcher->result();
-                if (srcSpace.isEmpty()) { emit sourceSpaceLoaded(false); return; }
-                m_model->addSourceSpace(srcSpace);
-                emit sourceSpaceLoaded(true);
-            });
-    watcher->setFuture(QtConcurrent::run([fwdPath]() {
-        return DataLoader::loadSourceSpace(fwdPath);
-    }));
-}
-
-//==============================================================================
-
-void BrainView::loadSensorFieldAsync(const QString &evokedPath, int aveIndex)
-{
-    auto *watcher = new QFutureWatcher<FIFFLIB::FiffEvoked>(this);
-    connect(watcher, &QFutureWatcher<FIFFLIB::FiffEvoked>::finished,
-            this, [this, watcher]() {
-                watcher->deleteLater();
-                auto evoked = watcher->result();
-                if (evoked.isEmpty()) { emit sensorFieldLoadComplete(false); return; }
-
-                const int previousTimePoint = m_fieldMapper.timePoint();
-                const bool canReuse = m_fieldMapper.hasMappingFor(evoked);
-                m_fieldMapper.setEvoked(evoked);
-
-                if (!canReuse) {
-                    if (!m_fieldMapper.buildMapping(m_surfaces, m_headToMriTrans, m_applySensorTrans)) {
-                        m_fieldMapper.setEvoked(FIFFLIB::FiffEvoked());
-                        emit sensorFieldLoadComplete(false);
-                        return;
-                    }
-                } else {
-                    m_fieldMapper.computeNormRange();
-                }
-
-                const int numTimes = static_cast<int>(m_fieldMapper.evoked().times.size());
-                const int tp = qBound(0, previousTimePoint, numTimes - 1);
-                emit sensorFieldLoaded(numTimes, tp);
-                setSensorFieldTimePoint(tp);
-                emit sensorFieldLoadComplete(true);
-            });
-    watcher->setFuture(QtConcurrent::run([evokedPath, aveIndex]() {
-        return DataLoader::loadEvoked(evokedPath, aveIndex);
-    }));
-}
 
 void BrainView::refreshSensorTransforms()
 {

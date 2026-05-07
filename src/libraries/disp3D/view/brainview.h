@@ -538,34 +538,6 @@ public slots:
      */
     bool loadTransformation(const QString &transPath);
 
-    //=========================================================================
-    // Async variants — I/O runs on a worker thread; model updates and signal
-    // emission happen on the GUI thread via QFutureWatcher.
-    //=========================================================================
-    /**
-     * @brief loadSensorsAsync  Non-blocking variant of loadSensors().
-     *        Runs file I/O on a worker thread; emits sensorsLoaded() when done.
-     */
-    void loadSensorsAsync(const QString &fifPath);
-
-    /**
-     * @brief loadTransformationAsync  Non-blocking variant of loadTransformation().
-     *        Runs file I/O on a worker thread; emits transformationLoaded() when done.
-     */
-    void loadTransformationAsync(const QString &transPath);
-
-    /**
-     * @brief loadSourceSpaceAsync  Non-blocking variant of loadSourceSpace().
-     *        Runs file I/O on a worker thread; emits sourceSpaceLoaded() when done.
-     */
-    void loadSourceSpaceAsync(const QString &fwdPath);
-
-    /**
-     * @brief loadSensorFieldAsync  Non-blocking variant of loadSensorField().
-     *        Runs file I/O on a worker thread; emits sensorFieldLoadComplete() when done.
-     */
-    void loadSensorFieldAsync(const QString &evokedPath, int aveIndex = 0);
-
     //=========================================================================================================
     /**
      * Set the current time point for source estimate visualization.
@@ -1024,18 +996,6 @@ signals:
      * @param[in] worldPos  Hit point in world (model) coordinates.
      */
     void surfacePointDoubleClicked(const QVector3D &worldPos);
-
-    //=========================================================================
-    // Async load completion signals
-    //=========================================================================
-    /** Emitted by loadSensorsAsync() when finished. @param success True on success. */
-    void sensorsLoaded(bool success);
-    /** Emitted by loadTransformationAsync() when finished. @param success True on success. */
-    void transformationLoaded(bool success);
-    /** Emitted by loadSourceSpaceAsync() when finished. @param success True on success. */
-    void sourceSpaceLoaded(bool success);
-    /** Emitted by loadSensorFieldAsync() when finished. @param success True on success. */
-    void sensorFieldLoadComplete(bool success);
 
 private slots:
     //=========================================================================================================
