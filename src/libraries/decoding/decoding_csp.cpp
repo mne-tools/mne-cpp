@@ -172,7 +172,7 @@ void DecodingCsp::fit(const std::vector<MatrixXd>& epochs,
     }
 
     // Patterns = pinv(filters) — shape (n_ch × n_comp)
-    auto svd = m_filters.bdcSvd(ComputeThinU | ComputeThinV);
+    auto svd = m_filters.bdcSvd<ComputeThinU | ComputeThinV>();
     m_patterns = svd.solve(MatrixXd::Identity(n_total, n_total));
 
     // Compute mean band power for z-score normalisation
