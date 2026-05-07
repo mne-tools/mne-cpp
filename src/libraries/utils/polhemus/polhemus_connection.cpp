@@ -182,7 +182,18 @@ void PolhemusConnection::onMockTick()
         kMockSphereRadiusM * static_cast<float>(std::sin(phase)),
         kMockSphereRadiusM * static_cast<float>(elevation));
     ++m_mockSampleIdx;
+
+    // Station 1 = tracker (device pose)
     emit pointReceived(/*station*/ 1, pos, QQuaternion());
+
+    // Station 2 = pen (stylus position with a small offset from tracker)
+    const QVector3D penPos(
+        kMockSphereRadiusM * static_cast<float>(std::cos(phase + 0.3)),
+        kMockSphereRadiusM * static_cast<float>(std::sin(phase + 0.3)),
+        kMockSphereRadiusM * static_cast<float>(elevation) + 0.02f);
+    const QQuaternion penOri = QQuaternion::fromAxisAndAngle(
+        QVector3D(0, 0, 1), static_cast<float>(phase * 180.0 / M_PI));
+    emit pointReceived(/*station*/ 2, penPos, penOri);
 }
 
 //=============================================================================================================
