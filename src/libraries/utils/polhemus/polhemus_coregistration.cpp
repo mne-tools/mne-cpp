@@ -125,6 +125,16 @@ bool PolhemusCoregistration::captureCurrentPenPositionAsHeadShape()
 
 //=============================================================================================================
 
+void PolhemusCoregistration::resetRegistration()
+{
+    m_registrationValid = false;
+    m_headToWorld.setToIdentity();
+    m_headToDevice.setToIdentity();
+    emit registrationChanged();
+}
+
+//=============================================================================================================
+
 bool PolhemusCoregistration::computeRegistration()
 {
     if (!m_pPoints->hasAllFiducials()) {

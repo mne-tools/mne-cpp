@@ -164,6 +164,12 @@ public:
      */
     bool computeRegistration();
 
+    /**
+     * @brief Reset the registration state (headToWorld, headToDevice) to identity.
+     *        Call this when the user clears all fiducials.
+     */
+    void resetRegistration();
+
     bool registrationValid() const { return m_registrationValid; }
 
     //=========================================================================================================
