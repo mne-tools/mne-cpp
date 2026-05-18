@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include "acquired_points.h"
+#include "polhemus_connection.h"
 
 #include <utils/montage/standard_montage.h>
 
@@ -67,8 +68,6 @@ class QPushButton;
 
 namespace MNEALIGN
 {
-
-class PolhemusConnection;
 
 //=============================================================================================================
 /** @brief Identifies the five wizard steps. */

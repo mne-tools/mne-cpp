@@ -42,6 +42,9 @@
 #include <QMainWindow>
 #include <QPointer>
 
+#include "acquired_points.h"
+#include "polhemus_connection.h"
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -64,8 +67,6 @@ enum class AlignStep;
 
 class AlignWizard;
 class Align3DView;
-class AcquiredPoints;
-class PolhemusConnection;
 
 //=============================================================================================================
 /**
