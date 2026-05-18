@@ -8,7 +8,10 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Gui SerialPort)
+set(QT_REQUIRED_COMPONENTS Core Gui)
+if(NOT WASM)
+  list(APPEND QT_REQUIRED_COMPONENTS SerialPort)
+endif()
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
@@ -18,9 +21,6 @@ set(SOURCES
   layoutmaker.cpp
   selectionio.cpp
   montage/standard_montage.cpp
-  polhemus/fastrak_parser.cpp
-  polhemus/polhemus_connection.cpp
-  polhemus/polhemus_coregistration.cpp
   report.cpp
   generics/observerpattern.cpp
   generics/mne_logger.cpp
@@ -36,15 +36,26 @@ set(HEADERS
   selectionio.h
   montage/standard_montage.h
   polhemus/acquired_points.h
-  polhemus/fastrak_parser.h
-  polhemus/polhemus_connection.h
-  polhemus/polhemus_coregistration.h
   report.h
   generics/circularbuffer.h
   generics/commandpattern.h
   generics/observerpattern.h
   generics/mne_logger.h
 )
+
+# Polhemus serial port code requires Qt SerialPort — not available in WASM.
+if(NOT WASM)
+  list(APPEND SOURCES
+    polhemus/fastrak_parser.cpp
+    polhemus/polhemus_connection.cpp
+    polhemus/polhemus_coregistration.cpp
+  )
+  list(APPEND HEADERS
+    polhemus/fastrak_parser.h
+    polhemus/polhemus_connection.h
+    polhemus/polhemus_coregistration.h
+  )
+endif()
 
 # QProcess is not available in Qt for WebAssembly, so exclude
 # PythonRunner / PythonTestHelper from WASM builds.
