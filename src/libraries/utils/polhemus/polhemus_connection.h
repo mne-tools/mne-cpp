@@ -85,6 +85,12 @@ struct UTILSSHARED_EXPORT PolhemusSerialConfig
 {
     int                       baudRate = 115200;
     FastrakParser::Units     units    = FastrakParser::Units::Inches;
+    /** Hemisphere vector for all stations. The Fastrak tracks sensors
+     *  within the half-space defined by this direction from the transmitter.
+     *  Example: (0,0,1) = +Z (superior), (0,0,-1) = -Z (inferior).
+     *  Set to a non-zero vector to send Fastrak "H<n>,x,y,z\r" for
+     *  stations 1-4 at connect time. Default (0,0,0) = don't change. */
+    QVector3D                 hemisphere = QVector3D(0, 0, 0);
     /** Stream control command sent right after opening the port. The
      *  factory default for Fastrak is `"C\r"` (continuous ASCII output);
      *  use `"P\r"` if the application drives polled mode itself. */

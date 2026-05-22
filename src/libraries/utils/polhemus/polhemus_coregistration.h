@@ -78,6 +78,8 @@
 #include <QQuaternion>
 #include <QVector3D>
 
+#include <vector>
+
 //=============================================================================================================
 // DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
@@ -113,6 +115,27 @@ public:
 
     int trackerStation() const { return m_trackerStation; }
     int penStation()     const { return m_penStation; }
+
+    //=========================================================================================================
+    // Pen tip offset (sensor body frame → tip)
+    //=========================================================================================================
+
+    void setPenTipOffset(const QVector3D& offset) { m_penTipOffset = offset; }
+    QVector3D penTipOffset() const { return m_penTipOffset; }
+    void setTipOffsetEnabled(bool on) { m_tipOffsetEnabled = on; }
+    bool tipOffsetEnabled() const { return m_tipOffsetEnabled; }
+
+    //=========================================================================================================
+    // Pivot calibration — determine pen tip offset by pivoting pen around its tip
+    //=========================================================================================================
+
+    enum class PivotState { Idle, WaitingForStart, Collecting, Done };
+
+    void startPivotCalibration();
+    void cancelPivotCalibration();
+    PivotState pivotState() const { return m_pivotState; }
+    int pivotSampleCount() const { return static_cast<int>(m_pivotPositions.size()); }
+    float pivotResidualMm() const { return m_pivotResidualMm; }
 
     //=========================================================================================================
     // Tracker-to-device calibration offset
@@ -152,6 +175,29 @@ public:
     bool captureCurrentPenPositionAsHeadShape();
 
     //=========================================================================================================
+    // Model (BEM / FIFF) fiducials — target landmarks for SVD coregistration
+    //=========================================================================================================
+
+    void setModelFiducial(FiducialId id, const QVector3D& posInModel);
+    bool hasModelFiducial(FiducialId id) const;
+    bool hasAllModelFiducials() const;
+    QVector3D modelFiducial(FiducialId id) const;
+
+    bool hasAllPenFiducials() const;
+
+    //=========================================================================================================
+    // Vertex (CZ / top of head) — 4th reference point for orientation validation
+    //=========================================================================================================
+
+    void setModelVertex(const QVector3D& pos) { m_modelVertex = pos; m_hasModelVertex = true; }
+    bool hasModelVertex() const { return m_hasModelVertex; }
+    QVector3D modelVertex() const { return m_modelVertex; }
+
+    bool captureCurrentPenPositionAsVertex();
+    bool hasPenVertex() const { return m_hasPenVertex; }
+    QVector3D penVertex() const { return m_penVertex; }
+
+    //=========================================================================================================
     // Registration
     //=========================================================================================================
 
@@ -179,6 +225,7 @@ public:
     QMatrix4x4  deviceToWorld()    const { return m_deviceToWorld; }
     QMatrix4x4  headToWorld()      const { return m_headToWorld; }
     QMatrix4x4  headToDevice()     const { return m_headToDevice; }
+    QMatrix4x4  worldToModel()     const { return m_worldToModel; }
     QVector3D   penPosition()      const { return m_penPosition; }
     QQuaternion penOrientation()   const { return m_penOrientation; }
     bool        haveLivePenPosition() const { return m_havePenPos; }
@@ -188,6 +235,8 @@ signals:
     void penPoseChanged(const QVector3D& position, const QQuaternion& orientation);
     void penButtonPressed(const QVector3D& position, const QQuaternion& orientation);
     void registrationChanged();
+    void pivotStateChanged(PolhemusCoregistration::PivotState state);
+    void pivotCalibrationDone(const QVector3D& offset, float residualMm);
 
 private slots:
     void onPointReceived(int station, const QVector3D& position, const QQuaternion& orientation);
@@ -198,11 +247,13 @@ private:
                                const QQuaternion& trackerOri) const;
     QMatrix4x4 buildHeadFrame() const;
 
-    int m_trackerStation = 1;
-    int m_penStation     = 2;
+    int m_trackerStation = 2;
+    int m_penStation     = 1;
 
     QVector3D   m_offsetTranslation;
     QQuaternion m_offsetRotation;
+    QVector3D   m_penTipOffset;        // tip offset in sensor body frame (metres)
+    bool        m_tipOffsetEnabled = false;
 
     PolhemusConnection* m_pConn   = nullptr;
     AcquiredPoints*     m_pPoints = nullptr;
@@ -214,7 +265,30 @@ private:
     QMatrix4x4  m_deviceToWorld;
     QMatrix4x4  m_headToWorld;
     QMatrix4x4  m_headToDevice;
+    QMatrix4x4  m_worldToModel;
     bool        m_registrationValid = false;
+
+    // Pen fiducials (captured from stylus in Polhemus world frame)
+    QVector3D   m_penFid[4];          // indexed by FiducialId (1..3)
+    bool        m_hasPenFid[4] = {};
+
+    // Model fiducials (from FIFF / BEM, in MRI/surface-RAS frame)
+    QVector3D   m_modelFid[4];        // indexed by FiducialId (1..3)
+    bool        m_hasModelFid[4] = {};
+
+    // Vertex / CZ (top of head) for orientation validation
+    QVector3D   m_modelVertex;
+    bool        m_hasModelVertex = false;
+    QVector3D   m_penVertex;
+    bool        m_hasPenVertex = false;
+
+    // Pivot calibration state
+    PivotState  m_pivotState = PivotState::Idle;
+    std::vector<QVector3D>   m_pivotPositions;
+    std::vector<QQuaternion> m_pivotOrientations;
+    float m_pivotResidualMm = 0.0f;
+
+    bool solvePivotCalibration();
 };
 
 } // namespace UTILSLIB

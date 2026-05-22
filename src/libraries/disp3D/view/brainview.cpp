@@ -78,6 +78,7 @@
 #include <mne/mne_bem.h>
 #include <mne/mne_source_spaces.h>
 #include <fiff/fiff_evoked_set.h>
+#include <fiff/fiff_constants.h>
 #include <conn/network/network.h>
 
 using namespace FIFFLIB;
@@ -2493,6 +2494,54 @@ bool BrainView::loadSensors(const QString &fifPath) {
     if (!r.digitizerPoints.isEmpty())
         m_model->addDigitizerData(r.digitizerPoints);
 
+    // Extract cardinal dig points for later fiducial queries
+    m_cardinalDigPoints.clear();
+    for (const auto &dp : r.digitizerPoints) {
+        if (dp.kind == FIFFV_POINT_CARDINAL)
+            m_cardinalDigPoints.append(dp);
+    }
+
+    return true;
+}
+
+//=============================================================================================================
+
+QMap<int, QVector3D> BrainView::cardinalFiducialsInMri() const
+{
+    QMap<int, QVector3D> result;
+    if (m_cardinalDigPoints.isEmpty())
+        return result;
+
+    // Cardinal points are in Head coordinates; transform to MRI if available
+    const bool haveTrans = (m_headToMriTrans.from != 0 || m_headToMriTrans.to != 0);
+    QMatrix4x4 headToMri;
+    headToMri.setToIdentity();
+    if (haveTrans)
+        headToMri = SURFACEKEYS::toQMatrix4x4(m_headToMriTrans.trans);
+
+    for (const auto &dp : m_cardinalDigPoints) {
+        const QVector3D posHead(dp.r[0], dp.r[1], dp.r[2]);
+        result[dp.ident] = haveTrans ? headToMri.map(posHead) : posHead;
+    }
+    return result;
+}
+
+//=============================================================================================================
+
+bool BrainView::bemTopVertexInMri(QVector3D& pos) const
+{
+    auto it = m_surfaces.find(QStringLiteral("bem_head"));
+    if (it == m_surfaces.end() || !it.value())
+        return false;
+
+    const BrainSurface *surf = it.value().get();
+    QVector3D bmin, bmax;
+    surf->boundingBox(bmin, bmax);
+
+    // Top of head = max Z in MRI/surface-RAS (Z = superior)
+    pos = QVector3D((bmin.x() + bmax.x()) * 0.5f,
+                    (bmin.y() + bmax.y()) * 0.5f,
+                    bmax.z());
     return true;
 }
 

@@ -224,6 +224,22 @@ bool PolhemusConnection::openSerial(const QString& portName, const PolhemusSeria
     connect(m_pSerial, &QSerialPort::readyRead, this, &PolhemusConnection::onSerialReadyRead);
     connect(m_pSerial, &QSerialPort::errorOccurred, this, &PolhemusConnection::onSerialError);
 
+    // Set tracking hemisphere per station if configured (non-zero vector).
+    // Fastrak command: "H<station>,x,y,z\r" — prevents position jumps
+    // when a sensor crosses the default hemisphere boundary.
+    if (!cfg.hemisphere.isNull()) {
+        const QVector3D& h = cfg.hemisphere;
+        for (int st = 1; st <= 4; ++st) {
+            const QByteArray cmd = QStringLiteral("H%1,%2,%3,%4\r")
+                .arg(st)
+                .arg(h.x(), 0, 'f', 1).arg(h.y(), 0, 'f', 1).arg(h.z(), 0, 'f', 1)
+                .toLatin1();
+            m_pSerial->write(cmd);
+        }
+        m_pSerial->flush();
+        qInfo() << "Fastrak: hemisphere set to" << cfg.hemisphere;
+    }
+
     if (!cfg.streamCommand.isEmpty()) {
         m_pSerial->write(cfg.streamCommand);
     }

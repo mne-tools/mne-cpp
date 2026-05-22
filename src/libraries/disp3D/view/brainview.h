@@ -52,6 +52,7 @@
 #include "scene/rtsensorstreammanager.h"
 
 #include <fiff/fiff_coord_trans.h>
+#include <fiff/fiff_dig_point.h>
 #include <QRhiWidget>
 #include <QMap>
 #include <QElapsedTimer>
@@ -480,6 +481,26 @@ public slots:
      * @return True if successful.
      */
     bool loadSensors(const QString &fifPath);
+
+    /**
+     * @brief Return cardinal fiducials (NAS/LPA/RPA) transformed to MRI coordinates.
+     *
+     * Returns an empty map when no cardinal dig points are loaded or when no
+     * head-to-MRI transform is available.  Keys are the FIFF ident values
+     * (FIFFV_POINT_LPA=1, FIFFV_POINT_NASION=2, FIFFV_POINT_RPA=3).
+     */
+    QMap<int, QVector3D> cardinalFiducialsInMri() const;
+
+    /**
+     * @brief Return the highest-Z vertex of the BEM head surface in MRI coords.
+     *
+     * This is the top-of-head (vertex/CZ) reference used for orientation
+     * validation during Polhemus coregistration.
+     *
+     * @param[out] pos  The vertex position (metres, MRI/surface-RAS).
+     * @return True if a BEM head surface is loaded; false otherwise.
+     */
+    bool bemTopVertexInMri(QVector3D& pos) const;
 
     //=========================================================================================================
     /**
@@ -1129,6 +1150,7 @@ private:
 
     // ── Coordinate transforms ──────────────────────────────────────────
     FIFFLIB::FiffCoordTrans m_headToMriTrans;       /**< Head-to-MRI coordinate transform. */
+    QList<FIFFLIB::FiffDigPoint> m_cardinalDigPoints; /**< Cardinal dig points from last sensor load. */
     bool m_applySensorTrans = true;                 /**< Whether to apply the transform to sensors/digitizers. */
     QString m_megHelmetOverridePath;                /**< Optional override path for MEG helmet surface. */
     QMatrix4x4 m_devHeadTrans;                      /**< Device→Head transformation from last sensor load. */
