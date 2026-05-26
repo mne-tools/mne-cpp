@@ -259,16 +259,17 @@ bool PolhemusCoregistration::computeRegistration()
             const QVector3D eyApp  = (lpa - origin).normalized();
 
             // Gram-Schmidt: remove component of eyApp along ex
-            const QVector3D ey = (eyApp - QVector3D::dotProduct(eyApp, ex) * ex).normalized();
+            QVector3D ey = (eyApp - QVector3D::dotProduct(eyApp, ex) * ex).normalized();
             // ez from right-hand rule: always consistent with ey toward LPA
             QVector3D ez = QVector3D::crossProduct(ex, ey).normalized();
 
-            // Optional validation: warn if ez disagrees with vertex direction
+            // Use vertex to correct superior direction — flip ez (and ey
+            // to maintain right-handedness) when ez disagrees with vertex.
             if (vertex) {
                 const QVector3D toVertex = (*vertex - origin).normalized();
                 if (QVector3D::dotProduct(ez, toVertex) < 0.0f) {
-                    qWarning() << "  head-frame: ez points away from vertex"
-                               << "— check fiducial digitization";
+                    ez = -ez;
+                    ey = -ey;
                 }
             }
 
