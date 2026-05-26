@@ -48,6 +48,8 @@ add_subdirectory(test_signalModel)
 
 add_subdirectory(test_fiff_annotation_event_utils)
 
+add_subdirectory(test_api_registry)
+
 add_subdirectory(test_interpolation)
 add_subdirectory(test_geometryinfo)
 add_subdirectory(test_rt_source_streaming)
@@ -270,3 +272,9 @@ add_subdirectory(test_decoding_ssd)
 
 # v2.3.0 Batch 16: GUI integration foundation (TASK 4 / 10 / 11)
 add_subdirectory(test_multimodal_scene)
+add_subdirectory(test_cortical_surface_stc)
+add_subdirectory(test_electrodes_plugin)
+add_subdirectory(test_mri_slices_plugin)
+
+# v2.3.0: CMNE routing in the rtcmne real-time inverse plugin
+add_subdirectory(test_rtcmne_cmne)

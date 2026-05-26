@@ -59,14 +59,22 @@
 #include <QSharedPointer>
 #include <QtCore/QtPlugin>
 
+#include <inv/inv_source_estimate.h>
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
 class QAction;
+class QCheckBox;
 class QComboBox;
 class QDockWidget;
+class QDoubleSpinBox;
+class QLabel;
 class QMenu;
+class QPushButton;
+class QSlider;
+class QTimer;
 class QWidget;
 
 namespace ANSHAREDLIB {
@@ -186,10 +194,110 @@ public:
      */
     static QStringList enumerateSubjects(const QString& subjectsDir);
 
+    //=========================================================================================================
+    // STC overlay
+    //=========================================================================================================
+
+    /**
+     * Read an STC file (FreeSurfer / MNE-Python compatible binary `.stc`)
+     * and install the resulting source estimate as the active overlay.
+     *
+     * @param[in] path   Absolute path to the `.stc` file.
+     * @return true if the file was loaded and a non-empty overlay was set.
+     */
+    bool loadSourceEstimate(const QString& path);
+
+    /**
+     * Install an already-constructed source estimate as the active overlay.
+     * Resets the time slider to sample 0 and re-publishes the overlay layer
+     * on the shared @ref DISP3DLIB::MultimodalScene.
+     */
+    void setSourceEstimate(const INVLIB::InvSourceEstimate& stc);
+
+    /** @return Current overlay (empty when none loaded). */
+    const INVLIB::InvSourceEstimate& sourceEstimate() const;
+
+    /** @return Number of vertex rows in the overlay (0 if none). */
+    int overlayRowCount() const;
+
+    /** @return Number of time samples in the overlay (0 if none). */
+    int totalTimeSamples() const;
+
+    /** @return Vertex count of the loaded surface(s) (left + right), or 0. */
+    int surfaceVertexCount() const;
+
+    /** @return true when overlay vertex count matches the loaded surface
+     *  vertex count, or there is no surface to compare against. */
+    bool overlayMatchesSurface() const;
+
+    /** @return Current time sample index, or -1 when no overlay is loaded. */
+    int currentTimeSample() const;
+
+    /**
+     * Set the current time sample. Values are clamped to
+     * `[0, totalTimeSamples()-1]` (or -1 if no overlay). Emits
+     * @ref timeSampleChanged and updates the slider + the scene's shared
+     * timeline cursor.
+     */
+    void setCurrentTimeSample(int sample);
+
+    /**
+     * Set the three colormap thresholds at once. The values are normalised
+     * so the invariant `fthresh <= fmid <= fmax` always holds, regardless
+     * of the order they are supplied in (the implementation sorts them).
+     * Negative values are allowed; a `fmax == fthresh` overlay collapses
+     * to a step function.
+     */
+    void setColormapThresholds(float fthresh, float fmid, float fmax);
+
+    float fThresh() const;
+    float fMid()    const;
+    float fMax()    const;
+
+    /** @return true when the playback timer is running. */
+    bool isPlaying() const;
+
+    /** Start playback at the configured FPS (no-op when already playing
+     *  or when no overlay is loaded). */
+    void play();
+
+    /** Stop playback. */
+    void pause();
+
+    /** Convenience for the toolbar play/pause button. */
+    void togglePlayPause();
+
+    /** @return Configured playback frame-rate (samples per second). */
+    double playbackFps() const;
+
+    /** Set the playback frame-rate. Values <= 0 are clamped to 1.0 fps. */
+    void setPlaybackFps(double fps);
+
+signals:
+    /** Emitted after @ref setSourceEstimate succeeds. */
+    void sourceEstimateLoaded(int nVertices, int nTimes);
+
+    /** Emitted when @ref setCurrentTimeSample actually changes the sample. */
+    void timeSampleChanged(int sample);
+
+    /** Emitted after @ref setColormapThresholds reorders/applies values. */
+    void colormapThresholdsChanged(float fthresh, float fmid, float fmax);
+
+    /** Emitted when @ref play / @ref pause toggle the playback state. */
+    void playStateChanged(bool playing);
+
 private slots:
     void onLoadSurfaceTriggered();
     void onHemisphereChoiceChanged(int index);
     void onSurfaceTypeChanged(int index);
+    void onLoadStcTriggered();
+    void onFThreshSpinChanged(double value);
+    void onFMidSpinChanged(double value);
+    void onFMaxSpinChanged(double value);
+    void onTimeSliderChanged(int sample);
+    void onPlayPauseClicked();
+    void onPlaybackFpsChanged(double fps);
+    void onPlaybackTick();
 
 private:
     /** Build the controls dock (hemisphere combo, surface-type combo,
@@ -208,12 +316,33 @@ private:
     /** Re-register the loaded surfaces on the scene with current visibility. */
     void refreshSceneLayers();
 
+    /** (Re)publish the source estimate overlay layer on the shared scene. */
+    void refreshOverlayLayer();
+
+    /** Refresh time-slider tooltip + status label to reflect current sample. */
+    void updateTimeReadout();
+
+    /** Sync the three spin-boxes from the stored thresholds without
+     *  re-emitting changed signals. */
+    void syncThresholdSpins();
+
     ANSHAREDLIB::Communicator*           m_pCommu = nullptr;
     QPointer<QMenu>                      m_pMenu;
     QPointer<QAction>                    m_pLoadSurfaceAction;
+    QPointer<QAction>                    m_pLoadStcAction;
     QPointer<QDockWidget>                m_pControlDock;
     QPointer<QComboBox>                  m_pHemiCombo;
     QPointer<QComboBox>                  m_pSurfaceTypeCombo;
+
+    // Overlay controls
+    QPointer<QDoubleSpinBox>             m_pFThreshSpin;
+    QPointer<QDoubleSpinBox>             m_pFMidSpin;
+    QPointer<QDoubleSpinBox>             m_pFMaxSpin;
+    QPointer<QSlider>                    m_pTimeSlider;
+    QPointer<QLabel>                     m_pTimeReadout;
+    QPointer<QPushButton>                m_pPlayButton;
+    QPointer<QDoubleSpinBox>             m_pFpsSpin;
+    QPointer<QTimer>                     m_pPlaybackTimer;
 
     HemisphereChoice                     m_hemi = HemisphereChoice::Both;
     CorticalSurfaceType                  m_surfaceType = CorticalSurfaceType::Inflated;
@@ -228,6 +357,16 @@ private:
 
     QString                              m_lastSubjectsDir;
     QString                              m_lastSubjectId;
+    QString                              m_lastStcDir;
+
+    // Overlay state
+    INVLIB::InvSourceEstimate            m_stc;
+    int                                  m_currentSample = -1;
+    float                                m_fThresh = 0.0f;
+    float                                m_fMid    = 0.5f;
+    float                                m_fMax    = 1.0f;
+    double                               m_fps = 10.0;
+    bool                                 m_playing = false;
 };
 
 } // namespace CORTICALSURFACEPLUGIN

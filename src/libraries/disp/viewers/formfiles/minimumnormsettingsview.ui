@@ -67,6 +67,11 @@
          <string>sLORETA</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>CMNE</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item row="1" column="0">
@@ -98,6 +103,43 @@
         <string>Time point (incl. pre stim):</string>
        </property>
       </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="m_label_modelCheckpoint">
+       <property name="text">
+        <string>Model checkpoint:</string>
+       </property>
+       <property name="visible">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <layout class="QHBoxLayout" name="m_hLayout_modelCheckpoint">
+       <item>
+        <widget class="QLineEdit" name="m_lineEdit_modelCheckpoint">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="placeholderText">
+          <string>Path to .onnx LSTM checkpoint…</string>
+         </property>
+         <property name="visible">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="m_pushButton_browseModelCheckpoint">
+         <property name="text">
+          <string>…</string>
+         </property>
+         <property name="visible">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

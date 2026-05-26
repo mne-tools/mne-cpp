@@ -110,6 +110,20 @@ public:
 
     //=========================================================================================================
     /**
+     * Sets the model checkpoint path shown in the read-only line edit.
+     *
+     * @param[in] sPath  Absolute path to the model checkpoint file (e.g. .onnx).
+     */
+    void setModelCheckpoint(const QString& sPath);
+
+    //=========================================================================================================
+    /**
+     * Returns the current model checkpoint path.
+     */
+    QString getModelCheckpoint() const;
+
+    //=========================================================================================================
+    /**
      * Saves all important settings of this view via QSettings.
      */
     void saveSettings();
@@ -165,8 +179,23 @@ protected:
      */
     void onTimePointValueChanged();
 
+    //=========================================================================================================
+    /**
+     * Show or hide the CMNE-only model checkpoint widgets based on the active method.
+     *
+     * @param[in] method  The currently selected inverse method.
+     */
+    void updateCmneWidgetVisibility(const QString& method);
+
+    //=========================================================================================================
+    /**
+     * Slot called when the user clicks the "browse model checkpoint" button.
+     */
+    void onBrowseModelCheckpointClicked();
+
     Ui::MinimumNormSettingsViewWidget* m_pUi;
     QString m_sMethod;
+    QString m_sModelCheckpoint;     /**< Persisted model-checkpoint path for CMNE. */
 
 signals:
     //=========================================================================================================
@@ -192,6 +221,14 @@ signals:
      * @param[in] iTimePoint        The new time point.
      */
     void timePointChanged(int iTimePoint);
+
+    //=========================================================================================================
+    /**
+     * Emit signal whenever the CMNE model checkpoint path changed.
+     *
+     * @param[in] sPath  The new model checkpoint path.
+     */
+    void modelCheckpointChanged(const QString& sPath);
 };
 } // NAMESPACE
 

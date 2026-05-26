@@ -27,22 +27,28 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @brief    Implementation of the five-step MNE Align capture wizard.
+ * @brief    Implementation of the seven-step MNE Align coregistration wizard.
  */
 
 #include "align_wizard.h"
 
 #include "polhemus_connection.h"
 
+#include <fiff/fiff_constants.h>
+#include <fiff/fiff_dig_point.h>
+#include <fiff/fiff_dig_point_set.h>
+
 #include <utils/montage/standard_montage.h>
 
 #include <QComboBox>
+#include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -56,7 +62,9 @@ constexpr int kSetupIdx     = 0;
 constexpr int kFiducialsIdx = 1;
 constexpr int kEegIdx       = 2;
 constexpr int kHspIdx       = 3;
-constexpr int kExportIdx    = 4;
+constexpr int kVerifyIdx    = 4;
+constexpr int kSaveIdx      = 5;
+constexpr int kDoneIdx      = 6;
 
 /** Canonical fiducial capture order. */
 constexpr FiducialId kFiducialOrder[] = {FiducialId::NAS, FiducialId::LPA, FiducialId::RPA};
@@ -98,7 +106,9 @@ AlignWizard::AlignWizard(AcquiredPoints* acquired,
     addWidget(buildFiducialsPage());
     addWidget(buildEegCapPage());
     addWidget(buildHeadShapePage());
-    addWidget(buildExportPage());
+    addWidget(buildVerifyPage());
+    addWidget(buildSavePage());
+    addWidget(buildDonePage());
 
     if (m_pDigitizer) {
         connect(m_pDigitizer, &PolhemusConnection::pointReceived,
@@ -118,7 +128,7 @@ AlignWizard::~AlignWizard() = default;
 
 //=============================================================================================================
 
-int     AlignWizard::stepCount() { return 5; }
+int     AlignWizard::stepCount() { return 7; }
 
 QString AlignWizard::titleFor(AlignStep step)
 {
@@ -127,7 +137,9 @@ QString AlignWizard::titleFor(AlignStep step)
         case AlignStep::Fiducials: return QStringLiteral("Fiducials");
         case AlignStep::EegCap:    return QStringLiteral("EEG Cap");
         case AlignStep::HeadShape: return QStringLiteral("Head Shape");
-        case AlignStep::Export:    return QStringLiteral("Export");
+        case AlignStep::Verify:    return QStringLiteral("Verify");
+        case AlignStep::Save:      return QStringLiteral("Save");
+        case AlignStep::Done:      return QStringLiteral("Done");
     }
     return {};
 }
@@ -150,7 +162,8 @@ void AlignWizard::setBemPath(const QString& path)
             ? QStringLiteral("<i>(no BEM loaded)</i>")
             : QFileInfo(path).fileName());
     }
-    refreshExportUi();
+    refreshSaveUi();
+    refreshDoneUi();
 }
 
 void AlignWizard::next() { if (currentIndex() < count() - 1) setCurrentIndex(currentIndex() + 1); }
@@ -220,7 +233,9 @@ void AlignWizard::onAcquiredChanged()
     refreshFiducialUi();
     refreshEegUi();
     refreshHeadShapeUi();
-    refreshExportUi();
+    refreshVerifyUi();
+    refreshSaveUi();
+    refreshDoneUi();
 }
 
 //=============================================================================================================
@@ -412,8 +427,13 @@ QWidget* AlignWizard::buildFiducialsPage()
     auto* btnRow = new QHBoxLayout;
     m_pFidCaptureBtn = new QPushButton(QStringLiteral("Capture"), page);
     m_pFidUndoBtn    = new QPushButton(QStringLiteral("Undo last"), page);
+    auto* fidLoadBtn = new QPushButton(QStringLiteral("Load FIFF…"), page);
+    fidLoadBtn->setToolTip(QStringLiteral(
+        "Import an existing digitisation (ISOTRAK) from a FIFF .fif file "
+        "instead of capturing live with the Polhemus FASTRAK."));
     btnRow->addWidget(m_pFidCaptureBtn);
     btnRow->addWidget(m_pFidUndoBtn);
+    btnRow->addWidget(fidLoadBtn);
     btnRow->addStretch(1);
     lay->addLayout(btnRow);
 
@@ -421,6 +441,7 @@ QWidget* AlignWizard::buildFiducialsPage()
 
     connect(m_pFidCaptureBtn, &QPushButton::clicked, this, &AlignWizard::onCaptureFiducial);
     connect(m_pFidUndoBtn,    &QPushButton::clicked, this, &AlignWizard::onUndoFiducial);
+    connect(fidLoadBtn,       &QPushButton::clicked, this, &AlignWizard::onLoadDigiFiff);
     return page;
 }
 
@@ -666,63 +687,317 @@ void AlignWizard::onUndoHsp()
 }
 
 //=============================================================================================================
-// Export page
+// Verify page
 //=============================================================================================================
 
-QWidget* AlignWizard::buildExportPage()
+QWidget* AlignWizard::buildVerifyPage()
 {
     auto* page = new QWidget(this);
     auto* lay  = new QVBoxLayout(page);
 
-    lay->addWidget(new QLabel(QStringLiteral("<h2>Step 5 — Export</h2>"
-                                              "Refine the coregistration with ICP, then save "
-                                              "the captured digitisation as a FIFF "
-                                              "<code>FIFFB_ISOTRAK</code> point set."), page));
+    lay->addWidget(new QLabel(QStringLiteral(
+        "<h2>Step 5 — Verify</h2>"
+        "Run ICP to refine the fiducial-based coregistration, then "
+        "inspect the per-fiducial residuals and overall RMSE before "
+        "saving the transform."), page));
 
-    m_pExportSummaryLabel = new QLabel(page);
-    m_pExportSummaryLabel->setTextFormat(Qt::RichText);
-    lay->addWidget(m_pExportSummaryLabel);
+    m_pVerifyIcpBtn = new QPushButton(QStringLiteral("Run ICP Fit"), page);
+    lay->addWidget(m_pVerifyIcpBtn);
 
-    auto* icpBtn = new QPushButton(QStringLiteral("Run ICP Fit"), page);
-    lay->addWidget(icpBtn);
+    m_pVerifyLabel = new QLabel(page);
+    m_pVerifyLabel->setTextFormat(Qt::RichText);
+    m_pVerifyLabel->setWordWrap(true);
+    lay->addWidget(m_pVerifyLabel);
+
+    lay->addStretch(1);
+
+    connect(m_pVerifyIcpBtn, &QPushButton::clicked, this,
+            [this]() { emit requestIcpFit(); });
+    return page;
+}
+
+void AlignWizard::refreshVerifyUi()
+{
+    if (!m_pVerifyLabel) return;
+
+    if (!m_haveIcpResult) {
+        m_pVerifyLabel->setText(QStringLiteral(
+            "<i>No ICP fit yet. Capture or load all three fiducials, then "
+            "click <b>Run ICP Fit</b> above.</i>"));
+        return;
+    }
+
+    QString html = QStringLiteral(
+        "<b>Source:</b> %1<br>"
+        "<b>RMSE:</b> %2 mm<br><br>"
+        "<b>Per-point residuals:</b><br>")
+        .arg(m_lastIcpSource)
+        .arg(m_lastIcpRmse * 1000.0f, 0, 'f', 2);
+
+    if (m_lastIcpResiduals.isEmpty()) {
+        html += QStringLiteral("<i>(none reported)</i>");
+    } else {
+        for (const auto& r : m_lastIcpResiduals) {
+            html += QStringLiteral("&nbsp;&nbsp;%1: %2 mm<br>")
+                        .arg(r.first)
+                        .arg(r.second * 1000.0f, 0, 'f', 2);
+        }
+    }
+    m_pVerifyLabel->setText(html);
+}
+
+//=============================================================================================================
+// Save page
+//=============================================================================================================
+
+QWidget* AlignWizard::buildSavePage()
+{
+    auto* page = new QWidget(this);
+    auto* lay  = new QVBoxLayout(page);
+
+    lay->addWidget(new QLabel(QStringLiteral(
+        "<h2>Step 6 — Save</h2>"
+        "Write the head→MRI coregistration to a <code>-trans.fif</code> "
+        "file. Optionally, also export the captured digitisation as a "
+        "FIFF <code>FIFFB_ISOTRAK</code> point set."), page));
+
+    m_pSaveSummaryLabel = new QLabel(page);
+    m_pSaveSummaryLabel->setTextFormat(Qt::RichText);
+    lay->addWidget(m_pSaveSummaryLabel);
+
     m_pIcpStatusLabel = new QLabel(page);
     m_pIcpStatusLabel->setTextFormat(Qt::RichText);
     lay->addWidget(m_pIcpStatusLabel);
 
-    auto* btn = new QPushButton(QStringLiteral("Save digitization…"), page);
-    lay->addWidget(btn);
+    m_pSaveTransBtn = new QPushButton(QStringLiteral("Save -trans.fif…"), page);
+    lay->addWidget(m_pSaveTransBtn);
+
+    m_pSaveDigiBtn  = new QPushButton(QStringLiteral("Save digitisation FIFF…"), page);
+    lay->addWidget(m_pSaveDigiBtn);
+
     lay->addStretch(1);
 
-    connect(icpBtn, &QPushButton::clicked, this, [this]() { emit requestIcpFit(); });
-    connect(btn, &QPushButton::clicked, this, &AlignWizard::onExportClicked);
+    connect(m_pSaveTransBtn, &QPushButton::clicked, this, &AlignWizard::onSaveTransClicked);
+    connect(m_pSaveDigiBtn,  &QPushButton::clicked, this, &AlignWizard::onSaveDigitisationClicked);
     return page;
 }
 
-void AlignWizard::refreshExportUi()
+void AlignWizard::refreshSaveUi()
 {
-    if (!m_pExportSummaryLabel) return;
+    if (m_pSaveSummaryLabel) {
+        const int nFid = m_pPoints->countOf(PointKind::Fiducial);
+        const int nEeg = m_pPoints->countOf(PointKind::Eeg);
+        const int nHsp = m_pPoints->countOf(PointKind::HeadShape);
+        m_pSaveSummaryLabel->setText(
+            QStringLiteral("BEM: <b>%1</b><br>"
+                           "Cap: <b>%2</b><br>"
+                           "Fiducials: <b>%3 / 3</b><br>"
+                           "EEG electrodes: <b>%4</b><br>"
+                           "Head-shape points: <b>%5</b>")
+                .arg(m_bemPath.isEmpty() ? QStringLiteral("(none)") : QFileInfo(m_bemPath).fileName(),
+                     systemLabel(m_capSystem))
+                .arg(nFid)
+                .arg(nEeg)
+                .arg(nHsp));
+    }
+    if (m_pIcpStatusLabel) {
+        if (m_haveIcpResult) {
+            m_pIcpStatusLabel->setText(
+                QStringLiteral("Coregistration: <b>%1</b> — RMSE %2 mm")
+                    .arg(m_lastIcpSource)
+                    .arg(m_lastIcpRmse * 1000.0f, 0, 'f', 2));
+        } else {
+            m_pIcpStatusLabel->setText(QStringLiteral(
+                "<i>Coregistration: fiducial fit only (no ICP refinement yet).</i>"));
+        }
+    }
+    if (m_pSaveTransBtn) {
+        m_pSaveTransBtn->setEnabled(m_pPoints->hasAllTwinFiducials()
+                                    && m_pPoints->hasFiducial(FiducialId::NAS)
+                                    && m_pPoints->hasFiducial(FiducialId::LPA)
+                                    && m_pPoints->hasFiducial(FiducialId::RPA));
+    }
+    if (m_pSaveDigiBtn) {
+        m_pSaveDigiBtn->setEnabled(m_pPoints->countOf(PointKind::Fiducial) > 0
+                                   || m_pPoints->countOf(PointKind::Eeg) > 0
+                                   || m_pPoints->countOf(PointKind::HeadShape) > 0);
+    }
+}
+
+//=============================================================================================================
+// Done page
+//=============================================================================================================
+
+QWidget* AlignWizard::buildDonePage()
+{
+    auto* page = new QWidget(this);
+    auto* lay  = new QVBoxLayout(page);
+
+    lay->addWidget(new QLabel(QStringLiteral(
+        "<h2>Step 7 — Done</h2>"
+        "The coregistration session is complete. The summary below "
+        "lists the artefacts produced. You can return to any earlier "
+        "step with the Back button to refine the fit."), page));
+
+    m_pDoneLabel = new QLabel(page);
+    m_pDoneLabel->setTextFormat(Qt::RichText);
+    m_pDoneLabel->setWordWrap(true);
+    lay->addWidget(m_pDoneLabel);
+
+    lay->addStretch(1);
+    return page;
+}
+
+void AlignWizard::refreshDoneUi()
+{
+    if (!m_pDoneLabel) return;
     const int nFid = m_pPoints->countOf(PointKind::Fiducial);
     const int nEeg = m_pPoints->countOf(PointKind::Eeg);
     const int nHsp = m_pPoints->countOf(PointKind::HeadShape);
-    m_pExportSummaryLabel->setText(
-        QStringLiteral("BEM: <b>%1</b><br>"
-                       "Cap: <b>%2</b><br>"
-                       "Fiducials: <b>%3 / 3</b><br>"
-                       "EEG electrodes: <b>%4</b><br>"
-                       "Head-shape points: <b>%5</b>")
-            .arg(m_bemPath.isEmpty() ? QStringLiteral("(none)") : QFileInfo(m_bemPath).fileName(),
-                 systemLabel(m_capSystem))
-            .arg(nFid)
-            .arg(nEeg)
-            .arg(nHsp));
+
+    QString html = QStringLiteral(
+        "<b>BEM:</b> %1<br>"
+        "<b>Cap:</b> %2<br>"
+        "<b>Captured:</b> %3 fiducials, %4 EEG, %5 HSP<br>")
+        .arg(m_bemPath.isEmpty() ? QStringLiteral("(none)") : QFileInfo(m_bemPath).fileName(),
+             systemLabel(m_capSystem))
+        .arg(nFid).arg(nEeg).arg(nHsp);
+
+    if (m_haveIcpResult) {
+        html += QStringLiteral("<b>ICP RMSE:</b> %1 mm (%2)<br>")
+                    .arg(m_lastIcpRmse * 1000.0f, 0, 'f', 2)
+                    .arg(m_lastIcpSource);
+    } else {
+        html += QStringLiteral("<b>ICP:</b> <i>not performed</i><br>");
+    }
+
+    if (!m_lastSavedTransPath.isEmpty()) {
+        html += QStringLiteral("<b>Saved -trans.fif:</b> %1")
+                    .arg(QFileInfo(m_lastSavedTransPath).fileName());
+    } else {
+        html += QStringLiteral("<i>-trans.fif not yet saved.</i>");
+    }
+    m_pDoneLabel->setText(html);
 }
 
-void AlignWizard::onExportClicked()
+//=============================================================================================================
+// Save handlers
+//=============================================================================================================
+
+void AlignWizard::onSaveTransClicked()
+{
+    const QString suggested = m_bemPath.isEmpty()
+        ? QStringLiteral("subject-trans.fif")
+        : QFileInfo(m_bemPath).completeBaseName() + QStringLiteral("-trans.fif");
+    const QString out = QFileDialog::getSaveFileName(
+        this, QStringLiteral("Save head→MRI transform"),
+        suggested, QStringLiteral("FIFF transforms (*.fif)"));
+    if (out.isEmpty()) return;
+    emit requestSaveTrans(out);
+}
+
+void AlignWizard::onSaveDigitisationClicked()
 {
     const QString out = QFileDialog::getSaveFileName(
-        this, QStringLiteral("Save digitization"),
-        QStringLiteral("digitization.fif"),
+        this, QStringLiteral("Save digitisation"),
+        QStringLiteral("digitisation.fif"),
         QStringLiteral("FIFF (*.fif)"));
     if (out.isEmpty()) return;
-    emit requestExport(out);
+    emit requestSaveDigitisation(out);
+}
+
+//=============================================================================================================
+// FIFF digitisation load
+//=============================================================================================================
+
+void AlignWizard::onLoadDigiFiff()
+{
+    const QString path = QFileDialog::getOpenFileName(
+        this, QStringLiteral("Load digitisation FIFF"),
+        QString(), QStringLiteral("FIFF (*.fif *.fif.gz)"));
+    if (path.isEmpty()) return;
+
+    QFile file(path);
+    FIFFLIB::FiffDigPointSet set;
+    try {
+        set = FIFFLIB::FiffDigPointSet(file);
+    } catch (const std::exception& e) {
+        QMessageBox::warning(this, QStringLiteral("Load digitisation"),
+            QStringLiteral("Failed to read %1:\n%2").arg(path, QString::fromUtf8(e.what())));
+        return;
+    }
+    if (set.isEmpty()) {
+        QMessageBox::warning(this, QStringLiteral("Load digitisation"),
+            QStringLiteral("No digitisation points found in:\n%1").arg(path));
+        return;
+    }
+
+    // Replace current capture with the imported set.
+    m_pPoints->clear();
+    int hspIdent = 1;
+    int eegIdent = 1;
+    for (qint32 i = 0; i < set.size(); ++i) {
+        const FIFFLIB::FiffDigPoint& dp = set[i];
+        DigitizedPoint p;
+        p.position = QVector3D(dp.r[0], dp.r[1], dp.r[2]);
+        switch (dp.kind) {
+            case FIFFV_POINT_CARDINAL: {
+                p.kind = PointKind::Fiducial;
+                // FIFF cardinal idents: 1=LPA, 2=Nasion, 3=RPA (mne-python convention).
+                FiducialId id = FiducialId::NAS;
+                switch (dp.ident) {
+                    case 1: id = FiducialId::LPA; break;
+                    case 2: id = FiducialId::NAS; break;
+                    case 3: id = FiducialId::RPA; break;
+                    default: continue;
+                }
+                p.identNumber = static_cast<int>(id);
+                p.label       = (id == FiducialId::LPA) ? QStringLiteral("LPA")
+                              : (id == FiducialId::NAS) ? QStringLiteral("NAS")
+                              :                           QStringLiteral("RPA");
+                break;
+            }
+            case FIFFV_POINT_EEG:
+                p.kind        = PointKind::Eeg;
+                p.identNumber = eegIdent++;
+                p.label       = QStringLiteral("EEG-%1").arg(p.identNumber);
+                break;
+            case FIFFV_POINT_EXTRA:
+                p.kind        = PointKind::HeadShape;
+                p.identNumber = hspIdent++;
+                p.label       = QStringLiteral("HSP-%1").arg(p.identNumber);
+                break;
+            default:
+                // Skip HPI / ECG / unknown for now.
+                continue;
+        }
+        m_pPoints->append(p);
+    }
+
+    emit digitisationLoaded(path);
+}
+
+//=============================================================================================================
+// ICP result reporting
+//=============================================================================================================
+
+void AlignWizard::setIcpResult(const QMatrix4x4& headToMri,
+                               float rmseMeters,
+                               const QVector<QPair<QString, float>>& residuals,
+                               const QString& sourceLabel)
+{
+    m_haveIcpResult     = true;
+    m_lastIcpHeadToMri  = headToMri;
+    m_lastIcpRmse       = rmseMeters;
+    m_lastIcpResiduals  = residuals;
+    m_lastIcpSource     = sourceLabel;
+    refreshVerifyUi();
+    refreshSaveUi();
+    refreshDoneUi();
+}
+
+void AlignWizard::setLastSavedTrans(const QString& outPath)
+{
+    m_lastSavedTransPath = outPath;
+    refreshDoneUi();
 }

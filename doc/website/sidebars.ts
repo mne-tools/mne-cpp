@@ -32,6 +32,9 @@ const sidebars: SidebarsConfig = {
                             label: 'MNE Scan',
                             link: { type: 'doc', id: 'manual/scan' },
                             items: [
+                                'manual/mne-scan-quickstart',
+                                'manual/mne-scan-hardware',
+                                'manual/mne-scan-deployment',
                                 'manual/scan-prerecordeddata',
                                 'manual/scan-sourceloc',
                                 'manual/scan-headmonitoring',
@@ -68,6 +71,7 @@ const sidebars: SidebarsConfig = {
                         'manual/browse-raw',
                         'manual/dipole-fit',
                         'manual/analyze-studio',
+                        'manual/mne-analyze-studio',
                         'manual/online',
                     ],
                 },

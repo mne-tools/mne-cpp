@@ -20,27 +20,40 @@
 
 #include <fs/fs_surface.h>
 
+#include <inv/inv_source_estimate.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QAction>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QDebug>
 #include <QDir>
 #include <QDockWidget>
+#include <QDoubleSpinBox>
+#include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFormLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
 #include <QInputDialog>
 #include <QLabel>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSignalBlocker>
+#include <QSlider>
 #include <QStringList>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QWidget>
+
+#include <algorithm>
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -50,6 +63,7 @@ using namespace CORTICALSURFACEPLUGIN;
 using namespace ANSHAREDLIB;
 using namespace DISP3DLIB;
 using namespace FSLIB;
+using namespace INVLIB;
 
 //=============================================================================================================
 
@@ -81,6 +95,9 @@ void CorticalSurface::init()
 
 void CorticalSurface::unload()
 {
+    pause();
+    m_stc = InvSourceEstimate();
+    m_currentSample = -1;
     m_pSurfaceLh.reset();
     m_pSurfaceRh.reset();
     if (m_pScene) {
@@ -111,6 +128,9 @@ QMenu* CorticalSurface::getMenu()
         m_pLoadSurfaceAction = m_pMenu->addAction(QStringLiteral("Load Surface…"));
         connect(m_pLoadSurfaceAction.data(), &QAction::triggered,
                 this, &CorticalSurface::onLoadSurfaceTriggered);
+        m_pLoadStcAction = m_pMenu->addAction(QStringLiteral("Load STC Overlay…"));
+        connect(m_pLoadStcAction.data(), &QAction::triggered,
+                this, &CorticalSurface::onLoadStcTriggered);
     }
     return m_pMenu;
 }
@@ -186,6 +206,80 @@ void CorticalSurface::buildControlDock()
     auto* loadButton = new QPushButton(QStringLiteral("Load Surface…"), container);
     connect(loadButton, &QPushButton::clicked, this, &CorticalSurface::onLoadSurfaceTriggered);
     form->addRow(loadButton);
+
+    // --- STC overlay controls -------------------------------------------------
+    auto* overlayGroup = new QGroupBox(QStringLiteral("STC Overlay"), container);
+    auto* overlayForm  = new QFormLayout(overlayGroup);
+
+    auto* loadStcButton = new QPushButton(QStringLiteral("Load STC…"), overlayGroup);
+    connect(loadStcButton, &QPushButton::clicked,
+            this, &CorticalSurface::onLoadStcTriggered);
+    overlayForm->addRow(loadStcButton);
+
+    auto makeThresholdSpin = [&](float initial) {
+        auto* spin = new QDoubleSpinBox(overlayGroup);
+        spin->setDecimals(4);
+        spin->setRange(-1.0e9, 1.0e9);
+        spin->setSingleStep(0.1);
+        spin->setValue(initial);
+        return spin;
+    };
+
+    m_pFThreshSpin = makeThresholdSpin(m_fThresh);
+    connect(m_pFThreshSpin.data(),
+            QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            this, &CorticalSurface::onFThreshSpinChanged);
+    overlayForm->addRow(QStringLiteral("fthresh"), m_pFThreshSpin);
+
+    m_pFMidSpin = makeThresholdSpin(m_fMid);
+    connect(m_pFMidSpin.data(),
+            QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            this, &CorticalSurface::onFMidSpinChanged);
+    overlayForm->addRow(QStringLiteral("fmid"), m_pFMidSpin);
+
+    m_pFMaxSpin = makeThresholdSpin(m_fMax);
+    connect(m_pFMaxSpin.data(),
+            QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            this, &CorticalSurface::onFMaxSpinChanged);
+    overlayForm->addRow(QStringLiteral("fmax"), m_pFMaxSpin);
+
+    m_pTimeSlider = new QSlider(Qt::Horizontal, overlayGroup);
+    m_pTimeSlider->setRange(0, 0);
+    m_pTimeSlider->setEnabled(false);
+    connect(m_pTimeSlider.data(), &QSlider::valueChanged,
+            this, &CorticalSurface::onTimeSliderChanged);
+    overlayForm->addRow(QStringLiteral("time"), m_pTimeSlider);
+
+    m_pTimeReadout = new QLabel(QStringLiteral("—"), overlayGroup);
+    overlayForm->addRow(QStringLiteral("sample"), m_pTimeReadout);
+
+    auto* playRow = new QWidget(overlayGroup);
+    auto* playLayout = new QHBoxLayout(playRow);
+    playLayout->setContentsMargins(0, 0, 0, 0);
+    m_pPlayButton = new QPushButton(QStringLiteral("Play"), playRow);
+    m_pPlayButton->setEnabled(false);
+    connect(m_pPlayButton.data(), &QPushButton::clicked,
+            this, &CorticalSurface::onPlayPauseClicked);
+    playLayout->addWidget(m_pPlayButton);
+
+    m_pFpsSpin = new QDoubleSpinBox(playRow);
+    m_pFpsSpin->setRange(0.1, 240.0);
+    m_pFpsSpin->setDecimals(2);
+    m_pFpsSpin->setSuffix(QStringLiteral(" fps"));
+    m_pFpsSpin->setValue(m_fps);
+    connect(m_pFpsSpin.data(),
+            QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            this, &CorticalSurface::onPlaybackFpsChanged);
+    playLayout->addWidget(m_pFpsSpin);
+    overlayForm->addRow(QStringLiteral("playback"), playRow);
+
+    form->addRow(overlayGroup);
+
+    if (!m_pPlaybackTimer) {
+        m_pPlaybackTimer = new QTimer(this);
+        connect(m_pPlaybackTimer.data(), &QTimer::timeout,
+                this, &CorticalSurface::onPlaybackTick);
+    }
 
     container->setLayout(form);
     m_pControlDock->setWidget(container);
@@ -396,4 +490,396 @@ void CorticalSurface::refreshSceneLayers()
 
     registerHemi(QStringLiteral("cortex_lh"), QStringLiteral("Cortex (left)"),  m_pSurfaceLh);
     registerHemi(QStringLiteral("cortex_rh"), QStringLiteral("Cortex (right)"), m_pSurfaceRh);
+}
+
+//=============================================================================================================
+// STC overlay
+//=============================================================================================================
+
+bool CorticalSurface::loadSourceEstimate(const QString& path)
+{
+    QFile file(path);
+    if (!QFileInfo::exists(path)) {
+        qWarning() << "[CorticalSurface] STC file not found:" << path;
+        return false;
+    }
+    InvSourceEstimate stc;
+    if (!InvSourceEstimate::read(file, stc)) {
+        qWarning() << "[CorticalSurface] InvSourceEstimate::read failed for" << path;
+        return false;
+    }
+    if (stc.isEmpty() || stc.data.rows() == 0) {
+        qWarning() << "[CorticalSurface] STC produced an empty estimate:" << path;
+        return false;
+    }
+    setSourceEstimate(stc);
+    m_lastStcDir = QFileInfo(path).absolutePath();
+    return true;
+}
+
+//=============================================================================================================
+
+void CorticalSurface::setSourceEstimate(const InvSourceEstimate& stc)
+{
+    m_stc = stc;
+    const int nTimes = totalTimeSamples();
+
+    if (nTimes <= 0) {
+        m_currentSample = -1;
+    } else {
+        m_currentSample = 0;
+    }
+
+    if (m_pTimeSlider) {
+        QSignalBlocker block(m_pTimeSlider.data());
+        m_pTimeSlider->setRange(0, std::max(0, nTimes - 1));
+        m_pTimeSlider->setValue(std::max(0, m_currentSample));
+        m_pTimeSlider->setEnabled(nTimes > 1);
+    }
+    if (m_pPlayButton) {
+        m_pPlayButton->setEnabled(nTimes > 1);
+    }
+
+    // Initialise thresholds from data range if user has not yet customised
+    // them (i.e. still at the default 0/0.5/1 triple).
+    if (m_fThresh == 0.0f && m_fMid == 0.5f && m_fMax == 1.0f && m_stc.data.size() > 0) {
+        const double absMax = m_stc.data.cwiseAbs().maxCoeff();
+        if (absMax > 0.0) {
+            m_fThresh = static_cast<float>(absMax * 0.25);
+            m_fMid    = static_cast<float>(absMax * 0.5);
+            m_fMax    = static_cast<float>(absMax);
+            syncThresholdSpins();
+            emit colormapThresholdsChanged(m_fThresh, m_fMid, m_fMax);
+        }
+    }
+
+    refreshOverlayLayer();
+    updateTimeReadout();
+    emit sourceEstimateLoaded(static_cast<int>(m_stc.data.rows()), nTimes);
+    if (nTimes > 0) {
+        emit timeSampleChanged(m_currentSample);
+    }
+}
+
+//=============================================================================================================
+
+const InvSourceEstimate& CorticalSurface::sourceEstimate() const
+{
+    return m_stc;
+}
+
+//=============================================================================================================
+
+int CorticalSurface::overlayRowCount() const
+{
+    return static_cast<int>(m_stc.data.rows());
+}
+
+//=============================================================================================================
+
+int CorticalSurface::totalTimeSamples() const
+{
+    return static_cast<int>(m_stc.data.cols());
+}
+
+//=============================================================================================================
+
+int CorticalSurface::surfaceVertexCount() const
+{
+    int n = 0;
+    if (m_pSurfaceLh) {
+        n += static_cast<int>(m_pSurfaceLh->rr().rows());
+    }
+    if (m_pSurfaceRh) {
+        n += static_cast<int>(m_pSurfaceRh->rr().rows());
+    }
+    return n;
+}
+
+//=============================================================================================================
+
+bool CorticalSurface::overlayMatchesSurface() const
+{
+    const int surfN = surfaceVertexCount();
+    if (surfN == 0) {
+        return true;
+    }
+    return overlayRowCount() == surfN;
+}
+
+//=============================================================================================================
+
+int CorticalSurface::currentTimeSample() const
+{
+    return m_currentSample;
+}
+
+//=============================================================================================================
+
+void CorticalSurface::setCurrentTimeSample(int sample)
+{
+    const int nTimes = totalTimeSamples();
+    int clamped = -1;
+    if (nTimes > 0) {
+        clamped = std::clamp(sample, 0, nTimes - 1);
+    }
+    if (clamped == m_currentSample) {
+        return;
+    }
+    m_currentSample = clamped;
+    if (m_pTimeSlider) {
+        QSignalBlocker block(m_pTimeSlider.data());
+        m_pTimeSlider->setValue(std::max(0, m_currentSample));
+    }
+    if (m_pScene) {
+        m_pScene->setCurrentTimeSample(m_currentSample);
+    }
+    updateTimeReadout();
+    emit timeSampleChanged(m_currentSample);
+}
+
+//=============================================================================================================
+
+void CorticalSurface::setColormapThresholds(float fthresh, float fmid, float fmax)
+{
+    float vals[3] = { fthresh, fmid, fmax };
+    std::sort(std::begin(vals), std::end(vals));
+    if (vals[0] == m_fThresh && vals[1] == m_fMid && vals[2] == m_fMax) {
+        return;
+    }
+    m_fThresh = vals[0];
+    m_fMid    = vals[1];
+    m_fMax    = vals[2];
+    syncThresholdSpins();
+    refreshOverlayLayer();
+    emit colormapThresholdsChanged(m_fThresh, m_fMid, m_fMax);
+}
+
+//=============================================================================================================
+
+float CorticalSurface::fThresh() const { return m_fThresh; }
+float CorticalSurface::fMid()    const { return m_fMid; }
+float CorticalSurface::fMax()    const { return m_fMax; }
+
+//=============================================================================================================
+
+bool CorticalSurface::isPlaying() const
+{
+    return m_playing;
+}
+
+//=============================================================================================================
+
+void CorticalSurface::play()
+{
+    if (m_playing) {
+        return;
+    }
+    if (totalTimeSamples() <= 1) {
+        return;
+    }
+    m_playing = true;
+    if (m_pPlayButton) {
+        m_pPlayButton->setText(QStringLiteral("Pause"));
+    }
+    if (m_pPlaybackTimer) {
+        const int interval = std::max(1, static_cast<int>(1000.0 / m_fps));
+        m_pPlaybackTimer->start(interval);
+    }
+    emit playStateChanged(true);
+}
+
+//=============================================================================================================
+
+void CorticalSurface::pause()
+{
+    if (!m_playing) {
+        return;
+    }
+    m_playing = false;
+    if (m_pPlaybackTimer) {
+        m_pPlaybackTimer->stop();
+    }
+    if (m_pPlayButton) {
+        m_pPlayButton->setText(QStringLiteral("Play"));
+    }
+    emit playStateChanged(false);
+}
+
+//=============================================================================================================
+
+void CorticalSurface::togglePlayPause()
+{
+    if (m_playing) {
+        pause();
+    } else {
+        play();
+    }
+}
+
+//=============================================================================================================
+
+double CorticalSurface::playbackFps() const
+{
+    return m_fps;
+}
+
+//=============================================================================================================
+
+void CorticalSurface::setPlaybackFps(double fps)
+{
+    if (fps <= 0.0) {
+        fps = 1.0;
+    }
+    if (fps == m_fps) {
+        return;
+    }
+    m_fps = fps;
+    if (m_pFpsSpin) {
+        QSignalBlocker block(m_pFpsSpin.data());
+        m_pFpsSpin->setValue(m_fps);
+    }
+    if (m_playing && m_pPlaybackTimer) {
+        const int interval = std::max(1, static_cast<int>(1000.0 / m_fps));
+        m_pPlaybackTimer->start(interval);
+    }
+}
+
+//=============================================================================================================
+// Slot implementations
+//=============================================================================================================
+
+void CorticalSurface::onLoadStcTriggered()
+{
+    const QString path = QFileDialog::getOpenFileName(
+        nullptr,
+        QStringLiteral("Load STC overlay"),
+        m_lastStcDir,
+        QStringLiteral("Source estimate (*.stc);;All files (*)"));
+    if (path.isEmpty()) {
+        return;
+    }
+    if (!loadSourceEstimate(path)) {
+        QMessageBox::warning(nullptr, getName(),
+                             QStringLiteral("Failed to load STC from '%1'.").arg(path));
+    }
+}
+
+//=============================================================================================================
+
+void CorticalSurface::onFThreshSpinChanged(double value)
+{
+    setColormapThresholds(static_cast<float>(value), m_fMid, m_fMax);
+}
+
+void CorticalSurface::onFMidSpinChanged(double value)
+{
+    setColormapThresholds(m_fThresh, static_cast<float>(value), m_fMax);
+}
+
+void CorticalSurface::onFMaxSpinChanged(double value)
+{
+    setColormapThresholds(m_fThresh, m_fMid, static_cast<float>(value));
+}
+
+//=============================================================================================================
+
+void CorticalSurface::onTimeSliderChanged(int sample)
+{
+    setCurrentTimeSample(sample);
+}
+
+//=============================================================================================================
+
+void CorticalSurface::onPlayPauseClicked()
+{
+    togglePlayPause();
+}
+
+//=============================================================================================================
+
+void CorticalSurface::onPlaybackFpsChanged(double fps)
+{
+    setPlaybackFps(fps);
+}
+
+//=============================================================================================================
+
+void CorticalSurface::onPlaybackTick()
+{
+    const int nTimes = totalTimeSamples();
+    if (nTimes <= 0) {
+        pause();
+        return;
+    }
+    int next = m_currentSample + 1;
+    if (next >= nTimes) {
+        next = 0; // loop
+    }
+    setCurrentTimeSample(next);
+}
+
+//=============================================================================================================
+
+void CorticalSurface::refreshOverlayLayer()
+{
+    if (!m_pScene) {
+        return;
+    }
+    const QString layerId = QStringLiteral("stc_overlay");
+    if (m_stc.isEmpty() || m_stc.data.size() == 0) {
+        m_pScene->removeLayer(layerId);
+        return;
+    }
+    SceneLayer layer;
+    layer.id = layerId;
+    layer.displayName = QStringLiteral("Source estimate");
+    layer.kind = SceneLayerKind::SourceOverlay;
+    layer.opacity = 1.0f;
+    layer.visible = true;
+
+    // Pass the source estimate as the payload; the renderer downcasts by
+    // kind. We copy into a std::shared_ptr<InvSourceEstimate> so the scene
+    // owns its own snapshot and downstream consumers can outlive the
+    // plugin's own m_stc field (e.g. after the next setSourceEstimate()).
+    auto payload = std::make_shared<InvSourceEstimate>(m_stc);
+    layer.payload = std::shared_ptr<void>(payload, payload.get());
+    m_pScene->addLayer(std::move(layer));
+}
+
+//=============================================================================================================
+
+void CorticalSurface::updateTimeReadout()
+{
+    if (!m_pTimeReadout) {
+        return;
+    }
+    const int nTimes = totalTimeSamples();
+    if (nTimes <= 0 || m_currentSample < 0) {
+        m_pTimeReadout->setText(QStringLiteral("—"));
+        return;
+    }
+    const float t = m_stc.tmin + m_currentSample * m_stc.tstep;
+    m_pTimeReadout->setText(QStringLiteral("%1 / %2  (t = %3 s)")
+                                .arg(m_currentSample)
+                                .arg(nTimes - 1)
+                                .arg(t, 0, 'f', 4));
+}
+
+//=============================================================================================================
+
+void CorticalSurface::syncThresholdSpins()
+{
+    if (m_pFThreshSpin) {
+        QSignalBlocker block(m_pFThreshSpin.data());
+        m_pFThreshSpin->setValue(m_fThresh);
+    }
+    if (m_pFMidSpin) {
+        QSignalBlocker block(m_pFMidSpin.data());
+        m_pFMidSpin->setValue(m_fMid);
+    }
+    if (m_pFMaxSpin) {
+        QSignalBlocker block(m_pFMaxSpin.data());
+        m_pFMaxSpin->setValue(m_fMax);
+    }
 }

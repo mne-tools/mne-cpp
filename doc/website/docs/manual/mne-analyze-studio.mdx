@@ -1,0 +1,237 @@
+---
+title: MNE Analyze Studio Walkthrough
+sidebar_label: MNA Studio Walkthrough
+sidebar_position: 13
+---
+
+# MNE Analyze Studio Walkthrough
+
+:::tip Preview
+This walkthrough targets the `staging` branch of MNE Analyze Studio (v2.3.0). For an
+architectural overview of the Workbench, Neuro Kernel and Skill Host, see
+[MNE Analyze Studio](analyze-studio). For the on-disk format used by the workflow
+files referenced below, see [MNA Format](mna-format).
+:::
+
+This page is an end-user walkthrough of MNE Analyze Studio. It uses the three demo
+workflows that ship under `src/applications/mne_analyze_studio/examples/workflows/`
+to illustrate how an **MNA** (MNE Node Authoring) project is loaded, inspected
+and executed through the three project-level skills bundled with the Studio.
+
+<!-- screenshot: full Workbench window with the Workflow Map and an MNA file open in an editor tab -->
+
+## MNA in one minute
+
+An **MNA project** is a declarative description of an analysis pipeline. It is a
+small JSON document (`.mna`) — or its compact CBOR sibling (`.mnx`) — listing:
+
+- `resources` — the data artifacts the pipeline consumes (raw FIFFs, MRIs,
+  inverse operators, …).
+- `pipeline` — an ordered list of **MNA nodes**. Each node names a
+  `skill_id` (the tool that runs it), its `inputs`, `parameters` and the
+  `outputs` it publishes back to the project.
+
+Inside MNE Analyze Studio the Workbench discovers MNA files in the project
+browser. Opening one renders the pipeline in the **Workflow Map** and lets you
+drive it through three project-level skills:
+
+| Skill ID | When to use it |
+|---|---|
+| `mne.skills.read_mna` | Inspect an MNA file (subject count, pipeline length) without running it. |
+| `mne.skills.write_mna` | Persist a freshly authored or round-tripped project to `.mna` / `.mnx`. |
+| `mne.skills.run_mna_graph` | Execute the pipeline of an MNA project end-to-end. |
+
+These three skills are implemented by the **MNA Project Skills** extension
+(`extensions/mna_skills/`) and registered with the Skill Host at startup.
+
+## Demo 1 — `temporal_filter_demo.mna`
+
+A minimal four-node pipeline that exercises the temporal-filter skill in
+isolation. Use this workflow as your first smoke test after building the
+Studio.
+
+**Pipeline:**
+
+| Node UID | Skill | Purpose |
+|---|---|---|
+| `op_preclean` | `mne.skills.temporal_filter` | 1–80 Hz broadband clean-up of `raw_01`. |
+| `op_alpha_band` | `mne.skills.temporal_filter` | 8–13 Hz alpha-band extraction from the cleaned signal. |
+| `op_beta_band` | `mne.skills.temporal_filter` | 13–30 Hz beta-band extraction (parallel branch). |
+| `op_beta_refine` | `mne.skills.temporal_filter` | 18–24 Hz refinement on top of `op_beta_band`. |
+
+**Walkthrough:**
+
+1. From the Workbench file browser, open
+   `examples/workflows/temporal_filter_demo.mna`. The Workflow Map will draw
+   the four temporal-filter nodes as a Y-shaped graph: `op_preclean` fans out
+   into `op_alpha_band` and `op_beta_band`, with `op_beta_refine` chained
+   downstream of the beta branch.
+2. (Optional) Drop a **Read MNA Project** node into the Studio session and
+   point its `path` input at the `.mna` file. Executing it reports the project
+   summary (`pipeline_length: 4`) without touching the data — a quick way to
+   confirm the file is well-formed.
+3. Drop a **Run MNA Pipeline** node (`mne.skills.run_mna_graph`) and route the
+   same `path` into its `project_path` input. Run it. The skill loads the
+   project, wraps `pipeline` into a transient `MnaGraph`, executes it via
+   `MnaGraphExecutor`, and reports `node_count: 4` plus the `result_keys`
+   published by each filter node.
+
+<!-- screenshot: Workflow Map for temporal_filter_demo.mna with op_preclean fanning out to alpha and beta branches -->
+
+## Demo 2 — `filter_then_source_estimation_demo.mna`
+
+A two-node MEG/EEG pipeline that filters a raw recording and then applies a
+pre-computed inverse operator to produce distributed source timecourses.
+
+**Resources:**
+
+- `raw_meg` — `fiff_raw`, path to `subject_raw.fif`.
+- `inv_op` — `fiff_inv`, path to `subject-inv.fif`.
+
+**Pipeline:**
+
+| Node UID | Skill | Purpose |
+|---|---|---|
+| `bandpass` | `mne.skills.temporal_filter` | 1–40 Hz band-pass to drop drifts and high-frequency noise. |
+| `source_est` | `mne.skills.source_estimation` | dSPM inverse on the band-passed data, writing an STC. |
+
+**Walkthrough:**
+
+1. Edit the two `uri` fields in `resources` to point at a real raw FIFF and an
+   inverse operator on disk (the shipped file uses
+   `file:///path/to/your/...` placeholders).
+2. Open the file in the Workbench. The Workflow Map shows a straight
+   `bandpass → source_est` chain.
+3. Use **Read MNA Project** first if you want to confirm the resolved paths
+   without running the pipeline.
+4. Trigger **Run MNA Pipeline** with `project_path` set to the demo file.
+   `MnaGraphExecutor` runs `bandpass` first, hands its `filtered_data` output
+   to `source_est` via the inputs map, and finally publishes
+   `source_est_out`. The skill returns `node_count: 2` and the result keys
+   for both nodes; the Studio's Analysis Results widget will pick the STC up
+   for cortical-surface rendering.
+
+<!-- screenshot: Source Estimation result rendered on the cortex after running filter_then_source_estimation_demo.mna -->
+
+## Demo 3 — `source_estimation_multimodal_demo.mna`
+
+A full auditory source-estimation pipeline (`Auditory_Source_Estimation_Demo`)
+that fuses MEG/EEG and MRI branches. All nodes in the shipped file are
+registered against `mne.skills.temporal_filter` as placeholders for the
+conceptual operator named in each node's `parameters.conceptual_operator` —
+this lets the entire graph traverse with the current skill set while the
+specialised skills land in follow-up releases.
+
+**Resources:**
+
+- `raw_run1` — auditory MEG/EEG recording placeholder.
+- `empty_room_meg` — empty-room recording for noise covariance.
+- `mri_raw_anatomical` — anatomical T1 placeholder.
+
+**Pipeline (12 nodes, three stages):**
+
+*MEG/EEG Processing*
+
+| Node UID | Conceptual operator | Produces |
+|---|---|---|
+| `op_noise_covariance` | `mne_compute_raw_covariance` | `noise_cov_01` |
+| `op_filtered_evoked` | `mne_process_raw` | `evoked_auditory_01` |
+
+*MRI Processing*
+
+| Node UID | Conceptual operator | Produces |
+|---|---|---|
+| `op_reconstructed_mri` | `FreeSurfer` | `reconstructed_mri_01` |
+| `op_cor_brain` | `mne_setup_mri` | `cor_brain_01` |
+| `op_source_space` | `mne_setup_source_space` | `source_space_01` |
+| `op_bem_mesh` | `mne_watershed_bem` | `bem_mesh_01` |
+| `op_bem_model` | `mne_setup_forward_model` | `bem_model_01` |
+| `op_cor_t1` | `mne_setup_mri` | `cor_t1_01` |
+| `op_coregistration` | `mne_setup_mri` | `coreg_aligned_01` |
+
+*Source Estimation*
+
+| Node UID | Conceptual operator | Produces |
+|---|---|---|
+| `op_forward_solution` | `mne_forward_solution` | `forward_solution_01` |
+| `op_inverse_operator` | `mne_inverse_operator` | `inverse_operator_01` |
+| `op_analyze_visualize` | `MNE Analyze` | `source_estimates_01` |
+
+**Walkthrough:**
+
+1. Open the file. The Workflow Map will draw the MRI branch on one side, the
+   MEG/EEG branch on the other, and the Source Estimation stage as the
+   confluence node that consumes `forward_solution_01`,
+   `noise_cov_01` and `raw_run1`.
+2. Run **Read MNA Project** to confirm the resource resolution; the summary
+   reports `pipeline_length: 12` and the project name
+   `Auditory_Source_Estimation_Demo`.
+3. (Optional) Drop a **Write MNA Project** node to round-trip the loaded
+   project into a sibling `.mnx` file — handy when you want a compact binary
+   snapshot to commit alongside the JSON. Set
+   `parameters.output_path` and (optionally) `parameters.format = "mnx"`.
+4. Run **Run MNA Pipeline** with the demo file as `project_path`. The
+   executor walks all twelve nodes in topological order and reports
+   `result_keys` containing the published artifacts of every stage so
+   downstream Studio steps can pick the final `source_estimates_01` for
+   visualisation.
+
+<!-- screenshot: Workflow Map for source_estimation_multimodal_demo.mna showing the MEG/EEG and MRI branches converging at op_forward_solution and op_inverse_operator -->
+
+## Skills reference
+
+The three skills below live under
+`src/applications/mne_analyze_studio/extensions/mna_skills/` and ship in the
+**MNA Project Skills** extension (`extension_id: mna-skills`).
+
+### `mne.skills.read_mna` — Read MNA Project
+
+Loads an `.mna` (JSON) or `.mnx` (CBOR) project and reports a summary.
+
+- **Inputs:** `path` (string, required) — file path or `file://` URI.
+- **Parameters:** *(none)*
+- **Outputs:**
+  - `project_summary` (object) — `name`, `description`, `mna_version`,
+    `subject_count`, `pipeline_length`.
+  - `project_path` (string) — the resolved on-disk path.
+- **Status:** `completed` on success; `error` with a `message` if the input is
+  missing or the file does not exist.
+
+### `mne.skills.write_mna` — Write MNA Project
+
+Persists a (possibly newly created) MNA project to disk.
+
+- **Inputs:** `source_project` (string, optional) — an existing project to
+  round-trip. If omitted, an empty project is created.
+- **Parameters:**
+  - `output_path` (string, required) — destination file.
+  - `format` (`"mna" | "mnx" | "auto"`, default `"auto"`) — serialisation
+    format; `auto` is inferred from the extension.
+  - `project_name` (string) — used when creating a new project from scratch.
+- **Outputs:** `output_path` (string) — the file actually written.
+
+### `mne.skills.run_mna_graph` — Run MNA Pipeline
+
+Executes the pipeline of an MNA project end-to-end.
+
+- **Inputs:** `project_path` (string, required) — file path or `file://` URI
+  of the `.mna` / `.mnx` project to run.
+- **Parameters:** `graph_inputs` (object, optional) — name→value map injected
+  into `MnaGraphExecutor::execute` as initial graph inputs.
+- **Outputs:**
+  - `result_keys` (array of `nodeId::portName` strings) — every value the
+    executor published during the run.
+  - `node_count` (integer) — the number of nodes executed.
+- **Behaviour:** the project's `pipeline` list is wrapped into a transient
+  `MnaGraph`. If `MnaGraph::validate` fails the skill returns `status:
+  "error"` with the validation messages; otherwise it reports
+  `status: "completed"` together with the result summary above.
+
+<!-- screenshot: Skill inspector panel showing the schema for mne.skills.run_mna_graph -->
+
+## See also
+
+- [MNE Analyze Studio](analyze-studio) — architectural overview of the
+  Workbench, Neuro Kernel and Skill Host.
+- [MNA Format](mna-format) — on-disk schema for `.mna` / `.mnx` projects.
+- [Workflow](workflow) — general analysis workflow guidance.

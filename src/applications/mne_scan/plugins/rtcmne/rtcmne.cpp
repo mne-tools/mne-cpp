@@ -53,6 +53,8 @@
 #include <mne/mne_epoch_data_list.h>
 
 #include <inv/minimum_norm/inv_minimum_norm.h>
+#include <inv/minimum_norm/inv_cmne.h>
+#include <inv/minimum_norm/inv_cmne_settings.h>
 
 #include <dsp/rt/rt_inv_op.h>
 
@@ -194,8 +196,18 @@ void RtcMne::initPluginControlWidgets()
             this, &RtcMne::onTriggerTypeChanged);
     connect(pMinimumNormSettingsView, &MinimumNormSettingsView::timePointChanged,
             this, &RtcMne::onTimePointValueChanged);
+    connect(pMinimumNormSettingsView, &MinimumNormSettingsView::modelCheckpointChanged,
+            this, &RtcMne::onModelCheckpointChanged);
     connect(this, &RtcMne::responsibleTriggerTypesChanged,
             pMinimumNormSettingsView, &MinimumNormSettingsView::setTriggerTypes);
+
+    // Push any restored checkpoint path to the view so the user sees the persisted value.
+    if(!m_sModelCheckpoint.isEmpty()) {
+        pMinimumNormSettingsView->setModelCheckpoint(m_sModelCheckpoint);
+    } else if(!pMinimumNormSettingsView->getModelCheckpoint().isEmpty()) {
+        // The view loaded a previously persisted path via its own QSettings.
+        m_sModelCheckpoint = pMinimumNormSettingsView->getModelCheckpoint();
+    }
 
     plControlWidgets.append(pMinimumNormSettingsView);
 
@@ -537,6 +549,15 @@ void RtcMne::onMethodChanged(const QString& method)
 
 //=============================================================================================================
 
+void RtcMne::onModelCheckpointChanged(const QString& sPath)
+{
+    QMutexLocker locker(&m_qMutex);
+
+    m_sModelCheckpoint = sPath;
+}
+
+//=============================================================================================================
+
 void RtcMne::onTriggerTypeChanged(const QString& triggerType)
 {
     m_sAvrType = triggerType;
@@ -583,6 +604,8 @@ void RtcMne::run()
     bool bEvokedInput = false;
     bool bRawInput = false;
     bool bUpdateMinimumNorm = false;
+    bool bCmne = false;
+    QString sModelCheckpoint;
     QSharedPointer<INVLIB::InvMinimumNorm> pMinimumNorm;
     QStringList lChNamesFiffInfo;
     QStringList lChNamesInvOp;
@@ -599,17 +622,25 @@ void RtcMne::run()
         lChNamesFiffInfo = m_pFiffInfoInput->ch_names;
         lChNamesInvOp = m_invOp.noise_cov->names;
         bUpdateMinimumNorm = m_bUpdateMinimumNorm;
+        bCmne = (m_sMethod == QLatin1String("CMNE"));
+        sModelCheckpoint = m_sModelCheckpoint;
         m_qMutex.unlock();
 
         if(bUpdateMinimumNorm) {
             m_qMutex.lock();
-            pMinimumNorm = InvMinimumNorm::SPtr(new InvMinimumNorm(m_invOp, lambda2, m_sMethod));
+            if(!bCmne) {
+                pMinimumNorm = InvMinimumNorm::SPtr(new InvMinimumNorm(m_invOp, lambda2, m_sMethod));
+            } else {
+                pMinimumNorm.reset();
+            }
             m_bUpdateMinimumNorm = false;
             m_qMutex.unlock();
 
             // Set up the inverse according to the parameters.
             // Use 1 nave here because in case of evoked data as input the minimum norm will always be updated when the source estimate is calculated (see run method).
-            pMinimumNorm->doInverseSetup(1,true);
+            if(pMinimumNorm) {
+                pMinimumNorm->doInverseSetup(1,true);
+            }
         }
 
         //Process data from raw data input
@@ -645,28 +676,85 @@ void RtcMne::run()
         }
 
         //Process data from averaging input
-        if(bEvokedInput && pMinimumNorm) {
-            if(m_pCircularEvokedBuffer->pop(evoked)) {
-                // Get the current evoked data
-                if(((skip_count % iDownSample) == 0)) {
-                    sourceEstimate = pMinimumNorm->calculateInverse(evoked);
+        if(bEvokedInput) {
+            if(bCmne) {
+                if(m_pCircularEvokedBuffer->pop(evoked)) {
+                    if(((skip_count % iDownSample) == 0)) {
+                        sourceEstimate = computeCmneInverse(evoked, lambda2, sModelCheckpoint);
 
-                    if(!sourceEstimate.isEmpty()) {
-                        if(iTimePointSps < sourceEstimate.data.cols() && iTimePointSps >= 0) {
-                            sourceEstimate = sourceEstimate.reduce(iTimePointSps,1);
-                            m_pRTSEOutput->measurementData()->setValue(sourceEstimate);
-                        } else {
+                        if(!sourceEstimate.isEmpty()) {
+                            if(iTimePointSps < sourceEstimate.data.cols() && iTimePointSps >= 0) {
+                                sourceEstimate = sourceEstimate.reduce(iTimePointSps,1);
+                            }
                             m_pRTSEOutput->measurementData()->setValue(sourceEstimate);
                         }
                     }
-                } else {
-                    m_pCircularEvokedBuffer->pop(evoked);
+                }
+            } else if(pMinimumNorm) {
+                if(m_pCircularEvokedBuffer->pop(evoked)) {
+                    // Get the current evoked data
+                    if(((skip_count % iDownSample) == 0)) {
+                        sourceEstimate = pMinimumNorm->calculateInverse(evoked);
+
+                        if(!sourceEstimate.isEmpty()) {
+                            if(iTimePointSps < sourceEstimate.data.cols() && iTimePointSps >= 0) {
+                                sourceEstimate = sourceEstimate.reduce(iTimePointSps,1);
+                                m_pRTSEOutput->measurementData()->setValue(sourceEstimate);
+                            } else {
+                                m_pRTSEOutput->measurementData()->setValue(sourceEstimate);
+                            }
+                        }
+                    } else {
+                        m_pCircularEvokedBuffer->pop(evoked);
+                    }
                 }
             }
         }
 
         ++skip_count;
     }
+}
+
+//=============================================================================================================
+
+InvSourceEstimate RtcMne::computeCmneInverse(const FiffEvoked& evoked,
+                                             float fLambda2,
+                                             const QString& sModelCheckpoint)
+{
+    InvSourceEstimate stcEmpty;
+
+    if(sModelCheckpoint.isEmpty()) {
+        qWarning() << "[RtcMne::computeCmneInverse] CMNE selected but no model checkpoint set.";
+        return stcEmpty;
+    }
+
+    QSharedPointer<MNEForwardSolution>          pFwd;
+    FIFFLIB::FiffCov::SDPtr                     pNoiseCov;
+    FIFFLIB::FiffCov::SDPtr                     pSrcCov;
+
+    {
+        QMutexLocker locker(&m_qMutex);
+        pFwd      = m_pFwd;
+        pNoiseCov = m_invOp.noise_cov;
+        pSrcCov   = m_invOp.source_cov;
+    }
+
+    if(!pFwd || !pFwd->sol || !pNoiseCov || !pSrcCov) {
+        qWarning() << "[RtcMne::computeCmneInverse] Missing forward solution, noise cov or source cov.";
+        return stcEmpty;
+    }
+
+    InvCMNESettings cmneSettings;
+    cmneSettings.onnxModelPath = sModelCheckpoint;
+    cmneSettings.lambda2       = static_cast<double>(fLambda2);
+    cmneSettings.numSources    = static_cast<int>(pFwd->sol->data.cols());
+
+    InvCMNEResult res = InvCMNE::compute(evoked.data,
+                                         pFwd->sol->data,
+                                         pNoiseCov->data,
+                                         pSrcCov->data,
+                                         cmneSettings);
+    return res.stcCmne;
 }
 
 //=============================================================================================================
@@ -688,6 +776,7 @@ QVariantMap RtcMne::getAttributes() const
     attrs[QStringLiteral("avrType")]        = m_sAvrType;
     attrs[QStringLiteral("downSample")]     = m_iDownSample;
     attrs[QStringLiteral("numAverages")]    = m_iNumAverages;
+    attrs[QStringLiteral("modelCheckpoint")]= m_sModelCheckpoint;
     return attrs;
 }
 
@@ -709,4 +798,6 @@ void RtcMne::setAttributes(const QVariantMap& attributes)
         m_iDownSample = attributes[QStringLiteral("downSample")].toInt();
     if (attributes.contains(QStringLiteral("numAverages")))
         m_iNumAverages = attributes[QStringLiteral("numAverages")].toInt();
+    if (attributes.contains(QStringLiteral("modelCheckpoint")))
+        m_sModelCheckpoint = attributes[QStringLiteral("modelCheckpoint")].toString();
 }

@@ -48,6 +48,8 @@
 
 #include <fiff/fiff_evoked.h>
 
+#include <inv/inv_source_estimate.h>
+
 #include <mne/mne_inverse_operator.h>
 
 //=============================================================================================================
@@ -211,6 +213,14 @@ protected:
 
     //=========================================================================================================
     /**
+     * Slot called when the CMNE model checkpoint path changed.
+     *
+     * @param[in] sPath  New absolute path to the model checkpoint file.
+     */
+    void onModelCheckpointChanged(const QString& sPath);
+
+    //=========================================================================================================
+    /**
      * Slot called when the trigger type changed.
      *
      * @param[in] triggerType        The new trigger type.
@@ -226,6 +236,20 @@ protected:
     void onTimePointValueChanged(int iTimePointMs);
 
     virtual void run() override;
+
+    //=========================================================================================================
+    /**
+     * Run the CMNE (Contextual MNE) inverse on a single evoked epoch.
+     *
+     * @param[in] evoked            The evoked epoch to localize.
+     * @param[in] fLambda2          Tikhonov regularisation (SNR^-2).
+     * @param[in] sModelCheckpoint  Absolute path to the LSTM .onnx checkpoint.
+     *
+     * @return The CMNE-corrected source estimate, or an empty estimate if prerequisites are missing.
+     */
+    INVLIB::InvSourceEstimate computeCmneInverse(const FIFFLIB::FiffEvoked& evoked,
+                                                 float fLambda2,
+                                                 const QString& sModelCheckpoint);
 
     QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeFwdSolution> >           m_pRTFSInput;               /**< The RealTimeFwdSolution input.*/
     QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray> >      m_pRTMSAInput;              /**< The RealTimeMultiSampleArray input.*/
@@ -260,7 +284,8 @@ protected:
     QString                         m_sAtlasDir;                /**< File to Atlas. */
     QString                         m_sSurfaceDir;              /**< File to FsSurface. */
     QString                         m_sAvrType;                 /**< The average type. */
-    QString                         m_sMethod;                  /**< The method: "MNE" | "dSPM" | "sLORETA". */
+    QString                         m_sMethod;                  /**< The method: "MNE" | "dSPM" | "sLORETA" | "CMNE". */
+    QString                         m_sModelCheckpoint;         /**< CMNE LSTM model checkpoint path (.onnx). */
     QFile                           m_fMriHeadTrans;            /**< The Head - Mri transformation. */
 
     QStringList                     m_qListCovChNames;          /**< Covariance channel names. */

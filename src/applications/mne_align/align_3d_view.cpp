@@ -191,6 +191,31 @@ void Align3DView::setLiveDigitizerPose(int station,
     }
 }
 
+void Align3DView::setHeadToMriOverride(const QMatrix4x4& headToMri)
+{
+    m_haveHeadToMriOverride = true;
+    m_headToMriOverride     = headToMri;
+    m_headToMri             = headToMri;
+    rebuildAcquiredLayer();
+    rebuildDigitizerLayer();
+    rebuildStaticMarkers();
+    m_liveTrackerDirty = true;
+    onLiveUpdateTick();
+}
+
+void Align3DView::clearHeadToMriOverride()
+{
+    if (!m_haveHeadToMriOverride) return;
+    m_haveHeadToMriOverride = false;
+    m_headToMriOverride.setToIdentity();
+    recomputeAlignment();
+    rebuildAcquiredLayer();
+    rebuildDigitizerLayer();
+    rebuildStaticMarkers();
+    m_liveTrackerDirty = true;
+    onLiveUpdateTick();
+}
+
 void Align3DView::onLiveUpdateTick()
 {
     if (!m_liveTrackerDirty || !m_pBrainView) {
@@ -271,6 +296,10 @@ void Align3DView::onLiveUpdateTick()
 
 void Align3DView::onPointsChanged()
 {
+    // Any change in captured/twin fiducials invalidates a prior ICP fit.
+    m_haveHeadToMriOverride = false;
+    m_headToMriOverride.setToIdentity();
+
     recomputeAlignment();
     rebuildAcquiredLayer();
     rebuildDigitizerLayer();

@@ -1,0 +1,93 @@
+---
+title: MNE Scan Quickstart
+sidebar_label: Quickstart
+---
+# MNE Scan Quickstart
+
+A 10–15 minute first-run walkthrough that brings a fresh install of MNE-CPP from "binary installed" to "FIFF file recorded from a simulated stream". No hardware required.
+
+## 1. Install MNE-CPP
+
+Pick **one** of the following:
+
+- **Binary release** — download the latest installer for your OS from [mne-cpp releases](https://github.com/mne-tools/mne-cpp/releases) and run it. The installer lays out `bin/`, `lib/`, and `plugins/` under a single prefix; see [Deployment](./mne-scan-deployment.mdx) for the layout.
+- **From source** — follow the [CMake build guide](../development/buildguide-cmake.mdx). The default build produces `mne_scan` plus all platform-compatible sensor plugins.
+
+Verify the install by listing the plugins directory; you should see one shared library per entry in the [Hardware Support Matrix](./mne-scan-hardware.mdx).
+
+## 2. Launch `mne_scan`
+
+From the install prefix:
+
+```bash
+# Linux / macOS
+./bin/mne_scan
+
+# Windows
+bin\mne_scan.exe
+```
+
+The main window opens with three docks:
+
+- **Plugin Toolbar** (left) — every loaded plugin, grouped Sensor / Algorithm / IO.
+- **Plugin Scene** (centre) — the drag-and-drop canvas where you wire up the pipeline.
+- **Log** (bottom) — runtime messages from each plugin.
+
+<!-- screenshot: doc/website/static/img/mne-scan-main-window.png — empty main window after first launch -->
+
+## 3. Add a Source Plugin (FiffSimulator)
+
+The `FiffSimulator` plugin replays a pre-recorded FIFF file and is the easiest way to test the pipeline without hardware.
+
+1. Drag `FiffSimulator` from the Plugin Toolbar onto the Plugin Scene.
+2. Click the plugin to open its configuration panel, then select the **Connection** tab.
+3. Start `mne_rt_server` in a separate terminal, pointing at the sample dataset:
+
+   ```bash
+   ./bin/mne_rt_server --file ./resources/data/MNE-sample-data/MEG/sample/ernoise_raw.fif
+   ```
+
+4. Back in MNE Scan, set the host to `127.0.0.1` and press **Connect**. The status indicator should switch to *Connected*.
+5. Open the **Preferences** tab and set *Block size* equal to the sampling frequency (so the display refreshes once per second).
+
+See [Stream Pre-Recorded Data](./scan-prerecordeddata.mdx) for a fuller walkthrough of `FiffSimulator`.
+
+## 4. Add a Display / Recording Plugin
+
+You can either look at the data live, record it, or both. For the quickstart, do both:
+
+1. Drag `writetofile` from the IO group onto the scene.
+2. Hover over `FiffSimulator`'s output connector (right side) and drag a connection to the `writetofile` input connector (left side). A solid line confirms the link is established.
+3. Click `writetofile` and pick an output path in its Preferences tab.
+
+Optionally drag any algorithm plugin (e.g. `noisereduction`) between the two to verify processing also works.
+
+<!-- screenshot: doc/website/static/img/mne-scan-pipeline-fiffsim-writetofile.png — wired pipeline: FiffSimulator → writetofile -->
+
+## 5. Start Streaming
+
+Press the green **Run** button in the top-left of the toolbar. You should observe:
+
+- The Log dock prints initialisation messages from every plugin in the pipeline.
+- Clicking on `FiffSimulator` shows the real-time channel display refreshing once per second.
+- The output FIFF file grows on disk as samples are written.
+
+If any plugin fails to start, the failing connector turns red and the Log dock prints an `[ERROR]` line tagged with the plugin name.
+
+## 6. Stop and Verify the FIFF Output
+
+Press the red **Stop** button when you have collected enough data. The output file is finalised (FIFF closing tags written) only after Stop completes — kill-9'ing `mne_scan` will leave a truncated file.
+
+Verify the recorded file:
+
+```bash
+./bin/mne_show_fiff <path-to-output.fif>
+```
+
+You should see the standard FIFF block structure (`FIFFB_MEAS_INFO`, `FIFFB_RAW_DATA`, …) and a sample count that matches your recording duration × the source sampling frequency.
+
+## Next Steps
+
+- Connect a real amplifier: see the [Hardware Support Matrix](./mne-scan-hardware.mdx) and the device-specific pages (e.g. [TMSI](./scan-tmsi.mdx), [BrainAmp](./scan-brainamp.mdx)).
+- Build a source-localisation pipeline: [Source Localization](./scan-sourceloc.mdx).
+- Move to a production / clinical setup: [Deployment Notes](./mne-scan-deployment.mdx).

@@ -1,0 +1,72 @@
+---
+title: MNE Scan Hardware Support Matrix
+sidebar_label: Hardware Support
+---
+# MNE Scan Hardware Support Matrix
+
+This page enumerates every plugin shipped under `src/applications/mne_scan/plugins/`, the device or data source it interfaces with, and the build-time / runtime constraints that determine whether a given plugin is usable on your system.
+
+Plugins fall into three roles:
+
+- **Sensor** — acquires data from a piece of hardware or a network stream.
+- **Algorithm** — processes data inside the running pipeline (no hardware contact).
+- **IO** — writes results to disk or downstream consumers.
+
+Only the **Sensor** plugins are tied to physical hardware; the others are pure data-flow stages and run wherever MNE-CPP itself builds.
+
+<!-- screenshot: doc/website/static/img/mne-scan-plugin-toolbar.png — toolbar listing all 18 plugins, grouped by role -->
+
+## Sensor Plugins
+
+| Plugin | Device / Source | Default Sampling Rate | Channel Counts | OS Support | Vendor SDK / Driver | Build Flag |
+|--------|-----------------|-----------------------|----------------|------------|---------------------|------------|
+| `babymeg` | BabyMEG (Boston Children's Hospital pediatric MEG) | 1000 Hz (configured by acquisition host) | Full BabyMEG channel set delivered by the BabyMEG server (magnetometers + references + trigger) | Linux, macOS, Windows | None for the plugin itself — relies on the BabyMEG TCP server (`babymegclient`) running on the acquisition host | Built by default |
+| `brainamp` | Brain Products BrainAmp EEG amplifier | 1000 Hz (driver runs internally at 5000 Hz and downsamples) | Up to the amplifier's configured montage (16/32/64/128 channels) | Windows only | BrainAmp SDK header `BrainAmpIoCtl.h`; USB driver installed on host | `-DWITH_BRAINAMP=ON` |
+| `eegosports` | ANT Neuro eego sports EEG amplifier | 512 Hz (also 500 / 1000 / 2000 Hz) | Up to amplifier model (8 / 32 / 64 / 88 channels) | Windows only | `eemagine` SDK (`eego-SDK.dll`, `eego-SDK.lib`); USB driver; per-device license files for older SDKs | `-DWITH_EEGOSPORTS=ON` |
+| `fiffsimulator` | Pre-recorded FIFF file streamed through `mne_rt_server` | Inherited from the source FIFF (typically 600–5000 Hz) | Inherited from the source FIFF | Linux, macOS, Windows | None — uses the in-tree `mne_rt_server` | Built by default |
+| `ftbuffer` | FieldTrip Buffer (TCP, default port 1972) | Inherited from the upstream producer (e.g. Neuromag / MEGIN via `neuromag2ft`) | Inherited from the FieldTrip header | Linux, macOS, Windows | None for the plugin; the producer side (e.g. `neuromag2ft`) must be installed on the acquisition computer | Built by default |
+| `gusbamp` | g.tec g.USBamp EEG / biosignal amplifier (up to 4 chained units) | 128 Hz (also 256 / 512 / 1200 / 2400 / 4800 / 9600 / 19200 / 38400 Hz) | Up to 16 channels per unit × up to 4 units (master + 3 slaves) | Windows only | `gtec_gUSBamp.h` and `gUSBamp_x64.lib` / `gUSBamp_x86.lib` from the g.tec SDK; USB driver | `-DWITH_GUSBAMP=ON` |
+| `lsladapter` | Lab Streaming Layer (LSL) outlets discovered on the local network | Inherited from the LSL stream | Inherited from the LSL stream | Linux, macOS, Windows | None — uses the in-tree `mne_lsl` library | Built by default |
+| `natus` | Natus Quantum amplifier (clinical EEG, phase-2 epilepsy monitoring) | 2048 Hz | Up to the amplifier configuration (typical 32–128 EEG + auxiliary) | Windows only (requires Natus SDK v8.4 host service `SelectStreamingMachine`) | Natus SDK v8.4; `startDataTransmit.bat` running on the streaming machine | `-DWITH_NATUS=ON` |
+| `tmsi` | TMSi Refa / Porti EEG amplifier | 1024 Hz | Up to amplifier model | Windows only | `TMSiSDK.dll` installed at `C:\Windows\System32\TMSiSDK.dll`; vendor USB driver | `-DWITH_TMSI=ON` |
+
+### Live-Status Checklist (per Sensor Plugin)
+
+Use this checklist whenever you bring up a new acquisition setup. The plugin will not start streaming unless every item is green.
+
+- [ ] Vendor driver installed and the device enumerates in the OS device manager (`lsusb` / Device Manager).
+- [ ] Vendor SDK library file is present in the search path (`*.dll` next to `mne_scan.exe`, or `*.so` / `*.dylib` under the install prefix).
+- [ ] License / activation file present (EEGoSports only, for SDK versions older than the bundled one).
+- [ ] Amplifier powered on **before** MNE Scan is launched.
+- [ ] Sampling frequency and block size configured in the plugin's *Preferences* tab and match the amplifier's allowed values.
+- [ ] FIFF info reports the expected channel count after `Init` (visible in the *Channel Selection* widget).
+- [ ] No `[ERROR]` lines tagged with the plugin name in the MNE Scan log dock when you press the green *Run* button.
+
+## Algorithm Plugins
+
+| Plugin | Role | Notes |
+|--------|------|-------|
+| `averaging` | Real-time evoked-response averaging with baseline correction and artifact thresholds | Triggered by stimulus channels in the input FIFF info |
+| `covariance` | Online noise-covariance estimation | Output is consumable by `rtcmne` |
+| `hpi` | Continuous HPI coil fitting and head-position monitoring | Requires a MEG input with active HPI coil channels; coil-frequency presets are read from `hpi.json` |
+| `neuronalconnectivity` | Real-time functional connectivity estimation | Input: source-localised data from `rtcmne` |
+| `noisereduction` | SSP projection, gradient compensation, and real-time filtering | Replaces several offline pre-processing steps |
+| `rtcmne` | Real-time minimum-norm source estimation | Requires forward solution (`rtfwd` or pre-computed) + noise covariance |
+| `rtfwd` | Real-time forward-solution recomputation, driven by HPI updates | Pairs with `hpi` for moving-subject MEG |
+
+## IO / Utility Plugins
+
+| Plugin | Role | Notes |
+|--------|------|-------|
+| `dummytoolbox` | Reference / template plugin for new plugin authors | Not intended for production use |
+| `writetofile` | Streams the pipeline output to a FIFF file on disk | One file per *Run*; filename pattern configurable in the plugin's GUI |
+
+## Plugin Count
+
+18 plugins in total: 9 sensor, 7 algorithm, 2 IO/utility.
+
+## See Also
+
+- [Quickstart](./mne-scan-quickstart.mdx)
+- [Deployment Notes](./mne-scan-deployment.mdx)
+- [MNE Scan overview](./scan.mdx)

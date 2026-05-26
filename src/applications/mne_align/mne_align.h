@@ -103,9 +103,11 @@ private slots:
     void onConnectDigitizer();
     void onDisconnectDigitizer();
     void onAbout();
-    void onWizardExportRequest(const QString& outPath);
+    void onWizardSaveTrans(const QString& outPath);
+    void onWizardSaveDigitisation(const QString& outPath);
     void onWizardBemPathChanged(const QString& path);
     void onWizardStepChanged(MNEALIGN::AlignStep step);
+    void onWizardDigitisationLoaded(const QString& path);
     void onDigitizerConnectedChanged(bool connected);
     void onIcpFit();
 

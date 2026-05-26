@@ -66,6 +66,7 @@ set(MNE_LIBS_REQUIRED
     mne_fwd
     mne_mne
     mne_mna
+    mne_mri
     mne_disp
     mne_inv
     mne_utils
@@ -73,9 +74,21 @@ set(MNE_LIBS_REQUIRED
     mne_conn
 )
 
+# Standalone static-library plugins (see app/plugins/README.md).
+add_subdirectory(app/plugins)
+
+set(INSPECT_PLUGIN_LIBS "")
+if(TARGET inspect_electrodes)
+    list(APPEND INSPECT_PLUGIN_LIBS inspect_electrodes)
+endif()
+if(TARGET inspect_mri_slices)
+    list(APPEND INSPECT_PLUGIN_LIBS inspect_mri_slices)
+endif()
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     ${MNE_LIBS_REQUIRED}
+    ${INSPECT_PLUGIN_LIBS}
     Eigen3::Eigen
 )
 

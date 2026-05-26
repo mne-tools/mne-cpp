@@ -44,6 +44,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QPushButton>
 #include <QSettings>
 
 //=============================================================================================================
@@ -80,11 +83,16 @@ MinimumNormSettingsView::MinimumNormSettingsView(const QString& sSettingsPath,
     connect(m_pUi->m_spinBox_timepoint, &QSpinBox::editingFinished,
             this, &MinimumNormSettingsView::onTimePointValueChanged);
 
+    connect(m_pUi->m_pushButton_browseModelCheckpoint, &QPushButton::clicked,
+            this, &MinimumNormSettingsView::onBrowseModelCheckpointClicked);
+
     if(!m_sMethod.isEmpty())
     {
         m_pUi->m_comboBox_method->setCurrentIndex(m_pUi->m_comboBox_method->findText(m_sMethod));
         m_pUi->m_comboBox_method->setEnabled(false);
     }
+
+    updateCmneWidgetVisibility(m_pUi->m_comboBox_method->currentText());
 
     this->setWindowTitle("InvMinimumNorm Settings");
     this->setMinimumWidth(330);
@@ -120,8 +128,9 @@ void MinimumNormSettingsView::saveSettings()
         return;
     }
 
-    // Save Settings
     QSettings settings("MNECPP");
+    settings.setValue(m_sSettingsPath + QString("/MinimumNormSettingsView/modelCheckpoint"),
+                      m_sModelCheckpoint);
 }
 
 //=============================================================================================================
@@ -132,8 +141,12 @@ void MinimumNormSettingsView::loadSettings()
         return;
     }
 
-    // Load Settings
     QSettings settings("MNECPP");
+    const QString sStored = settings.value(m_sSettingsPath + QString("/MinimumNormSettingsView/modelCheckpoint"),
+                                           QString()).toString();
+    if(!sStored.isEmpty()) {
+        setModelCheckpoint(sStored);
+    }
 }
 
 //=============================================================================================================
@@ -164,7 +177,53 @@ void MinimumNormSettingsView::updateProcessingMode(ProcessingMode mode)
 
 void MinimumNormSettingsView::onMethodChanged(const QString& method)
 {
+    updateCmneWidgetVisibility(method);
     emit methodChanged(method);
+}
+
+//=============================================================================================================
+
+void MinimumNormSettingsView::setModelCheckpoint(const QString& sPath)
+{
+    if(m_sModelCheckpoint == sPath) {
+        return;
+    }
+    m_sModelCheckpoint = sPath;
+    m_pUi->m_lineEdit_modelCheckpoint->setText(sPath);
+    saveSettings();
+    emit modelCheckpointChanged(sPath);
+}
+
+//=============================================================================================================
+
+QString MinimumNormSettingsView::getModelCheckpoint() const
+{
+    return m_sModelCheckpoint;
+}
+
+//=============================================================================================================
+
+void MinimumNormSettingsView::updateCmneWidgetVisibility(const QString& method)
+{
+    const bool bIsCmne = (method == QLatin1String("CMNE"));
+    m_pUi->m_label_modelCheckpoint->setVisible(bIsCmne);
+    m_pUi->m_lineEdit_modelCheckpoint->setVisible(bIsCmne);
+    m_pUi->m_pushButton_browseModelCheckpoint->setVisible(bIsCmne);
+}
+
+//=============================================================================================================
+
+void MinimumNormSettingsView::onBrowseModelCheckpointClicked()
+{
+    const QString sStartDir = m_sModelCheckpoint.isEmpty() ? QString()
+                                                           : QFileInfo(m_sModelCheckpoint).absolutePath();
+    const QString sFile = QFileDialog::getOpenFileName(this,
+                                                       tr("Select CMNE model checkpoint"),
+                                                       sStartDir,
+                                                       tr("ONNX model (*.onnx);;All files (*)"));
+    if(!sFile.isEmpty()) {
+        setModelCheckpoint(sFile);
+    }
 }
 
 //=============================================================================================================

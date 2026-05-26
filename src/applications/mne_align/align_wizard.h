@@ -27,12 +27,14 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @brief    Five-step capture wizard for the MNE Align app.
+ * @brief    Seven-step coregistration wizard for the MNE Align app.
  *
- *           Steps: Setup → Fiducials → EegCap → HeadShape → Export.
+ *           Steps: Setup → Fiducials → EegCap → HeadShape → Verify → Save → Done.
  *           Each digitisation step listens to a single
  *           @ref PolhemusConnection signal for the live cursor and
  *           appends to a shared @ref AcquiredPoints store on demand.
+ *           Digitisation can alternatively be imported from a FIFF .fif
+ *           file via the Fiducials page.
  */
 
 #ifndef MNE_ALIGN_WIZARD_H
@@ -47,10 +49,12 @@
 
 #include <utils/montage/standard_montage.h>
 
+#include <QPair>
 #include <QPointer>
 #include <QMatrix4x4>
 #include <QStackedWidget>
 #include <QString>
+#include <QVector>
 #include <QVector3D>
 
 //=============================================================================================================
@@ -70,22 +74,26 @@ namespace MNEALIGN
 {
 
 //=============================================================================================================
-/** @brief Identifies the five wizard steps. */
+/** @brief Identifies the seven wizard steps. */
 enum class AlignStep {
-    Setup = 0,    ///< Pick BEM file + EEG cap.
-    Fiducials,    ///< Capture NAS / LPA / RPA in turn.
+    Setup = 0,    ///< Load anatomy (BEM) and place MRI-space twin fiducials.
+    Fiducials,    ///< Capture NAS / LPA / RPA in turn (or load digitisation FIFF).
     EegCap,       ///< Walk the cap labels and capture each electrode.
     HeadShape,    ///< Free continuous capture of HSP points.
-    Export        ///< Write a FIFF digitizer set to disk.
+    Verify,       ///< Inspect ICP residuals before persisting the transform.
+    Save,         ///< Write the head→MRI transform to a -trans.fif file.
+    Done          ///< Completion summary.
 };
 
 //=============================================================================================================
 /**
- * @brief Five-step capture wizard for the MNE Align digitisation workflow.
+ * @brief Seven-step coregistration wizard for the MNE Align workflow.
  *
- * Steps: Setup → Fiducials → EegCap → HeadShape → Export.
+ * Steps: Setup → Fiducials → EegCap → HeadShape → Verify → Save → Done.
  * Each digitisation step listens to the @ref PolhemusConnection for the
- * live cursor and appends to a shared @ref AcquiredPoints store.
+ * live cursor and appends to a shared @ref AcquiredPoints store. The
+ * Fiducials page also exposes a “Load digitisation (FIFF …)” action
+ * which imports an existing ISOTRAK point set in lieu of live capture.
  */
 class AlignWizard : public QStackedWidget
 {
@@ -163,11 +171,17 @@ signals:
     /** @brief Emitted when the EEG cap selection changes. */
     void capChanged(UTILSLIB::StandardMontage::System system);
 
-    /** @brief Emitted when the user clicks Export in the Export step. */
-    void requestExport(const QString& outPath);
+    /** @brief Emitted when the user clicks Save in the Save step. */
+    void requestSaveTrans(const QString& outPath);
+
+    /** @brief Emitted when the user clicks Save digitisation in the Save step. */
+    void requestSaveDigitisation(const QString& outPath);
 
     /** @brief Emitted when the user requests an ICP refinement fit. */
     void requestIcpFit();
+
+    /** @brief Emitted when the user imports a FIFF digitisation file. */
+    void digitisationLoaded(const QString& path);
 
 public slots:
     /** @brief Advance to the next wizard step. */
@@ -185,12 +199,30 @@ public slots:
      */
     void onSurfaceDoubleClicked(const QVector3D& worldPos);
 
+    /**
+     * @brief Publish the result of the latest ICP refinement so the
+     *        Verify page can show RMSE / per-fiducial residuals and the
+     *        Save / Done pages can summarise it.
+     *
+     * @param[in] headToMri   Refined head→MRI rigid transform.
+     * @param[in] rmseMeters  Mean ICP residual, metres.
+     * @param[in] residuals   Per-label residual magnitudes, metres.
+     * @param[in] sourceLabel Human-readable description of the fit source
+     *                        (e.g. "ICP, 20 iterations").
+     */
+    void setIcpResult(const QMatrix4x4& headToMri,
+                      float rmseMeters,
+                      const QVector<QPair<QString, float>>& residuals,
+                      const QString& sourceLabel);
+
+    /** @brief Update the Save / Done summary with the path of the last write. */
+    void setLastSavedTrans(const QString& outPath);
+
 private slots:
     void onLivePoint(int station, const QVector3D& pos, const QQuaternion& ori);
     void onPenButtonPressed(int station, const QVector3D& pos, const QQuaternion& ori);
     void onPickBemFile();
     void onCapComboChanged(int index);
-    void onExportClicked();
     void onAcquiredChanged();
 
     void onCaptureFiducial();
@@ -199,18 +231,25 @@ private slots:
     void onUndoEeg();
     void onCaptureHsp();
     void onUndoHsp();
+    void onLoadDigiFiff();
+    void onSaveTransClicked();
+    void onSaveDigitisationClicked();
 
 private:
     QWidget* buildSetupPage();
     QWidget* buildFiducialsPage();
     QWidget* buildEegCapPage();
     QWidget* buildHeadShapePage();
-    QWidget* buildExportPage();
+    QWidget* buildVerifyPage();
+    QWidget* buildSavePage();
+    QWidget* buildDonePage();
 
     void refreshFiducialUi();
     void refreshEegUi();
     void refreshHeadShapeUi();
-    void refreshExportUi();
+    void refreshVerifyUi();
+    void refreshSaveUi();
+    void refreshDoneUi();
     void refreshSetupTwinUi();
 
     /** @return next un-captured fiducial in the {NAS,LPA,RPA} order. */
@@ -257,8 +296,22 @@ private:
     QPointer<QPushButton> m_pHspCaptureBtn;
     QPointer<QPushButton> m_pHspUndoBtn;
 
-    QPointer<QLabel>      m_pExportSummaryLabel;
+    QPointer<QLabel>      m_pVerifyLabel;
+    QPointer<QPushButton> m_pVerifyIcpBtn;
+
+    QPointer<QLabel>      m_pSaveSummaryLabel;
     QPointer<QLabel>      m_pIcpStatusLabel;
+    QPointer<QPushButton> m_pSaveTransBtn;
+    QPointer<QPushButton> m_pSaveDigiBtn;
+
+    QPointer<QLabel>      m_pDoneLabel;
+
+    QMatrix4x4                              m_lastIcpHeadToMri;
+    float                                   m_lastIcpRmse = -1.0f;
+    bool                                    m_haveIcpResult = false;
+    QString                                 m_lastIcpSource;
+    QVector<QPair<QString, float>>          m_lastIcpResiduals;
+    QString                                 m_lastSavedTransPath;
 };
 
 } // namespace MNEALIGN

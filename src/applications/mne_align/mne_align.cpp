@@ -84,10 +84,14 @@ MneAlign::MneAlign(QWidget* parent)
                 statusBar()->showMessage(QStringLiteral("Digitizer: %1").arg(msg), 5000);
             });
 
-    connect(m_pWizard, &AlignWizard::requestExport,
-            this, &MneAlign::onWizardExportRequest);
+    connect(m_pWizard, &AlignWizard::requestSaveTrans,
+            this, &MneAlign::onWizardSaveTrans);
+    connect(m_pWizard, &AlignWizard::requestSaveDigitisation,
+            this, &MneAlign::onWizardSaveDigitisation);
     connect(m_pWizard, &AlignWizard::requestIcpFit,
             this, &MneAlign::onIcpFit);
+    connect(m_pWizard, &AlignWizard::digitisationLoaded,
+            this, &MneAlign::onWizardDigitisationLoaded);
     connect(m_pWizard, &AlignWizard::bemPathChanged,
             this, &MneAlign::onWizardBemPathChanged);
         connect(m_pWizard, &AlignWizard::stepChanged,
@@ -406,13 +410,13 @@ void MneAlign::onWizardStepChanged(MNEALIGN::AlignStep step)
         m_pBackAction->setEnabled(step != AlignStep::Setup);
     }
     if (m_pNextAction) {
-        m_pNextAction->setEnabled(step != AlignStep::Export);
+        m_pNextAction->setEnabled(step != AlignStep::Done);
     }
 }
 
 //=============================================================================================================
 
-void MneAlign::onWizardExportRequest(const QString& outPath)
+void MneAlign::onWizardSaveDigitisation(const QString& outPath)
 {
     using namespace FIFFLIB;
 
@@ -445,11 +449,46 @@ void MneAlign::onWizardExportRequest(const QString& outPath)
     QString err;
     if (!set.write(outPath, &err)) {
         QMessageBox::warning(this, windowTitle(),
-                              QStringLiteral("Export failed:\n%1").arg(err));
+                              QStringLiteral("Save digitisation failed:\n%1").arg(err));
         return;
     }
     statusBar()->showMessage(
-        QStringLiteral("Wrote digitization to %1").arg(outPath), 5000);
+        QStringLiteral("Wrote digitisation to %1").arg(outPath), 5000);
+}
+
+void MneAlign::onWizardSaveTrans(const QString& outPath)
+{
+    using namespace FIFFLIB;
+
+    if (!m_pView3d) return;
+
+    // Compose the FiffCoordTrans for head→MRI from the 3D view.
+    const QMatrix4x4 h2m = m_pView3d->headToMri();
+    Eigen::Matrix4f mat;
+    for (int r = 0; r < 4; ++r)
+        for (int c = 0; c < 4; ++c)
+            mat(r, c) = h2m(r, c);
+
+    FiffCoordTrans trans(FIFFV_COORD_HEAD, FIFFV_COORD_MRI, mat);
+    FiffCoordTrans::addInverse(trans);
+
+    QFile file(outPath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        QMessageBox::warning(this, windowTitle(),
+            QStringLiteral("Cannot open %1 for writing.").arg(outPath));
+        return;
+    }
+    trans.write(file);   // closes the device
+    statusBar()->showMessage(
+        QStringLiteral("Wrote head→MRI transform to %1").arg(outPath), 5000);
+
+    if (m_pWizard) m_pWizard->setLastSavedTrans(outPath);
+}
+
+void MneAlign::onWizardDigitisationLoaded(const QString& path)
+{
+    statusBar()->showMessage(
+        QStringLiteral("Loaded digitisation from %1").arg(QFileInfo(path).fileName()), 4000);
 }
 
 //=============================================================================================================
@@ -527,9 +566,36 @@ void MneAlign::onIcpFit()
     for (int r = 0; r < 4; ++r)
         for (int c = 0; c < 4; ++c)
             refined(r, c) = trans.trans(r, c);
-    // TODO: push refined transform to Align3DView and persist for export
 
-    m_pPoints->emitChanged();
+    // The refined transform from performIcp maps device→MRI. Decompose
+    // into head→MRI by stripping the device→head component the view
+    // already computed from captured fiducials.
+    const QMatrix4x4 deviceToHead = m_pView3d->deviceToHead();
+    bool invertible = false;
+    const QMatrix4x4 headToDevice = deviceToHead.inverted(&invertible);
+    const QMatrix4x4 refinedHeadToMri = invertible ? (refined * headToDevice) : refined;
+
+    // Push override into the 3D view (it bypasses the fiducial-only fit).
+    m_pView3d->setHeadToMriOverride(refinedHeadToMri);
+
+    // Per-fiducial residuals in head space (after applying refined transform).
+    QVector<QPair<QString, float>> residuals;
+    auto residualFor = [&](FiducialId id, const QString& label) {
+        if (!m_pPoints->hasFiducial(id) || !m_pPoints->hasTwinFiducial(id)) return;
+        const QVector3D cap     = m_pPoints->fiducial(id);            // device space
+        const QVector3D mriRef  = m_pPoints->twinFiducial(id);        // MRI space
+        const QVector3D mriPred = (refinedHeadToMri * deviceToHead).map(cap);
+        residuals.append({label, (mriPred - mriRef).length()});
+    };
+    residualFor(FiducialId::NAS, QStringLiteral("NAS"));
+    residualFor(FiducialId::LPA, QStringLiteral("LPA"));
+    residualFor(FiducialId::RPA, QStringLiteral("RPA"));
+
+    if (m_pWizard) {
+        m_pWizard->setIcpResult(refinedHeadToMri, rmse, residuals,
+                                QStringLiteral("ICP, %1 iterations max")
+                                    .arg(20));
+    }
 
     statusBar()->showMessage(
         QStringLiteral("ICP fit complete — RMSE: %1 mm").arg(rmse * 1000.0f, 0, 'f', 2), 10000);

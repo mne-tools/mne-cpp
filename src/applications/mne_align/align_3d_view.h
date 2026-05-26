@@ -187,6 +187,21 @@ public:
      */
     void setLiveDigitizerPose(int station, const QVector3D& position, const QQuaternion& orientation);
 
+    /**
+     * @brief Override the head→MRI transform with an externally refined fit
+     *        (e.g. result of ICP). The override is cleared automatically the
+     *        next time fiducials change via @ref recomputeAlignment.
+     *
+     * @param[in] headToMri   Refined head→MRI transform.
+     */
+    void setHeadToMriOverride(const QMatrix4x4& headToMri);
+
+    /** @brief Drop any external head→MRI override and fall back to fiducial fit. */
+    void clearHeadToMriOverride();
+
+    /** @return true if an external head→MRI override is currently in effect. */
+    bool hasHeadToMriOverride() const { return m_haveHeadToMriOverride; }
+
 signals:
     /** @brief Emitted when the viewport count changes. */
     void viewCountChanged(int count);
@@ -230,6 +245,8 @@ private:
     QTimer                                         m_liveUpdateTimer;
     QMatrix4x4                                     m_deviceToHead;  ///< runtime offset, not in trans.fif
     QMatrix4x4                                     m_headToMri;     ///< coregistration for trans.fif
+    bool                                           m_haveHeadToMriOverride = false;
+    QMatrix4x4                                     m_headToMriOverride;
 
     QPointer<BrainView>                            m_pBrainView;
     QPointer<BrainTreeModel>                       m_pBrainModel;
