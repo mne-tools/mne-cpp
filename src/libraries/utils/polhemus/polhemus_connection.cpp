@@ -267,6 +267,7 @@ void PolhemusConnection::closeSerial()
         return;
     }
     m_streamPauseTimer.stop();
+    m_pSerial->disconnect(this);
     if (m_pSerial->isOpen()) {
         m_pSerial->write(QByteArrayLiteral("P\r"));
         m_pSerial->flush();
