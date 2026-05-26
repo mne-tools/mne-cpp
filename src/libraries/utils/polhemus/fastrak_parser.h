@@ -29,15 +29,16 @@
  *
  * @brief    Polhemus Fastrak / FastSCAN ASCII record parser.
  *
- *           Format-0 ASCII record (default factory output):
+ *           Supported ASCII record formats:
  *
- *               <st><sp> <x> <y> <z> <az> <el> <ro> CR LF
+ *             Euler:      <st> <x> <y> <z> <az> <el> <ro>    CR LF
+ *             Quaternion: <st> <x> <y> <z> <q0> <q1> <q2> <q3> CR LF
  *
- *           where each numeric field is fixed-width and signed
- *           (e.g. "+123.456"). Positions are in the units configured on
- *           the device (inches by default for Fastrak, centimetres for
- *           the FastSCAN family). Orientation is azimuth/elevation/roll
- *           in degrees, applied in that order around Z, Y, X.
+ *           Auto-detected by token count (7 = Euler, 8 = quaternion).
+ *           Quaternion mode (O-item 7) is preferred because it avoids
+ *           gimbal lock at elevation ±90°. Positions are in the units
+ *           configured on the device (inches for Fastrak, centimetres
+ *           for FastSCAN).
  *
  *           This parser is intentionally I/O-free so it can be unit
  *           tested without a serial port: feed bytes via @ref append,

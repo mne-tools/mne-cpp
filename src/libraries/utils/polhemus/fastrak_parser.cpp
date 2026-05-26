@@ -51,10 +51,30 @@ float linearScale(FastrakParser::Units units)
 
 bool FastrakParser::parseRecord(const QByteArray& record, Units units, FastrakSample& out)
 {
-    // Tokenise on whitespace; a record is "<station> <x> <y> <z> [<az> <el> <ro>]".
-    const QList<QByteArray> tokens = record.simplified().split(' ');
+    // Fastrak uses fixed-width ASCII fields.  When a negative value
+    // immediately follows a positive one the minus sign eats the
+    // separating space, e.g. "0.8829-0.3055".  Insert a space before
+    // every '-' that is preceded by a digit so tokenisation works.
+    QByteArray fixed = record.simplified();
+    for (int i = fixed.size() - 1; i > 0; --i) {
+        const char c  = fixed.at(i);
+        const char pc = fixed.at(i - 1);
+        if (c == '-' && pc >= '0' && pc <= '9') {
+            fixed.insert(i, ' ');
+        }
+    }
+
+    const QList<QByteArray> tokens = fixed.split(' ');
     if (tokens.size() < 4) {
         return false;
+    }
+
+    // One-shot debug: log the first record to confirm output format
+    static bool s_firstRecord = true;
+    if (s_firstRecord) {
+        qInfo() << "FastrakParser: raw record:" << record.simplified();
+        qInfo() << "FastrakParser: fixed →" << tokens.size() << "tokens:" << fixed;
+        s_firstRecord = false;
     }
 
     bool ok = false;
@@ -84,13 +104,24 @@ bool FastrakParser::parseRecord(const QByteArray& record, Units units, FastrakSa
     out.hasOrientation = false;
     out.orientation    = QQuaternion();
 
-    if (tokens.size() >= 7) {
+    if (tokens.size() >= 8) {
+        // Quaternion output (O-item 11): q0 q1 q2 q3 (scalar-first).
+        // No gimbal lock — preferred over Euler angles.
+        const float q0 = parseFloat(tokens[4]);
+        const float q1 = parseFloat(tokens[5]);
+        const float q2 = parseFloat(tokens[6]);
+        const float q3 = parseFloat(tokens[7]);
+        if (ok) {
+            out.orientation    = QQuaternion(q0, q1, q2, q3).normalized();
+            out.hasOrientation = true;
+        }
+    } else if (tokens.size() >= 7) {
+        // Euler angle output (O-item 4): azimuth, elevation, roll.
+        // Kept for backward compatibility; suffers from gimbal lock at elevation ±90°.
         const float az = parseFloat(tokens[4]);
         const float el = parseFloat(tokens[5]);
         const float ro = parseFloat(tokens[6]);
         if (ok) {
-            // Polhemus convention: yaw (azimuth, Z), pitch (elevation, Y), roll (X),
-            // intrinsic ZYX order. Pre-compose explicitly to avoid surprises.
             const QQuaternion qZ = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, az);
             const QQuaternion qY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, el);
             const QQuaternion qX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, ro);

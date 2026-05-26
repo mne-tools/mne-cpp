@@ -100,6 +100,30 @@ bool PolhemusCoregistration::captureCurrentPenPositionAsFiducial(FiducialId id)
     m_penFid[ident] = m_penPosition;
     m_hasPenFid[ident] = true;
 
+    // Compute raw sensor position (reverse the tip offset)
+    const QVector3D tipAdj = m_tipOffsetEnabled
+        ? m_penOrientation.rotatedVector(m_penTipOffset) : QVector3D();
+    const QVector3D rawSensor = m_penPosition - tipAdj;
+
+    qInfo().nospace() << "captureFiducial: " << labels[ident]
+        << "  tipPos=(" << m_penPosition.x()*1000.f << ", "
+        << m_penPosition.y()*1000.f << ", " << m_penPosition.z()*1000.f << ") mm"
+        << "  rawSensor=(" << rawSensor.x()*1000.f << ", "
+        << rawSensor.y()*1000.f << ", " << rawSensor.z()*1000.f << ") mm"
+        << "  ori=" << m_penOrientation
+        << "  tipAdj=(" << tipAdj.x()*1000.f << ", "
+        << tipAdj.y()*1000.f << ", " << tipAdj.z()*1000.f << ") mm";
+
+    // Log distances to previously captured fiducials
+    for (int j = 1; j <= 3; ++j) {
+        if (j != ident && m_hasPenFid[j]) {
+            float dist = (m_penFid[ident] - m_penFid[j]).length() * 1000.0f;
+            qInfo().nospace() << "  distance " << labels[ident] << "-" << labels[j]
+                << " = " << dist << " mm"
+                << (dist > 200.0f ? "  *** WARNING: > 200mm, likely wrong capture!" : "");
+        }
+    }
+
     m_pPoints->removeFiducial(id);
 
     DigitizedPoint dp;
@@ -210,34 +234,53 @@ bool PolhemusCoregistration::computeRegistration()
     }
 
     // --- Paired path: analytical head-frame alignment ---
-    // Build standard head coordinate frames in both Polhemus world and model
-    // space, then compute worldToModel = modelFrame * inverse(penFrame).
-    // A vertex (CZ) reference point validates the superior direction,
-    // resolving the coplanar ambiguity of 3 fiducials.
     if (hasAllModelFiducials()) {
         const QVector3D mNas = m_modelFid[static_cast<int>(FiducialId::NAS)];
         const QVector3D mLpa = m_modelFid[static_cast<int>(FiducialId::LPA)];
         const QVector3D mRpa = m_modelFid[static_cast<int>(FiducialId::RPA)];
 
-        // Build a head coordinate frame from 3 fiducials + optional vertex
+        // Compare pen vs model fiducial distances — should be similar for the same head
+        const float mNL = (mNas - mLpa).length() * 1000.0f;
+        const float mNR = (mNas - mRpa).length() * 1000.0f;
+        const float mLR = (mLpa - mRpa).length() * 1000.0f;
+        qInfo().nospace() << "computeRegistration: distance comparison (pen / model):"
+            << "\n  NAS-LPA: " << dNL << " / " << mNL << " mm  (ratio " << dNL/mNL << ")"
+            << "\n  NAS-RPA: " << dNR << " / " << mNR << " mm  (ratio " << dNR/mNR << ")"
+            << "\n  LPA-RPA: " << dLR << " / " << mLR << " mm  (ratio " << dLR/mLR << ")";
+
+        const float maxRatio = std::max({dNL/mNL, dNR/mNR, dLR/mLR});
+        const float minRatio = std::min({dNL/mNL, dNR/mNR, dLR/mLR});
+        if (maxRatio / minRatio > 2.0f) {
+            qWarning() << "computeRegistration: *** SHAPE MISMATCH — pen fiducial triangle"
+                       << "has very different proportions from model fiducials."
+                       << "One or more pen fiducials may be captured at the wrong location!";
+        }
+
+        // Build a head coordinate frame from 3 fiducials + optional vertex.
+        // Uses Gram-Schmidt to orthogonalize ey (toward LPA) against ex
+        // first, then derives ez via cross product.  This guarantees ey
+        // always points toward LPA regardless of coordinate system
+        // orientation, preventing left-right inversion.
         auto buildFrame = [](const QVector3D& nas, const QVector3D& lpa, const QVector3D& rpa,
                              const QVector3D* vertex) -> QMatrix4x4
         {
             const QVector3D origin = (lpa + rpa) * 0.5f;
             const QVector3D ex     = (nas - origin).normalized();
             const QVector3D eyApp  = (lpa - origin).normalized();
-            QVector3D ez           = QVector3D::crossProduct(ex, eyApp).normalized();
 
-            // Use vertex to validate superior direction
+            // Gram-Schmidt: remove component of eyApp along ex
+            const QVector3D ey = (eyApp - QVector3D::dotProduct(eyApp, ex) * ex).normalized();
+            // ez from right-hand rule: always consistent with ey toward LPA
+            QVector3D ez = QVector3D::crossProduct(ex, ey).normalized();
+
+            // Optional validation: warn if ez disagrees with vertex direction
             if (vertex) {
                 const QVector3D toVertex = (*vertex - origin).normalized();
                 if (QVector3D::dotProduct(ez, toVertex) < 0.0f) {
-                    ez = -ez;
-                    qInfo() << "  head-frame: flipped ez toward vertex";
+                    qWarning() << "  head-frame: ez points away from vertex"
+                               << "— check fiducial digitization";
                 }
             }
-
-            const QVector3D ey = QVector3D::crossProduct(ez, ex).normalized();
 
             QMatrix4x4 f;
             f.setToIdentity();
@@ -252,16 +295,32 @@ bool PolhemusCoregistration::computeRegistration()
         const QMatrix4x4 modelFrame = buildFrame(mNas, mLpa, mRpa,
                                                     m_hasModelVertex ? &m_modelVertex : nullptr);
 
+        // Debug: dump both frames and fiducial inputs
+        qInfo() << "computeRegistration: penFiducials (mm)"
+                << "NAS" << pNas * 1000.0f << "LPA" << pLpa * 1000.0f << "RPA" << pRpa * 1000.0f;
+        qInfo() << "computeRegistration: modelFiducials (mm)"
+                << "NAS" << mNas * 1000.0f << "LPA" << mLpa * 1000.0f << "RPA" << mRpa * 1000.0f;
+        qInfo() << "computeRegistration: penFrame\n" << penFrame;
+        qInfo() << "computeRegistration: modelFrame\n" << modelFrame;
+
         m_worldToModel = modelFrame * penFrame.inverted();
 
-        // Residuals
-        auto residual = [&](const QVector3D& pw, const QVector3D& pm) {
+        qInfo() << "computeRegistration: worldToModel\n" << m_worldToModel;
+
+        // Residuals — log both mapped and target positions for cross-checking
+        auto residual = [&](const char* label, const QVector3D& pw, const QVector3D& pm) {
             QVector3D mapped = m_worldToModel.map(pw);
-            return (mapped - pm).length() * 1000.0f;
+            float err = (mapped - pm).length() * 1000.0f;
+            qInfo().nospace() << "  " << label
+                << ": pen(world)=" << pw * 1000.0f
+                << " → mapped=" << mapped * 1000.0f
+                << "  model=" << pm * 1000.0f
+                << "  residual=" << err << " mm";
+            return err;
         };
-        qInfo() << "  residual NAS:" << residual(pNas, mNas) << "mm";
-        qInfo() << "  residual LPA:" << residual(pLpa, mLpa) << "mm";
-        qInfo() << "  residual RPA:" << residual(pRpa, mRpa) << "mm";
+        residual("NAS", pNas, mNas);
+        residual("LPA", pLpa, mLpa);
+        residual("RPA", pRpa, mRpa);
 
         m_headToWorld.setToIdentity();
         m_headToDevice = m_deviceToWorld.inverted() * m_headToWorld;
@@ -293,20 +352,98 @@ void PolhemusCoregistration::onPointReceived(int station,
                                               const QVector3D& position,
                                               const QQuaternion& orientation)
 {
+    // Periodic debug logging
+    static QHash<int, int> sampleCount;
+    int& n = sampleCount[station];
+    if (n == 0) {
+        qInfo() << "onPointReceived: FIRST sample station" << station
+                << "pos(mm)" << position * 1000.0f
+                << "ori" << orientation
+                << "hasOri" << !orientation.isIdentity();
+    }
+    ++n;
+
+    // Log every ~10 s per station (~600 samples at 60 Hz)
+    if (n % 600 == 0) {
+        const float sinEl = 2.0f * (orientation.scalar() * orientation.y()
+                                  - orientation.x() * orientation.z());
+        const float elDeg = std::asin(std::clamp(sinEl, -1.0f, 1.0f)) * (180.0f / 3.14159265f);
+        if (station == m_penStation && m_tipOffsetEnabled) {
+            const QVector3D tip = position + orientation.rotatedVector(m_penTipOffset);
+            if (m_registrationValid) {
+                const QVector3D mapped = m_worldToModel.map(tip);
+                qInfo().nospace() << "pen #" << n
+                    << "  raw(" << position.x()*1000.f << ", " << position.y()*1000.f << ", " << position.z()*1000.f << ") mm"
+                    << "  tip(" << tip.x()*1000.f << ", " << tip.y()*1000.f << ", " << tip.z()*1000.f << ") mm"
+                    << "  →model(" << mapped.x()*1000.f << ", " << mapped.y()*1000.f << ", " << mapped.z()*1000.f << ") mm"
+                    << "  el=" << elDeg << "\u00b0";
+            } else {
+                qInfo().nospace() << "pen #" << n
+                    << "  raw(" << position.x()*1000.f << ", " << position.y()*1000.f << ", " << position.z()*1000.f << ") mm"
+                    << "  tip(" << tip.x()*1000.f << ", " << tip.y()*1000.f << ", " << tip.z()*1000.f << ") mm"
+                    << "  el=" << elDeg << "\u00b0";
+            }
+        } else if (station == m_trackerStation && m_registrationValid) {
+            const QVector3D trkWorld(m_deviceToWorld(0,3), m_deviceToWorld(1,3), m_deviceToWorld(2,3));
+            const QVector3D mapped = m_worldToModel.map(trkWorld);
+            qInfo().nospace() << "st" << station << " #" << n
+                << "  pos(" << position.x()*1000.f << ", " << position.y()*1000.f << ", " << position.z()*1000.f << ") mm"
+                << "  →model(" << mapped.x()*1000.f << ", " << mapped.y()*1000.f << ", " << mapped.z()*1000.f << ") mm"
+                << "  el=" << elDeg << "\u00b0";
+        } else {
+            qInfo().nospace() << "st" << station << " #" << n
+                << "  pos(" << position.x()*1000.f << ", " << position.y()*1000.f << ", " << position.z()*1000.f << ") mm"
+                << "  el=" << elDeg << "\u00b0";
+        }
+    }
     if (station == m_trackerStation) {
         m_deviceToWorld = buildDevicePose(position, orientation);
         emit devicePoseChanged(m_deviceToWorld);
     } else if (station == m_penStation) {
-        const QVector3D tipAdj = m_tipOffsetEnabled
-            ? orientation.rotatedVector(m_penTipOffset) : QVector3D();
-        m_penPosition    = position + tipAdj;
-        m_penOrientation = orientation;
-        m_havePenPos     = true;
+        // Gimbal-lock guard: for ZYX Euler, sin(el) = 2*(w*y - x*z).
+        // When |el| > 80° the Euler→quaternion conversion is unreliable,
+        // so freeze the pen pose at its last good value.
+        const float sinEl = 2.0f * (orientation.scalar() * orientation.y()
+                                  - orientation.x() * orientation.z());
+        constexpr float kGimbalSinEl = 0.9848f; // sin(80°)
+        const bool gimbalLock = (std::abs(sinEl) > kGimbalSinEl);
 
-        // Collect raw (un-offset) samples during pivot calibration
+        if (!gimbalLock) {
+            const QVector3D tipAdj = m_tipOffsetEnabled
+                ? orientation.rotatedVector(m_penTipOffset) : QVector3D();
+            m_penPosition    = position + tipAdj;
+            m_penOrientation = orientation;
+            m_havePenPos     = true;
+        }
+
+        // Collect raw (un-offset) samples during pivot calibration.
+        // Only keep samples with sufficient angular change from the last
+        // accepted sample to avoid redundant near-identical rows in the SVD.
+        // Also reject position jumps and gimbal-lock orientations.
         if (m_pivotState == PivotState::Collecting) {
-            m_pivotPositions.push_back(position);
-            m_pivotOrientations.push_back(orientation);
+            constexpr float kMinAngleDeg = 3.0f;
+            constexpr float kMaxPosJumpM = 0.05f; // 5 cm
+            constexpr float kGimbalSinEl = 0.9848f; // sin(80°) — reject |el|>80°
+
+            // Gimbal-lock check: for ZYX Euler, sin(el) = 2*(w*y - x*z)
+            const float sinEl = 2.0f * (orientation.scalar() * orientation.y()
+                                      - orientation.x() * orientation.z());
+            if (std::abs(sinEl) > kGimbalSinEl) {
+                // Near gimbal lock — skip this sample silently
+            } else {
+                bool accept = m_pivotOrientations.empty();
+                if (!accept) {
+                    const QQuaternion& prev = m_pivotOrientations.back();
+                    float dot = std::abs(QQuaternion::dotProduct(prev, orientation));
+                    float angleDeg = 2.0f * std::acos(std::min(dot, 1.0f)) * (180.0f / 3.14159265f);
+                    float posDelta = (position - m_pivotPositions.back()).length();
+                    accept = (angleDeg >= kMinAngleDeg) && (posDelta < kMaxPosJumpM);
+                }
+                if (accept) {
+                    m_pivotPositions.push_back(position);
+                    m_pivotOrientations.push_back(orientation);
+                }
+            }
         }
 
         emit penPoseChanged(m_penPosition, m_penOrientation);
@@ -369,8 +506,9 @@ QMatrix4x4 PolhemusCoregistration::buildHeadFrame() const
     const QVector3D origin = (lpa + rpa) * 0.5f;
     const QVector3D ex     = (nas - origin).normalized();
     const QVector3D eyApprox = (lpa - origin).normalized();
-    const QVector3D ez     = QVector3D::crossProduct(ex, eyApprox).normalized();
-    const QVector3D ey     = QVector3D::crossProduct(ez, ex).normalized();
+    // Gram-Schmidt: orthogonalize ey against ex, preserving LPA direction
+    const QVector3D ey     = (eyApprox - QVector3D::dotProduct(eyApprox, ex) * ex).normalized();
+    const QVector3D ez     = QVector3D::crossProduct(ex, ey).normalized();
 
     QMatrix4x4 frame;
     frame.setToIdentity();
