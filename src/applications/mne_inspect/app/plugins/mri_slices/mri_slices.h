@@ -124,6 +124,18 @@ public:
 
     //=========================================================================================================
     /**
+     * Inject an already-built volume (no file IO). Used by the documentation
+     * screenshot tool and headless tests to push a synthetic in-memory
+     * volume into the plugin. On success the crosshair is reset to the
+     * volume centre and the three ortho slices are rebuilt.
+     *
+     * @param[in] volume  Already-populated volume. Must satisfy `isValid()`.
+     * @return true on success.
+     */
+    bool setVolume(std::unique_ptr<MRILIB::MriVolData> volume);
+
+    //=========================================================================================================
+    /**
      * @return Path of the most recent successful load. Empty if none.
      */
     QString sourcePath() const { return m_sourcePath; }
@@ -152,6 +164,30 @@ public:
      * Convenience: same as @ref setCrosshair, accepts a `QVector3D`.
      */
     void setCrosshair(const QVector3D& rasPoint);
+
+    //=========================================================================================================
+    /**
+     * Cross-modality jump entry point used by the Pick dock: when another
+     * renderable reports a hit (cortical vertex, electrode contact, …),
+     * snap the three ortho slices so they pass through @p worldPosition.
+     * Thin semantic alias of @ref setCrosshair.
+     */
+    void setVoxelOfInterest(const QVector3D& worldPosition);
+
+    //=========================================================================================================
+    /**
+     * Convert a world-RAS point to fractional voxel coordinates of the
+     * loaded volume. Returns NaN-filled vector if no volume is loaded.
+     */
+    Eigen::Vector3f voxelFromWorld(const QVector3D& worldPosition) const;
+
+    //=========================================================================================================
+    /**
+     * Sample the loaded volume at @p worldPosition (nearest voxel).
+     * Returns NaN if no volume is loaded or the point falls outside the
+     * volume.
+     */
+    float intensityAt(const QVector3D& worldPosition) const;
 
     //=========================================================================================================
     /** @return Renderable for the axial slice (Z = const). May be null when

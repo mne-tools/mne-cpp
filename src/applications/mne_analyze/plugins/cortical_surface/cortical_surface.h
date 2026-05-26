@@ -29,14 +29,14 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    CorticalSurface plugin — implements TASK 4.1 (FreeSurfer cortical
- *           surface plugin) of the v2.3.0 plan.
+ * @brief    CorticalSurface plugin — FreeSurfer cortical-surface loader
+ *           and visualiser for mne_analyze.
  *
  *           This first slice ships the plugin shell, FreeSurfer subject
  *           browser, hemisphere/surface-type selection, and a `MultimodalScene`
  *           registration of the loaded surfaces. The QRhi rendering, vertex
  *           picking dock, and STC overlay loading land in subsequent slices
- *           (TASK 4.2 – 4.5).
+ *           with STC overlays, vertex picking, inverse dispatch and labels.
  *
  */
 
@@ -55,8 +55,13 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QColor>
 #include <QPointer>
 #include <QSharedPointer>
+#include <QString>
+#include <QStringList>
+#include <QVector>
+#include <QVector3D>
 #include <QtCore/QtPlugin>
 
 #include <inv/inv_source_estimate.h>
@@ -67,14 +72,20 @@
 
 class QAction;
 class QCheckBox;
+class QColor;
 class QComboBox;
 class QDockWidget;
 class QDoubleSpinBox;
 class QLabel;
+class QListWidget;
+class QListWidgetItem;
 class QMenu;
 class QPushButton;
 class QSlider;
 class QTimer;
+class QToolBar;
+class QTreeWidget;
+class QTreeWidgetItem;
 class QWidget;
 
 namespace ANSHAREDLIB {
@@ -88,6 +99,7 @@ namespace DISP3DLIB {
 
 namespace FSLIB {
     class FsSurface;
+    class FsLabel;
 }
 
 //=============================================================================================================
@@ -122,6 +134,39 @@ enum class CorticalSurfaceType {
 
 //=============================================================================================================
 /**
+ * @brief Options for @ref CorticalSurface::runComputeSourceEstimate.
+ *
+ * The method string selects which inverse algorithm is dispatched:
+ *   - "MNE", "dSPM", "sLORETA", "eLORETA" → @ref INVLIB::InvMinimumNorm
+ *   - "MxNE"                              → @ref INVLIB::InvMxne
+ *   - "Gamma-MAP"                         → @ref INVLIB::InvGammaMap
+ *   - "CMNE"                              → @ref INVLIB::InvCMNE
+ */
+struct CORTICAL_SURFACE_SHARED_EXPORT ComputeSourceEstimateOptions
+{
+    QString method  = QStringLiteral("MNE");
+    double  snr     = 3.0;     /**< Linear regularisation: lambda² = 1 / SNR². */
+    double  alpha   = 1.0;     /**< Sparsity weight (MxNE / Gamma-MAP). */
+    double  loose   = 0.2;     /**< Loose orientation factor in [0, 1]. */
+    double  depth   = 0.8;     /**< Depth weighting exponent in [0, 1]. */
+    QString onnxPath;          /**< Optional CMNE LSTM model. */
+};
+
+//=============================================================================================================
+/**
+ * @brief One vertex picked from the cortex via @ref CorticalSurface::pickVertex.
+ */
+struct CORTICAL_SURFACE_SHARED_EXPORT CorticalPickedVertex
+{
+    int        hemi    = -1;          /**< 0 = lh, 1 = rh. */
+    int        vertex  = -1;          /**< Surface-local vertex index. */
+    QVector3D  world;                  /**< World position used to look up the vertex. */
+    QString    name;                   /**< Auto-generated or user-renamed label. */
+    QColor     color   = QColor("steelblue"); /**< Plot colour. */
+};
+
+//=============================================================================================================
+/**
  * @brief mne_analyze plugin that loads and visualises FreeSurfer cortical surfaces.
  *
  * Workflow:
@@ -136,7 +181,7 @@ enum class CorticalSurfaceType {
  *      switch what is shown without re-opening the dialog.
  *
  * The plugin emits the standard `MODEL_ADDED` event so other plugins
- * (TASK 4.2 STC overlay, TASK 4.3 vertex picking) can subscribe.
+ * (STC overlay, vertex picking) can subscribe.
  */
 class CORTICAL_SURFACE_SHARED_EXPORT CorticalSurface : public ANSHAREDLIB::AbstractPlugin
 {
@@ -273,6 +318,97 @@ public:
     /** Set the playback frame-rate. Values <= 0 are clamped to 1.0 fps. */
     void setPlaybackFps(double fps);
 
+    //=========================================================================================================
+    // Vertex picking + Time Course dock
+    //=========================================================================================================
+
+    /** @return The "Source Time Course" dock (built on first call). */
+    QDockWidget* getTimeCourseDock();
+
+    /**
+     * Pick the vertex of the currently loaded cortical surface closest to
+     * @p worldPoint. On success the pick is appended to the Time Course
+     * Manager and @ref vertexPicked is emitted.
+     *
+     * @return true if a vertex was identified.
+     */
+    bool pickVertex(const QVector3D& worldPoint);
+
+    /** @return Number of picks stored in the Time Course Manager. */
+    int pickedVertexCount() const;
+
+    /** @return Snapshot of all currently stored picks. */
+    QVector<CorticalPickedVertex> pickedVertices() const;
+
+    /**
+     * Look up the STC time course at a specific (hemisphere, vertex).
+     * Returns an empty vector if no overlay is loaded or the vertex is
+     * not represented in the overlay's vertex list.
+     */
+    QVector<double> timeCourseAt(int hemi, int vertex) const;
+
+    /**
+     * Export the currently stored picks (one column per pick, one row per
+     * time sample) to @p path in CSV format. Emits @ref timeCoursesExported.
+     */
+    bool exportTimeCoursesCsv(const QString& path) const;
+
+    //=========================================================================================================
+    // Inverse computation (Compute Source Estimate dialog)
+    //=========================================================================================================
+
+    /**
+     * Compute a source estimate from disk inputs and install it as the
+     * active overlay (calls @ref setSourceEstimate on success).
+     *
+     * @param[in] fwdPath     `-fwd.fif` forward solution.
+     * @param[in] covPath     `-cov.fif` noise covariance.
+     * @param[in] evokedPath  `-ave.fif` evoked response.
+     * @param[in] opts        Method + regularisation parameters.
+     *
+     * @return true on success.
+     */
+    bool runComputeSourceEstimate(const QString& fwdPath,
+                                  const QString& covPath,
+                                  const QString& evokedPath,
+                                  const ComputeSourceEstimateOptions& opts);
+
+    //=========================================================================================================
+    // Labels dock (FreeSurfer annotation / atlas browser)
+    //=========================================================================================================
+
+    /** @return The "Labels" dock (built on first call). */
+    QDockWidget* getLabelsDock();
+
+    /** @return Snapshot of all labels currently loaded in the labels dock. */
+    QList<FSLIB::FsLabel> labels() const;
+
+    /**
+     * Load a FreeSurfer `.label` file. The label is added to the labels
+     * dock under its hemisphere root.
+     *
+     * @return Number of labels added (0 or 1).
+     */
+    int loadLabel(const QString& path);
+
+    /**
+     * Load a FreeSurfer `.annot` annotation and explode it into one
+     * @ref FSLIB::FsLabel per parcel.
+     *
+     * @return Number of labels added.
+     */
+    int loadAnnot(const QString& path);
+
+    /**
+     * Extract an ROI time course from the loaded overlay using one of
+     * "mean", "mean_flip", "pca_flip", "max", "auto" and append the trace
+     * to the Time Course Manager.
+     */
+    bool extractLabelTimeCourse(const FSLIB::FsLabel& lbl, const QString& mode);
+
+    /** Write @p lbl to @p path in FreeSurfer `.label` format. */
+    bool saveLabel(const FSLIB::FsLabel& lbl, const QString& path);
+
 signals:
     /** Emitted after @ref setSourceEstimate succeeds. */
     void sourceEstimateLoaded(int nVertices, int nTimes);
@@ -286,6 +422,18 @@ signals:
     /** Emitted when @ref play / @ref pause toggle the playback state. */
     void playStateChanged(bool playing);
 
+    /** Emitted after @ref pickVertex succeeds. */
+    void vertexPicked(int hemi, int vertex);
+
+    /** Emitted after @ref exportTimeCoursesCsv succeeds. */
+    void timeCoursesExported(QString path);
+
+    /** Emitted whenever the labels-dock contents change. */
+    void labelsChanged();
+
+    /** Emitted after @ref runComputeSourceEstimate succeeds. */
+    void sourceEstimateComputed(QString method);
+
 private slots:
     void onLoadSurfaceTriggered();
     void onHemisphereChoiceChanged(int index);
@@ -298,6 +446,18 @@ private slots:
     void onPlayPauseClicked();
     void onPlaybackFpsChanged(double fps);
     void onPlaybackTick();
+    void onTimeCourseManagerSelectionChanged();
+    void onTimeCourseRenameClicked();
+    void onTimeCourseColorClicked();
+    void onTimeCourseRemoveClicked();
+    void onTimeCourseExportClicked();
+    void onComputeSourceEstimateTriggered();
+    void onLoadLabelTriggered();
+    void onLoadAnnotTriggered();
+    void onSaveLabelTriggered();
+    void onCreateLabelFromMarkedTriggered();
+    void onLabelItemChanged(QTreeWidgetItem* item, int column);
+    void onLabelTreeContextMenu(const QPoint& pos);
 
 private:
     /** Build the controls dock (hemisphere combo, surface-type combo,
@@ -326,6 +486,40 @@ private:
      *  re-emitting changed signals. */
     void syncThresholdSpins();
 
+    /** Build the Time Course dock (chart + manager list) on first request. */
+    void buildTimeCourseDock();
+
+    /** Build the Labels dock on first request. */
+    void buildLabelsDock();
+
+    /** Refresh the manager list, plot widget and current selection state. */
+    void refreshTimeCourseManager();
+
+    /** @return The "Source Time Course" plot widget (lazily constructed). */
+    class TimeCoursePlotter* plotter() const;
+
+    /** Add a label to the labels dock under the appropriate hemi root. */
+    QTreeWidgetItem* addLabelItem(const FSLIB::FsLabel& label);
+
+    /** Append a raw trace (used by both vertex picks and label extracts). */
+    void appendTrace(const QString& name,
+                     const QColor& color,
+                     const QVector<double>& trace,
+                     int hemi   = -1,
+                     int vertex = -1);
+
+    /** Find the row in m_stc.vertices that matches a (hemi, vertex) tuple. */
+    int findStcRowFor(int hemi, int vertex) const;
+
+    /** Render the current plotter cursor + traces. */
+    void refreshPlotter();
+
+    /** Resolve the FsLabel cached as data on a tree item. */
+    static FSLIB::FsLabel labelFromItem(QTreeWidgetItem* item);
+
+    /** Write @p label to disk in FreeSurfer `.label` format. */
+    static bool writeLabelFile(const FSLIB::FsLabel& label, const QString& path);
+
     ANSHAREDLIB::Communicator*           m_pCommu = nullptr;
     QPointer<QMenu>                      m_pMenu;
     QPointer<QAction>                    m_pLoadSurfaceAction;
@@ -351,8 +545,8 @@ private:
     QSharedPointer<FSLIB::FsSurface>     m_pSurfaceLh;
     QSharedPointer<FSLIB::FsSurface>     m_pSurfaceRh;
 
-    /** Per-plugin scene; v2.3.0 next slice will share this with TASK 10's
-     *  MNE Inspect plugin via the AnalyzeData store. */
+    /** Per-plugin scene; a future slice will share this with the
+     *  MNE Inspect application via the AnalyzeData store. */
     QScopedPointer<DISP3DLIB::MultimodalScene> m_pScene;
 
     QString                              m_lastSubjectsDir;
@@ -367,6 +561,51 @@ private:
     float                                m_fMax    = 1.0f;
     double                               m_fps = 10.0;
     bool                                 m_playing = false;
+
+    //=========================================================================================================
+    // Time Course dock (per-vertex STC trace)
+    //=========================================================================================================
+
+    QPointer<QDockWidget>                m_pTimeCourseDock;
+    QPointer<QListWidget>                m_pTimeCourseList;
+    class TimeCoursePlotter*             m_pPlotter = nullptr;
+    QPointer<QPushButton>                m_pTcRenameBtn;
+    QPointer<QPushButton>                m_pTcColorBtn;
+    QPointer<QPushButton>                m_pTcRemoveBtn;
+    QPointer<QPushButton>                m_pTcExportBtn;
+
+    struct TraceEntry {
+        QString          name;
+        QColor           color;
+        QVector<double>  data;
+        int              hemi   = -1;
+        int              vertex = -1;
+        bool             isPick = false;     /**< true if produced by pickVertex(); false for label extracts. */
+    };
+    QVector<TraceEntry>                  m_traces;
+
+    //=========================================================================================================
+    // Inverse dialog state
+    //=========================================================================================================
+
+    QPointer<QAction>                    m_pComputeSourceEstimateAction;
+    QString                              m_lastFwdDir;
+    QString                              m_lastCovDir;
+    QString                              m_lastAveDir;
+
+    //=========================================================================================================
+    // Labels dock state
+    //=========================================================================================================
+
+    QPointer<QDockWidget>                m_pLabelsDock;
+    QPointer<QTreeWidget>                m_pLabelTree;
+    QTreeWidgetItem*                     m_pLabelRootLh = nullptr;
+    QTreeWidgetItem*                     m_pLabelRootRh = nullptr;
+    QPointer<QAction>                    m_pLoadLabelAction;
+    QPointer<QAction>                    m_pLoadAnnotAction;
+    QPointer<QAction>                    m_pSaveLabelAction;
+    QPointer<QAction>                    m_pCreateLabelAction;
+    QString                              m_lastLabelDir;
 };
 
 } // namespace CORTICALSURFACEPLUGIN

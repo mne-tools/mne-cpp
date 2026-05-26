@@ -1,5 +1,5 @@
 {
     "name": "cortical_surface",
-    "description": "FreeSurfer cortical surface loader and visualiser (TASK 4.1).",
+    "description": "FreeSurfer cortical surface loader and visualiser.",
     "category": "Visualization"
 }

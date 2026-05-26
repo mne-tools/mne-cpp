@@ -31,8 +31,8 @@
  *
  * @brief    PickResult — uniform pick payload for multimodal 3-D scenes.
  *
- *           Used by the MultimodalScene controller (TASK 4 / TASK 10) and the
- *           coregistration wizard (TASK 11) to report what the user clicked
+ *           Used by the MultimodalScene controller (mne_analyze cortical surface,
+ *           mne_inspect) and the mne_align coregistration wizard to report what the user clicked
  *           on, regardless of which renderable produced the hit.
  *
  *           This header is dependency-free (Qt only) and lives in disp3D/scene/

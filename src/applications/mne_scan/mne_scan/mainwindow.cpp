@@ -325,6 +325,14 @@ void MainWindow::openConfiguration()
 
     QFileInfo qFileInfo(path);
     m_pPluginGui->loadConfig(qFileInfo.path(), qFileInfo.fileName());
+
+    // Restore dock geometry / window state stored inside the project (if any)
+    const QByteArray layoutBlob = m_pPluginGui->uiLayoutBlob(QStringLiteral("MainWindow"));
+    if (!layoutBlob.isEmpty()) {
+        restoreState(layoutBlob);
+    }
+
+    refreshPluginStatusWidgets();
 }
 
 //=============================================================================================================
@@ -341,6 +349,10 @@ void MainWindow::saveConfiguration()
 
     if (path.isEmpty())
         return;
+
+    // Persist current dock geometry / window state into the project so it can be
+    // restored when this project is re-opened.
+    m_pPluginGui->setUiLayoutBlob(QStringLiteral("MainWindow"), saveState());
 
     QFileInfo qFileInfo(path);
     m_pPluginGui->saveConfig(qFileInfo.path(), qFileInfo.fileName());
@@ -694,6 +706,17 @@ void MainWindow::createToolBars()
         m_pLabelTime = new QLabel(this);
         m_pToolBar->addWidget(m_pLabelTime);
         m_pLabelTime->setText(QTime(0, 0).toString());
+
+        // Right-hand area used to embed per-plugin status widgets (e.g. recording indicator).
+        auto* pSpacer = new QWidget(this);
+        pSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        m_pToolBar->addWidget(pSpacer);
+
+        m_pPluginStatusContainer = new QWidget(this);
+        auto* pStatusLayout = new QHBoxLayout(m_pPluginStatusContainer);
+        pStatusLayout->setContentsMargins(0, 0, 0, 0);
+        pStatusLayout->setSpacing(8);
+        m_pToolBar->addWidget(m_pPluginStatusContainer);
     }
 
     //Plugin
@@ -721,6 +744,41 @@ void MainWindow::createToolBars()
 void MainWindow::initStatusBar()
 {
     statusBar()->showMessage(tr("Ready"));
+}
+
+//=============================================================================================================
+
+void MainWindow::refreshPluginStatusWidgets()
+{
+    if (!m_pPluginStatusContainer) {
+        return;
+    }
+
+    // Clear previously installed plugin status widgets.
+    if (auto* pLayout = m_pPluginStatusContainer->layout()) {
+        while (QLayoutItem* item = pLayout->takeAt(0)) {
+            if (QWidget* w = item->widget()) {
+                w->deleteLater();
+            }
+            delete item;
+        }
+    }
+
+    if (!m_pPluginSceneManager) {
+        return;
+    }
+
+    auto* pLayout = qobject_cast<QHBoxLayout*>(m_pPluginStatusContainer->layout());
+    if (!pLayout) {
+        return;
+    }
+
+    for (const SCSHAREDLIB::AbstractPlugin::SPtr& pPlugin : m_pPluginSceneManager->getPlugins()) {
+        if (!pPlugin) continue;
+        if (QWidget* pStatus = pPlugin->getStatusWidget()) {
+            pLayout->addWidget(pStatus);
+        }
+    }
 }
 
 //=============================================================================================================
@@ -972,6 +1030,8 @@ void MainWindow::startMeasurement()
     m_pActionQuickControl->setVisible(true);
     //m_pDynamicPluginToolBar->addAction(m_pActionQuickControl);
     initMultiViewWidget(m_pPluginSceneManager->getPlugins());
+
+    refreshPluginStatusWidgets();
 }
 
 //=============================================================================================================

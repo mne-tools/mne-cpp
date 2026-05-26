@@ -11,13 +11,116 @@ set(QT_REQUIRED_COMPONENTS Core Gui Widgets)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
+set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
+list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
+
+set(MNE_LIBS_REQUIRED
+    mne_disp3D
+    mne_fs
+    mne_fiff
+    mne_fwd
+    mne_mne
+    mne_mna
+    mne_mri
+    mne_disp
+    mne_inv
+    mne_utils
+    mne_math
+    mne_conn
+)
+
+# Standalone static-library plugins (see app/plugins/README.md).
+add_subdirectory(app/plugins)
+
+set(INSPECT_PLUGIN_LIBS "")
+if(TARGET inspect_electrodes)
+    list(APPEND INSPECT_PLUGIN_LIBS inspect_electrodes)
+endif()
+if(TARGET inspect_mri_slices)
+    list(APPEND INSPECT_PLUGIN_LIBS inspect_mri_slices)
+endif()
+
+#---------------------------------------------------------------------------
+# mne_inspect_app_core: the full MainWindow + PickReadoutModel as a static
+# library so the executable, the test_mne_inspect_multimodal frame, and the
+# mne_doc_shots screenshot tool can all link against the live widget tree
+# without rebuilding the sources three times.
+#---------------------------------------------------------------------------
+set(MNE_INSPECT_CORE_SOURCES
+    app/mainwindow.cpp
+    app/pickreadoutmodel.cpp
+)
+
+set(MNE_INSPECT_CORE_HEADERS
+    app/mainwindow.h
+    app/pickreadoutmodel.h
+)
+
+add_library(mne_inspect_app_core STATIC
+    ${MNE_INSPECT_CORE_SOURCES}
+    ${MNE_INSPECT_CORE_HEADERS}
+)
+
+target_include_directories(mne_inspect_app_core PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/app
+)
+
+target_link_libraries(mne_inspect_app_core PUBLIC
+    ${QT_REQUIRED_COMPONENT_LIBS}
+    ${MNE_LIBS_REQUIRED}
+    ${INSPECT_PLUGIN_LIBS}
+    Eigen3::Eigen
+)
+
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(mne_inspect_app_core PUBLIC STATICBUILD)
+endif()
+
+set_target_properties(mne_inspect_app_core PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+)
+
+#---------------------------------------------------------------------------
+# mne_inspect_demo_fixtures: synthetic ElectrodeArray/MriVolData payloads
+# shared between the screenshot tool (mne_doc_shots) and the multimodal
+# test frame so visual docs and tests render the exact same scene.
+#---------------------------------------------------------------------------
+add_library(mne_inspect_demo_fixtures STATIC
+    fixtures/inspect_demo_fixtures.h
+    fixtures/inspect_demo_fixtures.cpp
+)
+
+target_include_directories(mne_inspect_demo_fixtures PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_link_libraries(mne_inspect_demo_fixtures PUBLIC
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Gui
+    mne_disp3D
+    mne_mri
+    mne_fiff
+    Eigen3::Eigen
+)
+
+set_target_properties(mne_inspect_demo_fixtures PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+)
+
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(mne_inspect_demo_fixtures PUBLIC STATICBUILD)
+endif()
+
+#---------------------------------------------------------------------------
+# mne_inspect: the application bundle. Only owns main.cpp + bundle
+# resources; all UI logic comes from mne_inspect_app_core.
+#---------------------------------------------------------------------------
 set(SOURCES
     main.cpp
-    app/mainwindow.cpp
 )
 
 set(HEADERS
-    app/mainwindow.h
 )
 
 set(RESOURCES
@@ -56,40 +159,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     app
 )
 
-set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
-list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
-
-set(MNE_LIBS_REQUIRED
-    mne_disp3D
-    mne_fs
-    mne_fiff
-    mne_fwd
-    mne_mne
-    mne_mna
-    mne_mri
-    mne_disp
-    mne_inv
-    mne_utils
-    mne_math
-    mne_conn
-)
-
-# Standalone static-library plugins (see app/plugins/README.md).
-add_subdirectory(app/plugins)
-
-set(INSPECT_PLUGIN_LIBS "")
-if(TARGET inspect_electrodes)
-    list(APPEND INSPECT_PLUGIN_LIBS inspect_electrodes)
-endif()
-if(TARGET inspect_mri_slices)
-    list(APPEND INSPECT_PLUGIN_LIBS inspect_mri_slices)
-endif()
-
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    ${QT_REQUIRED_COMPONENT_LIBS}
-    ${MNE_LIBS_REQUIRED}
-    ${INSPECT_PLUGIN_LIBS}
-    Eigen3::Eigen
+    mne_inspect_app_core
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

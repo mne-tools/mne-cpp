@@ -7,8 +7,7 @@
  *
  * @brief    Global symbol export macros for the mne_analyze CorticalSurface plugin.
  *
- *           Implements TASK 4.1 (FreeSurfer cortical surface plugin) of the
- *           v2.3.0 release plan.
+ *           Provides the FreeSurfer cortical-surface plugin for mne_analyze.
  */
 
 #ifndef MNEANALYZE_CORTICAL_SURFACE_GLOBAL_H

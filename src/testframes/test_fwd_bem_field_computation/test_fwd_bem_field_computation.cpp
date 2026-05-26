@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * @file     test_fwd_bem_field_computation.cpp
- * @author   MNE-CPP Tests
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @brief    Tests for BEM field/potential computation, sphere model fields,
  *           guess-point generation, and forward computation pipeline.
  */

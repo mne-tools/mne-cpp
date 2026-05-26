@@ -113,6 +113,22 @@ public:
     void saveConfig(const QString& sPath,
                     const QString& sFileName);
 
+    //=========================================================================================================
+    /**
+     * Returns the UI layout blob (base64-encoded QMainWindow state) stored under
+     * \a sWindowKey in the currently loaded MNA project's \c ui.layout.* section.
+     * Returns an empty QByteArray if no layout was stored.
+     */
+    QByteArray uiLayoutBlob(const QString& sWindowKey) const;
+
+    //=========================================================================================================
+    /**
+     * Stores a UI layout blob (base64-encoded QMainWindow state) under \a sWindowKey
+     * inside the currently loaded MNA project. The blob is persisted on the next
+     * saveConfig() call.
+     */
+    void setUiLayoutBlob(const QString& sWindowKey, const QByteArray& blob);
+
     inline SCSHAREDLIB::AbstractPlugin::SPtr getCurrentPlugin();
 
     void uiSetupRunningState(bool state);

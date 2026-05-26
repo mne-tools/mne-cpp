@@ -5,7 +5,7 @@
  * @since    2.3.0
  * @date     May, 2026
  *
- * @brief    Workflow skill that writes an MNA project file (TASK 5).
+ * @brief    Workflow skill that writes an MNA project file.
  */
 
 #ifndef MNE_ANALYZE_STUDIO_WRITEMNASKILL_H

@@ -222,6 +222,12 @@ QJsonObject SourceEstimationSkill::executeSkill(const WorkflowNode& nodeState)
         };
     }
 
+    // Activate projectors so the recorded SSPs participate in the whitening
+    // applied by the inverse operator.
+    for(int k = 0; k < raw.info.projs.size(); ++k) {
+        raw.info.projs[k].active = true;
+    }
+
     const float sfreq      = static_cast<float>(raw.info.sfreq);
     const int firstSamp    = raw.first_samp;
     const int lastSamp     = raw.last_samp;
@@ -254,13 +260,32 @@ QJsonObject SourceEstimationSkill::executeSkill(const WorkflowNode& nodeState)
     }
 
     // ── Prepare the inverse operator ──────────────────────────────────────────
-    const MNEInverseOperator prepInv = invOp.prepare_inverse_operator(1, lambda2, isDSPM, isSLORETA);
+    const qint32 nave = 1;
+    const MNEInverseOperator prepInv = invOp.prepare_inverse_operator(nave, lambda2, isDSPM, isSLORETA);
     InvMinimumNorm mnNorm(prepInv, lambda2, method);
+    // The MatrixXd overload of calculateInverse() requires the inverse operator
+    // to be fully set up first; the FiffEvoked overload does this internally.
+    mnNorm.doInverseSetup(nave, /*pick_normal=*/false);
+
+    // ── Pick raw channels that match the inverse operator ────────────────────
+    QStringList invChNames;
+    invChNames.reserve(invOp.noise_cov->names.size());
+    for(int i = 0; i < invOp.noise_cov->names.size(); ++i) {
+        invChNames << invOp.noise_cov->names[i];
+    }
+    const RowVectorXi picks = raw.info.pick_channels(invChNames);
+    if(picks.size() == 0) {
+        return QJsonObject{
+            {"status",  "error"},
+            {"message", QString("Source estimation node `%1`: no matching channels between raw data and inverse operator.")
+                            .arg(nodeState.uid)}
+        };
+    }
 
     // ── Read the requested window ─────────────────────────────────────────────
     MatrixXd data;
     MatrixXd times;
-    if(!raw.read_raw_segment(data, times, winFirst, winLast)) {
+    if(!raw.read_raw_segment(data, times, winFirst, winLast, picks)) {
         return QJsonObject{
             {"status",  "error"},
             {"message", QString("Source estimation node `%1`: failed to read raw segment [%2, %3] samples.")

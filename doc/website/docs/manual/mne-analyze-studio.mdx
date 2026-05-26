@@ -18,7 +18,7 @@ workflows that ship under `src/applications/mne_analyze_studio/examples/workflow
 to illustrate how an **MNA** (MNE Node Authoring) project is loaded, inspected
 and executed through the three project-level skills bundled with the Studio.
 
-<!-- screenshot: full Workbench window with the Workflow Map and an MNA file open in an editor tab -->
+![Full Workbench window with the Workflow Map and an MNA file open in an editor tab](/img/manual/auto/mne-analyze-studio/workbench-overview.png)
 
 ## MNA in one minute
 
@@ -76,7 +76,7 @@ Studio.
    `MnaGraphExecutor`, and reports `node_count: 4` plus the `result_keys`
    published by each filter node.
 
-<!-- screenshot: Workflow Map for temporal_filter_demo.mna with op_preclean fanning out to alpha and beta branches -->
+![Workflow Map for temporal_filter_demo.mna with op_preclean fanning out to alpha and beta branches](/img/manual/auto/mne-analyze-studio/temporal-filter-demo.png)
 
 ## Demo 2 — `filter_then_source_estimation_demo.mna`
 
@@ -111,7 +111,7 @@ pre-computed inverse operator to produce distributed source timecourses.
    for both nodes; the Studio's Analysis Results widget will pick the STC up
    for cortical-surface rendering.
 
-<!-- screenshot: Source Estimation result rendered on the cortex after running filter_then_source_estimation_demo.mna -->
+![Source Estimation result rendered on the cortex after running filter_then_source_estimation_demo.mna](/img/manual/auto/mne-analyze-studio/filter-then-source-estimation-demo.png)
 
 ## Demo 3 — `source_estimation_multimodal_demo.mna`
 
@@ -176,7 +176,7 @@ specialised skills land in follow-up releases.
    downstream Studio steps can pick the final `source_estimates_01` for
    visualisation.
 
-<!-- screenshot: Workflow Map for source_estimation_multimodal_demo.mna showing the MEG/EEG and MRI branches converging at op_forward_solution and op_inverse_operator -->
+![Workflow Map for source_estimation_multimodal_demo.mna showing the MEG/EEG and MRI branches converging at op_forward_solution and op_inverse_operator](/img/manual/auto/mne-analyze-studio/source-estimation-multimodal-demo.png)
 
 ## Skills reference
 
@@ -227,7 +227,7 @@ Executes the pipeline of an MNA project end-to-end.
   "error"` with the validation messages; otherwise it reports
   `status: "completed"` together with the result summary above.
 
-<!-- screenshot: Skill inspector panel showing the schema for mne.skills.run_mna_graph -->
+![Skill inspector panel showing the schema for mne.skills.run_mna_graph](/img/manual/auto/mne-analyze-studio/skill-run-mna-graph.png)
 
 ## See also
 

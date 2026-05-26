@@ -10,3 +10,6 @@ build/
 # Misc
 .DS_Store
 *.log
+
+# Auto-generated documentation screenshots (rebuilt by `make screenshots`)
+static/img/manual/auto/

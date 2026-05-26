@@ -1,0 +1,284 @@
+---
+title: MNE Inspect — Multimodal Workflow
+sidebar_label: MNE Inspect Multimodal
+---
+
+# MNE Inspect — Multimodal Workflow
+
+:::note
+Screenshots will be captured against the v2.3.0 release build.
+:::
+
+This page walks through the intracranial multimodal workflow added in
+mne-cpp v2.3.0: loading an MRI volume, a FreeSurfer cortical surface and
+an intracranial electrode set (sEEG depths + ECoG grids) into a single
+3-D scene, then driving the **Layers**, **Pick** and **Overlay** docks
+to inspect contact-by-contact data on top of the anatomy.
+
+For the architectural overview of `mne_inspect`, command-line flags, and
+the underlying renderables, see [MNE Inspect](inspect.mdx). For the
+coregistration helper used to bring digitisation into MRI space, see
+[MNE Align](mne-align.mdx).
+
+## Overview
+
+The multimodal workflow targets intracranial users (sEEG, ECoG, DBS)
+who need to look at electrode positions, the MRI they were planned
+from, and the cortical surface they sit on **in the same scene**, and
+to see recorded data and source estimates rendered in registration with
+that anatomy. The same `MultimodalScene` controller backs `mne_align`
+and the cortical workflow in `mne_analyze`, so layer / pick / overlay
+behaviour is consistent across the apps.
+
+![Multimodal scene overview](/img/manual/auto/inspect-multimodal/overview.png)
+
+## Prerequisites
+
+Before you start, make sure you have:
+
+- A FreeSurfer subject directory (`$SUBJECTS_DIR/<subject>/`) with at
+  least `mri/T1.mgz` (or `aparc+aseg.mgz`) and `surf/lh.inflated` +
+  `surf/rh.inflated`.
+- An MRI volume in MGZ or NIfTI (`*.mgz`, `*.nii`, `*.nii.gz`) — usually
+  the same `T1.mgz` the subject was reconstructed from.
+- Electrode coordinates as **one of**:
+  - a FIFF digitisation file (`*.fif`) with intracranial points, or
+  - a BIDS `*_electrodes.tsv` plus a matching `*_coordsystem.json`, or
+  - a plain CSV (`name,x,y,z,group`) in the same coordinate frame as
+    the MRI volume.
+- *Optional:* a source-estimate file (`*-stc.{lh,rh}`) and / or a
+  pre-computed per-contact time-series (FIFF or NumPy `.npy`) to drive
+  the **Overlay** dock.
+
+:::tip
+If your electrode coordinates are in subject-RAS (FreeSurfer) but the
+volume you loaded is in scanner-RAS, the converter
+[`mna_bids_converter`](tools-mna-bids-converter.mdx) can resample them
+into the MRI frame before you load them here.
+:::
+
+## Step-by-step walkthrough
+
+### 1. Launch `mne_inspect`
+
+```bash
+# Linux / macOS
+./bin/mne_inspect
+
+# Windows
+bin\mne_inspect.exe
+```
+
+The main window opens with an empty `MultimodalScene` in the centre,
+the **Layers** dock on the left, and the **Pick** / **Overlay** docks
+stacked on the right. The scene is empty until you load data through
+the `File` menu.
+
+### 2. File → Load MRI…
+
+`File ▸ Load MRI…` accepts `*.mgz`, `*.nii` and `*.nii.gz`. The volume
+is registered with the scene as three orthogonal slices (axial,
+coronal, sagittal) — one `SceneLayer` of kind `MriSlice` per slice,
+all sharing the same volume payload. The slice planes are placed at
+the volume centre on first load; you can drag them with the middle
+mouse button or scrub them from the **Layers** dock.
+
+![Load MRI dialog](/img/manual/auto/inspect-multimodal/load-mri.png)
+
+### 3. File → Load Surface…
+
+`File ▸ Load Surface…` opens the FreeSurfer subject browser. Pick a
+subject directory, then tick the surfaces you want (typically
+`lh.inflated` + `rh.inflated`, or `lh.pial` + `rh.pial`). Each surface
+is added as a `SceneLayer` of kind `BrainSurface` and rendered with the
+default cortical colormap.
+
+:::note
+The subject browser remembers the last `$SUBJECTS_DIR` per workspace.
+If you supplied `--subjectPath` on the command line it pre-selects that
+subject.
+:::
+
+### 4. File → Load Electrodes…
+
+`File ▸ Load Electrodes…` accepts three input shapes:
+
+| Input | Notes |
+|---|---|
+| FIFF | Uses the intracranial points in `ISOTRAK`. Groups are inferred from contact name prefixes. |
+| BIDS `*_electrodes.tsv` | The companion `*_coordsystem.json` selects the source coordinate frame. |
+| CSV (`name,x,y,z[,group]`) | Coordinates are assumed to be in the frame of the currently loaded MRI. |
+
+The loader produces one `ElectrodeArray` per group, classified as
+`Depth` (sEEG), `Strip`, or `Grid` (ECoG) based on the contact layout.
+Each array becomes a `SceneLayer` of kind `Electrode` and the layout
+type drives the default geometry (cylindrical depths, planar grids).
+
+![Electrode loader](/img/manual/auto/inspect-multimodal/load-electrodes.png)
+
+### 5. Toggle modalities in the Layers dock
+
+The **Layers** dock lists every registered `SceneLayer` grouped by
+modality. For each row you can:
+
+- toggle visibility (eye icon),
+- change opacity (slider),
+- re-order within a modality (drag handle, sets `drawOrder`),
+- right-click ▸ `Remove` to evict the payload from the scene.
+
+The renderer rebuilds its draw list on every `layersChanged` signal,
+so changes are reflected immediately without re-loading.
+
+### 6. Inspect with the Pick dock
+
+Click on any visible element in the scene. The ray picker returns a
+`PickResult` and the **Pick** dock displays the readout for whatever
+modality was hit. The contact / vertex / voxel is highlighted in the
+scene until the next pick.
+
+![Pick dock](/img/manual/auto/inspect-multimodal/pick-dock.png)
+
+### 7. Drive the Overlay dock
+
+The **Overlay** dock binds a *data source* to a *layer kind* through a
+*colormap* and a shared *time cursor*:
+
+| Data source | Drives | Typical use |
+|---|---|---|
+| Per-contact time series (FIFF / NPY) | `Electrode` layers | Colour sEEG / ECoG contacts by iEEG amplitude, HFO rate, … |
+| Source estimate (`*-stc.{lh,rh}`) | `BrainSurface` layers | Colour cortex by dSPM / sLORETA / MNE activation. |
+| Static per-contact column | `Electrode` layers | Colour by a clinically annotated value (e.g. SOZ score). |
+
+Pick a colormap (`viridis`, `RdBu_r`, `turbo`, …), set min / max (or
+let the dock auto-fit), and scrub the time slider. The time index is
+the scene-wide `timeSampleChanged` signal, so contact colours, cortical
+overlay and slice annotations advance together.
+
+### 8. Cross-modality jump
+
+Clicking a cortical vertex while an MRI volume is loaded does two
+things:
+
+1. The **Pick** dock fills in the vertex readout (as in step 6).
+2. The three MRI slice planes reposition so that the hit point lies at
+   their intersection — i.e. the orthogonal slices jump to the voxel
+   under the cortical vertex you clicked.
+
+The same dispatch works in the other direction: picking a voxel on a
+slice highlights the nearest cortical vertex (within a configurable
+search radius) and the nearest electrode contact.
+
+## Layer model
+
+The scene draws layers in modality order; opaque geometry (cortex, BEM,
+MRI slices) is rendered before translucent overlays. The available
+`SceneLayerKind` values are:
+
+| `SceneLayerKind` | What it shows |
+|---|---|
+| `BrainSurface` | Cortical / BEM surface (one layer per hemisphere or compartment). |
+| `MriSlice` | One orthogonal MRI slice (axial / coronal / sagittal). |
+| `Sensor` | MEG / EEG sensor positions. |
+| `Helmet` | MEG helmet shell. |
+| `Electrode` | sEEG depth, ECoG strip or ECoG grid `ElectrodeArray`. |
+| `Dipole` | Dipole renderable. |
+| `SourceOverlay` | Source-estimate activation overlay attached to a `BrainSurface`. |
+| `Network` | Connectivity network graph. |
+| `Custom` | Host-app-specific renderable (plugins, prototypes). |
+
+Each layer carries an opaque, type-erased payload owned by the
+producing plugin; the scene only needs the `kind`, the `id`, and the
+visibility / opacity flags to drive the draw list.
+
+## Pick model
+
+A single `PickResult` describes every hit, regardless of modality. The
+**Pick** dock surfaces the fields relevant to the layer kind that was
+hit:
+
+| Pick target | Readout fields |
+|---|---|
+| Cortical vertex | `surfaceKey`, `vertexIndex`, `hitPoint`, `regionName` / `regionId` (from FsAnnotation), current overlay value. |
+| MRI voxel | `hitPoint` in MRI RAS, voxel index, voxel intensity. |
+| sEEG / ECoG contact | Contact name, group label, layout kind (`Depth` / `Strip` / `Grid`), `hitPoint`, current time-series value. |
+| Sensor | Sensor name, channel index, `hitPoint`. |
+| Dipole | `dipoleIndex`, `hitPoint`, current amplitude. |
+
+`PickResult::displayLabel()` is the same string the dock uses for its
+header line, so log dumps and dock headers always agree.
+
+## Overlay model
+
+An overlay is the cross-product of three things:
+
+```
+overlay = data source × colormap × time cursor
+```
+
+- **Data source** — anything that exposes a value (or a per-element
+  vector of values) per scene element, sampled at the current time
+  index. Examples: an STC for cortical vertices, a `RowMatrixXf` for
+  electrode contacts, a static column for a clinical score.
+- **Colormap** — a named LUT (`viridis`, `turbo`, `RdBu_r`, …) plus a
+  min / max pair (auto-fit or user-set).
+- **Time cursor** — the scene-wide sample index. Changing it emits
+  `timeSampleChanged`; every bound overlay re-samples and the renderer
+  refreshes once.
+
+This means a single time cursor scrubs cortical activation, electrode
+colours and any slice annotations in lock-step.
+
+## Troubleshooting
+
+**Electrodes are not where you expect them.** The most common cause is
+a coordinate-frame mismatch (BIDS subject-RAS vs MRI scanner-RAS vs
+head). Check the companion `*_coordsystem.json` for BIDS inputs, or
+verify the FIFF `dig` block is in head coordinates. The
+[`mna_bids_converter`](tools-mna-bids-converter.mdx) tool can resample
+contacts into the MRI frame.
+
+**Surface and slices do not line up.** The cortical surface is in the
+FreeSurfer subject-RAS frame. If the loaded MRI is in scanner-RAS,
+either load `T1.mgz` from the same subject (which is in subject-RAS
+once FreeSurfer has run) or compute the surface-RAS-to-volume
+transform with `tools-collect-transforms`. The orthogonal slice planes
+honour the volume's own affine; they are not silently re-aligned.
+
+**Frame rate drops with many contacts and a dense surface.** Use the
+**Layers** dock to drop opacity on the surface to ~0.6 so the GPU can
+early-out occluded contacts, hide the hemisphere you are not currently
+inspecting, or switch the surface from `pial` to `inflated`. As a
+reference, the v2.3.0 target is ≥ 30 FPS on a 2024-class laptop for a
+327 k-triangle cortex + 120 sEEG contacts + 64-contact ECoG grid + 3
+MRI slices.
+
+**WASM build is slow on first load.** The browser file picker streams
+the MRI volume into memory before the slices are built; large NIfTIs
+can take several seconds. Subsequent layer toggles are GPU-only and
+should match the desktop frame rate.
+
+## Saving your work
+
+The multimodal scene is a **viewer** — none of the loaded MRI, surface,
+electrode or overlay state is persisted automatically when you close
+the window. To capture the current set of layers, their visibility,
+the overlay bindings and the time cursor, save the session as an MNA
+project (`File ▸ Save Project…`). The MNA file records the *paths* of
+the underlying data plus the scene state, so re-opening it restores
+the layout without re-importing.
+
+See [MNA / MNX Project Format](mna-format.mdx) for the on-disk format
+and [`show_mna`](tools-show-mna.mdx) for a CLI inspector.
+
+## See also
+
+- [MNE Inspect](inspect.mdx) — application overview and command-line
+  flags.
+- [MNE Align](mne-align.mdx) — coregistration wizard that produces the
+  `-trans.fif` consumed by this workflow.
+- [MNE Analyze](analyze.mdx) — the cortical / vertex workflow that
+  shares the same `MultimodalScene` primitives.
+- [MNA BIDS Converter](tools-mna-bids-converter.mdx) — resample BIDS
+  electrodes into the MRI frame before loading.
+- [MNA / MNX Project Format](mna-format.mdx) — on-disk layout for
+  saved sessions.

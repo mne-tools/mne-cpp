@@ -65,6 +65,8 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class TestWriteToFileStatus;
+
 namespace FIFFLIB{
     class FiffInfo;
     class FiffStream;
@@ -100,6 +102,8 @@ class WRITETOFILESHARED_EXPORT WriteToFile : public SCSHAREDLIB::AbstractAlgorit
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::AbstractAlgorithm)
 
+    friend class ::TestWriteToFileStatus;
+
 public:
     //=========================================================================================================
     /**
@@ -128,6 +132,30 @@ public:
     virtual QString getBuildInfo() override;
     virtual QVariantMap getAttributes() const override;
     virtual void setAttributes(const QVariantMap& attributes) override;
+
+    //=========================================================================================================
+    /**
+     * Returns a small status widget that visualizes the current recording state
+     * (red recording dot + elapsed time + current file size). Caller takes ownership.
+     * Returns nullptr if recording status is not applicable.
+     */
+    QWidget* getStatusWidget() override;
+
+signals:
+    //=========================================================================================================
+    /**
+     * Emitted approximately once per second while recording with a human readable
+     * summary of the form "HH:MM:SS  12.3 MB".
+     */
+    void recordingStatus(const QString& sSummary);
+
+    //=========================================================================================================
+    /**
+     * Emitted whenever recording starts (true) or stops (false).
+     */
+    void recordingActiveChanged(bool bActive);
+
+public:
 
     //=========================================================================================================
     /**
@@ -295,6 +323,27 @@ private:
     QSharedPointer<QTimer>                  m_pUpdateTimeInfoTimer;         /**< timer to control remaining time. */
     QSharedPointer<QTimer>                  m_pBlinkingRecordButtonTimer;   /**< timer to control blinking recording button. */
     QSharedPointer<QTimer>                  m_pRecordTimer;                 /**< timer to control recording time. */
+    QSharedPointer<QTimer>                  m_pStatusEmitTimer;             /**< 1 Hz timer that emits recordingStatus while recording.*/
+
+    //=========================================================================================================
+    /**
+     * Emit a recordingStatus signal computed from the current QFile and elapsed time.
+     * Public so widgets and tests can trigger an immediate refresh.
+     */
+private:
+    void emitRecordingStatus();
+
+    //=========================================================================================================
+    /**
+     * Format a byte count as a human readable string ("12.3 MB").
+     */
+    static QString formatBytes(qint64 iBytes);
+
+    //=========================================================================================================
+    /**
+     * Format an elapsed time in milliseconds as HH:MM:SS.
+     */
+    static QString formatElapsed(qint64 iMSecs);
 
     QFile                                   m_qFileOut;                     /**< QFile for writing to fif file.*/
     QString                                 m_sRecordFileName;              /**< Current record file. */

@@ -33,6 +33,8 @@
 #include <QStringList>
 #include <QTextStream>
 
+#include <limits>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -100,6 +102,30 @@ void ElectrodesPlugin::selectContact(const QString& name)
     }
     m_object->selectContact(name);
     emit contactPicked(name);
+}
+
+//=============================================================================================================
+
+QString ElectrodesPlugin::highlightNearest(const QVector3D& worldPosition)
+{
+    const QVector<ElectrodeArray>& arrays = m_object->arrays();
+    QString bestName;
+    float bestDistSq = std::numeric_limits<float>::max();
+    for (const ElectrodeArray& arr : arrays) {
+        for (const ElectrodeContact& c : arr.contacts) {
+            const float d = (c.position - worldPosition).lengthSquared();
+            if (d < bestDistSq) {
+                bestDistSq = d;
+                bestName = c.name;
+            }
+        }
+    }
+    if (bestName.isEmpty()) {
+        return QString();
+    }
+    m_object->selectContact(bestName);
+    emit contactPicked(bestName);
+    return bestName;
 }
 
 //=============================================================================================================

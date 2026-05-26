@@ -207,6 +207,18 @@ public:
 
     //=========================================================================================================
     /**
+     * Find the contact whose position is closest to @p worldPosition (in
+     * MRI surface RAS coordinates) and select it. Used for cross-modality
+     * jumps: when the user picks an MRI voxel or surface vertex, the
+     * Pick dock asks the electrodes plugin to highlight the nearest contact.
+     *
+     * @return Name of the highlighted contact, or empty string if no
+     *         contacts are loaded.
+     */
+    QString highlightNearest(const QVector3D& worldPosition);
+
+    //=========================================================================================================
+    /**
      * Clear the contact selection.
      */
     void clearSelection();

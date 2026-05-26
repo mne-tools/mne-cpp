@@ -72,7 +72,7 @@ The `writetofile` plugin produces one FIFF file per pipeline *Run*. Recommended 
 - **Backup.** At least one off-host copy. FIFF files are append-only during a recording but become read-only afterwards, so a daily rsync of the output directory is sufficient.
 - **Provenance.** Archive the MNE-CPP version (`mne_scan --version`), the plugin set in `plugins/mne_scan/`, and the calibration file set used. Without these, a recording is not reproducible.
 
-<!-- screenshot: doc/website/static/img/mne-scan-writetofile-prefs.png — writetofile Preferences tab showing the file-pattern field -->
+![writetofile Preferences tab showing the file-pattern field](/img/manual/auto/mne-scan/writetofile-prefs.png)
 
 ## Troubleshooting Common Runtime Errors
 

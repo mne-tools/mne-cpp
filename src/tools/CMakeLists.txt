@@ -117,6 +117,9 @@ option(BUILD_MNE_LIST_PROJ "Build MNE List Projectors" ON)
 option(BUILD_MNE_SENSOR_LOCATIONS "Build MNE Sensor Locations" ON)
 option(BUILD_MNE_EVOKED_DATA_SUMMARY "Build MNE Evoked Data Summary" ON)
 
+# Documentation utilities
+option(BUILD_MNE_DOC_SHOTS "Build MNE documentation screenshot generator" ON)
+
 # MNA/BIDS conversion
 option(BUILD_MNE_MNA_BIDS_CONVERTER "Build MNE MNA BIDS Converter" ON)
 
@@ -402,5 +405,10 @@ if(NOT WASM)
   # Simulation
   if(BUILD_MNE_SIMU)
     add_subdirectory(simulation/mne_simu)
+  endif()
+
+  # Documentation
+  if(BUILD_MNE_DOC_SHOTS)
+    add_subdirectory(doc_shots)
   endif()
 endif()

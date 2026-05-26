@@ -185,6 +185,15 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns an optional small status widget that hosts (e.g. MNE Scan main toolbar)
+     * may embed to surface plugin-specific live information (recording indicators,
+     * connection state, etc.). Default implementation returns nullptr.
+     * Caller takes ownership of the returned widget.
+     */
+    virtual QWidget* getStatusWidget() { return nullptr; }
+
+    //=========================================================================================================
+    /**
      * Returns string with plugin build date and time.
      *
      * @return build date and time

@@ -95,6 +95,18 @@ public:
      */
     ~MneAlign() override;
 
+    /** @return The seven-step wizard (never null after construction). */
+    AlignWizard* wizard() const;
+
+    /** @return The 3-D view widget (never null after construction). */
+    Align3DView* view3d() const;
+
+    /** @return The shared digitised-point store (never null after construction). */
+    AcquiredPoints* points() const { return m_pPoints; }
+
+    /** @return The Polhemus digitizer connection (never null after construction; not opened). */
+    PolhemusConnection* digitizer() const { return m_pDigitizer; }
+
 protected:
     void closeEvent(QCloseEvent* event) override;
 

@@ -13,6 +13,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 set(SOURCES
     writetofile.cpp 
     FormFiles/writetofilesetupwidget.cpp 
+    FormFiles/writetofilestatuswidget.cpp
     writetofile_global.cpp
 )
 
@@ -20,6 +21,7 @@ set(HEADERS
     writetofile_global.h 
     writetofile.h 
     FormFiles/writetofilesetupwidget.h
+    FormFiles/writetofilestatuswidget.h
 )
 
 set(UI

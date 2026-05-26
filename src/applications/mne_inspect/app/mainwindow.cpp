@@ -40,6 +40,8 @@
 #include <disp3D/view/brainview.h>
 #include <disp3D/model/braintreemodel.h>
 #include <disp3D/core/viewstate.h>
+#include <disp3D/scene/multimodalscene.h>
+#include <disp3D/scene/pickresult.h>
 
 #include <fs/fs_surface.h>
 #include <fs/fs_surfaceset.h>
@@ -92,7 +94,14 @@
 #include <QDesktopServices>
 #include <QUrl>
 
+#include <QFormLayout>
+#include <QLinearGradient>
+#include <QPainter>
+#include <QPaintEvent>
+#include <QSignalBlocker>
+
 #include <algorithm>
+#include <cmath>
 
 #ifdef WASMBUILD
 #include <QBuffer>
@@ -107,6 +116,83 @@
 using namespace FSLIB;
 using namespace MNELIB;
 using namespace MNALIB;
+
+//=============================================================================================================
+// OVERLAY COLOR BAR
+//=============================================================================================================
+
+/**
+ * Lightweight colour-bar widget for the Overlay dock. Renders a horizontal
+ * gradient between fmin/fmid/fmax with three tick labels. No signals.
+ */
+class OverlayColorBar : public QWidget
+{
+public:
+    explicit OverlayColorBar(QWidget* parent = nullptr) : QWidget(parent)
+    {
+        setMinimumHeight(40);
+        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    }
+
+    enum class Colormap { Sequential = 0, Divergent, HotCool };
+
+    void setRange(float fmin, float fmid, float fmax)
+    {
+        m_fmin = fmin;
+        m_fmid = fmid;
+        m_fmax = fmax;
+        update();
+    }
+
+    void setColormap(Colormap c)
+    {
+        m_cmap = c;
+        update();
+    }
+
+protected:
+    void paintEvent(QPaintEvent* /*event*/) override
+    {
+        QPainter p(this);
+        const QRect r = rect().adjusted(2, 2, -2, -18);
+        QLinearGradient g(r.topLeft(), r.topRight());
+        switch (m_cmap) {
+            case Colormap::Sequential:
+                g.setColorAt(0.0, QColor(20, 20, 80));
+                g.setColorAt(0.5, QColor(120, 80, 180));
+                g.setColorAt(1.0, QColor(255, 240, 120));
+                break;
+            case Colormap::Divergent:
+                g.setColorAt(0.0, QColor(30, 90, 220));
+                g.setColorAt(0.5, QColor(245, 245, 245));
+                g.setColorAt(1.0, QColor(220, 60, 30));
+                break;
+            case Colormap::HotCool:
+                g.setColorAt(0.0, QColor(0, 80, 200));
+                g.setColorAt(0.5, QColor(0, 0, 0));
+                g.setColorAt(1.0, QColor(240, 60, 0));
+                break;
+        }
+        p.fillRect(r, g);
+        p.setPen(palette().color(QPalette::Text));
+        p.drawRect(r);
+
+        const QString lo = QString::number(m_fmin, 'g', 3);
+        const QString mid = QString::number(m_fmid, 'g', 3);
+        const QString hi = QString::number(m_fmax, 'g', 3);
+        const int y = r.bottom() + 14;
+        p.drawText(r.left(), y, lo);
+        p.drawText(r.center().x() - p.fontMetrics().horizontalAdvance(mid) / 2,
+                   y, mid);
+        p.drawText(r.right() - p.fontMetrics().horizontalAdvance(hi), y, hi);
+    }
+
+private:
+    float    m_fmin = 0.0f;
+    float    m_fmid = 0.5f;
+    float    m_fmax = 1.0f;
+    Colormap m_cmap = Colormap::Sequential;
+};
 
 //=============================================================================================================
 // BIDS HELPERS
@@ -222,10 +308,26 @@ static QWidget *createFlatDockTitleBar(QDockWidget *dock, const QString &title)
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
+    , m_scene(this)
+    , m_electrodesPlugin(this)
+    , m_mriSlicesPlugin(this)
+    , m_pickReadout(this)
 {
     setWindowTitle("MNE Inspect");
 
+    // Wire the two inspection plugins (electrodes, MRI slices) to the shared scene before any UI
+    // construction so that subsequent dock widgets / menu actions can
+    // assume the scene is fully populated.
+    m_electrodesPlugin.attachScene(&m_scene);
+    m_mriSlicesPlugin.attachScene(&m_scene);
+    m_pickReadout.attachScene(&m_scene);
+    m_pickReadout.setElectrodesPlugin(&m_electrodesPlugin);
+    m_pickReadout.setMriSlicesPlugin(&m_mriSlicesPlugin);
+
     setupUI();
+    createPickDock();
+    createLayersDock();
+    createOverlayDock();
     createMenus();
     createStatusBar();
     setupConnections();
@@ -2459,6 +2561,12 @@ void MainWindow::createMenus()
     m_actLoadTransform = m_fileMenu->addAction("Load T&ransformation...");
 
     m_fileMenu->addSeparator();
+    m_actLoadElectrodes = m_fileMenu->addAction("Load &Electrodes...");
+    connect(m_actLoadElectrodes, &QAction::triggered, this, &MainWindow::onLoadElectrodes);
+    m_actLoadMri = m_fileMenu->addAction("Load &MRI...");
+    connect(m_actLoadMri, &QAction::triggered, this, &MainWindow::onLoadMri);
+
+    m_fileMenu->addSeparator();
 
 #ifndef WASMBUILD
     m_recentFilesMenu = m_fileMenu->addMenu("Recent Projects");
@@ -2483,6 +2591,25 @@ void MainWindow::createMenus()
     m_actShowLoadedFiles->setShortcut(QKeySequence("Ctrl+2"));
     m_actShowLoadedFiles->setText("Show Loaded Files Panel");
     m_viewMenu->addAction(m_actShowLoadedFiles);
+
+    if (m_pickDock) {
+        m_actShowPick = m_pickDock->toggleViewAction();
+        m_actShowPick->setText("Show Pick Panel");
+        m_actShowPick->setShortcut(QKeySequence("Ctrl+3"));
+        m_viewMenu->addAction(m_actShowPick);
+    }
+    if (m_layersDock) {
+        m_actShowLayers = m_layersDock->toggleViewAction();
+        m_actShowLayers->setText("Show Layers Panel");
+        m_actShowLayers->setShortcut(QKeySequence("Ctrl+4"));
+        m_viewMenu->addAction(m_actShowLayers);
+    }
+    if (m_overlayDock) {
+        m_actShowOverlay = m_overlayDock->toggleViewAction();
+        m_actShowOverlay->setText("Show Overlay Panel");
+        m_actShowOverlay->setShortcut(QKeySequence("Ctrl+5"));
+        m_viewMenu->addAction(m_actShowOverlay);
+    }
 
     m_viewMenu->addSeparator();
 
@@ -2715,4 +2842,286 @@ void MainWindow::addRecentFile(const QString &path)
 #else
     Q_UNUSED(path);
 #endif
+}
+
+//=============================================================================================================
+// Multimodal scene wiring (pick dock, layers dock, overlay dock, plugin loaders)
+//=============================================================================================================
+
+void MainWindow::createPickDock()
+{
+    m_pickDock = new QDockWidget("Pick", this);
+    m_pickDock->setObjectName("pickDock");
+    m_pickDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
+    m_pickDock->setTitleBarWidget(createFlatDockTitleBar(m_pickDock, "Pick"));
+
+    QWidget *body = new QWidget;
+    QVBoxLayout *lay = new QVBoxLayout(body);
+    lay->setContentsMargins(8, 8, 8, 8);
+    lay->setSpacing(4);
+
+    m_pickLabelLine = new QLabel(m_pickReadout.labelRow());
+    m_pickWorldLine = new QLabel(m_pickReadout.worldRow());
+    m_pickVoxelLine = new QLabel(m_pickReadout.voxelRow());
+    m_pickValueLine = new QLabel(m_pickReadout.valueRow());
+    for (QLabel* l : {m_pickLabelLine, m_pickWorldLine, m_pickVoxelLine, m_pickValueLine}) {
+        l->setTextInteractionFlags(Qt::TextSelectableByMouse);
+        lay->addWidget(l);
+    }
+    lay->addStretch(1);
+
+    m_pickDock->setWidget(body);
+    addDockWidget(Qt::RightDockWidgetArea, m_pickDock);
+
+    connect(&m_pickReadout, &MNEINSPECT::PickReadoutModel::readoutChanged,
+            this, &MainWindow::refreshPickDockLabels);
+}
+
+//=============================================================================================================
+
+void MainWindow::createLayersDock()
+{
+    m_layersDock = new QDockWidget("Layers", this);
+    m_layersDock->setObjectName("layersDock");
+    m_layersDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
+    m_layersDock->setTitleBarWidget(createFlatDockTitleBar(m_layersDock, "Layers"));
+
+    QWidget *body = new QWidget;
+    QVBoxLayout *lay = new QVBoxLayout(body);
+    lay->setContentsMargins(8, 8, 8, 8);
+    lay->setSpacing(6);
+
+    m_layerBrainCheck         = new QCheckBox("Cortical Surface");
+    m_layerElectrodesCheck    = new QCheckBox("Electrodes");
+    m_layerMriCheck           = new QCheckBox("MRI Slices");
+    m_layerSensorsCheck       = new QCheckBox("Sensors");
+    m_layerSourceOverlayCheck = new QCheckBox("Source Overlay");
+    for (QCheckBox *c : {m_layerBrainCheck, m_layerElectrodesCheck, m_layerMriCheck,
+                         m_layerSensorsCheck, m_layerSourceOverlayCheck}) {
+        c->setChecked(true);
+        lay->addWidget(c);
+    }
+    lay->addStretch(1);
+
+    // Toggling a kind-checkbox flips visibility on every layer of that kind.
+    auto toggleKind = [this](DISP3DLIB::SceneLayerKind kind, bool visible) {
+        const auto layers = m_scene.layers();
+        for (const auto& layer : layers) {
+            if (layer.kind == kind) {
+                m_scene.setLayerVisible(layer.id, visible);
+            }
+        }
+    };
+    connect(m_layerBrainCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
+        toggleKind(DISP3DLIB::SceneLayerKind::BrainSurface, v);
+    });
+    connect(m_layerElectrodesCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
+        toggleKind(DISP3DLIB::SceneLayerKind::Electrode, v);
+    });
+    connect(m_layerMriCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
+        toggleKind(DISP3DLIB::SceneLayerKind::MriSlice, v);
+    });
+    connect(m_layerSensorsCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
+        toggleKind(DISP3DLIB::SceneLayerKind::Sensor, v);
+    });
+    connect(m_layerSourceOverlayCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
+        toggleKind(DISP3DLIB::SceneLayerKind::SourceOverlay, v);
+    });
+
+    m_layersDock->setWidget(body);
+    addDockWidget(Qt::RightDockWidgetArea, m_layersDock);
+}
+
+//=============================================================================================================
+
+void MainWindow::createOverlayDock()
+{
+    m_overlayDock = new QDockWidget("Overlay", this);
+    m_overlayDock->setObjectName("overlayDock");
+    m_overlayDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
+    m_overlayDock->setTitleBarWidget(createFlatDockTitleBar(m_overlayDock, "Overlay"));
+
+    QWidget *body = new QWidget;
+    QVBoxLayout *lay = new QVBoxLayout(body);
+    lay->setContentsMargins(8, 8, 8, 8);
+    lay->setSpacing(6);
+
+    QFormLayout *form = new QFormLayout;
+    form->setLabelAlignment(Qt::AlignLeft);
+
+    m_overlaySourceCombo = new QComboBox;
+    m_overlaySourceCombo->addItems({"iEEG amplitude", "iEEG power",
+                                    "Source value", "MRI intensity"});
+    form->addRow("Data source", m_overlaySourceCombo);
+
+    m_overlayCmapCombo = new QComboBox;
+    m_overlayCmapCombo->addItems({"Sequential", "Divergent", "Hot/Cool"});
+    form->addRow("Colormap", m_overlayCmapCombo);
+
+    m_overlayFminSpin = new QDoubleSpinBox;
+    m_overlayFminSpin->setRange(-1e6, 1e6);
+    m_overlayFminSpin->setDecimals(4);
+    m_overlayFminSpin->setValue(m_scene.overlayFmin());
+    form->addRow("fmin", m_overlayFminSpin);
+
+    m_overlayFmidSpin = new QDoubleSpinBox;
+    m_overlayFmidSpin->setRange(-1e6, 1e6);
+    m_overlayFmidSpin->setDecimals(4);
+    m_overlayFmidSpin->setValue(m_scene.overlayFmid());
+    form->addRow("fmid", m_overlayFmidSpin);
+
+    m_overlayFmaxSpin = new QDoubleSpinBox;
+    m_overlayFmaxSpin->setRange(-1e6, 1e6);
+    m_overlayFmaxSpin->setDecimals(4);
+    m_overlayFmaxSpin->setValue(m_scene.overlayFmax());
+    form->addRow("fmax", m_overlayFmaxSpin);
+
+    lay->addLayout(form);
+
+    QHBoxLayout *timeRow = new QHBoxLayout;
+    timeRow->addWidget(new QLabel("Time"));
+    m_overlayTimeSlider = new QSlider(Qt::Horizontal);
+    m_overlayTimeSlider->setRange(0, 1000);
+    m_overlayTimeSlider->setValue(0);
+    timeRow->addWidget(m_overlayTimeSlider, 1);
+    m_overlayTimeLabel = new QLabel("0.000 s");
+    timeRow->addWidget(m_overlayTimeLabel);
+    lay->addLayout(timeRow);
+
+    m_overlayColorBar = new OverlayColorBar;
+    m_overlayColorBar->setRange(m_scene.overlayFmin(),
+                                m_scene.overlayFmid(),
+                                m_scene.overlayFmax());
+    lay->addWidget(m_overlayColorBar);
+
+    lay->addStretch(1);
+
+    m_overlayDock->setWidget(body);
+    addDockWidget(Qt::RightDockWidgetArea, m_overlayDock);
+
+    auto pushThresholds = [this]() { pushOverlayToScene(); };
+    connect(m_overlayFminSpin, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, pushThresholds);
+    connect(m_overlayFmidSpin, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, pushThresholds);
+    connect(m_overlayFmaxSpin, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, pushThresholds);
+    connect(m_overlayCmapCombo, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, [this](int idx) {
+                if (m_overlayColorBar) {
+                    m_overlayColorBar->setColormap(static_cast<OverlayColorBar::Colormap>(idx));
+                }
+            });
+    connect(m_overlayTimeSlider, &QSlider::valueChanged, this, [this](int v) {
+        // Map [0, 1000] -> [0, 1] s by default; downstream consumers map further.
+        const double seconds = static_cast<double>(v) / 1000.0;
+        m_overlayTimeLabel->setText(QString::number(seconds, 'f', 3) + " s");
+        m_scene.setTimeCursor(seconds);
+    });
+
+    // Bidirectional sync: external setTimeCursor / setOverlayThresholds
+    // updates should reflect in the dock without firing a feedback loop.
+    connect(&m_scene, &DISP3DLIB::MultimodalScene::overlayThresholdsChanged,
+            this, [this](float fmin, float fmid, float fmax) {
+        QSignalBlocker b1(m_overlayFminSpin);
+        QSignalBlocker b2(m_overlayFmidSpin);
+        QSignalBlocker b3(m_overlayFmaxSpin);
+        m_overlayFminSpin->setValue(fmin);
+        m_overlayFmidSpin->setValue(fmid);
+        m_overlayFmaxSpin->setValue(fmax);
+        if (m_overlayColorBar) {
+            m_overlayColorBar->setRange(fmin, fmid, fmax);
+        }
+    });
+    connect(&m_scene, &DISP3DLIB::MultimodalScene::timeCursorChanged,
+            this, [this](double seconds) {
+        QSignalBlocker b(m_overlayTimeSlider);
+        const int v = qBound(0, static_cast<int>(std::lround(seconds * 1000.0)), 1000);
+        m_overlayTimeSlider->setValue(v);
+        m_overlayTimeLabel->setText(QString::number(seconds, 'f', 3) + " s");
+    });
+}
+
+//=============================================================================================================
+
+void MainWindow::onLoadElectrodes()
+{
+    const QString filter = QStringLiteral("Electrode data (*.fif *.csv);;FIFF (*.fif);;CSV (*.csv);;All files (*)");
+    const QString path = QFileDialog::getOpenFileName(this, tr("Load Electrodes"),
+                                                      QString(), filter);
+    if (path.isEmpty()) {
+        return;
+    }
+    const QString suffix = QFileInfo(path).suffix().toLower();
+    const bool ok = (suffix == QLatin1String("csv"))
+                    ? m_electrodesPlugin.loadCsv(path)
+                    : m_electrodesPlugin.loadFiff(path);
+    if (!ok) {
+        QMessageBox::warning(this, tr("Load Electrodes"),
+                             tr("Failed to load electrode data from:\n%1").arg(path));
+        return;
+    }
+    if (m_statusLabel) {
+        m_statusLabel->setText(QStringLiteral("Loaded electrodes: %1 (%2 contacts)")
+                                .arg(QFileInfo(path).fileName())
+                                .arg(m_electrodesPlugin.contactCount()));
+    }
+    if (m_layerElectrodesCheck) {
+        m_layerElectrodesCheck->setChecked(true);
+    }
+}
+
+//=============================================================================================================
+
+void MainWindow::onLoadMri()
+{
+    const QString filter = QStringLiteral("MRI volume (*.mgh *.mgz);;All files (*)");
+    const QString path = QFileDialog::getOpenFileName(this, tr("Load MRI"),
+                                                      QString(), filter);
+    if (path.isEmpty()) {
+        return;
+    }
+    if (!m_mriSlicesPlugin.loadVolume(path)) {
+        QMessageBox::warning(this, tr("Load MRI"),
+                             tr("Failed to load MRI volume from:\n%1").arg(path));
+        return;
+    }
+    if (m_statusLabel) {
+        m_statusLabel->setText(QStringLiteral("Loaded MRI: %1")
+                                .arg(QFileInfo(path).fileName()));
+    }
+    if (m_layerMriCheck) {
+        m_layerMriCheck->setChecked(true);
+    }
+}
+
+//=============================================================================================================
+
+void MainWindow::pushOverlayToScene()
+{
+    if (!m_overlayFminSpin || !m_overlayFmidSpin || !m_overlayFmaxSpin) {
+        return;
+    }
+    const float fmin = static_cast<float>(m_overlayFminSpin->value());
+    const float fmid = static_cast<float>(m_overlayFmidSpin->value());
+    const float fmax = static_cast<float>(m_overlayFmaxSpin->value());
+    m_scene.setOverlayThresholds(fmin, fmid, fmax);
+    if (m_overlayColorBar) {
+        m_overlayColorBar->setRange(m_scene.overlayFmin(),
+                                    m_scene.overlayFmid(),
+                                    m_scene.overlayFmax());
+    }
+}
+
+//=============================================================================================================
+
+void MainWindow::refreshPickDockLabels()
+{
+    if (!m_pickLabelLine) {
+        return;
+    }
+    m_pickLabelLine->setText(m_pickReadout.labelRow());
+    m_pickWorldLine->setText(m_pickReadout.worldRow());
+    m_pickVoxelLine->setText(m_pickReadout.voxelRow());
+    m_pickValueLine->setText(m_pickReadout.valueRow());
 }

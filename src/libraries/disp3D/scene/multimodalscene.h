@@ -34,9 +34,9 @@
  *           slices, sensors, dipoles, network graph) and drives a single
  *           QRhi pass with consistent depth-test and alpha blending.
  *
- *           Required by TASK 4 (mne_analyze cortical workflow), TASK 10
- *           (MNE Inspect multimodal viz), and reusable from TASK 11 (the
- *           coregistration helper app's lightweight 3-D view).
+ *           Required by the mne_analyze cortical workflow and the
+ *           MNE Inspect multimodal visualisation, and reusable from the
+ *           mne_align coregistration helper app's lightweight 3-D view.
  *
  *           v2.3.0 ships the public data model, layer registry, picking
  *           dispatch, and shared timeline. The QRhi rendering glue is
@@ -216,6 +216,49 @@ public:
 
     //=========================================================================================================
     /**
+     * @return Current shared time cursor in seconds. Independent of the
+     *         integer-sample timeline (@ref currentTimeSample) — overlay
+     *         widgets that drive a continuous time slider operate in
+     *         seconds. Default 0.
+     */
+    double timeCursor() const;
+
+    //=========================================================================================================
+    /**
+     * Set the shared time cursor in seconds. Emits @ref timeCursorChanged
+     * if the value actually changes.
+     */
+    void setTimeCursor(double seconds);
+
+    //=========================================================================================================
+    /**
+     * @return Current overlay min threshold. Default 0.
+     */
+    float overlayFmin() const;
+
+    //=========================================================================================================
+    /**
+     * @return Current overlay mid threshold. Default 0.5.
+     */
+    float overlayFmid() const;
+
+    //=========================================================================================================
+    /**
+     * @return Current overlay max threshold. Default 1.
+     */
+    float overlayFmax() const;
+
+    //=========================================================================================================
+    /**
+     * Set the shared (fmin, fmid, fmax) overlay thresholds used by the
+     * data-driven Overlay dock and the renderables it drives. The values
+     * are clamped to fmin <= fmid <= fmax. Emits
+     * @ref overlayThresholdsChanged if any value actually changes.
+     */
+    void setOverlayThresholds(float fmin, float fmid, float fmax);
+
+    //=========================================================================================================
+    /**
      * @return Most recent pick reported via @ref reportPick. Default-
      *         constructed (kind == None) until the first hit.
      */
@@ -271,6 +314,18 @@ signals:
     void timeSampleChanged(int sample);
 
     /**
+     * Emitted when the shared time cursor (seconds) changes. Driven by
+     * the Overlay dock's continuous time slider; consumed by per-sample
+     * value lookup on electrodes / surface overlays.
+     */
+    void timeCursorChanged(double seconds);
+
+    /**
+     * Emitted when any of the shared overlay thresholds change.
+     */
+    void overlayThresholdsChanged(float fmin, float fmid, float fmax);
+
+    /**
      * Emitted when a pick is reported. Pick dock, status bar, and MRI
      * ortho viewer subscribe.
      */
@@ -281,6 +336,10 @@ private:
     QHash<QString, int>                       m_indexById;     /**< id -> position in m_layers. */
     QHash<int, BoundsFn>                      m_boundsFns;     /**< kind -> AABB extractor. */
     int                                       m_currentTimeSample = -1;
+    double                                    m_timeCursor = 0.0;
+    float                                     m_overlayFmin = 0.0f;
+    float                                     m_overlayFmid = 0.5f;
+    float                                     m_overlayFmax = 1.0f;
     PickResult                                m_lastPick;
 
     /** Re-sort m_layers by (kind, drawOrder, insertion) and refresh m_indexById. */

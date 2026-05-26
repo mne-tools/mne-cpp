@@ -6,7 +6,7 @@
  * @date     May, 2026
  *
  * @brief    Workflow skill that loads an MNA project file and reports its
- *           summary into the Studio workflow graph (TASK 5).
+ *           summary into the Studio workflow graph.
  */
 
 #ifndef MNE_ANALYZE_STUDIO_READMNASKILL_H

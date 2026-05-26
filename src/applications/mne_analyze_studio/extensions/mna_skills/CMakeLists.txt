@@ -1,5 +1,5 @@
 # MNA-aware workflow skills extension for MNE Analyze Studio.
-# Implements TASK 5 of the v2.3.0 release plan: read / write / execute
+# Studio MNA workflow skills: read / write / execute
 # MNA projects from inside the Studio workflow graph.
 
 cmake_minimum_required(VERSION 3.15)

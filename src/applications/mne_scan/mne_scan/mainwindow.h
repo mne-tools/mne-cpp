@@ -256,6 +256,14 @@ private:
 
     //=========================================================================================================
     /**
+     * Walks the active plugin scene and embeds any non-null per-plugin status
+     * widget (returned by AbstractPlugin::getStatusWidget()) into the main
+     * toolbar's right-hand area.
+     */
+    void refreshPluginStatusWidgets();
+
+    //=========================================================================================================
+    /**
      * Creates QToolBar for user interface of MainWindow class.
      */
     void initStatusBar();
@@ -425,6 +433,7 @@ private:
 
     QPointer<QToolBar>                  m_pToolBar;                     /**< Holds the tool bar.*/
     QPointer<QToolBar>                  m_pDynamicPluginToolBar;        /**< Holds the plugin tool bar.*/
+    QPointer<QWidget>                   m_pPluginStatusContainer;       /**< Right-hand toolbar container for per-plugin status widgets.*/
 
     QPointer<QLabel>                    m_pLabelTime;                   /**< Holds the display label for the running time.*/
 

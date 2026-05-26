@@ -107,6 +107,20 @@ MneAlign::~MneAlign() = default;
 
 //=============================================================================================================
 
+AlignWizard* MneAlign::wizard() const
+{
+    return m_pWizard.data();
+}
+
+//=============================================================================================================
+
+Align3DView* MneAlign::view3d() const
+{
+    return m_pView3d.data();
+}
+
+//=============================================================================================================
+
 void MneAlign::buildUi()
 {
     m_pWizard = new AlignWizard(m_pPoints, m_pDigitizer, this);

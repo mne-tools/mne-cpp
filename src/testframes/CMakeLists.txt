@@ -216,6 +216,7 @@ add_subdirectory(test_mna_inverse_pipeline)
 add_subdirectory(test_mna_registry_loader)
 add_subdirectory(test_mna_serialization)
 add_subdirectory(test_mna_bids)
+add_subdirectory(test_mna_skill_graph_equivalence)
 
 # v2.3.0 DSP preprocessing tests
 add_subdirectory(test_dsp_stim_artifact)
@@ -249,32 +250,45 @@ add_subdirectory(test_tf_mxne)
 add_subdirectory(test_source_estimate_io)
 add_subdirectory(test_report)
 
-# v2.3.0 Batch 10: Surface Laplacian, resolution matrix, label time course
+# Surface Laplacian, resolution matrix, label time course
 add_subdirectory(test_surface_laplacian)
 add_subdirectory(test_resolution_matrix)
 add_subdirectory(test_label_time_course)
 
-# v2.3.0 Batch 11: TRAP-MUSIC, epochs convenience, label operations
+# TRAP-MUSIC, epochs convenience, label operations
 add_subdirectory(test_trap_music)
 add_subdirectory(test_epochs)
 add_subdirectory(test_label_utils)
 
-# v2.3.0 Batch 12: Picard ICA, ICA labeling, source estimate types, AEC connectivity
+# Picard ICA, ICA labeling, source estimate types, AEC connectivity
 add_subdirectory(test_picard_ica)
 add_subdirectory(test_ica_label)
 add_subdirectory(test_source_estimate_types)
 add_subdirectory(test_connectivity_aec)
 
-# v2.3.0 Batch 15: Decoding library tests (CSP, SPoC, SSD)
+# Decoding library tests (CSP, SPoC, SSD)
 add_subdirectory(test_decoding_csp)
 add_subdirectory(test_decoding_spoc)
 add_subdirectory(test_decoding_ssd)
 
-# v2.3.0 Batch 16: GUI integration foundation (TASK 4 / 10 / 11)
+# GUI integration tests (cortical-surface plugin, mne_inspect multimodal, mne_align wizard)
 add_subdirectory(test_multimodal_scene)
 add_subdirectory(test_cortical_surface_stc)
+add_subdirectory(test_cortical_surface_picking)
+add_subdirectory(test_cortical_surface_inverse)
+add_subdirectory(test_cortical_surface_labels)
 add_subdirectory(test_electrodes_plugin)
 add_subdirectory(test_mri_slices_plugin)
+add_subdirectory(test_mne_inspect_multimodal)
 
-# v2.3.0: CMNE routing in the rtcmne real-time inverse plugin
+# CMNE routing in the rtcmne real-time inverse plugin
 add_subdirectory(test_rtcmne_cmne)
+
+# WriteToFile recording-status + project-resume-layout tests
+# + FiffSimulator SSP/bad-ch replay round trip
+add_subdirectory(test_writetofile_status)
+add_subdirectory(test_project_resume_layout)
+add_subdirectory(test_fiffsimulator_ssp)
+
+# Documentation screenshot tool (mne_doc_shots) smoke test
+add_subdirectory(test_doc_shots)

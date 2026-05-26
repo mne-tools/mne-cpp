@@ -83,7 +83,7 @@ struct DISP3DSHARED_EXPORT ElectrodeContact
 /**
  * @brief Geometry layout for an electrode array.
  *
- * Added in v2.3.0 (TASK 10) to extend the original sEEG-only ElectrodeObject
+ * Added in v2.3.0 to extend the original sEEG-only ElectrodeObject
  * with ECoG strip and grid topologies. The renderer interprets the layout
  * field on @ref ElectrodeArray:
  *

@@ -68,6 +68,8 @@ const sidebars: SidebarsConfig = {
                             ],
                         },
                         'manual/inspect',
+                        'manual/mne-inspect-multimodal',
+                        'manual/mne-align',
                         'manual/browse-raw',
                         'manual/dipole-fit',
                         'manual/analyze-studio',

@@ -155,6 +155,68 @@ void MultimodalScene::setCurrentTimeSample(int sample)
 
 //=============================================================================================================
 
+double MultimodalScene::timeCursor() const
+{
+    return m_timeCursor;
+}
+
+//=============================================================================================================
+
+void MultimodalScene::setTimeCursor(double seconds)
+{
+    if (qFuzzyCompare(seconds + 1.0, m_timeCursor + 1.0)) {
+        return;
+    }
+    m_timeCursor = seconds;
+    emit timeCursorChanged(seconds);
+}
+
+//=============================================================================================================
+
+float MultimodalScene::overlayFmin() const
+{
+    return m_overlayFmin;
+}
+
+//=============================================================================================================
+
+float MultimodalScene::overlayFmid() const
+{
+    return m_overlayFmid;
+}
+
+//=============================================================================================================
+
+float MultimodalScene::overlayFmax() const
+{
+    return m_overlayFmax;
+}
+
+//=============================================================================================================
+
+void MultimodalScene::setOverlayThresholds(float fmin, float fmid, float fmax)
+{
+    // Clamp to monotone fmin <= fmid <= fmax.
+    if (fmid < fmin) {
+        fmid = fmin;
+    }
+    if (fmax < fmid) {
+        fmax = fmid;
+    }
+    const bool same = qFuzzyCompare(fmin + 1.0f, m_overlayFmin + 1.0f)
+                   && qFuzzyCompare(fmid + 1.0f, m_overlayFmid + 1.0f)
+                   && qFuzzyCompare(fmax + 1.0f, m_overlayFmax + 1.0f);
+    if (same) {
+        return;
+    }
+    m_overlayFmin = fmin;
+    m_overlayFmid = fmid;
+    m_overlayFmax = fmax;
+    emit overlayThresholdsChanged(fmin, fmid, fmax);
+}
+
+//=============================================================================================================
+
 const PickResult& MultimodalScene::lastPick() const
 {
     return m_lastPick;

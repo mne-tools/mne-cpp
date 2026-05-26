@@ -5,7 +5,7 @@
  * @since    2.3.0
  * @date     May, 2026
  *
- * @brief    Workflow skill that executes an MNA pipeline (TASK 5).
+ * @brief    Workflow skill that executes an MNA pipeline.
  */
 
 #ifndef MNE_ANALYZE_STUDIO_RUNMNAGRAPHSKILL_H

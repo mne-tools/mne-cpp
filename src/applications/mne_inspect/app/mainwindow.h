@@ -45,6 +45,11 @@
 #include <mna/mna_types.h>
 #include <mna/mna_project.h>
 
+#include <disp3D/scene/multimodalscene.h>
+#include "plugins/electrodes/electrodes.h"
+#include "plugins/mri_slices/mri_slices.h"
+#include "pickreadoutmodel.h"
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -68,6 +73,7 @@ class QTreeWidget;
 class QTreeWidgetItem;
 class BrainView;
 class BrainTreeModel;
+class OverlayColorBar;
 
 
 //=============================================================================================================
@@ -117,6 +123,22 @@ public:
                          const QString &srcSpacePath = QString(),
                          const QString &atlasPath = QString(),
                          const QString &evokedPath = QString());
+
+    //=========================================================================================================
+    /**
+     * Headless/test accessors. The screenshot tool (mne_doc_shots) and the
+     * test_mne_inspect_multimodal frame need to push fixtures into the live
+     * MainWindow without triggering the disk-based loaders, then raise a
+     * specific dock for the framing of a screenshot. Production code does
+     * not go through these — they exist solely so we can drive the real
+     * widget tree from a documentation / test harness.
+     */
+    DISP3DLIB::MultimodalScene&         scene()             { return m_scene; }
+    ELECTRODESPLUGIN::ElectrodesPlugin& electrodesPlugin()  { return m_electrodesPlugin; }
+    MRISLICESPLUGIN::MriSlicesPlugin&   mriSlicesPlugin()   { return m_mriSlicesPlugin; }
+    QDockWidget*                        pickDock()          { return m_pickDock; }
+    QDockWidget*                        layersDock()        { return m_layersDock; }
+    QDockWidget*                        overlayDock()       { return m_overlayDock; }
 
 private:
     void setupUI();
@@ -201,6 +223,34 @@ private:
      * Add a path to the recent files list.
      */
     void addRecentFile(const QString &path);
+
+    //=========================================================================================================
+    // Multimodal scene wiring: pick readout, layer toggles, source overlay
+    //=========================================================================================================
+
+    /** Create the "Pick" QDockWidget that mirrors PickReadoutModel rows. */
+    void createPickDock();
+
+    /** Create the "Layers" QDockWidget with one visibility checkbox per
+     *  SceneLayerKind backed by the shared MultimodalScene. */
+    void createLayersDock();
+
+    /** Create the data-driven "Overlay" QDockWidget (data source / colormap
+     *  / fmin-fmid-fmax / time slider / shared colour bar). */
+    void createOverlayDock();
+
+    /** File → Load Electrodes… (FIFF or CSV). */
+    void onLoadElectrodes();
+
+    /** File → Load MRI… (MGH/MGZ). */
+    void onLoadMri();
+
+    /** Push the current Overlay-dock thresholds and colormap down to the
+     *  shared scene and to each affected renderable. */
+    void pushOverlayToScene();
+
+    /** Refresh the Pick dock labels from m_pickReadout. */
+    void refreshPickDockLabels();
 
 private:
     // Core components
@@ -363,6 +413,47 @@ private:
 
     // Recent files
     QStringList m_recentFiles;
+
+    //=========================================================================================================
+    // Multimodal scene + co-located inspection plugins (electrodes, MRI slices)
+    //=========================================================================================================
+    DISP3DLIB::MultimodalScene             m_scene;
+    ELECTRODESPLUGIN::ElectrodesPlugin     m_electrodesPlugin;
+    MRISLICESPLUGIN::MriSlicesPlugin       m_mriSlicesPlugin;
+    MNEINSPECT::PickReadoutModel           m_pickReadout;
+
+    // Pick dock
+    QDockWidget *m_pickDock = nullptr;
+    QLabel      *m_pickLabelLine = nullptr;
+    QLabel      *m_pickWorldLine = nullptr;
+    QLabel      *m_pickVoxelLine = nullptr;
+    QLabel      *m_pickValueLine = nullptr;
+
+    // Layers dock
+    QDockWidget *m_layersDock = nullptr;
+    QCheckBox   *m_layerBrainCheck = nullptr;
+    QCheckBox   *m_layerElectrodesCheck = nullptr;
+    QCheckBox   *m_layerMriCheck = nullptr;
+    QCheckBox   *m_layerSensorsCheck = nullptr;
+    QCheckBox   *m_layerSourceOverlayCheck = nullptr;
+
+    // Overlay dock
+    QDockWidget    *m_overlayDock = nullptr;
+    QComboBox      *m_overlaySourceCombo = nullptr;
+    QComboBox      *m_overlayCmapCombo = nullptr;
+    QDoubleSpinBox *m_overlayFminSpin = nullptr;
+    QDoubleSpinBox *m_overlayFmidSpin = nullptr;
+    QDoubleSpinBox *m_overlayFmaxSpin = nullptr;
+    QSlider        *m_overlayTimeSlider = nullptr;
+    QLabel         *m_overlayTimeLabel = nullptr;
+    OverlayColorBar *m_overlayColorBar = nullptr;
+
+    // Multimodal menu actions
+    QAction *m_actLoadElectrodes = nullptr;
+    QAction *m_actLoadMri = nullptr;
+    QAction *m_actShowPick = nullptr;
+    QAction *m_actShowLayers = nullptr;
+    QAction *m_actShowOverlay = nullptr;
 };
 
 #endif // MAINWINDOW_H

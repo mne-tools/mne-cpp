@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * @file     test_com.cpp
- * @author   MNE-CPP Team
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  *
  * @brief    Tests for the com library: Command, RawCommand, CommandParser, CommandManager

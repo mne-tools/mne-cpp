@@ -43,6 +43,7 @@ set(MNE_LIBS_REQUIRED
     mne_math
     mne_fiff
     mne_fs
+    mne_mne
     mne_inv
     mne_disp3D
 )

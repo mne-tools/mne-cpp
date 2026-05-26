@@ -40,10 +40,13 @@
 #include "writetofile.h"
 
 #include "FormFiles/writetofilesetupwidget.h"
+#include "FormFiles/writetofilestatuswidget.h"
 
 #include <disp/viewers/projectsettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <fiff/fiff_stream.h>
+
+#include <QFileInfo>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -103,6 +106,13 @@ WriteToFile::WriteToFile()
         m_pBlinkingRecordButtonTimer = QSharedPointer<QTimer>(new QTimer(this));
         connect(m_pBlinkingRecordButtonTimer.data(), &QTimer::timeout,
                 this, &WriteToFile::changeRecordingButton);
+    }
+
+    if(!m_pStatusEmitTimer) {
+        m_pStatusEmitTimer = QSharedPointer<QTimer>(new QTimer(this));
+        m_pStatusEmitTimer->setInterval(1000);
+        connect(m_pStatusEmitTimer.data(), &QTimer::timeout,
+                this, &WriteToFile::emitRecordingStatus);
     }
 }
 
@@ -369,6 +379,10 @@ void WriteToFile::toggleRecordingFile()
         m_pBlinkingRecordButtonTimer->stop();
         m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
         m_pUpdateTimeInfoTimer->stop();
+        if(m_pStatusEmitTimer) {
+            m_pStatusEmitTimer->stop();
+        }
+        emit recordingActiveChanged(false);
 
         promptFileName();
 
@@ -418,6 +432,11 @@ void WriteToFile::toggleRecordingFile()
         m_pBlinkingRecordButtonTimer->start(500);
         m_recordingStartedTime.restart();
         m_pUpdateTimeInfoTimer->start(200);
+        if(m_pStatusEmitTimer) {
+            m_pStatusEmitTimer->start();
+        }
+        emit recordingActiveChanged(true);
+        emitRecordingStatus();
 
         if(m_bUseRecordTimer) {
             m_pRecordTimer->start(m_iRecordingMSeconds);
@@ -649,4 +668,67 @@ void WriteToFile::setAttributes(const QVariantMap& attributes)
 {
     if (attributes.contains(QStringLiteral("recordFileName")))
         m_sRecordFileName = attributes[QStringLiteral("recordFileName")].toString();
+}
+
+//=============================================================================================================
+
+QWidget* WriteToFile::getStatusWidget()
+{
+    auto* pWidget = new WriteToFileStatusWidget(this);
+    return pWidget;
+}
+
+//=============================================================================================================
+
+void WriteToFile::emitRecordingStatus()
+{
+    qint64 iElapsed = 0;
+    qint64 iSize    = 0;
+    {
+        QMutexLocker locker(&m_mutex);
+        if (!m_bWriteToFile) {
+            return;
+        }
+        iElapsed = m_recordingStartedTime.isValid() ? m_recordingStartedTime.elapsed() : 0;
+        if (m_qFileOut.exists()) {
+            QFileInfo fi(m_qFileOut.fileName());
+            iSize = fi.size();
+        }
+    }
+    const QString summary = QStringLiteral("%1  %2")
+        .arg(formatElapsed(iElapsed), formatBytes(iSize));
+    emit recordingStatus(summary);
+}
+
+//=============================================================================================================
+
+QString WriteToFile::formatBytes(qint64 iBytes)
+{
+    constexpr double KB = 1024.0;
+    constexpr double MB = 1024.0 * 1024.0;
+    constexpr double GB = 1024.0 * 1024.0 * 1024.0;
+    if (iBytes >= GB) {
+        return QStringLiteral("%1 GB").arg(iBytes / GB, 0, 'f', 2);
+    }
+    if (iBytes >= MB) {
+        return QStringLiteral("%1 MB").arg(iBytes / MB, 0, 'f', 1);
+    }
+    if (iBytes >= KB) {
+        return QStringLiteral("%1 KB").arg(iBytes / KB, 0, 'f', 1);
+    }
+    return QStringLiteral("%1 B").arg(iBytes);
+}
+
+//=============================================================================================================
+
+QString WriteToFile::formatElapsed(qint64 iMSecs)
+{
+    const qint64 iTotalSecs = iMSecs / 1000;
+    const qint64 h = iTotalSecs / 3600;
+    const qint64 m = (iTotalSecs / 60) % 60;
+    const qint64 s = iTotalSecs % 60;
+    return QStringLiteral("%1:%2:%3")
+        .arg(h, 2, 10, QLatin1Char('0'))
+        .arg(m, 2, 10, QLatin1Char('0'))
+        .arg(s, 2, 10, QLatin1Char('0'));
 }

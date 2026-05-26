@@ -8,7 +8,7 @@ sidebar_label: MNE Align
 
 The app is built on the same `MultimodalScene` foundation as `mne_inspect`, and integrates direct serial capture from a Polhemus FASTRAK digitiser via the shared `UTILSLIB::PolhemusConnection` driver. It also accepts a previously recorded digitisation FIFF file when no hardware is available.
 
-<!-- screenshot: mne_align_overview.png -->
+![mne_align overview](/img/manual/auto/mne-align/overview.png)
 
 ## Launching
 
@@ -29,7 +29,7 @@ The toolbar exposes `Back` / `Next` navigation, viewport count, camera preset, r
 
 Load the head BEM (`.fif` / `.fif.gz`) and pick the standard EEG cap (10-20, 10-10, 10-05). Select a fiducial button (`NAS`, `LPA`, `RPA`) and **double-click** on the BEM surface to place the corresponding *twin fiducial* in MRI space. These twin points define the target landmarks for the head→MRI fit.
 
-<!-- screenshot: step1_setup.png -->
+![Step 1 — Setup](/img/manual/auto/mne-align/step1-setup.png)
 
 ### Step 2 — Fiducials
 
@@ -38,19 +38,19 @@ Capture the three cardinal points (NAS → LPA → RPA) from the subject. There 
 1. **Live FASTRAK capture.** Hold the stylus on the landmark and either press the pen button on the stylus or click `Capture`. The wizard advances to the next uncaptured fiducial automatically.
 2. **Load from FIFF.** Click `Load FIFF…` to import an existing digitisation (`ISOTRAK`) from a `.fif` file. Cardinal, EEG and HSP points are dispatched into the corresponding wizard buckets automatically.
 
-<!-- screenshot: step2_load_digitisation.png -->
+![Step 2 — Fiducials](/img/manual/auto/mne-align/step2-fiducials.png)
 
 ### Step 3 — EEG cap
 
 Walk the cap label by label. The wizard's electrode list highlights the next uncaptured site and the `Capture` button advances through the montage. `Undo last` reverts the most recent capture.
 
-<!-- screenshot: step3_eeg_cap.png -->
+![Step 3 — EEG cap](/img/manual/auto/mne-align/step3-eeg-cap.png)
 
 ### Step 4 — Head shape
 
 Sweep the stylus over the scalp and capture additional head-shape points (FIFF `EXTRA`). The capture count is shown live and the points appear immediately in the 3D scene.
 
-<!-- screenshot: step4_head_shape.png -->
+![Step 4 — Head shape](/img/manual/auto/mne-align/step4-head-shape.png)
 
 ### Step 5 — Verify
 
@@ -62,7 +62,7 @@ Click `Run ICP Fit` to refine the fiducial-based coregistration via the `mne_icp
 
 Re-running ICP after editing fiducials produces a new fit. Returning to an earlier step and re-capturing a landmark automatically invalidates the override so the next ICP run starts from a clean fiducial-only fit.
 
-<!-- screenshot: step5_verify.png -->
+![Step 5 — Verify](/img/manual/auto/mne-align/step5-verify.png)
 
 ### Step 6 — Save
 
@@ -71,13 +71,13 @@ Two save actions are exposed:
 - **Save -trans.fif…** writes the head→MRI rigid transform as a `FiffCoordTrans` via `FIFFLIB::FiffCoordTrans::write`. The suggested filename derives from the BEM stem (e.g. `subject01-trans.fif`). The transform is what downstream tools (`mne_forward_solution`, `mne_compute_mne`, mne-python's `read_trans`) expect.
 - **Save digitisation FIFF…** writes the captured `ISOTRAK` point set (cardinal, EEG, HSP) via `FIFFLIB::FiffDigPointSet::write` — useful for archiving the raw capture independently of the transform.
 
-<!-- screenshot: step6_save.png -->
+![Step 6 — Save](/img/manual/auto/mne-align/step6-save.png)
 
 ### Step 7 — Done
 
 A summary lists the BEM, cap, captured counts, ICP source / RMSE, and the path of the most recently saved `-trans.fif`. Use the `Back` button to refine and re-save at any time without restarting the session.
 
-<!-- screenshot: step7_done.png -->
+![Step 7 — Done](/img/manual/auto/mne-align/step7-done.png)
 
 ## Hardware: Polhemus FASTRAK
 

@@ -26,6 +26,9 @@
 #include <QFileInfo>
 #include <QImage>
 
+#include <cmath>
+#include <limits>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -114,6 +117,24 @@ bool MriSlicesPlugin::loadVolume(const QString& path)
 
 //=============================================================================================================
 
+bool MriSlicesPlugin::setVolume(std::unique_ptr<MriVolData> volume)
+{
+    if (!volume || !volume->isValid()) {
+        qWarning() << "MriSlicesPlugin::setVolume: rejecting null / invalid volume";
+        return false;
+    }
+
+    m_volume = std::move(volume);
+    m_sourcePath.clear();
+    m_crosshair = volumeCenter();
+    rebuildSlices();
+    emit volumeChanged();
+    emit crosshairChanged(QVector3D(m_crosshair.x(), m_crosshair.y(), m_crosshair.z()));
+    return true;
+}
+
+//=============================================================================================================
+
 void MriSlicesPlugin::setCrosshair(const Eigen::Vector3f& rasPoint)
 {
     if ((rasPoint - m_crosshair).norm() < 1e-6f) {
@@ -129,6 +150,54 @@ void MriSlicesPlugin::setCrosshair(const Eigen::Vector3f& rasPoint)
 void MriSlicesPlugin::setCrosshair(const QVector3D& rasPoint)
 {
     setCrosshair(Eigen::Vector3f(rasPoint.x(), rasPoint.y(), rasPoint.z()));
+}
+
+//=============================================================================================================
+
+void MriSlicesPlugin::setVoxelOfInterest(const QVector3D& worldPosition)
+{
+    setCrosshair(worldPosition);
+}
+
+//=============================================================================================================
+
+Eigen::Vector3f MriSlicesPlugin::voxelFromWorld(const QVector3D& worldPosition) const
+{
+    if (!m_volume) {
+        const float nan = std::numeric_limits<float>::quiet_NaN();
+        return Eigen::Vector3f(nan, nan, nan);
+    }
+    const Eigen::Matrix4f ras2vox = m_volume->computeVox2Ras().inverse();
+    const Eigen::Vector4f w(worldPosition.x(), worldPosition.y(), worldPosition.z(), 1.0f);
+    const Eigen::Vector4f v = ras2vox * w;
+    return Eigen::Vector3f(v.x(), v.y(), v.z());
+}
+
+//=============================================================================================================
+
+float MriSlicesPlugin::intensityAt(const QVector3D& worldPosition) const
+{
+    if (!m_volume) {
+        return std::numeric_limits<float>::quiet_NaN();
+    }
+    const Eigen::Vector3f voxF = voxelFromWorld(worldPosition);
+    const int ix = static_cast<int>(std::lround(voxF.x()));
+    const int iy = static_cast<int>(std::lround(voxF.y()));
+    const int iz = static_cast<int>(std::lround(voxF.z()));
+    const int nx = m_volume->dimX();
+    const int ny = m_volume->dimY();
+    const int nz = m_volume->dimZ();
+    if (ix < 0 || iy < 0 || iz < 0 || ix >= nx || iy >= ny || iz >= nz) {
+        return std::numeric_limits<float>::quiet_NaN();
+    }
+    const QVector<float> data = m_volume->voxelDataAsFloat();
+    const qsizetype idx = static_cast<qsizetype>(iz) * ny * nx
+                        + static_cast<qsizetype>(iy) * nx
+                        + ix;
+    if (idx < 0 || idx >= data.size()) {
+        return std::numeric_limits<float>::quiet_NaN();
+    }
+    return data[idx];
 }
 
 //=============================================================================================================

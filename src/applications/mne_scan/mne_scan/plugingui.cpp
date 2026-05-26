@@ -281,6 +281,39 @@ void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
 
 //=============================================================================================================
 
+namespace {
+constexpr const char* kUiLayoutPrefix = "ui.layout.";
+}
+
+QByteArray PluginGui::uiLayoutBlob(const QString& sWindowKey) const
+{
+    const QString fullKey = QString::fromLatin1(kUiLayoutPrefix) + sWindowKey;
+    const QJsonObject& extras = m_loadedMnaProject.extras;
+    if (!extras.contains(fullKey)) {
+        return {};
+    }
+    const QJsonValue v = extras.value(fullKey);
+    if (!v.isString()) {
+        return {};
+    }
+    return QByteArray::fromBase64(v.toString().toLatin1());
+}
+
+//=============================================================================================================
+
+void PluginGui::setUiLayoutBlob(const QString& sWindowKey, const QByteArray& blob)
+{
+    const QString fullKey = QString::fromLatin1(kUiLayoutPrefix) + sWindowKey;
+    if (blob.isEmpty()) {
+        m_loadedMnaProject.extras.remove(fullKey);
+        return;
+    }
+    m_loadedMnaProject.extras.insert(fullKey,
+                                     QString::fromLatin1(blob.toBase64()));
+}
+
+//=============================================================================================================
+
 void PluginGui::saveConfigMna(const QString& fullPath)
 {
     // Update GUI positions in the pipeline graph
