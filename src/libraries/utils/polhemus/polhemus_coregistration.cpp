@@ -100,27 +100,18 @@ bool PolhemusCoregistration::captureCurrentPenPositionAsFiducial(FiducialId id)
     m_penFid[ident] = m_penPosition;
     m_hasPenFid[ident] = true;
 
-    // Compute raw sensor position (reverse the tip offset)
-    const QVector3D tipAdj = m_tipOffsetEnabled
-        ? m_penOrientation.rotatedVector(m_penTipOffset) : QVector3D();
-    const QVector3D rawSensor = m_penPosition - tipAdj;
-
-    qInfo().nospace() << "captureFiducial: " << labels[ident]
-        << "  tipPos=(" << m_penPosition.x()*1000.f << ", "
-        << m_penPosition.y()*1000.f << ", " << m_penPosition.z()*1000.f << ") mm"
-        << "  rawSensor=(" << rawSensor.x()*1000.f << ", "
-        << rawSensor.y()*1000.f << ", " << rawSensor.z()*1000.f << ") mm"
-        << "  ori=" << m_penOrientation
-        << "  tipAdj=(" << tipAdj.x()*1000.f << ", "
-        << tipAdj.y()*1000.f << ", " << tipAdj.z()*1000.f << ") mm";
+    qInfo().nospace() << "Fiducial captured: " << labels[ident]
+        << "  (" << m_penPosition.x()*1000.f << ", "
+        << m_penPosition.y()*1000.f << ", "
+        << m_penPosition.z()*1000.f << ") mm";
 
     // Log distances to previously captured fiducials
     for (int j = 1; j <= 3; ++j) {
         if (j != ident && m_hasPenFid[j]) {
             float dist = (m_penFid[ident] - m_penFid[j]).length() * 1000.0f;
-            qInfo().nospace() << "  distance " << labels[ident] << "-" << labels[j]
-                << " = " << dist << " mm"
-                << (dist > 200.0f ? "  *** WARNING: > 200mm, likely wrong capture!" : "");
+            qInfo().nospace() << "  " << labels[ident] << " ↔ " << labels[j]
+                << ": " << dist << " mm"
+                << (dist > 200.0f ? "  *** WARNING: > 200 mm!" : "");
         }
     }
 
@@ -223,11 +214,9 @@ bool PolhemusCoregistration::computeRegistration()
     const float dNR = (pNas - pRpa).length() * 1000.0f;
     const float dLR = (pLpa - pRpa).length() * 1000.0f;
     const float minSpread = std::min({dNL, dNR, dLR});
-    qInfo() << "computeRegistration: pen spread NAS-LPA" << dNL
-            << "NAS-RPA" << dNR << "LPA-RPA" << dLR << "mm";
     if (minSpread < 20.0f) {
-        qWarning() << "computeRegistration: DEGENERATE — pen fiducials too close"
-                   << "(min spread" << minSpread << "mm, need >20 mm)";
+        qWarning() << "Registration failed: pen fiducials too close"
+                   << "(min spread" << minSpread << "mm, need > 20 mm)";
         m_registrationValid = false;
         emit registrationChanged();
         return false;
@@ -243,17 +232,18 @@ bool PolhemusCoregistration::computeRegistration()
         const float mNL = (mNas - mLpa).length() * 1000.0f;
         const float mNR = (mNas - mRpa).length() * 1000.0f;
         const float mLR = (mLpa - mRpa).length() * 1000.0f;
-        qInfo().nospace() << "computeRegistration: distance comparison (pen / model):"
-            << "\n  NAS-LPA: " << dNL << " / " << mNL << " mm  (ratio " << dNL/mNL << ")"
-            << "\n  NAS-RPA: " << dNR << " / " << mNR << " mm  (ratio " << dNR/mNR << ")"
-            << "\n  LPA-RPA: " << dLR << " / " << mLR << " mm  (ratio " << dLR/mLR << ")";
+        qInfo().nospace()
+            << "Registration — fiducial distances (pen / model):"
+            << "\n    NAS ↔ LPA: " << dNL << " / " << mNL << " mm  (ratio " << dNL/mNL << ")"
+            << "\n    NAS ↔ RPA: " << dNR << " / " << mNR << " mm  (ratio " << dNR/mNR << ")"
+            << "\n    LPA ↔ RPA: " << dLR << " / " << mLR << " mm  (ratio " << dLR/mLR << ")";
 
         const float maxRatio = std::max({dNL/mNL, dNR/mNR, dLR/mLR});
         const float minRatio = std::min({dNL/mNL, dNR/mNR, dLR/mLR});
         if (maxRatio / minRatio > 2.0f) {
-            qWarning() << "computeRegistration: *** SHAPE MISMATCH — pen fiducial triangle"
-                       << "has very different proportions from model fiducials."
-                       << "One or more pen fiducials may be captured at the wrong location!";
+            qWarning() << "Registration: shape mismatch — pen fiducial triangle"
+                       << "has very different proportions from model."
+                       << "Check fiducial placement!";
         }
 
         // Build a head coordinate frame from 3 fiducials + optional vertex.
@@ -295,37 +285,27 @@ bool PolhemusCoregistration::computeRegistration()
         const QMatrix4x4 modelFrame = buildFrame(mNas, mLpa, mRpa,
                                                     m_hasModelVertex ? &m_modelVertex : nullptr);
 
-        // Debug: dump both frames and fiducial inputs
-        qInfo() << "computeRegistration: penFiducials (mm)"
-                << "NAS" << pNas * 1000.0f << "LPA" << pLpa * 1000.0f << "RPA" << pRpa * 1000.0f;
-        qInfo() << "computeRegistration: modelFiducials (mm)"
-                << "NAS" << mNas * 1000.0f << "LPA" << mLpa * 1000.0f << "RPA" << mRpa * 1000.0f;
-        qInfo() << "computeRegistration: penFrame\n" << penFrame;
-        qInfo() << "computeRegistration: modelFrame\n" << modelFrame;
-
         m_worldToModel = modelFrame * penFrame.inverted();
 
-        qInfo() << "computeRegistration: worldToModel\n" << m_worldToModel;
-
-        // Residuals — log both mapped and target positions for cross-checking
+        // Residuals
         auto residual = [&](const char* label, const QVector3D& pw, const QVector3D& pm) {
             QVector3D mapped = m_worldToModel.map(pw);
             float err = (mapped - pm).length() * 1000.0f;
-            qInfo().nospace() << "  " << label
-                << ": pen(world)=" << pw * 1000.0f
-                << " → mapped=" << mapped * 1000.0f
-                << "  model=" << pm * 1000.0f
-                << "  residual=" << err << " mm";
             return err;
         };
-        residual("NAS", pNas, mNas);
-        residual("LPA", pLpa, mLpa);
-        residual("RPA", pRpa, mRpa);
+        const float rNas = residual("NAS", pNas, mNas);
+        const float rLpa = residual("LPA", pLpa, mLpa);
+        const float rRpa = residual("RPA", pRpa, mRpa);
+        qInfo().nospace()
+            << "Registration — residuals:"
+            << "\n    NAS: " << rNas << " mm"
+            << "\n    LPA: " << rLpa << " mm"
+            << "\n    RPA: " << rRpa << " mm";
 
         m_headToWorld.setToIdentity();
         m_headToDevice = m_deviceToWorld.inverted() * m_headToWorld;
         m_registrationValid = true;
-        qInfo() << "computeRegistration: analytical paired succeeded";
+        qInfo() << "Registration succeeded (analytical paired).";
         emit registrationChanged();
         return true;
     }
@@ -341,7 +321,7 @@ bool PolhemusCoregistration::computeRegistration()
     m_headToDevice      = m_deviceToWorld.inverted() * m_headToWorld;
     m_worldToModel.setToIdentity();
     m_registrationValid = true;
-    qInfo() << "computeRegistration: head-frame fallback succeeded";
+    qInfo() << "Registration succeeded (head-frame fallback).";
     emit registrationChanged();
     return true;
 }
@@ -352,50 +332,6 @@ void PolhemusCoregistration::onPointReceived(int station,
                                               const QVector3D& position,
                                               const QQuaternion& orientation)
 {
-    // Periodic debug logging
-    static QHash<int, int> sampleCount;
-    int& n = sampleCount[station];
-    if (n == 0) {
-        qInfo() << "onPointReceived: FIRST sample station" << station
-                << "pos(mm)" << position * 1000.0f
-                << "ori" << orientation
-                << "hasOri" << !orientation.isIdentity();
-    }
-    ++n;
-
-    // Log every ~10 s per station (~600 samples at 60 Hz)
-    if (n % 600 == 0) {
-        const float sinEl = 2.0f * (orientation.scalar() * orientation.y()
-                                  - orientation.x() * orientation.z());
-        const float elDeg = std::asin(std::clamp(sinEl, -1.0f, 1.0f)) * (180.0f / 3.14159265f);
-        if (station == m_penStation && m_tipOffsetEnabled) {
-            const QVector3D tip = position + orientation.rotatedVector(m_penTipOffset);
-            if (m_registrationValid) {
-                const QVector3D mapped = m_worldToModel.map(tip);
-                qInfo().nospace() << "pen #" << n
-                    << "  raw(" << position.x()*1000.f << ", " << position.y()*1000.f << ", " << position.z()*1000.f << ") mm"
-                    << "  tip(" << tip.x()*1000.f << ", " << tip.y()*1000.f << ", " << tip.z()*1000.f << ") mm"
-                    << "  →model(" << mapped.x()*1000.f << ", " << mapped.y()*1000.f << ", " << mapped.z()*1000.f << ") mm"
-                    << "  el=" << elDeg << "\u00b0";
-            } else {
-                qInfo().nospace() << "pen #" << n
-                    << "  raw(" << position.x()*1000.f << ", " << position.y()*1000.f << ", " << position.z()*1000.f << ") mm"
-                    << "  tip(" << tip.x()*1000.f << ", " << tip.y()*1000.f << ", " << tip.z()*1000.f << ") mm"
-                    << "  el=" << elDeg << "\u00b0";
-            }
-        } else if (station == m_trackerStation && m_registrationValid) {
-            const QVector3D trkWorld(m_deviceToWorld(0,3), m_deviceToWorld(1,3), m_deviceToWorld(2,3));
-            const QVector3D mapped = m_worldToModel.map(trkWorld);
-            qInfo().nospace() << "st" << station << " #" << n
-                << "  pos(" << position.x()*1000.f << ", " << position.y()*1000.f << ", " << position.z()*1000.f << ") mm"
-                << "  →model(" << mapped.x()*1000.f << ", " << mapped.y()*1000.f << ", " << mapped.z()*1000.f << ") mm"
-                << "  el=" << elDeg << "\u00b0";
-        } else {
-            qInfo().nospace() << "st" << station << " #" << n
-                << "  pos(" << position.x()*1000.f << ", " << position.y()*1000.f << ", " << position.z()*1000.f << ") mm"
-                << "  el=" << elDeg << "\u00b0";
-        }
-    }
     if (station == m_trackerStation) {
         m_deviceToWorld = buildDevicePose(position, orientation);
         emit devicePoseChanged(m_deviceToWorld);

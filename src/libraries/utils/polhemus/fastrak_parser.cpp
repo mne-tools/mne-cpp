@@ -69,14 +69,6 @@ bool FastrakParser::parseRecord(const QByteArray& record, Units units, FastrakSa
         return false;
     }
 
-    // One-shot debug: log the first record to confirm output format
-    static bool s_firstRecord = true;
-    if (s_firstRecord) {
-        qInfo() << "FastrakParser: raw record:" << record.simplified();
-        qInfo() << "FastrakParser: fixed →" << tokens.size() << "tokens:" << fixed;
-        s_firstRecord = false;
-    }
-
     bool ok = false;
     const int station = tokens[0].toInt(&ok);
     if (!ok) {
