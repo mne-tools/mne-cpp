@@ -193,6 +193,9 @@ bool PolhemusCoregistration::captureCurrentPenPositionAsVertex()
     m_penVertex = m_penPosition;
     m_hasPenVertex = true;
     qInfo() << "Captured pen vertex (CZ) at" << m_penVertex * 1000.0f << "mm";
+    // Notify observers so auto-registration can trigger
+    if (m_pPoints)
+        emit m_pPoints->pointsChanged();
     return true;
 }
 
@@ -222,11 +225,35 @@ bool PolhemusCoregistration::computeRegistration()
         return false;
     }
 
-    // --- Paired path: analytical head-frame alignment ---
+    // --- Paired path: SVD-based rigid registration (Kabsch / Procrustes) ---
+    //
+    // Finds the optimal rotation R and translation t that map pen
+    // fiducials to model fiducials:  model_pos ≈ R * pen_pos + t
+    //
+    // The Kabsch algorithm guarantees det(R) = +1 (proper rotation,
+    // no reflection) regardless of how the two coordinate systems are
+    // oriented.  This avoids the left-right / up-down inversion bugs
+    // that plagued the old buildFrame approach, where an asymmetric
+    // vertex correction could flip ey or ez in one frame but not the
+    // other.
     if (hasAllModelFiducials()) {
         const QVector3D mNas = m_modelFid[static_cast<int>(FiducialId::NAS)];
         const QVector3D mLpa = m_modelFid[static_cast<int>(FiducialId::LPA)];
         const QVector3D mRpa = m_modelFid[static_cast<int>(FiducialId::RPA)];
+
+        // Debug: raw fiducial positions
+        qInfo().nospace()
+            << "Registration — pen fiducial positions (Polhemus world, mm):"
+            << "\n    NAS: (" << pNas.x()*1000.f << ", " << pNas.y()*1000.f << ", " << pNas.z()*1000.f << ")"
+            << "\n    LPA: (" << pLpa.x()*1000.f << ", " << pLpa.y()*1000.f << ", " << pLpa.z()*1000.f << ")"
+            << "\n    RPA: (" << pRpa.x()*1000.f << ", " << pRpa.y()*1000.f << ", " << pRpa.z()*1000.f << ")";
+        qInfo().nospace()
+            << "Registration — model fiducial positions (MRI/surface-RAS, mm):"
+            << "\n    NAS: (" << mNas.x()*1000.f << ", " << mNas.y()*1000.f << ", " << mNas.z()*1000.f << ")"
+            << "\n    LPA: (" << mLpa.x()*1000.f << ", " << mLpa.y()*1000.f << ", " << mLpa.z()*1000.f << ")"
+            << "\n    RPA: (" << mRpa.x()*1000.f << ", " << mRpa.y()*1000.f << ", " << mRpa.z()*1000.f << ")";
+        qInfo().nospace()
+            << "Registration — axis mirror: mirrorX=" << m_mirrorX << " mirrorY=" << m_mirrorY;
 
         // Compare pen vs model fiducial distances — should be similar for the same head
         const float mNL = (mNas - mLpa).length() * 1000.0f;
@@ -246,62 +273,122 @@ bool PolhemusCoregistration::computeRegistration()
                        << "Check fiducial placement!";
         }
 
-        // Build a head coordinate frame from 3 fiducials + optional vertex.
-        // Uses Gram-Schmidt to orthogonalize ey (toward LPA) against ex
-        // first, then derives ez via cross product.  This guarantees ey
-        // always points toward LPA regardless of coordinate system
-        // orientation, preventing left-right inversion.
-        auto buildFrame = [](const QVector3D& nas, const QVector3D& lpa, const QVector3D& rpa,
-                             const QVector3D* vertex) -> QMatrix4x4
-        {
-            const QVector3D origin = (lpa + rpa) * 0.5f;
-            const QVector3D ex     = (nas - origin).normalized();
-            const QVector3D eyApp  = (lpa - origin).normalized();
+        // --- Kabsch algorithm (SVD least-squares rigid alignment) ---
 
-            // Gram-Schmidt: remove component of eyApp along ex
-            QVector3D ey = (eyApp - QVector3D::dotProduct(eyApp, ex) * ex).normalized();
-            // ez from right-hand rule: always consistent with ey toward LPA
-            QVector3D ez = QVector3D::crossProduct(ex, ey).normalized();
+        // 1. Centroids
+        const Eigen::Vector3d penC(
+            (pNas.x() + pLpa.x() + pRpa.x()) / 3.0,
+            (pNas.y() + pLpa.y() + pRpa.y()) / 3.0,
+            (pNas.z() + pLpa.z() + pRpa.z()) / 3.0);
+        const Eigen::Vector3d modC(
+            (mNas.x() + mLpa.x() + mRpa.x()) / 3.0,
+            (mNas.y() + mLpa.y() + mRpa.y()) / 3.0,
+            (mNas.z() + mLpa.z() + mRpa.z()) / 3.0);
 
-            // Use vertex to correct superior direction — flip ez (and ey
-            // to maintain right-handedness) when ez disagrees with vertex.
-            if (vertex) {
-                const QVector3D toVertex = (*vertex - origin).normalized();
-                if (QVector3D::dotProduct(ez, toVertex) < 0.0f) {
-                    ez = -ez;
-                    ey = -ey;
-                }
+        // 2. Centered point matrices (3×3, each column = one centered point)
+        Eigen::Matrix3d P, Q;
+        P.col(0) = Eigen::Vector3d(pNas.x(), pNas.y(), pNas.z()) - penC;
+        P.col(1) = Eigen::Vector3d(pLpa.x(), pLpa.y(), pLpa.z()) - penC;
+        P.col(2) = Eigen::Vector3d(pRpa.x(), pRpa.y(), pRpa.z()) - penC;
+
+        Q.col(0) = Eigen::Vector3d(mNas.x(), mNas.y(), mNas.z()) - modC;
+        Q.col(1) = Eigen::Vector3d(mLpa.x(), mLpa.y(), mLpa.z()) - modC;
+        Q.col(2) = Eigen::Vector3d(mRpa.x(), mRpa.y(), mRpa.z()) - modC;
+
+        // 3. Cross-covariance matrix H = P * Qᵀ
+        const Eigen::Matrix3d H = P * Q.transpose();
+
+        // 4. SVD of H
+        Eigen::JacobiSVD<Eigen::Matrix3d> svd(H, Eigen::ComputeFullU | Eigen::ComputeFullV);
+        const Eigen::Matrix3d U = svd.matrixU();
+        const Eigen::Matrix3d V = svd.matrixV();
+
+        // 5. Optimal rotation — ensure proper rotation (det = +1)
+        const double d = (V * U.transpose()).determinant();
+        Eigen::Matrix3d D = Eigen::Matrix3d::Identity();
+        D(2, 2) = (d > 0.0) ? 1.0 : -1.0;
+        Eigen::Matrix3d R = V * D * U.transpose();
+
+        // 6. Translation
+        Eigen::Vector3d t = modC - R * penC;
+
+        const Eigen::Vector3d sv = svd.singularValues();
+        qInfo().nospace()
+            << "Registration — Kabsch SVD:"
+            << "\n    det(V*Uᵀ) = " << d << (d < 0 ? " (det correction applied)" : " (no det correction)")
+            << "\n    det(R) = " << R.determinant()
+            << "\n    singular values: (" << sv(0) << ", " << sv(1) << ", " << sv(2) << ")";
+
+        // 6b. Vertex disambiguation for coplanar degeneracy.
+        //
+        // With only 3 coplanar fiducials the SVD's 3rd singular value
+        // is ~0, leaving the out-of-plane rotation direction ambiguous.
+        // The det(V*Uᵀ) sign heuristic picks one direction but may
+        // choose wrong, inverting superior ↔ inferior.
+        //
+        // Fix: if a pen vertex (CZ) and model vertex are available,
+        // test both candidate rotations (D₃₃ = +1 and D₃₃ = -1) and
+        // keep whichever maps pen CZ closer to model CZ.
+        if (m_hasPenVertex && m_hasModelVertex) {
+            const Eigen::Vector3d penCZ(m_penVertex.x(), m_penVertex.y(), m_penVertex.z());
+            const Eigen::Vector3d modCZ(m_modelVertex.x(), m_modelVertex.y(), m_modelVertex.z());
+
+            const Eigen::Vector3d mappedCZ = R * penCZ + t;
+            const double errCurrent = (mappedCZ - modCZ).norm();
+
+            // Try the alternative sign
+            Eigen::Matrix3d D_alt = D;
+            D_alt(2, 2) = -D(2, 2);
+            const Eigen::Matrix3d R_alt = V * D_alt * U.transpose();
+            const Eigen::Vector3d t_alt = modC - R_alt * penC;
+            const Eigen::Vector3d mappedCZ_alt = R_alt * penCZ + t_alt;
+            const double errAlt = (mappedCZ_alt - modCZ).norm();
+
+            qInfo().nospace()
+                << "Registration — vertex disambiguation:"
+                << "\n    CZ (pen):   (" << m_penVertex.x()*1000.f << ", " << m_penVertex.y()*1000.f << ", " << m_penVertex.z()*1000.f << ") mm"
+                << "\n    CZ (model): (" << m_modelVertex.x()*1000.f << ", " << m_modelVertex.y()*1000.f << ", " << m_modelVertex.z()*1000.f << ") mm"
+                << "\n    D₃₃=" << D(2,2) << " → mapped CZ err: " << errCurrent*1000.0 << " mm"
+                << "\n    D₃₃=" << D_alt(2,2) << " → mapped CZ err: " << errAlt*1000.0 << " mm";
+
+            if (errAlt < errCurrent) {
+                R = R_alt;
+                t = t_alt;
+                D = D_alt;
+                qInfo().nospace()
+                    << "Registration — vertex correction APPLIED: flipped out-of-plane direction"
+                    << " (det(R) now = " << R.determinant() << ")";
+            } else {
+                qInfo() << "Registration — vertex check passed, no flip needed.";
             }
+        } else {
+            qInfo() << "Registration — no vertex available for out-of-plane disambiguation."
+                    << "Capture CZ (pen vertex) and load BEM to enable this check.";
+        }
 
-            QMatrix4x4 f;
-            f.setToIdentity();
-            f(0,0) = ex.x();  f(0,1) = ey.x();  f(0,2) = ez.x();  f(0,3) = origin.x();
-            f(1,0) = ex.y();  f(1,1) = ey.y();  f(1,2) = ez.y();  f(1,3) = origin.y();
-            f(2,0) = ex.z();  f(2,1) = ey.z();  f(2,2) = ez.z();  f(2,3) = origin.z();
-            return f;
-        };
-
-        const QMatrix4x4 penFrame   = buildFrame(pNas, pLpa, pRpa,
-                                                    m_hasPenVertex ? &m_penVertex : nullptr);
-        const QMatrix4x4 modelFrame = buildFrame(mNas, mLpa, mRpa,
-                                                    m_hasModelVertex ? &m_modelVertex : nullptr);
-
-        m_worldToModel = modelFrame * penFrame.inverted();
+        // 7. Build QMatrix4x4 worldToModel = [R | t]
+        m_worldToModel.setToIdentity();
+        for (int r = 0; r < 3; ++r) {
+            for (int c = 0; c < 3; ++c) {
+                m_worldToModel(r, c) = static_cast<float>(R(r, c));
+            }
+            m_worldToModel(r, 3) = static_cast<float>(t(r));
+        }
 
         // Residuals
         auto residual = [&](const char* label, const QVector3D& pw, const QVector3D& pm) {
             QVector3D mapped = m_worldToModel.map(pw);
             float err = (mapped - pm).length() * 1000.0f;
+            qInfo().nospace() << "  " << label
+                << ":  pen(" << pw.x()*1000.f << ", " << pw.y()*1000.f << ", " << pw.z()*1000.f << ")"
+                << " → mapped(" << mapped.x()*1000.f << ", " << mapped.y()*1000.f << ", " << mapped.z()*1000.f << ")"
+                << "  model(" << pm.x()*1000.f << ", " << pm.y()*1000.f << ", " << pm.z()*1000.f << ")"
+                << "  err=" << err << " mm";
             return err;
         };
         const float rNas = residual("NAS", pNas, mNas);
         const float rLpa = residual("LPA", pLpa, mLpa);
         const float rRpa = residual("RPA", pRpa, mRpa);
-        qInfo().nospace()
-            << "Registration — residuals:"
-            << "\n    NAS: " << rNas << " mm"
-            << "\n    LPA: " << rLpa << " mm"
-            << "\n    RPA: " << rRpa << " mm";
 
         m_headToWorld.setToIdentity();
         m_headToDevice = m_deviceToWorld.inverted() * m_headToWorld;
@@ -333,8 +420,13 @@ void PolhemusCoregistration::onPointReceived(int station,
                                               const QVector3D& position,
                                               const QQuaternion& orientation)
 {
+    // Apply axis mirroring to compensate for transmitter placement
+    const QVector3D pos(m_mirrorX ? -position.x() : position.x(),
+                        m_mirrorY ? -position.y() : position.y(),
+                        position.z());
+
     if (station == m_trackerStation) {
-        m_deviceToWorld = buildDevicePose(position, orientation);
+        m_deviceToWorld = buildDevicePose(pos, orientation);
         emit devicePoseChanged(m_deviceToWorld);
     } else if (station == m_penStation) {
         // Gimbal-lock guard: for ZYX Euler, sin(el) = 2*(w*y - x*z).
@@ -348,7 +440,7 @@ void PolhemusCoregistration::onPointReceived(int station,
         if (!gimbalLock) {
             const QVector3D tipAdj = m_tipOffsetEnabled
                 ? orientation.rotatedVector(m_penTipOffset) : QVector3D();
-            m_penPosition    = position + tipAdj;
+            m_penPosition    = pos + tipAdj;
             m_penOrientation = orientation;
             m_havePenPos     = true;
         }
@@ -360,12 +452,12 @@ void PolhemusCoregistration::onPointReceived(int station,
         if (m_pivotState == PivotState::Collecting) {
             constexpr float kMinAngleDeg = 3.0f;
             constexpr float kMaxPosJumpM = 0.05f; // 5 cm
-            constexpr float kGimbalSinEl = 0.9848f; // sin(80°) — reject |el|>80°
+            constexpr float kGimbalSinEl2 = 0.9848f; // sin(80°) — reject |el|>80°
 
             // Gimbal-lock check: for ZYX Euler, sin(el) = 2*(w*y - x*z)
-            const float sinEl = 2.0f * (orientation.scalar() * orientation.y()
-                                      - orientation.x() * orientation.z());
-            if (std::abs(sinEl) > kGimbalSinEl) {
+            const float sinEl2 = 2.0f * (orientation.scalar() * orientation.y()
+                                       - orientation.x() * orientation.z());
+            if (std::abs(sinEl2) > kGimbalSinEl2) {
                 // Near gimbal lock — skip this sample silently
             } else {
                 bool accept = m_pivotOrientations.empty();
@@ -373,11 +465,11 @@ void PolhemusCoregistration::onPointReceived(int station,
                     const QQuaternion& prev = m_pivotOrientations.back();
                     float dot = std::abs(QQuaternion::dotProduct(prev, orientation));
                     float angleDeg = 2.0f * std::acos(std::min(dot, 1.0f)) * (180.0f / 3.14159265f);
-                    float posDelta = (position - m_pivotPositions.back()).length();
+                    float posDelta = (pos - m_pivotPositions.back()).length();
                     accept = (angleDeg >= kMinAngleDeg) && (posDelta < kMaxPosJumpM);
                 }
                 if (accept) {
-                    m_pivotPositions.push_back(position);
+                    m_pivotPositions.push_back(pos);
                     m_pivotOrientations.push_back(orientation);
                 }
             }
@@ -392,9 +484,14 @@ void PolhemusCoregistration::onPenButtonPressedFromConn(int station,
                                                          const QQuaternion& orientation)
 {
     if (station == m_penStation) {
+        // Apply axis mirroring to compensate for transmitter placement
+        const QVector3D pos(m_mirrorX ? -position.x() : position.x(),
+                            m_mirrorY ? -position.y() : position.y(),
+                            position.z());
+
         const QVector3D tipAdj = m_tipOffsetEnabled
             ? orientation.rotatedVector(m_penTipOffset) : QVector3D();
-        m_penPosition    = position + tipAdj;
+        m_penPosition    = pos + tipAdj;
         m_penOrientation = orientation;
         m_havePenPos     = true;
 

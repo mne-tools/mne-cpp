@@ -126,6 +126,23 @@ public:
     bool tipOffsetEnabled() const { return m_tipOffsetEnabled; }
 
     //=========================================================================================================
+    // Axis mirroring — compensate for transmitter placement
+    //=========================================================================================================
+
+    /**
+     * @brief Negate X and/or Y of incoming Polhemus positions.
+     *
+     * The Polhemus Fastrak coordinate system depends on the physical
+     * placement and orientation of the transmitter.  When the transmitter
+     * is oriented such that its axes are mirrored relative to the
+     * expected neuroscience convention, enable the corresponding mirror
+     * flags here.
+     */
+    void setAxisMirror(bool mirrorX, bool mirrorY) { m_mirrorX = mirrorX; m_mirrorY = mirrorY; }
+    bool mirrorX() const { return m_mirrorX; }
+    bool mirrorY() const { return m_mirrorY; }
+
+    //=========================================================================================================
     // Pivot calibration — determine pen tip offset by pivoting pen around its tip
     //=========================================================================================================
 
@@ -254,6 +271,8 @@ private:
     QQuaternion m_offsetRotation;
     QVector3D   m_penTipOffset;        // tip offset in sensor body frame (metres)
     bool        m_tipOffsetEnabled = false;
+    bool        m_mirrorX = false;     // negate X of incoming Polhemus positions
+    bool        m_mirrorY = false;     // negate Y of incoming Polhemus positions
 
     PolhemusConnection* m_pConn   = nullptr;
     AcquiredPoints*     m_pPoints = nullptr;
