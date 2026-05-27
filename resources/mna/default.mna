@@ -1,0 +1,56 @@
+{
+  "mna_format_version": "1.0",
+  "name": "MNE-CPP default workflow (sensor \u2192 filter \u2192 display)",
+  "description": "Minimal demonstration workflow shipped with the v2.3.0 installer. Loads a raw FIFF recording, applies a band-pass temporal filter, and exposes the filtered stream for the host application (MNE Scan / MNE Analyze Studio) to display. Replace 'raw_path' below with the path to any FIFF raw recording on disk \u2014 e.g. the MNE sample dataset's 'sample_audvis_raw.fif'.",
+  "resources": [
+    {
+      "uid": "raw_in",
+      "type": "fiff_raw",
+      "uri": "mne://workspace/inputs/default_raw.fif",
+      "metadata": {
+        "label": "Sensor input (raw FIFF)",
+        "note": "Point this at any FIFF raw recording; the MNE sample dataset is recommended for a first run."
+      }
+    }
+  ],
+  "pipeline": [
+    {
+      "uid": "op_sensor_load",
+      "skill_id": "mne.skills.load_fiff_raw",
+      "inputs": {},
+      "parameters": {
+        "raw_path": "$raw_in.uri"
+      },
+      "outputs": {
+        "raw_data": "raw_loaded",
+        "info":     "raw_info"
+      }
+    },
+    {
+      "uid": "op_filter_bandpass",
+      "skill_id": "mne.skills.temporal_filter",
+      "inputs": {
+        "raw_data": "raw_loaded"
+      },
+      "parameters": {
+        "highpass": 1.0,
+        "lowpass": 40.0
+      },
+      "outputs": {
+        "filtered_data": "raw_filtered"
+      }
+    },
+    {
+      "uid": "op_display",
+      "skill_id": "mne.skills.display_raw",
+      "inputs": {
+        "raw_data": "raw_filtered"
+      },
+      "parameters": {
+        "scaling": "auto",
+        "n_channels": 20
+      },
+      "outputs": {}
+    }
+  ]
+}

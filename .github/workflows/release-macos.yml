@@ -79,7 +79,15 @@ jobs:
         # Selectively clean hostedtoolcache without deleting Qt
         find /opt/hostedtoolcache -mindepth 1 -maxdepth 1 ! -name 'Qt' -exec sudo rm -rf {} + 2>/dev/null || true
         echo "Disk usage after cleanup:" && df -h
+    - name: Install create-dmg
+      run: |
+        brew list create-dmg >/dev/null 2>&1 || brew install create-dmg
     - name: Deploy binaries (MacOS)
+      env:
+        # Signing + notarization secrets are optional. When unset, deploy.bat
+        # falls back to producing an unsigned .dmg next to the tarball.
+        MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+        MACOS_NOTARY_PROFILE: ${{ secrets.MACOS_NOTARY_PROFILE }}
       run: |
         echo "Qt environment:"
         echo "  QT_ROOT_DIR=${QT_ROOT_DIR:-<not set>}"
@@ -109,6 +117,14 @@ jobs:
       run: |
         cp mne-cpp-macos-dynamic-arm64.tar.gz "${{ steps.release-info.outputs.prefix }}-macos-dynamic-arm64.tar.gz"
         gh release upload "${{ steps.release-info.outputs.tag }}" "${{ steps.release-info.outputs.prefix }}-macos-dynamic-arm64.tar.gz" --clobber
+        # Upload the .dmg too when it was produced (deploy.bat only generates
+        # it if create-dmg is available; missing file = silent skip).
+        if [ -f mne-cpp-macos-dynamic-arm64.dmg ]; then
+          cp mne-cpp-macos-dynamic-arm64.dmg "${{ steps.release-info.outputs.prefix }}-macos-dynamic-arm64.dmg"
+          gh release upload "${{ steps.release-info.outputs.tag }}" "${{ steps.release-info.outputs.prefix }}-macos-dynamic-arm64.dmg" --clobber
+        else
+          echo "No .dmg artefact present; uploading tarball only."
+        fi
 
 
   MacOSStatic:

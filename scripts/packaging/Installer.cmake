@@ -137,3 +137,14 @@ install(
 
 # CMake package configuration for SDK consumers is now handled by
 # the generated MNE-CPPConfig.cmake (see src/CMakeLists.txt).
+
+##==============================================================================
+## Bundled workflow templates (ship default.mna for the GUI apps)
+##==============================================================================
+
+install(
+    FILES "${CMAKE_CURRENT_SOURCE_DIR}/../resources/mna/default.mna"
+          "${CMAKE_CURRENT_SOURCE_DIR}/../resources/mna/mna-registry.json"
+    DESTINATION resources/mna
+    COMPONENT gui
+)

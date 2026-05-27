@@ -594,6 +594,53 @@ if [[ ${LinkOption} == "dynamic" ]]; then
         # include/ (public headers for SDK users), share/ (Eigen cmake config),
         # and resources/ (config files needed by CLI tools like mne_rt_server).
         ${MockText}tar cfvz mne-cpp-macos-dynamic-${MACOS_ARCH}.tar.gz -C ${BasePath}/out/${BuildName} bin lib include share resources
+
+        # Build a drag-install .dmg alongside the tarball when create-dmg is
+        # available. Optional: skipped silently in environments without the
+        # helper (e.g. minimal CI runners). Local devs can install via
+        # `brew install create-dmg`.
+        if command -v create-dmg >/dev/null 2>&1; then
+            DMG_NAME="mne-cpp-macos-dynamic-${MACOS_ARCH}.dmg"
+            DMG_STAGE="${BasePath}/out/${BuildName}/dmg_stage"
+            ${MockText}rm -rf "${DMG_STAGE}" "${DMG_NAME}"
+            ${MockText}mkdir -p "${DMG_STAGE}"
+            # Stage the .app bundles so the .dmg presents the GUI apps directly
+            # for drag-install into /Applications.
+            for app in ${BasePath}/out/${BuildName}/bin/*.app; do
+                [ -d "${app}" ] || continue
+                ${MockText}cp -a "${app}" "${DMG_STAGE}/"
+            done
+            ${MockText}create-dmg \
+                --volname "MNE-CPP ${MACOS_ARCH}" \
+                --window-pos 200 120 \
+                --window-size 720 420 \
+                --icon-size 96 \
+                --app-drop-link 540 200 \
+                --no-internet-enable \
+                "${DMG_NAME}" \
+                "${DMG_STAGE}" || echo "[deploy] create-dmg failed; tarball remains the primary artefact."
+            ${MockText}rm -rf "${DMG_STAGE}"
+            # Optional code-signing + notarization (release builds only).
+            # Activated when the following env vars are all set, which the
+            # GitHub release workflow conditionally exports from secrets:
+            #   MACOS_SIGN_IDENTITY      Developer ID Application: ...
+            #   MACOS_NOTARY_PROFILE     notarytool keychain profile name
+            if [ -f "${DMG_NAME}" ] && [ -n "${MACOS_SIGN_IDENTITY:-}" ]; then
+                echo "[deploy] codesigning ${DMG_NAME} with ${MACOS_SIGN_IDENTITY}"
+                ${MockText}codesign --force --sign "${MACOS_SIGN_IDENTITY}" --timestamp "${DMG_NAME}" || \
+                    echo "[deploy] codesign failed (continuing unsigned)"
+                if [ -n "${MACOS_NOTARY_PROFILE:-}" ]; then
+                    echo "[deploy] submitting ${DMG_NAME} for notarization (profile ${MACOS_NOTARY_PROFILE})"
+                    ${MockText}xcrun notarytool submit "${DMG_NAME}" \
+                        --keychain-profile "${MACOS_NOTARY_PROFILE}" --wait || \
+                        echo "[deploy] notarytool submit failed (continuing un-notarized)"
+                    ${MockText}xcrun stapler staple "${DMG_NAME}" || \
+                        echo "[deploy] stapler failed (continuing without stapled ticket)"
+                fi
+            fi
+        else
+            echo "[deploy] create-dmg not found on PATH; skipping .dmg generation (tarball is the only artefact)."
+        fi
     fi
 
 elif [[ ${LinkOption} == "static" ]]; then
