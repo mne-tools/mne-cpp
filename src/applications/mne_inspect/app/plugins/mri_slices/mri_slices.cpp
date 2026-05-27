@@ -93,10 +93,15 @@ std::array<QString, 3> MriSlicesPlugin::sceneLayerIds()
 
 bool MriSlicesPlugin::loadVolume(const QString& path)
 {
-    const QString suffix = QFileInfo(path).suffix().toLower();
-    if (suffix != QLatin1String("mgh") && suffix != QLatin1String("mgz")) {
-        qWarning() << "MriSlicesPlugin::loadVolume: unsupported format" << suffix
-                   << "— only MGH/MGZ are wired in v2.3.0";
+    const QString lower = path.toLower();
+    const bool supported =
+        lower.endsWith(QStringLiteral(".mgh"))    ||
+        lower.endsWith(QStringLiteral(".mgz"))    ||
+        lower.endsWith(QStringLiteral(".nii"))    ||
+        lower.endsWith(QStringLiteral(".nii.gz"));
+    if (!supported) {
+        qWarning() << "MriSlicesPlugin::loadVolume: unsupported format" << path
+                   << "\u2014 supported: .mgh, .mgz, .nii, .nii.gz";
         return false;
     }
 

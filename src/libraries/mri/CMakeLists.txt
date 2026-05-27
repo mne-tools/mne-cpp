@@ -30,6 +30,7 @@ set(SOURCES
     mri_global.cpp
     mri_vol_data.cpp
     mri_mgh_io.cpp
+    mri_nifti_io.cpp
     mri_cor_io.cpp
     mri_cor_fif_io.cpp
     mri_slicer.cpp
@@ -40,6 +41,7 @@ set(HEADERS
     mri_types.h
     mri_vol_data.h
     mri_mgh_io.h
+    mri_nifti_io.h
     mri_cor_io.h
     mri_cor_fif_io.h
     mri_slicer.h

@@ -38,6 +38,7 @@
 
 #include "mri_vol_data.h"
 #include "mri_mgh_io.h"
+#include "mri_nifti_io.h"
 
 #include <fiff/fiff_file.h>
 
@@ -87,6 +88,12 @@ bool MriVolData::isValid() const
 
 bool MriVolData::read(const QString& path)
 {
+    // Dispatch on filename suffix so callers can use the same one-shot loader
+    // for FreeSurfer MGH/MGZ and NIfTI-1 (.nii / .nii.gz) volumes.
+    const QString lower = path.toLower();
+    if (lower.endsWith(QStringLiteral(".nii")) || lower.endsWith(QStringLiteral(".nii.gz"))) {
+        return MriNiftiIO::read(path, *this);
+    }
     QVector<FIFFLIB::FiffCoordTrans> additionalTrans;
     return MriMghIO::read(path, *this, additionalTrans);
 }
