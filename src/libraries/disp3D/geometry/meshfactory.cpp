@@ -311,6 +311,110 @@ std::shared_ptr<BrainSurface> MeshFactory::createBarbell(const QVector3D &center
 
 //=============================================================================================================
 
+std::shared_ptr<BrainSurface> MeshFactory::createCylinder(const QVector3D &from,
+                                                          const QVector3D &to,
+                                                          float radius,
+                                                          const QColor &color,
+                                                          int sides)
+{
+    if (sides < 3) sides = 3;
+
+    const QVector3D axis = to - from;
+    const float length = axis.length();
+    if (length < 1e-8f)
+        return std::make_shared<BrainSurface>();
+
+    const QVector3D axisN = axis / length;
+
+    // Build an orthonormal basis (axisN, u, v)
+    QVector3D u = QVector3D::crossProduct(axisN, QVector3D(0, 0, 1));
+    if (u.lengthSquared() < 1e-6f)
+        u = QVector3D::crossProduct(axisN, QVector3D(1, 0, 0));
+    u.normalize();
+    const QVector3D v = QVector3D::crossProduct(axisN, u).normalized();
+
+    // Two rings of vertices (bottom = from, top = to) + 2 center caps
+    const int nVerts = 2 * sides + 2;
+    const int nTris  = 4 * sides; // 2 * sides for barrel + sides for each cap
+
+    Eigen::MatrixX3f verts(nVerts, 3);
+    Eigen::MatrixX3f norms(nVerts, 3);
+    Eigen::MatrixX3i tris(nTris, 3);
+
+    constexpr float kTwoPi = 2.0f * 3.14159265358979f;
+
+    // Bottom ring vertices [0..sides-1]
+    for (int i = 0; i < sides; ++i) {
+        const float angle = kTwoPi * static_cast<float>(i) / static_cast<float>(sides);
+        const float ca = std::cos(angle);
+        const float sa = std::sin(angle);
+        const QVector3D normal = (u * ca + v * sa);
+        const QVector3D pos = from + normal * radius;
+        verts(i, 0) = pos.x();
+        verts(i, 1) = pos.y();
+        verts(i, 2) = pos.z();
+        norms(i, 0) = normal.x();
+        norms(i, 1) = normal.y();
+        norms(i, 2) = normal.z();
+    }
+
+    // Top ring vertices [sides..2*sides-1]
+    for (int i = 0; i < sides; ++i) {
+        const float angle = kTwoPi * static_cast<float>(i) / static_cast<float>(sides);
+        const float ca = std::cos(angle);
+        const float sa = std::sin(angle);
+        const QVector3D normal = (u * ca + v * sa);
+        const QVector3D pos = to + normal * radius;
+        verts(sides + i, 0) = pos.x();
+        verts(sides + i, 1) = pos.y();
+        verts(sides + i, 2) = pos.z();
+        norms(sides + i, 0) = normal.x();
+        norms(sides + i, 1) = normal.y();
+        norms(sides + i, 2) = normal.z();
+    }
+
+    // Cap center vertices
+    const int bottomCenter = 2 * sides;
+    const int topCenter    = 2 * sides + 1;
+    verts(bottomCenter, 0) = from.x(); verts(bottomCenter, 1) = from.y(); verts(bottomCenter, 2) = from.z();
+    norms(bottomCenter, 0) = -axisN.x(); norms(bottomCenter, 1) = -axisN.y(); norms(bottomCenter, 2) = -axisN.z();
+    verts(topCenter, 0) = to.x(); verts(topCenter, 1) = to.y(); verts(topCenter, 2) = to.z();
+    norms(topCenter, 0) = axisN.x(); norms(topCenter, 1) = axisN.y(); norms(topCenter, 2) = axisN.z();
+
+    // Barrel triangles (2 tris per side)
+    int t = 0;
+    for (int i = 0; i < sides; ++i) {
+        const int i0 = i;
+        const int i1 = (i + 1) % sides;
+        const int i2 = sides + i;
+        const int i3 = sides + (i + 1) % sides;
+        tris(t, 0) = i0; tris(t, 1) = i2; tris(t, 2) = i1; ++t;
+        tris(t, 0) = i1; tris(t, 1) = i2; tris(t, 2) = i3; ++t;
+    }
+
+    // Bottom cap
+    for (int i = 0; i < sides; ++i) {
+        tris(t, 0) = bottomCenter;
+        tris(t, 1) = (i + 1) % sides;
+        tris(t, 2) = i;
+        ++t;
+    }
+
+    // Top cap
+    for (int i = 0; i < sides; ++i) {
+        tris(t, 0) = topCenter;
+        tris(t, 1) = sides + i;
+        tris(t, 2) = sides + (i + 1) % sides;
+        ++t;
+    }
+
+    auto surf = std::make_shared<BrainSurface>();
+    surf->createFromData(verts, norms, tris, color);
+    return surf;
+}
+
+//=============================================================================================================
+
 std::shared_ptr<BrainSurface> MeshFactory::createBatchedSpheres(const QVector<QVector3D> &positions,
                                                                   float radius,
                                                                   const QColor &color,

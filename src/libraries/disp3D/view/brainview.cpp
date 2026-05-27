@@ -1768,7 +1768,8 @@ void BrainView::render(QRhiCommandBuffer *cb)
         } else if (key.startsWith("srcsp_") || key.startsWith("dig_")) {
             if (!sv.shouldRenderSurface(key)) continue;
             if (!surf->isVisible()) continue;
-            if (key.startsWith(QLatin1String("dig_live_t_"))) {
+            if (key.startsWith(QLatin1String("dig_live_t_"))
+                || key.startsWith(QLatin1String("dig_liveray_"))) {
                 QVector3D bmin, bmax;
                 surf->boundingBox(bmin, bmax);
                 QVector3D ctr = (bmin + bmax) * 0.5f;
@@ -3149,6 +3150,28 @@ void BrainView::clearLiveMarkers()
     }
 }
 
+void BrainView::setLiveRay(const QVector3D& from, const QVector3D& to,
+                            const QColor& color, float radius)
+{
+    // Remove previous ray surface
+    m_surfaces.remove(QLatin1String("dig_liveray_0"));
+
+    auto surf = MeshFactory::createCylinder(from, to, radius, color);
+    surf->setVisible(true);
+    m_surfaces[QStringLiteral("dig_liveray_0")] = surf;
+
+    m_sceneDirty = true;
+    update();
+}
+
+void BrainView::clearLiveRay()
+{
+    if (m_surfaces.remove(QLatin1String("dig_liveray_0"))) {
+        m_sceneDirty = true;
+        update();
+    }
+}
+
 void BrainView::setStaticMarkers(const QVector<LiveMarker>& markers)
 {
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ) {
@@ -3334,4 +3357,19 @@ void BrainView::pushVideoOverlayFrame(const QImage &frame)
     if (!m_videoOverlay) return;
     m_videoOverlay->setFrame(frame);
     if (m_videoOverlay->isEnabled()) { m_sceneDirty = true; update(); }
+}
+
+bool BrainView::intersectWorldRay(const QVector3D& origin, const QVector3D& direction, QVector3D& hitPoint) const
+{
+    // Use the single-view SubView for surface visibility filtering
+    const SubView& sv = (m_viewMode == MultiView && !m_subViews.isEmpty())
+        ? m_subViews.first() : m_singleView;
+
+    PickResult result = RayPicker::pick(origin, direction, sv, m_surfaces,
+                                        m_itemSurfaceMap, m_itemDipoleMap);
+    if (result.hit) {
+        hitPoint = result.hitPoint;
+        return true;
+    }
+    return false;
 }

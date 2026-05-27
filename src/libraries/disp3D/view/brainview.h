@@ -852,6 +852,20 @@ public slots:
     void clearLiveMarkers();
 
     /**
+     * Set a semi-transparent ray cylinder between two world-space points.
+     *
+     * @param[in] from     Ray origin (metres).
+     * @param[in] to       Ray end point (metres).
+     * @param[in] color    Ray color (alpha channel controls transparency).
+     * @param[in] radius   Cylinder radius (metres, default 0.001 = 1 mm).
+     */
+    void setLiveRay(const QVector3D& from, const QVector3D& to,
+                    const QColor& color, float radius = 0.001f);
+
+    /** Remove the live ray from the scene. */
+    void clearLiveRay();
+
+    /**
      * Replace the set of static overlay markers (fiducials, acquired points).
      * These persist across frames and are always visible.
      */
@@ -914,6 +928,19 @@ public slots:
 
     /** Push a new video frame to the overlay (e.g. from QVideoSink). */
     void pushVideoOverlayFrame(const QImage &frame);
+
+    /**
+     * @brief Intersect a world-space ray with loaded scene geometry.
+     *
+     * Tests the ray against all visible surfaces (BEM, cortical, sensors)
+     * and returns the closest hit point.
+     *
+     * @param[in]  origin     Ray origin in world (model) space (metres).
+     * @param[in]  direction  Ray direction (unit vector).
+     * @param[out] hitPoint   Intersection point in world (model) space.
+     * @return @c true if the ray hits a surface; @c false otherwise.
+     */
+    bool intersectWorldRay(const QVector3D& origin, const QVector3D& direction, QVector3D& hitPoint) const;
 
 signals:
     //=========================================================================================================

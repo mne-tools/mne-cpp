@@ -172,6 +172,71 @@ public:
     QQuaternion trackerToDeviceRotation()    const { return m_offsetRotation; }
 
     //=========================================================================================================
+    // Optical path calibration — determine the microscope optical axis
+    // relative to the tracker sensor.
+    //
+    // Workflow:
+    //   1. Move the OPMI to a position, aim at a point on the head surface,
+    //      mark the focus point with the stylus pen → captureOpticalCalibSample().
+    //   2. Repeat at 2–3 different positions / focal distances.
+    //   3. Call solveOpticalCalibration() to fit a 3D line through the focus
+    //      points in the tracker's local frame, yielding the optical axis
+    //      direction and the optical center offset from the tracker.
+    //=========================================================================================================
+
+    struct OpticalCalibSample {
+        QVector3D   trackerPos;    ///< Tracker position in world frame (metres).
+        QQuaternion trackerOri;    ///< Tracker orientation in world frame.
+        QVector3D   focusPoint;    ///< Stylus focus point in world frame (metres).
+    };
+
+    /**
+     * @brief Record one calibration sample (current tracker pose + current pen position).
+     * @return @c true if both pen and tracker data are available, @c false otherwise.
+     */
+    bool captureOpticalCalibSample();
+
+    /** @return Number of calibration samples recorded so far. */
+    int opticalCalibSampleCount() const { return static_cast<int>(m_opticalCalibSamples.size()); }
+
+    /** Discard all calibration samples and reset the optical calibration. */
+    void clearOpticalCalibSamples();
+
+    /**
+     * @brief Fit a 3D line through the focus points in tracker-local frame.
+     *
+     * Requires at least 2 samples. Computes the optical axis direction
+     * and the optical center offset in the tracker body frame.
+     *
+     * @return @c true on success; @c false if insufficient or degenerate data.
+     */
+    bool solveOpticalCalibration();
+
+    /** @return Whether a valid optical calibration has been computed. */
+    bool opticalCalibrationValid() const { return m_opticalCalibValid; }
+
+    /** Direction of the optical axis in the tracker body frame (unit vector). */
+    QVector3D opticalAxisLocal() const { return m_opticalAxisLocal; }
+
+    /** Position of the optical center in the tracker body frame (metres). */
+    QVector3D opticalCenterLocal() const { return m_opticalCenterLocal; }
+
+    /** RMS residual of the last optical calibration (mm). */
+    float opticalCalibResidualMm() const { return m_opticalCalibResidualMm; }
+
+    /** Depth spread of calibration samples along the optical axis (mm). */
+    float opticalCalibDepthSpreadMm() const { return m_opticalCalibDepthSpreadMm; }
+
+    /**
+     * @brief Compute the current optical axis ray in Polhemus world frame.
+     *
+     * @param[out] origin     Ray origin (optical center in world frame).
+     * @param[out] direction  Ray direction (optical axis in world frame, unit vector).
+     * @return @c true if tracker data and calibration are available.
+     */
+    bool opticalRayInWorld(QVector3D& origin, QVector3D& direction) const;
+
+    //=========================================================================================================
     // Digitizer connection
     //=========================================================================================================
 
@@ -254,6 +319,8 @@ signals:
     void registrationChanged();
     void pivotStateChanged(PolhemusCoregistration::PivotState state);
     void pivotCalibrationDone(const QVector3D& offset, float residualMm);
+    void pivotSampleCollected(int sampleCount, float angularSpanDeg);
+    void opticalCalibrationChanged();
 
 private slots:
     void onPointReceived(int station, const QVector3D& position, const QQuaternion& orientation);
@@ -306,6 +373,14 @@ private:
     std::vector<QVector3D>   m_pivotPositions;
     std::vector<QQuaternion> m_pivotOrientations;
     float m_pivotResidualMm = 0.0f;
+
+    // Optical path calibration state
+    std::vector<OpticalCalibSample> m_opticalCalibSamples;
+    QVector3D m_opticalAxisLocal;           // optical axis direction in tracker body frame
+    QVector3D m_opticalCenterLocal;         // optical center position in tracker body frame
+    float     m_opticalCalibResidualMm = 0.0f;
+    float     m_opticalCalibDepthSpreadMm = 0.0f;
+    bool      m_opticalCalibValid = false;
 
     bool solvePivotCalibration();
 };

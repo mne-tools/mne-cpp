@@ -129,6 +129,23 @@ public:
 
     //=========================================================================================================
     /**
+     * Create a cylinder between two world-space endpoints.
+     *
+     * @param[in] from     Start point (metres).
+     * @param[in] to       End point (metres).
+     * @param[in] radius   Cylinder radius (metres).
+     * @param[in] color    Surface color.
+     * @param[in] sides    Number of sides around the circumference (min 3).
+     * @return Shared pointer to the created BrainSurface.
+     */
+    static std::shared_ptr<BrainSurface> createCylinder(const QVector3D &from,
+                                                         const QVector3D &to,
+                                                         float radius,
+                                                         const QColor &color,
+                                                         int sides = 12);
+
+    //=========================================================================================================
+    /**
      * Number of vertices in a subdivided icosahedron (for picking calculations).
      *
      * @param[in] subdivisions  Number of subdivision passes.

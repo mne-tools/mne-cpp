@@ -471,6 +471,19 @@ void PolhemusCoregistration::onPointReceived(int station,
                 if (accept) {
                     m_pivotPositions.push_back(pos);
                     m_pivotOrientations.push_back(orientation);
+
+                    // Compute angular span for live feedback
+                    float spanDeg = 0.0f;
+                    if (m_pivotOrientations.size() > 1) {
+                        float minDot = 1.0f;
+                        const auto& first = m_pivotOrientations.front();
+                        for (size_t k = 1; k < m_pivotOrientations.size(); ++k) {
+                            float d = std::abs(QQuaternion::dotProduct(first, m_pivotOrientations[k]));
+                            if (d < minDot) minDot = d;
+                        }
+                        spanDeg = 2.0f * std::acos(std::min(minDot, 1.0f)) * (180.0f / 3.14159265f);
+                    }
+                    emit pivotSampleCollected(static_cast<int>(m_pivotPositions.size()), spanDeg);
                 }
             }
         }
@@ -653,5 +666,245 @@ bool PolhemusCoregistration::solvePivotCalibration()
     m_pivotState = PivotState::Done;
     emit pivotStateChanged(m_pivotState);
     emit pivotCalibrationDone(offset, rms);
+    return true;
+}
+
+//=============================================================================================================
+// Optical path calibration
+//=============================================================================================================
+
+bool PolhemusCoregistration::captureOpticalCalibSample()
+{
+    if (!m_havePenPos) {
+        qWarning() << "Optical calibration: no pen position available";
+        return false;
+    }
+
+    const QMatrix4x4& dev = m_deviceToWorld;
+    if (dev.isIdentity()) {
+        qWarning() << "Optical calibration: no tracker data available";
+        return false;
+    }
+
+    // Extract tracker position and orientation from deviceToWorld.
+    // deviceToWorld = trackerToWorld * offset, but we want the raw tracker
+    // pose (before offset). Reconstruct from the current raw tracker data
+    // by removing the offset: trackerToWorld = deviceToWorld * offset^-1
+    QMatrix4x4 offsetInv;
+    offsetInv.setToIdentity();
+    offsetInv.translate(m_offsetTranslation);
+    offsetInv.rotate(m_offsetRotation);
+    offsetInv = offsetInv.inverted();
+
+    const QMatrix4x4 trackerToWorld = dev * offsetInv;
+    const QVector3D trackerPos(trackerToWorld(0, 3), trackerToWorld(1, 3), trackerToWorld(2, 3));
+    const QQuaternion trackerOri = QQuaternion::fromRotationMatrix(trackerToWorld.toGenericMatrix<3, 3>());
+
+    OpticalCalibSample sample;
+    sample.trackerPos = trackerPos;
+    sample.trackerOri = trackerOri;
+    sample.focusPoint = m_penPosition;
+    m_opticalCalibSamples.push_back(sample);
+
+    const int n = static_cast<int>(m_opticalCalibSamples.size());
+    const QVector3D localFocus = trackerOri.inverted().rotatedVector(m_penPosition - trackerPos);
+    const float distToTracker = localFocus.length() * 1000.0f;
+
+    qInfo().nospace()
+        << "Optical calibration sample " << n << ":"
+        << "\n    tracker pos: (" << trackerPos.x()*1000.f << ", " << trackerPos.y()*1000.f << ", " << trackerPos.z()*1000.f << ") mm"
+        << "\n    focus point: (" << m_penPosition.x()*1000.f << ", " << m_penPosition.y()*1000.f << ", " << m_penPosition.z()*1000.f << ") mm"
+        << "\n    focus (local): (" << localFocus.x()*1000.f << ", " << localFocus.y()*1000.f << ", " << localFocus.z()*1000.f << ") mm"
+        << "\n    distance tracker\u2194focus: " << distToTracker << " mm";
+
+    // Log convergence angle between tracker→focus directions for successive samples.
+    // As the OPMI moves farther away, this angle shrinks (lines become parallel);
+    // at close range the angle is large because the ~20 cm tracker offset dominates.
+    if (n >= 2) {
+        const auto& prev = m_opticalCalibSamples[static_cast<size_t>(n - 2)];
+        const QVector3D prevLocal = prev.trackerOri.inverted().rotatedVector(prev.focusPoint - prev.trackerPos);
+        const QVector3D curDir  = localFocus.normalized();
+        const QVector3D prevDir = prevLocal.normalized();
+        const float dot = std::clamp(QVector3D::dotProduct(curDir, prevDir), -1.0f, 1.0f);
+        const float angleDeg = std::acos(dot) * (180.0f / 3.14159265f);
+        const float prevDist = prevLocal.length() * 1000.0f;
+        qInfo().nospace()
+            << "    convergence angle (sample " << n-1 << "\u2194" << n << "): " << angleDeg << "\u00b0"
+            << "  (distances: " << prevDist << " / " << distToTracker << " mm)";
+    }
+
+    return true;
+}
+
+void PolhemusCoregistration::clearOpticalCalibSamples()
+{
+    m_opticalCalibSamples.clear();
+    m_opticalCalibValid = false;
+    m_opticalCalibResidualMm = 0.0f;
+    m_opticalCalibDepthSpreadMm = 0.0f;
+    emit opticalCalibrationChanged();
+}
+
+bool PolhemusCoregistration::solveOpticalCalibration()
+{
+    const int N = static_cast<int>(m_opticalCalibSamples.size());
+    if (N < 2) {
+        qWarning() << "Optical calibration: need at least 2 samples, have" << N;
+        return false;
+    }
+
+    // Step 1: Transform all focus points into the tracker's local frame
+    std::vector<Eigen::Vector3d> localPoints(static_cast<size_t>(N));
+    for (int i = 0; i < N; ++i) {
+        const auto& s = m_opticalCalibSamples[static_cast<size_t>(i)];
+        const QVector3D local = s.trackerOri.inverted().rotatedVector(s.focusPoint - s.trackerPos);
+        localPoints[static_cast<size_t>(i)] = Eigen::Vector3d(local.x(), local.y(), local.z());
+    }
+
+    // Step 2: Compute centroid
+    Eigen::Vector3d centroid = Eigen::Vector3d::Zero();
+    for (const auto& p : localPoints) centroid += p;
+    centroid /= static_cast<double>(N);
+
+    // Step 3: PCA — fit line via SVD of the centered point matrix
+    Eigen::MatrixXd centered(3, N);
+    for (int i = 0; i < N; ++i) {
+        centered.col(i) = localPoints[static_cast<size_t>(i)] - centroid;
+    }
+
+    Eigen::JacobiSVD<Eigen::MatrixXd> svd(centered, Eigen::ComputeThinU);
+    const Eigen::Vector3d axis = svd.matrixU().col(0); // principal direction
+
+    // Ensure the axis points away from the tracker origin (toward the focus points)
+    Eigen::Vector3d axisDir = axis;
+    if (centroid.dot(axisDir) < 0.0) {
+        axisDir = -axisDir;
+    }
+
+    // Step 4: Find the point on the fitted line closest to the tracker origin (0,0,0)
+    // Line: P = centroid + t * axisDir
+    // Closest point to origin: t = -dot(centroid, axisDir)
+    const double t0 = -centroid.dot(axisDir);
+    const Eigen::Vector3d opticalCenter = centroid + t0 * axisDir;
+
+    // Step 5: Compute RMS residual (perpendicular distance from each point to the line)
+    double sumSq = 0.0;
+    for (const auto& p : localPoints) {
+        const Eigen::Vector3d diff = p - centroid;
+        const double along = diff.dot(axisDir);
+        const double perpSq = (diff - along * axisDir).squaredNorm();
+        sumSq += perpSq;
+    }
+    const double rms = std::sqrt(sumSq / static_cast<double>(N)) * 1000.0; // mm
+
+    // Step 6: Check collinearity — with only 2 points the line is exact.
+    // With 3+ points, warn if residual is large.
+    const auto& sv = svd.singularValues();
+    const double linearityRatio = (sv.size() > 1 && sv(0) > 1e-12) ? sv(1) / sv(0) : 0.0;
+
+    // Compute depth spread: range of focal distances along the fitted axis.
+    // The tracker→focus line and the optical axis converge at the focus point
+    // but diverge at the tracker end due to the ~20 cm offset.  At large
+    // focal distances the lines are nearly parallel and the angular difference
+    // between them is small; at close range the angle is large (approaching
+    // 90° when focus point is at the optical center).  Good calibration
+    // requires samples at varied focal distances so the PCA can reliably
+    // separate the axis direction from noise.
+    double minDepth =  1e30, maxDepth = -1e30;
+    for (const auto& p : localPoints) {
+        const double depth = (p - opticalCenter).dot(axisDir);
+        minDepth = std::min(minDepth, depth);
+        maxDepth = std::max(maxDepth, depth);
+    }
+    const double depthSpreadMm = (maxDepth - minDepth) * 1000.0;
+
+    m_opticalAxisLocal   = QVector3D(static_cast<float>(axisDir.x()),
+                                     static_cast<float>(axisDir.y()),
+                                     static_cast<float>(axisDir.z()));
+    m_opticalCenterLocal = QVector3D(static_cast<float>(opticalCenter.x()),
+                                     static_cast<float>(opticalCenter.y()),
+                                     static_cast<float>(opticalCenter.z()));
+    m_opticalCalibResidualMm = static_cast<float>(rms);
+    m_opticalCalibDepthSpreadMm = static_cast<float>(depthSpreadMm);
+    m_opticalCalibValid = true;
+
+    const float distMm = m_opticalCenterLocal.length() * 1000.0f;
+
+    qInfo().nospace()
+        << "Optical calibration solved (" << N << " samples):"
+        << "\n    axis (local):   (" << m_opticalAxisLocal.x() << ", " << m_opticalAxisLocal.y() << ", " << m_opticalAxisLocal.z() << ")"
+        << "\n    center (local): (" << m_opticalCenterLocal.x()*1000.f << ", " << m_opticalCenterLocal.y()*1000.f << ", " << m_opticalCenterLocal.z()*1000.f << ") mm"
+        << "\n    tracker\u2194center: " << distMm << " mm"
+        << "\n    RMS residual:   " << rms << " mm"
+        << "\n    linearity:      " << (1.0 - linearityRatio) * 100.0 << "% (sv ratio " << linearityRatio << ")"
+        << "\n    depth spread:   " << depthSpreadMm << " mm (range " << minDepth*1000.0 << " .. " << maxDepth*1000.0 << " mm)";
+
+    // Per-sample: report convergence angle between tracker→focus direction
+    // and fitted optical axis.  This angle shrinks as the OPMI moves farther
+    // from the head (lines become parallel) and grows at close range where
+    // the tracker offset dominates.
+    qInfo() << "    Per-sample convergence angles (tracker\u2192focus vs optical axis):";
+    for (int i = 0; i < N; ++i) {
+        const Eigen::Vector3d& p = localPoints[static_cast<size_t>(i)];
+        const Eigen::Vector3d trkToFocus = p.normalized();
+        const double cosAngle = std::clamp(trkToFocus.dot(axisDir), -1.0, 1.0);
+        const double angleDeg = std::acos(cosAngle) * (180.0 / 3.14159265358979);
+        const double depth = (p - opticalCenter).dot(axisDir);
+        const double perpDist = (p - centroid - (p - centroid).dot(axisDir) * axisDir).norm() * 1000.0;
+        qInfo().nospace()
+            << "      sample " << (i + 1) << ": depth=" << depth*1000.0
+            << " mm, convergence angle=" << angleDeg << "\u00b0"
+            << ", perp err=" << perpDist << " mm";
+    }
+
+    if (depthSpreadMm < 50.0) {
+        qWarning() << "Optical calibration: depth spread is only" << depthSpreadMm
+                   << "mm. For a reliable axis direction, move the OPMI to vary the"
+                   << "focal distance by at least 50 mm between samples.";
+    }
+
+    if (rms > 10.0) {
+        qWarning() << "Optical calibration: RMS residual" << rms
+                   << "mm is large. Check that the stylus accurately marks the microscope focus point.";
+    }
+
+    // Plausibility check: the perpendicular distance from the tracker sensor
+    // to the optical axis should be approximately 270 mm for the Kinevo.
+    // The tracker is mounted on the microscope body, offset from the objective
+    // by a roughly fixed distance.  Flag anything clearly outside [100, 500] mm.
+    constexpr float kExpectedOffsetMm = 270.0f;
+    constexpr float kMinPlausibleMm   = 100.0f;
+    constexpr float kMaxPlausibleMm   = 500.0f;
+    if (distMm < kMinPlausibleMm || distMm > kMaxPlausibleMm) {
+        qWarning().nospace()
+            << "Optical calibration: tracker\u2194axis distance " << distMm
+            << " mm is outside the plausible range [" << kMinPlausibleMm
+            << ", " << kMaxPlausibleMm << "] mm (expected ~" << kExpectedOffsetMm
+            << " mm for Kinevo).  Calibration data may be unreliable.";
+    }
+
+    emit opticalCalibrationChanged();
+    return true;
+}
+
+bool PolhemusCoregistration::opticalRayInWorld(QVector3D& origin, QVector3D& direction) const
+{
+    if (!m_opticalCalibValid) return false;
+
+    const QMatrix4x4& dev = m_deviceToWorld;
+    if (dev.isIdentity()) return false;
+
+    // Recover raw tracker pose (before device offset)
+    QMatrix4x4 offsetMat;
+    offsetMat.setToIdentity();
+    offsetMat.translate(m_offsetTranslation);
+    offsetMat.rotate(m_offsetRotation);
+
+    const QMatrix4x4 trackerToWorld = dev * offsetMat.inverted();
+    const QVector3D trackerPos(trackerToWorld(0, 3), trackerToWorld(1, 3), trackerToWorld(2, 3));
+    const QQuaternion trackerOri = QQuaternion::fromRotationMatrix(trackerToWorld.toGenericMatrix<3, 3>());
+
+    origin    = trackerPos + trackerOri.rotatedVector(m_opticalCenterLocal);
+    direction = trackerOri.rotatedVector(m_opticalAxisLocal).normalized();
     return true;
 }
