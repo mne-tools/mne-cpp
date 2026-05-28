@@ -1,44 +1,19 @@
 //=============================================================================================================
 /**
- * @file     pickresult.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.3.0
- * @date     May, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file pickresult.h
+ * @since 2026
+ * @date  May 2026
+ * @brief Uniform pick payload (object identity, sub-index, world hit point, distance) for multimodal 3-D scenes.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided
- * that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and
- *       the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions
- *       and the following disclaimer in the documentation and/or other materials provided with the
- *       distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used to endorse or
- *       promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    PickResult — uniform pick payload for multimodal 3-D scenes.
- *
- *           Used by the MultimodalScene controller (mne_analyze cortical surface,
- *           mne_inspect) and the mne_align coregistration wizard to report what the user clicked
- *           on, regardless of which renderable produced the hit.
- *
- *           This header is dependency-free (Qt only) and lives in disp3D/scene/
- *           so that mne_analyze, mne_inspect, mne_coreg and mne_scan can all
- *           consume the same pick payload type.
- *
+ * Every renderable that supports picking (BrainSurface triangles,
+ * DipoleObject arrow instances, ElectrodeObject contacts,
+ * SliceObject voxels) returns a @ref PickResult so the host GUI can
+ * react with a single switch on @ref PickResult::kind regardless of
+ * which primitive was hit.
  */
 
 #ifndef DISP3DLIB_PICKRESULT_H

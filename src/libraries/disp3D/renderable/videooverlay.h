@@ -1,11 +1,20 @@
 //=============================================================================================================
 /**
- * @file     videooverlay.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @brief    VideoOverlay class declaration - generic live RGB video texture overlay.
+ * @file videooverlay.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Generic live-RGB video texture overlay rendered as a screen-aligned quad with chroma keying.
+ *
+ * VideoOverlay accepts a stream of QImage frames (e.g. from a
+ * tracking webcam or a recorded video) and uploads each frame to a
+ * QRhi RGBA texture sampled by a screen-aligned quad. The overlay
+ * is composited after the 3-D scene with alpha blending so it can
+ * be used as a picture-in-picture reference, an AR background, or
+ * a chroma-keyed avatar overlay.
  */
 
 #ifndef VIDEOOVERLAY_H

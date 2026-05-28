@@ -1,12 +1,13 @@
 //=============================================================================================================
 /**
- * @file     multimodalscene.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.3.0
- * @date     May, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @brief    MultimodalScene definition.
- *
+ * @file multimodalscene.cpp
+ * @since 2026
+ * @date  May 2026
+ * @brief Ordered scene-layer iteration, draw orchestration and picking routing across all disp3D modalities.
  */
 
 //=============================================================================================================

@@ -1,35 +1,26 @@
 //=============================================================================================================
 /**
- * @file     dataloader.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     February, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file dataloader.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Static helpers for loading FreeSurfer / MNE source-space and BEM data into the disp3D model tree.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * DataLoader is a thin facade over @ref FSLIB and @ref MNELIB readers
+ * that turns raw files (FsSurface, FsAnnotation, MNESourceSpaces,
+ * MNEBemSurface, FIFF digitizer / sensor blocks) into the in-memory
+ * objects that @ref BrainTreeModel and the @c renderable/ layer
+ * expect. It exists so GUI code can populate the 3-D scene without
+ * knowing the FreeSurfer / MNE file-format conventions (subject
+ * directory layout, hemisphere suffixes, surface-RAS vs head
+ * coordinate frames, ...).
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    DataLoader — static helpers for loading MNE data files.
- *
+ * All methods are stateless and may be called from worker threads;
+ * they return shared pointers to the produced data structures and do
+ * not touch the Qt RHI or any GUI state.
  */
 
 #ifndef DATALOADER_H

@@ -1,35 +1,27 @@
 //=============================================================================================================
 /**
- * @file     sourceestimateoverlay.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     January, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file sourceestimateoverlay.h
+ * @since 2026
+ * @date  May 2026
+ * @brief Colour-mapped source-time-course overlay that interpolates STC activation onto a cortical mesh and uploads per-vertex RGBA.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * SourceEstimateOverlay loads a pair of @c .stc files (one per
+ * hemisphere), holds the source-time-course matrix and the sparse
+ * vertex interpolation matrix produced by @ref GeometryInfo /
+ * @ref Interpolation, and for any given time index multiplies the
+ * two to obtain a per-vertex activation vector.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    SourceEstimateOverlay class declaration.
- *
+ * The vector is then mapped through a configurable colormap (Hot,
+ * Jet, MNE) with adjustable normalisation thresholds (fmin, fmid,
+ * fmax) and the resulting ABGR bytes are written into the
+ * secondary colour slot of the target @ref BrainSurface &mdash; the
+ * renderer simply switches @ref VisualizationMode to
+ * @c ModeSourceEstimate and the cortex lights up without any
+ * geometry change.
  */
 
 #ifndef SOURCEESTIMATEOVERLAY_H
