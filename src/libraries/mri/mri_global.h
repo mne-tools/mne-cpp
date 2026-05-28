@@ -6,9 +6,10 @@
 //   Gabriel B Motta <gbmotta@mgh.harvard.edu>
 //   Gabriel Motta <gabrielbenmotta@gmail.com>
 
-//=============================================================================================================
 /**
  * @file mri_global.h
+ * @since 2026
+ * @date  May 2026
  *
  * @brief Export/import macros and build-info accessors for MRILIB.
  *

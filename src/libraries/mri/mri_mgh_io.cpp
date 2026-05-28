@@ -2,9 +2,10 @@
 // Copyright (c) 2026
 //   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
-//=============================================================================================================
 /**
  * @file mri_mgh_io.cpp
+ * @since 2026
+ * @date  May 2026
  *
  * @brief Implementation of @ref MRILIB::MriMghIO: byte-exact MGH/MGZ parser and zlib-streamed MGZ decoder.
  *

@@ -2,9 +2,10 @@
 // Copyright (c) 2026
 //   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
-//=============================================================================================================
 /**
  * @file mri_types.h
+ * @since 2026
+ * @date  May 2026
  *
  * @brief Numeric type codes, layout constants, and sentinel values shared by every MRI reader.
  *

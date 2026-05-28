@@ -5,9 +5,10 @@
 //   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
 //   Gabriel Motta <gabrielbenmotta@gmail.com>
 
-//=============================================================================================================
 /**
  * @file mri_slicer.h
+ * @since 2026
+ * @date  May 2026
  *
  * @brief Orthogonal-plane resampler that turns a 3D @ref MriVolData into the 2D textures consumed by the slice viewer.
  *

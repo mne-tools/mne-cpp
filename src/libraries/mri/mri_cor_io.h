@@ -4,9 +4,10 @@
 //   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
 //   Gabriel Motta <gabrielbenmotta@gmail.com>
 
-//=============================================================================================================
 /**
  * @file mri_cor_io.h
+ * @since 2026
+ * @date  May 2026
  *
  * @brief Reader for the legacy FreeSurfer COR-NNN per-slice volume layout (256 unsigned-char coronal slices on a 1 mm isotropic grid).
  *

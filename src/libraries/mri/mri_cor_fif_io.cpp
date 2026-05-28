@@ -2,9 +2,10 @@
 // Copyright (c) 2026
 //   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
-//=============================================================================================================
 /**
  * @file mri_cor_fif_io.cpp
+ * @since 2026
+ * @date  May 2026
  *
  * @brief Implementation of @ref MRILIB::MriCorFifIO: block-and-tag serialiser that emits a FIFF MRI set from an in-memory @ref MriVolData.
  *

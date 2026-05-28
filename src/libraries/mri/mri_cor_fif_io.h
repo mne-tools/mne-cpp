@@ -4,9 +4,10 @@
 //   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
 //   Gabriel Motta <gabrielbenmotta@gmail.com>
 
-//=============================================================================================================
 /**
  * @file mri_cor_fif_io.h
+ * @since 2026
+ * @date  May 2026
  *
  * @brief Writer for the COR.fif FIFF representation of an MRI volume (Neuromag/MNE convention used by all mne-c source-space tooling).
  *

@@ -4,9 +4,10 @@
 //   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
 //   Gabriel Motta <gabrielbenmotta@gmail.com>
 
-//=============================================================================================================
 /**
  * @file mri_global.cpp
+ * @since 2026
+ * @date  May 2026
  *
  * @brief Out-of-line definitions of the MRILIB build-info accessors declared in @ref mri_global.h.
  *
