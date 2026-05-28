@@ -48,6 +48,11 @@ LOG = logging.getLogger("doxy2mdx")
 
 _REGISTRY: Optional[dict] = None
 _MODULES: Dict[str, dict] = {}
+# Files (qualified class names / module names) for which no @author /
+# SPDX-style author line could be located.  Every source file in the
+# repository is required to carry at least one author, so we abort
+# generation if this list is non-empty at the end of the run.
+_FILES_WITHOUT_AUTHOR: List[str] = []
 _CLASS_INDEX: Dict[str, List[dict]] = {}   # short-name -> list of entries
 
 # Namespaces we never document, even if they appear in the XML.
@@ -595,14 +600,27 @@ def generate_class_mdx(compounddef,
     detail_el = compounddef.find("detaileddescription")
     body_text = extract_body_text(detail_el) if detail_el is not None else ""
 
-    # Resolve source path for SPDX scraping
+    # Resolve source path for SPDX scraping.  Doxygen is configured
+    # with ``INPUT = src/libraries`` (relative to ``doc/``), so the
+    # ``<location file=...>`` values are relative to ``src/libraries``,
+    # e.g. ``fiff/fiff_id.h``.
     loc_el = compounddef.find("location")
     loc_file = loc_el.get("file", "") if loc_el is not None else ""
-    src_path = (repo_root / loc_file) if loc_file else None
+    src_path: Optional[Path] = None
+    if loc_file:
+        candidate = Path(loc_file)
+        if candidate.is_absolute():
+            src_path = candidate
+        else:
+            src_path = repo_root / "src" / "libraries" / loc_file
     authors = read_spdx_authors(src_path) if src_path else []
     if not authors:
         for a in extract_doxygen_authors(detail_el):
             authors.append((a, ""))
+    if not authors:
+        _FILES_WITHOUT_AUTHOR.append(
+            f"{compound_name}  ({loc_file or 'unknown location'})"
+        )
 
     # Module info & output folder
     module_key = reg_entry.get("module", "core")
@@ -633,14 +651,14 @@ def generate_class_mdx(compounddef,
     lines.append(f"# {short_name}")
     lines.append("")
 
-    # Prominent namespace / library / header banner so every page
-    # tells the reader where the symbol lives without scrolling.
+    # Prominent namespace / library banner so every page tells the
+    # reader where the symbol lives without scrolling.  The header path
+    # is shown by the ``#include`` line a few rows below, so we don't
+    # duplicate it here.
     ns = mod.get("namespace") or compound_name.split("::", 1)[0]
     mod_label = mod.get("sidebar_label", module_key)
-    header_rel = loc_file or f"{include_dir}/{slug.replace('-', '_')}.h"
     lines.append(
-        f"**Namespace:** `{ns}` &nbsp;·&nbsp; **Library:** {mod_label} "
-        f"&nbsp;·&nbsp; **Header:** `{header_rel}`"
+        f"**Namespace:** `{ns}` &nbsp;·&nbsp; **Library:** {mod_label}"
     )
     lines.append("")
 
@@ -730,7 +748,8 @@ def generate_class_mdx(compounddef,
     # --- Example (sourced from src/examples/<ex_id>/main.cpp) ---
     _render_example_section(reg_entry, repo_root, lines)
 
-    # --- Authors footer (always rendered for consistency) ---
+    # --- Authors footer (every source file must list its authors;
+    #     the generator aborts at the end if any were missed). ---
     lines.append("## Authors of this file")
     lines.append("")
     if authors:
@@ -739,8 +758,6 @@ def generate_class_mdx(compounddef,
                 lines.append(f"- {name} &lt;{email}&gt;")
             else:
                 lines.append(f"- {name}")
-    else:
-        lines.append("_No authors recorded in the source file._")
     lines.append("")
 
     content = "\n".join(lines)
@@ -880,6 +897,8 @@ def generate_module_mdx(xml_dir: Path,
     if not authors:
         for a in extract_doxygen_authors(detail_el):
             authors.append((a, ""))
+    if not authors:
+        _FILES_WITHOUT_AUTHOR.append(f"{short_name}  ({header_rel})")
 
     module_key = reg_entry.get("module", "core")
     mod = _MODULES.get(module_key, {})
@@ -911,8 +930,7 @@ def generate_module_mdx(xml_dir: Path,
     ns = mod.get("namespace") or module_key.upper() + "LIB"
     mod_label = mod.get("sidebar_label", module_key)
     lines.append(
-        f"**Namespace:** `{ns}` &nbsp;·&nbsp; **Library:** {mod_label} "
-        f"&nbsp;·&nbsp; **Header:** `{header_rel}`"
+        f"**Namespace:** `{ns}` &nbsp;·&nbsp; **Library:** {mod_label}"
     )
     lines.append("")
     lines.append(":::info[Module]")
@@ -963,7 +981,7 @@ def generate_module_mdx(xml_dir: Path,
     # --- Example (sourced from src/examples/<ex_id>/main.cpp) ---
     _render_example_section(reg_entry, repo_root, lines)
 
-    # --- Authors footer (always rendered for consistency) ---
+    # --- Authors footer (every source file must list its authors). ---
     lines.append("## Authors of this file")
     lines.append("")
     if authors:
@@ -972,8 +990,6 @@ def generate_module_mdx(xml_dir: Path,
                 lines.append(f"- {name} &lt;{email}&gt;")
             else:
                 lines.append(f"- {name}")
-    else:
-        lines.append("_No authors recorded in the source file._")
     lines.append("")
 
     content = "\n".join(lines)
@@ -996,7 +1012,91 @@ def _short_module_label(mod: dict, fallback: str) -> str:
     return mod.get("sidebar_label", fallback)
 
 
-def generate_sidebar_fragment(sidebar_out: Path, out_dir: Path) -> None:
+# Mapping from module key -> source file under doc/website/docs/development/
+# that documents that library at a conceptual level (architecture diagram,
+# class inventory, MNE-Python / MNE-C cross-reference table).  When present,
+# the contents of that file are embedded as the library's API landing page
+# (``docs/api/<module>/index.mdx``) and the sidebar category links to it.
+_LIBRARY_OVERVIEW_DEV_FILES: Dict[str, str] = {
+    "fiff": "api-fiff.mdx",
+    "mne": "api-mne.mdx",
+    "fwd": "api-fwd.mdx",
+    "inv": "api-inverse.mdx",
+    "dsp": "api-dsp.mdx",
+    "conn": "api-connectivity.mdx",
+    "ml": "api-ml.mdx",
+    "sts": "api-sts.mdx",
+    "mna": "api-mna.mdx",
+    "disp3D": "api-disp3d.mdx",
+}
+
+
+def generate_library_overview(module_key: str,
+                              mod: dict,
+                              out_dir: Path,
+                              repo_root: Path) -> Optional[Path]:
+    """Write ``docs/api/<module>/index.mdx`` for *module_key* by
+    embedding the matching ``docs/development/api-*.mdx`` page when
+    available.  Returns the written path, or ``None`` when no overview
+    source exists for this library."""
+    dev_name = _LIBRARY_OVERVIEW_DEV_FILES.get(module_key)
+    label = mod.get("sidebar_label", module_key)
+    namespace = mod.get("namespace") or module_key.upper() + "LIB"
+    dir_slug = mod.get("dir_slug", module_key)
+    out_path = out_dir / dir_slug
+    out_path.mkdir(parents=True, exist_ok=True)
+    out_file = out_path / "index.mdx"
+
+    front = [
+        "---",
+        "id: index",
+        f'title: "{label}"',
+        f"sidebar_label: Overview",
+        "sidebar_position: 0",
+        "---",
+        "",
+        f"# {label}",
+        "",
+        f"**Namespace:** `{namespace}` &nbsp;·&nbsp; **Source:** "
+        f"`src/libraries/{mod.get('include', module_key)}`",
+        "",
+    ]
+
+    body: str = ""
+    if dev_name:
+        dev_path = repo_root / "doc" / "website" / "docs" / "development" / dev_name
+        if dev_path.exists():
+            raw = dev_path.read_text(encoding="utf-8")
+            # Strip the dev-page frontmatter and the leading H1 (we
+            # render our own title above).
+            if raw.startswith("---\n"):
+                end = raw.find("\n---", 4)
+                if end != -1:
+                    raw = raw[end + 4:].lstrip("\n")
+            raw = re.sub(r"^#\s+[^\n]+\n+", "", raw, count=1)
+            body = raw.rstrip() + "\n"
+        else:
+            LOG.warning("library overview source missing: %s", dev_path)
+
+    if not body:
+        body = (
+            f"_This library landing page is generated automatically._\n\n"
+            f"Use the sidebar to browse every public class in **{label}** "
+            f"(`{namespace}`).  A high-level architectural description for "
+            f"this library has not been written yet; contributions are "
+            f"welcome under "
+            f"[`doc/website/docs/development/`]"
+            f"(https://github.com/mne-tools/mne-cpp/tree/staging/doc/website/docs/development).\n"
+        )
+
+    out_file.write_text("\n".join(front) + body, encoding="utf-8")
+    LOG.info("generated library overview %s", out_file)
+    return out_file
+
+
+def generate_sidebar_fragment(sidebar_out: Path,
+                              out_dir: Path,
+                              repo_root: Path) -> None:
     groups: Dict[str, List[dict]] = defaultdict(list)
     for entry in _REGISTRY["classes"]:
         if not entry.get("documented", False):
@@ -1016,6 +1116,9 @@ def generate_sidebar_fragment(sidebar_out: Path, out_dir: Path) -> None:
     for mod_name, mod in mod_items:
         items = []
         dir_slug = mod.get('dir_slug', mod_name)
+        # Generate the per-library landing page first so it can be
+        # added as the first item / category link.
+        overview_path = generate_library_overview(mod_name, mod, out_dir, repo_root)
         for entry in groups[mod_name]:
             slug = class_slug(entry["name"])
             mdx_path = out_dir / dir_slug / f"{slug}.mdx"
@@ -1025,17 +1128,27 @@ def generate_sidebar_fragment(sidebar_out: Path, out_dir: Path) -> None:
             items.append(f"        'api/{dir_slug}/{slug}'")
         if not items:
             continue
-        categories.append(
-            "    {\n"
-            "      type: 'category',\n"
-            f"      label: {json.dumps(_short_module_label(mod, mod_name), ensure_ascii=False)},\n"
-            "      collapsible: true,\n"
-            "      collapsed: true,\n"
-            "      items: [\n"
-            + ",\n".join(items) + "\n"
-            "      ],\n"
-            "    }"
+        label_json = json.dumps(_short_module_label(mod, mod_name),
+                                ensure_ascii=False)
+        overview_id = (
+            f"api/{dir_slug}/index" if overview_path is not None else None
         )
+        category_lines = [
+            "    {",
+            "      type: 'category',",
+            f"      label: {label_json},",
+            "      collapsible: true,",
+            "      collapsed: true,",
+        ]
+        if overview_id:
+            category_lines.append(
+                f"      link: {{type: 'doc', id: '{overview_id}'}},"
+            )
+        category_lines.append("      items: [")
+        category_lines.append(",\n".join(items))
+        category_lines.append("      ],")
+        category_lines.append("    }")
+        categories.append("\n".join(category_lines))
 
     if missing_mdx:
         raise SystemExit(
@@ -1227,7 +1340,15 @@ def main(argv: Optional[List[str]] = None) -> int:
             sidebar_out = args.sidebar_out
         else:
             sidebar_out = args.out_dir.resolve().parent.parent / "sidebars.api.generated.ts"
-        generate_sidebar_fragment(sidebar_out, args.out_dir)
+        generate_sidebar_fragment(sidebar_out, args.out_dir, repo_root)
+
+    if _FILES_WITHOUT_AUTHOR:
+        raise SystemExit(
+            "ERROR: every source file must declare at least one author "
+            "(SPDX-style ``* Name <email>`` line or an @author Doxygen "
+            f"tag).  {len(_FILES_WITHOUT_AUTHOR)} file(s) had none:\n  - "
+            + "\n  - ".join(sorted(_FILES_WITHOUT_AUTHOR))
+        )
 
     if args.strict and warnings:
         return 1

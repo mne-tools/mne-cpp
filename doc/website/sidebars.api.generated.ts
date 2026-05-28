@@ -10,6 +10,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       label: "FIFF Library",
       collapsible: true,
       collapsed: true,
+      link: {type: 'doc', id: 'api/fiff/index'},
       items: [
         'api/fiff/fiff-stream',
         'api/fiff/fiff-raw-data',
@@ -48,6 +49,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       label: "MNE Library",
       collapsible: true,
       collapsed: true,
+      link: {type: 'doc', id: 'api/mne/index'},
       items: [
         'api/mne/mne-forward-solution',
         'api/mne/mne-inverse-operator',
@@ -113,6 +115,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       label: "Forward Library",
       collapsible: true,
       collapsed: true,
+      link: {type: 'doc', id: 'api/fwd/index'},
       items: [
         'api/fwd/compute-fwd',
         'api/fwd/fwd-bem-model',
@@ -134,6 +137,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       label: "Inverse Library",
       collapsible: true,
       collapsed: true,
+      link: {type: 'doc', id: 'api/inv/index'},
       items: [
         'api/inv/inv-minimum-norm',
         'api/inv/inv-cmne',
@@ -161,6 +165,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       label: "DSP Library",
       collapsible: true,
       collapsed: true,
+      link: {type: 'doc', id: 'api/dsp/index'},
       items: [
         'api/dsp/filter-kernel',
         'api/dsp/fir-filter',
@@ -209,6 +214,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       label: "Connectivity Library",
       collapsible: true,
       collapsed: true,
+      link: {type: 'doc', id: 'api/conn/index'},
       items: [
         'api/conn/connectivity',
         'api/conn/coherence',
@@ -237,6 +243,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       label: "Decoding Library",
       collapsible: true,
       collapsed: true,
+      link: {type: 'doc', id: 'api/decoding/index'},
       items: [
         'api/decoding/decoding-csp',
         'api/decoding/decoding-spoc',
@@ -249,6 +256,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       label: "Machine Learning Library",
       collapsible: true,
       collapsed: true,
+      link: {type: 'doc', id: 'api/ml/index'},
       items: [
         'api/ml/ml-tensor',
         'api/ml/ml-model',
@@ -261,6 +269,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       label: "Statistics Library",
       collapsible: true,
       collapsed: true,
+      link: {type: 'doc', id: 'api/sts/index'},
       items: [
         'api/sts/sts-cov-estimators',
         'api/sts/stats-cluster',
@@ -276,6 +285,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       label: "FreeSurfer Library",
       collapsible: true,
       collapsed: true,
+      link: {type: 'doc', id: 'api/fs/index'},
       items: [
         'api/fs/fs-surface',
         'api/fs/fs-annotation',
@@ -292,6 +302,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       label: "Math Library",
       collapsible: true,
       collapsed: true,
+      link: {type: 'doc', id: 'api/math/index'},
       items: [
         'api/math/k-means',
         'api/math/linalg',
@@ -305,6 +316,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       label: "MRI Library",
       collapsible: true,
       collapsed: true,
+      link: {type: 'doc', id: 'api/mri/index'},
       items: [
         'api/mri/mri-cor-fif-io',
         'api/mri/mri-cor-io',
@@ -319,6 +331,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       label: "BIDS Library",
       collapsible: true,
       collapsed: true,
+      link: {type: 'doc', id: 'api/bids/index'},
       items: [
         'api/bids/bids-path',
         'api/bids/bids-raw-data',
@@ -333,6 +346,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       label: "Utilities Library",
       collapsible: true,
       collapsed: true,
+      link: {type: 'doc', id: 'api/utils/index'},
       items: [
         'api/utils/standard-montage',
         'api/utils/report',
@@ -371,6 +385,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       label: "LSL Library",
       collapsible: true,
       collapsed: true,
+      link: {type: 'doc', id: 'api/lsl/index'},
       items: [
         'api/lsl/stream_info',
         'api/lsl/stream_inlet',
@@ -382,6 +397,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       label: "MNA Library (Modular Architecture)",
       collapsible: true,
       collapsed: true,
+      link: {type: 'doc', id: 'api/mna/index'},
       items: [
         'api/mna/mna-graph',
         'api/mna/mna-graph-executor',
@@ -398,6 +414,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       label: "Display Library",
       collapsible: true,
       collapsed: true,
+      link: {type: 'doc', id: 'api/disp/index'},
       items: [
         'api/disp/abstract-view',
         'api/disp/apply-to-view',
@@ -472,6 +489,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       label: "3D Display Library",
       collapsible: true,
       collapsed: true,
+      link: {type: 'doc', id: 'api/disp3-d/index'},
       items: [
         'api/disp3-d/electrode-object',
         'api/disp3-d/geometry-info',
