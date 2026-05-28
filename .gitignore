@@ -115,3 +115,4 @@ scripts/ml/training/cmne/build/
 
 # Tool runtime output
 src/tools/inverse/mne_compute_cmne/output/
+/xml_out/
