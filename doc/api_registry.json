@@ -10,7 +10,7 @@
   "modules": {
     "fiff": {
       "dir": "src/libraries/fiff",
-      "sidebar_label": "FIFFLIB — FIFF I/O",
+      "sidebar_label": "FIFFLIB \u2014 FIFF I/O",
       "origin": "mne-c",
       "include": "fiff",
       "dir_slug": "fiff",
@@ -18,7 +18,7 @@
     },
     "mne": {
       "dir": "src/libraries/mne",
-      "sidebar_label": "MNELIB — Core Data Structures",
+      "sidebar_label": "MNELIB \u2014 Core Data Structures",
       "origin": "mne-c",
       "include": "mne",
       "dir_slug": "mne",
@@ -26,7 +26,7 @@
     },
     "fwd": {
       "dir": "src/libraries/fwd",
-      "sidebar_label": "FWDLIB — Forward Modeling",
+      "sidebar_label": "FWDLIB \u2014 Forward Modeling",
       "origin": "mne-c",
       "include": "fwd",
       "dir_slug": "fwd",
@@ -34,7 +34,7 @@
     },
     "inv": {
       "dir": "src/libraries/inv",
-      "sidebar_label": "INVLIB — Inverse Solutions",
+      "sidebar_label": "INVLIB \u2014 Inverse Solutions",
       "origin": "mne-c + mne-python",
       "include": "inv",
       "dir_slug": "inv",
@@ -42,7 +42,7 @@
     },
     "dsp": {
       "dir": "src/libraries/dsp",
-      "sidebar_label": "DSPLIB — Signal Processing",
+      "sidebar_label": "DSPLIB \u2014 Signal Processing",
       "origin": "mne-python + custom",
       "include": "dsp",
       "dir_slug": "dsp",
@@ -50,7 +50,7 @@
     },
     "conn": {
       "dir": "src/libraries/conn",
-      "sidebar_label": "CONNLIB — Connectivity",
+      "sidebar_label": "CONNLIB \u2014 Connectivity",
       "origin": "mne-python",
       "include": "conn",
       "dir_slug": "conn",
@@ -58,7 +58,7 @@
     },
     "decoding": {
       "dir": "src/libraries/decoding",
-      "sidebar_label": "DECODINGLIB — Signal Decoding",
+      "sidebar_label": "DECODINGLIB \u2014 Signal Decoding",
       "origin": "mne-python",
       "include": "decoding",
       "dir_slug": "decoding",
@@ -66,7 +66,7 @@
     },
     "ml": {
       "dir": "src/libraries/ml",
-      "sidebar_label": "MLLIB — ML Infrastructure",
+      "sidebar_label": "MLLIB \u2014 ML Infrastructure",
       "origin": "custom",
       "include": "ml",
       "dir_slug": "ml",
@@ -74,7 +74,7 @@
     },
     "sts": {
       "dir": "src/libraries/sts",
-      "sidebar_label": "STSLIB — Statistics",
+      "sidebar_label": "STSLIB \u2014 Statistics",
       "origin": "mne-python (scipy/sklearn)",
       "include": "sts",
       "dir_slug": "sts",
@@ -82,7 +82,7 @@
     },
     "fs": {
       "dir": "src/libraries/fs",
-      "sidebar_label": "FSLIB — FreeSurfer",
+      "sidebar_label": "FSLIB \u2014 FreeSurfer",
       "origin": "mne-c + mne-python",
       "include": "fs",
       "dir_slug": "fs",
@@ -90,7 +90,7 @@
     },
     "math": {
       "dir": "src/libraries/math",
-      "sidebar_label": "MATHLIB — Mathematics",
+      "sidebar_label": "MATHLIB \u2014 Mathematics",
       "origin": "mne-c + scipy",
       "include": "math",
       "dir_slug": "math",
@@ -98,7 +98,7 @@
     },
     "mri": {
       "dir": "src/libraries/mri",
-      "sidebar_label": "MRILIB — MRI / Anatomy",
+      "sidebar_label": "MRILIB \u2014 MRI / Anatomy",
       "origin": "mne-c",
       "include": "mri",
       "dir_slug": "mri",
@@ -106,7 +106,7 @@
     },
     "bids": {
       "dir": "src/libraries/bids",
-      "sidebar_label": "BIDSLIB — BIDS Format",
+      "sidebar_label": "BIDSLIB \u2014 BIDS Format",
       "origin": "mne-bids",
       "include": "bids",
       "dir_slug": "bids",
@@ -114,7 +114,7 @@
     },
     "utils": {
       "dir": "src/libraries/utils",
-      "sidebar_label": "UTILSLIB — Utilities",
+      "sidebar_label": "UTILSLIB \u2014 Utilities",
       "origin": "mne-c + custom",
       "include": "utils",
       "dir_slug": "utils",
@@ -122,7 +122,7 @@
     },
     "com": {
       "dir": "src/libraries/com",
-      "sidebar_label": "COMLIB — Real-Time Communication",
+      "sidebar_label": "COMLIB \u2014 Real-Time Communication",
       "origin": "custom",
       "include": "com",
       "dir_slug": "com",
@@ -130,7 +130,7 @@
     },
     "lsl": {
       "dir": "src/libraries/lsl",
-      "sidebar_label": "LSLLIB — Lab Streaming Layer",
+      "sidebar_label": "LSLLIB \u2014 Lab Streaming Layer",
       "origin": "custom",
       "include": "lsl",
       "dir_slug": "lsl",
@@ -138,7 +138,7 @@
     },
     "mna": {
       "dir": "src/libraries/mna",
-      "sidebar_label": "MNALIB — Modular Architecture",
+      "sidebar_label": "MNALIB \u2014 Modular Architecture",
       "origin": "custom",
       "include": "mna",
       "dir_slug": "mna",
@@ -146,7 +146,7 @@
     },
     "disp": {
       "dir": "src/libraries/disp",
-      "sidebar_label": "DISPLIB — 2D Visualization",
+      "sidebar_label": "DISPLIB \u2014 2D Visualization",
       "origin": "custom",
       "include": "disp",
       "dir_slug": "disp",
@@ -154,7 +154,7 @@
     },
     "disp3D": {
       "dir": "src/libraries/disp3D",
-      "sidebar_label": "DISP3DLIB — 3D Visualization",
+      "sidebar_label": "DISP3DLIB \u2014 3D Visualization",
       "origin": "custom",
       "include": "disp3D",
       "dir_slug": "disp3-d",
@@ -340,7 +340,8 @@
       "sidebar_position": 10,
       "guide": null,
       "python_equiv": "mne.events_from_annotations",
-      "python_url": null
+      "python_url": null,
+      "kind": "module"
     },
     {
       "name": "MNEForwardSolution",
@@ -430,7 +431,8 @@
       "sidebar_position": 5,
       "guide": null,
       "python_equiv": "mne.coreg.Coregistration",
-      "python_url": null
+      "python_url": null,
+      "kind": "module"
     },
     {
       "name": "ComputeFwd",
@@ -516,7 +518,7 @@
       "example": "ex_clustered_inverse_mne",
       "status": "done",
       "skigen_candidate": false,
-      "notes": "CMNE (Dinh et al. 2021) — MNE-CPP original; deep-learning-enhanced inverse",
+      "notes": "CMNE (Dinh et al. 2021) \u2014 MNE-CPP original; deep-learning-enhanced inverse",
       "documented": true,
       "sidebar_position": 2,
       "guide": null,
@@ -810,7 +812,8 @@
       "sidebar_position": 18,
       "guide": null,
       "python_equiv": "mne.minimum_norm.apply_inverse_epochs / apply_inverse_raw / apply_inverse_cov",
-      "python_url": null
+      "python_url": null,
+      "kind": "module"
     },
     {
       "name": "SourceMorph",
@@ -973,7 +976,8 @@
       "sidebar_position": 8,
       "guide": null,
       "python_equiv": "mne.preprocessing.find_bad_channels_maxwell",
-      "python_url": null
+      "python_url": null,
+      "kind": "module"
     },
     {
       "name": "BadChannelsLof",
@@ -993,7 +997,8 @@
       "sidebar_position": 9,
       "guide": null,
       "python_equiv": "mne.preprocessing._lof",
-      "python_url": null
+      "python_url": null,
+      "kind": "module"
     },
     {
       "name": "EogRegression",
@@ -1029,7 +1034,8 @@
       "sidebar_position": 11,
       "guide": null,
       "python_equiv": "mne.set_eeg_reference",
-      "python_url": null
+      "python_url": null,
+      "kind": "module"
     },
     {
       "name": "StimArtifact",
@@ -1047,7 +1053,8 @@
       "sidebar_position": 12,
       "guide": null,
       "python_equiv": "mne.preprocessing.fix_stim_artifact",
-      "python_url": null
+      "python_url": null,
+      "kind": "module"
     },
     {
       "name": "FilterChpi",
@@ -1065,7 +1072,8 @@
       "sidebar_position": 13,
       "guide": null,
       "python_equiv": "mne.chpi.filter_chpi",
-      "python_url": null
+      "python_url": null,
+      "kind": "module"
     },
     {
       "name": "AnnotateArtifact",
@@ -1083,7 +1091,8 @@
       "sidebar_position": 14,
       "guide": null,
       "python_equiv": "mne.preprocessing.annotate_muscle_zscore / annotate_amplitude",
-      "python_url": null
+      "python_url": null,
+      "kind": "module"
     },
     {
       "name": "BridgedElectrodes",
@@ -1101,7 +1110,8 @@
       "sidebar_position": 15,
       "guide": null,
       "python_equiv": "mne.preprocessing.compute_bridged_electrodes",
-      "python_url": null
+      "python_url": null,
+      "kind": "module"
     },
     {
       "name": "FineCalibration",
@@ -1173,7 +1183,8 @@
       "sidebar_position": 19,
       "guide": null,
       "python_equiv": "mne.preprocessing.peak_finder",
-      "python_url": null
+      "python_url": null,
+      "kind": "module"
     },
     {
       "name": "WelchPsd",
@@ -1295,12 +1306,13 @@
       "example": null,
       "status": "done",
       "skigen_candidate": false,
-      "notes": "SPHARA — MNE-CPP original; surface harmonics for MEG",
+      "notes": "SPHARA \u2014 MNE-CPP original; surface harmonics for MEG",
       "documented": true,
       "sidebar_position": 26,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "kind": "module"
     },
     {
       "name": "ConnectivityAec",
@@ -1336,7 +1348,8 @@
       "sidebar_position": 28,
       "guide": null,
       "python_equiv": "mne.simulation.simulate_stc / simulate_evoked",
-      "python_url": null
+      "python_url": null,
+      "kind": "module"
     },
     {
       "name": "Connectivity",
@@ -1533,7 +1546,7 @@
       "example": null,
       "status": "done",
       "skigen_candidate": false,
-      "notes": "ICA label classification — neuroscience-specific, stays in decoding",
+      "notes": "ICA label classification \u2014 neuroscience-specific, stays in decoding",
       "documented": true,
       "sidebar_position": 4,
       "guide": null,
@@ -1649,7 +1662,7 @@
       "status": "done",
       "skigen_candidate": true,
       "skigen_target": "Skigen::Covariance (new module needed)",
-      "notes": "Ledoit-Wolf, OAS shrinkage, PCA cov, Factor Analysis, auto-select via cross-validation — all reimplemented from sklearn; core algorithms should move to skigen",
+      "notes": "Ledoit-Wolf, OAS shrinkage, PCA cov, Factor Analysis, auto-select via cross-validation \u2014 all reimplemented from sklearn; core algorithms should move to skigen",
       "documented": true,
       "sidebar_position": 1,
       "guide": null,
@@ -1668,7 +1681,7 @@
       "example": null,
       "status": "done",
       "skigen_candidate": false,
-      "notes": "Cluster permutation testing — neuroscience-specific statistical method",
+      "notes": "Cluster permutation testing \u2014 neuroscience-specific statistical method",
       "documented": true,
       "sidebar_position": 2,
       "guide": null,
@@ -1838,7 +1851,7 @@
       "python_url": null
     },
     {
-      "name": "BidsPath",
+      "name": "BIDSPath",
       "module": "bids",
       "header": "bids/bids_path.h",
       "origin": "mne-bids",

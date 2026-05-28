@@ -480,6 +480,43 @@ def _render_method(func, lines: List[str]) -> None:
 # MDX generation per class
 # ---------------------------------------------------------------------------
 
+def _escape_mdx_bare_lt(content: str) -> str:
+    """HTML-escape every ``<`` / ``>`` and backslash-escape every
+    ``{`` / ``}`` that appears outside fenced code blocks and inline code
+    spans.  We never emit raw JSX/HTML tags or MDX expressions from
+    Doxygen content, so this prevents MDX from misreading C++ snippets
+    such as ``std::pair<X, Y>`` or prose like ``{0 -> lh, 1 -> rh}`` as
+    JSX/JS."""
+    out: List[str] = []
+    i, n = 0, len(content)
+    while i < n:
+        if content.startswith("```", i):
+            end = content.find("```", i + 3)
+            end = n if end == -1 else end + 3
+            out.append(content[i:end])
+            i = end
+            continue
+        if content[i] == "`":
+            end = content.find("`", i + 1)
+            end = n if end == -1 else end + 1
+            out.append(content[i:end])
+            i = end
+            continue
+        ch = content[i]
+        if ch == "<":
+            out.append("&lt;")
+        elif ch == ">":
+            out.append("&gt;")
+        elif ch == "{":
+            out.append("\\{")
+        elif ch == "}":
+            out.append("\\}")
+        else:
+            out.append(ch)
+        i += 1
+    return "".join(out)
+
+
 def generate_class_mdx(compounddef,
                        compound_name: str,
                        out_dir: Path,
@@ -624,6 +661,227 @@ def generate_class_mdx(compounddef,
 
     content = "\n".join(lines)
     content = re.sub(r"\n{4,}", "\n\n\n", content)
+    content = _escape_mdx_bare_lt(content)
+    out_file.write_text(content, encoding="utf-8")
+    LOG.info("generated %s", out_file)
+    return out_file
+
+
+# ---------------------------------------------------------------------------
+# Module (header-as-namespace) MDX generation
+# ---------------------------------------------------------------------------
+
+def _render_free_function(func, lines: List[str]) -> None:
+    """Same as _render_method but uses a fully-qualified call signature."""
+    name = func.findtext("name", "")
+    param_names = [p.findtext("declname", "") for p in func.findall("param")]
+    param_names = [p for p in param_names if p]
+    heading = f"{name}({', '.join(param_names)})"
+    lines.append(f"### {heading}")
+    lines.append("")
+
+    ret_type = beautify_type(text_of(func.find("type")).strip())
+    if ret_type:
+        param_types = [beautify_type(text_of(p.find("type")).strip())
+                       for p in func.findall("param")]
+        zipped = ", ".join(
+            f"{pt} {pn}".strip() for pt, pn in zip(param_types, param_names)
+        )
+        lines.append("```cpp")
+        lines.append(f"{ret_type} {name}({zipped});")
+        lines.append("```")
+        lines.append("")
+
+    brief = text_of(func.find("briefdescription")).strip()
+    detail_el = func.find("detaileddescription")
+    body = extract_body_text(detail_el)
+    if brief:
+        lines.append(brief)
+        lines.append("")
+    if body:
+        lines.append(body)
+        lines.append("")
+
+    xml_params: Dict[str, str] = {}
+    for p in func.findall("param"):
+        pname = p.findtext("declname", "")
+        ptype = text_of(p.find("type")).strip()
+        xml_params[pname] = ptype
+
+    params = extract_params(detail_el)
+    if params:
+        lines.append("**Parameters:**")
+        lines.append("")
+        for pname, pdesc in params:
+            display_type = beautify_type(xml_params.get(pname, ""))
+            if display_type:
+                lines.append(f"- **{pname}** : *{display_type}*")
+            else:
+                lines.append(f"- **{pname}**")
+            if pdesc:
+                lines.append(f"  {pdesc}")
+            lines.append("")
+
+    ret = extract_return(detail_el)
+    if ret:
+        lines.append("**Returns:**")
+        lines.append("")
+        if ret_type:
+            lines.append(f"- *{ret_type}* — {ret}")
+        else:
+            lines.append(f"- {ret}")
+        lines.append("")
+
+    for note in extract_notes(detail_el):
+        lines.append(f":::note\n{note}\n:::")
+        lines.append("")
+
+    lines.append("---")
+    lines.append("")
+
+
+def _collect_module_functions(xml_dir: Path,
+                              file_compounddef,
+                              header_rel: str) -> List:
+    """Walk every innernamespace referenced by *file_compounddef* and
+    return the public free functions whose ``<location file>`` matches
+    *header_rel* (e.g. ``dsp/sphara.h``)."""
+    out: List = []
+    seen_ids = set()
+    for ns_ref in file_compounddef.findall("innernamespace"):
+        refid = ns_ref.get("refid")
+        if not refid:
+            continue
+        ns_xml = xml_dir / f"{refid}.xml"
+        if not ns_xml.exists():
+            continue
+        ns_tree = ET.parse(ns_xml)
+        ns_def = ns_tree.find(".//compounddef")
+        if ns_def is None:
+            continue
+        ns_name = ns_def.findtext("compoundname", "")
+        if ns_name.split("::")[0] in _EXCLUDED_NAMESPACES:
+            continue
+        for sec in ns_def.findall("sectiondef"):
+            for m in sec.findall("memberdef[@kind='function']"):
+                if m.get("prot") != "public":
+                    continue
+                loc = m.find("location")
+                if loc is None:
+                    continue
+                if loc.get("file", "") != header_rel:
+                    continue
+                mid = m.get("id")
+                if mid in seen_ids:
+                    continue
+                seen_ids.add(mid)
+                out.append(m)
+    return out
+
+
+def generate_module_mdx(xml_dir: Path,
+                        file_compounddef,
+                        reg_entry: dict,
+                        out_dir: Path,
+                        repo_root: Path) -> Path:
+    """Render a header-level MDX page for a free-function module."""
+    short_name = reg_entry["name"]
+    header_rel = reg_entry["header"]
+    brief = text_of(file_compounddef.find("briefdescription")).strip()
+    detail_el = file_compounddef.find("detaileddescription")
+    body_text = extract_body_text(detail_el) if detail_el is not None else ""
+
+    src_path = repo_root / "src" / "libraries" / header_rel
+    authors = read_spdx_authors(src_path)
+    if not authors:
+        for a in extract_doxygen_authors(detail_el):
+            authors.append((a, ""))
+
+    module_key = reg_entry.get("module", "core")
+    mod = _MODULES.get(module_key, {})
+    dir_slug = mod.get("dir_slug", module_key)
+    out_path = out_dir / dir_slug
+    out_path.mkdir(parents=True, exist_ok=True)
+    slug = class_slug(short_name)
+    out_file = out_path / f"{slug}.mdx"
+
+    sidebar_position = reg_entry.get("sidebar_position")
+    guide = reg_entry.get("guide")
+    python_equiv = reg_entry.get("python_equiv")
+    python_url = reg_entry.get("python_url")
+    include_dir = mod.get("include", module_key)
+
+    funcs = _collect_module_functions(xml_dir, file_compounddef, header_rel)
+
+    lines: List[str] = []
+    lines.append("---")
+    lines.append(f"id: {slug}")
+    lines.append(f'title: "{short_name}"')
+    lines.append(f"sidebar_label: {short_name}")
+    if sidebar_position is not None:
+        lines.append(f"sidebar_position: {sidebar_position}")
+    lines.append("---")
+    lines.append("")
+    lines.append(f"# {short_name}")
+    lines.append("")
+    lines.append(":::info[Module]")
+    lines.append("This page documents a **header-level module** — a collection of free")
+    lines.append("functions that share an algorithmic topic. There is no enclosing C++")
+    lines.append("class; the functions live directly in the library namespace.")
+    lines.append(":::")
+    lines.append("")
+    if guide:
+        lines.append(":::tip[See also]")
+        lines.append(f"User guide: [{short_name} guide]({guide})")
+        lines.append(":::")
+        lines.append("")
+    if python_equiv:
+        lines.append(":::info[Python equivalent]")
+        if python_url:
+            lines.append(f"[`{python_equiv}`]({python_url}) in MNE-Python.")
+        else:
+            lines.append(f"`{python_equiv}` in MNE-Python.")
+        lines.append(":::")
+        lines.append("")
+
+    lines.append(f"`#include <{include_dir}/{Path(header_rel).name}>`")
+    lines.append("")
+
+    if brief:
+        lines.append(brief)
+        lines.append("")
+    if body_text:
+        lines.append(body_text)
+        lines.append("")
+    lines.append("---")
+    lines.append("")
+
+    if funcs:
+        lines.append("## Functions")
+        lines.append("")
+        for f in funcs:
+            _render_free_function(f, lines)
+    else:
+        lines.append(":::warning[No public functions found]")
+        lines.append("Doxygen did not report any public free functions for this")
+        lines.append("header. Verify the header is parsed and the functions have")
+        lines.append("`/** ... */` blocks.")
+        lines.append(":::")
+        lines.append("")
+
+    if authors:
+        lines.append("## Authors of this file")
+        lines.append("")
+        for name, email in authors:
+            if email:
+                lines.append(f"- {name} &lt;{email}&gt;")
+            else:
+                lines.append(f"- {name}")
+        lines.append("")
+
+    content = "\n".join(lines)
+    content = re.sub(r"\n{4,}", "\n\n\n", content)
+    content = _escape_mdx_bare_lt(content)
     out_file.write_text(content, encoding="utf-8")
     LOG.info("generated %s", out_file)
     return out_file
@@ -649,6 +907,7 @@ def generate_sidebar_fragment(sidebar_out: Path, out_dir: Path) -> None:
     )
 
     categories: List[str] = []
+    missing_mdx: List[str] = []
     for mod_name, mod in mod_items:
         items = []
         dir_slug = mod.get('dir_slug', mod_name)
@@ -656,10 +915,7 @@ def generate_sidebar_fragment(sidebar_out: Path, out_dir: Path) -> None:
             slug = class_slug(entry["name"])
             mdx_path = out_dir / dir_slug / f"{slug}.mdx"
             if not mdx_path.exists():
-                LOG.warning(
-                    "sidebar: skipping registered class %s (no MDX at %s)",
-                    entry["name"], mdx_path,
-                )
+                missing_mdx.append(f"{entry['name']} (expected {mdx_path})")
                 continue
             items.append(f"        'api/{dir_slug}/{slug}'")
         if not items:
@@ -674,12 +930,23 @@ def generate_sidebar_fragment(sidebar_out: Path, out_dir: Path) -> None:
             "    }"
         )
 
+    if missing_mdx:
+        raise SystemExit(
+            "ERROR: sidebar generation aborted — "
+            f"{len(missing_mdx)} registered class(es) have no generated MDX page. "
+            "Every entry in api_registry.json with documented=true must produce "
+            "an MDX file (i.e. Doxygen must emit XML for it). Fix the missing "
+            "documentation or set documented=false in the registry:\n  - "
+            + "\n  - ".join(sorted(missing_mdx))
+        )
+
     body = (
         "// Auto-generated by tools/doxy2mdx/doxy2mdx.py — do not edit by hand.\n"
         "// Regenerate with `python tools/doxy2mdx/doxy2mdx.py "
         "--generate-sidebars ...`\n\n"
         "import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';\n\n"
         "const apiSidebar: SidebarsConfig['apiSidebar'] = [\n"
+        "    'api/index',\n"
         + ",\n".join(categories) + "\n"
         "];\n\n"
         "export default apiSidebar;\n"
@@ -767,6 +1034,9 @@ def main(argv: Optional[List[str]] = None) -> int:
                         name)
             warnings += 1
             continue
+        if reg_entry.get("kind", "class") != "class":
+            # Registered as a non-class kind (module/namespace); handled below.
+            continue
         if not reg_entry.get("documented", True):
             LOG.info("skipping %s (documented=false in registry)", name)
             continue
@@ -786,6 +1056,44 @@ def main(argv: Optional[List[str]] = None) -> int:
             continue
 
         path = generate_class_mdx(compounddef, name, args.out_dir, reg_entry, repo_root)
+        generated.append(path)
+
+    # --- Module entries (header full of free functions) -------------------
+    # Map header basename -> file-compound refid from index.xml.
+    file_refid_by_basename: Dict[str, str] = {}
+    for compound in index_root.findall("compound"):
+        if compound.get("kind") != "file":
+            continue
+        fname = compound.findtext("name", "").strip()
+        if fname:
+            file_refid_by_basename[fname] = compound.get("refid", "")
+
+    for entry in _REGISTRY["classes"]:
+        if entry.get("kind", "class") != "module":
+            continue
+        if not entry.get("documented", False):
+            continue
+        if only is not None and entry["name"] not in only:
+            continue
+        header_rel = entry.get("header", "")
+        basename = Path(header_rel).name
+        refid = file_refid_by_basename.get(basename, "")
+        if not refid:
+            LOG.warning("module %s: no Doxygen file compound for header %s",
+                        entry["name"], header_rel)
+            warnings += 1
+            continue
+        xml_file = args.xml_dir / f"{refid}.xml"
+        if not xml_file.exists():
+            LOG.warning("module %s: missing XML %s", entry["name"], xml_file)
+            warnings += 1
+            continue
+        tree = ET.parse(xml_file)
+        file_def = tree.find(".//compounddef")
+        if file_def is None:
+            continue
+        found_qualified.add(entry["name"])
+        path = generate_module_mdx(args.xml_dir, file_def, entry, args.out_dir, repo_root)
         generated.append(path)
 
     # Reverse check: registered with documented:true but never seen in XML.
