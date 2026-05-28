@@ -1,36 +1,35 @@
 //=============================================================================================================
 /**
- * @file     bids_raw_data.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.1.0
- * @date     March, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file bids_raw_data.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Central container for a BIDS raw recording — the BIDS-side analogue of @c FIFFLIB::FiffRawData, bundling raw signal I/O with every electrophysiology sidecar.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * @ref BidsRawData is the top-level object exposed by BIDSLIB: a single
+ * @ref BidsRawData::read call walks a @ref BIDSPath, picks the right
+ * format reader via @ref BidsRawData::createReader, parses the raw data
+ * into a fully-populated @c FIFFLIB::FiffRawData, and then merges every
+ * sidecar BIDS defines for an electrophysiology recording —
+ * @c _channels.tsv (channel types, units, bad-channel marking),
+ * @c _electrodes.tsv plus @c _coordsystem.json (digitizer points and
+ * their reference frame), @c _events.tsv (trigger annotations) and the
+ * @c _<datatype>.json sidecar (line frequency, manufacturer, reference
+ * electrode, recording type) — into the resulting in-memory record.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    BidsRawData class declaration — central container for a BIDS raw dataset
- *           with integrated read/write capabilities and sidecar metadata.
- *
+ * @ref BidsRawData::write reverses the process: it materialises the
+ * @c sub-XX/[ses-YY/]<datatype>/ tree, optionally copies the source
+ * raw file in, regenerates every TSV/JSON sidecar from the in-memory
+ * state, and emits the mandatory @c dataset_description.json at the
+ * root. Sidecar fields that are derivable from @c FiffInfo (sampling
+ * frequency, channel counts) are recomputed on write and applied on
+ * read so they cannot drift; only fields that carry information not
+ * already present in @c FiffInfo are stored as explicit members. The
+ * class is move-only because the embedded reader owns the open file
+ * handle of the raw recording.
  */
 
 #ifndef BIDS_RAW_DATA_H

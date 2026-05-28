@@ -1,35 +1,26 @@
 //=============================================================================================================
 /**
- * @file     bids_event.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.1.0
- * @date     March, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file bids_event.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Reader/writer for the BIDS ``_events.tsv`` sidecar — discrete annotations on the time axis of a recording.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * BIDS events live in a @c _events.tsv sibling of every electrophysiology
+ * or functional acquisition with REQUIRED columns @c onset and
+ * @c duration (seconds) and a recommended @c trial_type label;
+ * mne-cpp additionally tracks the original 0-based @c sample index and
+ * the numeric trigger @c value so the record can round-trip back into
+ * FIFF @c stim-channel land without re-deriving them. @ref BidsEvent is
+ * the per-row value object and the static @ref BidsEvent::readTsv /
+ * @ref BidsEvent::writeTsv functions perform the TSV round-trip via
+ * @ref BidsTsv. Missing / @c n/a fields default to zero / empty so
+ * partially-populated event files still round-trip.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    BidsEvent struct declaration — a single BIDS event annotation.
- *
+ * Spec: https://bids-specification.readthedocs.io/en/stable/modality-agnostic-files.html#tasks
  */
 
 #ifndef BIDS_EVENT_H

@@ -1,35 +1,28 @@
 //=============================================================================================================
 /**
- * @file     bids_const.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.1.0
- * @date     March, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file bids_const.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Centralised BIDS vocabulary: datatype / suffix / extension whitelists, FIFF↔BIDS channel-type and coordinate-frame maps, and entity ordering.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * Every other translation unit in BIDSLIB derives its allowed values from
+ * the constants defined here, so a future BIDS specification bump
+ * (currently 1.9.x) only requires touching this header. The file groups
+ * five orthogonal concerns: BIDS datatype strings (@c meg, @c eeg,
+ * @c ieeg, @c anat, …), per-modality raw-data file extension
+ * whitelists, bidirectional FIFF-kind ↔ BIDS channel-type maps used by
+ * @ref BidsChannel and @ref BidsRawData, coordinate-system name ↔
+ * @c FIFFV_COORD_* maps used by @ref BidsCoordinateSystem, and the
+ * canonical entity order (@c sub, @c ses, @c task, @c acq, @c run, …)
+ * consumed by @ref BIDSPath when it serialises a filename.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    BIDS constants, channel type mappings, and allowed values.
- *
+ * Header-only and inline so the maps are constant-folded at the call
+ * sites and to avoid a hidden ODR surface for translation units that
+ * only need one or two entries.
  */
 
 #ifndef BIDS_CONST_H

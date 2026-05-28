@@ -1,35 +1,36 @@
 //=============================================================================================================
 /**
- * @file     bids_path.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.1.0
- * @date     March, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file bids_path.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Programmatic construction and matching of BIDS-compliant directories, filenames and sidecar paths.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * The BIDS specification fixes both the directory layout
+ * (@c root/sub-XX/[ses-YY/]<datatype>/) and the @c <entity>-<value>
+ * ordering of the basename (@c sub, @c ses, @c task, @c acq, @c run,
+ * @c proc, @c space, @c rec, @c split, @c desc, then a @c _<suffix>
+ * and a @c .<ext>). @ref BIDSPath is the value object that encodes
+ * those entities and emits canonical paths via @ref BIDSPath::basename,
+ * @ref BIDSPath::directory and @ref BIDSPath::filePath, mirroring the
+ * API of @c mne_bids.BIDSPath in mne-python so call sites can be
+ * ported with minimal cognitive overhead.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * Beyond serialisation, @ref BIDSPath provides three orthogonal
+ * conveniences: @ref BIDSPath::withSuffix and the dedicated
+ * @c channelsTsvPath / @c electrodesTsvPath / @c coordsystemJsonPath /
+ * @c eventsTsvPath / @c sidecarJsonPath helpers so a single
+ * @ref BIDSPath instance can spawn every sidecar derived from a raw-data
+ * BIDSPath; @ref BIDSPath::mkdirs to materialise the directory
+ * hierarchy lazily on write; and @ref BIDSPath::match to enumerate
+ * actual on-disk files whose entity values complete the unset slots of
+ * the current path. Entity-value validation rejects the three
+ * characters BIDS forbids inside a label (@c -, @c _, @c /).
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    BIDSPath class declaration — BIDS-compliant path construction and entity management.
- *
+ * Spec: https://bids-specification.readthedocs.io/en/stable/common-principles.html#file-name-structure
  */
 
 #ifndef BIDS_PATH_H

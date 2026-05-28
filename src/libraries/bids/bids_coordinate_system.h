@@ -1,35 +1,32 @@
 //=============================================================================================================
 /**
- * @file     bids_coordinate_system.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file bids_coordinate_system.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Reader/writer for the BIDS ``_coordsystem.json`` sidecar describing the spatial reference frame of an ``_electrodes.tsv`` record.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * @c _coordsystem.json is REQUIRED for every iEEG (and recommended for
+ * EEG) electrode-position file and pins down three things: the name of
+ * the coordinate system (@c ACPC, @c MNI305, @c CapTrak, @c Other, …),
+ * the unit of the @c x/@c y/@c z columns in the matching
+ * @c _electrodes.tsv (@c m, @c mm or @c cm) and an optional 4×4 affine
+ * linking that frame to an associated anatomical image. @ref
+ * BidsCoordinateSystem is the value object that captures those fields
+ * plus the recommended free-text description / processing-description /
+ * @c IntendedFor pointer.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * @ref BidsCoordinateSystem::toFiffCoordTrans bridges the parsed affine
+ * into a @c FIFFLIB::FiffCoordTrans so downstream MNE-CPP code (forward
+ * solution, source localisation, visualisation) can treat a BIDS
+ * dataset's coordinate metadata exactly like a FIFF MRI↔head transform.
+ * The BIDS↔FIFF coordinate-frame name mapping lives in @ref
+ * bids_const.h.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    BidsCoordinateSystem struct — iEEG coordinate system from *_coordsystem.json.
- *
+ * Spec: https://bids-specification.readthedocs.io/en/stable/modality-specific-files/electrophysiology.html#coordinate-system-json
  */
 
 #ifndef BIDS_COORDINATE_SYSTEM_H

@@ -1,38 +1,34 @@
 //=============================================================================================================
 /**
- * @file     bids_edf_reader.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
- *           Simon Heinke <simon.heinke@tu-ilmenau.de>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
- * @since    2.1.0
- * @date     March, 2019
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file bids_edf_reader.h
+ * @since 2026
+ * @date  April 2026
+ * @brief @ref BIDSLIB::AbstractFormatReader implementation for European Data Format (EDF / EDF+) files.
  *
- * Copyright (C) 2019, Christoph Dinh, Simon Heinke and Matti Hamalainen. All rights reserved.
+ * EDF stores a recording as a fixed-size ASCII header followed by a
+ * stream of @c duration_seconds-long ``data records''; inside each
+ * record the channels appear in order, with each channel contributing
+ * @c samples_per_record little-endian @c int16 samples. The header
+ * additionally lists per-channel physical / digital min / max which
+ * @ref BIDSLIB::EDFReader uses to derive the affine calibration that
+ * converts the on-disk integers back into the channel's physical unit
+ * (volts, microvolts, degrees Celsius, …).
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * The reader is the BIDS counterpart of the legacy @c mne_edf2fiff
+ * command-line tool, refactored into a reusable library class so the
+ * same parser feeds both @ref BIDSLIB::BidsRawData and standalone
+ * converters. The optional @c fScaleFactor constructor argument
+ * defaults to @c 1e6 so the canonical microvolt-stored EEG /
+ * iEEG channels emerge in volts, matching the MNE-CPP @c FIFFLIB
+ * convention.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Contains the declaration of the EDFReader class.
- *           Refactored from the mne_edf2fiff tool into a reusable library reader.
- *
+ * Format reference: Kemp & Olivan, ``European data format 'plus'
+ * (EDF+)'', Clin. Neurophysiol. 114 (2003) 1755–1761; spec at
+ * https://www.edfplus.info/specs/edf.html.
  */
 
 #ifndef BIDS_EDF_READER_H

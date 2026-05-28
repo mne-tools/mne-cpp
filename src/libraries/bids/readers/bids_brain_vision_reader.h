@@ -1,35 +1,35 @@
 //=============================================================================================================
 /**
- * @file     bids_brain_vision_reader.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.1.0
- * @date     March, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file bids_brain_vision_reader.h
+ * @since 2026
+ * @date  April 2026
+ * @brief @ref BIDSLIB::AbstractFormatReader implementation for the BrainVision ``.vhdr / .vmrk / .eeg`` triplet.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * BrainVision is the de-facto wire format for sEEG / ECoG / scalp-EEG
+ * recordings shared as BIDS datasets: an ASCII @c .vhdr describing
+ * sampling rate, channel labels, calibration factors and the binary
+ * layout; a parallel ASCII @c .vmrk carrying stimulus / response /
+ * segment markers; and a flat @c .eeg payload holding the samples as
+ * little-endian @c INT_16, @c INT_32 or @c IEEE_FLOAT_32 values, laid
+ * out either @c MULTIPLEXED (channels interleaved at every time point)
+ * or @c VECTORIZED (one contiguous channel after another).
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * @ref BIDSLIB::BrainVisionReader parses the @c .vhdr / @c .vmrk once
+ * on @ref BIDSLIB::BrainVisionReader::open, then services arbitrary
+ * segment reads by seeking into the still-open @c .eeg file and
+ * applying the per-channel @c resolution / unit scaling so callers
+ * always see physical-unit values. The auxiliary @ref
+ * BIDSLIB::BrainVisionMarker and @ref BIDSLIB::BrainVisionChannelInfo
+ * structs expose the parsed header data unchanged for callers that
+ * want to convert markers into BIDS events or channels into
+ * @c _channels.tsv rows.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Contains the declaration of the BrainVisionReader class.
- *
+ * Format reference: BrainVision Core Data Format 1.0
+ * (https://www.brainproducts.com/downloads/more-software-tools/#bvcdf).
  */
 
 #ifndef BIDS_BRAIN_VISION_READER_H
