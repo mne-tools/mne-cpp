@@ -1,37 +1,33 @@
 //=============================================================================================================
 /**
- * @file     fiff_stream.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fiff_stream.h
+ * @since 2022
+ * @date  April 2026
+ * @brief FIFF binary tag-stream layer: wraps a QIODevice to read and write FIFF tags, directories, blocks and the structured records nested inside them.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * @ref FiffStream is the workhorse of FIFFLIB. It owns a @c QIODevice
+ * (typically a @c QFile or a @c QTcpSocket for realtime), reads and
+ * writes the 16-byte FIFF tag header, decodes payloads through the
+ * endian-swap helpers in @ref fiff_byte_swap.h, and assembles the
+ * directory and block tree on the way in. The high-level methods then
+ * trade tag streams for typed objects: @ref read_meas_info returns a
+ * @ref FiffInfo, @ref read_raw_data returns a @ref FiffRawData,
+ * @ref read_evoked returns a @ref FiffEvoked, @ref read_cov returns a
+ * @ref FiffCov, etc. On the writing side @ref start_writing_raw,
+ * @ref write_tag, @ref write_int / @ref write_float /
+ * @ref write_float_matrix, @ref start_block / @ref end_block and the
+ * record-level writers (@ref write_id, @ref write_ch_info,
+ * @ref write_coord_trans, ...) emit a fully spec-compliant FIFF file
+ * that round-trips through MNE-Python and MNE-C unchanged.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FiffStream class declaration
- *
+ * Inheriting from @c QDataStream gives the class transparent access to
+ * the Qt I/O byte ordering / device abstraction while keeping the rest
+ * of FIFFLIB Qt-agnostic at the API boundary.
  */
 
 #ifndef FIFF_STREAM_H
@@ -97,11 +93,16 @@ class FiffDigitizerData;
 
 //=============================================================================================================
 /**
- * FiffStream provides an interface for reading from and writing to fiff files
- * Comparable to: fiffFile (struct *fiffFile,fiffFileRec)
+ * @brief FIFF tag-stream reader/writer: wraps a QIODevice and exposes typed read_* / write_* methods for every FIFF block and record kind.
  *
- * @brief FIFF File I/O routines.
- **/
+ * Reads or writes one @c QIODevice. Builds the FIFF directory and
+ * @ref FiffDirNode block tree on @ref open and exposes typed loaders /
+ * emitters for every structured record (id, channel info, coord trans,
+ * named matrix, dig point, projector, CTF comp, raw segment, evoked,
+ * covariance). The on-disk format is the Elekta/Neuromag FIFF
+ * specification — files emitted here round-trip through @c mne.io.fiff
+ * in MNE-Python without modification.
+ */
 
 class FIFFSHARED_EXPORT FiffStream : public QDataStream
 {

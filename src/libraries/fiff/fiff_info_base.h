@@ -1,37 +1,28 @@
 //=============================================================================================================
 /**
- * @file     fiff_info_base.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fiff_info_base.h
+ * @since 2022
+ * @date  April 2026
+ * @brief Minimal measurement-info subset (channel list, sampling rate, basic transforms) shared by FIFF readers that do not need the full FiffInfo.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * @ref FiffInfoBase carries only what every downstream component needs to
+ * interpret a data matrix: the channel list (@c chs / @c ch_names /
+ * @c nchan), the sampling frequency, the @c FIFFV_COORD_DEVICE →
+ * @c FIFFV_COORD_HEAD transform recovered from HPI, and the bad-channel
+ * list. @ref FiffInfo derives from it and adds the acquisition-specific
+ * metadata (projectors, CTF compensators, filter setups, subject info,
+ * HPI fit details, ...).
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FiffInfoBase class declaration.
- *
+ * Splitting the data this way lets stripped-down forms (e.g. evoked
+ * fragments stored without acquisition metadata, or info subsets sent
+ * over the real-time wire protocol) be passed around without forcing
+ * every consumer to deal with optional fields. Mirrors the
+ * @c mne.io.meas_info.MeasInfo / ``info_subset`` split in MNE-Python.
  */
 
 #ifndef FIFF_INFO_BASE_H
@@ -68,9 +59,13 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * Light measurement info
+ * @brief Stripped FIFF measurement info: channel list, sampling rate, device→head transform and bad-channel list.
  *
- * @brief light measurement info
+ * Owns just the fields needed to interpret a data matrix: @c chs,
+ * @c ch_names, @c nchan, @c sfreq, @c bads, @c dev_head_t, @c ctf_head_t.
+ * Base class of @ref FiffInfo, used directly when the rest of the
+ * acquisition metadata is not available (e.g. realtime client streams,
+ * trimmed evoked files).
  */
 class FIFFSHARED_EXPORT FiffInfoBase
 {

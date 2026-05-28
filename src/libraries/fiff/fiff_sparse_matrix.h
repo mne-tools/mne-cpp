@@ -1,37 +1,24 @@
 //=============================================================================================================
 /**
- * @file     fiff_sparse_matrix.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     January, 2017
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file fiff_sparse_matrix.h
+ * @since 2026
+ * @date  April 2026
+ * @brief FIFF sparse matrix: column / row-compressed sparse storage backed by Eigen::SparseMatrix.
  *
- * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FiffSparseMatrix class declaration.
- *
+ * The FIFF matrix tag format supports three storage modes encoded in the
+ * type word (see @ref fiff_tag.h): dense, column-compressed sparse
+ * (@c MATRIX_CODING_CCS) and row-compressed sparse (@c MATRIX_CODING_RCS).
+ * @ref FiffSparseMatrix is the in-memory representation of the two sparse
+ * forms. It owns the value array, the index array and the pointer array
+ * in the layout the FIFF stream produced, and exposes a conversion to
+ * @c Eigen::SparseMatrix so downstream linear-algebra code can operate
+ * on it directly. This is what backs large sparse blocks such as the
+ * source-space adjacency, the SourceSpace patch matrices and the
+ * volume-source-space neighbourhood matrices.
  */
 
 #ifndef FIFFSPARSEMATRIX_H
@@ -74,13 +61,12 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * FIFF sparse matrix — wraps Eigen::SparseMatrix<float>.
+ * @brief Sparse FIFF matrix: CCS or RCS storage with the value / index / pointer triple as written by FiffStream::write_float_sparse_*.
  *
- * Internally stores data in a single Eigen::SparseMatrix<float>.
- * The @c coding member records whether the FIFF source was CCS or RCS
- * (used only during serialization / deserialization).
- *
- * @brief FIFF sparse matrix storage backed by Eigen.
+ * Holds the three arrays the FIFF sparse-matrix tag stores on disk
+ * (values, inner indices, outer pointers) and the (nrow, ncol, nnz)
+ * shape, so it can be streamed in and out without conversion. Convert to
+ * an @c Eigen::SparseMatrix for arithmetic and back for serialization.
  */
 class FIFFSHARED_EXPORT FiffSparseMatrix
 {

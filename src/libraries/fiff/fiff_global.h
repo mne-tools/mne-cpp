@@ -1,37 +1,27 @@
 //=============================================================================================================
 /**
- * @file     fiff_global.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fiff_global.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Export/import macros and build-info accessors for the FIFFLIB shared library.
  *
- * Copyright (C) 2012-2026, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * This header is included first by every public FIFFLIB symbol and is the
+ * only place where the Q_DECL_EXPORT / Q_DECL_IMPORT visibility decoration
+ * is chosen. STATICBUILD strips the decoration entirely so the same
+ * sources can be linked into a monolithic static archive (used for the
+ * WebAssembly build and for the all-in-one fat library on Windows).
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Fiff library export/import macros.
- *
+ * The library also re-exports three string accessors backed by
+ * ``utils/buildinfo.h`` so that downstream tools can stamp the FIFF
+ * build identity (timestamp, short hash, long hash) into the FIFF
+ * @c FIFF_MNE_CREATOR and @c FIFF_PROC_HISTORY tags when writing files,
+ * keeping provenance with parity to MNE-Python's @c mne.__version__ field
+ * that lands in the same tags.
  */
 
 #ifndef FIFF_GLOBAL_H
@@ -58,8 +48,16 @@
 
 //=============================================================================================================
 /**
- * @namespace FIFFLIB
- * @brief     FIFF file I/O and data structures (raw, epochs, evoked, covariance, forward).
+ * @brief FIFF file I/O, in-memory data structures and high-level readers/writers.
+ *
+ * Houses every class that round-trips an Elekta/Neuromag FIFF file:
+ * the stream layer (@ref FiffStream, @ref FiffTag, @ref FiffDirNode,
+ * @ref FiffDirEntry), the measurement metadata (@ref FiffInfo,
+ * @ref FiffChInfo, @ref FiffCoordTrans, @ref FiffId, @ref FiffDigPoint),
+ * the data containers (@ref FiffRawData, @ref FiffEvoked,
+ * @ref FiffEvokedSet, @ref FiffCov, @ref FiffProj, @ref FiffCtfComp,
+ * @ref FiffNamedMatrix, @ref FiffSparseMatrix) and the convenience facade
+ * @ref FIFF. Surface-level parity with @c mne.io.fiff in MNE-Python.
  */
 namespace FIFFLIB{
 

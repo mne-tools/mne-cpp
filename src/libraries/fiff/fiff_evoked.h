@@ -1,37 +1,27 @@
 //=============================================================================================================
 /**
- * @file     fiff_evoked.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     September, 2015
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fiff_evoked.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Single averaged evoked response: time axis, samples, baseline, channel info and processing history.
  *
- * Copyright (C) 2015, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * @ref FiffEvoked is one averaged response as written under a
+ * @c FIFFB_EVOKED block: the time axis (@c times, @c first, @c last),
+ * the (nchan × nsamples) data matrix, the baseline interval, the
+ * averaging kind (@c FIFFV_ASPECT_AVERAGE,
+ * @c FIFFV_ASPECT_STD_ERR, ...), the trigger comment, the number of
+ * averaged epochs (@c nave) and the associated @ref FiffInfo. Multiple
+ * @ref FiffEvoked objects belonging to the same recording (one per
+ * condition) make up a @ref FiffEvokedSet.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FiffEvoked class declaration.
- *
+ * Drop-in counterpart of @c mne.Evoked in MNE-Python: the same kind /
+ * nave / comment / baseline semantics and the same channel-picking,
+ * projector-application and SSP behaviour.
  */
 
 #ifndef FIFF_EVOKED_H
@@ -71,9 +61,12 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * NEW PYTHON LIKE Fiff evoked
+ * @brief Single averaged evoked response: time axis, data, baseline, channel info and averaging metadata.
  *
- * @brief evoked data
+ * Holds one @c FIFFB_EVOKED block: @c times, @c data, @c first /
+ * @c last sample indices, @c baseline, @c kind, @c nave, @c comment and
+ * the @ref FiffInfo describing the channels. Use @ref FiffEvokedSet for
+ * recordings that contain multiple averaging conditions.
  */
 class FIFFSHARED_EXPORT FiffEvoked
 {

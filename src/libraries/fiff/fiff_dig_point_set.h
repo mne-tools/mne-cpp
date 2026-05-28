@@ -1,37 +1,23 @@
 //=============================================================================================================
 /**
- * @file     fiff_dig_point_set.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    0.1.0
- * @date     Jul, 2016
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fiff_dig_point_set.h
+ * @since 2022
+ * @date  May 2026
+ * @brief Container for the FIFF_DIG_POINT records of a measurement (a parsed FIFFB_ISOTRAK block).
  *
- * Copyright (C) 2016, Lorenz Esch, Matti Hamalainen. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief     FiffDigPointSet class declaration.
- *
+ * @ref FiffDigPointSet holds the head-coordinate point cloud associated
+ * with one recording: cardinal fiducials, HPI coil positions, EEG
+ * electrodes and the extra head-shape samples. It is what
+ * @ref FiffStream returns when asked for the contents of an
+ * @c FIFFB_ISOTRAK / @c FIFFB_HPI_MEAS block, and what
+ * @ref FiffDigitizerData consumes when constructing a digitization
+ * view for the registration GUIs. Round-trips with the @c info['dig']
+ * list in MNE-Python.
  */
 
 #ifndef FIFFLIB_FIFF_DIG_POINT_SET_H
@@ -78,9 +64,11 @@ class FiffDirNode;
 
 //=============================================================================================================
 /**
- * The FiffDigPointSet hold a set of Digitizer Points and read, write and transform function.
+ * @brief Collection of @ref FiffDigPoint records as parsed from a FIFFB_ISOTRAK block.
  *
- * @brief Holds a set of digitizer points.
+ * Indexed access plus convenience filters (cardinals only, HPI only,
+ * EEG only, extras only) so registration code can pick out the subset it
+ * needs without re-walking the underlying QList of dig points.
  */
 
 class FIFFSHARED_EXPORT FiffDigPointSet

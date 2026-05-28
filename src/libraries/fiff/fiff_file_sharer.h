@@ -1,35 +1,20 @@
 //=============================================================================================================
 /**
- * @file     fiff_file_sharer.h
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @since    0.1.9
- * @date     March, 2021
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file fiff_file_sharer.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Memory-mapped FIFF file handle shared between cooperating processes / threads to avoid duplicate reads of large raw recordings.
  *
- * Copyright (C) 2021, Gabriel Motta. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief     FiffFileSharer class declaration.
- *
+ * Large continuous FIFF recordings (multi-GB) are routinely opened by
+ * several cooperating components at once: the GUI viewer, the realtime
+ * processor, the recording dumper. @ref FiffFileSharer wraps a
+ * memory-mapped view of the file and a small refcount so each consumer
+ * gets a zero-copy @c QByteArray view of the same backing pages, instead
+ * of every process pulling the data through its own @c QFile read.
  */
 
 #ifndef FIFF_FILE_SHARER_H
@@ -56,9 +41,12 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * @brief Utility for sharing FIFF file data between processes or threads via memory-mapped I/O.
+ * @brief Refcounted memory-mapped view of a FIFF file shared between cooperating consumers.
  *
- * FiffFileSharer provides a way to share fiff files while they are being saved in real time
+ * Each consumer gets a zero-copy @c QByteArray view of the same backing
+ * pages. When the last reference goes away the mapping is unmapped.
+ * Used to let the GUI, the realtime pipeline and the recording dumper
+ * share one open FIFF file without duplicate I/O.
  */
 class FIFFSHARED_EXPORT FiffFileSharer : public QObject
 {

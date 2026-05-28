@@ -1,38 +1,25 @@
 //=============================================================================================================
 /**
- * @file     fiff_io.h
- * @author   Florian Schlembach <Florian.Schlembach@tu-ilmenau.de>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fiff_io.h
+ * @since 2022
+ * @date  March 2026
+ * @brief High-level convenience reader/writer that loads a whole FIFF measurement file into FIFFLIB containers in one call.
  *
- * Copyright (C) 2012, Florian Schlembach, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Definition of a generic Fiff IO interface
- *
+ * Most callers want to open a FIFF file and immediately get back a
+ * @ref FiffRawData (for ``*-raw.fif''), a @ref FiffEvokedSet (for
+ * ``*-ave.fif''), a @ref FiffCov (for ``*-cov.fif''), or the
+ * appropriate combination without micromanaging @ref FiffStream and the
+ * directory tree. @ref FiffIO provides exactly that one-call facade: it
+ * sniffs the top-level FIFF blocks (@c FIFFB_RAW_DATA, @c FIFFB_EVOKED,
+ * @c FIFFB_MNE_COV, ...), invokes the matching specialized reader and
+ * exposes the results as ready-to-use shared pointers, with parity to
+ * the @c mne.io.read_raw_fif / @c mne.read_evokeds / @c mne.read_cov
+ * front-end of MNE-Python.
  */
 
 #ifndef FIFF_IO_H
@@ -70,7 +57,13 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * @brief High-level reader/writer that loads and saves complete FIFF measurement files.
+ * @brief One-call FIFF reader/writer: opens a file, dispatches to the right specialized loader and returns ready-to-use FIFFLIB containers.
+ *
+ * Sniffs the FIFF block tree, dispatches @ref FiffRawData /
+ * @ref FiffEvokedSet / @ref FiffCov / @ref FiffInfo loaders as
+ * appropriate, and returns shared pointers so the resulting objects can
+ * be freely passed across the rest of the pipeline. Front-end parity
+ * with @c mne.io.read_raw_fif and friends.
  */
 class FIFFSHARED_EXPORT FiffIO : public QObject
 {

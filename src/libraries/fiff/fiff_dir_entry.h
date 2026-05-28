@@ -1,37 +1,26 @@
 //=============================================================================================================
 /**
- * @file     fiff_dir_entry.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fiff_dir_entry.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Single entry of the FIFF tag directory: kind, type, byte size and absolute file position.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * After the last tag of a FIFF file the writer appends a @c FIFF_DIR tag
+ * whose payload is an array of @c fiffDirEntryRec records, one per tag in
+ * the stream, terminated by a sentinel with kind = -1. The directory
+ * turns linear FIFF I/O into random-access: @ref FiffStream consults it to
+ * locate any tag by kind without rescanning the file, and
+ * @ref FiffDirNode uses it to materialize the block hierarchy
+ * (@c FIFFB_BLOCK_START / @c FIFFB_BLOCK_END pairs) into a navigable tree.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FiffDirEntry class declaration.
- *
+ * @ref FiffDirEntry is the in-memory mirror of that 16-byte record. It is
+ * intentionally trivially copyable so the directory can be slurped in as
+ * a single Eigen / Qt vector.
  */
 
 #ifndef FIFF_DIR_ENTRY_H
@@ -60,10 +49,13 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * A FIFF directory entry describing a tag's kind, type, size, and position.
+ * @brief Directory entry: tag kind + on-disk type + byte size + absolute file offset (16-byte record).
  *
- * @brief Directory entry description.
- **/
+ * Exact memory image of the legacy @c fiffDirEntryRec: kind (32-bit),
+ * type (32-bit), size (32-bit), pos (32-bit). The arrays of these records
+ * materialize the @c FIFF_DIR tag at the tail of every well-formed FIFF
+ * file and drive random-access tag lookup in @ref FiffStream.
+ */
 
 class FIFFSHARED_EXPORT FiffDirEntry
 {

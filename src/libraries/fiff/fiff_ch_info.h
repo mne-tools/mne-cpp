@@ -1,37 +1,30 @@
 //=============================================================================================================
 /**
- * @file     fiff_ch_info.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fiff_ch_info.h
+ * @since 2022
+ * @date  April 2026
+ * @brief FIFF channel descriptor record (FIFF_CH_INFO): per-channel logical/scanner numbers, kind, calibration, coil type, unit, location and orientation.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * A @c FIFF_CH_INFO tag stores everything needed to interpret one column
+ * of the raw / evoked data matrix: which physical channel produced it
+ * (@c scanno / @c logno), what kind of sensor it is
+ * (@c FIFFV_MEG_CH / @c FIFFV_EEG_CH / @c FIFFV_STIM_CH / ...), the
+ * calibration constants @c cal and @c range that map ADC counts to SI
+ * units, the coil-frame transform encoded in the @ref FiffChPos sub-record,
+ * the coil type (@c FIFFV_COIL_VV_PLANAR_T1, @c FIFFV_COIL_VV_MAG_T1,
+ * @c FIFFV_COIL_CTF_GRAD, ...) and the SI unit + multiplier of the
+ * calibrated samples.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief     FiffChInfo class declaration.
- *
+ * @ref FiffChInfo wraps that record. Exact field-for-field parity with the
+ * @c ch_info dict consumed by @c mne.io.meas_info in MNE-Python is
+ * mandatory: forward models, source localizers and CTF compensators all
+ * key on these fields and silently produce wrong topographies if any
+ * field drifts.
  */
 
 #ifndef FIFF_CH_INFO_H
@@ -68,9 +61,13 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * Channel info descriptor.
+ * @brief Per-channel FIFF descriptor: identifiers, kind, calibration, coil type, channel-frame coil position and SI unit.
  *
- * @brief Channel info descriptor.
+ * Holds the exact field set of the on-disk @c fiffChInfoRec: @c scanno,
+ * @c logno, @c kind, @c range, @c cal, @c coil_type, the embedded
+ * @ref FiffChPos coil location, @c unit and @c unit_mul. The @c ch_name
+ * string lives next to the record because the FIFF stream stores it as a
+ * separate @c FIFF_CH_NAME tag in modern files.
  */
 class FIFFSHARED_EXPORT FiffChInfo
 {

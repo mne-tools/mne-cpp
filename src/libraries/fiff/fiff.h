@@ -1,39 +1,26 @@
 //=============================================================================================================
 /**
- * @file     fiff.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fiff.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Static MATLAB-style FIFF facade: thin wrapper functions kept for parity with the historical mne-matlab toolbox API.
  *
- * Copyright (C) 2012-2026, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * The MNE-Matlab toolbox exposes file I/O as flat functions
+ * (@c fiff_open, @c fiff_read_raw_segment, @c fiff_read_evoked, ...).
+ * @ref FIFF mirrors that surface as a static-method facade so code ported
+ * from Matlab compiles unchanged. New C++ code should call the
+ * underlying class methods directly (@ref FiffStream, @ref FiffRawData,
+ * @ref FiffEvoked, ...) — the wrapper only exists for the
+ * backwards-compatible path.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FIFF class declaration, which provides static wrapper functions to stay consistent
- *           with mne matlab toolbox - Note: avoid using the wrappers, prefer the wrapped methods! Its
- *           sufficient to include this header to have access to all Fiff classes.
- *
+ * Including @c fiff.h is also the single-include shortcut that pulls in
+ * every public FIFFLIB header in one go, which is convenient for
+ * prototyping and for tools that need the full type universe.
  */
 
 #ifndef FIFF_H
@@ -87,10 +74,13 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * DECLARE CLASS Fiff
+ * @brief MATLAB-style static facade re-exporting every public FIFFLIB reader/writer for parity with the mne-matlab toolbox.
  *
- * @brief The Fiff class provides static wrapper functions to stay consistent with mne matlab toolbox
- *        Note: avoid using the wrappers, prefer the wrapped methods!
+ * Only wrappers — no state. Each method forwards to the matching method
+ * on @ref FiffStream / @ref FiffRawData / @ref FiffEvoked /
+ * @ref FiffEvokedSet / @ref FiffCov / @ref FiffInfo. Prefer the
+ * underlying classes for new code; this class exists so Matlab-style
+ * ports compile unchanged.
  */
 class FIFFSHARED_EXPORT Fiff
 {

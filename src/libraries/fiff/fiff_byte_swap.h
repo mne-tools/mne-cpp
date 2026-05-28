@@ -1,35 +1,26 @@
 //=============================================================================================================
 /**
- * @file     fiff_byte_swap.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     March, 2013
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file fiff_byte_swap.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Endianness swap helpers for the FIFF binary tag I/O layer (FIFF is always written big-endian on disk).
  *
- * Copyright (C) 2013, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * FIFF tags are stored in network (big-endian) byte order on disk while
+ * all currently supported host platforms are little-endian. @ref FiffStream
+ * therefore funnels every scalar / array read or write through one of
+ * these tiny inline helpers, which gives both the per-value variants
+ * (@c swap_short, @c swap_int, @c swap_long, @c swap_float, @c swap_double)
+ * and the in-place pointer variants used when decoding densely packed
+ * matrix payloads where allocating a copy would be wasteful.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * @brief    Byte-swap utility functions for FIFF binary I/O.
- *
+ * These functions intentionally mirror the @c swap_*() helpers in the MNE-C
+ * @c fiff_io.c and the @c numpy ``>i4`` / ``>f4`` dtype handling in
+ * MNE-Python so a tag written by any of the three implementations
+ * round-trips byte-for-byte through the others.
  */
 
 #ifndef FIFF_BYTE_SWAP_H

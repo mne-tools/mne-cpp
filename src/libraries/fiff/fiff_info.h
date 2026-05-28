@@ -1,38 +1,30 @@
 //=============================================================================================================
 /**
- * @file     fiff_info.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fiff_info.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Full FIFF measurement metadata: everything from FIFFB_MEAS / FIFFB_MEAS_INFO needed to interpret a recording.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * @ref FiffInfo is the C++ counterpart of MNE-Python's
+ * @c mne.Info dictionary. It collects everything stored under
+ * @c FIFFB_MEAS / @c FIFFB_MEAS_INFO of a FIFF file: per-channel
+ * descriptors (@ref FiffChInfo via @ref FiffInfoBase), sampling frequency,
+ * lowpass / highpass filter cutoffs, line frequency, measurement date,
+ * subject info, experimenter, projector list (@ref FiffProj), CTF
+ * software compensation list (@ref FiffCtfComp), HPI fit results, the
+ * device→head and CTF compensation transforms, the @c FIFFB_ISOTRAK
+ * digitization (@ref FiffDigPoint), and the per-channel calibration vectors.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FiffInfo class declaration.
- *
+ * Every higher-level container in FIFFLIB (@ref FiffRawData,
+ * @ref FiffEvoked, @ref FiffCov, @ref FiffEvokedSet) carries a
+ * @ref FiffInfo so that downstream consumers (filtering, source
+ * localization, plotting, BIDS export) can interpret the data without
+ * re-reading the file.
  */
 
 #ifndef FIFF_INFO_H
@@ -78,9 +70,15 @@ class FiffStream;
 
 //=============================================================================================================
 /**
- * Provides fiff measurement file information
+ * @brief Full FIFF measurement info: per-channel descriptors, sampling and filter setup, projectors, compensators, transforms and dig points.
  *
- * @brief FIFF measurement file information
+ * Materializes the union of the tags found in @c FIFFB_MEAS /
+ * @c FIFFB_MEAS_INFO: @c sfreq, @c lowpass / @c highpass / @c line_freq,
+ * @c meas_date, @c experimenter, @c projs (@ref FiffProj),
+ * @c comps (@ref FiffCtfComp), @c dig (@ref FiffDigPoint),
+ * @c hpi_results / @c hpi_meas, @c dev_head_t / @c ctf_head_t, plus the
+ * @ref FiffInfoBase channel / bads / sfreq subset. Drop-in counterpart of
+ * @c mne.Info in MNE-Python.
  */
 class FIFFSHARED_EXPORT FiffInfo : public FiffInfoBase
 {

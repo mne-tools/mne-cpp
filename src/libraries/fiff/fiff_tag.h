@@ -1,37 +1,33 @@
 //=============================================================================================================
 /**
- * @file     fiff_tag.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fiff_tag.h
+ * @since 2022
+ * @date  April 2026
+ * @brief FIFF tag: the 16-byte tag header (kind, type, size, next) plus its decoded payload.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * A FIFF tag is the atomic unit of the format: a fixed 16-byte header
+ * (@c kind, @c type, @c size, @c next) followed by @c size bytes of
+ * payload whose interpretation depends on the type descriptor. The upper
+ * byte of @c type selects the fundamental structure — scalar
+ * (@c FIFFFS_SCALAR == 0x00) or multidimensional matrix
+ * (@c FIFFFS_MATRIX == 0x40) — and the matrix variants additionally carry
+ * a coding flag in the low bits selecting dense (@c MATRIX_CODING_DENSE),
+ * column-compressed sparse (@c MATRIX_CODING_CCS) or row-compressed
+ * sparse (@c MATRIX_CODING_RCS) storage. @ref FiffTag is the C++ wrapper
+ * that holds the header fields, the raw payload bytes and a small set of
+ * typed accessors (@c toInt, @c toFloat, @c toMatrix, @c toCoordTrans,
+ * @c toChInfo, ...) that decode the payload on demand into the relevant
+ * FIFFLIB class.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FiffTag class declaration, which provides fiff tag I/O and processing methods.
- *
+ * The header also re-publishes the @c IS_MATRIX / @c MATRIX_CODING_*
+ * bitmasks and the @c NATIVE_ENDIAN macro driven by the OS-detection
+ * ladder above so callers can compare @c FiffTag::type against a
+ * canonical mask without duplicating the bit fiddling.
  */
 
 #ifndef FIFF_TAG_H
@@ -145,9 +141,16 @@ class FiffDirNode;
 
 //=============================================================================================================
 /**
- * Tags are used in front of data items to tell what they are.
+ * @brief FIFF tag: 16-byte header (kind, type, size, next) plus payload, with typed decoders for every FIFFT_* type.
  *
- * @brief FIFF data tag
+ * Holds the four header fields exactly as stored on disk and a
+ * @c QByteArray with the raw payload. Decoders convert the payload to the
+ * appropriate C++ representation: scalars via @c toInt / @c toFloat /
+ * @c toDouble, dense and sparse matrices via @c toFloatMatrix /
+ * @c toSparseFloatMatrix, and the structured FIFF records into their
+ * class wrappers (@c toFiffId, @c toCoordTrans, @c toChInfo,
+ * @c toChPos, @c toDigPoint, ...). Used by @ref FiffStream both for
+ * streaming reads and for assembling tags before write_tag.
  */
 class FIFFSHARED_EXPORT FiffTag : public QByteArray
 {

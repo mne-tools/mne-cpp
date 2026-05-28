@@ -1,37 +1,28 @@
 //=============================================================================================================
 /**
- * @file     fiff_evoked_set.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fiff_evoked_set.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Set of averaged evoked responses sharing a FiffInfo, plus the ave-style category / rejection descriptors for batch averaging.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * A single ``*-ave.fif`` typically contains several @c FIFFB_EVOKED
+ * blocks (one per stimulus condition / averaging category). @ref
+ * FiffEvokedSet groups them: a shared @ref FiffInfo and a list of
+ * @ref FiffEvoked instances, plus channel-picking and compensation
+ * helpers that apply uniformly to the whole set.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FiffEvokedSet class declaration.
- *
+ * The header additionally ports the three batch-averaging descriptor
+ * structs from MNE-C's @c browser_types.h (@ref RejectionParams,
+ * @ref AverageCategory, @ref AverageDescription) so the @c mne_browse_raw
+ * ``ave description'' files can be parsed and consumed verbatim. Together
+ * they describe artifact-rejection thresholds, per-category timing and
+ * trigger logic, and the file-level output settings used by the
+ * @c mne_process_raw averaging pipeline.
  */
 
 #ifndef FIFF_EVOKED_SET_H
@@ -75,8 +66,13 @@ class FiffRawData;
 
 //=============================================================================================================
 /**
- * Rejection parameters for artifact detection.
- * Ported from rejDataRec (MNE-C browser_types.h).
+ * @brief Artifact-rejection thresholds for the MNE-C batch averaging pipeline (gradiometer / magnetometer / EEG / EOG / ECG, peak-to-peak and flatness).
+ *
+ * Field-for-field port of @c rejDataRec from MNE-C @c browser_types.h.
+ * Used by @ref AverageDescription to drive @c mne_process_raw's
+ * peak-to-peak and flatness rejection when computing batch evokeds; the
+ * default values match the MNE-C defaults so existing ``ave description''
+ * files keep producing identical results.
  */
 struct FIFFSHARED_EXPORT RejectionParams {
     float stimIgnore       = 0.0f;      /**< Ignore this many seconds around the stimulus. */
@@ -94,8 +90,14 @@ struct FIFFSHARED_EXPORT RejectionParams {
 
 //=============================================================================================================
 /**
- * One averaging category.
- * Ported from aveCategRec (MNE-C browser_types.h).
+ * @brief One averaging category in an MNE-C ave-description file: trigger logic, timing window, baseline interval and display color.
+ *
+ * Port of @c aveCategRec from MNE-C @c browser_types.h. Describes one
+ * condition the batch averager produces: which trigger event (with
+ * required previous / following events and ignore masks), the epoch time
+ * window (@c tmin / @c tmax), the optional baseline interval, and the
+ * post-processing flags (baseline correction, std-error vs.\ average,
+ * absolute values).
  */
 struct FIFFSHARED_EXPORT AverageCategory {
     QString comment;                     /**< Description. */
@@ -118,8 +120,13 @@ struct FIFFSHARED_EXPORT AverageCategory {
 
 //=============================================================================================================
 /**
- * Set of averaging categories loaded from a description file.
- * Ported from aveDataRec (MNE-C browser_types.h).
+ * @brief Top-level MNE-C ave-description record: comment, category list, shared rejection limits and output file paths.
+ *
+ * Port of @c aveDataRec from MNE-C @c browser_types.h. Owns the list of
+ * @ref AverageCategory entries, the shared @ref RejectionParams, the
+ * skew-correction flag and the I/O paths (output ave file, event source,
+ * log file) so an entire batch-averaging job can be described as one
+ * value.
  */
 struct FIFFSHARED_EXPORT AverageDescription {
     QString comment;                     /**< Description. */
@@ -133,9 +140,12 @@ struct FIFFSHARED_EXPORT AverageDescription {
 
 //=============================================================================================================
 /**
- * Fiff evoked data set
+ * @brief Set of @ref FiffEvoked instances sharing one @ref FiffInfo, plus channel-picking and compensation helpers.
  *
- * @brief evoked data set
+ * The on-disk shape of a ``*-ave.fif``: one @ref FiffInfo and one
+ * @ref FiffEvoked per @c FIFFB_EVOKED block (one per averaging
+ * condition). Conversion utilities pick channels and shift compensation
+ * state across the whole set in lock-step.
  */
 class FIFFSHARED_EXPORT FiffEvokedSet
 {

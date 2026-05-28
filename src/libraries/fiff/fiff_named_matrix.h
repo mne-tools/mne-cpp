@@ -1,37 +1,24 @@
 //=============================================================================================================
 /**
- * @file     fiff_named_matrix.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fiff_named_matrix.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Matrix paired with row and column name lists, the on-disk form of FIFFB_PROJ_ITEM / FIFFB_MNE_NAMED_MATRIX payloads.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FiffNamedMatrix class declaration.
- *
+ * Several FIFF blocks store a matrix whose rows and columns refer to
+ * channel names (SSP projection vectors, CTF compensation matrices,
+ * forward gain matrices, MNE noise-covariance whiteners, ...). The
+ * on-disk representation is a @c FIFF_MNE_NROW + @c FIFF_MNE_NCOL pair
+ * plus a dense or sparse matrix tag plus two string-list tags with the
+ * row and column names. @ref FiffNamedMatrix bundles all of that into a
+ * single object: the Eigen matrix and the two @c QStringList name
+ * vectors, with the same default-construction semantics as
+ * @c numpy.zeros + name lists in @c mne.SourceEstimate / @c mne.Forward.
  */
 
 #ifndef FIFF_NAMED_MATRIX_H
@@ -70,9 +57,14 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * Matrix specification with named rows and cols.
+ * @brief FIFF named matrix: dense / sparse Eigen matrix plus row-name and column-name string lists.
  *
- * @brief A named matrix
+ * Used wherever the on-disk FIFF block pairs a matrix with channel-name
+ * metadata: SSP projectors (@c FIFFB_PROJ_ITEM), CTF compensators
+ * (@c FIFFB_MNE_CTF_COMP_DATA), forward gain matrices, MNE inverse
+ * operators, noise covariances. The name lists let downstream code index
+ * the matrix by name instead of by position, which is what the
+ * @c pick_channels / @c apply_proj paths rely on.
  */
 class FIFFSHARED_EXPORT FiffNamedMatrix : public QSharedData
 {

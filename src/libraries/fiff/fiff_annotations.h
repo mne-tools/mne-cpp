@@ -1,35 +1,25 @@
 //=============================================================================================================
 /**
- * @file     fiff_annotations.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file fiff_annotations.h
+ * @since 2026
+ * @date  April 2026
+ * @brief FIFF / MNE annotations: time-tagged textual marks (BAD_*, EDGE, custom) with onset, duration and description.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * Annotations are time-localized comments attached to a continuous
+ * recording: rejected segments (``BAD_*''), recording edges (``EDGE''),
+ * and arbitrary user-supplied marks. MNE-Python stores them as the
+ * @c mne.Annotations type and writes them under
+ * @c FIFFB_MNE_ANNOTATIONS; this header is the C++ mirror.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FiffAnnotations class declaration.
- *
+ * @ref FiffAnnotation is one entry (onset in seconds since the
+ * recording start, duration, description string), @ref FiffAnnotations is
+ * the container; together they expose JSON and CSV serialization so the
+ * same annotations can be exchanged with external tools that do not
+ * speak FIFF (eg. BIDS sidecar files).
  */
 
 #ifndef FIFF_ANNOTATIONS_H
@@ -60,7 +50,11 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * @brief Single annotation entry.
+ * @brief One FIFF / MNE annotation: onset (s), duration (s) and description string.
+ *
+ * Field-for-field counterpart of one row of @c mne.Annotations in
+ * MNE-Python. Onset is given in seconds relative to the recording start
+ * (matching the @c first_samp / @c sfreq convention of @ref FiffRawData).
  */
 struct FIFFSHARED_EXPORT FiffAnnotation
 {
@@ -74,7 +68,12 @@ struct FIFFSHARED_EXPORT FiffAnnotation
 
 //=============================================================================================================
 /**
- * @brief Container for FIFF annotations with I/O in JSON and CSV formats.
+ * @brief Container for @ref FiffAnnotation entries with FIFF, JSON and CSV serializers.
+ *
+ * Read and written under @c FIFFB_MNE_ANNOTATIONS so the annotation list
+ * travels with the FIFF file. The JSON and CSV exporters let the same
+ * annotations be consumed by BIDS sidecars and by external scoring
+ * tools that do not understand FIFF directly.
  */
 class FIFFSHARED_EXPORT FiffAnnotations
 {

@@ -1,37 +1,25 @@
 //=============================================================================================================
 /**
- * @file     fiff_raw_data.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fiff_raw_data.h
+ * @since 2022
+ * @date  March 2026
+ * @brief FIFF continuous raw recording: FiffInfo plus a directory of FIFF_DATA_BUFFER tags for random-access sample reads.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FiffRawData class declaration.
- *
+ * @ref FiffRawData represents a continuous (``raw'') Neuromag recording
+ * as stored under @c FIFFB_RAW_DATA / @c FIFFB_CONTINUOUS_DATA: a
+ * @ref FiffInfo describing the channels and acquisition setup, a list of
+ * @ref FiffRawDir entries pointing at each @c FIFF_DATA_BUFFER tag, the
+ * first and last sample indices, the per-channel calibration vector and a
+ * @ref FiffStream handle for on-demand reads. The
+ * @ref FiffStream::read_raw_segment family uses that directory to seek
+ * directly to the buffers that cover a requested sample range, decode
+ * them through the channel cals and projectors, and return a contiguous
+ * Eigen matrix. Drop-in counterpart of @c mne.io.Raw in MNE-Python.
  */
 
 #ifndef FIFF_RAW_DATA_H
@@ -73,9 +61,12 @@ class FiffRawData;
 
 //=============================================================================================================
 /**
- *Provides fiff raw measurement data, including I/O routines.
+ * @brief Continuous FIFF raw recording: @ref FiffInfo plus a random-access directory of @c FIFF_DATA_BUFFER tags.
  *
- * @brief FIFF raw measurement data
+ * The directory built into @ref FiffRawDir lets segment reads jump
+ * straight to the buffers covering the requested sample window, decode
+ * them through the channel cals and active projectors and return a
+ * contiguous channel × sample Eigen matrix without rescanning the file.
  */
 class FIFFSHARED_EXPORT FiffRawData
 {

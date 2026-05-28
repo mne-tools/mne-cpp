@@ -1,35 +1,25 @@
 //=============================================================================================================
 /**
- * @file     fiff_data_ref.h
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    2.0.0
- * @date     February, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file fiff_data_ref.h
+ * @since 2026
+ * @date  February 2026
+ * @brief External-data reference record describing type, endianness, size and offset of an out-of-file FIFF payload.
  *
- * Copyright (C) 2012, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FiffDataRef class declaration.
- *
+ * A @c FIFF_REF_ROLE / @c FIFF_DATA_REF tag carries a small fixed-size
+ * record (the original @c fiffDataRefRec, 24 bytes: two 32-bit ints
+ * followed by two 64-bit offsets) that points at a payload living in a
+ * separate file rather than inline in the FIFF tag stream. This is how
+ * the Neuromag acquisition system splits very long recordings across
+ * multiple physical files while keeping a single logical FIFF tree, and
+ * how MNE-Python's @c mne.io.Raw chains @c .fif fragments through the
+ * @c next_fname mechanism. @ref FiffDataRef is the in-memory representation
+ * of that record; @ref FiffDataRef::storageSize matches the on-disk size
+ * exactly so @ref FiffStream can stream the data ref directly into a
+ * buffer with no per-field marshalling.
  */
 
 #ifndef FIFF_DATA_REF_H
@@ -52,10 +42,13 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * External data reference record describing the type, byte order, size, and offset
- * of data stored in an external file.
+ * @brief External data reference: type, endian, byte size and offset into an external FIFF payload file.
  *
- * @brief External data reference descriptor.
+ * Mirrors the original @c fiffDataRefRec exactly: a 24-byte record made of
+ * two @c qint32 (type, endianness flag) followed by two @c qint64 (payload
+ * size in bytes, byte offset into the external file). The 64-bit fields
+ * let referenced payloads exceed 2 GiB, which is required by long
+ * continuous Neuromag recordings split into multi-file FIFF trees.
  */
 
 class FIFFSHARED_EXPORT FiffDataRef

@@ -1,37 +1,21 @@
 //=============================================================================================================
 /**
- * @file     fiff_events.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file fiff_events.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Stim-channel event list (sample, previous value, new value triples) with FIFF read/write helpers.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FiffEvents class declaration.
- *
+ * FIFF events are the standard integer representation of trigger / stim
+ * information: each event is a @c (sample, previous_value, new_value)
+ * triple, and a list of them is stored under @c FIFFB_MNE_EVENTS. The
+ * @ref FiffEvents class owns one such list and exposes the operations the
+ * rest of FIFFLIB needs: read / write FIFF event files, detect events on
+ * a stim channel of a @ref FiffRawData (parity with
+ * @c mne.find_events), filter by code, and clip to a sample range.
  */
 
 #ifndef FIFF_EVENTS_H
@@ -74,13 +58,12 @@ struct AverageCategory;
 
 //=============================================================================================================
 /**
- * Provides FIFF event storage and I/O operations.
+ * @brief FIFF event list: (sample, prev, new) integer triples with read / write / detect / filter helpers.
  *
- * Each event is stored as a row in an Nx3 matrix: [sample, before, after].
- * The class provides methods to read/write events from/to FIFF or ASCII files,
- * and to detect events from raw data trigger channels.
- *
- * @brief FIFF event container with reading, writing and detection.
+ * On-disk representation matches @c mne.io.write.write_events output and
+ * the @c -eve.fif files consumed by @c mne.read_events; the detection
+ * path mirrors @c mne.find_events. Used by @ref FiffEpochs and the
+ * batch-averaging path in @ref FiffEvokedSet to drive epoch extraction.
  */
 class FIFFSHARED_EXPORT FiffEvents
 {

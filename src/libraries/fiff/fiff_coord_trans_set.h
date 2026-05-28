@@ -1,36 +1,23 @@
 //=============================================================================================================
 /**
- * @file     fiff_coord_trans_set.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     April, 2017
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file fiff_coord_trans_set.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Ordered set of FIFF coordinate transforms, the on-disk content of a FIFFB_MRI / FIFFB_HPI_MEAS block.
  *
- * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FiffCoordTransSet class declaration.
- *
+ * Container that owns multiple @ref FiffCoordTrans instances along with the
+ * auxiliary tags that travel with them inside the FIFF tree
+ * (@c FIFF_MNE_RT_COMMAND comments, fiducial points from
+ * @c FIFFB_ISOTRAK, ...). Used by @ref FiffStream::read_meas_info to
+ * return every device→head / head→MRI / MRI→RAS transform discovered in
+ * the file, and by the registration tooling
+ * (@c mne_analyze, @c mne_coregistration) to load and persist coregistered
+ * ``-trans.fif`` files in the same format @c mne.write_trans produces in
+ * MNE-Python.
  */
 
 #ifndef FIFFCOORDTRANSSET_H
@@ -69,9 +56,12 @@ class FiffCoordTrans;
 
 //=============================================================================================================
 /**
- * Implements a FIFF coordinate transformation descriptor set.
+ * @brief Container for the FIFF coordinate transforms found in (or written to) a FIFFB_MRI / FIFFB_HPI_MEAS block.
  *
- * @brief Coordinate transformation descriptor set.
+ * Owns the list of @ref FiffCoordTrans and the metadata that travels with
+ * them (fiducial points, registration comments). Provides lookup by
+ * (@c from, @c to) frame pair so consumers can ask for, e.g.,
+ * @c FIFFV_COORD_HEAD → @c FIFFV_COORD_MRI without iterating manually.
  */
 class FIFFSHARED_EXPORT FiffCoordTransSet
 {

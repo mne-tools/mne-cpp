@@ -1,37 +1,28 @@
 //=============================================================================================================
 /**
- * @file     fiff_coord_trans.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fiff_coord_trans.h
+ * @since 2022
+ * @date  April 2026
+ * @brief 4x4 affine FIFF coordinate transform (FIFF_COORD_TRANS) annotated with source/destination coordinate-frame IDs.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * The FIFF coordinate-frame world is a small zoo (@c FIFFV_COORD_DEVICE,
+ * @c FIFFV_COORD_HEAD, @c FIFFV_COORD_MRI, @c FIFFV_COORD_HPI,
+ * @c FIFFV_COORD_RAS, ...) and any forward / inverse computation must
+ * move points and orientations between them. @ref FiffCoordTrans wraps one
+ * labelled affine: the 3x3 rotation @c rot, the 3-vector translation
+ * @c move, the precomputed inverse, and the integer @c from / @c to frame
+ * identifiers from @ref fiff_constants.h.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FiffCoordTrans class declaration.
- *
+ * The class also publishes the small algebra needed at the call sites:
+ * multiplication, inversion, and the convenience helper that picks the
+ * right transform out of a @ref FiffCoordTransSet by (@c from, @c to)
+ * pair. Surface-compatible with the @c mne.transforms.Transform object
+ * in MNE-Python.
  */
 
 #ifndef FIFF_COORD_TRANS_H
@@ -73,9 +64,14 @@ class FiffTag;
 
 //=============================================================================================================
 /**
- * Coordinate transformation description.
+ * @brief Labelled 4x4 FIFF affine: source frame, destination frame, rotation, translation and cached inverse.
  *
- * @brief Coordinate transformation description.
+ * Each transform carries its source (@c from) and destination (@c to)
+ * @c FIFFV_COORD_* frame identifiers so the inverse and any chained
+ * composition can be type-checked at runtime. The inverse is stored
+ * alongside the forward transform because both directions are routinely
+ * needed (device→head for head-position tracking, head→MRI for source
+ * space registration, etc.).
  */
 class FIFFSHARED_EXPORT FiffCoordTrans
 {

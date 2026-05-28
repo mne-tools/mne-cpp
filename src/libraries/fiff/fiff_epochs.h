@@ -1,36 +1,22 @@
 //=============================================================================================================
 /**
- * @file     fiff_epochs.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.3.0
- * @date     May, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file fiff_epochs.h
+ * @since 2026
+ * @date  May 2026
+ * @brief Static epoching utilities: cut a FiffRawData stream into fixed-length, event-aligned epochs.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Epoch convenience utilities.
- *
- * Equivalent to MNE-Python's mne.make_fixed_length_epochs and mne.concatenate_epochs.
+ * Implements the equivalent of @c mne.Epochs construction from a
+ * continuous recording: given a @ref FiffRawData, an event list (or a
+ * fixed step), and a time window (@c tmin, @c tmax), it returns a
+ * 3D (nepoch × nchan × nsamples) stack along with the associated
+ * @ref FiffInfo. Bad-segment rejection (via @ref FiffAnnotation
+ * ``BAD_*'' entries) and peak-to-peak / flatness rejection
+ * (via @ref RejectionParams in @ref fiff_evoked_set.h) are applied as
+ * the epochs are cut.
  */
 
 #ifndef FIFF_EPOCHS_H
@@ -65,7 +51,11 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * @brief Result structure for fixed-length epoching.
+ * @brief Fixed-length epoching result: the (nepoch × nchan × nsamples) data stack plus the matching @ref FiffInfo.
+ *
+ * Returned by the static epoch-cutting helpers in @ref FiffEpochsUtils.
+ * Mirrors the @c mne.EpochsArray construction return value in
+ * MNE-Python.
  */
 struct FIFFSHARED_EXPORT FiffEpochData
 {
@@ -76,12 +66,11 @@ struct FIFFSHARED_EXPORT FiffEpochData
 
 //=============================================================================================================
 /**
- * @brief Static utilities for epoch creation and manipulation.
+ * @brief Free / static helpers that turn a @ref FiffRawData plus an event list into fixed-length epochs.
  *
- * Provides:
- * - makeFixedLengthEpochs: Segment continuous data into fixed-length epochs
- * - concatenateEpochs: Concatenate multiple epoch sets into one
- * - averageEpochs: Compute average across epochs
+ * Stateless — operates on the @ref FiffRawData and event arguments
+ * directly. Used by the source-reconstruction pipeline and by the offline
+ * averaging tooling when building epochs for an @ref FiffEvokedSet.
  */
 class FIFFSHARED_EXPORT FiffEpochs
 {

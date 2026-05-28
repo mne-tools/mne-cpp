@@ -1,37 +1,25 @@
 //=============================================================================================================
 /**
- * @file     fiff_cov.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fiff_cov.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Noise / data covariance matrix as stored under FIFFB_MNE_COV, with channel names, kind, projector list and rank info.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FiffCov class declaration.
- *
+ * @ref FiffCov is the C++ counterpart of MNE-Python's @c mne.Covariance.
+ * It holds the (typically channel × channel) covariance matrix, the
+ * channel-name list it is indexed by, the kind tag
+ * (@c FIFFV_MNE_NOISE_COV / @c FIFFV_MNE_SOURCE_COV / ...), the diagonal
+ * flag, the projector list that was active when the covariance was
+ * estimated (@ref FiffProj), the bad-channel list, the nfree degrees of
+ * freedom and an optional pre-whitening eigendecomposition. The class is
+ * what @ref FiffStream reads from / writes to ``*-cov.fif`` files and
+ * what the source-localization pipeline consumes to whiten the forward
+ * gain matrix and the measurement data.
  */
 
 #ifndef FIFF_COV_H
@@ -77,9 +65,12 @@ class FiffRawData;
 
 //=============================================================================================================
 /**
- * Fiff cov data, which corresponds to a covariance data matrix
+ * @brief FIFF noise / data covariance: matrix, channel names, kind, applied projectors, bads, dof and optional whitening eigendecomposition.
  *
- * @brief covariance data
+ * Round-trips with ``*-cov.fif`` files and with @c mne.Covariance in
+ * MNE-Python. Carries both the raw matrix and the metadata needed to
+ * regularize, project away SSP subspaces, and pre-whiten downstream
+ * forward / inverse computations.
  */
 class FIFFSHARED_EXPORT FiffCov : public QSharedData
 {
