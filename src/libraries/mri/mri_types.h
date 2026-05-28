@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026 MNE-CPP Authors
+//   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 //=============================================================================================================
 /**
  * @file     mri_types.h
@@ -5,37 +9,28 @@
  * @since    2.0.0
  * @date     February, 2026
  *
- * @section  LICENSE
+ * @brief    Numeric type codes, layout constants, and sentinel values shared by every MRI reader.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ *           Centralises the four magic-number families that show up in every
+ *           MGH/MGZ, COR and (indirectly) NIfTI reader so that the I/O classes
+ *           themselves stay free of stray integer literals:
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ *             - @b voxel-type codes (MRI_UCHAR, MRI_INT, MRI_FLOAT, MRI_SHORT)
+ *               used to decode the @c type field of the MGH header and to
+ *               dispatch the corresponding QVector storage on the consumer side;
+ *             - @b frame-selection sentinels (MRI_ALL_FRAMES, MRI_NO_FRAMES)
+ *               used by the MGH reader API to distinguish "read everything"
+ *               from "header-only" without overloading the parameter type;
+ *             - @b format-version (MRI_MGH_VERSION = 1, the only value any
+ *               FreeSurfer-produced MGH file should ever carry) used as a
+ *               sanity gate when a candidate file is opened;
+ *             - @b COR geometry constants (slice size, isotropic 1 mm voxel
+ *               edge) used to materialise the per-slice coordinate transforms.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MRI type definitions and constants.
- *
- *           Constants and type definitions for handling FreeSurfer MRI data
- *           in MGH/MGZ format. Based on the FreeSurfer MGH format specification:
+ *           Format reference:
  *           https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat
- *
- *           Originally defined in MNE C (mne_types_mne-c.h) by Matti Hamalainen.
- *
+ *           These constants originate from FreeSurfer's @c mri.h and were
+ *           ported via MNE C's @c mne_types_mne-c.h by Matti Hamalainen.
  */
 
 #ifndef MRI_TYPES_H

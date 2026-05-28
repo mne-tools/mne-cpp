@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2012-2026 MNE-CPP Authors
+//   Christoph Dinh <christoph.dinh@mne-cpp.org>
+//   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+//   Gabriel Motta <gabrielbenmotta@gmail.com>
+
 //=============================================================================================================
 /**
  * @file     mri_cor_io.h
@@ -5,43 +11,30 @@
  * @since    2.0.0
  * @date     February, 2026
  *
- * @section  LICENSE
+ * @brief    Reader for the legacy FreeSurfer COR-NNN per-slice volume layout (256 unsigned-char coronal slices on a 1 mm isotropic grid).
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ *           COR is the directory-based volume format used by FreeSurfer
+ *           before MGH became the default. A subject's @c mri/T1 (and
+ *           historically @c mri/orig, @c mri/brain, ...) directory contains
+ *           256 files named @c COR-001 through @c COR-256, each a flat
+ *           65 536-byte (256\u00d7256 unsigned char) coronal slice. While
+ *           modern FreeSurfer prefers MGH, COR-format trees still appear
+ *           in legacy subject directories and in mne-c tutorial data, so
+ *           mne-cpp must read them to keep round-trip parity with the
+ *           original MNE C tooling.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ *           The reader fans the 256 files into an @ref MriSlice vector
+ *           with the canonical coronal-to-surface-RAS coordinate transform:
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ *             - Origin offset (mm): (128, -128, 128)
+ *             - Axis permutation:   x \u2192 -x,  y \u2192 z,  z \u2192 y
  *
+ *           which matches the convention emitted by @c make_cor_set() in
+ *           the original @c mne_make_cor_set C tool and is what every
+ *           downstream BEM / source-space builder in MNE-CPP expects.
  *
- * @brief    MriCorIO class declaration.
- *
- *           Reader for FreeSurfer COR slice files.
- *
- *           COR files are a legacy FreeSurfer volume format where each coronal
- *           slice is stored as a separate file named COR-001 through COR-256.
- *           Each file contains 256×256 unsigned chars at 1mm isotropic resolution.
- *
- *           The coordinate system uses coronal orientation:
- *             - Origin offset: (0.128, -0.128, 0.128) meters
- *             - Rotation:  x → -x,  y → z,  z → y  (coronal to MRI surface RAS)
- *
- *           Ported from make_cor_set() in MNE C mne_make_cor_set by Matti Hamalainen.
- *
+ *           Ported from @c make_cor_set() in MNE C @c mne_make_cor_set
+ *           by Matti Hamalainen.
  */
 
 #ifndef MRI_COR_IO_H

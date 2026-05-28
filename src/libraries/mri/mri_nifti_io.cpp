@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026 MNE-CPP Authors
+//   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 //=============================================================================================================
 /**
  * @file     mri_nifti_io.cpp
@@ -5,31 +9,22 @@
  * @since    2.3.0
  * @date     May, 2026
  *
- * @section  LICENSE
+ * @brief    Implementation of @ref MRILIB::MriNiftiIO: 348-byte header parse, byte-order auto-detect, sform/qform/pixdim transform reconstruction.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MriNiftiIO class implementation.
- *
+ *           Implements the three pieces the header documents: (1) a
+ *           little-endian-by-default 348-byte header parse that flips to
+ *           big-endian when @c sizeof_hdr fails its magic check and applies
+ *           the swap uniformly to every multi-byte field; (2) the voxel
+ *           reader, which respects @c datatype (UINT8 / INT16 / INT32 /
+ *           FLOAT32, the four types we actually encounter in practice)
+ *           and promotes to the matching @ref MriSlice pixel buffer so
+ *           round-tripping through @ref MriCorFifIO stays lossless;
+ *           (3) the sform \u2192 qform \u2192 pixdim transform fallback chain
+ *           (the same ordering nibabel and FSL use) that produces a
+ *           single canonical voxel\u2192RAS affine regardless of how the
+ *           source file was authored. The @c .nii.gz path shares the
+ *           MGZ zlib decoder so both compressed formats route through
+ *           the same code.
  */
 
 //=============================================================================================================

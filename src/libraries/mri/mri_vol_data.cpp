@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026 MNE-CPP Authors
+//   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 //=============================================================================================================
 /**
  * @file     mri_vol_data.cpp
@@ -5,31 +9,25 @@
  * @since    2.0.0
  * @date     February, 2026
  *
- * @section  LICENSE
+ * @brief    Implementation of @ref MRILIB::MriVolData: header-driven geometry computations and the suffix-dispatch loader.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ *           Houses the non-trivial methods @ref MriVolData declares:
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MriVolData class definition.
- *
+ *             - @c voxToSurfRAS() / @c surfRASToVox() build the
+ *               canonical 4\u00d74 affines from the MGH @c Mdc direction-
+ *               cosine matrix, @c spacing vector and @c c_ras centre,
+ *               matching FreeSurfer's @c MRIxfmCRS2XYZtkreg() exactly
+ *               (the same convention MNE-Python's @c _read_mri_info
+ *               returns) so source-space and BEM tooling stay
+ *               coordinate-compatible.
+ *             - @c voxelDataAsFloat() flattens the slice-of-slices
+ *               representation back into the column-major x-fastest
+ *               buffer that downstream resamplers and exporters expect,
+ *               promoting UCHAR / SHORT / INT inputs to float on the fly.
+ *             - @c read() inspects the path suffix and dispatches to
+ *               @ref MriMghIO (.mgh / .mgz), @ref MriNiftiIO
+ *               (.nii / .nii.gz), or the COR directory loader, giving
+ *               callers a single \"load whatever this is\" entry point.
  */
 
 //=============================================================================================================

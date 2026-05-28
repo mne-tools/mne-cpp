@@ -165,16 +165,81 @@ def build_spdx_block(
     return "\n".join(lines) + "\n"
 
 
+def _person_key(name: str) -> str:
+    """Normalize a display name into a person-identity key.
+
+    Collapses case, whitespace, punctuation, and short handle variants so that
+    ``Lorenz Esch``, ``lorenz.esch``, and ``LorenzE`` map to the same person.
+    The rule: lowercase, strip non-alphanumerics, then keep the longest
+    contiguous alpha run -- this folds handles like ``juangpc`` and
+    ``LorenzE`` onto the same key as their full name as long as the surname
+    (``gpc``/``esch``) is the shared longest token. When that fails, we fall
+    back to the raw lowercased name; the migration script's --strict mode can
+    later flag any remaining duplicates for a manual override file.
+    """
+    raw = re.sub(r"[^a-z0-9]+", " ", name.lower()).strip()
+    if not raw:
+        return ""
+    return raw
+
+
+# Manual person aliases for cases the heuristic can't collapse on its own.
+# Maps a normalized name fragment to a canonical (display name, preferred
+# email) tuple. Extend as needed; one entry per real person.
+_PERSON_ALIASES: dict[str, tuple[str, str]] = {
+    "christoph dinh":  ("Christoph Dinh",  "christoph.dinh@mne-cpp.org"),
+    "chdinh":          ("Christoph Dinh",  "christoph.dinh@mne-cpp.org"),
+    "lorenz esch":     ("Lorenz Esch",     "lorenz.esch@tu-ilmenau.de"),
+    "lorenze":         ("Lorenz Esch",     "lorenz.esch@tu-ilmenau.de"),
+    "lorenzesch":      ("Lorenz Esch",     "lorenz.esch@tu-ilmenau.de"),
+    "juan gpc":        ("Juan GPC",        "jgarciaprieto@mgh.harvard.edu"),
+    "juangpc":         ("Juan GPC",        "jgarciaprieto@mgh.harvard.edu"),
+    "gabriel motta":   ("Gabriel Motta",   "gabrielbenmotta@gmail.com"),
+    "gabrielbmotta":   ("Gabriel Motta",   "gabrielbenmotta@gmail.com"),
+    "matti hamalainen":("Matti Hamalainen","msh@nmr.mgh.harvard.edu"),
+    "rdoerfel":        ("Ruben Doerfel",   "doerfelruben@aol.com"),
+    "ruben doerfel":   ("Ruben Doerfel",   "doerfelruben@aol.com"),
+}
+
+
+def _canonical_person(name: str, email: str) -> tuple[str, str]:
+    """Resolve *(name, email)* to a canonical author identity via aliases.
+
+    Falls through to the raw inputs (cleaned up) when no alias matches.
+    """
+    key = _person_key(name)
+    if key in _PERSON_ALIASES:
+        return _PERSON_ALIASES[key]
+    # also try matching by the email local-part (e.g. "chdinh" in chdinh@...)
+    local = email.split("@", 1)[0].lower()
+    local_clean = re.sub(r"[^a-z]+", "", local)
+    if local_clean in _PERSON_ALIASES:
+        return _PERSON_ALIASES[local_clean]
+    return (name.strip(), email.strip())
+
+
 def _unique_authors(
     authors: Iterable[tuple[str, str]],
 ) -> list[tuple[str, str]]:
+    """Collapse the (name, email) stream to one entry per real person.
+
+    Dedup strategy (in order):
+      1. Drop bot/no-reply addresses.
+      2. Resolve each entry through :data:`_PERSON_ALIASES` to a canonical
+         identity (so ``chdinh@nmr.mgh.harvard.edu`` and
+         ``christoph.dinh@tu-ilmenau.de`` both fold to one Christoph Dinh).
+      3. Within a person, keep the FIRST canonical entry seen -- which, when
+         the caller feeds ``git log --follow`` output in reverse-chronological
+         order, means the most recent email survives.
+    """
     seen: dict[str, tuple[str, str]] = {}
     for name, email in authors:
-        key = email.strip().lower()
-        if not key or _BOT_EMAIL_RE.search(email):
+        if not email.strip() or _BOT_EMAIL_RE.search(email):
             continue
+        canon_name, canon_email = _canonical_person(name, email)
+        key = _person_key(canon_name) or canon_email.lower()
         if key not in seen:
-            seen[key] = (name.strip(), email.strip())
+            seen[key] = (canon_name, canon_email)
     return list(seen.values())
 
 

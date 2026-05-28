@@ -1,3 +1,10 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2012-2026 MNE-CPP Authors
+//   Christoph Dinh <christoph.dinh@mne-cpp.org>
+//   Ruben Doerfel <doerfelruben@aol.com>
+//   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+//   Gabriel Motta <gabrielbenmotta@gmail.com>
+
 //=============================================================================================================
 /**
  * @file     mri_slicer.h
@@ -5,31 +12,32 @@
  * @since    2.2.0
  * @date     April, 2026
  *
- * @section  LICENSE
+ * @brief    Orthogonal-plane resampler that turns a 3D @ref MriVolData into the 2D textures consumed by the slice viewer.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ *           The slicer is the bridge between the format-specific MRI
+ *           readers (@ref MriMghIO, @ref MriNiftiIO, @ref MriCorIO) and
+ *           the @c MriSlicesPlugin / @c MriSlicesView widgets that
+ *           render axial / coronal / sagittal cross-sections in
+ *           @c mne_analyze_studio. Two cooperating types live here:
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ *             - @ref SliceOrientation --- a strong enum picking the slicing
+ *               axis (Axial / Coronal / Sagittal); used both as the user-
+ *               facing radio-button value in the slice viewer and as the
+ *               index-permutation key inside the slicer itself.
+ *             - @ref MriSliceImage --- the result type: a normalised
+ *               (0..1) @c Eigen::MatrixXf pixel buffer ready to upload
+ *               as an OpenGL texture, paired with its own slice-to-RAS
+ *               4\u00d74 transform so the viewer can overlay surface meshes,
+ *               source estimates or fiducials in the correct world space
+ *               without re-deriving the geometry from the volume header.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MriSlicer class declaration.
- *
+ *           The static @ref MriSlicer::extract() method does the actual
+ *           work: it picks the right axis stride from the volume header,
+ *           dispatches by on-disk voxel type (UCHAR / SHORT / INT /
+ *           FLOAT) so quantisation matches the source, normalises by the
+ *           per-volume max so windowing stays stable across slices, and
+ *           composes @c sliceToRas from the volume's @c voxToSurfRAS()
+ *           pre-multiplied by the orientation-specific in-slice affine.
  */
 
 #ifndef MRI_SLICER_H

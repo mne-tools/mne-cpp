@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026 MNE-CPP Authors
+//   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 //=============================================================================================================
 /**
  * @file     mri_vol_data.h
@@ -5,40 +9,36 @@
  * @since    2.0.0
  * @date     February, 2026
  *
- * @section  LICENSE
+ * @brief    Format-agnostic in-memory representation of a 3D MRI volume plus its slice decomposition.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ *           Two cooperating types live in this header:
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ *             - @ref MriSlice --- a single 2D slice with its own pixel buffer
+ *               (byte / word / float, picked at load time to mirror the
+ *               on-disk @c FIFFV_MRI_PIXEL_* encoding) and an explicit
+ *               slice-to-MRI (surface RAS) @ref FIFFLIB::FiffCoordTrans.
+ *               This is the unit the rendering pipeline and the COR.fif
+ *               writer consume, so every loader (MGH, NIfTI, raw COR)
+ *               ultimately decomposes its 3D buffer into a vector of these.
+ *             - @ref MriVolData --- the full volume bundle: header geometry
+ *               (width/height/depth, voxel spacing, direction cosines,
+ *               RAS centre), optional scan parameters (TR / TE / flip-angle
+ *               / FoV), and the slice vector above. It owns the
+ *               @c voxToSurfRAS(), @c voxToTalairach() and inverse
+ *               transforms derived from the MGH @c Mdc / @c c_ras header
+ *               fields and any additional transforms attached by the
+ *               source-file reader (e.g. talairach.xfm).
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ *           The @c read() convenience method dispatches by file suffix to
+ *           the matching loader (@ref MriMghIO, @ref MriNiftiIO, COR
+ *           directory) so application code can stay one-liner clean
+ *           irrespective of the on-disk format --- the equivalent of
+ *           @c nibabel.load() on the Python side.
  *
- *
- * @brief    MriVolData class declaration.
- *
- *           Holds loaded MRI volume data from FreeSurfer MGH/MGZ files,
- *           including header geometry, voxel-to-RAS transforms, and voxel data.
- *
- *           Based on the FreeSurfer MGH format specification:
+ *           Header reference:
  *           https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat
- *
- *           Ported from mneMRIdataRec / mneMRIvolumeRec in MNE C (mne_types_mne-c.h)
- *           by Matti Hamalainen.
- *
+ *           Ported from @c mneMRIdataRec / @c mneMRIvolumeRec in MNE C
+ *           (@c mne_types_mne-c.h) by Matti Hamalainen.
  */
 
 #ifndef MRI_VOL_DATA_H

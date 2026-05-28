@@ -2,9 +2,13 @@
 # Copyright (c) 2026 MNE-CPP Authors
 #   Christoph Dinh <christoph.dinh@mne-cpp.org>
 #
-# doc/CMakeLists.txt — wires the `docs_api` custom target which runs
+# doc/CMakeLists.txt — wires the `mne_cpp_docs_api` custom target which runs
 # Doxygen against doc/Doxyfile to emit the XML AST consumed by
 # tools/doxy2mdx/doxy2mdx.py (see v2.3.0-requirements.md TASK 18).
+#
+# Note: skigen (vendored under src/external/skigen) defines its own
+# `docs_api` target, so ours carries the `mne_cpp_` prefix to coexist with
+# it inside a single configure tree.
 
 # Allow this directory to be configured standalone (handy for CI jobs
 # that only build docs and skip the heavy C++ tree); when included via
@@ -16,11 +20,11 @@ endif()
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-    add_custom_target(docs_api
+    add_custom_target(mne_cpp_docs_api
         COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating Doxygen XML for the mne-cpp public API"
         VERBATIM)
 else()
-    message(STATUS "Doxygen not found — docs_api target unavailable")
+    message(STATUS "Doxygen not found \u2014 mne_cpp_docs_api target unavailable")
 endif()

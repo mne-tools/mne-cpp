@@ -1,3 +1,11 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2012-2026 MNE-CPP Authors
+//   Christoph Dinh <christoph.dinh@mne-cpp.org>
+//   Ruben Doerfel <doerfelruben@aol.com>
+//   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+//   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+//   Gabriel Motta <gabrielbenmotta@gmail.com>
+
 //=============================================================================================================
 /**
  * @file     mri_nifti_io.h
@@ -5,46 +13,35 @@
  * @since    2.3.0
  * @date     May, 2026
  *
- * @section  LICENSE
+ * @brief    NIfTI-1 single-file (.nii / .nii.gz) volume reader producing the same per-slice layout as the MGH reader.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MriNiftiIO class declaration.
- *
- *           Reader for NIfTI-1 single-file volumes (.nii and .nii.gz).
- *
- *           Format reference: https://nifti.nimh.nih.gov/nifti-1
+ *           NIfTI-1 is the standard exchange container used by FSL, AFNI,
+ *           SPM, nibabel and essentially every neuroimaging toolchain
+ *           outside the FreeSurfer ecosystem; adding it to MRILIB lets
+ *           mne-cpp consume preprocessed structurals produced by any of
+ *           those pipelines (e.g. BIDS subjects whose anatomicals never
+ *           pass through @c recon-all) without requiring an external
+ *           conversion step. The reader stays surface-compatible with
+ *           @ref MriMghIO so the slicing, rendering and COR.fif export
+ *           paths downstream do not need to branch on source format.
  *
  *           The header is 348 bytes; image data starts at @c vox_offset
  *           (typically 352 for single-file .nii). All scalar fields are
  *           little-endian by default; big-endian files are detected via the
- *           @c sizeof_hdr field. Voxel data is read into the same
- *           per-slice @ref MriSlice layout used by the MGH reader so that
- *           the downstream MRI slicing/rendering pipeline does not need to
- *           branch on the source format.
+ *           @c sizeof_hdr magic and the whole header is byte-swapped
+ *           up-front. The @c .nii.gz variant is decompressed in memory via
+ *           zlib's @c MAX_WBITS+16 mode, mirroring the MGZ path.
  *
- *           Transform extraction prefers @c sform (3 affine rows directly in
- *           voxel→RAS mm), falls back to @c qform (quaternion + offset), and
- *           finally to the @c pixdim diagonal centred at the volume origin.
+ *           Transform extraction follows the NIfTI-1 priority rule used by
+ *           nibabel and FSL: prefer @c sform (3 affine rows directly in
+ *           voxel\u2192RAS mm), fall back to @c qform (unit quaternion +
+ *           offset, expanded into a rotation matrix), and as a last resort
+ *           build a diagonal transform from @c pixdim centred at the
+ *           volume origin. This ordering is encoded once in @ref read() so
+ *           every caller gets the same RAS regardless of how the source
+ *           file was authored.
+ *
+ *           Format reference: https://nifti.nimh.nih.gov/nifti-1
  */
 
 #ifndef MRI_NIFTI_IO_H
