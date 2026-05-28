@@ -4,10 +4,10 @@
  * Copyright (c) 2013-2026 MNE-CPP Authors
  *
  * @file     fiff_info_base.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Florian Schlembach <fschlembach@web.de>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Florian Schlembach <fschlembach@web.de>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     February 2013
  * @brief    Implementation of @ref FiffInfoBase: stripped measurement info (channels, sfreq, bads, dev_head_t) shared by every FIFF container.

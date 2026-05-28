@@ -4,14 +4,14 @@
  * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     fiff_dig_point.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
- * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   doerfelruben@aol.com <rdorfel@mgh.harvard.edu>
- * @author   Ruben Doerfel <doerfelruben@aol.com>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Christof Pieloth <pieloth@labp.htwk-leipzig.de>;
+ *           Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           doerfelruben@aol.com <rdorfel@mgh.harvard.edu>;
+ *           Ruben Doerfel <doerfelruben@aol.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     October 2012
  * @brief    Single digitization point (FIFF_DIG_POINT) with kind (cardinal/HPI/EEG/extra), identifier and 3D coordinates.

@@ -4,9 +4,9 @@
  * Copyright (c) 2017-2026 MNE-CPP Authors
  *
  * @file     observerpattern.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     September 2017
  * @brief    Out-of-line definitions of @ref UTILSLIB::Subject — attach/detach observer bookkeeping and the @c notify() fan-out.

@@ -4,13 +4,13 @@
  * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     fiff_info.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Florian Schlembach <fschlembach@web.de>
- * @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Ruben Doerfel <doerfelruben@aol.com>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Florian Schlembach <fschlembach@web.de>;
+ *           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Ruben Doerfel <doerfelruben@aol.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     October 2012
  * @brief    Implementation of @ref FiffInfo: read / write of FIFFB_MEAS / FIFFB_MEAS_INFO and the channel-picking, projector and compensator surgery.

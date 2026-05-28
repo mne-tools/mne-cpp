@@ -4,9 +4,9 @@
  * Copyright (c) 2020-2026 MNE-CPP Authors
  *
  * @file     coregsettingsview.cpp
- * @author   Ruben Doerfel <doerfelruben@aol.com>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Ruben Doerfel <doerfelruben@aol.com>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.7
  * @date     August 2020
  * @brief    Implementation of the CoregSettingsView co-registration parameter panel.

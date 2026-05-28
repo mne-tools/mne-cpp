@@ -4,10 +4,10 @@
  * Copyright (c) 2017-2026 MNE-CPP Authors
  *
  * @file     fwd_eeg_sphere_model.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     March 2017
  * @brief    Multi-shell spherical head model with Berg-Scherg equivalent-source approximation for fast EEG forward computation.

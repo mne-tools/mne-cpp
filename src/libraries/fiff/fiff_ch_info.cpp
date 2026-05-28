@@ -4,11 +4,11 @@
  * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     fiff_ch_info.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Andreas Griesshammer <ag@fieldlineinc.com>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Andreas Griesshammer <ag@fieldlineinc.com>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     October 2012
  * @brief    Implementation of @ref FiffChInfo: read / write of the FIFF_CH_INFO record and the conversion helpers used by the channel-picking path.

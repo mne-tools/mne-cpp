@@ -4,11 +4,11 @@
  * Copyright (c) 2013-2026 MNE-CPP Authors
  *
  * @file     fiff_info_base.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Florian Schlembach <fschlembach@web.de>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Florian Schlembach <fschlembach@web.de>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     February 2013
  * @brief    Minimal measurement-info subset (channel list, sampling rate, basic transforms) shared by FIFF readers that do not need the full FiffInfo.

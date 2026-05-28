@@ -4,10 +4,10 @@
  * Copyright (c) 2018-2026 MNE-CPP Authors
  *
  * @file     connectivitysettingsview.cpp
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   johaenns <j.vorw01@gmail.com>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           johaenns <j.vorw01@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
  * @brief    Implementation of the ConnectivitySettingsView connectivity-metric panel.

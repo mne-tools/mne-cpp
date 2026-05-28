@@ -4,10 +4,10 @@
  * Copyright (c) 2017-2026 MNE-CPP Authors
  *
  * @file     circularbuffer.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     September 2017
  * @brief    Bounded single-producer / single-consumer ring buffer used to decouple acquisition threads from processing threads.

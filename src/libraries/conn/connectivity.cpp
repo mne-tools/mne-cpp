@@ -4,11 +4,11 @@
  * Copyright (c) 2017-2026 MNE-CPP Authors
  *
  * @file     connectivity.cpp
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   mfarisyahya <mfarisyahya@gmail.com>
- * @author   Daniel Strohmeier <daniel.strohmeier@gmail.com>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           mfarisyahya <mfarisyahya@gmail.com>;
+ *           Daniel Strohmeier <daniel.strohmeier@gmail.com>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     March 2017
  * @brief    Implementation of @ref CONNLIB::Connectivity - the dispatcher that runs the requested functional-connectivity metrics over a @ref CONNLIB::ConnectivitySettings batch.

@@ -4,12 +4,12 @@
  * Copyright (c) 2015-2026 MNE-CPP Authors
  *
  * @file     mne_bem_surface.h
- * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   sheinke <simon.j.w.heinke@gmail.com>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           sheinke <simon.j.w.heinke@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     June 2015
  * @brief    Single closed BEM surface (triangulation, normals, conductivity).

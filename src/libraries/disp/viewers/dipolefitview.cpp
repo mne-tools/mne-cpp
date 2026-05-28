@@ -4,9 +4,9 @@
  * Copyright (c) 2020-2026 MNE-CPP Authors
  *
  * @file     dipolefitview.cpp
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Andreas Griesshammer <ag@fieldlineinc.com>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Andreas Griesshammer <ag@fieldlineinc.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.8
  * @date     November 2020
  * @brief    Implementation of the DipoleFitView dipole-fit input / result panel.

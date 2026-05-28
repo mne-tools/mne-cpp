@@ -4,11 +4,11 @@
  * Copyright (c) 2017-2026 MNE-CPP Authors
  *
  * @file     fwd_bem_model.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Ruben Doerfel <doerfelruben@aol.com>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Ruben Doerfel <doerfelruben@aol.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     March 2017
  * @brief    Boundary Element Method (BEM) volume-conductor model — layered triangulated surfaces, conductivities, IP-approach matrix and potential-solution matrix.

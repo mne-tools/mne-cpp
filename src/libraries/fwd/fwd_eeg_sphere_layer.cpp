@@ -4,9 +4,9 @@
  * Copyright (c) 2017-2026 MNE-CPP Authors
  *
  * @file     fwd_eeg_sphere_layer.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     March 2017
  * @brief    FwdEegSphereLayer implementation — trivial storage for one concentric shell (@c rad, @c sigma) of the layered de Munck / Berg-Scherg EEG head model, plus the inner-to-outer radius comparator used by the model setup.

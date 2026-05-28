@@ -4,9 +4,9 @@
  * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     fiff.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     August 2012
  * @brief    Definitions for the static MATLAB-style FIFF facade declared in @ref fiff.h.

@@ -4,10 +4,10 @@
  * Copyright (c) 2018-2026 MNE-CPP Authors
  *
  * @file     bar.cpp
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Andreas Griesshammer <ag@fieldlineinc.com>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Andreas Griesshammer <ag@fieldlineinc.com>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
  * @brief    Implementation of the Bar histogram widget (axis layout and bar drawing).

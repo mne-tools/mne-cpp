@@ -4,11 +4,11 @@
  * Copyright (c) 2015-2026 MNE-CPP Authors
  *
  * @file     selectionio.h
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Andreas Griesshammer <ag@fieldlineinc.com>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Andreas Griesshammer <ag@fieldlineinc.com>
  * @since    0.1.0
  * @date     May 2015
  * @brief    Reader / writer for MNE @c .sel channel-selection files and Brainstorm @c .mon montage files.

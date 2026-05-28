@@ -4,9 +4,9 @@
  * Copyright (c) 2016-2026 MNE-CPP Authors
  *
  * @file     networkedge.cpp
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     August 2016
  * @brief    Implementation of @ref CONNLIB::NetworkEdge - directional weighted edge with per-frequency weight matrix and configurable band-averaging window.

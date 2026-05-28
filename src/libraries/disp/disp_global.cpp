@@ -4,9 +4,9 @@
  * Copyright (c) 2021-2026 MNE-CPP Authors
  *
  * @file     disp_global.cpp
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     August 2021
  * @brief    Implementation of the build-info hook for the DISPLIB shared library.

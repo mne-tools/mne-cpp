@@ -4,12 +4,12 @@
  * Copyright (c) 2020-2026 MNE-CPP Authors
  *
  * @file     hpisettingsview.h
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Ruben Doerfel <doerfelruben@aol.com>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Andreas Griesshammer <ag@fieldlineinc.com>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Ruben Doerfel <doerfelruben@aol.com>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Andreas Griesshammer <ag@fieldlineinc.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     March 2020
  * @brief    Continuous HPI head-position-indicator configuration panel.

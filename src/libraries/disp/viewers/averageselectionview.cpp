@@ -4,9 +4,9 @@
  * Copyright (c) 2018-2026 MNE-CPP Authors
  *
  * @file     averageselectionview.cpp
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     July 2018
  * @brief    Implementation of the AverageSelectionView picker.

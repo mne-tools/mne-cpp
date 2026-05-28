@@ -4,11 +4,11 @@
  * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     fiff_stream.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Christof Pieloth <pieloth@labp.htwk-leipzig.de>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     October 2012
  * @brief    FIFF binary tag-stream layer: wraps a QIODevice to read and write FIFF tags, directories, blocks and the structured records nested inside them.

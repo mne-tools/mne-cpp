@@ -4,10 +4,10 @@
  * Copyright (c) 2014-2026 MNE-CPP Authors
  *
  * @file     layoutmaker.cpp
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Andreas Griesshammer <ag@fieldlineinc.com>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Andreas Griesshammer <ag@fieldlineinc.com>
  * @since    0.1.0
  * @date     November 2014
  * @brief    Implementation of @ref UTILSLIB::LayoutMaker — sphere fit, azimuthal projection and @c .lout writer.

@@ -4,11 +4,11 @@
  * Copyright (c) 2018-2026 MNE-CPP Authors
  *
  * @file     channelselectionview.cpp
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Andreas Griesshammer <ag@fieldlineinc.com>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Andreas Griesshammer <ag@fieldlineinc.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
  * @brief    Implementation of the ChannelSelectionView interactive channel-group picker.

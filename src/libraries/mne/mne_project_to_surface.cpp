@@ -4,12 +4,12 @@
  * Copyright (c) 2016-2026 MNE-CPP Authors
  *
  * @file     mne_project_to_surface.cpp
- * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
- * @author   1DIce <lars.debor@tu-ilmenau.de>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Ruben Doerfel <doerfelruben@aol.com>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
+ *           1DIce <lars.debor@tu-ilmenau.de>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Ruben Doerfel <doerfelruben@aol.com>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     August 2016
  * @brief    Implementation of @ref MNELIB::MNEProjectToSurface.

@@ -4,11 +4,11 @@
  * Copyright (c) 2016-2026 MNE-CPP Authors
  *
  * @file     networknode.h
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Daniel Strohmeier <daniel.strohmeier@gmail.com>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Daniel Strohmeier <daniel.strohmeier@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     August 2016
  * @brief    Node of a connectivity @ref Network; carries a 3D position and the lists of incident (in / out, full / thresholded) edges.

@@ -4,10 +4,10 @@
  * Copyright (c) 2017-2026 MNE-CPP Authors
  *
  * @file     connectivitysettings.h
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Daniel Strohmeier <daniel.strohmeier@gmail.com>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Daniel Strohmeier <daniel.strohmeier@gmail.com>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     March 2017
  * @brief    Input-data and parameter container shared by every functional-connectivity metric in @c CONNLIB.

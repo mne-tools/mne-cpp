@@ -4,11 +4,11 @@
  * Copyright (c) 2019-2026 MNE-CPP Authors
  *
  * @file     rtfiffrawviewdelegate.h
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Wayne F. Mead <isk@imsorrykun.com>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Wayne F. Mead <isk@imsorrykun.com>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     November 2019
  * @brief    QAbstractItemDelegate painting one FIFF channel's signal trace inside @ref RtFiffRawView.

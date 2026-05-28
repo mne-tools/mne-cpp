@@ -4,11 +4,11 @@
  * Copyright (c) 2018-2026 MNE-CPP Authors
  *
  * @file     imagcoherence.h
- * @author   Daniel Strohmeier <daniel.strohmeier@gmail.com>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Daniel Strohmeier <daniel.strohmeier@gmail.com>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     April 2018
  * @brief    Volume-conduction-robust imaginary coherence (Nolte et al., 2004) between every channel pair.

@@ -4,8 +4,8 @@
  * Copyright (c) 2020-2026 MNE-CPP Authors
  *
  * @file     applytoview.cpp
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.6
  * @date     August 2020
  * @brief    Implementation of the ApplyToView selector widget.

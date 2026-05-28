@@ -4,11 +4,11 @@
  * Copyright (c) 2013-2026 MNE-CPP Authors
  *
  * @file     fiff_evoked_set.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Florian Schlembach <fschlembach@web.de>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Florian Schlembach <fschlembach@web.de>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     March 2013
  * @brief    Set of averaged evoked responses sharing a FiffInfo, plus the ave-style category / rejection descriptors for batch averaging.

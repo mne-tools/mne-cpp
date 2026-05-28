@@ -4,10 +4,10 @@
  * Copyright (c) 2013-2026 MNE-CPP Authors
  *
  * @file     mne_surface.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Christof Pieloth <pieloth@labp.htwk-leipzig.de>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     August 2013
  * @brief    Implementation of @ref MNELIB::MNESurface.

@@ -4,8 +4,8 @@
  * Copyright (c) 2018-2026 MNE-CPP Authors
  *
  * @file     channeldataview.h
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
  * @brief    Composite real-time multi-channel time-series scroller (label panel, table view, time ruler, scrollbars).

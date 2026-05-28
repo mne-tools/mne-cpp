@@ -4,11 +4,11 @@
  * Copyright (c) 2016-2026 MNE-CPP Authors
  *
  * @file     fiff_explain.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Ruben Doerfel <doerfelruben@aol.com>
- * @author   Andreas Griesshammer <ag@fieldlineinc.com>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Ruben Doerfel <doerfelruben@aol.com>;
+ *           Andreas Griesshammer <ag@fieldlineinc.com>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     December 2016
  * @brief    Static lookup table mapping every documented FIFF tag kind to a fixed-width human-readable label, used by the FIFF dumper / show_fiff tool.

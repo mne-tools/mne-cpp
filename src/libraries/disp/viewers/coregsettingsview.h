@@ -4,10 +4,10 @@
  * Copyright (c) 2020-2026 MNE-CPP Authors
  *
  * @file     coregsettingsview.h
- * @author   Ruben Doerfel <doerfelruben@aol.com>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Ruben Doerfel <doerfelruben@aol.com>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.7
  * @date     August 2020
  * @brief    Co-registration parameter panel driving the MRI ↔ head fiducial alignment dialog.

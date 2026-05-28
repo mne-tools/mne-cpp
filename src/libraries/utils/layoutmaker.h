@@ -4,10 +4,10 @@
  * Copyright (c) 2014-2026 MNE-CPP Authors
  *
  * @file     layoutmaker.h
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     November 2014
  * @brief    Generator that projects 3-D electrode positions onto a 2-D @c .lout topographic layout via least-squares sphere fitting.

@@ -4,9 +4,9 @@
  * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     fiff_ctf_comp.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     October 2012
  * @brief    Implementation of @ref FiffCtfComp: read / write of FIFFB_MNE_CTF_COMP_DATA blocks and the gradient-compensation matrix algebra.

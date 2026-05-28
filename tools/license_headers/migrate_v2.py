@@ -155,6 +155,12 @@ def _parse_existing(txt: str) -> tuple[int, str | None, list[str]]:
     return m.end(), brief, body
 
 
+# Continuation lines under ``@author`` are indented to align the
+# author name with the first author (column 13: ``" *" + 11 spaces``
+# matches the ``" * @author   "`` prefix).
+_AUTHOR_CONT_PREFIX = " *           "
+
+
 def _render(
     fp: pathlib.Path, brief: str | None, body: list[str]
 ) -> str:
@@ -173,8 +179,15 @@ def _render(
         " *",
         f" * @file     {fp.name}",
     ]
-    for name, email in authors:
-        lines.append(f" * @author   {name} <{email}>")
+    # Single ``@author`` tag, semicolon-separated entries, one per line,
+    # with continuation lines indented under the first name.
+    n = len(authors)
+    for i, (name, email) in enumerate(authors):
+        sep = ";" if i < n - 1 else ""
+        if i == 0:
+            lines.append(f" * @author   {name} <{email}>{sep}")
+        else:
+            lines.append(f"{_AUTHOR_CONT_PREFIX}{name} <{email}>{sep}")
     lines.extend(
         [
             f" * @since    {since}",
@@ -252,10 +265,10 @@ def _parse_v2_existing(
                 r"\*\s*(SPDX-License-Identifier|Copyright)\b", s
             ):
                 continue
-            if re.match(r"\*\s+\S.+<[^>]+>\s*$", s):
-                # author line `` *   Name <email>``
-                continue
             if re.match(r"\*\s*@(file|since|date|author|version)\b", s):
+                continue
+            # Author continuation line `` *           Name <email>[;]``.
+            if re.match(r"\*\s+\S.+<[^>]+@[^>]+>;?\s*$", s):
                 continue
             bm = re.match(r"\*\s*@brief\s*(.*)$", s)
             if bm:

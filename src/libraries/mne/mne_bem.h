@@ -4,12 +4,12 @@
  * Copyright (c) 2015-2026 MNE-CPP Authors
  *
  * @file     mne_bem.h
- * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Ruben Doerfel <doerfelruben@aol.com>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Ruben Doerfel <doerfelruben@aol.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     June 2015
  * @brief    Boundary element model bundle (inner skull, outer skull, outer skin) loaded from -bem.fif.

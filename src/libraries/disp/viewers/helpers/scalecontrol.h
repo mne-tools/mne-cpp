@@ -4,9 +4,9 @@
  * Copyright (c) 2021-2026 MNE-CPP Authors
  *
  * @file     scalecontrol.h
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.9
  * @date     March 2021
  * @brief    Composite slider + spinbox widget for picking a (possibly logarithmic) scale value.

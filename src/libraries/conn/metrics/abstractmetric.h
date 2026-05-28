@@ -4,9 +4,9 @@
  * Copyright (c) 2018-2026 MNE-CPP Authors
  *
  * @file     abstractmetric.h
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     January 2018
  * @brief    Common static knobs shared by every functional-connectivity estimator in @c CONNLIB.

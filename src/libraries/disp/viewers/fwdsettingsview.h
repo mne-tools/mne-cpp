@@ -4,12 +4,12 @@
  * Copyright (c) 2020-2026 MNE-CPP Authors
  *
  * @file     fwdsettingsview.h
- * @author   Ruben Doerfel <doerfelruben@aol.com>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   johaenns <j.vorw01@gmail.com>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Ruben Doerfel <doerfelruben@aol.com>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           johaenns <j.vorw01@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.2
  * @date     May 2020
  * @brief    Forward-solution computation controls (BEM / source space / EEG sphere model selectors).

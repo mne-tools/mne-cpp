@@ -310,44 +310,40 @@ def detect_spdx_block(text: str) -> tuple[int, str, list[tuple[str, str]]] | Non
             if cm:
                 year_range = cm.group(1)
                 authors: list[tuple[str, str]] = []
-                idx = 2
-                # v2 bare-line form: ``*   Name <email>`` lines sit
-                # between Copyright and the blank separator.
-                while idx < len(inner):
-                    stripped = _strip(inner[idx])
-                    am = re.match(r"^\s{2,}(?P<name>[^<]+?)\s+<(?P<email>[^>]+)>\s*$", stripped)
-                    if not am:
-                        break
-                    authors.append((am.group("name").strip(), am.group("email").strip()))
-                    idx += 1
-                # v3 Doxygen-tag form: authors live in ``@author Name <email>``
-                # lines after the blank line, alongside @file/@since/@date.
-                # Walk the rest of the block and collect them.
-                tag_authors: list[tuple[str, str]] = []
-                for ln in inner[idx:]:
+                # Canonical v3 form: a single ``@author`` Doxygen tag
+                # introduces a semicolon-separated list whose entries
+                # span one or more lines; continuation lines have no
+                # ``@<tag>`` prefix but contain ``Name <email>;``.
+                in_author_block = False
+                _entry_re = re.compile(
+                    r"(?P<name>[A-ZÄÖÜ][^<;]*?)\s*<(?P<email>[^>]+@[^>]+)>"
+                )
+                for ln in inner[2:]:
                     if ln.strip() == "*/":
                         break
-                    body = _strip(ln)
-                    am2 = re.match(
-                        r"^@author\s+(?P<name>[^<]+?)\s+<(?P<email>[^>]+)>\s*$",
-                        body,
-                    )
-                    if am2:
-                        tag_authors.append(
-                            (am2.group("name").strip(),
-                             am2.group("email").strip())
+                    body_line = _strip(ln)
+                    if body_line.startswith("@author"):
+                        in_author_block = True
+                        rest = body_line[len("@author"):]
+                    elif body_line.startswith("@"):
+                        in_author_block = False
+                        continue
+                    elif in_author_block:
+                        rest = body_line
+                    else:
+                        continue
+                    for em in _entry_re.finditer(rest):
+                        authors.append(
+                            (em.group("name").strip(),
+                             em.group("email").strip())
                         )
-                if not authors and tag_authors:
-                    authors = tag_authors
-                elif tag_authors and not authors:
-                    pass
-                # Only accept the v2/v3 block if we found at least one author;
+                # Only accept the v3 block if we found at least one author;
                 # otherwise treat as a regular Doxygen file header.
                 if authors:
                     # Advance past the rest of the Doxygen block (up to and
                     # including ` */`) and an optional trailing `//===` divider
                     # so re-running the migrator is idempotent.
-                    close_idx = idx
+                    close_idx = 2
                     while close_idx < len(inner) and inner[close_idx].strip() != "*/":
                         close_idx += 1
                     if close_idx >= len(inner):
@@ -797,9 +793,32 @@ def validate_file(path: Path, *, strict: bool = False) -> list[str]:
     detected = detect_spdx_block(text)
     if detected is None:
         return [f"{path}: missing SPDX header block"]
-    _end, year_range, authors = detected
+    end, year_range, authors = detected
     if not authors:
         return [f"{path}: SPDX block has no author lines"]
+    # Enforce the canonical v3 format: exactly one ``@author`` Doxygen
+    # tag, with the rest of the contributors listed as semicolon-
+    # separated continuation lines aligned under the first name.
+    block = text[:end]
+    author_tag_lines = [
+        ln for ln in block.splitlines() if re.match(r"^\s*\*\s*@author\b", ln)
+    ]
+    if len(author_tag_lines) != 1:
+        return [
+            f"{path}: SPDX header must use exactly one ``@author`` tag "
+            f"(found {len(author_tag_lines)})"
+        ]
+    if len(authors) > 1:
+        # Validate continuation prefix and ``;`` separator.
+        cont_re = re.compile(r"^ \*           [A-ZÄÖÜ][^<;]*<[^>]+@[^>]+>;?\s*$")
+        for ln in block.splitlines():
+            if re.match(r"^\s*\*\s+\S.*<[^>]+@[^>]+>;?\s*$", ln) and not (
+                re.match(r"^\s*\*\s*@author\b", ln) or cont_re.match(ln)
+            ):
+                return [
+                    f"{path}: author continuation line must match "
+                    f"`` *           Name <email>[;]`` (got: {ln!r})"
+                ]
     if strict:
         expected = _unique_authors(authors_for(path))
         expected_emails = [e.lower() for _, e in expected]

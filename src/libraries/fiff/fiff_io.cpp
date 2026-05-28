@@ -4,13 +4,13 @@
  * Copyright (c) 2013-2026 MNE-CPP Authors
  *
  * @file     fiff_io.cpp
- * @author   Florian Schlembach <fschlembach@web.de>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Andreas Griesshammer <ag@fieldlineinc.com>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Florian Schlembach <fschlembach@web.de>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Christof Pieloth <pieloth@labp.htwk-leipzig.de>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Andreas Griesshammer <ag@fieldlineinc.com>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     November 2013
  * @brief    Implementation of @ref FiffIO: one-call FIFF reader/writer that dispatches to the right specialized loader per top-level block.

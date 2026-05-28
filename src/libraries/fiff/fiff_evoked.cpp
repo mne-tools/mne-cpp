@@ -4,11 +4,11 @@
  * Copyright (c) 2013-2026 MNE-CPP Authors
  *
  * @file     fiff_evoked.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Florian Schlembach <fschlembach@web.de>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Andreas Griesshammer <ag@fieldlineinc.com>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Florian Schlembach <fschlembach@web.de>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Andreas Griesshammer <ag@fieldlineinc.com>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     March 2013
  * @brief    Implementation of @ref FiffEvoked: read / write of one FIFFB_EVOKED block plus baseline / projector / pick operations.

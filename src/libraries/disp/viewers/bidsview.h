@@ -4,9 +4,9 @@
  * Copyright (c) 2020-2026 MNE-CPP Authors
  *
  * @file     bidsview.h
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.7
  * @date     October 2020
  * @brief    Tree view of the BIDS dataset hierarchy backed by @ref BidsViewModel.

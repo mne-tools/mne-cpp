@@ -4,11 +4,11 @@
  * Copyright (c) 2013-2026 MNE-CPP Authors
  *
  * @file     ioutils.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Andreas Griesshammer <ag@fieldlineinc.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Andreas Griesshammer <ag@fieldlineinc.com>
  * @since    0.1.0
  * @date     March 2013
  * @brief    Out-of-line implementations for the non-templated overloads of @ref UTILSLIB::IOUtils.

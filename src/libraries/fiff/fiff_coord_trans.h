@@ -4,13 +4,13 @@
  * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     fiff_coord_trans.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
- * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Ruben Doerfel <doerfelruben@aol.com>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Christof Pieloth <pieloth@labp.htwk-leipzig.de>;
+ *           Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Ruben Doerfel <doerfelruben@aol.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     August 2012
  * @brief    4x4 affine FIFF coordinate transform (FIFF_COORD_TRANS) annotated with source/destination coordinate-frame IDs.

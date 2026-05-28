@@ -4,9 +4,9 @@
  * Copyright (c) 2017-2026 MNE-CPP Authors
  *
  * @file     fwd_thread_arg.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     March 2017
  * @brief    Per-thread work packet (dipole range, coil set, output column) consumed by the parallel forward-solution dipole loop.

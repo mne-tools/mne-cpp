@@ -4,13 +4,13 @@
  * Copyright (c) 2013-2026 MNE-CPP Authors
  *
  * @file     ioutils.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Ricky <rickytjen@yahoo.com>
- * @author   liminsun <liminsun@nmr.mgh.harvard.edu>
- * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Andreas Griesshammer <ag@fieldlineinc.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Ricky <rickytjen@yahoo.com>;
+ *           liminsun <liminsun@nmr.mgh.harvard.edu>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Andreas Griesshammer <ag@fieldlineinc.com>
  * @since    0.1.0
  * @date     March 2013
  * @brief    Header-only Eigen matrix text I/O — round-trips dense matrices to whitespace-separated ASCII for cross-validation against MNE-Python.

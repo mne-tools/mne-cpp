@@ -113,30 +113,45 @@ def class_slug(qualified: str) -> str:
 # ---------------------------------------------------------------------------
 
 _SPDX_AUTHOR_RE = re.compile(
-    r"^\s*[*/#]*\s*(?:@author\s+)?([A-ZÄÖÜ][\w\-.' ]+?)\s*<([^>]+@[^>]+)>\s*$"
+    r"([A-ZÄÖÜ][\w\-.' ]+?)\s*<([^>]+@[^>]+)>"
 )
 _SPDX_HEADER_RE = re.compile(r"SPDX-License-Identifier", re.IGNORECASE)
 
 
 def read_spdx_authors(header_path: Path) -> List[Tuple[str, str]]:
-    """Scrape the first 30 lines of *header_path* for SPDX-style author
-    lines (``Name <email>``).  Returns ``[(name, email), ...]`` in file
-    order.  Returns ``[]`` when the file is missing or has no SPDX block.
+    """Scrape the first 40 lines of *header_path* for SPDX-style author
+    entries. Recognises the canonical v3 layout: a single ``@author``
+    Doxygen tag introduces a semicolon-separated list whose entries can
+    span one or more continuation lines (no ``@`` prefix).  Returns
+    ``[(name, email), ...]`` in file order, or ``[]`` when the file is
+    missing or carries no SPDX block.
     """
     if not header_path or not header_path.exists():
         return []
     authors: List[Tuple[str, str]] = []
     saw_spdx = False
+    in_author = False
     try:
         with open(header_path, encoding="utf-8", errors="replace") as f:
             for i, line in enumerate(f):
-                if i >= 30:
+                if i >= 40:
                     break
                 if _SPDX_HEADER_RE.search(line):
                     saw_spdx = True
                     continue
-                m = _SPDX_AUTHOR_RE.match(line)
-                if m:
+                # Strip the Doxygen ``*`` / ``//`` / ``#`` line prefix.
+                body = re.sub(r"^\s*[*/#]+\s?", "", line).rstrip()
+                if body.startswith("@author"):
+                    in_author = True
+                    rest = body[len("@author"):]
+                elif body.startswith("@"):
+                    in_author = False
+                    continue
+                elif in_author:
+                    rest = body
+                else:
+                    continue
+                for m in _SPDX_AUTHOR_RE.finditer(rest):
                     authors.append((m.group(1).strip(), m.group(2).strip()))
     except OSError:
         return []

@@ -4,9 +4,9 @@
  * Copyright (c) 2020-2026 MNE-CPP Authors
  *
  * @file     covariancesettingsview.cpp
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.3
  * @date     June 2020
  * @brief    Implementation of the CovarianceSettingsView covariance-length panel.
