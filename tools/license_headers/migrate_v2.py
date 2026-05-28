@@ -50,12 +50,8 @@ import re
 import subprocess
 import sys
 
-from .core import _unique_authors, _year_range_for
+from .core import _git_authors, _year_range_for, _git_creation_month_year
 
-MONTHS = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
-]
 DIV = "//" + "=" * 109
 
 
@@ -73,32 +69,18 @@ def _git(args: list[str], fp: pathlib.Path) -> list[str]:
 
 
 def git_authors(fp: pathlib.Path) -> list[tuple[str, str]]:
-    raw = [tuple(ln.split("\t", 1)) for ln in _git(["--format=%an\t%ae"], fp)]
-    raw = [(n, e) for n, e in raw if n and e]
-    return _unique_authors(raw)
+    # _git_authors already runs `git log --follow --reverse`, so the
+    # raw list is chronological. We dedup via _unique_authors inside
+    # build_spdx_block; here we just return the raw stream.
+    return _git_authors(fp)
 
 
 def git_year_span(fp: pathlib.Path) -> str:
-    # Match the validator's `_year_range_for` semantics: earliest path-only
-    # commit year .. CURRENT_YEAR (always extending to the current year so
-    # the SPDX range covers the active copyright window).
     return _year_range_for(fp)
 
 
 def git_since(fp: pathlib.Path) -> str:
-    added = _git(["--format=%aI", "--diff-filter=A"], fp)
-    if added:
-        return added[-1][:4]
-    any_ = _git(["--format=%aI"], fp)
-    return any_[-1][:4] if any_ else "2026"
-
-
-def git_date(fp: pathlib.Path) -> str:
-    out = _git(["-1", "--format=%aI"], fp)
-    if not out:
-        return "May 2026"
-    s = out[0]
-    return f"{MONTHS[int(s[5:7]) - 1]} {s[:4]}"
+    return _git_creation_month_year(fp) or "May 2026"
 
 
 def _parse_existing(txt: str) -> tuple[int, str | None, list[str]]:
@@ -157,12 +139,12 @@ def _parse_existing(txt: str) -> tuple[int, str | None, list[str]]:
 def _render(
     fp: pathlib.Path, brief: str | None, body: list[str]
 ) -> str:
-    authors = git_authors(fp)
+    from .core import _unique_authors
+    authors = _unique_authors(git_authors(fp))
     if not authors:
         authors = [("Christoph Dinh", "christoph.dinh@mne-cpp.org")]
     year_range = git_year_span(fp)
     since = git_since(fp)
-    date_s = git_date(fp)
     lines: list[str] = [
         DIV,
         "/**",
@@ -176,7 +158,6 @@ def _render(
             " *",
             f" * @file {fp.name}",
             f" * @since {since}",
-            f" * @date  {date_s}",
             f" * @brief {brief or 'TODO: describe this file in one substantive sentence.'}",
         ]
     )
@@ -194,10 +175,11 @@ _CMAKE_SPDX_RE = re.compile(r"^# SPDX-License-Identifier:", re.MULTILINE)
 
 
 def _migrate_cmake(fp: pathlib.Path) -> bool:
+    from .core import _unique_authors
     txt = fp.read_text()
     if _CMAKE_SPDX_RE.search(txt.split("\n\n", 1)[0] if "\n\n" in txt else txt):
         return False
-    authors = git_authors(fp) or [
+    authors = _unique_authors(git_authors(fp)) or [
         ("Christoph Dinh", "christoph.dinh@mne-cpp.org")
     ]
     year_range = git_year_span(fp)
@@ -209,6 +191,121 @@ def _migrate_cmake(fp: pathlib.Path) -> bool:
         lines.append(f"#   {name} <{email}>")
     block = "\n".join(lines) + "\n\n"
     fp.write_text(block + txt)
+    return True
+
+
+def _parse_v2_existing(
+    txt: str,
+) -> tuple[int, str | None, list[str]] | None:
+    """Parse an existing v2 unified Doxygen block.
+
+    Returns ``(consumed_chars, brief, body_lines)`` where ``body_lines``
+    are the substantive content lines (verbatim, including the leading
+    `` * `` prefix) that follow the ``@brief`` line, with leading/trailing
+    blank ``*`` separators trimmed. Returns ``None`` if the file does not
+    begin with a v2 unified block.
+    """
+    m = re.match(
+        r"(?P<head>(?://=+[ \t]*\n)?/\*\*\n)"
+        r"(?P<inner>(?: \*[^\n]*\n)+)"
+        r" \*/\n(?://=+[ \t]*\n)?",
+        txt,
+    )
+    if not m:
+        return None
+    inner_lines = m.group("inner").splitlines()
+    # Must begin with the SPDX line to be a v2 block.
+    if not re.match(
+        r" \* SPDX-License-Identifier: BSD-3-Clause\s*$", inner_lines[0]
+    ):
+        return None
+    brief: str | None = None
+    body: list[str] = []
+    saw_brief = False
+    for ln in inner_lines:
+        s = ln.strip()
+        # Discard the SPDX / Copyright / author / @file / @since / @date
+        # metadata lines -- they are regenerated.
+        if not saw_brief:
+            if re.match(
+                r"\*\s*(SPDX-License-Identifier|Copyright)\b", s
+            ):
+                continue
+            if re.match(r"\*\s+\S.+<[^>]+>\s*$", s):
+                # author line `` *   Name <email>``
+                continue
+            if re.match(r"\*\s*@(file|since|date|author|version)\b", s):
+                continue
+            bm = re.match(r"\*\s*@brief\s*(.*)$", s)
+            if bm:
+                brief = bm.group(1).strip() or None
+                saw_brief = True
+                continue
+            # Blank `` *`` separator between metadata and brief -- skip.
+            if s == "*":
+                continue
+            # Anything else before @brief is unexpected; bail out so we
+            # don't munge a hand-edited header.
+            return None
+        else:
+            body.append(ln)
+    while body and body[0].strip() == "*":
+        body.pop(0)
+    while body and body[-1].strip() == "*":
+        body.pop()
+    return m.end(), brief, body
+
+
+def rebuild_file(fp: pathlib.Path) -> bool:
+    """Re-render an already-v2 file's header with fresh git data.
+
+    Preserves the ``@brief`` text and substantive body verbatim while
+    regenerating the SPDX line, copyright year range, chronological
+    author list, ``@file`` and ``@since`` fields (and *omitting* the
+    legacy ``@date`` line entirely).
+    """
+    if fp.name == "CMakeLists.txt" or fp.suffix == ".cmake":
+        return _rebuild_cmake(fp)
+    txt = fp.read_text()
+    parsed = _parse_v2_existing(txt)
+    if parsed is None:
+        return False
+    end, brief, body = parsed
+    new = _render(fp, brief, body) + txt[end:]
+    if new == txt:
+        return False
+    fp.write_text(new)
+    return True
+
+
+_CMAKE_V2_BLOCK_RE = re.compile(
+    r"\A(# SPDX-License-Identifier: BSD-3-Clause\n"
+    r"# Copyright \(c\) [^\n]+\n"
+    r"(?:#   [^\n]+\n)+\n)"
+)
+
+
+def _rebuild_cmake(fp: pathlib.Path) -> bool:
+    from .core import _unique_authors
+    txt = fp.read_text()
+    m = _CMAKE_V2_BLOCK_RE.match(txt)
+    if not m:
+        return False
+    authors = _unique_authors(git_authors(fp)) or [
+        ("Christoph Dinh", "christoph.dinh@mne-cpp.org")
+    ]
+    year_range = git_year_span(fp)
+    lines = [
+        "# SPDX-License-Identifier: BSD-3-Clause",
+        f"# Copyright (c) {year_range} MNE-CPP Authors",
+    ]
+    for name, email in authors:
+        lines.append(f"#   {name} <{email}>")
+    block = "\n".join(lines) + "\n\n"
+    new = block + txt[m.end():]
+    if new == txt:
+        return False
+    fp.write_text(new)
     return True
 
 
@@ -236,7 +333,17 @@ def main(argv: list[str] | None = None) -> int:
         type=pathlib.Path,
         help="Files or directories to migrate (recursive for dirs).",
     )
+    ap.add_argument(
+        "--rebuild",
+        action="store_true",
+        help=(
+            "Re-render existing v2 headers from fresh git data "
+            "(refresh authors, year range, @since; drop @date)."
+        ),
+    )
     args = ap.parse_args(argv)
+    op = rebuild_file if args.rebuild else migrate_file
+    label = "rebuilt" if args.rebuild else "migrated"
     changed = 0
     scanned = 0
     for root in args.paths:
@@ -252,9 +359,9 @@ def main(argv: list[str] | None = None) -> int:
             )
         for fp in files:
             scanned += 1
-            if migrate_file(fp):
+            if op(fp):
                 changed += 1
-                print(f"migrated: {fp}")
+                print(f"{label}: {fp}")
     print(f"\nmigrate_v2: {changed} changed, {scanned - changed} unchanged")
     return 0
 

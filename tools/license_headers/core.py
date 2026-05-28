@@ -156,14 +156,20 @@ def build_spdx_block(
     year_range: str = f"{CURRENT_YEAR}",
     path: Path | None = None,
 ) -> str:
-    """Render the canonical 3+N-line SPDX block (terminated by ``\\n``)."""
+    """Render the canonical 3+N-line SPDX block (terminated by ``\\n``).
+
+    Authors are emitted in **chronological order** (oldest contributor
+    first, most recent last) so the list reads as a project timeline.
+    The caller is expected to feed the stream from ``_git_authors`` /
+    ``authors_for`` which is already ordered that way.
+    """
     prefix = _comment_prefix(comment_style, path)
-    sorted_authors = sorted(_unique_authors(authors), key=_surname_key)
+    ordered_authors = _unique_authors(authors)
     lines = [
         f"{prefix} SPDX-License-Identifier: BSD-3-Clause",
         f"{prefix} Copyright (c) {year_range} MNE-CPP Authors",
     ]
-    for name, email in sorted_authors:
+    for name, email in ordered_authors:
         lines.append(f"{prefix}   {name} <{email}>")
     return "\n".join(lines) + "\n"
 
@@ -198,10 +204,17 @@ _PERSON_ALIASES: dict[str, tuple[str, str]] = {
     "juan gpc":        ("Juan GPC",        "jgarciaprieto@mgh.harvard.edu"),
     "juangpc":         ("Juan GPC",        "jgarciaprieto@mgh.harvard.edu"),
     "gabriel motta":   ("Gabriel Motta",   "gabrielbenmotta@gmail.com"),
+    "gabriel b motta": ("Gabriel Motta",   "gabrielbenmotta@gmail.com"),
     "gabrielbmotta":   ("Gabriel Motta",   "gabrielbenmotta@gmail.com"),
+    "gbmotta":         ("Gabriel Motta",   "gabrielbenmotta@gmail.com"),
     "matti hamalainen":("Matti Hamalainen","msh@nmr.mgh.harvard.edu"),
     "rdoerfel":        ("Ruben Doerfel",   "doerfelruben@aol.com"),
     "ruben doerfel":   ("Ruben Doerfel",   "doerfelruben@aol.com"),
+    "christof pieloth":("Christof Pieloth","pieloth@labp.htwk-leipzig.de"),
+    "cpieloth":        ("Christof Pieloth","pieloth@labp.htwk-leipzig.de"),
+    "daniel strohmeier": ("Daniel Strohmeier", "daniel.strohmeier@gmail.com"),
+    "danielstrohmeier":  ("Daniel Strohmeier", "daniel.strohmeier@gmail.com"),
+    "joewalter":         ("Daniel Strohmeier", "daniel.strohmeier@gmail.com"),
 }
 
 
@@ -410,49 +423,221 @@ def parse_legacy_header(text: str) -> LegacyHeader | None:
 # ---------------------------------------------------------------------------
 
 
-def _git_authors(path: Path) -> list[tuple[str, str]]:
-    # Path-only history (no --follow): we want the people who actually edited
-    # *this* file, not the rename-ancestry authors of older sibling files.
-    abs_path = path.resolve()
+# ---------------------------------------------------------------------------
+# Explicit project-rename map
+#
+# git's ``--follow`` rename detection is content-similarity based and
+# produces extensive false positives on mne-cpp: brand-new files (e.g.
+# the ``mna/`` or ``mri/`` libraries created in 2026) get attributed to
+# 2012-era contributors merely because their boilerplate Doxygen headers
+# look similar to the headers of unrelated 2012 files. We therefore do
+# *not* use ``--follow``; instead we maintain a small hand-curated map
+# of the project's real historical paths so that a current file like
+# ``src/libraries/conn/conn_global.h`` also sees the history of
+# ``src/libraries/connectivity/connectivity_global.h`` and (further
+# back) ``libraries/connectivity/connectivity_global.h``.
+#
+# Format: a list of ``(prefix_old, prefix_new, basename_substitutions)``
+# entries describing each path rewrite that ever happened in the repo,
+# in any order. ``basename_substitutions`` is an iterable of
+# ``(old_substring, new_substring)`` tuples applied to the part of the
+# path *after* the prefix; pass an empty tuple if only the directory
+# changed.
+# ---------------------------------------------------------------------------
+
+_PROJECT_RENAMES: tuple[tuple[str, str, tuple[tuple[str, str], ...]], ...] = (
+    # Oct 2022, commit 41c19654d4: pure tree move libraries/ -> src/libraries/
+    ("src/libraries/", "libraries/", ()),
+    # Sep 2017: pure tree move MNE/ -> libraries/ ("Changed folder name
+    # MNE to libraries"). Cascades with the rule above so today's
+    # src/libraries/<lib>/<file> also picks up the MNE/<lib>/<file>
+    # history from 2012-2017.
+    ("libraries/", "MNE/", ()),
+    # Oct 2012: per-library ``include/`` subfolders were flattened
+    # ("flattened structure for easy access"). Only fiff and mne had
+    # this layer; record each so MNE/fiff/<file> also resolves to
+    # MNE/fiff/include/<file> and similarly for mne.
+    ("MNE/fiff/", "MNE/fiff/include/", ()),
+    ("MNE/mne/", "MNE/mne/include/", ()),
+    # Mar 2026, commit b3dfbd1a5f: connectivity/ -> conn/ plus the
+    # ``connectivity_global.{h,cpp}`` -> ``conn_global.{h,cpp}`` basename
+    # rename. Applies both to the current src/libraries/conn/ layout and
+    # (via cascade with the rule above) to the pre-Oct-2022 layout.
+    (
+        "src/libraries/conn/",
+        "src/libraries/connectivity/",
+        (("connectivity_global.", "conn_global."),),
+    ),
+    (
+        "libraries/conn/",
+        "libraries/connectivity/",
+        (("connectivity_global.", "conn_global."),),
+    ),
+)
+
+
+def _historical_paths(path: Path) -> list[Path]:
+    """Return *path* plus all of its known pre-rename historical paths.
+
+    The current path is always first; historical paths follow in arbitrary
+    order. The resulting list is fed to ``git log`` so we can union the
+    commit histories across renames *without* relying on git's fragile
+    content-similarity rename detection.
+    """
+    # Work in repo-relative posix form because the rename rules below are
+    # all expressed that way.
     try:
-        out = subprocess.check_output(
-            ["git", "log", "--format=%an <%ae>", "--", str(abs_path)],
-            cwd=abs_path.parent if abs_path.parent.exists() else None,
-            stderr=subprocess.DEVNULL,
-            text=True,
-        )
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        return []
-    result: list[tuple[str, str]] = []
-    for line in out.splitlines():
-        m = re.match(r"^(?P<name>.+?)\s+<(?P<email>[^>]+)>\s*$", line)
-        if m:
-            result.append((m.group("name").strip(), m.group("email").strip()))
-    return result
+        rel = path.relative_to(_repo_root()).as_posix()
+    except ValueError:
+        rel = path.as_posix()
+    candidates: list[str] = [rel]
+    queue: list[str] = [rel]
+    seen: set[str] = {rel}
+    while queue:
+        cur = queue.pop()
+        for prefix_new, prefix_old, subs in _PROJECT_RENAMES:
+            # Skip rules whose ``prefix_old`` is itself a refinement of
+            # ``prefix_new`` (e.g. MNE/fiff/ -> MNE/fiff/include/) once we
+            # are already living under ``prefix_old``; otherwise the BFS
+            # would keep inserting another ``include/`` segment forever.
+            if prefix_old.startswith(prefix_new) and cur.startswith(prefix_old):
+                continue
+            if cur.startswith(prefix_new):
+                tail = cur[len(prefix_new):]
+                for old, new in subs:
+                    tail = tail.replace(new, old)
+                older = prefix_old + tail
+                if older not in seen:
+                    seen.add(older)
+                    candidates.append(older)
+                    queue.append(older)
+    root = _repo_root()
+    return [root / c for c in candidates]
+
+
+def _repo_root() -> Path:
+    global _REPO_ROOT_CACHE
+    if _REPO_ROOT_CACHE is None:
+        try:
+            out = subprocess.check_output(
+                ["git", "rev-parse", "--show-toplevel"],
+                stderr=subprocess.DEVNULL,
+                text=True,
+            ).strip()
+            _REPO_ROOT_CACHE = Path(out)
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            _REPO_ROOT_CACHE = Path.cwd()
+    return _REPO_ROOT_CACHE
+
+
+_REPO_ROOT_CACHE: Path | None = None
+
+
+def _git_authors(path: Path) -> list[tuple[str, str]]:
+    """Return chronological author list for *path*, including pre-rename history.
+
+    Renames are followed via the explicit :data:`_PROJECT_RENAMES` map
+    (see comment block above) instead of ``git log --follow``, which is
+    content-similarity based and produces false attributions to unrelated
+    2012-era contributors for brand-new 2026 files.
+    """
+    rows: list[tuple[int, str, str]] = []
+    seen: set[tuple[int, str]] = set()
+    for hist in _historical_paths(path):
+        try:
+            out = subprocess.check_output(
+                [
+                    "git", "log",
+                    "--format=%at%x09%an%x09%ae",
+                    "--", str(hist),
+                ],
+                stderr=subprocess.DEVNULL,
+                text=True,
+            )
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            continue
+        for line in out.splitlines():
+            parts = line.split("\t")
+            if len(parts) != 3:
+                continue
+            ts_str, name, email = parts
+            try:
+                ts = int(ts_str)
+            except ValueError:
+                continue
+            key = (ts, email.lower())
+            if key in seen:
+                continue
+            seen.add(key)
+            rows.append((ts, name.strip(), email.strip()))
+    rows.sort(key=lambda r: r[0])
+    return [(n, e) for _, n, e in rows]
 
 
 def _git_earliest_year(path: Path) -> int | None:
-    # Path-only history (no --follow): the year range tracks edits to this
-    # path, not the content lineage of files it inherited from.
-    abs_path = path.resolve()
-    try:
-        out = subprocess.check_output(
-            [
-                "git",
-                "log",
-                "--format=%ad",
-                "--date=format:%Y",
-                "--",
-                str(abs_path),
-            ],
-            cwd=abs_path.parent if abs_path.parent.exists() else None,
-            stderr=subprocess.DEVNULL,
-            text=True,
-        )
-    except (subprocess.CalledProcessError, FileNotFoundError):
+    """Return the year of the earliest commit touching *path* or any
+    of its known pre-rename historical paths."""
+    earliest: int | None = None
+    for hist in _historical_paths(path):
+        try:
+            out = subprocess.check_output(
+                [
+                    "git", "log",
+                    "--format=%ad", "--date=format:%Y",
+                    "--", str(hist),
+                ],
+                stderr=subprocess.DEVNULL,
+                text=True,
+            )
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            continue
+        for y in out.split():
+            if y.isdigit():
+                yi = int(y)
+                if earliest is None or yi < earliest:
+                    earliest = yi
+    return earliest
+
+
+_MONTH_NAMES = (
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+)
+
+
+def _git_creation_month_year(path: Path) -> str | None:
+    """Return ``"Month YYYY"`` of the earliest commit touching *path* or
+    any of its known pre-rename historical paths.
+    """
+    earliest: tuple[int, int] | None = None
+    for hist in _historical_paths(path):
+        try:
+            out = subprocess.check_output(
+                [
+                    "git", "log",
+                    "--format=%ad", "--date=format:%Y-%m",
+                    "--", str(hist),
+                ],
+                stderr=subprocess.DEVNULL,
+                text=True,
+            )
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            continue
+        for entry in out.splitlines():
+            m = re.match(r"^(\d{4})-(\d{2})$", entry.strip())
+            if not m:
+                continue
+            year = int(m.group(1))
+            month = int(m.group(2))
+            if not (1 <= month <= 12):
+                continue
+            cand = (year, month)
+            if earliest is None or cand < earliest:
+                earliest = cand
+    if earliest is None:
         return None
-    years = [int(y) for y in out.split() if y.isdigit()]
-    return min(years) if years else None
+    year, month = earliest
+    return f"{_MONTH_NAMES[month - 1]} {year}"
 
 
 def _year_range_for(path: Path) -> str:
@@ -515,14 +700,12 @@ def validate_file(path: Path, *, strict: bool = False) -> list[str]:
         return [f"{path}: SPDX block has no author lines"]
     if strict:
         expected = _unique_authors(authors_for(path))
-        expected_set = {e.lower() for _, e in expected}
-        actual_set = {e.lower() for _, e in authors}
-        missing = expected_set - actual_set
-        extra = actual_set - expected_set
-        if missing or extra:
+        expected_emails = [e.lower() for _, e in expected]
+        actual_emails = [e.lower() for _, e in authors]
+        if expected_emails != actual_emails:
             return [
                 f"{path}: SPDX author list out of sync with git log "
-                f"(missing={sorted(missing)}, extra={sorted(extra)})"
+                f"(expected {expected_emails}, got {actual_emails})"
             ]
         expected_year = _year_range_for(path)
         if year_range != expected_year:
