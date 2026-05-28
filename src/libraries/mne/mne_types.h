@@ -1,48 +1,25 @@
-#ifndef _mne_types_h
-#define _mne_types_h
-
 //=============================================================================================================
 /**
- * @file     mne_types.h
- * @author   Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     January, 2017
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file mne_types.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Legacy MNE-C constants and shared typedefs used across MNELIB structures.
  *
- * Copyright (C) 2017, Matti Hamalainen, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * @brief    Legacy MNE-C constants and common typedefs.
- *
- * Provides the constants originally defined in the MNE-C @c mne_types.h
- * (source-space discriminators, CTF/4D-compensation grades,
- * channel-selection origin tags, trigger-channel defaults) together with
- * the @c mneUserFreeFunc callback typedef.
- *
- * This header also re-exports the individual MNE class headers that
- * replaced the original C struct definitions, so that existing code
- * relying on the umbrella include continues to compile.  New code
- * should include the specific class headers directly.
+ * Mirrors a curated subset of the @c mne_types.h shipped with the
+ * original MNE C tooling so ported code can continue to refer to the
+ * familiar enumerations (point types, surface ids, BEM coordinate frames,
+ * covariance kinds, ...) without dragging the full C header tree into
+ * every consumer. Definitions here are pure typedefs / @c enum / @c
+ * #define and carry no implementation, keeping the header safe to include
+ * from any layer of MNELIB.
  */
+
+#ifndef _mne_types_h
+#define _mne_types_h
 
 //=============================================================================================================
 // INCLUDES
