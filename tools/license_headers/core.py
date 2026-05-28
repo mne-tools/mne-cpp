@@ -249,20 +249,90 @@ def _unique_authors(
 def detect_spdx_block(text: str) -> tuple[int, str, list[tuple[str, str]]] | None:
     """If *text* starts with a valid SPDX block, return ``(end_offset, year_range, authors)``.
 
+    Two on-disk forms are recognised:
+
+    1. Legacy v1 form -- a run of bare ``//``/``#``/``::`` line comments at
+       the very top of the file::
+
+           // SPDX-License-Identifier: BSD-3-Clause
+           // Copyright (c) 2026
+           //   Name <email>
+
+    2. Unified v2 form -- the SPDX metadata is the leading section of a
+       single ``/** ... */`` Doxygen block, so the file opens with one
+       comment style instead of two::
+
+           /**
+            * SPDX-License-Identifier: BSD-3-Clause
+            * Copyright (c) 2026
+            *   Name <email>
+            *
+            * @file ...
+
     The end offset is the index of the first character after the block
-    (including the trailing newline). Returns ``None`` if no valid block is
-    present.
+    (including the trailing newline). Returns ``None`` if neither form
+    matches.
     """
     lines = text.splitlines(keepends=True)
     if len(lines) < 2:
         return None
+
+    # v2: unified Doxygen-block form, optionally wrapped by a `//===` divider
+    # line (matching the section-divider style used throughout the C++ files).
+    divider_prefix = 0
+    if re.match(r"^//=+\s*$", lines[0]):
+        divider_prefix = 1
+
+    if (
+        len(lines) >= divider_prefix + 3
+        and lines[divider_prefix].rstrip("\n") == "/**"
+    ):
+        inner = [ln.rstrip("\n") for ln in lines[divider_prefix + 1 :]]
+        # Allow an arbitrary `* ` prefix in the inner lines.
+        def _strip(s: str) -> str:
+            m = re.match(r"^\s*\*\s?(.*)$", s)
+            return m.group(1) if m else s
+        if inner and _strip(inner[0]).startswith("SPDX-License-Identifier: BSD-3-Clause"):
+            cm = re.match(r"^Copyright \(c\)\s+(\d{4}(?:-\d{4})?)\s*$", _strip(inner[1]))
+            if cm:
+                year_range = cm.group(1)
+                authors: list[tuple[str, str]] = []
+                idx = 2
+                while idx < len(inner):
+                    stripped = _strip(inner[idx])
+                    am = re.match(r"^\s{2,}(?P<name>[^<]+?)\s+<(?P<email>[^>]+)>\s*$", stripped)
+                    if not am:
+                        break
+                    authors.append((am.group("name").strip(), am.group("email").strip()))
+                    idx += 1
+                # Only accept the v2 block if we found at least one author;
+                # otherwise treat as a regular Doxygen file header.
+                if authors:
+                    # Advance past the rest of the Doxygen block (up to and
+                    # including ` */`) and an optional trailing `//===` divider
+                    # so re-running the migrator is idempotent.
+                    close_idx = idx
+                    while close_idx < len(inner) and inner[close_idx].strip() != "*/":
+                        close_idx += 1
+                    if close_idx >= len(inner):
+                        return None
+                    end_line_in_lines = divider_prefix + 1 + close_idx + 1
+                    if (
+                        end_line_in_lines < len(lines)
+                        and re.match(r"^//=+\s*$", lines[end_line_in_lines])
+                    ):
+                        end_line_in_lines += 1
+                    end_offset = sum(len(lines[i]) for i in range(end_line_in_lines))
+                    return end_offset, year_range, authors
+
+    # v1: legacy bare line-comment form.
     if not _SPDX_FIRST_LINE_RE.match(lines[0].rstrip("\n")):
         return None
     m = _SPDX_COPYRIGHT_RE.match(lines[1].rstrip("\n"))
     if not m:
         return None
     year_range = m.group(1)
-    authors: list[tuple[str, str]] = []
+    authors = []
     idx = 2
     while idx < len(lines):
         a = _SPDX_AUTHOR_RE.match(lines[idx].rstrip("\n"))
@@ -341,9 +411,11 @@ def parse_legacy_header(text: str) -> LegacyHeader | None:
 
 
 def _git_authors(path: Path) -> list[tuple[str, str]]:
+    # Path-only history (no --follow): we want the people who actually edited
+    # *this* file, not the rename-ancestry authors of older sibling files.
     try:
         out = subprocess.check_output(
-            ["git", "log", "--follow", "--format=%an <%ae>", "--", str(path)],
+            ["git", "log", "--format=%an <%ae>", "--", str(path)],
             cwd=path.parent if path.parent.exists() else None,
             stderr=subprocess.DEVNULL,
             text=True,
@@ -359,12 +431,13 @@ def _git_authors(path: Path) -> list[tuple[str, str]]:
 
 
 def _git_earliest_year(path: Path) -> int | None:
+    # Path-only history (no --follow): the year range tracks edits to this
+    # path, not the content lineage of files it inherited from.
     try:
         out = subprocess.check_output(
             [
                 "git",
                 "log",
-                "--follow",
                 "--format=%ad",
                 "--date=format:%Y",
                 "--",

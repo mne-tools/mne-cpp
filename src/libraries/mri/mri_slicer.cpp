@@ -1,12 +1,12 @@
-// SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2026
-//   Christoph Dinh <christoph.dinh@mne-cpp.org>
-
+//=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *
  * @file mri_slicer.cpp
  * @since 2026
  * @date  May 2026
- *
  * @brief Implementation of @ref MRILIB::MriSlicer: per-orientation extraction with on-the-fly type promotion and per-volume normalisation.
  *
  * Implements the three jobs the header advertises: (1) pick the
@@ -21,6 +21,7 @@
  * overlay placed in RAS lands in the right slice without
  * recomputing the volume geometry.
  */
+//=============================================================================================================
 
 //=============================================================================================================
 // INCLUDES

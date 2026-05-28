@@ -1,12 +1,12 @@
-// SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2026
-//   Christoph Dinh <christoph.dinh@mne-cpp.org>
-
+//=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *
  * @file mri_mgh_io.h
  * @since 2026
  * @date  May 2026
- *
  * @brief FreeSurfer MGH / MGZ volume reader: byte-level decoder for the 284-byte fixed header, voxel buffer, and optional tag footer.
  *
  * MGH is FreeSurfer's native volume container --- a fixed 284-byte
@@ -55,8 +55,8 @@
  * TAG_MGH_XFORM (31): path to talairach.xfm file, length is int64
  *
  * Ported from make_mgh_cor_set() in MNE C mne_make_cor_set by Matti Hamalainen.
- *
  */
+//=============================================================================================================
 
 #ifndef MRI_MGH_IO_H
 #define MRI_MGH_IO_H

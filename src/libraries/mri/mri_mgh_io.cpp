@@ -1,12 +1,12 @@
-// SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2026
-//   Christoph Dinh <christoph.dinh@mne-cpp.org>
-
+//=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *
  * @file mri_mgh_io.cpp
  * @since 2026
  * @date  May 2026
- *
  * @brief Implementation of @ref MRILIB::MriMghIO: byte-exact MGH/MGZ parser and zlib-streamed MGZ decoder.
  *
  * Implements the big-endian header parse, the column-major voxel
@@ -21,8 +21,8 @@
  * @ref MriVolData representation consumed by every downstream
  * rendering and export path.
  * Ported from make_mgh_cor_set() in MNE C mne_make_cor_set by Matti Hamalainen.
- *
  */
+//=============================================================================================================
 
 //=============================================================================================================
 // INCLUDES

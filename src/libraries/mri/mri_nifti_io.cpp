@@ -1,12 +1,12 @@
-// SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2026
-//   Christoph Dinh <christoph.dinh@mne-cpp.org>
-
+//=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *
  * @file mri_nifti_io.cpp
  * @since 2026
  * @date  May 2026
- *
  * @brief Implementation of @ref MRILIB::MriNiftiIO: 348-byte header parse, byte-order auto-detect, sform/qform/pixdim transform reconstruction.
  *
  * Implements the three pieces the header documents: (1) a
@@ -24,6 +24,7 @@
  * MGZ zlib decoder so both compressed formats route through
  * the same code.
  */
+//=============================================================================================================
 
 //=============================================================================================================
 // INCLUDES

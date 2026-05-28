@@ -1,14 +1,12 @@
-// SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2012-2026
-//   Christoph Dinh <christoph.dinh@mne-cpp.org>
-//   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
-//   Gabriel Motta <gabrielbenmotta@gmail.com>
-
+//=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *
  * @file mri_cor_io.h
  * @since 2026
  * @date  May 2026
- *
  * @brief Reader for the legacy FreeSurfer COR-NNN per-slice volume layout (256 unsigned-char coronal slices on a 1 mm isotropic grid).
  *
  * COR is the directory-based volume format used by FreeSurfer
@@ -34,6 +32,7 @@
  * Ported from @c make_cor_set() in MNE C @c mne_make_cor_set
  * by Matti Hamalainen.
  */
+//=============================================================================================================
 
 #ifndef MRI_COR_IO_H
 #define MRI_COR_IO_H

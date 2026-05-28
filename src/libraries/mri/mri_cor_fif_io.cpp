@@ -1,12 +1,12 @@
-// SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2026
-//   Christoph Dinh <christoph.dinh@mne-cpp.org>
-
+//=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *
  * @file mri_cor_fif_io.cpp
  * @since 2026
  * @date  May 2026
- *
  * @brief Implementation of @ref MRILIB::MriCorFifIO: block-and-tag serialiser that emits a FIFF MRI set from an in-memory @ref MriVolData.
  *
  * Drives a @ref FIFFLIB::FiffStream through the nested
@@ -21,8 +21,8 @@
  * quantisation drift.
  * Ported from save_slices() / write_slice() in MNE C write_mri_set.c
  * by Matti Hamalainen.
- *
  */
+//=============================================================================================================
 
 //=============================================================================================================
 // INCLUDES

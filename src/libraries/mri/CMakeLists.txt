@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (c) 2022-2026
+# Copyright (c) 2026
 #   Christoph Dinh <christoph.dinh@mne-cpp.org>
-#   Gabriel Motta <gabrielbenmotta@gmail.com>
 
 cmake_minimum_required(VERSION 3.14)
 project(mne_mri LANGUAGES CXX)

@@ -1,12 +1,12 @@
-// SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2026
-//   Christoph Dinh <christoph.dinh@mne-cpp.org>
-
+//=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *
  * @file mri_vol_data.h
  * @since 2026
  * @date  May 2026
- *
  * @brief Format-agnostic in-memory representation of a 3D MRI volume plus its slice decomposition.
  *
  * Two cooperating types live in this header:
@@ -38,6 +38,7 @@
  * Ported from @c mneMRIdataRec / @c mneMRIvolumeRec in MNE C
  * (@c mne_types_mne-c.h) by Matti Hamalainen.
  */
+//=============================================================================================================
 
 #ifndef MRI_VOL_DATA_H
 #define MRI_VOL_DATA_H

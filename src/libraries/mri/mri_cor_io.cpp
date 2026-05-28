@@ -1,12 +1,12 @@
-// SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2026
-//   Christoph Dinh <christoph.dinh@mne-cpp.org>
-
+//=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *
  * @file mri_cor_io.cpp
  * @since 2026
  * @date  May 2026
- *
  * @brief Implementation of @ref MRILIB::MriCorIO: per-file COR-NNN reader with coronal-orientation slice transform synthesis.
  *
  * Walks the 256 @c COR-001 \u2026 @c COR-256 files in the supplied
@@ -19,8 +19,8 @@
  * rejected so downstream code can rely on a complete 256-slice
  * coronal stack.
  * Ported from make_cor_set() in MNE C mne_make_cor_set by Matti Hamalainen.
- *
  */
+//=============================================================================================================
 
 //=============================================================================================================
 // INCLUDES

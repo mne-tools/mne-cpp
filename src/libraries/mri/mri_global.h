@@ -1,16 +1,12 @@
-// SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2020-2026
-//   Christoph Dinh <christoph.dinh@mne-cpp.org>
-//   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
-//   Juan GPC <jgarciaprieto@mgh.harvard.edu>
-//   Gabriel B Motta <gbmotta@mgh.harvard.edu>
-//   Gabriel Motta <gabrielbenmotta@gmail.com>
-
+//=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *
  * @file mri_global.h
  * @since 2026
  * @date  May 2026
- *
  * @brief Export/import macros and build-info accessors for MRILIB.
  *
  * Provides the @c MRISHARED_EXPORT decorator used by every public
@@ -24,6 +20,7 @@
  * @c tools/validate_api_registry.py needs to confirm which MRI
  * library snapshot is wired into a deployed binary.
  */
+//=============================================================================================================
 
 #ifndef MRI_GLOBAL_H
 #define MRI_GLOBAL_H

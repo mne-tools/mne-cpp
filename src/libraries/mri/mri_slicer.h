@@ -1,15 +1,12 @@
-// SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2012-2026
-//   Christoph Dinh <christoph.dinh@mne-cpp.org>
-//   Ruben Doerfel <doerfelruben@aol.com>
-//   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
-//   Gabriel Motta <gabrielbenmotta@gmail.com>
-
+//=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *
  * @file mri_slicer.h
  * @since 2026
  * @date  May 2026
- *
  * @brief Orthogonal-plane resampler that turns a 3D @ref MriVolData into the 2D textures consumed by the slice viewer.
  *
  * The slicer is the bridge between the format-specific MRI
@@ -37,6 +34,7 @@
  * composes @c sliceToRas from the volume's @c voxToSurfRAS()
  * pre-multiplied by the orientation-specific in-slice affine.
  */
+//=============================================================================================================
 
 #ifndef MRI_SLICER_H
 #define MRI_SLICER_H

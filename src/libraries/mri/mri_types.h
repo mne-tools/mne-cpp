@@ -1,12 +1,12 @@
-// SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2026
-//   Christoph Dinh <christoph.dinh@mne-cpp.org>
-
+//=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *
  * @file mri_types.h
  * @since 2026
  * @date  May 2026
- *
  * @brief Numeric type codes, layout constants, and sentinel values shared by every MRI reader.
  *
  * Centralises the four magic-number families that show up in every
@@ -30,6 +30,7 @@
  * These constants originate from FreeSurfer's @c mri.h and were
  * ported via MNE C's @c mne_types_mne-c.h by Matti Hamalainen.
  */
+//=============================================================================================================
 
 #ifndef MRI_TYPES_H
 #define MRI_TYPES_H

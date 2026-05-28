@@ -1,12 +1,9 @@
-// SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2012-2026
-//   Christoph Dinh <christoph.dinh@mne-cpp.org>
-//   Ruben Doerfel <doerfelruben@aol.com>
-//   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
-//   Juan GPC <jgarciaprieto@mgh.harvard.edu>
-//   Gabriel Motta <gabrielbenmotta@gmail.com>
-
+//=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *
  * @file mri_nifti_io.h
  * @since 2026
  * @date  May 2026
@@ -38,6 +35,7 @@
  *
  * Format reference: https://nifti.nimh.nih.gov/nifti-1
  */
+//=============================================================================================================
 
 #ifndef MRI_NIFTI_IO_H
 #define MRI_NIFTI_IO_H

@@ -1,14 +1,12 @@
-// SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2012-2026
-//   Christoph Dinh <christoph.dinh@mne-cpp.org>
-//   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
-//   Gabriel Motta <gabrielbenmotta@gmail.com>
-
+//=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *
  * @file mri_cor_fif_io.h
  * @since 2026
  * @date  May 2026
- *
  * @brief Writer for the COR.fif FIFF representation of an MRI volume (Neuromag/MNE convention used by all mne-c source-space tooling).
  *
  * COR.fif is the canonical FIFF wrapper for MRI volume data used
@@ -48,8 +46,8 @@
  *
  * Ported from save_slices() / write_slice() in MNE C write_mri_set.c
  * by Matti Hamalainen.
- *
  */
+//=============================================================================================================
 
 #ifndef MRI_COR_FIF_IO_H
 #define MRI_COR_FIF_IO_H
