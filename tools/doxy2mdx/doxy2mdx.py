@@ -1027,22 +1027,22 @@ def _short_module_label(mod: dict, fallback: str) -> str:
     return mod.get("sidebar_label", fallback)
 
 
-# Mapping from module key -> source file under doc/website/docs/development/
-# that documents that library at a conceptual level (architecture diagram,
+# Mapping from module key -> source file under doc/api_overviews/ that
+# documents that library at a conceptual level (architecture diagram,
 # class inventory, MNE-Python / MNE-C cross-reference table).  When present,
 # the contents of that file are embedded as the library's API landing page
 # (``docs/api/<module>/index.mdx``) and the sidebar category links to it.
 _LIBRARY_OVERVIEW_DEV_FILES: Dict[str, str] = {
-    "fiff": "api-fiff.mdx",
-    "mne": "api-mne.mdx",
-    "fwd": "api-fwd.mdx",
-    "inv": "api-inverse.mdx",
-    "dsp": "api-dsp.mdx",
-    "conn": "api-connectivity.mdx",
-    "ml": "api-ml.mdx",
-    "sts": "api-sts.mdx",
-    "mna": "api-mna.mdx",
-    "disp3D": "api-disp3d.mdx",
+    "fiff": "fiff.mdx",
+    "mne": "mne.mdx",
+    "fwd": "fwd.mdx",
+    "inv": "inverse.mdx",
+    "dsp": "dsp.mdx",
+    "conn": "connectivity.mdx",
+    "ml": "ml.mdx",
+    "sts": "sts.mdx",
+    "mna": "mna.mdx",
+    "disp3D": "disp3d.mdx",
 }
 
 
@@ -1051,7 +1051,7 @@ def generate_library_overview(module_key: str,
                               out_dir: Path,
                               repo_root: Path) -> Optional[Path]:
     """Write ``docs/api/<module>/index.mdx`` for *module_key* by
-    embedding the matching ``docs/development/api-*.mdx`` page when
+    embedding the matching ``doc/api_overviews/<lib>.mdx`` source when
     available.  Returns the written path, or ``None`` when no overview
     source exists for this library."""
     dev_name = _LIBRARY_OVERVIEW_DEV_FILES.get(module_key)
@@ -1079,10 +1079,10 @@ def generate_library_overview(module_key: str,
 
     body: str = ""
     if dev_name:
-        dev_path = repo_root / "doc" / "website" / "docs" / "development" / dev_name
+        dev_path = repo_root / "doc" / "api_overviews" / dev_name
         if dev_path.exists():
             raw = dev_path.read_text(encoding="utf-8")
-            # Strip the dev-page frontmatter and the leading H1 (we
+            # Strip any leading frontmatter and the leading H1 (we
             # render our own title above).
             if raw.startswith("---\n"):
                 end = raw.find("\n---", 4)

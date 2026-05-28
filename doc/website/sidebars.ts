@@ -227,6 +227,23 @@ const sidebars: SidebarsConfig = {
     developmentSidebar: [
         {
             type: 'category',
+            label: 'Library API',
+            link: { type: 'doc', id: 'development/api' },
+            items: [
+                { type: 'link', label: 'Fiff Library', href: '/docs/api/fiff/' },
+                { type: 'link', label: 'Mne Library', href: '/docs/api/mne/' },
+                { type: 'link', label: 'Forward Library', href: '/docs/api/fwd/' },
+                { type: 'link', label: 'DSP Library', href: '/docs/api/dsp/' },
+                { type: 'link', label: 'Inverse Library', href: '/docs/api/inv/' },
+                { type: 'link', label: 'Connectivity Library', href: '/docs/api/conn/' },
+                { type: 'link', label: 'Disp3D Library', href: '/docs/api/disp3-d/' },
+                { type: 'link', label: 'MNA Library', href: '/docs/api/mna/' },
+                { type: 'link', label: 'ML Library', href: '/docs/api/ml/' },
+                { type: 'link', label: 'Statistics Library', href: '/docs/api/sts/' },
+            ],
+        },
+        {
+            type: 'category',
             label: 'Build & Deploy',
             items: [
                 'development/buildguide-cmake',
@@ -261,23 +278,6 @@ const sidebars: SidebarsConfig = {
                 'development/contr-git',
                 'development/contr-docuimprovements',
                 'development/writingtest',
-            ],
-        },
-        {
-            type: 'category',
-            label: 'Library API',
-            link: { type: 'doc', id: 'development/api' },
-            items: [
-                'development/api-fiff',
-                'development/api-mne',
-                'development/api-fwd',
-                'development/api-dsp',
-                'development/api-inverse',
-                'development/api-connectivity',
-                'development/api-disp3d',
-                'development/api-mna',
-                'development/api-ml',
-                'development/api-sts',
             ],
         },
         {

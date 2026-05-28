@@ -5,7 +5,7 @@ sidebar_label: "ML"
 
 # ML Library API
 
-The `mne_ml` library (`MLLIB` namespace) provides machine learning infrastructure for MNE-CPP: ONNX Runtime inference for pre-trained neural networks, built-in linear models, feature scaling, tensor data structures, and a processing pipeline. The primary use case is [CMNE](../manual/glossary#general-concepts) (Contextual Minimum-Norm Estimate) inference, where an LSTM network trained in Python is deployed via ONNX Runtime in C++.
+The `mne_ml` library (`MLLIB` namespace) provides machine learning infrastructure for MNE-CPP: ONNX Runtime inference for pre-trained neural networks, built-in linear models, feature scaling, tensor data structures, and a processing pipeline. The primary use case is [CMNE](/docs/manual/glossary#general-concepts) (Contextual Minimum-Norm Estimate) inference, where an LSTM network trained in Python is deployed via ONNX Runtime in C++.
 
 ```cmake
 target_link_libraries(my_app PRIVATE mne_ml)
@@ -326,6 +326,6 @@ MLLIB::MlTensor sourceEstimate = pipeline.predict(input);
 
 ## See Also
 
-- [Inverse Estimation API](api-inverse) — MNE, dSPM, sLORETA, CMNE inverse methods
+- [Inverse Estimation API](/docs/api/inv/) — MNE, dSPM, sLORETA, CMNE inverse methods
 - [Library API](api) — Overview of all MNE-CPP libraries
-- [Glossary](../manual/glossary) — CMNE, ONNX, and related terms
+- [Glossary](/docs/manual/glossary) — CMNE, ONNX, and related terms
