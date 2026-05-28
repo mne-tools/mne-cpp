@@ -1,35 +1,37 @@
 //=============================================================================================================
 /**
- * @file     mvar_model.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file mvar_model.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Multivariate autoregressive (MVAR) model fit and its frequency-domain decomposition; backbone of the directed connectivity metrics.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * The MVAR(p) model expresses each channel as a linear combination of the
+ * last @c p samples of all channels plus white innovation noise,
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ *   X[t] = sum_{k=1}^{p} A_k * X[t - k] + E[t],   E ~ N(0, Sigma)
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Taking the @c z-transform with @c z = exp(-2*pi*i*f) gives the spectral
+ * representation @c X(f) = H(f) * E(f) with transfer matrix
  *
+ *   H(f) = ( I - sum_{k=1}^{p} A_k * exp(-2*pi*i*f*k) )^{-1}
  *
- * @brief     MvarModel class declaration.
+ * and spectral matrix @c S(f) = H(f) * Sigma * H(f)^H. @ref H and @ref S
+ * are the only two quantities the directed-connectivity metrics in this
+ * library actually need: spectral Granger Causality (@ref GrangerCausality)
+ * is a ratio of diagonal entries of @c S before and after conditioning,
+ * the Directed Transfer Function (@ref DirectedTransferFunction) is a row-
+ * normalised @c |H_{ij}(f)|^2, and Partial Directed Coherence
+ * (@ref PartialDirectedCoherence) is a column-normalised @c |A_{ij}(f)|.
  *
+ * The coefficient matrices @c A_1..A_p and the innovation covariance
+ * @c Sigma are estimated from the Yule-Walker equations via Levinson-
+ * Durbin recursion (numerically stable, O(p^2 * n^2)); the model order
+ * defaults to a Bayesian Information Criterion search over @c [1, 20]
+ * when the caller passes @c p = 0.
  */
 
 #ifndef MVARMODEL_H
@@ -69,13 +71,18 @@ namespace CONNLIB {
 
 //=============================================================================================================
 /**
- * Multivariate autoregressive (MVAR) model fitting and spectral decomposition.
+ * Multivariate autoregressive (MVAR) model fit and its frequency-domain
+ * decomposition into transfer function @c H(f) and spectral matrix @c S(f).
  *
- * Fits an MVAR model of order p to multi-channel time-series data and provides
- * the transfer function H(f) and spectral matrix S(f) used by directed
- * connectivity metrics (Granger Causality, DTF, PDC).
+ * The model order @c p is either supplied by the caller or selected
+ * automatically by Bayesian Information Criterion over @c [1, 20]; the
+ * coefficient matrices are estimated by Levinson-Durbin recursion on the
+ * Yule-Walker equations. The resulting @c H and @c S are consumed by the
+ * three directed-connectivity metrics in this library (Granger Causality,
+ * DTF, PDC) and are exposed via @ref transferFunction and
+ * @ref spectralMatrix at arbitrary normalised frequencies.
  *
- * @brief MVAR model fitting for directed connectivity metrics.
+ * @brief MVAR model fit; provides H(f) and S(f) for Granger Causality, DTF and PDC.
  * @since 2.2.0
  */
 class CONNSHARED_EXPORT MvarModel

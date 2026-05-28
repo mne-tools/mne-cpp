@@ -1,35 +1,34 @@
 //=============================================================================================================
 /**
- * @file     partial_directed_coherence.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file partial_directed_coherence.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Partial Directed Coherence (Baccala & Sameshima 2001) between every channel pair, derived from a fitted MVAR model.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * PDC works in the @c z-domain on the inverse of the MVAR transfer
+ * function, @c A(f) = I - sum_{k=1}^{p} A_k * exp(-2*pi*i*f*k), and
+ * column-normalises its magnitudes,
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ *   PDC_{ij}(f) = |A_{ij}(f)| / sqrt( sum_k |A_{kj}(f)|^2 )
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * giving the proportion of the outflow from channel @c j at frequency
+ * @c f that targets channel @c i directly. Output is in @c [0, 1] and
+ * asymmetric. Baccala and Sameshima (Biological Cybernetics, 2001)
+ * introduced PDC explicitly to separate direct from indirect causal
+ * pathways: a relay @c j -> k -> i contributes 0 to @c PDC_{ij} because
+ * the direct coefficient @c A_{ij}(f) is zero, in contrast to
+ * @ref DirectedTransferFunction which would still flag the indirect
+ * route.
  *
- *
- * @brief     PartialDirectedCoherence class declaration.
- *
+ * PDC therefore plays the role that partial correlation plays in static
+ * Gaussian models: it removes the influence of all other channels in the
+ * MVAR system before measuring the @c j -> i interaction. Like DTF and
+ * @ref GrangerCausality, PDC reuses the @ref MvarModel fit, so requesting
+ * all three metrics in one batch costs only one Levinson-Durbin solve.
  */
 
 #ifndef PARTIALDIRECTEDCOHERENCE_H
@@ -74,12 +73,16 @@ class ConnectivitySettings;
 
 //=============================================================================================================
 /**
- * This class computes Partial Directed Coherence (PDC) from an MVAR model.
+ * Partial Directed Coherence estimator of Baccala & Sameshima (2001).
  *
- * PDC_{ij}(f) = |A_{ij}(f)| / sqrt(sum_k |A_{kj}(f)|^2)
- * where A(f) = I - sum_{k=1}^{p} A_k * exp(-2*pi*i*f*k)
+ * Computes @c PDC_{ij}(f) = |A_{ij}(f)| / sqrt( sum_k |A_{kj}(f)|^2 ) from
+ * the MVAR coefficients delivered by @ref MvarModel, where @c A(f) is the
+ * frequency-domain inverse of the transfer matrix. Unlike
+ * @ref DirectedTransferFunction this estimator counts only direct causal
+ * paths - relayed interactions @c j -> k -> i contribute 0 - so PDC and
+ * DTF together separate direct from indirect flow.
  *
- * @brief This class computes Partial Directed Coherence.
+ * @brief Partial Directed Coherence estimator (Baccala & Sameshima 2001); directional, direct paths only.
  * @since 2.2.0
  */
 class CONNSHARED_EXPORT PartialDirectedCoherence : public AbstractMetric

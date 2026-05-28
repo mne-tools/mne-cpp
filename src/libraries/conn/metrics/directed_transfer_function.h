@@ -1,35 +1,33 @@
 //=============================================================================================================
 /**
- * @file     directed_transfer_function.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file directed_transfer_function.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Directed Transfer Function (Kaminski & Blinowska 1991) between every channel pair, derived from a fitted MVAR transfer function.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * The DTF normalises each row of the squared MVAR transfer matrix to a
+ * unit sum,
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ *   DTF_{ij}(f) = |H_{ij}(f)|^2 / sum_k |H_{ik}(f)|^2
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * which can be read as the fraction of the spectral power that channel
+ * @c i would have at frequency @c f that originates from channel @c j
+ * relative to all other channels in the model. Output is non-negative,
+ * bounded by 1, and asymmetric (@c DTF_{ij} != DTF_{ji} in general).
+ * Kaminski and Blinowska (Biological Cybernetics, 1991) introduced DTF
+ * for multi-channel EEG to track stimulus-driven propagation patterns
+ * across cortex, and it remains a popular reference for directed flow in
+ * multivariate spectral analysis.
  *
- *
- * @brief     DirectedTransferFunction class declaration.
- *
+ * Unlike @ref PartialDirectedCoherence, DTF includes both direct and
+ * indirect causal pathways: an indirect interaction @c j -> k -> i shows
+ * up as a non-zero @c DTF_{ij}. The two metrics are therefore
+ * complementary and are usually reported alongside @ref GrangerCausality,
+ * with all three computed from the same @ref MvarModel fit.
  */
 
 #ifndef DIRECTEDTRANSFERFUNCTION_H
@@ -74,11 +72,16 @@ class ConnectivitySettings;
 
 //=============================================================================================================
 /**
- * This class computes the Directed Transfer Function (DTF) from an MVAR model.
+ * Directed Transfer Function estimator of Kaminski & Blinowska (1991).
  *
- * DTF_{ij}(f) = |H_{ij}(f)|^2 / sum_k |H_{ik}(f)|^2
+ * Computes @c DTF_{ij}(f) = |H_{ij}(f)|^2 / sum_k |H_{ik}(f)|^2 from the
+ * transfer matrix @c H delivered by @ref MvarModel and reduces it to a
+ * scalar edge weight by averaging over the frequency window defined on
+ * @ref AbstractMetric. The resulting @ref Network is directional and
+ * includes both direct and indirect causal pathways - use
+ * @ref PartialDirectedCoherence for direct-only flow.
  *
- * @brief This class computes the Directed Transfer Function.
+ * @brief Directed Transfer Function estimator (Kaminski & Blinowska 1991); directional, includes indirect paths.
  * @since 2.2.0
  */
 class CONNSHARED_EXPORT DirectedTransferFunction : public AbstractMetric

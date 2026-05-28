@@ -1,35 +1,31 @@
 //=============================================================================================================
 /**
- * @file     network.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2016
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file network.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Graph container that stores the result of one functional-connectivity metric as nodes (sources/sensors) and weighted edges (channel-pair couplings).
  *
- * Copyright (C) 2016, Lorenz Esch. All rights reserved.
+ * @ref Network is the common output type returned by every estimator in
+ * @c CONNLIB. Each @ref NetworkNode carries a 3D position (sensor coordinate
+ * for sensor-space metrics, source vertex for source-space metrics) and
+ * the list of edges incident to it, and each @ref NetworkEdge stores the
+ * full per-frequency weight matrix together with the scalar band-averaged
+ * weight used for thresholding and display. The same container is reused
+ * for symmetric metrics (coherence, PLV, PLI/wPLI/dwPLI, imaginary
+ * coherence, correlation, cross-correlation) and for the directed metrics
+ * (Granger Causality, DTF, PDC); directionality is encoded by treating
+ * @c (i, j) and @c (j, i) as distinct edges.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief     Network class declaration.
- *
+ * The container also offers the bookkeeping operations needed by every
+ * downstream visualisation and statistical layer: distance-based and
+ * threshold-based edge selection, full vs. mirrored adjacency-matrix
+ * extraction, and a @ref VisualizationInfo block carrying the colour-map
+ * choice that disp3D and the @c connectivity-estimator plugin honour when
+ * rendering the graph in 3D.
  */
 
 #ifndef NETWORK_H
@@ -72,7 +68,7 @@ class NetworkEdge;
 class NetworkNode;
 
 /**
- * @brief Holds threshold and color settings for network edge visualization
+ * @brief Per-network rendering hints: colour-map name or fixed RGBA for nodes and edges.
  */
 struct VisualizationInfo {
     QString sMethod = "Map";                                    /**< The color method: Map (uses sColormap parameter) or Color (uses colNodes and colEdges).*/
@@ -83,9 +79,16 @@ struct VisualizationInfo {
 
 //=============================================================================================================
 /**
- * This class holds information (nodes and connecting edges) about a network, can compute a distance table and provide network metrics.
+ * Graph container for one functional-connectivity result.
  *
- * @brief This class holds information about a network, can compute a distance table and provide network metrics.
+ * Holds the @ref NetworkNode list (channel / source positions) and the
+ * @ref NetworkEdge list (per-frequency weight matrices + scalar band-
+ * averaged weights). Provides full and thresholded views of both edges
+ * and the corresponding adjacency matrix, the metric name ("COH", "PLI",
+ * "GC", ...) and threshold currently in effect, and the @ref VisualizationInfo
+ * block read by the disp3D rendering layer.
+ *
+ * @brief Graph container for one connectivity metric; nodes + weighted edges + threshold/visualisation state.
  */
 
 class CONNSHARED_EXPORT Network

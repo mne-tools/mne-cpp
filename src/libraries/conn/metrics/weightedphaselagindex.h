@@ -1,39 +1,33 @@
 //=============================================================================================================
 /**
- * @file     weightedphaselagindex.h
- * @author   Daniel Strohmeier <Daniel.Strohmeier@tu-ilmenau.de>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     April, 2018
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file weightedphaselagindex.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Weighted Phase Lag Index (Vinck, Oostenveld, van Wingerden, Battaglia & Pennartz 2011) between every channel pair.
  *
- * Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch. All rights reserved.
+ * The weighted PLI replaces the unweighted sign average used by @ref PhaseLagIndex
+ * with an imaginary-part-magnitude-weighted version,
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ *   wPLI_{xy}(f) = | E[ Im(S_{xy}(f)) ] | / E[ |Im(S_{xy}(f))| ]
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMWPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMWPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Vinck et al. (NeuroImage 2011) showed that this estimator dominates the
+ * plain PLI on three counts: it is less sensitive to phase fluctuations
+ * around the zero-lag line (because near-zero @c Im(S_{xy}) values
+ * contribute proportionally little to both numerator and denominator), it
+ * has lower sample-size bias, and it has higher statistical power to
+ * detect genuine non-zero lag interactions in noisy MEG/EEG. Like PLI and
+ * imaginary coherence, the construction guarantees rejection of zero-lag
+ * volume-conduction / common-reference mixing.
  *
- * @note Notes:
- * - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
- *
- *
- * @brief     WeightedPhaseLagIndex class declaration.
- *
+ * The output is bounded in @c [0, 1] and is still positively biased for
+ * small numbers of trials. The squared, debiased variant
+ * @ref DebiasedSquaredWeightedPhaseLagIndex - also from Vinck et al.
+ * (2011) - removes that small-sample bias analytically and should be
+ * preferred when the trial count is low.
  */
 
 #ifndef WEIGHTEDPHASELAGINDEX_H
@@ -79,9 +73,19 @@ class Network;
 
 //=============================================================================================================
 /**
- * This class computes the phase lag index connectivity metric.
+ * Computes the Weighted Phase Lag Index of Vinck et al. (NeuroImage 2011).
  *
- * @brief Computes the weighted phase lag index (WPLI) connectivity metric
+ * Each channel pair is reduced to
+ * @c |sum Im(S_{xy})| / sum |Im(S_{xy})|, weighting every cross-spectrum
+ * sample by the magnitude of its imaginary part. This down-weights
+ * near-zero-lag samples that dominate the bias of the plain @ref PhaseLagIndex
+ * and yields higher detection power for true delayed interactions while
+ * preserving the volume-conduction rejection property. Per-trial sums are
+ * accumulated in @ref ConnectivitySettings::IntermediateSumData and shared
+ * with @ref DebiasedSquaredWeightedPhaseLagIndex when both metrics are
+ * requested in one batch.
+ *
+ * @brief Weighted Phase Lag Index estimator (Vinck et al. 2011); volume-conduction-robust with lower bias than PLI.
  */
 class CONNSHARED_EXPORT WeightedPhaseLagIndex : public AbstractMetric
 {

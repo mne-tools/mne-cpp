@@ -1,35 +1,38 @@
 //=============================================================================================================
 /**
- * @file     granger_causality.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file granger_causality.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Spectral Granger Causality (Geweke 1982, Bressler & Seth 2011) between every channel pair, computed from a fitted MVAR model.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * Granger's idea (Granger, Econometrica 1969) is that a process @c X_j
+ * "causes" @c X_i if the past of @c X_j helps predict @c X_i beyond what
+ * the past of @c X_i alone already does. Geweke (JASA 1982) gave the
+ * frequency-resolved version used here:
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ *   GC_{j->i}(f) = ln( S_{ii}(f) /
+ *                      ( S_{ii}(f) -
+ *                        ( Sigma_{jj} - Sigma_{ij}^2 / Sigma_{ii} ) *
+ *                        |H_{ij}(f)|^2 ) )
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * with @c H the MVAR transfer function and @c Sigma the innovation
+ * covariance, both supplied by @ref MvarModel. The output is non-negative
+ * and asymmetric (@c GC_{j->i} != GC_{i->j} in general), so the resulting
+ * @ref Network is directional. Spectral GC is the standard reference
+ * directed measure for stationary linear systems and is the metric most
+ * directly comparable to the @c spectral_connectivity_epochs(method='gc')
+ * output produced by MNE-Python's mne-connectivity.
  *
- *
- * @brief     GrangerCausality class declaration.
- *
+ * Practical caveats are well known (Bressler & Seth, NeuroImage 2011):
+ * the estimate is sensitive to MVAR model order, requires reasonably
+ * stationary trial segments, and is biased by observation noise. The
+ * complementary @ref DirectedTransferFunction and @ref PartialDirectedCoherence
+ * metrics in this library are derived from the same MVAR fit and are
+ * usually reported together.
  */
 
 #ifndef GRANGERCAUSALITY_H
@@ -74,11 +77,18 @@ class ConnectivitySettings;
 
 //=============================================================================================================
 /**
- * This class computes spectral Granger causality from an MVAR model.
+ * Spectral Granger Causality estimator (Geweke 1982 formulation).
  *
- * GC_{j->i}(f) = ln( S_{ii}(f) / (S_{ii}(f) - (Sigma_{jj} - Sigma_{ij}^2/Sigma_{ii}) * |H_{ij}(f)|^2) )
+ * For every ordered channel pair @c (j -> i) the estimator fits an MVAR
+ * model to the trial-concatenated time series via @ref MvarModel and
+ * evaluates the log ratio of the unconditional and conditional spectra
+ * of @c X_i,
+ * @c GC_{j->i}(f) = ln( S_{ii}(f) / ( S_{ii}(f) - (Sigma_{jj} -
+ * Sigma_{ij}^2 / Sigma_{ii}) * |H_{ij}(f)|^2 ) ).
+ * The resulting @ref Network is directional and stores the band-averaged
+ * GC value as edge weight.
  *
- * @brief This class computes spectral Granger causality.
+ * @brief Spectral Granger Causality estimator; directional, MVAR-based.
  * @since 2.2.0
  */
 class CONNSHARED_EXPORT GrangerCausality : public AbstractMetric

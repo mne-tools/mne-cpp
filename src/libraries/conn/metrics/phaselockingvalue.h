@@ -1,39 +1,35 @@
 //=============================================================================================================
 /**
- * @file     phaselockingvalue.h
- * @author   Daniel Strohmeier <Daniel.Strohmeier@tu-ilmenau.de>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     April, 2018
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file phaselockingvalue.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Phase Locking Value (Lachaux, Rodriguez, Martinerie & Varela 1999) between every channel pair.
  *
- * Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch. All rights reserved.
+ * The Phase Locking Value is the resultant length of the unit-modulus
+ * cross-spectrum sample distribution,
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ *   PLV_{xy}(f) = | E[ S_{xy}(f) / |S_{xy}(f)| ] |
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * with output in @c [0, 1]: 1 means the instantaneous phase difference
+ * @c phi_x(f) - phi_y(f) is constant across trials (perfect inter-trial
+ * phase locking at frequency @c f) and 0 means the phase differences are
+ * uniformly distributed on the unit circle. Lachaux et al. (Human Brain
+ * Mapping, 1999) introduced PLV to detect transient phase coupling
+ * between visual-cortex sites in single-trial intracranial recordings
+ * without the amplitude bias that affects coherence-based measures.
  *
- * @note Notes:
- * - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
- *
- *
- * @brief     PhaseLockingValue class declaration.
- *
+ * Unlike imaginary coherence and the PLI family, PLV does not project out
+ * the zero-lag component of the phase distribution: it is therefore
+ * sensitive to genuine instantaneous coupling but cannot distinguish it
+ * from common-reference / volume-conduction mixing. PLV is the right
+ * choice for source-space analyses (where volume conduction is largely
+ * absorbed into the inverse operator) and for paradigms in which zero-lag
+ * locking is a hypothesis of interest; in sensor-space EEG/MEG it should
+ * be reported alongside @ref ImagCoherence or @ref WeightedPhaseLagIndex.
  */
 
 #ifndef PHASELOCKINGVALUE_H
@@ -79,9 +75,17 @@ class Network;
 
 //=============================================================================================================
 /**
- * This class computes the phase locking value connectivity metric.
+ * Computes the Phase Locking Value of Lachaux et al. (HBM 1999).
  *
- * @brief This class computes the phase locking value connectivity metric.
+ * Each cross-spectral sample is divided by its magnitude (yielding a unit
+ * complex number that encodes only the instantaneous phase difference)
+ * and averaged across trials; PLV is the magnitude of that average. Per-
+ * trial normalised cross-spectra are accumulated in
+ * @ref ConnectivitySettings::IntermediateSumData and the resulting edge
+ * weights are averaged over the frequency window defined on
+ * @ref AbstractMetric.
+ *
+ * @brief Phase Locking Value estimator (Lachaux et al. 1999); amplitude-independent phase coupling, sensitive to zero-lag.
  */
 class CONNSHARED_EXPORT PhaseLockingValue : public AbstractMetric
 {

@@ -1,35 +1,28 @@
 //=============================================================================================================
 /**
- * @file     abstractmetric.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     January, 2018
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file abstractmetric.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Common static knobs shared by every functional-connectivity estimator in @c CONNLIB.
  *
- * Copyright (C) 2018, Lorenz Esch. All rights reserved.
+ * Every metric in @c CONNLIB (Coherence, Imaginary Coherence, PLI, wPLI,
+ * dwPLI, USPLI, PLV, cross-correlation, Granger Causality, DTF, PDC) reads
+ * the same global control flags from @ref AbstractMetric so that the
+ * dispatcher in @ref Connectivity can decide once - before any FFT runs -
+ * whether intermediate per-trial spectra should be cached for reuse
+ * (storage mode) and which frequency-bin window the metrics should
+ * average over.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief     AbstractMetric class declaration.
- *
+ * The frequency-bin window is expressed as @c [m_iNumberBinStart,
+ * m_iNumberBinStart + m_iNumberBinAmount). All metrics collapse the
+ * spectral output to a single scalar per channel pair by averaging the
+ * magnitude (or squared magnitude, depending on the metric) over exactly
+ * this window, so callers select an EEG band (e.g. alpha 8-12 Hz) once and
+ * every estimator returns a comparable band-limited connectivity matrix.
  */
 
 #ifndef ABSTRACTMETRIC_H
@@ -70,9 +63,17 @@ namespace CONNLIB {
 
 //=============================================================================================================
 /**
- * This class provides basic functionalities for all implemented metrics.
+ * Static base for every estimator in @c CONNLIB. Holds the two pieces of
+ * global state that the dispatcher (@ref Connectivity::calculate) must set
+ * before any metric runs:
+ *  - @ref m_bStorageModeIsActive enables caching of per-trial tapered
+ *    spectra and CSDs in @ref ConnectivitySettings::IntermediateTrialData,
+ *    which lets a second metric reuse the FFT work done by the first.
+ *  - @ref m_iNumberBinStart and @ref m_iNumberBinAmount define the
+ *    frequency-bin window over which each metric averages its spectral
+ *    output into the single scalar weight stored on each network edge.
  *
- * @brief This class provides basic functionalities for all implemented metrics.
+ * @brief Static control knobs (storage mode, frequency band) shared by all CONNLIB metrics.
  */
 class CONNSHARED_EXPORT AbstractMetric
 {

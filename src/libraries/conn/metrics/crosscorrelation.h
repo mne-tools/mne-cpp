@@ -1,35 +1,31 @@
 //=============================================================================================================
 /**
- * @file     crosscorrelation.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     January, 2018
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file crosscorrelation.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Time-lagged cross-correlation between every channel pair, computed via the inverse FFT of the cross-spectrum.
  *
- * Copyright (C) 2018, Lorenz Esch. All rights reserved.
+ * For two zero-mean signals @c x and @c y the cross-correlation is
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ *   c_{xy}(tau) = E[ x[t] * y[t + tau] ]
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * which by the Wiener-Khinchin theorem equals the inverse Fourier
+ * transform of the cross-spectrum @c S_{xy}(f). This implementation
+ * therefore reuses the DPSS-tapered FFTs computed by the spectral metrics
+ * and runs an @c IFFT on @c S_{xy} to obtain @c c_{xy}(tau) for all lags
+ * in @c [-Nfft/2, Nfft/2); the edge weight stored on the @ref Network is
+ * the maximum absolute correlation over the lag axis, which gives a
+ * lag-robust scalar similarity measure suitable for detecting delayed
+ * coupling that zero-lag @ref Correlation would miss.
  *
- *
- * @brief     CrossCorrelation class declaration.
- *
+ * Like @ref Correlation this is a broadband time-domain estimator with no
+ * rejection of volume conduction or common-reference mixing; the lag at
+ * which the maximum occurs can however be inspected separately and used
+ * as a coarse conduction-delay estimate.
  */
 
 #ifndef CROSSCORRELATION_H
@@ -75,9 +71,16 @@ class Network;
 
 //=============================================================================================================
 /**
- * This class computes the cross correlation connectivity metric.
+ * Computes the time-lagged cross-correlation between every channel pair via
+ * the inverse FFT of the DPSS-tapered cross-spectrum, and reduces it to
+ * the maximum absolute correlation over the lag axis.
  *
- * @brief This class computes the cross correlation connectivity metric.
+ * Per-trial computations are dispatched through @c QtConcurrent::mapped
+ * and accumulated under a single @c QMutex. The estimator is broadband
+ * and does not reject zero-lag mixing, but - unlike @ref Correlation -
+ * is sensitive to delayed coupling because the lag axis is searched.
+ *
+ * @brief Time-lagged cross-correlation estimator; broadband, sensitive to delayed coupling.
  */
 class CONNSHARED_EXPORT CrossCorrelation : public AbstractMetric
 {

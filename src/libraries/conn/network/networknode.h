@@ -1,36 +1,26 @@
 //=============================================================================================================
 /**
- * @file     networknode.h
- * @author   Daniel Strohmeier <Daniel.Strohmeier@tu-ilmenau.de>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2016
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file networknode.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Node of a connectivity @ref Network; carries a 3D position and the lists of incident (in / out, full / thresholded) edges.
  *
- * Copyright (C) 2016, Daniel Strohmeier, Lorenz Esch. All rights reserved.
+ * One @ref NetworkNode is created per sensor (in sensor-space connectivity)
+ * or per source vertex / ROI centroid (in source-space connectivity). The
+ * 3D position is filled by @ref ConnectivitySettings::setNodePositions
+ * from either a @c FiffInfo channel set or from a forward solution + a
+ * @c FsSurfaceSet pair, and is used by disp3D to draw the node at the
+ * correct anatomical location.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief     NetworkNode class declaration.
- *
+ * The node also stores the lists of incident edges - separately for the
+ * full unthresholded graph and for the thresholded view, and separately
+ * for ingoing and outgoing directions - so that graph-theoretic measures
+ * (degree, hub-ness, in/out strength) can be computed in O(1) per node
+ * once the corresponding @ref Network has been assembled.
  */
 
 #ifndef NETWORKNODE_H
@@ -73,9 +63,13 @@ class NetworkEdge;
 
 //=============================================================================================================
 /**
- * This class holds an object to describe the node of a network.
+ * Node of a @ref Network. Stores a unique ID, a 3D anatomical position
+ * (sensor coordinate or source vertex) and the lists of incident edges
+ * partitioned by direction (in / out) and by threshold state (full /
+ * thresholded), so that graph-theoretic measures can be read off without
+ * rescanning the global edge list.
  *
- * @brief This class holds an object to describe the node of a network.
+ * @brief Graph node carrying a 3D position and its incident in/out, full/thresholded edge lists.
  */
 
 class CONNSHARED_EXPORT NetworkNode

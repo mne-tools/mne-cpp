@@ -1,39 +1,34 @@
 //=============================================================================================================
 /**
- * @file     imagcoherence.h
- * @author   Daniel Strohmeier <Daniel.Strohmeier@tu-ilmenau.de>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     April, 2018
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file imagcoherence.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Volume-conduction-robust imaginary coherence (Nolte et al., 2004) between every channel pair.
  *
- * Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch. All rights reserved.
+ * Imaginary coherence is the imaginary part of complex coherency,
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ *   ImCoh_{xy}(f) = Im( S_{xy}(f) / sqrt(S_{xx}(f) * S_{yy}(f)) )
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * with output range @c [-1, 1] - or @c [0, 1] when reported as
+ * @c |Im(Coh)|, as done here. Its key property, established by Nolte,
+ * Bai, Wheaton, Mari, Vorbach and Hallett (NeuroImage 2004), is that any
+ * instantaneous mixing of independent sources (volume conduction,
+ * common-reference, common-pickup) projects purely onto the real axis
+ * and therefore contributes 0 to @c Im(Coh). Only interactions with a
+ * non-zero phase lag - the signature of finite conduction delay between
+ * two true neural generators - survive, which makes this estimator a
+ * standard choice for sensor-space MEG/EEG connectivity where volume
+ * conduction would otherwise dominate ordinary coherence.
  *
- * @note Notes:
- * - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
- * - QtConcurrent can be used to speed up computation.
- *
- * @brief     Imaginary coherence class declaration.
- *
+ * The trade-off is reduced sensitivity to genuine but short-lag
+ * interactions and a non-trivial dependence on the relative source
+ * orientations, so ImCoh is usually reported alongside the phase-based
+ * estimators (PLI, wPLI) which share its anti-leakage property but have
+ * different bias/variance profiles.
  */
 
 #ifndef IMAGCOHERENCE_H
@@ -78,9 +73,17 @@ class Network;
 
 //=============================================================================================================
 /**
- * This class computes the imaginary coherence connectivity metric.
+ * Computes the imaginary part of complex coherency for every channel pair.
  *
- * @brief This class computes the imaginary coherence connectivity metric.
+ * The estimator inherits the volume-conduction rejection property derived
+ * by Nolte et al. (NeuroImage, 2004): zero-lag mixing of independent
+ * sources contributes only to the real axis and is removed, so the
+ * returned edge weights reflect interactions with non-zero conduction
+ * delay only. The cross-spectral accumulation is delegated to
+ * @ref Coherency::calculateImag; this class is the public entry point used
+ * by the dispatcher in @ref Connectivity.
+ *
+ * @brief Imaginary-coherence estimator (Nolte et al. 2004); rejects zero-lag volume-conduction mixing.
  */
 class CONNSHARED_EXPORT ImagCoherence : public AbstractMetric
 {

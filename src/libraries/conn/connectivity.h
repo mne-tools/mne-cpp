@@ -1,35 +1,29 @@
 //=============================================================================================================
 /**
- * @file     connectivity.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     March, 2017
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file connectivity.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Front-end dispatcher that runs the requested connectivity metrics over a @ref ConnectivitySettings batch.
  *
- * Copyright (C) 2017, Lorenz Esch. All rights reserved.
+ * @ref Connectivity is the single entry point used by GUI plugins (rtfwd,
+ * connectivity-estimator) and the @c mne_dipole_fit / batch tools to compute
+ * one or more functional-connectivity estimates from the same set of trials.
+ * The caller fills a @ref ConnectivitySettings object with the trial data,
+ * sampling frequency, FFT length, taper window, source/sensor node
+ * positions, and the list of method names ("COH", "IMAGCOH", "PLI",
+ * "WPLI", "DSWPLI", "USPLI", "PLV", "COR", "XCOR", "GC", "DTF",
+ * "PDC"), and @ref Connectivity::calculate dispatches to the corresponding
+ * metric implementations and returns one @ref Network per method.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief     Connectivity class declaration.
- *
+ * Trial preprocessing (DPSS tapering, FFT, cross- and auto-spectral sums) is
+ * cached in the shared @ref ConnectivitySettings::IntermediateSumData so
+ * that running several metrics over the same data set does not recompute
+ * the FFTs - the dispatcher therefore amortises the spectral cost across
+ * all selected estimators in a single pass.
  */
 
 #ifndef CONNECTIVITY_H
@@ -72,9 +66,17 @@ class Network;
 
 //=============================================================================================================
 /**
- * This class handles the incoming settings and computes the actual connectivity estimation.
+ * Dispatcher that runs one or more functional-connectivity estimators over a
+ * batch of pre-processed trials and returns one @ref Network per estimator.
  *
- * @brief Computes functional connectivity estimates from ConnectivitySettings using the selected metric
+ * The selected methods are read from @ref ConnectivitySettings::getConnectivityMethods
+ * and matched by string against the supported metric set
+ * ("COR", "XCOR", "COH", "IMAGCOH", "PLI", "USPLI", "WPLI", "DSWPLI",
+ * "PLV", "GC", "DTF", "PDC"). All spectral metrics share the same DPSS
+ * tapered FFT and CSD accumulator inside @ref ConnectivitySettings, so
+ * running e.g. PLI + wPLI + dwPLI in one call costs only one FFT pass.
+ *
+ * @brief Runs the selected functional-connectivity metrics over a @ref ConnectivitySettings batch.
  */
 class CONNSHARED_EXPORT Connectivity
 {

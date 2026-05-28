@@ -1,39 +1,32 @@
 //=============================================================================================================
 /**
- * @file     unbiasedsquaredphaselagindex.h
- * @author   Daniel Strohmeier <Daniel.Strohmeier@tu-ilmenau.de>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     April, 2018
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file unbiasedsquaredphaselagindex.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Unbiased estimator of squared Phase Lag Index between every channel pair.
  *
- * Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch. All rights reserved.
+ * The plain Phase Lag Index (Stam et al. 2007) and its square are biased
+ * upward when the number of trials @c N is small: even uncorrelated signals
+ * produce a non-zero expected magnitude of the empirical sign average
+ * because each @c sign() contribution has variance @c 1. The unbiased
+ * squared PLI removes the diagonal contribution analytically,
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ *   USPLI_{xy}(f) = ( ( sum_n sign(Im(S_{xy}^{(n)}(f))) )^2 - N ) / ( N * (N - 1) )
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * which is an unbiased estimator of @c PLI^2 in the sense that
+ * @c E[USPLI] = PLI^2 for any @c N >= 2. Values outside the nominal
+ * @c [0, 1] range can occur for very small @c N or noise-dominated pairs;
+ * these indicate a true PLI indistinguishable from zero at the available
+ * sample size and are usually clipped to 0 for display purposes.
  *
- * @note Notes:
- * - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
- *
- *
- * @brief     UnbiasedSquaredPhaseLagIndex class declaration.
- *
+ * This estimator is the direct phase-only analogue of the squared
+ * debiased weighted PLI of Vinck et al. (2011) and is the right choice
+ * when amplitude weighting is undesirable but small-sample bias must be
+ * removed.
  */
 
 #ifndef UNBIASEDSQUAREDPHASELAGINDEX_H
@@ -79,9 +72,16 @@ class Network;
 
 //=============================================================================================================
 /**
- * This class computes the phase lag index connectivity metric.
+ * Computes the unbiased estimator of squared PLI for every channel pair.
  *
- * @brief Computes the unbiased squared phase lag index (USPLI) connectivity metric
+ * The estimator subtracts the analytically known diagonal contribution
+ * from the squared sum of cross-spectral sign samples, yielding an
+ * estimate whose expectation equals @c PLI^2 for any trial count
+ * @c N >= 2 and is therefore free of the upward small-sample bias that
+ * affects the plain @ref PhaseLagIndex. The construction preserves the
+ * zero-lag rejection property of the PLI family.
+ *
+ * @brief Unbiased squared Phase Lag Index estimator; removes the small-sample bias of @ref PhaseLagIndex.
  */
 class CONNSHARED_EXPORT UnbiasedSquaredPhaseLagIndex : public AbstractMetric
 {

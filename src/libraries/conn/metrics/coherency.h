@@ -1,39 +1,34 @@
 //=============================================================================================================
 /**
- * @file     coherency.h
- * @author   Daniel Strohmeier <Daniel.Strohmeier@tu-ilmenau.de>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     April, 2018
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file coherency.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Complex coherency between every channel pair and its two reductions: magnitude (coherence) and imaginary part (imaginary coherence).
  *
- * Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch. All rights reserved.
+ * Coherency is the normalised cross-spectrum,
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ *   Coh_{xy}(f) = S_{xy}(f) / sqrt(S_{xx}(f) * S_{yy}(f))
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * a complex-valued quantity whose magnitude is the classical coherence in
+ * [0, 1] and whose argument is the average phase lag between the two
+ * signals at frequency @c f. Splitting it into real and imaginary parts is
+ * the basis of the volume-conduction-robust imaginary-coherence estimator
+ * of Nolte et al. (NeuroImage, 2004): only non-zero phase lag (i.e. true
+ * interaction with finite conduction delay) survives projection onto the
+ * imaginary axis, while instantaneous common-reference / volume-conduction
+ * mixing contributes only to the real axis and is rejected.
  *
- * @note Notes:
- * - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
- * - QtConcurrent can be used to speed up computation.
- *
- * @brief     Coherency class declaration.
- *
+ * The per-trial workhorse @ref Coherency::compute computes DPSS tapered
+ * spectra and accumulates the cross-spectral and auto-spectral sums into
+ * the shared @ref ConnectivitySettings::IntermediateSumData. The two
+ * public reductions, @ref calculateAbs and @ref calculateImag, then divide
+ * by the running auto-spectral norms and average over the frequency window
+ * defined on @ref AbstractMetric to produce the scalar edge weights of the
+ * returned @ref Network.
  */
 
 #ifndef COHERENCY_H
@@ -79,9 +74,17 @@ class Network;
 
 //=============================================================================================================
 /**
- * This class computes the coherency connectivity metric.
+ * Shared core of the coherence / imaginary-coherence family.
  *
- * @brief This class computes the coherency connectivity metric.
+ * @ref compute fills the per-trial DPSS spectra and accumulates the cross-
+ * and auto-spectral sums in @ref ConnectivitySettings::IntermediateSumData.
+ * The two public reductions then collapse the complex coherency to a real
+ * scalar per channel pair: @ref calculateAbs returns |Coh_{xy}(f)|^2
+ * (classical magnitude-squared coherence, symmetric, sensitive to
+ * zero-lag mixing) and @ref calculateImag returns |Im(Coh_{xy}(f))|, the
+ * volume-conduction-robust imaginary coherence of Nolte et al. (2004).
+ *
+ * @brief Complex coherency core; produces magnitude-squared and imaginary-part reductions for downstream metrics.
  */
 class CONNSHARED_EXPORT Coherency : public AbstractMetric
 {

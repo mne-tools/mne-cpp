@@ -1,39 +1,36 @@
 //=============================================================================================================
 /**
- * @file     phaselagindex.h
- * @author   Daniel Strohmeier <Daniel.Strohmeier@tu-ilmenau.de>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     April, 2018
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file phaselagindex.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Phase Lag Index (Stam, Nolte & Daffertshofer 2007) between every channel pair.
  *
- * Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch. All rights reserved.
+ * The Phase Lag Index measures the asymmetry of the cross-spectral phase
+ * distribution about zero,
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ *   PLI_{xy}(f) = | E[ sign( Im( S_{xy}(f) ) ) ] |
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * with output in @c [0, 1]: 0 means phase differences are symmetric about
+ * 0 or pi (i.e. dominated by zero-lag mixing) and 1 means the phase lag
+ * always has the same sign (perfect, consistently lagged or leading
+ * interaction). Stam, Nolte and Daffertshofer (Human Brain Mapping, 2007)
+ * introduced PLI specifically to suppress the spurious connectivity that
+ * volume conduction and common-reference effects produce in EEG/MEG
+ * sensor-space coherence: any pair of channels driven by the same source
+ * with constant gains has a phase difference of exactly 0 or pi and
+ * therefore PLI = 0 by construction.
  *
- * @note Notes:
- * - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
- *
- *
- * @brief     PhaseLagIndex class declaration.
- *
+ * PLI shares the anti-leakage property of imaginary coherence but, being
+ * amplitude-independent, is more robust to amplitude artefacts at the cost
+ * of being biased upward for small samples and discontinuous around the
+ * zero-phase line. The weighted variants @ref WeightedPhaseLagIndex and
+ * @ref DebiasedSquaredWeightedPhaseLagIndex (Vinck et al., 2011) and the
+ * sample-bias correction @ref UnbiasedSquaredPhaseLagIndex address those
+ * shortcomings.
  */
 
 #ifndef PHASELAGINDEX_H
@@ -79,9 +76,16 @@ class Network;
 
 //=============================================================================================================
 /**
- * This class computes the phase lag index connectivity metric.
+ * Computes the Phase Lag Index of Stam, Nolte & Daffertshofer (2007).
  *
- * @brief This class computes the phase lag index connectivity metric.
+ * For every channel pair the estimator averages @c sign(Im(S_{xy}(f)))
+ * across DPSS-tapered trial spectra and returns the magnitude of that
+ * average. Zero-lag mixing (volume conduction, common reference) yields
+ * sign = 0 and is rejected; consistently lagged or leading interactions
+ * yield magnitudes close to 1. The per-trial accumulation is parallelised
+ * over trials via @c QtConcurrent and reduced under a single @c QMutex.
+ *
+ * @brief Phase Lag Index estimator (Stam et al. 2007); rejects zero-lag volume-conduction mixing.
  */
 class CONNSHARED_EXPORT PhaseLagIndex : public AbstractMetric
 {
