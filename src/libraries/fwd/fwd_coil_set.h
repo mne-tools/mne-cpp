@@ -1,37 +1,28 @@
 //=============================================================================================================
 /**
- * @file     fwd_coil_set.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     December, 2016
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fwd_coil_set.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Container of FwdCoil instances representing either a sensor-type *template database* or a concrete per-channel sensor array.
  *
- * Copyright (C) 2016, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * FwdCoilSet serves two roles. As a *template database* it is the
+ * in-memory image of @c coil_def.dat, the canonical CTF/Elekta file
+ * mapping a numeric coil type (3022 = MEGIN VectorView magnetometer,
+ * 3024 = planar gradiometer, 5001 = CTF axial gradiometer, ...) to a
+ * normalised set of integration points and weights. As a *per-channel
+ * array* it holds one FwdCoil per recorded MEG channel, with the
+ * template's integration points already rotated and translated into the
+ * device-, head- or MRI-coordinate frame via the supplied FiffCoordTrans.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FwdCoilSet class declaration.
- *
+ * Mirrors @c fwdCoilSetRec from MNE-C; @c create_meg_coils() is the
+ * counterpart of @c read_meg_coils()/@c make_meg_coils() and is the only
+ * route by which raw @c FiffChInfo records become objects the forward
+ * solver can integrate against.
  */
 
 #ifndef FWD_COIL_SET_H
@@ -69,9 +60,9 @@ namespace FWDLIB
 class FwdBemSolution;
 //=============================================================================================================
 /**
- * Implements FwdCoilSet (Replaces *fwdCoilSet,fwdCoilSetRec; struct of MNE-C fwd_types.h).
+ * Implements FwdCoilSet (replaces @c fwdCoilSet / @c fwdCoilSetRec from MNE-C @c fwd_types.h).
  *
- * @brief Collection of FwdCoil objects representing a full MEG or EEG sensor array.
+ * @brief Container of FwdCoil instances acting both as the in-memory image of the @c coil_def.dat template database and as a per-channel sensor array in a chosen coordinate frame (device / head / MRI).
  */
 class FWDSHARED_EXPORT FwdCoilSet
 {

@@ -1,37 +1,22 @@
 //=============================================================================================================
 /**
- * @file     fwd.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     March, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file fwd.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Thin static-wrapper façade exposing the MNE Matlab-toolbox forward-solution entry points (e.g. mne_read_forward_solution).
  *
- * Copyright (C) 2026, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * @brief    Fwd class declaration, which provides static wrapper functions for the forward library.
+ * The MNE Matlab toolbox defines a flat set of top-level functions
+ * (@c mne_read_forward_solution, @c mne_pick_channels_forward, ...) that
+ * users have long scripted against. Fwd re-exposes the C++ equivalents
+ * implemented on @c MNELIB::MNEForwardSolution as @c static inline
+ * methods with matching names, signatures and side effects, so a port
+ * of an existing Matlab pipeline can be performed call-for-call without
+ * having to thread an object instance through every helper.
  */
-//=============================================================================================================
 
 #ifndef FWD_H
 #define FWD_H
@@ -61,7 +46,7 @@ namespace FWDLIB
 
 //=============================================================================================================
 /**
- * @brief The Fwd class provides static wrapper functions for the forward library.
+ * @brief Static-method façade that re-exposes MNEForwardSolution toolbox-equivalent entry points under their familiar @c mne_* names.
  */
 class FWDSHARED_EXPORT Fwd
 {

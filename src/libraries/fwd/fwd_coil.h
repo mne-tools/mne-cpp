@@ -1,37 +1,30 @@
 //=============================================================================================================
 /**
- * @file     fwd_coil.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     December, 2016
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fwd_coil.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Single MEG sensor coil or EEG electrode described by a set of weighted integration points in its own coordinate frame.
  *
- * Copyright (C) 2016, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * In the Biot-Savart formulation used for MEG, the signal a coil records
+ * is the surface integral of the dipole's magnetic field over the coil
+ * area projected along the coil normal. The CTF / Elekta coil-definition
+ * file approximates that integral as a weighted sum at a handful of
+ * integration points; each FwdCoil stores those points as @c rmag
+ * (positions), @c cosmag (orientations) and @c w (Gauss-Legendre or
+ * trapezoidal weights). A magnetometer reduces to a single point; an
+ * axial gradiometer uses two opposing loops with weights ±1; a planar
+ * gradiometer uses four points encoding a finite-difference baseline.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FwdCoil class declaration.
- *
+ * For EEG, FwdCoil collapses to a single point with @c cosmag = (0,0,0)
+ * — the electrode is a potential probe, not a field probe — and @c w
+ * carries the reference-electrode subtraction coefficient. The class is
+ * a direct refactor of the MNE-C @c fwdCoilRec struct with raw
+ * C-pointers replaced by Eigen matrices.
  */
 
 #ifndef FWD_COIL_H
@@ -85,9 +78,9 @@ inline constexpr bool FWD_IS_MEG_COIL(int x) { return (x != FWD_COILC_EEG && x !
 
 //=============================================================================================================
 /**
- * Implements FwdCoil (Replaces *fwdCoil,fwdCoilRec; struct of MNE-C fwd_types.h).
+ * Implements FwdCoil (replaces @c fwdCoil / @c fwdCoilRec from MNE-C @c fwd_types.h).
  *
- * @brief Single MEG or EEG sensor coil with integration points, weights, and coordinate frame.
+ * @brief Single MEG sensor coil or EEG electrode — stores the coil-local frame and the @c (r_mag, cos_mag, w) integration-point triples that approximate the Biot-Savart surface integral over the coil area.
  */
 class FWDSHARED_EXPORT FwdCoil
 {

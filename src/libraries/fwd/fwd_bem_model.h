@@ -1,37 +1,36 @@
 //=============================================================================================================
 /**
- * @file     fwd_bem_model.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     January, 2017
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fwd_bem_model.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Boundary Element Method (BEM) volume-conductor model — layered triangulated surfaces, conductivities, IP-approach matrix and potential-solution matrix.
  *
- * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * The BEM reformulates the EEG/MEG forward problem from a 3-D PDE on the
+ * head volume into a 2-D integral equation on the boundaries between
+ * compartments of piecewise-constant conductivity (typically scalp, outer
+ * skull, inner skull). Hamalainen & Sarvas (1989) discretise that
+ * equation by linear collocation on a triangulated surface, giving a
+ * dense linear system whose inverse — stored here as @c solution — maps
+ * the infinite-medium potential at every node to the true bounded-medium
+ * potential. From that node potential, electrode voltages follow by
+ * linear interpolation and MEG fields follow from the Geselowitz
+ * formula.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Because the scalp/skull conductivity ratio (≈50–1) makes the system
+ * ill-conditioned, the *Isolated Skull Approach* (IP) of Meijs et al.
+ * pre-conditions the inner-skull block; @c FWD_BEM_IP_APPROACH_LIMIT and
+ * @c ip_approach_limit guard that step. Constants @c FWD_BEM_LINEAR_COLL
+ * and @c FWD_BEM_CONSTANT_COLL select the linear- or constant-potential
+ * basis, and @c FWD_BEM_LIN_FIELD_* selects the analytic integral used
+ * for the MEG primary-current term (Simple / Ferguson / Urankar).
  *
- *
- * @brief    FwdBemModel class declaration.
- *
+ * Refactored from the MNE-C @c fwdBemModelRec struct in
+ * @c fwd_types.h and the solver routines in @c fwd_bem_linear_collocation.c.
  */
 
 #ifndef FWD_BEM_MODEL_H
@@ -115,15 +114,17 @@ class FwdThreadArg;
 
 //=============================================================================================================
 /**
- * @brief BEM (Boundary Element Method) model definition.
+ * @brief Layered triangulated volume-conductor model (scalp/skull/inner-skull surfaces, per-compartment conductivities, IP-approach data and dense potential-solution matrix) used by the linear-collocation BEM forward solver.
  *
- * Holds the BEM model surfaces, conductivity parameters, and potential
- * solution matrix used in MEG/EEG forward computations. Surfaces are
- * stored from outermost to innermost and owned by this object.
+ * Holds the BEM model surfaces, conductivity parameters and the
+ * pre-inverted potential-solution matrix consumed by the dipole loop.
+ * Surfaces are stored from outermost (scalp) to innermost (inner skull)
+ * and owned by this object; the solution matrix is built once by
+ * @ref fwd_bem_compute_solution and then re-used for every source.
  *
- * Refactored from the MNE-C fwdBemModel / fwdBemModelRec struct
- * (fwd_types.h). Raw C-style arrays replaced with Eigen types;
- * surface ownership managed through std::unique_ptr.
+ * Refactored from the MNE-C @c fwdBemModel / @c fwdBemModelRec struct
+ * (@c fwd_types.h). Raw C-style arrays were replaced with Eigen types;
+ * surface ownership is managed through @c std::unique_ptr.
  */
 class FWDSHARED_EXPORT FwdBemModel
 {

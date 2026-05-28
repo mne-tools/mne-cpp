@@ -1,37 +1,25 @@
 //=============================================================================================================
 /**
- * @file     fwd_eeg_sphere_model_set.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     December, 2016
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fwd_eeg_sphere_model_set.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Named container of FwdEegSphereModel objects loaded from an @c mne_setup_eeg_sphere_model parameter file.
  *
- * Copyright (C) 2016, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * MNE distributes a small text file (one model per line: @c name, radii,
+ * conductivities) so users can pick a standard 4-shell head model —
+ * @c "Default", Stok/Cuffin/Cohen variants, etc. — by name from the
+ * command line. FwdEegSphereModelSet parses that file, builds the
+ * corresponding FwdEegSphereModel objects (including the Berg-Scherg
+ * fit) and exposes name-based lookup so the rest of the pipeline can
+ * resolve a string like @c "Default" into a fully usable analytic head
+ * model.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FwdEegSphereModelSet class declaration.
- *
+ * Refactored from @c fwdEegSphereModelSetRec in MNE-C @c fwd_types.h.
  */
 
 #ifndef FWD_EEG_SPHERE_MODEL_SET_H
@@ -73,9 +61,9 @@ namespace FWDLIB {
 
 //=============================================================================================================
 /**
- * Definitions for the EEG Sphere Model Set (Replaces *fwdEegSphereModelSet,fwdEegSphereModelSetRec struct of MNE-C fwd_types.h).
+ * Definitions for the EEG Sphere Model Set (replaces @c fwdEegSphereModelSet / @c fwdEegSphereModelSetRec from MNE-C @c fwd_types.h).
  *
- * @brief Collection of FwdEegSphereModel objects for multi-model EEG forward solutions.
+ * @brief Name-indexed collection of FwdEegSphereModel objects parsed from an @c mne_setup_eeg_sphere_model parameter file so callers can resolve textual model names ("Default", "Stok", …) into ready-to-use analytic head models.
  */
 
 class FWDSHARED_EXPORT FwdEegSphereModelSet

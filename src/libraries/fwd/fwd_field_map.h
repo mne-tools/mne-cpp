@@ -1,38 +1,36 @@
 //=============================================================================================================
 /**
- * @file     fwd_field_map.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     January, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file fwd_field_map.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Sphere-model field interpolator that maps measured MEG/EEG values onto a dense scalp or cortical surface.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * Field mapping is the dual of source estimation: instead of recovering
+ * cortical currents, it produces a smooth continuous field on a target
+ * surface that exactly reproduces the recorded sensor values. The
+ * classical MNE approach (Hamalainen 1994; Ahlfors et al. 2010) treats
+ * every sensor as a dipole layer on a sphere fitted to the head and
+ * evaluates the Legendre-series lead-field dot products
+ * @c ⟨L_i, L_j⟩ between sensor pairs (@c self_dots) and between sensors
+ * and surface vertices (@c surface_dots). Solving the regularised system
+ * @c (Gᵢⱼ + λI) x = b yields per-vertex interpolation weights.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * FwdFieldMap implements that recipe for the spherical-model special
+ * case: fast @c _fast_sphere_dot_r0 lead-field dots, an SVD-based
+ * pseudo-inverse with eigenvalue truncation (@c miss) for regularisation,
+ * and optional pre-projection through the SSP operator to keep the map
+ * orthogonal to projected-out noise subspaces. The output matrix is
+ * channel-to-vertex and is reused across every sample of a recording.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FwdFieldMap class declaration.
- *
- * C++ port of MNE-Python field mapping (BSD-3-Clause, The MNE-Python contributors).
- * Source files: mne/forward/_lead_dots.py, mne/forward/_field_interpolation.py
- *
+ * Ported from MNE-Python (BSD-3-Clause):
+ *   @c _do_self_dots, @c _do_surface_dots, @c _fast_sphere_dot_r0
+ *   (@c mne/forward/_lead_dots.py);
+ *   @c _compute_mapping_matrix, @c _pinv_trunc
+ *   (@c mne/forward/_field_interpolation.py).
  */
 
 #ifndef FWD_FIELD_MAP_H
@@ -58,17 +56,17 @@ namespace FWDLIB
 
 //=============================================================================================================
 /**
- * @brief Computes and stores sensor-to-surface field mapping matrices for MEG/EEG forward solutions.
+ * @brief Computes the per-vertex sensor-to-surface mapping matrix used to render a continuous scalp/cortex field that exactly reproduces the recorded MEG/EEG values.
  *
- * Sphere-model based sensor-to-surface field mapping.
- *
- * Uses Legendre polynomial series for lead-field dot products and SVD-based
- * pseudo-inverse with eigenvalue truncation, matching the classic MNE field
- * interpolation approach.
+ * Uses Legendre-series lead-field dot products evaluated on a sphere
+ * fitted to the head together with an SVD-based pseudo-inverse with
+ * eigenvalue truncation — the classic MNE field-interpolation recipe.
  *
  * Ported from MNE-Python (BSD-3-Clause):
- *   _do_self_dots, _do_surface_dots, _fast_sphere_dot_r0  (_lead_dots.py)
- *   _compute_mapping_matrix, _pinv_trunc  (_field_interpolation.py)
+ *   @c _do_self_dots, @c _do_surface_dots, @c _fast_sphere_dot_r0
+ *   (@c _lead_dots.py);
+ *   @c _compute_mapping_matrix, @c _pinv_trunc
+ *   (@c _field_interpolation.py).
  */
 class FWDSHARED_EXPORT FwdFieldMap
 {

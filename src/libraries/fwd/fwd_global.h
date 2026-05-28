@@ -1,38 +1,27 @@
 //=============================================================================================================
 /**
- * @file     fwd_global.h
- * @author   Juan GP <jgarciaprieto@mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     February, 2017
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fwd_global.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Symbol-visibility macro and build-info entry points for the FWDLIB (MEG/EEG forward-modelling) library.
  *
- * Copyright (C) 2017-2026, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * FWDLIB implements the forward problem of bioelectromagnetism: given a
+ * current dipole at a known source location, compute the magnetic field
+ * sampled by each MEG coil and the electric potential sampled by each
+ * EEG electrode. Because Maxwell's equations are evaluated in the
+ * quasi-static regime (head-scale frequencies ≪ c/L), the lead-field
+ * matrix G that maps dipole moments to sensor readings is purely real,
+ * time-invariant for a fixed head and sensor array, and re-usable across
+ * every subsequent inverse-solution / source-localisation step.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Forward library export/import macros.
- *
+ * This translation unit only defines the FWDSHARED_EXPORT visibility
+ * macro and exposes the build-stamp helpers consumed by the library
+ * banner; the actual solver primitives live in the sibling headers.
  */
 
 #ifndef FWD_GLOBAL_H
@@ -60,7 +49,7 @@
 //=============================================================================================================
 /**
  * @namespace FWDLIB
- * @brief     Forward modelling (BEM, MEG/EEG lead fields).
+ * @brief Forward modelling — BEM solver, spherical models, sensor/coil definitions and the lead-field assembly that links current dipoles to MEG/EEG sensor readings.
  */
 namespace FWDLIB{
 

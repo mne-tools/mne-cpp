@@ -1,37 +1,35 @@
 //=============================================================================================================
 /**
- * @file     fwd_eeg_sphere_model.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     December, 2016
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fwd_eeg_sphere_model.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Multi-shell spherical head model with Berg-Scherg equivalent-source approximation for fast EEG forward computation.
  *
- * Copyright (C) 2016, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * For EEG, the exact potential of a current dipole in a layered sphere
+ * is a Legendre series whose convergence slows dramatically as the
+ * dipole approaches the inner-skull boundary, making the analytic
+ * solution expensive at realistic source eccentricities. Berg & Scherg
+ * (1994) showed that the series can be reproduced to four-digit accuracy
+ * by replacing it with a small set (typically 3) of *equivalent dipoles*
+ * inside a single homogeneous sphere, whose magnitudes and radial
+ * positions are obtained once per model via a non-linear least-squares
+ * fit. FwdEegSphereModel stores both the concentric layers and the
+ * fitted Berg-Scherg parameters @c mu / @c lambda so subsequent dipole
+ * evaluations cost only a few image-charge contributions.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * For MEG, the Sarvas (1987) closed-form expression — also implemented
+ * here — gives the analytic magnetic field of a dipole in a spherically
+ * symmetric conductor with no series at all, because the radial
+ * conductivity profile drops out of the Biot-Savart line integral.
  *
- *
- * @brief    FwdEegSphereModel class declaration.
- *
+ * Refactored from MNE-C @c fwd_eeg_sphere_model.c / @c fwd_types.h
+ * (@c fwdEegSphereModelRec); the embedded @c fitUserRec carries the
+ * SVD workspace of the Berg-Scherg fit.
  */
 
 #ifndef FWD_EEG_SPHERE_MODEL_H
@@ -89,9 +87,9 @@ using fitUser = fitUserRec*;
 
 //=============================================================================================================
 /**
- * Implements FwdEegSphereModel (Replaces *fwdEegSphereModel,fwdEegSphereModelRec struct of MNE-C fwd_types.h).
+ * Implements FwdEegSphereModel (replaces @c fwdEegSphereModel / @c fwdEegSphereModelRec from MNE-C @c fwd_types.h).
  *
- * @brief Multi-layer spherical head model for EEG forward computation.
+ * @brief Multi-shell concentric-sphere head model holding the Berg-Scherg equivalent-source parameters that accelerate the de Munck Legendre series for EEG, plus the Sarvas closed-form coefficients used for the spherically-symmetric MEG forward solution.
  */
 class FWDSHARED_EXPORT FwdEegSphereModel
 {

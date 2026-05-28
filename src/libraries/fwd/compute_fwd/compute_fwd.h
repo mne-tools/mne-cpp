@@ -1,38 +1,30 @@
 //=============================================================================================================
 /**
- * @file     compute_fwd.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Ruben Dörfel <ruben.deorfel@tu-ilmenau.de>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     February, 2017
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file compute_fwd.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Top-level driver that assembles the MEG/EEG lead-field matrix G from a source space, sensor array and volume-conductor model.
  *
- * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * ComputeFwd is the C++ analogue of the @c mne_forward_solution
+ * command-line tool: given a ComputeFwdSettings (source-space file, BEM
+ * or sphere model, raw/measurement file, coil-definition file,
+ * coordinate transforms, accuracy level), it loads every piece of input
+ * data, sets up the requested volume-conductor model (BEM via
+ * FwdBemModel or analytic sphere via FwdEegSphereModel), wraps the
+ * resulting field/grad callbacks in a CTF/4D compensation layer when
+ * needed, and runs the parallel dipole loop that fills G column by
+ * column. The output @c MNEForwardSolution carries G plus all metadata
+ * (source orientations, channel info, projection operators) that the
+ * downstream inverse stage requires.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    ComputeFwd class declaration.
- *
+ * @c updateHeadPos() supports head-motion-corrected averaging: it
+ * re-evaluates only the MEG block of G after a new device-to-head
+ * transform without re-touching the source space or BEM solution,
+ * matching the behaviour of MNE-C @c mne_forward_solution -- update_head_pos.
  */
 
 #ifndef COMPUTE_FWD_H
@@ -92,14 +84,17 @@ namespace FWDLIB
 
 //=============================================================================================================
 /**
- * Implements the forward solution computation.
+ * Implements the forward-solution computation driver.
  *
- * ComputeFwd is a worker/factory that takes ComputeFwdSettings, initialises
- * all required data structures (coil definitions, BEM model, source spaces, …)
- * and performs the actual forward calculation.  The computed
- * MNEForwardSolution is returned by calculateFwd() and updateHeadPos().
+ * ComputeFwd is the worker/factory that takes a ComputeFwdSettings,
+ * initialises all required data structures (coil definitions, BEM or
+ * sphere model, source spaces, compensation data, coordinate transforms)
+ * and assembles the MEG/EEG lead-field matrix @c G one dipole column at
+ * a time. The computed MNEForwardSolution is returned by
+ * @ref calculateFwd; @ref updateHeadPos rebuilds only the MEG block
+ * after a new device-to-head transform.
  *
- * @brief Forward solution computation worker.
+ * @brief Top-level driver for MEG/EEG forward-solution computation.
  */
 class FWDSHARED_EXPORT ComputeFwd
 {

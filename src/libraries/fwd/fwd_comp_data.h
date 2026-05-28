@@ -1,37 +1,29 @@
 //=============================================================================================================
 /**
- * @file     fwd_comp_data.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     January, 2017
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fwd_comp_data.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Software-gradiometer compensation wrapper that subtracts the reference-channel contribution from the primary forward field.
  *
- * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * CTF whole-head and 4D/BTi MEG systems acquire a bank of *reference
+ * channels* located far from the head and form synthetic higher-order
+ * gradiometers by subtracting linear combinations of those references
+ * from each primary channel. The compensation coefficients @c k are
+ * stored in the FIFF file as a @c MNECTFCompDataSet. To keep the forward
+ * model consistent with the data, the same linear combination must be
+ * applied to the predicted field: @c B_comp = B_primary − k·B_reference.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FwdCompData class declaration.
- *
+ * FwdCompData wraps an underlying field/grad function pair (BEM or
+ * sphere), evaluates it once for the primary coils and once for the
+ * reference coils, and returns the compensated result. The class
+ * mirrors @c fwdCompDataRec from MNE-C @c fwd_comp_data.h and preserves
+ * the same callback signatures so it can be dropped into the source-space
+ * loop without changes upstream.
  */
 
 #ifndef FWD_COMP_DATA_H
@@ -78,9 +70,9 @@ class FwdCoilSet;
 
 //=============================================================================================================
 /**
- * Implements the Forward Compensation Data description (Replaces *fwdCompData,fwdCompDataRec; struct of MNE-C fwd_comp_data.h).
+ * Implements the Forward Compensation Data description (replaces @c fwdCompData / @c fwdCompDataRec from MNE-C @c fwd_comp_data.h).
  *
- * @brief This structure is used in the compensated field calculations
+ * @brief CTF / 4D software-gradiometer wrapper that re-evaluates the primary field callback on a separate reference-coil set and subtracts the linear combination @c k·B_ref from the primary field to mirror the compensation already applied to the recorded data.
  */
 class FWDSHARED_EXPORT FwdCompData
 {
