@@ -1,35 +1,31 @@
 //=============================================================================================================
 /**
- * @file     mna_registry_loader.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file mna_registry_loader.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Declarative loader for @ref MnaOpRegistry contents — ingests @c mna-registry.json manifests and overrides them with drop-ins under @c mna-registry.d/.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * @ref MnaRegistryLoader is the bridge between the on-disk
+ * representation of MNA op schemas (JSON manifests authored by
+ * library and tool maintainers) and the in-memory
+ * @ref MnaOpRegistry consulted by the validator and executor. A
+ * manifest carries an @c mna_registry_version field for future-
+ * proofing, a @c provider name for diagnostics, and an @c ops
+ * array whose entries are deserialised into @ref MnaOpSchema
+ * instances.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MnaRegistryLoader class declaration — loads MNA op schemas from JSON manifests.
- *
+ * @ref loadFile handles a single manifest, @ref loadDirectory
+ * loads the master @c mna-registry.json first and then every
+ * @c *.json drop-in from @c mna-registry.d/ in alphabetical order;
+ * later files overwrite earlier definitions for the same op type,
+ * which is the mechanism plug-ins use to extend or shadow built-in
+ * operations. @ref saveFile re-emits the current registry to a
+ * canonical manifest so a running process can publish the exact
+ * op surface it offers.
  */
 
 #ifndef MNA_REGISTRY_LOADER_H
@@ -62,13 +58,13 @@ namespace MNALIB
 
 //=============================================================================================================
 /**
- * Loads MNA operation schemas from declarative JSON registry manifest files.
+ * Loads MNA operation schemas from declarative JSON registry manifests files.
  *
  * Registry files follow the mna-registry.json format with "mna_registry_version",
  * "provider", and "ops" array.  The loader supports a master manifest plus
  * drop-in files from a mna-registry.d/ directory.
  *
- * @brief Declarative MNA registry file loader.
+ * @brief Reads MNA op-schema manifests and feeds them into @ref MnaOpRegistry, with drop-in directory merge support.
  */
 class MNASHARED_EXPORT MnaRegistryLoader
 {

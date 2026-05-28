@@ -1,35 +1,31 @@
 //=============================================================================================================
 /**
- * @file     mna_param_tree.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file mna_param_tree.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Hierarchical parameter store with formula-driven dynamic bindings shared across an MNA graph.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * @ref MnaParamTree is the second authoritative source of node
+ * attribute values — the first being a node's own @c attributes
+ * map. Where the latter holds the literal value typed by the user
+ * for a single operation, the param tree expresses values that are
+ * either reused across many nodes (e.g. @c subject/fsdir) or
+ * computed from other values via @ref MnaParamBinding formulas
+ * resolved at execution time.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MnaParamTree class declaration — hierarchical parameter store with formula-driven bindings.
- *
+ * Paths are slash-separated and conventionally namespaced by node
+ * id (@c bandpass_01/lowcut, @c bandpass_01/highcut), letting the
+ * executor merge static defaults from the op schema, static
+ * overrides from the project, and dynamically bound values into
+ * the final @c resolvedAttributes captured in the
+ * @ref MnaProvenance record. @ref evaluate walks all registered
+ * bindings whose triggers have fired and returns the list of paths
+ * whose values changed, which the executor uses to mark downstream
+ * nodes dirty.
  */
 
 #ifndef MNA_PARAM_TREE_H
@@ -67,7 +63,7 @@ namespace MNALIB
  * ("nodeId/attrKey") and an optional binding — a formula that recomputes the
  * value whenever a trigger condition is met.
  *
- * @brief Parameter tree with formula-driven dynamic bindings.
+ * @brief Path-keyed parameter store with formula-driven dynamic bindings.
  */
 class MNASHARED_EXPORT MnaParamTree
 {

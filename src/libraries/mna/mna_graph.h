@@ -1,35 +1,30 @@
 //=============================================================================================================
 /**
- * @file     mna_graph.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file mna_graph.h
+ * @since 2026
+ * @date  April 2026
+ * @brief In-memory directed acyclic graph of @ref MnaNode operations — connectivity, validation, topological sort and serialization.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * @ref MnaGraph is the executable spine of an MNA project: a
+ * collection of @ref MnaNode operations wired together through
+ * named @ref MnaPort connections, surrounded by graph-level inputs
+ * and outputs that expose the pipeline to its host application,
+ * and parametrised by a shared @ref MnaParamTree.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MnaGraph class declaration — directed acyclic graph of processing nodes.
- *
+ * The class owns four responsibilities. (1) @em Composition: add /
+ * remove nodes, look them up by id, and @ref connect output ports
+ * to input ports by name. (2) @em Validation: @ref validate checks
+ * acyclicity, that every required input is connected, that
+ * @ref MnaDataKind matches across each edge, and that every node
+ * conforms to its @ref MnaOpSchema. (3) @em Scheduling:
+ * @ref topologicalSort, @ref upstreamNodes, @ref downstreamNodes
+ * and @ref dirtyNodes feed the executor's incremental re-run
+ * logic. (4) @em Persistence: lossless JSON and CBOR round-trip
+ * mirroring the @ref MnaIO codec choices.
  */
 
 #ifndef MNA_GRAPH_H
@@ -65,7 +60,7 @@ namespace MNALIB
 /**
  * Directed acyclic graph of processing nodes forming a computational pipeline.
  *
- * @brief MNA computational graph.
+ * @brief In-memory DAG of @ref MnaNode operations with validation, topological sort and JSON/CBOR persistence.
  */
 class MNASHARED_EXPORT MnaGraph
 {

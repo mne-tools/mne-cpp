@@ -1,35 +1,30 @@
 //=============================================================================================================
 /**
- * @file     mna_port.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file mna_port.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Typed input or output slot on a graph node — carries an @ref MnaDataKind, an upstream link, an optional real-time stream binding and a cached-result reference.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * @ref MnaPort is the unit of connectivity in an MNA graph: every
+ * data hand-off from one @ref MnaNode to another goes through a
+ * named, typed port pair, never an anonymous string. Input ports
+ * carry an explicit @c sourceNodeId / @c sourcePortName pointing at
+ * the producing output, which is what @ref MnaGraph::topologicalSort
+ * and @ref MnaGraph::validate rely on to detect cycles and reject
+ * mismatched @ref MnaDataKind connections at edit time.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MnaPort struct declaration — typed input/output slot on a graph node.
- *
+ * When a port participates in a streaming pipeline (e.g. MNE Scan),
+ * @c streamProtocol selects the transport — @c fiff-rt, @c lsl,
+ * @c ftbuffer, @c shm or the in-process default — and
+ * @c streamEndpoint / @c streamBufferMs configure the live
+ * connection. For batch outputs, @c cachedResultPath plus
+ * @c cachedResultHash let the executor skip re-computation when
+ * upstream inputs are unchanged. @c extras keeps any forward-
+ * compatible attributes a newer registry may attach.
  */
 
 #ifndef MNA_PORT_H
@@ -62,7 +57,7 @@ namespace MNALIB
 /**
  * Typed input/output slot on a graph node.
  *
- * @brief Graph port descriptor.
+ * @brief Named, typed port on an MNA graph node with upstream link and optional real-time stream binding.
  */
 struct MNASHARED_EXPORT MnaPort
 {

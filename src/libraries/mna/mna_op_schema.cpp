@@ -1,33 +1,24 @@
 //=============================================================================================================
 /**
- * @file     mna_op_schema.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file mna_op_schema.cpp
+ * @since 2026
+ * @date  April 2026
+ * @brief Implementation of @ref MnaOpSchema::validate — checks a concrete @ref MnaNode against its declared port and attribute contract.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- * * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * * @brief    MnaOpSchema class implementation.
- *
+ * The validator walks the schema's input and output port lists
+ * looking for matching named ports on the node, recording an
+ * error whenever a @c required port is missing or carries the
+ * wrong @ref MnaDataKind. It then walks the attribute schema,
+ * checks that every required attribute is present and that its
+ * runtime @c QMetaType matches what the schema expects, and
+ * supplies defaults for optional attributes that the node has
+ * not overridden. All errors are appended to the caller-supplied
+ * list so a GUI editor can surface every problem at once instead
+ * of bailing on the first mismatch.
  */
 
 //=============================================================================================================

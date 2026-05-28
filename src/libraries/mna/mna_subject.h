@@ -1,35 +1,30 @@
 //=============================================================================================================
 /**
- * @file     mna_subject.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file mna_subject.h
+ * @since 2026
+ * @date  April 2026
+ * @brief One participant in an MNA project — owner of measurement sessions and link to the FreeSurfer anatomy.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * @ref MnaSubject is the root of the per-participant subtree in an
+ * MNA project. It binds together all sessions/recordings that
+ * belong to one person and pins their structural MRI reconstruction
+ * via @c freeSurferDir, a project-relative path to the matching
+ * @c $SUBJECTS_DIR entry. Keeping that pointer alongside the data
+ * means forward solutions, source spaces and parcellations always
+ * resolve to the correct anatomy without relying on environment
+ * variables at analysis time.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MnaSubject class declaration.
- *
+ * The @c id mirrors the BIDS @c sub-XX convention and is the key
+ * downstream consumers (forward modelling, source estimation,
+ * group statistics) use to look the subject up. @c sessions holds
+ * the ordered @ref MnaSession list, and @c extras preserves any
+ * demographic, clinical or consent-tracking fields that newer
+ * tooling may attach so older MNALIB builds can still read and
+ * re-write the project without data loss.
  */
 
 #ifndef MNA_SUBJECT_H

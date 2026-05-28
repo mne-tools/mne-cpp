@@ -1,35 +1,27 @@
 //=============================================================================================================
 /**
- * @file     mna_session.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file mna_session.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Container for all recordings collected within a single experimental session for one subject.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * @ref MnaSession sits between @ref MnaSubject and @ref MnaRecording
+ * in the MNA project tree and mirrors the BIDS @c ses-XX directory
+ * level. It captures the natural grouping that occurs when a
+ * subject visits the scanner more than once — e.g. baseline,
+ * follow-up, intervention — without forcing those repeats into
+ * separate subject entries that would break longitudinal analyses.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MnaSession class declaration.
- *
+ * The structure is intentionally thin: an opaque @c id (typically
+ * @c ses-01, @c ses-pre, @c ses-post), an ordered list of
+ * @ref MnaRecording instances, and an @c extras bag for
+ * session-level sidecar metadata (date, scanner head-coil swap,
+ * paradigm version) that should round-trip losslessly even when
+ * unknown to the current MNALIB build.
  */
 
 #ifndef MNA_SESSION_H

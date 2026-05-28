@@ -1,35 +1,29 @@
 //=============================================================================================================
 /**
- * @file     mna_recording.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file mna_recording.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Grouping of every file that belongs to one continuous measurement run inside an MNA project.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * An @ref MnaRecording is the second tier of the
+ * subject → session → recording → file hierarchy used by MNA, and
+ * corresponds to a single "press record / stop record" interval in
+ * the acquisition software: one FIFF raw file plus its derived
+ * artefacts (events, evoked, behavioural log, …). Modelling this
+ * boundary explicitly avoids the legacy @c .ds / @c .fif sprawl
+ * where the only grouping was a shared filename prefix.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MnaRecording class declaration.
- *
+ * The @c id field is opaque to MNALIB but is conventionally the
+ * recording's base name (e.g. @c run-01_meg) so the user-facing
+ * GUI can render meaningful tree labels. @c files is an ordered
+ * @ref MnaFileRef list whose first @c MnaFileRole::Raw entry is
+ * treated as the canonical recording; everything else is derived
+ * data. @c extras keeps tool-specific metadata (acquisition notes,
+ * BIDS sidecars) attached without forcing schema changes.
  */
 
 #ifndef MNA_RECORDING_H

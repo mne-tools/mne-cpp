@@ -1,35 +1,35 @@
 //=============================================================================================================
 /**
- * @file     mna_node.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file mna_node.h
+ * @since 2026
+ * @date  April 2026
+ * @brief One operation in an MNA graph — opType, typed I/O ports, attributes, execution mode (Batch / Stream / IPC / Script) and provenance.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * @ref MnaNode is the executable counterpart to a @ref MnaFileRef:
+ * where the latter records a derived artefact, the node records
+ * @em how that artefact is produced. The @c opType string is
+ * resolved against @ref MnaOpRegistry to obtain the
+ * @ref MnaOpSchema (and, for built-in ops, the implementation
+ * function) used by @ref MnaGraphExecutor; @c attributes provides
+ * the per-call parameter values validated against that schema.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * The @c execMode field selects one of four executors:
+ * @c Batch (default, file-in/file-out), @c Stream (live MNE Scan
+ * plugin), @c Ipc (delegates to an external binary via
+ * @c ipcCommand / @c ipcArgs / @c ipcTransport), or @c Script
+ * (inline @ref MnaScript run by an interpreter). Each mode reuses
+ * the same node fields, so a pipeline can mix all four without
+ * structural changes.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MnaNode struct declaration — one operation in the computational graph.
- *
+ * @c verification carries pre/post checks, explanation text and the
+ * full @ref MnaProvenance snapshot captured at execution time;
+ * combined with @c toolVersion, @c executedAt and the @c dirty flag
+ * this is what makes MNA pipelines reproducible and supports
+ * incremental re-execution after a parameter edit.
  */
 
 #ifndef MNA_NODE_H
@@ -69,7 +69,7 @@ namespace MNALIB
 /**
  * One operation in the computational graph.
  *
- * @brief Graph node representing a processing step.
+ * @brief Single executable step in an MNA pipeline graph, with attributes, typed ports, exec mode, verification and provenance.
  */
 struct MNASHARED_EXPORT MnaNode
 {
