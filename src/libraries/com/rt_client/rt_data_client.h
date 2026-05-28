@@ -1,37 +1,35 @@
 //=============================================================================================================
 /**
- * @file     rtdataclient.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file rt_data_client.h
+ * @since 2026
+ * @date  April 2026
+ * @brief TCP client for the @c mne_rt_server raw-data port (4218): pulls @c FiffInfo, digitizer points and streamed sample buffers.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * @ref COMLIB::RtDataClient is a thin @c QTcpSocket subclass that speaks
+ * the binary FIFF dialect @c mne_rt_server uses on its data port. The
+ * server’s wire protocol is a sequence of FIFF tags rather than a custom
+ * framing format, so this class reuses @ref FIFFLIB::FiffStream and
+ * @ref FIFFLIB::FiffTag to parse what it receives — the same code paths
+ * that read measurement files from disk.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * Three message exchanges are supported. @c getClientId() asks the
+ * server to allocate an integer handle the server then uses to route
+ * subsequent buffers back to this socket. @c readInfo() /
+ * @c readMetadata() pull the channel layout, sampling rate and (when
+ * available) the head-shape digitiser point set captured during the
+ * measurement session. @c readRawBuffer() blocks until the next sample
+ * matrix arrives, reshapes the raw bytes into an @c Eigen::MatrixXf of
+ * @c n_channels × @c buffer_size, and reports the FIFF tag kind so the
+ * caller can distinguish data buffers from control frames
+ * (@c FIFF_BLOCK_START / @c FIFF_BLOCK_END / measurement stop).
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief     declaration of the RtDataClient Class.
- *
+ * The companion @ref COMLIB::MetaData struct bundles @c FiffInfo and
+ * @c FiffDigitizerData so a single call carries both pieces of the
+ * session header without forcing callers to introduce a tuple type.
  */
 
 #ifndef RTDATACLIENT_H
@@ -67,7 +65,15 @@ namespace COMLIB
 
 //=============================================================================================================
 /**
- * @brief Bundles FiffInfo and FiffDigitizerData received from mne_rt_server for a measurement session
+ * @brief Value-type aggregate of the FIFF metadata blocks @c mne_rt_server sends at the start of a measurement.
+ *
+ * @c mne_rt_server delivers both the per-channel @c FiffInfo header and
+ * the head-shape @c FiffDigitizerData block before the first sample
+ * buffer; callers usually need both to make sense of the stream
+ * (channel positions for visualisation, digitiser points for
+ * coregistration). @c MetaData lets @ref RtDataClient::readMetadata
+ * return them together without introducing a @c std::pair or splitting
+ * the read into two round trips.
  */
 struct MetaData{
     MetaData(FIFFLIB::FiffInfo::SPtr pInfo,
@@ -81,9 +87,16 @@ struct MetaData{
 
 //=============================================================================================================
 /**
- * The real-time data client class provides an interface to communicate with the data port 4218 of a running mne_rt_server.
+ * @brief @c QTcpSocket subclass that talks the FIFF wire dialect of the @c mne_rt_server data port (default 4218).
  *
- * @brief TCP client for streaming raw MEG/EEG measurement data from mne_rt_server (port 4218)
+ * Negotiates the per-session client id with @c setClientAlias /
+ * @c getClientId, fetches the @c FiffInfo (and optionally the digitiser
+ * point set) via @c readInfo / @c readMetadata, and then blocks on
+ * @c readRawBuffer to deliver one @c Eigen::MatrixXf sample matrix at a
+ * time. Parsing is delegated to @ref FIFFLIB::FiffStream / @c FiffTag so
+ * this class never re-implements the binary framing; the only socket
+ * state it owns beyond the @c QTcpSocket base is the assigned
+ * @c m_clientID.
  */
 class COMSHARED_EXPORT RtDataClient : public QTcpSocket
 {

@@ -1,37 +1,42 @@
 //=============================================================================================================
 /**
- * @file     command_manager.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file command_manager.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Per-component registry of @ref COMLIB::Command schemas; receives @ref COMLIB::RawCommand from the parser and dispatches matching @c Command instances.
  *
- * Copyright (C) 2012, Christoph Dinh, Lorenz Esch, Matti Hamalainen. All rights reserved.
+ * @ref COMLIB::CommandManager is the receiver half of the observer
+ * pattern anchored at @ref COMLIB::CommandParser. Each subsystem that
+ * understands a slice of the @c mne_rt_server vocabulary (acquisition
+ * control, source-estimation control, GUI plumbing, etc.) owns a
+ * @c CommandManager seeded with the @c Command schemas it accepts and
+ * attaches it to the shared @c CommandParser. When the parser fans an
+ * incoming @c RawCommand out, every manager checks its own map and
+ * silently ignores requests it does not own — there is no global
+ * dispatch table to keep in sync.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * Schemas can be installed three different ways: explicitly by name and
+ * description via @c insert(QString, QString), one at a time by handing
+ * over a fully-formed @c Command via @c insert(QString, Command) (the
+ * manager re-parents the @c Command so its lifetime tracks the manager),
+ * or in bulk by loading a @c QJsonDocument that describes a whole
+ * command set in the same JSON layout the server itself emits when a
+ * client asks for its command list. The CTOR overload that takes a
+ * @c QByteArray/@c QJsonDocument is the convenience entry point for
+ * that bulk path.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Declaration of the CommandManager Class.
- *
+ * Outbound traffic uses three signals. @c commandMapChanged() notifies
+ * the rest of the application when the schema set has been mutated.
+ * @c triggered(Command) lets the manager push outbound requests onto
+ * the shared @c RtCmdClient. @c response(QString, Command) carries the
+ * reply produced by an executed @c Command back to whoever originally
+ * sent it. @c m_bIsActive lets a subsystem temporarily mute the manager
+ * (during long-running operations, for example) without detaching it
+ * from the parser.
  */
 
 #ifndef COMMUNICATIONMANAGER_H
@@ -67,7 +72,15 @@ namespace COMLIB
 
 //=============================================================================================================
 /**
- * @brief Registry of available commands; dispatches parsed command strings to the matching Command handler
+ * @brief Observer-side registry of @ref Command schemas a subsystem accepts from the shared @ref CommandParser.
+ *
+ * Holds a @c QMap<QString,Command> indexed by command keyword; when
+ * @ref CommandParser notifies attached managers of a new
+ * @ref RawCommand, each manager looks the keyword up in its own map and
+ * either dispatches the corresponding @c Command (re-emitting
+ * @c triggered / @c response) or silently passes. Schemas can be added
+ * one at a time or bulk-loaded from a @c QJsonDocument matching the
+ * server’s self-described command list.
  */
 class COMSHARED_EXPORT CommandManager : public QObject, public UTILSLIB::IObserver
 {

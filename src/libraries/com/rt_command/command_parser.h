@@ -1,37 +1,36 @@
 //=============================================================================================================
 /**
- * @file     commandparser.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file command_parser.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Front-end tokeniser that turns incoming JSON or CLI payloads into @ref COMLIB::RawCommand objects and notifies attached managers.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * @ref COMLIB::CommandParser owns the @c Subject side of the observer
+ * pattern in @c utils/generics: every @ref COMLIB::CommandManager that
+ * wants to react to a slice of the command vocabulary attaches itself,
+ * and the parser then fans every accepted request out to all of them.
+ * That decoupling lets multiple subsystems (data acquisition, source
+ * estimation, GUI plumbing) each register only the commands they know
+ * how to handle without growing a single monolithic dispatcher.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * Two wire dialects are accepted on the same entry point. CLI input is
+ * whitespace-tokenised into a command keyword plus string arguments;
+ * JSON input is decoded with @c QJsonDocument and may contain either a
+ * single command object or an array of commands, allowing batched
+ * requests in one round-trip. In either case the result is the same
+ * untyped @ref RawCommand handed to the observers — the type-aware
+ * @ref Command is constructed downstream once a manager has identified
+ * which schema applies.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Declaration of the CommandParser Class.
- *
+ * @c parse() returns @c true when at least one observer claimed the
+ * input and additionally records the names of the recognised commands
+ * in @c p_qListCommandsParsed; the @c response(QString, Command) signal
+ * is the reverse channel used by managers to push reply text back to
+ * whichever socket originally produced the request.
  */
 
 #ifndef COMMANDPARSER_H
@@ -62,8 +61,15 @@
 namespace COMLIB
 {
 
+//=============================================================================================================
 /**
- * @brief Tokenizes and parses JSON or CLI command strings into RawCommand objects
+ * @brief Observer-pattern subject that decodes JSON or CLI command strings into @ref RawCommand and notifies attached managers.
+ *
+ * Single entry point @c parse() accepts either dialect, builds a
+ * @ref RawCommand, and broadcasts it to every attached
+ * @ref CommandManager; the @c response signal carries replies back from
+ * whichever manager handled the request so the caller (typically a
+ * @ref RtCmdClient) can forward them to the originating socket.
  */
 class COMSHARED_EXPORT CommandParser : public QObject, public UTILSLIB::Subject
 {

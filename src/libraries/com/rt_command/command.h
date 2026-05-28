@@ -1,37 +1,39 @@
 //=============================================================================================================
 /**
- * @file     command.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file command.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Typed, parameter-bearing command object that round-trips between mne-cpp clients and @c mne_rt_server.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * @ref COMLIB::Command is the unit of conversation on the
+ * @c mne_rt_server control channel after parsing has assigned types
+ * (compare @ref COMLIB::RawCommand, which carries only string tokens).
+ * Each instance holds a short command keyword (e.g. @c bufsize,
+ * @c selch, @c start), a human-readable description, a list of named
+ * parameters with both their @c QVariant values and their per-parameter
+ * descriptions, and a flag selecting JSON or CLI serialisation when the
+ * object is pushed out through @ref RtCmdClient.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * Two construction paths matter. The data path: an incoming JSON object
+ * is parsed into a fully-populated @c Command by the @c QJsonObject
+ * constructor, so the server’s self-described command list (returned by
+ * @c requestCommands()) can be replayed locally without hard-coding the
+ * schema. The authoring path: client code constructs an empty
+ * @c Command with name, description and parameter declarations, fills
+ * @c pValues() per call site, then forwards it to
+ * @ref RtCmdClient::sendCommandJSON. @c toStringReadySend() and
+ * @c toJsonObject() / @c toStringList() format the same object for the
+ * different transports.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Declaration of the Command Class.
- *
+ * @c Command implements @ref UTILSLIB::ICommand from the generic command
+ * pattern so it can be dispatched through @ref CommandManager without
+ * the manager needing to know whether the receiver is local or remote;
+ * the @c triggered / @c received signals are how the manager routes
+ * execution back to subscribers.
  */
 
 #ifndef COMMAND_H
@@ -70,9 +72,16 @@ static QVariant defaultVariant;
 
 //=============================================================================================================
 /**
- * Command, which includes beside command name also command parameters
+ * @brief Named, parameterised command exchanged with @c mne_rt_server; supports both JSON and CLI serialisation.
  *
- * @brief Named command with typed parameters for real-time server control
+ * Holds the command keyword, description, parallel lists of parameter
+ * names / values / descriptions, and a JSON-vs-CLI flag. Constructible
+ * either from a parsed @c QJsonObject (when echoing the server’s
+ * advertised command list) or from explicit string/value lists (when
+ * authoring a request). Implements @ref UTILSLIB::ICommand so it can be
+ * dispatched through @ref CommandManager and surfaces parameter access
+ * by both name (@c operator[](QString)) and index
+ * (@c operator[](qint32)).
  */
 class COMSHARED_EXPORT Command: public QObject, public UTILSLIB::ICommand
 {

@@ -1,37 +1,36 @@
 //=============================================================================================================
 /**
- * @file     rtcmdclient.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file rt_cmd_client.h
+ * @since 2026
+ * @date  March 2026
+ * @brief TCP client for the @c mne_rt_server command port (4217): negotiates session state via line- or JSON-encoded messages.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * @ref COMLIB::RtCmdClient is a @c QTcpSocket subclass that drives the
+ * server’s control channel. Two equivalent wire encodings are
+ * supported: plain CLI strings (newline-terminated tokens) for
+ * interactive shell use, and JSON command objects for programmatic
+ * clients. Both are produced from the same @ref COMLIB::Command
+ * vocabulary so the help text, parameter list and reply parsing stay in
+ * lock-step regardless of which transport a caller picks.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * The client maintains an internal @ref COMLIB::CommandManager that is
+ * populated on demand by @c requestCommands(); after that round-trip the
+ * @c [] operator and @c hasCommand() expose the server’s self-described
+ * vocabulary so callers can ask, for example, @c client["start-measurement"]
+ * without hard-coding the parameter list locally.
+ * @c requestBufsize() and @c requestConnectors() are convenience wrappers
+ * around the corresponding server commands used during the
+ * @ref RtClient handshake.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief     declaration of the RtCmdClient Class.
- *
+ * All socket reads are funnelled through @c waitForDataAvailable() and
+ * accumulated into @c m_sAvailableData, which @c readAvailableData()
+ * drains atomically under @c m_qMutex. The @c response(QString) signal
+ * fires whenever a complete reply has been collected so callers running
+ * in the GUI thread can react without polling the socket directly.
  */
 
 #ifndef RTCMDCLIENT_H
@@ -64,9 +63,14 @@ namespace COMLIB
 
 //=============================================================================================================
 /**
- * The real-time command client class provides an interface to communicate with the command port 4217 of a running mne_rt_server.
+ * @brief @c QTcpSocket subclass driving the @c mne_rt_server control channel (default port 4217).
  *
- * @brief TCP client for sending JSON commands to and receiving responses from mne_rt_server (port 4217)
+ * Sends commands in either CLI or JSON form via @c sendCLICommand /
+ * @c sendCommandJSON, accumulates replies under an internal mutex so a
+ * worker thread can produce while the GUI thread consumes through
+ * @c readAvailableData, and mirrors the server’s self-described command
+ * vocabulary into an embedded @ref CommandManager so callers can look
+ * commands up by name without hard-coding their schemas.
  */
 class COMSHARED_EXPORT RtCmdClient : public QTcpSocket
 {

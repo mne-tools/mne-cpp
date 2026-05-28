@@ -1,37 +1,38 @@
 //=============================================================================================================
 /**
- * @file     rtclient.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file rt_client.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Self-contained worker thread that owns the command and data sockets to a running @c mne_rt_server.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * @ref COMLIB::RtClient is the high-level convenience wrapper around the
+ * two lower-level sockets in this directory: it constructs a private
+ * @ref COMLIB::RtCmdClient and @ref COMLIB::RtDataClient, performs the
+ * full negotiation handshake (request a client id on the command port,
+ * register the alias against the same id on the data port, query the
+ * @c FiffInfo, request a buffer size) and then sits in a @c run() loop
+ * pulling raw sample matrices off the data socket and re-emitting them
+ * as Qt signals on the owning thread.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * The class inherits @c QThread directly rather than the now-preferred
+ * worker-object pattern because it predates that idiom and because the
+ * tight read/parse/emit loop benefits from running entirely inside
+ * @c run(); subclassing remains backwards-compatible with the
+ * acquisition plugins that already use it. Communication with the
+ * owning thread is one-way: rawBufferReceived() carries an
+ * @c Eigen::MatrixXf of @c n_channels × @c buffer_size samples,
+ * connectionChanged() flips on the first successful TCP connect and on
+ * any subsequent disconnect.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief     declaration of the RtClient Class.
- *
+ * Lifetime is cooperative: @c stop() clears the running flag, the
+ * @c run() loop notices, the sockets are disconnected and the thread
+ * exits, after which @c wait() / destruction is safe. Reconnects after a
+ * server restart are not handled here — callers destroy the client and
+ * construct a new one.
  */
 
 #ifndef RTCLIENT_H
@@ -73,9 +74,15 @@ namespace COMLIB
 
 //=============================================================================================================
 /**
- * The real-time client class provides an interface to communicate with a running mne_rt_server.
+ * @brief Threaded façade that owns a paired command/data connection to @c mne_rt_server and re-emits streamed buffers.
  *
- * @brief Threaded client that connects to mne_rt_server, retrieves measurement info, and streams raw data buffers
+ * Constructs and drives both @ref RtCmdClient (port 4217) and
+ * @ref RtDataClient (port 4218) from inside its own @c run() loop,
+ * handles the initial id/alias/info/buffer-size handshake, and surfaces
+ * each received raw buffer as @c rawBufferReceived(Eigen::MatrixXf) so
+ * consumers in the GUI / acquisition stack never touch the sockets
+ * directly. State changes on the underlying TCP connection are mirrored
+ * through @c connectionChanged(bool).
  */
 class COMSHARED_EXPORT RtClient : public QThread
 {

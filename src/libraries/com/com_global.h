@@ -1,37 +1,38 @@
 //=============================================================================================================
 /**
- * @file     communication_global.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file com_global.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Export macros, build-info entry points and namespace anchor for the @c COMLIB communication library.
  *
- * Copyright (C) 2012-2026, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * @c COMLIB is the transport layer that connects mne-cpp acquisition and
+ * analysis code to a running @c mne_rt_server instance — the long-running
+ * daemon shipped by mne-cpp that bridges MEG/EEG hardware drivers (or a
+ * pre-recorded FIFF file) to networked clients. Two TCP endpoints are
+ * exposed by the server and consumed here: the @e command port (default
+ * 4217), used to negotiate session state through line- or JSON-encoded
+ * messages, and the @e data port (default 4218), used to stream raw
+ * sample buffers tagged with FIFF block kinds.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * The library is intentionally narrow: it contains the threaded TCP
+ * clients (@ref COMLIB::RtClient, @ref COMLIB::RtCmdClient,
+ * @ref COMLIB::RtDataClient) and a small command vocabulary
+ * (@ref COMLIB::Command, @ref COMLIB::RawCommand,
+ * @ref COMLIB::CommandParser, @ref COMLIB::CommandManager) that both
+ * sides agree on. Higher-level orchestration (channel selection, ring
+ * buffering, source localisation) lives in the @c rtprocessing /
+ * @c disp / acquisition plugins that link against this library.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    realtime library export/import macros.
- *
+ * This header defines @ref COMSHARED_EXPORT, expanding to
+ * @c Q_DECL_EXPORT when building the shared library, @c Q_DECL_IMPORT
+ * when consuming it, and to nothing for the static build configuration
+ * (@c STATICBUILD). It also declares the three @c buildDateTime /
+ * @c buildHash / @c buildHashLong entry points used by tooling and the
+ * About dialogs to report the exact commit the binary was built from.
  */
 
 #ifndef COMMUNICATION_GLOBAL_H
@@ -59,25 +60,47 @@
 //=============================================================================================================
 /**
  * @namespace COMLIB
- * @brief     Real-time client/server communication (commands, raw data streaming).
+ * @brief Real-time client/server communication primitives for talking to @c mne_rt_server.
+ *
+ * Aggregates two cooperating subsystems. @c rt_client/ holds the
+ * @c QThread- and @c QTcpSocket-derived clients that own the actual
+ * socket connections and surface received data through Qt signals; they
+ * are designed to be moved to (or constructed in) a worker thread so the
+ * UI thread is never blocked by network I/O. @c rt_command/ holds the
+ * command vocabulary used on the wire: @ref RawCommand carries the
+ * tokenised request before types are known, @ref Command carries a
+ * named, typed, parameter-bearing message that round-trips through JSON,
+ * @ref CommandParser dispatches incoming text to all interested
+ * managers, and @ref CommandManager is a per-component registry of the
+ * commands that component understands.
  */
 namespace COMLIB{
 
 //=============================================================================================================
 /**
- * Returns build date and time.
+ * @brief Compile-time date/time stamp baked into the @c COMLIB binary.
+ *
+ * Resolved from the @c __DATE__ / @c __TIME__ macros at build time and
+ * surfaced through @c utils/buildinfo.h. Used by About dialogs and bug
+ * reports to disambiguate identically-versioned builds.
  */
 COMSHARED_EXPORT const char* buildDateTime();
 
 //=============================================================================================================
 /**
- * Returns abbreviated build git hash.
+ * @brief Abbreviated git commit hash (typically 7 hex chars) of the source tree this library was built from.
+ *
+ * Populated by the @c MNE_GIT_HASH_SHORT compile definition set by the
+ * top-level CMake project. Returns an empty string for tree-only builds.
  */
 COMSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**
- * Returns full build git hash.
+ * @brief Full-length git commit hash (40 hex chars) of the source tree this library was built from.
+ *
+ * Populated by the @c MNE_GIT_HASH_LONG compile definition; intended for
+ * scripted provenance checks where the abbreviated hash is ambiguous.
  */
 COMSHARED_EXPORT const char* buildHashLong();
 }
