@@ -1,0 +1,58 @@
+---
+id: inv-gamma-map
+title: "INVLIB::InvGammaMap"
+sidebar_label: InvGammaMap
+sidebar_position: 9
+---
+
+# InvGammaMap
+
+:::info[Python equivalent]
+`mne.inverse_sparse.gamma_map` in MNE-Python.
+:::
+
+`#include <inv/inv_gamma_map.h>`
+
+```cpp
+class INVLIB::InvGammaMap
+```
+
+Gamma-MAP sparse inverse solver (Sparse Bayesian Learning).
+
+Iteratively estimates source variance hyperparameters (gamma) and prunes sources whose gamma falls below a threshold, yielding a sparse solution.
+
+Gamma-MAP sparse inverse solver.
+
+---
+
+## Static Methods
+
+### compute(matGain, matData, matNoiseCov, nIterations, tolerance, gammaThreshold)
+
+Compute the Gamma-MAP inverse solution.
+
+**Parameters:**
+
+- **matGain** : *const Eigen::MatrixXd &*
+  Forward gain matrix (n_channels x n_sources).
+
+- **matData** : *const Eigen::MatrixXd &*
+  Measurement data (n_channels x n_times).
+
+- **matNoiseCov** : *const Eigen::MatrixXd &*
+  Noise covariance matrix (n_channels x n_channels).
+
+- **nIterations** : *int*
+  Maximum number of EM iterations.
+
+- **tolerance** : *double*
+  Convergence tolerance on relative gamma change.
+
+- **gammaThreshold** : *double*
+  Threshold below which sources are pruned.
+
+**Returns:**
+
+- *InvGammaMapResult* — The Gamma-MAP result containing the sparse source estimate.
+
+---

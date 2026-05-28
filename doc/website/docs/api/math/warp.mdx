@@ -1,0 +1,92 @@
+---
+id: warp
+title: "UTILSLIB::Warp"
+sidebar_label: Warp
+sidebar_position: 4
+---
+
+# Warp
+
+`#include <math/warp.h>`
+
+```cpp
+class UTILSLIB::Warp
+```
+
+Thin-plate-spline (Bookstein) 3-D warp that maps source landmarks exactly onto destination landmarks and extends smoothly to the rest of `R^3`.
+
+Used for non-rigid registration of EEG/MEG sensors and template-to-subject mesh warping.
+
+Thin-plate-spline 3-D warp fitted from landmark correspondences.
+
+---
+
+## Public Methods
+
+### calculate(sLm, dLm, sVert)
+
+Calculates the TPS `Warp` of given setup.
+
+**Parameters:**
+
+- **sLm** : *const Eigen::MatrixXf &*
+  3D Landmarks of the source geometry.
+
+- **dLm** : *const Eigen::MatrixXf &*
+  3D Landmarks of the destination geometry.
+
+- **sVert** : *const Eigen::MatrixXf &*
+  Vertices of the source geometry.
+
+**Returns:**
+
+- *Eigen::MatrixXf* — wVert Vertices of the warped destination geometry.
+
+---
+
+### calculate(sLm, dLm, vertList)
+
+Calculates the TPS `Warp` of a given setup for a List of vertices.
+
+**Parameters:**
+
+- **sLm** : *const Eigen::MatrixXf &*
+  3D Landmarks of the source geometry.
+
+- **dLm** : *const Eigen::MatrixXf &*
+  3D Landmarks of the destination geometry.
+
+- **[in/out]**
+  vertList List of Vertices of the source geometry that are warped to the destination.
+
+---
+
+### readsLm(electrodeFileName)
+
+Read electrode positions from MRI Database.
+
+**Parameters:**
+
+- **electrodeFileName** : *const QString &*
+  .txt file of electrodes.
+
+**Returns:**
+
+- *Eigen::MatrixXf* — electrodes Matrix with electrode positions.
+
+---
+
+### readsLm(electrodeFileName)
+
+Read electrode positions from MRI Database.
+
+**Parameters:**
+
+- **electrodeFileName** : *const std::string &*
+  .txt file of electrodes.
+
+**Returns:**
+
+- *Eigen::MatrixXf* — electrodes Matrix with electrode positions.
+
+---

@@ -1,0 +1,242 @@
+---
+id: fiff-cov
+title: "FIFFLIB::FiffCov"
+sidebar_label: FiffCov
+sidebar_position: 6
+---
+
+# FiffCov
+
+:::info[Python equivalent]
+`mne.Covariance` in MNE-Python.
+:::
+
+`#include <fiff/fiff_cov.h>`
+
+```cpp
+class FIFFLIB::FiffCov
+```
+
+FIFF noise / data covariance: matrix, channel names, kind, applied projectors, bads, dof and optional whitening eigendecomposition.
+
+Round-trips with `*-cov.fif` files and with `mne.Covariance` in MNE-Python. Carries both the raw matrix and the metadata needed to regularize, project away SSP subspaces, and pre-whiten downstream forward / inverse computations.
+
+---
+
+## Public Methods
+
+### FiffCov()
+
+Constructs the covariance data matrix.
+
+---
+
+### FiffCov(p_IODevice)
+
+Constructs a covariance data matrix, by reading from a IO device.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  IO device to read from the evoked data set.
+
+---
+
+### FiffCov(p_FiffCov)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FiffCov** : *const FiffCov &*
+  Covariance data matrix which should be copied.
+
+---
+
+### ~FiffCov()
+
+Destroys the covariance data matrix.
+
+---
+
+### clear()
+
+Initializes the covariance data matrix.
+
+---
+
+### isEmpty()
+
+True if FIFF covariance is empty.
+
+**Returns:**
+
+- *bool* — true if FIFF covariance is empty.
+
+---
+
+### pick_channels(p_include, p_exclude)
+
+python pick_channels_cov
+
+Pick channels from covariance matrix
+
+**Parameters:**
+
+- **p_include** : *const QStringList &*
+  List of channels to include (if empty, include all available). (optional).
+
+- **p_exclude** : *const QStringList &*
+  Channels to exclude (if empty, do not exclude any). (optional).
+
+**Returns:**
+
+- *FiffCov* — Covariance solution restricted to selected channels.
+
+---
+
+### prepare_noise_cov(p_info, p_chNames)
+
+Prepare noise covariance matrix.
+
+Before creating inverse operator.
+
+**Parameters:**
+
+- **p_info** : *const FiffInfo &*
+  measurement info.
+
+- **p_chNames** : *const QStringList &*
+  Channels which should be taken into account.
+
+**Returns:**
+
+- *FiffCov* — the prepared noise covariance matrix.
+
+---
+
+### regularize(p_info, p_fMag, p_fGrad, p_fEeg, p_bProj, p_exclude)
+
+Regularize noise covariance matrix.
+
+This method works by adding a constant to the diagonal for each channel type separatly. Special care is taken to keep the rank of the data constant.
+
+**Parameters:**
+
+- **p_info** : *const FiffInfo &*
+  The measurement info (used to get channel types and bad channels).
+
+- **p_fMag** : *double*
+  Regularization factor for MEG magnetometers.
+
+- **p_fGrad** : *double*
+  Regularization factor for MEG gradiometers.
+
+- **p_fEeg** : *double*
+  Regularization factor for EEG.
+
+- **p_bProj** : *bool*
+  Apply or not projections to keep rank of data.
+
+- **p_exclude** : *QStringList*
+  List of channels to mark as bad. If None, bads channels are extracted from both info['bads'] and cov['bads'].
+
+**Returns:**
+
+- *FiffCov* — the regularized covariance matrix.
+
+---
+
+### save(fileName)
+
+Save this covariance matrix to a FIFF file.
+
+**Parameters:**
+
+- **fileName** : *const QString &*
+  Output file path.
+
+**Returns:**
+
+- *bool* — true on success.
+
+---
+
+### operator=(rhs)
+
+Assignment Operator.
+
+**Parameters:**
+
+- **rhs** : *const FiffCov &*
+  `FiffCov` which should be assigned.
+
+**Returns:**
+
+- *FiffCov &* — the copied covariance matrix.
+
+---
+
+## Static Methods
+
+### compute_from_epochs(raw, events, eventCodes, tmin, tmax, bmin, bmax, doBaseline, removeMean, ignoreMask, delay)
+
+Compute a noise covariance matrix from raw data based on event-locked epochs.
+
+Ported from compute_cov.c (MNE-C).
+
+**Parameters:**
+
+- **raw** : *const FiffRawData &*
+  The raw data.
+
+- **events** : *const Eigen::MatrixXi &*
+  Event matrix (nEvents x 3): [sample, before, after].
+
+- **eventCodes** : *const QList&lt; int &gt; &*
+  Which event codes to include.
+
+- **tmin** : *float*
+  Start of time window relative to event (seconds).
+
+- **tmax** : *float*
+  End of time window relative to event (seconds).
+
+- **bmin** : *float*
+  Baseline start (seconds, relative to event). Only used if doBaseline is true.
+
+- **bmax** : *float*
+  Baseline end (seconds, relative to event). Only used if doBaseline is true.
+
+- **doBaseline** : *bool*
+  Whether to apply baseline correction before covariance computation.
+
+- **removeMean** : *bool*
+  Whether to remove sample mean from the covariance estimate.
+
+- **ignoreMask** : *unsigned int*
+  Bit mask ANDed away from event codes before matching (default: 0 = no masking).
+
+- **delay** : *float*
+  Delay in seconds applied to the event sample before extracting the epoch (default: 0).
+
+**Returns:**
+
+- *FiffCov* — The computed noise covariance matrix, or empty `FiffCov` on failure.
+
+---
+
+### computeGrandAverage(covs)
+
+Compute a weighted grand-average covariance from multiple covariance matrices, weighting each by its degrees of freedom (nfree).
+
+**Parameters:**
+
+- **covs** : *const QList&lt; FiffCov &gt; &*
+  List of covariance matrices to combine.
+
+**Returns:**
+
+- *FiffCov* — The grand-average covariance matrix, or empty `FiffCov` if covs is empty.
+
+---

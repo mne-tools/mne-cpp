@@ -1,0 +1,132 @@
+---
+id: fs-label
+title: "FSLIB::FsLabel"
+sidebar_label: FsLabel
+sidebar_position: 3
+---
+
+# FsLabel
+
+:::info[Python equivalent]
+`mne.read_label` in MNE-Python.
+:::
+
+`#include <fs/fs_label.h>`
+
+```cpp
+class FSLIB::FsLabel
+```
+
+A FreeSurfer/MNE surface label: per-vertex indices, Tk-RAS positions and scalar values for one hemisphere.
+
+Wraps the parsed contents of a ``.label file or an in-memory label constructed programmatically (e.g. by thresholding a source estimate via `FsLabelUtils::stcToLabel`). Vertex indices reference the matching `FsSurface` for the same subject and hemisphere; positions are the Tk-surface RAS coordinates copied from that surface; values are the per-vertex scalar payload (statistic, time, weight). Hemisphere is encoded with the FreeSurfer convention \{0 = lh, 1 = rh\}.
+
+---
+
+## Public Methods
+
+### FsLabel()
+
+Default constructor.
+
+---
+
+### FsLabel(p_vertices, p_pos, p_values, p_hemi, p_name, p_id)
+
+Constructs a label.
+
+**Parameters:**
+
+- **p_vertices** : *const Eigen::VectorXi &*
+  Vertices.
+
+- **p_pos** : *const Eigen::MatrixX3f &*
+  Positions.
+
+- **p_values** : *const Eigen::VectorXd &*
+  Values.
+
+- **p_hemi** : *qint32*
+  Hemisphere (lh = 0; rh = 1).
+
+- **p_name** : *const QString &*
+  label names.
+
+- **p_id** : *qint32*
+  label id (optional, default = -1).
+
+---
+
+### ~FsLabel()
+
+Destroys the `FsLabel` class.
+
+---
+
+### clear()
+
+Initializes the `FsLabel`.
+
+---
+
+### isEmpty()
+
+True if `FsLabel` is empty.
+
+**Returns:**
+
+- *bool* — true if `FsLabel` is empty, false otherwise.
+
+---
+
+### selectTris(p_Surface)
+
+Select tris for this label from a given surface file.
+
+**Parameters:**
+
+- **p_Surface** : *const FsSurface &*
+  to generate the label tris from.
+
+**Returns:**
+
+- *Eigen::MatrixX3i* — the generated tris.
+
+---
+
+### selectTris(p_matTris)
+
+Select tris for this label from a given tri matrix.
+
+**Parameters:**
+
+- **p_matTris** : *const Eigen::MatrixX3i &*
+  tris from which the selection should be made.
+
+**Returns:**
+
+- *Eigen::MatrixX3i* — the generated tris.
+
+---
+
+## Static Methods
+
+### read(p_sFileName, p_Label)
+
+mne_read_label_file
+
+Reads a `FsLabel` from a FreeSurfer label file. This is based on the FreeSurfer read_label routine SUBJECTS_DIR environment variable is not consulted for the standard location
+
+**Parameters:**
+
+- **p_sFileName** : *const QString &*
+  label file name.
+
+- **p_Label** : *FsLabel &*
+  read label.
+
+**Returns:**
+
+- *bool* — true if successful, false otherwise.
+
+---

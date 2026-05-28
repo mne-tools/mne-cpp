@@ -1,0 +1,85 @@
+---
+id: inv-source-estimate-io
+title: "INVLIB::InvSourceEstimateIO"
+sidebar_label: InvSourceEstimateIO
+sidebar_position: 15
+---
+
+# InvSourceEstimateIO
+
+:::info[Python equivalent]
+`mne.SourceEstimate.save / read` in MNE-Python.
+:::
+
+`#include <inv/inv_source_estimate_io.h>`
+
+```cpp
+class INVLIB::InvSourceEstimateIO
+```
+
+Extended I/O methods for `InvSourceEstimate`.
+
+---
+
+## Static Methods
+
+### writeCsv(stc, sPath, cDelim)
+
+Export source estimate to CSV format.
+
+Writes a header line with vertex indices, then one row per time point. First column is time (seconds).
+
+**Parameters:**
+
+- **stc** : *const InvSourceEstimate &*
+  Source estimate to export.
+
+- **sPath** : *const QString &*
+  Output file path.
+
+- **cDelim** : *char*
+  Delimiter character (default comma).
+
+**Returns:**
+
+- *bool* — true if successful.
+
+---
+
+### readCsv(sPath, cDelim)
+
+Read source estimate from CSV format.
+
+**Parameters:**
+
+- **sPath** : *const QString &*
+  Input file path.
+
+- **cDelim** : *char*
+  Delimiter character (default comma).
+
+**Returns:**
+
+- *InvSourceEstimate* — Source estimate (empty if failed).
+
+---
+
+### writeMatrix(stc, sPath)
+
+Export source estimate as a tab-separated matrix for easy import.
+
+No header; pure numeric matrix (n_vertices × n_times).
+
+**Parameters:**
+
+- **stc** : *const InvSourceEstimate &*
+  Source estimate to export.
+
+- **sPath** : *const QString &*
+  Output file path.
+
+**Returns:**
+
+- *bool* — true if successful.
+
+---

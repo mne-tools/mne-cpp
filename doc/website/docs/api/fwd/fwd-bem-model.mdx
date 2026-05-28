@@ -1,0 +1,1386 @@
+---
+id: fwd-bem-model
+title: "FWDLIB::FwdBemModel"
+sidebar_label: FwdBemModel
+sidebar_position: 2
+---
+
+# FwdBemModel
+
+:::info[Python equivalent]
+`mne.make_bem_model` in MNE-Python.
+:::
+
+`#include <fwd/fwd_bem_model.h>`
+
+```cpp
+class FWDLIB::FwdBemModel
+```
+
+Layered triangulated volume-conductor model (scalp/skull/inner-skull surfaces, per-compartment conductivities, IP-approach data and dense potential-solution matrix) used by the linear-collocation BEM forward solver.
+
+Holds the BEM model surfaces, conductivity parameters and the pre-inverted potential-solution matrix consumed by the dipole loop. Surfaces are stored from outermost (scalp) to innermost (inner skull) and owned by this object; the solution matrix is built once by `fwd_bem_compute_solution` and then re-used for every source.
+
+Refactored from the MNE-C `fwdBemModel` / `fwdBemModelRec` struct (``fwd_types.h``). Raw C-style arrays were replaced with Eigen types; surface ownership is managed through `std::unique_ptr`.
+
+---
+
+## Public Methods
+
+### FwdBemModel()
+
+Constructs an empty BEM model.
+
+All Eigen containers are left at size zero; scalar members are set to safe defaults (nsurf = 0, nsol = 0, bem_method = FWD_BEM_UNKNOWN).
+
+---
+
+### ~FwdBemModel()
+
+Destroys the BEM model.
+
+FsSurface ownership is released automatically via std::unique_ptr. The solution matrix is freed by `fwd_bem_free_solution()`.
+
+---
+
+### fwd_bem_free_solution()
+
+Release the potential solution matrix and associated workspace.
+
+Resets solution, v0, sol_name, nsol, and bem_method to their default (empty / unknown) state.
+
+---
+
+### fwd_bem_find_surface(kind)
+
+Find a surface of the given kind in this BEM model.
+
+**Parameters:**
+
+- **kind** : *int*
+  FsSurface ID to look for.
+
+**Returns:**
+
+- *MNELIB::MNESurface ** — Non-owning pointer to the surface, or nullptr if not found.
+
+---
+
+### fwd_bem_load_solution(name, bem_method)
+
+Load a pre-computed BEM solution from a FIFF file.
+
+Reads the solution matrix from disk and stores it in this model. The solution must match the requested BEM method.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Path to the solution FIFF file.
+
+- **bem_method** : *int*
+  Required BEM method (FWD_BEM_CONSTANT_COLL or FWD_BEM_LINEAR_COLL).
+
+**Returns:**
+
+- *int* — true if loaded, false if not found, FAIL on error.
+
+---
+
+### fwd_bem_set_head_mri_t(t)
+
+Set the Head-to-MRI coordinate transform for this BEM model.
+
+**Parameters:**
+
+- **t** : *const FIFFLIB::FiffCoordTrans &*
+  The head-to-MRI coordinate transformation.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### fwd_bem_linear_collocation_solution()
+
+Compute the linear-collocation BEM solution for this model.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### fwd_bem_constant_collocation_solution()
+
+Compute the constant-collocation BEM solution for this model.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### fwd_bem_compute_solution(bem_method)
+
+Compute the BEM solution matrix using the specified method.
+
+**Parameters:**
+
+- **bem_method** : *int*
+  BEM method (FWD_BEM_CONSTANT_COLL or FWD_BEM_LINEAR_COLL).
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### fwd_bem_load_recompute_solution(name, bem_method, force_recompute)
+
+Load a BEM solution from file, recomputing if necessary.
+
+Attempts to read the pre-computed solution; if it is missing or force_recompute is set, computes a fresh solution.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Path to the BEM model file.
+
+- **bem_method** : *int*
+  Required BEM method.
+
+- **force_recompute** : *int*
+  If non-zero, always recompute the solution.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### fwd_bem_specify_els(els)
+
+Precompute the electrode-specific BEM solution.
+
+Builds the coil-specific solution matrix for EEG electrodes by multiplying the BEM solution with infinite-medium potentials.
+
+**Parameters:**
+
+- **els** : *FwdCoilSet **
+  Electrode (coil) set to prepare.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### fwd_bem_pot_grad_calc(rd, Q, els, all_surfs, xgrad, ygrad, zgrad)
+
+Compute the gradient of BEM potentials with respect to dipole position (constant collocation).
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole orientation.
+
+- **els** : *FwdCoilSet **
+  Electrode set.
+
+- **all_surfs** : *int*
+  If non-zero, compute on all surfaces.
+
+- **xgrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to x (one value per electrode).
+
+- **ygrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to y.
+
+- **zgrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to z.
+
+---
+
+### fwd_bem_lin_pot_calc(rd, Q, els, all_surfs, pot)
+
+Compute BEM potentials at electrodes using linear collocation.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole orientation.
+
+- **els** : *FwdCoilSet **
+  Electrode set.
+
+- **all_surfs** : *int*
+  If non-zero, compute on all surfaces.
+
+- **pot** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Output potentials (one value per electrode).
+
+---
+
+### fwd_bem_lin_pot_grad_calc(rd, Q, els, all_surfs, xgrad, ygrad, zgrad)
+
+Compute the gradient of BEM potentials with respect to dipole position (linear collocation).
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole orientation.
+
+- **els** : *FwdCoilSet **
+  Electrode set.
+
+- **all_surfs** : *int*
+  If non-zero, compute on all surfaces.
+
+- **xgrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to x (one value per electrode).
+
+- **ygrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to y.
+
+- **zgrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to z.
+
+---
+
+### fwd_bem_pot_calc(rd, Q, els, all_surfs, pot)
+
+Compute BEM potentials at electrodes using constant collocation.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole orientation.
+
+- **els** : *FwdCoilSet **
+  Electrode set.
+
+- **all_surfs** : *int*
+  If non-zero, compute on all surfaces.
+
+- **pot** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Output potentials (one value per electrode).
+
+---
+
+### fwd_bem_field_coeff(coils)
+
+Assemble the constant-collocation magnetic field coefficient matrix.
+
+**Parameters:**
+
+- **coils** : *FwdCoilSet **
+  MEG coil set.
+
+**Returns:**
+
+- *Eigen::MatrixXf* — Coefficient matrix, or empty matrix on error.
+
+---
+
+### fwd_bem_lin_field_coeff(coils, method)
+
+Assemble the linear-collocation magnetic field coefficient matrix.
+
+**Parameters:**
+
+- **coils** : *FwdCoilSet **
+  MEG coil set.
+
+- **method** : *int*
+  Integration method (FWD_BEM_LIN_FIELD_SIMPLE, _FERGUSON, or _URANKAR).
+
+**Returns:**
+
+- *Eigen::MatrixXf* — Coefficient matrix, or empty matrix on error.
+
+---
+
+### fwd_bem_specify_coils(coils)
+
+Precompute the coil-specific BEM solution for MEG.
+
+Builds the coil-specific solution matrix by multiplying the BEM solution with the field coefficients.
+
+**Parameters:**
+
+- **coils** : *FwdCoilSet **
+  MEG coil set to prepare.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### fwd_bem_lin_field_calc(rd, Q, coils, B)
+
+Compute BEM magnetic fields at coils using linear collocation.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole orientation.
+
+- **coils** : *FwdCoilSet &*
+  MEG coil set.
+
+- **B** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Output magnetic fields (one value per coil).
+
+---
+
+### fwd_bem_field_calc(rd, Q, coils, B)
+
+Compute BEM magnetic fields at coils using constant collocation.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole orientation.
+
+- **coils** : *FwdCoilSet &*
+  MEG coil set.
+
+- **B** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Output magnetic fields (one value per coil).
+
+---
+
+### fwd_bem_field_grad_calc(rd, Q, coils, xgrad, ygrad, zgrad)
+
+Compute the gradient of BEM magnetic fields with respect to dipole position (constant collocation).
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole orientation.
+
+- **coils** : *FwdCoilSet &*
+  MEG coil set.
+
+- **xgrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to x (one value per coil).
+
+- **ygrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to y.
+
+- **zgrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to z.
+
+---
+
+### fwd_bem_lin_field_grad_calc(rd, Q, coils, xgrad, ygrad, zgrad)
+
+Compute the gradient of BEM magnetic fields with respect to dipole position (linear collocation).
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole orientation.
+
+- **coils** : *FwdCoilSet &*
+  MEG coil set.
+
+- **xgrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to x (one value per coil).
+
+- **ygrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to y.
+
+- **zgrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to z.
+
+---
+
+### compute_forward_meg(spaces, coils, comp_coils, comp_data, fixed_ori, r0, use_threads, resp, resp_grad, bDoGRad)
+
+Compute the MEG forward solution for one or more source spaces.
+
+**Parameters:**
+
+- **spaces** : *std::vector&lt; std::unique_ptr&lt; MNELIB::MNESourceSpace &gt; &gt; &*
+  Source spaces.
+
+- **coils** : *FwdCoilSet **
+  MEG coil set.
+
+- **comp_coils** : *FwdCoilSet **
+  Compensator coil set (may be nullptr).
+
+- **comp_data** : *MNELIB::MNECTFCompDataSet **
+  CTF compensation data (may be nullptr).
+
+- **fixed_ori** : *bool*
+  If true, use fixed-orientation dipoles.
+
+- **r0** : *const Eigen::Vector3f &*
+  Sphere model origin.
+
+- **use_threads** : *bool*
+  If true, parallelize across source spaces.
+
+- **resp** : *FIFFLIB::FiffNamedMatrix &*
+  Forward solution matrix.
+
+- **resp_grad** : *FIFFLIB::FiffNamedMatrix &*
+  Gradient forward solution matrix.
+
+- **bDoGRad** : *bool*
+  If true, also compute the gradient solution.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### compute_forward_eeg(spaces, els, fixed_ori, eeg_model, use_threads, resp, resp_grad, bDoGrad)
+
+Compute the EEG forward solution for one or more source spaces.
+
+**Parameters:**
+
+- **spaces** : *std::vector&lt; std::unique_ptr&lt; MNELIB::MNESourceSpace &gt; &gt; &*
+  Source spaces.
+
+- **els** : *FwdCoilSet **
+  Electrode locations.
+
+- **fixed_ori** : *bool*
+  If true, use fixed-orientation dipoles.
+
+- **eeg_model** : *FwdEegSphereModel **
+  Sphere model definition.
+
+- **use_threads** : *bool*
+  If true, parallelize across source spaces.
+
+- **resp** : *FIFFLIB::FiffNamedMatrix &*
+  Forward solution matrix.
+
+- **resp_grad** : *FIFFLIB::FiffNamedMatrix &*
+  Gradient forward solution matrix.
+
+- **bDoGrad** : *bool*
+  If true, also compute the gradient solution.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+## Static Methods
+
+### fwd_bem_make_bem_sol_name(name)
+
+Build a standard BEM solution file name from a model name.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Base BEM file name.
+
+**Returns:**
+
+- *QString* — The derived solution file name.
+
+---
+
+### fwd_bem_explain_surface(kind)
+
+Return a human-readable label for a BEM surface kind.
+
+**Parameters:**
+
+- **kind** : *int*
+  FIFF surface ID (e.g. FIFFV_BEM_SURF_ID_BRAIN).
+
+**Returns:**
+
+- *const QString &* — Reference to a static string label.
+
+---
+
+### fwd_bem_explain_method(method)
+
+Return a human-readable label for a BEM method.
+
+**Parameters:**
+
+- **method** : *int*
+  BEM method constant (FWD_BEM_CONSTANT_COLL / FWD_BEM_LINEAR_COLL).
+
+**Returns:**
+
+- *const QString &* — Reference to a static string label.
+
+---
+
+### get_int(stream, node, what, res)
+
+Read an integer tag from a FIFF node.
+
+---
+
+### fwd_bem_load_surfaces(name, kinds)
+
+Load BEM surfaces of specified kinds from a FIFF file.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Path to the BEM FIFF file.
+
+- **kinds** : *const std::vector&lt; int &gt; &*
+  FsSurface IDs to load (e.g. FIFFV_BEM_SURF_ID_BRAIN).
+
+**Returns:**
+
+- *FwdBemModel::UPtr* — BEM model containing the requested surfaces, or nullptr on failure.
+
+---
+
+### fwd_bem_load_homog_surface(name)
+
+Load a single-layer (homogeneous) BEM model from a FIFF file.
+
+Convenience wrapper that loads only the inner skull surface.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Path to the BEM FIFF file.
+
+**Returns:**
+
+- *FwdBemModel::UPtr* — BEM model, or nullptr on failure.
+
+---
+
+### fwd_bem_load_three_layer_surfaces(name)
+
+Load a three-layer BEM model (scalp, outer skull, inner skull) from a FIFF file.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Path to the BEM FIFF file.
+
+**Returns:**
+
+- *FwdBemModel::UPtr* — BEM model, or nullptr on failure.
+
+---
+
+### make_guesses(guess_surf, guessrad, guess_r0, grid, exclude, mindist)
+
+Generate a set of dipole guess locations inside a boundary surface.
+
+Creates an evenly-spaced grid of candidate source locations, optionally excluding points too close to the center of mass or outside the boundary.
+
+**Parameters:**
+
+- **guess_surf** : *MNELIB::MNESurface **
+  Predefined boundary surface for the guesses (may be nullptr).
+
+- **guessrad** : *float*
+  Radius for a spherical boundary if guess_surf is nullptr.
+
+- **guess_r0** : *const Eigen::Vector3f &*
+  Origin for the spherical boundary.
+
+- **grid** : *float*
+  Spacing between guess points (meters).
+
+- **exclude** : *float*
+  Exclude points closer than this to the CM of the boundary.
+
+- **mindist** : *float*
+  Minimum distance from the boundary surface.
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNELIB::MNESurface &gt;* — FsSurface containing the guess locations, or nullptr on failure.
+
+---
+
+### calc_beta(rk, rk1)
+
+Compute the beta angle used in the linear collocation integration.
+
+**Parameters:**
+
+- **rk** : *const Eigen::Vector3d &*
+  Position vector of vertex k.
+
+- **rk1** : *const Eigen::Vector3d &*
+  Position vector of vertex k+1.
+
+**Returns:**
+
+- *double* — The beta angle value.
+
+---
+
+### lin_pot_coeff(from, to, omega)
+
+Compute the linear potential coefficients for one source-destination pair.
+
+**Parameters:**
+
+- **from** : *const Eigen::Vector3f &*
+  Source point.
+
+- **to** : *MNELIB::MNETriangle &*
+  Destination triangle.
+
+- **omega** : *Eigen::Vector3d &*
+  Output coefficients for the three triangle vertices.
+
+---
+
+### correct_auto_elements(surf, mat)
+
+Correct the auto (self-coupling) elements of the linear collocation matrix.
+
+**Parameters:**
+
+- **surf** : *MNELIB::MNESurface &*
+  The BEM surface.
+
+- **mat** : *Eigen::MatrixXf &*
+  The coefficient matrix to correct (modified in-place).
+
+---
+
+### fwd_bem_lin_pot_coeff(surfs)
+
+Assemble the full linear-collocation potential coefficient matrix.
+
+**Parameters:**
+
+- **surfs** : *const std::vector&lt; MNELIB::MNESurface * &gt; &*
+  Vector of BEM surfaces.
+
+**Returns:**
+
+- *Eigen::MatrixXf* — Coefficient matrix (rows = nodes, columns = nodes).
+
+---
+
+### fwd_bem_multi_solution(solids, gamma, nsurf, ntri)
+
+Compute the multi-surface BEM solution from solid-angle coefficients.
+
+Applies the deflation technique and LU decomposition to produce the final BEM solution matrix for a multi-compartment model.
+
+**Parameters:**
+
+- **solids** : *Eigen::MatrixXf &*
+  Solid-angle coefficient matrix.
+
+- **gamma** : *const Eigen::MatrixXf **
+  Conductivity-ratio coupling matrix (nullptr for homogeneous).
+
+- **nsurf** : *int*
+  Number of surfaces.
+
+- **ntri** : *const Eigen::VectorXi &*
+  Triangle or node count per surface.
+
+**Returns:**
+
+- *Eigen::MatrixXf* — Solution matrix, or empty matrix on error.
+
+---
+
+### fwd_bem_homog_solution(solids, ntri)
+
+Compute the homogeneous (single-layer) BEM solution.
+
+**Parameters:**
+
+- **solids** : *Eigen::MatrixXf &*
+  Solid-angle coefficient matrix.
+
+- **ntri** : *int*
+  Number of triangles.
+
+**Returns:**
+
+- *Eigen::MatrixXf* — Solution matrix, or empty matrix on error.
+
+---
+
+### fwd_bem_ip_modify_solution(solution, ip_solution, ip_mult, nsurf, ntri)
+
+Modify the BEM solution with the isolated-problem (IP) approach.
+
+Applies the correction for the innermost surface conductivity jump (the "isolated problem" approach of Hamalainen and Sarvas, 1989).
+
+**Parameters:**
+
+- **solution** : *Eigen::MatrixXf &*
+  The original solution matrix (modified in-place).
+
+- **ip_solution** : *Eigen::MatrixXf &*
+  The isolated-problem solution matrix.
+
+- **ip_mult** : *float*
+  Conductivity ratio for the IP correction.
+
+- **nsurf** : *int*
+  Number of surfaces.
+
+- **ntri** : *const Eigen::VectorXi &*
+  Triangle or node count per surface.
+
+---
+
+### fwd_bem_check_solids(angles, ntri1, ntri2, desired)
+
+Verify that solid-angle sums match the expected value.
+
+**Parameters:**
+
+- **angles** : *const Eigen::MatrixXf &*
+  Solid-angle matrix.
+
+- **ntri1** : *int*
+  Row count.
+
+- **ntri2** : *int*
+  Column count.
+
+- **desired** : *float*
+  Expected solid-angle sum per row.
+
+**Returns:**
+
+- *int* — OK if all rows match within tolerance, FAIL otherwise.
+
+---
+
+### fwd_bem_solid_angles(surfs)
+
+Compute the solid-angle matrix for all BEM surfaces.
+
+**Parameters:**
+
+- **surfs** : *const std::vector&lt; MNELIB::MNESurface * &gt; &*
+  Vector of BEM surfaces.
+
+**Returns:**
+
+- *Eigen::MatrixXf* — Solid-angle matrix, or empty matrix on error.
+
+---
+
+### fwd_bem_inf_field(rd, Q, rp, dir)
+
+Compute the infinite-medium magnetic field at a single point.
+
+Returns the component of the magnetic field along the given direction, without the mu_0 / (4 pi) prefactor.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole moment.
+
+- **rp** : *const Eigen::Vector3f &*
+  Field point.
+
+- **dir** : *const Eigen::Vector3f &*
+  Field direction of interest (unit vector).
+
+**Returns:**
+
+- *float* — The infinite-medium magnetic field component.
+
+---
+
+### fwd_bem_inf_pot(rd, Q, rp)
+
+Compute the infinite-medium electric potential at a single point.
+
+Returns the potential without the 1 / (4 pi sigma) prefactor.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole moment.
+
+- **rp** : *const Eigen::Vector3f &*
+  Potential evaluation point.
+
+**Returns:**
+
+- *float* — The infinite-medium electric potential.
+
+---
+
+### fwd_bem_pot_els(rd, Q, els, pot, client)
+
+Callback: compute BEM potentials at electrodes for a dipole.
+
+Matches the fwdFieldFunc signature for use in forward computation threads.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position (3-element array).
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole orientation (3-element array).
+
+- **els** : *FwdCoilSet &*
+  Electrode descriptors.
+
+- **pot** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Output potentials.
+
+- **client** : *void **
+  Opaque pointer to the `FwdBemModel` instance.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### fwd_bem_pot_grad_els(rd, Q, els, pot, xgrad, ygrad, zgrad, client)
+
+Callback: compute BEM potentials and position gradients at electrodes.
+
+Matches the fwdFieldGradFunc signature for use in forward computation threads.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position (3-element array).
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole orientation (3-element array).
+
+- **els** : *FwdCoilSet &*
+  Electrode descriptors.
+
+- **pot** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Output potentials.
+
+- **xgrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to x.
+
+- **ygrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to y.
+
+- **zgrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to z.
+
+- **client** : *void **
+  Opaque pointer to the `FwdBemModel` instance.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### calc_f(xx, yy, f0, fx, fy)
+
+Compute the f0, fx, fy integration helper values from corner coordinates.
+
+**Parameters:**
+
+- **xx** : *const Eigen::Vector3d &*
+  Corner x-coordinates.
+
+- **yy** : *const Eigen::Vector3d &*
+  Corner y-coordinates.
+
+- **f0** : *Eigen::Vector3d &*
+  Integral f0.
+
+- **fx** : *Eigen::Vector3d &*
+  Integral fx.
+
+- **fy** : *Eigen::Vector3d &*
+  Integral fy.
+
+---
+
+### calc_magic(u, z, A, B, beta, D)
+
+Compute the "magic" beta and D factors for the Urankar field integration.
+
+**Parameters:**
+
+- **u** : *double*
+  Coordinate u.
+
+- **z** : *double*
+  Coordinate z.
+
+- **A** : *double*
+  Parameter A.
+
+- **B** : *double*
+  Parameter B.
+
+- **beta** : *Eigen::Vector3d &*
+  Output beta factor.
+
+- **D** : *double &*
+  Output D factor.
+
+---
+
+### field_integrals(from, to, I1p, T, S1, S2, f0, fx, fy)
+
+Compute the geometry integrals for the magnetic field from a triangle.
+
+**Parameters:**
+
+- **from** : *const Eigen::Vector3f &*
+  Source point.
+
+- **to** : *MNELIB::MNETriangle &*
+  Destination triangle.
+
+- **I1p** : *double &*
+  Monopolar integral.
+
+- **T** : *Eigen::Vector2d &*
+  Integral T.
+
+- **S1** : *Eigen::Vector2d &*
+  Integral S1.
+
+- **S2** : *Eigen::Vector2d &*
+  Integral S2.
+
+- **f0** : *Eigen::Vector3d &*
+  Integral f0.
+
+- **fx** : *Eigen::Vector3d &*
+  Integral fx.
+
+- **fy** : *Eigen::Vector3d &*
+  Integral fy.
+
+---
+
+### one_field_coeff(dest, normal, tri)
+
+Compute the constant-collocation magnetic field coefficient for one triangle.
+
+**Parameters:**
+
+- **dest** : *const Eigen::Vector3f &*
+  Destination field point.
+
+- **normal** : *const Eigen::Vector3f &*
+  Field direction of interest (unit vector).
+
+- **tri** : *MNELIB::MNETriangle &*
+  Source triangle.
+
+**Returns:**
+
+- *double* — The field coefficient.
+
+---
+
+### calc_gamma(rk, rk1)
+
+Compute the gamma angle for the linear field integration (Ferguson).
+
+**Parameters:**
+
+- **rk** : *const Eigen::Vector3d &*
+  Position vector of vertex k.
+
+- **rk1** : *const Eigen::Vector3d &*
+  Position vector of vertex k+1.
+
+**Returns:**
+
+- *double* — The gamma angle value.
+
+---
+
+### fwd_bem_one_lin_field_coeff_ferg(dest, dir, tri, res)
+
+Compute linear field coefficients using the Ferguson method.
+
+**Parameters:**
+
+- **dest** : *const Eigen::Vector3f &*
+  Field point.
+
+- **dir** : *const Eigen::Vector3f &*
+  Field direction of interest (unit vector).
+
+- **tri** : *MNELIB::MNETriangle &*
+  Destination triangle.
+
+- **res** : *Eigen::Vector3d &*
+  Output coefficients for the three triangle vertices.
+
+---
+
+### fwd_bem_one_lin_field_coeff_uran(dest, dir, tri, res)
+
+Compute linear field coefficients using the Urankar method.
+
+**Parameters:**
+
+- **dest** : *const Eigen::Vector3f &*
+  Field point.
+
+- **dir** : *const Eigen::Vector3f &*
+  Field direction of interest (unit vector).
+
+- **tri** : *MNELIB::MNETriangle &*
+  Destination triangle.
+
+- **res** : *Eigen::Vector3d &*
+  Output coefficients for the three triangle vertices.
+
+---
+
+### fwd_bem_one_lin_field_coeff_simple(dest, normal, source, res)
+
+Compute linear field coefficients using the simple (direct) method.
+
+**Parameters:**
+
+- **dest** : *const Eigen::Vector3f &*
+  Destination field point.
+
+- **normal** : *const Eigen::Vector3f &*
+  Field direction of interest (unit vector).
+
+- **source** : *MNELIB::MNETriangle &*
+  Source triangle.
+
+- **res** : *Eigen::Vector3d &*
+  Output coefficients for the three triangle vertices.
+
+---
+
+### fwd_bem_inf_field_der(rd, Q, rp, dir, comp)
+
+Compute the derivative of the infinite-medium magnetic field with respect to dipole position.
+
+Returns the field derivative without the mu_0 / (4 pi) prefactor.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole moment.
+
+- **rp** : *const Eigen::Vector3f &*
+  Field point.
+
+- **dir** : *const Eigen::Vector3f &*
+  Field direction of interest (unit vector).
+
+- **comp** : *const Eigen::Vector3f &*
+  Gradient component direction (unit vector).
+
+**Returns:**
+
+- *float* — The field derivative value.
+
+---
+
+### fwd_bem_inf_pot_der(rd, Q, rp, comp)
+
+Compute the derivative of the infinite-medium electric potential with respect to dipole position.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole moment.
+
+- **rp** : *const Eigen::Vector3f &*
+  Potential evaluation point.
+
+- **comp** : *const Eigen::Vector3f &*
+  Gradient component direction (unit vector).
+
+**Returns:**
+
+- *float* — The potential derivative value.
+
+---
+
+### fwd_bem_field(rd, Q, coils, B, client)
+
+Callback: compute BEM magnetic fields at coils for a dipole.
+
+Dispatches to fwd_bem_field_calc or fwd_bem_lin_field_calc based on the current BEM method. Matches the fwdFieldFunc signature.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position (3-element array).
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole orientation (3-element array).
+
+- **coils** : *FwdCoilSet &*
+  MEG coil descriptors.
+
+- **B** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Output magnetic fields.
+
+- **client** : *void **
+  Opaque pointer to the `FwdBemModel` instance.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### fwd_bem_field_grad(rd, Q, coils, Bval, xgrad, ygrad, zgrad, client)
+
+Callback: compute BEM magnetic fields and position gradients at coils.
+
+Matches the fwdFieldGradFunc signature for use in forward computation threads.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position (3-element array).
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole orientation (3-element array).
+
+- **coils** : *FwdCoilSet &*
+  MEG coil definitions.
+
+- **Bval** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Output magnetic fields.
+
+- **xgrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to x.
+
+- **ygrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to y.
+
+- **zgrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to z.
+
+- **client** : *void **
+  Opaque pointer to the `FwdBemModel` instance.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### meg_eeg_fwd_one_source_space(arg)
+
+Thread worker: compute the forward solution for one source space.
+
+Used as a thread entry point; the argument is cast to the appropriate worker struct internally.
+
+**Parameters:**
+
+- **arg** : *FwdThreadArg **
+  Per-thread work descriptor.
+
+---
+
+### fwd_sphere_field(rd, Q, coils, Bval, client)
+
+Callback: compute the spherical-model magnetic field at coils.
+
+Matches the fwdFieldFunc signature.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position (3-element array).
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole components (xyz).
+
+- **coils** : *FwdCoilSet &*
+  MEG coil definitions.
+
+- **Bval** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Output magnetic fields.
+
+- **client** : *void **
+  Opaque pointer to client data (sphere model origin).
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### fwd_sphere_field_vec(rd, coils, Bval, client)
+
+Callback: compute the spherical-model vector magnetic field at coils.
+
+Returns one row per cardinal dipole direction (x, y, z). Matches the fwdVecFieldFunc signature.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position (3-element array).
+
+- **coils** : *FwdCoilSet &*
+  MEG coil definitions.
+
+- **Bval** : *Eigen::Ref&lt; Eigen::MatrixXf &gt;*
+  Output fields (3 x ncoil matrix, row-major).
+
+- **client** : *void **
+  Opaque pointer to client data.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### fwd_sphere_field_grad(rd, Q, coils, Bval, xgrad, ygrad, zgrad, client)
+
+Callback: compute the spherical-model magnetic field and its position gradient at coils.
+
+Matches the fwdFieldGradFunc signature.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position (3-element array).
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole components (xyz).
+
+- **coils** : *FwdCoilSet &*
+  MEG coil definitions.
+
+- **Bval** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Output magnetic fields.
+
+- **xgrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to x.
+
+- **ygrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to y.
+
+- **zgrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to z.
+
+- **client** : *void **
+  Opaque pointer to client data.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### fwd_mag_dipole_field(rm, M, coils, Bval, client)
+
+Callback: compute the magnetic field of a magnetic dipole at coils.
+
+**Parameters:**
+
+- **rm** : *const Eigen::Vector3f &*
+  Dipole position (in the same coordinate system as the coils).
+
+- **M** : *const Eigen::Vector3f &*
+  Dipole moment components (xyz).
+
+- **coils** : *FwdCoilSet &*
+  MEG coil definitions.
+
+- **Bval** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Output magnetic fields.
+
+- **client** : *void **
+  Opaque pointer to client data (unused, may be nullptr).
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### fwd_mag_dipole_field_vec(rm, coils, Bval, client)
+
+Callback: compute the vector magnetic field of a magnetic dipole at coils.
+
+Returns one row per cardinal dipole direction (x, y, z).
+
+**Parameters:**
+
+- **rm** : *const Eigen::Vector3f &*
+  Dipole position (3-element array).
+
+- **coils** : *FwdCoilSet &*
+  MEG coil definitions.
+
+- **Bval** : *Eigen::Ref&lt; Eigen::MatrixXf &gt;*
+  Output fields (3 x ncoil matrix, row-major).
+
+- **client** : *void **
+  Opaque pointer to client data (unused, may be nullptr).
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---

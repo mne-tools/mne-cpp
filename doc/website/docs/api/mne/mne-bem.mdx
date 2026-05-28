@@ -1,0 +1,313 @@
+---
+id: mne-bem
+title: "MNELIB::MNEBem"
+sidebar_label: MNEBem
+sidebar_position: 4
+---
+
+# MNEBem
+
+:::info[Python equivalent]
+`mne.make_bem_model` in MNE-Python.
+:::
+
+`#include <mne/mne_bem.h>`
+
+```cpp
+class MNELIB::MNEBem
+```
+
+Boundary element model: aggregates the inner-skull, outer-skull and scalp `MNEBemSurface` objects of a head conductor model.
+
+Aggregated boundary element model loaded from a `-bem.fif` file.
+
+---
+
+## Public Methods
+
+### MNEBem()
+
+Default constructor.
+
+---
+
+### MNEBem(p_MNEBem)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_MNEBem** : *const MNEBem &*
+  `MNE` BEM.
+
+---
+
+### MNEBem(p_IODevice)
+
+Default constructor.
+
+---
+
+### ~MNEBem()
+
+Destroys the `MNE` Bem.
+
+---
+
+### clear()
+
+Initializes `MNE` Bem.
+
+---
+
+### isEmpty()
+
+True if `MNE` Bem is empty.
+
+**Returns:**
+
+- *bool* — true if `MNE` Bem is empty.
+
+---
+
+### size()
+
+Returns the number of stored bem surfaces.
+
+**Returns:**
+
+- *qint32* — number of stored bem surfaces.
+
+---
+
+### write(p_IODevice)
+
+`MNE` Toolbox function mne_write_bem_surfaces_block.
+
+Write the Bem to a FIF file
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  IO device to write the bem to.
+
+---
+
+### writeToStream(p_pStream)
+
+`MNE` Toolbox function mne_write_bem_surfaces_block.
+
+Write the Bem to a FIF stream
+
+**Parameters:**
+
+- **p_pStream** : *FIFFLIB::FiffStream **
+  The stream to write to.
+
+---
+
+### operator[](idx)
+
+Subscript operator [] to access bem_surface by index.
+
+**Parameters:**
+
+- **idx** : *qint32*
+  the surface index (0,1 or 2).
+
+**Returns:**
+
+- *const MNEBemSurface &* — `MNEBemSurface` related to the parameter index.
+
+---
+
+### operator[](idx)
+
+Subscript operator [] to access bem_surface by index.
+
+**Parameters:**
+
+- **idx** : *qint32*
+  the surface index (0,1 or 2).
+
+**Returns:**
+
+- *MNEBemSurface &* — `MNEBemSurface` related to the parameter index.
+
+---
+
+### operator&lt;&lt;(surf)
+
+Subscript operator &lt;&lt; to add a new bem_surface.
+
+**Parameters:**
+
+- **surf** : *const MNEBemSurface &*
+  BemSurface to be added.
+
+**Returns:**
+
+- *MNEBem &* — `MNEBem`.
+
+---
+
+### operator&lt;&lt;(surf)
+
+Subscript operator &lt;&lt; to add a new bem_surface.
+
+**Parameters:**
+
+- **surf** : *const MNEBemSurface **
+  BemSurface to be added.
+
+**Returns:**
+
+- *MNEBem &* — `MNEBem`.
+
+---
+
+### warp(sLm, dLm)
+
+Warp the Bem.
+
+**Parameters:**
+
+- **sLm** : *const Eigen::MatrixXf &*
+  3D Landmarks of the source geometry.
+
+- **dLm** : *const Eigen::MatrixXf &*
+  3D Landmarks of the destination geometry.
+
+---
+
+### transform(trans)
+
+Transform the Bem.
+
+**Parameters:**
+
+- **trans** : *const FIFFLIB::FiffCoordTrans &*
+  The Transformation Matrix.
+
+---
+
+### invtransform(trans)
+
+Transform the Bem using the inverse.
+
+**Parameters:**
+
+- **trans** : *const FIFFLIB::FiffCoordTrans &*
+  The Transformation Matrix.
+
+---
+
+## Static Methods
+
+### readFromStream(p_pStream, add_geom, p_Bem)
+
+**Parameters:**
+
+- **p_pStream** : *FIFFLIB::FiffStream::SPtr &*
+  The opened fif file.
+
+- **add_geom** : *bool*
+  Add geometry information to the Bem FsSurface.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+## Example
+
+Source: [`src/examples/ex_read_bem/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_read_bem/main.cpp)
+
+```cpp
+#include <iostream>
+
+#include <mne/mne.h>
+
+#include <utils/ioutils.h>
+#include <utils/generics/mne_logger.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtCore/QCoreApplication>
+#include <QCommandLineParser>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MNELIB;
+using namespace UTILSLIB;
+
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * The function main marks the entry point of the program.
+ * By default, main has the storage class extern.
+ *
+ * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+ * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+ * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+ */
+
+int main(int argc, char *argv[])
+{
+    qInstallMessageHandler(MNELogger::customLogWriter);
+    QCoreApplication app(argc, argv);
+
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Read BEM Example");
+    parser.addHelpOption();
+    QCommandLineOption bemFileInOption("bem", "Path to BEM <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    QCommandLineOption bemFileOutOption("bemOut", "Path to BEM <file>, which is to be written.", "file", "./sample-head-test.fif");
+
+//    QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif"
+//    QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/bem/sample-all-src.fif"
+//    QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif"
+//    QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif"
+
+    parser.addOption(bemFileInOption);
+    parser.addOption(bemFileOutOption);
+    parser.process(app);
+
+    // Read the BEM
+    QFile t_fileBem(parser.value(bemFileInOption));
+    MNEBem t_Bem(t_fileBem);
+
+    if( t_Bem.size() > 0 )
+    {
+        qDebug() << "Loaded BEM";
+        qDebug() << "t_Bem[0].tri_nn:" << t_Bem[0].tri_nn(0,0) << t_Bem[0].tri_nn(0,1) << t_Bem[0].tri_nn(0,2);
+        qDebug() << "t_Bem[0].tri_nn:" << t_Bem[0].tri_nn(2,0) << t_Bem[0].tri_nn(2,1) << t_Bem[0].tri_nn(2,2);
+        qDebug() << "t_Bem[0].rr:" << t_Bem[0].rr(2,0) << t_Bem[0].rr(2,1) << t_Bem[0].rr(2,2);
+    }
+
+    // Write the BEM
+    QFile t_fileBemTest(parser.value(bemFileOutOption));
+    t_Bem.write(t_fileBemTest);
+    t_fileBemTest.close();
+
+    MNEBem t_BemTest (t_fileBemTest) ;
+
+    if( t_BemTest.size() > 0 )
+    {
+        qDebug() << "Loaded written BEM";
+        qDebug() << "t_BemTest[0].tri_nn:" << t_BemTest[0].tri_nn(0,0) << t_BemTest[0].tri_nn(0,1) << t_BemTest[0].tri_nn(0,2);
+        qDebug() << "t_BemTest[0].tri_nn:" << t_BemTest[0].tri_nn(2,0) << t_BemTest[0].tri_nn(2,1) << t_BemTest[0].tri_nn(2,2);
+        qDebug() << "t_BemTest[0].rr:" << t_BemTest[0].rr(2,0) << t_BemTest[0].rr(2,1) << t_BemTest[0].rr(2,2);
+    }
+
+    return app.exec();
+}
+```

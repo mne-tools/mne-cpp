@@ -1,0 +1,80 @@
+---
+id: standard-montage
+title: "UTILSLIB::StandardMontage"
+sidebar_label: StandardMontage
+sidebar_position: 1
+---
+
+# StandardMontage
+
+:::info[Python equivalent]
+`mne.channels.make_standard_montage` in MNE-Python.
+:::
+
+`#include <utils/standard_montage.h>`
+
+```cpp
+class UTILSLIB::StandardMontage
+```
+
+Standard EEG montage with named electrode positions.
+
+---
+
+## Static Methods
+
+### getMontage(system)
+
+Get a standard montage by system name.
+
+**Parameters:**
+
+- **system** : *System*
+  The montage system.
+
+**Returns:**
+
+- *QList&lt; ElectrodePosition &gt;* — List of electrode positions.
+
+---
+
+### getElectrodeNames(system)
+
+Get electrode names for a standard montage.
+
+**Parameters:**
+
+- **system** : *System*
+  The montage system.
+
+**Returns:**
+
+- *QStringList* — List of electrode names.
+
+---
+
+### findElectrode(name, pos)
+
+Look up a single electrode position by name.
+
+Searches through all built-in montages.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Electrode name (case-insensitive).
+
+- **pos** : *Eigen::Vector3d &*
+  Position if found.
+
+**Returns:**
+
+- *bool* — true if found.
+
+---
+
+### electrodeCount(system)
+
+Get the number of electrodes in a montage.
+
+---

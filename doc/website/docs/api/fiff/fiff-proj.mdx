@@ -1,0 +1,140 @@
+---
+id: fiff-proj
+title: "FIFFLIB::FiffProj"
+sidebar_label: FiffProj
+sidebar_position: 7
+---
+
+# FiffProj
+
+:::info[Python equivalent]
+`mne.Projection` in MNE-Python.
+:::
+
+`#include <fiff/fiff_proj.h>`
+
+```cpp
+class FIFFLIB::FiffProj
+```
+
+Single SSP projection item: kind, active flag, desired flag and the named projection vector matrix.
+
+Maps one `FIFFB_PROJ_ITEM` block to a C++ value: description, kind, `nvec`, `active`, plus a `FiffNamedMatrix` whose row names are the channels the projector acts on. Multiple `FiffProj` instances form the `info`['projs'] list and are combined into one projection operator by `make_projector` when raw / evoked data is loaded.
+
+---
+
+## Public Methods
+
+### FiffProj()
+
+Default constructor.
+
+---
+
+### FiffProj(p_FiffProj)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FiffProj** : *const FiffProj &*
+  SSP projector data which should be copied.
+
+---
+
+### FiffProj(p_kind, p_active, p_desc, p_data)
+
+Constructor.
+
+---
+
+### ~FiffProj()
+
+Destroys the `FiffProj`.
+
+---
+
+## Static Methods
+
+### activate_projs(p_qListFiffProj)
+
+Set all projections to active.
+
+**Parameters:**
+
+- **p_qListFiffProj** : *QList&lt; FiffProj &gt; &*
+  activates projectors in place.
+
+---
+
+### make_projector(projs, ch_names, proj, bads, U)
+
+mne_make_projector
+
+ToDo move this to fiff_proj; Before: check if info is needed and if make_projector_info should be also moved.
+
+Make an SSP operator
+
+**Parameters:**
+
+- **projs** : *const QList&lt; FiffProj &gt; &*
+  A set of projection vectors.
+
+- **ch_names** : *const QStringList &*
+  A cell array of channel names.
+
+- **proj** : *Eigen::MatrixXd &*
+  The projection operator to apply to the data.
+
+- **bads** : *const QStringList &*
+  Bad channels to exclude.
+
+- **U** : *Eigen::MatrixXd &*
+  The orthogonal basis of the projection vectors (optional).
+
+**Returns:**
+
+- *fiff_int_t* — nproj - How many items in the projector.
+
+---
+
+### compute_from_raw(raw, events, eventCode, tmin, tmax, nGrad, nMag, nEeg, mapReject)
+
+compute_from_raw
+
+Create SSP (Signal-Space Projection) operators from raw data via SVD. Ported from make_ssp.c (MNE-C).
+
+**Parameters:**
+
+- **raw** : *const FiffRawData &*
+  The raw data.
+
+- **events** : *const Eigen::MatrixXi &*
+  Event matrix (nEvents x 3).
+
+- **eventCode** : *int*
+  Which event code to select epochs for.
+
+- **tmin** : *float*
+  Start of epoch relative to event (seconds).
+
+- **tmax** : *float*
+  End of epoch relative to event (seconds).
+
+- **nGrad** : *int*
+  Number of gradiometer projection vectors.
+
+- **nMag** : *int*
+  Number of magnetometer projection vectors.
+
+- **nEeg** : *int*
+  Number of EEG projection vectors.
+
+- **mapReject** : *const QMap&lt; QString, double &gt; &*
+  Rejection thresholds (key = channel type string, value = threshold).
+
+**Returns:**
+
+- *QList&lt; FiffProj &gt;* — List of `FiffProj` items, or empty list on failure.
+
+---

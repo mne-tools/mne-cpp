@@ -1,0 +1,81 @@
+---
+id: source-morph
+title: "INVLIB::SourceMorph"
+sidebar_label: SourceMorph
+sidebar_position: 19
+---
+
+# SourceMorph
+
+:::info[Python equivalent]
+`mne.SourceMorph` in MNE-Python.
+:::
+
+`#include <inv/source_morph.h>`
+
+```cpp
+class INVLIB::SourceMorph
+```
+
+Morphs source estimates from one subject's source space to another.
+
+Usage: 
+```cpp
+SourceMorph morph;
+morph.compute(srcVerticesFrom, srcVerticesTo, morphMapLh, morphMapRh);
+InvSourceEstimate morphed = morph.apply(stc);
+```
+
+---
+
+## Public Methods
+
+### SourceMorph()
+
+---
+
+### compute(verticesFrom, verticesTo, morphMap)
+
+Compute the morphing transformation.
+
+Builds a sparse interpolation matrix that maps source estimate data from one vertex set to another using nearest-neighbor interpolation.
+
+**Parameters:**
+
+- **verticesFrom** : *const Eigen::VectorXi &*
+  Source vertices in the "from" subject's source space.
+
+- **verticesTo** : *const Eigen::VectorXi &*
+  Target vertices in the "to" subject's source space.
+
+- **morphMap** : *const Eigen::SparseMatrix&lt; double &gt; &*
+  Sparse interpolation matrix (nTo x nFrom) — e.g. from MNEMorphMap::map.
+
+---
+
+### apply(stcFrom)
+
+Apply the morphing to a source estimate.
+
+**Parameters:**
+
+- **stcFrom** : *const InvSourceEstimate &*
+  Source estimate in the "from" subject's space.
+
+**Returns:**
+
+- *InvSourceEstimate* — Morphed source estimate in the "to" subject's space.
+
+---
+
+### isComputed()
+
+Check if the morph has been computed.
+
+---
+
+### nVerticesTo()
+
+Get the number of target vertices.
+
+---

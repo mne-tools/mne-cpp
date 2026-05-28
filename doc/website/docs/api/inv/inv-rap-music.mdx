@@ -1,0 +1,340 @@
+---
+id: inv-rap-music
+title: "INVLIB::InvRapMusic"
+sidebar_label: InvRapMusic
+sidebar_position: 5
+---
+
+# InvRapMusic
+
+:::info[Python equivalent]
+`mne.beamformer.rap_music` in MNE-Python.
+:::
+
+`#include <inv/inv_rap_music.h>`
+
+```cpp
+class INVLIB::InvRapMusic
+```
+
+RAP MUSIC (Recursively Applied and Projected Multiple Signal Classification) source localization algorithm.
+
+Implements the RAP MUSIC scanning algorithm which iteratively identifies correlated source pairs by projecting the signal subspace and re-scanning the lead field. Each iteration finds one dipole (or dipole pair), projects it out of the signal subspace, and repeats until the desired number of sources is found or the residual correlation drops below threshold.
+
+Reference: Mosher & Leahy, IEEE Trans. Signal Process. 47(2), 332-340, 1999.
+
+---
+
+## Public Methods
+
+### InvRapMusic()
+
+Default constructor creates an empty `InvRapMusic` algorithm which still needs to be initialized.
+
+---
+
+### InvRapMusic(p_pFwd, p_bSparsed, p_iN, p_dThr)
+
+Constructor which initializes the `InvRapMusic` algorithm with the given model.
+
+**Parameters:**
+
+- **p_Fwd**
+  The model which contains the gain matrix and its corresponding grid matrix.
+
+- **p_bSparsed** : *bool*
+  True when sparse matrices should be used.
+
+- **p_iN** : *int*
+  The number (default 2) of uncorrelated sources, which should be found. Starting with. the strongest.
+
+- **p_dThr** : *double*
+  The correlation threshold (default 0.5) at which the search for sources stops.
+
+---
+
+### ~InvRapMusic()
+
+---
+
+### init(p_pFwd, p_bSparsed, p_iN, p_dThr)
+
+Initializes the RAP MUSIC algorithm with the given model.
+
+**Parameters:**
+
+- **p_Fwd**
+  The model which contains the gain matrix and its corresponding Grid matrix.
+
+- **p_bSparsed** : *bool*
+  True when sparse matrices should be used.
+
+- **p_iN** : *int*
+  The number (default 2) of uncorrelated sources, which should be found. Starting with. the strongest.
+
+- **p_dThr** : *double*
+  The correlation threshold (default 0.5) at which the search for sources stops.
+
+**Returns:**
+
+- *bool* — true if successful initialized, false otherwise.
+
+---
+
+### calculateInverse(p_fiffEvoked, pick_normal)
+
+---
+
+### calculateInverse(data, tmin, tstep, pick_normal)
+
+---
+
+### calculateInverse(p_matMeasurement, p_RapDipoles)
+
+---
+
+### getName()
+
+---
+
+### getSourceSpace()
+
+---
+
+### setStcAttr(p_iSampStcWin, p_fStcOverlap)
+
+Sets the source estimate attributes.
+
+**Parameters:**
+
+- **p_iSampStcWin** : *int*
+  Samples per source localization window (default - 1 = not set).
+
+- **p_fStcOverlap** : *float*
+  Percentage of localization window overlap.
+
+---
+
+## Example
+
+Source: [`src/examples/ex_inverse_rap_music/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inverse_rap_music/main.cpp)
+
+```cpp
+#include <fs/fs_label.h>
+#include <fs/fs_surface.h>
+#include <fs/fs_surfaceset.h>
+#include <fs/fs_annotationset.h>
+
+#include <fiff/fiff_evoked.h>
+#include <fiff/fiff.h>
+
+#include <mne/mne.h>
+#include <inv/inv_source_estimate.h>
+
+#include <inv/rap_music/inv_rap_music.h>
+
+#include <disp3D/view/brainview.h>
+#include <disp3D/model/braintreemodel.h>
+
+#include <utils/generics/mne_logger.h>
+
+#include <iostream>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QApplication>
+#include <QCommandLineParser>
+#include <QDir>
+#include <QVector3D>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MNELIB;
+using namespace FSLIB;
+using namespace FIFFLIB;
+using namespace INVLIB;
+using namespace UTILSLIB;
+
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * The function main marks the entry point of the program.
+ * By default, main has the storage class extern.
+ *
+ * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+ * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+ * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+ */
+int main(int argc, char *argv[])
+{
+    #ifdef STATICBUILD
+    // Q_INIT_RESOURCE(mne_disp3d);
+    #endif
+
+    qInstallMessageHandler(MNELogger::customLogWriter);
+    QApplication a(argc, argv);
+
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Compute Inverse Rap Music Example");
+    parser.addHelpOption();
+    QCommandLineOption fwdFileOption("fwd", "Path to the forward solution <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption subjectDirectoryOption("subjDir", "Path to subject <directory>.", "directory", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
+    QCommandLineOption subjectOption("subj", "Selected <subject>.", "subject", "sample");
+    QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");//"InvRapMusic.stc");
+    QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.", "doMovie", "false");
+    QCommandLineOption annotOption("annotType", "FsAnnotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "1");
+    QCommandLineOption surfOption("surfType", "FsSurface type <type>.", "type", "orig");
+
+    parser.addOption(fwdFileOption);
+    parser.addOption(evokedFileOption);
+    parser.addOption(subjectDirectoryOption);
+    parser.addOption(subjectOption);
+    parser.addOption(stcFileOption);
+    parser.addOption(annotOption);
+    parser.addOption(numDipolePairsOption);
+    parser.addOption(surfOption);
+    parser.process(a);
+
+    //Load data
+    QFile t_fileFwd(parser.value(fwdFileOption));
+    QFile t_fileEvoked(parser.value(evokedFileOption));
+    QString subject(parser.value(subjectOption));
+    QString subjectDir(parser.value(subjectDirectoryOption));
+
+    FsAnnotationSet t_annotationSet(subject, 2, parser.value(annotOption), subjectDir);
+    FsSurfaceSet t_surfSet(subject, 2, parser.value(surfOption), subjectDir);
+
+    QString t_sFileNameStc(parser.value(stcFileOption));
+
+    qint32 numDipolePairs = parser.value(numDipolePairsOption).toInt();
+
+    bool doMovie = false;
+    if(parser.value(doMovieOption) == "false" || parser.value(doMovieOption) == "0") {
+        doMovie = false;
+    } else if(parser.value(doMovieOption) == "true" || parser.value(doMovieOption) == "1") {
+        doMovie = true;
+    }
+
+    qDebug() << "Start calculation with stc:" << t_sFileNameStc;
+
+    // Load data
+    fiff_int_t setno = 1;
+    QPair<float, float> baseline(-1.0f, -1.0f);
+    FiffEvoked evoked(t_fileEvoked, setno, baseline);
+    if(evoked.isEmpty())
+        return 1;
+
+    std::cout << "evoked first " << evoked.first << "; last " << evoked.last << std::endl;
+
+    MNEForwardSolution t_Fwd(t_fileFwd);
+    if(t_Fwd.isEmpty())
+        return 1;
+
+    QStringList ch_sel_names = t_Fwd.info.ch_names;
+    FiffEvoked pickedEvoked = evoked.pick_channels(ch_sel_names);
+
+    //
+    // Cluster forward solution;
+    //
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
+
+//    std::cout << "Size " << t_clusteredFwd.sol->data.rows() << " x " << t_clusteredFwd.sol->data.cols() << std::endl;
+//    std::cout << "Clustered Fwd:\n" << t_clusteredFwd.sol->data.row(0) << std::endl;
+
+    InvRapMusic t_rapMusic(t_clusteredFwd, false, numDipolePairs);
+
+    int iWinSize = 200;
+    if(doMovie) {
+        t_rapMusic.setStcAttr(iWinSize, 0.6f);
+    }
+
+    InvSourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
+
+    if(doMovie) {
+        //Select only the activations once
+        MatrixXd dataPicked(sourceEstimate.data.rows(), int(std::floor(sourceEstimate.data.cols()/iWinSize)));
+
+        for(int i = 0; i < dataPicked.cols(); ++i) {
+            dataPicked.col(i) = sourceEstimate.data.col(i*iWinSize);
+        }
+
+        sourceEstimate.data = dataPicked;
+    }
+
+    //Select only the activations once
+    MatrixXd dataPicked(sourceEstimate.data.rows(), int(std::floor(sourceEstimate.data.cols()/iWinSize)));
+
+    for(int i = 0; i < dataPicked.cols(); ++i) {
+        dataPicked.col(i) = sourceEstimate.data.col(i*iWinSize);
+    }
+
+    sourceEstimate.data = dataPicked;
+
+    if(sourceEstimate.isEmpty())
+        return 1;
+
+    // Write source estimate to temp files for visualization
+    int nVertLh = t_clusteredFwd.src[0].nuse;
+    InvSourceEstimate stcLh, stcRh;
+    stcLh.data = sourceEstimate.data.topRows(nVertLh);
+    stcLh.vertices = sourceEstimate.vertices.head(nVertLh);
+    stcLh.tmin = sourceEstimate.tmin;
+    stcLh.tstep = sourceEstimate.tstep;
+    stcLh.times = sourceEstimate.times;
+    stcRh.data = sourceEstimate.data.bottomRows(sourceEstimate.data.rows() - nVertLh);
+    stcRh.vertices = sourceEstimate.vertices.tail(sourceEstimate.vertices.size() - nVertLh);
+    stcRh.tmin = sourceEstimate.tmin;
+    stcRh.tstep = sourceEstimate.tstep;
+    stcRh.times = sourceEstimate.times;
+
+    QString tmpDir = QDir::tempPath();
+    QString lhStcPath = tmpDir + "/mnecpp_inverse_rap_music-lh.stc";
+    QString rhStcPath = tmpDir + "/mnecpp_inverse_rap_music-rh.stc";
+    QFile lhStcFile(lhStcPath);
+    stcLh.write(lhStcFile);
+    QFile rhStcFile(rhStcPath);
+    stcRh.write(rhStcFile);
+
+    BrainView *pBrainView = new BrainView();
+    BrainTreeModel *pModel = new BrainTreeModel();
+    pBrainView->setModel(pModel);
+
+    for (auto it = t_surfSet.data().constBegin(); it != t_surfSet.data().constEnd(); ++it) {
+        int hIdx = it.key();
+        QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
+        QString surfType = it.value().surf().isEmpty() ? "inflated" : it.value().surf();
+        pModel->addSurface(parser.value(subjectOption), hemi, surfType, it.value());
+        if (t_annotationSet.size() > hIdx)
+            pModel->addAnnotation(parser.value(subjectOption), hemi, t_annotationSet[hIdx]);
+    }
+
+    QObject::connect(pBrainView, &BrainView::sourceEstimateLoaded, [&](int /*nTimePoints*/) {
+        pBrainView->setSourceColormap("Hot");
+        pBrainView->setSourceThresholds(0.01f, 0.5f, 1.0f);
+        pBrainView->setRealtimeLooping(true);
+        pBrainView->setRealtimeInterval(17);
+        pBrainView->startRealtimeStreaming();
+    });
+    pBrainView->loadSourceEstimate(lhStcPath, rhStcPath);
+
+    if(!t_sFileNameStc.isEmpty())
+    {
+        QFile t_fileClusteredStc(t_sFileNameStc);
+        sourceEstimate.write(t_fileClusteredStc);
+    }
+
+    pBrainView->show();
+
+    return a.exec();
+}
+```

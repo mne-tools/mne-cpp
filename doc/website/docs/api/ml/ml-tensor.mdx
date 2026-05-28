@@ -1,0 +1,277 @@
+---
+id: ml-tensor
+title: "MLLIB::MlTensor"
+sidebar_label: MlTensor
+sidebar_position: 1
+---
+
+# MlTensor
+
+`#include <ml/ml_tensor.h>`
+
+```cpp
+class MLLIB::MlTensor
+```
+
+N-dimensional row-major float32 tensor with shared-buffer storage, Eigen Map accessors and a non-owning view mode.
+
+The shape is an arbitrary `std::vector<int64_t>` (matching ONNX Runtime), the buffer is a reference-counted `std::vector<float>` (or external memory in view mode), and copy / reshape / slice all stay O(1) by sharing the underlying storage. Eigen Map accessors give in-place row-major views of 2-D tensors; `toMatrixXf` / `toMatrixXd` produce column-major Eigen copies for code that needs the native Eigen layout.
+
+---
+
+## Public Methods
+
+### MlTensor()
+
+Default constructor – creates an empty 0-element tensor with shape \{\}.
+
+---
+
+### MlTensor(data, shape)
+
+Construct from a moved data buffer and an arbitrary shape.
+
+The buffer size must equal the product of shape elements.
+
+**Parameters:**
+
+- **data** : *std::vector&lt; float &gt; &&*
+  Flat float32 buffer (row-major order). Moved in.
+
+- **shape** : *std::vector&lt; int64_t &gt;*
+  Dimension sizes (e.g. \{batch, seq, features\}).
+
+---
+
+### MlTensor(data, shape)
+
+Construct by copying from a raw pointer and a shape.
+
+**Parameters:**
+
+- **data** : *const float **
+  Pointer to contiguous float32 data (row-major).
+
+- **shape** : *std::vector&lt; int64_t &gt;*
+  Dimension sizes.
+
+---
+
+### MlTensor(mat)
+
+Construct from an Eigen column-major MatrixXf.
+
+The data is copied and transposed into row-major layout. Shape is set to \{rows, cols\}.
+
+**Parameters:**
+
+- **mat** : *const Eigen::MatrixXf &*
+  Source matrix (column-major).
+
+---
+
+### MlTensor(mat)
+
+Construct from an Eigen column-major MatrixXd.
+
+The data is cast to float32 and stored in row-major layout. Shape is set to \{rows, cols\}.
+
+**Parameters:**
+
+- **mat** : *const Eigen::MatrixXd &*
+  Source matrix (column-major, double precision).
+
+---
+
+### ndim()
+
+**Returns:**
+
+- *int* — Number of dimensions.
+
+---
+
+### size()
+
+**Returns:**
+
+- *int64_t* — Total number of elements (product of all dimensions).
+
+---
+
+### shape()
+
+**Returns:**
+
+- *const std::vector&lt; int64_t &gt; &* — Const reference to the full shape vector.
+
+---
+
+### shape(dim)
+
+**Parameters:**
+
+- **dim** : *int*
+  Dimension index (negative indices count from the end).
+
+**Returns:**
+
+- *int64_t* — Size of the requested dimension.
+
+---
+
+### rows()
+
+2-D convenience — equivalent to shape(0).
+
+Asserts ndim &gt;= 1.
+
+**Returns:**
+
+- *int* — Number of rows.
+
+---
+
+### cols()
+
+2-D convenience — equivalent to shape(1).
+
+Asserts ndim &gt;= 2.
+
+**Returns:**
+
+- *int* — Number of columns.
+
+---
+
+### data()
+
+**Returns:**
+
+- *float ** — Mutable pointer to the contiguous float32 buffer.
+
+---
+
+### data()
+
+**Returns:**
+
+- *const float ** — Const pointer to the contiguous float32 buffer.
+
+---
+
+### matrix()
+
+Mutable row-major Eigen::Map for 2-D tensors.
+
+Asserts ndim == 2.
+
+**Returns:**
+
+- *RowMajorMatrixMap* — Row-major mutable Map.
+
+---
+
+### matrix()
+
+Const row-major Eigen::Map for 2-D tensors.
+
+Asserts ndim == 2.
+
+**Returns:**
+
+- *ConstRowMajorMatrixMap* — Row-major const Map.
+
+---
+
+### toMatrixXf()
+
+**Returns:**
+
+- *Eigen::MatrixXf* — Column-major float copy of the 2-D data. Asserts ndim == 2.
+
+---
+
+### toMatrixXd()
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Column-major double copy of the 2-D data. Asserts ndim == 2.
+
+---
+
+### reshape(newShape)
+
+Return a tensor that shares the same storage but has a different shape.
+
+The total element count must be unchanged. If this tensor owns its data the result shares ownership (reference-counted). If this tensor is a view, the result is also a view into the same external buffer.
+
+**Parameters:**
+
+- **newShape** : *std::vector&lt; int64_t &gt;*
+  New shape (product must equal `size()`).
+
+**Returns:**
+
+- *MlTensor* — Reshaped tensor (zero-copy).
+
+---
+
+### isView()
+
+**Returns:**
+
+- *bool* — True if this tensor does not own its data buffer.
+
+---
+
+### empty()
+
+**Returns:**
+
+- *bool* — True if the tensor contains zero elements.
+
+---
+
+## Static Methods
+
+### view(data, shape)
+
+Create a non-owning view over external mutable memory.
+
+The caller is responsible for keeping the buffer alive for the lifetime of this tensor (and any copies / reshapes derived from it).
+
+**Parameters:**
+
+- **data** : *float **
+  Pointer to external float32 data (row-major).
+
+- **shape** : *std::vector&lt; int64_t &gt;*
+  Dimension sizes.
+
+**Returns:**
+
+- *MlTensor* — A non-owning `MlTensor`.
+
+---
+
+### fromBuffer(data, rows, cols)
+
+Copy raw data into a new owning tensor (legacy 2-D helper).
+
+**Parameters:**
+
+- **data** : *const float **
+  Pointer to row-major float data.
+
+- **rows** : *int*
+  Number of rows.
+
+- **cols** : *int*
+  Number of columns.
+
+**Returns:**
+
+- *MlTensor* — Newly constructed tensor with shape \{rows, cols\}.
+
+---

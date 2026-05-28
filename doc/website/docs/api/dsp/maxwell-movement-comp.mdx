@@ -1,0 +1,100 @@
+---
+id: maxwell-movement-comp
+title: "UTILSLIB::MaxwellMovementComp"
+sidebar_label: MaxwellMovementComp
+sidebar_position: 17
+---
+
+# MaxwellMovementComp
+
+:::info[Python equivalent]
+`mne.preprocessing.maxwell_filter (head_pos)` in MNE-Python.
+:::
+
+`#include <dsp/maxwell_movement_comp.h>`
+
+```cpp
+class UTILSLIB::MaxwellMovementComp
+```
+
+Maxwell movement compensation using SSS.
+
+Usage: 
+```cpp
+QList<HeadPosEntry> headPos = ...; // from cHPI fitting
+MaxwellMoveCompParams params;
+Eigen::MatrixXd compensated = MaxwellMovementComp::apply(
+    matData, fiffInfo, headPos, params);
+```
+
+---
+
+## Static Methods
+
+### apply(matData, fiffInfo, headPos, dSFreq, params)
+
+Apply movement compensation via SSS.
+
+For each time segment (defined by headPos entries), the data is:
+Projected into SSS multipole space using the actual head position.
+
+
+Reconstructed at the reference head position.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Full sensor data (n_channels × n_samples).
+
+- **fiffInfo** : *const FIFFLIB::FiffInfo &*
+  Measurement info (channel positions, etc.).
+
+- **headPos** : *const QList&lt; HeadPosEntry &gt; &*
+  Head positions over time (from cHPI).
+
+- **dSFreq** : *double*
+  Sampling frequency (Hz).
+
+- **params** : *const MaxwellMoveCompParams &*
+  Compensation parameters.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Movement-compensated data (n_channels × n_samples).
+
+---
+
+### readHeadPos(sPath)
+
+Read head positions from a file.
+
+File format: whitespace-separated columns per line: time q1 q2 q3 tx ty tz gof
+
+**Parameters:**
+
+- **sPath** : *const QString &*
+  Path to head position file.
+
+**Returns:**
+
+- *QList&lt; HeadPosEntry &gt;* — List of head position entries.
+
+---
+
+### writeHeadPos(sPath, headPos)
+
+Write head positions to a file.
+
+**Parameters:**
+
+- **sPath** : *const QString &*
+  Output file path.
+
+- **headPos** : *const QList&lt; HeadPosEntry &gt; &*
+  Head positions to write.
+
+**Returns:**
+
+- *bool* — true if successful.
+
+---

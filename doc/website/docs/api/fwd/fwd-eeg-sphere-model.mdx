@@ -1,0 +1,503 @@
+---
+id: fwd-eeg-sphere-model
+title: "FWDLIB::FwdEegSphereModel"
+sidebar_label: FwdEegSphereModel
+sidebar_position: 3
+---
+
+# FwdEegSphereModel
+
+:::info[Python equivalent]
+`mne.make_sphere_model` in MNE-Python.
+:::
+
+`#include <fwd/fwd_eeg_sphere_model.h>`
+
+```cpp
+class FWDLIB::FwdEegSphereModel
+```
+
+Implements `FwdEegSphereModel` (replaces `fwdEegSphereModel` / `fwdEegSphereModelRec` from MNE-C ``fwd_types.h``).
+
+Multi-shell concentric-sphere head model holding the Berg-Scherg equivalent-source parameters that accelerate the de Munck Legendre series for EEG, plus the Sarvas closed-form coefficients used for the spherically-symmetric MEG forward solution.
+
+---
+
+## Public Methods
+
+### FwdEegSphereModel()
+
+Constructs the Forward EEG Sphere Model.
+
+---
+
+### FwdEegSphereModel(p_FwdEegSphereModel)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FwdEegSphereModel** : *const FwdEegSphereModel &*
+  Forward EEG Sphere Model which should be copied.
+
+---
+
+### ~FwdEegSphereModel()
+
+Destroys the Electric Current Dipole description.
+
+---
+
+### fwd_eeg_get_multi_sphere_model_coeff(n)
+
+fwd_multi_spherepot.c Get the model depended weighting factor for n
+
+**Parameters:**
+
+- **n** : *int*
+  coefficient to which the expansion shopuld be calculated.
+
+**Returns:**
+
+- *double* — the weighting factor for n.
+
+---
+
+### fwd_setup_eeg_sphere_model(rad, fit_berg_scherg, nfit)
+
+fwd_eeg_sphere_models.c
+
+Setup the EEG sphere model calculations
+
+**Parameters:**
+
+- **rad.**
+
+- **fit_berg_scherg** : *bool*
+  If Fit Berg Scherg should be performed.
+
+- **nfit.**
+
+**Returns:**
+
+- *bool* — True when setup was successful, false otherwise.
+
+---
+
+### fwd_eeg_fit_berg_scherg(nterms, nfit, rv)
+
+Fit Berg-Scherg equivalent spherical model parameters (mu and lambda) by minimizing the difference between actual and approximated series expansions using simplex optimization.
+
+On success, updates the internal mu and lambda member vectors.
+
+**Parameters:**
+
+- **nterms** : *int*
+  Number of terms in the series expansion.
+
+- **nfit** : *int*
+  Number of equivalent dipoles to fit (must be &gt;= 2).
+
+- **rv** : *float &*
+  Relative variance of the final fit.
+
+**Returns:**
+
+- *bool* — true if fitting succeeded, false otherwise. Number of layers.
+
+---
+
+### nlayer()
+
+---
+
+## Static Methods
+
+### fwd_create_eeg_sphere_model(name, nlayer, rads, sigmas)
+
+Create a new multi-layer EEG sphere model structure.
+
+Sorts layers by radius and scales radii relative to the outermost layer.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Textual identifier for the model.
+
+- **nlayer** : *int*
+  Number of concentric spherical layers.
+
+- **rads** : *const Eigen::VectorXf &*
+  Radius values for each layer.
+
+- **sigmas** : *const Eigen::VectorXf &*
+  Conductivity values for each layer.
+
+**Returns:**
+
+- *FwdEegSphereModel::UPtr* — Pointer to the newly created sphere model.
+
+---
+
+### setup_eeg_sphere_model(eeg_model_file, eeg_model_name, eeg_sphere_rad)
+
+Set up the desired sphere model for EEG.
+
+**Parameters:**
+
+- **eeg_model_file** : *const QString &*
+  Contains the model specifications.
+
+- **eeg_model_name** : *QString*
+  Name of the model to use.
+
+- **eeg_sphere_rad** : *float*
+  Outer surface radius.
+
+**Returns:**
+
+- *FwdEegSphereModel::UPtr* — the setup eeg sphere model.
+
+---
+
+### new_fit_user(nfit, nterms)
+
+Allocate and initialize a fitting workspace for Berg-Scherg parameter estimation.
+
+**Parameters:**
+
+- **nfit** : *int*
+  Number of equivalent dipoles to fit.
+
+- **nterms** : *int*
+  Number of terms in the series expansion.
+
+**Returns:**
+
+- *fitUser* — Pointer to the initialized fitting data structure.
+
+---
+
+### next_legen(n, x, p0, p01, p1, p11)
+
+Compute the next Legendre polynomials of the first and second kind using a recursion formula.
+
+Self-initializes for n = 0 and n = 1.
+
+**Parameters:**
+
+- **n** : *int*
+  Order of the Legendre polynomial.
+
+- **x** : *double*
+  Evaluation point (cosine of the angle).
+
+- **p0** : *double &*
+  Legendre polynomial of the first kind.
+
+- **p01** : *double &*
+  Previous value of p0.
+
+- **p1** : *double &*
+  Legendre polynomial of the second kind.
+
+- **p11** : *double &*
+  Previous value of p1.
+
+---
+
+### calc_pot_components(beta, cgamma, Vrp, Vtp, fn, nterms)
+
+Calculate the radial and tangential potential components for a dipole in a layered sphere model using a Legendre polynomial series expansion.
+
+**Parameters:**
+
+- **beta** : *double*
+  Ratio of dipole distance to field point distance.
+
+- **cgamma** : *double*
+  Cosine of the angle between dipole and field point vectors.
+
+- **Vrp** : *double &*
+  Radial component of the potential.
+
+- **Vtp** : *double &*
+  Tangential component of the potential.
+
+- **fn** : *const Eigen::VectorXd &*
+  Pre-computed expansion coefficients.
+
+- **nterms** : *int*
+  Maximum number of terms in the series.
+
+---
+
+### fwd_eeg_multi_spherepot(rd, Q, el, neeg, Vval, client)
+
+Compute EEG potentials at multiple electrodes for a current dipole in a multi-layer spherical head model.
+
+Based on the formulas in Zhang (1995) and Mosher et al. (1996).
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole moment.
+
+- **el** : *const Eigen::Matrix&lt; float, Eigen::Dynamic, 3, Eigen::RowMajor &gt; &*
+  Electrode positions (neeg x 3).
+
+- **neeg** : *int*
+  Number of electrodes.
+
+- **Vval** : *Eigen::VectorXf &*
+  Computed potential values at each electrode.
+
+- **client** : *void **
+  Pointer to the `FwdEegSphereModel`.
+
+**Returns:**
+
+- *int* — OK on success, FAIL otherwise.
+
+---
+
+### fwd_eeg_multi_spherepot_coil1(rd, Q, els, Vval, client)
+
+Calculate EEG potentials at compound electrodes (coils) by summing weighted contributions from individual integration points.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole moment.
+
+- **els** : *FwdCoilSet &*
+  Set of coils/electrodes.
+
+- **Vval** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Computed potentials (one per coil).
+
+- **client** : *void **
+  Pointer to the `FwdEegSphereModel`.
+
+**Returns:**
+
+- *int* — OK on success, FAIL otherwise.
+
+---
+
+### fwd_eeg_spherepot_vec(rd, el, neeg, Vval_vec, client)
+
+Compute the electric potentials in a set of electrodes in spherically Symmetric head model.
+
+This routine calculates the fields for all dipole directions.
+
+The code is based on the formulas presented in
+
+J.C. Moscher, R.M. Leahy, and P.S. Lewis, Matrix Kernels for Modeling of EEG and MEG Data, Los Alamos Technical Report, LA-UR-96-1993, 1996.
+
+This routine uses the acceleration with help of equivalent sources in the homogeneous sphere.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **el** : *const Eigen::Matrix&lt; float, Eigen::Dynamic, 3, Eigen::RowMajor &gt; &*
+  Electrode positions.
+
+- **neeg** : *int*
+  Number of electrodes.
+
+- **Vval_vec** : *Eigen::MatrixXf &*
+  The potential values Vval_vec[0][k] potentials given by Q = (1.0,0.0,0.0) at electrode k; Vval_vec[1][k] potentials given by Q = (0.0,1.0,0.0) at electrode k; Vval_vec[2][k] potentials given by Q = (0.0,0.0,1.0) at electrode k.
+
+**Returns:**
+
+- *bool* — true when successful.
+
+---
+
+### fwd_eeg_spherepot_coil_vec(rd, els, Vval_vec, client)
+
+fwd_multi_spherepot.c
+
+Calculate the EEG in the sphere model using the fwdCoilSet structure MEG channels are skipped
+
+This routine uses the acceleration with help of equivalent sources in the homogeneous sphere.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **els** : *FwdCoilSet &*
+  Electrode positions.
+
+- **Vval_vec** : *Eigen::Ref&lt; Eigen::MatrixXf &gt;*
+  The potential values; Vval_vec[0][k] potentials given by Q = (1.0,0.0,0.0) at electrode k; Vval_vec[1][k] potentials given by Q = (0.0,1.0,0.0) at electrode k; Vval_vec[2][k] potentials given by Q = (0.0,0.0,1.0) at electrode k.
+
+- **client.**
+
+**Returns:**
+
+- *int* — true when successful.
+
+---
+
+### fwd_eeg_spherepot_grad_coil(rd, Q, coils, Vval, xgrad, ygrad, zgrad, client)
+
+Compute potentials and spatial gradients of the potential field at coils using finite differences.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole moment.
+
+- **coils** : *FwdCoilSet &*
+  Set of coils/electrodes.
+
+- **Vval** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Computed potentials (one per coil).
+
+- **xgrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to x dipole coordinate.
+
+- **ygrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to y dipole coordinate.
+
+- **zgrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Gradient with respect to z dipole coordinate.
+
+- **client** : *void **
+  Pointer to the `FwdEegSphereModel`.
+
+**Returns:**
+
+- *int* — OK on success, FAIL otherwise.
+
+---
+
+### fwd_eeg_spherepot(rd, Q, el, neeg, Vval, client)
+
+fwd_multi_spherepot.c
+
+This routine calculates the potentials for a specific dipole direction
+
+This routine uses the acceleration with help of equivalent sources in the homogeneous sphere.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole moment.
+
+- **el** : *const Eigen::Matrix&lt; float, Eigen::Dynamic, 3, Eigen::RowMajor &gt; &*
+  Electrode positions.
+
+- **neeg** : *int*
+  Number of electrodes.
+
+- **Vval** : *Eigen::VectorXf &*
+  The potential values.
+
+- **client.**
+
+**Returns:**
+
+- *int* — true when successful.
+
+---
+
+### fwd_eeg_spherepot_coil(rd, Q, els, Vval, client)
+
+fwd_multi_spherepot.c
+
+Calculate the EEG in the sphere model using the megCoil structure MEG channels are skipped
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position.
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole moment.
+
+- **els** : *FwdCoilSet &*
+  Electrode positions.
+
+- **Vval** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  The potential values.
+
+- **client.**
+
+**Returns:**
+
+- *int* — true when successful.
+
+---
+
+### compose_linear_fitting_data(mu, u)
+
+Build the data matrix and target vector for the linear part of the Berg-Scherg parameter fit.
+
+**Parameters:**
+
+- **mu** : *const Eigen::VectorXd &*
+  Distance multipliers for the equivalent dipoles.
+
+- **u** : *fitUser*
+  Fitting workspace (M and y are populated on output).
+
+---
+
+### compute_linear_parameters(mu, lambda, u)
+
+Solve for the optimal lambda (dipole magnitude) parameters given fixed mu values using SVD.
+
+Returns the relative variance goodness-of-fit metric.
+
+**Parameters:**
+
+- **mu** : *const Eigen::VectorXd &*
+  Distance multipliers for the equivalent dipoles.
+
+- **lambda** : *Eigen::VectorXd &*
+  Computed dipole magnitudes.
+
+- **u** : *fitUser*
+  Fitting workspace.
+
+**Returns:**
+
+- *double* — Relative variance (0 = perfect fit, 1 = no fit).
+
+---
+
+### one_step(mu, user_data)
+
+Objective function for the simplex optimizer: evaluate the residual sum of squares for a given set of mu values.
+
+**Parameters:**
+
+- **mu** : *const Eigen::VectorXd &*
+  Distance multipliers to evaluate.
+
+- **user_data** : *const void **
+  Pointer to the fitUser workspace.
+
+**Returns:**
+
+- *double* — Sum of squared residuals; 1.0 if any mu exceeds +/-1.
+
+---

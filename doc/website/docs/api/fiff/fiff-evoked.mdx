@@ -1,0 +1,308 @@
+---
+id: fiff-evoked
+title: "FIFFLIB::FiffEvoked"
+sidebar_label: FiffEvoked
+sidebar_position: 4
+---
+
+# FiffEvoked
+
+:::info[Python equivalent]
+`mne.Evoked` in MNE-Python.
+:::
+
+`#include <fiff/fiff_evoked.h>`
+
+```cpp
+class FIFFLIB::FiffEvoked
+```
+
+Single averaged evoked response: time axis, data, baseline, channel info and averaging metadata.
+
+Holds one `FIFFB_EVOKED` block: `times`, `data`, `first` / `last` sample indices, `baseline`, `kind`, `nave`, `comment` and the `FiffInfo` describing the channels. Use `FiffEvokedSet` for recordings that contain multiple averaging conditions.
+
+---
+
+## Public Methods
+
+### FiffEvoked()
+
+Constructs a fiff evoked data.
+
+---
+
+### FiffEvoked(p_IODevice, setno, t_baseline, proj, p_aspect_kind)
+
+Constructs fiff evoked data, by reading from a IO device.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  IO device to read from the evoked data set.
+
+- **setno** : *QVariant*
+  The set to pick. Dataset ID number (int) or comment/name (str). Optional if there isonly one data set in file.
+
+- **t_baseline** : *QPair&lt; float, float &gt;*
+  The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b). the interval is between "a (s)" and "b (s)". If a is None the beginning of the data is used and if b is None then b is set to the end of the interval. If baseline is equal ot (None, None) all the time interval is used. If None, no correction is applied.
+
+- **proj** : *bool*
+  Apply SSP projection vectors (optional, default = true).
+
+- **p_aspect_kind** : *fiff_int_t*
+  Either "FIFFV_ASPECT_AVERAGE" or "FIFFV_ASPECT_STD_ERR". The type of data to read. Only used if "setno" is a str.
+
+---
+
+### FiffEvoked(p_FiffEvoked)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FiffEvoked** : *const FiffEvoked &*
+  `Fiff` evoked data which should be copied.
+
+---
+
+### ~FiffEvoked()
+
+Destroys the `FiffEvoked`.
+
+---
+
+### ch_names()
+
+Returns list of channel names stored in fiff info -&gt; this is to stay consistent with python.
+
+**Returns:**
+
+- *QStringList* — List of channel names.
+
+---
+
+### clear()
+
+Initializes fiff evoked data.
+
+---
+
+### aspectKindToString()
+
+Provides the python Evoked string formatted aspect_kind, which is stored in kind: "average" &lt;-&gt; FIFFV_ASPECT_AVERAGE, "standard_error" &lt;-&gt; FIFFV_ASPECT_STD_ERR or "unknown".
+
+**Returns:**
+
+- *QString* — string formatted aspect_kind.
+
+---
+
+### isEmpty()
+
+Returns whether `FiffEvoked` is empty.
+
+**Returns:**
+
+- *bool* — true if is empty, false otherwise.
+
+---
+
+### pick_channels(include, exclude)
+
+fiff_pick_channels_evoked
+
+Pick desired channels from evoked-response data
+
+**Parameters:**
+
+- **include** : *const QStringList &*
+  - Channels to include (if empty, include all available).
+
+- **exclude** : *const QStringList &*
+  - Channels to exclude (if empty, do not exclude any).
+
+**Returns:**
+
+- *FiffEvoked* — the desired fiff evoked data.
+
+---
+
+### setInfo(p_info, proj)
+
+Set a new fiff measurement info.
+
+**Parameters:**
+
+- **p_info** : *const FiffInfo &*
+  Info to set.
+
+- **proj** : *bool*
+  Apply SSP projection vectors (optional, default = true).
+
+---
+
+### operator+=(newData)
+
+Inputs a new data set and recalculates the average.
+
+This function also iterates the nave parameter by one.
+
+**Parameters:**
+
+- **newData** : *const Eigen::MatrixXd &*
+  the new data set which is to be added to the current average.
+
+**Returns:**
+
+- *FiffEvoked &* — the updated `FiffEvoked`.
+
+---
+
+### applyBaselineCorrection(p_baseline)
+
+Applies baseline correction to the evoked data.
+
+**Parameters:**
+
+- **p_baseline** : *QPair&lt; float, float &gt; &*
+  time definition of the baseline in seconds [from, to].
+
+---
+
+## Static Methods
+
+### read(p_IODevice, p_FiffEvoked, setno, t_baseline, proj, p_aspect_kind)
+
+fiff_read_evoked
+
+Wrapper for the FiffEvokedDataSet::read_evoked static function
+
+Read one evoked data set
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  An fiff IO device like a fiff QFile or QTCPSocket.
+
+- **p_FiffEvoked** : *FiffEvoked &*
+  The read evoked data.
+
+- **setno** : *QVariant*
+  the set to pick. Dataset ID number (int) or comment/name (str). Optional if there isonly one data set in file.
+
+- **t_baseline** : *QPair&lt; float, float &gt;*
+  The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b). the interval is between "a (s)" and "b (s)". If a is None the beginning of the data is used and if b is None then b is set to the end of the interval. If baseline is equal ot (None, None) all the time interval is used. If None, no correction is applied.
+
+- **proj** : *bool*
+  Apply SSP projection vectors (optional, default = true).
+
+- **p_aspect_kind** : *fiff_int_t*
+  Either "FIFFV_ASPECT_AVERAGE" or "FIFFV_ASPECT_STD_ERR". The type of data to read. Only used if "setno" is a str.
+
+**Returns:**
+
+- *bool* — true if successful, false otherwise.
+
+---
+
+## Example
+
+Source: [`src/examples/ex_read_evoked/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_read_evoked/main.cpp)
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <math.h>
+
+#include <fiff/fiff.h>
+#include <mne/mne.h>
+#include <utils/generics/mne_logger.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtCore/QCoreApplication>
+#include <QCommandLineParser>
+#include <QFile>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FIFFLIB;
+using namespace MNELIB;
+using namespace UTILSLIB;
+
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * The function main marks the entry point of the program.
+ * By default, main has the storage class extern.
+ *
+ * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+ * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+ * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+ */
+int main(int argc, char *argv[])
+{
+    qInstallMessageHandler(MNELogger::customLogWriter);
+    QCoreApplication a(argc, argv);
+
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Read Evoked Example");
+    parser.addHelpOption();
+
+    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "2");
+    QCommandLineOption useCTFCompOption("useCTFComp", "Use the CTF compensator, if available.");
+
+    parser.addOption(evokedFileOption);
+    parser.addOption(evokedIdxOption);
+
+    parser.process(a);
+
+    //generate FiffEvoked object
+    QFile t_sampleFile(parser.value(evokedFileOption));
+    FiffEvoked p_FiffEvoked(t_sampleFile,QVariant(parser.value(evokedIdxOption)));
+
+    //Select the head coordinate system
+    bool use_ctf_head = parser.isSet(useCTFCompOption);
+    FiffCoordTrans meg_trans;
+
+    if(use_ctf_head) {
+        if(p_FiffEvoked.info.ctf_head_t.isEmpty())
+           std::cout << "\nNo CTF head transformation available" << std::endl;
+        else {
+            meg_trans = p_FiffEvoked.info.dev_ctf_t;
+            FiffCoordTrans eeg_trans(meg_trans);
+            eeg_trans.invert_transform();
+            std::cout << "Employing the CTF/4D head coordinate system\n" << std::endl;
+        }
+    }
+    else {
+        meg_trans = p_FiffEvoked.info.dev_head_t;
+        FiffCoordTrans eeg_trans;
+        std::cout << "Employing the Neuromag head coordinate system\n" << std::endl;
+    }
+
+    //Transform coil and electrode locations to the desired coordinate frame
+    //ToDo: MATLAB root fct fiff_transform_meg_chs and fiff_transform_eeg_chs needs to be implemented
+
+    //Create the coil definitions
+    //ToDo: MATLAB root fct mne_add_coil_defs needs to be implemented
+
+    //N.B. If a nonstandard (in MNE sense) coil def file is used, do
+    //ToDo: MATLAB root fct mne_load_coil_def, mne_add_coil_defs needs to be implemented
+
+    return a.exec();
+}
+
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
+```

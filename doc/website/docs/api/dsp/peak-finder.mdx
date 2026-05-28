@@ -1,0 +1,89 @@
+---
+id: peak-finder
+title: "PeakFinder"
+sidebar_label: PeakFinder
+sidebar_position: 19
+---
+
+# PeakFinder
+
+:::info[Module]
+This page documents a **header-level module** — a collection of free
+functions that share an algorithmic topic. There is no enclosing C++
+class; the functions live directly in the library namespace.
+:::
+
+:::info[Python equivalent]
+`mne.preprocessing.peak_finder` in MNE-Python.
+:::
+
+`#include <dsp/peak_finder.h>`
+
+SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors Christoph Dinh [christoph.dinh@mne-cpp.org](mailto:christoph.dinh@mne-cpp.org).
+
+A peak is defined as a sample that is strictly larger than its two direct neighbours. The basic detector locates every such sample in linear time; three classical post-filters then prune the candidate list:
+a minimum height (absolute amplitude floor),
+
+
+a minimum inter-peak distance in samples (suppressing close-by peaks by retaining only the tallest within the exclusion window), and
+
+
+a minimum topographic prominence — the height by which a peak rises above the higher of the two adjacent valleys, computed in the same way as `scipy.signal.peak_prominences`.
+
+The API mirrors `scipy.signal.find_peaks` closely so MEG/EEG analysis pipelines that already rely on SciPy semantics (cHPI peak picking, ECG R-wave detection, event onset extraction) port to mne-cpp without behavioural drift.
+
+---
+
+## Functions
+
+### peakFinder(data, params)
+
+```cpp
+QList< QPair< int, double > > peakFinder(const Eigen::VectorXd & data, const PeakFinderParams & params);
+```
+
+Find peaks in a 1D signal.
+
+A peak is a sample that is strictly greater than both its neighbours. Additional filtering by height, distance, and prominence can be applied.
+
+**Parameters:**
+
+- **data** : *const Eigen::VectorXd &*
+  1D signal (row vector or VectorXd).
+
+- **params** : *const PeakFinderParams &*
+  Peak detection parameters.
+
+**Returns:**
+
+- *QList&lt; QPair&lt; int, double &gt; &gt;* — List of (peak_index, peak_value) pairs, sorted by index.
+
+---
+
+### peakProminences(data, peakIndices)
+
+```cpp
+Eigen::VectorXd peakProminences(const Eigen::VectorXd & data, const QList< int > & peakIndices);
+```
+
+Compute prominence of each peak.
+
+Prominence is the vertical distance from a peak to the highest valley on either side before reaching a higher peak.
+
+**Parameters:**
+
+- **data** : *const Eigen::VectorXd &*
+  1D signal.
+
+- **peakIndices** : *const QList&lt; int &gt; &*
+  Indices of detected peaks.
+
+**Returns:**
+
+- *Eigen::VectorXd* — Prominence value for each peak.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

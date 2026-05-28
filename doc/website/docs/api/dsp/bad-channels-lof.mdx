@@ -1,0 +1,85 @@
+---
+id: bad-channels-lof
+title: "BadChannelsLof"
+sidebar_label: BadChannelsLof
+sidebar_position: 9
+---
+
+# BadChannelsLof
+
+:::info[Module]
+This page documents a **header-level module** — a collection of free
+functions that share an algorithmic topic. There is no enclosing C++
+class; the functions live directly in the library namespace.
+:::
+
+:::info[Python equivalent]
+`mne.preprocessing._lof` in MNE-Python.
+:::
+
+`#include <dsp/bad_channels_lof.h>`
+
+SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors Christoph Dinh [christoph.dinh@mne-cpp.org](mailto:christoph.dinh@mne-cpp.org).
+
+LOF (Breunig et al., SIGMOD 2000) scores each channel by the ratio between its own local density (reachability distance to its `k` nearest channels in the chosen feature space) and the average local density of those neighbours. Values close to 1 indicate a sample that belongs to a dense cluster, values noticeably above 1 mark density outliers. For MEG / EEG each channel is summarised by per-segment statistics (RMS, variance, higher-order moments) so that genuinely flat, very noisy or amplifier- saturated sensors stand out in the LOF score and can be flagged at a single threshold (default 2.0).
+
+The detector follows MNE-Python's `mne.preprocessing.find_bad_channels_lof` so MEG / EEG pipelines can switch between the two without changing the downstream interpolation / SSS step.
+
+---
+
+## Functions
+
+### findBadChannelsLof(data, info, params)
+
+```cpp
+QStringList findBadChannelsLof(const Eigen::MatrixXd & data, const FIFFLIB::FiffInfo & info, const LofBadChannelParams & params);
+```
+
+Detect bad channels using Local Outlier Factor (LOF).
+
+Computes features for each channel (standard deviation, kurtosis, max absolute amplitude) and applies the LOF algorithm to identify outlier channels. LOF compares the local density of a point's neighbourhood to the densities of its neighbours.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  Data matrix (n_channels x n_times).
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  FiffInfo with channel types.
+
+- **params** : *const LofBadChannelParams &*
+  LOF parameters.
+
+**Returns:**
+
+- *QStringList* — List of bad channel names.
+
+---
+
+### computeLofScores(features, k)
+
+```cpp
+Eigen::VectorXd computeLofScores(const Eigen::MatrixXd & features, int k);
+```
+
+Compute LOF scores for a feature matrix.
+
+Pure algorithmic LOF implementation operating on feature vectors.
+
+**Parameters:**
+
+- **features** : *const Eigen::MatrixXd &*
+  Feature matrix (n_points x n_features).
+
+- **k** : *int*
+  Number of neighbours.
+
+**Returns:**
+
+- *Eigen::VectorXd* — LOF score for each point (n_points x 1). Values &gt; 1 indicate outliers.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

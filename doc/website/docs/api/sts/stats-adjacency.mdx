@@ -1,0 +1,87 @@
+---
+id: stats-adjacency
+title: "STSLIB::StatsAdjacency"
+sidebar_label: StatsAdjacency
+sidebar_position: 3
+---
+
+# StatsAdjacency
+
+:::info[Python equivalent]
+`mne.stats.combine_adjacency` in MNE-Python.
+:::
+
+`#include <sts/sts_adjacency.h>`
+
+```cpp
+class STSLIB::StatsAdjacency
+```
+
+Adjacency matrix construction for spatial clustering.
+
+Builds the sparse spatial and spatio-temporal neighbourhood graphs that define cluster support for permutation tests.
+
+---
+
+## Static Methods
+
+### fromChannelPositions(info, picks)
+
+Build a spatial adjacency matrix from channel positions in FiffInfo.
+
+Uses a distance threshold of 3x the median nearest-neighbor distance.
+
+**Parameters:**
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  FiffInfo with channel positions.
+
+- **picks** : *const QStringList &*
+  Optional list of channel names to include. If empty, all channels are used.
+
+**Returns:**
+
+- *Eigen::SparseMatrix&lt; int &gt;* — Sparse adjacency matrix (symmetric, nChannels x nChannels).
+
+---
+
+### fromSourceSpace(tris, nVertices)
+
+Build a spatial adjacency matrix from a triangulated source space.
+
+**Parameters:**
+
+- **tris** : *const Eigen::MatrixX3i &*
+  Triangle definitions (nTris x 3, vertex indices).
+
+- **nVertices** : *int*
+  Total number of vertices.
+
+**Returns:**
+
+- *Eigen::SparseMatrix&lt; int &gt;* — Sparse adjacency matrix (symmetric, nVertices x nVertices).
+
+---
+
+### fromSourceSpaceTemporal(tris, nVertices, nTimes)
+
+Build a spatio-temporal adjacency matrix from a triangulated source space.
+
+Constructs a (nVertices*nTimes) x (nVertices*nTimes) adjacency matrix where spatial neighbors come from the triangle mesh and temporal neighbors connect each vertex to itself at t-1 and t+1. The linear index is vertex * nTimes + time.
+
+**Parameters:**
+
+- **tris** : *const Eigen::MatrixX3i &*
+  Triangle definitions (nTris x 3, vertex indices).
+
+- **nVertices** : *int*
+  Total number of vertices.
+
+- **nTimes** : *int*
+  Number of time points.
+
+**Returns:**
+
+- *Eigen::SparseMatrix&lt; int &gt;* — Sparse adjacency matrix (symmetric, nVertices*nTimes x nVertices*nTimes).
+
+---

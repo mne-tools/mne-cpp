@@ -1,0 +1,61 @@
+---
+id: bad-channels-maxwell
+title: "BadChannelsMaxwell"
+sidebar_label: BadChannelsMaxwell
+sidebar_position: 8
+---
+
+# BadChannelsMaxwell
+
+:::info[Module]
+This page documents a **header-level module** — a collection of free
+functions that share an algorithmic topic. There is no enclosing C++
+class; the functions live directly in the library namespace.
+:::
+
+:::info[Python equivalent]
+`mne.preprocessing.find_bad_channels_maxwell` in MNE-Python.
+:::
+
+`#include <dsp/bad_channels_maxwell.h>`
+
+SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors Christoph Dinh [christoph.dinh@mne-cpp.org](mailto:christoph.dinh@mne-cpp.org).
+
+Channels whose SSS reconstruction error is anomalously high are flagged as bad. This mirrors MNE-Python's mne.preprocessing.find_bad_channels_maxwell().
+
+Reference: Taulu, S., Kajola, M. (2005). J. Appl. Phys. 97, 124905.
+
+---
+
+## Functions
+
+### findBadChannelsMaxwell(matData, info, params)
+
+```cpp
+BadChannelsMaxwellResult findBadChannelsMaxwell(const Eigen::MatrixXd & matData, const FIFFLIB::FiffInfo & info, const BadChannelsMaxwellParams & params);
+```
+
+Detect bad MEG channels using SSS reconstruction residuals.
+
+Computes the SSS reconstruction of the data, then flags channels whose residual (difference between original and reconstructed) is anomalously large relative to the population of channels.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  MEG data (n_channels x n_times). Should include all channels (MEG and non-MEG).
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  Measurement info with channel positions.
+
+- **params** : *const BadChannelsMaxwellParams &*
+  Detection parameters.
+
+**Returns:**
+
+- *BadChannelsMaxwellResult* — Detection result with bad channel names, indices, residuals, z-scores.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

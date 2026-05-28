@@ -1,0 +1,87 @@
+---
+id: ml-model
+title: "MLLIB::MlModel"
+sidebar_label: MlModel
+sidebar_position: 2
+---
+
+# MlModel
+
+`#include <ml/ml_model.h>`
+
+```cpp
+class MLLIB::MlModel
+```
+
+Backend-agnostic inference interface: load, predict, save plus model/task descriptors.
+
+---
+
+## Public Methods
+
+### ~MlModel()
+
+Virtual destructor.
+
+---
+
+### predict(input)
+
+Run inference on the given input tensor.
+
+**Parameters:**
+
+- **input** : *const MlTensor &*
+  The input data.
+
+**Returns:**
+
+- *MlTensor* — The prediction result.
+
+---
+
+### save(path)
+
+Serialise the model to disk.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  File path.
+
+**Returns:**
+
+- *bool* — True if successful.
+
+---
+
+### load(path)
+
+Load a model from disk.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  File path.
+
+**Returns:**
+
+- *bool* — True if successful.
+
+---
+
+### modelType()
+
+**Returns:**
+
+- *QString* — Human-readable model type name.
+
+---
+
+### taskType()
+
+**Returns:**
+
+- *MlTaskType* — The task type this model is configured for.
+
+---

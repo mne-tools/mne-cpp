@@ -1,0 +1,62 @@
+---
+id: picard-ica
+title: "UTILSLIB::PicardIca"
+sidebar_label: PicardIca
+sidebar_position: 5
+---
+
+# PicardIca
+
+:::info[Python equivalent]
+`mne.preprocessing.ICA (picard)` in MNE-Python.
+:::
+
+`#include <dsp/picard_ica.h>`
+
+```cpp
+class UTILSLIB::PicardIca
+```
+
+Independent Component Analysis using the Picard algorithm.
+
+Picard uses a preconditioned L-BFGS strategy to minimise the mutual information of the components. Compared to FastICA it typically converges in fewer iterations and handles badly conditioned data more robustly.
+
+```cpp
+IcaResult res = PicardIca::run(matRawData, 20);
+QVector<int> exclude = {0, 3};
+MatrixXd clean = ICA::excludeComponents(matRawData, res, exclude);
+```
+
+---
+
+## Static Methods
+
+### run(matData, nComponents, maxIter, tol, lbfgsMemory, randomSeed)
+
+Run the Picard `ICA` algorithm.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Input data (n_channels x n_samples).
+
+- **nComponents** : *int*
+  Number of components to extract (-1 = all channels).
+
+- **maxIter** : *int*
+  Maximum number of iterations (default 200).
+
+- **tol** : *double*
+  Convergence tolerance (default 1e-7).
+
+- **lbfgsMemory** : *int*
+  L-BFGS memory length (default 7).
+
+- **randomSeed** : *int*
+  Seed for initial weight randomisation (default 42).
+
+**Returns:**
+
+- *IcaResult* — `IcaResult` with mixing/unmixing matrices and source time series.
+
+---

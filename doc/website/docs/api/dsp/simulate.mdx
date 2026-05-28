@@ -1,0 +1,159 @@
+---
+id: simulate
+title: "Simulate"
+sidebar_label: Simulate
+sidebar_position: 28
+---
+
+# Simulate
+
+:::info[Module]
+This page documents a **header-level module** — a collection of free
+functions that share an algorithmic topic. There is no enclosing C++
+class; the functions live directly in the library namespace.
+:::
+
+:::info[Python equivalent]
+`mne.simulation.simulate_stc / simulate_evoked` in MNE-Python.
+:::
+
+`#include <dsp/simulate.h>`
+
+SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors Christoph Dinh [christoph.dinh@mne-cpp.org](mailto:christoph.dinh@mne-cpp.org).
+
+Provides functions equivalent to MNE-Python's mne.simulation module:
+simulateStc(): create synthetic source time courses
+
+
+simulateEvoked(): generate synthetic evoked data from forward model
+
+---
+
+## Functions
+
+### simulateStc(activeVertices, allVertices, params)
+
+```cpp
+INVLIB::InvSourceEstimate simulateStc(const Eigen::VectorXi & activeVertices, const Eigen::VectorXi & allVertices, const SimulateStcParams & params);
+```
+
+Create a synthetic source time course.
+
+Generates an InvSourceEstimate with Gaussian-envelope waveforms at specified source vertices. Each active source has a Gaussian temporal profile centered at different times.
+
+**Parameters:**
+
+- **activeVertices** : *const Eigen::VectorXi &*
+  Vertex indices for active sources.
+
+- **allVertices** : *const Eigen::VectorXi &*
+  Full vertex index vector for the source space.
+
+- **params** : *const SimulateStcParams &*
+  Simulation parameters (sfreq, tmin, duration).
+
+**Returns:**
+
+- *INVLIB::InvSourceEstimate* — Simulated source estimate.
+
+---
+
+### simulateStcFromWaveforms(waveforms, activeVertices, allVertices, tmin, tstep)
+
+```cpp
+INVLIB::InvSourceEstimate simulateStcFromWaveforms(const Eigen::MatrixXd & waveforms, const Eigen::VectorXi & activeVertices, const Eigen::VectorXi & allVertices, float tmin, float tstep);
+```
+
+Create a synthetic source time course from custom waveforms.
+
+**Parameters:**
+
+- **waveforms** : *const Eigen::MatrixXd &*
+  Waveform data (n_active_sources x n_times).
+
+- **activeVertices** : *const Eigen::VectorXi &*
+  Vertex indices for the active sources.
+
+- **allVertices** : *const Eigen::VectorXi &*
+  Full vertex index vector.
+
+- **tmin** : *float*
+  Start time (s).
+
+- **tstep** : *float*
+  Time step (s).
+
+**Returns:**
+
+- *INVLIB::InvSourceEstimate* — Simulated source estimate with zeros at inactive vertices.
+
+---
+
+### simulateEvoked(fwd, stc, info, noiseCov, nave, seed)
+
+```cpp
+FIFFLIB::FiffEvoked simulateEvoked(const MNELIB::MNEForwardSolution & fwd, const INVLIB::InvSourceEstimate & stc, const FIFFLIB::FiffInfo & info, const FIFFLIB::FiffCov & noiseCov, int nave, int seed);
+```
+
+Simulate evoked data from a source estimate and forward model.
+
+Projects the source estimate through the forward model to generate sensor-space data, optionally adding noise from a noise covariance.
+
+Equivalent to MNE-Python's mne.simulation.simulate_evoked().
+
+**Parameters:**
+
+- **fwd** : *const MNELIB::MNEForwardSolution &*
+  Forward solution (gain matrix).
+
+- **stc** : *const INVLIB::InvSourceEstimate &*
+  Source time course.
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  Measurement info (for output channel info).
+
+- **noiseCov** : *const FIFFLIB::FiffCov &*
+  Noise covariance for additive noise (optional).
+
+- **nave** : *int*
+  Number of averages (noise scaled by 1/sqrt(nave)).
+
+- **seed** : *int*
+  Random seed for noise generation.
+
+**Returns:**
+
+- *FIFFLIB::FiffEvoked* — Simulated evoked data.
+
+---
+
+### simulateEvokedNoiseless(fwd, stc, info)
+
+```cpp
+FIFFLIB::FiffEvoked simulateEvokedNoiseless(const MNELIB::MNEForwardSolution & fwd, const INVLIB::InvSourceEstimate & stc, const FIFFLIB::FiffInfo & info);
+```
+
+Simulate evoked data without noise.
+
+Projects source estimate through forward model (no noise added).
+
+**Parameters:**
+
+- **fwd** : *const MNELIB::MNEForwardSolution &*
+  Forward solution.
+
+- **stc** : *const INVLIB::InvSourceEstimate &*
+  Source time course.
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  Measurement info.
+
+**Returns:**
+
+- *FIFFLIB::FiffEvoked* — Simulated noiseless evoked data.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

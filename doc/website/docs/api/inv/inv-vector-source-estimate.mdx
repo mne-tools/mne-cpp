@@ -1,0 +1,96 @@
+---
+id: inv-vector-source-estimate
+title: "INVLIB::InvVectorSourceEstimate"
+sidebar_label: InvVectorSourceEstimate
+sidebar_position: 13
+---
+
+# InvVectorSourceEstimate
+
+:::info[Python equivalent]
+`mne.VectorSourceEstimate` in MNE-Python.
+:::
+
+`#include <inv/inv_vector_source_estimate.h>`
+
+```cpp
+class INVLIB::InvVectorSourceEstimate
+```
+
+Vector source estimate: each vertex carries a 3D orientation vector across time.
+
+data has shape (n_vertices*3 x n_times). Rows are interleaved: [x0,y0,z0, x1,y1,z1, ...]. Use `magnitude()` to collapse to scalar (n_vertices x n_times) for visualisation.
+
+---
+
+## Public Methods
+
+### InvVectorSourceEstimate()
+
+---
+
+### InvVectorSourceEstimate(p_sol, p_vertices, p_tmin, p_tstep)
+
+Construct from data and vertices.
+
+**Parameters:**
+
+- **p_sol** : *const Eigen::MatrixXd &*
+  Data (n_vertices*3 x n_times).
+
+- **p_vertices** : *const Eigen::VectorXi &*
+  Vertex indices (n_vertices).
+
+- **p_tmin** : *float*
+  Start time.
+
+- **p_tstep** : *float*
+  Time step.
+
+---
+
+### nVertices()
+
+Number of source vertices (data.rows() / 3).
+
+---
+
+### magnitude()
+
+Compute the magnitude (L2 norm) at each vertex across time.
+
+**Returns:**
+
+- *InvSourceEstimate* — Scalar source estimate (n_vertices x n_times).
+
+---
+
+### vertexData(vertexIdx)
+
+Extract the (x, y, z) data for a specific vertex.
+
+**Parameters:**
+
+- **vertexIdx** : *int*
+  Local index into vertices array.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Matrix (3 x n_times) for the requested vertex.
+
+---
+
+### projectToNormals(normals)
+
+Project the 3D vectors onto surface normals to produce a signed scalar estimate.
+
+**Parameters:**
+
+- **normals** : *const Eigen::MatrixX3f &*
+  Surface normals (n_vertices x 3).
+
+**Returns:**
+
+- *InvSourceEstimate* — Scalar source estimate (n_vertices x n_times).
+
+---

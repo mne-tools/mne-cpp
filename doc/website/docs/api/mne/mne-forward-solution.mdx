@@ -1,0 +1,525 @@
+---
+id: mne-forward-solution
+title: "MNELIB::MNEForwardSolution"
+sidebar_label: MNEForwardSolution
+sidebar_position: 1
+---
+
+# MNEForwardSolution
+
+:::info[Python equivalent]
+`mne.Forward` in MNE-Python.
+:::
+
+`#include <mne/mne_forward_solution.h>`
+
+```cpp
+class MNELIB::MNEForwardSolution
+```
+
+Forward solution: leadfield matrix mapping source-space dipoles to sensor measurements, together with the source spaces, coordinate transforms and SSP/CTF state it was computed under.
+
+In-memory representation of an `-fwd.fif` forward solution.
+
+---
+
+## Public Methods
+
+### MNEForwardSolution()
+
+Default constructor.
+
+---
+
+### MNEForwardSolution(p_IODevice, force_fixed, surf_ori, include, exclude, bExcludeBads)
+
+Constructs a forward operator, by reading from a IO device.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  IO device to read from the forward operator.
+
+- **force_fixed** : *bool*
+  Force fixed source orientation mode? (optional).
+
+- **surf_ori** : *bool*
+  Use surface based source coordinate system? (optional).
+
+- **include** : *const QStringList &*
+  Include these channels (optional).
+
+- **exclude** : *const QStringList &*
+  Exclude these channels (optional).
+
+- **bExcludeBads** : *bool*
+  If true bads are also read; default = false (optional).
+
+---
+
+### MNEForwardSolution(p_MNEForwardSolution)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_MNEForwardSolution** : *const MNEForwardSolution &*
+  `MNE` forward solution.
+
+---
+
+### operator=(other)
+
+Copy assignment operator.
+
+Copies public data fields only (not computation state).
+
+**Parameters:**
+
+- **other** : *const MNEForwardSolution &*
+  `MNE` forward solution to copy from.
+
+**Returns:**
+
+- *MNEForwardSolution &* — Reference to this.
+
+---
+
+### MNEForwardSolution(other)
+
+Move constructs an `MNEForwardSolution`.
+
+---
+
+### operator=(other)
+
+Move assignment operator.
+
+---
+
+### ~MNEForwardSolution()
+
+Destroys the `MNEForwardSolution`.
+
+---
+
+### clear()
+
+Initializes the `MNE` forward solution.
+
+---
+
+### cluster_forward_solution(p_AnnotationSet, p_iClusterSize, p_D, p_pNoise_cov, p_pInfo, p_sMethod)
+
+Cluster the forward solution and stores the result to p_fwdOut.
+
+The clustering is done by using the provided annotations
+
+**Parameters:**
+
+- **p_AnnotationSet** : *const FSLIB::FsAnnotationSet &*
+  FsAnnotation set containing the annotation of left & right hemisphere.
+
+- **p_iClusterSize** : *qint32*
+  Maximal cluster size per roi.
+
+- **p_D** : *Eigen::MatrixXd &*
+  The cluster operator.
+
+- **p_pNoise_cov.**
+
+- **p_pInfo.**
+
+- **p_sMethod** : *QString*
+  "cityblock" or "sqeuclidean".
+
+**Returns:**
+
+- *MNEForwardSolution* — clustered `MNE` forward solution.
+
+---
+
+### compute_orient_prior(loose)
+
+Compute orientation prior.
+
+**Parameters:**
+
+- **loose** : *float*
+  The loose orientation parameter.
+
+**Returns:**
+
+- *FIFFLIB::FiffCov* — Orientation priors.
+
+---
+
+### isClustered()
+
+Indicates whether fwd conatins a clustered forward solution.
+
+**Returns:**
+
+- *bool* — true if forward solution is clustered, false otherwise.
+
+---
+
+### isEmpty()
+
+True if FIFF measurement file information is empty.
+
+**Returns:**
+
+- *bool* — true if FIFF measurement file information is empty.
+
+---
+
+### isFixedOrient()
+
+Has forward operator fixed orientation?
+
+**Returns:**
+
+- *bool* — true if forward operator has fixed orientation, false otherwise.
+
+---
+
+### pick_channels(include, exclude)
+
+mne.fiff.pick_channels_forward
+
+Pick channels from forward operator
+
+**Parameters:**
+
+- **include** : *const QStringList &*
+  List of channels to include. (if None, include all available).
+
+- **exclude** : *const QStringList &*
+  Channels to exclude (if None, do not exclude any).
+
+**Returns:**
+
+- *MNEForwardSolution* — Forward solution restricted to selected channel types.
+
+---
+
+### pick_regions(p_qListLabels)
+
+Reduces a forward solution to selected regions.
+
+**Parameters:**
+
+- **p_qListLabels** : *const QList&lt; FSLIB::FsLabel &gt; &*
+  ROIs.
+
+**Returns:**
+
+- *MNEForwardSolution* — the reduced forward solution.
+
+---
+
+### pick_types(meg, eeg, include, exclude)
+
+mne.fiff.pick_types_forward
+
+Pick by channel type and names from a forward operator
+
+**Parameters:**
+
+- **meg** : *bool*
+  Include MEG channels.
+
+- **eeg** : *bool*
+  Include EEG channels.
+
+- **include** : *const QStringList &*
+  Additional channels to include (if empty, do not add any).
+
+- **exclude** : *const QStringList &*
+  Channels to exclude (if empty, do not exclude any).
+
+**Returns:**
+
+- *MNEForwardSolution* — Forward solution restricted to selected channel types.
+
+---
+
+### prepare_forward(p_info, p_noise_cov, p_pca, p_outFwdInfo, gain, p_outNoiseCov, p_outWhitener, p_outNumNonZero)
+
+Prepare forward for assembling the inverse operator.
+
+**Parameters:**
+
+- **p_info** : *const FIFFLIB::FiffInfo &*
+  The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
+
+- **p_noise_cov** : *const FIFFLIB::FiffCov &*
+  The noise covariance matrix.
+
+- **p_pca** : *bool*
+  Calculate pca or not.
+
+- **ch_names**
+  Selected channel names.
+
+- **gain** : *Eigen::MatrixXd &*
+  Gain matrix.
+
+- **p_outNoiseCov** : *FIFFLIB::FiffCov &*
+  noise covariance matrix.
+
+- **p_outWhitener** : *Eigen::MatrixXd &*
+  Whitener.
+
+- **p_outNumNonZero** : *qint32 &*
+  the rank (non zeros).
+
+---
+
+### tripletSelection(p_vecIdxSelection)
+
+---
+
+### write(p_IODevice)
+
+Write the forward solution to a FIFF file.
+
+Formerly write_solution (SVN `MNE`).
+
+Splits the combined MEG/EEG forward matrix back into separate blocks for FIFF storage, writes source spaces, coordinate transforms, and parent file provenance.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  The I/O device (e.g. QFile) to write to.
+
+**Returns:**
+
+- *bool* — True if succeeded, false otherwise.
+
+---
+
+### reduce_forward_solution(p_iNumDipoles, p_D)
+
+reduces the forward solution and stores the result to p_fwdOut.
+
+**Parameters:**
+
+- **p_iNumDipoles** : *qint32*
+  Desired number of dipoles.
+
+- **p_D** : *Eigen::MatrixXd &*
+  The reduction operator.
+
+**Returns:**
+
+- *MNEForwardSolution* — reduced `MNE` forward solution.
+
+---
+
+### to_fixed_ori()
+
+Helper to convert the forward solution to fixed ori from free.
+
+---
+
+### getSourcePositionsByLabel(lPickedLabels, tSurfSetInflated)
+
+Returns the positions of the specified sources based on their beloning labels.
+
+**Parameters:**
+
+- **lPickedLabels** : *const QList&lt; FSLIB::FsLabel &gt; &*
+  The stream to which the `MNE` forward solution should be assigned to.
+
+- **tSurfSetInflated** : *const FSLIB::FsSurfaceSet &*
+  The surface used to pick the source from, based on their index specified bzy this forward solution.
+
+**Returns:**
+
+- *Eigen::MatrixX3f* — the source position in 3D space.
+
+---
+
+## Static Methods
+
+### compute_depth_prior(Gain, gain_info, is_fixed_ori, exp, limit, patch_areas, limit_depth_chs)
+
+Compute weighting for depth prior.
+
+ToDo move this to FiffCov
+
+**Parameters:**
+
+- **Gain** : *const Eigen::MatrixXd &*
+  gain matrix.
+
+- **gain_info** : *const FIFFLIB::FiffInfo &*
+  The measurement info to specify the channels to include.
+
+- **is_fixed_ori** : *bool*
+  Fixed orientation?.
+
+- **exp** : *double*
+  float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed. (optional; default = 0.8).
+
+- **limit** : *double*
+  (optional; default = 10.0).
+
+- **patch_areas** : *const Eigen::MatrixXd &*
+  (optional).
+
+- **limit_depth_chs** : *bool*
+  If True, use only grad channels in depth weighting (equivalent to `MNE` C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels. (optional).
+
+**Returns:**
+
+- *FIFFLIB::FiffCov* — the depth prior.
+
+---
+
+### read(p_IODevice, fwd, force_fixed, surf_ori, include, exclude, bExcludeBads)
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  A fiff IO device like a fiff QFile or QTCPSocket.
+
+- **fwd** : *MNEForwardSolution &*
+  A forward solution from a fif file.
+
+- **force_fixed** : *bool*
+  Force fixed source orientation mode? (optional).
+
+- **surf_ori** : *bool*
+  Use surface based source coordinate system? (optional).
+
+- **include** : *const QStringList &*
+  Include these channels (optional).
+
+- **exclude** : *const QStringList &*
+  Exclude these channels (optional).
+
+- **bExcludeBads** : *bool*
+  If true bads are also read; default = false (optional).
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### restrict_gain_matrix(G, info)
+
+Restrict gain matrix entries for optimal depth weighting.
+
+**Parameters:**
+
+- **G** : *Eigen::MatrixXd &*
+  Gain matrix to be restricted; result is stored in place.
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  Fiff information.
+
+---
+
+## Example
+
+Source: [`src/examples/ex_read_fwd/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_read_fwd/main.cpp)
+
+```cpp
+#include <iostream>
+#include <mne/mne_forward_solution.h>
+#include <fs/fs_annotationset.h>
+#include <utils/ioutils.h>
+#include <utils/generics/mne_logger.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtCore/QCoreApplication>
+#include <QDebug>
+#include <QCommandLineParser>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MNELIB;
+using namespace UTILSLIB;
+using namespace FSLIB;
+
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * The function main marks the entry point of the program.
+ * By default, main has the storage class extern.
+ *
+ * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+ * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+ * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+ */
+int main(int argc, char *argv[])
+{
+    qInstallMessageHandler(MNELogger::customLogWriter);
+    QCoreApplication app(argc, argv);
+
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Read Forward Example");
+    parser.addHelpOption();
+
+    QCommandLineOption fwdFileOption("fwd", "Path to the forward solution <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption surfOption("surfType", "FsSurface type <type>.", "type", "orig");
+    QCommandLineOption annotOption("annotType", "FsAnnotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
+    QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
+
+    parser.addOption(fwdFileOption);
+    parser.addOption(surfOption);
+    parser.addOption(annotOption);
+    parser.addOption(subjectOption);
+    parser.addOption(subjectPathOption);
+    parser.addOption(hemiOption);
+
+    parser.process(app);
+
+    //Load data
+    QFile t_fileForwardSolution(parser.value(fwdFileOption));
+    MNEForwardSolution t_Fwd(t_fileForwardSolution);
+
+    if(t_Fwd.source_ori != -1)
+    {
+        std::cout << "\nfirst 10 rows and columns of the Gain Matrix:\n" << t_Fwd.sol->data.block(0,0,10,10) << std::endl;
+        std::cout << "\nfirst 10 dipole coordinates:\n" << t_Fwd.source_rr.block(0,0,10,3) << std::endl ;
+        std::cout << "\nfirst 10 dipole normales:\n" << t_Fwd.source_nn.block(0,0,10,3) << std::endl ;
+    }
+
+    // === Option to cluster forward solution ===
+    FsAnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
+
+    //
+    // Cluster forward solution;
+    //
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
+
+    qDebug() << "==== Results ====";
+    qDebug() << "nrow: " << t_clusteredFwd.sol->nrow;
+    qDebug() << "ncol: " << t_clusteredFwd.sol->ncol;
+    qDebug() << "row_names:";
+    qDebug() << t_clusteredFwd.sol->row_names;
+    qDebug() << "col_names:";
+    qDebug() << t_clusteredFwd.sol->col_names;
+    qDebug() << "write fwd data to ./test_fwd.txt ...";
+    IOUtils::write_eigen_matrix(t_clusteredFwd.sol->data, QString("./test_fwd.txt"));
+    qDebug() << "[done]";
+
+    return app.exec();
+}
+```

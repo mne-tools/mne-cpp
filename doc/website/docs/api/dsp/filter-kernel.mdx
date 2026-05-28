@@ -1,0 +1,307 @@
+---
+id: filter-kernel
+title: "UTILSLIB::FilterKernel"
+sidebar_label: FilterKernel
+sidebar_position: 1
+---
+
+# FilterKernel
+
+:::info[Python equivalent]
+`mne.filter.create_filter` in MNE-Python.
+:::
+
+`#include <dsp/filterkernel.h>`
+
+```cpp
+class UTILSLIB::FilterKernel
+```
+
+The `FilterKernel` class provides methods to create/design a FIR filter kernel.
+
+The `FilterKernel` class provides methods to create/design a FIR filter kernel
+
+---
+
+## Public Methods
+
+### FilterKernel()
+
+`FilterKernel` creates a default `FilterKernel` object.
+
+---
+
+### FilterKernel(sFilterName, iFilterType, iOrder, dCenterfreq, dBandwidth, dParkswidth, dSFreq, iDesignMethod)
+
+Constructs a `FilterKernel` object.
+
+**Parameters:**
+
+- **sFilterName** : *const QString &*
+  Defines the name of the generated filter.
+
+- **type**
+  Tyep of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType).
+
+- **iOrder** : *int*
+  Represents the order of the filter, the higher the higher is the stopband attenuation.
+
+- **dCenterfreq** : *double*
+  Determines the center of the frequency - normed to sFreq/2 (nyquist).
+
+- **dBandwidth** : *double*
+  Ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband - normed to sFreq/2 (nyquist).
+
+- **dParkswidth** : *double*
+  Determines the width of the filter slopes (steepness) - normed to sFreq/2 (nyquist).
+
+- **dSFreq** : *double*
+  The sampling frequency.
+
+- **designMethod**
+  Specifies the design method to use. Choose between Cosind and Tschebyscheff.
+
+---
+
+### prepareFilter(iDataSize)
+
+Prepares a filter kernel to be used wiht a specific data block length.
+
+This is favorable to call before filtering, in order to avoid transforming the filter coefficients anew during filtering. This functions was introduced since one does not always know the data length of the data blocks to be filtered when designing the filter.
+
+**Parameters:**
+
+- **iDataSize** : *int*
+  The data size to setup the filters to.
+
+---
+
+### applyConvFilter(vecData, bKeepOverhead)
+
+Applies the current filter to the input data using convolution in time domain.
+
+**Parameters:**
+
+- **vecData** : *const Eigen::RowVectorXd &*
+  Holds the data to be filtered.
+
+- **bKeepOverhead** : *bool*
+  Whether the result should still include the overhead information in front and back of the data. Default is set to false.
+
+**Returns:**
+
+- *Eigen::RowVectorXd* — the filtered data in form of a RowVectorXd.
+
+---
+
+### applyFftFilter(vecData, bKeepOverhead)
+
+Applies the current filter to the input data using multiplication in frequency domain.
+
+**Parameters:**
+
+- **vecData** : *Eigen::RowVectorXd &*
+  Holds the data to be filtered. Gets overwritten with its filtered result.
+
+- **bKeepOverhead** : *bool*
+  Whether the result should still include the overhead information in front and back of the data. Default is set to false.
+
+**Returns:**
+
+- *void* — the filtered data in form of a RowVectorXd.
+
+---
+
+### getName()
+
+---
+
+### setName(sFilterName)
+
+---
+
+### getSamplingFrequency()
+
+---
+
+### setSamplingFrequency(dSFreq)
+
+---
+
+### getFilterOrder()
+
+---
+
+### setFilterOrder(iOrder)
+
+---
+
+### getCenterFrequency()
+
+---
+
+### setCenterFrequency(dCenterFreq)
+
+---
+
+### getBandwidth()
+
+---
+
+### setBandwidth(dBandwidth)
+
+---
+
+### getParksWidth()
+
+---
+
+### setParksWidth(dParksWidth)
+
+---
+
+### getHighpassFreq()
+
+---
+
+### setHighpassFreq(dHighpassFreq)
+
+---
+
+### getLowpassFreq()
+
+---
+
+### setLowpassFreq(dLowpassFreq)
+
+---
+
+### getCoefficients()
+
+---
+
+### setCoefficients(vecCoeff)
+
+---
+
+### getFftCoefficients()
+
+---
+
+### setFftCoefficients(vecFftCoeff)
+
+---
+
+### getDesignMethod()
+
+---
+
+### setDesignMethod(iDesignMethod)
+
+---
+
+### getFilterType()
+
+---
+
+### setFilterType(iFilterType)
+
+---
+
+### getShortDescription()
+
+---
+
+## Example
+
+Source: [`src/examples/ex_filtering/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_filtering/main.cpp)
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <math.h>
+
+#include <fiff/fiff.h>
+
+#include <dsp/filterkernel.h>
+#include <utils/generics/mne_logger.h>
+
+#include <dsp/rt/rt_filter.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtCore/QCoreApplication>
+#include <QFile>
+#include <QCommandLineParser>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FIFFLIB;
+using namespace UTILSLIB;
+using namespace RTPROCESSINGLIB;
+using namespace Eigen;
+
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * The function main marks the entry point of the program.
+ * By default, main has the storage class extern.
+ *
+ * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+ * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+ * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+ */
+int main(int argc, char *argv[])
+{
+    qInstallMessageHandler(MNELogger::customLogWriter);
+    QCoreApplication a(argc, argv);
+
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Read Write Raw Example");
+    parser.addHelpOption();
+
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption outputOption("fileOut", "The output file <out>.", "out", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_filt_raw.fif");
+
+    parser.addOption(inputOption);
+    parser.addOption(outputOption);
+
+    parser.process(a);
+
+    // Init data loading and writing
+    QFile fileIn(parser.value(inputOption));
+    QFile fileOut(parser.value(outputOption));
+
+    FiffRawData::SPtr pRaw = FiffRawData::SPtr::create(fileIn);
+
+    // Only filter MEG and EEG channels
+    RowVectorXi picks = pRaw->info.pick_types(true, false, false);
+
+    // Filtering
+    printf("Filtering...");
+    if(RTPROCESSINGLIB::filterFile(fileOut,
+                                   pRaw,
+                                   FilterKernel::m_filterTypes.indexOf(FilterParameter("BPF")),
+                                   10,
+                                   10,
+                                   0.1,
+                                   pRaw->info.sfreq,
+                                   1024,
+                                   UTILSLIB::FilterKernel::m_designMethods.indexOf(FilterParameter("Cosine")),
+                                   picks)) {
+        printf("[done]\n");
+    } else {
+        printf("[failed]\n");
+    }
+
+    return 0;
+}
+```

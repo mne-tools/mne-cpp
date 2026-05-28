@@ -1,0 +1,139 @@
+---
+id: fs-label-utils
+title: "FSLIB::FsLabelUtils"
+sidebar_label: FsLabelUtils
+sidebar_position: 4
+---
+
+# FsLabelUtils
+
+:::info[Python equivalent]
+`mne.grow_labels / mne.split_label / mne.stc_to_label` in MNE-Python.
+:::
+
+`#include <fs/fs_label_utils.h>`
+
+```cpp
+class FSLIB::FsLabelUtils
+```
+
+Stateless utilities that grow, split and convert `FsLabel` objects on a FreeSurfer triangular surface.
+
+All operations take an `FsSurface` as the topology source and treat its triangle faces as the vertex adjacency graph. The helpers are static because labels carry their own state and the surface is supplied per call, mirroring the function-based API used by MNE-Python.
+
+---
+
+## Static Methods
+
+### growLabel(label, surface, nSteps)
+
+Grow a label by expanding along the surface mesh.
+
+Starting from the seed vertices in the label, expands outward by nSteps along surface edges (breadth-first).
+
+**Parameters:**
+
+- **label** : *const FsLabel &*
+  The seed label to grow from.
+
+- **surface** : *const FsSurface &*
+  The surface providing vertex adjacency.
+
+- **nSteps** : *int*
+  Number of expansion steps.
+
+**Returns:**
+
+- *FsLabel* — Grown label containing original + expanded vertices.
+
+---
+
+### splitLabel(label, surface)
+
+Split a label into connected components.
+
+Uses the surface mesh to identify connected sub-labels.
+
+**Parameters:**
+
+- **label** : *const FsLabel &*
+  The label to split.
+
+- **surface** : *const FsSurface &*
+  The surface providing vertex adjacency.
+
+**Returns:**
+
+- *QList&lt; FsLabel &gt;* — List of sub-labels (connected components).
+
+---
+
+### stcToLabel(stcData, vertices, surface, dThreshold, iHemi)
+
+Convert a source estimate to labels by thresholding.
+
+Vertices whose absolute value exceeds the threshold at any time point are grouped into connected labels on the surface.
+
+**Parameters:**
+
+- **stcData** : *const Eigen::MatrixXd &*
+  Source estimate data (n_vertices × n_times).
+
+- **vertices** : *const Eigen::VectorXi &*
+  Vertex indices in the source estimate.
+
+- **surface** : *const FsSurface &*
+  The surface providing positions and adjacency.
+
+- **dThreshold** : *double*
+  Absolute threshold for inclusion (default 0.0 = include all).
+
+- **iHemi** : *int*
+  Hemisphere id (0=lh, 1=rh).
+
+**Returns:**
+
+- *QList&lt; FsLabel &gt;* — List of labels (connected components above threshold).
+
+---
+
+### labelsToStc(labels, stcVertices, nTimes)
+
+Convert labels to a binary source estimate mask.
+
+Creates a matrix of ones for vertices inside the labels, zeros otherwise.
+
+**Parameters:**
+
+- **labels** : *const QList&lt; FsLabel &gt; &*
+  Labels to convert.
+
+- **stcVertices** : *const Eigen::VectorXi &*
+  Vertex indices of the target STC space.
+
+- **nTimes** : *int*
+  Number of time points.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Binary mask (n_vertices × n_times).
+
+---
+
+### buildAdjacency(tris, nVerts)
+
+Build adjacency list from surface triangle mesh.
+
+**Parameters:**
+
+- **tris** : *const Eigen::MatrixX3i &*
+  Triangle matrix (n_tris × 3).
+
+- **nVerts** : *int*
+  Total number of vertices.
+
+**Returns:**
+
+- *QList&lt; QSet&lt; int &gt; &gt;* — Adjacency list: for each vertex, the set of neighbor vertices.
+
+---

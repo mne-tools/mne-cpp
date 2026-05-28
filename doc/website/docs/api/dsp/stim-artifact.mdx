@@ -1,0 +1,67 @@
+---
+id: stim-artifact
+title: "StimArtifact"
+sidebar_label: StimArtifact
+sidebar_position: 12
+---
+
+# StimArtifact
+
+:::info[Module]
+This page documents a **header-level module** — a collection of free
+functions that share an algorithmic topic. There is no enclosing C++
+class; the functions live directly in the library namespace.
+:::
+
+:::info[Python equivalent]
+`mne.preprocessing.fix_stim_artifact` in MNE-Python.
+:::
+
+`#include <dsp/stim_artifact.h>`
+
+SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors Christoph Dinh [christoph.dinh@mne-cpp.org](mailto:christoph.dinh@mne-cpp.org).
+
+Repairs stimulus artifacts in continuous data by replacing samples in a window around each stimulus event with either linearly interpolated values (from the window boundaries) or zeros. This mirrors the functionality of MNE-Python's mne.preprocessing.fix_stim_artifact().
+
+---
+
+## Functions
+
+### fixStimArtifact(data, events, sfreq, eventId, tmin, tmax, mode)
+
+```cpp
+void fixStimArtifact(Eigen::MatrixXd & data, const Eigen::MatrixXi & events, double sfreq, int eventId, double tmin, double tmax, StimArtifactMode mode);
+```
+
+Repair stimulus artifacts by interpolating or zeroing data around events.
+
+For each event sample, the data in the window [event + tmin_samples, event + tmax_samples] is either linearly interpolated from the boundary values or set to zero.
+
+**Parameters:**
+
+- **data** : *Eigen::MatrixXd &*
+  Data matrix (n_channels x n_times). Modified in-place.
+
+- **events** : *const Eigen::MatrixXi &*
+  Event matrix (Nx3: [sample, before, after]). Only the sample column (col 0) is used to locate artifact windows.
+
+- **sfreq** : *double*
+  Sampling frequency in Hz.
+
+- **eventId** : *int*
+  If &gt;= 0, only process events where column 2 (after) matches this value. If &lt; 0, process all events. Default: -1.
+
+- **tmin** : *double*
+  Start of artifact window in seconds relative to event (negative = before event). Default: 0.0 (event onset).
+
+- **tmax** : *double*
+  End of artifact window in seconds relative to event. Default: 0.01 (10 ms after event).
+
+- **mode** : *StimArtifactMode*
+  Repair mode (Linear interpolation or zero-padding). Default: `StimArtifactMode::Linear`.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

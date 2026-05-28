@@ -1,0 +1,112 @@
+---
+id: eeg-reference
+title: "EegReference"
+sidebar_label: EegReference
+sidebar_position: 11
+---
+
+# EegReference
+
+:::info[Module]
+This page documents a **header-level module** — a collection of free
+functions that share an algorithmic topic. There is no enclosing C++
+class; the functions live directly in the library namespace.
+:::
+
+:::info[Python equivalent]
+`mne.set_eeg_reference` in MNE-Python.
+:::
+
+`#include <dsp/eeg_reference.h>`
+
+SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors Christoph Dinh [christoph.dinh@mne-cpp.org](mailto:christoph.dinh@mne-cpp.org).
+
+Every EEG measurement is implicitly a potential difference between an active electrode and a reference; changing that reference is therefore a linear operation on the data matrix. The functions in this header build and apply the most widely used reference operators: subtraction of a single electrode (or the average of a few), the common-average reference (CAR), and — where a forward model is supplied — the reference electrode standardisation technique (REST) which projects the data to the equivalent reference at infinity.
+
+Re-referencing is implemented as a single matrix multiplication so that channel covariances and inverse operators remain valid after re- referencing, provided the same operator is also applied to the noise covariance.
+
+---
+
+## Functions
+
+### setEegReference(data, info, refChannels, projection)
+
+```cpp
+void setEegReference(Eigen::MatrixXd & data, const FIFFLIB::FiffInfo & info, const QStringList & refChannels, bool projection);
+```
+
+Re-reference EEG channels to average, specific channel(s), or REST.
+
+Only modifies rows corresponding to EEG channels (kind == FIFFV_EEG_CH). Non-EEG channels are left untouched.
+
+**Parameters:**
+
+- **data** : *Eigen::MatrixXd &*
+  Data matrix (n_channels x n_times). Modified in-place.
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  Measurement info (used to identify EEG channels).
+
+- **refChannels** : *const QStringList &*
+  Reference channel name(s).- Empty or "average" -&gt; average reference (mean of all good EEG channels). - Single channel name -&gt; re-reference to that channel. - Multiple channel names -&gt; re-reference to mean of those channels.
+
+- **projection** : *bool*
+  If true, add an SSP projector for average reference instead of modifying data. (default: false — modify data directly)
+
+---
+
+### addReferenceChannels(data, info, chNames)
+
+```cpp
+void addReferenceChannels(Eigen::MatrixXd & data, FIFFLIB::FiffInfo & info, const QStringList & chNames);
+```
+
+Add reference channel(s) back as zero-filled rows.
+
+When EEG data was recorded with a physical reference electrode, that channel is implicit (all zeros after re-referencing). This function adds it back explicitly so it can participate in average re-referencing or source localization.
+
+**Parameters:**
+
+- **data** : *Eigen::MatrixXd &*
+  Data matrix. Rows are added at the end.
+
+- **info** : *FIFFLIB::FiffInfo &*
+  Measurement info. New EEG channels are appended.
+
+- **chNames** : *const QStringList &*
+  Names of the reference channel(s) to add.
+
+---
+
+### setBipolarReference(data, info, anodes, cathodes, dropOriginals)
+
+```cpp
+void setBipolarReference(Eigen::MatrixXd & data, FIFFLIB::FiffInfo & info, const QStringList & anodes, const QStringList & cathodes, bool dropOriginals);
+```
+
+Create bipolar derivations from EEG channels.
+
+Creates new bipolar channels by subtracting cathode from anode for each pair. The original channels are replaced with the bipolar derivations.
+
+**Parameters:**
+
+- **data** : *Eigen::MatrixXd &*
+  Data matrix. Replaced with bipolar derivation rows.
+
+- **info** : *FIFFLIB::FiffInfo &*
+  Measurement info. Updated with new bipolar channel info.
+
+- **anodes** : *const QStringList &*
+  List of anode channel names.
+
+- **cathodes** : *const QStringList &*
+  List of cathode channel names (same length as anodes).
+
+- **dropOriginals** : *bool*
+  If true, remove the original anode/cathode channels from the output (default: true).
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

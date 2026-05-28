@@ -1,0 +1,163 @@
+---
+id: inv-dics
+title: "INVLIB::InvDICS"
+sidebar_label: InvDICS
+sidebar_position: 4
+---
+
+# InvDICS
+
+:::info[Python equivalent]
+`mne.beamformer.make_dics / apply_dics` in MNE-Python.
+:::
+
+`#include <inv/inv_dics.h>`
+
+```cpp
+class INVLIB::InvDICS
+```
+
+Dynamic Imaging of Coherent Sources (DICS) beamformer for frequency-domain source localization using cross-spectral density (CSD) matrices.
+
+Typical workflow: 
+```cpp
+// 1. Compute CSD matrices for frequency bands of interest (externally)
+//    csdMatrices[i] = CSD at frequency[i], shape (n_channels, n_channels)
+
+// 2. Build the DICS spatial filter
+InvBeamformer filters = InvDICS::makeDICS(info, forward, csdMatrices, frequencies,
+                                           reg, realFilter, pickOri, weightNorm);
+
+// 3. Apply to CSD to get source power per frequency
+InvSourceEstimate power = InvDICS::applyDICSCsd(csdMatrices, frequencies, filters);
+```
+
+DICS beamformer (frequency-domain).
+
+---
+
+## Static Methods
+
+### makeDICS(info, forward, csdMatrices, frequencies, reg, realFilter, noiseCov, pickOri, weightNorm, reduceRank, invMethod)
+
+Compute DICS beamformer spatial filters for one or more frequencies.
+
+**Parameters:**
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  Measurement info.
+
+- **forward** : *const MNELIB::MNEForwardSolution &*
+  Forward solution containing the leadfield.
+
+- **csdMatrices** : *const std::vector&lt; Eigen::MatrixXd &gt; &*
+  Cross-spectral density matrices, one per frequency bin. Each is (n_channels, n_channels), may be complex.
+
+- **frequencies** : *const Eigen::VectorXd &*
+  Center frequency (Hz) for each CSD matrix.
+
+- **reg** : *double*
+  Regularization parameter (default 0.05).
+
+- **realFilter** : *bool*
+  If true, take real part of CSD before computing filter (default true).
+
+- **noiseCov** : *const FIFFLIB::FiffCov &*
+  Noise covariance for whitening. If empty, identity whitening.
+
+- **pickOri** : *BeamformerPickOri*
+  Orientation selection mode.
+
+- **weightNorm** : *BeamformerWeightNorm*
+  Weight normalization strategy.
+
+- **reduceRank** : *bool*
+  Reduce leadfield rank by 1.
+
+- **invMethod** : *BeamformerInversion*
+  Denominator inversion method.
+
+**Returns:**
+
+- *InvBeamformer* — Beamformer with one filter weight matrix per frequency.
+
+---
+
+### applyDICSCsd(csdMatrices, frequencies, filters)
+
+Apply DICS beamformer to CSD matrices to estimate source power per frequency.
+
+power_i(f) = trace(W_f_i @ CSD_f @ W_f_i^T)
+
+**Parameters:**
+
+- **csdMatrices** : *const std::vector&lt; Eigen::MatrixXd &gt; &*
+  CSD matrices (one per frequency).
+
+- **frequencies** : *const Eigen::VectorXd &*
+  Center frequencies (Hz).
+
+- **filters** : *const InvBeamformer &*
+  Pre-computed DICS beamformer from `makeDICS()`.
+
+**Returns:**
+
+- *InvSourceEstimate* — Source estimate where data has shape (n_sources, n_freqs) with power values.
+
+---
+
+### applyDICS(data, tmin, tstep, filters, freqIdx)
+
+Apply DICS beamformer to time-domain data at a single frequency.
+
+This is an approximate application — for accurate frequency-domain source estimation, use `applyDICSCsd()` with CSD matrices.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  Data matrix (n_channels, n_times).
+
+- **tmin** : *float*
+  Start time (s).
+
+- **tstep** : *float*
+  Time step (s).
+
+- **filters** : *const InvBeamformer &*
+  Pre-computed DICS beamformer (must have exactly 1 frequency).
+
+- **freqIdx** : *int*
+  Index of the frequency filter to use (default 0).
+
+**Returns:**
+
+- *InvSourceEstimate* — Source time-course estimate.
+
+---
+
+### applyDICSEpochs(epochs, tmin, tstep, filters, freqIdx)
+
+Apply DICS beamformer to each epoch in a list.
+
+**Parameters:**
+
+- **epochs** : *const QList&lt; Eigen::MatrixXd &gt; &*
+  List of epoch data matrices (n_channels x n_times each).
+
+- **tmin** : *float*
+  Start time of each epoch (seconds).
+
+- **tstep** : *float*
+  Time step (1/sfreq).
+
+- **filters** : *const InvBeamformer &*
+  Pre-computed DICS beamformer from `makeDICS()`.
+
+- **freqIdx** : *int*
+  Index of the frequency filter to use (default 0).
+
+**Returns:**
+
+- *QList&lt; InvSourceEstimate &gt;* — List of source estimates, one per epoch.
+
+---

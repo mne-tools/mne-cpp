@@ -1,0 +1,87 @@
+---
+id: filter-chpi
+title: "FilterChpi"
+sidebar_label: FilterChpi
+sidebar_position: 13
+---
+
+# FilterChpi
+
+:::info[Module]
+This page documents a **header-level module** — a collection of free
+functions that share an algorithmic topic. There is no enclosing C++
+class; the functions live directly in the library namespace.
+:::
+
+:::info[Python equivalent]
+`mne.chpi.filter_chpi` in MNE-Python.
+:::
+
+`#include <dsp/filter_chpi.h>`
+
+SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors Christoph Dinh [christoph.dinh@mne-cpp.org](mailto:christoph.dinh@mne-cpp.org).
+
+Removes continuous head-position indicator (cHPI) excitation signals from MEG data by applying zero-phase Butterworth band-stop (notch) filters at each cHPI frequency. This mirrors MNE-Python's mne.chpi.filter_chpi().
+
+---
+
+## Functions
+
+### filterChpi(data, info, sfreq, hpiFreqs, params)
+
+```cpp
+void filterChpi(Eigen::MatrixXd & data, const FIFFLIB::FiffInfo & info, double sfreq, const QVector< double > & hpiFreqs, const FilterChpiParams & params);
+```
+
+Remove cHPI excitation signals from MEG data by notch filtering.
+
+Applies a zero-phase Butterworth band-stop (notch) filter at each specified cHPI frequency. Only MEG channels are filtered by default.
+
+**Parameters:**
+
+- **data** : *Eigen::MatrixXd &*
+  Data matrix (n_channels x n_times). Modified in-place.
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  Measurement info (used to identify MEG channels if bMegOnly is true).
+
+- **sfreq** : *double*
+  Sampling frequency in Hz.
+
+- **hpiFreqs** : *const QVector&lt; double &gt; &*
+  List of cHPI excitation frequencies in Hz. Typical Elekta/MEGIN system: \{83, 143, 203, 263, 293\}.
+
+- **params** : *const FilterChpiParams &*
+  Filtering parameters.
+
+---
+
+### filterChpi(data, info, sfreq, params)
+
+```cpp
+void filterChpi(Eigen::MatrixXd & data, const FIFFLIB::FiffInfo & info, double sfreq, const FilterChpiParams & params);
+```
+
+Overload that attempts to extract cHPI frequencies from FiffInfo.
+
+Tries to read HPI coil frequencies from the FiffInfo metadata. Because the FiffInfo HPI frequency storage varies across file versions, this overload may not always succeed. If frequencies cannot be determined, a warning is logged and no filtering is applied. In that case, use the explicit-frequency overload instead.
+
+**Parameters:**
+
+- **data** : *Eigen::MatrixXd &*
+  Data matrix (n_channels x n_times). Modified in-place.
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  Measurement info.
+
+- **sfreq** : *double*
+  Sampling frequency in Hz.
+
+- **params** : *const FilterChpiParams &*
+  Filtering parameters.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

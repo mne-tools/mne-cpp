@@ -1,0 +1,429 @@
+---
+id: bids-path
+title: "BIDSLIB::BIDSPath"
+sidebar_label: BIDSPath
+sidebar_position: 1
+---
+
+# BIDSPath
+
+:::info[Python equivalent]
+`mne_bids.BIDSPath` in MNE-Python.
+:::
+
+`#include <bids/bids_path.h>`
+
+```cpp
+class BIDSLIB::BIDSPath
+```
+
+Manages BIDS-compliant file paths.
+
+A `BIDSPath` encodes the BIDS entities (subject, session, task, acquisition, run, etc.) together with a datatype, suffix, extension, and root directory to produce fully qualified file paths that conform to the BIDS specification.
+
+Example usage: 
+```cpp
+BIDSPath path;
+path.setRoot("/data/bids_dataset");
+path.setSubject("01");
+path.setSession("implant01");
+path.setTask("rest");
+path.setDatatype("ieeg");
+path.setSuffix("ieeg");
+path.setExtension(".vhdr");
+
+// Produces: sub-01_ses-implant01_task-rest_ieeg.vhdr
+QString filename = path.basename();
+
+// Produces: /data/bids_dataset/sub-01/ses-implant01/ieeg/
+QString dir = path.directory();
+
+// Produces: /data/bids_dataset/sub-01/ses-implant01/ieeg/sub-01_ses-implant01_task-rest_ieeg.vhdr
+QString full = path.filePath();
+```
+
+BIDS-compliant path and filename construction.
+
+---
+
+## Public Methods
+
+### BIDSPath()
+
+Constructs an empty `BIDSPath`.
+
+---
+
+### BIDSPath(sRoot, sSubject, sSession, sTask, sDatatype, sSuffix, sExtension)
+
+Constructs a `BIDSPath` with the most common entities.
+
+**Parameters:**
+
+- **sRoot** : *const QString &*
+  Root directory of the BIDS dataset.
+
+- **sSubject** : *const QString &*
+  Subject label (without "sub-" prefix).
+
+- **sSession** : *const QString &*
+  Session label (without "ses-" prefix). Can be empty.
+
+- **sTask** : *const QString &*
+  Task label. Can be empty.
+
+- **sDatatype** : *const QString &*
+  BIDS datatype (e.g. "ieeg", "eeg", "meg", "anat").
+
+- **sSuffix** : *const QString &*
+  Filename suffix (e.g. "ieeg", "channels", "electrodes").
+
+- **sExtension** : *const QString &*
+  File extension including dot (e.g. ".vhdr", ".tsv", ".json").
+
+---
+
+### BIDSPath(other)
+
+Copy constructor.
+
+---
+
+### ~BIDSPath()
+
+Destructor.
+
+---
+
+### setRoot(sRoot)
+
+Set the BIDS dataset root directory.
+
+---
+
+### setSubject(sSubject)
+
+Set the subject label (without "sub-" prefix).
+
+---
+
+### setSession(sSession)
+
+Set the session label (without "ses-" prefix).
+
+---
+
+### setTask(sTask)
+
+Set the task label.
+
+---
+
+### setAcquisition(sAcquisition)
+
+Set the acquisition label.
+
+---
+
+### setRun(sRun)
+
+Set the run index (will be zero-padded to 2 digits).
+
+---
+
+### setProcessing(sProcessing)
+
+Set the processing label.
+
+---
+
+### setSpace(sSpace)
+
+Set the space label.
+
+---
+
+### setRecording(sRecording)
+
+Set the recording label.
+
+---
+
+### setSplit(sSplit)
+
+Set the split index.
+
+---
+
+### setDescription(sDescription)
+
+Set the description label.
+
+---
+
+### setDatatype(sDatatype)
+
+Set the BIDS datatype (e.g.
+
+"ieeg", "eeg", "meg", "anat").
+
+---
+
+### setSuffix(sSuffix)
+
+Set the filename suffix (e.g.
+
+"ieeg", "channels", "electrodes", "coordsystem").
+
+---
+
+### setExtension(sExtension)
+
+Set the file extension including dot (e.g.
+
+".vhdr", ".tsv", ".json").
+
+---
+
+### root()
+
+BIDS dataset root path.
+
+---
+
+### subject()
+
+Subject label (without "sub-").
+
+---
+
+### session()
+
+Session label (without "ses-").
+
+---
+
+### task()
+
+Task label.
+
+---
+
+### acquisition()
+
+Acquisition label.
+
+---
+
+### run()
+
+Run index.
+
+---
+
+### processing()
+
+Processing label.
+
+---
+
+### space()
+
+Space label.
+
+---
+
+### recording()
+
+Recording label.
+
+---
+
+### split()
+
+Split index.
+
+---
+
+### description()
+
+Description label.
+
+---
+
+### datatype()
+
+BIDS datatype string.
+
+---
+
+### suffix()
+
+Filename suffix.
+
+---
+
+### extension()
+
+File extension.
+
+---
+
+### basename()
+
+Constructs the BIDS-compliant filename (without directory).
+
+Format: sub-&lt;label&gt;[*ses-&lt;label&gt;][_task-&lt;label&gt;][_acq-&lt;label&gt;][_run-&lt;index&gt;] [_proc-&lt;label&gt;][_space-&lt;label&gt;][_rec-&lt;label&gt;][_split-&lt;index&gt;] [_desc-&lt;label&gt;]*&lt;suffix&gt;&lt;extension&gt;
+
+**Returns:**
+
+- *QString* — The BIDS filename.
+
+---
+
+### directory()
+
+Constructs the directory path for this entity combination.
+
+Format: &lt;root&gt;/sub-&lt;label&gt;[/ses-&lt;label&gt;]/&lt;datatype&gt;/
+
+**Returns:**
+
+- *QString* — The BIDS directory path (with trailing separator).
+
+---
+
+### filePath()
+
+Constructs the full file path: `directory()` + `basename()`.
+
+**Returns:**
+
+- *QString* — The complete file path.
+
+---
+
+### withSuffix(sSuffix, sExtension)
+
+Returns a copy of this `BIDSPath` with updated suffix and extension.
+
+Useful for deriving sidecar paths from a data path.
+
+**Parameters:**
+
+- **sSuffix** : *const QString &*
+  New suffix (e.g. "channels", "electrodes", "coordsystem").
+
+- **sExtension** : *const QString &*
+  New extension (e.g. ".tsv", ".json").
+
+**Returns:**
+
+- *BIDSPath* — A new `BIDSPath` with the updated suffix and extension.
+
+---
+
+### channelsTsvPath()
+
+Returns the path for the channels.tsv sidecar.
+
+**Returns:**
+
+- *BIDSPath* — `BIDSPath` pointing to the *_channels.tsv file.
+
+---
+
+### electrodesTsvPath()
+
+Returns the path for the electrodes.tsv sidecar.
+
+**Returns:**
+
+- *BIDSPath* — `BIDSPath` pointing to the *_electrodes.tsv file.
+
+---
+
+### coordsystemJsonPath()
+
+Returns the path for the coordsystem.json sidecar.
+
+**Returns:**
+
+- *BIDSPath* — `BIDSPath` pointing to the *_coordsystem.json file.
+
+---
+
+### eventsTsvPath()
+
+Returns the path for the events.tsv sidecar.
+
+**Returns:**
+
+- *BIDSPath* — `BIDSPath` pointing to the *_events.tsv file.
+
+---
+
+### sidecarJsonPath()
+
+Returns the path for the sidecar JSON metadata file (e.g.
+
+*_ieeg.json, *_eeg.json).
+
+**Returns:**
+
+- *BIDSPath* — `BIDSPath` pointing to the sidecar JSON file.
+
+---
+
+### exists()
+
+Checks whether the file at `filePath()` exists on disk.
+
+**Returns:**
+
+- *bool* — true if the file exists.
+
+---
+
+### mkdirs()
+
+Creates the directory structure for this path (mkdir -p).
+
+**Returns:**
+
+- *bool* — true if the directory exists or was created successfully.
+
+---
+
+### match()
+
+Searches the BIDS root for all files matching the current entities.
+
+Wildcards are used for unset entities.
+
+**Returns:**
+
+- *QList&lt; BIDSPath &gt;* — List of matching `BIDSPath` objects.
+
+---
+
+### operator=(other)
+
+---
+
+## Static Methods
+
+### isValidEntityValue(sValue)
+
+Validates entity values (no forbidden characters: -, _, /).
+
+**Parameters:**
+
+- **sValue** : *const QString &*
+  Entity value to validate.
+
+**Returns:**
+
+- *bool* — true if the value is valid.
+
+---

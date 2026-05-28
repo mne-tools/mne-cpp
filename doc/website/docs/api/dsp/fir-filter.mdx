@@ -1,0 +1,226 @@
+---
+id: fir-filter
+title: "UTILSLIB::FirFilter"
+sidebar_label: FirFilter
+sidebar_position: 2
+---
+
+# FirFilter
+
+:::info[Python equivalent]
+`mne.filter.filter_data` in MNE-Python.
+:::
+
+`#include <dsp/firfilter.h>`
+
+```cpp
+class UTILSLIB::FirFilter
+```
+
+Discoverable façade over the `FilterKernel` FIR-filter engine.
+
+Quick-start example — mirrors the `IirFilter` API: 
+```cpp
+// Design a 256-tap band-pass filter
+FilterKernel bpf = FirFilter::design(256, FirFilter::BandPass, 1.0, 40.0, sFreq);
+
+// Apply to a single row vector (group delay already removed — symmetric FIR)
+Eigen::RowVectorXd out = FirFilter::apply(vecData, bpf);
+
+// Apply to all rows of a matrix
+Eigen::MatrixXd clean = FirFilter::applyZeroPhaseMatrix(matData, bpf);
+```
+
+---
+
+## Static Methods
+
+### design(iOrder, type, dCutoffLow, dCutoffHigh, dSFreq, dTransition, method)
+
+Design a linear-phase FIR filter using `FilterKernel` as the backend.
+
+Frequencies are given in Hz; the method converts them to the Nyquist-normalised form expected by `FilterKernel` internally.
+
+**Parameters:**
+
+- **iOrder** : *int*
+  Filter order (number of taps − 1). Must be even for linear phase.
+
+- **type** : *FilterType*
+  Filter type (LowPass, HighPass, BandPass, BandStop).
+
+- **dCutoffLow** : *double*
+  Lower cutoff frequency in Hz. For LowPass/HighPass: the single cutoff. For BandPass/BandStop: lower edge of the transition band.
+
+- **dCutoffHigh** : *double*
+  Upper cutoff frequency in Hz (ignored for LowPass/HighPass).
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+- **dTransition** : *double*
+  Width of the transition band in Hz (Parks-McClellan steepness / Cosine roll-off width). Defaults to 5 Hz.
+
+- **method** : *DesignMethod*
+  Design method (Cosine or `ParksMcClellan`).
+
+**Returns:**
+
+- *FilterKernel* — A ready-to-use `FilterKernel` object.
+
+---
+
+### apply(vecData, kernel)
+
+Apply the filter to a single row vector.
+
+Uses overlap-add FFT convolution. The group delay of a symmetric FIR is removed by the `FilterKernel` engine (it takes the output segment starting at order/2), so the result is already approximately zero-phase for symmetric designs.
+
+**Parameters:**
+
+- **vecData** : *const Eigen::RowVectorXd &*
+  Input row vector.
+
+- **kernel** : *FilterKernel &*
+  `FilterKernel` (prepareFilter is called if needed).
+
+**Returns:**
+
+- *Eigen::RowVectorXd* — Filtered row vector (same length as input).
+
+---
+
+### applyZeroPhase(vecData, kernel)
+
+Apply the filter in a zero-phase forward-backward pass to a single row vector.
+
+Runs the filter twice (forward then reverse) to achieve exactly zero phase shift. Effective order is doubled; transition bandwidth is halved.
+
+**Parameters:**
+
+- **vecData** : *const Eigen::RowVectorXd &*
+  Input row vector.
+
+- **kernel** : *FilterKernel &*
+  `FilterKernel`.
+
+**Returns:**
+
+- *Eigen::RowVectorXd* — Zero-phase filtered row vector.
+
+---
+
+### applyZeroPhaseMatrix(matData, kernel, vecPicks)
+
+Apply the filter in a zero-phase forward-backward pass to every row of a matrix.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Input matrix (n_channels × n_samples).
+
+- **kernel** : *FilterKernel &*
+  `FilterKernel`.
+
+- **vecPicks** : *const Eigen::RowVectorXi &*
+  Optional row indices to filter; if empty, all rows are filtered.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Zero-phase filtered matrix (same dimensions as input).
+
+---
+
+## Example
+
+Source: [`src/examples/ex_filtering/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_filtering/main.cpp)
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <math.h>
+
+#include <fiff/fiff.h>
+
+#include <dsp/filterkernel.h>
+#include <utils/generics/mne_logger.h>
+
+#include <dsp/rt/rt_filter.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtCore/QCoreApplication>
+#include <QFile>
+#include <QCommandLineParser>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FIFFLIB;
+using namespace UTILSLIB;
+using namespace RTPROCESSINGLIB;
+using namespace Eigen;
+
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * The function main marks the entry point of the program.
+ * By default, main has the storage class extern.
+ *
+ * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+ * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+ * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+ */
+int main(int argc, char *argv[])
+{
+    qInstallMessageHandler(MNELogger::customLogWriter);
+    QCoreApplication a(argc, argv);
+
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Read Write Raw Example");
+    parser.addHelpOption();
+
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption outputOption("fileOut", "The output file <out>.", "out", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_filt_raw.fif");
+
+    parser.addOption(inputOption);
+    parser.addOption(outputOption);
+
+    parser.process(a);
+
+    // Init data loading and writing
+    QFile fileIn(parser.value(inputOption));
+    QFile fileOut(parser.value(outputOption));
+
+    FiffRawData::SPtr pRaw = FiffRawData::SPtr::create(fileIn);
+
+    // Only filter MEG and EEG channels
+    RowVectorXi picks = pRaw->info.pick_types(true, false, false);
+
+    // Filtering
+    printf("Filtering...");
+    if(RTPROCESSINGLIB::filterFile(fileOut,
+                                   pRaw,
+                                   FilterKernel::m_filterTypes.indexOf(FilterParameter("BPF")),
+                                   10,
+                                   10,
+                                   0.1,
+                                   pRaw->info.sfreq,
+                                   1024,
+                                   UTILSLIB::FilterKernel::m_designMethods.indexOf(FilterParameter("Cosine")),
+                                   picks)) {
+        printf("[done]\n");
+    } else {
+        printf("[failed]\n");
+    }
+
+    return 0;
+}
+```

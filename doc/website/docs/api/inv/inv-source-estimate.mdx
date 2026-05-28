@@ -1,0 +1,260 @@
+---
+id: inv-source-estimate
+title: "INVLIB::InvSourceEstimate"
+sidebar_label: InvSourceEstimate
+sidebar_position: 12
+---
+
+# InvSourceEstimate
+
+:::info[Python equivalent]
+`mne.SourceEstimate` in MNE-Python.
+:::
+
+`#include <inv/inv_source_estimate.h>`
+
+```cpp
+class INVLIB::InvSourceEstimate
+```
+
+Central source-space container produced by every `INVLIB` inverse solver.
+
+Carries the dense ``(n_sources × n_times) data matrix plus vertex indices, time origin and step, and optional focal dipoles, coupling groups and connectivity layers so one value can represent the output of any algorithm in `INVLIB`. Replaces `mneStcDataRec` of MNE-C and implements round-trip STC / W binary I/O with mne-python and mne-c.
+
+Source-space inverse-solution container with dense grid plus optional focal-dipole, coupling and connectivity layers.
+
+---
+
+## Public Methods
+
+### InvSourceEstimate()
+
+Default constructor.
+
+---
+
+### InvSourceEstimate(p_sol, p_vertices, p_tmin, p_tstep)
+
+Constructs a source estimation from given data.
+
+**Parameters:**
+
+- **p_sol.**
+
+- **p_vertices.**
+
+- **p_tmin.**
+
+- **p_tstep.**
+
+---
+
+### InvSourceEstimate(p_SourceEstimate)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_SourceEstimate** : *const InvSourceEstimate &*
+  Source estimate data which should be copied.
+
+---
+
+### InvSourceEstimate(p_IODevice)
+
+Constructs a source estimation, by reading from a IO device.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  IO device to read from the source estimation.
+
+---
+
+### clear()
+
+Initializes source estimate.
+
+---
+
+### reduce(start, n)
+
+Reduces the source estimate to selected samples.
+
+**Parameters:**
+
+- **start** : *qint32*
+  The start index to cut the estimate from.
+
+- **n** : *qint32*
+  Number of samples to cut from start index.
+
+---
+
+### write(p_IODevice)
+
+mne_write_stc_file
+
+Writes a stc file
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  IO device to write the stc to.
+
+---
+
+### write_w(path)
+
+Write the first time point of this source estimate to a .w file.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  Path to the .w file to write.
+
+---
+
+### isEmpty()
+
+Returns whether SourceEstimate is empty.
+
+**Returns:**
+
+- *bool* — true if is empty, false otherwise.
+
+---
+
+### operator=(rhs)
+
+Assignment Operator.
+
+**Parameters:**
+
+- **rhs** : *const InvSourceEstimate &*
+  SourceEstimate which should be assigned.
+
+**Returns:**
+
+- *InvSourceEstimate &* — the copied source estimate.
+
+---
+
+### samples()
+
+Returns the number of samples.
+
+**Returns:**
+
+- *int* — the number of samples.
+
+---
+
+### getIndicesByLabel(lPickedLabels, bIsClustered)
+
+Returns the indices of sources in the data matrix based on their beloning label.
+
+**Parameters:**
+
+- **lPickedLabels** : *const QList&lt; FSLIB::FsLabel &gt; &*
+  The labels base the selection on.
+
+- **bIsClustered** : *bool*
+  Whether the source space was clustered.
+
+**Returns:**
+
+- *Eigen::VectorXi* — the indices.
+
+---
+
+### hasGridData()
+
+Returns true if the estimate contains grid-based data (distributed methods or RAP-MUSIC amplitudes).
+
+**Returns:**
+
+- *bool* — true if grid data is present.
+
+---
+
+### hasCouplings()
+
+Returns true if the estimate contains source coupling annotations (e.g.
+
+RAP-MUSIC pairs/N-tuples).
+
+**Returns:**
+
+- *bool* — true if couplings are present.
+
+---
+
+### hasFocalDipoles()
+
+Returns true if the estimate contains focal (off-grid) dipole results.
+
+**Returns:**
+
+- *bool* — true if focal dipoles are present.
+
+---
+
+### hasPositions()
+
+Returns true if the estimate carries explicit source positions (discrete source space).
+
+**Returns:**
+
+- *bool* — true if positions are present.
+
+---
+
+### hasConnectivity()
+
+Returns true if the estimate contains connectivity results.
+
+**Returns:**
+
+- *bool* — true if connectivity data is present.
+
+---
+
+## Static Methods
+
+### read(p_IODevice, p_stc)
+
+mne_read_stc_file
+
+Reads a source estimate from a given file
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  IO device to red the stc from.
+
+- **p_stc** : *InvSourceEstimate &*
+  the read stc.
+
+**Returns:**
+
+- *bool* — true if successful, false otherwise.
+
+---
+
+### read_w(path)
+
+Read a .w file (single time-point source estimate).
+
+The .w format stores vertex indices (3-byte big-endian) and float values (4-byte big-endian) for a single time point.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  Path to the .w file.
+
+**Returns:**
+
+- *InvSourceEstimate* — The source estimate with single-column data.
+
+---

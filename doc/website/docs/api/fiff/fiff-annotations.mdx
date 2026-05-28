@@ -1,0 +1,334 @@
+---
+id: fiff-annotations
+title: "FIFFLIB::FiffAnnotations"
+sidebar_label: FiffAnnotations
+sidebar_position: 9
+---
+
+# FiffAnnotations
+
+:::info[Python equivalent]
+`mne.Annotations` in MNE-Python.
+:::
+
+`#include <fiff/fiff_annotations.h>`
+
+```cpp
+class FIFFLIB::FiffAnnotations
+```
+
+Container for `FiffAnnotation` entries with FIFF, JSON and CSV serializers.
+
+Read and written under `FIFFB_MNE_ANNOTATIONS` so the annotation list travels with the FIFF file. The JSON and CSV exporters let the same annotations be consumed by BIDS sidecars and by external scoring tools that do not understand FIFF directly.
+
+---
+
+## Public Methods
+
+### FiffAnnotations()
+
+Constructs an empty `FiffAnnotations` object.
+
+---
+
+### size()
+
+Returns the number of annotations.
+
+**Returns:**
+
+- *int* — Number of annotations.
+
+---
+
+### isEmpty()
+
+Returns true if no annotations are stored.
+
+**Returns:**
+
+- *bool* — True if empty.
+
+---
+
+### operator[](index)
+
+Const subscript operator.
+
+**Parameters:**
+
+- **index** : *int*
+  Index of the annotation.
+
+**Returns:**
+
+- *const FiffAnnotation &* — Const reference to the annotation.
+
+---
+
+### operator[](index)
+
+Subscript operator.
+
+**Parameters:**
+
+- **index** : *int*
+  Index of the annotation.
+
+**Returns:**
+
+- *FiffAnnotation &* — Reference to the annotation.
+
+---
+
+### append(annotation)
+
+Appends an annotation.
+
+**Parameters:**
+
+- **annotation** : *const FiffAnnotation &*
+  The annotation to append.
+
+---
+
+### append(onset, duration, description, channelNames, comment)
+
+Appends an annotation by fields.
+
+**Parameters:**
+
+- **onset** : *double*
+  Onset in seconds.
+
+- **duration** : *double*
+  Duration in seconds.
+
+- **description** : *const QString &*
+  Description label.
+
+- **channelNames** : *const QStringList &*
+  Channel names (empty for global).
+
+- **comment** : *const QString &*
+  Optional comment.
+
+---
+
+### remove(index)
+
+Removes the annotation at the given index.
+
+**Parameters:**
+
+- **index** : *int*
+  Index to remove.
+
+---
+
+### clear()
+
+Removes all annotations.
+
+---
+
+### toVector()
+
+Returns a const reference to the underlying vector.
+
+**Returns:**
+
+- *const QVector&lt; FiffAnnotation &gt; &* — Const reference to annotation vector.
+
+---
+
+### onsetToSample(index, sfreq, firstSample)
+
+Converts onset of annotation at index to a sample number.
+
+**Parameters:**
+
+- **index** : *int*
+  Annotation index.
+
+- **sfreq** : *double*
+  Sampling frequency in Hz.
+
+- **firstSample** : *int*
+  First sample offset.
+
+**Returns:**
+
+- *int* — Sample number.
+
+---
+
+### endToSample(index, sfreq, firstSample)
+
+Converts end (onset+duration) of annotation at index to a sample number.
+
+**Parameters:**
+
+- **index** : *int*
+  Annotation index.
+
+- **sfreq** : *double*
+  Sampling frequency in Hz.
+
+- **firstSample** : *int*
+  First sample offset.
+
+**Returns:**
+
+- *int* — Sample number.
+
+---
+
+### select(descriptionFilter)
+
+Selects annotations whose description starts with the filter string.
+
+**Parameters:**
+
+- **descriptionFilter** : *const QString &*
+  Prefix to match.
+
+**Returns:**
+
+- *FiffAnnotations* — Filtered annotations.
+
+---
+
+### selectByChannel(channelName)
+
+Selects annotations that reference the given channel name.
+
+**Parameters:**
+
+- **channelName** : *const QString &*
+  Channel name to match.
+
+**Returns:**
+
+- *FiffAnnotations* — Filtered annotations.
+
+---
+
+### crop(tmin, tmax)
+
+Returns annotations overlapping [tmin, tmax], clipping partially overlapping ones.
+
+**Parameters:**
+
+- **tmin** : *double*
+  Start time in seconds.
+
+- **tmax** : *double*
+  End time in seconds.
+
+**Returns:**
+
+- *FiffAnnotations* — Cropped annotations.
+
+---
+
+## Static Methods
+
+### readJson(path)
+
+Reads annotations from a JSON file.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  File path.
+
+**Returns:**
+
+- *FiffAnnotations* — Parsed annotations.
+
+---
+
+### writeJson(path, annot)
+
+Writes annotations to a JSON file.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  File path.
+
+- **annot** : *const FiffAnnotations &*
+  Annotations to write.
+
+**Returns:**
+
+- *bool* — True on success.
+
+---
+
+### readCsv(path)
+
+Reads annotations from a CSV file.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  File path.
+
+**Returns:**
+
+- *FiffAnnotations* — Parsed annotations.
+
+---
+
+### writeCsv(path, annot)
+
+Writes annotations to a CSV file.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  File path.
+
+- **annot** : *const FiffAnnotations &*
+  Annotations to write.
+
+**Returns:**
+
+- *bool* — True on success.
+
+---
+
+### read(path)
+
+Auto-detects format and reads annotations.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  File path (.json or .csv).
+
+**Returns:**
+
+- *FiffAnnotations* — Parsed annotations.
+
+---
+
+### write(path, annot)
+
+Auto-detects format and writes annotations.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  File path (.json or .csv).
+
+- **annot** : *const FiffAnnotations &*
+  Annotations to write.
+
+**Returns:**
+
+- *bool* — True on success.
+
+---

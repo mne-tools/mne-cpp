@@ -1,0 +1,103 @@
+---
+id: ml-onnx-model
+title: "MLLIB::MlOnnxModel"
+sidebar_label: MlOnnxModel
+sidebar_position: 3
+---
+
+# MlOnnxModel
+
+`#include <ml/ml_onnx_model.h>`
+
+```cpp
+class MLLIB::MlOnnxModel
+```
+
+`MlModel` backend that runs ``.onnx graphs through ONNX Runtime with a cached CPU session.
+
+When mne-cpp is configured without `USE_ONNXRUNTIME` every method either throws `std::runtime_error` (`predict`) or returns false / logs a warning (`load`, `save`), so the same client code compiles and links on minimal builds and on WebAssembly without conditional call sites.
+
+---
+
+## Public Methods
+
+### MlOnnxModel()
+
+Default constructor.
+
+---
+
+### ~MlOnnxModel()
+
+Destructor.
+
+---
+
+### predict(input)
+
+Run inference on the given input tensor.
+
+**Parameters:**
+
+- **input** : *const MlTensor &*
+  The input data.
+
+**Returns:**
+
+- *MlTensor* — The prediction result.
+
+---
+
+### save(path)
+
+Serialise the model to disk.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  File path.
+
+**Returns:**
+
+- *bool* — True if successful.
+
+---
+
+### load(path)
+
+Load a model from disk.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  File path.
+
+**Returns:**
+
+- *bool* — True if successful.
+
+---
+
+### modelType()
+
+**Returns:**
+
+- *QString* — Human-readable model type name.
+
+---
+
+### taskType()
+
+**Returns:**
+
+- *MlTaskType* — The task type this model is configured for.
+
+---
+
+### isLoaded()
+
+**Returns:**
+
+- *bool* — True if an ONNX Runtime session has been loaded and is ready for inference.
+
+---

@@ -1,0 +1,192 @@
+---
+id: bids-raw-data
+title: "BIDSLIB::BidsRawData"
+sidebar_label: BidsRawData
+sidebar_position: 2
+---
+
+# BidsRawData
+
+:::info[Python equivalent]
+`mne_bids.read_raw_bids` in MNE-Python.
+:::
+
+`#include <bids/bids_raw_data.h>`
+
+```cpp
+class BIDSLIB::BidsRawData
+```
+
+Central container for a BIDS raw dataset, bundling electrophysiological data with all associated sidecar metadata.
+
+`BidsRawData` is the primary data object of the BIDS library, analogous to FiffRawData for the FIFF library. It owns both the data and the I/O logic:
+
+**`read()`** — static factory that loads a BIDS dataset from disk.
+
+
+**`write()`** — member that writes the current dataset to a BIDS directory.
+
+Sidecar and coordinate-system fields that are derivable from FiffInfo (sampling frequency, channel counts) are computed on write and applied to FiffInfo on read. Only fields carrying independent information are stored as explicit members.
+
+Example: 
+```cpp
+BIDSPath path("/data/bids", "01", "implant01", "rest", "ieeg", "ieeg", ".vhdr");
+BidsRawData data = BidsRawData::read(path);
+if(data.isValid()) {
+    qDebug() << "Channels:" << data.raw.info.nchan;
+    qDebug() << "Events:"   << data.events.size();
+
+    // Round-trip: write to a new BIDS root
+    BIDSPath out("/data/bids_out", "01", "implant01", "rest", "ieeg", "ieeg", ".vhdr");
+    data.write(out, path.filePath());
+}
+```
+
+---
+
+## Public Methods
+
+### BidsRawData()
+
+Default constructor.
+
+Creates an empty, invalid `BidsRawData`.
+
+---
+
+### ~BidsRawData()
+
+Destructor.
+
+---
+
+### BidsRawData(other)
+
+---
+
+### operator=(other)
+
+---
+
+### BidsRawData()
+
+---
+
+### operator=()
+
+---
+
+### write(bidsPath, sourcePath, options)
+
+Write this dataset to a BIDS-compliant directory.
+
+Orchestrates writing of:
+Directory structure: root/sub-XX/[ses-YY/]&lt;datatype&gt;/
+
+
+Raw data file — copies the source file into the BIDS directory
+
+
+*_channels.tsv
+
+
+*_electrodes.tsv + *_coordsystem.json
+
+
+*_events.tsv
+
+
+*_\{datatype\}.json (iEEG sidecar)
+
+
+dataset_description.json
+
+**Parameters:**
+
+- **bidsPath** : *const BIDSPath &*
+  Target `BIDSPath` (root, subject, task, datatype, suffix, extension).
+
+- **sourcePath** : *const QString &*
+  Path to the original raw data file to copy. If empty, the raw data file is not copied.
+
+- **options** : *const WriteOptions &*
+  Write options (overwrite, dataset name, etc.).
+
+**Returns:**
+
+- *BIDSPath* — `BIDSPath` of the written data file, or empty `BIDSPath` on failure.
+
+---
+
+### write(bidsPath, sourcePath)
+
+Convenience overload — write with default options.
+
+---
+
+### isValid()
+
+Returns true if the data was loaded successfully.
+
+---
+
+### setValid(bValid)
+
+Marks the data as valid or invalid.
+
+---
+
+### clear()
+
+Clears all data members and resets to invalid state.
+
+---
+
+## Static Methods
+
+### read(bidsPath)
+
+Read a BIDS dataset from disk.
+
+Static factory that orchestrates reading of:
+Raw data file via the appropriate format reader (EDF, BrainVision, …)
+
+
+*_channels.tsv → channel types, units, bad-channel marking
+
+
+*_electrodes.tsv + *_coordsystem.json → digitization points
+
+
+*_events.tsv → event annotations
+
+
+*_\{datatype\}.json → line frequency and recording metadata
+
+The `BIDSPath` must have at minimum: root, subject, datatype, suffix, extension.
+
+**Parameters:**
+
+- **bidsPath** : *const BIDSPath &*
+  Fully specified `BIDSPath` pointing to the raw data file.
+
+**Returns:**
+
+- *BidsRawData* — Populated `BidsRawData`. Check `isValid()` to determine success.
+
+---
+
+### createReader(sExtension)
+
+Create the appropriate format reader for a given file extension.
+
+**Parameters:**
+
+- **sExtension** : *const QString &*
+  File extension including dot (e.g. ".vhdr", ".edf").
+
+**Returns:**
+
+- *AbstractFormatReader::UPtr* — Shared pointer to the reader, or nullptr if unsupported.
+
+---

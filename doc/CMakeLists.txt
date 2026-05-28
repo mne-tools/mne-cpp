@@ -26,5 +26,5 @@ if(DOXYGEN_FOUND)
         COMMENT "Generating Doxygen XML for the mne-cpp public API"
         VERBATIM)
 else()
-    message(STATUS "Doxygen not found \u2014 mne_cpp_docs_api target unavailable")
+    message(STATUS "Doxygen not found -- mne_cpp_docs_api target unavailable")
 endif()

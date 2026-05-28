@@ -1,0 +1,154 @@
+---
+id: decoding-csp
+title: "DECODINGLIB::DecodingCsp"
+sidebar_label: DecodingCsp
+sidebar_position: 1
+---
+
+# DecodingCsp
+
+:::info[Python equivalent]
+`mne.decoding.CSP` in MNE-Python.
+:::
+
+`#include <decoding/decoding_csp.h>`
+
+```cpp
+class DECODINGLIB::DecodingCsp
+```
+
+Common Spatial Patterns decoder for two-class discriminative spatial filtering.
+
+Estimates the joint diagonaliser of two class-conditional covariance matrices estimated from labelled, band-passed epochs and exposes the top and bottom `n_components` eigenvectors as a bank of spatial filters; the corresponding patterns (the columns of the pseudoinverse of the filter matrix) describe the sensor-space activity that each filter is sensitive to and are what should be plotted as topographies for neurophysiological interpretation, as discussed by Haufe et al.
+After `fit` the class works as a deterministic feature extractor: `transform` reduces an epoch tensor either to one log-power (or z-scored) value per component (`AveragePower`, the standard input to an LDA / logistic-regression classifier) or to the full time-resolved projection (`CspSpace`, useful for downstream Riemannian or deep-learning stages).
+
+The implementation expects exactly two unique class labels in `y` and epochs already restricted to the discriminative frequency band (e.g. 8–30 Hz for sensorimotor rhythms); no regularisation is applied to the covariance estimate, so callers should ensure enough trials per class to avoid the ill-conditioned regime that motivates the regularised variants of Lotte & Guan 2011. `inverseTransform` provides the closed-form back-projection of a power-feature vector into sensor space, which is what the application layer uses to render CSP topographies side-by-side with the discriminative scores.
+
+---
+
+## Public Methods
+
+### DecodingCsp(nComponents, transformInto, useLog)
+
+Constructs a CSP decoder.
+
+**Parameters:**
+
+- **nComponents** : *int*
+  Number of CSP components (split between classes). Default: 4.
+
+- **transformInto** : *TransformMode*
+  Feature extraction mode. Default: AveragePower.
+
+- **useLog** : *bool*
+  If true (default) and transformInto == AveragePower, apply log transform; otherwise z-score features using mean_ and std_.
+
+---
+
+### fit(epochs, y)
+
+Fit CSP from labelled epoch data (binary classification).
+
+**Parameters:**
+
+- **epochs** : *const std::vector&lt; Eigen::MatrixXd &gt; &*
+  Vector of epoch matrices, each (n_channels × n_times).
+
+- **y** : *const Eigen::VectorXi &*
+  Class label for each epoch (must contain exactly 2 unique values).
+
+---
+
+### transform(epochs)
+
+Transform epoch data using the fitted CSP filters.
+
+When transformInto == AveragePower, returns (n_epochs × n_components) with log-transformed or z-scored mean band power.
+
+When transformInto == CspSpace, returns a matrix where each n_components rows correspond to one epoch's CSP-space projection. The shape is (n_epochs * n_components, n_times).
+
+**Parameters:**
+
+- **epochs** : *const std::vector&lt; Eigen::MatrixXd &gt; &*
+  Vector of epoch matrices, each (n_channels × n_times).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Feature matrix.
+
+---
+
+### fitTransform(epochs, y)
+
+Fit and transform in one step.
+
+**Parameters:**
+
+- **epochs** : *const std::vector&lt; Eigen::MatrixXd &gt; &*
+  Epoch data.
+
+- **y** : *const Eigen::VectorXi &*
+  Class labels.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Feature matrix (same as transform output).
+
+---
+
+### inverseTransform(X)
+
+Project CSP power features back to sensor space.
+
+Only valid when transformInto == AveragePower.
+
+**Parameters:**
+
+- **X** : *const Eigen::MatrixXd &*
+  Feature matrix (n_epochs × n_components).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Sensor-space projection (n_epochs × n_channels × n_components). Stored as (n_epochs, n_channels * n_components) flattened.
+
+---
+
+### filters()
+
+**Returns:**
+
+- *const Eigen::MatrixXd &* — Spatial filters (n_components × n_channels).
+
+---
+
+### patterns()
+
+**Returns:**
+
+- *const Eigen::MatrixXd &* — Spatial patterns (n_channels × n_components).
+
+---
+
+### mean()
+
+**Returns:**
+
+- *const Eigen::VectorXd &* — Mean band power per component (computed during fit).
+
+---
+
+### stddev()
+
+**Returns:**
+
+- *const Eigen::VectorXd &* — Standard deviation of band power per component (computed during fit).
+
+---
+
+### isFitted()
+
+**Returns:**
+
+- *bool* — True if the model has been fitted.
+
+---

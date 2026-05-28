@@ -1,0 +1,84 @@
+---
+id: ml-trainer
+title: "MLLIB::MLTrainer"
+sidebar_label: MLTrainer
+sidebar_position: 4
+---
+
+# MLTrainer
+
+`#include <ml/ml_trainer.h>`
+
+```cpp
+class MLLIB::MLTrainer
+```
+
+Launches Python training scripts via `UTILSLIB::PythonRunner` with automatic venv handling and prerequisite checks.
+
+Training logic (PyTorch, scikit-learn, MNE-Python, …) lives entirely in the ``.py scripts under `scripts/ml/training/` and runs in a child process; no Python embedding or `libpython` linkage is required. If the configured `UTILSLIB::PythonRunnerConfig` carries a `venvDir`, the runner creates and updates the venv before each script invocation so dependencies are pinned per training job.
+
+---
+
+## Public Methods
+
+### MLTrainer()
+
+Construct an `MLTrainer` with default PythonRunner configuration.
+
+---
+
+### MLTrainer(config)
+
+Construct an `MLTrainer` with explicit PythonRunner configuration.
+
+**Parameters:**
+
+- **config** : *const UTILSLIB::PythonRunnerConfig &*
+  PythonRunner configuration to use.
+
+---
+
+### runner()
+
+Access the underlying PythonRunner for callback/config changes.
+
+**Returns:**
+
+- *UTILSLIB::PythonRunner &* — Reference to the PythonRunner instance.
+
+---
+
+### run(scriptPath, args)
+
+Run a training script.
+
+If the PythonRunner is configured with a venvDir and packageDir, the venv is created/updated automatically before the script runs.
+
+**Parameters:**
+
+- **scriptPath** : *const QString &*
+  Path to the .py training script.
+
+- **args** : *const QStringList &*
+  Arguments forwarded to the script.
+
+**Returns:**
+
+- *UTILSLIB::PythonRunnerResult* — PythonRunnerResult with exit code, output, and progress.
+
+---
+
+### checkPrerequisites(packages)
+
+Check that the required Python packages are importable.
+
+**Parameters:**
+
+- **packages** : *const QStringList &*
+  List of package names (e.g. \{"torch", "mne"\}).
+
+**Returns:**
+
+- *QStringList* — List of packages that could NOT be imported (empty = all OK).
+
+---

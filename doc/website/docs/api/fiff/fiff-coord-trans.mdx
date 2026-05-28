@@ -1,0 +1,551 @@
+---
+id: fiff-coord-trans
+title: "FIFFLIB::FiffCoordTrans"
+sidebar_label: FiffCoordTrans
+sidebar_position: 8
+---
+
+# FiffCoordTrans
+
+:::info[Python equivalent]
+`mne.transforms.Transform` in MNE-Python.
+:::
+
+`#include <fiff/fiff_coord_trans.h>`
+
+```cpp
+class FIFFLIB::FiffCoordTrans
+```
+
+Labelled 4x4 FIFF affine: source frame, destination frame, rotation, translation and cached inverse.
+
+Each transform carries its source (`from`) and destination (`to`) `FIFFV_COORD_*` frame identifiers so the inverse and any chained composition can be type-checked at runtime. The inverse is stored alongside the forward transform because both directions are routinely needed (device→head for head-position tracking, head→MRI for source space registration, etc.).
+
+---
+
+## Public Methods
+
+### FiffCoordTrans()
+
+Constructs the coordinate transformation descriptor.
+
+---
+
+### FiffCoordTrans(p_IODevice)
+
+Constructs a coordinate transformation, by reading from a IO device.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  IO device to read from the coordinate transform.
+
+---
+
+### FiffCoordTrans(p_FiffCoordTrans)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FiffCoordTrans** : *const FiffCoordTrans &*
+  Coordinate transformation description which should be copied.
+
+---
+
+### FiffCoordTrans(from, to, rot, move)
+
+Constructs a coordinate transformation from a rotation matrix and translation vector.
+
+**Parameters:**
+
+- **from** : *int*
+  Source coordinate system.
+
+- **to** : *int*
+  Destination coordinate system.
+
+- **rot** : *const Eigen::Matrix3f &*
+  The forward transform (3×3 rotation matrix).
+
+- **move** : *const Eigen::Vector3f &*
+  The forward transform (3×1 translation vector).
+
+---
+
+### FiffCoordTrans(from, to, matTrans, bStandard)
+
+Constructs a coordinate transformation from a 4×4 homogeneous matrix.
+
+**Parameters:**
+
+- **from** : *int*
+  Source coordinate system.
+
+- **to** : *int*
+  Destination coordinate system.
+
+- **matTrans** : *const Eigen::Matrix4f &*
+  The 4×4 forward transform.
+
+- **bStandard** : *bool*
+  When true, enforce standard transform (last row = [0,0,0,1]). Defaults to false.
+
+---
+
+### ~FiffCoordTrans()
+
+Destroys the coordinate transformation descriptor.
+
+---
+
+### clear()
+
+Initializes the coordinate transformation descriptor.
+
+---
+
+### invert_transform()
+
+Invert a coordinate transformation (actual obsolete - cause trans and inverse are both stored).
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### isEmpty()
+
+Returns true if coordinate transform contains no data.
+
+**Returns:**
+
+- *bool* — true if coordinate transform is empty.
+
+---
+
+### apply_trans(rr, do_move)
+
+TODO: dest - The id of the destination coordinate system (FIFFV_COORD_...).
+
+Applies the coordinate transform to given coordinates and returns the transformed coordinates
+
+**Parameters:**
+
+- **rr** : *const Eigen::MatrixX3f &*
+  The coordinates.
+
+- **do_move** : *bool*
+  Perform translation next to rotation yes/no.
+
+**Returns:**
+
+- *Eigen::MatrixX3f* — Transformed coordinates.
+
+---
+
+### apply_inverse_trans(rr, do_move)
+
+Applies the inverse coordinate transform to given coordinates and returns the transformed coordinates.
+
+**Parameters:**
+
+- **rr** : *const Eigen::MatrixX3f &*
+  The coordinates.
+
+- **do_move** : *bool*
+  Perform translation next to rotation yes/no.
+
+**Returns:**
+
+- *Eigen::MatrixX3f* — Transformed coordinates.
+
+---
+
+### inverted()
+
+Returns a new inverted copy of this transformation (swaps from/to and trans/invtrans).
+
+**Returns:**
+
+- *FiffCoordTrans* — The inverted transformation.
+
+---
+
+### print()
+
+Prints the coordinate transform.
+
+---
+
+### write(p_IODevice)
+
+Writes the transformation to file.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  IO device to write the transformation to.
+
+---
+
+### writeToStream(p_pStream)
+
+Writes the transformation to a FIFF stream.
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  Pointer to the FIFF stream to write to.
+
+---
+
+### angleTo(mTransDest)
+
+Calculate rotation as angle between two rotation matrices.
+
+**Parameters:**
+
+- **mTransDest** : *Eigen::MatrixX4f*
+  The destination transformation matrix.
+
+**Returns:**
+
+- *float* — The angle of rotation between two rotation matrices in degrees.
+
+---
+
+### translationTo(mTransDest)
+
+Calculate translation between two rotation matrices in meter.
+
+**Parameters:**
+
+- **mTransDest** : *Eigen::MatrixX4f*
+  The destination transformation matrix.
+
+**Returns:**
+
+- *float* — The translation between two rotation matrices in m.
+
+---
+
+## Static Methods
+
+### read(p_IODevice, p_Trans)
+
+Reads a coordinate transform from a fif file.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  A fiff IO device like a fiff QFile or QTCPSocket.
+
+- **p_Trans** : *FiffCoordTrans &*
+  A coordinate transform from a fif file.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### readTransform(name, from, to)
+
+Reads a specified coordinate transform from a FIFF file.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  FIFF file path.
+
+- **from** : *int*
+  Expected source coordinate system.
+
+- **to** : *int*
+  Expected destination coordinate system.
+
+**Returns:**
+
+- *FiffCoordTrans* — The coordinate transform, or an empty transform if not found.
+
+---
+
+### readMriTransform(name)
+
+Reads the MRI → head coordinate transform from a FIFF file.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  FIFF file path.
+
+**Returns:**
+
+- *FiffCoordTrans* — The MRI→head transform, or an empty transform if not found.
+
+---
+
+### readMeasTransform(name)
+
+Reads the MEG device → head coordinate transform from a FIFF file.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  FIFF file path.
+
+**Returns:**
+
+- *FiffCoordTrans* — The device→head transform, or an empty transform if not found.
+
+---
+
+### readTransformAscii(name, from, to)
+
+Reads a coordinate transform from an ASCII 4×3 matrix file (mm-to-m conversion applied).
+
+**Parameters:**
+
+- **name** : *const QString &*
+  ASCII file path.
+
+- **from** : *int*
+  Source coordinate system.
+
+- **to** : *int*
+  Destination coordinate system.
+
+**Returns:**
+
+- *FiffCoordTrans* — The coordinate transform, or an empty transform on failure.
+
+---
+
+### readFShead2mriTransform(name)
+
+Reads the FreeSurfer head → MRI transform from an ASCII file.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  ASCII file path.
+
+**Returns:**
+
+- *FiffCoordTrans* — The head→MRI transform, or an empty transform on failure.
+
+---
+
+### apply_trans(r, t, do_move)
+
+Applies the coordinate transform to a single 3D point in place.
+
+**Parameters:**
+
+- **r** : *float*
+  3-element float array to transform in place.
+
+- **t** : *const FiffCoordTrans &*
+  The coordinate transformation to apply.
+
+- **do_move** : *bool*
+  If true, apply translation; if false, rotation only.
+
+---
+
+### apply_inverse_trans(r, t, do_move)
+
+Applies the inverse coordinate transform to a single 3D point in place.
+
+**Parameters:**
+
+- **r** : *float*
+  3-element float array to transform in place.
+
+- **t** : *const FiffCoordTrans &*
+  The coordinate transformation whose inverse to apply.
+
+- **do_move** : *bool*
+  If true, apply translation; if false, rotation only.
+
+---
+
+### frame_name(frame)
+
+Map coordinate frame integers to human-readable names.
+
+**Parameters:**
+
+- **frame** : *int*
+  The coordinate frame integer.
+
+**Returns:**
+
+- *QString* — Human readable form of the coordinate frame.
+
+---
+
+### identity(from, to)
+
+Creates an identity transformation between two coordinate systems.
+
+**Parameters:**
+
+- **from** : *int*
+  Source coordinate system.
+
+- **to** : *int*
+  Destination coordinate system.
+
+**Returns:**
+
+- *FiffCoordTrans* — An identity coordinate transformation.
+
+---
+
+### combine(from, to, t1, t2)
+
+Combines two coordinate transformations to yield a transform from `from` to `to`.
+
+Automatically handles inversion and ordering of the input transforms.
+
+**Parameters:**
+
+- **from** : *int*
+  Desired source coordinate system.
+
+- **to** : *int*
+  Desired destination coordinate system.
+
+- **t1** : *const FiffCoordTrans &*
+  First transformation.
+
+- **t2** : *const FiffCoordTrans &*
+  Second transformation.
+
+**Returns:**
+
+- *FiffCoordTrans* — The combined transformation, or an empty transform on failure.
+
+---
+
+### fromCardinalPoints(from, to, rL, rN, rR)
+
+Constructs a coordinate transformation from cardinal points (LPA, Nasion, RPA).
+
+**Parameters:**
+
+- **from** : *int*
+  Source coordinate system.
+
+- **to** : *int*
+  Destination coordinate system (in which the points are expressed).
+
+- **rL** : *const float **
+  Left auricular point (3 floats).
+
+- **rN** : *const float **
+  Nasion point (3 floats).
+
+- **rR** : *const float **
+  Right auricular point (3 floats).
+
+**Returns:**
+
+- *FiffCoordTrans* — The coordinate transformation.
+
+---
+
+### addInverse(t)
+
+**Parameters:**
+
+- **t** : *FiffCoordTrans &*
+  `Fiff` coordinate transform to which the inverse should be added.
+
+**Returns:**
+
+- *bool* — True when successful.
+
+---
+
+### storageSize()
+
+Size of the old struct (fiffCoordTransRec) 26*int = 26*4 = 104.
+
+**Returns:**
+
+- *qint32* — the size of the old struct fiffCoordTransRec.
+
+---
+
+### readFromTag(tag)
+
+Reads a coordinate transform from a FIFF tag.
+
+**Parameters:**
+
+- **tag** : *const std::unique_ptr&lt; FiffTag &gt; &*
+  The FIFF tag to read from.
+
+**Returns:**
+
+- *FiffCoordTrans* — The coordinate transform, or an empty transform if the tag is invalid.
+
+---
+
+### readTransformFromNode(stream, node, from, to)
+
+Reads a coordinate transform from a FIFF stream node.
+
+**Parameters:**
+
+- **stream** : *FiffStream::SPtr &*
+  The FIFF stream.
+
+- **node** : *const FiffDirNode::SPtr &*
+  The directory node to search.
+
+- **from** : *int*
+  Expected source coordinate system.
+
+- **to** : *int*
+  Expected destination coordinate system.
+
+**Returns:**
+
+- *FiffCoordTrans* — The coordinate transform, or an empty transform if not found.
+
+---
+
+### procrustesAlign(from_frame, to_frame, fromp, top, w, max_diff)
+
+Performs a Procrustes alignment between two sets of corresponding 3D points.
+
+**Parameters:**
+
+- **from_frame** : *int*
+  Source coordinate frame ID.
+
+- **to_frame** : *int*
+  Destination coordinate frame ID.
+
+- **fromp** : *const Eigen::MatrixXf &*
+  Point locations in the source frame (np×3 matrix).
+
+- **top** : *const Eigen::MatrixXf &*
+  Point locations in the destination frame (np×3 matrix).
+
+- **w** : *const Eigen::VectorXf &*
+  Weights (np elements), or empty vector for equal weight.
+
+- **max_diff** : *float*
+  Maximum allowed difference between transformed and target.
+
+**Returns:**
+
+- *FiffCoordTrans* — The alignment transform, or an empty transform on failure.
+
+---

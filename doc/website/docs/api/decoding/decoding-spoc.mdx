@@ -1,0 +1,120 @@
+---
+id: decoding-spoc
+title: "DECODINGLIB::DecodingSpoc"
+sidebar_label: DecodingSpoc
+sidebar_position: 2
+---
+
+# DecodingSpoc
+
+:::info[Python equivalent]
+`mne.decoding.SPoC` in MNE-Python.
+:::
+
+`#include <decoding/decoding_spoc.h>`
+
+```cpp
+class DECODINGLIB::DecodingSpoc
+```
+
+Source Power Comodulation decoder for continuous-target regression on band-power.
+
+Estimates a bank of spatial filters whose log band-power envelope is maximally correlated with a continuous trial-level target. The fit builds the unweighted trial-mean covariance and a target-weighted covariance from centred labels, solves the resulting generalised eigenvalue problem, and keeps the top `n_components` eigenvectors as filters and the columns of their pseudoinverse as the corresponding activation patterns. As with CSP, the patterns — not the filters — are the quantity that should be plotted as topographies when interpreting which cortical sources drive the regression, in line with Haufe et al. 2014.
+
+After `fit` the decoder behaves as a deterministic feature extractor. `AveragePower` returns one (optionally log- or z-scored) band-power value per component and epoch, which plugs directly into a linear regressor; `CspSpace` returns the time- resolved filtered signal, useful when the downstream model consumes envelopes or instantaneous phase. Inputs must be epoched and already filtered in the relevant frequency band; the target vector $$z$$ is a real-valued vector of length `n_epochs`.
+
+---
+
+## Public Methods
+
+### DecodingSpoc(nComponents, transformInto, useLog)
+
+Constructs a SPoC decoder.
+
+**Parameters:**
+
+- **nComponents** : *int*
+  Number of components. Default: 4.
+
+- **transformInto** : *TransformMode*
+  Feature extraction mode. Default: AveragePower.
+
+- **useLog** : *bool*
+  If true and transformInto == AveragePower, apply log transform.
+
+---
+
+### fit(epochs, y)
+
+Fit SPoC from epoch data and a continuous target variable.
+
+**Parameters:**
+
+- **epochs** : *const std::vector&lt; Eigen::MatrixXd &gt; &*
+  Vector of epoch matrices, each (n_channels × n_times).
+
+- **y** : *const Eigen::VectorXd &*
+  Continuous target variable (one value per epoch).
+
+---
+
+### transform(epochs)
+
+Transform epoch data using the fitted SPoC filters.
+
+**Parameters:**
+
+- **epochs** : *const std::vector&lt; Eigen::MatrixXd &gt; &*
+  Vector of epoch matrices.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Feature matrix.
+
+---
+
+### fitTransform(epochs, y)
+
+Fit and transform in one step.
+
+---
+
+### filters()
+
+**Returns:**
+
+- *const Eigen::MatrixXd &* — Spatial filters (n_components × n_channels).
+
+---
+
+### patterns()
+
+**Returns:**
+
+- *const Eigen::MatrixXd &* — Spatial patterns (n_channels × n_components).
+
+---
+
+### mean()
+
+**Returns:**
+
+- *const Eigen::VectorXd &* — Mean band power per component (computed during fit).
+
+---
+
+### stddev()
+
+**Returns:**
+
+- *const Eigen::VectorXd &* — Standard deviation of band power per component.
+
+---
+
+### isFitted()
+
+**Returns:**
+
+- *bool* — True if the model has been fitted.
+
+---

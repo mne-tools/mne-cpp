@@ -1,0 +1,210 @@
+---
+id: compute-fwd
+title: "FWDLIB::ComputeFwd"
+sidebar_label: ComputeFwd
+sidebar_position: 1
+---
+
+# ComputeFwd
+
+:::info[Python equivalent]
+`mne.make_forward_solution` in MNE-Python.
+:::
+
+`#include <fwd/compute_fwd.h>`
+
+```cpp
+class FWDLIB::ComputeFwd
+```
+
+Implements the forward-solution computation driver.
+
+`ComputeFwd` is the worker/factory that takes a `ComputeFwdSettings`, initialises all required data structures (coil definitions, BEM or sphere model, source spaces, compensation data, coordinate transforms) and assembles the MEG/EEG lead-field matrix `G` one dipole column at a time. The computed MNEForwardSolution is returned by `calculateFwd`; `updateHeadPos` rebuilds only the MEG block after a new device-to-head transform.
+
+Top-level driver for MEG/EEG forward-solution computation.
+
+---
+
+## Public Methods
+
+### ComputeFwd(pSettings)
+
+Constructs a `ComputeFwd` and initialises all data structures needed for the forward computation according to *pSettings*.
+
+**Parameters:**
+
+- **pSettings** : *std::shared_ptr&lt; ComputeFwdSettings &gt;*
+  Shared pointer to the forward computation settings.
+
+---
+
+### ~ComputeFwd()
+
+Destructor.
+
+---
+
+### calculateFwd()
+
+Perform the forward calculation.
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNELIB::MNEForwardSolution &gt;* — The computed forward solution, or nullptr on error.
+
+---
+
+### updateHeadPos(transDevHead, fwd)
+
+Update the head position with a new device-to-head transform and recompute the MEG portion of the forward solution.
+
+**Parameters:**
+
+- **transDevHead** : *const FIFFLIB::FiffCoordTrans &*
+  The updated device-to-head coordinate transform.
+
+- **fwd** : *MNELIB::MNEForwardSolution &*
+  The forward solution to update in place.
+
+**Returns:**
+
+- *bool* — True on success, false on error.
+
+---
+
+## Example
+
+Source: [`src/examples/ex_compute_forward/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_compute_forward/main.cpp)
+
+```cpp
+#include <iostream>
+#include <memory>
+
+#include <utils/generics/mne_logger.h>
+
+#include <fiff/fiff.h>
+#include <fiff/fiff_info.h>
+
+#include <fwd/compute_fwd/compute_fwd_settings.h>
+#include <fwd/compute_fwd/compute_fwd.h>
+
+#include <mne/mne_forward_solution.h>
+
+#include <mne/mne.h>
+//=============================================================================================================
+// Eigen
+//=============================================================================================================
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QApplication>
+#include <QCommandLineParser>
+#include <QFile>
+#include <QElapsedTimer>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FWDLIB;
+using namespace FIFFLIB;
+using namespace MNELIB;
+using namespace Eigen;
+
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * The function main marks the entry point of the program.
+ * By default, main has the storage class extern.
+ *
+ * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+ * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+ * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+ */
+int main(int argc, char *argv[])
+{
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
+    QCoreApplication a(argc, argv);
+
+    QElapsedTimer timer0, timer1, timer2, timer3, timer4;
+    float fTime0, fTime1, fTime2, fTime3, fTime4;
+
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Example name");
+    parser.addHelpOption();
+
+    QCommandLineOption parameterOption("parameter", "The first parameter description.");
+    parser.addOption(parameterOption);
+
+    parser.process(a);
+
+    // specify necessary information for forward computation
+    std::shared_ptr<ComputeFwdSettings> pSettings = std::make_shared<ComputeFwdSettings>();
+
+    QFile t_fileBemName(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+    QFile t_fileSrcName(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif");
+
+    pSettings->include_meg = true;
+    pSettings->include_eeg = true;
+    pSettings->accurate = true;
+    pSettings->srcname = QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif";
+    pSettings->measname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+    pSettings->mriname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif";
+    pSettings->transname.clear();
+    pSettings->bemname = QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif";
+    pSettings->mindist = 5.0f/1000.0f;
+    pSettings->solname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
+
+    // bring in dev_head transformation and FiffInfo
+    // Init data loading and writing
+    QFile t_fileIn(pSettings->measname);
+    FiffRawData raw(t_fileIn);
+    QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FiffInfo>::create(raw.info);
+
+    FiffCoordTrans meg_head_t = pFiffInfo->dev_head_t;
+
+    pSettings->meg_head_t = meg_head_t;
+    pSettings->pFiffInfo = pFiffInfo;
+
+    pSettings->checkIntegrity();
+
+    timer0.start();
+    std::shared_ptr<ComputeFwd> pFwdComputer = std::make_shared<ComputeFwd>(pSettings);
+    fTime0 = timer0.elapsed();
+
+    // perform the actual computation
+    timer1.start();
+    auto pFwdSolution = pFwdComputer->calculateFwd();
+    fTime1 = timer1.elapsed();
+
+    // store calculated forward solution
+    timer2.start();
+    QFile fwdFile(pSettings->solname);
+    pFwdSolution->write(fwdFile);
+    fTime2 = timer2.elapsed();
+
+    // read back to verify round-trip
+    timer3.start();
+    QFile t_solution(pSettings->solname);
+    MNEForwardSolution::SPtr pFwdRead = MNEForwardSolution::SPtr(new MNEForwardSolution(t_solution));
+    fTime3 = timer3.elapsed();
+
+    // update head position and recompute
+    timer4.start();
+    pFwdComputer->updateHeadPos(meg_head_t, *pFwdSolution);
+    fTime4 = timer4.elapsed();
+
+    // Print timer results
+    qInfo() << "The initialization took: " << fTime0  << " ms.";
+    qInfo() << "The computation took: " << fTime1  << " ms.";
+    qInfo() << "Storing the fwd solution took: " << fTime2 << " ms.";
+    qInfo() << "Reading the fwd solution took: " << fTime3 << " ms.";
+    qInfo() << "The recomputation took: " << fTime4 << " ms.";
+}
+```

@@ -1,0 +1,194 @@
+---
+id: inv-dipole-fit
+title: "INVLIB::InvDipoleFit"
+sidebar_label: InvDipoleFit
+sidebar_position: 7
+---
+
+# InvDipoleFit
+
+:::info[Python equivalent]
+`mne.fit_dipole` in MNE-Python.
+:::
+
+`#include <inv/inv_dipole_fit.h>`
+
+```cpp
+class INVLIB::InvDipoleFit
+```
+
+High-level driver for sequential dipole fitting.
+
+`InvDipoleFit` orchestrates the complete dipole-fit pipeline: it sets up the forward model via `InvDipoleFitData`, computes initial guess grids via `InvGuessData`, reads averaged or raw data, and fits an equivalent current dipole (ECD) at each requested time point.
+
+Refactored from fit_dipoles.c / dipole_fit_setup.c (MNE-C).
+
+---
+
+## Public Methods
+
+### InvDipoleFit(p_settings)
+
+Constructs Dipole Fit algorithm.
+
+**Parameters:**
+
+- **p_settings** : *InvDipoleFitSettings **
+  The dipole fit settings.
+
+---
+
+### ~InvDipoleFit()
+
+Destructs the Dipole Fit.
+
+---
+
+### calculateFit()
+
+Execute the dipole fit using the stored settings.
+
+**Returns:**
+
+- *InvEcdSet* — The fitted dipole set.
+
+---
+
+## Static Methods
+
+### fit_dipoles(dataname, data, fit, guess, tmin, tmax, tstep, integ, verbose, p_set)
+
+Fit a single dipole to each time point of averaged data.
+
+Refactored: fit_dipoles (fit_dipoles.c)
+
+**Parameters:**
+
+- **dataname** : *const QString &*
+  Data file name.
+
+- **data** : *MNELIB::MNEMeasData **
+  The measured data.
+
+- **fit** : *InvDipoleFitData **
+  Precomputed fitting data.
+
+- **guess** : *InvGuessData **
+  The initial guesses.
+
+- **tmin** : *float*
+  Fit start time (s).
+
+- **tmax** : *float*
+  Fit end time (s).
+
+- **tstep** : *float*
+  Time step to use (s).
+
+- **integ** : *float*
+  Integration time (s).
+
+- **verbose** : *int*
+  Verbose output.
+
+- **p_set** : *InvEcdSet &*
+  The fitted dipole set.
+
+**Returns:**
+
+- *bool* — true when successful.
+
+---
+
+### fit_dipoles_raw(dataname, raw, sel, fit, guess, tmin, tmax, tstep, integ, verbose, p_set)
+
+Fit a single dipole to each time point of raw data.
+
+Reads data in overlapping segments of `SEG_LEN` seconds and extracts values at each requested time point.
+
+Refactored: fit_dipoles_raw (fit_dipoles.c)
+
+**Parameters:**
+
+- **dataname** : *const QString &*
+  Data file name.
+
+- **raw** : *MNELIB::MNERawData **
+  The raw data description.
+
+- **sel** : *MNELIB::mneChSelection*
+  Channel selection to use.
+
+- **fit** : *InvDipoleFitData **
+  Precomputed fitting data.
+
+- **guess** : *InvGuessData **
+  The initial guesses.
+
+- **tmin** : *float*
+  Fit start time (s).
+
+- **tmax** : *float*
+  Fit end time (s).
+
+- **tstep** : *float*
+  Time step to use (s).
+
+- **integ** : *float*
+  Integration time (s).
+
+- **verbose** : *int*
+  Verbose output.
+
+- **p_set** : *InvEcdSet &*
+  The fitted dipole set.
+
+**Returns:**
+
+- *bool* — true when successful.
+
+---
+
+### fit_dipoles_raw(dataname, raw, sel, fit, guess, tmin, tmax, tstep, integ, verbose)
+
+Fit dipoles to raw data (convenience overload without output set).
+
+Refactored: fit_dipoles_raw (fit_dipoles.c)
+
+**Parameters:**
+
+- **dataname** : *const QString &*
+  Data file name.
+
+- **raw** : *MNELIB::MNERawData **
+  The raw data description.
+
+- **sel** : *MNELIB::mneChSelection*
+  Channel selection to use.
+
+- **fit** : *InvDipoleFitData **
+  Precomputed fitting data.
+
+- **guess** : *InvGuessData **
+  The initial guesses.
+
+- **tmin** : *float*
+  Fit start time (s).
+
+- **tmax** : *float*
+  Fit end time (s).
+
+- **tstep** : *float*
+  Time step to use (s).
+
+- **integ** : *float*
+  Integration time (s).
+
+- **verbose** : *int*
+  Verbose output.
+
+**Returns:**
+
+- *bool* — true when successful.
+
+---

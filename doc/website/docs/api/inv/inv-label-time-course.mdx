@@ -1,0 +1,87 @@
+---
+id: inv-label-time-course
+title: "INVLIB::InvLabelTimeCourse"
+sidebar_label: InvLabelTimeCourse
+sidebar_position: 16
+---
+
+# InvLabelTimeCourse
+
+:::info[Python equivalent]
+`mne.extract_label_time_course` in MNE-Python.
+:::
+
+`#include <inv/inv_label_time_course.h>`
+
+```cpp
+class INVLIB::InvLabelTimeCourse
+```
+
+Extract ROI-level time courses from vertex-level source estimates.
+
+Provides the five standard aggregation modes used in MNE-Python's `extract_label_time_course()`:
+**mean**: Simple average across vertices in the label.
+
+
+**mean_flip**: Mean with sign-flip so that dominant orientation is positive.
+
+
+**pca_flip**: First PCA component, flipped to align with dominant sign.
+
+
+**max**: Maximum absolute value at each time point.
+
+
+**auto**: mean_flip for scalar STCs.
+
+```cpp
+QList<FSLIB::FsLabel> labels = ...;
+InvSourceEstimate stc = ...;
+Eigen::MatrixXd tc = InvLabelTimeCourse::extract(stc, labels, "mean_flip");
+// tc: n_labels × n_times
+```
+
+---
+
+## Static Methods
+
+### extract(stc, labels, sMode, bAllowEmpty)
+
+Extract label time courses from a source estimate.
+
+**Parameters:**
+
+- **stc** : *const InvSourceEstimate &*
+  Source estimate (vertices × times).
+
+- **labels** : *const QList&lt; FSLIB::FsLabel &gt; &*
+  List of labels defining ROIs.
+
+- **sMode** : *const QString &*
+  Aggregation mode: "mean", "mean_flip", "pca_flip", "max", "auto".
+
+- **bAllowEmpty** : *bool*
+  If true, empty labels produce zero rows; if false, skip them.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Matrix of shape (n_labels × n_times).
+
+---
+
+### computeSignFlip(stcData)
+
+Compute sign-flip vector for a label based on vertex normals.
+
+For surface source spaces, the sign of each vertex's contribution should be flipped if its normal opposes the dominant direction in the label. This ensures coherent averaging.
+
+**Parameters:**
+
+- **stcData** : *const Eigen::MatrixXd &*
+  Source data for the label vertices (n_verts × n_times).
+
+**Returns:**
+
+- *Eigen::VectorXd* — Sign vector (+1 or -1 per vertex).
+
+---

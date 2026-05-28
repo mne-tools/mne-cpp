@@ -1,0 +1,85 @@
+---
+id: bridged-electrodes
+title: "BridgedElectrodes"
+sidebar_label: BridgedElectrodes
+sidebar_position: 15
+---
+
+# BridgedElectrodes
+
+:::info[Module]
+This page documents a **header-level module** — a collection of free
+functions that share an algorithmic topic. There is no enclosing C++
+class; the functions live directly in the library namespace.
+:::
+
+:::info[Python equivalent]
+`mne.preprocessing.compute_bridged_electrodes` in MNE-Python.
+:::
+
+`#include <dsp/bridged_electrodes.h>`
+
+SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors Christoph Dinh [christoph.dinh@mne-cpp.org](mailto:christoph.dinh@mne-cpp.org).
+
+Two EEG electrodes are said to be bridged when conductive paste, sweat or skin abrasion creates a low-impedance shortcut between them; the recorded signals then become near-identical and any subsequent source localisation is biased. Following Tenke & Kayser (2001, Clin. Neurophysiol. 112) the detector computes the Electrical Distance — the time-domain variance of the difference signal — for every channel pair, and flags pairs whose normalised distance falls below a user-defined threshold (default 0.3).
+
+The implementation operates on the raw broadband signal; no rereferencing or filtering is required up-front. Output is a list of ``(i, j) channel- index pairs that the caller can mark bad, interpolate, or pass into the SSS bad-channel set.
+
+---
+
+## Functions
+
+### computeElectricalDistance(data, info)
+
+```cpp
+Eigen::MatrixXd computeElectricalDistance(const Eigen::MatrixXd & data, const FIFFLIB::FiffInfo & info);
+```
+
+Compute electrical distance matrix between EEG channels.
+
+Electrical distance is defined as the standard deviation of the difference signal between two channels, normalised by the geometric mean of their individual standard deviations. Bridged electrodes will have near-zero electrical distance.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  Data matrix (n_channels x n_times).
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  FiffInfo with channel types.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Electrical distance matrix (n_eeg x n_eeg), with EEG channel indices stored in the order they appear in info.
+
+---
+
+### computeBridgedElectrodes(data, info, params)
+
+```cpp
+QList< QPair< int, int > > computeBridgedElectrodes(const Eigen::MatrixXd & data, const FIFFLIB::FiffInfo & info, const BridgedElectrodeParams & params);
+```
+
+Detect bridged EEG electrodes.
+
+Finds pairs of EEG channels whose electrical distance falls below the threshold, indicating a physical or gel bridge.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  Data matrix (n_channels x n_times).
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  FiffInfo with channel types.
+
+- **params** : *const BridgedElectrodeParams &*
+  Detection parameters.
+
+**Returns:**
+
+- *QList&lt; QPair&lt; int, int &gt; &gt;* — List of bridged electrode pairs as (channel_index_1, channel_index_2) using indices into info.chs.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

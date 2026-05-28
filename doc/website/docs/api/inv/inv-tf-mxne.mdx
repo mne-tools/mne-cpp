@@ -1,0 +1,85 @@
+---
+id: inv-tf-mxne
+title: "INVLIB::InvTfMxne"
+sidebar_label: InvTfMxne
+sidebar_position: 10
+---
+
+# InvTfMxne
+
+:::info[Python equivalent]
+`mne.inverse_sparse.tf_mixed_norm` in MNE-Python.
+:::
+
+`#include <inv/inv_tf_mxne.h>`
+
+```cpp
+class INVLIB::InvTfMxne
+```
+
+Time-Frequency Mixed-Norm Estimate (TF-MxNE) sparse inverse solver.
+
+Solves the inverse problem in the time-frequency domain: min ||M - G*Phi*Z||^2_F + alpha_space * ||Z||_21 + alpha_time * ||Z||_1
+
+where Phi is a Gabor dictionary (tight frame) and Z are the TF coefficients. The L21 penalty enforces spatial sparsity (few active sources) while L1 enforces temporal sparsity (focal activations in time-frequency).
+
+Usage: 
+```cpp
+InvTfMxneParams params;
+params.dAlphaSpace = 0.5;
+params.dAlphaTime  = 0.1;
+params.dSFreq      = 1000.0;
+InvTfMxneResult result = InvTfMxne::compute(matGain, matData, params);
+```
+
+---
+
+## Static Methods
+
+### compute(matGain, matData, params)
+
+Compute the TF-MxNE inverse solution.
+
+**Parameters:**
+
+- **matGain** : *const Eigen::MatrixXd &*
+  Forward gain matrix (n_channels × n_sources).
+
+- **matData** : *const Eigen::MatrixXd &*
+  Measurement data (n_channels × n_times).
+
+- **params** : *const InvTfMxneParams &*
+  TF-MxNE parameters.
+
+**Returns:**
+
+- *InvTfMxneResult* — TF-MxNE result with sparse source estimate.
+
+---
+
+### buildGaborDictionary(iNSamples, iNFreqs, dFMin, dFMax, dSFreq)
+
+Build a Gabor dictionary (tight frame) for time-frequency decomposition.
+
+**Parameters:**
+
+- **iNSamples** : *int*
+  Number of time samples.
+
+- **iNFreqs** : *int*
+  Number of frequency bins.
+
+- **dFMin** : *double*
+  Minimum frequency (Hz).
+
+- **dFMax** : *double*
+  Maximum frequency (Hz).
+
+- **dSFreq** : *double*
+  Sampling frequency (Hz).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Gabor dictionary matrix (n_atoms × n_samples), where n_atoms = n_freqs * n_samples.
+
+---

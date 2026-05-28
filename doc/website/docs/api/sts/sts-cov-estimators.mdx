@@ -1,0 +1,169 @@
+---
+id: sts-cov-estimators
+title: "STSLIB::StsCovEstimators"
+sidebar_label: StsCovEstimators
+sidebar_position: 1
+---
+
+# StsCovEstimators
+
+:::info[Python equivalent]
+`mne.cov (compute_covariance methods)` in MNE-Python.
+:::
+
+`#include <sts/sts_cov_estimators.h>`
+
+```cpp
+class STSLIB::StsCovEstimators
+```
+
+Covariance matrix estimators.
+
+Provides multiple regularised covariance estimation methods matching MNE-Python's compute_covariance() API. Each method takes zero-mean data (n_channels x n_samples) and returns a pair of (covariance, parameter).
+
+Regularised covariance estimators (Ledoit-Wolf, OAS, fixed-diagonal, PCA, Factor Analysis, cross-validated auto-select) matching the MNE-Python compute_covariance() API.
+
+---
+
+## Static Methods
+
+### ledoitWolf(matData)
+
+Ledoit-Wolf optimal shrinkage covariance estimator.
+
+Computes the shrinkage coefficient analytically using the formula from Ledoit & Wolf (2004) "A well-conditioned estimator for large-dimensional
+covariance matrices" (Journal of Multivariate Analysis, 88(2), 365-411).
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Zero-mean data, n_channels x n_samples.
+
+**Returns:**
+
+- *std::pair&lt; Eigen::MatrixXd, double &gt;* — std::pair containing the shrunk covariance matrix (n_channels x n_channels) and the shrinkage coefficient alpha in [0,1].
+
+---
+
+### oas(matData)
+
+Oracle Approximating Shrinkage (OAS) covariance estimator.
+
+Implements the OAS formula from Chen, Wiesel, Eldar & Hero (2010) "Shrinkage Algorithms for MMSE Covariance Estimation" (IEEE Transactions on Signal Processing, 58(10), 5016-5029).
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Zero-mean data, n_channels x n_samples.
+
+**Returns:**
+
+- *std::pair&lt; Eigen::MatrixXd, double &gt;* — std::pair containing the shrunk covariance matrix and the shrinkage coefficient rho in [0,1].
+
+---
+
+### diagonalFixed(matData, dReg)
+
+Fixed diagonal regularisation.
+
+Computes the sample covariance and adds a fixed fraction of the mean eigenvalue to the diagonal: C_reg = C + reg * trace(C)/p * I.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Zero-mean data, n_channels x n_samples.
+
+- **dReg** : *double*
+  Regularisation fraction (default 0.1).
+
+**Returns:**
+
+- *std::pair&lt; Eigen::MatrixXd, double &gt;* — std::pair containing the regularised covariance and dReg.
+
+---
+
+### pca(matData, iRank)
+
+PCA-based rank-reduced covariance estimator.
+
+Computes covariance in the subspace of the top-k principal components. Components beyond rank are zeroed. If iRank &lt;= 0, the rank is estimated from the eigenvalue spectrum.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Zero-mean data, n_channels x n_samples.
+
+- **iRank** : *int*
+  Number of principal components to retain (0 = auto).
+
+**Returns:**
+
+- *std::pair&lt; Eigen::MatrixXd, double &gt;* — std::pair containing the rank-reduced covariance and the effective rank used.
+
+---
+
+### factorAnalysis(matData, iNFactors, iMaxIter, dTol)
+
+Factor Analysis covariance estimator via EM algorithm.
+
+Decomposes covariance as C = W*W^T + Psi, where W is a low-rank loading matrix and Psi is a diagonal noise matrix. Uses the EM algorithm from Rubin & Thayer (1982).
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Zero-mean data, n_channels x n_samples.
+
+- **iNFactors** : *int*
+  Number of latent factors (default: min(p,n)/2).
+
+- **iMaxIter** : *int*
+  Maximum EM iterations (default 200).
+
+- **dTol** : *double*
+  Convergence tolerance on log-likelihood (default 1e-6).
+
+**Returns:**
+
+- *std::pair&lt; Eigen::MatrixXd, double &gt;* — std::pair containing the Factor Analysis covariance and the final log-likelihood.
+
+---
+
+### autoSelect(matData, iNFolds)
+
+Auto-select the best covariance estimator via cross-validation.
+
+Runs all available estimators (empirical, shrunk/LW, OAS, diagonal_fixed, PCA, factor_analysis) and selects the one with the highest average Gaussian log-likelihood on held-out folds.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Zero-mean data, n_channels x n_samples.
+
+- **iNFolds** : *int*
+  Number of cross-validation folds (default 3).
+
+**Returns:**
+
+- *std::pair&lt; Eigen::MatrixXd, double &gt;* — std::pair containing the best covariance matrix and the index of the winning method (0=empirical, 1=shrunk, 2=oas, 3=diagonal_fixed, 4=pca, 5=factor_analysis).
+
+---
+
+### gaussianLogLikelihood(matTestData, matCov)
+
+Gaussian log-likelihood of held-out data given a covariance model.
+
+Computes: -0.5 * (p * log(2π) + log|Σ| + trace(Σ^\{-1\} * S_test)) where S_test is the sample covariance of the test data.
+
+**Parameters:**
+
+- **matTestData** : *const Eigen::MatrixXd &*
+  Zero-mean test data, n_channels x n_test_samples.
+
+- **matCov** : *const Eigen::MatrixXd &*
+  Covariance model, n_channels x n_channels.
+
+**Returns:**
+
+- *double* — Average log-likelihood per sample.
+
+---

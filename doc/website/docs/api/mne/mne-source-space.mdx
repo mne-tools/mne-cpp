@@ -1,0 +1,265 @@
+---
+id: mne-source-space
+title: "MNELIB::MNESourceSpace"
+sidebar_label: MNESourceSpace
+sidebar_position: 3
+---
+
+# MNESourceSpace
+
+:::info[Python equivalent]
+`mne.SourceSpaces` in MNE-Python.
+:::
+
+`#include <mne/mne_source_space.h>`
+
+```cpp
+class MNELIB::MNESourceSpace
+```
+
+Implements the `MNE` Source Space (Replaces typedef mneSurfaceOrVolume mneSourceSpace; struct of MNE-C `mne_types.h`).
+
+This defines a source space
+
+---
+
+## Public Methods
+
+### MNESourceSpace(np)
+
+Constructs the `MNE` Source Space.
+
+---
+
+### ~MNESourceSpace()
+
+Destroys the `MNE` Source Space.
+
+---
+
+### clone()
+
+Creates a deep copy of this source space, preserving the actual derived type.
+
+**Returns:**
+
+- *MNESourceSpace::SPtr* — a shared_ptr to the cloned source space.
+
+---
+
+### enable_all_sources()
+
+Enable all source points (set inuse to TRUE, nuse = np).
+
+---
+
+### is_left_hemi()
+
+Determine whether this source space is on the left hemisphere based on the average x-coordinate of all vertices.
+
+**Returns:**
+
+- *bool* — true if left hemisphere, false otherwise.
+
+---
+
+### find_source_space_hemi()
+
+Returns the hemisphere id (FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for this source space, based on the average x-coordinate of all vertices.
+
+**Returns:**
+
+- *qint32* — the deduced hemisphere id.
+
+---
+
+### update_inuse(new_inuse)
+
+Update the active vertex (inuse) vector and recompute vertno.
+
+**Parameters:**
+
+- **new_inuse** : *Eigen::VectorXi*
+  New in-use vector (size np).
+
+---
+
+### transform_source_space(t)
+
+Transform this source space into another coordinate frame.
+
+**Parameters:**
+
+- **t** : *const FIFFLIB::FiffCoordTrans &*
+  The coordinate transformation to apply.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### add_patch_stats()
+
+Compute patch statistics (areas, normals, deviations).
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### rearrange_source_space()
+
+Rearrange source space after filtering: recount nuse, rebuild vertno, and recompute patch statistics if nearest info is available.
+
+---
+
+### writeToStream(stream, selected_only)
+
+Write this source space to a FIFF stream.
+
+**Parameters:**
+
+- **stream** : *FIFFLIB::FiffStream::SPtr &*
+  The FIFF output stream.
+
+- **selected_only** : *bool*
+  If true, write only the vertices that are in use.
+
+**Returns:**
+
+- *int* — FIFF_OK on success, FIFF_FAIL on error.
+
+---
+
+## Static Methods
+
+### create_source_space(np)
+
+Create a new source space with np vertices and all associated data initialized to defaults.
+
+**Parameters:**
+
+- **np** : *int*
+  Number of vertices.
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNESourceSpace &gt;* — Unique pointer to the newly allocated source space.
+
+---
+
+### load_surface(surf_file, curv_file)
+
+Load a FreeSurfer surface from disk, adding full geometry information.
+
+**Parameters:**
+
+- **surf_file** : *const QString &*
+  Path to the FreeSurfer surface file.
+
+- **curv_file** : *const QString &*
+  Path to the curvature file (may be empty).
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNESourceSpace &gt;* — Unique pointer to the loaded source space, or nullptr on error.
+
+---
+
+### load_surface_geom(surf_file, curv_file, add_geometry, check_too_many_neighbors)
+
+Load a FreeSurfer surface from disk, optionally adding geometry information.
+
+**Parameters:**
+
+- **surf_file** : *const QString &*
+  Path to the FreeSurfer surface file.
+
+- **curv_file** : *const QString &*
+  Path to the curvature file (may be empty).
+
+- **add_geometry** : *bool*
+  Whether to compute full geometry info.
+
+- **check_too_many_neighbors** : *bool*
+  Whether to error on excess neighbors.
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNESourceSpace &gt;* — Unique pointer to the loaded source space, or nullptr on error.
+
+---
+
+### make_volume_source_space(surf, grid, exclude, mindist)
+
+Create a volumetric source space by laying out a 3D grid of points within the bounding box of a surface, filtering out points that lie outside the surface or closer than `mindist` to the surface, and establishing 26-neighbor connectivity.
+
+**Parameters:**
+
+- **surf** : *const MNESurface &*
+  The bounding surface (e.g. inner skull).
+
+- **grid** : *float*
+  Grid spacing in meters.
+
+- **exclude** : *float*
+  Exclusion radius from the center of mass (m).
+
+- **mindist** : *float*
+  Minimum distance from the surface (m).
+
+**Returns:**
+
+- *MNESourceSpace ** — A new volumetric source space, or NULL on failure. Caller takes ownership.
+
+---
+
+### filter_source_spaces(surf, limit, mri_head_t, spaces, filtered)
+
+---
+
+### filter_source_space(arg)
+
+---
+
+### filter_source_spaces(limit, bemfile, mri_head_t, spaces, filtered, use_threads)
+
+---
+
+### read_source_spaces(name, spaces)
+
+---
+
+### transform_source_spaces_to(coord_frame, t, spaces)
+
+---
+
+### restrict_sources_to_labels(spaces, labels, nlabel)
+
+---
+
+### read_label(label, sel)
+
+---
+
+### icoDownsample(hemi, icoGrade)
+
+Downsample a hemisphere source space to an icosahedral subdivision of the given grade.
+
+For each vertex of the icosahedron at the requested grade, the nearest vertex in the hemisphere is found and marked as in-use.
+
+**Parameters:**
+
+- **hemi** : *const MNEHemisphere &*
+  The hemisphere to downsample.
+
+- **icoGrade** : *int*
+  Icosahedral subdivision grade (0-7).
+
+**Returns:**
+
+- *MNEHemisphere* — A new `MNEHemisphere` with the downsampled vertex selection.
+
+---

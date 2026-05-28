@@ -1,0 +1,117 @@
+---
+id: ml-ica-label
+title: "DECODINGLIB::MlIcaLabel"
+sidebar_label: MlIcaLabel
+sidebar_position: 4
+---
+
+# MlIcaLabel
+
+:::info[Python equivalent]
+`mne_icalabel` in MNE-Python.
+:::
+
+`#include <decoding/decoding_ica_label.h>`
+
+```cpp
+class DECODINGLIB::MlIcaLabel
+```
+
+Static utility that labels ICA components against EOG/ECG references and a muscle spectral heuristic.
+
+`classify` walks the rows of the source matrix and applies, in order, the EOG correlation test, the ECG correlation test and the high-frequency muscle test; the first one whose score exceeds its threshold wins, otherwise the component is labelled `Brain`. The thresholds default to the canonical 0.3 used by the MNE-Python helpers and can be tightened or loosened per call. `findArtifactComponents` is the convenience that returns just the indices of the rejected components in the order expected by the ICA reconstruction code, making it a one-liner to wire automatic cleaning into a real-time pipeline.
+
+The two scoring primitives — `maxAbsCorrelation` and `muscleScore` — are exposed publicly so an interactive viewer can display the per-component evidence behind each decision and let the user override the label without having to recompute the ICA itself. The class has no state, deleted constructor, and no virtual methods; it is purely a namespaced collection of pure functions.
+
+```cpp
+QList<IcaLabelResult> labels = MlIcaLabel::classify(
+    icaSources, eogData, ecgData, sFreq);
+QVector<int> artIdx = MlIcaLabel::findArtifactComponents(labels);
+```
+
+---
+
+## Static Methods
+
+### classify(matSources, matEog, matEcg, dSFreq, dEogThresh, dEcgThresh)
+
+Classify each ICA component using reference signals and spectral heuristics.
+
+**Parameters:**
+
+- **matSources** : *const Eigen::MatrixXd &*
+  ICA sources (n_components x n_samples).
+
+- **matEog** : *const Eigen::MatrixXd &*
+  EOG reference channels (n_eog x n_samples). Can be empty.
+
+- **matEcg** : *const Eigen::MatrixXd &*
+  ECG reference channels (n_ecg x n_samples). Can be empty.
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+- **dEogThresh** : *double*
+  Correlation threshold for EOG classification (default 0.3).
+
+- **dEcgThresh** : *double*
+  Correlation threshold for ECG classification (default 0.3).
+
+**Returns:**
+
+- *QList&lt; IcaLabelResult &gt;* — Label results for each component.
+
+---
+
+### findArtifactComponents(labels)
+
+Extract indices of artifact components (EOG, ECG, muscle).
+
+**Parameters:**
+
+- **labels** : *const QList&lt; IcaLabelResult &gt; &*
+  Label results from `classify()`.
+
+**Returns:**
+
+- *QVector&lt; int &gt;* — 0-based indices of artifact components.
+
+---
+
+### maxAbsCorrelation(source, matRef)
+
+Compute the maximum absolute Pearson correlation between a source and reference channels.
+
+**Parameters:**
+
+- **source** : *const Eigen::VectorXd &*
+  Source time course (n_samples).
+
+- **matRef** : *const Eigen::MatrixXd &*
+  Reference channels (n_ref x n_samples).
+
+**Returns:**
+
+- *double* — Maximum |r| across reference channels.
+
+---
+
+### muscleScore(source, dSFreq)
+
+Compute a simple spectral power ratio heuristic for muscle artifact detection.
+
+Muscle artifacts typically have high power above 30 Hz.
+
+**Parameters:**
+
+- **source** : *const Eigen::VectorXd &*
+  Source time course (n_samples).
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+**Returns:**
+
+- *double* — Ratio of high-frequency to total power (0 = no muscle, 1 = all muscle).
+
+---

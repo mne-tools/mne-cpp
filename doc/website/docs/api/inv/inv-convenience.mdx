@@ -1,0 +1,223 @@
+---
+id: inv-convenience
+title: "InvConvenience"
+sidebar_label: InvConvenience
+sidebar_position: 18
+---
+
+# InvConvenience
+
+:::info[Module]
+This page documents a **header-level module** — a collection of free
+functions that share an algorithmic topic. There is no enclosing C++
+class; the functions live directly in the library namespace.
+:::
+
+:::info[Python equivalent]
+`mne.minimum_norm.apply_inverse_epochs / apply_inverse_raw / apply_inverse_cov` in MNE-Python.
+:::
+
+`#include <inv/inv_convenience.h>`
+
+SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors Christoph Dinh [christoph.dinh@mne-cpp.org](mailto:christoph.dinh@mne-cpp.org).
+
+`apply_inverse_*` / `compute_source_psd` helpers.
+
+Free functions in this header glue together the lower-level `INVLIB` classes so users can match the MNE-Python ergonomics: `INVLIB::applyInverseEpochs` applies a precomputed inverse operator across an epoch list, applyInverseRaw streams raw data through the kernel in blocks, estimateSnr returns the source-space SNR trace from an evoked + inverse pair, computeWhitener produces the diagonal whitener from a noise covariance, and computeSourcePsd / computeSourceBandPower run Welch-based spectral analysis directly on InvSourceEstimate output. All methods are headers-only orchestration on top of InvMinimumNorm and the underlying FIFF / MNE primitives.
+
+---
+
+## Functions
+
+### applyInverseEpochs(epochs, inverse, lambda2, method, tmin, tstep, pickNormal)
+
+```cpp
+QList< InvSourceEstimate > applyInverseEpochs(const QList< Eigen::MatrixXd > & epochs, const MNELIB::MNEInverseOperator & inverse, float lambda2, const QString & method, float tmin, float tstep, bool pickNormal);
+```
+
+Apply inverse operator to each epoch in a list.
+
+For each epoch (data matrix), applies the minimum norm inverse and returns a list of source estimates. This is the equivalent of MNE-Python's mne.minimum_norm.apply_inverse_epochs().
+
+**Parameters:**
+
+- **epochs** : *const QList&lt; Eigen::MatrixXd &gt; &*
+  List of epoch data matrices (n_channels x n_times each).
+
+- **inverse** : *const MNELIB::MNEInverseOperator &*
+  Pre-computed inverse operator.
+
+- **lambda2** : *float*
+  Regularization parameter (1/SNR^2).
+
+- **method** : *const QString &*
+  "MNE", "dSPM", or "sLORETA".
+
+- **tmin** : *float*
+  Start time of each epoch (seconds).
+
+- **tstep** : *float*
+  Time step (1/sfreq).
+
+- **pickNormal** : *bool*
+  If true, keep only the normal component.
+
+**Returns:**
+
+- *QList&lt; InvSourceEstimate &gt;* — List of source estimates, one per epoch.
+
+---
+
+### applyInverseRaw(raw, inverse, lambda2, method, from, to, pickNormal)
+
+```cpp
+InvSourceEstimate applyInverseRaw(const FIFFLIB::FiffRawData & raw, const MNELIB::MNEInverseOperator & inverse, float lambda2, const QString & method, int from, int to, bool pickNormal);
+```
+
+Apply inverse operator to raw data in blocks.
+
+Reads and processes the raw data in chunks, applying the inverse operator to produce a continuous source estimate. Equivalent of MNE-Python's mne.minimum_norm.apply_inverse_raw().
+
+**Parameters:**
+
+- **raw** : *const FIFFLIB::FiffRawData &*
+  Raw data object.
+
+- **inverse** : *const MNELIB::MNEInverseOperator &*
+  Pre-computed inverse operator.
+
+- **lambda2** : *float*
+  Regularization parameter (1/SNR^2).
+
+- **method** : *const QString &*
+  "MNE", "dSPM", or "sLORETA".
+
+- **from** : *int*
+  First sample to process (default: first_samp).
+
+- **to** : *int*
+  Last sample to process (default: last_samp).
+
+- **pickNormal** : *bool*
+  If true, keep only the normal component.
+
+**Returns:**
+
+- *InvSourceEstimate* — Source estimate spanning the requested time range.
+
+---
+
+### estimateSnr(evoked, inverse, method)
+
+```cpp
+QPair< Eigen::VectorXd, Eigen::RowVectorXf > estimateSnr(const FIFFLIB::FiffEvoked & evoked, const MNELIB::MNEInverseOperator & inverse, const QString & method);
+```
+
+Estimate SNR from evoked data and inverse operator.
+
+Computes source-space SNR estimate using the GFP (Global Field Power) of the evoked data and the noise normalization from the inverse operator.
+
+**Parameters:**
+
+- **evoked** : *const FIFFLIB::FiffEvoked &*
+  Evoked data.
+
+- **inverse** : *const MNELIB::MNEInverseOperator &*
+  Inverse operator.
+
+- **method** : *const QString &*
+  "MNE", "dSPM", or "sLORETA".
+
+**Returns:**
+
+- *QPair&lt; Eigen::VectorXd, Eigen::RowVectorXf &gt;* — `Pair` of (SNR time course, times vector).
+
+---
+
+### computeWhitener(noiseCov, rank)
+
+```cpp
+QPair< Eigen::MatrixXd, int > computeWhitener(const FIFFLIB::FiffCov & noiseCov, int rank);
+```
+
+Compute whitening matrix from a noise covariance.
+
+Returns a whitening matrix W such that W * data has identity covariance. Matches MNE-Python's mne.cov.compute_whitener().
+
+**Parameters:**
+
+- **noiseCov** : *const FIFFLIB::FiffCov &*
+  Noise covariance matrix.
+
+- **rank** : *int*
+  Desired rank (0 = auto from eigenvalues).
+
+**Returns:**
+
+- *QPair&lt; Eigen::MatrixXd, int &gt;* — `Pair` of (whitener matrix, effective rank).
+
+---
+
+### computeSourcePsd(stc, sfreq, fmin, fmax, nFft)
+
+```cpp
+QPair< Eigen::MatrixXd, Eigen::VectorXd > computeSourcePsd(const InvSourceEstimate & stc, float sfreq, float fmin, float fmax, int nFft);
+```
+
+Compute PSD for a source estimate using Welch's method.
+
+Takes a source estimate (n_sources x n_times) and computes the power spectral density at each source vertex. Equivalent to MNE-Python's mne.minimum_norm.compute_source_psd().
+
+**Parameters:**
+
+- **stc** : *const InvSourceEstimate &*
+  Source estimate.
+
+- **sfreq** : *float*
+  Sampling frequency (Hz).
+
+- **fmin** : *float*
+  Minimum frequency of interest (Hz).
+
+- **fmax** : *float*
+  Maximum frequency of interest (Hz).
+
+- **nFft** : *int*
+  FFT length (0 = use data length).
+
+**Returns:**
+
+- *QPair&lt; Eigen::MatrixXd, Eigen::VectorXd &gt;* — `Pair` of (PSD matrix [n_sources x n_freqs], frequency vector).
+
+---
+
+### computeSourceBandPower(stc, sfreq, bands)
+
+```cpp
+QMap< QString, Eigen::VectorXd > computeSourceBandPower(const InvSourceEstimate & stc, float sfreq, const QMap< QString, QPair< float, float > > & bands);
+```
+
+Compute band power for source estimate.
+
+Integrates source PSD within specified frequency bands.
+
+**Parameters:**
+
+- **stc** : *const InvSourceEstimate &*
+  Source estimate.
+
+- **sfreq** : *float*
+  Sampling frequency (Hz).
+
+- **bands** : *const QMap&lt; QString, QPair&lt; float, float &gt; &gt; &*
+  Map of band name -&gt; (fmin, fmax) pairs.
+
+**Returns:**
+
+- *QMap&lt; QString, Eigen::VectorXd &gt;* — Map of band name -&gt; power vector (n_sources).
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

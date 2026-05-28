@@ -1,0 +1,55 @@
+---
+id: inv-mxne
+title: "INVLIB::InvMxne"
+sidebar_label: InvMxne
+sidebar_position: 8
+---
+
+# InvMxne
+
+:::info[Python equivalent]
+`mne.inverse_sparse.mixed_norm` in MNE-Python.
+:::
+
+`#include <inv/inv_mxne.h>`
+
+```cpp
+class INVLIB::InvMxne
+```
+
+Mixed-Norm Estimate (MxNE) sparse inverse solver.
+
+Minimizes: ||M - G*X||^2_F + alpha * sum_i ||X_i||_2 using an Iteratively Reweighted Least Squares (IRLS) approach for the L21-norm (group lasso).
+
+MxNE sparse inverse solver.
+
+---
+
+## Static Methods
+
+### compute(matGain, matData, alpha, nIterations, tolerance)
+
+Compute the MxNE inverse solution.
+
+**Parameters:**
+
+- **matGain** : *const Eigen::MatrixXd &*
+  Forward gain matrix (n_channels x n_sources).
+
+- **matData** : *const Eigen::MatrixXd &*
+  Measurement data (n_channels x n_times).
+
+- **alpha** : *double*
+  Regularization parameter.
+
+- **nIterations** : *int*
+  Maximum number of IRLS iterations.
+
+- **tolerance** : *double*
+  Convergence tolerance on weight change.
+
+**Returns:**
+
+- *InvMxneResult* — The MxNE result containing the sparse source estimate.
+
+---

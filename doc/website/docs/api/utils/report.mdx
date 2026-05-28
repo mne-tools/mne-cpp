@@ -1,0 +1,123 @@
+---
+id: report
+title: "UTILSLIB::Report"
+sidebar_label: Report
+sidebar_position: 2
+---
+
+# Report
+
+:::info[Python equivalent]
+`mne.Report` in MNE-Python.
+:::
+
+`#include <utils/report.h>`
+
+```cpp
+class UTILSLIB::Report
+```
+
+Simple HTML report builder for MEG/EEG analysis results.
+
+Usage: 
+```cpp
+Report report("My Analysis");
+report.addText("Data Info", "Subject: sub-01, 306 MEG channels");
+report.addTable("Channel Stats", headers, rows);
+report.addKeyValue("Parameters", {{"Lambda", "0.1"}, {"SNR", "3.0"}});
+report.save("/path/to/report.html");
+```
+
+---
+
+## Public Methods
+
+### Report(sTitle)
+
+Construct a report with a title.
+
+---
+
+### addText(sTitle, sContent)
+
+Add a text section.
+
+**Parameters:**
+
+- **sTitle** : *const QString &*
+  Section title.
+
+- **sContent** : *const QString &*
+  Text content (plain text or HTML).
+
+---
+
+### addTable(sTitle, headers, rows)
+
+Add a table section.
+
+**Parameters:**
+
+- **sTitle** : *const QString &*
+  Section title.
+
+- **headers** : *const QStringList &*
+  Column headers.
+
+- **rows** : *const QList&lt; QStringList &gt; &*
+  Row data (list of string lists).
+
+---
+
+### addKeyValue(sTitle, pairs)
+
+Add a key-value section.
+
+**Parameters:**
+
+- **sTitle** : *const QString &*
+  Section title.
+
+- **pairs** : *const QList&lt; QPair&lt; QString, QString &gt; &gt; &*
+  List of (key, value) pairs.
+
+---
+
+### addCode(sTitle, sCode)
+
+Add a preformatted code block.
+
+---
+
+### sectionCount()
+
+Get the number of sections.
+
+---
+
+### toHtml()
+
+Generate the full HTML string.
+
+---
+
+### save(sPath)
+
+Save the report to an HTML file.
+
+**Parameters:**
+
+- **sPath** : *const QString &*
+  Output file path.
+
+**Returns:**
+
+- *bool* — true if successful.
+
+---
+
+### title()
+
+Get the report title.
+
+---

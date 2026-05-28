@@ -1,0 +1,168 @@
+---
+id: inv-resolution-matrix
+title: "INVLIB::InvResolutionMatrix"
+sidebar_label: InvResolutionMatrix
+sidebar_position: 17
+---
+
+# InvResolutionMatrix
+
+:::info[Python equivalent]
+`mne.minimum_norm.make_inverse_resolution_matrix` in MNE-Python.
+:::
+
+`#include <inv/inv_resolution_matrix.h>`
+
+```cpp
+class INVLIB::InvResolutionMatrix
+```
+
+Resolution matrix analysis for linear inverse operators.
+
+The resolution matrix R = K · L, where K is the inverse operator (kernel) and L is the lead field (forward operator). Columns of R are point-spread functions (PSFs) and rows are cross-talk functions (CTFs).
+
+```cpp
+// Given an inverse kernel K (n_sources × n_channels)
+// and a lead field L (n_channels × n_sources):
+Eigen::MatrixXd R = InvResolutionMatrix::compute(K, L);
+Eigen::VectorXd psf = InvResolutionMatrix::getPsf(R, sourceIdx);
+Eigen::VectorXd ctf = InvResolutionMatrix::getCtf(R, sourceIdx);
+```
+
+---
+
+## Static Methods
+
+### compute(matInverseKernel, matLeadField)
+
+Compute the resolution matrix R = inverseKernel × leadField.
+
+**Parameters:**
+
+- **matInverseKernel** : *const Eigen::MatrixXd &*
+  Inverse operator matrix (n_sources × n_channels).
+
+- **matLeadField** : *const Eigen::MatrixXd &*
+  Forward operator / lead field (n_channels × n_sources).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Resolution matrix (n_sources × n_sources).
+
+---
+
+### getPsf(matResolution, iSourceIdx)
+
+Extract the point-spread function (PSF) for a given source index.
+
+The PSF is the column of the resolution matrix at the source index.
+
+**Parameters:**
+
+- **matResolution** : *const Eigen::MatrixXd &*
+  Resolution matrix (n_sources × n_sources).
+
+- **iSourceIdx** : *int*
+  Source index.
+
+**Returns:**
+
+- *Eigen::VectorXd* — PSF vector (n_sources).
+
+---
+
+### getCtf(matResolution, iSourceIdx)
+
+Extract the cross-talk function (CTF) for a given source index.
+
+The CTF is the row of the resolution matrix at the source index.
+
+**Parameters:**
+
+- **matResolution** : *const Eigen::MatrixXd &*
+  Resolution matrix (n_sources × n_sources).
+
+- **iSourceIdx** : *int*
+  Source index.
+
+**Returns:**
+
+- *Eigen::VectorXd* — CTF vector (n_sources).
+
+---
+
+### getPsfs(matResolution, vecSourceIdx)
+
+Extract PSFs for multiple source indices.
+
+**Parameters:**
+
+- **matResolution** : *const Eigen::MatrixXd &*
+  Resolution matrix.
+
+- **vecSourceIdx** : *const Eigen::VectorXi &*
+  Source indices.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Matrix where each column is a PSF (n_sources × n_indices).
+
+---
+
+### getCtfs(matResolution, vecSourceIdx)
+
+Extract CTFs for multiple source indices.
+
+**Parameters:**
+
+- **matResolution** : *const Eigen::MatrixXd &*
+  Resolution matrix.
+
+- **vecSourceIdx** : *const Eigen::VectorXi &*
+  Source indices.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Matrix where each row is a CTF (n_indices × n_sources).
+
+---
+
+### spatialSpread(matResolution, matPositions)
+
+Compute spatial spread (peak-width) metric for each source.
+
+For each source, the spatial spread is the standard deviation of the squared PSF weighted by distance from the peak.
+
+**Parameters:**
+
+- **matResolution** : *const Eigen::MatrixXd &*
+  Resolution matrix (n_sources × n_sources).
+
+- **matPositions** : *const Eigen::MatrixX3d &*
+  Source positions (n_sources × 3).
+
+**Returns:**
+
+- *Eigen::VectorXd* — Spatial spread per source (n_sources).
+
+---
+
+### peakLocalisationError(matResolution, matPositions)
+
+Compute peak localisation error for each source.
+
+Distance between true source location and the location of the maximum of the PSF.
+
+**Parameters:**
+
+- **matResolution** : *const Eigen::MatrixXd &*
+  Resolution matrix (n_sources × n_sources).
+
+- **matPositions** : *const Eigen::MatrixX3d &*
+  Source positions (n_sources × 3).
+
+**Returns:**
+
+- *Eigen::VectorXd* — Peak localisation error per source (n_sources).
+
+---

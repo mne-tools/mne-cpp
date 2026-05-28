@@ -9,8 +9,13 @@
 #   3) Docusaurus builds the static site in doc/website/build/.
 
 set -euo pipefail
-cd "$(dirname "$0")/.."
-doxygen doc/Doxyfile
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$REPO_ROOT"
+
+# Doxyfile uses paths relative to the doc/ directory (INPUT=../src/libraries),
+# so doxygen must be invoked with doc/ as the working directory.
+( cd doc && doxygen Doxyfile )
+
 python3 tools/doxy2mdx/doxy2mdx.py \
     --xml-dir doc/xml_out/xml \
     --out-dir doc/website/docs/api \

@@ -1,0 +1,51 @@
+---
+id: granger-causality
+title: "CONNLIB::GrangerCausality"
+sidebar_label: GrangerCausality
+sidebar_position: 5
+---
+
+# GrangerCausality
+
+:::info[Python equivalent]
+`mne_connectivity.spectral_connectivity_epochs (method='gc')` in MNE-Python.
+:::
+
+`#include <conn/granger_causality.h>`
+
+```cpp
+class CONNLIB::GrangerCausality
+```
+
+Spectral Granger Causality estimator (Geweke 1982 formulation).
+
+For every ordered channel pair ``(j -&gt; i) the estimator fits an MVAR model to the trial-concatenated time series via `MvarModel` and evaluates the log ratio of the unconditional and conditional spectra of `X_i`, `GC_{j->i}`(f) = ln( S_\{ii\}(f) / ( S_\{ii\}(f) - (Sigma_\{jj\} - Sigma_\{ij\}^2 / Sigma_\{ii\}) * |H_\{ij\}(f)|^2 ) ). The resulting `Network` is directional and stores the band-averaged GC value as edge weight.
+
+Spectral Granger Causality estimator; directional, MVAR-based.
+
+---
+
+## Public Methods
+
+### GrangerCausality()
+
+Constructs a `GrangerCausality` object.
+
+---
+
+## Static Methods
+
+### calculate(connectivitySettings)
+
+Calculates spectral Granger causality between all channel pairs.
+
+**Parameters:**
+
+- **connectivitySettings** : *ConnectivitySettings &*
+  The input data and parameters.
+
+**Returns:**
+
+- *Network* — The connectivity information in form of a network structure.
+
+---

@@ -1,0 +1,264 @@
+---
+id: fiff-epochs
+title: "FiffEpochs"
+sidebar_label: FiffEpochs
+sidebar_position: 5
+---
+
+# FiffEpochs
+
+:::info[Python equivalent]
+`mne.Epochs` in MNE-Python.
+:::
+
+`#include <fiff/fiff_epochs.h>`
+
+```cpp
+class FiffEpochs
+```
+
+Free / static helpers that turn a FiffRawData plus an event list into fixed-length epochs.
+
+Stateless — operates on the FiffRawData and event arguments directly. Used by the source-reconstruction pipeline and by the offline averaging tooling when building epochs for an `FiffEvokedSet`.
+
+---
+
+## Static Methods
+
+### makeFixedLengthEpochs(matData, dSFreq, dDuration, dOverlap, bDropLast)
+
+Create fixed-length epochs from continuous data.
+
+Segments the data matrix into non-overlapping (or overlapping) epochs of the specified duration.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Continuous data (n_channels × n_times).
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+- **dDuration** : *double*
+  Epoch duration in seconds.
+
+- **dOverlap** : *double*
+  Overlap between epochs in seconds (default 0.0).
+
+- **bDropLast** : *bool*
+  Drop the last epoch if it's shorter than duration (default true).
+
+**Returns:**
+
+- *QList&lt; FiffEpochData &gt;* — List of epoch data structures.
+
+---
+
+### concatenateEpochs(epochSets)
+
+Concatenate multiple epoch sets into a single list.
+
+**Parameters:**
+
+- **epochSets** : *const QList&lt; QList&lt; FiffEpochData &gt; &gt; &*
+  List of epoch sets to concatenate.
+
+**Returns:**
+
+- *QList&lt; FiffEpochData &gt;* — Combined list of all epochs.
+
+---
+
+### averageEpochs(epochs, dSFreq, comment)
+
+Compute the average (evoked response) across epochs.
+
+All epochs must have the same dimensions. Returns a FiffEvoked with data, nave, times, and aspect_kind populated.
+
+**Parameters:**
+
+- **epochs** : *const QList&lt; FiffEpochData &gt; &*
+  List of epochs.
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz (used to compute times vector).
+
+- **comment** : *const QString &*
+  Comment string for the evoked (default "Average").
+
+**Returns:**
+
+- *FiffEvoked* — FiffEvoked with averaged data and metadata.
+
+---
+
+### toMatrixList(epochs)
+
+Extract data matrices from epoch structures.
+
+Convenience method to get a list of data matrices from epoch structures, suitable for use with CSP, SPoC, SSD, etc.
+
+**Parameters:**
+
+- **epochs** : *const QList&lt; FiffEpochData &gt; &*
+  List of epoch data.
+
+**Returns:**
+
+- *QList&lt; Eigen::MatrixXd &gt;* — List of data matrices (n_channels × n_times).
+
+---
+
+## Example
+
+Source: [`src/examples/ex_read_epochs/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_read_epochs/main.cpp)
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <math.h>
+
+//=============================================================================================================
+// MNE INCLUDES
+//=============================================================================================================
+
+#include <fiff/fiff.h>
+#include <mne/mne.h>
+
+#include <mne/mne_epoch_data_list.h>
+
+#include <utils/generics/mne_logger.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtCore/QCoreApplication>
+#include <QCommandLineParser>
+#include <QFile>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FIFFLIB;
+using namespace MNELIB;
+using namespace UTILSLIB;
+using namespace Eigen;
+
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * The function main marks the entry point of the program.
+ * By default, main has the storage class extern.
+ *
+ * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+ * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+ * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+ */
+int main(int argc, char *argv[])
+{
+    qInstallMessageHandler(MNELogger::customLogWriter);
+    QCoreApplication a(argc, argv);
+
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Read Epochs Example");
+    parser.addHelpOption();
+
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
+    QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
+    QCommandLineOption pickAllOption("pickAll", "Pick all channels.", "pickAll", "true");
+    QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "false");
+    QCommandLineOption destCompsOption("destComps", "<Destination> of the compensator which is to be calculated.", "destination", "0");
+
+    parser.addOption(inputOption);
+    parser.addOption(eventsFileOption);
+    parser.addOption(evokedIdxOption);
+    parser.addOption(pickAllOption);
+    parser.addOption(keepCompOption);
+    parser.addOption(destCompsOption);
+
+    parser.process(a);
+
+    //Load data
+    QString t_fileRawName = parser.value(inputOption);
+    QFile t_fileRaw(t_fileRawName);
+
+    qint32 event = parser.value(evokedIdxOption).toInt();
+    QString t_sEventName = parser.value(eventsFileOption);
+    float fTMin = -1.5f;
+    float fTMax = 1.5f;
+
+    bool keep_comp = false;
+    if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
+        keep_comp = false;
+    } else if(parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
+        keep_comp = true;
+    }
+
+    fiff_int_t dest_comp = parser.value(destCompsOption).toInt();
+
+    bool pick_all = false;
+    if(parser.value(pickAllOption) == "false" || parser.value(pickAllOption) == "0") {
+        pick_all = false;
+    } else if(parser.value(pickAllOption) == "true" || parser.value(pickAllOption) == "1") {
+        pick_all = true;
+    }
+
+    // Setup for reading the raw data
+    FiffRawData raw(t_fileRaw);
+    MNE::setup_compensators(raw, dest_comp, keep_comp);
+
+    RowVectorXi picks;
+    if (pick_all) {
+        // Pick all
+        picks.resize(raw.info.nchan);
+
+        for(qint32 k = 0; k < raw.info.nchan; ++k) {
+            picks(k) = k;
+        }
+    } else {
+        QStringList include;
+        include << "STI 014";
+        bool want_meg   = true;
+        bool want_eeg   = false;
+        bool want_stim  = false;
+
+        picks = raw.info.pick_types(want_meg,
+                                    want_eeg,
+                                    want_stim,
+                                    include,
+                                    raw.info.bads);
+    }
+
+    // Read the events
+    MatrixXi events;    
+    MNE::read_events(t_sEventName,
+                     t_fileRawName,
+                     events);
+
+    // Read the epochs and reject epochs with EOG higher than 300e-06
+    QMap<QString,double> mapReject;
+    mapReject.insert("eog", 300e-06);
+
+    MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
+                                                         events,
+                                                         fTMin,
+                                                         fTMax,
+                                                         event,
+                                                         mapReject,
+                                                         QStringList(),
+                                                         picks);
+
+    return a.exec();
+}
+
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
+```

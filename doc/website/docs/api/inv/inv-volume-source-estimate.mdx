@@ -1,0 +1,103 @@
+---
+id: inv-volume-source-estimate
+title: "INVLIB::InvVolumeSourceEstimate"
+sidebar_label: InvVolumeSourceEstimate
+sidebar_position: 14
+---
+
+# InvVolumeSourceEstimate
+
+:::info[Python equivalent]
+`mne.VolumeSourceEstimate` in MNE-Python.
+:::
+
+`#include <inv/inv_volume_source_estimate.h>`
+
+```cpp
+class INVLIB::InvVolumeSourceEstimate
+```
+
+Volume source estimate: scalar values at voxel locations.
+
+Extends `InvSourceEstimate` with grid shape information to allow reshaping the flat data into a 3D volume.
+
+---
+
+## Public Methods
+
+### InvVolumeSourceEstimate()
+
+---
+
+### InvVolumeSourceEstimate(p_sol, p_vertices, p_tmin, p_tstep)
+
+Construct from data and vertices.
+
+**Parameters:**
+
+- **p_sol** : *const Eigen::MatrixXd &*
+  Data (n_voxels x n_times).
+
+- **p_vertices** : *const Eigen::VectorXi &*
+  Voxel indices.
+
+- **p_tmin** : *float*
+  Start time.
+
+- **p_tstep** : *float*
+  Time step.
+
+---
+
+### setShape(shape)
+
+Set the 3D grid shape (nx, ny, nz) for volume reshaping.
+
+**Parameters:**
+
+- **shape** : *const QVector&lt; int &gt; &*
+  Grid dimensions \{nx, ny, nz\}.
+
+---
+
+### shape()
+
+Get the 3D grid shape.
+
+---
+
+### hasShape()
+
+Check whether the grid shape has been set.
+
+---
+
+### toVolume(timeIdx)
+
+Extract a 3D volume for a given time point, filling the grid with zeros where no source is active.
+
+**Parameters:**
+
+- **timeIdx** : *int*
+  Time sample index.
+
+**Returns:**
+
+- *Eigen::VectorXd* — Flattened volume (nx*ny*nz) with values at active voxels.
+
+---
+
+### centreOfMass(timeIdx)
+
+Compute the centre of mass of the activity at a given time point.
+
+**Parameters:**
+
+- **timeIdx** : *int*
+  Time sample index.
+
+**Returns:**
+
+- *Eigen::Vector3d* — 3D position (x, y, z) in voxel coordinates, or (0,0,0) if no activity.
+
+---

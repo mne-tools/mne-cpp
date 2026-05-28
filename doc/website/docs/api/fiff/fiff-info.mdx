@@ -1,0 +1,234 @@
+---
+id: fiff-info
+title: "FIFFLIB::FiffInfo"
+sidebar_label: FiffInfo
+sidebar_position: 3
+---
+
+# FiffInfo
+
+:::info[Python equivalent]
+`mne.Info` in MNE-Python.
+:::
+
+`#include <fiff/fiff_info.h>`
+
+```cpp
+class FIFFLIB::FiffInfo
+```
+
+Full FIFF measurement info: per-channel descriptors, sampling and filter setup, projectors, compensators, transforms and dig points.
+
+Materializes the union of the tags found in `FIFFB_MEAS` / `FIFFB_MEAS_INFO:` `sfreq`, `lowpass` / `highpass` / `line_freq`, `meas_date`, `experimenter`, `projs` (`FiffProj`), `comps` (`FiffCtfComp`), `dig` (`FiffDigPoint`), `hpi_results` / `hpi_meas`, `dev_head_t` / `ctf_head_t`, plus the `FiffInfoBase` channel / bads / sfreq subset. Drop-in counterpart of `mne.Info` in MNE-Python.
+
+---
+
+## Public Methods
+
+### FiffInfo()
+
+Constructors the fiff measurement file information.
+
+---
+
+### FiffInfo(p_FiffInfo)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FiffInfo** : *const FiffInfo &*
+  FIFF measurement information which should be copied.
+
+---
+
+### ~FiffInfo()
+
+Destroys the fiff measurement file information.
+
+---
+
+### clear()
+
+Initializes FIFF measurement information.
+
+---
+
+### make_compensator(from, to, ctf_comp, exclude_comp_chs)
+
+mne_make_compensator
+
+Create a compensation matrix to bring the data from one compensation state to another
+
+**Parameters:**
+
+- **from** : *fiff_int_t*
+  compensation in the input data.
+
+- **to** : *fiff_int_t*
+  desired compensation in the output.
+
+- **ctf_comp** : *FiffCtfComp &*
+  Compensation Matrix.
+
+- **exclude_comp_chs** : *bool*
+  exclude compensation channels from the output (optional).
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### get_current_comp()
+
+mne_get_current_comp
+
+Get the current compensation in effect in the data
+
+**Returns:**
+
+- *qint32* — the current compensation.
+
+---
+
+### make_projector(proj)
+
+mne_make_projector_info
+
+Make a SSP operator using the meas info
+
+**Parameters:**
+
+- **proj** : *Eigen::MatrixXd &*
+  The projection operator to apply to the data.
+
+**Returns:**
+
+- *qint32* — nproj - How many items in the projector.
+
+---
+
+### make_projector(proj, p_chNames)
+
+mne_make_projector_info
+
+Make a SSP operator using the meas info
+
+**Parameters:**
+
+- **proj** : *Eigen::MatrixXd &*
+  The projection operator to apply to the data.
+
+- **p_chNames** : *const QStringList &*
+  List of channels to include in the projection matrix.
+
+**Returns:**
+
+- *qint32* — nproj - How many items in the projector.
+
+---
+
+### pick_info(sel)
+
+fiff_pick_info
+
+Pick desired channels from measurement info
+
+**Parameters:**
+
+- **sel** : *const Eigen::RowVectorXi &*
+  List of channels to select.
+
+**Returns:**
+
+- *FiffInfo* — Info modified according to sel.
+
+---
+
+### set_current_comp(value)
+
+Set the current compensation value in the channel info structures.
+
+**Parameters:**
+
+- **value** : *fiff_int_t*
+  compensation value.
+
+---
+
+### writeToStream(p_pStream)
+
+Writes the fiff information to a FIF stream.
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  The stream to write to.
+
+---
+
+### print()
+
+Prints class contents.
+
+---
+
+## Static Methods
+
+### set_current_comp(listFiffChInfo, value)
+
+mne_set_current_comp
+
+Consider taking the member function of `set_current_comp(fiff_int_t value)`, when compensation should be applied to the channels of `FiffInfo`
+
+Set the current compensation value in the channel info structures
+
+**Parameters:**
+
+- **chs**
+  fiff channel info list.
+
+- **value** : *fiff_int_t*
+  compensation value.
+
+**Returns:**
+
+- *QList&lt; FiffChInfo &gt;* — the current compensation.
+
+---
+
+### readMegEegChannels(name, do_meg, do_eeg, bads, chsp, nmegp, neegp)
+
+Read MEG and EEG channel information from a FIFF file, excluding bad channels.
+
+Opens the file, reads measurement info, and splits channels into MEG and EEG lists (in that order), skipping channels in the bads list. EEG channels must pass `FiffChInfo::isValidEeg()`.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Path to the FIFF measurement file.
+
+- **do_meg** : *bool*
+  If true, include MEG channels.
+
+- **do_eeg** : *bool*
+  If true, include EEG channels.
+
+- **bads** : *const QStringList &*
+  List of bad channel names to exclude.
+
+- **chsp** : *QList&lt; FiffChInfo &gt; &*
+  Combined list of accepted channels (MEG first, then EEG).
+
+- **nmegp** : *int &*
+  Number of MEG channels in chsp.
+
+- **neegp** : *int &*
+  Number of EEG channels in chsp.
+
+**Returns:**
+
+- *bool* — true on success, false on error.
+
+---

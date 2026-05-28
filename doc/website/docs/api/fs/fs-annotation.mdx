@@ -1,0 +1,293 @@
+---
+id: fs-annotation
+title: "FSLIB::FsAnnotation"
+sidebar_label: FsAnnotation
+sidebar_position: 2
+---
+
+# FsAnnotation
+
+:::info[Python equivalent]
+`mne.read_annot` in MNE-Python.
+:::
+
+`#include <fs/fs_annotation.h>`
+
+```cpp
+class FSLIB::FsAnnotation
+```
+
+Single-hemisphere FreeSurfer parcellation: vertex → region label plus embedded colortable.
+
+Holds the parsed contents of one ``.annot file: the dense per-vertex label assignment, the explicit vertex index list it was authored against, and the `FsColortable` describing the colour and name of every region. Indexing is aligned with the matching `FsSurface` for the same subject + hemisphere, so `label`[v] is the region of surface vertex `v`.
+
+---
+
+## Public Methods
+
+### FsAnnotation()
+
+Default constructor.
+
+---
+
+### FsAnnotation(p_sFileName)
+
+Construts the annotation by reading it of the given file.
+
+**Parameters:**
+
+- **p_sFileName** : *const QString &*
+  `FsAnnotation` file.
+
+---
+
+### FsAnnotation(subject_id, hemi, surf, subjects_dir)
+
+Construts the annotation by reading it of the given file.
+
+**Parameters:**
+
+- **subject_id** : *const QString &*
+  Name of subject.
+
+- **hemi** : *qint32*
+  Which hemisphere to load \{0 -&gt; lh, 1 -&gt; rh\}.
+
+- **atlas**
+  Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
+
+- **subjects_dir** : *const QString &*
+  Subjects directory.
+
+---
+
+### FsAnnotation(path, hemi, surf)
+
+Construts the annotation by reading it of the given file.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  path to surface directory.
+
+- **hemi** : *qint32*
+  Which hemisphere to load \{0 -&gt; lh, 1 -&gt; rh\}.
+
+- **atlas**
+  Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
+
+**Returns:**
+
+- true if read sucessful, false otherwise.
+
+---
+
+### ~FsAnnotation()
+
+Destroys the annotation.
+
+---
+
+### clear()
+
+Initializes the `FsAnnotation`.
+
+---
+
+### isEmpty()
+
+Returns whether `FsAnnotation` is empty.
+
+**Returns:**
+
+- *bool* — true if is empty, false otherwise.
+
+---
+
+### hemi()
+
+Returns the hemisphere id (0 = lh; 1 = rh).
+
+**Returns:**
+
+- *qint32* — hemisphere id.
+
+---
+
+### getVertices()
+
+Returns the vertix indeces.
+
+**Returns:**
+
+- *Eigen::VectorXi &* — vertix indeces.
+
+---
+
+### getVertices()
+
+Returns the vertix indeces.
+
+**Returns:**
+
+- *const Eigen::VectorXi* — vertix indeces.
+
+---
+
+### getLabelIds()
+
+Returns the vertix labels.
+
+**Returns:**
+
+- *Eigen::VectorXi &* — vertix labels.
+
+---
+
+### getLabelIds()
+
+Returns the vertix labels.
+
+**Returns:**
+
+- *const Eigen::VectorXi* — vertix labels.
+
+---
+
+### getColortable()
+
+Returns the coloratable containing the label based nomenclature.
+
+**Returns:**
+
+- *FsColortable &* — colortable.
+
+---
+
+### getColortable()
+
+Returns the coloratable containing the label based nomenclature.
+
+**Returns:**
+
+- *const FsColortable* — colortable.
+
+---
+
+### toLabels(p_surf, p_qListLabels, p_qListLabelRGBAs, lLabelPicks)
+
+python labels_from_parc
+
+Converts annotation to a label list and colortable
+
+**Parameters:**
+
+- **p_surf** : *const FsSurface &*
+  the surface to read the vertex positions from.
+
+- **p_qListLabels** : *QList&lt; FsLabel &gt; &*
+  the converted labels are appended to a given list. Stored data are not affected.
+
+- **p_qListLabelRGBAs** : *QList&lt; Eigen::RowVector4i &gt; &*
+  the converted label RGBAs are appended to a given list. Stored data are not affected.
+
+- **lLabelPicks** : *const QStringList &*
+  the label names which should be picked.
+
+**Returns:**
+
+- *bool* — true if successful, false otherwise.
+
+---
+
+### filePath()
+
+annotation file path
+
+**Returns:**
+
+- *QString* — the surf file path.
+
+---
+
+### fileName()
+
+annotation file name
+
+**Returns:**
+
+- *QString* — the surf file name.
+
+---
+
+## Static Methods
+
+### read(subject_id, hemi, atlas, subjects_dir, p_Annotation)
+
+Reads a FreeSurfer annotation file.
+
+**Parameters:**
+
+- **subject_id** : *const QString &*
+  Name of subject.
+
+- **hemi** : *qint32*
+  Which hemisphere to load \{0 -&gt; lh, 1 -&gt; rh\}.
+
+- **atlas** : *const QString &*
+  Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
+
+- **subjects_dir** : *const QString &*
+  Subjects directory.
+
+- **p_Annotation** : *FsAnnotation &*
+  The read annotation.
+
+**Returns:**
+
+- *bool* — true if read sucessful, false otherwise.
+
+---
+
+### read(path, hemi, atlas, p_Annotation)
+
+Reads a FreeSurfer annotation file.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  path to label directory.
+
+- **hemi** : *qint32*
+  Which hemisphere to load \{0 -&gt; lh, 1 -&gt; rh\}.
+
+- **atlas** : *const QString &*
+  Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
+
+- **p_Annotation** : *FsAnnotation &*
+  The read annotation.
+
+**Returns:**
+
+- *bool* — true if read sucessful, false otherwise.
+
+---
+
+### read(p_sFileName, p_Annotation)
+
+Reads an annotation of a file.
+
+**Parameters:**
+
+- **p_sFileName** : *const QString &*
+  `FsAnnotation` file.
+
+- **p_Annotation** : *FsAnnotation &*
+  the read annotation.
+
+**Returns:**
+
+- *bool* — true if successful, false otherwise.
+
+---

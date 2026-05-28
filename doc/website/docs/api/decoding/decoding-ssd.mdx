@@ -1,0 +1,138 @@
+---
+id: decoding-ssd
+title: "DECODINGLIB::DecodingSsd"
+sidebar_label: DecodingSsd
+sidebar_position: 3
+---
+
+# DecodingSsd
+
+:::info[Python equivalent]
+`mne.decoding.SSD` in MNE-Python.
+:::
+
+`#include <decoding/decoding_ssd.h>`
+
+```cpp
+class DECODINGLIB::DecodingSsd
+```
+
+Spatio-spectral decomposition for narrowband signal enhancement on continuous M/EEG.
+
+Computes the spatial filters that jointly maximise variance in the caller-specified signal band and minimise it in the surrounding noise band, returning the `n_components` leading components ranked by signal-to-noise eigenvalue. The fit takes raw continuous data (channels × samples), bandpasses it twice internally with a zero- phase windowed-sinc FIR, builds the two covariance matrices, shrinks the noise covariance towards a scaled identity by `regParam` to keep the generalised eigenproblem well-conditioned, and stores the resulting filters, patterns and eigenvalues. The eigenvalues are directly interpretable as the per-component signal-band power gain over the noise band and are the standard diagnostic for choosing the effective rank of the decomposition.
+
+`transform` returns the components themselves — a low-dimensional signal that already lives in the band of interest — while `apply` performs the low-rank back-projection $$X_\{\text\{clean\}\} = A_\{:,1:k\} W_\{1:k,:\} X$$ that yields a sensor-space, denoised reconstruction with the oscillation of interest preserved and the broadband background suppressed; this is the call most downstream pipelines (connectivity, inverse modelling) want when SSD is used purely as a preprocessor.
+
+---
+
+## Public Methods
+
+### DecodingSsd(nComponents, regParam)
+
+Constructs an SSD decoder.
+
+**Parameters:**
+
+- **nComponents** : *int*
+  Number of SSD components. Default: 6.
+
+- **regParam** : *double*
+  Regularisation parameter for noise covariance. Default: 0.05.
+
+---
+
+### fit(data, sfreq, signalLow, signalHigh, noiseLow, noiseHigh)
+
+Fit SSD from continuous data.
+
+**Parameters:**
+
+- **data** : *Eigen::MatrixXd*
+  Continuous data (n_channels × n_times).
+
+- **sfreq** : *double*
+  Sampling frequency in Hz.
+
+- **signalLow** : *double*
+  Lower edge of signal band (Hz).
+
+- **signalHigh** : *double*
+  Upper edge of signal band (Hz).
+
+- **noiseLow** : *double*
+  Lower edge of noise band (Hz).
+
+- **noiseHigh** : *double*
+  Upper edge of noise band (Hz).
+
+---
+
+### transform(data)
+
+Apply spatial filters to data.
+
+**Parameters:**
+
+- **data** : *Eigen::MatrixXd*
+  Continuous data (n_channels × n_times).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Filtered data (n_components × n_times).
+
+---
+
+### fitTransform(data, sfreq, signalLow, signalHigh, noiseLow, noiseHigh)
+
+Fit and transform in one step.
+
+---
+
+### apply(data)
+
+Denoise data by low-rank factorisation.
+
+Reconstructs M/EEG signals from which the dynamics described by the excluded components is subtracted.
+
+**Parameters:**
+
+- **data** : *Eigen::MatrixXd*
+  Continuous data (n_channels × n_times).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Denoised data (n_channels × n_times).
+
+---
+
+### filters()
+
+**Returns:**
+
+- *const Eigen::MatrixXd &* — Spatial filters (n_components × n_channels).
+
+---
+
+### patterns()
+
+**Returns:**
+
+- *const Eigen::MatrixXd &* — Spatial patterns (n_channels × n_components).
+
+---
+
+### eigenvalues()
+
+**Returns:**
+
+- *const Eigen::VectorXd &* — Eigenvalues (signal/noise power ratio).
+
+---
+
+### isFitted()
+
+**Returns:**
+
+- *bool* — True if the model has been fitted.
+
+---

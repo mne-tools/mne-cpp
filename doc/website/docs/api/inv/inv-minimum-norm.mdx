@@ -1,0 +1,347 @@
+---
+id: inv-minimum-norm
+title: "INVLIB::InvMinimumNorm"
+sidebar_label: InvMinimumNorm
+sidebar_position: 1
+---
+
+# InvMinimumNorm
+
+:::info[Python equivalent]
+`mne.minimum_norm.apply_inverse` in MNE-Python.
+:::
+
+`#include <inv/inv_minimum_norm.h>`
+
+```cpp
+class INVLIB::InvMinimumNorm
+```
+
+Minimum norm estimation algorithm.
+
+Computes L2 minimum-norm, dSPM, or sLORETA source estimates from MEG/EEG data using a pre-computed inverse operator.
+
+References:
+Hamalainen & Ilmoniemi, Med. & Biol. Eng. & Comput. 32, 35-42, 1994.
+
+
+Dale et al., Neuron 26, 55-67, 2000 (dSPM).
+
+
+Pascual-Marqui, Methods Find. Exp. Clin. Pharmacol. 24D, 5-12, 2002 (sLORETA).
+
+Minimum norm estimation
+
+---
+
+## Public Methods
+
+### InvMinimumNorm(p_inverseOperator, lambda, method)
+
+Constructs minimum norm inverse algorithm.
+
+**Parameters:**
+
+- **p_inverseOperator** : *const MNELIB::MNEInverseOperator &*
+  The inverse operator.
+
+- **lambda** : *float*
+  The regularization factor.
+
+- **method** : *const QString*
+  Use mininum norm, dSPM or sLORETA. ("MNE" | "dSPM" | "sLORETA").
+
+**Returns:**
+
+- the prepared inverse operator.
+
+---
+
+### InvMinimumNorm(p_inverseOperator, lambda, dSPM, sLORETA)
+
+Constructs minimum norm inverse algorithm.
+
+**Parameters:**
+
+- **p_inverseOperator** : *const MNELIB::MNEInverseOperator &*
+  The inverse operator.
+
+- **lambda** : *float*
+  The regularization factor.
+
+- **dSPM** : *bool*
+  Compute the noise-normalization factors for dSPM?.
+
+- **sLORETA** : *bool*
+  Compute the noise-normalization factors for sLORETA?.
+
+**Returns:**
+
+- the prepared inverse operator.
+
+---
+
+### ~InvMinimumNorm()
+
+---
+
+### calculateInverse(p_fiffEvoked, pick_normal)
+
+Computes a L2-norm inverse solution Actual code using these principles might be different because the inverse operator is often reused across data sets.
+
+**Parameters:**
+
+- **p_fiffEvoked** : *const FIFFLIB::FiffEvoked &*
+  Evoked data.
+
+- **pick_normal** : *bool*
+  If True, rather than pooling the orientations by taking the norm, only the. radial component is kept. This is only applied when working with loose orientations.
+
+**Returns:**
+
+- *InvSourceEstimate* — the calculated source estimation.
+
+---
+
+### calculateInverse(data, tmin, tstep, pick_normal)
+
+---
+
+### doInverseSetup(nave, pick_normal)
+
+Perform the inverse setup: Prepares this inverse operator and assembles the kernel.
+
+**Parameters:**
+
+- **nave** : *qint32*
+  Number of averages to use.
+
+- **pick_normal** : *bool*
+  If True, rather than pooling the orientations by taking the norm, only the. radial component is kept. This is only applied when working with loose orientations.
+
+---
+
+### getName()
+
+Get the name of the inverse operator.
+
+**Returns:**
+
+- *const char ** — the name of the inverse operator.
+
+---
+
+### getSourceSpace()
+
+Get the source space corresponding to this inverse operator.
+
+**Returns:**
+
+- *const MNELIB::MNESourceSpaces &* — the source space corresponding to this inverse operator.
+
+---
+
+### getPreparedInverseOperator()
+
+Get the prepared inverse operator.
+
+**Returns:**
+
+- *MNELIB::MNEInverseOperator &* — the prepared inverse operator.
+
+---
+
+### setMethod(method)
+
+Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA" | "eLORETA").
+
+**Parameters:**
+
+- **method** : *QString*
+  Use minimum norm, dSPM, sLORETA, or eLORETA.
+
+---
+
+### setMethod(dSPM, sLORETA, eLoreta)
+
+Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA" | "eLORETA").
+
+**Parameters:**
+
+- **dSPM** : *bool*
+  Compute the noise-normalization factors for dSPM?.
+
+- **sLORETA** : *bool*
+  Compute the noise-normalization factors for sLORETA?.
+
+- **eLoreta** : *bool*
+  Compute the eLORETA source weights?.
+
+---
+
+### setRegularization(lambda)
+
+Set regularization factor.
+
+**Parameters:**
+
+- **lambda** : *float*
+  The regularization factor.
+
+---
+
+### setELoretaOptions(maxIter, eps, forceEqual)
+
+Set eLORETA options.
+
+**Parameters:**
+
+- **maxIter** : *int*
+  Maximum number of eLORETA weight iterations (default: 20).
+
+- **eps** : *double*
+  Convergence threshold for weight fitting (default: 1e-6).
+
+- **forceEqual** : *bool*
+  If true, use uniform orientation weights (default: false).
+
+---
+
+### getKernel()
+
+Get the assembled kernel.
+
+**Returns:**
+
+- *Eigen::MatrixXd &* — the assembled kernel.
+
+---
+
+## Example
+
+Source: [`src/examples/ex_inverse_mne/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inverse_mne/main.cpp)
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <math.h>
+
+//=============================================================================================================
+// MNE INCLUDES
+//=============================================================================================================
+
+#include <fiff/fiff_evoked_set.h>
+#include <mne/mne_inverse_operator.h>
+
+#include <fiff/fiff_evoked.h>
+#include <inv/inv_source_estimate.h>
+#include <inv/minimum_norm/inv_minimum_norm.h>
+
+#include <utils/generics/mne_logger.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtCore/QCoreApplication>
+#include <QCommandLineParser>
+#include <QFile>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FIFFLIB;
+using namespace MNELIB;
+using namespace INVLIB;
+using namespace UTILSLIB;
+
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * The function main marks the entry point of the program.
+ * By default, main has the storage class extern.
+ *
+ * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+ * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+ * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+ */
+int main(int argc, char *argv[])
+{
+    qInstallMessageHandler(MNELogger::customLogWriter);
+    QCoreApplication app(argc, argv);
+
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Inverse MNE Example");
+    parser.addHelpOption();
+
+    QCommandLineOption evokedFileOption("ave", "Path to evoked <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption invFileOption("inv", "Path to inverse operator <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
+    QCommandLineOption snrOption("snr", "The <snr> value used for computation.", "snr", "1.0");
+    QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
+    QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
+
+    parser.addOption(evokedFileOption);
+    parser.addOption(invFileOption);
+    parser.addOption(snrOption);
+    parser.addOption(methodOption);
+    parser.addOption(stcFileOption);
+    parser.process(app);
+
+    QFile t_fileEvoked(parser.value(evokedFileOption));
+    QFile t_fileInv(parser.value(invFileOption));
+
+    float snr = parser.value(snrOption).toFloat();
+    QString method(parser.value(methodOption));
+    QString t_sFileNameStc(parser.value(stcFileOption));
+
+    double lambda2 = 1.0 / pow(snr, 2);
+    qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
+
+    //
+    //   Read the data first
+    //
+    fiff_int_t setno = 0;
+    QPair<float, float> baseline(-1.0f, -1.0f);
+    FiffEvoked evoked(t_fileEvoked, setno, baseline);
+    if(evoked.isEmpty())
+        return 1;
+
+    //
+    //   Then the inverse operator
+    //
+    MNEInverseOperator inverse_operator(t_fileInv);
+
+    //
+    // Compute inverse solution
+    //
+    InvMinimumNorm minimumNorm(inverse_operator, lambda2, method);
+    InvSourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
+
+    //
+    //Results
+    //
+    std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
+    printf("tmin = %f s\n", sourceEstimate.tmin);
+    printf("tstep = %f s\n", sourceEstimate.tstep);
+
+    if(!t_sFileNameStc.isEmpty())
+    {
+        QFile t_fileStc(t_sFileNameStc);
+        sourceEstimate.write(t_fileStc);
+
+        //test if everything was written correctly
+        InvSourceEstimate readSourceEstimate(t_fileStc);
+
+        std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << readSourceEstimate.data.block(0,0,10,10) << std::endl;
+        printf("tmin = %f s\n", readSourceEstimate.tmin);
+        printf("tstep = %f s\n", readSourceEstimate.tstep);
+    }
+
+    return 0;//app.exec();
+}
+```

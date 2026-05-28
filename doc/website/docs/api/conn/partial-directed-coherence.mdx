@@ -1,0 +1,51 @@
+---
+id: partial-directed-coherence
+title: "CONNLIB::PartialDirectedCoherence"
+sidebar_label: PartialDirectedCoherence
+sidebar_position: 6
+---
+
+# PartialDirectedCoherence
+
+:::info[Python equivalent]
+`mne_connectivity.spectral_connectivity_epochs (method='pdc')` in MNE-Python.
+:::
+
+`#include <conn/partial_directed_coherence.h>`
+
+```cpp
+class CONNLIB::PartialDirectedCoherence
+```
+
+Partial Directed `Coherence` estimator of Baccala & Sameshima (2001).
+
+Computes `PDC_{ij}`(f) = |A_\{ij\}(f)| / sqrt( sum_k |A_\{kj\}(f)|^2 ) from the MVAR coefficients delivered by `MvarModel`, where `A(f)` is the frequency-domain inverse of the transfer matrix. Unlike `DirectedTransferFunction` this estimator counts only direct causal paths - relayed interactions `j` -&gt; k -&gt; i contribute 0 - so PDC and DTF together separate direct from indirect flow.
+
+Partial Directed `Coherence` estimator (Baccala & Sameshima 2001); directional, direct paths only.
+
+---
+
+## Public Methods
+
+### PartialDirectedCoherence()
+
+Constructs a `PartialDirectedCoherence` object.
+
+---
+
+## Static Methods
+
+### calculate(connectivitySettings)
+
+Calculates Partial Directed `Coherence` between all channel pairs.
+
+**Parameters:**
+
+- **connectivitySettings** : *ConnectivitySettings &*
+  The input data and parameters.
+
+**Returns:**
+
+- *Network* — The connectivity information in form of a network structure.
+
+---

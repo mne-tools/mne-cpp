@@ -24,6 +24,10 @@ const config: Config = {
     onBrokenLinks: 'warn',
     onBrokenMarkdownLinks: 'warn',
 
+    markdown: {
+        mermaid: true,
+    },
+
     customFields: {
         version: '2.2.1',
     },

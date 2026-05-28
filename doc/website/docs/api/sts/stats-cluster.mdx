@@ -1,0 +1,143 @@
+---
+id: stats-cluster
+title: "STSLIB::StatsCluster"
+sidebar_label: StatsCluster
+sidebar_position: 2
+---
+
+# StatsCluster
+
+:::info[Python equivalent]
+`mne.stats.permutation_cluster_test` in MNE-Python.
+:::
+
+`#include <sts/sts_cluster.h>`
+
+```cpp
+class STSLIB::StatsCluster
+```
+
+Cluster-based permutation test for comparing two conditions.
+
+Maris-Oostenveld cluster-mass permutation tests and Threshold-Free Cluster Enhancement on (channel,time) or (vertex,time) statistic maps.
+
+---
+
+## Static Methods
+
+### permutationTest(dataA, dataB, adjacency, nPermutations, clusterAlpha, pThreshold, tail)
+
+Cluster-based permutation test.
+
+**Parameters:**
+
+- **dataA** : *const QVector&lt; Eigen::MatrixXd &gt; &*
+  Per-subject data for condition A. Each matrix is nChannels x nTimes.
+
+- **dataB** : *const QVector&lt; Eigen::MatrixXd &gt; &*
+  Per-subject data for condition B. Each matrix is nChannels x nTimes.
+
+- **adjacency** : *const Eigen::SparseMatrix&lt; int &gt; &*
+  Spatial adjacency matrix (nChannels x nChannels).
+
+- **nPermutations** : *int*
+  Number of permutations (default 1024).
+
+- **clusterAlpha** : *double*
+  Alpha level for initial thresholding (default 0.05).
+
+- **pThreshold** : *double*
+  p-value threshold for reporting significant clusters (default 0.05).
+
+- **tail** : *StatsTailType*
+  Tail type for the test.
+
+**Returns:**
+
+- *StatsClusterResult* — `StatsClusterResult` with observed t-map, cluster statistics, and p-values.
+
+---
+
+### oneSamplePermutationTest(data, adjacency, threshold, nPermutations, tail)
+
+One-sample cluster-based permutation test.
+
+Tests whether the mean across subjects differs from zero at each vertex x time point using sign-flip permutations.
+
+**Parameters:**
+
+- **data** : *const QVector&lt; Eigen::MatrixXd &gt; &*
+  Per-subject data. Each matrix is nVertices x nTimes.
+
+- **adjacency** : *const Eigen::SparseMatrix&lt; int &gt; &*
+  Spatio-temporal adjacency matrix (nVertices*nTimes x nVertices*nTimes).
+
+- **threshold** : *double*
+  Cluster-forming t-threshold.
+
+- **nPermutations** : *int*
+  Number of sign-flip permutations.
+
+- **tail** : *StatsTailType*
+  Tail type for the test.
+
+**Returns:**
+
+- *StatsClusterResult* — `StatsClusterResult` with observed t-map, cluster statistics, and p-values.
+
+---
+
+### fTestPermutationTest(conditions, adjacency, threshold, nPermutations)
+
+F-test cluster-based permutation test for one-way ANOVA.
+
+Tests for differences across conditions by randomly reassigning condition labels and computing max cluster F-statistics.
+
+**Parameters:**
+
+- **conditions** : *const QVector&lt; QVector&lt; Eigen::MatrixXd &gt; &gt; &*
+  Vector of conditions, each containing per-subject matrices (nVertices x nTimes).
+
+- **adjacency** : *const Eigen::SparseMatrix&lt; int &gt; &*
+  Spatio-temporal adjacency matrix (nVertices*nTimes x nVertices*nTimes).
+
+- **threshold** : *double*
+  Cluster-forming F-threshold.
+
+- **nPermutations** : *int*
+  Number of permutations.
+
+**Returns:**
+
+- *StatsClusterResult* — `StatsClusterResult` with observed F-map (in matTObs), cluster statistics, and p-values.
+
+---
+
+### tfce(statMap, adjacency, E, H, nSteps)
+
+Threshold-Free Cluster Enhancement (TFCE).
+
+Enhances a statistic map by integrating cluster extent and height over a range of thresholds (Smith & Nichols 2009). Handles both positive and negative values.
+
+**Parameters:**
+
+- **statMap** : *const Eigen::MatrixXd &*
+  Statistic map (nVertices x nTimes).
+
+- **adjacency** : *const Eigen::SparseMatrix&lt; int &gt; &*
+  Spatio-temporal adjacency matrix (nVertices*nTimes x nVertices*nTimes).
+
+- **E** : *double*
+  Extent exponent (default 0.5).
+
+- **H** : *double*
+  Height exponent (default 2.0).
+
+- **nSteps** : *int*
+  Number of threshold steps (default 100).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — TFCE-enhanced score map (nVertices x nTimes).
+
+---

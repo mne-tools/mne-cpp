@@ -1,0 +1,89 @@
+---
+id: inv-trap-music
+title: "INVLIB::InvTrapMusic"
+sidebar_label: InvTrapMusic
+sidebar_position: 6
+---
+
+# InvTrapMusic
+
+:::info[Python equivalent]
+`mne.beamformer.trap_music` in MNE-Python.
+:::
+
+`#include <inv/inv_trap_music.h>`
+
+```cpp
+class INVLIB::InvTrapMusic
+```
+
+TRAP-MUSIC (Truncated RAP-MUSIC) source localization.
+
+Extends RAP-MUSIC by adding a truncation step to the signal subspace at each iteration, improving robustness to correlated sources. Uses SVD of the measurement data to estimate the signal subspace, then iteratively scans the lead field for the best-matching dipole, projects it out, and truncates the subspace dimension.
+
+Reference: Makela et al., NeuroImage 197, 616-626, 2019.
+
+---
+
+## Public Methods
+
+### InvTrapMusic(iMaxSources, dThreshold)
+
+Construct TRAP-MUSIC scanner.
+
+**Parameters:**
+
+- **iMaxSources** : *int*
+  Maximum number of sources to find (default 5).
+
+- **dThreshold** : *double*
+  Correlation threshold to stop scanning (default 0.85).
+
+---
+
+### compute(matLeadField, matData, matSourcePos, iNOrient)
+
+Compute TRAP-MUSIC source localization.
+
+**Parameters:**
+
+- **matLeadField** : *const Eigen::MatrixXd &*
+  Lead field matrix (n_channels × n_sources*n_orient).
+
+- **matData** : *const Eigen::MatrixXd &*
+  Measurement data (n_channels × n_times).
+
+- **matSourcePos** : *const Eigen::MatrixXd &*
+  Source positions (n_sources × 3).
+
+- **iNOrient** : *int*
+  Number of orientations per source (1=fixed, 3=free; default 3).
+
+**Returns:**
+
+- *QList&lt; TrapMusicDipole &gt;* — List of found dipoles, ordered by descending correlation.
+
+---
+
+## Static Methods
+
+### scanCorrelations(matLeadField, matSignalSubspace, iNOrient)
+
+Compute the MUSIC-type subspace correlation for all source locations.
+
+**Parameters:**
+
+- **matLeadField** : *const Eigen::MatrixXd &*
+  Lead field matrix (n_channels × n_sources*n_orient).
+
+- **matSignalSubspace** : *const Eigen::MatrixXd &*
+  Signal subspace (n_channels × n_signal_dims).
+
+- **iNOrient** : *int*
+  Number of orientations per source (1 or 3).
+
+**Returns:**
+
+- *Eigen::VectorXd* — Correlation vector (n_sources).
+
+---

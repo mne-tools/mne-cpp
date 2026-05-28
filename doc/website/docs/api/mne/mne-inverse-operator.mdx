@@ -1,0 +1,426 @@
+---
+id: mne-inverse-operator
+title: "MNELIB::MNEInverseOperator"
+sidebar_label: MNEInverseOperator
+sidebar_position: 2
+---
+
+# MNEInverseOperator
+
+:::info[Python equivalent]
+`mne.InverseOperator` in MNE-Python.
+:::
+
+`#include <mne/mne_inverse_operator.h>`
+
+```cpp
+class MNELIB::MNEInverseOperator
+```
+
+MNE-style inverse operator.
+
+Encapsulates the SVD decomposition of the whitened and weighted lead-field matrix together with noise and source covariance, priors, and the source space. Supports reading/writing FIFF files, preparation for application (regularisation, whitening, noise normalisation), and gain-matrix clustering.
+
+---
+
+## Public Methods
+
+### MNEInverseOperator()
+
+Constructs an empty inverse operator with invalid sentinel values.
+
+---
+
+### MNEInverseOperator(p_IODevice)
+
+Constructs an inverse operator by reading from a FIFF IO device.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  IO device (e.g. QFile) containing the inverse operator.
+
+---
+
+### MNEInverseOperator(info, forward, noiseCov, loose, depth, fixed, limit_depth_chs)
+
+Constructs an inverse operator from measurement info, forward solution, and noise covariance.
+
+**Parameters:**
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  Measurement info specifying channels; bad channels in info.bads are excluded.
+
+- **forward** : *const MNEForwardSolution &*
+  Forward operator.
+
+- **noiseCov** : *const FIFFLIB::FiffCov &*
+  Noise covariance matrix.
+
+- **loose** : *float*
+  Tangential-component weight in [0, 1] (ignored when `fixed` is true).
+
+- **depth** : *float*
+  Depth-weighting exponent in [0, 1]; 0 disables depth weighting.
+
+- **fixed** : *bool*
+  If true, use fixed source orientations normal to the cortical mantle.
+
+- **limit_depth_chs** : *bool*
+  If true, restrict depth weighting to gradiometers (or magnetometers/EEG as fallback).
+
+---
+
+### MNEInverseOperator(other)
+
+Copy constructor.
+
+**Parameters:**
+
+- **other** : *const MNEInverseOperator &*
+  Inverse operator to copy.
+
+---
+
+### ~MNEInverseOperator()
+
+Destructor.
+
+---
+
+### assemble_kernel(label, method, pick_normal, K, noise_norm, vertno)
+
+Assemble the inverse kernel matrix.
+
+Applies eigenfield/eigenlead decomposition, regularisation, whitening, projection, and optional noise normalisation to produce the kernel matrix that maps sensor data to source estimates.
+
+**Parameters:**
+
+- **label** : *const FSLIB::FsLabel &*
+  Cortical label restricting the source space (empty for all sources).
+
+- **method** : *const QString &*
+  Inverse method: "MNE", "dSPM", or "sLORETA".
+
+- **pick_normal** : *bool*
+  If true, keep only the surface-normal component (requires free orientation).
+
+- **K** : *Eigen::MatrixXd &*
+  Assembled kernel matrix (nSources x nChannels).
+
+- **noise_norm** : *Eigen::SparseMatrix&lt; double &gt; &*
+  Diagonal noise-normalisation matrix (empty for `MNE`).
+
+- **vertno** : *QList&lt; Eigen::VectorXi &gt; &*
+  Vertex numbers per hemisphere.
+
+**Returns:**
+
+- *bool* — true on success.
+
+---
+
+### check_ch_names(info)
+
+Verify that inverse-operator channels are present in the measurement info.
+
+**Parameters:**
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  Measurement info whose channel names are checked.
+
+**Returns:**
+
+- *bool* — true if all channels match, false otherwise.
+
+---
+
+### cluster_kernel(annotationSet, clusterSize, D, method)
+
+Cluster the inverse kernel by cortical parcellation.
+
+Groups source-space points within each parcellation label using KMeans and returns a reduced kernel together with the cluster operator.
+
+**Parameters:**
+
+- **annotationSet** : *const FSLIB::FsAnnotationSet &*
+  Annotation set for left and right hemisphere.
+
+- **clusterSize** : *qint32*
+  Maximum number of sources per cluster.
+
+- **D** : *Eigen::MatrixXd &*
+  Cluster operator matrix (nSources x nClusters).
+
+- **method** : *const QString &*
+  Distance metric: "cityblock" or "sqeuclidean".
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Clustered kernel matrix.
+
+---
+
+### getKernel()
+
+Access the most recently assembled kernel (mutable).
+
+**Returns:**
+
+- *Eigen::MatrixXd &* — Reference to the kernel matrix.
+
+---
+
+### getKernel()
+
+Access the most recently assembled kernel (const).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Copy of the kernel matrix.
+
+---
+
+### isFixedOrient()
+
+Check whether the inverse operator uses fixed source orientations.
+
+**Returns:**
+
+- *bool* — true if orientation is fixed-normal.
+
+---
+
+### prepare_inverse_operator(nave, lambda2, dSPM, sLORETA)
+
+Prepare the inverse operator for source estimation.
+
+Scales covariances by the number of averages, builds the regularised pseudo-inverse, the whitener, the SSP projector, and (optionally) the noise-normalisation factors for dSPM or sLORETA.
+
+**Parameters:**
+
+- **nave** : *qint32*
+  Number of averages (scales the noise covariance).
+
+- **lambda2** : *float*
+  Regularisation parameter (SNR^\{-2\}).
+
+- **dSPM** : *bool*
+  Compute dSPM noise-normalisation factors.
+
+- **sLORETA** : *bool*
+  Compute sLORETA noise-normalisation factors.
+
+**Returns:**
+
+- *MNEInverseOperator* — A prepared copy of the inverse operator ready for apply_inverse.
+
+---
+
+### write(p_IODevice)
+
+Write the inverse operator to a FIFF file.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  IO device to write to.
+
+---
+
+### writeToStream(p_pStream)
+
+Write the inverse operator into an already-open FIFF stream.
+
+**Parameters:**
+
+- **p_pStream** : *FIFFLIB::FiffStream **
+  Open FIFF stream.
+
+---
+
+## Static Methods
+
+### make_inverse_operator(info, forward, noiseCov, loose, depth, fixed, limit_depth_chs)
+
+Assemble an inverse operator from a forward solution and noise covariance.
+
+Performs depth weighting, source-covariance construction, whitening, and SVD decomposition of the weighted lead-field matrix.
+
+**Parameters:**
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  Measurement info; bad channels in info.bads are excluded.
+
+- **forward** : *MNEForwardSolution*
+  Forward operator (modified internally for fixed orientation if needed).
+
+- **noiseCov** : *const FIFFLIB::FiffCov &*
+  Noise covariance matrix.
+
+- **loose** : *float*
+  Tangential-component weight in [0, 1].
+
+- **depth** : *float*
+  Depth-weighting exponent in [0, 1]; 0 disables.
+
+- **fixed** : *bool*
+  Use fixed surface-normal orientations.
+
+- **limit_depth_chs** : *bool*
+  Restrict depth weighting to gradiometers (or fallback).
+
+**Returns:**
+
+- *MNEInverseOperator* — Assembled inverse operator.
+
+---
+
+### read_inverse_operator(p_IODevice, inv)
+
+Read an inverse operator from a FIFF file.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  FIFF IO device (e.g. QFile or QTcpSocket).
+
+- **inv** : *MNEInverseOperator &*
+  Receives the loaded inverse operator.
+
+**Returns:**
+
+- *bool* — true on success, false on failure.
+
+---
+
+## Example
+
+Source: [`src/examples/ex_make_inverse_operator/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_make_inverse_operator/main.cpp)
+
+```cpp
+#include <fiff/fiff_cov.h>
+#include <fiff/fiff_evoked.h>
+#include <inv/inv_source_estimate.h>
+#include <inv/minimum_norm/inv_minimum_norm.h>
+#include <utils/generics/mne_logger.h>
+
+#include <iostream>
+#include <QCommandLineParser>
+#include <QFile>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtCore/QCoreApplication>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FIFFLIB;
+using namespace MNELIB;
+using namespace INVLIB;
+using namespace UTILSLIB;
+
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * The function main marks the entry point of the program.
+ * By default, main has the storage class extern.
+ *
+ * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+ * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+ * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+ */
+int main(int argc, char *argv[])
+{
+    
+    qInstallMessageHandler(MNELogger::customLogWriter);
+    QCoreApplication a(argc, argv);
+
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Make Inverse Operator Example");
+    parser.addHelpOption();
+    QCommandLineOption fwdMEGOption("fwdMEG", "Path to forwad solution <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption fwdEEGOption("fwdEEG", "Path to forwad solution <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-eeg-oct-6-fwd.fif");
+    QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
+    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "3.0");//3.0;//0.1;//3.0;
+
+    parser.addOption(fwdMEGOption);
+    parser.addOption(fwdEEGOption);
+    parser.addOption(covFileOption);
+    parser.addOption(evokedFileOption);
+    parser.addOption(methodOption);
+    parser.addOption(snrOption);
+
+    parser.process(a);
+
+    QFile t_fileFwdMeeg(parser.value(fwdMEGOption));
+    QFile t_fileFwdEeg(parser.value(fwdEEGOption));
+    QFile t_fileCov(parser.value(covFileOption));
+    QFile t_fileEvoked(parser.value(evokedFileOption));
+
+    double snr = parser.value(snrOption).toDouble();
+    double lambda2 = 1.0 / pow(snr, 2);
+    QString method(parser.value(methodOption));
+
+    // Load data
+    fiff_int_t setno = 0;
+    QPair<float, float> baseline(-1.0f, -1.0f);
+    FiffEvoked evoked(t_fileEvoked, setno, baseline);
+    if(evoked.isEmpty())
+        return 1;
+
+    MNEForwardSolution t_forwardMeeg(t_fileFwdMeeg, false, true);
+
+    FiffCov noise_cov(t_fileCov);
+
+    // regularize noise covariance
+    noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
+
+    // Restrict forward solution as necessary for MEG
+    MNEForwardSolution t_forwardMeg = t_forwardMeeg.pick_types(true, false);
+    // Alternatively, you can just load a forward solution that is restricted
+    MNEForwardSolution t_forwardEeg(t_fileFwdEeg, false, true);
+
+    // make an M/EEG, MEG-only, and EEG-only inverse operators
+    FiffInfo info = evoked.info;
+
+    MNEInverseOperator inverse_operator_meeg(info, t_forwardMeeg, noise_cov, 0.2f, 0.8f);
+    MNEInverseOperator inverse_operator_meg(info, t_forwardMeg, noise_cov, 0.2f, 0.8f);
+    MNEInverseOperator inverse_operator_eeg(info, t_forwardEeg, noise_cov, 0.2f, 0.8f);
+
+    // Compute inverse solution
+    InvMinimumNorm minimumNorm_meeg(inverse_operator_meeg, lambda2, method);
+    InvSourceEstimate sourceEstimate_meeg = minimumNorm_meeg.calculateInverse(evoked);
+
+    InvMinimumNorm minimumNorm_meg(inverse_operator_meg, lambda2, method);
+    InvSourceEstimate sourceEstimate_meg = minimumNorm_meg.calculateInverse(evoked);
+
+    InvMinimumNorm minimumNorm_eeg(inverse_operator_eeg, lambda2, method);
+    InvSourceEstimate sourceEstimate_eeg = minimumNorm_eeg.calculateInverse(evoked);
+
+    if(sourceEstimate_meeg.isEmpty() || sourceEstimate_meg.isEmpty() || sourceEstimate_eeg.isEmpty())
+        return 1;
+
+    // View activation time-series
+    std::cout << "\nsourceEstimate_meeg:\n" << sourceEstimate_meeg.data.block(0,0,10,10) << std::endl;
+    std::cout << "time\n" << sourceEstimate_meeg.times.block(0,0,1,10) << std::endl;
+
+    std::cout << "\nsourceEstimate_meg:\n" << sourceEstimate_meg.data.block(0,0,10,10) << std::endl;
+    std::cout << "time\n" << sourceEstimate_meg.times.block(0,0,1,10) << std::endl;
+
+    std::cout << "\nsourceEstimate_eeg:\n" << sourceEstimate_eeg.data.block(0,0,10,10) << std::endl;
+    std::cout << "time\n" << sourceEstimate_eeg.times.block(0,0,1,10) << std::endl;
+
+    return a.exec();
+}
+```

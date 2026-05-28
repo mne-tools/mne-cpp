@@ -1,0 +1,60 @@
+---
+id: multitaper-psd
+title: "UTILSLIB::MultitaperPsd"
+sidebar_label: MultitaperPsd
+sidebar_position: 21
+---
+
+# MultitaperPsd
+
+:::info[Python equivalent]
+`mne.time_frequency.psd_multitaper` in MNE-Python.
+:::
+
+`#include <dsp/multitaper_psd.h>`
+
+```cpp
+class UTILSLIB::MultitaperPsd
+```
+
+Multitaper power spectral density estimator using DPSS (Slepian) tapers.
+
+Applies multiple orthogonal DPSS tapers to the data, computes the FFT of each tapered segment, and averages the resulting periodograms weighted by the taper eigenvalues. This provides a PSD estimate with reduced variance compared to a single-taper (periodogram) approach.
+
+```cpp
+// 600 Hz data, half-bandwidth 4, default tapers
+MultitaperPsdResult r = MultitaperPsd::compute(matData, 600.0);
+// r.matPsd   → n_channels × (n_times/2+1)
+// r.vecFreqs → frequency axis in Hz
+```
+
+---
+
+## Static Methods
+
+### compute(matData, sfreq, halfBandwidth, nTapers, nFft)
+
+Compute multitaper PSD for every channel of a data matrix.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Data matrix (n_channels × n_times).
+
+- **sfreq** : *double*
+  Sampling frequency in Hz.
+
+- **halfBandwidth** : *double*
+  Half-bandwidth parameter (NW); default 4.0.
+
+- **nTapers** : *int*
+  Number of DPSS tapers; -1 → floor(2*halfBandwidth - 1).
+
+- **nFft** : *int*
+  FFT length; -1 → n_times.
+
+**Returns:**
+
+- *MultitaperPsdResult* — `MultitaperPsdResult` with matPsd and vecFreqs.
+
+---

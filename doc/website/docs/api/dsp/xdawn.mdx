@@ -1,0 +1,119 @@
+---
+id: xdawn
+title: "UTILSLIB::Xdawn"
+sidebar_label: Xdawn
+sidebar_position: 25
+---
+
+# Xdawn
+
+:::info[Python equivalent]
+`mne.preprocessing.Xdawn` in MNE-Python.
+:::
+
+`#include <dsp/xdawn.h>`
+
+```cpp
+class UTILSLIB::Xdawn
+```
+
+Event-related response enhancement with xDAWN spatial filtering.
+
+Typical usage: 
+```cpp
+auto xd = Xdawn::fit(epochs, 1, 4);
+Eigen::MatrixXd comp = Xdawn::apply(epoch.epoch, xd);      // 4 x n_samples
+Eigen::MatrixXd den  = Xdawn::denoise(epoch.epoch, xd, 2); // n_channels x n_samples
+```
+
+---
+
+## Static Methods
+
+### fit(epochs, iTargetEvent, nComponents, dReg)
+
+Fit xDAWN spatial filters for a target event code.
+
+Uses non-rejected epochs only. The target signal covariance is estimated from the average of epochs whose MNEEpochData::event equals `iTargetEvent`. The noise covariance is estimated from residuals around the class-wise average for each event type.
+
+**Parameters:**
+
+- **epochs** : *const QVector&lt; MNELIB::MNEEpochData &gt; &*
+  Input epochs.
+
+- **iTargetEvent** : *int*
+  Event code whose ERP/ERF should be enhanced.
+
+- **nComponents** : *int*
+  Number of xDAWN components to retain.
+
+- **dReg** : *double*
+  Relative diagonal regularisation added to the noise covariance.
+
+**Returns:**
+
+- *XdawnResult* — `XdawnResult` containing filters, patterns, and covariances.
+
+---
+
+### apply(matEpoch, result)
+
+Project one epoch into xDAWN component space.
+
+**Parameters:**
+
+- **matEpoch** : *const Eigen::MatrixXd &*
+  Epoch data (n_channels x n_samples).
+
+- **result** : *const XdawnResult &*
+  Result from `fit()`.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Component activations (n_components x n_samples).
+
+---
+
+### denoise(matEpoch, result, nComponents)
+
+Reconstruct one epoch from the first `nComponents` xDAWN components.
+
+If `nComponents` &lt;= 0 or exceeds the fitted dimensionality, all fitted components are used.
+
+**Parameters:**
+
+- **matEpoch** : *const Eigen::MatrixXd &*
+  Epoch data (n_channels x n_samples).
+
+- **result** : *const XdawnResult &*
+  Result from `fit()`.
+
+- **nComponents** : *int*
+  Number of leading xDAWN components to keep.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Denoised epoch (n_channels x n_samples).
+
+---
+
+### denoiseEpochs(epochs, result, nComponents)
+
+Apply `denoise()` to all epochs in the vector, preserving metadata.
+
+**Parameters:**
+
+- **epochs** : *const QVector&lt; MNELIB::MNEEpochData &gt; &*
+  Input epochs.
+
+- **result** : *const XdawnResult &*
+  Result from `fit()`.
+
+- **nComponents** : *int*
+  Number of leading xDAWN components to keep.
+
+**Returns:**
+
+- *QVector&lt; MNELIB::MNEEpochData &gt;* — Copy of the input epochs with denoised epoch matrices.
+
+---

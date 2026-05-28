@@ -1,0 +1,501 @@
+---
+id: fs-surface
+title: "FSLIB::FsSurface"
+sidebar_label: FsSurface
+sidebar_position: 1
+---
+
+# FsSurface
+
+:::info[Python equivalent]
+`mne.read_surface` in MNE-Python.
+:::
+
+`#include <fs/fs_surface.h>`
+
+```cpp
+class FSLIB::FsSurface
+```
+
+In-memory FreeSurfer triangular cortical surface for one hemisphere.
+
+Owns the vertex coordinate matrix (n_vertices × 3, Tk-surface RAS mm), the triangle index matrix (n_faces × 3, zero-based into the vertex array) and the hemisphere id (0 = `lh`, 1 = `rh`). Construction is purely an I/O operation: each constructor either takes a direct path to a `lh.pial` / `rh.white` / `lh.inflated` style binary surface file, or the `subject_id` / `hemi` / `surf` shorthand resolved against `$SUBJECTS_DIR`. The instance is intended to be paired with an `FsAnnotation` or `FsLabel` sharing the same vertex indexing.
+
+---
+
+## Public Methods
+
+### FsSurface()
+
+Default constructor.
+
+---
+
+### FsSurface(p_sFile)
+
+Construts the surface by reading it of the given file.
+
+**Parameters:**
+
+- **p_sFile** : *const QString &*
+  `FsSurface` file name with path.
+
+---
+
+### FsSurface(subject_id, hemi, surf, subjects_dir)
+
+Construts the surface by reading it of the given file.
+
+**Parameters:**
+
+- **subject_id** : *const QString &*
+  Name of subject.
+
+- **hemi** : *qint32*
+  Which hemisphere to load \{0 -&gt; lh, 1 -&gt; rh\}.
+
+- **surf** : *const QString &*
+  Name of the surface to load (eg. inflated, orig ...).
+
+- **subjects_dir** : *const QString &*
+  Subjects directory.
+
+---
+
+### FsSurface(path, hemi, surf)
+
+Construts the surface by reading it of the given file.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  path to surface directory.
+
+- **hemi** : *qint32*
+  Which hemisphere to load \{0 -&gt; lh, 1 -&gt; rh\}.
+
+- **surf** : *const QString &*
+  Name of the surface to load (eg. inflated, orig ...).
+
+**Returns:**
+
+- true if read sucessful, false otherwise.
+
+---
+
+### ~FsSurface()
+
+Destroys the `FsSurface` class.
+
+---
+
+### clear()
+
+Initializes the `FsSurface`.
+
+---
+
+### hemi()
+
+Returns the hemisphere id (0 = lh; 1 = rh).
+
+**Returns:**
+
+- *qint32* — hemisphere id.
+
+---
+
+### isEmpty()
+
+Returns whether `FsSurface` is empty.
+
+**Returns:**
+
+- *bool* — true if is empty, false otherwise.
+
+---
+
+### surf()
+
+Loaded surface (eg.
+
+inflated, orig ...)
+
+**Returns:**
+
+- *QString* — the surface.
+
+---
+
+### rr()
+
+Coordinates of vertices (rr).
+
+**Returns:**
+
+- *const Eigen::MatrixX3f &* — coordinates of vertices.
+
+---
+
+### tris()
+
+The triangle descriptions.
+
+**Returns:**
+
+- *const Eigen::MatrixX3i &* — triangle descriptions.
+
+---
+
+### nn()
+
+Normalized surface normals for each vertex.
+
+**Returns:**
+
+- *const Eigen::MatrixX3f &* — surface normals.
+
+---
+
+### curv()
+
+FreeSurfer curvature.
+
+**Returns:**
+
+- *const Eigen::VectorXf &* — the FreeSurfer curvature data.
+
+---
+
+### offset()
+
+Vector offset.
+
+**Returns:**
+
+- *const Eigen::Vector3f &* — the offset vector.
+
+---
+
+### offset()
+
+Vector offset.
+
+**Returns:**
+
+- *Eigen::Vector3f &* — the offset vector.
+
+---
+
+### filePath()
+
+path to surf directuryt
+
+**Returns:**
+
+- *QString* — the path to surf directory.
+
+---
+
+### fileName()
+
+surf file name
+
+**Returns:**
+
+- *QString* — the surf file name.
+
+---
+
+## Static Methods
+
+### read(subject_id, hemi, surf, subjects_dir, p_Surface, p_bLoadCurvature)
+
+mne_read_surface
+
+Reads a FreeSurfer surface file
+
+**Parameters:**
+
+- **subject_id** : *const QString &*
+  Name of subject.
+
+- **hemi** : *qint32*
+  Which hemisphere to load \{0 -&gt; lh, 1 -&gt; rh\}.
+
+- **surf** : *const QString &*
+  Name of the surface to load (eg. inflated, orig ...).
+
+- **subjects_dir** : *const QString &*
+  Subjects directory.
+
+- **p_Surface** : *FsSurface &*
+  The read surface.
+
+- **p_bLoadCurvature** : *bool*
+  True if the curvature should be read (optional, default = true).
+
+**Returns:**
+
+- *bool* — true if read sucessful, false otherwise.
+
+---
+
+### read(path, hemi, surf, p_Surface, p_bLoadCurvature)
+
+mne_read_surface
+
+Reads a FreeSurfer surface file
+
+**Parameters:**
+
+- **path** : *const QString &*
+  path to surface directory.
+
+- **hemi** : *qint32*
+  Which hemisphere to load \{0 -&gt; lh, 1 -&gt; rh\}.
+
+- **surf** : *const QString &*
+  Name of the surface to load (eg. inflated, orig ...).
+
+- **p_Surface** : *FsSurface &*
+  The read surface.
+
+- **p_bLoadCurvature** : *bool*
+  True if the curvature should be read (optional, default = true).
+
+**Returns:**
+
+- *bool* — true if read sucessful, false otherwise.
+
+---
+
+### read(p_sFileName, p_Surface, p_bLoadCurvature)
+
+mne_read_surface
+
+Reads a FreeSurfer surface file
+
+**Parameters:**
+
+- **p_sFileName** : *const QString &*
+  The file to read.
+
+- **p_Surface** : *FsSurface &*
+  The read surface.
+
+- **p_bLoadCurvature** : *bool*
+  True if the curvature should be read (optional, default = true).
+
+**Returns:**
+
+- *bool* — true if read sucessful, false otherwise.
+
+---
+
+### read_curv(p_sFileName)
+
+reads a binary curvature file into a vector
+
+**Returns:**
+
+- *Eigen::VectorXf* — the read curvature.
+
+---
+
+### compute_normals(rr, tris)
+
+Efficiently compute vertex normals for triangulated surface.
+
+**Parameters:**
+
+- **rr** : *const Eigen::MatrixX3f &*
+  Vertex coordinates in meters.
+
+- **tris** : *const Eigen::MatrixX3i &*
+  The triangle descriptions.
+
+**Returns:**
+
+- *Eigen::MatrixX3f* — The computed normals.
+
+---
+
+### fread3(stream)
+
+Reads a 3-byte integer out of a QDataStream (FreeSurfer format).
+
+**Parameters:**
+
+- **stream** : *QDataStream &*
+  Stream to read from.
+
+**Returns:**
+
+- *qint32* — the read 3-byte integer.
+
+---
+
+### fread3(stream)
+
+Reads a 3-byte integer out of a std::iostream (FreeSurfer format).
+
+**Parameters:**
+
+- **stream** : *std::iostream &*
+  Stream to read from.
+
+**Returns:**
+
+- *qint32* — the read 3-byte integer.
+
+---
+
+### fread3_many(stream, count)
+
+Reads multiple 3-byte integers out of a QDataStream (FreeSurfer format).
+
+**Parameters:**
+
+- **stream** : *QDataStream &*
+  Stream to read from.
+
+- **count** : *qint32*
+  Number of elements to read.
+
+**Returns:**
+
+- *Eigen::VectorXi* — the read 3-byte integers.
+
+---
+
+### fread3_many(stream, count)
+
+Reads multiple 3-byte integers out of a std::iostream (FreeSurfer format).
+
+**Parameters:**
+
+- **stream** : *std::iostream &*
+  Stream to read from.
+
+- **count** : *qint32*
+  Number of elements to read.
+
+**Returns:**
+
+- *Eigen::VectorXi* — the read 3-byte integers.
+
+---
+
+## Example
+
+Source: [`src/examples/ex_fs_surface/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fs_surface/main.cpp)
+
+```cpp
+#include <disp3D/view/brainview.h>
+#include <disp3D/model/braintreemodel.h>
+
+#include <fs/fs_surfaceset.h>
+
+#include <utils/generics/mne_logger.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QApplication>
+#include <QCommandLineParser>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FSLIB;
+
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * The function main marks the entry point of the program.
+ * By default, main has the storage class extern.
+ *
+ * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+ * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+ * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+ */
+int main(int argc, char *argv[])
+{
+    #ifdef STATICBUILD
+    // Q_INIT_RESOURCE(mne_disp3d);
+    #endif
+    
+    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
+    QApplication a(argc, argv);
+
+    // Command Line Parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Fs FsSurface Example");
+    parser.addHelpOption();
+
+    QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
+    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
+
+    parser.addOption(hemiOption);
+    parser.addOption(subjectOption);
+    parser.addOption(subjectPathOption);
+
+    parser.process(a);
+
+    int hemi = parser.value(hemiOption).toInt();
+    QString subject = parser.value(subjectOption);
+    QString subjectPath = parser.value(subjectPathOption);
+
+    //
+    // pial
+    //
+    FsSurfaceSet tSurfSetPial (subject, hemi, "pial", subjectPath);
+
+    BrainView *pBrainView = new BrainView();
+    BrainTreeModel *pModel = new BrainTreeModel();
+    pBrainView->setModel(pModel);
+
+    for (auto it = tSurfSetPial.data().constBegin(); it != tSurfSetPial.data().constEnd(); ++it) {
+        QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
+        pModel->addSurface(subject, hemi, "pial", it.value());
+    }
+
+    //
+    // inflated
+    //
+    FsSurfaceSet tSurfSetInflated (subject, hemi, "inflated", subjectPath);
+    for (auto it = tSurfSetInflated.data().constBegin(); it != tSurfSetInflated.data().constEnd(); ++it) {
+        QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
+        pModel->addSurface(subject, hemi, "inflated", it.value());
+    }
+
+    //
+    // orig
+    //
+    FsSurfaceSet tSurfSetOrig (subject, hemi, "orig", subjectPath);
+    for (auto it = tSurfSetOrig.data().constBegin(); it != tSurfSetOrig.data().constEnd(); ++it) {
+        QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
+        pModel->addSurface(subject, hemi, "orig", it.value());
+    }
+
+    //
+    // white
+    //
+    FsSurfaceSet tSurfSetWhite (subject, hemi, "white", subjectPath);
+    for (auto it = tSurfSetWhite.data().constBegin(); it != tSurfSetWhite.data().constEnd(); ++it) {
+        QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
+        pModel->addSurface(subject, hemi, "white", it.value());
+    }
+
+    pBrainView->show();
+
+    return a.exec();
+}
+```

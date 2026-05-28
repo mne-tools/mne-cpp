@@ -1,0 +1,99 @@
+---
+id: connectivity-aec
+title: "UTILSLIB::ConnectivityAec"
+sidebar_label: ConnectivityAec
+sidebar_position: 27
+---
+
+# ConnectivityAec
+
+:::info[Python equivalent]
+`mne_connectivity.envelope_correlation` in MNE-Python.
+:::
+
+`#include <dsp/connectivity_aec.h>`
+
+```cpp
+class UTILSLIB::ConnectivityAec
+```
+
+Amplitude Envelope Correlation connectivity.
+
+```cpp
+// Standard AEC
+MatrixXd aec = ConnectivityAec::compute(bandpassedData);
+
+// Orthogonalized AEC (corrected for source leakage)
+MatrixXd aecCorr = ConnectivityAec::computeOrthogonalized(bandpassedData);
+```
+
+---
+
+## Static Methods
+
+### compute(matData)
+
+Compute AEC between all pairs of signals.
+
+Steps: Hilbert envelope → Pearson correlation of envelopes.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Bandpassed data (n_signals x n_samples).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Symmetric connectivity matrix (n_signals x n_signals) with values in [-1, 1].
+
+---
+
+### computeOrthogonalized(matData)
+
+Compute orthogonalized AEC (corrected for volume conduction / source leakage).
+
+For each pair (i, j): orthogonalize j w.r.t. i, compute envelope correlation, then symmetrise by averaging AEC(i→j) and AEC(j→i).
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Bandpassed data (n_signals x n_samples).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Symmetric connectivity matrix (n_signals x n_signals) with values in [0, 1].
+
+---
+
+### hilbertEnvelope(signal)
+
+Compute the analytic signal envelope via Hilbert transform (using FFT).
+
+**Parameters:**
+
+- **signal** : *const Eigen::VectorXd &*
+  Real-valued signal (n_samples).
+
+**Returns:**
+
+- *Eigen::VectorXd* — Envelope (n_samples) — absolute value of analytic signal.
+
+---
+
+### pearsonCorrelation(a, b)
+
+Pearson correlation between two vectors.
+
+**Parameters:**
+
+- **a** : *const Eigen::VectorXd &*
+  First vector.
+
+- **b** : *const Eigen::VectorXd &*
+  Second vector (same length).
+
+**Returns:**
+
+- *double* — Correlation coefficient in [-1, 1].
+
+---

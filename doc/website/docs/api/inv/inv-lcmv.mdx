@@ -1,0 +1,195 @@
+---
+id: inv-lcmv
+title: "INVLIB::InvLCMV"
+sidebar_label: InvLCMV
+sidebar_position: 3
+---
+
+# InvLCMV
+
+:::info[Python equivalent]
+`mne.beamformer.make_lcmv / apply_lcmv` in MNE-Python.
+:::
+
+`#include <inv/inv_lcmv.h>`
+
+```cpp
+class INVLIB::InvLCMV
+```
+
+Linearly Constrained Minimum Variance (LCMV) beamformer for MEG/EEG source localization.
+
+Typical workflow: 
+```cpp
+// 1. Compute the spatial filter from forward model + data covariance
+InvBeamformer filters = InvLCMV::makeLCMV(info, forward, dataCov, noiseCov, reg,
+                                           pickOri, weightNorm, reduceRank, inversion);
+
+// 2. Apply to evoked data -> source time courses
+InvSourceEstimate stc = InvLCMV::applyLCMV(evoked, filters);
+
+// 3. Or apply to covariance -> source power map
+InvSourceEstimate power = InvLCMV::applyLCMVCov(dataCov, filters);
+```
+
+LCMV beamformer (time-domain).
+
+---
+
+## Static Methods
+
+### makeLCMV(info, forward, dataCov, reg, noiseCov, pickOri, weightNorm, reduceRank, invMethod)
+
+Compute LCMV beamformer spatial filters.
+
+**Parameters:**
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  Measurement info (for channel matching).
+
+- **forward** : *const MNELIB::MNEForwardSolution &*
+  Forward solution containing the leadfield.
+
+- **dataCov** : *const FIFFLIB::FiffCov &*
+  Data covariance matrix (from recording epoch).
+
+- **reg** : *double*
+  Regularization parameter (default 0.05 = 5% of trace).
+
+- **noiseCov** : *const FIFFLIB::FiffCov &*
+  Noise covariance for whitening. If empty, identity whitening.
+
+- **pickOri** : *BeamformerPickOri*
+  Orientation selection mode (default: None = keep all).
+
+- **weightNorm** : *BeamformerWeightNorm*
+  Weight normalization (default: UnitNoiseGain).
+
+- **reduceRank** : *bool*
+  Reduce leadfield rank by 1 (default: false).
+
+- **invMethod** : *BeamformerInversion*
+  Inversion method for denominator (default: Matrix).
+
+**Returns:**
+
+- *InvBeamformer* — The computed beamformer containing spatial filter weights.
+
+---
+
+### applyLCMV(evoked, filters)
+
+Apply LCMV beamformer to evoked data to produce source time courses.
+
+stc = W @ (whitener @ proj @ evoked.data)
+
+**Parameters:**
+
+- **evoked** : *const FIFFLIB::FiffEvoked &*
+  Evoked data (averaged, channel x time).
+
+- **filters** : *const InvBeamformer &*
+  Pre-computed LCMV beamformer from `makeLCMV()`.
+
+**Returns:**
+
+- *InvSourceEstimate* — Source estimate with time courses at each source point.
+
+---
+
+### applyLCMVRaw(data, tmin, tstep, filters)
+
+Apply LCMV beamformer to raw data matrix.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  Data matrix (n_channels, n_times).
+
+- **tmin** : *float*
+  Start time in seconds.
+
+- **tstep** : *float*
+  Time step in seconds.
+
+- **filters** : *const InvBeamformer &*
+  Pre-computed LCMV beamformer from `makeLCMV()`.
+
+**Returns:**
+
+- *InvSourceEstimate* — Source estimate with time courses.
+
+---
+
+### applyLCMVCov(dataCov, filters)
+
+Apply LCMV beamformer to a data covariance to produce a source power map.
+
+power_i = trace(W_i @ Cm @ W_i^T)
+
+**Parameters:**
+
+- **dataCov** : *const FIFFLIB::FiffCov &*
+  Data covariance matrix.
+
+- **filters** : *const InvBeamformer &*
+  Pre-computed LCMV beamformer from `makeLCMV()`.
+
+**Returns:**
+
+- *InvSourceEstimate* — Source estimate where data column 0 contains power at each source.
+
+---
+
+### applyLCMVEpochs(epochs, tmin, tstep, filters)
+
+Apply LCMV beamformer to a list of epochs.
+
+**Parameters:**
+
+- **epochs** : *const QList&lt; Eigen::MatrixXd &gt; &*
+  List of epoch data matrices (n_channels x n_times each).
+
+- **tmin** : *float*
+  Start time of each epoch (seconds).
+
+- **tstep** : *float*
+  Time step (1/sfreq).
+
+- **filters** : *const InvBeamformer &*
+  Pre-computed LCMV beamformer from `makeLCMV()`.
+
+**Returns:**
+
+- *QList&lt; InvSourceEstimate &gt;* — List of source estimates, one per epoch.
+
+---
+
+### makeLCMVResolutionMatrix(forward, info, dataCov, reg, noiseCov)
+
+Compute the LCMV resolution matrix: R = W @ G.
+
+The resolution matrix describes the point-spread function of the beamformer. Each row shows how a unit source at one location maps through the forward model and back through the beamformer. Ideally R = I (perfect resolution).
+
+**Parameters:**
+
+- **forward** : *const MNELIB::MNEForwardSolution &*
+  Forward solution with leadfield.
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  Measurement info.
+
+- **dataCov** : *const FIFFLIB::FiffCov &*
+  Data covariance.
+
+- **reg** : *double*
+  Regularization (default 0.05).
+
+- **noiseCov** : *const FIFFLIB::FiffCov &*
+  Noise covariance for whitening (optional).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Resolution matrix (n_sources x n_sources).
+
+---
