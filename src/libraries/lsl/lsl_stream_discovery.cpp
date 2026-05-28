@@ -1,35 +1,33 @@
 //=============================================================================================================
 /**
- * @file     lsl_stream_discovery.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    2.0.0
- * @date     February, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file lsl_stream_discovery.cpp
+ * @since 2026
+ * @date  March 2026
+ * @brief Implements the UDP multicast listener that turns LSL outlet announcements on 239.255.172.215:16571 into stream_info results.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * @ref LSLLIB::resolve_streams binds a @c QUdpSocket on the LSL
+ * discovery port @c 16571 with @c ShareAddress + @c ReuseAddressHint
+ * so multiple LSLLIB consumers can coexist on the same host, joins
+ * the well-known LSL multicast group @c 239.255.172.215 (skipped on
+ * WebAssembly, where the runtime cannot join multicast groups but
+ * may still receive broadcast traffic), and then enters a
+ * timeout-bounded loop that pulls every pending datagram, parses it
+ * via @ref LSLLIB::stream_info::from_string and accumulates the
+ * results.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Contains the definition of stream discovery functions.
- *
+ * Each accepted descriptor is deduplicated on its per-instance UUID
+ * and has its @c data_host overwritten with the datagram's actual
+ * sender address, which is more reliable than the hostname the
+ * outlet self-reports (it copes with hosts that have multiple
+ * interfaces or that resolve their own name to a loopback address).
+ * @ref LSLLIB::resolve_stream is implemented as a thin client-side
+ * filter on top: it calls @ref LSLLIB::resolve_streams once and
+ * then matches the requested property locally, which keeps the
+ * network-facing surface to a single well-tested code path.
  */
 
 //=============================================================================================================

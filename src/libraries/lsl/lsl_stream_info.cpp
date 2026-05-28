@@ -1,35 +1,31 @@
 //=============================================================================================================
 /**
- * @file     lsl_stream_info.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    2.0.0
- * @date     February, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file lsl_stream_info.cpp
+ * @since 2026
+ * @date  March 2026
+ * @brief Implements stream_info construction, accessors and the wire serialisation used by LSL discovery datagrams.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * The constructors populate the two transport-identity fields that
+ * cannot be supplied by the caller: a per-instance @c uid generated
+ * via @c QUuid::createUuid (the same UUID format used by liblsl) and
+ * the originating @c hostname obtained from @c QHostInfo. The data
+ * port and data host stay zero/empty until either the outlet binds a
+ * TCP server (and writes the bound port back in) or the discovery
+ * code observes the stream on the wire (and writes the sender
+ * address back in).
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Contains the definition of the stream_info class.
- *
+ * The @c to_string / @c from_string pair defines the on-wire
+ * representation broadcast over UDP multicast and stored by
+ * applications that want to remember a stream across runs. The
+ * format is a deliberately minimal, line-oriented key=value
+ * encoding rather than the XML used by upstream liblsl: it is
+ * trivial to parse without an external dependency, fits comfortably
+ * in a single UDP datagram, and round-trips every field exposed by
+ * the public accessors.
  */
 
 //=============================================================================================================

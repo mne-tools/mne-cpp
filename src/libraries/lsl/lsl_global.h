@@ -1,35 +1,31 @@
 //=============================================================================================================
 /**
- * @file     lsl_global.h
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    2.0.0
- * @date     February, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file lsl_global.h
+ * @since 2026
+ * @date  March 2026
+ * @brief LSLLIB shared-library export macro and build-stamp accessors used by every public LSL symbol.
  *
- * Copyright (C) 2026-2026, Christoph Dinh. All rights reserved.
+ * This header defines the @c LSLSHARED_EXPORT decoration that every
+ * exported class and free function in LSLLIB must carry so that the
+ * library can be linked both as a Qt shared library (the default
+ * mne-cpp build) and as a statically linked archive (the WebAssembly
+ * and @c STATICBUILD configurations). The macro expands to
+ * @c Q_DECL_EXPORT when @c MNE_LSL_LIBRARY is defined during the
+ * library's own translation units and to @c Q_DECL_IMPORT when the
+ * header is consumed by a downstream module, mirroring the convention
+ * used throughout the other mne-cpp libraries.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    lsl library export/import macros.
- *
+ * It also declares the @ref LSLLIB namespace itself and three
+ * @c buildDateTime / @c buildHash / @c buildHashLong free functions
+ * that surface the per-translation-unit build stamp produced by
+ * @c utils/buildinfo.h. Those accessors are wired into the build-info
+ * dialogs of every application that links against LSLLIB so the user
+ * can confirm which git revision of the LSL stack a running binary
+ * was compiled from without having to launch a debugger.
  */
 
 #ifndef LSL_GLOBAL_H

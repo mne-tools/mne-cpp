@@ -1,35 +1,33 @@
 //=============================================================================================================
 /**
- * @file     lsl_stream_info.h
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    2.0.0
- * @date     February, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file lsl_stream_info.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Declares stream_info, the LSL metadata descriptor that identifies and routes a stream on the network.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * A @ref LSLLIB::stream_info is the handshake object of the Lab
+ * Streaming Layer protocol: every outlet announces itself with one,
+ * @ref LSLLIB::resolve_streams returns a vector of them, and every
+ * inlet is constructed from one. It carries both the semantic
+ * description of the stream (name, content type, channel count,
+ * nominal sampling rate, per-channel data format, and a stable
+ * @c source_id used to recognise the same device across restarts)
+ * and the transport metadata (per-instance UUID, originating
+ * hostname, and the TCP host/port pair filled in by the discovery
+ * layer) needed to actually open a connection.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Contains the declaration of the stream_info class.
- *
+ * This header also defines the @ref LSLLIB::ChannelFormat enum,
+ * whose integer values intentionally match the @c cf_* constants of
+ * the upstream liblsl C API so that wire payloads serialised by
+ * @c to_string remain interoperable with third-party LSL clients.
+ * The class is intentionally a plain value type (cheap to copy,
+ * default-constructible into an "invalid" state) so it can be passed
+ * around freely between the discovery, outlet and inlet components
+ * without imposing any ownership constraints on callers.
  */
 
 #ifndef LSL_STREAM_INFO_H
@@ -71,13 +69,7 @@ enum class ChannelFormat : int {
 
 //=============================================================================================================
 /**
- * @brief Describes a particular stream on the network.
- *
- * The stream_info class holds the declaration of a data stream. It describes the core properties of
- * a stream such as its name, content type, channel count and sampling rate, as well as optional
- * meta-data and network endpoint information.
- *
- * This class is API-compatible with the liblsl stream_info to serve as a drop-in replacement.
+ * @brief Value-type descriptor of a single LSL stream: semantic metadata plus transport endpoint, API-compatible with liblsl's stream_info.
  */
 class LSLSHARED_EXPORT stream_info
 {

@@ -1,35 +1,33 @@
 //=============================================================================================================
 /**
- * @file     lsl_stream_discovery.h
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    2.0.0
- * @date     February, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file lsl_stream_discovery.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Declares the resolve_streams / resolve_stream free functions used to enumerate LSL outlets currently visible on the LAN.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * Stream discovery is the entry point of every LSLLIB consumer: an
+ * acquisition plug-in or analysis tool first calls
+ * @ref LSLLIB::resolve_streams to obtain the set of @ref LSLLIB::stream_info
+ * descriptors currently being advertised on the network, then
+ * constructs a @ref LSLLIB::stream_inlet from the one it is
+ * interested in. @ref LSLLIB::resolve_stream layers a property
+ * filter on top so that callers who already know the @c name,
+ * @c type, @c source_id, @c uid or @c hostname they expect can wait
+ * only for that match.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Contains the declaration of stream discovery functions.
- *
+ * Both functions block for at most the supplied timeout while
+ * listening for the periodic UDP multicast announcements emitted by
+ * every active @ref LSLLIB::stream_outlet on the LSL discovery
+ * channel. They deduplicate observed streams by their per-instance
+ * UUID so that the same outlet is not returned twice when it
+ * announces itself more than once during the listen window. The
+ * default 1.0 s timeout matches the upstream liblsl default and is
+ * long enough to pick up any outlet whose broadcast interval is at
+ * most half a second.
  */
 
 #ifndef LSL_STREAM_DISCOVERY_H

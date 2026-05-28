@@ -1,42 +1,32 @@
 //=============================================================================================================
 /**
- * @file     lsl.h
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    2.0.0
- * @date     February, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file lsl.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Umbrella include header that exposes the full LSLLIB public surface in a single import.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * LSLLIB is mne-cpp's in-tree, Qt-based reimplementation of the Lab
+ * Streaming Layer (LSL) client API. It is designed as an ABI- and
+ * source-compatible drop-in replacement for the public subset of liblsl's
+ * @c lsl_cpp.h header, so acquisition plug-ins and analysis tools can
+ * talk to any LSL-speaking device on the network without pulling the
+ * external @c liblsl dependency into the build.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Main include header for the MNE-CPP LSL library.
- *
- * This is intended as a drop-in replacement for the external liblsl <lsl_cpp.h> header.
- * Include this header to get access to all LSL functionality:
- *   - lsl::stream_info       : Describe a data stream
- *   - lsl::stream_outlet     : Publish data on the network
- *   - lsl::stream_inlet      : Receive data from the network
- *   - lsl::resolve_streams() : Discover available streams
- *
+ * Including this header transitively pulls in the four public components
+ * that together cover the round-trip data path: @ref LSLLIB::stream_info
+ * for describing a stream's content type, channel layout and sampling
+ * rate; @ref LSLLIB::stream_outlet for publishing samples over TCP while
+ * advertising the stream via UDP multicast; @ref LSLLIB::stream_inlet for
+ * connecting to a resolved outlet and pulling chunks of multichannel
+ * float samples; and the @c resolve_streams / @c resolve_stream free
+ * functions in @ref lsl_stream_discovery.h for enumerating outlets
+ * currently visible on the LAN. Downstream code should depend on this
+ * single header rather than the individual component headers so that the
+ * public surface remains coherent as the library evolves.
  */
 
 #ifndef LSL_H

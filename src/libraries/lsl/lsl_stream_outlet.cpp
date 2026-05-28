@@ -1,35 +1,31 @@
 //=============================================================================================================
 /**
- * @file     lsl_stream_outlet.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    2.0.0
- * @date     February, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file lsl_stream_outlet.cpp
+ * @since 2026
+ * @date  March 2026
+ * @brief Implements the TCP-server / UDP-announcer worker that publishes pushed samples to every connected LSL inlet.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * The PIMPL class @c StreamOutletPrivate spawns a dedicated
+ * @c std::thread that owns a @c QTcpServer for accepting inlet
+ * connections, a @c QUdpSocket that emits the stream's serialised
+ * @ref LSLLIB::stream_info to the LSL discovery multicast group
+ * @c 239.255.172.215:16571 every @c BROADCAST_INTERVAL_MS
+ * milliseconds, and a mutex-protected queue that buffers samples
+ * pushed from the producing thread.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Contains the definition of the stream_outlet class.
- *
+ * On every loop iteration the worker drains the queue, packs each
+ * sample as a contiguous @c channel_count * @c sizeof(float) byte
+ * block, and writes the result to every currently connected inlet
+ * socket; the multicast advertisement keeps firing on its own cadence
+ * so that newly started @ref LSLLIB::resolve_streams calls discover
+ * the outlet within at most one broadcast interval. The destructor
+ * signals the worker to stop, joins it, closes all sockets and tears
+ * down the server, guaranteeing that no Qt object outlives its
+ * owning thread.
  */
 
 //=============================================================================================================

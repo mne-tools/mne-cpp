@@ -1,35 +1,31 @@
 //=============================================================================================================
 /**
- * @file     lsl_stream_outlet.h
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    2.0.0
- * @date     February, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file lsl_stream_outlet.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Declares stream_outlet, the server side of an LSL stream that publishes samples over TCP and advertises itself via UDP multicast.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * A @ref LSLLIB::stream_outlet is the producer counterpart of
+ * @ref LSLLIB::stream_inlet: instantiating it immediately binds a
+ * @c QTcpServer on an OS-assigned port (which is written back into
+ * the contained @ref LSLLIB::stream_info so callers can read it via
+ * @ref info), starts a background worker that periodically multicasts
+ * the stream's serialised metadata on the LSL discovery channel, and
+ * accepts incoming inlet connections so they can be fed from the
+ * outlet's internal sample queue.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Contains the declaration of the stream_outlet class.
- *
+ * The public API is the standard LSL @c push_sample / @c push_chunk
+ * pair plus @c have_consumers for back-pressure decisions in
+ * acquisition loops. As with the inlet, all Qt network and threading
+ * machinery is hidden behind a PIMPL so this header stays
+ * lightweight and the implementation is free to evolve (for example,
+ * to swap the broadcast scheme or add a peer-discovery cache)
+ * without rippling through every translation unit that produces LSL
+ * data in mne-cpp.
  */
 
 #ifndef LSL_STREAM_OUTLET_H
@@ -60,20 +56,13 @@ namespace LSLLIB {
 //=============================================================================================================
 
 /**
- * @brief Private PIMPL implementation class for stream_outlet, managing the TCP server, UDP discovery broadcasts, and sample queue.
+ * @brief PIMPL backend of stream_outlet that owns the QTcpServer, the UDP multicast announcer and the producer-side sample queue.
  */
 class StreamOutletPrivate;
 
 //=============================================================================================================
 /**
- * @brief A stream outlet to publish data on the network.
- *
- * A stream_outlet creates a TCP server that stream_inlet instances can connect to, and periodically
- * broadcasts its stream_info via UDP multicast so that resolve_streams() can discover it.
- *
- * Data is pushed to connected inlets via push_sample() or push_chunk().
- *
- * This class is API-compatible with the liblsl stream_outlet to serve as a drop-in replacement.
+ * @brief Server-side LSL endpoint: binds a TCP data server, advertises the stream on the LSL discovery multicast group, and fans samples out to every connected inlet.
  */
 class LSLSHARED_EXPORT stream_outlet
 {
