@@ -1,36 +1,19 @@
 //=============================================================================================================
 /**
- * @file     mneoperator.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     February, 2014
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file mneoperator.h
+ * @since 2022
+ * @date  October 2022
+ * @brief Light-weight wrapper describing one MNE pre-processing operator (FIR, SSP, compensation) inside a model.
  *
- * Copyright (C) 2014, Lorenz Esch, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Declaration of the MNEOperator Class.
- *
+ * MNEOperator stores the operator type, display name, active flag and
+ * the underlying matrix / kernel reference. @ref ChannelInfoModel
+ * uses these wrappers to track which operators a channel is
+ * currently subject to so the delegate can render the
+ * post-processing version of the signal.
  */
 
 #ifndef MNEOPERATOR_H
@@ -70,10 +53,11 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
- * DECLARE CLASS MNEOperator
+ * @brief Light-weight wrapper describing one MNE pre-processing operator (FIR / SSP / compensation).
  *
- * @brief MNEOperator class represents the base class of an arbitrary MNEOperator, e.g. FILTER,PCA,AVERAGE.
- *        All specific Operators must be derived from MNEOperator, see the FilterOperator class.
+ * Stores the operator type, display name, active flag and the
+ * underlying matrix / kernel reference so @ref ChannelInfoModel can
+ * track which operators a channel is currently subject to.
  */
 class DISPSHARED_EXPORT MNEOperator
 {

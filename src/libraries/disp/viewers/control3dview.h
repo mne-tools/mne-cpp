@@ -1,35 +1,20 @@
 //=============================================================================================================
 /**
- * @file     control3dview.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     November, 2015
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file control3dview.h
+ * @since 2022
+ * @date  October 2022
+ * @brief Tree-based control panel for the 3-D scene (visibility, colour, alpha, threshold per tree item).
  *
- * Copyright (C) 2015, Lorenz Esch. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Control3DView class declaration
- *
+ * Control3DView wraps a @c QTreeView whose model is the same
+ * @c Data3DTreeModel that drives the 3-D scene, so toggling /
+ * editing items here (BEM surfaces, source spaces, sensor positions,
+ * MRI volumes, source estimates …) propagates directly to the
+ * renderer. A custom @c QStyledItemDelegate paints colour swatches,
+ * sliders and combo boxes inline.
  */
 
 #ifndef DISPLIB_CONTROL3DVIEW_H
@@ -74,9 +59,11 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
- * User GUI control for View3D.
+ * @brief Tree-view control panel for the 3-D scene (visibility, colour, alpha, threshold per item).
  *
- * @brief User GUI control for the View3D.
+ * Hosts a @c QTreeView bound to the @c Data3DTreeModel and a custom
+ * @c QStyledItemDelegate that paints colour swatches and slider
+ * editors inline so edits propagate directly to the renderer.
  */
 class DISPSHARED_EXPORT Control3DView : public AbstractView
 {

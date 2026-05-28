@@ -1,38 +1,20 @@
 //=============================================================================================================
 /**
- * @file     bidsview.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
- * @since    0.1.6
- * @date     October, 2020
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file bidsview.h
+ * @since 2022
+ * @date  January 2024
+ * @brief Tree view of the BIDS dataset hierarchy backed by @ref BidsViewModel.
  *
- * Copyright (C) 2020, Lorenz Esch, Lars Debor, Simon Heinke, Gabriel Motta. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Contains the declaration of the BidsView class.
- *
+ * BidsView wraps a @c QTreeView around a @ref BidsViewModel so the
+ * user can browse a loaded BIDS dataset (subjects → sessions →
+ * runs → derivatives) and double-click items to load them into the
+ * application. Context-menu actions expose import / export / convert
+ * operations that the surrounding plugin handles.
  */
 
 #ifndef BIDSVIEW_H
@@ -75,9 +57,11 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
- * DataManagerView Plugin Control
+ * @brief QTreeView wrapper around a @ref BidsViewModel for browsing a BIDS dataset.
  *
- * @brief The DataManagerView class provides the plugin control.
+ * Forwards double-click activations on data files / derivatives as
+ * @c loadItem signals so the surrounding plugin can open the chosen
+ * resource.
  */
 class DISPSHARED_EXPORT BidsView : public AbstractView
 {

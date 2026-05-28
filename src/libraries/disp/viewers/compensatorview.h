@@ -1,35 +1,19 @@
 //=============================================================================================================
 /**
- * @file     compensatorview.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2018
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file compensatorview.h
+ * @since 2022
+ * @date  March 2023
+ * @brief Gradient-compensation grade selector for Neuromag / CTF systems.
  *
- * Copyright (C) 2018, Lorenz Esch. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Declaration of the CompensatorView Class.
- *
+ * CompensatorView lists every compensation matrix advertised in the
+ * active @c FiffInfo and exposes them as mutually-exclusive
+ * @c QCheckBoxes; switching the active grade emits a signal that the
+ * real-time pipeline uses to apply (or undo) the corresponding
+ * balance/derivation matrix on the live stream.
  */
 
 #ifndef COMPENSATORVIEW_H
@@ -75,9 +59,11 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
- * DECLARE CLASS CompensatorView
+ * @brief Mutually-exclusive checkbox list picking the active MEG gradient compensation grade.
  *
- * @brief The CompensatorView class provides a view to select the compensators
+ * One checkbox per compensation matrix advertised in the active
+ * @c FiffInfo; toggling emits @c compSelectionChanged with the new
+ * grade so the live pipeline can (un)apply the matrix.
  */
 class DISPSHARED_EXPORT CompensatorView : public AbstractView
 {

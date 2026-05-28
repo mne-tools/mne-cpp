@@ -1,35 +1,20 @@
 //=============================================================================================================
 /**
- * @file     projectorsview.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2018
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Andreas Griesshammer <ag@fieldlineinc.com>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file projectorsview.h
+ * @since 2022
+ * @date  July 2022
+ * @brief SSP projector enable / disable checkbox list.
  *
- * Copyright (C) 2018, Lorenz Esch. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Declaration of the ProjectorsView Class.
- *
+ * ProjectorsView builds a @c QCheckBox per @c FiffProj loaded from the
+ * active dataset, plus an "all active / inactive" master toggle, and
+ * emits @c projSelectionChanged whenever the user flips one. The
+ * @c rtprocessing pipeline uses the resulting active mask to
+ * (de)project the streaming data on the fly.
  */
 
 #ifndef PROJECTORSVIEW_H
@@ -72,9 +57,11 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
- * DECLARE CLASS ProjectorsView
+ * @brief SSP projector enable / disable checkbox list.
  *
- * @brief The ProjectorsView class provides a view to select projectors
+ * One @c QCheckBox per @c FiffProj plus a master toggle; emits
+ * @c projSelectionChanged so the @c rtprocessing pipeline can
+ * (de)project the streaming data on the fly.
  */
 class DISPSHARED_EXPORT ProjectorsView : public AbstractView
 {

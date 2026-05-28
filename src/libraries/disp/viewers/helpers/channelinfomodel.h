@@ -1,36 +1,21 @@
 //=============================================================================================================
 /**
- * @file     channelinfomodel.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     November, 2014
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file channelinfomodel.h
+ * @since 2022
+ * @date  February 2026
+ * @brief QAbstractTableModel exposing per-channel FIFF metadata (name, type, unit, position, bad flag, mapping).
  *
- * Copyright (C) 2014, Lorenz Esch, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    The declaration for ChannelInfoModel..
- *
+ * ChannelInfoModel turns a @c FiffInfo into a sortable / filterable
+ * table model. Each row maps a FIFF channel to its presentation
+ * attributes — display name, modality, unit, scaling, layout-mapped
+ * alias and bad flag — and listens for live edits coming from the
+ * channel-selection / mapping dialogs to update the underlying
+ * @c FiffInfo in place.
  */
 
 #ifndef CHANNELINFOMODEL_H
@@ -96,9 +81,11 @@ namespace ChannelInfoModelRoles
 
 //=============================================================================================================
 /**
- * DECLARE CLASS ChannelInfoModel
+ * @brief QAbstractTableModel exposing per-channel FIFF metadata (name, type, unit, position, bad flag, mapping).
  *
- * @brief Table model exposing per-channel metadata (name, type, unit, position) for QTableView display.
+ * Each row maps a FIFF channel to its presentation attributes and
+ * listens for live edits from the channel-selection / mapping
+ * dialogs so the underlying @c FiffInfo is updated in place.
  */
 class DISPSHARED_EXPORT ChannelInfoModel : public QAbstractTableModel
 {

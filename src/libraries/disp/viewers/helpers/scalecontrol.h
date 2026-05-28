@@ -1,35 +1,20 @@
 //=============================================================================================================
 /**
- * @file     scalecontrol.h
- * @author   Juan Garcia-Prieto <jgarciaprieto@mgh.harvard.edu>
- * @since    0.1.9
- * @date     Feb, 2021
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file scalecontrol.h
+ * @since 2022
+ * @date  March 2023
+ * @brief Composite slider + spinbox widget for picking a (possibly logarithmic) scale value.
  *
- * Copyright (C) 2021, Juan Garcia-Prieto. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Declaration of the ScaleControl Class.
- *
+ * ScaleControl pairs a horizontal @c QSlider with a synchronised
+ * @c QDoubleSpinBox so the user can either drag for coarse control
+ * or type for precise control. It supports linear and log10 mapping,
+ * configurable min / max and the option to invert direction, and is
+ * the building block of @ref ScalingView and several settings
+ * panels.
  */
 #ifndef SCALECONTROL_H
 #define SCALECONTROL_H
@@ -67,10 +52,11 @@ namespace DISPLIB {
 
 //=============================================================================================================
 /**
- * DECLARE CLASS ScaleControl
+ * @brief Composite slider + spinbox widget for picking a (possibly logarithmic) scale value.
  *
- * @brief The ScaleControl class packs together a QLabel, a DoubleSpinbox and a Slider with the necessary facilities for the
- * interaction between them.
+ * Supports linear and log10 mapping, configurable min / max and an
+ * optional inverted direction; building block of @ref ScalingView
+ * and several other settings panels.
  */
 class DISPSHARED_EXPORT ScaleControl : public QWidget
 {

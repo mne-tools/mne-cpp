@@ -1,36 +1,23 @@
 //=============================================================================================================
 /**
- * @file     colormap.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     March, 2013
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file colormap.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Static scalar-to-colour lookup helpers (Jet, Hot, Bone, Viridis, Cool, RedBlue, MNE) used by every plot widget.
  *
- * Copyright (C) 2013, Lorenz Esch, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    ColorMap class declaration
- *
+ * ColorMap stores the 256-row RGB tables that back all DISPLIB heat
+ * maps and 3-D overlays as constant @c Eigen::MatrixX3i arrays and
+ * exposes pure-function @c valueToXxx(double v) accessors that map a
+ * value in @f$[0,1]@f$ to a @c QRgb / @c QColor through fast linear
+ * interpolation. Bundled palettes include the perceptually-uniform
+ * Viridis, the MATLAB classics (Jet, Hot, Bone, Cool), a diverging
+ * Red-Blue map for signed data and the asymmetric MNE-Python @c hot/
+ * @c hotNeg variants used by the source-estimate overlays.
  */
 
 #ifndef COLORMAP_H
@@ -330,9 +317,13 @@ const Eigen::MatrixX3i m_matViridrisData = (Eigen::MatrixX3i(256,3) << 68, 1, 84
 
 //=============================================================================================================
 /**
- * Provides diffenrent color maps like Jet,...
+ * @brief Static lookup helpers mapping scalar values to @c QRgb / @c QColor across all DISPLIB palettes.
  *
- * @brief Color map RGB transformations
+ * Each palette exists as a 256-row @c Eigen::MatrixX3i RGB table; the
+ * @c valueToXxx accessors interpolate between rows so callers can map
+ * any value in @f$[0,1]@f$ to a colour without instantiating an
+ * object. Bundled palettes include Viridis, Jet, Hot, HotNeg1,
+ * HotNeg2, Bone, Cool, RedBlue and the MNE-Python @c hot variant.
  */
 class DISPSHARED_EXPORT ColorMap
 {

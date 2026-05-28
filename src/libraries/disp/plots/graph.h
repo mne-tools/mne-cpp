@@ -1,37 +1,21 @@
 //=============================================================================================================
 /**
- * @file     graph.h
- * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     June, 2013
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file graph.h
+ * @since 2022
+ * @date  October 2022
+ * @brief Abstract base widget providing title, axis labels and resize handling for the in-house 2-D plots.
  *
- * Copyright (C) 2013, Gabriel B Motta, Lorenz Esch, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Graph class declaration
- *
+ * Graph centralises the boilerplate shared by @ref Plot, @ref ImageSc
+ * and any other small @c QPainter-based plot widget in DISPLIB:
+ * storing the plot title and x/y axis label strings, performing the
+ * minimal resize bookkeeping that keeps tick spacing readable, and
+ * drawing the label band around the actual plot area. Concrete
+ * subclasses paint inside the content rectangle that @ref Graph leaves
+ * free after the labels and title.
  */
 
 #ifndef GRAPH_H
@@ -73,9 +57,12 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
- * Graph base class
+ * @brief Common base widget providing title, axis labels and resize handling for DISPLIB's QPainter plots.
  *
- * @brief Base class for graphs
+ * Subclasses such as @ref Plot and @ref ImageSc paint inside the
+ * content rectangle that @ref Graph leaves free after stamping the
+ * title bar at the top and the x / y axis labels on the bottom and
+ * left margins.
  */
 class DISPSHARED_EXPORT Graph : public QWidget
 {

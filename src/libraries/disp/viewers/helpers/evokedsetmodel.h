@@ -1,35 +1,21 @@
 //=============================================================================================================
 /**
- * @file     evokedsetmodel.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     August, 2016
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file evokedsetmodel.h
+ * @since 2022
+ * @date  March 2026
+ * @brief QAbstractTableModel wrapping a FiffEvokedSet so views can render per-condition averages without copying data.
  *
- * Copyright (C) 2016, Lorenz Esch. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Declaration of the EvokedSetModel Class.
- *
+ * EvokedSetModel exposes one row per FIFF channel and one column per
+ * condition; each cell yields the underlying time-series view
+ * (plus colour / visibility) needed by @ref ButterflyView and
+ * @ref AverageLayoutView. It also propagates baseline-correction,
+ * SSP-projection and bad-channel updates so the visualisations stay
+ * in sync with the latest pre-processing settings.
  */
 
 #ifndef EVOKEDSETMODEL_H
@@ -94,9 +80,12 @@ typedef QPair<QString, DISPLIB::RowVectorPair> AvrTypeRowVectorPair;
 
 //=============================================================================================================
 /**
- * DECLARE CLASS EvokedSetModel
+ * @brief QAbstractTableModel wrapping a FiffEvokedSet (one row per channel, one column per condition).
  *
- * @brief The EvokedSetModel class implements the data access model for evoked set data
+ * Propagates baseline-correction, SSP-projection and bad-channel
+ * updates so connected views (@ref ButterflyView,
+ * @ref AverageLayoutView) stay in sync with the latest
+ * pre-processing settings.
  */
 class DISPSHARED_EXPORT EvokedSetModel : public QAbstractTableModel
 {

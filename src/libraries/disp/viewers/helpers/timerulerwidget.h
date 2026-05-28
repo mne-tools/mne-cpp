@@ -1,35 +1,19 @@
 //=============================================================================================================
 /**
- * @file     timerulerwidget.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file timerulerwidget.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Horizontal time-axis ruler displayed beneath @ref ChannelDataView with sample / second ticks.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Declaration of the TimeRulerWidget class.
- *
+ * TimeRulerWidget paints the time axis aligned with the central raw
+ * table, supports left-click drag for window scrolling and
+ * right-click context actions (jump to event, set marker). Tick
+ * spacing adapts to the current zoom so the labels stay readable
+ * from milliseconds to minutes.
  */
 
 #ifndef TIMERULERWIDGET_H
@@ -80,17 +64,12 @@ struct TimeRulerReferenceMark {
 
 //=============================================================================================================
 /**
- * @brief TimeRulerWidget – a thin horizontal time axis ruler for ChannelDataView.
+ * @brief Horizontal time-axis ruler displayed beneath @ref ChannelDataView.
  *
- * Displays time ticks and labels beneath the signal viewport.  Auto-computes a
- * "nice" tick interval so approximately 7 major ticks are visible regardless of
- * zoom level.  Labels show elapsed seconds from the start of the file or, for
- * longer ranges, a MM:SS clock format.
- *
- * The ruler is driven by two Q_PROPERTY-compatible slots that mirror the
- * ChannelRhiView properties:
- *   - setScrollSample(float)      – left-edge sample of the current view
- *   - setSamplesPerPixel(float)   – current horizontal zoom
+ * Tick spacing adapts to the current zoom so labels stay readable
+ * from milliseconds to minutes; supports left-click drag for window
+ * scrolling and right-click context actions (jump to event, set
+ * marker).
  */
 class DISPSHARED_EXPORT TimeRulerWidget : public QWidget
 {

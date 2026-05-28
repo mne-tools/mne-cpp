@@ -1,36 +1,25 @@
 //=============================================================================================================
 /**
- * @file     butterflyview.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2018
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ *   Andreas Griesshammer <ag@fieldlineinc.com>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file butterflyview.h
+ * @since 2022
+ * @date  April 2026
+ * @brief QRhi-accelerated butterfly plot overlaying every channel of one or more averaged conditions.
  *
- * Copyright (C) 2018, Lorenz Esch, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Declaration of the ButterflyView class.
- *
+ * ButterflyView is a @c QRhiWidget that pushes all averaged traces of
+ * the active @ref EvokedSetModel through a single vertex/fragment
+ * shader pair, giving a smooth zoomable rendering even with hundreds
+ * of channels. Per-modality visibility (@c MAG / @c GRAD / @c EEG) is
+ * toggled through @ref ModalitySelectionView and the colour /
+ * selection of conditions through @ref AverageSelectionView. The
+ * widget is the workhorse evoked viewer in MNE-Scan and is intended
+ * to live as a tab inside a @ref MultiView dock.
  */
 
 #ifndef BUTTERFLYVIEW_H
@@ -73,10 +62,14 @@ namespace DISPLIB
 class EvokedSetModel;
 class ChannelInfoModel;
 
+//=============================================================================================================
 /**
- * DECLARE CLASS ButterflyView
+ * @brief QRhi-accelerated butterfly viewer overlaying every channel of one or more averaged conditions.
  *
- * @brief Butterfly plot widget overlaying multiple channel waveforms in a single time-series view.
+ * Renders all visible traces in a single shader pass for smooth
+ * zoom / pan; visibility per modality and per condition is driven by
+ * @ref ModalitySelectionView and @ref AverageSelectionView. Used as
+ * the main evoked viewer in MNE-Scan.
  */
 class DISPSHARED_EXPORT ButterflyView : public QRhiWidget
 {

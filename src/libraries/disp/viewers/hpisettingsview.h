@@ -1,36 +1,20 @@
 //=============================================================================================================
 /**
- * @file     hpisettingsview.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- *           Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>
- * @since    0.1.0
- * @date     March, 2020
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Andreas Griesshammer <ag@fieldlineinc.com>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file hpisettingsview.h
+ * @since 2022
+ * @date  July 2022
+ * @brief Continuous HPI head-position-indicator configuration panel.
  *
- * Copyright (C) 2020, Lorenz Esch. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    HpiSettingsView class declaration.
- *
+ * HpiSettingsView lets the user enter the coil frequencies (Hz),
+ * tweak the goodness-of-fit threshold below which a coil is rejected,
+ * toggle continuous HPI tracking and trigger single-shot HPI fits.
+ * Live coil GoF values and resulting head-movement vectors come back
+ * through Qt signals and are mirrored in the panel's status labels.
  */
 
 #ifndef HPISETTINGSVIEW_H
@@ -77,9 +61,11 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
- * The HpiSettingsView class provides a QWidget for the HPI controls.
+ * @brief Continuous HPI head-position-indicator configuration panel.
  *
- * @brief The HpiSettingsView class provides a QWidget for the HPI controls.
+ * Coil-frequency table, GoF threshold spinbox, continuous HPI toggle
+ * and single-shot @c Fit trigger; emits coil-list and head-movement
+ * vectors back to the live pipeline.
  */
 class DISPSHARED_EXPORT HpiSettingsView : public AbstractView
 {

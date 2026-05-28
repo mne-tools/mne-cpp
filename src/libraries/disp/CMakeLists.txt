@@ -1,3 +1,10 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2022-2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+#   johaenns <j.vorw01@gmail.com>
+#   Gabriel Motta <gabrielbenmotta@gmail.com>
+#   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+
 cmake_minimum_required(VERSION 3.14)
 project(mne_disp LANGUAGES CXX)
 

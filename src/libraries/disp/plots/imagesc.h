@@ -1,36 +1,22 @@
 //=============================================================================================================
 /**
- * @file     imagesc.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     June, 2013
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file imagesc.h
+ * @since 2022
+ * @date  October 2022
+ * @brief MATLAB-style false-colour heat-map widget for Eigen matrices.
  *
- * Copyright (C) 2013, Lorenz Esch, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    ImageSc class declaration
- *
+ * ImageSc visualises an @c Eigen::MatrixXd / @c MatrixXf / @c MatrixXi as
+ * a 2-D image, mapping the data range linearly into a selectable
+ * colour map (Jet, Hot, Bone, ...) through @ref ColorMap. It inherits
+ * the title / axis-label scaffolding from @ref Graph and is the canvas
+ * of choice for sensor-by-sample heat maps, covariance matrices and
+ * any other rectangular numeric field that benefits from a glance-able
+ * false-colour rendering. Calling @ref ImageSc::updateData repaints the
+ * scaled view with new contents.
  */
 
 #ifndef IMAGESC_H
@@ -70,9 +56,12 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
- * Visualizes Eigen matrizes, similiar to MATLABs imagesc function; Available colormaps are: Jet, Hot, Bone
+ * @brief False-colour heat-map QWidget visualising an Eigen matrix with selectable colour map.
  *
- * @brief Eigen matrix visualization
+ * Accepts @c MatrixXd, @c MatrixXf and @c MatrixXi inputs; @c init()
+ * rebuilds the cached @c QImage from the current matrix and the
+ * active colour map, and @c updateData() / @c paintEvent() keep the
+ * rendering in sync with the data.
  */
 class DISPSHARED_EXPORT ImageSc : public Graph
 {

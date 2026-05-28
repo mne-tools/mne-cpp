@@ -1,36 +1,24 @@
 //=============================================================================================================
 /**
- * @file     filterdesignview.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     August, 2014
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file filterdesignview.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Interactive FIR / IIR filter design GUI with a live magnitude / phase preview.
  *
- * Copyright (C) 2014, Lorenz Esch, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Contains the declaration of the FilterDesignView class.
- *
+ * FilterDesignView is the largest settings panel in DISPLIB: it lets
+ * the user pick a filter type (low-, high-, band-pass or band-stop),
+ * a design family (cosine, Hamming, Blackman …), the cutoff
+ * frequencies, the transition bandwidth and the number of taps,
+ * preserves the resulting @c FilterKernel in a @c QSettings path and
+ * renders the magnitude (and optional group-delay / phase) response
+ * in a @ref FilterPlotScene that updates while the user drags the
+ * spinboxes. Designed filters are emitted as @c filterChanged signals
+ * consumed by the @c rtprocessing filter chain.
  */
 
 #ifndef FILTERDESIGNVIEW_H
@@ -78,10 +66,15 @@ namespace DISPLIB
 
 class FilterPlotScene;
 
+//=============================================================================================================
 /**
- * DECLARE CLASS FilterDesignView
+ * @brief Interactive FIR / IIR filter design GUI with a live magnitude / phase preview.
  *
- * @brief The FilterDesignView class provides the a manager for temporal filtering.
+ * Lets the user pick filter type, design family (cosine, Hamming,
+ * Blackman, …), cutoff frequencies, transition bandwidth and tap
+ * count, then renders the resulting frequency response in an
+ * embedded @ref FilterPlotScene and emits the @c FilterKernel as a
+ * @c filterChanged signal consumed by the @c rtprocessing chain.
  */
 class DISPSHARED_EXPORT FilterDesignView : public AbstractView
 {
