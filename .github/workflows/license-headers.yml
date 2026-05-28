@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+name: license-headers
+
+on:
+  push:
+    branches: [staging, main]
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tools/**'
+      - 'scripts/**'
+      - 'doc/website/src/**'
+      - '.github/workflows/license-headers.yml'
+      - '**/CMakeLists.txt'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history for git log --follow)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate SPDX headers (strict)
+        run: python -m tools.license_headers.validate --strict

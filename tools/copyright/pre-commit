@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+#
+# Git pre-commit hook: reject staged source files whose SPDX header drifts
+# from the canonical 3-line block. Install with:
+#
+#   ln -s ../../tools/copyright/pre-commit .git/hooks/pre-commit
+#
+# Skips deletions and renames-without-content-change; only runs when at
+# least one staged in-scope file is present.
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+STAGED=$(git diff --cached --name-only --diff-filter=AM)
+if [ -z "$STAGED" ]; then
+    exit 0
+fi
+
+# Filter to in-scope extensions/paths the validator knows about.
+IN_SCOPE=()
+while IFS= read -r f; do
+    case "$f" in
+        src/external/*) continue ;;
+        */build/*|build/*|build-*/*|build_*/*) continue ;;
+        */node_modules/*|*/.docusaurus/*) continue ;;
+        */moc_*|*/ui_*|*/qrc_*) continue ;;
+        */doxygen-awesome*|*/katex*) continue ;;
+    esac
+    case "$f" in
+        *.h|*.hpp|*.cpp|*.cc|*.cxx|*.c|*.inc) IN_SCOPE+=("$f") ;;
+        *.py|*.sh|*.bash|*.cmake|*.yml|*.yaml) IN_SCOPE+=("$f") ;;
+        *.ts|*.tsx|*.js|*.jsx|*.css) IN_SCOPE+=("$f") ;;
+        *.bat) IN_SCOPE+=("$f") ;;
+        */CMakeLists.txt|CMakeLists.txt) IN_SCOPE+=("$f") ;;
+    esac
+done <<< "$STAGED"
+
+if [ "${#IN_SCOPE[@]}" -eq 0 ]; then
+    exit 0
+fi
+
+PYTHON="${PYTHON:-python3}"
+exec "$PYTHON" -m tools.license_headers.validate --strict --paths "${IN_SCOPE[@]}"
