@@ -1,0 +1,98 @@
+---
+id: fiff-named-matrix
+title: "FIFFLIB::FiffNamedMatrix"
+sidebar_label: FiffNamedMatrix
+sidebar_position: 26
+---
+
+# FiffNamedMatrix
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_named_matrix.h`
+
+`#include <fiff/fiff_named_matrix.h>`
+
+```cpp
+class FIFFLIB::FiffNamedMatrix
+```
+
+FIFF named matrix: dense / sparse Eigen matrix plus row-name and column-name string lists.
+
+Used wherever the on-disk FIFF block pairs a matrix with channel-name metadata: SSP projectors (`FIFFB_PROJ_ITEM`), CTF compensators (`FIFFB_MNE_CTF_COMP_DATA`), forward gain matrices, MNE inverse operators, noise covariances. The name lists let downstream code index the matrix by name instead of by position, which is what the `pick_channels` / `apply_proj` paths rely on.
+
+---
+
+## Public Methods
+
+### FiffNamedMatrix()
+
+Default constructor.
+
+---
+
+### FiffNamedMatrix(p_nrow, p_ncol, p_row_names, p_col_names, p_data)
+
+Constructs named matrix with given parameters.
+
+(No plausibility check is performed)
+
+**Parameters:**
+
+- **p_nrow** : *fiff_int_t*
+  Number of rows.
+
+- **p_ncol** : *fiff_int_t*
+  Number of cols.
+
+- **p_row_names** : *const QStringList &*
+  Row names.
+
+- **p_col_names** : *const QStringList &*
+  Column names.
+
+- **p_data** : *const Eigen::MatrixXd &*
+  Data of the named matrix.
+
+---
+
+### FiffNamedMatrix(p_FiffNamedMatrix)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FiffNamedMatrix** : *const FiffNamedMatrix &*
+  Named matrix which should be copied.
+
+---
+
+### ~FiffNamedMatrix()
+
+Destroys the named matrix.
+
+---
+
+### clear()
+
+Initializes the named matrix.
+
+---
+
+### isEmpty()
+
+Returns true if named matrix contains no data.
+
+**Returns:**
+
+- *bool* — true if named matrix is empty.
+
+---
+
+### transpose_named_matrix()
+
+Transpose a named matrix (`FiffNamedMatrix`).
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

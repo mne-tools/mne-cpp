@@ -1,0 +1,63 @@
+---
+id: tf-settings-view
+title: "DISPLIB::TfSettingsView"
+sidebar_label: TfSettingsView
+sidebar_position: 64
+---
+
+# TfSettingsView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/tfsettingsview.h`
+
+`#include <disp/tfsettingsview.h>`
+
+```cpp
+class DISPLIB::TfSettingsView
+```
+
+Time-frequency analysis configuration panel (trials, window length, overlap).
+
+Spinboxes drive the on-line STFT / Wavelet estimator; values are emitted as Qt signals on every edit.
+
+---
+
+## Public Methods
+
+### TfSettingsView(sSettingsPath, parent, f)
+
+Constructs a `TfSettingsView` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  parent of widget.
+
+---
+
+### ~TfSettingsView()
+
+Destroys the `TfSettingsView`.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

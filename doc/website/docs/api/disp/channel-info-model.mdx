@@ -1,0 +1,159 @@
+---
+id: channel-info-model
+title: "DISPLIB::ChannelInfoModel"
+sidebar_label: ChannelInfoModel
+sidebar_position: 15
+---
+
+# ChannelInfoModel
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/helpers/channelinfomodel.h`
+
+`#include <disp/channelinfomodel.h>`
+
+```cpp
+class DISPLIB::ChannelInfoModel
+```
+
+QAbstractTableModel exposing per-channel FIFF metadata (name, type, unit, position, bad flag, mapping).
+
+Each row maps a FIFF channel to its presentation attributes and listens for live edits from the channel-selection / mapping dialogs so the underlying `FiffInfo` is updated in place.
+
+---
+
+## Public Methods
+
+### ChannelInfoModel(pFiffInfo, parent)
+
+---
+
+### ChannelInfoModel(parent)
+
+---
+
+### rowCount(parent)
+
+Reimplemented virtual functions.
+
+---
+
+### columnCount(parent)
+
+---
+
+### headerData(section, orientation, role)
+
+---
+
+### data(index, role)
+
+---
+
+### setData(index, value, role)
+
+---
+
+### flags(index)
+
+---
+
+### insertRows(position, span, parent)
+
+---
+
+### removeRows(position, span, parent)
+
+---
+
+### setFiffInfo(pFiffInfo)
+
+Updates the fiff info.
+
+**Parameters:**
+
+- **fiffInfo**
+  fiff info variabel.
+
+---
+
+### assignedOperatorsChanged(assignedOperators)
+
+Updates the fiff info.
+
+**Parameters:**
+
+- **assignedOperators** : *const QMultiMap&lt; int, QSharedPointer&lt;MNEOperator&gt; &gt; &*
+  the filter operators which are currently active.
+
+---
+
+### layoutChanged(layoutMap)
+
+Updates the layout map.
+
+**Parameters:**
+
+- **layoutMap** : *const QMap&lt; QString, QPointF &gt; &*
+  the layout map with the 2D positions.
+
+---
+
+### getMappedChannelsList()
+
+Updates the layout map.
+
+**Returns:**
+
+- *const QStringList &* — the current mapped channel list.
+
+---
+
+### getIndexFromOrigChName(chName)
+
+Returns the model index for the given input channel fro mthe original channel list.
+
+**Parameters:**
+
+- **chName** : *QString*
+  the channel name for which the model index is needed.
+
+**Returns:**
+
+- *int* — the index number. if channel was not found in the data this functions returns -1.
+
+---
+
+### getIndexFromMappedChName(chName)
+
+Returns the model index for the given input channel fro mthe mapped channel list.
+
+**Parameters:**
+
+- **chName** : *QString*
+  the channel name for which the model index is needed.
+
+**Returns:**
+
+- *int* — the index number. if channel was not found in the data this functions returns -1.
+
+---
+
+### getBadChannelList()
+
+Returns bad channel list.
+
+**Returns:**
+
+- *QStringList* — the bad channel list.
+
+---
+
+### clearModel()
+
+clearModel clears all model's members
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

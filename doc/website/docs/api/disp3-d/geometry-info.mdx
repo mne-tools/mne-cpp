@@ -1,0 +1,87 @@
+---
+id: geometry-info
+title: "DISP3DLIB::GeometryInfo"
+sidebar_label: GeometryInfo
+sidebar_position: 2
+---
+
+# GeometryInfo
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Header:** `disp3D/helpers/geometryinfo.h`
+
+`#include <disp3D/geometryinfo.h>`
+
+```cpp
+class DISP3DLIB::GeometryInfo
+```
+
+This class allows sensor-to-mesh mapping and calculation of surface constrained distances.
+
+This class holds static methods for sensor-to-mesh mapping and surface constrained distance calculation on a mesh
+
+---
+
+## Public Methods
+
+### GeometryInfo()
+
+---
+
+## Static Methods
+
+### scdc(matVertices, vecNeighborVertices, vecVertSubset, dCancelDist)
+
+scdc Calculates surface constrained distances on a mesh.
+
+---
+
+### scdcInterpolationMat(matVertices, vecNeighborVertices, vecVertSubset, interpolationFunction, dCancelDist, progressCallback, cancelledFlag)
+
+scdcInterpolationMat Computes geodesic distances (SCDC) and builds the sparse interpolation matrix in a single pass, without allocating a dense nVertices x nSources distance table.
+
+Produces identical results to `scdc()` + `Interpolation::createInterpolationMat()` but uses dramatically less memory (sparse representation only stores entries within cancelDist).
+
+**Parameters:**
+
+- **matVertices** : *const Eigen::MatrixX3f &*
+  Vertex positions (nVertices x 3).
+
+- **vecNeighborVertices** : *const std::vector&lt; Eigen::VectorXi &gt; &*
+  Adjacency list for each vertex.
+
+- **vecVertSubset** : *const Eigen::VectorXi &*
+  Source vertex indices.
+
+- **interpolationFunction** : *double(*)(double)*
+  Weight function (e.g. `Interpolation::cubic`).
+
+- **dCancelDist** : *double*
+  Maximum geodesic distance for interpolation.
+
+- **progressCallback** : *std::function&lt; void(int, int)&gt;*
+  Optional callback reporting Dijkstra progress (current, total).
+
+- **cancelledFlag** : *const std::atomic&lt; bool &gt; **
+  Optional pointer to an atomic bool; when set to true the computation aborts early.
+
+**Returns:**
+
+- *QSharedPointer&lt; Eigen::SparseMatrix&lt; float &gt; &gt;* — Sparse interpolation matrix (nVertices x nSources), or empty matrix if cancelled.
+
+---
+
+### projectSensors(matVertices, matSensorPositions)
+
+projectSensors Calculates the nearest neighbor vertex to each sensor.
+
+---
+
+### filterBadChannels(matDistanceTable, fiffInfo, iSensorType)
+
+filterBadChannels Filters bad channels from distance table.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

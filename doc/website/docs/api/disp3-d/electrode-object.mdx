@@ -1,0 +1,209 @@
+---
+id: electrode-object
+title: "DISP3DLIB::ElectrodeObject"
+sidebar_label: ElectrodeObject
+sidebar_position: 1
+---
+
+# ElectrodeObject
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Header:** `disp3D/renderable/electrodeobject.h`
+
+`#include <disp3D/electrodeobject.h>`
+
+```cpp
+class DISP3DLIB::ElectrodeObject
+```
+
+Data model for stereotactic depth electrode (sEEG) visualization.
+
+Holds electrode shaft definitions and contact metadata, and generates CPU-side geometry (vertices/indices) that a QRhi-based renderer can upload to the GPU.
+
+---
+
+## Public Methods
+
+### ElectrodeObject()
+
+---
+
+### ~ElectrodeObject()
+
+---
+
+### setArrays(arrays)
+
+Set electrode data from array definitions.
+
+**Parameters:**
+
+- **arrays** : *const QVector&lt; ElectrodeArray &gt; &*
+  Vector of electrode arrays.
+
+---
+
+### arrays()
+
+**Returns:**
+
+- *const QVector&lt; ElectrodeArray &gt; &* — Const reference to the current arrays.
+
+---
+
+### totalContactCount()
+
+**Returns:**
+
+- *int* — Total number of contacts across all shafts.
+
+---
+
+### setContactValues(values, minColor, maxColor)
+
+Apply per-contact scalar overlay values and map them to a color gradient.
+
+**Parameters:**
+
+- **values** : *const QMap&lt; QString, float &gt; &*
+  Map of contact name -&gt; scalar value.
+
+- **minColor** : *const QColor &*
+  Color for the minimum value (default: blue).
+
+- **maxColor** : *const QColor &*
+  Color for the maximum value (default: red).
+
+---
+
+### selectContact(name)
+
+Select a contact by name.
+
+Clears the previous selection.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Contact name to select.
+
+---
+
+### clearSelection()
+
+Clear all contact selections.
+
+---
+
+### selectedContact()
+
+**Returns:**
+
+- *QString* — Name of the currently selected contact, or empty string if none.
+
+---
+
+### generateShaftGeometry(vertices, indices, cylinderSides)
+
+Generate interleaved vertex + index data for all shaft cylinders.
+
+Each vertex: position (3 floats) + normal (3 floats) = 6 floats.
+
+**Parameters:**
+
+- **vertices** : *QVector&lt; float &gt; &*
+  Vertex buffer (position + normal interleaved).
+
+- **indices** : *QVector&lt; unsigned int &gt; &*
+  Index buffer (triangles).
+
+- **cylinderSides** : *int*
+  Number of sides for the cylinder cross-section.
+
+---
+
+### generateContactInstances(instanceData)
+
+Generate per-instance data for contact spheres.
+
+Per instance: position (3) + radius (1) + color RGBA (4) + selected flag (1) = 9 floats.
+
+**Parameters:**
+
+- **instanceData** : *QVector&lt; float &gt; &*
+  Flat float buffer.
+
+---
+
+### boundingBoxMin()
+
+**Returns:**
+
+- *QVector3D* — Axis-aligned bounding box minimum corner (with contact-radius padding).
+
+---
+
+### boundingBoxMax()
+
+**Returns:**
+
+- *QVector3D* — Axis-aligned bounding box maximum corner (with contact-radius padding).
+
+---
+
+### updateBuffers(rhi, u)
+
+Update GPU buffers (shaft vertex/index, contact instance) via QRhi.
+
+**Parameters:**
+
+- **rhi** : *QRhi **
+  Pointer to QRhi instance.
+
+- **u** : *QRhiResourceUpdateBatch **
+  Resource update batch.
+
+---
+
+### vertexBuffer()
+
+**Returns:**
+
+- *QRhiBuffer ** — Shaft vertex buffer (position + normal interleaved, 6 floats/vertex).
+
+---
+
+### indexBuffer()
+
+**Returns:**
+
+- *QRhiBuffer ** — Shaft index buffer.
+
+---
+
+### instanceBuffer()
+
+**Returns:**
+
+- *QRhiBuffer ** — Contact instance buffer (9 floats/instance).
+
+---
+
+### shaftIndexCount()
+
+**Returns:**
+
+- *uint32_t* — Number of shaft indices for drawIndexed.
+
+---
+
+### contactInstanceCount()
+
+**Returns:**
+
+- *uint32_t* — Number of contact instances for instanced draw.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

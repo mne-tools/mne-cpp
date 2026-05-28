@@ -1,0 +1,88 @@
+---
+id: sss
+title: "UTILSLIB::SSS"
+sidebar_label: SSS
+sidebar_position: 43
+---
+
+# SSS
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/sss.h`
+
+`#include <utils/sss.h>`
+
+```cpp
+class UTILSLIB::SSS
+```
+
+---
+
+## Static Methods
+
+### computeBasis(fiffInfo, params)
+
+Build the SSS spherical-harmonic basis from MEG sensor geometry.
+
+Only channels with kind == FIFFV_MEG_CH or FIFFV_REF_MEG_CH are used. Sensor positions and normals are taken from FiffChInfo::chpos (coil-centre single-point model).
+
+**Parameters:**
+
+- **fiffInfo** : *const FIFFLIB::FiffInfo &*
+  Measurement info containing channel positions.
+
+- **params** : *const Params &*
+  SSS configuration (order, origin, regularisation).
+
+**Returns:**
+
+- *Basis* — `Basis` struct containing all projectors needed for SSS and tSSS.
+
+---
+
+### apply(matData, basis)
+
+Apply SSS to MEG data — suppress external (environmental) interference.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Full sensor data (n_channels × n_samples). Non-MEG channels are passed through unchanged.
+
+- **basis** : *const Basis &*
+  Precomputed basis from computeBasis().
+
+**Returns:**
+
+- *Eigen::MatrixXd* — SSS-cleaned data (n_channels × n_samples).
+
+---
+
+### applyTemporal(matData, basis, iBufferLength, dCorrLimit)
+
+Apply temporal SSS (tSSS) — additionally suppress near-field artefacts.
+
+tSSS processes the data in sliding windows and removes the temporal subspace of the external expansion that exceeds `dCorrLimit` (relative to the dominant singular value).
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Full sensor data (n_channels × n_samples).
+
+- **basis** : *const Basis &*
+  Precomputed basis from computeBasis().
+
+- **iBufferLength** : *int*
+  Window length in samples (default 10000 ≈ 10 s at 1 kHz).
+
+- **dCorrLimit** : *double*
+  Correlation threshold [0, 1]; singular vectors of the external subspace whose normalised value exceeds this are removed from the internal expansion (default 0.98).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — tSSS-cleaned data (n_channels × n_samples).
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

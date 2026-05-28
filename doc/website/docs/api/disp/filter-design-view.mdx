@@ -1,0 +1,182 @@
+---
+id: filter-design-view
+title: "DISPLIB::FilterDesignView"
+sidebar_label: FilterDesignView
+sidebar_position: 29
+---
+
+# FilterDesignView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/filterdesignview.h`
+
+`#include <disp/filterdesignview.h>`
+
+```cpp
+class DISPLIB::FilterDesignView
+```
+
+Interactive FIR / IIR filter design GUI with a live magnitude / phase preview.
+
+Lets the user pick filter type, design family (cosine, Hamming, Blackman, …), cutoff frequencies, transition bandwidth and tap count, then renders the resulting frequency response in an embedded `FilterPlotScene` and emits the `FilterKernel` as a `filterChanged` signal consumed by the `rtprocessing` chain.
+
+---
+
+## Public Methods
+
+### FilterDesignView(sSettingsPath, parent, f)
+
+Constructs a `FilterDesignView` dialog which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  pointer to parent widget; If parent is 0, the new `FilterDesignView` becomes a window. If parent is another widget, `FilterDesignView` becomes a child window inside parent. `FilterDesignView` is deleted when its parent is deleted.
+
+---
+
+### ~FilterDesignView()
+
+Destroys the `FilterDesignView`.
+
+All `FilterDesignView`'s children are deleted first. The application exits if `FilterDesignView` is the main widget.
+
+---
+
+### setMaxAllowedFilterTaps(iMaxNumberFilterTaps)
+
+Sets the max number of allowed filter taps.
+
+**Parameters:**
+
+- **iMaxNumberFilterTaps** : *int*
+  number of max allowed filter taps.
+
+---
+
+### getFilterTaps()
+
+Returns the currently set number of filter taps.
+
+**Returns:**
+
+- *int* — returns the currently set number of filter taps.
+
+---
+
+### setSamplingRate(dSamplingRate)
+
+Sets the new samplingRate.
+
+**Parameters:**
+
+- **dSamplingRate** : *double*
+  the new sampling rate.
+
+---
+
+### setFrom(dFrom)
+
+Sets filter 'From' value.
+
+**Parameters:**
+
+- **dFrom** : *double*
+  set filter 'From' value.
+
+---
+
+### setTo(dTo)
+
+Sets filter 'To' value.
+
+**Parameters:**
+
+- **dTo** : *double*
+  set filter 'To' value.
+
+---
+
+### getFrom()
+
+Get filter 'From' value.
+
+**Returns:**
+
+- *double* — filter 'From' value.
+
+---
+
+### getTo()
+
+Get filter 'To' value.
+
+**Returns:**
+
+- *double* — filter 'To' value.
+
+---
+
+### getCurrentFilter()
+
+Returns the current filter.
+
+**Returns:**
+
+- *UTILSLIB::FilterKernel* — returns the current filter.
+
+---
+
+### getChannelType()
+
+Returns the current channel type which is to be filtered.
+
+**Returns:**
+
+- *QString* — returns the channel type.
+
+---
+
+### setChannelType(sType)
+
+Sets the current channel type which is to be filtered.
+
+**Parameters:**
+
+- **sType** : *const QString &*
+  The new channel type to be filtered.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+### updateFilterPlot()
+
+updates the filter plot scene with the newly generated filter
+
+---
+
+### guiStyleChanged(style)
+
+Process the event of style mode change in an upper class.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

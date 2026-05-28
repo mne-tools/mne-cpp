@@ -1,0 +1,114 @@
+---
+id: spectrum-view
+title: "DISPLIB::SpectrumView"
+sidebar_label: SpectrumView
+sidebar_position: 60
+---
+
+# SpectrumView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/spectrumview.h`
+
+`#include <disp/spectrumview.h>`
+
+```cpp
+class DISPLIB::SpectrumView
+```
+
+Per-channel frequency-spectrum heat-map QTableView (rows = channels, columns = freq bins).
+
+Wraps a `QTableView` around a `FrequencySpectrumModel` and paints each row with `FrequencySpectrumDelegate` so the live FFT amplitudes appear as a rolling colour band per channel.
+
+---
+
+## Public Methods
+
+### SpectrumView(sSettingsPath, parent, f)
+
+Constructs a `SpectrumView` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  parent of widget.
+
+---
+
+### ~SpectrumView()
+
+Destroys the `ArtifactSettingsView`.
+
+---
+
+### init(info, iScaleType)
+
+Initializes the view based on the FiffInfo and scale type.
+
+**Parameters:**
+
+- **info** : *QSharedPointer&lt;FIFFLIB::FiffInfo&gt; &*
+  The FiffInfo.
+
+- **iScaleType** : *int*
+  The scale type.
+
+---
+
+### addData(data)
+
+Adds data to the underlying model.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  The new data.
+
+---
+
+### setBoundaries(iLower, iUpper)
+
+Sets the boundaries.
+
+**Parameters:**
+
+- **iLower** : *int*
+  The lower boundary.
+
+- **iUpper** : *int*
+  The upper boundary.
+
+---
+
+### eventFilter(watched, event)
+
+The event filter.
+
+**Parameters:**
+
+- **watched.**
+
+- **event.**
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

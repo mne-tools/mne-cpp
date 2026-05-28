@@ -1,0 +1,54 @@
+---
+id: fiff-data-ref
+title: "FIFFLIB::FiffDataRef"
+sidebar_label: FiffDataRef
+sidebar_position: 16
+---
+
+# FiffDataRef
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_data_ref.h`
+
+`#include <fiff/fiff_data_ref.h>`
+
+```cpp
+class FIFFLIB::FiffDataRef
+```
+
+External data reference: type, endian, byte size and offset into an external FIFF payload file.
+
+Mirrors the original ``fiffDataRefRec`` exactly: a 24-byte record made of two `qint32` (type, endianness flag) followed by two `qint64` (payload size in bytes, byte offset into the external file). The 64-bit fields let referenced payloads exceed 2 GiB, which is required by long continuous Neuromag recordings split into multi-file FIFF trees.
+
+---
+
+## Public Methods
+
+### FiffDataRef()
+
+Default constructor.
+
+Initializes all fields to zero.
+
+---
+
+### ~FiffDataRef()
+
+Destroys the `FiffDataRef`.
+
+---
+
+## Static Methods
+
+### storageSize()
+
+Size of the old struct (`fiffDataRefRec`) 2*int + 2*long = 2*4 + 2*8 = 24.
+
+**Returns:**
+
+- *qint32* — the size of the old struct `fiffDataRefRec`.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

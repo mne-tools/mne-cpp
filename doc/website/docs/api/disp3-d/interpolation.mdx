@@ -1,0 +1,76 @@
+---
+id: interpolation
+title: "DISP3DLIB::Interpolation"
+sidebar_label: Interpolation
+sidebar_position: 3
+---
+
+# Interpolation
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Header:** `disp3D/helpers/interpolation.h`
+
+`#include <disp3D/interpolation.h>`
+
+```cpp
+class DISP3DLIB::Interpolation
+```
+
+This class holds methods for creating distance-based weight matrices and for interpolating signals.
+
+This class holds methods for creating distance-based weight matrices and for interpolating signals
+
+---
+
+## Public Methods
+
+### Interpolation()
+
+---
+
+## Static Methods
+
+### createInterpolationMat(vecProjectedSensors, matDistanceTable, interpolationFunction, dCancelDist, vecExcludeIndex)
+
+createInterpolationMat Calculates the weight matrix for interpolation.
+
+---
+
+### interpolateSignal(matInterpolationMatrix, vecMeasurementData)
+
+interpolateSignal Interpolates sensor data using the weight matrix (shared pointer version).
+
+---
+
+### interpolateSignal(matInterpolationMatrix, vecMeasurementData)
+
+interpolateSignal Interpolates sensor data using the weight matrix (reference version).
+
+---
+
+### linear(dIn)
+
+linear Identity interpolation function.
+
+---
+
+### gaussian(dIn)
+
+gaussian Gaussian interpolation function (sigma=1).
+
+---
+
+### square(dIn)
+
+square Negative parabola interpolation function with y-offset of 1.
+
+---
+
+### cubic(dIn)
+
+cubic Cubic hyperbola interpolation function.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

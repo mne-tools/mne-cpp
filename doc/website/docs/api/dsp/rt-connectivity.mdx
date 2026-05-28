@@ -1,0 +1,68 @@
+---
+id: rt-connectivity
+title: "RTPROCESSINGLIB::RtConnectivity"
+sidebar_label: RtConnectivity
+sidebar_position: 32
+---
+
+# RtConnectivity
+
+**Namespace:** `RTPROCESSINGLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Header:** `dsp/rt/rt_connectivity.h`
+
+`#include <dsp/rt_connectivity.h>`
+
+```cpp
+class RTPROCESSINGLIB::RtConnectivity
+```
+
+Real-time connectivity estimation.
+
+Controller that manages `RtConnectivityWorker` for online connectivity computation.
+
+---
+
+## Public Methods
+
+### RtConnectivity(parent)
+
+Creates the real-time connectivity estimation object.
+
+**Parameters:**
+
+- **parent** : *QObject **
+  Parent QObject (optional).
+
+---
+
+### ~RtConnectivity()
+
+Destroys the real-time connectivity estimation object.
+
+---
+
+### append(connectivitySettings)
+
+Slot to receive incoming data.
+
+**Parameters:**
+
+- **data**
+  Data to estimate the connectivity from.
+
+---
+
+### restart()
+
+Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
+
+---
+
+### stop()
+
+Stops the thread by interrupting its computation queue, quitting and waiting.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

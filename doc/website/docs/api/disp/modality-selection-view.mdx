@@ -1,0 +1,84 @@
+---
+id: modality-selection-view
+title: "DISPLIB::ModalitySelectionView"
+sidebar_label: ModalitySelectionView
+sidebar_position: 42
+---
+
+# ModalitySelectionView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/modalityselectionview.h`
+
+`#include <disp/modalityselectionview.h>`
+
+```cpp
+class DISPLIB::ModalitySelectionView
+```
+
+Per-modality visibility toggle panel (one `QCheckBox` per channel modality).
+
+Builds itself from the active `FiffInfo` modalities and emits `modalitiesChanged` so `ButterflyView` and `AverageLayoutView` can hide entire modalities at once.
+
+---
+
+## Public Methods
+
+### ModalitySelectionView(lChannelList, sSettingsPath, parent, f)
+
+Constructs a `ModalitySelectionView` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  parent of widget.
+
+---
+
+### ~ModalitySelectionView()
+
+Destroys the `ModalitySelectionView`.
+
+---
+
+### setModalityMap(modalityMap)
+
+Set the modality checkboxes.
+
+**Parameters:**
+
+- **modalityMap** : *const QMap&lt; QString, bool &gt; &*
+  The modality map.
+
+---
+
+### getModalityMap()
+
+Get the activation of the already created modality check boxes.
+
+**Returns:**
+
+- *QMap&lt; QString, bool &gt;* — The current modality map.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

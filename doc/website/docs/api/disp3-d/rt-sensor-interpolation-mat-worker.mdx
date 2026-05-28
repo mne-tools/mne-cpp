@@ -1,0 +1,130 @@
+---
+id: rt-sensor-interpolation-mat-worker
+title: "DISP3DLIB::RtSensorInterpolationMatWorker"
+sidebar_label: RtSensorInterpolationMatWorker
+sidebar_position: 6
+---
+
+# RtSensorInterpolationMatWorker
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Header:** `disp3D/workers/rtsensorinterpolationmatworker.h`
+
+`#include <disp3D/rtsensorinterpolationmatworker.h>`
+
+```cpp
+class DISP3DLIB::RtSensorInterpolationMatWorker
+```
+
+`RtSensorInterpolationMatWorker` computes dense sensor-to-surface field-mapping matrices in a background thread.
+
+This worker encapsulates the expensive `FieldMap::computeMegMapping()` and computeEegMapping() calls that were previously performed synchronously on the main thread inside BrainView::buildSensorFieldMapping().
+
+The worker stores all relevant parameters (evoked info, surface geometry, transforms, etc.) and recomputes the mapping matrices when any parameter changes. It emits newMappingMatrixAvailable() when a new matrix is ready.
+
+Thread-safety: all public setters are mutex-protected and schedule a recomputation via the `computeMapping()` slot.
+
+Background worker for computing sensor field mapping matrices.
+
+---
+
+## Public Methods
+
+### RtSensorInterpolationMatWorker(parent)
+
+Constructor.
+
+**Parameters:**
+
+- **parent** : *QObject **
+  Parent QObject.
+
+---
+
+### setEvoked(evoked)
+
+Set the evoked data that contains channel info and sensor definitions.
+
+**Parameters:**
+
+- **evoked** : *const FIFFLIB::FiffEvoked &*
+  The evoked dataset.
+
+---
+
+### setTransform(trans, applySensorTrans)
+
+Set the head-to-MRI coordinate transform.
+
+**Parameters:**
+
+- **trans** : *const FIFFLIB::FiffCoordTrans &*
+  The transform.
+
+- **applySensorTrans** : *bool*
+  Whether to apply the transform.
+
+---
+
+### setMegFieldMapOnHead(onHead)
+
+Set whether the MEG field should be mapped onto the head (BEM) surface rather than the helmet surface.
+
+**Parameters:**
+
+- **onHead** : *bool*
+  True to map onto head.
+
+---
+
+### setMegSurface(surfaceKey, vertices, normals, triangles)
+
+Set the surface geometry used for MEG field mapping.
+
+This must include vertex positions and normals (for MEG).
+
+**Parameters:**
+
+- **surfaceKey** : *const QString &*
+  The key identifying the surface.
+
+- **vertices** : *const Eigen::MatrixX3f &*
+  Vertex positions (nVerts x 3).
+
+- **normals** : *const Eigen::MatrixX3f &*
+  Vertex normals (nVerts x 3).
+
+- **triangles** : *const Eigen::MatrixX3i &*
+  Triangle indices (nTris x 3).
+
+---
+
+### setEegSurface(surfaceKey, vertices)
+
+Set the surface geometry used for EEG field mapping.
+
+**Parameters:**
+
+- **surfaceKey** : *const QString &*
+  The key identifying the surface.
+
+- **vertices** : *const Eigen::MatrixX3f &*
+  Vertex positions (nVerts x 3).
+
+---
+
+### setBadChannels(bads)
+
+Set the bad channels.
+
+Triggers recomputation if changed.
+
+**Parameters:**
+
+- **bads** : *const QStringList &*
+  List of bad channel names.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

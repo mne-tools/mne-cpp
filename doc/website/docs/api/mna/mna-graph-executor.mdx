@@ -1,0 +1,135 @@
+---
+id: mna-graph-executor
+title: "MNALIB::MnaGraphExecutor"
+sidebar_label: MnaGraphExecutor
+sidebar_position: 2
+---
+
+# MnaGraphExecutor
+
+**Namespace:** `MNALIB` &nbsp;·&nbsp; **Library:** MNA Library (Modular Architecture) &nbsp;·&nbsp; **Header:** `mna/mna_graph_executor.h`
+
+`#include <mna/mna_graph_executor.h>`
+
+```cpp
+class MNALIB::MnaGraphExecutor
+```
+
+Executes a computational graph by traversing nodes in topological order and invoking registered operation functions.
+
+Stateless batch and stream-mode runner for an `MnaGraph`.
+
+---
+
+## Static Methods
+
+### execute(graph, graphInputs)
+
+Execute the full graph (all nodes in topological order).
+
+**Parameters:**
+
+- **graph** : *MnaGraph &*
+  The graph to execute.
+
+- **graphInputs** : *const QVariantMap &*
+  Named inputs fed into graph-level input ports.
+
+**Returns:**
+
+- *Context* — Execution context with all results.
+
+---
+
+### executeIncremental(graph, existing)
+
+Execute only dirty nodes and their downstream dependents.
+
+**Parameters:**
+
+- **graph** : *MnaGraph &*
+  The graph to execute.
+
+- **existing** : *Context &*
+  Existing context with prior results.
+
+**Returns:**
+
+- *Context* — Updated context.
+
+---
+
+### executeNode(node, inputs)
+
+Execute a single node (for testing/debugging).
+
+**Parameters:**
+
+- **node** : *const MnaNode &*
+  The node to execute.
+
+- **inputs** : *const QVariantMap &*
+  Input data keyed by port name.
+
+**Returns:**
+
+- *QVariantMap* — Output data keyed by port name.
+
+---
+
+### setProgressCallback(cb)
+
+Set a progress callback invoked for each node execution.
+
+---
+
+### startStream(graph, factory)
+
+Start stream-mode execution of a graph.
+
+Validates the graph
+
+
+Performs topological sort
+
+
+For each node, calls `factory` to instantiate a live plugin
+
+
+Applies `MnaParamTree` values to node attributes
+
+
+Wires connections based on port dataKind matching
+
+The mna library does NOT depend on MNE Scan — the host app provides the factory and is responsible for wiring Qt signal/slot connections between the returned QObject* instances.
+
+**Parameters:**
+
+- **graph** : *MnaGraph &*
+  The pipeline graph.
+
+- **factory** : *PluginFactory*
+  Callback that maps opType → live QObject* plugin.
+
+**Returns:**
+
+- *StreamContext* — Stream context. Check ctx.running to see if startup succeeded.
+
+---
+
+### stopStream(ctx)
+
+Stop a running stream.
+
+Iterates nodes in reverse topological order and deletes the live plugin objects.
+
+**Parameters:**
+
+- **ctx** : *StreamContext &*
+  The stream context to stop.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

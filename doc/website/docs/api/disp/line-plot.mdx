@@ -1,0 +1,140 @@
+---
+id: line-plot
+title: "DISPLIB::LinePlot"
+sidebar_label: LinePlot
+sidebar_position: 39
+---
+
+# LinePlot
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/plots/lineplot.h`
+
+`#include <disp/lineplot.h>`
+
+```cpp
+class DISPLIB::LinePlot
+```
+
+Simple x / y line-series QWidget rendered with QPainter (no Qt Charts dependency).
+
+Supports multiple series, a settable title and x / y labels and auto-ranging axes. Series are stored as `QVector<double>` pairs and re-drawn during `paintEvent`.
+
+---
+
+## Public Methods
+
+### LinePlot(parent)
+
+Constructs a line series plot.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  If parent is nullptr, the new widget becomes a window.
+
+---
+
+### LinePlot(y, title, parent)
+
+Constructs a line series plot.
+
+**Parameters:**
+
+- **y** : *const QVector&lt; double &gt; &*
+  The double data vector.
+
+- **title** : *const QString &*
+  `Plot` title.
+
+- **parent** : *QWidget **
+  If parent is nullptr, the new widget becomes a window.
+
+---
+
+### LinePlot(x, y, title, parent)
+
+Constructs a line series plot.
+
+**Parameters:**
+
+- **x** : *const QVector&lt; double &gt; &*
+  X-Axis data to plot.
+
+- **y** : *const QVector&lt; double &gt; &*
+  Y-Axis data to plot.
+
+- **title** : *const QString &*
+  `Plot` title.
+
+- **parent** : *QWidget **
+  If parent is nullptr, the new widget becomes a window.
+
+---
+
+### ~LinePlot()
+
+Destructs the line series plot.
+
+---
+
+### setTitle(p_sTitle)
+
+Sets the plot title.
+
+**Parameters:**
+
+- **p_sTitle** : *const QString &*
+  The title.
+
+---
+
+### setXLabel(p_sXLabel)
+
+Sets the label of the x axis.
+
+**Parameters:**
+
+- **p_sXLabel** : *const QString &*
+  The x axis label.
+
+---
+
+### setYLabel(p_sYLabel)
+
+Sets the label of the y axis.
+
+**Parameters:**
+
+- **p_sYLabel** : *const QString &*
+  The y axis label.
+
+---
+
+### updateData(y)
+
+Updates the plot using a given double vector without given X data.
+
+**Parameters:**
+
+- **y** : *const QVector&lt; double &gt; &*
+  The double data vector.
+
+---
+
+### updateData(x, y)
+
+Updates the plot using the given vectors.
+
+**Parameters:**
+
+- **x** : *const QVector&lt; double &gt; &*
+  X-Axis data to plot.
+
+- **y** : *const QVector&lt; double &gt; &*
+  Y-Axis data to plot.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

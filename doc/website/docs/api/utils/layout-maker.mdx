@@ -1,0 +1,112 @@
+---
+id: layout-maker
+title: "UTILSLIB::LayoutMaker"
+sidebar_label: LayoutMaker
+sidebar_position: 28
+---
+
+# LayoutMaker
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `utils/layoutmaker.h`
+
+`#include <utils/layoutmaker.h>`
+
+```cpp
+class UTILSLIB::LayoutMaker
+```
+
+Make layout files from given 3D points.
+
+Make layout files from given 3D points.
+
+---
+
+## Static Methods
+
+### makeLayout(inputPoints, outputPoints, names, outFile, do_fit, prad, w, h, writeFile, mirrorXAxis, mirrorYAxis)
+
+Reads the specified ANT elc-layout file.
+
+**Parameters:**
+
+- **inputPoints** : *const QList&lt; QVector&lt; float &gt; &gt; &*
+  The input points in 3D space.
+
+- **outputPoints** : *QList&lt; QVector&lt; float &gt; &gt; &*
+  The output layout points in 2D space.
+
+- **names** : *const QStringList &*
+  The channel names.
+
+- **outFile** : *QFile &*
+  The outout file.
+
+- **do_fit** : *bool*
+  The flag whether to do a sphere fitting.
+
+- **prad.**
+
+- **w.**
+
+- **h.**
+
+- **writeFile** : *bool*
+  The flag whether to write to file.
+
+- **mirrorXAxis** : *bool*
+  Mirror points at x axis.
+
+- **mirrorYAxis** : *bool*
+  Mirror points at y axis.
+
+**Returns:**
+
+- *bool* — true if making layout was successful, false otherwise.
+
+---
+
+### makeLayout(inputPoints, outputPoints, names, outFilePath, do_fit, prad, w, h, writeFile, mirrorXAxis, mirrorYAxis)
+
+Reads the specified ANT elc-layout file.
+
+**Parameters:**
+
+- **inputPoints** : *const std::vector&lt; std::vector&lt; float &gt; &gt; &*
+  The input points in 3D space.
+
+- **outputPoints** : *std::vector&lt; std::vector&lt; float &gt; &gt; &*
+  The output layout points in 2D space.
+
+- **names** : *const std::vector&lt; std::string &gt; &*
+  The channel names.
+
+- **outFile**
+  The outout file.
+
+- **do_fit** : *bool*
+  The flag whether to do a sphere fitting.
+
+- **prad.**
+
+- **w.**
+
+- **h.**
+
+- **writeFile** : *bool*
+  The flag whether to write to file.
+
+- **mirrorXAxis** : *bool*
+  Mirror points at x axis.
+
+- **mirrorYAxis** : *bool*
+  Mirror points at y axis.
+
+**Returns:**
+
+- *bool* — true if making layout was successful, false otherwise.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

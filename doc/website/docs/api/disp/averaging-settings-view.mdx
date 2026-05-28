@@ -1,0 +1,130 @@
+---
+id: averaging-settings-view
+title: "DISPLIB::AveragingSettingsView"
+sidebar_label: AveragingSettingsView
+sidebar_position: 8
+---
+
+# AveragingSettingsView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/averagingsettingsview.h`
+
+`#include <disp/averagingsettingsview.h>`
+
+```cpp
+class DISPLIB::AveragingSettingsView
+```
+
+Settings panel driving the on-line / off-line averaging engine.
+
+Holds stim-channel and trigger-type pickers, pre / post-stimulus spinboxes (ms), baseline-correction toggles and an embedded `ArtifactSettingsView`. Parameter edits are forwarded as Qt signals to the `rtprocessing` averaging job.
+
+---
+
+## Public Methods
+
+### AveragingSettingsView(sSettingsPath, mapStimChsIndexNames, parent)
+
+---
+
+### ~AveragingSettingsView()
+
+Destroys the `AveragingSettingsView`.
+
+---
+
+### setStimChannels(mapStimChsIndexNames)
+
+---
+
+### getCurrentStimCh()
+
+---
+
+### getDoBaselineCorrection()
+
+---
+
+### getNumAverages()
+
+---
+
+### getBaselineFromSeconds()
+
+---
+
+### getBaselineToSeconds()
+
+---
+
+### getStimChannelIdx()
+
+---
+
+### getPreStimMSeconds()
+
+---
+
+### getPostStimMSeconds()
+
+---
+
+### getCurrentSelectGroup()
+
+---
+
+### setDetectedEpochs(evokedSet)
+
+---
+
+### getAutoComputeStatus()
+
+---
+
+### clearSelectionGroup()
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### updateGuiMode(mode)
+
+Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
+
+**Parameters:**
+
+- **mode** : *GuiMode*
+  The new mode (Clinical=0, Research=1).
+
+---
+
+### updateProcessingMode(mode)
+
+Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
+
+**Parameters:**
+
+- **mode** : *ProcessingMode*
+  The new mode (RealTime=0, Offline=1).
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

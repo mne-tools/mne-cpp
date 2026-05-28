@@ -1,0 +1,62 @@
+---
+id: fiff-file-sharer
+title: "FIFFLIB::FiffFileSharer"
+sidebar_label: FiffFileSharer
+sidebar_position: 23
+---
+
+# FiffFileSharer
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_file_sharer.h`
+
+`#include <fiff/fiff_file_sharer.h>`
+
+```cpp
+class FIFFLIB::FiffFileSharer
+```
+
+Refcounted memory-mapped view of a FIFF file shared between cooperating consumers.
+
+Each consumer gets a zero-copy `QByteArray` view of the same backing pages. When the last reference goes away the mapping is unmapped. Used to let the GUI, the realtime pipeline and the recording dumper share one open FIFF file without duplicate I/O.
+
+---
+
+## Public Methods
+
+### FiffFileSharer()
+
+Constructs a `FiffFileSharer` with default paramaters (based on m_sDefaultDirectory and m_sDefaultFileName).
+
+---
+
+### FiffFileSharer(sDirName)
+
+Constructs a `FiffFileSharer` to watch/save to sDirName.
+
+**Parameters:**
+
+- **sDirName** : *const QString &*
+  Directory to/from which data will saved/read
+
+---
+
+### copyRealtimeFile(sSourcePath)
+
+Copies unfinished fiff file to set directory and appends relevant end tags to copy.
+
+**Parameters:**
+
+- **sSourcePath** : *const QString &*
+  source file to ber copied
+
+---
+
+### initWatcher()
+
+Sets member QFileSystemWatcher to watch set directory.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

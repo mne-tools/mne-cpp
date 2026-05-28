@@ -1,0 +1,95 @@
+---
+id: rt-noise
+title: "RTPROCESSINGLIB::RtNoise"
+sidebar_label: RtNoise
+sidebar_position: 39
+---
+
+# RtNoise
+
+**Namespace:** `RTPROCESSINGLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Header:** `dsp/rt/rt_noise.h`
+
+`#include <dsp/rt_noise.h>`
+
+```cpp
+class RTPROCESSINGLIB::RtNoise
+```
+
+Controller that manages `RtNoiseWorker` for real-time noise spectrum estimation.
+
+---
+
+## Public Methods
+
+### RtNoise(iFftLength, pFiffInfo, iDataLength, parent)
+
+Creates the real-time noise estimation object.
+
+**Parameters:**
+
+- **iFftLength** : *qint32*
+  Number of samples per FFT window.
+
+- **pFiffInfo** : *FIFFLIB::FiffInfo::SPtr*
+  Associated Fiff Information.
+
+- **iDataLength** : *qint32*
+  Number of blocks to accumulate before computing.
+
+- **parent** : *QObject **
+  Parent QObject (optional).
+
+---
+
+### ~RtNoise()
+
+Destroys the real-time noise estimation object.
+
+---
+
+### append(matData)
+
+Submit incoming data for noise estimation.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Data block (channels x samples).
+
+---
+
+### isRunning()
+
+Returns whether the worker thread is running.
+
+---
+
+### start()
+
+Starts the worker thread.
+
+**Returns:**
+
+- *bool* — true on success.
+
+---
+
+### stop()
+
+Stops the worker thread.
+
+**Returns:**
+
+- *bool* — true on success.
+
+---
+
+### wait(time)
+
+Blocks until the worker thread has finished, or until the timeout (ms) expires.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

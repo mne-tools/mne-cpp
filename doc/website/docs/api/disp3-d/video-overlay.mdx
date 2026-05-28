@@ -1,0 +1,102 @@
+---
+id: video-overlay
+title: "DISP3DLIB::VideoOverlay"
+sidebar_label: VideoOverlay
+sidebar_position: 10
+---
+
+# VideoOverlay
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Header:** `disp3D/renderable/videooverlay.h`
+
+`#include <disp3D/videooverlay.h>`
+
+```cpp
+class DISP3DLIB::VideoOverlay
+```
+
+Camera-facing textured quad rendered at a focus point in the 3-D scene.
+
+The overlay displays any live RGB/video frame "as a small cut-out view" on top of the 3-D scene. It is a billboarded square positioned at `focusPosition` with side length `sizeMeters`, textured with the latest video frame.
+
+This class is a passive data holder: `BrainRenderer` owns the GPU resources (vertex buffer, texture, sampler, pipeline) and reads from here each frame.
+
+---
+
+## Public Methods
+
+### VideoOverlay()
+
+---
+
+### isEnabled()
+
+---
+
+### setEnabled(enabled)
+
+---
+
+### focusPosition()
+
+**Returns:**
+
+- *QVector3D* — World-space centre of the overlay quad (metres).
+
+---
+
+### setFocusPosition(pos)
+
+---
+
+### sizeMeters()
+
+**Returns:**
+
+- *float* — Side length of the overlay quad (metres).
+
+---
+
+### setSizeMeters(size)
+
+---
+
+### frame()
+
+**Returns:**
+
+- *const QImage &* — Latest video frame (CPU-side). Empty until a frame arrives.
+
+---
+
+### hasFrame()
+
+---
+
+### setFrame(image)
+
+Push a new video frame; bumps the generation counter so the GPU re-uploads.
+
+---
+
+### frameGeneration()
+
+Monotonic counter, incremented on every `setFrame()` call.
+
+---
+
+### opacity()
+
+**Returns:**
+
+- *float* — Overall opacity of the overlay [0..1].
+
+---
+
+### setOpacity(opacity)
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

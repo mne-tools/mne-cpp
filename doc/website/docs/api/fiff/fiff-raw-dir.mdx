@@ -1,0 +1,51 @@
+---
+id: fiff-raw-dir
+title: "FIFFLIB::FiffRawDir"
+sidebar_label: FiffRawDir
+sidebar_position: 27
+---
+
+# FiffRawDir
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_raw_dir.h`
+
+`#include <fiff/fiff_raw_dir.h>`
+
+```cpp
+class FIFFLIB::FiffRawDir
+```
+
+Per-buffer raw-data directory entry: data kind, first sample, sample count, on-disk tag position.
+
+One entry per `FIFF_DATA_BUFFER` tag. The (`first`, `nsamp`) fields let `FiffRawData::read_segment` binary-search the directory for the buffers that cover a requested sample window and stream them in without rescanning the file.
+
+---
+
+## Public Methods
+
+### FiffRawDir()
+
+Default constructor.
+
+---
+
+### FiffRawDir(p_FiffRawDir)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FiffRawDir** : *const FiffRawDir &*
+  Raw directory entry which should be copied.
+
+---
+
+### ~FiffRawDir()
+
+Destroys the raw Directory entry.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

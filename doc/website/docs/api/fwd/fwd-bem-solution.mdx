@@ -1,0 +1,40 @@
+---
+id: fwd-bem-solution
+title: "FWDLIB::FwdBemSolution"
+sidebar_label: FwdBemSolution
+sidebar_position: 6
+---
+
+# FwdBemSolution
+
+**Namespace:** `FWDLIB` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Header:** `fwd/fwd_bem_solution.h`
+
+`#include <fwd/fwd_bem_solution.h>`
+
+```cpp
+class FWDLIB::FwdBemSolution
+```
+
+Implements a Forward BEM Solution (replaces `fwdBemSolution` / `fwdBemSolutionRec` from MNE-C ``fwd_types.h``).
+
+Channel-specific projection that contracts a BEM node-potential vector down to one entry per MEG coil or EEG electrode — i.e. the Geselowitz surface-integral weights cached as a dense `ncoil` × `np` matrix.
+
+---
+
+## Public Methods
+
+### FwdBemSolution()
+
+Constructs the Forward BEM Solution.
+
+---
+
+### ~FwdBemSolution()
+
+Destroys the Forward BEM Solution.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

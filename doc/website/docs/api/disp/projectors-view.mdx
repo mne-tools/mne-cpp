@@ -1,0 +1,90 @@
+---
+id: projectors-view
+title: "DISPLIB::ProjectorsView"
+sidebar_label: ProjectorsView
+sidebar_position: 49
+---
+
+# ProjectorsView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/projectorsview.h`
+
+`#include <disp/projectorsview.h>`
+
+```cpp
+class DISPLIB::ProjectorsView
+```
+
+SSP projector enable / disable checkbox list.
+
+One `QCheckBox` per `FiffProj` plus a master toggle; emits `projSelectionChanged` so the `rtprocessing` pipeline can (de)project the streaming data on the fly.
+
+---
+
+## Public Methods
+
+### ProjectorsView(sSettingsPath, parent, f)
+
+Constructs a `ProjectorsView` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  parent of widget.
+
+---
+
+### ~ProjectorsView()
+
+Destroys the `ProjectorsView`.
+
+---
+
+### getProjectors()
+
+Get the current projectors.
+
+**Returns:**
+
+- *QList&lt; FIFFLIB::FiffProj &gt;* — The current projectors.
+
+---
+
+### setProjectors(projs)
+
+Set the current projectors.
+
+**Parameters:**
+
+- **projs** : *const QList&lt; FIFFLIB::FiffProj &gt; &*
+  The new projectors.
+
+---
+
+### redrawGUI()
+
+Redraw the view.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

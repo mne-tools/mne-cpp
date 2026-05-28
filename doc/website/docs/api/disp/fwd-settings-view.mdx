@@ -1,0 +1,148 @@
+---
+id: fwd-settings-view
+title: "DISPLIB::FwdSettingsView"
+sidebar_label: FwdSettingsView
+sidebar_position: 34
+---
+
+# FwdSettingsView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/fwdsettingsview.h`
+
+`#include <disp/fwdsettingsview.h>`
+
+```cpp
+class DISPLIB::FwdSettingsView
+```
+
+Forward-solution computation control panel (BEM / source-space / EEG sphere model selectors).
+
+Exposes the parameters required by the ``FWDLIB`` recomputation job and provides a `Recompute` trigger plus live status labels showing the currently loaded BEM and dipole / sensor counts.
+
+---
+
+## Public Methods
+
+### FwdSettingsView(sSettingsPath, parent, f)
+
+Constructs a `FwdSettingsView` object.
+
+---
+
+### ~FwdSettingsView()
+
+---
+
+### getRecomputationStatusChanged()
+
+Get status of recomputation check box.
+
+**Returns:**
+
+- *bool* — If recomputation status is checked.
+
+---
+
+### setRecomputationStatus(iStatus)
+
+Updates the clustering status (0 Initializing, 1 Computing, 2 Recomputing, 3 Clustering, 4 Not Computed, 5 Finished).
+
+**Parameters:**
+
+- **iStatus** : *int*
+  status of recomputation.
+
+---
+
+### getClusteringStatusChanged()
+
+Get status of clustering check box.
+
+**Returns:**
+
+- *bool* — Wheter clustering is checked or not.
+
+---
+
+### getClusterNumber()
+
+Get status of cluster size spin box.
+
+**Returns:**
+
+- *int* — Desired number of sources in clustered source space.
+
+---
+
+### showAtlasDirDialog()
+
+Shows atlas selection dialog.
+
+---
+
+### setSolutionInformation(iSourceOri, iCoordFrame, iNSource, iNChan, iNSpaces)
+
+Updates forward solution information.
+
+**Parameters:**
+
+- **iSourceOri** : *FIFFLIB::fiff_int_t*
+  Source orientation: fixed or free.
+
+- **iCoordFrame** : *FIFFLIB::fiff_int_t*
+  Coil coordinate system definition.
+
+- **iNSource** : *int*
+  Number of source dipoles.
+
+- **iNChan** : *int*
+  Number of channels.
+
+- **iNSpaces** : *int*
+  Number of source spaces.
+
+---
+
+### setClusteredInformation(iNSource)
+
+Updates clustered forward solution information.
+
+**Parameters:**
+
+- **iNSource** : *int*
+  Number of clustered source dipoles.
+
+---
+
+### onClusteringStatusChanged(bChecked)
+
+Updates clustered forward solution information.
+
+**Parameters:**
+
+- **bChecked** : *bool*
+  Whether the clustering check box is checked..
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

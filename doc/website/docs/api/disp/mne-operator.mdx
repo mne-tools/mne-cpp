@@ -1,0 +1,46 @@
+---
+id: mne-operator
+title: "DISPLIB::MNEOperator"
+sidebar_label: MNEOperator
+sidebar_position: 40
+---
+
+# MNEOperator
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/helpers/mneoperator.h`
+
+`#include <disp/mneoperator.h>`
+
+```cpp
+class DISPLIB::MNEOperator
+```
+
+Light-weight wrapper describing one MNE pre-processing operator (FIR / SSP / compensation).
+
+Stores the operator type, display name, active flag and the underlying matrix / kernel reference so `ChannelInfoModel` can track which operators a channel is currently subject to.
+
+---
+
+## Public Methods
+
+### MNEOperator()
+
+---
+
+### MNEOperator(obj)
+
+---
+
+### MNEOperator(type)
+
+---
+
+### ~MNEOperator()
+
+Destructor.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

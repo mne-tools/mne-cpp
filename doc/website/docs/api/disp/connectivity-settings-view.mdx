@@ -1,0 +1,159 @@
+---
+id: connectivity-settings-view
+title: "DISPLIB::ConnectivitySettingsView"
+sidebar_label: ConnectivitySettingsView
+sidebar_position: 21
+---
+
+# ConnectivitySettingsView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/connectivitysettingsview.h`
+
+`#include <disp/connectivitysettingsview.h>`
+
+```cpp
+class DISPLIB::ConnectivitySettingsView
+```
+
+Settings panel for the on-line connectivity estimator (metric, window, trials).
+
+Combo boxes pick the connectivity metric (coherence, PLV, PLI, wPLI, dwPLI, ImCoh, Granger / PDC / DTF) and the windowing function; spinboxes set the number of trials. Edits propagate via Qt signals to the `rtprocessing` connectivity job.
+
+---
+
+## Public Methods
+
+### ConnectivitySettingsView(sSettingsPath, parent, f)
+
+Constructs a `ConnectivitySettingsView` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  parent of widget.
+
+---
+
+### ~ConnectivitySettingsView()
+
+Destroys the `ConnectivitySettingsView`.
+
+---
+
+### setTriggerTypes(lTriggerTypes)
+
+Destroys the `ConnectivitySettingsView`.
+
+**Parameters:**
+
+- **lTriggerTypes** : *const QStringList &*
+  The new trigger types.
+
+---
+
+### setNumberTrials(iNumberTrials)
+
+Sets the new number of trials.
+
+**Parameters:**
+
+- **iNumberTrials** : *int*
+  The new number of trials.
+
+---
+
+### setFrequencyBand(dFreqLow, dFreqHigh)
+
+Sets the frequency band.
+
+**Parameters:**
+
+- **dFreqLow** : *double*
+  The lower frequency.
+
+- **dFreqHigh** : *double*
+  The upper frequency.
+
+---
+
+### getConnectivityMetric()
+
+Get the current connectivity metric.
+
+**Returns:**
+
+- *QString* — The current connectivity metric.
+
+---
+
+### getWindowType()
+
+Get the current window type.
+
+**Returns:**
+
+- *QString* — The current window type.
+
+---
+
+### getNumberTrials()
+
+Get the current number of trials.
+
+**Returns:**
+
+- *int* — The current number of trials.
+
+---
+
+### getTriggerType()
+
+Get the current trigger type.
+
+**Returns:**
+
+- *QString* — The current trigger type.
+
+---
+
+### getLowerFreq()
+
+Get the current lower frequency range.
+
+**Returns:**
+
+- *double* — The current lower frequency range.
+
+---
+
+### getUpperFreq()
+
+Get the current upper frequency range.
+
+**Returns:**
+
+- *double* — The current upper frequency range.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

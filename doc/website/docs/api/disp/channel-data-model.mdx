@@ -1,0 +1,276 @@
+---
+id: channel-data-model
+title: "DISPLIB::ChannelDataModel"
+sidebar_label: ChannelDataModel
+sidebar_position: 13
+---
+
+# ChannelDataModel
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/helpers/channeldatamodel.h`
+
+`#include <disp/channeldatamodel.h>`
+
+```cpp
+class DISPLIB::ChannelDataModel
+```
+
+Circular-buffer Qt model exposing a rolling window of the live FIFF stream as a table.
+
+Keeps a per-channel `Eigen::MatrixXd` ring buffer of the most recent N seconds, tracks bad-channel flags, trigger annotations and the active SSP / compensation / filter operators so the delegate can render the pre-processed signal without touching the raw buffer.
+
+---
+
+## Public Methods
+
+### ChannelDataModel(parent)
+
+---
+
+### init(pFiffInfo)
+
+Initialise with channel metadata from a FiffInfo.
+
+**Parameters:**
+
+- **pFiffInfo** : *QSharedPointer&lt;FIFFLIB::FiffInfo&gt;*
+  The FiffInfo describing the channels.
+
+---
+
+### setData(data, firstSample)
+
+Replace all stored data with the provided matrix (channels × samples).
+
+The absolute index of the first column is `firstSample`.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  Channels × samples matrix (double precision).
+
+- **firstSample** : *int*
+  Absolute sample index of column 0.
+
+---
+
+### appendData(data)
+
+Append new samples to the ring buffer.
+
+Oldest samples are dropped when the internal capacity (maxStoredSamples) is exceeded.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  Channels × newSamples matrix.
+
+---
+
+### clearData()
+
+Override the per-channel-type amplitude scale.
+
+Key = FIFF channel kind constant (e.g. FIFFV_MEG_CH), value = physical amplitude.
+
+**Parameters:**
+
+- **scaleMap**
+  Map from FIFF kind to amplitude max. Clear all stored sample data without affecting channel metadata. After this call totalSamples() == 0 and firstSample() == 0. Emits `dataChanged()`.
+
+---
+
+### setScaleMap(scaleMap)
+
+---
+
+### setScaleMapFromStrings(scaleMap)
+
+---
+
+### setVirtualChannels(virtualChannels)
+
+Set extra browser-level virtual channels appended after the FIFF channels.
+
+**Parameters:**
+
+- **virtualChannels** : *const QVector&lt; ChannelDisplayInfo &gt; &*
+  Display metadata for each appended virtual channel.
+
+---
+
+### setSignalColor(color)
+
+Set the signal line colour for all channels.
+
+Individual channel colours are derived from this base colour by type.
+
+**Parameters:**
+
+- **color** : *const QColor &*
+  The base signal colour.
+
+---
+
+### setMaxStoredSamples(n)
+
+Set the maximum number of samples to keep in the ring buffer.
+
+When samples are appended beyond this limit, the oldest are dropped. Set to 0 (default) for unlimited storage.
+
+**Parameters:**
+
+- **n** : *int*
+  Maximum sample count per channel, or 0 for unlimited.
+
+---
+
+### setChannelBad(channelIdx, bad)
+
+Mark/unmark a channel as bad.
+
+**Parameters:**
+
+- **channelIdx** : *int*
+  Zero-based channel index.
+
+- **bad** : *bool*
+  True to mark bad.
+
+---
+
+### setRemoveDC(remove)
+
+Enable or disable DC (mean) removal applied on-the-fly during rendering.
+
+When enabled each channel's mean amplitude over the requested window is subtracted.
+
+**Parameters:**
+
+- **remove** : *bool*
+  true = subtract mean, false = raw data.
+
+---
+
+### removeDC()
+
+---
+
+### setDetrendMode(mode)
+
+---
+
+### detrendMode()
+
+---
+
+### channelCount()
+
+---
+
+### firstSample()
+
+---
+
+### totalSamples()
+
+---
+
+### sfreq()
+
+Sampling frequency in Hz; 0 if no FiffInfo attached.
+
+---
+
+### channelInfo(channelIdx)
+
+Display metadata for the given channel.
+
+**Parameters:**
+
+- **channelIdx** : *int*
+  Zero-based channel index.
+
+**Returns:**
+
+- *ChannelDisplayInfo* — `ChannelDisplayInfo` struct with name, colour, amplitudeMax, bad flag.
+
+---
+
+### channelRms(channelIdx, firstSample, lastSample)
+
+Compute the RMS amplitude of a channel over a sample window.
+
+Samples outside the buffer are silently ignored. Capped internally at 1000 samples for rendering-thread safety.
+
+**Parameters:**
+
+- **channelIdx** : *int*
+  Zero-based channel index.
+
+- **firstSample** : *int*
+  Absolute first sample (inclusive).
+
+- **lastSample** : *int*
+  Absolute last sample (exclusive).
+
+**Returns:**
+
+- *float* — RMS in raw (physical) units, or 0 if no data is available.
+
+---
+
+### decimatedVertices(channelIdx, firstSample, lastSample, pixelWidth, vboFirstSample)
+
+Return a flat float array ready for VBO upload.
+
+The array contains interleaved (x_offset, y_amplitude) pairs.
+
+When samplesPerPixel &lt;= 1 (zoomed in), raw samples are returned. When samplesPerPixel &gt; 1 (zoomed out), min/max decimation is applied so that at most 2 * pixelWidth vertices are returned.
+
+**Parameters:**
+
+- **channelIdx** : *int*
+  Zero-based channel index.
+
+- **firstSample** : *int*
+  Absolute sample index of the first desired sample.
+
+- **lastSample** : *int*
+  Absolute sample index (exclusive) of the last desired sample.
+
+- **pixelWidth** : *int*
+  Destination viewport width in pixels.
+
+- **vboFirstSample** : *int &*
+  The absolute sample index stored at VBO vertex 0 (= firstSample, returned for the UBO uniform).
+
+**Returns:**
+
+- *QVector&lt; float &gt;* — Flat float array: [x0, y0, x1, y1, ...] where x is offset from vboFirstSample.
+
+---
+
+### sampleValueAt(channelIdx, sample)
+
+Return the raw sample value at a specific absolute sample index for the given channel.
+
+Returns 0 if the sample is outside the buffer or channel index is out of range.
+
+**Parameters:**
+
+- **channelIdx** : *int*
+  Zero-based channel index.
+
+- **sample** : *int*
+  Absolute sample index.
+
+**Returns:**
+
+- *float* — Sample value in physical units, or 0 if unavailable.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

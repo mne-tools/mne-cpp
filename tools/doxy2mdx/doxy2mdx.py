@@ -633,6 +633,17 @@ def generate_class_mdx(compounddef,
     lines.append(f"# {short_name}")
     lines.append("")
 
+    # Prominent namespace / library / header banner so every page
+    # tells the reader where the symbol lives without scrolling.
+    ns = mod.get("namespace") or compound_name.split("::", 1)[0]
+    mod_label = mod.get("sidebar_label", module_key)
+    header_rel = loc_file or f"{include_dir}/{slug.replace('-', '_')}.h"
+    lines.append(
+        f"**Namespace:** `{ns}` &nbsp;·&nbsp; **Library:** {mod_label} "
+        f"&nbsp;·&nbsp; **Header:** `{header_rel}`"
+    )
+    lines.append("")
+
     if guide:
         lines.append(":::tip[See also]")
         lines.append(f"User guide: [{short_name} guide]({guide})")
@@ -719,16 +730,18 @@ def generate_class_mdx(compounddef,
     # --- Example (sourced from src/examples/<ex_id>/main.cpp) ---
     _render_example_section(reg_entry, repo_root, lines)
 
-    # --- Authors footer ---
+    # --- Authors footer (always rendered for consistency) ---
+    lines.append("## Authors of this file")
+    lines.append("")
     if authors:
-        lines.append("## Authors of this file")
-        lines.append("")
         for name, email in authors:
             if email:
                 lines.append(f"- {name} &lt;{email}&gt;")
             else:
                 lines.append(f"- {name}")
-        lines.append("")
+    else:
+        lines.append("_No authors recorded in the source file._")
+    lines.append("")
 
     content = "\n".join(lines)
     content = re.sub(r"\n{4,}", "\n\n\n", content)
@@ -895,6 +908,13 @@ def generate_module_mdx(xml_dir: Path,
     lines.append("")
     lines.append(f"# {short_name}")
     lines.append("")
+    ns = mod.get("namespace") or module_key.upper() + "LIB"
+    mod_label = mod.get("sidebar_label", module_key)
+    lines.append(
+        f"**Namespace:** `{ns}` &nbsp;·&nbsp; **Library:** {mod_label} "
+        f"&nbsp;·&nbsp; **Header:** `{header_rel}`"
+    )
+    lines.append("")
     lines.append(":::info[Module]")
     lines.append("This page documents a **header-level module** — a collection of free")
     lines.append("functions that share an algorithmic topic. There is no enclosing C++")
@@ -943,15 +963,18 @@ def generate_module_mdx(xml_dir: Path,
     # --- Example (sourced from src/examples/<ex_id>/main.cpp) ---
     _render_example_section(reg_entry, repo_root, lines)
 
+    # --- Authors footer (always rendered for consistency) ---
+    lines.append("## Authors of this file")
+    lines.append("")
     if authors:
-        lines.append("## Authors of this file")
-        lines.append("")
         for name, email in authors:
             if email:
                 lines.append(f"- {name} &lt;{email}&gt;")
             else:
                 lines.append(f"- {name}")
-        lines.append("")
+    else:
+        lines.append("_No authors recorded in the source file._")
+    lines.append("")
 
     content = "\n".join(lines)
     content = re.sub(r"\n{4,}", "\n\n\n", content)
@@ -966,14 +989,11 @@ def generate_module_mdx(xml_dir: Path,
 # ---------------------------------------------------------------------------
 
 def _short_module_label(mod: dict, fallback: str) -> str:
-    """Trim ``"FIFFLIB — FIFF I/O"`` style labels down to ``"FIFFLIB"`` so
-    the sidebar reads like ``FIFFLIB > FiffInfo`` similar to skigen."""
-    label = mod.get("sidebar_label_short") or mod.get("sidebar_label", fallback)
-    for sep in (" — ", " - ", " – ", ":"):
-        if sep in label:
-            label = label.split(sep, 1)[0].strip()
-            break
-    return label
+    """Return the human-readable sidebar label for a module. The label
+    is taken verbatim from the registry (e.g. ``"FIFF Library"``); the
+    namespace (``FIFFLIB``) is exposed separately in the page header so
+    the sidebar can read like ``FIFF Library > FiffStream``."""
+    return mod.get("sidebar_label", fallback)
 
 
 def generate_sidebar_fragment(sidebar_out: Path, out_dir: Path) -> None:

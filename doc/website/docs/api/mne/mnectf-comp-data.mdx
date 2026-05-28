@@ -1,0 +1,72 @@
+---
+id: mnectf-comp-data
+title: "MNELIB::MNECTFCompData"
+sidebar_label: MNECTFCompData
+sidebar_position: 9
+---
+
+# MNECTFCompData
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_ctf_comp_data.h`
+
+`#include <mne/mne_ctf_comp_data.h>`
+
+```cpp
+class MNELIB::MNECTFCompData
+```
+
+Represents a single CTF compensation data element.
+
+Holds the compensation matrix together with optional sparse pre-/post-selectors and intermediate computation buffers used by `MNECTFCompDataSet::apply()` and apply_transpose().
+
+---
+
+## Public Methods
+
+### MNECTFCompData()
+
+Constructs an empty `MNE` CTF Compensation Data object.
+
+---
+
+### MNECTFCompData(comp)
+
+Copy constructor.
+
+**Parameters:**
+
+- **comp** : *const MNECTFCompData &*
+  The compensation data to copy.
+
+---
+
+### ~MNECTFCompData()
+
+Destructor.
+
+---
+
+### calibrate(chs, nch, do_it)
+
+Apply or remove channel calibration to/from the compensation matrix by scaling each element by (row_cal / col_cal) or its inverse.
+
+**Parameters:**
+
+- **chs** : *const QList&lt; FIFFLIB::FiffChInfo &gt; &*
+  Channel information used for calibration factors.
+
+- **nch** : *int*
+  Number of channels.
+
+- **do_it** : *bool*
+  If true, apply calibration; if false, remove it.
+
+**Returns:**
+
+- *int* — OK on success, FAIL if a channel is not found.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

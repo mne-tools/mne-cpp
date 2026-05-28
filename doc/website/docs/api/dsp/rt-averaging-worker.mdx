@@ -1,0 +1,174 @@
+---
+id: rt-averaging-worker
+title: "RTPROCESSINGLIB::RtAveragingWorker"
+sidebar_label: RtAveragingWorker
+sidebar_position: 31
+---
+
+# RtAveragingWorker
+
+**Namespace:** `RTPROCESSINGLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Header:** `dsp/rt/rt_averaging.h`
+
+`#include <dsp/rt_averaging.h>`
+
+```cpp
+class RTPROCESSINGLIB::RtAveragingWorker
+```
+
+Real-time averaging worker.
+
+Background worker thread that accumulates and averages epochs in real time.
+
+---
+
+## Public Methods
+
+### RtAveragingWorker(numAverages, iPreStimSamples, iPostStimSamples, iBaselineFromMSecs, iBaselineToMSecs, iTriggerIndex, pFiffInfo)
+
+Creates the real-time averaging object.
+
+**Parameters:**
+
+- **numAverages** : *quint32*
+  Number of evkos to average.
+
+- **iPreStimSamples** : *quint32*
+  Number of samples averaged before the stimulus.
+
+- **iPostStimSamples** : *quint32*
+  Number of samples averaged after the stimulus (including the stimulus).
+
+- **iBaselineFromMSecs** : *quint32*
+  Start of baseline area which was/is used for correction in msecs.
+
+- **iBaselineToMSecs** : *quint32*
+  End of baseline area which was/is used for correction in msecs.
+
+- **iTriggerIndex** : *quint32*
+  Row in dex of channel which is to be scanned for triggers.
+
+- **pFiffInfo** : *FIFFLIB::FiffInfo::SPtr*
+  Associated Fiff Information.
+
+---
+
+### doWork(matData)
+
+Perform one averaging step on new incoming data.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Data to average.
+
+---
+
+### setAverageNumber(numAve)
+
+Sets the number of averages.
+
+**Parameters:**
+
+- **numAve** : *qint32*
+  new number of averages.
+
+---
+
+### setPreStim(samples, secs)
+
+Sets the number of pre stimulus samples.
+
+**Parameters:**
+
+- **samples** : *qint32*
+  new number of pre stimulus samples.
+
+- **secs** : *qint32*
+  new number of pre stimulus seconds.
+
+---
+
+### setPostStim(samples, secs)
+
+Sets the number of post stimulus samples.
+
+**Parameters:**
+
+- **samples** : *qint32*
+  new number of post stimulus samples.
+
+- **secs** : *qint32*
+  new number of pre stimulus seconds.
+
+---
+
+### setTriggerChIndx(idx)
+
+Sets the index of the trigger channel which is to be scanned fo triggers.
+
+**Parameters:**
+
+- **idx** : *qint32*
+  trigger channel index.
+
+---
+
+### setArtifactReduction(mapThresholds)
+
+Sets the artifact reduction.
+
+**Parameters:**
+
+- **mapThresholds** : *const QMap&lt; QString, double &gt; &*
+  The new map including the current thresholds for the channels.
+
+---
+
+### setBaselineActive(activate)
+
+Sets the baseline correction on or off.
+
+**Parameters:**
+
+- **activate** : *bool*
+  activate baseline correction.
+
+---
+
+### setBaselineFrom(fromSamp, fromMSec)
+
+Sets the from mSeconds of the baseline area.
+
+**Parameters:**
+
+- **fromSamp** : *int*
+  from of baseline area in samples.
+
+- **fromMSec** : *int*
+  from of baseline area in mSeconds.
+
+---
+
+### setBaselineTo(toSamp, toMSec)
+
+Sets the to mSeconds of the baseline area.
+
+**Parameters:**
+
+- **toSamp** : *int*
+  to of baseline area in samples.
+
+- **toMSec** : *int*
+  to of baseline area in mSeconds.
+
+---
+
+### reset()
+
+Resets the averaged data stored.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

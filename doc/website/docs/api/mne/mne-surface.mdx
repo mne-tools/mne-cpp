@@ -1,0 +1,352 @@
+---
+id: mne-surface
+title: "MNELIB::MNESurface"
+sidebar_label: MNESurface
+sidebar_position: 53
+---
+
+# MNESurface
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_surface.h`
+
+`#include <mne/mne_surface.h>`
+
+```cpp
+class MNELIB::MNESurface
+```
+
+Implements the `MNE` FsSurface (Replaces typedef mneSurfaceOrVolume mneSurface; struct of MNE-C `mne_types.h`).
+
+Lightweight triangulated surface (vertices, triangles, normals).
+
+---
+
+## Public Methods
+
+### MNESurface()
+
+Constructs the `MNE` FsSurface.
+
+---
+
+### ~MNESurface()
+
+Destroys the `MNE` FsSurface.
+
+---
+
+### sum_solids(from)
+
+Sum the solid angles of all triangles as seen from a given point.
+
+~4pi if inside, ~0 if outside.
+
+**Parameters:**
+
+- **from** : *const Eigen::Vector3f &*
+  The test point.
+
+**Returns:**
+
+- *double* — Total solid angle in steradians.
+
+---
+
+### triangle_coords(r, tri, x, y, z)
+
+Compute barycentric-like coordinates of a point relative to a triangle.
+
+**Parameters:**
+
+- **r** : *const Eigen::Vector3f &*
+  The point.
+
+- **tri** : *int*
+  Triangle index.
+
+- **x** : *float &*
+  Barycentric coordinate along first edge.
+
+- **y** : *float &*
+  Barycentric coordinate along second edge.
+
+- **z** : *float &*
+  Signed perpendicular distance from the plane.
+
+---
+
+### nearest_triangle_point(r, user, tri, x, y, z)
+
+Find the nearest point on a triangle to a given point.
+
+**Parameters:**
+
+- **r** : *const Eigen::Vector3f &*
+  The point.
+
+- **user** : *const MNEProjData **
+  Optional `MNEProjData` restricting active triangles (may be NULL).
+
+- **tri** : *int*
+  Triangle index.
+
+- **x** : *float &*
+  Coordinate along first edge.
+
+- **y** : *float &*
+  Coordinate along second edge.
+
+- **z** : *float &*
+  Distance from the triangle.
+
+**Returns:**
+
+- *int* — TRUE if the triangle is active, FALSE if inactive.
+
+---
+
+### nearest_triangle_point(r, tri, x, y, z)
+
+Find the nearest point on a triangle (simplified, no projection data).
+
+**Parameters:**
+
+- **r** : *const Eigen::Vector3f &*
+  The point.
+
+- **tri** : *int*
+  Triangle index.
+
+- **x** : *float &*
+  Coordinate along first edge.
+
+- **y** : *float &*
+  Coordinate along second edge.
+
+- **z** : *float &*
+  Distance from the triangle.
+
+**Returns:**
+
+- *int* — TRUE always.
+
+---
+
+### project_to_triangle(tri, p, q)
+
+Compute 3D position on a triangle from barycentric coordinates.
+
+**Parameters:**
+
+- **tri** : *int*
+  Triangle index.
+
+- **p** : *float*
+  Barycentric coordinate along first edge.
+
+- **q** : *float*
+  Barycentric coordinate along second edge.
+
+**Returns:**
+
+- *Eigen::Vector3f* — The 3D point on the triangle.
+
+---
+
+### project_to_triangle(best, r)
+
+Find the nearest point on a given triangle and return the projected 3D coordinates.
+
+**Parameters:**
+
+- **best** : *int*
+  Triangle index.
+
+- **r** : *const Eigen::Vector3f &*
+  The source point.
+
+**Returns:**
+
+- *Eigen::Vector3f* — The projected 3D point.
+
+---
+
+### project_to_surface(proj_data, r, distp)
+
+Project a point onto the nearest triangle of the surface.
+
+**Parameters:**
+
+- **proj_data** : *const MNEProjData **
+  Optional `MNEProjData` restricting active triangles (may be NULL).
+
+- **r** : *const Eigen::Vector3f &*
+  The 3D point to project.
+
+- **distp** : *float &*
+  Receives the signed distance to the surface.
+
+**Returns:**
+
+- *int* — Index of the closest triangle, or -1 if none found.
+
+---
+
+### find_closest_on_surface_approx(r, np, nearest_tri, dist, nstep)
+
+For each point, find the closest point on the surface using neighborhood-restricted search.
+
+**Parameters:**
+
+- **r** : *const PointsT &*
+  Array of np point coordinates.
+
+- **np** : *int*
+  Number of points.
+
+- **nearest_tri** : *Eigen::VectorXi &*
+  Best triangle index for each point.
+
+- **dist** : *Eigen::VectorXf &*
+  Distance to the surface for each point.
+
+- **nstep** : *int*
+  Number of neighborhood expansion steps.
+
+---
+
+### decide_search_restriction(p, approx_best, nstep, r)
+
+Set up the triangle activation mask for a restricted surface search.
+
+**Parameters:**
+
+- **p** : *MNEProjData &*
+  The projection data whose mask is set.
+
+- **approx_best** : *int*
+  Approximate best triangle, or negative for brute-force.
+
+- **nstep** : *int*
+  Neighborhood expansion levels.
+
+- **r** : *const Eigen::Vector3f &*
+  The query point.
+
+---
+
+### activate_neighbors(start, act, nstep)
+
+Recursively mark neighboring triangles as active.
+
+**Parameters:**
+
+- **start** : *int*
+  Starting vertex index.
+
+- **act** : *Eigen::VectorXi &*
+  Triangle activation array.
+
+- **nstep** : *int*
+  Recursive expansion steps.
+
+---
+
+## Static Methods
+
+### read_bem_surface(name, which, add_geometry)
+
+Read a BEM surface from a FIFF file (excess-neighbor checking enabled).
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Path to the BEM FIFF file.
+
+- **which** : *int*
+  FsSurface ID to load (-1 loads the first found).
+
+- **add_geometry** : *bool*
+  If true, compute full geometry info.
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNESurface &gt;* — The loaded surface, or nullptr on failure. Caller takes ownership.
+
+---
+
+### read_bem_surface(name, which, add_geometry, sigma)
+
+Read a BEM surface from a FIFF file (excess-neighbor checking enabled).
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Path to the BEM FIFF file.
+
+- **which** : *int*
+  FsSurface ID to load (-1 loads the first found).
+
+- **add_geometry** : *bool*
+  If true, compute full geometry info.
+
+- **sigma** : *float &*
+  Receives the surface conductivity.
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNESurface &gt;* — The loaded surface, or nullptr on failure. Caller takes ownership.
+
+---
+
+### read_bem_surface2(name, which, add_geometry)
+
+Read a BEM surface from a FIFF file (excess-neighbor checking disabled).
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Path to the BEM FIFF file.
+
+- **which** : *int*
+  FsSurface ID to load (-1 loads the first found).
+
+- **add_geometry** : *bool*
+  If true, compute full geometry info.
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNESurface &gt;* — The loaded surface, or nullptr on failure. Caller takes ownership.
+
+---
+
+### read_bem_surface(name, which, add_geometry, sigma, check_too_many_neighbors)
+
+Read a BEM surface from a FIFF file.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Path to the BEM FIFF file.
+
+- **which** : *int*
+  FsSurface ID to load (-1 loads the first found).
+
+- **add_geometry** : *bool*
+  If true, compute full geometry info.
+
+- **sigma** : *float &*
+  Receives the surface conductivity.
+
+- **check_too_many_neighbors** : *bool*
+  Fail on excess neighbor count.
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNESurface &gt;* — The loaded surface, or nullptr on failure. Caller takes ownership.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

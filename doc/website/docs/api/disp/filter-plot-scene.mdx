@@ -1,0 +1,59 @@
+---
+id: filter-plot-scene
+title: "DISPLIB::FilterPlotScene"
+sidebar_label: FilterPlotScene
+sidebar_position: 30
+---
+
+# FilterPlotScene
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/helpers/filterplotscene.h`
+
+`#include <disp/filterplotscene.h>`
+
+```cpp
+class DISPLIB::FilterPlotScene
+```
+
+QGraphicsScene rendering the magnitude (and optional phase) response of a designed FIR / IIR filter.
+
+Used by `FilterDesignView` to preview the currently designed filter; re-renders itself every time the host view edits a kernel parameter.
+
+---
+
+## Public Methods
+
+### FilterPlotScene(view, parent)
+
+Constructs a `FilterPlotScene` dialog which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QObject **
+  pointer to parent widget; If parent is 0, the new `FilterPlotScene` becomes a window. If parent is another widget, `FilterPlotScene` becomes a child window inside parent. `FilterPlotScene` is deleted when its parent is deleted.
+
+---
+
+### updateFilter(operatorFilter, samplingFreq, cutOffLow, cutOffHigh)
+
+Updates the current filter.
+
+**Parameters:**
+
+- **operatorFilter** : *const UTILSLIB::FilterKernel &*
+  pointer to the current filter operator which is to be plotted.
+
+- **samplingFreq** : *int*
+  holds the current sampling frequency.
+
+- **cutOffLow** : *int*
+  cut off frequqency lowpass or lower cut off when filter is a bandpass.
+
+- **cutOffHigh** : *int*
+  cut off frequqency highpass or higher cut off when filter is a bandpass.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

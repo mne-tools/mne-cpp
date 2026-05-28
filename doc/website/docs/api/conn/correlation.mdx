@@ -1,0 +1,53 @@
+---
+id: correlation
+title: "CONNLIB::Correlation"
+sidebar_label: Correlation
+sidebar_position: 11
+---
+
+# Correlation
+
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Header:** `conn/metrics/correlation.h`
+
+`#include <conn/correlation.h>`
+
+```cpp
+class CONNLIB::Correlation
+```
+
+Computes the trial-averaged Pearson correlation coefficient between every channel pair from the raw time-domain trial data.
+
+Per-trial correlation matrices are computed in parallel via `QtConcurrent::mappedReduced` and summed in `reduce`. The result is a symmetric matrix in ``[-1, 1]; it is broadband, zero-lag and does not reject volume conduction, so it is mainly useful as a baseline against the spectral and phase-based estimators.
+
+Pearson correlation estimator; broadband, zero-lag time-domain baseline.
+
+---
+
+## Public Methods
+
+### Correlation()
+
+Constructs a `Correlation` object.
+
+---
+
+## Static Methods
+
+### calculate(connectivitySettings)
+
+Calculates the correlation coefficient between the rows of the data matrix.
+
+**Parameters:**
+
+- **connectivitySettings** : *ConnectivitySettings &*
+  The input data and parameters.
+
+**Returns:**
+
+- *Network* — The connectivity information in form of a network structure.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

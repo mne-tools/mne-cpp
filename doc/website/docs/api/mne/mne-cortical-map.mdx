@@ -1,0 +1,59 @@
+---
+id: mne-cortical-map
+title: "MNELIB::MNECorticalMap"
+sidebar_label: MNECorticalMap
+sidebar_position: 13
+---
+
+# MNECorticalMap
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_cortical_map.h`
+
+`#include <mne/mne_cortical_map.h>`
+
+```cpp
+class MNELIB::MNECorticalMap
+```
+
+Cortical map interpolation: creates a mapping matrix that transforms sensor-level data to source space using forward and inverse operators.
+
+Cortical map interpolation utilities
+
+---
+
+## Public Methods
+
+### MNECorticalMap()
+
+---
+
+## Static Methods
+
+### makeCorticalMap(fwd, inv, info)
+
+Create a cortical mapping matrix that transforms sensor-level data to source space.
+
+The mapping is computed as: M = inv_kernel * fwd_gain^T
+
+where inv_kernel is the inverse operator kernel and fwd_gain is the forward solution gain matrix.
+
+**Parameters:**
+
+- **fwd** : *const MNEForwardSolution &*
+  The forward solution containing the gain matrix.
+
+- **inv** : *const MNEInverseOperator &*
+  The inverse operator (must have been prepared / have a kernel).
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  The measurement info for channel selection.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — The cortical mapping matrix (nSources x nSources).
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

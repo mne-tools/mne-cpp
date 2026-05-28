@@ -1,0 +1,40 @@
+---
+id: fiff-coord-trans-set
+title: "FIFFLIB::FiffCoordTransSet"
+sidebar_label: FiffCoordTransSet
+sidebar_position: 14
+---
+
+# FiffCoordTransSet
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_coord_trans_set.h`
+
+`#include <fiff/fiff_coord_trans_set.h>`
+
+```cpp
+class FIFFLIB::FiffCoordTransSet
+```
+
+Container for the FIFF coordinate transforms found in (or written to) a FIFFB_MRI / FIFFB_HPI_MEAS block.
+
+Owns the list of `FiffCoordTrans` and the metadata that travels with them (fiducial points, registration comments). Provides lookup by (`from`, `to`) frame pair so consumers can ask for, e.g., `FIFFV_COORD_HEAD` → `FIFFV_COORD_MRI` without iterating manually.
+
+---
+
+## Public Methods
+
+### FiffCoordTransSet()
+
+Constructs the `FiffCoordTransSet`.
+
+---
+
+### ~FiffCoordTransSet()
+
+Destroys the `FiffCoordTransSet`.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,86 @@
+---
+id: stats-source-metrics
+title: "STSLIB::StatsSourceMetrics"
+sidebar_label: StatsSourceMetrics
+sidebar_position: 6
+---
+
+# StatsSourceMetrics
+
+**Namespace:** `STATSLIB` &nbsp;·&nbsp; **Library:** Statistics Library &nbsp;·&nbsp; **Header:** `sts/sts_source_metrics.h`
+
+`#include <sts/sts_source_metrics.h>`
+
+```cpp
+class STSLIB::StatsSourceMetrics
+```
+
+Source-space evaluation metrics for inverse solutions.
+
+Provides peak localization error (PE) and spatial dispersion (SD) as defined in Lin et al. (2006) and used for CMNE evaluation in Dinh et al. (2021).
+
+Peak localisation error and spatial dispersion metrics for evaluating distributed M/EEG inverse solutions.
+
+---
+
+## Static Methods
+
+### peakLocalizationError(truePos, estimatedPos)
+
+Peak localization error (Euclidean distance between true and estimated peak).
+
+**Parameters:**
+
+- **truePos** : *const Eigen::Vector3d &*
+  True source position (3D).
+
+- **estimatedPos** : *const Eigen::Vector3d &*
+  Estimated source position (3D).
+
+**Returns:**
+
+- *double* — Distance (same unit as input, typically mm).
+
+---
+
+### spatialDispersion(sourceAmplitudes, sourcePositions, peakIndex)
+
+Spatial dispersion (amplitude-weighted mean distance from peak).
+
+SD = sum_k |a_k| * d(k, peak) / sum_k |a_k|
+
+**Parameters:**
+
+- **sourceAmplitudes** : *const Eigen::VectorXd &*
+  Source amplitudes (n_sources).
+
+- **sourcePositions** : *const Eigen::MatrixXd &*
+  Source positions (n_sources x 3).
+
+- **peakIndex** : *int*
+  Index of the peak source.
+
+**Returns:**
+
+- *double* — Spatial dispersion value (same unit as positions).
+
+---
+
+### findPeakIndex(sourceAmplitudes)
+
+Find the index of the source with maximum absolute amplitude.
+
+**Parameters:**
+
+- **sourceAmplitudes** : *const Eigen::VectorXd &*
+  Source amplitudes (n_sources).
+
+**Returns:**
+
+- *int* — Index of the peak source.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

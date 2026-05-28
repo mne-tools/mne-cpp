@@ -1,0 +1,244 @@
+---
+id: fiff-info-base
+title: "FIFFLIB::FiffInfoBase"
+sidebar_label: FiffInfoBase
+sidebar_position: 25
+---
+
+# FiffInfoBase
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_info_base.h`
+
+`#include <fiff/fiff_info_base.h>`
+
+```cpp
+class FIFFLIB::FiffInfoBase
+```
+
+Stripped FIFF measurement info: channel list, sampling rate, device→head transform and bad-channel list.
+
+Owns just the fields needed to interpret a data matrix: `chs`, `ch_names`, `nchan`, `sfreq`, `bads`, `dev_head_t`, `ctf_head_t`. Base class of `FiffInfo`, used directly when the rest of the acquisition metadata is not available (e.g. realtime client streams, trimmed evoked files).
+
+---
+
+## Public Methods
+
+### FiffInfoBase()
+
+Constructors the light fiff measurement file information.
+
+---
+
+### FiffInfoBase(p_FiffInfoBase)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FiffInfoBase** : *const FiffInfoBase &*
+  light FIFF measurement information which should be copied.
+
+---
+
+### ~FiffInfoBase()
+
+Destroys the light fiff measurement file information.
+
+---
+
+### clear()
+
+Initializes light FIFF measurement information.
+
+---
+
+### channel_type(idx)
+
+Get channel type.
+
+**Parameters:**
+
+- **idx** : *qint32*
+  Index of channel.
+
+**Returns:**
+
+- *QString* — Type of channel ('grad', 'mag', 'eeg', 'stim', 'eog', 'emg', 'ecg').
+
+---
+
+### isEmpty()
+
+True if FIFF measurement file information is empty.
+
+**Returns:**
+
+- *bool* — true if FIFF measurement file information is empty.
+
+---
+
+### pick_info(sel)
+
+fiff_pick_info
+
+Pick desired channels from measurement info
+
+**Parameters:**
+
+- **sel** : *const Eigen::RowVectorXi **
+  List of channels to select.
+
+**Returns:**
+
+- *FiffInfoBase* — Info modified according to sel.
+
+---
+
+### pick_types(meg, eeg, stim, include, exclude)
+
+fiff_pick_types (highy diversity in meg picking)
+
+Create a selector to pick desired channel types from data
+
+**Parameters:**
+
+- **meg** : *const QString*
+  It can be "all", to select all or it can be "mag" or "grad" to select only gradiometers or magnetometers.
+
+- **eeg** : *bool*
+  Include EEG channels.
+
+- **stim** : *bool*
+  Include stimulus channels.
+
+- **include** : *const QStringList &*
+  Additional channels to include (if empty, do not add any).
+
+- **exclude** : *const QStringList &*
+  Channels to exclude (if empty, do not exclude any).
+
+**Returns:**
+
+- *Eigen::RowVectorXi* — the selector matrix (row vector).
+
+---
+
+### pick_types(meg, eeg, stim, include, exclude)
+
+fiff_pick_types
+
+Create a selector to pick desired channel types from data Use overloaded pick_types method to specify meg (grad, mag, ref_meg)type
+
+**Parameters:**
+
+- **meg** : *bool*
+  Include MEG channels.
+
+- **eeg** : *bool*
+  Include EEG channels.
+
+- **stim** : *bool*
+  Include stimulus channels.
+
+- **include** : *const QStringList &*
+  Additional channels to include (if empty, do not add any).
+
+- **exclude** : *const QStringList &*
+  Channels to exclude (if empty, do not exclude any).
+
+**Returns:**
+
+- *Eigen::RowVectorXi* — the selector matrix (row vector).
+
+---
+
+### mne_read_meg_comp_eeg_ch_info(megp, nmegp, meg_compp, nmeg_compp, eegp, neegp, meg_head_t, idp)
+
+Read MEG, compensation, and EEG channel information from this measurement info.
+
+Classifies channels by kind (FIFFV_MEG_CH, FIFFV_REF_MEG_CH, FIFFV_EEG_CH) and returns the device-to-head transform and measurement ID.
+
+**Parameters:**
+
+- **megp** : *QList&lt; FiffChInfo &gt; &*
+  List of MEG channel info descriptors.
+
+- **nmegp** : *int &*
+  Number of MEG channels found.
+
+- **meg_compp** : *QList&lt; FiffChInfo &gt; &*
+  List of MEG compensation (reference) channel info descriptors.
+
+- **nmeg_compp** : *int &*
+  Number of compensation channels found.
+
+- **eegp** : *QList&lt; FiffChInfo &gt; &*
+  List of EEG channel info descriptors.
+
+- **neegp** : *int &*
+  Number of EEG channels found.
+
+- **meg_head_t** : *FiffCoordTrans &*
+  Device-to-head coordinate transformation.
+
+- **idp** : *FiffId &*
+  Measurement ID.
+
+---
+
+### get_channel_types()
+
+Parses the channel info information and returns a string list of channel types.
+
+**Returns:**
+
+- *QStringList* — The channel types present in this fiff info (grad,mag,eeg,ecg,emg,misc,stim).
+
+---
+
+## Static Methods
+
+### pick_channels(ch_names, include, exclude)
+
+fiff_pick_channels
+
+Make a selector to pick desired channels from data
+
+**Parameters:**
+
+- **ch_names** : *const QStringList &*
+  - The channel name list to consult.
+
+- **include** : *const QStringList &*
+  - Channels to include (if empty, include all available).
+
+- **exclude** : *const QStringList &*
+  - Channels to exclude (if empty, do not exclude any).
+
+**Returns:**
+
+- *Eigen::RowVectorXi* — the selector matrix (row Vector).
+
+---
+
+### readBadChannelsFromFile(name, listOut)
+
+Read bad channel names from a plain text file (one name per line, '#' comments skipped).
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Path to the bad channel file (empty string is a no-op).
+
+- **listOut** : *QStringList &*
+  The bad channel names read from the file.
+
+**Returns:**
+
+- *bool* — true on success, false on error.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

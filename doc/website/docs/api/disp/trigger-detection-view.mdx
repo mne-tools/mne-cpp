@@ -1,0 +1,93 @@
+---
+id: trigger-detection-view
+title: "DISPLIB::TriggerDetectionView"
+sidebar_label: TriggerDetectionView
+sidebar_position: 66
+---
+
+# TriggerDetectionView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/triggerdetectionview.h`
+
+`#include <disp/triggerdetectionview.h>`
+
+```cpp
+class DISPLIB::TriggerDetectionView
+```
+
+Stim-channel chooser plus threshold spinbox for on-line trigger detection.
+
+Picks the stim channel to monitor, sets the rising-edge threshold and resets the detected-event list; detected events feed the averaging pipeline and the `ChannelDataView` trigger overlay.
+
+---
+
+## Public Methods
+
+### TriggerDetectionView(sSettingsPath, parent, f)
+
+Constructs a `TriggerDetectionView` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  parent of widget.
+
+---
+
+### ~TriggerDetectionView()
+
+Destroys the `TriggerDetectionView`.
+
+---
+
+### init(pFiffInfo)
+
+Init the view.
+
+---
+
+### setNumberDetectedTriggersAndTypes(totalNumberDetections, mapDetectedTriggers)
+
+Set total number of detected triggers and trigger types.
+
+**Parameters:**
+
+- **totalNumberDetections** : *int*
+  The numger of detected triggers.
+
+- **mapDetectedTriggers** : *const QMap&lt; int, QList&lt; QPair&lt; int, double &gt; &gt; &gt; &*
+  The currently detected triggers.
+
+---
+
+### getSelectedStimChannel()
+
+Gets currently selected STIM channel in GUI.
+
+**Returns:**
+
+- *QString* — currently selected STIM channel.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

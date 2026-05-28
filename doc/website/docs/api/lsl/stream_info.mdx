@@ -1,0 +1,72 @@
+---
+id: stream_info
+title: "LSLLIB::stream_info"
+sidebar_label: stream_info
+sidebar_position: 1
+---
+
+# stream_info
+
+**Namespace:** `LSLLIB` &nbsp;·&nbsp; **Library:** LSL Library &nbsp;·&nbsp; **Header:** `lsl/lsl_stream_info.h`
+
+`#include <lsl/lsl_stream_info.h>`
+
+```cpp
+class LSLLIB::stream_info
+```
+
+Value-type descriptor of a single LSL stream: semantic metadata plus transport endpoint, API-compatible with liblsl's `stream_info`.
+
+---
+
+## Public Methods
+
+### stream_info()
+
+Default constructor.
+
+Creates an empty / invalid `stream_info`.
+
+---
+
+### stream_info(name, type, channel_count, nominal_srate, channel_format, source_id)
+
+Construct a new `stream_info` object.
+
+**Parameters:**
+
+- **name** : *const std::string &*
+  Name of the stream (e.g. "EEG" or "MoCap").
+
+- **type** : *const std::string &*
+  Content type of the stream (e.g. "EEG", "Markers").
+
+- **channel_count** : *int*
+  Number of channels in the stream.
+
+- **nominal_srate** : *double*
+  The nominal sampling rate (Hz). Use 0.0 for irregular streams.
+
+- **channel_format** : *ChannelFormat*
+  Data format of a channel (default: cf_float32).
+
+- **source_id** : *const std::string &*
+  A unique identifier for the device or source that generates the stream.
+
+---
+
+### stream_info(other)
+
+Copy constructor.
+
+---
+
+### operator=(other)
+
+Copy assignment operator.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

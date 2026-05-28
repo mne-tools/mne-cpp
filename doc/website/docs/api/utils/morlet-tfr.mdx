@@ -1,0 +1,86 @@
+---
+id: morlet-tfr
+title: "UTILSLIB::MorletTfr"
+sidebar_label: MorletTfr
+sidebar_position: 32
+---
+
+# MorletTfr
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/morlet_tfr.h`
+
+`#include <utils/morlet_tfr.h>`
+
+```cpp
+class UTILSLIB::MorletTfr
+```
+
+Complex Morlet wavelet time-frequency representation.
+
+For each requested centre frequency f the signal is convolved (via FFT) with a complex Morlet wavelet whose time-domain standard deviation is σ_t = nCycles / (2π·f) The instantaneous power at every time sample is |convolution|².
+
+```cpp
+// 30 log-spaced frequencies from 4 to 80 Hz, 7 cycles per wavelet
+RowVectorXd freqs = RowVectorXd::LinSpaced(30, 4.0, 80.0);
+MorletTfrResult r = MorletTfr::compute(vecSignal, 600.0, freqs);
+// r.matPower → 30 × n_samples instantaneous-power map
+```
+
+---
+
+## Static Methods
+
+### compute(vecData, dSFreq, vecFreqs, dNCycles)
+
+Compute Morlet TFR for a single channel time series.
+
+**Parameters:**
+
+- **vecData** : *const Eigen::RowVectorXd &*
+  Single-channel data row vector (1 × n_samples).
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+- **vecFreqs** : *const Eigen::RowVectorXd &*
+  Centre frequencies in Hz (row vector).
+
+- **dNCycles** : *double*
+  Number of wavelet cycles (controls time–frequency trade-off; default 7).
+
+**Returns:**
+
+- *MorletTfrResult* — `MorletTfrResult` with matPower (n_freqs × n_samples).
+
+---
+
+### computeMultiChannel(matData, dSFreq, vecFreqs, dNCycles, vecPicks)
+
+Compute Morlet TFR for every (selected) channel of a data matrix.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Data matrix (n_channels × n_samples).
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+- **vecFreqs** : *const Eigen::RowVectorXd &*
+  Centre frequencies in Hz.
+
+- **dNCycles** : *double*
+  Number of wavelet cycles (default 7).
+
+- **vecPicks** : *const Eigen::RowVectorXi &*
+  Channel row indices; empty = all channels.
+
+**Returns:**
+
+- *QVector&lt; MorletTfrResult &gt;* — One `MorletTfrResult` per selected channel.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,240 @@
+---
+id: average-layout-view
+title: "DISPLIB::AverageLayoutView"
+sidebar_label: AverageLayoutView
+sidebar_position: 4
+---
+
+# AverageLayoutView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/averagelayoutview.h`
+
+`#include <disp/averagelayoutview.h>`
+
+```cpp
+class DISPLIB::AverageLayoutView
+```
+
+Sensor-layout viewer drawing per-channel evoked traces at their physical 2-D positions.
+
+Wraps a `QGraphicsView` around an `AverageScene` fed by an `EvokedSetModel` and a `ChannelInfoModel`; selection groups are pushed in as `SelectionItem` to show only a subset of channels.
+
+---
+
+## Public Methods
+
+### AverageLayoutView(sSettingsPath, parent, f)
+
+Constructs a `AverageLayoutView` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  parent of widget.
+
+---
+
+### ~AverageLayoutView()
+
+Destroys the `AverageLayoutView`.
+
+---
+
+### updateViewport()
+
+Update the viewport.
+
+This, e.g., necessary if this widget was set to a QDockWidget which changes its floating state.
+
+---
+
+### setChannelInfoModel(pChannelInfoModel)
+
+Sets the channel info model.
+
+**Parameters:**
+
+- **pChannelInfoModel** : *QSharedPointer&lt;ChannelInfoModel&gt; &*
+  The new channel info model.
+
+---
+
+### setEvokedSetModel(pEvokedSetModel)
+
+Sets the evoked set model.
+
+**Parameters:**
+
+- **pEvokedSetModel** : *QSharedPointer&lt;EvokedSetModel&gt;*
+  The new evoked set model.
+
+---
+
+### getEvokedSetModel()
+
+Returns the currently set `EvokedSetModel`.
+
+**Returns:**
+
+- *QSharedPointer&lt;EvokedSetModel&gt;* — the currently set `EvokedSetModel`.
+
+---
+
+### setBackgroundColor(backgroundColor)
+
+Sets the background color of the scene.
+
+**Parameters:**
+
+- **backgroundColor** : *const QColor &*
+  The new background color.
+
+---
+
+### getBackgroundColor()
+
+Returns the background color of the scene.
+
+**Returns:**
+
+- *QColor* — The current background color.
+
+---
+
+### takeScreenshot(fileName)
+
+Renders a screenshot of the scene and saves it to the passed path.
+
+SVG and PNG supported.
+
+**Parameters:**
+
+- **fileName** : *const QString &*
+  The file name and path where to store the screenshot.
+
+---
+
+### setScaleMap(scaleMap)
+
+Sets the scale map to scaleMap.
+
+**Parameters:**
+
+- **scaleMap** : *const QMap&lt; qint32, float &gt; &*
+  map with all channel types and their current scaling value.
+
+---
+
+### getAverageColor()
+
+Get the current average colors.
+
+**Returns:**
+
+- *QSharedPointer&lt; QMap&lt; QString, QColor &gt; &gt;* — Pointer to the current average colors.
+
+---
+
+### getAverageActivation()
+
+Get the current average activations.
+
+**Returns:**
+
+- *QSharedPointer&lt; QMap&lt; QString, bool &gt; &gt;* — Pointer to the current average activations.
+
+---
+
+### setAverageColor(qMapAverageColor)
+
+Set the average colors.
+
+**Parameters:**
+
+- **qMapAverageColor** : *const QSharedPointer&lt; QMap&lt; QString, QColor &gt; &gt;*
+  Pointer to the new average colors.
+
+---
+
+### setSingleAverageColor(avgColor)
+
+Sets the color used to draw the average to avgColor.
+
+**Parameters:**
+
+- **avgColor** : *const QColor &*
+  Color of averaged signal.
+
+---
+
+### setAverageActivation(qMapAverageActivation)
+
+Set the average activations.
+
+**Parameters:**
+
+- **qMapAverageActivation** : *const QSharedPointer&lt; QMap&lt; QString, bool &gt; &gt;*
+  Pointer to the new average activations.
+
+---
+
+### setFiffInfo(pFiffInfo)
+
+Stores FiffInfo to local variable to be used for getting channel info.
+
+**Parameters:**
+
+- **pFiffInfo** : *const QSharedPointer&lt;FIFFLIB::FiffInfo&gt;*
+  shared pointer to Fiff Info of currently loaded data.
+
+---
+
+### channelSelectionManagerChanged(selectedChannelItems)
+
+call this whenever the external channel selection manager changes
+
+**Parameters:**
+
+- **selectedChannelItems** : *const QList&lt; QGraphicsItem * &gt; &*
+  list of selected graphic items
+
+---
+
+### channelSelectionChanged(data)
+
+Sets the currently viewable channels using the corrent name and location parameters.
+
+**Parameters:**
+
+- **data** : *const QVariant &*
+  QVariant containing a `SelectionItem` object with selected channel information.
+
+---
+
+### updateData()
+
+call this function whenever the items' data needs to be updated
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

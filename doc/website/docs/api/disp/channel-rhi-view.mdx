@@ -1,0 +1,422 @@
+---
+id: channel-rhi-view
+title: "DISPLIB::ChannelRhiView"
+sidebar_label: ChannelRhiView
+sidebar_position: 17
+---
+
+# ChannelRhiView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/helpers/channelrhiview.h`
+
+`#include <disp/channelrhiview.h>`
+
+```cpp
+class DISPLIB::ChannelRhiView
+```
+
+QRhi-based GPU-accelerated channel time-series renderer used by the modern raw browser.
+
+Manages its own pipeline, samplers, resource bindings and a small `CrosshairOverlay` for the time / amplitude cursor; exposes callbacks for the host `ChannelDataView` to push samples, change scaling or update the visible window.
+
+---
+
+## Public Methods
+
+### ChannelRhiView(parent)
+
+---
+
+### ~ChannelRhiView()
+
+---
+
+### setModel(model)
+
+Attach the data model.
+
+The view does NOT take ownership.
+
+**Parameters:**
+
+- **model** : *ChannelDataModel **
+  The channel data model to render.
+
+---
+
+### setEvents(events)
+
+Set the list of stimulus / event markers to overlay on the traces.
+
+Each marker is drawn as a coloured vertical line spanning all channel rows, with a small colour-coded label chip at the bottom of the view. Pass an empty vector to clear all markers.
+
+**Parameters:**
+
+- **events** : *const QVector&lt; EventMarker &gt; &*
+  List of `EventMarker` objects.
+
+---
+
+### setEpochMarkers(triggerSamples)
+
+---
+
+### setEpochMarkersVisible(visible)
+
+---
+
+### epochMarkersVisible()
+
+---
+
+### setClippingVisible(visible)
+
+---
+
+### clippingVisible()
+
+---
+
+### setZScoreMode(enabled)
+
+---
+
+### zScoreMode()
+
+---
+
+### setAnnotations(annotations)
+
+Set the list of time-span annotations to overlay on the traces.
+
+**Parameters:**
+
+- **annotations** : *const QVector&lt; AnnotationSpan &gt; &*
+  List of `AnnotationSpan` objects.
+
+---
+
+### setAnnotationSelectionEnabled(enabled)
+
+Enable or disable annotation range selection.
+
+When enabled, Shift+drag emits sampleRangeSelected on mouse release instead of acting as a pure measurement tool.
+
+---
+
+### setEventsVisible(visible)
+
+---
+
+### eventsVisible()
+
+---
+
+### setAnnotationsVisible(visible)
+
+---
+
+### annotationsVisible()
+
+---
+
+### scrollSample()
+
+---
+
+### samplesPerPixel()
+
+---
+
+### setScrollSample(sample)
+
+Set the left-edge scroll position.
+
+Updates only the GPU uniform — no VBO rebuild unless the prefetch window is exhausted.
+
+**Parameters:**
+
+- **sample** : *float*
+  Absolute sample index for the left viewport edge.
+
+---
+
+### setSamplesPerPixel(spp)
+
+Set the horizontal zoom (samples per screen pixel).
+
+Triggers a VBO rebuild with new decimation.
+
+**Parameters:**
+
+- **spp** : *float*
+  Samples per pixel (&gt; 1 = zoomed out, &lt; 1 = zoomed in).
+
+---
+
+### scrollTo(targetSample, durationMs)
+
+Smoothly animate the scroll position.
+
+**Parameters:**
+
+- **targetSample** : *float*
+  Target left-edge sample index.
+
+- **durationMs** : *int*
+  Animation duration in milliseconds (0 = instant).
+
+---
+
+### zoomTo(targetSpp, durationMs)
+
+Smoothly animate the zoom level.
+
+**Parameters:**
+
+- **targetSpp** : *float*
+  Target samples-per-pixel.
+
+- **durationMs** : *int*
+  Animation duration in milliseconds (0 = instant).
+
+---
+
+### setBackgroundColor(color)
+
+Background colour of the render surface.
+
+**Parameters:**
+
+- **color** : *const QColor &*
+  The new background colour.
+
+---
+
+### backgroundColor()
+
+---
+
+### setPrefetchFactor(factor)
+
+How many samples to prefetch beyond the visible window on each side (in multiples of the visible window).
+
+Default = 1.0.
+
+**Parameters:**
+
+- **factor** : *float*
+  Prefetch factor.
+
+---
+
+### visibleFirstSample()
+
+Returns the absolute sample index currently shown at x = 0 (left edge).
+
+(Same as scrollSample rounded to int.)
+
+---
+
+### visibleSampleCount()
+
+Returns the number of samples currently visible.
+
+---
+
+### setChannelIndices(indices)
+
+Restrict rendering to a specific subset of channel indices.
+
+When `indices` is empty all channels in the model are shown (no filter). When set, scrolling and visible-channel-count are relative to this subset.
+
+**Parameters:**
+
+- **indices** : *const QVector&lt; int &gt; &*
+  Ordered list of model channel indices to display. Pass an empty vector to clear the filter.
+
+---
+
+### totalLogicalChannels()
+
+Total number of logical channels available for scrolling (respects active filter).
+
+---
+
+### setFirstVisibleChannel(ch)
+
+Set the index of the first visible channel row.
+
+**Parameters:**
+
+- **ch** : *int*
+  Zero-based channel index (within the active filter if any).
+
+---
+
+### firstVisibleChannel()
+
+---
+
+### setVisibleChannelCount(count)
+
+Set how many channel rows are displayed simultaneously.
+
+**Parameters:**
+
+- **count** : *int*
+  Number of channels to show (clamped to 1–model count).
+
+---
+
+### visibleChannelCount()
+
+---
+
+### setFrozen(frozen)
+
+Freeze or unfreeze drag-panning (mouse drag and inertia).
+
+Wheel scroll and the scrollbar remain active when frozen.
+
+---
+
+### isFrozen()
+
+---
+
+### setGridVisible(visible)
+
+Show or hide the time and amplitude grid overlay.
+
+---
+
+### gridVisible()
+
+---
+
+### setSfreq(sfreq)
+
+Set the sampling frequency (Hz) used to place time-grid tick lines.
+
+Call this from `ChannelDataView::init()` after FiffInfo is available.
+
+---
+
+### setFirstFileSample(first)
+
+Set the absolute sample index of the first sample in the file.
+
+Used to align grid tick lines with the time ruler labels.
+
+**Parameters:**
+
+- **first** : *int*
+  Absolute sample index of the file's first sample.
+
+---
+
+### setLastFileSample(last)
+
+Set the absolute sample index of the last sample in the file.
+
+Used to clamp scrolling so mouse pan cannot exceed the file end. Pass -1 (default) for unlimited.
+
+**Parameters:**
+
+- **last** : *int*
+  Absolute sample index of the file's last sample.
+
+---
+
+### lastFileSample()
+
+---
+
+### setWheelScrollsChannels(channelsMode)
+
+Control what the vertical mouse wheel scrolls.
+
+When `channelsMode` is true the vertical wheel scrolls through channels. When false the vertical wheel scrolls through time (same as horizontal).
+
+**Parameters:**
+
+- **channelsMode** : *bool*
+  true = vertical wheel → channels, false → time.
+
+---
+
+### wheelScrollsChannels()
+
+---
+
+### setScrollSpeedFactor(factor)
+
+---
+
+### scrollSpeedFactor()
+
+---
+
+### setHideBadChannels(hide)
+
+Show or hide waveform traces of channels marked bad.
+
+When `hide` is true bad channels are removed from the logical channel list used for scrolling and rendering so the trace lanes collapse upward in sync with the label panel.
+
+**Parameters:**
+
+- **hide** : *bool*
+  true = remove bad channels from the visible trace list.
+
+---
+
+### hideBadChannels()
+
+---
+
+### setCrosshairEnabled(enabled)
+
+Enable or disable the crosshair cursor overlay.
+
+When enabled, a vertical + horizontal cross follows the mouse and the view continuously emits `cursorDataChanged()` with the time/amplitude under the cursor.
+
+---
+
+### crosshairEnabled()
+
+---
+
+### setClockTimeFormat(useClock)
+
+Set whether the crosshair label uses clock time (mm:ss.ms) or seconds.
+
+---
+
+### clockTimeFormat()
+
+---
+
+### setScalebarsVisible(visible)
+
+Show or hide per-channel-type scalebars in the bottom-right corner.
+
+---
+
+### scalebarsVisible()
+
+---
+
+### setButterflyMode(enabled)
+
+Toggle butterfly mode: all channels of the same type are overlaid in a single lane.
+
+---
+
+### butterflyMode()
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,102 @@
+---
+id: frequency-spectrum-delegate
+title: "DISPLIB::FrequencySpectrumDelegate"
+sidebar_label: FrequencySpectrumDelegate
+sidebar_position: 32
+---
+
+# FrequencySpectrumDelegate
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/helpers/frequencyspectrumdelegate.h`
+
+`#include <disp/frequencyspectrumdelegate.h>`
+
+```cpp
+class DISPLIB::FrequencySpectrumDelegate
+```
+
+QAbstractItemDelegate painting one `SpectrumView` row as a horizontal frequency band.
+
+Maps the per-row FFT amplitudes through a Hot / Jet colour table and draws the resulting pixel strip plus the lower / upper frequency cursors during ``paint()``.
+
+---
+
+## Public Methods
+
+### FrequencySpectrumDelegate(m_pTableView, parent)
+
+Creates a new abstract item delegate with the given parent.
+
+**Parameters:**
+
+- **parent** : *QObject **
+  Parent of the delegate.
+
+---
+
+### setScaleType(ScaleType)
+
+Set scale type.
+
+**Parameters:**
+
+- **ScaleType.**
+
+---
+
+### paint(painter, option, index)
+
+Use the painter and style option to render the item specified by the item index.
+
+(`sizeHint()` must be implemented also)
+
+**Parameters:**
+
+- **painter** : *QPainter **
+  Low-level painting on widgets and other paint devices.
+
+- **option** : *const QStyleOptionViewItem &*
+  Describes the parameters used to draw an item in a view widget.
+
+- **index** : *const QModelIndex &*
+  Used to locate data in a data model.
+
+---
+
+### sizeHint(option, index)
+
+Item size.
+
+**Parameters:**
+
+- **option** : *const QStyleOptionViewItem &*
+  Describes the parameters used to draw an item in a view widget.
+
+- **index** : *const QModelIndex &*
+  Used to locate data in a data model.
+
+---
+
+### rcvMouseLoc(row, x, y, visRect)
+
+Receive Mouse location.
+
+**Parameters:**
+
+- **row** : *int*
+  The select row of tableview.
+
+- **x** : *int*
+  mouse x pos.
+
+- **y** : *int*
+  mouse y pos.
+
+- **visRect** : *QRect*
+  visual rect of row_tableview.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

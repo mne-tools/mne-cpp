@@ -1,0 +1,157 @@
+---
+id: network-edge
+title: "CONNLIB::NetworkEdge"
+sidebar_label: NetworkEdge
+sidebar_position: 17
+---
+
+# NetworkEdge
+
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Header:** `conn/network/networkedge.h`
+
+`#include <conn/networkedge.h>`
+
+```cpp
+class CONNLIB::NetworkEdge
+```
+
+Directed weighted edge connecting two `NetworkNode` instances.
+
+Holds the start- and end-node IDs, the full per-frequency weight matrix delivered by the metric, an active/inactive flag honoured by the thresholded views on `Network`, and the ``[iStartWeightBin, iEndWeightBin) window that reduces the matrix to the scalar weight used for thresholding and rendering. For symmetric metrics the directionality is purely a storage convention.
+
+Weighted, directional edge in a `Network`; carries per-frequency weights plus a band-averaged scalar.
+
+---
+
+## Public Methods
+
+### NetworkEdge(iStartNodeID, iEndNodeID, matWeight, bIsActive, iStartWeightBin, iEndWeightBin)
+
+Constructs a `NetworkEdge` object.
+
+**Parameters:**
+
+- **iStartNodeID** : *int*
+  The start node id of the edge.
+
+- **iEndNodeID** : *int*
+  The end node id of the edge.
+
+- **matWeight** : *const Eigen::MatrixXd &*
+  The edge weight.
+
+- **bIsActive** : *bool*
+  The active flag of this edge. Default is true.
+
+- **iStartWeightBin** : *int*
+  The bin index to start avergaing from. Default is -1 which means an average over all weights.
+
+- **iEndWeightBin** : *int*
+  The bin index to end avergaing to. Default is -1 which means an average over all weights.
+
+---
+
+### getStartNodeID()
+
+Returns the start node of this edge.
+
+**Returns:**
+
+- *int* — The start node of the edge.
+
+---
+
+### getEndNodeID()
+
+Returns the end node of this edge.
+
+**Returns:**
+
+- *int* — The end node of the edge.
+
+---
+
+### setActive(bActiveFlag)
+
+Sets the activity flag of this edge.
+
+**Parameters:**
+
+- **bActiveFlag** : *bool*
+  The new activity flag of this edge.
+
+---
+
+### isActive()
+
+Returns the activity flag of this edge.
+
+**Returns:**
+
+- *bool* — The current activity flag of this edge.
+
+---
+
+### getWeight()
+
+Returns the edge weight.
+
+The weights are averaged between the specified bin indeces and their corresponding tapers.
+
+**Returns:**
+
+- *double* — The current edge weight.
+
+---
+
+### getMatrixWeight()
+
+Returns the edge weight non-averaged in form of a matrix.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — The current edge weight matrix.
+
+---
+
+### setWeight(dAveragedWeight)
+
+Set the averaged edge weight.
+
+**Parameters:**
+
+- **dAveragedWeight** : *double*
+  The new weight.
+
+---
+
+### calculateAveragedWeight()
+
+Calculates the edge weight based on the currently set min/max frequency bins.
+
+---
+
+### setFrequencyBins(minMaxFreqBins)
+
+Sets the frequency bins to average from/to.
+
+**Parameters:**
+
+- **minMaxFreqBins** : *const QPair&lt; int, int &gt; &*
+  The new lower/upper bin to average from/to.
+
+---
+
+### getFrequencyBins()
+
+Returns the current frequency bins to average from/to.
+
+**Returns:**
+
+- *const QPair&lt; int, int &gt; &* — The current upper/lower bin to average from/to.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

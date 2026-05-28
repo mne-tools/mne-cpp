@@ -1,0 +1,46 @@
+---
+id: mne-triangle
+title: "MNELIB::MNETriangle"
+sidebar_label: MNETriangle
+sidebar_position: 56
+---
+
+# MNETriangle
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_triangle.h`
+
+`#include <mne/mne_triangle.h>`
+
+```cpp
+class MNELIB::MNETriangle
+```
+
+Per-triangle geometric data for a cortical or BEM surface.
+
+Stores vertex indices, edge vectors, normal, area, centroid and auxiliary unit vectors. Vertex pointers (``r1``/``r2``/``r3``) and the index pointer (``vert``) alias data owned by the parent surface and must not be freed.
+
+---
+
+## Public Methods
+
+### MNETriangle()
+
+Constructs an empty `MNETriangle` with zeroed geometry.
+
+---
+
+### ~MNETriangle()
+
+Default destructor (non-owning pointers are not freed).
+
+---
+
+### compute_data()
+
+Compute derived geometry (edge vectors, normal, area, centroid, auxiliary unit vectors) from the current vertex positions.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,76 @@
+---
+id: fastrak-parser
+title: "UTILSLIB::FastrakParser"
+sidebar_label: FastrakParser
+sidebar_position: 15
+---
+
+# FastrakParser
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `utils/polhemus/fastrak_parser.h`
+
+`#include <utils/fastrak_parser.h>`
+
+```cpp
+class UTILSLIB::FastrakParser
+```
+
+Streaming parser for Fastrak / FastSCAN ASCII records.
+
+Thread-affine: the caller is responsible for serialising calls. No heap allocations on the hot path other than the internal buffer.
+
+---
+
+## Public Methods
+
+### FastrakParser()
+
+---
+
+### setUnits(units)
+
+Configure the linear unit reported by the device.
+
+---
+
+### units()
+
+---
+
+### append(chunk)
+
+Append raw bytes received from the serial port.
+
+---
+
+### nextSample(out)
+
+Pop the next fully-decoded sample, if any.
+
+**Returns:**
+
+- *bool* — true when `out` was populated; false when the buffer does not yet contain a complete record.
+
+---
+
+### reset()
+
+Reset accumulated buffer state.
+
+---
+
+## Static Methods
+
+### parseRecord(record, units, out)
+
+Parse one record line (without trailing CR/LF) — exposed for unit tests and for callers that pre-frame their data.
+
+**Returns:**
+
+- *bool* — true on success; false on malformed input.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

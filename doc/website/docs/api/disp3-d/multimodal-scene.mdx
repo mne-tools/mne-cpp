@@ -1,0 +1,215 @@
+---
+id: multimodal-scene
+title: "DISP3DLIB::MultimodalScene"
+sidebar_label: MultimodalScene
+sidebar_position: 4
+---
+
+# MultimodalScene
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Header:** `disp3D/scene/multimodalscene.h`
+
+`#include <disp3D/multimodalscene.h>`
+
+```cpp
+class DISP3DLIB::MultimodalScene
+```
+
+Host-app-agnostic controller that owns the ordered renderable set and dispatches picks back to the producing layer.
+
+Responsibilities:
+Maintain an ordered registry of `SceneLayer` payloads keyed by id.
+
+
+Emit `layersChanged` whenever a layer is added, removed, or its visibility/opacity flips, so the renderer can rebuild its draw list.
+
+
+Maintain a shared timeline (current time index) that data overlays across modalities consume; emits `timeSampleChanged`.
+
+
+Maintain the most recent `PickResult` and emit `picked` when a layer producer reports a hit; consumers (Pick dock, status bar, MRI ortho viewer) subscribe to that signal.
+
+The class is **non-virtual** on purpose: it is a pure data/dispatch hub with no rendering logic. The renderer (``BrainRenderer`` or a future `MultimodalRenderer`) reads layers via `layers()` and per-kind downcasts the payload pointer.
+
+---
+
+## Public Methods
+
+### MultimodalScene(parent)
+
+---
+
+### ~MultimodalScene()
+
+---
+
+### addLayer(layer)
+
+Add or replace a layer.
+
+If a layer with the same `SceneLayer::id` already exists, the stored layer is overwritten in place (preserving its slot in the draw order). Otherwise the new layer is appended to its kind's group.
+
+**Parameters:**
+
+- **layer** : *SceneLayer*
+  Layer record. The caller retains ownership of the underlying payload via the shared_ptr.
+
+---
+
+### removeLayer(id)
+
+Remove a layer by id.
+
+**Parameters:**
+
+- **id** : *const QString &*
+  Layer id supplied to `addLayer`.
+
+**Returns:**
+
+- *bool* — true if a layer was removed, false if the id was unknown.
+
+---
+
+### clear()
+
+Remove every layer.
+
+---
+
+### layers()
+
+**Returns:**
+
+- *QVector&lt; SceneLayer &gt;* — All layers in current draw order (sorted by kind, then by drawOrder, then by insertion order).
+
+---
+
+### findLayer(id)
+
+**Parameters:**
+
+- **id** : *const QString &*
+  Layer id.
+
+**Returns:**
+
+- *const SceneLayer ** — Pointer to the layer with the given id, or nullptr. The pointer is valid only until the next mutation.
+
+---
+
+### setLayerVisible(id, visible)
+
+Toggle visibility of a layer.
+
+No-op if the id is unknown.
+
+---
+
+### setLayerOpacity(id, opacity)
+
+Set per-layer opacity in [0, 1].
+
+No-op if the id is unknown.
+
+---
+
+### currentTimeSample()
+
+**Returns:**
+
+- *int* — Current shared time index (used by data overlays). -1 if no time-resolved data is loaded.
+
+---
+
+### setCurrentTimeSample(sample)
+
+Set the current time index.
+
+Emits `timeSampleChanged` if it actually changes. Negative values are clamped to -1.
+
+---
+
+### timeCursor()
+
+**Returns:**
+
+- *double* — Current shared time cursor in seconds. Independent of the integer-sample timeline (`currentTimeSample`) — overlay widgets that drive a continuous time slider operate in seconds. Default 0.
+
+---
+
+### setTimeCursor(seconds)
+
+Set the shared time cursor in seconds.
+
+Emits `timeCursorChanged` if the value actually changes.
+
+---
+
+### overlayFmin()
+
+**Returns:**
+
+- *float* — Current overlay min threshold. Default 0.
+
+---
+
+### overlayFmid()
+
+**Returns:**
+
+- *float* — Current overlay mid threshold. Default 0.5.
+
+---
+
+### overlayFmax()
+
+**Returns:**
+
+- *float* — Current overlay max threshold. Default 1.
+
+---
+
+### setOverlayThresholds(fmin, fmid, fmax)
+
+Set the shared (fmin, fmid, fmax) overlay thresholds used by the data-driven Overlay dock and the renderables it drives.
+
+The values are clamped to fmin &lt;= fmid &lt;= fmax. Emits `overlayThresholdsChanged` if any value actually changes.
+
+---
+
+### lastPick()
+
+**Returns:**
+
+- *const PickResult &* — Most recent pick reported via `reportPick`. Default- constructed (kind == None) until the first hit.
+
+---
+
+### reportPick(pick)
+
+Report a pick result from a layer's renderer or hit-tester.
+
+Emits `picked`. Used by both real ray-cast picking and synthetic picks (e.g. wizard "show this contact" navigation).
+
+---
+
+### worldBounds(bbMin, bbMax)
+
+**Returns:**
+
+- *void* — Scene-wide axis-aligned bounding box union of all visible layers, computed by the supplied per-kind extractor. The scene itself does not know how to read each payload type; the host registers extractors via `registerBoundsFn`.
+
+---
+
+### registerBoundsFn(kind, fn)
+
+Register an AABB extractor for a given layer kind.
+
+Replaces any previously registered fn for that kind.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,120 @@
+---
+id: mne-meas-data-set
+title: "MNELIB::MNEMeasDataSet"
+sidebar_label: MNEMeasDataSet
+sidebar_position: 27
+---
+
+# MNEMeasDataSet
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_meas_data_set.h`
+
+`#include <mne/mne_meas_data_set.h>`
+
+```cpp
+class MNELIB::MNEMeasDataSet
+```
+
+Single measurement epoch or average within `MNEMeasData`.
+
+Replaces `*mneMeasDataSet` / `mneMeasDataSetRec` from MNE-C ``mne_types.h``. Holds the measured data matrix, optional projector / whitened / filtered copies, baseline values, and per-epoch metadata (number of averages, time range, etc.).
+
+---
+
+## Public Methods
+
+### MNEMeasDataSet()
+
+Constructs an empty measurement data set.
+
+Refactored from `mne_new_meas_data_set` (mne_read_data.c).
+
+---
+
+### ~MNEMeasDataSet()
+
+Destroys the measurement data set and frees all owned C-style arrays.
+
+Refactored from `mne_free_meas_data_set` (mne_read_data.c).
+
+---
+
+### getValuesAtTime(time, integ, nch, use_abs, value)
+
+Pick signal values at a specified time point using linear interpolation.
+
+Reads from the data matrix (time-by-time layout: data[sample][channel]) and writes interpolated values into the output array.
+
+Refactored: mne_get_values_from_data (mne_get_values.c)
+
+**Parameters:**
+
+- **time** : *float*
+  Target time point (seconds).
+
+- **integ** : *float*
+  Integration window width (seconds).
+
+- **nch** : *int*
+  Number of channels to pick.
+
+- **use_abs** : *bool*
+  If true, take absolute values before averaging.
+
+- **value** : *float **
+  Output array of picked values (nch elements).
+
+**Returns:**
+
+- *int* — 0 on success, -1 on error.
+
+---
+
+## Static Methods
+
+### getValuesFromChannelData(time, integ, data, nsamp, nch, tmin, sfreq, use_abs, value)
+
+Pick signal values at a specified time point using linear interpolation (channel-major layout).
+
+Reads from a channel-by-time data matrix (data[channel][sample]).
+
+Refactored: mne_get_values_from_data_ch (mne_get_values.c)
+
+**Parameters:**
+
+- **time** : *float*
+  Target time point (seconds).
+
+- **integ** : *float*
+  Integration window width (seconds).
+
+- **data** : *float ***
+  Data matrix (channel-by-time layout).
+
+- **nsamp** : *int*
+  Number of time samples.
+
+- **nch** : *int*
+  Number of channels.
+
+- **tmin** : *float*
+  Time of first sample (seconds).
+
+- **sfreq** : *float*
+  Sampling frequency (Hz).
+
+- **use_abs** : *bool*
+  If true, take absolute values before averaging.
+
+- **value** : *float **
+  Output array of picked values (nch elements).
+
+**Returns:**
+
+- *int* — 0 on success, -1 on error.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

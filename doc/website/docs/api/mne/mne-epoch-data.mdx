@@ -1,0 +1,88 @@
+---
+id: mne-epoch-data
+title: "MNELIB::MNEEpochData"
+sidebar_label: MNEEpochData
+sidebar_position: 18
+---
+
+# MNEEpochData
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_epoch_data.h`
+
+`#include <mne/mne_epoch_data.h>`
+
+```cpp
+class MNELIB::MNEEpochData
+```
+
+Epoch data, which corresponds to an event.
+
+Single epoch (trial slice) of sensor data with timing and rejection metadata.
+
+---
+
+## Public Methods
+
+### MNEEpochData()
+
+Default constructor.
+
+---
+
+### MNEEpochData(p_MNEEpochData)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_MNEEpochData** : *const MNEEpochData &*
+  `MNE` epoch data.
+
+---
+
+### ~MNEEpochData()
+
+Destroys the `MNE` epoch data.
+
+---
+
+### applyBaselineCorrection(baseline)
+
+Applies baseline (mode=mean) correction to the evoked data.
+
+**Parameters:**
+
+- **baseline** : *const QPair&lt; float, float &gt; &*
+  time definition of the baseline in seconds [from, to].
+
+---
+
+### pick_channels(sel)
+
+Reduces the data to the selected rows.
+
+**Parameters:**
+
+- **sel** : *const Eigen::RowVectorXi &*
+  The selected rows to keep.
+
+---
+
+### isRejected(respectAutoReject)
+
+Returns whether this epoch should be excluded from averaging.
+
+**Parameters:**
+
+- **respectAutoReject** : *bool*
+  Whether automatic artifact rejection should be honored.
+
+**Returns:**
+
+- *bool* — true when the epoch should be excluded.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,123 @@
+---
+id: iir-filter
+title: "UTILSLIB::IirFilter"
+sidebar_label: IirFilter
+sidebar_position: 25
+---
+
+# IirFilter
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/iirfilter.h`
+
+`#include <utils/iirfilter.h>`
+
+```cpp
+class UTILSLIB::IirFilter
+```
+
+Butterworth IIR filter design and application using second-order sections.
+
+All filter types (LP, HP, BP, BS) are supported via the classical analogue-prototype → bilinear-transform design route with pre-warped cutoff frequencies. The resulting biquad cascade is numerically stable for high filter orders.
+
+Typical usage: 
+```cpp
+// Design a 4th-order zero-phase Butterworth bandpass 1–40 Hz at 1000 Hz sampling rate
+auto sos = IirFilter::designButterworth(4, IirFilter::BandPass, 1.0, 40.0, 1000.0);
+
+// Apply to one channel
+Eigen::RowVectorXd filtered = IirFilter::applyZeroPhase(rawChannel, sos);
+
+// Apply to all channels of a matrix
+Eigen::MatrixXd matFiltered = IirFilter::applyZeroPhaseMatrix(rawMatrix, sos);
+```
+
+---
+
+## Static Methods
+
+### designButterworth(iOrder, type, dCutoffLow, dCutoffHigh, dSFreq)
+
+Design a Butterworth filter as a cascade of second-order sections.
+
+**Parameters:**
+
+- **iOrder** : *int*
+  Filter order (≥ 1). For BP/BS the effective order is 2*iOrder.
+
+- **type** : *FilterType*
+  Filter type: LowPass, HighPass, BandPass, or BandStop.
+
+- **dCutoffLow** : *double*
+  Lower cutoff frequency in Hz. Used for LP, HP, BP, BS.
+
+- **dCutoffHigh** : *double*
+  Upper cutoff frequency in Hz. Used for BP and BS only.
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+**Returns:**
+
+- *QVector&lt; IirBiquad &gt;* — QVector of `IirBiquad` sections (multiply their transfer functions to get H(z)).
+
+---
+
+### applySos(vecData, sos)
+
+Apply a biquad cascade to one data row (causal, single-pass).
+
+**Parameters:**
+
+- **vecData** : *const Eigen::RowVectorXd &*
+  Input row vector.
+
+- **sos** : *const QVector&lt; IirBiquad &gt; &*
+  Second-order sections from `designButterworth()`.
+
+**Returns:**
+
+- *Eigen::RowVectorXd* — Filtered row vector (same length as vecData).
+
+---
+
+### applyZeroPhase(vecData, sos)
+
+Apply a biquad cascade with zero-phase (forward + backward pass) to one row.
+
+The effective order is doubled and there is no phase distortion.
+
+**Parameters:**
+
+- **vecData** : *const Eigen::RowVectorXd &*
+  Input row vector.
+
+- **sos** : *const QVector&lt; IirBiquad &gt; &*
+  Second-order sections from `designButterworth()`.
+
+**Returns:**
+
+- *Eigen::RowVectorXd* — Zero-phase filtered row vector (same length as vecData).
+
+---
+
+### applyZeroPhaseMatrix(matData, sos)
+
+Apply zero-phase filtering to every row of a matrix (each row = one channel).
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Input matrix (n_channels x n_samples).
+
+- **sos** : *const QVector&lt; IirBiquad &gt; &*
+  Second-order sections from `designButterworth()`.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Filtered matrix (n_channels x n_samples).
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

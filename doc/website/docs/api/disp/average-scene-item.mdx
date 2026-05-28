@@ -1,0 +1,63 @@
+---
+id: average-scene-item
+title: "DISPLIB::AverageSceneItem"
+sidebar_label: AverageSceneItem
+sidebar_position: 6
+---
+
+# AverageSceneItem
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/helpers/averagesceneitem.h`
+
+`#include <disp/averagesceneitem.h>`
+
+```cpp
+class DISPLIB::AverageSceneItem
+```
+
+QGraphicsObject painting one channel's averaged evoked traces inside `AverageScene`.
+
+Stores per-condition data vectors and colours and paints overlaid traces, the t = 0 marker and the baseline inside its bounding rect during `paint()`.
+
+---
+
+## Public Methods
+
+### AverageSceneItem(channelName, channelNumber, channelPosition, channelKind, channelUnit, color)
+
+Constructs a `AverageSceneItem`.
+
+---
+
+### boundingRect()
+
+Reimplemented virtual functions.
+
+---
+
+### mousePressEvent(event)
+
+---
+
+### mouseReleaseEvent(event)
+
+---
+
+### paint(painter, option, widget)
+
+---
+
+### setDefaultColor(viewColor)
+
+Sets the item color to the input parameter viewColor.
+
+**Parameters:**
+
+- **viewColor** : *const QColor &*
+  desired item color.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

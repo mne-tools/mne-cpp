@@ -1,0 +1,270 @@
+---
+id: python-test-helper
+title: "UTILSLIB::PythonTestHelper"
+sidebar_label: PythonTestHelper
+sidebar_position: 41
+---
+
+# PythonTestHelper
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `utils/python_test_helper.h`
+
+`#include <utils/python_test_helper.h>`
+
+```cpp
+class UTILSLIB::PythonTestHelper
+```
+
+---
+
+## Public Methods
+
+### PythonTestHelper()
+
+Constructs a PythonTestHelper with auto-detected Python.
+
+---
+
+### isAvailable()
+
+Check if Python is available and MNE-Python is importable.
+
+**Returns:**
+
+- *bool* — True if both python3 and the 'mne' package are available.
+
+---
+
+### isPythonAvailable()
+
+Check if Python is available (without checking for mne package).
+
+**Returns:**
+
+- *bool* — True if python3 is reachable.
+
+---
+
+### hasPackage(packageName)
+
+Check if a specific Python package is importable.
+
+**Parameters:**
+
+- **packageName** : *const QString &*
+  Package name (e.g. "numpy", "scipy", "mne").
+
+**Returns:**
+
+- *bool* — True if the import succeeds.
+
+---
+
+### eval(code, timeoutMs)
+
+Run inline Python code and return the result.
+
+**Parameters:**
+
+- **code** : *const QString &*
+  Python code to execute via `python -c`.
+
+- **timeoutMs** : *int*
+  Timeout in milliseconds (-1 = no limit).
+
+**Returns:**
+
+- *PythonRunnerResult* — `PythonRunnerResult` with captured stdout/stderr.
+
+---
+
+### evalDouble(code, ok, timeoutMs)
+
+Run inline Python code that prints a single double value, and parse it.
+
+**Parameters:**
+
+- **code** : *const QString &*
+  Python code whose stdout is a single number.
+
+- **ok** : *bool **
+  Set to true on success, false on parse failure.
+
+- **timeoutMs** : *int*
+  Timeout in milliseconds.
+
+**Returns:**
+
+- *double* — The parsed double value, or 0.0 on failure.
+
+---
+
+### evalVector(code, ok, timeoutMs)
+
+Run inline Python code that prints a flat array of doubles (one per line or space-separated), and parse it into an Eigen VectorXd.
+
+**Parameters:**
+
+- **code** : *const QString &*
+  Python code whose stdout is numeric values.
+
+- **ok** : *bool **
+  Set to true on success.
+
+- **timeoutMs** : *int*
+  Timeout in milliseconds.
+
+**Returns:**
+
+- *Eigen::VectorXd* — Eigen VectorXd, or empty vector on failure.
+
+---
+
+### evalMatrix(code, ok, timeoutMs)
+
+Run inline Python code that prints a matrix (one row per line, space-separated values), and parse it into an Eigen MatrixXd.
+
+**Parameters:**
+
+- **code** : *const QString &*
+  Python code whose stdout is a space-separated matrix.
+
+- **ok** : *bool **
+  Set to true on success.
+
+- **timeoutMs** : *int*
+  Timeout in milliseconds.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Eigen MatrixXd, or empty matrix on failure.
+
+---
+
+### runScript(scriptPath, args, timeoutMs)
+
+Run a Python script file and return the result.
+
+**Parameters:**
+
+- **scriptPath** : *const QString &*
+  Path to the .py file.
+
+- **args** : *const QStringList &*
+  Arguments forwarded to the script.
+
+- **timeoutMs** : *int*
+  Timeout in milliseconds.
+
+**Returns:**
+
+- *PythonRunnerResult* — `PythonRunnerResult`.
+
+---
+
+### evalMatrixViaFile(code, outputFilePath, ok, timeoutMs)
+
+Run Python code that writes a matrix to outputFilePath (e.g.
+
+via numpy.savetxt), then read the result back as an Eigen MatrixXd.
+
+This is preferred over evalMatrix() for large matrices or when full double precision is required, because it avoids stdout parsing.
+
+Example: 
+```cpp
+QString code = QString(
+    "import numpy as np\n"
+    "cov = np.eye(3)\n"
+    "np.savetxt('%1', cov, fmt='%%.17e')\n"
+).arg(outPath);
+bool ok;
+auto mat = helper.evalMatrixViaFile(code, outPath, &ok);
+```
+
+**Parameters:**
+
+- **code** : *const QString &*
+  Python code to execute.
+
+- **outputFilePath** : *const QString &*
+  Path where Python writes the matrix.
+
+- **ok** : *bool **
+  Set to true on success.
+
+- **timeoutMs** : *int*
+  Timeout in milliseconds.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Parsed MatrixXd, or empty matrix on failure.
+
+---
+
+## Static Methods
+
+### testDataPath()
+
+Get the standard path to mne-cpp-test-data from the test binary location.
+
+**Returns:**
+
+- *QString* — Absolute path to the test data directory.
+
+---
+
+### isPythonRequired()
+
+Check whether the environment demands Python availability.
+
+When MNE_REQUIRE_PYTHON=true is set, test guards should QFAIL instead of QSKIP, ensuring skips are never silent in CI.
+
+**Returns:**
+
+- *bool* — True if MNE_REQUIRE_PYTHON environment variable is "true" (or "1").
+
+---
+
+### writeMatrix(filePath, mat)
+
+Write an Eigen matrix to a text file with full double precision.
+
+The format is one row per line, space-separated values, using %.17e notation — compatible with Python's numpy.loadtxt().
+
+**Parameters:**
+
+- **filePath** : *const QString &*
+  Output file path.
+
+- **mat** : *const Eigen::MatrixXd &*
+  Matrix to write.
+
+**Returns:**
+
+- *bool* — True on success.
+
+---
+
+### readMatrix(filePath, ok)
+
+Read an Eigen matrix from a text file (space-separated values, one row per line).
+
+Compatible with numpy.savetxt() output.
+
+**Parameters:**
+
+- **filePath** : *const QString &*
+  Input file path.
+
+- **ok** : *bool **
+  Set to true on success, false on failure.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Parsed MatrixXd, or empty matrix on failure.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

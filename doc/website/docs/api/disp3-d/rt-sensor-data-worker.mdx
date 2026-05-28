@@ -1,0 +1,150 @@
+---
+id: rt-sensor-data-worker
+title: "DISP3DLIB::RtSensorDataWorker"
+sidebar_label: RtSensorDataWorker
+sidebar_position: 5
+---
+
+# RtSensorDataWorker
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Header:** `disp3D/workers/rtsensordataworker.h`
+
+`#include <disp3D/rtsensordataworker.h>`
+
+```cpp
+class DISP3DLIB::RtSensorDataWorker
+```
+
+`RtSensorDataWorker` processes incoming sensor measurement data in a background thread.
+
+It manages a data queue, performs averaging, applies a dense mapping matrix (MEG or EEG sensor → surface vertex), normalises values symmetrically, and converts them to per-vertex ABGR colours for rendering.
+
+This worker is driven by a timer in the `RtSensorDataController` and follows the same architecture as `RtSourceDataWorker`, adapted for dense sensor-to-surface mapping instead of sparse source interpolation.
+
+Background worker for real-time sensor data streaming.
+
+---
+
+## Public Methods
+
+### RtSensorDataWorker(parent)
+
+Constructor.
+
+**Parameters:**
+
+- **parent** : *QObject **
+  Parent QObject.
+
+---
+
+### addData(data)
+
+Add a new sensor measurement vector to the streaming queue.
+
+The vector contains one measurement per picked sensor channel.
+
+**Parameters:**
+
+- **data** : *const Eigen::VectorXf &*
+  Sensor measurement vector (nChannels x 1).
+
+---
+
+### clear()
+
+Clear all queued data and reset averaging state.
+
+---
+
+### setMappingMatrix(mat)
+
+Set the dense mapping matrix (sensor → surface vertices).
+
+This matrix is typically produced by `FieldMap::computeMegMapping()` or computeEegMapping(). Size: (nVertices × nChannels).
+
+**Parameters:**
+
+- **mat** : *std::shared_ptr&lt; Eigen::MatrixXf &gt;*
+  Dense mapping matrix.
+
+---
+
+### setNumberAverages(numAvr)
+
+Set the number of samples to average before emitting.
+
+**Parameters:**
+
+- **numAvr** : *int*
+  Number of averages (1 = no averaging).
+
+---
+
+### setColormapType(name)
+
+Set the colormap type used for color conversion.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Colormap name ("MNE", "Hot", "Jet", "Viridis", "Cool", "RedBlue").
+
+---
+
+### setThresholds(min, max)
+
+Set explicit normalization thresholds instead of auto-normalization.
+
+When set, the symmetric auto-normalization is replaced by fixed thresholds. Values below min are mapped to 0, above max to 1.
+
+Pass min == 0 and max == 0 to re-enable auto-normalization.
+
+**Parameters:**
+
+- **min** : *double*
+  Lower threshold (values below are at colormap start).
+
+- **max** : *double*
+  Upper threshold (values above are at colormap end).
+
+---
+
+### setLoopState(enabled)
+
+Enable or disable looping (replay from beginning when queue is exhausted).
+
+**Parameters:**
+
+- **enabled** : *bool*
+  True to enable looping.
+
+---
+
+### setSFreq(sFreq)
+
+Set the sampling frequency of the incoming data.
+
+**Parameters:**
+
+- **sFreq** : *double*
+  Sampling frequency in Hz.
+
+---
+
+### setStreamSmoothedData(bStreamSmoothedData)
+
+Toggle between emitting per-vertex color data (smoothed) and raw sensor values.
+
+When enabled (default), `streamData()` performs mapping + normalization + color conversion and emits `newRtSensorColors()`. When disabled, it emits `newRtRawSensorData()` with the raw measurement vector, which can be used for GPU-side mapping.
+
+**Parameters:**
+
+- **bStreamSmoothedData** : *bool*
+  True for smoothed colors (default), false for raw.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

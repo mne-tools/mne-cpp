@@ -1,0 +1,158 @@
+---
+id: fwd-field-map
+title: "FWDLIB::FwdFieldMap"
+sidebar_label: FwdFieldMap
+sidebar_position: 12
+---
+
+# FwdFieldMap
+
+**Namespace:** `FWDLIB` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Header:** `fwd/fwd_field_map.h`
+
+`#include <fwd/fwd_field_map.h>`
+
+```cpp
+class FWDLIB::FwdFieldMap
+```
+
+Computes the per-vertex sensor-to-surface mapping matrix used to render a continuous scalp/cortex field that exactly reproduces the recorded MEG/EEG values.
+
+Uses Legendre-series lead-field dot products evaluated on a sphere fitted to the head together with an SVD-based pseudo-inverse with eigenvalue truncation — the classic MNE field-interpolation recipe.
+
+Ported from MNE-Python (BSD-3-Clause): `_do_self_dots`, `_do_surface_dots`, `_fast_sphere_dot_r0` (`_lead_dots.py`); `_compute_mapping_matrix`, `_pinv_trunc` (`_field_interpolation.py`).
+
+---
+
+## Static Methods
+
+### computeMegMapping(coils, vertices, normals, origin, intrad, miss)
+
+Compute MEG sensor-to-surface mapping matrix.
+
+**Parameters:**
+
+- **coils** : *const FwdCoilSet &*
+  MEG coils (already transformed to target coordinate frame).
+
+- **vertices** : *const Eigen::MatrixX3f &*
+  FsSurface vertex positions (nvert × 3).
+
+- **normals** : *const Eigen::MatrixX3f &*
+  FsSurface vertex normals (nvert × 3).
+
+- **origin** : *const Eigen::Vector3f &*
+  Sphere origin in the target coordinate frame.
+
+- **intrad** : *float*
+  Integration radius (default 0.06, matching MNE-Python _setup_dots).
+
+- **miss** : *float*
+  Eigenvalue truncation threshold (default 1e-4, matching _make_surface_mapping).
+
+**Returns:**
+
+- *std::unique_ptr&lt; Eigen::MatrixXf &gt;* — Mapping matrix (nvert × nchan), or null on failure.
+
+---
+
+### computeMegMapping(coils, vertices, normals, origin, info, chNames, intrad, miss)
+
+Compute MEG sensor-to-surface mapping matrix with SSP projection.
+
+**Parameters:**
+
+- **coils** : *const FwdCoilSet &*
+  MEG coils (already transformed to target coordinate frame).
+
+- **vertices** : *const Eigen::MatrixX3f &*
+  FsSurface vertex positions (nvert × 3).
+
+- **normals** : *const Eigen::MatrixX3f &*
+  FsSurface vertex normals (nvert × 3).
+
+- **origin** : *const Eigen::Vector3f &*
+  Sphere origin in the target coordinate frame.
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  FiffInfo with SSP projectors and channel names.
+
+- **chNames** : *const QStringList &*
+  Channel names corresponding to the coils (for projector matching).
+
+- **intrad** : *float*
+  Integration radius (default 0.06).
+
+- **miss** : *float*
+  Eigenvalue truncation threshold (default 1e-4).
+
+**Returns:**
+
+- *std::unique_ptr&lt; Eigen::MatrixXf &gt;* — Mapping matrix (nvert × nchan), or null on failure.
+
+---
+
+### computeEegMapping(coils, vertices, origin, intrad, miss)
+
+Compute EEG electrode-to-surface mapping matrix.
+
+The effective integration radius is intrad * 0.7, matching MNE-Python's internal scaling in _do_self_dots / _do_surface_dots for EEG.
+
+**Parameters:**
+
+- **coils** : *const FwdCoilSet &*
+  EEG electrodes (already transformed to target coordinate frame).
+
+- **vertices** : *const Eigen::MatrixX3f &*
+  FsSurface vertex positions (nvert × 3).
+
+- **origin** : *const Eigen::Vector3f &*
+  Sphere origin in the target coordinate frame.
+
+- **intrad** : *float*
+  Base integration radius (default 0.06, matching MNE-Python _setup_dots).
+
+- **miss** : *float*
+  Eigenvalue truncation threshold (default 1e-3, matching _make_surface_mapping).
+
+**Returns:**
+
+- *std::unique_ptr&lt; Eigen::MatrixXf &gt;* — Mapping matrix (nvert × nchan), or null on failure.
+
+---
+
+### computeEegMapping(coils, vertices, origin, info, chNames, intrad, miss)
+
+Compute EEG electrode-to-surface mapping matrix with SSP projection and average reference.
+
+**Parameters:**
+
+- **coils** : *const FwdCoilSet &*
+  EEG electrodes (already transformed to target coordinate frame).
+
+- **vertices** : *const Eigen::MatrixX3f &*
+  FsSurface vertex positions (nvert × 3).
+
+- **origin** : *const Eigen::Vector3f &*
+  Sphere origin in the target coordinate frame.
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  FiffInfo with SSP projectors and channel names.
+
+- **chNames** : *const QStringList &*
+  Channel names corresponding to the coils (for projector matching).
+
+- **intrad** : *float*
+  Base integration radius (default 0.06).
+
+- **miss** : *float*
+  Eigenvalue truncation threshold (default 1e-3).
+
+**Returns:**
+
+- *std::unique_ptr&lt; Eigen::MatrixXf &gt;* — Mapping matrix (nvert × nchan), or null on failure.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

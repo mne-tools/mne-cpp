@@ -1,0 +1,64 @@
+---
+id: fwd
+title: "FWDLIB::Fwd"
+sidebar_label: Fwd
+sidebar_position: 5
+---
+
+# Fwd
+
+**Namespace:** `FWDLIB` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Header:** `fwd/fwd.h`
+
+`#include <fwd/fwd.h>`
+
+```cpp
+class FWDLIB::Fwd
+```
+
+Static-method façade that re-exposes MNEForwardSolution toolbox-equivalent entry points under their familiar `mne_*` names.
+
+---
+
+## Public Methods
+
+### ~Fwd()
+
+Destructor.
+
+---
+
+## Static Methods
+
+### read_forward_solution(p_IODevice, fwd, force_fixed, surf_ori, include, exclude)
+
+mne_read_forward_solution
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  A fiff IO device like a fiff QFile or QTCPSocket.
+
+- **fwd** : *MNELIB::MNEForwardSolution &*
+  A forward solution from a fif file.
+
+- **force_fixed** : *bool*
+  Force fixed source orientation mode? (optional).
+
+- **surf_ori** : *bool*
+  Use surface based source coordinate system? (optional).
+
+- **include** : *const QStringList &*
+  Include these channels (optional).
+
+- **exclude** : *const QStringList &*
+  Exclude these channels (optional).
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

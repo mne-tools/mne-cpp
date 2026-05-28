@@ -1,0 +1,119 @@
+---
+id: csd
+title: "UTILSLIB::Csd"
+sidebar_label: Csd
+sidebar_position: 10
+---
+
+# Csd
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/csd.h`
+
+`#include <utils/csd.h>`
+
+```cpp
+class UTILSLIB::Csd
+```
+
+Cross-Spectral Density (CSD) estimator.
+
+Provides three methods for computing the CSD matrix between channels: multitaper (DPSS tapers), Fourier (Welch-style segmented), and Morlet wavelet.
+
+```cpp
+// Multitaper CSD: 600 Hz data, 0–60 Hz band, half-bandwidth 4
+CsdResult r = Csd::computeMultitaper(matData, 600.0, 0.0, 60.0, 4.0);
+// r.matCsd       → n_ch × n_ch mean CSD
+// r.csdByFreq[k] → n_ch × n_ch at frequency r.vecFreqs[k]
+```
+
+---
+
+## Static Methods
+
+### computeMultitaper(matData, sfreq, fmin, fmax, halfBandwidth, nTapers)
+
+Compute CSD using multitaper (DPSS) spectral estimation.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Data matrix (n_channels × n_samples).
+
+- **sfreq** : *double*
+  Sampling frequency in Hz.
+
+- **fmin** : *double*
+  Minimum frequency of interest in Hz (default 0).
+
+- **fmax** : *double*
+  Maximum frequency in Hz; -1 → Nyquist (default -1).
+
+- **halfBandwidth** : *double*
+  Half-bandwidth parameter (NW) for DPSS tapers (default 4).
+
+- **nTapers** : *int*
+  Number of tapers; -1 → floor(2*halfBandwidth - 1) (default -1).
+
+**Returns:**
+
+- *CsdResult* — `CsdResult` with per-frequency and mean CSD matrices.
+
+---
+
+### computeFourier(matData, sfreq, fmin, fmax, nFft, overlap)
+
+Compute CSD using Welch-style Fourier segmented estimation.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Data matrix (n_channels × n_samples).
+
+- **sfreq** : *double*
+  Sampling frequency in Hz.
+
+- **fmin** : *double*
+  Minimum frequency of interest in Hz (default 0).
+
+- **fmax** : *double*
+  Maximum frequency in Hz; -1 → Nyquist (default -1).
+
+- **nFft** : *int*
+  FFT / segment length in samples (default 256).
+
+- **overlap** : *double*
+  Fractional overlap between adjacent segments, in [0, 1) (default 0.5).
+
+**Returns:**
+
+- *CsdResult* — `CsdResult` with per-frequency and mean CSD matrices.
+
+---
+
+### computeMorlet(matData, sfreq, frequencies, nCycles)
+
+Compute CSD using Morlet wavelet convolution.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Data matrix (n_channels × n_samples).
+
+- **sfreq** : *double*
+  Sampling frequency in Hz.
+
+- **frequencies** : *const Eigen::RowVectorXd &*
+  Target frequencies in Hz.
+
+- **nCycles** : *int*
+  Number of cycles in the Morlet wavelet (default 7).
+
+**Returns:**
+
+- *CsdResult* — `CsdResult` with one CSD matrix per target frequency.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

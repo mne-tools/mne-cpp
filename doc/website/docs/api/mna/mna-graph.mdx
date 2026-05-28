@@ -1,0 +1,121 @@
+---
+id: mna-graph
+title: "MNALIB::MnaGraph"
+sidebar_label: MnaGraph
+sidebar_position: 1
+---
+
+# MnaGraph
+
+**Namespace:** `MNALIB` &nbsp;·&nbsp; **Library:** MNA Library (Modular Architecture) &nbsp;·&nbsp; **Header:** `mna/mna_graph.h`
+
+`#include <mna/mna_graph.h>`
+
+```cpp
+class MNALIB::MnaGraph
+```
+
+Directed acyclic graph of processing nodes forming a computational pipeline.
+
+In-memory DAG of `MnaNode` operations with validation, topological sort and JSON/CBOR persistence.
+
+---
+
+## Public Methods
+
+### MnaGraph()
+
+---
+
+### addNode(node)
+
+---
+
+### removeNode(nodeId)
+
+---
+
+### node(nodeId)
+
+---
+
+### node(nodeId)
+
+---
+
+### nodes()
+
+---
+
+### nodes()
+
+---
+
+### hasNode(nodeId)
+
+---
+
+### connect(srcNodeId, srcPortName, dstNodeId, dstPortName)
+
+Connect output port of srcNode to input port of dstNode.
+
+Sets the sourceNodeId and sourcePortName on the destination input port.
+
+**Returns:**
+
+- *bool* — true if connection was made, false if ports not found.
+
+---
+
+### validate(errors)
+
+Validate the graph: acyclicity, port connections, data-kind compatibility, op schema compliance, required attributes.
+
+**Parameters:**
+
+- **errors** : *QStringList **
+  Optional list to receive error messages.
+
+**Returns:**
+
+- *bool* — true if valid.
+
+---
+
+### topologicalSort()
+
+---
+
+### upstreamNodes(nodeId)
+
+---
+
+### downstreamNodes(nodeId)
+
+---
+
+### dirtyNodes()
+
+---
+
+### toJson()
+
+---
+
+### toCbor()
+
+---
+
+## Static Methods
+
+### fromJson(json)
+
+---
+
+### fromCbor(cbor)
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

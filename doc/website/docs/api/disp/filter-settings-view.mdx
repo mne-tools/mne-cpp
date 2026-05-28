@@ -1,0 +1,86 @@
+---
+id: filter-settings-view
+title: "DISPLIB::FilterSettingsView"
+sidebar_label: FilterSettingsView
+sidebar_position: 31
+---
+
+# FilterSettingsView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/filtersettingsview.h`
+
+`#include <disp/filtersettingsview.h>`
+
+```cpp
+class DISPLIB::FilterSettingsView
+```
+
+Compact filter on / off + bandwidth panel that opens the full `FilterDesignView` on demand.
+
+Houses an activation `QCheckBox`, from / to frequency labels and an `Edit` button; the two widgets stay in sync via `filterChannelTypeChanged` and `filterChanged` signals.
+
+---
+
+## Public Methods
+
+### FilterSettingsView(sSettingsPath, parent, f)
+
+Constructs a `FilterSettingsView` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  parent of widget.
+
+---
+
+### ~FilterSettingsView()
+
+Destroys the `FilterSettingsView`.
+
+---
+
+### getFilterView()
+
+Returns the filter design view used to design filters.
+
+---
+
+### getFilterActive()
+
+Returns true if the filters a set as active.
+
+---
+
+### setSamplingRate(dSFreq)
+
+Sets the sampling frequency and setups this view accrodingly.
+
+**Parameters:**
+
+- **dSFreq** : *double*
+  the new sampling frequency.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

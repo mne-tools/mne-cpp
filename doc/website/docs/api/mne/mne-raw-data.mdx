@@ -1,0 +1,231 @@
+---
+id: mne-raw-data
+title: "MNELIB::MNERawData"
+sidebar_label: MNERawData
+sidebar_position: 48
+---
+
+# MNERawData
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_raw_data.h`
+
+`#include <mne/mne_raw_data.h>`
+
+```cpp
+class MNELIB::MNERawData
+```
+
+Implements the `MNE` Raw Data (Replaces *mneRawData,mneRawDataRec; struct of MNE-C `mne_types.h`).
+
+A comprehensive raw data structure
+
+---
+
+## Public Methods
+
+### MNERawData()
+
+Constructs the `MNE` Raw Data Refactored: new_raw_data (mne_raw_data.c).
+
+---
+
+### ~MNERawData()
+
+Destroys the `MNE` Raw Data Refactored: mne_raw_free_data (mne_raw_data.c).
+
+---
+
+### add_filter_response(highpass_effective)
+
+Create a frequency-domain filter response from the current filter definition and sampling frequency, replacing any existing response.
+
+**Parameters:**
+
+- **highpass_effective** : *int **
+  Set to non-zero if the highpass filter is active.
+
+---
+
+### setup_filter_bufs()
+
+Allocate filter output buffers spanning the entire raw data range (with taper overlap), initialize a ring buffer for filtered data, and create the filter response.
+
+---
+
+### load_one_buffer(buf)
+
+Read a single raw data buffer from the FIFF file into memory, allocating from the ring buffer if needed.
+
+**Parameters:**
+
+- **buf** : *MNERawBufDef **
+  The buffer definition to load.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on read error.
+
+---
+
+### compensate_buffer(buf)
+
+Apply CTF compensation to a loaded raw data buffer if its compensation status differs from the desired one.
+
+**Parameters:**
+
+- **buf** : *MNERawBufDef **
+  The buffer to compensate.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### pick_data(sel, firsts, ns, picked)
+
+Extract raw data samples for selected channels (including derived channels) with compensation applied, zero-padding or edge-extending as needed at boundaries.
+
+**Parameters:**
+
+- **sel** : *mneChSelection*
+  Channel selection descriptor.
+
+- **firsts** : *int*
+  First sample index (absolute).
+
+- **ns** : *int*
+  Number of samples to extract.
+
+- **picked** : *float ***
+  Array of per-channel data vectors (pre-allocated).
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### pick_data_proj(sel, firsts, ns, picked)
+
+Extract raw data with SSP projection applied to each time sample before channel selection.
+
+**Parameters:**
+
+- **sel** : *mneChSelection*
+  Channel selection descriptor.
+
+- **firsts** : *int*
+  First sample index (absolute).
+
+- **ns** : *int*
+  Number of samples to extract.
+
+- **picked** : *float ***
+  Array of per-channel data vectors (pre-allocated).
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### load_one_filt_buf(buf)
+
+Load a single filter-sized buffer by picking projected unfiltered data with taper margins for overlap-add filtering.
+
+**Parameters:**
+
+- **buf** : *MNERawBufDef **
+  The filter buffer definition to load.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### pick_data_filt(sel, firsts, ns, picked)
+
+Pick filtered data for a channel selection by loading filter buffers, applying the frequency-domain filter per channel (skipping stimulus channels), and accumulating overlapping results.
+
+**Parameters:**
+
+- **sel** : *mneChSelection*
+  Channel selection descriptor.
+
+- **firsts** : *int*
+  First sample index (absolute).
+
+- **ns** : *int*
+  Number of samples to extract.
+
+- **picked** : *float ***
+  Array of per-channel data vectors (pre-allocated).
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+## Static Methods
+
+### open_file_comp(name, omit_skip, allow_maxshield, filter, comp_set)
+
+Open a raw FIFF file with explicit compensation grade.
+
+Reads channel info, compensation data, SSS data, sets up data/filter buffers and bad channels, and returns a fully initialized raw data object.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Path to the raw FIFF file.
+
+- **omit_skip** : *int*
+  If non-zero, discard initial skip samples.
+
+- **allow_maxshield** : *int*
+  If non-zero, allow MaxShield data.
+
+- **filter** : *const MNEFilterDef &*
+  Filter definition to apply.
+
+- **comp_set** : *int*
+  Desired compensation grade (-1 for file native).
+
+**Returns:**
+
+- *MNERawData ** — A new raw data object, or NULL on failure. Caller takes ownership.
+
+---
+
+### open_file(name, omit_skip, allow_maxshield, filter)
+
+Open a raw FIFF file using the file's native compensation grade.
+
+Convenience wrapper for `open_file_comp()` with comp_set = -1.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Path to the raw FIFF file.
+
+- **omit_skip** : *int*
+  If non-zero, discard initial skip samples.
+
+- **allow_maxshield** : *int*
+  If non-zero, allow MaxShield data.
+
+- **filter** : *const MNEFilterDef &*
+  Filter definition to apply.
+
+**Returns:**
+
+- *MNERawData ** — A new raw data object, or NULL on failure. Caller takes ownership.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

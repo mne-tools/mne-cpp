@@ -1,0 +1,63 @@
+---
+id: sphara-settings-view
+title: "DISPLIB::SpharaSettingsView"
+sidebar_label: SpharaSettingsView
+sidebar_position: 61
+---
+
+# SpharaSettingsView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/spharasettingsview.h`
+
+`#include <disp/spharasettingsview.h>`
+
+```cpp
+class DISPLIB::SpharaSettingsView
+```
+
+SPHARA spatial-filter configuration panel (per-modality basis order spinboxes).
+
+An activation `QCheckBox` plus per-modality basis-order spinboxes (MAG, GRAD, EEG) forwarded to the `rtprocessing` SPHARA decomposition.
+
+---
+
+## Public Methods
+
+### SpharaSettingsView(sSettingsPath, parent, f)
+
+Constructs a `SpharaSettingsView` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  parent of widget.
+
+---
+
+### ~SpharaSettingsView()
+
+Destroys the `SpharaSettingsView`.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

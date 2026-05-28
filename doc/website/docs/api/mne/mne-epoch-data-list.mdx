@@ -1,0 +1,238 @@
+---
+id: mne-epoch-data-list
+title: "MNELIB::MNEEpochDataList"
+sidebar_label: MNEEpochDataList
+sidebar_position: 19
+---
+
+# MNEEpochDataList
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_epoch_data_list.h`
+
+`#include <mne/mne_epoch_data_list.h>`
+
+```cpp
+class MNELIB::MNEEpochDataList
+```
+
+Epoch data list, which corresponds to a set of events.
+
+Ordered list of `MNEEpochData` objects sharing a common measurement info.
+
+---
+
+## Public Methods
+
+### MNEEpochDataList()
+
+Default constructor.
+
+---
+
+### ~MNEEpochDataList()
+
+Destroys the `MNEEpochDataList`.
+
+---
+
+### average(p_info, first, last, sel, proj)
+
+Averages epoch list.
+
+Note that no baseline correction performed.
+
+**Parameters:**
+
+- **info**
+  measurement info.
+
+- **first** : *FIFFLIB::fiff_int_t*
+  First time sample.
+
+- **last** : *FIFFLIB::fiff_int_t*
+  Last time sample.
+
+- **sel** : *Eigen::VectorXi*
+  Which epochs should be averaged (optional).
+
+- **proj** : *bool*
+  Apply SSP projection vectors (optional, default = false).
+
+---
+
+### applyBaselineCorrection(baseline)
+
+Applies baseline correction to the evoked data.
+
+**Parameters:**
+
+- **baseline** : *const QPair&lt; float, float &gt; &*
+  time definition of the baseline in seconds [from, to].
+
+---
+
+### dropRejected()
+
+Drop/Remove all epochs tagged as rejected.
+
+---
+
+### pick_channels(sel)
+
+Reduces alld epochs to the selected rows.
+
+**Parameters:**
+
+- **sel** : *const Eigen::RowVectorXi &*
+  The selected rows to keep.
+
+---
+
+## Static Methods
+
+### readEpochs(raw, events, tmin, tmax, event, mapReject, lExcludeChs, picks)
+
+Read the epochs from a raw file based on provided events.
+
+**Parameters:**
+
+- **raw** : *const FIFFLIB::FiffRawData &*
+  The raw data.
+
+- **events** : *const Eigen::MatrixXi &*
+  The events provided in samples and event kind.
+
+- **tmin** : *float*
+  The start time relative to the event in seconds.
+
+- **tmax** : *float*
+  The end time relative to the event in seconds.
+
+- **event** : *qint32*
+  The event kind.
+
+- **lExcludeChs** : *const QStringList &*
+  List of channel names to exclude.
+
+- **picks** : *const Eigen::RowVectorXi &*
+  Which channels to pick.
+
+---
+
+### checkForArtifact(data, pFiffInfo, mapReject, lExcludeChs)
+
+Checks the givven matrix for artifacts beyond a threshold value.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  The data matrix.
+
+- **pFiffInfo** : *const FIFFLIB::FiffInfo &*
+  The fiff info.
+
+- **mapReject** : *const QMap&lt; QString, double &gt; &*
+  The channel data types to scan for. EEG, MEG or EOG.
+
+- **lExcludeChs** : *const QStringList &*
+  List of channel names to exclude.
+
+**Returns:**
+
+- *bool* — Whether a threshold artifact was detected.
+
+---
+
+### checkChThreshold(inputData)
+
+---
+
+### averageCategories(raw, events, eventCodes, comments, tmin, tmax, mapReject, baseline, proj)
+
+averageCategories
+
+Multi-category offline averaging. Reads epochs from raw data for multiple event types and returns an `FiffEvokedSet` with one FiffEvoked per category. Ported from average.c (MNE-C).
+
+**Parameters:**
+
+- **raw** : *const FIFFLIB::FiffRawData &*
+  The raw data.
+
+- **events** : *const Eigen::MatrixXi &*
+  Event matrix (nEvents x 3): [sample, before, after].
+
+- **eventCodes** : *const QList&lt; int &gt; &*
+  List of event codes, one per category.
+
+- **comments** : *const QStringList &*
+  List of category names/comments, one per category.
+
+- **tmin** : *float*
+  Start of epoch relative to event (seconds).
+
+- **tmax** : *float*
+  End of epoch relative to event (seconds).
+
+- **mapReject** : *const QMap&lt; QString, double &gt; &*
+  Rejection thresholds (key = channel type string, value = threshold).
+
+- **baseline** : *const QPair&lt; float, float &gt; &*
+  Baseline interval [from, to] in seconds. If from==to, no baseline correction.
+
+- **proj** : *bool*
+  Apply SSP projection vectors (optional, default = false).
+
+**Returns:**
+
+- *FIFFLIB::FiffEvokedSet* — `FiffEvokedSet` containing one FiffEvoked per category.
+
+---
+
+### computeAverage(raw, matEvents, fTMinS, fTMaxS, eventType, bApplyBaseline, fTBaselineFromS, fTBaselineToS, mapReject, lExcludeChs, vecPicks)
+
+Convenience function: reads epochs, optionally applies baseline correction and artifact rejection, then returns the averaged evoked response.
+
+**Parameters:**
+
+- **raw** : *const FIFFLIB::FiffRawData &*
+  The raw data.
+
+- **matEvents** : *const Eigen::MatrixXi &*
+  The events provided in samples and event kinds.
+
+- **fTMinS** : *float*
+  The start time relative to the event in seconds.
+
+- **fTMaxS** : *float*
+  The end time relative to the event in seconds.
+
+- **eventType** : *qint32*
+  The event type.
+
+- **bApplyBaseline** : *bool*
+  Whether to use baseline correction (mode=mean).
+
+- **fTBaselineFromS** : *float*
+  The start baseline correction time relative to the event in seconds.
+
+- **fTBaselineToS** : *float*
+  The end baseline correction time relative to the event in seconds.
+
+- **mapReject** : *const QMap&lt; QString, double &gt; &*
+  The thresholds per channel type to reject epochs.
+
+- **lExcludeChs** : *const QStringList &*
+  List of channel names to exclude.
+
+- **vecPicks** : *const Eigen::RowVectorXi &*
+  Which channels to pick.
+
+**Returns:**
+
+- *FIFFLIB::FiffEvoked* — The averaged evoked data.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

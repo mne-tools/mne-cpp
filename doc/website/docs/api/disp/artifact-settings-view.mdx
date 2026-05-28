@@ -1,0 +1,72 @@
+---
+id: artifact-settings-view
+title: "DISPLIB::ArtifactSettingsView"
+sidebar_label: ArtifactSettingsView
+sidebar_position: 3
+---
+
+# ArtifactSettingsView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/artifactsettingsview.h`
+
+`#include <disp/artifactsettingsview.h>`
+
+```cpp
+class DISPLIB::ArtifactSettingsView
+```
+
+Per-modality peak-to-peak artefact-rejection threshold panel.
+
+Builds one `QCheckBox` + `QDoubleSpinBox` row per supported channel modality and emits `changeArtifactThreshold(QMap)` when any threshold or activation flag changes.
+
+---
+
+## Public Methods
+
+### ArtifactSettingsView(sSettingsPath, fiffChInfoList, parent)
+
+---
+
+### ~ArtifactSettingsView()
+
+Destroys the `ArtifactSettingsView`.
+
+---
+
+### setChInfo(fiffChInfoList)
+
+---
+
+### getThresholdMap()
+
+---
+
+### setThresholdMap(mapThresholds)
+
+---
+
+### getDoArtifactThresholdRejection()
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

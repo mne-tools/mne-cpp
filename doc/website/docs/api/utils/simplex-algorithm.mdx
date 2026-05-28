@@ -1,0 +1,75 @@
+---
+id: simplex-algorithm
+title: "UTILSLIB::SimplexAlgorithm"
+sidebar_label: SimplexAlgorithm
+sidebar_position: 45
+---
+
+# SimplexAlgorithm
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `math/simplex_algorithm.h`
+
+`#include <utils/simplex_algorithm.h>`
+
+```cpp
+class UTILSLIB::SimplexAlgorithm
+```
+
+Header-only Nelder–Mead simplex minimiser templated on the scalar type and on the cost / report callables, implementing the Strategy pattern at zero runtime cost (the functors are inlined by the compiler).
+
+Header-only Nelder–Mead simplex minimiser with templated cost and report functors.
+
+---
+
+## Static Methods
+
+### simplex_minimize(p, y, ftol, stol, func, max_eval, neval, report, report_func)
+
+mne_simplex_fit.c Refactored: mne_simplex_minimize
+
+Minimization with the simplex algorithm. Modified from Numerical Recipes. Supports an optional absolute spatial tolerance (stol) to detect simplex collapse.
+
+**Parameters:**
+
+- **p** : *Eigen::Matrix&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; &*
+  The initial simplex (npar+1 x npar). On return, row 0 is the best vertex.
+
+- **y** : *Eigen::Matrix&lt; T, Eigen::Dynamic, 1 &gt; &*
+  Function values at the vertices.
+
+- **ftol** : *T*
+  Relative convergence tolerance.
+
+- **stol** : *T*
+  Absolute spatial convergence tolerance (0 to disable).
+
+- **func** : *CostFunc &&*
+  The cost function to be evaluated.
+
+- **max_eval** : *int*
+  Maximum number of function evaluations.
+
+- **neval** : *int &*
+  Number of function evaluations performed.
+
+- **report** : *int*
+  How often to report (-1 = no reporting).
+
+- **report_func** : *ReportFunc &&*
+  The function to be called when reporting (may be nullptr).
+
+**Returns:**
+
+- *bool* — True when minimization succeeded, false otherwise.
+
+---
+
+### simplex_minimize(p, y, ftol, stol, func, max_eval, neval)
+
+Overload without report function (no reporting).
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

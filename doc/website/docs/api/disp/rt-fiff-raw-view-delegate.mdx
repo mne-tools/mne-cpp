@@ -1,0 +1,131 @@
+---
+id: rt-fiff-raw-view-delegate
+title: "DISPLIB::RtFiffRawViewDelegate"
+sidebar_label: RtFiffRawViewDelegate
+sidebar_position: 52
+---
+
+# RtFiffRawViewDelegate
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/helpers/rtfiffrawviewdelegate.h`
+
+`#include <disp/rtfiffrawviewdelegate.h>`
+
+```cpp
+class DISPLIB::RtFiffRawViewDelegate
+```
+
+QAbstractItemDelegate painting one FIFF channel's signal trace inside `RtFiffRawView`.
+
+Transforms each visible row of the `RtFiffRawViewModel` into a polyline drawn inside the cell rectangle, applying the active y-scaling, SSP / compensation operators, trigger overlays and bad-channel greying.
+
+---
+
+## Public Methods
+
+### RtFiffRawViewDelegate(parent)
+
+Creates a new abstract item delegate with the given parent.
+
+**Parameters:**
+
+- **parent** : *RtFiffRawView **
+  Parent of the delegate.
+
+---
+
+### initPainterPaths(model)
+
+Initializes painter path variables to fit number of channels in the model/view.
+
+**Parameters:**
+
+- **model** : *const QAbstractTableModel **
+  model.
+
+---
+
+### paint(painter, option, index)
+
+Use the painter and style option to render the item specified by the item index.
+
+(`sizeHint()` must be implemented also)
+
+**Parameters:**
+
+- **painter** : *QPainter **
+  Low-level painting on widgets and other paint devices.
+
+- **option** : *const QStyleOptionViewItem &*
+  Describes the parameters used to draw an item in a view widget.
+
+- **index** : *const QModelIndex &*
+  Used to locate data in a data model.
+
+---
+
+### sizeHint(option, index)
+
+Item size.
+
+**Parameters:**
+
+- **option** : *const QStyleOptionViewItem &*
+  Describes the parameters used to draw an item in a view widget.
+
+- **index** : *const QModelIndex &*
+  Used to locate data in a data model.
+
+---
+
+### markerMoved(position, activeRow)
+
+markerMoved is called whenever user moves the mouse inside of the table view viewport
+
+**Parameters:**
+
+- **position** : *QPoint*
+  The current mouse position.
+
+- **activeRow** : *int*
+  The current row which the mouse is moved over.
+
+---
+
+### setSignalColor(signalColor)
+
+Set the signal color.
+
+**Parameters:**
+
+- **signalColor** : *const QColor &*
+  The new signal color.
+
+---
+
+### getSignalColor()
+
+Returns the signal color.
+
+**Returns:**
+
+- *QColor* — The current signal color.
+
+---
+
+### setUpperItemIndex(iUpperItemIndex)
+
+Set the new upper item index color.
+
+This is used to only plot the background for the upper, visible item in the QTableView. This is a rather ugly hack in order to cope with QOpenGLWidget's/QtableView's problem when setting a background color.
+
+**Parameters:**
+
+- **iUpperItem**
+  The new upper item index color.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,91 @@
+---
+id: stream_inlet
+title: "LSLLIB::stream_inlet"
+sidebar_label: stream_inlet
+sidebar_position: 2
+---
+
+# stream_inlet
+
+**Namespace:** `LSLLIB` &nbsp;·&nbsp; **Library:** LSL Library &nbsp;·&nbsp; **Header:** `lsl/lsl_stream_inlet.h`
+
+`#include <lsl/lsl_stream_inlet.h>`
+
+```cpp
+class LSLLIB::stream_inlet
+```
+
+Client-side LSL endpoint: connects to a resolved outlet over TCP and exposes pulled samples as float chunks.
+
+---
+
+## Public Methods
+
+### stream_inlet(info)
+
+Construct a new `stream_inlet` from a resolved `stream_info`.
+
+**Parameters:**
+
+- **info** : *const stream_info &*
+  A `stream_info` object (typically obtained from resolve_streams).
+
+---
+
+### ~stream_inlet()
+
+Destructor.
+
+Closes the connection if still open.
+
+---
+
+### open_stream()
+
+Open the TCP connection to the outlet and begin receiving data.
+
+---
+
+### close_stream()
+
+Close the TCP connection to the outlet.
+
+---
+
+### samples_available()
+
+Check whether new samples are available in the internal buffer.
+
+Also performs a non-blocking read from the TCP socket to collect any pending data.
+
+**Returns:**
+
+- *bool* — True if at least one complete sample is available.
+
+---
+
+### pull_chunk()
+
+Pull a chunk of multichannel data from the inlet.
+
+Returns all complete samples currently in the buffer. Template is provided for API compatibility with liblsl; only float is supported in this implementation.
+
+**Returns:**
+
+- *std::vector&lt; std::vector&lt; T &gt; &gt;* — A vector of samples, where each sample is a vector of channel values.
+
+---
+
+### pull_chunk_float()
+
+Pull a chunk of float data (non-template version).
+
+**Returns:**
+
+- *std::vector&lt; std::vector&lt; float &gt; &gt;* — A vector of samples, where each sample is a vector of float channel values.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

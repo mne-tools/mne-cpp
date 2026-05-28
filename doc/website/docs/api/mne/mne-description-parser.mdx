@@ -1,0 +1,66 @@
+---
+id: mne-description-parser
+title: "MNELIB::MNEDescriptionParser"
+sidebar_label: MNEDescriptionParser
+sidebar_position: 17
+---
+
+# MNEDescriptionParser
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_description_parser.h`
+
+`#include <mne/mne_description_parser.h>`
+
+```cpp
+class MNELIB::MNEDescriptionParser
+```
+
+Parses MNE-C style averaging (.ave) and covariance (.cov) description files.
+
+File format is a keyword-value text format with nested blocks: average \{ ... category \{ ... \} ... \} cov \{ ... def \{ ... \} ... \}
+
+Lines starting with '#' are comments.
+
+---
+
+## Static Methods
+
+### parseAverageFile(fileName, desc)
+
+Parse an averaging description file.
+
+**Parameters:**
+
+- **fileName** : *const QString &*
+  Path to the .ave file.
+
+- **desc** : *AverageDescription &*
+  Parsed description.
+
+**Returns:**
+
+- *bool* — true if successful, false on error.
+
+---
+
+### parseCovarianceFile(fileName, desc)
+
+Parse a covariance description file.
+
+**Parameters:**
+
+- **fileName** : *const QString &*
+  Path to the .cov file.
+
+- **desc** : *CovDescription &*
+  Parsed description.
+
+**Returns:**
+
+- *bool* — true if successful, false on error.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

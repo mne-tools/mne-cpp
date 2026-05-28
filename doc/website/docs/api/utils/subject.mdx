@@ -1,0 +1,84 @@
+---
+id: subject
+title: "UTILSLIB::Subject"
+sidebar_label: Subject
+sidebar_position: 49
+---
+
+# Subject
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `utils/generics/observerpattern.h`
+
+`#include <utils/observerpattern.h>`
+
+```cpp
+class UTILSLIB::Subject
+```
+
+DECLARE BASE CLASS SUBJECT.
+
+The `Subject` class provides the base class of every subject of the observer design pattern.
+
+---
+
+## Public Methods
+
+### ~Subject()
+
+Destroys the `Subject`.
+
+---
+
+### attach(pObserver)
+
+Attaches an observer to the subject.
+
+**Parameters:**
+
+- **pObserver** : *IObserver **
+  pointer to the observer which should be attached to the subject.
+
+---
+
+### detach(pObserver)
+
+Detaches an observer of the subject.
+
+**Parameters:**
+
+- **pObserver** : *IObserver **
+  pointer to the observer which should be detached of the subject.
+
+---
+
+### notify()
+
+Notifies all attached servers by calling there update method.
+
+Is used when subject has updates to provide. This method is enabled when nothifiedEnabled is true.
+
+---
+
+### observers()
+
+Returns attached observers.
+
+**Returns:**
+
+- *t_Observers &* — attached observers.
+
+---
+
+### observerNumDebug()
+
+Returns attached observers.
+
+**Returns:**
+
+- *int* — attached observers. Returns number of attached observers.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

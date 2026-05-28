@@ -1,0 +1,59 @@
+---
+id: rt-hpi-worker
+title: "RTPROCESSINGLIB::RtHpiWorker"
+sidebar_label: RtHpiWorker
+sidebar_position: 36
+---
+
+# RtHpiWorker
+
+**Namespace:** `RTPROCESSINGLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Header:** `dsp/rt/rt_hpis.h`
+
+`#include <dsp/rt_hpis.h>`
+
+```cpp
+class RTPROCESSINGLIB::RtHpiWorker
+```
+
+Real-time HPI worker.
+
+Background worker thread that runs continuous HPI coil localization.
+
+---
+
+## Public Methods
+
+### RtHpiWorker(sensorSet)
+
+Creates the real-time HPI worker object.
+
+**Parameters:**
+
+- **pFiffInfo**
+  Associated Fiff Information.
+
+---
+
+### doWork(matData, matProjectors, hpiModelParameters, matCoilsHead)
+
+Perform one single HPI fit.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Data to estimate the HPI positions from.
+
+- **matProjectors** : *const Eigen::MatrixXd &*
+  The projectors to apply. Bad channels are still included.
+
+- **vFreqs**
+  The frequencies for each coil.
+
+- **pFiffInfo**
+  Associated Fiff Information.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

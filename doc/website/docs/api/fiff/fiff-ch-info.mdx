@@ -1,0 +1,95 @@
+---
+id: fiff-ch-info
+title: "FIFFLIB::FiffChInfo"
+sidebar_label: FiffChInfo
+sidebar_position: 12
+---
+
+# FiffChInfo
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_ch_info.h`
+
+`#include <fiff/fiff_ch_info.h>`
+
+```cpp
+class FIFFLIB::FiffChInfo
+```
+
+Per-channel FIFF descriptor: identifiers, kind, calibration, coil type, channel-frame coil position and SI unit.
+
+Holds the exact field set of the on-disk `fiffChInfoRec:` `scanno`, `logno`, `kind`, `range`, `cal`, `coil_type`, the embedded `FiffChPos` coil location, `unit` and `unit_mul`. The `ch_name` string lives next to the record because the FIFF stream stores it as a separate `FIFF_CH_NAME` tag in modern files.
+
+---
+
+## Public Methods
+
+### FiffChInfo()
+
+Constructs the channel info descriptor.
+
+---
+
+### FiffChInfo(p_FiffChInfo)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FiffChInfo** : *const FiffChInfo &*
+  Channel Info descriptor which should be copied.
+
+---
+
+### ~FiffChInfo()
+
+Destroys the channel info descriptor.
+
+---
+
+### isValidEeg()
+
+Check whether this channel has a valid EEG electrode position.
+
+A channel is a valid EEG channel if its kind is FIFFV_EEG_CH, its electrode position is not at the origin, and its coil type is not FIFFV_COIL_NONE.
+
+**Returns:**
+
+- *bool* — true if this is a valid EEG channel with proper electrode location.
+
+---
+
+## Static Methods
+
+### storageSize()
+
+Size of the old struct (fiffChInfoRec) 20*int + 16 = 20*4 + 16 = 96.
+
+**Returns:**
+
+- *qint32* — the size of the old struct fiffChInfoRec.
+
+---
+
+### checkEegLocations(chs, nch)
+
+Check that all EEG channels in the list have reasonable (non-origin) locations.
+
+Formerly mne_check_chinfo (MNE C).
+
+**Parameters:**
+
+- **chs** : *const QList&lt; FiffChInfo &gt; &*
+  The list of channel info structures to check.
+
+- **nch** : *int*
+  The number of channels to check.
+
+**Returns:**
+
+- *bool* — true if all EEG channels have valid locations, false otherwise.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

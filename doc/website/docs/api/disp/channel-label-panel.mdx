@@ -1,0 +1,106 @@
+---
+id: channel-label-panel
+title: "DISPLIB::ChannelLabelPanel"
+sidebar_label: ChannelLabelPanel
+sidebar_position: 16
+---
+
+# ChannelLabelPanel
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/helpers/channellabelpanel.h`
+
+`#include <disp/channellabelpanel.h>`
+
+```cpp
+class DISPLIB::ChannelLabelPanel
+```
+
+Vertical column of channel-name labels synced with `ChannelDataView` row geometry.
+
+Listens to the same `ChannelDataModel` as the central data view; bad channels are greyed and label clicks emit channel selection signals.
+
+---
+
+## Public Methods
+
+### ChannelLabelPanel(parent)
+
+---
+
+### setModel(model)
+
+---
+
+### setFirstVisibleChannel(ch)
+
+Set the index of the first visible channel row (kept in sync with `ChannelRhiView`).
+
+---
+
+### setVisibleChannelCount(count)
+
+Set how many channel rows are simultaneously visible (kept in sync with `ChannelRhiView`).
+
+---
+
+### setChannelIndices(indices)
+
+Restrict the panel to a subset of model channel indices.
+
+When `indices` is empty all model channels are available (no filter). Must be kept in sync with `ChannelRhiView::setChannelIndices()`.
+
+**Parameters:**
+
+- **indices** : *const QVector&lt; int &gt; &*
+  Ordered list of model channel indices to display.
+
+---
+
+### setHideBadChannels(hide)
+
+Show or hide bad-channel rows.
+
+When `hide` is true, bad channels are removed from the visible row list so the panel stays aligned with the trace view.
+
+---
+
+### setButterflyMode(enabled)
+
+Enable or disable butterfly mode.
+
+When active, lanes show type group labels (e.g. "MEG", "EEG") instead of individual channel names.
+
+**Parameters:**
+
+- **enabled** : *bool*
+  true = butterfly mode, false = normal per-channel mode.
+
+---
+
+### setVisibleSampleRange(firstSample, lastSample)
+
+Update the visible sample window used for the per-channel RMS level bar.
+
+Call this whenever the horizontal scroll position changes.
+
+**Parameters:**
+
+- **firstSample** : *int*
+  Absolute first sample in the visible window.
+
+- **lastSample** : *int*
+  Absolute last sample (exclusive) in the visible window.
+
+---
+
+### sizeHint()
+
+---
+
+### minimumSizeHint()
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

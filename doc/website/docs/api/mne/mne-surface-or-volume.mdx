@@ -1,0 +1,268 @@
+---
+id: mne-surface-or-volume
+title: "MNELIB::MNESurfaceOrVolume"
+sidebar_label: MNESurfaceOrVolume
+sidebar_position: 54
+---
+
+# MNESurfaceOrVolume
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_surface_or_volume.h`
+
+`#include <mne/mne_surface_or_volume.h>`
+
+```cpp
+class MNELIB::MNESurfaceOrVolume
+```
+
+Defines a source space or a surface.
+
+Holds vertex positions, normals, triangulation, patch statistics, neighborhood connectivity, and optional volume-grid metadata for MEG/EEG source-space analysis.
+
+---
+
+## Public Methods
+
+### MNESurfaceOrVolume()
+
+Constructs the `MNE` FsSurface or Volume.
+
+---
+
+### ~MNESurfaceOrVolume()
+
+Destroys the `MNE` FsSurface or Volume description.
+
+---
+
+### MNESurfaceOrVolume()
+
+---
+
+### operator=()
+
+---
+
+### MNESurfaceOrVolume()
+
+---
+
+### operator=()
+
+---
+
+### add_uniform_curv()
+
+Set all vertex curvature values to 1.0 (uniform curvature), if not already present.
+
+---
+
+### add_triangle_data()
+
+Populate the `MNETriangle` structures for both the full and in-use triangulations by computing edge vectors, normals, and areas.
+
+Accumulates the total surface area into tot_area.
+
+**Parameters:**
+
+- **s**
+  The source space whose triangle data is filled in.
+
+---
+
+### compute_surface_cm()
+
+Compute and store the center of mass of a surface's vertices.
+
+**Parameters:**
+
+- **s**
+  The surface whose cm field is set.
+
+---
+
+### calculate_vertex_distances()
+
+Compute the Euclidean distances from each vertex to its topological neighbors and store them in the vert_dist array.
+
+**Parameters:**
+
+- **s**
+  The source space with neighbor_vert already set.
+
+---
+
+### add_vertex_normals()
+
+Compute vertex normals by area-weighted accumulation of triangle normals, then normalize to unit length.
+
+Also calls `add_triangle_data()` and `compute_surface_cm()`.
+
+**Parameters:**
+
+- **s**
+  The source space to update.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### add_geometry_info(do_normals, check_too_many_neighbors)
+
+Build complete geometry information for a source space: triangle data, vertex normals, neighbor-triangle lists, neighbor-vertex lists, vertex distances, and center of mass.
+
+Optionally checks for topological defects (excessive number of neighbors).
+
+**Parameters:**
+
+- **s**
+  The source space to augment.
+
+- **do_normals** : *bool*
+  If non-zero, compute vertex normals.
+
+- **check_too_many_neighbors** : *bool*
+  If non-zero, fail on excessive neighbor count.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### add_geometry_info(do_normals)
+
+Convenience overload that adds geometry information with border detection disabled and excess-neighbor checking enabled.
+
+**Parameters:**
+
+- **s**
+  The source space to augment.
+
+- **do_normals** : *bool*
+  If non-zero, compute vertex normals.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### add_geometry_info2(do_normals)
+
+Add geometry information with excess-neighbor checking disabled (warns instead of failing when a vertex has too many neighbors).
+
+**Parameters:**
+
+- **s**
+  The source space to augment.
+
+- **do_normals** : *bool*
+  If non-zero, compute vertex normals.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### nearestVertIdx()
+
+Extract the nearest in-use vertex indices from the nearest vector.
+
+Equivalent to the old `MNEHemisphere::nearest` (VectorXi).
+
+**Returns:**
+
+- *Eigen::VectorXi* — VectorXi where element i = nearest[i].nearest.
+
+---
+
+### nearestDistVec()
+
+Extract the nearest distances from the nearest vector as doubles.
+
+Equivalent to the old MNEHemisphere::nearest_dist (VectorXd).
+
+**Returns:**
+
+- *Eigen::VectorXd* — VectorXd where element i = (double)nearest[i].dist.
+
+---
+
+### setNearestData(nearestIdx, nearestDist)
+
+Populate the nearest vector from separate index and distance arrays.
+
+Sets vert = i, patch = nullptr for each entry.
+
+**Parameters:**
+
+- **nearestIdx** : *const Eigen::VectorXi &*
+  Nearest in-use vertex index for each vertex.
+
+- **nearestDist** : *const Eigen::VectorXd &*
+  Distance to nearest in-use vertex for each vertex.
+
+---
+
+### point(k)
+
+Return a read-only map to the k-th vertex position (3 contiguous floats).
+
+---
+
+### point(k)
+
+Return a mutable map to the k-th vertex position.
+
+---
+
+### normal(k)
+
+Return a read-only map to the k-th vertex normal (3 contiguous floats).
+
+---
+
+## Static Methods
+
+### solid_angle(from, tri)
+
+Compute the solid angle subtended by a triangle as seen from a given point using van Oosterom's formula (scalar triple product of the edge vectors).
+
+**Parameters:**
+
+- **from** : *const Eigen::Vector3f &*
+  The observation point (3-element float array).
+
+- **tri** : *const MNELIB::MNETriangle &*
+  The triangle whose solid angle is computed.
+
+**Returns:**
+
+- *double* — The solid angle in steradians.
+
+---
+
+### compute_cm(rr, np, cm)
+
+Compute the center of mass (mean position) of a set of points.
+
+**Parameters:**
+
+- **rr** : *const PointsT &*
+  Array of 3D point coordinates.
+
+- **np** : *int*
+  Number of points.
+
+- **cm** : *float(&)*
+  Receives the center of mass (3-element float array).
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

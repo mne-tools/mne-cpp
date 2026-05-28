@@ -1,0 +1,107 @@
+---
+id: circular-buffer
+title: "UTILSLIB::CircularBuffer"
+sidebar_label: CircularBuffer
+sidebar_position: 7
+---
+
+# CircularBuffer
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `utils/generics/circularbuffer.h`
+
+`#include <utils/circularbuffer.h>`
+
+```cpp
+template <typename _Tp>
+class UTILSLIB::CircularBuffer
+```
+
+TEMPLATE CIRCULAR BUFFER.
+
+Thread-safe lock-free circular (ring) buffer for producer-consumer data exchange between threads.
+
+---
+
+## Public Methods
+
+### CircularBuffer(uiMaxNumElements)
+
+Constructs a `CircularBuffer`.
+
+**Parameters:**
+
+- **uiMaxNumElements** : *unsigned int*
+  length of buffer.
+
+---
+
+### ~CircularBuffer()
+
+Destroys the `CircularBuffer`.
+
+---
+
+### push(pArray, size)
+
+Adds a whole array at the end buffer.
+
+**Parameters:**
+
+- **pArray** : *const _Tp **
+  pointer to an Array which should be apend to the end.
+
+- **size** : *unsigned int*
+  number of elements containing the array.
+
+---
+
+### push(newElement)
+
+Adds an element at the end of the buffer.
+
+**Parameters:**
+
+- **newElement** : *const _Tp &*
+  pointer to an Array which should be apend to the end.
+
+---
+
+### pop(element)
+
+Returns the first element (first in first out).
+
+**Returns:**
+
+- *bool* — the first element.
+
+---
+
+### clear()
+
+Clears the buffer.
+
+---
+
+### pause()
+
+Pauses the buffer.
+
+Skpis any incoming matrices and only pops zero matrices.
+
+---
+
+### getFreeElementsRead()
+
+Returns the number of free elements for thread safe reading.
+
+---
+
+### getFreeElementsWrite()
+
+Returns the number of free elements for thread safe reading.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,113 @@
+---
+id: eog-regression
+title: "UTILSLIB::EogRegression"
+sidebar_label: EogRegression
+sidebar_position: 12
+---
+
+# EogRegression
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/eog_regression.h`
+
+`#include <utils/eog_regression.h>`
+
+```cpp
+class UTILSLIB::EogRegression
+```
+
+Remove EOG artifacts via linear regression.
+
+Fits a least-squares model: data_ch = beta * EOG + residual, then subtracts beta * EOG from each non-EOG channel.
+
+Usage: 
+```cpp
+EogRegression eogReg;
+eogReg.fit(data, info);           // fit regression coefficients
+eogReg.apply(data, info);         // subtract EOG contribution in-place
+// or one-step:
+EogRegression::fitApply(data, info);
+```
+
+---
+
+## Public Methods
+
+### EogRegression()
+
+Constructs a default `EogRegression` object.
+
+---
+
+### fit(data, info, eogChannels)
+
+Fit regression coefficients from EOG to all other channels.
+
+Uses ordinary least squares: beta = T * E^T * (E * E^T)^\{-1\}
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  Data matrix (n_channels x n_times).
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  Measurement info (identifies EOG channels by kind == FIFFV_EOG_CH).
+
+- **eogChannels** : *const QStringList &*
+  Optional explicit EOG channel names. If empty, auto-detect from info.
+
+---
+
+### apply(data, info)
+
+Apply the fitted regression to remove EOG artifacts in-place.
+
+Subtracts beta * EOG from all non-EOG channels. `fit()` must be called first.
+
+**Parameters:**
+
+- **data** : *Eigen::MatrixXd &*
+  Data matrix (n_channels x n_times). Modified in-place.
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  Measurement info.
+
+---
+
+### coefficients()
+
+Returns the fitted regression coefficients.
+
+**Returns:**
+
+- *const Eigen::MatrixXd &* — Matrix (n_non_eog_channels x n_eog_channels).
+
+---
+
+### isFitted()
+
+Returns true if `fit()` has been called successfully.
+
+---
+
+## Static Methods
+
+### fitApply(data, info, eogChannels)
+
+Convenience: fit and apply in one step.
+
+**Parameters:**
+
+- **data** : *Eigen::MatrixXd &*
+  Data matrix (n_channels x n_times). Modified in-place.
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  Measurement info.
+
+- **eogChannels** : *const QStringList &*
+  Optional explicit EOG channel names.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

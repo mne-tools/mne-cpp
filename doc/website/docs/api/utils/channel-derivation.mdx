@@ -1,0 +1,130 @@
+---
+id: channel-derivation
+title: "UTILSLIB::ChannelDerivation"
+sidebar_label: ChannelDerivation
+sidebar_position: 6
+---
+
+# ChannelDerivation
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/channel_derivation.h`
+
+`#include <utils/channel_derivation.h>`
+
+```cpp
+class UTILSLIB::ChannelDerivation
+```
+
+Channel derivation and re-referencing utilities.
+
+Provides methods to build bipolar and common-average re-referencing schemes, apply arbitrary linear derivation rules to data matrices, and read/write derivation definition files.
+
+```cpp
+QStringList chNames = {"LH1","LH2","LH3","RA1","RA2"};
+auto rules = ChannelDerivation::buildBipolar(chNames);
+// rules: LH1-LH2, LH2-LH3, RA1-RA2
+
+auto [matDerived, derivedNames] = ChannelDerivation::apply(matData, chNames, rules);
+```
+
+---
+
+## Static Methods
+
+### buildBipolar(channelNames)
+
+Build bipolar derivation rules from sequential electrode pairs.
+
+Channels are grouped by shaft prefix (all leading alphabetic characters and apostrophes before the first digit). Within each group, consecutive pairs are subtracted: channel[i] − channel[i+1].
+
+**Parameters:**
+
+- **channelNames** : *const QStringList &*
+  List of channel names, e.g. \{"LH1","LH2","LH3","RA1","RA2"\}.
+
+**Returns:**
+
+- *QVector&lt; DerivationRule &gt;* — Vector of `DerivationRule`, e.g. LH1-LH2 (+1·LH1, −1·LH2), LH2-LH3, RA1-RA2.
+
+---
+
+### buildCommonAverage(channelNames)
+
+Build common-average reference derivation rules.
+
+Each output channel equals the original channel minus the mean of all channels: out_i = ch_i − (1/N) Σ ch_j.
+
+**Parameters:**
+
+- **channelNames** : *const QStringList &*
+  List of channel names.
+
+**Returns:**
+
+- *QVector&lt; DerivationRule &gt;* — Vector of `DerivationRule`, one per input channel.
+
+---
+
+### apply(matData, channelNames, rules)
+
+Apply derivation rules to a data matrix.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Input data matrix (n_channels × n_times).
+
+- **channelNames** : *const QStringList &*
+  Channel names corresponding to rows of matData.
+
+- **rules** : *const QVector&lt; DerivationRule &gt; &*
+  Derivation rules to apply.
+
+**Returns:**
+
+- *QPair&lt; Eigen::MatrixXd, QStringList &gt;* — A pair of (derived data matrix, derived channel names). The output matrix has n_rules rows × n_times columns.
+
+---
+
+### readDefinitionFile(path)
+
+Read derivation rules from a text definition file.
+
+File format (lines starting with '#' are comments): 
+```cpp
+# output_name = weight1 * input1 + weight2 * input2 + ...
+LH1-LH2 = 1.0 * LH1 + -1.0 * LH2
+```
+
+**Parameters:**
+
+- **path** : *const QString &*
+  Path to the definition file.
+
+**Returns:**
+
+- *QVector&lt; DerivationRule &gt;* — Vector of parsed `DerivationRule`. Empty on error.
+
+---
+
+### writeDefinitionFile(path, rules)
+
+Write derivation rules to a text definition file.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  Path to the output file.
+
+- **rules** : *const QVector&lt; DerivationRule &gt; &*
+  Derivation rules to write.
+
+**Returns:**
+
+- *bool* — True if the file was written successfully.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

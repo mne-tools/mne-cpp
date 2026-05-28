@@ -1,0 +1,39 @@
+---
+id: rt-inv-op-worker
+title: "RTPROCESSINGLIB::RtInvOpWorker"
+sidebar_label: RtInvOpWorker
+sidebar_position: 38
+---
+
+# RtInvOpWorker
+
+**Namespace:** `RTPROCESSINGLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Header:** `dsp/rt/rt_inv_op.h`
+
+`#include <dsp/rt_inv_op.h>`
+
+```cpp
+class RTPROCESSINGLIB::RtInvOpWorker
+```
+
+Real-time inverse operator worker.
+
+Background worker thread that recomputes the MNE inverse operator when covariance updates arrive.
+
+---
+
+## Public Methods
+
+### doWork(inputData)
+
+Perform actual inverse operator creation.
+
+**Parameters:**
+
+- **inputData** : *const RtInvOpInput &*
+  Data to estimate the inverse operator from.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

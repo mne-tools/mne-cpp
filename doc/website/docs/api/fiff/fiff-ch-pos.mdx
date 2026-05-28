@@ -1,0 +1,63 @@
+---
+id: fiff-ch-pos
+title: "FIFFLIB::FiffChPos"
+sidebar_label: FiffChPos
+sidebar_position: 13
+---
+
+# FiffChPos
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_ch_pos.h`
+
+`#include <fiff/fiff_ch_pos.h>`
+
+```cpp
+class FIFFLIB::FiffChPos
+```
+
+Channel coil-frame placement: origin `r0` (m) and orthonormal axes `ex` / `ey` / `ez` in `FIFFV_COORD_DEVICE`.
+
+Twelve floats laid out exactly like the `fiffChPosRec` struct: three for `r0` and three each for `ex`, `ey`, `ez`. Consumed by forward-solution coil integration and by sensor visualization to draw oriented coil glyphs in the device frame.
+
+---
+
+## Public Methods
+
+### FiffChPos()
+
+Constructs the coil position descriptor.
+
+---
+
+### FiffChPos(p_FiffChPos)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FiffChPos** : *const FiffChPos &*
+  Coil position descriptor which should be copied.
+
+---
+
+### ~FiffChPos()
+
+Destroys the coil position descriptor.
+
+---
+
+## Static Methods
+
+### storageSize()
+
+Size of the old struct (fiffChPosRec) 13*int = 13*4 = 52.
+
+**Returns:**
+
+- *qint32* — the size of the old struct fiffChPosRec.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

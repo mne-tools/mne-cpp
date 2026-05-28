@@ -1,0 +1,121 @@
+---
+id: stats-ttest
+title: "STSLIB::StatsTtest"
+sidebar_label: StatsTtest
+sidebar_position: 7
+---
+
+# StatsTtest
+
+**Namespace:** `STATSLIB` &nbsp;·&nbsp; **Library:** Statistics Library &nbsp;·&nbsp; **Header:** `sts/sts_ttest.h`
+
+`#include <sts/sts_ttest.h>`
+
+```cpp
+class STSLIB::StatsTtest
+```
+
+Provides t-test implementations: one-sample, paired, and independent two-sample.
+
+One-sample, paired and independent two-sample Student t-tests with exact p-values via the regularised incomplete beta function.
+
+---
+
+## Static Methods
+
+### oneSample(data, mu, tail)
+
+One-sample t-test.
+
+Each column of data is tested against mu.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  Matrix of observations (rows = observations, cols = variables).
+
+- **mu** : *double*
+  Hypothesized mean (default 0.0).
+
+- **tail** : *StatsTailType*
+  Tail type for the test.
+
+**Returns:**
+
+- *StatsTtestResult* — `StatsTtestResult` with t-statistics, p-values, and degrees of freedom.
+
+---
+
+### paired(dataA, dataB, tail)
+
+Paired t-test.
+
+Tests dataA - dataB against 0.
+
+**Parameters:**
+
+- **dataA** : *const Eigen::MatrixXd &*
+  Matrix of observations for condition A.
+
+- **dataB** : *const Eigen::MatrixXd &*
+  Matrix of observations for condition B (same dimensions as dataA).
+
+- **tail** : *StatsTailType*
+  Tail type for the test.
+
+**Returns:**
+
+- *StatsTtestResult* — `StatsTtestResult` with t-statistics, p-values, and degrees of freedom.
+
+---
+
+### independent(dataA, dataB, tail)
+
+Independent two-sample t-test.
+
+**Parameters:**
+
+- **dataA** : *const Eigen::MatrixXd &*
+  Matrix of observations for group A (rows = observations, cols = variables).
+
+- **dataB** : *const Eigen::MatrixXd &*
+  Matrix of observations for group B (same number of columns as dataA).
+
+- **tail** : *StatsTailType*
+  Tail type for the test.
+
+**Returns:**
+
+- *StatsTtestResult* — `StatsTtestResult` with t-statistics, p-values, and degrees of freedom.
+
+---
+
+### tCdf(t, df)
+
+Compute the CDF of the t-distribution using the regularized incomplete beta function.
+
+**Parameters:**
+
+- **t** : *double*
+  The t-value.
+
+- **df** : *int*
+  Degrees of freedom.
+
+**Returns:**
+
+- *double* — The probability P(T &lt;= t).
+
+---
+
+### regularizedBeta(x, a, b)
+
+Regularized incomplete beta function I_x(a, b).
+
+Public because it is also used by `StatsFtest`.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,106 @@
+---
+id: ica
+title: "UTILSLIB::ICA"
+sidebar_label: ICA
+sidebar_position: 21
+---
+
+# ICA
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/ica.h`
+
+`#include <utils/ica.h>`
+
+```cpp
+class UTILSLIB::ICA
+```
+
+Independent Component Analysis using the FastICA algorithm (deflationary, logcosh nonlinearity).
+
+Typical MEG/EEG usage: 
+```cpp
+// Fit ICA on raw sensor data (n_channels x n_samples)
+IcaResult result = ICA::run(matRawData, 20);
+
+// Inspect source waveforms and mark artifact components (e.g. {0, 3})
+QVector<int> exclude = {0, 3};
+Eigen::MatrixXd matClean = ICA::excludeComponents(matRawData, result, exclude);
+```
+
+---
+
+## Static Methods
+
+### run(matData, nComponents, maxIter, tol, randomSeed)
+
+Fit FastICA on the given data matrix.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Input data (n_channels x n_samples). Each row is one sensor channel.
+
+- **nComponents** : *int*
+  Number of independent components to extract. Pass -1 (default) to use all channels.
+
+- **maxIter** : *int*
+  Maximum iterations per component (default 200).
+
+- **tol** : *double*
+  Convergence tolerance on |w_new · w_old| - 1 (default 1e-4).
+
+- **randomSeed** : *int*
+  Seed for the random weight initialisation (default 42).
+
+**Returns:**
+
+- *IcaResult* — `IcaResult` containing mixing/unmixing matrices and source time series.
+
+---
+
+### applyUnmixing(matData, result)
+
+Project new data through a previously fitted unmixing matrix.
+
+The same mean centering as during fitting is applied.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  New data (n_channels x n_samples), same channel order as training data.
+
+- **result** : *const IcaResult &*
+  Result from a previous `ICA::run()` call.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Source matrix (n_components x n_samples).
+
+---
+
+### excludeComponents(matData, result, excludedComponents)
+
+Reconstruct sensor-space data after suppressing selected components.
+
+The excluded component(s) are zeroed in source space before back-projection.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Original sensor data (n_channels x n_samples).
+
+- **result** : *const IcaResult &*
+  Result from `ICA::run()` on matData (or a representative segment).
+
+- **excludedComponents** : *const QVector&lt; int &gt; &*
+  0-based indices of components to suppress (e.g. ECG, EOG artifacts).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Cleaned sensor data (n_channels x n_samples).
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

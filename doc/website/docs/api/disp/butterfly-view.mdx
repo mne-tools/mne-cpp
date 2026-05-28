@@ -1,0 +1,268 @@
+---
+id: butterfly-view
+title: "DISPLIB::ButterflyView"
+sidebar_label: ButterflyView
+sidebar_position: 12
+---
+
+# ButterflyView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/butterflyview.h`
+
+`#include <disp/butterflyview.h>`
+
+```cpp
+class DISPLIB::ButterflyView
+```
+
+QRhi-accelerated butterfly viewer overlaying every channel of one or more averaged conditions.
+
+Renders all visible traces in a single shader pass for smooth zoom / pan; visibility per modality and per condition is driven by `ModalitySelectionView` and `AverageSelectionView`. Used as the main evoked viewer in MNE-Scan.
+
+---
+
+## Public Methods
+
+### ButterflyView(sSettingsPath, parent, f)
+
+The constructor.
+
+---
+
+### ~ButterflyView()
+
+Destroys the `ButterflyView`.
+
+---
+
+### updateViewport()
+
+Update the viewport.
+
+This, e.g., necessary if this widget was set to a QDockWidget which changes its floating state.
+
+---
+
+### setEvokedSetModel(model)
+
+Set the evoked set model.
+
+**Parameters:**
+
+- **model** : *QSharedPointer&lt;EvokedSetModel&gt;*
+  The new evoked set model.
+
+---
+
+### getEvokedSetModel()
+
+Returns the currently set `EvokedSetModel`.
+
+**Returns:**
+
+- *QSharedPointer&lt;EvokedSetModel&gt;* — the currently set `EvokedSetModel`.
+
+---
+
+### dataUpdate()
+
+Perform a data update.
+
+---
+
+### getModalityMap()
+
+Get the activation of the already created modality check boxes.
+
+**Returns:**
+
+- *QMap&lt; QString, bool &gt;* — The current modality map.
+
+---
+
+### setModalityMap(modalityMap)
+
+Set the modality checkboxes.
+
+**Parameters:**
+
+- **modalityMap** : *const QMap&lt; QString, bool &gt; &*
+  The modality map.
+
+---
+
+### setScaleMap(scaleMap)
+
+Sets the scale map to scaleMap.
+
+**Parameters:**
+
+- **scaleMap** : *const QMap&lt; qint32, float &gt; &*
+  map with all channel types and their current scaling value.
+
+---
+
+### setSelectedChannels(selectedChannels)
+
+Set the selected channels.
+
+**Parameters:**
+
+- **selectedChannels** : *const QList&lt; int &gt; &*
+  The new selected channels.
+
+---
+
+### updateView()
+
+Perform a view update from outside of this class.
+
+---
+
+### setBackgroundColor(backgroundColor)
+
+Set the background color.
+
+**Parameters:**
+
+- **backgroundColor** : *const QColor &*
+  The new background color.
+
+---
+
+### getBackgroundColor()
+
+Returns the background color.
+
+**Returns:**
+
+- *const QColor &* — The current background color.
+
+---
+
+### takeScreenshot(fileName)
+
+Renders a screenshot of the view and saves it to the passed path.
+
+SVG and PNG supported.
+
+**Parameters:**
+
+- **fileName** : *const QString &*
+  The file name and path where to store the screenshot.
+
+---
+
+### getAverageColor()
+
+Get the current average colors.
+
+**Returns:**
+
+- *QSharedPointer&lt; QMap&lt; QString, QColor &gt; &gt;* — Pointer to the current average colors.
+
+---
+
+### getAverageActivation()
+
+Get the current average activations.
+
+**Returns:**
+
+- *QSharedPointer&lt; QMap&lt; QString, bool &gt; &gt;* — Pointer to the current average activations.
+
+---
+
+### setAverageColor(qMapAverageColor)
+
+Set the average colors.
+
+**Parameters:**
+
+- **qMapAverageColor** : *const QSharedPointer&lt; QMap&lt; QString, QColor &gt; &gt;*
+  Pointer to the new average colors.
+
+---
+
+### setSingleAverageColor(avgColor)
+
+Sets the color used to draw the average to avgColor.
+
+**Parameters:**
+
+- **avgColor** : *const QColor &*
+  Color of averaged signal.
+
+---
+
+### setAverageActivation(qMapAverageActivation)
+
+Set the average activations.
+
+**Parameters:**
+
+- **qMapAverageActivation** : *const QSharedPointer&lt; QMap&lt; QString, bool &gt; &gt;*
+  Pointer to the new average activations.
+
+---
+
+### setChannelInfoModel(pChannelInfoModel)
+
+Set the channel info model.
+
+**Parameters:**
+
+- **pChannelInfoModel** : *QSharedPointer&lt;ChannelInfoModel&gt; &*
+  The new channel info model.
+
+---
+
+### showSelectedChannelsOnly(selectedChannels)
+
+Only shows the channels defined in the QStringList selectedChannels.
+
+**Parameters:**
+
+- **selectedChannels** : *const QStringList &*
+  list of all channel names which are currently selected in the selection manager.
+
+---
+
+### showSelectedChannels(selectedChannelsIndexes)
+
+Shows selected channels based on a list of selected channel indices.
+
+**Parameters:**
+
+- **selectedChannelsIndexes** : *const QList&lt; int &gt;*
+  list of indices of channels channels to be displayed.
+
+---
+
+### showAllChannels()
+
+Shows all channels in view.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,213 @@
+---
+id: fiff-events
+title: "FIFFLIB::FiffEvents"
+sidebar_label: FiffEvents
+sidebar_position: 22
+---
+
+# FiffEvents
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_events.h`
+
+`#include <fiff/fiff_events.h>`
+
+```cpp
+class FIFFLIB::FiffEvents
+```
+
+FIFF event list: (sample, prev, new) integer triples with read / write / detect / filter helpers.
+
+On-disk representation matches `mne.io.write.write_events` output and the `-eve.fif` files consumed by `mne.read_events`; the detection path mirrors `mne.find_events`. Used by `FiffEpochs` and the batch-averaging path in `FiffEvokedSet` to drive epoch extraction.
+
+---
+
+## Public Methods
+
+### FiffEvents()
+
+Default constructor.
+
+Creates an empty event set.
+
+---
+
+### FiffEvents(p_IODevice)
+
+Constructs `FiffEvents` by reading from an I/O device.
+
+Attempts to read as FIFF first; if that fails, tries ASCII format.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  The I/O device to read from.
+
+---
+
+### write_to_fif(p_IODevice)
+
+Write the event list to a FIFF file.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  The I/O device to write to.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### write_to_ascii(p_IODevice, sfreq)
+
+Write the event list to a text file (MNE-C compatible format).
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  The I/O device to write to.
+
+- **sfreq** : *float*
+  Sampling frequency for time column computation.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### num_events()
+
+Returns the number of events.
+
+**Returns:**
+
+- *int* — Number of events.
+
+---
+
+### is_empty()
+
+Returns true if no events are stored.
+
+**Returns:**
+
+- *bool* — true if the event matrix has zero rows.
+
+---
+
+## Static Methods
+
+### read(t_sEventName, t_fileRawName, p_Events)
+
+Read events from a FIFF or ASCII event file.
+
+If t_sEventName is empty, the event file name is derived from the raw file name (replacing ".fif" with "-eve.fif").
+
+**Parameters:**
+
+- **t_sEventName** : *const QString &*
+  Path to the event file (empty = derive from raw file name).
+
+- **t_fileRawName** : *const QString &*
+  Path to the raw data file (used to derive event file name if needed).
+
+- **p_Events** : *FiffEvents &*
+  The loaded events.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### read_from_fif(p_IODevice, p_Events)
+
+Read an event list from a FIFF file.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  The I/O device to read from.
+
+- **p_Events** : *FiffEvents &*
+  The loaded events.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### read_from_ascii(p_IODevice, p_Events)
+
+Read a list of events from an ASCII event file.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  The I/O device to read from.
+
+- **p_Events** : *FiffEvents &*
+  The loaded events.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### detect_from_raw(raw, p_Events, triggerCh, triggerMask, leadingEdge)
+
+Detect trigger events from raw data using a stimulus channel.
+
+Ported from detect_events (MNE-C).
+
+**Parameters:**
+
+- **raw** : *const FiffRawData &*
+  The raw data.
+
+- **p_Events** : *FiffEvents &*
+  The detected events.
+
+- **triggerCh** : *const QString &*
+  Name of the trigger channel (empty = default "STI 014").
+
+- **triggerMask** : *unsigned int*
+  Bitmask to apply to trigger values.
+
+- **leadingEdge** : *bool*
+  If true, only detect rising edges (default = true).
+
+**Returns:**
+
+- *bool* — true if events were detected, false otherwise.
+
+---
+
+### matchEvent(cat, events, eventIdx)
+
+Check whether an event matches a category definition.
+
+**Parameters:**
+
+- **cat** : *const AverageCategory &*
+  The averaging category to match against.
+
+- **events** : *const Eigen::MatrixXi &*
+  Full event matrix (nEvents x 3): [sample, from, to].
+
+- **eventIdx** : *int*
+  Index of the current event row.
+
+**Returns:**
+
+- *bool* — true if the event matches.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

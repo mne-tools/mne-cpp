@@ -1,0 +1,197 @@
+---
+id: quick-control-view
+title: "DISPLIB::QuickControlView"
+sidebar_label: QuickControlView
+sidebar_position: 50
+---
+
+# QuickControlView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/quickcontrolview.h`
+
+`#include <disp/quickcontrolview.h>`
+
+```cpp
+class DISPLIB::QuickControlView
+```
+
+Floating frameless container hosting modular Quick-Control settings tabs.
+
+Owns a `QTabWidget` into which application code drops arbitrary `AbstractView` panels grouped by name. Supports opacity, transparency and "pinned" behaviour and persists the current tab through `QSettings`.
+
+---
+
+## Public Methods
+
+### QuickControlView(sSettingsPath, name, flags, parent, bDraggable)
+
+Constructs a `QuickControlView` which is a child of parent.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  The name to be displayed on the minimize button.
+
+- **flags** : *Qt::WindowFlags*
+  The window flags.
+
+- **parent** : *QWidget **
+  The parent of widget.
+
+- **bDraggable** : *bool*
+  Flag specifying whether this widget is draggable.
+
+---
+
+### ~QuickControlView()
+
+Destructs a `QuickControlView`.
+
+---
+
+### clear()
+
+Clear this widget by removing all of its child widgets.
+
+---
+
+### findTabWidgetLayout(sTabName)
+
+---
+
+### addWidgets(lWidgets, sTabName, bAddToEnd)
+
+This convenience function adds control widgets to the `QuickControlView` based on their set objects names.
+
+Takes ownership of the QWidgets.
+
+**Parameters:**
+
+- **lWidgets** : *const QList&lt; QWidget * &gt; &*
+  The widget which are supposed to be added. The widgets will be categorized based on their. object names: "widget_", "group_", "group_tab_".
+
+- **sTabName** : *const QString &*
+  The tab to which the widgets are supposed to be added to.
+
+- **bAddToEnd** : *bool*
+  Whether to add the new widgets to the end of the layout. If true, the widgets will inserted in the beginning of the layout.
+
+---
+
+### addWidget(pWidget, sTabName, bAddToEnd)
+
+Add a new group box to this Widget.
+
+Takes ownership of the passed widget. Takes ownership of the QWidget.
+
+**Parameters:**
+
+- **pWidget** : *QWidget **
+  The widget which is supposed to be added.
+
+- **sTabName** : *const QString &*
+  The tab to which the widget is supposed to be added to.
+
+- **bAddToEnd** : *bool*
+  Whether to add the new widgets to the end of the layout. If true, the widgets will inserted in the beginning of the layout.
+
+---
+
+### addGroupBox(pWidget, sGroupBoxName, sTabName, bAddToEnd)
+
+Add a new group box to this Widget.
+
+Takes ownership of the passed widget. Takes ownership of the QWidget.
+
+**Parameters:**
+
+- **pWidget** : *QWidget **
+  The widgets which will be put into the new group box.
+
+- **sGroupBoxName** : *const QString &*
+  The name of the new group box.
+
+- **sTabName** : *const QString &*
+  The tab to which the group box is supposed to be added to.
+
+- **bAddToEnd** : *bool*
+  Whether to add the new widgets to the end of the layout. If true, the widgets will inserted in the beginning of the layout.
+
+---
+
+### addGroupBoxWithTabs(pWidget, sGroupBoxName, sTabNameGroupBox, sTabName, bAddToEnd)
+
+Add a new group box with tabs to this Widget.
+
+If the group box already exists, a new tab will be added to its QTabWidget. Takes ownership of the QWidget.
+
+**Parameters:**
+
+- **pWidget** : *QWidget **
+  The widgets which will be put into the new group box.
+
+- **sGroupBoxName** : *const QString &*
+  The name of the new group box.
+
+- **sTabNameGroupBox** : *const QString &*
+  The tab name inside the tab widget of the group box.
+
+- **sTabName** : *const QString &*
+  The tab to which the group box with the tab widget is supposed to be added to.
+
+- **bAddToEnd** : *bool*
+  Whether to add the new widgets to the end of the layout. If true, the widgets will inserted in the beginning of the layout.
+
+---
+
+### setOpacityValue(opactiy)
+
+Sets the values of the opacity slider.
+
+Choose value between 0.0 and 1.0.
+
+**Parameters:**
+
+- **opactiy** : *int*
+  the new opacity value.
+
+---
+
+### getOpacityValue()
+
+Get current opacity value.
+
+Value between 0.0 and 1.0.
+
+**Returns:**
+
+- *int* — the current set opacity value of this window.
+
+---
+
+### setVisiblityHideOpacityClose(bVisibility)
+
+Sets the visibility of the hide/show and close button.
+
+**Parameters:**
+
+- **bVisibility** : *bool*
+  the new visiblity state.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

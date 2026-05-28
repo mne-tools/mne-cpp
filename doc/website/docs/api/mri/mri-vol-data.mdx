@@ -1,0 +1,123 @@
+---
+id: mri-vol-data
+title: "MRILIB::MriVolData"
+sidebar_label: MriVolData
+sidebar_position: 6
+---
+
+# MriVolData
+
+**Namespace:** `MRILIB` &nbsp;·&nbsp; **Library:** MRI Library &nbsp;·&nbsp; **Header:** `mri/mri_vol_data.h`
+
+`#include <mri/mri_vol_data.h>`
+
+```cpp
+class MRILIB::MriVolData
+```
+
+Format-agnostic 3D MRI volume: header geometry, voxel buffer (as a vector of `MriSlice`), scan parameters and provenance.
+
+The volume is the single in-memory representation every consumer in mne-cpp operates on, regardless of whether it was loaded from MGH/MGZ, NIfTI-1 or a FreeSurfer COR directory. Storage is decomposed into a vector of `MriSlice` so the COR.fif writer can serialise without an intermediate copy, while the slice viewer and the BEM coregistration step both index it through the same (column, row, slice) coordinate.
+
+The header captures FreeSurfer's MGH conventions: voxel sizes (`spacingX/Y/Z`), direction cosines (`Mdc`, column-major), centre RAS (`c_ras`) and voxel data type (`MRI_UCHAR` / `MRI_INT` / `MRI_FLOAT` / `MRI_SHORT`). Optional scan parameters (TR, flip angle, TE, TI, FoV) and tags (Talairach transform path, provenance) round out the structure. The ``read()`` entry point dispatches on the file extension so callers do not need to branch on format.
+
+Format reference: [https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat](https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat)
+
+Ported from `mneMRIdataRec` in MNE C (`mne_types_mne-c.h`) by Matti Hamalainen.
+
+---
+
+## Public Methods
+
+### MriVolData()
+
+Default constructor.
+
+---
+
+### read(path)
+
+Convenience loader: reads an MGH/MGZ file and populates this volume.
+
+Wraps `MriMghIO::read()` so callers don't need to manage a separate additionalTrans vector. Mirrors MNE-Python's `nib.load(path)` one-liner.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  Path to the .mgh or .mgz file.
+
+**Returns:**
+
+- *bool* — True on success, false on error.
+
+---
+
+### isValid()
+
+Returns whether this volume contains valid data.
+
+**Returns:**
+
+- *bool* — True if the volume has been loaded successfully.
+
+---
+
+### dimX()
+
+**Returns:**
+
+- *int* — First (x) dimension — fastest-varying axis.
+
+---
+
+### dimY()
+
+**Returns:**
+
+- *int* — Second (y) dimension.
+
+---
+
+### dimZ()
+
+**Returns:**
+
+- *int* — Third (z) dimension — slowest-varying axis.
+
+---
+
+### dims()
+
+**Returns:**
+
+- *QVector&lt; int &gt;* — Volume dimensions as \{dimX, dimY, dimZ\}.
+
+---
+
+### voxelDataAsFloat()
+
+Returns all voxel data as a contiguous float array in x-fastest order.
+
+Mirrors MNE-Python's `img.get_fdata().ravel(order='F')`. Regardless of the on-disk type (UCHAR, SHORT, INT, FLOAT) the output is always float. The array length is ``width` * `height` * `depth``.
+
+**Returns:**
+
+- *QVector&lt; float &gt;* — Flat voxel data; empty vector if the volume has no slices.
+
+---
+
+### computeVox2Ras()
+
+Builds the voxel-to-surface-RAS (MRI) 4×4 transform matrix.
+
+Following FreeSurfer convention: M = Mdc * diag(xsize, ysize, zsize) P0 = c_ras - M * (dim/2) vox2ras = | M P0 | (in mm, converted to meters for FIFF) | 0 1 |
+
+**Returns:**
+
+- *Eigen::Matrix4f* — The 4×4 voxel-to-surface-RAS transform in meters.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

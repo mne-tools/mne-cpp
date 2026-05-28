@@ -1,0 +1,664 @@
+---
+id: rt-fiff-raw-view-model
+title: "DISPLIB::RtFiffRawViewModel"
+sidebar_label: RtFiffRawViewModel
+sidebar_position: 53
+---
+
+# RtFiffRawViewModel
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/helpers/rtfiffrawviewmodel.h`
+
+`#include <disp/rtfiffrawviewmodel.h>`
+
+```cpp
+class DISPLIB::RtFiffRawViewModel
+```
+
+Circular-buffer QAbstractTableModel feeding the real-time FIFF raw browser.
+
+Keeps the last few seconds of streaming FIFF data in a per-channel ring buffer and forwards bad-channel flips, trigger detections and annotation edits back to the underlying `FiffInfo` / event list.
+
+---
+
+## Public Methods
+
+### RtFiffRawViewModel(parent)
+
+Constructs an real-time multi sample array table model for the given parent.
+
+**Parameters:**
+
+- **parent** : *QObject **
+  parent of the table model.
+
+---
+
+### ~RtFiffRawViewModel()
+
+Destructs `RtFiffRawViewModel` and stops the use of Shared Memory within the Event Manager.
+
+---
+
+### rowCount(parent)
+
+Returns the number of rows under the given parent.
+
+When the parent is valid it means that rowCount is returning the number of children of parent.
+
+**Parameters:**
+
+- **parent** : *const QModelIndex &*
+  not used.
+
+**Returns:**
+
+- *int* — number of rows.
+
+---
+
+### columnCount(parent)
+
+Returns the number of columns for the children of the given parent.
+
+**Parameters:**
+
+- **parent** : *const QModelIndex &*
+  not used.
+
+**Returns:**
+
+- *int* — number of columns.
+
+---
+
+### data(index, role)
+
+Returns the data stored under the given role for the item referred to by the index.
+
+**Parameters:**
+
+- **index** : *const QModelIndex &*
+  determines item location.
+
+- **role** : *int*
+  role to return.
+
+**Returns:**
+
+- *QVariant* — accessed data.
+
+---
+
+### headerData(section, orientation, role)
+
+Returns the data for the given role and section in the header with the specified orientation.
+
+**Parameters:**
+
+- **section** : *int*
+  For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
+
+- **orientation** : *Qt::Orientation*
+  Qt::Horizontal or Qt::Vertical.
+
+- **role** : *int*
+  role to show.
+
+**Returns:**
+
+- *QVariant* — accessed eader data.
+
+---
+
+### setFiffInfo(p_pFiffInfo)
+
+Sets corresponding fiff information.
+
+**Parameters:**
+
+- **p_pFiffInfo** : *QSharedPointer&lt;FIFFLIB::FiffInfo&gt; &*
+  The corresponding fiff information.
+
+---
+
+### setSamplingInfo(sps, T, bSetZero)
+
+Sets the sampling information and calculates the resulting downsampling factor between actual sps and desired sps.
+
+**Parameters:**
+
+- **sps** : *float*
+  Samples per second of incomming data.
+
+- **T** : *int*
+  Time window length to display.
+
+- **bSetZero** : *bool*
+  If data should be set to zero. Default is false.
+
+---
+
+### getLastBlock()
+
+Returns the last received data block.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — the last data block.
+
+---
+
+### addData(data)
+
+Adds multiple time points (QVector) for a channel set (VectorXd).
+
+**Parameters:**
+
+- **data** : *const QList&lt; Eigen::MatrixXd &gt; &*
+  data to add (Time points of channel samples).
+
+---
+
+### getKind(row)
+
+Returns the kind of a given channel number.
+
+**Parameters:**
+
+- **row** : *qint32*
+  row number which correspodns to a given channel.
+
+**Returns:**
+
+- *FIFFLIB::fiff_int_t* — kind of given channel number.
+
+---
+
+### getUnit(row)
+
+Returns the unit of a given channel number.
+
+**Parameters:**
+
+- **row** : *qint32*
+  row number which correspodns to a given channel.
+
+**Returns:**
+
+- *FIFFLIB::fiff_int_t* — unit of given channel number.
+
+---
+
+### getCoil(row)
+
+Returns the coil type of a given channel number.
+
+**Parameters:**
+
+- **row** : *qint32*
+  row number which correspodns to a given channel.
+
+**Returns:**
+
+- *FIFFLIB::fiff_int_t* — coil type of given channel number.
+
+---
+
+### getMaxSamples()
+
+Returns the maximal number of samples of the downsampled data to display.
+
+**Returns:**
+
+- *qint32* — the maximal number of samples.
+
+---
+
+### getCurrentSampleIndex()
+
+Returns the current sample index which represents the index which the next incoming data will be stored at in the data.
+
+**Returns:**
+
+- *qint32* — the current sample index.
+
+---
+
+### getLastBlockFirstValue(row)
+
+Returns the first value of the last complete data display block.
+
+**Parameters:**
+
+- **row** : *int*
+  row for which the first value is to be returned.
+
+**Returns:**
+
+- *double* — the first value of the last complete data display block.
+
+---
+
+### getIdxSelMap()
+
+Returns a map which conatins the channel idx and its corresponding selection status.
+
+**Returns:**
+
+- *const QMap&lt; qint32, qint32 &gt; &* — the channel idx to selection status.
+
+---
+
+### selectRows(selection)
+
+Selects the given list of channel indeces and unselect all other channels.
+
+**Parameters:**
+
+- **selection** : *const QList&lt; qint32 &gt; &*
+  channel index list to select.
+
+---
+
+### hideRows(selection)
+
+Hides the given list of channel.
+
+**Parameters:**
+
+- **selection** : *const QList&lt; qint32 &gt; &*
+  channel index list to select.
+
+---
+
+### resetSelection()
+
+Resets the current selection (selects all channels).
+
+---
+
+### toggleFreeze(index)
+
+Toggle freeze for all channels when a channel is double clicked.
+
+**Parameters:**
+
+- **index** : *const QModelIndex &*
+  of the channel which has been double clicked.
+
+---
+
+### setScaling(p_qMapChScaling)
+
+Set scaling channel scaling.
+
+**Parameters:**
+
+- **p_qMapChScaling** : *const QMap&lt; qint32, float &gt; &*
+  Map of scaling factors.
+
+---
+
+### updateProjection(projs)
+
+Update the SSP projection.
+
+**Parameters:**
+
+- **projs** : *const QList&lt; FIFFLIB::FiffProj &gt; &*
+  The new projectors.
+
+---
+
+### updateCompensator(to)
+
+Update the compensator.
+
+**Parameters:**
+
+- **to** : *int*
+  Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind).
+
+---
+
+### updateSpharaActivation(state)
+
+Update the SPHARA operator.
+
+**Parameters:**
+
+- **state** : *bool*
+  The current state of teh SPHARA tool.
+
+---
+
+### updateSpharaOptions(sSytemType, nBaseFctsFirst, nBaseFctsSecond)
+
+Update the SPHARA operator.
+
+**Parameters:**
+
+- **sSystemType**
+  The current acquisition system type (VectorView, BabyMEG, EEG).
+
+- **nBaseFctsFirst** : *int*
+  The new number of basis function to use for the first SPHARA operator.
+
+- **nBaseFctsSecond** : *int*
+  The new number of basis function to use for the second SPHARA operator.
+
+---
+
+### setFilter(filterData)
+
+Set new filter parameters.
+
+**Parameters:**
+
+- **filterData** : *QList&lt; UTILSLIB::FilterKernel &gt;*
+  list of the new filter.
+
+---
+
+### setFilterActive(state)
+
+Set filter activation.
+
+**Parameters:**
+
+- **state** : *bool*
+  filter on/off flag.
+
+---
+
+### setBackgroundColor(color)
+
+Set the background color.
+
+**Parameters:**
+
+- **color** : *const QColor &*
+  The background color.
+
+---
+
+### setFilterChannelType(channelType)
+
+Sets the type of channel which are to be filtered.
+
+**Parameters:**
+
+- **channelType** : *const QString &*
+  the channel type which is to be filtered (EEG, MEG, All).
+
+---
+
+### createFilterChannelList(channelNames)
+
+Create list of channels which are to be filtered based on channel names.
+
+**Parameters:**
+
+- **channelNames** : *QStringList*
+  the channel names which are to be filtered.
+
+---
+
+### markChBad(ch, status)
+
+markChBad marks the selected channels as bad/good in m_chInfolist
+
+**Parameters:**
+
+- **chlist**
+  index that is selected for marking.
+
+- **status** : *bool*
+  -&gt; mark as bad, status=0 -&gt; mark as good.
+
+---
+
+### markChBad(chlist, status)
+
+markChBad marks the selected channels as bad/good in m_chInfolist
+
+**Parameters:**
+
+- **chlist** : *QModelIndexList*
+  is the list of indices that are selected for marking.
+
+- **status** : *bool*
+  -&gt; mark as bad, status=0 -&gt; mark as good.
+
+---
+
+### triggerInfoChanged(colorMap, active, triggerCh, threshold)
+
+markChBad marks the selected channels as bad/good in m_chInfolist
+
+**Parameters:**
+
+- **colorMap** : *const QMap&lt; double, QColor &gt; &*
+  color for each trigger channel.
+
+- **activ**
+  real time trigger detection active.
+
+- **triggerCh** : *QString*
+  current trigger channel to scan.
+
+- **threshold** : *double*
+  threshold for the detection process.
+
+---
+
+### distanceTimeSpacerChanged(value)
+
+distanceTimeSpacerChanged changes the distance of the time spacers
+
+**Parameters:**
+
+- **value** : *int*
+  the new distance for the time spacers.
+
+---
+
+### resetTriggerCounter()
+
+resetTriggerCounter resets the trigger counter
+
+---
+
+### numVLines()
+
+Returns the number of vertical lines (one per second).
+
+**Returns:**
+
+- *qint32* — number of vertical lines.
+
+---
+
+### isFreezed()
+
+Returns current freezing status.
+
+**Returns:**
+
+- *bool* — the current freezing status.
+
+---
+
+### getScaling()
+
+Returns current scaling.
+
+**Returns:**
+
+- *const QMap&lt; qint32, float &gt; &* — the current scaling.
+
+---
+
+### getDetectedTriggers()
+
+Returns current detected trigger flanks.
+
+**Returns:**
+
+- *QList&lt; QPair&lt; int, double &gt; &gt;* — the current detected trigger flanks.
+
+---
+
+### getDetectedTriggersOld()
+
+Returns old detected trigger flanks.
+
+**Returns:**
+
+- *QList&lt; QPair&lt; int, double &gt; &gt;* — the old detected trigger flanks.
+
+---
+
+### getTriggerColor()
+
+Returns current trigger color.
+
+**Returns:**
+
+- *QMap&lt; double, QColor &gt;* — the current trigger color map fpr each detected type.
+
+---
+
+### getNumberOfTimeSpacers()
+
+Returns the current number for the time spacers.
+
+**Returns:**
+
+- *int* — the current number for the time spacers.
+
+---
+
+### getTriggerThreshold()
+
+Returns the current trigger threshold.
+
+**Returns:**
+
+- *double* — the current trigger threshold.
+
+---
+
+### getTriggerName()
+
+Returns the current trigger name.
+
+**Returns:**
+
+- *QString* — the current trigger name.
+
+---
+
+### getCurrentTriggerIndex()
+
+Returns the current trigger channel index.
+
+**Returns:**
+
+- *int* — the current trigger channel index.
+
+---
+
+### triggerDetectionActive()
+
+Returns whether trigger detection is active or not.
+
+**Returns:**
+
+- *bool* — whether trigger detection is active or not.
+
+---
+
+### getCurrentOverlapAddDelay()
+
+Returns the current overlap add delay.
+
+**Returns:**
+
+- *int* — the current overlap add delay.
+
+---
+
+### getFirstSampleOffset()
+
+Get offset of first drawn sample in the window.
+
+**Returns:**
+
+- *int* — sample offset of window
+
+---
+
+### getMaxValueFromRawViewModel(row)
+
+Get maximum range of respective channel type.
+
+range value in FiffChInfo does not seem to contain a reasonable value
+
+**Parameters:**
+
+- **Row**
+  of the model
+
+**Returns:**
+
+- *double* — the max value of the y axis for the channel
+
+---
+
+### addEvent(iSample)
+
+Adds event based on input parameters.
+
+**Parameters:**
+
+- ****
+
+---
+
+### getEventsToDisplay(iBegin, iEnd)
+
+Returns event sample positions between two samples.
+
+**Parameters:**
+
+- **iBegin** : *int*
+  Lower bound for sample (inclusive).
+
+- **iEnd** : *int*
+  Upper bound for sample (exclusive).
+
+**Returns:**
+
+- *std::vector&lt; int &gt;* — Vector of event sample positions.
+
+---
+
+### setEventCallbacks(addFn, getFn)
+
+Sets callbacks for adding and querying events.
+
+**Parameters:**
+
+- **addFn** : *std::function&lt; void(int)&gt;*
+  Callback invoked when an event is added.
+
+- **getFn** : *std::function&lt; std::vector&lt; int &gt;(int, int)&gt;*
+  Callback returning event sample positions in a range.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

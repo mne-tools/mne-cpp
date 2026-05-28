@@ -1,0 +1,91 @@
+---
+id: minimum-norm-settings-view
+title: "DISPLIB::MinimumNormSettingsView"
+sidebar_label: MinimumNormSettingsView
+sidebar_position: 41
+---
+
+# MinimumNormSettingsView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/minimumnormsettingsview.h`
+
+`#include <disp/minimumnormsettingsview.h>`
+
+```cpp
+class DISPLIB::MinimumNormSettingsView
+```
+
+Inverse-method / regularisation panel (MNE, dSPM, sLORETA) for the on-line source estimator.
+
+Combo boxes pick the inverse method, spinboxes set the SNR lambda and the time-frame window; edits propagate via Qt signals to the `rtprocessing` inverse job.
+
+---
+
+## Public Methods
+
+### MinimumNormSettingsView(sSettingsPath, sMethod, parent, f)
+
+Constructs a `MinimumNormSettingsView` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  parent of widget.
+
+---
+
+### ~MinimumNormSettingsView()
+
+Destroys the `MinimumNormSettingsView`.
+
+---
+
+### setTriggerTypes(lTriggerTypes)
+
+Destroys the `MinimumNormSettingsView`.
+
+**Parameters:**
+
+- **lTriggerTypes** : *const QStringList &*
+  The new trigger types.
+
+---
+
+### setModelCheckpoint(sPath)
+
+Sets the model checkpoint path shown in the read-only line edit.
+
+**Parameters:**
+
+- **sPath** : *const QString &*
+  Absolute path to the model checkpoint file (e.g. .onnx).
+
+---
+
+### getModelCheckpoint()
+
+Returns the current model checkpoint path.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

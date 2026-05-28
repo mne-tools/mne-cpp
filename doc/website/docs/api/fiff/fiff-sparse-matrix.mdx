@@ -1,0 +1,253 @@
+---
+id: fiff-sparse-matrix
+title: "FIFFLIB::FiffSparseMatrix"
+sidebar_label: FiffSparseMatrix
+sidebar_position: 28
+---
+
+# FiffSparseMatrix
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_sparse_matrix.h`
+
+`#include <fiff/fiff_sparse_matrix.h>`
+
+```cpp
+class FIFFLIB::FiffSparseMatrix
+```
+
+Sparse FIFF matrix: CCS or RCS storage with the value / index / pointer triple as written by FiffStream::write_float_sparse_*.
+
+Holds the three arrays the FIFF sparse-matrix tag stores on disk (values, inner indices, outer pointers) and the (nrow, ncol, nnz) shape, so it can be streamed in and out without conversion. Convert to an `Eigen::SparseMatrix` for arithmetic and back for serialization.
+
+---
+
+## Public Methods
+
+### FiffSparseMatrix()
+
+Constructs an empty `FiffSparseMatrix`.
+
+---
+
+### FiffSparseMatrix(mat, coding)
+
+Constructs a `FiffSparseMatrix` wrapping an existing Eigen sparse matrix.
+
+**Parameters:**
+
+- **mat** : *Eigen::SparseMatrix&lt; float &gt; &&*
+  Eigen sparse matrix to wrap (moved in).
+
+- **coding** : *FIFFLIB::fiff_int_t*
+  FIFF storage coding (FIFFTS_MC_RCS or FIFFTS_MC_CCS).
+
+---
+
+### FiffSparseMatrix(mat)
+
+Default copy constructor.
+
+---
+
+### FiffSparseMatrix(mat)
+
+Default move constructor.
+
+---
+
+### operator=()
+
+Default copy-assignment operator.
+
+---
+
+### operator=()
+
+Default move-assignment operator.
+
+---
+
+### ~FiffSparseMatrix()
+
+Default destructor.
+
+---
+
+### eigen()
+
+Mutable access to the underlying Eigen sparse matrix.
+
+**Returns:**
+
+- *Eigen::SparseMatrix&lt; float &gt; &* — Reference to the internal Eigen::SparseMatrix&lt;float&gt;.
+
+---
+
+### eigen()
+
+Const access to the underlying Eigen sparse matrix.
+
+**Returns:**
+
+- *const Eigen::SparseMatrix&lt; float &gt; &* — Const reference to the internal Eigen::SparseMatrix&lt;float&gt;.
+
+---
+
+### operator const Eigen::SparseMatrix&lt; float &gt; &()
+
+Implicit conversion to const Eigen::SparseMatrix&lt;float&gt;&.
+
+---
+
+### rows()
+
+Number of rows.
+
+---
+
+### cols()
+
+Number of columns.
+
+---
+
+### nonZeros()
+
+Number of stored non-zero elements.
+
+---
+
+### mne_add_upper_triangle_rcs()
+
+Add the upper triangle to a lower-triangular sparse RCS matrix.
+
+**Returns:**
+
+- *FiffSparseMatrix::UPtr* — A unique pointer to the newly constructed `FiffSparseMatrix` with both triangles.
+
+---
+
+### pickLowerTriangleRcs()
+
+Extract only the lower triangle (including diagonal) from a square RCS matrix.
+
+**Returns:**
+
+- *FiffSparseMatrix::UPtr* — A unique pointer to the newly constructed `FiffSparseMatrix` with lower-triangle elements.
+
+---
+
+### is_empty()
+
+Check whether this sparse matrix is empty (no non-zero elements).
+
+**Returns:**
+
+- *bool* — true if the matrix has no data.
+
+---
+
+### toEigenSparse()
+
+Convert to Eigen::SparseMatrix&lt;double&gt; (cast from float).
+
+**Returns:**
+
+- *Eigen::SparseMatrix&lt; double &gt;* — A double-precision copy of the internal sparse matrix.
+
+---
+
+## Static Methods
+
+### fiff_get_matrix_sparse_dims(tag)
+
+Interpret dimensions and nz from matrix data.
+
+**Parameters:**
+
+- **tag** : *const FIFFLIB::FiffTag::UPtr &*
+  The tag containing sparse matrix data.
+
+**Returns:**
+
+- *std::vector&lt; int &gt;* — A vector with the matrix dimension info, or empty on error.
+
+---
+
+### fiff_get_float_sparse_matrix(tag)
+
+Conversion of tag data into the standard sparse representation.
+
+**Parameters:**
+
+- **tag** : *const FIFFLIB::FiffTag::UPtr &*
+  The tag containing sparse matrix data.
+
+**Returns:**
+
+- *FiffSparseMatrix::UPtr* — A unique pointer to the newly constructed `FiffSparseMatrix`, or nullptr on error.
+
+---
+
+### create_sparse_rcs(nrow, ncol, nnz, colindex, vals)
+
+Create a sparse RCS matrix from row-based data.
+
+**Parameters:**
+
+- **nrow** : *int*
+  Number of rows.
+
+- **ncol** : *int*
+  Number of columns.
+
+- **nnz** : *int **
+  Number of non-zero elements on each row.
+
+- **colindex** : *int ***
+  Column indices of non-zero elements on each row.
+
+- **vals** : *float ***
+  Values of non-zero elements on each row.
+
+**Returns:**
+
+- *FiffSparseMatrix::UPtr* — A unique pointer to the newly constructed `FiffSparseMatrix`, or nullptr on error.
+
+---
+
+### fromEigenSparse(mat)
+
+Create a `FiffSparseMatrix` from an Eigen::SparseMatrix&lt;double&gt;.
+
+The data is cast to float for internal storage.
+
+**Parameters:**
+
+- **mat** : *const Eigen::SparseMatrix&lt; double &gt; &*
+  The Eigen sparse matrix to convert.
+
+**Returns:**
+
+- *FiffSparseMatrix* — The equivalent `FiffSparseMatrix`.
+
+---
+
+### fromEigenSparse(mat)
+
+Create a `FiffSparseMatrix` from an Eigen::SparseMatrix&lt;float&gt;.
+
+**Parameters:**
+
+- **mat** : *const Eigen::SparseMatrix&lt; float &gt; &*
+  The Eigen sparse matrix to wrap.
+
+**Returns:**
+
+- *FiffSparseMatrix* — The equivalent `FiffSparseMatrix`.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

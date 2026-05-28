@@ -1,0 +1,69 @@
+---
+id: filter-parameter
+title: "UTILSLIB::FilterParameter"
+sidebar_label: FilterParameter
+sidebar_position: 18
+---
+
+# FilterParameter
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/filterkernel.h`
+
+`#include <utils/filterkernel.h>`
+
+```cpp
+class UTILSLIB::FilterParameter
+```
+
+Named filter-design parameter descriptor holding a human-readable name and description (e.g.
+
+design method or filter type).
+
+---
+
+## Public Methods
+
+### FilterParameter()
+
+Creates a filter parameter with name 'Unknown'.
+
+---
+
+### FilterParameter(sName)
+
+Creates a filter parameter with name sName.
+
+**Parameters:**
+
+- **sName** : *QString*
+  input name.
+
+---
+
+### FilterParameter(sName, sDescription)
+
+Creates a filter parameter with name sName and description sDescription.
+
+**Parameters:**
+
+- **sName** : *QString*
+  input name.
+
+- **sDescription** : *QString*
+  input desxription.
+
+---
+
+### getName()
+
+Returns parameter name.
+
+**Returns:**
+
+- *QString* — Parameter name.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

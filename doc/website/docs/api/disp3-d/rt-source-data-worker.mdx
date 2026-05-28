@@ -1,0 +1,174 @@
+---
+id: rt-source-data-worker
+title: "DISP3DLIB::RtSourceDataWorker"
+sidebar_label: RtSourceDataWorker
+sidebar_position: 7
+---
+
+# RtSourceDataWorker
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Header:** `disp3D/workers/rtsourcedataworker.h`
+
+`#include <disp3D/rtsourcedataworker.h>`
+
+```cpp
+class DISP3DLIB::RtSourceDataWorker
+```
+
+`RtSourceDataWorker` processes incoming source estimate data in a background thread.
+
+It manages a data queue, performs averaging, applies interpolation matrices, and converts source values to per-vertex ABGR colors for rendering.
+
+This worker is driven by a timer in the `RtSourceDataController`.
+
+Background worker for real-time source estimate streaming.
+
+---
+
+## Public Methods
+
+### RtSourceDataWorker(parent)
+
+Constructor.
+
+**Parameters:**
+
+- **parent** : *QObject **
+  Parent QObject.
+
+---
+
+### addData(data)
+
+Add a new source estimate data vector to the streaming queue.
+
+The vector contains source values for all sources (LH + RH concatenated).
+
+**Parameters:**
+
+- **data** : *const Eigen::VectorXd &*
+  Source activity vector (nSources x 1).
+
+---
+
+### clear()
+
+Clear all queued data.
+
+---
+
+### setInterpolationMatrixLeft(mat)
+
+Set the interpolation matrix for the left hemisphere.
+
+**Parameters:**
+
+- **mat** : *QSharedPointer&lt; Eigen::SparseMatrix&lt; float &gt; &gt;*
+  Sparse interpolation matrix (nVertices x nSourcesLH).
+
+---
+
+### setInterpolationMatrixRight(mat)
+
+Set the interpolation matrix for the right hemisphere.
+
+**Parameters:**
+
+- **mat** : *QSharedPointer&lt; Eigen::SparseMatrix&lt; float &gt; &gt;*
+  Sparse interpolation matrix (nVertices x nSourcesRH).
+
+---
+
+### setNumberAverages(numAvr)
+
+Set the number of samples to average before emitting.
+
+**Parameters:**
+
+- **numAvr** : *int*
+  Number of averages (1 = no averaging).
+
+---
+
+### setColormapType(name)
+
+Set the colormap type used for color conversion.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Colormap name ("Hot", "Jet", "Viridis", "Cool", "RedBlue").
+
+---
+
+### setThresholds(min, mid, max)
+
+Set the threshold values for normalization.
+
+**Parameters:**
+
+- **min** : *double*
+  Lower threshold (values below are transparent).
+
+- **mid** : *double*
+  Mid-point threshold (fade-in range).
+
+- **max** : *double*
+  Upper threshold (values above are clamped).
+
+---
+
+### setLoopState(enabled)
+
+Enable or disable looping (replay from beginning when queue is exhausted).
+
+**Parameters:**
+
+- **enabled** : *bool*
+  True to enable looping.
+
+---
+
+### setSFreq(sFreq)
+
+Set the sampling frequency of the incoming data.
+
+**Parameters:**
+
+- **sFreq** : *double*
+  Sampling frequency in Hz.
+
+---
+
+### setStreamSmoothedData(bStreamSmoothedData)
+
+Toggle between emitting interpolated color data (smoothed) and raw source values split by hemisphere.
+
+When enabled (default), `streamData()` performs interpolation + colormap conversion and emits `newRtSmoothedData()`. When disabled, it emits `newRtRawData()` with the raw source values per hemisphere, which can be used for GPU-side interpolation.
+
+**Parameters:**
+
+- **bStreamSmoothedData** : *bool*
+  True for smoothed colors (default), false for raw.
+
+---
+
+### setSurfaceColor(baseColorsLh, baseColorsRh)
+
+Set the base surface colors for both hemispheres.
+
+Sub-threshold vertices will display these colors instead of being transparent.
+
+**Parameters:**
+
+- **baseColorsLh** : *const QVector&lt; uint32_t &gt; &*
+  Per-vertex ABGR colors for the left hemisphere.
+
+- **baseColorsRh** : *const QVector&lt; uint32_t &gt; &*
+  Per-vertex ABGR colors for the right hemisphere.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

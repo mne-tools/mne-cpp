@@ -1,0 +1,46 @@
+---
+id: selection-scene-item
+title: "DISPLIB::SelectionSceneItem"
+sidebar_label: SelectionSceneItem
+sidebar_position: 58
+---
+
+# SelectionSceneItem
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/helpers/selectionsceneitem.h`
+
+`#include <disp/selectionsceneitem.h>`
+
+```cpp
+class DISPLIB::SelectionSceneItem
+```
+
+Graphics item representing a selectable electrode or channel in a 2-D layout scene.
+
+---
+
+## Public Methods
+
+### SelectionSceneItem(channelName, channelNumber, channelPosition, channelKind, channelUnit, channelColor, bIsBadChannel)
+
+Constructs a `SelectionSceneItem`.
+
+---
+
+### boundingRect()
+
+Returns the bounding rect of the electrode item.
+
+This rect describes the area which the item uses to plot in.
+
+---
+
+### paint(painter, option, widget)
+
+Reimplemented paint function.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

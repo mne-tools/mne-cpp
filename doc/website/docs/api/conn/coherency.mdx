@@ -1,0 +1,66 @@
+---
+id: coherency
+title: "CONNLIB::Coherency"
+sidebar_label: Coherency
+sidebar_position: 9
+---
+
+# Coherency
+
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Header:** `conn/metrics/coherency.h`
+
+`#include <conn/coherency.h>`
+
+```cpp
+class CONNLIB::Coherency
+```
+
+Shared core of the coherence / imaginary-coherence family.
+
+compute fills the per-trial DPSS spectra and accumulates the cross- and auto-spectral sums in `ConnectivitySettings::IntermediateSumData`. The two public reductions then collapse the complex coherency to a real scalar per channel pair: `calculateAbs` returns |Coh_\{xy\}(f)|^2 (classical magnitude-squared coherence, symmetric, sensitive to zero-lag mixing) and `calculateImag` returns |Im(Coh_\{xy\}(f))|, the volume-conduction-robust imaginary coherence of Nolte et al. (2004).
+
+Complex coherency core; produces magnitude-squared and imaginary-part reductions for downstream metrics.
+
+---
+
+## Public Methods
+
+### Coherency()
+
+Constructs a `Coherency` object.
+
+---
+
+## Static Methods
+
+### calculateAbs(finalNetwork, connectivitySettings)
+
+Calculates the absolute value of coherency of the rows of the data matrix.
+
+**Parameters:**
+
+- **finalNetwork** : *Network &*
+  The resulting network.
+
+- **connectivitySettings** : *ConnectivitySettings &*
+  The input data and parameters.
+
+---
+
+### calculateImag(finalNetwork, connectivitySettings)
+
+Calculates the imaginary part of coherency of the rows of the data matrix.
+
+**Parameters:**
+
+- **finalNetwork** : *Network &*
+  The resulting network.
+
+- **connectivitySettings** : *ConnectivitySettings &*
+  The input data and parameters.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

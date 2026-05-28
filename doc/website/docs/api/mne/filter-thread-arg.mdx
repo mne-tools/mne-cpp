@@ -1,0 +1,40 @@
+---
+id: filter-thread-arg
+title: "MNELIB::FilterThreadArg"
+sidebar_label: FilterThreadArg
+sidebar_position: 6
+---
+
+# FilterThreadArg
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/filter_thread_arg.h`
+
+`#include <mne/filter_thread_arg.h>`
+
+```cpp
+class MNELIB::FilterThreadArg
+```
+
+Implements a Filter Thread Argument (Replaces *filterThreadArg,filterThreadArgRec; struct of MNE-C filter_source_space.c).
+
+Thread-local arguments for parallel raw data filtering (channel range, filter kernel, buffer).
+
+---
+
+## Public Methods
+
+### FilterThreadArg()
+
+Constructs the Filter Thread Argument Refactored: new_filter_thread_arg (filter_source_space.c).
+
+---
+
+### ~FilterThreadArg()
+
+Destroys the Filter Thread Argument Refactored: free_filter_thread_arg (filter_source_space.c).
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

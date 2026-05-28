@@ -1,0 +1,89 @@
+---
+id: fs-atlas-lookup
+title: "FSLIB::FsAtlasLookup"
+sidebar_label: FsAtlasLookup
+sidebar_position: 6
+---
+
+# FsAtlasLookup
+
+**Namespace:** `FSLIB` &nbsp;·&nbsp; **Library:** FreeSurfer Library &nbsp;·&nbsp; **Header:** `fs/fs_atlas_lookup.h`
+
+`#include <fs/fs_atlas_lookup.h>`
+
+```cpp
+class FSLIB::FsAtlasLookup
+```
+
+RAS-point → anatomical-region resolver backed by a FreeSurfer volumetric parcellation.
+
+Owns the parcellation voxel grid, its inverse RAS-to-voxel affine, and a label-id → region-name map seeded from FreeSurferColorLUT. Designed for cheap per-point queries: a ``labelAtRas()`` call is an affine transform, three bound checks and an `int` → `QString` hash lookup.
+
+---
+
+## Public Methods
+
+### FsAtlasLookup()
+
+Constructs an empty atlas lookup.
+
+---
+
+### load(sParcellationPath)
+
+Load a FreeSurfer MGH/MGZ volume parcellation.
+
+**Parameters:**
+
+- **sParcellationPath** : *const QString &*
+  Path to the volume file (e.g. aparc+aseg.mgz).
+
+**Returns:**
+
+- *bool* — true if loaded successfully.
+
+---
+
+### labelAtRas(ras)
+
+Look up the anatomical label at a RAS coordinate.
+
+**Parameters:**
+
+- **ras** : *const Eigen::Vector3f &*
+  3D position in RAS space (in mm).
+
+**Returns:**
+
+- *QString* — Label string, or "Unknown" if out of bounds or unlabeled.
+
+---
+
+### labelsForPositions(positions)
+
+Look up labels for multiple RAS positions.
+
+**Parameters:**
+
+- **positions** : *const QVector&lt; Eigen::Vector3f &gt; &*
+  List of 3D RAS positions.
+
+**Returns:**
+
+- *QStringList* — List of label strings (one per position).
+
+---
+
+### isLoaded()
+
+Check whether a parcellation volume has been loaded.
+
+**Returns:**
+
+- *bool* — true if loaded.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

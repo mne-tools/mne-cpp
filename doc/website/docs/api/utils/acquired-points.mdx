@@ -1,0 +1,110 @@
+---
+id: acquired-points
+title: "UTILSLIB::AcquiredPoints"
+sidebar_label: AcquiredPoints
+sidebar_position: 3
+---
+
+# AcquiredPoints
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `utils/polhemus/acquired_points.h`
+
+`#include <utils/acquired_points.h>`
+
+```cpp
+class UTILSLIB::AcquiredPoints
+```
+
+In-memory store of all points captured during a session.
+
+The wizard hands one of these to the 3-D view (for visualisation) and later to the export step (for FIFF write). Single-threaded, no locking.
+
+---
+
+## Public Methods
+
+### AcquiredPoints(parent)
+
+---
+
+### points()
+
+---
+
+### append(p)
+
+Append a new point and emit pointsChanged.
+
+---
+
+### undoLast(kind)
+
+Remove the most recently captured point matching `kind`, if any.
+
+---
+
+### clear()
+
+Drop every captured point.
+
+---
+
+### fiducial(id)
+
+Convenience accessor: returns the captured fiducial position for `id`, or a default-constructed `QVector3D` if not yet captured.
+
+---
+
+### hasFiducial(id)
+
+True iff a fiducial of the given id has been captured.
+
+---
+
+### removeFiducial(id)
+
+Remove a previously captured fiducial so it can be re-recorded.
+
+---
+
+### hasAllFiducials()
+
+True iff all three cardinal fiducials have been captured.
+
+---
+
+### countOf(kind)
+
+---
+
+### setPosition(index, pos)
+
+---
+
+### emitChanged()
+
+---
+
+### setTwinFiducial(id, pos)
+
+---
+
+### clearTwinFiducial(id)
+
+---
+
+### hasTwinFiducial(id)
+
+---
+
+### twinFiducial(id)
+
+---
+
+### hasAllTwinFiducials()
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

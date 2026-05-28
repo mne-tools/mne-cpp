@@ -1,0 +1,230 @@
+---
+id: channel-selection-view
+title: "DISPLIB::ChannelSelectionView"
+sidebar_label: ChannelSelectionView
+sidebar_position: 18
+---
+
+# ChannelSelectionView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/channelselectionview.h`
+
+`#include <disp/channelselectionview.h>`
+
+```cpp
+class DISPLIB::ChannelSelectionView
+```
+
+Interactive 2-D sensor-layout picker for building, loading and saving channel groups.
+
+Drives a `SelectionScene` of layout dots; lasso / click selection updates the named groups stored in MNE ``.sel files and emits the resulting visible-channel list to the raw and butterfly viewers.
+
+---
+
+## Public Methods
+
+### ChannelSelectionView(sSettingsPath, parent, pChannelInfoModel, f)
+
+Constructs a `ChannelSelectionView` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  pointer to parent widget; If parent is 0, the new `ChannelSelectionView` becomes a window. If parent is another widget, `ChannelSelectionView` becomes a child window inside parent. `ChannelSelectionView` is deleted when its parent is deleted.
+
+- **pChannelInfoModel** : *QSharedPointer&lt;ChannelInfoModel&gt;*
+  pointer to the channel info model.
+
+---
+
+### ~ChannelSelectionView()
+
+Destroys the `ChannelSelectionView`.
+
+All `ChannelSelectionView`'s children are deleted first. The application exits if `ChannelSelectionView` is the main widget.
+
+---
+
+### setCurrentlyMappedFiffChannels(mappedLayoutChNames)
+
+Sets the currently mapped fiff channels.
+
+used to create the group All.
+
+**Parameters:**
+
+- **mappedLayoutChNames** : *const QStringList &*
+  the currently to layout mapped channels.
+
+---
+
+### highlightChannels(channelIndexList)
+
+Highlight channels This function highlights channels which were selected outside this selection manager (i.e in the DataWindow's Table View).
+
+**Parameters:**
+
+- **channelList**
+  channels which are be to set as selected.
+
+---
+
+### selectChannels(channelList)
+
+Select channels This function selects channels which were selected outside this selection manager (i.e in the DataWindow's Table View).
+
+**Parameters:**
+
+- **channelList** : *QStringList*
+  channels which are be to set as selected.
+
+---
+
+### getSelectedChannels()
+
+Current selected channels This function returns the current channel selection.
+
+---
+
+### getItemForChName(listWidget, channelName)
+
+gets the item corresponding to text in listWidget
+
+**Parameters:**
+
+- **listWidget** : *QListWidget **
+  QListWidget which inhibits the needed item.
+
+- **channelName** : *const QString &*
+  the corresponding channel name.
+
+---
+
+### getLayoutMap()
+
+returns the current layout map.
+
+---
+
+### newFiffFileLoaded(pFiffInfo)
+
+call this whenever a new file was loaded.
+
+---
+
+### getCurrentLayoutFile()
+
+Returns the currently selected layout file.
+
+**Returns:**
+
+- *QString* — the currently selected layout file.
+
+---
+
+### getCurrentGroupFile()
+
+Returns the currently loaded group file.
+
+**Returns:**
+
+- *QString* — currently loaded selection group file.
+
+---
+
+### setCurrentLayoutFile(currentLayoutFile)
+
+Sets the current layout file.
+
+**Parameters:**
+
+- **currentLayoutFile** : *QString*
+  the current layout file.
+
+---
+
+### updateBadChannels()
+
+Update the scene items according to the bad channel list in the fiff info file.
+
+---
+
+### updateDataView()
+
+Updates data view.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### updateGuiMode(mode)
+
+Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
+
+**Parameters:**
+
+- **mode** : *GuiMode*
+  The new mode (Clinical=0, Research=1).
+
+---
+
+### updateProcessingMode(mode)
+
+Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
+
+**Parameters:**
+
+- **mode** : *ProcessingMode*
+  The new mode (RealTime=0, Offline=1).
+
+---
+
+### getViewWidget()
+
+Returns pointer to the portion of the channel view with the graphics view.
+
+**Returns:**
+
+- *QWidget ** — pointer to the channelselectionview view.
+
+---
+
+### getControlWidget()
+
+Returns pointer to the portion of the channel view with the controls.
+
+**Returns:**
+
+- *QWidget ** — pointer to the channelselectionview controls.
+
+---
+
+### isSelectionEmpty()
+
+Returns whether there is a user selection.
+
+**Returns:**
+
+- *bool* — true if there is a user selection, false if not.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

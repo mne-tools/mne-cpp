@@ -1,0 +1,198 @@
+---
+id: hpi-settings-view
+title: "DISPLIB::HpiSettingsView"
+sidebar_label: HpiSettingsView
+sidebar_position: 36
+---
+
+# HpiSettingsView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/hpisettingsview.h`
+
+`#include <disp/hpisettingsview.h>`
+
+```cpp
+class DISPLIB::HpiSettingsView
+```
+
+Continuous HPI head-position-indicator configuration panel.
+
+Coil-frequency table, GoF threshold spinbox, continuous HPI toggle and single-shot `Fit` trigger; emits coil-list and head-movement vectors back to the live pipeline.
+
+---
+
+## Public Methods
+
+### HpiSettingsView(sSettingsPath, parent, f)
+
+Constructs a `HpiSettingsView` object.
+
+**Parameters:**
+
+- **pFiffInfo**
+  The FiffInfo.
+
+- **parent** : *QWidget **
+  The parent widget.
+
+---
+
+### ~HpiSettingsView()
+
+---
+
+### setErrorLabels(vError, dMeanErrorDist)
+
+Updates the error related labels.
+
+**Parameters:**
+
+- **vError** : *const QVector&lt; double &gt; &*
+  the new error values.
+
+- **dMeanErrorDist** : *const double*
+  the mean error value.
+
+---
+
+### setGoFLabels(vGoF, dMeanGof)
+
+Updates the gof related labels.
+
+**Parameters:**
+
+- **vGoF** : *const Eigen::VectorXd &*
+  the new gof values.
+
+- **dMeanGof** : *const double*
+  the mean gof value.
+
+---
+
+### setMovementResults(dMovement, dRotation)
+
+Updates the movement refered to last reference head position.
+
+**Parameters:**
+
+- **dMovement** : *double*
+  the movement refered to last fit.
+
+- **dRotation** : *double*
+  the rotation refered to last fit.
+
+---
+
+### getSspStatusChanged()
+
+Get the SSP checked status.
+
+**Returns:**
+
+- *bool* — The current SSP checked status.
+
+---
+
+### getCompStatusChanged()
+
+Get the Comp checked status.
+
+**Returns:**
+
+- *bool* — The current Comp checked status.
+
+---
+
+### getAllowedMeanErrorDistChanged()
+
+Get the allowed mean error distance.
+
+**Returns:**
+
+- *double* — The current allowed mean error distance.
+
+---
+
+### getAllowedMovementChanged()
+
+Get the allowed head movement.
+
+**Returns:**
+
+- *double* — The current allowed head movement.
+
+---
+
+### getAllowedRotationChanged()
+
+Get the allowed head rotation.
+
+**Returns:**
+
+- *double* — The current allowed head rotation.
+
+---
+
+### continuousHPIChecked()
+
+Returns whether continuous fitting is checked.
+
+**Returns:**
+
+- *bool* — Whether continuous fitting is checked.
+
+---
+
+### getFittingWindowSize()
+
+Get number of fits per second to do when performing continuous hpi.
+
+**Returns:**
+
+- *int* — Number of fits per second
+
+---
+
+### newDigitizerList(pointList)
+
+Display digitizer metadata bsed on input pointList.
+
+**Parameters:**
+
+- **pointList** : *QList&lt; FIFFLIB::FiffDigPoint &gt;*
+  list of digitizer points
+
+---
+
+### loadCoilPresets(sFilePath)
+
+Load coil presets from json file at the provided path.
+
+**Parameters:**
+
+- **sFilePath** : *const QString &*
+  PAth to json file with coil preset data
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

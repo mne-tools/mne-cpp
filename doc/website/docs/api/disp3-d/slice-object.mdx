@@ -1,0 +1,155 @@
+---
+id: slice-object
+title: "DISP3DLIB::SliceObject"
+sidebar_label: SliceObject
+sidebar_position: 9
+---
+
+# SliceObject
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Header:** `disp3D/renderable/sliceobject.h`
+
+`#include <disp3D/sliceobject.h>`
+
+```cpp
+class DISP3DLIB::SliceObject
+```
+
+Data model for a single 2-D MRI volume slice.
+
+Holds the greyscale slice image, orientation metadata, and the slice-to-world transform. Generates a textured quad and vertex/UV data for upload to a QRhi renderer via the slice.vert / slice.frag shaders.
+
+---
+
+## Public Methods
+
+### SliceObject()
+
+---
+
+### setSlice(image, orientation, sliceIndex, voxelToWorld)
+
+Set the slice image data and orientation.
+
+**Parameters:**
+
+- **image** : *const QImage &*
+  Greyscale slice image (QImage::Format_Grayscale8 or 16).
+
+- **orientation** : *SliceOrientation*
+  Axial, Sagittal, or Coronal.
+
+- **sliceIndex** : *int*
+  Index along the perpendicular axis (voxel units).
+
+- **voxelToWorld** : *const Eigen::Matrix4d &*
+  4×4 voxel-to-RAS transform from the MRI header.
+
+---
+
+### orientation()
+
+**Returns:**
+
+- *SliceOrientation* — Current slice orientation.
+
+---
+
+### sliceIndex()
+
+**Returns:**
+
+- *int* — Current slice index (voxel units along the perpendicular axis).
+
+---
+
+### image()
+
+**Returns:**
+
+- *const QImage &* — The slice image.
+
+---
+
+### sliceToWorld()
+
+**Returns:**
+
+- *QMatrix4x4* — 4×4 matrix that maps the unit quad [0,1]² into world (RAS) coordinates.
+
+---
+
+### setWindowLevel(center, width)
+
+Intensity windowing parameters for the fragment shader.
+
+**Parameters:**
+
+- **center** : *float*
+  Window center in normalised intensity [0,1].
+
+- **width** : *float*
+  Window width in normalised intensity [0,1].
+
+---
+
+### windowCenter()
+
+**Returns:**
+
+- *float* — Window center.
+
+---
+
+### windowWidth()
+
+**Returns:**
+
+- *float* — Window width.
+
+---
+
+### setOpacity(opacity)
+
+**Parameters:**
+
+- **opacity** : *float*
+  Slice transparency [0,1].
+
+---
+
+### opacity()
+
+**Returns:**
+
+- *float* — Current opacity.
+
+---
+
+### generateQuadVertices(vertices)
+
+Generate quad vertex buffer: 4 vertices × (3 pos + 2 UV) = 20 floats.
+
+**Parameters:**
+
+- **vertices** : *QVector&lt; float &gt; &*
+  Output vertex data.
+
+---
+
+## Static Methods
+
+### generateQuadIndices(indices)
+
+Generate quad index buffer: 2 triangles = 6 indices.
+
+**Parameters:**
+
+- **indices** : *QVector&lt; unsigned int &gt; &*
+  Output index data.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

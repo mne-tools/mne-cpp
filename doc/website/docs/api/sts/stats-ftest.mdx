@@ -1,0 +1,64 @@
+---
+id: stats-ftest
+title: "STSLIB::StatsFtest"
+sidebar_label: StatsFtest
+sidebar_position: 4
+---
+
+# StatsFtest
+
+**Namespace:** `STATSLIB` &nbsp;·&nbsp; **Library:** Statistics Library &nbsp;·&nbsp; **Header:** `sts/sts_ftest.h`
+
+`#include <sts/sts_ftest.h>`
+
+```cpp
+class STSLIB::StatsFtest
+```
+
+Provides F-test / one-way ANOVA implementation.
+
+One-way ANOVA F-test with exact p-values via the regularised incomplete beta function.
+
+---
+
+## Static Methods
+
+### oneWay(groups)
+
+One-way ANOVA F-test.
+
+**Parameters:**
+
+- **groups** : *const QVector&lt; Eigen::MatrixXd &gt; &*
+  Vector of matrices, each n_observations x n_variables.
+
+**Returns:**
+
+- *StatsFtestResult* — `StatsFtestResult` with F-statistics, p-values, and degrees of freedom.
+
+---
+
+### fCdf(f, df1, df2)
+
+Compute the CDF of the F-distribution using the regularized incomplete beta function.
+
+**Parameters:**
+
+- **f** : *double*
+  The F-value.
+
+- **df1** : *int*
+  Numerator degrees of freedom.
+
+- **df2** : *int*
+  Denominator degrees of freedom.
+
+**Returns:**
+
+- *double* — The probability P(F &lt;= f).
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

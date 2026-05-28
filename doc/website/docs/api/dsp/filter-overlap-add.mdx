@@ -1,0 +1,114 @@
+---
+id: filter-overlap-add
+title: "RTPROCESSINGLIB::FilterOverlapAdd"
+sidebar_label: FilterOverlapAdd
+sidebar_position: 29
+---
+
+# FilterOverlapAdd
+
+**Namespace:** `RTPROCESSINGLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Header:** `dsp/rt/rt_filter.h`
+
+`#include <dsp/rt_filter.h>`
+
+```cpp
+class RTPROCESSINGLIB::FilterOverlapAdd
+```
+
+Filtering with FFT convolution and the overlap add method for continuous data streams.
+
+This class will hold all needed information about the last block in order to overlap it with the current one.
+
+Applies FIR filtering via FFT-based overlap-add convolution for continuous data streams.
+
+---
+
+## Public Methods
+
+### calculate(matData, type, dCenterfreq, dBandwidth, dTransition, dSFreq, iOrder, designMethod, vecPicks, bFilterEnd, bUseThreads, bKeepOverhead)
+
+Creates a user designed filter kernel and filters the raw input data.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  The data which is to be filtered.
+
+- **type** : *int*
+  The type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType).
+
+- **dCenterfreq** : *double*
+  The center of the frequency.
+
+- **dBandwidth** : *double*
+  The filter bandwidth. Ignored if FilterType is set to LPF,HPF. If NOTCH/BPF: bandwidth of stop-/passband.
+
+- **dTransition** : *double*
+  The transition band determines the width of the filter slopes (steepness).
+
+- **dSFreq** : *double*
+  The input data sampling frequency.
+
+- **iOrder** : *int*
+  Represents the order of the filter, the higher the higher is the stopband attenuation. Default is 1024 taps.
+
+- **designMethod** : *int*
+  The design method to use. Choose between Cosine and Tschebyscheff. Default is set to Cosine.
+
+- **vecPicks** : *const Eigen::RowVectorXi &*
+  Channel indexes to filter. Default is filter all channels.
+
+- **bFilterEnd** : *bool*
+  Whether to perform the overlap add in the beginning or end of the data. Default is set to true (end of data).
+
+- **bUseThreads** : *bool*
+  Whether to use multiple threads. Default is set to true.
+
+- **bKeepOverhead** : *bool*
+  Whether to keep the delayed part of the data after filtering. Default is set to false .
+
+**Returns:**
+
+- *Eigen::MatrixXd* — The filtered data in form of a matrix.
+
+---
+
+### calculate(matData, filterKernel, vecPicks, bFilterEnd, bUseThreads, bKeepOverhead)
+
+Calculates the filtered version of the raw input data based on a given list filters.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  The data which is to be filtered.
+
+- **filterKernel** : *const UTILSLIB::FilterKernel &*
+  The list of filter kernels to use.
+
+- **vecPicks** : *const Eigen::RowVectorXi &*
+  Channel indexes to filter. Default is filter all channels.
+
+- **bFilterEnd** : *bool*
+  Whether to perform the overlap add in the beginning or end of the data. Default is set to true (end of data).
+
+- **bUseThreads** : *bool*
+  Whether to use multiple threads. Default is set to true.
+
+- **bKeepOverhead** : *bool*
+  Whether to keep the delayed part of the data after filtering. Default is set to false .
+
+**Returns:**
+
+- *Eigen::MatrixXd* — The filtered data in form of a matrix.
+
+---
+
+### reset()
+
+Reset the stored overlap matrices.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

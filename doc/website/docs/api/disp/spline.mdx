@@ -1,0 +1,155 @@
+---
+id: spline
+title: "DISPLIB::Spline"
+sidebar_label: Spline
+sidebar_position: 62
+---
+
+# Spline
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/plots/spline.h`
+
+`#include <disp/spline.h>`
+
+```cpp
+class DISPLIB::Spline
+```
+
+Histogram QWidget with cubic-spline overlay and interactive threshold markers.
+
+Click-drag drops left / middle / right threshold lines that are emitted as data-space coordinates; otherwise the API mirrors `Bar` (`setData` / `updatePlot` templates).
+
+---
+
+## Public Methods
+
+### Spline(parent, title)
+
+The constructor for `Spline`.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  sets the behaviour of `Spline` as an object, defaults to no parent QWidget.
+
+- **title** : *const QString &*
+  string to specify the title displayed on the histogram, defaults to "Spline Histogram".
+
+---
+
+### setData(matClassLimitData, matClassFrequencyData)
+
+creates a spline histogram from 2 vectors: class limits and class frequency
+
+**Parameters:**
+
+- **matClassLimitData** : *const Eigen::Matrix&lt; T, Eigen::Dynamic, 1 &gt; &*
+  vector input filled with class limits.
+
+- **matClassFrequencyData** : *const Eigen::Matrix&lt; int, Eigen::Dynamic, 1 &gt; &*
+  vector input filled with class frequency to the corresponding class.
+
+---
+
+### setData(matClassLimitData, matClassFrequencyData)
+
+---
+
+### updatePlot(matClassLimitData, matClassFrequencyData)
+
+Updates the spline with new data.
+
+**Parameters:**
+
+- **matClassLimitData** : *const Eigen::Matrix&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; &*
+  vector input filled with class limits.
+
+- **matClassFrequencyData** : *const Eigen::VectorXi &*
+  vector input filled with class frequency to the corresponding class.
+
+---
+
+### mousePressEvent(event)
+
+constructor for mouse press event behaviour to create threshold lines and signal emit
+
+**Parameters:**
+
+- **event** : *QMouseEvent **
+  mouse press input.
+
+---
+
+### splitCoefficientAndExponent(matClassLimitData, iClassAmount, vecCoefficientResults, vecExponentValues)
+
+splitCoefficientAndExponent takes in QVector value of coefficient and exponent and normalizes them.
+
+**Parameters:**
+
+- **matClassLimitData** : *const Eigen::Matrix&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; &*
+  vector input filled with values of class limits.
+
+- **iClassAmount** : *int*
+  amount of classes in the histogram.
+
+- **vecCoefficientResults** : *Eigen::VectorXd &*
+  vector filled with values of coefficient only.
+
+- **vecExponentValues** : *Eigen::VectorXi &*
+  vector filled with values of exponent only.
+
+---
+
+### setThreshold(vecThresholdValues)
+
+setThreshold takes in QVector3D value and creates the corresponding lines in the histogram
+
+**Parameters:**
+
+- **vecThresholdValues** : *const QVector3D &*
+  QVector3D consisting of 3 values corresponding to the threshold lines.
+
+---
+
+### getThreshold()
+
+getThreshold retrieves the current threshold values
+
+**Returns:**
+
+- *const QVector3D &* — returns QVector3D corresponding to the x-axis value of the threshold lines.
+
+---
+
+### correctionDisplayTrueValue(vecOriginalValues, upOrDown)
+
+correctionDisplayTrueValue creates necessary adjustment of exponential multiplication with base 10
+
+**Parameters:**
+
+- **vecOriginalValues** : *QVector3D*
+  QVector3D consisting of 3 original values.
+
+- **upOrDown** : *QString*
+  Choice between "up" or "down" conversion direction.
+
+**Returns:**
+
+- *QVector3D* — returns QVector3D after necessary adjustment.
+
+---
+
+### setColorMap(colorMap)
+
+setColorMap sets the color mapping on the histogram background
+
+**Parameters:**
+
+- **colorMap** : *const QString &*
+  qstring of the color gradient from user input.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

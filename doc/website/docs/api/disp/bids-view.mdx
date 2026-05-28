@@ -1,0 +1,96 @@
+---
+id: bids-view
+title: "DISPLIB::BidsView"
+sidebar_label: BidsView
+sidebar_position: 10
+---
+
+# BidsView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/bidsview.h`
+
+`#include <disp/bidsview.h>`
+
+```cpp
+class DISPLIB::BidsView
+```
+
+QTreeView wrapper around a `BidsViewModel` for browsing a BIDS dataset.
+
+Forwards double-click activations on data files / derivatives as `loadItem` signals so the surrounding plugin can open the chosen resource.
+
+---
+
+## Public Methods
+
+### BidsView(parent)
+
+Constructs the DataManagerView.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  If parent is not NULL the QWidget becomes a child of QWidget inside parent.
+
+---
+
+### ~BidsView()
+
+Destroys the DataManagerView.
+
+---
+
+### setModel(pModel)
+
+Sets the model to the tree view.
+
+**Parameters:**
+
+- **pModel** : *QAbstractItemModel **
+  The new model.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### updateGuiMode(mode)
+
+Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
+
+**Parameters:**
+
+- **mode** : *GuiMode*
+  The new mode (Clinical=0, Research=1).
+
+---
+
+### updateProcessingMode(mode)
+
+Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
+
+**Parameters:**
+
+- **mode** : *ProcessingMode*
+  The new mode (RealTime=0, Offline=1).
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

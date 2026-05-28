@@ -1,0 +1,71 @@
+---
+id: mne-cluster-info
+title: "MNELIB::MNEClusterInfo"
+sidebar_label: MNEClusterInfo
+sidebar_position: 12
+---
+
+# MNEClusterInfo
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_cluster_info.h`
+
+`#include <mne/mne_cluster_info.h>`
+
+```cpp
+class MNELIB::MNEClusterInfo
+```
+
+Per-cluster bookkeeping for a label-restricted clustering of a forward solution: contained vertices, representative dipole and mean orientation.
+
+Cluster table used to compress and reconstruct a clustered leadfield.
+
+---
+
+## Public Methods
+
+### MNEClusterInfo()
+
+Default constructor.
+
+---
+
+### clear()
+
+Initializes the cluster information.
+
+---
+
+### isEmpty()
+
+Returns true if `MNE` cluster information contains no data.
+
+**Returns:**
+
+- *bool* — true if `MNE` cluster information is empty.
+
+---
+
+### numClust()
+
+Returns the number of clusters.
+
+**Returns:**
+
+- *qint32* — number of clusters.
+
+---
+
+### write(p_sFileName)
+
+Writes the cluster info to a file.
+
+**Parameters:**
+
+- **p_sFileName** : *QString*
+  FileName to write to.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

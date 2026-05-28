@@ -1,0 +1,323 @@
+---
+id: mne-source-spaces
+title: "MNELIB::MNESourceSpaces"
+sidebar_label: MNESourceSpaces
+sidebar_position: 50
+---
+
+# MNESourceSpaces
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_source_spaces.h`
+
+`#include <mne/mne_source_spaces.h>`
+
+```cpp
+class MNELIB::MNESourceSpaces
+```
+
+Container pairing the left and right cortical source spaces (and optional discrete / volume source spaces) of a subject as written by `mne_setup_source_space`.
+
+List of `MNESourceSpace` objects forming a subject source space.
+
+---
+
+## Public Methods
+
+### MNESourceSpaces()
+
+Default constructor.
+
+---
+
+### MNESourceSpaces(p_MNESourceSpaces)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_MNESourceSpaces** : *const MNESourceSpaces &*
+  `MNE` forward solution.
+
+---
+
+### ~MNESourceSpaces()
+
+Destroys the `MNE` forward solution.
+
+---
+
+### clear()
+
+Initializes `MNE` source space.
+
+---
+
+### isEmpty()
+
+True if `MNE` Source Space is empty.
+
+**Returns:**
+
+- *bool* — true if `MNE` Source Space is empty.
+
+---
+
+### get_vertno()
+
+Returns the Zero based (different to MATLAB) indices of the used vertices of both hemispheres.
+
+**Returns:**
+
+- *QList&lt; Eigen::VectorXi &gt;* — the hemisphere vertices.
+
+---
+
+### label_src_vertno_sel(p_label, src_sel)
+
+Find vertex numbers and indices from label.
+
+**Parameters:**
+
+- **label**
+  Source space label.
+
+- **src_sel** : *Eigen::VectorXi &*
+  array of int (idx.size() = vertno[0].`size()` + vertno[1].`size()`). Indices of the selected vertices in sourse space
+
+**Returns:**
+
+- *QList&lt; Eigen::VectorXi &gt;* — vertno list of length 2 Vertex numbers for lh and rh.
+
+---
+
+### pick_regions(p_qListLabels)
+
+Reduces a source space to selected regions.
+
+**Parameters:**
+
+- **p_qListLabels** : *const QList&lt; FSLIB::FsLabel &gt; &*
+  ROIs.
+
+**Returns:**
+
+- *MNESourceSpaces* — the reduced source space.
+
+---
+
+### size()
+
+Returns the number of stored hemispheres 0, 1 or 2.
+
+**Returns:**
+
+- *qint32* — number of stored hemispheres.
+
+---
+
+### transform_source_space_to(dest, trans)
+
+**Parameters:**
+
+- **dest** : *FIFFLIB::fiff_int_t*
+  destination check code.
+
+- **trans** : *FIFFLIB::FiffCoordTrans &*
+  transformation information.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### writeToStream(p_pStream)
+
+**Parameters:**
+
+- **p_pStream** : *FIFFLIB::FiffStream **
+  The stream to write to.
+
+---
+
+### append(space)
+
+Appends a deep copy of the given source space.
+
+**Parameters:**
+
+- **space** : *const MNESourceSpace &*
+  The source space to append.
+
+---
+
+### operator[](idx)
+
+Subscript operator [] to access source spaces by index.
+
+**Parameters:**
+
+- **idx** : *qint32*
+  the source space index (0 or 1).
+
+**Returns:**
+
+- *MNESourceSpace &* — Reference to the source space at the given index.
+
+---
+
+### operator[](idx)
+
+Subscript operator [] to access source spaces by index.
+
+**Parameters:**
+
+- **idx** : *qint32*
+  the source space index (0 or 1).
+
+**Returns:**
+
+- *const MNESourceSpace &* — Const reference to the source space at the given index.
+
+---
+
+### operator[](idt)
+
+Subscript operator [] to access source spaces by hemisphere identifier.
+
+**Parameters:**
+
+- **idt** : *QString*
+  the hemisphere identifier ("lh" or "rh").
+
+**Returns:**
+
+- *MNESourceSpace &* — Reference to the source space for the given hemisphere.
+
+---
+
+### operator[](idt)
+
+Subscript operator [] to access source spaces by hemisphere identifier.
+
+**Parameters:**
+
+- **idt** : *QString*
+  the hemisphere identifier ("lh" or "rh").
+
+**Returns:**
+
+- *const MNESourceSpace &* — Const reference to the source space for the given hemisphere.
+
+---
+
+### hemisphereAt(idx)
+
+Safe downcast to `MNEHemisphere` at the given index.
+
+**Parameters:**
+
+- **idx** : *qint32*
+  the source space index.
+
+**Returns:**
+
+- *MNEHemisphere ** — Pointer to `MNEHemisphere`, or nullptr if the element is not a hemisphere.
+
+---
+
+### hemisphereAt(idx)
+
+Safe downcast to `MNEHemisphere` at the given index (const).
+
+**Parameters:**
+
+- **idx** : *qint32*
+  the source space index.
+
+**Returns:**
+
+- *const MNEHemisphere ** — Const pointer to `MNEHemisphere`, or nullptr if the element is not a hemisphere.
+
+---
+
+### at(idx)
+
+Access the underlying shared_ptr at the given index.
+
+**Parameters:**
+
+- **idx** : *qint32*
+  the source space index.
+
+**Returns:**
+
+- *std::shared_ptr&lt; MNESourceSpace &gt; &* — shared_ptr to the `MNESourceSpace`.
+
+---
+
+### at(idx)
+
+Access the underlying shared_ptr at the given index (const).
+
+**Parameters:**
+
+- **idx** : *qint32*
+  the source space index.
+
+**Returns:**
+
+- *const std::shared_ptr&lt; MNESourceSpace &gt; &* — const shared_ptr to the `MNESourceSpace`.
+
+---
+
+## Static Methods
+
+### find_source_space_hemi(p_SourceSpace)
+
+**Parameters:**
+
+- **p_Hemisphere**
+  the hemisphere to investigate.
+
+**Returns:**
+
+- *qint32* — the deduced hemisphere id.
+
+---
+
+### patch_info(p_Hemisphere)
+
+**Parameters:**
+
+- **p_Hemisphere** : *MNEHemisphere &*
+  The source space.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### readFromStream(p_pStream, add_geom, p_SourceSpace)
+
+**Parameters:**
+
+- **p_pStream** : *FIFFLIB::FiffStream::SPtr &*
+  The opened fif file.
+
+- **add_geom** : *bool*
+  Add geometry information to the source spaces.
+
+- **p_SourceSpace** : *MNESourceSpaces &*
+  The read source spaces.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

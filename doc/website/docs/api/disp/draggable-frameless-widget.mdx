@@ -1,0 +1,68 @@
+---
+id: draggable-frameless-widget
+title: "DISPLIB::DraggableFramelessWidget"
+sidebar_label: DraggableFramelessWidget
+sidebar_position: 26
+---
+
+# DraggableFramelessWidget
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/helpers/draggableframelesswidget.h`
+
+`#include <disp/draggableframelesswidget.h>`
+
+```cpp
+class DISPLIB::DraggableFramelessWidget
+```
+
+Frameless QWidget that can be dragged anywhere on its body.
+
+Base class of `QuickControlView` and any other floating popup that wants to look like an in-app palette rather than a system window.
+
+---
+
+## Public Methods
+
+### DraggableFramelessWidget(parent, flags, bRoundEdges, bDraggable, bFrameless)
+
+Constructs a `DraggableFramelessWidget` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  The parent of the widget.
+
+- **flags** : *Qt::WindowFlags*
+  The window flags.
+
+- **bRoundEdges** : *bool*
+  Flag specifying whether to round the edges.
+
+- **bDraggable** : *bool*
+  Flag specifying whether this widget is draggable.
+
+- **bFrameless** : *bool*
+  Flag specifying whether this widget is frameless.
+
+---
+
+### ~DraggableFramelessWidget()
+
+Destructs a `DraggableFramelessWidget`.
+
+---
+
+### setDraggable(bFlag)
+
+Set the draggable flag of this widget.
+
+**Parameters:**
+
+- **bFlag** : *bool*
+  the flag to set.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

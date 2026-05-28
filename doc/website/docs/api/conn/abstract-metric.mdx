@@ -1,0 +1,40 @@
+---
+id: abstract-metric
+title: "CONNLIB::AbstractMetric"
+sidebar_label: AbstractMetric
+sidebar_position: 8
+---
+
+# AbstractMetric
+
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Header:** `conn/metrics/abstractmetric.h`
+
+`#include <conn/abstractmetric.h>`
+
+```cpp
+class CONNLIB::AbstractMetric
+```
+
+Static base for every estimator in ``CONNLIB``.
+
+Holds the two pieces of global state that the dispatcher (`Connectivity::calculate`) must set before any metric runs:
+m_bStorageModeIsActive enables caching of per-trial tapered spectra and CSDs in `ConnectivitySettings::IntermediateTrialData`, which lets a second metric reuse the FFT work done by the first.
+
+
+m_iNumberBinStart and m_iNumberBinAmount define the frequency-bin window over which each metric averages its spectral output into the single scalar weight stored on each network edge.
+
+Static control knobs (storage mode, frequency band) shared by all `CONNLIB` metrics.
+
+---
+
+## Public Methods
+
+### AbstractMetric()
+
+Constructs a `AbstractMetric` object.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

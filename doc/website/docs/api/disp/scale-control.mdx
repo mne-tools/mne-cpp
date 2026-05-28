@@ -1,0 +1,157 @@
+---
+id: scale-control
+title: "DISPLIB::ScaleControl"
+sidebar_label: ScaleControl
+sidebar_position: 54
+---
+
+# ScaleControl
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/helpers/scalecontrol.h`
+
+`#include <disp/scalecontrol.h>`
+
+```cpp
+class DISPLIB::ScaleControl
+```
+
+Composite slider + spinbox widget for picking a (possibly logarithmic) scale value.
+
+Supports linear and log10 mapping, configurable min / max and an optional inverted direction; building block of `ScalingView` and several other settings panels.
+
+---
+
+## Public Methods
+
+### ScaleControl(label)
+
+Constructs a `ScaleControl` object who's Qlabel element will be set.
+
+**Parameters:**
+
+- **label** : *const char **
+  Text for the Qlabel.
+
+---
+
+### ScaleControl(label, parent)
+
+Constructs a `ScaleControl` object who's Qlabel element will be set, and sets the parent of the underlying QWidget.
+
+**Parameters:**
+
+- **label** : *const char **
+  Text for the Qlabel.
+
+- **parent** : *QWidget **
+  Parent of widget.
+
+---
+
+### ScaleControl(label, parent, min, max)
+
+Constructs a `ScaleControl` object who's Qlabel element will be set, and sets the parent of the underlying QWidget.
+
+The min and max values for the control will also be initialized.
+
+**Parameters:**
+
+- **label** : *const char **
+  Text for the Qlabel.
+
+- **parent** : *QWidget **
+  Parent of widget.
+
+- **min** : *double*
+  Min value of the control.
+
+- **max** : *double*
+  Max value of the control.
+
+---
+
+### getUI()
+
+getUI Return a pointer to the GUI of the `ScaleControl`.
+
+**Returns:**
+
+- *Ui::ScaleControlWidget ** — Pointer to the ScaleControlWidget.
+
+---
+
+### value()
+
+Return the value of the control.
+
+**Returns:**
+
+- *double* — value of the control.
+
+---
+
+### setMaxSensitivityPoint(s)
+
+Set the value of the maximum sensitivity point for the non-linear sensitivity curve of the sensor.
+
+**Parameters:**
+
+- **s** : *double*
+  Maximum sensitivity value.
+
+---
+
+### setSensitivity(s)
+
+Set the sensitivity value of the non-linear mapping between the control slider and the control value.
+
+**Parameters:**
+
+- **s** : *double*
+  Sensitivity, between [0, 1].
+
+---
+
+### setRange(min, max)
+
+Set the range of the Scalecontrol object.
+
+Tha it the maximum and minimum values allowed.
+
+**Parameters:**
+
+- **min** : *double*
+  Minimum value to be allowed for the Scalecontrol.
+
+- **max** : *double*
+  Maximum value to be allowed for the Scalecontrol.
+
+---
+
+### setDecimals(d)
+
+Set the number of decimals to show in the spinbox of the control.
+
+**Parameters:**
+
+- **d** : *int*
+  Number of decimals to show in the spinbox.
+
+---
+
+### invertSlider(inverted)
+
+Invert the effect of sliding the control slider to the right.
+
+Slider right decreases the control value.
+
+**Parameters:**
+
+- **inverted** : *bool*
+  (True = Invert the slider effect).
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,44 @@
+---
+id: spectrogram
+title: "UTILSLIB::Spectrogram"
+sidebar_label: Spectrogram
+sidebar_position: 47
+---
+
+# Spectrogram
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/spectrogram.h`
+
+`#include <utils/spectrogram.h>`
+
+```cpp
+class UTILSLIB::Spectrogram
+```
+
+Computes time-frequency spectrograms via short-time Fourier transform with configurable window and overlap.
+
+---
+
+## Static Methods
+
+### makeSpectrogram(signal, windowSize)
+
+Calculates the spectrogram (tf-representation) of a given signal.
+
+**Parameters:**
+
+- **signal** : *Eigen::VectorXd*
+  input-signal to calculate spectrogram of.
+
+- **windowSize** : *qint32*
+  size of the window which is used (resolution in time an frequency is depending on it).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — spectrogram-matrix (tf-representation of the input signal).
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

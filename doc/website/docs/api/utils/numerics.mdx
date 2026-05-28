@@ -1,0 +1,184 @@
+---
+id: numerics
+title: "UTILSLIB::Numerics"
+sidebar_label: Numerics
+sidebar_position: 35
+---
+
+# Numerics
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `math/numerics.h`
+
+`#include <utils/numerics.h>`
+
+```cpp
+class UTILSLIB::Numerics
+```
+
+Static numerical helpers: integer GCD and log2, `nchoose2`, sparsity test, fixed-width histogram binning and time-series baseline rescaling shared across `MATHLIB`, DISP and the evoked / source-estimate pipelines.
+
+Static scalar/per-vector numerical helpers (GCD, log2, histograms, baseline rescaling).
+
+---
+
+## Public Methods
+
+### ~Numerics()
+
+Destroys the `Numerics` object.
+
+---
+
+## Static Methods
+
+### gcd(iA, iB)
+
+Finds the Greatest Common Divisor (GCD) of two integer values.
+
+**Parameters:**
+
+- **iA** : *int*
+  First input integer.
+
+- **iB** : *int*
+  Second input integer.
+
+**Returns:**
+
+- *int* — The Greatest Common Divisor (GCD) of iA and iB.
+
+---
+
+### issparse(v)
+
+Determines if a given data (stored as vector v) are representing a sparse matrix.
+
+**Parameters:**
+
+- **v** : *Eigen::VectorXd &*
+  Data to be tested.
+
+**Returns:**
+
+- *bool* — true if sparse, false otherwise.
+
+---
+
+### nchoose2(n)
+
+Calculates the combination of n over 2 (nchoosek(n,2)).
+
+**Parameters:**
+
+- **n** : *int*
+  The number of elements which should be combined with each other (n over 2).
+
+**Returns:**
+
+- *int* — The number of combinations.
+
+---
+
+### rescale(data, times, baseline, mode)
+
+Rescale (baseline correct) data.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  Data Matrix (m x n_time).
+
+- **times** : *const Eigen::RowVectorXf &*
+  Time instants in seconds.
+
+- **baseline** : *const QPair&lt; float, float &gt; &*
+  If baseline is (a, b) the interval is between "a (s)" and "b (s)". If a and b are equal, use interval between the beginning of the data and time 0.
+
+- **mode** : *QString*
+  Baseline correction mode: "logratio" | "ratio" | "zscore" | "mean" | "percent".
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Rescaled data matrix.
+
+---
+
+### rescale(data, times, baseline, mode)
+
+Rescale (baseline correct) data.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  Data Matrix (m x n_time).
+
+- **times** : *const Eigen::RowVectorXf &*
+  Time instants in seconds.
+
+- **baseline** : *const std::pair&lt; float, float &gt; &*
+  If baseline is (a, b) the interval is between "a (s)" and "b (s)". If a and b are equal, use interval between the beginning of the data and time 0.
+
+- **mode** : *const std::string &*
+  Baseline correction mode: "logratio" | "ratio" | "zscore" | "mean" | "percent".
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Rescaled data matrix.
+
+---
+
+### log2(d)
+
+Compute log base 2 of a given number.
+
+**Parameters:**
+
+- **d** : *const T*
+  Input value.
+
+**Returns:**
+
+- *double* — log2 of d.
+
+---
+
+### histcounts(matRawData, bMakeSymmetrical, iClassAmount, vecResultClassLimits, vecResultFrequency, dGlobalMin, dGlobalMax)
+
+Creates a class and frequency distribution from data matrix.
+
+**Parameters:**
+
+- **matRawData** : *const Eigen::Matrix&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; &*
+  Raw data matrix that needs to be analyzed.
+
+- **bMakeSymmetrical** : *bool*
+  User input to turn the x-axis symmetric.
+
+- **iClassAmount** : *int*
+  User input to determine the amount of classes in the histogram.
+
+- **vecResultClassLimits** : *Eigen::VectorXd &*
+  The upper limit of each individual class.
+
+- **vecResultFrequency** : *Eigen::VectorXi &*
+  The amount of data that fits in the appropriate class ranges.
+
+- **dGlobalMin** : *double*
+  User input to determine the minimum value allowed in the histogram.
+
+- **dGlobalMax** : *double*
+  User input to determine the maximum value allowed in the histogram.
+
+---
+
+### histcounts(matRawData, bMakeSymmetrical, iClassAmount, vecResultClassLimits, vecResultFrequency, dGlobalMin, dGlobalMax)
+
+---
+
+### histcounts(matRawData, bMakeSymmetrical, iClassAmount, vecResultClassLimits, vecResultFrequency, dGlobalMin, dGlobalMax)
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

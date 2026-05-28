@@ -1,0 +1,63 @@
+---
+id: mna-io
+title: "MNALIB::MnaIO"
+sidebar_label: MnaIO
+sidebar_position: 3
+---
+
+# MnaIO
+
+**Namespace:** `MNALIB` &nbsp;·&nbsp; **Library:** MNA Library (Modular Architecture) &nbsp;·&nbsp; **Header:** `mna/mna_io.h`
+
+`#include <mna/mna_io.h>`
+
+```cpp
+class MNALIB::MnaIO
+```
+
+Read/write MNA project files (.mna = JSON, .mnx = CBOR with "MNX1" magic header).
+
+---
+
+## Static Methods
+
+### read(path)
+
+Read an MNA project from file.
+
+Dispatches by extension.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  Path to the .mna or .mnx file.
+
+**Returns:**
+
+- *MnaProject* — The deserialized `MnaProject`.
+
+---
+
+### write(project, path)
+
+Write an MNA project to file.
+
+Dispatches by extension.
+
+**Parameters:**
+
+- **project** : *const MnaProject &*
+  The project to write.
+
+- **path** : *const QString &*
+  Path to the .mna or .mnx file.
+
+**Returns:**
+
+- *bool* — True if successful.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

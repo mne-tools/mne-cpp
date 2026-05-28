@@ -1,0 +1,427 @@
+---
+id: fiff-tag
+title: "FIFFLIB::FiffTag"
+sidebar_label: FiffTag
+sidebar_position: 29
+---
+
+# FiffTag
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_tag.h`
+
+`#include <fiff/fiff_tag.h>`
+
+```cpp
+class FIFFLIB::FiffTag
+```
+
+FIFF tag: 16-byte header (kind, type, size, next) plus payload, with typed decoders for every FIFFT_* type.
+
+Holds the four header fields exactly as stored on disk and a `QByteArray` with the raw payload. Decoders convert the payload to the appropriate C++ representation: scalars via `toInt` / `toFloat` / `toDouble`, dense and sparse matrices via `toFloatMatrix` / `toSparseFloatMatrix`, and the structured FIFF records into their class wrappers (`toFiffId`, `toCoordTrans`, `toChInfo`, `toChPos`, `toDigPoint`, ...). Used by `FiffStream` both for streaming reads and for assembling tags before write_tag.
+
+---
+
+## Public Methods
+
+### FiffTag()
+
+Constructs a default `FiffTag`.
+
+---
+
+### FiffTag(p_FiffTag)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FiffTag** : *const FiffTag &*
+  `FiffTag` to copy.
+
+---
+
+### FiffTag(other)
+
+Move constructor.
+
+---
+
+### operator=(other)
+
+Copy assignment operator.
+
+---
+
+### operator=(other)
+
+Move assignment operator.
+
+---
+
+### ~FiffTag()
+
+Destroys the `FiffTag`.
+
+---
+
+### getMatrixCoding()
+
+Provides information about matrix coding.
+
+**Returns:**
+
+- *fiff_int_t* — Matrix coding.
+
+---
+
+### isMatrix()
+
+Provides information if tag contains a matrix.
+
+**Returns:**
+
+- *bool* — true if tag contains a matrix.
+
+---
+
+### getMatrixDimensions(p_ndim, p_Dims)
+
+Returns matrix dimensions Refactors: fiff_get_matrix_dims (fiff_matrix.c).
+
+**Parameters:**
+
+- **p_ndim** : *qint32 &*
+  number of dimensions.
+
+- **p_Dims** : *QVector&lt; qint32 &gt; &*
+  vector containing the size of each dimension.
+
+**Returns:**
+
+- *bool* — true if dimensions are available.
+
+---
+
+### getType()
+
+Provides the tag type information.
+
+**Returns:**
+
+- *fiff_int_t* — the tag type.
+
+---
+
+### getInfo()
+
+Type information as a string.
+
+**Returns:**
+
+- *QString* — the tag type information.
+
+---
+
+### toByte()
+
+to Byte Fast access; Data are deleted if tag gets deleted, and vice versa
+
+**Returns:**
+
+- *quint8 ** — type cast of the tag data pointer.
+
+---
+
+### toUnsignedShort()
+
+to unsigned Short Fast access; Data are deleted if tag gets deleted, and vice versa
+
+**Returns:**
+
+- *quint16 ** — type cast of the tag data pointer.
+
+---
+
+### toShort()
+
+to Short Fast access; Data are deleted if tag gets deleted, and vice versa
+
+**Returns:**
+
+- *qint16 ** — type cast of the tag data pointer.
+
+---
+
+### toUnsignedInt()
+
+to Int Fast access; Data are deleted if tag gets deleted, and vice versa
+
+**Returns:**
+
+- *quint32 ** — type cast of the tag data pointer.
+
+---
+
+### toInt()
+
+to Int Fast access; Data are deleted if tag gets deleted, and vice versa
+
+**Returns:**
+
+- *qint32 ** — type cast of the tag data pointer.
+
+---
+
+### toJulian()
+
+to Julian Fast access; Data are deleted if tag gets deleted, and vice versa
+
+**Returns:**
+
+- *qint32 ** — type cast of the tag data pointer.
+
+---
+
+### toFloat()
+
+to Float Fast access; Data are deleted if tag gets deleted, and vice versa
+
+**Returns:**
+
+- *const float ** — type cast of the tag data pointer.
+
+---
+
+### toDouble()
+
+to Double Fast access; Data are deleted if tag gets deleted, and vice versa
+
+**Returns:**
+
+- *const double ** — type cast of the tag data pointer.
+
+---
+
+### toString()
+
+to String
+
+**Returns:**
+
+- *QString* — converts data to a string.
+
+---
+
+### toDauPack16()
+
+to DauPack16 Fast access; Data are deleted if tag gets deleted, and vice versa
+
+**Returns:**
+
+- *qint16 ** — type cast of the tag data pointer.
+
+---
+
+### toFiffID()
+
+to fiff ID
+
+**Returns:**
+
+- *FiffId* — `Fiff` universially unique identifier.
+
+---
+
+### toDigPoint()
+
+to fiff DIG POINT
+
+**Returns:**
+
+- *FiffDigPoint* — `Fiff` point descriptor.
+
+---
+
+### toCoordTrans()
+
+to fiff COORD TRANS
+
+**Returns:**
+
+- *FiffCoordTrans* — `Fiff` coordinate transformation descriptor.
+
+---
+
+### toChInfo()
+
+to fiff CH INFO
+
+to fiff CH INFO STRUCT
+
+**Returns:**
+
+- *FiffChInfo* — `Fiff` channel info descriptor.
+
+---
+
+### toDirEntry()
+
+to fiff OLD PACK
+
+to fiff DIR ENTRY
+
+**Returns:**
+
+- *QList&lt; QSharedPointer&lt;FiffDirEntry&gt; &gt;* — List of directory entry descriptors.
+
+---
+
+### toIntMatrix()
+
+to fiff FIFFT INT MATRIX
+
+**Returns:**
+
+- *Eigen::MatrixXi* — Integer matrix.
+
+---
+
+### toFloatMatrix()
+
+to fiff FIFFT FLOAT MATRIX
+
+parses a fiff float matrix
+
+**Returns:**
+
+- *Eigen::MatrixXf* — the parsed float matrix.
+
+---
+
+### toSparseFloatMatrix()
+
+to sparse fiff FIFFT FLOAT MATRIX
+
+parses a sparse fiff float matrix and returns a double sparse matrix to make sure only double is used
+
+**Returns:**
+
+- *Eigen::SparseMatrix&lt; double &gt;* — a sparse double matrix which is newly created from the parsed float.
+
+---
+
+## Static Methods
+
+### convert_ch_pos(pos)
+
+Convert coil position descriptor.
+
+**Parameters:**
+
+- **pos** : *FiffChPos **
+  coil position descriptor to convert.
+
+---
+
+### convert_matrix_from_file_data(tag)
+
+Machine dependent data type conversions (tag info only).
+
+from_endian defines the byte order of the input to_endian defines the byte order of the output
+
+Either of these may be specified as FIFFV_LITTLE_ENDIAN, FIFFV_BIG_ENDIAN, or FIFFV_NATIVE_ENDIAN. The last choice means that the native byte order value will be substituted here before proceeding
+
+---
+
+### convert_matrix_to_file_data(tag)
+
+Convert matrix data before writing to a file inside a fiff tag.
+
+**Parameters:**
+
+- **tag** : *const FiffTag::UPtr &*
+  matrix data to convert.
+
+---
+
+### convert_tag_data(tag, from_endian, to_endian)
+
+Machine dependent data type conversions (tag info only).
+
+from_endian defines the byte order of the input to_endian defines the byte order of the output
+
+Either of these may be specified as FIFFV_LITTLE_ENDIAN, FIFFV_BIG_ENDIAN, or FIFFV_NATIVE_ENDIAN. The last choice means that the native byte order value will be substituted here before proceeding
+
+**Parameters:**
+
+- **tag** : *const FiffTag::UPtr &*
+  matrix data to convert.
+
+- **from_endian** : *int*
+  from endian encoding.
+
+- **to_endian** : *int*
+  to endian encoding.
+
+---
+
+### fiff_type_fundamental(type)
+
+These return information about a fiff type.
+
+**Parameters:**
+
+- **type** : *fiff_int_t*
+  The fiff data type to query.
+
+**Returns:**
+
+- *fiff_int_t* — fiff type.
+
+---
+
+### fiff_type_base(type)
+
+These return information about fiff type base.
+
+**Parameters:**
+
+- **type** : *fiff_int_t*
+  The fiff data type to query.
+
+**Returns:**
+
+- *fiff_int_t* — fiff type.
+
+---
+
+### fiff_type_matrix_coding(type)
+
+These return information about the matrix coding.
+
+**Parameters:**
+
+- **type** : *fiff_int_t*
+  The fiff data type to query.
+
+**Returns:**
+
+- *fiff_int_t* — matrix coding.
+
+---
+
+### storageSize()
+
+Size of the on-disk tag info header: kind + type + size + next = 4 x fiff_int_t.
+
+This corresponds to the old sizeof(fiffTagRec) - sizeof(fiff_data_t *).
+
+**Returns:**
+
+- *qint32* — the byte size of the on-disk tag info header.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

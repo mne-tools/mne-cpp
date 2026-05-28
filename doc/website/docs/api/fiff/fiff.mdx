@@ -1,0 +1,972 @@
+---
+id: fiff
+title: "FIFFLIB::Fiff"
+sidebar_label: Fiff
+sidebar_position: 11
+---
+
+# Fiff
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff.h`
+
+`#include <fiff/fiff.h>`
+
+```cpp
+class FIFFLIB::Fiff
+```
+
+MATLAB-style static facade re-exporting every public `FIFFLIB` reader/writer for parity with the mne-matlab toolbox.
+
+Only wrappers — no state. Each method forwards to the matching method on `FiffStream` / FiffRawData / `FiffEvoked` / `FiffEvokedSet` / `FiffCov` / `FiffInfo`. Prefer the underlying classes for new code; this class exists so Matlab-style ports compile unchanged.
+
+---
+
+## Public Methods
+
+### ~Fiff()
+
+dtor
+
+---
+
+## Static Methods
+
+### copy_tree(p_pStreamIn, in_id, p_Nodes, p_pStreamOut)
+
+fiff_copy_tree
+
+Wrapper for the static `FiffDirNode::copy_tree` function
+
+Copies directory subtrees from fidin to fidout
+
+**Parameters:**
+
+- **p_pStreamIn** : *FiffStream::SPtr*
+  fiff file to copy from.
+
+- **in_id** : *const FiffId &*
+  file id description.
+
+- **p_Nodes** : *const QList&lt; FiffDirNode::SPtr &gt; &*
+  subtree directories to be copied.
+
+- **p_pStreamOut** : *FiffStream::SPtr &*
+  fiff file to write to.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### end_block(p_pStream, kind)
+
+fiff_end_block
+
+Wrapper for the `FiffStream` end_block member function
+
+Writes a FIFF_BLOCK_END tag
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  the opened fiff file.
+
+- **kind** : *fiff_int_t*
+  The block kind to end.
+
+---
+
+### end_file(p_pStream)
+
+fiff_end_file
+
+Wrapper for the `FiffStream` end_file member function
+
+Writes the closing tags to a fif file and closes the file
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  the opened fiff file.
+
+---
+
+### finish_writing_raw(p_pStream)
+
+fiff_finish_writing_raw
+
+Wrapper for the `FiffStream` finish_writing_raw member function
+
+Finishes a raw file by writing all necessary end tags.
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  the opened fiff file.
+
+---
+
+### dir_tree_find(p_Node, p_kind)
+
+fiff_dir_tree_find
+
+Wrapper for the `FiffDirNode` dir_tree_find member function
+
+Find nodes of the given kind from a directory tree structure
+
+**Parameters:**
+
+- **p_Node** : *const FiffDirNode::SPtr &*
+  The directory tree structure.
+
+- **p_kind** : *fiff_int_t*
+  The given kind.
+
+**Returns:**
+
+- *QList&lt; FiffDirNode::SPtr &gt;* — the found nodes.
+
+---
+
+### invert_transform(p_Transform)
+
+fiff_invert_transform
+
+Wrapper for the static `FiffCoordTrans::invert_transform` function
+
+Invert a coordinate transformation
+
+**Parameters:**
+
+- **p_Transform** : *FiffCoordTrans &*
+  The transformation which should be inverted.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### open(p_IODevice, p_pStream)
+
+fiff_open
+
+Wrapper for the `FiffStream` open member function
+
+Opens a fif file and provides the directory of tags
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  A fiff IO device like a fiff QFile or QTCPSocket.
+
+- **p_pStream** : *FiffStream::SPtr &*
+  file which is openened.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### pick_channels(ch_names, include, exclude)
+
+fiff_pick_channels
+
+Wrapper for the `FiffInfo::pick_channels` static function
+
+Make a selector to pick desired channels from data
+
+**Parameters:**
+
+- **ch_names** : *QStringList &*
+  - The channel name list to consult.
+
+- **include** : *const QStringList &*
+  - Channels to include (if empty, include all available).
+
+- **exclude** : *const QStringList &*
+  - Channels to exclude (if empty, do not exclude any).
+
+**Returns:**
+
+- *Eigen::RowVectorXi* — the selector matrix (row Vector).
+
+---
+
+### pick_channels(orig, include, exclude)
+
+fiff_pick_channels_evoked
+
+Wrapper for the FiffEvokedDataSet pick_channels_evoked member function
+
+Pick desired channels from evoked-response data
+
+**Parameters:**
+
+- **orig** : *FiffEvokedSet &*
+  The original data.
+
+- **include** : *const QStringList &*
+  - Channels to include (if empty, include all available).
+
+- **exclude** : *const QStringList &*
+  - Channels to exclude (if empty, do not exclude any).
+
+**Returns:**
+
+- *FiffEvokedSet* — the desired fiff evoked data set.
+
+---
+
+### find_evoked(orig)
+
+fiff_find_evoked
+
+Wrapper for the FiffEvokedDataSet find_evoked member function
+
+Find evoked data sets
+
+**Parameters:**
+
+- **orig** : *FiffEvokedSet &*
+  The read evoked data set.
+
+**Returns:**
+
+- *bool* — true when any set was found, false otherwise.
+
+---
+
+### pick_info(info, sel)
+
+fiff_pick_info
+
+Wrapper for the `FiffInfo` pick_info member function
+
+Pick desired channels from measurement info
+
+**Parameters:**
+
+- **info** : *const FiffInfo &*
+  The original data.
+
+- **sel** : *const Eigen::RowVectorXi &*
+  List of channels to select.
+
+**Returns:**
+
+- *FiffInfo* — Info modified according to sel.
+
+---
+
+### pick_types(info, meg, eeg, stim, include, exclude)
+
+fiff_pick_types
+
+Wrapper for the `FiffInfo` pick_types member function
+
+Create a selector to pick desired channel types from data
+
+**Parameters:**
+
+- **info** : *FiffInfo &*
+  The measurement info.
+
+- **meg** : *bool*
+  Include MEG channels.
+
+- **eeg** : *bool*
+  Include EEG channels.
+
+- **stim** : *bool*
+  Include stimulus channels.
+
+- **include** : *const QStringList &*
+  Additional channels to include (if empty, do not add any).
+
+- **exclude** : *const QStringList &*
+  Channels to exclude (if empty, do not exclude any).
+
+**Returns:**
+
+- *Eigen::RowVectorXi* — the selector matrix (row vector).
+
+---
+
+### read_bad_channels(p_pStream, p_Node)
+
+fiff_read_bad_channels
+
+Wrapper for the `FiffStream` read_bad_channels member function
+
+Reads the bad channel list from a node if it exists
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream::SPtr &*
+  The opened fif file to read from.
+
+- **p_Node** : *FiffDirNode::SPtr &*
+  The node of interest.
+
+**Returns:**
+
+- *QStringList* — the bad channel list.
+
+---
+
+### read_ctf_comp(p_pStream, p_Node, p_Chs)
+
+fiff_read_ctf_comp
+
+Wrapper for the `FiffStream` read_ctf_comp member function
+
+Read the CTF software compensation data from the given node
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream::SPtr &*
+  The opened fif file to read from.
+
+- **p_Node** : *const FiffDirNode::SPtr &*
+  The node of interest.
+
+- **p_Chs** : *const QList&lt; FiffChInfo &gt; &*
+  channels with the calibration info.
+
+**Returns:**
+
+- *QList&lt; FiffCtfComp &gt;* — the CTF software compensation data.
+
+---
+
+### read_evoked(p_IODevice, data, setno, baseline, proj, p_aspect_kind)
+
+fiff_read_evoked
+
+Wrapper for the `FiffEvoked::read` static function
+
+Read one evoked data set
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  A fiff IO device like a fiff QFile or QTCPSocket.
+
+- **data** : *FiffEvoked &*
+  The read evoked data.
+
+- **setno** : *QVariant*
+  the set to pick.
+
+- **baseline** : *QPair&lt; float, float &gt;*
+  The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b). the interval is between "a (s)" and "b (s)". If a is None the beginning of the data is used and if b is None then b is set to the end of the interval. If baseline is equal ot (None, None) all the time interval is used. If None, no correction is applied.
+
+- **proj** : *bool*
+  Apply SSP projection vectors (optional, default = true).
+
+- **p_aspect_kind** : *fiff_int_t*
+  Either "FIFFV_ASPECT_AVERAGE" or "FIFFV_ASPECT_STD_ERR". The type of data to read. Only used if "setno" is a str.
+
+**Returns:**
+
+- *bool* — true if successful, false otherwise.
+
+---
+
+### read_evoked_set(p_IODevice, data)
+
+Read all evoked data from one file.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  A fiff IO device like a fiff QFile or QTCPSocket.
+
+- **data** : *FiffEvokedSet &*
+  The read evoked data.
+
+**Returns:**
+
+- *bool* — true if successful, false otherwise.
+
+---
+
+### read_meas_info(p_pStream, p_Node, p_Info, p_NodeInfo)
+
+fiff_read_meas_info
+
+Wrapper for the `FiffStream` read_meas_info member function
+
+Read the measurement info Source is assumed to be an open fiff stream.
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream::SPtr &*
+  The opened fiff stream to read from.
+
+- **p_Node** : *const FiffDirNode::SPtr &*
+  The node of interest.
+
+- **p_Info** : *FiffInfo &*
+  The read measurement info.
+
+- **p_NodeInfo** : *FiffDirNode::SPtr &*
+  The to measurement corresponding fiff_dir_tree.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### read_named_matrix(p_pStream, p_Node, matkind, mat)
+
+fiff_read_named_matrix
+
+Wrapper for the `FiffStream` read_named_matrix member function
+
+Reads a named matrix.
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream::SPtr &*
+  The opened fif file to read from.
+
+- **p_Node** : *const FiffDirNode::SPtr &*
+  The node of interest.
+
+- **matkind** : *fiff_int_t*
+  The matrix kind to look for.
+
+- **mat** : *FiffNamedMatrix &*
+  The named matrix.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### read_proj(p_pStream, p_Node)
+
+[ projdata ] = fiff_read_proj(fid,node)
+
+Read the SSP data under a given directory node
+
+Wrapper for the `FiffStream` read_proj member function
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream::SPtr &*
+  The opened fif file to read from.
+
+- **p_Node** : *const FiffDirNode::SPtr &*
+  The node of interest.
+
+**Returns:**
+
+- *QList&lt; FiffProj &gt;* — a list of SSP projectors.
+
+---
+
+### read_raw_segment(raw, data, times, from, to, sel)
+
+fiff_read_raw_segment
+
+Wrapper for the FiffRawData read_raw_segment member function
+
+Read a specific raw data segment
+
+**Parameters:**
+
+- **raw** : *FiffRawData &*
+  structure returned by fiff_setup_read_raw.
+
+- **data** : *Eigen::MatrixXd &*
+  returns the data matrix (channels x samples).
+
+- **times** : *Eigen::MatrixXd &*
+  returns the time values corresponding to the samples.
+
+- **from** : *fiff_int_t*
+  first sample to include. If omitted, defaults to the first sample in data (optional).
+
+- **to** : *fiff_int_t*
+  last sample to include. If omitted, defaults to the last sample in data (optional).
+
+- **sel** : *Eigen::MatrixXi*
+  channel selection vector (optional).
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### read_raw_segment(raw, data, times, mult, from, to, sel)
+
+fiff_read_raw_segment
+
+Wrapper for the FiffRawData read_raw_segment member function
+
+Read a specific raw data segment
+
+**Parameters:**
+
+- **raw** : *FiffRawData &*
+  structure returned by fiff_setup_read_raw.
+
+- **data** : *Eigen::MatrixXd &*
+  returns the data matrix (channels x samples).
+
+- **times** : *Eigen::MatrixXd &*
+  returns the time values corresponding to the samples.
+
+- **mult** : *Eigen::SparseMatrix&lt; double &gt; &*
+  matrix to store used multiplication matrix (compensator,projection,calibration).
+
+- **from** : *fiff_int_t*
+  first sample to include. If omitted, defaults to the first sample in data (optional).
+
+- **to** : *fiff_int_t*
+  last sample to include. If omitted, defaults to the last sample in data (optional).
+
+- **sel** : *Eigen::MatrixXi*
+  channel selection vector (optional).
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### read_tag(p_pStream, p_pTag, pos)
+
+fiff_read_tag
+
+Wrapper for the FiffTag::read_tag function
+
+Read one tag from a fif file. if pos is not provided, reading starts from the current file position
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream::SPtr &*
+  opened fif file.
+
+- **p_pTag** : *FiffTag::UPtr &*
+  the read tag.
+
+- **pos** : *qint64*
+  position of the tag inside the fif file.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### read_tag_info(p_pStream, p_pTag)
+
+fiff_read_tag_info
+
+Wrapper for the FiffTag::read_tag_info function
+
+Read tag information of one tag from a fif file. if pos is not provided, reading starts from the current file position
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream::SPtr &*
+  opened fif file.
+
+- **p_pTag** : *FiffTag::UPtr &*
+  the read tag info.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### setup_read_raw(p_IODevice, data, allow_maxshield)
+
+fiff_setup_read_raw
+
+Wrapper for the `FiffStream::setup_read_raw` static function
+
+Read information about raw data file
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  A fiff IO device like a fiff QFile or QTCPSocket.
+
+- **data** : *FiffRawData &*
+  The raw data information - contains the opened fiff file.
+
+- **allow_maxshield** : *bool*
+  Accept unprocessed MaxShield data.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### split_name_list(p_sNameList)
+
+fiff_split_name_list
+
+Wrapper for the `FiffStream::split_name_list` static function
+
+Splits a string by looking for seperator ":"
+
+**Parameters:**
+
+- **p_sNameList** : *QString*
+  string to split.
+
+**Returns:**
+
+- *QStringList* — the splitted string list.
+
+---
+
+### start_block(p_pStream, kind)
+
+fiff_start_block
+
+Wrapper for the `FiffStream` start_block member function
+
+Writes a FIFF_BLOCK_START tag
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  An open fif file to write to.
+
+- **kind** : *fiff_int_t*
+  The block kind to start.
+
+---
+
+### start_file(p_IODevice)
+
+fiff_start_file
+
+Wrapper for the `FiffStream::start_file` static function
+
+Opens a fiff file for writing and writes the compulsory header tags
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  A fiff IO device like a fiff QFile or QTCPSocket.
+
+**Returns:**
+
+- *FiffStream::SPtr* — The opened file.
+
+---
+
+### start_writing_raw(p_IODevice, info, cals, sel)
+
+fiff_start_writing_raw
+
+Wrapper for the `FiffStream::start_writing_raw` static function
+
+function [fid,cals] = fiff_start_writing_raw(name,info,sel)
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  A fiff IO device like a fiff QFile or QTCPSocket.
+
+- **info** : *const FiffInfo &*
+  The measurement info block of the source file.
+
+- **cals** : *Eigen::RowVectorXd &*
+  Thecalibration matrix.
+
+- **sel** : *Eigen::MatrixXi*
+  Which channels will be included in the output file (optional).
+
+**Returns:**
+
+- *FiffStream::SPtr* — the started fiff file.
+
+---
+
+### write_ch_info(p_pStream, ch)
+
+fiff_write_ch_info
+
+Wrapper for the `FiffStream` write_ch_info member function
+
+Writes a channel information record to a fif file The type, cal, unit, and pos members are explained in Table 9.5 of the MNE manual
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  An open fif file.
+
+- **ch** : *const FiffChInfo &*
+  The channel information structure to write.
+
+---
+
+### write_coord_trans(p_pStream, trans)
+
+fiff_write_coord_trans
+
+Wrapper for the `FiffStream` write_coord_trans member function
+
+Writes a coordinate transformation structure
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  An open fif file.
+
+- **trans** : *FiffCoordTrans &*
+  The coordinate transfomation structure.
+
+---
+
+### write_ctf_comp(p_pStream, comps)
+
+fiff_write_ctf_comp
+
+Wrapper for the `FiffStream` write_ctf_comp member function
+
+Writes the CTF compensation data into a fif file
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  An open fif file.
+
+- **comps** : *QList&lt; FiffCtfComp &gt; &*
+  The compensation data to write.
+
+---
+
+### write_dig_point(p_pStream, dig)
+
+fiff_write_dig_point
+
+Wrapper for the `FiffStream` write_dig_point member function
+
+Writes a digitizer data point into a fif file
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  An open fif file.
+
+- **dig** : *FiffDigPoint &*
+  The point to write.
+
+---
+
+### write_id(p_pStream, kind, id)
+
+fiff_write_id
+
+Wrapper for the `FiffStream` write_id member function
+
+Writes fiff id If the id argument is missing it will be generated here
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  An open fif file.
+
+- **kind** : *fiff_int_t*
+  The tag kind.
+
+- **id** : *FiffId &*
+  The id to write.
+
+---
+
+### write_int(p_pStream, kind, data, nel)
+
+fiff_write_int
+
+Wrapper for the `FiffStream` write_int member function
+
+Writes a 32-bit integer tag to a fif file
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  An open fif file.
+
+- **kind** : *fiff_int_t*
+  Tag kind.
+
+- **data** : *const fiff_int_t **
+  The integer data pointer.
+
+- **nel** : *fiff_int_t*
+  Number of integers to write (default = 1).
+
+---
+
+### write_float(p_pStream, kind, data, nel)
+
+fiff_write_float
+
+Wrapper for the `FiffStream` write_float member function
+
+Writes a single-precision floating point tag to a fif file
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  An open fif file.
+
+- **kind** : *fiff_int_t*
+  Tag kind.
+
+- **data** : *float **
+  The float data pointer.
+
+- **nel** : *fiff_int_t*
+  Number of floats to write (default = 1).
+
+---
+
+### write_float_matrix(p_pStream, kind, mat)
+
+fiff_write_float_matrix
+
+Wrapper for the `FiffStream` write_float_matrix member function
+
+Writes a single-precision floating-point matrix tag
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  An open fif file.
+
+- **kind** : *fiff_int_t*
+  The tag kind.
+
+- **mat** : *Eigen::MatrixXf &*
+  The data matrix.
+
+---
+
+### write_name_list(p_pStream, kind, data)
+
+fiff_write_name_list
+
+Wrapper for the `FiffStream` write_name_list member function
+
+Writes a colon-separated list of names
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  An open fif file.
+
+- **kind** : *fiff_int_t*
+  The tag kind.
+
+- **data** : *QStringList &*
+  An array of names to create the list from.
+
+---
+
+### write_named_matrix(p_pStream, kind, mat)
+
+fiff_write_named_matrix
+
+Wrapper for the `FiffStream` write_named_matrix member function
+
+Writes a named single-precision floating-point matrix
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  An open fif file.
+
+- **kind** : *fiff_int_t*
+  The tag kind to use for the data.
+
+- **mat** : *FiffNamedMatrix &*
+  The data matrix.
+
+---
+
+### write_proj(p_pStream, projs)
+
+fiff_write_proj
+
+Wrapper for the `FiffStream` write_proj member function
+
+Writes the projection data into a fif file
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  An open fif file.
+
+- **projs** : *QList&lt; FiffProj &gt; &*
+  The compensation data to write.
+
+---
+
+### write_raw_buffer(p_pStream, buf, cals)
+
+fiff_write_raw_buffer
+
+Wrapper for the `FiffStream` write_raw_buffer member function
+
+Writes a raw buffer.
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  An open fif file.
+
+- **buf** : *const Eigen::MatrixXd &*
+  the buffer to write.
+
+- **cals** : *const Eigen::MatrixXd &*
+  calibration factors.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### write_string(p_pStream, kind, data)
+
+fiff_write_string
+
+Wrapper for the `FiffStream` write_string member function
+
+Writes a string tag
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  An open fif file.
+
+- **kind** : *fiff_int_t*
+  The tag kind.
+
+- **data** : *QString &*
+  The string data to write.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

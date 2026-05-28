@@ -1,0 +1,88 @@
+---
+id: bids-tsv
+title: "BIDSLIB::BidsTsv"
+sidebar_label: BidsTsv
+sidebar_position: 4
+---
+
+# BidsTsv
+
+**Namespace:** `BIDSLIB` &nbsp;·&nbsp; **Library:** BIDS Library &nbsp;·&nbsp; **Header:** `bids/bids_tsv.h`
+
+`#include <bids/bids_tsv.h>`
+
+```cpp
+class BIDSLIB::BidsTsv
+```
+
+Generic BIDS TSV file reader/writer.
+
+BIDS TSV files are tab-separated value files with:
+A mandatory header row defining column names.
+
+
+"n/a" for missing values.
+
+
+UTF-8 encoding, LF line endings.
+
+Domain-specific TSV I/O (channels, electrodes, events) is handled by `BidsChannel`, `BidsElectrode`, and `BidsEvent` respectively.
+
+Generic BIDS TSV file I/O.
+
+---
+
+## Public Methods
+
+### BidsTsv()
+
+---
+
+### ~BidsTsv()
+
+---
+
+## Static Methods
+
+### readTsv(sFilePath, headers)
+
+Reads a TSV file into an ordered list of row maps.
+
+**Parameters:**
+
+- **sFilePath** : *const QString &*
+  Path to the TSV file.
+
+- **headers** : *QStringList &*
+  Column names from the header row.
+
+**Returns:**
+
+- *QList&lt; BidsTsvRow &gt;* — List of rows, each row a map of column-name → value.
+
+---
+
+### writeTsv(sFilePath, headers, rows)
+
+Writes rows to a TSV file.
+
+**Parameters:**
+
+- **sFilePath** : *const QString &*
+  Output file path.
+
+- **headers** : *const QStringList &*
+  Column names (determines column order).
+
+- **rows** : *const QList&lt; BidsTsvRow &gt; &*
+  Data rows.
+
+**Returns:**
+
+- *bool* — true on success, false on I/O error.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

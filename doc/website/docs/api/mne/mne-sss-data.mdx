@@ -1,0 +1,101 @@
+---
+id: mne-sss-data
+title: "MNELIB::MNESssData"
+sidebar_label: MNESssData
+sidebar_position: 52
+---
+
+# MNESssData
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_sss_data.h`
+
+`#include <mne/mne_sss_data.h>`
+
+```cpp
+class MNELIB::MNESssData
+```
+
+Implements `MNE` SSS Data (Replaces *mneSssData,mneSssDataRec struct of MNE-C `mne_types.h`).
+
+Container for Signal Space Separation (SSS/Maxwell filtering) expansion coefficients and metadata.
+
+---
+
+## Public Methods
+
+### MNESssData()
+
+Constructs the `MNE` SSS Data.
+
+---
+
+### MNESssData(p_MneSssData)
+
+Copy constructor.
+
+Refactored: mne_dup_sss_data (mne_sss_data.c)
+
+**Parameters:**
+
+- **p_MneSssData** : *const MNESssData &*
+  `MNE` SSS Data which should be copied.
+
+---
+
+### ~MNESssData()
+
+Destroys the `MNE` SSS Data description.
+
+---
+
+### print(out)
+
+Output the SSS information for debugging purposes.
+
+Refactored: mne_print_sss_data (mne_sss_data.c)
+
+**Parameters:**
+
+- **out** : *QTextStream &*
+  The text stream to write the SSS diagnostics to (e.g. a QTextStream wrapping stderr).
+
+---
+
+## Static Methods
+
+### read(name)
+
+Read SSS data from anywhere in a file Refactored: mne_read (mne_sss_data.c).
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Name of the file to read the SSS data from.
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNESssData &gt;* — The read SSS data.
+
+---
+
+### read_from_node(stream, start)
+
+Read the SSS data from the given node of an open fiff stream Refactored: mne_read_from_node (mne_sss_data.c).
+
+**Parameters:**
+
+- **stream** : *QSharedPointer&lt;FIFFLIB::FiffStream&gt; &*
+  The open fiff stream.
+
+- **start** : *const QSharedPointer&lt;FIFFLIB::FiffDirNode&gt; &*
+  The node/tree to read the SSS data from.
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNESssData &gt;* — The read SSS data.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

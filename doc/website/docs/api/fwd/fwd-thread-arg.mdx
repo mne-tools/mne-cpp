@@ -1,0 +1,78 @@
+---
+id: fwd-thread-arg
+title: "FWDLIB::FwdThreadArg"
+sidebar_label: FwdThreadArg
+sidebar_position: 13
+---
+
+# FwdThreadArg
+
+**Namespace:** `FWDLIB` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Header:** `fwd/fwd_thread_arg.h`
+
+`#include <fwd/fwd_thread_arg.h>`
+
+```cpp
+class FWDLIB::FwdThreadArg
+```
+
+Implements a Forward Thread Argument (replaces `fwdThreadArg` / `fwdThreadArgRec` from MNE-C `compute_forward.c`).
+
+Per-thread work packet carrying the dipole-index range, coil set, field/grad callback and write-back view into the shared lead-field matrix — unit of work for the parallel source-space dipole loop.
+
+---
+
+## Public Methods
+
+### FwdThreadArg()
+
+Constructs the Forward Thread Argument.
+
+---
+
+### ~FwdThreadArg()
+
+Destroys the Forward Thread Argument.
+
+---
+
+## Static Methods
+
+### create_eeg_multi_thread_duplicate(one, bem_model)
+
+Create a thread-safe duplicate for EEG parallel forward computation.
+
+**Parameters:**
+
+- **one** : *FwdThreadArg &*
+  Template thread argument to duplicate.
+
+- **bem_model** : *bool*
+  Whether to duplicate the BEM model sub-object.
+
+**Returns:**
+
+- *FwdThreadArg::UPtr* — Thread-safe duplicate.
+
+---
+
+### create_meg_multi_thread_duplicate(one, bem_model)
+
+Create a thread-safe duplicate for MEG parallel forward computation.
+
+**Parameters:**
+
+- **one** : *FwdThreadArg &*
+  Template thread argument to duplicate.
+
+- **bem_model** : *bool*
+  Whether to duplicate the BEM model sub-object.
+
+**Returns:**
+
+- *FwdThreadArg::UPtr* — Thread-safe duplicate.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

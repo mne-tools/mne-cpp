@@ -1,0 +1,116 @@
+---
+id: control3-d-view
+title: "DISPLIB::Control3DView"
+sidebar_label: Control3DView
+sidebar_position: 22
+---
+
+# Control3DView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/control3dview.h`
+
+`#include <disp/control3dview.h>`
+
+```cpp
+class DISPLIB::Control3DView
+```
+
+Tree-view control panel for the 3-D scene (visibility, colour, alpha, threshold per item).
+
+Hosts a `QTreeView` bound to the `Data3DTreeModel` and a custom `QStyledItemDelegate` that paints colour swatches and slider editors inline so edits propagate directly to the renderer.
+
+---
+
+## Public Methods
+
+### Control3DView(sSettingsPath, parent, slFlags, type)
+
+Default constructor.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  The parent of the QObject.
+
+- **slFlags** : *const QStringList &*
+  The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: "Data", "View", "Light".
+
+- **type.**
+
+---
+
+### ~Control3DView()
+
+Destroys the `Control3DView`.
+
+---
+
+### setFlags(slFlags)
+
+Set the flags specifying which part of the GUI should be shown.
+
+**Parameters:**
+
+- **slFlags** : *const QStringList &*
+  flags.
+
+---
+
+### setDelegate(pItemDelegate)
+
+Set the delegate for the tree view.
+
+**Parameters:**
+
+- **pItemDelegate** : *QStyledItemDelegate **
+  The delegate.
+
+---
+
+### setModel(pDataTreeModel)
+
+Init the control widget based on the 3D view and data model.
+
+**Parameters:**
+
+- **pData3DTreeModel**
+  The 3D data tree model.
+
+- **pView3D**
+  The view3D to bec connected to this widget.
+
+---
+
+### onTreeViewHeaderHide()
+
+Slot called when tree view header visibilty changed.
+
+---
+
+### onTreeViewRemoveItem(index)
+
+Slot called when an item should be removed.
+
+---
+
+### onTreeViewDescriptionHide()
+
+Slot called when tree view description visibilty changed.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

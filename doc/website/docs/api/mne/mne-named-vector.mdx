@@ -1,0 +1,58 @@
+---
+id: mne-named-vector
+title: "MNELIB::MNENamedVector"
+sidebar_label: MNENamedVector
+sidebar_position: 40
+---
+
+# MNENamedVector
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_named_vector.h`
+
+`#include <mne/mne_named_vector.h>`
+
+```cpp
+class MNELIB::MNENamedVector
+```
+
+Named vector - vector specification with a channel list.
+
+---
+
+## Public Methods
+
+### MNENamedVector()
+
+---
+
+### ~MNENamedVector()
+
+---
+
+### pick(names, nnames, require_all, res)
+
+Pick elements from this named vector by name matching, writing them into a result vector ordered according to the supplied name list.
+
+**Parameters:**
+
+- **names** : *const QStringList &*
+  List of names to pick.
+
+- **nnames** : *int*
+  Number of names in the list.
+
+- **require_all** : *bool*
+  If true, fail when any name is not found.
+
+- **res** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Output vector (must have at least nnames elements).
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

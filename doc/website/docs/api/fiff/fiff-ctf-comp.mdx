@@ -1,0 +1,57 @@
+---
+id: fiff-ctf-comp
+title: "FIFFLIB::FiffCtfComp"
+sidebar_label: FiffCtfComp
+sidebar_position: 15
+---
+
+# FiffCtfComp
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_ctf_comp.h`
+
+`#include <fiff/fiff_ctf_comp.h>`
+
+```cpp
+class FIFFLIB::FiffCtfComp
+```
+
+One CTF software-gradient compensation matrix: grade kind, calibration flag and the gradiometer × reference named matrix.
+
+A list of `FiffCtfComp` lives inside `FiffInfo` and lets raw / evoked data be moved between compensation grades by chaining the appropriate matrices. The `save_calibrated` flag controls whether the matrix was stored already-calibrated (and therefore must not be re-multiplied by the channel cals on apply).
+
+---
+
+## Public Methods
+
+### FiffCtfComp()
+
+Constructs the CTF software compensation data.
+
+---
+
+### FiffCtfComp(p_FiffCtfComp)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FiffCtfComp** : *const FiffCtfComp &*
+  CTF software compensation data which should be copied.
+
+---
+
+### ~FiffCtfComp()
+
+Destroys the CTF software compensation data.
+
+---
+
+### clear()
+
+Initializes the CTF software compensation data.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

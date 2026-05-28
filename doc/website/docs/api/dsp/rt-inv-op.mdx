@@ -1,0 +1,85 @@
+---
+id: rt-inv-op
+title: "RTPROCESSINGLIB::RtInvOp"
+sidebar_label: RtInvOp
+sidebar_position: 37
+---
+
+# RtInvOp
+
+**Namespace:** `RTPROCESSINGLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Header:** `dsp/rt/rt_inv_op.h`
+
+`#include <dsp/rt_inv_op.h>`
+
+```cpp
+class RTPROCESSINGLIB::RtInvOp
+```
+
+Real-time inverse dSPM, sLoreta inverse operator estimation.
+
+Controller that manages `RtInvOpWorker` for online inverse operator updates.
+
+---
+
+## Public Methods
+
+### RtInvOp(p_pFiffInfo, p_pFwd, parent)
+
+Creates the real-time inverse operator estimation object.
+
+**Parameters:**
+
+- **p_pFiffInfo** : *QSharedPointer&lt;FIFFLIB::FiffInfo&gt; &*
+  Fiff measurement info.
+
+- **p_pFwd** : *QSharedPointer&lt;MNELIB::MNEForwardSolution&gt; &*
+  Forward solution.
+
+- **parent** : *QObject **
+  Parent QObject (optional).
+
+---
+
+### ~RtInvOp()
+
+Destroys the inverse operator estimation object.
+
+---
+
+### append(noiseCov)
+
+Slot to receive incoming noise covariance estimations.
+
+**Parameters:**
+
+- **noiseCov** : *const FIFFLIB::FiffCov &*
+  Noise covariance estimation.
+
+---
+
+### setFwdSolution(pFwd)
+
+Slot to receive incoming forward solution.
+
+**Parameters:**
+
+- **pFwd** : *QSharedPointer&lt;MNELIB::MNEForwardSolution&gt;*
+  Forward solution.
+
+---
+
+### restart()
+
+Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
+
+---
+
+### stop()
+
+Stops the thread by interrupting its computation queue, quitting and waiting.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,92 @@
+---
+id: mne-proj-item
+title: "MNELIB::MNEProjItem"
+sidebar_label: MNEProjItem
+sidebar_position: 44
+---
+
+# MNEProjItem
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_proj_item.h`
+
+`#include <mne/mne_proj_item.h>`
+
+```cpp
+class MNELIB::MNEProjItem
+```
+
+A single SSP (Signal-Space Projection) item.
+
+`MNEProjItem` holds one linear projection operator consisting of a set of projection vectors (stored as an `MNENamedMatrix`), together with metadata such as the projection kind, a human-readable description, and flags indicating whether the item is currently active and which channel types (MEG / EEG) it covers.
+
+Projection items are aggregated by `MNEProjOp` to form the complete SSP operator that is applied during inverse computations and dipole fitting.
+
+---
+
+## Public Methods
+
+### MNEProjItem()
+
+Default constructor.
+
+Initialises all flags to their default values (active = true, kind = FIFFV_PROJ_ITEM_NONE, no MEG/EEG channels).
+
+---
+
+### MNEProjItem(other)
+
+Copy constructor.
+
+Deep-copies the projection vectors (unique_ptr member).
+
+---
+
+### operator=(other)
+
+Copy assignment operator.
+
+Deep-copies the projection vectors (unique_ptr member).
+
+---
+
+### MNEProjItem()
+
+Move constructor (defaulted).
+
+---
+
+### operator=()
+
+Move assignment operator (defaulted).
+
+---
+
+### ~MNEProjItem()
+
+Destructor.
+
+---
+
+### affect(list, nlist)
+
+Test whether this projection item affects any of the listed channels.
+
+Iterates over `list` and checks if any channel name matches a column in the projection vectors that contains at least one non-zero entry.
+
+**Parameters:**
+
+- **list** : *const QStringList &*
+  Channel names to test against.
+
+- **nlist** : *int*
+  Number of channel names in `list`.
+
+**Returns:**
+
+- *int* — `true` (non-zero) if this item affects at least one channel, `false` (0) otherwise.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,45 @@
+---
+id: mne-logger
+title: "UTILSLIB::MNELogger"
+sidebar_label: MNELogger
+sidebar_position: 30
+---
+
+# MNELogger
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `utils/generics/mne_logger.h`
+
+`#include <utils/mne_logger.h>`
+
+```cpp
+class UTILSLIB::MNELogger
+```
+
+The Apllicationlogger provides colorized keywords in terminal outputs for better overview.
+
+Custom Qt message handler that formats and routes qDebug/qWarning/qCritical output to file or console.
+
+---
+
+## Static Methods
+
+### customLogWriter(type, context, msg)
+
+Customized logWriter to colorize type of the message in the terminal.
+
+**Parameters:**
+
+- **type** : *QtMsgType*
+  Enum to identify the various message types (qDebug, qInfo, qCritical, qWarning and qFatal).
+
+- **context** : *const QMessageLogContext &*
+  Context provides information about the source code location.
+
+- **msg** : *const QString &*
+  The message to print in the terminal.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

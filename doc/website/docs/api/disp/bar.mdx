@@ -1,0 +1,92 @@
+---
+id: bar
+title: "DISPLIB::Bar"
+sidebar_label: Bar
+sidebar_position: 9
+---
+
+# Bar
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/plots/bar.h`
+
+`#include <disp/bar.h>`
+
+```cpp
+class DISPLIB::Bar
+```
+
+`Bar` chart / histogram QWidget rendering Eigen class-limit + frequency vectors with QPainter.
+
+Templated on the value type so callers can pass either integer or floating bin limits. Use `setData` to install a new dataset and `updatePlot` to refresh an existing chart in place; both call `splitCoefficientAndExponent` internally to format the tick labels with a configurable number of significant digits.
+
+---
+
+## Public Methods
+
+### Bar(title, parent)
+
+The constructor for `Bar`.
+
+---
+
+### setData(matClassLimitData, matClassFrequencyData, iPrecisionValue)
+
+Sets new data to the bar chart.
+
+**Parameters:**
+
+- **matClassLimitData** : *const Eigen::Matrix&lt; T, Eigen::Dynamic, 1 &gt; &*
+  vector input filled with class limits.
+
+- **matClassFrequencyData** : *const Eigen::Matrix&lt; int, Eigen::Dynamic, 1 &gt; &*
+  vector input filled with class frequency to the corresponding class.
+
+- **iPrecisionValue** : *int*
+  user input to determine the amount of digits of coefficient shown in the histogram.
+
+---
+
+### setData(matClassLimitData, matClassFrequencyData, iPrecisionValue)
+
+---
+
+### updatePlot(matClassLimitData, matClassFrequencyData, iPrecisionValue)
+
+Updates the bar plot with the new data.
+
+**Parameters:**
+
+- **matClassLimitData** : *const Eigen::Matrix&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; &*
+  vector input filled with class limits.
+
+- **matClassFrequencyData** : *const Eigen::Matrix&lt; int, Eigen::Dynamic, Eigen::Dynamic &gt; &*
+  vector input filled with class frequency to the corresponding class.
+
+- **iPrecisionValue** : *int*
+  user input to determine the amount of digits of coefficient shown in the histogram.
+
+---
+
+### splitCoefficientAndExponent(matClassLimitData, iClassAmount, vecCoefficientResults, vecExponentValues)
+
+splitCoefficientAndExponent takes in QVector value of coefficient and exponent and normalizes them.
+
+**Parameters:**
+
+- **matClassLimitData** : *const Eigen::Matrix&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; &*
+  vector input filled with values of class limits.
+
+- **iClassAmount** : *int*
+  amount of classes in the histogram.
+
+- **vecCoefficientResults** : *Eigen::VectorXd &*
+  vector filled with values of coefficient only.
+
+- **vecExponentValues** : *Eigen::VectorXi &*
+  vector filled with values of exponent only.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

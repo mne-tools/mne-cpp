@@ -1,0 +1,483 @@
+---
+id: channel-data-view
+title: "DISPLIB::ChannelDataView"
+sidebar_label: ChannelDataView
+sidebar_position: 14
+---
+
+# ChannelDataView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/channeldataview.h`
+
+`#include <disp/channeldataview.h>`
+
+```cpp
+class DISPLIB::ChannelDataView
+```
+
+Composite real-time multi-channel raw scroller assembling label panel, table view, time ruler and scrollbars.
+
+Acts as the user-facing host of the `ChannelDataModel` and `RtFiffRawViewDelegate` pair, exposing playback / zoom / channel-selection signals consumed by the surrounding plugin GUI.
+
+---
+
+## Public Methods
+
+### ChannelDataView(sSettingsPath, parent, f)
+
+Constructs a `ChannelDataView`.
+
+**Parameters:**
+
+- **sSettingsPath** : *const QString &*
+  QSettings prefix for persistent GUI settings.
+
+- **parent** : *QWidget **
+  Parent widget.
+
+- **f** : *Qt::WindowFlags*
+  Window flags.
+
+---
+
+### ~ChannelDataView()
+
+---
+
+### init(pInfo)
+
+Initialise the view from a FiffInfo (channel names, types, sampling rate).
+
+**Parameters:**
+
+- **pInfo** : *QSharedPointer&lt;FIFFLIB::FiffInfo&gt;*
+  Shared pointer to FiffInfo.
+
+---
+
+### setData(data, firstSample)
+
+Replace all buffered data.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  Channels × samples matrix.
+
+- **firstSample** : *int*
+  Absolute sample index of column 0.
+
+---
+
+### addData(data)
+
+Append new samples (real-time streaming use-case).
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  Channels × new-samples matrix.
+
+---
+
+### scrollToSample(sample, animate)
+
+Scroll to the given absolute sample index.
+
+**Parameters:**
+
+- **sample** : *int*
+  Target left-edge sample.
+
+- **animate** : *bool*
+  If true, animate with a smooth cubic ease-out.
+
+---
+
+### setWindowSize(seconds)
+
+Set the visible time window (in seconds).
+
+This adjusts samplesPerPixel to fit the requested duration.
+
+**Parameters:**
+
+- **seconds** : *float*
+  Duration of the visible window.
+
+---
+
+### windowSize()
+
+Get the current visible time window in seconds.
+
+---
+
+### setZoom(factor)
+
+Set the zoom factor (&gt; 1 = zoom in, &lt; 1 = zoom out relative to default).
+
+**Parameters:**
+
+- **factor** : *double*
+  Zoom multiplier applied to the default samples-per-pixel.
+
+---
+
+### zoom()
+
+Return the current zoom factor.
+
+---
+
+### setBackgroundColor(color)
+
+Set the background colour of the rendering surface.
+
+**Parameters:**
+
+- **color** : *const QColor &*
+  New background colour.
+
+---
+
+### backgroundColor()
+
+---
+
+### setSignalColor(color)
+
+Set the default signal line colour (used for channel types without a type-specific colour).
+
+**Parameters:**
+
+- **color** : *const QColor &*
+  New signal colour.
+
+---
+
+### signalColor()
+
+---
+
+### setScalingMap(scaleMap)
+
+Set the per-channel-type amplitude scale map.
+
+Keys should be FIFF channel kind constants (FIFFV_MEG_CH, FIFFV_EEG_CH, …).
+
+**Parameters:**
+
+- **scaleMap** : *const QMap&lt; qint32, float &gt; &*
+  Map from FIFF kind to physical amplitude (e.g. 1.2e-12 for MEG).
+
+---
+
+### scalingMap()
+
+---
+
+### hideBadChannels(hide)
+
+Show or hide channels marked bad.
+
+**Parameters:**
+
+- **hide** : *bool*
+  If true, bad channels are collapsed to zero height.
+
+---
+
+### badChannelsHidden()
+
+---
+
+### setChannelFilter(names)
+
+Restrict the view to a named subset of channels.
+
+Channels not in `names` are hidden immediately. Pass an empty list to restore all channels.
+
+**Parameters:**
+
+- **names** : *const QStringList &*
+  List of channel names to show (case-sensitive).
+
+---
+
+### setRemoveDC(dc)
+
+Enable or disable DC (mean) removal applied at render time.
+
+Takes effect immediately — the view redraws with the current data.
+
+**Parameters:**
+
+- **dc** : *bool*
+  true = subtract per-channel mean from each rendered window.
+
+---
+
+### setDetrendMode(mode)
+
+Set the detrending mode for on-the-fly trend removal during rendering.
+
+None = raw, Mean = DC offset, Linear = least-squares linear fit.
+
+**Parameters:**
+
+- **mode** : *DetrendMode*
+  The `DetrendMode` to use.
+
+---
+
+### detrendMode()
+
+---
+
+### setFileBounds(first, last)
+
+Set the absolute sample indices of the file's first and last samples.
+
+The scrollbar range and mouse-pan clamp use these to prevent scrolling outside the actual file boundaries regardless of the ring-buffer state.
+
+**Parameters:**
+
+- **first** : *int*
+  Absolute sample index of the file's first sample.
+
+- **last** : *int*
+  Absolute sample index of the file's last sample.
+
+---
+
+### setEvents(events)
+
+Set the list of event / stimulus markers to display as coloured vertical lines.
+
+Pass an empty vector to clear all markers.
+
+**Parameters:**
+
+- **events** : *const QVector&lt; ChannelRhiView::EventMarker &gt; &*
+  List of EventMarker objects.
+
+---
+
+### setEpochMarkers(triggerSamples)
+
+---
+
+### setEpochMarkersVisible(visible)
+
+---
+
+### epochMarkersVisible()
+
+---
+
+### setClippingVisible(visible)
+
+---
+
+### clippingVisible()
+
+---
+
+### setZScoreMode(enabled)
+
+---
+
+### zScoreMode()
+
+---
+
+### setReferenceMarkers(markers)
+
+Set the list of persistent sample/reference markers shown in the time ruler.
+
+**Parameters:**
+
+- **markers** : *const QVector&lt; TimeRulerReferenceMark &gt; &*
+  Reference markers to display in the ruler.
+
+---
+
+### setAnnotations(annotations)
+
+Set the list of annotation spans to display as translucent overlays.
+
+**Parameters:**
+
+- **annotations** : *const QVector&lt; ChannelRhiView::AnnotationSpan &gt; &*
+  List of AnnotationSpan objects.
+
+---
+
+### setAnnotationSelectionEnabled(enabled)
+
+Enable or disable annotation span selection in the raw browser.
+
+---
+
+### setEventsVisible(visible)
+
+---
+
+### eventsVisible()
+
+---
+
+### setAnnotationsVisible(visible)
+
+---
+
+### annotationsVisible()
+
+---
+
+### setOverviewBarVisible(visible)
+
+---
+
+### overviewBarVisible()
+
+---
+
+### setScrollSpeedFactor(factor)
+
+---
+
+### scrollSpeedFactor()
+
+---
+
+### sortChannelsByType()
+
+---
+
+### resetChannelOrder()
+
+---
+
+### setCrosshairEnabled(enabled)
+
+Enable or disable the crosshair cursor with coordinate readout.
+
+---
+
+### crosshairEnabled()
+
+---
+
+### setScalebarsVisible(visible)
+
+Show or hide per-channel-type amplitude scalebars.
+
+---
+
+### scalebarsVisible()
+
+---
+
+### setButterflyMode(enabled)
+
+Toggle butterfly mode (overlay all same-type channels).
+
+---
+
+### butterflyMode()
+
+---
+
+### toggleTimeFormat()
+
+Toggle time format between float seconds and HH:MM:SS clock time.
+
+---
+
+### setClockTimeFormat(useClock)
+
+Set clock time format on the ruler.
+
+---
+
+### clockTimeFormat()
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+### firstVisibleSample()
+
+Returns the first currently visible sample.
+
+---
+
+### visibleSampleCount()
+
+---
+
+### signalViewportRect()
+
+Returns the geometry of the actual QRHI signal viewport in ChannelDataView-local coordinates.
+
+---
+
+### sampleToViewportX(sample)
+
+Maps an absolute sample index to an x coordinate inside the signal viewport.
+
+**Parameters:**
+
+- **sample** : *int*
+  Absolute sample index.
+
+**Returns:**
+
+- *int* — x position in ChannelDataView-local coordinates.
+
+---
+
+### viewportXToSample(x)
+
+Maps a ChannelDataView-local x coordinate inside the signal viewport to an absolute sample index.
+
+**Parameters:**
+
+- **x** : *int*
+  ChannelDataView-local x coordinate.
+
+**Returns:**
+
+- *int* — Absolute sample index at the requested x position.
+
+---
+
+### model()
+
+Returns the underlying data model (non-owning pointer).
+
+Use for advanced configuration such as setMaxStoredSamples().
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

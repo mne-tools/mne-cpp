@@ -1,0 +1,116 @@
+---
+id: compensator-view
+title: "DISPLIB::CompensatorView"
+sidebar_label: CompensatorView
+sidebar_position: 20
+---
+
+# CompensatorView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/compensatorview.h`
+
+`#include <disp/compensatorview.h>`
+
+```cpp
+class DISPLIB::CompensatorView
+```
+
+Mutually-exclusive checkbox list picking the active MEG gradient compensation grade.
+
+One checkbox per compensation matrix advertised in the active `FiffInfo`; toggling emits `compSelectionChanged` with the new grade so the live pipeline can (un)apply the matrix.
+
+---
+
+## Public Methods
+
+### CompensatorView(sSettingsPath, parent, f)
+
+Constructs a `CompensatorView` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  parent of widget.
+
+---
+
+### ~CompensatorView()
+
+Destroys the `CompensatorView`.
+
+---
+
+### getCompensators()
+
+Get the current compensators.
+
+**Returns:**
+
+- *QList&lt; FIFFLIB::FiffCtfComp &gt;* — The current compensators.
+
+---
+
+### getLastTo()
+
+Get the last value of comp.to.
+
+**Returns:**
+
+- *int* — The last value of comp.to.
+
+---
+
+### setCompensators(comps)
+
+Set the current compensators.
+
+**Parameters:**
+
+- **comps** : *const QList&lt; FIFFLIB::FiffCtfComp &gt; &*
+  The new compensators.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### updateGuiMode(mode)
+
+Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
+
+**Parameters:**
+
+- **mode** : *GuiMode*
+  The new mode (Clinical=0, Research=1).
+
+---
+
+### updateProcessingMode(mode)
+
+Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
+
+**Parameters:**
+
+- **mode** : *ProcessingMode*
+  The new mode (RealTime=0, Offline=1).
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

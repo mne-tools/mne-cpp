@@ -1,0 +1,130 @@
+---
+id: abstract-format-reader
+title: "BIDSLIB::AbstractFormatReader"
+sidebar_label: AbstractFormatReader
+sidebar_position: 3
+---
+
+# AbstractFormatReader
+
+**Namespace:** `BIDSLIB` &nbsp;·&nbsp; **Library:** BIDS Library &nbsp;·&nbsp; **Header:** `bids/readers/bids_abstract_format_reader.h`
+
+`#include <bids/bids_abstract_format_reader.h>`
+
+```cpp
+class BIDSLIB::AbstractFormatReader
+```
+
+The `AbstractFormatReader` class provides a common interface for reading raw neurophysiology data from various file formats (EDF, BrainVision, etc.) used in BIDS datasets.
+
+Subclasses implement format-specific parsing and expose the data uniformly as FIFF structures.
+
+---
+
+## Public Methods
+
+### ~AbstractFormatReader()
+
+Virtual destructor.
+
+---
+
+### open(sFilePath)
+
+Open and parse the file header.
+
+Must be called before reading data.
+
+**Parameters:**
+
+- **sFilePath** : *const QString &*
+  Absolute path to the primary data file.
+
+**Returns:**
+
+- *bool* — True if the file was opened and parsed successfully.
+
+---
+
+### getInfo()
+
+Return measurement metadata as FiffInfo.
+
+**Returns:**
+
+- *FIFFLIB::FiffInfo* — FiffInfo populated from the native format header.
+
+---
+
+### readRawSegment(iStartSampleIdx, iEndSampleIdx)
+
+Read a segment of raw data.
+
+**Parameters:**
+
+- **iStartSampleIdx** : *int*
+  First sample index (0-based, inclusive).
+
+- **iEndSampleIdx** : *int*
+  Last sample index (0-based, exclusive).
+
+**Returns:**
+
+- *Eigen::MatrixXf* — Matrix of shape (n_channels x n_samples) with calibrated physical values.
+
+---
+
+### getSampleCount()
+
+Return total number of samples across the recording.
+
+---
+
+### getFrequency()
+
+Return the sampling frequency in Hz.
+
+---
+
+### getChannelCount()
+
+Return the number of measurement channels.
+
+---
+
+### toFiffRawData()
+
+Convert the entire dataset to a FiffRawData structure.
+
+**Returns:**
+
+- *FIFFLIB::FiffRawData* — FiffRawData populated with info, calibrations, and sample bounds.
+
+---
+
+### formatName()
+
+Return a descriptive name for the format (e.g.
+
+"EDF", "BrainVision").
+
+---
+
+### supportsExtension(sExtension)
+
+Check whether this reader can handle the given file extension.
+
+**Parameters:**
+
+- **sExtension** : *const QString &*
+  File extension including dot (e.g. ".edf", ".vhdr").
+
+**Returns:**
+
+- *bool* — True if this reader supports the extension.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

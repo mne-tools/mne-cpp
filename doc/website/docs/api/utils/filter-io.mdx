@@ -1,0 +1,74 @@
+---
+id: filter-io
+title: "UTILSLIB::FilterIO"
+sidebar_label: FilterIO
+sidebar_position: 16
+---
+
+# FilterIO
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/filterio.h`
+
+`#include <utils/filterio.h>`
+
+```cpp
+class UTILSLIB::FilterIO
+```
+
+Processes txt files which hold filter coefficients.
+
+Processes txt files which hold filter coefficients.
+
+---
+
+## Public Methods
+
+### FilterIO()
+
+Constructs a `FilterIO` object.
+
+---
+
+## Static Methods
+
+### readFilter(path, filter)
+
+Reads a given txt file and scans it for filter coefficients.
+
+Pls see sample file for file syntax.
+
+**Parameters:**
+
+- **path** : *QString*
+  holds the file path of the txt file which is to be read.
+
+- **filter** : *FilterKernel &*
+  holds the filter which the read parameters are to be saved to.
+
+**Returns:**
+
+- *bool* — true if reading was successful, false otherwise.
+
+---
+
+### writeFilter(path, filter)
+
+Writes a given filter to txt file .
+
+**Parameters:**
+
+- **path** : *const QString &*
+  holds the file path of the txt file which is to be written to.
+
+- **filter** : *const FilterKernel &*
+  holds the filter which is to be written to file.
+
+**Returns:**
+
+- *bool* — true if reading was successful, false otherwise.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

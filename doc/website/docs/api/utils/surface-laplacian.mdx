@@ -1,0 +1,93 @@
+---
+id: surface-laplacian
+title: "UTILSLIB::SurfaceLaplacian"
+sidebar_label: SurfaceLaplacian
+sidebar_position: 50
+---
+
+# SurfaceLaplacian
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/surface_laplacian.h`
+
+`#include <utils/surface_laplacian.h>`
+
+```cpp
+class UTILSLIB::SurfaceLaplacian
+```
+
+Surface Laplacian / Current Source Density (CSD) transformation.
+
+Computes a reference-free spatial Laplacian of EEG data using spherical spline interpolation (Perrin et al. 1989). This improves spatial resolution by acting as a high-pass spatial filter that enhances local sources and attenuates volume-conducted far-field activity.
+
+```cpp
+Eigen::MatrixX3d pos = ...;  // EEG electrode positions (n_ch × 3)
+Eigen::MatrixXd  data = ...; // EEG data (n_ch × n_times)
+auto result = SurfaceLaplacian::compute(data, pos);
+// result.matData      → CSD-transformed data
+// result.matTransform → n_ch × n_ch transformation matrix
+```
+
+---
+
+## Static Methods
+
+### compute(matData, matPositions, dLambda2, iStiffness, iNLegendreTerms, dSphereRadius)
+
+Compute the surface Laplacian (CSD) transformation.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  EEG data matrix (n_channels × n_times).
+
+- **matPositions** : *const Eigen::MatrixX3d &*
+  Electrode positions in 3D (n_channels × 3), in head coordinates.
+
+- **dLambda2** : *double*
+  Regularization parameter (default 1e-5).
+
+- **iStiffness** : *int*
+  Spline stiffness parameter (default 4).
+
+- **iNLegendreTerms** : *int*
+  Number of Legendre terms to evaluate (default 50).
+
+- **dSphereRadius** : *double*
+  `Sphere` radius in metres; if &lt;= 0, fitted from positions (default -1).
+
+**Returns:**
+
+- *SurfaceLaplacianResult* — `SurfaceLaplacianResult` with transformed data and transform matrix.
+
+---
+
+### computeTransform(matPositions, dLambda2, iStiffness, iNLegendreTerms, dSphereRadius)
+
+Compute only the CSD transformation matrix (without applying to data).
+
+**Parameters:**
+
+- **matPositions** : *const Eigen::MatrixX3d &*
+  Electrode positions in 3D (n_channels × 3).
+
+- **dLambda2** : *double*
+  Regularization parameter (default 1e-5).
+
+- **iStiffness** : *int*
+  Spline stiffness parameter (default 4).
+
+- **iNLegendreTerms** : *int*
+  Number of Legendre terms (default 50).
+
+- **dSphereRadius** : *double*
+  `Sphere` radius; if &lt;= 0, fitted from positions.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Transformation matrix (n_channels × n_channels).
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

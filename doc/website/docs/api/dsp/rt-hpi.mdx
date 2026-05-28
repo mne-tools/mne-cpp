@@ -1,0 +1,104 @@
+---
+id: rt-hpi
+title: "RTPROCESSINGLIB::RtHpi"
+sidebar_label: RtHpi
+sidebar_position: 35
+---
+
+# RtHpi
+
+**Namespace:** `RTPROCESSINGLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Header:** `dsp/rt/rt_hpis.h`
+
+`#include <dsp/rt_hpis.h>`
+
+```cpp
+class RTPROCESSINGLIB::RtHpi
+```
+
+Real-time Head Coil Positions estimation.
+
+Controller that manages `RtHpiWorker` for continuous head position tracking.
+
+---
+
+## Public Methods
+
+### RtHpi(sensorSet, parent)
+
+Creates the real-time HPIS estimation object.
+
+**Parameters:**
+
+- **p_pFiffInfo**
+  Associated Fiff Information.
+
+- **parent** : *QObject **
+  Parent QObject (optional).
+
+---
+
+### ~RtHpi()
+
+Destroys the Real-time HPI estimation object.
+
+---
+
+### append(data)
+
+Slot to receive incoming data.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  Data to estimate the HPI positions from.
+
+---
+
+### setModelParameters(hpiModelParameters)
+
+Set the coil frequencies.
+
+**Parameters:**
+
+- **vCoilFreqs**
+  The coil frequencies.
+
+---
+
+### setProjectionMatrix(matProjectors)
+
+Set the new projection matrix.
+
+**Parameters:**
+
+- **matProjectors** : *const Eigen::MatrixXd &*
+  The new projection matrix.
+
+---
+
+### setHpiDigitizer(matCoilsHead)
+
+Set the new projection matrix.
+
+**Parameters:**
+
+- **matProjectors**
+  The new projection matrix.
+
+---
+
+### restart()
+
+Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
+
+---
+
+### stop()
+
+Stops the thread by interrupting its computation queue, quitting and waiting.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

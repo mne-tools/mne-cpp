@@ -1,0 +1,68 @@
+---
+id: fiff-time
+title: "FIFFLIB::FiffTime"
+sidebar_label: FiffTime
+sidebar_position: 30
+---
+
+# FiffTime
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_time.h`
+
+`#include <fiff/fiff_time.h>`
+
+```cpp
+class FIFFLIB::FiffTime
+```
+
+FIFF time stamp: Unix seconds plus a microsecond fraction matching the on-disk `fiffTimeRec` record.
+
+Layout is two 32-bit fields (secs, usecs) — the exact representation used by `FIFF_MEAS_DATE` and the per-buffer timestamps embedded in raw data blocks, so an instance can be streamed in and out without per-field marshalling.
+
+---
+
+## Public Methods
+
+### FiffTime()
+
+Default constructor.
+
+Initializes both fields to zero.
+
+---
+
+### FiffTime(p_secs, p_usecs)
+
+Parameterized constructor.
+
+**Parameters:**
+
+- **p_secs** : *qint32*
+  GMT time in seconds since epoch.
+
+- **p_usecs** : *qint32*
+  Fraction of seconds in microseconds.
+
+---
+
+### ~FiffTime()
+
+Destroys the `FiffTime`.
+
+---
+
+## Static Methods
+
+### storageSize()
+
+Size of the old struct (fiffTimeRec) 2*int = 2*4 = 8.
+
+**Returns:**
+
+- *qint32* — the size of the old struct fiffTimeRec.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

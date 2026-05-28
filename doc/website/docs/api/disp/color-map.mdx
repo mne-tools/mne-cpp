@@ -1,0 +1,197 @@
+---
+id: color-map
+title: "DISPLIB::ColorMap"
+sidebar_label: ColorMap
+sidebar_position: 19
+---
+
+# ColorMap
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/plots/helpers/colormap.h`
+
+`#include <disp/colormap.h>`
+
+```cpp
+class DISPLIB::ColorMap
+```
+
+Static lookup helpers mapping scalar values to `QRgb` / `QColor` across all `DISPLIB` palettes.
+
+Each palette exists as a 256-row `Eigen::MatrixX3i` RGB table; the `valueToXxx` accessors interpolate between rows so callers can map any value in $$[0,1]$$ to a colour without instantiating an object. Bundled palettes include Viridis, Jet, Hot, HotNeg1, HotNeg2, Bone, Cool, RedBlue and the MNE-Python `hot` variant.
+
+---
+
+## Public Methods
+
+### ColorMap()
+
+Default constructor.
+
+---
+
+### ~ColorMap()
+
+Destructs the `ColorMap` class.
+
+---
+
+## Static Methods
+
+### valueToColor(v, sMap)
+
+Returns a Jet RGB to a given double value [0,1] and a colormap specified by sMap.
+
+If no matching colormap was found return Jet.
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [0,1].
+
+- **sMap** : *const QString &*
+  the colormap to choose.
+
+**Returns:**
+
+- *QRgb* — the corresponding RGB value.
+
+---
+
+### valueToJet(v)
+
+Returns a Jet RGB to a given double value [0,1].
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [0,1].
+
+**Returns:**
+
+- *QRgb* — the corresponding Jet RGB.
+
+---
+
+### valueToHot(v)
+
+Returns a Hot RGB to a given double value [0,1].
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [0,1].
+
+**Returns:**
+
+- *QRgb* — the corresponding Hot RGB.
+
+---
+
+### valueToHotNegative1(v)
+
+Returns a negative skewed hot RGB to a given double value [0,1].
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [0,1].
+
+**Returns:**
+
+- *QRgb* — the corresponding negative skewed Hot RGB.
+
+---
+
+### valueToHotNegative2(v)
+
+Returns a negative skewed hot RGB to a given double value [0,1].
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [0,1].
+
+**Returns:**
+
+- *QRgb* — the corresponding negative skewed Hot RGB.
+
+---
+
+### valueToBone(v)
+
+Returns a Bone RGB to a given double value [0,1].
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [0,1].
+
+**Returns:**
+
+- *QRgb* — the corresponding Bone RGB.
+
+---
+
+### valueToRedBlue(v)
+
+Returns a RedBlue RGB to a given double value [-1,1].
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [-1,1].
+
+**Returns:**
+
+- *QRgb* — the corresponding Bone RGB.
+
+---
+
+### valueToCool(v)
+
+Returns a Cool RGB to a given double value [-1,1].
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [-1,1].
+
+**Returns:**
+
+- *QRgb* — the corresponding Cool RGB.
+
+---
+
+### valueToViridis(v)
+
+Returns a Viridis RGB to a given double value [-1,1].
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [-1,1].
+
+**Returns:**
+
+- *QRgb* — the corresponding Cool RGB.
+
+---
+
+### valueToViridisNegated(v)
+
+Returns a negated Viridis RGB to a given double value [-1,1].
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [-1,1].
+
+**Returns:**
+
+- *QRgb* — the corresponding Cool RGB.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

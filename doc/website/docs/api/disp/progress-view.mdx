@@ -1,0 +1,111 @@
+---
+id: progress-view
+title: "DISPLIB::ProgressView"
+sidebar_label: ProgressView
+sidebar_position: 47
+---
+
+# ProgressView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/progressview.h`
+
+`#include <disp/progressview.h>`
+
+```cpp
+class DISPLIB::ProgressView
+```
+
+Labelled `QProgressBar` with optional auto-hide on completion.
+
+Standard progress widget used by `DISPLIB` plugins to report long-running jobs (BEM solving, recording write-out, …).
+
+---
+
+## Public Methods
+
+### ProgressView(bHorizontalMessage, sStyleSheet)
+
+Creates an instance of a `ProgressView` object.
+
+**Parameters:**
+
+- **bHorizontalMessage** : *bool*
+  Whether message id beside(true) or under(false) the loading bar.
+
+- **sStyleSheet** : *const QString &*
+  Set the stylesheet of the QLabels that display the loading message.
+
+---
+
+### ~ProgressView()
+
+Deletes this instance of a `ProgressView` object.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### updateGuiMode(mode)
+
+Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
+
+**Parameters:**
+
+- **mode** : *GuiMode*
+  The new mode (Clinical=0, Research=1).
+
+---
+
+### updateProcessingMode(mode)
+
+Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
+
+**Parameters:**
+
+- **mode** : *ProcessingMode*
+  The new mode (RealTime=0, Offline=1).
+
+---
+
+### setHorizontal()
+
+Sets message to appear next to loading bar.
+
+---
+
+### setVertical()
+
+Sets message to appear under the loading bar.
+
+---
+
+### setTextStyleSheet(styleSheet)
+
+Sets stylesheet parameters for the QLabels that display loading message.
+
+**Parameters:**
+
+- **styleSheet** : *const QString &*
+  string with parameters for the QLabels.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

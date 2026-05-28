@@ -1,0 +1,60 @@
+---
+id: fwd-eeg-sphere-layer
+title: "FWDLIB::FwdEegSphereLayer"
+sidebar_label: FwdEegSphereLayer
+sidebar_position: 10
+---
+
+# FwdEegSphereLayer
+
+**Namespace:** `FWDLIB` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Header:** `fwd/fwd_eeg_sphere_layer.h`
+
+`#include <fwd/fwd_eeg_sphere_layer.h>`
+
+```cpp
+class FWDLIB::FwdEegSphereLayer
+```
+
+Implements `FwdEegSphereLayer` (replaces `fwdEegSphereLayer` / `fwdEegSphereLayerRec` from MNE-C ``fwd_types.h``).
+
+One concentric shell (outer radius `rad`, conductivity `sigma` and the derived ratios) of a multi-shell de Munck / Berg-Scherg EEG head model.
+
+---
+
+## Public Methods
+
+### FwdEegSphereLayer()
+
+Constructs the Electric Current Dipole.
+
+---
+
+### ~FwdEegSphereLayer()
+
+Destroys the Forward EEG Sphere Layer description.
+
+---
+
+## Static Methods
+
+### comp_layers(v1, v2)
+
+Compare two sphere layers by radius for sorting.
+
+**Parameters:**
+
+- **v1** : *const FwdEegSphereLayer &*
+  First layer.
+
+- **v2** : *const FwdEegSphereLayer &*
+  Second layer.
+
+**Returns:**
+
+- *bool* — True if v1.rad &lt; v2.rad.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

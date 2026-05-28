@@ -1,0 +1,76 @@
+---
+id: mne-project-to-surface
+title: "MNELIB::MNEProjectToSurface"
+sidebar_label: MNEProjectToSurface
+sidebar_position: 46
+---
+
+# MNEProjectToSurface
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_project_to_surface.h`
+
+`#include <mne/mne_project_to_surface.h>`
+
+```cpp
+class MNELIB::MNEProjectToSurface
+```
+
+Description of what this class is intended to do (in detail).
+
+Projects 3-D points onto a triangulated surface mesh and returns nearest vertices and distances
+
+---
+
+## Public Methods
+
+### MNEProjectToSurface()
+
+Constructs a `MNEProjectToSurface` object.
+
+---
+
+### MNEProjectToSurface(p_MNEBemSurf)
+
+Constructs a `MNEProjectToSurface` with the data of a `MNEBemSurface` object.
+
+Build a projector that snaps points onto the triangulation of `p_MNEBemSurf`.
+
+**Parameters:**
+
+- **p_MNEBemSurf** : *const MNELIB::MNEBemSurface &*
+  The `MNEBemSurface` to which is to be projected.
+
+---
+
+### find_closest_on_surface(r, np, rTri, nearest, dist)
+
+Projects a set of points r on the FsSurface.
+
+Project a set of points onto the surface and return the nearest triangle and signed distance per point.
+
+**Parameters:**
+
+- **r** : *const Eigen::MatrixXf &*
+  Set of pionts, which are to be projectied.
+
+- **np** : *const int*
+  number of points.
+
+- **rTri** : *Eigen::MatrixXf &*
+  set of points on the surface.
+
+- **nearest** : *Eigen::VectorXi &*
+  Triangle of the new point.
+
+- **dist** : *Eigen::VectorXf &*
+  Distance between r and rTri.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

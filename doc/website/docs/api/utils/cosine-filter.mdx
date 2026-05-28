@@ -1,0 +1,63 @@
+---
+id: cosine-filter
+title: "UTILSLIB::CosineFilter"
+sidebar_label: CosineFilter
+sidebar_position: 9
+---
+
+# CosineFilter
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/cosinefilter.h`
+
+`#include <utils/cosinefilter.h>`
+
+```cpp
+class UTILSLIB::CosineFilter
+```
+
+Creates a cosine filter response in the frequency domain.
+
+Creates a cosine filter response in the frequency domain.
+
+---
+
+## Public Methods
+
+### CosineFilter()
+
+Constructs a `CosineFilter` object.
+
+---
+
+### CosineFilter(fftLength, lowpass, lowpass_width, highpass, highpass_width, sFreq, type)
+
+Constructs a `CosineFilter` object.
+
+**Parameters:**
+
+- **fftLength** : *int*
+  length of the fft (multiple integer of 2^x).
+
+- **lowpass** : *float*
+  low cutoff frequency in Hz (not normed to sampling freq).
+
+- **lowpass_width** : *float*
+  determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq).
+
+- **highpass** : *float*
+  highpass high cutoff frequency in Hz (not normed to sampling freq).
+
+- **highpass_width** : *float*
+  determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq).
+
+- **sFreq** : *double*
+  sampling frequency.
+
+- **type** : *TPassType*
+  filter type (lowpass, highpass, etc.).
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

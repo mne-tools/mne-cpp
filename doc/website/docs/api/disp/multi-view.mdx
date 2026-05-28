@@ -1,0 +1,90 @@
+---
+id: multi-view
+title: "DISPLIB::MultiView"
+sidebar_label: MultiView
+sidebar_position: 43
+---
+
+# MultiView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/multiview.h`
+
+`#include <disp/multiview.h>`
+
+```cpp
+class DISPLIB::MultiView
+```
+
+QMainWindow container hosting an arbitrary number of `MultiViewWindow` dock widgets.
+
+Inherits `QMainWindow` purely for the dock infrastructure; named views are added with `addWidgetTop` / `addWidgetBottom` and geometry is persisted via `QSettings`.
+
+---
+
+## Public Methods
+
+### MultiView(sSettingsPath, parent, flags)
+
+Constructs an `MultiView`.
+
+---
+
+### ~MultiView()
+
+Destructs an `MultiView`.
+
+---
+
+### addWidgetTop(pWidget, sName)
+
+Adds a QWidget to the top docking area.
+
+**Parameters:**
+
+- **pWidget** : *QWidget **
+  The widget to be added.
+
+- **sName** : *const QString &*
+  The window title shown in the QSplitter.
+
+**Returns:**
+
+- *MultiViewWindow ** — Returns a pointer to the added widget in form of a `MultiViewWindow`.
+
+---
+
+### addWidgetBottom(pWidget, sName)
+
+Adds a QWidget to the bottom docking area.
+
+Please note that all bottom dock widgets are tabbified by default.
+
+**Parameters:**
+
+- **pWidget** : *QWidget **
+  The widget to be added.
+
+- **sName** : *const QString &*
+  The window title shown in the QSplitter.
+
+**Returns:**
+
+- *MultiViewWindow ** — Returns a pointer to the added widget in form of a `MultiViewWindow`.
+
+---
+
+### saveSettings()
+
+Saves geometry and state of GUI dock widgets that have given a name with setObjectName().
+
+---
+
+### loadSettings()
+
+Restores geometry and state as saved by `saveSettings()`.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

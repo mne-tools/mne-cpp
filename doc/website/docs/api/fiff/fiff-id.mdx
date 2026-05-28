@@ -1,0 +1,142 @@
+---
+id: fiff-id
+title: "FIFFLIB::FiffId"
+sidebar_label: FiffId
+sidebar_position: 24
+---
+
+# FiffId
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_id.h`
+
+`#include <fiff/fiff_id.h>`
+
+```cpp
+class FIFFLIB::FiffId
+```
+
+128-bit FIFF identifier: hardware machine ID plus creation time, stamped on every file and block.
+
+On-disk layout is a 20-byte record (version + 2x4-byte machine ID + 8-byte `FiffTime`). The `machid` is filled from the host MAC address by ``FiffStream::write_id`` when generating new identifiers, matching the Neuromag acquisition stack so file lineage stays reconstructible.
+
+---
+
+## Public Methods
+
+### FiffId()
+
+Default Constructor.
+
+---
+
+### FiffId(p_FiffId)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FiffId** : *const FiffId &*
+  Universially unique identifier which should be copied.
+
+---
+
+### ~FiffId()
+
+Destroys the universially unique identifier.
+
+---
+
+### clear()
+
+Resets the File identifier.
+
+---
+
+### print()
+
+Prints the id.
+
+---
+
+### isEmpty()
+
+True if FIFF id is empty.
+
+**Returns:**
+
+- *bool* — true if FIFF id is empty.
+
+---
+
+### toMachidString()
+
+Returns the machine ID as a human-readable string.
+
+**Returns:**
+
+- *QString* — The machine ID formatted as a string.
+
+---
+
+### toString()
+
+Returns a human-readable string representation of this ID.
+
+Format: "major.minor 0xMACHID1MACHID2 timestamp"
+
+**Returns:**
+
+- *QString* — Formatted string describing the ID.
+
+---
+
+## Static Methods
+
+### new_file_id()
+
+Constructs a (hopefully) unique file id.
+
+**Returns:**
+
+- *FiffId* — A new unique `FiffId`.
+
+---
+
+### get_machid(fixed_id)
+
+Returns the machine ID consisting of a two integer number.
+
+**Parameters:**
+
+- **fixed_id** : *int **
+  Pointer to an array of at least 2 ints to receive the machine ID.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### getDefault()
+
+Returns a default `FiffId` object to be used as a mutable placeholder for a default instance of the class.
+
+**Returns:**
+
+- *FiffId &* — Reference to the default `FiffId` instance.
+
+---
+
+### storageSize()
+
+Size of the old struct (fiffIdRec) 5*int = 5*4 = 20.
+
+**Returns:**
+
+- *qint32* — the size of the old struct fiffIdRec.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

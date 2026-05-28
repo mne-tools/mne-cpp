@@ -1,0 +1,125 @@
+---
+id: fwd-coil
+title: "FWDLIB::FwdCoil"
+sidebar_label: FwdCoil
+sidebar_position: 7
+---
+
+# FwdCoil
+
+**Namespace:** `FWDLIB` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Header:** `fwd/fwd_coil.h`
+
+`#include <fwd/fwd_coil.h>`
+
+```cpp
+class FWDLIB::FwdCoil
+```
+
+Implements `FwdCoil` (replaces `fwdCoil` / `fwdCoilRec` from MNE-C ``fwd_types.h``).
+
+Single MEG sensor coil or EEG electrode — stores the coil-local frame and the ``(r_mag, cos_mag, w) integration-point triples that approximate the Biot-Savart surface integral over the coil area.
+
+---
+
+## Public Methods
+
+### FwdCoil(p_np)
+
+Constructs the Forward Coil.
+
+---
+
+### FwdCoil(p_FwdCoil)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FwdCoil** : *const FwdCoil &*
+  `FwdCoil` which should be copied.
+
+---
+
+### ~FwdCoil()
+
+Destroys the Forward Coil description.
+
+---
+
+### is_axial_coil()
+
+Checks if this is an axial coil.
+
+**Returns:**
+
+- *bool* — True if axial coil, false otherwise.
+
+---
+
+### is_magnetometer_coil()
+
+Checks if this is an magnetometer.
+
+**Returns:**
+
+- *bool* — True if magnetometer, false otherwise.
+
+---
+
+### is_planar_coil()
+
+Checks if this is an planar coil.
+
+**Returns:**
+
+- *bool* — True if planar coil, false otherwise.
+
+---
+
+### is_eeg_electrode()
+
+Checks if this is an EEG electrode.
+
+**Returns:**
+
+- *bool* — True if EEG electrode, false otherwise.
+
+---
+
+### pos(j)
+
+Return a read-only map to the j-th integration point position (3 contiguous floats).
+
+---
+
+### dir(j)
+
+Return a read-only map to the j-th integration point direction cosine.
+
+---
+
+## Static Methods
+
+### create_eeg_el(ch, t)
+
+Create an electrode definition.
+
+Transform coordinate frame if so desired.
+
+**Parameters:**
+
+- **ch** : *const FIFFLIB::FiffChInfo &*
+  Channel information to use.
+
+- **t** : *const FIFFLIB::FiffCoordTrans &*
+  Transform the points using this.
+
+**Returns:**
+
+- *FwdCoil::UPtr* — The created coil.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

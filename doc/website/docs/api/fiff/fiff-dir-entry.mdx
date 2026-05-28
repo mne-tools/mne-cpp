@@ -1,0 +1,63 @@
+---
+id: fiff-dir-entry
+title: "FIFFLIB::FiffDirEntry"
+sidebar_label: FiffDirEntry
+sidebar_position: 20
+---
+
+# FiffDirEntry
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_dir_entry.h`
+
+`#include <fiff/fiff_dir_entry.h>`
+
+```cpp
+class FIFFLIB::FiffDirEntry
+```
+
+Directory entry: tag kind + on-disk type + byte size + absolute file offset (16-byte record).
+
+Exact memory image of the legacy ``fiffDirEntryRec`:` kind (32-bit), type (32-bit), size (32-bit), pos (32-bit). The arrays of these records materialize the `FIFF_DIR` tag at the tail of every well-formed FIFF file and drive random-access tag lookup in `FiffStream`.
+
+---
+
+## Public Methods
+
+### FiffDirEntry()
+
+Constructs the dir entry.
+
+---
+
+### FiffDirEntry(p_FiffDirEntry)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FiffDirEntry** : *const FiffDirEntry &*
+  Dir Entry which should be copied.
+
+---
+
+### ~FiffDirEntry()
+
+Destroys the dir entry.
+
+---
+
+## Static Methods
+
+### storageSize()
+
+Size of the old struct (`fiffDirEntryRec`) 4*int = 4*4 = 16.
+
+**Returns:**
+
+- *qint32* — the size of the old struct `fiffDirEntryRec`.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

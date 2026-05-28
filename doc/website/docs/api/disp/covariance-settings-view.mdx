@@ -1,0 +1,78 @@
+---
+id: covariance-settings-view
+title: "DISPLIB::CovarianceSettingsView"
+sidebar_label: CovarianceSettingsView
+sidebar_position: 24
+---
+
+# CovarianceSettingsView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/covariancesettingsview.h`
+
+`#include <disp/covariancesettingsview.h>`
+
+```cpp
+class DISPLIB::CovarianceSettingsView
+```
+
+Settings panel exposing the noise-covariance estimation window length.
+
+Holds a single `QSpinBox` forwarded as `changeMinNumberSamples` to the `rtprocessing` covariance estimator.
+
+---
+
+## Public Methods
+
+### CovarianceSettingsView(sSettingsPath, parent)
+
+---
+
+### ~CovarianceSettingsView()
+
+Destroys the `CovarianceSettingsView`.
+
+---
+
+### setCurrentSamples(iSamples)
+
+Set current samples to gather until a new covariance is calculated.
+
+**Parameters:**
+
+- **iSamples** : *int*
+  new number samples.
+
+---
+
+### setMinSamples(iSamples)
+
+Set minimum number of samples to gather until a new covariance is calculated.
+
+**Parameters:**
+
+- **iSamples** : *int*
+  new minimum number of samples.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

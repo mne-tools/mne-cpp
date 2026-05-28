@@ -1,0 +1,110 @@
+---
+id: dipole-fit-view
+title: "DISPLIB::DipoleFitView"
+sidebar_label: DipoleFitView
+sidebar_position: 25
+---
+
+# DipoleFitView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/dipolefitview.h`
+
+`#include <disp/dipolefitview.h>`
+
+```cpp
+class DISPLIB::DipoleFitView
+```
+
+Single-equivalent-current-dipole-fit input / result panel.
+
+Collects measurement / BEM / covariance / trans inputs and a time window, launches the underlying `INVERSELIB::DipoleFit` job, then renders the fitted position, orientation, magnitude and goodness-of-fit in a result table.
+
+---
+
+## Public Methods
+
+### DipoleFitView(parent, f)
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### addBem(sFileName)
+
+Updates GUI to show selected BEM file.
+
+**Parameters:**
+
+- **sFileName.**
+
+---
+
+### addMri(sFileName)
+
+Updates GUI to show selected MRI file.
+
+**Parameters:**
+
+- **sFileName.**
+
+---
+
+### addNoise(sFileName)
+
+Updates GUI to show selecte Noise file.
+
+**Parameters:**
+
+- **sFileName.**
+
+---
+
+### addMeas(sFileName)
+
+Updates GUI to show selected measurement file.
+
+**Parameters:**
+
+- **sFileName.**
+
+---
+
+### removeModel(sModelName, iType)
+
+Removes model from view.
+
+**Parameters:**
+
+- **sModelName** : *const QString &*
+  name of model to be removed.
+
+- **iType** : *int*
+  type of model (1-measurement, 2-BEM, 3-MRI, 4-Cov).
+
+---
+
+### requestParams()
+
+Sends updated signals for parameters (excluding selected models).
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

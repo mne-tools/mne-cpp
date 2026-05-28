@@ -1,0 +1,89 @@
+---
+id: stream_outlet
+title: "LSLLIB::stream_outlet"
+sidebar_label: stream_outlet
+sidebar_position: 3
+---
+
+# stream_outlet
+
+**Namespace:** `LSLLIB` &nbsp;·&nbsp; **Library:** LSL Library &nbsp;·&nbsp; **Header:** `lsl/lsl_stream_outlet.h`
+
+`#include <lsl/lsl_stream_outlet.h>`
+
+```cpp
+class LSLLIB::stream_outlet
+```
+
+Server-side LSL endpoint: binds a TCP data server, advertises the stream on the LSL discovery multicast group, and fans samples out to every connected inlet.
+
+---
+
+## Public Methods
+
+### stream_outlet(info)
+
+Construct a `stream_outlet` for the given `stream_info`.
+
+This immediately starts the TCP data server and begins UDP discovery broadcasts.
+
+**Parameters:**
+
+- **info** : *const stream_info &*
+  The `stream_info` describing this outlet's stream.
+
+---
+
+### ~stream_outlet()
+
+Destructor.
+
+Stops broadcasting and closes all connections.
+
+---
+
+### push_sample(sample)
+
+Push a single multichannel sample into the outlet.
+
+**Parameters:**
+
+- **sample** : *const std::vector&lt; float &gt; &*
+  A vector of channel values (must match the stream's channel_count).
+
+---
+
+### push_chunk(chunk)
+
+Push a chunk of multichannel samples into the outlet.
+
+**Parameters:**
+
+- **chunk** : *const std::vector&lt; std::vector&lt; float &gt; &gt; &*
+  A vector of samples, where each sample is a vector of channel values.
+
+---
+
+### info()
+
+Get the `stream_info` associated with this outlet (including the assigned data port).
+
+**Returns:**
+
+- *stream_info* — The `stream_info` for this outlet.
+
+---
+
+### have_consumers()
+
+Check whether any consumers are currently connected.
+
+**Returns:**
+
+- *bool* — True if at least one inlet is connected.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

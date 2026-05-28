@@ -1,0 +1,122 @@
+---
+id: bad-channel-detect
+title: "UTILSLIB::BadChannelDetect"
+sidebar_label: BadChannelDetect
+sidebar_position: 5
+---
+
+# BadChannelDetect
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/bad_channel_detect.h`
+
+`#include <utils/bad_channel_detect.h>`
+
+```cpp
+class UTILSLIB::BadChannelDetect
+```
+
+Automated detection of bad MEG/EEG channels using flat, variance, and correlation criteria.
+
+```cpp
+// Run all three detectors with default parameters
+BadChannelDetect::Params p;
+QVector<int> bad = BadChannelDetect::detect(matData, p);
+
+// Or run individual detectors
+QVector<int> flat  = BadChannelDetect::detectFlat(matData);
+QVector<int> noisy = BadChannelDetect::detectHighVariance(matData);
+QVector<int> weird = BadChannelDetect::detectLowCorrelation(matData);
+```
+
+---
+
+## Static Methods
+
+### detect(matData, params)
+
+Run all three detectors and return the union of bad channel row indices.
+
+The order of the returned indices is ascending and each index appears at most once.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Data matrix (n_channels × n_samples), calibrated (SI units).
+
+- **params** : *const Params &*
+  Detection parameters.
+
+**Returns:**
+
+- *QVector&lt; int &gt;* — Sorted list of bad channel row indices (0-based).
+
+---
+
+### detectFlat(matData, dThreshold)
+
+Detect flat (dead) channels.
+
+A channel is flat if its peak-to-peak amplitude over the whole segment is &lt; `dThreshold`.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Data matrix (n_channels × n_samples).
+
+- **dThreshold** : *double*
+  Minimum peak-to-peak amplitude (SI units). Default 1e-13 T (0.1 fT).
+
+**Returns:**
+
+- *QVector&lt; int &gt;* — Row indices of flat channels.
+
+---
+
+### detectHighVariance(matData, dZThresh)
+
+Detect high-variance (noisy) channels.
+
+Computes the per-channel standard deviation, then flags any channel whose z-score (relative to the median and MAD across channels) exceeds `dZThresh`. Using the median/MAD makes the test robust to a few very bad channels.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Data matrix (n_channels × n_samples).
+
+- **dZThresh** : *double*
+  Z-score threshold (default 4.0).
+
+**Returns:**
+
+- *QVector&lt; int &gt;* — Row indices of high-variance channels.
+
+---
+
+### detectLowCorrelation(matData, dCorrThresh, iNeighbours)
+
+Detect low-correlation (isolated) channels.
+
+For each channel, computes the mean absolute Pearson correlation with its `iNeighbours` nearest channels on each side of the channel list. A channel is flagged if this mean falls below `dCorrThresh`.
+
+This detector is most useful for sensor arrays where physically close channels share common signal; it is less meaningful for widely-spaced EEG reference montages.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Data matrix (n_channels × n_samples).
+
+- **dCorrThresh** : *double*
+  Minimum acceptable mean absolute correlation (default 0.4).
+
+- **iNeighbours** : *int*
+  Channels on each side (default 5).
+
+**Returns:**
+
+- *QVector&lt; int &gt;* — Row indices of low-correlation channels.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

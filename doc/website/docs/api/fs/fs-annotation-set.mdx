@@ -1,0 +1,261 @@
+---
+id: fs-annotation-set
+title: "FSLIB::FsAnnotationSet"
+sidebar_label: FsAnnotationSet
+sidebar_position: 5
+---
+
+# FsAnnotationSet
+
+**Namespace:** `FSLIB` &nbsp;·&nbsp; **Library:** FreeSurfer Library &nbsp;·&nbsp; **Header:** `fs/fs_annotationset.h`
+
+`#include <fs/fs_annotationset.h>`
+
+```cpp
+class FSLIB::FsAnnotationSet
+```
+
+Container holding the lh and/or rh `FsAnnotation` for one parcellation atlas.
+
+Keyed on hemisphere id (0 = lh, 1 = rh). When loaded from a single atlas name both hemispheres share the same colortable layout, so cross-hemisphere region lookup is consistent. The set is intended to be aligned one-to-one with an `FsSurfaceSet` sharing the same subject and vertex count per hemisphere.
+
+---
+
+## Public Methods
+
+### FsAnnotationSet()
+
+Default constructor.
+
+---
+
+### FsAnnotationSet(subject_id, hemi, atlas, subjects_dir)
+
+Construts the surface set by reading it of the given files.
+
+**Parameters:**
+
+- **subject_id** : *const QString &*
+  Name of subject.
+
+- **hemi** : *qint32*
+  Which hemisphere to load \{0 -&gt; lh, 1 -&gt; rh, 2 -&gt; both\}.
+
+- **atlas** : *const QString &*
+  Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
+
+- **subjects_dir** : *const QString &*
+  Subjects directory.
+
+---
+
+### FsAnnotationSet(path, hemi, atlas)
+
+Construts the surface set by reading it of the given files.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  path to surface directory.
+
+- **hemi** : *qint32*
+  Which hemisphere to load \{0 -&gt; lh, 1 -&gt; rh, 2 -&gt; both\}.
+
+- **atlas** : *const QString &*
+  Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
+
+---
+
+### FsAnnotationSet(p_LHAnnotation, p_RHAnnotation)
+
+Constructs an annotation set by assembling given annotations.
+
+**Parameters:**
+
+- **p_LHAnnotation** : *const FsAnnotation &*
+  Left hemisphere annotation.
+
+- **p_RHAnnotation** : *const FsAnnotation &*
+  Right hemisphere annotation.
+
+---
+
+### FsAnnotationSet(p_sLHFileName, p_sRHFileName)
+
+Constructs an annotation set by reading from annotation files.
+
+**Parameters:**
+
+- **p_sLHFileName** : *const QString &*
+  Left hemisphere annotation file.
+
+- **p_sRHFileName** : *const QString &*
+  Right hemisphere annotation file.
+
+---
+
+### ~FsAnnotationSet()
+
+Destroys the annotation set.
+
+---
+
+### clear()
+
+Initializes the `FsAnnotationSet`.
+
+---
+
+### data()
+
+Returns The `FsAnnotation` set map.
+
+**Returns:**
+
+- *QMap&lt; qint32, FsAnnotation &gt; &* — the annotation set map.
+
+---
+
+### isEmpty()
+
+True if `FsAnnotationSet` is empty.
+
+**Returns:**
+
+- *bool* — true if `FsAnnotationSet` is empty.
+
+---
+
+### insert(p_Annotation)
+
+Insert an annotation.
+
+**Parameters:**
+
+- **p_Annotation** : *const FsAnnotation &*
+  `FsAnnotation` to insert.
+
+---
+
+### toLabels(p_surfSet, p_qListLabels, p_qListLabelRGBAs, lLabelPicks)
+
+python labels_from_parc
+
+Converts annotation to a label list and colortable
+
+**Parameters:**
+
+- **p_surfSet** : *const FsSurfaceSet &*
+  the `FsSurfaceSet` to read the vertex positions from.
+
+- **p_qListLabels** : *QList&lt; FsLabel &gt; &*
+  the converted labels are appended to a given list. Stored data are not affected.
+
+- **p_qListLabelRGBAs** : *QList&lt; Eigen::RowVector4i &gt; &*
+  the converted label RGBAs are appended to a given list. Stored data are not affected.
+
+- **lLabelPicks** : *const QStringList &*
+  the label names which should be picked.
+
+**Returns:**
+
+- *bool* — true if successful, false otherwise.
+
+---
+
+### operator[](idx)
+
+Subscript operator [] to access annotation by index.
+
+**Parameters:**
+
+- **idx** : *qint32*
+  the hemisphere index (0 or 1).
+
+**Returns:**
+
+- *FsAnnotation &* — `FsAnnotation` related to the parameter index.
+
+---
+
+### operator[](idx)
+
+Subscript operator [] to access annotation by index.
+
+**Parameters:**
+
+- **idx** : *qint32*
+  the hemisphere index (0 or 1).
+
+**Returns:**
+
+- *const FsAnnotation* — `FsAnnotation` related to the parameter index.
+
+---
+
+### operator[](idt)
+
+Subscript operator [] to access annotation by identifier.
+
+**Parameters:**
+
+- **idt** : *QString*
+  the hemisphere identifier ("lh" or "rh").
+
+**Returns:**
+
+- *FsAnnotation &* — `FsAnnotation` related to the parameter identifier.
+
+---
+
+### operator[](idt)
+
+Subscript operator [] to access annotation by identifier.
+
+**Parameters:**
+
+- **idt** : *QString*
+  the hemisphere identifier ("lh" or "rh").
+
+**Returns:**
+
+- *const FsAnnotation* — `FsAnnotation` related to the parameter identifier.
+
+---
+
+### size()
+
+Returns number of loaded hemispheres.
+
+**Returns:**
+
+- *qint32* — number of loaded hemispheres.
+
+---
+
+## Static Methods
+
+### read(p_sLHFileName, p_sRHFileName, p_AnnotationSet)
+
+Reads different annotation files and assembles them to a `FsAnnotationSet`.
+
+**Parameters:**
+
+- **p_sLHFileName** : *const QString &*
+  Left hemisphere annotation file.
+
+- **p_sRHFileName** : *const QString &*
+  Right hemisphere annotation file.
+
+- **p_AnnotationSet** : *FsAnnotationSet &*
+  The read annotation set.
+
+**Returns:**
+
+- *bool* — true if succesfull, false otherwise.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

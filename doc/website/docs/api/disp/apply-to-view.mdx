@@ -1,0 +1,83 @@
+---
+id: apply-to-view
+title: "DISPLIB::ApplyToView"
+sidebar_label: ApplyToView
+sidebar_position: 2
+---
+
+# ApplyToView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/applytoview.h`
+
+`#include <disp/applytoview.h>`
+
+```cpp
+class DISPLIB::ApplyToView
+```
+
+Three-way radio selector for scope = Selected / Visible / All channels.
+
+Emits `selectionChanged(int)` when the active radio flips; the integer matches the `QButtonGroup` id of the chosen scope.
+
+---
+
+## Public Methods
+
+### ApplyToView(sSettingsPath, parent, f)
+
+`ApplyToView`.
+
+**Parameters:**
+
+- **sSettingsPath** : *const QString &*
+  path for saving view settings.
+
+- **parent** : *QWidget **
+  parent of widget.
+
+- **f** : *Qt::WindowFlags*
+  flag to denote window porperties of the widget.
+
+---
+
+### ~ApplyToView()
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### selectAll()
+
+Selects all View Select checkboxes.
+
+---
+
+### selectClear()
+
+Clear all View Select checkboxes.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+### getSelectedViews()
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,61 @@
+---
+id: extended-infomax
+title: "UTILSLIB::ExtendedInfomax"
+sidebar_label: ExtendedInfomax
+sidebar_position: 14
+---
+
+# ExtendedInfomax
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/extended_infomax.h`
+
+`#include <utils/extended_infomax.h>`
+
+```cpp
+class UTILSLIB::ExtendedInfomax
+```
+
+Extended Infomax `ICA` (Lee et al., 1999).
+
+Performs Independent Component Analysis using the extended infomax algorithm, which can separate both super-Gaussian and sub-Gaussian sources.
+
+---
+
+## Static Methods
+
+### compute(matData, nComponents, maxIterations, learningRate, tolerance, extendedMode, seed)
+
+Compute `ICA` decomposition using the extended infomax algorithm.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Input data matrix (n_channels x n_times), should be mean-removed.
+
+- **nComponents** : *int*
+  Number of components to extract (-1 for n_channels).
+
+- **maxIterations** : *int*
+  Maximum number of iterations.
+
+- **learningRate** : *double*
+  Learning rate for weight updates.
+
+- **tolerance** : *double*
+  Convergence tolerance.
+
+- **extendedMode** : *bool*
+  If true, use extended mode (sub- and super-Gaussian).
+
+- **seed** : *unsigned int*
+  Random seed (0 for no seeding).
+
+**Returns:**
+
+- *InfomaxResult* — `InfomaxResult` containing unmixing/mixing matrices and sources.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

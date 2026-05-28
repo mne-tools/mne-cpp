@@ -24,19 +24,53 @@ and the generator is implemented in
 
 ## How to use this reference
 
-- Pick a **library** from the sidebar on the left (`FIFFLIB`, `MNELIB`,
-  `FWDLIB`, …). Each library expands into the public classes and
-  header-level modules it ships.
-- **Class pages** list the public **Signals**, **Public Slots**,
-  **Public Methods** and **Static Methods** with full Doxygen-derived
-  signatures, parameter descriptions and KaTeX-rendered math. The
-  right-hand table of contents lets you jump between members.
-- **Module pages** document headers that contain free functions instead
-  of a C++ class (for example `Sphara`, `PeakFinder`, `InvConvenience`).
+- Pick a **library** from the sidebar on the left. Each entry expands
+  into the public classes and header-level modules it ships. The
+  sidebar labels are human-readable ("FIFF Library", "MNE Library",
+  "Forward Library", …); the C++ namespace they map to is listed in
+  the table below.
+- **Class pages** start with a banner that names the C++ **namespace**,
+  the **library** the class belongs to, and the **header** it ships
+  in. Below that the page lists the public **Signals**, **Public
+  Slots**, **Public Methods** and **Static Methods** with full
+  Doxygen-derived signatures, parameter descriptions and
+  KaTeX-rendered math. The right-hand table of contents lets you jump
+  between members.
+- **Module pages** document headers that contain free functions
+  instead of a C++ class (for example `Sphara`, `PeakFinder`,
+  `InvConvenience`).
 - Pages that have a worked example in
   [`src/examples/`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples)
   surface it inline in a dedicated **Example** section so you have a
   runnable starting point.
+
+## Libraries and namespaces
+
+The sidebar groups every public class by the C++ library it ships in.
+The table below maps each sidebar entry to its `*LIB` namespace and the
+source folder that backs it.
+
+| Sidebar label                         | C++ namespace        | Source folder                |
+| ------------------------------------- | -------------------- | ---------------------------- |
+| FIFF Library                          | `FIFFLIB`            | `src/libraries/fiff`         |
+| MNE Library                           | `MNELIB`             | `src/libraries/mne`          |
+| Forward Library                       | `FWDLIB`             | `src/libraries/fwd`          |
+| Inverse Library                       | `INVERSELIB`         | `src/libraries/inverse`      |
+| DSP Library                           | `RTPROCESSINGLIB`    | `src/libraries/rtprocessing` |
+| Connectivity Library                  | `CONNECTIVITYLIB`    | `src/libraries/connectivity` |
+| Decoding Library                      | `DECODINGLIB`        | `src/libraries/decoding`     |
+| Machine Learning Library              | `MNECPP_ML`          | `src/libraries/mne_ml`       |
+| Statistics Library                    | `STATSLIB`           | `src/libraries/statistics`   |
+| FreeSurfer Library                    | `FSLIB`              | `src/libraries/fs`           |
+| Math Library                          | `UTILSLIB` (math)    | `src/libraries/utils/math`   |
+| MRI Library                           | `MRILIB`             | `src/libraries/mri`          |
+| BIDS Library                          | `BIDSLIB`            | `src/libraries/bids`         |
+| Utilities Library                     | `UTILSLIB`           | `src/libraries/utils`        |
+| Communication Library                 | `COMMUNICATIONLIB`   | `src/libraries/communication`|
+| LSL Library                           | `LSLLIB`             | `src/libraries/lsl`          |
+| MNA Library (Modular Architecture)    | `MNALIB`             | `src/libraries/mna`          |
+| Display Library                       | `DISPLIB`            | `src/libraries/disp`         |
+| 3D Display Library                    | `DISP3DLIB`          | `src/libraries/disp3D`       |
 
 ## Generation pipeline
 
@@ -50,7 +84,7 @@ flowchart LR
     D --> F[sidebars.api.generated.ts]
     E --> G[Docusaurus]
     F --> G
-    G --> H[/api]
+    G --> H["/api"]
 ```
 
 Reproduce locally with

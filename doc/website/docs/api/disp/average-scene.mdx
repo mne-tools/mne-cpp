@@ -1,0 +1,115 @@
+---
+id: average-scene
+title: "DISPLIB::AverageScene"
+sidebar_label: AverageScene
+sidebar_position: 5
+---
+
+# AverageScene
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/helpers/averagescene.h`
+
+`#include <disp/averagescene.h>`
+
+```cpp
+class DISPLIB::AverageScene
+```
+
+Sensor-layout `QGraphicsScene` placing one `AverageSceneItem` per visible channel.
+
+Extends `LayoutScene` with the per-condition colour table, the cached `FiffInfo` channel map and the dispatcher that creates / refreshes one `AverageSceneItem` per visible sensor.
+
+---
+
+## Public Methods
+
+### AverageScene(view, parent)
+
+Constructs a `AverageScene`.
+
+---
+
+### setScaleMap(scaleMap)
+
+Sets the scale map to scaleMap.
+
+**Parameters:**
+
+- **scaleMap** : *const QMap&lt; qint32, float &gt; &*
+  map with all channel types and their current scaling value.
+
+---
+
+### repaintItems(selectedChannelItems)
+
+Repaints all items from the layout data in the scene.
+
+**Parameters:**
+
+- **selectedChannelItems** : *const QList&lt; QGraphicsItem * &gt; &*
+  items which are to painted to the average scene
+
+---
+
+### repaintSelectionItems(selectedChannelItems)
+
+Repaints all items from the layout data in the scene from a `SelectionItem` object.
+
+**Parameters:**
+
+- **selectedChannelItems** : *const DISPLIB::SelectionItem &*
+  data about items which are to be painted.
+
+---
+
+### updateScene()
+
+Updates and repaints the scene.
+
+---
+
+### setActivationPerAverage(qMapActivationPerAverage)
+
+Set the activation per average map information.
+
+**Parameters:**
+
+- **qMapActivationPerAverage** : *const QSharedPointer&lt; QMap&lt; QString, bool &gt; &gt;*
+  The average activation information.
+
+---
+
+### setColorPerAverage(qMapAverageColor)
+
+Set the color per average map information.
+
+**Parameters:**
+
+- **qMapAverageColor** : *const QSharedPointer&lt; QMap&lt; QString, QColor &gt; &gt;*
+  The average color information.
+
+---
+
+### getSignalColorForAllItems()
+
+Set the signal color for all items in the scene.
+
+**Returns:**
+
+- *const QColor &* — The color used for all the itmes' signal paths.
+
+---
+
+### setSignalItemColor(signalColor)
+
+Sets the signal color for the items the scene holds.
+
+**Parameters:**
+
+- **signalColor.**
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

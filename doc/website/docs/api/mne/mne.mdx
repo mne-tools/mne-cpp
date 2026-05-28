@@ -1,0 +1,480 @@
+---
+id: mne
+title: "MNELIB::MNE"
+sidebar_label: MNE
+sidebar_position: 7
+---
+
+# MNE
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne.h`
+
+`#include <mne/mne.h>`
+
+```cpp
+class MNELIB::MNE
+```
+
+DECLARE `MNE` WRAPPER CLASS.
+
+The `MNE` class provides wrapper functions to stay consistent with mne matlab toolbox.
+
+---
+
+## Public Methods
+
+### ~MNE()
+
+dtor
+
+---
+
+## Static Methods
+
+### combine_xyz(vec)
+
+mne_combine_xyz
+
+**Parameters:**
+
+- **vec** : *const Eigen::VectorXd &*
+  Input row vector [ x1 y1 z1 ... x_n y_n z_n ].
+
+**Returns:**
+
+- *Eigen::VectorXd* — Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ].
+
+---
+
+### find_source_space_hemi(p_Hemisphere)
+
+mne_find_source_space_hemi
+
+**Parameters:**
+
+- **p_Hemisphere** : *MNEHemisphere &*
+  The hemisphere to investigate.
+
+**Returns:**
+
+- *qint32* — the deduced hemisphere id.
+
+---
+
+### get_current_comp(info)
+
+mne_get_current_comp
+
+**Parameters:**
+
+- **info** : *FIFFLIB::FiffInfo **
+  Fiff measurement info.
+
+**Returns:**
+
+- *qint32* — the current compensation.
+
+---
+
+### make_block_diag(A, n)
+
+mne_block_diag - encoding part
+
+**Parameters:**
+
+- **A** : *const Eigen::MatrixXd &*
+  Matrix which should be diagonlized.
+
+- **n** : *qint32*
+  Columns of the submatrices.
+
+**Returns:**
+
+- *Eigen::SparseMatrix&lt; double &gt;* — A sparse block diagonal, diagonalized from the elements in "A".
+
+---
+
+### make_compensator(info, from, to, ctf_comp, exclude_comp_chs)
+
+mne_make_compensator
+
+**Parameters:**
+
+- **info** : *const FIFFLIB::FiffInfo &*
+  measurement info as returned by the fif reading routines.
+
+- **from** : *FIFFLIB::fiff_int_t*
+  compensation in the input data.
+
+- **to** : *FIFFLIB::fiff_int_t*
+  desired compensation in the output.
+
+- **ctf_comp** : *FIFFLIB::FiffCtfComp &*
+  Compensation Matrix.
+
+- **exclude_comp_chs** : *bool*
+  exclude compensation channels from the output (optional).
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### make_projector(projs, ch_names, proj, bads, U)
+
+make_projector
+
+**Parameters:**
+
+- **projs** : *const QList&lt; FIFFLIB::FiffProj &gt; &*
+  A set of projection vectors.
+
+- **ch_names** : *const QStringList &*
+  A cell array of channel names.
+
+- **proj** : *Eigen::MatrixXd &*
+  The projection operator to apply to the data.
+
+- **bads** : *const QStringList &*
+  Bad channels to exclude.
+
+- **U** : *Eigen::MatrixXd &*
+  The orthogonal basis of the projection vectors (optional).
+
+**Returns:**
+
+- *FIFFLIB::fiff_int_t* — nproj - How many items in the projector.
+
+---
+
+### make_projector(info, proj)
+
+mne_make_projector_info
+
+**Parameters:**
+
+- **info** : *FIFFLIB::FiffInfo &*
+  Fiff measurement info.
+
+- **proj** : *Eigen::MatrixXd &*
+  The projection operator to apply to the data.
+
+**Returns:**
+
+- *qint32* — nproj - How many items in the projector.
+
+---
+
+### patch_info(p_Hemisphere)
+
+mne_patch_info
+
+**Parameters:**
+
+- **p_Hemisphere** : *MNEHemisphere &*
+  The source space.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### read_events(t_sEventName, t_fileRawName, events)
+
+---
+
+### read_events_from_fif(p_IODevice, eventlist)
+
+mne_read_events
+
+Read an event list from a fif file
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  The I/O device to read from.
+
+- **eventlist** : *Eigen::MatrixXi &*
+  The read eventlist m x 3; with m events; colum: 1 - position in samples, 3 - eventcode.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### read_events_from_ascii(p_IODevice, eventlist)
+
+read_events
+
+Read a list of events from an eve file
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  The I/O device to read from.
+
+- **eventList**
+  List of events.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### write_events_to_fif(p_IODevice, eventlist)
+
+write_events_to_fif
+
+Write an event list to a FIFF file.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  The I/O device to write to.
+
+- **eventlist** : *const Eigen::MatrixXi &*
+  The event list (nEvents x 3): [sample, before, after].
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### write_events_to_ascii(p_IODevice, eventlist, sfreq)
+
+write_events_to_ascii
+
+Write an event list to a text file (MNE-C compatible format).
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  The I/O device to write to.
+
+- **eventlist** : *const Eigen::MatrixXi &*
+  The event list (nEvents x 3): [sample, before, after].
+
+- **sfreq** : *float*
+  Sampling frequency for time column computation.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### compute_epoch_covariance(raw, events, eventCodes, tmin, tmax, bmin, bmax, doBaseline, removeMean)
+
+compute_epoch_covariance
+
+**Parameters:**
+
+- **raw** : *const FIFFLIB::FiffRawData &*
+  The raw data.
+
+- **events** : *const Eigen::MatrixXi &*
+  Event matrix (nEvents x 3): [sample, before, after].
+
+- **eventCodes** : *const QList&lt; int &gt; &*
+  Which event codes to include.
+
+- **tmin** : *float*
+  Start of time window relative to event (seconds).
+
+- **tmax** : *float*
+  End of time window relative to event (seconds).
+
+- **bmin** : *float*
+  Baseline start (seconds, relative to event). Only used if doBaseline is true.
+
+- **bmax** : *float*
+  Baseline end (seconds, relative to event). Only used if doBaseline is true.
+
+- **doBaseline** : *bool*
+  Whether to apply baseline correction before covariance computation.
+
+- **removeMean** : *bool*
+  Whether to remove sample mean from the covariance estimate.
+
+**Returns:**
+
+- *FIFFLIB::FiffCov* — The computed noise covariance matrix, or empty FiffCov on failure.
+
+---
+
+### compute_proj(raw, events, eventCode, tmin, tmax, nGrad, nMag, nEeg, mapReject)
+
+compute_proj
+
+**Parameters:**
+
+- **raw** : *const FIFFLIB::FiffRawData &*
+  The raw data.
+
+- **events** : *const Eigen::MatrixXi &*
+  Event matrix (nEvents x 3).
+
+- **eventCode** : *int*
+  Which event code to select epochs for.
+
+- **tmin** : *float*
+  Start of epoch relative to event (seconds).
+
+- **tmax** : *float*
+  End of epoch relative to event (seconds).
+
+- **nGrad** : *int*
+  Number of gradiometer projection vectors.
+
+- **nMag** : *int*
+  Number of magnetometer projection vectors.
+
+- **nEeg** : *int*
+  Number of EEG projection vectors.
+
+- **mapReject** : *const QMap&lt; QString, double &gt; &*
+  Rejection thresholds (key = channel type string, value = threshold).
+
+**Returns:**
+
+- *QList&lt; FIFFLIB::FiffProj &gt;* — List of FiffProj items, or empty list on failure.
+
+---
+
+### save_raw(raw, p_IODevice, picks, decim, from, to)
+
+save_raw
+
+**Parameters:**
+
+- **raw** : *const FIFFLIB::FiffRawData &*
+  The raw data to save.
+
+- **p_IODevice** : *QIODevice &*
+  Output device to write to.
+
+- **picks** : *const Eigen::RowVectorXi &*
+  Channel indices to include (empty = all channels).
+
+- **decim** : *int*
+  Decimation factor (1 = no decimation).
+
+- **from** : *int*
+  First sample to save (-1 = from start of raw data).
+
+- **to** : *int*
+  Last sample to save (-1 = to end of raw data).
+
+**Returns:**
+
+- *bool* — true on success.
+
+---
+
+### setup_compensators(raw, dest_comp, keep_comp)
+
+---
+
+### read_cov(p_pStream, p_Node, cov_kind, p_covData)
+
+mne_read_cov
+
+**Parameters:**
+
+- **p_pStream** : *FIFFLIB::FiffStream::SPtr &*
+  an open fiff file.
+
+- **p_Node** : *const FIFFLIB::FiffDirNode::SPtr &*
+  look for the matrix in here.
+
+- **cov_kind** : *FIFFLIB::fiff_int_t*
+  what kind of a covariance matrix do we want?.
+
+- **p_covData** : *FIFFLIB::FiffCov &*
+  the read covariance matrix.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### read_source_spaces(p_pStream, add_geom, p_SourceSpace)
+
+mne_read_source_spaces
+
+**Parameters:**
+
+- **p_pStream** : *FIFFLIB::FiffStream::SPtr &*
+  The open fiff file.
+
+- **add_geom** : *bool*
+  Add geometry information to the source spaces.
+
+- **p_SourceSpace** : *MNESourceSpaces &*
+  The read source spaces.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### set_current_comp(chs, value)
+
+mne_set_current_comp
+
+**Parameters:**
+
+- **chs** : *QList&lt; FIFFLIB::FiffChInfo &gt; &*
+  fiff channel info list.
+
+- **value** : *FIFFLIB::fiff_int_t*
+  compensation value.
+
+**Returns:**
+
+- *QList&lt; FIFFLIB::FiffChInfo &gt;* — the current compensation.
+
+---
+
+### transform_source_space_to(p_pMNESourceSpaces, dest, trans)
+
+mne_transform_source_space_to
+
+**Parameters:**
+
+- **p_pMNESourceSpaces** : *MNESourceSpaces &*
+  the source space which is should be transformed.
+
+- **dest** : *FIFFLIB::fiff_int_t*
+  destination check code.
+
+- **trans** : *FIFFLIB::FiffCoordTrans &*
+  transformation information.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### transpose_named_matrix(mat)
+
+mne_transpose_named_matrix
+
+**Parameters:**
+
+- **mat** : *FIFFLIB::FiffNamedMatrix &*
+  FiffNamedMatrix which shoul be transposed.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,175 @@
+---
+id: mne-hemisphere
+title: "MNELIB::MNEHemisphere"
+sidebar_label: MNEHemisphere
+sidebar_position: 23
+---
+
+# MNEHemisphere
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_hemisphere.h`
+
+`#include <mne/mne_hemisphere.h>`
+
+```cpp
+class MNELIB::MNEHemisphere
+```
+
+Hemisphere source space geometry information.
+
+Hemisphere provides geometry information
+
+---
+
+## Public Methods
+
+### MNEHemisphere()
+
+Constructors the hemisphere source space.
+
+---
+
+### MNEHemisphere(p_MNEHemisphere)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_MNEHemisphere** : *const MNEHemisphere &*
+  Hemisphere source space which should be copied.
+
+---
+
+### ~MNEHemisphere()
+
+Destroys the hemisphere source space.
+
+---
+
+### clone()
+
+Creates a deep copy of this hemisphere, preserving the `MNEHemisphere` type.
+
+**Returns:**
+
+- *MNESourceSpace::SPtr* — a shared_ptr&lt;MNESourceSpace&gt; pointing to a cloned `MNEHemisphere`.
+
+---
+
+### add_geometry_info()
+
+Add vertex normals and neighbourhood information.
+
+**Parameters:**
+
+- **p_pHemisphere**
+  Hemisphere to be completed.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### complete_source_space_info()
+
+Complete triangulation information (triangle centers, normals, areas) for both the main and use triangulations.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### compute_patch_info()
+
+Compute patch statistics from the nearest-vertex data.
+
+Fills pinfo (per-patch vertex lists) and patch_inds (patch index per vertex).
+
+**Returns:**
+
+- *bool* — true if patch info was computed, false if nearest data is empty.
+
+---
+
+### clear()
+
+Initializes the hemisphere source space.
+
+---
+
+### getTriCoords(p_fScaling)
+
+Qt 3d geometry information.
+
+Data are generated within first call.
+
+**Parameters:**
+
+- **p_fScaling** : *float*
+  Scale factor of the returned geometry tri model.
+
+**Returns:**
+
+- *Eigen::MatrixXf &* — the geometry model.
+
+---
+
+### isClustered()
+
+is hemisphere clustered?
+
+**Returns:**
+
+- *bool* — true if hemisphere is clustered, false otherwise.
+
+---
+
+### transform_hemisphere_to(dest, p_Trans)
+
+mne_transform_source_space_to
+
+**Parameters:**
+
+- **dest** : *FIFFLIB::fiff_int_t*
+  The id of the destination coordinate system (FIFFV_COORD_...).
+
+- **p_Trans** : *const FIFFLIB::FiffCoordTrans &*
+  The coordinate transformation structure to use.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### writeToStream(p_pStream)
+
+mne_python _write_one_source_space
+
+**Parameters:**
+
+- **p_pStream** : *FIFFLIB::FiffStream **
+  The stream to write to.
+
+---
+
+### operator=(other)
+
+Copy assignment operator.
+
+**Parameters:**
+
+- **other** : *const MNEHemisphere &*
+  The `MNEHemisphere` to assign from.
+
+**Returns:**
+
+- *MNEHemisphere &* — Reference to this object.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

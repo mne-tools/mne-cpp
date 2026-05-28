@@ -1,0 +1,105 @@
+---
+id: average-selection-view
+title: "DISPLIB::AverageSelectionView"
+sidebar_label: AverageSelectionView
+sidebar_position: 7
+---
+
+# AverageSelectionView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/averageselectionview.h`
+
+`#include <disp/averageselectionview.h>`
+
+```cpp
+class DISPLIB::AverageSelectionView
+```
+
+Tabular picker for active / colour of each averaged condition in the current evoked set.
+
+Emits `newAverageActivationMap` and `newAverageColorMap` whenever the user toggles a row or changes a colour; consumers refresh their evoked plots accordingly.
+
+---
+
+## Public Methods
+
+### AverageSelectionView(sSettingsPath, parent, f)
+
+Constructs a `AverageSelectionView` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  parent of widget.
+
+---
+
+### ~AverageSelectionView()
+
+Destroys the `AverageSelectionView`.
+
+---
+
+### getAverageColor()
+
+Get the current average colors.
+
+**Returns:**
+
+- *QSharedPointer&lt; QMap&lt; QString, QColor &gt; &gt;* — Pointer to the current average colors.
+
+---
+
+### getAverageActivation()
+
+Get the current average activations.
+
+**Returns:**
+
+- *QSharedPointer&lt; QMap&lt; QString, bool &gt; &gt;* — Pointer to the current average activations.
+
+---
+
+### setAverageColor(qMapAverageColor)
+
+Set the average colors.
+
+**Parameters:**
+
+- **qMapAverageColor** : *const QSharedPointer&lt; QMap&lt; QString, QColor &gt; &gt;*
+  Pointer to the new average colors.
+
+---
+
+### setAverageActivation(qMapAverageActivation)
+
+Set the average activations.
+
+**Parameters:**
+
+- **qMapAverageActivation** : *const QSharedPointer&lt; QMap&lt; QString, bool &gt; &gt;*
+  Pointer to the new average activations.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

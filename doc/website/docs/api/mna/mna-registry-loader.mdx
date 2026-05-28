@@ -1,0 +1,89 @@
+---
+id: mna-registry-loader
+title: "MNALIB::MnaRegistryLoader"
+sidebar_label: MnaRegistryLoader
+sidebar_position: 8
+---
+
+# MnaRegistryLoader
+
+**Namespace:** `MNALIB` &nbsp;·&nbsp; **Library:** MNA Library (Modular Architecture) &nbsp;·&nbsp; **Header:** `mna/mna_registry_loader.h`
+
+`#include <mna/mna_registry_loader.h>`
+
+```cpp
+class MNALIB::MnaRegistryLoader
+```
+
+Loads MNA operation schemas from declarative JSON registry manifests files.
+
+Registry files follow the mna-registry.json format with "mna_registry_version", "provider", and "ops" array. The loader supports a master manifest plus drop-in files from a mna-registry.d/ directory.
+
+Reads MNA op-schema manifests and feeds them into `MnaOpRegistry`, with drop-in directory merge support.
+
+---
+
+## Static Methods
+
+### loadFile(path, registry)
+
+Load a single registry manifest file and register all ops.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  Path to the JSON manifest file.
+
+- **registry** : *MnaOpRegistry &*
+  Registry to populate.
+
+**Returns:**
+
+- *int* — Number of ops successfully loaded, or -1 on file error.
+
+---
+
+### loadDirectory(registryDir, registry)
+
+Load the master manifest plus all drop-in files from a directory.
+
+Loads mna-registry.json first, then all *.json files from mna-registry.d/ in alphabetical order. Later files override earlier entries for the same op type.
+
+**Parameters:**
+
+- **registryDir** : *const QString &*
+  Directory containing mna-registry.json.
+
+- **registry** : *MnaOpRegistry &*
+  Registry to populate.
+
+**Returns:**
+
+- *int* — Total number of ops loaded across all files.
+
+---
+
+### saveFile(path, provider, registry)
+
+Serialize current registry schemas to a JSON manifest file.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  Output file path.
+
+- **provider** : *const QString &*
+  Provider name for the manifest header.
+
+- **registry** : *const MnaOpRegistry &*
+  Registry to serialize.
+
+**Returns:**
+
+- *bool* — True if writing succeeded.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,54 @@
+---
+id: rt-noise-worker
+title: "RTPROCESSINGLIB::RtNoiseWorker"
+sidebar_label: RtNoiseWorker
+sidebar_position: 40
+---
+
+# RtNoiseWorker
+
+**Namespace:** `RTPROCESSINGLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Header:** `dsp/rt/rt_noise.h`
+
+`#include <dsp/rt_noise.h>`
+
+```cpp
+class RTPROCESSINGLIB::RtNoiseWorker
+```
+
+Background worker that computes a noise power spectral density estimate from accumulated data blocks.
+
+---
+
+## Public Methods
+
+### RtNoiseWorker(iFftLength, pFiffInfo, iDataLength)
+
+Creates the worker.
+
+**Parameters:**
+
+- **iFftLength** : *qint32*
+  FFT length (number of samples per window).
+
+- **pFiffInfo** : *FIFFLIB::FiffInfo::SPtr*
+  Associated Fiff Information.
+
+- **iDataLength** : *qint32*
+  Number of blocks to accumulate before computing the spectrum.
+
+---
+
+### doWork(matData)
+
+Process one data block, accumulate, and emit the spectrum when enough blocks are collected.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  The incoming data block (channels x samples).
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

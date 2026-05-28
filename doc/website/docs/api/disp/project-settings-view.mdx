@@ -1,0 +1,105 @@
+---
+id: project-settings-view
+title: "DISPLIB::ProjectSettingsView"
+sidebar_label: ProjectSettingsView
+sidebar_position: 48
+---
+
+# ProjectSettingsView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/projectsettingsview.h`
+
+`#include <disp/projectsettingsview.h>`
+
+```cpp
+class DISPLIB::ProjectSettingsView
+```
+
+Output-path / filename-template panel for recording and export sessions.
+
+Resolves user-edited templates with `S` / `T` / `P` placeholders into the absolute file path used by the recording plugin.
+
+---
+
+## Public Methods
+
+### ProjectSettingsView(sSettingsPath, sDataPath, sCurrentProject, sCurrentSubject, sCurrentParadigm, parent)
+
+---
+
+### ~ProjectSettingsView()
+
+---
+
+### setRecordingElapsedTime(mSecsElapsed)
+
+Sets elapsed time to input parameter.
+
+**Parameters:**
+
+- **mSecsElapsed** : *int*
+  elapsed tim in milliseconds
+
+---
+
+### getCurrentFileName()
+
+Updates and gets current file name based on project and subject.
+
+**Returns:**
+
+- *QString* — file name
+
+---
+
+### triggerFileNameUpdate()
+
+Updates file name based on current project and subject.
+
+---
+
+### hideFileNameUi()
+
+Hides file name ui elements.
+
+---
+
+### showFileNameUi()
+
+Shows file name ui elements.
+
+---
+
+### hideParadigmUi()
+
+Hides paradigm ui elements.
+
+---
+
+### showParadigmUi()
+
+Shows paradigm ui elements.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

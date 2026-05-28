@@ -1,0 +1,159 @@
+---
+id: mne-msh-display-surface-set
+title: "MNELIB::MNEMshDisplaySurfaceSet"
+sidebar_label: MNEMshDisplaySurfaceSet
+sidebar_position: 34
+---
+
+# MNEMshDisplaySurfaceSet
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_msh_display_surface_set.h`
+
+`#include <mne/mne_msh_display_surface_set.h>`
+
+```cpp
+class MNELIB::MNEMshDisplaySurfaceSet
+```
+
+Replaces *mshDisplaySurfaceSet, mshDisplaySurfaceSetRec struct (analyze_types.c).
+
+Note that another implementation can be found in movie_types.h
+
+The `MNE` Msh Display FsSurface Set class holds information about a set of surfaces to be rendered.
+
+---
+
+## Public Methods
+
+### MNEMshDisplaySurfaceSet(nsurf)
+
+Constructs the `MNEMshDisplaySurfaceSet`.
+
+---
+
+### ~MNEMshDisplaySurfaceSet()
+
+Destroys the `MNEMshDisplaySurfaceSet`.
+
+---
+
+### add_bem_surface(filepath, kind, bemname, full_geom, check)
+
+Read a BEM surface from a FIFF file, optionally validate that it is topologically closed (via solid-angle check), and add it to this set.
+
+**Parameters:**
+
+- **filepath** : *const QString &*
+  Path to the BEM FIFF file.
+
+- **kind** : *int*
+  BEM surface kind constant.
+
+- **bemname** : *const QString &*
+  Display name for the surface.
+
+- **full_geom** : *int*
+  If non-zero, compute full geometry information.
+
+- **check** : *int*
+  If non-zero, verify the surface is closed.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### add_replace_surface(newSurf, replace, drawable)
+
+Add a new surface to the set, or replace an existing surface with the same ID if `replace` is true.
+
+**Parameters:**
+
+- **newSurf** : *std::unique_ptr&lt; MNEMshDisplaySurface &gt;*
+  The surface to add or use as replacement.
+
+- **replace** : *bool*
+  If true, replace an existing surface with matching ID.
+
+- **drawable** : *bool*
+  Whether the surface should be marked as drawable.
+
+---
+
+### apply_left_right_eyes()
+
+Assign hemisphere-appropriate eye positions and up-vectors to each surface (left eye for left hemisphere, right eye for right).
+
+---
+
+### apply_left_eyes()
+
+Apply the left-eye position and up-vector uniformly to all surfaces regardless of hemisphere.
+
+---
+
+### setup_current_lights()
+
+Initialize the custom light set (if needed) and apply it as the active lighting configuration.
+
+---
+
+### setup_lights(set)
+
+Replace the current active lighting with a deep copy of the provided light set.
+
+**Parameters:**
+
+- **set** : *const MNEMshLightSet &*
+  The light set to apply.
+
+---
+
+## Static Methods
+
+### load(subject_id, surf, subjects_dir)
+
+Load left and right hemisphere FreeSurfer surfaces (with curvature) from the subjects directory, configuring eye positions and lighting.
+
+**Parameters:**
+
+- **subject_id** : *const QString &*
+  Subject name.
+
+- **surf** : *const QString &*
+  FsSurface type name (e.g. "inflated", "white").
+
+- **subjects_dir** : *const QString &*
+  Path to the FreeSurfer subjects directory.
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNEMshDisplaySurfaceSet &gt;* — A new display surface set, or NULL on failure. Caller takes ownership.
+
+---
+
+### initialize_custom_lights()
+
+Create a default set of 8 directional lights if custom lights have not been initialized yet.
+
+---
+
+### dup_light_set(s)
+
+Deep-copy a light set including all individual light entries.
+
+**Parameters:**
+
+- **s** : *const MNEMshLightSet &*
+  The light set to duplicate.
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNEMshLightSet &gt;* — A new deep copy. Caller takes ownership.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

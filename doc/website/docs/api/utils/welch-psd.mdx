@@ -1,0 +1,110 @@
+---
+id: welch-psd
+title: "UTILSLIB::WelchPsd"
+sidebar_label: WelchPsd
+sidebar_position: 52
+---
+
+# WelchPsd
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/welch_psd.h`
+
+`#include <utils/welch_psd.h>`
+
+```cpp
+class UTILSLIB::WelchPsd
+```
+
+Welch's averaged-periodogram power spectral density estimator.
+
+Divides each channel into overlapping windowed segments, computes the FFT of each segment, and averages the squared magnitudes. The result is a one-sided PSD normalised so that integrating over frequency recovers the mean signal power.
+
+```cpp
+// 600 Hz data, 512-sample FFT, 50 % overlap, Hann window
+WelchPsdResult r = WelchPsd::compute(matData, 600.0, 512);
+// r.matPsd   → n_channels × 257
+// r.vecFreqs → [0, 1.17, 2.34, …, 300] Hz
+```
+
+---
+
+## Static Methods
+
+### compute(matData, dSFreq, iNfft, dOverlap, window, vecPicks)
+
+Compute Welch PSD for every (selected) channel of a data matrix.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Data matrix (n_channels × n_samples).
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+- **iNfft** : *int*
+  FFT length / segment length in samples (default 256).
+
+- **dOverlap** : *double*
+  Fractional overlap between adjacent segments, in [0, 1) (default 0.5).
+
+- **window** : *WindowType*
+  Window function (default Hann).
+
+- **vecPicks** : *const Eigen::RowVectorXi &*
+  Channel row indices to process; empty = all channels.
+
+**Returns:**
+
+- *WelchPsdResult* — `WelchPsdResult` with matPsd (n_picks × iNfft/2+1) and vecFreqs.
+
+---
+
+### computeVector(vecData, dSFreq, iNfft, dOverlap, window)
+
+Compute Welch PSD for a single channel row vector.
+
+**Parameters:**
+
+- **vecData** : *const Eigen::RowVectorXd &*
+  Single-channel data (1 × n_samples row vector).
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+- **iNfft** : *int*
+  FFT / segment length in samples.
+
+- **dOverlap** : *double*
+  Fractional segment overlap in [0, 1).
+
+- **window** : *WindowType*
+  Window function.
+
+**Returns:**
+
+- *Eigen::RowVectorXd* — One-sided PSD row vector of length iNfft/2+1.
+
+---
+
+### freqAxis(iNfft, dSFreq)
+
+Build the frequency axis for a given FFT length and sampling frequency.
+
+**Parameters:**
+
+- **iNfft** : *int*
+  FFT length.
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+**Returns:**
+
+- *Eigen::RowVectorXd* — Row vector of length iNfft/2+1 with frequencies in Hz.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,70 @@
+---
+id: fs-colortable
+title: "FSLIB::FsColortable"
+sidebar_label: FsColortable
+sidebar_position: 7
+---
+
+# FsColortable
+
+**Namespace:** `FSLIB` &nbsp;·&nbsp; **Library:** FreeSurfer Library &nbsp;·&nbsp; **Header:** `fs/fs_colortable.h`
+
+`#include <fs/fs_colortable.h>`
+
+```cpp
+class FSLIB::FsColortable
+```
+
+FreeSurfer colour lookup table: region name + RGBA + packed label, indexed by entry.
+
+Backs the colour/structure mapping used by `FsAnnotation` and by any caller that needs to translate a packed ``.annot label into the matching anatomical name and RGBA colour. The container is a thin value object: rows of `table` align with `struct_names`, and the label column matches the per-vertex integer stored in ``.annot files so direct equality lookup is sufficient.
+
+---
+
+## Public Methods
+
+### FsColortable()
+
+Default constructor.
+
+---
+
+### clear()
+
+Initializes colortable.
+
+---
+
+### getLabelIds()
+
+Ids encoded in the colortable.
+
+**Returns:**
+
+- *Eigen::VectorXi* — ids.
+
+---
+
+### getNames()
+
+Names encoded in the colortable.
+
+**Returns:**
+
+- *QStringList* — ids.
+
+---
+
+### getRGBAs()
+
+RGBAs encoded in the colortable.
+
+**Returns:**
+
+- *Eigen::MatrixX4i* — RGBAs.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

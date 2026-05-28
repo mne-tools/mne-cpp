@@ -1,0 +1,103 @@
+---
+id: fiff-digitizer-data
+title: "FIFFLIB::FiffDigitizerData"
+sidebar_label: FiffDigitizerData
+sidebar_position: 19
+---
+
+# FiffDigitizerData
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_digitizer_data.h`
+
+`#include <fiff/fiff_digitizer_data.h>`
+
+```cpp
+class FIFFLIB::FiffDigitizerData
+```
+
+Registration-ready digitization data: dig points, device→head transform and HPI fit metadata.
+
+Pairs a `FiffDigPointSet` with the `FiffCoordTrans` that maps it into the head frame, plus optional HPI goodness-of-fit values. Used by the coregistration GUI and by every downstream tool that needs a single self-contained record describing where a subject's head sat in the helmet for one measurement.
+
+---
+
+## Public Methods
+
+### FiffDigitizerData()
+
+Constructs the `FiffDigitizerData`.
+
+---
+
+### FiffDigitizerData(p_FiffDigitizerData)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FiffDigitizerData** : *const FiffDigitizerData &*
+  Digitization point descriptor which should be copied.
+
+---
+
+### operator=(rhs)
+
+Copy assignment operator (deep-copies unique_ptr members).
+
+**Parameters:**
+
+- **rhs** : *const FiffDigitizerData &*
+  Digitization point descriptor to assign from.
+
+**Returns:**
+
+- *FiffDigitizerData &* — Reference to this object.
+
+---
+
+### FiffDigitizerData(p_IODevice)
+
+Constructs a `FiffDigitizerData` by reading from an IO device.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  Input device to read data from.
+
+---
+
+### ~FiffDigitizerData()
+
+Destroys the digitization point description.
+
+---
+
+### print()
+
+Prints class contents.
+
+---
+
+### nfids()
+
+Returns the number of MRI fiducial points (cardinal points transformed into MRI coordinates via head_mri_t_adj).
+
+Kept as `nfids()` for API compatibility with the original MNE C code (digitizerDataRec.nfids in mne_analyze/analyze_types.h).
+
+**Returns:**
+
+- *int* — Number of fiducials in mri_fids.
+
+---
+
+### pickCardinalFiducials()
+
+Extracts cardinal digitizer points (LPA, Nasion, RPA) from the digitizer point list and transforms them into MRI coordinates using head_mri_t_adj, populating the mri_fids list.
+
+This is a port of the original C function update_fids_from_dig_data from mne_analyze/adjust_alignment.c.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

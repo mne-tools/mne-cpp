@@ -1,0 +1,53 @@
+---
+id: cross-correlation
+title: "CONNLIB::CrossCorrelation"
+sidebar_label: CrossCorrelation
+sidebar_position: 12
+---
+
+# CrossCorrelation
+
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Header:** `conn/metrics/crosscorrelation.h`
+
+`#include <conn/crosscorrelation.h>`
+
+```cpp
+class CONNLIB::CrossCorrelation
+```
+
+Computes the time-lagged cross-correlation between every channel pair via the inverse FFT of the DPSS-tapered cross-spectrum, and reduces it to the maximum absolute correlation over the lag axis.
+
+Per-trial computations are dispatched through `QtConcurrent::mapped` and accumulated under a single `QMutex`. The estimator is broadband and does not reject zero-lag mixing, but - unlike `Correlation` - is sensitive to delayed coupling because the lag axis is searched.
+
+Time-lagged cross-correlation estimator; broadband, sensitive to delayed coupling.
+
+---
+
+## Public Methods
+
+### CrossCorrelation()
+
+Constructs a `CrossCorrelation` object.
+
+---
+
+## Static Methods
+
+### calculate(connectivitySettings)
+
+Calculates the cross correlation between the rows of the data matrix.
+
+**Parameters:**
+
+- **connectivitySettings** : *ConnectivitySettings &*
+  The input data and parameters.
+
+**Returns:**
+
+- *Network* — The connectivity information in form of a network structure.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,181 @@
+---
+id: mne-raw-info
+title: "MNELIB::MNERawInfo"
+sidebar_label: MNERawInfo
+sidebar_position: 49
+---
+
+# MNERawInfo
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_raw_info.h`
+
+`#include <mne/mne_raw_info.h>`
+
+```cpp
+class MNELIB::MNERawInfo
+```
+
+Information about raw data in a FIFF file.
+
+---
+
+## Public Methods
+
+### MNERawInfo()
+
+Constructs a default `MNERawInfo`.
+
+---
+
+### ~MNERawInfo()
+
+Destroys the `MNERawInfo` and releases owned resources.
+
+---
+
+## Static Methods
+
+### find_meas(node)
+
+Finds the nearest FIFFB_MEAS parent node in the FIFF directory tree.
+
+Walks up the tree from the given node by following parent pointers until a node of type FIFFB_MEAS is found.
+
+**Parameters:**
+
+- **node** : *const FIFFLIB::FiffDirNode::SPtr &*
+  Starting node from which to search upward.
+
+**Returns:**
+
+- *FIFFLIB::FiffDirNode::SPtr* — Shared pointer to the enclosing FIFFB_MEAS node, or an empty shared pointer if no such node is found.
+
+---
+
+### find_meas_info(node)
+
+Finds the FIFFB_MEAS_INFO child node within the nearest FIFFB_MEAS block.
+
+First locates the enclosing FIFFB_MEAS node by walking up the tree from the given node, then searches its immediate children for a node of type FIFFB_MEAS_INFO.
+
+**Parameters:**
+
+- **node** : *const FIFFLIB::FiffDirNode::SPtr &*
+  Starting node from which to search.
+
+**Returns:**
+
+- *FIFFLIB::FiffDirNode::SPtr* — Shared pointer to the FIFFB_MEAS_INFO node, or an empty shared pointer if not found.
+
+---
+
+### find_raw(node)
+
+Finds the raw data block in the FIFF directory tree.
+
+Searches the tree under the given node for a FIFFB_RAW_DATA block. If none is found, falls back to searching for a FIFFB_CONTINUOUS_DATA block.
+
+**Parameters:**
+
+- **node** : *const FIFFLIB::FiffDirNode::SPtr &*
+  Root node of the subtree to search.
+
+**Returns:**
+
+- *FIFFLIB::FiffDirNode::SPtr* — Shared pointer to the raw data directory node, or an empty shared pointer if neither raw nor continuous data blocks are found.
+
+---
+
+### find_maxshield(node)
+
+Finds the MaxShield raw data block in the FIFF directory tree.
+
+Searches the tree under the given node for a FIFFB_SMSH_RAW_DATA block, which contains SSS/MaxShield processed raw data.
+
+**Parameters:**
+
+- **node** : *const FIFFLIB::FiffDirNode::SPtr &*
+  Root node of the subtree to search.
+
+**Returns:**
+
+- *FIFFLIB::FiffDirNode::SPtr* — Shared pointer to the MaxShield raw data directory node, or an empty shared pointer if no such block is found.
+
+---
+
+### get_meas_info(stream, node, id, nchan, sfreq, highpass, lowpass, chp, trans, start_time)
+
+Reads measurement information from the nearest FIFFB_MEAS_INFO parent of a node.
+
+Extracts channel information, sampling frequency, filter parameters, coordinate transformation (device-to-head), and measurement ID from the FIFF file. Lowpass and highpass default to sfreq/2 and 0 respectively if not explicitly present in the file.
+
+**Parameters:**
+
+- **stream** : *FIFFLIB::FiffStream::SPtr &*
+  Open FIFF stream to read tags from.
+
+- **node** : *FIFFLIB::FiffDirNode::SPtr &*
+  Starting directory node (typically the raw data node).
+
+- **id** : *std::unique_ptr&lt; FIFFLIB::FiffId &gt; &*
+  Measurement ID (managed via unique_ptr). Reset if absent.
+
+- **nchan** : *int **
+  Number of channels.
+
+- **sfreq** : *float **
+  Sampling frequency in Hz.
+
+- **highpass** : *float **
+  Highpass filter cutoff frequency in Hz.
+
+- **lowpass** : *float **
+  Lowpass filter cutoff frequency in Hz.
+
+- **chp** : *QList&lt; FIFFLIB::FiffChInfo &gt; &*
+  List of channel information structures, one per channel.
+
+- **trans** : *FIFFLIB::FiffCoordTrans &*
+  Device-to-head coordinate transformation.
+
+- **start_time** : *FIFFLIB::FiffTime &*
+  Measurement start time. Populated from FIFF_MEAS_DATE if present; otherwise from the measurement ID time; otherwise zeroed.
+
+**Returns:**
+
+- *int* — 0 on success, -1 on failure.
+
+---
+
+### get_meas_info(stream, node, id, nchan, sfreq, highpass, lowpass, chp, trans)
+
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. Overload that does not return the measurement start time.
+
+---
+
+### load(name, allow_maxshield, infop)
+
+Loads raw data information from a FIFF file.
+
+Opens the specified FIFF file, locates the raw data block (or MaxShield data block if allowed and no standard raw data is found), reads the measurement information, determines the buffer size from the first data buffer tag, and assembles a complete `MNERawInfo` structure.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Path to the FIFF file to load.
+
+- **allow_maxshield** : *int*
+  If non-zero, fall back to MaxShield (SSS) data when no standard raw data block is found.
+
+- **infop** : *std::unique_ptr&lt; MNERawInfo &gt; &*
+  Pointer to receive the newly allocated `MNERawInfo` structure. Only valid on success.
+
+**Returns:**
+
+- *int* — FIFF_OK on success, FIFF_FAIL on failure.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,333 @@
+---
+id: polhemus-coregistration
+title: "UTILSLIB::PolhemusCoregistration"
+sidebar_label: PolhemusCoregistration
+sidebar_position: 39
+---
+
+# PolhemusCoregistration
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `utils/polhemus/polhemus_coregistration.h`
+
+`#include <utils/polhemus_coregistration.h>`
+
+```cpp
+class UTILSLIB::PolhemusCoregistration
+```
+
+Head–device coregistration engine driven by a Polhemus Fastrak.
+
+The class wires itself to a `PolhemusConnection` and maintains:
+A continuously updated device-to-world transform (from the tracker station + user-supplied calibration offset).
+
+
+An `AcquiredPoints` store filled by explicit capture calls or automatically on pen-button press.
+
+
+The computed head–device transform after `computeRegistration`.
+
+---
+
+## Public Methods
+
+### PolhemusCoregistration(parent)
+
+---
+
+### ~PolhemusCoregistration()
+
+---
+
+### setTrackerStation(station)
+
+---
+
+### setPenStation(station)
+
+---
+
+### trackerStation()
+
+---
+
+### penStation()
+
+---
+
+### setPenTipOffset(offset)
+
+---
+
+### penTipOffset()
+
+---
+
+### setTipOffsetEnabled(on)
+
+---
+
+### tipOffsetEnabled()
+
+---
+
+### setAxisMirror(mirrorX, mirrorY)
+
+Negate X and/or Y of incoming Polhemus positions.
+
+The Polhemus Fastrak coordinate system depends on the physical placement and orientation of the transmitter. When the transmitter is oriented such that its axes are mirrored relative to the expected neuroscience convention, enable the corresponding mirror flags here.
+
+---
+
+### mirrorX()
+
+---
+
+### mirrorY()
+
+---
+
+### startPivotCalibration()
+
+---
+
+### cancelPivotCalibration()
+
+---
+
+### pivotState()
+
+---
+
+### pivotSampleCount()
+
+---
+
+### pivotResidualMm()
+
+---
+
+### setTrackerToDeviceOffset(translation, rotation)
+
+Set the rigid offset from the tracker sensor body frame to the device frame.
+
+**Parameters:**
+
+- **translation** : *const QVector3D &*
+  Translation in metres, expressed in the tracker body frame.
+
+- **rotation** : *const QQuaternion &*
+  Rotation from tracker body frame to device frame.
+
+---
+
+### trackerToDeviceTranslation()
+
+---
+
+### trackerToDeviceRotation()
+
+---
+
+### captureOpticalCalibSample()
+
+Record one calibration sample (current tracker pose + current pen position).
+
+**Returns:**
+
+- *bool* — `true` if both pen and tracker data are available, `false` otherwise.
+
+---
+
+### opticalCalibSampleCount()
+
+**Returns:**
+
+- *int* — Number of calibration samples recorded so far.
+
+---
+
+### clearOpticalCalibSamples()
+
+Discard all calibration samples and reset the optical calibration.
+
+---
+
+### solveOpticalCalibration()
+
+Fit a 3D line through the focus points in tracker-local frame.
+
+Requires at least 2 samples. Computes the optical axis direction and the optical center offset in the tracker body frame.
+
+**Returns:**
+
+- *bool* — `true` on success; `false` if insufficient or degenerate data.
+
+---
+
+### opticalCalibrationValid()
+
+**Returns:**
+
+- *bool* — Whether a valid optical calibration has been computed.
+
+---
+
+### opticalAxisLocal()
+
+Direction of the optical axis in the tracker body frame (unit vector).
+
+---
+
+### opticalCenterLocal()
+
+Position of the optical center in the tracker body frame (metres).
+
+---
+
+### opticalCalibResidualMm()
+
+RMS residual of the last optical calibration (mm).
+
+---
+
+### opticalCalibDepthSpreadMm()
+
+Depth spread of calibration samples along the optical axis (mm).
+
+---
+
+### opticalRayInWorld(origin, direction)
+
+Compute the current optical axis ray in Polhemus world frame.
+
+**Parameters:**
+
+- **origin** : *QVector3D &*
+  Ray origin (optical center in world frame).
+
+- **direction** : *QVector3D &*
+  Ray direction (optical axis in world frame, unit vector).
+
+**Returns:**
+
+- *bool* — `true` if tracker data and calibration are available.
+
+---
+
+### setConnection(conn)
+
+---
+
+### connection()
+
+---
+
+### acquiredPoints()
+
+---
+
+### captureCurrentPenPositionAsFiducial(id)
+
+---
+
+### captureCurrentPenPositionAsHeadShape()
+
+---
+
+### setModelFiducial(id, posInModel)
+
+---
+
+### hasModelFiducial(id)
+
+---
+
+### hasAllModelFiducials()
+
+---
+
+### modelFiducial(id)
+
+---
+
+### hasAllPenFiducials()
+
+---
+
+### setModelVertex(pos)
+
+---
+
+### hasModelVertex()
+
+---
+
+### modelVertex()
+
+---
+
+### captureCurrentPenPositionAsVertex()
+
+---
+
+### hasPenVertex()
+
+---
+
+### penVertex()
+
+---
+
+### computeRegistration()
+
+Compute the head→device rigid transform from the three captured fiducials (NAS, LPA, RPA).
+
+**Returns:**
+
+- *bool* — `true` on success; `false` if any fiducial is missing or the fiducials are degenerate (collinear).
+
+---
+
+### resetRegistration()
+
+Reset the registration state (headToWorld, headToDevice) to identity.
+
+Call this when the user clears all fiducials.
+
+---
+
+### registrationValid()
+
+---
+
+### deviceToWorld()
+
+---
+
+### headToWorld()
+
+---
+
+### headToDevice()
+
+---
+
+### worldToModel()
+
+---
+
+### penPosition()
+
+---
+
+### penOrientation()
+
+---
+
+### haveLivePenPosition()
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

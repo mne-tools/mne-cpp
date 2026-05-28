@@ -1,0 +1,59 @@
+---
+id: selection-scene
+title: "DISPLIB::SelectionScene"
+sidebar_label: SelectionScene
+sidebar_position: 57
+---
+
+# SelectionScene
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/helpers/selectionscene.h`
+
+`#include <disp/selectionscene.h>`
+
+```cpp
+class DISPLIB::SelectionScene
+```
+
+QGraphicsScene of sensor-layout dots used by `ChannelSelectionView` for interactive channel picking.
+
+Places one `SelectionSceneItem` per sensor, supports rubber-band selection and lasso grouping, and emits the resulting channel-name lists so the host view can store them as named ``.sel groups.
+
+---
+
+## Public Methods
+
+### SelectionScene(view, parent)
+
+Constructs a `SelectionScene`.
+
+---
+
+### repaintItems(layoutMap, badChannels)
+
+Updates layout data.
+
+**Parameters:**
+
+- **layoutMap** : *const QMap&lt; QString, QPointF &gt; &*
+  layout data map.
+
+- **bad**
+  channel list.
+
+---
+
+### hideItems(visibleItems)
+
+Hides all items described in list.
+
+**Parameters:**
+
+- **list**
+  string list with items name which are to be hidden.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

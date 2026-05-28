@@ -1,0 +1,111 @@
+---
+id: time-ruler-widget
+title: "DISPLIB::TimeRulerWidget"
+sidebar_label: TimeRulerWidget
+sidebar_position: 65
+---
+
+# TimeRulerWidget
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/helpers/timerulerwidget.h`
+
+`#include <disp/timerulerwidget.h>`
+
+```cpp
+class DISPLIB::TimeRulerWidget
+```
+
+Horizontal time-axis ruler displayed beneath `ChannelDataView`.
+
+Tick spacing adapts to the current zoom so labels stay readable from milliseconds to minutes; supports left-click drag for window scrolling and right-click context actions (jump to event, set marker).
+
+---
+
+## Public Methods
+
+### TimeRulerWidget(parent)
+
+---
+
+### setSfreq(sfreq)
+
+Set the file sampling frequency.
+
+Must be called before the first paint.
+
+**Parameters:**
+
+- **sfreq** : *double*
+  Sampling frequency in Hz.
+
+---
+
+### setFirstFileSample(firstFileSample)
+
+Set the absolute sample index of the left viewport edge (file-relative).
+
+Also records the file's first sample so labels show elapsed time.
+
+**Parameters:**
+
+- **firstFileSample** : *int*
+  The absolute sample index of the first sample in the file.
+
+---
+
+### sizeHint()
+
+---
+
+### minimumSizeHint()
+
+---
+
+### setEvents(events)
+
+Set the list of stimulus / event marks to display in the stim lane.
+
+Pass an empty vector to clear all marks.
+
+**Parameters:**
+
+- **events** : *const QVector&lt; TimeRulerEventMark &gt; &*
+  Event marks (sample position + colour + label).
+
+---
+
+### setReferenceMarkers(markers)
+
+Set the list of persistent sample markers to display in the ruler.
+
+**Parameters:**
+
+- **markers** : *const QVector&lt; TimeRulerReferenceMark &gt; &*
+  Reference/sample markers.
+
+---
+
+### toggleTimeFormat()
+
+Toggle the time format between float seconds and HH:MM:SS clock time.
+
+---
+
+### setClockTimeFormat(useClock)
+
+Set whether to use clock time (HH:MM:SS) or float seconds for labels.
+
+**Parameters:**
+
+- **useClock** : *bool*
+  true = HH:MM:SS, false = float seconds.
+
+---
+
+### clockTimeFormat()
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

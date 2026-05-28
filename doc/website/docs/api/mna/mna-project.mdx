@@ -1,0 +1,97 @@
+---
+id: mna-project
+title: "MNALIB::MnaProject"
+sidebar_label: MnaProject
+sidebar_position: 7
+---
+
+# MnaProject
+
+**Namespace:** `MNALIB` &nbsp;·&nbsp; **Library:** MNA Library (Modular Architecture) &nbsp;·&nbsp; **Header:** `mna/mna_project.h`
+
+`#include <mna/mna_project.h>`
+
+```cpp
+class MNALIB::MnaProject
+```
+
+Top-level MNA project container.
+
+Holds subjects, pipeline steps, and project metadata.
+
+---
+
+## Public Methods
+
+### MnaProject()
+
+Default constructor.
+
+---
+
+### toJson()
+
+Serialize to QJsonObject.
+
+---
+
+### toCbor()
+
+Serialize to QCborMap.
+
+---
+
+## Static Methods
+
+### fromJson(json)
+
+Deserialize from QJsonObject.
+
+---
+
+### fromCbor(cbor)
+
+Deserialize from QCborMap.
+
+---
+
+### read(path)
+
+Read an MNA project from file.
+
+Delegates to `MnaIO`.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  Path to the .mna or .mnx file.
+
+**Returns:**
+
+- *MnaProject* — The deserialized `MnaProject`.
+
+---
+
+### write(project, path)
+
+Write an MNA project to file.
+
+Delegates to `MnaIO`.
+
+**Parameters:**
+
+- **project** : *const MnaProject &*
+  The project to write.
+
+- **path** : *const QString &*
+  Path to the .mna or .mnx file.
+
+**Returns:**
+
+- *bool* — True if successful.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

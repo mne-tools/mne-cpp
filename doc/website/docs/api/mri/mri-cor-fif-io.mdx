@@ -1,0 +1,51 @@
+---
+id: mri-cor-fif-io
+title: "MRILIB::MriCorFifIO"
+sidebar_label: MriCorFifIO
+sidebar_position: 1
+---
+
+# MriCorFifIO
+
+**Namespace:** `MRILIB` &nbsp;·&nbsp; **Library:** MRI Library &nbsp;·&nbsp; **Header:** `mri/mri_cor_fif_io.h`
+
+`#include <mri/mri_cor_fif_io.h>`
+
+```cpp
+class MRILIB::MriCorFifIO
+```
+
+Stateless serialiser that turns an `MriVolData` into a FIFF MRI set (COR.fif).
+
+Writes MRI slice data  whether originally loaded from a FreeSurfer COR tree, an MGH/MGZ volume, or a NIfTI file  into the FIFF block hierarchy (`FIFFB_MRI` / `FIFFB_MRI_SET` / `FIFFB_MRI_SLICE`) understood by every downstream MNE C / MNE-Python step that needs an MRI volume in source-space coordinates. The class exposes only `static` methods so callers can use it without owning any state; the input `MriVolData` is consumed verbatim.
+
+Ported from `save_slices()` / `write_slice()` in MNE C `write_mri_set.c` by Matti Hamalainen.
+
+---
+
+## Static Methods
+
+### write(fileName, slices, additionalTrans)
+
+Writes COR.fif file from slice data.
+
+**Parameters:**
+
+- **fileName** : *const QString &*
+  Output FIFF file path.
+
+- **slices** : *const QVector&lt; MriSlice &gt; &*
+  Vector of `MriSlice` structures to write.
+
+- **additionalTrans** : *const QVector&lt; FIFFLIB::FiffCoordTrans &gt; &*
+  Additional coordinate transforms (Talairach etc.).
+
+**Returns:**
+
+- *bool* — True on success, false on error.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

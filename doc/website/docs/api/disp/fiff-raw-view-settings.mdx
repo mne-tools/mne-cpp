@@ -1,0 +1,179 @@
+---
+id: fiff-raw-view-settings
+title: "DISPLIB::FiffRawViewSettings"
+sidebar_label: FiffRawViewSettings
+sidebar_position: 28
+---
+
+# FiffRawViewSettings
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/fiffrawviewsettings.h`
+
+`#include <disp/fiffrawviewsettings.h>`
+
+```cpp
+class DISPLIB::FiffRawViewSettings
+```
+
+Display-style settings panel for the FIFF raw browser (zoom, colours, distance, scope).
+
+Bundles the visible time window, signal / background / trigger colours and the distance-to-axis spinbox with an embedded `ApplyToView` so the user controls whether changes affect selected / visible / all channels.
+
+---
+
+## Public Methods
+
+### FiffRawViewSettings(sSettingsPath, parent, f)
+
+Constructs a `FiffRawViewSettings` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  parent of widget.
+
+---
+
+### ~FiffRawViewSettings()
+
+Destroys the `FiffRawViewSettings`.
+
+---
+
+### setWidgetList(lVisibleWidgets)
+
+Init the view.
+
+**Parameters:**
+
+- **lVisibleWidgets** : *const QStringList &*
+  The widgets to be visible: numberChannels, windowSize, distanceSpacers,. backgroundcolor, signalColor, screenshot
+
+---
+
+### setWindowSize(windowSize)
+
+Sets the values of the windowSize spin box.
+
+**Parameters:**
+
+- **windowSize** : *int*
+  new window size value.
+
+---
+
+### setZoom(zoomFactor)
+
+Sets the values of the zoomFactor spin box.
+
+**Parameters:**
+
+- **zoomFactor** : *double*
+  new zoomFactor value.
+
+---
+
+### getDistanceTimeSpacer()
+
+Get current distance time spacer.
+
+**Returns:**
+
+- *int* — the current distance time spacer.
+
+---
+
+### setDistanceTimeSpacer(value)
+
+Set current distance time spacer combo box.
+
+**Parameters:**
+
+- **value** : *int*
+  the new value of the combo box.
+
+---
+
+### setBackgroundColor(backgroundColor)
+
+Set current background color.
+
+**Parameters:**
+
+- **backgroundColor** : *const QColor &*
+  The new background color.
+
+---
+
+### setSignalColor(signalColor)
+
+Set current signal color.
+
+**Parameters:**
+
+- **signalColor** : *const QColor &*
+  The new signal color.
+
+---
+
+### getSignalColor()
+
+Returns the current signal color.
+
+**Returns:**
+
+- *const QColor &* — The current signal color.
+
+---
+
+### getBackgroundColor()
+
+Returns the current background color.
+
+**Returns:**
+
+- *const QColor &* — The current background color.
+
+---
+
+### getZoom()
+
+Returns the current zoom.
+
+**Returns:**
+
+- *double* — The current zoom.
+
+---
+
+### getWindowSize()
+
+Returns the current window size.
+
+**Returns:**
+
+- *int* — The current window size.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

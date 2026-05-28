@@ -1,0 +1,139 @@
+---
+id: mne-msh-display-surface
+title: "MNELIB::MNEMshDisplaySurface"
+sidebar_label: MNEMshDisplaySurface
+sidebar_position: 33
+---
+
+# MNEMshDisplaySurface
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_msh_display_surface.h`
+
+`#include <mne/mne_msh_display_surface.h>`
+
+```cpp
+class MNELIB::MNEMshDisplaySurface
+```
+
+Replaces *mshDisplaySurface, mshDisplaySurfaceRec struct (analyze_types.c).
+
+The `MNE` Msh Display FsSurface class holds information about a surface to be rendered.
+
+---
+
+## Public Methods
+
+### MNEMshDisplaySurface()
+
+Constructs the `MNEMshDisplaySurface`.
+
+---
+
+### ~MNEMshDisplaySurface()
+
+Destroys the `MNEMshDisplaySurface`.
+
+---
+
+### align_fiducials(head_dig, mri_dig, niter, scale_head, omit_dist, scales)
+
+Align MEG and MRI coordinate systems using fiducial points and ICP.
+
+**Parameters:**
+
+- **head_dig** : *FIFFLIB::FiffDigitizerData &*
+  MEG digitizer data (transformed in-place).
+
+- **mri_dig** : *const FIFFLIB::FiffDigitizerData &*
+  MRI digitizer data with fiducial locations.
+
+- **head_surf**
+  The scalp surface used for ICP.
+
+- **niter** : *int*
+  Number of ICP iterations.
+
+- **scale_head** : *int*
+  If non-zero, scale the head surface to match digitizer.
+
+- **omit_dist** : *float*
+  Discard digitizer points farther than this from the surface (m).
+
+- **scales** : *Eigen::Vector3f &*
+  If non-null, receives the per-axis scale factors applied.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### get_head_scale(dig, mri_fid, scales)
+
+Compute a uniform head scale factor by fitting spheres.
+
+---
+
+### discard_outlier_digitizer_points(d, maxdist)
+
+Mark digitizer points whose distance to the head surface exceeds maxdist.
+
+---
+
+### calculate_digitizer_distances(dig, do_all, do_approx)
+
+Compute the distance from each active digitizer point to the head surface.
+
+---
+
+### iterate_alignment_once(dig, nasion_weight, nasion_mri, last_step)
+
+Perform one iteration of ICP-like alignment.
+
+---
+
+### rms_digitizer_distance(dig)
+
+Compute the RMS distance from active digitizer points to the head surface.
+
+---
+
+### scale(scales)
+
+Scale a display surface's bounding box and all vertex positions.
+
+---
+
+### decide_surface_extent(tag)
+
+Compute and store the axis-aligned bounding box and field-of-view radius by iterating all vertex positions.
+
+**Parameters:**
+
+- **tag** : *const QString &*
+  FsSurface name tag (used for debug logging).
+
+---
+
+### decide_curv_display(name)
+
+Set the curvature display mode based on a surface type name.
+
+Inflated, sphere, and white surfaces use overlay mode; others use none.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  FsSurface type name.
+
+---
+
+### setup_curvature_colors()
+
+Allocate and fill per-vertex color arrays using positive/negative curvature colors (if curvature overlay mode is on) or uniform gray.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

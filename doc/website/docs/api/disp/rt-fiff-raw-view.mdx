@@ -1,0 +1,411 @@
+---
+id: rt-fiff-raw-view
+title: "DISPLIB::RtFiffRawView"
+sidebar_label: RtFiffRawView
+sidebar_position: 51
+---
+
+# RtFiffRawView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/rtfiffrawview.h`
+
+`#include <disp/rtfiffrawview.h>`
+
+```cpp
+class DISPLIB::RtFiffRawView
+```
+
+QTableView-based real-time FIFF raw-data browser host.
+
+Owns the scrollbars, the marker / annotation machinery and the trigger-channel overlay; delegates per-row painting to `RtFiffRawViewDelegate` and data access to `RtFiffRawViewModel`.
+
+---
+
+## Public Methods
+
+### RtFiffRawView(sSettingsPath, parent, f)
+
+Constructs a `RtFiffRawView` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  The parent of widget.
+
+---
+
+### ~RtFiffRawView()
+
+Destroys the `RtFiffRawView`.
+
+---
+
+### updateViewport()
+
+Update the viewport.
+
+This, e.g., necessary if this widget was set to a QDockWidget which changes its floating state.
+
+---
+
+### setSettingsPath(sSettingsPath)
+
+Set the path where to store the settings of this widget via QSettings.
+
+Note that this will also trigger a reload of the stored settings.
+
+**Parameters:**
+
+- **sSettingsPath** : *const QString &*
+  The new settings path.
+
+---
+
+### init(info)
+
+Initilaizes the `RtFiffRawView` based on a FiffInfo.
+
+**Parameters:**
+
+- **info** : *QSharedPointer&lt;FIFFLIB::FiffInfo&gt; &*
+  The FiffInfo.
+
+---
+
+### addData(data)
+
+Add data to the view.
+
+**Parameters:**
+
+- **data** : *const QList&lt; Eigen::MatrixXd &gt; &*
+  The new data.
+
+---
+
+### getLastBlock()
+
+Get the latest data block from the underlying model.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — The last data block.
+
+---
+
+### eventFilter(object, event)
+
+Is called when mouse wheel is used.
+
+Function is selecting the tool (freezing/annotation);
+
+**Parameters:**
+
+- **object.**
+
+- **event.**
+
+---
+
+### setBackgroundColor(backgroundColor)
+
+Broadcast the background color changes made in the QuickControl widget.
+
+**Parameters:**
+
+- **backgroundColor** : *const QColor &*
+  The new background color.
+
+---
+
+### getBackgroundColor()
+
+Returns the current background color.
+
+**Returns:**
+
+- *QColor* — The current background color.
+
+---
+
+### getScalingMap()
+
+Get the current scaling map.
+
+**Returns:**
+
+- *QMap&lt; qint32, float &gt;* — The current scaling map.
+
+---
+
+### setScalingMap(scaleMap)
+
+Broadcast channel scaling.
+
+**Parameters:**
+
+- **scaleMap** : *const QMap&lt; qint32, float &gt; &*
+  QMap with scaling values which is to be broadcasted to the model.
+
+---
+
+### setSignalColor(signalColor)
+
+Set the signal color.
+
+**Parameters:**
+
+- **signalColor** : *const QColor &*
+  The new signal color.
+
+---
+
+### getSignalColor()
+
+Returns the signal color.
+
+**Returns:**
+
+- *QColor* — The current signal color.
+
+---
+
+### hideBadChannels()
+
+Hides/shows all bad channels in the view.
+
+---
+
+### getBadChannelHideStatus()
+
+Get whether the bad channels are currently hidden or not.
+
+**Returns:**
+
+- *bool* — The current bad channel hidden status.
+
+---
+
+### showSelectedChannelsOnly(selectedChannels)
+
+Only shows the channels defined in the QStringList selectedChannels.
+
+**Parameters:**
+
+- **selectedChannels** : *const QStringList &*
+  list of all channel names which are currently selected in the selection manager.
+
+---
+
+### setZoom(zoomFac)
+
+Sets new zoom factor.
+
+**Parameters:**
+
+- **zoomFac** : *double*
+  time window size;.
+
+---
+
+### getZoom()
+
+Get the current zoom.
+
+**Returns:**
+
+- *double* — The current zoom.
+
+---
+
+### setWindowSize(T)
+
+Sets new time window size.
+
+**Parameters:**
+
+- **T** : *int*
+  time window size;.
+
+---
+
+### getWindowSize()
+
+Get the current window size.
+
+**Returns:**
+
+- *int* — The current window size.
+
+---
+
+### takeScreenshot(fileName)
+
+Renders a screenshot of the view and saves it to the passed path.
+
+SVG and PNG supported.
+
+**Parameters:**
+
+- **fileName** : *const QString &*
+  The file name and path where to store the screenshot.
+
+---
+
+### updateProjection(projs)
+
+Update the SSP projection.
+
+**Parameters:**
+
+- **projs** : *const QList&lt; FIFFLIB::FiffProj &gt; &*
+  The new projectors.
+
+---
+
+### updateCompensator(to)
+
+Update the compensator.
+
+**Parameters:**
+
+- **to** : *int*
+  Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind).
+
+---
+
+### updateSpharaActivation(state)
+
+Update the SPHARA operator.
+
+**Parameters:**
+
+- **state** : *bool*
+  The current state of teh SPHARA tool.
+
+---
+
+### updateSpharaOptions(sSytemType, nBaseFctsFirst, nBaseFctsSecond)
+
+Update the SPHARA operator.
+
+**Parameters:**
+
+- **sSystemType**
+  The current acquisition system type (VectorView, BabyMEG, EEG).
+
+- **nBaseFctsFirst** : *int*
+  The new number of basis function to use for the first SPHARA operator.
+
+- **nBaseFctsSecond** : *int*
+  The new number of basis function to use for the second SPHARA operator.
+
+---
+
+### setFilter(filterData)
+
+Filter parameters changed.
+
+**Parameters:**
+
+- **filterData** : *const UTILSLIB::FilterKernel &*
+  the currently active filter.
+
+---
+
+### setFilterActive(state)
+
+Filter avtivated.
+
+**Parameters:**
+
+- **state** : *bool*
+  filter on/off flag.
+
+---
+
+### setFilterChannelType(channelType)
+
+Sets the type of channel which are to be filtered.
+
+**Parameters:**
+
+- **channelType** : *const QString &*
+  the channel type which is to be filtered (EEG, MEG, All).
+
+---
+
+### triggerInfoChanged(colorMap, active, triggerCh, threshold)
+
+markChBad marks the selected channels as bad/good in m_chInfolist
+
+**Parameters:**
+
+- **colorMap** : *const QMap&lt; double, QColor &gt; &*
+  color for each trigger channel.
+
+- **activ**
+  real time trigger detection active.
+
+- **triggerCh** : *const QString &*
+  current trigger channel to scan.
+
+- **threshold** : *double*
+  threshold for the detection process.
+
+---
+
+### setDistanceTimeSpacer(value)
+
+distanceTimeSpacerChanged changes the distance of the time spacers
+
+**Parameters:**
+
+- **value** : *int*
+  the new distance for the time spacers.
+
+---
+
+### getDistanceTimeSpacer()
+
+Returns teh current distance between time spacers.
+
+**Returns:**
+
+- *int* — The current distance between the time spacers.
+
+---
+
+### resetTriggerCounter()
+
+resetTriggerCounter resets the trigger counter
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+### getSamplingFreq()
+
+Getter fcn for Sampling Frequency member.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

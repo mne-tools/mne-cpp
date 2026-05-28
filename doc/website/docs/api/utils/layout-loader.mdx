@@ -1,0 +1,106 @@
+---
+id: layout-loader
+title: "UTILSLIB::LayoutLoader"
+sidebar_label: LayoutLoader
+sidebar_position: 27
+---
+
+# LayoutLoader
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `utils/layoutloader.h`
+
+`#include <utils/layoutloader.h>`
+
+```cpp
+class UTILSLIB::LayoutLoader
+```
+
+Processes layout files (AsA .elc, MNE .lout) files which contain the electrode positions of a EEG/MEG hat.
+
+Reads ANT .elc electrode files and MNE .lout 2-D channel layouts into Qt/STL containers.
+
+---
+
+## Static Methods
+
+### readAsaElcFile(path, channelNames, location3D, location2D, unit)
+
+Reads the specified ANT elc-layout file.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  holds the file path of the elc file which is to be read.
+
+- **location3D** : *QList&lt; QVector&lt; float &gt; &gt; &*
+  holds the vector to which the read 3D positions are stored.
+
+- **location2D** : *QList&lt; QVector&lt; float &gt; &gt; &*
+  holds the vector to which the read 2D positions are stored.
+
+**Returns:**
+
+- *bool* — true if reading was successful, false otherwise.
+
+---
+
+### readAsaElcFile(path, channelNames, location3D, location2D, unit)
+
+Reads the specified ANT elc-layout file.
+
+**Parameters:**
+
+- **path** : *const std::string &*
+  holds the file path of the elc file which is to be read.
+
+- **location3D** : *std::vector&lt; std::vector&lt; float &gt; &gt; &*
+  holds the vector to which the read 3D positions are stored.
+
+- **location2D** : *std::vector&lt; std::vector&lt; float &gt; &gt; &*
+  holds the vector to which the read 2D positions are stored.
+
+**Returns:**
+
+- *bool* — true if reading was successful, false otherwise.
+
+---
+
+### readMNELoutFile(path, channelData)
+
+Reads the specified MNE .lout file.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  holds the file path of the lout file which is to be read.
+
+- **channel**
+  data holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
+
+**Returns:**
+
+- *bool* — bool true if reading was successful, false otherwise.
+
+---
+
+### readMNELoutFile(path, channelData)
+
+Reads the specified MNE .lout file.
+
+**Parameters:**
+
+- **path** : *const std::string &*
+  holds the file path of the lout file which is to be read.
+
+- **channel**
+  data holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
+
+**Returns:**
+
+- *bool* — bool true if reading was successful, false otherwise.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

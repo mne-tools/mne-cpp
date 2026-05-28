@@ -1,0 +1,161 @@
+---
+id: rt-source-interpolation-mat-worker
+title: "DISP3DLIB::RtSourceInterpolationMatWorker"
+sidebar_label: RtSourceInterpolationMatWorker
+sidebar_position: 8
+---
+
+# RtSourceInterpolationMatWorker
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Header:** `disp3D/workers/rtsourceinterpolationmatworker.h`
+
+`#include <disp3D/rtsourceinterpolationmatworker.h>`
+
+```cpp
+class DISP3DLIB::RtSourceInterpolationMatWorker
+```
+
+`RtSourceInterpolationMatWorker` computes sparse source-to-vertex interpolation matrices in a background thread.
+
+This worker encapsulates the expensive `GeometryInfo::scdc()` (geodesic distance computation) and `Interpolation::createInterpolationMat()` calls that were previously performed either in `StcLoadingWorker` (at load time only) or not recomputed at all when parameters changed at runtime.
+
+The worker for each hemisphere stores:
+FsSurface vertex positions and neighbor topology
+
+
+Source vertex indices (from the STC file)
+
+
+Cancel distance and interpolation function
+
+When any parameter changes, `computeInterpolationMatrix()` can be called (typically via a queued connection) to recompute the sparse interpolation matrix on the worker thread. When done, the result is emitted via newInterpolationMatrixAvailable().
+
+Background worker for computing source interpolation matrices.
+
+---
+
+## Public Methods
+
+### RtSourceInterpolationMatWorker(parent)
+
+Constructor.
+
+**Parameters:**
+
+- **parent** : *QObject **
+  Parent QObject.
+
+---
+
+### setInterpolationFunction(sInterpolationFunction)
+
+Set the interpolation function used for weight computation.
+
+Available functions: "linear", "gaussian", "square", "cubic" (default).
+
+**Parameters:**
+
+- **sInterpolationFunction** : *const QString &*
+  Function name.
+
+---
+
+### setCancelDistance(dCancelDist)
+
+Set the cancel distance used in SCDC distance calculations.
+
+Distances larger than this are ignored (coefficients set to zero).
+
+**Parameters:**
+
+- **dCancelDist** : *double*
+  Cancel distance in meters (default: 0.05).
+
+---
+
+### setInterpolationInfoLeft(matVertices, vecNeighborVertices, vecSourceVertices)
+
+Set the surface and source geometry for the left hemisphere.
+
+**Parameters:**
+
+- **matVertices** : *const Eigen::MatrixX3f &*
+  Vertex positions (nVerts x 3).
+
+- **vecNeighborVertices** : *const std::vector&lt; Eigen::VectorXi &gt; &*
+  Per-vertex neighbor index lists.
+
+- **vecSourceVertices** : *const Eigen::VectorXi &*
+  Source vertex indices into the surface.
+
+---
+
+### setInterpolationInfoRight(matVertices, vecNeighborVertices, vecSourceVertices)
+
+Set the surface and source geometry for the right hemisphere.
+
+**Parameters:**
+
+- **matVertices** : *const Eigen::MatrixX3f &*
+  Vertex positions (nVerts x 3).
+
+- **vecNeighborVertices** : *const std::vector&lt; Eigen::VectorXi &gt; &*
+  Per-vertex neighbor index lists.
+
+- **vecSourceVertices** : *const Eigen::VectorXi &*
+  Source vertex indices into the surface.
+
+---
+
+### setVisualizationType(iVisType)
+
+Set the visualization type.
+
+When set to AnnotationBased, the worker emits annotation matrices instead of interpolation matrices.
+
+**Parameters:**
+
+- **iVisType** : *int*
+  `VisualizationType` enum value.
+
+---
+
+### setAnnotationInfoLeft(vecLabelIds, lLabels, vecVertNo)
+
+Set annotation info for the left hemisphere.
+
+Required for AnnotationBased visualization.
+
+**Parameters:**
+
+- **vecLabelIds** : *const Eigen::VectorXi &*
+  Per-vertex label IDs for the surface.
+
+- **lLabels** : *const QList&lt; FSLIB::FsLabel &gt; &*
+  List of FreeSurfer Labels.
+
+- **vecVertNo** : *const Eigen::VectorXi &*
+  Source-space vertex numbers.
+
+---
+
+### setAnnotationInfoRight(vecLabelIds, lLabels, vecVertNo)
+
+Set annotation info for the right hemisphere.
+
+**Parameters:**
+
+- **vecLabelIds** : *const Eigen::VectorXi &*
+  Per-vertex label IDs for the surface.
+
+- **lLabels** : *const QList&lt; FSLIB::FsLabel &gt; &*
+  List of FreeSurfer Labels.
+
+- **vecVertNo** : *const Eigen::VectorXi &*
+  Source-space vertex numbers.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

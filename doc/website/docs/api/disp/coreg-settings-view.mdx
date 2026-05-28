@@ -1,0 +1,264 @@
+---
+id: coreg-settings-view
+title: "DISPLIB::CoregSettingsView"
+sidebar_label: CoregSettingsView
+sidebar_position: 23
+---
+
+# CoregSettingsView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/coregsettingsview.h`
+
+`#include <disp/coregsettingsview.h>`
+
+```cpp
+class DISPLIB::CoregSettingsView
+```
+
+MRI ↔ head co-registration configuration / refinement panel.
+
+Exposes the inputs of the ICP-based co-registration step (fiducial files, trans-file load / save paths, ICP iteration cap, outlier threshold) plus manual scale / rotation / translation tweak spinboxes.
+
+---
+
+## Public Methods
+
+### CoregSettingsView(sSettingsPath, parent, f)
+
+Constructs a `CoregSettingsView` object.
+
+---
+
+### ~CoregSettingsView()
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### updateGuiMode(mode)
+
+Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
+
+**Parameters:**
+
+- **mode** : *GuiMode*
+  The new mode (Clinical=0, Research=1).
+
+---
+
+### updateProcessingMode(mode)
+
+Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
+
+**Parameters:**
+
+- **mode** : *ProcessingMode*
+  The new mode (RealTime=0, Offline=1).
+
+---
+
+### clearSelectionBem()
+
+Clear/Emüpty the selection menu for bem models.
+
+---
+
+### addSelectionBem(sBemName)
+
+Add a new Bem to the drop down menu.
+
+**Parameters:**
+
+- **sBemName** : *const QString &*
+  The name of the bem.
+
+---
+
+### getCurrentSelectedBem()
+
+Return the currently selected bem.
+
+**Returns:**
+
+- *QString* — The name of the currently selected bem.
+
+---
+
+### getCurrentFiducial()
+
+Get the checked radio box for fiducial picking.
+
+**Returns:**
+
+- *int* — The currently selected fiducial.
+
+---
+
+### setFiducials(vecAxialPosition)
+
+Set the position of the fiducials.
+
+**Parameters:**
+
+- **vecAxialPosition** : *const QVector3D*
+  The vector containig x-,y- and x- Position for LPA, Nasion and RPA.
+
+---
+
+### getMaxIter()
+
+Get the maximum number of icp iterations.
+
+**Returns:**
+
+- *int* — The maximum number of iterations.
+
+---
+
+### getConvergence()
+
+Get the onvergence value.
+
+**Returns:**
+
+- *float* — The convergence value.
+
+---
+
+### getAutoScale()
+
+Get the auto scale state.
+
+If activated, unform scaling is applied for any icp iteration.
+
+**Returns:**
+
+- *bool* — The auto scale state.
+
+---
+
+### getOmmitDistance()
+
+Get the the maximum distance for digitizers from the surface.
+
+**Returns:**
+
+- *float* — The maximum distance in m.
+
+---
+
+### setOmittedPoints(iN)
+
+Set the the number of omitted points.
+
+**Parameters:**
+
+- **iN** : *const int*
+  The number of omitted digitizer points.
+
+---
+
+### setRMSE(fRMSE)
+
+Set the the Root-Mean-Square-Error (Digitizer-FsSurface) after icp.
+
+**Parameters:**
+
+- **fRMSE** : *const float*
+  The RMSE in m.
+
+---
+
+### getWeightLPA()
+
+Get the weights for the digitizer types.
+
+**Returns:**
+
+- *float* — The weight.
+
+---
+
+### getWeightRPA()
+
+---
+
+### getWeightNAS()
+
+---
+
+### getWeightEEG()
+
+---
+
+### getWeightHSP()
+
+---
+
+### getWeightHPI()
+
+---
+
+### getDigitizerCheckState()
+
+Get the types of digitizers to use for coregistration.
+
+**Returns:**
+
+- *QList&lt; int &gt;* — The list containing the digitizer types to use for coregistration.
+
+---
+
+### getTransParams(vecRot, vecTrans, vecScale)
+
+Get the parameters for the new transformation to build from the adjustment values.
+
+**Parameters:**
+
+- **vecRot** : *Eigen::Vector3f &*
+  The rotation angle vector in rad (x,y,z).
+
+- **vecTrans** : *Eigen::Vector3f &*
+  The traslation vector (x,y,z).
+
+- **vecScale** : *Eigen::Vector3f &*
+  The vector with the scaling parameters (due to euler transformation: z,y,x).
+
+---
+
+### setTransParams(vecTrans, vecRot, vecScale)
+
+Set the transformation received from the ICP algorithm.
+
+**Parameters:**
+
+- **vecRot** : *const Eigen::Vector3f &*
+  The rotation angle vector in rad (x,y,z).
+
+- **vecTrans** : *const Eigen::Vector3f &*
+  The traslation vector (x,y,z).
+
+- **vecScale** : *const Eigen::Vector3f &*
+  The vector with the scaling parameters (due to euler transformation: z,y,x).
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

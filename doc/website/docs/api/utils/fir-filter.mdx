@@ -1,0 +1,134 @@
+---
+id: fir-filter
+title: "UTILSLIB::FirFilter"
+sidebar_label: FirFilter
+sidebar_position: 20
+---
+
+# FirFilter
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/firfilter.h`
+
+`#include <utils/firfilter.h>`
+
+```cpp
+class UTILSLIB::FirFilter
+```
+
+Discoverable façade over the `FilterKernel` FIR-filter engine.
+
+Quick-start example — mirrors the `IirFilter` API: 
+```cpp
+// Design a 256-tap band-pass filter
+FilterKernel bpf = FirFilter::design(256, FirFilter::BandPass, 1.0, 40.0, sFreq);
+
+// Apply to a single row vector (group delay already removed — symmetric FIR)
+Eigen::RowVectorXd out = FirFilter::apply(vecData, bpf);
+
+// Apply to all rows of a matrix
+Eigen::MatrixXd clean = FirFilter::applyZeroPhaseMatrix(matData, bpf);
+```
+
+---
+
+## Static Methods
+
+### design(iOrder, type, dCutoffLow, dCutoffHigh, dSFreq, dTransition, method)
+
+Design a linear-phase FIR filter using `FilterKernel` as the backend.
+
+Frequencies are given in Hz; the method converts them to the Nyquist-normalised form expected by `FilterKernel` internally.
+
+**Parameters:**
+
+- **iOrder** : *int*
+  Filter order (number of taps − 1). Must be even for linear phase.
+
+- **type** : *FilterType*
+  Filter type (LowPass, HighPass, BandPass, BandStop).
+
+- **dCutoffLow** : *double*
+  Lower cutoff frequency in Hz. For LowPass/HighPass: the single cutoff. For BandPass/BandStop: lower edge of the transition band.
+
+- **dCutoffHigh** : *double*
+  Upper cutoff frequency in Hz (ignored for LowPass/HighPass).
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+- **dTransition** : *double*
+  Width of the transition band in Hz (Parks-McClellan steepness / Cosine roll-off width). Defaults to 5 Hz.
+
+- **method** : *DesignMethod*
+  Design method (Cosine or `ParksMcClellan`).
+
+**Returns:**
+
+- *FilterKernel* — A ready-to-use `FilterKernel` object.
+
+---
+
+### apply(vecData, kernel)
+
+Apply the filter to a single row vector.
+
+Uses overlap-add FFT convolution. The group delay of a symmetric FIR is removed by the `FilterKernel` engine (it takes the output segment starting at order/2), so the result is already approximately zero-phase for symmetric designs.
+
+**Parameters:**
+
+- **vecData** : *const Eigen::RowVectorXd &*
+  Input row vector.
+
+- **kernel** : *FilterKernel &*
+  `FilterKernel` (prepareFilter is called if needed).
+
+**Returns:**
+
+- *Eigen::RowVectorXd* — Filtered row vector (same length as input).
+
+---
+
+### applyZeroPhase(vecData, kernel)
+
+Apply the filter in a zero-phase forward-backward pass to a single row vector.
+
+Runs the filter twice (forward then reverse) to achieve exactly zero phase shift. Effective order is doubled; transition bandwidth is halved.
+
+**Parameters:**
+
+- **vecData** : *const Eigen::RowVectorXd &*
+  Input row vector.
+
+- **kernel** : *FilterKernel &*
+  `FilterKernel`.
+
+**Returns:**
+
+- *Eigen::RowVectorXd* — Zero-phase filtered row vector.
+
+---
+
+### applyZeroPhaseMatrix(matData, kernel, vecPicks)
+
+Apply the filter in a zero-phase forward-backward pass to every row of a matrix.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Input matrix (n_channels × n_samples).
+
+- **kernel** : *FilterKernel &*
+  `FilterKernel`.
+
+- **vecPicks** : *const Eigen::RowVectorXi &*
+  Optional row indices to filter; if empty, all rows are filtered.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Zero-phase filtered matrix (same dimensions as input).
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

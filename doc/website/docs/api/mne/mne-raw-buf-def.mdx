@@ -1,0 +1,40 @@
+---
+id: mne-raw-buf-def
+title: "MNELIB::MNERawBufDef"
+sidebar_label: MNERawBufDef
+sidebar_position: 47
+---
+
+# MNERawBufDef
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_raw_buf_def.h`
+
+`#include <mne/mne_raw_buf_def.h>`
+
+```cpp
+class MNELIB::MNERawBufDef
+```
+
+Definition of one raw data buffer within a FIFF file.
+
+Each `MNERawBufDef` describes a contiguous chunk of samples, either loaded from the FIFF file or produced by the overlap-add filter pipeline. Sample values are stored in a row-major matrix (nchan x ns) that is managed by an external ring buffer; an empty (0x0) matrix indicates that the data are not currently resident in memory.
+
+---
+
+## Public Methods
+
+### MNERawBufDef()
+
+Default constructor.
+
+---
+
+### ~MNERawBufDef()
+
+Destructor.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

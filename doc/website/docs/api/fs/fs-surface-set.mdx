@@ -1,0 +1,247 @@
+---
+id: fs-surface-set
+title: "FSLIB::FsSurfaceSet"
+sidebar_label: FsSurfaceSet
+sidebar_position: 8
+---
+
+# FsSurfaceSet
+
+**Namespace:** `FSLIB` &nbsp;·&nbsp; **Library:** FreeSurfer Library &nbsp;·&nbsp; **Header:** `fs/fs_surfaceset.h`
+
+`#include <fs/fs_surfaceset.h>`
+
+```cpp
+class FSLIB::FsSurfaceSet
+```
+
+Container holding the lh and/or rh `FsSurface` for one subject and one surface kind.
+
+The set is keyed on the hemisphere id (0 = lh, 1 = rh) so callers can do `set`[0] / `set`[1] or iterate over `set.data()`. All member surfaces are loaded with the same `surf` name (e.g. `pial`), so the set is homogeneous across hemispheres and stays aligned with a paired `FsAnnotationSet` sharing the same vertex indexing.
+
+---
+
+## Public Methods
+
+### FsSurfaceSet()
+
+Default constructor.
+
+---
+
+### FsSurfaceSet(subject_id, hemi, surf, subjects_dir)
+
+Construts the surface set by reading it of the given files.
+
+**Parameters:**
+
+- **subject_id** : *const QString &*
+  Name of subject.
+
+- **hemi** : *qint32*
+  Which hemisphere to load \{0 -&gt; lh, 1 -&gt; rh, 2 -&gt; both\}.
+
+- **surf** : *const QString &*
+  Name of the surface to load (eg. inflated, orig ...).
+
+- **subjects_dir** : *const QString &*
+  Subjects directory.
+
+---
+
+### FsSurfaceSet(path, hemi, surf)
+
+Construts the surface set by reading it of the given files.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  path to surface directory.
+
+- **hemi** : *qint32*
+  Which hemisphere to load \{0 -&gt; lh, 1 -&gt; rh, 2 -&gt; both\}.
+
+- **surf** : *const QString &*
+  Name of the surface to load (eg. inflated, orig ...).
+
+---
+
+### FsSurfaceSet(p_LHSurface, p_RHSurface)
+
+Constructs a surface set by assembling given surfaces.
+
+**Parameters:**
+
+- **p_LHSurface** : *const FsSurface &*
+  Left hemisphere surface.
+
+- **p_RHSurface** : *const FsSurface &*
+  Right hemisphere surface.
+
+---
+
+### FsSurfaceSet(p_sLHFileName, p_sRHFileName)
+
+Constructs an annotation set by reading from annotation files.
+
+**Parameters:**
+
+- **p_sLHFileName** : *const QString &*
+  Left hemisphere annotation file.
+
+- **p_sRHFileName** : *const QString &*
+  Right hemisphere annotation file.
+
+---
+
+### ~FsSurfaceSet()
+
+Destroys the `FsSurfaceSet` class.
+
+---
+
+### clear()
+
+Initializes the `FsAnnotationSet`.
+
+---
+
+### data()
+
+Returns The surface set map.
+
+**Returns:**
+
+- *QMap&lt; qint32, FsSurface &gt; &* — the surface set map.
+
+---
+
+### isEmpty()
+
+True if `FsSurfaceSet` is empty.
+
+**Returns:**
+
+- *bool* — true if `FsSurfaceSet` is empty.
+
+---
+
+### insert(p_Surface)
+
+Insert a surface.
+
+**Parameters:**
+
+- **p_Surface** : *const FsSurface &*
+  `FsSurface` to insert.
+
+---
+
+### surf()
+
+The kind of Surfaces which are held by the `FsSurfaceSet` (eg.
+
+inflated, orig ...)
+
+**Returns:**
+
+- *QString* — the loaded surfaces (eg. inflated, orig ...).
+
+---
+
+### operator[](idx)
+
+Subscript operator [] to access surface by index.
+
+**Parameters:**
+
+- **idx** : *qint32*
+  the hemisphere index (0 or 1).
+
+**Returns:**
+
+- *const FsSurface &* — `FsSurface` related to the parameter index.
+
+---
+
+### operator[](idx)
+
+Subscript operator [] to access surface by index.
+
+**Parameters:**
+
+- **idx** : *qint32*
+  the hemisphere index (0 or 1).
+
+**Returns:**
+
+- *FsSurface &* — `FsSurface` related to the parameter index.
+
+---
+
+### operator[](idt)
+
+Subscript operator [] to access surface by identifier.
+
+**Parameters:**
+
+- **idt** : *QString*
+  the hemisphere identifier ("lh" or "rh").
+
+**Returns:**
+
+- *const FsSurface &* — `FsSurface` related to the parameter identifier.
+
+---
+
+### operator[](idt)
+
+Subscript operator [] to access surface by identifier.
+
+**Parameters:**
+
+- **idt** : *QString*
+  the hemisphere identifier ("lh" or "rh").
+
+**Returns:**
+
+- *FsSurface &* — `FsSurface` related to the parameter identifier.
+
+---
+
+### size()
+
+Returns number of loaded hemispheres.
+
+**Returns:**
+
+- *qint32* — number of loaded hemispheres.
+
+---
+
+## Static Methods
+
+### read(p_sLHFileName, p_sRHFileName, p_SurfaceSet)
+
+Reads different surface files and assembles them to a `FsSurfaceSet`.
+
+**Parameters:**
+
+- **p_sLHFileName** : *const QString &*
+  Left hemisphere surface file.
+
+- **p_sRHFileName** : *const QString &*
+  Right hemisphere surface file.
+
+- **p_SurfaceSet** : *FsSurfaceSet &*
+  The read surface set.
+
+**Returns:**
+
+- *bool* — true if succesfull, false otherwise.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

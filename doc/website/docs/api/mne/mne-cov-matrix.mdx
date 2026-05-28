@@ -1,0 +1,353 @@
+---
+id: mne-cov-matrix
+title: "MNELIB::MNECovMatrix"
+sidebar_label: MNECovMatrix
+sidebar_position: 14
+---
+
+# MNECovMatrix
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_cov_matrix.h`
+
+`#include <mne/mne_cov_matrix.h>`
+
+```cpp
+class MNELIB::MNECovMatrix
+```
+
+Covariance matrix storage.
+
+Stores a noise or source covariance matrix in dense (packed lower-triangle), diagonal, or sparse form together with its eigendecomposition and associated metadata (projection operator, SSS info, channel classification, bad channels).
+
+---
+
+## Public Methods
+
+### MNECovMatrix(p_kind, p_ncov, p_names, p_cov, p_cov_diag, p_cov_sparse)
+
+Construct a covariance matrix.
+
+**Parameters:**
+
+- **p_kind** : *int*
+  Covariance kind (sensor or source).
+
+- **p_ncov** : *int*
+  Dimension (number of channels).
+
+- **p_names** : *const QStringList &*
+  Channel names.
+
+- **p_cov** : *const Eigen::VectorXd &*
+  Packed lower-triangle data (may be empty).
+
+- **p_cov_diag** : *const Eigen::VectorXd &*
+  Diagonal data (may be empty).
+
+- **p_cov_sparse** : *FIFFLIB::FiffSparseMatrix **
+  Sparse covariance data (may be nullptr).
+
+---
+
+### ~MNECovMatrix()
+
+Destructor.
+
+---
+
+### dup()
+
+Create a deep copy of this covariance matrix including data, channel classes, bad channel list, projection, and SSS info.
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNECovMatrix &gt;* — A newly allocated copy.
+
+---
+
+### is_diag()
+
+Check whether this covariance matrix is stored in diagonal form.
+
+**Returns:**
+
+- *int* — Non-zero if diagonal, zero if full or sparse.
+
+---
+
+### add_inv()
+
+Compute the inverse square-root of eigenvalues (or diagonal elements) for whitening, storing the result in inv_lambda.
+
+**Returns:**
+
+- *int* — OK on success, FAIL if neither diagonal nor decomposed.
+
+---
+
+### condition(rank_threshold, use_rank)
+
+Condition the covariance matrix by eigendecomposition with per-channel-type scaling, zeroing sub-threshold eigenvalues, and reconstructing.
+
+**Parameters:**
+
+- **rank_threshold** : *float*
+  Eigenvalue threshold ratio for rank estimation.
+
+- **use_rank** : *int*
+  If positive, override the automatic rank estimate.
+
+**Returns:**
+
+- *int* — The estimated rank, or FAIL on error.
+
+---
+
+### decompose_eigen_small(p_small, use_rank)
+
+Perform eigenvalue decomposition of the covariance matrix, zero sub-threshold eigenvalues, classify eigenvectors by channel type, and compute inverse square-roots for whitening.
+
+**Parameters:**
+
+- **p_small** : *float*
+  Eigenvalue threshold (negative uses default).
+
+- **use_rank** : *int*
+  If positive, override automatic rank estimate.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### decompose_eigen()
+
+Convenience wrapper for `decompose_eigen_small()` with default threshold and no rank override.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### classify_channels(chs, nchan)
+
+Assign channel-type classifications (MEG mag, MEG grad, EEG) to channels in this covariance matrix, based on channel information.
+
+**Parameters:**
+
+- **chs** : *const QList&lt; FIFFLIB::FiffChInfo &gt; &*
+  Channel information list.
+
+- **nchan** : *int*
+  Number of channels in chs.
+
+**Returns:**
+
+- *int* — OK on success, FAIL if channel information is not available.
+
+---
+
+### whiten_vector(data, whitened_data, nchan)
+
+Apply whitening to a data vector using the inverse square-root eigenvalues stored in this covariance matrix.
+
+**Parameters:**
+
+- **data** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Input data vector.
+
+- **whitened_data** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Whitened output vector (may alias data for in-place).
+
+- **nchan** : *int*
+  Number of channels.
+
+**Returns:**
+
+- *int* — OK on success, FAIL if dimensions are incompatible.
+
+---
+
+### regularize(regs)
+
+Regularize different channel types of the covariance matrix by adding a fraction of the average diagonal value for each channel class.
+
+**Parameters:**
+
+- **regs** : *const Eigen::Vector3f &*
+  Regularization fractions for [MEG_MAG, MEG_GRAD, EEG].
+
+---
+
+### revert_to_diag()
+
+Revert a full (lower-triangle packed) covariance matrix to its diagonal elements, discarding off-diagonal data and eigendecomposition.
+
+---
+
+### pick_chs_omit(new_names, new_ncov, omit_meg_eeg, chs)
+
+Pick designated channels from this covariance matrix, optionally omitting MEG-EEG cross-correlations.
+
+**Parameters:**
+
+- **new_names** : *const QStringList &*
+  Names of channels to pick.
+
+- **new_ncov** : *int*
+  Number of channels to pick.
+
+- **omit_meg_eeg** : *int*
+  If non-zero, zero out MEG-EEG cross entries.
+
+- **chs** : *const QList&lt; FIFFLIB::FiffChInfo &gt; &*
+  Channel information list (for MEG/EEG classification).
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNECovMatrix &gt;* — A new covariance matrix with only the selected channels, or nullptr on error.
+
+---
+
+## Static Methods
+
+### create_dense(kind, ncov, names, cov)
+
+Create a dense (full lower-triangle packed) covariance matrix.
+
+**Parameters:**
+
+- **kind** : *int*
+  Covariance kind (sensor or source).
+
+- **ncov** : *int*
+  Dimension (number of channels).
+
+- **names** : *const QStringList &*
+  Channel names.
+
+- **cov** : *const Eigen::VectorXd &*
+  Packed lower-triangle data (length ncov*(ncov+1)/2). Ownership transferred.
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNECovMatrix &gt;* — A new covariance matrix.
+
+---
+
+### create_diag(kind, ncov, names, cov_diag)
+
+Create a diagonal covariance matrix.
+
+**Parameters:**
+
+- **kind** : *int*
+  Covariance kind (sensor or source).
+
+- **ncov** : *int*
+  Dimension (number of channels).
+
+- **names** : *const QStringList &*
+  Channel names.
+
+- **cov_diag** : *const Eigen::VectorXd &*
+  Diagonal data (ncov elements).
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNECovMatrix &gt;* — A new covariance matrix.
+
+---
+
+### create_sparse(kind, ncov, names, cov_sparse)
+
+Create a sparse covariance matrix.
+
+**Parameters:**
+
+- **kind** : *int*
+  Covariance kind (sensor or source).
+
+- **ncov** : *int*
+  Dimension (number of channels).
+
+- **names** : *const QStringList &*
+  Channel names.
+
+- **cov_sparse** : *FIFFLIB::FiffSparseMatrix **
+  Sparse covariance data (note: data are floats).
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNECovMatrix &gt;* — A new covariance matrix.
+
+---
+
+### create(kind, ncov, names, cov, cov_diag)
+
+Create a covariance matrix from either dense or diagonal data.
+
+**Parameters:**
+
+- **kind** : *int*
+  Covariance kind (sensor or source).
+
+- **ncov** : *int*
+  Dimension (number of channels).
+
+- **names** : *const QStringList &*
+  Channel names.
+
+- **cov** : *const Eigen::VectorXd &*
+  Packed lower-triangle data (may be empty).
+
+- **cov_diag** : *const Eigen::VectorXd &*
+  Diagonal data (may be empty).
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNECovMatrix &gt;* — A new covariance matrix.
+
+---
+
+### read(name, kind)
+
+Read a covariance matrix of the specified kind from a FIFF file.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Path to the FIFF file.
+
+- **kind** : *int*
+  Covariance kind (e.g. FIFFV_MNE_SENSOR_COV).
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNECovMatrix &gt;* — The covariance matrix, or nullptr on failure.
+
+---
+
+### lt_packed_index(j, k)
+
+Compute the linear index into a symmetric lower-triangular packed storage array for element (j, k).
+
+**Parameters:**
+
+- **j** : *int*
+  Row index.
+
+- **k** : *int*
+  Column index.
+
+**Returns:**
+
+- *int* — The packed storage index.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

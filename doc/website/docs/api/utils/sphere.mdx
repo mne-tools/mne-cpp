@@ -1,0 +1,129 @@
+---
+id: sphere
+title: "UTILSLIB::Sphere"
+sidebar_label: Sphere
+sidebar_position: 48
+---
+
+# Sphere
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `math/sphere.h`
+
+`#include <utils/sphere.h>`
+
+```cpp
+class UTILSLIB::Sphere
+```
+
+Best-fit sphere primitive carrying centre and radius, with static factories for the closed-form algebraic fit (Jennings) and the Nelder–Mead geometric-residual refinement.
+
+Used to build spherical head models, fit HPI coils and digitiser scalps.
+
+3-D sphere value type with algebraic and Nelder–Mead best-fit factories.
+
+---
+
+## Public Methods
+
+### Sphere(center, radius)
+
+Constructs the `Sphere`.
+
+**Parameters:**
+
+- **center** : *const Eigen::Vector3f &*
+  The sphere's center.
+
+- **radius** : *float*
+  The sphere's radius.
+
+---
+
+### center()
+
+The center of the sphere.
+
+**Returns:**
+
+- *Eigen::Vector3f &* — reference to the sphere's center.
+
+---
+
+### radius()
+
+The radius of the sphere.
+
+**Returns:**
+
+- *float &* — reference to the sphere's radius.
+
+---
+
+## Static Methods
+
+### fit_sphere(points)
+
+Fits a sphere to a point cloud.
+
+Algorithm by Alan Jennings, University of Dayton
+
+**Parameters:**
+
+- **points** : *const Eigen::MatrixX3f &*
+  n x 3 matrix of cartesian data to fit the sphere to.
+
+**Returns:**
+
+- *Sphere* — the fitted sphere.
+
+---
+
+### fit_sphere_simplex(points, simplex_size)
+
+Fits a sphere to a point cloud.
+
+**Parameters:**
+
+- **points** : *const Eigen::MatrixX3f &*
+  n x 3 matrix of cartesian data to fit the sphere to.
+
+- **simplex_size** : *double*
+  The simplex size.
+
+**Returns:**
+
+- *Sphere* — the fitted sphere.
+
+---
+
+### fit_sphere_to_points(rr, simplex_size, r0, R)
+
+Fits a sphere to a point cloud.
+
+**Parameters:**
+
+- **rr** : *const Eigen::MatrixXf &*
+  n x 3 matrix of cartesian data to fit the sphere to.
+
+- **simplex_size** : *float*
+  The simplex size.
+
+- **r0** : *Eigen::VectorXf &*
+  center (1 x 3 matrix) of the sphere.
+
+- **R** : *float &*
+  Radius.
+
+**Returns:**
+
+- *bool* — true if successful.
+
+---
+
+### fit_sphere_to_points(rr, np, simplex_size, r0, R)
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

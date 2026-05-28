@@ -1,0 +1,105 @@
+---
+id: abstract-view
+title: "DISPLIB::AbstractView"
+sidebar_label: AbstractView
+sidebar_position: 1
+---
+
+# AbstractView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/abstractview.h`
+
+`#include <disp/abstractview.h>`
+
+```cpp
+class DISPLIB::AbstractView
+```
+
+Base widget for every dockable settings panel in `DISPLIB`; centralises GUI / processing mode and settings persistence.
+
+Subclasses override `updateGuiMode`, `updateProcessingMode` and `saveSettings` / `loadSettings` to react to mode changes and to round-trip their state through `QSettings`. The class deliberately exposes no domain-specific API.
+
+---
+
+## Public Methods
+
+### AbstractView(parent, f)
+
+Constructs a `AbstractView` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  parent of widget.
+
+---
+
+### setGuiMode(mode)
+
+Sets the GUI of this view to a specific mode.
+
+Clinical = 0, Research = 0.
+
+**Parameters:**
+
+- **mode** : *GuiMode*
+  The new mode.
+
+---
+
+### setProcessingMode(mode)
+
+Sets the GUI of this view to a specific mode.
+
+RealTime = 0, Offline = 0.
+
+**Parameters:**
+
+- **mode** : *ProcessingMode*
+  The new mode.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### updateGuiMode(mode)
+
+Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
+
+**Parameters:**
+
+- **mode** : *GuiMode*
+  The new mode (Clinical=0, Research=1).
+
+---
+
+### updateProcessingMode(mode)
+
+Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
+
+**Parameters:**
+
+- **mode** : *ProcessingMode*
+  The new mode (RealTime=0, Offline=1).
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,78 @@
+---
+id: graph
+title: "DISPLIB::Graph"
+sidebar_label: Graph
+sidebar_position: 35
+---
+
+# Graph
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/plots/graph.h`
+
+`#include <disp/graph.h>`
+
+```cpp
+class DISPLIB::Graph
+```
+
+Common base widget providing title, axis labels and resize handling for `DISPLIB`'s QPainter plots.
+
+Subclasses such as `Plot` and `ImageSc` paint inside the content rectangle that `Graph` leaves free after stamping the title bar at the top and the x / y axis labels on the bottom and left margins.
+
+---
+
+## Public Methods
+
+### Graph(parent)
+
+The constructor.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  The parent widget.
+
+---
+
+### init()
+
+Init this class.
+
+---
+
+### setTitle(p_sTitle)
+
+Sets the scaled image view title.
+
+**Parameters:**
+
+- **p_sTitle** : *const QString &*
+  The title.
+
+---
+
+### setXLabel(p_sXLabel)
+
+Sets the label of the y axes.
+
+**Parameters:**
+
+- **p_sXLabel** : *const QString &*
+  The x axes label.
+
+---
+
+### setYLabel(p_sYLabel)
+
+Sets the label of the y axes.
+
+**Parameters:**
+
+- **p_sXLabel**
+  The y axes label.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

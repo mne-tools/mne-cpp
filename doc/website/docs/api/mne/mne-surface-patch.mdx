@@ -1,0 +1,45 @@
+---
+id: mne-surface-patch
+title: "MNELIB::MNESurfacePatch"
+sidebar_label: MNESurfacePatch
+sidebar_position: 55
+---
+
+# MNESurfacePatch
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_surface_patch.h`
+
+`#include <mne/mne_surface_patch.h>`
+
+```cpp
+class MNELIB::MNESurfacePatch
+```
+
+Cortical surface patch linking a set of vertices to a single source space point.
+
+Each patch represents a contiguous region of a FreeSurfer cortical surface. It stores the mapping between patch-local and full-surface vertex/triangle indices and marks which vertices lie on the patch border.
+
+---
+
+## Public Methods
+
+### MNESurfacePatch(np)
+
+Constructs a patch with `np` vertices.
+
+**Parameters:**
+
+- **np** : *int*
+  Number of vertices in the patch (0 for an empty patch).
+
+---
+
+### ~MNESurfacePatch()
+
+Destroys the `MNESurfacePatch`.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

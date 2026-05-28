@@ -1,0 +1,250 @@
+---
+id: fiff-dir-node
+title: "FIFFLIB::FiffDirNode"
+sidebar_label: FiffDirNode
+sidebar_position: 21
+---
+
+# FiffDirNode
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_dir_node.h`
+
+`#include <fiff/fiff_dir_node.h>`
+
+```cpp
+class FIFFLIB::FiffDirNode
+```
+
+Recursive FIFF block-tree node: block kind, block ID, directly contained directory entries and child sub-blocks.
+
+Each node corresponds to one `FIFFB_BLOCK_START` ... `FIFFB_BLOCK_END` pair in the on-disk tag stream. The full tree is built once by FiffStream::make_dir_tree after the directory tag is parsed, and is then traversed by every higher-level reader (`FiffInfo`, FiffRawData, `FiffEvoked`, `FiffCov`, ...) via `dir_tree_find`. The static `copy_tree` helper streams an entire sub-tree from one `FiffStream` to another preserving block IDs, which is how MNE-CPP writes derived files that keep provenance back to the source recording.
+
+---
+
+## Public Methods
+
+### FiffDirNode()
+
+Constructors the directory tree structure.
+
+---
+
+### FiffDirNode(p_FiffDirTree)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FiffDirTree** : *const FiffDirNode **
+  Directory tree structure which should be copied.
+
+---
+
+### ~FiffDirNode()
+
+Destroys the fiffDirTree.
+
+---
+
+### isEmpty()
+
+Returns true if directory tree structure contains no data.
+
+**Returns:**
+
+- *bool* — true if directory tree structure is empty.
+
+---
+
+### dir_tree_find(p_kind)
+
+Find nodes of the given kind from a directory tree structure.
+
+**Parameters:**
+
+- **p_kind** : *fiff_int_t*
+  the given kind.
+
+**Returns:**
+
+- *QList&lt; FiffDirNode::SPtr &gt;* — list of the found nodes.
+
+---
+
+### find_tag(p_pStream, findkind, p_pTag)
+
+Definition of the find_tag function in various files e.g.
+
+fiff_read_named_matrix.m,
+
+Founds a tag of a given kind within a tree, and reeds it from file. Note: In difference to mne-matlab this is not a static function. This is a method of the `FiffDirNode` class, that's why a tree object doesn't need to be handed to the function.
+
+**Parameters:**
+
+- **p_pStream** : *QSharedPointer&lt;FiffStream&gt; &*
+  the opened fif file.
+
+- **findkind** : *fiff_int_t*
+  the kind which should be found.
+
+- **p_pTag** : *std::unique_ptr&lt; FiffTag &gt; &*
+  the found tag.
+
+**Returns:**
+
+- *bool* — true if found, false otherwise.
+
+---
+
+### find_tag(p_pStream, findkind, p_pTag)
+
+Definition of the find_tag function in various files e.g.
+
+fiff_read_named_matrix.m,
+
+Founds a tag of a given kind within a tree, and reeds it from file. Note: In difference to mne-matlab this is not a static function. This is a method of the `FiffDirNode` class, that's why a tree object doesn't need to be handed to the function.
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  the opened fif file.
+
+- **findkind** : *fiff_int_t*
+  the kind which should be found.
+
+- **p_pTag** : *std::unique_ptr&lt; FiffTag &gt; &*
+  the found tag.
+
+**Returns:**
+
+- *bool* — true if found, false otherwise.
+
+---
+
+### has_tag(findkind)
+
+Definition of the has_tag function in fiff_read_named_matrix.m.
+
+**Parameters:**
+
+- **findkind** : *fiff_int_t*
+  kind to find.
+
+**Returns:**
+
+- *bool* — true when fiff_dir_node contains kind.
+
+---
+
+### has_kind(p_kind)
+
+Checks whether a `FiffDirNode` has a specific kind.
+
+**Parameters:**
+
+- **findkind**
+  kind to find.
+
+**Returns:**
+
+- *bool* — true when fiff_dir_node contains kind.
+
+---
+
+### print(indent)
+
+Prints elements of a tree.
+
+**Parameters:**
+
+- **indent** : *int*
+  number of intendations.
+
+---
+
+### nent()
+
+Returns the number of entries in this node.
+
+**Returns:**
+
+- *fiff_int_t* — Number of entries in this node.
+
+---
+
+### nchild()
+
+Returns the number of child nodes.
+
+**Returns:**
+
+- *fiff_int_t* — Number of child nodes.
+
+---
+
+## Static Methods
+
+### copy_tree(p_pStreamIn, in_id, p_Nodes, p_pStreamOut)
+
+Copies directory subtrees from fidin to fidout.
+
+**Parameters:**
+
+- **p_pStreamIn** : *QSharedPointer&lt;FiffStream&gt; &*
+  fiff file to copy from.
+
+- **in_id** : *const FiffId &*
+  file id description.
+
+- **p_Nodes** : *const QList&lt; QSharedPointer&lt;FiffDirNode&gt; &gt; &*
+  subtree directories to be copied.
+
+- **p_pStreamOut** : *QSharedPointer&lt;FiffStream&gt; &*
+  fiff file to write to.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### explain_block(kind)
+
+Try to explain a block...
+
+**Parameters:**
+
+- **kind** : *int*
+  Block kind.
+
+---
+
+### explain(kind)
+
+Try to explain...
+
+**Parameters:**
+
+- **kind** : *int*
+  directory kind.
+
+---
+
+### get_tag_explanation(kind)
+
+Get textual explanation of a tag.
+
+**Parameters:**
+
+- **kind** : *int*
+  directory kind.
+
+**Returns:**
+
+- *const char ** — Pointer to the static string explaining the tag, or nullptr if not found.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

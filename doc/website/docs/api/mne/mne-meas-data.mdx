@@ -1,0 +1,133 @@
+---
+id: mne-meas-data
+title: "MNELIB::MNEMeasData"
+sidebar_label: MNEMeasData
+sidebar_position: 26
+---
+
+# MNEMeasData
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_meas_data.h`
+
+`#include <mne/mne_meas_data.h>`
+
+```cpp
+class MNELIB::MNEMeasData
+```
+
+Measurement data container for `MNE` inverse and dipole-fit computations.
+
+Replaces `*mneMeasData` / `mneMeasDataRec` from MNE-C ``mne_types.h``. Holds channel information, coordinate transforms, projection operators, and one or more `MNEMeasDataSet` epochs loaded from a FIFF evoked-response file.
+
+---
+
+## Public Methods
+
+### MNEMeasData()
+
+Constructs an empty measurement data container.
+
+Refactored from `mne_new_meas_data` (mne_read_data.c).
+
+---
+
+### ~MNEMeasData()
+
+Destroys the measurement data and all owned data sets.
+
+Refactored from `mne_free_meas_data` (mne_read_data.c).
+
+---
+
+### adjust_baselines(bmin, bmax)
+
+Adjust baseline offset of the current data set.
+
+Subtracts the mean over [`bmin`, `bmax`] from every channel and accumulates the offset in `MNEMeasDataSet::baselines`.
+
+Refactored from `mne_adjust_baselines` (mne_apply_baselines.c).
+
+**Parameters:**
+
+- **bmin** : *float*
+  Baseline window start (seconds).
+
+- **bmax** : *float*
+  Baseline window end (seconds).
+
+---
+
+## Static Methods
+
+### mne_read_meas_data_add(name, set, op, fwd, namesp, nnamesp, add_to)
+
+Read an evoked-response data set and append it to an existing container.
+
+If `add_to` is `nullptr` a new `MNEMeasData` is created; otherwise the loaded epoch is appended to `add_to's` set list.
+
+Refactored from `mne_read_meas_data_add` (mne_read_data.c).
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Path to the FIFF measurement file.
+
+- **set** : *int*
+  1-based data-set index to load.
+
+- **op** : *MNEInverseOperator **
+  Inverse operator for consistency checks (may be `nullptr`).
+
+- **fwd** : *MNENamedMatrix **
+  Forward operator for consistency checks (may be `nullptr`).
+
+- **namesp** : *const QStringList &*
+  Explicit channel name list (fallback if `op` and `fwd` are `nullptr`).
+
+- **nnamesp** : *int*
+  Number of entries in `namesp`.
+
+- **add_to** : *MNEMeasData **
+  Existing container to append to, or `nullptr` to create a new one.
+
+**Returns:**
+
+- *MNEMeasData ** — Pointer to the (new or existing) container, or `nullptr` on failure.
+
+---
+
+### mne_read_meas_data(name, set, op, fwd, namesp, nnamesp)
+
+Read an evoked-response data set into a new container.
+
+Convenience wrapper around `mne_read_meas_data_add()` with `add_to` = `nullptr`.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Path to the FIFF measurement file.
+
+- **set** : *int*
+  1-based data-set index to load.
+
+- **op** : *MNEInverseOperator **
+  Inverse operator for consistency checks (may be `nullptr`).
+
+- **fwd** : *MNENamedMatrix **
+  Forward operator for consistency checks (may be `nullptr`).
+
+- **namesp** : *const QStringList &*
+  Explicit channel name list.
+
+- **nnamesp** : *int*
+  Number of entries in `namesp`.
+
+**Returns:**
+
+- *MNEMeasData ** — Pointer to the new container, or `nullptr` on failure.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

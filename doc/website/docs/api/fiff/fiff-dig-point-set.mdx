@@ -1,0 +1,260 @@
+---
+id: fiff-dig-point-set
+title: "FIFFLIB::FiffDigPointSet"
+sidebar_label: FiffDigPointSet
+sidebar_position: 18
+---
+
+# FiffDigPointSet
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_dig_point_set.h`
+
+`#include <fiff/fiff_dig_point_set.h>`
+
+```cpp
+class FIFFLIB::FiffDigPointSet
+```
+
+Collection of `FiffDigPoint` records as parsed from a FIFFB_ISOTRAK block.
+
+Indexed access plus convenience filters (cardinals only, HPI only, EEG only, extras only) so registration code can pick out the subset it needs without re-walking the underlying QList of dig points.
+
+---
+
+## Public Methods
+
+### FiffDigPointSet()
+
+Constructs a `FiffDigPointSet` object.
+
+---
+
+### FiffDigPointSet(p_FiffDigPointSet)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_FiffDigPointSet** : *const FiffDigPointSet &*
+  `FiffDigPointSet` which should be copied.
+
+---
+
+### FiffDigPointSet(pointList)
+
+Construct `FiffDigPointSet` based on input pointList.
+
+**Parameters:**
+
+- **pointList** : *QList&lt; FIFFLIB::FiffDigPoint &gt;*
+  list of digitizer points
+
+---
+
+### FiffDigPointSet(p_IODevice)
+
+Constructs a `FiffDigPointSet` by reading from a IO device.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  IO device to read the digitizer point set from.
+
+---
+
+### ~FiffDigPointSet()
+
+Destroys the `FiffDigPointSet`.
+
+---
+
+### clear()
+
+Initializes `FiffDigPointSet`.
+
+---
+
+### isEmpty()
+
+True if `FiffDigPointSet` is empty.
+
+**Returns:**
+
+- *bool* — true if `FiffDigPointSet` is empty.
+
+---
+
+### size()
+
+Returns the number of stored FiffDigPoints.
+
+**Returns:**
+
+- *qint32* — number of stored FiffDigPoints.
+
+---
+
+### write(p_IODevice)
+
+Writes the `FiffDigPointSet` to a FIFF file.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  IO device to write the digitizer point set to.
+
+---
+
+### write(filePath, errorMessage)
+
+Convenience overload: write the digitizer point set to a path on disk.
+
+Verifies that the destination directory exists and that the file was actually produced. The file is opened in WriteOnly|Truncate mode.
+
+**Parameters:**
+
+- **filePath** : *const QString &*
+  Destination .fif file path.
+
+- **errorMessage** : *QString **
+  Optional, populated on failure.
+
+**Returns:**
+
+- *bool* — true on success, false on error.
+
+---
+
+### writeToStream(p_pStream)
+
+Writes the `FiffDigPointSet` to a FIFF stream.
+
+**Parameters:**
+
+- **p_pStream** : *FiffStream **
+  Pointer to the FIFF stream to write to.
+
+---
+
+### operator[](idx)
+
+Subscript operator [] to access `FiffDigPoint` by index.
+
+**Parameters:**
+
+- **idx** : *qint32*
+  the `FiffDigPoint` index.
+
+**Returns:**
+
+- *const FiffDigPoint &* — `FiffDigPoint` related to the parameter index.
+
+---
+
+### operator[](idx)
+
+Subscript operator [] to access `FiffDigPoint` by index.
+
+**Parameters:**
+
+- **idx** : *qint32*
+  the `FiffDigPoint` index.
+
+**Returns:**
+
+- *FiffDigPoint &* — `FiffDigPoint` related to the parameter index.
+
+---
+
+### pickTypes(includeTypes)
+
+Pick the wanted types from this set and returns them.
+
+**Parameters:**
+
+- **includeTypes** : *QList&lt; int &gt;*
+  The include types (FIFFV_POINT_HPI, FIFFV_POINT_CARDINAL, FIFFV_POINT_EEG, FIFFV_POINT_ECG, FIFFV_POINT_EXTRA, FIFFV_POINT_LPA, FIFFV_POINT_NASION, FIFFV_POINT_RPA).
+
+**Returns:**
+
+- *FiffDigPointSet* — `FiffDigPointSet`.
+
+---
+
+### operator&lt;&lt;(dig)
+
+Subscript operator &lt;&lt; to add a new `FiffDigPoint`.
+
+**Parameters:**
+
+- **dig** : *const FiffDigPoint &*
+  `FiffDigPoint` to be added.
+
+**Returns:**
+
+- *FiffDigPointSet &* — `FiffDigPointSet`.
+
+---
+
+### operator&lt;&lt;(dig)
+
+Subscript operator &lt;&lt; to add a new `FiffDigPoint`.
+
+**Parameters:**
+
+- **dig** : *const FiffDigPoint **
+  `FiffDigPoint` to be added.
+
+**Returns:**
+
+- *FiffDigPointSet &* — `FiffDigPointSet`.
+
+---
+
+### applyTransform(coordTrans, bApplyInverse)
+
+Apply a transformation matrix on the 3D position of the digitized points.
+
+**Parameters:**
+
+- **coordTrans** : *const FiffCoordTrans &*
+  `FiffCoordTrans` which is to be applied.
+
+- **bApplyInverse** : *bool*
+  Whether to apply the inverse. False by default.
+
+---
+
+### getList()
+
+Returns list of digitizer point the set contains.
+
+**Returns:**
+
+- *QList&lt; FiffDigPoint &gt;* — list of digitizer points
+
+---
+
+## Static Methods
+
+### readFromStream(p_Stream, p_Dig)
+
+Reads `FiffDigPointSet` from a fif file.
+
+**Parameters:**
+
+- **p_Stream** : *FiffStream::SPtr &*
+  The opened fif file.
+
+- **p_Dig** : *FiffDigPointSet &*
+  The read digitizer point set.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,40 @@
+---
+id: bids-view-model
+title: "DISPLIB::BidsViewModel"
+sidebar_label: BidsViewModel
+sidebar_position: 11
+---
+
+# BidsViewModel
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/helpers/bidsviewmodel.h`
+
+`#include <disp/bidsviewmodel.h>`
+
+```cpp
+class DISPLIB::BidsViewModel
+```
+
+QStandardItemModel mirroring the BIDS dataset hierarchy (subjects / sessions / runs / derivatives).
+
+Rebuilds itself from a top-level dataset path; item roles carry the absolute path, BIDS entity type and loadable-by-this-app flag so the host `BidsView` can dispatch double-clicks without re-walking the file system.
+
+---
+
+## Public Methods
+
+### BidsViewModel(pParent)
+
+Constructs the Analyze Data Model.
+
+---
+
+### ~BidsViewModel()
+
+Destroys the Analyze Data Model.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

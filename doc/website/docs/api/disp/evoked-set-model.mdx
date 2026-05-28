@@ -1,0 +1,402 @@
+---
+id: evoked-set-model
+title: "DISPLIB::EvokedSetModel"
+sidebar_label: EvokedSetModel
+sidebar_position: 27
+---
+
+# EvokedSetModel
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/helpers/evokedsetmodel.h`
+
+`#include <disp/evokedsetmodel.h>`
+
+```cpp
+class DISPLIB::EvokedSetModel
+```
+
+QAbstractTableModel wrapping a `FiffEvokedSet` (one row per channel, one column per condition).
+
+Propagates baseline-correction, SSP-projection and bad-channel updates so connected views (`ButterflyView`, `AverageLayoutView`) stay in sync with the latest pre-processing settings.
+
+---
+
+## Public Methods
+
+### EvokedSetModel(parent)
+
+Constructs an real-time multi sample array table model for the given parent.
+
+**Parameters:**
+
+- **parent** : *QObject **
+  parent of the table model.
+
+---
+
+### ~EvokedSetModel()
+
+---
+
+### isInit()
+
+Returns whether this class is initalized.
+
+**Returns:**
+
+- *bool* — Flag specifying whether this class is initalized.
+
+---
+
+### getNumSamples()
+
+Returns the number of samples.
+
+**Returns:**
+
+- *qint32* — The number of samples.
+
+---
+
+### rowCount(parent)
+
+Returns the number of rows under the given parent.
+
+When the parent is valid it means that rowCount is returning the number of children of parent.
+
+**Parameters:**
+
+- **parent** : *const QModelIndex &*
+  not used.
+
+**Returns:**
+
+- *int* — number of rows.
+
+---
+
+### columnCount(parent)
+
+Returns the number of columns for the children of the given parent.
+
+**Parameters:**
+
+- **parent** : *const QModelIndex &*
+  not used.
+
+**Returns:**
+
+- *int* — number of columns.
+
+---
+
+### data(row, column, role)
+
+Data for the row and column and given display role.
+
+**Parameters:**
+
+- **row** : *int*
+  index row.
+
+- **column** : *int*
+  index column.
+
+- **role** : *int*
+  display role to access.
+
+**Returns:**
+
+- *QVariant* — the accessed data.
+
+---
+
+### data(index, role)
+
+Returns the data stored under the given role for the item referred to by the index.
+
+**Parameters:**
+
+- **index** : *const QModelIndex &*
+  determines item location.
+
+- **role** : *int*
+  role to return.
+
+**Returns:**
+
+- *QVariant* — accessed data.
+
+---
+
+### headerData(section, orientation, role)
+
+Returns the data for the given role and section in the header with the specified orientation.
+
+**Parameters:**
+
+- **section** : *int*
+  For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
+
+- **orientation** : *Qt::Orientation*
+  Qt::Horizontal or Qt::Vertical.
+
+- **role** : *int*
+  role to show.
+
+**Returns:**
+
+- *QVariant* — accessed eader data.
+
+---
+
+### init()
+
+---
+
+### setEvokedSet(pEvokedSet)
+
+Sets corresponding evoked set.
+
+**Parameters:**
+
+- **pEvokedSet** : *QSharedPointer&lt;FIFFLIB::FiffEvokedSet&gt;*
+  The evoked set.
+
+---
+
+### getEvokedSet()
+
+---
+
+### updateData()
+
+Update stored data.
+
+---
+
+### getAverageColor()
+
+Get the current average colors.
+
+**Returns:**
+
+- *QSharedPointer&lt; QMap&lt; QString, QColor &gt; &gt;* — Pointer to the current average colors.
+
+---
+
+### getAverageActivation()
+
+Get the current average activations.
+
+**Returns:**
+
+- *QSharedPointer&lt; QMap&lt; QString, bool &gt; &gt;* — Pointer to the current average activations.
+
+---
+
+### setAverageColor(qMapAverageColor)
+
+Set the average colors.
+
+**Parameters:**
+
+- **qMapAverageColor** : *const QSharedPointer&lt; QMap&lt; QString, QColor &gt; &gt;*
+  Pointer to the new average colors.
+
+---
+
+### setAverageActivation(qMapAverageActivation)
+
+Set the average activations.
+
+**Parameters:**
+
+- **qMapAverageActivation** : *const QSharedPointer&lt; QMap&lt; QString, bool &gt; &gt;*
+  Pointer to the new average activations.
+
+---
+
+### getKind(row)
+
+Returns the kind of a given channel number.
+
+**Parameters:**
+
+- **row** : *qint32*
+  row number which correspodns to a given channel.
+
+**Returns:**
+
+- *FIFFLIB::fiff_int_t* — kind of given channel number.
+
+---
+
+### getIsChannelBad(row)
+
+Returns true or fals whether the provided channel is bad.
+
+**Parameters:**
+
+- **row** : *qint32*
+  row number which correspodns to a given channel.
+
+**Returns:**
+
+- *bool* — Returns true or fals whether the provided channel is bad.
+
+---
+
+### getUnit(row)
+
+Returns the unit of a given channel number.
+
+**Parameters:**
+
+- **row** : *qint32*
+  row number which correspodns to a given channel.
+
+**Returns:**
+
+- *FIFFLIB::fiff_int_t* — unit of given channel number.
+
+---
+
+### getCoil(row)
+
+Returns the coil type of a given channel number.
+
+**Parameters:**
+
+- **row** : *qint32*
+  row number which correspodns to a given channel.
+
+**Returns:**
+
+- *FIFFLIB::fiff_int_t* — coil type of given channel number.
+
+---
+
+### getIdxSelMap()
+
+Returns a map which conatins the channel idx and its corresponding selection status.
+
+**Returns:**
+
+- *const QMap&lt; qint32, qint32 &gt; &* — the channel idx to selection status.
+
+---
+
+### getNumberOfTimeSpacers()
+
+Returns the current number for the time spacers.
+
+**Returns:**
+
+- *int* — the current number for the time spacers.
+
+---
+
+### getBaselineInfo()
+
+Returns the current baseline information.
+
+**Returns:**
+
+- *QPair&lt; QVariant, QVariant &gt;* — the current baseline information as a from to QPair.
+
+---
+
+### getNumAverages()
+
+Returns the current number of stored averages.
+
+**Returns:**
+
+- *int* — the current number of stored averages.
+
+---
+
+### getNumPreStimSamples()
+
+Returns the number of pre-stimulus samples.
+
+**Returns:**
+
+- *qint32* — the number of pre-stimulus samples.
+
+---
+
+### getSamplingFrequency()
+
+Returns the current sampling frequency.
+
+**Returns:**
+
+- *float* — the current sampling frequency.
+
+---
+
+### selectRows(selection)
+
+Selects the given list of channel indeces and unselect all other channels.
+
+**Parameters:**
+
+- **selection** : *const QList&lt; qint32 &gt; &*
+  channel index list to select.
+
+---
+
+### resetSelection()
+
+Resets the current selection (selects all channels).
+
+---
+
+### numVLines()
+
+Returns the number of vertical lines (one per second).
+
+**Returns:**
+
+- *qint32* — number of vertical lines.
+
+---
+
+### isFreezed()
+
+Returns current freezing status.
+
+**Returns:**
+
+- *bool* — the current freezing status.
+
+---
+
+### updateProjection(projs)
+
+Update projections.
+
+---
+
+### updateCompensator(to)
+
+Update the compensator.
+
+**Parameters:**
+
+- **to** : *int*
+  Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind).
+
+---
+
+### toggleFreeze()
+
+Toggle freeze for all channels when a channel is double clicked.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

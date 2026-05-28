@@ -1,0 +1,76 @@
+---
+id: stats-mc-correction
+title: "STSLIB::StatsMcCorrection"
+sidebar_label: StatsMcCorrection
+sidebar_position: 5
+---
+
+# StatsMcCorrection
+
+**Namespace:** `STATSLIB` &nbsp;·&nbsp; **Library:** Statistics Library &nbsp;·&nbsp; **Header:** `sts/sts_correction.h`
+
+`#include <sts/sts_correction.h>`
+
+```cpp
+class STSLIB::StatsMcCorrection
+```
+
+Multiple comparison correction methods.
+
+Bonferroni, Holm-Bonferroni and Benjamini-Hochberg FDR adjustments for mass-univariate p-value maps.
+
+---
+
+## Static Methods
+
+### bonferroni(pValues)
+
+Bonferroni correction: corrected_p = min(p * n, 1.0).
+
+**Parameters:**
+
+- **pValues** : *const Eigen::MatrixXd &*
+  Matrix of p-values.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Corrected p-values (same shape as input).
+
+---
+
+### holmBonferroni(pValues)
+
+Holm-Bonferroni step-down correction.
+
+**Parameters:**
+
+- **pValues** : *const Eigen::MatrixXd &*
+  Matrix of p-values.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Corrected p-values (same shape as input).
+
+---
+
+### fdr(pValues, alpha)
+
+False Discovery Rate (Benjamini-Hochberg) correction.
+
+**Parameters:**
+
+- **pValues** : *const Eigen::MatrixXd &*
+  Matrix of p-values.
+
+- **alpha** : *double*
+  Significance level (default 0.05, used for reference only; correction is applied regardless).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Corrected p-values (same shape as input).
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

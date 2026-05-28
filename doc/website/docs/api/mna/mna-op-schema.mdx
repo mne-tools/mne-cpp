@@ -1,0 +1,46 @@
+---
+id: mna-op-schema
+title: "MNALIB::MnaOpSchema"
+sidebar_label: MnaOpSchema
+sidebar_position: 5
+---
+
+# MnaOpSchema
+
+**Namespace:** `MNALIB` &nbsp;·&nbsp; **Library:** MNA Library (Modular Architecture) &nbsp;·&nbsp; **Header:** `mna/mna_op_schema.h`
+
+`#include <mna/mna_op_schema.h>`
+
+```cpp
+class MNALIB::MnaOpSchema
+```
+
+Contract declaring an operation's expected inputs, outputs, and attributes.
+
+Operation schema for graph validation.
+
+---
+
+## Public Methods
+
+### validate(node, errors)
+
+Validate that a node conforms to this schema.
+
+**Parameters:**
+
+- **node** : *const MnaNode &*
+  Node to validate.
+
+- **errors** : *QStringList **
+  Optional list of validation error messages.
+
+**Returns:**
+
+- *bool* — True if the node conforms to the schema.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

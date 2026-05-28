@@ -1,0 +1,379 @@
+---
+id: mne-proj-op
+title: "MNELIB::MNEProjOp"
+sidebar_label: MNEProjOp
+sidebar_position: 45
+---
+
+# MNEProjOp
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_proj_op.h`
+
+`#include <mne/mne_proj_op.h>`
+
+```cpp
+class MNELIB::MNEProjOp
+```
+
+Projection operator managing a set of linear projection items and the final compiled projector matrix.
+
+`MNEProjOp` aggregates zero or more `MNEProjItem` entries, each holding a named matrix of projection vectors. When the operator is compiled (make_projector), the individual items are orthogonalised into a single dense projector stored in `proj_data`.
+
+---
+
+## Public Methods
+
+### MNEProjOp()
+
+Default constructor.
+
+Creates an empty operator with no projection items.
+
+---
+
+### ~MNEProjOp()
+
+Destructor.
+
+---
+
+### free_proj()
+
+Release the compiled projector data.
+
+Clears `proj_data`, `names`, `nch`, and `nvec` without touching the underlying projection items.
+
+---
+
+### combine(from)
+
+Append all projection items from another operator.
+
+Each item's active_file flag is preserved.
+
+**Parameters:**
+
+- **from** : *MNEProjOp **
+  Source operator whose items are copied.
+
+**Returns:**
+
+- *MNEProjOp ** — Pointer to this operator.
+
+---
+
+### add_item_active(vecs, kind, desc, is_active)
+
+Add a projection item with an explicit active/inactive state.
+
+The projection kind (MEG/EEG) is auto-detected from channel names.
+
+**Parameters:**
+
+- **vecs** : *const MNENamedMatrix **
+  Named matrix holding the projection vectors.
+
+- **kind** : *int*
+  Projection kind constant.
+
+- **desc** : *const QString &*
+  Human-readable description of the projection.
+
+- **is_active** : *bool*
+  Whether the item is active on load.
+
+---
+
+### add_item(vecs, kind, desc)
+
+Add a projection item that is active by default.
+
+Convenience wrapper around `add_item_active()` with `is_active` = TRUE.
+
+**Parameters:**
+
+- **vecs** : *const MNENamedMatrix **
+  Named matrix holding the projection vectors.
+
+- **kind** : *int*
+  Projection kind constant.
+
+- **desc** : *const QString &*
+  Human-readable description of the projection.
+
+---
+
+### dup()
+
+Create a deep copy of this projection operator.
+
+Copies all items, their vectors, descriptions, and active states.
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNEProjOp &gt;* — A newly allocated copy. Caller takes ownership.
+
+---
+
+### affect(list, nlist)
+
+Count how many active projection vectors affect a given list of channel names.
+
+**Parameters:**
+
+- **list** : *const QStringList &*
+  List of channel names to test.
+
+- **nlist** : *int*
+  Number of channel names.
+
+**Returns:**
+
+- *int* — Number of projection vectors that affect at least one channel in the list (0 if none).
+
+---
+
+### affect_chs(chs, nch)
+
+Count how many active projection vectors affect the given channels.
+
+Convenience wrapper that extracts channel names and delegates to `affect()`.
+
+**Parameters:**
+
+- **chs** : *const QList&lt; FIFFLIB::FiffChInfo &gt; &*
+  Channel information list.
+
+- **nch** : *int*
+  Number of channels.
+
+**Returns:**
+
+- *int* — Number of affecting projection vectors (0 if none or nch == 0).
+
+---
+
+### project_vector(vec, do_complement)
+
+Apply the compiled projection operator to a data vector in-place.
+
+If `do_complement` is true, the projected components are subtracted from `vec` (signal cleaning). Otherwise, `vec` is replaced by the projection itself.
+
+**Parameters:**
+
+- **vec** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  Data vector of length nch.
+
+- **do_complement** : *bool*
+  If true, compute the complement (I - P) * vec.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on dimension mismatch.
+
+---
+
+### report_data(out, tag, list_data, exclude)
+
+Write a formatted summary of all projection items to a text stream, optionally including the full projection vector data while zeroing out excluded channels.
+
+**Parameters:**
+
+- **out** : *QTextStream &*
+  The text stream to write to.
+
+- **tag** : *const QString &*
+  Prefix string printed before each line.
+
+- **list_data** : *bool*
+  If true, print full vector data.
+
+- **exclude** : *const QStringList &*
+  Channel names to exclude from the display.
+
+---
+
+### report(out, tag)
+
+Write a one-line-per-item summary of all projection items to a text stream (no vector data).
+
+Convenience wrapper around `report_data()`.
+
+**Parameters:**
+
+- **out** : *QTextStream &*
+  The text stream to write to.
+
+- **tag** : *const QString &*
+  Prefix string printed before each line.
+
+---
+
+### assign_channels(list, nlist)
+
+Assign a channel name list to this projection operator, invalidating any previously compiled projector.
+
+**Parameters:**
+
+- **list** : *const QStringList &*
+  Channel name list.
+
+- **nlist** : *int*
+  Number of channels.
+
+**Returns:**
+
+- *int* — OK on success.
+
+---
+
+### make_proj_bad(bad)
+
+Compile the projection operator via SVD, excluding bad channels.
+
+Active projection items are picked, expanded to the assigned channel list, bad channels are zeroed, and SVD is performed to produce an orthogonal projector matrix stored in proj_data.
+
+**Parameters:**
+
+- **bad** : *const QStringList &*
+  List of bad channel names.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### make_proj()
+
+Compile the projection operator via SVD (no bad channels).
+
+Convenience wrapper around `make_proj_bad()`.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### project_dvector(vec, do_complement)
+
+Apply the compiled projection operator to a double-precision data vector.
+
+**Parameters:**
+
+- **vec** : *Eigen::Ref&lt; Eigen::VectorXd &gt;*
+  Data vector.
+
+- **do_complement** : *bool*
+  If true, compute (I - P) * vec.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on dimension mismatch.
+
+---
+
+### apply_cov(c)
+
+Apply this projection operator to a covariance matrix from both sides: C' = (I - P) C (I - P)^T (or P C P^T if do_complement is false).
+
+**Parameters:**
+
+- **c** : *MNECovMatrix **
+  The covariance matrix to project.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+## Static Methods
+
+### create_average_eeg_ref(chs, nch)
+
+Create an average EEG reference projector.
+
+Builds a uniform-weight vector ( $$1/\sqrt\{N_\{\text\{EEG\}\}\}$$) across all EEG channels.
+
+**Parameters:**
+
+- **chs** : *const QList&lt; FIFFLIB::FiffChInfo &gt; &*
+  Channel information list.
+
+- **nch** : *int*
+  Number of channels.
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNEProjOp &gt;* — A new projection operator, or NULL if no EEG channels are found. Caller takes ownership.
+
+---
+
+### read_from_node(stream, start)
+
+Read all linear projection items from a FIFF tree node.
+
+**Parameters:**
+
+- **stream** : *FIFFLIB::FiffStream::SPtr &*
+  An open FIFF stream.
+
+- **start** : *const FIFFLIB::FiffDirNode::SPtr &*
+  The tree node to search for projection blocks.
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNEProjOp &gt;* — A populated projection operator (possibly with zero items), or NULL on error. Caller takes ownership.
+
+---
+
+### read(name)
+
+Read a projection operator from a FIFF file by path.
+
+Convenience wrapper that opens the file and delegates to `read_from_node()`.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Path to the FIFF file.
+
+**Returns:**
+
+- *std::unique_ptr&lt; MNEProjOp &gt;* — The loaded projection operator, or NULL on error. Caller takes ownership.
+
+---
+
+### makeProjection(projnames, chs, nch, result)
+
+Load and combine SSP projection operators from files for the selected channels.
+
+Reads projection items from each file in `projnames`, and if EEG channels are present adds an average EEG reference projector when none is found. Returns nullptr if the resulting projector does not affect any of the given channels.
+
+Refactored: make_projection (dipole_fit_setup.c)
+
+**Parameters:**
+
+- **projnames** : *const QList&lt; QString &gt; &*
+  List of FIFF file paths containing projection data.
+
+- **chs** : *const QList&lt; FIFFLIB::FiffChInfo &gt; &*
+  Channel information list.
+
+- **nch** : *int*
+  Number of channels.
+
+- **result** : *std::unique_ptr&lt; MNEProjOp &gt; &*
+  The combined projection operator (nullptr when no projection is needed).
+
+**Returns:**
+
+- *bool* — true on success, false on read error.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

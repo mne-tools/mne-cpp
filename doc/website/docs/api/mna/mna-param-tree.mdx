@@ -1,0 +1,109 @@
+---
+id: mna-param-tree
+title: "MNALIB::MnaParamTree"
+sidebar_label: MnaParamTree
+sidebar_position: 6
+---
+
+# MnaParamTree
+
+**Namespace:** `MNALIB` &nbsp;·&nbsp; **Library:** MNA Library (Modular Architecture) &nbsp;·&nbsp; **Header:** `mna/mna_param_tree.h`
+
+`#include <mna/mna_param_tree.h>`
+
+```cpp
+class MNALIB::MnaParamTree
+```
+
+Hierarchical parameter store for the MNA graph.
+
+Each parameter has a path ("nodeId/attrKey") and an optional binding — a formula that recomputes the value whenever a trigger condition is met.
+
+Path-keyed parameter store with formula-driven dynamic bindings.
+
+---
+
+## Public Methods
+
+### MnaParamTree()
+
+---
+
+### setParam(path, value)
+
+---
+
+### param(path)
+
+---
+
+### hasParam(path)
+
+---
+
+### allPaths()
+
+---
+
+### addBinding(binding)
+
+---
+
+### removeBinding(targetPath)
+
+---
+
+### bindings()
+
+---
+
+### hasBinding(targetPath)
+
+---
+
+### evaluate(results)
+
+Evaluate all bindings whose trigger condition is met.
+
+**Parameters:**
+
+- **results** : *const QMap&lt; QString, QVariant &gt; &*
+  Map of nodeId::portName → data (from execution context).
+
+**Returns:**
+
+- *QStringList* — Paths whose values changed.
+
+---
+
+### evaluateExpression(expr, results)
+
+Evaluate a single expression in the current context.
+
+**Parameters:**
+
+- **expr** : *const QString &*
+  Expression string.
+
+- **results** : *const QMap&lt; QString, QVariant &gt; &*
+  Map of nodeId::portName → data (from execution context).
+
+**Returns:**
+
+- *QVariant* — Computed value.
+
+---
+
+### toJson()
+
+---
+
+## Static Methods
+
+### fromJson(obj)
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

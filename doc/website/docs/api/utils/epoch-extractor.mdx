@@ -1,0 +1,110 @@
+---
+id: epoch-extractor
+title: "UTILSLIB::EpochExtractor"
+sidebar_label: EpochExtractor
+sidebar_position: 13
+---
+
+# EpochExtractor
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/epoch_extractor.h`
+
+`#include <utils/epoch_extractor.h>`
+
+```cpp
+class UTILSLIB::EpochExtractor
+```
+
+Segments continuous raw data into fixed-length epochs locked to events.
+
+```cpp
+EpochExtractor::Params p;
+p.dTmin      = -0.2;     // 200 ms pre-stimulus
+p.dTmax      =  0.8;     // 800 ms post-stimulus
+p.dBaseMin   = -0.2;
+p.dBaseMax   =  0.0;
+p.dThreshold = 150e-6;   // 150 µV peak-to-peak rejection
+
+QVector<MNELIB::MNEEpochData> epochs =
+    EpochExtractor::extract(matRawData, eventSamples, sFreq, p);
+
+// Good epochs only
+QVector<MNELIB::MNEEpochData> clean =
+    EpochExtractor::rejectMarked(epochs);
+```
+
+---
+
+## Static Methods
+
+### extract(matData, eventSamples, dSFreq, params, eventCodes)
+
+Extract epochs from a continuous raw data matrix.
+
+For each event sample index the function:
+Cuts a window [tmin, tmax] around the event.
+
+
+Applies mean baseline correction over [baseMin, baseMax] (if bApplyBaseline and the window is valid).
+
+
+Marks the epoch for rejection if any channel has peak-to-peak &gt; dThreshold (and dThreshold &gt; 0).
+
+Epochs whose window extends outside the data boundaries are silently skipped.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Continuous raw data (n_channels × n_samples), calibrated (SI units).
+
+- **eventSamples** : *const QVector&lt; int &gt; &*
+  0-based sample indices of events.
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+- **params** : *const Params &*
+  Extraction parameters.
+
+- **eventCodes** : *const QVector&lt; int &gt; &*
+  Optional per-event integer codes stored in MNEEpochData::event. Must be empty or the same length as eventSamples.
+
+**Returns:**
+
+- *QVector&lt; MNELIB::MNEEpochData &gt;* — Vector of MNEEpochData (one per valid event). Rejected epochs are included with MNEEpochData::bReject == true so callers can choose whether to exclude them.
+
+---
+
+### average(epochs)
+
+Compute the grand average (ERP/ERF) across all non-rejected epochs.
+
+**Parameters:**
+
+- **epochs** : *const QVector&lt; MNELIB::MNEEpochData &gt; &*
+  Vector of extracted epochs (output of `extract()`).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Mean data matrix (n_channels × n_epoch_samples), or empty matrix if no good epochs.
+
+---
+
+### rejectMarked(epochs)
+
+Return only the epochs that are NOT marked for rejection.
+
+**Parameters:**
+
+- **epochs** : *const QVector&lt; MNELIB::MNEEpochData &gt; &*
+  Input epoch vector.
+
+**Returns:**
+
+- *QVector&lt; MNELIB::MNEEpochData &gt;* — Subset of epochs with bReject == false.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

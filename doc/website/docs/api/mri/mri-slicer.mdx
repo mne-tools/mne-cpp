@@ -1,0 +1,190 @@
+---
+id: mri-slicer
+title: "MRILIB::MriSlicer"
+sidebar_label: MriSlicer
+sidebar_position: 5
+---
+
+# MriSlicer
+
+**Namespace:** `MRILIB` &nbsp;·&nbsp; **Library:** MRI Library &nbsp;·&nbsp; **Header:** `mri/mri_slicer.h`
+
+`#include <mri/mri_slicer.h>`
+
+```cpp
+class MRILIB::MriSlicer
+```
+
+Orthogonal-plane resampler (axial / coronal / sagittal) from `MriVolData` to `MriSliceImage`.
+
+Pure `static` methods  no instance state is owned. For a given orientation and slice index, samples the source volume at the matching row/column/depth plane, normalises voxel intensities into 8-bit grayscale via the volume's percentile-clipped window, and emits the result with the slice→RAS transform the viewer needs to draw rulers and crosshairs in millimetres.
+
+---
+
+## Static Methods
+
+### extractSlice(volData, dims, vox2ras, orientation, sliceIndex)
+
+Extract a 2D slice from a 3D volume stored as a flat array.
+
+**Parameters:**
+
+- **volData** : *const QVector&lt; float &gt; &*
+  Flat array of voxel intensities (dimX x dimY x dimZ, x-fastest).
+
+- **dims** : *const QVector&lt; int &gt; &*
+  Volume dimensions \{dimX, dimY, dimZ\}.
+
+- **vox2ras** : *const Eigen::Matrix4f &*
+  4x4 voxel-to-RAS transform.
+
+- **orientation** : *SliceOrientation*
+  Slice orientation (Axial, Coronal, or Sagittal).
+
+- **sliceIndex** : *int*
+  Index along the slicing axis.
+
+**Returns:**
+
+- *MriSliceImage* — The extracted slice image.
+
+---
+
+### extractOrthogonal(volData, dims, vox2ras, rasPoint)
+
+Extract all three orthogonal slices at a given RAS point.
+
+**Parameters:**
+
+- **volData** : *const QVector&lt; float &gt; &*
+  Flat array of voxel intensities.
+
+- **dims** : *const QVector&lt; int &gt; &*
+  Volume dimensions \{dimX, dimY, dimZ\}.
+
+- **vox2ras** : *const Eigen::Matrix4f &*
+  4x4 voxel-to-RAS transform.
+
+- **rasPoint** : *const Eigen::Vector3f &*
+  RAS coordinate to slice through.
+
+**Returns:**
+
+- *QVector&lt; MriSliceImage &gt;* — Vector of three `MriSliceImage` (axial, coronal, sagittal).
+
+---
+
+### rasToVoxel(vox2ras, rasPoint)
+
+Convert RAS coordinate to voxel index.
+
+**Parameters:**
+
+- **vox2ras** : *const Eigen::Matrix4f &*
+  4x4 voxel-to-RAS transform.
+
+- **rasPoint** : *const Eigen::Vector3f &*
+  RAS coordinate.
+
+**Returns:**
+
+- *Eigen::Vector3i* — Voxel index (rounded to nearest integer).
+
+---
+
+### voxelToRas(vox2ras, voxel)
+
+Convert voxel index to RAS coordinate.
+
+**Parameters:**
+
+- **vox2ras** : *const Eigen::Matrix4f &*
+  4x4 voxel-to-RAS transform.
+
+- **voxel** : *const Eigen::Vector3i &*
+  Voxel index.
+
+**Returns:**
+
+- *Eigen::Vector3f* — RAS coordinate.
+
+---
+
+### extractSlice(vol, orientation, sliceIndex)
+
+Extract a 2D slice from an `MriVolData` volume.
+
+**Parameters:**
+
+- **vol** : *const MriVolData &*
+  Loaded MRI volume.
+
+- **orientation** : *SliceOrientation*
+  Slice orientation.
+
+- **sliceIndex** : *int*
+  Index along the slicing axis.
+
+**Returns:**
+
+- *MriSliceImage* — The extracted slice image.
+
+---
+
+### extractOrthogonal(vol, rasPoint)
+
+Extract all three orthogonal slices at a given RAS point.
+
+**Parameters:**
+
+- **vol** : *const MriVolData &*
+  Loaded MRI volume.
+
+- **rasPoint** : *const Eigen::Vector3f &*
+  RAS coordinate to slice through.
+
+**Returns:**
+
+- *QVector&lt; MriSliceImage &gt;* — Vector of three `MriSliceImage` (axial, coronal, sagittal).
+
+---
+
+### rasToVoxel(vol, rasPoint)
+
+Convert RAS coordinate to voxel index using a volume's transform.
+
+**Parameters:**
+
+- **vol** : *const MriVolData &*
+  Loaded MRI volume.
+
+- **rasPoint** : *const Eigen::Vector3f &*
+  RAS coordinate.
+
+**Returns:**
+
+- *Eigen::Vector3i* — Voxel index (rounded to nearest integer).
+
+---
+
+### voxelToRas(vol, voxel)
+
+Convert voxel index to RAS coordinate using a volume's transform.
+
+**Parameters:**
+
+- **vol** : *const MriVolData &*
+  Loaded MRI volume.
+
+- **voxel** : *const Eigen::Vector3i &*
+  Voxel index.
+
+**Returns:**
+
+- *Eigen::Vector3f* — RAS coordinate.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

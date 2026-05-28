@@ -1,0 +1,204 @@
+---
+id: fwd-coil-set
+title: "FWDLIB::FwdCoilSet"
+sidebar_label: FwdCoilSet
+sidebar_position: 8
+---
+
+# FwdCoilSet
+
+**Namespace:** `FWDLIB` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Header:** `fwd/fwd_coil_set.h`
+
+`#include <fwd/fwd_coil_set.h>`
+
+```cpp
+class FWDLIB::FwdCoilSet
+```
+
+Implements `FwdCoilSet` (replaces `fwdCoilSet` / `fwdCoilSetRec` from MNE-C ``fwd_types.h``).
+
+Container of `FwdCoil` instances acting both as the in-memory image of the `coil_def.dat` template database and as a per-channel sensor array in a chosen coordinate frame (device / head / MRI).
+
+---
+
+## Public Methods
+
+### FwdCoilSet()
+
+Constructs the Forward Coil Set description.
+
+---
+
+### ~FwdCoilSet()
+
+Destroys the Forward Coil Set description.
+
+---
+
+### create_meg_coil(ch, acc, t)
+
+Create a MEG coil definition using a database of templates Change the coordinate frame if so desired.
+
+**Parameters:**
+
+- **ch** : *const FIFFLIB::FiffChInfo &*
+  Channel information to use.
+
+- **acc** : *int*
+  Required accuracy.
+
+- **t** : *const FIFFLIB::FiffCoordTrans &*
+  Transform the points using this.
+
+**Returns:**
+
+- *FwdCoil::UPtr* — The created meg coil.
+
+---
+
+### create_meg_coils(chs, nch, acc, t)
+
+Create a MEG coil set definition using a database of templates Change the coordinate frame if so desired.
+
+**Parameters:**
+
+- **ch**
+  Channel information to use.
+
+- **nch** : *int*
+  Number of channels.
+
+- **acc** : *int*
+  Required accuracy.
+
+- **t** : *const FIFFLIB::FiffCoordTrans &*
+  Transform the points using this.
+
+**Returns:**
+
+- *FwdCoilSet::UPtr* — The created meg coil set.
+
+---
+
+### dup_coil_set(t)
+
+Make a coil set duplicate.
+
+**Parameters:**
+
+- **t** : *const FIFFLIB::FiffCoordTrans &*
+  Transformation which should be applied to the duplicate.
+
+**Returns:**
+
+- *FwdCoilSet::UPtr* — The duplicated coil set.
+
+---
+
+### is_planar_coil_type(type)
+
+Checks if a set of templates contains a planar coil of a specified type.
+
+**Parameters:**
+
+- **type** : *int*
+  This is the coil type we are interested in.
+
+**Returns:**
+
+- *bool* — True if set contains a planar coil of specified type, false otherwise.
+
+---
+
+### is_axial_coil_type(type)
+
+Checks if a set of templates contains an axial coil of a specified type.
+
+**Parameters:**
+
+- **type** : *int*
+  This is the coil type we are interested in.
+
+**Returns:**
+
+- *bool* — True if set contains an axial coil of specified type, false otherwise.
+
+---
+
+### is_magnetometer_coil_type(type)
+
+Checks if a set of templates contains a magnetometer of a specified type.
+
+**Parameters:**
+
+- **type** : *int*
+  This is the coil type we are interested in.
+
+**Returns:**
+
+- *bool* — True if set contains a magnetometer of specified type, false otherwise.
+
+---
+
+### is_eeg_electrode_type(type)
+
+Checks if a set of templates contains an EEG electrode of a specified type.
+
+**Parameters:**
+
+- **type** : *int*
+  This is the coil type we are interested in.
+
+**Returns:**
+
+- *bool* — True if set contains an EEG electrode of specified type, false otherwise.
+
+---
+
+### ncoil()
+
+Number of coils (convenience accessor).
+
+---
+
+## Static Methods
+
+### create_eeg_els(chs, nch, t)
+
+Create a EEG coil set definition using a channel information Change the coordinate frame if so desired.
+
+**Parameters:**
+
+- **ch**
+  Channel information to use.
+
+- **nch** : *int*
+  Number of channels.
+
+- **t** : *const FIFFLIB::FiffCoordTrans &*
+  Transform the points using this.
+
+**Returns:**
+
+- *FwdCoilSet::UPtr* — The created meg coil set.
+
+---
+
+### read_coil_defs(name)
+
+Read a coil definitions from file.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  File name to read from.
+
+**Returns:**
+
+- *FwdCoilSet::UPtr* — The read meg coil set.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

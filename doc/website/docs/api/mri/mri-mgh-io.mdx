@@ -1,0 +1,63 @@
+---
+id: mri-mgh-io
+title: "MRILIB::MriMghIO"
+sidebar_label: MriMghIO
+sidebar_position: 3
+---
+
+# MriMghIO
+
+**Namespace:** `MRILIB` &nbsp;·&nbsp; **Library:** MRI Library &nbsp;·&nbsp; **Header:** `mri/mri_mgh_io.h`
+
+`#include <mri/mri_mgh_io.h>`
+
+```cpp
+class MRILIB::MriMghIO
+```
+
+Stateless decoder for FreeSurfer MGH and MGZ volume containers.
+
+Parses the 284-byte big-endian header, decodes the column-major voxel buffer for every supported MRI type (uchar, int, float, short) and reads the optional tag footer (scan parameters, `talairach.xfm` path) into an `MriVolData`. ``.mgz inputs are inflated in-memory through zlib's `MAX_WBITS+16` gunzip mode before parsing, so callers never need to know whether they are looking at the compressed or uncompressed variant.
+
+Format reference: [https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat](https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat)
+
+Ported from `make_mgh_cor_set()` in MNE C `mne_make_cor_set` by Matti Hamalainen.
+
+---
+
+## Static Methods
+
+### read(mgzFile, volData, additionalTrans, subjectMriDir, verbose)
+
+Reads a FreeSurfer MGH or MGZ file.
+
+Parses the header geometry (dimensions, voxel sizes, direction cosines, center RAS), reads voxel data into per-slice `MriSlice` structures, and extracts footer tags including the Talairach .xfm path.
+
+For .mgz files, automatic gzip decompression is performed via zlib.
+
+**Parameters:**
+
+- **mgzFile** : *const QString &*
+  Path to the .mgz or .mgh file.
+
+- **volData** : *MriVolData &*
+  `MriVolData` structure to populate.
+
+- **additionalTrans** : *QVector&lt; FIFFLIB::FiffCoordTrans &gt; &*
+  Additional coordinate transforms found in footer (e.g., Talairach).
+
+- **subjectMriDir** : *const QString &*
+  Path to subject's mri/ directory (for resolving relative .xfm paths).
+
+- **verbose** : *bool*
+  If true, print progress information.
+
+**Returns:**
+
+- *bool* — True on success, false on error.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,52 @@
+---
+id: fiff-dig-point
+title: "FIFFLIB::FiffDigPoint"
+sidebar_label: FiffDigPoint
+sidebar_position: 17
+---
+
+# FiffDigPoint
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Header:** `fiff/fiff_dig_point.h`
+
+`#include <fiff/fiff_dig_point.h>`
+
+```cpp
+class FIFFLIB::FiffDigPoint
+```
+
+One digitizer point: kind (cardinal/HPI/EEG/extra), ident, 3D position in `FIFFV_COORD_HEAD`.
+
+Field layout matches ``fiffDigPointRec`` on disk. The (`kind`, `ident`) pair is the lookup key used everywhere else in the codebase — for example, the LPA/Nasion/RPA fiducials are found by searching for `kind` == `FIFFV_POINT_CARDINAL` and `ident` == 1 / 2 / 3.
+
+---
+
+## Public Methods
+
+### FiffDigPoint()
+
+Constructs the digitization point description.
+
+---
+
+### ~FiffDigPoint()
+
+Destroys the digitization point description.
+
+---
+
+## Static Methods
+
+### storageSize()
+
+Size of the old struct (`fiffDigPointRec`) 5*int = 5*4 = 20.
+
+**Returns:**
+
+- *qint32* — the size of the old struct `fiffDigPointRec`.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

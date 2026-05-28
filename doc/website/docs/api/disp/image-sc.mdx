@@ -1,0 +1,139 @@
+---
+id: image-sc
+title: "DISPLIB::ImageSc"
+sidebar_label: ImageSc
+sidebar_position: 37
+---
+
+# ImageSc
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/plots/imagesc.h`
+
+`#include <disp/imagesc.h>`
+
+```cpp
+class DISPLIB::ImageSc
+```
+
+False-colour heat-map QWidget visualising an Eigen matrix with selectable colour map.
+
+Accepts `MatrixXd`, `MatrixXf` and `MatrixXi` inputs; ``init()`` rebuilds the cached `QImage` from the current matrix and the active colour map, and ``updateData()`` / ``paintEvent()`` keep the rendering in sync with the data.
+
+---
+
+## Public Methods
+
+### ImageSc(parent)
+
+Creates the scaled image view.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  Parent QObject (optional).
+
+---
+
+### ImageSc(p_dMat, parent)
+
+Creates the scaled image view with a given double matrix.
+
+**Parameters:**
+
+- **p_dMat** : *Eigen::MatrixXd &*
+  The double data matrix.
+
+- **parent** : *QWidget **
+  Parent QObject (optional).
+
+---
+
+### ImageSc(p_fMat, parent)
+
+Creates the scaled image view with a given float matrix.
+
+**Parameters:**
+
+- **p_fMat** : *Eigen::MatrixXf &*
+  The float data matrix.
+
+- **parent** : *QWidget **
+  Parent QObject (optional).
+
+---
+
+### ImageSc(p_iMat, parent)
+
+Creates the scaled image view with a given integer matrix.
+
+**Parameters:**
+
+- **p_iMat** : *Eigen::MatrixXi &*
+  The integer data matrix.
+
+- **parent** : *QWidget **
+  Parent QObject (optional).
+
+---
+
+### ~ImageSc()
+
+Destructs the `ImageSc` object.
+
+---
+
+### init()
+
+Initializes the `ImageSc` object.
+
+---
+
+### updateData(p_dMat)
+
+Updates the scaled image view with a given double matrix.
+
+**Parameters:**
+
+- **p_dMat** : *Eigen::MatrixXd &*
+  The double data matrix.
+
+---
+
+### updateData(p_fMat)
+
+Updates the scaled image view with a given float matrix.
+
+**Parameters:**
+
+- **p_fMat** : *Eigen::MatrixXf &*
+  The float data matrix.
+
+---
+
+### updateData(p_iMat)
+
+Updates the scaled image view with a given integer matrix.
+
+**Parameters:**
+
+- **p_dMat**
+  The integer data matrix.
+
+---
+
+### setColorMap(p_sColorMap)
+
+Sets the color map to use, e.g.
+
+"Jet", "Hot", "Bone"
+
+**Parameters:**
+
+- **p_sColorMap** : *const QString &*
+  The colormap to use.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

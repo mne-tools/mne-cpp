@@ -1,0 +1,86 @@
+---
+id: artifact-detect
+title: "UTILSLIB::ArtifactDetect"
+sidebar_label: ArtifactDetect
+sidebar_position: 4
+---
+
+# ArtifactDetect
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/artifact_detect.h`
+
+`#include <utils/artifact_detect.h>`
+
+```cpp
+class UTILSLIB::ArtifactDetect
+```
+
+ECG and EOG physiological artifact event detection.
+
+```cpp
+// ECG: returns sample indices of R-peaks
+QVector<int> rPeaks = ArtifactDetect::detectEcg(matData, fiffInfo, sFreq);
+
+// EOG: returns sample indices of blink/saccade onsets
+QVector<int> blinks = ArtifactDetect::detectEog(matData, fiffInfo, sFreq);
+```
+
+---
+
+## Static Methods
+
+### detectEcg(matData, fiffInfo, dSFreq, params)
+
+Detect ECG R-peak events.
+
+The function searches FiffInfo for a channel with kind == FIFFV_ECG_CH. If none is found it synthesises an ECG proxy by averaging the absolute gradient-magnetometer data (MEG channels), which often shows a clear cardiac artefact.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Raw data matrix (n_channels × n_samples), calibrated (SI units).
+
+- **fiffInfo** : *const FIFFLIB::FiffInfo &*
+  Measurement info (channel kinds, names).
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+- **params** : *const EcgParams &*
+  Detection parameters.
+
+**Returns:**
+
+- *QVector&lt; int &gt;* — Sample indices (0-based) of detected R-peaks.
+
+---
+
+### detectEog(matData, fiffInfo, dSFreq, params)
+
+Detect EOG blink/saccade events.
+
+The function searches FiffInfo for channels with kind == FIFFV_EOG_CH. If multiple EOG channels are present the channel with the largest peak-to-peak amplitude is used. Returns an empty vector if no EOG channel is found.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Raw data matrix (n_channels × n_samples), calibrated (SI units).
+
+- **fiffInfo** : *const FIFFLIB::FiffInfo &*
+  Measurement info.
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+- **params** : *const EogParams &*
+  Detection parameters.
+
+**Returns:**
+
+- *QVector&lt; int &gt;* — Sample indices (0-based) of detected EOG events (onset of supra-threshold excursion).
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

@@ -1,0 +1,111 @@
+---
+id: spectrum-settings-view
+title: "DISPLIB::SpectrumSettingsView"
+sidebar_label: SpectrumSettingsView
+sidebar_position: 59
+---
+
+# SpectrumSettingsView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/spectrumsettingsview.h`
+
+`#include <disp/spectrumsettingsview.h>`
+
+```cpp
+class DISPLIB::SpectrumSettingsView
+```
+
+Lower / upper-bound frequency sliders for the FFT spectrum viewer.
+
+Two `QSliders` emit `lowerFreqChanged` / `upperFreqChanged` so the connected `SpectrumView` can crop the displayed frequency axis.
+
+---
+
+## Public Methods
+
+### SpectrumSettingsView(sSettingsPath, parent, f)
+
+Constructs a `SpectrumSettingsView` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  parent of widget.
+
+---
+
+### ~SpectrumSettingsView()
+
+Destroys the `SpectrumSettingsView`.
+
+---
+
+### updateValue(value)
+
+Update slider value.
+
+**Parameters:**
+
+- **value** : *qint32*
+  slider value.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### setBoundaries(fSFreq, fLowerBound, fUpperBound)
+
+Sets the sampling frequency as well as boundaries and configure the GUI elements accordingly.
+
+**Parameters:**
+
+- **fSFreq** : *float*
+  The sampling frequency.
+
+- **fLowerBound** : *float*
+  The lower bound of the spectrum.
+
+- **fUpperBound** : *float*
+  The upper bound of the spectrum.
+
+---
+
+### getLowerBound()
+
+Returns the lower bound.
+
+**Returns:**
+
+- *float* — Returns the lower bound as a float.
+
+---
+
+### getUpperBound()
+
+Returns the upper bound.
+
+**Returns:**
+
+- *float* — Returns the upper bound as a float.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

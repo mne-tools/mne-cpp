@@ -1,0 +1,92 @@
+---
+id: scaling-view
+title: "DISPLIB::ScalingView"
+sidebar_label: ScalingView
+sidebar_position: 55
+---
+
+# ScalingView
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/viewers/scalingview.h`
+
+`#include <disp/scalingview.h>`
+
+```cpp
+class DISPLIB::ScalingView
+```
+
+Per-modality y-scale spinbox panel built from `ScaleControl` widgets.
+
+One `ScaleControl` per channel modality in the active `FiffInfo`; edits are emitted as `scalingChanged` maps consumed by `RtFiffRawView`, `ChannelDataView` and `ButterflyView`.
+
+---
+
+## Public Methods
+
+### ScalingView(sSettingsPath, parent, f, lChannelsToShow)
+
+Constructs a `ScalingView` which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  Parent of widget.
+
+---
+
+### ~ScalingView()
+
+Destroys the `ScalingView`.
+
+---
+
+### getScaleMap()
+
+Get the current scaling map.
+
+**Returns:**
+
+- *QMap&lt; qint32, float &gt;* — The current scaling map.
+
+---
+
+### setScaleMap(qMapChScaling)
+
+Set the current scaling map.
+
+This also recreates the GUI.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+### setMagGradLink(l)
+
+Link the Magnetometers to the Gradiometers scale.
+
+**Parameters:**
+
+- **l** : *Qt::CheckState*
+  Set the link between MAGs and GRADs active or inactive.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

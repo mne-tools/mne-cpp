@@ -1,0 +1,56 @@
+---
+id: dpss
+title: "UTILSLIB::Dpss"
+sidebar_label: Dpss
+sidebar_position: 11
+---
+
+# Dpss
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `dsp/dpss.h`
+
+`#include <utils/dpss.h>`
+
+```cpp
+class UTILSLIB::Dpss
+```
+
+Discrete Prolate Spheroidal Sequences (Slepian tapers).
+
+Computes DPSS tapers via the tridiagonal eigenvalue formulation. These tapers are used by the multitaper spectral estimator to achieve optimal spectral concentration within a given half-bandwidth.
+
+```cpp
+// 256-sample window, half-bandwidth 4, default number of tapers (7)
+DpssResult r = Dpss::compute(256, 4.0);
+// r.matTapers   → 7 × 256
+// r.vecEigenvalues → 7 concentration ratios ≈ 1.0
+```
+
+---
+
+## Static Methods
+
+### compute(N, halfBandwidth, nTapers)
+
+Compute DPSS tapers for a given window length and half-bandwidth.
+
+**Parameters:**
+
+- **N** : *int*
+  Window length in samples.
+
+- **halfBandwidth** : *double*
+  Half-bandwidth parameter (NW); typical values: 2, 3, 4.
+
+- **nTapers** : *int*
+  Number of tapers to return; -1 → floor(2*halfBandwidth - 1).
+
+**Returns:**
+
+- *DpssResult* — `DpssResult` with matTapers (nTapers × N) and vecEigenvalues.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

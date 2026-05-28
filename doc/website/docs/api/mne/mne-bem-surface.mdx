@@ -1,0 +1,139 @@
+---
+id: mne-bem-surface
+title: "MNELIB::MNEBemSurface"
+sidebar_label: MNEBemSurface
+sidebar_position: 8
+---
+
+# MNEBemSurface
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Header:** `mne/mne_bem_surface.h`
+
+`#include <mne/mne_bem_surface.h>`
+
+```cpp
+class MNELIB::MNEBemSurface
+```
+
+BEM surface geometry information.
+
+Inherits core geometry (vertices, normals, triangles, neighbors) from MNESurface/MNESurfaceOrVolume. Adds BEM-specific computed triangle metadata (centers, normals, areas) and I/O.
+
+BEM surface provides geometry information
+
+---
+
+## Public Methods
+
+### MNEBemSurface()
+
+Constructors the bem surface.
+
+---
+
+### MNEBemSurface(p_MNEBemSurface)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_MNEBemSurface** : *const MNEBemSurface &*
+  BEM surface which should be copied.
+
+---
+
+### ~MNEBemSurface()
+
+Destroys the BEM surface.
+
+---
+
+### clear()
+
+Initializes the BEM surface.
+
+---
+
+### addTriangleData()
+
+Definition of the mne_add_triangle_data function in mne_add_geometry_info.c.
+
+Completes triangulation info
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### add_geometry_info()
+
+Add vertex normals and neighbourhood information.
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### addVertexNormals()
+
+Definition of the addVertexNormals function in mne_add_geometry_info.c.
+
+Completes triangulation info
+
+**Returns:**
+
+- *bool* — true if succeeded, false otherwise.
+
+---
+
+### writeToStream(p_pStream)
+
+Writes the bem surface to a FIFF stream.
+
+**Parameters:**
+
+- **p_pStream** : *FIFFLIB::FiffStream **
+  The stream to write to.
+
+---
+
+## Static Methods
+
+### id_name(id)
+
+Map bem id integers to human-readable names.
+
+**Parameters:**
+
+- **frame**
+  The bem id integer.
+
+**Returns:**
+
+- *QString* — Human readable form of the bem id.
+
+---
+
+### makeScalpSurfaces(outerSkin, targetVertices)
+
+Decimate the outer skin surface to the target vertex counts using iterative edge collapse simplification.
+
+**Parameters:**
+
+- **outerSkin** : *const MNEBemSurface &*
+  The outer skin BEM surface to decimate.
+
+- **targetVertices** : *const QList&lt; int &gt; &*
+  List of target vertex counts (default: \{2562, 10242, 40962\}).
+
+**Returns:**
+
+- *QList&lt; MNEBemSurface &gt;* — A list of decimated BEM surfaces, one per target resolution.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

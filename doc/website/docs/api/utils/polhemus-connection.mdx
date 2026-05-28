@@ -1,0 +1,82 @@
+---
+id: polhemus-connection
+title: "UTILSLIB::PolhemusConnection"
+sidebar_label: PolhemusConnection
+sidebar_position: 38
+---
+
+# PolhemusConnection
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Header:** `utils/polhemus/polhemus_connection.h`
+
+`#include <utils/polhemus_connection.h>`
+
+```cpp
+class UTILSLIB::PolhemusConnection
+```
+
+Polhemus digitizer connection (mock + serial-port backends).
+
+---
+
+## Public Methods
+
+### PolhemusConnection(parent)
+
+---
+
+### ~PolhemusConnection()
+
+---
+
+### open(portName, cfg)
+
+Open the connection.
+
+**Parameters:**
+
+- **portName** : *const QString &*
+  Empty → mock backend. Non-empty → hardware backend.
+
+- **cfg** : *const PolhemusSerialConfig &*
+  Serial transport configuration; ignored by the mock backend.
+
+---
+
+### close()
+
+Close the active connection.
+
+Safe to call when already closed.
+
+---
+
+### isConnected()
+
+---
+
+### backendName()
+
+---
+
+## Static Methods
+
+### availablePorts()
+
+Enumerate every serial port currently visible to the OS.
+
+Convenience wrapper around `QSerialPortInfo::availablePorts` that returns just the system port names (e.g. `/dev/cu.usbserial-AB0`, `COM3`) so callers can populate a combo box without pulling in `QSerialPortInfo` themselves.
+
+---
+
+### autoDetectPortName()
+
+Best-effort auto-detection of an attached Fastrak/FastSCAN.
+
+Polhemus Fastrak/FastSCAN units ship with an FTDI USB-serial bridge (vendor id 0x0F44 for newer Polhemus-branded units, 0x0403 for the generic FTDI chip used in older units). This scan returns the first matching port name, or an empty string if no candidate is found.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

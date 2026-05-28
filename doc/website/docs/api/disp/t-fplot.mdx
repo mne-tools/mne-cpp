@@ -1,0 +1,68 @@
+---
+id: t-fplot
+title: "DISPLIB::TFplot"
+sidebar_label: TFplot
+sidebar_position: 63
+---
+
+# TFplot
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Header:** `disp/plots/tfplot.h`
+
+`#include <disp/tfplot.h>`
+
+```cpp
+class DISPLIB::TFplot
+```
+
+Time-frequency spectrogram QWidget rendering an Eigen matrix as a colour image.
+
+Two constructors accept either a full or a frequency-cropped `MatrixXd` spectrogram together with a sample rate and a ColorMaps enum entry; ``calc_plot()`` builds the cached `QImage` that subsequent `paintEvents` draw.
+
+---
+
+## Public Methods
+
+### TFplot(tf_matrix, sample_rate, lower_frq, upper_frq, cmap)
+
+Constructs `TFplot` class.
+
+**Parameters:**
+
+- **tf_matrix** : *Eigen::MatrixXd*
+  given spectrogram.
+
+- **sample_rate** : *qreal*
+  given sample rate of signal related to th spectrogram.
+
+- **lower_frq** : *qreal*
+  lower bound frequency, that should be plotted.
+
+- **upper_frq** : *qreal*
+  upper bound frequency, that should be plotted.
+
+- **cmap** : *ColorMaps*
+  colormap used to plot the spectrogram.
+
+---
+
+### TFplot(tf_matrix, sample_rate, cmap)
+
+Constructs `TFplot` class.
+
+**Parameters:**
+
+- **tf_matrix** : *Eigen::MatrixXd*
+  given spectrogram.
+
+- **sample_rate** : *qreal*
+  given sample rate of signal related to th spectrogram.
+
+- **cmap** : *ColorMaps*
+  colormap used to plot the spectrogram.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._

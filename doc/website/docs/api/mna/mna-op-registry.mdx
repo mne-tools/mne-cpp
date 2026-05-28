@@ -1,0 +1,99 @@
+---
+id: mna-op-registry
+title: "MNALIB::MnaOpRegistry"
+sidebar_label: MnaOpRegistry
+sidebar_position: 4
+---
+
+# MnaOpRegistry
+
+**Namespace:** `MNALIB` &nbsp;·&nbsp; **Library:** MNA Library (Modular Architecture) &nbsp;·&nbsp; **Header:** `mna/mna_op_registry.h`
+
+`#include <mna/mna_op_registry.h>`
+
+```cpp
+class MNALIB::MnaOpRegistry
+```
+
+Singleton catalog of all registered operation schemas.
+
+Process-wide lookup from `opType` to `MnaOpSchema` and implementation function.
+
+---
+
+## Public Methods
+
+### registerOp(schema)
+
+Register an operation schema.
+
+---
+
+### hasOp(opType)
+
+Check if an operation type is registered.
+
+---
+
+### schema(opType)
+
+Get the schema for an operation type.
+
+---
+
+### registeredOps()
+
+List all registered operation types.
+
+---
+
+### registerOpFunc(opType, func)
+
+Register an implementation function for an operation type.
+
+---
+
+### opFunc(opType)
+
+Get the implementation function for an operation type.
+
+---
+
+### loadRegistryFiles()
+
+Load registry files from the standard resources/mna/ directory.
+
+Searches upward from the application directory to find resources/mna/, then loads mna-registry.json and all drop-in files from mna-registry.d/.
+
+**Returns:**
+
+- *int* — Number of ops loaded, or 0 if no registry directory was found.
+
+---
+
+### missingOps(pipelineTools)
+
+Return op types referenced in a project that have no registered schema.
+
+**Parameters:**
+
+- **project**
+  The MNA project to check.
+
+**Returns:**
+
+- *QStringList* — List of op type strings with no registered schema.
+
+---
+
+## Static Methods
+
+### instance()
+
+Access the singleton instance.
+
+---
+
+## Authors of this file
+
+_No authors recorded in the source file._
