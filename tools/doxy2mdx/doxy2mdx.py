@@ -633,7 +633,7 @@ def generate_class_mdx(compounddef,
 # Sidebar fragment
 # ---------------------------------------------------------------------------
 
-def generate_sidebar_fragment(sidebar_out: Path) -> None:
+def generate_sidebar_fragment(sidebar_out: Path, out_dir: Path) -> None:
     groups: Dict[str, List[dict]] = defaultdict(list)
     for entry in _REGISTRY["classes"]:
         if not entry.get("documented", False):
@@ -651,9 +651,17 @@ def generate_sidebar_fragment(sidebar_out: Path) -> None:
     categories: List[str] = []
     for mod_name, mod in mod_items:
         items = []
+        dir_slug = mod.get('dir_slug', mod_name)
         for entry in groups[mod_name]:
             slug = class_slug(entry["name"])
-            items.append(f"        'api/{mod.get('dir_slug', mod_name)}/{slug}'")
+            mdx_path = out_dir / dir_slug / f"{slug}.mdx"
+            if not mdx_path.exists():
+                LOG.warning(
+                    "sidebar: skipping registered class %s (no MDX at %s)",
+                    entry["name"], mdx_path,
+                )
+                continue
+            items.append(f"        'api/{dir_slug}/{slug}'")
         if not items:
             continue
         categories.append(
@@ -804,7 +812,7 @@ def main(argv: Optional[List[str]] = None) -> int:
             sidebar_out = args.sidebar_out
         else:
             sidebar_out = args.out_dir.resolve().parent.parent / "sidebars.api.generated.ts"
-        generate_sidebar_fragment(sidebar_out)
+        generate_sidebar_fragment(sidebar_out, args.out_dir)
 
     if args.strict and warnings:
         return 1
