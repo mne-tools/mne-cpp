@@ -1,35 +1,33 @@
 //=============================================================================================================
 /**
- * @file     sts_ttest.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file sts_ttest.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Frequentist Student's t-tests with exact p-values via the regularised incomplete beta function.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * Provides the three single-sample / paired / two-sample independent
+ * variants of Student's t-test that the rest of STSLIB needs. All three
+ * test the null hypothesis that the mean (or mean difference) equals
+ * @c mu, with the alternative selected via @ref STSLIB::StatsTailType
+ * (left, right, both). The statistic is the textbook
+ * @f$t = (\bar{x}-\mu) / (s/\sqrt{n})@f$ with @c n-1 / @c n-1 / @c n_A+n_B-2
+ * degrees of freedom; columns of the input matrix are tested in parallel
+ * so a (n_obs x n_features) array produces a single row of t-values and
+ * p-values in one call.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * The p-value is computed from the exact Student-t CDF, evaluated via
+ * the regularised incomplete beta function @f$I_x(a,b)@f$ with the
+ * Lentz continued-fraction recursion of Numerical Recipes 6.4; no
+ * normal-approximation fallback is used. The CDF and incomplete-beta
+ * routines are exposed as @c public so @ref STSLIB::StatsFtest can reuse
+ * them for its F-distribution implementation.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    StatsTtest class declaration.
- *
+ * References: Student (1908), Biometrika 6(1); Press et al., Numerical
+ * Recipes 3rd ed., section 6.4.
  */
 
 #ifndef STS_TTEST_H
@@ -58,6 +56,8 @@ namespace STSLIB
 //=============================================================================================================
 /**
  * Result structure for t-tests.
+ *
+ * @brief Per-call output of a Student t-test: t-statistics, p-values and degrees of freedom.
  */
 struct STSSHARED_EXPORT StatsTtestResult {
     Eigen::MatrixXd matTstat;       /**< t-statistics (same shape as input columns). */
@@ -69,7 +69,7 @@ struct STSSHARED_EXPORT StatsTtestResult {
 /**
  * Provides t-test implementations: one-sample, paired, and independent two-sample.
  *
- * @brief T-test statistical testing.
+ * @brief One-sample, paired and independent two-sample Student t-tests with exact p-values via the regularised incomplete beta function.
  */
 class STSSHARED_EXPORT StatsTtest
 {

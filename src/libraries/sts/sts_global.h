@@ -1,35 +1,29 @@
 //=============================================================================================================
 /**
- * @file     sts_global.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file sts_global.h
+ * @since 2026
+ * @date  April 2026
+ * @brief STSLIB shared-library export macro and build-info accessors for the statistical-tests library.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * STSLIB is the mne-cpp library that performs frequentist inference on
+ * sensor- and source-level M/EEG data. It bundles classic parametric
+ * tests (one-sample, paired and two-sample Student t-tests, one-way
+ * ANOVA), the family of multiple-comparison corrections used in the
+ * neuroimaging literature (Bonferroni, Holm-Bonferroni, Benjamini-Hochberg
+ * FDR), Maris-Oostenveld cluster permutation testing with sign-flip and
+ * label-shuffle nulls, Threshold-Free Cluster Enhancement, regularised
+ * covariance estimators (Ledoit-Wolf, OAS, PCA, factor analysis,
+ * cross-validated auto-select) and the peak-error / spatial-dispersion
+ * source-localisation metrics used for inverse-solution evaluation.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    stats library export/import macros.
- *
+ * This header only exposes the @c STSSHARED_EXPORT decoration and the
+ * three @c buildDateTime / @c buildHash accessors that let downstream
+ * tools stamp the exact STSLIB binary used to produce a result; all
+ * statistical machinery lives in the per-method headers in this folder.
  */
 
 #ifndef STS_GLOBAL_H

@@ -1,35 +1,39 @@
 //=============================================================================================================
 /**
- * @file     sts_cov_estimators.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file sts_cov_estimators.h
+ * @since 2026
+ * @date  May 2026
+ * @brief Regularised covariance estimators for M/EEG noise covariances, matching MNE-Python's compute_covariance() API.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * M/EEG sensor counts routinely exceed the number of clean baseline
+ * samples, which makes the unregularised sample covariance rank-deficient
+ * and unusable as the @c C operator in MNE/dSPM/sLORETA inverse
+ * solutions. This module provides the same family of regularised
+ * estimators as @c mne.compute_covariance with @c method='auto', so
+ * STSLIB users get a numerically well-conditioned covariance regardless
+ * of how undersampled the input is.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * Six estimators are exposed: the analytic Ledoit-Wolf shrinkage,
+ * Oracle Approximating Shrinkage (OAS), fixed diagonal regularisation
+ * @f$C+\lambda\,\bar{\sigma}^2 I@f$, rank-reduced PCA, EM Factor
+ * Analysis and a cross-validated auto-selector that picks the estimator
+ * with the highest held-out Gaussian log-likelihood. All routines take
+ * zero-mean data shaped @c (n_channels, n_samples) and return a
+ * @c (cov, parameter) pair; the auto-selector additionally returns the
+ * index of the winning method.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * The Ledoit-Wolf and OAS back-ends are thin wrappers over the
+ * scikit-learn-compatible @c Skigen::LedoitWolf and @c Skigen::OAS
+ * classes so the resulting covariances are numerically identical to
+ * those produced by MNE-Python.
  *
- *
- * @brief    StsCovEstimators class declaration.
- *
+ * References: Ledoit & Wolf (2004), J. Multivariate Anal. 88(2);
+ * Chen, Wiesel, Eldar & Hero (2010), IEEE TSP 58(10);
+ * Engemann & Gramfort (2015), NeuroImage 108.
  */
 
 #ifndef STS_COV_ESTIMATORS_H
@@ -69,7 +73,7 @@ namespace STSLIB {
  * MNE-Python's compute_covariance() API. Each method takes zero-mean data
  * (n_channels x n_samples) and returns a pair of (covariance, parameter).
  *
- * @brief Covariance matrix estimators including shrinkage methods.
+ * @brief Regularised covariance estimators (Ledoit-Wolf, OAS, fixed-diagonal, PCA, Factor Analysis, cross-validated auto-select) matching the MNE-Python compute_covariance() API.
  */
 class STSSHARED_EXPORT StsCovEstimators
 {

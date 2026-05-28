@@ -1,35 +1,31 @@
 //=============================================================================================================
 /**
- * @file     sts_ftest.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file sts_ftest.h
+ * @since 2026
+ * @date  April 2026
+ * @brief One-way ANOVA F-test with exact p-values for comparing two or more independent groups.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * Provides a one-way ANOVA on a list of @c k matrices, each holding
+ * @c n_g observations of the same set of variables. For each variable
+ * (column) the routine partitions the total sum-of-squares into the
+ * between-group and within-group components and forms
+ * @f$F = \mathrm{MS}_\text{between} / \mathrm{MS}_\text{within}@f$ with
+ * @c k-1 numerator and @c N-k denominator degrees of freedom, where
+ * @c N = sum of all @c n_g.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * The null hypothesis is equality of the group means; the alternative is
+ * that at least one group mean differs. P-values come from the exact F
+ * CDF expressed via the regularised incomplete beta function that
+ * @ref STSLIB::StatsTtest already exposes, so the two test families
+ * remain numerically consistent. The F-statistic is also the natural
+ * cluster-forming statistic for @ref STSLIB::StatsCluster::fTestPermutationTest.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    StatsFtest class declaration.
- *
+ * Reference: Fisher (1925), Statistical Methods for Research Workers,
+ * chapter 7.
  */
 
 #ifndef STS_FTEST_H
@@ -63,6 +59,8 @@ namespace STSLIB
 //=============================================================================================================
 /**
  * Result structure for F-tests.
+ *
+ * @brief Per-call output of a one-way ANOVA F-test: F-statistics, p-values, and between/within degrees of freedom.
  */
 struct STSSHARED_EXPORT StatsFtestResult {
     Eigen::MatrixXd matFstat;   /**< F-statistics. */
@@ -75,7 +73,7 @@ struct STSSHARED_EXPORT StatsFtestResult {
 /**
  * Provides F-test / one-way ANOVA implementation.
  *
- * @brief F-test (one-way ANOVA) statistical testing.
+ * @brief One-way ANOVA F-test with exact p-values via the regularised incomplete beta function.
  */
 class STSSHARED_EXPORT StatsFtest
 {

@@ -1,35 +1,33 @@
 //=============================================================================================================
 /**
- * @file     sts_source_metrics.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file sts_source_metrics.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Peak localisation error and spatial dispersion metrics for evaluating distributed M/EEG inverse solutions.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * Distributed source estimators (MNE, dSPM, sLORETA, eLORETA, CMNE)
+ * smear point sources across a neighbourhood of the cortex, so judging
+ * an inverse solver requires more than just looking at the maximum.
+ * This module provides the two metrics standardly reported in the
+ * source-localisation literature: peak localisation error (PE), the
+ * Euclidean distance between the true source and the estimated peak,
+ * and spatial dispersion (SD), the amplitude-weighted mean distance
+ * from the estimated peak
+ * @f$\mathrm{SD} = \sum_k |a_k|\,\|r_k - r_\text{peak}\| / \sum_k |a_k|@f$.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * PE quantifies localisation bias; SD quantifies how focally the
+ * solver concentrates activity around that peak. A good solver achieves
+ * a small PE and a small SD; trade-offs between the two characterise
+ * the different inverse families. The helper @c findPeakIndex returns
+ * the index of the source with maximum absolute amplitude so callers
+ * never have to roll their own argmax.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    StatsSourceMetrics class declaration.
- *
+ * References: Molins et al. (2008), NeuroImage 42(3); Lin et al. (2006),
+ * NeuroImage 31(1); Dinh et al. (2021), Front. Neurosci. 15.
  */
 
 #ifndef STS_SOURCE_METRICS_H
@@ -62,7 +60,7 @@ namespace STSLIB
  * as defined in Lin et al. (2006) and used for CMNE evaluation
  * in Dinh et al. (2021).
  *
- * @brief Source-space evaluation metrics.
+ * @brief Peak localisation error and spatial dispersion metrics for evaluating distributed M/EEG inverse solutions.
  */
 class STSSHARED_EXPORT StatsSourceMetrics
 {

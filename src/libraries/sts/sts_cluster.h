@@ -1,35 +1,35 @@
 //=============================================================================================================
 /**
- * @file     sts_cluster.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file sts_cluster.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Maris-Oostenveld cluster-mass permutation tests and Threshold-Free Cluster Enhancement for M/EEG inference.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * Mass-univariate t- or F-tests on dense (channel, time) or (vertex, time)
+ * grids generate a severe multiple-comparison problem. This module
+ * implements the standard fix: form an observed statistic map, threshold
+ * it at an a-priori cluster-forming level, group the supra-threshold
+ * samples into spatially (or spatio-temporally) connected clusters using
+ * a sparse adjacency graph from @ref STSLIB::StatsAdjacency and assign
+ * each cluster a cluster-mass test statistic equal to the sum of the
+ * underlying t- or F-values.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * The null distribution of the maximum cluster-mass is then built by
+ * Monte-Carlo permutation: condition labels are shuffled for the
+ * two-sample test, signs are flipped for the one-sample test, and
+ * groups are reassigned for the one-way ANOVA variant. The exchangeable
+ * label / sign-flip framework controls family-wise error in the strong
+ * sense at the cluster level. The module also exposes Threshold-Free
+ * Cluster Enhancement (TFCE), which integrates cluster extent and height
+ * over a range of thresholds and removes the arbitrary cluster-forming
+ * threshold.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    StatsCluster class declaration.
- *
+ * References: Maris & Oostenveld (2007), J. Neurosci. Methods 164(1);
+ * Smith & Nichols (2009), NeuroImage 44(1).
  */
 
 #ifndef STS_CLUSTER_H
@@ -66,6 +66,8 @@ namespace STSLIB
 //=============================================================================================================
 /**
  * Result structure for cluster permutation tests.
+ *
+ * @brief Per-call output of a cluster permutation test: observed statistic map, cluster masses, cluster p-values and cluster labels.
  */
 struct STSSHARED_EXPORT StatsClusterResult {
     Eigen::MatrixXd matTObs;            /**< Observed t-statistic map (nChannels x nTimes). */
@@ -79,7 +81,7 @@ struct STSSHARED_EXPORT StatsClusterResult {
 /**
  * Cluster-based permutation test for comparing two conditions.
  *
- * @brief Cluster permutation testing.
+ * @brief Maris-Oostenveld cluster-mass permutation tests and Threshold-Free Cluster Enhancement on (channel,time) or (vertex,time) statistic maps.
  */
 class STSSHARED_EXPORT StatsCluster
 {

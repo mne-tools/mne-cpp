@@ -1,35 +1,30 @@
 //=============================================================================================================
 /**
- * @file     sts_correction.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file sts_correction.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Family-wise error and false-discovery-rate corrections for mass-univariate p-value maps.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * Provides the three multiple-comparison adjustments most commonly
+ * reported in M/EEG papers: classical Bonferroni
+ * (@f$p^* = \min(np, 1)@f$), the Holm-Bonferroni step-down procedure
+ * that gives uniformly tighter family-wise error control than
+ * Bonferroni while remaining distribution-free, and the
+ * Benjamini-Hochberg FDR step-up procedure that controls the expected
+ * proportion of false discoveries rather than the probability of any.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * All three routines operate on an Eigen matrix of raw p-values and
+ * return a matrix of the same shape with corrected p-values; the caller
+ * compares against the desired @f$\alpha@f$ as usual. Cluster-based
+ * correction (the Maris-Oostenveld alternative to FDR for spatially
+ * structured data) lives in @ref STSLIB::StatsCluster.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    StatsMcCorrection class declaration.
- *
+ * References: Holm (1979), Scandinavian Journal of Statistics 6(2);
+ * Benjamini & Hochberg (1995), JRSS-B 57(1).
  */
 
 #ifndef STS_CORRECTION_H
@@ -58,7 +53,7 @@ namespace STSLIB
 /**
  * Multiple comparison correction methods.
  *
- * @brief Multiple comparison corrections (Bonferroni, Holm-Bonferroni, FDR).
+ * @brief Bonferroni, Holm-Bonferroni and Benjamini-Hochberg FDR adjustments for mass-univariate p-value maps.
  */
 class STSSHARED_EXPORT StatsMcCorrection
 {

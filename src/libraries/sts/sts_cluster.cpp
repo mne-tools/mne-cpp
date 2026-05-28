@@ -1,35 +1,36 @@
 //=============================================================================================================
 /**
- * @file     sts_cluster.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file sts_cluster.cpp
+ * @since 2026
+ * @date  April 2026
+ * @brief Implementation of the cluster permutation tests and TFCE enhancement declared in sts_cluster.h.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * Each permutation entry point first computes the observed statistic map
+ * (paired or one-sample t for the t-variants, one-way ANOVA F for the
+ * @c fTestPermutationTest) and derives the cluster-forming threshold
+ * from @c clusterAlpha through the inverse Student-t CDF. Connected
+ * supra-threshold components are extracted with a queue-based
+ * breadth-first search over the @ref STSLIB::StatsAdjacency sparse
+ * graph and each component is assigned a cluster-mass equal to the sum
+ * of its t- or F-values.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * The null distribution of the maximum absolute cluster-mass is then
+ * built by @c QtConcurrent::blockingMapped over @c nPermutations
+ * randomisations - exchangeable label shuffles for the two-sample test,
+ * Rademacher sign flips for the one-sample test, and group-label
+ * reassignments for the ANOVA test - with thread-local
+ * @c QRandomGenerator instances for reproducibility. Observed cluster
+ * p-values are the empirical exceedance probability under that null.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    StatsCluster class definition.
- *
+ * TFCE follows Smith & Nichols (2009): the statistic map is swept by
+ * @c nSteps thresholds and each supra-threshold connected component
+ * contributes @f$\text{extent}^E \cdot h^H \cdot \Delta h@f$ to every
+ * sample it covers. Positive and negative tails are handled separately
+ * and recombined so signed enhancement is preserved.
  */
 
 //=============================================================================================================
