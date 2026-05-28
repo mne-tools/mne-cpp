@@ -2,7 +2,7 @@
   "$comment": "Single source of truth for all MNE-CPP public API classes and their provenance. Tracks where each implementation originates (mne-python, mne-c/SVN, scikit-learn, scipy, custom), where it is tested, and whether an example exists. Used for systematic porting coverage analysis.",
   "meta": {
     "version": "1.0.0",
-    "last_updated": "2026-05-02",
+    "last_updated": "2026-05-28",
     "mne_cpp_version": "2.3.0-dev",
     "mne_python_ref": "1.9.x",
     "mne_c_ref": "SVN r12960"
@@ -11,97 +11,154 @@
     "fiff": {
       "dir": "src/libraries/fiff",
       "sidebar_label": "FIFFLIB — FIFF I/O",
-      "origin": "mne-c"
+      "origin": "mne-c",
+      "include": "fiff",
+      "dir_slug": "fiff",
+      "sidebar_position": 1
     },
     "mne": {
       "dir": "src/libraries/mne",
       "sidebar_label": "MNELIB — Core Data Structures",
-      "origin": "mne-c"
+      "origin": "mne-c",
+      "include": "mne",
+      "dir_slug": "mne",
+      "sidebar_position": 2
     },
     "fwd": {
       "dir": "src/libraries/fwd",
       "sidebar_label": "FWDLIB — Forward Modeling",
-      "origin": "mne-c"
+      "origin": "mne-c",
+      "include": "fwd",
+      "dir_slug": "fwd",
+      "sidebar_position": 3
     },
     "inv": {
       "dir": "src/libraries/inv",
       "sidebar_label": "INVLIB — Inverse Solutions",
-      "origin": "mne-c + mne-python"
+      "origin": "mne-c + mne-python",
+      "include": "inv",
+      "dir_slug": "inv",
+      "sidebar_position": 4
     },
     "dsp": {
       "dir": "src/libraries/dsp",
       "sidebar_label": "DSPLIB — Signal Processing",
-      "origin": "mne-python + custom"
+      "origin": "mne-python + custom",
+      "include": "dsp",
+      "dir_slug": "dsp",
+      "sidebar_position": 5
     },
     "conn": {
       "dir": "src/libraries/conn",
       "sidebar_label": "CONNLIB — Connectivity",
-      "origin": "mne-python"
+      "origin": "mne-python",
+      "include": "conn",
+      "dir_slug": "conn",
+      "sidebar_position": 6
     },
     "decoding": {
       "dir": "src/libraries/decoding",
       "sidebar_label": "DECODINGLIB — Signal Decoding",
-      "origin": "mne-python"
+      "origin": "mne-python",
+      "include": "decoding",
+      "dir_slug": "decoding",
+      "sidebar_position": 7
     },
     "ml": {
       "dir": "src/libraries/ml",
       "sidebar_label": "MLLIB — ML Infrastructure",
-      "origin": "custom"
+      "origin": "custom",
+      "include": "ml",
+      "dir_slug": "ml",
+      "sidebar_position": 8
     },
     "sts": {
       "dir": "src/libraries/sts",
       "sidebar_label": "STSLIB — Statistics",
-      "origin": "mne-python (scipy/sklearn)"
+      "origin": "mne-python (scipy/sklearn)",
+      "include": "sts",
+      "dir_slug": "sts",
+      "sidebar_position": 9
     },
     "fs": {
       "dir": "src/libraries/fs",
       "sidebar_label": "FSLIB — FreeSurfer",
-      "origin": "mne-c + mne-python"
+      "origin": "mne-c + mne-python",
+      "include": "fs",
+      "dir_slug": "fs",
+      "sidebar_position": 10
     },
     "math": {
       "dir": "src/libraries/math",
       "sidebar_label": "MATHLIB — Mathematics",
-      "origin": "mne-c + scipy"
+      "origin": "mne-c + scipy",
+      "include": "math",
+      "dir_slug": "math",
+      "sidebar_position": 11
     },
     "mri": {
       "dir": "src/libraries/mri",
       "sidebar_label": "MRILIB — MRI / Anatomy",
-      "origin": "mne-c"
+      "origin": "mne-c",
+      "include": "mri",
+      "dir_slug": "mri",
+      "sidebar_position": 12
     },
     "bids": {
       "dir": "src/libraries/bids",
       "sidebar_label": "BIDSLIB — BIDS Format",
-      "origin": "mne-bids"
+      "origin": "mne-bids",
+      "include": "bids",
+      "dir_slug": "bids",
+      "sidebar_position": 13
     },
     "utils": {
       "dir": "src/libraries/utils",
       "sidebar_label": "UTILSLIB — Utilities",
-      "origin": "mne-c + custom"
+      "origin": "mne-c + custom",
+      "include": "utils",
+      "dir_slug": "utils",
+      "sidebar_position": 14
     },
     "com": {
       "dir": "src/libraries/com",
       "sidebar_label": "COMLIB — Real-Time Communication",
-      "origin": "custom"
+      "origin": "custom",
+      "include": "com",
+      "dir_slug": "com",
+      "sidebar_position": 15
     },
     "lsl": {
       "dir": "src/libraries/lsl",
       "sidebar_label": "LSLLIB — Lab Streaming Layer",
-      "origin": "custom"
+      "origin": "custom",
+      "include": "lsl",
+      "dir_slug": "lsl",
+      "sidebar_position": 16
     },
     "mna": {
       "dir": "src/libraries/mna",
       "sidebar_label": "MNALIB — Modular Architecture",
-      "origin": "custom"
+      "origin": "custom",
+      "include": "mna",
+      "dir_slug": "mna",
+      "sidebar_position": 17
     },
     "disp": {
       "dir": "src/libraries/disp",
       "sidebar_label": "DISPLIB — 2D Visualization",
-      "origin": "custom"
+      "origin": "custom",
+      "include": "disp",
+      "dir_slug": "disp",
+      "sidebar_position": 18
     },
     "disp3D": {
       "dir": "src/libraries/disp3D",
       "sidebar_label": "DISP3DLIB — 3D Visualization",
-      "origin": "custom"
+      "origin": "custom",
+      "include": "disp3D",
+      "dir_slug": "disp3-d",
+      "sidebar_position": 19
     }
   },
   "classes": [
@@ -116,7 +173,12 @@
       "test": "test_fiff_raw_io",
       "example": "ex_fiff_io",
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 1,
+      "guide": null,
+      "python_equiv": "mne.io.fiff.FiffStream",
+      "python_url": null
     },
     {
       "name": "FiffRawData",
@@ -129,7 +191,12 @@
       "test": "test_fiff_raw_io",
       "example": "ex_read_raw",
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 2,
+      "guide": null,
+      "python_equiv": "mne.io.Raw",
+      "python_url": null
     },
     {
       "name": "FiffInfo",
@@ -142,7 +209,12 @@
       "test": "test_fiff_info",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 3,
+      "guide": null,
+      "python_equiv": "mne.Info",
+      "python_url": null
     },
     {
       "name": "FiffEvoked",
@@ -155,7 +227,12 @@
       "test": "test_fiff_io_evoked_info",
       "example": "ex_read_evoked",
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 4,
+      "guide": null,
+      "python_equiv": "mne.Evoked",
+      "python_url": null
     },
     {
       "name": "FiffEpochs",
@@ -168,7 +245,12 @@
       "test": "test_epochs",
       "example": "ex_read_epochs",
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 5,
+      "guide": null,
+      "python_equiv": "mne.Epochs",
+      "python_url": null
     },
     {
       "name": "FiffCov",
@@ -181,7 +263,12 @@
       "test": "test_fiff_cov",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 6,
+      "guide": null,
+      "python_equiv": "mne.Covariance",
+      "python_url": null
     },
     {
       "name": "FiffProj",
@@ -194,7 +281,12 @@
       "test": "test_mne_projections",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 7,
+      "guide": null,
+      "python_equiv": "mne.Projection",
+      "python_url": null
     },
     {
       "name": "FiffCoordTrans",
@@ -207,7 +299,12 @@
       "test": "test_fiff_coord_trans",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 8,
+      "guide": null,
+      "python_equiv": "mne.transforms.Transform",
+      "python_url": null
     },
     {
       "name": "FiffAnnotations",
@@ -220,7 +317,12 @@
       "test": "test_fiff_annotations",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 9,
+      "guide": null,
+      "python_equiv": "mne.Annotations",
+      "python_url": null
     },
     {
       "name": "FiffAnnotationEventUtils",
@@ -233,7 +335,12 @@
       "test": "test_fiff_annotation_event_utils",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 10,
+      "guide": null,
+      "python_equiv": "mne.events_from_annotations",
+      "python_url": null
     },
     {
       "name": "MNEForwardSolution",
@@ -246,7 +353,12 @@
       "test": "test_mne_forward_solution",
       "example": "ex_read_fwd",
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 1,
+      "guide": null,
+      "python_equiv": "mne.Forward",
+      "python_url": null
     },
     {
       "name": "MNEInverseOperator",
@@ -259,7 +371,12 @@
       "test": "test_tool_inverse_operator",
       "example": "ex_make_inverse_operator",
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 2,
+      "guide": null,
+      "python_equiv": "mne.InverseOperator",
+      "python_url": null
     },
     {
       "name": "MNESourceSpace",
@@ -272,7 +389,12 @@
       "test": "test_mne_source_data",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 3,
+      "guide": null,
+      "python_equiv": "mne.SourceSpaces",
+      "python_url": null
     },
     {
       "name": "MNEBem",
@@ -285,7 +407,12 @@
       "test": "test_fwd_bem_data",
       "example": "ex_read_bem",
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 4,
+      "guide": null,
+      "python_equiv": "mne.make_bem_model",
+      "python_url": null
     },
     {
       "name": "MneICP",
@@ -298,7 +425,12 @@
       "test": "test_coregistration",
       "example": "ex_coreg",
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 5,
+      "guide": null,
+      "python_equiv": "mne.coreg.Coregistration",
+      "python_url": null
     },
     {
       "name": "ComputeFwd",
@@ -311,7 +443,12 @@
       "test": "test_tool_forward_generation",
       "example": "ex_compute_forward",
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 1,
+      "guide": null,
+      "python_equiv": "mne.make_forward_solution",
+      "python_url": null
     },
     {
       "name": "FwdBemModel",
@@ -324,7 +461,12 @@
       "test": "test_fwd_bem_data",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 2,
+      "guide": null,
+      "python_equiv": "mne.make_bem_model",
+      "python_url": null
     },
     {
       "name": "FwdEegSphereModel",
@@ -337,7 +479,12 @@
       "test": "test_fwd_sphere_settings",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 3,
+      "guide": null,
+      "python_equiv": "mne.make_sphere_model",
+      "python_url": null
     },
     {
       "name": "InvMinimumNorm",
@@ -350,7 +497,12 @@
       "test": "test_compute_raw_inverse",
       "example": "ex_inverse_mne",
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 1,
+      "guide": null,
+      "python_equiv": "mne.minimum_norm.apply_inverse",
+      "python_url": null
     },
     {
       "name": "InvCMNE",
@@ -364,7 +516,12 @@
       "example": "ex_clustered_inverse_mne",
       "status": "done",
       "skigen_candidate": false,
-      "notes": "CMNE (Dinh et al. 2021) — MNE-CPP original; deep-learning-enhanced inverse"
+      "notes": "CMNE (Dinh et al. 2021) — MNE-CPP original; deep-learning-enhanced inverse",
+      "documented": true,
+      "sidebar_position": 2,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
     },
     {
       "name": "InvLCMV",
@@ -377,7 +534,12 @@
       "test": "test_inv_beamformer",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 3,
+      "guide": null,
+      "python_equiv": "mne.beamformer.make_lcmv / apply_lcmv",
+      "python_url": null
     },
     {
       "name": "InvDICS",
@@ -390,7 +552,12 @@
       "test": "test_inv_beamformer",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 4,
+      "guide": null,
+      "python_equiv": "mne.beamformer.make_dics / apply_dics",
+      "python_url": null
     },
     {
       "name": "InvRapMusic",
@@ -403,7 +570,12 @@
       "test": "test_inv_dipole_rap_mne",
       "example": "ex_inverse_rap_music",
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 5,
+      "guide": null,
+      "python_equiv": "mne.beamformer.rap_music",
+      "python_url": null
     },
     {
       "name": "InvTrapMusic",
@@ -416,7 +588,12 @@
       "test": "test_trap_music",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 6,
+      "guide": null,
+      "python_equiv": "mne.beamformer.trap_music",
+      "python_url": null
     },
     {
       "name": "InvDipoleFit",
@@ -429,7 +606,12 @@
       "test": "test_dipole_fit",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 7,
+      "guide": null,
+      "python_equiv": "mne.fit_dipole",
+      "python_url": null
     },
     {
       "name": "InvMxne",
@@ -443,7 +625,12 @@
       "example": null,
       "status": "done",
       "skigen_candidate": false,
-      "notes": "Uses IRLS internally, not direct sklearn MultiTaskLasso"
+      "notes": "Uses IRLS internally, not direct sklearn MultiTaskLasso",
+      "documented": true,
+      "sidebar_position": 8,
+      "guide": null,
+      "python_equiv": "mne.inverse_sparse.mixed_norm",
+      "python_url": null
     },
     {
       "name": "InvGammaMap",
@@ -456,7 +643,12 @@
       "test": "test_inv_sparse",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 9,
+      "guide": null,
+      "python_equiv": "mne.inverse_sparse.gamma_map",
+      "python_url": null
     },
     {
       "name": "InvTfMxne",
@@ -469,7 +661,12 @@
       "test": "test_tf_mxne",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 10,
+      "guide": null,
+      "python_equiv": "mne.inverse_sparse.tf_mixed_norm",
+      "python_url": null
     },
     {
       "name": "InvHpiFit",
@@ -482,7 +679,12 @@
       "test": "test_hpiFit",
       "example": "ex_hpiFit",
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 11,
+      "guide": null,
+      "python_equiv": "mne.chpi",
+      "python_url": null
     },
     {
       "name": "InvSourceEstimate",
@@ -495,7 +697,12 @@
       "test": "test_source_estimate_types",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 12,
+      "guide": null,
+      "python_equiv": "mne.SourceEstimate",
+      "python_url": null
     },
     {
       "name": "InvVectorSourceEstimate",
@@ -508,7 +715,12 @@
       "test": "test_source_estimate_types",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 13,
+      "guide": null,
+      "python_equiv": "mne.VectorSourceEstimate",
+      "python_url": null
     },
     {
       "name": "InvVolumeSourceEstimate",
@@ -521,7 +733,12 @@
       "test": "test_source_estimate_types",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 14,
+      "guide": null,
+      "python_equiv": "mne.VolumeSourceEstimate",
+      "python_url": null
     },
     {
       "name": "InvSourceEstimateIO",
@@ -534,7 +751,12 @@
       "test": "test_source_estimate_io",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 15,
+      "guide": null,
+      "python_equiv": "mne.SourceEstimate.save / read",
+      "python_url": null
     },
     {
       "name": "InvLabelTimeCourse",
@@ -547,7 +769,12 @@
       "test": "test_label_time_course",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 16,
+      "guide": null,
+      "python_equiv": "mne.extract_label_time_course",
+      "python_url": null
     },
     {
       "name": "InvResolutionMatrix",
@@ -560,7 +787,12 @@
       "test": "test_resolution_matrix",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 17,
+      "guide": null,
+      "python_equiv": "mne.minimum_norm.make_inverse_resolution_matrix",
+      "python_url": null
     },
     {
       "name": "InvConvenience",
@@ -573,7 +805,12 @@
       "test": "test_inv_convenience",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 18,
+      "guide": null,
+      "python_equiv": "mne.minimum_norm.apply_inverse_epochs / apply_inverse_raw / apply_inverse_cov",
+      "python_url": null
     },
     {
       "name": "SourceMorph",
@@ -586,7 +823,12 @@
       "test": "test_source_morph",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 19,
+      "guide": null,
+      "python_equiv": "mne.SourceMorph",
+      "python_url": null
     },
     {
       "name": "FilterKernel",
@@ -599,7 +841,12 @@
       "test": "test_filter_kernel",
       "example": "ex_filtering",
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 1,
+      "guide": null,
+      "python_equiv": "mne.filter.create_filter",
+      "python_url": null
     },
     {
       "name": "FirFilter",
@@ -612,7 +859,12 @@
       "test": "test_dsp_firfilter",
       "example": "ex_filtering",
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 2,
+      "guide": null,
+      "python_equiv": "mne.filter.filter_data",
+      "python_url": null
     },
     {
       "name": "IirFilter",
@@ -625,7 +877,12 @@
       "test": "test_dsp_iirfilter",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 3,
+      "guide": null,
+      "python_equiv": "mne.filter.filter_data (method='iir')",
+      "python_url": null
     },
     {
       "name": "ICA",
@@ -639,7 +896,12 @@
       "example": null,
       "status": "done",
       "skigen_candidate": false,
-      "notes": "Custom FastICA impl; does NOT call sklearn directly"
+      "notes": "Custom FastICA impl; does NOT call sklearn directly",
+      "documented": true,
+      "sidebar_position": 4,
+      "guide": null,
+      "python_equiv": "mne.preprocessing.ICA (fastica)",
+      "python_url": null
     },
     {
       "name": "PicardIca",
@@ -652,7 +914,12 @@
       "test": "test_picard_ica",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 5,
+      "guide": null,
+      "python_equiv": "mne.preprocessing.ICA (picard)",
+      "python_url": null
     },
     {
       "name": "ExtendedInfomax",
@@ -665,7 +932,12 @@
       "test": "test_dsp_infomax",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 6,
+      "guide": null,
+      "python_equiv": "mne.preprocessing.ICA (infomax)",
+      "python_url": null
     },
     {
       "name": "SSS",
@@ -678,7 +950,12 @@
       "test": "test_dsp_sss",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 7,
+      "guide": null,
+      "python_equiv": "mne.preprocessing.maxwell_filter",
+      "python_url": null
     },
     {
       "name": "BadChannelsMaxwell",
@@ -691,7 +968,12 @@
       "test": "test_dsp_bad_channels_maxwell",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 8,
+      "guide": null,
+      "python_equiv": "mne.preprocessing.find_bad_channels_maxwell",
+      "python_url": null
     },
     {
       "name": "BadChannelsLof",
@@ -706,7 +988,12 @@
       "status": "done",
       "skigen_candidate": true,
       "skigen_target": "Skigen::Neighbors::LocalOutlierFactor",
-      "notes": "LOF algorithm reimplemented in mne-cpp; should be migrated to skigen"
+      "notes": "LOF algorithm reimplemented in mne-cpp; should be migrated to skigen",
+      "documented": true,
+      "sidebar_position": 9,
+      "guide": null,
+      "python_equiv": "mne.preprocessing._lof",
+      "python_url": null
     },
     {
       "name": "EogRegression",
@@ -719,7 +1006,12 @@
       "test": "test_dsp_eog_regression",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 10,
+      "guide": null,
+      "python_equiv": "mne.preprocessing.regress_artifact",
+      "python_url": null
     },
     {
       "name": "EegReference",
@@ -732,7 +1024,12 @@
       "test": "test_dsp_eeg_reference",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 11,
+      "guide": null,
+      "python_equiv": "mne.set_eeg_reference",
+      "python_url": null
     },
     {
       "name": "StimArtifact",
@@ -745,7 +1042,12 @@
       "test": "test_dsp_stim_artifact",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 12,
+      "guide": null,
+      "python_equiv": "mne.preprocessing.fix_stim_artifact",
+      "python_url": null
     },
     {
       "name": "FilterChpi",
@@ -758,7 +1060,12 @@
       "test": "test_dsp_filter_chpi",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 13,
+      "guide": null,
+      "python_equiv": "mne.chpi.filter_chpi",
+      "python_url": null
     },
     {
       "name": "AnnotateArtifact",
@@ -771,7 +1078,12 @@
       "test": "test_dsp_annotate_artifact",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 14,
+      "guide": null,
+      "python_equiv": "mne.preprocessing.annotate_muscle_zscore / annotate_amplitude",
+      "python_url": null
     },
     {
       "name": "BridgedElectrodes",
@@ -784,7 +1096,12 @@
       "test": "test_dsp_bridged_electrodes",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 15,
+      "guide": null,
+      "python_equiv": "mne.preprocessing.compute_bridged_electrodes",
+      "python_url": null
     },
     {
       "name": "FineCalibration",
@@ -797,7 +1114,12 @@
       "test": "test_fine_calibration",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 16,
+      "guide": null,
+      "python_equiv": "mne.preprocessing.read_fine_calibration",
+      "python_url": null
     },
     {
       "name": "MaxwellMovementComp",
@@ -810,7 +1132,12 @@
       "test": "test_maxwell_movement_comp",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 17,
+      "guide": null,
+      "python_equiv": "mne.preprocessing.maxwell_filter (head_pos)",
+      "python_url": null
     },
     {
       "name": "SurfaceLaplacian",
@@ -823,7 +1150,12 @@
       "test": "test_surface_laplacian",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 18,
+      "guide": null,
+      "python_equiv": "mne.preprocessing.compute_current_source_density",
+      "python_url": null
     },
     {
       "name": "PeakFinder",
@@ -836,7 +1168,12 @@
       "test": "test_dsp_peak_finder",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 19,
+      "guide": null,
+      "python_equiv": "mne.preprocessing.peak_finder",
+      "python_url": null
     },
     {
       "name": "WelchPsd",
@@ -849,7 +1186,12 @@
       "test": "test_dsp_welch_psd",
       "example": "ex_spectral",
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 20,
+      "guide": null,
+      "python_equiv": "mne.time_frequency.psd_welch",
+      "python_url": null
     },
     {
       "name": "MultitaperPsd",
@@ -862,7 +1204,12 @@
       "test": "test_dsp_multitaper",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 21,
+      "guide": null,
+      "python_equiv": "mne.time_frequency.psd_multitaper",
+      "python_url": null
     },
     {
       "name": "MorletTfr",
@@ -875,7 +1222,12 @@
       "test": "test_dsp_morlet_tfr",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 22,
+      "guide": null,
+      "python_equiv": "mne.time_frequency.tfr_morlet",
+      "python_url": null
     },
     {
       "name": "MultitaperTfr",
@@ -888,7 +1240,12 @@
       "test": "test_dsp_multitaper",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 23,
+      "guide": null,
+      "python_equiv": "mne.time_frequency.tfr_multitaper",
+      "python_url": null
     },
     {
       "name": "Resample",
@@ -901,7 +1258,12 @@
       "test": "test_dsp_resample",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 24,
+      "guide": null,
+      "python_equiv": "mne.filter.resample",
+      "python_url": null
     },
     {
       "name": "Xdawn",
@@ -914,7 +1276,12 @@
       "test": "test_dsp_xdawn",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 25,
+      "guide": null,
+      "python_equiv": "mne.preprocessing.Xdawn",
+      "python_url": null
     },
     {
       "name": "Sphara",
@@ -928,7 +1295,12 @@
       "example": null,
       "status": "done",
       "skigen_candidate": false,
-      "notes": "SPHARA — MNE-CPP original; surface harmonics for MEG"
+      "notes": "SPHARA — MNE-CPP original; surface harmonics for MEG",
+      "documented": true,
+      "sidebar_position": 26,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
     },
     {
       "name": "ConnectivityAec",
@@ -941,7 +1313,12 @@
       "test": "test_connectivity_aec",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 27,
+      "guide": null,
+      "python_equiv": "mne_connectivity.envelope_correlation",
+      "python_url": null
     },
     {
       "name": "Simulate",
@@ -954,7 +1331,12 @@
       "test": "test_dsp_simulate",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 28,
+      "guide": null,
+      "python_equiv": "mne.simulation.simulate_stc / simulate_evoked",
+      "python_url": null
     },
     {
       "name": "Connectivity",
@@ -967,7 +1349,12 @@
       "test": "test_connectivity_metrics",
       "example": "ex_connectivity",
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 1,
+      "guide": null,
+      "python_equiv": "mne_connectivity.spectral_connectivity_epochs",
+      "python_url": null
     },
     {
       "name": "Coherence",
@@ -980,7 +1367,12 @@
       "test": "test_connectivity_metrics",
       "example": "ex_connectivity",
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 2,
+      "guide": null,
+      "python_equiv": "mne_connectivity.spectral_connectivity_epochs (method='coh')",
+      "python_url": null
     },
     {
       "name": "PhaseLockingValue",
@@ -993,7 +1385,12 @@
       "test": "test_connectivity_metrics",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 3,
+      "guide": null,
+      "python_equiv": "mne_connectivity.spectral_connectivity_epochs (method='plv')",
+      "python_url": null
     },
     {
       "name": "PhaseLagIndex",
@@ -1006,7 +1403,12 @@
       "test": "test_connectivity_metrics",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 4,
+      "guide": null,
+      "python_equiv": "mne_connectivity.spectral_connectivity_epochs (method='pli')",
+      "python_url": null
     },
     {
       "name": "GrangerCausality",
@@ -1019,7 +1421,12 @@
       "test": "test_spectral_connectivity",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 5,
+      "guide": null,
+      "python_equiv": "mne_connectivity.spectral_connectivity_epochs (method='gc')",
+      "python_url": null
     },
     {
       "name": "PartialDirectedCoherence",
@@ -1032,7 +1439,12 @@
       "test": "test_spectral_connectivity",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 6,
+      "guide": null,
+      "python_equiv": "mne_connectivity.spectral_connectivity_epochs (method='pdc')",
+      "python_url": null
     },
     {
       "name": "DirectedTransferFunction",
@@ -1045,7 +1457,12 @@
       "test": "test_spectral_connectivity",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 7,
+      "guide": null,
+      "python_equiv": "mne_connectivity.spectral_connectivity_epochs (method='dtf')",
+      "python_url": null
     },
     {
       "name": "DecodingCsp",
@@ -1059,7 +1476,12 @@
       "example": null,
       "status": "done",
       "skigen_candidate": false,
-      "notes": "Delegates to Skigen::CSP; adds MNE-specific transform modes (AveragePower/CspSpace), log/z-score standardisation, inverse_transform"
+      "notes": "Delegates to Skigen::CSP; adds MNE-specific transform modes (AveragePower/CspSpace), log/z-score standardisation, inverse_transform",
+      "documented": true,
+      "sidebar_position": 1,
+      "guide": null,
+      "python_equiv": "mne.decoding.CSP",
+      "python_url": null
     },
     {
       "name": "DecodingSpoc",
@@ -1073,7 +1495,12 @@
       "example": null,
       "status": "done",
       "skigen_candidate": false,
-      "notes": "Delegates to Skigen::SPoC; adds MNE-specific power feature extraction and transform modes"
+      "notes": "Delegates to Skigen::SPoC; adds MNE-specific power feature extraction and transform modes",
+      "documented": true,
+      "sidebar_position": 2,
+      "guide": null,
+      "python_equiv": "mne.decoding.SPoC",
+      "python_url": null
     },
     {
       "name": "DecodingSsd",
@@ -1087,7 +1514,12 @@
       "example": null,
       "status": "done",
       "skigen_candidate": false,
-      "notes": "Delegates to Skigen::SSD; adds apply() for denoised low-rank reconstruction"
+      "notes": "Delegates to Skigen::SSD; adds apply() for denoised low-rank reconstruction",
+      "documented": true,
+      "sidebar_position": 3,
+      "guide": null,
+      "python_equiv": "mne.decoding.SSD",
+      "python_url": null
     },
     {
       "name": "MlIcaLabel",
@@ -1101,7 +1533,12 @@
       "example": null,
       "status": "done",
       "skigen_candidate": false,
-      "notes": "ICA label classification — neuroscience-specific, stays in decoding"
+      "notes": "ICA label classification — neuroscience-specific, stays in decoding",
+      "documented": true,
+      "sidebar_position": 4,
+      "guide": null,
+      "python_equiv": "mne_icalabel",
+      "python_url": null
     },
     {
       "name": "MlTensor",
@@ -1115,7 +1552,12 @@
       "example": null,
       "status": "done",
       "skigen_candidate": false,
-      "notes": "N-dimensional tensor for ML inference (ONNX Runtime interop)"
+      "notes": "N-dimensional tensor for ML inference (ONNX Runtime interop)",
+      "documented": true,
+      "sidebar_position": 1,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
     },
     {
       "name": "MlModel",
@@ -1129,7 +1571,12 @@
       "example": null,
       "status": "done",
       "skigen_candidate": false,
-      "notes": "Abstract base class for ML model inference"
+      "notes": "Abstract base class for ML model inference",
+      "documented": true,
+      "sidebar_position": 2,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
     },
     {
       "name": "MlOnnxModel",
@@ -1143,7 +1590,12 @@
       "example": null,
       "status": "done",
       "skigen_candidate": false,
-      "notes": "ONNX Runtime model inference implementation"
+      "notes": "ONNX Runtime model inference implementation",
+      "documented": true,
+      "sidebar_position": 3,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
     },
     {
       "name": "MLTrainer",
@@ -1157,7 +1609,12 @@
       "example": null,
       "status": "done",
       "skigen_candidate": false,
-      "notes": "Orchestrates ML training via Python subprocess"
+      "notes": "Orchestrates ML training via Python subprocess",
+      "documented": true,
+      "sidebar_position": 4,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
     },
     {
       "name": "KMeans",
@@ -1172,7 +1629,12 @@
       "status": "done",
       "skigen_candidate": true,
       "skigen_target": "Skigen::Cluster::KMeans (exists)",
-      "notes": "Direct sklearn equivalent; should delegate to skigen"
+      "notes": "Direct sklearn equivalent; should delegate to skigen",
+      "documented": true,
+      "sidebar_position": 1,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
     },
     {
       "name": "StsCovEstimators",
@@ -1187,7 +1649,12 @@
       "status": "done",
       "skigen_candidate": true,
       "skigen_target": "Skigen::Covariance (new module needed)",
-      "notes": "Ledoit-Wolf, OAS shrinkage, PCA cov, Factor Analysis, auto-select via cross-validation — all reimplemented from sklearn; core algorithms should move to skigen"
+      "notes": "Ledoit-Wolf, OAS shrinkage, PCA cov, Factor Analysis, auto-select via cross-validation — all reimplemented from sklearn; core algorithms should move to skigen",
+      "documented": true,
+      "sidebar_position": 1,
+      "guide": null,
+      "python_equiv": "mne.cov (compute_covariance methods)",
+      "python_url": null
     },
     {
       "name": "StatsCluster",
@@ -1201,7 +1668,12 @@
       "example": null,
       "status": "done",
       "skigen_candidate": false,
-      "notes": "Cluster permutation testing — neuroscience-specific statistical method"
+      "notes": "Cluster permutation testing — neuroscience-specific statistical method",
+      "documented": true,
+      "sidebar_position": 2,
+      "guide": null,
+      "python_equiv": "mne.stats.permutation_cluster_test",
+      "python_url": null
     },
     {
       "name": "StatsAdjacency",
@@ -1214,7 +1686,12 @@
       "test": "test_sts_cluster",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 3,
+      "guide": null,
+      "python_equiv": "mne.stats.combine_adjacency",
+      "python_url": null
     },
     {
       "name": "FsSurface",
@@ -1227,7 +1704,12 @@
       "test": "test_fs",
       "example": "ex_fs_surface",
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 1,
+      "guide": null,
+      "python_equiv": "mne.read_surface",
+      "python_url": null
     },
     {
       "name": "FsAnnotation",
@@ -1240,7 +1722,12 @@
       "test": "test_fs_annotation_labels",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 2,
+      "guide": null,
+      "python_equiv": "mne.read_annot",
+      "python_url": null
     },
     {
       "name": "FsLabel",
@@ -1253,7 +1740,12 @@
       "test": "test_fs_annotation_labels",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 3,
+      "guide": null,
+      "python_equiv": "mne.read_label",
+      "python_url": null
     },
     {
       "name": "FsLabelUtils",
@@ -1266,7 +1758,12 @@
       "test": "test_label_utils",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 4,
+      "guide": null,
+      "python_equiv": "mne.grow_labels / mne.split_label / mne.stc_to_label",
+      "python_url": null
     },
     {
       "name": "Linalg",
@@ -1279,7 +1776,12 @@
       "test": "test_utils_mnemath",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 2,
+      "guide": null,
+      "python_equiv": "numpy.linalg / scipy.linalg",
+      "python_url": null
     },
     {
       "name": "SimplexAlgorithm",
@@ -1292,7 +1794,12 @@
       "test": "test_hpiFit",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 3,
+      "guide": null,
+      "python_equiv": "scipy.optimize.fmin",
+      "python_url": null
     },
     {
       "name": "Warp",
@@ -1305,7 +1812,12 @@
       "test": "test_utils_warp",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 4,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
     },
     {
       "name": "Sphere",
@@ -1318,7 +1830,12 @@
       "test": "test_utils_sphere",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 5,
+      "guide": null,
+      "python_equiv": "mne.make_sphere_model",
+      "python_url": null
     },
     {
       "name": "BidsPath",
@@ -1331,7 +1848,12 @@
       "test": "test_bids",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 1,
+      "guide": null,
+      "python_equiv": "mne_bids.BIDSPath",
+      "python_url": null
     },
     {
       "name": "BidsRawData",
@@ -1344,7 +1866,12 @@
       "test": "test_bids",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 2,
+      "guide": null,
+      "python_equiv": "mne_bids.read_raw_bids",
+      "python_url": null
     },
     {
       "name": "StandardMontage",
@@ -1357,7 +1884,12 @@
       "test": "test_standard_montage",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 1,
+      "guide": null,
+      "python_equiv": "mne.channels.make_standard_montage",
+      "python_url": null
     },
     {
       "name": "Report",
@@ -1370,7 +1902,12 @@
       "test": "test_report",
       "example": null,
       "status": "done",
-      "skigen_candidate": false
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 2,
+      "guide": null,
+      "python_equiv": "mne.Report",
+      "python_url": null
     }
   ],
   "skigen_migration_candidates": [
@@ -1434,19 +1971,33 @@
   "skigen_new_modules_needed": [
     {
       "module": "Covariance",
-      "classes": ["LedoitWolf", "OAS", "ShrunkCovariance", "EmpiricalCovariance"],
+      "classes": [
+        "LedoitWolf",
+        "OAS",
+        "ShrunkCovariance",
+        "EmpiricalCovariance"
+      ],
       "sklearn_module": "sklearn.covariance",
       "rationale": "mne-python uses sklearn.covariance extensively for noise covariance estimation; critical for inverse solutions"
     },
     {
       "module": "Decomposition (additions)",
-      "classes": ["FactorAnalysis", "FastICA", "CSP", "SPoC", "SSD"],
+      "classes": [
+        "FactorAnalysis",
+        "FastICA",
+        "CSP",
+        "SPoC",
+        "SSD"
+      ],
       "sklearn_module": "sklearn.decomposition + mne.decoding",
       "rationale": "FactorAnalysis for covariance estimation; FastICA as alternative to custom impl; CSP/SPoC/SSD are sklearn-patterned spatial filters"
     },
     {
       "module": "Neighbors (additions)",
-      "classes": ["LocalOutlierFactor", "BallTree"],
+      "classes": [
+        "LocalOutlierFactor",
+        "BallTree"
+      ],
       "sklearn_module": "sklearn.neighbors",
       "rationale": "LOF for bad channel detection; BallTree for fast spatial indexing on meshes"
     }

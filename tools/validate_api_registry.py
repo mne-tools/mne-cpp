@@ -80,6 +80,64 @@ def validate_skigen_targets(registry: Dict[str, Any]) -> Tuple[bool, List[str]]:
     return (len(issues) == 0, issues)
 
 
+def validate_documented_flag(registry: Dict[str, Any]) -> Tuple[bool, List[str]]:
+    """Enforce the TASK 18.3 ``documented`` flag invariants.
+
+    * ``documented`` (when present) must be a boolean.
+    * For every ``documented: true`` entry, ``name`` and ``module``
+      must be non-empty strings.
+    * The referenced module must exist in ``modules`` and have
+      ``dir_slug`` set (added in TASK 18.3 alongside the flag).
+    * Within a module, ``(module, sidebar_position)`` tuples must be
+      unique across ``documented: true`` entries.
+    """
+    issues: List[str] = []
+    modules = registry.get("modules", {})
+    if not isinstance(modules, dict):
+        return (False, ["'modules' must be a JSON object"])
+
+    seen_positions: Dict[Tuple[str, int], str] = {}
+    for cls in registry.get("classes", []):
+        name = cls.get("name", "UNNAMED")
+        if "documented" in cls and not isinstance(cls["documented"], bool):
+            issues.append(f"'{name}': 'documented' must be boolean, got "
+                          f"{type(cls['documented']).__name__}")
+            continue
+        if not cls.get("documented", False):
+            continue
+        if not isinstance(cls.get("name"), str) or not cls["name"]:
+            issues.append(f"documented entry has empty/missing 'name'")
+            continue
+        mod_key = cls.get("module")
+        if not isinstance(mod_key, str) or not mod_key:
+            issues.append(f"'{name}': documented entry has empty/missing 'module'")
+            continue
+        if mod_key not in modules:
+            issues.append(f"'{name}': module '{mod_key}' not declared in "
+                          f"registry 'modules'")
+            continue
+        mod = modules[mod_key]
+        if not isinstance(mod, dict) or not mod.get("dir_slug"):
+            issues.append(f"'{name}': module '{mod_key}' is missing required "
+                          f"'dir_slug' field")
+            continue
+        pos = cls.get("sidebar_position")
+        if pos is not None:
+            if not isinstance(pos, int):
+                issues.append(f"'{name}': 'sidebar_position' must be an int")
+                continue
+            key = (mod_key, pos)
+            if key in seen_positions:
+                issues.append(
+                    f"'{name}': sidebar_position collision in module "
+                    f"'{mod_key}' (position {pos} already used by "
+                    f"'{seen_positions[key]}')"
+                )
+                continue
+            seen_positions[key] = name
+    return (len(issues) == 0, issues)
+
+
 def validate_skigen_cross_reference(
     repo_root: Path,
     mne_cpp_registry: Dict[str, Any],
@@ -141,13 +199,13 @@ def main() -> int:
     all_passed = True
     total = len(registry.get("classes", []))
 
-    print("[1/5] JSON well-formed...")
+    print("[1/6] JSON well-formed...")
     if not validate_json_wellformed(registry):
         all_passed = False
     else:
         print("  OK")
 
-    print("[2/5] Header paths under src/libraries/...")
+    print("[2/6] Header paths under src/libraries/...")
     ok, missing = validate_headers(repo_root, registry)
     if not ok:
         all_passed = False
@@ -156,7 +214,7 @@ def main() -> int:
     else:
         print(f"  OK ({total} entries)")
 
-    print("[3/5] Test directories under src/testframes/...")
+    print("[3/6] Test directories under src/testframes/...")
     ok, missing = validate_tests(repo_root, registry)
     if not ok:
         all_passed = False
@@ -166,7 +224,7 @@ def main() -> int:
         with_tests = sum(1 for c in registry.get("classes", []) if c.get("test"))
         print(f"  OK ({with_tests} entries with test)")
 
-    print("[4/5] skigen_target presence on done candidates...")
+    print("[4/6] skigen_target presence on done candidates...")
     ok, issues = validate_skigen_targets(registry)
     if not ok:
         all_passed = False
@@ -175,7 +233,18 @@ def main() -> int:
     else:
         print("  OK")
 
-    print("[5/5] Cross-reference with skigen registry...")
+    print("[5/6] documented flag + sidebar invariants (TASK 18.3)...")
+    ok, issues = validate_documented_flag(registry)
+    if not ok:
+        all_passed = False
+        for i in issues:
+            print(f"  VIOLATION: {i}")
+    else:
+        doc_count = sum(1 for c in registry.get("classes", [])
+                        if c.get("documented", False))
+        print(f"  OK ({doc_count} documented entries)")
+
+    print("[6/6] Cross-reference with skigen registry...")
     ok, _ = validate_skigen_cross_reference(repo_root, registry, args.skigen_registry, args.strict)
     if not ok:
         all_passed = False

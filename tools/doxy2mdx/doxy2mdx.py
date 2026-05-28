@@ -1,0 +1,815 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+"""
+doxy2mdx.py — Convert Doxygen XML output to Docusaurus MDX pages for
+MNE-CPP's public API reference.
+
+Ported from src/external/skigen/doc/doxygen2mdx.py and adapted to:
+  * MNE-CPP's FIFFLIB::, MNELIB::, ... namespaced compound names.
+  * Qt-specific Q_SIGNALS: / Q_SLOTS: sections.
+  * SPDX-style author headers (TASK 17).
+  * Math passthrough for KaTeX (remark-math) in the Docusaurus site.
+  * Registry-driven coverage with optional user-guide and Python
+    cross-reference admonitions.
+
+CLI
+---
+    python3 tools/doxy2mdx/doxy2mdx.py \\
+        --xml-dir   doc/xml_out/xml \\
+        --out-dir   doc/website/docs/api \\
+        --registry  doc/api_registry.json \\
+        --generate-sidebars \\
+        [--classes FIFFLIB::FiffInfo,...] \\
+        [--sidebar-out doc/website/sidebars.api.generated.ts] \\
+        [--strict]
+"""
+
+from __future__ import annotations
+
+import argparse
+import html
+import json
+import logging
+import re
+import sys
+import textwrap
+import xml.etree.ElementTree as ET
+from collections import defaultdict
+from pathlib import Path
+from typing import Dict, Iterable, List, Optional, Tuple
+
+LOG = logging.getLogger("doxy2mdx")
+
+# ---------------------------------------------------------------------------
+# Registry state (loaded once, cached globally)
+# ---------------------------------------------------------------------------
+
+_REGISTRY: Optional[dict] = None
+_MODULES: Dict[str, dict] = {}
+_CLASS_INDEX: Dict[str, List[dict]] = {}   # short-name -> list of entries
+
+# Namespaces we never document, even if they appear in the XML.
+_EXCLUDED_NAMESPACES = {
+    "std", "Eigen", "boost", "qt", "Qt",
+    "QtPrivate", "ANONYMOUS", "anonymous_namespace",
+}
+
+
+def _load_registry(registry_path: Path) -> None:
+    """Load the registry from JSON.  Called once; cached globally."""
+    global _REGISTRY, _MODULES, _CLASS_INDEX
+    with open(registry_path, encoding="utf-8") as f:
+        _REGISTRY = json.load(f)
+    _MODULES = _REGISTRY["modules"]
+    _CLASS_INDEX.clear()
+    for entry in _REGISTRY["classes"]:
+        _CLASS_INDEX.setdefault(entry["name"], []).append(entry)
+
+
+def module_for(qualified: str) -> Optional[dict]:
+    """Resolve a qualified class name (``FIFFLIB::FiffInfo``) to a
+    registry entry.  When the short-name has multiple matches we
+    disambiguate by lowercased-namespace ↔ ``module`` key.
+    Returns ``None`` if no match is registered.
+    """
+    parts = qualified.split("::")
+    short = parts[-1]
+    candidates = _CLASS_INDEX.get(short, [])
+    if not candidates:
+        return None
+    if len(candidates) == 1:
+        return candidates[0]
+    if len(parts) >= 2:
+        ns_lower = parts[-2].lower()
+        # FIFFLIB -> "fiff"; strip trailing "lib"
+        ns_key = ns_lower[:-3] if ns_lower.endswith("lib") else ns_lower
+        for c in candidates:
+            if c.get("module") == ns_key or c.get("module") == ns_lower:
+                return c
+    return candidates[0]
+
+
+# ---------------------------------------------------------------------------
+# URL slug helpers
+# ---------------------------------------------------------------------------
+
+def class_slug(qualified: str) -> str:
+    """``FIFFLIB::FiffInfo`` -> ``fiff-info`` (kebab-case of leaf)."""
+    short = qualified.split("::")[-1]
+    slug = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "-", short)
+    slug = re.sub(r"(?<=[A-Z])(?=[A-Z][a-z])", "-", slug)
+    return slug.lower()
+
+
+# ---------------------------------------------------------------------------
+# SPDX author scraping (TASK 17 source files)
+# ---------------------------------------------------------------------------
+
+_SPDX_AUTHOR_RE = re.compile(
+    r"^\s*[*/#]*\s*([A-ZÄÖÜ][\w\-.' ]+?)\s*<([^>]+@[^>]+)>\s*$"
+)
+_SPDX_HEADER_RE = re.compile(r"SPDX-License-Identifier", re.IGNORECASE)
+
+
+def read_spdx_authors(header_path: Path) -> List[Tuple[str, str]]:
+    """Scrape the first 30 lines of *header_path* for SPDX-style author
+    lines (``Name <email>``).  Returns ``[(name, email), ...]`` in file
+    order.  Returns ``[]`` when the file is missing or has no SPDX block.
+    """
+    if not header_path or not header_path.exists():
+        return []
+    authors: List[Tuple[str, str]] = []
+    saw_spdx = False
+    try:
+        with open(header_path, encoding="utf-8", errors="replace") as f:
+            for i, line in enumerate(f):
+                if i >= 30:
+                    break
+                if _SPDX_HEADER_RE.search(line):
+                    saw_spdx = True
+                    continue
+                m = _SPDX_AUTHOR_RE.match(line)
+                if m:
+                    authors.append((m.group(1).strip(), m.group(2).strip()))
+    except OSError:
+        return []
+    return authors if saw_spdx else []
+
+
+# ---------------------------------------------------------------------------
+# XML text extraction
+# ---------------------------------------------------------------------------
+
+def text_of(el) -> str:
+    if el is None:
+        return ""
+    parts: List[str] = []
+    if el.text:
+        parts.append(el.text)
+    for child in el:
+        tag = child.tag
+        if tag == "computeroutput":
+            parts.append(f"`{text_of(child)}`")
+        elif tag == "bold":
+            parts.append(f"**{text_of(child)}**")
+        elif tag == "emphasis":
+            parts.append(f"*{text_of(child)}*")
+        elif tag == "ref":
+            parts.append(f"`{text_of(child)}`")
+        elif tag == "ulink":
+            url = child.get("url", "")
+            parts.append(f"[{text_of(child)}]({url})")
+        elif tag == "formula":
+            formula = text_of(child).strip()
+            # Doxygen: @f[...]@f] => display math; @f$...@f$ => inline.
+            # The XML emission uses \[ \] / $ $ / \( \).
+            if formula.startswith("\\[") and formula.endswith("\\]"):
+                parts.append(f"\n\n$$\n{formula[2:-2].strip()}\n$$\n\n")
+            elif formula.startswith("\\(") and formula.endswith("\\)"):
+                parts.append(f"${formula[2:-2].strip()}$")
+            elif formula.startswith("$") and formula.endswith("$"):
+                parts.append(formula)
+            else:
+                parts.append(f"${formula}$")
+        elif tag == "simplesect":
+            kind = child.get("kind", "")
+            body = text_of(child).strip()
+            if kind == "return":
+                parts.append(f"\n\n**Returns:** {body}\n\n")
+            elif kind == "note":
+                parts.append(f"\n\n:::note\n{body}\n:::\n\n")
+            elif kind == "see":
+                parts.append(f"\n\n**See also:** {body}\n\n")
+            elif kind == "warning":
+                parts.append(f"\n\n:::warning\n{body}\n:::\n\n")
+            else:
+                parts.append(body)
+        elif tag == "parameterlist":
+            pass  # handled separately
+        elif tag == "para":
+            parts.append(text_of(child))
+            parts.append("\n\n")
+        elif tag in ("sect1", "sect2", "sect3"):
+            parts.append(text_of(child))
+        elif tag == "title":
+            depth = {"sect1": "##", "sect2": "###", "sect3": "####"}.get(el.tag, "##")
+            parts.append(f"\n\n{depth} {text_of(child)}\n\n")
+        elif tag == "itemizedlist":
+            for item in child.findall("listitem"):
+                parts.append(f"- {text_of(item).strip()}\n")
+            parts.append("\n")
+        elif tag == "table":
+            parts.append(render_table(child))
+        elif tag == "programlisting":
+            parts.append(render_code_block(child))
+        elif tag == "sp":
+            parts.append(" ")
+        else:
+            parts.append(text_of(child))
+        if child.tail:
+            parts.append(child.tail)
+    return "".join(parts)
+
+
+def render_table(table_el) -> str:
+    rows = table_el.findall("row")
+    if not rows:
+        return ""
+    lines: List[str] = []
+    for i, row in enumerate(rows):
+        cells = [text_of(e).strip().replace("\n", " ") for e in row.findall("entry")]
+        lines.append("| " + " | ".join(cells) + " |")
+        if i == 0:
+            lines.append("|" + "|".join(["---"] * len(cells)) + "|")
+    return "\n" + "\n".join(lines) + "\n\n"
+
+
+def render_code_block(listing_el) -> str:
+    lines: List[str] = []
+    for codeline in listing_el.findall("codeline"):
+        parts: List[str] = []
+        for hl in codeline:
+            t = hl.text or ""
+            for sub in hl:
+                if sub.tag == "sp":
+                    t += " "
+                else:
+                    t += sub.text or ""
+                if sub.tail:
+                    t += sub.tail
+            parts.append(t)
+            if hl.tail:
+                parts.append(hl.tail)
+        lines.append("".join(parts))
+    return f"\n```cpp\n" + "\n".join(lines) + "\n```\n\n"
+
+
+# ---------------------------------------------------------------------------
+# C++ type beautifier
+# ---------------------------------------------------------------------------
+
+_EIGEN_MATRIX_RE = re.compile(
+    r"Eigen::Matrix\s*<\s*(?P<scalar>[\w:]+)\s*,\s*"
+    r"(?P<rows>[\w\-]+)\s*,\s*(?P<cols>[\w\-]+)"
+    r"(?:\s*,[^<>]*)?\s*>"
+)
+
+_SCALAR_SHORT = {
+    "double": "d", "float": "f", "int": "i",
+    "std::complex<double>": "cd", "std::complex<float>": "cf",
+}
+
+_DIM_TOKEN = {"-1": "X", "Dynamic": "X", "1": "1", "2": "2", "3": "3", "4": "4"}
+
+
+def _shorten_eigen_matrix(m: re.Match) -> str:
+    scalar = m.group("scalar")
+    rows = _DIM_TOKEN.get(m.group("rows"), m.group("rows"))
+    cols = _DIM_TOKEN.get(m.group("cols"), m.group("cols"))
+    short_scalar = _SCALAR_SHORT.get(scalar)
+    if short_scalar is None:
+        return m.group(0)
+    if rows == "X" and cols == "X":
+        return f"Eigen::MatrixX{short_scalar}"
+    if cols == "1":
+        if rows == "X":
+            return f"Eigen::VectorX{short_scalar}"
+        return f"Eigen::Vector{rows}{short_scalar}"
+    if rows == "1":
+        if cols == "X":
+            return f"Eigen::RowVectorX{short_scalar}"
+        return f"Eigen::RowVector{cols}{short_scalar}"
+    if rows == cols and rows in {"2", "3", "4"}:
+        return f"Eigen::Matrix{rows}{short_scalar}"
+    return f"Eigen::Matrix<{scalar}, {rows}, {cols}>"
+
+
+def beautify_type(t: str) -> str:
+    """Collapse noisy template forms into something readable."""
+    if not t:
+        return ""
+    t = t.replace("`", "").strip()
+    # Strip class/struct keyword prefixes
+    t = re.sub(r"\b(class|struct|typename|enum)\s+", "", t)
+    # Strip MNE-CPP *_EXPORT macro suffixes ("FIFFSHARED_EXPORT FiffInfo")
+    t = re.sub(r"\b\w+SHARED_EXPORT\s+", "", t)
+    t = re.sub(r"\b\w+_EXPORT\b", "", t)
+    # Collapse Eigen::Matrix<...> down to short forms (best-effort)
+    for _ in range(3):
+        new_t = _EIGEN_MATRIX_RE.sub(_shorten_eigen_matrix, t)
+        if new_t == t:
+            break
+        t = new_t
+    # Normalise spaces inside QSharedPointer<X>
+    t = re.sub(r"QSharedPointer\s*<\s*([^<>]+?)\s*>", r"QSharedPointer<\1>", t)
+    t = re.sub(r"QSharedPointer<\s*([^<>]+?)\s*>", r"QSharedPointer<\1>", t)
+    # Common Eigen::Ref unwrapping
+    t = re.sub(r"const\s+Eigen::Ref<\s*const\s+([^<>]+?)\s*>\s*&", r"\1", t)
+    t = re.sub(r"Eigen::Ref<\s*const\s+([^<>]+?)\s*>\s*&", r"\1", t)
+    t = re.sub(r"Eigen::Ref<\s*([^<>]+?)\s*>\s*&", r"\1", t)
+    # Collapse repeated whitespace
+    t = re.sub(r"\s{2,}", " ", t).strip()
+    return t
+
+
+# ---------------------------------------------------------------------------
+# Param / return / note extraction
+# ---------------------------------------------------------------------------
+
+def extract_params(detail_el) -> List[Tuple[str, str]]:
+    out: List[Tuple[str, str]] = []
+    if detail_el is None:
+        return out
+    for plist in detail_el.findall(".//parameterlist[@kind='param']"):
+        for item in plist.findall("parameteritem"):
+            name_el = item.find(".//parametername")
+            desc_el = item.find("parameterdescription")
+            name = (text_of(name_el).strip() if name_el is not None else "").strip("`")
+            desc = re.sub(r"\s*\n\s*", " ",
+                          text_of(desc_el).strip() if desc_el is not None else "")
+            out.append((name, desc))
+    return out
+
+
+def extract_return(detail_el) -> str:
+    if detail_el is None:
+        return ""
+    for ss in detail_el.findall(".//simplesect[@kind='return']"):
+        return text_of(ss).strip()
+    return ""
+
+
+def extract_notes(detail_el) -> List[str]:
+    if detail_el is None:
+        return []
+    return [text_of(ss).strip()
+            for ss in detail_el.findall(".//simplesect[@kind='note']")]
+
+
+def extract_doxygen_authors(detail_el) -> List[str]:
+    """Fallback when no SPDX block exists: pull plain ``@author`` lines."""
+    if detail_el is None:
+        return []
+    out: List[str] = []
+    for ss in detail_el.findall(".//simplesect[@kind='author']"):
+        a = text_of(ss).strip()
+        if a:
+            out.append(a)
+    return out
+
+
+def extract_body_text(detail_el) -> str:
+    if detail_el is None:
+        return ""
+    parts: List[str] = []
+    for child in detail_el:
+        if child.tag != "para":
+            continue
+        text_parts: List[str] = []
+        if child.text:
+            text_parts.append(child.text)
+        has_content = bool(child.text and child.text.strip())
+        for sub in child:
+            if sub.tag in ("parameterlist", "simplesect"):
+                continue
+            has_content = True
+            if sub.tag == "computeroutput":
+                text_parts.append(f"`{text_of(sub)}`")
+            elif sub.tag == "bold":
+                text_parts.append(f"**{text_of(sub)}**")
+            elif sub.tag == "emphasis":
+                text_parts.append(f"*{text_of(sub)}*")
+            elif sub.tag == "formula":
+                f = text_of(sub).strip()
+                if f.startswith("\\[") and f.endswith("\\]"):
+                    text_parts.append(f"\n\n$$\n{f[2:-2].strip()}\n$$\n\n")
+                elif f.startswith("\\(") and f.endswith("\\)"):
+                    text_parts.append(f"${f[2:-2].strip()}$")
+                else:
+                    text_parts.append(f"${f}$")
+            elif sub.tag == "ref":
+                text_parts.append(f"`{text_of(sub)}`")
+            elif sub.tag == "ulink":
+                text_parts.append(f"[{text_of(sub)}]({sub.get('url','')})")
+            elif sub.tag == "programlisting":
+                text_parts.append(render_code_block(sub))
+            else:
+                text_parts.append(text_of(sub))
+            if sub.tail:
+                text_parts.append(sub.tail)
+        if has_content:
+            body = "".join(text_parts).strip()
+            if body:
+                parts.append(body)
+    return "\n\n".join(parts)
+
+
+# ---------------------------------------------------------------------------
+# Section iteration: Qt slots/signals + public methods
+# ---------------------------------------------------------------------------
+
+def _public_members(section) -> List:
+    return [m for m in section.findall("memberdef[@kind='function']")
+            if m.get("prot") == "public"]
+
+
+# ---------------------------------------------------------------------------
+# Method rendering
+# ---------------------------------------------------------------------------
+
+def _render_method(func, lines: List[str]) -> None:
+    name = func.findtext("name", "")
+    param_names = [p.findtext("declname", "") for p in func.findall("param")]
+    param_names = [p for p in param_names if p]
+    heading = f"{name}({', '.join(param_names)})"
+    lines.append(f"### {heading}")
+    lines.append("")
+
+    brief = text_of(func.find("briefdescription")).strip()
+    detail_el = func.find("detaileddescription")
+    body = extract_body_text(detail_el)
+    if brief:
+        lines.append(brief)
+        lines.append("")
+    if body:
+        lines.append(body)
+        lines.append("")
+
+    xml_params: Dict[str, str] = {}
+    for p in func.findall("param"):
+        pname = p.findtext("declname", "")
+        ptype = text_of(p.find("type")).strip()
+        xml_params[pname] = ptype
+
+    params = extract_params(detail_el)
+    if params:
+        lines.append("**Parameters:**")
+        lines.append("")
+        for pname, pdesc in params:
+            display_type = beautify_type(xml_params.get(pname, ""))
+            if display_type:
+                lines.append(f"- **{pname}** : *{display_type}*")
+            else:
+                lines.append(f"- **{pname}**")
+            if pdesc:
+                lines.append(f"  {pdesc}")
+            lines.append("")
+
+    ret = extract_return(detail_el)
+    if ret:
+        display_ret = beautify_type(text_of(func.find("type")).strip())
+        lines.append("**Returns:**")
+        lines.append("")
+        if display_ret:
+            lines.append(f"- *{display_ret}* — {ret}")
+        else:
+            lines.append(f"- {ret}")
+        lines.append("")
+
+    for note in extract_notes(detail_el):
+        lines.append(f":::note\n{note}\n:::")
+        lines.append("")
+
+    lines.append("---")
+    lines.append("")
+
+
+# ---------------------------------------------------------------------------
+# MDX generation per class
+# ---------------------------------------------------------------------------
+
+def generate_class_mdx(compounddef,
+                       compound_name: str,
+                       out_dir: Path,
+                       reg_entry: dict,
+                       repo_root: Path) -> Path:
+    short_name = compound_name.split("::")[-1]
+    brief = text_of(compounddef.find("briefdescription")).strip()
+    detail_el = compounddef.find("detaileddescription")
+    body_text = extract_body_text(detail_el) if detail_el is not None else ""
+
+    # Resolve source path for SPDX scraping
+    loc_el = compounddef.find("location")
+    loc_file = loc_el.get("file", "") if loc_el is not None else ""
+    src_path = (repo_root / loc_file) if loc_file else None
+    authors = read_spdx_authors(src_path) if src_path else []
+    if not authors:
+        for a in extract_doxygen_authors(detail_el):
+            authors.append((a, ""))
+
+    # Module info & output folder
+    module_key = reg_entry.get("module", "core")
+    mod = _MODULES.get(module_key, {})
+    dir_slug = mod.get("dir_slug", module_key)
+    out_path = out_dir / dir_slug
+    out_path.mkdir(parents=True, exist_ok=True)
+
+    slug = class_slug(compound_name)
+    out_file = out_path / f"{slug}.mdx"
+
+    sidebar_position = reg_entry.get("sidebar_position")
+    guide = reg_entry.get("guide")
+    python_equiv = reg_entry.get("python_equiv")
+    python_url = reg_entry.get("python_url")
+    include_dir = mod.get("include", module_key)
+
+    # ---- assemble ----
+    lines: List[str] = []
+    lines.append("---")
+    lines.append(f"id: {slug}")
+    lines.append(f'title: "{compound_name}"')
+    lines.append(f"sidebar_label: {short_name}")
+    if sidebar_position is not None:
+        lines.append(f"sidebar_position: {sidebar_position}")
+    lines.append("---")
+    lines.append("")
+    lines.append(f"# {short_name}")
+    lines.append("")
+
+    if guide:
+        lines.append(":::tip[See also]")
+        lines.append(f"User guide: [{short_name} guide]({guide})")
+        lines.append(":::")
+        lines.append("")
+    if python_equiv:
+        if python_url:
+            lines.append(":::info[Python equivalent]")
+            lines.append(f"[`{python_equiv}`]({python_url}) in MNE-Python.")
+            lines.append(":::")
+        else:
+            lines.append(":::info[Python equivalent]")
+            lines.append(f"`{python_equiv}` in MNE-Python.")
+            lines.append(":::")
+        lines.append("")
+
+    lines.append(f"`#include <{include_dir}/{Path(loc_file).name}>`"
+                 if loc_file else f"`#include <{include_dir}>`")
+    lines.append("")
+
+    # Class signature (with template parameters)
+    tparams: List[Tuple[str, str]] = []
+    for tp in compounddef.findall("templateparamlist/param"):
+        tp_type = text_of(tp.find("type")).strip()
+        tp_defval = text_of(tp.find("defval")).strip()
+        tparams.append((tp_type, tp_defval))
+
+    lines.append("```cpp")
+    if tparams:
+        tps = [f"{a} = {b}" if b else a for a, b in tparams]
+        lines.append(f"template <{', '.join(tps)}>")
+    lines.append(f"class {compound_name}")
+    lines.append("```")
+    lines.append("")
+
+    if brief:
+        lines.append(brief)
+        lines.append("")
+    if body_text:
+        lines.append(body_text)
+        lines.append("")
+    lines.append("---")
+    lines.append("")
+
+    # --- Q_SIGNALS first (Qt convention: read top-down) ---
+    signal_sections = compounddef.findall("sectiondef[@kind='signal']")
+    signals = [m for sec in signal_sections for m in _public_members(sec)]
+    if signals:
+        lines.append("## Signals")
+        lines.append("")
+        for f in signals:
+            _render_method(f, lines)
+
+    # --- Public slots ---
+    pub_slots = []
+    for sec in compounddef.findall("sectiondef[@kind='public-slot']"):
+        pub_slots.extend(_public_members(sec))
+    if pub_slots:
+        lines.append("## Public Slots")
+        lines.append("")
+        for f in pub_slots:
+            _render_method(f, lines)
+
+    # --- Generic public methods ---
+    public_funcs: List = []
+    for sec in compounddef.findall("sectiondef[@kind='public-func']"):
+        public_funcs.extend(_public_members(sec))
+    if public_funcs:
+        lines.append("## Public Methods")
+        lines.append("")
+        for f in public_funcs:
+            _render_method(f, lines)
+
+    # --- Static methods ---
+    static_funcs: List = []
+    for sec in compounddef.findall("sectiondef[@kind='public-static-func']"):
+        static_funcs.extend(_public_members(sec))
+    if static_funcs:
+        lines.append("## Static Methods")
+        lines.append("")
+        for f in static_funcs:
+            _render_method(f, lines)
+
+    # --- Authors footer ---
+    if authors:
+        lines.append("## Authors of this file")
+        lines.append("")
+        for name, email in authors:
+            if email:
+                lines.append(f"- {name} &lt;{email}&gt;")
+            else:
+                lines.append(f"- {name}")
+        lines.append("")
+
+    content = "\n".join(lines)
+    content = re.sub(r"\n{4,}", "\n\n\n", content)
+    out_file.write_text(content, encoding="utf-8")
+    LOG.info("generated %s", out_file)
+    return out_file
+
+
+# ---------------------------------------------------------------------------
+# Sidebar fragment
+# ---------------------------------------------------------------------------
+
+def generate_sidebar_fragment(sidebar_out: Path) -> None:
+    groups: Dict[str, List[dict]] = defaultdict(list)
+    for entry in _REGISTRY["classes"]:
+        if not entry.get("documented", False):
+            continue
+        groups[entry["module"]].append(entry)
+    for ents in groups.values():
+        ents.sort(key=lambda e: (e.get("sidebar_position", 999), e["name"]))
+
+    # Module order from JSON insertion order
+    mod_items = sorted(
+        ((k, v) for k, v in _MODULES.items() if k in groups),
+        key=lambda kv: kv[1].get("sidebar_position", 999),
+    )
+
+    categories: List[str] = []
+    for mod_name, mod in mod_items:
+        items = []
+        for entry in groups[mod_name]:
+            slug = class_slug(entry["name"])
+            items.append(f"        'api/{mod.get('dir_slug', mod_name)}/{slug}'")
+        if not items:
+            continue
+        categories.append(
+            "    {\n"
+            "      type: 'category',\n"
+            f"      label: {json.dumps(mod.get('sidebar_label', mod_name), ensure_ascii=False)},\n"
+            "      items: [\n"
+            + ",\n".join(items) + "\n"
+            "      ],\n"
+            "    }"
+        )
+
+    body = (
+        "// Auto-generated by tools/doxy2mdx/doxy2mdx.py — do not edit by hand.\n"
+        "// Regenerate with `python tools/doxy2mdx/doxy2mdx.py "
+        "--generate-sidebars ...`\n\n"
+        "import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';\n\n"
+        "const apiSidebar: SidebarsConfig['apiSidebar'] = [\n"
+        + ",\n".join(categories) + "\n"
+        "];\n\n"
+        "export default apiSidebar;\n"
+    )
+    sidebar_out.parent.mkdir(parents=True, exist_ok=True)
+    sidebar_out.write_text(body, encoding="utf-8")
+    LOG.info("generated sidebar fragment %s", sidebar_out)
+
+
+# ---------------------------------------------------------------------------
+# Discovery
+# ---------------------------------------------------------------------------
+
+def _is_excluded_namespace(qualified: str) -> bool:
+    parts = qualified.split("::")
+    if len(parts) <= 1:
+        return False
+    return parts[0] in _EXCLUDED_NAMESPACES
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--xml-dir", required=True, type=Path)
+    parser.add_argument("--out-dir", required=True, type=Path)
+    parser.add_argument("--registry", required=True, type=Path)
+    parser.add_argument("--generate-sidebars", action="store_true")
+    parser.add_argument("--sidebar-out", type=Path, default=None,
+                        help="Override sidebar fragment path (default: "
+                             "<out-dir>/../../sidebars.api.generated.ts).")
+    parser.add_argument("--classes", default=None,
+                        help="Comma-separated list of qualified names to filter to.")
+    parser.add_argument("--repo-root", type=Path, default=None,
+                        help="Repository root for SPDX header scraping "
+                             "(default: parent of --registry).")
+    parser.add_argument("--strict", action="store_true",
+                        help="Treat unregistered public classes as a fatal error.")
+    parser.add_argument("-v", "--verbose", action="store_true")
+    args = parser.parse_args(argv)
+
+    logging.basicConfig(
+        level=logging.DEBUG if args.verbose else logging.INFO,
+        format="%(levelname)s %(name)s: %(message)s",
+    )
+
+    _load_registry(args.registry)
+    repo_root = (args.repo_root or args.registry.resolve().parent.parent).resolve()
+
+    if not args.xml_dir.exists():
+        LOG.error("XML directory not found: %s", args.xml_dir)
+        return 2
+
+    only: Optional[set] = None
+    if args.classes:
+        only = {c.strip() for c in args.classes.split(",") if c.strip()}
+
+    index_path = args.xml_dir / "index.xml"
+    if not index_path.exists():
+        LOG.error("Doxygen index.xml not found at %s", index_path)
+        return 2
+
+    index_tree = ET.parse(index_path)
+    index_root = index_tree.getroot()
+
+    found_qualified: set = set()
+    generated: List[Path] = []
+    warnings = 0
+
+    for compound in index_root.findall("compound"):
+        if compound.get("kind") != "class":
+            continue
+        name = compound.findtext("name", "").strip()
+        if not name:
+            continue
+        if only is not None and name not in only:
+            continue
+        if _is_excluded_namespace(name):
+            continue
+        if "internal" in name.lower() or "::detail::" in name:
+            continue
+
+        reg_entry = module_for(name)
+        if reg_entry is None:
+            LOG.warning("class %s found in XML but NOT registered in api_registry.json",
+                        name)
+            warnings += 1
+            continue
+        if not reg_entry.get("documented", True):
+            LOG.info("skipping %s (documented=false in registry)", name)
+            continue
+
+        found_qualified.add(reg_entry["name"])
+
+        refid = compound.get("refid")
+        xml_file = args.xml_dir / f"{refid}.xml"
+        if not xml_file.exists():
+            LOG.warning("XML file %s missing for %s", xml_file, name)
+            warnings += 1
+            continue
+
+        tree = ET.parse(xml_file)
+        compounddef = tree.find(".//compounddef")
+        if compounddef is None:
+            continue
+
+        path = generate_class_mdx(compounddef, name, args.out_dir, reg_entry, repo_root)
+        generated.append(path)
+
+    # Reverse check: registered with documented:true but never seen in XML.
+    missing: List[str] = []
+    for entry in _REGISTRY["classes"]:
+        if not entry.get("documented", False):
+            continue
+        if only is not None:
+            continue
+        if entry["name"] not in found_qualified:
+            missing.append(entry["name"])
+    if missing and only is None:
+        msg = ("registered classes with documented=true not found in "
+               "Doxygen XML: " + ", ".join(sorted(missing)))
+        if args.strict:
+            raise SystemExit(f"ERROR: {msg}")
+        LOG.warning(msg)
+        warnings += 1
+
+    LOG.info("generated %d MDX page(s)", len(generated))
+
+    if args.generate_sidebars:
+        if args.sidebar_out:
+            sidebar_out = args.sidebar_out
+        else:
+            sidebar_out = args.out_dir.resolve().parent.parent / "sidebars.api.generated.ts"
+        generate_sidebar_fragment(sidebar_out)
+
+    if args.strict and warnings:
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
