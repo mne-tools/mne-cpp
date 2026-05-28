@@ -1,0 +1,87 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+#
+# Build the MNE-CPP API documentation (Doxygen -> doxy2mdx -> Docusaurus)
+# on every push to staging/main and on PRs that touch the documented
+# surface. On main, the built site is deployed to the
+# mne-tools.github.io repo under the mne-cpp/ subdirectory.
+
+name: api-docs
+
+on:
+  push:
+    branches:
+      - staging
+      - main
+  pull_request:
+    paths:
+      - 'src/libraries/**'
+      - 'doc/api_registry.json'
+      - 'doc/Doxyfile'
+      - 'tools/doxy2mdx/**'
+      - 'doc/website/**'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build API site
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history for SPDX-author lookup)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Doxygen + Graphviz
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build API docs
+        run: bash doc/build-api-docs.sh
+
+      - name: Upload built site
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-docs-site
+          path: doc/website/build
+          if-no-files-found: error
+          retention-days: 14
+
+  deploy:
+    name: Deploy to mne-tools.github.io
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download built site
+        uses: actions/download-artifact@v4
+        with:
+          name: api-docs-site
+          path: site
+
+      - name: Publish to mne-tools.github.io
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          personal_token: ${{ secrets.DOCS_DEPLOY_TOKEN }}
+          external_repository: mne-tools/mne-tools.github.io
+          publish_branch: gh-pages
+          publish_dir: site
+          destination_dir: mne-cpp
+          keep_files: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'docs(mne-cpp): deploy API site from ${{ github.sha }}'
