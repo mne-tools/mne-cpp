@@ -1,0 +1,88 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+#
+# Doxyfile — Doxygen configuration for the mne-cpp public C++ API.
+# Generates XML consumed by tools/doxy2mdx/doxy2mdx.py to produce
+# Docusaurus MDX pages (one per registered class). HTML/LaTeX output
+# is intentionally disabled; the XML AST is the contract.
+#
+# Run from the doc/ directory:
+#     cd doc && doxygen Doxyfile
+# Output lands in doc/xml_out/.
+
+# ---------------------------------------------------------------------------
+# Project
+# ---------------------------------------------------------------------------
+PROJECT_NAME           = "MNE-CPP"
+PROJECT_NUMBER         = "2.3.0-dev"
+PROJECT_BRIEF          = "MEG/EEG real-time analysis library (C++17 / Qt)"
+
+# ---------------------------------------------------------------------------
+# Input
+# ---------------------------------------------------------------------------
+INPUT                  = ../src/libraries
+RECURSIVE              = YES
+FILE_PATTERNS          = *.h *.hpp
+EXCLUDE_PATTERNS       = */internal/* */detail/* */moc_* */ui_*
+STRIP_FROM_PATH        = ../src/libraries/
+EXAMPLE_PATH           = ../src/applications ../doc/website/docs/snippets
+EXAMPLE_RECURSIVE      = YES
+
+# ---------------------------------------------------------------------------
+# Extraction settings
+# ---------------------------------------------------------------------------
+EXTRACT_ALL            = NO
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = NO
+EXTRACT_LOCAL_CLASSES  = NO
+HIDE_UNDOC_MEMBERS     = YES
+HIDE_UNDOC_CLASSES     = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_FORMAT            = "$file:$line: $text"
+WARN_AS_ERROR          = NO
+QUIET                  = YES
+
+# ---------------------------------------------------------------------------
+# Output — XML only (doxy2mdx.py reads XML; HTML/LaTeX intentionally off)
+# ---------------------------------------------------------------------------
+OUTPUT_DIRECTORY       = xml_out
+GENERATE_XML           = YES
+GENERATE_HTML          = NO
+GENERATE_LATEX         = NO
+GENERATE_MAN           = NO
+GENERATE_RTF           = NO
+XML_PROGRAMLISTING     = NO
+
+# ---------------------------------------------------------------------------
+# C++ / template handling
+# ---------------------------------------------------------------------------
+BUILTIN_STL_SUPPORT    = YES
+DISTRIBUTE_GROUP_DOC   = YES
+JAVADOC_AUTOBRIEF      = YES
+QT_AUTOBRIEF           = YES
+MARKDOWN_SUPPORT       = YES
+
+# ---------------------------------------------------------------------------
+# Preprocessor — strip Qt and per-library DLL export macros so they do
+# not pollute the generated AST consumed by doxy2mdx.
+# ---------------------------------------------------------------------------
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+PREDEFINED             = "Q_OBJECT=" \
+                         "Q_DISABLE_COPY(x)=" \
+                         "Q_DECLARE_METATYPE(x)=" \
+                         "Q_SIGNALS=public" \
+                         "Q_SLOTS=" \
+                         "QT_BEGIN_NAMESPACE=" \
+                         "QT_END_NAMESPACE=" \
+                         "FIFFSHARED_EXPORT=" \
+                         "MNESHARED_EXPORT=" \
+                         "FSSHARED_EXPORT=" \
+                         "FWDSHARED_EXPORT=" \
+                         "INVSHARED_EXPORT=" \
+                         "MRISHARED_EXPORT=" \
+                         "DISP3DSHARED_EXPORT=" \
+                         "ANSHAREDSHARED_EXPORT=" \
+                         "EIGEN_MAKE_ALIGNED_OPERATOR_NEW="
