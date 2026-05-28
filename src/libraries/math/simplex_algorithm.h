@@ -1,36 +1,34 @@
 //=============================================================================================================
 /**
- * @file     simplex_algorithm.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     December, 2016
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file simplex_algorithm.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Header-only Nelder–Mead simplex minimiser with pluggable cost and report callables.
  *
- * Copyright (C) 2016, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * Nelder–Mead is a derivative-free direct-search minimiser that
+ * deforms a simplex of @c n+1 vertices in @c R^n using reflection,
+ * expansion, contraction and shrink moves driven entirely by function
+ * value comparisons. mne-cpp uses it for dipole-fit residual
+ * minimisation (FWDLIB) and for sphere fitting (@ref UTILSLIB::Sphere)
+ * where the objective is noisy and the gradient is either unavailable
+ * or expensive.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * The implementation lives entirely in this header because it is
+ * templated on the scalar type and on the cost / report functors (zero
+ * runtime cost over a hand-written loop). Termination uses both a
+ * relative function-value tolerance @c ftol and an optional absolute
+ * spatial tolerance @c stol that detects simplex collapse, plus a hard
+ * cap on function evaluations. A reporting callback can be provided to
+ * stream per-iteration progress without coupling the solver to any UI
+ * or logging facility.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    SimplexAlgorithm Template Implementation.
- *
+ * Reference: Nelder & Mead (1965) "A simplex method for function
+ * minimization"; refactored from the @c mne_simplex_minimize routine in
+ * mne_simplex_fit.c.
  */
 
 #ifndef SIMPLEXALGORITHM_H
@@ -57,9 +55,12 @@ namespace UTILSLIB
 
 //=============================================================================================================
 /**
- * Simplex algorithm is an optimization method to solve linear optimization problems.
+ * Header-only Nelder–Mead simplex minimiser templated on the scalar
+ * type and on the cost / report callables, implementing the Strategy
+ * pattern at zero runtime cost (the functors are inlined by the
+ * compiler).
  *
- * @brief Simplex algorithm.
+ * @brief Header-only Nelder–Mead simplex minimiser with templated cost and report functors.
  * @note  Implements the Strategy pattern — the cost function and report function
  *        are injected as callable template parameters (zero-overhead type erasure).
  */

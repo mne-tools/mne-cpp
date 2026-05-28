@@ -1,35 +1,33 @@
 //=============================================================================================================
 /**
- * @file     warp.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     November, 2015
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file warp.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Thin-plate-spline 3-D warp from landmark correspondences.
  *
- * Copyright (C) 2015, Lorenz Esch. All rights reserved.
+ * @ref UTILSLIB::Warp implements Bookstein's thin-plate spline (TPS), the
+ * minimum-bending-energy interpolant that maps an @c n×3 set of source
+ * landmarks exactly onto an @c n×3 set of destination landmarks and
+ * extends smoothly to the rest of @c R^3. It is mne-cpp's reference
+ * tool for non-rigid registration of EEG electrodes and MEG digitiser
+ * points onto a subject MRI scalp, and for warping a template mesh
+ * (cortex, head surface) into the geometry of an individual subject.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * The warp evaluates as
+ * @f$f(\mathbf{x}) = A\mathbf{x} + \mathbf{t} + \sum_i w_i\,U(\|\mathbf{x}-\mathbf{p}_i\|)@f$
+ * with @f$U(r) = r@f$ for 3-D (the conditionally positive definite TPS
+ * kernel). Fitting requires one @c (n+4)×(n+4) linear solve
+ * (@c Eigen::FullPivLU); evaluation at @c m points is then
+ * @c O(m*n + m). The class is also a wrapper around a tiny landmark
+ * file reader (@ref readsLm) so calibration data shipped as plain text
+ * can be ingested without extra glue.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Warp class declaration.
- *
+ * Reference: Bookstein (1989) "Principal Warps: Thin-Plate Splines and
+ * the Decomposition of Deformations".
  */
 
 #ifndef WARP_H
@@ -67,7 +65,12 @@ namespace UTILSLIB
 
 //=============================================================================================================
 /**
- * @brief Thin Plate Spline Warp
+ * Thin-plate-spline (Bookstein) 3-D warp that maps source landmarks
+ * exactly onto destination landmarks and extends smoothly to the rest
+ * of @c R^3. Used for non-rigid registration of EEG/MEG sensors and
+ * template-to-subject mesh warping.
+ *
+ * @brief Thin-plate-spline 3-D warp fitted from landmark correspondences.
  */
 class MATHSHARED_EXPORT Warp
 {

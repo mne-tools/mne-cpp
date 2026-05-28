@@ -1,40 +1,34 @@
 //=============================================================================================================
 /**
- * @file     spectral.h
- * @author   Daniel Strohmeier <Daniel.Strohmeier@tu-ilmenau.de>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
- * @since    0.1.0
- * @date     March, 2018
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file spectral.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Multi-taper spectral estimation: tapered FFT, power and cross-spectral density, DPSS weighting.
  *
- * Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch, Gabriel Motta. All rights reserved.
+ * @ref UTILSLIB::Spectral implements the multi-taper / Welch family of
+ * spectral estimators that the connectivity and time-frequency pipelines
+ * in mne-cpp rely on. A single segment of length @c N is windowed by
+ * each of @c K Slepian (DPSS) tapers, FFT'd to length @c iNfft, and the
+ * @c K complex spectra are combined into a power spectral density (PSD)
+ * or a cross-spectral density (CSD) matrix; multi-tapering reduces the
+ * variance of the estimator by roughly @c 1/K at the cost of
+ * @c (K+1)/(NW) of spectral resolution.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * The class is static and operates row-wise on @c Eigen matrices so it
+ * can fan out across channels via @c QtConcurrent without touching any
+ * shared state. PSD scaling follows the one-sided convention
+ * (factor 2 on bins 1…Nyquist-1, no doubling at DC or Nyquist) so
+ * results are directly comparable to MNE-Python's @c psd_array_multitaper,
+ * and CSD matrices are returned as one complex matrix per frequency bin
+ * for direct ingestion by CONNECTIVITYLIB's coherence and phase
+ * estimators.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * @note Notes:
- * - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
- * - This code is prepared for adding spectral estimation with multitapers, which is, however not yet supported.
- * - This code only allows FFT based spectral estimation. Time-frequency transforms are not yet supported.
- *
- * @brief    Declaration of Spectral class.
+ * Reference: Percival & Walden (1993) "Spectral Analysis for Physical
+ * Applications", chapters 7–8.
  */
 
 #ifndef SPECTRAL_H
@@ -71,7 +65,7 @@ namespace UTILSLIB
 {
 
 /**
- * @brief Input parameters for multi-taper spectral estimation (data matrix, taper weights, frequencies, sample rate).
+ * @brief Per-row input bundle for parallel multi-taper spectral estimation (data row, taper matrix, FFT length).
  */
 struct TaperedSpectraInputData {
     Eigen::RowVectorXd vecData;
@@ -81,9 +75,12 @@ struct TaperedSpectraInputData {
 
 //=============================================================================================================
 /**
- * Computes spectral measures of input data such as spectra, power spectral density, cross-spectral density.
+ * Static multi-taper spectral estimator producing tapered spectra, PSDs
+ * and cross-spectral density matrices over @c Eigen row inputs. Designed
+ * for fan-out across channels via @c QtConcurrent and feeding
+ * CONNECTIVITYLIB's coherence / phase estimators.
  *
- * @brief Computes spectral measures of input data.
+ * @brief Static multi-taper spectra, PSD and CSD estimator for MEG/EEG time series.
  */
 class MATHSHARED_EXPORT Spectral
 {

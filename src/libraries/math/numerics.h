@@ -1,35 +1,31 @@
 //=============================================================================================================
 /**
- * @file     numerics.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file numerics.h
+ * @since 2026
+ * @date  March 2026
+ * @brief General numerical helpers: GCD, log2, histogram binning, baseline rescaling, sparsity tests.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * @ref UTILSLIB::Numerics groups the scalar / per-vector numerical
+ * primitives that almost every other library needs but that have no
+ * natural home in Eigen or @ref UTILSLIB::Linalg: the Euclidean GCD,
+ * integer log2 and @c nchoose2 combinatorics used to size connectivity
+ * containers, the sparsity heuristic that decides whether a dense
+ * vector should be promoted to an Eigen sparse matrix, fixed-width
+ * histogram binning over arbitrary ranges, and the @c rescale routine
+ * that applies the standard MNE baseline corrections
+ * ("logratio", "ratio", "zscore", "mean", "percent") in-place.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Numerics class declaration.
- *
+ * @c rescale is the most important entry point: it locates the
+ * (a, b) baseline window in @p times via @c std::lower_bound, computes
+ * the per-row baseline summary in @c O(m*n_b), and applies the chosen
+ * transform in @c O(m*n) with no allocation. The same routine is used
+ * by DISP, EVOKED averaging and the source-estimate pipelines so
+ * results stay byte-identical regardless of which front-end produced
+ * the data.
  */
 
 #ifndef NUMERICS_H
@@ -66,9 +62,12 @@ namespace UTILSLIB
 
 //=============================================================================================================
 /**
- * General numerical utility functions: GCD, log2, histograms, baseline rescaling, etc.
+ * Static numerical helpers: integer GCD and log2, @c nchoose2,
+ * sparsity test, fixed-width histogram binning and time-series
+ * baseline rescaling shared across MATHLIB, DISP and the evoked /
+ * source-estimate pipelines.
  *
- * @brief Static numerical utility functions.
+ * @brief Static scalar/per-vector numerical helpers (GCD, log2, histograms, baseline rescaling).
  */
 class MATHSHARED_EXPORT Numerics
 {

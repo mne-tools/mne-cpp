@@ -1,35 +1,28 @@
 //=============================================================================================================
 /**
- * @file     linalg.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file linalg.cpp
+ * @since 2026
+ * @date  April 2026
+ * @brief Jacobi-SVD condition metrics, block-diagonal sparse builder and xyz reduction.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * Implements the static helpers declared in @ref linalg.h. Conditioning
+ * is derived from the singular values returned by
+ * @c Eigen::JacobiSVD: the classical condition number is
+ * @f$\kappa = \sigma_{max}/\sigma_{min}@f$, while the condition slope is
+ * the least-squares slope of the log-singular-value spectrum, which is
+ * a more informative diagnostic for the rapidly decaying spectra typical
+ * of MEG/EEG gain matrices.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Definition of the Linalg class.
- *
+ * The block-diagonal builder walks each dense input block once and emits
+ * an @c Eigen::SparseMatrix via @c setFromTriplets, giving a single
+ * @c O(\\sum nnz_k log nnz_k) construction even for the thousands of 3x3
+ * blocks produced by free-orientation source spaces. @c combine_xyz
+ * collapses a row of free-orientation components into per-source
+ * squared magnitudes by reusing the same block-diagonal layout.
  */
 
 //=============================================================================================================

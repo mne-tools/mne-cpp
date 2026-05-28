@@ -1,37 +1,36 @@
 //=============================================================================================================
 /**
- * @file     kmeans.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file kmeans.h
+ * @since 2026
+ * @date  March 2026
+ * @brief K-means partitional clustering with multiple distance metrics, initialisations and empty-cluster policies.
  *
- * Copyright (C) 2012, Lorenz Esch, Christoph Dinh, Gabriel Motta. All rights reserved.
+ * Lloyd-style K-means partitions @c n p-dimensional samples into @c k
+ * clusters by alternating an assignment step (each point goes to the
+ * nearest centroid under the selected metric) with an update step
+ * (centroid ← mean of its members) until the total within-cluster
+ * distortion stops decreasing or the iteration cap is hit. Per-iteration
+ * cost is @c O(n*k*p), which dominates everything else in MATHLIB and
+ * makes the algorithm suitable for the cortical-patch decimation and
+ * dipole-cluster prior workflows that consume it inside INVERSELIB.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * The implementation mirrors MATLAB's @c kmeans/@c kmeans2 in feature
+ * set: five distance metrics (squared Euclidean, city-block, cosine,
+ * correlation, Hamming) selectable via @ref KMeansDistance, three
+ * seeding strategies (random sample, uniform within data range,
+ * subsample-then-cluster) via @ref KMeansStart, multiple replicates
+ * with best-of selection, and three empty-cluster policies (error,
+ * drop, singleton-from-farthest-point) via @ref KMeansEmptyAction. An
+ * optional online update phase performs single-point Lloyd moves after
+ * the batch loop converges and is enabled by default to escape shallow
+ * local minima.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    KMeans class declaration.
- *
+ * Reference: Lloyd (1982) "Least squares quantization in PCM";
+ * Arthur & Vassilvitskii (2007) for the seeding intuition.
  */
 
 #ifndef KMEANS_H
@@ -101,9 +100,11 @@ enum class KMeansEmptyAction
 
 //=============================================================================================================
 /**
- * K-Means Clustering
+ * Lloyd-style K-means partitional clustering with configurable distance
+ * metric, seeding strategy, replicate count, empty-cluster policy and
+ * optional online refinement phase.
  *
- * @brief K-Means Clustering
+ * @brief Lloyd-style K-means clustering with configurable metric, seeding and replicates.
  */
 class MATHSHARED_EXPORT KMeans
 {

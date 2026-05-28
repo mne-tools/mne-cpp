@@ -1,35 +1,30 @@
 //=============================================================================================================
 /**
- * @file     sphere.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     April, 2016
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file sphere.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Best-fit sphere from a 3-D point cloud with closed-form and Nelder–Mead solvers.
  *
- * Copyright (C) 2016, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * @ref UTILSLIB::Sphere fits a single sphere
+ * @f$(\mathbf{c}, r)@f$ to an @c n×3 point cloud and is the geometric
+ * primitive used to build the spherical head models consumed by
+ * FWDLIB's BEM solvers and by INVERSELIB's depth weighting. Two solvers
+ * are provided: a closed-form algebraic fit due to Alan Jennings
+ * (University of Dayton) that solves a single linear system in
+ * @c O(n) and returns the algebraic best fit in one shot, and a
+ * Nelder–Mead refinement (@ref fit_sphere_simplex) that minimises the
+ * geometric residual @f$\sum_i (\|\mathbf{p}_i - \mathbf{c}\| - r)^2@f$
+ * via @ref UTILSLIB::SimplexAlgorithm and is more robust on noisy
+ * digitiser data where the algebraic fit is biased toward outliers.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * @brief    Sphere class declaration.
- *
+ * The class itself is a lightweight value type carrying @c (center, radius);
+ * the fit routines are static factories so the same object layout is
+ * shared between MRI head-shape extraction, HPI coil fitting and the
+ * spherical-shell BEM construction in FWDLIB.
  */
 
 #ifndef SPHERE_H
@@ -58,7 +53,7 @@ namespace UTILSLIB
 // TYPEDEFS
 //=============================================================================================================
 
-/** @brief Workspace for sphere-fitting optimisation, holding 3-D point coordinates and a report flag. */
+/** @brief Cost-function workspace for @ref Sphere::fit_sphere_simplex: holds the @c nx3 point cloud and a verbose-report flag. */
 struct FitUser {
     Eigen::MatrixXf rr;
     bool report;
@@ -66,9 +61,12 @@ struct FitUser {
 
 //=============================================================================================================
 /**
- * Sphere description.
+ * Best-fit sphere primitive carrying centre and radius, with static
+ * factories for the closed-form algebraic fit (Jennings) and the
+ * Nelder–Mead geometric-residual refinement. Used to build spherical
+ * head models, fit HPI coils and digitiser scalps.
  *
- * @brief Describes a 3D sphere object.
+ * @brief 3-D sphere value type with algebraic and Nelder–Mead best-fit factories.
  */
 class MATHSHARED_EXPORT Sphere
 {
