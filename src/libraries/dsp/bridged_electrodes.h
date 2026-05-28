@@ -1,34 +1,26 @@
 //=============================================================================================================
 /**
- * @file     bridged_electrodes.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.3.0
- * @date     May, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file bridged_electrodes.h
+ * @since 2026
+ * @date  May 2026
+ * @brief Detection of electrically bridged EEG electrodes via the Electrical Distance metric.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * Two EEG electrodes are said to be bridged when conductive paste, sweat or
+ * skin abrasion creates a low-impedance shortcut between them; the recorded
+ * signals then become near-identical and any subsequent source localisation
+ * is biased. Following Tenke & Kayser (2001, Clin. Neurophysiol. 112) the
+ * detector computes the Electrical Distance — the time-domain variance of
+ * the difference signal — for every channel pair, and flags pairs whose
+ * normalised distance falls below a user-defined threshold (default 0.3).
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Bridged electrode detection functions.
+ * The implementation operates on the raw broadband signal; no rereferencing
+ * or filtering is required up-front. Output is a list of @c (i, j) channel-
+ * index pairs that the caller can mark bad, interpolate, or pass into the
+ * SSS bad-channel set.
  */
 
 #ifndef BRIDGED_ELECTRODES_H

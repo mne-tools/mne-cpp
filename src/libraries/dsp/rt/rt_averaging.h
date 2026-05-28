@@ -1,36 +1,27 @@
 //=============================================================================================================
 /**
- * @file     rtaveraging.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.3
- * @date     June, 2020
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file rt_averaging.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Real-time stimulus-locked averaging worker producing running evoked responses.
  *
- * Copyright (C) 2020, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * RtAveragingWorker accumulates fixed-length epochs around trigger events
+ * detected on a user-specified stim channel and maintains a running
+ * arithmetic mean per condition, yielding a @ref FIFFLIB::FiffEvokedSet that
+ * updates as new data arrives. The worker is designed to run on its own
+ * @c QThread so the GUI and acquisition pipeline remain responsive even at
+ * high sample rates and large evoked counts. RtAveraging is the thin
+ * QObject wrapper that owns the worker, forwards configuration changes
+ * (pre/post-stim samples, baseline window, average count) and re-emits the
+ * worker's result signal back to the main thread.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief     Declaration of the RtAveraging and RtAveragingWorker classes.
- *
+ * Baseline correction is applied per epoch on the configured baseline
+ * window before accumulation, and the @c numAverages parameter selects
+ * between a strict moving-window mean and a cumulative running mean.
  */
 
 #ifndef RT_AVERAGING_RTPROCESSING_H

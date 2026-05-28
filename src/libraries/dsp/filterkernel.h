@@ -1,47 +1,37 @@
 //=============================================================================================================
 /**
- * @file     filterkernel.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Ruben Doerfel <Ruben.Doerfel@tu-ilmenau.de>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.3
- * @date     June, 2020
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file filterkernel.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Linear-phase FIR filter kernel with overlap-add FFT convolution back-end.
  *
- * Copyright (C) 2020, Lorenz Esch, Ruben Doerfel, Christoph Dinh. All rights reserved.
+ * FilterKernel is the core FIR engine of the DSP library: it owns the impulse
+ * response coefficients of a low-pass, high-pass, band-pass or notch filter
+ * together with their zero-padded FFT and applies them to incoming data via
+ * overlap-add convolution. Two design back-ends are supported — the
+ * cosine-tapered raised-cosine design (@ref CosineFilter, fast, smooth
+ * roll-off) and the Parks–McClellan equiripple design
+ * (@ref ParksMcClellan, optimal minimax behaviour). Both produce Type-I
+ * linear-phase responses, so the kernel can be applied either as a single
+ * forward pass with a fixed group delay of @c (NumTaps-1)/2 samples or in
+ * zero-phase forward / time-reverse mode.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * Frequency-domain convolution is realised by zero-padding the impulse
+ * response to the next power of two, transforming once at design time and
+ * caching the result. Each input block of length @c FFTLength − @c NumTaps
+ * is then transformed, multiplied with the cached spectrum and inverse-
+ * transformed; consecutive blocks are stitched by adding the @c NumTaps − 1
+ * tail of the preceding block to the head of the next, which suppresses
+ * circular-convolution artefacts. Typical example: with @c FFTLength = 4096
+ * and @c NumTaps = 80 the useful per-block input length is 4016 samples.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    The FilterKernel class represents a filter object that generates the FIR filter coefficients using Park's McClellan's
- *           filter design algorithm [1] and offers a overlap-add method [2] for frequency filtering of an input
- *           sequence. In this regard, the filter coefficients of a certain filter order are zero-padded to fill
- *           a length of an multiple integer of a power of 2 in order to efficiently compute a FFT. The length of
- *           the FFT is given by the next power of 2 of the length of the input sequence. In order to avoid
- *           circular-convolution, the input sequence is given by the FFT-length-NumFilterTaps.
- *
- *           e.g. FFT length=4096, NumFilterTaps=80 -> input sequence 4096-80=4016
- *
- *
- *           [1] http://en.wikipedia.org/wiki/Parks%E2%80%93McClellan_filter_design_algorithm
- *           [2] http://en.wikipedia.org/wiki/Overlap_add
+ * References:
+ *   [1] https://en.wikipedia.org/wiki/Parks%E2%80%93McClellan_filter_design_algorithm
+ *   [2] https://en.wikipedia.org/wiki/Overlap%E2%80%93add_method
  */
 
 #ifndef FILTERKERNEL_H

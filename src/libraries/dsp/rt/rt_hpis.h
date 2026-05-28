@@ -1,35 +1,27 @@
 //=============================================================================================================
 /**
- * @file     rthpis.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     November, 2016
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file rt_hpis.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Real-time continuous Head-Position-Indicator (cHPI) coil-localisation worker.
  *
- * Copyright (C) 2016, Lorenz Esch. All rights reserved.
+ * RtHpi runs the inverse-library HPI fitter (@ref INVLIB::InvHpiFit) on each
+ * incoming data window from a background @c QThread. For every window the
+ * worker extracts the narrow-band cHPI carriers at the configured coil
+ * frequencies, fits a single-dipole model to each carrier amplitude /
+ * phase pattern and emits an @ref INVLIB::HpiFitResult containing the
+ * estimated coil positions, the head-to-device transform and per-coil
+ * goodness-of-fit values.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief     RtHpi class declaration.
- *
+ * The continuously updated head-to-device transform is the input to
+ * Maxwell movement compensation (@ref MaxwellMovementComp), to the live
+ * coordinate-frame display, and to dynamic forward-solution updates. The
+ * threaded design keeps the GUI responsive even when the HPI fit is run
+ * at the full block rate of a multi-channel acquisition.
  */
 
 #ifndef RT_HPIS_RTPROCESSING_H

@@ -1,40 +1,27 @@
 //=============================================================================================================
 /**
- * @file     firfilter.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file firfilter.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Discoverable design / apply façade over the @ref FilterKernel FIR engine.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * FirFilter mirrors the @ref IirFilter API surface (design, apply,
+ * applyZeroPhase, applyZeroPhaseMatrix) so callers see one consistent
+ * way of building and running FIR or IIR filters in mne-cpp. Internally
+ * every call delegates to @ref FilterKernel, which executes the actual
+ * frequency-domain overlap-add convolution against the precomputed FFT
+ * of the impulse response.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Declaration of FirFilter — a discoverable façade over the existing FilterKernel FIR API.
- *
- * FirFilter provides the same design/apply/applyZeroPhase/applyZeroPhaseMatrix pattern as IirFilter
- * so that both FIR and IIR filters are found in one consistent place in the DSP library.
- * All frequencies are specified in Hz; the normalisation to Nyquist is handled internally.
- *
- * The underlying engine is FilterKernel (overlap-add FFT convolution).
+ * All cutoff / bandwidth parameters are specified in Hz; normalisation
+ * against the sampling frequency happens inside the design step. Because
+ * the underlying kernels are linear-phase Type-I FIRs, the zero-phase
+ * helpers simply remove the deterministic @c (NumTaps-1)/2 group delay
+ * after a single forward pass — no forward / backward filtering is
+ * required.
  */
 
 #ifndef FIRFILTER_DSP_H

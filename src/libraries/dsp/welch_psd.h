@@ -1,34 +1,27 @@
 //=============================================================================================================
 /**
- * @file     welch_psd.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.1.0
- * @date     March, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file welch_psd.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Welch's averaged-periodogram power-spectral-density estimator.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * Welch's method (1967) splits the signal into overlapping segments,
+ * applies a window function (Hann by default) to each segment, takes the
+ * squared magnitude FFT, and averages the resulting periodograms. Compared
+ * with a single FFT of the full record, the segment averaging reduces the
+ * variance of the estimate by approximately the number of segments at the
+ * cost of a coarser frequency resolution proportional to the inverse of
+ * the window length. Standard overlap is 50% with a Hann window, which
+ * gives an effectively independent sample count of @c ≈0.36 · (n_segments).
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    WelchPsd class declaration — Welch's averaged periodogram PSD estimator.
+ * The estimator returns either a one-sided spectrum (real-valued input,
+ * negative frequencies folded onto positive ones with a factor of two) or
+ * the full two-sided spectrum, and supports linear, mean and constant
+ * detrending of each segment prior to windowing.
  */
 
 #ifndef WELCH_PSD_H

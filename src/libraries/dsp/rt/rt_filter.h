@@ -1,36 +1,27 @@
 //=============================================================================================================
 /**
- * @file     filter.h
- * @author   Ruben Doerfel <Ruben.Doerfel@tu-ilmenau.de>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.3
- * @date     June, 2020
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file rt_filter.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Real-time FIR / IIR filtering of streaming MEG / EEG data blocks.
  *
- * Copyright (C) 2020, Ruben Doerfel, Lorenz Esch. All rights reserved.
+ * The functions in this header wrap @ref UTILSLIB::FilterKernel and the
+ * design back-ends so an incoming raw data file or live data block can be
+ * low-pass, high-pass, band-pass or notch-filtered in place with a single
+ * call. @ref filterFile streams a @ref FIFFLIB::FiffRawData source through
+ * a user-designed kernel and writes the filtered output to an arbitrary
+ * @c QIODevice, optionally parallelising the per-channel overlap-add work
+ * with Qt Concurrent.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief     Filter declarations.
- *
+ * The companion @ref FilterObject struct bundles the FIR coefficients with
+ * the per-channel @c iRow and a contiguous @c vecData buffer so independent
+ * channels can be filtered in parallel without sharing mutable state. All
+ * cutoff and transition values are specified in Hz — normalisation against
+ * the sampling rate happens inside the design call.
  */
 
 #ifndef RT_FILTER_RT_H

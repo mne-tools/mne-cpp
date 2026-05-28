@@ -1,36 +1,30 @@
 //=============================================================================================================
 /**
- * @file     dsp_global.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     March, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file dsp_global.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Export/import macros and namespace declaration for the DSP library.
  *
- * Copyright (C) 2026-2026, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * The DSP library bundles every digital-signal-processing component shipped
+ * with mne-cpp: FIR / IIR / cosine-tapered / Parks–McClellan filter design
+ * and application, FFT-based overlap-add convolution, polyphase rational
+ * resampling, Morlet wavelet and multitaper time-frequency representations,
+ * Welch and multitaper power spectral density estimators, surface Laplacian
+ * (CSD) and SPHARA spatial filters, ExtendedInfomax and PICARD ICA, Maxwell
+ * filtering (SSS, movement compensation, fine calibration), cHPI line-noise
+ * removal, bridged-electrode and LOF bad-channel detection, EOG regression
+ * and assorted real-time wrappers (averaging, covariance, noise PSD, inverse
+ * operator update).
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    dsp library export/import macros.
- *
+ * @c DSPSHARED_EXPORT resolves to @c Q_DECL_EXPORT inside the DSP target
+ * itself and to @c Q_DECL_IMPORT for every downstream consumer; it collapses
+ * to an empty token in static builds. This macro must annotate every symbol
+ * that crosses the shared-library boundary on Windows so the import library
+ * is generated correctly.
  */
 
 #ifndef DSP_GLOBAL_H

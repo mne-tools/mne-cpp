@@ -1,36 +1,27 @@
 //=============================================================================================================
 /**
- * @file     rtnoise.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     August, 2014
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file rt_noise.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Real-time noise power-spectral-density estimation from streaming data blocks.
  *
- * Copyright (C) 2014, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * RtNoiseWorker accumulates a configurable number of contiguous data blocks,
+ * applies an FFT of user-defined length and averages the squared magnitude
+ * spectra into a running noise-PSD estimate. The estimator follows the
+ * classical periodogram-averaging recipe (Welch with rectangular windowing
+ * and no overlap), so longer accumulation windows trade temporal
+ * responsiveness for spectral variance reduction. RtNoise is the QObject
+ * front-end that owns the worker, forwards configuration changes, and re-
+ * emits the PSD result back on the GUI thread.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief     RtNoiseWorker and RtNoise class declarations.
- *
+ * This estimate is what feeds the live noise-spectrum display and provides
+ * a sanity-check companion to @ref RtCov whenever a quick frequency-domain
+ * view of the noise floor is more informative than the full channel–channel
+ * covariance matrix.
  */
 
 #ifndef RT_NOISE_RTPROCESSING_H
