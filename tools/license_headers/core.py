@@ -161,7 +161,7 @@ def build_spdx_block(
     sorted_authors = sorted(_unique_authors(authors), key=_surname_key)
     lines = [
         f"{prefix} SPDX-License-Identifier: BSD-3-Clause",
-        f"{prefix} Copyright (c) {year_range}",
+        f"{prefix} Copyright (c) {year_range} MNE-CPP Authors",
     ]
     for name, email in sorted_authors:
         lines.append(f"{prefix}   {name} <{email}>")
@@ -293,7 +293,7 @@ def detect_spdx_block(text: str) -> tuple[int, str, list[tuple[str, str]]] | Non
             m = re.match(r"^\s*\*\s?(.*)$", s)
             return m.group(1) if m else s
         if inner and _strip(inner[0]).startswith("SPDX-License-Identifier: BSD-3-Clause"):
-            cm = re.match(r"^Copyright \(c\)\s+(\d{4}(?:-\d{4})?)\s*$", _strip(inner[1]))
+            cm = re.match(r"^Copyright \(c\)\s+(\d{4}(?:-\d{4})?)(?:\s+MNE-CPP Authors)?\s*$", _strip(inner[1]))
             if cm:
                 year_range = cm.group(1)
                 authors: list[tuple[str, str]] = []

@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026
+ * Copyright (c) 2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mri_global.cpp
