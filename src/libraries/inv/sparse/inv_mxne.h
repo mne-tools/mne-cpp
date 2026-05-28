@@ -1,35 +1,24 @@
 //=============================================================================================================
 /**
- * @file     inv_mxne.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file inv_mxne.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Mixed-Norm Estimate (MxNE) sparse inverse solver — block-sparse L21 minimisation for focal source recovery.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    InvMxne class declaration.
- *
+ * @ref INVLIB::InvMxne implements the MxNE solver of Gramfort et al.,
+ * @em Mixed-norm estimates for the M/EEG inverse problem using
+ * accelerated gradient methods, Phys. Med. Biol. 57(7), 1937-1961
+ * (2012). It minimises
+ * @f$ \tfrac{1}{2}\,\|M - G X\|_F^{2} + \alpha\,\|X\|_{2,1} @f$
+ * using iteratively-reweighted least squares; the @c L21 group penalty
+ * zeros out entire source rows that do not contribute to the residual,
+ * producing a focal solution with a small list of active vertices.
+ * Outputs the sparse @ref InvSourceEstimate, the active-vertex list,
+ * iteration count and final residual norm in an @ref InvMxneResult.
  */
 
 #ifndef INV_MXNE_H

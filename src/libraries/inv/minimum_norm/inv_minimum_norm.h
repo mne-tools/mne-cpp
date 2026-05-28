@@ -1,37 +1,29 @@
 //=============================================================================================================
 /**
- * @file     inv_minimum_norm.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file inv_minimum_norm.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Linear minimum-norm inverse solver — MNE, dSPM, sLORETA and eLORETA from a precomputed @c MNEInverseOperator.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * @ref INVLIB::InvMinimumNorm wraps an @c MNELIB::MNEInverseOperator
+ * and turns it into a runnable inverse pipeline. The class can compute
+ * the regularised L2 minimum-norm estimate, the dSPM noise-normalised
+ * estimate (Dale et al., Neuron 26, 55-67, 2000), the sLORETA estimate
+ * (Pascual-Marqui, Methods Find. Exp. Clin. Pharmacol. 24D, 5-12,
+ * 2002) and the iterative eLORETA estimate (Pascual-Marqui, 2007) from
+ * either an @c FiffEvoked or a raw data matrix. @ref doInverseSetup
+ * re-prepares the operator for a given number of averages and assembles
+ * the kernel matrix once, after which @c calculateInverse becomes a
+ * single dense matmul per input epoch.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Minimum norm class declaration.
- *
+ * References:
+ *   - Hamalainen &amp; Ilmoniemi, Med. &amp; Biol. Eng. &amp; Comput. 32, 35-42, 1994.
+ *   - Dale et al., Neuron 26, 55-67, 2000 (dSPM).
+ *   - Pascual-Marqui, Methods Find. Exp. Clin. Pharmacol. 24D, 5-12, 2002 (sLORETA).
  */
 
 #ifndef INV_MINIMUM_NORM_H

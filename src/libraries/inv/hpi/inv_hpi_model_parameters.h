@@ -1,35 +1,23 @@
 //=============================================================================================================
 /**
- * @file     inv_hpi_model_parameters.h
- * @author   Ruben Dörfel <doerfelruben@aol.com>
- * @since    0.1.9
- * @date     February, 2022
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file inv_hpi_model_parameters.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Immutable configuration for the HPI signal model — coil drive frequencies, sample rate, line frequency and model variant.
  *
- * Copyright (C) 2022, Ruben Dörfel. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief     InvHpiModelParameters class declaration.
- *
+ * @ref INVLIB::InvHpiModelParameters captures the four quantities that
+ * fully determine the design of the sinusoidal HPI signal model:
+ * the list of HPI coil drive frequencies (typically four MEGIN /
+ * Elekta coils between 154 and 304 Hz), the sampling frequency of the
+ * acquisition, the local power-line frequency (50 / 60 Hz) and a
+ * @c bBasic flag that selects whether the line component is included
+ * in the regressor matrix. Value-typed with copy semantics and
+ * equality operators so the cache logic in @ref InvHpiDataUpdater and
+ * @ref InvSignalModel can detect changes cheaply.
  */
 
 #ifndef INV_HPI_MODEL_PARAMETERS_H

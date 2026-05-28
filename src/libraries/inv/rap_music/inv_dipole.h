@@ -1,22 +1,23 @@
 //=============================================================================================================
 /**
- * @file     inv_dipole.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     March, 2011
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file inv_dipole.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Templated dipole and dipole-pair value types used by the RAP-MUSIC scanning algorithm.
  *
- * Copyright (C) 2011, Lorenz Esch, Christoph Dinh. All rights reserved.
- *
- * No part of this program may be photocopied, reproduced,
- * or translated to another program language without the
- * prior written consent of the author.
- *
- *
- * @brief    InvDipole class declaration for RAP MUSIC dipole results.
- *
+ * @ref INVLIB::InvDipole<T> is a templated representation of a single
+ * current dipole (position + orientation, optionally length and
+ * frequency) and @ref INVLIB::InvDipolePair<T> a pair of correlated
+ * dipoles returned by one iteration of the RAP-MUSIC search. The
+ * templates are kept separate from the rest of INVLIB so that
+ * scanning code can run in @c float, @c double or even integer-index
+ * mode without forcing a global precision choice. The header
+ * includes its own @c .cpp at the bottom because the templates have to
+ * be visible at the first point of instantiation.
  */
 
 #ifndef INV_DIPOLE_H

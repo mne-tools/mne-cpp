@@ -1,35 +1,24 @@
 //=============================================================================================================
 /**
- * @file     inv_gamma_map.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file inv_gamma_map.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Gamma-MAP sparse Bayesian inverse solver — automatic-relevance-determination prior on per-source variance hyperparameters.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    InvGammaMap class declaration.
- *
+ * @ref INVLIB::InvGammaMap implements the Gamma-MAP / sparse Bayesian
+ * learning (SBL) solver of Wipf &amp; Rao, NeuroImage 44(3), 947-966
+ * (2009). The algorithm models source amplitudes as Gaussians with
+ * per-source variance hyperparameters @f$\gamma_{i}@f$ and uses an
+ * EM / fixed-point update to iteratively re-estimate the @f$\gamma@f$
+ * vector from the data; sources whose @f$\gamma_{i}@f$ collapses below
+ * threshold are pruned, leaving a sparse active set. Output is an
+ * @ref InvGammaMapResult carrying the @ref InvSourceEstimate, the
+ * surviving active-vertex list, the final @f$\gamma@f$ vector,
+ * iteration count and residual norm.
  */
 
 #ifndef INV_GAMMA_MAP_H

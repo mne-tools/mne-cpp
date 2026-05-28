@@ -1,37 +1,24 @@
 //=============================================================================================================
 /**
- * @file     source_morph.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.3.0
- * @date     May, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file source_morph.h
+ * @since 2026
+ * @date  May 2026
+ * @brief Sparse morph operator that re-samples an @ref INVLIB::InvSourceEstimate from one subject's source space onto another.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    SourceMorph class for morphing source estimates between subjects.
- *
- * Equivalent to MNE-Python's mne.compute_source_morph() + SourceMorph.apply().
- * Uses nearest-neighbor interpolation via MNEMorphMap.
+ * @ref INVLIB::SourceMorph is the C++ peer of mne-python's
+ * @c mne.compute_source_morph + @c SourceMorph.apply. It consumes the
+ * sparse vertex-to-vertex interpolation matrix produced by
+ * @c FSLIB::MNEMorphMap (nearest-neighbour on the subject sphere)
+ * and stores it together with the from/to vertex lists so a precomputed
+ * morph can be re-applied to many source estimates from the same
+ * subject pair without re-doing the surface interpolation. The
+ * resulting morphed estimate carries the @em to subject's vertex list
+ * and time axis untouched, making it directly comparable to estimates
+ * that were inverse-solved natively on the target subject.
  */
 
 #ifndef SOURCE_MORPH_H

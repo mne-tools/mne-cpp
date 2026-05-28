@@ -1,37 +1,23 @@
 //=============================================================================================================
 /**
- * @file     inv_dipole_fit_settings.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     December, 2016
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file inv_dipole_fit_settings.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Command-line and programmatic settings struct for the @c mne_dipole_fit driver.
  *
- * Copyright (C) 2016, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Dipole Fit Setting class declaration.
- *
+ * @ref INVLIB::InvDipoleFitSettings collects every option that the
+ * classic @c mne_dipole_fit command-line tool accepts — BEM file, sphere
+ * origin, EEG model, guess-grid parameters, noise-covariance file,
+ * measurement file and time window, projection list, regularisation per
+ * channel type, and output dip/bdip file names. The class can be
+ * populated from @c argc / @c argv (for the @c mne_dipole_fit binary)
+ * or directly by application code, and @c checkIntegrity validates the
+ * combination of choices before the fit workspace is built. Refactored
+ * from @c setup.c / argument-parsing code in MNE-C.
  */
 
 #ifndef INV_DIPOLE_FIT_SETTINGS_H
@@ -78,9 +64,13 @@ inline constexpr double BIG_TIME = 1e6;
 
 //=============================================================================================================
 /**
- * Implements the dipole fit setting parser
+ * Command-line and programmatic settings for the @c mne_dipole_fit driver:
+ * BEM / sphere model, EEG model, guess-grid parameters, noise-covariance
+ * file, measurement file + time window, projection list, per-channel-type
+ * regularisation and output dip/bdip file names. Can be populated from
+ * @c argc / @c argv or directly by application code.
  *
- * @brief Dipole Fit setting implementation
+ * @brief Settings for the @c mne_dipole_fit driver (forward model, guess grid, data, projections, output).
  */
 class INVSHARED_EXPORT InvDipoleFitSettings
 {

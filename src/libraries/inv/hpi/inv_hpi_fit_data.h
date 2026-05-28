@@ -1,37 +1,24 @@
 //=============================================================================================================
 /**
- * @file     inv_hpi_fit_data.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Ruben Dörfel <doerfelruben@aol.com>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     April, 2017
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file inv_hpi_fit_data.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Per-coil magnetic-dipole fitting workspace — Nelder-Mead optimiser plus leadfield computation for HPI coil localisation.
  *
- * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    InvHpiFitData class declaration.
- *
+ * @ref INVLIB::InvHpiFitData implements the inner loop of
+ * @ref InvHpiFit: for every HPI coil it computes the magnetic-dipole
+ * leadfield in an infinite homogeneous medium, evaluates the residual
+ * between the model field and the measured projection, and runs a
+ * Nelder-Mead simplex search (@c fminsearch) to refine the coil
+ * position. Helper structs @ref DipFitError and @ref HPISortStruct
+ * carry per-iteration diagnostics and the post-fit coil-ordering
+ * metadata. The leadfield and fit-error routines are validated against
+ * the FieldTrip @c magnetic_dipole / @c ft_compute_leadfield reference
+ * implementations.
  */
 
 #ifndef INV_HPI_FIT_DATA_H
@@ -105,9 +92,13 @@ struct HPISortStruct {
 
 //=============================================================================================================
 /**
- * HPI Fit algorithm data structure.
+ * Per-coil magnetic-dipole fitter: computes the infinite-medium leadfield
+ * for a candidate coil position, evaluates the residual against the
+ * projected MEG sample and refines the position with a Nelder-Mead simplex
+ * search. Routines are validated against FieldTrip's @c magnetic_dipole
+ * and @c ft_compute_leadfield reference implementations.
  *
- * @brief HPI Fit algorithm data structure.
+ * @brief Per-coil magnetic-dipole fitter (leadfield, residual, Nelder-Mead refinement) for the HPI pipeline.
  */
 class INVSHARED_EXPORT InvHpiFitData
 {

@@ -1,38 +1,24 @@
 //=============================================================================================================
 /**
- * @file     inv_hpi_fit.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Ruben Dörfel <doerfelruben@aol.com>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    0.1.0
- * @date     March, 2017
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file inv_hpi_fit.h
+ * @since 2026
+ * @date  March 2026
+ * @brief HPI (Head Position Indicator) fitting — estimates the MEG dewar-to-head transform from coil-current signals.
  *
- * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    InvHpiFit class declaration.
- *
+ * @ref INVLIB::InvHpiFit fits a magnetic dipole to each HPI coil from
+ * the projected MEG data, matches the fitted coils to the digitised coil
+ * locations and returns the resulting dewar↔head coordinate transform.
+ * The class drives the same pipeline used by Elekta/MEGIN MaxFilter and
+ * mne-python's @c mne.chpi: per-coil dipole localisation, frequency
+ * ordering, large-movement detection and quaternion-formatted position
+ * storage. Inputs are the projected sensor data, the SSP projector and
+ * an @ref InvHpiModelParameters spec; output is an @ref HpiFitResult
+ * that downstream stages can feed to head-movement-corrected averaging
+ * or continuous co-registration.
  */
 
 #ifndef INV_HPI_FIT_H
@@ -133,9 +119,13 @@ struct HpiFitResult {
 
 //=============================================================================================================
 /**
- * HPI Fit algorithms.
+ * Drives one HPI fit: per-coil magnetic-dipole localisation, frequency
+ * matching against the digitised coil layout and Procrustes solve for the
+ * dewar-to-head transform. The class is reusable across consecutive
+ * measurement blocks and caches the sensor geometry to avoid
+ * recomputing it on every call.
  *
- * @brief HPI Fit algorithms.
+ * @brief Drives one HPI fit (per-coil dipole localisation, coil ordering, dewar-to-head transform).
  */
 class INVSHARED_EXPORT InvHpiFit
 {

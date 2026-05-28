@@ -1,61 +1,24 @@
 //=============================================================================================================
 /**
- * @file     inv_token.h
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    2.0.0
- * @date     June, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file inv_token.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Token vocabulary, value-carrier struct and tokenisation options for the foundation-model serialisation of @ref INVLIB::InvSourceEstimate.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Token vocabulary and structures for foundation-model tokenization of InvSourceEstimate.
- *
- * @details  The token vocabulary defines a self-describing sequence format for serializing
- *           multimodal neural source representations into a flat token stream that transformers
- *           and other foundation models can process.
- *
- *           Each token carries an integer vocabulary ID and an optional continuous floating-point
- *           value.  Structural tokens (section delimiters, metadata labels) use only the ID;
- *           value-carrier tokens (amplitudes, positions, times, indices) pair the ID with the
- *           continuous quantity.  This hybrid design supports both:
- *             - Models with continuous-value embedding layers (use id + value)
- *             - Purely discrete language-model architectures (use id only, apply external
- *               quantization to the value field before embedding)
- *
- *           A typical token sequence for a surface MNE estimate has the form:
- *
- *             [BOS] [META_BEGIN] [METHOD_MNE] [SPACE_SURFACE] [ORIENT_FIXED] [META_END]
- *             [GRID_BEGIN] [N_SOURCES val] [N_TIMES val] [T_MIN val] [T_STEP val]
- *               [VERTEX val] ... [VERTEX val]
- *               [GRID_ROW] [AMP val] ... [AMP val]
- *               ...
- *             [GRID_END]
- *             [EOS]
- *
- *           Dense data layers (grid amplitudes, connectivity matrices) can be optionally
- *           omitted via InvTokenizeOptions, producing a compact metadata-only sequence
- *           suitable for context-limited attention windows.
- *
+ * Defines @ref INVLIB::InvTokenId — the integer vocabulary used by the
+ * tokeniser in @c inv_source_estimate_token.h — organised into stable
+ * ID ranges for special markers, section brackets, method / source-space
+ * / orientation labels, value-carrier tokens (amplitude, vertex,
+ * position, time, correlation, ...), booleans, dimension sizes,
+ * connectivity-measure names and a reserved block for external
+ * quantisation bins. Also exposes the @ref InvToken value type
+ * (id + continuous value) and the @ref InvTokenizeOptions knobs that
+ * control which layers are emitted and whether dense grids are
+ * sub-sampled to fit a transformer's context window.
  */
 
 #ifndef INV_TOKEN_H

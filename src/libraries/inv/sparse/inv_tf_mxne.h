@@ -1,38 +1,28 @@
 //=============================================================================================================
 /**
- * @file     inv_tf_mxne.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.3.0
- * @date     May, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file inv_tf_mxne.h
+ * @since 2026
+ * @date  May 2026
+ * @brief Time-Frequency Mixed-Norm Estimate (TF-MxNE) sparse inverse solver — joint L21 + L1 sparsity in a Gabor time-frequency dictionary.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Time-Frequency Mixed-Norm Estimate (TF-MxNE) sparse inverse solver.
- *
- * Equivalent to MNE-Python's mne.inverse_sparse.tf_mixed_norm().
- * Solves the L21+L1 problem in the time-frequency domain using
- * Gabor dictionary decomposition.
+ * @ref INVLIB::InvTfMxne implements the TF-MxNE solver of Gramfort
+ * et al., @em Time-Frequency Mixed-Norm Estimates: Sparse M/EEG imaging
+ * with non-stationary source activations, NeuroImage 70, 410-422
+ * (2013). It solves
+ * @f$ \min \|M - G\Phi Z\|_F^{2} + \alpha_{s}\|Z\|_{2,1}
+ *    + \alpha_{t}\|Z\|_{1} @f$
+ * where @f$\Phi@f$ is a tight Gabor frame; the @c L21 penalty enforces
+ * spatial sparsity (few active sources) while the @c L1 penalty
+ * enforces temporal sparsity (focal activations in time-frequency).
+ * Equivalent to mne-python's
+ * @c mne.inverse_sparse.tf_mixed_norm. The accompanying
+ * @ref InvTfMxneParams struct exposes the Gabor frequency range,
+ * spatial / temporal regularisation, debias flag and convergence
+ * controls.
  */
 
 #ifndef INV_TF_MXNE_H

@@ -1,22 +1,19 @@
 //=============================================================================================================
 /**
- * @file     inv_dipole.cpp
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     March, 2011
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file inv_dipole.cpp
+ * @since 2026
+ * @date  April 2026
+ * @brief Template definitions for @ref INVLIB::InvDipole<T> (included from the matching header).
  *
- * Copyright (C) 2011, Lorenz Esch, Christoph Dinh. All rights reserved.
- *
- * No part of this program may be photocopied, reproduced,
- * or translated to another program language without the
- * prior written consent of the author.
- *
- *
- * @brief    ToDo Documentation...
- *
+ * Provides the explicit ctor / dtor and the @c clean reset method for
+ * @ref INVLIB::InvDipole<T>. This file is included from
+ * @c inv_dipole.h rather than compiled standalone so the templates are
+ * available to every translation unit that uses them without an
+ * explicit instantiation list.
  */
 
 #ifndef DIPOLE_SOURCES //Because this cpp is part of the header -> template

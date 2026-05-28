@@ -1,44 +1,29 @@
 //=============================================================================================================
 /**
- * @file     inv_beamformer_compute.h
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    2.1.0
- * @date     March, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file inv_beamformer_compute.h
+ * @since 2026
+ * @date  April 2026
+ * @brief Shared math kernels (filter derivation, source power, regularised pseudo-inverse) used by both the LCMV and DICS beamformers.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Shared beamformer computation routines for LCMV and DICS.
- *
- * Core mathematical formulations:
- *   Unit-gain filter:   W_ug = [G^T Cm^{-1} G]^{-1} G^T Cm^{-1}
- *   Unit-noise-gain:    W = W_ug / sqrt(diag(W_ug W_ug^T))
- *   NAI:                W = W_ung / sqrt(noise_level)
+ * @ref INVLIB::InvBeamformerCompute is a stateless helper that holds
+ * the numerical core of every beamformer in INVLIB. It implements the
+ * unit-gain filter @f$W_{ug} = (G^{T} C_m^{-1} G)^{-1} G^{T} C_m^{-1}@f$,
+ * the Sekihara unit-noise-gain normalisation, the NAI variant, the
+ * per-source max-power orientation search, the regularised symmetric
+ * pseudo-inverse used to invert the data covariance / CSD, and the
+ * rank-reduction step for radially-deficient MEG sphere models. Pulling
+ * this code out keeps @ref InvLCMV and @ref InvDICS as thin
+ * orchestration layers and ensures both algorithms share the same
+ * numerically-robust kernel.
  *
  * References:
- *   Van Veen et al., IEEE Trans. Biomed. Eng. 44(9), 867-880, 1997.
- *   Sekihara & Nagarajan, Adaptive Spatial Filters, Springer, 2008.
- *   Gross & Ioannides, Phys. Med. Biol. 44, 2081-2097, 1999.
+ *   - Van Veen et al., IEEE Trans. Biomed. Eng. 44(9), 867-880, 1997.
+ *   - Sekihara &amp; Nagarajan, Springer, 2008.
+ *   - Gross &amp; Ioannides, Phys. Med. Biol. 44, 2081-2097, 1999.
  */
 
 #ifndef INV_BEAMFORMER_COMPUTE_H
