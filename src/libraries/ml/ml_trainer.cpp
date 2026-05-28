@@ -1,35 +1,29 @@
 //=============================================================================================================
 /**
- * @file     ml_trainer.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file ml_trainer.cpp
+ * @since 2026
+ * @date  May 2026
+ * @brief Implementation of @ref MLLIB::MLTrainer that dispatches training scripts through @ref UTILSLIB::PythonRunner.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * The class is a few-line orchestrator on top of
+ * @ref UTILSLIB::PythonRunner: @c run first checks that a Python
+ * interpreter is reachable (returning an error-populated
+ * @ref UTILSLIB::PythonRunnerResult if not), then branches on whether
+ * a @c venvDir is configured. With a venv it calls @c runInVenv which
+ * creates / refreshes the virtual environment and installs the
+ * required packages before launching the script; without a venv it
+ * forwards directly to @c run and uses whatever interpreter the
+ * caller's configuration points at.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MLTrainer class definition.
- *
+ * @ref MLLIB::MLTrainer::checkPrerequisites iterates the caller's
+ * package list through @c isPackageAvailable and returns the missing
+ * ones so the UI can surface a single "install these to enable
+ * training" message instead of failing mid-script. The whole TU is
+ * gated by @c WASMBUILD because @c QProcess is not part of Qt-for-WASM.
  */
 
 //=============================================================================================================

@@ -1,35 +1,31 @@
 //=============================================================================================================
 /**
- * @file     ml_onnx_model.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file ml_onnx_model.h
+ * @since 2026
+ * @date  May 2026
+ * @brief ONNX Runtime backed @ref MLLIB::MlModel implementation for loading and evaluating @c .onnx graphs.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * @ref MLLIB::MlOnnxModel is the default inference backend in MLLIB:
+ * load any model exported to the ONNX format - from PyTorch,
+ * scikit-learn (via @c skl2onnx), TensorFlow, or hand-crafted - and
+ * predict on @ref MLLIB::MlTensor inputs without any framework runtime
+ * other than ONNX Runtime itself. The class owns the @c Ort::Session,
+ * a reusable CPU @c Ort::MemoryInfo, and the cached input/output node
+ * names and shapes so per-call overhead stays minimal.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MlOnnxModel class declaration.
- *
+ * Each @c predict wraps the input tensor's row-major float buffer in
+ * an @c Ort::Value zero-copy, dispatches @c Session::Run, and copies
+ * the first output tensor into a fresh @ref MLLIB::MlTensor; multi-IO
+ * graphs are supported by the cached name arrays but the public API
+ * intentionally exposes a single-in / single-out shape until a use
+ * case requires more. When mne-cpp is built without
+ * @c USE_ONNXRUNTIME the methods compile to stubs that throw
+ * @c std::runtime_error or log and return, so dependent code can be
+ * gated at runtime rather than via @c \#ifdef chains.
  */
 
 #ifndef ML_ONNX_MODEL_H
@@ -72,9 +68,13 @@ namespace MLLIB{
 
 //=============================================================================================================
 /**
- * @brief ONNX Runtime backed model.
+ * @brief @ref MlModel backend that runs @c .onnx graphs through ONNX Runtime with a cached CPU session.
  *
- * When built without USE_ONNXRUNTIME all methods throw std::runtime_error.
+ * When mne-cpp is configured without @c USE_ONNXRUNTIME every method
+ * either throws @c std::runtime_error (@c predict) or returns false /
+ * logs a warning (@c load, @c save), so the same client code compiles
+ * and links on minimal builds and on WebAssembly without conditional
+ * call sites.
  */
 class MLSHARED_EXPORT MlOnnxModel : public MlModel
 {

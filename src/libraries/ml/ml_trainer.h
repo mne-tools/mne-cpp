@@ -1,35 +1,30 @@
 //=============================================================================================================
 /**
- * @file     ml_trainer.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file ml_trainer.h
+ * @since 2026
+ * @date  May 2026
+ * @brief @ref MLLIB::MLTrainer convenience wrapper that drives Python training scripts via @ref UTILSLIB::PythonRunner.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * Inference in mne-cpp goes through ONNX Runtime, but training itself
+ * stays in Python where the ecosystem lives (PyTorch, scikit-learn,
+ * MNE-Python). @ref MLLIB::MLTrainer is the thin C++ side that
+ * launches those scripts as child processes, optionally inside a
+ * managed virtual environment, without embedding a Python interpreter
+ * or linking against @c libpython.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MLTrainer class declaration — ML-specific convenience wrapper over PythonRunner.
- *
+ * The class adds three things on top of the generic
+ * @ref UTILSLIB::PythonRunner: prerequisite checking via
+ * @c isPackageAvailable so callers can fail fast with a useful message,
+ * automatic delegation to @c runInVenv when a @c venvDir is configured
+ * (which creates and updates the venv before the script runs), and
+ * convention-friendly defaults that match the @c scripts/ml/training/
+ * layout shipped with the repository. The whole class is compiled
+ * out under @c WASMBUILD because @c QProcess is not available in the
+ * Qt-for-WASM port.
  */
 
 #ifndef ML_TRAINER_H
@@ -61,17 +56,14 @@ namespace MLLIB
 
 //=============================================================================================================
 /**
- * ML-specific convenience wrapper over UTILSLIB::PythonRunner.
+ * @brief Launches Python training scripts via @ref UTILSLIB::PythonRunner with automatic venv handling and prerequisite checks.
  *
- * Adds:
- * - Automatic prerequisite checking (Python + required packages).
- * - Default scripts directory resolution (scripts/ml/training/).
- * - Forwards line/progress callbacks to PythonRunner.
- *
- * Training logic lives entirely in Python (PyTorch, scikit-learn, …).
- * No Python embedding or linkage is required.
- *
- * @brief ML training script launcher.
+ * Training logic (PyTorch, scikit-learn, MNE-Python, …) lives entirely
+ * in the @c .py scripts under @c scripts/ml/training/ and runs in a
+ * child process; no Python embedding or @c libpython linkage is
+ * required. If the configured @ref UTILSLIB::PythonRunnerConfig
+ * carries a @c venvDir, the runner creates and updates the venv before
+ * each script invocation so dependencies are pinned per training job.
  */
 class MLSHARED_EXPORT MLTrainer
 {

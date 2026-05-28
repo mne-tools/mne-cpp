@@ -1,35 +1,30 @@
 //=============================================================================================================
 /**
- * @file     ml_tensor.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file ml_tensor.h
+ * @since 2026
+ * @date  May 2026
+ * @brief N-dimensional, row-major, reference-counted float32 tensor used as the universal MLLIB data carrier.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * @ref MLLIB::MlTensor is the interchange type that crosses every
+ * MLLIB boundary: feature matrices going into a classifier, batched
+ * activations between pre-processing and inference, prediction tensors
+ * coming back from ONNX Runtime. The storage is contiguous row-major
+ * float32 wrapped in a @c std::shared_ptr buffer so copies, reshapes
+ * and slices are all O(1); a non-owning @c view mode lets the same
+ * type wrap memory-mapped files, ORT-allocated buffers or external
+ * device pointers without an extra allocation.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MlTensor class declaration — N-dimensional, row-major, zero-copy.
- *
+ * The row-major layout deliberately matches ONNX Runtime, PyTorch and
+ * NumPy so handing a tensor to ORT is a pure pointer-and-shape cast,
+ * and Eigen interop is exposed through @c Eigen::Map accessors that
+ * read/write the same buffer in place. Convenience constructors copy
+ * (and, where needed, transpose) from Eigen's column-major
+ * @c MatrixXf / @c MatrixXd so existing mne-cpp pipelines can feed
+ * data in without restructuring their math code.
  */
 
 #ifndef ML_TENSOR_H
@@ -64,16 +59,15 @@ namespace MLLIB{
 
 //=============================================================================================================
 /**
- * @brief N-dimensional tensor with contiguous row-major (C-order) float32 storage.
+ * @brief N-dimensional row-major float32 tensor with shared-buffer storage, Eigen Map accessors and a non-owning view mode.
  *
- * Data is held in a reference-counted buffer so that copy, reshape and
- * slice are O(1).  A non-owning "view" mode lets the tensor wrap
- * external memory (e.g. memory-mapped files, CUDA device pointers)
- * without any allocation.
- *
- * Storage layout is row-major to match ONNX Runtime, PyTorch and NumPy
- * conventions.  Eigen interop is provided through Map accessors that
- * expose the data without copying.
+ * The shape is an arbitrary @c std::vector<int64_t> (matching ONNX
+ * Runtime), the buffer is a reference-counted @c std::vector<float>
+ * (or external memory in view mode), and copy / reshape / slice all
+ * stay O(1) by sharing the underlying storage. Eigen Map accessors
+ * give in-place row-major views of 2-D tensors; @c toMatrixXf /
+ * @c toMatrixXd produce column-major Eigen copies for code that needs
+ * the native Eigen layout.
  */
 class MLSHARED_EXPORT MlTensor
 {

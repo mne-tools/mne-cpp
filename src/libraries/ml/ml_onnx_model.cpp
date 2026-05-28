@@ -1,35 +1,32 @@
 //=============================================================================================================
 /**
- * @file     ml_onnx_model.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file ml_onnx_model.cpp
+ * @since 2026
+ * @date  May 2026
+ * @brief Implementation of @ref MLLIB::MlOnnxModel including session creation, IO-binding cache and zero-copy predict.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * The translation unit isolates every direct dependency on the ONNX
+ * Runtime C++ API behind @c \#ifdef @c MNE_USE_ONNXRUNTIME, so the
+ * library object is buildable even when ORT is absent. The single
+ * static @c Ort::Env returned by @ref MLLIB::MlOnnxModel::ortEnv is
+ * shared by all sessions in the process; per-instance @c Ort::Session
+ * and @c Ort::MemoryInfo are held in @c std::unique_ptr so the
+ * destructor must live in this TU (the forward-declared Ort types are
+ * incomplete at the header).
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MlOnnxModel class definition.
- *
+ * @c load opens the file with @c GraphOptimizationLevel::ORT_ENABLE_ALL,
+ * forces a single intra-op thread for deterministic output, disables
+ * memory patterns to keep peak RSS small, and caches input/output node
+ * names and shapes once so @c predict only pays for the actual
+ * @c Session::Run call. @c predict builds a zero-copy @c Ort::Value over
+ * the @ref MLLIB::MlTensor buffer, runs the session, and copies the
+ * first output back into an owning tensor. @c save is intentionally a
+ * no-op: ONNX graphs are produced by their training framework, not by
+ * this thin inference wrapper.
  */
 
 //=============================================================================================================
