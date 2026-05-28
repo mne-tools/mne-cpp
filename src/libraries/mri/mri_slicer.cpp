@@ -1,27 +1,24 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2026 MNE-CPP Authors
+// Copyright (c) 2026
 //   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
 //=============================================================================================================
 /**
- * @file     mri_slicer.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * @file mri_slicer.cpp
  *
- * @brief    Implementation of @ref MRILIB::MriSlicer: per-orientation extraction with on-the-fly type promotion and per-volume normalisation.
+ * @brief Implementation of @ref MRILIB::MriSlicer: per-orientation extraction with on-the-fly type promotion and per-volume normalisation.
  *
- *           Implements the three jobs the header advertises: (1) pick the
- *           right axis stride from the volume's @c (dimX, dimY, dimZ)
- *           triple for the requested @ref SliceOrientation; (2) iterate
- *           the voxel buffer in the on-disk type (UCHAR / SHORT / INT /
- *           FLOAT) and promote to the normalised @c Eigen::MatrixXf the
- *           viewer consumes --- keeping the dispatch in one place so the
- *           four code paths stay byte-for-byte consistent; (3) compose the
- *           emitted @c sliceToRas as @c volume.voxToSurfRAS() *
- *           orientationAffine so any surface, source estimate or fiducial
- *           overlay placed in RAS lands in the right slice without
- *           recomputing the volume geometry.
+ * Implements the three jobs the header advertises: (1) pick the
+ * right axis stride from the volume's @c (dimX, dimY, dimZ)
+ * triple for the requested @ref SliceOrientation; (2) iterate
+ * the voxel buffer in the on-disk type (UCHAR / SHORT / INT /
+ * FLOAT) and promote to the normalised @c Eigen::MatrixXf the
+ * viewer consumes --- keeping the dispatch in one place so the
+ * four code paths stay byte-for-byte consistent; (3) compose the
+ * emitted @c sliceToRas as @c volume.voxToSurfRAS() *
+ * orientationAffine so any surface, source estimate or fiducial
+ * overlay placed in RAS lands in the right slice without
+ * recomputing the volume geometry.
  */
 
 //=============================================================================================================

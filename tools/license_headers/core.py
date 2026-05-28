@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (c) 2026 MNE-CPP Authors
+# Copyright (c) 2026
 #   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
 """Shared logic for SPDX license-header migration and validation.
@@ -75,7 +75,10 @@ _SPDX_FIRST_LINE_RE = re.compile(
     r"^(?://|#|::)\s*SPDX-License-Identifier:\s*BSD-3-Clause\s*$"
 )
 _SPDX_COPYRIGHT_RE = re.compile(
-    r"^(?://|#|::)\s*Copyright \(c\)\s+(\d{4}(?:-\d{4})?)\s+MNE-CPP Authors\s*$"
+    # Accept both the new form `Copyright (c) <years>` and the legacy form
+    # `Copyright (c) <years> MNE-CPP Authors` for backward compatibility,
+    # so files migrated under v1 of the emitter don't churn on validation.
+    r"^(?://|#|::)\s*Copyright \(c\)\s+(\d{4}(?:-\d{4})?)(?:\s+MNE-CPP Authors)?\s*$"
 )
 _SPDX_AUTHOR_RE = re.compile(
     r"^(?://|#|::)\s{2,}(?P<name>[^<]+?)\s+<(?P<email>[^>]+)>\s*$"
@@ -158,7 +161,7 @@ def build_spdx_block(
     sorted_authors = sorted(_unique_authors(authors), key=_surname_key)
     lines = [
         f"{prefix} SPDX-License-Identifier: BSD-3-Clause",
-        f"{prefix} Copyright (c) {year_range} MNE-CPP Authors",
+        f"{prefix} Copyright (c) {year_range}",
     ]
     for name, email in sorted_authors:
         lines.append(f"{prefix}   {name} <{email}>")

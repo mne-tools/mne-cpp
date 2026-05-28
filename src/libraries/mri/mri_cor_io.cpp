@@ -1,26 +1,23 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2026 MNE-CPP Authors
+// Copyright (c) 2026
 //   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
 //=============================================================================================================
 /**
- * @file     mri_cor_io.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     February, 2026
+ * @file mri_cor_io.cpp
  *
- * @brief    Implementation of @ref MRILIB::MriCorIO: per-file COR-NNN reader with coronal-orientation slice transform synthesis.
+ * @brief Implementation of @ref MRILIB::MriCorIO: per-file COR-NNN reader with coronal-orientation slice transform synthesis.
  *
- *           Walks the 256 @c COR-001 \u2026 @c COR-256 files in the supplied
- *           directory, mmap-friendly reads the 65\u202f536-byte flat slice
- *           buffer of each one into a @ref MriSlice with FIFFV_MRI_PIXEL_BYTE
- *           encoding, and stamps every slice with its coronal-orientation
- *           slice\u2192MRI transform (the (128, -128, 128) mm offset plus the
- *           @c x\u2192-x, @c y\u2192z, @c z\u2192y axis permutation). Missing or
- *           short-read files are reported as warnings; partial sets are
- *           rejected so downstream code can rely on a complete 256-slice
- *           coronal stack.
- *           Ported from make_cor_set() in MNE C mne_make_cor_set by Matti Hamalainen.
+ * Walks the 256 @c COR-001 \u2026 @c COR-256 files in the supplied
+ * directory, mmap-friendly reads the 65\u202f536-byte flat slice
+ * buffer of each one into a @ref MriSlice with FIFFV_MRI_PIXEL_BYTE
+ * encoding, and stamps every slice with its coronal-orientation
+ * slice\u2192MRI transform (the (128, -128, 128) mm offset plus the
+ * @c x\u2192-x, @c y\u2192z, @c z\u2192y axis permutation). Missing or
+ * short-read files are reported as warnings; partial sets are
+ * rejected so downstream code can rely on a complete 256-slice
+ * coronal stack.
+ * Ported from make_cor_set() in MNE C mne_make_cor_set by Matti Hamalainen.
  *
  */
 

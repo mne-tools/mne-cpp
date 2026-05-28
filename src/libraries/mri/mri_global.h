@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2020-2026 MNE-CPP Authors
+// Copyright (c) 2020-2026
 //   Christoph Dinh <christoph.dinh@mne-cpp.org>
 //   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
 //   Juan GPC <jgarciaprieto@mgh.harvard.edu>
@@ -8,23 +8,20 @@
 
 //=============================================================================================================
 /**
- * @file     mri_global.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     February, 2026
+ * @file mri_global.h
  *
- * @brief    Export/import macros and build-info accessors for MRILIB.
+ * @brief Export/import macros and build-info accessors for MRILIB.
  *
- *           Provides the @c MRISHARED_EXPORT decorator used by every public
- *           symbol in the MRI library so that the same headers can be
- *           consumed by a shared-library build (Q_DECL_EXPORT when compiling
- *           MNE_MRI_LIBRARY, Q_DECL_IMPORT when linking against it) and a
- *           static build (empty decorator). Also exposes @c buildDateTime()
- *           and @c buildHash() for runtime provenance reporting --- e.g.
- *           when @c mne_analyze prints the linked-library version table
- *           in its About dialog or when the registry validator in
- *           @c tools/validate_api_registry.py needs to confirm which MRI
- *           library snapshot is wired into a deployed binary.
+ * Provides the @c MRISHARED_EXPORT decorator used by every public
+ * symbol in the MRI library so that the same headers can be
+ * consumed by a shared-library build (Q_DECL_EXPORT when compiling
+ * MNE_MRI_LIBRARY, Q_DECL_IMPORT when linking against it) and a
+ * static build (empty decorator). Also exposes @c buildDateTime()
+ * and @c buildHash() for runtime provenance reporting --- e.g.
+ * when @c mne_analyze prints the linked-library version table
+ * in its About dialog or when the registry validator in
+ * @c tools/validate_api_registry.py needs to confirm which MRI
+ * library snapshot is wired into a deployed binary.
  */
 
 #ifndef MRI_GLOBAL_H
@@ -52,7 +49,13 @@
 //=============================================================================================================
 /**
  * @namespace MRILIB
- * @brief     MRI volume and coordinate-system I/O (volumes, voxel geometry, transforms).
+ * @brief Volume I/O, voxel geometry and slice resampling for structural MRI data inside mne-cpp.
+ *
+ * Hosts every public type that participates in loading a 3D MRI volume
+ * (MGH/MGZ, NIfTI-1, FreeSurfer COR), describing it in memory
+ * (@ref MriVolData, @ref MriSlice), resampling it onto an orthogonal viewing
+ * plane (@ref MriSlicer, @ref MriSliceImage) and re-serialising it through
+ * the FIFF MRI block hierarchy (@ref MriCorFifIO).
  */
 namespace MRILIB {
 

@@ -1,44 +1,41 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2026 MNE-CPP Authors
+// Copyright (c) 2026
 //   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
 //=============================================================================================================
 /**
- * @file     mri_vol_data.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     February, 2026
+ * @file mri_vol_data.h
  *
- * @brief    Format-agnostic in-memory representation of a 3D MRI volume plus its slice decomposition.
+ * @brief Format-agnostic in-memory representation of a 3D MRI volume plus its slice decomposition.
  *
- *           Two cooperating types live in this header:
+ * Two cooperating types live in this header:
  *
- *             - @ref MriSlice --- a single 2D slice with its own pixel buffer
- *               (byte / word / float, picked at load time to mirror the
- *               on-disk @c FIFFV_MRI_PIXEL_* encoding) and an explicit
- *               slice-to-MRI (surface RAS) @ref FIFFLIB::FiffCoordTrans.
- *               This is the unit the rendering pipeline and the COR.fif
- *               writer consume, so every loader (MGH, NIfTI, raw COR)
- *               ultimately decomposes its 3D buffer into a vector of these.
- *             - @ref MriVolData --- the full volume bundle: header geometry
- *               (width/height/depth, voxel spacing, direction cosines,
- *               RAS centre), optional scan parameters (TR / TE / flip-angle
- *               / FoV), and the slice vector above. It owns the
- *               @c voxToSurfRAS(), @c voxToTalairach() and inverse
- *               transforms derived from the MGH @c Mdc / @c c_ras header
- *               fields and any additional transforms attached by the
- *               source-file reader (e.g. talairach.xfm).
+ * - @ref MriSlice --- a single 2D slice with its own pixel buffer
+ * (byte / word / float, picked at load time to mirror the
+ * on-disk @c FIFFV_MRI_PIXEL_* encoding) and an explicit
+ * slice-to-MRI (surface RAS) @ref FIFFLIB::FiffCoordTrans.
+ * This is the unit the rendering pipeline and the COR.fif
+ * writer consume, so every loader (MGH, NIfTI, raw COR)
+ * ultimately decomposes its 3D buffer into a vector of these.
+ * - @ref MriVolData --- the full volume bundle: header geometry
+ * (width/height/depth, voxel spacing, direction cosines,
+ * RAS centre), optional scan parameters (TR / TE / flip-angle
+ * / FoV), and the slice vector above. It owns the
+ * @c voxToSurfRAS(), @c voxToTalairach() and inverse
+ * transforms derived from the MGH @c Mdc / @c c_ras header
+ * fields and any additional transforms attached by the
+ * source-file reader (e.g. talairach.xfm).
  *
- *           The @c read() convenience method dispatches by file suffix to
- *           the matching loader (@ref MriMghIO, @ref MriNiftiIO, COR
- *           directory) so application code can stay one-liner clean
- *           irrespective of the on-disk format --- the equivalent of
- *           @c nibabel.load() on the Python side.
+ * The @c read() convenience method dispatches by file suffix to
+ * the matching loader (@ref MriMghIO, @ref MriNiftiIO, COR
+ * directory) so application code can stay one-liner clean
+ * irrespective of the on-disk format --- the equivalent of
+ * @c nibabel.load() on the Python side.
  *
- *           Header reference:
- *           https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat
- *           Ported from @c mneMRIdataRec / @c mneMRIvolumeRec in MNE C
- *           (@c mne_types_mne-c.h) by Matti Hamalainen.
+ * Header reference:
+ * https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat
+ * Ported from @c mneMRIdataRec / @c mneMRIvolumeRec in MNE C
+ * (@c mne_types_mne-c.h) by Matti Hamalainen.
  */
 
 #ifndef MRI_VOL_DATA_H
@@ -74,15 +71,18 @@ namespace MRILIB {
 
 //=============================================================================================================
 /**
- * Holds data for a single MRI slice within a volume.
+ * @brief Single 2D MRI slice (pixels + slice→RAS transform) used as the volume's storage unit.
  *
- * Used for COR-format representation: each slice is a 2D image with
- * associated pixel data and a coordinate transform from slice coordinates
- * to MRI (surface RAS) coordinates.
+ * Mirrors the on-disk @c FIFFB_MRI_SLICE record so that round-tripping
+ * through COR.fif is lossless: each slice owns its pixel buffer in the
+ * source's native @c FIFFV_MRI_PIXEL_BYTE / @c _WORD / @c _FLOAT encoding,
+ * its width/height in pixels and millimetres, and an explicit
+ * @ref FIFFLIB::FiffCoordTrans mapping slice (column, row) to MRI surface
+ * RAS. The slicing pipeline and the COR.fif writer consume slices directly
+ * --- every format-specific loader (MGH, NIfTI, raw COR) builds its volume
+ * as a vector of these.
  *
- * Ported from mriSliceRec in the original MNE C mne_make_cor_set.
- *
- * @brief Single MRI slice data.
+ * Ported from @c mriSliceRec in the original MNE C @c mne_make_cor_set.
  */
 struct MRISHARED_EXPORT MriSlice
 {
@@ -114,36 +114,28 @@ struct MRISHARED_EXPORT MriSlice
 
 //=============================================================================================================
 /**
- * Holds a complete MRI volume loaded from a FreeSurfer MGH/MGZ file.
+ * @brief Format-agnostic 3D MRI volume: header geometry, voxel buffer (as a vector of @ref MriSlice), scan parameters and provenance.
  *
- * This class encapsulates all header geometry, coordinate transforms,
- * scan parameters, and voxel data that describe a 3D MRI volume.
+ * The volume is the single in-memory representation every consumer in
+ * mne-cpp operates on, regardless of whether it was loaded from MGH/MGZ,
+ * NIfTI-1 or a FreeSurfer COR directory. Storage is decomposed into a
+ * vector of @ref MriSlice so the COR.fif writer can serialise without an
+ * intermediate copy, while the slice viewer and the BEM coregistration
+ * step both index it through the same (column, row, slice) coordinate.
  *
- * Based on the FreeSurfer MGH format specification:
+ * The header captures FreeSurfer's MGH conventions: voxel sizes
+ * (@c spacingX/Y/Z), direction cosines (@c Mdc, column-major), centre RAS
+ * (@c c_ras) and voxel data type (@c MRI_UCHAR / @c MRI_INT / @c MRI_FLOAT
+ * / @c MRI_SHORT). Optional scan parameters (TR, flip angle, TE, TI, FoV)
+ * and tags (Talairach transform path, provenance) round out the structure.
+ * The @c read() entry point dispatches on the file extension so callers do
+ * not need to branch on format.
+ *
+ * Format reference:
  * https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat
  *
- * Header structure (all big-endian):
- *   - version (int32): current value is 1
- *   - width (int32): first dimension (fastest-varying)
- *   - height (int32): second dimension
- *   - depth (int32): third dimension (slowest)
- *   - nframes (int32): number of scalar components per voxel
- *   - type (int32): voxel data type (MRI_UCHAR=0, MRI_INT=1, MRI_FLOAT=3, MRI_SHORT=4)
- *   - dof (int32): degrees of freedom
- *   - goodRASflag (int16): if true, direction cosines follow
- *   - spacingX/Y/Z (float32): voxel sizes in mm
- *   - Mdc (9×float32): direction cosine matrix (column-major)
- *   - c_ras (3×float32): center RAS coordinates
- *   - (padding to byte 284)
- *
- * Image data starts at byte 284.
- *
- * Footer (after data): optional scan parameters (TR, FlipAngle, TE, TI, FoV)
- * and tags (Talairach transform path, provenance info).
- *
- * Ported from mneMRIdataRec in MNE C (mne_types_mne-c.h) by Matti Hamalainen.
- *
- * @brief MRI volume data from FreeSurfer MGH/MGZ file.
+ * Ported from @c mneMRIdataRec in MNE C (@c mne_types_mne-c.h) by Matti
+ * Hamalainen.
  */
 class MRISHARED_EXPORT MriVolData
 {

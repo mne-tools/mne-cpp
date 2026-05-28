@@ -1,28 +1,25 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2026 MNE-CPP Authors
+// Copyright (c) 2026
 //   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
 //=============================================================================================================
 /**
- * @file     mri_mgh_io.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     February, 2026
+ * @file mri_mgh_io.cpp
  *
- * @brief    Implementation of @ref MRILIB::MriMghIO: byte-exact MGH/MGZ parser and zlib-streamed MGZ decoder.
+ * @brief Implementation of @ref MRILIB::MriMghIO: byte-exact MGH/MGZ parser and zlib-streamed MGZ decoder.
  *
- *           Implements the big-endian header parse, the column-major voxel
- *           buffer reader (templated over the four MGH voxel types ---
- *           UCHAR / SHORT / INT / FLOAT --- so quantisation is preserved
- *           instead of being eagerly promoted to float), and the optional
- *           footer-tag walker that recovers TR / TE / flipAngle / FoV plus
- *           the @c talairach.xfm path. MGZ inputs are routed through a
- *           single zlib @c inflate() call with @c MAX_WBITS+16 (gzip
- *           wrapping enabled) so the on-disk and in-memory paths share the
- *           same parser. Output is materialised as the slice-of-slices
- *           @ref MriVolData representation consumed by every downstream
- *           rendering and export path.
- *           Ported from make_mgh_cor_set() in MNE C mne_make_cor_set by Matti Hamalainen.
+ * Implements the big-endian header parse, the column-major voxel
+ * buffer reader (templated over the four MGH voxel types ---
+ * UCHAR / SHORT / INT / FLOAT --- so quantisation is preserved
+ * instead of being eagerly promoted to float), and the optional
+ * footer-tag walker that recovers TR / TE / flipAngle / FoV plus
+ * the @c talairach.xfm path. MGZ inputs are routed through a
+ * single zlib @c inflate() call with @c MAX_WBITS+16 (gzip
+ * wrapping enabled) so the on-disk and in-memory paths share the
+ * same parser. Output is materialised as the slice-of-slices
+ * @ref MriVolData representation consumed by every downstream
+ * rendering and export path.
+ * Ported from make_mgh_cor_set() in MNE C mne_make_cor_set by Matti Hamalainen.
  *
  */
 

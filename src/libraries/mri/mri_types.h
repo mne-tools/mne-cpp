@@ -1,36 +1,33 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2026 MNE-CPP Authors
+// Copyright (c) 2026
 //   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
 //=============================================================================================================
 /**
- * @file     mri_types.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     February, 2026
+ * @file mri_types.h
  *
- * @brief    Numeric type codes, layout constants, and sentinel values shared by every MRI reader.
+ * @brief Numeric type codes, layout constants, and sentinel values shared by every MRI reader.
  *
- *           Centralises the four magic-number families that show up in every
- *           MGH/MGZ, COR and (indirectly) NIfTI reader so that the I/O classes
- *           themselves stay free of stray integer literals:
+ * Centralises the four magic-number families that show up in every
+ * MGH/MGZ, COR and (indirectly) NIfTI reader so that the I/O classes
+ * themselves stay free of stray integer literals:
  *
- *             - @b voxel-type codes (MRI_UCHAR, MRI_INT, MRI_FLOAT, MRI_SHORT)
- *               used to decode the @c type field of the MGH header and to
- *               dispatch the corresponding QVector storage on the consumer side;
- *             - @b frame-selection sentinels (MRI_ALL_FRAMES, MRI_NO_FRAMES)
- *               used by the MGH reader API to distinguish "read everything"
- *               from "header-only" without overloading the parameter type;
- *             - @b format-version (MRI_MGH_VERSION = 1, the only value any
- *               FreeSurfer-produced MGH file should ever carry) used as a
- *               sanity gate when a candidate file is opened;
- *             - @b COR geometry constants (slice size, isotropic 1 mm voxel
- *               edge) used to materialise the per-slice coordinate transforms.
+ * - @b voxel-type codes (MRI_UCHAR, MRI_INT, MRI_FLOAT, MRI_SHORT)
+ * used to decode the @c type field of the MGH header and to
+ * dispatch the corresponding QVector storage on the consumer side;
+ * - @b frame-selection sentinels (MRI_ALL_FRAMES, MRI_NO_FRAMES)
+ * used by the MGH reader API to distinguish "read everything"
+ * from "header-only" without overloading the parameter type;
+ * - @b format-version (MRI_MGH_VERSION = 1, the only value any
+ * FreeSurfer-produced MGH file should ever carry) used as a
+ * sanity gate when a candidate file is opened;
+ * - @b COR geometry constants (slice size, isotropic 1 mm voxel
+ * edge) used to materialise the per-slice coordinate transforms.
  *
- *           Format reference:
- *           https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat
- *           These constants originate from FreeSurfer's @c mri.h and were
- *           ported via MNE C's @c mne_types_mne-c.h by Matti Hamalainen.
+ * Format reference:
+ * https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat
+ * These constants originate from FreeSurfer's @c mri.h and were
+ * ported via MNE C's @c mne_types_mne-c.h by Matti Hamalainen.
  */
 
 #ifndef MRI_TYPES_H

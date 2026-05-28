@@ -1,30 +1,27 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2026 MNE-CPP Authors
+// Copyright (c) 2026
 //   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
 //=============================================================================================================
 /**
- * @file     mri_nifti_io.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.3.0
- * @date     May, 2026
+ * @file mri_nifti_io.cpp
  *
- * @brief    Implementation of @ref MRILIB::MriNiftiIO: 348-byte header parse, byte-order auto-detect, sform/qform/pixdim transform reconstruction.
+ * @brief Implementation of @ref MRILIB::MriNiftiIO: 348-byte header parse, byte-order auto-detect, sform/qform/pixdim transform reconstruction.
  *
- *           Implements the three pieces the header documents: (1) a
- *           little-endian-by-default 348-byte header parse that flips to
- *           big-endian when @c sizeof_hdr fails its magic check and applies
- *           the swap uniformly to every multi-byte field; (2) the voxel
- *           reader, which respects @c datatype (UINT8 / INT16 / INT32 /
- *           FLOAT32, the four types we actually encounter in practice)
- *           and promotes to the matching @ref MriSlice pixel buffer so
- *           round-tripping through @ref MriCorFifIO stays lossless;
- *           (3) the sform \u2192 qform \u2192 pixdim transform fallback chain
- *           (the same ordering nibabel and FSL use) that produces a
- *           single canonical voxel\u2192RAS affine regardless of how the
- *           source file was authored. The @c .nii.gz path shares the
- *           MGZ zlib decoder so both compressed formats route through
- *           the same code.
+ * Implements the three pieces the header documents: (1) a
+ * little-endian-by-default 348-byte header parse that flips to
+ * big-endian when @c sizeof_hdr fails its magic check and applies
+ * the swap uniformly to every multi-byte field; (2) the voxel
+ * reader, which respects @c datatype (UINT8 / INT16 / INT32 /
+ * FLOAT32, the four types we actually encounter in practice)
+ * and promotes to the matching @ref MriSlice pixel buffer so
+ * round-tripping through @ref MriCorFifIO stays lossless;
+ * (3) the sform \u2192 qform \u2192 pixdim transform fallback chain
+ * (the same ordering nibabel and FSL use) that produces a
+ * single canonical voxel\u2192RAS affine regardless of how the
+ * source file was authored. The @c .nii.gz path shares the
+ * MGZ zlib decoder so both compressed formats route through
+ * the same code.
  */
 
 //=============================================================================================================

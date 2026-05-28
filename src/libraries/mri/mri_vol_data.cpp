@@ -1,33 +1,30 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2026 MNE-CPP Authors
+// Copyright (c) 2026
 //   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
 //=============================================================================================================
 /**
- * @file     mri_vol_data.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     February, 2026
+ * @file mri_vol_data.cpp
  *
- * @brief    Implementation of @ref MRILIB::MriVolData: header-driven geometry computations and the suffix-dispatch loader.
+ * @brief Implementation of @ref MRILIB::MriVolData: header-driven geometry computations and the suffix-dispatch loader.
  *
- *           Houses the non-trivial methods @ref MriVolData declares:
+ * Houses the non-trivial methods @ref MriVolData declares:
  *
- *             - @c voxToSurfRAS() / @c surfRASToVox() build the
- *               canonical 4\u00d74 affines from the MGH @c Mdc direction-
- *               cosine matrix, @c spacing vector and @c c_ras centre,
- *               matching FreeSurfer's @c MRIxfmCRS2XYZtkreg() exactly
- *               (the same convention MNE-Python's @c _read_mri_info
- *               returns) so source-space and BEM tooling stay
- *               coordinate-compatible.
- *             - @c voxelDataAsFloat() flattens the slice-of-slices
- *               representation back into the column-major x-fastest
- *               buffer that downstream resamplers and exporters expect,
- *               promoting UCHAR / SHORT / INT inputs to float on the fly.
- *             - @c read() inspects the path suffix and dispatches to
- *               @ref MriMghIO (.mgh / .mgz), @ref MriNiftiIO
- *               (.nii / .nii.gz), or the COR directory loader, giving
- *               callers a single \"load whatever this is\" entry point.
+ * - @c voxToSurfRAS() / @c surfRASToVox() build the
+ * canonical 4\u00d74 affines from the MGH @c Mdc direction-
+ * cosine matrix, @c spacing vector and @c c_ras centre,
+ * matching FreeSurfer's @c MRIxfmCRS2XYZtkreg() exactly
+ * (the same convention MNE-Python's @c _read_mri_info
+ * returns) so source-space and BEM tooling stay
+ * coordinate-compatible.
+ * - @c voxelDataAsFloat() flattens the slice-of-slices
+ * representation back into the column-major x-fastest
+ * buffer that downstream resamplers and exporters expect,
+ * promoting UCHAR / SHORT / INT inputs to float on the fly.
+ * - @c read() inspects the path suffix and dispatches to
+ * @ref MriMghIO (.mgh / .mgz), @ref MriNiftiIO
+ * (.nii / .nii.gz), or the COR directory loader, giving
+ * callers a single \"load whatever this is\" entry point.
  */
 
 //=============================================================================================================

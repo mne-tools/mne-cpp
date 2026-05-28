@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2012-2026 MNE-CPP Authors
+// Copyright (c) 2012-2026
 //   Christoph Dinh <christoph.dinh@mne-cpp.org>
 //   Ruben Doerfel <doerfelruben@aol.com>
 //   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
@@ -7,37 +7,34 @@
 
 //=============================================================================================================
 /**
- * @file     mri_slicer.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * @file mri_slicer.h
  *
- * @brief    Orthogonal-plane resampler that turns a 3D @ref MriVolData into the 2D textures consumed by the slice viewer.
+ * @brief Orthogonal-plane resampler that turns a 3D @ref MriVolData into the 2D textures consumed by the slice viewer.
  *
- *           The slicer is the bridge between the format-specific MRI
- *           readers (@ref MriMghIO, @ref MriNiftiIO, @ref MriCorIO) and
- *           the @c MriSlicesPlugin / @c MriSlicesView widgets that
- *           render axial / coronal / sagittal cross-sections in
- *           @c mne_analyze_studio. Two cooperating types live here:
+ * The slicer is the bridge between the format-specific MRI
+ * readers (@ref MriMghIO, @ref MriNiftiIO, @ref MriCorIO) and
+ * the @c MriSlicesPlugin / @c MriSlicesView widgets that
+ * render axial / coronal / sagittal cross-sections in
+ * @c mne_analyze_studio. Two cooperating types live here:
  *
- *             - @ref SliceOrientation --- a strong enum picking the slicing
- *               axis (Axial / Coronal / Sagittal); used both as the user-
- *               facing radio-button value in the slice viewer and as the
- *               index-permutation key inside the slicer itself.
- *             - @ref MriSliceImage --- the result type: a normalised
- *               (0..1) @c Eigen::MatrixXf pixel buffer ready to upload
- *               as an OpenGL texture, paired with its own slice-to-RAS
- *               4\u00d74 transform so the viewer can overlay surface meshes,
- *               source estimates or fiducials in the correct world space
- *               without re-deriving the geometry from the volume header.
+ * - @ref SliceOrientation --- a strong enum picking the slicing
+ * axis (Axial / Coronal / Sagittal); used both as the user-
+ * facing radio-button value in the slice viewer and as the
+ * index-permutation key inside the slicer itself.
+ * - @ref MriSliceImage --- the result type: a normalised
+ * (0..1) @c Eigen::MatrixXf pixel buffer ready to upload
+ * as an OpenGL texture, paired with its own slice-to-RAS
+ * 4\u00d74 transform so the viewer can overlay surface meshes,
+ * source estimates or fiducials in the correct world space
+ * without re-deriving the geometry from the volume header.
  *
- *           The static @ref MriSlicer::extract() method does the actual
- *           work: it picks the right axis stride from the volume header,
- *           dispatches by on-disk voxel type (UCHAR / SHORT / INT /
- *           FLOAT) so quantisation matches the source, normalises by the
- *           per-volume max so windowing stays stable across slices, and
- *           composes @c sliceToRas from the volume's @c voxToSurfRAS()
- *           pre-multiplied by the orientation-specific in-slice affine.
+ * The static @ref MriSlicer::extract() method does the actual
+ * work: it picks the right axis stride from the volume header,
+ * dispatches by on-disk voxel type (UCHAR / SHORT / INT /
+ * FLOAT) so quantisation matches the source, normalises by the
+ * per-volume max so windowing stays stable across slices, and
+ * composes @c sliceToRas from the volume's @c voxToSurfRAS()
+ * pre-multiplied by the orientation-specific in-slice affine.
  */
 
 #ifndef MRI_SLICER_H
@@ -81,9 +78,12 @@ enum class SliceOrientation { Axial, Coronal, Sagittal };
 
 //=============================================================================================================
 /**
- * Holds extracted 2D slice image data from a 3D MRI volume.
+ * @brief Single 2D MRI cross-section produced by @ref MriSlicer (pixel buffer + RAS metadata).
  *
- * @brief Extracted MRI slice image.
+ * Carries one orthogonal-plane sample of a 3D @ref MriVolData ready for
+ * upload to the slice viewer: a normalised 8-bit grayscale pixel buffer,
+ * the in-volume slice index it was sampled at, and the bookkeeping the
+ * widget needs to map mouse picks back to RAS millimetres.
  */
 struct MRISHARED_EXPORT MriSliceImage
 {
@@ -97,12 +97,14 @@ struct MRISHARED_EXPORT MriSliceImage
 
 //=============================================================================================================
 /**
- * Provides static methods for extracting 2D slices from 3D MRI volumes.
+ * @brief Orthogonal-plane resampler (axial / coronal / sagittal) from @ref MriVolData to @ref MriSliceImage.
  *
- * Supports axial, coronal, and sagittal slice extraction with automatic
- * normalisation and RAS coordinate mapping.
- *
- * @brief MRI volume slicer.
+ * Pure @c static methods --- no instance state is owned. For a given
+ * orientation and slice index, samples the source volume at the matching
+ * row/column/depth plane, normalises voxel intensities into 8-bit grayscale
+ * via the volume's percentile-clipped window, and emits the result with
+ * the slice→RAS transform the viewer needs to draw rulers and crosshairs
+ * in millimetres.
  */
 class MRISHARED_EXPORT MriSlicer
 {

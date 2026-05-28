@@ -1,28 +1,25 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2026 MNE-CPP Authors
+// Copyright (c) 2026
 //   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
 //=============================================================================================================
 /**
- * @file     mri_cor_fif_io.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     February, 2026
+ * @file mri_cor_fif_io.cpp
  *
- * @brief    Implementation of @ref MRILIB::MriCorFifIO: block-and-tag serialiser that emits a FIFF MRI set from an in-memory @ref MriVolData.
+ * @brief Implementation of @ref MRILIB::MriCorFifIO: block-and-tag serialiser that emits a FIFF MRI set from an in-memory @ref MriVolData.
  *
- *           Drives a @ref FIFFLIB::FiffStream through the nested
- *           @c FIFFB_MRI / @c FIFFB_MRI_SET / @c FIFFB_MRI_SLICE block
- *           hierarchy declared in the header. For each slice it writes
- *           the geometry tags (@c FIFF_MRI_WIDTH / @c FIFF_MRI_HEIGHT and
- *           their metric counterparts), the slice\u2192MRI coordinate
- *           transform, the pixel-encoding selector, and the raw pixel
- *           buffer in the source's native @c FIFFV_MRI_PIXEL_BYTE /
- *           @c _WORD / @c _FLOAT encoding so reads through the FIFF
- *           toolchain reproduce the original sample-level data without
- *           quantisation drift.
- *           Ported from save_slices() / write_slice() in MNE C write_mri_set.c
- *           by Matti Hamalainen.
+ * Drives a @ref FIFFLIB::FiffStream through the nested
+ * @c FIFFB_MRI / @c FIFFB_MRI_SET / @c FIFFB_MRI_SLICE block
+ * hierarchy declared in the header. For each slice it writes
+ * the geometry tags (@c FIFF_MRI_WIDTH / @c FIFF_MRI_HEIGHT and
+ * their metric counterparts), the slice\u2192MRI coordinate
+ * transform, the pixel-encoding selector, and the raw pixel
+ * buffer in the source's native @c FIFFV_MRI_PIXEL_BYTE /
+ * @c _WORD / @c _FLOAT encoding so reads through the FIFF
+ * toolchain reproduce the original sample-level data without
+ * quantisation drift.
+ * Ported from save_slices() / write_slice() in MNE C write_mri_set.c
+ * by Matti Hamalainen.
  *
  */
 
