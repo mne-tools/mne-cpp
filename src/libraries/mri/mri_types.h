@@ -30,7 +30,6 @@
  * These constants originate from FreeSurfer's @c mri.h and were
  * ported via MNE C's @c mne_types_mne-c.h by Matti Hamalainen.
  */
-//=============================================================================================================
 
 #ifndef MRI_TYPES_H
 #define MRI_TYPES_H

@@ -56,7 +56,6 @@
  *
  * Ported from make_mgh_cor_set() in MNE C mne_make_cor_set by Matti Hamalainen.
  */
-//=============================================================================================================
 
 #ifndef MRI_MGH_IO_H
 #define MRI_MGH_IO_H

@@ -32,7 +32,6 @@
  * Ported from @c make_cor_set() in MNE C @c mne_make_cor_set
  * by Matti Hamalainen.
  */
-//=============================================================================================================
 
 #ifndef MRI_COR_IO_H
 #define MRI_COR_IO_H

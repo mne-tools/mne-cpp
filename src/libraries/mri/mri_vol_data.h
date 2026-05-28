@@ -38,7 +38,6 @@
  * Ported from @c mneMRIdataRec / @c mneMRIvolumeRec in MNE C
  * (@c mne_types_mne-c.h) by Matti Hamalainen.
  */
-//=============================================================================================================
 
 #ifndef MRI_VOL_DATA_H
 #define MRI_VOL_DATA_H

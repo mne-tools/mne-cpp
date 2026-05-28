@@ -47,7 +47,6 @@
  * Ported from save_slices() / write_slice() in MNE C write_mri_set.c
  * by Matti Hamalainen.
  */
-//=============================================================================================================
 
 #ifndef MRI_COR_FIF_IO_H
 #define MRI_COR_FIF_IO_H

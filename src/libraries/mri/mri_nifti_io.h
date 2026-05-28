@@ -35,7 +35,6 @@
  *
  * Format reference: https://nifti.nimh.nih.gov/nifti-1
  */
-//=============================================================================================================
 
 #ifndef MRI_NIFTI_IO_H
 #define MRI_NIFTI_IO_H

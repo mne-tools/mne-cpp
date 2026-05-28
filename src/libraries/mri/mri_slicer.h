@@ -34,7 +34,6 @@
  * composes @c sliceToRas from the volume's @c voxToSurfRAS()
  * pre-multiplied by the orientation-specific in-slice affine.
  */
-//=============================================================================================================
 
 #ifndef MRI_SLICER_H
 #define MRI_SLICER_H

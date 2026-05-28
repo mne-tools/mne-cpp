@@ -20,7 +20,6 @@
  * @c tools/validate_api_registry.py needs to confirm which MRI
  * library snapshot is wired into a deployed binary.
  */
-//=============================================================================================================
 
 #ifndef MRI_GLOBAL_H
 #define MRI_GLOBAL_H
