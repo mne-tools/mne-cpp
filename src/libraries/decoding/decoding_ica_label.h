@@ -1,34 +1,36 @@
 //=============================================================================================================
 /**
- * @file     ml_ica_label.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.3.0
- * @date     May, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file decoding_ica_label.h
+ * @since 2026
+ * @date  May 2026
+ * @brief Automatic ICA component labelling for artefact identification on M/EEG.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * After an independent-component analysis decomposition of an M/EEG
+ * recording the analyst is left with one source time course per
+ * component and must decide which sources represent brain activity and
+ * which are physiological or technical artefacts (eye blinks, lateral
+ * eye movements, heart-beat, muscle tonus, line noise). Doing that by
+ * hand is the dominant bottleneck of the cleaning pipeline; this
+ * module replaces it with a deterministic, reference-driven
+ * classifier that is fast enough to run in the GUI on every fit.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    MlIcaLabel class for automatic ICA component classification.
+ * The strategy is the same as the classic correlation-with-references
+ * approach used in @c mne.preprocessing.ICA.find_bads_eog /
+ * @c find_bads_ecg: for each component the maximum absolute Pearson
+ * correlation with the (possibly multi-channel) EOG and ECG reference
+ * traces is computed and compared against per-modality thresholds. A
+ * spectral heuristic estimating the fraction of power above 30 Hz is
+ * additionally used to flag muscle components, which dominate the
+ * high-frequency end of the EEG spectrum. The output is one
+ * @ref IcaLabelResult per component carrying the assigned
+ * @ref IcaComponentLabel and a confidence score in @f$[0, 1]@f$ that
+ * the higher-level workflow can threshold or visualise. The class is
+ * a static-only utility — there is no fitted state and no learned
+ * model file — which makes the labelling fully reproducible.
  */
 
 #ifndef DECODING_ICA_LABEL_H
@@ -63,7 +65,14 @@ namespace DECODINGLIB
 
 //=============================================================================================================
 /**
- * @brief Label assigned to an ICA component.
+ * @brief Categorical label assigned to a single ICA component.
+ *
+ * Spans the four artefact families that account for essentially all
+ * non-brain variance in scalp M/EEG — ocular, cardiac and muscular —
+ * plus a generic @c Other bucket for components that fail every
+ * specific check (line noise, channel pops, residual sensor jumps).
+ * @c Brain is the default and means "keep this component in the
+ * reconstruction".
  */
 enum class IcaComponentLabel
 {
@@ -76,7 +85,15 @@ enum class IcaComponentLabel
 
 //=============================================================================================================
 /**
- * @brief Result of labeling one ICA component.
+ * @brief Outcome of labelling a single ICA component.
+ *
+ * Pairs a component index with its winning @ref IcaComponentLabel and a
+ * confidence score in @f$[0, 1]@f$ derived from the underlying
+ * correlation or spectral statistic (for EOG/ECG: the maximum absolute
+ * Pearson correlation with the reference traces; for muscle: the
+ * fraction of power above 30 Hz). Downstream consumers typically
+ * threshold the score or render it next to the component topography so
+ * the user can override the automatic decision.
  */
 struct DECODINGSHARED_EXPORT IcaLabelResult
 {
@@ -89,11 +106,25 @@ struct DECODINGSHARED_EXPORT IcaLabelResult
 
 //=============================================================================================================
 /**
- * @brief Automatic ICA component labeling via correlation with reference signals.
+ * @brief Static utility that labels ICA components against EOG/ECG references and a muscle spectral heuristic.
  *
- * Classifies ICA components by correlating each source time course with EOG and ECG
- * reference channels.  Components with high temporal correlation to a reference are
- * labeled accordingly; remaining components are classified by their spectral profile.
+ * @ref classify walks the rows of the source matrix and applies, in
+ * order, the EOG correlation test, the ECG correlation test and the
+ * high-frequency muscle test; the first one whose score exceeds its
+ * threshold wins, otherwise the component is labelled @c Brain. The
+ * thresholds default to the canonical 0.3 used by the MNE-Python
+ * helpers and can be tightened or loosened per call. @ref findArtifactComponents
+ * is the convenience that returns just the indices of the rejected
+ * components in the order expected by the ICA reconstruction code,
+ * making it a one-liner to wire automatic cleaning into a real-time
+ * pipeline.
+ *
+ * The two scoring primitives — @ref maxAbsCorrelation and
+ * @ref muscleScore — are exposed publicly so an interactive viewer can
+ * display the per-component evidence behind each decision and let the
+ * user override the label without having to recompute the ICA itself.
+ * The class has no state, deleted constructor, and no virtual methods;
+ * it is purely a namespaced collection of pure functions.
  *
  * @code
  *   QList<IcaLabelResult> labels = MlIcaLabel::classify(

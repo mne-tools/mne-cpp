@@ -1,35 +1,35 @@
 //=============================================================================================================
 /**
- * @file     decoding_ssd.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.3.0
- * @date     May, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file decoding_ssd.cpp
+ * @since 2026
+ * @date  May 2026
+ * @brief Implementation of the Spatio-Spectral Decomposition narrowband enhancer.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * Internally band-passes the input continuous data twice — once for the
+ * signal band and once for the flanking noise band — with a zero-phase
+ * windowed-sinc FIR (forward + reverse pass), computes the two
+ * covariance matrices, shrinks the noise covariance towards a scaled
+ * identity by @c regParam, and solves the generalised eigenproblem
+ * @f$\Sigma_s w = \lambda \Sigma_n w@f$ via Eigen's
+ * @c GeneralizedSelfAdjointEigenSolver. The leading @c n_components
+ * eigenvectors are stored as filters; their pseudoinverse columns are
+ * stored as patterns and the eigenvalues themselves are kept verbatim
+ * as the per-component signal-band-to-noise-band power ratio that the
+ * caller uses to decide on the effective rank.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    DecodingSsd class implementation.
- *
+ * @ref DecodingSsd::transform returns the projection of the input
+ * into the (lower-dimensional) signal subspace, while
+ * @ref DecodingSsd::apply performs the low-rank back-projection
+ * @f$X_{\text{clean}} = A_{:,1:k} W_{1:k,:} X@f$ to produce a sensor-
+ * space denoised reconstruction with the broadband background
+ * suppressed but the narrowband oscillation of interest preserved.
+ * The bandpass kernel is generated on the fly per call: this trades a
+ * negligible amount of compute for the freedom to reuse the same fitted
+ * model with different sampling rates downstream.
  */
 
 //=============================================================================================================

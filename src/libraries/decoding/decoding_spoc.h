@@ -1,35 +1,36 @@
 //=============================================================================================================
 /**
- * @file     decoding_spoc.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.3.0
- * @date     May, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file decoding_spoc.h
+ * @since 2026
+ * @date  May 2026
+ * @brief Source Power Comodulation (SPoC) for regressing continuous targets onto narrowband M/EEG power.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * SPoC is the regression analogue of CSP: instead of two class
+ * covariances it solves the generalised eigenproblem
+ * @f$\Sigma_z w = \lambda \Sigma w@f$ where @f$\Sigma@f$ is the
+ * trial-averaged covariance of band-passed epochs and @f$\Sigma_z@f$ is
+ * the same covariance weighted (and centred) by the per-trial target
+ * variable @f$z@f$. The leading eigenvector therefore extracts a
+ * spatial filter whose epoch-wise band-power envelope maximally
+ * covaries with the external regressor, which can be a behavioural
+ * score, a stimulus parameter, a haemodynamic signal recorded in
+ * parallel, or any other continuous label. The method was introduced
+ * by Dähne, Meinecke, Haufe, Höhne, Tangermann, Müller & Nikulin,
+ * *SPoC: a novel framework for relating the amplitude of neuronal
+ * oscillations to behaviorally relevant parameters*, NeuroImage 86,
+ * 2014.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    DecodingSpoc class declaration.
- *
+ * @ref DecodingSpoc mirrors @c mne.decoding.SPoC and reuses the same
+ * @c fit / @c transform / @c fitTransform scikit-learn pattern as
+ * @ref DecodingCsp, including the @c AveragePower vs @c CspSpace
+ * @c TransformMode switch and the optional log / z-score normalisation
+ * of the band-power features. Inputs are expected to be already
+ * band-passed (SPoC has no spectral component of its own) and the
+ * target vector must be aligned one-to-one with the epoch list.
  */
 
 #ifndef DECODING_SPOC_H
@@ -61,20 +62,29 @@ namespace DECODINGLIB{
 
 //=============================================================================================================
 /**
- * @brief Source Power Comodulation (SPoC) for M/EEG signal decomposition.
+ * @brief Source Power Comodulation decoder for continuous-target regression on band-power.
  *
- * Mirrors mne.decoding.SPoC from MNE-Python. SPoC finds spatial filters
- * whose band-power envelope maximally covaries with a continuous target
- * variable. The core GED is implemented inline.
+ * Estimates a bank of spatial filters whose log band-power envelope is
+ * maximally correlated with a continuous trial-level target. The fit
+ * builds the unweighted trial-mean covariance and a target-weighted
+ * covariance from centred labels, solves the resulting generalised
+ * eigenvalue problem, and keeps the top @c n_components eigenvectors as
+ * filters and the columns of their pseudoinverse as the corresponding
+ * activation patterns. As with CSP, the patterns — not the filters —
+ * are the quantity that should be plotted as topographies when
+ * interpreting which cortical sources drive the regression, in line
+ * with Haufe et al. 2014.
  *
- * MNE-specific additions:
- * - transform_into modes: AveragePower (default) or CspSpace
- * - Log or z-score standardisation of band-power features
- * - Mean and standard deviation for z-score normalisation
+ * After @ref fit the decoder behaves as a deterministic feature
+ * extractor. @c AveragePower returns one (optionally log- or
+ * z-scored) band-power value per component and epoch, which plugs
+ * directly into a linear regressor; @c CspSpace returns the time-
+ * resolved filtered signal, useful when the downstream model consumes
+ * envelopes or instantaneous phase. Inputs must be epoched and already
+ * filtered in the relevant frequency band; the target vector @f$z@f$
+ * is a real-valued vector of length @c n_epochs.
  *
- * Input data: each epoch is (n_channels × n_times).
- *
- * @see mne.decoding.SPoC in MNE-Python
+ * @see DECODINGLIB, @c mne.decoding.SPoC
  */
 class DECODINGSHARED_EXPORT DecodingSpoc
 {

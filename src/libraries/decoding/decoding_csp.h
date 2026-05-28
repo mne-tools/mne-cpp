@@ -1,35 +1,38 @@
 //=============================================================================================================
 /**
- * @file     decoding_csp.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.3.0
- * @date     May, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file decoding_csp.h
+ * @since 2026
+ * @date  May 2026
+ * @brief Common Spatial Patterns (CSP) for two-class discriminative spatial filtering of band-passed M/EEG.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * CSP finds spatial filters @f$w@f$ that maximise the variance of
+ * narrow-band M/EEG for one class while simultaneously minimising it
+ * for the other; equivalently, it diagonalises the per-class covariance
+ * matrices @f$\Sigma_1@f$ and @f$\Sigma_2@f$ jointly via the
+ * generalised eigenvalue problem
+ * @f$\Sigma_1 w = \lambda (\Sigma_1 + \Sigma_2) w@f$. The components
+ * with the largest and smallest eigenvalues carry the strongest
+ * class-discriminative band-power and form the standard 2-class motor
+ * imagery feature set used since Koles (1990) and popularised for BCI
+ * by Blankertz, Tomioka, Lemm, Kawanabe & Müller, *Optimizing Spatial
+ * Filters for Robust EEG Single-Trial Analysis*, IEEE Signal Processing
+ * Magazine 25(1), 2008.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    DecodingCsp class declaration.
- *
+ * @ref DecodingCsp mirrors the public surface of @c mne.decoding.CSP
+ * but implements the GED inline with Eigen so no LAPACK dependency is
+ * required, which matters for the WebAssembly target. Beyond the
+ * upstream algorithm it provides the @c TransformMode switch
+ * (@c AveragePower returns one log- or z-scored band-power feature per
+ * component and epoch; @c CspSpace returns the time-resolved
+ * projection), the closed-form @c inverseTransform back to sensor space
+ * via the patterns matrix, and persistent @c mean / @c stddev vectors
+ * for cross-session normalisation. Inputs are always epoched and
+ * already band-passed in the discriminative frequency range — CSP itself
+ * is purely spatial.
  */
 
 #ifndef DECODING_CSP_H
@@ -61,20 +64,33 @@ namespace DECODINGLIB{
 
 //=============================================================================================================
 /**
- * @brief Common Spatial Patterns (CSP) for M/EEG signal decomposition.
+ * @brief Common Spatial Patterns decoder for two-class discriminative spatial filtering.
  *
- * Mirrors the public API of mne.decoding.CSP from MNE-Python. The core
- * The core GED computation is implemented inline. This class adds
- * MNE-specific features:
+ * Estimates the joint diagonaliser of two class-conditional covariance
+ * matrices estimated from labelled, band-passed epochs and exposes the
+ * top and bottom @c n_components eigenvectors as a bank of spatial
+ * filters; the corresponding patterns (the columns of the pseudoinverse
+ * of the filter matrix) describe the sensor-space activity that each
+ * filter is sensitive to and are what should be plotted as topographies
+ * for neurophysiological interpretation, as discussed by Haufe et al.
+ * 2014. After @ref fit the class works as a deterministic feature
+ * extractor: @ref transform reduces an epoch tensor either to one
+ * log-power (or z-scored) value per component (@c AveragePower, the
+ * standard input to an LDA / logistic-regression classifier) or to the
+ * full time-resolved projection (@c CspSpace, useful for downstream
+ * Riemannian or deep-learning stages).
  *
- * - transform_into modes: AveragePower (default) or CspSpace
- * - Log or z-score standardisation of band-power features
- * - Inverse transform from feature space back to sensor space
- * - Mean and standard deviation for z-score normalisation
+ * The implementation expects exactly two unique class labels in @c y
+ * and epochs already restricted to the discriminative frequency band
+ * (e.g.\ 8–30 Hz for sensorimotor rhythms); no regularisation is
+ * applied to the covariance estimate, so callers should ensure enough
+ * trials per class to avoid the ill-conditioned regime that motivates
+ * the regularised variants of Lotte & Guan 2011. @ref inverseTransform
+ * provides the closed-form back-projection of a power-feature vector
+ * into sensor space, which is what the application layer uses to render
+ * CSP topographies side-by-side with the discriminative scores.
  *
- * Input data convention: each epoch is (n_channels × n_times).
- *
- * @see mne.decoding.CSP in MNE-Python
+ * @see DECODINGLIB, @c mne.decoding.CSP
  */
 class DECODINGSHARED_EXPORT DecodingCsp
 {

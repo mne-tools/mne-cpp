@@ -1,35 +1,31 @@
 //=============================================================================================================
 /**
- * @file     decoding_global.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.3.0
- * @date     May, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file decoding_global.h
+ * @since 2026
+ * @date  May 2026
+ * @brief Export/import macros and build-info entry points for DECODINGLIB.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * DECODINGLIB groups the supervised- and unsupervised-decomposition
+ * algorithms that turn raw M/EEG into discriminative or regressable
+ * features for brain-computer interfaces and pattern-recognition
+ * pipelines: Common Spatial Patterns (CSP), Source Power Comodulation
+ * (SPoC), Spatio-Spectral Decomposition (SSD), and ICA component
+ * labelling. All of these algorithms share the same mathematical
+ * skeleton — a generalised eigenvalue problem on two covariance
+ * matrices — which is why they live in one compilation unit and not in
+ * @c rtprocessing or @c dsp.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    decoding library export/import macros.
- *
+ * The header only declares the Qt @c Q_DECL_EXPORT / @c Q_DECL_IMPORT
+ * macro plus the build-stamp accessors used by the version probe in the
+ * applications layer; the actual algorithms are declared in
+ * @ref decoding_csp.h, @ref decoding_spoc.h, @ref decoding_ssd.h and
+ * @ref decoding_ica_label.h. Keeping the export macro in its own
+ * translation unit lets us link DECODINGLIB statically (@c STATICBUILD)
+ * or as a shared library without touching the per-algorithm files.
  */
 
 #ifndef DECODING_GLOBAL_H
@@ -62,12 +58,27 @@
 //=============================================================================================================
 /**
  * @namespace DECODINGLIB
- * @brief     M/EEG signal decoding (CSP, SPoC, SSD, LinearModel).
+ * @brief     Supervised and unsupervised spatial-filter decompositions for M/EEG decoding.
  *
- * Mirrors the public API of mne.decoding from MNE-Python. Classes in this
- * library implement the core decomposition algorithms inline while
- * adding MNE-specific features such as transform modes, feature
- * standardisation, and inverse transforms.
+ * DECODINGLIB exposes a small, deliberately scikit-learn-shaped API
+ * (@c fit, @c transform, @c fitTransform, @c inverseTransform) around
+ * the four spatial-filter families that dominate BCI and biomarker work
+ * on continuous and epoched M/EEG: CSP for binary class-discriminative
+ * power, SPoC for regressing a continuous target onto band-power, SSD
+ * for noise-aware narrowband enhancement, and an ICA component
+ * labeller for automatic artefact tagging. The public surface mirrors
+ * @c mne.decoding so that a pipeline prototyped in MNE-Python can be
+ * ported one-to-one into a real-time mne-cpp application.
+ *
+ * Every algorithm reduces to a generalised eigendecomposition of two
+ * symmetric positive-definite covariance matrices, computed inline with
+ * Eigen rather than delegated to LAPACK; this keeps the library free of
+ * heavyweight numerical dependencies and makes it trivially usable from
+ * the WebAssembly build. MNE-specific extensions on top of the
+ * upstream Python API are the explicit @c TransformMode enums
+ * (@c AveragePower vs raw @c CspSpace projection), opt-in log or
+ * z-score normalisation of band-power features, and a closed-form
+ * inverse-transform back to sensor space.
  */
 namespace DECODINGLIB{
 

@@ -1,35 +1,31 @@
 //=============================================================================================================
 /**
- * @file     decoding_csp.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.3.0
- * @date     May, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file decoding_csp.cpp
+ * @since 2026
+ * @date  May 2026
+ * @brief Implementation of the Common Spatial Patterns decoder.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * Estimates the per-class covariance matrices from a list of labelled,
+ * band-passed epochs, solves the generalised eigenproblem
+ * @f$\Sigma_1 w = \lambda (\Sigma_1 + \Sigma_2) w@f$ with Eigen's
+ * @c GeneralizedSelfAdjointEigenSolver, and keeps the @c n_components
+ * eigenvectors with the largest and smallest eigenvalues as the bank of
+ * spatial filters; the corresponding activation patterns are recovered
+ * from the pseudoinverse computed via a thin SVD so that ill-conditioned
+ * filter matrices degrade gracefully instead of throwing.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    DecodingCsp class implementation.
- *
+ * @ref DecodingCsp::transform reduces an epoch tensor either to one
+ * log-transformed (or z-scored) band-power value per component or to
+ * the time-resolved CSP-space projection, depending on the
+ * @c TransformMode selected at construction. @ref DecodingCsp::inverseTransform
+ * maps a power-feature matrix back to sensor space by weighting the
+ * patterns with the per-feature scores, which is what the application
+ * layer uses to render CSP topographies side-by-side with the
+ * classification output.
  */
 
 //=============================================================================================================
