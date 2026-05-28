@@ -1,75 +1,67 @@
-{/* SPDX-License-Identifier: BSD-3-Clause */}
-{/* Copyright (c) 2026 MNE-CPP Authors */}
-{/*   Christoph Dinh <christoph.dinh@mne-cpp.org> */}
 ---
 id: index
-title: "MNE-CPP API Reference"
+title: MNE-CPP API Reference
+sidebar_label: Overview
 sidebar_position: 0
 slug: /api
 ---
+
+{/* SPDX-License-Identifier: BSD-3-Clause */}
+{/* Copyright (c) 2026 MNE-CPP Authors */}
+{/*   Christoph Dinh <christoph.dinh@mne-cpp.org> */}
 
 # MNE-CPP API Reference
 
 This section is the canonical reference for every public class in the
 MNE-CPP C++ libraries. It is generated automatically from the in-source
-Doxygen comments and a curated registry of public symbols, so the API
-view always matches the headers that ship with the build.
+Doxygen comments and a curated registry of public symbols, so the view
+you see here always matches the headers that ship with the build.
 
-The registry is maintained at
-[`doc/api_registry.json`](https://github.com/mne-tools/mne-cpp/blob/main/doc/api_registry.json)
-and the generation pipeline is specified by
-[TASK 18 in the v2.3.0 dev-notes](https://github.com/mne-tools/mne-cpp/blob/staging/doc/dev-notes/v2.3.0-requirements.md).
+The registry lives at
+[`doc/api_registry.json`](https://github.com/mne-tools/mne-cpp/blob/staging/doc/api_registry.json)
+and the generator is implemented in
+[`tools/doxy2mdx/doxy2mdx.py`](https://github.com/mne-tools/mne-cpp/blob/staging/tools/doxy2mdx/doxy2mdx.py).
 
-## Modules
+## How to use this reference
 
-The first-pass coverage milestone covers the following twelve
-libraries. Each link lands on the auto-generated index for that
-module.
+- Pick a **library** from the sidebar on the left (`FIFFLIB`, `MNELIB`,
+  `FWDLIB`, …). Each library expands into the public classes and
+  header-level modules it ships.
+- **Class pages** list the public **Signals**, **Public Slots**,
+  **Public Methods** and **Static Methods** with full Doxygen-derived
+  signatures, parameter descriptions and KaTeX-rendered math. The
+  right-hand table of contents lets you jump between members.
+- **Module pages** document headers that contain free functions instead
+  of a C++ class (for example `Sphara`, `PeakFinder`, `InvConvenience`).
+- Pages that have a worked example in
+  [`src/examples/`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples)
+  surface it inline in a dedicated **Example** section so you have a
+  runnable starting point.
 
-| Module | Description | Reference |
-| --- | --- | --- |
-| `fiff` | FIFFLIB — FIFF I/O | [/api/fiff/](/api/fiff/) |
-| `mne` | MNELIB — Core Data Structures | [/api/mne/](/api/mne/) |
-| `fwd` | FWDLIB — Forward Modeling | [/api/fwd/](/api/fwd/) |
-| `inv` | INVLIB — Inverse Solutions | [/api/inv/](/api/inv/) |
-| `dsp` | DSPLIB — Signal Processing | [/api/dsp/](/api/dsp/) |
-| `disp` | DISPLIB — 2D Visualization | [/api/disp/](/api/disp/) |
-| `disp3D` | DISP3DLIB — 3D Visualization | [/api/disp3D/](/api/disp3D/) |
-| `fs` | FSLIB — FreeSurfer | [/api/fs/](/api/fs/) |
-| `mri` | MRILIB — MRI / Anatomy | [/api/mri/](/api/mri/) |
-| `connectivity` | CONNLIB — Connectivity | [/api/connectivity/](/api/connectivity/) |
-| `realtime` | Real-time acquisition & streaming | [/api/realtime/](/api/realtime/) |
-| `utils` | UTILSLIB — Utilities | [/api/utils/](/api/utils/) |
+## Generation pipeline
 
-:::note
-Pages for individual classes are written to `docs/api/<module>/*.mdx`
-by `tools/doxy2mdx/doxy2mdx.py` and are excluded from version
-control. Run `doc/build-api-docs.sh` (or trigger the `api-docs`
-GitHub workflow) to populate them.
-:::
+```mermaid
+flowchart LR
+    A[src/libraries/**/*.h] --> B[doxygen]
+    B --> C[doc/xml_out/xml/]
+    C --> D[doxy2mdx.py]
+    R[(api_registry.json)] --> D
+    D --> E[docs/api/*.mdx]
+    D --> F[sidebars.api.generated.ts]
+    E --> G[Docusaurus]
+    F --> G
+    G --> H[/api]
+```
 
-## How is this page generated?
-
-The pipeline has three stages and is invoked end-to-end by
-[`doc/build-api-docs.sh`](https://github.com/mne-tools/mne-cpp/blob/staging/doc/build-api-docs.sh):
-
-1. **Doxygen** parses the public headers in `src/libraries/**` using
-   [`doc/Doxyfile`](https://github.com/mne-tools/mne-cpp/blob/staging/doc/Doxyfile)
-   and writes XML to `doc/xml_out/xml/`.
-2. **`tools/doxy2mdx/doxy2mdx.py`** translates the XML into MDX
-   pages, cross-referencing the registry to drop unregistered
-   internals and emitting a deterministic `sidebars.api.generated.ts`
-   fragment.
-3. **Docusaurus** consumes the MDX plus the sidebar fragment to
-   render the navigable `/api/` section you are reading. Math is
-   rendered through KaTeX (`remark-math` + `rehype-katex`) and code
-   blocks are highlighted via Prism with `cpp`, `cmake` and `bash`
-   support.
+Reproduce locally with
+[`doc/build-api-docs.sh`](https://github.com/mne-tools/mne-cpp/blob/staging/doc/build-api-docs.sh).
+The generator refuses to write a sidebar when a registered
+`documented: true` entry has no corresponding Doxygen XML, so the public
+surface and the docs stay in lock-step.
 
 ## Adding a new public class
 
-1. Add a new entry to `doc/api_registry.json` under `classes`. The
-   minimum schema is:
+1. Add an entry to `doc/api_registry.json` under `classes`:
 
    ```json
    {
@@ -77,17 +69,17 @@ The pipeline has three stages and is invoked end-to-end by
      "module": "fiff",
      "header": "fiff/my_class.h",
      "origin": "custom",
-     "documented": true
+     "documented": true,
+     "sidebar_position": 50,
+     "example": "ex_my_class"
    }
    ```
 
-2. Make sure the header carries a Doxygen `@brief` and the SPDX
-   header block introduced by TASK 17.
-3. Re-run `doc/build-api-docs.sh` — the validator will fail the
-   build if the registered class cannot be resolved in the Doxygen
-   XML, or if a public class is found in Doxygen output that is not
-   in the registry.
-
-For the full schema and contribution workflow see
-[`doc/api_registry.json`](https://github.com/mne-tools/mne-cpp/blob/main/doc/api_registry.json)
-and the TASK 18 specification.
+2. Make sure the header has Doxygen `/** ... */` blocks for the class
+   and every public member you want to surface.
+3. (Optional) Add a worked example under `src/examples/ex_my_class/`
+   and reference its directory name from the `example` field. The
+   first contiguous block of code from `main.cpp` is embedded into the
+   generated class page.
+4. Run `doc/build-api-docs.sh` and verify your class appears at
+   `/api/<module>/<my-class>`.

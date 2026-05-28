@@ -517,6 +517,74 @@ def _escape_mdx_bare_lt(content: str) -> str:
     return "".join(out)
 
 
+def _render_example_section(reg_entry: dict,
+                            repo_root: Path,
+                            lines: List[str]) -> None:
+    """Append an ``## Example`` section sourced from
+    ``src/examples/<example>/main.cpp`` when the registry entry has a
+    non-null ``example`` field.  Always emits the section header so the
+    right-hand table of contents stays consistent across pages."""
+    example = reg_entry.get("example")
+    if not example:
+        return
+    ex_dir = repo_root / "src" / "examples" / example
+    main_cpp = ex_dir / "main.cpp"
+    gh_url = (f"https://github.com/mne-tools/mne-cpp/tree/staging/"
+              f"src/examples/{example}")
+    lines.append("## Example")
+    lines.append("")
+    if not main_cpp.exists():
+        lines.append(f":::warning[Example `{example}` not found]")
+        lines.append(f"The registry references `src/examples/{example}/` but no")
+        lines.append("`main.cpp` was found at that path.")
+        lines.append(":::")
+        lines.append("")
+        return
+    try:
+        body = main_cpp.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return
+    # Strip the SPDX/license header block (everything up to and
+    # including the first blank line after the leading comment block).
+    snippet = _strip_leading_comment(body)
+    lines.append(f"Source: [`src/examples/{example}/main.cpp`]({gh_url}/main.cpp)")
+    lines.append("")
+    lines.append("```cpp")
+    lines.append(snippet.rstrip())
+    lines.append("```")
+    lines.append("")
+
+
+def _strip_leading_comment(src: str) -> str:
+    """Remove leading SPDX / license / banner comments from a C++ source
+    file so the inlined example focuses on the runnable code. Loops over
+    contiguous blank lines, ``//`` line comments and ``/* ... */`` block
+    comments at the very top of the file.
+
+    Stops when a non-empty, non-comment line is reached or when an
+    ``#include`` directive appears (whichever comes first).
+    """
+    lines = src.splitlines()
+    i, n = 0, len(lines)
+    while i < n:
+        stripped = lines[i].lstrip()
+        if not stripped:
+            i += 1
+            continue
+        if stripped.startswith("//"):
+            i += 1
+            continue
+        if stripped.startswith("/*"):
+            # Consume the whole block comment.
+            while i < n and "*/" not in lines[i]:
+                i += 1
+            i += 1  # past the closing */
+            continue
+        # First real code line.
+        break
+    return "\n".join(lines[i:])
+
+
 def generate_class_mdx(compounddef,
                        compound_name: str,
                        out_dir: Path,
@@ -647,6 +715,9 @@ def generate_class_mdx(compounddef,
         lines.append("")
         for f in static_funcs:
             _render_method(f, lines)
+
+    # --- Example (sourced from src/examples/<ex_id>/main.cpp) ---
+    _render_example_section(reg_entry, repo_root, lines)
 
     # --- Authors footer ---
     if authors:
@@ -869,6 +940,9 @@ def generate_module_mdx(xml_dir: Path,
         lines.append(":::")
         lines.append("")
 
+    # --- Example (sourced from src/examples/<ex_id>/main.cpp) ---
+    _render_example_section(reg_entry, repo_root, lines)
+
     if authors:
         lines.append("## Authors of this file")
         lines.append("")
@@ -890,6 +964,17 @@ def generate_module_mdx(xml_dir: Path,
 # ---------------------------------------------------------------------------
 # Sidebar fragment
 # ---------------------------------------------------------------------------
+
+def _short_module_label(mod: dict, fallback: str) -> str:
+    """Trim ``"FIFFLIB — FIFF I/O"`` style labels down to ``"FIFFLIB"`` so
+    the sidebar reads like ``FIFFLIB > FiffInfo`` similar to skigen."""
+    label = mod.get("sidebar_label_short") or mod.get("sidebar_label", fallback)
+    for sep in (" — ", " - ", " – ", ":"):
+        if sep in label:
+            label = label.split(sep, 1)[0].strip()
+            break
+    return label
+
 
 def generate_sidebar_fragment(sidebar_out: Path, out_dir: Path) -> None:
     groups: Dict[str, List[dict]] = defaultdict(list)
@@ -923,7 +1008,9 @@ def generate_sidebar_fragment(sidebar_out: Path, out_dir: Path) -> None:
         categories.append(
             "    {\n"
             "      type: 'category',\n"
-            f"      label: {json.dumps(mod.get('sidebar_label', mod_name), ensure_ascii=False)},\n"
+            f"      label: {json.dumps(_short_module_label(mod, mod_name), ensure_ascii=False)},\n"
+            "      collapsible: true,\n"
+            "      collapsed: true,\n"
             "      items: [\n"
             + ",\n".join(items) + "\n"
             "      ],\n"
