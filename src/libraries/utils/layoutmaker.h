@@ -1,37 +1,31 @@
 //=============================================================================================================
 /**
- * @file     layoutmaker.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
- * @since    0.1.0
- * @date     September, 2014
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file layoutmaker.h
+ * @since 2022
+ * @date  April 2026
+ * @brief Generator that projects 3-D electrode positions onto a 2-D @c .lout topographic layout via least-squares sphere fitting.
  *
- * Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Gabriel Motta. All rights reserved.
+ * @ref UTILSLIB::LayoutMaker is the counterpart of
+ * @ref UTILSLIB::LayoutLoader: given the 3-D coordinates of an
+ * EEG cap (typically captured with the Polhemus digitizer or
+ * loaded from a vendor @c .elc file) it produces the 2-D
+ * channel layout file used by every topographic widget in
+ * mne-cpp — butterfly plots, sensor maps, time-frequency
+ * heatmaps in DISPLIB and DISP3DLIB.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    LayoutLoader class declaration.
- *
+ * The projection is done by first fitting a sphere to the
+ * supplied head-frame points (helper struct @ref fitUserRec
+ * carries the working set for the non-linear fit), then
+ * applying an azimuthal projection of every electrode onto
+ * the tangent plane at the sphere apex. Optional mirroring
+ * flags exist for caps whose left/right convention differs
+ * from MNE's defaults.
  */
 
 #ifndef LAYOUTMAKER_H

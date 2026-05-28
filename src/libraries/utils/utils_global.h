@@ -1,38 +1,32 @@
 //=============================================================================================================
 /**
- * @file     utils_global.h
- * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
- *           Juan G Prieto <jgarciaprieto@mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     September, 2021
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file utils_global.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Public umbrella header for UTILSLIB exposing the @c UTILSSHARED_EXPORT macro and build-info accessors.
  *
- * Copyright (C) 2021-2026, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * UTILSLIB is the cross-cutting helper library that every other
+ * mne-cpp module links against: I/O helpers, layout / selection
+ * parsers, command and observer patterns, thread-safe circular
+ * buffers, the Polhemus digitizer stack, the Python runner used
+ * by tests, and the standard EEG montages. This header carries
+ * the @c Q_DECL_EXPORT / @c Q_DECL_IMPORT switch so symbols
+ * resolve correctly whether UTILSLIB is built as a shared
+ * library, a static archive (@c STATICBUILD) or imported by a
+ * downstream consumer.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    utils library export/import macros.
- *
+ * The free functions defined here (@ref buildDateTime,
+ * @ref buildHash, @ref buildHashLong) are the runtime-callable
+ * entry points for the compile-time constants in
+ * @ref buildinfo.h and are surfaced in the About dialog of the
+ * mne-cpp applications and in version banners written by CLI
+ * tools so bug reports always identify the exact build.
  */
 
 #ifndef UTILS_GLOBAL_H

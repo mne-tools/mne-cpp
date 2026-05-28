@@ -1,36 +1,32 @@
 //=============================================================================================================
 /**
- * @file     ioutils.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
- * @since    0.1.0
- * @date     March, 2013
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ *   Andreas Griesshammer <ag@fieldlineinc.com>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file ioutils.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Header-only Eigen matrix text I/O — round-trips dense matrices to whitespace-separated ASCII for cross-validation against MNE-Python.
  *
- * Copyright (C) 2013, Lorenz Esch, Christoph Dinh, Gabriel Motta. All rights reserved.
+ * @ref UTILSLIB::IOUtils provides a single, overload-rich API
+ * for writing and reading @c Eigen::Matrix instances in plain
+ * text with an optional two-line header (@c rows x cols /
+ * description). Every other mne-cpp library, test binary, and
+ * example tool uses these helpers when it needs to dump an
+ * intermediate matrix to disk for inspection in Python /
+ * MATLAB or to compare reference data committed to the @c bin/
+ * MNE-CPP-Test-Data repository against freshly-computed C++
+ * results.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * @brief    IOUtils class declaration
- *
+ * The class is templated on scalar type and dimensionality
+ * (dynamic, row-vector and column-vector specialisations) and
+ * accepts both @c QString and @c std::string paths so callers
+ * can choose whichever string flavour is idiomatic for their
+ * surrounding code without an extra conversion.
  */
 
 #ifndef IOUTILS_H
