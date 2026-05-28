@@ -3,7 +3,6 @@ id: index
 title: MNE-CPP API Reference
 sidebar_label: Overview
 sidebar_position: 0
-slug: /api
 ---
 
 {/* SPDX-License-Identifier: BSD-3-Clause */}
@@ -46,31 +45,65 @@ and the generator is implemented in
 
 ## Libraries and namespaces
 
-The sidebar groups every public class by the C++ library it ships in.
-The table below maps each sidebar entry to its `*LIB` namespace and the
-source folder that backs it.
+MNE-CPP provides a modular set of cross-platform C++ libraries built on
+[Qt](https://www.qt.io/) and [Eigen](http://eigen.tuxfamily.org/). All
+MNE-CPP applications — MNE Scan, MNE Analyze, MNE Anonymize, and the
+command-line tools — are built solely on these libraries, so any
+functionality available in an application can also be used
+programmatically. The libraries are organised in layers: low-level I/O
+and math utilities at the bottom, domain-specific processing in the
+middle, and visualization at the top.
 
-| Sidebar label                         | C++ namespace        | Source folder                |
-| ------------------------------------- | -------------------- | ---------------------------- |
-| FIFF Library                          | `FIFFLIB`            | `src/libraries/fiff`         |
-| MNE Library                           | `MNELIB`             | `src/libraries/mne`          |
-| Forward Library                       | `FWDLIB`             | `src/libraries/fwd`          |
-| Inverse Library                       | `INVERSELIB`         | `src/libraries/inverse`      |
-| DSP Library                           | `RTPROCESSINGLIB`    | `src/libraries/rtprocessing` |
-| Connectivity Library                  | `CONNECTIVITYLIB`    | `src/libraries/connectivity` |
-| Decoding Library                      | `DECODINGLIB`        | `src/libraries/decoding`     |
-| Machine Learning Library              | `MNECPP_ML`          | `src/libraries/mne_ml`       |
-| Statistics Library                    | `STATSLIB`           | `src/libraries/statistics`   |
-| FreeSurfer Library                    | `FSLIB`              | `src/libraries/fs`           |
-| Math Library                          | `UTILSLIB` (math)    | `src/libraries/utils/math`   |
-| MRI Library                           | `MRILIB`             | `src/libraries/mri`          |
-| BIDS Library                          | `BIDSLIB`            | `src/libraries/bids`         |
-| Utilities Library                     | `UTILSLIB`           | `src/libraries/utils`        |
-| Communication Library                 | `COMMUNICATIONLIB`   | `src/libraries/communication`|
-| LSL Library                           | `LSLLIB`             | `src/libraries/lsl`          |
-| MNA Library (Modular Architecture)    | `MNALIB`             | `src/libraries/mna`          |
-| Display Library                       | `DISPLIB`            | `src/libraries/disp`         |
-| 3D Display Library                    | `DISP3DLIB`          | `src/libraries/disp3D`       |
+### Core Libraries
+
+| Library | Namespace | Purpose |
+|---------|-----------|---------|
+| [**Utils**](/docs/api/utils/) | `UTILSLIB` | Shared utilities: I/O helpers, spectral analysis, layout management, and warp algorithms |
+| [**Math**](/docs/api/math/) | `MATHLIB` | Mathematical algorithms and geometry: linear algebra, optimization, spectral estimation, K-Means, sphere fitting |
+| [**Fs**](/docs/api/fs/) | `FSLIB` | FreeSurfer surface and annotation I/O |
+| [**Fiff**](/docs/api/fiff/) | `FIFFLIB` | FIFF file I/O and data structures (raw, epochs, evoked, covariance, forward) |
+| [**Mne**](/docs/api/mne/) | `MNELIB` | Core MNE data structures: source spaces, source estimates, hemispheres |
+| [**Mri**](/docs/api/mri/) | `MRILIB` | MRI volume and coordinate-system I/O (volumes, voxel geometry, transforms) |
+| [**Bids**](/docs/api/bids/) | `BIDSLIB` | BIDS dataset reading, writing, path construction, and sidecar metadata handling for iEEG/EEG/MEG |
+
+### Processing Libraries
+
+| Library | Namespace | Purpose |
+|---------|-----------|---------|
+| [**Fwd**](/docs/api/fwd/) | `FWDLIB` | Forward modelling: BEM and MEG/EEG lead field computation |
+| [**Inv**](/docs/api/inv/) | `INVLIB` | Inverse source estimation: MNE, dSPM, sLORETA, beamforming, dipole fitting, HPI fitting, RAP-MUSIC |
+| [**Dsp**](/docs/api/dsp/) | `DSPLIB` | Digital signal processing: filtering, spectrograms, real-time averaging, trigger detection, SPHARA, HPI, noise reduction |
+| [**Conn**](/docs/api/conn/) | `CONNLIB` | Functional connectivity metrics: Coherence, Cross-Correlation, PLV, PLI, WPLI, and variants |
+| [**Lsl**](/docs/api/lsl/) | `LSLLIB` | Lab Streaming Layer (LSL) integration for real-time data exchange |
+| [**Mna**](/docs/api/mna/) | `MNALIB` | MNA graph engine: analysis pipeline specification (`.mna`/`.mnx`), operator schemas, batch and stream execution |
+| [**Ml**](/docs/api/ml/) | `MLLIB` | Machine learning: ONNX Runtime inference, linear models, feature pipelines, scalers, tensors |
+| [**Sts**](/docs/api/sts/) | `STSLIB` | Statistics: t-tests, F-tests, cluster permutation, covariance estimators (Ledoit-Wolf, shrinkage), source-level metrics |
+
+### Visualization Libraries
+
+| Library | Namespace | Purpose |
+|---------|-----------|---------|
+| [**Disp**](/docs/api/disp/) | `DISPLIB` | 2D display widgets and visualization helpers: charts, topography, colour maps, `QWidget`-based viewers |
+| [**Disp3D**](/docs/api/disp3-d/) | `DISP3DLIB` | 3D brain visualization using the Qt RHI rendering backend: cortical surfaces, connectivity networks, BEM models, source estimates, digitizers — supports Metal, Vulkan, D3D, and OpenGL backends |
+
+Each library link above leads to its dedicated overview page with the
+architecture diagram, class inventory, MNE-Python and MNE-C
+cross-references, code examples, and gap analysis.
+
+## External API references
+
+The legacy auto-generated Doxygen HTML reference is still available
+alongside this site. Use these entry points to navigate it:
+
+| Section | Description |
+|---|---|
+| [Doxygen API Reference](https://mne-cpp.github.io/doxygen-api/) | Full auto-generated Doxygen HTML site |
+| [Namespace List](https://mne-cpp.github.io/doxygen-api/namespaces.html) | All namespaces with brief descriptions — one per library |
+| [Class List](https://mne-cpp.github.io/doxygen-api/annotated.html) | Alphabetical list of all classes, structs, and unions |
+| [Class Hierarchy](https://mne-cpp.github.io/doxygen-api/hierarchy.html) | Inheritance tree showing parent-child relationships |
+| [Class Members](https://mne-cpp.github.io/doxygen-api/functions.html) | Index of all documented class members |
+| [Namespace Members](https://mne-cpp.github.io/doxygen-api/namespacemembers.html) | All symbols declared at namespace scope |
+| [File List](https://mne-cpp.github.io/doxygen-api/files.html) | Source and header files with directory structure |
 
 ## Generation pipeline
 

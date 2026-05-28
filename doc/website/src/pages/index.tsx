@@ -22,7 +22,7 @@ const applications = [
     {
         title: 'C++ Library',
         description: 'Cross-platform API built on Qt & Eigen. Build your own neuroscience applications.',
-        link: '/docs/development/api',
+        link: '/docs/api',
         icon: 'img/icon_mne-lib_256x256.png',
     },
 ];
